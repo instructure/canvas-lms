@@ -30,6 +30,7 @@ describe 'appointment_canceled_by_user.twitter' do
 
     @message.body.should include('some title')
     @message.body.should include(user.name)
+    @message.main_link.should be_present
   end
 
   it "should render for groups" do
@@ -46,5 +47,6 @@ describe 'appointment_canceled_by_user.twitter' do
 
     @message.body.should include('some title')
     @message.body.should include(user.name)
+    @message.main_link.should be_present
   end
 end

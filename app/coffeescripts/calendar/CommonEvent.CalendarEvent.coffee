@@ -15,18 +15,19 @@ define [
       @deleteConfirmation = deleteConfirmation
       @deleteURL = contextInfo.calendar_event_url
 
-      @copyDataFromObject(data)
-
     copyDataFromObject: (data) =>
       data = data.calendar_event if data.calendar_event
       @object = @calendarEvent = data
-      @id = "calendar_event_#{data.id}"
+      @id = "calendar_event_#{data.id}" if data.id
       @title = data.title || "Untitled"
-      @start = if data.start_at then $.parseFromISO(data.start_at).time else null
-      @end = if data.end_at then $.parseFromISO(data.end_at).time else null
+      @start = @parseStartDate()
+      @originalStartDate = new Date(@start) if @start
+      @end = @parseEndDate()
+      @originalEndDate = new Date(@end) if @end
       @allDay = data.all_day
       @editable = true
       @lockedTitle = @object.parent_event_id?
+      @description = data.description
       @addClass "group_#{@contextCode()}"
       if @isAppointmentGroupEvent()
         @addClass "scheduler-event"
@@ -38,12 +39,15 @@ define [
           @addClass "scheduler-available"
         @editable = false
 
-      @description = data.description
+      super
 
-    startDate: () ->
+    startDate: () -> @originalStartDate
+    endDate: () -> @originalEndDate
+
+    parseStartDate: () ->
       if @calendarEvent.start_at then $.parseFromISO(@calendarEvent.start_at).time else null
 
-    endDate: () ->
+    parseEndDate: () ->
       if @calendarEvent.end_at then $.parseFromISO(@calendarEvent.end_at).time else null
 
     fullDetailsURL: () ->
@@ -53,12 +57,17 @@ define [
         $.replaceTags(@contextInfo.calendar_event_url, 'id', @calendarEvent.parent_event_id ? @calendarEvent.id)
 
     displayTimeString: () ->
-      semanticDateRange(@calendarEvent.start_at, @calendarEvent.end_at)
+        if @calendarEvent.all_day
+          date = this.startDate()
+          "<time datetime='#{date.toISOString()}'>#{$.dateString(date)}</time>"
+        else
+          semanticDateRange(@calendarEvent.start_at, @calendarEvent.end_at)
 
     saveDates: (success, error) =>
       @save {
         'calendar_event[start_at]': if @start then $.dateToISO8601UTC($.unfudgeDateForProfileTimezone(@start)) else ''
         'calendar_event[end_at]': if @end then $.dateToISO8601UTC($.unfudgeDateForProfileTimezone(@end)) else ''
+        'calendar_event[all_day]': @allDay
       }, success, error
 
     methodAndURLForSave: () ->

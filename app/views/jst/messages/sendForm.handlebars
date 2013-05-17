@@ -1,0 +1,16 @@
+<form action="{{location}}" method="post" class="bootstrap-form message-send-form">
+  <div class="fields">
+    <label for="message-send-body">{{#t "labels.message_body"}}Message{{/t}}</label>
+    <textarea name="message" class="input-xlarge" id="message-send-body"></textarea>
+
+    <input type="hidden" name="from" value="{{from}}" />
+    <input type="hidden" name="subject" value="{{subject}}" />
+    <input type="hidden" name="secure_id" value="{{secureId}}" />
+    <input type="hidden" name="message_id" value="{{messageId}}" />
+  </div>
+
+  <div class="actions">
+    <button type="submit" class="btn btn-primary">{{#t "labels.send_button"}}Send{{/t}}</button>
+  </div>
+</form>
+

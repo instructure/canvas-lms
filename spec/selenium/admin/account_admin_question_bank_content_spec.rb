@@ -4,10 +4,11 @@ require File.expand_path(File.dirname(__FILE__) + '/../helpers/external_tools_co
 describe "account admin question bank" do
   it_should_behave_like "in-process server selenium tests"
 
-  before (:each) do
+  before(:each) do
     admin_logged_in
     @question_bank = create_question_bank
     @question = create_question
+    @outcome = create_outcome
     get "/accounts/#{Account.default.id}/question_banks/#{@question_bank.id}"
   end
 
@@ -27,6 +28,24 @@ describe "account admin question bank" do
     bank.assessment_questions << question
     question
   end
+
+  def create_outcome (short_description = "good student")
+    outcome = Account.default.learning_outcomes.create!(
+        :short_description => short_description,
+        :rubric_criterion => {
+            :description => "test description",
+            :points_possible => 10,
+            :mastery_points => 9,
+            :ratings => [
+                {:description => "Exceeds Expectations", :points => 5},
+                {:description => "Meets Expectations", :points => 3},
+                {:description => "Does Not Meet Expectations", :points => 0}
+            ]
+        })
+    Account.default.root_outcome_group.add_outcome(outcome)
+    outcome
+  end
+
 
   def verify_added_question(name, question_text, chosen_question_type)
     question = AssessmentQuestion.find_by_name(name)
@@ -48,15 +67,20 @@ describe "account admin question bank" do
     multiple_choice_value = "multiple_choice_question"
     question_text = "what is the answer to #{name}?"
     f(".add_question_link").click
+    wait_for_ajaximations
     question_form = f(".question_form")
     question_form.find_element(:css, "[name='question_name']").send_keys(name)
     replace_content(question_form.find_element(:css, "[name='question_points']"), points)
+    wait_for_ajaximations
     click_option(".header .question_type", multiple_choice_value, :value)
+    wait_for_ajaximations
     type_in_tiny(".question_content", question_text)
+    wait_for_ajaximations
     answer_inputs = ff(".form_answers .select_answer input")
     answer_inputs[0].send_keys("correct answer")
     (1..3).each do |i|
       answer_inputs[i*2].send_keys("incorrect answer")
+      wait_for_ajaximations
     end
     submit_form(question_form)
     wait_for_ajaximations
@@ -65,15 +89,6 @@ describe "account admin question bank" do
 
   it "should add a multiple choice question" do
     add_multiple_choice_question
-  end
-
-  it "should delete a multiple choice question" do
-    hover_and_click("#question_#{@question.id} .delete_question_link")
-    driver.switch_to.alert.accept
-    wait_for_ajaximations
-    @question.reload
-    @question.workflow_state.should == "deleted"
-    f("#questions .question_name").should be_nil
   end
 
   it "should edit a multiple choice question" do
@@ -100,8 +115,10 @@ describe "account admin question bank" do
   it "should move question to another bank" do
     question_bank_2 = create_question_bank("bank 2")
     f(".move_question_link").click
+    wait_for_ajaximations
     f("#move_question_dialog #question_bank_#{question_bank_2.id}").click
-    submit_dialog("#move_question_dialog")
+    wait_for_ajaximations
+    submit_dialog("#move_question_dialog", '.submit_button')
     wait_for_ajaximations
     question_bank_2.assessment_questions.find_by_name(@question.name).should be_present
   end
@@ -117,6 +134,7 @@ describe "account admin question bank" do
 
   it "should edit bank details" do
     f(".edit_bank_link").click
+    wait_for_ajaximations
     question_bank_title = f("#assessment_question_bank_title")
     new_title = "bank 2"
     replace_content(question_bank_title, new_title)
@@ -130,7 +148,18 @@ describe "account admin question bank" do
     driver.switch_to.alert.accept
     wait_for_ajaximations
     @question_bank.reload
-    @question_bank.workflow_state.should == "deleted"
+    keep_trying_until { @question_bank.workflow_state.should == "deleted" }
+  end
+
+  it "should delete a multiple choice question" do
+    hover_and_click("#question_#{@question.id} .delete_question_link")
+    driver.switch_to.alert.accept
+    wait_for_ajaximations
+    @question.reload
+    keep_trying_until do
+      @question.workflow_state.should == "deleted"
+      fj("#questions .question_name").should be_nil
+    end
   end
 
   context "moving multiple questions" do
@@ -140,12 +169,13 @@ describe "account admin question bank" do
       questions.push @question
       question_count.times { |i| questions.push create_question("question #{question_number+i}") }
       f(".move_questions_link").click
-      wait_for_ajax_requests
+      wait_for_ajaximations
       question_list = ffj(".list_question:visible")
       question_list.count.should == questions.count
       question_list.each_with_index do |question, i|
         question.should include_text questions[i].name
         f("#list_question_#{questions[i].id}").click
+        wait_for_ajaximations
       end
       questions
     end
@@ -153,7 +183,7 @@ describe "account admin question bank" do
     def move_questions_validation(bank_name, questions)
       new_question_bank = AssessmentQuestionBank.find_by_title(bank_name)
       new_question_bank.should be_present
-      new_questions = AssessmentQuestion.all(:conditions => {:assessment_question_bank_id => new_question_bank.id})
+      new_questions = AssessmentQuestion.where(:assessment_question_bank_id => new_question_bank).all
       new_questions.should be_present
       new_questions.should == questions
     end
@@ -164,7 +194,7 @@ describe "account admin question bank" do
       questions.count.should == 3
       f("#bank_new").click
       f("#new_question_bank_name").send_keys(new_bank)
-      submit_dialog("#move_question_dialog")
+      submit_dialog("#move_question_dialog", '.submit_button')
       wait_for_ajaximations
       AssessmentQuestionBank.count.should == 2
       move_questions_validation(new_bank, questions)
@@ -177,74 +207,50 @@ describe "account admin question bank" do
       questions.count.should == 2
       f(".bank .bank_name").should include_text bank_name
       f("#question_bank_#{question_bank_2.id}").click
-      submit_dialog("#move_question_dialog")
+      submit_dialog("#move_question_dialog", '.submit_button')
       wait_for_ajaximations
       move_questions_validation(bank_name, questions)
     end
   end
 
   context "outcome alignment" do
-    before (:each) do
-      @outcome = create_outcome
-    end
-
-    def create_outcome (short_description = "good student")
-      ratings = [{:description => "Exceeds Expectations", :points => 5},
-                 {:description => "Meets Expectations", :points => 3},
-                 {:description => "Does Not Meet Expectations", :points => 0}]
-      rubric_criterion =
-          {:ratings => ratings,
-           :description => "test description", :points_possible => 10, :mastery_points => 9}
-      data = {:rubric_criterion => rubric_criterion}
-      outcome = LearningOutcome.create!(:short_description => short_description)
-      outcome.data = data
-      outcome.save
-      Account.default.learning_outcomes << outcome
-      outcome
-    end
-
-    def add_outcome_to_bank(outcome)
-      f(".add_outcome_link").click
+    def add_outcome_to_bank(outcome, mastery_percent = 60)
+      f('.add_outcome_link').click
+      wait_for_ajaximations
+      f('.outcome-link').click
+      wait_for_ajaximations
+      replace_content(f('#outcome_mastery_at'), mastery_percent)
+      fj('.btn-primary:visible').click
+      driver.switch_to.alert.accept
       wait_for_ajax_requests
-      short_description = outcome.short_description
-      f(".outcome_#{outcome.id} .short_description").should include_text short_description
-      f(".outcome_#{outcome.id} .select_outcome_link").click
-      wait_for_ajax_requests
-      f("[data-id = '#{outcome.id}']").should include_text short_description
+      fj("[data-id=#{outcome.id}]:visible").should include_text outcome.short_description
     end
 
     it "should align an outcome" do
-      mastery_points = @outcome[:data][:rubric_criterion][:mastery_points]
-      possible_points = @outcome[:data][:rubric_criterion][:points_possible]
-      percentage = mastery_points.to_f/possible_points.to_f
-      @question_bank.learning_outcome_tags.count.should == 0
+      mastery_points, possible_points = @outcome.data[:rubric_criterion].values_at(:mastery_points, :points_possible)
+      percentage = mastery_points.to_f / possible_points.to_f
       add_outcome_to_bank(@outcome)
-      f("[data-id = '#{@outcome.id}']").should include_text("#{(percentage*100).to_i}%")
-      @question_bank.reload
-      @question_bank.learning_outcome_tags.count.should be > 0
-      learning_outcome_tag = @question_bank.learning_outcome_tags.find_by_mastery_score(percentage)
+      fj("[data-id=#{@outcome.id}]:visible").should include_text("60%")
+      @question_bank.reload.learning_outcome_alignments.count.should be > 0
+      learning_outcome_tag = @question_bank.learning_outcome_alignments.find_by_mastery_score(0.6)
       learning_outcome_tag.should be_present
     end
 
     it "should change the outcome set mastery score" do
       f(".add_outcome_link").click
       wait_for_ajax_requests
-      mastery_percent = f("#outcome_question_bank_mastery_#{@outcome.id}")
-      percentage = "40"
-      replace_content(mastery_percent, percentage)
-      f(".outcome_#{@outcome.id} .select_outcome_link").click
-      wait_for_ajax_requests
-      f("[data-id = '#{@outcome.id}'] .content").should include_text("mastery at #{percentage}%")
-      learning_outcome_tag = AssessmentQuestionBank.last.learning_outcome_tags.find_by_mastery_score(0.4)
+      add_outcome_to_bank(@outcome, 40)
+      fj("[data-id=#{@outcome.id}]:visible .content").should include_text("mastery at 40%")
+      learning_outcome_tag = AssessmentQuestionBank.last.learning_outcome_alignments.find_by_mastery_score(0.4)
       learning_outcome_tag.should be_present
     end
 
     it "should delete an aligned outcome" do
       add_outcome_to_bank(@outcome)
-      f("[data-id='#{@outcome.id}'] .delete_outcome_link").click
+      fj("[data-id='#{@outcome.id}']:visible .delete_outcome_link").click
       driver.switch_to.alert.accept
       wait_for_ajaximations
-      f("[data-id='#{@outcome.id}'] .delete_outcome_link").should be_nil
+      fj("[data-id='#{@outcome.id}']:visible .delete_outcome_link").should be_nil
     end
   end
 end

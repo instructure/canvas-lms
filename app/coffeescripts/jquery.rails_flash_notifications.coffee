@@ -4,6 +4,7 @@ define [
   'underscore'
   'compiled/fn/preventDefault'
   'jqueryui/effects/drop'
+  'vendor/jquery.cookie'
 ], (I18n, _, preventDefault) ->
 
   $buffer = $("#flash_message_buffer")
@@ -12,23 +13,22 @@ define [
   $holder.on 'click', 'li', ->
     $this = $(this)
     return if $this.hasClass('no_close')
+    $.cookie('unsupported_browser_dismissed', '1') if $this.hasClass('unsupported_browser')
     $this.stop(true, true).remove()
-    if $this.hasClass('static_message')
-      $buffer.height _.reduce($holder.find('.static_message'),
-        (s, n) -> s + $(n).outerHeight()
-      , 0)
+    if (bufferIndex = $this.data('buffer-index'))?
+      $buffer.find("[data-buffer-index=#{bufferIndex}]").remove()
 
-  flashBox = (type, content, timeout) ->
+  flashBox = (type, content, timeout, cssOptions = {}) ->
     $node = $("""
-      <li class='ui-state-#{type}'>
+      <li class="ui-state-#{type}" role="alert">
         <i></i>
         #{content}
-        <a href='#' class='close_link'>#{I18n.t("close", "Close")}</a>
+        <a href="#" class="close_link icon-end">#{I18n.t("close", "Close")}</a>
       </li>
     """)
 
     $node.appendTo($holder).
-      css('z-index', 1).
+      css(_.extend(zIndex: 1, cssOptions)).
       show('drop', direction: "up", 'fast', -> $(this).css('z-index', 2)).
       delay(timeout || 7000).
       animate({'z-index': 1}, 0).
@@ -40,5 +40,10 @@ define [
 
   # Pops up a small error box at the top of the screen.
   $.flashError = (content, timeout) ->
-    flashBox("error", content, timeout);
+    flashBox("error", content, timeout)
 
+  $.screenReaderFlashMessage = (content, timeout = 3000) ->
+    flashBox('success', content, timeout, position: 'absolute', left: -10000)
+
+  $.screenReaderFlashError = (content, timeout = 3000) ->
+    flashBox('error', content, timeout, position: 'absolute', left: -10000)

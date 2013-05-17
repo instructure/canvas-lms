@@ -151,6 +151,91 @@
           </material>
         </itemfeedback>
       </item>
+      <item ident="OBJ_3983699" label="QUES_443669_123456" d2l_2p0:page="1">
+        <itemmetadata>
+          <qtimetadata>
+            <qti_metadatafield>
+              <fieldlabel>qmd_computerscored</fieldlabel>
+              <fieldentry>yes</fieldentry>
+            </qti_metadatafield>
+            <qti_metadatafield>
+              <fieldlabel>qmd_questiontype</fieldlabel>
+              <fieldentry>True/False</fieldentry>
+            </qti_metadatafield>
+            <qti_metadatafield>
+              <fieldlabel>qmd_weighting</fieldlabel>
+              <fieldentry>1.000000000</fieldentry>
+            </qti_metadatafield>
+          </qtimetadata>
+        </itemmetadata>
+        <itemproc_extension>
+          <d2l_2p0:difficulty>1</d2l_2p0:difficulty>
+          <d2l_2p0:isbonus>no</d2l_2p0:isbonus>
+          <d2l_2p0:ismandatory>no</d2l_2p0:ismandatory>
+        </itemproc_extension>
+        <presentation>
+          <flow>
+            <material>
+              <mattext texttype="text/plain">I have submitted the Week 2 Storybook assignment.</mattext>
+            </material>
+            <response_extension>
+              <d2l_2p0:display_style>2</d2l_2p0:display_style>
+              <d2l_2p0:enumeration>6</d2l_2p0:enumeration>
+              <d2l_2p0:grading_type>0</d2l_2p0:grading_type>
+            </response_extension>
+            <response_lid ident="QUES_443669_123456_LID" rcardinality="Single">
+              <render_choice shuffle="no">
+                <flow_label class="Block">
+                  <response_label ident="QUES_443669_123456_A2890736">
+                    <flow_mat>
+                      <material>
+                        <mattext texttype="text/plain">True</mattext>
+                      </material>
+                    </flow_mat>
+                  </response_label>
+                </flow_label>
+                <flow_label class="Block">
+                  <response_label ident="QUES_443669_123456_A2890737">
+                    <flow_mat>
+                      <material>
+                        <mattext texttype="text/plain">False</mattext>
+                      </material>
+                    </flow_mat>
+                  </response_label>
+                </flow_label>
+              </render_choice>
+            </response_lid>
+          </flow>
+        </presentation>
+        <resprocessing>
+          <respcondition title="Response Condition 1">
+            <conditionvar>
+              <varequal respident="QUES_443669_123456_LID">QUES_443669_123456_A2890736</varequal>
+            </conditionvar>
+            <setvar action="Set">100.000000000</setvar>
+            <displayfeedback feedbacktype="Response" linkrefid="QUES_443669_123456_IF2890736"/>
+          </respcondition>
+          <respcondition title="Response Condition 2">
+            <conditionvar>
+              <varequal respident="QUES_443669_123456_LID">
+                QUES_443669_123456_A2890737
+              </varequal>
+            </conditionvar>
+            <setvar action="Set">0.000000000</setvar>
+            <displayfeedback feedbacktype="Response" linkrefid="QUES_443669_123456_IF2890737"/>
+          </respcondition>
+        </resprocessing>
+        <itemfeedback ident="QUES_443669_123456_IF2890736">
+          <material>
+            <mattext texttype="text/plain"/>
+          </material>
+        </itemfeedback>
+        <itemfeedback ident="QUES_443669_123456_IF2890737">
+          <material>
+            <mattext texttype="text/plain"/>
+          </material>
+        </itemfeedback>
+      </item>
     </section>
   </assessment>
 </questestinterop>

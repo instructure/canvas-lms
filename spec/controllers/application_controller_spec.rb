@@ -89,7 +89,10 @@ describe ApplicationController do
       @controller.expects(:file_download_url).
         with(@attachment, @common_params.merge(:inline => 1)).
         returns('')
-      @controller.send(:safe_domain_file_url, @attachment)
+      HostUrl.expects(:file_host_with_shard).with(42, '').returns(['myfiles', Shard.default])
+      @controller.instance_variable_set(:@domain_root_account, 42)
+      url = @controller.send(:safe_domain_file_url, @attachment)
+      url.should match /myfiles/
     end
 
     it "should include :download=>1 in inline urls for relative contexts" do
@@ -115,6 +118,10 @@ describe ApplicationController do
   end
 
   describe "get_context" do
+    after do
+      I18n.localizer = nil
+    end
+
     it "should find user with api_find for api requests" do
       user_with_pseudonym
       @pseudonym.update_attribute(:sis_user_id, 'test1')
@@ -136,6 +143,33 @@ describe ApplicationController do
       @controller.stubs(:api_request?).returns(true)
       @controller.send(:get_context)
       @controller.instance_variable_get(:@context).should == @section
+    end
+
+    # this test is supposed to represent calling I18n.t before a context is set
+    # and still having later localizations that depend on the locale of the
+    # context work.
+    it "should reset the localizer" do
+      # emulate all the locale related work done before/around a request
+      acct = Account.default
+      acct.default_locale = "es"
+      acct.save!
+      @controller.instance_variable_set(:@domain_root_account, acct) 
+      req = mock()
+      req.stubs(:headers).returns({})
+      @controller.stubs(:request).returns(req)
+      @controller.send(:assign_localizer)
+      I18n.set_locale_with_localizer # this is what t() triggers
+      I18n.locale.to_s.should == "es"
+      course_model(:locale => "ru")
+      @controller.stubs(:named_context_url).with(@course, :context_url).returns('')
+      @controller.stubs(:params).returns({ :course_id => @course.id })
+      @controller.stubs(:api_request?).returns(false)
+      @controller.stubs(:session).returns({})
+      @controller.stubs(:js_env).returns({})
+      @controller.send(:get_context)
+      @controller.instance_variable_get(:@context).should == @course
+      I18n.set_locale_with_localizer # this is what t() triggers
+      I18n.locale.to_s.should == "ru"
     end
   end
 

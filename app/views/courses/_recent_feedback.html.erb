@@ -8,7 +8,7 @@
     context = recent_feedback.context
     assignment = recent_feedback.assignment
     url = context_url(context, :context_assignment_submission_url, :assignment_id => recent_feedback.assignment_id, :id=>@current_user.id)
-    grade = recent_feedback.readable_grade if recent_feedback.grade and recent_feedback.workflow_state == 'graded'
+    grade = readable_grade(recent_feedback)
     score = recent_feedback.score
     comment = recent_feedback.last_teacher_comment
     comment_text = comment.comment if comment
@@ -19,7 +19,11 @@
                                              :student_only => true)
   %>
 <li style="<%= hidden if is_hidden %>" class="event">
-  <a class="<%= icon_class %> tooltip" href="<%= url %>">
+  <a
+    data-track-category="dashboard"
+    data-track-label="recent feedback"
+    class="<%= icon_class %> tooltip" href="<%= url %>"
+  >
     <span class="tooltip_wrap">
       <span class='tooltip-carat'></span>
       <span class="tooltip_text">
@@ -36,12 +40,12 @@
           <% end %>
         <% else %>
           <span style="display: block; font-style: italic;"><%= icon_explanation.try(:capitalize) %></span>
-          <span style="display: block;"><%= before_label('due_date', %{Due}) %> <span style="font-size: 0.8em;"><%= datetime_string(assignment.due_at) %></span></span>
+          <span style="display: block; font-size: 0.8em;"><%= translated_due_date(assignment) %></span>
         <% end %>
         <% if assignment.points_possible %>
           <span style="display: block;">
             <% if grade %>
-              <%= t 'submission_points.with_score', %{Score: %{score} *out of %{points_possible}*}, :score => score, :points_possible => assignment.points_possible,
+              <%= t 'submission_points.with_score', %{Score: %{score} *out of %{points_possible}*}, :score => render_score(score), :points_possible => assignment.points_possible,
                 :wrapper => '<span style="font-size: 0.8em;">\1</span>' %>
             <% else %>
               <span style="font-size: 0.8em;"><%= t 'submission_points.without_score', "out of %{points_possible}", :points_possible => assignment.points_possible %></span>

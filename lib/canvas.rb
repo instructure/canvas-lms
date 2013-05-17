@@ -4,13 +4,6 @@ module Canvas
   # this to :raise to raise an exception.
   mattr_accessor :protected_attribute_error
 
-  # defines the behavior around casting arguments passed into dynamic finders.
-  # Arguments are coerced to the appropriate type (if the column exists), so
-  # things like find_by_id('123') become find_by_id(123). The default (:log)
-  # logs a warning if the cast isn't clean (e.g. '123a' -> 123 or '' -> 0).
-  # Set this to :raise to raise an error on unclean casts.
-  mattr_accessor :dynamic_finder_type_cast_error
-
   # defines the behavior when nil or empty array arguments passed into dynamic
   # finders. The default (:log) logs a warning if the finder is not scoped and
   # if *all* arguments are nil/[], e.g.
@@ -32,6 +25,13 @@ module Canvas
     # create the redis cluster connection using config/redis.yml
     redis_settings = Setting.from_config('redis')
     raise("Redis is not enabled for this install") if redis_settings.blank?
+    @redis = redis_from_config(redis_settings)
+  end
+
+  # Builds a redis object using a config hash in the format used by a couple
+  # different config/*.yml files, like redis.yml, cache_store.yml and
+  # delayed_jobs.yml
+  def self.redis_from_config(redis_settings)
     Bundler.require 'redis'
     if redis_settings.is_a?(Array)
       redis_settings = { :servers => redis_settings }
@@ -40,11 +40,11 @@ module Canvas
     redis_settings[:servers].map! { |s|
       ::Redis::Factory.convert_to_redis_client_options(s).merge(:marshalling => false)
     }
-    @redis = ::Redis::Factory.create(redis_settings[:servers])
+    redis = ::Redis::Factory.create(redis_settings[:servers])
     if redis_settings[:database].present?
-      @redis.select(redis_settings[:database])
+      redis.select(redis_settings[:database])
     end
-    @redis
+    redis
   end
 
   def self.redis_enabled?
@@ -54,38 +54,48 @@ module Canvas
   def self.reconnect_redis
     @redis = nil
     if Rails.cache && Rails.cache.respond_to?(:reconnect)
-      Canvas::Redis.handle_redis_failure(nil) do
+      Canvas::Redis.handle_redis_failure(nil, "none") do
         Rails.cache.reconnect
       end
     end
   end
 
-  def self.cache_store_config
+  def self.cache_store_config(rails_env = :current, nil_is_nil = false)
+    # this method is called really early in the bootup process, and autoloading
+    # might not be available yet, so we need to manually require Setting
+    require_dependency "app/models/setting"
     cache_store_config = {
       'cache_store' => 'mem_cache_store',
-    }.merge(Setting.from_config('cache_store') || {})
+    }.merge(Setting.from_config('cache_store', rails_env) || {})
     config = nil
     case cache_store_config.delete('cache_store')
     when 'mem_cache_store'
       cache_store_config['namespace'] ||= cache_store_config['key']
-      servers = cache_store_config['servers'] || (Setting.from_config('memcache'))
+      servers = cache_store_config['servers'] || (Setting.from_config('memcache', rails_env))
       if servers
         config = :mem_cache_store, servers, cache_store_config
       end
     when 'redis_store'
       Bundler.require 'redis'
+      require_dependency 'canvas/redis'
       Canvas::Redis.patch
       # merge in redis.yml, but give precedence to cache_store.yml
       #
       # the only options currently supported in redis-cache are the list of
       # servers, not key prefix or database names.
-      cache_store_config = (Setting.from_config('redis') || {}).merge(cache_store_config)
+      cache_store_config = (Setting.from_config('redis', rails_env) || {}).merge(cache_store_config)
       cache_store_config['key_prefix'] ||= cache_store_config['key']
       servers = cache_store_config['servers']
       config = :redis_store, servers
+    when 'memory_store'
+      config = :memory_store
+    when 'nil_store'
+      require 'nil_store'
+      config = NilStore.new
     end
-    unless config
-      config = :nil_store
+    if !config && !nil_is_nil
+      require 'nil_store'
+      config = NilStore.new
     end
     config
   end
@@ -124,7 +134,7 @@ module Canvas
   def self.reloadable_plugin(dirname)
     return unless Rails.env.development?
     base_path = File.expand_path(dirname)
-    ActiveSupport::Dependencies.load_once_paths.reject! { |p|
+    ActiveSupport::Dependencies.autoload_once_paths.reject! { |p|
       p[0, base_path.length] == base_path
     }
   end

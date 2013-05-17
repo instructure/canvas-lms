@@ -168,9 +168,7 @@ $(function($) {
       }
       $(".calendar_url").attr('href', base_url + "#" + $.encodeToHex(JSON.stringify(json)));
 
-      if ($full_calendar_event_holder.hasClass('editing')) {
-        window.location.href = $(".calendar_url").attr('href');
-      }
+      window.location.href = $(".calendar_url").attr('href');
     },
     error: function(data) {
       $full_calendar_event_holder.loadingImage('remove');

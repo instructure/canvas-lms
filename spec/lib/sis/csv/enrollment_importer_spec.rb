@@ -23,6 +23,9 @@ describe SIS::CSV::EnrollmentImporter do
   before { account_model }
 
   it 'should skip bad content' do
+    course_model(:account => @account, :sis_source_id => 'C001')
+    @course.course_sections.create.update_attribute(:sis_source_id, '1B')
+    user_with_managed_pseudonym(:account => @account, :sis_user_id => 'U001')
     before_count = Enrollment.count
     importer = process_csv_data(
       "course_id,user_id,role,section_id,status",
@@ -35,10 +38,13 @@ describe SIS::CSV::EnrollmentImporter do
 
     importer.errors.should == []
     warnings = importer.warnings.map { |r| r.last }
+    # since accounts can define course roles, the "cheater" row can't be
+    # rejected immediately on parse like the others; that's why the warning
+    # comes out of order with the source data
     warnings.should == ["No course_id or section_id given for an enrollment",
                       "No user_id given for an enrollment",
-                      "Improper role \"cheater\" for an enrollment",
-                      "Improper status \"semi-active\" for an enrollment"]
+                      "Improper status \"semi-active\" for an enrollment",
+                      "Improper role \"cheater\" for an enrollment"]
   end
 
   it 'should warn about inconsistent data' do
@@ -65,6 +71,28 @@ describe SIS::CSV::EnrollmentImporter do
                         "An enrollment referenced a non-existent section NONEXISTENT",
                         "An enrollment listed a section and a course that are unrelated"]
     importer.errors.should == []
+  end
+
+  it "should not fail for really long course names" do
+    #create course, users, and sections
+    process_csv_data_cleanly(
+        "course_id,short_name,long_name,account_id,term_id,status",
+        "test_1,TC 101,Test Course 101,,,active"
+    )
+    process_csv_data_cleanly(
+        "user_id,login_id,first_name,last_name,email,status",
+        "user_1,user1,User,Uno,user@example.com,active"
+    )
+    name = '0123456789' * 25
+    process_csv_data_cleanly(
+        "section_id,course_id,name,status,start_date,end_date",
+        "S001,test_1,#{name},active,,"
+    )
+    # the enrollments
+    process_csv_data_cleanly(
+        "course_id,user_id,role,section_id,status,associated_user_id,start_date,end_date",
+        "test_1,user_1,teacher,S001,active,,,"
+    )
   end
 
   it "should enroll users" do
@@ -295,7 +323,7 @@ describe SIS::CSV::EnrollmentImporter do
       "test_1,user_1,student,,deleted,"
     )
     @course = Course.find_by_sis_source_id('test_1')
-    scope = Enrollment.scoped(:conditions => { :course_id => @course.id })
+    scope = Enrollment.where(:course_id => @course)
     scope.count.should == 1
     @enrollment = scope.first
     @enrollment.should be_deleted
@@ -384,4 +412,183 @@ describe SIS::CSV::EnrollmentImporter do
     @course2.enrollments.count.should == 3
     @course1.enrollments.count.should == 0
   end
+
+  it "should not recycle an observer's associated user id in subsequent student enrollments" do
+    process_csv_data_cleanly(
+        "course_id,short_name,long_name,account_id,term_id,status",
+        "test_1,TC 101,Test Course 101,,,active"
+    )
+    process_csv_data_cleanly(
+        "user_id,login_id,first_name,last_name,email,status",
+        "user_1,user1,User,Uno,user1@example.com,active",
+        "user_2,user2,User,Dos,user2@example.com,active",
+        "observer_1,observer1,Observer,Uno,observer1@example.com,active"
+    )
+    process_csv_data_cleanly(
+        "course_id,user_id,role,section_id,status,associated_user_id",
+        "test_1,user_1,student,,active,",
+        "test_1,observer_1,observer,,active,user_1",
+        "test_1,user_2,student,,active,"
+    )
+    @course = Course.find_by_sis_source_id('test_1')
+    @course.enrollments.count.should == 3
+    @observer = Pseudonym.find_by_sis_user_id('observer_1').user
+    @user1 = Pseudonym.find_by_sis_user_id('user_1').user
+    @user2 = Pseudonym.find_by_sis_user_id('user_2').user
+
+    @observer.enrollments.size.should == 1
+    observer_enrollment = @observer.enrollments.first
+    observer_enrollment.type.should == "ObserverEnrollment"
+    observer_enrollment.associated_user_id.should == @user1.id
+
+    @user2.enrollments.size.should == 1
+    user2_enrollment = @user2.enrollments.first
+    user2_enrollment.type.should == "StudentEnrollment"
+    user2_enrollment.associated_user_id.should be_nil
+  end
+
+  it "should find observed user who is deleted and clear observer correctly" do
+    process_csv_data_cleanly(
+        "course_id,short_name,long_name,account_id,term_id,status",
+        "test_1,TC 101,Test Course 101,,,active"
+    )
+    process_csv_data_cleanly(
+        "user_id,login_id,first_name,last_name,email,status",
+        "user_1,user1,User,Uno,user1@example.com,active",
+        "observer_1,observer1,Observer,Uno,observer1@example.com,active"
+    )
+    process_csv_data_cleanly(
+        "course_id,user_id,role,section_id,status,associated_user_id",
+        "test_1,user_1,student,,active,",
+        "test_1,observer_1,observer,,active,user_1"
+    )
+
+    @observer = Pseudonym.find_by_sis_user_id('observer_1').user
+    @observer.enrollments.count.should == 1
+
+    process_csv_data_cleanly(
+        "course_id,user_id,role,section_id,status,associated_user_id",
+        "test_1,user_1,student,,completed,",
+        "test_1,observer_1,observer,,completed,user_1"
+    )
+
+    @observer.reload
+    @observer.enrollments.count.should == 1
+    @observer.enrollments.first.workflow_state.should == 'completed'
+  end
+
+  describe "custom roles" do
+    context "in an account" do
+      before do
+        @course = course_model(:account => @account, :sis_source_id => 'TehCourse')
+        @user1 = user_with_managed_pseudonym(:account => @account, :sis_user_id => 'user1')
+        @user2 = user_with_managed_pseudonym(:account => @account, :sis_user_id => 'user2')
+        @role = custom_role('StudentEnrollment', 'cheater')
+        @role2 = custom_role('StudentEnrollment', 'insufferable know-it-all')
+      end
+
+      it "should enroll with a custom role" do
+        process_csv_data_cleanly(
+            "course_id,user_id,role,section_id,status,associated_user_id",
+            "TehCourse,user1,student,,active,",
+            "TehCourse,user2,cheater,,active,"
+        )
+        @user1.enrollments.map{|e|[e.type, e.role_name]}.should == [['StudentEnrollment', nil]]
+        @user2.enrollments.map{|e|[e.type, e.role_name]}.should == [['StudentEnrollment', 'cheater']]
+      end
+
+      it "should not enroll with an inactive role" do
+        @role.deactivate!
+        importer = process_csv_data(
+            "course_id,user_id,role,section_id,status,associated_user_id",
+            "TehCourse,user1,cheater,,active,"
+        )
+        @user1.enrollments.size.should == 0
+        importer.warnings.map(&:last).should == ["Improper role \"cheater\" for an enrollment"]
+      end
+
+      it "should not enroll with a nonexistent role" do
+        importer = process_csv_data(
+            "course_id,user_id,role,section_id,status,associated_user_id",
+            "TehCourse,user1,basketweaver,,active,"
+        )
+        @user1.enrollments.size.should == 0
+        importer.warnings.map(&:last).should == ["Improper role \"basketweaver\" for an enrollment"]
+      end
+
+      it "should create multiple enrollments with different roles having the same base type" do
+        process_csv_data_cleanly(
+            "course_id,user_id,role,section_id,status,associated_user_id",
+            "TehCourse,user1,cheater,,active,",
+            "TehCourse,user1,insufferable know-it-all,,active,"
+        )
+        @user1.enrollments.sort_by(&:id).map(&:role_name).should == ['cheater', 'insufferable know-it-all']
+      end
+    end
+
+    context "in a sub-account" do
+      before do
+        @role = @account.roles.build :name => 'instruc-TOR'
+        @role.base_role_type = 'TeacherEnrollment'
+        @role.save!
+        @user1 = user_with_managed_pseudonym(:name => 'Dolph Hauldhagen', :account => @account, :sis_user_id => 'user1')
+        @user2 = user_with_managed_pseudonym(:name => 'Strong Bad', :account => @account, :sis_user_id => 'user2')
+        @sub_account = @account.sub_accounts.create!(:name => "The Rec Center")
+        @course = course_model(:account => @sub_account, :name => 'Battle Axe Lessons', :sis_source_id => 'TehCourse')
+      end
+
+      it "should enroll with an inherited custom role" do
+        process_csv_data_cleanly(
+            "course_id,user_id,role,section_id,status,associated_user_id",
+            "TehCourse,user1,instruc-TOR,,active,",
+            "TehCourse,user2,student,,active,"
+        )
+        @user1.enrollments.map{|e|[e.type, e.role_name]}.should == [['TeacherEnrollment', 'instruc-TOR']]
+        @user2.enrollments.map{|e|[e.type, e.role_name]}.should == [['StudentEnrollment', nil]]
+      end
+
+      it "should not enroll with an inactive inherited role" do
+        @role.deactivate!
+        importer = process_csv_data(
+            "course_id,user_id,role,section_id,status,associated_user_id",
+            "TehCourse,user1,instruc-TOR,,active,",
+            "TehCourse,user2,student,,active,"
+        )
+        @user1.enrollments.size.should == 0
+        @user2.enrollments.map{|e|[e.type, e.role_name]}.should == [['StudentEnrollment', nil]]
+        importer.warnings.map(&:last).should == ["Improper role \"instruc-TOR\" for an enrollment"]
+      end
+
+      it "should enroll with a custom role that overrides an inactive inherited role" do
+        @role.deactivate!
+        sub_role = @sub_account.roles.build :name => 'instruc-TOR'
+        sub_role.base_role_type = 'TeacherEnrollment'
+        sub_role.save!
+        process_csv_data_cleanly(
+            "course_id,user_id,role,section_id,status,associated_user_id",
+            "TehCourse,user1,instruc-TOR,,active,",
+            "TehCourse,user2,student,,active,"
+        )
+        @user1.enrollments.map{|e|[e.type, e.role_name]}.should == [['TeacherEnrollment', 'instruc-TOR']]
+        @user2.enrollments.map{|e|[e.type, e.role_name]}.should == [['StudentEnrollment', nil]]
+      end
+
+      it "should not enroll with a custom role defined in a sibling account" do
+        other_account = @account.sub_accounts.create!
+        other_role = other_account.roles.build :name => 'Pixel Pusher'
+        other_role.base_role_type = 'DesignerEnrollment'
+        other_role.save!
+        course_model(:account => other_account, :sis_source_id => 'OtherCourse')
+        importer = process_csv_data(
+            "course_id,user_id,role,section_id,status,associated_user_id",
+            "TehCourse,user1,Pixel Pusher,,active,",
+            "OtherCourse,user2,Pixel Pusher,,active,"
+        )
+        importer.warnings.map(&:last).should == ["Improper role \"Pixel Pusher\" for an enrollment"]
+        @user1.enrollments.size.should == 0
+        @user2.enrollments.map{|e|[e.type, e.role_name]}.should == [['DesignerEnrollment', 'Pixel Pusher']]
+      end
+    end
+  end
+
 end

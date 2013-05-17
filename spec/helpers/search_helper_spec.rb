@@ -20,10 +20,39 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe SearchHelper do
   
-  #Delete this example and add some real ones or delete this file
-  it "should be included in the object returned by #helper" do
-    included_modules = (class << helper; self; end).send :included_modules
-    included_modules.should be_include(SearchHelper)
-  end
+  include SearchHelper
 
+  context "load_all_contexts" do
+    it "should return requested permissions" do
+      course(:active_all => true)
+      @current_user = @teacher
+      
+      load_all_contexts
+      @contexts[:courses][@course.id][:permissions].should be_empty
+
+      load_all_contexts(:permissions => [:manage_assignments])
+      @contexts[:courses][@course.id][:permissions][:manage_assignments].should be_true
+    end
+
+    describe "sharding" do
+      specs_require_sharding
+
+      before do
+        @current_user = @shard1.activate{ user(:active_all => true) }
+        @shard2.activate{ course_with_teacher(:account => Account.create!, :user => @current_user, :active_all => true) }
+      end
+
+      it "should include courses from shards other than the user's native shard" do
+        load_all_contexts
+        @contexts[:courses].should have_key(@course.id)
+      end
+
+      it "should include sections from shards other than the user's native shard" do
+        # needs at least two sections for any sections to show up
+        second_section = @course.course_sections.create!(:name => 'second section')
+        load_all_contexts
+        @contexts[:sections].should have_key(second_section.id)
+      end
+    end
+  end
 end

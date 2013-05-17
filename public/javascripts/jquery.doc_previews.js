@@ -57,7 +57,11 @@ define([
   };
 
   $.filePreviewsEnabled = function(){
-    return !(INST.disableScribdPreviews && INST.disableGooglePreviews);
+    return !(
+      INST.disableCrocodocPreviews &&
+      INST.disableScribdPreviews &&
+      INST.disableGooglePreviews
+    );
   }
 
   // check to see if a file of a certan mimeType is previewable inline in the browser by either scribd or googleDocs
@@ -78,6 +82,7 @@ define([
     return this.each(function(){
       var $this = $(this),
           opts = $.extend({
+            width: '100%',
             height: '400px'
           }, $this.data(), options);
 
@@ -89,8 +94,20 @@ define([
         }
       }
 
-      // if doc is scribdable, and the browser can show it.
-      if (!INST.disableScribdPreviews && opts.scribd_doc_id && opts.scribd_access_key && hasGoodEnoughFlash && scribd) {
+      if (!INST.disableCrocodocPreviews && opts.crocodoc_session_url) {
+        var iframe = $('<iframe/>', {
+            src: opts.crocodoc_session_url,
+            width: opts.width,
+            height: opts.height
+        });
+        iframe.appendTo($this);
+        iframe.load(function() {
+          tellAppIViewedThisInline('crocodoc');
+          if ($.isFunction(opts.ready))
+            opts.ready();
+        });
+      }
+      else if (!INST.disableScribdPreviews && opts.scribd_doc_id && opts.scribd_access_key && hasGoodEnoughFlash && scribd) {
         var scribdDoc = scribd.Document.getDoc( opts.scribd_doc_id, opts.scribd_access_key ),
             id = $this.attr('id'),
             // see http://www.scribd.com/developers/api?method_name=Javascript+API for an explaination of these options
@@ -155,9 +172,9 @@ define([
             }
           });
         }
-      } else {
+      } else if ($.filePreviewsEnabled()) {
         // else fall back with a message that the document can't be viewed inline
-        $this.html('<p>' + htmlEscape(I18n.t('errors.cannot_view_document_inline', 'This document cannot be viewed inline, you might not have permission to view it or it might have been deleted.')) + '</p>');
+        $this.html('<p>' + htmlEscape(I18n.t('errors.cannot_view_document_inline', 'This document cannot be viewed inline.')) + '</p>');
       }
     });
   };

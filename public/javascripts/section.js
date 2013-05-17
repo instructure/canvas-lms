@@ -84,10 +84,9 @@ define([
     $(".datetime_field").datetime_field();
     $(".uncrosslist_link").click(function(event) {
       event.preventDefault();
-      $("#uncrosslist_form").dialog('close').dialog({
-        autoOpen: false,
+      $("#uncrosslist_form").dialog({
         width: 400
-      }).dialog('open');
+      });
     });
     $("#uncrosslist_form .cancel_button").click(function(event) {
       $("#uncrosslist_form").dialog('close');
@@ -96,10 +95,9 @@ define([
     });
     $(".crosslist_link").click(function(event) {
       event.preventDefault();
-      $("#crosslist_course_form").dialog('close').dialog({
-        autoOpen: false,
+      $("#crosslist_course_form").dialog({
         width: 450
-      }).dialog('open');
+      });
       $("#crosslist_course_form .submit_button").attr('disabled', true);
       $("#course_autocomplete_id_lookup").val("");
       $("#course_id").val("").change();

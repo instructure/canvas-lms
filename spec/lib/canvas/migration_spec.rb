@@ -10,6 +10,7 @@ describe "Migration package importers" do
     end
     
     supported = {
+            "Old Canvas Cartridge" => [:old_canvas, CC::Importer::Canvas::Converter],
             "Canvas Cartridge" => [:canvas, CC::Importer::Canvas::Converter],
             "Common Cartridge 1.0" => ["cc1-0", CC::Importer::Standard::Converter],
             "Common Cartridge 1.1" => ["cc1-1", CC::Importer::Standard::Converter],
@@ -56,8 +57,8 @@ describe "Migration package importers" do
     mig = Canvas::Migration::Migrator.new({:archive_file => file, :content_migration => cm}, "test")
     mig.unzip_archive
     
-    cm.migration_settings[:warnings].length.should == 1
-    cm.migration_settings[:warnings].first.tap do |w|
+    cm.old_warnings_format.length.should == 1
+    cm.old_warnings_format.first.tap do |w|
       w.first.should == "The content package unzipped successfully, but with a warning"
       w.last.should =~ /backslashes as path separators/
     end

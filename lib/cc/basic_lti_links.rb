@@ -83,12 +83,12 @@ module CC
             ext_node.lticm :property, tool.consumer_key, 'name' => 'consumer_key'
             ext_node.lticm :property, tool.shared_secret, 'name' => 'shared_secret'
           end
-          [:user_navigation, :course_navigation, :account_navigation, :resource_selection, :editor_button].each do |type|
+          ContextExternalTool::EXTENSION_TYPES.each do |type|
             if tool.settings[type]
               ext_node.lticm(:options, :name => type.to_s) do |type_node|
-                type_node.lticm(:property, tool.settings[type][:url], 'name' => 'url')
+                type_node.lticm(:property, tool.settings[type][:url], 'name' => 'url') if tool.settings[type][:url]
                 type_node.lticm(:property, tool.settings[type][:text], 'name' => 'text') if tool.settings[type][:text]
-                if [:resource_selection,:editor_button].include?(type)
+                if [:resource_selection,:editor_button,:homework_submission].include?(type)
                   type_node.lticm(:property, tool.settings[type][:selection_width], 'name' => 'selection_width')
                   type_node.lticm(:property, tool.settings[type][:selection_height], 'name' => 'selection_height')
                 end
@@ -103,6 +103,13 @@ module CC
                   type_node.lticm(:options, :name => 'labels') do |labels_node|
                     tool.settings[type][:labels].each do |lang, text|
                       labels_node.lticm(:property, text, 'name' => lang)
+                    end
+                  end
+                end
+                if tool.settings[type][:custom_fields]
+                  type_node.tag!("blti:custom") do |custom_node|
+                    tool.settings[type][:custom_fields].each_pair do |key, val|
+                      custom_node.lticm :property, val, 'name' => key
                     end
                   end
                 end

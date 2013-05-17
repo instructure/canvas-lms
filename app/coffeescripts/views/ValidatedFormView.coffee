@@ -1,9 +1,13 @@
 define [
   'Backbone'
-  'formToJSON'
+  'compiled/views/ValidatedMixin'
+  'jquery'
+  'underscore'
+  'compiled/fn/preventDefault'
+  'jquery.toJSON'
   'jquery.disableWhileLoading'
   'jquery.instructure_forms'
-], ({View, Model}, formToJSON) ->
+], (Backbone, ValidatedMixin, $, _) ->
 
   ##
   # Sets model data from a form, saves it, and displays errors returned in a
@@ -18,33 +22,52 @@ define [
   #
   # @event success
   #   @signature `(response, status, jqXHR)`
-  class ValidatedFormView extends View
+  class ValidatedFormView extends Backbone.View
+
+    @mixin ValidatedMixin
 
     tagName: 'form'
 
     className: 'validated-form-view'
 
-    events: {'submit'}
-
-    ##
-    # When the form submits, the model's attributes are set from the form
-    # and saved to the server. Make sure to pass in `model` to the options on
-    # initialize
-    model: Model.extend()
+    events:
+      submit: 'submit'
 
     ##
     # Sets the model data from the form and saves it. Called when the form
     # submits, or can be called programatically.
+    # set @saveOpts in your view to to pass opts to Backbone.sync (like multipart: true if you have
+    # a file attachment).  if you want the form not to be re-enabled after save success (because you
+    # are navigating to a new page, set dontRenableAfterSaveSuccess to true on your view)
+    #
+    # NOTE: If you are uploading a file attachment, be careful! our
+    # syncWithMultipart extension doesn't call toJSON on your model!
     #
     # @api public
     # @returns jqXHR
     submit: (event) ->
-      event.preventDefault() if event
+      event?.preventDefault()
+      @$el.hideErrors()
+
       data = @getFormData()
-      dfd = @model.save(data).then @onSaveSuccess, @onSaveFail
-      @$el.disableWhileLoading dfd
-      @trigger 'submit'
-      dfd
+      errors = @validateBeforeSave data, {}
+
+      if _.keys(errors).length == 0
+        disablingDfd = new $.Deferred()
+        saveDfd = @model
+          .save(data, @saveOpts)
+          .then(@onSaveSuccess, @onSaveFail)
+          .fail -> disablingDfd.reject()
+
+        unless @dontRenableAfterSaveSuccess
+          saveDfd.done -> disablingDfd.resolve()
+
+        @$el.disableWhileLoading disablingDfd
+        @trigger 'submit'
+        saveDfd
+      else
+        @showErrors errors
+        null
 
     ##
     # Converts the form to an object. Override this if the form's input names
@@ -52,12 +75,17 @@ define [
     getFormData: ->
       @$el.toJSON()
 
+    ##
+    # Override this to perform pre-save validations.  Return errors that can
+    # show with the showErrors format below
+    validateBeforeSave: -> {}
+
     onSaveSuccess: =>
       @trigger 'success', arguments...
 
     onSaveFail: (xhr) =>
       errors = {}
-      errors = @parseErrorResponse xhr.responseText
+      errors = @parseErrorResponse xhr
       @showErrors errors
       @trigger 'fail', errors, arguments...
 
@@ -86,36 +114,10 @@ define [
     #     ]
     #   }
     parseErrorResponse: (response) ->
-      $.parseJSON(response).errors
-
-    showErrors: (errors) ->
-      for fieldName, field of errors
-        $input = @findField fieldName
-        html = (message for {message} in field).join('</p><p>')
-        $input.errorBox "<div>#{html}</div>"
-        field.$input = $input
-        field.$errorBox = $input.data 'associated_error_box'
-
-    ##
-    # Errors are displayed relative to the field to which they belong. If
-    # the key of the error in the response doesn't match the name attribute
-    # of the form input element, configure a selector here.
-    #
-    # For example, given a form field like this:
-    #
-    #   <input name="user[first_name]">
-    #
-    # and an error response like this:
-    #
-    #   {errors: { first_name: {...} }}
-    #
-    # you would do this:
-    #
-    #   fieldSelectors:
-    #     first_name: '[name=user[first_name]]'
-    fieldSelectors: null
-
-    findField: (field) ->
-      selector = @fieldSelectors?[field] or "[name=#{field}]"
-      @$ selector
-
+      if response.status is 422
+        {authenticity_token: "invalid"}
+      else
+        try
+          $.parseJSON(response.responseText).errors
+        catch error
+          {}

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2012 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -56,7 +56,8 @@
 #       // Associated comments for a submission (optional)
 #       submission_comments: [
 #         {
-#           author_id: 134
+#           id: 37,
+#           author_id: 134,
 #           author_name: "Toph Beifong",
 #           comment: "Well here's the thing...",
 #           created_at: "2012-01-01T01:00:00Z",
@@ -83,8 +84,14 @@
 #       // The id of the user who created the submission
 #       user_id: 134
 #
+#       // The id of the user who graded the submission
+#       grader_id: 86
+#
 #       // The submissions user (see user API) (optional)
 #       user: User
+#
+#       // Whether the submission was made after the applicable due date
+#       late: false
 #     }
 #
 class SubmissionsController < ApplicationController
@@ -112,7 +119,7 @@ class SubmissionsController < ApplicationController
     if @context_enrollment && @context_enrollment.is_a?(ObserverEnrollment) && @context_enrollment.associated_user_id
       id = @context_enrollment.associated_user_id
     else
-      id = @current_user.id
+      id = @current_user.try(:id)
     end
     @user = @context.all_students.find(params[:id]) rescue nil
     if !@user
@@ -123,7 +130,7 @@ class SubmissionsController < ApplicationController
       end
       return
     end
-    @submission = @assignment.find_submission(@user) #_params[:.find(:first, :conditions => {:assignment_id => @assignment.id, :user_id => params[:id]})
+    @submission = @assignment.find_submission(@user)
     @submission ||= @context.submissions.build(:user => @user, :assignment_id => @assignment.id)
     @submission.grants_rights?(@current_user, session)
     @rubric_association = @assignment.rubric_association
@@ -147,7 +154,7 @@ class SubmissionsController < ApplicationController
           end
 
           @headers = false
-          if @assignment.quiz && @context.class.to_s == 'Course' && @context.user_is_student?(@current_user)
+          if @assignment.quiz && @context.is_a?(Course) && @context.user_is_student?(@current_user) && !@context.user_is_instructor?(@current_user)
             format.html { redirect_to(named_context_url(@context, :context_quiz_url, @assignment.quiz.id, :headless => 1)) }
           elsif @submission.submission_type == "online_quiz" && @submission.quiz_submission_version
             format.html { redirect_to(named_context_url(@context, :context_quiz_history_url, @assignment.quiz.id, :user_id => @submission.user_id, :headless => 1, :version => @submission.quiz_submission_version)) }
@@ -255,8 +262,9 @@ class SubmissionsController < ApplicationController
   def create
     params[:submission] ||= {}
     @assignment = @context.assignments.active.find(params[:assignment_id])
+    @assignment = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @current_user)
     if authorized_action(@assignment, @current_user, :submit)
-      if @assignment.locked_for?(@current_user) && !@assignment.grants_right?(@current_user, nil, :update)
+          if @assignment.locked_for?(@current_user) && !@assignment.grants_right?(@current_user, nil, :update)
         flash[:notice] = t('errors.can_not_submit_locked_assignment', "You can't submit an assignment when it is locked")
         redirect_to named_context_url(@context, :context_assignment_user, @assignment.id)
         return
@@ -278,6 +286,10 @@ class SubmissionsController < ApplicationController
           return render(:json => { :message => "Invalid parameters for submission_type #{submission_type}. Required: #{API_SUBMISSION_TYPES[submission_type].map { |p| "submission[#{p}]" }.join(", ") }" }, :status => 400)
         end
         params[:submission][:comment] = params[:comment].try(:delete, :text_comment)
+
+        if params[:submission].has_key?(:body)
+          params[:submission][:body] = process_incoming_html_content(params[:submission][:body])
+        end
       end
 
       if params[:submission][:file_ids].is_a?(Array)
@@ -346,6 +358,9 @@ class SubmissionsController < ApplicationController
         )
         @attachment.save!
         params[:submission][:attachments] << @attachment
+      elsif !api_request? && params[:submission][:submission_type] == 'media_recording' && params[:submission][:media_comment_id].blank?
+        flash[:error] = t('errors.media_file_attached', "There was no media recording in the submission")
+        return redirect_to named_context_url(@context, :context_assignment_url, @assignment)
       end
       params[:submission][:attachments] = params[:submission][:attachments].compact.uniq
 
@@ -368,6 +383,7 @@ class SubmissionsController < ApplicationController
       respond_to do |format|
         if @submission.save
           log_asset_access(@assignment, "assignments", @assignment_group, 'submit')
+          generate_new_page_view
           format.html {
             flash[:notice] = t('assignment_submit_success', 'Assignment successfully submitted.')
             redirect_to course_assignment_url(@context, @assignment)
@@ -389,8 +405,10 @@ class SubmissionsController < ApplicationController
       end
     end
   end
-  
+
   def turnitin_report
+    return render(:nothing => true, :status => 400) unless params_are_integers?(:assignment_id, :submission_id)
+
     @assignment = @context.assignments.active.find(params[:assignment_id])
     @submission = @assignment.submissions.find_by_user_id(params[:submission_id])
     @asset_string = params[:asset_string]
@@ -406,12 +424,14 @@ class SubmissionsController < ApplicationController
   end
 
   def resubmit_to_turnitin
+    return render(:nothing => true, :status => 400) unless params_are_integers?(:assignment_id, :submission_id)
+
     if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
       @assignment = @context.assignments.active.find(params[:assignment_id])
       @submission = @assignment.submissions.find_by_user_id(params[:submission_id])
       @submission.resubmit_to_turnitin
       respond_to do |format|
-        format.html { 
+        format.html {
           flash[:notice] = t('resubmitted_to_turnitin', "Successfully resubmitted to turnitin.")
           redirect_to named_context_url(@context, :context_assignment_submission_url, @assignment.id, @submission.user_id)
         }
@@ -419,7 +439,7 @@ class SubmissionsController < ApplicationController
       end
     end
   end
-  
+
   def update
     @assignment = @context.assignments.active.find(params[:assignment_id])
     @user = @context.all_students.find(params[:id])
@@ -433,6 +453,7 @@ class SubmissionsController < ApplicationController
     end
     if authorized_action(@submission, @current_user, :comment)
       params[:submission][:commenter] = @current_user
+      admin_in_context = !@context_enrollment || @context_enrollment.admin?
       if params[:attachments]
         attachments = []
         params[:attachments].each do |idx, attachment|
@@ -451,7 +472,7 @@ class SubmissionsController < ApplicationController
           :commenter => @current_user,
           :assessment_request => @request,
           :group_comment => params[:submission][:group_comment],
-          :hidden => @assignment.muted? && @context_enrollment.admin?
+          :hidden => @assignment.muted? && admin_in_context
         }
       end
       begin
@@ -471,7 +492,7 @@ class SubmissionsController < ApplicationController
           json_args = Submission.json_serialization_full_parameters({
             :exclude => @assignment.grants_right?(@current_user, session, :grade) ? [:grade, :score, :turnitin_data] : [],
             :except => [:quiz_submission,:submission_history],
-            :comments => @context_enrollment.admin? ? :submission_comments : :visible_submission_comments
+            :comments => admin_in_context ? :submission_comments : :visible_submission_comments
           }).merge(:permissions => { :user => @current_user, :session => session, :include_permissions => false })
           format.json { 
             render :json => @submissions.to_json(json_args), :status => :created, :location => course_gradebook_url(@submission.assignment.context)
@@ -493,7 +514,7 @@ class SubmissionsController < ApplicationController
   protected
 
   def submission_zip
-    @attachments = @assignment.attachments.find(:all, :conditions => ["display_name='submissions.zip' AND workflow_state IN ('to_be_zipped', 'zipping', 'zipped', 'errored') AND user_id=?", @current_user.id], :order => :created_at)
+    @attachments = @assignment.attachments.where(:display_name => 'submissions.zip', :workflow_state => ['to_be_zipped', 'zipping', 'zipped', 'errored'], :user_id => @current_user).order(:created_at).all
     @attachment = @attachments.pop
     @attachments.each{|a| a.destroy! }
     if @attachment && (@attachment.created_at < 1.hour.ago || @attachment.created_at < (@assignment.submissions.map{|s| s.submitted_at}.compact.max || @attachment.created_at))

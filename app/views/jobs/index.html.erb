@@ -26,6 +26,9 @@
   #show-job dt {
     font-weight: bold;
   }
+  #show-job h4 {
+    font-size: 14px;
+  }
   h2 {
     font-size: 16px;
   }
@@ -61,10 +64,8 @@
 <div id="tags-wrapper" style="float:right">
   <h2><%= t 'headings.popular_tags', "Popular Tags" %></h2>
   <select id="tags-flavor">
-    <%= options_for_select([[t('job_options.all', 'All'), 'all'],
-                            [t('job_options.current', "Current"), 'current'],
-                            [t('job_options.future', "Future"), 'future'],
-                            [t('job_options.failed', "Failed"), 'failed']], @flavor) %>
+    <%= options_for_select([[t('job_options.current', "Current"), 'current'],
+                            [t('job_options.all', "All"), 'all']], @flavor) %>
   </select>
   <div id="tags-grid" style="clear:both; width:250px; height:250px" class='grid'>
   </div>
@@ -73,25 +74,30 @@
   <h2><%= t 'headings.jobs_list', "Jobs List" %></h2>
   <div id="jobs-grid-controls">
     <select id="jobs-flavor">
-      <%= options_for_select([[t('job_options.all', 'All'), 'all'],
-                              [t('job_options.current', "Current"), 'current'],
+      <%= options_for_select([[t('job_options.current', "Current"), 'current'],
                               [t('job_options.future', "Future"), 'future'],
-                              [t('job_options.failed', "Failed"), 'failed']], @flavor) %>
+                              [t('job_options.failed', "Failed"), 'failed'],
+                              [t('job_options.id', "ID"), 'id'],
+                              [t('job_options.strand', "Strand"), 'strand'],
+                              [t('job_options.tag', "Tag"), 'tag'],
+      ], @flavor) %>
     </select>
-    <button id='jobs-refresh'><%= t '#buttons.refresh', "refresh" %></button>
     <input type='search' results='15' placeholder='<%= t :search_jobs, "Search Jobs" %>' autosave='canvas-jobs-search' id='jobs-search' name='q' value="<%= params[:q].presence %>" />
+    <button id='jobs-refresh'><%= t '#buttons.refresh', "refresh" %></button>
     <%= before_label :total_jobs, "Total" %> <span id='jobs-total'><%= @jobs_count %></span>
-    <button id='select-all-jobs'><%= t 'buttons.select_all', 'select all' %></button>
-    <%= before_label :with_selection, "With Selection" %>
-    <button id='hold-jobs'><%= t 'buttons.hold', 'hold' %></button>
-    <button id='un-hold-jobs'><%= t 'buttons.un_hold', 'un-hold' %></button>
-    <button id='delete-jobs'><%= t 'buttons.delete', 'delete' %></button>
+    <% if Account.site_admin.grants_right?(@current_user, :manage_jobs) %>
+      <button id='select-all-jobs'><%= t 'buttons.select_all', 'select all' %></button>
+      <%= before_label :with_selection, "With Selection" %>
+      <button id='hold-jobs'><%= t 'buttons.hold', 'hold' %></button>
+      <button id='un-hold-jobs'><%= t 'buttons.un_hold', 'un-hold' %></button>
+      <button id='delete-jobs'><%= t 'buttons.delete', 'delete' %></button>
+    <% end %>
   </div>
   <div id="jobs-grid" style="width:700px; height:300px;" class='grid'>
   </div>
 <div id="show-job">
   <h2><%= t 'headings.selected_job', "Selected Job" %></h2>
-  <h3><%= before_label :id, "id" %> <a href="#" id="job-id-link"><span id="job-id" class="show-field">&nbsp;</span></a></h3>
+  <h4><%= before_label :id, "id" %> <a href="#" id="job-id-link"><span id="job-id" class="show-field">&nbsp;</span></a></h4>
   <h4><%= before_label :tag, "tag" %> <span id='job-tag' class='show-field'>&nbsp;</span></h4>
   <h4><%= before_label :strand, "strand" %> <span id='job-strand' class='show-field'>&nbsp;</span></h4>
   <table id='job-attributes' cellspacing="0">
@@ -108,8 +114,16 @@
       <td id="job-max_attempts" class="show-field">&nbsp;</td>
     </tr>
     <tr>
+      <td><%= before_label :locked_by, "Locked By" %></td>
+      <td id="job-locked_by" class="show-field">&nbsp;</td>
+    </tr>
+    <tr>
       <td><%= before_label :run_at, "Run At" %></td>
       <td id="job-run_at" class="show-field">&nbsp;</td>
+    </tr>
+    <tr>
+      <td><%= before_label :locked_at, "Locked At" %></td>
+      <td id="job-locked_at" class="show-field">&nbsp;</td>
     </tr>
     <tr>
       <td><%= before_label :failed_at, "Failed At" %></td>
@@ -132,30 +146,24 @@
 </div>
 
 <%
-jobs_data = @jobs.all(:limit => JobsController::LIMIT)
-jobs_data.length.upto(@jobs_count - 1) { jobs_data << {} }
 jobs_opts = {
-  :data => jobs_data,
   :max_attempts => Delayed::Worker.max_attempts,
-  :rows => @jobs_count,
   :flavor => @flavor,
   :url => jobs_url(:only => :jobs),
   :batch_update_url => batch_update_jobs_url,
+  :job_url => jobs_url,
   :on_hold_attempt_count => Delayed::Job::ON_HOLD_COUNT,
   :limit => JobsController::LIMIT,
   :starting_query => params[:q],
 }
 running_opts = jobs_opts.merge({
-  :data => @running.all,
   :url => jobs_url(:only => :running),
-  :refresh_rate => 2.seconds * 1000,
+  :refresh_rate => @running_jobs_refresh_seconds * 1000,
   :starting_query => nil,
 })
 tags_opts = {
-  :data => @tags,
   :url => jobs_url(:only => :tags),
-  :refresh_rate => 10.seconds * 1000,
-  :flavor => @flavor,
+  :refresh_rate => @job_tags_refresh_seconds * 1000,
 }
 
 js_env :JOBS => {

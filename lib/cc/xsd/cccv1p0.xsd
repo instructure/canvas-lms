@@ -130,6 +130,15 @@
         <xs:element name="position" type="xs:integer" minOccurs="0"/>
         <xs:element name="external_feed_identifierref" type="xs:string" minOccurs="0"/>
         <xs:element name="attachment_identifierref" type="xs:string" minOccurs="0"/>
+        <xs:element name="discussion_type" minOccurs="0">
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="side_comment"/>
+              <xs:enumeration value="threaded"/>
+              <xs:enumeration value="flat"/>
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:element>
         <xs:element name="type" minOccurs="0">
           <xs:simpleType>
             <xs:restriction base="xs:string">
@@ -150,6 +159,7 @@
           <xs:complexType>
             <xs:all minOccurs="0">
               <xs:element name="title" type="xs:string" minOccurs="1"/>
+              <xs:element name="workflow_state" type="xs:string" minOccurs="1"/>
               <xs:element name="position" type="xs:integer" minOccurs="0"/>
               <xs:element name="start_at" type="xs:dateTime" minOccurs="0"/>
               <xs:element name="end_at" type="xs:dateTime" minOccurs="0"/>
@@ -343,6 +353,8 @@
             <xs:element name="points_possible" type="xs:float" minOccurs="0"/>
             <xs:element name="mastery_points" type="xs:float" minOccurs="0"/>
             <xs:element name="ratings" type="ratingsType" minOccurs="0"/>
+            <xs:element name="external_identifier" type="xs:string" minOccurs="0"/>
+            <xs:element name="is_global_outcome" type="xs:boolean" minOccurs="0"/>
           </xs:all>
           <xs:attribute name="identifier" type="xs:ID" use="required"/>
         </xs:complexType>
@@ -457,6 +469,8 @@
         <xs:element name="available" type="xs:boolean" minOccurs="0"/>
         <xs:element name="time_limit" type="xs:integer" minOccurs="0"/>
         <xs:element name="allowed_attempts" type="xs:integer" minOccurs="0"/>
+        <xs:element name="one_question_at_a_time" type="xs:boolean" minOccurs="0"/>
+        <xs:element name="cant_go_back" type="xs:boolean" minOccurs="0"/>
         <xs:element name="assignment_group_identifierref" type="xs:string" minOccurs="0"/>
 
         <xs:element name="quiz_type" minOccurs="0" default="practice_quiz">

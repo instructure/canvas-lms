@@ -6,16 +6,17 @@ class ContextExternalTool < ActiveRecord::Base
   attr_accessible :privacy_level, :domain, :url, :shared_secret, :consumer_key, 
                   :name, :description, :custom_fields, :custom_fields_string,
                   :course_navigation, :account_navigation, :user_navigation,
-                  :resource_selection, :editor_button,
+                  :resource_selection, :editor_button, :homework_submission,
                   :config_type, :config_url, :config_xml, :tool_id
   validates_presence_of :name
+  validates_length_of :name, :maximum => maximum_string_length
   validates_presence_of :consumer_key
   validates_presence_of :shared_secret
   validate :url_or_domain_is_set
   serialize :settings
   attr_accessor :config_type, :config_url, :config_xml
   
-  before_save :infer_defaults
+  before_save :infer_defaults, :validate_vendor_help_link
   after_save :touch_context
   validate :check_for_xml_error
 
@@ -50,8 +51,9 @@ class ContextExternalTool < ActiveRecord::Base
     can :read and can :update and can :delete
   end
   
+  EXTENSION_TYPES = [:user_navigation, :course_navigation, :account_navigation, :resource_selection, :editor_button, :homework_submission]
   def url_or_domain_is_set
-    setting_types = [:user_navigation, :course_navigation, :account_navigation, :resource_selection, :editor_button]
+    setting_types = EXTENSION_TYPES
     # both url and domain should not be set
     if url.present? && domain.present?
       errors.add(:url, t('url_or_domain_not_both', "Either the url or domain should be set, not both."))
@@ -107,9 +109,27 @@ class ContextExternalTool < ActiveRecord::Base
   def custom_fields_string
     (settings[:custom_fields] || {}).map{|key, val|
       "#{key}=#{val}"
-    }.join("\n")
+    }.sort.join("\n")
   end
-  
+
+  def vendor_help_link
+    settings[:vendor_help_link]
+  end
+
+  def vendor_help_link=(val)
+    settings[:vendor_help_link] = val
+  end
+
+  def validate_vendor_help_link
+    return if self.vendor_help_link.blank?
+    begin
+      value, uri = CustomValidations.validate_url(self.vendor_help_link)
+      self.vendor_help_link = uri.to_s
+    rescue URI::InvalidURIError, ArgumentError
+      self.vendor_help_link = nil
+    end
+  end
+
   def config_type=(val)
     @config_type = val
     process_extended_configuration
@@ -129,7 +149,7 @@ class ContextExternalTool < ActiveRecord::Base
     return unless (config_type == 'by_url' && config_url) || (config_type == 'by_xml' && config_xml)
     tool_hash = nil
     begin
-      converter = CC::Importer::Canvas::Converter.new({:no_archive_file => true})
+      converter = CC::Importer::BLTIConverter.new
       if config_type == 'by_url'
         tool_hash = converter.retrieve_and_convert_blti_url(config_url)
       else
@@ -165,12 +185,15 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   def course_navigation=(hash)
-    tool_setting(:course_navigation, hash) { |nav_settings|
+    tool_setting(:course_navigation, hash, :default) { |nav_settings|
       if hash[:visibility] == 'members' || hash[:visibility] == 'admins'
         nav_settings[:visibility] = hash[:visibility]
       end
-      nav_settings[:default] = !!hash[:default]
     }
+  end
+
+  def course_navigation
+    settings[:course_navigation]
   end
 
   def account_navigation=(hash)
@@ -204,6 +227,14 @@ class ContextExternalTool < ActiveRecord::Base
   def editor_button
     settings[:editor_button]
   end
+  
+  def homework_submission=(hash)
+    tool_setting(:homework_submission, hash, :selection_width, :selection_height, :icon_url)
+  end
+  
+  def homework_submission
+    settings[:homework_submission]
+  end
 
   def icon_url=(i_url)
     settings[:icon_url] = i_url
@@ -224,19 +255,19 @@ class ContextExternalTool < ActiveRecord::Base
   def shared_secret=(val)
     write_attribute(:shared_secret, val) unless val.blank?
   end
-  
+
   def infer_defaults
     self.url = nil if url.blank?
     self.domain = nil if domain.blank?
 
-    [:resource_selection, :editor_button].each do |type|
+    [:resource_selection, :editor_button, :homework_submission].each do |type|
       if settings[type]
         settings[:icon_url] ||= settings[type][:icon_url] if settings[type][:icon_url]
         settings[type][:selection_width] = settings[type][:selection_width].to_i if settings[type][:selection_width]
         settings[type][:selection_height] = settings[type][:selection_height].to_i if settings[type][:selection_height]
       end
     end
-    [:course_navigation, :account_navigation, :user_navigation, :resource_selection, :editor_button].each do |type|
+    EXTENSION_TYPES.each do |type|
       if settings[type]
         if !(settings[type][:url] || self.url) || (settings[type].has_key?(:enabled) && !settings[type][:enabled])
           settings.delete(type)
@@ -247,14 +278,39 @@ class ContextExternalTool < ActiveRecord::Base
     settings.delete(:resource_selection) if settings[:resource_selection] && (!settings[:resource_selection][:selection_width] || !settings[:resource_selection][:selection_height])
     settings.delete(:editor_button) if settings[:editor_button] && !settings[:icon_url]
 
-    self.has_user_navigation = !!settings[:user_navigation]
-    self.has_course_navigation = !!settings[:course_navigation]
-    self.has_account_navigation = !!settings[:account_navigation]
-    self.has_resource_selection = !!settings[:resource_selection]
-    self.has_editor_button = !!settings[:editor_button]
+    EXTENSION_TYPES.each do |type|
+      message = "has_#{type}="
+      self.send(message, !!settings[type]) if self.respond_to?(message)
+    end
     true
   end
-  
+
+  #This aggressively updates the domain on all URLs in this tool
+  def change_domain!(new_domain)
+    replace_host = lambda do |url, host|
+      uri = URI.parse(url)
+      uri.host = host
+      uri.to_s
+    end
+
+    self.domain = new_domain if self.domain
+
+    self.url = replace_host.call(self.url, new_domain) if self.url
+
+    settings.keys.each do |setting|
+      next if [:custom_fields, :environments].include? setting.to_sym
+      if settings[setting].is_a?(Hash)
+        settings[setting].keys.each do |property|
+          if settings[setting][property] =~ URI::regexp
+            settings[setting][property] = replace_host.call(settings[setting][property], new_domain)
+          end
+        end
+      elsif settings[setting] =~ URI::regexp
+        settings[setting] = replace_host.call(settings[setting], new_domain)
+      end
+    end
+  end
+
   def self.standardize_url(url)
     return "" if url.empty?
     url = "http://" + url unless url.match(/:\/\//)
@@ -289,18 +345,34 @@ class ContextExternalTool < ActiveRecord::Base
     end
   end
   
-  def matches_url?(url)
+  def matches_url?(url, match_queries_exactly=true)
     if !defined?(@standard_url)
       @standard_url = !self.url.blank? && ContextExternalTool.standardize_url(self.url)
     end
-    return true if url == @standard_url
+    if match_queries_exactly
+      url = ContextExternalTool.standardize_url(url)
+      return true if url == @standard_url
+    elsif @standard_url.present?
+      if !defined?(@url_params)
+        res = URI.parse(@standard_url)
+        @url_params = res.query.present? ? res.query.split(/&/) : []
+      end
+      res = URI.parse(url).normalize
+      res.query = res.query.split(/&/).select{|p| @url_params.include?(p)}.sort.join('&') if res.query.present?
+      res.query = nil if res.query.blank?
+      res.normalize!
+      return true if res.to_s == @standard_url
+    end
     host = URI.parse(url).host rescue nil
     !!(host && ('.' + host).match(/\.#{domain}\z/))
   end
   
-  def self.all_tools_for(context)
+  def self.all_tools_for(context, options={})
     contexts = []
     tools = []
+    if options[:user]
+      contexts << options[:user]
+    end
     while context
       if context.is_a?(Group)
         contexts << context
@@ -335,7 +407,6 @@ class ContextExternalTool < ActiveRecord::Base
   # then check for a match on the current context (configured by
   # the teacher).
   def self.find_external_tool(url, context, preferred_tool_id=nil)
-    url = ContextExternalTool.standardize_url(url)
     contexts = []
     while context
       if context.is_a?(Group)
@@ -358,22 +429,24 @@ class ContextExternalTool < ActiveRecord::Base
     # insertion, there's a stronger chance that a different URL was intended.
     preferred_tool = ContextExternalTool.active.find_by_id(preferred_tool_id)
     return preferred_tool if preferred_tool && preferred_tool.settings[:resource_selection]
-    
-    contexts.each do |context|
-      res = context.context_external_tools.active.sort_by{|t| [t.precedence, t.id == preferred_tool_id ? 0 : 1] }.detect{|tool| tool.url && tool.matches_url?(url) }
-      return res if res
-    end
-    contexts.each do |context|
-      res = context.context_external_tools.active.sort_by{|t| [t.precedence, t.id == preferred_tool_id ? 0 : 1] }.detect{|tool| tool.domain && tool.matches_url?(url) }
-      return res if res
-    end
+
+    sorted_external_tools = contexts.collect{|context| context.context_external_tools.active.sort_by{|t| [t.precedence, t.id == preferred_tool_id ? 0 : 1] }}.flatten(1)
+
+    res = sorted_external_tools.detect{|tool| tool.url && tool.matches_url?(url) }
+    return res if res
+
+    # If exactly match doesn't work, try to match by ignoring extra query parameters
+    res = sorted_external_tools.detect{|tool| tool.url && tool.matches_url?(url, false) }
+    return res if res
+
+    res = sorted_external_tools.detect{|tool| tool.domain && tool.matches_url?(url) }
+    return res if res
+
     nil
   end
   
-  named_scope :having_setting, lambda{|setting|
-    {:conditions => {"has_#{setting.to_s}" => true} }
-  }
-  
+  scope :having_setting, lambda { |setting| where("has_#{setting.to_s}" => true) }
+
   def self.find_for(id, context, type)
     tool = context.context_external_tools.having_setting(type).find_by_id(id)
     if !tool && context.is_a?(Group)
@@ -387,7 +460,7 @@ class ContextExternalTool < ActiveRecord::Base
     raise ActiveRecord::RecordNotFound if !tool
     tool
   end
-  named_scope :active, :conditions => ['context_external_tools.workflow_state != ?', 'deleted']
+  scope :active, where("context_external_tools.workflow_state<>'deleted'")
   
   def self.find_all_for(context, type)
     tools = []
@@ -496,8 +569,10 @@ class ContextExternalTool < ActiveRecord::Base
       settings.delete setting
       return
     else
-      settings[setting] = {}
+      settings[setting] = {}.with_indifferent_access
     end
+
+    hash = hash.with_indifferent_access
 
     settings[setting][:url] = hash[:url] if hash[:url]
     settings[setting][:text] = hash[:text] if hash[:text]
@@ -510,5 +585,4 @@ class ContextExternalTool < ActiveRecord::Base
 
     settings[setting]
   end
-  
 end

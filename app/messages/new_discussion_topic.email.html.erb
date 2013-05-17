@@ -1,0 +1,42 @@
+<% define_content :link do %>
+  <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.context) %>/<%= asset.context.class.to_s.downcase.pluralize %>/<%= asset.context_id %>/discussion_topics/<%= asset.id %>
+<% end %>
+
+<% define_content :subject do %>
+  <%= t :subject, "New Discussion - %{discussion_topic}: %{course}", :discussion_topic => asset.title, :course => asset.context.name %>
+<% end %>
+
+<p><%= t :body, "A new discussion has been started that may be interesting to you:" %></p>
+
+<hr style="border: 0;
+    height: 1px;
+    background: #333;
+    background-image: -webkit-linear-gradient(left, #ddd, #aaa, #eee);
+    background-image:    -moz-linear-gradient(left, #ddd, #aaa, #eee);
+    background-image:     -ms-linear-gradient(left, #ddd, #aaa, #eee);
+    background-image:      -o-linear-gradient(left, #ddd, #aaa, #eee);" />
+
+<p><strong><%= asset.title %></strong></p>
+
+<p><%= strip_and_truncate(asset.message, :max_length => 5000).gsub(/\n/, '</p><p>') %></p>
+
+<hr style="border: 0;
+    height: 1px;
+    background: #333;
+    background-image: -webkit-linear-gradient(left, #ddd, #aaa, #eee);
+    background-image:    -moz-linear-gradient(left, #ddd, #aaa, #eee);
+    background-image:     -ms-linear-gradient(left, #ddd, #aaa, #eee);
+    background-image:      -o-linear-gradient(left, #ddd, #aaa, #eee);" />
+
+<% if asset.attachment %>
+  <div style="margin-top: 20px; padding: 10px; border: 1px solid #f1f1f1; background-color: #f3f3f3;">
+      <p style="margin: 0px;"><%= t :attached_file, "Attached File" %></p>
+      <ul style="padding-left: 20px;">
+          <li><%= asset.attachment.display_name %> - <%= asset.attachment.readable_size %>
+              <a href="<%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.context) %>/<%= asset.context.class.to_s.downcase.pluralize %>/<%= asset.context_id %>/files/<%= asset.attachment_id %>/download">[<%= t :download, "download" %>]</a></li>
+      </ul>
+  </div>
+<% end %>
+
+<p><a href="<%= content :link %>"><%= t :details, "Join the conversation here" %></a></p>
+

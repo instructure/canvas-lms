@@ -18,6 +18,7 @@
 
 module Api::V1::DiscussionTopics
   include Api::V1::Json
+  include Api::V1::User
   include Api::V1::Attachment
 
   def discussion_topics_api_json(topics, context, user, session)
@@ -26,7 +27,7 @@ module Api::V1::DiscussionTopics
     end
   end
 
-  def discussion_topic_api_json(topic, context, user, session)
+  def discussion_topic_api_json(topic, context, user, session, include_assignment = true)
     attachments = []
     if topic.attachment
       attachments << attachment_json(topic.attachment, user)
@@ -38,11 +39,11 @@ module Api::V1::DiscussionTopics
       url = feeds_topic_format_path(topic.id, code, :rss)
     end
 
-    children = topic.child_topics.scoped(:select => 'id').map(&:id)
+    children = topic.child_topics.pluck(:id)
 
     api_json(topic, user, session, {
-                  :only => %w(id title assignment_id delayed_post_at last_reply_at posted_at root_topic_id),
-                  :methods => [:user_name, :discussion_subentry_count], }, [:attach]
+                  :only => %w(id title assignment_id delayed_post_at last_reply_at posted_at root_topic_id podcast_has_student_posts),
+                  :methods => [:user_name, :discussion_subentry_count], }, [:attach, :update, :delete]
     ).tap do |json|
       json.merge! :message => api_user_content(topic.message, context),
                   :discussion_type => topic.discussion_type,
@@ -52,12 +53,19 @@ module Api::V1::DiscussionTopics
                   :unread_count => topic.unread_count(user),
                   :topic_children => children,
                   :attachments => attachments,
+                  :locked => topic.locked?,
+                  :author => user_display_json(topic.user, topic.context),
                   :html_url => context.is_a?(CollectionItem) ? nil :
                           named_context_url(context,
                                             :context_discussion_topic_url,
                                             topic,
                                             :include_host => true)
       json[:url] = json[:html_url] # deprecated
+      if include_assignment && topic.assignment
+        extend Api::V1::Assignment
+        json[:assignment] = assignment_json(topic.assignment, user, session, !:include_discussion_topic)
+      end
+      json
     end
   end
 
@@ -71,13 +79,13 @@ module Api::V1::DiscussionTopics
   def discussion_entry_api_json(entries, context, user, session, includes = [:user_name, :subentries])
     entries.map do |entry|
       if entry.deleted?
-        json = api_json(entry, user, session, :only => %w(id created_at updated_at parent_id))
+        json = api_json(entry, user, session, :only => %w(id created_at updated_at parent_id editor_id))
         json[:deleted] = true
       else
         json = api_json(entry, user, session,
                         :only => %w(id user_id created_at updated_at parent_id))
         json[:user_name] = entry.user_name if includes.include?(:user_name)
-        json[:editor_id] = entry.editor_id if entry.editor_id && entry.editor_id != entry.user_id
+        json[:editor_id] = entry.editor_id if entry.editor_id
         json[:message] = api_user_content(entry.message, context, user)
         if entry.attachment
           json[:attachment] = attachment_json(entry.attachment, user, :host => HostUrl.context_host(context))
@@ -88,7 +96,7 @@ module Api::V1::DiscussionTopics
       json[:read_state] = entry.read_state(user) if user
 
       if includes.include?(:subentries) && entry.root_entry_id.nil?
-        replies = entry.flattened_discussion_subentries.active.newest_first.find(:all, :limit => 11).to_a
+        replies = entry.flattened_discussion_subentries.active.newest_first.limit(11).all
         unless replies.empty?
           json[:recent_replies] = discussion_entry_api_json(replies.first(10), context, user, session, includes)
           json[:has_more_replies] = replies.size > 10
@@ -98,27 +106,27 @@ module Api::V1::DiscussionTopics
     end
   end
 
-  def topic_pagination_path
+  def topic_pagination_url(options = {})
     if @context.is_a? Course
-      api_v1_course_discussion_topics_path(@context)
+      api_v1_course_discussion_topics_url(@context, options)
     else
-      api_v1_group_discussion_topics_path(@context)
+      api_v1_group_discussion_topics_url(@context, options)
     end
   end
 
-  def entry_pagination_path(topic)
+  def entry_pagination_url(topic)
     if @context.is_a? Course
-      api_v1_course_discussion_entries_path(@context)
+      api_v1_course_discussion_entries_url(@context)
     else
-      api_v1_group_discussion_entries_path(@context)
+      api_v1_group_discussion_entries_url(@context)
     end
   end
 
-  def reply_pagination_path(entry)
+  def reply_pagination_url(entry)
     if @context.is_a? Course
-      api_v1_course_discussion_replies_path(@context)
+      api_v1_course_discussion_replies_url(@context)
     else
-      api_v1_group_discussion_replies_path(@context)
+      api_v1_group_discussion_replies_url(@context)
     end
   end
 end

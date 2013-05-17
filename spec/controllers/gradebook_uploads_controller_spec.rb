@@ -61,7 +61,7 @@ describe GradebookUploadsController do
   
   describe "POST 'update'" do
     
-    it "should update grades" do
+    it "should update grades and save new versions" do
       course_with_graded_student
       @assignment.reload
       @assignment2.reload
@@ -78,10 +78,19 @@ describe GradebookUploadsController do
       @gi.parse!
       post 'update', :course_id => @course.id, :json_data_to_submit => @gi.to_json
       
-      @assignment.reload
-      @assignment2.reload
-      @assignment.submissions.first.grade.should == '5'
-      @assignment2.submissions.first.grade.should == '7'
+      a_sub = @assignment.reload.submissions.first
+      a2_sub = @assignment2.reload.submissions.first
+      a_sub.grade.should == '5'
+      a_sub.graded_at.should_not be_nil
+      a_sub.grader_id.should_not be_nil
+      a_sub.version_number.should == 2
+      a2_sub.grade.should == '7'
+      a2_sub.graded_at.should_not be_nil
+      a2_sub.grader_id.should_not be_nil
+      a2_sub.version_number.should == 2
+
+      response.should be_redirect
+      response.redirected_to.should =~ %r|/courses/#{@course.id}/gradebook2|
     end
     
     it "should create new assignments" do

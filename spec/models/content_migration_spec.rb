@@ -65,17 +65,18 @@ describe ContentMigration do
     def run_course_copy(warnings=[])
       @cm.copy_course_without_send_later
       @cm.reload
-      @cm.warnings.should == warnings
       if @cm.migration_settings[:last_error]
         er = ErrorReport.last
         "#{er.message} - #{er.backtrace}".should == ""
       end
+      @cm.warnings.should == warnings
       @cm.workflow_state.should == 'imported'
       @copy_to.reload
     end
 
     it "should migrate syllabus links on copy" do
       course_model
+
       topic = @copy_from.discussion_topics.create!(:title => "some topic", :message => "<p>some text</p>")
       @copy_from.syllabus_body = "<a href='/courses/#{@copy_from.id}/discussion_topics/#{topic.id}'>link</a>"
       @copy_from.save!
@@ -86,6 +87,31 @@ describe ContentMigration do
       new_topic.should_not be_nil
       new_topic.message.should == topic.message
       @copy_to.syllabus_body.should match(/\/courses\/#{@copy_to.id}\/discussion_topics\/#{new_topic.id}/)
+    end
+
+    it "should copy course syllabus when the everything option is selected" do 
+      course_model
+
+      @copy_from.syllabus_body = "What up"
+      @copy_from.save!
+
+      run_course_copy
+
+      @copy_to.syllabus_body.should =~ /#{@copy_from.syllabus_body}/
+    end
+
+    it "should not migrate syllabus when not selected" do
+      course_model
+      @copy_from.syllabus_body = "<p>wassup</p>"
+
+      @cm.copy_options = {
+        :course => {'syllabus_body' => false}
+      }
+      @cm.save!
+
+      run_course_copy
+
+      @copy_to.syllabus_body.should == nil
     end
 
     def make_grading_standard(context)
@@ -104,8 +130,6 @@ describe ContentMigration do
       @copy_from.course_code = 'something funny'
       @copy_from.publish_grades_immediately = false
       @copy_from.allow_student_wiki_edits = true
-      @copy_from.allow_student_assignment_edits = true
-      @copy_from.hashtag = 'oi'
       @copy_from.show_public_context_messages = false
       @copy_from.allow_student_forum_attachments = false
       @copy_from.default_wiki_editing_roles = 'teachers'
@@ -120,27 +144,19 @@ describe ContentMigration do
       @copy_from.license = "cc_by_nc_nd"
       @copy_from.locale = "es"
       @copy_from.tab_configuration = [{"id"=>0}, {"id"=>14}, {"id"=>8}, {"id"=>5}, {"id"=>6}, {"id"=>2}, {"id"=>3, "hidden"=>true}]
-      @copy_from.settings[:hide_final_grade] = true
+      @copy_from.hide_final_grades = true
       gs = make_grading_standard(@copy_from)
       @copy_from.grading_standard = gs
       @copy_from.grading_standard_enabled = true
       @copy_from.save!
-
-      body_with_link = %{<p>Watup? <strong>eh?</strong><a href="/courses/%s/assignments">Assignments</a></p>
-  <div>
-    <div><img src="http://www.instructure.com/images/header-logo.png"></div>
-    <div><img src="http://www.instructure.com/images/header-logo.png"></div>
-  </div>}
-      @copy_from.syllabus_body = body_with_link % @copy_from.id
 
       run_course_copy
 
       #compare settings
       @copy_to.conclude_at.should == nil
       @copy_to.start_at.should == nil
-      @copy_to.syllabus_body.should == (body_with_link % @copy_to.id)
       @copy_to.storage_quota.should == 444
-      @copy_to.settings[:hide_final_grade].should == true
+      @copy_to.hide_final_grades.should == true
       @copy_to.grading_standard_enabled.should == true
       gs_2 = @copy_to.grading_standards.find_by_migration_id(mig_id(gs))
       gs_2.data.should == gs.data
@@ -192,62 +208,17 @@ describe ContentMigration do
       @copy_to.grading_standard.should == nil
     end
 
+    it "should not copy deleted grading standards" do
+      gs = make_grading_standard(@copy_from)
+      @copy_from.grading_standard_enabled = true
+      @copy_from.save!
 
-    it "should copy external tools" do
-      tool_from = @copy_from.context_external_tools.create!(:name => "new tool", :consumer_key => "key", :shared_secret => "secret", :domain => 'example.com', :custom_fields => {'a' => '1', 'b' => '2'})
-      tool_from.settings[:course_navigation] = {:url => "http://www.example.com", :text => "Example URL"}
-      tool_from.save
-
+      gs.destroy
       run_course_copy
 
-      @copy_to.context_external_tools.count.should == 1
-
-      tool_to = @copy_to.context_external_tools.first
-      tool_to.name.should == tool_from.name
-      tool_to.custom_fields.should == tool_from.custom_fields
-      tool_to.has_course_navigation.should == true
-      tool_to.consumer_key.should == tool_from.consumer_key
-      tool_to.shared_secret.should == tool_from.shared_secret
+      @copy_to.grading_standards.should be_empty
     end
 
-    it "should not duplicate external tools used in modules" do
-      tool_from = @copy_from.context_external_tools.create!(:name => "new tool", :consumer_key => "key", :shared_secret => "secret", :domain => 'example.com', :custom_fields => {'a' => '1', 'b' => '2'})
-      tool_from.settings[:course_navigation] = {:url => "http://www.example.com", :text => "Example URL"}
-      tool_from.save
-
-      mod1 = @copy_from.context_modules.create!(:name => "some module")
-      tag = mod1.add_item({:type => 'context_external_tool',
-                           :title => 'Example URL',
-                           :url => "http://www.example.com",
-                           :new_tab => true})
-      tag.save
-
-      run_course_copy
-
-      @copy_to.context_external_tools.count.should == 1
-
-      tool_to = @copy_to.context_external_tools.first
-      tool_to.name.should == tool_from.name
-      tool_to.consumer_key.should == tool_from.consumer_key
-      tool_to.has_course_navigation.should == true
-    end
-
-    it "should copy external tool assignments" do
-      assignment_model(:course => @copy_from, :points_possible => 40, :submission_types => 'external_tool', :grading_type => 'points')
-      tag_from = @assignment.build_external_tool_tag(:url => "http://example.com/one", :new_tab => true)
-      tag_from.content_type = 'ContextExternalTool'
-      tag_from.save!
-
-      run_course_copy
-
-      asmnt_2 = @copy_to.assignments.first
-      asmnt_2.submission_types.should == "external_tool"
-      asmnt_2.external_tool_tag.should_not be_nil
-      tag_to = asmnt_2.external_tool_tag
-      tag_to.content_type.should == tag_from.content_type
-      tag_to.url.should == tag_from.url
-      tag_to.new_tab.should == tag_from.new_tab
-    end
 
     def mig_id(obj)
       CC::CCHelper.create_key(obj)
@@ -285,7 +256,7 @@ describe ContentMigration do
       new_att.grants_right?(student, :download).should be_false
     end
 
-    it "should tranlsate links to module items in html content" do
+    it "should translate links to module items in html content" do
       mod1 = @copy_from.context_modules.create!(:name => "some module")
       asmnt1 = @copy_from.assignments.create!(:title => "some assignment")
       tag = mod1.add_item({:id => asmnt1.id, :type => 'assignment', :indent => 1})
@@ -298,6 +269,34 @@ describe ContentMigration do
       tag_to = mod1_to.content_tags.first
       page_to = @copy_to.wiki.wiki_pages.find_by_migration_id(mig_id(page))
       page_to.body.should == body % [@copy_to.id, tag_to.id]
+    end
+
+    it "should copy unpublished modules" do
+      cm = @copy_from.context_modules.create!(:name => "some module")
+      cm.publish
+      cm2 = @copy_from.context_modules.create!(:name => "another module")
+      cm2.unpublish
+
+      run_course_copy
+
+      @copy_to.context_modules.count.should == 2
+      cm_2 = @copy_to.context_modules.find_by_migration_id(mig_id(cm))
+      cm_2.workflow_state.should == 'active'
+      cm2_2 = @copy_to.context_modules.find_by_migration_id(mig_id(cm2))
+      cm2_2.workflow_state.should == 'unpublished'
+    end
+
+    it "should find and fix wiki links by title or id" do
+      # simulating what happens when the user clicks "link to new page" and enters a title that isn't
+      # urlified the same way by the client vs. the server.  this doesn't break navigation because
+      # ApplicationController#get_wiki_page can match by urlified title, but it broke import (see #9945)
+      main_page = @copy_from.wiki.wiki_page
+      main_page.body = %{<a href="/courses/#{@copy_from.id}/wiki/online:-unit-pages">wut</a>}
+      main_page.save!
+      @copy_from.wiki.wiki_pages.create!(:title => "Online: Unit Pages", :body => %{<a href="/courses/#{@copy_from.id}/wiki/#{main_page.id}">whoa</a>})
+      run_course_copy
+      @copy_to.wiki.wiki_page.body.should == %{<a href="/courses/#{@copy_to.id}/wiki/online-unit-pages">wut</a>}
+      @copy_to.wiki.wiki_pages.find_by_url!("online-unit-pages").body.should == %{<a href="/courses/#{@copy_to.id}/wiki/#{main_page.url}">whoa</a>}
     end
 
     it "should selectively copy items" do
@@ -319,47 +318,47 @@ describe ContentMigration do
       rub2.data = data
       rub2.save!
       rub2.associate_with(@copy_from, @copy_from)
-      default = LearningOutcomeGroup.default_for(@copy_from)
+      default = @copy_from.root_outcome_group
       log = @copy_from.learning_outcome_groups.new
       log.context = @copy_from
       log.title = "outcome group"
       log.description = "<p>Groupage</p>"
       log.save!
-      default.add_item(log)
+      default.adopt_outcome_group(log)
       log2 = @copy_from.learning_outcome_groups.new
       log2.context = @copy_from
       log2.title = "empty group"
       log2.description = "<p>Groupage</p>"
       log2.save!
-      default.add_item(log2)
+      default.adopt_outcome_group(log2)
       log3 = @copy_from.learning_outcome_groups.new
       log3.context = @copy_from
       log3.title = "empty group"
       log3.description = "<p>Groupage</p>"
       log3.save!
-      default.add_item(log3)
-      lo = @copy_from.learning_outcomes.new
+      default.adopt_outcome_group(log3)
+      lo = @copy_from.created_learning_outcomes.new
       lo.context = @copy_from
       lo.short_description = "outcome1"
       lo.workflow_state = 'active'
       lo.data = {:rubric_criterion=>{:mastery_points=>2, :ratings=>[{:description=>"e", :points=>50}, {:description=>"me", :points=>2}, {:description=>"Does Not Meet Expectations", :points=>0.5}], :description=>"First outcome", :points_possible=>5}}
       lo.save!
-      lo2 = @copy_from.learning_outcomes.new
+      lo2 = @copy_from.created_learning_outcomes.new
       lo2.context = @copy_from
       lo2.short_description = "outcome2"
       lo2.workflow_state = 'active'
       lo2.data = {:rubric_criterion=>{:mastery_points=>2, :ratings=>[{:description=>"e", :points=>50}, {:description=>"me", :points=>2}, {:description=>"Does Not Meet Expectations", :points=>0.5}], :description=>"First outcome", :points_possible=>5}}
       lo2.save!
-      lo3 = @copy_from.learning_outcomes.new
+      lo3 = @copy_from.created_learning_outcomes.new
       lo3.context = @copy_from
       lo3.short_description = "outcome3"
       lo3.workflow_state = 'active'
       lo3.data = {:rubric_criterion=>{:mastery_points=>2, :ratings=>[{:description=>"e", :points=>50}, {:description=>"me", :points=>2}, {:description=>"Does Not Meet Expectations", :points=>0.5}], :description=>"First outcome", :points_possible=>5}}
       lo3.save!
 
-      default.add_item(lo)
-      log.add_item(lo2)
-      default.add_item(lo3)
+      default.add_outcome(lo)
+      log.add_outcome(lo2)
+      default.add_outcome(lo3)
 
       # only select one of each type
       @cm.copy_options = {
@@ -369,7 +368,7 @@ describe ContentMigration do
               :wiki_pages => {mig_id(wiki) => "1", mig_id(wiki2) => "0"},
               :rubrics => {mig_id(rub1) => "1", mig_id(rub2) => "0"},
               :learning_outcomes => {mig_id(lo) => "1", mig_id(lo2) => "1", mig_id(lo3) => "0"},
-              :learning_outcome_groups => {mig_id(log) => "0", mig_id(log2) => "1", mig_id(log3) => "0"},
+              :learning_outcome_groups => {mig_id(log) => "1", mig_id(log2) => "1", mig_id(log3) => "0"},
       }
       @cm.save!
 
@@ -391,9 +390,9 @@ describe ContentMigration do
       @copy_to.rubrics.find_by_migration_id(mig_id(rub1)).should_not be_nil
       @copy_to.rubrics.find_by_migration_id(mig_id(rub2)).should be_nil
 
-      @copy_to.learning_outcomes.find_by_migration_id(mig_id(lo)).should_not be_nil
-      @copy_to.learning_outcomes.find_by_migration_id(mig_id(lo2)).should_not be_nil
-      @copy_to.learning_outcomes.find_by_migration_id(mig_id(lo3)).should be_nil
+      @copy_to.created_learning_outcomes.find_by_migration_id(mig_id(lo)).should_not be_nil
+      @copy_to.created_learning_outcomes.find_by_migration_id(mig_id(lo2)).should_not be_nil
+      @copy_to.created_learning_outcomes.find_by_migration_id(mig_id(lo3)).should be_nil
 
       @copy_to.learning_outcome_groups.find_by_migration_id(mig_id(log)).should_not be_nil
       @copy_to.learning_outcome_groups.find_by_migration_id(mig_id(log2)).should_not be_nil
@@ -417,14 +416,14 @@ describe ContentMigration do
       rub1.data = data
       rub1.save!
       rub1.associate_with(@copy_from, @copy_from)
-      default = LearningOutcomeGroup.default_for(@copy_from)
-      lo = @copy_from.learning_outcomes.new
+      default = @copy_from.root_outcome_group
+      lo = @copy_from.created_learning_outcomes.new
       lo.context = @copy_from
       lo.short_description = "outcome1"
       lo.workflow_state = 'active'
       lo.data = {:rubric_criterion=>{:mastery_points=>2, :ratings=>[{:description=>"e", :points=>50}, {:description=>"me", :points=>2}, {:description=>"Does Not Meet Expectations", :points=>0.5}], :description=>"First outcome", :points_possible=>5}}
       lo.save!
-      default.add_item(lo)
+      default.add_outcome(lo)
       gs = @copy_from.grading_standards.new
       gs.title = "Standard eh"
       gs.data = [["A", 0.93], ["A-", 0.89], ["B+", 0.85], ["B", 0.83], ["B!-", 0.80], ["C+", 0.77], ["C", 0.74], ["C-", 0.70], ["D+", 0.67], ["D", 0.64], ["D-", 0.61], ["F", 0]]
@@ -437,7 +436,7 @@ describe ContentMigration do
       @copy_to.attachments.find_by_migration_id(mig_id(att)).destroy
       @copy_to.wiki.wiki_pages.find_by_migration_id(mig_id(wiki)).destroy
       @copy_to.rubrics.find_by_migration_id(mig_id(rub1)).destroy
-      @copy_to.learning_outcomes.find_by_migration_id(mig_id(lo)).destroy
+      @copy_to.created_learning_outcomes.find_by_migration_id(mig_id(lo)).destroy
       @copy_to.quizzes.find_by_migration_id(mig_id(quiz)).destroy if Qti.qti_enabled?
       @copy_to.context_external_tools.find_by_migration_id(mig_id(tool)).destroy
       @copy_to.assignment_groups.find_by_migration_id(mig_id(ag)).destroy
@@ -457,7 +456,7 @@ describe ContentMigration do
       @copy_to.attachments.find_by_migration_id(mig_id(att)).file_state.should == 'available'
       @copy_to.wiki.wiki_pages.find_by_migration_id(mig_id(wiki)).workflow_state.should == 'active'
       @copy_to.rubrics.find_by_migration_id(mig_id(rub1)).workflow_state.should == 'active'
-      @copy_to.learning_outcomes.find_by_migration_id(mig_id(lo)).workflow_state.should == 'active'
+      @copy_to.created_learning_outcomes.find_by_migration_id(mig_id(lo)).workflow_state.should == 'active'
       @copy_to.quizzes.find_by_migration_id(mig_id(quiz)).workflow_state.should == 'created' if Qti.qti_enabled?
       @copy_to.context_external_tools.find_by_migration_id(mig_id(tool)).workflow_state.should == 'public'
       @copy_to.assignment_groups.find_by_migration_id(mig_id(ag)).workflow_state.should == 'available'
@@ -465,60 +464,180 @@ describe ContentMigration do
       @copy_to.grading_standards.find_by_migration_id(mig_id(gs)).workflow_state.should == 'active'
       @copy_to.calendar_events.find_by_migration_id(mig_id(cal)).workflow_state.should == 'active'
     end
+    
+    def create_outcome(context, group=nil)
+      lo = LearningOutcome.new
+      lo.context = context
+      lo.short_description = "haha_#{rand(10_000)}"
+      lo.data = {:rubric_criterion=>{:mastery_points=>3, :ratings=>[{:description=>"Exceeds Expectations", :points=>5}], :description=>"First outcome", :points_possible=>5}} 
+      lo.save!
+      if group
+        group.add_outcome(lo)
+      elsif context
+        context.root_outcome_group.add_outcome(lo)
+      end
+      
+      lo
+    end
 
     it "should copy learning outcomes into the new course" do
-      lo = @copy_from.learning_outcomes.new
-      lo.context = @copy_from
-      lo.short_description = "Lone outcome"
-      lo.description = "<p>Descriptions are boring</p>"
-      lo.workflow_state = 'active'
-      lo.data = {:rubric_criterion=>{:mastery_points=>3, :ratings=>[{:description=>"Exceeds Expectations", :points=>5}, {:description=>"Meets Expectations", :points=>3}, {:description=>"Does Not Meet Expectations", :points=>0}], :description=>"First outcome", :points_possible=>5}}
-      lo.save!
+      old_root = @copy_from.root_outcome_group
+      
+      lo = create_outcome(@copy_from, old_root)
 
-      old_root = LearningOutcomeGroup.default_for(@copy_from)
-      old_root.add_item(lo)
+      log = @copy_from.learning_outcome_groups.new
+      log.context = @copy_from
+      log.title = "An outcome group"
+      log.description = "<p>Groupage</p>"
+      log.save!
+      old_root.adopt_outcome_group(log)
 
-      lo_g = @copy_from.learning_outcome_groups.new
-      lo_g.context = @copy_from
-      lo_g.title = "Lone outcome group"
-      lo_g.description = "<p>Groupage</p>"
-      lo_g.save!
-      old_root.add_item(lo_g)
-
-      lo2 = @copy_from.learning_outcomes.new
-      lo2.context = @copy_from
-      lo2.short_description = "outcome in group"
-      lo2.workflow_state = 'active'
-      lo2.data = {:rubric_criterion=>{:mastery_points=>2, :ratings=>[{:description=>"e", :points=>50}, {:description=>"me", :points=>2}, {:description=>"Does Not Meet Expectations", :points=>0.5}], :description=>"First outcome", :points_possible=>5}}
-      lo2.save!
-      lo_g.add_item(lo2)
-      old_root.reload
+      lo2 = create_outcome(@copy_from, log)
+      
+      log_sub = @copy_from.learning_outcome_groups.new
+      log_sub.context = @copy_from
+      log_sub.title = "Sub group"
+      log_sub.description = "<p>SubGroupage</p>"
+      log_sub.save!
+      log.adopt_outcome_group(log_sub)
+      
+      log_sub2 = @copy_from.learning_outcome_groups.new
+      log_sub2.context = @copy_from
+      log_sub2.title = "Sub group2"
+      log_sub2.description = "<p>SubGroupage2</p>"
+      log_sub2.save!
+      log_sub.adopt_outcome_group(log_sub2)
+      
+      lo3 = create_outcome(@copy_from, log_sub2)
 
       # copy outcomes into new course
-      new_root = LearningOutcomeGroup.default_for(@copy_to)
+      new_root = @copy_to.root_outcome_group
 
       run_course_copy
 
-      @copy_to.learning_outcomes.count.should == @copy_from.learning_outcomes.count
+      @copy_to.created_learning_outcomes.count.should == @copy_from.created_learning_outcomes.count
       @copy_to.learning_outcome_groups.count.should == @copy_from.learning_outcome_groups.count
-      new_root.sorted_content.count.should == old_root.sorted_content.count
+      new_root.child_outcome_links.count.should == old_root.child_outcome_links.count
+      new_root.child_outcome_groups.count.should == old_root.child_outcome_groups.count
 
-      lo_2 = new_root.sorted_content.first
-      lo_2.short_description.should == lo.short_description
-      lo_2.description.should == lo.description
-      lo_2.data.should == lo.data
+      lo_new = new_root.child_outcome_links.first.content
+      lo_new.short_description.should == lo.short_description
+      lo_new.description.should == lo.description
+      lo_new.data.should == lo.data
 
-      lo_g_2 = new_root.sorted_content.last
-      lo_g_2.title.should == lo_g.title
-      lo_g_2.description.should == lo_g.description
-      lo_g_2.sorted_content.length.should == 1
-      lo_g_2.root_learning_outcome_group_id.should == new_root.id
-      lo_g_2.learning_outcome_group_id.should == new_root.id
+      log_new = new_root.child_outcome_groups.first
+      log_new.title.should == log.title
+      log_new.description.should == log.description
+      log_new.child_outcome_links.length.should == 1
 
-      lo_2 = lo_g_2.sorted_content.first
-      lo_2.short_description.should == lo2.short_description
-      lo_2.description.should == lo2.description
-      lo_2.data.should == lo2.data
+      lo_new = log_new.child_outcome_links.first.content
+      lo_new.short_description.should == lo2.short_description
+      lo_new.description.should == lo2.description
+      lo_new.data.should == lo2.data
+      
+      log_sub_new = log_new.child_outcome_groups.first
+      log_sub_new.title.should == log_sub.title
+      log_sub_new.description.should == log_sub.description
+      
+      log_sub2_new = log_sub_new.child_outcome_groups.first
+      log_sub2_new.title.should == log_sub2.title
+      log_sub2_new.description.should == log_sub2.description
+      
+      lo3_new = log_sub2_new.child_outcome_links.first.content
+      lo3_new.short_description.should == lo3.short_description
+      lo3_new.description.should == lo3.description
+      lo3_new.data.should == lo3.data
+    end
+    
+    it "should relink to external outcomes" do
+      account = @copy_from.account
+      a_group = account.root_outcome_group
+      
+      root_group = LearningOutcomeGroup.create!(:title => "contextless group")
+      
+      lo = create_outcome(nil, root_group)
+      
+      lo2 = create_outcome(account, a_group)
+      
+      from_root = @copy_from.root_outcome_group
+      from_root.add_outcome(lo)
+      from_root.add_outcome(lo2)
+      
+      run_course_copy
+      
+      to_root = @copy_to.root_outcome_group
+      to_root.child_outcome_links.count.should == 2
+      to_root.child_outcome_links.find_by_content_id(lo.id).should_not be_nil
+      to_root.child_outcome_links.find_by_content_id(lo2.id).should_not be_nil
+    end
+    
+    it "should create outcomes in new course if external context not found" do 
+      hash = {"is_global_outcome"=>true,
+               "points_possible"=>nil,
+               "type"=>"learning_outcome",
+               "ratings"=>[],
+               "description"=>nil,
+               "mastery_points"=>nil,
+               "external_identifier"=>"0",
+               "title"=>"root outcome",
+               "migration_id"=>"id1072dcf40e801c6468d9eaa5774e56d"}
+      
+      @cm.outcome_to_id_map = {}
+      LearningOutcome.import_from_migration(hash, @cm)
+      
+      @cm.warnings.should == ["The external Learning Outcome couldn't be found for \"root outcome\", creating a copy."]
+      
+      to_root = @copy_to.root_outcome_group
+      to_root.child_outcome_links.count.should == 1
+      new_lo = to_root.child_outcome_links.first.content
+      new_lo.id.should_not == 0
+      new_lo.short_description.should == hash["title"]
+    end
+
+    it "should link rubric (and assignments) to outcomes" do 
+      root_group = LearningOutcomeGroup.create!(:title => "contextless group")
+      
+      lo = create_outcome(nil, root_group)
+      lo2 = create_outcome(@copy_from)
+      
+      from_root = @copy_from.root_outcome_group
+      from_root.add_outcome(lo)
+      from_root.add_outcome(lo2)
+      
+      rub = Rubric.new(:context => @copy_from)
+      rub.data = [
+        {
+          :points => 3,
+          :description => "Outcome row",
+          :id => 1,
+          :ratings => [{:points => 3,:description => "Rockin'",:criterion_id => 1,:id => 2}],
+          :learning_outcome_id => lo.id
+        },
+        {
+          :points => 3,
+          :description => "Outcome row 2",
+          :id => 2,
+          :ratings => [{:points => 3,:description => "lame'",:criterion_id => 2,:id => 3}],
+          :learning_outcome_id => lo2.id
+        }
+      ]
+      rub.alignments_changed = true
+      rub.save!
+      rub.associate_with(@copy_from, @copy_from)
+
+      from_assign = @copy_from.assignments.create!(:title => "some assignment")
+      rub.associate_with(from_assign, @copy_from, :purpose => "grading")
+      
+      run_course_copy
+      
+      new_lo2 = @copy_to.created_learning_outcomes.find_by_migration_id(mig_id(lo2))
+      to_rub = @copy_to.rubrics.first
+      to_assign = @copy_to.assignments.first
+      
+      to_rub.data[1]["learning_outcome_id"].should == new_lo2.id
+      to_rub.data[0]["learning_outcome_id"].should == lo.id
+      to_rub.learning_outcome_alignments.map(&:learning_outcome_id).sort.should == [lo.id, new_lo2.id].sort
+      to_assign.learning_outcome_alignments.map(&:learning_outcome_id).sort.should == [lo.id, new_lo2.id].sort
     end
 
     it "should copy a quiz when assignment is selected" do
@@ -529,8 +648,8 @@ describe ContentMigration do
       @quiz.assignment.should_not be_nil
 
       @cm.copy_options = {
-              :assignments => {mig_id(@quiz.assignment) => "1"},
-              :quizzes => {mig_id(@quiz) => "0"},
+        :assignments => {mig_id(@quiz.assignment) => "1"},
+        :quizzes => {mig_id(@quiz) => "0"},
       }
       @cm.save!
 
@@ -648,10 +767,22 @@ describe ContentMigration do
       bank2.assessment_questions.size.should == 2
     end
 
+    it "should copy discussion topic attributes" do
+      topic = @copy_from.discussion_topics.create!(:title => "topic", :message => "<p>bloop</p>", :discussion_type => "threaded")
+
+      run_course_copy
+
+      @copy_to.discussion_topics.count.should == 1
+      new_topic = @copy_to.discussion_topics.first
+
+      attrs = ["title", "message", "discussion_type", "type"]
+      topic.attributes.slice(*attrs).should == new_topic.attributes.slice(*attrs)
+    end
+
     it "should copy a discussion topic when assignment is selected" do
       topic = @copy_from.discussion_topics.build(:title => "topic")
       assignment = @copy_from.assignments.build(:submission_types => 'discussion_topic', :title => topic.title)
-      assignment.infer_due_at
+      assignment.infer_times
       assignment.saved_by = :discussion_topic
       topic.assignment = assignment
       topic.save
@@ -670,7 +801,7 @@ describe ContentMigration do
     it "should not copy deleted assignment attached to topic" do
       topic = @copy_from.discussion_topics.build(:title => "topic")
       assignment = @copy_from.assignments.build(:submission_types => 'discussion_topic', :title => topic.title)
-      assignment.infer_due_at
+      assignment.infer_times
       assignment.saved_by = :discussion_topic
       topic.assignment = assignment
       topic.save!
@@ -710,7 +841,7 @@ describe ContentMigration do
     def create_rubric_asmnt
       @rubric = @copy_from.rubrics.new
       @rubric.title = "Rubric"
-      @rubric.data = [{:ratings=>[{:criterion_id=>"309_6312", :points=>5, :description=>"Full Marks", :id=>"blank", :long_description=>""}, {:criterion_id=>"309_6312", :points=>0, :description=>"No Marks", :id=>"blank_2", :long_description=>""}], :points=>5, :description=>"Description of criterion", :id=>"309_6312", :long_description=>""}]
+      @rubric.data = [{:ratings=>[{:criterion_id=>"309_6312", :points=>5.5, :description=>"Full Marks", :id=>"blank", :long_description=>""}, {:criterion_id=>"309_6312", :points=>0, :description=>"No Marks", :id=>"blank_2", :long_description=>""}], :points=>5.5, :description=>"Description of criterion", :id=>"309_6312", :long_description=>""}]
       @rubric.save!
 
       @assignment = @copy_from.assignments.create!(:title => "some assignment", :points_possible => 12)
@@ -729,6 +860,16 @@ describe ContentMigration do
 
       rub = @copy_to.rubrics.find_by_migration_id(mig_id(@rubric))
       rub.should_not be_nil
+
+      [:description, :id, :points].each do |k|
+        rub.data.first[k].should == @rubric.data.first[k]
+      end
+      [:criterion_id, :description, :id, :points].each do |k|
+        rub.data.first[:ratings].each_with_index do |criterion, i|
+          criterion[k].should == @rubric.data.first[:ratings][i][k]
+        end
+      end
+
       asmnt2 = @copy_to.assignments.find_by_migration_id(mig_id(@assignment))
       asmnt2.rubric.id.should == rub.id
       asmnt2.rubric_association.use_for_grading.should == true
@@ -768,6 +909,7 @@ describe ContentMigration do
 
     it "items in the root folder should be in the root in the new course" do
       att = Attachment.create!(:filename => 'dummy.txt', :uploaded_data => StringIO.new('fakety'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
+
       @copy_from.syllabus_body = "<a href='/courses/#{@copy_from.id}/files/#{att.id}/download?wrap=1'>link</a>"
       @copy_from.save!
 
@@ -781,8 +923,19 @@ describe ContentMigration do
       @copy_to.syllabus_body.should == %{<a href="/courses/#{@copy_to.id}/files/#{new_attachment.id}/download?wrap=1">link</a>}
     end
 
+    it "should add a warning instead of failing when trying to copy an invalid file" do
+      att = Attachment.create!(:filename => 'dummy.txt', :uploaded_data => StringIO.new('fakety'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
+      Attachment.where(:id => att).update_all(:filename => nil)
+
+      att.reload
+      att.should_not be_valid
+
+      run_course_copy(["Couldn't copy file \"dummy.txt\""])
+    end
+
     it "should preserve media comment links" do
       pending unless Qti.qti_enabled?
+
       @copy_from.media_objects.create!(:media_id => '0_12345678')
       @copy_from.syllabus_body = <<-HTML.strip
       <p>
@@ -939,6 +1092,9 @@ describe ContentMigration do
       @copy_from.discussion_topics.create!(:title => "some topic",
                                            :message => "<p>some text</p>",
                                            :delayed_post_at => old_start + 3.days)
+      @copy_from.calendar_events.create!(:title => "an event",
+                                         :start_at => old_start + 4.days,
+                                         :end_at => old_start + 4.days + 1.hour)
       cm = @copy_from.context_modules.build(:name => "some module", :unlock_at => old_start + 1.days)
       cm.start_at = old_start + 2.day
       cm.end_at = old_start + 3.days
@@ -965,6 +1121,10 @@ describe ContentMigration do
       new_disc = @copy_to.discussion_topics.first
       new_disc.delayed_post_at.to_i.should == (new_start + 3.day).to_i
 
+      new_event = @copy_to.calendar_events.first
+      new_event.start_at.to_i.should == (new_start + 4.day).to_i
+      new_event.end_at.to_i.should == (new_start + 4.day + 1.hour).to_i
+
       new_mod = @copy_to.context_modules.first
       new_mod.unlock_at.to_i.should  == (new_start + 1.day).to_i
       new_mod.start_at.to_i.should == (new_start + 2.day).to_i
@@ -988,7 +1148,9 @@ describe ContentMigration do
               :ip_filter => '192.168.1.1',
               :require_lockdown_browser => true,
               :require_lockdown_browser_for_results => true,
-              :notify_of_update => true
+              :notify_of_update => true,
+              :one_question_at_a_time => true,
+              :cant_go_back => true
       )
 
       run_course_copy
@@ -1005,57 +1167,76 @@ describe ContentMigration do
 
     end
 
-    it "should copy time correctly across daylight savings shift MST to MDT" do
-      Time.use_zone('America/Denver') do
-        asmnt = @copy_from.assignments.new
-        asmnt.title = "Nothing Assignment"
-        asmnt.description = 'oi'
-        asmnt.due_at = Time.zone.at(1325876400) # Fri, 06 Jan 2012 12:00:00 MST -07:00
-        asmnt.save!
+    context "should copy time correctly across daylight saving shift" do
+      let(:local_time_zone) { ActiveSupport::TimeZone.new 'America/Denver' }
 
-        @cm.migration_settings[:migration_ids_to_import] = {
-                :copy => {
-                        :everything => true,
-                        :shift_dates => true,
-                        :old_start_date => 'Jan 1, 2012',
-                        :old_end_date => 'Jan 15, 2012',
-                        :new_start_date => 'Jun 2, 2012',
-                        :new_end_date => 'Jun 16, 2012'
-                }
-        }
-        @cm.save!
+      def copy_assignment(options = {})
+        account = @copy_to.account
 
-        run_course_copy
+        old_time_zone = account.default_time_zone
+        account.default_time_zone = options.include?(:account_time_zone) ? options[:account_time_zone].name : 'UTC'
+        account.save!
 
-        asmnt_2 = @copy_to.assignments.find_by_migration_id(mig_id(asmnt))
-        asmnt_2.due_at.to_i.should == Time.zone.at(1339178400).to_i # Fri, 08 Jun 2012 12:00:00 MDT -06:00
+        Time.use_zone('UTC') do
+          assignment = @copy_from.assignments.create! :title => 'Assignment', :due_at => old_date
+          assignment.save!
+
+          migration_settings = {
+            :copy => {
+              :everything => true,
+              :shift_dates => true,
+              :old_start_date => old_start_date,
+              :old_end_date => old_end_date,
+              :new_start_date => new_start_date,
+              :new_end_date => new_end_date
+            }
+          }
+          migration_settings[:copy][:time_zone] = options[:time_zone].name if options.include?(:time_zone)
+          @cm.migration_settings[:migration_ids_to_import] = migration_settings
+          @cm.save!
+
+          run_course_copy
+
+          assignment2 = @copy_to.assignments.find_by_migration_id(mig_id(assignment))
+          assignment2.due_at.in_time_zone(local_time_zone)
+        end
+      ensure
+        account.default_time_zone = old_time_zone
+        account.save!
       end
-    end
 
-    it "should copy time correctly across daylight savings shift MDT to MST" do
-      Time.use_zone('America/Denver') do
-        asmnt = @copy_from.assignments.new
-        asmnt.title = "Nothing Assignment"
-        asmnt.description = 'oi'
-        asmnt.due_at = Time.zone.at(1339178400) # Fri, 08 Jun 2012 12:00:00 MDT -06:00
-        asmnt.save!
+      context "from MST to MDT" do
+        let(:old_date)       { local_time_zone.local(2012, 1, 6, 12, 0) } # 6 Jan 2012 12:00
+        let(:new_date)       { local_time_zone.local(2012, 4, 6, 12, 0) } # 6 Apr 2012 12:00
+        let(:old_start_date) { 'Jan 1, 2012' }
+        let(:old_end_date)   { 'Jan 15, 2012' }
+        let(:new_start_date) { 'Apr 1, 2012' }
+        let(:new_end_date)   { 'Apr 15, 2012' }
 
-        @cm.migration_settings[:migration_ids_to_import] = {
-                :copy => {
-                        :everything => true,
-                        :shift_dates => true,
-                        :old_start_date => 'Jun 2, 2012',
-                        :old_end_date => 'Jun 16, 2012',
-                        :new_start_date => 'Jan 4, 2013',
-                        :new_end_date => 'Jan 18, 2013'
-                }
-        }
-        @cm.save!
+        it "using an explicit time zone" do
+          new_date.should == copy_assignment(:time_zone => local_time_zone)
+        end
 
-        run_course_copy
+        it "using the account time zone" do
+          new_date.should == copy_assignment(:account_time_zone => local_time_zone)
+        end
+      end
 
-        asmnt_2 = @copy_to.assignments.find_by_migration_id(mig_id(asmnt))
-        asmnt_2.due_at.to_i.should == Time.zone.at(1357326000).to_i # Fri, 04 Jan 2013 12:00:00 MST -07:00
+      context "from MDT to MST" do
+        let(:old_date)       { local_time_zone.local(2012, 9, 6, 12, 0) }  # 6 Sep 2012 12:00
+        let(:new_date)       { local_time_zone.local(2012, 12, 6, 12, 0) } # 6 Dec 2012 12:00
+        let(:old_start_date) { 'Sep 1, 2012' }
+        let(:old_end_date)   { 'Sep 15, 2012' }
+        let(:new_start_date) { 'Dec 1, 2012' }
+        let(:new_end_date)   { 'Dec 15, 2012' }
+
+        it "using an explicit time zone" do
+          new_date.should == copy_assignment(:time_zone => local_time_zone)
+        end
+
+        it "using the account time zone" do
+          new_date.should == copy_assignment(:account_time_zone => local_time_zone)
+        end
       end
     end
 
@@ -1101,7 +1282,7 @@ describe ContentMigration do
       bank.assessment_questions.count.should == 1
       aq = bank.assessment_questions.first
 
-      aq.question_data['question_text'].should == @question.question_data['question_text']
+      aq.question_data['question_text'].should match_ignoring_whitespace(@question.question_data['question_text'])
     end
 
     it "should correctly copy quiz question html file references" do
@@ -1145,8 +1326,8 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
 
       q_to = @copy_to.quizzes.first
       qq_to = q_to.quiz_questions.first
-      qq_to.question_data[:question_text].should == qtext % [@copy_to.id, att_2.id, @copy_to.id, "files/#{att2_2.id}/preview", @copy_to.id, "files/#{att4_2.id}/preview"]
-      qq_to.question_data[:answers][0][:html].should == %{File ref:<img src="/courses/#{@copy_to.id}/files/#{att3_2.id}/download">}
+      qq_to.question_data[:question_text].should match_ignoring_whitespace(qtext % [@copy_to.id, att_2.id, @copy_to.id, "files/#{att2_2.id}/preview", @copy_to.id, "files/#{att4_2.id}/preview"])
+      qq_to.question_data[:answers][0][:html].should match_ignoring_whitespace(%{File ref:<img src="/courses/#{@copy_to.id}/files/#{att3_2.id}/download">})
     end
 
     it "should copy all html fields in assessment questions" do
@@ -1275,7 +1456,7 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
         @quiz.save!
         @topic = @copy_from.discussion_topics.build(:title => "topic")
         assignment = @copy_from.assignments.build(:submission_types => 'discussion_topic', :title => @topic.title)
-        assignment.infer_due_at
+        assignment.infer_times
         assignment.saved_by = :discussion_topic
         assignment.copied = true
         assignment.freeze_on_copy = true
@@ -1315,7 +1496,6 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
         @copy_to.assignments.count.should == 0
         @copy_to.quizzes.count.should == 0
         @copy_to.discussion_topics.count.should == 0
-
         @cm.content_export.error_messages.should == [
                 ["The assignment \"lock locky\" could not be copied because it is locked.", nil],
                 ["The topic \"topic\" could not be copied because it is locked.", nil],
@@ -1352,7 +1532,7 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
       end
 
       it "should send notifications immediately" do
-        communication_channel_model(:user_id => @user).confirm!
+        communication_channel_model.confirm!
         @cm.source_course = nil # so that it's not a course copy
         @cm.save!
 
@@ -1364,6 +1544,108 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
         expect { @cm.save! }.to change(DelayedMessage, :count).by 0
         @cm.messages_sent['Migration Import Finished'].should_not be_blank
       end
+    end
+
+    context "external tools" do
+      append_before do
+        @tool_from = @copy_from.context_external_tools.create!(:name => "new tool", :consumer_key => "key", :shared_secret => "secret", :domain => 'example.com', :custom_fields => {'a' => '1', 'b' => '2'})
+        @tool_from.settings[:course_navigation] = {:url => "http://www.example.com", :text => "Example URL"}
+        @tool_from.save!
+      end
+
+      it "should copy external tools" do
+
+        run_course_copy
+
+        @copy_to.context_external_tools.count.should == 1
+
+        tool_to = @copy_to.context_external_tools.first
+        tool_to.name.should == @tool_from.name
+        tool_to.custom_fields.should == @tool_from.custom_fields
+        tool_to.has_course_navigation.should == true
+        tool_to.consumer_key.should == @tool_from.consumer_key
+        tool_to.shared_secret.should == @tool_from.shared_secret
+      end
+
+      it "should not duplicate external tools used in modules" do
+        mod1 = @copy_from.context_modules.create!(:name => "some module")
+        tag = mod1.add_item({:type => 'context_external_tool',
+                             :title => 'Example URL',
+                             :url => "http://www.example.com",
+                             :new_tab => true})
+        tag.save
+
+        run_course_copy
+
+        @copy_to.context_external_tools.count.should == 1
+
+        tool_to = @copy_to.context_external_tools.first
+        tool_to.name.should == @tool_from.name
+        tool_to.consumer_key.should == @tool_from.consumer_key
+        tool_to.has_course_navigation.should == true
+      end
+
+      it "should copy external tool assignments" do
+        assignment_model(:course => @copy_from, :points_possible => 40, :submission_types => 'external_tool', :grading_type => 'points')
+        tag_from = @assignment.build_external_tool_tag(:url => "http://example.com/one", :new_tab => true)
+        tag_from.content_type = 'ContextExternalTool'
+        tag_from.save!
+
+        run_course_copy
+
+        asmnt_2 = @copy_to.assignments.first
+        asmnt_2.submission_types.should == "external_tool"
+        asmnt_2.external_tool_tag.should_not be_nil
+        tag_to = asmnt_2.external_tool_tag
+        tag_to.content_type.should == tag_from.content_type
+        tag_to.url.should == tag_from.url
+        tag_to.new_tab.should == tag_from.new_tab
+      end
+
+      it "should copy vendor extensions" do
+        @tool_from.settings[:vendor_extensions] = [{:platform=>"my.lms.com", :custom_fields=>{"key"=>"value"}}]
+        @tool_from.save!
+
+        run_course_copy
+
+        tool = @copy_to.context_external_tools.find_by_migration_id(CC::CCHelper.create_key(@tool_from))
+        tool.settings[:vendor_extensions].should == [{'platform'=>"my.lms.com", 'custom_fields'=>{"key"=>"value"}}]
+      end
+
+      it "should copy canvas extensions" do
+        @tool_from.user_navigation = {:url => "http://www.example.com", :text => "hello", :labels => {'en' => 'hello', 'es' => 'hola'}, :extra => 'extra', :custom_fields=>{"key"=>"value"}}
+        @tool_from.course_navigation = {:url => "http://www.example.com", :text => "hello", :labels => {'en' => 'hello', 'es' => 'hola'}, :default => 'disabled', :visibility => 'members', :extra => 'extra', :custom_fields=>{"key"=>"value"}}
+        @tool_from.account_navigation = {:url => "http://www.example.com", :text => "hello", :labels => {'en' => 'hello', 'es' => 'hola'}, :extra => 'extra', :custom_fields=>{"key"=>"value"}}
+        @tool_from.resource_selection = {:url => "http://www.example.com", :text => "hello", :labels => {'en' => 'hello', 'es' => 'hola'}, :selection_width => 100, :selection_height => 50, :extra => 'extra', :custom_fields=>{"key"=>"value"}}
+        @tool_from.editor_button = {:url => "http://www.example.com", :text => "hello", :labels => {'en' => 'hello', 'es' => 'hola'}, :selection_width => 100, :selection_height => 50, :icon_url => "http://www.example.com", :extra => 'extra', :custom_fields=>{"key"=>"value"}}
+        @tool_from.save!
+
+        run_course_copy
+
+        tool = @copy_to.context_external_tools.find_by_migration_id(CC::CCHelper.create_key(@tool_from))
+        tool.course_navigation.should_not be_nil
+        tool.course_navigation.should == @tool_from.course_navigation
+        tool.editor_button.should_not be_nil
+        tool.editor_button.should == @tool_from.editor_button
+        tool.resource_selection.should_not be_nil
+        tool.resource_selection.should == @tool_from.resource_selection
+        tool.account_navigation.should_not be_nil
+        tool.account_navigation.should == @tool_from.account_navigation
+        tool.user_navigation.should_not be_nil
+        tool.user_navigation.should == @tool_from.user_navigation
+      end
+    end
+  end
+
+  context "#prepare_data" do
+    it "should strip invalid utf8" do
+      pending("Ruby 1.9 only") if RUBY_VERSION < "1.9"
+      data = {
+        'assessment_questions' => [{
+          'question_name' => "hai\xfbabcd"
+        }]
+      }
+      ContentMigration.new.prepare_data(data)[:assessment_questions][0][:question_name].should == "haiabcd"
     end
   end
 
@@ -1411,6 +1693,11 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
       @cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm)).should == true
     end
 
+  end
+  
+  it "should exclude user-hidden migration plugins" do
+    ab = Canvas::Plugin.find(:academic_benchmark_importer)
+    ContentMigration.migration_plugins(true).include?(ab).should be_false
   end
 
 end

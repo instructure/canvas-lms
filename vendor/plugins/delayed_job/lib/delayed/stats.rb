@@ -14,21 +14,21 @@ module Stats
       #   redis.keys("job:id:*")
       # but that requires walking the entire keyspace
       # (this is an index sorted by completion time)
-      redis.lpush("job:id", job.id)
+      redis.lpush("job_stats:id", job.id)
       # set of tags ever seen
       # sorted set, but all weights are 0 so that we get a sorted-by-name set
-      redis.zadd('job:tag', 0, job.tag)
+      redis.zadd('job_stats:tag', 0, job.tag)
       # second sorted set, with weights as number of jobs of that type completed
-      redis.zincrby("job:tag:counts", 1, job.tag)
+      redis.zincrby("job_stats:tag:counts", 1, job.tag)
       # job details, stored in a redis hash
       data = job.attributes
       data['finished_at'] = job.class.db_time_now
       data['worker'] = worker.name
       data['full_command'] = job.full_name
       data['run_time'] = data['finished_at'] - data['locked_at']
-      redis.hmset("job:id:#{job.id}", *data.to_a.flatten)
+      redis.hmset("job_stats:id:#{job.id}", *data.to_a.flatten)
       ttl = Setting.get_cached('delayed_jobs_stats_ttl', 1.month.to_s).to_i.from_now
-      redis.expireat("job:id:#{job.id}", ttl.to_i)
+      redis.expireat("job_stats:id:#{job.id}", ttl.to_i)
     end
   rescue
     Rails.logger.warn "Failed saving job stats: #{$!.inspect}"
@@ -45,9 +45,9 @@ module Stats
     # sort job:id, looking up the id in the individual job hash, and storing
     # back to the same key. the end result is that any job that's expired will
     # get its id in this list reset to the empty string
-    redis.sort 'job:id', :by => 'nosort', :get => 'job:id:*->id', :store => 'job:id'
+    redis.sort 'job_stats:id', :by => 'nosort', :get => 'job_stats:id:*->id', :store => 'job_stats:id'
     # now, remove all elements that match the empty string
-    redis.lrem 'job:id', 0, ''
+    redis.lrem 'job_stats:id', 0, ''
     # we don't remove anything from job:tag or job:tag:counts -- we don't have
     # enough information stored to do so. in theory those sets could grow
     # without bound, which would be an issue, but really they are limited in

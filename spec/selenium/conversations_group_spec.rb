@@ -2,9 +2,9 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/conversations_common
 
 describe "conversations group" do
   it_should_behave_like "in-process server selenium tests"
-  it_should_behave_like "conversations selenium tests"
 
   before(:each) do
+    conversation_setup
     @course.update_attribute(:name, "the course")
     @course.default_section.update_attribute(:name, "the section")
     @other_section = @course.course_sections.create(:name => "the other section")
@@ -19,7 +19,7 @@ describe "conversations group" do
 
     new_conversation
     @input = fj("#create_message_form input:visible")
-    @checkbox = f("#group_conversation")
+    @checkbox = f(".group_conversation")
   end
 
   def choose_recipient(*names)
@@ -52,17 +52,17 @@ describe "conversations group" do
     @checkbox.should_not be_displayed
   end
 
-  it "should be an option, default false, for a single 'bulk' recipient" do
+  it "should be an option, default false, for a single bulk recipient" do
     choose_recipient("the course", "Everyone", "Select All")
     @checkbox.should be_displayed
-    is_checked("#group_conversation").should be_false
+    is_checked(".group_conversation").should be_false
   end
 
   it "should be an option, default false, for multiple individual recipients" do
     choose_recipient("student 1")
     choose_recipient("student 2")
     @checkbox.should be_displayed
-    is_checked("#group_conversation").should be_false
+    is_checked(".group_conversation").should be_false
   end
 
   it "should disappear when there are no longer multiple recipients" do
@@ -79,6 +79,6 @@ describe "conversations group" do
     @input.send_keys([:backspace])
     choose_recipient("student 2")
     @checkbox.should be_displayed
-    is_checked("#group_conversation").should be_false
+    is_checked(".group_conversation").should be_false
   end
 end

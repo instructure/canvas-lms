@@ -25,18 +25,18 @@ class WikiPage < ActiveRecord::Base
   include HasContentTags
   include CopyAuthorizedLinks
   include ContextModuleItem
-  
+
   belongs_to :wiki, :touch => true
   belongs_to :cloned_item
   belongs_to :user
   has_many :wiki_page_comments, :order => "created_at DESC"
   acts_as_url :title, :scope => [:wiki_id, :not_deleted], :sync_url => true
-  
+
   before_save :set_revised_at
   before_validation :ensure_unique_title
-  
+
   TITLE_LENGTH = WikiPage.columns_hash['title'].limit rescue 255
-  
+
   def ensure_unique_title
     return if deleted?
     self.title ||= (self.url || "page").to_cased_title
@@ -55,11 +55,11 @@ class WikiPage < ActiveRecord::Base
         new_title = real_title[0...(TITLE_LENGTH - mod.length)] + mod
         n = n.succ
       end while self.wiki.wiki_pages.not_deleted.find_by_title(new_title)
-      
+
       self.title = new_title
     end
   end
-  
+
   def ensure_unique_url
     url_attribute = self.class.url_attribute
     base_url = self.send(url_attribute)
@@ -71,7 +71,7 @@ class WikiPage < ActiveRecord::Base
     end
     # make stringex scoping a little more useful/flexible... in addition to
     # the normal constructed attribute scope(s), it also supports paramater-
-    # less named_scopeds. note that there needs to be an instance_method of
+    # less scopeds. note that there needs to be an instance_method of
     # the same name for this to work
     scopes = self.class.scope_for_url ? Array(self.class.scope_for_url) : []
     base_scope = self.class
@@ -85,7 +85,7 @@ class WikiPage < ActiveRecord::Base
         conditions << send(scope)
       end
     end
-    url_owners = base_scope.find(:all, :conditions => conditions)
+    url_owners = base_scope.where(conditions).all
     # This is the part in stringex that messed us up, since it will never allow
     # a url of "front-page" once "front-page-1" or "front-page-2" is created
     # We modify it to allow "front-page" and start the indexing at "front-page-2"
@@ -103,7 +103,7 @@ class WikiPage < ActiveRecord::Base
 
   sanitize_field :body, Instructure::SanitizeField::SANITIZE
   copy_authorized_links(:body) { [self.context, self.user] }
-  
+
   validates_each :title do |record, attr, value|
     if value.blank?
       record.errors.add(attr, t('errors.blank_title', "Title can't be blank"))
@@ -113,63 +113,61 @@ class WikiPage < ActiveRecord::Base
       record.errors.add(attr, t('errors.title_characters', "Title must contain at least one letter or number")) # it's a bit more liberal than this, but let's not complicate things
     end
   end
-  
+
   has_a_broadcast_policy
   simply_versioned
   after_save :remove_changed_flag
-  
+
   workflow do
     state :active
     state :post_delayed do
       event :delayed_post, :transitions_to => :active
     end
-    
+
     state :deleted
-    
+
   end
-  
+
   def restore
     self.workflow_state = 'active'
     self.save
   end
-  
+
   def set_revised_at
     self.revised_at ||= Time.now
     self.revised_at = Time.now if self.body_changed?
     @page_changed = self.body_changed? || self.title_changed?
     true
   end
-  
+
   def notify_of_update=(val)
     @wiki_page_changed = (val == '1' || val == true)
   end
-  
+
   def notify_of_update
     false
   end
-  
+
   def remove_changed_flag
     @wiki_page_changed = false
   end
-  
+
   def version_history
     self.versions.map(&:model)
   end
-  
-  named_scope :active, lambda{
-    {:conditions => ['wiki_pages.workflow_state = ?', 'active'] }
-  }
-  
-  named_scope :deleted_last, lambda{
-    {:order => "workflow_state = 'deleted'" }
-  }
 
-  named_scope :not_deleted, lambda{
-    {:conditions => ['wiki_pages.workflow_state <> ?', 'deleted'] }
-  }
+  scope :active, where(:workflow_state => 'active')
+
+  scope :deleted_last, order("workflow_state='deleted'")
+
+  scope :not_deleted, where("wiki_pages.workflow_state<>'deleted'")
+
   def not_deleted
     !deleted?
   end
+
+  scope :visible_to_students, where(:hide_from_students => false)
+  scope :order_by_id, order(:id)
 
   def locked_for?(context, user, opts={})
     return false unless self.could_be_locked
@@ -182,48 +180,48 @@ class WikiPage < ActiveRecord::Base
       locked
     end
   end
-  
+
   def context_module_tag_for(context)
     @tag ||= self.context_module_tags.find_by_context_id_and_context_type(context.id, context.class.to_s)
   end
-  
+
   def context_module_action(user, context, action)
     tag = self.context_module_tags.find_by_context_id_and_context_type(context.id, context.class.to_s)
     tag.context_module_action(user, action) if tag
   end
-  
+
   set_policy do
     given {|user, session| self.wiki.grants_right?(user, session, :read) && can_read_page?(user) }
     can :read
-    
+
     given {|user, session| self.wiki.grants_right?(user, session, :contribute) && can_read_page?(user) }
     can :read
 
     given {|user, session| self.editing_role?(user) && !self.locked_for?(nil, user) }
     can :read and can :update_content and can :create
-    
+
     given {|user, session| self.wiki.grants_right?(user, session, :manage) }
     can :create and can :read and can :update and can :delete and can :update_content
-    
+
     given {|user, session| self.wiki.grants_right?(user, session, :manage_content) }
     can :create and can :read and can :update and can :delete and can :update_content
-    
+
   end
-  
+
   def can_read_page?(user)
     !hide_from_students || (context.respond_to?(:admins) && context.admins.include?(user))
   end
-  
+
   def editing_role?(user)
     context_roles = context.default_wiki_editing_roles rescue nil
-    roles = (self.editing_roles || context_roles || default_roles).split(",")
+    roles = (editing_roles || context_roles || default_roles).split(",")
     return true if roles.include?('teachers') && context.respond_to?(:teachers) && context.teachers.include?(user)
-    return true if !hide_from_students && roles.include?('students') && context.respond_to?(:students) && context.students.include?(user)
+    return true if !hide_from_students && roles.include?('students') && context.respond_to?(:students) && context.includes_student?(user)
     return true if !hide_from_students && roles.include?('members') && context.respond_to?(:users) && context.users.include?(user)
     return true if !hide_from_students && roles.include?('public')
     false
   end
-  
+
   def default_roles
     if context.is_a?(Group)
       'members'
@@ -263,7 +261,7 @@ class WikiPage < ActiveRecord::Base
     end
     res.flatten.uniq
   end
-    
+
   def to_atom(opts={})
     context = opts[:context]
     Atom::Entry.new do |entry|
@@ -277,21 +275,21 @@ class WikiPage < ActiveRecord::Base
       entry.content   = Atom::Content::Html.new(self.body || t('defaults.no_content', "no content"))
     end
   end
-  
+
   def user_name
     (user && user.name) || t('unknown_user_name', "Unknown")
   end
-  
+
   def to_param
     url
   end
-  
+
   def last_revision_at
     res = self.revised_at || self.updated_at
     res = Time.now if res.is_a?(String)
     res
   end
-  
+
   attr_accessor :clone_updated
   def clone_for(context, dup=nil, options={}) #migrate=true)
     options[:migrate] = true if options[:migrate] == nil
@@ -340,11 +338,11 @@ class WikiPage < ActiveRecord::Base
       begin
         import_from_migration(wiki, migration.context) if wiki
       rescue
-        migration.add_warning("Couldn't import the wiki page \"#{wiki[:title]}\"", $!)
+        migration.add_import_warning(t('#migration.wiki_page_type', "Wiki Page"), wiki[:title], $!)
       end
     end
   end
-  
+
   def self.import_from_migration(hash, context, item=nil)
     hash = hash.with_indifferent_access
     item ||= find_by_wiki_id_and_id(context.wiki.id, hash[:id])
@@ -374,6 +372,7 @@ class WikiPage < ActiveRecord::Base
       }), context)
     end
     return if hash[:type] && ['folder', 'FOLDER_TYPE'].member?(hash[:type]) && hash[:linked_resource_id]
+    hash[:missing_links] = {}
     allow_save = true
     if hash[:type] == 'linked_resource' || hash[:type] == "URL_TYPE"
       allow_save = false
@@ -381,9 +380,11 @@ class WikiPage < ActiveRecord::Base
       item.title = hash[:title] unless hash[:root_folder]
       description = ""
       if hash[:header]
-        description += hash[:header][:is_html] ? ImportedHtmlConverter.convert(hash[:header][:body] || "", context) : ImportedHtmlConverter.convert_text(hash[:header][:body] || [""], context)
+        hash[:missing_links][:field] = []
+        description += hash[:header][:is_html] ? ImportedHtmlConverter.convert(hash[:header][:body] || "", context, {:missing_links => hash[:missing_links][:header]}) : ImportedHtmlConverter.convert_text(hash[:header][:body] || [""], context)
       end
-      description += ImportedHtmlConverter.convert(hash[:description], context) if hash[:description]
+      hash[:missing_links][:description] = []
+      description += ImportedHtmlConverter.convert(hash[:description], context, {:missing_links => hash[:missing_links][:description]}) if hash[:description]
       contents = ""
       allow_save = false if hash[:migration_id] && hash[:outline_folders_to_import] && !hash[:outline_folders_to_import][hash[:migration_id]]
       hash[:contents].each do |sub_item|
@@ -397,11 +398,12 @@ class WikiPage < ActiveRecord::Base
             contents = ""
           end
           description += "\n<h2>#{sub_item[:title]}</h2>\n" if sub_item[:title]
-          description += ImportedHtmlConverter.convert(sub_item[:description], context) if sub_item[:description]
+          hash[:missing_links][:sub_item] = []
+          description += ImportedHtmlConverter.convert(sub_item[:description], context, {:missing_links => hash[:missing_links][:sub_item]}) if sub_item[:description]
         elsif sub_item[:type] == 'linked_resource'
           case sub_item[:linked_resource_type]
           when 'TOC_TYPE'
-            obj = context.context_modules.find_by_migration_id(sub_item[:linked_resource_id])
+            obj = context.context_modules.not_deleted.find_by_migration_id(sub_item[:linked_resource_id])
             contents += "  <li><a href='/courses/#{context.id}/modules'>#{obj.name}</a></li>\n" if obj
           when 'ASSESSMENT_TYPE'
             obj = context.quizzes.find_by_migration_id(sub_item[:linked_resource_id])
@@ -429,7 +431,8 @@ class WikiPage < ActiveRecord::Base
       end
       description += "<ul>\n#{contents}\n</ul>" if contents && contents.length > 0
       if hash[:footer]
-        description += hash[:footer][:is_html] ? ImportedHtmlConverter.convert(hash[:footer][:body] || "", context) : ImportedHtmlConverter.convert_text(hash[:footer][:body] || [""], context)
+        hash[:missing_links][:footer] = []
+        description += hash[:footer][:is_html] ? ImportedHtmlConverter.convert(hash[:footer][:body] || "", context, {:missing_links => hash[:missing_links][:footer]}) : ImportedHtmlConverter.convert_text(hash[:footer][:body] || [""], context)
       end
       item.body = description
       allow_save = false if !description || description.empty?
@@ -456,10 +459,13 @@ class WikiPage < ActiveRecord::Base
       #it's an actual wiki page
       item.title = hash[:title].presence || item.url.presence || "unnamed page"
       if item.title.length > TITLE_LENGTH
-        migration.add_warning(t('warnings.truncated_wiki_title', "The title of the following wiki page was truncated: %{title}", :title => item.title))
+        if context.respond_to?(:content_migration) && context.content_migration
+          context.content_migration.add_warning(t('warnings.truncated_wiki_title', "The title of the following wiki page was truncated: %{title}", :title => item.title))
+        end
         item.title.splice!(0...TITLE_LENGTH) # truncate too-long titles
       end
-      item.body = ImportedHtmlConverter.convert(hash[:text] || "", context)
+      hash[:missing_links][:body] = []
+      item.body = ImportedHtmlConverter.convert(hash[:text] || "", context, {:missing_links => hash[:missing_links][:body]})
       item.editing_roles = hash[:editing_roles] if hash[:editing_roles].present?
       item.hide_from_students = hash[:hide_from_students] if !hash[:hide_from_students].nil?
       item.notify_of_update = hash[:notify_of_update] if !hash[:notify_of_update].nil?
@@ -469,15 +475,18 @@ class WikiPage < ActiveRecord::Base
     if allow_save && hash[:migration_id]
       item.save_without_broadcasting!
       context.imported_migration_items << item if context.imported_migration_items
+      if context.respond_to?(:content_migration) && context.content_migration
+        hash[:missing_links].each do |field, missing_links|
+          context.content_migration.add_missing_content_links(:class => item.class.to_s,
+            :id => item.id, :field => field, :missing_links => missing_links,
+            :url => "/#{context.class.to_s.underscore.pluralize}/#{context.id}/wiki/#{item.url}")
+        end
+      end
       return item
     end
   end
-  
-  def self.comments_enabled?
-    ENV['RAILS_ENV'] != 'production'
-  end
 
-  def self.search(query)
-    find(:all, :conditions => wildcard('title', 'body', query))
+  def self.comments_enabled?
+    !Rails.env.production?
   end
 end

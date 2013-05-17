@@ -36,13 +36,13 @@ describe UsersController do
 
     it "should count conversations as interaction" do
       get user_student_teacher_activity_url(@teacher, @e1.user)
-      Nokogiri::HTML(response.body).at_css('table.report tr:first td:nth(2)').text.should match(/never/)
+      Nokogiri::HTML(response.body).at_css('table.report tbody tr:first td:nth(2)').text.should match(/never/)
 
-      @conversation = Conversation.initiate([@e1.user_id, @teacher.id], false)
+      @conversation = Conversation.initiate([@e1.user, @teacher], false)
       @conversation.add_message(@teacher, "hello")
 
       get user_student_teacher_activity_url(@teacher, @e1.user)
-      Nokogiri::HTML(response.body).at_css('table.report tr:first td:nth(2)').text.should match(/less than 1 day/)
+      Nokogiri::HTML(response.body).at_css('table.report tbody tr:first td:nth(2)').text.should match(/less than 1 day/)
     end
 
     it "should only include students the teacher can view" do
@@ -123,16 +123,6 @@ describe UsersController do
       response.body.should match /Olds, JT.*St\. Clair, John/m
     end
 
-    it "should not show student view student in a course context" do
-      course_with_teacher_logged_in(:active_all => true)
-      @fake_student = @course.student_view_student
-
-      get course_users_url @course.id
-      body = Nokogiri::HTML(response.body)
-      body.css("#user_#{@fake_student.id}").should be_empty
-      body.at_css('.student_roster').text.should_not match(/Test Student/)
-    end
-
     it "should not show any student view students at the account level" do
       course_with_teacher(:active_all => true)
       @fake_student = @course.student_view_student
@@ -144,6 +134,47 @@ describe UsersController do
       body = Nokogiri::HTML(response.body)
       body.css("#user_#{@fake_student.id}").should be_empty
       body.at_css('.users').text.should_not match(/Test Student/)
+    end
+  end
+
+  describe "#show" do
+    it "should allow admins to view users in their account" do
+      @admin = account_admin_user
+      user_session(@admin)
+
+      course
+      student_in_course(:course => @course)
+      get "/users/#{@student.id}"
+      response.should be_success
+
+      course(:account => account_model)
+      student_in_course(:course => @course)
+      get "/users/#{@student.id}"
+      response.status.should == "401 Unauthorized"
+    end
+
+    it "should show user to account users that have the view_statistics permission" do
+      account_model
+      student_in_course(:account => @account)
+      RoleOverride.create!(:context => @account, :permission => 'view_statistics',
+                           :enrollment_type => 'AccountMembership', :enabled => true)
+      @account.add_user(user, 'AccountMembership')
+      user_session(@user)
+
+      get "/users/#{@student.id}"
+      response.should be_success
+    end
+
+    it "should show course user to account users that have the read_roster permission" do
+      account_model
+      student_in_course(:account => @account)
+      RoleOverride.create!(:context => @account, :permission => 'read_roster',
+                           :enrollment_type => 'AccountMembership', :enabled => true)
+      @account.add_user(user, 'AccountMembership')
+      user_session(@user)
+
+      get "/courses/#{@course.id}/users/#{@student.id}"
+      response.should be_success
     end
   end
 
@@ -212,17 +243,15 @@ describe UsersController do
         diff = data.select{|k,v|k =~ /avatar_img/}.size - orig_size
         diff.should > 0
 
-        expect {
-          @user.update_attribute(:avatar_image, {'type' => 'attachment', 'url' => '/images/thumbnails/foo.gif'})
-        }.to change(data, :size).by(-diff)
+        @user.update_attribute(:avatar_image, {'type' => 'attachment', 'url' => '/images/thumbnails/foo.gif'})
+        data.select{|k,v|k =~ /avatar_img/}.size.should == orig_size
 
-        expect {
-          get "http://someschool.instructure.com/images/users/#{User.avatar_key(@user.id)}"
-          response.should redirect_to "http://someschool.instructure.com/images/thumbnails/foo.gif"
+        get "http://someschool.instructure.com/images/users/#{User.avatar_key(@user.id)}"
+        response.should redirect_to "http://someschool.instructure.com/images/thumbnails/foo.gif"
 
-          get "http://otherschool.instructure.com/images/users/#{User.avatar_key(@user.id)}?fallback=#{CGI::escape("https://test.domain/my/custom/fallback/url.png")}"
-          response.should redirect_to "http://otherschool.instructure.com/images/thumbnails/foo.gif"
-        }.to change(data, :size).by(diff)
+        get "http://otherschool.instructure.com/images/users/#{User.avatar_key(@user.id)}?fallback=#{CGI::escape("https://test.domain/my/custom/fallback/url.png")}"
+        response.should redirect_to "http://otherschool.instructure.com/images/thumbnails/foo.gif"
+        data.select{|k,v|k =~ /avatar_img/}.size.should == orig_size + diff
       end
     end
   end
@@ -240,6 +269,33 @@ describe UsersController do
       student_grades.length.should == 2
       student_grades.text.should match /#{@first_course.name}/
       student_grades.text.should match /#{@course.name}/
+    end
+  end
+
+  describe "admin_merge" do
+    it "should work for the whole flow" do
+      user_with_pseudonym(:active_all => 1)
+      Account.default.add_user(@user)
+      @admin = @user
+      user_with_pseudonym(:active_all => 1, :username => 'user2@instructure.com')
+      user_session(@admin)
+
+      get user_admin_merge_url(@user, :pending_user_id => @admin.id)
+      response.should be_success
+      assigns['pending_other_user'].should == @admin
+      assigns['other_user'].should be_nil
+
+      get user_admin_merge_url(@user, :new_user_id => @admin.id)
+      response.should be_success
+      assigns['pending_other_user'].should be_nil
+      assigns['other_user'].should == @admin
+
+      post user_merge_url(@user, :new_user_id => @admin.id)
+      response.should redirect_to(user_profile_url(@admin))
+
+      @user.reload.should be_deleted
+      @admin.reload.should be_registered
+      @admin.pseudonyms.count.should == 2
     end
   end
 end

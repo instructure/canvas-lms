@@ -17,20 +17,20 @@
 #
 
 module AuthenticationMethods
-  
+
   def authorized(*groups)
     authorized_roles = groups
     return true
   end
-  
+
   def authorized_roles
     @authorized_roles ||= []
   end
-  
+
   def consume_authorized_roles
     authorized_roles = []
   end
-  
+
   def load_pseudonym_from_policy
     skip_session_save = false
     if session.to_hash.empty? && # if there's already some session data, defer to normal auth
@@ -63,8 +63,8 @@ module AuthenticationMethods
     end
 
     if token_string
-      @access_token = AccessToken.find_by_token(token_string)
-      if !@access_token.try(:usable?)
+      @access_token = AccessToken.authenticate(token_string)
+      if !@access_token
         raise AccessTokenError
       end
       @current_user = @access_token.user
@@ -102,17 +102,13 @@ module AuthenticationMethods
         if @pseudonym_session.try(:used_basic_auth?) && params[:api_key].present?
           Shard.default.activate { @developer_key = DeveloperKey.find_by_api_key(params[:api_key]) }
         end
-        @developer_key || request.get? || form_authenticity_token == form_authenticity_param || form_authenticity_token == request.headers['X-CSRF-Token'] || raise(AccessTokenError)
+        @developer_key || request.get? || !allow_forgery_protection || form_authenticity_token == form_authenticity_param || form_authenticity_token == request.headers['X-CSRF-Token'] || raise(AccessTokenError)
       end
     end
 
     if @current_user && @current_user.unavailable?
       @current_pseudonym = nil
       @current_user = nil
-    end
-
-    if api_request? && !@current_user
-      raise AccessTokenError
     end
 
     if @current_user && %w(become_user_id me become_teacher become_student).any? { |k| params.key?(k) }
@@ -173,9 +169,11 @@ module AuthenticationMethods
   private :load_user
 
   def require_user
-    unless @current_user && @current_pseudonym
+    if @current_user && @current_pseudonym
+      true
+    else
       redirect_to_login
-      return false
+      false
     end
   end
   protected :require_user
@@ -201,22 +199,36 @@ module AuthenticationMethods
 
   def redirect_to_login
     respond_to do |format|
-      if request.path.match(/getting_started/)
-        format.html {
-          store_location
-          redirect_to register_url
-        }
-      else
-        format.html {
-          store_location
-          flash[:notice] = I18n.t('lib.auth.errors.not_authenticated', "You must be logged in to access this page") unless request.path == '/'
-          opts = {}
-          opts[:canvas_login] = 1 if params[:canvas_login]
-          redirect_to login_url(opts) # should this have :no_auto => 'true' ?
-        }
-      end
-      format.json { render :json => {:errors => {:message => I18n.t('lib.auth.authentication_required', "user authorization required")}}.to_json, :status => :unauthorized}
+      format.html {
+        store_location
+        flash[:warning] = I18n.t('lib.auth.errors.not_authenticated', "You must be logged in to access this page") unless request.path == '/'
+        opts = {}
+        opts[:canvas_login] = 1 if params[:canvas_login]
+        redirect_to login_url(opts) # should this have :no_auto => 'true' ?
+      }
+      format.json { render_json_unauthorized }
     end
+  end
+
+  def render_json_unauthorized
+    add_www_authenticate_header if api_request? && !@current_user
+    if @current_user
+      render :json => {
+               :status => I18n.t('lib.auth.status_unauthorized', 'unauthorized'),
+               :errors => { :message => I18n.t('lib.auth.not_authorized', "user not authorized to perform that action") }
+             },
+             :status => :unauthorized
+    else
+      render :json => {
+               :status => I18n.t('lib.auth.status_unauthenticated', 'unauthenticated'),
+               :errors => { :message => I18n.t('lib.auth.authentication_required', "user authorization required") }
+             },
+             :status => :unauthorized
+    end
+  end
+
+  def add_www_authenticate_header
+    response['WWW-Authenticate'] = %{Bearer realm="canvas-lms"}
   end
 
   # Reset the session, and copy the specified keys over to the new session.
@@ -235,13 +247,19 @@ module AuthenticationMethods
 
   def initiate_delegated_login(current_host=nil)
     is_delegated = @domain_root_account.delegated_authentication? && !params[:canvas_login]
-    is_cas = @domain_root_account.cas_authentication? && is_delegated
-    is_saml = @domain_root_account.saml_authentication? && is_delegated
+    is_cas = is_delegated && @domain_root_account.cas_authentication?
+    is_saml = is_delegated && @domain_root_account.saml_authentication?
     if is_cas
       initiate_cas_login
       return true
     elsif is_saml
-      initiate_saml_login(current_host)
+
+      if @domain_root_account.auth_discovery_url
+        redirect_to @domain_root_account.auth_discovery_url
+      else
+        initiate_saml_login(current_host)
+      end
+
       return true
     end
     false
@@ -254,9 +272,9 @@ module AuthenticationMethods
     delegated_auth_redirect(cas_client.add_service_to_login_url(cas_login_url))
   end
 
-  def initiate_saml_login(current_host=nil)
+  def initiate_saml_login(current_host=nil, aac=nil)
     reset_session_for_login
-    aac = @domain_root_account.account_authorization_config
+    aac ||= @domain_root_account.account_authorization_config
     settings = aac.saml_settings(current_host)
     request = Onelogin::Saml::AuthRequest.new(settings)
     forward_url = request.generate_request
@@ -275,10 +293,5 @@ module AuthenticationMethods
 
   def delegated_auth_redirect_uri(uri)
     uri
-  end
-
-  # if true, the user is currently stepping through the oauth2 flow for the canvas api
-  def in_oauth_flow?
-    !!session[:oauth2]
   end
 end

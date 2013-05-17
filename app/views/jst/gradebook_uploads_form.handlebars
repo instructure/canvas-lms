@@ -1,18 +1,9 @@
 <form action="{{action}}" enctype="multipart/form-data" id="upload_modal" method="post" title="{{#t "titles.upload_form"}}Choose a CSV file to upload{{/t}}">
   <input type="hidden" name='authenticity_token' value="{{authenticityToken}}">
   <style>
-    #gradebook-upload-help {
-      display: none;
-      border: 1px solid #ccc;
-      border-radius: 10px;
-      padding: 10px;
-      margin-bottom: 1.4em;
-      background-color: rgba(0,0,0,0.02);
-    }
     tr.table-callout-notes td div {
       padding: 6px;
       border-radius: 10px;
-      font-weight: bold;
     }
     tr.table-callout-notes-spacer td, tr.table-callout-notes td{
       padding: 0 10px;
@@ -24,22 +15,30 @@
     .table-callout-notes-spacer span {
       width: 0;
       border-style: solid;
-      border-color: #FBD850 transparent;
-      border-width: 15px 15px 0px ;
-      margin: 0 auto;
+      /*should be same as ui-state-highlight gradient bottom*/
+      border-color: #eedc94 transparent;
+      border-width: 8px 8px 0px;
+      margin: -1px auto 0;
       display: block;
     }
   </style>
-  <p><a class="help" id="gradebook-upload-help-trigger" href="#">{{#t "what_should_csv_look_like"}}What should the CSV file look like?{{/t}}</a></p>
-  <div id="gradebook-upload-help">
-    <h3 style="margin:0">{{#t "example_csv_file"}}Example CSV file{{/t}}</h3>
-    <table class="stylized striped bordered">
-      <thead>
+  <p>
+    <a class="icon-question element_toggler"
+       aria-controls="gradebook-upload-help"
+       data-hide-while-target-shown="true"
+       href="#">
+        {{#t "what_should_csv_look_like"}}What should the CSV file look like?{{/t}}
+    </a>
+  </p>
+  <div id="gradebook-upload-help" class="well" style="display:none">
+    <h3>{{#t "example_csv_file"}}Example CSV file{{/t}}</h3>
+    <table class="table table-striped" >
+      <thead style="background: none">
         <tr class="table-callout-notes">
-          <td colspan="4"><div class="ui-state-active">{{#t "explanation_of_required_columns"}}You Must have <em>all</em> of these columns, you only <em>need</em> one per row.{{/t}}</div></td>
-          <td><div class="ui-state-active">{{#t "optional_ignored"}}Optional, ignored.{{/t}}</div></td>
-          <td colspan="2"><div class="ui-state-active">{{#t "leaving_id_will_match_better_can_add_new_assignment"}}Leaving the ID intact (the "(581)" part in this case) will help match better.  You can also add new assignments that will be created on the fly.{{/t}}</div></td>
-          <td colspan="2"><div class="ui-state-active">{{#t "optional_ignored"}}Optional, ignored.{{/t}}</div></td>
+          <td colspan="4"><div class="ui-state-highlight">{{#t "explanation_of_required_columns"}}You Must have <em>all</em> of these columns, you only <em>need</em> one per row.{{/t}}</div></td>
+          <td><div class="ui-state-highlight">{{#t "optional_ignored"}}Optional, ignored.{{/t}}</div></td>
+          <td colspan="2"><div class="ui-state-highlight">{{#t "leaving_id_will_match_better_can_add_new_assignment"}}Leaving the ID intact (the "(581)" part in this case) will help match better.  You can also add new assignments that will be created on the fly.{{/t}}</div></td>
+          <td colspan="2"><div class="ui-state-highlight">{{#t "optional_ignored"}}Optional, ignored.{{/t}}</div></td>
         </tr>
         <tr class="table-callout-notes-spacer">
           <td colspan="4"><span /></td>
@@ -134,6 +133,6 @@
     <label for="gradebook_upload_uploaded_data">{{#t "labels.upload"}}Choose a CSV file to upload:{{/t}}</label>
     <input id="gradebook_upload_uploaded_data" name="gradebook_upload[uploaded_data]" type="file" />
   </p>
-  
-  <button class="button" type="submit">{{#t "buttons.upload_data"}}Upload Data{{/t}}</button>
+
+  <button class="btn btn-primary" type="submit">{{#t "buttons.upload_data"}}Upload Data{{/t}}</button>
 </form>

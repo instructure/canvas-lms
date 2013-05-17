@@ -1,5 +1,5 @@
 <% define_content :link do %>
-  http://<%= HostUrl.context_host(asset.group.context) %>/<%= asset.group.context.class.to_s.downcase.pluralize %>/<%= asset.group.context_id %>/groups
+  <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.group.context) %>/<%= asset.group.context.class.to_s.downcase.pluralize %>/<%= asset.group.context_id %>/groups
 <% end %>
 <% define_content :subject do %>
   <%= t('subject', 'Group Membership Rejected: %{group_name}', :group_name => asset.group.name) %>

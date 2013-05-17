@@ -1,0 +1,63 @@
+<div class="collaborator-picker"
+     data-collaboration-id="{{id}}">
+  {{#t "labels.collaborate_with"}}Collaborate With:{{/t}}
+
+  <div class="box-with-header">
+    <header class="toolbar border border-round-t border-trbl">
+      <div class="filters">
+        <input type="radio"
+               aria-controls="available-users"
+               id="users-filter-btn-{{id}}"
+               name="filter"
+               value="available-users"
+               checked="checked" />
+        <label for="users-filter-btn-{{id}}">
+          <i class="icon-user" aria-hidden="true"></i>
+          {{#t "labels.people"}}People{{/t}}
+        </label>
+
+        <input type="radio"
+               aria-controls="available-groups"
+               id="groups-filter-btn-{{id}}"
+               name="filter"
+               value="available-groups" />
+        <label for="groups-filter-btn-{{id}}">
+          <i class="icon-group" aria-hidden="true"></i>
+          {{#t "labels.groups"}}Groups{{/t}}
+        </label>
+      </div>
+    </header>
+
+    <div class="box-content border border-round-b border-rbl">
+      <div class="list-wrapper available-lists">
+        <div class="list-view">
+          <ul class="available-users" aria-label="{{#t "labels.available_users"}}Available users{{/t}}" tabindex="-1">
+            <li class="loading-wrapper">
+              <img src="/images/load.gif" alt="{{#t "labels.loading"}}Loading{{/t}}" />
+            </li>
+          </ul>
+          <ul class="available-groups" aria-label="{{#t "labels.available_groups"}}Available groups{{/t}}" tabindex="-1">
+            <li class="loading-wrapper">
+              <img src="/images/load.gif" alt="{{#t "labels.loading"}}Loading{{/t}}" />
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="list-wrapper">
+        <div class="members-list-wrapper list-view">
+          <header class="remove-button">
+            <a href="#" class="remove-all" role="button">&times; {{#t "labels.remove_all"}}Remove All{{/t}}</a>
+          </header>
+          <p class="member-instructions">
+            {{#t "member_instructions"}}Click or tap a user or group in the
+            left-hand column to add Collaborators.{{/t}}
+          </p>
+          <ul class="members-list"
+              tabindex="-1"
+              aria-label="{{#t "labels.collaboration_members"}}Collaboration members{{/t}}"></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

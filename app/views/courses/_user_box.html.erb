@@ -1,0 +1,16 @@
+<%
+   role_class = "#{base_role[:label]}_enrollments".downcase
+   role_count = "#{base_role[:label]}_count".downcase
+%>
+<div class="users-wrapper">
+  <h3><%= base_role[:plural_label] %> <small>(<span class="<%= role_count %>"><%= base_role[:count] %></span>)</small></h3>
+  <ul id="<%= role_class %>" class="user_list <%= role_class %>"></ul>
+</div>
+<% base_role[:custom_roles].each do |cr|
+     next if skip_custom_role?(cr)
+%>
+  <div class="users-wrapper">
+    <h3><%= cr[:label] %> <small>(<span class="<%= cr[:asset_string] %>_count"><%= cr[:count] %></span>)</small></h3>
+    <ul id="<%= cr[:asset_string] %>" class="user_list <%= role_class %>"></ul>
+  </div>
+<% end %>

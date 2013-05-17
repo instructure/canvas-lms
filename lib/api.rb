@@ -27,9 +27,23 @@ module Api
     if collection.table_name == User.table_name && @current_user
       ids = ids.map{|id| id == 'self' ? @current_user.id : id }
     end
+    if collection.table_name == Account.table_name
+      ids = ids.map do |id|
+        case id
+        when 'self'
+          @domain_root_account.id
+        when 'default'
+          Account.default.id
+        when 'site_admin'
+          Account.site_admin.id
+        else
+          id
+        end
+      end
+    end
 
     find_params = Api.sis_find_params_for_collection(collection, ids, @domain_root_account)
-    return [] if find_params[:conditions] == ["?", false]
+    return [] if find_params == :not_found
     find_params[:limit] = limit unless limit.nil?
     return collection.all(find_params)
   end
@@ -44,8 +58,8 @@ module Api
     result = columns.delete(sis_mapping[:lookups]["id"]) || []
     unless columns.empty?
       find_params = sis_make_params_for_sis_mapping_and_columns(columns, sis_mapping, root_account)
-      find_params[:select] = :id
-      result.concat collection.all(find_params).map(&:id)
+      return result if find_params == :not_found
+      result.concat collection.scoped(find_params).pluck(:id)
       result.uniq!
     end
     result
@@ -75,6 +89,8 @@ module Api
         :scope => 'root_account_id' },
   }.freeze
 
+  ID_REGEX = %r{\A\d+\z}
+
   def self.sis_parse_id(id, lookups)
     # returns column_name, column_value
     return lookups['id'], id if id.is_a?(Numeric)
@@ -85,8 +101,8 @@ module Api
     elsif id =~ %r{\A(sis_[\w_]+):(.+)\z}
       sis_column = $1
       sis_id = $2
-    elsif id =~ %r{\A\d+\z}
-      return lookups['id'], id.to_i
+    elsif id =~ ID_REGEX
+      return lookups['id'], (id =~ /\A\d+\z/ ? id.to_i : id)
     else
       return nil, nil
     end
@@ -109,6 +125,15 @@ module Api
     return columns
   end
 
+  # remove things that don't look like valid database IDs
+  # return in integer format if possible
+  # (note that ID_REGEX may be redefined by a plugin!)
+  def self.map_non_sis_ids(ids)
+    ids.map{ |id| id.to_s.strip }.select{ |id| id =~ ID_REGEX }.map do |id|
+      id =~ /\A\d+\z/ ? id.to_i : id
+    end
+  end
+
   def self.sis_find_sis_mapping_for_collection(collection)
     SIS_MAPPINGS[collection.table_name] or
         raise(ArgumentError, "need to add support for table name: #{collection.table_name}")
@@ -125,49 +150,86 @@ module Api
   def self.sis_make_params_for_sis_mapping_and_columns(columns, sis_mapping, sis_root_account)
     raise ArgumentError, "sis_root_account required for lookups" unless sis_root_account.is_a?(Account)
 
-    args = [false]
-    query = ["?"]
+    return :not_found if columns.empty?
 
-    columns.keys.sort.each do |column|
-      sis_ids = columns[column]
-      if (sis_mapping[:is_not_scoped_to_account] || []).include?(column)
-        query << " OR (#{column} IN ("
-      else
-        raise ArgumentError, "missing scope for collection" unless sis_mapping[:scope]
-        query << " OR (#{sis_mapping[:scope]} = #{sis_root_account.id} AND #{column} IN ("
+    not_scoped_to_account = sis_mapping[:is_not_scoped_to_account] || []
+
+    if columns.length == 1 && not_scoped_to_account.include?(columns.keys.first)
+      find_params = {:conditions => columns}
+    else
+      args = []
+      query = []
+      columns.keys.sort.each do |column|
+        if not_scoped_to_account.include?(column)
+          query << "#{column} IN (?)"
+        else
+          raise ArgumentError, "missing scope for collection" unless sis_mapping[:scope]
+          query << "(#{sis_mapping[:scope]} = #{sis_root_account.id} AND #{column} IN (?))"
+        end
+        args << columns[column]
       end
-      query << sis_ids.map{"?"}.join(", ")
-      args.concat sis_ids
-      query << "))"
+
+      args.unshift(query.join(" OR "))
+      find_params = { :conditions => args }
     end
 
-    find_params = { :conditions => ([query.join] + args) }
     find_params[:include] = sis_mapping[:joins] if sis_mapping[:joins]
     return find_params
+  end
+
+  def self.per_page_for(controller)
+    [(controller.params[:per_page] || Setting.get_cached('api_per_page', '10')).to_i, Setting.get_cached('api_max_per_page', '50').to_i].min
   end
 
   # Add [link HTTP Headers](http://www.w3.org/Protocols/9707-link-header.html) for pagination
   # The collection needs to be a will_paginate collection (or act like one)
   # a new, paginated collection will be returned
   def self.paginate(collection, controller, base_url, pagination_args = {})
-    per_page = [(controller.params[:per_page] || Setting.get_cached('api_per_page', '10')).to_i, Setting.get_cached('api_max_per_page', '50').to_i].min
-    collection = collection.paginate({ :page => controller.params[:page], :per_page => per_page }.merge(pagination_args))
+    per_page = per_page_for(controller)
+    pagination_args.reverse_merge!({ :page => controller.params[:page], :per_page => per_page })
+    collection = collection.paginate(pagination_args)
     return unless collection.respond_to?(:next_page)
-    links = []
-    base_url += (base_url =~ /\?/ ? '&': '?')
-    template = "<%spage=%s&per_page=#{collection.per_page}>; rel=\"%s\""
-    if collection.next_page
-      links << template % [base_url, collection.next_page, "next"]
-    end
-    if collection.previous_page
-      links << template % [base_url, collection.previous_page, "prev"]
-    end
-    links << template % [base_url, 1, "first"]
-    if !pagination_args[:without_count] && collection.total_pages && collection.total_pages > 1
-      links << template % [base_url, collection.total_pages, "last"]
-    end
+
+    first_page = collection.respond_to?(:first_page) && collection.first_page
+    first_page ||= 1
+
+    last_page = (pagination_args[:without_count] ? nil : collection.total_pages)
+    last_page = nil if last_page.to_i <= 1
+
+    links = build_links(base_url, {
+      :query_parameters => controller.request.query_parameters,
+      :per_page => collection.per_page,
+      :next => collection.next_page,
+      :prev => collection.previous_page,
+      :first => first_page,
+      :last => last_page,
+    })
     controller.response.headers["Link"] = links.join(',') if links.length > 0
     collection
+  end
+
+  EXCLUDE_IN_PAGINATION_LINKS = %w(page per_page access_token api_key)
+  def self.build_links(base_url, opts={})
+    links = []
+    base_url += (base_url =~ /\?/ ? '&': '?')
+    qp = opts[:query_parameters] || {}
+    qp = qp.with_indifferent_access.except(*EXCLUDE_IN_PAGINATION_LINKS)
+    base_url += "#{qp.to_query}&" if qp.present?
+    [:next, :prev, :first, :last].each do |k|
+      if opts[k].present?
+        links << "<#{base_url}page=#{opts[k]}&per_page=#{opts[:per_page]}>; rel=\"#{k}\""
+      end
+    end
+    links
+  end
+
+  def self.parse_pagination_links(link_header)
+    link_header.split(",").map do |link|
+      url, rel = link.match(%r{^<([^>]+)>; rel="([^"]+)"}).captures
+      uri = URI.parse(url)
+      raise(ArgumentError, "pagination url is not an absolute uri: #{url}") unless uri.is_a?(URI::HTTP)
+      Rack::Utils.parse_nested_query(uri.query).merge(:uri => uri, :rel => rel)
+    end
   end
 
   def media_comment_json(media_object_or_hash)
@@ -181,20 +243,6 @@ module Api
                                        :entryId => media_object_or_hash.media_id,
                                        :type => "mp4",
                                        :redirect => "1")
-    }
-  end
-
-  # stream an array of objects as a json response, without building a string of
-  # the whole response in memory.
-  def stream_json_array(array, json_opts)
-    response.content_type ||= Mime::JSON
-    render :text => proc { |r, o|
-      o.write('[')
-      array.each_with_index { |v,i|
-        o.write(v.to_json(json_opts));
-        o.write(',') unless i == array.length - 1
-      }
-      o.write(']')
     }
   end
 
@@ -219,9 +267,25 @@ module Api
 
     rewriter = UserContent::HtmlRewriter.new(context, user)
     rewriter.set_handler('files') do |match|
-      obj = match.obj_class.find_by_id(match.obj_id)
+      if match.obj_id
+        if match.obj_class == Attachment && context && !context.is_a?(User)
+          obj = context.attachments.find(match.obj_id) rescue nil
+        else
+          obj = match.obj_class.find_by_id(match.obj_id)
+        end
+      end
       next unless obj && rewriter.user_can_view_content?(obj)
-      file_download_url(obj.id, :verifier => obj.uuid, :download => '1', :host => host, :protocol => protocol)
+
+      if ["Course", "Group", "Account", "User"].include?(obj.context_type)
+        if match.rest.start_with?("/preview")
+          url = self.send("#{obj.context_type.downcase}_file_preview_url", obj.context_id, obj.id, :verifier => obj.uuid, :host => host, :protocol => protocol)
+        else
+          url = self.send("#{obj.context_type.downcase}_file_download_url", obj.context_id, obj.id, :verifier => obj.uuid, :download => '1', :host => host, :protocol => protocol)
+        end
+      else
+        url = file_download_url(obj.id, :verifier => obj.uuid, :download => '1', :host => host, :protocol => protocol)
+      end
+      url
     end
     html = rewriter.translate_content(html)
 
@@ -276,8 +340,11 @@ module Api
             # made absolute with the canvas hostname prepended
             if !url.host && url_str[0] == '/'[0]
               element[attribute] = "#{protocol}://#{host}#{url_str}"
+              api_endpoint_info(protocol, host, url_str).each do |att, val|
+                element[att] = val
+              end
             end
-          rescue URI::InvalidURIError => e
+          rescue URI::Error => e
             # leave it as is
           end
         end
@@ -287,7 +354,107 @@ module Api
     return doc.to_s
   end
 
+  # This removes the verifier parameters that are added to attachment links by api_user_content
+  # and adds context (e.g. /courses/:id/) if it is missing
+  def process_incoming_html_content(html)
+    return html unless html.present? &&
+      (html.include?("verifier=") || html.include?("'/files") || html.include?("\"/files"))
+
+    attrs = ['href', 'src']
+    link_regex = %r{/files/(\d+)/(?:download|preview)}
+    verifier_regex = %r{(\?)verifier=[^&]*&?|&verifier=[^&]*}
+
+    context_types = ["Course", "Group", "Account", "User"]
+
+    doc = Nokogiri::HTML(html)
+    doc.search("*").each do |node|
+      attrs.each do |attr|
+        if link = node[attr]
+          if link =~ link_regex
+            if link.start_with?('/files')
+              att_id = $1
+              if (att = Attachment.find_by_id(att_id)) && context_types.include?(att.context_type)
+                link = "/#{att.context_type.underscore.pluralize}/#{att.context_id}" + link
+              end
+            end
+            if link.include?('verifier=')
+              link.gsub!(verifier_regex, '\1')
+            end
+            node[attr] = link
+          end
+        end
+      end
+    end
+
+    return doc.at_css('body').inner_html
+  end
+
   def value_to_boolean(value)
     Canvas::Plugin.value_to_boolean(value)
   end
+
+  # regex for shard-aware ID
+  ID = '(?:\d+~)?\d+'
+
+  # maps a Canvas data type to an API-friendly type name
+  API_DATA_TYPE = { "Attachment" => "File",
+                    "WikiPage" => "Page",
+                    "DiscussionTopic" => "Discussion",
+                    "Assignment" => "Assignment",
+                    "Quiz" => "Quiz",
+                    "ContextModuleSubHeader" => "SubHeader",
+                    "ExternalUrl" => "ExternalUrl",
+                    "ContextExternalTool" => "ExternalTool" }.freeze
+
+  # maps canvas URLs to API URL helpers
+  # target array is return type, helper, name of each capture, and optionally a Hash of extra arguments
+  API_ROUTE_MAP = {
+      # list discussion topics
+      %r{^/courses/(#{ID})/discussion_topics$} => ['[Discussion]', :api_v1_course_discussion_topics_url, :course_id],
+      %r{^/groups/(#{ID})/discussion_topics$} => ['[Discussion]', :api_v1_group_discussion_topics_url, :group_id],
+
+      # get a single topic
+      %r{^/courses/(#{ID})/discussion_topics/(#{ID})$} => ['Discussion', :api_v1_course_discussion_topic_url, :course_id, :topic_id],
+      %r{^/groups/(#{ID})/discussion_topics/(#{ID})$} => ['Discussion', :api_v1_group_discussion_topic_url, :group_id, :topic_id],
+
+      # List pages
+      %r{^/courses/(#{ID})/wiki$} => ['[Page]', :api_v1_course_wiki_pages_url, :course_id],
+      %r{^/groups/(#{ID})/wiki$} => ['[Page]', :api_v1_group_wiki_pages_url, :group_id],
+
+      # Show page
+      %r{^/courses/(#{ID})/wiki/([^/]+)$} => ['Page', :api_v1_course_wiki_page_url, :course_id, :url],
+      %r{^/groups/(#{ID})/wiki/([^/]+)$} => ['Page', :api_v1_group_wiki_page_url, :group_id, :url],
+
+      # List assignments
+      %r{^/courses/(#{ID})/assignments$} => ['[Assignment]', :api_v1_course_assignments_url, :course_id],
+
+      # Get assignment
+      %r{^/courses/(#{ID})/assignments/(#{ID})$} => ['Assignment', :api_v1_course_assignment_url, :course_id, :id],
+
+      # List files
+      %r{^/courses/(#{ID})/files$} => ['Folder', :api_v1_course_folder_url, :course_id, {:id => 'root'}],
+      %r{^/groups/(#{ID})/files$} => ['Folder', :api_v1_group_folder_url, :group_id, {:id => 'root'}],
+      %r{^/users/(#{ID})/files$} => ['Folder', :api_v1_user_folder_url, :user_id, {:id => 'root'}],
+
+      # Get file
+      %r{^/courses/#{ID}/files/(#{ID})/} => ['File', :api_v1_attachment_url, :id],
+      %r{^/groups/#{ID}/files/(#{ID})/} => ['File', :api_v1_attachment_url, :id],
+      %r{^/users/#{ID}/files/(#{ID})/} => ['File', :api_v1_attachment_url, :id],
+      %r{^/files/(#{ID})/} => ['File', :api_v1_attachment_url, :id],
+  }.freeze
+
+  def api_endpoint_info(protocol, host, url)
+    API_ROUTE_MAP.each_pair do |re, api_route|
+      match = re.match(url)
+      next unless match
+      return_type = api_route[0]
+      helper = api_route[1]
+      args = { :protocol => protocol, :host => host }
+      args.merge! Hash[api_route.slice(2, match.captures.size).zip match.captures]
+      api_route.slice(match.captures.size + 2, 1).each { |opts| args.merge!(opts) }
+      return { 'data-api-endpoint' => self.send(helper, args), 'data-api-returntype' => return_type }
+    end
+    {}
+  end
+
 end

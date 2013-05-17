@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2012 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -33,7 +33,7 @@ describe "API", :type => :integration do
   describe "as_json extensions" do
     it "should skip attribute filtering if obj doesn't respond" do
       course_with_teacher
-      @course.respond_to?(:filter_attributes_for_user).should be_false
+      @course.respond_to?(:filter_attributes_for_user).should be_true
       @course.as_json(:include_root => false, :permissions => { :user => @user }, :only => %w(name sis_source_id)).keys.sort.should == %w(name permissions sis_source_id)
     end
 
@@ -62,22 +62,22 @@ describe "API", :type => :integration do
     it "should use html form encoding by default" do
       html_request = "assignment[name]=test+assignment&assignment[points_possible]=15"
       # no content-type header is sent
-      post "/api/v1/courses/#{@course.id}/assignments", html_request, { "authorization" => "Bearer #{@token.token}" }
+      post "/api/v1/courses/#{@course.id}/assignments", html_request, { "authorization" => "Bearer #{@token.full_token}" }
       response.should be_success
       response.header['content-type'].should == 'application/json; charset=utf-8'
 
-      @assignment = @course.assignments.last(:order => :id)
+      @assignment = @course.assignments.order(:id).last
       @assignment.title.should == "test assignment"
       @assignment.points_possible.should == 15
     end
 
     it "should support json POST request bodies" do
       json_request = { "assignment" => { "name" => "test assignment", "points_possible" => 15 } }
-      post "/api/v1/courses/#{@course.id}/assignments", json_request.to_json, { "content-type" => "application/json", "authorization" => "Bearer #{@token.token}" }
+      post "/api/v1/courses/#{@course.id}/assignments", json_request.to_json, { "content-type" => "application/json", "authorization" => "Bearer #{@token.full_token}" }
       response.should be_success
       response.header['content-type'].should == 'application/json; charset=utf-8'
 
-      @assignment = @course.assignments.last(:order => :id)
+      @assignment = @course.assignments.order(:id).last
       @assignment.title.should == "test assignment"
       @assignment.points_possible.should == 15
     end
@@ -94,7 +94,7 @@ describe "API", :type => :integration do
                        "submission" => {
                           "submission_type" => "online_upload",
                           "file_ids" => [a1.id, a2.id] } }
-      post "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions", json_request.to_json, { "content-type" => "application/json", "authorization" => "Bearer #{@token.token}" }
+      post "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions", json_request.to_json, { "content-type" => "application/json", "authorization" => "Bearer #{@token.full_token}" }
       response.should be_success
       response.header['content-type'].should == 'application/json; charset=utf-8'
 

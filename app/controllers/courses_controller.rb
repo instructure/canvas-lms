@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 Instructure, Inc.
+# Copyright (C) 2011 - 2012 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -35,6 +35,10 @@ require 'set'
 #       // the course code
 #       course_code: "INSTCON12",
 #
+#       // the current state of the course
+#       // one of "unpublished", "available", "completed", or "deleted"
+#       workflow_state: "available",
+#
 #       // the account associated with the course
 #       account_id: 81259,
 #
@@ -50,9 +54,11 @@ require 'set'
 #       enrollments: [
 #         {
 #           type: student,
+#           role: StudentEnrollment,
 #           computed_final_score: 41.5,
 #           computed_current_score: 90,
-#           computed_final_grade: 'A-'
+#           computed_final_grade: 'F'
+#           computed_current_grade: 'A-',
 #         }
 #       ],
 #
@@ -61,6 +67,15 @@ require 'set'
 #         ics: "https:\/\/canvas.instructure.com\/feeds\/calendars\/course_abcdef.ics"
 #       }
 #
+#       // the type of page that users will see when they first visit the course
+#       // - 'feed': Recent Activity Dashboard
+#       // - 'wiki': Wiki Front Page
+#       // - 'modules': Course Modules/Sections Page
+#       // - 'assignments': Course Assignments List
+#       // - 'syllabus': Course Syllabus Page
+#       // other types may be added in the future
+#       default_view: 'feed'
+#
 #       // optional: user-generated HTML for the course syllabus
 #       syllabus_body: "<p>syllabus html goes here<\/p>",
 #
@@ -68,6 +83,16 @@ require 'set'
 #       // returned only if the current user has grading rights
 #       // and include[]=needs_grading_count
 #       needs_grading_count: '17'
+#
+#       // optional: the name of the enrollment term for the course
+#       // returned only if include[]=term
+#       term: {
+#         id: 1,
+#         name: 'Default Term',
+#         start_at: "2012-06-01T00:00:00-06:00",
+#         end_at: null
+#       }
+#
 #   }
 class CoursesController < ApplicationController
   include SearchHelper
@@ -76,6 +101,7 @@ class CoursesController < ApplicationController
   before_filter :require_context, :only => [:roster, :locks, :switch_role, :create_file]
 
   include Api::V1::Course
+  include Api::V1::Progress
 
   # @API List your courses
   # Returns the list of active courses for the current user.
@@ -83,7 +109,14 @@ class CoursesController < ApplicationController
   # @argument enrollment_type [optional, "teacher"|"student"|"ta"|"observer"|"designer"]
   #   When set, only return courses where the user is enrolled as this type. For
   #   example, set to "teacher" to return only courses where the user is
-  #   enrolled as a Teacher.
+  #   enrolled as a Teacher.  This argument is ignored if enrollment_role is given.
+  #
+  # @argument enrollment_role [optional]
+  #   When set, only return courses where the user is enrolled with the specified
+  #   course-level role.  This can be a role created with the
+  #   {api:RoleOverridesController#add_role Add Role API} or a base role type of
+  #   'StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment', 'ObserverEnrollment',
+  #   or 'DesignerEnrollment'.
   #
   # @argument include[] ["needs_grading_count"] Optional information to include with each Course.
   #   When needs_grading_count is given, and the current user has grading
@@ -91,31 +124,45 @@ class CoursesController < ApplicationController
   #   assignments is returned.
   #
   # @argument include[] ["syllabus_body"] Optional information to include with each Course.
-  #   When syllabus_body is given the user-generated html for the course 
+  #   When syllabus_body is given the user-generated html for the course
   #   syllabus is returned.
   #
   # @argument include[] ["total_scores"] Optional information to include with each Course.
   #   When total_scores is given, any enrollments with type 'student' will also
   #   include the fields 'calculated_current_score', 'calculated_final_score',
-  #   and 'calculated_final_grade'. calculated_current_score is the student's
-  #   score in the course, ignoring ungraded assignments. calculated_final_score
-  #   is the student's score in the course including ungraded assignments with
-  #   a score of 0. calculated_final_grade is the letter grade equivalent of
-  #   calculated_final_score (if available). This argument is ignored if the
-  #   course is configured to hide final grades.
+  #   'calculated_current_grade', and 'calculated_final_grade'.
+  #   calculated_current_score is the student's score in the course, ignoring
+  #   ungraded assignments. calculated_final_score is the student's score in
+  #   the course including ungraded assignments with a score of 0.
+  #   calculated_current_grade is the letter grade equivalent of
+  #   calculated_current_score (if available). calculated_final_grade is the
+  #   letter grade equivalent of calculated_final_score (if available). This
+  #   argument is ignored if the course is configured to hide final grades.
+  #
+  # @argument include[] ["term"] Optional information to include with each Course.
+  #   When term is given, the information for the enrollment term for each course
+  #   is returned.
   #
   # @returns [Course]
   def index
     respond_to do |format|
       format.html {
         @current_enrollments = @current_user.cached_current_enrollments(:include_enrollment_uuid => session[:enrollment_uuid]).sort_by{|e| [e.active? ? 1 : 0, e.long_name] }
-        @past_enrollments = @current_user.enrollments.ended.scoped(:conditions=>"enrollments.workflow_state NOT IN ('invited', 'deleted')")
+        @past_enrollments    = @current_user.enrollments.with_each_shard{|scope| scope.past }
+        @future_enrollments  = @current_user.enrollments.with_each_shard{|scope| scope.future.includes(:root_account)}.reject{|e| e.root_account.settings[:restrict_student_future_view]}
+
         @past_enrollments.concat(@current_enrollments.select { |e| e.state_based_on_date == :completed })
-        @current_enrollments.reject! { |e| [:inactive, :completed].include?(e.state_based_on_date) }
+        @current_enrollments.reject! do |e|
+          [:inactive, :completed].include?(e.state_based_on_date) ||
+            @future_enrollments.include?(e)
+        end
       }
+
       format.json {
         enrollments = @current_user.cached_current_enrollments
-        if params[:enrollment_type]
+        if params[:enrollment_role]
+          enrollments = enrollments.reject { |e| (e.role_name || e.class.name) != params[:enrollment_role] }
+        elsif params[:enrollment_type]
           e_type = "#{params[:enrollment_type].capitalize}Enrollment"
           enrollments = enrollments.reject { |e| e.class.name != e_type }
         end
@@ -142,9 +189,9 @@ class CoursesController < ApplicationController
   # @argument course[end_at] [Datetime] [optional] Course end date in ISO8601 format. e.g. 2011-01-01T01:00Z
   # @argument course[license] [String] [optional] The name of the licensing. Should be one of the following abbreviations (a descriptive name is included in parenthesis for reference): 'private' (Private Copyrighted); 'cc_by_nc_nd' (CC Attribution Non-Commercial No Derivatives); 'cc_by_nc_sa' (CC Attribution Non-Commercial Share Alike); 'cc_by_nc' (CC Attribution Non-Commercial); 'cc_by_nd' (CC Attribution No Derivatives); 'cc_by_sa' (CC Attribution Share Alike); 'cc_by' (CC Attribution); 'public_domain' (Public Domain).
   # @argument course[is_public] [Boolean] [optional] Set to true if course if public.
+  # @argument course[public_syllabus] [Boolean] [optional] Set to true to make the course syllabus public.
   # @argument course[public_description] [String] [optional] A publicly visible description of the course.
   # @argument course[allow_student_wiki_edits] [Boolean] [optional] If true, students will be able to modify the course wiki.
-  # @argument course[allow_student_assignment_edits] [optional] Set to true if students should be allowed to make modifications to assignments.
   # @argument course[allow_wiki_comments] [Boolean] [optional] If true, course members will be able to comment on wiki pages.
   # @argument course[allow_student_forum_attachments] [Boolean] [optional] If true, students can attach files to forum posts.
   # @argument course[open_enrollment] [Boolean] [optional] Set to true if the course is open enrollment.
@@ -152,12 +199,19 @@ class CoursesController < ApplicationController
   # @argument course[restrict_enrollments_to_course_dates] [Boolean] [optional] Set to true to restrict user enrollments to the start and end dates of the course.
   # @argument course[enroll_me] [Boolean] [optional] Set to true to enroll the current user as the teacher.
   # @argument course[sis_course_id] [String] [optional] The unique SIS identifier.
+  # @argument course[hide_final_grades] [Boolean] [optional] If this option is set to true, the totals in student grades summary will be hidden.
   # @argument offer [Boolean] [optional] If this option is set to true, the course will be available to students immediately.
   #
   # @returns Course
   def create
-    @account = Account.find(params[:account_id])
-    if authorized_action(@account, @current_user, :manage_courses)
+    @account = params[:account_id] ? Account.find(params[:account_id]) : @domain_root_account.manually_created_courses_account
+    if authorized_action(@account, @current_user, [:manage_courses, :create_courses])
+      params[:course] ||= {}
+
+      if params[:course].has_key?(:syllabus_body)
+        params[:course][:syllabus_body] = process_incoming_html_content(params[:course][:syllabus_body])
+      end
+
       if (sub_account_id = params[:course].delete(:account_id)) && sub_account_id.to_i != @account.id
         @sub_account = @account.find_child(sub_account_id) || raise(ActiveRecord::RecordNotFound)
       end
@@ -178,6 +232,11 @@ class CoursesController < ApplicationController
                      :conclude_at
                    end
 
+      unless @account.grants_right? @current_user, session, :manage_storage_quotas
+        params[:course].delete :storage_quota
+        params[:course].delete :storage_quota_mb
+      end
+      
       @course = (@sub_account || @account).courses.build(params[:course])
       @course.sis_source_id = sis_course_id if api_request? && @account.grants_right?(@current_user, :manage_sis)
       respond_to do |format|
@@ -185,16 +244,16 @@ class CoursesController < ApplicationController
           @course.enroll_user(@current_user, 'TeacherEnrollment', :enrollment_state => 'active') if params[:enroll_me].to_s == 'true'
           # offer updates the workflow state, saving the record without doing validation callbacks
           @course.offer if api_request? and params[:offer].present?
-          format.html
+          format.html { redirect_to @course }
           format.json { render :json => course_json(
             @course,
             @current_user,
             session,
             [:start_at, course_end, :license, :publish_grades_immediately,
-             :is_public, :allow_student_assignment_edits, :allow_wiki_comments,
+             :is_public, :public_syllabus, :allow_student_assignment_edits, :allow_wiki_comments,
              :allow_student_forum_attachments, :open_enrollment, :self_enrollment,
              :root_account_id, :account_id, :public_description,
-             :restrict_enrollments_to_course_dates, :workflow_state], nil)
+             :restrict_enrollments_to_course_dates, :hide_final_grades], nil)
           }
         else
           flash[:error] = t('errors.create_failed', "Course creation failed")
@@ -232,7 +291,7 @@ class CoursesController < ApplicationController
       }
     end
   end
-  
+
   def restore
     get_context
     if authorized_action(@context, @current_user, :update)
@@ -263,21 +322,16 @@ class CoursesController < ApplicationController
   #
   # Returns the list of students enrolled in this course.
   #
-  # @response_field id The unique identifier for the student.
-  # @response_field name The full student name.
-  # @response_field sis_user_id The SIS id for the user's primary pseudonym.
+  # DEPRECATED: Please use the {api:CoursesController#users course users} endpoint
+  # and pass "student" as the enrollment_type.
   #
-  # @example_response
-  #   [ { 'id': 1, 'name': 'first student', 'sis_user_id': null, 'sis_login_id': null },
-  #     { 'id': 2, 'name': 'second student', 'sis_user_id': 'from-sis', 'sis_login_id': 'login-from-sis' } ]
+  # @returns [User]
   def students
-    # DEPRECATED. #users should replace this in a new version of the API.
+    # DEPRECATED. Needs to stay separate from #users though, because this is un-paginated
     get_context
     if authorized_action(@context, @current_user, :read_roster)
       proxy = @context.students.order_by_sortable_name
-      if user_json_is_admin?
-        proxy = proxy.scoped(:include => :pseudonyms)
-      end
+      user_json_preloads(proxy, false)
       render :json => proxy.map { |u| user_json(u, @current_user, session) }
     end
   end
@@ -287,53 +341,74 @@ class CoursesController < ApplicationController
   #
   # @argument enrollment_type [optional, "teacher"|"student"|"ta"|"observer"|"designer"]
   #   When set, only return users where the user is enrolled as this type.
+  #   This argument is ignored if enrollment_role is given.
+  # @argument enrollment_role [optional]
+  #   When set, only return users enrolled with the specified course-level role.  This can be
+  #   a role created with the {api:RoleOverridesController#add_role Add Role API} or a
+  #   base role type of 'StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment',
+  #   'ObserverEnrollment', or 'DesignerEnrollment'.
   #
   # @argument include[] ["email"] Optional user email.
-  # @argument include[] ["enrollments"] Optionally include with each Course the
-  #   user's current and invited enrollments.
+  # @argument include[] ["enrollments"]
+  #   Optionally include with each Course the user's current and invited
+  #   enrollments. If the user is enrolled as a student, and the account has
+  #   permission to manage or view all grades, each enrollment will include a
+  #   'grades' key with 'current_score', 'final_score', 'current_grade' and
+  #   'final_grade' values.
   # @argument include[] ["locked"] Optionally include whether an enrollment is locked.
   # @argument include[] ["avatar_url"] Optionally include avatar_url.
+  # @argument include[] ["test_student"] Optionally include the course's Test Student,
+  #   if present. Default is to not include Test Student.
   #
-  # @response_field id The unique identifier for the user.
-  # @response_field name The full user name.
-  # @response_field sortable_name The sortable user name.
-  # @response_field short_name The short user name.
-  # @response_field sis_user_id The SIS id for the user's primary pseudonym.
+  # @argument user_id [optional]
+  #   If included, the user will be queried and if the user is part of the
+  #   users set, the page parameter will be modified so that the page
+  #   containing user_id will be returned.
   #
-  # @response_field enrollments The user's enrollments in this course.
-  #   See the API documentation for enrollment data returned; however, the user data is not included.
-  #
-  # @example_response
-  #   [
-  #     {
-  #       'id': 1,
-  #       'name': 'first user',
-  #       'sis_user_id': null,
-  #       'sis_login_id': null,
-  #       'enrollments': [ ... ],
-  #     },
-  #     {
-  #       'id': 2,
-  #       'name': 'second user',
-  #       'sis_user_id': 'from-sis',
-  #       'sis_login_id': 'login-from-sis',
-  #       'enrollments': [ ... ],
-  #     }
-  #   ]
+  # @returns [User]
   def users
     get_context
     if authorized_action(@context, @current_user, :read_roster)
-      enrollment_type = "#{params[:enrollment_type].capitalize}Enrollment" if params[:enrollment_type]
-      users = @context.users_visible_to(@current_user)
-      users = users.scoped(:order => "users.sortable_name")
-      users = users.scoped(:conditions => ["enrollments.type = ? ", enrollment_type]) if enrollment_type
-      if user_json_is_admin?
-        users = users.scoped(:include => {:pseudonym => :communication_channel})
+      #backcompat limit param
+      params[:per_page] ||= params.delete(:limit)
+
+      search_params = params.slice(:search_term, :enrollment_role, :enrollment_type)
+      if (search_term = search_params[:search_term]) && search_term.size < 3
+        return render \
+            :json => {
+            "status" => "argument_error",
+            "message" => "search_term of 3 or more characters is required" },
+            :status => :bad_request
       end
-      users = Api.paginate(users, self, api_v1_course_users_path)
+
+      if search_term
+        users = UserSearch.for_user_in_course(search_term, @context, @current_user, search_params)
+      else
+        users = UserSearch.scope_for(@context, @current_user, search_params)
+      end
+      # If a user_id is passed in, modify the page parameter so that the page
+      # that contains that user is returned.
+      # We delete it from params so that it is not maintained in pagination links.
+      user_id = params.delete(:user_id)
+      if user_id.present? && user = users.where(:users => { :id => user_id }).first
+        position_scope = users.where("#{User.sortable_name_order_by_clause}<=#{User.best_unicode_collation_key('?')}", user.sortable_name)
+        position = position_scope.count(:select => "users.*", :distinct => true)
+        per_page = Api.per_page_for(self)
+        params[:page] = (position.to_f / per_page.to_f).ceil
+      end
+
+      users = Api.paginate(users, self, api_v1_course_users_url)
       includes = Array(params[:include])
+      user_json_preloads(users, includes.include?('email'))
+      if not includes.include?('test_student')
+        users.reject! do |u|
+          u.preferences[:fake_student]
+        end
+      end
       if includes.include?('enrollments')
-        User.send(:preload_associations, users, :not_ended_enrollments,
+        # not_ended_enrollments for enrollment_json
+        # enrollments course for has_grade_permissions?
+        User.send(:preload_associations, users, { :not_ended_enrollments => :course },
                   :conditions => ['enrollments.course_id = ?', @context.id])
       end
       render :json => users.map { |u|
@@ -343,36 +418,56 @@ class CoursesController < ApplicationController
     end
   end
 
+  # @API Search users
+  # Returns a list of users in this course that match a search term.
+  #
+  # @argument search_term
+  #   The partial name or full ID of the users to match and return in the results list.
+  # @argument enrollment_type [optional, "teacher"|"student"|"ta"|"observer"|"designer"]
+  #   When set, only return users where the user is enrolled as this type.
+  #   This argument is ignored if enrollment_role is given.
+  # @argument enrollment_role [optional]
+  #   When set, only return users enrolled with the specified course-level role.  This can be
+  #   a role created with the {api:RoleOverridesController#add_role Add Role API} or a
+  #   base role type of 'StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment',
+  #   'ObserverEnrollment', or 'DesignerEnrollment'.
+  # @argument include[]
+  #   The same as the List Users API
+  #
+  # @returns [User]
+  def search_users
+    get_context
+    if authorized_action(@context, @current_user, :read_roster)
+      unless params['search_term']
+        return render \
+                :json => {
+            "status" => "argument_error",
+            "message" => "search_term of 3 or more characters is required" },
+                :status => :bad_request
+      end
+      users
+    end
+  end
+
   # @API List recently logged in students
   #
-  # Returns the list of users in this course, including a 'last_login' field
-  # which contains a timestamp of the last time that user logged into canvas.
-  # The querying user must have the 'View usage reports' permission.
+  # Returns the list of users in this course, ordered by how recently they have
+  # logged in. The records include the 'last_login' field which contains
+  # a timestamp of the last time that user logged into canvas.  The querying
+  # user must have the 'View usage reports' permission.
   #
   # @example_request
   #     curl -H 'Authorization: Bearer <token>' \ 
   #          https://<canvas>/api/v1/courses/<course_id>/recent_users
   #
-  # @example_response
-  #   [
-  #     {
-  #       'id': 1,
-  #       'name': 'first user',
-  #       'sis_user_id': null,
-  #       'sis_login_id': null,
-  #       'last_login': <timestamp>,
-  #     },
-  #     ...
-  #   ]
+  # @returns [User]
   def recent_students
     get_context
     if authorized_action(@context, @current_user, :read_reports)
       scope = User.for_course_with_last_login(@context, @context.root_account_id, 'StudentEnrollment')
-      scope = scope.scoped(:order => 'login_info_exists, last_login DESC')
+      scope = scope.order('login_info_exists, last_login DESC')
       users = Api.paginate(scope, self, api_v1_course_recent_students_url)
-      if user_json_is_admin?
-        User.send(:preload_associations, users, :pseudonyms)
-      end
+      user_json_preloads(users)
       render :json => users.map { |u| user_json(u, @current_user, session, ['last_login']) }
     end
   end
@@ -382,17 +477,19 @@ class CoursesController < ApplicationController
   #
   # Accepts the same include[] parameters as the :users: action, and returns a
   # single user with the same fields as that action.
+  #
+  # @returns User
   def user
     get_context
     if authorized_action(@context, @current_user, :read_roster)
       users = @context.users_visible_to(@current_user)
-      users = users.scoped(:conditions => ['users.id = ?', params[:id]])
-      if user_json_is_admin?
-        users = users.scoped(:include => {:pseudonym => :communication_channel})
-      end
+      users = users.where(:users => { :id => params[:id]})
       includes = Array(params[:include])
+      user_json_preloads(users, includes.include?('email'))
       if includes.include?('enrollments')
-        User.send(:preload_associations, users, :not_ended_enrollments,
+        # not_ended_enrollments for enrollment_json
+        # enrollments course for has_grade_permissions?
+        User.send(:preload_associations, users, { :not_ended_enrollments => :course },
                   :conditions => ['enrollments.course_id = ?', @context.id])
       end
       user = users.first or raise ActiveRecord::RecordNotFound
@@ -445,8 +542,13 @@ class CoursesController < ApplicationController
       flash[:notice] = t('notices.deleted', "Course successfully deleted")
     else
       return unless authorized_action(@context, @current_user, permission_for_event(params[:event]))
+
       @context.complete
-      flash[:notice] = t('notices.concluded', "Course successfully concluded")
+      if @context.save
+        flash[:notice] = t('notices.concluded', "Course successfully concluded")
+      else
+        flash[:notice] = t('notices.failed_conclude', "Course failed to conclude")
+      end
     end
     @current_user.touch
     respond_to do |format|
@@ -460,7 +562,7 @@ class CoursesController < ApplicationController
   def statistics
     get_context
     if authorized_action(@context, @current_user, :read_reports)
-      @student_ids = @context.students.map &:id
+      @student_ids = @context.student_ids
       @range_start = Date.parse("Jan 1 2000")
       @range_end = Date.tomorrow
 
@@ -486,7 +588,7 @@ class CoursesController < ApplicationController
           @old_range_start = @view_month << 1
         end
       end
-      
+
       respond_to do |format|
         format.html do
           js_env(:RECENT_STUDENTS_URL => api_v1_course_recent_students_url(@context))
@@ -496,30 +598,46 @@ class CoursesController < ApplicationController
     end
   end
 
+  # @API Get course settings
+  # Returns some of a course's settings.
+  #
+  # @example_request
+  #   curl https://<canvas>/api/v1/courses/<course_id>/settings \ 
+  #     -X GET \ 
+  #     -H 'Authorization: Bearer <token>'
+  #
+  # @example_response
+  #   {
+  #     "allow_student_discussion_topics": true,
+  #     "allow_student_forum_attachments": false,
+  #     "allow_student_discussion_editing": true
+  #   }
+  include Api::V1::Course
   def settings
     get_context
     if authorized_action(@context, @current_user, :read_as_admin)
-      load_all_contexts(@context)
+      if api_request?
+        render :json => course_settings_json(@context)
+        return
+      end
+
+      load_all_contexts(:context => @context)
+
+      @all_roles = Role.custom_roles_and_counts_for_course(@context, @current_user, true)
+
       users_scope = @context.users_visible_to(@current_user)
-      enrollment_counts = users_scope.count(:distinct => true, :group => 'enrollments.type', :select => 'users.id')
-      @user_counts = {
-        :student  => enrollment_counts['StudentEnrollment'] || 0,
-        :teacher  => enrollment_counts['TeacherEnrollment'] || 0,
-        :ta       => enrollment_counts['TaEnrollment'] || 0,
-        :observer => enrollment_counts['ObserverEnrollment'] || 0,
-        :designer => enrollment_counts['DesignerEnrollment'] || 0,
-        :invited  => users_scope.count(:distinct => true, :select => 'users.id', :conditions => ["enrollments.workflow_state = 'invited'"])
-      }
+      @invited_count = users_scope.count(:distinct => true, :select => 'users.id', :conditions => ["enrollments.workflow_state = 'invited' AND enrollments.type != 'StudentViewEnrollment'"])
+
       js_env(:COURSE_ID => @context.id,
-             :USER_COUNTS => @user_counts,
              :USERS_URL => "/api/v1/courses/#{ @context.id }/users",
+             :ALL_ROLES => @all_roles,
              :COURSE_ROOT_URL => "/courses/#{ @context.id }",
              :SEARCH_URL => search_recipients_url,
              :CONTEXTS => @contexts,
-             :USER_PARAMS => {:include => ['email', 'enrollments', 'locked']},
+             :USER_PARAMS => {:include => ['email', 'enrollments', 'locked', 'observed_users']},
              :PERMISSIONS => {
-               :manage_students => (@context.grants_right?(@current_user, session, :manage_students) ||
-                                    @context.grants_right?(@current_user, session, :manage_admin_users)),
+               :manage_students => @context.grants_right?(@current_user, session, :manage_students),
+               :manage_admin_users => @context.grants_right?(@current_user, session, :manage_admin_users),
                :manage_account_settings => @context.account.grants_right?(@current_user, session, :manage_account_settings),
              })
 
@@ -528,7 +646,31 @@ class CoursesController < ApplicationController
       add_crumb(t('#crumbs.settings', "Settings"), named_context_url(@context, :context_details_url))
     end
   end
-  
+
+  # @API Update course settings
+  # Can update the following course settings:
+  #
+  # - `allow_student_discussion_topics` (true|false)
+  # - `allow_student_forum_attachments` (true|false)
+  # - `allow_student_discussion_editing` (true|false)
+  #
+  # @example_request
+  #   curl https://<canvas>/api/v1/courses/<course_id>/settings \ 
+  #     -X PUT \ 
+  #     -H 'Authorization: Bearer <token>' \ 
+  #     -d 'allow_student_discussion_topics=false'
+  def update_settings
+    return unless api_request?
+    @course = api_find(Course, params[:course_id])
+    return unless authorized_action(@course, @current_user, :update)
+    @course.update_attributes params.slice(
+      :allow_student_discussion_topics,
+      :allow_student_forum_attachments,
+      :allow_student_discussion_editing
+    )
+    render :json => course_settings_json(@course)
+  end
+
   def update_nav
     get_context
     if authorized_action(@context, @current_user, :update)
@@ -540,7 +682,7 @@ class CoursesController < ApplicationController
       end
     end
   end
-  
+
   def roster
     if authorized_action(@context, @current_user, :read_roster)
       log_asset_access("roster:#{@context.asset_string}", "roster", "other")
@@ -549,67 +691,87 @@ class CoursesController < ApplicationController
       @groups = @context.groups.active
     end
   end
-  
+
   def re_send_invitations
     get_context
     if authorized_action(@context, @current_user, [:manage_students, :manage_admin_users])
-      @context.detailed_enrollments.each do |e|
-        e.re_send_confirmation! if e.invited?
-      end
+      @context.send_later_if_production(:re_send_invitations!)
+
       respond_to do |format|
         format.html { redirect_to course_settings_url }
         format.json { render :json => {:re_sent => true}.to_json }
       end
     end
   end
-  
+
   def enrollment_invitation
     get_context
-    return if check_enrollment
-    if !@pending_enrollment
-      redirect_to course_url(@context.id)
-      return true
-    end
+
+    return if check_enrollment(true)
+    return !!redirect_to(course_url(@context.id)) unless @pending_enrollment
+
     if params[:reject]
-      if @pending_enrollment.invited?
-        @pending_enrollment.reject!
-        flash[:notice] = t('notices.invitation_cancelled', "Invitation canceled.")
-      end
-      session.delete(:enrollment_uuid)
-      if @current_user
-        redirect_to dashboard_url
-      else
-        redirect_to root_url
-      end
+      return reject_enrollment(@pending_enrollment)
     elsif params[:accept]
-      if @current_user && @pending_enrollment.user == @current_user
-        if @pending_enrollment.invited?
-          @pending_enrollment.accept!
-          flash[:notice] = t('notices.invitation_accepted', "Invitation accepted!  Welcome to %{course}!", :course => @context.name)
-        end
-        session[:accepted_enrollment_uuid] = @pending_enrollment.uuid
-        if params[:action] != 'show'
-          redirect_to course_url(@context.id)
-        else
-          @context_enrollment = @pending_enrollment
-          @pending_enrollment = nil
-          return false
-        end
-      elsif !@current_user && @pending_enrollment.user.registered? || !@pending_enrollment.user.email_channel
-        session[:return_to] = course_url(@context.id)
-        flash[:notice] = t('notices.login_to_accept', "You'll need to log in before you can accept the enrollment.")
-        return redirect_to login_url(:re_login => 1) if @current_user
-        redirect_to login_url
-      else
-        # defer to CommunicationChannelsController#confirm for the logic of merging users
-        redirect_to registration_confirmation_path(@pending_enrollment.user.email_channel.confirmation_code, :enrollment => @pending_enrollment.uuid)
-      end
+      return accept_enrollment(@pending_enrollment)
     else
       redirect_to course_url(@context.id)
     end
-    true
   end
-  
+
+  # Internal: Accept an enrollment invitation and redirect.
+  #
+  # enrollment - An enrollment object to accept.
+  #
+  # Returns nothing.
+  def accept_enrollment(enrollment)
+    if @current_user && enrollment.user == @current_user
+      if enrollment.workflow_state == 'invited'
+        enrollment.accept!
+        flash[:notice] = t('notices.invitation_accepted', 'Invitation accepted!  Welcome to %{course}!', :course => @context.name)
+      end
+
+      session[:accepted_enrollment_uuid] = enrollment.uuid
+
+      if params[:action] != 'show'
+        if @context.restrict_enrollments_to_course_dates?
+          redirect_to courses_url
+        else
+          redirect_to course_url(@context.id)
+        end
+      else
+        @context_enrollment = enrollment
+        enrollment = nil
+        return false
+      end
+    elsif !@current_user && enrollment.user.registered? || !enrollment.user.email_channel
+      session[:return_to] = course_url(@context.id)
+      flash[:notice] = t('notices.login_to_accept', "You'll need to log in before you can accept the enrollment.")
+      return redirect_to login_url(:re_login => 1) if @current_user
+      redirect_to login_url
+    else
+      # defer to CommunicationChannelsController#confirm for the logic of merging users
+      redirect_to registration_confirmation_path(enrollment.user.email_channel.confirmation_code, :enrollment => enrollment.uuid)
+    end
+  end
+  protected :accept_enrollment
+
+  # Internal: Reject an enrollment invitation and redirect.
+  #
+  # enrollment - An enrollment object to reject.
+  #
+  # Returns nothing.
+  def reject_enrollment(enrollment)
+    if enrollment.invited?
+      enrollment.reject!
+      flash[:notice] = t('notices.invitation_cancelled', 'Invitation canceled.')
+    end
+
+    session.delete(:enrollment_uuid)
+    redirect_to(@current_user ? dashboard_url : root_url)
+  end
+  protected :reject_enrollment
+
   def claim_course
     if params[:verification] == @context.uuid
       session[:claim_course_uuid] = @context.uuid
@@ -620,38 +782,39 @@ class CoursesController < ApplicationController
     end
   end
   protected :claim_course
-  
-  def check_enrollment
+
+  # Protected: Check a user's enrollment in the current course and redirect
+  #   them/clean up the session as needed.
+  #
+  # ignore_restricted_courses - if true, don't exit on enrollments to non-active,
+  #   date-restricted courses.
+  #
+  # Returns boolean (true if parent request should be cancelled).
+  def check_enrollment(ignore_restricted_courses = false)
     return false if @pending_enrollment
 
-    # Use the enrollment we already fetched, if possible
-    enrollment = @context_enrollment if @context_enrollment && @context_enrollment.pending? && (@context_enrollment.uuid == params[:invitation] || params[:invitation].blank?)
-    # Overwrite with the session enrollment, if one exists, and it's different than the current user's
-    enrollment = @context.enrollments.find_by_uuid_and_workflow_state(session[:enrollment_uuid], "invited") if session[:enrollment_uuid] && enrollment.try(:uuid) != session[:enrollment_uuid] && params[:invitation].blank? && session[:enrollment_uuid_course_id] == @context.id
-    # Look for enrollments to matching temporary users		
-    enrollment ||= @current_user.temporary_invitations.find { |i| i.course_id == @context.id } if @current_user
-    # Look up the explicitly provided invitation
-    enrollment ||= @context.enrollments.find(:first, :conditions => ["uuid=? AND workflow_state IN ('invited', 'rejected')", params[:invitation]]) unless params[:invitation].blank?
-    if enrollment && enrollment.state_based_on_date == :inactive
-      flash[:notice] = t('notices.enrollment_not_active', "Your membership in the course, %{course}, is not yet activated", :course => @context.name)
-      redirect_to dashboard_url
-      return true
-    end
-    if enrollment
+    if enrollment = fetch_enrollment
+      if enrollment.state_based_on_date == :inactive && !ignore_restricted_courses
+        flash[:notice] = t('notices.enrollment_not_active', 'Your membership in the course, %{course}, is not yet activated', :course => @context.name)
+        return !!redirect_to(enrollment.workflow_state == 'invited' ? courses_url : dashboard_url)
+      end
+
       if enrollment.rejected?
         enrollment.workflow_state = 'invited'
         enrollment.save_without_broadcasting
       end
+
       if enrollment.self_enrolled?
-        redirect_to registration_confirmation_path(enrollment.user.email_channel.confirmation_code, :enrollment => enrollment.uuid)
-        return true
+        return !!redirect_to(registration_confirmation_path(enrollment.user.email_channel.confirmation_code, :enrollment => enrollment.uuid))
       end
-      e = enrollment
-      session[:enrollment_uuid] = e.uuid
+
+      session[:enrollment_uuid]             = enrollment.uuid
       session[:session_affects_permissions] = true
-      session[:enrollment_as_student] = true if e.student?
-      session[:enrollment_uuid_course_id] = e.course_id
+      session[:enrollment_as_student]       = true if enrollment.student?
+      session[:enrollment_uuid_course_id]   = enrollment.course_id
+
       @pending_enrollment = enrollment
+
       if @context.root_account.allow_invitation_previews?
         flash[:notice] = t('notices.preview_course', "You've been invited to join this course.  You can look around, but you'll need to accept the enrollment invitation before you can participate.")
       elsif params[:action] != "enrollment_invitation"
@@ -661,19 +824,55 @@ class CoursesController < ApplicationController
         return enrollment_invitation
       end
     end
-    if session[:accepted_enrollment_uuid] && (e = @context.enrollments.find_by_uuid(session[:accepted_enrollment_uuid]))
-      if e.invited?
-        e.accept!
-        flash[:notice] = t('notices.invitation_accepted', "Invitation accepted!  Welcome to %{course}!", :course => @context.name)
+
+    if session[:accepted_enrollment_uuid].present? &&
+      enrollment = @context.enrollments.find_by_uuid(session[:accepted_enrollment_uuid])
+
+      success = false
+      if enrollment.invited?
+        success = enrollment.accept!
+        flash[:notice] = message || t('notices.invitation_accepted', "Invitation accepted!  Welcome to %{course}!", :course => @context.name)
       end
+
+      session.delete(:enrollment_uuid) if session[:enrollment_uuid] == session[:accepted_enrollment_uuid]
       session.delete(:accepted_enrollment_uuid)
       session.delete(:enrollment_uuid_course_id)
-      session.delete(:enrollment_uuid) if session[:enrollment_uuid] == session[:accepted_enrollment_uuid]
     end
+
     false
   end
   protected :check_enrollment
-  
+
+  # Internal: Get the current user's enrollment (if any) in the requested course.
+  #
+  # Returns enrollment (or nil).
+  def fetch_enrollment
+    # Use the enrollment we already fetched, if possible
+    enrollment = @context_enrollment if @context_enrollment && @context_enrollment.pending? && (@context_enrollment.uuid == params[:invitation] || params[:invitation].blank?)
+
+    # Overwrite with the session enrollment, if one exists, and it's different than the current user's
+    if session[:enrollment_uuid] && enrollment.try(:uuid) != session[:enrollment_uuid] &&
+      params[:invitation].blank? && session[:enrollment_uuid_course_id] == @context.id
+
+      enrollment = @context.enrollments.find_by_uuid_and_workflow_state(session[:enrollment_uuid], "invited")
+    end
+
+    # Look for enrollments to matching temporary users
+    if @current_user
+      enrollment ||= @current_user.temporary_invitations.find do |invitation|
+        invitation.course_id == @context.id
+      end
+    end
+
+    # Look up the explicitly provided invitation
+    unless params[:invitation].blank?
+      enrollment ||= @context.enrollments.where("enrollments.uuid=? AND enrollments.workflow_state IN ('invited', 'rejected')", params[:invitation]).first
+    end
+
+    enrollment
+  end
+  protected :fetch_enrollment
+
   def locks
     if authorized_action(@context, @current_user, :read)
       assets = params[:assets].split(",")
@@ -705,51 +904,28 @@ class CoursesController < ApplicationController
       render :json => locks_hash.to_json
     end
   end
-  
+
   def self_unenrollment
     get_context
-    unless @context_enrollment && params[:self_unenrollment] && params[:self_unenrollment] == @context_enrollment.uuid && @context_enrollment.self_enrolled?
-      redirect_to course_url(@context)
-      return
+    if @context_enrollment && params[:self_unenrollment] && params[:self_unenrollment] == @context_enrollment.uuid && @context_enrollment.self_enrolled?
+      @context_enrollment.conclude
+      render :json => ""
+    else
+      render :json => "", :status => :bad_request
     end
-    @context_enrollment.complete
-    redirect_to course_url(@context)
   end
-  
+
+  # DEPRECATED
   def self_enrollment
     get_context
-    unless @context.self_enrollment && params[:self_enrollment] && @context.self_enrollment_codes.include?(params[:self_enrollment])
+    unless params[:self_enrollment] &&
+        @context.self_enrollment_codes.include?(params[:self_enrollment]) &&
+        @context.self_enrollment_code
       return redirect_to course_url(@context)
     end
-    unless @current_user || @context.root_account.open_registration?
-      store_location
-      flash[:notice] = t('notices.login_required', "Please log in to join this course.")
-      return redirect_to login_url
-    end
-    if @current_user
-      @enrollment = @context.self_enroll_student(@current_user)
-      flash[:notice] = t('notices.enrolled', "You are now enrolled in this course.")
-      return redirect_to course_url(@context)
-    end
-    if params[:email]
-      begin
-        address = TMail::Address::parse(params[:email])
-      rescue
-        flash[:error] = t('errors.invalid_email', "Invalid e-mail address, please try again.")
-        render :action => 'open_enrollment'
-        return
-      end
-      user = User.new(:name => address.name || address.address)
-      user.communication_channels.build(:path => address.address)
-      user.workflow_state = 'creation_pending'
-      user.save!
-      @enrollment = @context.enroll_student(user)
-      @enrollment.update_attribute(:self_enrolled, true)
-      return render :action => 'open_enrollment_confirmed'
-    end
-    render :action => 'open_enrollment'
+    redirect_to enroll_url(@context.self_enrollment_code)
   end
-  
+
   def check_pending_teacher
     store_location if @context.created?
     if session[:saved_course_uuid] == @context.uuid
@@ -765,7 +941,7 @@ class CoursesController < ApplicationController
     end
   end
   protected :check_pending_teacher
-  
+
   def check_unknown_user
     @public_view = true unless @current_user && @context.grants_right?(@current_user, session, :read_roster)
   end
@@ -773,10 +949,8 @@ class CoursesController < ApplicationController
 
   def check_for_xlist
     return false unless @current_user.present? && @context_enrollment.blank?
-    xlist_enrollment = @current_user.enrollments.scoped({
-      :joins => :course_section,
-      :conditions => { :course_sections => { :nonxlist_course_id => @context.id } },
-    }).first
+    xlist_enrollment = @current_user.enrollments.joins(:course_section).
+      where(:course_sections => { :nonxlist_course_id => @context }).first
     if xlist_enrollment.present?
       redirect_params = {}
       redirect_params[:invitation] = params[:invitation] if params[:invitation].present?
@@ -790,17 +964,31 @@ class CoursesController < ApplicationController
   # @API Get a single course
   # Return information on a single course.
   #
-  # Accepts the same include[] parameters as the list action, and returns a
-  # single course with the same fields as that action.
+  # Accepts the same include[] parameters as the list action plus:
+  #
+  # @argument include[] ["all_courses"] Also search recently deleted courses
   #
   # @returns Course
   def show
     if api_request?
-      @context = api_find(Course.active, params[:id])
-      if authorized_action(@context, @current_user, :read)
-        enrollments = @context.current_enrollments.all(:conditions => { :user_id => @current_user.id })
-        includes = Set.new(Array(params[:include]))
-        render :json => course_json(@context, @current_user, session, includes, enrollments)
+      includes = Set.new(Array(params[:include]))
+
+      if params[:account_id]
+        @account = api_find(Account.active, params[:account_id])
+        scope = @account.all_courses
+      else
+        scope = Course
+      end
+
+      if !includes.member?("all_courses")
+        scope = scope.not_deleted
+      end
+      @course = api_find(scope, params[:id])
+
+      if authorized_action(@course, @current_user, :read)
+        enrollments = @course.current_enrollments.where(:user_id => @current_user).all
+        includes << :hide_final_grades
+        render :json => course_json(@course, @current_user, session, includes, enrollments)
       end
       return
     end
@@ -808,11 +996,7 @@ class CoursesController < ApplicationController
     @context = Course.active.find(params[:id])
     if request.xhr?
       if authorized_action(@context, @current_user, [:read, :read_as_admin])
-        if is_authorized_action?(@context, @current_user, [:manage_students, :manage_admin_users])
-          render :json => @context.to_json(:include => {:current_enrollments => {:methods => :email}})
-        else
-          render :json => @context.to_json
-        end
+        render :json => @context.to_json
       end
       return
     end
@@ -833,11 +1017,14 @@ class CoursesController < ApplicationController
 
     @context_enrollment ||= @pending_enrollment
     if is_authorized_action?(@context, @current_user, :read)
+      check_incomplete_registration
+
       if @current_user && @context.grants_right?(@current_user, session, :manage_grades)
         @assignments_needing_publishing = @context.assignments.active.need_publishing || []
       end
 
       add_crumb(@context.short_name, url_for(@context), :id => "crumb_#{@context.asset_string}")
+      set_badge_counts_for(@context, @current_user, @current_enrollment)
 
       @course_home_view = (params[:view] == "feed" && 'feed') || @context.default_view || 'feed'
 
@@ -851,11 +1038,12 @@ class CoursesController < ApplicationController
         get_sorted_assignments
       when 'modules'
         add_crumb(t('#crumbs.modules', "Modules"))
-        @modules = @context.context_modules.active
-        @collapsed_modules = ContextModuleProgression.for_user(@current_user).for_modules(@modules).scoped(:select => 'context_module_id, collapsed').select{|p| p.collapsed? }.map(&:context_module_id)
+        @modules = @context.modules_visible_to(@current_user)
+        @collapsed_modules = ContextModuleProgression.for_user(@current_user).for_modules(@modules).select([:context_module_id, :collapsed]).select{|p| p.collapsed? }.map(&:context_module_id)
       when 'syllabus'
         add_crumb(t('#crumbs.syllabus', "Syllabus"))
-        @groups = @context.assignment_groups.active.find(:all, :order => 'position, name')
+        @syllabus_body = api_user_content(@context.syllabus_body, @context)
+        @groups = @context.assignment_groups.active.order(:position, :name).all
         @events = @context.calendar_events.active.to_a
         @events.concat @context.assignments.active.to_a
         @undated_events = @events.select {|e| e.start_at == nil}
@@ -868,6 +1056,7 @@ class CoursesController < ApplicationController
           @contexts += @user_groups if @user_groups
         end
         @current_conferences = @context.web_conferences.select{|c| c.active? && c.users.include?(@current_user) }
+        @stream_items = @current_user.try(:cached_recent_stream_items, { :contexts => @contexts }) || []
       end
 
       if @current_user and (@show_recent_feedback = @context.user_is_student?(@current_user))
@@ -880,9 +1069,9 @@ class CoursesController < ApplicationController
       render_unauthorized_action(@context)
     end
   end
-  
+
   def switch_role
-    @enrollments = @context.enrollments.scoped({:conditions => ['workflow_state = ?', 'active']}).for_user(@current_user)
+    @enrollments = @context.enrollments.where("workflow_state='active'").for_user(@current_user)
     @enrollment = @enrollments.sort_by{|e| [e.state_sortable, e.rank_sortable] }.first
     if params[:role] == 'revert'
       session.delete("role_course_#{@context.id}")
@@ -901,7 +1090,7 @@ class CoursesController < ApplicationController
     end
     redirect_to course_url(@context)
   end
-  
+
   def confirm_action
     get_context
     params[:event] ||= (@context.claimed? || @context.created? || @context.completed?) ? 'delete' : 'conclude'
@@ -923,7 +1112,7 @@ class CoursesController < ApplicationController
       authorized_action(@context, @current_user, :permission_fail)
     end
   end
-  
+
   def unconclude_user
     get_context
     @enrollment = @context.enrollments.find(params[:id])
@@ -942,7 +1131,7 @@ class CoursesController < ApplicationController
       authorized_action(@context, @current_user, :permission_fail)
     end
   end
-  
+
   def limit_user
     get_context
     @user = @context.users.find(params[:id])
@@ -958,7 +1147,7 @@ class CoursesController < ApplicationController
       authorized_action(@context, @current_user, :permission_fail)
     end
   end
-  
+
   def unenroll_user
     get_context
     @enrollment = @context.enrollments.find(params[:id])
@@ -978,12 +1167,38 @@ class CoursesController < ApplicationController
   def enroll_users
     get_context
     params[:enrollment_type] ||= 'StudentEnrollment'
+
+    custom_role = nil
+    if !Role.is_base_role?(params[:enrollment_type])
+      if custom_role = @context.account.get_course_role(params[:enrollment_type])
+        params[:enrollment_type] = custom_role.base_role_type
+
+        if custom_role.workflow_state != 'active'
+          render :json => t('errors.role_not_active', "Can't add users for non-active role: '%{role}'", :role => custom_role.name), :status => :bad_request
+          return
+        end
+      else
+        render :json => t('errors.role_not_found', "No role named '%{role}' exists.", :role => params[:enrollment_type]), :status => :bad_request
+        return
+      end
+    end
+
     params[:course_section_id] ||= @context.default_section.id
     if @current_user && @current_user.can_create_enrollment_for?(@context, session, params[:enrollment_type])
       params[:user_list] ||= ""
-      
+
       respond_to do |format|
-        if (@enrollments = EnrollmentsFromUserList.process(UserList.new(params[:user_list], @context.root_account, @context.user_list_search_mode_for(@current_user)), @context, :course_section_id => params[:course_section_id], :enrollment_type => params[:enrollment_type], :limit_privileges_to_course_section => params[:limit_privileges_to_course_section] == '1'))
+        # Enrollment settings hash
+        # Change :limit_privileges_to_course_section to be an explicit true/false value
+        enrollment_options = params.slice(:course_section_id, :enrollment_type, :limit_privileges_to_course_section)
+        limit_privileges = value_to_boolean(enrollment_options[:limit_privileges_to_course_section])
+        enrollment_options[:limit_privileges_to_course_section] = limit_privileges
+        enrollment_options[:role_name] = custom_role.name if custom_role
+        list = UserList.new(params[:user_list],
+                            :root_account => @context.root_account,
+                            :search_method => @context.user_list_search_mode_for(@current_user),
+                            :initial_type => params[:enrollment_type])
+        if !(@context.completed? || @context.soft_concluded?) && (@enrollments = EnrollmentsFromUserList.process(list, @context, enrollment_options))
           format.json do
             Enrollment.send(:preload_associations, @enrollments, [:course_section, {:user => [:communication_channel, :pseudonym]}])
             json = @enrollments.map { |e|
@@ -998,7 +1213,9 @@ class CoursesController < ApplicationController
                   'short_name' => e.user.short_name,
                   'type' => e.type,
                   'user_id' => e.user_id,
-                  'workflow_state' => e.workflow_state
+                  'workflow_state' => e.workflow_state,
+                  'custom_role_asset_string' => custom_role ? custom_role.asset_string : nil,
+                  'already_enrolled' => e.already_enrolled
                 }
               }
             }
@@ -1034,9 +1251,9 @@ class CoursesController < ApplicationController
       respond_to do |format|
         # ensure user_id,section_id,type,associated_user_id is unique (this
         # will become a DB constraint eventually)
-        @possible_dup = @context.enrollments.find(:first, :conditions =>
-          ["id <> ? AND user_id = ? AND course_section_id = ? AND type = ? AND (associated_user_id IS NULL OR associated_user_id = ?)",
-          @enrollment.id, @enrollment.user_id, params[:course_section_id], @enrollment.type, @enrollment.associated_user_id])
+        @possible_dup = @context.enrollments.where(
+          "id<>? AND user_id=? AND course_section_id=? AND type=? AND (associated_user_id IS NULL OR associated_user_id=?)",
+          @enrollment, @enrollment.user_id, params[:course_section_id], @enrollment.type, @enrollment.associated_user_id).first
         if @possible_dup.present?
           format.json { render :json => @enrollment.to_json, :status => :forbidden }
         else
@@ -1050,14 +1267,14 @@ class CoursesController < ApplicationController
       authorized_action(@context, @current_user, :permission_fail)
     end
   end
-  
+
   def copy
     get_context
     authorized_action(@context, @current_user, :read) &&
       authorized_action(@context, @current_user, :read_as_admin) &&
       authorized_action(@domain_root_account.manually_created_courses_account, @current_user, [:create_courses, :manage_courses])
   end
-  
+
   def copy_course
     get_context
     if authorized_action(@context, @current_user, :read) &&
@@ -1111,13 +1328,17 @@ class CoursesController < ApplicationController
   def update
     @course = api_find(Course, params[:id])
     if authorized_action(@course, @current_user, :update)
+      params[:course] ||= {}
+      if params[:course].has_key?(:syllabus_body)
+        params[:course][:syllabus_body] = process_incoming_html_content(params[:course][:syllabus_body])
+      end
       root_account_id = params[:course].delete :root_account_id
       if root_account_id && Account.site_admin.grants_right?(@current_user, session, :manage_courses)
         @course.root_account = Account.root_accounts.find(root_account_id)
       end
       standard_id = params[:course].delete :grading_standard_id
-      if standard_id && @course.grants_right?(@current_user, session, :manage_grades)
-        @course.grading_standard = GradingStandard.standards_for(@course).detect{|s| s.id == standard_id.to_i }
+      if standard_id.present? && @course.grants_right?(@current_user, session, :manage_grades)
+        @course.grading_standard = GradingStandard.standards_for(@course).find_by_id(standard_id)
       end
       if @course.root_account.grants_right?(@current_user, session, :manage_courses)
         if params[:course][:account_id]
@@ -1132,9 +1353,11 @@ class CoursesController < ApplicationController
         params[:course].delete :account_id
         params[:course].delete :enrollment_term_id
       end
-      if !@course.account.grants_right?(@current_user, session, :manage_courses)
+      unless @course.account.grants_right? @current_user, session, :manage_storage_quotas
         params[:course].delete :storage_quota
         params[:course].delete :storage_quota_mb
+      end
+      if !@course.account.grants_right?(@current_user, session, :manage_courses)
         if @course.root_account.settings[:prevent_course_renaming_by_teachers]
           params[:course].delete :name
           params[:course].delete :course_code
@@ -1151,6 +1374,16 @@ class CoursesController < ApplicationController
         end
       end
       params[:course][:event] = :offer if params[:offer].present?
+
+      lock_announcements = params[:course].delete(:lock_all_announcements)
+      if value_to_boolean(lock_announcements)
+        @course.lock_all_announcements = true
+        Announcement.where(:context_type => 'Course', :context_id => @course, :workflow_state => 'active').
+            update_all(:workflow_state => 'locked')
+      elsif @course.lock_all_announcements
+        @course.lock_all_announcements = false
+      end
+
       @course.process_event(params[:course].delete(:event)) if params[:course][:event] && @course.grants_right?(@current_user, session, :change_course_state)
       params[:course][:conclude_at] = params[:course].delete(:end_at) if api_request? && params[:course].has_key?(:end_at)
       respond_to do |format|
@@ -1164,9 +1397,9 @@ class CoursesController < ApplicationController
           format.html { redirect_to((!params[:continue_to] || params[:continue_to].empty?) ? course_url(@course) : params[:continue_to]) }
           format.json do
             if api_request?
-              render :json => course_json(@course, @current_user, session, [], nil)
+              render :json => course_json(@course, @current_user, session, [:hide_final_grades], nil)
             else
-             render :json => @course.to_json(:methods => [:readable_license, :quota, :account_name, :term_name, :grading_standard_title, :storage_quota_mb]), :status => :ok 
+             render :json => @course.to_json(:methods => [:readable_license, :quota, :account_name, :term_name, :grading_standard_title, :storage_quota_mb]), :status => :ok
             end
           end
         else
@@ -1174,6 +1407,49 @@ class CoursesController < ApplicationController
           format.json { render :json => @course.errors.to_json, :status => :bad_request }
         end
       end
+    end
+  end
+
+  # @API Update courses
+  # Update multiple courses in an account.  Operates asynchronously; use the {api:ProgressController#show progress endpoint}
+  # to query the status of an operation.
+  #
+  # @argument course_ids[] List of ids of courses to update. At most 500 courses may be updated in one call.
+  # @argument event The action to take on each course.  Must be one of 'offer', 'conclude', 'delete', or 'undelete'.
+  #   * 'offer' makes a course visible to students. This action is also called "publish" on the web site.
+  #   * 'conclude' prevents future enrollments and makes a course read-only for all participants. The course still appears
+  #     in prior-enrollment lists.
+  #   * 'delete' completely removes the course from the web site (including course menus and prior-enrollment lists).
+  #     All enrollments are deleted. Course content may be physically deleted at a future date.
+  #   * 'undelete' attempts to recover a course that has been deleted. (Recovery is not guaranteed; please conclude
+  #     rather than delete a course if there is any possibility the course will be used again.) The recovered course
+  #     will be unpublished. Deleted enrollments will not be recovered.
+  # @example_request
+  #     curl https://<canvas>/api/v1/accounts/<account_id>/courses \ 
+  #       -X PUT \ 
+  #       -H 'Authorization: Bearer <token>' \ 
+  #       -d 'event=offer' \ 
+  #       -d 'course_ids[]=1' \ 
+  #       -d 'course_ids[]=2' 
+  #
+  # @returns Progress
+  def batch_update
+    @account = Account.find(params[:account_id])
+    if params[:event] == 'undelete'
+      permission = :undelete_courses
+    else
+      permission = :manage_courses
+    end
+
+    if authorized_action(@account, @current_user, permission)
+      return render(:json => { :message => 'must specify course_ids[]' }, :status => :bad_request) unless params[:course_ids].is_a?(Array)
+      @course_ids = Api.map_ids(params[:course_ids], Course, @domain_root_account)
+      return render(:json => { :message => 'course batch size limit (500) exceeded' }, :status => :forbidden) if @course_ids.size > 500
+      update_params = params.slice(:event).with_indifferent_access
+      return render(:json => { :message => 'need to specify event' }, :status => :bad_request) unless update_params[:event]
+      return render(:json => { :message => 'invalid event' }, :status => :bad_request) unless %w(offer conclude delete undelete).include? update_params[:event]
+      progress = Course.batch_update(@account, @current_user, @course_ids, update_params)
+      render :json => progress_json(progress, @current_user, session)
     end
   end
 
@@ -1229,7 +1505,7 @@ class CoursesController < ApplicationController
     @new_course = @context.reset_content
     redirect_to course_settings_path(@new_course.id)
   end
-  
+
   def student_view
     get_context
     if authorized_action(@context, @current_user, :use_student_view)
@@ -1274,4 +1550,5 @@ class CoursesController < ApplicationController
       :nothing
     end
   end
+
 end

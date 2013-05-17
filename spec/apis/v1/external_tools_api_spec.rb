@@ -199,21 +199,21 @@ describe ExternalToolsController, :type => :integration do
                     {:controller => 'external_tools', :action => 'index', :format => 'json', :"#{type}_id" => context.id.to_s, :per_page => '3'})
 
     json.length.should == 3
-    response.headers['Link'].should == [
-            %{</api/v1/#{type}s/#{context.id}/external_tools?page=2&per_page=3>; rel="next"},
-            %{</api/v1/#{type}s/#{context.id}/external_tools?page=1&per_page=3>; rel="first"},
-            %{</api/v1/#{type}s/#{context.id}/external_tools?page=3&per_page=3>; rel="last"}
-    ].join(',')
+    links = response.headers['Link'].split(",")
+    links.all?{ |l| l =~ /api\/v1\/#{type}s\/#{context.id}\/external_tools/ }.should be_true
+    links.find{ |l| l.match(/rel="next"/)}.should =~ /page=2/
+    links.find{ |l| l.match(/rel="first"/)}.should =~ /page=1/
+    links.find{ |l| l.match(/rel="last"/)}.should =~ /page=3/
 
     # get the last page
     json = api_call(:get, "/api/v1/#{type}s/#{context.id}/external_tools.json?page=3&per_page=3",
                     {:controller => 'external_tools', :action => 'index', :format => 'json', :"#{type}_id" => context.id.to_s, :per_page => '3', :page => '3'})
     json.length.should == 1
-    response.headers['Link'].should == [
-            %{</api/v1/#{type}s/#{context.id}/external_tools?page=2&per_page=3>; rel="prev"},
-            %{</api/v1/#{type}s/#{context.id}/external_tools?page=1&per_page=3>; rel="first"},
-            %{</api/v1/#{type}s/#{context.id}/external_tools?page=3&per_page=3>; rel="last"}
-    ].join(',')
+    links = response.headers['Link'].split(",")
+    links.all?{ |l| l =~ /api\/v1\/#{type}s\/#{context.id}\/external_tools/ }.should be_true
+    links.find{ |l| l.match(/rel="prev"/)}.should =~ /page=2/
+    links.find{ |l| l.match(/rel="first"/)}.should =~ /page=1/
+    links.find{ |l| l.match(/rel="last"/)}.should =~ /page=3/
   end
   
   def tool_with_everything(context, opts={})
@@ -225,10 +225,11 @@ describe ExternalToolsController, :type => :integration do
     et.url = "http://www.example.com/ims/lti"
     et.workflow_state = 'public'
     et.custom_fields = {:key1 => 'val1', :key2 => 'val2'}
-    et.course_navigation = {:url=>"http://www.example.com/ims/lti/course", :visibility=>"admins", :text=>"Course nav"}
-    et.account_navigation = {:url=>"http://www.example.com/ims/lti/account", :text=>"Account nav"}
+    et.course_navigation = {:url=>"http://www.example.com/ims/lti/course", :visibility=>"admins", :text=>"Course nav", "default"=>"disabled"}
+    et.account_navigation = {:url=>"http://www.example.com/ims/lti/account", :text=>"Account nav", :custom_fields=>{"key"=>"value"}}
     et.user_navigation = {:url=>"http://www.example.com/ims/lti/user", :text=>"User nav"}
     et.editor_button = {:url=>"http://www.example.com/ims/lti/editor", :icon_url=>"/images/delete.png", :selection_width=>50, :selection_height=>50, :text=>"editor button"}
+    et.homework_submission = {:url=>"http://www.example.com/ims/lti/editor", :selection_width=>50, :selection_height=>50, :text=>"homework submission"}
     et.resource_selection = {:url=>"http://www.example.com/ims/lti/resource", :text => "", :selection_width=>50, :selection_height=>50}
     et.save!
     et
@@ -271,11 +272,18 @@ describe ExternalToolsController, :type => :integration do
               "url"=>"http://www.example.com/ims/lti/editor",
               "selection_height"=>50,
               "selection_width"=>50},
+     "homework_submission"=>
+             {"text"=>"homework submission",
+              "url"=>"http://www.example.com/ims/lti/editor",
+              "selection_height"=>50,
+              "selection_width"=>50},
      "custom_fields"=>{"key1"=>"val1", "key2"=>"val2"},
      "description"=>"For testing stuff",
      "user_navigation"=>
              {"text"=>"User nav", "url"=>"http://www.example.com/ims/lti/user"},
+     "course_navigation" =>
+             {"text"=>"Course nav", "url"=>"http://www.example.com/ims/lti/course", "visibility"=>"admins", "default"=> "disabled"},
      "account_navigation"=>
-             {"text"=>"Account nav", "url"=>"http://www.example.com/ims/lti/account"}}
+             {"text"=>"Account nav", "url"=>"http://www.example.com/ims/lti/account", "custom_fields"=>{"key"=>"value"}}}
   end
 end

@@ -1,14 +1,9 @@
 <%
   js_bundle :registration
   jammit_css :registration
-  js_env :USER => {
-    :LOGIN_HANDLE_NAME => (@domain_root_account.login_handle_name rescue AccountAuthorizationConfig.default_login_handle_name),
-    :MIN_AGE => User.self_enrollment_min_age
-  }
+  content_for :page_title, t('create_a_canvas_account', "Create a Canvas Account")
+  content_for :head, include_stylesheets(:common, :media => "all")
 %>
-<% content_for :head do %>
-  <%= include_stylesheets :common, :media => "all" %>
-<% end %>
 
 <div id="registration_header">
   <div class="registration-content">
@@ -25,6 +20,16 @@
       <a href="#" id="signup_teacher" class="signup_link" data-template="teacherDialog" title="Teacher Signup">I'm a Teacher</a>
       <a href="#" id="signup_student" class="signup_link" data-template="studentDialog" title="Student Signup">I'm a Student</a>
       <a href="#" id="signup_parent" class="signup_link" data-template="parentDialog" title="Parent Signup">Parents sign up here</a>
+    </div>
+  </div>
+</div>
+
+<div id="registration_footer">
+  <div class="registration-content">
+    <div class="left">&copy; <%= Time.now.year %> <a href="http://www.instructure.com">Instructure</a></div>
+    <div class="right">
+      <a href="http://www.instructure.com/terms-of-use">Terms of Use</a>
+      <a href="http://www.instructure.com/privacy-policy">Privacy Policy</a>
     </div>
   </div>
 </div>

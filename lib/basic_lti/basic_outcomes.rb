@@ -77,6 +77,14 @@ module BasicLTI::BasicOutcomes
       @lti_request.at_css('imsx_POXBody > replaceResultRequest > resultRecord > result > resultScore > textString').try(:content)
     end
 
+    def result_data_text
+      @lti_request && @lti_request.at_css('imsx_POXBody > replaceResultRequest > resultRecord > result > resultData > text').try(:content)
+    end
+
+    def result_data_url
+      @lti_request && @lti_request.at_css('imsx_POXBody > replaceResultRequest > resultRecord > result > resultData > url').try(:content)
+    end
+
     def to_xml
       xml = LtiResponse.envelope.dup
       xml.at_css('imsx_POXHeader imsx_statusInfo imsx_codeMajor').content = code_major
@@ -136,16 +144,49 @@ module BasicLTI::BasicOutcomes
 
     def handle_replaceResult(tool, course, assignment, user)
       text_value = self.result_score
-      new_value = Float(text_value) rescue false
-      if new_value && (0.0 .. 1.0).include?(new_value)
-        submission_hash = { :grade => "#{new_value * 100}%", :submission_type => 'external_tool' }
+      new_score = Float(text_value) rescue false
+      error_message = nil
+      submission_hash = { :submission_type => 'external_tool' }
+
+      if text = result_data_text
+        submission_hash[:body] = text
+        submission_hash[:submission_type] = 'online_text_entry'
+      elsif url = result_data_url
+        submission_hash[:url] = url
+        submission_hash[:submission_type] = 'online_url'
+      end
+
+      if new_score
+        if (0.0 .. 1.0).include?(new_score)
+          submission_hash[:grade] = "#{new_score * 100}%"
+        else
+          error_message = I18n.t('lib.basic_lti.bad_score', "Score is not between 0 and 1")
+        end
+      elsif !text && !url
+          error_message = I18n.t('lib.basic_lti.no_score', "No score given")
+      end
+
+      if error_message
+        self.code_major = 'failure'
+        self.description = error_message
+      elsif assignment.points_possible.nil?
+        submission = Submission.create!(submission_hash.merge(:user       => user,
+                                                              :assignment => assignment))
+        submission.submission_comments.create!(:comment => I18n.t('lib.basic_lti.no_points_comment', <<-NO_POINTS, :grade => submission_hash[:grade]))
+An external tool attempted to grade this assignment as %{grade}, but was unable
+to because the assignment has no points possible.
+        NO_POINTS
+        self.code_major = 'failure'
+        self.description = I18n.t('lib.basic_lti.no_points_possible', 'Assignment has no points possible.')
+      else
+        if submission_hash[:submission_type] != 'external_tool'
+          assignment.submit_homework(user, submission_hash.clone)
+        end
         @submission = assignment.grade_student(user, submission_hash).first
         self.body = "<replaceResultResponse />"
-        return true
-      else
-        self.code_major = 'failure'
-        return true
       end
+
+      true
     end
 
     def handle_deleteResult(tool, course, assignment, user)

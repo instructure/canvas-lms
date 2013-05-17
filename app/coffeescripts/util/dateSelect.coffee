@@ -34,6 +34,8 @@ define [
   dateSelect = (name, options, htmlOptions = _.clone(options)) ->
     validOptions = ['type', 'startYear', 'endYear', 'includeBlank', 'order']
     delete htmlOptions[opt] for opt in validOptions
+    htmlOptions['class'] ?= ''
+    htmlOptions['class'] += ' date-select'
 
     year         = (new Date()).getFullYear()
     position     = {year: 1, month: 2, day: 3}
@@ -53,7 +55,7 @@ define [
     $result = $('<span>')
     for i in [0...options.order.length]
       type = options.order[i]
-      tName = name.replace(/(\]?)$/, "(" + position[type] + ")$1")
+      tName = name.replace(/(\]?)$/, "(" + position[type] + "i)$1")
       $result.append(
         builders[type](
           options,

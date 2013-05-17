@@ -9,14 +9,14 @@
 
   content_for :pre_html do
     @body_class_no_headers = @headers == false
-    @show_fixed_bottom = @fixed_warnings.present? || (@real_current_user && @real_current_user != @current_user && (!@body_class_no_headers || @outer_frame))
+    @show_fixed_bottom = (@fixed_warnings.present? || (@real_current_user && @real_current_user != @current_user)) && (!@body_class_no_headers || @outer_frame)
     @body_classes << "no-headers" if @body_class_no_headers
     unless (@body_classes.include? "no-headers") || (@show_left_side == false)
       left_side = yield :left_side
       left_side_custom = yield :left_side_custom
       @show_left_side ||= (section_tabs.length > 0 || left_side_custom.try(:length))
     end
-     @body_classes << "with-left-side" if @show_left_side
+    @body_classes << "with-left-side" if @show_left_side
     #we dont want to render a right side unless there is actually content in it.
     @body_classes << "with-right-side" if right_side and not right_side.strip.empty?
     @body_classes << "padless-content" if @padless
@@ -50,7 +50,7 @@
     </div>
     <%= render(:partial => "shared/keyboard_navigation_hint") if keyboard_navigation %>
     <% if @current_user %>
-    <ul role="navigation" id="menu">
+    <ul role="navigation" id="menu" aria-label="<%= t('navigation.main', 'Main Navigation') %>">
       <%- cache([@current_user, 'home-menu-15m'], :expires_in => 15.minutes) do -%>
       <li id="courses_menu_item" class="menu-item">
         <%- if show_home_menu? -%>
@@ -78,7 +78,7 @@
         total_shown = 0
         if assignment_sets.any?{ |k, v| @current_user.send("assignments_#{k}").length > 0 }
       -%>
-        <a href="/assignments" class="menu-item-title"><%= t('menu.assignments', 'Assignments') %><span class="menu-item-title-icon"></span></a>
+        <a href="/assignments" class="menu-item-title"><%= t('menu.assignments', 'Assignments') %><span class="menu-item-title-icon"></span> <i class="icon-mini-arrow-down"></i></a>
         <div class="menu-item-drop">
           <table cellspacing="0">
             <tr>
@@ -142,9 +142,7 @@
         <%= section_tabs %>
       <% end %>
       <% if left_side_custom %>
-        <div class="left-side-inner">
-          <%= left_side_custom %>
-        </div>
+        <%= left_side_custom %>
       <% end %>
     </div>
     <% end %>
@@ -157,7 +155,7 @@
       <div id="not_right_side">
         <div id="content-wrapper">
           <%= render_crumbs %>
-          <div id="content" role="main">
+          <div id="content" role="main" class="container-fluid">
             <%= yield %>
           </div>
         </div>
@@ -182,13 +180,13 @@
 
 <% if wizard %>
   <div id="wizard_spacer_box"></div>
-  <div id="wizard_box" role="dialog">
+  <div id="wizard_box" role="dialog" tabindex="-1">
     <div class="shadow shadow_1"></div>
     <div class="shadow shadow_3"></div>
     <div class="shadow shadow_5"></div>
     <div class="wizard_content">
       <div class="links">
-        <a href="#" class="close_wizard_link close_link"><%= t('links.close', 'Close') %></a>
+        <a href="#" class="close_wizard_link"><i class="icon-x"></i><span class="screen-reader-text"><%= t('links.close', 'Close') %></span></a>
       </div>
       <%= wizard %>
     </div>
@@ -197,6 +195,9 @@
 <% if keyboard_navigation %>
   <div id="keyboard_navigation">
     <%= keyboard_navigation %>
+    <div class='hidden-readable' tabindex='0'>
+      <%= t('keyboard_navigation.close', 'Press comma to close this dialog') %>
+    </div>
   </div>
 <% end %>
   <div style="display:none;"><!-- Everything inside of this should always stay hidden -->
@@ -223,5 +224,5 @@
 <% cache('global_dialogs_render') do %>
   <%= render :partial => "shared/global_dialogs" %>
 <% end %>
-
+<div id='aria_alerts' aria-live="assertive" class='hide-text affix'></div>
 <%= render :partial => 'layouts/foot', :locals => { :include_common_bundle => true } %>

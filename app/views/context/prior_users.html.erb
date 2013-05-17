@@ -7,7 +7,7 @@
 
 <% content_for :right_side do %>
   <div class="rs-margin-lr rs-margin-top">
-    <a href="<%= context_url(@context, :context_users_url) %>" class="button button-sidebar-wide"><%= image_tag "group.png" %> <%= t('links.back_to_people', %{Back to People}) %></a>
+    <a href="<%= context_url(@context, :context_users_url) %>" class="btn button-sidebar-wide"><i class="icon-arrow-left"></i> <%= t('links.back_to_people', %{Back to People}) %></a>
   </div>
 <% end %>
 
@@ -22,19 +22,20 @@
     </tr>
   </thead>
   <tbody>
-    <% @prior_memberships.each do |enrollment| %>
+    <% @prior_users.each do |user| %>
       <tr>
         <td class="name">
-          <%= link_to(enrollment.user.last_name_first, context_url(@context, :context_user_url, enrollment.user_id)) %>
+          <%= link_to(user.last_name_first, context_url(@context, :context_user_url, user.id)) %>
           <div class="email">
-            <%= enrollment.user.email %>
+            <%= user.email %>
           </div>
         </td>
         <td class="type">
-          <%= enrollment.readable_type %>
+          <%= user.prior_enrollment.readable_type %>
         </td>
-        <td class="score"><%= link_to(enrollment.computed_final_score || '--', context_url(@context, :context_student_grades_url, enrollment.user_id)) if enrollment.student? %></td>
+        <td class="score"><%= link_to(user.prior_enrollment.computed_final_score || '--', context_url(@context, :context_student_grades_url, user.id)) if user.prior_enrollment.student? %></td>
       </tr>
     <% end %>
   </tbody>
 </table>
+<%= will_paginate(@prior_users) %>

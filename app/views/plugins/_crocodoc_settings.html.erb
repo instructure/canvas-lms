@@ -1,0 +1,14 @@
+<% fields_for :settings, OpenObject.new(settings) do |f| %>
+  <table style="width: 500px;" class="formtable">
+    <tr>
+      <td colspan="2">
+        <p><%= t :description, "This plugin integrates with Crocodoc to provide an HTML5 document previewer which provides teachers and students with the ability to annotate documents." %></p>
+      </td>
+    </tr>
+    <tr>
+      <td><%= f.blabel :api_key, :en => "Crocodoc API Key" %></td>
+      <td><%= f.text_field :api_key %></td>
+    </tr>
+  </table>
+<% end %>
+

@@ -24,7 +24,7 @@
         font-weight: bold;
         text-shadow: 0 1px 0 rgba(255,255,255,0.5);
       }
-      &.ui-tabs-selected { margin-bottom: 0; padding-bottom: 1px;
+      &.ui-tabs-active { margin-bottom: 0; padding-bottom: 1px;
         // need to override filter or bg gradiant will remain in IE
         -ms-filter: "progid:DXImageTransform.Microsoft.gradient(enabled = false)";
         background: $bgColorContent;
@@ -32,12 +32,12 @@
         box-shadow: none;
         a { color: $fcDefault; }
       }
-      &.ui-tabs-selected, &.ui-state-disabled, &.ui-state-processing {
+      &.ui-tabs-active, &.ui-state-disabled, &.ui-state-processing {
         a { cursor: text; }
       }
     }
   }
-  .ui-tabs-nav li a, &.ui-tabs-collapsible .ui-tabs-nav li.ui-tabs-selected a { cursor: pointer; } /* first selector in group seems obsolete, but required to overcome bug in Opera applying cursor: text overall if defined elsewhere... */
+  .ui-tabs-nav li a, &.ui-tabs-collapsible .ui-tabs-nav li.ui-tabs-active a { cursor: pointer; } /* first selector in group seems obsolete, but required to overcome bug in Opera applying cursor: text overall if defined elsewhere... */
   .ui-tabs-panel { display: block; padding: 1em 1.4em;
     background-color: $bgColorContent;
     border-width: 0 1px 1px 1px;
@@ -45,4 +45,18 @@
 
   }
   .ui-tabs-hide { display: none !important; }
+}
+
+// this is a custom minimal tab style added by instructure, apply this class in addition to the .ui-tabs
+// that jqueryui puts on.
+.ui-tabs-minimal {
+  .ui-tabs-nav {
+    border-bottom-color: $borderColorContent;
+  }
+  .ui-tabs-panel {
+    border-width: 0;
+    padding-left: 0;
+    padding-right: 0;
+    padding-bottom: 0;
+  }
 }

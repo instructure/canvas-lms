@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../lib/validates_as_url.rb')
 describe Submission do
   before(:each) do
     @user = factory_with_protected_attributes(User, :name => "some student", :workflow_state => "registered")
-    @context = factory_with_protected_attributes(Course, :name => "some course", :workflow_state => "available")
+    @course = @context = factory_with_protected_attributes(Course, :name => "some course", :workflow_state => "available")
     @context.enroll_student(@user)
     @assignment = @context.assignments.new(:title => "some assignment")
     @assignment.workflow_state = "published"
@@ -38,7 +38,7 @@ describe Submission do
   it "should create a new instance given valid attributes" do
     Submission.create!(@valid_attributes)
   end
-  
+
   it_should_behave_like "url validation tests"
   it "should check url validity" do
     test_url_validation(Submission.create!(@valid_attributes))
@@ -60,21 +60,21 @@ describe Submission do
     @course = Course.new
     @assignment = Assignment.new(:context => @course)
     @assignment.expects(:context).returns(@course)
-    
+
     @submission = Submission.new
     lambda{@submission.context}.should_not raise_error
     @submission.context.should be_nil
     @submission.assignment = @assignment
     @submission.context.should eql(@course)
   end
-  
+
   it "should have an interesting state machine" do
     submission_spec_model
     @submission.state.should eql(:submitted)
     @submission.grade_it
     @submission.state.should eql(:graded)
   end
-  
+
   it "should be versioned" do
     submission_spec_model
     @submission.should be_respond_to(:versions)
@@ -85,6 +85,31 @@ describe Submission do
     lambda {
       @submission.save!
     }.should_not change(@submission.versions, :count)
+  end
+
+  describe "version indexing" do
+    it "should create a SubmissionVersion when a new submission is created" do
+      lambda {
+        submission_spec_model
+      }.should change(SubmissionVersion, :count)
+    end
+
+    it "should create a SubmissionVersion when a new version is saved" do
+      submission_spec_model
+      lambda {
+        @submission.with_versioning(:explicit => true) { @submission.save }
+      }.should change(SubmissionVersion, :count)
+    end
+
+    it "should update a SubmissionVersion when an existing version is updated" do
+      submission_spec_model
+      version = SubmissionVersion.where(:version_id => @submission.versions.current).first
+      @submission.user = new_user = user_model
+      lambda {
+        @submission.with_versioning{ @submission.save }
+      }.should_not change(SubmissionVersion, :count)
+      version.reload.user_id.should == new_user.id
+    end
   end
 
   it "should not return duplicate conversation groups" do
@@ -121,7 +146,7 @@ describe Submission do
       @entry1 = @topic.discussion_entries.create(:message => "first entry", :user => @user)
       @topic.assignment_id = @assignment.id
       @topic.save!
-      @submission = @assignment.submissions.scoped(:conditions => {:user_id => @entry1.user_id}).first
+      @submission = @assignment.submissions.where(:user_id => @entry1.user_id).first
       new_time = Time.now + 30.minutes
       Time.stubs(:now).returns(new_time)
       @entry2 = @topic.discussion_entries.create(:message => "second entry", :user => @user)
@@ -131,25 +156,65 @@ describe Submission do
   end
 
   context "broadcast policy" do
-    context "Assignment Submitted Late" do
-      it "should create a message when the assignment is turned in late" do
+    context "Submission Notifications" do
+      before do
+        Notification.create(:name => 'Assignment Submitted')
+        Notification.create(:name => 'Assignment Resubmitted')
         Notification.create(:name => 'Assignment Submitted Late')
-        t = User.create(:name => "some teacher")
-        s = User.create(:name => "late student")
-        @context.enroll_teacher(t)
-        @context.enroll_student(s)
-#        @context.stubs(:teachers).returns([@user])
+        Notification.create(:name => 'Group Assignment Submitted Late')
+
+        @teacher = User.create(:name => "some teacher")
+        @student = User.create(:name => "a student")
+        @context.enroll_teacher(@teacher)
+        @context.enroll_student(@student)
+      end
+
+      it "should send the correct message when an assignment is turned in on-time" do
+        @assignment.workflow_state = "published"
+        @assignment.update_attributes(:due_at => Time.now + 1000)
+
+        submission_spec_model(:user => @student)
+        @submission.messages_sent.keys.should == ['Assignment Submitted']
+      end
+
+      it "should send the correct message when an assignment is turned in late" do
         @assignment.workflow_state = "published"
         @assignment.update_attributes(:due_at => Time.now - 1000)
-#        @assignment.stubs(:due_at).returns(Time.now - 100)
-        submission_spec_model(:user => s)
-        
-#        @submission.stubs(:validate_enrollment).returns(true)
-#        @submission.save
-        @submission.messages_sent.should be_include('Assignment Submitted Late')
+
+        submission_spec_model(:user => @student)
+        @submission.messages_sent.keys.should == ['Assignment Submitted Late']
+      end
+
+      it "should send the correct message when an assignment is resubmitted on-time" do
+        @assignment.submission_types = ['online_text_entry']
+        @assignment.due_at = Time.now + 1000
+        @assignment.save!
+
+        @assignment.submit_homework(@student, :body => "lol")
+        resubmission = @assignment.submit_homework(@student, :body => "frd")
+        resubmission.messages_sent.keys.should == ['Assignment Resubmitted']
+      end
+
+      it "should send the correct message when an assignment is resubmitted late" do
+        @assignment.submission_types = ['online_text_entry']
+        @assignment.due_at = Time.now - 1000
+        @assignment.save!
+
+        @assignment.submit_homework(@student, :body => "lol")
+        resubmission = @assignment.submit_homework(@student, :body => "frd")
+        resubmission.messages_sent.keys.should == ['Assignment Submitted Late']
+      end
+
+      it "should send the correct message when a group assignment is submitted late" do
+        @a = assignment_model(:course => @context, :group_category => "Study Groups", :due_at => Time.now - 1000, :submission_types => ["online_text_entry"])
+        @group1 = @a.context.groups.create!(:name => "Study Group 1", :group_category => @a.group_category)
+        @group1.add_user(@student)
+        submission = @a.submit_homework @student, :submission_type => "online_text_entry", :body => "blah"
+
+        submission.messages_sent.keys.should == ['Group Assignment Submitted Late']
       end
     end
-    
+
     context "Submission Graded" do
       it "should create a message when the assignment has been graded and published" do
         Notification.create(:name => 'Submission Graded')
@@ -196,6 +261,33 @@ describe Submission do
         @assignment.mute!
         @user.stream_item_instances.last.should be_hidden
       end
+
+      it "should not create a message for admins and teachers with quiz submissions" do
+        Notification.create!(:name => 'Submission Graded')
+
+        course_with_teacher(:active_all => true)
+        assignment = @course.assignments.create!(
+          :title => 'assignment',
+          :points_possible => 10)
+        quiz       = @course.quizzes.build(
+          :assignment_id   => assignment.id,
+          :title           => 'test quiz',
+          :points_possible => 10)
+        quiz.workflow_state = 'available'
+        quiz.save!
+
+        user       = account_admin_user
+        channel    = user.communication_channels.create!(:path => 'admin@example.com')
+        submission = quiz.generate_submission(user, false)
+        submission.grade_submission
+
+        channel2   = @teacher.communication_channels.create!(:path => 'chang@example.com')
+        submission2 = quiz.generate_submission(@teacher, false)
+        submission2.grade_submission
+
+        submission.submission.messages_sent.should_not be_include('Submission Graded')
+        submission2.submission.messages_sent.should_not be_include('Submission Graded')
+      end
     end
 
     it "should create a stream_item_instance when graded and published" do
@@ -217,9 +309,8 @@ describe Submission do
       }.should change StreamItemInstance, :count
 
       @assignment.unmute!
-      item_asset_strings    = @assignment.submissions.map { |s| "submission_#{s.id}" }
-      stream_item_ids       = StreamItem.all(:select => :id, :conditions => { :item_asset_string => item_asset_strings })
-      stream_item_instances = StreamItemInstance.all(:conditions => { :stream_item_id => stream_item_ids })
+      stream_item_ids       = StreamItem.where(:asset_type => 'Submission', :asset_id => @assignment.submissions.all).pluck(:id)
+      stream_item_instances = StreamItemInstance.where(:stream_item_id => stream_item_ids)
       stream_item_instances.each { |sii| sii.should_not be_hidden }
     end
 
@@ -296,7 +387,6 @@ describe Submission do
       end
 
       before(:each) do
-        Delayed::Job.destroy_all(:tag => 'Submission#submit_to_turnitin')
         @assignment.submission_types = "online_upload,online_text_entry"
         @assignment.turnitin_enabled = true
         @assignment.turnitin_settings = @assignment.turnitin_settings
@@ -305,7 +395,7 @@ describe Submission do
       end
 
       it "should submit to turnitin after a delay" do
-        job = Delayed::Job.find_by_tag('Submission#submit_to_turnitin')
+        job = Delayed::Job.list_jobs(:future, 100).find { |j| j.tag == 'Submission#submit_to_turnitin' }
         job.should_not be_nil
         job.run_at.should > Time.now.utc
       end
@@ -324,7 +414,7 @@ describe Submission do
         @turnitin_api.expects(:createOrUpdateAssignment).with(@assignment, @assignment.turnitin_settings).returns({ :assignment_id => "1234" })
         @turnitin_api.expects(:enrollStudent).with(@context, @user).returns(false)
         @submission.submit_to_turnitin
-        Delayed::Job.find_all_by_tag('Submission#submit_to_turnitin').count.should == 2
+        Delayed::Job.list_jobs(:future, 100).find_all { |j| j.tag == 'Submission#submit_to_turnitin' }.size.should == 2
       end
 
       it "should set status as failed if something fails after several attempts" do
@@ -372,9 +462,10 @@ describe Submission do
         @submission.turnitin_data[@submission.asset_string] = { :object_id => '1234', :status => 'pending' }
         @turnitin_api.expects(:generateReport).with(@submission, @submission.asset_string).returns({})
 
-        @submission.check_turnitin_status(Submission::TURNITIN_RETRY-1)
-        @submission.reload.turnitin_data[@submission.asset_string][:status].should == 'pending'
-        Delayed::Job.find_by_tag('Submission#check_turnitin_status').should_not be_nil
+        expects_job_with_tag('Submission#check_turnitin_status') do
+          @submission.check_turnitin_status(Submission::TURNITIN_RETRY-1)
+          @submission.reload.turnitin_data[@submission.asset_string][:status].should == 'pending'
+        end
 
         @submission.check_turnitin_status(Submission::TURNITIN_RETRY)
         @submission.reload.turnitin_data[@submission.asset_string][:status].should == 'error'
@@ -524,7 +615,7 @@ describe Submission do
     end
 
     # the real test, quiz_submission_version shouldn't care about usecs
-    submission.quiz_submission_version.should == 2
+    submission.reload.quiz_submission_version.should == 2
   end
 
   it "should return only comments readable by the user" do
@@ -556,7 +647,170 @@ describe Submission do
     @submission.submission_comments.count.should eql 1
     @submission.visible_submission_comments.count.should eql 1
   end
-  
+
+  describe "read/unread state" do
+    it "should be read if a submission exists with no grade" do
+      @submission = @assignment.submit_homework(@user)
+      @submission.read?(@user).should be_true
+    end
+
+    it "should be unread after assignment is graded" do
+      @submission = @assignment.grade_student(@user, { :grade => 3 }).first
+      @submission.unread?(@user).should be_true
+    end
+
+    it "should be unread after submission is graded" do
+      @assignment.submit_homework(@user)
+      @submission = @assignment.grade_student(@user, { :grade => 3 }).first
+      @submission.unread?(@user).should be_true
+    end
+
+    it "should be unread after submission is commented on by teacher" do
+      @student = @user
+      course_with_teacher(:course => @context, :active_all => true)
+      @submission = @assignment.grade_student(@student, { :grader => @teacher, :comment => "good!" }).first
+      @submission.unread?(@user).should be_true
+    end
+
+    it "should be read if other submission fields change" do
+      @submission = @assignment.submit_homework(@user)
+      @submission.workflow_state = 'graded'
+      @submission.graded_at = Time.now
+      @submission.save!
+      @submission.read?(@user).should be_true
+    end
+  end
+
+  describe "mute" do
+    let(:submission) { Submission.new }
+
+    before :each do
+      submission.published_score = 100
+      submission.published_grade = 'A'
+      submission.graded_at = Time.now
+      submission.grade = 'B'
+      submission.score = 90
+      submission.mute
+    end
+
+    specify { submission.published_score.should be_nil }
+    specify { submission.published_grade.should be_nil }
+    specify { submission.graded_at.should be_nil }
+    specify { submission.grade.should be_nil }
+    specify { submission.score.should be_nil }
+  end
+
+  describe "muted_assignment?" do
+    it "returns true if assignment is muted" do
+      assignment = stub(:muted? => true)
+      @submission = Submission.new
+      @submission.expects(:assignment).returns(assignment)
+      @submission.muted_assignment?.should == true
+    end
+
+    it "returns false if assignment is not muted" do
+      assignment = stub(:muted? => false)
+      @submission = Submission.new
+      @submission.expects(:assignment).returns(assignment)
+      @submission.muted_assignment?.should == false 
+    end
+  end
+
+  describe "without_graded_submission?" do
+    let(:submission) { Submission.new }
+
+    it "returns false if submission does not has_submission?" do
+      submission.stubs(:has_submission?).returns false
+      submission.stubs(:graded?).returns true
+      submission.without_graded_submission?.should == false
+    end
+
+    it "returns false if submission does is not graded" do
+      submission.stubs(:has_submission?).returns true
+      submission.stubs(:graded?).returns false
+      submission.without_graded_submission?.should == false
+    end
+
+    it "returns true if submission is not graded and has no submission" do
+      submission.stubs(:has_submission?).returns false
+      submission.stubs(:graded?).returns false
+      submission.without_graded_submission?.should == true
+    end
+  end
+
+  describe "late" do
+    before do
+      u1 = @user
+      submission_spec_model
+      @submission1 = @submission
+
+      add_section('overridden section')
+      u2 = student_in_section(@course_section, :active_all => true)
+      submission_spec_model(:user => u2)
+      @submission2 = @submission
+
+      @assignment.update_attribute(:due_at, Time.zone.now - 1.day)
+      @submission1.reload
+      @submission2.reload
+    end
+
+    it "should get recomputed when an assignment's due date is changed" do
+      @submission1.should be_late
+      @assignment.reload.update_attribute(:due_at, Time.zone.now + 1.day)
+      @submission1.reload.should_not be_late
+    end
+
+    it "should get recomputed when an applicable override is changed" do
+      @submission1.should be_late
+      @submission2.should be_late
+
+      assignment_override_model :assignment => @assignment,
+                                :due_at => Time.zone.now + 1.day,
+                                :set => @course_section
+      @submission1.reload.should be_late
+      @submission2.reload.should_not be_late
+    end
+
+    it "should only call compute_lateness for relevant submissions" do
+      # this is kind of hacky
+      hasnt_been_updated_flag_time = Time.zone.now - 1.year
+      Submission.update_all(:updated_at => hasnt_been_updated_flag_time)
+
+      assignment_override_model :assignment => @assignment,
+                                :due_at => Time.zone.now + 1.day,
+                                :set => @course_section
+      @submission1.reload.updated_at.should eql hasnt_been_updated_flag_time
+      @submission2.reload.updated_at.should_not eql hasnt_been_updated_flag_time
+    end
+
+    it "should give a quiz submission 30 extra seconds before making it late" do
+      quiz_with_graded_submission([{:question_data => {:name => 'question 1', :points_possible => 1, 'question_type' => 'essay_question'}}]) do
+        {
+          "text_after_answers"            => "",
+          "question_#{@questions[0].id}"  => "<p>Lorem ipsum answer.</p>",
+          "context_id"                    => "#{@course.id}",
+          "context_type"                  => "Course",
+          "user_id"                       => "#{@user.id}",
+          "quiz_id"                       => "#{@quiz.id}",
+          "course_id"                     => "#{@course.id}",
+          "question_text"                 => "Lorem ipsum question",
+        }
+      end
+      @assignment.due_at = "20130101T23:59Z"
+      @assignment.save!
+
+      submission = @quiz_submission.submission.reload
+      submission.write_attribute(:submitted_at, @assignment.due_at + 3.days)
+      submission.compute_lateness
+      submission.save!
+      submission.should be_late
+
+      submission.write_attribute(:submitted_at, @assignment.due_at + 30.seconds)
+      submission.compute_lateness
+      submission.save!
+      submission.should_not be_late
+    end
+  end
 end
 
 def submission_spec_model(opts={})
@@ -564,5 +818,5 @@ def submission_spec_model(opts={})
   @submission.assignment.should eql(@assignment)
   @assignment.context.should eql(@context)
   @submission.assignment.context.should eql(@context)
-  @submission.save
+  @submission.save!
 end

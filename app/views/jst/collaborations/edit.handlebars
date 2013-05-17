@@ -1,0 +1,37 @@
+<form action="{{action}}"
+      class="edit_collaboration communication_message"
+      method="POST">
+  <input type="hidden" name="_method" value="put" />
+  <input type="hidden" name="authenticity_token" value="{{token}}" />
+  <div class="header">
+    <input name="collaboration[title]"
+           aria-label="{{#t "labels.title"}}Collaboration title{{/t}}"
+           style="width: 300px;"
+           type="text"
+           value="{{title}}" />
+  </div>
+
+  <div class="content">
+    <label for="collaboration_{{id}}_description">
+      {{#t "labels.description"}}Description{{/t}}
+    </label><br />
+    <textarea id="collaboration_{{id}}_description"
+              name="collaboration[description]"
+              style="height: 50px; width: 400px;">
+      {{description}}
+    </textarea>
+  </div>
+
+  <div class="footer">
+    <div class="collaborator_list"></div>
+  </div>
+
+  <div class="collaboration-actions form-actions">
+    <button type="button" class="btn cancel_button">
+      {{#t "buttons.cancel"}}Cancel{{/t}}
+    </button>
+    <button type="submit" class="btn btn-primary">
+      {{#t "buttons.update"}}Update collaboration{{/t}}
+    </button>
+  </div>
+</form>

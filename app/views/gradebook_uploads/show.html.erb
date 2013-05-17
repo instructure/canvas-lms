@@ -1,11 +1,5 @@
 <% content_for :page_title do %><%= join_title t(:page_title, "Gradebook"), @context.name %><% end %>
 
-<% content_for :auto_discovery do %>
-  <% if @context_enrollment %>
-    <%= auto_discovery_link_tag(:atom, feeds_gradebook_url(@context_enrollment.feed_code), {:title => t('titles.feed', "Course Gradebook Atom Feed")}) %>
-  <% end %>
-<% end %>
-
 <% 
   jammit_css :gradebook_uploads
   js_bundle :gradebook_uploads 
@@ -63,14 +57,14 @@
     </table>
   </div>
   <div class="button-container">
-    <button type="submit" class="button"><%= t('buttons.continue', "Continue %{icon}", :icon => raw('&rarr;')) %></button>
+    <button type="submit" class="btn"><%= t('buttons.continue', "Continue %{icon}", :icon => raw('&rarr;')) %></button>
   </div>
 </form>
 
 <div id="no_changes_detected" style="display:none;">
   <h2><%= t('headers.no_changes', "There were no changes detected in the gradebook you uploaded.") %></h2>
   <p>
-    <%= link_to(t('links.back', "Go back to Gradebook"), context_url(@context, :context_gradebook_url) ) %>
+  <%= link_to(t('links.back', "Go back to Gradebook"), gradebook_url_for(@current_user,@context)) %>
   </p>
   
 </div>
@@ -79,8 +73,8 @@
   <div id="gradebook_grid"></div>
   <input type="hidden" name="json_data_to_submit" value="" />
   <div class="button-container" style="padding-left:7px;">
-    <button type="submit" class="button"><%= t('buttons.save_changes', "Save Changes") %></button>
-    <%= link_to t('#buttons.cancel', "Cancel"), :back , :class => "button button-secondary" %>
+    <button type="submit" class="btn"><%= t('buttons.save_changes', "Save Changes") %></button>
+    <%= link_to t('#buttons.cancel', "Cancel"), :back , :class => "btn btn button-secondary" %>
     <span id="assignments_without_changes_alert" style="display:none; margin-left: 50px;"><%= t('notices.unchanged', "Note: You uploaded some assignments that had no grade changes detected. They have been hidden.") %></span>
   </div>
 <% end -%>

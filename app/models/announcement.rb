@@ -26,6 +26,7 @@ class Announcement < DiscussionTopic
   sanitize_field :message, Instructure::SanitizeField::SANITIZE
   
   before_save :infer_content
+  before_save :respect_context_lock_rules
   validates_presence_of :context_id
   validates_presence_of :context_type
   validates_presence_of :message
@@ -34,16 +35,23 @@ class Announcement < DiscussionTopic
     self.title ||= t(:no_title, "No Title")
   end
   protected :infer_content
-  
-  set_broadcast_policy do 
+
+  def respect_context_lock_rules
+    lock if active? &&
+            context.is_a?(Course) &&
+            context.lock_all_announcements?
+  end
+  protected :respect_context_lock_rules
+
+  set_broadcast_policy! do
     dispatch :new_announcement
     to { active_participants(true) - [user] }
-    whenever { |record| 
+    whenever { |record|
       record.context.available? and
       ((record.just_created and not record.post_delayed?) || record.changed_state(:active, :post_delayed))
     }
   end
-    
+
   set_policy do
     given { |user| self.user == user }
     can :update and can :reply and can :read

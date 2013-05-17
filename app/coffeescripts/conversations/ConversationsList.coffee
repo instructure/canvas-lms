@@ -22,21 +22,15 @@ define [
         baseUrl: '/conversations?include_all_conversation_ids=1'
         noAutoLoad: true
 
-      @$list.delegate '.action_mark_as_read, .action_mark_as_unread, .action_unstar, .action_star', 'click', (e) =>
-        @pane.action $(e.currentTarget), method: 'PUT'
-        return false
+      $('#menu-wrapper').on('click', 'a.standard_action', @triggerConversationAction)
+      @$list.on('click', 'li[data-id] > a.standard_action', @triggerConversationAction)
+      @$list.on('click', 'button.al-trigger', @pane.filterMenu.bind(@pane))
 
-      @$list.delegate '.actions a', 'blur', (e) =>
-        $(window).one 'keyup', (e) =>
-          @app.closeMenus() if e.shiftKey
+      $(window).unload(=> clearTimeout(@markAsUnread))
 
-      @$list.delegate '.actions a', 'click', (e) =>
-        @pane.openConversationMenu($(e.currentTarget))
-        return false
-      .focus (e) =>
-        @pane.openConversationMenu($(e.currentTarget))
-
-      $(window).unload => clearTimeout @markAsUnread
+    triggerConversationAction: (e) =>
+      e.preventDefault()
+      @pane.action($(e.currentTarget), method: 'PUT')
 
     baseData: ->
       {scope: @scope, filter: @filters}
@@ -47,6 +41,7 @@ define [
       super
         sortKey: "#{@lastMessageKey()}_at"
         params: @baseData()
+        force: params.force
         loadId: params.id # if set, make sure it's loaded, and scroll into view
         cb: =>
           @emptyCheck()
@@ -78,7 +73,9 @@ define [
       @activate(null) if @isActive(data.id)
 
     clicked: (e) =>
-      @select $(e.currentTarget).data('id')
+      # ignore clicks that come from the gear menu
+      unless $(e.target).closest('.admin-links').length
+        @select $(e.currentTarget).data('id')
 
     lastMessageKey: ->
       if @scope is 'sent'
@@ -146,7 +143,8 @@ define [
 
       if data.audience
         data.audienceHtml = @app.htmlAudience(data, highlightFilters: true)
-        @app.resetMessageForm(false) if @isActive(data.id)
+        @app.formPane.refresh() if @isActive(data.id)
+
       data.lastMessage = data[@lastMessageKey()]
       data.lastMessageAt = $.friendlyDatetime($.parseFromISO(data[@lastMessageKey() + "_at"]).datetime)
       data.hideCount = data.message_count is 1
@@ -158,4 +156,5 @@ define [
       classes.push 'unsubscribed' unless data.subscribed
       classes.push 'selected' if $.inArray(data.id, @selected) >= 0
       data.classes = classes.join(' ')
+
       conversationItemTemplate(data)

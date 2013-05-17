@@ -1,21 +1,21 @@
 require File.expand_path(File.dirname(__FILE__) + '/helpers/discussions_common')
 
-describe "threaded discussions" do
-  it_should_behave_like "discussions selenium tests"
 
-  TOPIC_TITLE = 'threaded discussion topic'
+describe "threaded discussions" do
+  it_should_behave_like "in-process server selenium tests"
 
   before (:each) do
+    @topic_title = 'threaded discussion topic'
     course_with_teacher_logged_in
-    @topic = create_discussion(TOPIC_TITLE, 'threaded')
+    @topic = create_discussion(@topic_title, 'threaded')
     @student = student_in_course.user
   end
 
   it "should create a threaded discussion" do
     get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
-    wait_for_ajax_requests
+    wait_for_ajaximations
 
-    f('.discussion-title').text.should == TOPIC_TITLE
+    f('.discussion-title').text.should == @topic_title
   end
 
   it "should reply to the threaded discussion" do
@@ -38,22 +38,60 @@ describe "threaded discussions" do
     DiscussionEntry.last.depth.should == reply_depth
   end
 
+  it "should allow edits to entries with replies" do
+    edit_text = 'edit message '
+    entry       = @topic.discussion_entries.create!(:user => @student, :message => 'new threaded reply from student')
+    child_entry = @topic.discussion_entries.create!(:user => @student, :message => 'new threaded child reply from student', :parent_entry => entry)
+    get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+    wait_for_ajax_requests
+    edit_entry(entry, edit_text)
+    entry.reload.message.should match(edit_text)
+  end
+
   it "should edit a reply" do
-    pending("intermittently fails")
     edit_text = 'edit message '
     entry = @topic.discussion_entries.create!(:user => @student, :message => "new threaded reply from student")
     get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
     wait_for_ajax_requests
-
     edit_entry(entry, edit_text)
   end
 
   it "should delete a reply" do
-    pending("intermittently fails")
+    entry = @topic.discussion_entries.create!(:user => @student, :message => "new threaded reply from student")
+    get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+    wait_for_ajaximations
+    delete_entry(entry)
+  end
+
+  it "should display editor name and timestamp after edit" do
+    edit_text = 'edit message '
     entry = @topic.discussion_entries.create!(:user => @student, :message => "new threaded reply from student")
     get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
     wait_for_ajax_requests
+    edit_entry(entry, edit_text)
+    f("#entry-#{entry.id} .discussion-fyi").text.should match("Edited by #{@teacher.name} on")
+  end
 
+  it "should support repeated editing" do
+    entry = @topic.discussion_entries.create!(:user => @student, :message => "new threaded reply from student")
+    get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+    wait_for_ajaximations
+    edit_entry(entry, 'New text 1')
+    f("#entry-#{entry.id} .discussion-fyi").text.should match("Edited by #{@teacher.name} on")
+    # second edit
+    edit_entry(entry, 'New text 2')
+    entry.reload
+    entry.message.should match 'New text 2'
+  end
+
+  it "should display editor name and timestamp after delete" do
+    entry_text = 'new entry'
+    get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+    wait_for_ajax_requests
+
+    add_reply(entry_text)
+    entry = DiscussionEntry.last
     delete_entry(entry)
+    f("#entry-#{entry.id} .discussion-title").text.should match("Deleted by #{@teacher.name} on")
   end
 end

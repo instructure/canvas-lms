@@ -64,7 +64,7 @@
   });
   </script>
   <% end %>
-  <div style="text-align: right; margin-right: 20px;">
+  <div style="text-align: right; margin-top: 15px;">
     <select class="data_view">
       <option value="paper"><%= t('paper_view', 'Paper View') %></option>
       <option value="plain_text"><%= t('plain_view', 'Plain Text View') %></option>
@@ -89,7 +89,7 @@
           <% else %>
             <% @submission.attachments.each do |attachment| %>
               <li>
-                <div class="ui-listview-text ui-listview-right">
+                <div class="ui-listview-text ui-listview-right" style="padding-left:5px; padding-right:5px;">
                   <% if can_do(@submission, @current_user, :view_turnitin_report) && (turnitin_score = @submission.turnitin_data[attachment.asset_string]) && turnitin_score[:similarity_score] %>
                     <span class="turnitin_score_container">
                       <span class="turnitin_score_container_caret <%= turnitin_score[:state] %>_score"></span>
@@ -98,11 +98,15 @@
                   <% end %>
                   <span><%= number_to_human_size(attachment.size) %></span>
                 </div>
-                <a href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, @submission.user_id, :download => attachment.id) %>" class="ui-listview-text comment_attachment_link <%= attachment.mime_class %>">
+                <% preview_url = context_url(@context, :context_assignment_submission_url, @assignment.id, @submission.user_id, :download => attachment.id) %>
+                <% preview_document = t('preview_document', 'Preview the document') %>
+                <% if attachment.crocodoc_available? || attachment.scribdable? %>
+                <div class="ui-listview-text ui-listview-right" style="padding-left:5px; padding-right:5px;">
+                  <a href=<%= preview_url %> title="<%= preview_document %>" class="modal_preview_link" data-attachment_id="<%= attachment.id %>" data-submission_id="<%= @submission.id %>" data-dialog-title="<%= attachment.display_name %>" <%= doc_preview_attributes(attachment) %>><%= image_tag('preview.png') %></a>
+                </div>
+                <% end %>
+                <a href="<%= preview_url %>" class="ui-listview-text comment_attachment_link <%= attachment.mime_class %>">
                   <%= attachment.display_name %>
-                  <% if attachment.scribdable? %>
-                    <span style="padding: 0 3px;" title="<%= t('preview_document', 'Preview the document') %>" class="modal_preview_link" data-attachment_id="<%= attachment.id %>" data-submission_id="<%= @submission.id %>" data-scribd_doc_id="<%= attachment.scribd_doc.try(:doc_id) %>" data-scribd_access_key="<%= attachment.scribd_doc.try(:access_key) %>" ><%= image_tag('preview.png') %></span>
-                  <% end %>
                 </a>
               </li>
             <% end %>
@@ -130,9 +134,9 @@
           $('.modal_preview_link').live('click', function() {
             $('<div style="padding:0; overflow:hidden;">') //overflow:hidden is because of some weird thing where the google doc preview gets double scrollbars
               .dialog({
-                title: "Preview of " + $(this).closest('a').text(),
-                width: document.width * .95,
-                height: document.height * .95
+                title: "Preview of " + $(this).data('dialog-title'),
+                width: $(document).width() * .95,
+                height: $(document).height() * .75
               })
               .loadDocPreview($.extend({
                 height: '100%'
@@ -154,7 +158,7 @@
     <%= t('quiz_submission', 'This submission was a quiz submission.  Redirecting to quiz page.') %>
   </div>
 <% elsif @submission.submission_type == 'media_recording' && @submission.media_comment_id %>
-  <%= t('media_comment_link', "This submission is a media recording. *click here to view*.", :wrapper => '<a href="#" class="play_media_recording_link">\1</a>.') %>
+  <%= t('media_comment_link', "This submission is a media recording. *click here to view.*", :wrapper => '<div><a href="#" class="play_media_recording_link" '+ dataify(@submission, :media_comment_id, :media_comment_type) + '>\1</a></div>') %>
   <div style="width: 400px; margin: 10px auto;" id="media_recording_box">
     <div class="box_content">
     </div>

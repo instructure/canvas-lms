@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -22,17 +22,18 @@
 class ConversationsController < ApplicationController
   include ConversationsHelper
   include SearchHelper
-  include Api::V1::Submission
-  include Api::V1::Attachment
+  include Api::V1::Conversation
+  include Api::V1::Progress
 
   before_filter :require_user, :except => [:public_feed]
   before_filter :reject_student_view_student
   before_filter :get_conversation, :only => [:show, :update, :destroy, :add_recipients, :remove_messages]
-  before_filter :load_all_contexts, :except => [:public_feed]
   before_filter :infer_scope, :only => [:index, :show, :create, :update, :add_recipients, :add_message, :remove_messages]
   before_filter :normalize_recipients, :only => [:create, :add_recipients]
   before_filter :infer_tags, :only => [:create, :add_message, :add_recipients]
-  add_crumb(proc { I18n.t 'crumbs.messages', "Conversations" }) { |c| c.send :conversations_url }
+  # whether it's a bulk private message, or a big group conversation,
+  # batch up all delayed jobs to make this more responsive to the user
+  batch_jobs_in_actions :only => :create
 
   # @API List conversations
   # Returns the list of conversations for the current user, most recent ones first.
@@ -107,16 +108,16 @@ class ConversationsController < ApplicationController
   #       "audience": [2],
   #       "audience_contexts": {"courses": {"1": ["StudentEnrollment"]}, "groups": {}},
   #       "avatar_url": "https://canvas.instructure.com/images/messages/avatar-group-50.png",
-  #       "participants": [{"id": 1, "name": "Joe TA"}, {"id": 2, "name": "Jane Teacher"}]
+  #       "participants": [{"id": 1, "name": "Joe TA"}, {"id": 2, "name": "Jane Teacher"}],
   #       "visible": true
   #     }
   #   ]
   def index
     if request.format == :json
-      conversations = Api.paginate(@conversations_scope, self, request.request_uri.gsub(/(per_)?page=[^&]*(&|\z)/, '').sub(/[&?]\z/, ''))
+      conversations = Api.paginate(@conversations_scope, self, api_v1_conversations_url)
       # optimize loading the most recent messages for each conversation into a single query
-      ConversationParticipant.preload_latest_messages(conversations, @current_user.id)
-      @conversations_json = conversations.map{ |c| jsonify_conversation(c, :include_participant_avatars => false, :include_participant_contexts => false, :visible => true) }
+      ConversationParticipant.preload_latest_messages(conversations, @current_user)
+      @conversations_json = conversations.map{ |c| conversation_json(c, @current_user, session, :include_participant_avatars => false, :include_participant_contexts => false, :visible => true) }
   
       if params[:include_all_conversation_ids]
         @conversations_json = {:conversations => @conversations_json, :conversation_ids => @conversations_scope.conversation_ids}
@@ -124,15 +125,18 @@ class ConversationsController < ApplicationController
       render :json => @conversations_json
     else
       return redirect_to conversations_path(:scope => params[:redirect_scope]) if params[:redirect_scope]
+      @current_user.reset_unread_conversations_counter
+      load_all_contexts :permissions => [:manage_user_notes]
       notes_enabled = @current_user.associated_accounts.any?{|a| a.enable_user_notes }
       can_add_notes_for_account = notes_enabled && @current_user.associated_accounts.any?{|a| a.grants_right?(@current_user, nil, :manage_students) }
       js_env(:CONVERSATIONS => {
-        :USER => jsonify_users([@current_user], :include_participant_contexts => false).first,
+        :USER => conversation_users_json([@current_user], @current_user, session, :include_participant_contexts => false).first,
         :CONTEXTS => @contexts,
         :NOTES_ENABLED => notes_enabled,
         :CAN_ADD_NOTES_FOR_ACCOUNT => can_add_notes_for_account,
         :SHOW_INTRO => !@current_user.watched_conversations_intro?,
-        :FOLDER_ID => @current_user.conversation_attachments_folder.id
+        :FOLDER_ID => @current_user.conversation_attachments_folder.id,
+        :MEDIA_COMMENTS_ENABLED => feature_enabled?(:kaltura),
       })
     end
   end
@@ -157,53 +161,78 @@ class ConversationsController < ApplicationController
   #   be associated with this message.
   # @argument media_comment_type ["audio"|"video"] Type of the associated
   #   media file
+  # @argument mode ["sync"|"async"] Determines whether the messages will be
+  #   created/sent synchronously or asynchronously. Defaults to sync, and this
+  #   option is ignored if this is a group conversation or there is just one
+  #   recipient (i.e. it must be a bulk private message). When sent async, the
+  #   response will be an empty array (batch status can be queried via the
+  #   {api:ConversationsController#batches batches API})
   # @argument scope [optional, "unread"|"starred"|"archived"]
   #   Used when generating "visible" in the API response. See the explanation
-  #   under the index API action
+  #   under the {api:ConversationsController#index index API action}
   # @argument filter [optional, course_id|group_id|user_id]
   #   Used when generating "visible" in the API response. See the explanation
-  #   under the index API action
+  #   under the {api:ConversationsController#index index API action}
   def create
     return render_error('recipients', 'blank') if params[:recipients].blank?
     return render_error('recipients', 'invalid') if @recipients.blank?
     return render_error('body', 'blank') if params[:body].blank?
 
     batch_private_messages = !value_to_boolean(params[:group_conversation]) && @recipients.size > 1
-    recipient_ids = @recipients.keys
 
-    # whether it's a bulk private message, or a big group conversation,
-    # batch up all delayed jobs to make this more responsive to the user
-    Delayed::Batch.serial_batch do
-      if batch_private_messages
-        conversations = []
-        existing_conversations = Conversation.find_all_private_conversations(@current_user.id, recipient_ids)
-        ModelCache.with_cache(:conversations => existing_conversations, :users => {:id => @recipients.update(@current_user.id => @current_user)}) do
-          recipient_ids.each do |recipient_id|
-            conversations << conversation = @current_user.initiate_conversation([recipient_id])
-            create_message_on_conversation(conversation, false)
-          end
-        end
-
-        # reload and preload stuff
-        conversations = ConversationParticipant.find(:all, :conditions => {:id => conversations.map(&:id)}, :include => [:conversation], :order => "visible_last_authored_at DESC, last_message_at DESC, id DESC")
-        Conversation.preload_participants(conversations.map(&:conversation))
-        ConversationParticipant.preload_latest_messages(conversations, @current_user.id)
-        visibility_map = infer_visibility(*conversations)
-        render :json => conversations.map{ |c| jsonify_conversation(c, :include_participant_avatars => false, :include_participant_contexts => false, :visible => visibility_map[c.conversation_id]) }
-      else
-        @conversation = @current_user.initiate_conversation(recipient_ids)
-        message = create_message_on_conversation(@conversation)
-        render :json => [jsonify_conversation(@conversation.reload, :include_indirect_participants => true, :messages => [message])]
+    message = build_message
+    if batch_private_messages
+      mode = params[:mode] == 'async' ? :async : :sync
+      batch = ConversationBatch.generate(message, @recipients, mode, :tags => @tags)
+      if mode == :async
+        headers['X-Conversation-Batch-Id'] = batch.id.to_s
+        return render :json => [], :status => :accepted
       end
+
+      # reload and preload stuff
+      conversations = ConversationParticipant.where(:id => batch.conversations).includes(:conversation).order("visible_last_authored_at DESC, last_message_at DESC, id DESC")
+      Conversation.preload_participants(conversations.map(&:conversation))
+      ConversationParticipant.preload_latest_messages(conversations, @current_user)
+      visibility_map = infer_visibility(*conversations) 
+      render :json => conversations.map{ |c| conversation_json(c, @current_user, session, :include_participant_avatars => false, :include_participant_contexts => false, :visible => visibility_map[c.conversation_id]) }, :status => :created
+    else
+      @conversation = @current_user.initiate_conversation(@recipients)
+      @conversation.add_message(message, :tags => @tags, :update_for_sender => false)
+      render :json => [conversation_json(@conversation.reload, @current_user, session, :include_indirect_participants => true, :messages => [message])], :status => :created
     end
   end
 
-  def render_error(attribute, message)
-    render :json => [{
-        :attribute => attribute,
-        :message => message,
-      }],
-      :status => :bad_request
+  # @API
+  # Returns any currently running conversation batches for the current user.
+  # Conversation batches are created when a bulk private message is sent
+  # asynchronously (see the mode argument to the {api:ConversationsController#create create API action}).
+  #
+  # @example_response
+  #   [
+  #     {
+  #       "id": 1,
+  #       "workflow_state": "created",
+  #       "completion": 0.1234,
+  #       "tags": [],
+  #       "message":
+  #       {
+  #         "id": 1,
+  #         "created_at": "2011-09-02T10:00:00Z",
+  #         "body": "quick reminder, no class tomorrow",
+  #         "author_id": 1,
+  #         "generated": false,
+  #         "media_comment": null,
+  #         "forwarded_messages": [],
+  #         "attachments": []
+  #       }
+  #     }
+  #   ]
+  def batches
+    batches = Api.paginate(@current_user.conversation_batches.in_progress,
+                           self,
+                           api_v1_conversations_batches_url,
+                           :order => :id)
+    render :json => batches.map{ |m| conversation_batch_json(m, @current_user, session) }
   end
 
   # @API Get a single conversation
@@ -218,10 +247,10 @@ class ConversationsController < ApplicationController
   #   set, the message_count will also include these messages in the total.
   # @argument scope [optional, "unread"|"starred"|"archived"]
   #   Used when generating "visible" in the API response. See the explanation
-  #   under the index API action
+  #   under the {api:ConversationsController#index index API action}
   # @argument filter [optional, course_id|group_id|user_id]
   #   Used when generating "visible" in the API response. See the explanation
-  #   under the index API action
+  #   under the {api:ConversationsController#index index API action}
   # @argument auto_mark_as_read Boolean, default true. If true, unread
   #   conversations will be automatically marked as read. This will default
   #   to false in a future API release, so clients should explicitly send
@@ -242,8 +271,8 @@ class ConversationsController < ApplicationController
   #   attachments:: Array of attachments for this message. Fields include: display_name, content-type, filename, url
   # @response_field submissions Array of assignment submissions having
   #   comments relevant to this conversation. These should be interleaved with
-  #   the messages when displaying to the user. See the Submissions API
-  #   documentation for details on the fields included. This response includes
+  #   the messages when displaying to the user. See the {api:SubmissionsApiController#index Submissions API documentation}
+  #   for details on the fields included. This response includes
   #   the submission_comments and assignment associations.
   #
   # @example_response
@@ -264,7 +293,7 @@ class ConversationsController < ApplicationController
   #     "messages":
   #       [
   #         {
-  #           "id": 3
+  #           "id": 3,
   #           "created_at": "2011-09-02T12:00:00Z",
   #           "body": "sure thing, here's the file",
   #           "author_id": 2,
@@ -274,7 +303,7 @@ class ConversationsController < ApplicationController
   #           "attachments": [{"id": 1, "display_name": "notes.doc", "uuid": "abcdefabcdefabcdefabcdefabcdef"}]
   #         },
   #         {
-  #           "id": 2
+  #           "id": 2,
   #           "created_at": "2011-09-02T11:00:00Z",
   #           "body": "hey, bob didn't get the notes. do you have a copy i can give him?",
   #           "author_id": 2,
@@ -283,7 +312,7 @@ class ConversationsController < ApplicationController
   #           "forwarded_messages":
   #             [
   #               {
-  #                 "id": 1
+  #                 "id": 1,
   #                 "created_at": "2011-09-02T10:00:00Z",
   #                 "body": "can i get a copy of the notes? i was out",
   #                 "author_id": 3,
@@ -311,19 +340,24 @@ class ConversationsController < ApplicationController
     end
 
     @conversation.update_attribute(:workflow_state, "read") if @conversation.unread? && auto_mark_as_read?
-    messages = @conversation.messages
-    ConversationMessage.send(:preload_associations, messages, :asset)
-    submissions = messages.map(&:submission).compact
-    Submission.send(:preload_associations, submissions, [:assignment, :submission_comments])
-    if interleave_submissions
-      submissions = nil
-    else
-      messages = messages.select{ |message| message.submission.nil? }
+    messages = submissions = nil
+    Shackles.activate(:slave) do
+      messages = @conversation.messages
+      ConversationMessage.send(:preload_associations, messages, :asset)
+      submissions = messages.map(&:submission).compact
+      Submission.send(:preload_associations, submissions, [:assignment, :submission_comments])
+      if interleave_submissions
+        submissions = nil
+      else
+        messages = messages.select{ |message| message.submission.nil? }
+      end
     end
-    render :json => jsonify_conversation(@conversation,
-                                         :include_indirect_participants => true,
-                                         :messages => messages,
-                                         :submissions => submissions)
+    render :json => conversation_json(@conversation,
+                                      @current_user,
+                                      session,
+                                      :include_indirect_participants => true,
+                                      :messages => messages,
+                                      :submissions => submissions)
   end
 
   # @API Edit a conversation
@@ -334,10 +368,10 @@ class ConversationsController < ApplicationController
   # @argument conversation[starred] [true|false] Toggle the starred state of the current user's view of the conversation.
   # @argument scope [optional, "unread"|"starred"|"archived"]
   #   Used when generating "visible" in the API response. See the explanation
-  #   under the index API action
+  #   under the {api:ConversationsController#index index API action}
   # @argument filter [optional, course_id|group_id|user_id]
   #   Used when generating "visible" in the API response. See the explanation
-  #   under the index API action
+  #   under the {api:ConversationsController#index index API action}
   #
   # @example_response
   #   {
@@ -357,7 +391,7 @@ class ConversationsController < ApplicationController
   #   }
   def update
     if @conversation.update_attributes(params[:conversation])
-      render :json => jsonify_conversation(@conversation)
+      render :json => conversation_json(@conversation, @current_user, session)
     else
       render :json => @conversation.errors, :status => :bad_request
     end
@@ -390,7 +424,20 @@ class ConversationsController < ApplicationController
   #   }
   def destroy
     @conversation.remove_messages(:all)
-    render :json => jsonify_conversation(@conversation, :visible => false)
+    render :json => conversation_json(@conversation, @current_user, session, :visible => false)
+  end
+
+  # internal api
+  # @example_request
+  #     curl https://<canvas>/api/v1/conversations/:id/delete_for_all \ 
+  #       -X DELETE \ 
+  #       -H 'Authorization: Bearer <token>'
+  def delete_for_all
+    return unless authorized_action(Account.site_admin, @current_user, :become_user)
+
+    Conversation.find(params[:id]).delete_for_all
+
+    render :json => {}
   end
 
   # @API Add recipients
@@ -420,7 +467,7 @@ class ConversationsController < ApplicationController
   #     "messages":
   #       [
   #         {
-  #           "id": 4
+  #           "id": 4,
   #           "created_at": "2011-09-02T12:10:00Z",
   #           "body": "Jim was added to the conversation by Joe TA",
   #           "author_id": 1,
@@ -434,8 +481,8 @@ class ConversationsController < ApplicationController
   #
   def add_recipients
     if @recipients.present?
-      @conversation.add_participants(@recipients.keys, :tags => @tags, :root_account_id => @domain_root_account.id)
-      render :json => jsonify_conversation(@conversation.reload, :messages => [@conversation.messages.first])
+      @conversation.add_participants(@recipients, :tags => @tags, :root_account_id => @domain_root_account.id)
+      render :json => conversation_json(@conversation.reload, @current_user, session, :messages => [@conversation.messages.first])
     else
       render :json => {}, :status => :bad_request
     end
@@ -473,7 +520,7 @@ class ConversationsController < ApplicationController
   #     "messages":
   #       [
   #         {
-  #           "id": 3
+  #           "id": 3,
   #           "created_at": "2011-09-02T12:00:00Z",
   #           "body": "let's talk this over with jim",
   #           "author_id": 2,
@@ -488,8 +535,9 @@ class ConversationsController < ApplicationController
   def add_message
     get_conversation(true)
     if params[:body].present?
-      message = create_message_on_conversation
-      render :json => jsonify_conversation(@conversation.reload, :messages => [message])
+      message = build_message
+      @conversation.add_message message, :tags => @tags, :update_for_sender => false
+      render :json => conversation_json(@conversation.reload, @current_user, session, :messages => [message])
     else
       render :json => {}, :status => :bad_request
     end
@@ -515,18 +563,45 @@ class ConversationsController < ApplicationController
   #   }
   def remove_messages
     if params[:remove]
-      to_delete = []
-      @conversation.messages.each do |message|
-        to_delete << message if params[:remove].include?(message.id.to_s)
-      end
-      @conversation.remove_messages(*to_delete)
-      render :json => jsonify_conversation(@conversation)
+      @conversation.remove_messages(*@conversation.messages.find_all_by_id(*params[:remove]))
+      render :json => conversation_json(@conversation, @current_user, session)
     end
   end
 
+  # @API Batch update conversations
+  # Perform a change on a set of conversations. Operates asynchronously; use the {api:ProgressController#show progress endpoint}
+  # to query the status of an operation.
+  #
+  # @argument conversation_ids[] List of conversations to update. Limited to 500 conversations.
+  # @argument event The action to take on each conversation. Must be one of 'mark_as_read', 'mark_as_unread', 'star', 'unstar', 'archive', 'destroy'
+  #
+  # @example_request
+  #     curl https://<canvas>/api/v1/conversations \ 
+  #       -X PUT \ 
+  #       -H 'Authorization: Bearer <token>' \ 
+  #       -d 'event=mark_as_read' \ 
+  #       -d 'conversation_ids[]=1' \ 
+  #       -d 'conversation_ids[]=2'
+  #
+  # @returns Progress
+  def batch_update
+    conversation_ids = params[:conversation_ids]
+    update_params = params.slice(:event).with_indifferent_access
+
+    allowed_events = %w(mark_as_read mark_as_unread star unstar archive destroy)
+    return render(:json => {:message => 'conversation_ids not specified'}, :status => :bad_request) unless params[:conversation_ids].is_a?(Array)
+    return render(:json => {:message => 'conversation batch size limit (500) exceeded'}, :status => :bad_request) unless params[:conversation_ids].size <= 500
+    return render(:json => {:message => 'event not specified'}, :status => :bad_request) unless update_params[:event]
+    return render(:json => {:message => 'invalid event'}, :status => :bad_request) unless allowed_events.include? update_params[:event]
+
+    progress = ConversationParticipant.batch_update(@current_user, conversation_ids, update_params)
+    render :json => progress_json(progress, @current_user, session)
+  end
+
+
   # @API Find recipients
   #
-  # Deprecated, see the Find recipients endpoint in the Search API
+  # Deprecated, see the {api:SearchController#recipients Find recipients endpoint} in the Search API
   def find_recipients; end
 
   def public_feed
@@ -539,17 +614,19 @@ class ConversationsController < ApplicationController
       f.updated = Time.now
       f.id = conversations_url
     end
-    @entries = []
-    @conversation_contexts = {}
-    @current_user.conversations.each do |conversation|
-      @entries.concat(conversation.messages.human)
-      if @conversation_contexts[conversation.conversation.id].blank?
-        @conversation_contexts[conversation.conversation.id] = feed_context_content(conversation)
+    Shackles.activate(:slave) do
+      @entries = []
+      @conversation_contexts = {}
+      @current_user.conversations.each do |conversation|
+        @entries.concat(conversation.messages.human)
+        if @conversation_contexts[conversation.conversation.id].blank?
+          @conversation_contexts[conversation.conversation.id] = feed_context_content(conversation)
+        end
       end
-    end
-    @entries = @entries.sort_by{|e| e.created_at}.reverse
-    @entries.each do |entry|
-      feed.entries << entry.to_atom(:additional_content => @conversation_contexts[entry.conversation.id])
+      @entries = @entries.sort_by{|e| e.created_at}.reverse
+      @entries.each do |entry|
+        feed.entries << entry.to_atom(:additional_content => @conversation_contexts[entry.conversation.id])
+      end
     end
     respond_to do |format|
       format.atom { render :text => feed.to_xml }
@@ -560,7 +637,7 @@ class ConversationsController < ApplicationController
     content = ""
     audience = conversation.other_participants
     audience_names = audience.map(&:name)
-    audience_contexts = contexts_for(audience, conversation.context_tags) # will be 0, 1, or 2 contexts
+    audience_contexts = contexts_for(audience, conversation.local_context_tags) # will be 0, 1, or 2 contexts
     audience_context_names = [:courses, :groups].inject([]) { |ary, context_key|
       ary + audience_contexts[context_key].keys.map { |k| @contexts[context_key][k] && @contexts[context_key][k][:name] }
     }.reject(&:blank?)
@@ -596,6 +673,14 @@ class ConversationsController < ApplicationController
 
   private
 
+  def render_error(attribute, message)
+    render :json => [{
+        :attribute => attribute,
+        :message => message,
+      }],
+      :status => :bad_request
+  end
+
   def infer_scope
     @conversations_scope = case params[:scope]
       when 'unread'
@@ -611,19 +696,17 @@ class ConversationsController < ApplicationController
         @current_user.conversations.default
     end
 
-    filters = Array(params[:filter]).compact
+    filters = param_array(:filter)
     @conversations_scope = @conversations_scope.for_masquerading_user(@real_current_user) if @real_current_user
     @conversations_scope = @conversations_scope.tagged(*filters) if filters.present?
+    @set_visibility = true
   end
 
   def infer_visibility(*conversations)
-    infer_scope unless @conversations_scope
-
     result = Hash.new(false)
-    visible_conversations = @conversations_scope.find(:all,
-      :select => "conversation_id",
-      :conditions => {:conversation_id => conversations.map(&:conversation_id)}
-    )
+    visible_conversations = @current_user.shard.activate do
+        @conversations_scope.select(:conversation_id).where(:conversation_id => conversations.map(&:conversation_id)).all
+      end
     visible_conversations.each { |c| result[c.conversation_id] = true }
     if conversations.size == 1
       result[conversations.first.conversation_id]
@@ -638,19 +721,16 @@ class ConversationsController < ApplicationController
       if recipient_ids.is_a?(String)
         params[:recipients] = recipient_ids = recipient_ids.split(/,/)
       end
-      recipients = @current_user.messageable_users(:ids => recipient_ids.grep(/\A\d+\z/), :conversation_id => params[:from_conversation_id])
-      recipient_ids.grep(User::MESSAGEABLE_USER_CONTEXT_REGEX).map do |context|
-        recipients.concat @current_user.messageable_users(:context => context)
+      @recipients = @current_user.load_messageable_users(MessageableUser.individual_recipients(recipient_ids), :conversation_id => params[:from_conversation_id])
+      MessageableUser.context_recipients(recipient_ids).map do |context|
+        @recipients.concat @current_user.messageable_users_in_context(context)
       end
-      @recipients = recipients.inject({}){ |hash, user|
-        hash[user.id] ||= user
-        hash
-      }
+      @recipients = @recipients.uniq_by(&:id)
     end
   end
 
   def infer_tags
-    tags = Array(params[:tags] || []).concat(params[:recipients] || [])
+    tags = param_array(:tags).concat(param_array(:recipients))
     tags = SimpleTags.normalize_tags(tags)
     tags += tags.grep(/\Agroup_(\d+)\z/){ g = Group.find_by_id($1.to_i) and g.context.asset_string }.compact
     @tags = tags.uniq
@@ -658,23 +738,21 @@ class ConversationsController < ApplicationController
 
   def get_conversation(allow_deleted = false)
     scope = @current_user.all_conversations
-    scope = scope.scoped(:conditions => "message_count > 0") unless allow_deleted
+    scope = scope.where('message_count>0') unless allow_deleted
     @conversation = scope.find_by_conversation_id(params[:id] || params[:conversation_id] || 0)
     raise ActiveRecord::RecordNotFound unless @conversation
   end
 
-  def create_message_on_conversation(conversation=@conversation, update_for_sender=true)
-    message = conversation.add_message(
-                params[:body],
-                :attachment_ids => params[:attachment_ids],
-                :forwarded_message_ids => params[:forwarded_message_ids],
-                :update_for_sender => update_for_sender,
-                :root_account_id => @domain_root_account.id,
-                :tags => @tags,
-                :media_comment => infer_media_comment
-              )
-    message.generate_user_note if params[:user_note]
-    message
+  def build_message
+    Conversation.build_message(
+      @current_user,
+      params[:body],
+      :attachment_ids => params[:attachment_ids],
+      :forwarded_message_ids => params[:forwarded_message_ids],
+      :root_account_id => @domain_root_account.id,
+      :media_comment => infer_media_comment,
+      :generate_user_note => params[:user_note]
+    )
   end
 
   def infer_media_comment
@@ -695,48 +773,13 @@ class ConversationsController < ApplicationController
     end
   end
 
-  def jsonify_conversation(conversation, options = {})
-    options = {
-      :include_participant_contexts => true
-    }.merge(options)
-    result = conversation.as_json(options)
-    participants = conversation.participants(options.slice(:include_participant_contexts, :include_indirect_participants))
-    explicit_participants = conversation.participants({:include_participant_contexts => include_private_conversation_enrollments})
-    audience = conversation.other_participants(explicit_participants)
-    result[:messages] = jsonify_messages(options[:messages]) if options[:messages]
-    result[:submissions] = options[:submissions].map { |s| submission_json(s, s.assignment, @current_user, session, nil, ['assignment', 'submission_comments']) } if options[:submissions]
-    unless interleave_submissions
-      result['message_count'] = result[:submissions] ?
-        result['message_count'] - result[:submissions].size :
-        conversation.messages.human.scoped(:conditions => "asset_id IS NULL").size
-    end
-    result[:audience] = audience.map(&:id)
-    result[:audience_contexts] = contexts_for(audience, conversation.context_tags)
-    result[:avatar_url] = avatar_url_for(conversation, explicit_participants)
-    result[:participants] = jsonify_users(participants, options)
-    result[:visible] = options.key?(:visible) ? options[:visible] : infer_visibility(conversation)
-    result
-  end
-
-  def jsonify_messages(messages)
-    messages.map{ |message|
-      result = message.as_json
-      result['media_comment'] = media_comment_json(result['media_comment']) if result['media_comment']
-      result['attachments'] = result['attachments'].map{ |attachment| attachment_json(attachment, @current_user) }
-      result['forwarded_messages'] = jsonify_messages(result['forwarded_messages'])
-      result['submission'] = submission_json(message.submission, message.submission.assignment, @current_user, session, nil, ['assignment', 'submission_comments']) if message.submission
-      result
-    }
-  end
-
   # TODO API v2: default to true, like we do in the UI
   def interleave_submissions
-    params[:interleave_submissions] || !api_request?
+    value_to_boolean(params[:interleave_submissions]) || !api_request?
   end
 
   def include_private_conversation_enrollments
-    enabled = params[:include_private_conversation_enrollments] || api_request?
-    ["1", "true"].include?(enabled.to_s)
+    value_to_boolean(params[:include_private_conversation_enrollments]) || api_request?
   end
 
   # TODO API v2: default to false, like we do in the UI
@@ -745,4 +788,8 @@ class ConversationsController < ApplicationController
     value_to_boolean(params[:auto_mark_as_read])
   end
 
+  # look up the param and cast it to an array. treat empty string same as empty
+  def param_array(key)
+    Array(params[key].presence || []).compact
+  end
 end

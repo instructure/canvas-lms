@@ -1,0 +1,16 @@
+<div
+  id="js-sequential-warning-dialogue"
+  data-turn-into-dialog='{"width": 400, "modal":true}'
+  title="Attention!"
+  style="display: none;"
+>
+  <p style="font-size: 14px; padding: 10px 10px 10px 10px;">
+    Once you have submitted an answer, you will not be able to change it later.
+    You will not be able to view the previous question.
+  </p>
+  <div class="button-container">
+    <a href="<%= take_quiz_url %>" data-method="POST">
+      <button type="button" class="btn btn-primary">Begin</button>
+    </a>
+  </div>
+</div>

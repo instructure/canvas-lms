@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011-2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -30,25 +30,27 @@ class GoogleDocsTest
   end
 end
 
+DOCS_FIXTURES_PATH = File.dirname(__FILE__) + '/../fixtures/google_docs/'
+def load_fixture(filename)
+  File.read(DOCS_FIXTURES_PATH + filename)
+end
+
 describe GoogleDocs do
 
-  def google_doc_settings
-    path = RAILS_ROOT + "/config/google_docs.yml"
-    if File.exists?(path)
-      YAML.load_file(path)[RAILS_ENV]
-    else
-      {
-        'test_user_token' => 'u_token',
-        'test_user_secret' => 'u_secret',
-        'test_user_id' => 'u_id',
-        'test_user_name' => 'u_name',
-        'api_key' => 'key',
-        'secret_key' => 'secret'
-      }
-    end
-  end
+  let(:lib) { GoogleDocsTest.new(@user, nil, nil) }
+  let(:xml_schema_id) { 'https://docs.google.com/feeds/documents/private/full' }
 
-  before(:each) do
+  let(:xml_doc_list_empty)      { load_fixture("doc_list_empty.xml") }
+  let(:xml_doc_list_one)        { load_fixture("doc_list_one.xml") }
+  let(:xml_doc_list_many)        { load_fixture("doc_list_many.xml") }
+  let(:xml_create_doc_request)  { load_fixture("create_doc_request.xml") }
+  let(:xml_create_doc_response) { load_fixture("create_doc_response.xml") }
+  let(:xml_remove_doc_request)  { load_fixture("remove_doc_request.xml") }
+  let(:xml_remove_doc_response) { load_fixture("remove_doc_response.xml") }
+  let(:xml_delete_doc_request)  { load_fixture("delete_doc_request.xml") }
+  let(:xml_delete_doc_response) { load_fixture("delete_doc_response.xml") }
+
+  before do
     @user = User.create!
     PluginSetting.create!(:name => 'google_docs', :settings => google_doc_settings)
     UserService.register(
@@ -62,134 +64,186 @@ describe GoogleDocs do
     )
   end
 
-  it 'should add and remove documents' do
-    @lib = GoogleDocsTest.new @user, nil, nil
-    unless use_remote_services
-      consumer = mock()
-      OAuth::Consumer.expects(:new).with(GoogleDocs.config["api_key"],
-          GoogleDocs.config["secret_key"], {:signature_method => 'HMAC-SHA1',
-          :request_token_path => '/accounts/OAuthGetRequestToken',
-          :site => 'https://www.google.com',
-          :authorize_path => '/accounts/OAuthAuthorizeToken',
-          :access_token_path => '/accounts/OAuthGetAccessToken'}).returns(consumer)
-      access_token = mock()
-      OAuth::AccessToken.expects(:new).with(consumer,
-          GoogleDocs.config["test_user_token"],
-          GoogleDocs.config["test_user_secret"]).returns(access_token)
-      list_response = mock()
-      access_token.expects(:get).with('https://docs.google.com/feeds/documents/private/full').returns(list_response)
-      list_response.expects(:body).returns("<?xml version='1.0' encoding='UTF-8'?><feed xmlns='http://www.w3.org/2005/Atom' xmlns:openSearch='http://a9.com/-/spec/opensearchrss/1.0/' xmlns:docs='http://schemas.google.com/docs/2007' xmlns:batch='http://schemas.google.com/gdata/batch' xmlns:gd='http://schemas.google.com/g/2005'><id>https://docs.google.com/feeds/documents/private/full</id><updated>2011-10-31T22:23:05.864Z</updated><category scheme='http://schemas.google.com/g/2005#kind' term='http://schemas.google.com/docs/2007#item' label='item'/><title type='text'>Available Documents - instructure.test.2011@gmail.com</title><link rel='alternate' type='text/html' href='http://docs.google.com'/><link rel='http://schemas.google.com/g/2005#feed' type='application/atom+xml' href='https://docs.google.com/feeds/documents/private/full'/><link rel='http://schemas.google.com/g/2005#post' type='application/atom+xml' href='https://docs.google.com/feeds/documents/private/full'/><link rel='http://schemas.google.com/g/2005#batch' type='application/atom+xml' href='https://docs.google.com/feeds/documents/private/full/batch'/><link rel='self' type='application/atom+xml' href='https://docs.google.com/feeds/documents/private/full'/><author><name>instructure.test.2011</name><email>instructure.test.2011@gmail.com</email></author><openSearch:totalResults>0</openSearch:totalResults><openSearch:startIndex>1</openSearch:startIndex></feed>")
-    end
+  it "should allow a null access_token to be passed" do
+    body     = File.read('spec/fixtures/google_docs/doc_list.xml')
+    token    = mock()
+    token.expects(:get).
+      with('https://docs.google.com/feeds/documents/private/full').
+      returns(Struct.new(:body).new(body))
+    lib.expects(:google_docs_retrieve_access_token).returns(token)
 
-    document_id_list = @lib.google_doc_list.files.map(&:document_id)
-
-    unless use_remote_services
-      consumer = mock()
-      OAuth::Consumer.expects(:new).with(GoogleDocs.config["api_key"],
-          GoogleDocs.config["secret_key"], {:signature_method => 'HMAC-SHA1',
-          :request_token_path => '/accounts/OAuthGetRequestToken',
-          :site => 'https://www.google.com',
-          :authorize_path => '/accounts/OAuthAuthorizeToken',
-          :access_token_path => '/accounts/OAuthGetAccessToken'}).returns(consumer)
-      access_token = mock()
-      OAuth::AccessToken.expects(:new).with(consumer,
-          GoogleDocs.config["test_user_token"],
-          GoogleDocs.config["test_user_secret"]).returns(access_token)
-      create_response = mock()
-      access_token.expects(:post).with('https://docs.google.com/feeds/documents/private/full',
-          "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<entry xmlns=\"http://www.w3.org/2005/Atom\">\n  <title>test document</title>\n  <category label=\"document\" scheme=\"http://schemas.google.com/g/2005#kind\" term=\"http://schemas.google.com/docs/2007#document\"/>\n</entry>\n", {'Content-Type' => 'application/atom+xml'}).returns(create_response)
-      create_response.expects(:body).returns("<?xml version='1.0' encoding='UTF-8'?><entry xmlns='http://www.w3.org/2005/Atom' xmlns:docs='http://schemas.google.com/docs/2007' xmlns:batch='http://schemas.google.com/gdata/batch' xmlns:gd='http://schemas.google.com/g/2005'><id>https://docs.google.com/feeds/documents/private/full/document%3A1HJoN38KHlnu32B5z_THgchnTMUbj7dgs8P-Twrm38cA</id><published>2011-10-31T22:23:06.375Z</published><updated>2011-10-31T22:23:06.993Z</updated><category scheme='http://schemas.google.com/g/2005#kind' term='http://schemas.google.com/docs/2007#document' label='document'/><category scheme='http://schemas.google.com/g/2005/labels' term='http://schemas.google.com/g/2005/labels#viewed' label='viewed'/><title type='text'>test document</title><content type='text/html' src='https://docs.google.com/feeds/download/documents/export/Export?id=1HJoN38KHlnu32B5z_THgchnTMUbj7dgs8P-Twrm38cA'/><link rel='alternate' type='text/html' href='https://docs.google.com/document/d/1HJoN38KHlnu32B5z_THgchnTMUbj7dgs8P-Twrm38cA/edit?hl=en_US'/><link rel='self' type='application/atom+xml' href='https://docs.google.com/feeds/documents/private/full/document%3A1HJoN38KHlnu32B5z_THgchnTMUbj7dgs8P-Twrm38cA'/><link rel='edit' type='application/atom+xml' href='https://docs.google.com/feeds/documents/private/full/document%3A1HJoN38KHlnu32B5z_THgchnTMUbj7dgs8P-Twrm38cA/gug1bunq'/><link rel='edit-media' type='text/html' href='https://docs.google.com/feeds/media/private/full/document%3A1HJoN38KHlnu32B5z_THgchnTMUbj7dgs8P-Twrm38cA/gug1bunq'/><author><name>instructure.test.2011</name><email>instructure.test.2011@gmail.com</email></author><gd:resourceId>document:1HJoN38KHlnu32B5z_THgchnTMUbj7dgs8P-Twrm38cA</gd:resourceId><gd:lastModifiedBy><name>instructure.test.2011</name><email>instructure.test.2011@gmail.com</email></gd:lastModifiedBy><gd:lastViewed>2011-10-31T22:23:06.652Z</gd:lastViewed><gd:quotaBytesUsed>0</gd:quotaBytesUsed><docs:writersCanInvite value='true'/><gd:feedLink rel='http://schemas.google.com/acl/2007#accessControlList' href='https://docs.google.com/feeds/acl/private/full/document%3A1HJoN38KHlnu32B5z_THgchnTMUbj7dgs8P-Twrm38cA'/></entry>")
-    end
-
-    new_document = @lib.google_docs_create_doc "test document"
-    document_id_list.include?(new_document.document_id).should be_false
-
-    unless use_remote_services
-      consumer = mock()
-      OAuth::Consumer.expects(:new).with(GoogleDocs.config["api_key"],
-          GoogleDocs.config["secret_key"], {:signature_method => 'HMAC-SHA1',
-          :request_token_path => '/accounts/OAuthGetRequestToken',
-          :site => 'https://www.google.com',
-          :authorize_path => '/accounts/OAuthAuthorizeToken',
-          :access_token_path => '/accounts/OAuthGetAccessToken'}).returns(consumer)
-      access_token = mock()
-      OAuth::AccessToken.expects(:new).with(consumer,
-          GoogleDocs.config["test_user_token"],
-          GoogleDocs.config["test_user_secret"]).returns(access_token)
-      list_response = mock()
-      access_token.expects(:get).with('https://docs.google.com/feeds/documents/private/full').returns(list_response)
-      list_response.expects(:body).returns("<?xml version='1.0' encoding='UTF-8'?><feed xmlns='http://www.w3.org/2005/Atom' xmlns:openSearch='http://a9.com/-/spec/opensearchrss/1.0/' xmlns:docs='http://schemas.google.com/docs/2007' xmlns:batch='http://schemas.google.com/gdata/batch' xmlns:gd='http://schemas.google.com/g/2005'><id>https://docs.google.com/feeds/documents/private/full</id><updated>2011-10-31T22:23:07.920Z</updated><category scheme='http://schemas.google.com/g/2005#kind' term='http://schemas.google.com/docs/2007#item' label='item'/><title type='text'>Available Documents - instructure.test.2011@gmail.com</title><link rel='alternate' type='text/html' href='http://docs.google.com'/><link rel='http://schemas.google.com/g/2005#feed' type='application/atom+xml' href='https://docs.google.com/feeds/documents/private/full'/><link rel='http://schemas.google.com/g/2005#post' type='application/atom+xml' href='https://docs.google.com/feeds/documents/private/full'/><link rel='http://schemas.google.com/g/2005#batch' type='application/atom+xml' href='https://docs.google.com/feeds/documents/private/full/batch'/><link rel='self' type='application/atom+xml' href='https://docs.google.com/feeds/documents/private/full'/><author><name>instructure.test.2011</name><email>instructure.test.2011@gmail.com</email></author><openSearch:totalResults>1</openSearch:totalResults><openSearch:startIndex>1</openSearch:startIndex><entry><id>https://docs.google.com/feeds/documents/private/full/document%3A1HJoN38KHlnu32B5z_THgchnTMUbj7dgs8P-Twrm38cA</id><published>2011-10-31T22:23:06.375Z</published><updated>2011-10-31T22:23:06.993Z</updated><category scheme='http://schemas.google.com/g/2005#kind' term='http://schemas.google.com/docs/2007#document' label='document'/><category scheme='http://schemas.google.com/g/2005/labels' term='http://schemas.google.com/g/2005/labels#viewed' label='viewed'/><title type='text'>test document</title><content type='text/html' src='https://docs.google.com/feeds/download/documents/export/Export?id=1HJoN38KHlnu32B5z_THgchnTMUbj7dgs8P-Twrm38cA'/><link rel='alternate' type='text/html' href='https://docs.google.com/document/d/1HJoN38KHlnu32B5z_THgchnTMUbj7dgs8P-Twrm38cA/edit?hl=en_US'/><link rel='self' type='application/atom+xml' href='https://docs.google.com/feeds/documents/private/full/document%3A1HJoN38KHlnu32B5z_THgchnTMUbj7dgs8P-Twrm38cA'/><link rel='edit' type='application/atom+xml' href='https://docs.google.com/feeds/documents/private/full/document%3A1HJoN38KHlnu32B5z_THgchnTMUbj7dgs8P-Twrm38cA/gug1buow'/><link rel='edit-media' type='text/html' href='https://docs.google.com/feeds/media/private/full/document%3A1HJoN38KHlnu32B5z_THgchnTMUbj7dgs8P-Twrm38cA/gug1buow'/><author><name>instructure.test.2011</name><email>instructure.test.2011@gmail.com</email></author><gd:resourceId>document:1HJoN38KHlnu32B5z_THgchnTMUbj7dgs8P-Twrm38cA</gd:resourceId><gd:lastModifiedBy><name>instructure.test.2011</name><email>instructure.test.2011@gmail.com</email></gd:lastModifiedBy><gd:lastViewed>2011-10-31T22:23:07.015Z</gd:lastViewed><gd:quotaBytesUsed>0</gd:quotaBytesUsed><docs:writersCanInvite value='true'/><gd:feedLink rel='http://schemas.google.com/acl/2007#accessControlList' href='https://docs.google.com/feeds/acl/private/full/document%3A1HJoN38KHlnu32B5z_THgchnTMUbj7dgs8P-Twrm38cA'/></entry></feed>")
-    end
-
-    @lib.google_doc_list.files.map(&:document_id).include?(new_document.document_id).should be_true
-
-    unless use_remote_services
-      consumer = mock()
-      OAuth::Consumer.expects(:new).with(GoogleDocs.config["api_key"],
-          GoogleDocs.config["secret_key"], {:signature_method => 'HMAC-SHA1',
-          :request_token_path => '/accounts/OAuthGetRequestToken',
-          :site => 'https://www.google.com',
-          :authorize_path => '/accounts/OAuthAuthorizeToken',
-          :access_token_path => '/accounts/OAuthGetAccessToken'}).returns(consumer)
-      access_token = mock()
-      OAuth::AccessToken.expects(:new).with(consumer,
-          GoogleDocs.config["test_user_token"],
-          GoogleDocs.config["test_user_secret"]).returns(access_token)
-      access_token.expects(:delete).with('https://docs.google.com/feeds/documents/private/full/document:1HJoN38KHlnu32B5z_THgchnTMUbj7dgs8P-Twrm38cA', {'GData-Version' => '2', 'If-Match' => '*'}).returns(mock())
-    end
-
-    @lib.google_docs_delete_doc new_document
-
-    unless use_remote_services
-      consumer = mock()
-      OAuth::Consumer.expects(:new).with(GoogleDocs.config["api_key"],
-          GoogleDocs.config["secret_key"], {:signature_method => 'HMAC-SHA1',
-          :request_token_path => '/accounts/OAuthGetRequestToken',
-          :site => 'https://www.google.com',
-          :authorize_path => '/accounts/OAuthAuthorizeToken',
-          :access_token_path => '/accounts/OAuthGetAccessToken'}).returns(consumer)
-      access_token = mock()
-      OAuth::AccessToken.expects(:new).with(consumer,
-          GoogleDocs.config["test_user_token"],
-          GoogleDocs.config["test_user_secret"]).returns(access_token)
-      list_response = mock()
-      access_token.expects(:get).with('https://docs.google.com/feeds/documents/private/full').returns(list_response)
-      list_response.expects(:body).returns("<?xml version='1.0' encoding='UTF-8'?><feed xmlns='http://www.w3.org/2005/Atom' xmlns:openSearch='http://a9.com/-/spec/opensearchrss/1.0/' xmlns:docs='http://schemas.google.com/docs/2007' xmlns:batch='http://schemas.google.com/gdata/batch' xmlns:gd='http://schemas.google.com/g/2005'><id>https://docs.google.com/feeds/documents/private/full</id><updated>2011-10-31T22:23:09.244Z</updated><category scheme='http://schemas.google.com/g/2005#kind' term='http://schemas.google.com/docs/2007#item' label='item'/><title type='text'>Available Documents - instructure.test.2011@gmail.com</title><link rel='alternate' type='text/html' href='http://docs.google.com'/><link rel='http://schemas.google.com/g/2005#feed' type='application/atom+xml' href='https://docs.google.com/feeds/documents/private/full'/><link rel='http://schemas.google.com/g/2005#post' type='application/atom+xml' href='https://docs.google.com/feeds/documents/private/full'/><link rel='http://schemas.google.com/g/2005#batch' type='application/atom+xml' href='https://docs.google.com/feeds/documents/private/full/batch'/><link rel='self' type='application/atom+xml' href='https://docs.google.com/feeds/documents/private/full'/><author><name>instructure.test.2011</name><email>instructure.test.2011@gmail.com</email></author><openSearch:totalResults>0</openSearch:totalResults><openSearch:startIndex>1</openSearch:startIndex></feed>")
-    end
-
-    @lib.google_doc_list.files.map(&:document_id).include?(new_document.document_id).should be_false
+    lib.google_docs_list(nil)
   end
 
-  it "should use the real_current_user if possible" do
-    @user2 = User.create!
-    @lib = GoogleDocsTest.new nil, @user, @user2
-    unless use_remote_services
-      consumer = mock()
-      OAuth::Consumer.expects(:new).with(GoogleDocs.config["api_key"],
-          GoogleDocs.config["secret_key"], {:signature_method => 'HMAC-SHA1',
-          :request_token_path => '/accounts/OAuthGetRequestToken',
-          :site => 'https://www.google.com',
-          :authorize_path => '/accounts/OAuthAuthorizeToken',
-          :access_token_path => '/accounts/OAuthGetAccessToken'}).returns(consumer)
+  describe "documents" do
+
+    it "can be an empty list" do
+      prepare_mock_get xml_doc_list_empty
+
+      document_id_list = lib.google_docs_list.files.map(&:document_id)
+      document_id_list.should == []
     end
-    lambda { @lib.google_docs_retrieve_access_token }.should raise_error
+
+    it "can be listed" do
+      prepare_mock_get xml_doc_list_one
+      list = lib.google_docs_list
+      document_id_list = list.files.map(&:document_id)
+      document_id_list.should == ["document:1HJoN38KHlnu32B5z_THgchnTMUbj7dgs8P-Twrm38cA"]
+    end
+
+    it "can folderize the list" do
+      prepare_mock_get xml_doc_list_many
+      root_folder = lib.google_docs_list
+      root_folder.should be_a(GoogleDocs::Folder)
+      root_folder.name.should == '/'
+      root_folder.folders.size.should == 1
+      root_folder.folders.map{ |f| f.name }.should == ["Good Stuff"]
+      root_folder.folders.first.files.size.should == 1
+      root_folder.folders.first.files.map(&:display_name).should == ["2012 Employee Review Form"]
+      root_folder.files.size.should == 10
+    end
+
+    describe "#google_docs_list_with_extension_filter" do
+      it "should filter only if list of extensions given" do
+        prepare_mock_get xml_doc_list_one
+        list = lib.google_docs_list_with_extension_filter([])
+        document_id_list = list.files.map(&:document_id)
+        document_id_list.should == ["document:1HJoN38KHlnu32B5z_THgchnTMUbj7dgs8P-Twrm38cA"]
+
+        prepare_mock_get xml_doc_list_one
+        list = lib.google_docs_list_with_extension_filter(['doc'])
+        document_id_list = list.files.map(&:document_id)
+        document_id_list.should == ["document:1HJoN38KHlnu32B5z_THgchnTMUbj7dgs8P-Twrm38cA"]
+
+        prepare_mock_get xml_doc_list_one
+        list = lib.google_docs_list_with_extension_filter(['xls'])
+        document_id_list = list.files.map(&:document_id)
+        document_id_list.should == []
+      end
+    end
+
+    it "can be created" do
+      prepare_mock_post \
+        xml_create_doc_request,
+        xml_create_doc_response
+      new_document = lib.google_docs_create_doc "test document"
+    end
+
+    it "can be removed" do
+      response = mock()
+      headers = {'Content-Type' => 'application/atom+xml'}
+      lib.expects(:post_for_removal).returns(response)
+      response.expects(:body).returns(xml_remove_doc_response)
+      lib.google_docs_acl_remove 'document:1HJoN38KHlnu32B5z_THgchnTMUbj7dgs8P-Twrm38cA',
+                                 [ 'user@example.com' ]
+    end
+
+    it "can be deleted" do
+      prepare_mock_post \
+        xml_create_doc_request,
+        xml_create_doc_response
+      new_document = lib.google_docs_create_doc "test document"
+
+      prepare_mock_delete "#{xml_schema_id}/document:1HJoN38KHlnu32B5z_THgchnTMUbj7dgs8P-Twrm38cA"
+      lib.google_docs_delete_doc new_document
+    end
   end
 
-  it "should use the current_user if no real_current_user" do
-    @lib = GoogleDocsTest.new nil, @user, nil
-    unless use_remote_services
-      consumer = mock()
-      OAuth::Consumer.expects(:new).with(GoogleDocs.config["api_key"],
-          GoogleDocs.config["secret_key"], {:signature_method => 'HMAC-SHA1',
-          :request_token_path => '/accounts/OAuthGetRequestToken',
-          :site => 'https://www.google.com',
-          :authorize_path => '/accounts/OAuthAuthorizeToken',
-          :access_token_path => '/accounts/OAuthGetAccessToken'}).returns(consumer)
-      access_token = mock()
-      OAuth::AccessToken.expects(:new).with(consumer,
-          GoogleDocs.config["test_user_token"],
-          GoogleDocs.config["test_user_secret"]).returns(access_token)
+  describe '#google_docs_retrieve_access_token' do
+    it "should use the real_current_user if possible" do
+      lib = GoogleDocsTest.new nil, @user, User.create!
+      mock_consumer()
+
+      lambda { lib.google_docs_retrieve_access_token }.should \
+        raise_error(RuntimeError, 'User does not have valid Google Docs token')
     end
-    @lib.google_docs_retrieve_access_token.should eql access_token
+
+    it "should use the current_user if no real_current_user" do
+      lib = GoogleDocsTest.new nil, @user, nil
+      access_token = mock_access_token()
+      lib.google_docs_retrieve_access_token.should eql access_token
+    end
+
+    it 'should not error out if the google plugin is not configured' do
+      GoogleDocs.stubs(:config).returns nil
+      lib = GoogleDocsTest.new nil, @user, nil
+      lib.google_docs_retrieve_access_token.should be_nil
+    end
+  end
+
+  describe '#google_docs_download' do
+    it 'pulls the document out that matches the provided id' do
+      doc_id = 'spreadsheet:0AiN8C_VHrPxkdEF6YmQyc3p2Qm02ODhJWGJnUmJYY2c'
+      token = mock_access_token
+      token.expects(:get).with('https://docs.google.com/feeds/download/spreadsheets/Export?key=0AiN8C_VHrPxkdEF6YmQyc3p2Qm02ODhJWGJnUmJYY2c').returns(mock())
+      response = mock()
+      response.expects(:body).returns(xml_doc_list_many)
+      token.expects(:get).with(xml_schema_id).returns(response)
+
+      lib = GoogleDocsTest.new nil, @user, nil
+      doc_array = lib.google_docs_download(doc_id)
+      doc_array[1].should == 'Sprint Teams'
+    end
+  end
+
+  # ----------------------------
+  # Helper methods for this spec
+  # ----------------------------
+
+  def google_doc_settings
+    path = Rails.root+"config/google_docs.yml"
+    if File.exists?(path)
+      YAML.load_file(path)[Rails.env]
+    else
+      {
+        'test_user_token' => 'u_token',
+        'test_user_secret' => 'u_secret',
+        'test_user_id' => 'u_id',
+        'test_user_name' => 'u_name',
+        'api_key' => 'key',
+        'secret_key' => 'secret'
+      }
+    end
+  end
+
+  def mock_consumer
+    consumer = mock()
+    OAuth::Consumer.expects(:new).with(
+      GoogleDocs.config["api_key"],
+      GoogleDocs.config["secret_key"], {
+        :signature_method => 'HMAC-SHA1',
+        :request_token_path => '/accounts/OAuthGetRequestToken',
+        :site => 'https://www.google.com',
+        :authorize_path => '/accounts/OAuthAuthorizeToken',
+        :access_token_path => '/accounts/OAuthGetAccessToken'}).returns(consumer)
+    return consumer
+  end
+
+  def mock_access_token
+    access_token = mock()
+    OAuth::AccessToken.expects(:new).with(mock_consumer(),
+      GoogleDocs.config["test_user_token"],
+      GoogleDocs.config["test_user_secret"]).returns(access_token)
+    return access_token
+  end
+
+  def prepare_mock_get(response_xml)
+    response = mock()
+    mock_access_token.expects(:get).with(xml_schema_id).returns(response)
+    response.expects(:body).returns(response_xml)
+  end
+
+  def prepare_mock_post(request_xml, response_xml)
+    response = mock()
+    headers = {'Content-Type' => 'application/atom+xml'}
+    mock_access_token.expects(:post).
+      with(xml_schema_id, request_xml, headers).returns(response)
+    response.expects(:body).returns(response_xml)
+  end
+
+  def prepare_mock_delete(xml_schema_id)
+    response = mock()
+    headers = {'GData-Version' => '2', 'If-Match' => '*'}
+    mock_access_token.expects(:delete).with(xml_schema_id, headers).returns(mock())
   end
 end

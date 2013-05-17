@@ -1,0 +1,49 @@
+.js-assignment-overrides {
+  overflow: auto;
+
+  .remove-link .icon-end:hover {
+    opacity: 1.0;
+  }
+
+  .remove-link .icon-end {
+    opacity: 0.5;
+    color: black;
+    vertical-align: middle;
+  }
+
+  .due-date-override-headers {
+    min-width: 900px;
+
+    div {
+      width: 210px;
+      float: left;
+      margin-right: 10px;
+    }
+  }
+
+  .due-date-overrides {
+    margin: 0;
+
+    li.due-date-row {
+      list-style-type: none;
+      overflow: hidden;
+      min-width: 900px;
+      select {
+        float: left;
+        margin: 0px 10px 0px 0px;
+        width: 210px;
+      }
+      .date_field_container {
+        float: left;
+        position: relative;
+        margin-right: 10px;
+        input {
+          width: 155px;
+        }
+        .datetime_suggest {
+          height: 20px;
+        }
+      }
+    }
+  }
+}

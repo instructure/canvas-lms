@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -19,6 +19,115 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe ActiveRecord::Base do
+  describe "count_by_date" do
+    def create_courses(start_times)
+      start_times.each_with_index do |time, i|
+        (i + 1).times do
+          course = Course.new
+          course.start_at = time
+          course.save!
+        end
+      end
+    end
+
+    it "should work" do
+      start_times = [
+        Time.zone.now,
+        Time.zone.now.advance(:days => -1),
+        Time.zone.now.advance(:days => -2),
+        Time.zone.now.advance(:days => -3)
+      ]
+      create_courses(start_times)
+
+      # updated_at
+      Course.count_by_date.should eql({start_times.first.to_date => 10})
+
+      Course.count_by_date(:column => :start_at).should eql Hash[
+        start_times.each_with_index.map{ |t, i| [t.to_date, i + 1]}
+      ]
+    end
+
+    it "should just do the last 20 days by default" do
+      start_times = [
+        Time.zone.now,
+        Time.zone.now.advance(:days => -19),
+        Time.zone.now.advance(:days => -20),
+        Time.zone.now.advance(:days => 1)
+      ]
+      create_courses(start_times)
+
+      # updated_at
+      Course.count_by_date.should eql({start_times.first.to_date => 10})
+
+      Course.count_by_date(:column => :start_at).should eql Hash[
+        start_times[0..1].each_with_index.map{ |t, i| [t.to_date, i + 1]}
+      ]
+    end
+  end
+
+  describe "find in batches" do
+    before do
+      c1 = course(:name => 'course1', :active_course => true)
+      c2 = course(:name => 'course2', :active_course => true)
+      u1 = user(:name => 'user1', :active_user => true)
+      u2 = user(:name => 'user2', :active_user => true)
+      u3 = user(:name => 'user3', :active_user => true)
+      @e1 = c1.enroll_student(u1, :enrollment_state => 'active')
+      @e2 = c1.enroll_student(u2, :enrollment_state => 'active')
+      @e3 = c1.enroll_student(u3, :enrollment_state => 'active')
+      @e4 = c2.enroll_student(u1, :enrollment_state => 'active')
+      @e5 = c2.enroll_student(u2, :enrollment_state => 'active')
+      @e6 = c2.enroll_student(u3, :enrollment_state => 'active')
+    end
+
+    it "should find each enrollment from course join" do
+      e = Course.active.joins(:enrollments)
+      all_enrollments = []
+      e.useful_find_each(:batch_size => 2) do |e|
+        all_enrollments << e.id
+      end
+      all_enrollments.length.should == 6
+    end
+
+    it "should find in batches all enrollments from course join" do
+      e = Course.active.select("enrollments.id as eid").joins(:enrollments)
+      all_enrollments = []
+      e.useful_find_in_batches(:batch_size => 2) do |batch|
+        batch.each do |e|
+          all_enrollments << e.eid
+        end
+      end
+      all_enrollments.length.should == 6
+    end
+
+    it "should find each enrollment from course using temp table" do
+      e = Course.active.select("enrollments.id AS e_id").
+                        joins(:enrollments).order("e_id asc")
+      es = []
+      e.find_each_with_temp_table(:batch_size => 2) do |record|
+        es << record["e_id"]
+      end
+      es.length.should == 6
+      es.should == [@e1.id.to_s,@e2.id.to_s,@e3.id.to_s,@e4.id.to_s,@e5.id.to_s,@e6.id.to_s]
+
+    end
+
+    it "should find all enrollments from course join in batches" do
+      e = Course.active.select("enrollments.id AS e_id").
+                        joins(:enrollments).order("e_id asc")
+      batch_size = 2
+      es = []
+      e.find_in_batches_with_temp_table(:batch_size => batch_size) do |batch|
+        batch.size.should == batch_size
+        batch.each do |r|
+          es << r["e_id"]
+        end
+      end
+      es.length.should == 6
+      es.should == [@e1.id.to_s,@e2.id.to_s,@e3.id.to_s,@e4.id.to_s,@e5.id.to_s,@e6.id.to_s]
+    end
+  end
+
   describe "#remove_dropped_columns" do
     before do
       @orig_dropped = ActiveRecord::Base::DROPPED_COLUMNS
@@ -33,6 +142,7 @@ describe ActiveRecord::Base do
     it "should mask columns marked as dropped from column info methods" do
       User.columns.any? { |c| c.name == 'name' }.should be_true
       User.column_names.should be_include('name')
+      u = User.create!(:name => 'my name')
       # if we ever actually drop the name column, this spec will fail on the line
       # above, so it's all good
       ActiveRecord::Base.send(:remove_const, :DROPPED_COLUMNS)
@@ -40,6 +150,10 @@ describe ActiveRecord::Base do
       User.reset_column_information
       User.columns.any? { |c| c.name == 'name' }.should be_false
       User.column_names.should_not be_include('name')
+
+      # load from the db should hide the attribute
+      u = User.find(u.id)
+      u.attributes.keys.include?('name').should be_false
     end
 
     it "should only drop columns from the specific table specified" do
@@ -96,7 +210,7 @@ describe ActiveRecord::Base do
           User.create!
           Submission.create!(:user => @user, :assignment => @assignment)
         end
-      }.should raise_error # we don't catch the error the second time 
+      }.should raise_error(ActiveRecord::Base::UniqueConstraintViolation) # we don't catch the error the second time
       Submission.count.should eql 1
       tries.should eql 2
       User.count.should eql @orig_user_count
@@ -297,7 +411,7 @@ describe ActiveRecord::Base do
   describe "find_ids_in_ranges" do
     it "should return ids from the table in ranges" do
       ids = []
-      10.times { ids << User.create!().id }
+      10.times { ids << User.create!().id.to_s }
       batches = []
       User.find_ids_in_ranges(:batch_size => 4) do |*found_ids|
         batches << found_ids
@@ -305,6 +419,15 @@ describe ActiveRecord::Base do
       batches.should == [ [ids[0], ids[3]],
                           [ids[4], ids[7]],
                           [ids[8], ids[9]] ]
+    end
+
+    it "should work with scopes" do
+      user = User.create!
+      user2 = User.create!
+      user2.destroy
+      User.active.find_ids_in_ranges do |*found_ids|
+        found_ids.should == [user.id.to_s, user.id.to_s]
+      end
     end
   end
 
@@ -357,18 +480,144 @@ describe ActiveRecord::Base do
 
     it "should fail with improper nested hashes" do
       lambda {
-        User.find(:first, :conditions => { :name => { :users => { :id => @user.id }}})
+        User.where(:name => { :users => { :id => @user }}).first
       }.should raise_error(ActiveRecord::StatementInvalid)
     end
 
     it "should fail with dot in nested column name" do
       lambda {
-        User.find(:first, :conditions => { :name => { "users.id" => @user.id }})
+        User.where(:name => { "users.id" => @user }).first
       }.should raise_error(ActiveRecord::StatementInvalid)
     end
 
     it "should not fail with a dot in column name only" do
-      User.find(:first, :conditions => { 'users.id' => @user.id }).should_not be_nil
+      User.where('users.id' => @user).first.should_not be_nil
+    end
+  end
+
+  describe "find_by_asset_string" do
+    it "should enforce type restrictions" do
+      u = User.create!
+      ActiveRecord::Base.find_by_asset_string(u.asset_string).should == u
+      ActiveRecord::Base.find_by_asset_string(u.asset_string, ['User']).should == u
+      ActiveRecord::Base.find_by_asset_string(u.asset_string, ['Course']).should == nil
+    end
+  end
+
+  describe "update_all/delete_all with_joins" do
+    before do
+      pending "MySQL and Postgres only" unless %w{PostgreSQL MySQL Mysql2}.include?(ActiveRecord::Base.connection.adapter_name)
+
+      @u1 = User.create!(:name => 'a')
+      @u2 = User.create!(:name => 'b')
+      @p1 = @u1.pseudonyms.create!(:unique_id => 'pa', :account => Account.default)
+      @p1_2 = @u1.pseudonyms.create!(:unique_id => 'pa2', :account => Account.default)
+      @p2 = @u2.pseudonyms.create!(:unique_id => 'pb', :account => Account.default)
+      @p1_2.destroy
+    end
+
+    it "should do an update all with a join" do
+      Pseudonym.joins(:user).active.where(:users => {:name => 'a'}).update_all(:unique_id => 'pa3')
+      @p1.reload.unique_id.should == 'pa3'
+      @p1_2.reload.unique_id.should == 'pa2'
+      @p2.reload.unique_id.should == 'pb'
+    end
+
+    it "should do a delete all with a join" do
+      Pseudonym.joins(:user).active.where(:users => {:name => 'a'}).delete_all
+      lambda { @p1.reload }.should raise_error(ActiveRecord::RecordNotFound)
+      @u1.reload.should_not be_deleted
+      @p1_2.reload.unique_id.should == 'pa2'
+      @p2.reload.unique_id.should == 'pb'
+    end
+  end
+
+  context "fake arel extensions" do
+    before do
+      @user = User.create!(:name => 'a')
+      @cc = @user.communication_channels.create!(:path => 'nobody@example.com')
+    end
+
+    describe "scoped" do
+      it "should work on models, associations, and scopes" do
+        # all we care is that we can call it with no arguments
+        User.scoped
+        User.scoped.scoped
+        @user.communication_channels.scoped
+      end
+    end
+
+    describe "except" do
+      it "should work on models, associations, and scopes" do
+        User.except(:select).scope(:find, :select).should be_nil
+        User.scoped.select(:id).except(:select).scope(:find, :select).should be_nil
+        @user.communication_channels.except(:select).scope(:find, :select).should be_nil
+      end
+
+      it "should work for :includes (Rails 3 name, Rails 2 name is :include)" do
+        User.includes(:communication_channels).except(:includes).scope(:find, :include).should be_nil
+      end
+    end
+
+    describe "reorder" do
+      it "should work on models, associations, and scopes" do
+        User.reorder(:id).scope(:find, :order).should == 'id'
+        User.scoped.reorder(:id).scope(:find, :order).should == 'id'
+        @user.communication_channels.reorder(:id).scope(:find, :order).should == 'id'
+      end
+
+      it "should discard previous order by options" do
+        User.order(:id).reorder(:name).scope(:find, :order).should == 'name'
+      end
+    end
+
+    describe "uniq" do
+      it "should work on models, associations, and scopes" do
+        User.uniq.scope(:find, :select).should match /DISTINCT/
+        User.scoped.uniq.scope(:find, :select).should match /DISTINCT/
+        @user.communication_channels.uniq.scope(:find, :select).should match /DISTINCT/
+      end
+
+      it "should un-unique" do
+        User.uniq.uniq(false).scope(:find, :select).should_not match /DISTINCT/
+      end
+
+      it "should un-unique custom DISTINCT" do
+        select = User.select('DISTINCT id').uniq(false).scope(:find, :select)
+        select.should_not be_nil
+        select.should_not match /DISTINCT/
+        select.should match /id/
+      end
+    end
+
+    describe "select" do
+      it "should work on models, associations, and scopes" do
+        User.select(:id).scope(:find, :select).should == 'id'
+        User.scoped.select(:id).scope(:find, :select).should == 'id'
+        @user.communication_channels.select(:id).scope(:find, :select).should == 'id'
+      end
+    end
+
+    describe "pluck" do
+      it "should work on models, associations, and scopes" do
+        User.pluck(:id).should == [@user.id]
+        User.scoped.pluck(:id).should == [@user.id]
+        @user.communication_channels.pluck(:id).should == [@cc.id]
+      end
+    end
+
+    describe "scope chaining" do
+      it "should merge select" do
+        User.select(:id).select(:name).scope(:find, :select).should == 'id, name'
+      end
+
+      it "should merge order" do
+        User.order(:id).order(:name).scope(:find, :order).should == 'id, name'
+      end
+
+      it "should merge group" do
+        User.group(:id).group(:name).scope(:find, :group).should == 'id, name'
+      end
     end
   end
 end

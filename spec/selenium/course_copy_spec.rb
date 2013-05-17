@@ -25,8 +25,8 @@ describe "course copy" do
     select_box = f('#copy_from_course')
     select_box.find_elements(:css, 'optgroup').length.should == 2
     optgroups = select_box.find_elements(:css, 'optgroup')
-    optgroups.map { |og| og.attribute('label') }.sort.should eql ["Default Term", "Test Term"]
-    optgroups.map { |og| og.find_elements(:css, 'option').length }.should eql [1, 1]
+    optgroups.map { |og| og.attribute('label') }.sort.should == ["Default Term", "Test Term"]
+    optgroups.map { |og| og.find_elements(:css, 'option').length }.should == [1, 1]
 
     click_option('#copy_from_course', 'second course')
     f('button[type="submit"]').click
@@ -44,6 +44,12 @@ describe "course copy" do
     @course.reload
   end
 
+  def validate_course_main_page
+    header = f('#section-tabs-header')
+    header.should be_displayed
+    header.text.should == @course.course_code
+  end
+
   def upload_helper(import_quiz = false)
     if import_quiz
       expect_new_page_load { fj('.content-imports-instructions a:last').click }
@@ -57,13 +63,18 @@ describe "course copy" do
       f('#zip_file').send_keys(fullpath)
       submit_form('#zip_file_import_form')
       keep_trying_until { Delayed::Job.count > 0 }
-      Delayed::Job.last.invoke_job
-      back_button = keep_trying_until do
-        back_button = f('.back_to_course')
-        back_button.should_not be_nil
-        back_button
+      expect_new_page_load { Delayed::Job.last.invoke_job }
+      if defined?(QTI) != nil && QTI.qti_enabled?
+        back_button = keep_trying_until do
+          back_button = f('.back_to_course')
+          back_button.should_not be_nil
+          back_button
+          expect_new_page_load { back_button.click }
+        end
+        validate_course_main_page
+      else
+        validate_course_main_page
       end
-      expect_new_page_load { back_button.click }
       folder = Folder.root_folders(@course).first
       folder.attachments.active.map(&:display_name).should == ["first_entry.txt"]
       folder.sub_folders.active.count.should == 1
@@ -73,7 +84,7 @@ describe "course copy" do
     end
   end
 
-  describe "course copy (through course 'copying')" do
+  describe "course copy through course copying" do
     it "should copy the course" do
       course_with_admin_logged_in
       @course.syllabus_body = "<p>haha</p>"
@@ -100,6 +111,7 @@ describe "course copy" do
     end
 
     it "should copy the course with different settings" do
+      pending("killing thread with intermittent failures")
       enable_cache do
         course_with_admin_logged_in
         5.times { |i| @course.wiki.wiki_pages.create!(:title => "hi #{i}", :body => "Whatever #{i}") }
@@ -117,7 +129,7 @@ describe "course copy" do
 
         @new_course = Course.last
         get "/courses/#{@new_course.id}"
-        f("#no_topics_message").should include_text("No Recent Messages")
+        f(".no-recent-messages").should include_text("No Recent Messages")
         @new_course.wiki.wiki_pages.count.should == 5
       end
     end
@@ -128,11 +140,9 @@ describe "course copy" do
       get "/courses/#{@course.id}/copy"
 
       name = f('#course_name')
-      name.clear
-      name.send_keys("course name of testing")
+      replace_content(name, "course name of testing")
       name = f('#course_course_code')
-      name.clear
-      name.send_keys("course code of testing")
+      replace_content(name, "course code of testing")
 
       expect_new_page_load { f('button[type="submit"]').click }
       submit_form('#copy_context_form')
@@ -144,7 +154,7 @@ describe "course copy" do
     end
   end
 
-  describe "course copy (through course 'importing')" do
+  describe "course copy through course importing" do
     it "should copy course content" do
       course_copy_helper
       @course.wiki.wiki_pages.count.should == 5
@@ -206,7 +216,6 @@ describe "course copy" do
 
     it "should not copy course settings if not checked" do
       @second_course = Course.create!(:name => 'second course')
-      @second_course.syllabus_body = "<p>haha</p>"
       @second_course.tab_configuration = [{"id" => 0}, {"id" => 14}, {"id" => 8}, {"id" => 5}, {"id" => 6}, {"id" => 2}, {"id" => 3, "hidden" => true}]
       @second_course.default_view = 'modules'
 
@@ -215,9 +224,20 @@ describe "course copy" do
         wait_for_ajaximations
       end
 
-      @course.syllabus_body.should == nil
       @course.tab_configuration.should == []
       @course.default_view.should == 'feed'
+    end
+
+    it "should not copy syllabus body if not selected" do
+      @second_course = Course.create!(:name => 'second course')
+      @second_course.syllabus_body = "<p>haha</p>"
+
+      course_copy_helper do
+        f('#copy_everything').click
+        wait_for_ajaximations
+      end
+
+      @course.syllabus_body.should == nil
     end
 
     it "should correctly copy content from a completed course" do
@@ -264,7 +284,7 @@ describe "course copy" do
 
   describe "course file imports" do
     before (:each) do
-      course_with_teacher_logged_in
+      course_with_teacher_logged_in(:course_code => 'first files course')
       @second_course = Course.create!(:name => 'second files course')
       @second_course.offer!
       @second_course.enroll_teacher(@user).accept!

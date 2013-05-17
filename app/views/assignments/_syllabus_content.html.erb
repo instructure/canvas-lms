@@ -1,3 +1,4 @@
+<% js_env :CAN_READ => can_do(@context, @current_user, :read) %>
 <% @active_tab = "syllabus" %>
 <% course_home ||= false %>
 <% if !course_home %>
@@ -8,7 +9,7 @@
   <div style="margin-top: -5px; margin-bottom: 10px;"><a href="#" class="jump_to_today_link"><%= t 'links.jump_to_today', "Jump to Today" %></a></div>
 <% end %>
 <div id="course_syllabus" style="margin-bottom: 10px;" class="user_content">
-  <%= user_content(@context.syllabus_body) %>
+  <%= user_content(@syllabus_body) %>
 </div>
 <div id="course_syllabus_details" style="<%= hidden unless can_do(@context, @current_user, :manage_content) && (!@context.syllabus_body || @context.syllabus_body.strip.empty?) %>">
   <%= mt 'instructions.syllabus', <<-DOC
@@ -25,30 +26,32 @@ DOC
   <%= f.blabel :syllabus_body, :en => "Syllabus Description" %>
   <div class="clear"></div>
   <%= f.text_area :syllabus_body, :style => "width: 100%; height: 300px;", :id => "course_syllabus_body" %>
-  <div class='button-container'>
-    <button type="submit" class='button'><%= t 'buttons.update_syllabus', "Update Syllabus" %></button>
-    <button type="button" class="button-secondary cancel_button"><%= t '#buttons.cancel', "Cancel" %></button>
+  <div class='form-actions'>
+    <button type="button" class="btn cancel_button"><%= t '#buttons.cancel', "Cancel" %></button>
+    <button type="submit" class='btn btn-primary'><%= t 'buttons.update_syllabus', "Update Syllabus" %></button>
   </div>
 <% end %>
-<table id="syllabus">
-  <thead>
-    <tr>
-      <th scope="col" style="width: 10%;"><%= t 'headers.date', "Date" %></th>
-      <th scope="col" style="width: 10%;"><%= t 'headers.day', "Day" %></th>
-      <th scope="col" style="width: 80%;">
-      <div style="float: right;"></div>
-      <%= t 'headers.details', "Details" %>
-      </th>
-    </tr>
-  </thead>
-  <tbody>
-    <% today = Time.zone.today
-      @dates.each do |d| %>
-      <% events = @events.select{|e| e.start_at != nil && e.start_at.to_date == d}.sort_by{ |e| [e.start_at, e.title] } %>
-      <%= render :partial => "assignments/syllabus_row", :object => events, :locals => {:date => d, :date_passed => (d < today)} %>
-    <% end %>
-    <% if @undated_events && !@undated_events.empty? %>
-      <%= render :partial => "assignments/syllabus_row", :object => @undated_events.sort_by{|e| e.title } %>
-    <% end %>
-  </tbody>
-</table>
+<div id="syllabusContainer">
+  <div id="syllabus_links">
+    <a id="toggle_special_dates_in_syllabus">&nbsp;</a>
+  </div>
+  <table id="syllabus">
+    <thead>
+      <tr>
+        <th scope="col" style="width: 10%;"><%= t 'headers.date', "Date" %></th>
+        <th scope="col" style="width: 10%;"><%= t 'headers.day', "Day" %></th>
+        <th scope="col" style="width: 80%;">
+        <div style="float: right;"></div>
+        <%= t 'headers.details', "Details" %>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td scope="row">
+          <span id="loading_indicator"/>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

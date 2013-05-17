@@ -10,7 +10,7 @@ describe "managing developer keys" do
 
   it "should allow creating, editing and deleting a developer key" do
     get '/developer_keys'
-    keep_trying_until { f("#loading").attribute('class') != 'loading' }
+    wait_for_ajaximations
     ff("#keys tbody tr").length.should == 0
 
     f(".add_key").click
@@ -81,6 +81,7 @@ describe "managing developer keys" do
     ff("#keys tbody tr").length.should == 10
     f('#loading').should have_class('show_more')
     f("#loading .show_all").click
+    wait_for_ajaximations
     keep_trying_until do
       f("#loading").should_not have_class('loading')
       true

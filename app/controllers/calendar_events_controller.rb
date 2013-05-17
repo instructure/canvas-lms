@@ -31,12 +31,13 @@ class CalendarEventsController < ApplicationController
       return
     end
     if authorized_action(@event, @current_user, :read)
-      if @domain_root_account.enable_scheduler? # no read-only view for calendar2
-        return redirect_to calendar_url_for(@event.effective_context, :event => @event) unless @event.grants_right?(@current_user, session, :update)
+      # If param specifies to open event on calendar, redirect to view
+      if params[:calendar] == '1'
+        return redirect_to calendar_url_for(@event.effective_context, :event => @event)
       end
       log_asset_access(@event, "calendar", "calendar")
       respond_to do |format|
-        format.html { render :action => 'new' }
+        format.html
         format.json { render :json => @event.to_json(:permissions => {:user => @current_user, :session => session}) }
       end
     end

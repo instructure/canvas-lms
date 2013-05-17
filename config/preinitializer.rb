@@ -11,10 +11,10 @@ if Gem::Version.new(Bundler::VERSION) <= Gem::Version.new("1.0.0")
 end
 
 begin
+  Encoding.default_external = 'utf-8' if defined?(Encoding)
   # Set up load paths for all bundled gems
-  ENV["BUNDLE_GEMFILE"] = File.expand_path("../../Gemfile", __FILE__)
+  ENV["BUNDLE_GEMFILE"] ||= File.expand_path("../../Gemfile", __FILE__)
   Bundler.setup
-  Encoding.default_internal = Encoding.default_external = 'UTF-8' if defined?(Encoding)
 rescue Bundler::GemNotFound
   raise RuntimeError, "Bundler couldn't find some gems." +
     "Did you run `bundle install`?"

@@ -1,7 +1,7 @@
-/*
+/*!
  * jQuery UI Progressbar @VERSION
  *
- * Copyright 2011, AUTHORS.txt (http://jqueryui.com/about)
+ * Copyright 2012, AUTHORS.txt (http://jqueryui.com/about)
  * Dual licensed under the MIT or GPL Version 2 licenses.
  * http://jquery.org/license
  *
@@ -12,12 +12,13 @@
  *   jquery.ui.widget.js
  */
 define([
-	'jquery',
-	'jqueryui/core',
-	'jqueryui/widget'
-], function( $, _core, _widget, undefined ) {
+  'jquery',
+  'jqueryui/core',
+  'jqueryui/widget'
+], function( $ ) {
 
 $.widget( "ui.progressbar", {
+	version: "@VERSION",
 	options: {
 		value: 0,
 		max: 100
@@ -42,7 +43,7 @@ $.widget( "ui.progressbar", {
 		this._refreshValue();
 	},
 
-	destroy: function() {
+	_destroy: function() {
 		this.element
 			.removeClass( "ui-progressbar ui-widget ui-widget-content ui-corner-all" )
 			.removeAttr( "role" )
@@ -51,8 +52,6 @@ $.widget( "ui.progressbar", {
 			.removeAttr( "aria-valuenow" );
 
 		this.valueDiv.remove();
-
-		$.Widget.prototype.destroy.apply( this, arguments );
 	},
 
 	value: function( newValue ) {
@@ -73,7 +72,7 @@ $.widget( "ui.progressbar", {
 			}
 		}
 
-		$.Widget.prototype._setOption.apply( this, arguments );
+		this._super( key, value );
 	},
 
 	_value: function() {
@@ -90,8 +89,8 @@ $.widget( "ui.progressbar", {
 	},
 
 	_refreshValue: function() {
-		var value = this.value();
-		var percentage = this._percentage();
+		var value = this.value(),
+			percentage = this._percentage();
 
 		if ( this.oldValue !== value ) {
 			this.oldValue = value;
@@ -104,10 +103,6 @@ $.widget( "ui.progressbar", {
 			.width( percentage.toFixed(0) + "%" );
 		this.element.attr( "aria-valuenow", value );
 	}
-});
-
-$.extend( $.ui.progressbar, {
-	version: "@VERSION"
 });
 
 });

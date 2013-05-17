@@ -23,7 +23,6 @@ class EportfoliosController < ApplicationController
   
   def index
     user_index
-    # @portfolios = Eportfolio.find_all_by_public(true)
   end
   
   def user_index
@@ -32,7 +31,7 @@ class EportfoliosController < ApplicationController
     @active_tab = "eportfolios"
     add_crumb(@current_user.short_name, user_profile_url(@current_user))
     add_crumb(t(:crumb, "ePortfolios"))
-    @portfolios = @current_user.eportfolios.active.find(:all, :order => :updated_at)
+    @portfolios = @current_user.eportfolios.active.order(:updated_at).all
     render :action => 'user_index'
   end
   
@@ -77,6 +76,8 @@ class EportfoliosController < ApplicationController
       end
       @show_left_side = true
       eportfolio_page_attributes
+      js_env :folder_id => Folder.unfiled_folder(@current_user).id,
+             :context_code => @current_user.asset_string
       render :template => "eportfolios/show"
     end
   end
@@ -188,7 +189,7 @@ class EportfoliosController < ApplicationController
   def public_feed
     @portfolio = Eportfolio.find(params[:eportfolio_id])
     if @portfolio.public || params[:verifier] == @portfolio.uuid
-      @entries = @portfolio.eportfolio_entries.find(:all, :order => 'eportfolio_entries.created_at DESC')
+      @entries = @portfolio.eportfolio_entries.order('eportfolio_entries.created_at DESC').all
       feed = Atom::Feed.new do |f|
         f.title = t(:title, "%{portfolio_name} Feed", :portfolio_name => @portfolio.name)
         f.links << Atom::Link.new(:href => eportfolio_url(@portfolio.id), :rel => 'self')

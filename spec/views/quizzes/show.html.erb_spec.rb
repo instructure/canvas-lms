@@ -50,5 +50,14 @@ describe "/quizzes/show" do
     response.should have_tag ".muted-notice"
     true
   end
+
+  it "should warn students if quiz is unpublished" do
+    course_with_student_logged_in(:active_all => true)
+    quiz = @course.quizzes.create!
+    assigns[:quiz] = quiz
+    view_context
+    render "quizzes/show"
+    response.should have_tag ".unpublished_warning"
+  end
 end
 

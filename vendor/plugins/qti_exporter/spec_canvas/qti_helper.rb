@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../../../spec/spec_helper')
 
 unless defined? BASE_FIXTURE_DIR
-  BASE_FIXTURE_DIR = File.dirname(__FILE__) + '/fixtures/'
+  BASE_FIXTURE_DIR = File.expand_path(File.dirname(__FILE__)) + '/fixtures/'
   CANVAS_FIXTURE_DIR = BASE_FIXTURE_DIR + 'canvas/'
   VISTA_FIXTURE_DIR = BASE_FIXTURE_DIR + 'bb_vista/'
   BB8_FIXTURE_DIR = BASE_FIXTURE_DIR + 'bb8/'

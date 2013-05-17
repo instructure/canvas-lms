@@ -116,7 +116,7 @@ module DataFixup::PopulateConversationRootAccountIds
           SQL
     
           # any w/ multiple accounts will have to be reordered in ruby
-          Conversation.find_each(:conditions => Conversation.wildcard(:root_account_ids, ',')) do |c|
+          Conversation.where(Conversation.wildcard(:root_account_ids, ',')).find_each do |c|
             c.root_account_ids = c.root_account_ids # does a reorder
             c.save if c.root_account_ids_changed?
           end

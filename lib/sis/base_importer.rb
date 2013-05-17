@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require_dependency 'sis/common'
+
 module SIS
   class BaseImporter
     def initialize(root_account, opts)

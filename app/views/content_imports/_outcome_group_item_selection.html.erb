@@ -1,0 +1,16 @@
+<% group.child_outcome_links.each do |item| %>
+  <li>
+    <% item = item.content %>
+    <%= check_box "copy[learning_outcomes]", mig_id(item), :class => "select_parents" %>
+    <%= label "copy[learning_outcomes]", mig_id(item), item.short_description %>
+    <% if item.context_type != 'Course' || item.context_id != @source_course.id %>
+      <%= t('external_outcome', '(external)') %>
+    <% end %>
+  </li>
+<% end %>
+<% group.child_outcome_groups.each do |item| %>
+  <h4><%= check_box "copy[learning_outcome_groups]", mig_id(item), :class => "copy_all select_parents" %><%= label "copy[learning_outcome_groups]", mig_id(item), item.title %></h4>
+  <ul class="unstyled_list asset_list">
+    <%= render :partial => 'outcome_group_item_selection', :locals => {:group => item}  %>
+  </ul>
+<% end %>

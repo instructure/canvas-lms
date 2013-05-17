@@ -32,3 +32,4 @@ describe "acts_as_list" do
     end
   end
 end
+

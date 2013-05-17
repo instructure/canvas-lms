@@ -1,12 +1,10 @@
-
-
 body, html
   height: 100%
 body
   background-image: url("/images/blue/bg.jpg")
   min-width: $min_main_width
 
-  &.no-headers
+  &.no-headers, &.embedded
     #header, #topbar, #left-side, #breadcrumbs
       display: none !important
     #footer
@@ -21,6 +19,46 @@ body
       box-shadow: none
     #content
       padding-top: 0
+  
+  &.embedded
+    #wrapper-container, #wrapper, #main
+      height: 100%
+    #main
+      min-height: 0
+    #content
+      padding: 1em
+    h2
+      @include ui-widget-header-bg-and-text
+      font-size: 14px
+      font-weight: bold
+      margin: -0.95em -0.95em 1em
+      padding: 0.4em 1em
+      line-height: 20px
+    &.no-headers
+      h2
+        display: none
+    .embedded-footer
+      position: absolute
+      bottom: 0
+      width: 100%
+      padding: 14px 0 15px
+      margin: 0 -1em !important
+      background-color: #EFEFEF
+      border-top: 1px solid #DDD
+      box-shadow: inset 0 1px 0 white
+      text-align: right
+      .footer-info
+        position: absolute
+        left: 1em
+        top: 1.5em
+      .controls
+        margin-left: 15px
+        margin-right: 15px
+    #modal-box
+      background: #fff !important
+      color: #333 !important
+      height: auto !important
+    background: #fff
 
 // so we don't get the non-interactionable content
 .scripts-not-loaded
@@ -36,7 +74,7 @@ body
 #main
   position: relative
   z-index: 10
-  background-color: $main_background_color
+  background-color: $bodyBackground
   border: 1px solid $listBorderColor
   border-top: 0
   margin-bottom: 40px
@@ -90,6 +128,16 @@ body
     max-width: none
 
 
+// This hides stuff till the javascript has done it's stuff
+.hide-content-while-scripts-not-loaded
+  #content, #right-side-wrapper
+    +single-transition(opacity, 0.3s)
+    +opacity(1)
+.scripts-not-loaded
+  #content, #right-side-wrapper
+    +opacity(0)
+
+
 // **********************************************************************************
 // end classes applied to body
 
@@ -109,17 +157,18 @@ body
       line-height: 29px
       padding-left: 12px
       margin-left: 8px
-      background: url(/images/breadcrumb-chevron.png) left 50% no-repeat
+      @include bg-image(breadcrumb-chevron, png, no-repeat, 0, 50%, transparent, 5px, 9px)
       &:first-child
         background: none
         padding-left: 0
         margin-left: 0
     .home a
-      background: url(/images/breadcrumb-home.png) no-repeat left 50%
-      display: block
-      width: 10px
-      height: 26px
-      text-indent: -999px
+      color: #ccc
+      i
+        margin-right: -5px
+        vertical-align: text-bottom
+        &:before
+          font-size: 12px
 
   .ellipsis
     display: inline-block
@@ -137,8 +186,8 @@ body
   a
     border-left: 1px solid #5C5C5C
     color: #5C5C5C
-    margin-right: 0.4em
-    padding-left: 0.4em
+    padding-right: 2px
+    padding-left: 5px
     &:hover, &:focus
       text-decoration: underline
     // ie7 supports :first-child so this will work on everything we support.

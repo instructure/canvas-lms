@@ -2,7 +2,10 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/conversations_common
 
 describe "conversations" do
   it_should_behave_like "in-process server selenium tests"
-  it_should_behave_like "conversations selenium tests"
+
+  before (:each) do
+    conversation_setup
+  end
 
   it "should not allow double form submissions" do
     new_message = 'new conversation message'
@@ -12,9 +15,9 @@ describe "conversations" do
     add_recipient("student1")
 
     expect {
-      f('#body').send_keys(new_message)
-      5.times { submit_form('#create_message_form') }
-      keep_trying_until { get_conversations.size == 1 }
+      f('#create_message_form .conversation_body').send_keys(new_message)
+      5.times { submit_form('#create_message_form form') rescue nil }
+      assert_message_status("sent", new_message[0, 10])
     }.to change(ConversationMessage, :count).by(1)
   end
 
@@ -29,18 +32,30 @@ describe "conversations" do
       @me = @user
       5.times { conversation(@me, user, :workflow_state => 'unread') }
       get "/conversations/unread"
-      c = get_conversations.first
-      c.click
-      c.should have_class('unread') # not marked immediately
-      @me.conversations.unread.size.should eql 5
+      ce = get_conversations.first
+      ce.should have_class('unread') # not marked immediately
+      ce.click
+      wait_for_ajaximations
+      @me.conversations.unread.size.should == 5
       keep_trying_until do
         get_conversations.first.should_not have_class('unread')
         true
       end
-      @me.conversations.unread.size.should eql 4
+      @me.conversations.unread.size.should == 4
 
       get_conversations.last.click
-      get_conversations.size.should eql 4 # removed once deselected
+      get_conversations.size.should == 4 # removed once deselected
+    end
+
+    it "should not open the conversation when the gear menu is clicked" do
+      create_conversation
+      wait_for_ajaximations
+      f('.al-options').should_not be_displayed
+      driver.execute_script "$('.admin-link-hover-area').addClass('active')"
+      f('.admin-links button').click
+      wait_for_ajaximations
+      f('.al-options').should be_displayed
+      f('.messages').should_not be_displayed
     end
 
     it "should star a conversation" do
@@ -74,21 +89,24 @@ describe "conversations" do
 
     it "should delete a conversation" do
       create_conversation
+      wait_for_ajaximations
+      driver.execute_script "$('.admin-link-hover-area').addClass('active')"
 
-      driver.execute_script("$('.actions').addClass('selected')")
-      f('.actions a').click
-      f('#action_delete_all').click
+      f('.admin-links button').click
+      f('.al-options .action_delete_all').click
       driver.switch_to.alert.accept
       wait_for_ajaximations
+
       f('#no_messages').should be_displayed
     end
 
     it "should archive a conversation" do
       create_conversation
 
-      driver.execute_script("$('.actions').addClass('selected')")
-      f('.actions a').click
-      f('#action_archive').click
+      wait_for_ajaximations
+      driver.execute_script("$('.admin-link-hover-area').addClass('active')")
+      f('.admin-links button').click
+      f('.al-options .action_archive').click
       wait_for_ajaximations
       f('#no_messages').should be_displayed
       expect_new_page_load { get '/conversations/archived' }
@@ -120,9 +138,10 @@ describe "conversations" do
       wait_for_ajaximations
       f('.selectable').click
       f('#forward_body').send_keys(forward_body_text)
-      f('.btn-primary').click
+      f('.ui-dialog-buttonset > .btn-primary').click
       wait_for_ajaximations
-      f('.messages .message').should include_text(forward_body_text)
+      expect_new_page_load { get '/conversations/sent' }
+      f('.conversations li.read').should include_text(forward_body_text)
     end
 
     it "should delete a message" do
@@ -156,7 +175,7 @@ describe "conversations" do
           true
         end
         get '/conversations'
-        f('.unread-messages-count').text.should eql '4'
+        f('.unread-messages-count').text.should == '4'
       end
     end
   end
@@ -175,13 +194,16 @@ describe "conversations" do
         mo.title = "test title"
         mo.save!
 
-        new_conversation
+        new_conversation(:message => media_comment_type)
 
         message = submit_message_form(:media_comment => [mo.media_id, mo.media_type])
-        message = "#message_#{message.id}"
 
-        ffj("#{message} .message_attachments li").size.should == 1
-        fj("#{message} .message_attachments li a .title").text.should == mo.title
+        expect_new_page_load { get '/conversations/sent' }
+        f('.conversations li').click
+        wait_for_ajaximations
+        message = "#message_#{message.id}"
+        ff("#{message} .message_attachments li").size.should == 1
+        f("#{message} .message_attachments li a .title").text.should == mo.title
       end
     end
   end
@@ -240,7 +262,7 @@ describe "conversations" do
       new_conversation
       add_recipient("student1")
 
-      submit_message_form(:message => "ohai", :add_recipient => false).should_not be_nil
+      submit_message_form(:message => "ohai", :add_recipient => false, :existing_conversation => true).should_not be_nil
     end
   end
 
@@ -257,15 +279,44 @@ describe "conversations" do
 
       add_recipient("student1")
       add_recipient("student2")
-      f("#body").send_keys "testing testing"
+      f("#create_message_form .conversation_body").send_keys "testing testing"
       submit_form('#create_message_form')
 
       wait_for_ajaximations
 
-      assert_flash_notice_message /Messages Sent/
+      assert_message_status "sending"
+      run_jobs
+      assert_message_status "sent"
 
       # no conversations should show up in the conversation list
       get_conversations(false).should be_empty
+    end
+  end
+
+  context "bulk popovers" do
+    before (:each) do
+      @number_of_people = 10
+      @conversation_students = []
+      @number_of_people.times do |i|
+        u = User.create!(:name => "conversation student #{i}")
+        @course.enroll_user(u, "StudentEnrollment").accept!
+        @conversation_students << u
+      end
+    end
+
+    it "should validate the others popover" do
+      new_conversation
+      @conversation_students.each { |student| add_recipient(student.name) }
+      f("#create_message_form .conversation_body").send_keys "testing testing"
+      f('.group_conversation').click
+      submit_form('#create_message_form')
+      wait_for_ajaximations
+      run_jobs
+      expect_new_page_load { get "/conversations/sent" }
+      wait_for_ajaximations
+      f('.others').click
+      f('#others_popup').should be_displayed
+      ff('#others_popup li').count.should == (@conversation_students.count - 2) # - 2 because the first 2 show up in the conversation summary
     end
   end
 end

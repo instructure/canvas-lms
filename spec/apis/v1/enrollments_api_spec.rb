@@ -53,11 +53,14 @@ describe EnrollmentsApiController, :type => :integration do
           'enrollment_state'                   => 'active',
           'course_id'                          => @course.id,
           'type'                               => 'StudentEnrollment',
+          'role'                               => 'StudentEnrollment',
           'html_url'                           => course_user_url(@course, @unenrolled_user),
           'grades'                             => {
             'html_url' => course_student_grades_url(@course, @unenrolled_user),
             'final_score' => nil,
-            'current_score' => nil
+            'current_score' => nil,
+            'final_grade' => nil,
+            'current_grade' => nil,
           },
           'associated_user_id'                 => nil,
           'updated_at'                         => new_enrollment.updated_at.xmlschema
@@ -159,6 +162,12 @@ describe EnrollmentsApiController, :type => :integration do
         JSON.parse(response.body)['message'].should eql 'Invalid type'
       end
 
+      it "should enroll a designer" do
+        json = api_call :post, @path, @path_options, { :enrollment => { :user_id => @unenrolled_user.id, :type => 'DesignerEnrollment' } }
+        json['type'].should eql 'DesignerEnrollment'
+        @unenrolled_user.enrollments.find(json['id']).should be_an_instance_of(DesignerEnrollment)
+      end
+
       it "should return an error if no user_id is given" do
         raw_api_call :post, @path, @path_options, { :enrollment => { :type => 'StudentEnrollment' } }
         response.code.should eql '403'
@@ -183,6 +192,157 @@ describe EnrollmentsApiController, :type => :integration do
             :user_id                            => @unenrolled_user.id,
             :enrollment_state                   => 'active',
             :notify                             => false }})
+      end
+
+      it "should not allow enrollments to be added to a hard-concluded course" do
+        @course.complete
+        raw_api_call :post, @path, @path_options, {
+          :enrollment => {
+            :user_id                            => @unenrolled_user.id,
+            :type                               => 'StudentEnrollment',
+            :enrollment_state                   => 'active',
+            :course_section_id                  => @section.id,
+            :limit_privileges_to_course_section => true
+          }
+        }
+
+        JSON.parse(response.body)['message'].should eql 'Can\'t add an enrollment to a concluded course.'
+      end
+
+      it "should not allow enrollments to be added to a soft-concluded course" do
+        @course.conclude_at = 1.day.ago
+        @course.restrict_enrollments_to_course_dates = true
+        @course.save!
+        raw_api_call :post, @path, @path_options, {
+            :enrollment => {
+                :user_id                            => @unenrolled_user.id,
+                :type                               => 'StudentEnrollment',
+                :enrollment_state                   => 'active',
+                :course_section_id                  => @section.id,
+                :limit_privileges_to_course_section => true
+            }
+        }
+
+        JSON.parse(response.body)['message'].should eql 'Can\'t add an enrollment to a concluded course.'
+      end
+
+      context "custom course-level roles" do
+        before :each do
+          @course_role = @course.root_account.roles.build(:name => 'newrole')
+          @course_role.base_role_type = 'TeacherEnrollment'
+          @course_role.save!
+        end
+
+        it "should set role_name and type for a new enrollment if role is specified" do
+          json = api_call :post, @path, @path_options,
+          {
+              :enrollment => {
+                  :user_id => @unenrolled_user.id,
+                  :role    => 'newrole',
+                  :enrollment_state => 'active',
+                  :course_section_id => @section.id,
+                  :limit_privileges_to_course_section => true
+              }
+          }
+          Enrollment.find(json['id']).should be_an_instance_of TeacherEnrollment
+          Enrollment.find(json['id']).role_name.should == 'newrole'
+          json['role'].should == 'newrole'
+        end
+
+        it "should return an error if type is specified but does not the role's base_role_type" do
+          json = api_call :post, @path, @path_options, {
+              :enrollment => {
+                  :user_id                            => @unenrolled_user.id,
+                  :role                               => 'newrole',
+                  :type                               => 'StudentEnrollment',
+                  :enrollment_state                   => 'active',
+                  :course_section_id                  => @section.id,
+                  :limit_privileges_to_course_section => true
+              }
+          }, {}, :expected_status => 403
+          json['message'].should eql 'The specified type must match the base type for the role'
+        end
+
+        it "should return an error if role is specified but is invalid" do
+          json = api_call :post, @path, @path_options, {
+              :enrollment => {
+                  :user_id                            => @unenrolled_user.id,
+                  :role                               => 'badrole',
+                  :enrollment_state                   => 'active',
+                  :course_section_id                  => @section.id,
+                  :limit_privileges_to_course_section => true
+              }
+          }, {}, :expected_status => 403
+          json['message'].should eql 'Invalid role'
+        end
+
+        it "should return an error if role is specified but is inactive" do
+          @course_role.deactivate
+          json = api_call :post, @path, @path_options, {
+              :enrollment => {
+                  :user_id                            => @unenrolled_user.id,
+                  :role                               => 'newrole',
+                  :enrollment_state                   => 'active',
+                  :course_section_id                  => @section.id,
+                  :limit_privileges_to_course_section => true
+              }
+          }, {}, :expected_status => 403
+          json['message'].should eql 'Cannot create an enrollment with this role because it is inactive.'
+        end
+
+        it "should return a suitable error if role is specified but is deleted" do
+          @course_role.destroy
+          json = api_call :post, @path, @path_options, {
+              :enrollment => {
+                  :user_id                            => @unenrolled_user.id,
+                  :role                               => 'newrole',
+                  :enrollment_state                   => 'active',
+                  :course_section_id                  => @section.id,
+                  :limit_privileges_to_course_section => true
+              }
+          }, {}, :expected_status => 403
+          json['message'].should eql 'Invalid role'
+        end
+
+        it "should accept base roles in the role parameter" do
+          json = api_call :post, @path, @path_options,
+              {
+                  :enrollment => {
+                      :user_id => @unenrolled_user.id,
+                      :role => 'ObserverEnrollment',
+                      :enrollment_state => 'active',
+                      :course_section_id => @section.id,
+                      :limit_privileges_to_course_section => true
+                  }
+              }
+          Enrollment.find(json['id']).should be_an_instance_of ObserverEnrollment
+        end
+
+        it "should derive roles from parent accounts" do
+          sub_account = Account.create!(:name => 'sub', :parent_account => @course.account)
+          course(:account => sub_account)
+
+          @course.account.roles.active.find_by_name('newrole').should be_nil
+          @course.account.get_course_role('newrole').should_not be_nil
+
+          @path = "/api/v1/courses/#{@course.id}/enrollments"
+          @path_options = { :controller => 'enrollments_api', :action => 'create', :format => 'json', :course_id => @course.id.to_s }
+          @section = @course.course_sections.create!
+
+          json = api_call :post, @path, @path_options,
+          {
+              :enrollment => {
+                  :user_id => @unenrolled_user.id,
+                  :role    => 'newrole',
+                  :enrollment_state => 'active',
+                  :course_section_id => @section.id,
+                  :limit_privileges_to_course_section => true
+              }
+          }
+          Enrollment.find(json['id']).should be_an_instance_of TeacherEnrollment
+          Enrollment.find(json['id']).role_name.should == 'newrole'
+          json['role'].should == 'newrole'
+        end
       end
     end
 
@@ -220,11 +380,14 @@ describe EnrollmentsApiController, :type => :integration do
           'enrollment_state'                   => 'active',
           'course_id'                          => @course.id,
           'type'                               => 'StudentEnrollment',
+          'role'                               => 'StudentEnrollment',
           'html_url'                           => course_user_url(@course, @unenrolled_user),
           'grades'                             => {
             'html_url' => course_student_grades_url(@course, @unenrolled_user),
             'final_score' => nil,
-            'current_score' => nil
+            'current_score' => nil,
+            'final_grade' => nil,
+            'current_grade' => nil,
           },
           'associated_user_id'                 => nil,
           'updated_at'                         => new_enrollment.updated_at.xmlschema
@@ -293,7 +456,7 @@ describe EnrollmentsApiController, :type => :integration do
 
       it "should list all of a user's enrollments in an account" do
         json = api_call(:get, @user_path, @user_params)
-        enrollments = @student.current_enrollments.scoped(:include => :user, :order => 'users.sortable_name ASC')
+        enrollments = @student.current_enrollments.includes(:user).order("users.sortable_name ASC")
         json.should == enrollments.map { |e|
           {
             'root_account_id' => e.root_account_id,
@@ -302,6 +465,7 @@ describe EnrollmentsApiController, :type => :integration do
             'id' => e.id,
             'user_id' => e.user_id,
             'type' => e.type,
+            'role' => e.role,
             'course_section_id' => e.course_section_id,
             'course_id' => e.course_id,
             'user' => {
@@ -315,7 +479,9 @@ describe EnrollmentsApiController, :type => :integration do
             'grades' => {
               'html_url' => course_student_grades_url(e.course_id, e.user_id),
               'final_score' => nil,
-              'current_score' => nil
+              'current_score' => nil,
+              'final_grade' => nil,
+              'current_grade' => nil,
             },
             'associated_user_id' => nil,
             'updated_at' => e.updated_at.xmlschema
@@ -361,6 +527,73 @@ describe EnrollmentsApiController, :type => :integration do
         json.length.should eql 1
         json.all?{ |r| r["course_section_id"] == @section.id }.should be_true
       end
+
+      describe "custom roles" do
+        context "user context" do
+          before do
+            @original_course = @course
+            course.offer!
+            role = @course.account.roles.build :name => 'CustomStudent'
+            role.base_role_type = 'StudentEnrollment'
+            role.save!
+            @course.enroll_user(@student, 'StudentEnrollment', :role_name => 'CustomStudent')
+          end
+
+          it "should include derived roles when called with type=StudentEnrollment" do
+            json = api_call(:get, "#{@user_path}?type=StudentEnrollment", @user_params.merge(:type => 'StudentEnrollment'))
+            json.map{ |e| e['course_id'].to_i }.sort.should == [@original_course.id, @course.id].sort
+          end
+
+          it "should include only vanilla StudentEnrollments when called with role=StudentEnrollment" do
+            json = api_call(:get, "#{@user_path}?role=StudentEnrollment", @user_params.merge(:role => 'StudentEnrollment'))
+            json.map{ |e| e['course_id'].to_i }.should == [@original_course.id]
+          end
+
+          it "should filter by custom role" do
+            json = api_call(:get, "#{@user_path}?role=CustomStudent", @user_params.merge(:role => 'CustomStudent'))
+            json.map{ |e| e['course_id'].to_i }.should == [@course.id]
+            json[0]['role'].should == 'CustomStudent'
+          end
+
+          it "should accept an array of enrollment roles" do
+            json = api_call(:get, "#{@user_path}?role[]=StudentEnrollment&role[]=CustomStudent",
+                            @user_params.merge(:role => %w{StudentEnrollment CustomStudent}))
+            json.map{ |e| e['course_id'].to_i }.sort.should == [@original_course.id, @course.id].sort
+          end
+        end
+
+        context "course context" do
+          before do
+            role = @course.account.roles.build :name => 'CustomStudent'
+            role.base_role_type = 'StudentEnrollment'
+            role.save!
+            @original_student = @student
+            student_in_course(:course => @course, :role_name => 'CustomStudent')
+          end
+
+          it "should include derived roles when called with type=StudentEnrollment" do
+            json = api_call(:get, "#{@path}?type=StudentEnrollment", @params.merge(:type => 'StudentEnrollment'))
+            json.map{ |e| e['user_id'].to_i }.sort.should == [@original_student.id, @student.id].sort
+          end
+
+          it "should include only vanilla StudentEnrollments when called with role=StudentEnrollment" do
+            json = api_call(:get, "#{@path}?role=StudentEnrollment", @params.merge(:role => 'StudentEnrollment'))
+            json.map{ |e| e['user_id'].to_i }.should == [@original_student.id]
+          end
+
+          it "should filter by custom role" do
+            json = api_call(:get, "#{@path}?role=CustomStudent", @params.merge(:role => 'CustomStudent'))
+            json.map{ |e| e['user_id'].to_i }.should == [@student.id]
+            json[0]['role'].should == 'CustomStudent'
+          end
+
+          it "should accept an array of enrollment roles" do
+            json = api_call(:get, "#{@path}?role[]=StudentEnrollment&role[]=CustomStudent",
+                            @params.merge(:role => %w{StudentEnrollment CustomStudent}))
+            json.map{ |e| e['user_id'].to_i }.sort.should == [@original_student.id, @student.id].sort
+          end
+        end
+      end
     end
 
     context "a student" do
@@ -372,7 +605,7 @@ describe EnrollmentsApiController, :type => :integration do
         @user = current_user
         json = api_call(:get, @path, @params)
         enrollments = %w{observer student ta teacher}.inject([]) do |res, type|
-          res = res + @course.send("#{type}_enrollments").scoped(:include => :user, :order => 'users.sortable_name ASC')
+          res = res + @course.send("#{type}_enrollments").includes(:user).order("users.sortable_name ASC")
         end
         json.should == enrollments.map { |e|
           h = {
@@ -382,6 +615,7 @@ describe EnrollmentsApiController, :type => :integration do
             'id' => e.id,
             'user_id' => e.user_id,
             'type' => e.type,
+            'role' => e.role,
             'course_section_id' => e.course_section_id,
             'course_id' => e.course_id,
             'html_url' => course_user_url(@course, e.user),
@@ -398,7 +632,9 @@ describe EnrollmentsApiController, :type => :integration do
           h['grades'] = {
             'html_url' => course_student_grades_url(@course, e.user),
             'final_score' => nil,
-            'current_score' => nil
+            'current_score' => nil,
+            'final_grade' => nil,
+            'current_grade' => nil,
           } if e.student? && e.user_id == @user.id
           # should not display grades for other users.
           h['grades'] = {
@@ -418,7 +654,7 @@ describe EnrollmentsApiController, :type => :integration do
 
       it "should list its own enrollments" do
         json = api_call(:get, @user_path, @user_params)
-        enrollments = @user.current_enrollments.scoped(:include => :user, :order => 'users.sortable_name ASC')
+        enrollments = @user.current_enrollments.includes(:user).order("users.sortable_name ASC")
         json.should == enrollments.map { |e|
           {
             'root_account_id' => e.root_account_id,
@@ -427,6 +663,7 @@ describe EnrollmentsApiController, :type => :integration do
             'id' => e.id,
             'user_id' => e.user_id,
             'type' => e.type,
+            'role' => e.role,
             'course_section_id' => e.course_section_id,
             'course_id' => e.course_id,
             'user' => {
@@ -439,7 +676,9 @@ describe EnrollmentsApiController, :type => :integration do
             'grades' => {
               'html_url' => course_student_grades_url(e.course_id, e.user_id),
               'final_score' => nil,
-              'current_score' => nil
+              'current_score' => nil,
+              'final_grade' => nil,
+              'current_grade' => nil,
             },
             'associated_user_id' => nil,
             'updated_at' => e.updated_at.xmlschema
@@ -447,8 +686,8 @@ describe EnrollmentsApiController, :type => :integration do
         }
       end
 
-      it "should not display grades when hide_final_grade is true for the course" do
-        @course.settings[:hide_final_grade] = true
+      it "should not display grades when hide_final_grades is true for the course" do
+        @course.hide_final_grades = true
         @course.save
 
         json = api_call(:get, @user_path, @user_params)
@@ -473,6 +712,17 @@ describe EnrollmentsApiController, :type => :integration do
         json.map { |e| e['id'] }.should_not include enrollment.id
       end
 
+      it "should accept multiple state[] filters" do
+        course
+        @course.offer!
+        enrollment = course.enroll_student(@user)
+        enrollment.update_attribute(:workflow_state, 'completed')
+
+        json = api_call(:get, "#{@user_path}?state[]=active&state[]=completed",
+                        @user_params.merge(:state => %w{active completed}))
+        json.map { |e| e['id'].to_i }.sort.should == @user.enrollments.map(&:id).sort
+      end
+
       it "should not include the users' sis and login ids" do
         json = api_call(:get, @path, @params)
         json.each do |res|
@@ -489,7 +739,7 @@ describe EnrollmentsApiController, :type => :integration do
       it "should include users' sis and login ids" do
         json = api_call(:get, @path, @params)
         enrollments = %w{observer student ta teacher}.inject([]) do |res, type|
-          res = res + @course.send("#{type}_enrollments").scoped(:include => :user)
+          res = res + @course.send("#{type}_enrollments").includes(:user)
         end
         json.should == enrollments.map do |e|
           user_json = {
@@ -510,6 +760,7 @@ describe EnrollmentsApiController, :type => :integration do
             'id' => e.id,
             'user_id' => e.user_id,
             'type' => e.type,
+            'role' => e.role,
             'course_section_id' => e.course_section_id,
             'course_id' => e.course_id,
             'user' => user_json,
@@ -520,7 +771,9 @@ describe EnrollmentsApiController, :type => :integration do
           h['grades'] = {
             'html_url' => course_student_grades_url(@course, e.user),
             'final_score' => nil,
-            'current_score' => nil
+            'current_score' => nil,
+            'final_grade' => nil,
+            'current_grade' => nil,
           } if e.student?
           h
         end
@@ -547,7 +800,7 @@ describe EnrollmentsApiController, :type => :integration do
       it "should properly paginate" do
         json = api_call(:get, "#{@path}?page=1&per_page=1", @params.merge(:page => 1.to_param, :per_page => 1.to_param))
         enrollments = %w{observer student ta teacher}.inject([]) { |res, type|
-          res = res + @course.send("#{type}_enrollments").scoped(:include => :user)
+          res = res + @course.send("#{type}_enrollments").includes(:user)
         }.map do |e|
           h = {
             'root_account_id' => e.root_account_id,
@@ -556,6 +809,7 @@ describe EnrollmentsApiController, :type => :integration do
             'id' => e.id,
             'user_id' => e.user_id,
             'type' => e.type,
+            'role' => e.role,
             'course_section_id' => e.course_section_id,
             'course_id' => e.course_id,
             'user' => {
@@ -571,7 +825,9 @@ describe EnrollmentsApiController, :type => :integration do
           h['grades'] = {
             'html_url' => course_student_grades_url(@course, e.user),
             'final_score' => nil,
-            'current_score' => nil
+            'current_score' => nil,
+            'final_grade' => nil,
+            'current_grade' => nil,
           } if e.student?
           h
         end
@@ -621,11 +877,14 @@ describe EnrollmentsApiController, :type => :integration do
             'enrollment_state'                   => 'completed',
             'course_id'                          => @course.id,
             'type'                               => @enrollment.type,
+            'role'                               => @enrollment.role,
             'html_url'                           => course_user_url(@course, @student),
             'grades'                             => {
               'html_url' => course_student_grades_url(@course, @student),
               'final_score' => nil,
-              'current_score' => nil
+              'current_score' => nil,
+              'final_grade' => nil,
+              'current_grade' => nil,
             },
             'associated_user_id'                 => @enrollment.associated_user_id,
             'updated_at'                         => @enrollment.updated_at.xmlschema
@@ -644,11 +903,14 @@ describe EnrollmentsApiController, :type => :integration do
             'enrollment_state'                   => 'deleted',
             'course_id'                          => @course.id,
             'type'                               => @enrollment.type,
+            'role'                               => @enrollment.role,
             'html_url'                           => course_user_url(@course, @student),
             'grades'                             => {
               'html_url' => course_student_grades_url(@course, @student),
               'final_score' => nil,
-              'current_score' => nil
+              'current_score' => nil,
+              'final_grade' => nil,
+              'current_grade' => nil,
             },
             'associated_user_id'                 => @enrollment.associated_user_id,
             'updated_at'                         => @enrollment.updated_at.xmlschema
@@ -665,7 +927,7 @@ describe EnrollmentsApiController, :type => :integration do
 
           response.code.should eql '401'
           JSON.parse(response.body).should == {
-            'message' => 'You are not authorized to perform that action.',
+            'errors' => { 'message' => 'user not authorized to perform that action' },
             'status'  => 'unauthorized'
           }
         end
@@ -694,13 +956,16 @@ describe EnrollmentsApiController, :type => :integration do
             'id' => e.id,
             'user_id' => e.user_id,
             'type' => e.type,
+            'role' => e.role,
             'course_section_id' => e.course_section_id,
             'course_id' => e.course_id,
             'html_url' => course_user_url(@course, e.user),
             'grades' => {
               'html_url' => course_student_grades_url(@course, e.user),
               'final_score' => nil,
-              'current_score' => nil
+              'current_score' => nil,
+              'final_grade' => nil,
+              'current_grade' => nil,
             },
             'associated_user_id' => nil,
             'updated_at' => e.updated_at.xmlschema,
@@ -730,6 +995,7 @@ describe EnrollmentsApiController, :type => :integration do
             'id' => e.id,
             'user_id' => e.user_id,
             'type' => e.type,
+            'role' => e.role,
             'course_section_id' => e.course_section_id,
             'course_id' => e.course_id,
             'html_url' => course_user_url(@course, e.user),
@@ -745,7 +1011,9 @@ describe EnrollmentsApiController, :type => :integration do
           h['grades'] = {
             'html_url' => course_student_grades_url(@course, e.user),
             'final_score' => nil,
-            'current_score' => nil
+            'current_score' => nil,
+            'final_grade' => nil,
+            'current_grade' => nil,
           } if e.student?
           h
         }

@@ -30,16 +30,17 @@ class CommunicationChannel < ActiveRecord::Base
   belongs_to :user
   has_many :notification_policies, :dependent => :destroy
   has_many :messages
-  
+
   before_save :consider_retiring, :assert_path_type, :set_confirmation_code
   before_save :consider_building_pseudonym
   validates_presence_of :path
   validate :uniqueness_of_path
+  validate :not_otp_communication_channel, :if => lambda { |cc| cc.path_type == TYPE_SMS && cc.retired? && !cc.new_record? }
 
   acts_as_list :scope => :user_id
-  
+
   has_a_broadcast_policy
-  
+
   attr_reader :request_password
   attr_reader :send_confirmation
 
@@ -50,8 +51,24 @@ class CommunicationChannel < ActiveRecord::Base
   TYPE_TWITTER  = 'twitter'
   TYPE_FACEBOOK = 'facebook'
 
+  def self.sms_carriers
+    @sms_carriers ||= (Setting.from_config('sms', false) ||
+        { 'AT&T' => 'txt.att.net',
+          'Alltel' => 'message.alltel.com',
+          'Boost' => 'myboostmobile.com',
+          'C Spire' => 'cspire1.com',
+          'Cingular' => 'cingularme.com',
+          'CellularOne' => 'mobile.celloneusa.com',
+          'Cricket' => 'sms.mycricket.com',
+          'Nextel' => 'messaging.nextel.com',
+          'Sprint PCS' => 'messaging.sprintpcs.com',
+          'T-Mobile' => 'tmomail.net',
+          'Verizon' => 'vtext.com',
+          'Virgin Mobile' => 'vmobl.com' }).map.sort
+  end
+
   def pseudonym
-    self.user.pseudonyms.find_by_unique_id(self.path)
+    user.pseudonyms.where(:unique_id => path).first if user
   end
 
   set_broadcast_policy do |p|
@@ -60,7 +77,7 @@ class CommunicationChannel < ActiveRecord::Base
     p.whenever { |record|
       @request_password
     }
-    
+
     p.dispatch :confirm_registration
     p.to { self }
     p.whenever { |record|
@@ -78,14 +95,14 @@ class CommunicationChannel < ActiveRecord::Base
       self.path_type == TYPE_EMAIL
     }
     p.context { @root_account }
-    
+
     p.dispatch :merge_email_communication_channel
     p.to { self }
     p.whenever {|record|
       @send_merge_notification and
       self.path_type == TYPE_EMAIL
     }
-    
+
     p.dispatch :confirm_sms_communication_channel
     p.to { self }
     p.whenever { |record|
@@ -111,9 +128,25 @@ class CommunicationChannel < ActiveRecord::Base
       conditions.first << " AND id<>?"
       conditions << id
     end
-    if self.class.exists?(conditions)
+    if self.class.where(conditions).exists?
       self.errors.add(:path, :taken, :value => path)
     end
+  end
+
+  def not_otp_communication_channel
+    self.errors.add(:workflow_state, "Can't remove a user's SMS that is used for one time passwords") if self.id == self.user.otp_communication_channel_id
+  end
+
+  def context
+    pseudonym.try(:account)
+  end
+
+  # Public: Determine if this channel is the product of an SIS import.
+  #
+  # Returns a boolean.
+  def imported?
+    id.present? &&
+      Pseudonym.where(:sis_communication_channel_id => self).exists?
   end
 
   # Return the 'path' for simple communication channel types like email and sms. For
@@ -152,7 +185,14 @@ class CommunicationChannel < ActiveRecord::Base
     self.save!
     @send_merge_notification = false
   end
-  
+
+  def send_otp!(code)
+    m = self.messages.new
+    m.to = self.path
+    m.body = t :body, "Your Canvas verification code is %{verification_code}", :verification_code => code
+    Mailer.deliver_message(m) rescue nil # omg! just ignore delivery failures
+  end
+
   # If you are creating a new communication_channel, do nothing, this just
   # works.  If you are resetting the confirmation_code, call @cc.
   # set_confirmation_code(true), or just save the record to leave the old
@@ -166,31 +206,33 @@ class CommunicationChannel < ActiveRecord::Base
     end
   end
   
-  named_scope :for, lambda { |context| 
+  scope :for, lambda { |context|
     case context
     when User
-      { :conditions => ['communication_channels.user_id = ?', context.id] }
+      where(:user_id => context)
     when Notification
-      { :include => [:notification_policies], :conditions => ['notification_policies.notification_id = ?', context.id] }
+      includes(:notification_policies).where(:notification_policies => { :notification_id => context })
     else
-      {}
+      scoped
     end
   }
 
-  named_scope :by_path, lambda { |path|
-    if connection_pool.spec.config[:adapter] == 'mysql'
-      { :conditions => {:path => path } }
+  scope :by_path, lambda { |path|
+    if %{mysql mysql2}.include?(connection_pool.spec.config[:adapter])
+      where(:path => path)
     else
-      { :conditions => ["LOWER(communication_channels.path)=?", path.try(:downcase)]}
+      where("LOWER(communication_channels.path)=?", path.try(:downcase))
     end
   }
 
-  named_scope :email, :conditions => { :path_type => TYPE_EMAIL }
-  named_scope :active, :conditions => { :workflow_state => 'active' }
-  named_scope :unretired, :conditions => ['communication_channels.workflow_state<>?', 'retired']
+  scope :email, where(:path_type => TYPE_EMAIL)
+  scope :sms, where(:path_type => TYPE_SMS)
 
-  named_scope :for_notification_frequency, lambda {|notification, frequency|
-    { :include => [:notification_policies], :conditions => ['notification_policies.notification_id = ? and notification_policies.frequency = ?', notification.id, frequency] }
+  scope :active, where(:workflow_state => 'active')
+  scope :unretired, where("communication_channels.workflow_state<>'retired'")
+
+  scope :for_notification_frequency, lambda { |notification, frequency|
+    includes(:notification_policies).where(:notification_policies => { :notification_id => notification, :frequency => frequency })
   }
 
   # Get the list of communication channels that overrides an association's default order clause.
@@ -205,59 +247,18 @@ class CommunicationChannel < ActiveRecord::Base
     # Add facebook and twitter (in that order) if the user's account is setup for them.
     rank_order << TYPE_FACEBOOK unless user.user_services.for_service(CommunicationChannel::TYPE_FACEBOOK).empty?
     rank_order << TYPE_TWITTER if twitter_service
-    self.unretired.scoped(:conditions => ['communication_channels.path_type IN (?)', rank_order]).
-      find(:all, :order => "#{self.rank_sql(rank_order, 'communication_channels.path_type')} ASC, communication_channels.position asc")
+    self.unretired.where('communication_channels.path_type IN (?)', rank_order).
+      order("#{self.rank_sql(rank_order, 'communication_channels.path_type')} ASC, communication_channels.position asc").
+      all
   end
 
-  named_scope :include_policies, :include => :notification_policies
+  scope :include_policies, includes(:notification_policies)
 
-  named_scope :in_state, lambda { |state| { :conditions => ["communication_channels.workflow_state = ?", state.to_s]}}
-  named_scope :of_type, lambda {|type| { :conditions => ['communication_channels.path_type = ?', type] } }
+  scope :in_state, lambda { |state| where(:workflow_state => state.to_s) }
+  scope :of_type, lambda {|type| where(:path_type => type) }
   
   def can_notify?
     self.notification_policies.any? { |np| np.frequency == 'never' } ? false : true
-  end
-  
-  # This is the re-worked find_for_all.  It is created to get all
-  # communication channels that have a specific, valid notification policy
-  # setup for it, or the default communication channel for a user.  This,
-  # of course, doesn't hold for registration, since no policy is expected
-  # to intervene.  All registration notices go to the passed-in
-  # communication channel.  That information is being handed to us from
-  # the context of the notification policy being fired. 
-  def self.find_all_for(user=nil, notification=nil, cc=nil, frequency='immediately')
-    return [] unless user && notification
-    return [cc] if cc and notification.registration?
-    return [] unless user.registered?
-    policy_matches_frequency = {}
-    policy_for_channel = {}
-    can_notify = {}
-    NotificationPolicy.for(user).for(notification).each do |policy|
-      policy_matches_frequency[policy.communication_channel_id] = true if policy.frequency == frequency
-      policy_for_channel[policy.communication_channel_id] = true
-      can_notify[policy.communication_channel_id] = false if policy.frequency == 'never'
-    end
-    all_channels = user.communication_channels.active
-    communication_channels = all_channels.select{|cc| policy_matches_frequency[cc.id] }
-    all_channels = all_channels.select{|cc| policy_for_channel[cc.id] }
-
-    # The trick here is that if the user has ANY policies defined for this notification
-    # then we shouldn't overwrite it with the default channel -- but we only want to
-    # return the list of channels for immediate dispatch.
-    communication_channels = [user.email_channel] if all_channels.empty? && notification.default_frequency == 'immediately'
-    communication_channels.compact!
-
-    # Remove ALL channels if one is 'never'?  No, I think we should just remove any paths that are set to 'never'
-    # User can say NEVER email me, but SMS me right away.
-    communication_channels.reject!{|cc| can_notify[cc] == false}
-    communication_channels
-  end
-  
-  def self.ids_with_pending_delayed_messages
-    CommunicationChannel.connection.select_values(
-      "SELECT distinct communication_channel_id
-         FROM delayed_messages
-        WHERE workflow_state = 'pending' AND send_at <= '#{Time.now.to_s(:db)}'")
   end
   
   def move_to_user(user, migrate=true)
@@ -269,8 +270,8 @@ class CommunicationChannel < ActiveRecord::Base
       self.user_id = user.id
       self.save!
       if old_user_id
-        Pseudonym.update_all({:user_id => user.id}, {:user_id => old_user_id, :unique_id => self.path})
-        User.update_all({:updated_at => Time.now.utc}, {:id => [old_user_id, user.id]})
+        Pseudonym.where(:user_id => old_user_id, :unique_id => self.path).update_all(:user_id => user)
+        User.where(:id => [old_user_id, user]).update_all(:updated_at => Time.now.utc)
       end
     end
   end
@@ -326,4 +327,17 @@ class CommunicationChannel < ActiveRecord::Base
   protected :assert_path_type
     
   def self.serialization_excludes; [:confirmation_code]; end
+
+  def self.associated_shards(path)
+    [Shard.default]
+  end
+
+  def merge_candidates
+    shards = self.class.associated_shards(self.path) if Enrollment.cross_shard_invitations?
+    shards ||= [self.shard]
+    scope = CommunicationChannel.active.by_path(self.path).of_type(self.path_type)
+    Shard.with_each_shard(shards) do
+      scope.where("user_id<>?", self.user_id).includes(:user).map(&:user)
+    end.uniq.select { |u| u.all_active_pseudonyms.length != 0 }
+  end
 end

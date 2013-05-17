@@ -3,43 +3,7 @@
   js_bundle :learning_outcomes
   content_for :page_title, t("#titles.learning_outcomes", "Learning Outcomes")
 %>
-<% content_for :right_side do %>
-  <div class="rs-margin-all">
-    <% if can_do(@context, @current_user, :manage_outcomes) %>
-      <a href="#" class="add_outcome_link button button-sidebar-wide"><%= image_tag "add.png" %> <%= t("#buttons.add_learning_outcome", "Add Learning Outcome") %></a>
-      <a href="#" class="add_outcome_group_link button button-sidebar-wide"><%= image_tag "add.png" %> <%= t("#buttons.add_outcome_group", "Add Outcome Group") %></a>
-      <a href="#" class="find_outcome_link button button-sidebar-wide"><%= image_tag "find.png" %> <%= t("#buttons.find_learning_outcome", "Find Learning Outcome") %></a>
-      <a href="<%= context_url(@context, :context_rubrics_url) %>" class="button button-sidebar-wide"><%= image_tag "rubric.png" %> <%= t("#buttons.manage_rubrics", "Manage Rubrics") %></a>
-    <% else %>
-      <a href="<%= context_url(@context, :context_url) %>" class="button button-sidebar-wide"><%= image_tag "back.png" %>
-      <%= case @context
-          when Account
-            t(:back_to_account_home, "Back to Account Home")
-          when Course
-            t(:back_to_course_home, "Back to Course Home")
-          when User
-            t(:back_to_user_home, "Back to User Home")
-          when Group
-            t(:back_to_group_home, "Back to Group Home")
-          else
-            t(:back_to_unknown_home, "Back to Home")
-          end %></a>
-    <% end %>
-  </div>
-<% end %>
-
 
 <h2><%= t("#titles.learning_outcomes", "Learning Outcomes") %></h2>
-<div id="outcome_links">
-  <a href="<%= context_url(@context, :context_outcomes_url) %>" class="add_outcome_url" style="display: none;">&nbsp;</a>
-  <a href="<%= context_url(@context, :context_outcome_groups_url) %>" class="add_outcome_group_url" style="display: none;">&nbsp;</a>
-  <a href="<%= context_url(@context, :context_outcome_group_reorder_url, "{{ id }}") %>" class="reorder_items_url" style="display: none;">&nbsp;</a>
-</div>
-<div id="outcomes" class="<%= 'uneditable' unless can_do(@context, @current_user, :manage_outcomes) %>">
-  <%= render :partial => "outcome_group", :object => @root_outcome_group %>
-</div>
-<%= render :partial => 'outcome_group', :object => nil %>
-<%= render :partial => 'outcome' %>
 
-<%= render :partial => 'outcome_form' %>
-<%= render :partial => 'find_outcome' %>
+<div id="outcomes"></div>

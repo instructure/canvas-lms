@@ -32,11 +32,12 @@ module TextHelper
   # This is still a pretty basic implementation, I'm sure we'll find ways to
   # tweak and improve it as time goes on.
   def html_to_text(html_str)
+    html_str ||= ''
     doc = Nokogiri::HTML::DocumentFragment.parse(html_str.squeeze(" ").squeeze("\n"))
     # translate anchor tags into a markdown-style name/link combo
     doc.css('a').each { |node| next if node.text.strip == node['href']; node.replace("[#{node.text}](#{node['href']})") }
     # translate img tags into just a url to the image
-    doc.css('img').each { |node| node.replace(node['src']) }
+    doc.css('img').each { |node| node.replace(node['src'] || '') }
     # append a line break to br and p tags, so they retain a line break after stripping tags
     doc.css('br, p').each { |node| node.after("\n\n") }
     doc.text.strip
@@ -62,16 +63,10 @@ module TextHelper
         |                                        # or
         [a-z0-9.\-]+[.][a-z]{2,4}/               # looks like domain name followed by a slash
       )
-      (?:                                        # One or more:
-        [^\s()<>]+                               # Run of non-space, non-()<>
-        |                                        # or
-        \(([^\s()<>]+|(\([^\s()<>]+\)))*\)       # balanced parens, up to 2 levels
-      )+
-      (?:                                        # End with:
-        \(([^\s()<>]+|(\([^\s()<>]+\)))*\)       # balanced parens, up to 2 levels
-        |                                        # or
-        [^\s`!()\[\]{};:'".,<>?«»“”‘’]           # not a space or one of these punct chars
-      )
+
+      [^\s()<>]+                                 # Run of non-space, non-()<>
+
+      [^\s`!()\[\]{};:'".,<>?«»“”‘’]             # End with: not a space or one of these punct chars
     ) | (
       #{AUTO_LINKIFY_PLACEHOLDER}
     )
@@ -426,10 +421,49 @@ def self.date_component(start_date, style=:normal)
       end
     end
     translated = t(*args)
-    translated = ERB::Util.h(translated) unless translated.html_safe?
-    result = RDiscount.new(translated).to_html.strip
+    markdown(translated, inlinify)
+  end
+
+  def markdown(string, inlinify = :auto)
+    string = ERB::Util.h(string) unless string.html_safe?
+    result = RDiscount.new(string).to_html.strip
     # Strip wrapping <p></p> if inlinify == :auto && they completely wrap the result && there are not multiple <p>'s
     result.gsub!(/<\/?p>/, '') if inlinify == :auto && result =~ /\A<p>.*<\/p>\z/m && !(result =~ /.*<p>.*<p>.*/m)
     result.html_safe.strip
+  end
+
+  # This doesn't make any attempt to convert other encodings to utf-8, it just
+  # removes invalid bytes from otherwise valid utf-8 strings.
+  # Basically, this is a last ditch effort, you probably don't want to use it
+  # as part of normal request processing.
+  # It's used for things like filtering out ErrorReport data so that we can
+  # make sure we won't get an invalid utf-8 error trying to save the error
+  # report to the db.
+  def self.strip_invalid_utf8(string)
+    return string if string.nil?
+    # add four spaces to the end of the string, because iconv with the //IGNORE
+    # option will still fail on incomplete byte sequences at the end of the input
+    # we force_encoding on the returned string because Iconv.conv returns binary.
+    string = Iconv.conv('UTF-8//IGNORE', 'UTF-8', string + '    ')[0...-4]
+    if string.respond_to?(:force_encoding)
+      string.force_encoding(Encoding::UTF_8)
+    end
+    string
+  end
+
+  def self.recursively_strip_invalid_utf8!(object, force_utf8 = false)
+    case object
+    when Hash
+      object.each_value { |o| self.recursively_strip_invalid_utf8!(o, force_utf8) }
+    when Array
+      object.each { |o| self.recursively_strip_invalid_utf8!(o, force_utf8) }
+    when String
+      if object.encoding == Encoding::ASCII_8BIT && force_utf8
+        object.force_encoding(Encoding::UTF_8)
+      end
+      if !object.valid_encoding?
+        object.replace(self.strip_invalid_utf8(object))
+      end
+    end
   end
 end

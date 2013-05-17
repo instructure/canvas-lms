@@ -32,6 +32,7 @@ define([
   'jquery.inst_tree' /* instTree */,
   'jquery.instructure_forms' /* formSubmit, getFormData, formErrors, errorBox */,
   'jqueryui/dialog',
+  'compiled/jquery/fixDialogButtons' /* fix dialog formatting */,
   'jquery.instructure_misc_helpers' /* replaceTags, scrollSidebar */,
   'jquery.instructure_misc_plugins' /* confirmDelete, showIf */,
   'jquery.loadingImg' /* loadingImage */,
@@ -75,11 +76,10 @@ define([
   $(document).ready(function() {
     $(".portfolio_settings_link").click(function(event) {
       event.preventDefault();
-      $("#edit_eportfolio_form").dialog('close').dialog({
-        autoOpen: false,
+      $("#edit_eportfolio_form").dialog({
         width: "auto",
         title: I18n.t('eportfolio_settings', "ePortfolio Settings")
-      }).dialog('open');
+      }).fixDialogButtons();
     });
     $("#edit_eportfolio_form .cancel_button").click(function(event) {
       $("#edit_eportfolio_form").dialog('close');
@@ -149,11 +149,11 @@ define([
       $("#edit_page_form,#page_content,#page_sidebar").removeClass('previewing');
       $("#page_content .preview_section").remove();
     }).end().find(".cancel_button").click(function() {
+      $('.edit_section').editorBox('destroy');
       $("#edit_page_form,#page_content,#page_sidebar").removeClass('editing');
       $("#page_content .section.unsaved").remove();
       $(".edit_content_link_holder").show();
       $("#edit_page_form .edit_section").each(function() {
-        $(this).editorBox('destroy');
         $(this).remove();
       });
       $("#page_content .section .form_content").remove();
@@ -179,10 +179,10 @@ define([
         return data;
       },
       beforeSubmit: function(data) {
+        $('.edit_section').editorBox('destroy');
         $("#edit_page_form,#page_content,#page_sidebar").removeClass('editing').removeClass('previewing');
-        $("#page_content .section.unsaved").remove();
+        $("#page_content .section.unsaved,#page_content .section .form_content").remove();
         $("#edit_page_form .edit_section").each(function() {
-          $(this).editorBox('destroy');
           $(this).remove();
         });
         $(this).loadingImage();
@@ -302,7 +302,7 @@ define([
       });
       $(this).parents(".section").find(".section_content").empty().append($message.show());
       var $form = $("#upload_file_form").clone(true).attr('id', '');
-      $("body").append($form.hide());
+      $("body").append($form.css({position: 'absolute', zIndex: -1}));
       $form.data('section', $section);
       $form.find(".file_upload").remove().end()
         .append($upload)
@@ -311,6 +311,14 @@ define([
     });
     $("#upload_file_form").formSubmit({
       fileUpload: true,
+      fileUploadOptions: {
+        preparedFileUpload: true,
+        upload_only: true,
+        singleFile: true,
+        context_code: ENV.context_code,
+        folder_id: ENV.folder_id,
+        formDataTarget: 'uploadDataUrl'
+      },
       object_name: 'attachment',
       processData: function(data) {
         if(!data.uploaded_data) {
@@ -394,15 +402,14 @@ define([
         $("#add_submission_form .submission_description").val(
           I18n.t('default_description', "This is my %{assignment} submission for %{course}.",
             { 'assignment': assignment, 'course': context }));
-        $("#add_submission_form").dialog('close').dialog({
-          autoOpen: false,
+        $("#add_submission_form").dialog({
           title: I18n.t('titles.add_submission', 'Add Page for Submission'),
           width: 400,
           open: function() {
             $(this).find(":text:visible:first").val(assignment).focus().select();
             $(document).triggerHandler('submission_dialog_opened');
           }
-        }).dialog('open');
+        }).fixDialogButtons();
       }
     });
     $("#add_submission_form .cancel_button").click(function() {
@@ -869,10 +876,9 @@ define([
       check(true);
     });
     $(".download_eportfolio_link").click(function(event) {
-      $("#downloading_eportfolio_dialog").dialog('close').dialog({
-        autoOpen: false,
+      $("#downloading_eportfolio_dialog").dialog({
         title: I18n.t('titles.download_eportfolio', "Download ePortfolio")
-      }).dialog('open');
+      });
     });
   });
 });

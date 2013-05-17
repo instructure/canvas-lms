@@ -36,7 +36,7 @@ module SIS
       end
 
       Course.update_account_associations(course_ids_to_update_associations.to_a) unless course_ids_to_update_associations.empty?
-      Course.update_all({:sis_batch_id => @batch_id}, {:id => courses_to_update_sis_batch_id}) if @batch_id && !courses_to_update_sis_batch_id.empty?
+      Course.where(:id => courses_to_update_sis_batch_id).update_all(:sis_batch_id => @batch_id) if @batch_id && !courses_to_update_sis_batch_id.empty?
       @logger.debug("Courses took #{Time.now - start} seconds")
       return importer.success_count
     end
@@ -68,7 +68,9 @@ module SIS
         course = Course.find_by_root_account_id_and_sis_source_id(@root_account.id, course_id)
         course ||= Course.new
         course_enrollment_term_id_stuck = course.stuck_sis_fields.include?(:enrollment_term_id)
-        term = course_enrollment_term_id_stuck ? nil : @root_account.enrollment_terms.find_by_sis_source_id(term_id)
+        if !course_enrollment_term_id_stuck && term_id
+          term = @root_account.enrollment_terms.active.find_by_sis_source_id(term_id)
+        end
         course.enrollment_term = term if term
         course.root_account = @root_account
 
@@ -155,10 +157,24 @@ module SIS
             end
             templated_course.sis_batch_id = @batch_id if @batch_id
             @course_ids_to_update_associations.add(templated_course.id) if templated_course.account_id_changed? || templated_course.root_account_id_changed?
-            templated_course.save_without_broadcasting!
+            if templated_course.valid?
+              templated_course.save_without_broadcasting!
+            else
+              msg = "A (templated) course did not pass validation "
+              msg += "(" + "course: #{course_id} / #{short_name}, error: " + 
+              msg += templated_course.errors.full_messages.join(",") + ")"
+              raise ImportError, msg
+            end
           end
           course.sis_batch_id = @batch_id if @batch_id
-          course.save_without_broadcasting!
+          if course.valid?
+            course.save_without_broadcasting!
+          else
+            msg = "A course did not pass validation "
+            msg += "(" + "course: #{course_id} / #{short_name}, error: " + 
+            msg += course.errors.full_messages.join(",") + ")"
+            raise ImportError, msg
+          end
           @course_ids_to_update_associations.add(course.id) if update_account_associations
         elsif @batch_id
           @courses_to_update_sis_batch_id << course.id

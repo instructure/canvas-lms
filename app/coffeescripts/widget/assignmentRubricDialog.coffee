@@ -31,7 +31,7 @@ define [
         autoOpen: false
 
       $.get @url, (html) ->
-        # weird hackery because the server returns a <div id="rubrics" style="display:none"> 
+        # weird hackery because the server returns a <div id="rubrics" style="display:none">
         # as it's root node, so we need to show it before we inject it
         assignmentRubricDialog.$dialog.html $(html).show()
 
@@ -39,7 +39,7 @@ define [
         # since that is the point of why they clicked the link.
         if assignmentRubricDialog.noRubricExists
           $.subscribe 'edit_rubric/initted', ->
-            assignmentRubricDialog.$dialog.find('.button.add_rubric_link').click()
+            assignmentRubricDialog.$dialog.find('.btn.add_rubric_link').click()
 
     openDialog: ->
       @initDialog() unless @dialogInited

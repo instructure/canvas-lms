@@ -1,12 +1,12 @@
 define [
   'compiled/views/QuickStartBar/BaseItemView'
   'underscore'
-  'compiled/models/Assignment'
+  'compiled/models/QuickStartAssignment'
   'jst/quickStartBar/assignment'
   'compiled/widget/ContextSearch'
   'jquery.instructure_date_and_time'
   'jquery.disableWhileLoading'
-], (BaseItemView, _, Assignment, template, ContextSearch) ->
+], (BaseItemView, _, QuickStartAssignment, template, ContextSearch) ->
 
   class AssignmentView extends BaseItemView
 
@@ -19,15 +19,13 @@ define [
       selector:
         baseData:
           type: 'course'
-        preparer: (postData, data, parent) ->
-          for row in data
-            row.noExpand = true
+        noExpand: true
         browser: false
 
     save: (json) ->
       json.date = @$('.datetime_suggest').text()
       dfds = _.map json.course_ids, (id) =>
-        model = new Assignment json
+        model = new QuickStartAssignment json
         model.set 'course_id', id.replace /^course_/, ''
         model.save()
       $.when dfds...

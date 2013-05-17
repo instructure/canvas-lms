@@ -1,9 +1,7 @@
 <div class="registration-dialog">
   <form class="form-horizontal bootstrap-form" method="post" action="/users">
     <div class="control-group">
-      <label class="control-label" for="student_join_code">{{#t "labels.join_code"}}Join Code{{/t}}
-        <a class="help-block-small signup_link" data-template="studentHigherEdDialog" href="#" title="Student Signup">{{#t "sign_up_without_code"}}don't have a code?{{/t}}</a>
-      </label>
+      <label class="control-label" for="student_join_code">{{#t "labels.join_code"}}Join Code{{/t}}</label>
       <div class="controls">
         <input type="text" id="student_join_code" name="user[self_enrollment_code]">
       </div>
@@ -12,12 +10,6 @@
       <label class="control-label" for="student_name">{{#t "labels.name"}}Full Name{{/t}}</label>
       <div class="controls">
         <input type="text" id="student_name" name="user[name]">
-      </div>
-    </div>
-    <div class="control-group">
-      <label class="control-label" for="student_birthdate">{{#t "labels.birthdate"}}Birth Date{{/t}}</label>
-      <div class="controls">
-        {{dateSelect "user[birthdate]" id="student_birthdate" type="birthdate" class="select-birthdate"}}
       </div>
     </div>
     <div class="control-group">
@@ -42,15 +34,16 @@
       <div class="controls">
         <label class="checkbox">
           <input type="checkbox" name="user[terms_of_use]" value="1">
-          {{#t "agree_to_terms"}}You agree to the <a href="{{terms_url}}" target="_new">terms of use</a>.{{/t}}
+          {{#t "agree_to_terms_and_pp"}}You agree to the <a href="{{terms_url}}" target="_blank">terms of use</a> and the <a href="{{privacy_url}}" target="_blank">privacy policy</a>.{{/t}}
         </label>
       </div>
     </div>
     <div class="control-group">
       <div class="controls">
-        <input type="hidden" name="enrollment_type" value="student">
+        <input type="hidden" name="user[initial_enrollment_type]" value="student">
         <input type="hidden" name="self_enrollment" value="1">
-        <button class="button btn-primary" type="submit">{{#t "buttons.start_learning"}}Start Learning{{/t}}</button>
+        <input type="hidden" name="pseudonym_type" value="username">
+        <button class="btn btn-primary" type="submit">{{#t "buttons.start_learning"}}Start Learning{{/t}}</button>
       </div>
     </div>
   </form>

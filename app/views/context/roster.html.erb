@@ -1,117 +1,99 @@
-<% 
-  add_crumb(t('#crumbs.people', "People"), context_url(@context, :context_users_url))
-  @active_tab="people"
-  content_for :page_title, case @context
-  when Course
-    join_title t('titles.course_roster', "Course Roster"), @context.name
-  when Group
-    join_title t('titles.group_roster', "Group Roster"), @context.name
-  end
+<%
+  add_crumb t('#crumbs.people', 'People'), context_url(@context, :context_users_url)
+  @active_tab = 'people'
+  translated_title = @context.is_a?(Course) ? t('titles.course_roster', 'Course Roster') : t('titles.group_roster', 'Group Roster')
+
+  join_title(translated_title, @context.name)
 %>
 
-<% content_for :right_side do %>
-  <div class="rs-margin-lr rs-margin-top">
-    <% if @context.is_a?(Course) %>
-      <% if can_do(@context, @current_user, :read_roster) %>
-        <a href="<%= context_url(@context, :context_groups_url) %>" class="button button-sidebar-wide"><%= image_tag "group.png" %> <%= t('links.view_student_groups', %{View Student Groups}) %></a>
+<% content_for :right_side, render(:partial => 'context/roster_right_side') %>
+
+<% if @context.is_a?(Course) %>
+  <% js_bundle :roster %>
+<% else %>
+  <% content_for :stylesheets do %>
+    <style>
+      .roster .more_info {
+        font-size: 0.85em;
+        margin-left: 10px;
+      }
+
+      .roster div.avatar {
+        float: left;
+        padding-right: 5px;
+      }
+
+      .fill_height_div { overflow: auto; }
+    </style>
+  <% end %>
+
+  <table style="width: 100%;">
+    <tr>
+      <td style="width: 50%; vertical-align: top;" class="roster student_roster">
+        <h2><%= @primary_users.keys.first %></h2>
+        <div style="max-height: 300px; margin-right: 20px;" class="fill_height_div">
+        <table>
+        <% @primary_users[@primary_users.keys.first].each do |student| %>
+          <tr class="user" id="user_<%= student.id %>">
+            <td style="vertical-align: top;">
+              <% if service_enabled?(:avatars) %>
+                <div class="avatar"><%= avatar(student, @context.asset_string, 30) %></div>
+              <% end %>
+            </td>
+            <td>
+              <div><a href="<%= context_url(@context, :context_user_url, student.id) %>" class="user_name"><%= can_do(@context, @current_user, :manage_students) ? student.name : student.short_name %></a></div>
+              <% if can_do(@context, @current_user, :manage_students) %>
+                <div class="more_info">
+                  <div class="short_name"><%= student.short_name %></div>
+                  <div class="email"><%= student.email %></div>
+                  <% if @enrollments_hash %> 
+                    <% @enrollments_hash[student.id].each do |e| %>
+                      <div class="course_section"><%= e.try(:course_section).try(:display_name) %></div>
+                    <% end %>
+                  <% end %>
+                </div>
+              <% end %>
+              <div style="clear: left;"></div>
+            </td>
+          </tr>
+        <% end %>
+        </table>
+        </div>
+      </td>
+      <% unless !@secondary_users || @secondary_users.empty? %>
+      <td style="vertical-align: top;" class="roster teacher_roster">
+        <h2><%= @secondary_users.keys.first %></h2>
+        <div style="max-height: 300px;" class="fill_height_div">
+        <table>
+        <% @secondary_users[@secondary_users.keys.first].each do |teacher| %>
+          <tr class="user" id="user_<%= teacher.id %>">
+            <td style="vertical-align: top;">
+              <% if service_enabled?(:avatars) %>
+                <div class="avatar"><%= avatar(teacher, @context.asset_string, 30) %></div>
+              <% end %>
+            </td>
+            <td>
+              <div><a href="<%= context_url(@context, :context_user_url, teacher.id) %>" class="user_name"><%= teacher.name %></a></div>
+              <% if can_do(@context, @current_user, :manage_admin_users) %>
+                <div class="more_info">
+                  <div class="short_name"><%= teacher.short_name %></div>
+                  <div class="email"><%= teacher.email %></div>
+                  <% if @enrollments_hash %> 
+                    <% @enrollments_hash[teacher.id].each do |e| %>
+                      <div class="course_section"><%= e.try(:course_section).try(:display_name) %></div>
+                    <% end %>
+                  <% end %>
+                </div>
+              <% end %>
+              <div style="clear: left;"></div>
+            </td>
+          </tr>
+        <% end %>
+        </table>
+        </div>
+      </td>
       <% end %>
-      <% if can_do(@context, @current_user, :manage_students) && @context.enable_user_notes %>
-        <a href="<%= course_user_notes_path(@context) %>" class="button button-sidebar-wide"><%= t('links.view_faculty_journals', %{View Faculty Journals}) %></a>
-      <% end %>
-      <% if can_do(@context, @current_user, :manage_admin_users, :manage_students, :read_prior_roster) %>
-        <a href="<%= course_prior_users_path(@context) %>" class="button button-sidebar-wide"><%= image_tag "history.png" %> <%= t('links.view_prior_enrollments', %{View Prior Enrollments}) %></a>
-      <% end %>
-    <% end %>
-    <% if can_do(@context, @current_user, :read_roster) %>
-      <a href="<%= context_url(@context, :context_user_services_url) %>" class="button button-sidebar-wide"><%= image_tag "link.png" %> <%= t('links.view_services', %{View Registered Services}) %></a>
-    <% end %>
-    <% if @context.is_a?(Course) && can_do(@context, @current_user, :manage_students) %>
-      <a href="<%= context_url(@context, :context_details_url) %>#tab-users" class="button button-sidebar-wide"><%= image_tag "group.png" %> <%= t('links.manage_users', %{Manage Users}) %></a>
-    <% end %>
-  </div>
+    </tr>
+  </table>
 <% end %>
 
-<% content_for :stylesheets do %>
-<style>
-.roster .more_info {
-  margin-left: 10px;
-  font-size: 0.85em;
-}
-.roster div.avatar {
-  float: left; 
-  padding-right: 5px;
-}
-.fill_height_div {
-  overflow: auto;
-}
-</style>
-<% end %>
-
-<table style="width: 100%;">
-  <tr>
-    <td style="width: 50%; vertical-align: top;" class="roster student_roster">
-      <h2><%= @primary_users.keys.first %></h2>
-      <div style="max-height: 300px; margin-right: 20px;" class="fill_height_div">
-      <table>
-      <% @primary_users[@primary_users.keys.first].each do |student| %>
-        <tr class="user" id="user_<%= student.id %>">
-          <td style="vertical-align: top;">
-            <% if service_enabled?(:avatars) %>
-              <div class="avatar"><%= avatar(student, @context.asset_string, 30) %></div>
-            <% end %>
-          </td>
-          <td>
-            <div><a href="<%= context_url(@context, :context_user_url, student.id) %>" class="user_name"><%= can_do(@context, @current_user, :manage_students) ? student.name : student.short_name %></a></div>
-            <% if can_do(@context, @current_user, :manage_students) %>
-              <div class="more_info">
-                <div class="short_name"><%= student.short_name %></div>
-                <div class="email"><%= student.email %></div>
-                <% if @enrollments_hash %> 
-                  <% @enrollments_hash[student.id].each do |e| %>
-                    <div class="course_section"><%= e.try(:course_section).try(:display_name) %></div>
-                  <% end %>
-                <% end %>
-              </div>
-            <% end %>
-            <div style="clear: left;"></div>
-          </td>
-        </tr>
-      <% end %>
-      </table>
-      </div>
-    </td>
-    <% unless !@secondary_users || @secondary_users.empty? %>
-    <td style="vertical-align: top;" class="roster teacher_roster">
-      <h2><%= @secondary_users.keys.first %></h2>
-      <div style="max-height: 300px;" class="fill_height_div">
-      <table>
-      <% @secondary_users[@secondary_users.keys.first].each do |teacher| %>
-        <tr class="user" id="user_<%= teacher.id %>">
-          <td style="vertical-align: top;">
-            <% if service_enabled?(:avatars) %>
-              <div class="avatar"><%= avatar(teacher, @context.asset_string, 30) %></div>
-            <% end %>
-          </td>
-          <td>
-            <div><a href="<%= context_url(@context, :context_user_url, teacher.id) %>" class="user_name"><%= teacher.name %></a></div>
-            <% if can_do(@context, @current_user, :manage_admin_users) %>
-              <div class="more_info">
-                <div class="short_name"><%= teacher.short_name %></div>
-                <div class="email"><%= teacher.email %></div>
-                <% if @enrollments_hash %> 
-                  <% @enrollments_hash[teacher.id].each do |e| %>
-                    <div class="course_section"><%= e.try(:course_section).try(:display_name) %></div>
-                  <% end %>
-                <% end %>
-              </div>
-            <% end %>
-            <div style="clear: left;"></div>
-          </td>
-        </tr>
-      <% end %>
-      </table>
-      </div>
-    </td>
-    <% end %>
-  </tr>
-</table>

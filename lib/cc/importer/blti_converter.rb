@@ -16,13 +16,14 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 module CC::Importer
-  module BLTIConverter
+  class BLTIConverter
+    class CCImportError < Exception; end
     include CC::Importer
     
-    def get_blti_resources
+    def get_blti_resources(manifest)
       blti_resources = []
 
-      @manifest.css("resource[type=#{BASIC_LTI}]").each do |r_node|
+      manifest.css("resource[type=#{BASIC_LTI}]").each do |r_node|
         res = {}
         res[:migration_id] = r_node['identifier']
         res[:href] = r_node['href']
@@ -37,13 +38,12 @@ module CC::Importer
       blti_resources
     end
 
-    def convert_blti_links(blti_resources=nil)
-      blti_resources ||= get_blti_resources
+    def convert_blti_links(blti_resources, converter)
       tools = []
 
       blti_resources.each do |res|
         path = res[:href] || res[:files].first[:href]
-        path = get_full_path(path)
+        path = converter.get_full_path(path)
 
         if File.exists?(path)
           doc = open_file_xml(path)
@@ -60,15 +60,18 @@ module CC::Importer
     
     def convert_blti_link(doc)
       blti = get_blti_namespace(doc)
+      link_css_path = "cartridge_basiclti_link"
       tool = {}
-      tool[:description] = get_node_val(doc, "#{blti}|description")
-      tool[:title] = get_node_val(doc, "#{blti}|title")
-      tool[:url] = get_node_val(doc, "#{blti}|secure_launch_url")
-      tool[:url] ||= get_node_val(doc, "#{blti}|launch_url")
-      if custom_node = doc.css("#{blti}|custom")
+      tool[:description] = get_node_val(doc, "#{link_css_path} > #{blti}|description")
+      tool[:title] = get_node_val(doc, "#{link_css_path} > #{blti}|title")
+      tool[:url] = get_node_val(doc, "#{link_css_path} > #{blti}|secure_launch_url")
+      tool[:url] ||= get_node_val(doc, "#{link_css_path} > #{blti}|launch_url")
+      if custom_node = doc.css("#{link_css_path} > #{blti}|custom").first
         tool[:custom_fields] = get_custom_properties(custom_node)
       end
-      doc.css("#{blti}|extensions").each do |extension|
+      tool[:custom_fields] ||= {}
+
+      doc.css("#{link_css_path} > #{blti}|extensions").each do |extension|
         tool[:extensions] ||= []
         ext = {}
         ext[:platform] = extension['platform']
@@ -88,7 +91,7 @@ module CC::Importer
           tool[:extensions] << ext
         end
       end
-      if icon = get_node_val(doc, "#{blti}|icon")
+      if icon = get_node_val(doc, "#{link_css_path} > #{blti}|icon")
         tool[:settings] ||= {}
         tool[:settings][:icon_url] = icon
       end
@@ -98,12 +101,32 @@ module CC::Importer
     def convert_blti_xml(xml)
       doc = Nokogiri::XML(xml)
       begin
-        convert_blti_link(doc)
+        tool = convert_blti_link(doc)
+        check_for_unescaped_url_properties(tool) if tool
       rescue Nokogiri::XML::XPath::SyntaxError
-        raise CCImportError.new(I18n.t(:invalid_xml_syntax, "invalid xml syntax"))
+        raise CCImportError.new(I18n.t(:invalid_xml_syntax, "Invalid xml syntax"))
+      end
+      tool
+    end
+
+    def check_for_unescaped_url_properties(obj)
+      # Recursively look for properties named 'url'
+      if obj.is_a?(Hash)
+        obj.select{|k, v| k.to_s == 'url' && v.is_a?(String)}.each do |k, v|
+          check_for_unescaped_url(v)
+        end
+        obj.each{|k, v| check_for_unescaped_url_properties(v)}
+      elsif obj.is_a?(Array)
+        obj.each{|o| check_for_unescaped_url_properties(o)}
       end
     end
-    
+
+    def check_for_unescaped_url(url)
+      if (url =~ /(.*[^\=]*\?*\=)[^\&]*\=/)
+        raise CCImportError.new(I18n.t(:invalid_url_in_xml, "Invalid url in xml. Ampersands must be escaped."))
+      end
+    end
+
     def retrieve_and_convert_blti_url(url)
       begin
         uri = URI.parse(url)
@@ -129,6 +152,8 @@ module CC::Importer
           props[property['name']] = property.text
         elsif property.name == 'options'
           props[property['name']] = get_custom_properties(property)
+        elsif property.name == 'custom'
+          props[:custom_fields] = get_custom_properties(property)
         end
       end
       props
@@ -161,6 +186,5 @@ module CC::Importer
 
       asmnts
     end
-    class CCImportError < Exception; end
   end
 end

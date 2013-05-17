@@ -1,4 +1,5 @@
 <% content_for :page_title do %><%= t('user_dashboard', 'User Dashboard') %><% end %>
+<% jammit_css :dashboard %>
 <% js_bundle :dashboard %>
 <% content_for :auto_discovery do %>
   <% if @current_user %>
@@ -7,100 +8,11 @@
 <% end %>
 
 <% content_for :right_side do %>
-  <%= render :partial => 'courses/assignments_needing_grading', :locals => {:contexts => nil} %>
-  <% locals = {:title => t('coming_up', "Coming Up"), :display_count => 3, :period => :one_week, :show_context => true, :upcoming => true} %>
-  <% if @current_user %>    
-    <% cache([@current_user, 'user_dashboard_upcoming_events' ], :expires_in => 3.minutes) do %>
-      <% 
-        upcoming_events = @current_user.upcoming_events
-        @current_user_submissions ||= @current_user && @current_user.submissions.scoped(:select => 'id, assignment_id, score, workflow_state', :conditions => {:assignment_id => upcoming_events.select{|e| e.is_a?(Assignment) }.map(&:id)}) 
-      %>
-      <%= render :partial => "shared/event_list", :object => upcoming_events, :locals => locals %>
-    <% end %>
-  <% else %>
-    <%= render :partial => "shared/event_list", :object => [], :locals => locals %>
-  <% end %>
-  <% if @show_recent_feedback %>
-    <%= render :partial => "shared/event_list", :object => @recent_feedback, :locals => {:title => t('recent_feedback', "Recent Feedback"), :display_count => 3, :period => :two_weeks, :show_context => true, :is_recent_feedback => true} %>
-  <% end %>
-  <% if show_user_create_course_button(@current_user) %>
-  <div class="rs-margin-lr">
-    <a href="<%= getting_started_path(:fresh => 1) %>" class="button button-sidebar-wide"><%= t('start_new_course', 'Start a New Course') %></a>
-  </div>
-  <% end %>
+  <div class="placeholder"></div>
 <% end %>
-<div>
-<% if @current_user.cached_current_enrollments(:include_enrollment_uuid => session[:enrollment_uuid]).empty? %>
-  <%= render :partial => 'ie7_upgrade' %>
-  <%= render :partial => 'users/account_notification', :collection => @announcements %>
-  <div class="communication_message dashboard_notification">
-    <div class="header">
-      <div class="header_title">
-        <%= image_tag "information.png", :class => "header_icon", :style => "padding: 7px 2px 2px;" %>
-        <span class="title subject"><%= t('welcome_to_happiness', 'Welcome to Canvas!') %></span>
-        <div class="sub_title">
-          <span class="context_code"><%= t('information', 'Information') %></span>
-        </div>
-      </div>
-      <div style="clear: left;"></div>
-    </div>
-    <div class="content">
-      <div class="message user_content">
-        <%= t('no_courses_message', "You don't have any courses, so this page won't be very exciting for now.
-        Once you've created or signed up for courses, you'll start to see
-        conversations from all of your classes.") %>
-      </div>
-      <div class="clear"></div>
-    </div>
-  </div>
-  <%= render :partial => 'cc_prefs', :locals => {:message_count => ((@current_user && @current_user.recent_stream_items) || []).length} %>
-<% else %>
-  <% pending_invitations = @current_user.cached_current_enrollments(:include_enrollment_uuid => session[:enrollment_uuid]).select { |e| e.invited? } %>
-  <% if pending_invitations.empty? %>
-  <% elsif pending_invitations.length == 1 %>
-    <% invitation = pending_invitations.first %>
-    <div class="communication_message dashboard_notification alert alert-info">
-      <div class="header">
-        <div class="header_title">
-          <%= image_tag "information.png", :class => "header_icon", :style => "padding: 0;" %>
-          <span class="title subject"><a href="<%= course_path(invitation.course_id, :invitation => invitation.uuid) %>"><%= invitation.long_name %></a></span>
-          <div class="sub_title">
-            <span class="context_code"><%= t('information', 'Information') %></span>
-          </div>
-        </div>
-        <div style="clear: left;"></div>
-      </div>
-      <div class="content">
-        <div class="message user_content">
-          <%=  render :partial => 'shared/invitation', :object => invitation %>
-        </div>
-        <div class="clear"></div>
-      </div>
-    </div>
-  <% else %>
-    <div class="communication_message dashboard_notification alert alert-info">
-      <div class="header">
-        <div class="header_title">
-          <%= image_tag "information.png", :class => "header_icon", :style => "padding: 7px 2px 2px;" %>
-          <span class="title subject"><%= t('pending_invitations', 'Pending Invitations') %></span>
-          <div class="sub_title">
-            <span class="context_code"><%= t('information', 'Information') %></span>
-          </div>
-        </div>
-        <div style="clear: left;"></div>
-      </div>
-      <div class="content">
-        <div class="message user_content">
-          <%= t('pending_invitations_link', "You've been invited to join %{count} courses. Go to your *course list* to view them.",
-                  :count => pending_invitations.length, :wrapper => link_to('\1', courses_url)) %>
-        </div>
-        <div class="clear"></div>
-      </div>
-    </div>
-  <% end %>
 
-  <% cache([@current_user, 'recent_messages'], :expires_in => 3.minutes) do %>
-    <%= render :partial => 'shared/recent_messages', :object => ((@current_user && @current_user.recent_stream_items) || []), :locals => {:show_context => true} %>
-  <% end %>
-<% end %>
+<div id="dashboard">
+<%= render :partial => 'shared/dashboard_invitation', :collection => @pending_invitations %>
+<%= render :partial => 'shared/dashboard_messages' %>
+<%= render :partial => 'shared/recent_activity' %>
 </div>

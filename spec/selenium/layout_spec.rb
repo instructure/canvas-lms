@@ -28,7 +28,7 @@ describe "layout" do
     rs_wrapper.should_not have_class 'with-scrolling-right-side'
     rs_wrapper.should have_class 'with-sidebar-pinned-to-bottom'
 
-    f('#topic_list').location_once_scrolled_into_view
+    f('#dashboard').location_once_scrolled_into_view
     sleep 0.1
     rs_wrapper.should have_class 'with-scrolling-right-side'
     rs_wrapper.should_not have_class 'with-sidebar-pinned-to-bottom'

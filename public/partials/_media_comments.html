@@ -3,7 +3,7 @@
     <li><a href="#record_media_tab">Record Media</a></li>
     <li><a href="#upload_media_tab">Upload Media</a></li>
   </ul>
-  <div id="record_media_tab">
+  <div id="record_media_tab" class="clearfix media_tab">
     <div id="media_record_option_holder">
       <a id="video_record_option" class="record_option tooltip" title="Record with Webcam">
         <span class="tooltip_wrap" style="display: none;">
@@ -68,20 +68,20 @@
     </div>
     <div class="clear"></div>
   </div>
-  <div id="upload_media_tab">
+  <div id="upload_media_tab" class="clearfix media_tab">
     <div id="media_upload_holder">
       <div id="audio_upload_holder" style="float: left;">
         <div id="audio_upload">
         </div>
         <div id="audio_upload_under" style="margin-bottom: 20px;">
-          <button class="button" type="button"><img src="/images/audio.png" alt=""/> Select Audio File</button>
+          <button class="btn" type="button"><img src="/images/audio.png" alt=""/> Select Audio File</button>
         </div>
       </div>
       <div id="video_upload_holder" style="float: left;">
         <div id="video_upload">
         </div>
         <div id="video_upload_under" style="margin-bottom: 20px;">
-          <button class="button" type="button"><img src="/images/video.png" alt=""/> Select Video File</button>
+          <button class="btn" type="button"><img src="/images/video.png" alt=""/> Select Video File</button>
         </div>
       </div>
       <div class="clear"></div>
@@ -100,7 +100,7 @@
         <div class="content" id="media_upload_progress" style="visibility: hidden; margin-top: 20px;"></div>
         <div class="content" id="media_upload_errors" style="visibility: hidden; margin-top: 20px;"></div>
         <div class="content">
-          <button class="button disabled" disabled="true" type="button" id="media_upload_submit">Submit Media File</button>
+          <button class="btn disabled" disabled="true" type="button" id="media_upload_submit">Submit Media File</button>
         </div>
       </div>
     </div>

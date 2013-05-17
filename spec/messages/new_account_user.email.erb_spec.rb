@@ -20,13 +20,22 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/messages_helper')
 
 describe 'new_account_user.email' do
-  it "should render" do
-    account = Account.create!(:name => "some account")
+  before do
+    @account = Account.create!(:name => "some account", :settings => {:outgoing_email_default_name => "Custom From"})
     user_model
-    account_user = account.add_user(@user)
-    account_user.account.should eql(account)
+    account_user = @account.add_user(@user)
+    account_user.account.should eql(@account)
     account_user.user.should eql(@user)
     @object = account_user
+  end
+
+  it "should render" do
     generate_message(:new_account_user, :email, @object)
+  end
+
+  it "should use the custom From: setting" do
+    msg = generate_message(:new_account_user, :email, @object)
+    msg.save
+    msg.from_name.should == "Custom From"
   end
 end

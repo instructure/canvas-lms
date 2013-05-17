@@ -9,7 +9,7 @@ class FixUserMergeConversations2 < ActiveRecord::Migration
     # the previous merging was done incorrectly due to a scoping issue
     
     # there are only about 100 that need to be fixed, so we just load them all
-    convos = ConversationParticipant.find(:all, :conditions => "NOT EXISTS (SELECT 1 FROM conversations WHERE id = conversation_id)")
+    convos = ConversationParticipant.where("NOT EXISTS (SELECT 1 FROM conversations WHERE id = conversation_id)")
     convos.group_by(&:conversation_id).each do |conversation_id, cps|
       private_hash = Conversation.private_hash_for(cps.map(&:user_id))
       if target = Conversation.find_by_private_hash(private_hash)
@@ -17,7 +17,7 @@ class FixUserMergeConversations2 < ActiveRecord::Migration
         cps.each do |cp|
           if new_cp = new_participants[cp.user_id]
             new_cp.update_attribute(:workflow_state, cp.workflow_state) if cp.unread? || new_cp.archived?
-            cp.conversation_message_participants.update_all(["conversation_participant_id = ?", new_cp.id])
+            cp.conversation_message_participants.update_all(:conversation_participant_id => new_cp)
             cp.destroy
           else
             $stderr.puts "couldn't find a target ConversationParticipant for id #{cp.id}"

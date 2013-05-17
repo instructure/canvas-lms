@@ -1,3 +1,12 @@
+if Rails.version < "3.0"
+  ActionController::Base.param_parsers.delete(Mime::XML)
+end
+
+# CVE-2013-0333
+# https://groups.google.com/d/topic/rubyonrails-security/1h2DR63ViGo/discussion
+# With Rails 2.3.16 we could remove this line, but we still prefer JSONGem for performance reasons
+ActiveSupport::JSON.backend = "JSONGem"
+
 if Rails::VERSION::MAJOR == 3 && Rails::VERSION::MINOR >= 1
   raise "This patch has been merged into rails 3.1, remove it from our repo"
 else
@@ -35,39 +44,6 @@ else
       target
     end
   end
-
-  # https://github.com/rails/rails/commit/0e17cf17ebeb70490d7c7cd25c6bf8f9401e44b3
-  # https://github.com/rails/rails/commit/63cd9432265a32d222353b535d60333c2a6a5125
-  # Backport from Rails 3.1
-  ERB::Util.module_eval do
-    # Detect whether 1.9 can transcode with XML escaping.
-    if '"&gt;&lt;&amp;&quot;"' == ('><&"'.encode('utf-8', :xml => :attr) rescue false)
-      def html_escape(s)
-        s = s.to_s
-        if s.html_safe?
-          s
-        else
-          s.encode(s.encoding, :xml => :attr)[1...-1].html_safe
-        end
-      end
-    else
-      def html_escape(s)
-        s = s.to_s
-        if s.html_safe?
-          s
-        else
-          s.gsub(/[&"><]/n) { |special| ERB::Util::HTML_ESCAPE[special] }.html_safe
-        end
-      end
-    end
-
-    remove_method(:h)
-    alias h html_escape
-
-    module_function :h
-    module_function :html_escape
-  end
-
 
   # Fix for has_many :through where the through and target reflections are the
   # same table (the through table needs to be aliased)
@@ -121,6 +97,45 @@ else
     end
   end
 
+  # Patch for CVE-2013-0155
+  # https://groups.google.com/d/topic/rubyonrails-security/c7jT-EeN9eI/discussion
+  # The one changed line is flagged
+  class ActiveRecord::Base
+    class << self
+      def sanitize_sql_hash_for_conditions(attrs, default_table_name = quoted_table_name, top_level = true)
+        attrs = expand_hash_conditions_for_aggregates(attrs)
+
+        # This is the one modified line
+        raise(ActiveRecord::StatementInvalid, "non-top-level hash is empty") if !top_level && attrs.is_a?(Hash) && attrs.empty?
+
+        conditions = attrs.map do |attr, value|
+          table_name = default_table_name
+
+          if not value.is_a?(Hash)
+            attr = attr.to_s
+
+            # Extract table name from qualified attribute names.
+            if attr.include?('.') and top_level
+              attr_table_name, attr = attr.split('.', 2)
+              attr_table_name = connection.quote_table_name(attr_table_name)
+            else
+              attr_table_name = table_name
+            end
+
+            attribute_condition("#{attr_table_name}.#{connection.quote_column_name(attr)}", value)
+          elsif top_level
+            sanitize_sql_hash_for_conditions(value, connection.quote_table_name(attr.to_s), false)
+          else
+            raise ActiveRecord::StatementInvalid
+          end
+        end.join(' AND ')
+
+        replace_bind_variables(conditions, expand_range_bind_variables(attrs.values))
+      end
+      alias_method :sanitize_sql_hash, :sanitize_sql_hash_for_conditions
+    end
+  end
+
   # ensure that the query cache is cleared on inserts, even if there's a db
   # error. this is fixed in rails 3.1. unfortunately we have to reproduce
   # whole method here and can't just alias it, since it calls super :(
@@ -159,39 +174,61 @@ else
       end
     end
   end
-end
 
-if Rails::VERSION::MAJOR == 2
-  # So far a new version of rails 2.3 has not been released to patch this.
-  # Hopefully the next minor version (if there is one) will incorporate it
-  # and we can add another && Rails::VERSION::MINOR < condition to above
-  class ActiveRecord::Base
-    def self.sanitize_sql_hash_for_conditions(attrs, default_table_name = quoted_table_name, top_level = true)
-      attrs = expand_hash_conditions_for_aggregates(attrs)
-
-      conditions = attrs.map do |attr, value|
-        table_name = default_table_name
-
-        if not value.is_a?(Hash)
-          attr = attr.to_s
-
-          # Extract table name from qualified attribute names.
-          if attr.include?('.') and top_level
-            attr_table_name, attr = attr.split('.', 2)
-            attr_table_name = connection.quote_table_name(attr_table_name)
+  # Handle quoting properly for Infinity and NaN. This fix exists in Rails 3.1
+  # and can be safely removed once we upgrade.
+  #
+  # Adapted from: https://github.com/rails/rails/commit/06c23c4c7ff842f7c6237f3ac43fc9d19509a947
+  #
+  # This patch is covered by tests in spec/initializers/active_record_quoting_spec.rb
+  if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
+    ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.class_eval do
+      # Quotes PostgreSQL-specific data types for SQL input.
+      def quote(value, column = nil) #:nodoc:
+        if value.kind_of?(String) && column && column.type == :binary
+          "'#{escape_bytea(value)}'"
+        elsif value.kind_of?(String) && column && column.sql_type == 'xml'
+          "xml '#{quote_string(value)}'"
+        elsif value.kind_of?(Float)
+          if value.infinite? && column && column.type == :datetime
+            "'#{value.to_s.downcase}'"
+          elsif value.infinite? || value.nan?
+            "'#{value.to_s}'"
           else
-            attr_table_name = table_name
+            super
           end
-
-          attribute_condition("#{attr_table_name}.#{connection.quote_column_name(attr)}", value)
-        elsif top_level
-          sanitize_sql_hash_for_conditions(value, connection.quote_table_name(attr.to_s), false)
+        elsif value.kind_of?(Numeric) && column && column.sql_type == 'money'
+          # Not truly string input, so doesn't require (or allow) escape string syntax.
+          "'#{value.to_s}'"
+        elsif value.kind_of?(String) && column && column.sql_type =~ /^bit/
+          case value
+            when /^[01]*$/
+              "B'#{value}'" # Bit-string notation
+            when /^[0-9A-F]*$/i
+              "X'#{value}'" # Hexadecimal notation
+          end
         else
-          raise ActiveRecord::StatementInvalid
+          super
         end
-      end.join(' AND ')
+      end
+    end
+  end
 
-      replace_bind_variables(conditions, expand_range_bind_variables(attrs.values))
+  # This change allows us to use whatever is in the latest tzinfo gem
+  # (like the Moscow change to always be on daylight savings)
+  # instead of the hard-coded list in ActiveSupport::TimeZone.zones_map
+  #
+  # Fixed in Rails 3
+  ActiveSupport::TimeZone.class_eval do
+    instance_variable_set '@zones', nil
+    instance_variable_set '@zones_map', nil
+    instance_variable_set '@us_zones', nil
+
+    def self.zones_map
+      @zones_map ||= begin
+        zone_names = ActiveSupport::TimeZone::MAPPING.keys
+        Hash[zone_names.map { |place| [place, create(place)] }]
+      end
     end
   end
 end

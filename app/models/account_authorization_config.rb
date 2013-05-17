@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -20,25 +20,61 @@ require 'onelogin/saml'
 
 class AccountAuthorizationConfig < ActiveRecord::Base
   belongs_to :account
+  acts_as_list :scope => :account
 
   attr_accessible :account, :auth_port, :auth_host, :auth_base, :auth_username,
                   :auth_password, :auth_password_salt, :auth_type, :auth_over_tls,
                   :log_in_url, :log_out_url, :identifier_format,
                   :certificate_fingerprint, :entity_id, :change_password_url,
                   :login_handle_name, :ldap_filter, :auth_filter, :requested_authn_context,
-                  :login_attribute
+                  :login_attribute, :idp_entity_id
 
   before_validation :set_saml_defaults, :if => Proc.new { |aac| aac.saml_authentication? }
   validates_presence_of :account_id
   validates_presence_of :entity_id, :if => Proc.new{|aac| aac.saml_authentication?}
   after_create :disable_open_registration_if_delegated
+  after_destroy :enable_canvas_authentication
   # if the config changes, clear out last_timeout_failure so another attempt can be made immediately
   before_save :clear_last_timeout_failure
+
+  def self.recognized_params(auth_type)
+    case auth_type
+    when 'cas'
+      [ :auth_type, :auth_base, :log_in_url, :login_handle_name ]
+    when 'ldap'
+      [ :auth_type, :auth_host, :auth_port, :auth_over_tls, :auth_base,
+        :auth_filter, :auth_username, :auth_password, :change_password_url,
+        :identifier_format, :login_handle_name, :position ]
+    when 'saml'
+      [ :auth_type, :log_in_url, :log_out_url, :change_password_url, :requested_authn_context,
+        :certificate_fingerprint, :identifier_format, :login_handle_name,
+        :login_attribute, :idp_entity_id, :position]
+    else
+      []
+    end
+  end
+
+  def self.auth_over_tls_setting(value)
+    case value
+      when nil, '', false, 'false', 'f', 0, '0'
+        nil
+      when true, 'true', 't', 1, '1', 'simple_tls', :simple_tls
+        'simple_tls'
+      when 'start_tls', :start_tls
+        'start_tls'
+      else
+        raise ArgumentError("invalid auth_over_tls setting: #{value}")
+    end
+  end
+
+  def auth_over_tls
+    self.class.auth_over_tls_setting(read_attribute(:auth_over_tls))
+  end
 
   def ldap_connection
     raise "Not an LDAP config" unless self.auth_type == 'ldap'
     require 'net/ldap'
-    ldap = Net::LDAP.new(:encryption => (self.auth_over_tls ? :simple_tls : nil))
+    ldap = Net::LDAP.new(:encryption => self.auth_over_tls.try(:to_sym))
     ldap.host = self.auth_host
     ldap.port = self.auth_port
     ldap.base = self.auth_base
@@ -68,7 +104,7 @@ class AccountAuthorizationConfig < ActiveRecord::Base
   
   def ldap_filter(login = nil)
     filter = self.auth_filter
-    filter.gsub!(/\{\{login\}\}/, sanitized_ldap_login(login)) if login
+    filter = filter.gsub(/\{\{login\}\}/, sanitized_ldap_login(login)) if login
     filter
   end
   
@@ -145,24 +181,25 @@ class AccountAuthorizationConfig < ActiveRecord::Base
     
     encryption = app_config[:encryption]
     if encryption.is_a?(Hash)
-      resolve_path = lambda { |path|
-        if path.nil?
-          nil
-        elsif path[0, 1] == '/'
-          path
-        else
-          File.join(Rails.root, 'config', path)
-        end
-      }
+      settings.xmlsec_certificate = resolve_saml_key_path(encryption[:certificate])
+      settings.xmlsec_privatekey = resolve_saml_key_path(encryption[:private_key])
 
-      private_key_path = resolve_path.call(encryption[:private_key])
-      certificate_path = resolve_path.call(encryption[:certificate])
-
-      settings.xmlsec_certificate = certificate_path if certificate_path.present? && File.exists?(certificate_path)
-      settings.xmlsec_privatekey = private_key_path if private_key_path.present? && File.exists?(private_key_path)
+      settings.xmlsec_additional_privatekeys = Array(encryption[:additional_private_keys]).map { |apk| resolve_saml_key_path(apk) }.compact
     end
     
     settings
+  end
+
+  def self.resolve_saml_key_path(path)
+    return nil unless path
+
+    path = Pathname(path)
+
+    if path.relative?
+      path = Rails.root.join 'config', path
+    end
+
+    path.exist? ? path.to_s : nil
   end
   
   def email_identifier?
@@ -209,36 +246,40 @@ class AccountAuthorizationConfig < ActiveRecord::Base
         TCPSocket.open(self.auth_host, self.auth_port)
       end
       return true
+    rescue SocketError
+      self.errors.add(:ldap_connection_test, t(:test_host_unknown, "Unknown host: %{host}", :host => self.auth_host))
     rescue Timeout::Error
-      self.errors.add(
-        :ldap_connection_test,
-        t(:test_connection_timeout, "Timeout when connecting")
-      )
-    rescue
-      self.errors.add(
-        :ldap_connection_test,
-        t(:test_connection_failed, "Failed to connect to host/port")
-        )
+      self.errors.add(:ldap_connection_test, t(:test_connection_timeout, "Timeout when connecting"))
+    rescue => e
+      self.errors.add(:ldap_connection_test, e.message)
     end
     false
   end
 
   def test_ldap_bind
     begin
-      return self.ldap_connection.bind
-    rescue
-      self.errors.add(
-        :ldap_bind_test,
-        t(:test_bind_failed, "Failed to bind")
-      )
+      conn = self.ldap_connection
+      unless res = conn.bind
+        error = conn.get_operation_result
+        self.errors.add(:ldap_bind_test, "Error #{error.code}: #{error.message}")
+      end
+      return res
+    rescue => e
+      self.errors.add(:ldap_bind_test, t(:test_bind_failed, "Failed to bind with the following error: %{error}", :error => e.message))
       return false
     end
   end
 
   def test_ldap_search
     begin
-      res = self.ldap_connection.search {|s| break s}
-      return true if res
+      conn = self.ldap_connection
+      filter = self.ldap_filter("canvas_ldap_test_user")
+      Net::LDAP::Filter.construct(filter)
+      unless res = conn.search {|s| break s}
+        error = conn.get_operation_result
+        self.errors.add(:ldap_search_test, "Error #{error.code}: #{error.message}")
+      end
+      return res.present?
     rescue
       self.errors.add(
         :ldap_search_test,
@@ -269,11 +310,18 @@ class AccountAuthorizationConfig < ActiveRecord::Base
 
   def disable_open_registration_if_delegated
     if self.delegated_authentication? && self.account.open_registration?
-      @account.settings = { :open_registration => false }
+      @account.settings = { :open_registration => false, :self_registration => false }
       @account.save!
     end
   end
-  
+
+  def enable_canvas_authentication
+    if self.account.settings[:canvas_authentication] == false
+      self.account.settings[:canvas_authentication] = true
+      self.account.save!
+    end
+  end
+
   def debugging?
     !!Rails.cache.fetch(debug_key(:debugging))
   end
@@ -318,6 +366,8 @@ class AccountAuthorizationConfig < ActiveRecord::Base
   end
 
   def ldap_bind_result(unique_id, password_plaintext)
+    return nil if password_plaintext.blank?
+
     if self.last_timeout_failure.present?
       failure_timeout = self.class.ldap_failure_wait_time.ago
       if self.last_timeout_failure >= failure_timeout
@@ -336,10 +386,12 @@ class AccountAuthorizationConfig < ActiveRecord::Base
         return res if res
       end
     rescue Net::LDAP::LdapError
-      ErrorReport.log_exception(:ldap, $!)
+      ErrorReport.log_exception(:ldap, $!, :account => self.account)
     rescue Timeout::Error
-      ErrorReport.log_exception(:ldap, $!)
+      ErrorReport.log_exception(:ldap, $!, :account => self.account)
       self.update_attribute(:last_timeout_failure, Time.now)
+    rescue
+      ErrorReport.log_exception(:ldap, $!, :account => self.account)
     end
 
     return nil

@@ -86,7 +86,9 @@ class DiscussionEntry < ActiveRecord::Base
 
   on_create_send_to_streams do
     if self.root_entry_id.nil?
-      recent_entries = DiscussionEntry.active.find(:all, :select => 'user_id', :conditions => ['discussion_entries.discussion_topic_id=? AND discussion_entries.created_at > ?', self.discussion_topic_id, 2.weeks.ago])
+      recent_entries = DiscussionEntry.active.
+          where('discussion_topic_id=? AND created_at > ?', self.discussion_topic_id, 2.weeks.ago).
+          select(:user_id).all
       # If the topic has been going for more than two weeks and it suddenly
       # got "popular" again, move it back up in user streams
       if !self.discussion_topic.for_assignment? && self.created_at && self.created_at > self.discussion_topic.created_at + 2.weeks && recent_entries.select{|e| e.created_at && e.created_at > 24.hours.ago }.length > 10
@@ -119,9 +121,14 @@ class DiscussionEntry < ActiveRecord::Base
   end
 
   def reply_from(opts)
-    return if self.context.root_account.deleted?
+    raise IncomingMessageProcessor::UnknownAddressError if self.context.root_account.deleted?
     user = opts[:user]
-    message = opts[:html].strip
+    if opts[:html]
+      message = opts[:html].strip
+    else
+      message = opts[:text].strip
+      message = format_message(message).first
+    end
     user = nil unless user && self.context.users.include?(user)
     if !user
       raise "Only context participants may reply to messages"
@@ -132,8 +139,12 @@ class DiscussionEntry < ActiveRecord::Base
       entry.discussion_topic_id = self.discussion_topic_id
       entry.parent_entry = self
       entry.user = user
-      entry.save!
-      entry
+      if entry.grants_right?(user, :create)
+        entry.save!
+        entry
+      else
+        raise IncomingMessageProcessor::ReplyToLockedTopicError
+      end
     end
   end
 
@@ -163,6 +174,7 @@ class DiscussionEntry < ActiveRecord::Base
     self.deleted_at = Time.now
     save!
     update_topic_submission
+    decrement_unread_counts_for_this_entry
   end
 
   def update_discussion
@@ -179,10 +191,10 @@ class DiscussionEntry < ActiveRecord::Base
 
   def update_topic_submission
     if self.discussion_topic.for_assignment?
-      entries = self.discussion_topic.discussion_entries.scoped(:conditions => {:user_id => self.user_id, :workflow_state => 'active'})
-      submission = self.discussion_topic.assignment.submissions.scoped(:conditions => {:user_id => self.user_id}).first
+      entries = self.discussion_topic.discussion_entries.where(:user_id => self.user_id, :workflow_state => 'active')
+      submission = self.discussion_topic.assignment.submissions.where(:user_id => self.user_id).first
       if entries.any?
-        submission_date = entries.scoped(:order => 'created_at').first.created_at
+        submission_date = entries.order(:created_at).limit(1).pluck(:created_at).first
         if submission_date > self.created_at
           submission.submitted_at = submission_date
           submission.save!
@@ -196,8 +208,22 @@ class DiscussionEntry < ActiveRecord::Base
     end
   end
 
-  named_scope :active, :conditions => ['discussion_entries.workflow_state != ?', 'deleted']
-  named_scope :deleted, :conditions => ['discussion_entries.workflow_state = ?', 'deleted']
+  def decrement_unread_counts_for_this_entry
+    # decrement unread_entry_count for every participant that has not read the
+    transaction do
+      # get a list of users who have not read the entry yet
+      users = discussion_topic.discussion_topic_participants.
+          where(['user_id NOT IN (?)', discussion_entry_participants.read.pluck(:user_id)]).pluck(:user_id)
+      # decrement unread_entry_count for topic participants
+      if users.present?
+        DiscussionTopicParticipant.where(:discussion_topic_id => self.discussion_topic_id, :user_id => users).
+            update_all('unread_entry_count = unread_entry_count - 1')
+      end
+    end
+  end
+
+  scope :active, where("discussion_entries.workflow_state<>'deleted'")
+  scope :deleted, where(:workflow_state => 'deleted')
 
   def user_name
     self.user.name rescue t :default_user_name, "User Name"
@@ -218,19 +244,19 @@ class DiscussionEntry < ActiveRecord::Base
   def update_topic
     if self.discussion_topic
       last_reply_at = [self.discussion_topic.last_reply_at, self.created_at].max
-      DiscussionTopic.update_all({:last_reply_at => last_reply_at, :updated_at => Time.now.utc}, {:id => self.discussion_topic_id})
+      DiscussionTopic.where(:id => self.discussion_topic_id).update_all(:last_reply_at => last_reply_at, :updated_at => Time.now.utc)
     end
   end
 
   set_policy do
-    given { |user| self.user && self.user == user && !self.discussion_topic.locked? }
-    can :update and can :reply and can :read
-
     given { |user| self.user && self.user == user }
     can :read
 
     given { |user| self.user && self.user == user && !self.discussion_topic.locked? }
-    can :delete
+    can :reply
+
+    given { |user| self.user && self.user == user && !self.discussion_topic.locked? && context.user_can_manage_own_discussion_posts?(user) }
+    can :update and can :delete
 
     given { |user, session| self.cached_context_grants_right?(user, session, :read_forum) }
     can :read
@@ -241,7 +267,7 @@ class DiscussionEntry < ActiveRecord::Base
     given { |user, session| self.cached_context_grants_right?(user, session, :post_to_forum) }
     can :read
 
-    given { |user, session| self.discussion_topic.context.respond_to?(:allow_student_forum_attachments) && self.discussion_topic.context.allow_student_forum_attachments && self.cached_context_grants_right?(user, session, :post_to_forum) && !self.discussion_topic.locked?  }
+    given { |user, session| context.respond_to?(:allow_student_forum_attachments) && context.allow_student_forum_attachments && cached_context_grants_right?(user, session, :post_to_forum) && !discussion_topic.locked? }
     can :attach
 
     given { |user, session| !self.discussion_topic.root_topic_id && self.cached_context_grants_right?(user, session, :moderate_forum) && !self.discussion_topic.locked? }
@@ -263,28 +289,12 @@ class DiscussionEntry < ActiveRecord::Base
     can :create
   end
 
-  named_scope :for_user, lambda{|user|
-    {:conditions => ['discussion_entries.user_id = ?', (user.is_a?(User) ? user.id : user)], :order => 'discussion_entries.created_at'}
-  }
-  named_scope :for_users, lambda{|users|
-    user_ids = users.map{ |u| u.is_a?(User) ? u.id : u }
-    {:conditions => ['discussion_entries.user_id IN (?)', user_ids]}
-  }
-  named_scope :after, lambda{|date|
-    {:conditions => ['created_at > ?', date] }
-  }
-  named_scope :include_subentries, lambda{
-    {:include => discussion_subentries}
-  }
-  named_scope :top_level_for_topics, lambda {|topics|
-    topic_ids = topics.map{ |t| t.is_a?(DiscussionTopic) ? t.id : t }
-    {:conditions => ['discussion_entries.root_entry_id IS NULL AND discussion_entries.discussion_topic_id IN (?)', topic_ids]}
-  }
-  named_scope :all_for_topics, lambda { |topics|
-    topic_ids = topics.map{ |t| t.is_a?(DiscussionTopic) ? t.id : t }
-    {:conditions => ['discussion_entries.discussion_topic_id IN (?)', topic_ids]}
-  }
-  named_scope :newest_first, :order => 'discussion_entries.created_at DESC'
+  scope :for_user, lambda { |user| where(:user_id => user).order("discussion_entries.created_at") }
+  scope :for_users, lambda { |users| where(:user_id => users) }
+  scope :after, lambda { |date| where("created_at>?", date) }
+  scope :top_level_for_topics, lambda {|topics| where(:root_entry_id => nil, :discussion_topic_id => topics) }
+  scope :all_for_topics, lambda { |topics| where(:discussion_topic_id => topics) }
+  scope :newest_first, order("discussion_entries.created_at DESC")
 
   def to_atom(opts={})
     author_name = self.user.present? ? self.user.name : t('atom_no_author', "No Author")
@@ -355,9 +365,9 @@ class DiscussionEntry < ActiveRecord::Base
 
   def create_participants
     transaction do
-      dtp_conditions = sanitize_sql(["discussion_topic_id = ?", self.discussion_topic_id])
-      dtp_conditions = sanitize_sql(["discussion_topic_id = ? AND user_id <> ?", self.discussion_topic_id, self.user_id]) if self.user
-      DiscussionTopicParticipant.update_all("unread_entry_count = unread_entry_count + 1", dtp_conditions)
+      scope = DiscussionTopicParticipant.where(:discussion_topic_id => self.discussion_topic_id)
+      scope = scope.where("user_id<>?", self.user) if self.user
+      scope.update_all("unread_entry_count = unread_entry_count + 1")
 
       if self.user
         my_entry_participant = self.discussion_entry_participants.create(:user => self.user, :workflow_state => "read")
@@ -377,8 +387,7 @@ class DiscussionEntry < ActiveRecord::Base
   def read_state(current_user = nil)
     current_user ||= self.current_user
     return "read" unless current_user # default for logged out users
-    uid = current_user.is_a?(User) ? current_user.id : current_user
-    discussion_entry_participants.find_by_user_id(uid).try(:workflow_state) || "unread"
+    discussion_entry_participants.find_by_user_id(current_user).try(:workflow_state) || "unread"
   end
 
   def read?(current_user = nil)
@@ -411,7 +420,7 @@ class DiscussionEntry < ActiveRecord::Base
     entry_participant = nil
     DiscussionEntry.uncached do
       DiscussionEntry.unique_constraint_retry do
-        entry_participant = self.discussion_entry_participants.find(:first, :conditions => ['user_id = ?', current_user.id])
+        entry_participant = self.discussion_entry_participants.where(:user_id => current_user).first
         entry_participant ||= self.discussion_entry_participants.build(:user => current_user, :workflow_state => "unread")
         entry_participant.workflow_state = opts[:new_state] if opts[:new_state]
         entry_participant.save

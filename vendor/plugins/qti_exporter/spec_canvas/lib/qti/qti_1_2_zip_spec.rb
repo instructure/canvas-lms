@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/../../qti_helper'
+require File.expand_path(File.dirname(__FILE__) + '/../../qti_helper')
 if Qti.migration_executable
   describe "QTI 1.2 zip with id prepender value" do
     before(:all) do
@@ -21,7 +21,7 @@ if Qti.migration_executable
     end
 
     after(:all) do
-      ALL_MODELS.each { |m| truncate_table(m) }
+      ActiveRecord::Base.all_models.each { |m| truncate_table(m) }
       @converter.delete_unzipped_archive
       if File.exists?(@dir)
         FileUtils::rm_rf(@dir)
@@ -39,6 +39,13 @@ if Qti.migration_executable
     it "should convert the questions" do
       @course_data[:assessment_questions][:assessment_questions].length.should == 10
       @course.assessment_questions.count.should == 10
+    end
+
+    it "should create an assessment question bank for the quiz" do
+      @course.assessment_question_banks.count.should == 1
+      bank = @course.assessment_question_banks.first
+      bank.title.should == 'Quiz'
+      bank.assessment_questions.count.should == 10
     end
 
     it "should have file paths" do

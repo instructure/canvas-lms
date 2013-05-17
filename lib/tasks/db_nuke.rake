@@ -11,7 +11,7 @@ namespace :db do
     abcs = ActiveRecord::Base.configurations
     ["development"].each do |db|
       case abcs[db]["adapter"]
-        when "mysql"
+        when 'mysql', 'mysql2'
           ActiveRecord::Base.establish_connection(db.to_sym)
           conn = ActiveRecord::Base.connection
           conn.execute("DROP DATABASE #{abcs[db]["database"]}")

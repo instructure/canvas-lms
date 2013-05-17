@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/cc_spec_helper'
+require File.expand_path(File.dirname(__FILE__) + '/cc_spec_helper')
 
 describe "Common Cartridge exporting" do
   it "should collect errors and finish running" do
@@ -68,19 +68,19 @@ describe "Common Cartridge exporting" do
       @et2 = @course.context_external_tools.create!(:name => "new tool2", :consumer_key => "key", :shared_secret => "secret", :domain => 'example.com')
       @q1 = @course.quizzes.create!(:title => 'quiz1')
       @q2 = @course.quizzes.create!(:title => 'quiz2')
-      @log = LearningOutcomeGroup.default_for(@course)
-      @lo = @course.learning_outcomes.create!(:description => "outcome 2", :short_description => "for testing 2", :context => @course)
+      @log = @course.root_outcome_group
+      @lo = @course.created_learning_outcomes.create!(:description => "outcome 2", :short_description => "for testing 2", :context => @course)
       @lo.data = {:rubric_criterion=>{:mastery_points=>3, :ratings=>[{:description=>"Exceeds Expectations", :points=>5}, {:description=>"Meets Expectations", :points=>3}, {:description=>"Does Not Meet Expectations", :points=>0}], :description=>"First outcome", :points_possible=>5}}
       @lo.save
-      @lo2 = @course.learning_outcomes.create!(:description => "outcome 2", :short_description => "for testing 2", :context => @course)
+      @lo2 = @course.created_learning_outcomes.create!(:description => "outcome 2", :short_description => "for testing 2", :context => @course)
       @lo2.data = {:rubric_criterion=>{:mastery_points=>3, :ratings=>[{:description=>"Exceeds Expectations", :points=>5}, {:description=>"Meets Expectations", :points=>3}, {:description=>"Does Not Meet Expectations", :points=>0}], :description=>"First outcome", :points_possible=>5}}
       @lo2.save
       @log2 = @course.learning_outcome_groups.create!(:title => 'groupage', :context => @course)
-      @log2.add_item(@lo)
-      @log2.add_item(@lo2)
+      @log2.add_outcome(@lo)
+      @log2.add_outcome(@lo2)
       @log3 = @course.learning_outcome_groups.create!(:title => 'groupage2', :context => @course)
-      @log.add_item(@log2)
-      @log.add_item(@log3)
+      @log.adopt_outcome_group(@log2)
+      @log.adopt_outcome_group(@log3)
       @ag = @course.assignment_groups.create!(:name => 'group1')
       @ag2 = @course.assignment_groups.create!(:name => 'group2')
       @asmnt = @course.assignments.create!(:title => 'Assignment 1', :points_possible => 10, :assignment_group => @ag)
@@ -275,5 +275,133 @@ describe "Common Cartridge exporting" do
       @zip_file.find_entry(path).should_not be_nil
     end
 
+    it "should export web content files properly when display name is changed" do
+      @att = Attachment.create!(:filename => 'first.png', :uploaded_data => StringIO.new('ohai'), :folder => Folder.unfiled_folder(@course), :context => @course)
+      @att.display_name = "not_actually_first.png"
+      @att.save!
+
+      @q1 = @course.quizzes.create(:title => 'quiz1')
+
+      qq = @q1.quiz_questions.create!
+      data = {:correct_comments => "",
+              :question_type => "multiple_choice_question",
+              :question_bank_name => "Quiz",
+              :assessment_question_id => "9270",
+              :migration_id => "QUE_1014",
+              :incorrect_comments => "",
+              :question_name => "test fun",
+              :name => "test fun",
+              :points_possible => 1,
+              :question_text => "Image yo: <img src=\"/courses/#{@course.id}/files/#{@att.id}/preview\">",
+              :answers =>
+                  [{:migration_id => "QUE_1016_A1", :text => "True", :weight => 100, :id => 8080},
+                   {:migration_id => "QUE_1017_A2", :text => "False", :weight => 0, :id => 2279}]}.with_indifferent_access
+      qq.write_attribute(:question_data, data)
+      qq.save!
+
+      @ce.export_type = ContentExport::COMMON_CARTRIDGE
+      @ce.selected_content = {
+          :all_quizzes => "1",
+      }
+      @ce.save!
+
+      run_export
+
+      check_resource_node(@q1, CC::CCHelper::ASSESSMENT_TYPE)
+
+      doc = Nokogiri::XML.parse(@zip_file.read("#{mig_id(@q1)}/assessment_qti.xml"))
+      doc.at_css("presentation material mattext").text.should == "<div>Image yo: <img src=\"%24IMS_CC_FILEBASE%24/unfiled/not_actually_first.png\">\n</div>"
+
+      check_resource_node(@att, CC::CCHelper::WEBCONTENT)
+
+      path = @manifest_doc.at_css("resource[identifier=#{mig_id(@att)}]")['href']
+      @zip_file.find_entry(path).should_not be_nil
+    end
+
+    it "should not fail when answers are missing for FIMB" do
+      @q1 = @course.quizzes.create(:title => 'quiz1')
+
+      qq = @q1.quiz_questions.create!
+      data = {"question_text" =>
+                      "<p><span>enter three things [d], [e], [f]</span></p>",
+              "neutral_comments" => "",
+              "incorrect_comments" => "",
+              "name" => "silly question with no answers",
+              "answers" =>
+                      [{"id" => 4505, "weight" => 0, "text" => "", "blank_id" => "d", "comments" => ""},
+                       {"id" => 7936, "weight" => 0, "text" => "", "blank_id" => "d", "comments" => ""}],
+              "correct_comments" => "",
+              "question_type" => "fill_in_multiple_blanks_question",
+              "assessment_question_id" => nil,
+              "question_name" => "personality",
+              "points_possible" => 1}.with_indifferent_access
+      qq.write_attribute(:question_data, data)
+      qq.save!
+
+      @ce.export_type = ContentExport::QTI
+      @ce.selected_content = {
+              :all_quizzes => "1",
+      }
+      @ce.save!
+
+      # this checks that there are no export errors, so the test is in there
+      run_export
+    end
+
+    it "should deal with file URLs in anchor bodies" do
+      @att = Attachment.create!(:filename => 'first.txt', :uploaded_data => StringIO.new('ohai'), :folder => Folder.unfiled_folder(@course), :context => @course)
+      link_thing = %{<a href="/courses/#{@course.id}/files/#{@att.id}/download?wrap=1">/courses/#{@course.id}/files/#{@att.id}/download?wrap=1</a>}
+      @course.syllabus_body = link_thing
+      @course.save!
+      @ag = @course.assignment_groups.create!(:name => 'group1')
+      @asmnt = @course.assignments.create!(:title => 'Assignment 1', :points_possible => 10, :assignment_group => @ag,
+                                           :description => link_thing)
+      @ag2 = @course.assignment_groups.create!(:name => 'group2')
+      @asmnt2 = @course.assignments.create!(:title => 'Assignment 2', :points_possible => 10, :assignment_group => @ag2)
+
+      # verifies there were no export errors
+      run_export
+
+      # both assignments should be present, including the one with the link in the description
+      check_resource_node(@asmnt, CC::CCHelper::LOR)
+      check_resource_node(@asmnt2, CC::CCHelper::LOR)
+
+      # both assignment groups should be present as well
+      doc = Nokogiri::XML.parse(@zip_file.read("course_settings/assignment_groups.xml"))
+      doc.at_css("assignmentGroup[identifier=#{mig_id(@ag)}]").should_not be_nil
+      doc.at_css("assignmentGroup[identifier=#{mig_id(@ag2)}]").should_not be_nil
+    end
+
+    it "should not export syllabus if not selected" do
+      @course.syllabus_body = "<p>Bodylicious</p>"
+
+      run_export
+      @manifest_doc.at_css('resource[href="course_settings/syllabus.html"]').should be_nil
+    end
+
+    it "should export syllabus when selected" do 
+      @course.syllabus_body = "<p>Bodylicious</p>"
+
+      @ce.selected_content = {
+        :syllabus_body => "1"
+      }
+      @ce.save!
+
+      run_export
+      @manifest_doc.at_css('resource[href="course_settings/syllabus.html"]').should_not be_nil
+    end
+
+    it "should use canvas_export.txt as flag" do
+      run_export
+
+      @manifest_doc.at_css('resource[href="course_settings/canvas_export.txt"]').should_not be_nil
+      @zip_file.find_entry('course_settings/canvas_export.txt').should_not be_nil
+    end
+
+    it "should not error if the course name is too long" do
+      @course.name = "a" * Course.maximum_string_length
+
+      run_export
+    end
   end
 end

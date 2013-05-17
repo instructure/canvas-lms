@@ -19,17 +19,8 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe ConferencesController, :type => :integration do
-  before(:all) do
-    WebConference.instance_eval do
-      def plugins
-        [OpenObject.new(:id => "wimba", :settings => {:domain => "wimba.test"}, :valid_settings? => true, :enabled? => true)]
-      end
-    end
-  end
-  after(:all) do
-    WebConference.instance_eval do
-      def plugins; Canvas::Plugin.all_for_tag(:web_conferencing); end
-    end
+  before do
+    WebConference.stubs(:plugins).returns([web_conference_plugin_mock("wimba", {:domain => "wimba.test"})])
   end
 
   it "should notify participants" do
@@ -54,7 +45,7 @@ describe ConferencesController, :type => :integration do
     Set.new(Message.all.map(&:user)).should == Set.new([@teacher, @student1, @student2, @student3])
   end
 
-  it "should render the correct conferences for group news feed" do
+  it "should find the correct conferences for group news feed" do
     course_with_student_logged_in(:active_all => true, :user => user_with_pseudonym)
     @group = @course.groups.create!(:name => "some group")
     @group.add_user(@user)
@@ -66,9 +57,7 @@ describe ConferencesController, :type => :integration do
 
     get "/courses/#{@course.id}/groups/#{@group.id}"
     response.should be_success
-
-    response.body.should_not match(/conference_#{course_conference.id}/)
-    response.body.should match(/conference_#{group_conference.id}/)
+    assigns['current_conferences'].map(&:id).should == [group_conference.id]
   end
 
   it "shouldn't show concluded users" do

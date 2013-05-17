@@ -19,12 +19,14 @@ define([
     });
     $(".edit_letter_grades_link").click(function(event) {
       event.preventDefault();
-      $("#edit_letter_grades_form").dialog('close').dialog({
+      $("#edit_letter_grades_form").dialog({
         title: I18n.t('titles.grading_scheme_info', "View/Edit Grading Scheme"),
-        autoOpen: false,
         width: 600,
-        height: 310
-      }).dialog('open');
+        height: 310,
+        dialogClass: 'form-inline',
+        resizable: false,
+        close: function() { $(event.target).focus() }
+      });
     });
     $(".grading_standard .delete_grading_standard_link").click(function(event) {
       event.preventDefault();
@@ -242,7 +244,7 @@ define([
           'assignment[grading_type]': 'letter_grade'
         };
         var url = $("#edit_assignment_form").attr('action');
-        $("#edit_assignment_form .grading_standard_id").val(standard.id);
+        $("input.grading_standard_id, ").val(standard.id);
         if($("#update_course_url").length) {
           put_data = {
             'course[grading_standard_id]': standard.id

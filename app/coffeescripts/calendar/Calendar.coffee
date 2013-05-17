@@ -7,6 +7,8 @@
 define [
   'i18n!calendar'
   'jquery'
+  'underscore'
+  'compiled/userSettings'
   'compiled/util/hsvToRgb'
   'jst/calendar/calendarApp'
   'compiled/calendar/EventDataSource'
@@ -14,13 +16,14 @@ define [
   'compiled/calendar/ShowEventDetailsDialog'
   'compiled/calendar/EditEventDetailsDialog'
   'compiled/calendar/Scheduler'
+  'compiled/calendar/CalendarDefaults'
   'vendor/fullcalendar'
 
   'jquery.instructure_misc_helpers'
   'jquery.instructure_misc_plugins'
   'vendor/jquery.ba-tinypubsub'
   'jqueryui/button'
-], (I18n, $, hsvToRgb, calendarAppTemplate, EventDataSource, commonEventFactory, ShowEventDetailsDialog, EditEventDetailsDialog, Scheduler) ->
+], (I18n, $, _, userSettings, hsvToRgb, calendarAppTemplate, EventDataSource, commonEventFactory, ShowEventDetailsDialog, EditEventDetailsDialog, Scheduler, calendarDefaults) ->
 
   class Calendar
     constructor: (selector, @contexts, @manageContexts, @dataSource, @options) ->
@@ -42,6 +45,7 @@ define [
         "EventDataSource/ajaxStarted" : @ajaxStarted
         "EventDataSource/ajaxEnded" : @ajaxEnded
         "Calendar/refetchEvents" : @refetchEvents
+        'CommonEvent/assignmentSaved' : @updateOverrides
 
       weekColumnFormatter = """
         '<span class="agenda-col-wrapper">
@@ -53,7 +57,7 @@ define [
         </span>'
       """
 
-      fullCalendarParams =
+      fullCalendarParams = _.defaults(
         header:
           left:   'prev,today,next,title'
           center: ''
@@ -62,33 +66,29 @@ define [
         columnFormat:
           month: 'dddd'
           week: weekColumnFormatter
-        allDayDefault: false
         buttonText:
           today: I18n.t 'today', 'Today'
         defaultEventMinutes: 60
-        weekMode: 'variable'
         slotMinutes: 30
         firstHour: 7
         droppable: true
         dropAccept: '.undated_event'
-        # In order to display times in the time zone configured in the user's profile,
-        # and NOT the system timezone, we tell fullcalendar to ignore timezones and
-        # give it Date objects that have had times shifted appropriately.
-        ignoreTimezone: true
-        # We do our own caching with our EventDataSource, so there's no need for
-        # fullcalendar to also cache.
-        lazyFetching: false
         events: @getEvents
         eventRender: @eventRender
         eventAfterRender: @eventAfterRender
+        eventDragStart: @eventDragStart
         eventDrop: @eventDrop
         eventClick: @eventClick
         eventResize: @eventResize
+        eventResizeStart: @eventResizeStart
         dayClick: @dayClick
+        addEventClick: @addEventClick
         titleFormat:
           week: "MMM d[ yyyy]{ '&ndash;'[ MMM] d, yyyy}"
         viewDisplay: @viewDisplay
+        windowResize: @windowResize
         drop: @drop
+        , calendarDefaults)
 
       data = @dataFromDocumentHash()
       if not data.view_start and @options?.viewStart
@@ -101,8 +101,11 @@ define [
           fullCalendarParams.month = date.getMonth()
           fullCalendarParams.date = date.getDate()
 
-      @el = $(selector).html calendarAppTemplate()
+      @el = $(selector).html calendarAppTemplate(
+        calendar2Only: @options.calendar2Only,
+        showScheduler: @options.showScheduler)
 
+      data.view_name = 'agendaWeek' if data.view_name == 'week'
       if data.view_name == 'month' || data.view_name == 'agendaWeek'
         radioId = if data.view_name == 'agendaWeek' then 'week' else 'month'
         $("##{radioId}").click()
@@ -119,19 +122,20 @@ define [
         @loadView $(event.target).attr('id')
 
       @$refresh_calendar_link = @el.find('#refresh_calendar_link').click @reloadClick
+      @$create_new_event_link = @el.find('#create_new_event_link').click @addEventClick
       @colorizeContexts()
 
       @scheduler = new Scheduler(".scheduler-wrapper", this)
-      $('html').addClass('calendar-loaded')
 
-      # Pre-load the appointment group list, for the badge
-      @dataSource.getAppointmentGroups false, (data) =>
-        required = 0
-        for group in data
-          required += 1 if group.requiring_action
-        @el.find("#calendar-header .counter-badge")
-          .toggle(required > 0)
-          .text(required)
+      if @options.showScheduler
+        # Pre-load the appointment group list, for the badge
+        @dataSource.getAppointmentGroups false, (data) =>
+          required = 0
+          for group in data
+            required += 1 if group.requiring_action
+          @el.find("#calendar-header .counter-badge")
+            .toggle(required > 0)
+            .text(required)
 
       window.setTimeout =>
         if data.view_name == 'scheduler'
@@ -164,9 +168,10 @@ define [
                 # If there is not a reserve_url set, then it is an
                 # actual, scheduled event and not just a placeholder.
                 keep = true
-              else if event.calendarEvent.child_events_count > 0 && !event.calendarEvent.reserved
+              else if event.calendarEvent.child_events_count > 0 && !event.calendarEvent.reserved && event.can_edit
                 # If this *is* a placeholder, and it has child events, and it's not reserved by me,
-                # that means people have signed up for it, so we want to display it.
+                # that means people have signed up for it, so we want to display it if I am able to
+                #  manage it (as a teacher or TA might)
                 keep = true
               else
                 keep = false
@@ -198,6 +203,17 @@ define [
         else
           cb(filterEvents(events))
 
+    # Close all event details popup on the page and have them cleaned up.
+    closeEventPopups: ->
+      # Close any open popup as it gets detached when rendered
+      $('.event-details').each ->
+        existingDialog = $(this).data('showEventDetailsDialog')
+        if existingDialog
+          existingDialog.close()
+
+    windowResize: (view) =>
+      @closeEventPopups()
+
     eventRender: (event, element, view) =>
       $element = $(element)
       if event.isAppointmentGroupEvent() && @displayAppointmentEvents &&
@@ -216,15 +232,31 @@ define [
         if event.calendarEvent.reserved == true
           status = "Reserved" # TODO: i18n
         $element.find('.fc-event-title').text(status)
-      $element.attr('title', $.trim("#{$element.find('.fc-event-time').text()}\n#{$element.find('.fc-event-title').text()}"))
+      
+      # TODO: i18n
+      timeString = if !event.endDate() || event.startDate().getTime() == event.endDate().getTime()
+          @calendar.fullCalendar('formatDate', event.startDate(), 'h:mmtt')
+        else
+          @calendar.fullCalendar('formatDates', event.startDate(), event.endDate(), 'h:mmtt{ – h:mmtt}')
+      screenReaderTitleHint = if event.eventType.match(/assignment/)
+          I18n.t('event_assignment_title', 'Assignment Title: ')
+        else
+          I18n.t('event_event_title', 'Event Title: ')
+
+      $element.attr('title', $.trim("#{timeString}\n#{$element.find('.fc-event-title').text()}\n\n#{I18n.t('calendar_title', 'Calendar:')} #{event.contextInfo.name}"))
+      $element.find('.fc-event-inner').prepend($("<span class='screenreader-only'>#{I18n.t('calendar_title', 'Calendar:')} #{event.contextInfo.name}</span>"));
+      $element.find('.fc-event-title').prepend($("<span class='screenreader-only'>#{screenReaderTitleHint}</span>"))
       true
 
     eventAfterRender: (event, element, view) =>
-      if event.eventType == 'assignment' && event.isDueAtMidnight()
-        element.find('.fc-event-time').remove()
-      if event.eventType == 'assignment' && view.name == "agendaWeek"
+      if event.isDueAtMidnight()
+        # show the actual time instead of the midnight fudged time
+        element.find('.fc-event-time').html @calendar.fullCalendar('formatDate', event.startDate(), 'h(:mm)t')
+      if event.eventType.match(/assignment/) && view.name == "agendaWeek"
         element.height('') # this fixes it so it can wrap and not be forced onto 1 line
           .find('.ui-resizable-handle').remove()
+      if event.eventType.match(/assignment/)
+        element.find('.fc-event-time').html I18n.t('labels.due', 'due')
       if event.eventType == 'calendar_event' && @options?.activateEvent && event.id == "calendar_event_#{@options?.activateEvent}"
         @options.activateEvent = null
         @eventClick event,
@@ -233,14 +265,57 @@ define [
           pageX: element.offset().left + parseInt(element.width() / 2)
           view
 
+    eventDragStart: (event, jsEvent, ui, view) =>
+      @closeEventPopups()
+
+    eventResizeStart: (event, jsEvent, ui, view) =>
+      @closeEventPopups()
+
+    # event triggered by items being dropped from within the calendar
     eventDrop: (event, dayDelta, minuteDelta, allDay, revertFunc, jsEvent, ui, view) =>
+
+      if event.eventType == "assignment" && allDay
+        revertFunc()
+        return
+
       # isDueAtMidnight() will read cached midnightFudged property
       if event.eventType == "assignment" && event.isDueAtMidnight() && minuteDelta == 0
         event.start.setMinutes(59)
+
+      # set event as an all day event if allDay
+      if event.eventType == "calendar_event" && allDay
+        event.allDay = true
+
+      # if a short event gets dragged, we don't want to change its duration
+      if event.end && event.endDate()
+        originalDuration = event.endDate().getTime() - event.startDate().getTime()
+        event.end = new Date(event.start.getTime() + originalDuration)
+
       event.saveDates null, revertFunc
 
+    eventResize: (event, dayDelta, minuteDelta, revertFunc, jsEvent, ui, view) =>
+      # assignments can't be resized
+      # if short events are being resized, assume the user knows what they're doing
+      event.saveDates null, revertFunc
+
+    addEventClick: (event, jsEvent, view) =>
+      if @displayAppointmentEvents
+        # Don't allow new event creation while in scheduler mode
+        return
+
+      # create a new dummy event
+      allowedContexts = userSettings.get('checked_calendar_codes') or _.pluck(@contexts, 'asset_string')
+      activeContexts  = _.filter @contexts, (c) -> _.contains(allowedContexts, c.asset_string)
+      event = commonEventFactory(null, activeContexts)
+
+      new EditEventDetailsDialog(event).show()
+
     eventClick: (event, jsEvent, view) =>
-      (new ShowEventDetailsDialog(event)).show(jsEvent)
+      $event = $(jsEvent.currentTarget)
+      if !$event.hasClass('event_pending')
+        detailsDialog = new ShowEventDetailsDialog(event)
+        $event.data('showEventDetailsDialog', detailsDialog)
+        detailsDialog.show jsEvent
 
     dayClick: (date, allDay, jsEvent, view) =>
       if @displayAppointmentEvents
@@ -248,14 +323,13 @@ define [
         return
 
       # create a new dummy event
-      event = commonEventFactory(null, @contexts)
+      allowedContexts = userSettings.get('checked_calendar_codes') or _.pluck(@contexts, 'asset_string')
+      activeContexts  = _.filter @contexts, (c) -> _.contains(allowedContexts, c.asset_string)
+      event = commonEventFactory(null, activeContexts)
       event.allDay = allDay
       event.date = date
 
       (new EditEventDetailsDialog(event)).show()
-
-    eventResize: (event, dayDelta, minuteDelta, revertFunc, jsEvent, ui, view) =>
-      event.saveDates null, revertFunc
 
     updateFragment: (opts) ->
       data = @dataFromDocumentHash()
@@ -266,19 +340,35 @@ define [
     viewDisplay: (view) =>
       @updateFragment view_start: $.dateToISO8601UTC(view.start)
 
+    # event triggered by items being dropped from outside the calendar
     drop: (date, allDay, jsEvent, ui) =>
-      eventId = $(ui.helper).data('event-id')
-      event   = $("[data-event-id=#{eventId}]").data('calendarEvent')
-
-      date.setHours(23)
-      date.setMinutes(59)
+      eventId    = $(ui.helper).data('event-id')
+      event      = $("[data-event-id=#{eventId}]").data('calendarEvent')
+      revertFunc = -> console.log("could not save date on undated event")
 
       if event
         event.start = date
         event.addClass 'event_pending'
-        @calendar.fullCalendar('renderEvent', event)
-        event.saveDates null, -> console.log("could not save date on undated event")
 
+        if event.eventType == "assignment" && allDay
+          revertFunc()
+          return
+
+        # isDueAtMidnight() will read cached midnightFudged property
+        if event.eventType == "assignment" && event.isDueAtMidnight() && minuteDelta == 0
+          event.start.setMinutes(59)
+
+        # set event as an all day event if allDay
+        if event.eventType == "calendar_event" && allDay
+          event.allDay = true
+
+        # if a short event gets dragged, we don't want to change its duration
+        if event.end && event.endDate()
+          originalDuration = event.endDate().getTime() - event.startDate().getTime()
+          event.end = new Date(event.start.getTime() + originalDuration)
+
+        @calendar.fullCalendar('renderEvent', event)
+        event.saveDates null, revertFunc
 
     # DOM callbacks
 
@@ -324,12 +414,19 @@ define [
 
     eventSaved: (event) =>
       event.removeClass 'event_pending'
+
+      # If we just saved a new event then the id field has changed from what it
+      # was in eventSaving. So we need to clear out the old _id that
+      # fullcalendar stores for itself because the id has changed.
+      # This is another reason to do a refetchEvents instead of just an update.
+      delete event._id
       @calendar.fullCalendar('refetchEvents')
       # We'd like to just add the event to the calendar rather than fetching,
       # but the save may be as a result of moving an event from being undated
       # to dated, and in that case we don't know whether to just update it or
       # add it. Some new state would need to be kept to track that.
       # @calendar.fullCalendar('updateEvent', event)
+      @closeEventPopups()
 
     eventSaveFailed: (event) =>
       event.removeClass 'event_pending'
@@ -337,6 +434,12 @@ define [
         @calendar.fullCalendar('removeEvents', event.id)
       else
         @calendar.fullCalendar('updateEvent', event)
+
+    # When an assignment event is updated, update its related overrides.
+    updateOverrides: (event) =>
+      _.each @dataSource.cache.contexts[event.contextCode()].events, (override, key) ->
+        if key.match(/override/) and event.assignment.id == override.assignment.id
+          override.updateAssignmentTitle(event.title)
 
     visibleContextListChanged: (newList) =>
       @visibleContextList = newList
@@ -366,12 +469,14 @@ define [
         @calendar.removeClass('scheduler-mode')
         @displayAppointmentEvents = null
         @scheduler.hide()
+        @$create_new_event_link.show()
         @calendar.show()
         @calendar.fullCalendar('refetchEvents')
         @calendar.fullCalendar('changeView', if view == 'week' then 'agendaWeek' else 'month')
       else
         @currentView = 'scheduler'
         @calendar.addClass('scheduler-mode')
+        @$create_new_event_link.hide()
         @calendar.hide()
         @scheduler.show()
 

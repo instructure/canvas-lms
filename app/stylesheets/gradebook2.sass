@@ -45,6 +45,8 @@ $cell_height: 33px
   .student-placeholder
     display: none
   .student-section
+    position: relative
+    top: -7px
     font-size: 10px
     color: #aaa
   .secondary_identifier_cell
@@ -66,7 +68,8 @@ $cell_height: 33px
 .slick-header.ui-state-default
   border-top: 0
 .slick-header-column
-  +vertical-gradient(#f3f4f8, #dbdcde)
+  background-color: #f3f4f8
+  background-image: none
   padding: 10px
   font-size: 12px
   text-align: center
@@ -92,8 +95,8 @@ $cell_height: 33px
     text-overflow: ellipsis
     white-space: nowrap
   .muted
-    background: url('/images/sound_mute.png') no-repeat center right
-    padding-right: 16px
+    background: url('/images/sound_mute.png') no-repeat center left
+    padding-left: 16px
   .assignment-points-possible
     font-weight: normal
     text-shadow: #84848a 0 0 1px
@@ -114,17 +117,16 @@ $cell_height: 33px
     right: 3px
     text-indent: 999px
     +opacity(0)
+
+    //override jqueryui blue border
+    border: 0 none
+
     &:hover, &.ui-menu-trigger-menu-is-open
       background-position: bottom left
       +opacity(1)
   &:hover .gradebook-header-drop
     +opacity(1)
 
-
-
-#sort_rows_dialog
-  .button
-    margin-bottom: 5px
 
 .odd .slick-cell
   background-color: #f5f6f7
@@ -198,6 +200,12 @@ $cell_height: 33px
 .slick-cell.completely-hidden
   display: none
 
+.gradebook-tooltip-last
+  left: auto
+  right: 0
+  &:after
+    left: auto
+    right: 15px
 
 .gradebook-cell
   padding-top: 8px
@@ -211,10 +219,12 @@ $cell_height: 33px
 
   &.late
     background-image: url("/images/gradebook-late-indicator.png")
-  &.dropped
-    background-image: url("/images/gradebook-dropped-indicator.png")
   &.resubmitted
     background-image: url("/images/gradebook-resubmitted-indicator.png")
+
+.slick-cell.dropped
+  background-image: url("/images/gradebook-dropped-indicator.png")
+  background-repeat: repeat
 
 .gradebook-cell-turnitin
   position: absolute
@@ -247,8 +257,8 @@ $cell_height: 33px
   z-index: 2 //needs to be above "normal but below tooltips"
   overflow: hidden
 
-  &:hover,
-  &:focus
+  #gradebook_grid.editable &:hover,
+  #gradebook_grid.editable &:focus
     visibility: visible
     background-position: 100% -88px !important
     width: 17px
@@ -256,16 +266,16 @@ $cell_height: 33px
 
   .slick-cell.with-comments &
     visibility: visible
-  .slick-cell.focus &,
-  .slick-cell.hover &
+  #gradebook_grid.editable .slick-cell.focus &,
+  #gradebook_grid.editable .slick-cell.hover &
     visibility: visible
     background-position: 100% -41px
     width: 25px
     height: 25px
 
 .gradebook-cell-comment-label
-  +accessible_text_replacement
-
+  +hide-text
+  display: inline-block
 
 .gradebook-cell-editable
   height: $cell_height - 1px -8px
@@ -310,7 +320,7 @@ $cell_height: 33px
       display: inline-block
       background: transparent
     .outof
-      +unselectable
+      +user-select(none)
 
       text-align: left
       color: #888
@@ -324,7 +334,7 @@ $cell_height: 33px
 
 $gradebook_checkbox_width: 16px
 .gradebook-checkbox
-  +accessible_text_replacement
+  +hide-text
   display: block
   position: absolute
   left: 50%
@@ -356,16 +366,35 @@ $gradebook_checkbox_width: 16px
 
 // STUFF FOR HEADER
 #gradebook-toolbar
-  background: url('/images/black-header-bg.png') repeat-x
   height: 28px
-  padding: 8px 20px
+  padding: 6px 10px
+  position: relative
+  border-left: none
+  border-right: none
+
+.gradebook_filter
+  position: absolute
+  right: 10px
+  top: 6px
+
+.gradebook_filter input
+  width: 300px
+
+=gradebook_menu_label
+  font-size: 12px
+  font-weight: bold
+  margin-bottom: 0
+  vertical-align: 0px !important
+  position: relative
+  line-height: 1.5
 
 #section-to-show-menu
   width: 200px
-  &.scrolling
-    overflow-x: hidden
-    overflow-y: auto
-    max-height: 550px
+  overflow-x: hidden
+  overflow-y: auto
+  max-height: 550px
+  label
+    +gradebook_menu_label
 
 .submission_type_icon
   display: block
@@ -392,3 +421,11 @@ $gradebook_checkbox_width: 16px
   font-size: 11px
   padding-left: 8px
   line-height: 19px
+
+.final-warning
+  margin-left: -16px
+
+.gradebook_drop_down
+  label
+    +gradebook_menu_label
+

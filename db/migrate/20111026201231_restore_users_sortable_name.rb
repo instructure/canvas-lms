@@ -7,7 +7,7 @@ class RestoreUsersSortableName < ActiveRecord::Migration
         batch.each do |user|
           user.sortable_name = nil
           user.sortable_name
-          User.update_all({ :sortable_name => user.sortable_name }, :id => user.id) if user.changed?
+          User.where(:id => user).update_all(:sortable_name => user.sortable_name) if user.changed?
         end
       end
     end

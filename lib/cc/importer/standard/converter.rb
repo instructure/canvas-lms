@@ -21,7 +21,6 @@ module CC::Importer::Standard
     include WebcontentConverter
     include OrgConverter
     include DiscussionConverter
-    include CC::Importer::BLTIConverter
     include QuizConverter
 
     MANIFEST_FILE = "imsmanifest.xml"
@@ -51,8 +50,9 @@ module CC::Importer::Standard
       get_all_resources(@manifest)
       create_file_map
       @course[:discussion_topics] = convert_discussions
-      @course[:external_tools] = convert_blti_links(resources_by_type("imsbasiclti"))
-      @course[:assignments] = create_assignments_from_lti_links(@course[:external_tools])
+      lti_converter = CC::Importer::BLTIConverter.new
+      @course[:external_tools] = lti_converter.convert_blti_links(resources_by_type("imsbasiclti"), self)
+      @course[:assignments] = lti_converter.create_assignments_from_lti_links(@course[:external_tools])
       @course[:assessment_questions], @course[:assessments] = convert_quizzes if Qti.qti_enabled?
       @course[:modules] = convert_organizations(@manifest)
       @course[:all_files_zip] = package_course_files(@course[:file_map])

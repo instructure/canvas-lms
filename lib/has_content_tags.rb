@@ -38,7 +38,7 @@ module HasContentTags
   end
   
   def self.included(klass)
-    klass.send(:after_save, :update_associated_content_tags_later)
+    klass.send(:after_save, :update_associated_content_tags)
     klass.send(:before_save, :check_if_associated_content_tags_need_updating)
   end
   

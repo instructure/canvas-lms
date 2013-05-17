@@ -1,9 +1,2 @@
 <% content_for :page_title, join_title(t('titles.course_modules', "Course Modules"), @context.name) %>
-<% js_bundle :context_modules %>
-<% if can_do(@context, @current_user, :manage_content) %>
-  <% content_for :right_side do %>
-    <%= render :partial => 'context_modules/context_module_right_side' %>
-  <% end %>
-<% end %>
-<h2><%= t('headings.course_modules', %{Course Modules}) %></h2>
 <%= render :partial => "context_modules/content" %>

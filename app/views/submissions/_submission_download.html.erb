@@ -11,13 +11,12 @@ require([
 
   INST.downloadSubmissions = function(url) {
     var cancelled = false;
-    $("#download_submissions_dialog").dialog('close').dialog({
-      autoOpen: false,
+    $("#download_submissions_dialog").dialog({
       title: <%= jt("#submissions.download_submissions", "Download Assignment Submissions") %>,
       close: function() {
         cancelled = true;
       }
-    }).dialog('open');
+    });
     $("#download_submissions_dialog .progress").progressbar({value: 0});
     var checkForChange = function() {
       if(cancelled || $("#download_submissions_dialog:visible").length == 0) { return; }

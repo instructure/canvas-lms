@@ -20,9 +20,9 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe OutcomesController do
   def context_outcome(context)
-    @outcome_group ||= LearningOutcomeGroup.default_for(context)
-    @outcome = context.created_learning_outcomes.create
-    @outcome_group.add_item(@outcome)
+    @outcome_group ||= context.root_outcome_group
+    @outcome = context.created_learning_outcomes.create!(:title => 'outcome')
+    @outcome_group.add_outcome(@outcome)
   end
   
   def course_outcome
@@ -60,6 +60,16 @@ describe OutcomesController do
       user_session(@user)
       account_outcome
       get 'index', :account_id => @account.id
+    end
+
+    it "should find a common core group from settings" do
+      @account = Account.default
+      account_admin_user
+      user_session(@user)
+      account_outcome
+      Setting.set(AcademicBenchmark.common_core_setting_key, @outcome_group.id)
+      get 'index', :account_id => @account.id
+      assigns[:js_env][:COMMON_CORE_GROUP_ID].should == @outcome_group.id
     end
   end
 
@@ -102,13 +112,24 @@ describe OutcomesController do
       @outcome
 
       quiz = @course.quizzes.create!
-      tag = ContentTag.create!(:content => quiz, :context => @course, :learning_outcome => @outcome)
+      alignment = @outcome.align(quiz, @course)
 
       account_admin_user(:account => @account)
       user_session(@user)
       get 'show', :account_id => @account.id, :id => @outcome.id
 
-      assigns[:tags].any?{ |t| t.id == tag.id }.should be_true
+      assigns[:alignments].any?{ |a| a.id == alignment.id }.should be_true
+    end
+
+    it "should not allow access to individual outcomes for large_roster courses" do
+      course
+      course_outcome
+
+      @course.large_roster = true
+      @course.save!
+
+      get 'show', :course_id => @course.id, :id => @outcome.id
+      response.response_code.should == 302 # requests are redirected for large_roster courses
     end
   end
 

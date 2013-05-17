@@ -24,15 +24,15 @@
           </select>
         </td>
       </tr><tr>
-      <td><label for="include_concluded_courses">Include completed courses?</label></td>
-      <td><input type="checkbox" id="include_concluded_courses" name="include_concluded_courses" /></td>
+      <td></td>
+      <td><input type="checkbox" id="include_concluded_courses" name="include_concluded_courses" /> <label for="include_concluded_courses">Include completed courses?</label></td>
       </tr><tr>
         <td colspan="2">
           <div id="course_autocomplete_name_holder" style="display: none; margin-top: 20px;">
             Selected Course:
             <span id="course_autocomplete_name" style="font-weight: bold;">&nbsp;</span>
             <div class="button-container">
-              <button type="submit" class="button"><%= t 'buttons.copy_from_course', "Copy From this Course" %></button>
+              <button type="submit" class="btn btn-primary"><%= t 'buttons.copy_from_course', "Copy From this Course" %></button>
             </div>
           </div>
         </td>

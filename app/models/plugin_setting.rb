@@ -35,6 +35,8 @@ class PluginSetting < ActiveRecord::Base
   attr_writer :plugin
 
   before_save :encrypt_settings
+  after_save :clear_cache
+  after_destroy :clear_cache
   
   def validate_uniqueness_of_name?
     true
@@ -97,16 +99,28 @@ class PluginSetting < ActiveRecord::Base
   end
   
   def self.settings_for_plugin(name, plugin=nil)
-    if (plugin_setting = PluginSetting.find_by_name(name.to_s)) && plugin_setting.valid_settings? && plugin_setting.enabled?
-      plugin_setting.plugin = plugin
-      settings = plugin_setting.settings
-    else
-      plugin ||= Canvas::Plugin.find(name.to_s)
-      raise Canvas::NoPluginError unless plugin
-      settings = plugin.default_settings
+    res = Rails.cache.fetch(settings_cache_key(name), :expires_in => 5.minutes) do
+      if (plugin_setting = PluginSetting.find_by_name(name.to_s)) && plugin_setting.valid_settings? && plugin_setting.enabled?
+        plugin_setting.plugin = plugin
+        settings = plugin_setting.settings
+      else
+        plugin ||= Canvas::Plugin.find(name.to_s)
+        raise Canvas::NoPluginError unless plugin
+        settings = plugin.default_settings
+      end
+
+      settings || :nil
     end
-    
-    settings
+    res = nil if res == :nil
+    res
+  end
+
+  def self.settings_cache_key(name)
+    ["settings_for_plugin", name].cache_key
+  end
+
+  def clear_cache
+    Rails.cache.delete(PluginSetting.settings_cache_key(self.name))
   end
 
   def self.encrypt(text)

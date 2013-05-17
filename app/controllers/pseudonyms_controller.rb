@@ -46,11 +46,13 @@ class PseudonymsController < ApplicationController
 
     if @context.is_a?(Account)
       return unless context_is_root_account?
+      scope = @context.pseudonyms.active.where(:user_id => @user)
       @pseudonyms = Api.paginate(
-        @user.pseudonyms.scoped(:conditions => { :account_id => @context.id }),
-        self, api_v1_account_pseudonyms_path)
+        scope,
+        self, api_v1_account_pseudonyms_url)
     else
-      @pseudonyms = Api.paginate(@user.pseudonyms, self, api_v1_user_pseudonyms_path)
+      scope = @user.all_active_pseudonyms
+      @pseudonyms = Api.paginate(scope, self, api_v1_user_pseudonyms_url)
     end
 
     render :json => @pseudonyms.map { |p| pseudonym_json(p, @current_user, session) }
@@ -94,7 +96,7 @@ class PseudonymsController < ApplicationController
       format.js { render :json => {:requested => true}.to_json }
     end
   end
-  
+
   def confirm_change_password
     @pseudonym = Pseudonym.find(params[:pseudonym_id])
     @cc = @pseudonym.user.communication_channels.find_by_confirmation_code(params[:nonce])
@@ -105,35 +107,40 @@ class PseudonymsController < ApplicationController
     if !@cc || @cc.path_type != 'email'
       flash[:error] = t 'errors.cant_change_password', "Cannot change the password for that login, or login does not exist"
       redirect_to root_url
+    else
+      @password_pseudonyms = @cc.user.pseudonyms.active.select{|p| p.account.password_authentication? }
+      js_env :PASSWORD_POLICY => @domain_root_account.password_policy,
+             :PASSWORD_POLICIES => Hash[@password_pseudonyms.map{ |p| [p.id, p.account.password_policy]}]
     end
   end
-  
+
   def change_password
     @pseudonym = Pseudonym.find(params[:pseudonym][:id] || params[:pseudonym_id])
-    @cc = @pseudonym.user.communication_channels.find_by_confirmation_code(params[:nonce])
-    if @cc
+    if @cc = @pseudonym.user.communication_channels.find_by_confirmation_code(params[:nonce])
+      @pseudonym.require_password = true
       @pseudonym.password = params[:pseudonym][:password]
       @pseudonym.password_confirmation = params[:pseudonym][:password_confirmation]
-    end
-    if @cc && @pseudonym.save
-      # If they changed the password (and we subsequently log them in) then
-      # we're pretty confident this is the right user, and the communication
-      # channel is valid, so register the user and approve the channel.
-      @cc.set_confirmation_code(true)
-      @cc.confirm
-      @pseudonym.user.register
+      if @pseudonym.save
+        # If they changed the password (and we subsequently log them in) then
+        # we're pretty confident this is the right user, and the communication
+        # channel is valid, so register the user and approve the channel.
+        @cc.set_confirmation_code(true)
+        @cc.confirm
+        @cc.save
+        @pseudonym.user.register
 
-      # reset the session id cookie to prevent session fixation.
-      reset_session
+        # reset the session id cookie to prevent session fixation.
+        reset_session
 
-      @pseudonym_session = PseudonymSession.new(@pseudonym, true)
-      flash[:notice] = t 'notices.password_changed', "Password changed"
-      redirect_to dashboard_url
-    elsif @cc
-      render :action => "confirm_change_password"
+        @pseudonym_session = PseudonymSession.new(@pseudonym, true)
+        flash[:notice] = t 'notices.password_changed', "Password changed"
+        render :json => @pseudonym, :status => :ok # -> dashboard
+      else
+        render :json => {:pseudonym => @pseudonym.errors.as_json[:errors]}, :status => :bad_request
+      end
     else
-      flash[:notice] = t 'notices.link_invalid', "The link you used appears to no longer be valid.  If you can't login, try clicking \"Don't Know My Password\" and having a new message sent for you."
-      redirect_to login_url
+      flash[:notice] = t 'notices.link_invalid', "The link you used is no longer valid.  If you can't log in, click \"Don't know your password?\" to reset your password."
+      render :json => {:errors => {:nonce => 'expired'}}, :status => :bad_request # -> login url
     end
   end
 
@@ -143,7 +150,7 @@ class PseudonymsController < ApplicationController
   end
 
   def new
-    @pseudonym = @current_user.pseudonyms.build(:account_id => @domain_root_account.id)
+    @pseudonym = @domain_root_account.pseudonyms.build(:user => @current_user)
   end
 
   # @API Create a user login
@@ -159,16 +166,15 @@ class PseudonymsController < ApplicationController
 
     if api_request?
       return unless context_is_root_account?
-      params[:pseudonym] = params[:login].merge(
-        :password_confirmation => params[:login][:password],
-        :account => @context
-      )
+      @account = @context
+      params[:login][:password_confirmation] = params[:login][:password]
+      params[:pseudonym] = params[:login]
     else
       account_id = params[:pseudonym].delete(:account_id)
       if Account.site_admin.grants_right?(@current_user, :manage_user_logins)
-        params[:pseudonym][:account] = Account.root_accounts.find(account_id)
+        @account = Account.root_accounts.find(account_id)
       else
-        params[:pseudonym][:account] = @domain_root_account
+        @account = @domain_root_account
         unless @domain_root_account.settings[:admins_can_change_passwords]
           params[:pseudonym].delete :password
           params[:pseudonym].delete :password_confirmation
@@ -176,9 +182,10 @@ class PseudonymsController < ApplicationController
       end
     end
 
+    params[:pseudonym][:user] = @user
     sis_user_id = params[:pseudonym].delete(:sis_user_id)
-    @pseudonym = @user.pseudonyms.build(params[:pseudonym])
-    @pseudonym.sis_user_id = sis_user_id if sis_user_id.present? && @pseudonym.account.grants_right?(@current_user, session, :manage_sis)
+    @pseudonym = @account.pseudonyms.build(params[:pseudonym])
+    @pseudonym.sis_user_id = sis_user_id if sis_user_id.present? && @account.grants_right?(@current_user, session, :manage_sis)
     @pseudonym.generate_temporary_password if !params[:pseudonym][:password]
     if @pseudonym.save
       respond_to do |format|
@@ -198,7 +205,7 @@ class PseudonymsController < ApplicationController
     @user = @current_user
     @pseudonym = @current_pseudonym
   end
-  
+
   def get_user
     user_id = params[:user_id] || params[:user].try(:[], :id)
     @user = case
@@ -221,12 +228,14 @@ class PseudonymsController < ApplicationController
   # @argument login[sis_user_id] SIS ID for the login. To set this parameter, the caller must be able to manage SIS permissions on the account.
   def update
     if api_request?
-      @pseudonym          = Pseudonym.find(params[:id])
+      @pseudonym          = Pseudonym.active.find(params[:id])
       return unless @user = @pseudonym.user
+      params[:login][:password_confirmation] = params[:login][:password]
       params[:pseudonym]  = params[:login]
     else
       return unless get_user
-      @pseudonym = @user.pseudonyms.find(params[:id])
+      @pseudonym = Pseudonym.active.find(params[:id])
+      raise ActiveRecord::RecordNotFound unless @pseudonym.user_id == @user.id
     end
     return unless @user == @current_user || authorized_action(@user, @current_user, :manage_logins)
     return render(:json => nil, :status => :bad_request) if params[:pseudonym].blank?
@@ -284,8 +293,9 @@ class PseudonymsController < ApplicationController
   def destroy
     return unless get_user
     return unless @user == @current_user || authorized_action(@user, @current_user, :manage_logins)
-    @pseudonym = @user.pseudonyms.find(params[:id])
-    if @user.pseudonyms.active.length < 2
+    @pseudonym = Pseudonym.active.find(params[:id])
+    raise ActiveRecord::RecordNotFound unless @pseudonym.user_id == @user.id
+    if @user.all_active_pseudonyms.length < 2
       @pseudonym.errors.add_to_base(t('errors.login_required', "Users must have at least one login"))
       render :json => @pseudonym.errors.to_json, :status => :bad_request
     elsif @pseudonym.sis_user_id && !@pseudonym.account.grants_right?(@current_user, session, :manage_sis)

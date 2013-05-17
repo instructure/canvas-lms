@@ -17,12 +17,14 @@
 #
 
 class QuestionBanksController < ApplicationController
-  before_filter :require_context
-  add_crumb("Question Banks") { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_question_banks_url }
-  
+  before_filter :require_context, :except => :bookmark
+  add_crumb(proc { t('#crumbs.question_banks', "Question Banks") }, :except => :bookmark) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_question_banks_url }
+
+  include Api::V1::Outcome
+
   def index
     if @context == @current_user || authorized_action(@context, @current_user, :manage_assignments)
-      @question_banks = @context.assessment_question_banks.active
+      @question_banks = @context.assessment_question_banks.active.all
       if params[:include_bookmarked] == '1'
         @question_banks += @current_user.assessment_question_banks.active
       end
@@ -52,12 +54,14 @@ class QuestionBanksController < ApplicationController
       render :json => {:reorder => true}
     end
   end
-  
+
   def show
     @bank = @context.assessment_question_banks.find(params[:id])
+    js_env :ROOT_OUTCOME_GROUP => outcome_group_json(@context.root_outcome_group, @current_user, session)
+
     add_crumb(@bank.title)
     if authorized_action(@bank, @current_user, :read)
-      @outcome_tags = @bank.learning_outcome_tags.sort_by{|t| t.learning_outcome.short_description.downcase }
+      @alignments = @bank.learning_outcome_alignments.sort_by{|a| a.learning_outcome.short_description.downcase }
       @questions = @bank.assessment_questions.active.paginate(:per_page => 50, :page => 1)
     end
   end
@@ -70,7 +74,7 @@ class QuestionBanksController < ApplicationController
       params[:questions].each do |key, value|
         ids << key.to_i if value != '0' && key.to_i != 0
       end
-      @questions = @bank.assessment_questions.scoped(:conditions => { :id => ids})
+      @questions = @bank.assessment_questions.where(:id => ids)
       if params[:move] != '1'
         attributes = @questions.columns.map(&:name) - %w{id created_at updated_at assessment_question_bank_id}
         connection = @questions.connection
@@ -78,9 +82,9 @@ class QuestionBanksController < ApplicationController
         now = connection.quote(Time.now.utc)
         connection.execute(
             "INSERT INTO assessment_questions (#{(%w{assessment_question_bank_id created_at updated_at} + attributes).join(', ')})" +
-            @questions.construct_finder_sql(:select => ([@new_bank.id, now, now] + attributes).join(', ')))
+            @questions.select(([@new_bank.id, now, now] + attributes).join(', ')).to_sql)
       else
-        @questions.update_all(:assessment_question_bank_id => @new_bank.id)
+        @questions.update_all(:assessment_question_bank_id => @new_bank)
       end
       render :json => {}
     end
@@ -105,9 +109,12 @@ class QuestionBanksController < ApplicationController
   end
   
   def bookmark
-    @bank = @context.assessment_question_banks.find(params[:question_bank_id])
-    if authorized_action(@bank, @current_user, :update)
-      render :json => @bank.bookmark_for(@current_user, params[:unbookmark] != '1').to_json
+    @bank = AssessmentQuestionBank.find(params[:question_bank_id])
+
+    if params[:unbookmark] == "1"
+      render :json => @bank.bookmark_for(@current_user, false).to_json
+    elsif authorized_action(@bank, @current_user, :update)
+      render :json => @bank.bookmark_for(@current_user).to_json
     end
   end
   
@@ -116,7 +123,7 @@ class QuestionBanksController < ApplicationController
     if authorized_action(@bank, @current_user, :update)
       if @bank.update_attributes(params[:assessment_question_bank])
         @bank.reload
-        render :json => @bank.to_json(:include => {:learning_outcome_tags => {:include => :learning_outcome}})
+        render :json => @bank.to_json(:include => {:learning_outcome_alignments => {:include => :learning_outcome}})
       else
         render :json => @bank.errors.to_json, :status => :bad_request
       end

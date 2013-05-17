@@ -46,6 +46,17 @@
 #       // The address of the appointment group's location
 #       location_address: "Room 234",
 #
+#       // The number of participant who have reserved slots
+#       // (see include[] argument)
+#       participant_count: 2,
+#
+#       // The start and end times of slots reserved by the current user as
+#       // well as the id of the calendar event for the reservation (see
+#       // include[] argument)
+#       reserved_times: [{id: 987,
+#                         start_at: "2012-07-20T15:00:00-06:00",
+#                         start_at: "2012-07-20T15:00:00-06:00"}],
+#
 #       // The context codes (i.e. courses) this appointment group belongs to.
 #       // Only people in these courses will be eligible to sign up.
 #       context_codes: ["course_123"],
@@ -102,6 +113,9 @@
 #       // URL for this appointment group (to update, delete, etc.)
 #       url: "https://example.com/api/v1/appointment_groups/543",
 #
+#       // URL for a user to view this appointment group
+#       html_url: "http://example.com/appointment_groups/1",
+#
 #       // When the appointment group was created
 #       created_at: "2012-07-13T10:55:20-06:00",
 #
@@ -126,32 +140,52 @@ class AppointmentGroupsController < ApplicationController
   # the current user.
   #
   # @argument scope [Optional, "reservable"|"manageable"] Defaults to "reservable"
+  # @argument context_codes[] [Optional] Array of context codes used to limit returned results.
   # @argument include_past_appointments [Optional] Boolean, defaults to false.
   #   If true, includes past appointment groups
   # @argument include[] [Optional] Array of additional information to include.
   #   Allowable values include "appointments" (i.e. calendar event time slots
-  #   for this appointment group) and "child_events" (i.e. reservations of those
-  #   time slots)
+  #   for this appointment group), "child_events" (i.e. reservations of those
+  #   time slots), "participant_count" (i.e. number of reservations), and
+  #   "reserved_times" (i.e. the event id, start time and end time of
+  #   reservations the current user has made)
   def index
     unless request.format == :json
       anchor = calendar_fragment :view_name => :scheduler
       return redirect_to calendar2_url(:anchor => anchor)
     end
 
+    contexts = params[:context_codes] if params.include?(:context_codes)
+
     if params[:scope] == 'manageable'
-      scope = AppointmentGroup.manageable_by(@current_user)
+      scope = AppointmentGroup.manageable_by(@current_user, contexts)
       scope = scope.current_or_undated unless value_to_boolean(params[:include_past_appointments])
     else
-      scope = AppointmentGroup.reservable_by(@current_user)
+      scope = AppointmentGroup.reservable_by(@current_user, contexts)
       scope = scope.current unless value_to_boolean(params[:include_past_appointments])
     end
     groups = Api.paginate(
       scope.order('id'),
       self,
-      api_v1_appointment_groups_path(:scope => params[:scope])
+      api_v1_appointment_groups_url(:scope => params[:scope])
     )
-    AppointmentGroup.send(:preload_associations, groups, :appointments) if params[:include]
-    render :json => groups.map{ |group| appointment_group_json(group, @current_user, session, :include => params[:include]) }
+    if params[:include]
+      AppointmentGroup.send(:preload_associations, groups,
+                            [{:appointments =>
+                               [:parent_event,
+                                {:context =>
+                                  [{:appointment_group_contexts => :context},
+                                   :appointment_group_sub_contexts]},
+                                {:child_events =>
+                                  [:parent_event,
+                                   :context,
+                                   {:child_events =>
+                                     [:parent_event,
+                                      :context]}]}]},
+                             {:appointment_group_contexts => :context},
+                             :appointment_group_sub_contexts])
+    end
+    render :json => groups.map{ |group| appointment_group_json(group, @current_user, session, :include => params[:include]) } 
   end
 
   # @API Create an appointment group
@@ -322,7 +356,7 @@ class AppointmentGroupsController < ApplicationController
       render :json => Api.paginate(
         @group.possible_participants(params[:registration_status]),
         self,
-        send("api_v1_appointment_group_#{params[:action]}_path", @group)
+        send("api_v1_appointment_group_#{params[:action]}_url", @group)
       ).map(&formatter)
     end
   end

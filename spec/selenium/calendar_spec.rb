@@ -43,13 +43,14 @@ describe "calendar" do
       calendar_event_model(:title => event_title, :start_at => Time.now)
       go_to_calendar
 
-      f("##{Time.now.strftime("day_%Y_%m_%d")} .calendar_day .calendar_event").click
-      f('.delete_event_link').click
       keep_trying_until do
+        f("##{Time.now.strftime("day_%Y_%m_%d")} .calendar_day .calendar_event").click
+        f('.delete_event_link').click
         driver.switch_to.alert.should_not be nil
         driver.switch_to.alert.accept
         true
       end
+
       wait_for_ajaximations
       f("##{Time.now.strftime("day_%Y_%m_%d")} .calendar_day").should_not include_text(event_title)
       CalendarEvent.find_by_title(event_title).workflow_state.should == 'deleted'
@@ -139,28 +140,6 @@ describe "calendar" do
       f("##{date_holder_id} #event_assignment_#{second_assignment.id}").should_not be_displayed
     end
 
-    it "should allow editing event details repeatedly" do
-      calendar_event_model(:title => "ev", :start_at => "2012-04-02")
-      @event.all_day.should be_true
-
-      get "/courses/#{@course.id}/calendar_events/#{@event.id}"
-      f(".edit_calendar_event_link").click
-      replace_content(f("#calendar_event_title"), "edit1")
-      submit_form("#edit_calendar_event_form")
-      wait_for_ajax_requests
-
-      keep_trying_until { fj(".edit_calendar_event_link").should be_displayed } #using fj to bypass selenium cache
-      fj(".edit_calendar_event_link").click
-      replace_content(f("input[name=start_date]"), "2012-04-05")
-      replace_content(f("#calendar_event_title"), "edit2")
-      submit_form("#edit_calendar_event_form")
-      wait_for_ajax_requests
-
-      @event.reload
-      @event.title.should == "edit2"
-      @event.all_day.should be_true
-      @event.start_at.should == Time.zone.parse("2012-04-05")
-    end
   end
 
   context "student view" do
@@ -210,6 +189,19 @@ describe "calendar" do
       f('.mini-cal-header .next_month_link').click
       ff('.mini_calendar_day .day_number')[10].click
       keep_trying_until { f('.calendar_month .month_name').text.should == f('.mini-cal-month-and-year .month_name').text }
+    end
+
+    it "should open an event dialog on calendar from URL" do
+      event_title = 'Test Event 123'
+      start_time = 3.months.ago
+      end_time = start_time + 1.hour
+      calendar_event_model(:title => event_title, :start_at => start_time, :end_at => end_time)
+
+      get "/calendar?event_id=#{@event.id}&include_contexts=course_#{@course.id}"
+      wait_for_ajax_requests
+
+      keep_trying_until { fj(".ui-dialog").should be_displayed } #using fj to bypass selenium cache
+      fj(".ui-dialog .title").text.should == event_title
     end
   end
 end

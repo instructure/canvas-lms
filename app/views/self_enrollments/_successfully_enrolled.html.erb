@@ -1,0 +1,23 @@
+<div class="form-horizontal bootstrap-form" id="enroll_form">
+  <p><%= mt :already_enrolled, "You have successfully enrolled in **%{course}**.", :course => @course.name %></p>
+
+  <% if @course.user_is_student?(@current_user) 
+       # i.e. *current* student, the course has started %>
+    <%= registration_summary %>
+    <div class="control-group embedded-footer">
+      <div class="controls">
+        <%= @extra_actions %>
+        <a class="btn" href="<%= dashboard_url(:registration_success => params[:just_created]) %>" target="_top"><%= t "buttons.go_to_dashboard", "Go to your Dashboard" %></a>
+        <a class="btn btn-primary" href="<%= course_url(@course, :registration_success => params[:just_created]) %>" target="_top"><%= t "buttons.go_to_course", "Go to the Course" %></a>
+      </div>
+    </div>
+  <% else %>
+    <%= registration_summary || content_tag(:p, t(:not_available_yet, "We'll send you an email shortly before the course begins.")) %>
+    <div class="control-group embedded-footer">
+      <div class="controls">
+        <%= @extra_actions %>
+        <a class="btn btn-primary" href="<%= dashboard_url(:registration_success => params[:just_created]) %>" target="_top"><%= t "buttons.go_to_dashboard", "Go to your Dashboard" %></a>
+      </div>
+    </div>
+  <% end %>
+</div>

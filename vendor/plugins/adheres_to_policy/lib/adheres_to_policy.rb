@@ -27,8 +27,8 @@ module Instructure #:nodoc:
     #   end
     # end
     # 
-    # u = User.find(:first)
-    # a = Account.find(:first)
+    # u = User.first
+    # a = Account.first
     # a.check_policy(u)
     module ClassMethods
       # This stores the policy or permissions for a class.  It works like a
@@ -80,7 +80,7 @@ module Instructure #:nodoc:
     end
 
     # These are all available on an ActiveRecord model instance.  So a =
-    # Account.find(:first);
+    # Account.first;
 
     module InstanceMethods
       # Returns all permissions available for a user.  If a specific set of
@@ -111,38 +111,24 @@ module Instructure #:nodoc:
           session = sought_rights.shift
         end
         sought_rights = (sought_rights || []).compact.uniq
-        check_rights = sought_rights
+
+        cache_lookup = is_a_context? && !is_a?(User)
         # If you're going to add something to the user session that
         # affects permissions, you'd durn well better set :session_affects_permissions
         # to true as well
-        session = nil if session && !session[:session_affects_permissions]
-        # If this checking a course policy (which is the most expensive lookup)
-        # then just grab all the permissions at once instead of just the one
-        # being asked for.
-        if user && (self.is_a_context?) && !session
-          check_rights = []
-        end
-        # Generate cache key for memcached lookup
-        cache_lookup = ['course_permissions', self.cache_key, (user.cache_key rescue 'nobody'), check_rights.join('/')].join('/')
-        # Don't memcache the value unless it's checking all values for a course
-        cache_lookup = nil unless self.is_a?(Course) && check_rights.empty?
-        # Sometimes the session object holds information that can affect
-        # permission policies.  If this is true, we shouldn't cache the
-        # result, either.
-        cache_lookup = nil if session && session[:session_affects_permissions]
-        user_id = user ? user.id : nil
-        cache_param = [user_id, sought_rights].flatten
+        cache_lookup = false if session && session[:session_affects_permissions]
 
-        # According to my understanding, calling Rails.cache.fetch with an
-        # empty string will always return the contents of the block, and
-        # will not cache the value at all
-        granted_rights = []
-        if cache_lookup && RAILS_ENV != "test"
-          granted_rights = Rails.cache.fetch(cache_lookup) do
-            check_policy(user, session, *check_rights)
+        # Cache the lookup, iff this is a non-user context and the session
+        # doesn't affect the policies. Since context policy lookups are
+        # expensive (especially for courses), we grab all the permissions at
+        # once
+        granted_rights = if cache_lookup
+          # Check and cache all the things!
+          Rails.cache.fetch(permission_cache_key_for(user), :expires_in => 1.hour) do
+            check_policy(user)
           end
         else
-          granted_rights = check_policy(user, session, *check_rights)
+          check_policy(user, session, *sought_rights)
         end
 
         sought_rights = granted_rights if sought_rights.empty?
@@ -150,27 +136,21 @@ module Instructure #:nodoc:
         res
       end
 
-      def grants_right?(user, *sought_rights)
-        session = nil
-        if !sought_rights[0].is_a? Symbol
-          session = sought_rights.shift
-        end
-        sought_right = sought_rights[0].to_sym rescue nil
+      # user [, session], [, sought_right]
+      def grants_right?(user, *args)
+        sought_right = args.first.is_a?(Symbol) ? args.first : args[1].to_sym rescue nil
         return false unless sought_right
 
-        # if this is a course, call grants_rights which has specific logic to
-        # cache course rights lookups. otherwise we lose the benefits of that cache.
-        if self.is_a?(Course) && !(session && session[:session_affects_permissions])
-          return !!(self.grants_rights?(user, *[session].compact)[sought_right])
-        end
-
-        granted_rights = check_policy(user, session, *sought_rights)
-        granted_rights.include?(sought_right)
+        grants_rights?(user, *args)[sought_right]
       end
 
       # Used for a more-natural: user.has_rights?(@account, :destroy)
       def has_rights?(obj, *sought_rights)
         obj.grants_rights?(self, *sought_rights)
+      end
+
+      def permission_cache_key_for(user)
+        ['context_permissions', self, user].cache_key
       end
 
     end # InstanceMethods

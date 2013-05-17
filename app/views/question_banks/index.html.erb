@@ -1,3 +1,4 @@
+<% @active_tab = "question_banks" %>
 <% content_for :page_title, t(:page_title, "Question Banks") %>
 
 <% jammit_css :quizzes %>
@@ -5,7 +6,7 @@
 <% content_for :stylesheets do %>
   <style>
   .question_bank {
-    margin-bottom: 10px;
+    padding-bottom: 10px;
   }
   .question_bank .header {
     padding: 3px 5px;
@@ -38,24 +39,26 @@
 <% content_for :right_side do %>
   <div class="rs-margin-all">
     <% if !@context.is_a?(User) %>
-      <a href="#" class="add_bank_link button button-sidebar-wide"><%= image_tag "add.png" %> <%= t 'add_bank', 'Add Question Bank' %></a>
+      <a href="#" class="add_bank_link btn button-sidebar-wide"><i class="icon-add"></i> <%= t 'add_bank', 'Add Question Bank' %></a>
     <% end %>
     <% if @current_user && @context != @current_user %>
-      <a href="<%= context_url(@current_user, :context_question_banks_url) %>" class="button button-sidebar-wide see_bookmarked_banks"><%= image_tag "bookmark.png" %> <%= t 'see_bookmarked_banks', 'See My Bookmarked Banks' %></a>
+      <a href="<%= context_url(@current_user, :context_question_banks_url) %>" class="btn button-sidebar-wide see_bookmarked_banks"><%= image_tag "bookmark.png" %> <%= t 'see_bookmarked_banks', 'See My Bookmarked Banks' %></a>
     <% end %>
   </div>
 <% end %>
 
-<h2>
-  <% case @context.class.to_s %>
-    <% when 'Course' %>
-      <%= t 'course_question_banks', "Course Question Banks" %>
-    <% when 'User' %>
-      <%= t 'user_question_banks', "User Question Banks" %>
-    <% when 'Account' %>
-      <%= t 'account_question_banks', "Account Question Banks" %>
-  <% end %>
-</h2>
+<div class="quiz-header">
+  <h2>
+    <% case @context.class.to_s %>
+      <% when 'Course' %>
+        <%= t 'course_question_banks', "Course Question Banks" %>
+      <% when 'User' %>
+        <%= t 'user_question_banks', "User Question Banks" %>
+      <% when 'Account' %>
+        <%= t 'account_question_banks', "Account Question Banks" %>
+    <% end %>
+  </h2>
+</div>
 <% if @context != @current_user %>
   <%= render :partial => "question_bank" %>
 

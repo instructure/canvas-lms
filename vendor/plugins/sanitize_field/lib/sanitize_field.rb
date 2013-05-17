@@ -77,8 +77,8 @@ module Instructure #:nodoc:
       :elements => [
         'a', 'b', 'blockquote', 'br', 'caption', 'cite', 'code', 'col',
         'hr', 'h2', 'h3', 'h4', 'h5', 'h6', 'h7', 'h8',
-        'del', 'ins', 'iframe',
-        'colgroup', 'dd', 'div', 'dl', 'dt', 'em', 'i', 'img', 'li', 'ol', 'p', 'pre',
+        'del', 'ins', 'iframe', 'font',
+        'colgroup', 'dd', 'div', 'dl', 'dt', 'em', 'figure', 'figcaption', 'i', 'img', 'li', 'ol', 'p', 'pre',
         'q', 'small', 'span', 'strike', 'strong', 'sub', 'sup', 'table', 'tbody', 'td',
         'tfoot', 'th', 'thead', 'tr', 'u', 'ul', 'object', 'embed', 'param'],
 
@@ -89,7 +89,7 @@ module Instructure #:nodoc:
         'col'        => ['span', 'width'],
         'colgroup'   => ['span', 'width'],
         'img'        => ['align', 'alt', 'height', 'src', 'title', 'width'],
-        'iframe'     => ['src', 'width', 'height', 'name', 'align', 'frameborder', 'scrolling'],
+        'iframe'     => ['src', 'width', 'height', 'name', 'align', 'frameborder', 'scrolling', 'sandbox'],
         'ol'         => ['start', 'type'],
         'q'          => ['cite'],
         'table'      => ['summary', 'width', 'border', 'cellpadding', 'cellspacing', 'center', 'frame', 'rules', 'dir', 'lang'],
@@ -99,7 +99,8 @@ module Instructure #:nodoc:
         'ul'         => ['type'],
         'param'      => ['name', 'value'],
         'object'     => ['width', 'height', 'style', 'data', 'type', 'classid', 'codebase'],
-        'embed'      => ['name', 'src', 'type', 'allowfullscreen', 'pluginspage', 'wmode', 'allowscriptaccess', 'width', 'height']
+        'embed'      => ['name', 'src', 'type', 'allowfullscreen', 'pluginspage', 'wmode', 'allowscriptaccess', 'width', 'height'],
+        'font'       => ['face', 'color', 'size']
       },
 
       :protocols => {
@@ -155,7 +156,11 @@ module Instructure #:nodoc:
         @config.fields = []
         @config.allow_comments = true
         args.each { |arg| infer_sanitize_arg(arg) }
-        @config.fields.each { |field| write_inheritable_hash(:fully_sanitize_fields, {field => @config.sanitizer.first} ) }
+        @config.fields.each do |field|
+          class_attribute :fully_sanitize_fields_config
+          fields = (self.fully_sanitize_fields_config ||= {})
+          fields[field] = @config.sanitizer.first
+        end
 
         before_save :fully_sanitize_fields
       end
@@ -191,7 +196,7 @@ module Instructure #:nodoc:
         # configuration set for that specific field or 
         # Sanitize::Config::RESTRICTED as the default. 
         def fully_sanitize_fields
-          fields_hash = self.class.read_inheritable_attribute(:fully_sanitize_fields) || {}
+          fields_hash = self.class.fully_sanitize_fields_config || {}
           fields_hash.each do |field, config|
             config ||= Sanitize::Config::RESTRICTED
             config = Sanitize::Config::RESTRICTED if config.empty?

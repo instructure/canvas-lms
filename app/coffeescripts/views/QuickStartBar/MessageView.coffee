@@ -16,9 +16,7 @@ define [
       contexts: ENV.CONTEXTS
       placeholder: "Type the name of the person to send this to..."
       selector:
-        preparer: (postData, data, parent) ->
-          for row in data
-            row.noExpand = true
+        noExpand: true
         browser: false
 
     initialize: ->

@@ -2,9 +2,9 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/conversations_common
 
 describe "conversations user notes" do
   it_should_behave_like "in-process server selenium tests"
-  it_should_behave_like "conversations selenium tests"
 
   before(:each) do
+    conversation_setup
     @the_teacher = User.create(:name => "teacher bob")
     @course.enroll_teacher(@the_teacher)
     @the_student = User.create(:name => "student bob")
@@ -15,14 +15,14 @@ describe "conversations user notes" do
     @course.account.update_attribute(:enable_user_notes, false)
     new_conversation
     add_recipient("student bob")
-    f("#add_to_faculty_journal").should_not be_displayed
+    f(".user_note").should_not be_displayed
   end
 
   it "should not allow user notes to teachers" do
     @course.account.update_attribute(:enable_user_notes, true)
     new_conversation
     add_recipient("teacher bob")
-    f("#add_to_faculty_journal").should_not be_displayed
+    f(".user_note").should_not be_displayed
   end
 
   it "should not allow user notes on group conversations" do
@@ -30,20 +30,20 @@ describe "conversations user notes" do
     new_conversation
     add_recipient("student bob")
     add_recipient("teacher bob")
-    f("#add_to_faculty_journal").should_not be_displayed
+    f(".user_note").should_not be_displayed
     fj("#create_message_form input:visible").send_keys :backspace
-    f("#add_to_faculty_journal").should be_displayed
+    f(".user_note").should be_displayed
   end
 
   it "should allow user notes on new private conversations with students" do
     @course.account.update_attribute(:enable_user_notes, true)
     new_conversation
     add_recipient("student bob")
-    checkbox = f("#add_to_faculty_journal")
+    checkbox = f(".user_note")
     checkbox.should be_displayed
     checkbox.click
     submit_message_form(:add_recipient => false)
-    @the_student.user_notes.size.should eql(1)
+    @the_student.user_notes.size.should == 1
   end
 
   it "should allow user notes on existing private conversations with students" do
@@ -51,10 +51,15 @@ describe "conversations user notes" do
     new_conversation
     add_recipient("student bob")
     submit_message_form(:add_recipient => false)
-    checkbox = f("#add_to_faculty_journal")
+
+    expect_new_page_load { get "/conversations/sent" }
+    f(".conversations li").click
+    wait_for_ajaximations
+
+    checkbox = f(".user_note")
     checkbox.should be_displayed
     checkbox.click
-    submit_message_form
-    @the_student.user_notes.size.should eql(1)
+    submit_message_form(:existing_conversation => true)
+    @the_student.user_notes.size.should == 1
   end
 end

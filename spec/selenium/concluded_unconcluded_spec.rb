@@ -27,8 +27,8 @@ describe "concluded/unconcluded" do
     get "/courses/#{@course.id}/gradebook"
     wait_for_ajax_requests
     
-    keep_trying_until { driver.find_element(:css, "#submission_#{@student.id}_#{@assignment.id} .grade").displayed? }
-    entry = driver.find_element(:css, "#submission_#{@student.id}_#{@assignment.id}")
+    keep_trying_until { f("#submission_#{@student.id}_#{@assignment.id} .grade").displayed? }
+    entry = f("#submission_#{@student.id}_#{@assignment.id}")
     entry.find_element(:css, ".grade").should be_displayed
     # normally we hate sleeping in these tests, but in this case, i'm not sure what we're waiting to see happen,
     # and if we just try to click and click until it works, then things get jammed up.
@@ -42,8 +42,8 @@ describe "concluded/unconcluded" do
     @e.conclude
     get "/courses/#{@course.id}/gradebook"
     
-    keep_trying_until { driver.find_element(:css, "#submission_#{@student.id}_#{@assignment.id} .grade").displayed? }
-    entry = driver.find_element(:css, "#submission_#{@student.id}_#{@assignment.id}")
+    keep_trying_until { f("#submission_#{@student.id}_#{@assignment.id} .grade").displayed? }
+    entry = f("#submission_#{@student.id}_#{@assignment.id}")
     entry.find_element(:css, ".grade").should be_displayed
     sleep 2
     entry.find_element(:css, ".grade").click
@@ -53,33 +53,33 @@ describe "concluded/unconcluded" do
   it "should let the teacher add comments to the gradebook by default" do
     get "/courses/#{@course.id}/gradebook"
     
-    keep_trying_until { driver.find_element(:css, "#submission_#{@student.id}_#{@assignment.id} .grade").displayed? }
-    entry = driver.find_element(:css, "#submission_#{@student.id}_#{@assignment.id}")
+    keep_trying_until { f("#submission_#{@student.id}_#{@assignment.id} .grade").displayed? }
+    entry = f("#submission_#{@student.id}_#{@assignment.id}")
 
     driver.execute_script("$('#submission_#{@student.id}_#{@assignment.id} .grade').mouseover();")
-    keep_trying_until {
+    keep_trying_until do
       entry.send_keys('i')
-      driver.find_element(:css, "#submission_information").displayed?
-    }
+      f("#submission_information").should be_displayed
+    end
 
-    driver.find_element(:css, "#submission_information .add_comment").should be_displayed
-    driver.find_element(:css, "#submission_information .save_buttons").should be_displayed
+    f("#submission_information .add_comment").should be_displayed
+    f("#submission_information .save_buttons").should be_displayed
   end
   
   it "should not let the teacher add comments to the gradebook when concluded" do
     @e.conclude
     get "/courses/#{@course.id}/gradebook"
     
-    keep_trying_until { driver.find_element(:css, "#submission_#{@student.id}_#{@assignment.id} .grade").displayed? }
-    entry = driver.find_element(:css, "#submission_#{@student.id}_#{@assignment.id}")
+    keep_trying_until { f("#submission_#{@student.id}_#{@assignment.id} .grade").displayed? }
+    entry = f("#submission_#{@student.id}_#{@assignment.id}")
 
     driver.execute_script("$('#submission_#{@student.id}_#{@assignment.id} .grade').mouseover();")
     keep_trying_until {
       entry.send_keys('i')
-      driver.find_element(:css, "#submission_information").displayed?
+      f("#submission_information").displayed?
     }
 
-    driver.find_element(:css, "#submission_information .add_comment").should_not be_displayed
-    driver.find_element(:css, "#submission_information .save_buttons").should_not be_displayed
+    f("#submission_information .add_comment").should_not be_displayed
+    f("#submission_information .save_buttons").should_not be_displayed
   end
 end

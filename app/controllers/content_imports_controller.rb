@@ -93,7 +93,7 @@ class ContentImportsController < ApplicationController
           render :json => @migration.errors, :status => :bad_request
         end
       else
-        @plugins = Canvas::Plugin.all_for_tag(:export_system)
+        @plugins = ContentMigration.migration_plugins(true)
         @select_options = @plugins.map{|p|[p.metadata(:select_text), p.id]}
         @pending_migrations = ContentMigration.find_all_by_context_id(@context.id).any?
         render
@@ -113,7 +113,7 @@ class ContentImportsController < ApplicationController
 
   def migrate_content_s3_success
     load_migration_and_attachment do
-      if Attachment.s3_storage? && details = AWS::S3::S3Object.about(@attachment.full_filename, @attachment.bucket_name) rescue nil
+      if Attachment.s3_storage? && details = @attachment.s3object.head rescue nil
         @attachment.process_s3_details!(details)
         @migration.export_content
       end
@@ -152,7 +152,7 @@ class ContentImportsController < ApplicationController
         @content_migration.migration_settings[:migration_ids_to_import] = params
         @content_migration.save
         @content_migration.import_content
-        render :json => {:success => true}.to_json
+        render :text => {:success => true}.to_json
       else
         render :json => @content_migration.to_json
       end

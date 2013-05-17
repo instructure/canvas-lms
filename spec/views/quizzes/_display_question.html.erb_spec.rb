@@ -19,17 +19,29 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
-describe "/quizzes/_display_answer" do
+describe "/quizzes/_display_question" do
   it "should render" do
     course_with_student
     view_context
-    assigns[:quiz] = @course.quizzes.create!
-    question = {}
-    question[:id] = 5
-    question[:answers] = []
-    question[:question_type] = "multiple_choice_question"
-    render :partial => "quizzes/display_answer", :object => question, :locals => {:question_type => OpenObject.new}
+
+    @quiz = @course.quizzes.create!(:title => "new quiz")
+    @quiz.quiz_questions.create!(:question_data =>
+      {:name => 'LTUE', :points_possible => 1, 'question_type' => 'numerical_question',
+       'answers' => {'answer_0' => {'numerical_answer_type' => 'exact_answer',
+                                    'answer_exact' => 42, 'answer_text' => '', 'answer_weight' => '100'}}})
+    @quiz.generate_quiz_data
+    @quiz.save
+
+    @submission = @quiz.generate_submission(@student)
+    @submission.submission_data = { "question_#{@quiz.quiz_data[0][:id]}" => "42.0" }
+    @submission.grade_submission
+
+    assigns[:quiz] = @quiz
+    q = @quiz.stored_questions.first
+    q[:answers][0].delete(:margin) # sometimes this is missing; see #10785
+    render :partial => "quizzes/display_question", :object => q, :locals => {
+        :user_answer => @submission.submission_data.find{|a| a[:question_id] == q[:id]},
+        :assessment_results => true}
     response.should_not be_nil
   end
 end
-

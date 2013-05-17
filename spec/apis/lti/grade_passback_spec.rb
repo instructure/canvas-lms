@@ -59,8 +59,28 @@ describe LtiApiController, :type => :integration do
     response.status.should == "401 Unauthorized"
   end
 
-  def replace_result(score, sourceid = nil)
+  def replace_result(score=nil, sourceid = nil, result_data=nil)
     sourceid ||= BasicLTI::BasicOutcomes.encode_source_id(@tool, @course, @assignment, @student)
+    
+    score_xml = ''
+    if score
+      score_xml = <<-XML
+          <resultScore>
+            <language>en</language>
+            <textString>#{score}</textString>
+          </resultScore>
+      XML
+    end
+    
+    result_data_xml = ''
+    if result_data && !result_data.empty?
+      result_data_xml = "<resultData>\n"
+      result_data.each_pair do |key, val|
+        result_data_xml += "<#{key}>#{val}</#{key}>"
+      end
+      result_data_xml += "\n</resultData>\n"
+    end
+    
     body = %{
 <?xml version = "1.0" encoding = "UTF-8"?>
 <imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/lis/oms1p0/pox">
@@ -77,10 +97,8 @@ describe LtiApiController, :type => :integration do
           <sourcedId>#{sourceid}</sourcedId>
         </sourcedGUID>
         <result>
-          <resultScore>
-            <language>en</language>
-            <textString>#{score}</textString>
-          </resultScore>
+          #{score_xml}
+          #{result_data_xml}
         </result>
       </resultRecord>
     </replaceResultRequest>
@@ -151,22 +169,113 @@ describe LtiApiController, :type => :integration do
   end
 
   describe "replaceResult" do
-    it "should allow updating the submission score" do
-      @assignment.submissions.find_by_user_id(@student.id).should be_nil
-      make_call('body' => replace_result('0.6'))
-      check_success
-
+    
+    def verify_xml(response)
       xml = Nokogiri::XML.parse(response.body)
       xml.at_css('imsx_codeMajor').content.should == 'success'
       xml.at_css('imsx_messageRefIdentifier').content.should == '999999123'
       xml.at_css('imsx_operationRefIdentifier').content.should == 'replaceResult'
       xml.at_css('imsx_POXBody *:first').name.should == 'replaceResultResponse'
+    end
+    
+    it "should allow updating the submission score" do
+      @assignment.submissions.find_by_user_id(@student.id).should be_nil
+      make_call('body' => replace_result('0.6'))
+      check_success
+      
+      verify_xml(response)
+      
       submission = @assignment.submissions.find_by_user_id(@student.id)
       submission.should be_present
       submission.should be_graded
       submission.should be_submitted_at
       submission.submission_type.should eql 'external_tool'
       submission.score.should == 12
+    end
+    
+    it "should set the submission data text" do
+      make_call('body' => replace_result('0.6', nil, {:text =>"oioi"}))
+      check_success
+    
+      verify_xml(response)
+      submission = @assignment.submissions.find_by_user_id(@student.id)
+      submission.score.should == 12
+      submission.body.should == "oioi"
+    end
+    
+    it "should set complex submission text" do
+      text = CGI::escapeHTML("<p>stuff</p>")
+      make_call('body' => replace_result('0.6', nil, {:text => "<![CDATA[#{text}]]>" }))
+      check_success
+    
+      verify_xml(response)
+      submission = @assignment.submissions.find_by_user_id(@student.id)
+      submission.submission_type.should == 'online_text_entry'
+      submission.body.should == text
+    end
+    
+    it "should set the submission data url" do
+      make_call('body' => replace_result('0.6', nil, {:url =>"http://www.example.com/lti"}))
+      check_success
+    
+      verify_xml(response)
+      submission = @assignment.submissions.find_by_user_id(@student.id)
+      submission.submission_type.should == 'online_url'
+      submission.score.should == 12
+      submission.url.should == "http://www.example.com/lti"
+    end
+    
+    it "should set the submission data text even with no score" do
+      make_call('body' => replace_result(nil, nil, {:text =>"oioi"}))
+      check_success
+    
+      verify_xml(response)
+      submission = @assignment.submissions.find_by_user_id(@student.id)
+      submission.score.should == nil
+      submission.body.should == "oioi"
+    end
+    
+    it "should fail if no score and not submission data" do
+      make_call('body' => replace_result(nil, nil))
+      response.should be_success
+      xml = Nokogiri::XML.parse(response.body)
+      xml.at_css('imsx_codeMajor').content.should == 'failure'
+      xml.at_css('imsx_description').content.should == "No score given"
+    
+      @assignment.submissions.find_by_user_id(@student.id).should be_nil
+    end
+    
+    it "should fail if bad score given" do
+      make_call('body' => replace_result('1.5', nil))
+      response.should be_success
+      xml = Nokogiri::XML.parse(response.body)
+      xml.at_css('imsx_codeMajor').content.should == 'failure'
+      xml.at_css('imsx_description').content.should == "Score is not between 0 and 1"
+    
+      @assignment.submissions.find_by_user_id(@student.id).should be_nil
+    end
+
+    it "should fail if assignment has no points possible" do
+      @assignment.update_attributes(:points_possible => nil, :grading_type => 'percent')
+      make_call('body' => replace_result('0.75', nil))
+      response.should be_success
+      xml = Nokogiri::XML.parse(response.body)
+      xml.at_css('imsx_codeMajor').content.should == 'failure'
+      xml.at_css('imsx_description').content.should == "Assignment has no points possible."
+    end
+
+    it "should notify users if it fails because the assignment has no points" do
+      @assignment.update_attributes(:points_possible => nil, :grading_type => 'percent')
+      make_call('body' => replace_result('0.75', nil))
+      response.should be_success
+      submissions = @assignment.submissions.find_all_by_user_id(@student.id)
+      comments    = submissions.first.submission_comments
+      submissions.count.should == 1
+      comments.count.should == 1
+      comments.first.comment.should == <<-NO_POINTS
+An external tool attempted to grade this assignment as 75%, but was unable
+to because the assignment has no points possible.
+      NO_POINTS
     end
 
     it "should reject out of bound scores" do
@@ -410,9 +519,6 @@ describe LtiApiController, :type => :integration do
       end
 
       it "should set the grader to nil" do
-        # don't call id on nil, because it'll return 4 instead of nil.
-        nil.expects(:id).never
-
         make_call('body' => update_result('1.0'))
 
         check_success

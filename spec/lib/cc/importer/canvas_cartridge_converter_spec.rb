@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/../cc_spec_helper'
+require File.expand_path(File.dirname(__FILE__) + '/../cc_spec_helper')
 
 describe "Canvas Cartridge importing" do
   before(:each) do
@@ -85,10 +85,11 @@ describe "Canvas Cartridge importing" do
     tool1.tool_id = "test_tool"
     tool1.settings[:custom_fields] = {"key1" => "value1", "key2" => "value2"}
     tool1.settings[:user_navigation] = {:url => "http://www.example.com", :text => "hello", :labels => {'en' => 'hello', 'es' => 'hola'}, :extra => 'extra'}
-    tool1.settings[:course_navigation] = {:url => "http://www.example.com", :text => "hello", :labels => {'en' => 'hello', 'es' => 'hola'}, :default => 'disabled', :visibility => 'members', :extra => 'extra'}
+    tool1.settings[:course_navigation] = {:text => "hello", :labels => {'en' => 'hello', 'es' => 'hola'}, :default => 'disabled', :visibility => 'members', :extra => 'extra', :custom_fields => {"key3" => "value3"}}
     tool1.settings[:account_navigation] = {:url => "http://www.example.com", :text => "hello", :labels => {'en' => 'hello', 'es' => 'hola'}, :extra => 'extra'}
     tool1.settings[:resource_selection] = {:url => "http://www.example.com", :text => "hello", :labels => {'en' => 'hello', 'es' => 'hola'}, :selection_width => 100, :selection_height => 50, :extra => 'extra'}
     tool1.settings[:editor_button] = {:url => "http://www.example.com", :text => "hello", :labels => {'en' => 'hello', 'es' => 'hola'}, :selection_width => 100, :selection_height => 50, :icon_url => "http://www.example.com", :extra => 'extra'}
+    tool1.settings[:homework_submission] = {:url => "http://www.example.com", :text => "hello", :labels => {'en' => 'hello', 'es' => 'hola'}, :selection_width => 100, :selection_height => 50, :extra => 'extra'}
     tool1.settings[:icon_url] = "http://www.example.com/favicon.ico"
     tool1.save!
     tool2 = @copy_from.context_external_tools.new
@@ -110,10 +111,11 @@ describe "Canvas Cartridge importing" do
 
     #convert to json
     doc1 = Nokogiri::XML(builder.target!)
-    tool1_hash = @converter.convert_blti_link(doc1)
+    lti_converter = CC::Importer::BLTIConverter.new
+    tool1_hash = lti_converter.convert_blti_link(doc1)
     tool1_hash['migration_id'] = CC::CCHelper.create_key(tool1)
     doc2 = Nokogiri::XML(builder2.target!)
-    tool2_hash = @converter.convert_blti_link(doc2)
+    tool2_hash = lti_converter.convert_blti_link(doc2)
     tool2_hash['migration_id'] = CC::CCHelper.create_key(tool2)
     #import json into new course
     ContextExternalTool.process_migration({'external_tools'=>[tool1_hash, tool2_hash]}, @migration)
@@ -131,19 +133,20 @@ describe "Canvas Cartridge importing" do
     t1.tool_id.should == 'test_tool'
     t1.settings[:icon_url].should == 'http://www.example.com/favicon.ico'
     [:user_navigation, :course_navigation, :account_navigation].each do |type|
-      t1.settings[type][:url].should == "http://www.example.com"
       t1.settings[type][:text].should == "hello"
       t1.settings[type][:labels][:en].should == 'hello'
       t1.settings[type][:labels]['es'].should == 'hola'
       if type == :course_navigation
         t1.settings[type][:default].should == 'disabled'
         t1.settings[type][:visibility].should == 'members'
-        t1.settings[type].keys.map(&:to_s).sort.should == ['default', 'labels', 'text', 'url', 'visibility']
+        t1.settings[type][:custom_fields].should == {"key3" => "value3"}
+        t1.settings[type].keys.map(&:to_s).sort.should == ['custom_fields', 'default', 'labels', 'text', 'visibility']
       else
+        t1.settings[type][:url].should == "http://www.example.com"
         t1.settings[type].keys.map(&:to_s).sort.should == ['labels', 'text', 'url']
       end
     end
-    [:resource_selection, :editor_button].each do |type|
+    [:resource_selection, :editor_button, :homework_submission].each do |type|
       t1.settings[type][:url].should == "http://www.example.com"
       t1.settings[type][:text].should == "hello"
       t1.settings[type][:labels][:en].should == 'hello'
@@ -175,6 +178,7 @@ describe "Canvas Cartridge importing" do
     t2.settings[:account_navigation].should be_nil
     t2.settings[:resource_selection].should be_nil
     t2.settings[:editor_button].should be_nil
+    t2.settings[:homework_submission].should be_nil
     t2.settings.keys.map(&:to_s).sort.should == ['custom_fields', 'vendor_extensions']
     t2.settings[:vendor_extensions].should == [{'platform'=>"my.lms.com", 'custom_fields'=>{"key"=>"value"}}]
     t2.settings[:vendor_extensions][0][:platform].should == 'my.lms.com'
@@ -293,15 +297,15 @@ describe "Canvas Cartridge importing" do
   end
   
   def create_learning_outcome
-    lo = @copy_from.learning_outcomes.new
+    lo = @copy_from.created_learning_outcomes.new
     lo.context = @copy_from
     lo.short_description = "Lone outcome"
     lo.description = "<p>Descriptions are boring</p>"
     lo.workflow_state = 'active'
     lo.data = {:rubric_criterion=>{:mastery_points=>3, :ratings=>[{:description=>"Exceeds Expectations", :points=>5}, {:description=>"Meets Expectations", :points=>3}, {:description=>"Does Not Meet Expectations", :points=>0}], :description=>"First outcome", :points_possible=>5}}
     lo.save!
-    default = LearningOutcomeGroup.default_for(@copy_from)
-    default.add_item(lo)
+    default = @copy_from.root_outcome_group
+    default.add_outcome(lo)
     lo
   end
   
@@ -331,26 +335,26 @@ describe "Canvas Cartridge importing" do
     lo_g2.title = "Empty Group"
     lo_g2.save!
     
-    lo2 = @copy_from.learning_outcomes.new
+    lo2 = @copy_from.created_learning_outcomes.new
     lo2.context = @copy_from
     lo2.short_description = "outcome in group"
     lo2.workflow_state = 'active'
     lo2.data = {:rubric_criterion=>{:mastery_points=>2, :ratings=>[{:description=>"e", :points=>50}, {:description=>"me", :points=>2}, {:description=>"Does Not Meet Expectations", :points=>0.5}], :description=>"First outcome", :points_possible=>5}}
     lo2.save!
-    lo_g.add_item(lo2)
+    lo_g.add_outcome(lo2)
     
-    default = LearningOutcomeGroup.default_for(@copy_from)
-    default.add_item(lo_g)
-    default.add_item(lo_g2)
+    default = @copy_from.root_outcome_group
+    default.adopt_outcome_group(lo_g)
+    default.adopt_outcome_group(lo_g2)
     
     import_learning_outcomes
     
-    lo_2 = @copy_to.learning_outcomes.find_by_migration_id(CC::CCHelper.create_key(lo))
+    lo_2 = @copy_to.created_learning_outcomes.find_by_migration_id(CC::CCHelper.create_key(lo))
     lo_2.short_description.should == lo.short_description
     lo_2.description.should == lo.description
     lo_2.data.with_indifferent_access.should == lo.data.with_indifferent_access
     
-    lo2_2 = @copy_to.learning_outcomes.find_by_migration_id(CC::CCHelper.create_key(lo2))
+    lo2_2 = @copy_to.created_learning_outcomes.find_by_migration_id(CC::CCHelper.create_key(lo2))
     lo2_2.short_description.should == lo2.short_description
     lo2_2.description.should == lo2.description
     lo2_2.data.with_indifferent_access.should == lo2.data.with_indifferent_access
@@ -358,12 +362,12 @@ describe "Canvas Cartridge importing" do
     lo_g_2 = @copy_to.learning_outcome_groups.find_by_migration_id(CC::CCHelper.create_key(lo_g))
     lo_g_2.title.should == lo_g.title
     lo_g_2.description.should == lo_g.description
-    lo_g_2.sorted_content.length.should == 1
+    lo_g_2.child_outcome_links.length.should == 1
     
     lo_g2_2 = @copy_to.learning_outcome_groups.find_by_migration_id(CC::CCHelper.create_key(lo_g2))
     lo_g2_2.title.should == lo_g2.title
     lo_g2_2.description.should == lo_g2.description
-    lo_g2_2.sorted_content.length.should == 0
+    lo_g2_2.child_outcome_links.length.should == 0
   end
   
   it "should import rubrics" do
@@ -400,7 +404,7 @@ describe "Canvas Cartridge importing" do
     @copy_to.save!
 
     @copy_to.rubric_associations.count.should == 2
-    lo_2 = @copy_to.learning_outcomes.find_by_migration_id(CC::CCHelper.create_key(lo))
+    lo_2 = @copy_to.created_learning_outcomes.find_by_migration_id(CC::CCHelper.create_key(lo))
     lo_2.should_not be_nil
     rubric_2 = @copy_to.rubrics.find_by_migration_id(CC::CCHelper.create_key(rubric))
     rubric_2.title.should == rubric.title
@@ -411,7 +415,7 @@ describe "Canvas Cartridge importing" do
   end
   
   it "should import modules" do 
-    mod1 = @copy_from.context_modules.create!(:name => "some module", :unlock_at => 1.week.from_now)
+    mod1 = @copy_from.context_modules.create!(:name => "some module", :unlock_at => 1.week.from_now, :require_sequential_progress => true)
     mod2 = @copy_from.context_modules.create!(:name => "next module")
     mod3 = @copy_from.context_modules.create!(:name => "url module")
     mod4 = @copy_from.context_modules.create!(:name => "attachment module")
@@ -440,7 +444,7 @@ describe "Canvas Cartridge importing" do
     mod3.add_item({ :title => 'Example 1', :type => 'external_url', :url => 'http://a.example.com/' })
     mod3.add_item({ :title => 'Example 2', :type => 'external_url', :url => 'http://b.example.com/' })
     ct = mod3.add_item({ :title => 'Example 3', :type => 'external_url', :url => 'http://b.example.com/with%20space' })
-    ContentTag.update_all({:url => "http://b.example.com/with space"}, "id=#{ct.id}")
+    ContentTag.where(:id => ct).update_all(:url => "http://b.example.com/with space")
     
     # attachments are migrated with just their filename as display_name, 
     # if a content tag has a different title the display_name should not update
@@ -479,6 +483,7 @@ describe "Canvas Cartridge importing" do
     mod1_2 = @copy_to.context_modules.find_by_migration_id(CC::CCHelper.create_key(mod1))
     mod1_2.name.should == mod1.name
     mod1_2.unlock_at.to_i.should == mod1.unlock_at.to_i
+    mod1_2.require_sequential_progress.should == mod1.require_sequential_progress
     mod1_2.content_tags.count.should == mod1.content_tags.count
     tag = mod1_2.content_tags.first
     tag.content_id.should == asmnt2.id
@@ -501,7 +506,7 @@ describe "Canvas Cartridge importing" do
     mod3_2.content_tags.length.should == 2
     mod3_2.content_tags[0].url.should == "http://a.example.com/"
     mod3_2.content_tags[1].url.should == "http://b.example.com/"
-    @migration.migration_settings[:warnings].first.first.should == %{Couldn't import the module item "Example 3" in the module "url module"}
+    @migration.old_warnings_format.first.first.should == %{Import Error: Module Item - "Example 3"}
     
     mod4_2 = @copy_to.context_modules.find_by_migration_id(CC::CCHelper.create_key(mod4))
     mod4_2.content_tags.first.title.should == att_tag.title
@@ -890,4 +895,296 @@ XML
     q.assignment_group_id.should == ag.id
   end
 
+  it "should import quizzes' assignment from a migration id" do
+    assignment = @copy_from.assignments.build
+    assignment.title = "Don't care"
+    assignment.points_possible = 13.37
+    assignment.due_at = 1.week.from_now
+    assignment.migration_id = "hurpdurp"
+    assignment.save
+
+    quiz_hash = {
+      "lock_at"=>nil,
+      "questions"=>[],
+      "title"=>"Assignment Quiz",
+      "available"=>true,
+      "assignment_migration_id" => "assignmentmigrationid",
+      "migration_id"=>"quizmigrationid",
+      "question_count"=>19,
+      "scoring_policy"=>"keep_highest",
+      "shuffle_answers"=>true,
+      "quiz_name"=>"Assignment Quiz",
+      "unlock_at"=>nil,
+      "quiz_type"=>"assignment",
+      "points_possible"=>0,
+      "description"=>"",
+      "time_limit"=>nil,
+      "allowed_attempts"=>-1,
+      "due_at"=>1305805680000,
+      "could_be_locked"=>true,
+      "anonymous_submissions"=>false,
+      "show_correct_answers"=>true
+    }.with_indifferent_access
+
+    assignment_hash = {
+      "position"=>2,
+      "rubric_migration_id"=>nil,
+      "title"=>"Assignment Quiz",
+      "grading_standard_migration_id"=>nil,
+      "migration_id"=>"assignmentmigrationid",
+      "points_possible"=>0,
+      "all_day_date"=>1305698400000,
+      "peer_reviews_assigned"=>false,
+      "peer_review_count"=>0,
+      "automatic_peer_reviews"=>false,
+      "grading_type"=>"points",
+      "due_at"=>1305805680000,
+      "peer_reviews"=>false,
+      "all_day"=>false
+    }.with_indifferent_access
+
+    data = {"assignments" => [assignment_hash], "assessments" => {"assessments" => [quiz_hash]}}
+
+    migration = ContentMigration.create(:context => @copy_to)
+    migration.migration_settings[:migration_ids_to_import] = {:copy => {"everything" => 1}}
+    @copy_to.import_from_migration(data, nil, migration)
+
+    q = @copy_to.quizzes.find_by_migration_id("quizmigrationid")
+    a = @copy_to.assignments.find_by_migration_id("assignmentmigrationid")
+
+    q.assignment_id.should == a.id
+    a.submission_types.should == "online_quiz"
+  end
+
+  context "warnings for missing links in imported html" do
+    it "should add warnings for assessment questions" do
+      data = {
+        "assessment_questions" => {
+          "assessment_questions" =>[{
+            "answers" => [],
+            "correct_comments" => "",
+            "incorrect_comments" => "",
+            "question_text" => "<a href='/badlink/toabadplace'>mwhahaha</a>",
+            "question_name" => "Question",
+            "migration_id" => "i340ed54b48e0de110bda151e00a3bbfd",
+            "question_bank_name" => "Imported Questions",
+            "question_bank_id" => "i00cddcedde037ed59771ba680d2c00da",
+            "question_type" => "essay_question"
+          }]
+        }
+      }.with_indifferent_access
+
+      migration = ContentMigration.create(:context => @copy_to)
+      migration.migration_settings[:migration_ids_to_import] = {:copy => {"everything" => 1}}
+      @copy_to.import_from_migration(data, nil, migration)
+
+      bank = @copy_to.assessment_question_banks.first
+      question = @copy_to.assessment_questions.first
+
+      migration.migration_issues.count.should == 1
+      warning = migration.migration_issues.first
+      warning.issue_type.should == "warning"
+      warning.description.start_with?("Missing links found in imported content").should == true
+      warning.fix_issue_html_url.should == "/courses/#{@copy_to.id}/question_banks/#{bank.id}#question_#{question.id}_question_text"
+      warning.error_message.should include("question_text")
+    end
+
+    it "should add warnings for assignments" do
+      data = {
+        "assignments" => [{
+          "position"=>2,
+          "rubric_migration_id"=>nil,
+          "title"=>"Assignment Quiz",
+          "grading_standard_migration_id"=>nil,
+          "migration_id"=>"assignmentmigrationid",
+          "points_possible"=>0,
+          "all_day_date"=>1305698400000,
+          "peer_reviews_assigned"=>false,
+          "peer_review_count"=>0,
+          "automatic_peer_reviews"=>false,
+          "grading_type"=>"points",
+          "due_at"=>1305805680000,
+          "peer_reviews"=>false,
+          "all_day"=>false,
+          "description" => "<a href='wiki_page_migration_id=notarealid'>hooray for bad links</a>"
+        }]
+      }.with_indifferent_access
+
+      migration = ContentMigration.create(:context => @copy_to)
+      migration.migration_settings[:migration_ids_to_import] = {:copy => {"everything" => 1}}
+      @copy_to.import_from_migration(data, nil, migration)
+
+      a = @copy_to.assignments.first
+
+      migration.migration_issues.count.should == 1
+      warning = migration.migration_issues.first
+      warning.issue_type.should == "warning"
+      warning.description.start_with?("Missing links found in imported content").should == true
+      warning.fix_issue_html_url.should == "/courses/#{@copy_to.id}/assignments/#{a.id}"
+      warning.error_message.should include("description")
+    end
+
+    it "should add warnings for calendar events" do
+      data = {
+        "calendar_events" => [{
+          "migration_id" => "id4bebe19c7b729e22543bed8a5a02dcb",
+          "title" => "Start of Course",
+          "start_at" => 1371189600000,
+          "end_at" => 1371189600000,
+          "all_day" => false,
+          "description" => "<a href='discussion_topic_migration_id=stillnotreal'>hooray for bad links</a>"
+        },
+        {
+          "migration_id" => "blahblahblah",
+          "title" => "Start of Course",
+          "start_at" => 1371189600000,
+          "end_at" => 1371189600000,
+          "all_day" => false,
+          "description" => "<a href='http://thislinkshouldbeokaythough.com'>hooray for good links</a>"
+        }]
+      }.with_indifferent_access
+
+      migration = ContentMigration.create(:context => @copy_to)
+      migration.migration_settings[:migration_ids_to_import] = {:copy => {"everything" => 1}}
+      @copy_to.import_from_migration(data, nil, migration)
+
+      event = @copy_to.calendar_events.find_by_migration_id("id4bebe19c7b729e22543bed8a5a02dcb")
+
+      migration.migration_issues.count.should == 1
+      warning = migration.migration_issues.first
+      warning.issue_type.should == "warning"
+      warning.description.start_with?("Missing links found in imported content").should == true
+      warning.fix_issue_html_url.should == "/courses/#{@copy_to.id}/calendar_events/#{event.id}"
+    end
+
+    it "should add warnings for course syllabus" do
+      data = {
+        "course" => {
+          "syllabus_body" => "<a href='%24CANVAS_COURSE_REFERENCE%24/modules/items/9001'>moar bad links? nooo</a>"
+        }
+      }.with_indifferent_access
+
+      migration = ContentMigration.create(:context => @copy_to)
+      migration.migration_settings[:migration_ids_to_import] = {:copy => {"everything" => 1}}
+      @copy_to.import_from_migration(data, nil, migration)
+
+      migration.migration_issues.count.should == 1
+      warning = migration.migration_issues.first
+      warning.issue_type.should == "warning"
+      warning.description.start_with?("Missing links found in imported content").should == true
+      warning.fix_issue_html_url.should == "/courses/#{@copy_to.id}/assignments/syllabus"
+    end
+
+    it "should add warnings for discussion topics" do
+      data = {
+        "discussion_topics" => [{
+          "description" => "<a href='%24WIKI_REFERENCE%24/nope'>yet another bad link</a>",
+          "title" => "Two-Question Class Evaluation...",
+          "migration_id" => "iaccaf448c9f5218ff2a89d1d846b5224",
+          "type" => "announcement",
+          "posted_at" => 1332158400000,
+          "delayed_post_at" => 1361793600000,
+          "position" => 41
+        },
+        {
+          "description" => "<a href='%24CANVAS_OBJECT_REFERENCE%24/stillnope'>was there ever any doubt?</a>",
+          "title" => "Two-Question Class Evaluation...",
+          "migration_id" => "iaccaf448c9f5218ff2a89d1d846b52242",
+          "type" => "discussion",
+          "posted_at" => 1332158400000,
+          "delayed_post_at" => 1361793600000,
+          "position" => 41
+        }]
+      }.with_indifferent_access
+
+      migration = ContentMigration.create(:context => @copy_to)
+      migration.migration_settings[:migration_ids_to_import] = {:copy => {"everything" => 1}}
+      @copy_to.import_from_migration(data, nil, migration)
+
+      topic1 = @copy_to.discussion_topics.find_by_migration_id("iaccaf448c9f5218ff2a89d1d846b5224")
+      topic2 = @copy_to.discussion_topics.find_by_migration_id("iaccaf448c9f5218ff2a89d1d846b52242")
+
+      migration.migration_issues.count.should == 2
+
+      warnings = migration.migration_issues.sort_by{|i| i.fix_issue_html_url}
+      warning1 = warnings[0]
+      warning1.issue_type.should == "warning"
+      warning1.description.start_with?("Missing links found in imported content").should == true
+      warning1.fix_issue_html_url.should == "/courses/#{@copy_to.id}/announcements/#{topic1.id}"
+
+      warning2 = warnings[1]
+      warning2.issue_type.should == "warning"
+      warning2.description.start_with?("Missing links found in imported content").should == true
+      warning2.fix_issue_html_url.should == "/courses/#{@copy_to.id}/discussion_topics/#{topic2.id}"
+    end
+
+    it "should add warnings for quizzes" do
+      data = {
+        "assessments" => {
+          "assessments" => [{
+            "questions" => [],
+            "quiz_type" => "assignment",
+            "question_count" => 1,
+            "title" => "Week 1 - Activity 4 Quiz",
+            "quiz_name" => "Week 1 - Activity 4 Quiz",
+            "migration_id" => "i18b97d4d9de02036d8b8861645c5f8ec",
+            "allowed_attempts" => -1,
+            "description" => "<img src='$IMS_CC_FILEBASE$/somethingthatdoesntexist'/>",
+            "scoring_policy" => "keep_highest",
+            "assignment_group_migration_id" => "ia517adfdd9051a85ec5cfb1c57b9b853",
+            "points_possible" => 1,
+            "lock_at" => 1360825140000,
+            "unlock_at" => 1359615600000,
+            "due_at" => 1360220340000,
+            "anonymous_submissions" => false,
+            "show_correct_answers" => false,
+            "require_lockdown_browser" => false,
+            "require_lockdown_browser_for_results" => false,
+            "shuffle_answers" => false,
+            "available" => true,
+            "cant_go_back" => false,
+            "one_question_at_a_time" => false
+          }]
+        }
+      }.with_indifferent_access
+
+      migration = ContentMigration.create(:context => @copy_to)
+      migration.migration_settings[:migration_ids_to_import] = {:copy => {"everything" => 1}}
+      @copy_to.import_from_migration(data, nil, migration)
+
+      quiz = @copy_to.quizzes.first
+
+      migration.migration_issues.count.should == 1
+      warning = migration.migration_issues.first
+      warning.issue_type.should == "warning"
+      warning.description.start_with?("Missing links found in imported content").should == true
+      warning.fix_issue_html_url.should == "/courses/#{@copy_to.id}/quizzes/#{quiz.id}"
+    end
+
+    it "should add warnings for wiki pages" do
+      data = {
+        "wikis" => [{
+          "title" => "Credit Options",
+          "migration_id" => "i642b8969dbfa332fd96ec9029e96156a",
+          "editing_roles" => "teachers",
+          "hide_from_students" => false,
+          "notify_of_update" => false,
+          "text" => "<img src='/cantthinkofanothertypeofbadlinkohwell' />",
+          "url_name" => "credit-options"
+        }]
+      }.with_indifferent_access
+
+      migration = ContentMigration.create(:context => @copy_to)
+      migration.migration_settings[:migration_ids_to_import] = {:copy => {"everything" => 1}}
+      @copy_to.import_from_migration(data, nil, migration)
+
+      wiki = @copy_to.wiki.wiki_pages.find_by_migration_id("i642b8969dbfa332fd96ec9029e96156a")
+      migration.migration_issues.count.should == 1
+      warning = migration.migration_issues.first
+      warning.issue_type.should == "warning"
+      warning.description.start_with?("Missing links found in imported content").should == true
+      warning.fix_issue_html_url.should == "/courses/#{@copy_to.id}/wiki/#{wiki.url}"
+      warning.error_message.should include("body")
+    end
+  end
 end

@@ -23,8 +23,8 @@
         <%= f.hidden_field :parent_id, :value => parent_entry.id, :class => "parent_id" %>
         <%= f.text_area :message, :style => "height: 200px;", :class => "rich_text" %>
         <div class="button-container" style="padding-bottom: 5px;">
-          <button type="submit" class="button small-button submit_button"><%= t :post_message, "Post Message" %></button>
-          <button type="button" class="button button-secondary cancel_button"><%= t "#buttons.cancel", "Cancel" %></button>
+          <button type="submit" class="btn btn-small submit_button"><%= t :post_message, "Post Message" %></button>
+          <button type="button" class="btn button-secondary cancel_button"><%= t "#buttons.cancel", "Cancel" %></button>
         </div>
       <% end %>
     <% end %>

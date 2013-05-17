@@ -17,41 +17,23 @@
 #
 
 class Notification < ActiveRecord::Base
-  include LocaleSelection
-
   include Workflow
-  
-  TYPES_TO_SHOW_IN_FEED = ["Assignment Due Date Changed", 
-    "Assignment Publishing Reminder", 
-    "Assignment Grading Reminder", 
-    "Assignment Due Date Reminder", 
-    "Assignment Created", 
-    "Grade Weight Changed", 
-    "Assignment Graded", 
-    "New Event Created", 
-    "Event Date Changed", 
-    "Collaboration Invitation", 
-    "Web Conference Invitation", 
-    "Enrollment Invitation", 
-    "Enrollment Registration", 
-    "Enrollment Notification", 
-    "Enrollment Accepted", 
-    "New Context Group Membership", 
-    "New Context Group Membership Invitation", 
-    "Group Membership Accepted", 
-    "Group Membership Rejected", 
-    "New Student Organized Group", 
-    "Rubric Assessment Submission Reminder", 
-    "Rubric Assessment Invitation", 
-    "Rubric Association Created", 
-    "Assignment Submitted Late", 
+
+  TYPES_TO_SHOW_IN_FEED = [
+    # Assignment
+    "Assignment Created",
+    "Assignment Changed",
+    "Assignment Due Date Changed",
+    "Assignment Due Date Override Changed",
+
+    # Submissions / Grading
+    "Assignment Graded",
+    "Assignment Submitted Late",
+    "Grade Weight Changed",
     "Group Assignment Submitted Late",
+
+    # Testing
     "Show In Feed",
-    "Migration Import Finished",
-    "Migration Import Failed",
-    "Appointment Group Published",
-    "Appointment Group Updated",
-    "Appointment Reserved For User",
   ].freeze
 
   FREQ_IMMEDIATELY = 'immediately'
@@ -63,10 +45,12 @@ class Notification < ActiveRecord::Base
   has_many :notification_policies, :dependent => :destroy
   before_save :infer_default_content
 
-  attr_accessible  :name, :subject, :body, :sms_body, :main_link, :delay_for, :category
+  attr_accessible  :name, :subject, :main_link, :delay_for, :category
   
-  named_scope :to_show_in_feed, :conditions => ["messages.category = ? OR messages.notification_name IN (?) ", "TestImmediately", TYPES_TO_SHOW_IN_FEED]
-  
+  scope :to_show_in_feed, where("messages.category='TestImmediately' OR messages.notification_name IN (?)", TYPES_TO_SHOW_IN_FEED)
+
+  validates_uniqueness_of :name
+
   workflow do
     state :active do
       event :deactivate, :transitions_to => :inactive
@@ -77,7 +61,7 @@ class Notification < ActiveRecord::Base
     end
 
   end
-  
+
   def self.summary_notification
     by_name('Summaries')
   end
@@ -97,216 +81,24 @@ class Notification < ActiveRecord::Base
   end
 
   def infer_default_content
-    self.body ||= t(:no_comments, "No comments")
     self.subject ||= t(:no_subject, "No Subject")
-    self.sms_body ||= t(:no_comments, "No comments")
   end
   protected :infer_default_content
-  
-  # If there is a policy for summarizing this message, a DelayedMessage is
-  # created with the credentials for the summary service to send out the
-  # right messages. 
-  def record_delayed_messages(opts={})
-    @delayed_messages_to_save ||= []
-    user = opts[:user]
-    cc = opts[:communication_channel]
-    raise ArgumentError, "Must provide a user" unless user
 
-    asset = opts[:asset] || raise(ArgumentError, "Must provide an asset")
-
-    policies = NotificationPolicy.for(user).for(self).to_a
-    policies << NotificationPolicy.create(:notification => self, :communication_channel => cc, :frequency => self.default_frequency) if policies.empty? && cc && cc.active?
-    policies = policies.select{|p| [:daily,:weekly].include?(p.frequency.to_sym) }
-
-    # If we pass in a fallback_channel, that means this message has been
-    # throttled, so it definitely needs to go to at least one communication
-    # channel with 'daily' as the frequency.
-    if !policies.any?{|p| p.frequency == 'daily'} && opts[:fallback_channel]
-      fallback_policy = opts[:fallback_channel].notification_policies.by(:daily).find(:first, :conditions => { :notification_id => nil })
-      fallback_policy ||= NotificationPolicy.new(:communication_channel => opts[:fallback_channel], :frequency => 'daily')
-      policies << fallback_policy
-    end
-
-    return false if (!opts[:fallback_channel] && cc && !cc.active?) || policies.empty? || !self.summarizable?
-
-    policies.inject([]) do |list, policy|
-      message = Message.new(
-        :subject => self.subject
-      )
-      message.body = self.sms_body
-      message.notification = self
-      message.notification_name = self.name
-      message.user = user
-      message.context = asset
-      message.asset_context = opts[:asset_context] || asset.context(user) rescue asset
-      message.parse!('summary')
-      delayed_message = DelayedMessage.new(
-        :notification => self,
-        :notification_policy => policy,
-        :frequency => policy.frequency,
-        :communication_channel_id => policy.communication_channel_id,
-        :linked_name => 'work on this link!!!',
-        :name_of_topic => message.subject,
-        :link => message.url,
-        :summary => message.body
-      )
-      delayed_message.context = asset
-      @delayed_messages_to_save << delayed_message
-      delayed_message.save! if ENV['RAILS_ENV'] == 'test'
-      list << delayed_message
-    end
+  # Public: create (and dispatch, and queue delayed) a message
+  #  for this notication, associated with the given asset, sent to the given recipients
+  #
+  # asset - what the message applies to. An assignment, a discussion, etc.
+  # to_list - a list of who to send the message to. the list can contain Users, User ids, or communication channels
+  # options - a hash of extra options to merge with the options used to build the Message
+  #
+  # Returns a list of the messages dispatched immediately
+  def create_message(asset, to_list, options={})
+    return NotificationMessageCreator.new(self, asset, options.merge(:to_list => to_list)).create_message
   end
-  
-  def create_message(asset, *tos)
-    current_locale = I18n.locale
-
-    tos = tos.flatten.compact.uniq
-    if tos.last.is_a? Hash
-      options = tos.delete_at(tos.length - 1)
-      data = options.delete(:data)
-    end
-    @delayed_messages_to_save = []
-    recipient_ids = []
-    recipients = []
-    tos.each do |to|
-      if to.is_a?(CommunicationChannel)
-        recipients << to
-      else
-        user = nil
-        case to
-        when User
-          user = to
-        when Numeric
-          user = User.find(to)
-        when CommunicationChannel
-          user = to.user
-        end
-        recipient_ids << user.id if user
-      end
-    end
-    
-    recipients += User.find(:all, :conditions => {:id => recipient_ids}, :include => { :communication_channels => :notification_policies})
-    
-    messages = []
-    @user_counts = {}
-    recipients.uniq.each do |recipient|
-      cc = nil
-      user = nil
-      if recipient.is_a?(CommunicationChannel)
-        cc = recipient
-        user = cc.user
-      elsif recipient.is_a?(User)
-        user = recipient
-        cc = user.email_channel
-      end
-      I18n.locale = infer_locale(:user => user)
-      
-      # For non-essential messages, check if too many have gone out, and if so
-      # send this message as a daily summary message instead of immediate.
-      should_summarize = user && self.summarizable? && too_many_messages?(user)
-      channels = CommunicationChannel.find_all_for(user, self, cc)
-      fallback_channel = channels.sort_by{|c| c.path_type }.first
-      record_delayed_messages((options || {}).merge(:user => user, :communication_channel => cc, :asset => asset, :fallback_channel => should_summarize ? channels.first : nil))
-      if should_summarize
-        channels = channels.select{|cc| cc.path_type != 'email' && cc.path_type != 'sms' }
-      end
-      channels << "dashboard" if self.dashboard? && self.show_in_feed?
-      channels.clear if !user || (user.pre_registered? && !self.registration?)
-      channels.each do |c|
-        to_path = c
-        to_path = c.path if c.respond_to?("path")
-
-        message = (user || cc || self).messages.build(
-          :subject => self.subject, 
-          :to => to_path,
-          :notification => self
-        )
-
-        message.body = self.body
-        message.body = self.sms_body if c.respond_to?("path_type") && c.path_type == "sms"
-        message.notification_name = self.name
-        message.communication_channel = c if c.is_a?(CommunicationChannel)
-        message.dispatch_at = nil
-        message.user = user
-        message.context = asset
-        message.asset_context = options[:asset_context] || asset.context(user) rescue asset
-        message.notification_category = self.category
-        message.delay_for = self.delay_for if self.delay_for 
-        message.data = data if data
-        message.parse!
-        # keep track of new messages added for caching so we don't
-        # have to re-look it up
-        @user_counts[user.id] ||= 0
-        @user_counts[user.id] += 1 if c.respond_to?(:path_type) && ['email', 'sms'].include?(c.path_type)
-        @user_counts["#{user.id}_#{self.category_spaceless}"] ||= 0
-        @user_counts["#{user.id}_#{self.category_spaceless}"] += 1 if c.respond_to?(:path_type) && ['email', 'sms'].include?(c.path_type)
-        messages << message
-      end
-    end
-    @delayed_messages_to_save.each{|m| m.save! }
-
-    dashboard_messages, dispatch_messages = messages.partition { |m| m.to == 'dashboard' }
-
-    dashboard_messages.each do |m|
-      if Notification.types_to_show_in_feed.include?(self.name)
-        m.set_asset_context_code
-        m.infer_defaults
-        m.create_stream_items
-      end
-    end
-
-    Message.transaction do
-      # Cancel any that haven't been sent out for the same purpose
-      all_matching_messages = self.messages.for(asset).by_name(name).for_user(recipients).in_state([:created,:staged,:sending,:dashboard])
-      all_matching_messages.update_all(:workflow_state => 'cancelled')
-      dispatch_messages.each { |m| m.stage_without_dispatch!; m.save! }
-    end
-    MessageDispatcher.batch_dispatch(dispatch_messages)
-
-    # re-set cached values
-    @user_counts.each{|user_id, cnt| recent_messages_for_user(user_id, cnt) }
-
-    messages
-  ensure
-    I18n.locale = current_locale
-  end
-  
+ 
   def category_spaceless
     (self.category || "None").gsub(/\s/, "_")
-  end
-  
-  def too_many_messages?(user)
-    return false unless user
-    all_messages = recent_messages_for_user(user.id) || 0
-    @user_counts[user.id] = all_messages
-    for_category = recent_messages_for_user("#{user.id}_#{self.category_spaceless}") || 0
-    @user_counts["#{user.id}_#{self.category_spaceless}"] = for_category
-    all_messages >= user.max_messages_per_day
-  end
-  
-  # Cache the count for number of messages sent to a user/user-with-category,
-  # it can also be manually re-set to reflect new rows added... this cache
-  # data can get out of sync if messages are cancelled for being repeats...
-  # not sure if we care about that...
-  def recent_messages_for_user(id, messages=nil)
-    if !id
-      nil
-    elsif messages
-      Rails.cache.write(['recent_messages_for', id].cache_key, messages, :expires_in => 1.hour)
-    else
-      category = nil
-      user_id = id
-      if id.is_a?(String)
-        user_id, category = id.split(/_/)
-      end
-      messages = Rails.cache.fetch(['recent_messages_for', id].cache_key, :expires_in => 1.hour) do
-        lookup = Message.scoped(:conditions => ['dispatch_at > ? AND user_id = ? AND to_email = ?', 24.hours.ago, user_id, true])
-        if category
-          lookup = lookup.scoped(:conditions => ['notification_category = ?', category.gsub(/_/, " ")])
-        end
-        lookup.count
-      end
-    end
   end
 
   def sort_order
@@ -363,7 +155,7 @@ class Notification < ActiveRecord::Base
   def self.dashboard_categories(user = nil)
     seen_types = {}
     res = []
-    Notification.find(:all).each do |n|
+    Notification.all.each do |n|
       if !seen_types[n.category] && (user.nil? || n.relevant_to_user?(user))
         seen_types[n.category] = true
         res << n if n.category && n.dashboard?
@@ -388,7 +180,8 @@ class Notification < ActiveRecord::Base
     setting
   end
   
-  def default_frequency
+  def default_frequency(user = nil)
+    # user arg is used in plugins
     case category
     when 'All Submissions'
       FREQ_NEVER
@@ -460,10 +253,8 @@ class Notification < ActiveRecord::Base
     t 'names.assignment_changed', 'Assignment Changed'
     t 'names.assignment_created', 'Assignment Created'
     t 'names.assignment_due_date_changed', 'Assignment Due Date Changed'
-    t 'names.assignment_due_date_reminder', 'Assignment Due Date Reminder'
+    t 'names.assignment_due_date_override_changed', 'Assignment Due Date Override Changed'
     t 'names.assignment_graded', 'Assignment Graded'
-    t 'names.assignment_grading_reminder', 'Assignment Grading Reminder'
-    t 'names.assignment_publishing_reminder', 'Assignment Publishing Reminder'
     t 'names.assignment_resubmitted', 'Assignment Resubmitted'
     t 'names.assignment_submitted', 'Assignment Submitted'
     t 'names.assignment_submitted_late', 'Assignment Submitted Late'
@@ -682,5 +473,4 @@ class Notification < ActiveRecord::Base
       true
     end
   end
-
 end

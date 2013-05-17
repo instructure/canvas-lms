@@ -1,11 +1,12 @@
   <% jammit_css :user_logins %>
   <% js_bundle :user_logins %>
+  <% js_env :PASSWORD_POLICY => @domain_root_account.try(:password_policy) %>
   <fieldset id="login_information">
     <legend><%= t('titles.logins', 'Login Information') %></legend>
     <table>
-      <% pseudonyms = @user.pseudonyms.active.scoped(:include => :account) + [nil] %>
+      <% pseudonyms = @user.all_active_pseudonyms + [nil] %>
       <% pseudonyms.each do |pseudonym| %>
-        <% can_change_pseudonym_password = (pseudonym && pseudonym.account && pseudonym.account.settings && pseudonym.account.settings[:admins_can_change_passwords]) %>
+        <% can_change_pseudonym_password = (pseudonym && pseudonym.account && pseudonym.account.settings && pseudonym.account.settings[:admins_can_change_passwords]) && pseudonym.account.canvas_authentication? %>
         <tr class='login <%= 'blank' unless pseudonym %>' style="<%= hidden unless pseudonym %>">
           <th scope='row'>
             <b class='unique_id'><%= pseudonym && pseudonym.unique_id %></b>
@@ -48,8 +49,8 @@
           </td>
           <% if !pseudonym || can_do(pseudonym.account, @current_user, :manage_user_logins) %>
             <td class='links <%= 'passwordable' if can_change_pseudonym_password %>'>
-              <a href="#" rel="<%= user_pseudonym_url(@user.id, pseudonym ? pseudonym.id : "{{ id }}") %>" class="edit_pseudonym_link"><%= image_tag "edit.png" %></a>
-              <a href="#" rel="<%= user_pseudonym_url(@user.id, pseudonym ? pseudonym.id : "{{ id }}") %>" class="delete_pseudonym_link" style="<%= hidden if pseudonyms.length <= 2 || (pseudonym && pseudonym.sis_user_id && !can_do(pseudonym.account, @current_user, :manage_sis)) %>"><%= image_tag "delete.png" %></a>
+              <a href="#" rel="<%= user_pseudonym_url(@user.id, pseudonym ? pseudonym.id : "{{ id }}") %>" class="edit_pseudonym_link"><i class="icon-edit standalone-icon"></i></a>
+              <a href="#" rel="<%= user_pseudonym_url(@user.id, pseudonym ? pseudonym.id : "{{ id }}") %>" class="delete_pseudonym_link" style="<%= hidden if pseudonyms.length <= 2 || (pseudonym && pseudonym.sis_user_id && !can_do(pseudonym.account, @current_user, :manage_sis)) %>"><i class="icon-end standalone-icon"></i></a>
             </td>
           <% else %>
             <td>&nbsp;</td>
@@ -60,6 +61,11 @@
         <tr class="add_holder">
           <td colspan="4" style="font-size: 0.8em;">
             <a href="#" rel="<%= user_pseudonyms_url(@user.id) %>" class="add_pseudonym_link"><%= t('add_login', 'Add Login') %></a>
+            <% if @user.otp_secret_key && (@user.mfa_settings != :required || @user != @current_user) %>
+              <span>|
+                <a href="<%= disable_mfa_path(@user) %>" class="reset_mfa_link"><%=  t('reset_mfa', "Reset Multi-Factor Authentication") %></a>
+              </span>
+            <% end %>
           </td>
         </tr>
       <% end %>
@@ -76,10 +82,11 @@
         <td><%= f.text_field :sis_user_id, :style => "width: 150px;" %></td>
       </tr>
       <% if can_do(Account.site_admin, @current_user, :manage_user_logins) %>
+        <% js_env :PASSWORD_POLICIES => Hash[Account.root_accounts.active.map{ |a| [a.id, a.password_policy]}] %>
         <tr class="account_id">
             <td><%= f.blabel :account_id, :en => "Account" %></td>
             <td>
-              <% accounts = Account.root_accounts.map{|a| [a.name, a.id] }.sort_by(&:first) %>
+              <% accounts = Account.root_accounts.active.map{|a| [a.name, a.id] }.sort_by(&:first) %>
               <%= f.select :account_id, accounts, {:selected => @domain_root_account.id}, :class => "account_id_select" %>
             </td>
         </tr>
@@ -99,8 +106,8 @@
       <tr>
         <td colspan="2">
           <div class="button-container">
-            <button type="submit" class="button submit_button"><%= t('buttons.update_login', 'Update Login') %></button>
-            <button type="button" class="button button-secondary cancel_button"><%= t('#buttons.cancel', 'Cancel') %></button>
+            <button type="button" class="btn cancel_button"><%= t('#buttons.cancel', 'Cancel') %></button>
+            <button type="submit" class="btn btn-primary submit_button"><%= t('buttons.update_login', 'Update Login') %></button>
           </div>
         </td>
       </tr>

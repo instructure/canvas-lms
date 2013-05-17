@@ -21,13 +21,44 @@ require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 describe DeveloperKey do
   describe "default" do
     context "sharding" do
-      it_should_behave_like "sharding"
+      specs_require_sharding
 
       it "should always create the default key on the default shard" do
         @shard1.activate do
           DeveloperKey.default.shard.should be_default
         end
       end
+
+      it 'uses integer special keys properly because the query does not like strings' do
+        # this test mirrors what happens in production when retrieving keys, but does not test it
+        # directly because there's a short circuit clause in 'get_special_key' that pops out with a
+        # different finder because of the transactions-in-test issue. this confirms that setting
+        # a key id does not translate it to a string and therefore can be used with 'find_by_id'
+        # safely
+        key = DeveloperKey.create!
+        Setting.set('rspec_developer_key_id', key.id)
+        key_id = Setting.get('rspec_developer_key_id', nil)
+        DeveloperKey.find_by_id(key_id).should == key
+      end
+    end
+  end
+
+  describe "#redirect_domain_matches?" do
+    it "should match domains exactly, and sub-domains" do
+      key = DeveloperKey.create!(:redirect_uri => "http://example.com/a/b")
+      key.redirect_domain_matches?("http://example.com/a/b").should be_true
+      # other paths on the same domain are ok
+      key.redirect_domain_matches?("http://example.com/other").should be_true
+      # completely separate domain
+      key.redirect_domain_matches?("http://example2.com/a/b").should be_false
+      # not a sub-domain
+      key.redirect_domain_matches?("http://wwwexample.com/a/b").should be_false
+      key.redirect_domain_matches?("http://example.com.evil/a/b").should be_false
+      key.redirect_domain_matches?("http://www.example.com.evil/a/b").should be_false
+      # sub-domains are ok
+      key.redirect_domain_matches?("http://www.example.com/a/b").should be_true
+      key.redirect_domain_matches?("http://a.b.example.com/a/b").should be_true
+      key.redirect_domain_matches?("http://a.b.example.com/other").should be_true
     end
   end
 end

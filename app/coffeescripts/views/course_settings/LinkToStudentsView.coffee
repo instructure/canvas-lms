@@ -35,8 +35,7 @@ define [
             context: "course_#{ENV.COURSE_ID}_students"
             exclude: [@model.get('id')]
             skip_visibility_checks: true
-          preparer: (postData, data, parent) ->
-            row.noExpand = true for row in data
+          noExpand: true
           browser:
             data:
               per_page: 100
@@ -44,12 +43,12 @@ define [
       input = @$('#student_input').data('token_input')
       input.$fakeInput.css('width', '100%')
 
-      for e in @model.get('enrollments') when e.associated_user_id
-        dfds.push @getUserData(e.associated_user_id).done (user) ->
+      for e in @model.allEnrollmentsWithRole(@role)
+        if e.observed_user && _.any(e.observed_user.enrollments)
           input.addToken
-            value: user.id
-            text: user.name
-            data: user
+            value: e.observed_user.id
+            text: e.observed_user.name
+            data: e.observed_user
 
       # if a dfd fails (e.g. observee was removed from course), we still want
       # the observer dialog to render (possibly with other observees)
@@ -63,7 +62,7 @@ define [
       e.preventDefault()
 
       dfds = []
-      enrollments = @model.get('enrollments')
+      enrollments = @model.allEnrollmentsWithRole(@role)
       enrollment = enrollments[0]
       unlinkedEnrolls = _.filter enrollments, (en) -> !en.associated_user_id # keep the original observer enrollment around
       currentLinks = _.compact _.pluck(enrollments, 'associated_user_id')
@@ -88,6 +87,8 @@ define [
                 associated_user_id: user.id
                 type: enrollment.type
                 limit_privileges_to_course_section: enrollment.limit_priveleges_to_course_section
+            if enrollment.role != enrollment.type
+              data.enrollment.role = enrollment.role
             udfds.push $.ajaxJSON url, 'POST', data
           $.when(udfds...).done ->
             dfdsDone += 1

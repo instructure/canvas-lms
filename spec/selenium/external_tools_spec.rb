@@ -7,6 +7,22 @@ describe "editing external tools" do
     course_with_teacher_logged_in
   end
 
+  it "should clear the shared secret after saving" do
+    tool_name = 'test tool'
+    get "/courses/#{@course.id}/settings"
+    f("#tab-tools-link").click
+    f('.add_tool_link').click
+    f('#external_tool_name').send_keys(tool_name)
+    f('#external_tool_consumer_key').send_keys('fdjaklfjdaklfdjaslfjajfkljsalkjflas')
+    f('#external_tool_shared_secret').send_keys('r08132ufio1jfj1iofj3j1kf3ljl1')
+    f('#external_tool_domain').send_keys('instructure.com')
+    submit_form('#external_tool_form')
+    wait_for_ajaximations
+    f("#external_tool_#{ContextExternalTool.find_by_name(tool_name).id} .edit_tool_link").click
+    f('#external_tool_name').should have_attribute(:value, tool_name)
+    f('#external_tool_shared_secret').should have_attribute(:value, "")
+  end
+
   it "should allow creating a new course external tool with custom fields" do
     get "/courses/#{@course.id}/settings"
     f("#tab-tools-link").click
@@ -31,21 +47,21 @@ describe "editing external tools" do
     tool_elem = f("#external_tool_#{tool.id}")
     tool_elem.find_element(:css, ".edit_tool_link").click
     f("#external_tools_dialog").should be_displayed
-    replace_content(f("#external_tool_name"),"new tool (updated)")
-    replace_content(f("#external_tool_consumer_key"),"key (updated)")
-    replace_content(f("#external_tool_shared_secret"),"secret (updated)")
+    replace_content(f("#external_tool_name"), "new tool (updated)")
+    replace_content(f("#external_tool_consumer_key"), "key (updated)")
+    replace_content(f("#external_tool_shared_secret"), "secret (updated)")
     replace_content(f("#external_tool_domain"), "example2.com")
-    replace_content(f("#external_tool_custom_fields_string"),"a=9\nb=8")
+    replace_content(f("#external_tool_custom_fields_string"), "a=9\nb=8")
     f("#external_tools_dialog .save_button").click
     wait_for_ajax_requests
     f("#external_tools_dialog").should_not be_displayed
     tool_elem = fj("#external_tools .external_tool:visible").should be_displayed
     tool_elem.should_not be_nil
     tool.reload
-    tool.name.should eql "new tool (updated)"
-    tool.consumer_key.should eql "key (updated)"
-    tool.shared_secret.should eql "secret (updated)"
-    tool.domain.should eql "example2.com"
+    tool.name.should == "new tool (updated)"
+    tool.consumer_key.should == "key (updated)"
+    tool.shared_secret.should == "secret (updated)"
+    tool.domain.should == "example2.com"
     tool.settings[:custom_fields].should == {'a' => '9', 'b' => '8'}
   end
 
@@ -55,15 +71,17 @@ describe "editing external tools" do
 
     keep_trying_until { driver.execute_script("return window.modules.refreshed == true") }
 
+    f("#context_module_#{@module.id} .admin-links .al-trigger").click
     f("#context_module_#{@module.id} .add_module_item_link").click
+
     f("#add_module_item_select option[value='context_external_tool']").click
     f("#external_tool_create_url").send_keys("http://www.example.com")
     f("#external_tool_create_title").send_keys("Example")
     f("#external_tool_create_new_tab").click
-    f("#select_context_content_dialog .add_item_button").click
+    fj(".add_item_button:visible").click
     wait_for_ajax_requests
     f("#select_context_content_dialog").should_not be_displayed
-    ff("#context_module_item_new").length.should eql 0
+    ff("#context_module_item_new").length.should == 0
 
     @tag = ContentTag.last
     @tag.should_not be_nil
@@ -74,7 +92,7 @@ describe "editing external tools" do
 
   it "should not list external tools that don't have a url, domain, or resource_selection configured" do
     @module = @course.context_modules.create!(:name => "module")
-    
+
     @tool1 = @course.context_external_tools.create!(:name => "First Tool", :url => "http://www.example.com", :consumer_key => "key", :shared_secret => "secret")
     @tool2 = @course.context_external_tools.new(:name => "Another Tool", :consumer_key => "key", :shared_secret => "secret")
     @tool2.settings[:editor_button] = {:url => "http://www.example.com", :icon_url => "http://www.example.com", :selection_width => 100, :selection_height => 100}.with_indifferent_access
@@ -87,11 +105,13 @@ describe "editing external tools" do
 
     keep_trying_until { driver.execute_script("return window.modules.refreshed == true") }
 
-    driver.find_element(:css, "#context_module_#{@module.id} .add_module_item_link").click
-    driver.find_element(:css, "#add_module_item_select option[value='context_external_tool']").click
-    
-    keep_trying_until { driver.find_elements(:css, "#context_external_tools_select .tool .name").length > 0 }
-    names = driver.find_elements(:css, "#context_external_tools_select .tool .name").map(&:text)
+    f("#context_module_#{@module.id} .admin-links .al-trigger").click
+    f("#context_module_#{@module.id} .add_module_item_link").click
+
+    f("#add_module_item_select option[value='context_external_tool']").click
+
+    keep_trying_until { ff("#context_external_tools_select .tool .name").length > 0 }
+    names = ff("#context_external_tools_select .tool .name").map(&:text)
     names.should be_include(@tool1.name)
     names.should_not be_include(@tool2.name)
     names.should be_include(@tool3.name)
@@ -106,7 +126,9 @@ describe "editing external tools" do
 
     keep_trying_until { driver.execute_script("return window.modules.refreshed == true") }
 
+    f("#context_module_#{@module.id} .admin-links .al-trigger").click
     f("#context_module_#{@module.id} .add_module_item_link").click
+
     f("#add_module_item_select option[value='context_external_tool']").click
     keep_trying_until { ff("#context_external_tools_select .tools .tool").length > 0 }
     ff("#context_external_tools_select .tools .tool")[1].click
@@ -115,10 +137,10 @@ describe "editing external tools" do
     ff("#context_external_tools_select .tools .tool")[0].click
     f("#external_tool_create_url").should have_value @tool1.url
     f("#external_tool_create_title").should have_value @tool1.name
-    f("#select_context_content_dialog .add_item_button").click
+    fj(".add_item_button:visible").click
     wait_for_ajax_requests
     f("#select_context_content_dialog").should_not be_displayed
-    keep_trying_until { ff("#context_module_item_new").length.should eql 0 }
+    keep_trying_until { ff("#context_module_item_new").length.should == 0 }
 
     @tag = ContentTag.last
     @tag.should_not be_nil
@@ -126,15 +148,17 @@ describe "editing external tools" do
     @tag.url.should == @tool1.url
     @tag.content.should == @tool1
 
+    f("#context_module_#{@module.id} .admin-links .al-trigger").click
     f("#context_module_#{@module.id} .add_module_item_link").click
+
     f("#add_module_item_select option[value='context_external_tool']").click
     ff("#context_external_tools_select .tools .tool")[1].click
     f("#external_tool_create_url").should have_value @tool2.url
     f("#external_tool_create_title").should have_value @tool2.name
-    f("#select_context_content_dialog .add_item_button").click
+    fj(".add_item_button:visible").click
     wait_for_ajax_requests
     f("#select_context_content_dialog").should_not be_displayed
-    ff("#context_module_item_new").length.should eql 0
+    ff("#context_module_item_new").length.should == 0
 
     @tag = ContentTag.last
     @tag.should_not be_nil
@@ -157,7 +181,9 @@ describe "editing external tools" do
 
     keep_trying_until { driver.execute_script("return window.modules.refreshed == true") }
 
+    f("#context_module_#{@module.id} .admin-links .al-trigger").click
     f("#context_module_#{@module.id} .add_module_item_link").click
+
     f("#add_module_item_select option[value='context_external_tool']").click
     wait_for_ajax_requests
     ff("#context_external_tools_select .tools .tool").length > 0
@@ -167,14 +193,14 @@ describe "editing external tools" do
     tools[1].find_element(:css, ".name").text.should match(/not bob/)
     tools[1].click
     f("#external_tool_create_url").should have_value "https://www.example.com"
-    f("#external_tool_create_title").should have_value"not bob"
+    f("#external_tool_create_title").should have_value "not bob"
 
     tools[0].click
     keep_trying_until { f("#resource_selection_dialog").should be_displayed }
 
     in_frame('resource_selection_iframe') do
       keep_trying_until { ff("#basic_lti_link").length > 0 }
-      ff(".link").length.should eql 4
+      ff(".link").length.should == 4
       f("#basic_lti_link").click
       wait_for_ajax_requests
     end
@@ -184,7 +210,6 @@ describe "editing external tools" do
   end
 
   it "should alert when invalid url data is returned by a resource selection dialog" do
-    skip_if_ie("Out of memory / Stack overflow")
     @module = @course.context_modules.create!(:name => "module")
     tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob", :url => "http://www.example.com/ims/lti")
     tool.settings[:resource_selection] = {
@@ -199,6 +224,7 @@ describe "editing external tools" do
 
     keep_trying_until { driver.execute_script("return window.modules.refreshed == true") }
 
+    f("#context_module_#{@module.id} .admin-links .al-trigger").click
     f("#context_module_#{@module.id} .add_module_item_link").click
     f("#add_module_item_select option[value='context_external_tool']").click
     wait_for_ajax_requests
@@ -213,12 +239,12 @@ describe "editing external tools" do
 
     tools[0].click
 
-    keep_trying_until {f("#resource_selection_dialog").should be_displayed }
+    keep_trying_until { f("#resource_selection_dialog").should be_displayed }
 
     expect_fired_alert do
       in_frame('resource_selection_iframe') do
         keep_trying_until { ff("#basic_lti_link").length > 0 }
-        ff(".link").length.should eql 4
+        ff(".link").length.should == 4
         f("#bad_url_basic_lti_link").click
       end
     end
@@ -229,12 +255,12 @@ describe "editing external tools" do
     f("#external_tool_create_title").should have_value ""
 
     tools[0].click
-    keep_trying_until {f("#resource_selection_dialog").should be_displayed }
+    keep_trying_until { f("#resource_selection_dialog").should be_displayed }
 
     expect_fired_alert do
       in_frame('resource_selection_iframe') do
         keep_trying_until { ff("#basic_lti_link").length > 0 }
-        ff(".link").length.should eql 4
+        ff(".link").length.should == 4
         f("#no_url_basic_lti_link").click
       end
     end
@@ -259,6 +285,7 @@ describe "editing external tools" do
 
     keep_trying_until { driver.execute_script("return window.modules.refreshed == true") }
 
+    f("#context_module_#{@module.id} .admin-links .al-trigger").click
     f("#context_module_#{@module.id} .add_module_item_link").click
     f("#add_module_item_select option[value='context_external_tool']").click
 
@@ -272,10 +299,10 @@ describe "editing external tools" do
     f("#external_tool_create_title").should have_value "not bob"
 
     tools[0].click
-    keep_trying_until {f("#resource_selection_dialog").should be_displayed }
+    keep_trying_until { f("#resource_selection_dialog").should be_displayed }
     in_frame('resource_selection_iframe') do
       keep_trying_until { ff("#basic_lti_link").length > 0 }
-      ff(".link").length.should eql 4
+      ff(".link").length.should == 4
       f("#no_text_basic_lti_link").click
       wait_for_ajax_requests
     end
@@ -335,7 +362,7 @@ describe "editing external tools" do
                             })
     get "/courses/#{@course.id}/modules/items/#{@tag.id}"
 
-    ff("#tool_content").length.should eql 1
+    ff("#tool_content").length.should == 1
     keep_trying_until { f("#tool_content").should be_displayed }
   end
 
@@ -350,8 +377,163 @@ describe "editing external tools" do
                             })
     get "/courses/#{@course.id}/modules/items/#{@tag.id}"
 
-    ff("#tool_content").length.should eql 0
+    ff("#tool_content").length.should == 0
     f("#tool_form").should be_displayed
-    ff("#tool_form .load_tab").length.should eql 1
+    ff("#tool_form .load_tab").length.should == 1
+  end
+
+  context "homework submission from an LTI tool" do
+    before(:each) do
+      course_with_student_logged_in
+      @assignment = @course.assignments.create!(:title => "test assignment", :submission_types => "online_upload,online_url")
+    end
+
+    def homework_submission_tool
+      @tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob", :url => "http://www.example.com/ims/lti")
+      @tool.settings[:homework_submission] = {
+          :url => "http://#{HostUrl.default_host}/selection_test",
+          :selection_width => 400,
+          :selection_height => 400
+      }
+      @tool.save!
+    end
+
+    def pick_submission_tool(iframe_link_selector)
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+      wait_for_dom_ready
+      f(".submit_assignment_link").click
+      wait_for_ajax_requests
+      f(".submit_from_external_tool_option").should be_displayed
+      f(".submit_from_external_tool_option").click
+      ff("#submit_from_external_tool_form .tools .tool").length.should > 0
+      f("#external_tool_url").attribute('value').should == ""
+      select_submission_content(iframe_link_selector)
+    end
+
+    def select_submission_content(iframe_link_selector)
+      f("#submit_from_external_tool_form .tools .tool").click
+      keep_trying_until { f("#homework_selection_dialog").displayed? }
+
+      in_frame('homework_selection_iframe') do
+        keep_trying_until { ff(iframe_link_selector).length > 0 }
+        f(iframe_link_selector).click
+      end
+      keep_trying_until { f("#homework_selection_dialog") == nil }
+    end
+
+    def assert_invalid_selection_message(msg=nil)
+      msg ||= /returned an invalid/
+      keep_trying_until{ ff("#flash_message_holder li").length > 0 }
+      message = f("#flash_message_holder li")
+      message.should_not be_nil
+      message.text.should match(msg)
+      ff("#submit_assignment .cancel_button").select(&:displayed?).first.click
+    end
+
+    it "should not load if no tools are configured" do
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+      wait_for_dom_ready
+      f(".submit_assignment_link").click
+      wait_for_ajax_requests
+      f(".submit_from_external_tool_option").should_not be_displayed
+      ff("#submit_assignment .cancel_button").select(&:displayed?).first.click
+    end
+
+    it "should load a list of tools in the 'more' tab if configured and applicable" do
+      homework_submission_tool
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+      wait_for_dom_ready
+      f(".submit_assignment_link").click
+      wait_for_ajax_requests
+      f(".submit_from_external_tool_option").should be_displayed
+      ff("#submit_assignment .cancel_button").select(&:displayed?).first.click
+      # TODO: make sure the 'submit' button isn't enabled yed
+    end
+
+    it "should allow submission for a tool that returns a file URL for a file assignment" do
+      homework_submission_tool
+      pick_submission_tool('#file_link')
+
+      f("#external_tool_url").attribute('value').should match(/delete\.png/)
+      f("#external_tool_filename").attribute('value').should eql('delete.png')
+      f("#external_tool_submission_type").attribute('value').should eql('online_url_to_file')
+      f("#submit_from_external_tool_form .btn-primary").click
+      wait_for_ajax_requests
+      Delayed::Job.last.invoke_job
+      a = Attachment.last
+      keep_trying_until { puts a.file_state; a.file_state == 'available' }
+      keep_trying_until { !f("#submit_assignment").displayed? }
+      submission = @assignment.find_or_create_submission(@user)
+      submission.submission_type.should == 'online_upload'
+      submission.submitted_at.should_not be_nil
+    end
+
+    it "should allow submission for a tool that returns a URL for a URL assignment" do
+      homework_submission_tool
+      pick_submission_tool('#full_url_link')
+
+      f("#external_tool_url").attribute('value').should match(/delete\.png/)
+      f("#external_tool_submission_type").attribute('value').should eql('online_url')
+      f("#submit_from_external_tool_form .btn-primary").click
+      keep_trying_until { !f("#submit_assignment").displayed? }
+      submission = @assignment.find_or_create_submission(@user)
+      submission.submission_type.should == 'online_url'
+      submission.submitted_at.should_not be_nil
+    end
+
+    it "should fail if the tool tries to return any other type" do
+      homework_submission_tool
+      pick_submission_tool('#basic_lti_link')
+
+      assert_invalid_selection_message
+    end
+
+    it "should fail if the tool returns a file type that isn't valid for the file assignment" do
+      @assignment.update_attributes(:allowed_extensions => 'pdf,doc')
+      @assignment.reload.allowed_extensions.should == ['pdf', 'doc']
+      homework_submission_tool
+      pick_submission_tool('#file_link')
+      f('#submit_from_external_tool_form .bad_ext_msg').should be_displayed
+      f('#submit_from_external_tool_form .btn-primary').should have_attribute('disabled', 'true')
+      ff("#submit_assignment .cancel_button").select(&:displayed?).first.click
+    end
+
+    it "should allow submission for a valid type after an invalid submission" do
+      @assignment.update_attributes(:allowed_extensions => 'pdf,doc')
+      @assignment.reload.allowed_extensions.should == ['pdf', 'doc']
+      homework_submission_tool
+      pick_submission_tool('#file_link')
+      select_submission_content('#full_url_link')
+      f('#submit_from_external_tool_form .bad_ext_msg').should_not be_displayed
+      f('#submit_from_external_tool_form .btn-primary').attribute('disabled').should be_nil
+      ff("#submit_assignment .cancel_button").select(&:displayed?).first.click
+    end
+
+    it "should fail if the tool returns a file URL for a non-file assignment" do
+      @assignment.update_attributes(:submission_types => 'online_url')
+      homework_submission_tool
+      pick_submission_tool('#file_link')
+      assert_invalid_selection_message
+    end
+
+    it "should fail if the tool returns a URL for a non-URL assignment" do
+      @assignment.update_attributes(:submission_types => 'online_upload')
+      homework_submission_tool
+      pick_submission_tool('#full_url_link')
+      assert_invalid_selection_message
+    end
+
+    it "should fail to submit if the tool returns an invalid file URL" do
+      homework_submission_tool
+      pick_submission_tool('#bad_file_link')
+
+      f("#external_tool_submission_type").attribute('value').should eql('online_url_to_file')
+      f('#submit_from_external_tool_form .btn-primary').click
+      wait_for_ajax_requests
+      Delayed::Job.last.invoke_job
+      a = Attachment.last
+
+      assert_invalid_selection_message(/problem retrieving/)
+    end
   end
 end

@@ -21,8 +21,11 @@ class DelayedMessage < ActiveRecord::Base
   belongs_to :notification_policy
   belongs_to :context, :polymorphic => true
   belongs_to :communication_channel
-  attr_accessible :notification, :notification_policy, :frequency, :communication_channel, :linked_name, :name_of_topic,:link, :summary, :notification_id, :notification_policy_id, :context_id, :context_type, :communication_channel_id, :context, :workflow_state
-  
+  attr_accessible :notification, :notification_policy, :frequency,
+    :communication_channel, :linked_name, :name_of_topic, :link, :summary,
+    :notification_id, :notification_policy_id, :context_id, :context_type,
+    :communication_channel_id, :context, :workflow_state, :root_account_id
+
   validates_length_of :summary, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   validates_presence_of :communication_channel_id
 
@@ -35,44 +38,41 @@ class DelayedMessage < ActiveRecord::Base
       write_attribute(:summary, val[0,self.class.maximum_text_length])
     end
   end
-  
-  named_scope :for, lambda { |context|
+
+  def formatted_summary
+    (summary || '').
+        gsub(/\n/, "<br />\n").
+        gsub(/(\s\s+)/) { |str| str.gsub(/\s/, '&nbsp;') }
+  end
+
+  scope :for, lambda { |context|
     case context
     when :daily
-      { :conditions => { :frequency => 'daily' } }
+      where(:frequency => 'daily')
     when :weekly
-      { :conditions => { :frequency => 'weekly' } }
+      where(:frequency => 'weekly')
     when Notification
-      { :conditions => { :notification_id => context.id} }
+      where(:notification_id => context)
     when NotificationPolicy
-      { :conditions => { :notification_policy_id => context.id} }
+      where(:notification_policy_id => context)
     when CommunicationChannel
-      { :conditions => { :communication_channel_id => context.id} }
+      where(:communication_channel_id => context)
     else
-      { :conditions => { :context_id => context.id, :context_type => context.class.base_ar_class.to_s } }
+      where(:context_id => context, :context_type => context.class.base_ar_class.to_s)
     end
   }
   
-  named_scope :by, lambda {|field| { :order => field } }
+  scope :by, lambda { |field| order(field) }
   
-  named_scope :in_state, lambda { |state|
-    { :conditions => ["workflow_state = ?", state.to_s]}
+  scope :in_state, lambda { |state| where(:workflow_state => state.to_s) }
+
+  scope :to_summarize, lambda {
+    where("delayed_messages.workflow_state='pending' and delayed_messages.send_at<=?", Time.now.utc)
   }
   
-  named_scope :to_summarize, lambda {
-    { :conditions => ['delayed_messages.workflow_state = ? and delayed_messages.send_at <= ?', 'pending', Time.now.utc ] }
+  scope :next_to_summarize, lambda {
+    where(:workflow_state => 'pending').order(:send_at).limit(1)
   }
-  
-  named_scope :next_to_summarize, lambda {
-    { :conditions => ['delayed_messages.workflow_state = ?', 'pending'], :order => :send_at, :limit => 1 }
-  }
-  
-  def self.ids_for_messages_with_communication_channel_id(cc_id)
-    dm_ids = DelayedMessage.connection.select_values(
-      "SELECT id
-         FROM delayed_messages
-        WHERE workflow_state = 'pending' AND send_at <= '#{Time.now.to_s(:db)}' AND communication_channel_id = #{cc_id}")
-  end
   
   include Workflow
   
@@ -97,7 +97,7 @@ class DelayedMessage < ActiveRecord::Base
   # should be deliverable. After this is run on a list of delayed messages,
   # the regular dispatch process will take place. 
   def self.summarize(delayed_message_ids)
-    delayed_messages = DelayedMessage.scoped(:include => :notification, :conditions => {:id => delayed_message_ids.uniq}).compact
+    delayed_messages = DelayedMessage.includes(:notification).where(:id => delayed_message_ids.uniq).compact
     uniqs = {}
     # only include the most recent instance of each notification-context pairing
     delayed_messages.each do |m|
@@ -114,50 +114,50 @@ class DelayedMessage < ActiveRecord::Base
     return nil unless context # the context for this message has already been deleted
     notification = Notification.by_name('Summaries')
     path = HostUrl.outgoing_email_address
-    message = notification.messages.build(
+    message = to.messages.build(
       :subject => notification.subject,
       :to => to.path,
-      :body => notification.body,
       :notification_name => notification.name,
       :notification => notification,
       :from => path,
-      :communication_channel => to,
       :user => user
     )
     message.delayed_messages = delayed_messages
     message.context = context
     message.asset_context = context.context(user) rescue context
+    message.root_account_id = delayed_messages.first.try(:root_account_id)
     message.delay_for = 0
     message.parse!
     message.save
   end
-  
-  protected
-    def set_send_at
-      # Find the user's timezone
-      if self.communication_channel and self.communication_channel.user
-        user = self.communication_channel.user
-        time_zone = ActiveSupport::TimeZone.us_zones.find {|zone| zone.name == user.time_zone}
-      else
-        time_zone = ActiveSupport::TimeZone.us_zones.find {|zone| zone.name == 'Mountain Time (US & Canada)'}
-      end
 
-      time_zone ||= ActiveSupport::TimeZone.us_zones.find {|zone| zone.name == 'Mountain Time (US & Canada)'}
-      time_zone ||= Time.zone
+  protected
+    MINUTES_PER_DAY = 60 * 24
+    WEEKLY_ACCOUNT_BUCKETS = 4
+    MINUTES_PER_WEEKLY_ACCOUNT_BUCKET = MINUTES_PER_DAY / WEEKLY_ACCOUNT_BUCKETS
+
+    def set_send_at
+      # no cc yet = wait
+      return unless self.communication_channel and self.communication_channel.user
+      return if self.send_at
 
       # I got tired of trying to figure out time zones in my head, and I realized
       # if we do it this way, Rails will take care of it all for us!
-      target = ActiveSupport::TimeWithZone.new(Time.now.utc, time_zone)
       if self.frequency == 'weekly'
-        target = target.next_week.advance(:day => -2).change(:hour => 20)
-      elsif target.hour >= 18
-        target = target.tomorrow.change(:hour => 18)
+        target = self.communication_channel.user.weekly_notification_time
       else
-        target = target.change(:hour => 18)
+        # Find the appropriate timezone. For weekly notifications, always use
+        # Eastern. For other notifications, try and user the user's time zone,
+        # defaulting to mountain. (Should be impossible to not find mountain, but
+        # default to system time if necessary.)
+        zone_name = self.communication_channel.user.time_zone || 'Mountain Time (US & Canada)'
+        time_zone = ActiveSupport::TimeZone.us_zones.find{ |zone| zone.name == zone_name } || Time.zone
+        target = time_zone.now.change(:hour => 18)
+        target += 1.day if target < time_zone.now
       end
 
       # Set the send_at value
-      self.send_at ||= target
+      self.send_at = target
     end
 
 end

@@ -38,13 +38,30 @@ describe AvatarHelper do
       avatar_url_for_user(user, true).should match(%r{\Ahttps?://})
 
       @services[:avatars] = true
+      # reload to clear instance vars
+      user = User.find(user.id)
       avatar_url_for_user(user).should match(%r{\Ahttps?://})
       avatar_url_for_user(user, true).should match(%r{\Ahttps?://})
 
       user.avatar_image_source = 'no_pic'
       user.save!
+      user = User.find(user.id)
       avatar_url_for_user(user).should match(%r{\Ahttps?://})
       avatar_url_for_user(user, true).should match(%r{\Ahttps?://})
+
+      user.avatar_state = 'approved'
+
+      user.avatar_image_source = 'attachment'
+      user.avatar_image_url = "/relative/canvas/path"
+      user.save!
+      user = User.find(user.id)
+      avatar_url_for_user(user).should == "http://test.host/relative/canvas/path"
+
+      user.avatar_image_source = 'external'
+      user.avatar_image_url = "http://www.example.com/path"
+      user.save!
+      user = User.find(user.id)
+      avatar_url_for_user(user).should == "http://www.example.com/path"
     end
 
     it "should return full URIs for groups" do

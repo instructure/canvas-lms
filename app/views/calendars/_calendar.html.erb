@@ -1,4 +1,5 @@
 <%
+  js_env :CALENDAR => { :ACTIVE_EVENT => @active_event_id }
   js_bundle :calendar
   jammit_css :calendar
   @body_classes << "full-width"
@@ -23,7 +24,7 @@
   
     <%= render :partial => 'calendars/mini_calendar', :locals => {:current => current, :first_day => first_day } %>
     <hr />
-    <div style="text-align: right; font-size: 0.8em;">
+    <div class="text-right" style="font-size: 0.8em;">
       <%= t :calendars_count, { :one => "1 calendar, %{open_count} open", :other => "%{count} calendars, %{open_count} open" },
             :count => @contexts.length, :open_count => '<span class="calendars_open_count"></span>'.html_safe %>
     </div>
@@ -31,7 +32,7 @@
     <% @contexts.each_with_index do |c, idx| %>
       <div>
         <div class="group_reference group_<%= "#{c.class.to_s.downcase}_#{c.id}" %> <%= 'default_context' if c == @context %>">
-          <a href="<%= context_url(c, :new_context_calendar_event_url) %>" class="add_event_link button small-button" ><%= image_tag "add-small.png" %> <%= t 'links.add_event', "Add Event" %></a>
+          <a href="<%= context_url(c, :new_context_calendar_event_url) %>" class="add_event_link btn btn-small" ><%= image_tag "add-small.png" %> <%= t 'links.add_event', "Add Event" %></a>
         
           &nbsp;
           <div style="position: absolute; top: 2px; left: 2px;">
@@ -58,7 +59,7 @@
           <%= render :partial => 'event', :collection => @undated_events %>
         </div>
       </div>
-      <div style="text-align: right; font-size: 0.8em;">
+      <div class="text-right" style="font-size: 0.8em;">
         <a href="#" class="add_event_link add-small"><%= t 'links.add_event', "Add Event" %></a>
       </div>
     </div>
@@ -80,7 +81,7 @@
       <% if context.respond_to?("assignments") %>
         <a href="<%= context_url(context, :context_assignments_url) %>" class="<%= context.class.to_s.downcase %>_<%= context.id %>_add_assignment_url">&nbsp;</a>
         <a href="<%= context_url(context, :context_assignment_url, "{{ id }}") %>" class="<%= context.class.to_s.downcase %>_<%= context.id %>_assignment_url">&nbsp;</a>
-        <%= select :assignment, :assignment_group_id, (context.assignment_groups.active.scoped(:select => "id, name").map {|g| [g.name, g.id]} << [t('options.new_group', "[ New Group ]"), "new"]), {}, {:class => "assignment_group_id #{context.try_rescue(:weight_assignment_groups) ? 'weight' : ''}", :id => "#{ context.class.to_s.downcase }_#{ context.id }_assignment_groups"} %>
+        <%= select :assignment, :assignment_group_id, (context.assignment_groups.active.select("id, name").map {|g| [g.name, g.id]} << [t('options.new_group', "[ New Group ]"), "new"]), {}, {:class => "assignment_group_id #{context.try_rescue(:weight_assignment_groups) ? 'weight' : ''}", :id => "#{ context.class.to_s.downcase }_#{ context.id }_assignment_groups"} %>
         <a href="<%= context_url(context, :context_assignment_groups_url) %>" class="<%= context.class.to_s.downcase %>_<%= context.id %>_add_assignment_group_url">&nbsp;</a>
       <% end %>
     <% end %>
@@ -94,16 +95,14 @@
   <table class="calendar_month">
     <tr>
       <td colspan="7" class="month_title">
-        <div style="position: relative; text-align: center;">
-          <span style="display: none;" class="month_number"><%= @current.month %></span>
-          <a href="#" class="prev_month_link no-hover"><%= image_tag "arrow_left.png", :alt => t('alts.previous', "Previous") %></a>
-          <span id="month_and_year">
-            <span class="month_name"><%= I18n.t('date.month_names')[current.month] %></span>
-            <span class="year_number"><%= @current.year %></span>
-          </span>
-          <a href="#" class="next_month_link no-hover"><%= image_tag "arrow_right.png", :alt => t('alts.next', "Next") %></a>
-          <a href="#" class="refresh_calendar_link"><%= image_tag "ajax-reload.gif", :class => "static" %><%= image_tag "ajax-reload-animated.gif", :class => "animated", :style => "display: none;" %></a>
-        </div>
+        <span style="display: none;" class="month_number"><%= @current.month %></span>
+        <a href="#" class="prev_month_link no-hover"><%= image_tag "arrow_left.png", :alt => t('alts.previous', "Previous") %></a>
+        <span id="month_and_year">
+          <span class="month_name"><%= I18n.t('date.month_names')[current.month] %></span>
+          <span class="year_number"><%= @current.year %></span>
+        </span>
+        <a href="#" class="next_month_link no-hover"><%= image_tag "arrow_right.png", :alt => t('alts.next', "Next") %></a>
+        <a href="#" class="refresh_calendar_link"><%= image_tag "ajax-reload.gif", :class => "static" %><%= image_tag "ajax-reload-animated.gif", :class => "animated", :style => "display: none;" %></a>
       </td>
     </tr>
     <tr id="calendar-days">
@@ -184,17 +183,15 @@
         <td><%= before_label :calendar, "Calendar" %></td>
         <td>
           <select class="context_id">
-            <% @contexts.select{|c| c.respond_to?("calendar_events") && c.calendar_events.new.grants_right?(@current_user, session, :create)}.each do |context| %>
+            <% @contexts.select{|c| c.respond_to?("calendar_events") && c.calendar_events.build.grants_right?(@current_user, session, :create)}.each do |context| %>
               <option value="<%= context.class.to_s.downcase %>_<%= context.id %>"><%= context.name %></option>
             <% end %>
           </select>
         </td>
       </tr><tr>
-        <td></td>
-        <td><a href="#" class="more_options_link"><%= t 'links.more_options', "more options" %></a></td>
-      </tr><tr>
-        <td colspan="2" class="button-container">
-          <button type="submit" class="button"><%= t '#buttons.submit', "Submit" %></button>
+        <td colspan="2" class="text-right">
+          <a href="#" class="btn btn-secondary more_options_link"><%= t 'links.more_options', "More Options" %></a>
+          <button type="submit" class="btn btn-primary"><%= t '#buttons.submit', "Submit" %></button>
         </td>
       </tr>
     </table>
@@ -213,7 +210,7 @@
         <td><%= before_label :calendar, "Calendar" %></td>
         <td>
           <select class="context_id">
-            <% @contexts.select{|c| c.respond_to?("assignments") && c.assignments.new.grants_right?(@current_user, session, :create)}.each do |context| %>
+            <% @contexts.select{|c| c.respond_to?("assignments") && c.assignments.build.grants_right?(@current_user, session, :create)}.each do |context| %>
               <option value="<%= context.class.to_s.downcase %>_<%= context.id %>"><%= context.name %></option>
             <% end %>
           </select>
@@ -223,11 +220,9 @@
         <td class="assignment_group_select">
         </td>
       </tr><tr>
-        <td></td>
-        <td><a href="#" class="more_options_link"><%= t 'links.more_options', "more options" %></a></td>
-      </tr><tr>
-        <td colspan="2">
-          <button type="submit" class="button"><%= t '#buttons.submit', "Submit" %></button>
+        <td colspan="2" class="text-right">
+          <a href="#" class="btn btn-secondary more_options_link"><%= t 'links.more_options', "More Options" %></a>
+          <button type="submit" class="btn btn-primary"><%= t '#buttons.submit', "Submit" %></button>
         </td>
       </tr>
     </table>

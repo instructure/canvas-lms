@@ -36,12 +36,13 @@ define [
         width: 400
         resizable: false
         buttons: [
-          text: I18n.t('buttons.send_message', 'Send')
-          'data-text-while-loading': I18n.t('buttons.sending_message', 'Sending...')
-          click: -> $(this).submit()
-        ,
           text: I18n.t('buttons.cancel', 'Cancel')
           click: -> $(this).dialog('close')
+        ,
+          text: I18n.t('buttons.send_message', 'Send')
+          'data-text-while-loading': I18n.t('buttons.sending_message', 'Sending...')
+          class: 'btn-primary'
+          click: -> $(this).submit()
         ]
         close: -> $(this).remove()
       @loadParticipants()

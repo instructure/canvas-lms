@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2012 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -27,6 +27,7 @@
 # "sis_section_id:" as described in the API documentation on SIS IDs.
 class SubmissionsApiController < ApplicationController
   before_filter :get_course_from_section, :require_context
+  batch_jobs_in_actions :only => :update, :batch => { :priority => Delayed::LOW_PRIORITY }
 
   include Api::V1::Submission
 
@@ -39,6 +40,7 @@ class SubmissionsApiController < ApplicationController
   # Fields include:
   # assignment_id:: The unique identifier for the assignment.
   # user_id:: The id of the user who submitted the assignment.
+  # grader_id:: The id of the user who graded the assignment.
   # submitted_at:: The timestamp when the assignment was submitted, if an actual submission has been made.
   # score:: The raw score for the assignment submission.
   # attempt:: If multiple submissions have been made, this is the attempt number.
@@ -48,11 +50,11 @@ class SubmissionsApiController < ApplicationController
   # preview_url:: Link to the URL in canvas where the submission can be previewed. This will require the user to log in.
   # submitted_at:: Timestamp when the submission was made.
   # url:: If the submission was made as a URL.
+  # late:: Whether the submission was made after the applicable due date.
   def index
-    if authorized_action(@context, @current_user, :manage_grades)
+    if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
       @assignment = @context.assignments.active.find(params[:assignment_id])
-      @submissions = @assignment.submissions.all(
-        :conditions => { :user_id => visible_user_ids })
+      @submissions = @assignment.submissions.where(:user_id => visible_user_ids).all
 
       includes = Array(params[:include])
 
@@ -90,9 +92,9 @@ class SubmissionsApiController < ApplicationController
   #       }
   #     ]
   def for_students
-    if authorized_action(@context, @current_user, :view_all_grades)
+    if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
       raise ActiveRecord::RecordNotFound if params[:student_ids].blank?
-      student_ids = map_user_ids(params[:student_ids]).map(&:to_i) & visible_user_ids
+      student_ids = map_user_ids(params[:student_ids]).map(&:to_i) & visible_user_ids(:include_priors => true)
       return render(:json => []) if student_ids.blank?
 
       includes = Array(params[:include])
@@ -100,7 +102,7 @@ class SubmissionsApiController < ApplicationController
       assignment_scope = @context.assignments.active
       requested_assignment_ids = Array(params[:assignment_ids]).map(&:to_i)
       if requested_assignment_ids.present?
-        assignment_scope = assignment_scope.scoped(:conditions => { 'assignments.id' => requested_assignment_ids })
+        assignment_scope = assignment_scope.where('assignments.id' => requested_assignment_ids)
       end
       assignments = assignment_scope.all
       assignments_hash = {}
@@ -110,9 +112,9 @@ class SubmissionsApiController < ApplicationController
       Api.assignment_ids_for_students_api = assignments.map(&:id)
       sql_includes = { :user => [] }
       sql_includes[:user] << :submissions_for_given_assignments unless assignments.empty?
-      scope = (@section || @context).student_enrollments.scoped(
-        :include => sql_includes,
-        :conditions => { 'users.id' => student_ids })
+      scope = (@section || @context).all_student_enrollments.
+          includes(sql_includes).
+          where('users.id' => student_ids)
 
       result = scope.map do |enrollment|
         student = enrollment.user
@@ -177,7 +179,7 @@ class SubmissionsApiController < ApplicationController
     permission = :nothing if @user != @current_user
     # we don't check quota when uploading a file for assignment submission
     if authorized_action(@assignment, @current_user, permission)
-      api_attachment_preflight(@user, request, :check_quota => false)
+      api_attachment_preflight(@user, request, :check_quota => false, :do_submit_to_scribd => true)
     end
   end
 
@@ -259,7 +261,7 @@ class SubmissionsApiController < ApplicationController
     end
 
     if authorized
-      submission = {}
+      submission = { :grader => @current_user }
       if params[:submission].is_a?(Hash)
         submission[:grade] = params[:submission].delete(:posted_grade)
       end
@@ -285,8 +287,10 @@ class SubmissionsApiController < ApplicationController
 
       comment = params[:comment]
       if comment.is_a?(Hash)
+        admin_in_context = !@context_enrollment || @context_enrollment.admin?
         comment = {
-          :comment => comment[:text_comment], :author => @current_user }.merge(
+          :comment => comment[:text_comment], :author => @current_user,
+          :hidden => @assignment.muted? && admin_in_context }.merge(
           comment.slice(:media_comment_id, :media_comment_type, :group_comment)
         ).with_indifferent_access
         @assignment.update_submission(@submission.user, comment)
@@ -309,17 +313,16 @@ class SubmissionsApiController < ApplicationController
   def get_user_considering_section(user_id)
     scope = @context.students_visible_to(@current_user)
     if @section
-      scope = scope.scoped(:conditions => { 'enrollments.course_section_id' => @section.id })
+      scope = scope.where(:enrollments => { :course_section_id => @section })
     end
     api_find(scope, user_id)
   end
 
-  def visible_user_ids
-    scope = if @section
-      @context.enrollments_visible_to(@current_user, :section_ids => [@section.id])
-    else
-      @context.enrollments_visible_to(@current_user)
+  def visible_user_ids(opts = {})
+    if @section
+      opts[:section_ids] = [@section.id]
     end
-    scope.all(:select => :user_id).map(&:user_id)
+    scope = @context.enrollments_visible_to(@current_user, opts)
+    scope.pluck(:user_id)
   end
 end

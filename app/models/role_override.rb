@@ -21,12 +21,25 @@ class RoleOverride < ActiveRecord::Base
   has_many :children, :class_name => "Role", :foreign_key => "parent_id"
   belongs_to :parent, :class_name => "Role"
 
-  attr_accessible :context, :permission, :enrollment_type, :enabled
+  attr_accessible :context, :permission, :enrollment_type, :enabled, :applies_to_self, :applies_to_descendants
+
+  validate :must_apply_to_something
+
+  def must_apply_to_something
+    self.errors.add(nil, "Must apply to something") unless applies_to_self? || applies_to_descendants?
+  end
+
+  def applies_to
+    result = []
+    result << :self if applies_to_self?
+    result << :descendants if applies_to_descendants?
+    result.presence
+  end
 
   def self.account_membership_types(account)
-    res = [{:name => "AccountAdmin", :label => t('roles.account_admin', "Account Admin")}]
-    (account.account_membership_types - ['AccountAdmin']).each do |t| 
-      res << {:name => t, :label => t}
+    res = [{:name => "AccountAdmin", :base_role_name => AccountUser::BASE_ROLE_NAME, :label => t('roles.account_admin', "Account Admin")}]
+    (account.available_account_roles - ['AccountAdmin']).each do |t|
+      res << {:name => t, :base_role_name => AccountUser::BASE_ROLE_NAME, :label => t}
     end
     res
   end
@@ -34,15 +47,24 @@ class RoleOverride < ActiveRecord::Base
   ENROLLMENT_TYPES =
     [
       # StudentViewEnrollment permissions will mirror StudentPermissions
-      {:name => 'StudentEnrollment', :label => lambda { t('roles.student', 'Student') } },
-      {:name => 'TaEnrollment', :label => lambda { t('roles.ta', 'TA') } },
-      {:name => 'TeacherEnrollment', :label => lambda { t('roles.teacher', 'Teacher') } },
-      {:name => 'DesignerEnrollment', :label => lambda { t('roles.designer', 'Course Designer') } },
-      {:name => 'ObserverEnrollment', :label => lambda { t('roles.observer', 'Observer') } }
+      {:base_role_name => 'StudentEnrollment', :name => 'StudentEnrollment', :label => lambda { t('roles.student', 'Student') }, :plural_label => lambda { t('roles.students', 'Students') } },
+      {:base_role_name => 'TeacherEnrollment', :name => 'TeacherEnrollment', :label => lambda { t('roles.teacher', 'Teacher') }, :plural_label => lambda { t('roles.teachers', 'Teachers') } },
+      {:base_role_name => 'TaEnrollment', :name => 'TaEnrollment', :label => lambda { t('roles.ta', 'TA') }, :plural_label => lambda { t('roles.tas', 'TAs') } },
+      {:base_role_name => 'DesignerEnrollment', :name => 'DesignerEnrollment', :label => lambda { t('roles.designer', 'Designer') }, :plural_label => lambda { t('roles.designers', 'Designers') } },
+      {:base_role_name => 'ObserverEnrollment', :name => 'ObserverEnrollment', :label => lambda { t('roles.observer', 'Observer') }, :plural_label => lambda { t('roles.observers', 'Observers') } }
     ].freeze
+
   def self.enrollment_types
     ENROLLMENT_TYPES
   end
+
+  BASE_ROLE_TYPES = ['AccountMembership', 'StudentEnrollment', 'TeacherEnrollment',
+                     'TaEnrollment', 'ObserverEnrollment', 'DesignerEnrollment'].freeze
+  def self.base_role_types
+    BASE_ROLE_TYPES
+  end
+
+  NO_PERMISSIONS_TYPE = 'NoPermissions'
 
   KNOWN_ROLE_TYPES =
     [
@@ -53,7 +75,9 @@ class RoleOverride < ActiveRecord::Base
       'StudentViewEnrollment',
       'ObserverEnrollment',
       'TeacherlessStudentEnrollment',
-      'AccountAdmin'
+      'AccountAdmin',
+      'AccountMembership',
+      NO_PERMISSIONS_TYPE
     ].freeze
   def self.known_role_types
     KNOWN_ROLE_TYPES
@@ -89,6 +113,7 @@ class RoleOverride < ActiveRecord::Base
           'StudentEnrollment',
           'TaEnrollment',
           'DesignerEnrollment',
+          'TeacherEnrollment',
           'TeacherlessStudentEnrollment',
           'ObserverEnrollment',
           'AccountAdmin',
@@ -109,6 +134,7 @@ class RoleOverride < ActiveRecord::Base
           'StudentEnrollment',
           'TaEnrollment',
           'DesignerEnrollment',
+          'TeacherEnrollment',
           'TeacherlessStudentEnrollment',
           'ObserverEnrollment',
           'AccountAdmin',
@@ -142,7 +168,7 @@ class RoleOverride < ActiveRecord::Base
         ]
       },
       :send_messages => {
-        :label => lambda { t('permissions.send_messages', "Send messages to course members") },
+        :label => lambda { t('permissions.send_messages', "Send messages to individual course members") },
         :available_to => [
           'StudentEnrollment',
           'TaEnrollment',
@@ -155,6 +181,25 @@ class RoleOverride < ActiveRecord::Base
         ],
         :true_for => [
           'StudentEnrollment',
+          'TaEnrollment',
+          'DesignerEnrollment',
+          'TeacherEnrollment',
+          'AccountAdmin'
+        ]
+      },
+      :send_messages_all => {
+        :label => lambda { t('permissions.send_messages_all', "Send messages to the entire class") },
+        :available_to => [
+          'StudentEnrollment',
+          'TaEnrollment',
+          'DesignerEnrollment',
+          'TeacherEnrollment',
+          'TeacherlessStudentEnrollment',
+          'ObserverEnrollment',
+          'AccountAdmin',
+          'AccountMembership'
+        ],
+        :true_for => [
           'TaEnrollment',
           'DesignerEnrollment',
           'TeacherEnrollment',
@@ -256,7 +301,7 @@ class RoleOverride < ActiveRecord::Base
         ]
       },
       :manage_grades => {
-        :label => lambda { t('permissions.manage_grades', "Edit grades (includes assessing rubrics)") },
+        :label => lambda { t('permissions.manage_grades', "Edit grades") },
         :available_to => [
           'TaEnrollment',
           'TeacherEnrollment',
@@ -268,6 +313,22 @@ class RoleOverride < ActiveRecord::Base
           'TeacherEnrollment',
           'AccountAdmin'
         ]
+      },
+      :manage_rubrics => {
+          :label => lambda { t('permissions.manage_rubrics', "Create and edit assessing rubrics") },
+          :available_to => [
+              'TaEnrollment',
+              'DesignerEnrollment',
+              'TeacherEnrollment',
+              'AccountAdmin',
+              'AccountMembership'
+          ],
+          :true_for => [
+              'DesignerEnrollment',
+              'TaEnrollment',
+              'TeacherEnrollment',
+              'AccountAdmin'
+          ]
       },
       :comment_on_others_submissions => {
         :label => lambda { t('permissions.comment_on_others_submissions', "View all students' submissions and make comments on them") },
@@ -414,6 +475,27 @@ class RoleOverride < ActiveRecord::Base
           'AccountAdmin'
         ]
       },
+      :undelete_courses => {
+        :label => lambda { t('permissions.undelete_courses', "Undelete courses") },
+        :admin_tool => true,
+        :account_only => true, 
+        :available_to => [
+          'AccountAdmin',
+          'AccountMembership'
+        ], 
+        :true_for => [ 'AccountAdmin' ]
+      },
+      :view_notifications => {
+        :label => lambda { t('permissions.view_notifications', "View notifications") },
+        :admin_tool => true,
+        :account_only => true,
+        :available_to => [
+          'AccountAdmin',
+          'AccountMembership'
+        ],
+        :true_for => [],
+        :account_allows => lambda {|acct| acct.settings[:admins_can_view_notifications]}
+      },
       :read_question_banks => {
         :label => lambda { t('permissions.read_question_banks', "View and link to question banks") },
         :available_to => [
@@ -545,6 +627,12 @@ class RoleOverride < ActiveRecord::Base
         :true_for => %w(AccountAdmin),
         :available_to => %w(AccountAdmin AccountMembership)
       },
+      :manage_storage_quotas => {
+          :label => lambda { t('permissions.manage_storage_quotas', "Manage storage quotas") },
+          :account_only => true,
+          :true_for => %w(AccountAdmin),
+          :available_to => %w(AccountAdmin AccountMembership)
+      },
       :manage_user_notes => {
         :label => lambda { t('permissions.manage_user_notes', "Manage faculty journal entries") },
         :available_to => [
@@ -557,7 +645,8 @@ class RoleOverride < ActiveRecord::Base
           'TaEnrollment',
           'TeacherEnrollment',
           'AccountAdmin'
-        ]
+        ],
+        :if => :enable_user_notes
       },
       :read_course_content => {
         :label => lambda { t('permissions.read_course_content', "View course content") },
@@ -593,8 +682,20 @@ class RoleOverride < ActiveRecord::Base
         :true_for => %w(AccountAdmin),
         :available_to => %w(AccountAdmin AccountMembership),
       },
+      :view_jobs => {
+          :label => lambda { t('permissions.view_jobs', "View background jobs") },
+          :account_only => :site_admin,
+          :true_for => %w(AccountAdmin),
+          :available_to => %w(AccountAdmin AccountMembership),
+      },
       :view_error_reports => {
         :label => lambda { t('permissions.view_error_reports', "View error reports") },
+        :account_only => :site_admin,
+        :true_for => %w(AccountAdmin),
+        :available_to => %w(AccountAdmin AccountMembership),
+      },
+      :manage_global_outcomes => {
+        :label => lambda { t('permissions.manage_global_outcomes', "Manage global learning outcomes") },
         :account_only => :site_admin,
         :true_for => %w(AccountAdmin),
         :available_to => %w(AccountAdmin AccountMembership),
@@ -616,26 +717,21 @@ class RoleOverride < ActiveRecord::Base
       }
     })
 
-  RESERVED_ROLES =
-    [
-      'AccountAdmin', 'AccountMembership', 'DesignerEnrollment',
-      'ObserverEnrollment', 'StudentEnrollment', 'StudentViewEnrollment', 
-      'TaEnrollment', 'TeacherEnrollment', 'TeacherlessStudentEnrollment'
-    ].freeze
-
   def self.permissions
     Permissions.retrieve
   end
 
-  def self.manageable_permissions(context)
+  def self.manageable_permissions(context, base_role_type=nil)
     permissions = self.permissions.dup
     permissions.reject!{ |k, p| p[:account_only] == :site_admin } unless context.site_admin?
     permissions.reject!{ |k, p| p[:account_only] == :root } unless context.root_account?
+    permissions.reject!{ |k, p| !p[:available_to].include?(base_role_type)} unless base_role_type.nil?
+    permissions.reject!{ |k, p| p[:account_allows] && !p[:account_allows].call(context)}
     permissions
   end
 
-  def self.css_class_for(context, permission, enrollment_type)
-    generated_permission = self.permission_for(context, permission, enrollment_type)
+  def self.css_class_for(context, permission, base_role, custom_role=nil)
+    generated_permission = self.permission_for(context, permission, base_role, custom_role)
     
     css = []
     if generated_permission[:readonly]
@@ -649,12 +745,12 @@ class RoleOverride < ActiveRecord::Base
     css.join(' ')
   end
   
-  def self.readonly_for(context, permission, enrollment_type)
-    self.permission_for(context, permission, enrollment_type)[:readonly]
+  def self.readonly_for(context, permission, base_role, custom_role=nil)
+    self.permission_for(context, permission, base_role, custom_role)[:readonly]
   end
   
-  def self.title_for(context, permission, enrollment_type)
-    generated_permission = self.permission_for(context, permission, enrollment_type)
+  def self.title_for(context, permission, base_role, custom_role=nil)
+    generated_permission = self.permission_for(context, permission, base_role, custom_role)
     if generated_permission[:readonly]
       t 'tooltips.readonly', "you do not have permission to change this."
     else
@@ -662,12 +758,12 @@ class RoleOverride < ActiveRecord::Base
     end
   end
   
-  def self.locked_for(context, permission, enrollment_type=nil)
-    self.permission_for(context, permission, enrollment_type)[:locked]
+  def self.locked_for(context, permission, base_role, custom_role=nil)
+    self.permission_for(context, permission, base_role, custom_role)[:locked]
   end
   
-  def self.hidden_value_for(context, permission, enrollment_type=nil)
-    generated_permission = self.permission_for(context, permission, enrollment_type)
+  def self.hidden_value_for(context, permission, base_role, custom_role=nil)
+    generated_permission = self.permission_for(context, permission, base_role, custom_role)
     if !generated_permission[:readonly] && generated_permission[:explicit]
       generated_permission[:enabled] ? 'checked' : 'unchecked'
     else
@@ -684,79 +780,107 @@ class RoleOverride < ActiveRecord::Base
     @cached_permissions = {}
   end
   
-  def self.permission_for(context, permission, enrollment_type=nil)
-    enrollment_type = 'StudentEnrollment' if enrollment_type == 'StudentViewEnrollment'
+  def self.permission_for(role_context, permission, base_role, custom_role=nil)
+    base_role = 'StudentEnrollment' if base_role == 'StudentViewEnrollment'
+    custom_role = nil if base_role == NO_PERMISSIONS_TYPE
+    if custom_role && custom_role == 'AccountAdmin'
+      raise ArgumentError.new("Can't have AccountAdmin with base_role #{base_role}") unless base_role == AccountUser::BASE_ROLE_NAME
+      # An AccountAdmin is the default account user and uses a different base
+      # permission set. So set its base_role to AccountAdmin instead of AccountMembership
+      base_role = 'AccountAdmin'
+    end
+    custom_role ||= base_role
+
     @cached_permissions ||= {}
-    key = [context.cache_key, permission.to_s, enrollment_type.to_s].join
-    permissionless_key = [context.cache_key, enrollment_type.to_s].join
+    key = [role_context.cache_key, role_context.global_id, permission.to_s, custom_role.to_s].join
+    permissionless_key = [role_context.cache_key, role_context.global_id, custom_role.to_s].join
     return @cached_permissions[key] if @cached_permissions[key]
     
-    fallback_enrollment_type = enrollment_type
-    fallback_enrollment_type = 'AccountMembership' if !self.known_role_types.include?(enrollment_type)
+    if !self.known_role_types.include?(base_role)
+      raise ArgumentError.new("Invalid base_role #{base_role}")
+    end
+    default_data = self.permissions[permission]
+    # Determine if the permission is able to be used for the account. A non-setting is 'true'.
+    # Execute linked proc if given.
+    account_allows = !!(default_data[:account_allows].nil? || (default_data[:account_allows].respond_to?(:call) &&
+        default_data[:account_allows].call(role_context.root_account)))
     generated_permission = {
-      :permission =>  self.permissions[permission],
-      :enabled    =>  self.permissions[permission][:true_for].include?(fallback_enrollment_type),
-      :locked     => !self.permissions[permission][:available_to].include?(fallback_enrollment_type),
-      :readonly   => !self.permissions[permission][:available_to].include?(fallback_enrollment_type),
+      :account_allows => account_allows,
+      :permission =>  default_data,
+      :enabled    =>  account_allows && (default_data[:true_for].include?(base_role) ? [:self, :descendants] : false),
+      :locked     => !default_data[:available_to].include?(base_role),
+      :readonly   => !default_data[:available_to].include?(base_role),
       :explicit   => false,
-      :enrollment_type => enrollment_type
+      :base_role_type => base_role,
+      :enrollment_type => custom_role
     }
-    
-    @@role_override_chain ||= {}
-    overrides = @@role_override_chain[permissionless_key]
-    unless overrides
-      account_ids = []
-      context_walk = context
-      while context_walk
-        account_ids << context_walk.id if context_walk.is_a? Account
-        if context_walk.respond_to?(:course)
-          context_walk = context_walk.course
-        elsif context_walk.respond_to?(:account)
-          context_walk = context_walk.account
-        elsif context_walk.respond_to?(:parent_account)
-          context_walk = context_walk.parent_account
-        else
-          context_walk = nil
-        end
+    if default_data[:account_only]
+      if role_context.is_a? Account
+        generated_permission[:enabled] = false if default_data[:account_only] == :root && !role_context.root_account?
+        generated_permission[:enabled] = false if default_data[:account_only] == :site_admin && !role_context.site_admin?
+      else
+        generated_permission[:enabled] = false
       end
-      case_string = ""
-      account_ids.each_with_index{|account_id, idx| case_string += " WHEN context_id='#{account_id}' THEN #{idx} " }
-      overrides = RoleOverride.find(:all, :conditions => {:context_id => account_ids, :enrollment_type => generated_permission[:enrollment_type].to_s}, :order => (case_string.empty? ? nil : "CASE #{case_string} ELSE 9999 END DESC"))
     end
-    
-    @@role_override_chain[permissionless_key] = overrides
-    overrides.each do |override|
-      if override.permission == permission.to_s
-        generated_permission[:readonly] = true if override.locked && (override.context_id != context.id || !context.is_a?(Account))
-        generated_permission.merge!({
-          :readonly => generated_permission[:readonly] || generated_permission[:locked],
-          :explicit => false
-        })
 
-        if !generated_permission[:locked]
-          unless override.enabled.nil?
-            if override.context == context
-              # if the explicit override is for the target context, the prior default
-              # is the parent context's value
-              generated_permission[:prior_default] = generated_permission[:enabled]
-            else
-              # otherwise, the prior default is the same as the new override,
-              # since changing it in the target context will create a new
-              # override
-              generated_permission[:prior_default] = override.enabled?
-            end
-            generated_permission.merge!({
-              :enabled => override.enabled?,
-              :explicit => !override.enabled.nil?
-            })
-          end
-          generated_permission[:locked] = override.locked?
-        end
+    # cannot be overridden; don't bother looking for overrides
+    return generated_permission if generated_permission[:locked]
+
+    @@role_override_chain ||= {}
+    overrides = @@role_override_chain[permissionless_key] ||= begin
+      role_context.shard.activate do
+        account_ids = role_context.account_chain_ids
+        case_string = ""
+        account_ids.each_with_index{|account_id, idx| case_string += " WHEN context_id='#{account_id}' THEN #{idx} " }
+        overrides = RoleOverride.where(:context_id => account_ids, :enrollment_type => generated_permission[:enrollment_type].to_s).order("CASE #{case_string} ELSE 9999 END DESC")
+        overrides.group_by(&:permission).freeze
       end
     end
-    @cached_permissions[key] = generated_permission
+
+    # walk the overrides from most general (root account) to most specific (the role's account)
+    # and apply them; short-circuit once someone has locked it
+    last_override = false
+    (overrides[permission.to_s] || []).each do |override|
+      # set the flag that we have an override for the context we're on
+      last_override = override.context_id == role_context.id && override.context_type == role_context.class.base_class.name
+
+      generated_permission[:context_id] = override.context_id
+      generated_permission[:locked] = override.locked?
+      # keep track of the value for the parent
+      generated_permission[:prior_default] = generated_permission[:enabled]
+
+      unless override.enabled.nil?
+        generated_permission[:explicit] = true if last_override
+        generated_permission[:enabled] = override.enabled? ? override.applies_to : nil
+      end
+
+      break if override.locked?
+    end
+
+    # there was not an override matching this context, so do a half loop
+    # to set the inherited values
+    if !last_override
+      generated_permission[:prior_default] = generated_permission[:enabled]
+      generated_permission[:readonly] = true if generated_permission[:locked]
+    end
+
+    @cached_permissions[key] = generated_permission.freeze
   end
-  
+
+  # returns just the :enabled key of permission_for, adjusted for applying it to a certain
+  # context
+  def self.enabled_for?(role_context, context, permission, base_role, custom_role = nil)
+    permission = permission_for(role_context, permission, base_role, custom_role)
+    return [] unless permission[:enabled]
+
+    # this override applies to self, and we are self; no adjustment necessary
+    return permission[:enabled] if context.id == permission[:context_id]
+    # this override applies to descendants, and we're not applying it to self
+    #   (presumed that other logic prevents calling this method with context being a parent of role_context)
+    return [:self, :descendants] if context.id != permission[:context_id] && permission[:enabled].include?(:descendants)
+    []
+  end
+
   # settings is a hash with recognized keys :override and :locked. each key
   # differentiates nil, false, and truthy as possible values
   def self.manage_role_override(context, role, permission, settings)

@@ -17,9 +17,8 @@
 #
 
 class ContentMigration < ActiveRecord::Base
-  require 'aws/s3'
-  include AWS::S3
   include Workflow
+  include TextHelper
   belongs_to :context, :polymorphic => true
   belongs_to :user
   belongs_to :attachment
@@ -27,6 +26,7 @@ class ContentMigration < ActiveRecord::Base
   belongs_to :exported_attachment, :class_name => 'Attachment'
   belongs_to :source_course, :class_name => 'Course'
   has_one :content_export
+  has_many :migration_issues
   has_a_broadcast_policy
   serialize :migration_settings
   before_save :infer_defaults
@@ -54,6 +54,7 @@ class ContentMigration < ActiveRecord::Base
           'wikis' => false
   }
   attr_accessible :context, :migration_settings, :user, :source_course, :copy_options
+  attr_accessor :outcome_to_id_map
 
   workflow do
     state :created
@@ -87,6 +88,11 @@ class ContentMigration < ActiveRecord::Base
       record.changed_state(:failed) && !record.migration_settings[:skip_import_notification]
     }
   end
+  
+  def self.migration_plugins(exclude_hidden=false)
+    plugins = Canvas::Plugin.all_for_tag(:export_system)
+    exclude_hidden ? plugins.select{|p|!p.meta[:hide_from_users]} : plugins
+  end
 
   # the stream item context is decided by calling asset.context(user), i guess
   # to differentiate from the normal asset.context() call that may not give us
@@ -109,7 +115,27 @@ class ContentMigration < ActiveRecord::Base
       end
     end
   end
+  
+  def import_immediately?
+    !!migration_settings[:import_immediately]
+  end
+  
+  def converter_class=(c_class)
+    migration_settings[:converter_class] = c_class
+  end
+  
+  def converter_class
+    migration_settings[:converter_class]
+  end
 
+  def strand=(s)
+    migration_settings[:strand] = s
+  end
+
+  def strand
+    migration_settings[:strand]
+  end
+  
   def migration_ids_to_import=(val)
     migration_settings[:migration_ids_to_import] = val
   end
@@ -164,23 +190,72 @@ class ContentMigration < ActiveRecord::Base
     end
   end
 
-  # add a non-fatal error/warning to the import. user_message is what will be
-  # displayed to the end user. exception_or_info can be either an Exception
-  # object or any other information on the error.
-  def add_warning(user_message, exception_or_info='')
-    migration_settings[:warnings] ||= []
-    if exception_or_info.is_a?(Exception)
-      er = ErrorReport.log_exception(:content_migration, exception_or_info)
-      migration_settings[:warnings] << [user_message, "ErrorReport:#{er.id}"]
-    else
-      migration_settings[:warnings] << [user_message, exception_or_info]
+  # add todo/error/warning issue to the import. user_message is what will be
+  # displayed to the end user. 
+  # type must be one of: :todo, :warning, :error 
+  #
+  # The possible opts keys are:
+  #
+  # error_message - an admin-only error message
+  # exception - an exception object
+  # error_report_id - the id to an error report
+  # fix_issue_html_url - the url to send the user to to fix problem
+  # 
+  def add_issue(user_message, type, opts={})
+    mi = self.migration_issues.build(:issue_type => type.to_s, :description => user_message)
+    if opts[:error_report_id]
+      mi.error_report_id = opts[:error_report_id]
+    elsif opts[:exception]
+      er = ErrorReport.log_exception(:content_migration, opts[:exception])
+      mi.error_report_id = er.id
+    end
+    mi.error_message = opts[:error_message]
+    mi.fix_issue_html_url = opts[:fix_issue_html_url]
+
+    mi.save!
+    
+    mi
+  end
+  
+  def add_todo(user_message, opts={})
+    add_issue(user_message, :todo, opts)
+  end
+  
+  def add_error(user_message, opts={})
+    add_issue(user_message, :error, opts)
+  end
+  
+  def add_warning(user_message, opts={})
+    if !opts.is_a? Hash
+      # convert deprecated behavior to new
+      exception_or_info = opts
+      opts={}
+      if exception_or_info.is_a?(Exception)
+        opts[:exception] = exception_or_info
+      else
+        opts[:error_message] = exception_or_info
+      end
+    end
+    add_issue(user_message, :warning, opts)
+  end
+
+  def add_import_warning(item_type, item_name, warning)
+    item_name = truncate_text(item_name || "", :max_length => 150)
+    add_warning(t('errors.import_error', "Import Error: ") + "#{item_type} - \"#{item_name}\"", warning)
+  end
+
+  # deprecated warning format
+  def old_warnings_format
+    self.migration_issues.map do |mi|
+      message = mi.error_report_id ? "ErrorReport:#{mi.error_report_id}" : mi.error_message
+      [mi.description, message]
     end
   end
 
   def warnings
-    (migration_settings[:warnings] || []).map(&:first)
+    old_warnings_format.map(&:first)
   end
-
+  
   def export_content
     check_quiz_id_prepender
     plugin = Canvas::Plugin.find(migration_settings['migration_type'])
@@ -214,8 +289,8 @@ class ContentMigration < ActiveRecord::Base
   def check_quiz_id_prepender
     if !migration_settings[:id_prepender] && !migration_settings[:overwrite_questions]
       # only prepend an id if the course already has some migrated questions/quizzes
-      if self.context.assessment_questions.scoped(:conditions => 'assessment_questions.migration_id IS NOT NULL').any? ||
-         self.context.quizzes.scoped(:conditions => 'quizzes.migration_id IS NOT NULL').any?
+      if self.context.assessment_questions.where('assessment_questions.migration_id IS NOT NULL').exists? ||
+         (self.context.respond_to?(:quizzes) && self.context.quizzes.where('quizzes.migration_id IS NOT NULL').exists?)
         migration_settings[:id_prepender] = self.id
       end
     end
@@ -250,8 +325,7 @@ class ContentMigration < ActiveRecord::Base
       @zip_file = Zip::ZipFile.open(@exported_data_zip.path)
       @exported_data_zip.close
       data = JSON.parse(@zip_file.read('course_export.json'), :max_nesting => 50)
-      data = data.with_indifferent_access if data.is_a? Hash
-      data['all_files_export'] ||= {}
+      data = prepare_data(data)
 
       if @zip_file.find_entry('all_files.zip')
         # the file importer needs an actual file to process
@@ -278,6 +352,13 @@ class ContentMigration < ActiveRecord::Base
     end
   end
   handle_asynchronously :import_content, :priority => Delayed::LOW_PRIORITY, :max_attempts => 1
+
+  def prepare_data(data)
+    data = data.with_indifferent_access if data.is_a? Hash
+    TextHelper.recursively_strip_invalid_utf8!(data, true) if RUBY_VERSION >= "1.9"
+    data['all_files_export'] ||= {}
+    data
+  end
 
   def copy_options
     self.migration_settings[:copy_options]
@@ -360,14 +441,12 @@ class ContentMigration < ActiveRecord::Base
   end
   handle_asynchronously :copy_course, :priority => Delayed::LOW_PRIORITY, :max_attempts => 1
   
-  named_scope :for_context, lambda{|context|
-    {:conditions => {:context_id => context.id, :context_type => context.class.to_s} }
-  }
-  
-  named_scope :successful, :conditions=>"workflow_state = 'imported'"
-  named_scope :running, :conditions=>"workflow_state IN ('exporting', 'importing')"
-  named_scope :waiting, :conditions=>"workflow_state IN ('exported')"
-  named_scope :failed, :conditions=>"workflow_state IN ('failed', 'pre_process_error')"
+  scope :for_context, lambda { |context| where(:context_id => context, :context_type => context.class.to_s) }
+
+  scope :successful, where(:workflow_state => 'imported')
+  scope :running, where(:workflow_state => ['exporting', 'importing'])
+  scope :waiting, where(:workflow_state => 'exported')
+  scope :failed, where(:workflow_state => ['failed', 'pre_process_error'])
 
   def complete?
     %w[imported failed pre_process_error].include?(workflow_state)
@@ -411,6 +490,29 @@ class ContentMigration < ActiveRecord::Base
 
   def fast_update_progress(val)
     self.progress = val
-    ContentMigration.update_all({:progress=>val}, "id=#{self.id}")
+    ContentMigration.where(:id => self).update_all(:progress=>val)
+  end
+
+  def add_missing_content_links(item)
+    @missing_content_links ||= {}
+    item[:field] ||= :text
+    key = "#{item[:class]}_#{item[:id]}_#{item[:field]}"
+    if item[:missing_links].present?
+      @missing_content_links[key] = item
+    else
+      @missing_content_links.delete(key)
+    end
+  end
+
+  def add_warnings_for_missing_content_links
+    return unless @missing_content_links
+    @missing_content_links.each_value do |item|
+      if item[:missing_links].any?
+        add_warning(t(:missing_content_links_title, "Missing links found in imported content") + " - #{item[:class]} #{item[:field]}",
+          {:error_message => "#{item[:class]} #{item[:field]} - " + t(:missing_content_links_message,
+            "The following references could not be resolved: ") + " " + item[:missing_links].join(', '),
+            :fix_issue_html_url => item[:url]})
+      end
+    end
   end
 end

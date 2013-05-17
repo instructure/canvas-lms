@@ -25,7 +25,7 @@ describe 'FixUserConversationsCountsForAll' do
       # Setup user with correct unread_conversations_count (2 unread convos)
       u1 = user
       2.times do
-        c = u1.initiate_conversation([u1.id], false)
+        c = u1.initiate_conversation([u1], false)
         c.add_message('Hello')
         c.add_message('Hello again')
         c.update_attribute(:workflow_state, 'unread')
@@ -35,7 +35,7 @@ describe 'FixUserConversationsCountsForAll' do
       # Setup user with wrong unread_conversations_count (negative)
       u2 = user
       1.times do
-        c = u2.initiate_conversation([u2.id], false)
+        c = u2.initiate_conversation([u2], false)
         c.add_message('Hello')
         c.add_message('Hello again')
         c.update_attribute(:workflow_state, 'unread')
@@ -46,7 +46,7 @@ describe 'FixUserConversationsCountsForAll' do
       # Setup user with wrong unread_conversations_count (too many)
       u3 = user
       3.times do
-        c = u3.initiate_conversation([u3.id], false)
+        c = u3.initiate_conversation([u3], false)
         c.add_message('Hello')
         c.add_message('Hello again')
         c.update_attribute(:workflow_state, 'unread')
@@ -65,13 +65,13 @@ describe 'FixUserConversationsCountsForAll' do
       # Setup user with some deleted conversations
       u1 = user
       2.times do
-        c = u1.initiate_conversation([u1.id], false)
+        c = u1.initiate_conversation([u1], false)
         c.add_message('Hello')
         c.add_message('Hello again')
         c.update_attribute(:workflow_state, 'unread')
       end
       1.times do
-        c = u1.initiate_conversation([u1.id], false)
+        c = u1.initiate_conversation([u1], false)
         c.add_message('Deleted myself')
         c.add_message('Empty yo')
         c.update_attribute(:workflow_state, 'unread')
@@ -82,7 +82,7 @@ describe 'FixUserConversationsCountsForAll' do
       # Setup user with only deleted conversations (should have count 0)
       u2 = user
       3.times do
-        c = u2.initiate_conversation([u2.id], false)
+        c = u2.initiate_conversation([u2], false)
         c.add_message('Hello')
         c.add_message('Hello again')
         c.update_attribute(:workflow_state, 'unread')

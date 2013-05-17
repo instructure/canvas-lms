@@ -1,4 +1,4 @@
-<% define_content :link do %>http://<%= HostUrl.context_host(asset) %>/courses/<%= asset.id %><% end %>
+<% define_content :link do %><%= HostUrl.protocol %>://<%= HostUrl.context_host(asset) %>/courses/<%= asset.id %><% end %>
 
 <%= t :subject, "New Course for %{account}", :account => asset.root_account.name %>
   
@@ -6,6 +6,6 @@
 <% if !asset.teachers.empty? %>
 <%= before_label :teachers, "Teachers" %>
 <% asset.teachers.each do |teacher| %>
-  - <a href="http://<%= HostUrl.context_host(asset) %>/users/<%= teacher.id %>"><b><%= teacher.name %> (<%= teacher.email %>)</b></a>
+  - <a href="<%= HostUrl.protocol %>://<%= HostUrl.context_host(asset) %>/users/<%= teacher.id %>"><b><%= teacher.name %> (<%= teacher.email %>)</b></a>
 <% end %><% end %>
 

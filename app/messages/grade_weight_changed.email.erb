@@ -1,6 +1,6 @@
 <% course = asset.is_a?(Course) ? asset : asset.context %>
 <% define_content :link do %>
-  http://<%= HostUrl.context_host(asset) %>/<%= course.class.to_s.downcase.pluralize %>/<%= course.id %>/assignments
+  <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset) %>/<%= course.class.to_s.downcase.pluralize %>/<%= course.id %>/assignments
 <% end %>
 
 <% define_content :subject do %>

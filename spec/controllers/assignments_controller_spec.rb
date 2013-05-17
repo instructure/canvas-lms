@@ -43,7 +43,7 @@ describe AssignmentsController do
       get 'index', :course_id => @course.id
       assert_status(401)
     end
-    
+
     it "should redirect 'disabled', if disabled by the teacher" do
       course_with_student_logged_in(:active_all => true)
       @course.update_attribute(:tab_configuration, [{'id'=>3,'hidden'=>true}])
@@ -88,28 +88,28 @@ describe AssignmentsController do
       rescue_action_in_public!
       #controller.use_rails_error_handling!
       course_with_student_logged_in(:active_all => true)
-      
+
       get 'show', :course_id => @course.id, :id => 5
       response.status.should eql('404 Not Found')
     end
-    
+
     it "should return unauthorized if not enrolled" do
       course_with_student(:active_all => true)
       course_assignment
-      
+
       get 'show', :course_id => @course.id, :id => @assignment.id
       assert_unauthorized
     end
-    
+
     it "should assign variables" do
       course_with_student_logged_in(:active_all => true)
       a = @course.assignments.create(:title => "some assignment")
-      
+
       get 'show', :course_id => @course.id, :id => a.id
-      assigns[:assignment_groups].should_not be_blank
+      @course.reload.assignment_groups.should_not be_empty
       assigns[:unlocked].should_not be_nil
     end
-    
+
     it "should assign submission variable if current user and submitted" do
       course_with_student_logged_in(:active_all => true)
       course_assignment
@@ -162,8 +162,29 @@ describe AssignmentsController do
       # in normal cases we redirect to the assignment's external_tool_tag.
       response.rendered[:template].should eql 'assignments/show.html.erb'
     end
+
+    it "should require login for external tools in a public course" do
+      course_with_student(:active_all => true)
+      @course.update_attribute(:is_public, true)
+      @course.context_external_tools.create!(:shared_secret => 'test_secret', :consumer_key => 'test_key', :name => 'test tool', :domain => 'example.com')
+      course_assignment
+      @assignment.submission_types = 'external_tool'
+      @assignment.build_external_tool_tag(:url => "http://example.com/test")
+      @assignment.save!
+
+      get 'show', :course_id => @course.id, :id => @assignment.id
+      assert_require_login
+    end
+
+    it 'should not error out when google docs is not configured' do
+      GoogleDocs.stubs(:config).returns nil
+      course_with_student_logged_in(:active_all => true)
+      a = @course.assignments.create(:title => "some assignment")
+      get 'show', :course_id => @course.id, :id => a.id
+      GoogleDocs.unstub(:config)
+    end
   end
-  
+
   describe "GET 'syllabus'" do
     it "should require authorization" do
       course_with_student
@@ -180,7 +201,7 @@ describe AssignmentsController do
       response.should be_redirect
       flash[:notice].should match(/That page has been disabled/)
     end
-    
+
     it "should assign variables" do
       course_with_student_logged_in(:active_all => true)
       get 'syllabus', :course_id => @course.id
@@ -225,6 +246,15 @@ describe AssignmentsController do
       assigns[:assignment].title.should eql("some assignment")
       assigns[:assignment].context_id.should eql(@course.id)
     end
+
+    it "should set updating_user on created assignment" do
+      course_with_teacher_logged_in(:active_all => true)
+      post 'create', :course_id => @course.id, :assignment => {:title => "some assignment", :submission_types => "discussion_topic"}
+      a = assigns[:assignment]
+      a.should_not be_nil
+      a.discussion_topic.should_not be_nil
+      a.discussion_topic.user_id.should eql(@teacher.id)
+    end
   end
   
   describe "GET 'edit'" do
@@ -243,8 +273,20 @@ describe AssignmentsController do
       get 'edit', :course_id => @course.id, :id => @assignment.id
       assigns[:assignment].should eql(@assignment)
     end
+
+    it "bootstraps the correct assignment info to js_env" do
+      course_with_teacher_logged_in(:active_all => true)
+      course_assignment
+      get 'edit', :course_id => @course.id, :id => @assignment.id
+      assigns[:js_env][:ASSIGNMENT].should ==
+        subject.send(:assignment_json,@assignment,assigns[:current_user],session)
+      assigns[:js_env][:ASSIGNMENT_OVERRIDES].should ==
+        subject.send(:assignment_overrides_json,
+                     @assignment.overrides_visible_to(assigns[:current_user]))
+    end
+
   end
-  
+
   describe "PUT 'update'" do
     it "should require authorization" do
       rescue_action_in_public!
@@ -254,7 +296,7 @@ describe AssignmentsController do
       put 'update', :course_id => @course.id, :id => @assignment.id
       assert_unauthorized
     end
-    
+
     it "should update attributes" do
       course_with_teacher_logged_in(:active_all => true)
       course_assignment
@@ -262,30 +304,8 @@ describe AssignmentsController do
       assigns[:assignment].should eql(@assignment)
       assigns[:assignment].title.should eql("test title")
     end
-    
-    it "should not update description for students (if not allowed)" do
-      course_with_student_logged_in(:active_all => true)
-      @course.allow_student_assignment_edits = false
-      @course.save!
-      course_assignment
-      put 'update', :course_id => @course.id, :id => @assignment.id, :assignment => {:title => "test title", :description => "what up"}
-      assigns[:assignment].should eql(@assignment)
-      assigns[:assignment].title.should eql("some assignment")
-      assigns[:assignment].description.should eql(nil)
-    end
-
-    it "should only update description for students (if allowed)" do
-      course_with_student_logged_in(:active_all => true)
-      @course.allow_student_assignment_edits = true
-      @course.save!
-      course_assignment
-      put 'update', :course_id => @course.id, :id => @assignment.id, :assignment => {:title => "test title", :description => "what up"}
-      assigns[:assignment].should eql(@assignment)
-      assigns[:assignment].title.should eql("some assignment")
-      assigns[:assignment].description.should eql("what up")
-    end
   end
-  
+
   describe "DELETE 'destroy'" do
     it "should require authorization" do
       course_with_student(:active_all => true)
@@ -293,7 +313,7 @@ describe AssignmentsController do
       delete 'destroy', :course_id => @course.id, :id => @assignment.id
       assert_unauthorized
     end
-    
+
     it "should delete assignments if authorized" do
       course_with_teacher_logged_in(:active_all => true)
       course_assignment
@@ -303,31 +323,4 @@ describe AssignmentsController do
       assigns[:assignment].should be_deleted
     end
   end
-  # describe "GET 'show'" do
-  #   it "should be successful" do
-  #     get 'show'
-  #     response.should be_success
-  #   end
-  # end
-  # 
-  # describe "GET 'new'" do
-  #   it "should be successful" do
-  #     get 'new'
-  #     response.should be_success
-  #   end
-  # end
-  # 
-  # describe "GET 'edit'" do
-  #   it "should be successful" do
-  #     get 'edit'
-  #     response.should be_success
-  #   end
-  # end
-  # 
-  # describe "GET 'destroy'" do
-  #   it "should be successful" do
-  #     get 'destroy'
-  #     response.should be_success
-  #   end
-  # end
 end

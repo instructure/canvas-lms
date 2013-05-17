@@ -1,69 +1,71 @@
 <%
   js_bundle :quizzes_bundle, :question_bank
-  jammit_css :quizzes, :tinymce
+  jammit_css :quizzes, :learning_outcomes, :tinymce
   content_for :page_title, @bank.title
 %>
 <% content_for :right_side do %>
   <div class="rs-margin-all">
     <% if can_do(@bank, @current_user, :manage) %>
-      <a href="#" class="button button-sidebar-wide add_question_link"><%= image_tag "add.png" %> <%= t 'buttons.add_a_question', "Add a Question" %></a>
-      <a href="<%= context_url(@context, :context_question_bank_url, @bank.id) %>" class="button button-sidebar-wide edit_bank_link"><%= image_tag "edit.png" %> <%= t 'buttons.edit', "Edit Bank Details" %></a>
-      <a href="#" class="button button-sidebar-wide move_questions_link"><%= image_tag "edit.png" %> <%= t 'buttons.move_questions', "Move Multiple Questions" %></a>
-      <a href="<%= context_url(@context, :context_question_bank_url, @bank.id) %>" class="button button-sidebar-wide delete_bank_link"><%= image_tag "delete.png" %> <%= t 'buttons.delete', "Delete Bank" %></a>
+      <a href="#" class="btn button-sidebar-wide add_question_link"><i class="icon-add"></i> <%= t 'buttons.add_a_question', "Add a Question" %></a>
+      <a href="<%= context_url(@context, :context_question_bank_url, @bank.id) %>" class="btn button-sidebar-wide edit_bank_link"><i class="icon-edit"></i> <%= t 'buttons.edit', "Edit Bank Details" %></a>
+      <a href="#" class="btn button-sidebar-wide move_questions_link"><i class="icon-arrow-right"></i> <%= t 'buttons.move_questions', "Move Multiple Questions" %></a>
+      <a href="<%= context_url(@context, :context_question_bank_url, @bank.id) %>" class="btn button-sidebar-wide delete_bank_link"><i class="icon-end"></i> <%= t 'buttons.delete', "Delete Bank" %></a>
     <% end %>
     <% if @bank && !@bank.bookmarked_for?(@current_user) %>
-      <a href="<%= context_url(@context, :context_question_bank_bookmark_url, @bank ? @bank.id : "{{ id }}") %>" class="button button-sidebar-wide bookmark_bank_link"><%= image_tag "bookmark_gray.png" %> <span class="message"><%= t 'buttons.bookmark', "Bookmark this Bank" %></span></a>
+      <a href="<%= context_url(@context, :context_question_bank_bookmark_url, @bank ? @bank.id : "{{ id }}") %>" class="btn button-sidebar-wide bookmark_bank_link"><%= image_tag "bookmark_gray.png" %> <span class="message"><%= t 'buttons.bookmark', "Bookmark this Bank" %></span></a>
     <% else %>
-      <button class="button button-sidebar-wide disabled" disabled="true"><%= image_tag "bookmark.png" %> <%= t 'buttons.already_bookmarked', "Already Bookmarked" %></button>
+      <button class="btn button-sidebar-wide disabled" disabled="true"><%= image_tag "bookmark.png" %> <%= t 'buttons.already_bookmarked', "Already Bookmarked" %></button>
     <% end %>
   </div>
   <h2 id="aligned_outcomes"><%= t 'headings.aligned_outcomes', "Aligned Outcomes" %></h2>
   <div class="rs-margin-lr rs-margin-bottom">
     <ul class="unstyled_list" id="aligned_outcomes_list">
-      <% @outcome_tags.each do |tag| %>
-        <li class="outcome" data-id="<%= tag.learning_outcome_id %>">
-          <span class="short_description"><%= tag.learning_outcome.short_description %></span>
-          <a href="#" class="delete_outcome_link no-hover"><%= image_tag "delete_circle.png" %></a>
+      <% @alignments.each do |alignment| %>
+        <li class="outcome" data-id="<%= alignment.learning_outcome_id %>">
+          <span class="short_description"><%= alignment.learning_outcome.short_description %></span>
+          <a href="#" class="delete_outcome_link no-hover"><i class="icon-end standalone-icon"></i></a>
           <span class="clear"></span>
-          <span class="content"><%= t :mastery_threshold, "mastery at %{threshold_percentage}", :threshold_percentage => raw("<span class=\"mastery_threshold\">#{(tag.mastery_score || 0) * 100.0}</span>%") %></span>
+          <span class="content"><%= t :mastery_threshold, "mastery at %{threshold_percentage}", :threshold_percentage => raw("<span class=\"mastery_threshold\">#{(alignment.mastery_score || 0) * 100.0}</span>%") %></span>
         </li>
       <% end %>
       <li class="blank outcome" style="display: none;">
         <span class="short_description">&nbsp;</span>
-        <a href="#" class="delete_outcome_link no-hover"><%= image_tag "delete_circle.png" %></a>
+        <a href="#" class="delete_outcome_link no-hover"><i class="icon-end standalone-icon"></i></a>
         <span class="clear"></span>
         <span class="content"><%= t :mastery_threshold, "mastery at %{threshold_percentage}", :threshold_percentage => raw("<span class=\"mastery_threshold\">&nbsp;</span>%") %></span>
       </li>
     </ul>
-    <a href="#" class="button button-sidebar-wide add_outcome_link"><%= image_tag "ball.png" %> <span class="add_outcome_text"><%= t 'links.align_outcome', "Align Outcome" %></span></a>
+    <a href="#" class="btn button-sidebar-wide add_outcome_link"><i class="icon-paperclip"></i> <span class="add_outcome_text"><%= t 'links.align_outcome', "Align Outcome" %></span></a>
   </div>
   <%= render :partial => 'shared/find_outcome', :locals => {:purpose => 'question_bank'}  %>
 <% end %>
 
-<% form_for @bank, :url => context_url(@context, :context_question_bank_url), :html => {:id => "edit_bank_form", :method => :put} do |f| %>
-  <div class="displaying">
-    <h2><%= @bank.title %></h2>
+<div class="quiz-header">
+  <% form_for @bank, :url => context_url(@context, :context_question_bank_url), :html => {:id => "edit_bank_form", :method => :put} do |f| %>
+    <div class="displaying">
+      <h2><%= @bank.title %></h2>
+    </div>
+    <div class="editing" style="display: none;">
+      <b><%= f.label :title, :en => "Bank Name" %></b>
+      <%= f.text_field :title, :class => "bank_name_box" %>
+    </div>
+  <% end %>
+  <p>
+    <%= t('edit_warning', "Remember, changes to question templates won't automatically update quizzes that are already using those questions.") %>
+  </p>
+  <div style="margin-bottom: 5px; <%= hidden if @questions.total_pages > 1 %>">
+    <input type="checkbox" id="show_question_details" <%= 'checked' if @questions.total_pages > 1 %> /><label for="show_question_details"> <%= t('show_details', 'Show Question Details') %></label>
   </div>
-  <div class="editing" style="display: none;">
-    <b><%= f.label :title, :en => "Bank Name" %></b>
-    <%= f.text_field :title, :class => "bank_name_box" %>
+  <div id="bank_urls" style="display: none;">
+    <a href="<%= context_url(@context, :context_question_bank_questions_url, @bank, :page => "{{ page }}") %>" class="more_questions_url">&nbsp;</a>
+    <a href="<%= context_url(@context, :context_question_bank_assessment_questions_url, @bank) %>" class="add_question_url">&nbsp;</a>
+    <a href="<%= context_url(@context, :context_question_bank_assessment_question_move_question_url, "{{ id }}") %>" class="move_question_url">&nbsp;</a>
+    <a href="<%= context_url(@context, :context_question_bank_move_questions_url, @bank.id) %>" class="move_questions_url">&nbsp;</a>
+    <a href="<%= context_url(@context, :context_question_banks_url) %>" class="assessment_question_banks_url">&nbsp;</a>
+    <a href="<%= context_url(@context, :context_question_banks_url, :managed => '1') %>" class="managed_banks_url">&nbsp;</a>
+    <a href="<%= context_url(@context, :context_question_bank_reorder_url, @bank.id) %>" class="reorder_questions_url" style="display: none;">&nbsp;</a>
+    <span class="current_question_bank_id"><%= @bank.id %></span>
   </div>
-<% end %>
-<p>
-  <%= t('edit_warning', "Remember, changes to question templates won't automatically update quizzes that are already using those questions.") %>
-</p>
-<div style="margin-bottom: 5px; <%= hidden if @questions.total_pages > 1 %>">
-  <input type="checkbox" id="show_question_details" <%= 'checked' if @questions.total_pages > 1 %> /><label for="show_question_details"> <%= t('show_details', 'Show Question Details') %></label>
-</div>
-<div id="bank_urls" style="display: none;">
-  <a href="<%= context_url(@context, :context_question_bank_questions_url, @bank, :page => "{{ page }}") %>" class="more_questions_url">&nbsp;</a>
-  <a href="<%= context_url(@context, :context_question_bank_assessment_questions_url, @bank) %>" class="add_question_url">&nbsp;</a>
-  <a href="<%= context_url(@context, :context_question_bank_assessment_question_move_question_url, "{{ id }}") %>" class="move_question_url">&nbsp;</a>
-  <a href="<%= context_url(@context, :context_question_bank_move_questions_url, @bank.id) %>" class="move_questions_url">&nbsp;</a>
-  <a href="<%= context_url(@context, :context_question_banks_url) %>" class="assessment_question_banks_url">&nbsp;</a>
-  <a href="<%= context_url(@context, :context_question_banks_url, :managed => '1') %>" class="managed_banks_url">&nbsp;</a>
-  <a href="<%= context_url(@context, :context_question_bank_reorder_url, @bank.id) %>" class="reorder_questions_url" style="display: none;">&nbsp;</a>
-  <span class="current_question_bank_id"><%= @bank.id %></span>
 </div>
 <div id="questions" class="<%= 'uneditable' unless can_do(@bank, @current_user, :manage) %> question_editing brief question_bank">
   <% if @questions.total_pages <= 1 %>
@@ -128,8 +130,8 @@
       <label for="copy_question"><%= t 'labels.keep_copy', 'Keep a copy in this question bank as well' %></label>
     </div>
     <div class="button-container">
-      <button type="button" class="button submit_button"><%= t 'button.move_copy_question', 'Move/Copy Question' %></button>
-      <button type="button" class="button cancel_button button-secondary"><%= t 'button.cancel', 'Cancel' %></button>
+      <button type="button" class="btn submit_button"><%= t 'button.move_copy_question', 'Move/Copy Question' %></button>
+      <button type="button" class="btn cancel_button btn button-secondary"><%= t 'button.cancel', 'Cancel' %></button>
     </div>
   </div>
 </div>
@@ -265,7 +267,7 @@ $(document).ready(function() {
     if(bank.id == current_question_bank_id) { return; }
     var $dialog = $("#move_question_dialog");
     var $bank = $dialog.find("li.bank.blank:first").clone(true).removeClass('blank');
-    
+
     $bank.find("input").attr('id', "question_bank_" + bank.id).val(bank.id);
     $bank.find("label").attr('for', "question_bank_" + bank.id)
       .find(".bank_name").text(bank.title || <%= jt('default_name', "No Name") %>).end()
@@ -327,10 +329,10 @@ $(document).ready(function() {
         this.elements.$dialog.find('li message').hide();
       }
 
-      this.elements.$dialog.dialog('close').dialog({
+      this.elements.$dialog.dialog({
         title: this.messages.move_copy_questions,
         width: 600
-      }).dialog('open');
+      });
     },
     loadData: function(){
       this.elements.$questions.append(this.elements.$loadMessage);
@@ -368,10 +370,10 @@ $(document).ready(function() {
       data: template
     });
     $dialog.data('question', $(this).parents(".question_holder"));
-    $dialog.dialog('close').dialog({
+    $dialog.dialog({
       width: 600,
       title: <%= jt('title.move_copy_questions', "Move/Copy Questions") %>
-    }).dialog('open');
+    });
   });
   $("#move_question_dialog .submit_button").click(function() {
     var $dialog = $("#move_question_dialog");
@@ -493,13 +495,13 @@ $(document).ready(function() {
   float: left;
 }
 #move_question_dialog li.bank .bank_label .bank_name {
-  font-weight: bold; 
+  font-weight: bold;
   display: block;
 }
 #move_question_dialog li.bank .bank_label .context_name {
-  font-size: 0.8em; 
-  display: block; 
-  padding-left: 10px; 
+  font-size: 0.8em;
+  display: block;
+  padding-left: 10px;
   color: #888;
 }
 #questions.uneditable .question_holder .display_question .move {

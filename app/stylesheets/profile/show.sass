@@ -1,4 +1,6 @@
 @import 'environment'
+@import 'header_reset'
+@import 'accessible_headers/profile_show'
 
 .not-editing
   .show-if-editing
@@ -53,7 +55,6 @@
   margin-bottom: 0
 
 #content h2
-  font-size: 14px
   margin: 1em 0 0.5em 0
   color: $gray
 
@@ -86,10 +87,10 @@
     text-align: center
 
     .social
+      +hide-text
       width: 30px
       height: 30px
       background-image: url(/images/social-icons.png)
-      +accessible_text_replacement
       display: block
 
 .message
@@ -131,5 +132,3 @@
   background-position: -193px 0
   &:hover
     background-position: -193px -32px
-
-

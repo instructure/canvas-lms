@@ -1,11 +1,31 @@
 <% course_home ||= false %>
+<% js_bundle :context_modules %>
+<% jammit_css :context_modules %>
 <% js_env :COLLAPSED_MODULES => @collapsed_modules %>
+<% js_env :CAN_MANAGE_MODULES  => can_do(@context, @current_user, :manage_grades) || can_do(@context, @current_user, :manage_content) %>
+<% js_env :COURSE_ID => @context.id %>
+<% js_env :NO_MODULE_PROGRESSIONS => @context.large_roster %>
+
 <% if course_home %>
   <h2><%= @context.name %></h2>
 <% end %>
+
+<div class="context-modules-main-header clearfix">
+  <h2 class="context-modules-title">
+    <%= t('headings.course_modules', %{Course Modules}) %>
+  </h2>
+
+  <% if can_do(@context, @current_user, :manage_content) %>
+    <div class="context-modules-main-toolbar">
+      <button class="btn btn-small module_progressions_link"><%= t('links.student_progress', 'View Progress') %></button>
+      <button class="btn btn-small btn-primary add_module_link"><%= t('#context_modules.buttons.add_module', 'Create a Module') %></button>
+    </div>
+  <% end %>
+</div>
+
 <div id="no_context_modules_message" style="display:none; clear: both;">
   <% if can_do(@context.context_modules.new, @current_user, :create) %>
-    <%= mt 'help.create', <<TEXT, :button => t('#context_modules.buttons.add_module', 'Add a New Module')
+    <%= mt 'help.create', <<TEXT, :button => t('#context_modules.buttons.add_module_first', 'Add a New Module')
 Course modules let you organize your assignments, pages, files, etc. into smaller sections or units. Modules could be centered around a theme, focused on a specific topic, or even just grouped chronologically.
 
 You can also sequence modules by defining criteria and prerequisites for each module. Students won't be able to access modules until they have unlocked all their prerequisites. That way you can prevent students from accessing certain content or files until they have, say, gotten at least 75% on a review quiz.
@@ -17,8 +37,24 @@ TEXT
     <p><%= t('help.no_modules', %{No modules have been defined for this course.}) %></p>
   <% end %>
 </div>
+<div class="hidden-readable" tabindex="0" aria-label="keyboard instructions">
+  <%= t('modules_keyboard_hint',
+        'To change the order of the course modules and module items,
+        first turn the cursor off on your screen reader. Insert-z in JAWS.
+        Press tab to select the first module.
+        Press up and down to choose a module or module item.
+        Press space to select the module or module item to start dragging.
+        Then press up and down to select a destination.
+        Then press space a second time to drop selection after destination.') %>
+</div>
+
+<% keyboard_navigation([
+   {:key => t('keycodes.next_module_item', 'Up'), :description => t('keycode_descriptions.next_module_item', 'Select next module or module item')},
+   {:key => t('keycodes.previous_module_item', 'Down'), :description => t('keycode_descriptions.previous_module_item', 'Select previous module or module item')},
+   {:key => t('keycodes.toggle_module_dragging', 'Space'), :description => t('keycode_descriptions.toggle_module_dragging', 'Select item to begin dragging, or drop previously selected item')}
+]) %>
 <div id="context_modules_sortable_container">
-  <div id="context_modules" class="<%= 'editable' if can_do(@context, @current_user, :manage_content) %>">
+  <div id="context_modules" tabindex="0" aria-label="<%= t('headings.course_modules', %{Course Modules}) %>" class="<%= 'editable' if can_do(@context, @current_user, :manage_content) %>">
     <% editable = can_do(@context, @current_user, :manage_grades) || can_do(@context, @current_user, :manage_content) %>
     <% cache([@context.cache_key, editable, 'all_context_modules', collection_cache_key(@modules)].join('/')) do %>
       <% ContextModule.send(:preload_associations, @modules, [:context_module_progressions, {:content_tags => :content}]) %>
@@ -34,13 +70,9 @@ TEXT
   <% form_for :context_module, :url => context_url(@context, :context_context_modules_url), :html => {:id => "add_context_module_form", :style => "display: none;"} do |f| %>
     <table class="formtable">
       <tr>
-        <td>
+        <td colspan="2">
           <div class="module_name">
-            <%= before_label('module_name', %{Name}) %>
-          </div>
-        </td><td>
-          <div class="module_name">
-            <%= f.text_field :name %>
+            <%= f.text_field :name, :placeholder => t('module_name', %{Module Name}), :class => 'input-block-level' %>
           </div>
         </td>
       </tr><tr>
@@ -52,41 +84,41 @@ TEXT
         <td>
           <%= before_label('unlock_at', %{Unlock At}) %>
         </td><td>
-          <%= f.text_field :unlock_at, :class => "datetime_field", :style => "width: 125px;" %>
+          <%= f.text_field :unlock_at, :class => "datetime_field" %>
         </td>
       </tr><tr>
         <td colspan="2">
         <div class="prerequisites_entry">
           <b><%= before_label('modules.before_students_view', %{Before students can view this module}) %></b>
-          <div style="margin: 2px 10px 5px 20px;" class="prerequisites_list">
+          <div class="prerequisites_list">
             <div class="no_prerequisites_message"><%= t('no_preprequisites', %{No prerequisites defined}) %></div>
             <div class="criteria_list" style="display: none;">
             </div>
-            <div id="criterion_blank" class="criterion" style="display: none;">
+            <div id="criterion_blank" class="criterion clearfix" style="display: none;">
               <div style="float: left">
                 <span class="prereq_desc"><%= t('must_complete_prerequisites', %{They must complete}) %></span>
                 <span class="option">
                 </span>
               </div>
               <div style="float: right;">
-                <a href="#" class="delete_criterion_link no-hover"><%= image_tag "delete_circle.png" %></a>
+                <a href="#" class="delete_criterion_link dim-till-hover"><i class="icon-end standalone-icon" title="Delete"></i></a>
               </div>
               <div class="clear"></div>
             </div>
             <div style="font-size: 0.9em;">
-              <a href="#" class="add_prerequisite_link add-small"><%= t('links.add_prerequisite', %{Add prerequisite}) %></a>
+              <a href="#" class="add_prerequisite_link icon-add"><%= t('links.add_prerequisite', %{Add prerequisite}) %></a>
             </div>
           </div>
         </div>
         <div class="completion_entry">
           <b><%= before_label('module_complete_when', %{This module is complete when}) %></b>
-          <div style="margin: 2px 10px 5px 20px;" class="completion_criteria_list">
+          <div class="completion_criteria_list">
             <div class="no_items_message"><%= t('prerequisites_need_item', %{You'll need to add items before you can specify how a user will complete this module}) %></div>
             <div class="no_criteria_message" style="display: none;"><%= t('no_requirements', %{No requirements defined}) %></div>
             <div class="criteria_list" style="display: none;">
             </div>
             <div style="font-size: 0.9em;">
-              <a href="#" class="add_completion_criterion_link add-small"><%= t('links.add_requirement', %{Add requirement}) %></a>
+              <a href="#" class="add_completion_criterion_link icon-add"><%= t('links.add_requirement', %{Add requirement}) %></a>
             </div>
           </div>
         </div>
@@ -98,9 +130,9 @@ TEXT
         </td>
     </tr><tr>
       <td colspan="2">
-        <div class="button-container" style="margin-top: 10px;">
-          <button type="submit" class="button submit_button"><%= t('buttons.add_module', %{Add Module}) %></button>
-          <button type="button" class="cancel_button button-secondary"><%= t('#buttons.cancel', %{Cancel}) %></button>
+        <div class="button-container">
+          <button type="button" class="btn cancel_button"><%= t('#buttons.cancel', %{Cancel}) %></button>
+          <button type="submit" class="btn btn-primary submit_button"><%= t('buttons.add_module', %{Add Module}) %></button>
         </div>
         <a href="<%= context_url(@context, :context_context_modules_url) %>" style="display: none;" class="add_context_module_url">&nbsp;</a>
       </td>
@@ -115,8 +147,8 @@ TEXT
     <div style="text-align: center;" class="prerequisite_module_select">
     </div>
     <div class="button-container">
-      <button type="button" class="button submit_button"><%= t('buttons.add_prerequisite', %{Add Prerequisite}) %></button>
-      <button type="button" class="button button-secondary cancel_button"><%= t('#buttons.cancel', %{Cancel}) %></button>
+      <button type="button" class="btn submit_button"><%= t('buttons.add_prerequisite', %{Add Prerequisite}) %></button>
+      <button type="button" class="btn button-secondary cancel_button"><%= t('#buttons.cancel', %{Cancel}) %></button>
     </div>
   </div>
   <%= render :partial => "shared/select_content_dialog", :locals => {:for_modules => true} %>
@@ -149,8 +181,10 @@ TEXT
         </tr>
         <tr>
           <td colspan="2">
-            <button type="submit" class="button"><%= t('#buttons.update', %{Update}) %></button>
-            <button type="button" class="button button-secondary cancel_button"><%= t('#buttons.cancel', %{Cancel}) %></button>
+            <div class="button-container">
+              <button type="button" class="btn cancel_button"><%= t('#buttons.cancel', %{Cancel}) %></button>
+              <button type="submit" class="btn btn-primary"><%= t('#buttons.update', %{Update}) %></button>
+            </div>
           </td>
         </tr>
       </table>
@@ -211,7 +245,10 @@ TEXT
               </thead>
               <tbody>
                 <tr class="module blank" style="display: none;">
-                  <td class="icon">&nbsp;</td>
+                  <td class="icon">
+                    <i class="icon-check"></i>
+                    <i class="icon-lock"></i>
+                  </td>
                   <td class="details">
                     <span class="name">&nbsp;</span>
                     <span class="id" style="display: none;">&nbsp;</span>
@@ -268,7 +305,7 @@ TEXT
     <span class="id" style="display: none;">&nbsp;</span>
     <span class="type" style="display: none;">&nbsp;</span>
     <span class="name"><%= t('module', %{module}) %></span>
-    <span style="padding-left: 3px;"><a href="#" class="delete_prerequisite_link" title="<%= t('links.title.remove_prerequisite', %{Remove this prerequisite}) %>" style="text-decoration: none;">&#215;</a></span>
+    <span><a href="#" class="delete_prerequisite_link" title="<%= t('links.title.remove_prerequisite', %{Remove this prerequisite}) %>">&#215;</a></span>
   </div>
   <div id="completion_criterion_option" class="completion_criterion_option">
     <% ot 'criterion_for_assignment', 'For %{assignment} users must %{select_criterion}', :assignment => capture { %>
@@ -311,7 +348,7 @@ TEXT
 <div style="display: none;" id="progression_list">
   <a href="#" class="progression_list_url">&nbsp;</a>
   <% cache([@context, @current_user, 'students_visible_to_user'].cache_key, :no_locale => true) do %>
-    <% @context.students_visible_to(@current_user).scoped(:select => "id, name").order_by_sortable_name.each do |student| %>
+    <% @context.students_visible_to(@current_user).except(:select).select("users.id, users.name").order_by_sortable_name.each do |student| %>
       <div class="student student_<%= student.id %>">
         <div class="id"><%= student.id %></div>
         <div class="name"><%= student.last_name_first %></div>

@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 
 describe FilesController do
   def course_folder
@@ -30,18 +30,18 @@ describe FilesController do
   def course_file
     @file = factory_with_protected_attributes(@course.attachments, :uploaded_data => io)
   end
-  
+
   def user_file
     @file = factory_with_protected_attributes(@user.attachments, :uploaded_data => io)
   end
-  
+
   def folder_file
     @file = @folder.active_file_attachments.build(:uploaded_data => io)
     @file.context = @course
     @file.save!
     @file
   end
-  
+
   def file_in_a_module
     course_with_student_logged_in(:active_all => true)
     @file = factory_with_protected_attributes(@course.attachments, :uploaded_data => io)
@@ -54,7 +54,7 @@ describe FilesController do
     @module.save!
     @module.evaluate_for(@user, true, true).state.should eql(:unlocked)
   end
-  
+
   def file_with_path(path)
     components = path.split('/')
     folder = nil
@@ -69,21 +69,21 @@ describe FilesController do
     @file.save!
     @file
   end
-  
+
   describe "GET 'quota'" do
     it "should require authorization" do
       course_with_teacher(:active_all => true)
       get 'quota', :course_id => @course.id
       assert_unauthorized
     end
-    
+
     it "should assign variables for course quota" do
       course_with_teacher_logged_in(:active_all => true)
       get 'quota', :course_id => @course.id
       assigns[:quota].should_not be_nil
       response.should be_success
     end
-    
+
     it "should assign variables for user quota" do
       user(:active_all => true)
       user_session(@user)
@@ -108,14 +108,14 @@ describe FilesController do
       response.should be_success
     end
   end
-  
+
   describe "GET 'index'" do
     it "should require authorization" do
       course_with_teacher(:active_all => true)
       get 'index', :course_id => @course.id
       assert_unauthorized
     end
-    
+
     it "should redirect 'disabled', if disabled by the teacher" do
       course_with_student_logged_in(:active_all => true)
       @course.update_attribute(:tab_configuration, [{'id'=>11,'hidden'=>true}])
@@ -123,7 +123,7 @@ describe FilesController do
       response.should be_redirect
       flash[:notice].should match(/That page has been disabled/)
     end
-    
+
     it "should assign variables" do
       course_with_teacher_logged_in(:active_all => true)
       get 'index', :course_id => @course.id
@@ -131,7 +131,7 @@ describe FilesController do
       assigns[:contexts].should_not be_nil
       assigns[:contexts][0].should eql(@course)
     end
-    
+
     it "should return data for sub_folder if specified" do
       course_with_teacher_logged_in(:active_all => true)
       f1 = course_folder
@@ -142,7 +142,7 @@ describe FilesController do
       data.should_not be_nil
       data['contexts'].length.should eql(1)
       data['contexts'][0]['course']['id'].should eql(@course.id)
-      
+
       f2 = course_folder
       a2 = folder_file
       get 'index', :course_id => @course.id, :folder_id => f2.id
@@ -152,28 +152,49 @@ describe FilesController do
       assigns[:current_attachments].should_not be_empty
       assigns[:current_attachments][0].should eql(a2)
     end
-    
+
     it "should work for a user context, too" do
       user(:active_all => true)
       user_session(@user)
       get 'index', :user_id => @user.id
       response.should be_success
     end
-    
+
     it "should work for a group context, too" do
       group_with_user_logged_in(:group_context => Account.default)
       get 'index', :group_id => @group.id
       response.should be_success
     end
+
+    describe 'across shards' do
+      specs_require_sharding
+
+      before do
+        @shard2.activate do
+          user(:active_all => true)
+        end
+        user_session(@user)
+      end
+
+      it "authorizes users on a remote shard" do
+        get 'index', :user_id => @user.global_id
+        response.should be_success
+      end
+
+      it "authorizes users on a remote shard for JSON data" do
+        get 'index', :user_id => @user.global_id, :format => :json
+        response.should be_success
+      end
+    end
   end
-  
+
   describe "GET 'show'" do
     it "should require authorization" do
       course_with_teacher(:active_all => true)
       course_file
       get 'show', :course_id => @course.id, :id => @file.id
     end
-    
+
     it "should assign variables" do
       course_with_teacher_logged_in(:active_all => true)
       course_file
@@ -182,7 +203,7 @@ describe FilesController do
       assigns[:attachment].should_not be_nil
       assigns[:attachment].should eql(@file)
     end
-    
+
     it "should redirect for download" do
       course_with_teacher_logged_in(:active_all => true)
       course_file
@@ -198,6 +219,34 @@ describe FilesController do
       get 'show', :course_id => @course.id, :id => @file.id, :download => 1, :verifier => @file.uuid, :download_frd => 1
     end
 
+    it "should set cache headers for non text files" do
+      course_with_teacher(:active_all => true)
+      course_file
+      get 'show', :course_id => @course.id, :id => @file.id, :download => 1, :verifier => @file.uuid, :download_frd => 1
+      response.header["Cache-Control"].should include "private, max-age"
+      response.header["Cache-Control"].should_not include "no-cache"
+      response.header["Cache-Control"].should_not include "no-store"
+      response.header["Cache-Control"].should_not include "max-age=0"
+      response.header["Cache-Control"].should_not include "must-revalidate"
+      response.header.should include("Expires")
+      response.header.should_not include("Pragma")
+    end
+
+    it "should not set cache headers for text files" do
+      course_with_teacher(:active_all => true)
+      course_file
+      @file.content_type = "text/html"
+      @file.save
+      get 'show', :course_id => @course.id, :id => @file.id, :download => 1, :verifier => @file.uuid, :download_frd => 1
+      response.header["Cache-Control"].should_not include "private, max-age"
+      response.header["Cache-Control"].should include "no-cache"
+      response.header["Cache-Control"].should include "no-store"
+      response.header["Cache-Control"].should include "max-age=0"
+      response.header["Cache-Control"].should include "must-revalidate"
+      response.header.should_not include("Expires")
+      response.header.should include("Pragma")
+    end
+
     it "should allow concluded teachers to read and download files" do
       course_with_teacher_logged_in(:active_all => true)
       course_file
@@ -207,7 +256,7 @@ describe FilesController do
       get 'show', :course_id => @course.id, :id => @file.id, :download => 1
       response.should be_redirect
     end
-    
+
     it "should allow concluded students to read and download files" do
       course_with_student_logged_in(:active_all => true)
       course_file
@@ -217,14 +266,14 @@ describe FilesController do
       get 'show', :course_id => @course.id, :id => @file.id, :download => 1
       response.should be_redirect
     end
-    
+
     it "should mark files as viewed for module progressions if the file is downloaded" do
       file_in_a_module
       get 'show', :course_id => @course.id, :id => @file.id, :download => 1
       @module.reload
       @module.evaluate_for(@user, true, true).state.should eql(:completed)
     end
-    
+
     it "should not mark a file as viewed for module progressions if the file is locked" do
       file_in_a_module
       @file.locked = true
@@ -233,7 +282,7 @@ describe FilesController do
       @module.reload
       @module.evaluate_for(@user, true, true).state.should eql(:unlocked)
     end
-    
+
     it "should not mark a file as viewed for module progressions just because the files#show view is rendered" do
       file_in_a_module
       @file.locked = true
@@ -242,7 +291,7 @@ describe FilesController do
       @module.reload
       @module.evaluate_for(@user, true, true).state.should eql(:unlocked)
     end
-    
+
     it "should mark files as viewed for module progressions if the file is previewed inline" do
       file_in_a_module
       get 'show', :course_id => @course.id, :id => @file.id, :inline => 1
@@ -250,7 +299,7 @@ describe FilesController do
       @module.reload
       @module.evaluate_for(@user, true, true).state.should eql(:completed)
     end
-    
+
     it "should mark files as viewed for module progressions if the file data is requested and it includes the scribd_doc data" do
       file_in_a_module
       @file.scribd_doc = Scribd::Document.new
@@ -259,17 +308,17 @@ describe FilesController do
       @module.reload
       @module.evaluate_for(@user, true, true).state.should eql(:completed)
     end
-    
+
     it "should not mark files as viewed for module progressions if the file data is requested and it doesn't include the scribd_doc data (meaning it got viewed in scribd inline) and google docs preview is disabled" do
       file_in_a_module
       @file.scribd_doc = nil
       @file.save!
-      
+
       # turn off google docs previews for this acccount so we can isolate testing just scribd.
       account = Account.default
       account.disable_service(:google_docs_previews)
       account.save!
-      
+
       get 'show', :course_id => @course.id, :id => @file.id, :format => :json
       @module.reload
       @module.evaluate_for(@user, true, true).state.should eql(:unlocked)
@@ -294,6 +343,15 @@ describe FilesController do
       get 'show', :course_id => @course.id, :id => old_file.id
       response.should be_success
       assigns(:attachment).should == new_file
+    end
+
+    it "should work for quiz_statistics" do
+      course_with_teacher_logged_in(:active_all => true)
+      quiz_model
+      file = @quiz.statistics_csv.csv_attachment
+      get 'show', :quiz_statistics_id => file.reload.context.id,
+        :file_id => file.id, :download => '1', :verifier => file.uuid
+      response.should be_redirect
     end
 
     describe "scribd_doc" do
@@ -334,13 +392,13 @@ describe FilesController do
   describe "GET 'show_relative'" do
     it "should find files by relative path" do
       course_with_teacher_logged_in(:active_all => true)
-      
+
       file_in_a_module
       get "show_relative", :course_id => @course.id, :file_path => @file.full_display_path
       response.should be_redirect
       get "show_relative", :course_id => @course.id, :file_path => @file.full_path
       response.should be_redirect
-      
+
       def test_path(path)
         file_with_path(path)
         get "show_relative", :course_id => @course.id, :file_path => @file.full_display_path
@@ -348,7 +406,7 @@ describe FilesController do
         get "show_relative", :course_id => @course.id, :file_path => @file.full_path
         response.should be_redirect
       end
-      
+
       test_path("course files/unfiled/test1.txt")
       test_path("course files/blah")
       test_path("course files/a/b/c%20dude/d/e/f.gif")
@@ -368,21 +426,21 @@ describe FilesController do
       get 'new', :course_id => @course.id
       assert_unauthorized
     end
-    
+
     it "should assign variables" do
       course_with_teacher_logged_in(:active_all => true)
       get 'new', :course_id => @course.id
       assigns[:attachment].should_not be_nil
     end
   end
-  
+
   describe "POST 'create'" do
     it "should require authorization" do
       course_with_teacher(:active_all => true)
       post 'create', :course_id => @course.id, :attachment => {:display_name => "bob"}
       assert_unauthorized
     end
-    
+
     it "should create file" do
       course_with_teacher_logged_in(:active_all => true)
       post 'create', :course_id => @course.id, :attachment => {:display_name => "bob", :uploaded_data => io}
@@ -391,7 +449,7 @@ describe FilesController do
       assigns[:attachment].display_name.should eql("bob")
     end
   end
-  
+
   describe "PUT 'update'" do
     it "should require authorization" do
       course_with_teacher(:active_all => true)
@@ -399,7 +457,7 @@ describe FilesController do
       put 'update', :course_id => @course.id, :id => @file.id
       assert_unauthorized
     end
-    
+
     it "should update file" do
       course_with_teacher_logged_in(:active_all => true)
       course_file
@@ -408,27 +466,27 @@ describe FilesController do
       assigns[:attachment].should eql(@file)
       assigns[:attachment].display_name.should eql("new name")
     end
-    
+
     it "should move file into a folder" do
       course_with_teacher_logged_in(:active_all => true)
       course_file
       course_folder
-      
+
       put 'update', :course_id => @course.id, :id => @file.id, :attachment => { :folder_id => @folder.id }, :format => 'json'
       response.should be_success
-      
+
       @file.reload
       @file.folder.should eql(@folder)
     end
   end
-  
+
   describe "DELETE 'destroy'" do
     it "should require authorization" do
       course_with_teacher(:active_all => true)
       course_file
       delete 'destroy', :course_id => @course.id, :id => @file.id
     end
-    
+
     it "should delete file" do
       course_with_teacher_logged_in(:active_all => true)
       course_file
@@ -438,7 +496,7 @@ describe FilesController do
       assigns[:attachment].file_state.should == 'deleted'
     end
   end
-  
+
   describe "POST 'create_pending'" do
     it "should require authorization" do
       course(:active_course => true)
@@ -453,7 +511,7 @@ describe FilesController do
       post 'create_pending', {:attachment => {:context_code => @course.asset_string}}
       response.should redirect_to login_url
     end
-    
+
     it "should create file placeholder (in local mode)" do
       local_storage!
       course_with_teacher_logged_in(:active_all => true)
@@ -472,7 +530,7 @@ describe FilesController do
       json['upload_params'].should_not be_empty
       json['remote_url'].should eql(false)
     end
-    
+
     it "should create file placeholder (in s3 mode)" do
       s3_storage!
       course_with_teacher_logged_in(:active_all => true)
@@ -491,7 +549,7 @@ describe FilesController do
       json['upload_params']['AWSAccessKeyId'].should == 'stub_id'
       json['remote_url'].should eql(true)
     end
-    
+
     it "should not allow going over quota for file uploads" do
       s3_storage!
       course_with_student_logged_in(:active_all => true)
@@ -503,7 +561,7 @@ describe FilesController do
       response.should be_redirect
       assigns[:quota_used].should > assigns[:quota]
     end
-    
+
     it "should allow going over quota for homework submissions" do
       s3_storage!
       course_with_student_logged_in(:active_all => true)
@@ -560,12 +618,8 @@ describe FilesController do
       course_with_teacher(:active_all => true, :user => user_with_pseudonym)
       @attachment = factory_with_protected_attributes(Attachment, :context => @course, :file_state => 'deleted', :workflow_state => 'unattached', :filename => 'test.txt', :content_type => 'text')
       @content = StringIO.new("test file")
-      enable_forgery_protection true
       request.env['CONTENT_TYPE'] = 'multipart/form-data'
-    end
-
-    after do
-      enable_forgery_protection false
+      enable_forgery_protection
     end
 
     it "should accept the upload data if the policy and attachment are acceptable" do
@@ -603,34 +657,6 @@ describe FilesController do
       @attachment.save!
       post "api_create", params[:upload_params].merge(:file => @content)
       response.status.to_i.should == 400
-    end
-  end
-
-  describe "GET 'public_feed.atom'" do
-    before(:each) do
-      course_with_student(:active_all => true)
-      user_file
-    end
-
-    it "should require authorization" do
-      get 'public_feed', :format => 'atom', :feed_code => @user.feed_code + 'x'
-      assigns[:problem].should match /The verification code is invalid/
-    end
-
-    it "should include absolute path for rel='self' link" do
-      get 'public_feed', :format => 'atom', :feed_code => @user.feed_code
-      feed = Atom::Feed.load_feed(response.body) rescue nil
-      feed.should_not be_nil
-      feed.links.first.rel.should match(/self/)
-      feed.links.first.href.should match(/http:\/\//)
-    end
-
-    it "should include an author for each entry" do
-      get 'public_feed', :format => 'atom', :feed_code => @user.feed_code
-      feed = Atom::Feed.load_feed(response.body) rescue nil
-      feed.should_not be_nil
-      feed.entries.should_not be_empty
-      feed.entries.all?{|e| e.authors.present?}.should be_true
     end
   end
 end

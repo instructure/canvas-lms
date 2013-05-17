@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2012 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -31,6 +31,9 @@ class Enrollment < ActiveRecord::Base
 
   validates_presence_of :user_id, :course_id
   validates_inclusion_of :limit_privileges_to_course_section, :in => [true, false]
+  validates_inclusion_of :associated_user_id, :in => [nil],
+                         :unless => lambda { |enrollment| enrollment.type == 'ObserverEnrollment' },
+                         :message => "only ObserverEnrollments may have an associated_user_id"
 
   before_save :assign_uuid
   before_save :assert_section
@@ -42,7 +45,8 @@ class Enrollment < ActiveRecord::Base
   after_save :cancel_future_appointments
   after_save :update_linked_enrollments
 
-  attr_accessible :user, :course, :workflow_state, :course_section, :limit_privileges_to_course_section
+  attr_accessor :already_enrolled
+  attr_accessible :user, :course, :workflow_state, :course_section, :limit_privileges_to_course_section, :already_enrolled
 
   def self.active_student_conditions(prefix = 'enrollments')
     "(#{prefix}.type IN ('StudentEnrollment', 'StudentViewEnrollment') AND #{prefix}.workflow_state = 'active')"
@@ -54,33 +58,36 @@ class Enrollment < ActiveRecord::Base
 
   def self.needs_grading_trigger_sql
     no_other_enrollments_sql = "NOT " + active_student_subselect("user_id = NEW.user_id AND course_id = NEW.course_id AND id <> NEW.id")
-
-    # IN (...) subselects perform poorly in mysql, plus we want to avoid
-    # locking rows in other tables
-    {:default => <<-SQL, :mysql => <<-MYSQL}
-      UPDATE assignments SET needs_grading_count = needs_grading_count + %s
+    default_sql = <<-SQL
+      UPDATE assignments SET needs_grading_count = needs_grading_count + %s, updated_at = {{now}}
       WHERE context_id = NEW.course_id
-        AND context_type = 'Course'
-        AND EXISTS (
-          SELECT 1
-          FROM submissions
-          WHERE user_id = NEW.user_id
-            AND assignment_id = assignments.id
-            AND (#{Submission.needs_grading_conditions})
-          LIMIT 1
-        )
-        AND #{no_other_enrollments_sql};
-    SQL
+      AND context_type = 'Course'
+      AND EXISTS (
+        SELECT 1
+        FROM submissions
+        WHERE user_id = NEW.user_id
+        AND assignment_id = assignments.id
+        AND (#{Submission.needs_grading_conditions})
+                LIMIT 1
+      )
+      AND #{no_other_enrollments_sql};
+      SQL
 
-      IF #{no_other_enrollments_sql} THEN
-        UPDATE assignments, submissions SET needs_grading_count = needs_grading_count + %s
-        WHERE context_id = NEW.course_id
-          AND context_type = 'Course'
-          AND assignments.id = submissions.assignment_id
-          AND submissions.user_id = NEW.user_id
-          AND (#{Submission.needs_grading_conditions});
-      END IF;
-    MYSQL
+    # IN (...) subselects perform poorly in mysql, plus we want to avoid locking rows in other tables
+    # also, every database uses a different construct for a current UTC timestamp
+    { :default    => default_sql.gsub("{{now}}", "now()"),
+      :postgresql => default_sql.gsub("{{now}}", "now() AT TIME ZONE 'UTC'"),
+      :sqlite     => default_sql.gsub("{{now}}", "datetime('now')"),
+      :mysql => <<-MYSQL }
+        IF #{no_other_enrollments_sql} THEN
+          UPDATE assignments, submissions SET needs_grading_count = needs_grading_count + %s, assignments.updated_at = utc_timestamp()
+          WHERE context_id = NEW.course_id
+            AND context_type = 'Course'
+            AND assignments.id = submissions.assignment_id
+            AND submissions.user_id = NEW.user_id
+            AND (#{Submission.needs_grading_conditions});
+        END IF;
+      MYSQL
   end
 
   trigger.after(:insert).where(active_student_conditions('NEW')) do
@@ -129,42 +136,60 @@ class Enrollment < ActiveRecord::Base
     }
   end
 
-  named_scope :active,
-              :conditions => ['enrollments.workflow_state != ?', 'deleted']
-  named_scope :admin,
-              :select => 'course_id',
-              :joins => :course,
-              :conditions => "enrollments.type IN ('TeacherEnrollment','TaEnrollment', 'DesignerEnrollment')
-                              AND (courses.workflow_state = 'claimed' OR (enrollments.workflow_state = 'active' and  courses.workflow_state = 'available'))"
+  scope :active, where("enrollments.workflow_state<>'deleted'")
 
-  named_scope :student,
-              :select => 'course_id',
-              :joins => :course,
-              :conditions => "enrollments.type = 'StudentEnrollment'
-                              AND enrollments.workflow_state = 'active'
-                              AND courses.workflow_state = 'available'"
+  scope :admin,
+        select(:course_id).
+        joins(:course).
+        where("enrollments.type IN ('TeacherEnrollment','TaEnrollment', 'DesignerEnrollment')
+              AND (courses.workflow_state='claimed' OR (enrollments.workflow_state='active' AND courses.workflow_state='available'))")
 
-  named_scope :student_in_claimed_or_available,
-              :select => 'course_id',
-              :joins => :course,
-              :conditions => "enrollments.type = 'StudentEnrollment'
-                              AND enrollments.workflow_state = 'active'
-                              AND courses.workflow_state IN ('available', 'claimed')"
+  scope :of_admin_type, where(:type => ['TeacherEnrollment','TaEnrollment', 'DesignerEnrollment'])
 
-  named_scope :all_student,
-              :include => :course,
-              :conditions => "(enrollments.type = 'StudentEnrollment'
-                              AND enrollments.workflow_state IN ('invited', 'active', 'completed')
-                              AND courses.workflow_state IN ('available', 'completed')) OR
-                              (enrollments.type = 'StudentViewEnrollment'
-                              AND enrollments.workflow_state = 'active'
-                              AND courses.workflow_state != 'deleted')"
+  scope :of_instructor_type, where(:type => ['TeacherEnrollment', 'TaEnrollment'])
 
-  named_scope :ended,
-              :joins => :course,
-              :conditions => "courses.workflow_state = 'completed' or enrollments.workflow_state = 'rejected' or enrollments.workflow_state = 'completed'"
-  
-  named_scope :not_fake, :conditions => "enrollments.type != 'StudentViewEnrollment'"
+  scope :of_content_admins, where(:type => ['TeacherEnrollment', 'DesignerEnrollment'])
+
+  scope :student,
+        select(:course_id).
+        joins(:course).
+        where(:type => 'StudentEnrollment', :workflow_state => 'active', :courses => { :workflow_state => 'available' })
+
+  scope :student_in_claimed_or_available,
+        select(:course_id).
+        joins(:course).
+        where(:type => 'StudentEnrollment', :workflow_state => 'active', :courses => { :workflow_state => ['available', 'claimed'] })
+
+  scope :all_student,
+        includes(:course).
+        where("(enrollments.type = 'StudentEnrollment'
+              AND enrollments.workflow_state IN ('invited', 'active', 'completed')
+              AND courses.workflow_state IN ('available', 'completed')) OR
+              (enrollments.type = 'StudentViewEnrollment'
+              AND enrollments.workflow_state = 'active'
+              AND courses.workflow_state != 'deleted')")
+
+  scope :ended,
+        joins(:course).
+        where("courses.workflow_state='completed' OR enrollments.workflow_state='rejected' OR enrollments.workflow_state='completed'")
+
+  scope :future, lambda {
+    joins(:course).
+        where("(courses.start_at>?
+              AND courses.workflow_state='available'
+              AND courses.restrict_enrollments_to_course_dates=?
+              AND enrollments.workflow_state IN ('invited', 'active', 'completed'))
+              OR (courses.workflow_state IN ('created', 'claimed')
+              AND enrollments.workflow_state IN ('invited', 'active', 'completed', 'creation_pending'))", Time.now.utc, true)
+  }
+
+  scope :past,
+        joins(:course).
+        where("(courses.workflow_state='completed'
+              AND enrollments.workflow_state NOT IN ('invited', 'deleted'))
+              OR enrollments.workflow_state IN ('rejected', 'completed')")
+
+  scope :not_fake, where("enrollments.type<>'StudentViewEnrollment'")
 
 
   READABLE_TYPES = {
@@ -178,6 +203,42 @@ class Enrollment < ActiveRecord::Base
 
   def self.readable_type(type)
     READABLE_TYPES[type] || READABLE_TYPES['StudentEnrollment']
+  end
+
+  SIS_TYPES = {
+      'TeacherEnrollment' => 'teacher',
+      'TaEnrollment' => 'ta',
+      'DesignerEnrollment' => 'designer',
+      'StudentEnrollment' => 'student',
+      'ObserverEnrollment' => 'observer'
+  }
+  def self.sis_type(type)
+    SIS_TYPES[type] || SIS_TYPES['StudentEnrollment']
+  end
+
+  def sis_role
+    self.role_name || Enrollment.sis_type(self.type)
+  end
+
+  def self.valid_types
+    SIS_TYPES.keys
+  end
+
+  def self.valid_type?(type)
+    SIS_TYPES.has_key?(type)
+  end
+
+  TYPES_WITH_INDEFINITE_ARTICLE = {
+    'TeacherEnrollment' => t('#enrollment.roles.teacher_with_indefinite_article', "A Teacher"),
+    'TaEnrollment' => t('#enrollment.roles.ta_with_indefinite_article', "A TA"),
+    'DesignerEnrollment' => t('#enrollment.roles.designer_with_indefinite_article', "A Designer"),
+    'StudentEnrollment' => t('#enrollment.roles.student_with_indefinite_article', "A Student"),
+    'StudentViewEnrollment' => t('#enrollment.roles.student_with_indefinite_article', "A Student"),
+    'ObserverEnrollment' => t('#enrollment.roles.observer_with_indefinite_article', "An Observer")
+  }
+
+  def self.type_with_indefinite_article(type)
+    TYPES_WITH_INDEFINITE_ARTICLE[type] || TYPES_WITH_INDEFINITE_ARTICLE['StudentEnrollment']
   end
 
   def should_update_user_account_association?
@@ -208,9 +269,8 @@ class Enrollment < ActiveRecord::Base
     section = CourseSection.find(self.course_section_id_was)
 
     # ok, consider groups the user is in from the abandoned section's course
-    self.user.groups.scoped(:include => :group_category, :conditions =>
-      ['context_type=? AND context_id=?',
-       'Course', section.course_id]).each do |group|
+    self.user.groups.includes(:group_category).where(
+      :context_type => 'Course', :context_id => section.course_id).each do |group|
 
       # don't bother unless the group's category has section restrictions or
       # the enrollment was deleted
@@ -266,11 +326,11 @@ class Enrollment < ActiveRecord::Base
   def linked_enrollment_for(observer)
     # there should really only ever be one, but due to SIS or legacy data there
     # could be multiple. we'll use the best match (based on workflow_state)
-    enrollment = observer.observer_enrollments.find :first, :conditions => {
+    enrollment = observer.observer_enrollments.where(
       :associated_user_id => user_id,
       :course_id => course_id,
-      :course_section_id => course_section_id_was
-    }, :order => self.class.state_rank_sql
+      :course_section_id => course_section_id_was).
+      order(self.class.state_rank_sql).first
     # we don't want to "undelete" observer enrollments that have been
     # explicitly deleted 
     return nil if enrollment && enrollment.deleted? && workflow_state_was != 'deleted'
@@ -290,7 +350,13 @@ class Enrollment < ActiveRecord::Base
 
   def clear_email_caches
     if self.workflow_state_changed? && (self.workflow_state_was == 'invited' || self.workflow_state == 'invited')
-      self.user.communication_channels.email.unretired.each { |cc| Rails.cache.delete([cc.path, 'invited_enrollments'].cache_key)}
+      if Enrollment.cross_shard_invitations?
+        Shard.default.activate do
+          self.user.communication_channels.email.unretired.each { |cc| Rails.cache.delete([cc.path, 'all_invited_enrollments'].cache_key)}
+        end
+      else
+        self.user.communication_channels.email.unretired.each { |cc| Rails.cache.delete([cc.path, 'invited_enrollments'].cache_key)}
+      end
     end
   end
 
@@ -357,7 +423,7 @@ class Enrollment < ActiveRecord::Base
 
   def assert_section
     self.course_section ||= self.course.default_section if self.course
-    self.root_account_id = self.course_section.root_account_id rescue nil
+    self.root_account_id = self.course.root_account_id rescue nil
   end
 
   def infer_privileges
@@ -397,17 +463,18 @@ class Enrollment < ActiveRecord::Base
     @long_name
   end
 
-  TYPE_RANK = ['TeacherEnrollment','TaEnrollment','DesignerEnrollment','StudentEnrollment','StudentViewEnrollment','ObserverEnrollment']
-  TYPE_RANK_HASH = rank_hash(TYPE_RANK)
-  def self.type_rank_sql
+  TYPE_RANKS = {
+    :default => ['TeacherEnrollment','TaEnrollment','DesignerEnrollment','StudentEnrollment','StudentViewEnrollment','ObserverEnrollment'],
+    :student => ['StudentEnrollment','TeacherEnrollment','TaEnrollment','DesignerEnrollment','StudentViewEnrollment','ObserverEnrollment']
+  }
+  TYPE_RANK_HASHES = Hash[TYPE_RANKS.map{ |k, v| [k, rank_hash(v)] }]
+  def self.type_rank_sql(order = :default)
     # don't call rank_sql during class load
-    @type_rank_sql ||= rank_sql(TYPE_RANK, 'enrollments.type')
+    rank_sql(TYPE_RANKS[order], 'enrollments.type')
   end
 
-  def rank_sortable(student_first=false)
-    type = self.class.to_s
-    return 0 if type == 'StudentEnrollment' && student_first
-    TYPE_RANK_HASH[type]
+  def rank_sortable(order = :default)
+    TYPE_RANK_HASHES[order][self.class.to_s]
   end
 
   STATE_RANK = ['active', ['invited', 'creation_pending'], 'completed', 'rejected', 'deleted']
@@ -427,14 +494,12 @@ class Enrollment < ActiveRecord::Base
     res
   end
 
-  def accept
-    return false unless invited?
-    ids = nil
-    ids = self.user.dashboard_messages.find_all_by_context_id_and_context_type(self.id, 'Enrollment', :select => "id").map(&:id) if self.user
-    Message.delete_all({:id => ids}) if ids && !ids.empty?
+  def accept(force = false)
+    return false unless force || invited?
+    ids = self.user.dashboard_messages.where(:context_id => self, :context_type => 'Enrollment').pluck(:id) if self.user
+    Message.where(:id => ids).delete_all if ids.present?
     update_attribute(:workflow_state, 'active')
-    user.touch
-    true
+    touch_user
   end
 
   workflow do
@@ -465,47 +530,29 @@ class Enrollment < ActiveRecord::Base
   end
 
   def enrollment_dates
-    Rails.cache.fetch([self, self.course, 'enrollment_date_ranges'].cache_key) do
-      result = []
-      if self.start_at && self.end_at
-        result << [self.start_at, self.end_at]
-      elsif course_section.try(:restrict_enrollments_to_section_dates)
-        result << [course_section.start_at, course_section.end_at]
-        result << course.enrollment_term.enrollment_dates_for(self) if self.course.try(:enrollment_term) && self.admin?
-      elsif course.try(:restrict_enrollments_to_course_dates)
-        result << [course.start_at, course.conclude_at]
-        result << course.enrollment_term.enrollment_dates_for(self) if self.course.try(:enrollment_term) && self.admin?
-      elsif course.try(:enrollment_term)
-        result << course.enrollment_term.enrollment_dates_for(self)
-      else
-        result << [nil, nil]
-      end
-      result
-    end
+    Canvas::Builders::EnrollmentDateBuilder.build(self)
   end
 
   def state_based_on_date
-    if [:invited, :active].include?(state)
-      ranges = self.enrollment_dates
-      now = Time.now
-      ranges.each do |range|
-        start_at, end_at = range
-        # start_at <= now <= end_at, allowing for open ranges on either end
-        return state if (start_at || now) <= now && now <= (end_at || now)
-      end
-      # not strictly within any range
-      global_start_at = ranges.map(&:first).compact.min
-      return state unless global_start_at
-      if global_start_at < Time.now
-        :completed
-      # Allow student view students to use course before the term starts
-      elsif !self.fake_student?
-        :inactive
-      else
-        state
-      end
-    else
+    return state unless [:invited, :active].include?(state)
+
+    ranges = self.enrollment_dates
+    now    = Time.now
+    ranges.each do |range|
+      start_at, end_at = range
+      # start_at <= now <= end_at, allowing for open ranges on either end
+      return state if (start_at || now) <= now && now <= (end_at || now)
+    end
+
+    # Not strictly within any range
+    return state unless global_start_at = ranges.map(&:compact).map(&:min).compact.min
+    if global_start_at < now
+      :completed
+    # Allow student view students to use the course before the term starts
+    elsif self.fake_student? || (state == :invited && !self.root_account.settings[:restrict_student_future_view])
       state
+    else
+      :inactive
     end
   end
 
@@ -561,9 +608,13 @@ class Enrollment < ActiveRecord::Base
   def has_permission_to?(action)
     @permission_lookup ||= {}
     unless @permission_lookup.has_key? action
-      @permission_lookup[action] = RoleOverride.permission_for(self, action, self.class.to_s)[:enabled]
+      @permission_lookup[action] = RoleOverride.enabled_for?(course, course, action, base_role_name, self.role_name)
     end
-    @permission_lookup[action]
+    @permission_lookup[action].include?(:self)
+  end
+
+  def base_role_name
+    self.class.to_s
   end
 
   # Determine if a user has permissions to conclude this enrollment.
@@ -713,14 +764,12 @@ class Enrollment < ActiveRecord::Base
     end
   end
 
-  def computed_final_grade
-    self.course.score_to_grade(self.computed_final_score)
+  def computed_current_grade
+    self.course.score_to_grade(self.computed_current_score)
   end
 
-  def self.students(opts={})
-    with_scope :find => opts do
-      find(:all, :conditions => {:type => 'Student'}).map(&:user).compact
-    end
+  def computed_final_grade
+    self.course.score_to_grade(self.computed_final_score)
   end
 
   def self.typed_enrollment(type)
@@ -732,7 +781,7 @@ class Enrollment < ActiveRecord::Base
   def student?
     false
   end
-  
+
   def fake_student?
     false
   end
@@ -789,42 +838,70 @@ class Enrollment < ActiveRecord::Base
     given { |user, session| self.course.students_visible_to(user, true).map(&:id).include?(self.user_id) && self.course.grants_rights?(user, session, :manage_grades, :view_all_grades).values.any? }
     can :read and can :read_grades
 
-    given { |user| !!Enrollment.active.find_by_user_id_and_associated_user_id(user.id, self.user_id) }
+    given { |user| course.observer_enrollments.find_by_user_id_and_associated_user_id(user.id, self.user_id).present? }
     can :read and can :read_grades and can :read_services
   end
 
-  named_scope :before, lambda{|date|
-    {:conditions => ['enrollments.created_at < ?', date]}
+  scope :before, lambda{ |date|
+    where("enrollments.created_at<?", date)
   }
 
-  named_scope :for_user, lambda{|user|
-    {:conditions => ['enrollments.user_id = ?', user.id] }
-  }
+  scope :for_user, lambda { |user| where(:user_id => user) }
 
-  named_scope :for_courses_with_user_name, lambda{|courses|
-    {
-      :conditions => {:course_id => courses.map(&:id)},
-      :joins => :user,
-      :select => 'user_id, course_id, users.name AS user_name'
-    }
+  scope :for_courses_with_user_name, lambda { |courses|
+    where(:course_id => courses).
+        joins(:user).
+        select("user_id, course_id, users.name AS user_name")
   }
-  named_scope :invited, :conditions => { :workflow_state => 'invited' }
-  named_scope :accepted, :conditions => ['enrollments.workflow_state != ?', 'invited']
-  named_scope :active_or_pending, :conditions => {:workflow_state => ['invited', 'creation_pending', 'active']}
-  named_scope :currently_online, :joins => :pseudonyms, :conditions => ['pseudonyms.last_request_at > ?', 5.minutes.ago]
+  scope :invited, where(:workflow_state => 'invited')
+  scope :accepted, where("enrollments.workflow_state<>'invited'")
+  scope :active_or_pending, where(:workflow_state => ['invited', 'creation_pending', 'active'])
+  scope :currently_online, joins(:pseudonyms).where("pseudonyms.last_request_at>?", 5.minutes.ago)
   # this returns enrollments for creation_pending users; should always be used in conjunction with the invited scope
-  named_scope :for_email, lambda { |email|
-    {
-      :joins => { :user => :communication_channels },
-      :conditions => ["users.workflow_state='creation_pending' AND communication_channels.workflow_state='unconfirmed' AND path_type='email' AND LOWER(path)=?", email.downcase],
-      :select => 'enrollments.*',
-      :readonly => false
-    }
+  scope :for_email, lambda { |email|
+    if Rails.version < '3.0'
+      {
+        :joins => { :user => :communication_channels },
+        :conditions => ["users.workflow_state='creation_pending' AND communication_channels.workflow_state='unconfirmed' AND path_type='email' AND LOWER(path)=?", email.downcase],
+        :select => 'enrollments.*',
+        :readonly => false
+      }
+    else
+      joins(:user => :communication_channels).
+          where("users.workflow_state='creation_pending' AND communication_channels.workflow_state='unconfirmed' AND path_type='email' AND LOWER(path)=?", email.downcase).
+          select("enrollments.*").
+          readonly(false)
+    end
   }
   def self.cached_temporary_invitations(email)
-    Rails.cache.fetch([email, 'invited_enrollments'].cache_key) do
-      Enrollment.invited.for_email(email).to_a
+    if Enrollment.cross_shard_invitations?
+      Shard.default.activate do
+        invitations = Rails.cache.fetch([email, 'all_invited_enrollments'].cache_key) do
+          Shard.with_each_shard(CommunicationChannel.associated_shards(email)) do
+            Enrollment.invited.for_email(email).to_a
+          end
+        end
+      end
+    else
+      Rails.cache.fetch([email, 'invited_enrollments'].cache_key) do
+        Enrollment.invited.for_email(email).to_a
+      end
     end
+  end
+
+  def self.order_by_sortable_name
+    clause = User.sortable_name_order_by_clause('users')
+    scope = self.order(clause)
+    if scope.scope(:find, :select)
+      scope = scope.select(clause)
+    end
+    scope
+  end
+
+  def self.top_enrollment_by(key, rank_order = :default)
+    raise "top_enrollment_by_user must be scoped" unless scoped?(:find, :conditions)
+    key = key.to_s
+    distinct_on(key, :order => "#{key}, #{type_rank_sql(rank_order)}")
   end
 
   def assign_uuid
@@ -842,7 +919,9 @@ class Enrollment < ActiveRecord::Base
   end
 
   def self.limit_privileges_to_course_section!(course, user, limit)
-    Enrollment.update_all({:limit_privileges_to_course_section => !!limit}, {:course_id => course.id, :user_id => user.id})
+    course.shard.activate do
+      Enrollment.where(:course_id => course, :user_id => user).update_all(:limit_privileges_to_course_section => !!limit)
+    end
     user.touch
   end
 
@@ -885,9 +964,10 @@ class Enrollment < ActiveRecord::Base
           HAVING count(*) > 1 LIMIT 50000")
       break if pairs.empty?
       pairs.each do |(user_id, course_section_id, type, associated_user_id)|
-        scope = self.scoped(:conditions => { :user_id => user_id, :course_section_id => course_section_id, :type => type, :associated_user_id => associated_user_id }).scoped(:conditions => "sis_source_id IS NOT NULL")
-        keeper = scope.first(:select => "id, workflow_state", :order => 'sis_batch_id desc')
-        deleted += scope.delete_all(["id<>?", keeper.id]) if keeper
+        scope = self.where(:user_id => user_id, :course_section_id => course_section_id, :type => type, :associated_user_id => associated_user_id).
+            where("sis_source_id IS NOT NULL")
+        keeper = scope.select([:id, :workflow_state]).order(:sis_batch_id).last
+        deleted += scope.where("id<>?", keeper).delete_all if keeper
       end
     end
     return deleted
@@ -895,8 +975,7 @@ class Enrollment < ActiveRecord::Base
 
   # similar to above, but used on a scope or association (e.g. User#enrollments)
   def self.remove_duplicates!
-    scope = current_scoped_methods && current_scoped_methods[:find]
-    raise "remove_duplicates! needs to be scoped" unless scope && scope[:conditions]
+    raise "remove_duplicates! needs to be scoped" unless scoped?(:find, :conditions)
 
     where(["workflow_state NOT IN (?)", ['deleted', 'inactive', 'rejected']]).
       group_by{ |e| [e.user_id, e.course_id, e.course_section_id, e.associated_user_id] }.
@@ -933,5 +1012,44 @@ class Enrollment < ActiveRecord::Base
     course_section && course_section.end_at ||
     course.conclude_at ||
     course.enrollment_term && course.enrollment_term.end_at
+  end
+
+  def self.cross_shard_invitations?
+    false
+  end
+
+  def role
+    self.role_name || self.type
+  end
+
+  # DO NOT TRUST
+  # This is only a convenience method to assist in identifying which enrollment
+  # goes to which user when users have accidentally been merged together
+  # This is the *only* reason the sis_source_id column has not been dropped
+  def sis_user_id
+    return @sis_user_id if @sis_user_id
+    sis_source_id_parts = sis_source_id ? sis_source_id.split(':') : []
+    if sis_source_id_parts.length == 4
+      @sis_user_id = sis_source_id_parts[1]
+    else
+      @sis_user_id = sis_source_id_parts[0]
+    end
+    @sis_user_id
+  end
+
+  def record_recent_activity_threshold
+    Setting.get_cached('enrollment_last_activity_at_threshold', 10.minutes).to_i
+  end
+
+  def record_recent_activity_worthwhile?(as_of, threshold)
+    last_activity_at.nil? || (as_of - last_activity_at >= threshold)
+  end
+
+  def record_recent_activity(as_of = Time.zone.now,
+                             threshold = record_recent_activity_threshold)
+    if record_recent_activity_worthwhile?(as_of, threshold)
+      self.class.where(:id => self).update_all(:last_activity_at => as_of)
+      self.last_activity_at = as_of
+    end
   end
 end

@@ -11,6 +11,12 @@ class Worker
 
   self.max_attempts = 15
   self.max_run_time = 4.hours
+
+  def self.queue=(queue_name)
+    raise(ArgumentError, "queue_name must not be blank") if queue_name.blank?
+    @@queue = queue_name
+  end
+
   self.queue = "canvas_queue"
 
   attr_reader :config, :queue, :min_priority, :max_priority, :sleep_delay, :sleep_delay_stagger
@@ -154,33 +160,9 @@ class Worker
   end
 
   def handle_failed_job(job, error)
-    job.last_error = error.message + "\n" + error.backtrace.join("\n")
+    job.last_error = "#{error.message}\n#{error.backtrace.join("\n")}"
     say("Failed with #{error.class} [#{error.message}] (#{job.attempts} attempts)", :error)
-    reschedule(job, error)
-  end
-
-  # Reschedule the job in the future (when a job fails).
-  # Uses an exponential scale depending on the number of failed attempts.
-  def reschedule(job, error = nil, time = nil)
-    job.attempts += 1
-    if job.attempts >= (job.max_attempts || self.class.max_attempts)
-      destroy_job = true
-      if self.class.on_max_failures
-        destroy_job = self.class.on_max_failures.call(job, error)
-      end
-
-      if destroy_job
-        say("destroying job because of #{job.attempts} failures", :info)
-        job.destroy
-      else
-        job.fail!
-      end
-    else
-      time ||= job.reschedule_at
-      job.run_at = time
-      job.unlock
-      job.save!
-    end
+    job.reschedule(error)
   end
 
   def id
@@ -205,9 +187,10 @@ class Worker
   def configure_for_job(job)
     previous_tmpdir = ENV['TMPDIR'] if @make_tmpdir
     Thread.current[:context] = {
-      # these keys aren't terribly well named for this, since they were intended for http requests
+      # these 2 keys aren't terribly well named for this, since they were intended for http requests
       :request_id => job.id,
       :session_id => self.name,
+      :job        => job,
     }
 
     if @make_tmpdir
@@ -231,6 +214,10 @@ class Worker
       # if this fails again, it'll raise the error up
       ActiveRecord::Base.connection.execute("select 1")
     end
+  end
+
+  def self.current_job
+    Thread.current[:context].try(:[], :job)
   end
 
 end

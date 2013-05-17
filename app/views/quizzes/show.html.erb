@@ -2,107 +2,68 @@
 
 <% if @headers %>
   <% content_for :right_side do %>
-    <% if @submission && params[:preview] %>
-      <div class="rs-margin-lr rs-margin-top">
-        <a href="<%= context_url(@context, :edit_context_quiz_url, @quiz) %>" class="button button-sidebar-wide"><%= image_tag "edit.png" %> <%= @quiz.survey? ? t('links.keep_editing_this_survey', "Keep Editing This Survey") : t('links.keep_editing_this_quiz', "Keep Editing This Quiz") %></a><br/>
-        <%= render :partial => "quizzes/quiz_right_side", :locals => {:allow_take => false} %>
-      </div>
-    <% else %>
-      <div class="rs-margin-lr rs-margin-top">
-        <% if can_do(@quiz, @current_user, :manage) && @submitted_students && !@submitted_students.empty? %>
-          <a href="<%= context_url(@context, :context_quiz_statistics_url, @quiz.id) %>" class="button button-sidebar-wide"><%= image_tag "graph.png" %> <%= @quiz.survey? ? t('links.survey_statistics', "Survey Statistics") : t('links.quiz_statistics', "Quiz Statistics") %></a>
-        <% end %>
+    <div id="sidebar_content" class="rs-margin-bottom">
+      <ul class="page-action-list" style="display:none;">
+        <h2><%= t 'titles.related_items', "Related Items" %></h2>
+
         <% if can_do(@quiz, @current_user, :update) %>
-          <a href="<%= context_url(@context, :edit_context_quiz_url, @quiz) %>" class="button button-sidebar-wide"><%= image_tag "edit.png" %> <%= @quiz.survey? ? t('links.edit_this_survey', "Edit This Survey") : t('links.edit_this_quiz', "Edit This Quiz") %></a>
           <% if can_do(@quiz, @current_user, :manage) %>
-            <a href="<%= context_url(@context, :context_quiz_moderate_url, @quiz.id) %>" class="button button-sidebar-wide"><%= image_tag "ball.png" %> <%= @quiz.survey? ? t('links.moderate_this_survey', "Moderate This Survey") : t('links.moderate_this_quiz', "Moderate This Quiz") %></a>
-          <% end %>
-          <a href="<%= context_url(@context, :context_quiz_url, @quiz) %>" class="delete_quiz_link button button-sidebar-wide"><%= image_tag "delete.png" %> <%= @quiz.survey? ? t('links.delete_this_survey', "Delete This Survey") : t('links.delete_this_quiz', "Delete This Quiz") %></a>
-          <% if @quiz.locked? %>
-            <% form_for @quiz, :url => context_url(@context, :context_quiz_url, @quiz.id, :id => 'quiz_unlock_form') do |f| %>
-              <%= hidden_field_tag 'quiz[locked]', false %>
-              <div id="unlock_for_how_long_dialog" title="<%= t('titles.unlock_for_how_long', "How long would you like to unlock the quiz for?") %>" style="display:none;">
-                <label style="float: left;" for="no_time_limit">
-                  <%= f.radio_button('do_lock_at', false, :checked => true) %>
-                  <%= f.label('do_lock_at_false', :no_time_limit, :en => 'No time limit') %>
-                </label>
-                <label id="how_long_to_unlock_wrapper" style="float: left; margin-left: 30px;" for="until">
-                  <%= f.radio_button('do_lock_at', true, :checked => false) %>
-                  <%= f.label('do_lock_at', :available_until, :en => 'Until', :value => true) %>
-                  <%= f.text_field :lock_at, :class => "datetime_field", :style => "width: 150px;", :value => datetime_string(@quiz.lock_at) %>
-                </label>
-              </div>
-              <button id="let_students_take_this_quiz_button" class="button button-sidebar-wide" type="submit">
-                <%= image_tag "unlock.png" %> <%= @quiz.survey? ? t('buttons.unlock_survey', "Let Students Take this Survey Now") : t('buttons.unlock_quiz', "Let Students Take this Quiz Now") %>
-              </button>
+            <% if @submitted_student_count && @submitted_student_count > 0 && @context.allows_speed_grader? %>
+              <li>
+                <a href="<%= context_url(@context, :context_quiz_statistics_url, @quiz.id) %>">
+                  <i class="icon-stats"></i> <%= @quiz.survey? ? t('links.survey_statistics', "Survey Statistics") : t('links.quiz_statistics', "Quiz Statistics") %>
+                </a>
+              </li>
             <% end %>
-          <% else %>
-            <% form_for @quiz, :url => context_url(@context, :context_quiz_url, @quiz.id) do |f| %>
-              <%= hidden_field_tag 'quiz[locked]', true %>
-              <button class="button button-sidebar-wide" type="submit">
-                <%= image_tag "lock.png" %> <%= @quiz.survey? ? t('buttons.lock_survey', "Lock this Survey Now") : t('buttons.lock_quiz', "Lock this Quiz Now") %>
-              </button>
-            <% end %>
+
+            <a href="<%= context_url(@context, :context_quiz_moderate_url, @quiz.id) %>">
+              <i class="icon-settings"></i> <%= @quiz.survey? ? t('links.moderate_this_survey', "Moderate This Survey") : t('links.moderate_this_quiz', "Moderate This Quiz") %>
+            </a>
           <% end %>
         <% elsif can_do(@quiz, @current_user, :review_grades) %>
-          <% if @submitted_students && !@submitted_students.empty? %>
-            <a href="<%= context_url(@context, :context_quiz_statistics_url, @quiz.id) %>" class="button button-sidebar-wide"><%= image_tag "graph.png" %> <%= @quiz.survey? ? t('links.survey_statistics', "Survey Statistics") : t('links.quiz_statistics', "Quiz Statistics") %></a>
+          <% if @submitted_student_count && @submitted_student_count > 0 && @context.allows_speed_grader? %>
+            <li>
+              <a href="<%= context_url(@context, :context_quiz_statistics_url, @quiz.id) %>">
+                <i class="icon-stats"></i> <%= @quiz.survey? ? t('links.survey_statistics', "Survey Statistics") : t('links.quiz_statistics', "Quiz Statistics") %>
+              </a>
+            </li>
           <% end %>
-          <a href="<%= context_url(@context, :context_quiz_read_only_url, @quiz.id) %>" class="button button-sidebar-wide"><%= image_tag "file.png" %> <%= t('links.see_full_quiz', "See Full Quiz") %></a>
-        <% end %>
-        <% if can_do(@assignment, @current_user, :update) || @assignment.try(:rubric_association).try(:rubric) %>
-          <a href="#" rel="<%= context_url(@context, :context_assignment_rubric_url, @assignment.id) %>" class="show_rubric_link button button-sidebar-wide" style="<%= hidden unless @assignment %>"><%= image_tag "rubric.png" %> <%= t('links.show_assignment_rubric', "Show Assignment Rubric") %></a>
-          <a href="<%= context_url(@context, :context_rubrics_url) %>" id="add_rubric_url" style="display:hidden">&nbsp;</a>
-        <% end %>
-        <% if (can_do(@quiz, @current_user, :grade) || can_do(@quiz, @current_user, :review_grades)) && @quiz.available? %>
-          <% submitted_student_ids = @submitted_students.map{|s| s.id} %>
-          <a href="#" class="button quiz_details_link button-sidebar-wide">
-            <% if @submissions.find{|s| s.pending_review? && submitted_student_ids.include?(s.user_id)} %>
-              <%= image_tag "warning.png" %>
-            <% end %>
-            <%= image_tag "group.png" %> <%= @quiz.survey? ? t('links.show_student_survey_results', "Show Student Survey Results") : t('links.show_student_quiz_results', "Show Student Quiz Results") %>
-            <div style="font-size: 0.8em; padding-left: 20px;">(<%= t(:students_submitted_so_far, {:one => "1 student submitted so far", :other => "%{count} students submitted so far"}, :count => @submitted_students.length) %>)</div>
-            <% if @quiz.assignment %>
-              <a target="_blank" class="button button-sidebar-wide" href="<%= context_url(@context, :speed_grader_context_gradebook_url, :assignment_id => @quiz.assignment.id) %>"><%= image_tag "grading_icon.png" %> <%= t(:speed_grader, "SpeedGrader™") %></a><br/>
-            <% end %>
+          <a href="<%= context_url(@context, :context_quiz_read_only_url, @quiz.id) %>">
+            <i class="icon-quiz"></i> <%= t('links.see_full_quiz', "See Full Quiz") %>
           </a>
         <% end %>
-        <% if can_do(@quiz, @current_user, :grade) && can_do(@context, @current_user, :send_messages) && @quiz.available? && !@quiz.anonymous_submissions? && @quiz.graded? %>
-          <a href="#" class="button message_students_link button-sidebar-wide">
-            <%= image_tag "email.png" %> <%= t('links.message_students_who', "Message Students Who...") %>
+
+        <% if (can_do(@quiz, @current_user, :grade) || can_do(@quiz, @current_user, :review_grades)) && @quiz.available? && @quiz.assignment && @context.allows_speed_grader? %>
+          <li>
+            <a target="_blank" href="<%= context_url(@context, :speed_grader_context_gradebook_url, :assignment_id => @quiz.assignment.id) %>">
+              <i class="icon-speed-grader"></i> <%= t(:speed_grader, "SpeedGrader™") %>
+            </a>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+
+    <% if @submission && params[:preview] %>
+      <ul class="page-action-list">
+        <li>
+          <a href="<%= context_url(@context, :edit_context_quiz_url, @quiz) %>">
+            <i class="icon-edit"></i> <%= @quiz.survey? ? t('links.keep_editing_this_survey', "Keep Editing This Survey") : t('links.keep_editing_this_quiz', "Keep Editing This Quiz") %>
           </a>
-        <% end %>
-        <% if can_do(@quiz, @current_user, :manage) && @quiz.access_code && !@quiz.access_code.empty? %>
-          <div style="margin-bottom: 10px; line-height: 1.5em;">
-            <%= before_label(:access_code, "Access Code") %> <%= @quiz.access_code %>
-          </div>
-        <% end %>
-      </div>
-      <div class="rs-margin-lr rs-margin-top">
+        </li>
+      </ul>
+      <%= render :partial => "quizzes/quiz_right_side", :locals => {:allow_take => false} %>
+    <% else %>
+      
+      <div class="rs-margin-top">
         <% if @submission && @submission.completed? %>
           <%= render :partial => "quizzes/quiz_right_side", :locals => {:allow_take => !@locked} %>
         <% elsif @submission && @submission.untaken? %>
-          <div style="margin-left: 20px; margin-top: 20px; line-height: 1.3em;">
+          <div>
             <% if !@quiz.locked? %>
                 <%= @quiz.survey? ?
                             t(:survey_in_progress, "You're in the middle of taking this survey.") :
                             t(:quiz_in_progress, "You're in the middle of taking this quiz.") %><br/>
-                <% link_to context_url(@context, :context_quiz_take_url, @quiz.id, :user_id => @current_user && @current_user.id), :class => "button", 'data-method' => 'post' do %><%= @quiz.survey? ? t('links.resume_survey', "Resume Survey") : t('links.resume_quiz', "Resume Quiz") %><% end %>
-            <% end %>
-          </div>
-        <% end %>
-        <% if @quiz.for_assignment? %>
-          <div style="margin-top: 20px; display: none;">
-            <div style="margin-bottom: 5px;">
-              <%= @quiz.survey? ?
-                mt(:survey_for_assignment, "This survey is for the assignment **%{assignment}**", :assignment => @quiz.assignment.title) :
-                mt(:quiz_for_assignment, "This quiz is for the assignment **%{assignment}**", :assignment => @quiz.assignment.title) %>
-              <% if @quiz.assignment.points_possible %>
-                (<%= t(:points_possible, "pt", :count => @quiz.assignment.points_possible) %>)
-              <% end %>.
-            </div>
-            <% if can_do(@quiz, @current_user, :grade) || can_do(@quiz, @current_user, :update) %>
-              <a href="<%= context_url(@context, :edit_context_assignment_url, @quiz.assignment_id, :return_to => request.url) %>" class="button"><%= image_tag "edit.png" %> <%= t('links.edit_assignment_details', "Edit Assignment Details") %></a>
+                <%= link_to_resume_poll(:class => "btn") %>
             <% end %>
           </div>
         <% end %>
@@ -110,114 +71,216 @@
     <% end %>
   <% end %>
 <% end %>
+
 <% js_bundle :quiz_show %>
-<% jammit_css :quizzes %>
-<a id="context_quzzes_url" style="display:none;" href="<%= context_url(@context, :context_quizzes_url) %>">&nbsp;<!-- needed by quiz_show.js --></a>
-<h2 id="quiz_title"><%= @quiz.quiz_title || @quiz.readable_type %></h2>
-<% if @submission && params[:preview] %>
-  <h3>
-    <%= image_tag "warning.png" %> <%= t('warnings.draft_version', "This is a preview of the draft version of the quiz") %>
-  </h3>
-<% end %>
-<% if !@quiz.available? %><p>
-  <%= @quiz.survey? ? t(:survey_not_published, "This survey hasn't been published yet.  Students can't take the survey until it's published.") : t(:quiz_not_published, "This quiz hasn't been published yet.  Students can't take the quiz until it's published.") %>
-  <% if can_do(@quiz, @current_user, :update) %>
-    <%= @quiz.survey? ? t(:publish_survey_instructions, 'To publish the survey, click "Edit This Survey" to the right and then click the "Publish" button.') : t(:publish_quiz_instructions, 'To publish the quiz, click "Edit This Quiz" to the right and then click the "Publish" button.') %>
-    <% if @submission && @submission.completed? %>
-      <%= render :partial => "quizzes/quiz_submission" %>
-    <% end %>
-  <% end %>
-  </p>
-  <% if !@locked || @locked_reason[:lock_at] %>
-    <% if @quiz.due_at %>
-      <%= before_label(:quiz_due, "due") %> <%= datetime_string(@quiz.due_at) %>
-    <% end %>
-    <% if @quiz.description && !@quiz.description.empty? %>
-      <h3><%= before_label(:instructions, "Instructions") %></h3>
-      <div class="description user_content"><%= user_content(@quiz.description) %></div>
-    <% end %>
-  <% end %>
-  <% if can_do(@quiz, @current_user, :update) %>
-    <div style="text-align: center; margin-top: 10px; display: none;">
-      <a href="<%= context_url(@context, :edit_context_quiz_url, @quiz) %>" class="edit"><%= @quiz.survey? ? t('links.edit_this_survey', "Edit This Survey") : t('links.edit_this_quiz', "Edit This Quiz") %></a>
-      <a style="padding-left: 40px;" href="<%= context_url(@context, :context_quiz_url, @quiz) %>" class="delete_quiz_link delete"><%= @quiz.survey? ? t('links.delete_this_survey', "Delete This Survey") : t('links.delete_this_quiz', "Delete This Quiz") %></a>
-    </div>
-  <% end %>
-<% else %>
-  <% if can_do(@quiz, @current_user, :grade) || can_do(@quiz, @current_user, :review_grades) %>
-    <table id="quiz_details" style="display: none; clear: both;">
-      <tr>
-        <td style="vertical-align: top;">
-          <h3><%= @quiz.survey? ? t('headers.submitted_students_survey', "Students who have taken the survey") : t('headers.submitted_students_quiz', "Students who have taken the quiz") %></h3>
-          <ul class="student_list submitted">
-            <% if @submitted_students.empty? %>
-              <li><%= @quiz.survey? ? t(:survey_no_submissions, "No Students have taken the survey yet") : t(:quiz_no_submissions, "No Students have taken the quiz yet") %></li>
+<% jammit_css :quizzes, :learning_outcomes %>
+
+<div id="quiz_show">
+  <header class="quiz-header">
+    <% if needs_unpublished_warning? %>
+      <div class="alert">
+        <div class='row-fluid'>
+          <div class='span8 unpublished_warning'>
+            <% if !@quiz.available? %>
+              <%= unpublished_quiz_warning %>
+            <% else %>
+              <%= unpublished_changes_warning %>
             <% end %>
-            <% @submitted_students.each_with_index do |s, idx| %>
-              <% submission = @submissions.find{|qs| qs.user_id == s.id} %>
-              <li class="student" data-id="<%= s.id %>">
-                <% if submission.pending_review? %>
-                  <%= image_tag "pending_review.png", :title => t('titles.submission_needs_review', "This submission needs review") %>
-                <% end %>
-                <a href="<%= context_url(@context, :context_quiz_history_url, @quiz, :quiz_submission_id => submission.id) %>" class="name">
-                  <% if @quiz.survey? && @quiz.anonymous_submissions %>
-                    <%= t(:anonymous_student, "Student %{n}", :n => idx + 1) %>
+          </div>
+          <div class='span4 actions'>
+            <% if can_do(@quiz, @current_user, :update) || can_do(@quiz, @current_user, :manage) %>
+              <% link_to context_url(@context, :context_quiz_take_url, @quiz, :preview => 1), :method => :post, :class => 'btn', :id => 'preview_quiz_button' do %><%= t('links.preview', "Preview") %><% end %>
+              <% form_tag context_url(@context, :context_quiz_url, @quiz.id), {:method => :put, :style => 'display:inline', :id => 'publish_quiz_form'} do %>
+                <input type="hidden" name="activate" value="true"/>
+                <button type="submit" class="btn btn-primary publish_quiz_button">
+                  <% if !@quiz.available? %>
+                    <%= t('buttons.publish', "Publish") %>
                   <% else %>
-                    <%= s.name %>
+                    <%= t('buttons.republish', "Re-Publish") %>
                   <% end %>
-                </a>
-              </li>
+                </button>
+              <% end %>
             <% end %>
-          </ul>
-        </td><td style="vertical-align: top; padding-left: 20px;">
-          <% if @quiz.survey? && @quiz.anonymous_submissions %>
-            <h3><%= t('headers.unsubmitted_students_count', {:one => "1 student hasn't taken the survey", :other => "%{count} students haven't taken the survey"}, :count => @unsubmitted_students.length) %></h3>
-          <% else %>
-            <h3><%= @quiz.survey? ? t('headers.survey_unsubmitted_students', "Students who haven't taken the survey") : t('headers.quiz_unsubmitted_students', "Students who haven't taken the quiz") %></h3>
-            <ul class="student_list">
-              <% if @unsubmitted_students.empty? && !@submitted_students.empty? %>
-                <li><%= @quiz.survey? ? t(:survey_all_students_submitted, "All Students have taken the survey") : t(:quiz_all_students_submitted, "All Students have taken the quiz") %></li>
-              <% end %>
-              <% @unsubmitted_students.each do |s| %>
-                <li class="student" data-id="<%= s.id %>">
-                  <span class="name"><%= s.name %></span>
-                </li>
-              <% end %>
-            </ul>
-          <% end %>
-        </td>
-      </tr>
-    </table>
-  <% end %>
-  <% if !@locked || @locked_reason[:lock_at] %>
-    <h3><%= before_label(:instructions, "Instructions") %></h3>
-    <div class="description user_content"><%= user_content(@quiz.description) %></div>
-  <% end %>
-  <% if !@submission || !@submission.completed? || @quiz.unlimited_attempts? || (@submission.completed? && @submission.attempts_left > 0) %>
-    <%= render :partial => "quiz_details" %>
-    <% if @locked && !can_do(@quiz, @current_user, :update) %>
-      <div style="text-align: left; margin-top: 20px;">
-        <%= lock_explanation(@locked_reason, 'quiz', @context) %>
-      </div>
-    <% elsif !@current_user && @quiz.graded? %>
-      <div style="text-align: left; margin-top: 20px;">
-        <%= t(:only_registered_users, "Only registered, enrolled users can take graded quizzes") %>
-      </div>
-    <% elsif @submission && @submission.untaken? %>
-      <div style="text-align: center; margin-top: 20px; font-size: 1.3em;">
-        <% link_to context_url(@context, :context_quiz_take_url, @quiz.id, :user_id => @current_user && @current_user.id), 'data-method' => 'post' do %><%= @quiz.survey? ? t('links.resume_survey', "Resume Survey") : t('links.resume_quiz', "Resume Quiz") %><% end %>
-      </div>
-    <% elsif can_do(@quiz, @current_user, :submit) && !@lockdown_browser_authorized_to_view %>
-      <div style="text-align: center; margin-top: 20px; font-size: 1.3em;">
-        <% link_to context_url(@context, :context_quiz_take_url, @quiz.id, :user_id => @current_user && @current_user.id), :id => "take_quiz_link", 'data-method' => 'post' do %><% if @submission && !@submission.settings_only? %><%= @quiz.survey? ? t('links.take_the_survey_again', "Take the Survey Again") : t('links.take_the_quiz_again', "Take the Quiz Again") %><% else %><%= @quiz.survey? ? t('links.take_the_survey', "Take the Survey") : t('links.take_the_quiz', "Take the Quiz") %><% end %><% end %>
+          </div>
+        </div>
       </div>
     <% end %>
-  <% end %>
+
+    <div class='row-fluid'>
+      <div class='span9'>
+        <h2 id="quiz_title">
+          <%= @quiz.quiz_title || @quiz.readable_type %>
+        </h2>
+      </div>
+      <div class='span3' style="text-align: right;line-height: 36px">
+          <div class="admin-link-hover-area">
+          <% if can_do(@quiz, @current_user, :update) %>
+            <a href="<%= edit_polymorphic_path([@context, @quiz]) %>" class='btn edit_assignment_link quiz-edit-button'>
+              <i class='icon-edit'></i> <%= t('links.edit', 'Edit') %>
+            </a>
+          <% end %>
+
+          <% if can_do(@quiz, @current_user, :update) || can_do(@quiz, @current_user, :grade) || can_do(@quiz, @current_user, :review_grades) %>
+            <div class="admin-links" style="margin-left: 5px">
+              <a class="al-trigger btn">
+                <span class="screenreader-only">Manage</span>
+                <i class="icon-settings"></i>
+                <i class="icon-mini-arrow-down"></i>
+              </a>
+              <ul class="al-options">
+
+                <% if can_do(@quiz, @current_user, :update) && @assignment %>
+                  <li>
+                    <a href="#" rel="<%= context_url(@context, :context_assignment_rubric_url, @assignment.id) %>" class="show_rubric_link">
+                      <i class="icon-rubric"></i>
+                      <%= t('links.show_assignment_rubric', "Show Rubric") %>
+                    </a>
+                  </li>
+                  <a href="<%= context_url(@context, :context_rubrics_url) %>" class="icon-rubric" id="add_rubric_url" style="display:none">&nbsp;</a>
+                <% end %>
+
+                <% if can_do(@quiz, @current_user, :update) && !needs_unpublished_warning? %>
+                  <li>
+                    <a href="<%= polymorphic_path([@context, @quiz, :take], :preview => 1) %>" class="preview_link" data-method="post">
+                      <i class="icon-quiz"></i>
+                      <%= t('links.preview', "Preview") %>
+                    </a>
+                  </li>
+                <% end %>
+
+                <% if can_do(@quiz, @current_user, :update) %>
+                  <% if @quiz.locked? %>
+                    <% form_for @quiz, :url => context_url(@context, :context_quiz_url, @quiz.id), :html => { :id => 'quiz_unlock_form' } do |f| %>
+                      <%= hidden_field_tag 'quiz[locked]', false %>
+                      <div id="unlock_for_how_long_dialog" title="<%= t('titles.unlock_for_how_long', "How long would you like to unlock the quiz for?") %>" style="display:none;">
+                        <label style="float: left;" for="no_time_limit">
+                          <%= f.radio_button('do_lock_at', false, :checked => true) %>
+                          <%= f.label('do_lock_at_false', :no_time_limit, :en => 'No time limit') %>
+                        </label>
+                        <label id="how_long_to_unlock_wrapper" style="float: left; margin-left: 30px;" for="until">
+                          <%= f.radio_button('do_lock_at', true, :checked => false) %>
+                          <%= f.label('do_lock_at', :available_until, :en => 'Until', :value => true) %>
+                          <%= f.text_field :lock_at, :class => "datetime_field", :style => "width: 150px;", :value => datetime_string(@quiz.lock_at) %>
+                        </label>
+                      </div>
+                    <% end %>
+                    <li>
+                      <a href="#" id="let_students_take_this_quiz_button">
+                        <i class="icon-unlock"></i> <%= @quiz.survey? ? t('buttons.unlock_survey', "Let Students Take this Survey Now") : t('buttons.unlock_quiz', "Let Students Take this Quiz Now") %>
+                      </a>
+                    </li>
+                  <% else %>
+                    <% form_for @quiz, :url => context_url(@context, :context_quiz_url, @quiz.id), :html => { :id => 'quiz_lock_form' } do |f| %>
+                      <%= hidden_field_tag 'quiz[locked]', true %>
+                    <% end %>
+                    <li>
+                      <a href="#" id="lock_this_quiz_now_link">
+                        <i class="icon-lock"></i> <%= @quiz.survey? ? t('buttons.lock_survey', "Lock this Survey Now") : t('buttons.lock_quiz', "Lock this Quiz Now") %>
+                      </a>
+                    </li>
+                  <% end %>
+                <% end %>
+
+                <% if (can_do(@quiz, @current_user, :grade) || can_do(@quiz, @current_user, :review_grades)) && @quiz.available? %>
+                  <li>
+                    <a href="#" class="quiz_details_link">
+                      <% if @any_submissions_pending_review %>
+                        <i class="icon-warning"></i>
+                      <% end %>
+                      <i class="icon-group"></i> 
+                      <span id="quiz_details_text">
+                        <%= @quiz.survey? ? t('links.show_student_survey_results', "Show Student Survey Results") : t('links.show_student_quiz_results', "Show Student Quiz Results") %>
+                      </span>
+                      <div style="font-size: 0.8em; padding-left: 20px;">(<%= t(:students_submitted_so_far, {:one => "1 student submitted so far", :other => "%{count} students submitted so far"}, :count => @submitted_student_count) %>)</div>
+                    </a>
+                  </li>
+                <% end %>
+
+                <% if can_do(@quiz, @current_user, :grade) && can_do(@context, @current_user, :send_messages) && @quiz.available? && !@quiz.anonymous_submissions? && @quiz.graded? %>
+                  <li>
+                    <a href="#" class="message_students_link">
+                      <i class="icon-email"></i> <%= t('links.message_students_who', "Message Students Who...") %>
+                    </a>
+                  </li>
+                <% end %>
+
+                <li>
+                  <a href="<%= context_url(@context, :context_quiz_url, @quiz) %>" class="delete_quiz_link">
+                    <i class="icon-trash"></i> <%= t('titles.delete', "Delete") %>
+                  </a>
+                </li>
+
+              </ul>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+
+    <% if @submission && params[:preview] %>
+      <h3>
+        <i class="icon-warning"></i> <%= t('warnings.draft_version', "This is a preview of the draft version of the quiz") %>
+      </h3>
+    <% end %>
+
+    <div class="row-fluid">
+      <% if @quiz.available? %>
+        <div id="quiz_details_wrapper" data-url="<%= course_quiz_managed_quiz_data_url(@context.id, @quiz.id) %>" data-submitted-count="<%= @submitted_student_count %>"></div>
+      <% end %>
+    </div>
+    <div class="row-fluid">
+      <% if can_do(@quiz, @current_user, :update) || can_do(@quiz, @current_user, :manage) %>
+        <%= render :partial => 'quiz_show_teacher' %>
+      <% else %>
+        <%= render :partial => 'quiz_show_student' %>
+      <% end %>
+    </div>
+
+    <% if @quiz.available? %>
+
+      <% if !@submission || !@submission.completed? || @quiz.unlimited_attempts? || (@submission.completed? && @submission.attempts_left > 0) %>
+        <% if @locked && !can_do(@quiz, @current_user, :update) %>
+          <div class="lock_explanation">
+            <%= lock_explanation(@locked_reason, 'quiz', @context) %>
+          </div>
+        <% elsif !@current_user && @quiz.graded? %>
+          <div class="lock_explanation">
+            <%= t(:only_registered_users, "Only registered, enrolled users can take graded quizzes") %>
+          </div>
+        <% elsif @submission && @submission.untaken? %>
+          <div class="take_quiz_button">
+            <%= link_to_resume_poll('class' => "btn btn-primary") %>
+          </div>
+        <% elsif can_do(@quiz, @current_user, :submit) && !@lockdown_browser_authorized_to_view %>
+          <div class="take_quiz_button">
+            <%= link_to_take_or_retake_poll('class' => "btn btn-primary", 'id' => "take_quiz_link") %>
+          </div>
+        <% end %>
+      <% end %>
+    <% end %>
+  </header>
+
   <% if @submission && @submission.completed? %>
-    <%= @quiz.assignment && @quiz.assignment.muted? ? render(:partial => "quizzes/muted") : render(:partial => "quizzes/quiz_submission") %>
+    <% if @quiz.assignment && @quiz.assignment.muted? %>
+      <%= render(:partial => "quizzes/muted") %>
+    <% else %>
+      <%= render(:partial => "quizzes/quiz_submission") %>
+    <% end %>
   <% end %>
-  <% if can_do(@quiz, @current_user, :grade) %>
-    <%= render :partial => "shared/message_students" %>
+
+  <% if @quiz.available? %>
+    <% if can_do(@quiz, @current_user, :grade) %>
+      <%= render :partial => "shared/message_students" %>
+    <% end %>   
   <% end %>
-<% end %>
-<%= render :partial => "shared/sequence_footer", :locals => {:asset => @sequence_asset} if @sequence_asset %>
+
+  <% if @quiz.cant_go_back? %>
+    <%= render 'cant_go_back_warning' %>
+  <% end %>
+
+  <% if @sequence_asset %>
+    <%= render :partial => "shared/sequence_footer", :locals => {:asset => @sequence_asset} %>
+  <% end %>
+
+</div>

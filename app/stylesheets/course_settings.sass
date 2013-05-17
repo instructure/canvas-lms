@@ -1,26 +1,28 @@
 @import environment.sass
+@import 'utilities/context_search'
 
-#course_form .course_form 
+#course_form .course_form
   display: none
 
-#course_form.editing 
-  .course_form 
+#course_form.editing
+  .course_form
     display: inline
   .course_info, .edit_course_link, .move_course_link
     display: none
 
-
-#course_form .date_entry 
+#course_form .date_entry
   width: 100px
 
 .users-wrapper
   border: 1px solid #CCC
   margin-bottom: 1.4em
-  h3
+  h3, .h3
+    font-size: 18px
     margin: 0
     padding: 8px
     background-color: #F7F7F7
     border-bottom: 1px solid #CCC
+    line-height: 1em
 
   .pagination-loading
     padding: 8px
@@ -30,7 +32,7 @@
     background-color: #06A9EE
     color: white
 
-ul.user_list 
+ul.user_list
   list-style: none
   padding: 0px
   margin: 0
@@ -41,7 +43,7 @@ ul.user_list
   li.none
     padding: 8px
 
-ul.user_list li.user 
+ul.user_list li.user
   min-height: 30px
   padding-left: 10px
   color: #444
@@ -61,13 +63,13 @@ ul.user_list li.user
     display: block
     position: relative
 
-ul.user_list li.user:hover 
+ul.user_list li.user:hover
   background-color: $hover-color
 
-ul.user_list li.user .email 
+ul.user_list li.user .email
   font-size: 0.8em
   margin-left: 10px
-  
+
 ul.user_list li.user .associated_user
   display: none
   font-size: 0.8em
@@ -75,11 +77,11 @@ ul.user_list li.user .associated_user
 ul.user_list li.user.observer_enrollment .associated_user
   display: block
 
-ul.user_list li.user .section 
+ul.user_list li.user .section
   font-size: 0.8em
   margin-left: 10px
 
-ul.user_list li.user .short_name 
+ul.user_list li.user .short_name
   font-size: 0.8em
   margin-left: 10px
   margin-top: 2px
@@ -87,20 +89,20 @@ ul.user_list li.user .short_name
 ul.user_list li.user .associated_user_name:hover
   text-decoration: underline
 
-ul.user_list li.user .enrollment_type 
+ul.user_list li.user .enrollment_type
   font-size: 0.8em
   margin: -2px 10px 0px
 
-ul.user_list li.user .links 
+ul.user_list li.user .links
   float: right
   padding-right: 20px
   padding-top: 5px
   visibility: hidden
 
-ul.user_list li.user .links a 
+ul.user_list li.user .links a
   text-decoration: none
 
-ul.user_list li.user:hover .links 
+ul.user_list li.user:hover .links
   float: right
   padding-right: 20px
   visibility: visible
@@ -109,10 +111,6 @@ ul.user_list div.enrollment_type.pending
   color: #888
   font-style: italic
 
-h3 .tally  
-  font-family: arial,sans-serif
-  font-size: 12px
-  padding-left: 5px
 
 .add-course-users
   border: 1px solid #CCC
@@ -133,34 +131,34 @@ h3 .tally
       height: auto
       width: 98%
 
-#sections 
+#sections
   +reset-list
   max-width: 500px
   list-style-type: none
 
-#sections .section 
+#sections .section
   padding: 3px 2px
 
-#sections .section .delete_section_link, 
-#sections .section .edit_section_link, 
+#sections .section .delete_section_link,
+#sections .section .edit_section_link,
 #sections .section .cant_delete_section_link
 
   float: right
 
-#sections .section .section_link 
+#sections .section .section_link
   +opacity(0.3)
 
-#sections .section:hover 
+#sections .section:hover
   background-color: #eee
 
-#sections .section:hover .section_link 
+#sections .section:hover .section_link
   +opacity(1)
 
-#sections .section .users_count 
+#sections .section .users_count
   font-size: 0.8em
   padding-left: 5px
 
-#edit_section_form 
+#edit_section_form
   float: left
 
 .nav_list
@@ -205,225 +203,8 @@ h3 .tally
       line-height: 0.7em
       font-style: italic
 
-
-.autocomplete_menu
-  position: absolute
-  z-index: 2000
-  overflow: hidden
-  margin-left: -12px
-  padding: 0 12px 12px
-  > div
-    background: #ebebeb
-    border: 1px solid #999999
-    +border-radius(0 0 10px 10px)
-    box-shadow 0 0 12px 3px rgba(0,0,0,0.15)
-    overflow: hidden
-    width: 341px
-    > div // gets shifted left/right as menu slides
-      position: relative
-      > div // each menu level (contains two uls)
-        float: left
-        width: 341px
-  ul.heading
-    margin: 0
-    overflow: visible
-  ul
-    list-style: none
-    padding: 0
-    margin: 0 0 10px
-    overflow: auto
-    max-height: 218px
-    position: relative
-    li
-      position: relative
-      overflow: hidden
-      border-top: 1px solid #fff
-      border-bottom: 1px solid #d4d5d7
-      padding: 5px
-    li.first
-      border-top: none
-    li.last
-      border-bottom: none
-    li.expanded
-      cursor: default
-      background: #fff
-      position: relative
-      z-index: 1
-      box-shadow 0 0 4px 2px rgba(0,0,0,0.1)
-    li.message
-      line-height: 32px
-      text-align: center
-      border-bottom: none
-    li.active
-      border-top-color: #d7eefb
-      border-bottom-color: #297fd1
-      background: #2da5f0 url(/images/messages/finder-active.png) repeat-x 0 0
-    li.active.expanded
-      background: #f4fbff
-      border-top-color: #fff
-      border-bottom-color: #d4d5d7
-  li, li.active.expanded
-    height: 32px
-    cursor: pointer
-    a
-      position: relative
-      padding: 1px
-      background: transparent
-    i
-      display: block
-      width: 30px
-      height: 30px
-    a.expand
-      float: right
-      i
-        background: transparent url(/images/messages/expand-context.png) no-repeat 10px -23px
-    a.toggle
-      float: left
-      margin: 0 14px 0 6px
-      i
-        width: 16px
-        height: 16px
-        margin: 7px
-    img.avatar
-      width: 32px
-      height: 32px
-      float: left
-      margin-right: 6px
-      background: transparent url(/images/messages/avatar-sprites.png) 0 0 no-repeat
-    span.name, span.details
-      white-space: nowrap
-      overflow: hidden
-      display: block
-    b
-      color: #000
-      text-shadow: none
-    span.details, span.context_info
-      color: #2571bd
-      font-weight: bold
-      font-size: 0.8em
-    span.details
-      display: block
-    span.context_info
-      padding-left: 6px
-  li.toggleable a.toggle i
-    background: transparent url(/images/messages/checkbox-sprite.png) no-repeat 0 0
-  li.context img.avatar, li.context.active.expanded img.avatar
-    background-position: 0 -64px
-  li.user.active img.avatar
-    background-position: 0 -32px
-  li.context.active img.avatar
-    background-position: 0 -96px
-  li.active
-    a.expand
-      i
-        background-position: 10px 10px
-    a.expand:hover
-      padding: 0
-      border: 1px solid #2da5f0
-      background: #2da5f0 url(/images/messages/finder-active.png) repeat-x 0 0
-    b
-      color: #fff
-      text-shadow: 0px 1px 1px #0587bb
-    span
-      color: #0d4276
-    a.toggle i
-      background-position: 0 -48px
-    img.user.avatar
-      background-position: 0 -32px
-    img.context.avatar
-      background-position: 0 -96px
-  li.toggleable.on a.toggle i
-    background-position: 0 -32px
-  li.toggleable.on.active a.toggle i
-    background-position: 0 -80px
-  li.toggleable.on.active a.toggle:hover i
-    background-position: 0 -64px
-  li.expanded, li.active.expanded
-    cursor: default
-    a.expand
-      i
-        background-position: 10px -55px
-    a.toggle
-      display: none
-  li.active.expanded
-    a.expand:hover
-      cursor: pointer
-      background: #fff
-      border-color: #e4ebef
-  &.with-toggles
-    li.expanded, li.active.expanded
-      padding-left: 11px
-      img.avatar
-        margin: 0 14px 0 0
-
 .token_input
   width: 100%
-  line-height: 1.1em
-  min-height: 20px
-  display: -moz-inline-box
-  display: inline-block
-  border: 1px solid #999999
-  border-top-color: #737373
-  padding: 0
-  background: #fff
-  box-sizing: border-box
-  -webkit-box-sizing: border-box
-  -moz-box-sizing: border-box
-  cursor: text
-  position: relative
-  a.browser
-    position: absolute
-    top: 0
-    right: 0
-    cursor: pointer
-    overflow: hidden
-    height: 18px
-    width: 18px
-    text-indent: -9999em
-    background: transparent url(/images/messages/address-book-icon-sprite.png) 0 0 no-repeat
-  a.browser:hover
-    background-position: 0 -18px
-  > span
-    float: left
-    color: #888
-    margin: 2px 1px 0
-  > div
-    overflow: auto
-    max-height: 90px
-  &.browsable > div
-    padding-right: 20px
-  ul
-    list-style: none
-    margin: 0
-    padding: 0
-  li
-    +name_bubbles
-  li.selected
-    background-color: #5b89f3
-    border-color: #5b89f3
-    color: #fff
-    a
-      background-position: -10px center
-  li.details
-    div
-      padding: 0 11px
-    span
-      padding: 0 15px 0 4px
-  input
-    -webkit-box-shadow: none
-    -moz-box-shadow: none
-    box-shadow: none
-    float: left
-    border: 0
-    outline: none
-    padding: 0
-    margin: 1px 0
-.token_input.browse
-  a.browser
-    background-position: 0 -36px
-
-.token_input.active
-  box-shadow: #68B4DF 0 0 3px 2px
 
 #user_sections
   list-style: none
@@ -439,3 +220,28 @@ h3 .tally
 
 #right-side table.summary
   margin-top: 20px
+
+#course_form table.coursesettings
+  th
+    text-align: left
+    vertical-align: top
+    padding-top: 3px
+    width: 10%
+  .aside
+    font-size: 0.9em
+  .checklabelfix
+    vertical-align: -4px
+  .license_help_link img, #course_locale, #course_default_wiki_editing_roles 
+    vertical-align: baseline
+  #course_locale
+    width: 360px
+  .palign
+    line-height: 100%
+    margin-bottom: 10px
+  select#course_locale + span
+    white-space: nowrap
+
+#course_form.editing table.coursesettings
+  th
+    vertical-align: top
+    padding-top: 5px

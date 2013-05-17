@@ -22,7 +22,8 @@ class MediaObject < ActiveRecord::Base
   belongs_to :context, :polymorphic => true
   belongs_to :attachment
   belongs_to :root_account, :class_name => 'Account'
-  validates_presence_of :media_id, :context_id, :context_type
+  validates_presence_of :media_id
+  has_many :media_tracks, :dependent => :destroy, :order => 'locale'
   after_create :retrieve_details_later
   after_save :update_title_on_kaltura_later
   serialize :data
@@ -35,17 +36,23 @@ class MediaObject < ActiveRecord::Base
     @push_user_title = true
     write_attribute(:user_entered_title, val)
   end
-  
+
   def update_title_on_kaltura_later
     send_later(:update_title_on_kaltura) if @push_user_title
     @push_user_title = nil
   end
-  
+
   def self.find_by_media_id(media_id)
     unless Rails.env.production?
       raise "Do not look up MediaObjects by media_id - use the scope by_media_id instead to support migrated content."
     end
     super
+  end
+
+
+  set_policy do
+    given { |user| self.user && (self.user == user || (self.context && self.context.grants_right?(user, nil, :manage_content))) }
+    can :add_captions and can :delete_captions
   end
 
   # if wait_for_completion is true, this will wait SYNCHRONOUSLY for the bulk
@@ -86,7 +93,7 @@ class MediaObject < ActiveRecord::Base
     end
     res
   end
-  
+
   def self.bulk_migration(csv, root_account_id)
     client = Kaltura::ClientV3.new
     client.startSession(Kaltura::SessionType::ADMIN)
@@ -98,7 +105,7 @@ class MediaObject < ActiveRecord::Base
     end
     res
   end
-  
+
   def self.migration_csv(media_objects)
     FasterCSV.generate do |csv|
       media_objects.each do |mo|
@@ -148,7 +155,7 @@ class MediaObject < ActiveRecord::Base
         MediaObject.send_later_enqueue_args(:refresh_media_files, {:run_at => wait_period.minutes.from_now, :priority => Delayed::LOW_PRIORITY}, bulk_upload_id, attachment_ids, root_account_id, attempt + 1)
       else
         # if it fails, then the attachment should no longer consider itself kalturable
-        Attachment.update_all({:media_entry_id => nil}, "id IN (#{attachment_ids.join(",")}) OR root_attachment_id IN (#{attachment_ids.join(",")})") unless attachment_ids.empty?
+        Attachment.where("id IN (?) OR root_attachment_id IN (?)", attachment_ids, attachment_ids).update_all(:media_entry_id => nil) unless attachment_ids.empty?
       end
       res
     else
@@ -186,9 +193,13 @@ class MediaObject < ActiveRecord::Base
     end
     res
   end
-  
+
   def retrieve_details_later
     send_later(:retrieve_details_ensure_codecs)
+  end
+
+  def media_sources
+    Kaltura::ClientV3.new.media_sources(self.media_id)
   end
   
   def retrieve_details_ensure_codecs(attempt=0)
@@ -204,11 +215,11 @@ class MediaObject < ActiveRecord::Base
       end
     end
   end
-  
+
   def name
     self.title
   end
-  
+
   def retrieve_details
     return unless self.media_id
     # From Kaltura, retrieve the title (if it's not already set)
@@ -241,7 +252,7 @@ class MediaObject < ActiveRecord::Base
     self.save
     self.data
   end
-  
+
   def podcast_format_details
     data = self.data && self.data[:extensions] && self.data[:extensions][:mp3]
     data ||= self.data && self.data[:extensions] && self.data[:extensions][:mp4]
@@ -252,7 +263,7 @@ class MediaObject < ActiveRecord::Base
     end
     data
   end
-  
+
   def delete_from_remote
     return unless self.media_id
 
@@ -260,14 +271,14 @@ class MediaObject < ActiveRecord::Base
     client.startSession(Kaltura::SessionType::ADMIN)
     client.mediaDelete(self.media_id)
   end
-  
+
   alias_method :destroy!, :destroy
   def destroy
     self.workflow_state = 'deleted'
     self.attachment.destroy if self.attachment
     save!
   end
-  
+
   def data
     self.read_attribute(:data) || self.write_attribute(:data, {})
   end
@@ -276,30 +287,24 @@ class MediaObject < ActiveRecord::Base
     send_later(:updated_viewed_at_and_retrieve_details, Time.now) if !self.data[:last_viewed_at] || self.data[:last_viewed_at] > 1.hour.ago
     true
   end
-    
+
   def updated_viewed_at_and_retrieve_details(time)
     self.data[:last_viewed_at] = [time, self.data[:last_viewed_at]].compact.max
     self.retrieve_details
   end
-  
+
   def destroy_without_destroying_attachment
     self.workflow_state = 'deleted'
     self.attachment_id = nil
     save!
   end
-  
-  named_scope :active, lambda{
-    {:conditions => ['media_objects.workflow_state != ?', 'deleted'] }
-  }
-  
-  named_scope :by_media_id, lambda { |media_id|
-    { :conditions => [ 'media_objects.media_id = ? OR media_objects.old_media_id = ?', media_id, media_id ] }
-  }
-  
-  named_scope :by_media_type, lambda { |media_type|
-    { :conditions => [ 'media_objects.media_type = ?', media_type ]}
-  }
-  
+
+  scope :active, where("media_objects.workflow_state<>'deleted'")
+
+  scope :by_media_id, lambda { |media_id| where("media_objects.media_id=? OR media_objects.old_media_id=?", media_id, media_id) }
+
+  scope :by_media_type, lambda { |media_type| where(:media_type => media_type) }
+
   workflow do
     state :active
     state :deleted

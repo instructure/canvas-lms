@@ -1,7 +1,7 @@
 class SubmissionPointsPossibleFixData < ActiveRecord::Migration
   def self.up
-    case adapter_name
-      when 'MySQL'
+    case connection.adapter_name
+      when 'MySQL', 'Mysql2'
         execute <<-SQL
           UPDATE quiz_submissions, quizzes
           SET quiz_points_possible = points_possible

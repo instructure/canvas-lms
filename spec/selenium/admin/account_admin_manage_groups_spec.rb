@@ -1,9 +1,8 @@
-require File.expand_path(File.dirname(__FILE__) + '/../common')
 require File.expand_path(File.dirname(__FILE__) + '/../helpers/manage_groups_common')
 require 'thread'
 
 describe "account admin manage groups" do
-  it_should_behave_like "manage groups selenium tests"
+  it_should_behave_like "in-process server selenium tests"
 
   def add_account_category (account, name)
     driver.find_element(:css, ".add_category_link").click
@@ -131,6 +130,7 @@ describe "account admin manage groups" do
     it "should add multiple groups and be sure they are all deleted" do
       add_groups_in_category @courses_group_category
       get "/accounts/#{@admin_account.id}/groups"
+      make_full_screen
       delete = driver.find_element(:css, ".delete_category_link")
       delete.click
       confirm_dialog = driver.switch_to.alert
@@ -143,13 +143,16 @@ describe "account admin manage groups" do
     it "should edit an individual group" do
       get "/accounts/#{@admin_account.id}/groups"
       group = add_group_to_category @courses_group_category, "group 1"
+      group.should_not be_nil
       driver.find_element(:id, "group_#{group.id}").click
+      wait_for_ajaximations
       driver.find_element(:css, "#group_#{group.id} .edit_group_link").click
+      wait_for_ajaximations
       name = "new group 1"
       driver.find_element(:css, "#group_name").send_keys(name)
-      driver.find_element(:css, "#group_#{group.id} .button").click
+      driver.find_element(:css, "#group_#{group.id} .btn").click
       wait_for_ajaximations
-      new_group = @admin_account.groups.find_by_name(name)
+      group = @admin_account.groups.find_by_name(name)
       group.should_not be_nil
     end
 
@@ -201,12 +204,17 @@ describe "account admin manage groups" do
       unassigned_div = driver.find_element(:css, "#category_#{@courses_group_category.id} .group_blank")
       simulate_group_drag(student.id, groups[1].id, "blank")
       unassigned_div.find_elements(:css, ".user_id_#{student.id}").should_not be_empty
+      get "/accounts/#{@admin_account.id}/groups"
+      unassigned_div = driver.find_element(:css, "#category_#{@courses_group_category.id} .group_blank")
+      unassigned_div.find_elements(:css, ".user_id_#{student.id}").should_not be_empty
     end
 
     it "should create a category and should be able to edit it" do
       get "/accounts/#{@admin_account.id}/groups"
       @admin_account.group_categories.last.name.should == "Existing Category"
-      driver.find_element(:css, "#category_#{@courses_group_category.id} .edit_category_link").click
+      make_full_screen
+      driver.find_element(:css, "#category_#{@courses_group_category.id} .edit_category_link .icon-edit").click
+      wait_for_ajaximations
       form = driver.find_element(:id, "edit_category_form")
       input_box = form.find_element(:css, "input[type=text]")
       category_name = "New Category"
@@ -219,9 +227,12 @@ describe "account admin manage groups" do
     it "should create a category and should be able to check the Allow self sign-up box" do
       get "/accounts/#{@admin_account.id}/groups"
       @admin_account.group_categories.last.name.should == "Existing Category"
-      driver.find_element(:css, "#category_#{@courses_group_category.id} .edit_category_link").click
+      make_full_screen
+      driver.find_element(:css, "#category_#{@courses_group_category.id} .edit_category_link .icon-edit").click
+      wait_for_ajaximations
       form = driver.find_element(:id, "edit_category_form")
       form.find_element(:id, "category_enable_self_signup").click
+      wait_for_ajaximations
       is_checked('#category_enable_self_signup').should be_true
       submit_form(form)
       wait_for_ajaximations
@@ -231,11 +242,15 @@ describe "account admin manage groups" do
     it "should create a category and should be able to check the Allow self sign-up box and the Require group members to be in the same section" do
       get "/accounts/#{@admin_account.id}/groups"
       @admin_account.group_categories.last.name.should == "Existing Category"
-      driver.find_element(:css, "#category_#{@courses_group_category.id} .edit_category_link").click
+      make_full_screen
+      driver.find_element(:css, "#category_#{@courses_group_category.id} .edit_category_link .icon-edit").click
+      wait_for_ajaximations
       form = driver.find_element(:id, "edit_category_form")
       form.find_element(:id, "category_enable_self_signup").click
+      wait_for_ajaximations
       is_checked('#category_enable_self_signup').should be_true
       form.find_element(:id, "category_restrict_self_signup").click
+      wait_for_ajaximations
       is_checked('#category_restrict_self_signup').should be_true
       submit_form(form)
       wait_for_ajaximations
@@ -246,9 +261,12 @@ describe "account admin manage groups" do
     it "should click on  the self signup help link " do
       get "/accounts/#{@admin_account.id}/groups"
       @admin_account.group_categories.last.name.should include "Existing Category"
-      driver.find_element(:css, "#category_#{@courses_group_category.id} .edit_category_link").click
+      make_full_screen
+      driver.find_element(:css, "#category_#{@courses_group_category.id} .edit_category_link .icon-edit").click
+      wait_for_ajaximations
       form = driver.find_element(:id, "edit_category_form")
       form.find_element(:css, ".self_signup_help_link").click
+      wait_for_ajaximations
       driver.find_element(:id, "self_signup_help_dialog").should be_displayed
     end
   end

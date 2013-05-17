@@ -23,6 +23,9 @@ describe 'new_announcement.facebook' do
   it "should render" do
     announcement_model
     @object = @a
-    generate_message(:new_announcement, :facebook, @object)
+    @message = generate_message(:new_announcement, :facebook, @object)
+    @message.subject.should == "Canvas Alert"
+    @message.url.should match(/\/courses\/\d+\/announcements\/\d+/)
+    @message.body.should match(/\/courses\/\d+\/announcements\/\d+/)
   end
 end

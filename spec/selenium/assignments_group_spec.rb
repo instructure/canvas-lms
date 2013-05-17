@@ -4,7 +4,7 @@ describe "assignment groups" do
   it_should_behave_like "in-process server selenium tests"
 
   def get_assignment_groups
-    driver.find_elements(:css, '#groups .assignment_group')
+    ff('#groups .assignment_group')
   end
 
   before (:each) do
@@ -15,12 +15,12 @@ describe "assignment groups" do
     get "/courses/#{@course.id}/assignments"
 
     wait_for_animations
-    driver.find_element(:css, '#right-side .add_group_link').click
-    driver.find_element(:id, 'assignment_group_name').send_keys('test group')
+    f('#right-side .add_group_link').click
+    f('#assignment_group_name').send_keys('test group')
     submit_form('#add_group_form')
     wait_for_animations
-    driver.find_element(:id, 'add_group_form').should_not be_displayed
-    driver.find_element(:css, '#groups .assignment_group').should include_text('test group')
+    f('#add_group_form').should_not be_displayed
+    f('#groups .assignment_group').should include_text('test group')
   end
 
 
@@ -30,44 +30,45 @@ describe "assignment groups" do
     get "/courses/#{@course.id}/assignments"
 
     #edit group grading rules
-    driver.find_element(:css, '.edit_group_link img').click
+    driver.execute_script %{$('.edit_group_link:first').addClass('focus');}
+    f('.edit_group_link').click
     #set number of lowest scores to drop
-    driver.find_element(:css, '.add_rule_link').click
-    driver.find_element(:css, 'input.drop_count').send_keys('2')
+    f('.add_rule_link').click
+    f('input.drop_count').send_keys('2')
     #set number of highest scores to drop
-    driver.find_element(:css, '.add_rule_link').click
+    f('.add_rule_link').click
     click_option('.form_rules div:nth-child(2) select', 'Drop the Highest')
-    driver.find_element(:css, '.form_rules div:nth-child(2) input').send_keys('3')
+    f('.form_rules div:nth-child(2) input').send_keys('3')
     #set assignment to never drop
-    driver.find_element(:css, '.add_rule_link').click
+    f('.add_rule_link').click
     never_drop_css = '.form_rules div:nth-child(3) select'
     click_option(never_drop_css, 'Never Drop')
     wait_for_animations
     assignment_css = '.form_rules div:nth-child(3) .never_drop_assignment select'
-    keep_trying_until { driver.find_element(:css, assignment_css).displayed? }
+    keep_trying_until { f(assignment_css).displayed? }
     click_option(assignment_css, assignment.title)
     #delete second grading rule and save
-    driver.find_element(:css, '.form_rules div:nth-child(2) a img').click
+    f('.form_rules div:nth-child(2) a').click
     submit_form('#add_group_form')
 
     #verify grading rules
-    driver.find_element(:css, '.more_info_link').click
-    driver.find_element(:css, '.assignment_group .rule_details').should include_text('2')
-    driver.find_element(:css, '.assignment_group .rule_details').should include_text('assignment with rubric')
+    f('.more_info_link').click
+    f('.assignment_group .rule_details').should include_text('2')
+    f('.assignment_group .rule_details').should include_text('assignment with rubric')
   end
 
-  it "should edit assignment group's grade weights" do
+  it "should edit assignment groups grade weights" do
     @course.assignment_groups.create!(:name => "first group")
     @course.assignment_groups.create!(:name => "second group")
     get "/courses/#{@course.id}/assignments"
 
-    driver.find_element(:id, 'class_weighting_policy').click
+    f('#class_weighting_policy').click
     #wanted to change number but can only use clear because of the auto insert of 0 after clearing
     # the input
-    driver.find_element(:css, 'input.weight').clear
+    f('input.weight').clear
     #need to wait for the total to update
     wait_for_animations
-    keep_trying_until { find_with_jquery('#group_weight_total').text.should == '50%' }
+    keep_trying_until { fj('#group_weight_total').text.should == '50%' }
   end
 
   it "should reorder assignment groups with drag and drop" do
@@ -75,19 +76,20 @@ describe "assignment groups" do
     4.times do |i|
       ags << @course.assignment_groups.create!(:name => "group_#{i}")
     end
-    ags.collect(&:position).should eql([1,2,3,4])
+    ags.collect(&:position).should == [1,2,3,4]
 
     get "/courses/#{@course.id}/assignments"
 
+    driver.execute_script %{$('.group_move_icon').addClass('focus');}
     second_group = fj("#group_#{ags[1].id} .group_move_icon")
     third_group = fj("#group_#{ags[2].id} .group_move_icon")
     driver.action.drag_and_drop(third_group, second_group).perform
     wait_for_ajaximations
-    
+
     ags.each {|ag| ag.reload}
-    ags.collect(&:position).should eql([1,3,2,4])
+    ags.collect(&:position).should == [1,3,2,4]
   end
-  
+
   it "should round assignment groups percentages to 2 decimal places" do
     pending("bug 7387 - Assignment group weight should be rounded to 2 decimal places. Not 10") do
       3.times do |i|
@@ -95,13 +97,13 @@ describe "assignment groups" do
       end
       get "/courses/#{@course.id}/assignments"
 
-      driver.find_element(:id, 'class_weighting_policy').click
+      f('#class_weighting_policy').click
       wait_for_ajaximations
-      group_weights = driver.find_elements(:css, '.assignment_group .more_info_brief')
+      group_weights = ff('.assignment_group .more_info_brief')
       group_weights.each_with_index do |gw, i|
         gw.text.should == "33.33%"
       end
-      driver.find_element(:id, 'group_weight_total').text.should == "99.99%"
+      f('#group_weight_total').text.should == "99.99%"
     end
   end
 

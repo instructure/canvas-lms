@@ -12,7 +12,7 @@ describe FilesController do
     end
 
     it "with safefiles" do
-      HostUrl.stubs(:file_host).returns('files-test.host')
+      HostUrl.stubs(:file_host_with_shard).returns(['files-test.host', Shard.default])
       get "http://test.host/files/#{@submission.attachment.id}/download", :inline => '1', :verifier => @submission.attachment.uuid
       response.should be_redirect
       uri = URI.parse response['Location']
@@ -32,7 +32,7 @@ describe FilesController do
     end
 
     it "without safefiles" do
-      HostUrl.stubs(:file_host).returns('test.host')
+      HostUrl.stubs(:file_host_with_shard).returns(['test.host', Shard.default])
       get "http://test.host/files/#{@submission.attachment.id}/download", :inline => '1', :verifier => @submission.attachment.uuid
       response.should be_success
       response.content_type.should == 'image/png'
@@ -50,7 +50,7 @@ describe FilesController do
     end
 
     it "with safefiles" do
-      HostUrl.stubs(:file_host).returns('files-test.host')
+      HostUrl.stubs(:file_host_with_shard).returns(['files-test.host', Shard.default])
       get "http://test.host/users/#{@me.id}/files/#{@att.id}/download"
       response.should be_redirect
       uri = URI.parse response['Location']
@@ -84,7 +84,7 @@ describe FilesController do
       end
 
       it "with safefiles" do
-        HostUrl.stubs(:file_host).returns('files-test.host')
+        HostUrl.stubs(:file_host_with_shard).returns(['files-test.host', Shard.default])
         get "http://test.host/users/#{@me.id}/files/#{@att.id}/download", :wrap => '1'
         response.should be_redirect
         uri = URI.parse response['Location']
@@ -102,7 +102,7 @@ describe FilesController do
       end
 
       it "without safefiles" do
-        HostUrl.stubs(:file_host).returns('test.host')
+        HostUrl.stubs(:file_host_with_shard).returns(['test.host', Shard.default])
         get "http://test.host/users/#{@me.id}/files/#{@att.id}/download", :wrap => '1'
         response.should be_redirect
         location = response['Location']
@@ -114,7 +114,7 @@ describe FilesController do
       end
 
       it "should not inline the file if passed download_frd param" do
-        HostUrl.stubs(:file_host).returns('files-test.host')
+        HostUrl.stubs(:file_host_with_shard).returns(['files-test.host', Shard.default])
         get "http://test.host/users/#{@me.id}/files/#{@att.id}/download?download_frd=1&verifier=#{@att.uuid}"
         response.should be_redirect
         get response['Location']
@@ -128,7 +128,7 @@ describe FilesController do
     course_with_teacher(:active_all => true, :user => user_with_pseudonym)
     login_as
     a1 = attachment_model(:uploaded_data => stub_png_data, :content_type => 'image/png', :context => @course)
-    HostUrl.stubs(:file_host).returns('files-test.host')
+    HostUrl.stubs(:file_host_with_shard).returns(['files-test.host', Shard.default])
     get "http://test.host/courses/#{@course.id}/files/#{a1.id}/download", :inline => '1'
     response.should be_redirect
     uri = URI.parse response['Location']
@@ -146,9 +146,53 @@ describe FilesController do
     # ensure that the user wasn't logged in by the normal means
     controller.instance_variable_get(:@current_user).should be_nil
   end
+  
+  it "should be able to use verifier in course context" do
+    course_with_teacher(:active_all => true, :user => user_with_pseudonym)
+    a1 = attachment_model(:uploaded_data => stub_png_data, :content_type => 'image/png', :context => @course)
+    HostUrl.stubs(:file_host_with_shard).returns(['files-test.host', Shard.default])
+    get "http://test.host/courses/#{@course.id}/files/#{a1.id}/download?verifier=#{a1.uuid}"
+    response.should be_redirect
+
+    uri = URI.parse response['Location']
+    qs = Rack::Utils.parse_nested_query(uri.query)
+    uri.host.should == 'files-test.host'
+    uri.path.should == "/courses/#{@course.id}/files/#{a1.id}/course%20files/test%20my%20file%3F%20hai!%26.png"
+    qs['verifier'].should == a1.uuid
+    location = response['Location']
+    reset!
+
+    get location
+    response.should be_success
+    response.content_type.should == 'image/png'
+    # ensure that the user wasn't logged in by the normal means
+    controller.instance_variable_get(:@current_user).should be_nil
+  end
+
+  it "should be able to directly download in course context preview links with verifier" do
+    course_with_teacher(:active_all => true, :user => user_with_pseudonym)
+    a1 = attachment_model(:uploaded_data => stub_png_data, :content_type => 'image/png', :context => @course)
+    HostUrl.stubs(:file_host_with_shard).returns(['files-test.host', Shard.default])
+    get "http://test.host/courses/#{@course.id}/files/#{a1.id}/preview?verifier=#{a1.uuid}"
+    response.should be_redirect
+
+    uri = URI.parse response['Location']
+    qs = Rack::Utils.parse_nested_query(uri.query)
+    uri.host.should == 'files-test.host'
+    uri.path.should == "/courses/#{@course.id}/files/#{a1.id}/course%20files/test%20my%20file%3F%20hai!%26.png"
+    qs['verifier'].should == a1.uuid
+    location = response['Location']
+    reset!
+
+    get location
+    response.should be_success
+    response.content_type.should == 'image/png'
+    # ensure that the user wasn't logged in by the normal means
+    controller.instance_variable_get(:@current_user).should be_nil
+  end
 
   it "should update module progressions for html safefiles iframe" do
-    HostUrl.stubs(:file_host).returns('files-test.host')
+    HostUrl.stubs(:file_host_with_shard).returns(['files-test.host', Shard.default])
     course_with_student(:active_all => true, :user => user_with_pseudonym)
     login_as
     @att = @course.attachments.create(:uploaded_data => stub_file_data("ohai.html", "<html><body>ohai</body></html>", "text/html"))
@@ -185,7 +229,7 @@ describe FilesController do
     end
 
     def do_with_safefiles_test(url)
-      HostUrl.stubs(:file_host).returns('files-test.host')
+      HostUrl.stubs(:file_host_with_shard).returns(['files-test.host', Shard.default])
       get url
       response.should be_redirect
       uri = URI.parse response['Location']
@@ -238,7 +282,7 @@ describe FilesController do
     submission_model
     @submission.attachment = attachment_model(:uploaded_data => stub_png_data, :content_type => 'image/png')
     @submission.save!
-    HostUrl.stubs(:file_host).returns('files-test.host')
+    HostUrl.stubs(:file_host_with_shard).returns(['files-test.host', Shard.default])
     get "http://test.host/users/#{@submission.user.id}/files/#{@submission.attachment.id}/download", :verifier => @submission.attachment.uuid
     
     response.should be_redirect

@@ -1,6 +1,5 @@
 require [
-  'ENV'
   'compiled/gradebook2/Gradebook'
-], (ENV, Gradebook) ->
+], (Gradebook) ->
   new Gradebook(ENV.GRADEBOOK_OPTIONS)
 

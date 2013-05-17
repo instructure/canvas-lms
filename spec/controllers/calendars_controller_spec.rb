@@ -24,6 +24,13 @@ describe CalendarsController do
     @event = @course.calendar_events.create(:title => "some assignment", :start_at => date, :end_at => date)
   end
 
+  def calendar2_only!
+    Account.default.update_attribute :settings, {
+      :enable_scheduler => true,
+      :calendar2_only => true
+    }
+  end
+
   describe "GET 'show'" do
     it "should redirect if no contexts are found" do
       course_with_student(:active_all => true)
@@ -77,6 +84,21 @@ describe CalendarsController do
       get 'show', :month => "02", :year => "2008"
       response.should be_success
     end
+
+    it "should redirect if the user should be on the new calendar" do
+      calendar2_only!
+      course_with_student_logged_in(:active_all => true)
+      Account.default.update_attribute :settings, {
+        :enable_scheduler => true,
+        :calendar2_only => true
+      }
+      @user.preferences[:use_calendar1] = true
+      @user.save!
+      get 'show'
+
+      response.should be_redirect
+      response.redirected_to.should == {:action => 'show2', :anchor => ' '}
+    end
   end
 
   describe "GET 'show2'" do
@@ -100,54 +122,6 @@ describe CalendarsController do
     end
   end
 
-  describe "GET 'public_feed'" do
-    before(:each) do
-      course_with_student(:active_all => true)
-      course_event
-      @course.is_public = true
-      @course.save!
-      @course.assignments.create!(:title => "some assignment")
-    end
-
-    it "should assign variables" do
-      get 'public_feed', :feed_code => "course_#{@course.uuid}"
-      response.should be_success
-      assigns[:events].should_not be_nil
-      assigns[:events].should_not be_empty
-      assigns[:events][0].should eql(@event)
-    end
-
-    it "should assign variables" do
-      e = @user.calendar_events.create(:title => "my event")
-      get 'public_feed', :feed_code => "user_#{@user.uuid}"
-      response.should be_success
-      assigns[:events].should_not be_nil
-      assigns[:events].should_not be_empty
-      assigns[:events].should be_include(e)
-    end
-
-    it "should require authorization" do
-      get 'public_feed', :format => 'atom', :feed_code => @user.feed_code + 'x'
-      assigns[:problem].should eql("The verification code is invalid.")
-    end
-
-    it "should include absolute path for rel='self' link" do
-      get 'public_feed', :format => 'atom', :feed_code => @user.feed_code
-      feed = Atom::Feed.load_feed(response.body) rescue nil
-      feed.should_not be_nil
-      feed.links.first.rel.should match(/self/)
-      feed.links.first.href.should match(/http:\/\//)
-    end
-
-    it "should include an author for each entry" do
-      get 'public_feed', :format => 'atom', :feed_code => @user.feed_code
-      feed = Atom::Feed.load_feed(response.body) rescue nil
-      feed.should_not be_nil
-      feed.entries.should_not be_empty
-      feed.entries.all?{|e| e.authors.present?}.should be_true
-    end
-  end
-
   describe "POST 'switch_calendar'" do
     it "should switch to the old calendar" do
       Account.default.update_attribute(:settings, {:enable_scheduler => true})
@@ -157,6 +131,18 @@ describe CalendarsController do
       post 'switch_calendar', {:preferred_calendar => '1'}
       response.should be_redirect
       response.redirected_to.should == {:action => 'show', :anchor => ' '}
+      @user.reload.preferences[:use_calendar1].should be_true
+    end
+
+    it "should not switch to the old calendar if not allowed" do
+      calendar2_only!
+      course_with_student_logged_in(:active_all => true)
+      @user.preferences[:use_calendar1].should be_nil
+      post 'switch_calendar', {:preferred_calendar => '1'}
+      response.redirected_to.should == {:action => 'show2', :anchor => ' '}
+
+      # not messing with their preference in case they prefer cal1 in a
+      # different account
       @user.reload.preferences[:use_calendar1].should be_true
     end
 
@@ -179,6 +165,71 @@ describe CalendarsController do
       response.should be_redirect
       response.redirected_to.should == {:action => 'show2', :anchor => ' '}
       @user.reload.preferences[:use_calendar1].should be_nil
+    end
+  end
+end
+
+describe CalendarEventsApiController do
+  def course_event(date=Time.now)
+    @event = @course.calendar_events.create(:title => "some assignment", :start_at => date, :end_at => date)
+  end
+
+  describe "GET 'public_feed'" do
+    before(:each) do
+      course_with_student(:active_all => true)
+      course_event
+      @course.is_public = true
+      @course.save!
+      @course.assignments.create!(:title => "some assignment")
+    end
+
+    it "should assign variables" do
+      get 'public_feed', :feed_code => "course_#{@course.uuid}"
+      response.should be_success
+      assigns[:events].should be_present
+      assigns[:events][0].should eql(@event)
+    end
+
+    it "should use the relevant event for that section" do
+      s2 = @course.course_sections.create!(:name => 's2')
+      c1 = factory_with_protected_attributes(@event.child_events, :description => @event.description, :title => @event.title, :context => @course.default_section, :start_at => 2.hours.ago, :end_at => 1.hour.ago)
+      c2 = factory_with_protected_attributes(@event.child_events, :description => @event.description, :title => @event.title, :context => s2, :start_at => 3.hours.ago, :end_at => 2.hours.ago)
+      get 'public_feed', :feed_code => "user_#{@user.uuid}"
+      response.should be_success
+      assigns[:events].should be_present
+      assigns[:events].should == [c1]
+    end
+
+    it "should use the relevant event for that section, in the course feed" do
+      pending "requires changing the format of the course feed url to include user information"
+      s2 = @course.course_sections.create!(:name => 's2')
+      c1 = factory_with_protected_attributes(@event.child_events, :description => @event.description, :title => @event.title, :context => @course.default_section, :start_at => 2.hours.ago, :end_at => 1.hour.ago)
+      c2 = factory_with_protected_attributes(@event.child_events, :description => @event.description, :title => @event.title, :context => s2, :start_at => 3.hours.ago, :end_at => 2.hours.ago)
+      get 'public_feed', :feed_code => "course_#{@course.uuid}"
+      response.should be_success
+      assigns[:events].should be_present
+      assigns[:events].should == [c1]
+    end
+
+    it "should require authorization" do
+      get 'public_feed', :format => 'atom', :feed_code => @user.feed_code + 'x'
+      response.should render_template('shared/unauthorized_feed')
+    end
+
+    it "should include absolute path for rel='self' link" do
+      get 'public_feed', :format => 'atom', :feed_code => @user.feed_code
+      feed = Atom::Feed.load_feed(response.body) rescue nil
+      feed.should_not be_nil
+      feed.links.first.rel.should match(/self/)
+      feed.links.first.href.should match(/http:\/\//)
+    end
+
+    it "should include an author for each entry" do
+      get 'public_feed', :format => 'atom', :feed_code => @user.feed_code
+      feed = Atom::Feed.load_feed(response.body) rescue nil
+      feed.should_not be_nil
+      feed.entries.should_not be_empty
+      feed.entries.all?{|e| e.authors.present?}.should be_true
     end
   end
 end

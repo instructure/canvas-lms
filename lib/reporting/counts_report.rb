@@ -42,7 +42,7 @@ class CountsReport
   def process
     start_time = Time.now
 
-    ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
+    Shackles.activate(:slave) do
       Shard.with_each_shard do
         Account.root_accounts.active.each do |account|
           next if account.external_status == 'test'
@@ -57,17 +57,33 @@ class CountsReport
           data[:last_activity] = activity
 
           course_ids = get_course_ids(account)
-
           data[:courses] = course_ids.length
-          data[:teachers] = course_ids.length == 0 ? 0 : Enrollment.count(:user_id, :distinct => true, :conditions => { :course_id => course_ids, :type => 'TeacherEnrollment' })
-          data[:students] = course_ids.length == 0 ? 0 : Enrollment.count(:user_id, :distinct => true, :conditions => { :course_id => course_ids, :type => 'StudentEnrollment' })
-          data[:users] = course_ids.length == 0 ? 0 : Enrollment.count(:user_id, :distinct => true, :conditions => ["course_id IN (?) AND type <> ?", course_ids, 'StudentViewEnrollment'])
-          # ActiveRecord::Base.calculate doesn't support multiple calculations in account single pass
-          data[:files], data[:files_size] = course_ids.length == 0 ? [0, 0] : Attachment.connection.select_rows("SELECT COUNT(id), SUM(size) FROM #{Attachment.table_name} WHERE namespace='account_%s' AND root_attachment_id IS NULL AND file_state != 'deleted'" % [account.id]).first.map(&:to_i)
-          data[:media_files], data[:media_files_size] = course_ids.length == [0, 0] ? 0 : MediaObject.connection.select_rows("SELECT COUNT(id), SUM(total_size) FROM #{MediaObject.table_name} WHERE root_account_id='%s' AND attachment_id IS NULL AND workflow_state != 'deleted'" % [account.id]).first.map(&:to_i)
-          data[:media_files_size] *= 1000
 
-          ActiveRecord::Base::ConnectionSpecification.with_environment(nil) do
+          if data[:courses] == 0
+            data[:teachers] = 0
+            data[:students] = 0
+            data[:users] = 0
+            data[:files] = 0
+            data[:files_size] = 0
+            data[:media_files] = 0
+            data[:media_files_size] = 0
+          else
+            timespan = Setting.get('recently_logged_in_timespan', 30.days.to_s).to_i.seconds
+            enrollment_scope = Enrollment.active.not_fake.
+              joins(:user => :active_pseudonyms).
+              where("course_id IN (?) AND pseudonyms.last_request_at>?", course_ids, timespan.ago)
+
+            data[:teachers] = enrollment_scope.where(:type => 'TeacherEnrollment').count(:user_id, :distinct => true)
+            data[:students] = enrollment_scope.where(:type => 'StudentEnrollment').count(:user_id, :distinct => true)
+            data[:users] = enrollment_scope.count(:user_id, :distinct => true)
+
+            # ActiveRecord::Base.calculate doesn't support multiple calculations in account single pass
+            data[:files], data[:files_size] = Attachment.connection.select_rows("SELECT COUNT(id), SUM(size) FROM #{Attachment.table_name} WHERE namespace='account_%s' AND root_attachment_id IS NULL AND file_state != 'deleted'" % [account.id]).first.map(&:to_i)
+            data[:media_files], data[:media_files_size] = MediaObject.connection.select_rows("SELECT COUNT(id), SUM(total_size) FROM #{MediaObject.table_name} WHERE root_account_id='%s' AND attachment_id IS NULL AND workflow_state != 'deleted'" % [account.id]).first.map(&:to_i)
+            data[:media_files_size] *= 1000
+          end
+
+          Shackles.activate(:master) do
             detailed = account.report_snapshots.detailed.build
             detailed.created_at = @yesterday
             detailed.data = data
@@ -197,13 +213,13 @@ class CountsReport
   end
 
   def self.last_activity(account_id)
-    PageView.maximum(:created_at, :conditions => { :account_id => account_id })
+    PageView.where(:account_id => account_id).maximum(:created_at)
   end
 
   def get_course_ids(account)
     is_default_account = account.external_status == ExternalStatuses.default_external_status.to_s
     course_ids = []
-    account.all_courses.scoped(:conditions => { :workflow_state => 'available' }, :select => 'id, updated_at').find_in_batches do |batch|
+    account.all_courses.where(:workflow_state => 'available').select([:id, :updated_at]).find_in_batches do |batch|
       course_ids.concat batch.select { |course| !is_default_account || should_use_default_account_course(course) }.map(&:id)
     end
     course_ids

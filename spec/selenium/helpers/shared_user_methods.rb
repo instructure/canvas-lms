@@ -21,10 +21,10 @@ def add_user (opts={})
   f("#pseudonym_unique_id").send_keys email
   submit_form("#add_user_form")
   wait_for_ajax_requests
-  user = User.first(:conditions => {:name => name})
+  user = User.where(:name => name).first
   user.should be_present
-  user.sortable_name.should eql sortable_name
-  user.short_name.should eql short_name
-  user.email.should eql email
+  user.sortable_name.should == sortable_name
+  user.short_name.should == short_name
+  user.email.should == email
   user
 end

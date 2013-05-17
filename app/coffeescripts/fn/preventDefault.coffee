@@ -5,5 +5,5 @@
 define ->
   preventDefault = (fn) ->
     (event) ->
-      event.preventDefault()
+      event?.preventDefault()
       fn.apply(this, arguments)

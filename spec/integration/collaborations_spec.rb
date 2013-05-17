@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011-2012 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -38,28 +38,5 @@ describe CollaborationsController, :type => :integration do
     link = links.first
     link.attr("href").should == "/courses/#{@course.id}/users/#{@teacher.id}"
     link.text.should == "teacher 1"
-  end
-
-  it "shouldn't show concluded users" do
-    PluginSetting.create!(:name => 'etherpad', :settings => {})
-    course_with_teacher_logged_in(:active_all => true, :user => user_with_pseudonym(:username => "teacher@example.com"))
-    @teacher = @user
-    @teacher.register!
-    @enroll1 = student_in_course(:active_all => true, :course => @course, :user => user_with_pseudonym(:username => "student1@example.com"))
-    @student1 = @enroll1.user
-    @student1.register!
-    @enroll2 = student_in_course(:active_all => true, :course => @course, :user => user_with_pseudonym(:username => "student2@example.com"))
-    @student2 = @enroll2.user
-    @student2.register!
-
-    @enroll1.attributes['workflow_state'].should == 'active'
-    @enroll2.attributes['workflow_state'].should == 'active'
-    @enroll2.update_attributes('workflow_state' => 'completed')
-    @enroll2.attributes['workflow_state'].should == 'completed'
-
-    get "/courses/#{@course.id}/collaborations"
-    assigns['users'].member?(@teacher).should be_false
-    assigns['users'].member?(@student1).should be_true
-    assigns['users'].member?(@student2).should be_false
   end
 end

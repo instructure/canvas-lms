@@ -22,11 +22,12 @@ define([
   'jquery' /* $ */,
   'underscore',
   'str/htmlEscape',
+  'compiled/str/TextHelper',
   'jquery.ajaxJSON' /* ajaxJSON */,
-  'jquery.instructure_forms' /* formSuggestion */,
+  'jquery.instructure_forms',
   'jqueryui/dialog',
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */
-], function(INST, I18n, $, _, htmlEscape) {
+], function(INST, I18n, $, _, htmlEscape, TextHelper) {
 
   // Return the first value which passes a truth test
   $.detect = function(collection, callback) {
@@ -39,57 +40,6 @@ define([
     });
     return result;
   };
-
-  $.mimeClass = function(contentType){
-    return {
-      "video/mp4": "video",
-      "application/x-rar-compressed": "zip",
-      "application/vnd.oasis.opendocument.spreadsheet": "xls",
-      "application/x-docx": "doc",
-      "application/x-shockwave-flash": "flash",
-      "audio/x-mpegurl": "audio",
-      "image/png": "image",
-      "text/xml": "code",
-      "video/x-ms-asf": "video",
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": "xls",
-      "text/html": "html",
-      "video/x-msvideo": "video",
-      "audio/x-pn-realaudio": "audio",
-      "application/x-zip-compressed": "zip",
-      "text/css": "code",
-      "video/x-sgi-movie": "video",
-      "audio/x-aiff": "audio",
-      "application/zip": "zip",
-      "application/xml": "code",
-      "application/x-zip": "zip",
-      "text/rtf": "doc",
-      "text": "text",
-      "video/mpeg": "video",
-      "video/quicktime": "video",
-      "audio/3gpp": "audio",
-      "audio/mid": "audio",
-      "application/x-rar": "zip",
-      "image/x-psd": "image",
-      "application/vnd.ms-excel": "xls",
-      "application/msword": "doc",
-      "video/x-la-asf": "video",
-      "image/gif": "image",
-      "application/rtf": "doc",
-      "video/3gpp": "video",
-      "image/pjpeg": "image",
-      "image/jpeg": "image",
-      "application/vnd.oasis.opendocument.text": "doc",
-      "audio/x-wav": "audio",
-      "audio/basic": "audio",
-      "audio/mpeg": "audio",
-      "application/vnd.openxmlformats-officedocument.presentationml.presentation": "ppt",
-      "application/vnd.ms-powerpoint": "ppt",
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document": "doc",
-      "application/pdf": "pdf",
-      "text/plain": "text",
-      "text/x-csharp": "code"
-    }[contentType] || 'file'
-  }
 
   $.encodeToHex = function(str) {
     var hex = "";
@@ -258,7 +208,7 @@ define([
       $dialog.append("<form id='bookmark_search_form' style='margin-bottom: 5px;'>" +
                        "<img src='/images/blank.png'/>&nbsp;&nbsp;" +
                        "<input type='text' class='query' style='width: 230px;'/>" +
-                       "<button class='button search_button' type='submit'>" +
+                       "<button class='btn search_button' type='submit'>" +
                        htmlEscape(I18n.t('buttons.search', "Search")) + "</button></form>");
       $dialog.append("<div class='results' style='max-height: 200px; overflow: auto;'/>");
       $dialog.find("form").submit(function(event) {
@@ -286,7 +236,7 @@ define([
           for(var idx in data) {
             data[idx].short_title = data[idx].title;
             if(data[idx].title == data[idx].description) {
-              data[idx].short_title = $.truncateText(data[idx].description, 30);
+              data[idx].short_title = TextHelper.truncateText(data[idx].description, {max: 30});
             }
             $("<div class='bookmark'/>")
               .appendTo($dialog.find(".results"))
@@ -320,14 +270,13 @@ define([
     $dialog.data('reference_url', url);
     $dialog.find(".results").empty().end()
       .find(".query").val("");
-    $dialog.dialog('close').dialog({
-      autoOpen: false,
+    $dialog.dialog({
       title: I18n.t('titles.bookmark_search', "Bookmark Search: %{service_name}", {service_name: $.titleize(service_type)}),
       open: function() {
         $dialog.find("input:visible:first").focus().select();
       },
       width: 400
-    }).dialog('open');
+    });
   };
 
   $.findImageForService = function(service_type, callback) {
@@ -335,15 +284,14 @@ define([
     $dialog.find("button").attr('disabled', false);
     if( !$dialog.length ) {
       $dialog = $("<div id='instructure_image_search'/>")
-                  .append("<form id='image_search_form' style='margin-bottom: 5px;'>" +
+                  .append("<form id='image_search_form' class='form-inline' style='margin-bottom: 5px;'>" +
                             "<img src='/images/flickr_creative_commons_small_icon.png'/>&nbsp;&nbsp;" + 
-                            "<input type='text' class='query' style='width: 250px;' title='" +
+                            "<input type='text' class='query' style='width: 250px;' placeholder='" +
                             htmlEscape(I18n.t('tooltips.enter_search_terms', "enter search terms")) + "'/>" + 
-                            "<button class='button' type='submit'>" +
+                            "<button class='btn' type='submit'>" +
                             htmlEscape(I18n.t('buttons.search', "Search")) + "</button></form>")
                   .append("<div class='results' style='max-height: 240px; overflow: auto;'/>");
 
-      $dialog.find("form .query").formSuggestion();
       $dialog.find("form").submit(function(event) {
         event.preventDefault();
         event.stopPropagation();
@@ -406,33 +354,6 @@ define([
       },
       height: 320
     });
-  };
-
-  $.truncateText = function(string, max) {
-    max = max || 30;
-    if ( !string ) { 
-      return ""; 
-    } else {
-      var split  = (string || "").split(/\s/),
-          result = "",
-          done   = false;
-
-      for(var idx in split) {
-        var val = split[idx];
-        if ( done ) {
-          // do nothing
-        } else if( val && result.length < max) {
-          if(result.length > 0) {
-            result += " ";
-          }
-          result += val;
-        } else {
-          done = true;
-          result += "...";
-        }
-      }
-      return result;
-    }
   };
 
   $.toSentence = function(array, options) {

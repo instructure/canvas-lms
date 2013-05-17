@@ -1,8 +1,27 @@
+#
+# Copyright (C) 2012 Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+
 define [
+  'underscore'
   'jquery'
   'Backbone'
   'jst/PaginatedView'
-], ($, Backbone, template) ->
+], (_, $, Backbone, template) ->
 
   class PaginatedView extends Backbone.View
 
@@ -18,9 +37,7 @@ define [
       ret = super options
       @fetchOptions = options.fetchOptions
       @startPaginationListener()
-      @collection.on 'beforeFetchNextPage', @showPaginationLoader, this
-      @collection.on 'didFetchNextPage', @hidePaginationLoader, this
-      @collection.on 'all', @fetchNextPageIfNeeded, this
+      @bindPaginationEvents()
       ret
 
     render: ->
@@ -29,7 +46,11 @@ define [
       ret
 
     showPaginationLoader: ->
-      (@$paginationLoader ?= $(@paginationLoaderTemplate())).insertAfter @el
+      @$paginationLoader ?= $(@paginationLoaderTemplate())
+      @placePaginationLoader()
+
+    placePaginationLoader: ->
+      @$paginationLoader?.insertAfter @el
 
     hidePaginationLoader: ->
       @$paginationLoader?.remove()
@@ -43,7 +64,7 @@ define [
       containerScrollHeight - $container.scrollTop() - $container.height()
 
     startPaginationListener: ->
-      $(@paginationScrollContainer).on "scroll.pagination#{@cid} resize.pagination#{@cid}", $.proxy @fetchNextPageIfNeeded, this
+      $(@paginationScrollContainer).on "scroll.pagination#{@cid}, resize.pagination#{@cid}", $.proxy @fetchNextPageIfNeeded, this
       @fetchNextPageIfNeeded()
 
     stopPaginationListener: ->
@@ -51,8 +72,16 @@ define [
 
     fetchNextPageIfNeeded: ->
       return if @collection.fetchingNextPage
-      unless @collection.nextPageUrl
+      if !@collection.urls or !@collection.urls.next
         @stopPaginationListener() if @collection.length
         return
-      if $(@paginationScrollContainer).is(':visible') and @distanceToBottom() < @distanceTillFetchNextPage
-        @collection.fetchNextPage @fetchOptions
+      # let the call stack play out before checking the scroll position.
+      setTimeout =>
+        if $(@paginationScrollContainer).is(':visible') and @distanceToBottom() < @distanceTillFetchNextPage
+          @collection.fetch _.extend({page: 'next'}, @fetchOptions)
+      , 0
+
+    bindPaginationEvents: ->
+      @collection.on 'beforeFetch:next', @showPaginationLoader, this
+      @collection.on 'fetch:next', @hidePaginationLoader, this
+      @collection.on 'all', @fetchNextPageIfNeeded, this

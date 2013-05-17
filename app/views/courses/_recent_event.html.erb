@@ -1,33 +1,55 @@
 <% 
   show_context ||= false; upcoming ||= false
-  if recent_event.is_a?(Assignment)
+  is_assignment = recent_event.is_a?(Assignment)
+  is_calendar_event = recent_event.is_a?(CalendarEvent)
+  if is_assignment
     if @current_user_submissions
       submission = @current_user_submissions.detect { |s| s.assignment_id == recent_event.id }
     elsif @current_user
-      submission = @current_user.submissions.scoped(:select => 'id, assignment_id, score, workflow_state', :conditions => { :assignment_id => recent_event.id }).first
+      submission = @current_user.submissions.select([:id, :assignment_id, :score, :workflow_state]).where(:assignment_id => recent_event).first
+    end
+    
+    if is_assignment
+      recent_event = recent_event.overridden_for(@current_user)
     end
   end
 
-  cache(['recent_event_render', submission || 'no_submission', recent_event || 'blank_event', Time.zone.utc_offset, recent_event.cached_context_grants_right?(@current_user, nil, :manage_grades), recent_event.cached_context_grants_right?(@current_user, nil, :participate_as_student)].cache_key) do 
+  cache([ 'recent_event_render',
+          submission || 'no_submission',
+          recent_event || 'blank_event',
+          (recent_event.due_at if is_assignment),
+          Date.today,
+          Time.zone.name,
+          recent_event.cached_context_grants_right?(@current_user, nil, :manage_grades),
+          recent_event.cached_context_grants_right?(@current_user, nil, :participate_as_student)
+        ].cache_key) do
     icon_explanation, icon_class = icon_data(:context => @context, 
                                              :contexts => @contexts, 
                                              :current_user => @current_user, 
                                              :recent_event => recent_event, 
                                              :submission => submission)
-  %>
+
+%>
+
 <li style="<%= hidden if is_hidden %>" class="event">
-  <a class="<%= icon_class %> tooltip" href="<%= recent_event_url(recent_event) %>">
+  <a
+    data-track-category="dashboard"
+    data-track-label="recent event"
+    class="<%= icon_class %> tooltip" href="<%= recent_event_url(recent_event) %>"
+  >
     <span class="tooltip_wrap">
       <span class='tooltip-carat'></span>
       <span class="tooltip_text">
-        <% if recent_event.is_a?(Assignment) %>
-          <span style="display: block;">due: <%= datetime_string(recent_event.due_at) %></span>
+        <% if is_assignment %>
+          <span style="display: block;"><%= t(:due, "due") %>: 
+            <%= due_at(recent_event, @current_user) %>
+          </span>
           <% if icon_explanation %>
             <span style="display: block; font-style: italic;"><%= icon_explanation %></span>
           <% end %>
           <% if recent_event.points_possible %>
             <span style="display: block;"><%= t 'submission_score', %{%{score} *out of %{points_possible}*},
-              :score => "<strong>#{submission.score if submission && !recent_event.muted?}</strong>".html_safe,
+              :score => "<strong>#{render_score(submission.score) if submission && !recent_event.muted?}</strong>".html_safe,
               :points_possible => recent_event.points_possible,
               :wrapper => '<span style="font-size: 0.8em;">\1</span>' %></span>
           <% end %>
@@ -36,13 +58,19 @@
         <% end %>
         <% if show_context %>
           <span style="display: block; font-size: 0.8em;">
-            <%= recent_event.is_a?(CalendarEvent) ? recent_event.effective_context.short_name : recent_event.context.short_name %>
+            <%= is_calendar_event ? recent_event.effective_context.short_name : recent_event.context.short_name %>
           </span>
         <% end %>
       </span>
     </span>
     <b><%= recent_event.title %></b>
-    <em><%= date_string(recent_event.start_at, :short) %></em>
+    <em>
+      <% if is_assignment %>
+        <%= due_at(recent_event, @current_user, 'date') %>
+      <% else %>
+        <%= datetime_string(recent_event.start_at, :short ) %>
+      <% end %>
+    </em>
   </a>
 </li>
 

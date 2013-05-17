@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
 
 def gen_ssha_password(password)
-  salt = ActiveSupport::SecureRandom.random_bytes(10)
+  salt = SecureRandom.random_bytes(10)
   "{SSHA}" + Base64.encode64(Digest::SHA1.digest(password+salt).unpack('H*').first+salt).gsub(/\s/, '')
 end
 
@@ -321,19 +321,24 @@ describe SIS::CSV::UserImporter do
   end
 
   it "should allow a user to update emails specifically" do
-    process_csv_data_cleanly(
-      "user_id,login_id,first_name,last_name,email,status",
-      "user_1,user1,User,Uno,user1@example.com,active"
-    )
+    enable_cache do
+      now = Time.now
+      Time.stubs(:now).returns(now - 2)
+      process_csv_data_cleanly(
+        "user_id,login_id,first_name,last_name,email,status",
+        "user_1,user1,User,Uno,user1@example.com,active"
+      )
 
-    Pseudonym.find_by_account_id_and_sis_user_id(@account.id, "user_1").user.email.should == "user1@example.com"
+      Pseudonym.find_by_account_id_and_sis_user_id(@account.id, "user_1").user.email.should == "user1@example.com"
 
-    process_csv_data_cleanly(
-      "user_id,login_id,first_name,last_name,email,status",
-      "user_1,user1,User,Uno,user2@example.com,active"
-    )
+      Time.stubs(:now).returns(now)
+      process_csv_data_cleanly(
+        "user_id,login_id,first_name,last_name,email,status",
+        "user_1,user1,User,Uno,user2@example.com,active"
+      )
 
-    Pseudonym.find_by_account_id_and_sis_user_id(@account.id, "user_1").user.email.should == "user2@example.com"
+      Pseudonym.find_by_account_id_and_sis_user_id(@account.id, "user_1").user.email.should == "user2@example.com"
+    end
   end
 
   it "should add two users with different user_ids, login_ids, but the same email" do
@@ -352,7 +357,7 @@ describe SIS::CSV::UserImporter do
     user2.pseudonyms.count.should == 1
     user2.pseudonyms.first.communication_channel_id.should_not be_nil
 
-    Message.find(:first, :conditions => { :communication_channel_id => user2.email_channel.id, :notification_id => notification.id }).should_not be_nil
+    Message.where(:communication_channel_id => user2.email_channel, :notification_id => notification).first.should_not be_nil
   end
 
   it "should not notify about a merge opportunity to an SIS user in the same account" do
@@ -372,7 +377,7 @@ describe SIS::CSV::UserImporter do
     user1.pseudonyms.first.communication_channel_id.should_not be_nil
     user2.pseudonyms.first.communication_channel_id.should_not be_nil
 
-    Message.find(:first, :conditions => { :communication_channel_id => user2.email_channel.id, :notification_id => notification.id }).should be_nil
+    Message.where(:communication_channel_id => user2.email_channel, :notification_id => notification).first.should be_nil
   end
 
   it "should not notify about merge opportunities for users that have no means of logging in" do
@@ -392,7 +397,7 @@ describe SIS::CSV::UserImporter do
     user1.pseudonyms.first.communication_channel_id.should_not be_nil
     user2.pseudonyms.first.communication_channel_id.should_not be_nil
 
-    Message.find(:first, :conditions => { :communication_channel_id => user2.email_channel.id, :notification_id => notification.id }).should be_nil
+    Message.where(:communication_channel_id => user2.email_channel, :notification_id => notification).first.should be_nil
   end
 
   it "should not have problems updating a user to a conflicting email" do
@@ -421,7 +426,7 @@ describe SIS::CSV::UserImporter do
     user2.email_channel.should be_active
     user2.email.should == 'user1@example.com'
 
-    Message.find(:first, :conditions => { :communication_channel_id => user2.email_channel.id, :notification_id => notification.id }).should be_nil
+    Message.where(:communication_channel_id => user2.email_channel, :notification_id => notification).first.should be_nil
   end
 
   it "should not have a problem adding an existing e-mail that differs in case" do
@@ -485,7 +490,7 @@ describe SIS::CSV::UserImporter do
     )
     user2.reload
 
-    Message.find(:first, :conditions => { :communication_channel_id => user2.email_channel.id, :notification_id => notification.id }).should_not be_nil
+    Message.where(:communication_channel_id => user2.email_channel, :notification_id => notification).first.should_not be_nil
   end
 
   it "should not send merge opportunity notifications if the conflicting cc is retired or unconfirmed" do
@@ -503,7 +508,7 @@ describe SIS::CSV::UserImporter do
     user1.communication_channels.length.should == 1
     user1.email.should == 'user1@example.com'
     [cc1, cc2].should_not be_include(user1.email_channel)
-    Message.find(:first, :conditions => { :communication_channel_id => user1.email_channel.id, :notification_id => notification.id }).should be_nil
+    Message.where(:communication_channel_id => user1.email_channel, :notification_id => notification).first.should be_nil
   end
 
   it "should create everything in the deleted state when deleted initially" do
@@ -869,7 +874,7 @@ describe SIS::CSV::UserImporter do
       @pseudo2 = @account.pseudonyms.find_by_sis_user_id('user_1')
       @pseudo2.user.user_account_associations.map { |uaa| uaa.account_id }.sort.should == [@account.id, Account.find_by_sis_source_id('A102').id, Account.find_by_sis_source_id('A101').id].sort
 
-      @pseudo1.user.move_to_user @pseudo2.user
+      UserMerge.from(@pseudo1.user).into(@pseudo2.user)
       @user = @account1.pseudonyms.find_by_sis_user_id('user_1').user
       @account2.pseudonyms.find_by_sis_user_id('user_1').user.should == @user
 

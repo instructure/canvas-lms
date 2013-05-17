@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011-12 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -32,7 +32,7 @@
 # 
 # The submission hash has some very useful meta data in there:
 # 
-# :grader => printable name of the grader, or Someone if unknown
+# :grader => printable name of the grader, or Graded on submission if unknown
 # :grader_id => user_id of the grader
 # :previous_grade => the grade previous to this one, or nil
 # :current_grade => the most current grade, the last submission for this assignment and student
@@ -198,13 +198,19 @@ class SubmissionList
     
     # A hash of the current grades of each submission, keyed by submission.id
     def current_grade_map
-      @current_grade_map ||= self.course.submissions.inject({}) do |h, s|
-        grader = s.grader_id ? self.grader_map[s.grader_id].name : 'Someone' rescue 'Someone'
-        h[s.id] = OpenObject.new(:grade => s.grade, :graded_at => s.graded_at, :grader => grader)
-        h
+      @current_grade_map ||= self.course.submissions.inject({}) do |hash, submission|
+        grader = if submission.grader_id.present?
+          self.grader_map[submission.grader_id].try(:name)
+        end
+        grader ||= I18n.t('gradebooks.history.graded_on_submission', 'Graded on submission')
+
+        hash[submission.id] = OpenObject.new(:grade     => submission.grade,
+                                             :graded_at => submission.graded_at,
+                                             :grader    => grader)
+        hash
       end
     end
-    
+
     # Ensures that the final product only has approved keys in it.  This
     # makes our final product much more yummy. 
     def trim_keys(list)
@@ -333,14 +339,18 @@ class SubmissionList
     # Still a list of unsorted, unfiltered hashes, but the meta data is inserted at this point
     def full_hash_list
       @full_hash_list ||= self.raw_hash_list.map do |h|
-        h[:grader] = h[:grader_id] && self.grader_map[h[:grader_id]] ? self.grader_map[h[:grader_id]].name : 'Someone'
+        h[:grader] = if h[:grader_id] && self.grader_map[h[:grader_id]]
+          self.grader_map[h[:grader_id]].name
+        else
+          I18n.t('gradebooks.history.graded_on_submission', 'Graded on submission')
+        end
         h[:safe_grader_id] = h[:grader_id] ? h[:grader_id] : 0
         h[:assignment_name] = self.assignment_map[h[:assignment_id]].title
         h[:student_user_id] = h[:user_id]
         h[:student_name] = self.student_map[h[:user_id]].name
         h[:course_id] = self.course.id
         h[:submission_id] = h[:id]
-        h[:graded_on] = Date.parse(h[:graded_at].to_s) if h[:graded_at]
+        h[:graded_on] = h[:graded_at].in_time_zone.to_date if h[:graded_at]
 
         h
       end
@@ -354,7 +364,7 @@ class SubmissionList
     # A complete list of all graders that have graded submissions for this
     # course as User models 
     def graders
-      @graders ||= User.find(:all, :conditions => ['id IN (?)', all_grader_ids])
+      @graders ||= User.where(:id => all_grader_ids).all
     end
     
     # A hash of graders by their ids, for easy lookup in full_hash_list
@@ -373,7 +383,7 @@ class SubmissionList
     # A complete list of all students that have submissions for this course
     # as User models 
     def students
-      @students ||= User.find(:all, :conditions => ['id IN (?)', all_student_ids])
+      @students ||= User.where(:id => all_student_ids).all
     end
     
     # A hash of students by their ids, for easy lookup in full_hash_list
@@ -391,7 +401,7 @@ class SubmissionList
     
     # A complete list of assignments that have submissions for this course
     def assignments
-      @assignments ||= Assignment.find(:all, :conditions => ['id IN (?)', all_assignment_ids])
+      @assignments ||= Assignment.where(:id => all_assignment_ids).all
     end
     
     # A hash of assignments by their ids, for easy lookup in full_hash_list

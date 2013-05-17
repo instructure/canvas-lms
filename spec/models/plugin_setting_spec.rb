@@ -68,4 +68,19 @@ describe PluginSetting do
     settings.should_not be_nil
     settings[:bar].should == "asdf"
   end
+
+  it "should immediately uncache on save" do
+    enable_cache do
+      s = PluginSetting.new(:name => "plugin_setting_test", :settings => {:bar => "qwerty"})
+      s.save!
+      # cache it
+      settings = PluginSetting.settings_for_plugin("plugin_setting_test")
+      settings.should == {:bar => "qwerty"}
+      s.settings = {:food => "bar"}
+      s.save!
+      # new settings
+      settings = PluginSetting.settings_for_plugin("plugin_setting_test")
+      settings.should == {:food => "bar"}
+    end
+  end
 end

@@ -8,31 +8,9 @@
    js_env :CONTENT_SELECT_URL => context_url(@context, :context_import_copy_course_checklist_url) + "?source_course=#{@source_course.id}"
 %>
 
-<% content_for :stylesheets do %>
-<style>
-.root_asset_list {
-  margin-top: 10px;
-  margin-bottom: 5px;
-  margin-left: 30px;
-}
-.root_asset_list > li {
-  margin-bottom: 10px;
-}
-.root_asset_list h4 {
-  margin: 0;
-}
-.asset_list {
-  margin-top: 10px;
-  margin-bottom: 5px;
-  margin-left: 30px;
-}
-#copy_context_form h3 {
-  color: #444;
-}
-</style>
-<% end %>
+<% jammit_css :content_imports %>
 
-<% form_tag context_url(@context, :context_import_copy_content_url), :id => "copy_context_form" do %>
+<% form_tag context_url(@context, :context_import_copy_content_url), :id => "copy_context_form", :class => "form-inline" do %>
     <input type="hidden" name="source_course" id="source_cource_id" value="<%= @source_course.id %>"/>
     <h2><%= t 'titles.copy_from_course', "Copy Content From %{course}", :course => @source_course.name %></h2>
     <p><%= t 'descriptions.copy_content', "Select the content you'd like copied into this course." %></p>
@@ -56,7 +34,7 @@
     <div class="copy_progress"></div>
   </div>
   <div class="button-container" style="margin-top: 20px;">
-    <button class="button big-button submit_button" type="submit"><%= t 'buttons.import', "Import Course Content" %></button>
+    <button class="btn btn-primary submit_button" type="submit"><%= t 'buttons.import', "Import Course Content" %></button>
   </div>
 
 <% end %>

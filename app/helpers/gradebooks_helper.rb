@@ -29,4 +29,25 @@ module GradebooksHelper
   def display_grade(grade)
     grade.blank? ? "--" : grade
   end
+
+  def gradebook_url_for(user, context, assignment=nil)
+    if context
+      gradebook_version = get_gradebook_version(user, context)
+      gradebook_url = polymorphic_url([context, gradebook_version])
+
+      if assignment && gradebook_version == 'gradebook'
+        gradebook_url += "#assignment/#{assignment.id}"
+      end
+    end
+
+    gradebook_url
+  end
+
+  def get_gradebook_version(user, context)
+    if !context.old_gradebook_visible? || user.nil? || user.prefers_gradebook2?
+      'gradebook2'
+    else
+      'gradebook'
+    end
+  end
 end

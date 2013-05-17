@@ -103,4 +103,19 @@ describe "External Tools" do
     end
     
   end
+
+  it "should highlight the navigation tab when using an external tool" do
+    course_with_teacher_logged_in(:active_all => true)
+
+    @tool = @course.context_external_tools.create!(:shared_secret => 'test_secret', :consumer_key => 'test_key', :name => 'my grade passback test tool', :domain => 'example.com')
+    @tool.settings[:course_navigation] = {:url => "http://www.example.com", :text => "Example URL"}
+    @tool.save!
+
+    get "/courses/#{@course.id}/external_tools/#{@tool.id}"
+    response.should be_success
+    doc = Nokogiri::HTML.parse(response.body)
+    tab = doc.at_css("a.#{@tool.asset_string}")
+    tab.should_not be_nil
+    tab['class'].split.should include("active")
+  end
 end

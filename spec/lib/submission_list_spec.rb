@@ -40,7 +40,32 @@ describe SubmissionList do
     interesting_submission_list
     @sl.list.keys.should eql([Date.parse(Time.now.utc.to_s)])
   end
-  
+
+  it "should take the time zone into account when dividing grading history into days" do
+    course_with_teacher(:active_all => true)
+    course_with_student(:course => @course, :active_all => true)
+
+    @assignment1 = @course.assignments.create!(:title => 'one', :points_possible => 10)
+    @assignment2 = @course.assignments.create!(:title => 'two', :points_possible => 10)
+    @assignment3 = @course.assignments.create!(:title => 'three', :points_possible => 10)
+
+    Time.zone = 'Alaska'
+    Time.stubs(:now).returns(Time.utc(2011, 12, 31, 23, 0))   # 12/31 14:00 local time
+    @assignment1.grade_student(@student, {:grade => 10, :grader => @teacher})
+    Time.stubs(:now).returns(Time.utc(2012, 1, 1, 1, 0))      # 12/31 16:00 local time
+    @assignment2.grade_student(@student, {:grade => 10, :grader => @teacher})
+    Time.stubs(:now).returns(Time.utc(2012, 1, 1, 10, 0))     #  1/01 01:00 local time
+    @assignment3.grade_student(@student, {:grade => 10, :grader => @teacher})
+    Time.unstub(:now)
+
+    @days = SubmissionList.new(@course).days
+    @days.size.should == 2
+    @days[0].date.should == Date.new(2012, 1, 1)
+    @days[0].graders[0].assignments.size.should == 1
+    @days[1].date.should == Date.new(2011, 12, 31)
+    @days[1].graders[0].assignments.size.should == 2
+  end
+
   context "named loops" do
     
     before do

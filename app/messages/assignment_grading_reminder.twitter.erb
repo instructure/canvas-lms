@@ -1,4 +1,0 @@
-<% define_content :link do %>
-  http://<%= HostUrl.context_host(asset.assignment.context) %>/<%= asset.assignment.context.class.to_s.downcase.pluralize %>/<%= asset.assignment.context_id %>/assignments/<%= asset.assignment.id %>
-<% end %>
-<%= t('not_graded', "Canvas Alert - Reminder: grade %{assignment_name}, %{course_name}, due %{due_date}", :assignment_name => asset.assignment.title, :course_name => asset.assignment.context.name, :due_date => datetime_string(force_zone(asset.assignment.due_at)))  %>

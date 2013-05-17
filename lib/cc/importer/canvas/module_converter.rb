@@ -26,6 +26,7 @@ module CC::Importer::Canvas
       doc.css('module').each do |r_node|
         mod = {}
         mod[:migration_id] = r_node['identifier']
+        mod[:workflow_state] = get_node_val(r_node, 'workflow_state')
         mod[:title] = get_node_val(r_node, 'title')
         mod[:position] = get_int_val(r_node, 'position')
         mod[:start_at] = get_time_val(r_node, 'start_at')

@@ -27,6 +27,8 @@ class ContentExport < ActiveRecord::Base
   serialize :settings
   attr_accessible
 
+  alias_method :context, :course
+
   #export types
   COMMON_CARTRIDGE = 'common_cartridge'
   COURSE_COPY = 'course_copy'
@@ -107,6 +109,11 @@ class ContentExport < ActiveRecord::Base
     self.settings[:selected_content] ||= {}
   end
 
+  # Method Summary
+  #   Takes in an ActiveRecord object. Determines if the item being 
+  #   checked should be exported or not. 
+  #
+  #   Returns: bool
   def export_object?(obj)
     return false unless obj
     return true if selected_content.empty?
@@ -119,6 +126,16 @@ class ContentExport < ActiveRecord::Base
     return true if is_set?(selected_content[asset_type][CC::CCHelper.create_key(obj)])
 
     false
+  end
+
+  # Method Summary
+  #   Takes a symbol containing the items that were selected to export.
+  #   is_set? will return true if the item is selected. Also handles
+  #   a case where 'everything' is set and returns true
+  #   
+  # Returns: bool
+  def export_symbol?(symbol)
+    is_set?(selected_content[symbol]) || is_set?(selected_content[:everything])
   end
 
   def add_item_to_export(obj)
@@ -162,15 +179,15 @@ class ContentExport < ActiveRecord::Base
   
   def fast_update_progress(val)
     self.progress = val
-    ContentExport.update_all({:progress=>val}, "id=#{self.id}")
+    ContentExport.where(:id => self).update_all(:progress=>val)
   end
   
-  named_scope :active, {:conditions => ['workflow_state != ?', 'deleted']}
-  named_scope :not_for_copy, {:conditions => ['workflow_state != ?', 'exported_for_course_copy']}
-  named_scope :common_cartridge, {:conditions => ['export_type == ?', COMMON_CARTRIDGE]}
-  named_scope :qti, {:conditions => ['export_type == ?', QTI]}
-  named_scope :course_copy, {:conditions => ['export_type == ?', COURSE_COPY]}
-  named_scope :running, {:conditions => ['workflow_state IN (?)', ['created', 'exporting']]}
+  scope :active, where("workflow_state<>'deleted'")
+  scope :not_for_copy, where("workflow_state<>'exported_for_course_copy'")
+  scope :common_cartridge, where(:export_type => COMMON_CARTRIDGE)
+  scope :qti, where(:export_type => QTI)
+  scope :course_copy, where(:export_type => COURSE_COPY)
+  scope :running, where(:workflow_state => ['created', 'exporting'])
 
   private
 

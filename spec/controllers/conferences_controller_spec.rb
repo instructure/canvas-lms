@@ -130,25 +130,53 @@ describe ConferencesController do
       response['Location'].should =~ /dimdim\.test/
     end
 
-    it "should let students join an active conference" do
-      course_with_student_logged_in(:active_all => true, :user => user_with_pseudonym(:active_all => true))
-      @conference = @course.web_conferences.create(:conference_type => 'DimDim', :duration => 60)
-      @conference.users << @user
-      DimDimConference.any_instance.expects(:active?).returns(true)
-      post 'join', :course_id => @course.id, :conference_id => @conference.id
-      response.should be_redirect
-      response['Location'].should =~ /dimdim\.test/
+    describe 'when student is part of the conference' do
+
+      before do
+        course_with_student_logged_in(:active_all => true, :user => user_with_pseudonym(:active_all => true))
+        @conference = @course.web_conferences.create(:conference_type => 'DimDim', :duration => 60)
+        @conference.users << @user
+      end
+
+      it "should not let students join an inactive conference" do
+        DimDimConference.any_instance.expects(:active?).returns(false)
+        post 'join', :course_id => @course.id, :conference_id => @conference.id
+        response.should be_redirect
+        response['Location'].should_not =~ /dimdim\.test/
+        flash[:notice].should match(/That conference is not currently active/)
+      end
+
+      describe 'when the conference is active' do
+        before do
+          Setting.set('enable_page_views', 'db')
+          DimDimConference.any_instance.expects(:active?).returns(true)
+          post 'join', :course_id => @course.id, :conference_id => @conference.id
+        end
+
+        after { Setting.set 'enable_page_views', 'false' }
+
+        it "should let students join an active conference" do
+          response.should be_redirect
+          response['Location'].should =~ /dimdim\.test/
+        end
+
+        it 'logs an asset access record for the discussion topic' do
+          accessed_asset = assigns[:accessed_asset]
+          accessed_asset[:code].should == @conference.asset_string
+          accessed_asset[:category].should == 'conferences'
+          accessed_asset[:level].should == 'participate'
+        end
+
+        it 'registers a page view' do
+          page_view = assigns[:page_view]
+          page_view.should_not be_nil
+          page_view.http_method.should == 'post'
+          page_view.url.should =~ %r{^http://test\.host/courses/\d+/conferences/\d+/join}
+          page_view.participated.should be_true
+        end
+
+      end
     end
 
-    it "should not let students join an inactive conference" do
-      course_with_student_logged_in(:active_all => true, :user => user_with_pseudonym(:active_all => true))
-      @conference = @course.web_conferences.create(:conference_type => 'DimDim', :duration => 60)
-      @conference.users << @user
-      DimDimConference.any_instance.expects(:active?).returns(false)
-      post 'join', :course_id => @course.id, :conference_id => @conference.id
-      response.should be_redirect
-      response['Location'].should_not =~ /dimdim\.test/
-      flash[:notice].should match(/That conference is not currently active/)
-    end
   end
 end

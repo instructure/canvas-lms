@@ -31,7 +31,7 @@ describe SisBatch do
     # it'll try to delete the file later during finalization, which is
     # not a convenient time for us.
     tempfile.close!
-    Zip::ZipFile.open(path, true) do |z|
+    Zip::ZipFile.open(path, Zip::ZipFile::CREATE) do |z|
       data.each do |dat|
         z.get_output_stream("csv_#{i}.csv") { |f| f.puts(dat) }
         i += 1
@@ -96,21 +96,29 @@ describe SisBatch do
   end
 
   it "should schedule in the future if configured" do
-    create_csv_data(['abc']) do |batch|
-      batch.process
-      Delayed::Job.find_by_tag('SisBatch.process_all_for_account').run_at.to_i.should <= Time.now.to_i
+    track_jobs do
+      create_csv_data(['abc']) do |batch|
+        batch.process
+      end
     end
 
-    Delayed::Job.delete_all
+    job = created_jobs.find { |j| j.tag == 'SisBatch.process_all_for_account' }
+    job.should be_present
+    job.run_at.to_i.should <= Time.now.to_i
+
+    job.destroy
 
     Setting.set('sis_batch_process_start_delay', '120')
-    create_csv_data(['abc']) do |batch|
-      start_time = Time.now.to_i
-      batch.process
-      job = Delayed::Job.find_by_tag('SisBatch.process_all_for_account')
-      job.run_at.to_i.should >= 100.seconds.from_now.to_i
-      job.run_at.to_i.should <= 150.minutes.from_now.to_i
+    track_jobs do
+      create_csv_data(['abc']) do |batch|
+        batch.process
+      end
     end
+
+    job = created_jobs.find { |j| j.tag == 'SisBatch.process_all_for_account' }
+    job.should be_present
+    job.run_at.to_i.should >= 100.seconds.from_now.to_i
+    job.run_at.to_i.should <= 150.minutes.from_now.to_i
   end
 
   describe "batch mode" do

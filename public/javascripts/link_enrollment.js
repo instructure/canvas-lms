@@ -49,11 +49,10 @@ define([
         $dialog.find(".existing_user").showIf(current_user_id);
 
         $dialog
-          .dialog('close').dialog({
-            autoOpen: false,
+          .dialog({
             title: I18n.t('titles.link_to_student', "Link to Student"),
             width: 400
-          }).dialog('open');
+          });
       },
       updateDialog: function($dialog, enrollment_id, current_user_id) {
         $dialog.find(".enrollment_id").val(enrollment_id);

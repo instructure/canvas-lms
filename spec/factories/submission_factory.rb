@@ -25,12 +25,3 @@ def submission_model(opts={})
   @submission.save!
   @submission
 end
-
-def assignment_valid_attributes
-  {
-    :title => "value for title",
-    :description => "value for description",
-    :due_at => Time.now,
-    :points_possible => "1.5"
-  }
-end

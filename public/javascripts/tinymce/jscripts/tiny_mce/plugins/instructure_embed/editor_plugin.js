@@ -45,7 +45,7 @@ define([
   };
 
   function initShared () {
-    $box = $('<div/>', {html: TRANSLATIONS.instructions + "<form id='instructure_embed_prompt_form' style='margin-top: 5px;'><table class='formtable'><tr><td>"+ TRANSLATIONS.url +"</td><td><input type='text' class='prompt' style='width: 250px;' value='http://'/></td></tr><tr><td class='nobr'>"+TRANSLATIONS.alt_text+"</td><td><input type='text' class='alt_text' style='width: 150px;' value=''/></td></tr><tr><td colspan='2' style='text-align: right;'><input type='submit' value='Embed Image'/></td></tr></table></form><div class='actions'></div>"}).hide();
+    $box = $('<div/>', {html: TRANSLATIONS.instructions + "<form id='instructure_embed_prompt_form' style='margin-top: 5px;'><table class='formtable'><tr><td>"+ TRANSLATIONS.url +"</td><td><input type='text' class='prompt' style='width: 250px;' value='http://'/></td></tr><tr><td class='nobr'>"+TRANSLATIONS.alt_text+"</td><td><input type='text' class='alt_text' style='width: 150px;' value=''/></td></tr><tr><td colspan='2' style='text-align: right;'><input type='submit' class='btn' value='Embed Image'/></td></tr></table></form><div class='actions'></div>"}).hide();
     $altText = $box.find('.alt_text');
     $actions = $box.find('.actions');
     $userURL = $box.find('.prompt');
@@ -125,6 +125,17 @@ define([
     });
   }
 
+  function loadFields () {
+    var selection = $(tinyMCE.get($editor.attr('id')).selection.getContent());
+    if (selection.length) {
+      $altText.val(selection.attr('alt'));
+      $userURL.val(selection.attr('src'));
+    } else {
+      $altText.val('');
+      $userURL.val('');
+    }
+  }
+
   tinymce.create('tinymce.plugins.InstructureEmbed', {
     init: function (editor, url) {
       var thisEditor = $('#' + editor.id);
@@ -132,6 +143,8 @@ define([
       editor.addCommand('instructureEmbed', function (search) {
         if (!initted) initShared();
         $editor = thisEditor; // set shared $editor so images are pasted into the correct editor
+
+        loadFields();
         $box.dialog('open');
 
         if (search === 'flickr') $flickrLink.click();

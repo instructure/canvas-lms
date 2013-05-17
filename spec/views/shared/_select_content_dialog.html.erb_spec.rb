@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 describe "/shared/_select_content_dialog" do
   it "should alphabetize the file list" do
     course_with_teacher
-    folder = @course.folders.create!(:full_name => 'test')
+    folder = @course.folders.create!(:name => 'test')
     folder.attachments.create!(:context => @course, :uploaded_data => default_uploaded_data, :display_name => "b")
     folder.attachments.create!(:context => @course, :uploaded_data => default_uploaded_data, :display_name => "a")
     view_context

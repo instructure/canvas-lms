@@ -17,4 +17,11 @@
 #
 
 module ContextModulesHelper
+  def cache_if_module(context_module, editable, &block)
+    if context_module
+      cache(['context_module_render_2_', context_module.cache_key, editable].join('/'), nil, &block)
+    else
+      yield
+    end
+  end
 end

@@ -24,7 +24,13 @@
   bottom: 21px
   position: absolute
   text-indent: -9999px
-  outline: none
+  @media (min--moz-device-pixel-ratio: 1.5),(-o-min-device-pixel-ratio: 3/2),(-webkit-min-device-pixel-ratio: 1.5),(min-device-pixel-ratio: 1.5),(min-resolution: 1.5dppx)
+    background-image: url("/images/canvas/header_canvas_logo@2x.png")
+    background-size: 110px 26px
+// TODO: remove this style once people have time to update their logo-related custom
+// css. See related code in app/coffeescripts/bundles/common.coffee too.
+#header-logo.original, #header.no-user #header-logo.original
+  bottom: 12px
 #header-logo-secondary
   display: none
   background: url("/images/canvas/header_canvas_logo.png") no-repeat
@@ -33,6 +39,9 @@
   right: 26px
   bottom: 6px
   position: absolute
+  @media (min--moz-device-pixel-ratio: 1.5),(-o-min-device-pixel-ratio: 3/2),(-webkit-min-device-pixel-ratio: 1.5),(min-device-pixel-ratio: 1.5),(min-resolution: 1.5dppx)
+    background-image: url("/images/canvas/header_canvas_logo@2x.png")
+    background-size: 110px 26px
 
 #header-inner
   padding-top: 26px
@@ -98,12 +107,8 @@
         text-decoration: underline
 
     .unread-messages-count
-      text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25)
-      +border-radius(8px)
-      background-color: $highlight-color
-      padding: 1px 6px
+      +count-bubble
   #identity-help-container a
-    color: $help-link-color
     padding: 1px 8px
 
 #menu
@@ -131,12 +136,8 @@
 
   .menu-item-no-drop:hover
     text-decoration: underline
-  .menu-item-title
-    background: url("/images/canvas/menu_arrow_white.png") no-repeat right 17px
-    padding-right: 27px
   &.hover
     .menu-item-title
-      background-image: url("/images/canvas/menu_arrow.png")
       text-shadow: none
       color: $menu-text-color
       border-top-color: $menu-border-color
@@ -177,7 +178,8 @@
       min-width: 270px
       width: 270px
       vertical-align: top
-      h2
+      .h2
+        display: block
         padding: 9px 12px 3px
         border-bottom: 1px solid lighten($borderColor, 22%)
         color: $menu-text-color
@@ -226,7 +228,7 @@
     border-bottom: 1px solid lighten($borderColor, 22%)
     &:hover
       .name
-        color: darken($link_color, 12%)
+        color: $linkColorHover
     a
       display: block
       line-height: 1.2
@@ -280,7 +282,7 @@
         background-position: -8px -41px
 
   .customListOpen
-    color: $link_color
+    color: $linkColor
     float: right
     font-size: 11px
 

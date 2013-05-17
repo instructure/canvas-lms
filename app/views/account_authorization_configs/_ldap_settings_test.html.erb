@@ -10,8 +10,7 @@ ldap_tests << OpenStruct.new(
     t(:test_ldap_connection_help_fixes_2, "This was only a connection test. SSL certificates were not validated."),
     t(:test_ldap_connection_help_fixes_3, "Check your firewall settings. Are all Canvas IP address allowed to access your server?")
   ],
-  :js_function => 'testLDAPConnection',
-  :url_context => :context_test_ldap_connections_url
+  :url => account_test_ldap_connections_url(@account)
 )
 ldap_tests << OpenStruct.new(
   :test_type => :bind,
@@ -22,8 +21,7 @@ ldap_tests << OpenStruct.new(
     t(:test_ldap_bind_help_fixes_1, "Verify the provided filter string (i.e. '(sAMAccountName={{login}})')."),
     t(:test_ldap_bind_help_fixes_2, "Does the username require more scoping information? (i.e. 'cn=Canvas,ou=people,dc=example,dc=com').")
   ],
-  :js_function => 'testLDAPBind',
-  :url_context => :context_test_ldap_binds_url
+  :url => account_test_ldap_binds_url(@account)
 )
 ldap_tests << OpenStruct.new(
   :test_type => :search,
@@ -35,8 +33,7 @@ ldap_tests << OpenStruct.new(
     t(:test_ldap_search_help_fixes_2, "Verify the provided search base (i.e. 'ou=people,dc=example,dc=com')."),
     t(:test_ldap_search_help_fixes_3, "Verify that the user object in LDAP has search privileges for the  provided search base.")
   ],
-  :js_function => 'testLDAPSearch',
-  :url_context => :context_test_ldap_searches_url
+  :url => account_test_ldap_searches_url(@account)
 )
 %>
 
@@ -91,115 +88,10 @@ ldap_tests << OpenStruct.new(
         </div></td>
       </tr>
     </table>
-    <button type="button" class="button submit_button ldap_test_close" style="float:right"><%= t(:test_ldap_dialog_close, "Close") %></button>
+    <button type="button" class="btn submit_button ldap_test_close" style="float:right"><%= t(:test_ldap_dialog_close, "Close") %></button>
   </div>
 </div>
 
-<% js_block do %>
-<script>
-require([
-  'i18nObj' /* I18n.t */,
-  'jquery' /* $ */,
-  'jquery.ajaxJSON' /* getJSON */,
-  'jqueryui/dialog'
-], function(I18n, $) {
+<% js_env :LDAP_TESTS => ldap_tests.map{|t|t.send(:table)}, :LOGIN_TEST_URL => account_test_ldap_logins_url(@account) %>
+<% js_bundle :ldap_settings_test %>
 
-  function testLDAP() {
-    clearTestLDAP();
-    $("#test_ldap_dialog").dialog('close').dialog({
-      autoOpen: false,
-      title: <%= jt('#accounts.test_ldap_dialog_title', "Test LDAP Settings") %>,
-      width: 500
-    }).dialog('open');
-    <%= ldap_tests.first.js_function %>();
-  }
-  function clearTestLDAP() {
-    <% ldap_tests.each do |test| %>
-      $("#ldap_<%= test.test_type %>_result").html("");
-      $("#ldap_<%= test.test_type %>_help").hide();
-    <% end %>
-    $("#ldap_login_result").html("");
-    $("#ldap_login_form").hide();
-  }
-  <% ldap_tests.each_with_index do |test, i| %>
-    function <%= test.js_function %>() {
-      $("#ldap_<%= test.test_type %>_result").html("<img src='/images/ajax-loader.gif'/>");
-      $.getJSON('<%= context_url(@account, test.url_context) %>', function(data) {
-        status = true;
-        $.each(data, function(i, config) {
-          if (!config['ldap_<%= test.test_type %>_test']) {
-            status = false;
-          }
-        });
-        if (status == "true") {
-          $("#ldap_<%= test.test_type %>_result").html("<h4 style='color:green'>" + <%= jt('#accounts.test_ldap_result_ok', 'OK') %> + "</h4>");
-          <% if next_test = ldap_tests[i+1] %>
-            // proceed to the next test
-            <%= next_test.js_function %>();
-          <% else %>
-            // show login test tool
-            $("#ldap_login_form").show('blind');
-          <% end %>
-        } else {
-          $("#ldap_<%= test.test_type %>_result").html("<h4 style='color:red'>" + <%= jt('#accounts.test_ldap_result_failed', 'Failed') %> + "</h4>");
-          $("#ldap_<%= test.test_type %>_help").show();
-          <% ldap_tests[i+1..-1].each do |next_test| %>
-            $("#ldap_<%= next_test.test_type %>_result").html("<h4 style='color:red'>" + <%= jt('#accounts.test_ldap_result_canceled', 'Canceled') %> + "</h4>");
-          <% end %>
-          $("#ldap_login_result").html("<h4 style='color:red'>" + <%= jt('#accounts.test_ldap_result_canceled', 'Canceled') %> + "</h4>");
-        }
-      });
-    }
-  <% end %>
-  function testLDAPLogin() {
-    $("#ldap_test_login").attr('disabled', 'true').attr('value', 'Testing...');
-    $("#ldap_login_result").html("<img src='/images/ajax-loader.gif'/>");
-    username = $("#ldap_test_login_user").val();
-    password = $("#ldap_test_login_pass").val();
-    url = '<%= context_url(@account, :context_test_ldap_logins_url) %>';
-    $.post(url, {'username': username, 'password': password, authenticity_token: '<%= form_authenticity_token %>'}, function(data) {
-      status = true;
-      message = "";
-      $.each(data, function(i, config) {
-        if (!config['ldap_login_test']) {
-          status = false;
-        }
-        if (config['errors']) {
-          $.each(config['errors'], function(i, m) {
-            $.each(m, function(err, msg) {
-              message += msg;
-            })
-          });
-        }
-      });
-      if (status == "true") {
-        $("#ldap_login_help_error").hide();
-        $("#ldap_login_result").html("<h4 style='color:green'>" + <%= jt('#accounts.test_ldap_result_ok', 'OK') %> + "</h4>");
-        $("#ldap_test_login").attr('disabled', '').attr('value', 'Test Login');
-      } else {
-        $("#ldap_login_result").html("<h4 style='color:red'>" + <%= jt('#accounts.test_ldap_result_failed', 'Failed') %> + "</h4>");
-        $("#ldap_login_help").show();
-        $("#ldap_test_login").attr('disabled', '').attr('value', 'Retry Login');
-        $("#ldap_login_help_error").html(message);
-      }
-    });
-  }
-
-  $(document).ready(function() {
-    $(".test_ldap_link").click(function(event) {
-      event.preventDefault();
-      // kick off our test
-      testLDAP();
-    });
-    $(".ldap_test_close").click(function(event) {
-      event.preventDefault();
-      $("#test_ldap_dialog").dialog('close')
-    });
-    $("#ldap_test_login_form").submit(function(event) {
-      event.preventDefault();
-      testLDAPLogin();
-    });
-  });
-});
-</script>
-<% end %>

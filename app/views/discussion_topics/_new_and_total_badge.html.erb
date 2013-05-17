@@ -1,26 +1,17 @@
 <div class="new-and-total-badge">
-  <span class="tooltip new-items">
-    <span class="tooltip_wrap">
-      <span class="tooltip_text topic_unread_entries_tooltip" data-bind="unreadText"><%= t('unread_count_tooltip', {
-                                                                                          :zero => 'No unread replies',
-                                                                                          :one => '*1* unread reply',
-                                                                                          :other => '%{count} unread replies' },
-                                                                                          :count => unread_count) %></span>
-      </span>
-    <span class='topic_unread_entries_count' data-bind="unreadCount"><%= unread_count if unread_count > 0 %></span>
-  </span>
-  <span class="tooltip total-items">
-    <span class="tooltip_wrap">
-      <span class="tooltip_text">
-        <%= t('reply_count_tooltip', {
-              :zero => 'No replies',
-              :one => '1 reply',
-              :other => '%{count} replies' },
-              :count => reply_count) %>
-      </span>
-    </span>
-    <span class='topic_reply_count'><%= reply_count if reply_count > 0 %></span>
-  </span>
+  <span class="new-items"
+        data-tooltip
+        data-bind='{"title":"unreadText", "text":"unreadCount"}'
+        title="<%= t('unread_count_tooltip', { 
+                     :zero => 'No unread replies',
+                     :one => '1 unread reply',
+                     :other => '%{count} unread replies'
+                    }, :count => unread_count) %>"><%= unread_count if unread_count > 0 %></span>
+  <span class="total-items"
+        data-tooltip
+        title="<%= t('reply_count_tooltip', {
+                     :zero => 'No replies',
+                     :one => '1 reply',
+                     :other => '%{count} replies'
+                    }, :count => reply_count) %>"><%= reply_count if reply_count > 0 %></span>
 </div>
-
-

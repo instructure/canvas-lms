@@ -103,7 +103,21 @@ describe ImportedHtmlConverter do
       test_string = %{<img src="subfolder/WithCapital/TEST.png" alt="nope" />}
       ImportedHtmlConverter.convert(test_string, @course).should == %{<img src="#{@path}files/#{att.id}/preview" alt="nope">}
     end
-  
+
+    it "should find an attachment with query params" do
+      att = make_test_att()
+      @course.attachment_path_id_lookup = {"test.png" => att.migration_id}
+
+      test_string = %{<img src="%24IMS_CC_FILEBASE%24/test.png?canvas_customaction=1&canvas_qs_customparam=1" alt="nope" />}
+      ImportedHtmlConverter.convert(test_string, @course).should == %{<img src="#{@path}files/#{att.id}/customaction?customparam=1" alt="nope">}
+
+      test_string = %{<img src="%24IMS_CC_FILEBASE%24/test.png?canvas_qs_customparam2=3" alt="nope" />}
+      ImportedHtmlConverter.convert(test_string, @course).should == %{<img src="#{@path}files/#{att.id}/preview?customparam2=3" alt="nope">}
+
+      test_string = %{<img src="%24IMS_CC_FILEBASE%24/test.png?notarelevantparam" alt="nope" />}
+      ImportedHtmlConverter.convert(test_string, @course).should == %{<img src="#{@path}files/#{att.id}/preview" alt="nope">}
+    end
+
     it "should convert course section urls" do
       test_string = %{<a href="%24CANVAS_COURSE_REFERENCE%24/discussion_topics">discussions</a>}
       ImportedHtmlConverter.convert(test_string, @course).should == %{<a href="#{@path}discussion_topics">discussions</a>}
@@ -138,6 +152,30 @@ describe ImportedHtmlConverter do
       test_string = %{<p><a href="/courses/#{@course.id}/file_contents/%24IMS_CC_FILEBASE%24/#" class="instructure_inline_media_comment video_comment" id="media_comment_0_l4l5n0wt">this is a media comment</a><br><br></p>}
       
       ImportedHtmlConverter.convert(test_string, @course).should == %{<p><a href="/media_objects/0_l4l5n0wt" class="instructure_inline_media_comment video_comment" id="media_comment_0_l4l5n0wt">this is a media comment</a><br><br></p>}
+    end
+
+    it "should only convert url params" do
+      test_string = <<-HTML
+<object>
+<param name="controls" value="CONSOLE" />
+<param name="controller" value="true" />
+<param name="autostart" value="false" />
+<param name="loop" value="false" />
+<param name="src" value="%24IMS_CC_FILEBASE%24/test.mp3" />
+<EMBED name="tag"  src="%24IMS_CC_FILEBASE%24/test.mp3" loop="false" autostart="false" controller="true" controls="CONSOLE" >
+</EMBED>
+</object>
+      HTML
+
+      ImportedHtmlConverter.convert(test_string, @course).should match_ignoring_whitespace(<<-HTML.strip)
+<object>
+<param name="controls" value="CONSOLE">
+<param name="controller" value="true">
+<param name="autostart" value="false">
+<param name="loop" value="false">
+<param name="src" value="/courses/#{@course.id}/file_contents/course%20files/test.mp3">
+<embed name="tag" src="/courses/#{@course.id}/file_contents/course%20files/test.mp3" loop="false" autostart="false" controller="true" controls="CONSOLE"></embed></object>
+    HTML
     end
     
   end

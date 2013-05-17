@@ -752,11 +752,16 @@ define([
     });
     $(".self_signup_help_link").click(function(event) {
       event.preventDefault();
-      $("#self_signup_help_dialog").dialog('close').dialog({
-        autoOpen: false,
+      $("#self_signup_help_dialog").dialog({
         title: I18n.t('titles.self_signup_help', "Self Sign-Up Groups"),
         width: 400
-      }).dialog('open');
+      });
+    });
+    $("#category_split_groups").on('click', function() {
+      $("#category_split_group_count").val("1");
+    });
+    $("#category_no_groups").on('click', function() {
+      $("#category_split_group_count").val("");
     });
     contextGroups.populateCategory($("#group_tabs .group_category:first"));
     $(window).resize(function() {

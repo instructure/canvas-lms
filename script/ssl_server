@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
-require File.dirname(__FILE__) + '/../config/boot'
+require File.expand_path(File.dirname(__FILE__) + '/../config/boot')
 
 require 'active_support'
 require 'action_controller'
@@ -21,8 +21,7 @@ end
 options = {
   :Port        => 443,
   :Host        => "0.0.0.0",
-  :environment => (ENV['RAILS_ENV'] || "development").dup,
-  :config      => RAILS_ROOT + "/config.ru",
+  :config      => (Rails.root+"config.ru").to_s,
   :detach      => false,
   :debugger    => false,
   :path        => nil,
@@ -40,9 +39,6 @@ ARGV.clone.options do |opts|
           "Use custom rackup configuration file") { |v| options[:config] = v }
   opts.on("-d", "--daemon", "Make server run as a Daemon.") { options[:detach] = true }
   opts.on("-u", "--debugger", "Enable ruby-debugging for the server.") { options[:debugger] = true }
-  opts.on("-e", "--environment=name", String,
-          "Specifies the environment to run this server under (test/development/production).",
-          "Default: development") { |v| options[:environment] = v }
   opts.on("-P", "--path=/path", String, "Runs Rails app mounted at a specific path.", "Default: /") { |v| options[:path] = v }
 
   opts.separator ""
@@ -66,18 +62,15 @@ puts "=> Booting #{ActiveSupport::Inflector.demodulize(server)}"
 puts "=> Rails #{Rails.version} application starting on http://#{options[:Host]}:#{options[:Port]}#{options[:path]}"
 
 %w(cache pids sessions sockets).each do |dir_to_make|
-  FileUtils.mkdir_p(File.join(RAILS_ROOT, 'tmp', dir_to_make))
+  FileUtils.mkdir_p(Rails.root.join('tmp', dir_to_make))
 end
 
 if options[:detach]
   Process.daemon
-  pid = "#{RAILS_ROOT}/tmp/pids/server.pid"
+  pid = "#{Rails.root}/tmp/pids/server.pid"
   File.open(pid, 'w'){ |f| f.write(Process.pid) }
   at_exit { File.delete(pid) if File.exist?(pid) }
 end
-
-ENV["RAILS_ENV"] = options[:environment]
-RAILS_ENV.replace(options[:environment]) if defined?(RAILS_ENV)
 
 if File.exist?(options[:config])
   config = options[:config]
@@ -92,7 +85,7 @@ if File.exist?(options[:config])
     inner_app = Object.const_get(File.basename(config, '.rb').capitalize)
   end
 else
-  require RAILS_ROOT + "/config/environment"
+  require Rails.root+"config/environment"
   inner_app = ActionController::Dispatcher.new
 end
 

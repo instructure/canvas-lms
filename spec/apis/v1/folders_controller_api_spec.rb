@@ -84,19 +84,19 @@ describe "Folders API", :type => :integration do
       7.times {|i| @root.sub_folders.create!(:name => "folder#{i}", :context => @course) }
       json = api_call(:get, @folders_path + "/#{@root.id}/folders?per_page=3", @folders_path_options.merge(:per_page => '3'), {})
       json.length.should == 3
-      response.headers['Link'].should == [
-        %{<http://www.example.com/api/v1/folders/#{@root.id}/folders?page=2&per_page=3>; rel="next"},
-        %{<http://www.example.com/api/v1/folders/#{@root.id}/folders?page=1&per_page=3>; rel="first"},
-        %{<http://www.example.com/api/v1/folders/#{@root.id}/folders?page=3&per_page=3>; rel="last"}
-      ].join(',')
+      links = response.headers['Link'].split(",")
+      links.all?{ |l| l =~ /api\/v1\/folders\/#{@root.id}\/folders/ }.should be_true
+      links.find{ |l| l.match(/rel="next"/)}.should =~ /page=2&per_page=3>/
+      links.find{ |l| l.match(/rel="first"/)}.should =~ /page=1&per_page=3>/
+      links.find{ |l| l.match(/rel="last"/)}.should =~ /page=3&per_page=3>/
 
       json = api_call(:get, @folders_path + "/#{@root.id}/folders?per_page=3&page=3", @folders_path_options.merge(:per_page => '3', :page => '3'), {})
       json.length.should == 1
-      response.headers['Link'].should == [
-        %{<http://www.example.com/api/v1/folders/#{@root.id}/folders?page=2&per_page=3>; rel="prev"},
-        %{<http://www.example.com/api/v1/folders/#{@root.id}/folders?page=1&per_page=3>; rel="first"},
-        %{<http://www.example.com/api/v1/folders/#{@root.id}/folders?page=3&per_page=3>; rel="last"}
-      ].join(',')
+      links = response.headers['Link'].split(",")
+      links.all?{ |l| l =~ /api\/v1\/folders\/#{@root.id}\/folders/ }.should be_true
+      links.find{ |l| l.match(/rel="prev"/)}.should =~ /page=2&per_page=3>/
+      links.find{ |l| l.match(/rel="first"/)}.should =~ /page=1&per_page=3>/
+      links.find{ |l| l.match(/rel="last"/)}.should =~ /page=3&per_page=3>/
     end
   end
 
@@ -145,8 +145,7 @@ describe "Folders API", :type => :integration do
 
       student_in_course(:course => @course, :active_all => true)
       json = api_call(:get, @folders_path + "/#{@root.id}/folders", @folders_path_options, {})
-      json[0]["locked"].should == true
-      json[0]["locked_for_user"].should == true
+      json.should be_empty
     end
 
     describe "folder in context" do
@@ -382,7 +381,7 @@ describe "Folders API", :type => :integration do
       api_call(:post, "/api/v1/folders/#{@root_folder.id}/files",
         { :controller => "folders", :action => "create_file", :format => "json", :folder_id => @root_folder.id.to_param, },
         :name => "with_path.txt")
-      attachment = Attachment.last(:order => :id)
+      attachment = Attachment.order(:id).last
       attachment.folder_id.should == @root_folder.id
     end
   end

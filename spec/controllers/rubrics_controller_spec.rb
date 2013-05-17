@@ -25,16 +25,22 @@ describe RubricsController do
       get 'index', :course_id => @course.id
       assert_unauthorized
     end
-    it "should assign variables" do
-      course_with_teacher_logged_in(:active_all => true)
-      get 'index', :course_id => @course.id
-      response.should be_success
-      
-      get 'index', :user_id => @user.id
-      response.should be_success
+
+    describe 'variables' do
+      before { course_with_teacher_logged_in(:active_all => true) }
+
+      it "should be assigned with a course" do
+        get 'index', :course_id => @course.id
+        response.should be_success
+      end
+
+      it "should be assigned with a user" do
+        get 'index', :user_id => @user.id
+        response.should be_success
+      end
     end
   end
-  
+
   describe "POST 'create' for course" do
     it "should require authorization" do
       course_with_teacher(:active_all => true)

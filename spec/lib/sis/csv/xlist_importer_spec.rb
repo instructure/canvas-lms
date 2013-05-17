@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -43,14 +43,14 @@ describe SIS::CSV::XlistImporter do
 
     it 'should have proper account associations when new' do
       process_csv_data_cleanly(
-        "section_id,course_id,name,start_date,end_date,status,account_id",
-        "S001,C002,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active,A004"
+        "section_id,course_id,name,start_date,end_date,status",
+        "S001,C002,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active"
       )
       process_csv_data_cleanly(
         "xlist_course_id,section_id,status",
         "X001,S001,active"
       )
-      Course.find_by_sis_source_id("X001").associated_accounts.map(&:id).sort.should == [Account.find_by_sis_source_id('A001').id, Account.find_by_sis_source_id('A004').id, @account.id].sort
+      Course.find_by_sis_source_id("X001").associated_accounts.map(&:id).sort.should == [Account.find_by_sis_source_id('A001').id, @account.id].sort
       process_csv_data_cleanly(
         "xlist_course_id,section_id,status",
         "X001,S001,deleted"
@@ -60,9 +60,9 @@ describe SIS::CSV::XlistImporter do
 
     it 'should have proper account associations when being undeleted' do
       process_csv_data_cleanly(
-        "section_id,course_id,name,start_date,end_date,status,account_id",
-        "S001,C002,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active,A004",
-        "S002,C002,Sec2,2011-1-05 00:00:00,2011-4-14 00:00:00,active,A004"
+        "section_id,course_id,name,start_date,end_date,status",
+        "S001,C002,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active",
+        "S002,C002,Sec2,2011-1-05 00:00:00,2011-4-14 00:00:00,active"
       )
       process_csv_data_cleanly(
         "xlist_course_id,section_id,status",
@@ -79,33 +79,33 @@ describe SIS::CSV::XlistImporter do
         "X001,S002,active"
       )
       Course.find_by_sis_source_id("X001").deleted?.should be_false
-      Course.find_by_sis_source_id("X001").associated_accounts.map(&:id).sort.should == [Account.find_by_sis_source_id('A001').id, Account.find_by_sis_source_id('A004').id, @account.id].sort
+      Course.find_by_sis_source_id("X001").associated_accounts.map(&:id).sort.should == [Account.find_by_sis_source_id('A001').id, @account.id].sort
     end
 
     it 'should have proper account associations when a section is added and then removed' do
       process_csv_data_cleanly(
-        "section_id,course_id,name,start_date,end_date,status,account_id",
-        "S001,C001,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active,A004"
+        "section_id,course_id,name,start_date,end_date,status",
+        "S001,C005,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active"
       )
-      Course.find_by_sis_source_id("C001").associated_accounts.map(&:id).sort.should == [@account.id, Account.find_by_sis_source_id('A004').id].sort
+      Course.find_by_sis_source_id("C005").associated_accounts.map(&:id).sort.should == [Account.find_by_sis_source_id('A004').id, @account.id].sort
       Course.find_by_sis_source_id("C002").associated_accounts.map(&:id).sort.should == [Account.find_by_sis_source_id('A001').id, @account.id].sort
       process_csv_data_cleanly(
         "xlist_course_id,section_id,status",
         "C002,S001,active"
       )
-      Course.find_by_sis_source_id("C001").associated_accounts.map(&:id).should == [@account.id]
+      Course.find_by_sis_source_id("C005").associated_accounts.map(&:id).should == [Account.find_by_sis_source_id('A004').id, @account.id]
       Course.find_by_sis_source_id("C002").associated_accounts.map(&:id).sort.should == [Account.find_by_sis_source_id('A001').id, Account.find_by_sis_source_id('A004').id, @account.id].sort
       process_csv_data_cleanly(
         "xlist_course_id,section_id,status",
         "C002,S001,deleted"
       )
-      Course.find_by_sis_source_id("C001").associated_accounts.map(&:id).sort.should == [@account.id, Account.find_by_sis_source_id('A004').id].sort
+      Course.find_by_sis_source_id("C005").associated_accounts.map(&:id).sort.should == [Account.find_by_sis_source_id('A004').id, @account.id].sort
       Course.find_by_sis_source_id("C002").associated_accounts.map(&:id).sort.should == [Account.find_by_sis_source_id('A001').id, @account.id].sort
     end
 
     it 'should get account associations updated when the template course is updated' do
       process_csv_data_cleanly(
-        "section_id,course_id,name,start_date,end_date,status,account_id",
+        "section_id,course_id,name,start_date,end_date,status",
         "S001,C001,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active"
       )
       process_csv_data_cleanly(

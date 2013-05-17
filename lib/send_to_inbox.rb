@@ -52,7 +52,7 @@ module SendToInbox
           InboxItem.create(
             :user_id => user_id,
             :asset => self,
-            :subject => inbox_results[:subject] || I18n.t('lib.send_to_inbox.default_subject', "No Subject"),
+            :subject => truncate_text(inbox_results[:subject] || I18n.t('lib.send_to_inbox.default_subject', "No Subject"), :max_length => 255),
             :body_teaser => inbox_results[:body_teaser],
             :sender_id => sender_id
           )

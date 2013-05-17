@@ -221,10 +221,16 @@ class ContextController < ApplicationController
     end
     if authorized_action(@context, @current_user, :read_roster)
       return unless tab_enabled?(@context.class::TAB_CHAT)
-      
+
       add_crumb(t('#crumbs.chat', "Chat"), named_context_url(@context, :context_chat_url))
       self.active_tab="chat"
-      
+
+      js_env :tinychat => {
+               :room => "inst#{Digest::MD5.hexdigest(@context.asset_string)}",
+               :nick => (@current_user.short_name.gsub(/[^\w]+/, '_').sub(/_\z/, '') rescue 'user'),
+               :key  => Tinychat.config['api_key']
+             }
+
       res = nil
       begin
         session[:last_chat] ||= {}
@@ -259,6 +265,10 @@ class ContextController < ApplicationController
       end
     end
   end
+
+  def chat_iframe
+    render :layout => false
+  end
   
   def inbox
     redirect_to conversations_url, :status => :moved_permanently
@@ -278,47 +288,67 @@ class ContextController < ApplicationController
   def mark_inbox_as_read
     flash[:notice] = t(:all_marked_read, "Inbox messages all marked as read")
     if @current_user
-      InboxItem.update_all({:workflow_state => 'read'}, {:user_id => @current_user.id})
-      User.update_all({:unread_inbox_items_count => (@current_user.inbox_items.unread.count rescue 0)}, {:id => @current_user.id})
+      InboxItem.where(:user_id => @current_user).update_all(:workflow_state => 'read')
+      User.where(:id => @current_user).update_all(:unread_inbox_items_count => (@current_user.inbox_items.unread.count rescue 0))
     end
     respond_to do |format|
       format.html { redirect_to inbox_url }
       format.json { render :json => {:marked_as_read => true}.to_json }
     end
   end
-  
+
   def roster
-    if authorized_action(@context, @current_user, [:read_roster, :manage_students, :manage_admin_users])
-      log_asset_access("roster:#{@context.asset_string}", "roster", "other")
-      if @context.is_a?(Course)
-        @enrollments_hash = Hash.new{ |hash,key| hash[key] = [] }
-        @context.enrollments.sort_by{|e| [e.state_sortable, e.rank_sortable] }.each{ |e| @enrollments_hash[e.user_id] << e }
-        @students = @context.
-          students_visible_to(@current_user).
-          scoped(:conditions => "enrollments.type != 'StudentViewEnrollment'").
-          order_by_sortable_name.uniq
-        @teachers = @context.instructors.order_by_sortable_name.uniq
-        user_ids = @students.map(&:id) + @teachers.map(&:id)
-        if @context.visibility_limited_to_course_sections?(@current_user)
-          user_ids = @students.map(&:id) + [@current_user.id]
-        end
-        @primary_users = {t('roster.students', 'Students') => @students}
-        @secondary_users = {t('roster.teachers', 'Teachers & TAs') => @teachers}
-      elsif @context.is_a?(Group)
-        @users = @context.participating_users.order_by_sortable_name.uniq
-        @primary_users = {t('roster.group_members', 'Group Members') => @users}
-        if @context.context && @context.context.is_a?(Course)
-          @secondary_users = {t('roster.teachers', 'Teachers & TAs') => @context.context.instructors.order_by_sortable_name.uniq}
-        end
+    return unless authorized_action(@context, @current_user, [:read_roster, :manage_students, :manage_admin_users])
+    log_asset_access("roster:#{@context.asset_string}", 'roster', 'other')
+
+    if @context.is_a?(Course)
+      sections = @context.course_sections.select([:id, :name])
+      all_roles = Role.role_data(@context, @current_user)
+      js_env({
+        :ALL_ROLES => all_roles,
+        :SECTIONS => sections.map { |s| { :id => s.id, :name => s.name } },
+        :USER_LISTS_URL => polymorphic_path([@context, :user_lists], :format => :json),
+        :ENROLL_USERS_URL => course_enroll_users_url(@context),
+        :permissions => {
+          :manage_students => (manage_students = @context.grants_right?(@current_user, session, :manage_students)),
+          :manage_admin_users => (manage_admins = @context.grants_right?(@current_user, session, :manage_admin_users)),
+          :add_users => manage_students || manage_admins
+        },
+        :course => {
+          :completed => (completed = @context.completed?),
+          :soft_concluded => (soft_concluded = @context.soft_concluded?),
+          :concluded => completed || soft_concluded,
+          :teacherless => @context.teacherless?,
+          :available => @context.available?
+        }
+      })
+    elsif @context.is_a?(Group)
+      @users         = @context.participating_users.order_by_sortable_name.uniq
+      @primary_users = { t('roster.group_members', 'Group Members') => @users }
+      if course = @context.context.try(:is_a?, Course) && @context.context
+        @secondary_users = { t('roster.teachers_and_tas', 'Teachers & TAs') => course.instructors.order_by_sortable_name.uniq }
       end
-      @secondary_users ||= {}
-      @groups = @context.groups.active rescue []
     end
+
+    @secondary_users ||= {}
+    @groups = @context.groups.active rescue []
   end
-  
+
   def prior_users
     if authorized_action(@context, @current_user, [:manage_students, :manage_admin_users, :read_prior_roster])
-      @prior_memberships = @context.enrollments.not_fake.scoped(:conditions => {:workflow_state => 'completed'}, :include => :user).to_a.once_per(&:user_id).sort_by{|e| [e.rank_sortable(true), e.user.sortable_name.downcase] }
+      @prior_users = @context.prior_users.
+        where(Enrollment.not_fake.proxy_options[:conditions]).
+        select("users.*, NULL AS prior_enrollment").
+        by_top_enrollment.
+        paginate(:page => params[:page], :per_page => 20)
+
+      users = @prior_users.index_by(&:id)
+      if users.present?
+        # put the relevant prior enrollment on each user
+        @context.prior_enrollments.where({:user_id => users.keys}).
+          top_enrollment_by(:user_id, :student).
+          each { |e| users[e.user_id].write_attribute :prior_enrollment, e }
+      end
     end
   end
 
@@ -337,7 +367,7 @@ class ContextController < ApplicationController
       @services_hash = @services.to_a.clump_per{|s| s.service }
     end
   end
-  
+
   def roster_user_usage
     if authorized_action(@context, @current_user, :read_reports)
       @user = @context.users.find(params[:user_id])
@@ -348,17 +378,17 @@ class ContextController < ApplicationController
       end
     end
   end
-  
+
   def roster_user
     if authorized_action(@context, @current_user, :read_roster)
+      user_id = Shard.relative_id_for(params[:id], @context.shard)
       if @context.is_a?(Course)
-        @membership = @context.enrollments.find_by_user_id(params[:id])
-        log_asset_access(@enrollment, "roster", "roster")
+        @membership = @context.enrollments.find_by_user_id(user_id)
+        log_asset_access(@membership, "roster", "roster")
       elsif @context.is_a?(Group)
-        @membership = @context.group_memberships.find_by_user_id(params[:id])
+        @membership = @context.group_memberships.find_by_user_id(user_id)
       end
-      @enrollment ||= @membership
-      @user = @context.users.find(params[:id]) rescue nil
+      @user = @membership.user rescue nil
       if !@user
         if @context.is_a?(Course)
           flash[:error] = t('no_user.course', "That user does not exist or is not currently a member of this course")
@@ -368,7 +398,7 @@ class ContextController < ApplicationController
         redirect_to named_context_url(@context, :context_users_url)
         return
       end
-       
+
       @topics = @context.discussion_topics.active.reject{|a| a.locked_for?(@current_user, :check_policies => true) }
       @entries = []
       @topics.each do |topic|
@@ -393,36 +423,37 @@ class ContextController < ApplicationController
       true
     end
   end
-    
+
   def undelete_index
     if authorized_action(@context, @current_user, :manage_content)
-      @item_types = {
-        :discussion_topics => ['workflow_state = ?', 'deleted'],
-        :assignments => ['workflow_state = ?', 'deleted'],
-        :assignment_groups => ['workflow_state = ?', 'deleted'],
-        :enrollments => ['workflow_state = ?', 'deleted'],
-        :default_wiki_wiki_pages => ['workflow_state = ?', 'deleted'],
-        :attachments => ['file_state = ?', 'deleted'],
-        :rubrics => ['workflow_state = ?', 'deleted'],
-        :collaborations => ['workflow_state = ?', 'deleted'],
-        :quizzes => ['workflow_state = ?', 'deleted'],
-        :context_modules => ['workflow_state = ?', 'deleted']
-      }
+      @item_types = [
+        @context.discussion_topics,
+        @context.assignments,
+        @context.assignment_groups,
+        @context.enrollments,
+        @context.wiki.wiki_pages,
+        @context.rubrics,
+        @context.collaborations,
+        @context.quizzes,
+        @context.context_modules
+      ]
       @deleted_items = []
-      @item_types.each do |type, conditions|
-        @deleted_items += @context.send(type).find(:all, :conditions => conditions, :limit => 25) rescue []
+      @item_types.each do |scope|
+        @deleted_items += scope.where(:workflow_state => 'deleted').limit(25).all
       end
+      @deleted_items += @context.attachments.where(:file_state => 'deleted').limit(25).all
       @deleted_items.sort_by{|item| item.read_attribute(:deleted_at) || item.created_at }.reverse
     end
   end
-  
+
   def undelete_item
     if authorized_action(@context, @current_user, :manage_content)
       type = params[:asset_string].split("_")
       id = type.pop
       type = type.join("_")
-      type = 'default_wiki_wiki_pages' if type == 'wiki_pages'
-      @item = @context.send(type.pluralize).find(id)
+      scope = @context
+      scope = @context.wiki if type == 'wiki_pages'
+      @item = scope.send(type.pluralize).find(id)
       @item.restore
       render :json => @item
     end

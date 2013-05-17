@@ -21,14 +21,17 @@ cache(safe_cache_key([@current_user, contexts, 'a_need_grading']), cache_opts) d
     <% needs_grading.each_with_index do |assignment, i| %>
 
       <li style="<%= hidden if i >= visible_limit %>">
-      <a class="item icon-grading-gray tooltip" href="<%= speed_grader_course_gradebook_path( assignment.context_id, :assignment_id => assignment.id) %>">
+      <a
+        class="item icon-grading-gray tooltip"
+        href="<%= speed_grader_course_gradebook_path( assignment.context_id, :assignment_id => assignment.id) %>"
+        data-track-category="dashboard"
+        data-track-label="todo needs grading"
+      >
           <% if assignment.due_at || assignment.points_possible || show_context %>
             <span class="tooltip_wrap">
               <span class='tooltip-carat'></span>
               <span class="tooltip_text">
-                <% if assignment.due_at %>
-                  <span style="display: block;"><%= t 'tooltip.due_at', 'due: %{date}', :date => datetime_string(assignment.due_at) %></span>
-                <% end %>
+                <span style="display: block;"><%= translated_due_date(assignment) %></span>
                 <% if assignment.points_possible %>
                   <span style="display: block; font-size: 0.8em;"><%= t 'points_possible', 'out of %{points_possible}', :points_possible => assignment.points_possible %></span>
                 <% end %>
@@ -39,14 +42,19 @@ cache(safe_cache_key([@current_user, contexts, 'a_need_grading']), cache_opts) d
             </span>
           <% end %>
           <b><%= t 'headings.grade', 'Grade %{assignment}', :assignment => assignment.title %></b>
-          <em><%= t 'need_grading_count', { :one => '1 needs grading', :other => '%{count} need grading' }, :count => assignment.needs_grading_count %></em>
+          <em><%= t 'need_grading_count', { :one => '1 needs grading', :other => '%{count} need grading' }, :count => assignment.needs_grading_count_for_user(@current_user) %></em>
         </a>
         <a class='disable_item_link grading' title="<%= t('links.title.ignore', %{Ignore this assignment}) %>" href="#" data-api-href="<%= api_v1_users_todo_ignore_url(assignment.asset_string, 'grading') %>"><%= image_tag "earmark_hover.png", :alt => t('images.alt.ignore', 'ignore') %></a>
       </li>
     <% end %>
     <% needs_submitting.each_with_index do |assignment, i| %>
       <li style="<%= hidden if i >= visible_limit %>">
-        <a class="item icon-grading-gray tooltip" href="<%= course_assignment_path( assignment.context_id, assignment.id ) %>#submit">
+        <a
+          class="item icon-grading-gray tooltip"
+          href="<%= course_assignment_path( assignment.context_id, assignment.id ) %>#submit"
+          data-track-category="dashboard"
+          data-track-label="todo needs submitting"
+        >
           <% if show_context || assignment.points_possible %>
             <span class="tooltip_wrap">
               <span class='tooltip-carat'></span>
@@ -61,7 +69,7 @@ cache(safe_cache_key([@current_user, contexts, 'a_need_grading']), cache_opts) d
             </span>
           <% end %>
           <b><%= assignment.submission_action_string %></b>
-          <em><%= t 'due_at', 'Due %{date}', :date => datetime_string(assignment.due_at) %></em>
+          <em><%= translated_due_date(assignment) %></em>
         </a>
         <a class='disable_item_link submitting' title="<%= t('links.title.ignore', %{Ignore this assignment}) %>"  href="#" data-api-href="<%= api_v1_users_todo_ignore_url(assignment.asset_string, 'submitting') %>"><%= image_tag "earmark_hover.png", :alt => t('images.alt.ignore', 'ignore') %></a>
       </li>

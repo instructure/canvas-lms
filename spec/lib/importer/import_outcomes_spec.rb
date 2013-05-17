@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.dirname(__FILE__) + '/import_helper'
+require File.expand_path(File.dirname(__FILE__) + '/import_helper')
 
 describe "Importing Learning Outcomes" do
   it "should import" do
@@ -35,8 +35,8 @@ describe "Importing Learning Outcomes" do
     lo2 = LearningOutcome.find_by_migration_id("fa67b467-37c7-4fb9-aef4-21a33a06d0be")
     lo2.description.should == "Outcome 2: follow directions"
 
-    log = LearningOutcomeGroup.default_for(context)
-    log.sorted_content.member?(lo1).should_not be_nil
-    log.sorted_content.member?(lo2).should_not be_nil
+    log = context.root_outcome_group
+    log.child_outcome_links.detect{ |link| link.content == lo1 }.should_not be_nil
+    log.child_outcome_links.detect{ |link| link.content == lo2 }.should_not be_nil
   end
 end

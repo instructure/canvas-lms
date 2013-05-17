@@ -4,11 +4,12 @@ define [
   'i18n!calendar.edit'
   'Backbone'
   'jst/calendar/editCalendarEventFull'
+  'compiled/views/calendar/MissingDateDialogView'
   'wikiSidebar'
   'compiled/object/unflatten'
   'tinymce.editor_box'
   'compiled/tinymce'
-], ($, _, I18n, Backbone, editCalendarEventFullTemplate, wikiSidebar, unflatten) ->
+], ($, _, I18n, Backbone, editCalendarEventFullTemplate, MissingDateDialogView, wikiSidebar, unflatten) ->
 
   ##
   # View for editing a calendar event on it's own page
@@ -22,6 +23,7 @@ define [
       'submit form': 'submit'
       'change [name="use_section_dates"]': 'toggleUseSectionDates'
       'click .delete_link': 'destroyModel'
+      'click .switch_event_description_view': 'toggleHtmlView'
 
     initialize: ->
       @model.fetch().done =>
@@ -54,8 +56,17 @@ define [
     # boilerplate that could be replaced with data bindings
     toggleUsingSectionClass: =>
       @$('#editCalendarEventFull').toggleClass 'use_section_dates', @model.get('use_section_dates')
-    toggleUseSectionDates: =>
+      $('.show_if_using_sections input').prop('disabled', !@model.get('use_section_dates'))
+    toggleUseSectionDates: (e) =>
       @model.set 'use_section_dates', !@model.get('use_section_dates')
+      @updateRemoveChildEvents(e)
+    toggleHtmlView: (event) ->
+      event?.preventDefault()
+      $("textarea[name=description]").editorBox('toggle')
+
+    updateRemoveChildEvents: (e) ->
+      value = if $(e.target).prop('checked') then '' else '1'
+      $('input[name=remove_child_events]').val(value)
 
     redirectWithMessage: (message) ->
       $.flashMessage message
@@ -67,14 +78,31 @@ define [
       # force use_section_dates to boolean, so it doesnt cause 'change' if it is '1'
       eventData.use_section_dates = !!eventData.use_section_dates
       _.each [eventData].concat(eventData.child_event_data), @setStartEnd
+      delete eventData.child_event_data if eventData.remove_child_events == '1'
 
+      if $('[name=use_section_dates]').prop('checked')
+        dialog = new MissingDateDialogView
+          validationFn: ->
+            $fields = $('[name*=start_date]:visible').filter -> $(this).val() is ''
+            if $fields.length > 0 then $fields else true
+          labelFn   : (input) -> $(input).parents('tr').prev().find('label').text()
+          success   : ($dialog) =>
+            $dialog.dialog('close')
+            @$el.disableWhileLoading @model.save eventData, success: =>
+              @redirectWithMessage I18n.t 'event_saved', 'Event Saved Successfully'
+            $dialog.remove()
+        return if dialog.render()
+
+      @saveEvent(eventData)
+
+    saveEvent: (eventData) ->
       @$el.disableWhileLoading @model.save eventData, success: =>
         @redirectWithMessage I18n.t 'event_saved', 'Event Saved Successfully'
 
     setStartEnd: (obj) ->
       return unless obj
-      obj.start_at = Date.parse obj.start_date+' '+obj.start_time
-      obj.end_at   = Date.parse obj.start_date+' '+obj.end_time
+      obj.start_at = $.unfudgeDateForProfileTimezone(Date.parse obj.start_date+' '+obj.start_time)
+      obj.end_at   = $.unfudgeDateForProfileTimezone(Date.parse obj.start_date+' '+obj.end_time)
 
     @type:  'event'
     @title: -> super 'event', 'Event'

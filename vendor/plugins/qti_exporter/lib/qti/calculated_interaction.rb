@@ -9,7 +9,8 @@ class CalculatedInteraction < AssessmentItemConverter
   end
 
   def parse_question_data
-    @question[:imported_formula] = CGI.unescape(@doc.at_css('calculated formula').text)
+    imported_formula = @doc.at_css('calculated formula')
+    @question[:imported_formula] = CGI.unescape(imported_formula.text) if imported_formula
     get_calculated_property('answer_tolerance')
     @question[:answer_tolerance] = @question[:answer_tolerance].to_f if @question[:answer_tolerance]
     get_calculated_property('unit_points_percent')

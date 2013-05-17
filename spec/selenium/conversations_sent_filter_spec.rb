@@ -2,9 +2,9 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/conversations_common
 
 describe "conversations sent filter" do
   it_should_behave_like "in-process server selenium tests"
-  it_should_behave_like "conversations selenium tests"
 
-  before do
+  before (:each) do
+    conversation_setup
     @course.update_attribute(:name, "the course")
     @course1 = @course
     @s1 = User.create(:name => "student1")
@@ -22,9 +22,9 @@ describe "conversations sent filter" do
     get "/conversations/sent"
 
     conversations = get_conversations
-    conversations.first.attribute('data-id').should eql(@c1.conversation_id.to_s)
+    conversations.first.should have_attribute('data-id', @c1.conversation_id.to_s)
     conversations.first.should include_text('yay i sent this')
-    conversations.last.attribute('data-id').should eql(@c2.conversation_id.to_s)
+    conversations.last.should have_attribute('data-id', @c2.conversation_id.to_s)
     conversations.last.should include_text('test')
   end
 
@@ -33,12 +33,11 @@ describe "conversations sent filter" do
     get_conversations.last.click
     get_messages(false)
 
-    submit_message_form(:message => first_message_text)
+    submit_message_form(:message => first_message_text, :existing_conversation => true)
 
-    conversations = get_conversations
-    conversations.size.should eql 2
-    conversations.first.should include_text(first_message_text)
-    conversations.last.should include_text('yay i sent this')
+    ff(".last_author").length.should == 2
+    ff(".last_author")[0].should include_text(first_message_text)
+    ff(".last_author")[1].should include_text('yay i sent this')
   end
 
   it "should remove the conversation when the last message by the author is deleted" do
@@ -61,10 +60,11 @@ describe "conversations sent filter" do
     add_recipient("student2")
     add_recipient("student3")
 
+    ConversationBatch.any_instance.stubs(:mode).returns(:sync)
     submit_message_form(:message => message_text, :add_recipient => false, :group_conversation => false)
 
     conversations = get_conversations
-    conversations.size.should eql 3
+    conversations.size.should == 3
     conversations.each { |conversation| conversation.should include_text(message_text) }
   end
 end

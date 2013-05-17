@@ -32,6 +32,13 @@ describe "assignments" do
     @submission2 = @assignment.submit_homework(@student2, :submission_type => "online_text_entry", :body => "there")
   end
 
+  def create_assignment_section_override(section, due_at)
+    override = assignment_override_model(:assignment => @assignment)
+    override.set = section
+    override.override_due_at(due_at)
+    override.save!
+  end
+
   it "should correctly list ungraded and total submissions for teacher" do
     multiple_section_submissions
 
@@ -66,6 +73,47 @@ describe "assignments" do
 
     response.should be_success
     Nokogiri::HTML(response.body).at_css('.graded_count').text.should match(/0 out of 1/)
+  end
+
+  describe "due date overrides" do
+    include TextHelper
+
+    before do
+      course_with_teacher_logged_in(:active_all => true)
+      assignment_model(:course => @course, :due_at => 3.days.from_now)
+      @assignment.update_attribute :due_at, 2.days.from_now
+      @cs1 = @course.default_section
+      @cs2 = @course.course_sections.create!
+    end
+
+    it "should show 'Everyone' when there are no overrides" do
+      get "courses/#{@course.id}/assignments/#{@assignment.id}"
+
+      doc = Nokogiri::HTML(response.body)
+      doc.css(".assignment_dates").text.should include "Everyone"
+      doc.css(".assignment_dates").text.should_not include "Everyone else"
+    end
+
+    it "should show 'Everyone else' when some sections have due date overrides" do
+      due_at1 = 3.days.from_now
+      create_assignment_section_override(@cs1, due_at1)
+
+      get "courses/#{@course.id}/assignments/#{@assignment.id}"
+
+      doc = Nokogiri::HTML(response.body)
+      doc.css(".assignment_dates").text.should include "Everyone else"
+    end
+
+    it "should not show 'Everyone else' when all sections have due date overrides" do
+      due_at1, due_at2 = 3.days.from_now, 4.days.from_now
+      create_assignment_section_override(@cs1, due_at1)
+      create_assignment_section_override(@cs2, due_at2)
+
+      get "courses/#{@course.id}/assignments/#{@assignment.id}"
+
+      doc = Nokogiri::HTML(response.body)
+      doc.css(".assignment_dates").text.should_not include "Everyone"
+    end
   end
 end
 

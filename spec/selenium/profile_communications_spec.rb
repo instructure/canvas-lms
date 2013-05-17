@@ -48,12 +48,12 @@ describe "profile communication settings" do
     # Page title should match expected
     f('title').text.should == 'Notification Preferences'
     # Expect breadcrumbs to correctly display page name
-    f('nav#breadcrumbs').should include_text('Notification Preferences')
+    f('#breadcrumbs').should include_text('Notification Preferences')
     # Expect h2 with
     f('#content > h2').text.should == 'Notification Preferences'
   end
 
-  it "should display the user's email address as channel" do
+  it "should display the users email address as channel" do
     get "/profile/communication"
     wait_for_ajaximations
     fj('th.comm-channel:first').should include_text('Email Address')

@@ -19,20 +19,13 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe WebConference do
-  before(:all) do
-    WebConference.instance_eval do
-      def plugins
-        [OpenObject.new(:id => "dim_dim", :settings => {:domain => "dimdim.instructure.com"}, :valid_settings? => true, :enabled? => true),
-         OpenObject.new(:id => "big_blue_button", :settings => {:domain => "bbb.instructure.com", :secret_dec => "secret"}, :valid_settings? => true, :enabled? => true),
-         OpenObject.new(:id => "wimba", :settings => {:domain => "wimba.test"}, :valid_settings? => true, :enabled? => true),
-         OpenObject.new(:id => "broken_plugin", :settings => {:foo => :bar}, :valid_settings? => true, :enabled? => true)]
-      end
-    end
-  end
-  after(:all) do
-    WebConference.instance_eval do
-      def plugins; Canvas::Plugin.all_for_tag(:web_conferencing); end
-    end
+  before do
+    WebConference.stubs(:plugins).returns(
+        [web_conference_plugin_mock("dim_dim", {:domain => "dimdim.instructure.com"}),
+         web_conference_plugin_mock("big_blue_button", {:domain => "bbb.instructure.com", :secret_dec => "secret"}),
+         web_conference_plugin_mock("wimba", {:domain => "wimba.test"}),
+         web_conference_plugin_mock("broken_plugin", {:foor => :bar})]
+    )
   end
 
   context "broken_plugin" do
@@ -121,7 +114,7 @@ describe WebConference do
       # second one doesn't trigger another create call
       conference.craft_url(@user).should match(/\Ahttp:\/\/bbb\.instructure\.com\/bigbluebutton\/api\/join/)
 
-      WebConference.update_all({:updated_at => 1.day.ago}, {:id => conference.id})
+      WebConference.where(:id => conference).update_all(:updated_at => 1.day.ago)
       conference.reload
 
       conference.craft_url(@user).should match(/\Ahttp:\/\/bbb\.instructure\.com\/bigbluebutton\/api\/join/)
@@ -271,11 +264,12 @@ describe WebConference do
 
   context "notifications" do
     before do
-      Notification.create!(:name => 'Web Conference Invitation')
+      Notification.create!(:name => 'Web Conference Invitation', :category => "TestImmediately")
+      course_with_student(:active_all => 1)
+      @student.communication_channels.create(:path => "test_channel_email_#{user.id}", :path_type => "email").confirm
     end
 
     it "should send notifications" do
-      course_with_student(:active_all => 1)
       conference = DimDimConference.create!(:title => "my conference", :user => @user, :context => @course)
       conference.add_attendee(@student)
       conference.save!
@@ -283,7 +277,6 @@ describe WebConference do
     end
 
     it "should not send notifications to inactive users" do
-      course_with_student(:active_all => 1)
       @course.restrict_enrollments_to_course_dates = true
       @course.start_at = 2.days.from_now
       @course.conclude_at = 4.days.from_now

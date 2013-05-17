@@ -32,7 +32,7 @@ class UserNotesController < ApplicationController
   
    def user_notes
     get_context
-    return render 'shared/unauthorized' unless @context.root_account.enable_user_notes
+    return render_unauthorized_action unless @context.root_account.enable_user_notes
     if authorized_action(@context, @current_user, :manage_user_notes)
       if @context && @context.is_a?(Account)
         @users = @context.all_users.active.has_current_student_enrollments
@@ -41,7 +41,7 @@ class UserNotesController < ApplicationController
         @is_course = true
       end
       count = @users.count
-      @users = @users.scoped(:select=> "name, users.id, last_user_note", :order=>"last_user_note ASC, #{User.sortable_name_order_by_clause} ASC", :extend => User::SortableNameExtension)
+      @users = @users.select("name, users.id, last_user_note").order("last_user_note").order_by_sortable_name
       @users = @users.paginate(:page => params[:page], :per_page => 20, :total_entries=>count)
       # rails gets confused by :include => :courses, because has_current_student_enrollments above references courses in a subquery
       User.send(:preload_associations, @users, :courses)

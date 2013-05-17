@@ -3,12 +3,19 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 describe "plugins ui" do
   it_should_behave_like "in-process server selenium tests"
 
-  it 'should have plugins default to disabled when no plugin_setting exits' do
+  before(:each) do
     site_admin_logged_in
+  end
 
+  after(:each) do
+    truncate_table PluginSetting
+  end
+
+  it 'should have plugins default to disabled when no plugin_setting exits' do
     get '/plugins/etherpad'
     is_checked('#plugin_setting_disabled').should be_true
-    expect_new_page_load { driver.find_element(:css, "button.save_button").click }
+
+    expect_new_page_load { submit_form("#new_plugin_setting") }
     PluginSetting.all.count.should == 1
     PluginSetting.first.tap do |ps|
       ps.name.should == "etherpad"
@@ -16,12 +23,13 @@ describe "plugins ui" do
     end
     get '/plugins/etherpad'
     is_checked('#plugin_setting_disabled').should be_true
+  end
 
-    truncate_table PluginSetting
+  it 'should have plugin settings not disabled when set' do
     get '/plugins/etherpad'
     is_checked('#plugin_setting_disabled').should be_true
-    driver.find_element(:css, '#plugin_setting_disabled').click
-    expect_new_page_load { driver.find_element(:css, "button.save_button").click }
+    f('#plugin_setting_disabled').click
+    expect_new_page_load { submit_form("#new_plugin_setting") }
     PluginSetting.all.count.should == 1
     PluginSetting.first.tap do |ps|
       ps.name.should == "etherpad"
@@ -31,3 +39,4 @@ describe "plugins ui" do
     is_checked('#plugin_setting_disabled').should be_false
   end
 end
+

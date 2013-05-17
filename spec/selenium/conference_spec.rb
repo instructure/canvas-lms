@@ -11,25 +11,23 @@ describe "web conference" do
   end
 
   it "should create a web conference" do
-    conference_title = 'new conference'
-    driver.find_element(:link, 'Make a New Conference').click
-
-    driver.find_element(:id, 'web_conference_title').clear
-    driver.find_element(:id, 'web_conference_title').send_keys(conference_title)
-    submit_form('#add_conference_form')
-    wait_for_ajaximations
-    driver.find_element(:link, conference_title).click
-    driver.find_element(:id, 'content').text.include?(conference_title).should be_true
-
+    conference_title = 'Course Conference'
+    f('.add_conference_link').click
+    keep_trying_until do
+      f('.communication_message .btn-primary').click
+      wait_for_ajaximations
+      fj(".title:contains('#{conference_title}')").displayed?
+    end
+    fj(".title:contains('#{conference_title}')").click
+    f('#content').text.include?(conference_title).should be_true
   end
 
   it "should cancel creating a web conference" do
     conference_title = 'new conference'
-    driver.find_element(:link, 'Make a New Conference').click
-    driver.find_element(:id, 'web_conference_title').clear
-    driver.find_element(:id, 'web_conference_title').send_keys(conference_title)
-    driver.find_element(:css, '#add_conference_form button.cancel_button').click
+    f('.add_conference_link').click
+    replace_content(f('#web_conference_title'), conference_title)
+    f('#add_conference_form button.cancel_button').click
     wait_for_animations
-    driver.find_element(:css, '#add_conference_form div.header').text.include?('Start').should be_false
+    f('#add_conference_form div.header').text.include?('Start').should be_false
   end
 end

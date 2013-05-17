@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2012 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -39,13 +39,14 @@ module Api::V1::Submission
       hash['submission_comments'] = submission.comments_for(@current_user).map do |sc|
         sc_hash = sc.as_json(
           :include_root => false,
-          :only => %w(author_id author_name created_at comment))
+          :only => %w(id author_id author_name created_at comment))
         if sc.media_comment?
           sc_hash['media_comment'] = media_comment_json(:media_id => sc.media_comment_id, :media_type => sc.media_comment_type)
         end
         sc_hash['attachments'] = sc.attachments.map do |a|
           attachment_json(a, user)
         end unless sc.attachments.blank?
+        sc_hash['author'] = user_display_json(sc.author, sc.context)
         sc_hash
       end
     end
@@ -75,7 +76,7 @@ module Api::V1::Submission
     hash
   end
 
-  SUBMISSION_JSON_FIELDS = %w(id user_id url score grade attempt submission_type submitted_at body assignment_id grade_matches_current_submission workflow_state).freeze
+  SUBMISSION_JSON_FIELDS = %w(id user_id url score grade attempt submission_type submitted_at body assignment_id graded_at grade_matches_current_submission grader_id workflow_state late).freeze
   SUBMISSION_OTHER_FIELDS = %w(attachments discussion_entries)
 
   def submission_attempt_json(attempt, assignment, user, session, version_idx = nil, context = nil)

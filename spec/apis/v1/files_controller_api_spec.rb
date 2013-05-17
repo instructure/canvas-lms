@@ -67,16 +67,19 @@ describe "Files API", :type => :integration do
         'hidden_for_user' => false,
         'created_at' => @attachment.created_at.as_json,
         'updated_at' => @attachment.updated_at.as_json,
+        'thumbnail_url' => nil
       }
       @attachment.file_state.should == 'available'
     end
 
     it "should set the attachment to available (s3 storage)" do
       s3_storage!
-      AWS::S3::S3Object.expects(:about).with(@attachment.full_filename, @attachment.bucket_name).returns({
-        'content-type' => 'text/plain',
-        'content-length' => 1234,
-      })
+
+      AWS::S3::S3Object.any_instance.expects(:head).returns({
+                                          :content_type => 'text/plain',
+                                          :content_length => 1234,
+                                      })
+
       json = api_call(:post, "/api/v1/files/#{@attachment.id}/create_success?uuid=#{@attachment.uuid}",
                    { :controller => "files", :action => "api_create_success", :format => "json", :id => @attachment.to_param, :uuid => @attachment.uuid })
       @attachment.reload
@@ -95,6 +98,7 @@ describe "Files API", :type => :integration do
         'hidden_for_user' => false,
         'created_at' => @attachment.created_at.as_json,
         'updated_at' => @attachment.updated_at.as_json,
+        'thumbnail_url' => nil
       }
       @attachment.reload.file_state.should == 'available'
     end
@@ -169,26 +173,26 @@ describe "Files API", :type => :integration do
       7.times {|i| Attachment.create!(:filename => "test#{i}.txt", :display_name => "test#{i}.txt", :uploaded_data => StringIO.new('file'), :folder => @root, :context => @course) }
       json = api_call(:get, "/api/v1/folders/#{@root.id}/files?per_page=3", @files_path_options.merge(:id => @root.id.to_param, :per_page => '3'), {})
       json.length.should == 3
-      response.headers['Link'].should == [
-        %{<http://www.example.com/api/v1/folders/#{@root.id}/files?page=2&per_page=3>; rel="next"},
-        %{<http://www.example.com/api/v1/folders/#{@root.id}/files?page=1&per_page=3>; rel="first"},
-        %{<http://www.example.com/api/v1/folders/#{@root.id}/files?page=3&per_page=3>; rel="last"}
-      ].join(',')
+      links = response.headers['Link'].split(",")
+      links.all?{ |l| l =~ /api\/v1\/folders\/#{@root.id}\/files/ }.should be_true
+      links.find{ |l| l.match(/rel="next"/)}.should =~ /page=2/
+      links.find{ |l| l.match(/rel="first"/)}.should =~ /page=1/
+      links.find{ |l| l.match(/rel="last"/)}.should =~ /page=3/
 
       json = api_call(:get, "/api/v1/folders/#{@root.id}/files?per_page=3&page=3", @files_path_options.merge(:id => @root.id.to_param, :per_page => '3', :page => '3'), {})
       json.length.should == 1
-      response.headers['Link'].should == [
-        %{<http://www.example.com/api/v1/folders/#{@root.id}/files?page=2&per_page=3>; rel="prev"},
-        %{<http://www.example.com/api/v1/folders/#{@root.id}/files?page=1&per_page=3>; rel="first"},
-        %{<http://www.example.com/api/v1/folders/#{@root.id}/files?page=3&per_page=3>; rel="last"}
-      ].join(',')
+      links = response.headers['Link'].split(",")
+      links.all?{ |l| l =~ /api\/v1\/folders\/#{@root.id}\/files/ }.should be_true
+      links.find{ |l| l.match(/rel="prev"/)}.should =~ /page=2/
+      links.find{ |l| l.match(/rel="first"/)}.should =~ /page=1/
+      links.find{ |l| l.match(/rel="last"/)}.should =~ /page=3/
     end
   end
-
+  
   describe "#show" do
     append_before do
       @root = Folder.root_folders(@course).first
-      @att = Attachment.create!(:filename => 'test.txt', :display_name => "test.txt", :uploaded_data => StringIO.new('file'), :folder => @root, :context => @course)
+      @att = Attachment.create!(:filename => 'test.png', :display_name => "test-frd.png", :uploaded_data => stub_png_data, :folder => @root, :context => @course)
       @file_path = "/api/v1/files/#{@att.id}"
       @file_path_options = { :controller => "files", :action => "api_show", :format => "json", :id => @att.id.to_param }
     end
@@ -198,21 +202,22 @@ describe "Files API", :type => :integration do
       json.should == {
               'id' => @att.id,
               'url' => file_download_url(@att, :verifier => @att.uuid, :download => '1', :download_frd => '1'),
-              'content-type' => "unknown/unknown",
-              'display_name' => 'test.txt',
+              'content-type' => "image/png",
+              'display_name' => 'test-frd.png',
               'filename' => @att.filename,
               'size' => @att.size,
               'unlock_at' => nil,
               'locked' => false,
-        'hidden' => false,
+              'hidden' => false,
               'lock_at' => nil,
               'locked_for_user' => false,
               'hidden_for_user' => false,
               'created_at' => @att.created_at.as_json,
               'updated_at' => @att.updated_at.as_json,
+              'thumbnail_url' => @att.thumbnail_url
       }
     end
-
+    
     it "should return lock information" do
       one_month_ago, one_month_from_now = 1.month.ago, 1.month.from_now
       att2 = Attachment.create!(:filename => 'test.txt', :display_name => "test.txt", :uploaded_data => StringIO.new('file'), :folder => @root, :context => @course, :locked => true)
@@ -307,10 +312,16 @@ describe "Files API", :type => :integration do
     end
 
     it "should update" do
-      api_call(:put, @file_path, @file_path_options, {:name => "newname.txt", :locked => 'true'}, {}, :expected_status => 200)
+      unlock = 1.days.from_now
+      lock = 3.days.from_now
+      new_params = {:name => "newname.txt", :locked => 'true', :hidden => true, :unlock_at => unlock.iso8601, :lock_at => lock.iso8601}
+      api_call(:put, @file_path, @file_path_options, new_params, {}, :expected_status => 200)
       @att.reload
       @att.display_name.should == "newname.txt"
-      @att.locked.should == true
+      @att.locked.should be_true
+      @att.hidden.should be_true
+      @att.unlock_at.to_i.should == unlock.to_i
+      @att.lock_at.to_i.should == lock.to_i
     end
 
     it "should move to another folder" do

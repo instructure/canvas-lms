@@ -46,10 +46,11 @@ Delayed::Periodic.cron 'Attachment.process_scribd_conversion_statuses', '*/5 * *
   end
 end
 
-Delayed::Periodic.cron 'Twitter processing', '*/15 * * * *' do
-  Shard.with_each_shard do
-    TwitterSearcher.process
-    TwitterUserPoller.process
+Delayed::Periodic.cron 'CrocodocDocument.update_process_states', '*/5 * * * *' do
+  if Canvas::Crocodoc.config
+    Shard.with_each_shard do
+      CrocodocDocument.update_process_states
+    end
   end
 end
 
@@ -69,11 +70,15 @@ if Mailman.config.poll_interval == 0 && Mailman.config.ignore_stdin == true
   end
 end
 
-if PageView.page_view_method == :cache
+if PageView.redis_queue?
   # periodically pull new page views off the cache and insert them into the db
   Delayed::Periodic.cron 'PageView.process_cache_queue', '*/1 * * * *' do
     Shard.with_each_shard do
-      PageView.send_later_enqueue_args(:process_cache_queue, :singleton => "PageView.process_cache_queue:#{Shard.current.description}")
+      unless Shard.current.settings[:process_page_view_queue] == false
+        PageView.send_later_enqueue_args(:process_cache_queue,
+                                         :singleton => "PageView.process_cache_queue:#{Shard.current.id}",
+                                         :max_attempts => 1)
+      end
     end
   end
 end
@@ -103,4 +108,14 @@ Delayed::Periodic.cron 'Attachment.do_notifications', '*/10 * * * *', :priority 
   Shard.with_each_shard do
     Attachment.do_notifications
   end
+end
+
+Delayed::Periodic.cron 'Ignore.cleanup', '45 23 * * *' do
+  Shard.with_each_shard do
+    Ignore.send_later_enqueue_args(:cleanup, :singleton => "Ignore.cleanup:#{Shard.current.id}")
+  end
+end
+
+Dir[Rails.root.join('vendor', 'plugins', '*', 'config', 'periodic_jobs.rb')].each do |plugin_periodic_jobs|
+  require plugin_periodic_jobs
 end

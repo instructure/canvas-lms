@@ -39,7 +39,7 @@ define [
         tabs.tabs('select', 0)
         tabs.tabs('remove', 1)
         @calendarEventForm.activate()
-      else if @event.eventType == 'assignment'
+      else if @event.eventType.match(/assignment/)
         tabs.tabs('select', 1)
         tabs.tabs('remove', 0)
         @assignmentDetailsForm.activate()
@@ -74,7 +74,7 @@ define [
           @calendarEventForm = new EditCalendarEventDetails(formHolder, @event, @contextChange, @closeCB)
           formHolder.data('form-widget', @calendarEventForm)
 
-        if @event.isNewEvent() || @event.eventType == 'assignment'
+        if @event.isNewEvent() || @event.eventType.match(/assignment/)
           @assignmentDetailsForm = new EditAssignmentDetails($('#edit_assignment_form_holder'), @event, @contextChange, @closeCB)
           dialog.find("#edit_assignment_form_holder").data('form-widget', @assignmentDetailsForm)
 

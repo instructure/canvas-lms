@@ -32,48 +32,52 @@ class ConversationMessage < ActiveRecord::Base
   delegate :subscribed_participants, :to => :conversation
   attr_accessible
 
-  named_scope :human, :conditions => "NOT generated"
-  named_scope :with_attachments, :conditions => "attachment_ids <> '' OR has_attachments" # TODO: simplify post-migration
-  named_scope :with_media_comments, :conditions => "media_comment_id IS NOT NULL OR has_media_objects" # TODO: simplify post-migration
-  named_scope :by_user, lambda { |user_or_id|
-    user_or_id = user_or_id.id if user_or_id.is_a?(User)
-    {:conditions => {:author_id => user_or_id}}
-  }
-  def self.preload_latest(conversation_participants, author_id=nil)
+  after_create :generate_user_note!
+
+  scope :human, where("NOT generated")
+  scope :with_attachments, where("attachment_ids<>'' OR has_attachments") # TODO: simplify post-migration
+  scope :with_media_comments, where("media_comment_id IS NOT NULL OR has_media_objects") # TODO: simplify post-migration
+  scope :by_user, lambda { |user_or_id| where(:author_id => user_or_id) }
+
+  def self.preload_latest(conversation_participants, author=nil)
     return unless conversation_participants.present?
-    base_conditions = sanitize_sql([
-      "conversation_id IN (?) AND conversation_participant_id in (?) AND NOT generated",
-      conversation_participants.map(&:conversation_id),
-      conversation_participants.map(&:id)
-    ])
-    base_conditions << sanitize_sql([" AND author_id = ?", author_id]) if author_id
 
-    # limit it for non-postgres so we can reduce the amount of extra data we
-    # crunch in ruby (generally none, unless a conversation has multiple
-    # most-recent messages, i.e. same created_at)
-    unless connection.adapter_name == 'PostgreSQL'
-      base_conditions << <<-SQL
-        AND conversation_messages.created_at = (
-          SELECT MAX(created_at)
-          FROM conversation_messages cm2
-          JOIN conversation_message_participants cmp2 ON cm2.id = conversation_message_id
-          WHERE cm2.conversation_id = conversation_messages.conversation_id
-            AND #{base_conditions}
+    Shard.partition_by_shard(conversation_participants, lambda { |cp| cp.conversation_id }) do |shard_participants|
+      base_conditions = "(#{shard_participants.map { |cp|
+          "(conversation_id=#{cp.conversation_id} AND user_id=#{cp.user_id})" }.join(" OR ")
+        }) AND NOT generated"
+      base_conditions << sanitize_sql([" AND author_id = ?", author.id]) if author
+
+      # limit it for non-postgres so we can reduce the amount of extra data we
+      # crunch in ruby (generally none, unless a conversation has multiple
+      # most-recent messages, i.e. same created_at)
+      unless connection.adapter_name == 'PostgreSQL'
+        base_conditions << <<-SQL
+          AND conversation_messages.created_at = (
+            SELECT MAX(created_at)
+            FROM conversation_messages cm2
+            JOIN conversation_message_participants cmp2 ON cm2.id = conversation_message_id
+            WHERE cm2.conversation_id = conversation_messages.conversation_id
+              AND #{base_conditions}
+          )
+        SQL
+      end
+
+      Shackles.activate(:slave) do
+        ret = distinct_on(['conversation_id', 'user_id'],
+          :select => "conversation_messages.*, conversation_participant_id, conversation_message_participants.user_id, conversation_message_participants.tags",
+          :joins => 'JOIN conversation_message_participants ON conversation_messages.id = conversation_message_id',
+          :conditions => base_conditions,
+          :order => 'conversation_id DESC, user_id DESC, created_at DESC'
         )
-      SQL
-    end
-
-    ret = distinct_on('conversation_participant_id',
-      :select => "conversation_messages.*, conversation_participant_id, conversation_message_participants.tags",
-      :joins => 'JOIN conversation_message_participants ON conversation_messages.id = conversation_message_id',
-      :conditions => base_conditions,
-      :order => 'conversation_participant_id, created_at DESC'
-    )
-    map = Hash[ret.map{ |m| [m.conversation_participant_id.to_i, m]}]
-    if author_id
-      conversation_participants.each{ |cp| cp.last_authored_message = map[cp.id] }
-    else
-      conversation_participants.each{ |cp| cp.last_message = map[cp.id] }
+        map = Hash[ret.map{ |m| [[m.conversation_id, m.user_id.to_i], m]}]
+        backmap = Hash[ret.map{ |m| [m.conversation_participant_id.to_i, m]}]
+        if author
+          shard_participants.each{ |cp| cp.last_authored_message = map[[cp.conversation_id, cp.user_id]] || backmap[cp.id] }
+        else
+          shard_participants.each{ |cp| cp.last_message = map[[cp.conversation_id, cp.user_id]] || backmap[cp.id] }
+        end
+      end
     end
   end
 
@@ -120,6 +124,12 @@ class ConversationMessage < ActiveRecord::Base
     write_attribute(:attachment_ids, attachments.map(&:id).join(','))
   end
 
+  def clone
+    copy = super
+    copy.attachments = attachments
+    copy
+  end
+
   def delete_from_participants
     conversation.conversation_participants.each do |p|
       p.remove_messages(self) # ensures cached stuff gets updated, etc.
@@ -154,10 +164,12 @@ class ConversationMessage < ActiveRecord::Base
   end
 
   def recipients
+    return [] unless conversation
     self.subscribed_participants.reject{ |u| u.id == self.author_id }
   end
 
   def new_recipients
+    return [] unless conversation
     return [] unless generated? and event_data[:event_type] == :users_added
     recipients.select{ |u| event_data[:user_ids].include?(u.id) }
   end
@@ -190,7 +202,9 @@ class ConversationMessage < ActiveRecord::Base
     end
   end
 
-  def generate_user_note
+  attr_accessor :generate_user_note
+  def generate_user_note!
+    return unless @generate_user_note
     return unless recipients.size == 1
     recipient = recipients.first
     return unless recipient.grants_right?(author, :create_user_notes) && recipient.associated_accounts.any?{|a| a.enable_user_notes }
@@ -213,7 +227,7 @@ class ConversationMessage < ActiveRecord::Base
   end
 
   def reply_from(opts)
-    return if self.context.try(:root_account).try(:deleted?)
+    raise IncomingMessageProcessor::UnknownAddressError if self.context.try(:root_account).try(:deleted?)
     conversation.reply_from(opts.merge(:root_account_id => self.root_account_id))
   end
 

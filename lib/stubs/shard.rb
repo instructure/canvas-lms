@@ -30,11 +30,16 @@ class Shard
   end
 
   def self.partition_by_shard(array, partition_proc = nil)
+    return [] if array.empty?
     Array(yield array)
   end
 
-  def self.with_each_shard
+  def self.with_each_shard(shards = nil)
     Array(yield)
+  end
+
+  def self.shard_for(object)
+    default
   end
 
   def activate
@@ -49,8 +54,20 @@ class Shard
     {}
   end
 
-  def description
+  def id
     "default"
+  end
+
+  def relative_id_for(any_id, target_shard = nil)
+    any_id
+  end
+
+  def self.global_id_for(any_id)
+    any_id
+  end
+
+  def self.relative_id_for(any_id, target_shard = nil)
+    any_id
   end
 
   yaml_as "tag:instructure.com,2012:Shard"
@@ -69,15 +86,46 @@ class Shard
 end
 
 ActiveRecord::Base.class_eval do
-  def shard
+  if Rails.version < "3.0"
+    class << self
+      VALID_FIND_OPTIONS << :shard
+    end
+  end
+
+  scope :shard, lambda { |shard| scoped }
+
+  def shard(shard = nil)
     Shard.default
+  end
+
+  def shard=(new_shard)
+    raise ReadOnlyRecord if new_record? && self.shard != new_shard
+    new_shard
   end
 
   def global_id
     id
   end
 
-  def self.set_shard_override(&block)
-    # pass
+  def local_id
+    id
+  end
+end
+
+module ActiveRecord::Associations
+  AssociationProxy.class_eval do
+    def shard
+      Shard.default
+    end
+  end
+
+  %w{HasManyAssociation HasManyThroughAssociation}.each do |klass|
+    const_get(klass).class_eval do
+      def with_each_shard(*shards)
+        scope = self
+        scope = yield(scope) if block_given?
+        Array(scope)
+      end
+    end
   end
 end

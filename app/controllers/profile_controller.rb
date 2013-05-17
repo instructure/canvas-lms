@@ -18,8 +18,8 @@
 
 # @API Users
 class ProfileController < ApplicationController
-  before_filter :require_registered_user, :except => [:show, :settings]
-  before_filter :require_user, :only => :settings
+  before_filter :require_registered_user, :except => [:show, :settings, :communication, :communication_update]
+  before_filter :require_user, :only => [:settings, :communication, :communication_update]
   before_filter :require_user_for_private_profile, :only => :show
   before_filter :reject_student_view_student
   before_filter :require_password_session, :only => [:settings, :communication, :communication_update, :update]
@@ -39,7 +39,7 @@ class ProfileController < ApplicationController
       return
     end
 
-    @user = User.find(params[:id])
+    @user ||= @current_user
     @active_tab = "profile"
     @context = @user.profile if @user == @current_user
 
@@ -52,7 +52,7 @@ class ProfileController < ApplicationController
 
     known_user = @user_data[:common_contexts].present?
     if @user_data[:known_user] # if you can message them, you can see the profile
-      add_crumb(t('crumbs.profile_frd', "%{user}'s profile", :user => @user.short_name), user_profile_path(@user))
+      add_crumb(t('crumbs.settings_frd', "%{user}'s settings", :user => @user.short_name), user_profile_path(@user))
       return render :action => :show
     else
       return render :action => :unauthorized
@@ -101,7 +101,7 @@ class ProfileController < ApplicationController
     @active_tab = "profile_settings"
     respond_to do |format|
       format.html do
-        add_crumb(t(:crumb, "%{user}'s profile", :user => @user.short_name), settings_profile_path )
+        add_crumb(t(:crumb, "%{user}'s settings", :user => @user.short_name), settings_profile_path )
         render :action => "profile"
       end
       format.json do
@@ -123,19 +123,21 @@ class ProfileController < ApplicationController
       :channels => @user.communication_channels.all_ordered_for_display(@user).map { |c| communication_channel_json(c, @user, session) },
       :policies => NotificationPolicy.setup_with_default_policies(@user, full_category_list).map{ |p| notification_policy_json(p, @user, session) },
       :categories => full_category_list.map{ |c| notification_category_json(c, @user, session) },
-      :update_url => communication_update_profile_path
-    }
+      :update_url => communication_update_profile_path,
+      },
+      :READ_PRIVACY_INFO => @user.preferences[:read_notification_privacy_info],
+      :ACCOUNT_PRIVACY_NOTICE => @domain_root_account.settings[:external_notification_warning]
   end
 
   def communication_update
     params[:root_account] = @domain_root_account
-    @policies = NotificationPolicy.setup_for(@current_user, params)
+    NotificationPolicy.setup_for(@current_user, params)
     render :json => {}, :status => :ok
   end
 
   # @API List avatar options
   # Retrieve the possible user avatar options that can be set with the user update endpoint. The response will be an array of avatar records. If the 'type' field is 'attachment', the record will include all the normal attachment json fields; otherwise it will include only the 'url' and 'display_name' fields. Additionally, all records will include a 'type' field and a 'token' field. The following explains each field in more detail
-  # type:: ["gravatar"|"twitter"|"linked_in"|"attachment"|"no_pic"] The type of avatar record, for categorization purposes.
+  # type:: ["gravatar"|"attachment"|"no_pic"] The type of avatar record, for categorization purposes.
   # url:: The url of the avatar 
   # token:: A unique representation of the avatar record which can be used to set the avatar with the user update endpoint. Note: this is an internal representation and is subject to change without notice. It should be consumed with this api endpoint and used in the user update endpoint, and should not be constructed by the client.
   # display_name:: A textual description of the avatar record
@@ -184,6 +186,14 @@ class ProfileController < ApplicationController
   
   def update
     @user = @current_user
+
+    if params[:privacy_notice].present?
+      @user.preferences[:read_notification_privacy_info] = Time.now.utc.to_s
+      @user.save
+
+      return render(:nothing => true, :status => 208)
+    end
+
     respond_to do |format|
       if !@user.user_can_edit_name? && params[:user]
         params[:user].delete(:name)
@@ -199,7 +209,10 @@ class ProfileController < ApplicationController
         if params[:pseudonym]
           change_password = params[:pseudonym].delete :change_password
           old_password = params[:pseudonym].delete :old_password
-          pseudonym_to_update = @user.pseudonyms.find(params[:pseudonym][:password_id]) if params[:pseudonym][:password_id] && change_password
+          if params[:pseudonym][:password_id] && change_password
+            pseudonym_to_update = @user.pseudonyms.find(params[:pseudonym][:password_id])
+            pseudonym_to_update.require_password = true if pseudonym_to_update
+          end
           if change_password == '1' && pseudonym_to_update && !pseudonym_to_update.valid_arbitrary_credentials?(old_password)
             error_msg = t('errors.invalid_old_passowrd', "Invalid old password for the login %{pseudonym}", :pseudonym => pseudonym_to_update.unique_id)
             pseudonymed = true
@@ -220,7 +233,7 @@ class ProfileController < ApplicationController
           end
         end
         unless pseudonymed
-          flash[:notice] = t('notices.updated_profile', "Profile successfully updated")
+          flash[:notice] = t('notices.updated_profile', "Settings successfully updated")
           format.html { redirect_to user_profile_url(@current_user) }
           format.json { render :json => @user.to_json(:methods => :avatar_url, :include => {:communication_channel => {:only => [:id, :path]}, :pseudonym => {:only => [:id, :unique_id]} }) }
         end
@@ -261,8 +274,8 @@ class ProfileController < ApplicationController
         visible, invisible = params[:user_services].partition { |service,bool|
           value_to_boolean(bool)
         }
-        @user.user_services.update_all("visible = TRUE", :service => visible.map(&:first))
-        @user.user_services.update_all("visible = FALSE", :service => invisible.map(&:first))
+        @user.user_services.where(:service => visible.map(&:first)).update_all(:visible => true)
+        @user.user_services.where(:service => invisible.map(&:first)).update_all(:visible => false)
       end
 
       respond_to do |format|
@@ -279,7 +292,7 @@ class ProfileController < ApplicationController
 
   def require_user_for_private_profile
     if params[:id]
-      @user = User.find(params[:id])
+      @user = api_find(User, params[:id])
       return if @user.public?
     end
     require_user

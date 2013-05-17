@@ -77,12 +77,16 @@ describe SubAccountsController do
       sub_account_4 = root_account.sub_accounts.create!
       sub_sub_account = sub_account_4.sub_accounts.create!
       sub_sub_sub_account = sub_sub_account.sub_accounts.create!
+      # add one more, then delete it; the count should remain the same
+      sub_sub_account.sub_accounts.create! { |sa| sa.workflow_state = 'deleted' }
 
       # 150 sub_accounts; these sub_accounts won't be visible
       sub_account_5 = root_account.sub_accounts.create!
       (1..150).each { sub_account_5.sub_accounts.create! }
       # give one of them a course (which previously triggered a bug)
       Course.create!(:account => sub_account_5.sub_accounts.last)
+      # add one more, then delete it; count should remain unchanged
+      sub_account_5.sub_accounts.create! { |sa| sa.workflow_state = 'deleted' }
 
       get 'index', :account_id => root_account.id
 

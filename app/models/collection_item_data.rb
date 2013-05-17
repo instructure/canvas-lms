@@ -19,9 +19,14 @@
 class CollectionItemData < ActiveRecord::Base
   include CustomValidations
 
+  # rails3 realized that plural form is actually "data",
+  # but we don't want to rename the table at this point
+  set_table_name :collection_item_datas
+
   belongs_to :root_item, :class_name => "CollectionItem"
   belongs_to :image_attachment, :class_name => "Attachment"
-  has_many :collection_item_upvotes
+  # belongs with the user, so avoid accessing from here
+  # has_many :collection_item_upvotes
 
   VALID_ITEM_TYPES = %w(url image audio video)
   THUMBNAIL_SIZE = "640x>"

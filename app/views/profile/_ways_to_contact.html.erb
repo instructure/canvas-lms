@@ -45,7 +45,7 @@
   <% @email_channels.each do |c| %>
     <tr class="channel <%= "default" if c.position && c.position <= 1 %> <%= "unconfirmed" if c.state == :unconfirmed %> pseudonym_<%= c.pseudonym &&c.pseudonym.id %>" id="channel_<%= c.id %>">
       <td style="padding: 0; text-align: center;">
-        <a href="<%= user_profile_url(@current_user) %>" class="default_link no-hover"><%= image_tag "star.png", :title => t('titles.default_email_address', "Default email address") %></a>
+        <a href="<%= profile_url %>" class="default_link no-hover"><i class="icon-star standalone-icon" title="<%= t('titles.default_email_address', "Default email address") %>"></i></a>
       </td>
       <td><div style="overflow: hidden; position: relative;">&nbsp;
       <div style="position: absolute; top: 0; left: 0; font-size: 0.8em;" title="<%=h c.path %>">
@@ -53,11 +53,13 @@
       </div></div></td>
       <td style="padding: 0; text-align: center;" class="hidden_for_single">
         <% if c.state == :unconfirmed && (@user.grants_right?(@current_user, nil, :manage_user_details) || (@real_current_user && @user.grants_right?(@real_current_user, nil, :manage_user_details))) %>
-            <a href="<%= registration_confirmation_url(c.confirmation_code) %>" class="confirm_channel_link no-hover"><%= image_tag "pass.png", :title => t('titles.confirm_email_address', "Confirm Email Address") %></a>
+            <a href="<%= registration_confirmation_url(c.confirmation_code) %>" class="confirm_channel_link no-hover"><i class="icon-check standalone-icon" title="<%= t('titles.confirm_email_address', "Confirm Email Address") %>"></i></a>
         <% end %>
-        <a href="<%= communication_channel_url(c.id) %>" class="delete_channel_link no-hover"><%= image_tag "delete.png", :title => t('titles.remove_email_address', "Remove email address") %></a>
-        <% if c.active? && CommunicationChannel.active.email.by_path(c.path).count(:all, :joins => { :user => :pseudonyms }, :conditions => ["communication_channels.user_id<>? AND pseudonyms.workflow_state='active'", @user.id]) != 0 %>
-          <a href="<%= registration_confirmation_url(c.confirmation_code) %>" class="merge_users_link no-hover"><%= image_tag "group.png", :title => t('titles.merge_users', "Another user has the same email address.  Click here to combine user accounts.") %></a>
+        <% unless !@domain_root_account.edit_institution_email? && c.imported? %>
+          <a href="<%= communication_channel_url(c.id) %>" class="delete_channel_link no-hover"><i class="icon-trash standalone-icon" title="<%= t('titles.remove_email_address', "Remove email address") %>"></i></a>
+        <% end %>
+        <% if c.active? && c.merge_candidates.length != 0 %>
+          <a href="<%= registration_confirmation_url(c.confirmation_code) %>" class="merge_users_link no-hover"><i class="icon-group-new standalone-icon" title="<%= t('titles.merge_users', "Another user has the same email address.  Click here to combine user accounts.") %>"></i></a>
         <% end %>
         <span class="pseudonym_id" style="display: none;"><%= c.pseudonym_id %></span>
         <span class="channel_id" style="display: none;"><%= c.id %></span>
@@ -67,14 +69,14 @@
   <% end %>
   <tr class="channel blank unconfirmed" style="display: none;">
     <td style="padding: 0; text-align: center;">
-      <a href="<%= user_profile_url(@current_user) %>" class="default_link no-hover"><%= image_tag "star.png", :title => t('titles.default_email_address', "Default email address") %></a>
+      <a href="<%= user_profile_url(@current_user) %>" class="default_link no-hover"><i class="icon-star standalone-icon" title="<%= t('titles.default_email_address', "Default email address") %>"></i></a>
     </td>
     <td><div style="overflow: hidden; position: relative;">&nbsp;
     <div style="position: absolute; top: 0; left: 0; font-size: 0.8em;" title="">
       <a href="#" class="path">&nbsp;</a>
     </div></div></td>
     <td style="padding: 0; text-align: center;" class="hidden_for_single">
-      <a href="<%= communication_channel_url("{{ channel_id }}") %>" class="delete_channel_link no-hover"><%= image_tag "delete.png" %></a>
+      <a href="<%= communication_channel_url("{{ channel_id }}") %>" class="delete_channel_link no-hover"><i class="icon-trash standalone-icon"></i></a>
       <span class="pseudonym_id" style="display: none;">&nbsp;</span>
       <span class="channel_id" style="display: none;">&nbsp;</span>
       <span class="user_id" style="display: none;">&nbsp;</span>
@@ -82,7 +84,7 @@
   </tr>
   <tr>
     <td colspan="3" style="text-align: center;">
-      <a href="#" class="add_email_link add"><%= t('links.add_email_address', "Add Email Address") %></a>
+      <a href="#" class="add_email_link icon-add"><%= t('links.add_email_address', "Add Email Address") %></a>
     </td>
   </tr>
 </table>
@@ -100,9 +102,11 @@
       <td><%= c.path_type %></td>
       <td style="padding: 0; text-align: center;">
         <% if c.state == :unconfirmed && (@user.grants_right?(@current_user, nil, :manage_user_details) || (@real_current_user && @user.grants_right?(@real_current_user, nil, :manage_user_details))) %>
-            <a href="<%= registration_confirmation_url(c.confirmation_code) %>" class="confirm_channel_link no-hover"><%= image_tag "pass.png", :title => t('titles.confirm_email_address', "Confirm Email Address") %></a>
+            <a href="<%= registration_confirmation_url(c.confirmation_code) %>" class="confirm_channel_link no-hover"><i class="icon-check standalone-icon" title="<%= t('titles.confirm_email_address', "Confirm Email Address") %>"></i></a>
         <% end %>
-        <a href="<%= communication_channel_url(c.id) %>" class="delete_channel_link no-hover"><%= image_tag "delete.png", :title => t('titles.remove_email_address', "Remove email address"), :style => (c.first?) ? "display: none;" : "" %></a>
+        <% unless c.id == c.user.otp_communication_channel_id %>
+          <a href="<%= communication_channel_url(c.id) %>" class="delete_channel_link no-hover"><i class="icon-trash standalone-icon" style="<%= (c.first?) ? "display: none;" : "" %>" title="<%= t('titles.remove_email_address', "Remove email address") %>"></i></a>
+        <% end %>
         <span class="pseudonym_id" style="display: none;"><%= c.pseudonym_id %></span>
         <span class="channel_id" style="display: none;"><%= c.id %></span>
         <span class="user_id" style="display: none;"><%= c.user_id %></span>
@@ -113,7 +117,7 @@
     <td><a href="#" class="path">&nbsp;</a></td>
     <td><%= t('contact_types.sms', "sms") %></td>
     <td style="padding: 0; text-align: center;">
-      <a href="<%= communication_channel_url("{{ channel_id }}") %>" class="delete_channel_link no-hover"><%= image_tag "delete.png" %></a>
+      <a href="<%= communication_channel_url("{{ channel_id }}") %>" class="delete_channel_link no-hover"><i class="icon-trash standalone-icon"></i></a>
       <span class="pseudonym_id" style="display: none;">&nbsp;</span>
       <span class="channel_id" style="display: none;">&nbsp;</span>
       <span class="user_id" style="display: none;">&nbsp;</span>
@@ -123,7 +127,7 @@
   <tfoot>
   <tr>
     <td colspan="3" style="text-align: center;">
-      <a href="#" class="add_contact_link add"> <%= t('links.add_contact_method', "Add Contact Method") %></a>
+      <a href="#" class="add_contact_link icon-add"><%= t('links.add_contact_method', "Add Contact Method") %></a>
     </td>
   </tr>
   </tfoot>
@@ -151,7 +155,7 @@
   <% end %>
   <tr>
     <td colspan="2">
-      <button type="submit" class="button"><%= t('buttons.register_email', "Register Email") %></button>
+      <button type="submit" class="btn btn-primary"><%= t('buttons.register_email', "Register Email") %></button>
     </td>
   </tr>
 </table>
@@ -170,17 +174,9 @@
     <td>
       <select class="user_selected carrier">
         <option value="other"><%= t(:default_carrier_option, "[Select Carrier]") %></option>
-        <option value="#@txt.att.net"><%= t('carriers.a_t_and_t', "AT&T") %></option>
-        <option value="#@message.alltel.com"><%= t('carriers.alltel', "Alltel") %></option>
-        <option value="#@myboostmobile.com"><%= t('carriers.boost', "Boost") %></option>
-        <option value="#@cingularme.com"><%= t('carriers.cingular', "Cingular") %></option>
-        <option value="#@mobile.celloneusa.com"><%= t('carriers.cellular_one', "CellularOne") %></option>
-        <option value="#@sms.mycricket.com"><%= t('carriers.cricket', "Cricket") %></option>
-        <option value="#@messaging.nextel.com"><%= t('carriers.nextel', "Nextel") %></option>
-        <option value="#@messaging.sprintpcs.com"><%= t('carriers.sprint_psc', "Sprint PCS") %></option>
-        <option value="#@tmomail.net"><%= t('carriers.t_mobile', "T-Mobile") %></option>
-        <option value="#@vtext.com"><%= t('carriers.verizon', "Verizon") %></option>
-        <option value="#@vmobl.com"><%= t('carriers.virgin_mobile', "Virgin Mobile") %></option>
+        <% CommunicationChannel.sms_carriers.each do |(carrier, domain)| %>
+          <option value="#@<%= domain %>"><%= carrier %></option>
+        <% end %>
         <option value="other"><%= t('carriers.other', "Other Carrier") %></option>
       </select>
     </td>
@@ -191,7 +187,7 @@
     </td>
   </tr><tr>
     <td colspan="2">
-      <button type="submit" class="button"><%= t('buttons.register_sms', "Register SMS") %></button>
+      <button type="submit" class="btn btn-primary"><%= t('buttons.register_sms', "Register SMS") %></button>
     </td>
 </table>
 <% end %>
@@ -208,7 +204,7 @@
     <a href="<%= re_send_confirmation_url("{{ user_id }}", "{{ id }}") %>" class="re_send_confirmation_url" style="display: none;">&nbsp;</a>
   </div>
   <div class="button-container">
-    <button type="button" class="button cancel_button"><%= t('buttons.ok_thanks', "Ok, Thanks") %></button>
+    <button type="button" class="btn cancel_button"><%= t('buttons.ok_thanks', "Ok, Thanks") %></button>
   </div>
 </div>
 <% form_tag "", {:id => "confirm_communication_channel", :style => "display: none;", :class => "dialog"} do %>
@@ -230,7 +226,7 @@
   </div>
   <div class="status_message" style="visibility: hidden; text-align: center; color: #444; font-weight: bold"><%= t(:confirming_contact, "Confirming...") %></div>
   <div class="button-container">
-    <button type="submit" class="button"><%= t('buttons.confirm', "Confirm") %></button>
+    <button type="submit" class="btn"><%= t('buttons.confirm', "Confirm") %></button>
   </div>
 <% end %>
 <div style="display: none;" id="select_templates">

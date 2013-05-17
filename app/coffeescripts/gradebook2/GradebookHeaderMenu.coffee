@@ -21,6 +21,7 @@ define [
       templateLocals =
         assignmentUrl: "#{@gradebook.options.context_url}/assignments/#{@assignment.id}"
         speedGraderUrl: "#{@gradebook.options.context_url}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+      templateLocals.speedGraderUrl = null unless @gradebook.options.speed_grader_enabled
       @$menu = $(gradebookHeaderMenuTemplate(templateLocals)).insertAfter(@$trigger)
       @$trigger.kyleMenu(noButton:true)
       @$menu
@@ -50,7 +51,12 @@ define [
       new AssignmentDetailsDialog(@assignment, @gradebook)
 
     messageStudentsWho: =>
-      students = ($.extend({ id: student.id, name: student.name}, student["assignment_#{@assignment.id}"]) for i, student of @gradebook.students)
+      students = _.map @gradebook.students, (student)=>
+        id: student.id
+        name: student.name
+        score: student["assignment_#{@assignment.id}"].score
+        submitted_at: student["assignment_#{@assignment.id}"].submitted_at
+
       submissionTypes = @assignment.submission_types
       hasSubmission = true
       if submissionTypes.length == 0
@@ -74,7 +80,7 @@ define [
           students = $.grep students, ($student, idx) ->
             student = $student.user_data
             if selected == I18n.t("students_who.havent_submitted_yet", "Haven't submitted yet")
-              !student.submitted_at
+              !student.submitted_at and !student.score?
             else if selected == I18n.t("students_who.havent_been_graded", "Haven't been graded")
               !student.score?
             else if selected == I18n.t("students_who.scored_less_than", "Scored less than")
@@ -96,7 +102,10 @@ define [
 
     reuploadSubmissions: =>
       unless @$re_upload_submissions_form
-        GradebookHeaderMenu::$re_upload_submissions_form = $(re_upload_submissions_form())
+        locals =
+          authenticityToken: $("#ajax_authenticity_token").text()
+
+        GradebookHeaderMenu::$re_upload_submissions_form = $(re_upload_submissions_form(locals))
           .dialog
             width: 400
             modal: true

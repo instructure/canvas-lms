@@ -1,0 +1,94 @@
+<?xml version='1.0' encoding='utf-8'?>
+<feed xmlns='http://www.w3.org/2005/Atom'
+xmlns:openSearch='http://a9.com/-/spec/opensearchrss/1.0/'
+xmlns:docs='http://schemas.google.com/docs/2007'
+xmlns:batch='http://schemas.google.com/gdata/batch'
+xmlns:gd='http://schemas.google.com/g/2005'>
+  <id>https://docs.google.com/feeds/documents/private/full</id>
+  <updated>2013-01-29T23:11:36.156Z</updated>
+  <category scheme='http://schemas.google.com/g/2005#kind'
+  term='http://schemas.google.com/docs/2007#item' label='item' />
+  <title type='text'>Available Documents -
+  don@sterlingcooperdraperpryce.com</title>
+  <link rel='alternate' type='text/html'
+  href='https://docs.google.com' />
+  <link rel='http://schemas.google.com/g/2005#feed'
+  type='application/atom+xml'
+  href='https://docs.google.com/feeds/documents/private/full' />
+  <link rel='http://schemas.google.com/g/2005#post'
+  type='application/atom+xml'
+  href='https://docs.google.com/feeds/documents/private/full' />
+  <link rel='http://schemas.google.com/g/2005#batch'
+  type='application/atom+xml'
+  href='https://docs.google.com/feeds/documents/private/full/batch' />
+  <link rel='self' type='application/atom+xml'
+  href='https://docs.google.com/feeds/documents/private/full' />
+  <author>
+    <name>don draper</name>
+    <email>don@sterlingcooperdraperpryce.com</email>
+  </author>
+  <openSearch:totalResults>1</openSearch:totalResults>
+  <openSearch:startIndex>1</openSearch:startIndex>
+  <entry>
+    <id>
+    https://docs.google.com/feeds/documents/private/full/spreadsheet%12345</id>
+    <published>2012-09-05T15:21:42.872Z</published>
+    <updated>2013-01-29T21:56:31.800Z</updated>
+    <category scheme='http://schemas.google.com/g/2005/labels'
+    term='http://schemas.google.com/g/2005/labels#viewed'
+    label='viewed' />
+    <category scheme='http://schemas.google.com/g/2005#kind'
+    term='http://schemas.google.com/docs/2007#spreadsheet'
+    label='spreadsheet' />
+    <category scheme='http://schemas.google.com/g/2005/labels'
+    term='http://schemas.google.com/g/2005/labels#modified-by-me'
+    label='modified-by-me' />
+    <category scheme='http://schemas.google.com/g/2005/labels'
+    term='http://schemas.google.com/g/2005/labels#shared'
+    label='shared' />
+    <title type='text'>Lucky Strike Campaign</title>
+    <content type='text/html'
+    src='https://docs.google.com/feeds/download/spreadsheets/Export?key=12345' />
+    <link rel='alternate' type='text/html'
+    href='https://docs.google.com/a/instructure.com/spreadsheet/ccc?key=12345' />
+    <link rel='http://schemas.google.com/docs/2007#embed'
+    type='text/html'
+    href='https://docs.google.com/a/instructure.com/spreadsheet/ccc?key=12345&amp;output=html&amp;chrome=false&amp;widget=true' />
+    <link rel='http://schemas.google.com/docs/2007#icon'
+    type='image/png'
+    href='https://ssl.gstatic.com/docs/doclist/images/icon_11_spreadsheet_list.png' />
+    <link rel='http://schemas.google.com/spreadsheets/2006#worksheetsfeed'
+    type='application/atom+xml'
+    href='https://spreadsheets.google.com/feeds/worksheets/12345/private/full' />
+    <link rel='http://schemas.google.com/spreadsheets/2006#tablesfeed'
+    type='application/atom+xml'
+    href='https://spreadsheets.google.com/feeds/12345/tables' />
+    <link rel='self' type='application/atom+xml'
+    href='https://docs.google.com/feeds/documents/private/full/spreadsheet%12345' />
+    <link rel='edit' type='application/atom+xml'
+    href='https://docs.google.com/feeds/documents/private/full/spreadsheet%12345/hcjl6593' />
+    <link rel='edit-media' type='text/html'
+    href='https://docs.google.com/feeds/media/private/full/spreadsheet%12345/hcjl6593' />
+    <author>
+      <name>don draper</name>
+      <email>don@sterlingcooperdraperpryce.com</email>
+    </author>
+    <gd:resourceId>
+    spreadsheet:12345</gd:resourceId>
+    <docs:isShareable value='true' />
+    <docs:modifiedByMeDate>
+    2012-09-13T21:09:04.878Z</docs:modifiedByMeDate>
+    <docs:sharedWithMeDate>
+    2012-09-05T15:46:27.146Z</docs:sharedWithMeDate>
+    <gd:lastModifiedBy>
+      <name>peggy olson</name>
+      <email>peggy@sterlingcooperdraperpryce.com</email>
+    </gd:lastModifiedBy>
+    <gd:lastViewed>2012-09-13T21:08:09.688Z</gd:lastViewed>
+    <gd:quotaBytesUsed>0</gd:quotaBytesUsed>
+    <docs:writersCanInvite value='true' />
+    <docs:hasForm value='false' />
+    <gd:feedLink rel='http://schemas.google.com/acl/2007#accessControlList'
+    href='https://docs.google.com/feeds/acl/private/full/spreadsheet%12345' />
+  </entry>
+</feed>

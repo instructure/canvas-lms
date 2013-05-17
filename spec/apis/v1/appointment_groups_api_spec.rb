@@ -29,7 +29,7 @@ describe AppointmentGroupsController, :type => :integration do
 
   expected_fields = [
     'appointments_count', 'context_codes', 'created_at', 'description',
-    'end_at', 'id', 'location_address', 'location_name',
+    'end_at', 'html_url', 'id', 'location_address', 'location_name',
     'max_appointments_per_participant', 'min_appointments_per_participant',
     'participant_type', 'participant_visibility',
     'participants_per_appointment', 'requiring_action', 'start_at',
@@ -55,6 +55,19 @@ describe AppointmentGroupsController, :type => :integration do
     ag = AppointmentGroup.create!(:title => "past", :new_appointments => [["#{Time.now.year - 1}-01-01 12:00:00", "#{Time.now.year - 1}-01-01 13:00:00"]], :contexts => [@course])
     json = api_call(:get, "/api/v1/appointment_groups?scope=manageable&include_past_appointments=1", {
                       :controller => 'appointment_groups', :action => 'index', :format => 'json', :scope => 'manageable', :include_past_appointments => '1'})
+    json.size.should eql 1
+  end
+
+  it "should restrict manageable appointment groups by context_codes" do
+    ag1 = AppointmentGroup.create!(:title => "yay", :new_appointments => [["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"]], :contexts => [@course1])
+    ag2 = AppointmentGroup.create!(:title => "yay", :new_appointments => [["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"]], :contexts => [@course2])
+
+    json = api_call(:get, "/api/v1/appointment_groups?scope=manageable", {
+        :controller => 'appointment_groups', :action => 'index', :format => 'json', :scope => 'manageable'})
+    json.size.should eql 2
+
+    json = api_call(:get, "/api/v1/appointment_groups?scope=manageable&context_codes[]=course_#{@course2.id}", {
+        :controller => 'appointment_groups', :action => 'index', :format => 'json', :scope => 'manageable', :context_codes => ["course_#{@course2.id}"]})
     json.size.should eql 1
   end
 
@@ -112,6 +125,24 @@ describe AppointmentGroupsController, :type => :integration do
     end
   end
 
+  it "should restrict reservable appointment groups by context_codes" do
+    student_in_course :course => course(:active_all => true), :user => @me, :active_all => true
+    ag1 = AppointmentGroup.create!(:title => "yay", :new_appointments => [["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"]], :contexts => [@course])
+    ag1.publish!
+
+    student_in_course :course => course(:active_all => true), :user => @me, :active_all => true
+    ag2 = AppointmentGroup.create!(:title => "yay", :new_appointments => [["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"]], :contexts => [@course])
+    ag2.publish!
+
+    json = api_call(:get, "/api/v1/appointment_groups?scope=reservable", {
+        :controller => 'appointment_groups', :action => 'index', :format => 'json', :scope => 'reservable'})
+    json.size.should eql 2
+
+    json = api_call(:get, "/api/v1/appointment_groups?scope=reservable&context_codes[]=course_#{@course.id}", {
+        :controller => 'appointment_groups', :action => 'index', :format => 'json', :scope => 'reservable', :context_codes => ["course_#{@course.id}"]})
+    json.size.should eql 1
+  end
+
   it "should return past reservable appointment groups, if requested" do
     student_in_course :course => course(:active_all => true), :user => @me, :active_all => true
     ag = AppointmentGroup.create!(:title => "past", :new_appointments => [["#{Time.now.year - 1}-01-01 12:00:00", "#{Time.now.year - 1}-01-01 13:00:00"]], :contexts => [@course])
@@ -127,13 +158,13 @@ describe AppointmentGroupsController, :type => :integration do
                       :controller => 'appointment_groups', :action => 'index', :format => 'json',
                       :scope => 'manageable', :per_page => '10'})
     json.size.should eql 10
-    response.headers['Link'].should match(%r{</api/v1/appointment_groups\?.*page=2.*>; rel="next",</api/v1/appointment_groups\?.*page=1.*>; rel="first",</api/v1/appointment_groups\?.*page=3.*>; rel="last"})
+    response.headers['Link'].should match(%r{<http://www.example.com/api/v1/appointment_groups\?.*page=2.*>; rel="next",<http://www.example.com/api/v1/appointment_groups\?.*page=1.*>; rel="first",<http://www.example.com/api/v1/appointment_groups\?.*page=3.*>; rel="last"})
 
     json = api_call(:get, "/api/v1/appointment_groups?scope=manageable&per_page=10&page=3", {
                       :controller => 'appointment_groups', :action => 'index', :format => 'json',
                       :scope => 'manageable', :per_page => '10', :page => '3'})
     json.size.should eql 5
-    response.headers['Link'].should match(%r{</api/v1/appointment_groups\?.*page=2.*>; rel="prev",</api/v1/appointment_groups\?.*page=1.*>; rel="first",</api/v1/appointment_groups\?.*page=3.*>; rel="last"})
+    response.headers['Link'].should match(%r{<http://www.example.com/api/v1/appointment_groups\?.*page=2.*>; rel="prev",<http://www.example.com/api/v1/appointment_groups\?.*page=1.*>; rel="first",<http://www.example.com/api/v1/appointment_groups\?.*page=3.*>; rel="last"})
   end
 
   it 'should include appointments and child_events, if requested' do
@@ -308,6 +339,47 @@ describe AppointmentGroupsController, :type => :integration do
     ag.reload.should be_deleted
   end
 
+  it 'should include participant count, if requested' do
+    ag = AppointmentGroup.create!(:title => "something", :new_appointments => [["#{Time.now.year + 1}-01-01 12:00:00",
+                                                                                "#{Time.now.year + 1}-01-01 13:00:00"],
+                                                                               ["#{Time.now.year + 1}-01-01 13:00:00",
+                                                                                "#{Time.now.year + 1}-01-01 14:00:00"]], :contexts => [@course])
+    student_in_course(:course => @course, :active_all => true)
+    ag.appointments.first.reserve_for @student, @me
+    student_in_course(:course => @course, :active_all => true)
+    ag.appointments.last.reserve_for @student, @me
+
+    @user = @me
+
+    json = api_call(:get, "/api/v1/appointment_groups?scope=manageable&include[]=participant_count", {
+                      :controller => 'appointment_groups', :action => 'index', :format => 'json', :scope => 'manageable', :include => ['participant_count']})
+    json.size.should eql 1
+    json.first.keys.sort.should eql((expected_fields + ['participant_count']).sort)
+    json.first['participant_count'].should eql(2)
+  end
+
+  it "should include the user's reserved times, if requested" do
+    year = Time.now.year + 1
+    appointment_times = [["#{year}-01-01T12:00:00Z", "#{year}-01-01T13:00:00Z"],
+                         ["#{year}-01-01T13:00:00Z", "#{year}-01-01T14:00:00Z"]]
+    ag = AppointmentGroup.create!(:title => "something", :new_appointments => appointment_times, :contexts => [@course])
+    ag.publish!
+    student_in_course(:course => @course, :active_all => true)
+    child_events = []
+    ag.appointments.each {|appt| child_events << appt.reserve_for(@student, @me)}
+
+    @user = @student
+
+    json = api_call(:get, "/api/v1/appointment_groups?include[]=reserved_times", {
+                      :controller => 'appointment_groups', :action => 'index', :format => 'json', :include => ['reserved_times']})
+    json.size.should eql 1
+    json.first.keys.sort.should eql((expected_fields + ['reserved_times']).sort)
+    json.first['reserved_times'].length.should eql(child_events.length)
+    child_events.each do |event|
+      json.first['reserved_times'].should include({"id" => event.id, "start_at" => event.start_at.iso8601, "end_at" => event.end_at.iso8601})
+    end
+  end
+  
   types = {
     'users' => proc {
       @ag = AppointmentGroup.create!(:title => "yay", :new_appointments => [["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"], ["#{Time.now.year + 1}-01-01 13:00:00", "#{Time.now.year + 1}-01-01 14:00:00"]], :contexts => [@course])
@@ -344,13 +416,13 @@ describe AppointmentGroupsController, :type => :integration do
                           :controller => 'appointment_groups', :id => @ag.id.to_s, :action => type,
                           :format => 'json', :per_page => '1'})
         json.size.should eql 1
-        response.headers['Link'].should match(%r{</api/v1/appointment_groups/#{@ag.id}/#{type}\?.*page=2.*>; rel="next",</api/v1/appointment_groups/#{@ag.id}/#{type}\?.*page=1.*>; rel="first",</api/v1/appointment_groups/#{@ag.id}/#{type}\?.*page=2.*>; rel="last"})
+        response.headers['Link'].should match(%r{<http://www.example.com/api/v1/appointment_groups/#{@ag.id}/#{type}\?.*page=2.*>; rel="next",<http://www.example.com/api/v1/appointment_groups/#{@ag.id}/#{type}\?.*page=1.*>; rel="first",<http://www.example.com/api/v1/appointment_groups/#{@ag.id}/#{type}\?.*page=2.*>; rel="last"})
 
         json = api_call(:get, "/api/v1/appointment_groups/#{@ag.id}/#{type}?per_page=1&page=2", {
                           :controller => 'appointment_groups', :id => @ag.id.to_s, :action => type,
                           :format => 'json', :per_page => '1', :page => '2'})
         json.size.should eql 1
-        response.headers['Link'].should match(%r{</api/v1/appointment_groups/#{@ag.id}/#{type}\?.*page=1.*>; rel="prev",</api/v1/appointment_groups/#{@ag.id}/#{type}\?.*page=1.*>; rel="first",</api/v1/appointment_groups/#{@ag.id}/#{type}\?.*page=2.*>; rel="last"})
+        response.headers['Link'].should match(%r{<http://www.example.com/api/v1/appointment_groups/#{@ag.id}/#{type}\?.*page=1.*>; rel="prev",<http://www.example.com/api/v1/appointment_groups/#{@ag.id}/#{type}\?.*page=1.*>; rel="first",<http://www.example.com/api/v1/appointment_groups/#{@ag.id}/#{type}\?.*page=2.*>; rel="last"})
       end
 
       it "should return registered #{type}" do

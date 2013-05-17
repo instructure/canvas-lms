@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -20,14 +20,10 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe GroupsController do
 
-  #Delete these examples and add some real ones
-  it "should use GroupsController" do
-    controller.should be_an_instance_of(GroupsController)
-  end
-
   describe "GET context_index" do
     it "should require authorization" do
-      course_with_student
+      course(:active_all => true)
+      user_session(user) # logged in user without course access
       category1 = @course.group_categories.create(:name => "category 1")
       category2 = @course.group_categories.create(:name => "category 2")
       g1 = @course.groups.create(:name => "some group", :group_category => category1)
@@ -54,9 +50,24 @@ describe GroupsController do
   end
 
   describe "GET index" do
-    it "should assign variables" do
-      get 'index'
-      assigns[:groups].should_not be_nil
+    describe 'pagination' do
+      before do
+        course_with_student_logged_in(:active_all => 1)
+        group_with_user(:group_context => @course, :user => @student, :active_all => true)
+        group_with_user(:group_context => @course, :user => @student, :active_all => true)
+      end
+
+      it "should not paginate non-json" do
+        get 'index', :per_page => 1
+        assigns[:groups].should == @student.current_groups
+        response.headers['Link'].should be_nil
+      end
+
+      it "should paginate json" do
+        get 'index', :format => 'json', :per_page => 1
+        assigns[:groups].should == [@student.current_groups.order(:id).first]
+        response.headers['Link'].should_not be_nil
+      end
     end
   end
 
@@ -77,6 +88,7 @@ describe GroupsController do
       response.should be_success
       assigns[:group].should eql(@group)
       assigns[:context].should eql(@group)
+      assigns[:stream_items].should eql([])
     end
 
     it "should allow user to join self-signup groups" do
@@ -132,220 +144,6 @@ describe GroupsController do
       @group = @course.groups.create(:name => "some group")
       get 'new', :course_id => @course.id
       assert_unauthorized
-    end
-  end
-
-  describe "POST create_category" do
-    it "should require authorization" do
-      @course = course_model(:reusable => true)
-      @group = @course.groups.create(:name => "some groups")
-      post 'create_category', :course_id => @course.id, :category => {}
-      assert_unauthorized
-    end
-
-    it "should assign variables" do
-      course_with_teacher_logged_in(:active_all => true)
-      @group = @course.groups.create(:name => "some groups")
-      e1 = @course.enroll_student(user_model)
-      e2 = @course.enroll_student(user_model)
-      e3 = @course.enroll_student(user_model)
-      e4 = @course.enroll_student(user_model)
-      e5 = @course.enroll_student(user_model)
-      e6 = @course.enroll_student(user_model)
-      post 'create_category', :course_id => @course.id, :category => {:name => "Study Groups", :split_group_count => 2, :split_groups => '1'}
-      response.should be_success
-      assigns[:group_category].should_not be_nil
-      groups = assigns[:group_category].groups
-      groups.length.should eql(2)
-      groups[0].users.length.should eql(3)
-      groups[1].users.length.should eql(3)
-    end
-
-    it "should give the new groups the right group_category" do
-      course_with_teacher_logged_in(:active_all => true)
-      student_in_course
-      post 'create_category', :course_id => @course.id, :category => {:name => "Study Groups", :split_group_count => 1, :split_groups => '1'}
-      response.should be_success
-      assigns[:group_category].should_not be_nil
-      assigns[:group_category].groups[0].group_category.name.should == "Study Groups"
-    end
-
-    it "should error if the group name is protected" do
-      course_with_teacher_logged_in(:active_all => true)
-      post 'create_category', :course_id => @course.id, :category => {:name => "Student Groups"}
-      response.should_not be_success
-    end
-
-    it "should error if the group name is already in use" do
-      course_with_teacher_logged_in(:active_all => true)
-      @course.group_categories.create(:name => "My Category")
-      post 'create_category', :course_id => @course.id, :category => {:name => "My Category"}
-      response.should_not be_success
-    end
-
-    it "should default an empty or missing name to 'Study Groups'" do
-      course_with_teacher_logged_in(:active_all => true)
-      post 'create_category', :course_id => @course.id, :category => {}
-      response.should be_success
-      assigns[:group_category].name.should == "Study Groups"
-      assigns[:group_category].destroy
-
-      post 'create_category', :course_id => @course.id, :category => {:name => ''}
-      response.should be_success
-      assigns[:group_category].name.should == "Study Groups"
-    end
-
-    it "should respect enable_self_signup" do
-      course_with_teacher_logged_in(:active_all => true)
-      student_in_course
-      post 'create_category', :course_id => @course.id, :category => {:name => "Study Groups", :enable_self_signup => '1'}
-      response.should be_success
-      assigns[:group_category].should_not be_nil
-      assigns[:group_category].should be_self_signup
-      assigns[:group_category].should be_unrestricted_self_signup
-    end
-
-    it "should use create_group_count when self-signup" do
-      course_with_teacher_logged_in(:active_all => true)
-      student_in_course
-      post 'create_category', :course_id => @course.id, :category => {:name => "Study Groups", :enable_self_signup => '1', :create_group_count => '3'}
-      response.should be_success
-      assigns[:group_category].should_not be_nil
-      assigns[:group_category].groups.size.should == 3
-    end
-
-    it "should not distribute students when self-signup" do
-      course_with_teacher_logged_in(:active_all => true)
-      student_in_course
-      student_in_course
-      student_in_course
-      student_in_course
-      post 'create_category', :course_id => @course.id, :category => {:name => "Study Groups", :enable_self_signup => '1', :create_category_count => '2'}
-      response.should be_success
-      assigns[:group_category].should_not be_nil
-      assigns[:group_category].groups.all?{ |g| g.users.should be_empty }
-    end
-
-    it "should respect restrict_self_signup" do
-      course_with_teacher_logged_in(:active_all => true)
-      student_in_course
-      post 'create_category', :course_id => @course.id, :category => {:name => "Study Groups", :enable_self_signup => '1', :restrict_self_signup => '1'}
-      response.should be_success
-      assigns[:group_category].should_not be_nil
-      assigns[:group_category].should be_restricted_self_signup
-    end
-
-    it "should work when the context is an account and not enable_self_signup and split_groups" do
-      user = account_admin_user
-      user_session(user)
-      post 'create_category', :account_id => Account.default, :category => {:name => "Study Groups", :split_group_count => 1, :split_groups => '1'}
-      response.should be_success
-      assigns[:group_category].should_not be_nil
-    end
-  end
-
-  describe "PUT update_category" do
-    before :each do
-      course_with_teacher(:active_all => true)
-      @group_category = @course.group_categories.create(:name => "My Category")
-    end
-
-    it "should require authorization" do
-      put 'update_category', :course_id => @course.id, :category_id => @group_category.id, :category => {}
-      assert_unauthorized
-    end
-
-    it "should update category" do
-      user_session(@user)
-      put 'update_category', :course_id => @course.id, :category_id => @group_category.id, :category => {:name => "Different Category", :enable_self_signup => "1"}
-      response.should be_success
-      assigns[:group_category].should eql(@group_category)
-      assigns[:group_category].name.should eql("Different Category")
-      assigns[:group_category].should be_self_signup
-    end
-
-    it "should leave the name alone if not given" do
-      user_session(@user)
-      put 'update_category', :course_id => @course.id, :category_id => @group_category.id, :category => {}
-      response.should be_success
-      assigns[:group_category].name.should == "My Category"
-    end
-
-    it "should treat a sent but empty name as 'Study Groups'" do
-      user_session(@user)
-      put 'update_category', :course_id => @course.id, :category_id => @group_category.id, :category => {:name => ''}
-      response.should be_success
-      assigns[:group_category].name.should == "Study Groups"
-    end
-
-    it "should error if the name is protected" do
-      user_session(@user)
-      put 'update_category', :course_id => @course.id, :category_id => @group_category.id, :category => {:name => "Student Groups"}
-      response.should_not be_success
-    end
-
-    it "should error if the name is already in use" do
-      user_session(@user)
-      @course.group_categories.create(:name => "Other Category")
-      put 'update_category', :course_id => @course.id, :category_id => @group_category.id, :category => {:name => "Other Category"}
-      response.should_not be_success
-    end
-
-    it "should not error if the name is the current name" do
-      user_session(@user)
-      put 'update_category', :course_id => @course.id, :category_id => @group_category.id, :category => {:name => "My Category"}
-      response.should be_success
-      assigns[:group_category].name.should eql("My Category")
-    end
-
-    it "should error if restrict_self_signups is specified but the category has heterogenous groups" do
-      section1 = @course.course_sections.create
-      section2 = @course.course_sections.create
-      user1 = section1.enroll_user(user_model, 'StudentEnrollment').user
-      user2 = section2.enroll_user(user_model, 'StudentEnrollment').user
-      group = @group_category.groups.create(:context => @course)
-      group.add_user(user1)
-      group.add_user(user2)
-
-      user_session(@teacher)
-      put 'update_category', :course_id => @course.id, :category_id => @group_category.id, :category => {:enable_self_signup => '1', :restrict_self_signup => '1'}
-      response.should_not be_success
-    end
-  end
-
-  describe "DELETE delete_category" do
-    it "should require authorization" do
-      @course = course_model(:reusable => true)
-      group_category = @course.group_categories.create(:name => "Study Groups")
-      delete 'delete_category', :course_id => @course.id, :category_id => group_category.id
-      assert_unauthorized
-    end
-
-    it "should delete the category and groups" do
-      course_with_teacher_logged_in(:active_all => true)
-      category1 = @course.group_categories.create(:name => "Study Groups")
-      category2 = @course.group_categories.create(:name => "Other Groups")
-      @course.groups.create(:name => "some group", :group_category => category1)
-      @course.groups.create(:name => "another group", :group_category => category2)
-      delete 'delete_category', :course_id => @course.id, :category_id => category1.id
-      response.should be_success
-      @course.reload
-      @course.all_group_categories.length.should eql(2)
-      @course.group_categories.length.should eql(1)
-      @course.groups.length.should eql(2)
-      @course.groups.active.length.should eql(1)
-    end
-
-    it "should fail if category doesn't exist" do
-      course_with_teacher_logged_in(:active_all => true)
-      delete 'delete_category', :course_id => @course.id, :category_id => 11235
-      response.should_not be_success
-    end
-
-    it "should fail if category is protected" do
-      course_with_teacher_logged_in(:active_all => true)
-      delete 'delete_category', :course_id => @course.id, :category_id => GroupCategory.student_organized_for(@course).id
-      response.should_not be_success
     end
   end
 
@@ -445,6 +243,36 @@ describe GroupsController do
       post 'create', :course_id => @course.id, :group => {:name => "some group", :group_category_id => 11235}
       response.should_not be_success
     end
+    
+    describe "quota" do
+      before do
+        course :active_all => true
+        Setting.set('group_default_quota', 11.megabytes)
+      end
+      
+      context "teacher" do
+        before do
+          course_with_teacher_logged_in :course => @course, :active_all => true
+        end
+        
+        it "should ignore the storage_quota_mb parameter" do
+          post 'create', :course_id => @course.id, :group => {:name => "a group", :storage_quota_mb => 22}
+          assigns[:group].storage_quota_mb.should == 11
+        end
+      end
+      
+      context "account admin" do
+        before do
+          account_admin_user
+          user_session(@admin)
+        end
+        
+        it "should set the storage_quota_mb parameter" do
+          post 'create', :course_id => @course.id, :group => {:name => "a group", :storage_quota_mb => 22}
+          assigns[:group].storage_quota_mb.should == 22
+        end
+      end
+    end
   end
 
   describe "PUT update" do
@@ -481,8 +309,44 @@ describe GroupsController do
       put 'update', :course_id => @course.id, :id => @group.id, :group => {:group_category_id => 11235}
       response.should_not be_success
     end
+    
+    describe "quota" do
+      before do
+        course :active_all => true
+        @group = @course.groups.build(:name => "teh gruop")
+        @group.storage_quota_mb = 11
+        @group.save!
+      end
+      
+      context "teacher" do
+        before do
+          course_with_teacher_logged_in :course => @course, :active_all => true
+        end
+        
+        it "should ignore the quota parameter" do
+          put 'update', :course_id => @course.id, :id => @group.id, :group => {:name => 'the group', :storage_quota_mb => 22}
+          @group.reload
+          @group.name.should == 'the group'
+          @group.storage_quota_mb.should == 11
+        end
+      end
+      
+      context "account admin" do
+        before do
+          account_admin_user
+          user_session(@admin)
+        end
+        
+        it "should update group quota" do
+          put 'update', :course_id => @course.id, :id => @group.id, :group => {:name => 'the group', :storage_quota_mb => 22}
+          @group.reload
+          @group.name.should == 'the group'
+          @group.storage_quota_mb.should == 22
+        end
+      end
+    end
   end
-
+  
   describe "DELETE destroy" do
     it "should require authorization" do
       course_with_teacher(:active_all => true)
@@ -782,14 +646,14 @@ describe GroupsController do
       get 'accept_invitation', :group_id => @group.id, :uuid => @membership.uuid
       @group.reload
       @group.has_member?(@user).should be_true
-      @group.group_memberships.scoped(:conditions => {:workflow_state => "invited"}).count.should == 0
+      @group.group_memberships.where(:workflow_state => "invited").count.should == 0
     end
 
     it "should reject an invalid invitation uuid" do
       get 'accept_invitation', :group_id => @group.id, :uuid => @membership.uuid + "x"
       @group.reload
       @group.has_member?(@user).should be_false
-      @group.group_memberships.scoped(:conditions => {:workflow_state => "invited"}).count.should == 1
+      @group.group_memberships.where(:workflow_state => "invited").count.should == 1
     end
   end
 end

@@ -27,13 +27,15 @@
       <div id="combo_box_container"></div>
       <a href="#" class="next"><%= t('links.next', "Next") %></a>
       <div id='x_of_x_students'>
-        (<%= t(:student_index_of_total, "student %{index} of %{total_students}", :index => raw('<span>???</span>'), :total_students => @assignment.context.students_visible_to(@current_user).uniq.count) %>)<br />
-        <a href="<%= context_url(@context, :context_gradebook_url) %>#assignment/<%= @assignment.id %>"><%= t('links.gradebook', "Gradebook") %></a> | 
+        (<%= t(:student_index_of_total, "student %{index} of %{total_students}", :index => raw('<span>???</span>'), :total_students => @assignment.context.students_visible_to(@current_user).count(:id, :distinct => true)) %>)<br />
+        <a href="<%= gradebook_url_for(@current_user, @context, @assignment) %>" id="speed_grader_gradebook_link">
+          <%= t('links.gradebook', "Gradebook") %>
+        </a>
         <a href="<%= context_url(@context, :context_url) %>"><%= t('links.course_home', "Course Home") %></a>
       </div>
     </div>
     <div class="right">
-      <a data-muted="<%= @assignment.muted? ? "true" : "false" %>" id="mute_link" href="#"><span class="ui-icon ui-icon-volume-<%= @assignment.muted? ? "on" : "off" %>"></span><span class="label"><%= @assignment.muted? ? t("gradebook.unmute_assignment", "Unmute Assignment") : t("gradebook.mute_assignment", "Mute Assignment") %></span></a>
+      <a data-muted="<%= @assignment.muted? ? "true" : "false" %>" id="mute_link" href="#"><span class="ui-icon ui-icon-volume-<%= @assignment.muted? ? "on" : "off" %>"></span><span><%= @assignment.muted? ? t("gradebook.unmute_assignment", "Unmute Assignment") : t("gradebook.mute_assignment", "Mute Assignment") %></span></a>
       <a id="settings_link" href="#"><span class="ui-icon ui-icon-wrench"></span><%= t('links.settings', "Settings") %></a>
       <% if help_link %>
         | <%= help_link %>
@@ -46,9 +48,7 @@
     <div class='center'>
       <a id="assignment_url" href="<%= context_url(@context, :context_assignment_url, @assignment.id) %>"><%= @assignment.title %></a>
       (<span id="context_title" ><%= @context.short_name %></span>)
-      <% if @assignment.due_at %>
-        <div class="due_at"><%= t(:due_at, "due %{datetime}", :datetime => datetime_string(@assignment.due_at)) %></div>
-      <% end %>
+      <div class="due_at"><%= translated_due_date(@assignment) %></div>
     </div>
   <% end %>
 </div>
@@ -56,6 +56,10 @@
 <div id="full_width_container" style="display:none;">
   <div id="left_side" class="full_height">
     <div id="left_side_inner">
+      <div id="no_annotation_warning" class="alert">
+        <a id="hide_no_annotation_warning" href="#" class="close">×</a>
+        <%= t :no_annotation, "Annotations are not available for this document" %>
+      </div>
       <div id='submissions_container'>
         <div id="this_student_does_not_have_a_submission">
           <h3><%= t('headers.no_submission', "This student does not have a submission for this assignment") %></h3>
@@ -114,9 +118,9 @@
             <%= render :partial => "shared/rubric", :object => @assignment.try_rescue(:rubric_association).try_rescue(:rubric), :locals => {:assessing => true, :rubric_association => @assignment.rubric_association } if @assignment.try_rescue(:rubric_association).try_rescue(:rubric) %>
             <div class="button-container">
               <% if @assignment.rubric_association && can_do(@assignment.rubric_association, @current_user, :assess) %>
-                <button type="button" class="save_rubric_button button"><%= t('buttons.save', "Save") %></button>
+                <button type="button" class="save_rubric_button btn"><%= t('buttons.save', "Save") %></button>
               <% end %>
-              <button type="button" class="hide_rubric_link button-secondary"><%= t('#buttons.cancel', "Cancel") %></button>
+              <button type="button" class="hide_rubric_link btn button-secondary"><%= t('#buttons.cancel', "Cancel") %></button>
             </div>
             <a href="<%= context_url(@context, :context_rubric_association_rubric_assessments_url, @assignment.rubric_association) %>" class="update_rubric_assessment_url" style="display: none;">&nbsp;</a>
             <%= render :partial => "shared/rubric_criterion_dialog" %>
@@ -173,7 +177,6 @@
               <img src="#" class="avatar" alt="" style="display: none;"/>
               <span class="comment"></span>
               <a href="#" class="play_comment_link media-comment" style="display:none;"><%= t('links.click_to_view', "click here to view") %></a>
-              <span class="media_comment_id" style="display: none;">&nbsp;</span>
               <div class="media_comment_content" style="display:none"></div>
               <div class="comment_attachments"></div>
               <div class="comment_citation">
@@ -207,7 +210,7 @@
                 </div>
 
 
-                <button class="button small-button" type="submit"><%= t('buttons.submit_comment', "Submit Comment") %></button>
+                <button class="btn btn-small" type="submit"><%= t('buttons.submit_comment', "Submit Comment") %></button>
                 <ul class="attach_things">
                   <li class="prompt"><%= t(:attach, "Attach") %></li>
                   <li>
@@ -262,9 +265,10 @@
     <input type="checkbox" id="hide_student_names" name="hide_student_names"/>
     <label for="hide_student_names"><%= t('labels.hide_names', "Hide student names in the SpeedGrader") %></label>
   </p>
-  <p>
-    <button type="submit" class="button submit_button"><%= t('buttons.save_settings', "Save Settings") %></button>
-  </p>
+  <div class="button-container">
+    <button class="btn dialog_closer"><%= t('#buttons.cancel', "Cancel") %></button>
+    <button type="submit" class="btn btn-primary submit_button"><%= t('buttons.save_settings', "Save Settings") %></button>
+  </div>
 </form>
 <%= render :partial => "shared/mute_dialog" %>
 <ul id="section-menu" class="ui-selectmenu-menu ui-widget ui-widget-content ui-selectmenu-menu-dropdown ui-selectmenu-open" style="display:none;" role="listbox" aria-activedescendant="section-menu-link">

@@ -178,18 +178,19 @@ Canvas::Plugin.register('sis_import', :sis, {
                  :minimum_rows_for_parallel => 1000,
                  :queue_for_parallel_jobs => nil }
 })
-if Attachment.s3_storage?
-  Canvas::Plugin.register('s3', nil, {
-      :name => lambda { t :name, 'S3' },
-      :description => lambda { t :description, 'S3 storage for files' },
-      :website => 'http://www.instructure.com',
-      :author => 'Instructure',
-      :author_website => 'http://www.instructure.com',
-      :version => '1.0.0',
-      :settings_partial => 'plugins/s3_settings',
-      :settings => Attachment.s3_config
-  })
-end
+
+Canvas::Plugin.register('sessions', nil, {
+  :name => lambda{ t :name, 'Sessions' },
+  :description => lambda{ t :description, 'Manage session timeouts' },
+  :website => 'http://www.instructure.com',
+  :author => 'Instructure',
+  :author_website => 'http://www.instructure.com',
+  :version => '1.0.0',
+  :settings_partial => 'plugins/sessions_timeout',
+  :validator => 'SessionsValidator',
+  :settings => nil
+})
+
 Canvas::Plugin.register('assignment_freezer', nil, {
   :name => lambda{ t :name, 'Assignment Property Freezer' },
   :description => lambda{ t :description, 'Freeze Assignment Properties on Copy' },
@@ -200,6 +201,7 @@ Canvas::Plugin.register('assignment_freezer', nil, {
   :settings_partial => 'plugins/assignment_freezer_settings',
   :settings => nil
 })
+
 Canvas::Plugin.register('embedly', nil, {
   :name => lambda{ t :name, 'Embedly Integration' },
   :description => lambda{ t :description, 'Pull Embedly info for Collections' },
@@ -209,4 +211,25 @@ Canvas::Plugin.register('embedly', nil, {
   :version => '1.0.0',
   :settings_partial => 'plugins/embedly_settings',
   :settings => nil
+})
+Canvas::Plugin.register('crocodoc', :previews, {
+  :name => lambda { t :name, 'Crocodoc' },
+  :description => lambda { t :description, 'Enabled Crocodoc as a document preview option' },
+  :website => 'https://crocodoc.com/',
+  :author => 'Instructure',
+  :author_website => 'http://www.instructure.com',
+  :version => '1.0.0',
+  :settings_partial => 'plugins/crocodoc_settings',
+  :settings => nil
+})
+Canvas::Plugin.register('account_reports', nil, {
+  :name => lambda{ t :name, 'Account Reports' },
+  :description => lambda{ t :description, 'Select account reports' },
+  :website => 'http://www.instructure.com',
+  :author => 'Instructure',
+  :author_website => 'http://www.instructure.com',
+  :version => '1.0.0',
+  :settings_partial => 'plugins/account_report_settings',
+  :settings => nil,
+  :validator => 'AccountReportsValidator'
 })

@@ -29,6 +29,7 @@ define [
       buttons = if @apptGroup.workflow_state == 'active'
         [
           text: I18n.t 'save_changes', 'Save Changes'
+          class: 'btn-primary'
           click: @appointmentGroupsForm.saveClick
         ]
       else
@@ -37,7 +38,7 @@ define [
           click: @appointmentGroupsForm.saveWithoutPublishingClick
         ,
           text: I18n.t 'save_and_publish', 'Save & Publish'
-          'class' : 'btn-primary'
+          class: 'btn-primary'
           click: @appointmentGroupsForm.saveClick
         ]
 

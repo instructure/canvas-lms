@@ -18,11 +18,11 @@
 
 class AssessmentQuestionBank < ActiveRecord::Base
   include Workflow
-  attr_accessible :context, :title, :user, :outcomes
+  attr_accessible :context, :title, :user, :alignments
   belongs_to :context, :polymorphic => true
   has_many :assessment_questions, :order => 'name, position, created_at'
   has_many :assessment_question_bank_users
-  has_many :learning_outcome_tags, :as => :content, :class_name => 'ContentTag', :conditions => ['content_tags.tag_type = ? AND content_tags.workflow_state != ?', 'learning_outcome', 'deleted'], :include => :learning_outcome
+  has_many :learning_outcome_alignments, :as => :content, :class_name => 'ContentTag', :conditions => ['content_tags.tag_type = ? AND content_tags.workflow_state != ?', 'learning_outcome', 'deleted'], :include => :learning_outcome
   has_many :quiz_groups
   before_save :infer_defaults
   validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true
@@ -36,7 +36,7 @@ class AssessmentQuestionBank < ActiveRecord::Base
     given{|user, session| cached_context_grants_right?(user, session, :manage_assignments) }
     can :read and can :create and can :update and can :delete and can :manage
     
-    given{|user, session| user && self.assessment_question_bank_users.exists?(:user_id => user.id) }
+    given{|user, session| user && self.assessment_question_bank_users.where(:user_id => user).exists? }
     can :read
   end
 
@@ -69,13 +69,40 @@ class AssessmentQuestionBank < ActiveRecord::Base
   def infer_defaults
     self.title = t(:default_title, "No Name - %{course}", :course => self.context.name) if self.title.blank?
   end
-  
+
+  def alignments=(alignments)
+    # empty string from controller or empty hash
+    if alignments.empty?
+      outcomes = []
+    else
+      outcomes = context.linked_learning_outcomes.find_all_by_id(alignments.keys.map(&:to_i))
+    end
+
+    # delete alignments that aren't in the list anymore
+    if outcomes.empty?
+      learning_outcome_alignments.update_all(:workflow_state => 'deleted')
+    else
+      learning_outcome_alignments.
+        where("learning_outcome_id NOT IN (?)", outcomes).
+        update_all(:workflow_state => 'deleted')
+    end
+
+    # add/update current alignments
+    unless outcomes.empty?
+      alignments.each do |outcome_id, mastery_score|
+        outcome = outcomes.detect{ |outcome| outcome.id == outcome_id.to_i }
+        next unless outcome
+        outcome.align(self, context, :mastery_score => mastery_score)
+      end
+    end
+  end
+
   def bookmark_for(user, do_bookmark=true)
     if do_bookmark
       question_bank_user = self.assessment_question_bank_users.find_by_user_id(user.id)
       question_bank_user ||= self.assessment_question_bank_users.create(:user => user)
     else
-      AssessmentQuestionBankUser.delete_all({:user_id => user.id, :assessment_question_bank_id => self.id})
+      AssessmentQuestionBankUser.where(:user_id => user, :assessment_question_bank_id => self).delete_all
     end
   end
   
@@ -84,36 +111,9 @@ class AssessmentQuestionBank < ActiveRecord::Base
   end
   
   def select_for_submission(count, exclude_ids=[])
-    ids = AssessmentQuestion.connection.select_all("SELECT id FROM assessment_questions WHERE workflow_state != 'deleted' AND assessment_question_bank_id = #{self.id}")
-    ids = (ids.map{|i|i['id'].to_i} - exclude_ids).sort_by{rand}[0...count]
+    ids = self.assessment_questions.active.pluck(:id)
+    ids = (ids - exclude_ids).sort_by{rand}[0...count]
     ids.empty? ? [] : AssessmentQuestion.find_all_by_id(ids)
-  end
-  
-  def outcomes=(hash)
-    raise "Can't set outcomes on unsaved bank" if new_record?
-    hash = {} if hash.blank?
-    ids = []
-    hash.each do |key, val|
-      ids.push(key) if !key.blank? && key.to_i != 0
-    end
-    ids.uniq!
-    tags = self.learning_outcome_tags
-    tag_outcome_ids = tags.map(&:learning_outcome_id).compact.uniq
-    outcomes = LearningOutcome.available_in_context(self.context, tag_outcome_ids)
-    missing_ids = ids.select{|id| !tag_outcome_ids.include?(id) }
-    tags.each do |tag|
-      if hash[tag.learning_outcome_id.to_s]
-        tag.update_attribute(:mastery_score, hash[tag.learning_outcome_id.to_s].to_f)
-      end
-    end
-    tags_to_delete = tags.select{|t| !ids.include?(t.learning_outcome_id) }
-    missing_ids.each do |id|
-      lot = self.learning_outcome_tags.build(:context => self.context, :tag_type => 'learning_outcome', :mastery_score => hash[id].to_f)
-      lot.learning_outcome_id = id.to_i
-      lot.save!
-    end
-    tags_to_delete.each{|t| t.destroy }
-    true
   end
   
   alias_method :destroy!, :destroy
@@ -129,7 +129,5 @@ class AssessmentQuestionBank < ActiveRecord::Base
     quiz_groups.destroy_all
   end
   
-  named_scope :active, lambda {
-    {:conditions => ['assessment_question_banks.workflow_state != ?', 'deleted'] }
-  }
+  scope :active, where("assessment_question_banks.workflow_state<>'deleted'")
 end

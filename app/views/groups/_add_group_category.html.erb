@@ -3,11 +3,11 @@
 require([
   'i18nObj' /* I18n.t */,
   'jquery' /* $ */,
-  'jqueryui/dialog'
+  'jqueryui/dialog',
+  'compiled/jquery/fixDialogButtons' /* fix dialog formatting */,
 ], function(I18n, $) {
   window.addGroupCategory = function(callback) {
-    $("#add_category_form").dialog('close').dialog({
-      autoOpen: false,
+    $("#add_category_form").dialog({
       width: "auto",
       title: <%= jt('#groups.titles.add_group_category', 'Add Set of Groups') %>,
       modal: true,
@@ -15,7 +15,7 @@ require([
         backgroundColor: "#000",
         opacity: 0.7
       }
-    }).dialog('open');
+    }).fixDialogButtons();
     var callbacks = $("#add_category_form").data('callbacks') || [];
     callbacks.push(callback);
     $("#add_category_form").data('callbacks', callbacks);
@@ -23,11 +23,11 @@ require([
 });
 </script>
 <% end %>
-<% form_tag context_url(@context, :create_category_context_groups_url), {:id => "add_category_form", :style => "display: none;"} do %>
+<% form_tag context_url(@context, :context_group_categories_url), {:id => "add_category_form", :style => "display: none;"} do %>
   <table>
     <tr>
       <td style="vertical-align: top; padding: 0.5em;"><%= before_label :name_for_groups, "Name for Groups" %></td>
-      <td style="padding: 0.5em;"><input type="text" name="category[name]" value="<%= t :default_name_for_groups, "Project Groups" %>"/></td>
+      <td style="padding: 0.5em;"><input type="text" name="category[name]" maxlength="255" value="<%= t :default_name_for_groups, "Project Groups" %>"/></td>
     </tr>
     <% if @context.is_a?(Account) %>
       <input type="hidden" name="category[split_groups]" value="0">
@@ -41,7 +41,7 @@ require([
           <%= link_to(image_tag('help.png'), '#', :class => 'self_signup_help_link no-hover',
                       :title => t(:self_signup_help_tooltip, "What Are Self Sign-Up Groups?")) %>
           <br/>
-          <input type="checkbox" name="category[restrict_self_signup]" id="category_restrict_self_signup" value="1" />
+          <input type="checkbox" name="category[restrict_self_signup]" id="category_restrict_self_signup" value="1" disabled />
           <label for="category_restrict_self_signup"><%= t :restricted_self_signup, "Require group members to be in the same section" %></label>
         </td>
       </tr>
@@ -51,8 +51,8 @@ require([
           <div id="group_structure_standard_subcontainer">
             <input type="radio" name="category[split_groups]" id="category_split_groups" value="1"/>
             <%= t :group_structure_standard, "*Split students into* %{number_of_groups} *equal groups*",
-              :number_of_groups => '<input type="text" name="category[split_group_count]" id="category_split_group_count" style="width: 25px;"/>'.html_safe,
-              :wrapper => '<label for="category_split_groups">\1</label>' %><br/>
+              :number_of_groups => '<input type="text" name="category[split_group_count]" id="category_split_group_count" style="width: 25px; margin: 0;"/>'.html_safe,
+              :wrapper => '<label for="category_split_groups" style="vertical-align: -4px">\1</label>' %><br/>
             <input type="radio" name="category[split_groups]" id="category_no_groups" value="0" checked="true"/>
             <label for="category_no_groups"><%= t 'labels.manually_create_groups', "I'll create groups manually" %></label>
           </div>
@@ -80,7 +80,7 @@ TEXT
     <% end %>
     <tr>
       <td colspan="2" class="button-container-right-aligned" style="padding: 0.5em;">
-        <button type="submit" class="button submit_button"><%= t 'buttons.create_category', "Create Category" %></button>
+        <button type="submit" class="btn btn-primary submit_button"><%= t 'buttons.create_category', "Create Category" %></button>
       </td>
     </tr>
   </table>

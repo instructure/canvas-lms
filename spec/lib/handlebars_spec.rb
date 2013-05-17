@@ -29,6 +29,11 @@ describe Handlebars do
         should eql('{{{t "test" "this is a test of %{foo}" scope="test"}}}')
     end
 
+    it "should flag triple-stashed interpolation variables as safe" do
+      Handlebars.prepare_i18n('{{#t "pizza"}}give me {{{input}}} pizzas{{/t}}', 'test')[:content].
+        should eql('{{{t "pizza" "give me %h{input} pizzas" scope="test"}}}')
+    end
+
     it "should extract wrappers" do
       Handlebars.prepare_i18n('{{#t "test"}}<b>{{person}}</b> is <b>so</b> <b title="{{definition}}"><i>cool</i></b>{{/t}}', 'test')[:content].
         should eql('{{{t "test" "*%{person}* is *so* **cool**" scope="test" w0="<b>$1</b>" w1="<b title=\\"%{definition}\\"><i>$1</i></b>"}}}')
@@ -41,12 +46,10 @@ describe Handlebars do
     end
 
     it "should fix up the scope" do
-      Handlebars.prepare_i18n('{{#t "foo"}}hello{{/t}}', '_test')[:content].
-        should eql('{{{t "foo" "hello" scope="test"}}}')
-      Handlebars.prepare_i18n('{{#t "foo"}}hello{{/t}}', 'test/test')[:content].
-        should eql('{{{t "foo" "hello" scope="test.test"}}}')
-      Handlebars.prepare_i18n('{{#t "foo"}}hello{{/t}}', 'test/_this_is_a_test')[:content].
-        should eql('{{{t "foo" "hello" scope="test.this_is_a_test"}}}')
+      Handlebars.scopify('_test').should == "test"
+      Handlebars.scopify('test/test').should == "test.test"
+      Handlebars.scopify('test/_this_is-a_test').should == "test.this_is_a_test"
+      Handlebars.scopify('test/_andThisIsATest').should == "test.and_this_is_a_test"
     end
 
   end

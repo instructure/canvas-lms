@@ -1,4 +1,4 @@
-<% define_content :link do %>http://<%= HostUrl.context_host(asset) %>/courses/<%= asset.id %><% end %>
+<% define_content :link do %><%= HostUrl.protocol %>://<%= HostUrl.context_host(asset) %>/courses/<%= asset.id %><% end %>
 <% define_content :subject do %>
   <%= t :subject, "New Course" %>
 <% end %>
@@ -10,7 +10,7 @@
 <%= before_label :teachers, "Teachers" %>
 <% asset.teachers.each do |teacher| %>
   - <%= teacher.name %> (<%= teacher.email %>)
-    http://<%= HostUrl.context_host(asset) %>/users/<%= teacher.id %>
+    <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset) %>/users/<%= teacher.id %>
     
 <% end %><% end %>
 

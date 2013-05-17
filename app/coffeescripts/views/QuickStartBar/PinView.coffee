@@ -16,7 +16,7 @@ define [
       @$('.toolbar').removeClass('toolbar')
       @$('.box-header').removeClass('box-header')
       @$('.box-content').removeClass('box-content').addClass('v-gutter')
-      @$('.button').addClass('small-button')
+      @$('.btn').addClass('small-button')
       @$('[autoFocus]').removeAttr('autoFocus')
 
   class PinView extends BaseItemView

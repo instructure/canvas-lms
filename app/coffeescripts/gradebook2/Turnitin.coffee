@@ -1,8 +1,7 @@
 define [
   'i18n!turnitin'
   'underscore'
-  'compiled/util/invert'
-], (I18n, {max}, invert) ->
+], (I18n, {max, invert}) ->
 
   Turnitin =
     extractData: (submission) ->
@@ -21,8 +20,8 @@ define [
       return unless data.items.length
 
       stateList = ['no', 'none', 'acceptable', 'warning', 'problem', 'failure']
-      stateMap = invert(stateList, parseInt)
-      states = (stateMap[item.state or 'no'] for item in data.items)
+      stateMap = invert(stateList)
+      states = (parseInt(stateMap[item.state or 'no']) for item in data.items)
       data.state = stateList[max(states)]
       data
 

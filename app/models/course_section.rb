@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -24,11 +24,11 @@ class CourseSection < ActiveRecord::Base
   belongs_to :course
   belongs_to :nonxlist_course, :class_name => 'Course'
   belongs_to :root_account, :class_name => 'Account'
-  belongs_to :account
   has_many :enrollments, :include => :user, :conditions => ['enrollments.workflow_state != ?', 'deleted'], :dependent => :destroy
   has_many :all_enrollments, :class_name => 'Enrollment'
   has_many :students, :through => :student_enrollments, :source => :user
   has_many :student_enrollments, :class_name => 'StudentEnrollment', :conditions => ['enrollments.workflow_state != ? AND enrollments.workflow_state != ? AND enrollments.workflow_state != ? AND enrollments.workflow_state != ?', 'deleted', 'completed', 'rejected', 'inactive'], :include => :user
+  has_many :all_student_enrollments, :class_name => 'StudentEnrollment', :conditions => ['enrollments.workflow_state != ?', 'deleted'], :include => :user
   has_many :instructor_enrollments, :class_name => 'Enrollment', :conditions => "(enrollments.type = 'TaEnrollment' or enrollments.type = 'TeacherEnrollment')"
   has_many :admin_enrollments, :class_name => 'Enrollment', :conditions => "(enrollments.type = 'TaEnrollment' or enrollments.type = 'TeacherEnrollment' or enrollments.type = 'DesignerEnrollment')"
   has_many :users, :through => :enrollments
@@ -50,12 +50,15 @@ class CourseSection < ActiveRecord::Base
   end
 
   def participating_students
-    course.participating_students.scoped(:conditions => ["enrollments.course_section_id = ?", id])
+    course.participating_students.where(:enrollments => { :course_section_id => self })
+  end
+
+  def participating_admins
+    course.participating_admins.where("enrollments.course_section_id = ? OR NOT COALESCE(enrollments.limit_privileges_to_course_section, ?)", self, false)
   end
 
   def participants
-    participating_students + 
-    course.participating_admins.scoped(:conditions => ["enrollments.course_section_id = ? OR NOT COALESCE(enrollments.limit_privileges_to_course_section, ?)", id, false])
+    participating_students + participating_admins
   end
 
   def available?
@@ -66,10 +69,10 @@ class CourseSection < ActiveRecord::Base
     return if new_record?
     self.enrollments.update_all(:updated_at => Time.now.utc)
     case User.connection.adapter_name
-    when 'MySQL'
+    when 'MySQL', 'Mysql2'
       User.connection.execute("UPDATE users, enrollments SET users.updated_at=NOW() WHERE users.id=enrollments.user_id AND enrollments.course_section_id=#{self.id}")
     else
-      User.update_all({:updated_at => Time.now.utc}, "id IN (SELECT user_id FROM enrollments WHERE course_section_id=#{self.id})")
+      User.where("id IN (SELECT user_id FROM enrollments WHERE course_section_id=?)", self).update_all(:updated_at => Time.now.utc)
     end
   end
 
@@ -86,7 +89,7 @@ class CourseSection < ActiveRecord::Base
     given {|user, session| self.cached_context_grants_right?(user, session, :manage_calendar) }
     can :manage_calendar
 
-    given {|user, session| self.enrollments.find_by_user_id(user.id) && self.cached_context_grants_right?(user, session, :read_roster) }
+    given {|user, session| user && self.enrollments.find_by_user_id(user.id) && self.cached_context_grants_right?(user, session, :read_roster) }
     can :read
 
     given {|user, session| self.cached_context_grants_right?(user, session, :read_as_admin) }
@@ -94,19 +97,19 @@ class CourseSection < ActiveRecord::Base
   end
 
   def set_update_account_associations_if_changed
-    @should_update_account_associations = self.account_id_changed? || self.course_id_changed? || self.nonxlist_course_id_changed?
-    @should_update_account_associations = false if self.new_record? && self.account_id.nil?
+    @should_update_account_associations = self.course_id_changed? || self.nonxlist_course_id_changed?
     true
   end
 
   def update_account_associations_if_changed
-    send_later_if_production(:update_account_associations) if @should_update_account_associations && !Course.skip_updating_account_associations?
+    if @should_update_account_associations && !Course.skip_updating_account_associations?
+      Course.send_later_if_production(:update_account_associations,
+                                      [self.course_id, self.course_id_was, self.nonxlist_course_id, self.nonxlist_course_id_was].compact.uniq)
+    end
   end
 
   def update_account_associations
-    Course.update_account_associations([self.course, self.nonxlist_course].compact)
-    self.course.try(:update_account_associations)
-    self.nonxlist_course.try(:update_account_associations)
+    Course.update_account_associations([self.course_id, self.nonxlist_course_id].compact)
   end
 
   def verify_unique_sis_source_id
@@ -126,7 +129,6 @@ class CourseSection < ActiveRecord::Base
 
   def infer_defaults
     self.root_account_id ||= (self.course.root_account_id rescue nil) || Account.default.id
-    self.assert_course unless self.course
     raise "Course required" unless self.course
     self.root_account_id = self.course.root_account_id || Account.default.id
     # This is messy, and I hate it.
@@ -158,10 +160,6 @@ class CourseSection < ActiveRecord::Base
     @section_display_name ||= self.name || self.section_code
   end
 
-  def assert_course
-    self.course ||= Course.create!(:name => self.name || self.section_code, :root_account => self.root_account)
-  end
-
   def move_to_course(course, *opts)
     return self if self.course_id == course.id
     old_course = self.course
@@ -175,10 +173,10 @@ class CourseSection < ActiveRecord::Base
     old_course_is_unrelated = old_course.id != self.course_id && old_course.id != self.nonxlist_course_id
     if self.root_account_id_changed?
       self.save!
-      self.enrollments.update_all :course_id => course.id, :root_account_id => self.root_account_id
+      self.enrollments.update_all :course_id => course, :root_account_id => self.root_account_id
     else
       self.save!
-      self.enrollments.update_all :course_id => course.id
+      self.enrollments.update_all :course_id => course
     end
     User.send_later_if_production(:update_account_associations, user_ids) if old_course.account_id != course.account_id && !User.skip_updating_account_associations?
     if old_course.id != self.course_id && old_course.id != self.nonxlist_course_id
@@ -215,7 +213,7 @@ class CourseSection < ActiveRecord::Base
   end
 
   def deletable?
-    self.enrollments.count == 0
+    self.enrollments.not_fake.count == 0
   end
 
   def enroll_user(user, type, state='invited')
@@ -233,13 +231,9 @@ class CourseSection < ActiveRecord::Base
     save!
   end
 
-  named_scope :active, lambda {
-    { :conditions => ['course_sections.workflow_state != ?', 'deleted'] }
-  }
+  scope :active, where("course_sections.workflow_state<>'deleted'")
 
-  named_scope :sis_sections, lambda{|account, *source_ids|
-    {:conditions => {:root_account_id => account.id, :sis_source_id => source_ids}, :order => :sis_source_id}
-  }
+  scope :sis_sections, lambda { |account, *source_ids| where(:root_account_id => account, :sis_source_id => source_ids).order(:sis_source_id) }
 
   def common_to_users?(users)
     users.all?{ |user| self.student_enrollments.active.for_user(user).count > 0 }

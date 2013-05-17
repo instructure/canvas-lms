@@ -1,0 +1,8 @@
+You can use this folder to store images you want to include in the
+HTML source documentation. RDoc syntax for including images:
+
+`link:images/my_image.png`
+
+--
+This folder and its contents will automatically be copied to the output 
+documentation HTML directory by the documentation generation scripts.

@@ -21,20 +21,14 @@ module ApplicationHelper
   include TextHelper
   include LocaleSelection
 
-  # Admins of the given context can see the User.name attribute,
-  # but everyone else sees the User.short_name attribute.
-  def context_user_name(context, user, last_name_first=false)
+  def context_user_name(context, user)
     return nil unless user
     return user.short_name if !context && user.respond_to?(:short_name)
-    context_code = context
-    context_code = context.asset_string if context.respond_to?(:asset_string)
-    context_code ||= "no_context"
     user_id = user
     user_id = user.id if user.is_a?(User) || user.is_a?(OpenObject)
-    Rails.cache.fetch(['context_user_name', context_code, user_id, last_name_first].cache_key, {:expires_in=>15.minutes}) do
-      user = User.find_by_id(user_id)
-      res = user.short_name || user.name
-      res
+    Rails.cache.fetch(['context_user_name', context, user_id].cache_key, {:expires_in=>15.minutes}) do
+      user = user.respond_to?(:short_name) ? user : User.find(user_id)
+      user.short_name || user.name
     end
   end
 
@@ -103,27 +97,44 @@ module ApplicationHelper
       end
     elsif hash[:context_module]
       obj = hash[:context_module].is_a?(ContextModule) ? hash[:context_module] : OpenObject.new(hash[:context_module])
-      html = case type
-        when "quiz"
-          I18n.t('messages.quiz_locked_module', "This quiz is part of the module *%{module}* and hasn't been unlocked yet.",
-            :module => TextHelper.escape_html(obj.name), :wrapper => '<b>\1</b>')
-        when "assignment"
-          I18n.t('messages.assignment_locked_module', "This assignment is part of the module *%{module}* and hasn't been unlocked yet.",
-            :module => TextHelper.escape_html(obj.name), :wrapper => '<b>\1</b>')
-        when "topic"
-          I18n.t('messages.topic_locked_module', "This topic is part of the module *%{module}* and hasn't been unlocked yet.",
-            :module => TextHelper.escape_html(obj.name), :wrapper => '<b>\1</b>')
-        when "file"
-          I18n.t('messages.file_locked_module', "This file is part of the module *%{module}* and hasn't been unlocked yet.",
-            :module => TextHelper.escape_html(obj.name), :wrapper => '<b>\1</b>')
-        when "page"
-          I18n.t('messages.page_locked_module', "This page is part of the module *%{module}* and hasn't been unlocked yet.",
-            :module => TextHelper.escape_html(obj.name), :wrapper => '<b>\1</b>')
-        else
-          I18n.t('messages.content_locked_module', "This content is part of the module *%{module}* and hasn't been unlocked yet.",
-            :module => TextHelper.escape_html(obj.name), :wrapper => '<b>\1</b>')
+      html = if obj.workflow_state == 'unpublished'
+        case type
+          when "quiz"
+            I18n.t('messages.quiz_unpublished_module', "This quiz is part of an unpublished module and is not available yet.")
+          when "assignment"
+            I18n.t('messages.assignment_unpublished_module', "This assignment is part of an unpublished module and is not available yet.")
+          when "topic"
+            I18n.t('messages.topic_unpublished_module', "This topic is part of an unpublished module and is not available yet.")
+          when "file"
+            I18n.t('messages.file_unpublished_module', "This file is part of an unpublished module and is not available yet.")
+          when "page"
+            I18n.t('messages.page_unpublished_module', "This page is part of an unpublished module and is not available yet.")
+          else
+            I18n.t('messages.content_unpublished_module', "This content is part of an unpublished module and is not available yet.")
         end
-      if context
+      else
+        case type
+          when "quiz"
+            I18n.t('messages.quiz_locked_module', "This quiz is part of the module *%{module}* and hasn't been unlocked yet.",
+              :module => TextHelper.escape_html(obj.name), :wrapper => '<b>\1</b>')
+          when "assignment"
+            I18n.t('messages.assignment_locked_module', "This assignment is part of the module *%{module}* and hasn't been unlocked yet.",
+              :module => TextHelper.escape_html(obj.name), :wrapper => '<b>\1</b>')
+          when "topic"
+            I18n.t('messages.topic_locked_module', "This topic is part of the module *%{module}* and hasn't been unlocked yet.",
+              :module => TextHelper.escape_html(obj.name), :wrapper => '<b>\1</b>')
+          when "file"
+            I18n.t('messages.file_locked_module', "This file is part of the module *%{module}* and hasn't been unlocked yet.",
+              :module => TextHelper.escape_html(obj.name), :wrapper => '<b>\1</b>')
+          when "page"
+            I18n.t('messages.page_locked_module', "This page is part of the module *%{module}* and hasn't been unlocked yet.",
+              :module => TextHelper.escape_html(obj.name), :wrapper => '<b>\1</b>')
+          else
+            I18n.t('messages.content_locked_module', "This content is part of the module *%{module}* and hasn't been unlocked yet.",
+              :module => TextHelper.escape_html(obj.name), :wrapper => '<b>\1</b>')
+        end
+      end
+      if context && (obj.workflow_state != 'unpublished')
         html << "<br/>".html_safe
         html << I18n.t('messages.visit_modules_page', "*Visit the course modules page for information on how to unlock this content.*",
           :wrapper => "<a href='#{context_url(context, :context_context_modules_url)}'>\\1</a>")
@@ -225,7 +236,7 @@ module ApplicationHelper
   end
 
   def hidden(include_style=false)
-    include_style ? "style='display:none;'" : "display: none;"
+    include_style ? "style='display:none;'".html_safe : "display: none;"
   end
 
   # Helper for easily checking vender/plugins/adheres_to_policy.rb
@@ -275,10 +286,18 @@ module ApplicationHelper
     return if @wiki_sidebar_data
     logger.warn "database lookups happening in view code instead of controller code for wiki sidebar (load_wiki_sidebar)"
     @wiki_sidebar_data = {}
-    includes = [:default_wiki_wiki_pages, :active_assignments, :active_discussion_topics, :active_quizzes, :active_context_modules]
-    includes.each{|i| @wiki_sidebar_data[i] = @context.send(i).scoped({:limit => 150}) if @context.respond_to?(i) }
+    includes = [:active_assignments, :active_discussion_topics, :active_quizzes, :active_context_modules]
+    includes.each{|i| @wiki_sidebar_data[i] = @context.send(i).limit(150) if @context.respond_to?(i) }
     includes.each{|i| @wiki_sidebar_data[i] ||= [] }
-    @wiki_sidebar_data[:root_folders] = Folder.root_folders(@context)
+    @wiki_sidebar_data[:wiki_pages] = @context.wiki.wiki_pages.active.order(:title).limit(150) if @context.respond_to?(:wiki)
+    @wiki_sidebar_data[:wiki_pages] ||= []
+    if can_do(@context, @current_user, :manage_files)
+      @wiki_sidebar_data[:root_folders] = Folder.root_folders(@context)
+    elsif @context.is_a?(Course) && !@context.tab_hidden?(Course::TAB_FILES)
+      @wiki_sidebar_data[:root_folders] = Folder.root_folders(@context).reject{|folder| folder.locked? || folder.hidden}
+    else
+      @wiki_sidebar_data[:root_folders] = []
+    end
     @wiki_sidebar_data
   end
 
@@ -324,6 +343,10 @@ module ApplicationHelper
     attr_accessor :cached_translation_blocks
   end
 
+  def include_js_translations?
+    !!(params[:include_js_translations] || use_optimized_js?)
+  end
+
   # See `js_base_url`
   def use_optimized_js?
     if ENV['USE_OPTIMIZED_JS'] == 'true'
@@ -364,6 +387,7 @@ module ApplicationHelper
   def include_css_bundles
     unless jammit_css_bundles.empty?
       bundles = jammit_css_bundles.map{ |(bundle,plugin)| plugin ? "plugins_#{plugin}_#{bundle}" : bundle }
+      bundles << {:media => 'all'}
       include_stylesheets(*bundles)
     end
   end
@@ -390,7 +414,7 @@ module ApplicationHelper
           end
         end
         return '' if tabs.empty?
-        html << '<nav role="navigation"><ul id="section-tabs">'
+        html << '<nav role="navigation" aria-label="context"><ul id="section-tabs">'
         tabs.each do |tab|
           path = nil
           if tab[:args]
@@ -403,7 +427,7 @@ module ApplicationHelper
           hide = tab[:hidden] || tab[:hidden_unused]
           class_name = tab[:css_class].to_css_class
           class_name += ' active' if @active_tab == tab[:css_class]
-          html << "<li class='section #{"hidden" if hide }'>" + link_to(tab[:label], path, :class => class_name) + "</li>" if tab[:href]
+          html << "<li class='section #{"section-tab-hidden" if hide }'>" + link_to(tab[:label], path, :class => class_name) + "</li>" if tab[:href]
         end
         html << "</ul></nav>"
         html.join("")
@@ -442,6 +466,19 @@ module ApplicationHelper
     @domain_root_account.manually_created_courses_account.grants_rights?(user, session, :create_courses, :manage_courses).values.any?
   end
 
+  # Public: Create HTML for a sidebar button w/ icon.
+  #
+  # url - The url the button should link to.
+  # img - The path to an image (e.g. 'icon.png')
+  # label - The text to display on the button (should already be internationalized).
+  #
+  # Returns an HTML string.
+  def sidebar_button(url, label, img = nil)
+    link_to(url, :class => 'btn button-sidebar-wide') do
+      img ? ("<i class='icon-" + img + "'></i> ").html_safe + label : label
+    end
+  end
+
   def hash_get(hash, key, default=nil)
     if hash
       if hash[key.to_s] != nil
@@ -475,6 +512,7 @@ module ApplicationHelper
       :error_id                 => @error && @error.id,
       :disableGooglePreviews    => !service_enabled?(:google_docs_previews),
       :disableScribdPreviews    => !feature_enabled?(:scribd),
+      :disableCrocodocPreviews  => !feature_enabled?(:crocodoc),
       :logPageViews             => !@body_class_no_headers,
       :maxVisibleEditorButtons  => 3,
       :editorButtons            => editor_buttons,
@@ -492,7 +530,7 @@ module ApplicationHelper
     contexts += @context.account_chain if @context.respond_to?(:account_chain)
     contexts << @domain_root_account if @domain_root_account
     Rails.cache.fetch((['editor_buttons_for'] + contexts.uniq).cache_key) do
-      tools = ContextExternalTool.active.having_setting('editor_button').scoped(:conditions => contexts.map{|context| "(context_type='#{context.class.base_class.to_s}' AND context_id=#{context.id})"}.join(" OR "))
+      tools = ContextExternalTool.active.having_setting('editor_button').where(contexts.map{|context| "(context_type='#{context.class.base_class.to_s}' AND context_id=#{context.id})"}.join(" OR "))
       tools.sort_by(&:id).map do |tool|
         {
           :name => tool.label_for(:editor_button, nil),
@@ -508,6 +546,25 @@ module ApplicationHelper
 
   def nbsp
     raw("&nbsp;")
+  end
+
+  def dataify(obj, *attributes)
+    hash = obj.respond_to?(:to_hash) && obj.to_hash
+    res = ""
+    if !attributes.empty?
+      attributes.each do |attribute|
+        res << %Q{ data-#{h attribute}="#{h(hash ? hash[attribute] : obj.send(attribute))}"}
+      end
+    elsif hash
+      res << hash.map { |key, value| %Q{data-#{h key}="#{h value}"} }.join(" ")
+    end
+    raw(" #{res} ")
+  end
+
+  def inline_media_comment_link(comment=nil)
+    if comment && comment.media_comment_id
+      raw %Q{<a href="#" class="instructure_inline_media_comment no-underline" #{dataify(comment, :media_comment_id, :media_comment_type)} >&nbsp;</a>}
+    end
   end
 
   # translate a URL intended for an iframe into an alternative URL, if one is
@@ -561,7 +618,7 @@ module ApplicationHelper
   end
 
   def jt(key, default, js_options='{}')
-    full_key = key =~ /\A#/ ? key : i18n_scope + '.' + key
+    full_key = key =~ /\A#/ ? key.sub(/\A#/, '') : i18n_scope + '.' + key
     translated_default = I18n.backend.send(:lookup, I18n.locale, full_key) || default # string or hash
     raw "I18n.scoped(#{i18n_scope.to_json}).t(#{key.to_json}, #{translated_default.to_json}, #{js_options})"
   end
@@ -660,7 +717,10 @@ module ApplicationHelper
     css_classes << "support_url" if url
     css_classes << "help_dialog_trigger" if show_feedback_link
     if url || show_feedback_link
-      link_to t('#links.help', "Help"), url || '#', :class => css_classes.join(" ")
+      link_to t('#links.help', "Help"), url || '#',
+        :class => css_classes.join(" "),
+        'data-track-category' => "help system",
+        'data-track-label' => 'help button'
     end
   end
 
@@ -700,6 +760,7 @@ module ApplicationHelper
   end
 
   def include_account_js
+    return if params[:global_includes] == '0'
     includes = get_global_includes.inject([]) do |js_includes, global_include|
       js_includes << "'#{global_include[:js]}'" if global_include[:js].present?
       js_includes
@@ -726,6 +787,7 @@ module ApplicationHelper
   end
 
   def include_account_css
+    return if params[:global_includes] == '0'
     includes = get_global_includes.inject([]) do |css_includes, global_include|
       css_includes << global_include[:css] if global_include[:css].present?
       css_includes
@@ -745,6 +807,13 @@ module ApplicationHelper
     end
   end
 
+  # render a link with a tooltip containing a summary of due dates
+  def multiple_due_date_tooltip(assignment, user, opts={})
+    user ||= @current_user
+    presenter = OverrideTooltipPresenter.new(assignment, user, opts)
+    render 'shared/vdd_tooltip', :presenter => presenter
+  end
+
   require 'digest'
 
   # create a checksum of an array of objects' cache_key values.
@@ -756,9 +825,33 @@ module ApplicationHelper
     Digest::MD5.hexdigest(keys.join('/'))
   end
 
+  def translated_due_date(assignment)
+    if assignment.multiple_due_dates_apply_to?(@current_user)
+      t('#due_dates.multiple_due_dates', 'due: Multiple Due Dates')
+    else
+      assignment = assignment.overridden_for(@current_user)
+
+      if assignment.due_at
+        t('#due_dates.due_at', 'due: %{assignment_due_date_time}', {
+          :assignment_due_date_time => datetime_string(force_zone(assignment.due_at))
+        })
+      else
+        t('#due_dates.no_due_date', 'due: No Due Date')
+      end
+    end
+  end
+
   def add_uri_scheme_name(uri)
     noSchemeName = !uri.match(/^(.+):\/\/(.+)/)
     uri = 'http://' + uri if noSchemeName
     uri
+  end
+
+  def agree_to_terms
+    # may be overridden by a plugin
+    @agree_to_terms ||
+    t("#user.registration.agree_to_terms",
+      "You agree to the *terms of use*.",
+      :wrapper => link_to('\1', "http://www.instructure.com/terms-of-use", :target => "_new"))
   end
 end

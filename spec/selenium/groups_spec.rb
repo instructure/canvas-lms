@@ -12,11 +12,11 @@ describe "groups" do
 
     get "/courses/#{@course.id}/groups"
 
-    group_div = driver.find_element(:css, "#group_#{g1.id}")
+    group_div = f("#group_#{g1.id}")
     group_div.find_element(:css, ".name").text.should == "some group"
 
     group_div.find_element(:css, ".management a").click
-    wait_for_dom_ready
+    wait_for_ajaximations
 
     @student.group_memberships.should_not be_empty
     @student.group_memberships.first.should be_accepted
@@ -28,11 +28,11 @@ describe "groups" do
 
     get "/courses/#{@course.id}/groups"
 
-    group_div = driver.find_element(:css, "#group_#{g1.id}")
+    group_div = f("#group_#{g1.id}")
     group_div.find_element(:css, ".name").text.should == "my group"
 
     group_div.find_element(:css, ".management a").click
-    wait_for_dom_ready
+    wait_for_ajaximations
 
     @student.group_memberships.should_not be_empty
     @student.group_memberships.first.should be_accepted
@@ -44,7 +44,7 @@ describe "groups" do
 
     get "/courses/#{@course.id}/groups"
 
-    driver.find_elements(:css, "#group_#{g1.id}").should be_empty
+    ff("#group_#{g1.id}").should be_empty
   end
 
   it "should allow a student to create a group" do
@@ -54,16 +54,16 @@ describe "groups" do
 
     get "/courses/#{@course.id}/groups"
 
-    driver.find_element(:css, ".add_group_link").click
+    f(".add_group_link").click
     wait_for_animations
 
-    driver.find_element(:id, "group_name").send_keys("My Group")
-    driver.find_elements(:css, "#group_join_level option").length.should == 2
-    driver.find_element(:id, "invitees_#{@student.id}").click
+    f("#group_name").send_keys("My Group")
+    ff("#group_join_level option").length.should == 2
+    f("#invitees_#{@student.id}").click
     submit_form('#add_group_form')
     wait_for_ajax_requests
 
-    new_group_el = find_with_jquery(".group:visible")
+    new_group_el = fj(".group:visible")
     members_link = new_group_el.find_element(:css, ".members_count")
     members_link.should include_text "2"
     members_link.click

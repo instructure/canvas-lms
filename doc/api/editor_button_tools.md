@@ -18,7 +18,7 @@ of the configured tools in a dropdown.
 
 When tools are loaded as rich editor buttons, Canvas sends an additional 
 parameter to notify the tool of the directive, 
-<code>selection_directive=embed_content</code>. When a tool receives this directive, 
+<code>ext_content_return_types=embed_content</code>. When a tool receives this directive,
 it means Canvas is expecting the tool to redirect the user to the LTI 
 success URL with some additional parameters. These additional parameters 
 tell Canvas what type of content to embed, as listed below. Remember to 
@@ -31,7 +31,7 @@ that all URLs you return be over SSL (https instead of http).
 ### to embed an image:
 <table class="tool">
   <tr>
-    <td>embed_type=image</td>
+    <td>return_type=image_url</td>
     <td></td>
     <td>(required)</td>
   </tr><tr>
@@ -57,13 +57,13 @@ that all URLs you return be over SSL (https instead of http).
 If the <code>launch_presentation_return_url</code> were
 <code>http://www.example.com/done</code>, possible return URLs could include:
 
-- http://www.example.com/done?embed_type=image&url=https%3A%2F%2Fothersite.com%2Fimage.gif&alt=good+picture&width=30&height=50
-- http://www.example.com/done?embed_type=image&url=https%3A%2F%2Fothersite.com%2Fimage2.gif&alt=&width=300&height=500
+- http://www.example.com/done?return_type=image_url&url=https%3A%2F%2Fothersite.com%2Fimage.gif&alt=good+picture&width=30&height=50
+- http://www.example.com/done?return_type=image_url&url=https%3A%2F%2Fothersite.com%2Fimage2.gif&alt=&width=300&height=500
 
 ### to embed an iframe:
 <table class="tool">
   <tr>
-    <td>embed_type=iframe</td>
+    <td>return_type=iframe</td>
     <td></td>
     <td>(required)</td>
   </tr><tr>
@@ -89,13 +89,13 @@ If the <code>launch_presentation_return_url</code> were
 If the <code>launch_presentation_return_url</code> were
 <code>http://www.example.com/done</code>, possible return URLs could include:
 
-- http://www.example.com/done?embed_type=iframe&url=https%3A%2F%2Fothersite.com%2Fiframe&width=30&height=50
-- http://www.example.com/done?embed_type=iframe&url=https%3A%2F%2Fothersite.com%2Fiframe2&text=good+iframe&width=300&height=500
+- http://www.example.com/done?return_type=iframe&url=https%3A%2F%2Fothersite.com%2Fiframe&width=30&height=50
+- http://www.example.com/done?return_type=iframe&url=https%3A%2F%2Fothersite.com%2Fiframe2&text=good+iframe&width=300&height=500
 
 ### to embed a link:
 <table class="tool">
   <tr>
-    <td>embed_type=link</td>
+    <td>return_type=url</td>
     <td></td>
     <td>(required)</td>
   </tr><tr>
@@ -121,14 +121,14 @@ If the <code>launch_presentation_return_url</code> were
 If the <code>launch_presentation_return_url</code> were
 <code>http://www.example.com/done</code>, possible return URLs could include:
 
-- http://www.example.com/done?embed_type=link&url=https%3A%2F%2Fothersite.com%2Flink
-- http://www.example.com/done?embed_type=link&url=https%3A%2F%2Fothersite.com%2Flink&text=other+site+link
-- http://www.example.com/done?embed_type=link&url=https%3A%2F%2Fothersite.com%2Flink&title=link&target=_blank
+- http://www.example.com/done?return_type=url&url=https%3A%2F%2Fothersite.com%2Flink
+- http://www.example.com/done?return_type=url&url=https%3A%2F%2Fothersite.com%2Flink&text=other+site+link
+- http://www.example.com/done?return_type=url&url=https%3A%2F%2Fothersite.com%2Flink&title=link&target=_blank
 
 ### to embed an external tool link:
 <table class="tool">
   <tr>
-    <td>embed_type=basic_lti</td>
+    <td>return_type=lti_launch_url</td>
     <td></td>
     <td>(required)</td>
   </tr><tr>
@@ -150,9 +150,9 @@ If the <code>launch_presentation_return_url</code> were
 If the <code>launch_presentation_return_url</code> were
 <code>http://www.example.com/done</code>, possible return URLs could include:
 
-- http://www.example.com/done?embed_type=basic_lti&url=https%3A%2F%2Fothersite.com%2Flti_link
-- http://www.example.com/done?embed_type=basic_lti&url=https%3A%2F%2Fothersite.com%2Flti_link&text=other+site+link
-- http://www.example.com/done?embed_type=basic_lti&url=https%3A%2F%2Fothersite.com%2Flti_link&title=link
+- http://www.example.com/done?return_type=lti_launch_url&url=https%3A%2F%2Fothersite.com%2Flti_link
+- http://www.example.com/done?return_type=lti_launch_url&url=https%3A%2F%2Fothersite.com%2Flti_link&text=other+site+link
+- http://www.example.com/done?return_type=lti_launch_url&url=https%3A%2F%2Fothersite.com%2Flti_link&title=link
 
 Remember that these links would only work if the current tool or some other tool was set to
 match on either the exact URL returned or the domain (in this case othersite.com)
@@ -161,7 +161,7 @@ match on either the exact URL returned or the domain (in this case othersite.com
 For other types of rich content (such as a video tag, a large block of text, etc.) we also support the oEmbed standard. oEmbed works by giving Canvas an additional URL that can be queried to retrieve the block of content to be embedded. See http://oembed.com for more details about how oEmbed works
 <table class="tool">
   <tr>
-    <td>embed_type=oembed</td>
+    <td>return_type=oembed</td>
     <td></td>
     <td>(required)</td>
   </tr><tr>
@@ -179,8 +179,8 @@ For other types of rich content (such as a video tag, a large block of text, etc
 If the <code>launch_presentation_return_url</code> were
 <code>http://www.example.com/done</code>, possible return URLs could include:
 
-- http://www.example.com/done?embed_type=oembed&endpoint=https%3A%2F%2Fothersite.com%2Foembed&url=https%3A%2F%2Fothersite.com%2Fresources%2Fimage1
-- http://www.example.com/done?embed_type=oembed&endpoint=http%3A%2F%2Fwww.flickr.com%2Fservices%2Foembed%2F&url=http%3A%2F%2Fwww.flickr.com%2Fphotos%2Fbees%2F2341623661%2F
+- http://www.example.com/done?return_type=oembed&endpoint=https%3A%2F%2Fothersite.com%2Foembed&url=https%3A%2F%2Fothersite.com%2Fresources%2Fimage1
+- http://www.example.com/done?return_type=oembed&endpoint=http%3A%2F%2Fwww.flickr.com%2Fservices%2Foembed%2F&url=http%3A%2F%2Fwww.flickr.com%2Fphotos%2Fbees%2F2341623661%2F
 
 ## Settings
 All of these settings are contained under "editor_button" in the tool configuration

@@ -1,0 +1,12 @@
+{{#ifEqual status "error"}}
+  {{#t "error_sending_message"}}Error sending message:{{/t}}
+  <em>
+    {{error}}
+  </em>
+{{else}}
+  {{#ifEqual status "complete"}}
+    {{#t "done_sending_message"}}Sent <b>{{message_preview}}</b> to <b>{{num_people}}</b>{{/t}}
+  {{else}}
+    {{#t "sending_message"}}Sending <b>{{message_preview}}</b> to <b>{{num_people}}</b>{{/t}}
+  {{/ifEqual}}
+{{/ifEqual}}

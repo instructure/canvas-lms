@@ -1,5 +1,8 @@
 <div class="registration-dialog">
   <form class="form-horizontal bootstrap-form" method="post" action="/users">
+    {{#each hiddenFields}}
+    <input type="hidden" name="{{name}}" value="{{value}}" />
+    {{/each}}
     <div class="control-group">
       <label class="control-label" for="parent_name">{{#t "labels.name"}}Your Name{{/t}}</label>
       <div class="controls">
@@ -28,14 +31,14 @@
       <div class="controls">
         <label class="checkbox">
           <input type="checkbox" name="user[terms_of_use]" value="1">
-          {{#t "agree_to_terms"}}You agree to the <a href="{{terms_url}}" target="_new">terms of use</a>.{{/t}}
+          {{#t "agree_to_terms_and_pp"}}You agree to the <a href="{{terms_url}}" target="_blank">terms of use</a> and the <a href="{{privacy_url}}" target="_blank">privacy policy</a>.{{/t}}
         </label>
       </div>
     </div>
     <div class="control-group">
       <div class="controls">
-        <input type="hidden" name="enrollment_type" value="observer">
-        <button class="button btn-primary" type="submit">{{#t "buttons.start_participating"}}Start Participating{{/t}}</button>
+        <input type="hidden" name="user[initial_enrollment_type]" value="observer">
+        <button class="btn btn-primary" type="submit">{{#t "buttons.start_participating"}}Start Participating{{/t}}</button>
       </div>
     </div>
   </form>

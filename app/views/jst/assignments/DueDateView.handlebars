@@ -1,0 +1,25 @@
+<form>
+  {{#with assignment_override}}
+  <select class="section-list input-small" name="course_section_id">
+  </select>
+
+  <div class="date_field_container">
+    <input value="{{datetimeFormatted due_at}}" name="due_at" type="text"
+    class="input-small date_field">
+  </div>
+
+  <div class="date_field_container">
+    <input name="unlock_at" value="{{datetimeFormatted unlock_at}}" type="text"
+    class="date_field">
+  </div>
+
+  <div class="date_field_container to">
+    <input name="lock_at" value="{{datetimeFormatted lock_at}}" type="text"
+    class="date_field">
+  </div>
+
+  <div>
+    <a href="#" class="remove-link"><i class="icon-end"></i></a>
+  </div>
+  {{/with}}
+</form>

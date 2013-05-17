@@ -17,13 +17,41 @@
 #
 
 class StreamItemInstance < ActiveRecord::Base
+  include Workflow
+
   belongs_to :user
   belongs_to :stream_item
+  belongs_to :context, :polymorphic => true
 
-  attr_accessible :user_id, :stream_item
+  validates_presence_of :stream_item_id
+
+  attr_accessible :user, :stream_item, :context
 
   before_save :set_context_code
   def set_context_code
-    self.context_code = stream_item && stream_item.context_code
+    self.context_type ||= stream_item.context_type
+    self.context_id ||= stream_item.context_id
+  end
+
+  class << self
+    alias_method :original_update_all, :update_all
+    # Don't use update_all() because there is an observer
+    # on StreamItemInstance to invalidate some cache keys.
+    # Use update_all_with_invalidation() instead.
+    def update_all(*args)
+      raise "Using update_all will break things, use update_all_with_invalidation instead."
+    end
+
+    # Runs update_all() and also invalidates cache keys for the array of contexts (a context
+    # is an array of [context_type, context_id])
+    def update_all_with_invalidation(contexts, updates)
+      contexts.each { |context| StreamItemCache.invalidate_context_stream_item_key(context.first, context.last) }
+      self.original_update_all(updates)
+    end
+  end
+
+  workflow do
+    state :read
+    state :unread
   end
 end

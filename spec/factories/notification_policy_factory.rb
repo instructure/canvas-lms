@@ -18,7 +18,8 @@
 
 def notification_policy_model(opts={})
   opts = opts.dup
-  opts[:notification] ||= Notification.create!
+  opts[:notification] ||= @notification
+  opts[:notification] ||= notification_model
   opts[:communication_channel] ||= CommunicationChannel.create!(:path => 'notification_policy@example.com')
   @notification_policy = factory_with_protected_attributes(NotificationPolicy,
     opts)

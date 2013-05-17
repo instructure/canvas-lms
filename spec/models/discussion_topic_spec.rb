@@ -102,6 +102,29 @@ describe DiscussionTopic do
     (@entry.check_policy(@student) & relevant_permissions).map(&:to_s).sort.should == ['read', 'reply'].sort
   end
 
+  describe "allow_student_discussion_topics setting" do
+
+    before(:each) do
+      course_with_teacher(:active_all => 1)
+      student_in_course(:active_all => 1)
+      @topic = @course.discussion_topics.create!(:user => @teacher)
+    end
+
+    it "should allow students to create topics by default" do
+      @topic.check_policy(@teacher).should include :create
+      @topic.check_policy(@student).should include :create
+    end
+
+    it "should disallow students from creating topics" do
+      @course.allow_student_discussion_topics = false
+      @course.save!
+      @topic.reload
+      @topic.check_policy(@teacher).should include :create
+      @topic.check_policy(@student).should_not include :create
+    end
+
+  end
+
   it "should grant observers read permission by default" do
     course_with_teacher(:active_all => true)
     course_with_observer(:course => @course, :active_all => true)
@@ -139,14 +162,14 @@ describe DiscussionTopic do
       course_with_student(:active_all => true)
       @user.register
       topic = @course.discussion_topics.create!(:title => "this should not be delayed", :message => "content here")
-      StreamItem.find_by_item_asset_string(topic.asset_string).should_not be_nil
+      topic.stream_item.should_not be_nil
 
       topic = delayed_discussion_topic(:title => "this should be delayed", :message => "content here", :delayed_post_at => Time.now + 1.day)
-      StreamItem.find_by_item_asset_string(topic.asset_string).should be_nil
+      topic.stream_item.should be_nil
 
       topic.message = "content changed!"
       topic.save
-      StreamItem.find_by_item_asset_string(topic.asset_string).should be_nil
+      topic.stream_item.should be_nil
     end
 
     it "should send to streams on update from delayed to active" do
@@ -154,13 +177,13 @@ describe DiscussionTopic do
       @user.register
       topic = delayed_discussion_topic(:title => "this should be delayed", :message => "content here", :delayed_post_at => Time.now + 1.day)
       topic.workflow_state.should == 'post_delayed'
-      StreamItem.find_by_item_asset_string(topic.asset_string).should be_nil
+      topic.stream_item.should be_nil
 
       topic.delayed_post_at = nil
       topic.title = "this isn't delayed any more"
       topic.workflow_state = 'active'
       topic.save!
-      StreamItem.find_by_item_asset_string(topic.asset_string).should_not be_nil
+      topic.stream_item.should_not be_nil
     end
   end
 
@@ -186,7 +209,7 @@ describe DiscussionTopic do
       @topic.subtopics_refreshed_at.should be_nil
 
       @topic.assignment = @course.assignments.build(:submission_types => 'discussion_topic', :title => @topic.title, :group_category => @group.group_category)
-      @topic.assignment.infer_due_at
+      @topic.assignment.infer_times
       @topic.assignment.saved_by = :discussion_topic
       @topic.save
       @topic.subtopics_refreshed_at.should_not be_nil
@@ -261,7 +284,7 @@ describe DiscussionTopic do
       @parent_topic = @course.discussion_topics.create(:title => "parent topic")
       @subtopic = @parent_topic.child_topics.build(:title => "subtopic")
       @assignment = @course.assignments.build(:submission_types => 'discussion_topic', :title => @subtopic.title, :group_category => group_category)
-      @assignment.infer_due_at
+      @assignment.infer_times
       @assignment.saved_by = :discussion_topic
       @subtopic.assignment = @assignment
       @subtopic.save
@@ -281,7 +304,7 @@ describe DiscussionTopic do
       course_with_student(:active_all => true)
       @topic = @course.discussion_topics.create(:title => "topic")
       @assignment = @course.assignments.build(:submission_types => 'discussion_topic', :title => @topic.title)
-      @assignment.infer_due_at
+      @assignment.infer_times
       @assignment.saved_by = :discussion_topic
       @topic.assignment = @assignment
       @topic.save
@@ -295,12 +318,26 @@ describe DiscussionTopic do
       group_category = @course.group_categories.create(:name => "category")
       @topic = @course.discussion_topics.create(:title => "topic")
       @assignment = @course.assignments.build(:submission_types => 'discussion_topic', :title => @topic.title, :group_category => group_category)
-      @assignment.infer_due_at
+      @assignment.infer_times
       @assignment.saved_by = :discussion_topic
       @topic.assignment = @assignment
       @topic.save
 
       @topic.should be_root_topic
+    end
+  end
+
+  context "#discussion_subentry_count" do
+    it "returns the count of all active discussion_entries" do
+      @student = student_in_course(:active_all => true).user
+      @topic = @course.discussion_topics.create(:title => "topic")
+      @topic.reply_from(:user => @teacher, :text => "entry 1").destroy  # no count
+      @topic.reply_from(:user => @teacher, :text => "entry 1")          # 1
+      @entry = @topic.reply_from(:user => @teacher, :text => "entry 2") # 2
+      @entry.reply_from(:user => @student, :html => "reply 1")          # 3
+      @entry.reply_from(:user => @student, :html => "reply 2")          # 4
+      # expect
+      @topic.discussion_subentry_count.should == 4
     end
   end
 
@@ -313,7 +350,7 @@ describe DiscussionTopic do
 
       group_category = @course.group_categories.build(:name => "category")
       @topic.assignment = @course.assignments.build(:submission_types => 'discussion_topic', :title => @topic.title, :group_category => group_category)
-      @topic.assignment.infer_due_at
+      @topic.assignment.infer_times
       @topic.assignment.saved_by = :discussion_topic
       @topic.save
       @topic.should be_for_assignment
@@ -324,7 +361,7 @@ describe DiscussionTopic do
       course_with_student(:active_all => true)
       @topic = @course.discussion_topics.build(:title => "topic")
       @assignment = @course.assignments.build(:submission_types => 'discussion_topic', :title => @topic.title)
-      @assignment.infer_due_at
+      @assignment.infer_times
       @assignment.saved_by = :discussion_topic
       @topic.assignment = @assignment
       @topic.save
@@ -374,13 +411,13 @@ describe DiscussionTopic do
 
       topic = @course.discussion_topics.create!(:title => "secret topic", :user => @teacher)
 
-      StreamItem.for_user(@student).count.should == 0
-      StreamItem.for_user(@teacher).count.should == 1
+      @student.stream_item_instances.count.should == 0
+      @teacher.stream_item_instances.count.should == 1
 
       topic.discussion_entries.create!
 
-      StreamItem.for_user(@student).count.should == 0
-      StreamItem.for_user(@teacher).count.should == 1
+      @student.stream_item_instances.count.should == 0
+      @teacher.stream_item_instances.count.should == 1
     end
 
   end
@@ -398,6 +435,18 @@ describe DiscussionTopic do
 
     it "should allow admins to see posts without posting" do
       @topic.user_can_see_posts?(@teacher).should == true
+    end
+
+    it "should only allow active admins to see posts without posting" do
+      @ta_enrollment = course_with_ta(:course => @course, :active_enrollment => true)
+      # TA should be able to see
+      @topic.user_can_see_posts?(@ta).should == true
+      # Remove user as TA and enroll as student, should not be able to see
+      @ta_enrollment.destroy
+      # enroll as a student.
+      course_with_student(:course => @course, :user => @ta, :active_enrollment => true)
+      @topic.reload
+      @topic.user_can_see_posts?(@ta).should == false
     end
 
     it "shouldn't allow student (and observer) who hasn't posted to see" do
@@ -472,7 +521,7 @@ describe DiscussionTopic do
       @entry1 = @topic.discussion_entries.create!(:message => "second message", :user => @user)
       @entry1.created_at = 1.week.ago
       @entry1.save!
-      @submission = @assignment.submissions.scoped(:conditions => {:user_id => @entry1.user_id}).first
+      @submission = @assignment.submissions.where(:user_id => @entry1.user_id).first
     end
 
     it "should not re-flag graded discussion as needs grading if student make another comment" do
@@ -606,7 +655,7 @@ describe DiscussionTopic do
       @student.reload
 
       @assignment.grade_student(@student, :grade => 1)
-      @submission = Submission.find(:first, :conditions => {:user_id => @student.id, :assignment_id => @assignment.id})
+      @submission = Submission.where(:user_id => @student, :assignment_id => @assignment).first
       @submission.workflow_state.should == 'graded'
 
       @topic.ensure_submission(@student)
@@ -633,12 +682,14 @@ describe DiscussionTopic do
 
     it "should allow being marked unread" do
       @topic.change_read_state("unread", @teacher)
+      @topic.reload
       @topic.read?(@teacher).should be_false
       @topic.unread_count(@teacher).should == 0
     end
 
     it "should allow being marked read" do
       @topic.change_read_state("read", @student)
+      @topic.reload
       @topic.read?(@student).should be_true
       @topic.unread_count(@student).should == 0
     end
@@ -646,6 +697,7 @@ describe DiscussionTopic do
     it "should allow mark all as unread" do
       @entry = @topic.discussion_entries.create!(:message => "Hello!", :user => @teacher)
       @topic.change_all_read_state("unread", @teacher)
+      @topic.reload
 
       @topic.read?(@student).should be_false
       @entry.read?(@student).should be_false
@@ -655,6 +707,7 @@ describe DiscussionTopic do
     it "should allow mark all as read" do
       @entry = @topic.discussion_entries.create!(:message => "Hello!", :user => @teacher)
       @topic.change_all_read_state("read", @student)
+      @topic.reload
 
       @topic.read?(@student).should be_true
       @entry.read?(@student).should be_true
@@ -670,6 +723,20 @@ describe DiscussionTopic do
       DiscussionTopic.expects(:unique_constraint_retry).once
       @topic.change_all_read_state("unread", @student)
     end
+
+    it "should sync unread state with the stream item" do
+      @stream_item = @topic.stream_item(true)
+      @stream_item.stream_item_instances.detect{|sii| sii.user_id == @teacher.id}.should be_read
+      @stream_item.stream_item_instances.detect{|sii| sii.user_id == @student.id}.should be_unread
+
+      @topic.change_all_read_state("unread", @teacher)
+      @topic.change_all_read_state("read", @student)
+      @topic.reload
+
+      @stream_item = @topic.stream_item
+      @stream_item.stream_item_instances.detect{|sii| sii.user_id == @teacher.id}.should be_unread
+      @stream_item.stream_item_instances.detect{|sii| sii.user_id == @student.id}.should be_read
+    end
   end
 
   context "materialized view" do
@@ -682,37 +749,37 @@ describe DiscussionTopic do
       DiscussionTopic::MaterializedView.for(@topic).destroy
       @topic.materialized_view.should be_nil
       @topic.materialized_view.should be_nil
-      Delayed::Job.find_all_by_strand("materialized_discussion:#{@topic.id}").size.should == 1
+      Delayed::Job.strand_size("materialized_discussion:#{@topic.id}").should == 1
     end
 
     it "should return the materialized view if it's up to date" do
-      run_job(Delayed::Job.find_by_strand("materialized_discussion:#{@topic.id}"))
+      run_jobs
       view = DiscussionTopic::MaterializedView.find_by_discussion_topic_id(@topic.id)
       @topic.materialized_view.should == [view.json_structure, view.participants_array, view.entry_ids_array, "[]"]
     end
 
     it "should update the materialized view on new entry" do
-      run_job(Delayed::Job.find_by_strand("materialized_discussion:#{@topic.id}"))
-      Delayed::Job.find_all_by_strand("materialized_discussion:#{@topic.id}").size.should == 0
+      run_jobs
+      Delayed::Job.strand_size("materialized_discussion:#{@topic.id}").should == 0
       @topic.reply_from(:user => @user, :text => "ohai")
       run_transaction_commit_callbacks
-      Delayed::Job.find_all_by_strand("materialized_discussion:#{@topic.id}").size.should == 1
+      Delayed::Job.strand_size("materialized_discussion:#{@topic.id}").should == 1
     end
 
     it "should update the materialized view on edited entry" do
       reply = @topic.reply_from(:user => @user, :text => "ohai")
-      run_job(Delayed::Job.find_by_strand("materialized_discussion:#{@topic.id}"))
-      Delayed::Job.find_all_by_strand("materialized_discussion:#{@topic.id}").size.should == 0
+      run_jobs
+      Delayed::Job.strand_size("materialized_discussion:#{@topic.id}").should == 0
       reply.update_attributes(:message => "i got that wrong before")
       run_transaction_commit_callbacks
-      Delayed::Job.find_all_by_strand("materialized_discussion:#{@topic.id}").size.should == 1
+      Delayed::Job.strand_size("materialized_discussion:#{@topic.id}").should == 1
     end
 
     it "should return empty data for a materialized view on a new (unsaved) topic" do
       new_topic = DiscussionTopic.new(:context => @topic.context, :discussion_type => DiscussionTopic::DiscussionTypes::SIDE_COMMENT)
       new_topic.should be_new_record
       new_topic.materialized_view.should == [ "[]", [], [], "[]" ]
-      Delayed::Job.find_all_by_strand("materialized_discussion:#{new_topic.id}").size.should == 0
+      Delayed::Job.strand_size("materialized_discussion:#{new_topic.id}").should == 0
     end
   end
 
@@ -734,6 +801,18 @@ describe DiscussionTopic do
     end
   end
 
+  context "restore" do
+    it "should restore the assignment and associated child topics" do
+      group_discussion_assignment
+      @topic.destroy
+
+      @topic.reload.assignment.expects(:restore).with(:discussion_topic).once
+      @topic.restore
+      @topic.reload.should be_active
+      @topic.child_topics.each { |ct| ct.reload.should be_active }
+    end
+  end
+
   describe "reply_from" do
     it "should ignore responses in deleted account" do
       account = Account.create!
@@ -741,7 +820,24 @@ describe DiscussionTopic do
       @context = @course
       discussion_topic_model(:user => @teacher)
       account.destroy
-      @topic.reply_from(:user => @teacher, :text => "entry").should be_nil
+      lambda { @topic.reply_from(:user => @teacher, :text => "entry") }.should raise_error(IncomingMessageProcessor::UnknownAddressError)
     end
+
+    it "should prefer html to text" do
+      course_with_teacher
+      discussion_topic_model
+      msg = @topic.reply_from(:user => @teacher, :text => "text body", :html => "<p>html body</p>")
+      msg.should_not be_nil
+      msg.message.should == "<p>html body</p>"
+    end
+
+    it "should not allow replies to locked topics" do
+      course_with_teacher
+      discussion_topic_model
+      @topic.lock!
+      lambda { @topic.reply_from(:user => @teacher, :text => "reply") }.should raise_error(IncomingMessageProcessor::ReplyToLockedTopicError)
+    end
+
   end
+
 end

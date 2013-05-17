@@ -21,13 +21,13 @@ shared_examples_for "external tools tests" do
     else
       add_manual opts
     end
-    f("#external_tools_dialog .save_button").click
+    submit_form("#external_tools_dialog")
     wait_for_ajax_requests
-    ContextExternalTool.count > 0
+   # ContextExternalTool.count.should != 0
     tool = ContextExternalTool.last
-    tool.name.should eql name
-    tool.consumer_key.should eql key
-    tool.shared_secret.should eql secret
+    tool.name.should == name
+    tool.consumer_key.should == key
+    tool.shared_secret.should == secret
     tool_checker tool, opts
   end
 
@@ -35,59 +35,64 @@ shared_examples_for "external tools tests" do
 
     if (opts.include? :xml)
       url = "http://example.com/other_url"
-      tool.url.should eql url
-      tool.workflow_state.should eql "public"
-      tool.description.should eql "Description"
+      tool.url.should == url
+      tool.workflow_state.should == "public"
+      tool.description.should == "Description"
       tool.has_editor_button.should be_true
       tool.has_resource_selection.should be_true
       tool.has_course_navigation.should be_true
       tool.has_account_navigation.should be_true
       tool.has_user_navigation.should be_true
-      f("#external_tool_#{tool.id} .url").text.should eql url
+      f("#external_tool_#{tool.id} .url").text.should == url
       f("#external_tool_#{tool.id} .editor_button").should be_displayed
       f("#external_tool_#{tool.id} .resource_selection").should be_displayed
       f("#external_tool_#{tool.id} .course_navigation").should be_displayed
       f("#external_tool_#{tool.id} .user_navigation").should be_displayed
       f("#external_tool_#{tool.id} .account_navigation").should be_displayed
-      f("#external_tool_#{tool.id} .readable_state").text.should eql "Public"
-      f("#external_tool_#{tool.id} .description").text.should eql "Description"
+      f("#external_tool_#{tool.id} .readable_state").text.should == "Public"
+      f("#external_tool_#{tool.id} .description").text.should == "Description"
+      f("#external_tool_#{tool.id} .vendor_help_link").should be_displayed
+      f("#external_tool_#{tool.id} .vendor_help_link").text.should == tool.vendor_help_link
+      ContextExternalTool::EXTENSION_TYPES.each do |type|
+        f("#external_tool_#{tool.id} .#{type}").should be_displayed
+      end
     elsif opts.include? :url
       url = "https://lti-examples.heroku.com/tool_redirect"
       kitten_text = "pictures of kittens to your site"
-      tool.workflow_state.should eql "anonymous"
-      tool.url.should eql url
+      tool.workflow_state.should == "anonymous"
+      tool.url.should == url
       tool.description.should include_text kitten_text
       tool.has_editor_button.should be_true
       tool.settings.should be_present
       tool.settings[:editor_button].should be_present
-      f("#external_tool_#{tool.id} .url").text.should eql url
+      f("#external_tool_#{tool.id} .url").text.should == url
       f("#external_tool_#{tool.id} .description").text.should include_text kitten_text
       f("#external_tool_#{tool.id} .editor_button").should be_displayed
 
     else
-      tool.description.should eql @description
+      tool.description.should == @description
       tool.settings.count > 0
       tool.settings[:custom_fields].keys.count >0
       custom_hash = {@custom_key => @custom_value}
-      tool.settings[:custom_fields].should eql custom_hash
-      f("#external_tool_#{tool.id} .description").text.should eql @description
+      tool.settings[:custom_fields].should == custom_hash
+      f("#external_tool_#{tool.id} .description").text.should == @description
 
       if (opts.include? :manual_url)
-        f("#external_tool_#{tool.id} .url").text.should eql @manual_url
-        tool.url.should eql @manual_url
+        f("#external_tool_#{tool.id} .url").text.should == @manual_url
+        tool.url.should == @manual_url
       else
-        tool.domain.should eql @domain
+        tool.domain.should == @domain
       end
 
       if (opts.include? :name_only)
-        tool.workflow_state.should eql "name_only"
-        f("#external_tool_#{tool.id} .readable_state").text.should eql "Name Only"
+        tool.workflow_state.should == "name_only"
+        f("#external_tool_#{tool.id} .readable_state").text.should == "Name Only"
       elsif (opts.include? :public)
-        tool.workflow_state.should eql "public"
-        f("#external_tool_#{tool.id} .readable_state").text.should eql "Public"
+        tool.workflow_state.should == "public"
+        f("#external_tool_#{tool.id} .readable_state").text.should == "Public"
       else
-        tool.workflow_state.should eql "anonymous"
-        f("#external_tool_#{tool.id} .readable_state").text.should eql "Anonymous"
+        tool.workflow_state.should == "anonymous"
+        f("#external_tool_#{tool.id} .readable_state").text.should == "Anonymous"
       end
     end
 
@@ -123,7 +128,7 @@ shared_examples_for "external tools tests" do
   end
 
   def add_url
-    url = "https://lti-examples.heroku.com/config/editor_button2.xml"
+    url = 'http://localhost:4567/lti_url'
     f("#external_tool_config_type option[value='by_url']").click
     f("#external_tool_form .config_type.manual").should_not be_displayed
     f("#external_tool_config_xml").should_not be_displayed
@@ -157,6 +162,7 @@ shared_examples_for "external tools tests" do
     <blti:launch_url>http://example.com/other_url</blti:launch_url>
     <blti:extensions platform="canvas.instructure.com">
       <lticm:property name="privacy_level">public</lticm:property>
+      <lticm:property name="vendor_help_link">http://example.com/help</lticm:property>
       <lticm:options name="editor_button">
         <lticm:property name="url">http://example.com/editor</lticm:property>
         <lticm:property name="icon_url">http://example.com/icon.png</lticm:property>
@@ -167,6 +173,12 @@ shared_examples_for "external tools tests" do
     XML
     f("#external_tool_config_xml").send_keys <<-XML
       <lticm:options name="resource_selection">
+        <lticm:property name="url">https://example.com/wiki</lticm:property>
+        <lticm:property name="text">Build/Link to Wiki Page</lticm:property>
+        <lticm:property name="selection_width">500</lticm:property>
+        <lticm:property name="selection_height">300</lticm:property>
+      </lticm:options>
+      <lticm:options name="homework_submission">
         <lticm:property name="url">https://example.com/wiki</lticm:property>
         <lticm:property name="text">Build/Link to Wiki Page</lticm:property>
         <lticm:property name="selection_width">500</lticm:property>

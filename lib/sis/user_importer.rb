@@ -34,7 +34,7 @@ module SIS
       end
       User.update_account_associations(importer.users_to_add_account_associations, :incremental => true, :precalculated_associations => {@root_account.id => 0})
       User.update_account_associations(importer.users_to_update_account_associations)
-      Pseudonym.update_all({:sis_batch_id => @batch_id}, {:id => importer.pseudos_to_set_sis_batch_ids}) if @batch && !importer.pseudos_to_set_sis_batch_ids.empty?
+      Pseudonym.where(:id => importer.pseudos_to_set_sis_batch_ids).update_all(:sis_batch_id => @batch_id) if @batch && !importer.pseudos_to_set_sis_batch_ids.empty?
       @logger.debug("Users took #{Time.now - start} seconds")
       return importer.success_count
     end
@@ -67,7 +67,7 @@ module SIS
         raise ImportError, "No login_id given for user #{user_id}" if login_id.blank?
         raise ImportError, "Improper status for user #{user_id}" unless status =~ /\A(active|deleted)/i
 
-        @batched_users << [user_id, login_id, status, first_name, last_name, email, password, ssha_password]
+        @batched_users << [user_id.to_s, login_id, status, first_name, last_name, email, password, ssha_password]
         process_batch if @batched_users.size >= @updates_every
       end
 
@@ -86,7 +86,7 @@ module SIS
             @logger.debug("Processing User #{user_row.inspect}")
             user_id, login_id, status, first_name, last_name, email, password, ssha_password = user_row
 
-            pseudo = @root_account.pseudonyms.find_by_sis_user_id(user_id)
+            pseudo = @root_account.pseudonyms.find_by_sis_user_id(user_id.to_s)
             pseudo_by_login = @root_account.pseudonyms.active.by_unique_id(login_id).first
             pseudo ||= pseudo_by_login
             pseudo ||= @root_account.pseudonyms.active.by_unique_id(email).first if email.present?
@@ -125,7 +125,7 @@ module SIS
             if !status_is_active && !user.new_record?
               # if this user is deleted, we're just going to make sure the user isn't enrolled in anything in this root account and
               # delete the pseudonym.
-              if 0 < user.enrollments.scoped(:conditions => ["root_account_id = ? AND workflow_state <> ?", @root_account.id, 'deleted']).update_all(:workflow_state => 'deleted')
+              if 0 < user.enrollments.where("root_account_id=? AND workflow_state<>?", @root_account, 'deleted').update_all(:workflow_state => 'deleted')
                 should_update_account_associations = true
               end
             end
@@ -154,18 +154,20 @@ module SIS
             end
             pseudo.sis_ssha = ssha_password if !ssha_password.blank?
             pseudo.reset_persistence_token if pseudo.sis_ssha_changed? && pseudo.password_auto_generated
+            user_touched = false
 
             begin
               User.transaction(:requires_new => true) do
                 if user.changed?
-                  raise user.errors.first.join(" ") if !user.save_without_broadcasting && user.errors.size > 0
+                  user_touched = true
+                  raise ImportError, user.errors.first.join(" ") if !user.save_without_broadcasting && user.errors.size > 0
                 elsif @batch_id
                   @users_to_set_sis_batch_ids << user.id
                 end
                 pseudo.user_id = user.id
                 if pseudo.changed?
                   pseudo.sis_batch_id = @batch_id if @batch_id
-                  raise pseudo.errors.first.join(" ") if !pseudo.save_without_broadcasting && pseudo.errors.size > 0
+                  raise ImportError, pseudo.errors.first.join(" ") if !pseudo.save_without_broadcasting && pseudo.errors.size > 0
                 end
               end
             rescue => e
@@ -180,7 +182,7 @@ module SIS
               # find all CCs for this user, and active conflicting CCs for all users
               # unless we're deleting this user, then only find CCs for this user
               if status_is_active
-                ccs = CommunicationChannel.scoped(:conditions => ["workflow_state='active' OR user_id=?", user.id])
+                ccs = CommunicationChannel.where("workflow_state='active' OR user_id=?", user)
               else
                 ccs = user.communication_channels
               end
@@ -207,12 +209,22 @@ module SIS
               cc.path = email
               cc.workflow_state = status_is_active ? 'active' : 'retired'
               newly_active = cc.path_changed? || (cc.active? && cc.workflow_state_changed?)
-              cc.save_without_broadcasting if cc.changed?
+              if cc.changed?
+                if cc.valid?
+                  cc.save_without_broadcasting
+                else
+                  msg = "An email did not pass validation "
+                  msg += "(" + "#{email}, error: "
+                  msg += cc.errors.full_messages.join(", ") + ")"
+                  raise ImportError, msg
+                end
+                user.touch unless user_touched
+              end
               pseudo.sis_communication_channel_id = pseudo.communication_channel_id = cc.id
 
               if newly_active
                 other_ccs = ccs.reject { |other_cc| other_cc.user_id == user.id || other_cc.user.nil? || other_cc.user.pseudonyms.active.count == 0 ||
-                  !other_cc.user.pseudonyms.active.scoped(:conditions => ['account_id=? AND sis_user_id IS NOT NULL', @root_account.id]).empty? }
+                  !other_cc.user.pseudonyms.active.where("account_id=? AND sis_user_id IS NOT NULL", @root_account).empty? }
                 unless other_ccs.empty?
                   cc.send_merge_notification!
                 end
@@ -221,12 +233,20 @@ module SIS
 
             if pseudo.changed?
               pseudo.sis_batch_id = @batch_id if @batch_id
-              pseudo.save_without_broadcasting
+              if pseudo.valid?
+                pseudo.save_without_broadcasting
+                @success_count += 1
+              else
+                msg = "A user did not pass validation "
+                msg += "(" + "user: #{user_id}, error: "
+                msg += pseudo.errors.full_messages.join(", ") + ")"
+                raise ImportError, msg
+              end
             elsif @batch_id && pseudo.sis_batch_id != @batch_id
               @pseudos_to_set_sis_batch_ids << pseudo.id
+              @success_count += 1
             end
 
-            @success_count += 1
           end
         end
       end

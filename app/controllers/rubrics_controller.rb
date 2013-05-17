@@ -20,26 +20,24 @@ class RubricsController < ApplicationController
   before_filter :require_context
   before_filter { |c| c.active_tab = "rubrics" }
 
+  include Api::V1::Outcome
+
   def index
-    if authorized_action(@context, @current_user, :manage)
-      @rubric_associations = @context.rubric_associations.bookmarked.include_rubric.to_a
-      @rubric_associations = @rubric_associations.select(&:rubric_id).once_per(&:rubric_id).sort_by{|a| a.rubric.title }
-      @rubrics = @rubric_associations.map(&:rubric)
-      if @context.is_a?(User)
-        render :action => 'user_index'
-      else
-        render
-      end
-    end
+    return unless authorized_action(@context, @current_user, :manage)
+    js_env :ROOT_OUTCOME_GROUP => get_root_outcome
+    @rubric_associations = @context.rubric_associations.bookmarked.include_rubric.to_a
+    @rubric_associations = @rubric_associations.select(&:rubric_id).once_per(&:rubric_id).sort_by{|a| a.rubric.title }
+    @rubrics = @rubric_associations.map(&:rubric)
+    @context.is_a?(User) ? render(:action => 'user_index') : render
   end
-  
+
   def show
-    if authorized_action(@context, @current_user, :manage)
-      @rubric_association = @context.rubric_associations.bookmarked.find_by_rubric_id(params[:id])
-      @actual_rubric = @rubric_association.rubric
-    end
+    return unless authorized_action(@context, @current_user, :manage)
+    js_env :ROOT_OUTCOME_GROUP => get_root_outcome
+    @rubric_association = @context.rubric_associations.bookmarked.find_by_rubric_id(params[:id])
+    @actual_rubric = @rubric_association.rubric
   end
-  
+
   def assessments
     if authorized_action(@context, @current_user, :manage)
       @rubric_associations = @context.rubric_associations.bookmarked
@@ -63,7 +61,7 @@ class RubricsController < ApplicationController
     params[:rubric_association].delete(:invitations)
     @association_object = RubricAssociation.get_association_object(params[:rubric_association])
     params[:rubric][:user] = @current_user if params[:rubric]
-    if (!@association_object || authorized_action(@association_object, @current_user, :read)) && authorized_action(@context, @current_user, :manage_grades)
+    if (!@association_object || authorized_action(@association_object, @current_user, :read)) && authorized_action(@context, @current_user, :manage_rubrics)
       @association = @context.rubric_associations.find_by_id(params[:rubric_association_id]) if params[:rubric_association_id].present?
       @association_object ||= @association.association if @association
       params[:rubric_association][:association] = @association_object
@@ -105,4 +103,18 @@ class RubricsController < ApplicationController
     end
   end
 
+  # Internal: Find and format the given context's root outcome group.
+  #
+  # Returns a JSON outcome object or nil.
+  def get_root_outcome
+    root_outcome = if @context.respond_to?(:root_outcome_group)
+                     @context.root_outcome_group
+                   elsif @context.respond_to?(:account)
+                     @context.account.root_outcome_group
+                   end
+
+    return nil if root_outcome.nil?
+    outcome_group_json(root_outcome, @current_user, session)
+  end
+  protected :get_root_outcome
 end

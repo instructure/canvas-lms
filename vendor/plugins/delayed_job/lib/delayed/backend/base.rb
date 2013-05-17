@@ -23,6 +23,7 @@ module Delayed
 
       module ClassMethods
         attr_accessor :batches
+        attr_accessor :batch_enqueue_args
         attr_accessor :default_priority
 
         # Add a job to the queue
@@ -53,13 +54,18 @@ module Delayed
 
           if options[:singleton]
             options[:strand] = options.delete :singleton
-            self.create_singleton(options)
+            job = self.create_singleton(options)
           elsif batches && options.slice(:strand, :run_at).empty?
-            batch_enqueue_args = options.slice(:priority, :queue)
+            batch_enqueue_args = options.slice(*self.batch_enqueue_args)
             batches[batch_enqueue_args] << options
+            return true
           else
-            self.create(options)
+            job = self.create(options)
           end
+
+          JobTracking.job_created(job)
+
+          job
         end
 
         def in_delayed_job?
@@ -70,11 +76,48 @@ module Delayed
           Thread.current[:in_delayed_job] = val
         end
 
-        # Get the current time (GMT or local depending on DB)
+        def check_queue(queue)
+          raise(ArgumentError, "queue name can't be blank") if queue.blank?
+        end
+
+        def check_priorities(min_priority, max_priority)
+          if min_priority && min_priority < Delayed::MIN_PRIORITY
+            raise(ArgumentError, "min_priority #{min_priority} can't be less than #{Delayed::MIN_PRIORITY}")
+          end
+          if max_priority && max_priority > Delayed::MAX_PRIORITY
+            raise(ArgumentError, "max_priority #{max_priority} can't be greater than #{Delayed::MAX_PRIORITY}")
+          end
+        end
+
+        # Get the current time (UTC)
         # Note: This does not ping the DB to get the time, so all your clients
         # must have syncronized clocks.
         def db_time_now
-          Time.now.in_time_zone
+          Time.zone.now
+        end
+
+        def unlock_orphaned_jobs(pid = nil, name = nil)
+          begin
+            name ||= Socket.gethostname
+          rescue
+            return 0
+          end
+          pid_regex = pid || '(\d+)'
+          regex = Regexp.new("^#{Regexp.escape(name)}:#{pid_regex}$")
+          unlocked_jobs = 0
+          running = false if pid
+          self.running_jobs.each do |job|
+            next unless job.locked_by =~ regex
+            unless pid
+              job_pid = $1.to_i
+              running = Process.kill(0, job_pid) rescue false
+            end
+            if !running
+              unlocked_jobs += 1
+              job.reschedule("process died")
+            end
+          end
+          unlocked_jobs
         end
       end
 
@@ -83,8 +126,51 @@ module Delayed
       end
       alias_method :failed, :failed?
 
+      # Reschedule the job in the future (when a job fails).
+      # Uses an exponential scale depending on the number of failed attempts.
+      def reschedule(error = nil, time = nil)
+        begin
+          obj = payload_object
+          obj.on_failure(error) if obj && obj.respond_to?(:on_failure)
+        rescue DeserializationError
+          # don't allow a failed deserialization to prevent rescheduling
+        end
+
+        self.attempts += 1
+        if self.attempts >= (self.max_attempts || Delayed::Worker.max_attempts)
+          permanent_failure error || "max attempts reached"
+        else
+          time ||= self.reschedule_at
+          self.run_at = time
+          self.unlock
+          self.save!
+        end
+      end
+
+      def permanent_failure(error)
+        begin
+          # notify the payload_object of a permanent failure
+          obj = payload_object
+          obj.on_permanent_failure(error) if obj && obj.respond_to?(:on_permanent_failure)
+        rescue DeserializationError
+          # don't allow a failed deserialization to prevent destroying the job
+        end
+
+        # optionally destroy the object
+        destroy_self = true
+        if Delayed::Worker.on_max_failures
+          destroy_self = Delayed::Worker.on_max_failures.call(self, error)
+        end
+
+        if destroy_self
+          self.destroy
+        else
+          self.fail!
+        end
+      end
+
       def payload_object
-        @payload_object ||= deserialize(self['handler'])
+        @payload_object ||= deserialize(self['handler'].untaint)
       end
 
       def name
@@ -180,10 +266,10 @@ module Delayed
       def deserialize(source)
         handler = nil
         begin
-          handler = YAML.load(source)
+          handler = YAML.unsafe_load(source)
         rescue TypeError
           attempt_to_load_from_source(source)
-          handler = YAML.load(source)
+          handler = YAML.unsafe_load(source)
         end
 
         return handler if handler.respond_to?(:perform)
@@ -204,6 +290,7 @@ module Delayed
     protected
 
       def before_save
+        self.queue ||= Delayed::Worker.queue
         self.run_at ||= self.class.db_time_now
       end
 

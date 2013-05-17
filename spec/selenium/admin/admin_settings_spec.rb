@@ -2,6 +2,23 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
 require File.expand_path(File.dirname(__FILE__) + '/../helpers/external_tools_common')
 require File.expand_path(File.dirname(__FILE__) + '/../helpers/basic/settings_specs')
 
+describe "site admin settings tabs" do
+  it_should_behave_like "external tools tests"
+  before(:each) do
+    # course_with_
+    site_admin_logged_in
+    get "/accounts/#{Account.default.id}/settings"
+  end
+
+  context "settings tab" do
+    it "cal2 checkbox should toggle visibility of enable scheduler checkbox" do
+      f("#show_scheduler_checkbox").should_not be_displayed
+      f("#account_settings_enable_scheduler").click
+      f("#show_scheduler_checkbox").should be_displayed
+    end
+  end
+end
+
 describe "admin settings tabs" do
   it_should_behave_like "external tools tests"
   before (:each) do
@@ -31,6 +48,7 @@ describe "admin settings tabs" do
     end
 
     it "should add url external tool" do
+      #pending("failing because of external dependency")
       add_external_tool :url
     end
 
@@ -49,7 +67,7 @@ describe "admin settings tabs" do
       new_description = "a different description"
       hover_and_click(".edit_tool_link:visible")
       replace_content(f("#external_tool_description"), new_description)
-      f(".save_button").click
+      fj(".save_button:visible").click
       wait_for_ajax_requests
       tool = ContextExternalTool.last
       tool.description.should == new_description
@@ -79,9 +97,9 @@ describe "admin settings tabs" do
 
     def add_announcement
       fj(".element_toggler:visible").click
-      subject = "This is a file"
+      subject = "This is a date change"
       f("#account_notification_subject").send_keys(subject)
-      f("#account_notification_icon .file").click
+      f("#account_notification_icon .calendar").click
       ff("#add_notification_form .ui-datepicker-trigger")[0].click
       today = date_chooser
       ff("#add_notification_form .ui-datepicker-trigger")[1].click

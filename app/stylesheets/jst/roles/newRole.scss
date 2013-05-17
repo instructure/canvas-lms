@@ -1,0 +1,8 @@
+div.dropdown-menu.new-role {
+  top: 0px !important;
+  padding: 20px;
+
+  select[disabled], select:disabled {
+    display: none;
+  }
+}

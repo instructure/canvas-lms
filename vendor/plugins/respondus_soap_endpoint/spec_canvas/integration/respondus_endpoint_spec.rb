@@ -119,13 +119,13 @@ Implemented for: Canvas LMS}
       @key = DeveloperKey.create!
       @token = AccessToken.create!(:user => @user, :developer_key => @key)
       soap_response = soap_request('ValidateAuth',
-                                   uname, @token.token,
+                                   uname, @token.full_token,
                                    '',
                                    ['Institution', ''])
       soap_response.first.should == "Success"
 
       status, details, context, list = soap_request('GetServerItems',
-                                                    uname, @token.token,
+                                                    uname, @token.full_token,
                                                     '', ['itemType', 'course'])
       status.should == "Success"
       pair = list.item
@@ -134,7 +134,7 @@ Implemented for: Canvas LMS}
 
       # verify that the respondus api session works with token auth
       status, details, context = soap_request('SelectServerItem',
-                                              uname, @token.token,
+                                              uname, @token.full_token,
                                               context, ['itemType', 'course'],
                                               ['itemID', @course.to_param],
                                               ['clearState', ''])

@@ -8,8 +8,6 @@
   <% end %>
 <% end %>
 
-<% add_crumb "", '#', :id => 'help_crumb' %>
-
 <% js_bundle :conversations %>
 <% jammit_css :conversations %>
 
@@ -18,7 +16,15 @@
     <div id="actions">
       <ul class="buttons">
         <% unless @disallow_messages %>
-        <li><a href="#" id="action_compose_message" title="<%= t('titles.compose_new_message', 'Write a new message') %>" style="background-image: url(/images/messages/compose-button-sprite.png)"><%= t('links.compose_new_message', 'New Message') %></a></li>
+          <li>
+            <a href="#"
+               id="action_compose_message"
+               title="<%= t('titles.compose_new_message', 'Write a new message') %>"
+               data-track-category="Compose Message"
+               data-track-action="Click"
+               data-track-label="New Message Symbol"
+               style="background-image: url(/images/messages/compose-button-sprite.png)"><%= t('links.compose_new_message', 'New Message') %></a>
+          </li>
         <% end %>
       </ul>
       <ul class="menus">
@@ -29,16 +35,30 @@
               <li><b><%= t(:inbox_view, "VIEW") %></b></li>
             </ul>
             <ul>
-              <li data-scope="inbox"><%= link_to t('inbox_views.inbox', "Inbox"), '#' %></li>
-              <li data-scope="unread"><%= link_to t('inbox_views.unread_messages', "Unread"), '#' %></li>
-              <li data-scope="starred"><%= link_to t('inbox_views.starred_messages', "Starred"), '#' %></li>
+              <li data-scope="inbox"
+                  data-track-category="Combo_Box"
+                  data-track-action="Select_Folder"
+                  data-track-label="Inbox"><%= link_to t('inbox_views.inbox', "Inbox"), '#' %></li>
+              <li data-scope="unread"
+                  data-track-category="Combo_Box"
+                  data-track-action="Select_Folder"
+                  data-track-label="Unread"><%= link_to t('inbox_views.unread_messages', "Unread"), '#' %></li>
+              <li data-scope="starred"
+                  data-track-category="Combo_Box"
+                  data-track-action="Select_Folder"
+                  data-track-label="Starred"><%= link_to t('inbox_views.starred_messages', "Starred"), '#' %></li>
               <li data-scope="sent"><%= link_to t('inbox_views.sent_messages', "Sent"), '#' %></li>
             </ul>
             <ul>
-              <li data-scope="archived"><%= link_to t('inbox_views.archived_messages', "Archived"), '#' %></li>
+              <li data-scope="archived"
+                  data-track-category="Combo_Box"
+                  data-track-action="Select_Folder"
+                  data-track-label="Archived"><%= link_to t('inbox_views.archived_messages', "Archived"), '#' %></li>
             </ul>
             <ul class="last">
-              <li><%= link_to t('inbox_views.discussion_replies', "Discussion Replies"), discussion_replies_url %></li>
+              <li data-track-category="Combo_Box"
+                  data-track-action="Select_Folder"
+                  data-track-label="Discussion_Replies"><%= link_to t('inbox_views.discussion_replies', "Discussion Replies"), discussion_replies_url %></li>
             </ul>
           </div>
         </li>
@@ -55,70 +75,51 @@
     <p id="no_messages" style="display:none"></p>
   </div>
   <div id="messages">
-    <div id="message_actions">
-      <ul>
-        <li><%= link_to t('inbox_actions.forward', "Forward"), {}, :id => :action_forward %></li>
-        <li><%= link_to t('inbox_actions.delete', "Delete"), conversation_remove_messages_url('{{ id }}'), :id => :action_delete %></li>
-      </ul>
-      <a href="#" id="cancel_bulk_message_action"><%= t '#buttons.cancel', 'Cancel' %></a>
+    <div aria-live="polite">
+      <div id="message_actions">
+        <ul>
+          <li><%= link_to t('inbox_actions.forward', "Forward"), {}, :id => :action_forward %></li>
+          <li><%= link_to t('inbox_actions.delete', "Delete"), conversation_remove_messages_url('{{ id }}'), :id => :action_delete %></li>
+        </ul>
+        <a href="#" id="cancel_bulk_message_action"><%= t '#buttons.cancel', 'Cancel' %></a>
+      </div>
     </div>
-    <% form_tag conversations_url, :id => 'create_message_form' do %>
-      <ul class="conversations">
-        <li>
-          <span class="audience"><%= t('headings.new_message', 'New Message') %></span>
-          <%= link_to t('inbox_actions.add_people', "Add People..."), conversation_add_recipients_url('{{ id }}'), :id => :action_add_recipients %>
-        </li>
-      </ul>
-      <table>
-        <tr id="recipient_info"><th><%= label_tag :recipients, :to, :en => "To", :before => true %></th><td><%= text_field_tag :recipients, nil, 'data-finder_url' => search_recipients_url, :class => "recipients" %></td></tr>
-        <tr><th><%= label_tag :body, :message, :en => "Message", :before => true %></th><td><%= text_area_tag :body %></td></tr>
-        <tr id="group_conversation_info"><th></th><td><%= check_box_tag :group_conversation %> <%= label_tag :group_conversation, :en => "This is a group conversation. Participants will see everyone's replies" %></td></tr>
-        <tr id="user_note_info"><th></th><td><%= check_box_tag :user_note, "1", false, :id => :add_to_faculty_journal %> <%= label_tag :add_to_faculty_journal, :en => "Add as a Faculty Journal entry" %></td></tr>
-        <tr>
-          <th>&nbsp;</th>
-          <td>
-            <% if feature_enabled?(:kaltura) %>
-              <div class="media_comment" style="display: none;" title="<%= t('titles.media_comment', "Recorded media comment") %>">
-                <%= image_tag "messages/media-gray.png" %>
-                <%= t('media_comment', %{Media Comment}) %>
-                <a href="#" class="remove_link" style="float: right;" title="<%= t('titles.remove_media_comment', "Remove media comment") %>"><%= image_tag "delete_circle.png" %></a>
-                <div class="clear"></div>
-              </div>
-              <input type="hidden" name="media_comment_id" id="media_comment_id">
-              <input type="hidden" name="media_comment_type" id="media_comment_type">
-            <% end %>
-            <ul id="attachment_list">
-              <li id="attachment_blank" class="attachment" style="display: none;" title="<%= t('titles.attachment', "File to attach") %>">
-                <%= image_tag "messages/attach-gray.png" %> 
-                <input type="file" class="file_input"/>
-                <a href="#" class="remove_link" style="float: right;" title="<%= t('titles.remove_attachment', "Remove attachment") %>"><%= image_tag "delete_circle.png" %></a>
-                <div class="clear"></div>
-              </li>
-            </ul>
-            <a id="action_add_attachment" href="#" title="<%= t('titles.add_attachment', "Add an attachment") %>"><%= image_tag "messages/attach-blue.png" %> <%= t('links.add_attachment', %{Attach}) %></a>
-            <% if feature_enabled?(:kaltura) %>
-              <a id="action_media_comment" href="#" title="<%= t('titles.record_media_comment', "Record an audio or video comment") %>"><%= image_tag "messages/media-blue.png" %> <%= t('links.media_comment', %{Record}) %></a>
-            <% end %>
-            <div style="float: right">
-              <input type="hidden" name="from_conversation_id" id="from_conversation_id">
-              <button type="submit" class="button"><%= t('buttons.send_message', 'Send') %></button>
-            </div>
-          </td>
-        </tr>
-      </table>
-    <% end %>
+    <ul id="message_status"></ul>
+    <a id="help_crumb"
+       data-track-category="Individual Message"
+       data-track-action="Click"
+       data-track-label="Question Mark"
+       href="#"><i class="icon-question standalone-icon"></i></a>
+    <div id="create_message_form"></div>
     <ul class="messages">
     </ul>
   </div>
   <div class="spin_holder"></div>
 </div>
+
+<div id="menu-wrapper"></div>
+
 <ul style="display:none">
-  <li id="message_blank" class="message">
+  <li id="message_blank"
+      data-track-category="Individual Message"
+      data-track-action="Click"
+      data-track-label="Message Block"
+      class="message">
     <span class="date"></span>
     <b class="audience"></b>
-    <span class="actions"><a href="#/conversations?user_id={{ user_id }}&amp;from_conversation_id={{ from_conversation_id }}" class="send_private_message"><%= t :send_private_message, "New message..." %></a></span>
+    <span class="actions">
+      <a href="#/conversations?user_id={{ user_id }}&amp;from_conversation_id={{ from_conversation_id }}"
+         data-track-category="Individual Message"
+         data-track-action="Click"
+         data-track-label="New Message..."
+         class="send_private_message"><%= t :send_private_message, "New message..." %></a>
+    </span>
     <p></p>
-    <input type="checkbox" />
+    <input type="checkbox"
+           data-track-category="Individual Message"
+           data-track-action="Click"
+           data-track-label="Check Box"
+          />
     <ul class='message_attachments'>
       <li class='media_object_blank'>
         <a href="#" class="instructure_inline_media_comment media_comment no-underline" title="<%= t('titles.play_media_comment', "Play media comment") %>">
@@ -139,10 +140,15 @@
     <ul>
       <li class="header">
         <span class="submission_date"><%= before_label('submitted', "Submitted") %> <span class="date">&nbsp;</span></span>
-        <a target="_blank" href="<%= course_assignment_submission_path(
-          :course_id => '{{ course_id }}',
-          :assignment_id => '{{ assignment_id }}',
-          :id => '{{ id }}') %>" style="text-decoration: none;" title="<%= t('titles.view_submission', "Open submission in new window.") %>">
+        <a target="_blank"
+           data-track-category="Individual Message"
+           data-track-action="Click"
+           data-track-label="Open message in new window"
+           href="<%= course_assignment_submission_path(:course_id => '{{ course_id }}',
+                                                       :assignment_id => '{{ assignment_id }}',
+                                                       :id => '{{ id }}') %>"
+           style="text-decoration: none;"
+           title="<%= t('titles.view_submission', "Open submission in new window.") %>">
           <b class="title"></b>
         </a>
         <span class="audience" title="<%= t('titles.submission_author', "Submission Author") %>"></span>
@@ -164,26 +170,6 @@
     <input type="checkbox" />
   </li>
 </ul>
-<div id="conversation_actions">
-  <span></span>
-  <div>
-    <ul>
-      <li><%= link_to t('inbox_actions.mark_as_unread', "Mark as Unread"), conversation_url('{{ id }}', :conversation => {:workflow_state => "unread"}), :id => 'action_mark_as_unread', :class => :standard_action %></li>
-      <li><%= link_to t('inbox_actions.mark_as_read', "Mark as Read"), conversation_url('{{ id }}', :conversation => {:workflow_state => "read"}), :id => 'action_mark_as_read', :class => :standard_action %></li>
-      <li><%= link_to t('inbox_actions.unstar', "Unstar"), conversation_url('{{ id }}', :conversation => {:starred => false}), :id => 'action_unstar', :class => :standard_action %></li>
-      <li><%= link_to t('inbox_actions.star', "Star"), conversation_url('{{ id }}', :conversation => {:starred => true}), :id => 'action_star', :class => :standard_action %></li>
-    </ul>
-    <ul>
-      <li><%= link_to t('inbox_actions.unsubscribe', "Unsubscribe"), conversation_url('{{ id }}', :conversation => {:subscribed => 0}), :id => :action_unsubscribe, :class => :standard_action %></li>
-      <li><%= link_to t('inbox_actions.subscribe', "Subscribe"), conversation_url('{{ id }}', :conversation => {:subscribed => 1}), :id => :action_subscribe, :class => :standard_action %></li>
-    </ul>
-    <ul>
-      <li><%= link_to t('inbox_actions.archive', "Archive"), conversation_url('{{ id }}', :conversation => {:workflow_state => "archived"}), :id => :action_archive, :class => :standard_action %></li>
-      <li><%= link_to t('inbox_actions.unarchive', "Unarchive"), conversation_url('{{ id }}', :conversation => {:workflow_state => "read"}), :id => :action_unarchive, :class => :standard_action %></li>
-      <li><%= link_to t('inbox_actions.delete', "Delete"), conversation_url('{{ id }}'), :id => :action_delete_all %></li>
-    </ul>
-  </div>
-</div>
 
 <form id="add_recipients_form" method="post">
   <p>
@@ -194,7 +180,14 @@
 
 <% form_tag conversations_url, :id => 'forward_message_form' do %>
   <table>
-    <tr id="recipient_info"><th><%= label_tag :forward_recipients, :to, :en => "To", :before => true %></th><td><%= text_field_tag :recipients, nil, :id => :forward_recipients, 'data-finder_url' => search_recipients_url, :class => "recipients" %></td></tr>
+    <tr id="recipient_info">
+      <th><%= label_tag :forward_recipients, :to, :en => "To", :before => true %></th>
+      <td>
+        <%= text_field_tag :recipients, nil, :id => :forward_recipients,
+          'data-finder_url' => search_recipients_url,
+          :class => "recipients" %>
+      </td>
+  </tr>
     <tr><th><%= label_tag :body, :message, :en => "Message", :before => true %></th><td><%= text_area_tag :body, nil, :id => :forward_body %></td></tr>
   </table>
   <ul class="messages"></ul>

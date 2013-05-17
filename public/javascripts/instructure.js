@@ -17,7 +17,6 @@
  */
 
 define([
-  'ENV',
   'INST' /* INST */,
   'i18n!instructure',
   'jquery' /* $ */,
@@ -41,7 +40,7 @@ define([
   'compiled/jquery.rails_flash_notifications',
   'jquery.templateData' /* fillTemplateData, getTemplateData */,
   'compiled/jquery/fixDialogButtons',
-  'media_comments' /* mediaComment, mediaCommentThumbnail */,
+  'compiled/jquery/mediaCommentThumbnail',
   'tinymce.editor_box' /* editorBox */,
   'vendor/date' /* Date.parse */,
   'vendor/jquery.ba-tinypubsub' /* /\.publish\(/ */,
@@ -49,8 +48,13 @@ define([
   'jqueryui/resizable' /* /\.resizable/ */,
   'jqueryui/sortable' /* /\.sortable/ */,
   'jqueryui/tabs' /* /\.tabs/ */,
-  'vendor/scribd.view' /* scribd */
-], function(ENV, INST, I18n, $, _, userSettings, htmlEscape, wikiSidebar) {
+  'compiled/behaviors/trackEvent',
+  'compiled/badge_counts',
+  'vendor/scribd.view' /* scribd */,
+  'vendor/jquery.placeholder'
+], function(INST, I18n, $, _, userSettings, htmlEscape, wikiSidebar) {
+
+  $.trackEvent('Route', location.pathname.replace(/\/$/, '').replace(/\d+/g, '--') || '/');
 
   // see: https://github.com/rails/jquery-ujs/blob/master/src/rails.js#L80
   var CSRFProtection =  function(xhr) {
@@ -198,14 +202,32 @@ define([
       }
     });
 
+    var activeElement;
+    $(document).keypress(function(e) {
+      var commaOrQuestionMark = e.which == '44' || e.which == '63';
 
-    $(document).keycodes("shift+/", function(event) {
-      $("#keyboard_navigation").dialog('close').dialog({
-        title: I18n.t('titles.keyboard_shortcuts', "Keyboard Shortcuts"),
-        width: 400,
-        height: "auto",
-        autoOpen: false
-      }).dialog('open');
+      if(commaOrQuestionMark && !$(e.target).is(":input")) {
+        if($("#keyboard_navigation").is(":visible")) {
+          $("#keyboard_navigation").dialog("close");
+          if(activeElement) { $(activeElement).focus(); }
+        }
+        else {
+          activeElement = document.activeElement;
+
+          $("#keyboard_navigation").dialog({
+            title: I18n.t('titles.keyboard_shortcuts', "Keyboard Shortcuts"),
+            width: 400,
+            height: "auto",
+            open: function() {
+              $(".navigation_list:first").focus();
+            },
+            close: function() {
+              $("li", this).attr("tabindex", ""); // prevents chrome bsod
+              if(activeElement) { $(activeElement).focus(); }
+            }
+          });
+        }        
+      }
     });
 
     $("#switched_role_type").ifExists(function(){
@@ -253,44 +275,14 @@ define([
     $(".custom_search_results_link").click(function(event) {
       event.preventDefault();
       var $dialog = $("#custom_search_results_dialog");
-      $dialog.dialog('close').dialog({
-        autoOpen: false,
+      $dialog.dialog({
         title: I18n.t('titles.search_for_open_resources', "Search for Open Resources"),
         width: 600,
         height: 400
-      }).dialog('open');
+      });
       var control = $dialog.data('searchControl');
       if(control) {
         control.execute($("title").text());
-      }
-    });
-
-    $("a.instructure_inline_media_comment").live('click', function(event) {
-      event.preventDefault();
-      if(INST.kalturaSettings) {
-        var $link = $(this),
-            $div = $("<span><span></span></span>"),
-            mediaType = 'video',
-            id = $link.data('media_comment_id') || $link.find(".media_comment_id:first").text();
-        $div.css('display', 'block');
-
-        if(!id && $link.attr('id') && $link.attr('id').match(/^media_comment_/)) {
-          id = $link.attr('id').substring(14);
-        }
-        $link.after($div);
-        $link.hide(); //remove();
-        if($link.data('media_comment_type') === 'audio' || $link.is('.audio_playback, .audio_comment, .instructure_audio_link')) { mediaType = 'audio'; }
-        $div.children("span").mediaComment('show_inline', id, mediaType, $link.attr('href'));
-        $div.append("<br/><a href='#' style='font-size: 0.8em;' class='hide_flash_embed_link'>" + I18n.t('links.minimize_embedded_kaltura_content', "Minimize Embedded Content") + "</a>");
-        $div.find(".hide_flash_embed_link").click(function(event) {
-          event.preventDefault();
-          $div.remove();
-          $link.show();
-          $.trackEvent('hide_embedded_content', 'hide_media');
-        });
-        $.trackEvent('show_embedded_content', 'show_media');
-      } else {
-        alert(I18n.t('alerts.kaltura_disabled', "Kaltura has been disabled for this Canvas site"));
       }
     });
 
@@ -387,6 +379,7 @@ define([
             .addClass('external')
             .html('<span>' + $(this).html() + '</span>')
             .attr('target', '_blank')
+            .attr('aria-label', htmlEscape(I18n.t('titles.external_link', 'Links to an external site.')))
             .append('<span class="ui-icon ui-icon-extlink ui-icon-inline" title="' + htmlEscape(I18n.t('titles.external_link', 'Links to an external site.')) + '"/>');
         }).end()
         .find("a.instructure_file_link").each(function() {
@@ -571,12 +564,11 @@ define([
 
     $(".cant_record_link").click(function(event) {
       event.preventDefault();
-      $("#cant_record_dialog").dialog('close').dialog({
-        autoOpen: false,
+      $("#cant_record_dialog").dialog({
         modal: true,
         title: I18n.t('titles.cant_create_recordings', "Can't Create Recordings?"),
         width: 400
-      }).dialog('open');
+      });
     });
 
     $(".communication_message .content .links .show_users_link,.communication_message .header .show_users_link").click(function(event) {
@@ -626,7 +618,7 @@ define([
         // notify the user and any other watchers in the document
         $.flashMessage('Message Sent!');
         $(document).triggerHandler('user_content_change');
-        if(location.href.match(/dashboard/)) {
+        if(location.pathname === '/') {
           $.trackEvent('dashboard_comment', 'create');
         }
       },
@@ -890,6 +882,9 @@ define([
 
               if (!data[label + '_item']) {
                 tag.title = tag.title || tag.name;
+                if( tag.workflow_state === "unpublished" ){
+                  tag.title += " (" + I18n.t("draft", "Draft") + ")"
+                }
                 tag.text = (label == 'previous' ?
                   I18n.t('buttons.previous_module', "Previous Module") :
                   I18n.t('buttons.next_module', "Next Module"));
@@ -923,6 +918,7 @@ define([
       userSettings.set('hide_wizard_' + pathname, true);
       $wizard_box.slideUp('fast', function() {
         $(".wizard_popup_link").slideDown('fast');
+        $('.wizard_popup_link').focus();
         setWizardSpacerBoxDispay('hide');
       });
     });
@@ -932,6 +928,7 @@ define([
       $(".wizard_popup_link").slideUp('fast');
       $wizard_box.slideDown('fast', function() {
         $wizard_box.triggerHandler('wizard_opened');
+        $wizard_box.focus();
         $([document, window]).triggerHandler('scroll');
       });
     });
@@ -981,7 +978,7 @@ define([
 
     // this is for things like the to-do, recent items and upcoming, it
     // happend a lot so rather than duplicating it everywhere I stuck it here
-    $(".more_link").click(function(event) {
+    $("#right-side").delegate(".more_link", "click", function(event) {
       var $this = $(this);
       var $children = $this.parents("ul").children().show();
       $this.closest('li').remove();
@@ -996,7 +993,7 @@ define([
       }
       return false;
     });
-    $(".to-do-list, #topic_list").delegate('.disable_item_link', 'click', function(event) {
+    $("#right-side, #topic_list").delegate('.disable_item_link', 'click', function(event) {
       event.preventDefault();
       var $item = $(this).parents("li, div.topic_message");
       var url = $(this).data('api-href');
@@ -1020,17 +1017,6 @@ define([
         remove(url + "?permanent=1");
       }
     });
-    // if there is not a h1 or h2 on the page, then stick one in there for accessibility.
-    if (!$('h1').length) {
-      $('<h1 class="ui-helper-hidden-accessible" />').text(document.title).prependTo('#content');
-    }
-    if(!$('h2').length && $('#breadcrumbs li:last').text().length ) {
-      var $h2 = $('<h2 class="ui-helper-hidden-accessible" />').text($('#breadcrumbs li:last').text()),
-          $h1 = $('#content h1');
-      $h1.length ?
-        $h1.after($h2) :
-        $h2.prependTo('#content');
-    }
 
     // in 2 seconds (to give time for everything else to load), find all the external links and add give them
     // the external link look and behavior (force them to open in a new tab)
@@ -1046,6 +1032,7 @@ define([
           .append('<span class="ui-icon ui-icon-extlink ui-icon-inline" title="' + htmlEscape(I18n.t('titles.external_link', 'Links to an external site.')) + '"/>');
       });
     }, 2000);
-
   });
+
+  $('input[placeholder], textarea[placeholder]').placeholder();
 });

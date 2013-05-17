@@ -1,5 +1,6 @@
 define [
   'jquery'
+  'underscore'
   'compiled/userSettings'
   'jst/calendar/contextList'
   'jst/calendar/undatedEvents'
@@ -9,7 +10,7 @@ define [
   'compiled/jquery.kylemenu'
   'jquery.instructure_misc_helpers'
   'vendor/jquery.ba-tinypubsub'
-], ($, userSettings, contextListTemplate, undatedEventsTemplate, commonEventFactory, EditEventDetailsDialog, EventDataSource) ->
+], ($, {map}, userSettings, contextListTemplate, undatedEventsTemplate, commonEventFactory, EditEventDetailsDialog, EventDataSource) ->
 
   class VisibleContextManager
     constructor: (contexts, selectedContexts, @$holder) ->
@@ -58,8 +59,6 @@ define [
         $li.toggleClass('checked', visible).toggleClass('not-checked', !visible)
 
   return sidebar = (contexts, selectedContexts, dataSource) ->
-    for c in contexts
-      c.can_create_stuff = c.can_create_calendar_events || c.can_create_assignments
 
     $holder = $('#context-list-holder')
 
@@ -67,37 +66,7 @@ define [
 
     visibleContexts = new VisibleContextManager(contexts, selectedContexts, $holder)
 
-    $holder.find('.settings').kyleMenu
-      buttonOpts:
-        icons:
-          primary:'ui-icon-cog-with-droparrow'
-          secondary: null
-      popupOpts:
-        position:
-          offset: '-25px 10px'
-          within: '#right-side'
-
     $holder.delegate '.context_list_context', 'click', (event) ->
-      # dont toggle if thy were clicking the .settings button
-      unless $(event.target).closest('.settings, .actions').length
-        visibleContexts.toggle $(this).data('context')
-
-    $holder.delegate '.context_list_context'
-      'mouseenter mouseleave': (event) ->
-        hovering = !(event.type == 'mouseleave' && !$(this).find('.ui-menu:visible').length)
-        $(this).toggleClass('hovering', hovering)
-      'popupopen popupclose': (event) ->
-        hovering = event.type == 'popupopen'
-        $(this).toggleClass('hovering', hovering)
-          .find('.settings').toggleClass('ui-state-active', hovering)
-
-    $holder.delegate '.actions a', 'click', ->
-      context = $(this).parents('li[data-context]').data('context')
-      action = $(this).data('action')
-      if action == 'add_event' || action == 'add_assignment'
-        event = commonEventFactory(null, contexts)
-        new EditEventDetailsDialog(event).show()
-        # TODO, codesmell: we should get rid of these next 2 lines and let EditEventDetailsDialog
-        # take care of that behaviour
-        $('select[class="context_id"]').val(context).triggerHandler('change')
-        $('a[href="#edit_assignment_form"]').click() if action == 'add_assignment'
+      visibleContexts.toggle $(this).data('context')
+      userSettings.set('checked_calendar_codes',
+        map($(this).parent().children('.checked'), (c) -> $(c).data('context')))

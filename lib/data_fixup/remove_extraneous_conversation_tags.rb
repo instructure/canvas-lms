@@ -10,7 +10,7 @@ module DataFixup::RemoveExtraneousConversationTags
         WHERE conversation_id = conversations.id
       ) > 1
     COND
-    Conversation.find_each(:conditions => conditions) do |c|
+    Conversation.where(conditions).find_each do |c|
       fix_private_conversation!(c)
     end
   end

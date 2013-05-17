@@ -51,12 +51,8 @@ class AssessmentRequest < ActiveRecord::Base
     }
   end
   
-  named_scope :incomplete, lambda {
-    {:conditions => ['assessment_requests.workflow_state = ?', 'assigned'] }
-  }
-  named_scope :for_assessee, lambda{|user_id|
-    {:conditions => ['assessment_requests.user_id = ?', user_id]}
-  }
+  scope :incomplete, where(:workflow_state => 'assigned')
+  scope :for_assessee, lambda { |user_id| where(:user_id => user_id) }
 
   def send_invitation!
     @send_invitation = true
@@ -71,6 +67,10 @@ class AssessmentRequest < ActiveRecord::Base
     self.save!
     @send_reminder = nil
     true
+  end
+
+  def context
+    submission.try(:context)
   end
   
   def assessor_name

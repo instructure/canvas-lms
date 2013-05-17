@@ -2,96 +2,98 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe "grading standards" do
   it_should_behave_like "in-process server selenium tests"
-  
+
   it "should allow creating/deleting grading standards" do
     course_with_teacher_logged_in
 
     get "/courses/#{@course.id}/grading_standards"
-    driver.find_element(:css, ".add_standard_link").click
-    standard = driver.find_element(:css, "#grading_standard_new")
+    f(".add_standard_link").click
+    standard = f("#grading_standard_new")
     standard.should_not be_nil
-    standard.attribute(:class).should match(/editing/)
+    standard.should have_class(/editing/)
     standard.find_elements(:css, ".delete_row_link").select(&:displayed?).each_with_index do |link, i|
       if i % 2 == 1
         link.click
         wait_for_animations
-        keep_trying_until { !link.displayed? }
+        keep_trying_until { !link.should_not be_displayed }
       end
     end
     standard.find_element(:css, "input.scheme_name").send_keys("New Standard")
     standard.find_element(:css, ".save_button").click
     keep_trying_until { !standard.attribute(:class).match(/editing/) }
-    standard.find_elements(:css, ".grading_standard_row").select(&:displayed?).length.should eql(6)
-    standard.find_element(:css, ".standard_title .title").text.should eql("New Standard")
-    
+    standard.find_elements(:css, ".grading_standard_row").select(&:displayed?).length.should == 6
+    standard.find_element(:css, ".standard_title .title").text.should == "New Standard"
+
     id = standard.attribute(:id)
     standard.find_element(:css, ".delete_grading_standard_link").click
     driver.switch_to.alert.accept
     driver.switch_to.default_content
-    keep_trying_until { !(driver.find_element(:css, "##{id}") rescue nil) }
+    keep_trying_until { !(f("##{id}") rescue nil) }
   end
-  
+
   it "should allow setting a grading standard for an assignment" do
-    skip_if_ie("Out of memory")
     course_with_teacher_logged_in
-    
+
     @assignment = @course.assignments.create!(:title => "new assignment")
     @standard = @course.grading_standards.create!(:title => "some standard", :standard_data => {:a => {:name => 'A', :value => '95'}, :b => {:name => 'B', :value => '80'}, :f => {:name => 'F', :value => ''}})
 
-    get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-    driver.find_element(:css, ".edit_full_assignment_link").click
-    form = driver.find_element(:css, "#edit_assignment_form")
-    form.find_element(:css, ".more_options_link").click
-    form.find_element(:css, ".grading_type option[value='letter_grade']").click
-    form.find_element(:css, ".edit_letter_grades_link").displayed?.should be_true
-    form.find_element(:css, ".edit_letter_grades_link").click
-    
-    dialog = driver.find_element(:css, "#edit_letter_grades_form")
-    dialog.find_elements(:css, ".grading_standard_row").select(&:displayed?).length.should eql(12)
-    dialog.find_elements(:css, ".grading_standard_row").select(&:displayed?).map{|e| e.find_element(:css, ".name").text }.should eql(["A", "A-", "B+", "B", "B-", "C+", "C", "C-", "D+", "D", "D-", "F"])
-    
+    get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
+    form = f("#edit_assignment_form")
+    f('#assignment_toggle_advanced_options').click
+    click_option('#assignment_grading_type', "Letter Grade")
+    f('.edit_letter_grades_link').should be_displayed
+    f('.edit_letter_grades_link').click
+
+    dialog = f("#edit_letter_grades_form")
+    dialog.find_elements(:css, ".grading_standard_row").select(&:displayed?).length.should == 12
+    dialog.find_elements(:css, ".grading_standard_row").select(&:displayed?).map { |e| e.find_element(:css, ".name").text }.should == ["A", "A-", "B+", "B", "B-", "C+", "C", "C-", "D+", "D", "D-", "F"]
+
     dialog.find_element(:css, ".find_grading_standard_link").click
-    keep_trying_until { driver.find_element(:css, ".find_grading_standard").attribute(:class).match(/loaded/) }
-    dialog.find_element(:css, ".find_grading_standard").displayed?.should be_true
-    dialog.find_element(:css, ".display_grading_standard").displayed?.should be_false
+    keep_trying_until { f(".find_grading_standard").should have_class("loaded") }
+    dialog.find_element(:css, ".find_grading_standard").should be_displayed
+    dialog.find_element(:css, ".display_grading_standard").should_not be_displayed
     dialog.find_element(:css, ".cancel_find_grading_standard_link").click
-    dialog.find_element(:css, ".find_grading_standard").displayed?.should be_false
-    dialog.find_element(:css, ".display_grading_standard").displayed?.should be_true
+    dialog.find_element(:css, ".find_grading_standard").should_not be_displayed
+    dialog.find_element(:css, ".display_grading_standard").should be_displayed
     dialog.find_element(:css, ".find_grading_standard_link").click
-    
-    dialog.find_elements(:css, ".grading_standard_select .title")[-1].text.should eql(@standard.title)
+
+    dialog.find_elements(:css, ".grading_standard_select .title")[-1].text.should == @standard.title
     dialog.find_elements(:css, ".grading_standard_select")[-1].click
-    dialog.find_element(:css, "#grading_standard_brief_#{@standard.id}").displayed?.should be_true
+    dialog.find_element(:css, "#grading_standard_brief_#{@standard.id}").should be_displayed
     dialog.find_element(:css, "#grading_standard_brief_#{@standard.id} .select_grading_standard_link").click
-    dialog.find_element(:css, "#grading_standard_brief_#{@standard.id}").displayed?.should be_false
-    dialog.find_element(:css, ".display_grading_standard").displayed?.should be_true
-    dialog.find_element(:css, ".standard_title .title").text.should eql(@standard.title)
-    sleep 2
+    dialog.find_element(:css, "#grading_standard_brief_#{@standard.id}").should_not be_displayed
+    dialog.find_element(:css, ".display_grading_standard").should be_displayed
+    dialog.find_element(:css, ".standard_title .title").text.should == @standard.title
+
+    dialog.find_element(:css, ".done_button").click
+    expect_new_page_load { submit_form('#edit_assignment_form') }
+
+    @assignment.reload.grading_standard_id.should == @standard.id
   end
-  
+
   it "should allow setting a grading standard for a course" do
     course_with_teacher_logged_in
 
     @standard = @course.grading_standards.create!(:title => "some standard", :standard_data => {:a => {:name => 'A', :value => '95'}, :b => {:name => 'B', :value => '80'}, :f => {:name => 'F', :value => ''}})
 
     get "/courses/#{@course.id}/details#tab-details"
-    driver.find_element(:css, ".edit_course_link").click
-    form = driver.find_element(:css, "#course_form")
+    f(".edit_course_link").click
+    form = f("#course_form")
     form.find_element(:css, "#course_grading_standard_enabled").click
     is_checked('#course_form #course_grading_standard_enabled').should be_true
-    
-    form.find_element(:css, ".edit_letter_grades_link").displayed?.should be_true
+
+    form.find_element(:css, ".edit_letter_grades_link").should be_displayed
     form.find_element(:css, ".edit_letter_grades_link").click
-    
-    dialog = driver.find_element(:css, "#edit_letter_grades_form")
-    dialog.find_elements(:css, ".grading_standard_row").select(&:displayed?).length.should eql(12)
-    dialog.find_elements(:css, ".grading_standard_row").select(&:displayed?).map{|e| e.find_element(:css, ".name").text }.should eql(["A", "A-", "B+", "B", "B-", "C+", "C", "C-", "D+", "D", "D-", "F"])
-    
+
+    dialog = f("#edit_letter_grades_form")
+    dialog.find_elements(:css, ".grading_standard_row").select(&:displayed?).length.should ==(12)
+    dialog.find_elements(:css, ".grading_standard_row").select(&:displayed?).map { |e| e.find_element(:css, ".name").text }.should == ["A", "A-", "B+", "B", "B-", "C+", "C", "C-", "D+", "D", "D-", "F"]
+
     dialog.find_element(:css, ".find_grading_standard_link").click
-    keep_trying_until { driver.find_element(:css, ".find_grading_standard").attribute(:class).match(/loaded/) }
-    dialog.find_elements(:css, ".grading_standard_select .title")[-1].text.should eql(@standard.title)
+    keep_trying_until { f(".find_grading_standard").should have_class("loaded") }
+    dialog.find_elements(:css, ".grading_standard_select .title")[-1].text.should == @standard.title
     dialog.find_elements(:css, ".grading_standard_select")[-1].click
-    (standard_brief = dialog.find_element(:css, "#grading_standard_brief_#{@standard.id}")).displayed?.should be_true
+    (standard_brief = dialog.find_element(:css, "#grading_standard_brief_#{@standard.id}")).should be_displayed
     rows = standard_brief.find_elements(:css, '.details_row')
     rows.shift['class'].should match /blank/
     rows.length.should == @standard.data.length
@@ -101,16 +103,16 @@ describe "grading standards" do
       r.find_element(:css, '.next_value').text.should == "#{@standard.data[idx].last * 100}"
     end
     dialog.find_element(:css, "#grading_standard_brief_#{@standard.id} .select_grading_standard_link").click
-    dialog.find_element(:css, "#grading_standard_brief_#{@standard.id}").displayed?.should be_false
-    dialog.find_element(:css, ".display_grading_standard").displayed?.should be_true
-    dialog.find_element(:css, ".standard_title .title").text.should eql(@standard.title)
+    dialog.find_element(:css, "#grading_standard_brief_#{@standard.id}").should_not be_displayed
+    dialog.find_element(:css, ".display_grading_standard").should be_displayed
+    dialog.find_element(:css, ".standard_title .title").text.should == @standard.title
 
-    dialog.find_element(:css, ".remove_grading_standard_link").displayed?.should be_true
+    dialog.find_element(:css, ".remove_grading_standard_link").should be_displayed
     dialog.find_element(:css, ".remove_grading_standard_link").click
     driver.switch_to.alert.accept
     driver.switch_to.default_content
     keep_trying_until { !dialog.displayed? }
-    
+
     is_checked('#course_form #course_grading_standard_enabled').should be_false
   end
 
@@ -125,7 +127,6 @@ describe "grading standards" do
     get "/courses/#{@course.id}/grades/#{student.id}"
     grading_scheme = driver.execute_script "return grading_scheme"
     grading_scheme[2][0].should == 'B+'
-    driver.execute_script("return INST.GradeCalculator.letter_grade(grading_scheme, 89.9)").should == 'B+'
     driver.find_element(:css, '#right-side .final_grade .grade').text.should == '89.9'
     driver.find_element(:css, '#final_letter_grade_text').text.should == 'B+'
   end
@@ -134,13 +135,13 @@ describe "grading standards" do
     user_session(account_admin_user)
     @standard = Account.default.grading_standards.create!(:title => "some standard", :standard_data => {:a => {:name => 'A', :value => '95'}, :b => {:name => 'B', :value => '80'}, :f => {:name => 'F', :value => ''}})
     get("/accounts/#{Account.default.id}/grading_standards")
-    std = keep_trying_until { driver.find_element(:css, "#grading_standard_#{@standard.id}") }
+    std = keep_trying_until { f("#grading_standard_#{@standard.id}") }
     std.find_element(:css, ".edit_grading_standard_link").click
     std.find_element(:css, "button.save_button").click
     wait_for_ajax_requests
-    std = keep_trying_until { driver.find_element(:css, "#grading_standard_#{@standard.id}") }
+    std = keep_trying_until { f("#grading_standard_#{@standard.id}") }
     std.find_element(:css, ".edit_grading_standard_link").click
-    std.find_element(:css, "button.save_button").click
+    std.find_element(:css, "button.save_button")
     wait_for_ajax_requests
     @standard.reload.data.length.should == 3
   end

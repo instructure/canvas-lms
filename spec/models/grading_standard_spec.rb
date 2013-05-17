@@ -95,6 +95,35 @@ describe GradingStandard do
     end
   end
 
+  context "sorted" do
+    it "should return used grading standards before unused ones" do
+      course_with_teacher
+      gs = grading_standard_for(@course.root_account, :title => "zzz")
+      gs2 = grading_standard_for(@course.root_account, :title => "aaa")
+
+      # Add this grading standard to 3 assignments, triggring the "used" condition
+      3.times do
+        @course.assignments.create!(:title => "hi", :grading_standard_id => gs.id)
+      end
+      
+      standards = GradingStandard.standards_for(@course).sorted
+      standards.length.should == 2
+      standards.map(&:id).should == [gs.id, gs2.id]
+    end
+
+    it "it should return standards with a title first" do
+      course_with_teacher
+      gs = grading_standard_for(@course.root_account, :title => "zzz")
+      gs2 = grading_standard_for(@course.root_account, :title => "aaa")
+      gs2.title = nil
+      gs2.save!
+      
+      standards = GradingStandard.standards_for(@course).sorted
+      standards.length.should == 2
+      standards.map(&:id).should == [gs.id, gs2.id]
+    end
+  end
+
   context "score_to_grade" do
     it "should compute correct grades" do
       input = [['A', 0.90], ['B', 0.80], ['C', 0.675], ['D', 0.55], ['E', 0.00]]
@@ -125,6 +154,19 @@ describe GradingStandard do
       standard = GradingStandard.new
       standard.data = input
       standard.score_to_grade(40).should eql("E")
+    end
+  end
+
+  context "associations" do
+    it "should not count deleted standards in associations" do
+      course_with_teacher
+      grading_standard_for(@course)
+      grading_standard_for(@course).destroy
+      @course.grading_standards.count.should == 1
+
+      grading_standard_for(@course.root_account)
+      grading_standard_for(@course.root_account).destroy
+      @course.root_account.grading_standards.count.should == 1
     end
   end
 end

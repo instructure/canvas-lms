@@ -8,6 +8,10 @@ module Canvas
       PATH_REGEX = %r{.*?/javascripts/(plugins/)?(.*)\.js\z}
       JS_ROOT = "#{Rails.root}/public/javascripts"
 
+      def matcher
+        ENV['JS_SPEC_MATCHER'] || '**/*Spec.js'
+      end
+
       # get all regular canvas (and plugin) bundles
       def app_bundles
         app_bundles = (
@@ -50,8 +54,8 @@ module Canvas
         @paths ||= {
           :common => 'compiled/bundles/common',
           :jqueryui => 'vendor/jqueryui',
-          :uploadify => '../flash/uploadify/jquery.uploadify.v2.1.4',
           :use => 'vendor/use',
+          :uploadify => '../flash/uploadify/jquery.uploadify-3.1.min'
         }.update(plugin_paths).to_json.gsub(/([,{])/, "\\1\n    ")
       end
   
@@ -95,6 +99,11 @@ module Canvas
             'vendor/slickgrid/plugins/slick.rowselectionmodel': {
               deps: ['use!vendor/slickgrid/slick.core'],
               attach: 'Slick'
+            },
+
+            'uploadify' : {
+              deps: ['jquery'],
+              attach: '$'
             }
           }
         JS

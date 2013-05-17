@@ -45,7 +45,7 @@ define([
           $spinHolder.show().spin(options);
           $($spinHolder.data().spinner.el).css({'max-width':'100px'});
           $disabledArea.css('opacity', function(i, currentOpacity){
-            $(this).data(dataKey+'opacityBefore', this.style.opacity);
+            $(this).data(dataKey+'opacityBefore', this.style.opacity || 1);
             return opts.opacity;
           });
           $.each(opts.buttons, function(selector, text) {
@@ -67,7 +67,9 @@ define([
           clearTimeout(disabler);
           if (disabled) {
             $spinHolder.css('display', previousSpinHolderDisplay).spin(false); // stop spinner
-            $disabledArea.css('opacity', function(){ return $(this).data(dataKey+'opacityBefore') });
+            $disabledArea.css('opacity', function(){
+              return $(this).data(dataKey+'opacityBefore') || 1;
+            });
             $inputsToDisable.prop('disabled', false);
             $.each(opts.buttons, function(selector, text) {
               if(typeof selector === 'number') var selector = ''+this; // for arrays

@@ -1,6 +1,16 @@
 <div class="gradebook-cell">
-  <div class="gradebook-tooltip">{{score}} / {{possible}}</div>
+  <div class="gradebook-tooltip {{#if lastColumn}}gradebook-tooltip-last{{/if}}">
+    {{#if warning}}
+      {{warning}}
+    {{else}}
+      {{score}} / {{possible}}
+    {{/if}}
+  </div>
   <span class="percentage">
+    {{#if warning}}
+      <i class="icon-warning final-warning"></i>
+    {{/if}}
+
     {{#if possible}}
       {{percentage}}%
     {{else}}

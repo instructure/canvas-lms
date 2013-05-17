@@ -115,6 +115,18 @@ describe PseudonymSessionsController do
     end
   end
 
+  context "SAML" do
+    it 'redirects to the discovery page when hitting a deep link while unauthenticated' do
+      account = account_with_saml( :account => Account.default )
+      discovery_url = 'http://discovery-url.example.com'
+      account.auth_discovery_url = discovery_url
+      account.save!
+
+      get account_account_authorization_configs_url(account)
+      redirect_until(discovery_url)
+    end
+  end
+
   it "should redirect back for jobs controller" do
     user_with_pseudonym(:password => 'qwerty', :active_all => 1)
     Account.site_admin.add_user(@user)

@@ -28,4 +28,33 @@ describe ContentExportsController do
       ContentExport.last.selected_content[:everything].should be_present
     end
   end
+
+  describe 'GET xml_schema' do
+    describe 'with a valid file' do
+      let(:filename) { 'cccv1p0' }
+      let(:full_path) { Rails.root + "lib/cc/xsd/#{filename}.xsd" }
+      before { get 'xml_schema', :version => filename }
+
+      it 'sends in the entire file' do
+        response.header['Content-Length'].to_i.should == File.size?(full_path)
+      end
+
+      it 'recognizes the file as xml' do
+        response.header['Content-Type'].should == 'text/xml'
+      end
+
+    end
+
+    describe 'with a nonexistant file' do
+      before { get 'xml_schema', :version => 'notafile' }
+
+      it 'returns a 404' do
+        response.should_not be_success
+      end
+
+      it 'renders the 404 template' do
+        response.should render_template('shared/errors/404_message')
+      end
+    end
+  end
 end

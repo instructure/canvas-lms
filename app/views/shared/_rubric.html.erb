@@ -3,21 +3,22 @@
    for_context ||= false
    context = @context
    context = context.context if context.is_a?(Group)
+   show_grading = !@assignment || @assignment.submission_types != 'online_quiz' 
 %>
 <% rubric_association = assessment.rubric_association if assessment %>
-<% cache(['rubric_render', (rubric.cache_key rescue 'no_rubric'), (rubric.cache_key rescue context.asset_string), (rubric_association.cache_key rescue 'no_association'), (assessment.cache_key rescue 'no_assessment'), editable, edit_view, assessing].join('/')) do %>
+<% cache(['rubric_render2', (rubric.cache_key rescue 'no_rubric'), (rubric.cache_key rescue context.asset_string), (rubric_association.cache_key rescue 'no_association'), (assessment.cache_key rescue 'no_assessment'), editable, edit_view, assessing, show_grading].join('/')) do %>
 <table class="rubric <%= "assessing" if assessing %> <%= "for_grading" if (rubric.use_for_grading rescue false) %>" id="<%= rubric ? "rubric_#{rubric.id}" : "default_rubric" %>" style="<%= hidden unless rubric %>">
 <thead>
   <tr class="rubric_title">
     <th colspan="4">
       <div style="float: right; <%= hidden unless editable && edit_view %>" class="links displaying">
         <% hash = rubric_association ? {:rubric_association_id => rubric_association.id} : {} %>
-        <a href="<%= context_url(context, :context_rubric_url, rubric ? rubric.id : "{{ id }}", hash) %>" class="<%= 'copy_edit' if rubric && !can_do(rubric, @current_user, :update) %> edit_rubric_link no-print no-hover" title="<%= t 'links.edit', "Edit Rubric" %>" style="<%= hidden unless !rubric || can_do(rubric_association, @current_user, :update) %>"><%= image_tag "edit.png" %></a>
-        <a href="<%= search_rubrics_url(:q => "") %>" class="find_rubric_link no-print no-hover" style="<%= hidden unless !rubric || can_do(rubric_association, @current_user, :update) %>" title="<%= t 'links.find_another_rubric', "Find Another Rubric" %>"><%= image_tag "find.png" %></a>
+        <a href="<%= context_url(context, :context_rubric_url, rubric ? rubric.id : "{{ id }}", hash) %>" class="<%= 'copy_edit' if rubric && !can_do(rubric, @current_user, :update) %> edit_rubric_link no-print no-hover" title="<%= t 'links.edit', "Edit Rubric" %>" style="<%= hidden unless !rubric || can_do(rubric_association, @current_user, :update) %>"><i class="icon-edit standalone-icon"></i></a>
+        <a href="<%= search_rubrics_url(:q => "") %>" class="find_rubric_link no-print no-hover" style="<%= hidden unless !rubric || can_do(rubric_association, @current_user, :update) %>" title="<%= t 'links.find_another_rubric', "Find Another Rubric" %>"><i class="icon-search standalone-icon"></i></a>
         <% if for_context %>
-          <a href="<%= context_url(context, :context_rubric_url, rubric ? rubric.id : "{{ id }}") %>" class="delete_rubric_link no-print no-hover" title="<%= t 'links.delete', "Delete Rubric" %>" style="<%= hidden unless !rubric || can_do(rubric_association, @current_user, :delete) %>"><%= image_tag "delete.png" %></a>
+          <a href="<%= context_url(context, :context_rubric_url, rubric ? rubric.id : "{{ id }}") %>" class="delete_rubric_link no-print no-hover" title="<%= t 'links.delete', "Delete Rubric" %>" style="<%= hidden unless !rubric || can_do(rubric_association, @current_user, :delete) %>"><i class="icon-trash standalone-icon"></i></a>
         <% else %>
-          <a href="<%= context_url(context, :context_rubric_association_url, rubric_association ? rubric_association.id : "{{ rubric_association_id }}") %>" class="delete_rubric_link no-print no-hover" title="<%= t 'links.delete', "Delete Rubric" %>" style="<%= hidden unless !rubric || can_do(rubric_association, @current_user, :delete) %>"><%= image_tag "delete.png" %></a>
+          <a href="<%= context_url(context, :context_rubric_association_url, rubric_association ? rubric_association.id : "{{ rubric_association_id }}") %>" class="delete_rubric_link no-print no-hover" title="<%= t 'links.delete', "Delete Rubric" %>" style="<%= hidden unless !rubric || can_do(rubric_association, @current_user, :delete) %>"><i class="icon-trash standalone-icon"></i></a>
         <% end %>
         <div style="display: none;">
           <div class="use_for_grading"><%= (rubric_association && rubric_association.use_for_grading) ? "true" : nbsp %></div>
@@ -45,10 +46,10 @@
       </div>
       
       <div class="editing" style="float: right;">
-        <a href="<%= search_rubrics_url(:q => "") %>" class="find_rubric_link find" style="<%= hidden unless !rubric || can_do(rubric_association, @current_user, :update) %>" title="<%= t 'titles.find_existing_rubric', "Find Existing Rubric" %>"><%= t 'links.find_a_rubric', "Find a Rubric" %></a>
+        <a href="<%= search_rubrics_url(:q => "") %>" class="find_rubric_link icon-search" style="<%= hidden unless !rubric || can_do(rubric_association, @current_user, :update) %>" title="<%= t 'titles.find_existing_rubric', "Find Existing Rubric" %>"><%= t 'links.find_a_rubric', "Find a Rubric" %></a>
       </div>
-      <div class="editing">
-        <%= before_label :title, "Title" %> <input type="text" name="title" value="<%= rubric.title rescue t('defaults.rubric_title', "Some Rubric") %>" style="width: 200px;"/>
+      <div class="editing" style="text-align: left">
+        <%= before_label :title, "Title" %> <input type="text" class="no-margin-bottom" name="title" value="<%= rubric.title rescue t('defaults.rubric_title', "Some Rubric") %>" style="width: 200px;" maxlength="255"/>
         <a href="<%= search_rubrics_url(:q => "") %>" style="display: none;"><%= image_tag "find.png" %> <%= t 'links.find_rubric', "Find Rubric" %></a>
         <% if rubric_association && !rubric_association.rubric_assessments.empty? %>
           <div class="editing" style="font-size: 0.8em;"><%= t 'messages.rubric_in_use',
@@ -92,8 +93,8 @@
         </span>
       </div>
       <div style="float: left;" class="editing">
-      <a href="#" class="add_criterion_link add"><%= t 'links.add_criterion', "Add Criterion" %></a>
-      &nbsp;&nbsp;<a href="#" class="find find_outcome_link outcome" style="<%= hidden unless LearningOutcome.enabled? %>"><%= t 'links.find_outcome_criterion', "Find Outcome Criterion" %></a>
+      <a href="#" class="icon-add add_criterion_link"><%= t 'links.add_criterion', "Add Criterion" %></a>
+      &nbsp;&nbsp;<a href="#" class="icon-search find_outcome_link outcome"><%= t 'links.find_outcome_criterion', "Find Outcome Criterion" %></a>
       </div>
       <div class="clear"></div>
     </td>
@@ -103,12 +104,12 @@
 <table style="display: none;">
   <tr id="edit_rubric">
     <td colspan="4">
-      <form id="edit_rubric_form">
+      <form id="edit_rubric_form" class="edit-rubric-form no-margin-bottom">
         <div class="rubric_custom_ratings" style="<%= hidden unless @assignment %>">
           <input type="checkbox" id="rubric_custom_rating" class="rubric_custom_rating" <%= 'checked' if rubric && rubric.free_form_criterion_comments %>/>
           <label for="rubric_custom_rating"><%= t 'labels.custom_rating', "I'll write free-form comments when assessing students" %></label>
         </div>
-        <% if !@assignment || @assignment.submission_types != 'online_quiz' %>
+        <% if show_grading %>
           <div class="rubric_grading" style="<%= hidden unless @assignment %>">
             <input type="checkbox" id="grading_rubric" class="grading_rubric_checkbox" <%= 'checked' if rubric_association && rubric_association.use_for_grading %>/>
             <label for="grading_rubric"><%= t 'labels.grading_rubric', "Use this rubric for assignment grading" %></label>
@@ -119,8 +120,8 @@
           <label for="totalling_rubric"><%= t 'labels.totallying_rubric', "Hide score total for assessment results" %></label>
         </div>
         <div class="button-container">
-          <button type="submit" class="button small-button save_button"><%= t 'buttons.create', "Create Rubric" %></button>
-          <button type="button" class="button-secondary cancel_button"><%= t '#buttons.cancel', "Cancel" %></button>
+          <button type="button" class="btn btn-small cancel_button"><%= t '#buttons.cancel', "Cancel" %></button>
+          <button type="submit" class="btn btn-small save_button btn-primary"><%= t 'buttons.create', "Create Rubric" %></button>
         </div>
       </form>
     </td>

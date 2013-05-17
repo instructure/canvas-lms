@@ -29,7 +29,7 @@ class ContentZipper
   end
   
   def self.send_later_if_production(*args)
-    if ENV['RAILS_ENV'] == 'production'
+    if Rails.env.production?
       send_later(*args)
     else
       send(*args)
@@ -37,7 +37,7 @@ class ContentZipper
   end
   
   def send_later_if_production(*args)
-    if ENV['RAILS_ENV'] == 'production'
+    if Rails.env.production?
       send_later(*args)
     else
       send(*args)
@@ -78,17 +78,21 @@ class ContentZipper
     end
   end
   
+  def assignment_zip_filename(assignment)
+    "#{assignment.context.short_name_slug}-#{assignment.title_slug} submissions"
+  end
+
   def zip_assignment(zip_attachment, assignment)
     files = []
     @logger.debug("zipping into attachment: #{zip_attachment.id}")
     zip_attachment.workflow_state = 'zipping'
     zip_attachment.scribd_attempts += 1
     zip_attachment.save!
-    filename = "#{assignment.context.short_name}-#{assignment.title} submissions".gsub(/ /, "_").gsub(/[^\w-]/, "")
+    filename = assignment_zip_filename(assignment)
     submissions = assignment.submissions
     if zip_attachment.user && assignment.context.enrollment_visibility_level_for(zip_attachment.user) != :full
-      visible_student_ids = assignment.context.enrollments_visible_to(zip_attachment.user).find(:all, :select => 'user_id').map(&:user_id)
-      submissions = submissions.scoped(:conditions => { :user_id => visible_student_ids})
+      visible_student_ids = assignment.context.enrollments_visible_to(zip_attachment.user).pluck(:user_id)
+      submissions = submissions.where(:user_id => visible_student_ids)
     end
     make_zip_tmpdir(filename) do |zip_name|
       @logger.debug("creating #{zip_name}")
@@ -166,6 +170,12 @@ class ContentZipper
   def self.zip_eportfolio(*args)
     ContentZipper.new.zip_eportfolio(*args)
   end
+
+  StaticAttachment = Struct.new(:display_name,
+                                :filename,
+                                :content_type,
+                                :uuid,
+                                :attachment)
   
   def zip_eportfolio(zip_attachment, portfolio)
     static_attachments = []
@@ -184,7 +194,7 @@ class ContentZipper
       end
     end
     static_attachments = static_attachments.uniq.map do |a|
-      obj = OpenObject.new
+      obj = StaticAttachment.new
       obj.display_name = a.display_name
       obj.filename = "#{idx}_#{a.filename}"
       obj.content_type = a.content_type
@@ -193,7 +203,7 @@ class ContentZipper
       idx += 1
       obj
     end
-    filename = "#{portfolio.name.gsub(/\s/, "_")}"
+    filename = portfolio.name
     make_zip_tmpdir(filename) do |zip_name|
       idx = 0
       count = static_attachments.length + 2
@@ -212,11 +222,11 @@ class ContentZipper
           zip_attachment.file_state = ((idx + 1).to_f / count.to_f * 100).to_i
           zip_attachment.save!
         end
-        if css = File.open(File.join(RAILS_ROOT, 'public', 'stylesheets', 'static', 'eportfolio_static.css')) rescue nil
+        if css = File.open(Rails.root.join('public', 'stylesheets', 'static', 'eportfolio_static.css')) rescue nil
           content = css.read
           zipfile.get_output_stream("eportfolio.css") {|f| f.puts content } if content
         end
-        content = File.open(File.join(RAILS_ROOT, 'public', 'images', 'logo.png'), 'rb').read rescue nil
+        content = File.open(Rails.root.join('public', 'images', 'logo.png'), 'rb').read rescue nil
         zipfile.get_output_stream("logo.png") {|f| f.write content } if content
       end
       @logger.debug("data zipped!")
@@ -249,7 +259,7 @@ class ContentZipper
     zip_attachment.workflow_state = 'zipping' #!(:workflow_state => 'zipping')
     zip_attachment.scribd_attempts += 1
     zip_attachment.save!
-    filename = "#{folder.context.short_name}-#{folder.name} files".gsub(/ /, "_").gsub(/[^\w-]/, "")
+    filename = "#{folder.context.short_name}-#{folder.name} files"
     make_zip_tmpdir(filename) do |zip_name|
       @logger.debug("creating #{zip_name}")
       Zip::ZipFile.open(zip_name, Zip::ZipFile::CREATE) do |zipfile|
@@ -281,6 +291,7 @@ class ContentZipper
   # make a tmp directory and yield a filename under that directory to the block
   # given. the tmp directory is deleted when the block returns.
   def make_zip_tmpdir(filename)
+    filename = File.basename(filename.gsub(/ /, "_").gsub(/[^\w-]/, ""))
     Dir.mktmpdir do |dirname|
       zip_name = File.join(dirname, "#{filename}.zip")
       yield zip_name

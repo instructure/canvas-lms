@@ -26,30 +26,45 @@ describe RoleOverridesController do
   end
 
   describe "add_role" do
-    it "should add the role type to the account" do
-      @account.account_membership_types.should_not include('NewRole')
+    it "adds the role type to the account" do
+      @account.available_account_roles.should_not include('NewRole')
       post 'add_role', :account_id => @account.id, :role_type => 'NewRole'
       @account.reload
-      @account.account_membership_types.should include('NewRole')
+      @account.available_account_roles.should include('NewRole')
     end
 
-    it "should check require a role type" do
+    it "requires a role type" do
       post 'add_role', :account_id => @account.id
       flash[:error].should == 'Role creation failed'
     end
 
-    it "should fail when given an existing role type" do
-      @account.add_account_membership_type('NewRole')
+    it "fails when given an existing role type" do
+      role = @account.roles.build(:name => 'NewRole')
+      role.base_role_type = AccountUser::BASE_ROLE_NAME
+      role.workflow_state = 'active'
+      role.save!
       post 'add_role', :account_id => @account.id, :role_type => 'NewRole'
       flash[:error].should == 'Role creation failed'
     end
+  end
+
+  it "should deactivate a role" do
+    role = @account.roles.build(:name => 'NewRole')
+    role.base_role_type = AccountUser::BASE_ROLE_NAME
+    role.workflow_state = 'active'
+    role.save!
+    delete 'remove_role', :account_id => @account.id, :role => 'NewRole'
+    @account.roles.find_by_name('NewRole').should be_inactive
   end
 
   describe "create" do
     before :each do
       @role = 'NewRole'
       @permission = 'read_reports'
-      @account.add_account_membership_type(@role)
+      role = @account.roles.build(:name => @role)
+      role.base_role_type = AccountUser::BASE_ROLE_NAME
+      role.workflow_state = 'active'
+      role.save!
     end
 
     def post_with_settings(settings={})
@@ -81,11 +96,13 @@ describe RoleOverridesController do
         @existing_override.locked.should be_true
       end
 
-      it "should only update the parts that are specified" do
+      it "only updates unchecked" do
         post_with_settings(:override => 'unchecked')
         @existing_override.reload
         @existing_override.locked.should be_false
-
+      end
+      
+      it "only updates enabled" do 
         @existing_override.enabled = true
         @existing_override.save
 
@@ -127,14 +144,16 @@ describe RoleOverridesController do
         override.locked.should be_true
       end
 
-      it "should only set the parts that are specified" do
+      it "sets override as false when override is unchecked" do 
         post_with_settings(:override => 'unchecked')
         override = @account.role_overrides(true).find_by_permission_and_enrollment_type(@permission, @role)
         override.should_not be_nil
         override.enabled.should be_false
         override.locked.should be_nil
         override.destroy
+      end
 
+      it "sets the override to locked when specifiying locked" do
         post_with_settings(:locked => 'true')
         override = @account.role_overrides(true).find_by_permission_and_enrollment_type(@permission, @role)
         override.should_not be_nil

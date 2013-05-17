@@ -1,0 +1,38 @@
+<div class="list-view border border-trbl" data-message-id="{{id}}">
+  <header>
+    <span class="h6" tabindex="0">{{subject}}</span>
+
+    <span class="label label-{{workflow_state}}" tabindex="0">
+      {{workflow_state}}
+    </span>
+  </header>
+
+  <table class="message-meta-data">
+    <tbody>
+    <tr>
+      <td class='meta-data-label' tabindex="0">{{#t "to"}}To{{/t}}</td>
+      <td tabindex="0" class="message-to">{{to}}</td>
+    </tr>
+    <tr>
+      <td class='meta-data-label' tabindex="0">{{#t "from_name"}}From{{/t}}</td>
+      <td tabindex="0" class="message-from">{{from}}</td>
+    </tr>
+      {{#if reply_to}}
+      <td class='meta-data-label' tabindex="0">{{#t "reply_to"}}Reply to{{/t}}</td>
+      <td tabindex="0">{{reply_to}}</td>
+      {{/if}}
+    <tr>
+      <td class='meta-data-label' tabindex="0">{{#t "created_at"}}Created at{{/t}}</td>
+      <td tabindex="0">{{datetimeFormatted created_at}}</td>
+    </tr>
+    <tr>
+      <td class='meta-data-label' tabindex="0">{{#t "sent_at"}}Sent at{{/t}}</td>
+      <td tabindex="0">{{datetimeFormatted sent_at}}</td>
+    </tr>
+    </tbody>
+  </table>
+
+  <pre class="message-body well" tabindex="0">
+    {{body}}
+  </pre>
+</div>

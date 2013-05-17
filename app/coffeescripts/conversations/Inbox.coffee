@@ -22,9 +22,10 @@ define [
   'str/htmlEscape'
   'compiled/conversations/introSlideshow'
   'compiled/conversations/ConversationsPane'
+  'compiled/conversations/MessageFormPane'
   'compiled/conversations/audienceList'
-  'compiled/conversations/contextList'
-  'compiled/widget/TokenInput'
+  'compiled/util/contextList'
+  'compiled/widget/ContextSearch'
   'compiled/str/TextHelper'
   'jquery.ajaxJSON'
   'jquery.instructure_date_and_time'
@@ -33,11 +34,12 @@ define [
   'jquery.instructure_misc_helpers'
   'jquery.disableWhileLoading'
   'compiled/jquery.rails_flash_notifications'
+  'compiled/jquery/offsetFrom'
   'media_comments'
   'vendor/jquery.ba-hashchange'
   'vendor/jquery.elastic'
   'jqueryui/position'
-], (I18n, _, h, introSlideshow, ConversationsPane, audienceList, contextList, TokenInput, TextHelper) ->
+], (I18n, _, h, introSlideshow, ConversationsPane, MessageFormPane, audienceList, contextList, TokenInput, TextHelper) ->
 
   class
     constructor: (@options) ->
@@ -53,56 +55,27 @@ define [
       @$conversations = $('#conversations')
       @$messages = $('#messages')
       @$messageList = @$messages.find('ul.messages')
+      @$others = $('<div class="others" id="others_popup" />')
       @initializeHelp()
       @initializeForms()
       @initializeMenus()
       @initializeMessageActions()
-      @initializeConversationActions()
-      @initializeTemplates()
       @initializeTokenInputs()
       @initializeConversationsPane()
+      @initializeMessageFormPane()
       @initializeAutoResize()
       @initializeHashChange()
       if @options.SHOW_INTRO
         introSlideshow()
 
-    showMessageForm: ->
-      conversation = @conversations.active()
-      newMessage = !conversation?
-      @$form.find('#recipient_info').showIf newMessage
-      @$form.find('#group_conversation_info').hide()
-      $('#action_compose_message').toggleClass 'active', newMessage
-
-      if newMessage
-        @$form.addClass('new')
-        @$form.find('#action_add_recipients').hide()
-        @$form.attr action: '/conversations?' + $.param(@conversations?.baseData() ? {})
-      else
-        @$form.removeClass('new')
-        @$form.find('#action_add_recipients').showIf(!conversation.get('private'))
-        @$form.attr action: conversation.url('add_message')
-
-      @resetMessageForm()
-      @$form.find('#user_note_info').hide().find('input').attr('checked', false)
-      @$form.show().find(':input:visible:first').focus()
-
-    resetMessageForm: (resetFields = true) ->
-      @$form.find('.audience').html(if c = @conversations.active()
-          @htmlAudience(c.attributes, linkToContexts: true, highlightFilters: true)
-        else
-          h(I18n.t('headings.new_message', 'New Message'))
-      )
-      if resetFields
-        @$form.find('input[name!=authenticity_token], textarea').not(":checkbox").val('').change()
-        @$form.find(".attachment:visible").remove()
-        @$form.find(".media_comment").hide()
-        @$form.find("#action_media_comment").show()
-      @resize()
-
     filters: ->
       @conversations.baseData().filter ? []
 
     htmlAudience: (conversation, options = {}) ->
+      conversation ?= @conversations.active()?.attributes
+      unless conversation?
+        return h(I18n.t('headings.new_message', 'New Message'))
+
       filters = options.filters = if options.highlightFilters then @filters() else []
       audience = for id in conversation.audience
         {
@@ -117,38 +90,28 @@ define [
       ret
 
     htmlContextList: (contexts, options = {}) ->
-      filters = options.filters ? []
-      contexts = (course for id, roles of contexts.courses when course = @contexts.courses[id]).
-           concat(group for id, roles of contexts.groups when group = @contexts.groups[id])
-      contexts = for context in contexts
-        context = _.clone(context)
-        context.activeFilter = _.include(filters, "#{context.type}_#{context.id}")
-        context
-      contextList(contexts, options)
+      contexts = {courses: _.keys(contexts.courses), groups: _.keys(contexts.groups)}
+      contextList(contexts, @contexts, options)
 
     htmlNameForUser: (user, contexts = {courses: user.common_courses, groups: user.common_groups}) ->
       h(user.name) + if contexts.courses?.length or contexts.groups?.length then " <em>" + @htmlContextList(contexts) + "</em>" else ''
 
-    canAddNotesFor: (user) ->
+    canAddNotesFor: (userOrId) =>
       return false unless @options.NOTES_ENABLED
-      return true if user.can_add_notes
+      user = if typeof userOrId is 'object' then userOrId else @userCache[userOrId]
+      return false unless user?
       for id, roles of user.common_courses
-        return true if 'StudentEnrollment' in roles and (@options.CAN_ADD_NOTES_FOR_ACCOUNT or @contexts.courses[id]?.can_add_notes)
+        return true if 'StudentEnrollment' in roles and (@options.CAN_ADD_NOTES_FOR_ACCOUNT or @contexts.courses[id]?.permissions?.manage_user_notes)
       false
 
     loadConversation: (conversation, $node, cb) ->
-      @toggleMessageActions(off)
       @$messageList.removeClass('private').hide().html ''
       @$messageList.addClass('private') if $conversation?.hasClass('private')
-      @showMessageForm()
 
-      params = @currentHashData()
-      @$form.find('#body').val(params.message) if params.message
-      unless conversation?
-        if params.user_id
-          $('#from_conversation_id').val(params.from_conversation_id)
-          $('#recipients').data('token_input').selector.addByUserId(params.user_id, params.from_conversation_id)
-        return cb()
+      @resetMessageForm(conversation)
+      @toggleMessageActions(off)
+
+      return cb() unless conversation?
 
       url = conversation.url()
       @$messageList.show().disableWhileLoading $.ajaxJSON url, 'GET', {}, (data) =>
@@ -157,13 +120,37 @@ define [
         for user in data.participants when !@userCache[user.id]?.avatar_url
           @userCache[user.id] = user
           user.htmlName = @htmlNameForUser(user)
-        if data['private'] and user = (user for user in data.participants when user.id isnt @currentUser.id)[0] and @canAddNotesFor(user)
-          @$form.find('#user_note_info').show()
+        if data['private'] and user = (user for user in data.participants when user.id isnt @currentUser.id)[0]
+          @formPane.resetForParticipant(user)
         @resize()
         @$messages.show()
         @$messageList.append @buildMessage(message) for message in data.messages
         @$messageList.show()
         cb()
+
+    resetMessageForm: (conversation) ->
+      $('#action_compose_message').toggleClass 'active', !conversation?
+      baseData = @conversations.baseData()
+      @formPane.reset(_.extend({}, @currentHashData(),
+                       conversation: conversation
+                       audience: @htmlAudience(null, linkToContexts: true, highlightFilters: true)
+                       addRecipientsEnabled: conversation? and !conversation.get('private')
+                       mediaCommentsEnabled: @options.MEDIA_COMMENTS_ENABLED
+                       filter: baseData.filter
+                       scope: baseData.scope
+                    ))
+
+    updatedConversation: (data) ->
+      @formPane.refresh @htmlAudience(null, linkToContexts: true, highlightFilters: true)
+      return unless data.length
+
+      @conversations.updateItems data
+      if data.length is 1
+        conversation = data[0]
+        if @conversations.isActive(conversation.id)
+          @buildMessage(conversation.messages[0]).prependTo(@$messageList).slideDown 'fast'
+        if conversation.visible
+          @updateHashData id: conversation.id
 
     deselectMessages: ->
       @$messageList.find('li.selected').removeClass 'selected'
@@ -334,7 +321,7 @@ define [
         availableHeight = @minHeight if availableHeight < @minHeight
         $(document.body).toggleClass('too_small', availableHeight <= @minHeight)
         @$inbox.height(availableHeight)
-        @$messageList.height(availableHeight - @$form.outerHeight(true))
+        @$messageList.height(availableHeight - @formPane.height())
         @conversations.resize(availableHeight)
       , delay
 
@@ -346,7 +333,7 @@ define [
         state = !!@$messageList.find('li.selected').length
       $('#action_forward').parent().showIf(state and @$messageList.find('li.selected.forwardable').length)
       if state then $("#message_actions").slideDown(100) else $("#message_actions").slideUp(100)
-      @$form[if state then 'addClass' else 'removeClass']('disabled')
+      @formPane.toggle(state)
 
     updateHashData: (changes) ->
       data = $.extend(@currentHashData(), changes)
@@ -360,64 +347,17 @@ define [
         e.preventDefault()
         introSlideshow()
 
-    initializeForms: ->
-      $('#create_message_form, #forward_message_form').find('textarea').elastic().keypress (e) =>
+    prepareTextareas: ($nodes) ->
+      $nodes.elastic()
+      $nodes.keypress (e) =>
         if e.which is 13 and e.shiftKey
-          e.preventDefault()
           $(e.target).closest('form').submit()
           false
 
-      @$form = $('#create_message_form')
+    initializeForms: ->
       @$addForm = $('#add_recipients_form')
       @$forwardForm = $('#forward_message_form')
-
-      @$form.submit (e) =>
-        valid = !!(@$form.find('#body').val() and (@$form.find('#recipient_info').filter(':visible').length is 0 or @$form.find('.token_input li').length > 0))
-        e.stopImmediatePropagation() unless valid
-        valid
-      @$form.formSubmit
-        fileUpload: =>
-          return @$form.find(".file_input:visible").length > 0
-        preparedFileUpload: true
-        context_code: "user_" + $("#identity .user_id").text()
-        folder_id: @options.FOLDER_ID
-        intent: 'message'
-        formDataTarget: 'url'
-        handle_files: (attachments, data) ->
-          data.attachment_ids = (a.attachment.id for a in attachments)
-          data
-        disableWhileLoading: true
-        success: (data) =>
-          data = [data] unless data.length?
-          @conversations.updateItems data
-          if data.length == 1
-            conversation = data[0]
-            if @conversations.isActive(conversation.id)
-              @buildMessage(conversation.messages[0]).prependTo(@$messageList).slideDown 'fast'
-            if conversation.visible
-              @updateHashData id: conversation.id
-            $.flashMessage I18n.t('message_sent', 'Message Sent')
-          else
-            $.flashMessage I18n.t('messages_sent', 'Messages Sent')
-          @resetMessageForm()
-        error: (data) =>
-          return if data.isRejected?() # e.g. refreshed the page, thus aborting the request
-          error = data[0]
-          if error?.attribute is 'body'
-            @$form.find('#body').errorBox I18n.t('message_blank_error', 'No message was specified')
-          else
-            errorText = (if error?.attribute is 'recipients'
-              if error.message is 'blank'
-                I18n.t('recipient_blank_error', 'No recipients were specified')
-              else
-                I18n.t('recipient_error', 'The course or group you have selected has no valid recipients')
-            else
-              I18n.t('unspecified_error', 'An unexpected error occurred, please try again')
-            )
-            @$form.find('.token_input').errorBox(errorText)
-          $('.error_box').filter(':visible').css('z-index', 10) # TODO: figure out why this is necessary
-      @$form.click =>
-        @toggleMessageActions off
+      @prepareTextareas(@$forwardForm.find('textarea'))
 
       @$addForm.submit (e) =>
         valid = !!(@$addForm.find('.token_input li').length)
@@ -426,9 +366,7 @@ define [
       @$addForm.formSubmit
         disableWhileLoading: true,
         success: (data) =>
-          @buildMessage(data.messages[0]).prependTo(@$messageList).slideDown 'fast'
-          @conversations.updateItems [data]
-          @resetMessageForm()
+          @updatedConversation(data)
           @$addForm.dialog('close')
         error: (data) =>
           @$addForm.dialog('close')
@@ -440,20 +378,18 @@ define [
       @$forwardForm.formSubmit
         disableWhileLoading: true,
         success: (data) =>
-          conversation = data[0]
-          @conversations.updateItems [conversation]
-          @updateHashData id: conversation.id
-          @resetMessageForm()
+          @updatedConversation(data)
           @$forwardForm.dialog('close')
         error: (data) =>
           @$forwardForm.dialog('close')
 
 
       @$messageList.click (e) =>
-        if $(e.target).closest('a.instructure_inline_media_comment').length
+        if $(e.target).closest('a.instructure_inline_media_comment, .mejs-container').length
           # a.instructure_inline_media_comment clicks have to propagate to the
           # top due to "live" handling; if it's one of those, it's not really
           # intended for us, just let it go
+          # also, dont catch clicks on mediaelementjs videos.  that is for play/pause
         else
           $message = $(e.target).closest('#messages > ul > li')
           unless $message.hasClass('generated')
@@ -469,8 +405,8 @@ define [
         @openMenu $(e.currentTarget)
 
       $(document).bind 'mousedown', (e) =>
-        unless $(e.target).closest("span.others").find('> span').length
-          $('span.others > span').hide()
+        unless $(e.target).closest("#others_popup").length
+          @$others.hide()
         @closeMenus() unless $(e.target).closest(".menus > li, #conversation_actions, #conversations .actions").length
 
       @$menuViews = $('#menu_views')
@@ -481,14 +417,16 @@ define [
           e.preventDefault()
           @updateHashData scope: scope
 
-      $('#conversations ul, #create_message_form').delegate '.audience', 'click', (e) =>
-        if ($others = $(e.target).closest('span.others').find('> span')).length
-          if not $(e.target).closest('span.others > span').length
-            $('span.others > span').not($others).hide()
-            $others.toggle()
-            $others.css('left', $others.parent().position().left)
-            $others.css('top', $others.parent().height() + $others.parent().position().top)
-          return false
+      $('#conversations ul, #create_message_form').on 'click', '.others', (e) =>
+        $this = $(e.currentTarget)
+        $container = $this.closest('li').offsetParent()
+        offset = $this.offsetFrom($container)
+        @$others.empty().append($this.find('> span').clone()).css
+          left: offset.left
+          top: offset.top + $this.height() + $container.scrollTop()
+          fontSize: $this.css('fontSize')
+        $container.append(@$others.show())
+        return false # i.e. don't select conversation
 
     setScope: (scope) ->
       $items = @$menuViewsList.find('li')
@@ -536,7 +474,7 @@ define [
             $(this).closest('li').data('id')
         $preview.find('> li').last().addClass('last')
         @$forwardForm.css('max-height', ($(window).height() - 300) + 'px')
-        .dialog('close').dialog
+        .dialog
           position: 'center'
           height: 'auto'
           width: 510
@@ -554,140 +492,40 @@ define [
           close: =>
             $('#forward_recipients').data('token_input').$input.blur()
 
-
-    initializeConversationActions: ->
       $('#action_compose_message').click (e) =>
         e.preventDefault()
         @updateHashData id: null
 
-      $('#action_add_recipients').click (e) =>
-        e.preventDefault()
-        return unless @conversations.active()?
-        @$addForm
-          .attr('action', @conversations.actionUrlFor($(e.currentTarget)))
-          .dialog('close').dialog
-            width: 420
-            title: I18n.t('title.add_recipients', 'Add Recipients')
-            buttons: [
-              {
-                text: I18n.t('buttons.add_people', 'Add People')
-                click: => @$addForm.submit()
-              }
-              {
-                text: I18n.t('#buttons.cancel', 'Cancel')
-                click: => @$addForm.dialog('close')
-              }
-            ]
-            open: =>
-              tokenInput = $('#add_recipients').data('token_input')
-              tokenInput.baseExclude = @conversations.active().get('audience')
-              @$addForm.find("input[name!=authenticity_token]").val('').change()
-            close: =>
-              $('#add_recipients').data('token_input').$input.blur()
+    addRecipients: ($node) ->
+      return unless @conversations.active()?
+      @$addForm
+        .attr('action', $node.prop('href'))
+        .dialog
+          width: 420
+          title: I18n.t('title.add_recipients', 'Add Recipients')
+          buttons: [
+            {
+              text: I18n.t('buttons.add_people', 'Add People')
+              click: => @$addForm.submit()
+            }
+            {
+              text: I18n.t('#buttons.cancel', 'Cancel')
+              click: => @$addForm.dialog('close')
+            }
+          ]
+          open: =>
+            tokenInput = $('#add_recipients').data('token_input')
+            tokenInput.baseExclude = @conversations.active().get('audience')
+            @$addForm.find("input[name!=authenticity_token]").val('').change()
+          close: =>
+            $('#add_recipients').data('token_input').$input.blur()
 
-    initializeTemplates: ->
-      nextAttachmentIndex = 0
-      $('#action_add_attachment').click (e) =>
-        e.preventDefault()
-        $attachment = $("#attachment_blank").clone(true)
-        $attachment.attr('id', null)
-        $attachment.find("input[type='file']").attr('name', 'attachments[' + (nextAttachmentIndex++) + ']')
-        $('#attachment_list').append($attachment)
-        $attachment.slideDown "fast", =>
-          @resize()
-        return false
-
-      $("#attachment_blank a.remove_link").click (e) =>
-        e.preventDefault()
-        $attachment = $(e.currentTarget).closest(".attachment")
-        $attachment.slideUp "fast", =>
-          @resize()
-          $attachment.remove()
-        return false
-
-      $('#action_media_comment').click (e) =>
-        e.preventDefault()
-        $("#create_message_form .media_comment").mediaComment 'create', 'any', (id, type) =>
-          $("#media_comment_id").val(id)
-          $("#media_comment_type").val(type)
-          $("#create_message_form .media_comment").show()
-          $("#action_media_comment").hide()
-
-      $('#create_message_form .media_comment a.remove_link').click (e) =>
-        e.preventDefault()
-        $("#media_comment_id").val('')
-        $("#media_comment_type").val('')
-        $("#create_message_form .media_comment").hide()
-        $("#action_media_comment").show()
-
-    buildContextInfo: (data) ->
-      match = data.id.match(/^(course|section)_(\d+)$/)
-      termInfo = @contexts["#{match[1]}s"][match[2]] if match
-
-      contextInfo = data.context_name or ''
-      contextInfo = if contextInfo.length < 40 then contextInfo else contextInfo.substr(0, 40) + '...'
-      if termInfo?.term
-        contextInfo = if contextInfo
-          "#{contextInfo} - #{termInfo.term}"
-        else
-          termInfo.term
-
-      if contextInfo
-        $('<span />', class: 'context_info').text("(#{contextInfo})")
-      else
-        ''
-    initializeTokenInputs: ->
-      buildPopulator = (pOptions={}) =>
-        (selector, $node, data, options={}) =>
-          data.id = "#{data.id}"
-          if data.avatar_url
-            $img = $('<img class="avatar" />')
-            $img.attr('src', data.avatar_url)
-            $node.append($img)
-          $b = $('<b />')
-          $b.text(data.name)
-          $name = $('<span />', class: 'name')
-          $contextInfo = @buildContextInfo(data) unless options.parent
-          $name.append($b, $contextInfo)
-          $span = $('<span />', class: 'details')
-          if data.common_courses?
-            $span.html(@htmlContextList({courses: data.common_courses, groups: data.common_groups}, hardCutoff: 2))
-          else if data.type and data.user_count?
-            $span.text(I18n.t('people_count', 'person', {count: data.user_count}))
-          else if data.item_count?
-            if data.id.match(/_groups$/)
-              $span.text(I18n.t('groups_count', 'group', {count: data.item_count}))
-            else if data.id.match(/_sections$/)
-              $span.text(I18n.t('sections_count', 'section', {count: data.item_count}))
-          else if data.subText
-            $span.text(data.subText)
-          $node.append($name, $span)
-          $node.attr('title', data.name)
-          text = data.name
-          if options.parent
-            if data.selectAll and data.noExpand # "Select All", e.g. course_123_all -> "Spanish 101: Everyone"
-              text = options.parent.data('text')
-            else if data.id.match(/_\d+_/) # e.g. course_123_teachers -> "Spanish 101: Teachers"
-              text = I18n.beforeLabel(options.parent.data('text')) + " " + text
-          $node.data('text', text)
-          $node.data('id', if data.type is 'context' or not pOptions.prefixUserIds then data.id else "user_#{data.id}")
-          data.rootId = options.ancestors[0]
-          $node.data('user_data', data)
-          $node.addClass(if data.type then data.type else 'user')
-          if options.level > 0 and selector.options.showToggles
-            $node.prepend('<a class="toggle"><i></i></a>')
-            $node.addClass('toggleable') unless data.item_count # can't toggle certain synthetic contexts, e.g. "Student Groups"
-          if data.type == 'context' and not data.noExpand
-            $node.prepend('<a class="expand"><i></i></a>')
-            $node.addClass('expandable')
-
-      placeholderText =  I18n.t('recipient_field_placeholder', "Enter a name, course, or group")
-      noResultsText = I18n.t('no_results', 'No results found')
+    initializeTokenInputs: ($scope) ->
       everyoneText  = I18n.t('enrollments_everyone', "Everyone")
       selectAllText = I18n.t('select_all', "Select All")
 
-      $('.recipients').tokenInput
-        placeholder: placeholderText
+      ($scope ? $(document)).find('.recipients').contextSearch
+        contexts: @contexts
         added: (data, $token, newToken) =>
           data.id = "#{data.id}"
           if newToken and data.rootId
@@ -699,99 +537,49 @@ define [
               $details = $('<span />')
               $details.text(I18n.t('people_count', 'person', {count: data.user_count}))
               $token.append($details)
+              $token.data('user_count', data.user_count)
           unless data.id.match(/^(course|group)_/)
             data = $.extend({}, data)
             delete data.avatar_url # since it's the wrong size and possibly a blank image
             currentData = @userCache[data.id] ? {}
             @userCache[data.id] = $.extend(currentData, data)
+        canToggle: (data) ->
+          data.type is 'user' or data.permissions?.send_messages_all
         selector:
-          messages: {noResults: noResultsText}
-          populator: buildPopulator()
-          limiter: (options) =>
-            if options.level > 0 then -1 else 5
           showToggles: true
-          preparer: (postData, data, parent) =>
-            context = postData.context
-            if not postData.search and context and data.length > 1
-              if context.match(/^(course|section)_\d+$/)
-                # i.e. we are listing synthetic contexts under a course or section
-                data.unshift
-                  id: "#{context}_all"
-                  name: everyoneText
-                  user_count: parent.data('user_data').user_count
-                  type: 'context'
-                  avatar_url: parent.data('user_data').avatar_url
-                  selectAll: true
-              else if context.match(/^((course|section)_\d+_.*|group_\d+)$/) and not context.match(/^course_\d+_(groups|sections)$/)
-                # i.e. we are listing all users in a group or synthetic context
-                data.unshift
-                  id: context
-                  name: selectAllText
-                  user_count: parent.data('user_data').user_count
-                  type: 'context'
-                  avatar_url: parent.data('user_data').avatar_url
-                  selectAll: true
-                  noExpand: true # just a magic select-all checkbox, you can't drill into it
+          includeEveryoneOption: (postData, parent) =>
+            # i.e. we are listing synthetic contexts under a course or section
+            if postData.context?.match(/^(course|section)_\d+$/)
+              everyoneText
+          includeSelectAllOption: (postData, parent) =>
+            # i.e. we are listing all users in a group or synthetic context
+            if postData.context?.match(/^((course|section)_\d+_.*|group_\d+)$/) and not postData.context?.match(/^(course|section)_\d+$/) and not postData.context?.match(/^course_\d+_(groups|sections)$/) and parent.data('user_data').permissions.send_messages_all
+              selectAllText
           baseData:
-            synthetic_contexts: 1
-          browser:
-            data:
-              per_page: -1
-              type: 'context'
+            permissions: ["send_messages_all"]
 
-      tokenInput = $('#recipients').data('token_input')
-      # since it doesn't infer percentage widths, just whatever the current pixels are
-      tokenInput.$fakeInput.css('width', '100%')
-      tokenInput.change = (tokens) =>
-        if tokens.length > 1 or tokens[0]?.match(/^(course|group)_/)
-          @$form.find('#group_conversation').attr('checked', false) if !@$form.find('#group_conversation_info').is(':visible')
-          @$form.find('#group_conversation_info').show()
-          @$form.find('#user_note_info').hide()
-        else
-          @$form.find('#group_conversation').attr('checked', false)
-          @$form.find('#group_conversation_info').hide()
-          @$form.find('#user_note_info').showIf((user = @userCache[tokens[0]]) and @canAddNotesFor(user))
-        @resize()
+      return if $scope
 
       @filterNameMap = {}
-      $('#context_tags').tokenInput
-        placeholder: placeholderText
+      $('#context_tags').contextSearch
+        contexts: @contexts
+        prefixUserIds: true
         added: (data, $token, newToken) =>
-          $token.prevAll().remove()
+          $token.prevAll().remove() # only one token at a time
         tokenWrapBuffer: 80
         selector:
-          messages: {noResults: noResultsText}
-          populator: buildPopulator(prefixUserIds: true)
-          limiter: (options) => 5
-          preparer: (postData, data, parent) =>
-            context = postData.context
-            if not postData.search and context and data.length > 0 and context.match(/^(course|group)_\d+$/)
-              if data.length > 1 and context.match(/^course_/)
-                data.unshift
-                  id: "#{context}_all"
-                  name: everyoneText
-                  user_count: parent.data('user_data').user_count
-                  type: 'context'
-                  avatar_url: parent.data('user_data').avatar_url
-              filterText = if context.match(/^course/)
-                I18n.t('filter_by_course', 'Fiter by this course')
-              else
-                I18n.t('filter_by_group', 'Fiter by this group')
-              data.unshift
-                id: context
-                name: parent.data('text')
-                type: 'context'
-                avatar_url: parent.data('user_data').avatar_url
-                subText: filterText
-                noExpand: true
+          includeEveryoneOption: (postData, parent) =>
+            if postData.context?.match(/^course_\d+$/)
+              everyoneText
+          includeFilterOption: (postData) =>
+            if postData.context?.match(/^course_\d+$/)
+              I18n.t('filter_by_course', 'Filter by this course')
+            else if postData.context?.match(/^group_\d+$/)
+              I18n.t('filter_by_group', 'Filter by this group')
           baseData:
             synthetic_contexts: 1
             types: ['course', 'user', 'group']
             include_inactive: true
-          browser:
-            data:
-              per_page: -1
-              types: ['context']
       filterInput = $('#context_tags').data('token_input')
       filterInput.change = (tokenValues) =>
         filters = for pair in filterInput.tokenPairs()
@@ -801,6 +589,13 @@ define [
 
     initializeConversationsPane: () ->
       @conversations = new ConversationsPane this, @$conversations
+
+    initializeMessageFormPane: () ->
+      @formPane = new MessageFormPane(this, folderId: @options.FOLDER_ID)
+
+    addedMessageForm: ($form) ->
+      @prepareTextareas($form.find('textarea'))
+      @initializeTokenInputs($form)
 
     initializeAutoResize: ->
       $(window).resize => @resize(50)
@@ -813,13 +608,15 @@ define [
         data = {}
       data
 
+    updateView: (force = false) =>
+      hash = location.hash
+      data = @currentHashData()
+      data.force = force
+      if data.filter
+        data.filter = (id for id in data.filter when @filterNameMap[id])
+        return @updateHashData(filter: null) if not data.filter.length
+      @setScope(data.scope)
+      @conversations.updateView(data)
+
     initializeHashChange: ->
-      $(window).bind 'hashchange', =>
-        hash = location.hash
-        data = @currentHashData()
-        if data.filter
-          data.filter = (id for id in data.filter when @filterNameMap[id])
-          return @updateHashData(filter: null) if not data.filter.length
-        @setScope(data.scope)
-        @conversations.updateView(data)
-      .triggerHandler('hashchange')
+      $(window).bind('hashchange', => @updateView()).triggerHandler('hashchange')

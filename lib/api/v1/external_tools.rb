@@ -26,17 +26,19 @@ module Api::V1::ExternalTools
   end
 
   def external_tool_json(tool, context, user, session)
+    methods = %w[privacy_level custom_fields]
+    methods += ContextExternalTool::EXTENSION_TYPES
     api_json(tool, user, session,
                   :only => %w(id name description url domain consumer_key created_at updated_at),
-                  :methods => %w[privacy_level custom_fields account_navigation user_navigation course_navigation editor_button resource_selection]
+                  :methods => methods
     )
   end
 
-  def tool_pagination_path
+  def tool_pagination_url
     if @context.is_a? Course
-      api_v1_course_external_tools_path(@context)
+      api_v1_course_external_tools_url(@context)
     else
-      api_v1_account_external_tools_path(@context)
+      api_v1_account_external_tools_url(@context)
     end
   end
 end

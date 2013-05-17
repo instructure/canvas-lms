@@ -35,11 +35,11 @@ def check_syntax(files)
       end
 
       raise "jsl needs to be in your $PATH, download from: javascriptlint.com" if `which jsl`.empty?
-      puts " --> Checking #{js_file} using jsl:"
       jsl_output = `jsl -process "#{file_path}" -nologo -conf "#{File.join(Rails.root, 'config', 'jslint.conf')}"`
       exit_status = $?.exitstatus
       if exit_status != 0
-        if jsl_output.match("warning: trailing comma is not legal in ECMA-262 object initializers")
+        puts " --> Error checking #{js_file} using jsl:"
+        if jsl_output.match("warning: trailing comma is not legal in ECMA-262 object initializers") || jsl_output.match("extra comma is not recommended in array initializers")
           exit_status = 2
           jsl_output << "fatal trailing comma found. Stupid IE!"
         end
@@ -92,14 +92,18 @@ namespace :canvas do
   end
 
   desc "Compile javascript and css assets."
-  task :compile_assets do
+  task :compile_assets, :generate_documentation do |t, args|
+    args.with_defaults(:generate_documentation => 'true')
+    generate_docs = args[:generate_documentation]
+    generate_docs = 'true' if !['true', 'false'].include?(args[:generate_documentation])
+
     puts "--> Compiling static assets [css]"
     Rake::Task['css:generate'].invoke
+    Rake::Task['css:styleguide'].invoke
 
     puts "--> Compiling static assets [jammit]"
     output = `bundle exec jammit 2>&1`
     raise "Error running jammit: \n#{output}\nABORTING" if $?.exitstatus != 0
-
     puts "--> Compiled static assets [css/jammit]"
 
     puts "--> Compiling static assets [javascript]"
@@ -111,8 +115,10 @@ namespace :canvas do
     puts "--> Optimizing JavaScript [r.js]"
     Rake::Task['js:build'].invoke
 
-    puts "--> Generating documentation [yardoc]"
-    Rake::Task['doc:api'].invoke
+    if generate_docs == 'true'
+      puts "--> Generating documentation [yardoc]"
+      Rake::Task['doc:api'].invoke
+      end
   end
 
   desc "Check static assets and generate api documentation."
@@ -165,17 +171,22 @@ namespace :db do
   end
 
   namespace :test do
-    unless Rake::Task.task_defined?('db:test:reset')
-      task :reset => [:environment, :load_config] do
-        raise "Run with RAILS_ENV=test" unless Rails.env.test?
-        config = ActiveRecord::Base.configurations['test']
-        queue = config['queue']
-        drop_database(queue) if queue rescue nil
-        drop_database(config) rescue nil
-        create_database(queue) if queue
-        create_database(config)
-        Rake::Task['db:migrate'].invoke
+    desc "Drop and regenerate the test db by running migrations"
+    task :reset => [:environment, :load_config] do
+      raise "Run with RAILS_ENV=test" unless Rails.env.test?
+      config = ActiveRecord::Base.configurations['test']
+      queue = config['queue']
+      drop_database(queue) if queue rescue nil
+      drop_database(config) rescue nil
+      Canvas::Cassandra::Database.config_names.each do |cass_config|
+        db = Canvas::Cassandra::Database.from_config(cass_config)
+        db.keyspace_information.tables.each do |table|
+          db.execute("DROP TABLE #{table}")
+        end
       end
+      create_database(queue) if queue
+      create_database(config)
+      Rake::Task['db:migrate'].invoke
     end
   end
 end

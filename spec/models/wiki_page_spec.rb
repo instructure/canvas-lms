@@ -1,3 +1,4 @@
+# coding: utf-8
 #
 # Copyright (C) 2011 Instructure, Inc.
 #
@@ -44,6 +45,12 @@ describe WikiPage do
     @course.wiki.wiki_pages.new(:title => "asdf").valid?.should be_true
   end
 
+  it "should transliterate unicode characters in the title for the url" do
+    course_with_teacher(:active_all => true)
+    page = @course.wiki.wiki_pages.create!(:title => "æ vęrÿ ßpéçïâł なまえ ¼‽")
+    page.url.should == 'ae-very-sspecial-namae-1-slash-4'
+  end
+
   it "should make the title/url unique" do
     course_with_teacher(:active_all => true)
     p1 = @course.wiki.wiki_pages.create(:title => "Asdf")
@@ -81,7 +88,7 @@ describe WikiPage do
     p1.save.should be_true
     p1.title.should eql('Asdf')
     p1.url.should eql('asdf')
-    
+
     p1.workflow_state = 'active'
     p1.save.should be_true
     p1.title.should eql('Asdf-2')
@@ -98,6 +105,22 @@ describe WikiPage do
       new_p.title.should eql(p.title)
       new_p.should_not eql(p)
       new_p.wiki.should_not eql(p.wiki)
+    end
+  end
+
+  describe '#editing_role?' do
+    it 'is true if the editing roles include teachers and the user is a teacher' do
+      course_with_teacher(:active_all => true)
+      page = @course.wiki.wiki_pages.create(:title => "some page", :editing_roles => 'teachers', :hide_from_students => true)
+      teacher = @course.teachers.first
+      page.editing_role?(teacher).should be_true
+    end
+
+    it 'is true for students who are in the course' do
+      course_with_student(:active_all => true)
+      page = @course.wiki.wiki_pages.create(:title => "some page", :editing_roles => 'students', :hide_from_students => false)
+      student = @course.students.first
+      page.editing_role?(student).should be_true
     end
   end
 end

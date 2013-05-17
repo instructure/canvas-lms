@@ -6,12 +6,13 @@
 require([
   'i18nObj' /* I18n.t */,
   'jquery' /* $ */,
+  'str/htmlEscape',
   'jquery.fancyplaceholder' /* fancyPlaceholder */,
   'jquery.google-analytics' /* trackPage, trackPageview */,
   'jquery.instructure_forms' /* formSubmit, getFormData, formErrors, errorBox */,
   'jquery.loadingImg' /* loadingImage */,
-  'compiled/jquery.rails_flash_notifications'
-], function(I18n, $) {
+  'compiled/jquery.rails_flash_notifications',
+], function(I18n, $, htmlEscape) {
 
 $(document).ready(function() {
   $("#register_link").click(function(){
@@ -27,7 +28,7 @@ $(document).ready(function() {
     },
     success: function(data) {
       $(this).loadingImage('remove');
-      $.flashMessage(<%= jt("#pseudonyms.login.password_confirmation_sent", "Password confirmation sent to %{email_address}. Make sure you check your spam box.", '{email_address: $(this).find(".email_address").val()}') %>);
+      $.flashMessage(htmlEscape(<%= jt("#pseudonyms.login.password_confirmation_sent", "Password confirmation sent to %{email_address}. Make sure you check your spam box.", '{email_address: $(this).find(".email_address").val()}') %>));
       $(".login_link:first").click();
     },
     error: function(data) {
@@ -69,7 +70,6 @@ $(document).ready(function() {
 </script>
 <% end %>
 <% login_handle_name = @domain_root_account.login_handle_name rescue AccountAuthorizationConfig.default_login_handle_name %>
-<% @is_delegated = @domain_root_account.delegated_authentication? if @domain_root_account and @is_delegated.nil? %>
 <div id="modal-box" class="login-box">
     <div id="modal-box-inner">
     <h1>Canvas</h1>
@@ -86,11 +86,11 @@ $(document).ready(function() {
              login_message = t('login_at_account', "Log in at %{school_name}", :school_name => @domain_root_account.display_name)
            end
         %>
-        <a href="<%= login_path %>" style="font-size: 1.3em;" class="button"><%= login_message %></a>
+        <a href="<%= login_path %>" style="font-size: 1.3em;" class="btn"><%= login_message %></a>
       </div>
     <% else %>
-      <% form_for :pseudonym_session, :url => login_path, :html => {:id => "login_form"} do |f| %>
-        <%= link_to t("register_for_canvas", "*Need a Canvas Account?* **Click Here, It's Free!**", :wrapper => {'*' => '<i>\1</i>', '**' => '<b>\1</b>'}),  Setting.get_cached("registration_link", "/register_from_website"), :id => 'register_link', :class => 'not_external' if @domain_root_account == Account.default && @domain_root_account.open_registration? && @domain_root_account.no_enrollments_can_create_courses? && !hide_fft %>
+      <% form_for :pseudonym_session, :url => login_path(:nonldap => (@domain_root_account && !@domain_root_account.ldap_authentication?).presence), :html => {:id => "login_form"} do |f| %>
+        <%= link_to t("register_for_canvas", "*Need a Canvas Account?* **Click Here, It's Free!**", :wrapper => {'*' => '<i>\1</i>', '**' => '<b>\1</b>'}),  Setting.get_cached("registration_link", "/register_from_website"), :id => 'register_link', :class => 'not_external' if @domain_root_account.self_registration? && !hide_fft %>
         <h2 class="ui-helper-hidden-accessible"><%= t('log_in', 'Log In') %></h2>
         <% login_inner_dialog = yield :login_inner_dialog %>
         <%= login_inner_dialog if login_inner_dialog && !login_inner_dialog.strip.empty? %>
@@ -101,12 +101,20 @@ $(document).ready(function() {
         </div>
         <div>
           <div class="login-options">
-            <%= f.check_box :remember_me, :checked => session[:used_remember_me_token] %> <%= f.label :remember_me, :en => "Stay signed in" %>
+            <% unless session_timeout_enabled %>
+              <%= f.check_box :remember_me, :checked => session[:used_remember_me_token] %>
+              <%= f.label :remember_me, :en => "Stay signed in" %>
+            <% end %>
+
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <% url = (params[:canvas_login] != '1' && @domain_root_account.try(:forgot_password_external_url)) || "#" %><br />
             <%= link_to t('dont_know_password', "Don't know your password?"), url, :class => (url != '#' ? "not_external" : "forgot_password_link"), :id => "login_forgot_password" %>
           </div>
-          <button type="submit" class="button btn-primary"><%= t('log_in', 'Log In') %></button> 
+
+          <!-- crazy IE 8-9 workaround!, if you take this input type=submit out, you cannot just submit the form by hitting enter in ie8-9 -->
+          <input type="submit" style="position: absolute; height: 0px; width: 0px; border: none; padding: 0px;" hidefocus="true" tabindex="-1" />
+
+          <button type="submit" class="btn btn-primary"><%= t('log_in', 'Log In') %></button>
         </div>
       <% end %>
     <% end %>
@@ -116,7 +124,7 @@ $(document).ready(function() {
       <p><%= t('login_handle', "Enter your %{login_handle_name} and we'll send you a link to change your password.", :login_handle_name => login_handle_name) %></p>
       <div>
         <span class=" field-with-fancyplaceholder"><label for="pseudonym_session_unique_id_forgot"><%= login_handle_name %></label><input class="email_address text" type="text" name="pseudonym_session[unique_id_forgot]" value="<%= @unauthorized_user.email rescue '' %>" id="pseudonym_session_unique_id_forgot" /></span>
-        <button type="submit" class="button btn-primary"><%= t('buttons.request_password', 'Request Password') %></button>
+        <button type="submit" class="btn btn-primary"><%= t('buttons.request_password', 'Request Password') %></button>
       </div>
   
       &larr; <%= link_to t('back_to_login', "Back to Login"), login_path, :class => "login_link" %>

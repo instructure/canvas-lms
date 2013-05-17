@@ -5,7 +5,7 @@ class LoadAccount
 
   def call(env)
     Account.clear_special_account_cache!
-    domain_root_account = LoadAccount.default_domain_root_account
+    domain_root_account = ::LoadAccount.default_domain_root_account
     configure_for_root_account(domain_root_account)
 
     env['canvas.domain_root_account'] = domain_root_account

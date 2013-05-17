@@ -1,0 +1,85 @@
+{"status":"ok", "itm":[
+  {
+    "title":"United States",
+    "guid":"US",
+    "type":"country",
+    "itm":[
+      {
+        "title":"NGA Center/CCSSO",
+        "guid":"aaaaaaaaaa",
+        "type":"authority",
+        "itm":[
+          {
+            "title":"Common Core State Standards",
+            "guid":"bbbbbbbbbbbb",
+            "type":"document",
+            "itm":[
+              {
+                "title":"College- and Career-Readiness Standards and K-12 Mathematics",
+                "guid":"cccccccccc",
+                "type":"subject",
+                "meta":{
+                  "content":"2010",
+                  "name":"year"
+                },
+                "itm":[
+                  {
+                    "title":"First Grade",
+                    "guid":"jjjjjjjjjjj",
+                    "type":"grade",
+                    "meta":{
+                      "hi":"1",
+                      "lo":"1",
+                      "name":"grade"
+                    },
+                    "itm":[
+                      {
+                        "guid":"kkkkkkkkkkk",
+                        "type":"standard",
+                        "meta":{
+                          "num":{
+                            "content":"1.DD"
+                          },
+                          "descr":{
+                            "content":"zéééééééééééééééééééééééééééééééééééééééééééééééééééééééééé"
+                          }
+                        },
+                        "itm":[
+                          {
+                            "guid":"lllllllll",
+                            "type":"standard",
+                            "meta":{
+                              "num":{},
+                              "descr":{
+                                "content":"Something else"
+                              }
+                            },
+                            "itm":[
+                              {
+                                "guid":"mmmmmmmmmmm",
+                                "type":"standard",
+                                "meta":{
+                                  "num":{
+                                    "content":"1"
+                                  },
+                                  "descr":{
+                                    "content":"And something else"
+                                  }
+                                },
+                                "chld":"0"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]}

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -25,10 +25,11 @@ describe AppointmentGroup do
     end
 
     it "should ensure the course section matches the course" do
+      other_section = Course.create!.default_section
       AppointmentGroup.new(
         :title => "test",
         :contexts => [@course],
-        :sub_context_codes => [CourseSection.create.asset_string]
+        :sub_context_codes => [other_section.asset_string]
       ).should_not be_valid
     end
 

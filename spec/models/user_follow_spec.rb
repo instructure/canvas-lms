@@ -38,7 +38,7 @@ describe "UserFollow" do
   end
 
   context "across shards" do
-    it_should_behave_like "sharding"
+    specs_require_sharding
 
     before do
       @user1 = user_model
@@ -53,7 +53,7 @@ describe "UserFollow" do
     it "should delete on the other shard on un-follow" do
       @uf = @user1.user_follows.create!(:followed_item => @collection)
       @uf.shard.should == Shard.default
-      @uf2 = @collection.shard.activate { UserFollow.first(:conditions => { :following_user_id => @user1.id, :followed_item_id => @collection.id }) }
+      @uf2 = @collection.shard.activate { UserFollow.where(:following_user_id => @user1, :followed_item_id => @collection).first }
       @uf2.shard.should == @collection.shard
       @uf.destroy
       expect { @collection.shard.activate { @uf2.reload } }.to raise_error(ActiveRecord::RecordNotFound)
@@ -62,7 +62,7 @@ describe "UserFollow" do
     it "should delete from the other shard to the current" do
       @uf = @user1.user_follows.create!(:followed_item => @collection)
       @uf.shard.should == Shard.default
-      @uf2 = @collection.shard.activate { UserFollow.first(:conditions => { :following_user_id => @user1.id, :followed_item_id => @collection.id }) }
+      @uf2 = @collection.shard.activate { UserFollow.where(:following_user_id => @user1, :followed_item_id => @collection).first }
       @uf2.shard.should == @collection.shard
       @uf2.destroy
       expect { @uf.reload }.to raise_error(ActiveRecord::RecordNotFound)
@@ -112,7 +112,7 @@ describe "UserFollow" do
       it_should_behave_like "sharded user following"
 
       before do
-        @uf = @user1.user_follows.create!(:followed_item => @collection)
+        @uf = UserFollow.create_follow(@user1, @collection)
         @uf.shard.should == @user1.shard
       end
     end
@@ -121,7 +121,7 @@ describe "UserFollow" do
       it_should_behave_like "sharded user following"
 
       before do
-        @uf = @collection.shard.activate { UserFollow.create!(:following_user => @user1, :followed_item => @collection) }
+        @uf = @collection.shard.activate { UserFollow.create_follow(@user1, @collection) }
         @uf.shard.should == @user1.shard
       end
     end
@@ -130,7 +130,7 @@ describe "UserFollow" do
       it_should_behave_like "sharded user following"
 
       before do
-        @uf = @shard2.activate { UserFollow.create!(:following_user => @user1, :followed_item => @collection) }
+        @uf = @shard2.activate { UserFollow.create_follow(@user1, @collection) }
         @uf.shard.should == @user1.shard
       end
     end

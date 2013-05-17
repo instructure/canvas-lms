@@ -17,6 +17,7 @@
  */
 
 define([
+  'underscore',
   'INST' /* INST */,
   'i18n!files',
   'jquery' /* jQuery, $ */,
@@ -40,9 +41,8 @@ define([
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'jqueryui/droppable' /* /\.droppable/ */,
   'jqueryui/progressbar' /* /\.progressbar/ */,
-  'jqueryui/sortable' /* /\.sortable/ */,
   'vendor/scribd.view' /* scribd */
-], function(INST, I18n, $, htmlEscape) {
+], function(_, INST, I18n, $, htmlEscape) {
 
   var files = {};
   var fileStructureData = [];
@@ -63,6 +63,7 @@ define([
         $files_structure_list = $("#files_structure_list");
         $files_content.prepend($swfupload_holder);
         files.clearDataCache.cacheIndex = 0;
+
         for(var idx in contexts) {
           var obj = {
             context: contexts[idx],
@@ -77,6 +78,7 @@ define([
             obj, {}
           ]);
         }
+
         for(var idx in fileStructureData) {
           if(fileStructureData[idx]) {
             var context = fileStructureData[idx][0];
@@ -155,8 +157,7 @@ define([
                 var $progress = $dialog.find(".progress");
                 $progress.css('margin', '10px');
                 $progress.progressbar();
-                $dialog.dialog('close').dialog({
-                  autoOpen: false,
+                $dialog.dialog({
                   title: I18n.t('titles.extracting', "Extracting Files into Folder"),
                   close: function() {
                     $dialog.data('closed', true);
@@ -164,7 +165,7 @@ define([
                       $dialog.detach();
                     }, 500);
                   }
-                }).dialog('open');
+                });
                 
                 var importFailed = function(errors) {
                   $dialog.text(I18n.t('errors.extracting', "There were errors extracting the zip file.  Please try again."));
@@ -177,6 +178,7 @@ define([
                   }
                   $dialog.append($ul);
                 };
+
                 var pollImport = function(zip_import_id) {
                   var pollUrl = $("#file_context_links ." + folder.context_string + "_zip_import_status_url").attr('href');
                   pollUrl = $.replaceTags(pollUrl, 'id', zip_import_id);
@@ -231,9 +233,11 @@ define([
               } else {
                 var folder = files.currentItemData();
                 var filenames = [];
+
                 for (idx in filesToUpload) {
                   filenames.push(filesToUpload[idx].name);
                 }
+
                 files.preflight(folder.id, folder.context_string, filenames,
                   function(duplicate_handling_method) { // onChooseDuplicateHandler
                     for (idx in filesToUpload) {
@@ -264,26 +268,30 @@ define([
             var $dialog = $("#duplicate_filename_dialog");
             $dialog.find(".duplicate_filename_prompt").text(
               I18n.t('prompts.duplicate_filenames', "Files with the following names already exist in this folder. Do you want to replace them, or rename the new files with unique names?"));
+
             var duplicatesHtml = '';
             for (idx in data.duplicates) {
               duplicatesHtml += "<span class='duplicate_filename'>" + htmlEscape(data.duplicates[idx]) + "</span>";
             }
+
             $dialog.find(".duplicate_filenames").html(duplicatesHtml);
-            $dialog.dialog('close').dialog({
-              autoOpen: false,
+            $dialog.dialog({
               title: '',
               width: 500
-            }).dialog('open');
+            });
+
             $dialog.find("button").unbind('click');
             $dialog.find(".cancel_button").click(function() {
               on_cancel();
               $dialog.dialog('close');
             });
+
             $dialog.find(".rename_button").click(function() {
               on_choose('rename');
               on_success();
               $dialog.dialog('close');
             });
+
             $dialog.find(".overwrite_button").click(function() {
               on_choose('overwrite');
               on_success();
@@ -355,19 +363,26 @@ define([
           return;
         }
         files.gettingFiles[key] = true;
+
         var url = $.replaceTags($("#file_context_links ." + original_folder.context_string + "_folder_url").attr('href'), 'id', original_folder.id);
         $.ajaxJSON(url, 'GET', {}, function(data) {
           files.gettingFiles[key] = false;
           var folder = data.actual_folder.folder;
           folder.includes_files = true;
           files.updateFolder(original_folder.context_string, {folder: folder, already_in_place: true}, false);
+
+          // returns adds an empty string to ensure .toLowerCase() isn't calling on an undefined object
+          data.files = _.sortBy(data.files, function(obj){ return (obj.attachment.display_name || "").toLowerCase() });
+
           for(var idx in data.files) {
             var file = data.files[idx].attachment;
             if(file) {
               files.updateFile(original_folder.context_string, {attachment: file, definitely_new: true}, false);
             }
           }
+
           $files_structure.find(".folder_" + folder.id).triggerHandler('files_load');
+
           var needsRefreshing = $files_content.find(".message.no_content:visible").length > 0;
           if(refresh !== false || needsRefreshing) {
             if(refresh && $.isFunction(refresh)) {
@@ -376,6 +391,7 @@ define([
               files.refreshView();
             }
           }
+
           $add_file_link.triggerHandler('show');
         }, function(data) {
           files.gettingFiles[key] = false;
@@ -413,11 +429,6 @@ define([
         }
       },
       nodeFromPath: function(path) {
-        try {
-          if($files_structure.find("#files_structure_list > li." + path).length > 0) {
-            return $files_structure.find("#files_structure_list > li." + path);
-          }
-        } catch(e) {}
         var names = path.replace(/\/\//g, "\\").split('/');
         var $node = $files_structure;
         var keepGoing = true;
@@ -583,8 +594,11 @@ define([
       },
       refreshContext: function(context_string, callback) {
         files.refreshContext.refreshing = files.refreshContext.refreshing || {};
+
         if(files.refreshContext.refreshing[context_string]) { return; }
+
         files.refreshContext.refreshing[context_string] = true;
+
         var url = $("#file_context_links ." + context_string + "_attachments_url").attr('href');
         $.ajaxJSON(url, 'GET', {}, function(data) {
           files.clearDataCache();
@@ -596,6 +610,7 @@ define([
             if(context.context_string == context_string) {
               context_name = context.context_name;
               fileStructureData[idx][0].context.includes_files = true;
+
               for(var jdx in data.folders) {
                 for(var kdx in fileStructureData[idx][1].folders) {
                   if(fileStructureData[idx][1].folders[kdx].id == data.folders[jdx].id) {
@@ -603,15 +618,19 @@ define([
                   }
                 }
               }
+
               data.files = data.files || [];
               for(var jdx in fileStructureData[idx][1].files) {
                 data.files.push(fileStructureData[idx][1].files[jdx]);
               }
+
               fileStructureData[idx][1] = data;
             }
           }
+
           var $context = $("#files_structure > ul > li.context." + context_string).filter(":first");
           if($context.length === 0) { $context = null; }
+
           var opens = [];
           var openRoot = false;
           if($context) {
@@ -621,6 +640,7 @@ define([
               opens.push(files.itemData($(this)).id);
             });
           }
+
           var context_type = null;
           for(var idx in data.contexts) {
             for(var jdx in data.contexts[idx]) {
@@ -630,23 +650,30 @@ define([
               }
             }
           }
+
           var root_folder = null;
           if(!data.folders && data[0] && data[0][1] && data[0][1].folders) {
             data.folders = data[0][1].folders;
           }
+
           for(var idx in data.folders) {
             if(!root_folder && data.folders[idx].folder && data.folders[idx].folder.parent_folder_id === null) {
               root_folder = data.folders[idx].folder;
             }
           }
+
           var $context_folder = $context;
           if(!$context_folder || $context_folder.length === 0) {
-            $context_folder = $files_structure.find(".folder_blank").clone(true).removeClass('folder_blank');
+            $context_folder = $files_structure.find(".folder_blank")
+                                              .clone(true)
+                                              .removeClass('folder_blank');
           }
+
           $context_folder.children(".name").text(context_name);
           $context_folder.children(".id").text(root_folder.id);
           $context_folder.addClass('context folder folder_' + root_folder.id + ' ' + context_string);
           $context_folder.find("li").addClass('to_be_removed');
+
           var $ul = $context_folder.children("ul");
           var addChildren = function($parent_folder, folder) {
             for(var jdx in data.folders) {
@@ -666,46 +693,36 @@ define([
               }
             }
           };
+
+          // returns adds an empty string to ensure .toLowerCase() isn't calling on an undefined object
+          data.folders = _.sortBy(data.folders, function(obj){ return (obj.folder.name || "").toLowerCase() });
+
           for(var idx in data.folders) {
             if(data.folders[idx].folder.parent_folder_id == root_folder.id) {
               var $folder = $ul.find(".folder_" + data.folders[idx].folder.id);
+
               if($folder.length === 0) {
                 $folder = $files_structure.find(".folder_blank").clone(true).removeClass('folder_blank');
                 $folder.addClass('folder folder_' + data.folders[idx].folder.id);
                 $folder.children(".name").text(data.folders[idx].folder.name);
                 $folder.children(".id").text(data.folders[idx].folder.id);
               }
+
               $folder.removeClass('to_be_removed');
               addChildren($folder, data.folders[idx].folder);
+
+              // Check to see if this folder is attached to the dom.
               if($folder.parents("body").length === 0) {
                 $ul.append($folder.show());
               }
             }
           }
-          if(data.collaborations && !context_string.match(/^user_/)) {
-            var $collaborations = $files_structure.find(".folder_blank").clone(true).removeClass('folder_blank');
-            $collaborations.addClass('collaborations');
-            $collaborations.fillTemplateData({data: {name: "collaborations"}});
-            for(var idx in data.collaborations) {
-              var collaboration = data.collaborations[idx].collaboration || data.collaborations[idx].google_docs_collaboration || data.collaborations[idx].etherpad_collaboration;
-              var $file = $(".collaboration_" + collaboration.id);
-              if($file.length === 0) {
-                $file = $files_structure.find(".file_blank").clone(true).removeClass('file_blank');
-                $file.addClass('collaboration_' + data.collaborations[idx].collaboration.id);
-                $file.addClass('collaboration ' + data.collaborations[idx].collaboration.collaboration_type);
-                $file.fillTemplateData({data: {name: data.collaborations[idx].collaboration.title, id: data.collaborations[idx].collaboration.id}});
-              }
-              $file.removeClass('to_be_removed');
-              if($file.parents("body").length === 0) {
-                $collaborations.children("ul").append($file.show());
-              }
-            }
-            $ul.append($collaborations.show());
-          }
+
           var group_names = {};
           for(var idx in data.groups) {
             group_names[(data.groups[idx].group || data.groups[idx].course_assigned_group).category] = true;
           }
+
           for(var idx in group_names) {
             var $category = $files_structure.find(".folder_blank").clone(true).removeClass('folder_blank');
             $category.fillTemplateData({data: {name: idx}});
@@ -737,6 +754,7 @@ define([
             }
             $ul.append($category.show());
           }
+
           var found = false;
           $context_folder.find(".to_be_removed").remove();
           $files_structure.find("#files_structure_list > .folder").each(function() {
@@ -749,14 +767,17 @@ define([
               found = true;
             }
           });
+
           if(!found) {
             $files_structure.find("#files_structure_list").append($context_folder.show());
           }
+
           $context_folder.children(".text").droppable(files.droppable_options);
           $context_folder.find(".folder > .text").droppable(files.droppable_options);
           for(var idx in opens) {
             files.expandFolder($context_folder.find(".folder_" + opens[idx]));
           }
+
           if(openRoot) {
             files.expandFolder($context_folder);
           }
@@ -776,10 +797,6 @@ define([
         var context = files.currentContext();
         if(context && context.permissions && context.permissions.manage_files) {
           $files_content.find(".folder.draggable_droppable").droppable(files.droppable_options);
-          $files_content.sortable('enable');
-          $files_content.sortable('refresh');
-        } else {
-          $files_content.sortable('disable').removeClass('ui-state-disabled');
         }
         if(files.canManageAContext) {
           $files_content.find(".folder.draggable_droppable").draggable(files.draggable_options);
@@ -816,6 +833,7 @@ define([
           }
           $files_content.scrollTop(scrollTop);
         };
+
         var $li = $("<li class='catcher'>&nbsp;</li>");
         if(!files.watchingScroll) {
           $files_content.bind('scroll', function(event) {
@@ -836,76 +854,90 @@ define([
         var data = files.itemData($item);
         if(!data || !data.id) { return; }
         var isNew = false;
+
         if($item.hasClass('node')) {
           var $content = $files_content.find(".folder_" + data.id);
+
           if($content.length === 0) {
+            var folder_url = $.replaceTags($("." + data.context_string + "_folder_url")
+                              .attr('href'), 'id', data.id);
             isNew = true;
             $content = $("#content_templates .folder:first").clone(true);
-            if(hidden) {
-              $content.hide();
-            }
-            $content.fillTemplateData({
-              data: data
-            });
-            $content.data('parent_node', $item.parent().parent());
-            var folder_url = $.replaceTags($("." + data.context_string + "_folder_url").attr('href'), 'id', data.id);
-            $content.find(".rename_item_link,.delete_item_link,.folder_url").attr('href', folder_url);
-            $content.addClass('folder_' + data.id);
-            $content.find(".item_icon.draggable").attr('title', I18n.t('titles.click_and_drag', 'Click and drag to move folder to another folder'));
-            $content.data('node', $item);
+
+            if(hidden) $content.hide();
+
+            $content.fillTemplateData({ data: data })
+                    .data({'node': $item, 'parent_node': $item.parent().parent()})
+                    .addClass('folder_' + data.id);
+
+            $content.find(".rename_item_link,.delete_item_link,.folder_url")
+                    .attr('href', folder_url);
+
+            $content.find(".item_icon.draggable")
+                    .attr('title', I18n.t('titles.click_and_drag', 'Click and drag to move folder to another folder'));
           }
-          $content.toggleClass('editable_folder_item', !!(!$item.hasClass('context') && ((data.context && data.context.permissions && data.context.permissions.manage_files) || (data.permissions && data.permissions.update))));
+
+          $content.toggleClass('editable_folder_item', !!(!$item.hasClass('context') && 
+                (( data.context &&
+                   data.context.permissions && 
+                   data.context.permissions.manage_files) || 
+                 (data.permissions && data.permissions.update)
+                )))
+
           $content.removeClass('to_be_removed');
           $content.find(".item_icon").toggleClass('draggable', $content.hasClass('editable_folder_item'));
-          $content.find(".item_icon").attr('alt', 'Folder').attr('src', $("#content_blank_icon").attr('src'));
+          $content.find(".item_icon")
+                  .attr('alt', I18n.t('alts.folder', 'Folder'))
+                  .attr('src', $("#content_blank_icon").attr('src'));
+
           if(data && data.currently_locked) {
-            $content.find(".item_icon").attr('alt', I18n.t('alts.folder_locked', 'Locked Folder'))
-              .attr('src', $("#content_locked_icon").attr('src'));
+            $content.find(".item_icon")
+                    .attr('alt', I18n.t('alts.folder_locked', 'Locked Folder'))
+                    .attr('src', $("#content_locked_icon").attr('src'));
           }
+
           $content.find(".lock_item_link").showIf(!data.currently_locked);
           $content.find(".unlock_item_link").showIf(data.currently_locked);
-          $content.toggleClass('folder_locked', !!(data && data.currently_locked));
-          $content.toggleClass('draggable_droppable', $item.hasClass('folder') && !$item.hasClass('context'));
+          $content.toggleClass('folder_locked', !!(data && data.currently_locked))
+                  .toggleClass('draggable_droppable', $item.hasClass('folder') && !$item.hasClass('context'));
+
           if(isNew) {
-            $files_content.append($content);
-          }
-        } else if($item.hasClass('collaboration')) {
-          // set the edit and delete urls, for sure
-          var $content = $files_content.find(".collaboration_" + data.id);
-          if($content.length === 0) {
-            isNew = true;
-            $content = $("#content_templates .collaboration:first").clone(true);
-            if(hidden) {
-              $content.hide();
-            }
-            $content.fillTemplateData({
-              data: data
+            var folders = _.filter(fileStructureData[0][1].folders, function(obj){
+              return obj.folder.parent_folder_id === data.parent_folder_id
             });
-            $content.data('parent_node', $item.parent().parent());
-            $content.data('node', $item);
-            var collaboration_url = $.replaceTags($("." + data.context_string + "_collaboration_url").attr('href'), "id", data.id);
-            $content.find(".collaboration_url").attr('href', collaboration_url);
-            $content.addClass('collaboration_' + data.id);
-            $content.addClass(data.collaboration_type);
+
+            var folder = _.find(folders, function(obj){ 
+              return obj.folder.name == data.name;
+            });
+
+            var index = _.indexOf(folders, folder);
+            $target = $files_content.find("li.folder_item.folder")
+                                    .eq(index);
+
+            $files = $files_content.children('li.folder_item.file');
+            if ($target.length){
+              $target.before($content);
+            }else if($files && $files.length){
+              $files.first()
+                    .before($content);
+            } else{
+              $files_content.append($content);
+            } 
           }
-          $content.toggleClass('editable_folder_item', !!(data.permissions && data.permissions.update));
-          $content.removeClass('to_be_removed');
-          $content.find(".item_icon").attr('alt', I18n.t('alts.collaboration', 'Collaboration')).attr('src', $("#content_blank_icon").attr('src'));
-          if(isNew) {
-            $files_content.append($content);
-          }
+          // Else it's a file
         } else {
           var $content = $files_content.find(".file_" + data.id);
+
           if($content.length === 0) {
             isNew = true;
             $content = $("#content_templates .file:first").clone(true);
-            if(hidden) {
-              $content.hide();
-            }
+
+            if (hidden) $content.hide();
+
             var file_url = $.replaceTags($("#file_context_links ." + data.context_string + "_attachment_url").attr('href'), "id", data.id);
             var download_url = $.replaceTags($("#file_context_links ." + data.context_string + "_download_attachment_url").attr('href'), "id", data.id);
-            $content
-              .fillTemplateData({
+
+            $content.fillTemplateData({
                 data: data
               })
               .data({
@@ -917,6 +949,7 @@ define([
             $content.find(".download_url").attr('href', download_url);
             $content.find(".item_icon.draggable").attr('title', 'Click and drag to move file to another folder');
           }
+
           $content
             .toggleClass('editable_folder_item', !!((data.context && data.context.permissions && data.context.permissions.manage_files) || (data.permissions && data.permissions.update)))
             .removeClass('to_be_removed')
@@ -925,12 +958,14 @@ define([
                 alt: I18n.t('alts.file', 'File'),
                 src: $("#content_blank_icon").attr('src')
               });
+
           if(data && data.currently_locked) {
             $content.find(".item_icon").attr({
               alt: I18n.t('alts.locked_file', 'Locked File'),
               src: $("#content_locked_icon").attr('src')
             });
           }
+
           $content.find(".lock_item_link").showIf(!data.currently_locked);
           $content.find(".unlock_item_link").showIf(data.currently_locked);
           $content.find(".preview_item_link").showIf(data.scribd_doc || data.content_type.match(/image/) || (data.content_type.match(/(video|audio)/) && data.media_entry_id));
@@ -939,146 +974,125 @@ define([
           $content.find(".edit_item_content_link_holder").showIf($content.hasClass('editable_folder_item') && data.context_type != 'User' && ($content.hasClass('text') || $content.hasClass('html') || $content.hasClass('code')));
           $content.find(".item_icon").toggleClass('draggable', $content.hasClass('editable_folder_item'));
           if(isNew) {
-            $files_content.append($content);
+
+            var folder_files = _.filter(fileStructureData[0][1].files, function(obj){
+              return obj.attachment.folder_id === data.folder_id
+            });
+
+            var folder_file = _.find(folder_files, function(obj){ 
+              return obj.attachment.display_name === data.display_name;
+            });
+
+            var index = _.indexOf(folder_files, folder_file);
+            $target = $files_content.find("li.folder_item.file")
+                                    .eq(index);
+
+            ($target.length) ? $target.before($content) : $files_content.append($content);
+            
           }
         }
         return isNew;
       },
-      reorderContent: function(folder_id, subcontent) {
-        var attachments = [];
-        var folders = [];
-        for(var idx = 0; idx < subcontent.length; idx++) {
-          if(subcontent[idx].attachment) {
-            attachments.push(subcontent[idx]);
-          } else if(subcontent[idx].folder) {
-            folders.push(subcontent[idx]);
-          }
-        }
-        $files_structure.find(".folder_" + folder_id).each(function() {
-          var $folder = $(this);
-          var $folders = [];
-          var $files = [];
-          $folder.children("ul").children("li").each(function() {
-            if($(this).hasClass('file')) {
-              $files.push($(this));
-            } else {
-              $folders.push($(this));
-            }
-          });
-          $files = $files.sort(function($a, $b) {
-            var a = files.itemData($a);
-            var b = files.itemData($b);
-            return a.position - b.position;
-          });
-          for(var idx in $files) {
-            $folder.children("ul").append($files[idx].prev(".separator"));
-            $folder.children("ul").append($files[idx]);
-          }
-          $folders = $folders.sort(function($a, $b) {
-            var a = files.itemData($a) || {};
-            var b = files.itemData($b) || {};
-            return (b.position || 0) - (a.position || 0);
-          });
-          for(var idx in $folders) {
-            if ($files[idx]) {
-              $folder.children("ul").prepend($files[idx].prev(".separator"));
-              $folder.children("ul").prepend($files[idx]);
-            }
-          }
-        });
-        files.refreshView();
-      },
-      updateCollaboration: function(context_string, data, refresh) {
-        var file_context_string = $.underscore(data.collaboration.context_type) + "_" + data.collaboration.context_id;
-        for(var idx in fileStructureData) {
-          if(fileStructureData[idx] && (fileStructureData[idx][0].context_string == context_string || fileStructureData[idx][0].context_string == file_context_string)) {
-            var found = false;
-            for(var jdx in fileStructureData[idx][1].collaborations) {
-              var collab = fileStructureData[idx][1].collaborations[jdx].collaboration;
-              if(collab.id == data.collaboration.id) {
-                fileStructureData[idx][1].collaborations[jdx] = data;
-                $files_structure.find(".collaboration_" + collab.id).each(function() {
-                  var folder = files.itemData($(this).parent("ul").parent("li"));
-                  $(this).fillTemplateData({data: {'name': data.collaboration.title}});
-
-                  // add 'title="this is the filename.txt" so you can read files/folders that have really long names
-                  if (data.collaboration.title) $(this).find('.name').attr('title', data.collaboration.title);
-
-                });
-                found = true;
-              }
-            }
-            if(!found) {
-              var collab = data.collaboration;
-              fileStructureData[idx][1].collaborations.push(data);
-              var $collab = $files_structure.find(".file_blank").clone(true).removeClass('file_blank');
-              $collab.removeClass('file');
-              $collab.addClass('collaboration collaboration_' + collab.id + ' ' + collab.collaboration_type);
-              collab.name = collab.title;
-              $collab.fillTemplateData({data: collab});
-
-              // add 'title="this is the filename.txt" so you can read files/folders that have really long names
-              if (collab.title) $collab.find('.name').attr('title', collab.title);
-
-              $files_structure.find("." + context_string + " .collaborations").children("ul").prepend($collab.show());
-            }
-          }
-        }
-        if(refresh !== false ) {
-          files.refreshView(data.attachment);
-          $files_structure_list.instTree.InitInstTree($files_structure_list);
-        }
-      },
       updateFile: function(context_string, data, refresh) {
         files.clearDataCache();
         var file_context_string = $.underscore(data.attachment.context_type) + "_" + data.attachment.context_id;
+
         for(var idx in fileStructureData) {
-          if(fileStructureData[idx] && (fileStructureData[idx][0].context_string == context_string || fileStructureData[idx][0].context_string == file_context_string)) {
+
+          var context_is_correct = fileStructureData[idx] &&
+             (
+               fileStructureData[idx][0].context_string == context_string || 
+               fileStructureData[idx][0].context_string == file_context_string
+             )
+
+          if(context_is_correct) {
             var found = false;
             var moved = false;
+
             if(!data.definitely_new) {
               for(var jdx in fileStructureData[idx][1].files) {
+
                 var file = fileStructureData[idx][1].files[jdx].attachment;
                 if(file.id == data.attachment.id) {
+
                   fileStructureData[idx][1].files[jdx] = data;
                   $files_structure.find(".file_" + file.id).each(function() {
+
                     var folder = files.itemData($(this).parent("ul").parent("li"));
                     if(folder.id == data.attachment.folder_id) {
                       $(this).fillTemplateData({data: {'name': data.attachment.display_name}});
-
-                      // add 'title="this is the filename.txt" so you can read files/folders that have really long names
                       if (data.attachment.display_name) $(this).find('.name').attr('title', data.attachment.display_name);
 
                     } else {
                       moved = true;
                     }
                   });
+
                   found = true;
+
                   if(moved) {
                     $files_structure.find(".file_" + file.id).remove();
                   }
                 }
               }
             }
+
             if(!found || moved) {
-              var attachment = data.attachment;
+
               if(!found) {
                 data.definitely_new = false;
                 fileStructureData[idx][1].files.push(data);
               }
-              var $file = $files_structure.find(".file_blank").clone(true).removeClass('file_blank');
-              $file.addClass('file_' + attachment.id);
-              $file.addClass(attachment.mime_class);
-              attachment.name = attachment.display_name;
-              $file.fillTemplateData({data: attachment});
 
-              // add 'title="this is the filename.txt" so you can read files/folders that have really long names
+              // Sort files
+              var unsorted_files = fileStructureData[idx][1].files
+              fileStructureData[idx][1].files = _.sortBy(
+                unsorted_files, function(obj){ 
+
+                  // returns adds an empty string to ensure .toLowerCase() isn't calling on an undefined object
+                  return (obj.attachment.display_name || "").toLowerCase();
+                }
+              );
+
+              var attachment = data.attachment;
+              attachment.name = attachment.display_name;
+
+              var $file = $files_structure.find(".file_blank")
+                                          .clone(true)
+                                          .removeClass('file_blank')
+                                          .addClass('file_' + attachment.id)
+                                          .addClass(attachment.mime_class)
+                                          .fillTemplateData({data: attachment});
+
               if (attachment.name) $file.find('.name').attr('title', attachment.name);
 
-              $files_structure.find(".folder_" + attachment.folder_id).children("ul").append($file.show());
+              var append_file_to_parent_folder = function(){
+                $files_structure.find(".folder_" + attachment.folder_id)
+                                .children("ul")
+                                .append($file.show());
+              }
+
+              // Find location to insert files ----------------
+              var folder_files = _.filter(fileStructureData[idx][1].files, function(obj){
+                return obj.attachment.folder_id === data.attachment.folder_id
+              });
+
+              var folder_file = _.find(folder_files, function(obj){ 
+                return obj.attachment.display_name === data.attachment.display_name;
+              });
+
+              var index = _.indexOf(folder_files, folder_file);
+              var $element = $files_structure.find(".folder_" + attachment.folder_id)
+                              .children("ul")
+                              .find('> li.file')
+                              .eq(index);
+
+              // Insert file in the correct location
+              ($element.length) ? $element.before($file.show()) : append_file_to_parent_folder();
             }
           }
         }
+
         if(refresh !== false ) {
           files.refreshView(data.attachment);
           $files_structure_list.instTree.InitInstTree($files_structure_list);
@@ -1113,24 +1127,35 @@ define([
                         // add 'title="this is the filename.txt" so you can read files/folders that have really long names
                         .attr('title', data.folder.name);
                     }
+
                     if(!already_in_place) {
                       $(this).prev("li.separator").remove();
+
                       var $parent = $(this).parent("ul").parent("li");
                       var $before = null;
-                      var $current = $(this);
+
+                      var $new_folder = $(this);
+                      var new_folder_el = $(this)[0];
+                      var new_folder_name = files.itemData($(this)).name || "";
+
                       $parent.children("ul").children("li:not(.separator)").each(function() {
-                        var position = files.itemData($(this)).position;
-                        if($(this)[0] != $current[0] && (!$(this).hasClass('folder') || position >= folder.position)) {
-                          $before = $(this);
+                        var current_folder_name = files.itemData($(this)).name || "";
+                        var $current_folder = $(this);
+                        var current_folder_el = $current_folder[0];
+
+                        if(current_folder_el != new_folder_el && (!$current_folder.hasClass('folder') || new_folder_name.toLowerCase() < current_folder_name.toLowerCase()))                               {
+                          $before = $current_folder;
                           return false;
                         }
                       });
+
                       if($before) {
-                        $before.before($(this).show());
-                        $before.before("<li class='separator'/>");
+                        $before.before($new_folder.show())
+                               .before("<li class='separator'/>");
                       } else {
-                        $parent.children("ul").append("<li class='separator'/>");
-                        $parent.children("ul").append($(this).show());
+                        $parent.children("ul")
+                               .append("<li class='separator'/>")
+                               .append($new_folder.show());
                       }
                     }
                   } else {
@@ -1212,30 +1237,12 @@ define([
                 return file;
               }
             }
-          } else if($node.hasClass('collaborations')) {
-            if($node.parents("li.context:last").hasClass(context[0].context_string)) {
-              res = $node.getTemplateData({textValues: ['name']});
-              res.context_string = context[0].context_string;
-              res.context = context[0].context;
-              return res;
-            }
           } else if($node.hasClass('groups')) {
             if($node.parents("li.context:last").hasClass(context[0].context_string)) {
               res = $node.getTemplateData({textValues: ['name']});
               res.context_string = context[0].context_string;
               res.context = context[0].context;
               return res;
-            }
-          } else if($node.hasClass('collaboration')) {
-            var collaborations = context[1].collaborations;
-            for(var jdx in collaborations) {
-              var collaboration = collaborations[jdx].collaboration;
-              if(collaboration.id == id) {
-                collaboration.context_string = $.underscore(collaboration.context_type) + "_" + collaboration.context_id;
-                collaboration.root_context_string = context[0].context_string;
-                collaboration.name = collaboration.title;
-                return collaboration;
-              }
             }
           } else if($node.hasClass('folder')) {
             var folders = context[1].folders;
@@ -1270,6 +1277,7 @@ define([
               context = fileStructureData[idx];
             }
           }
+          
           for(var idx in files.foldersStillLoading) {
             if(files.foldersStillLoading[idx].folder.id == id) {
               var folder = files.foldersStillLoading[idx].folder;
@@ -1279,6 +1287,7 @@ define([
               return folder;
             }
           }
+
           if(context) {
             var folder = {};
             folder.name = $node.getTemplateData({textValues: ['name']}).name;
@@ -1296,15 +1305,19 @@ define([
 
     $(document).ready(function() {
       files.init();
+
       setInterval(function() {
         $add_file_link.triggerHandler('show');
       }, 1000);
+
       $(".folder_item").live('mousedown', function(event) {
         event.preventDefault();
       });
+
       $(".folder_item.ui-draggable").live('mouseover', function() {
         $(this).find(".item_icon").attr('title', I18n.t('titles.drag_to_move', 'Drag to move to a different folder'));
       });
+
       // on hover of the swfupload link, manually set the underline on
       // the add files link because otherwise the swf keeps the link from
       // registering mouseover events.
@@ -1313,6 +1326,7 @@ define([
       }, function(e) {
         $add_file_link.css('text-decoration', 'none');
       });
+
       $add_file_link.bind('show', function() {
         var linkWidth = $add_file_link.width();
         var linkHeight = $add_file_link.height();
@@ -1327,73 +1341,18 @@ define([
           left: linkOffset.left - 5
         });
       });
+
       $("#file_uploads_dialog_link").click(function(event) {
         event.preventDefault();
-        $("#file_uploads").dialog('close').dialog({
-          autoOpen: false,
+        $("#file_uploads").dialog({
           title: I18n.t('titles.file_uplaods_queue', "File Uploads Queue")
-        }).dialog('open');
+        });
       });
+
       setTimeout(function() {
         $files_structure.find(".folder > .text").droppable(files.droppable_options);
-        $files_content.sortable({
-          distance: 5,
-          cancel: '.draggable.item_icon',
-          items: 'li.file,li.folder',
-          axis: 'y',
-          hoverClass: 'lameness',
-          containment: 'parent',
-          start: function(event, ui) {
-            $files_content.addClass('dragging');
-          },
-          stop: function(event, ui) {
-            setTimeout(function() {
-              $files_content.removeClass('dragging');
-            }, 500);
-          },
-          helper: files.draggable_helper,
-          update: function(event, ui) {
-            var data = files.itemData($(ui.item));
-            var folder_order = [];
-            var order = [];
-            var $first_file = $files_content.find(".file:first");
-            var $items = $files_content.find(".folder_item");
-            var firstFileIndex = $items.index($first_file);
-            $files_content.find(".folder").each(function() {
-              if($items.index($(this)) > firstFileIndex) {
-                $first_file.before($(this));
-              }
-              var id = files.itemData($(this)).id;
-              folder_order.push(id);
-            });
-            $files_content.find(".file").each(function() {
-              var id = files.itemData($(this)).id;
-              order.push(id);
-            });
-            $files_content.loadingImage();
-            var send_data = {
-              order: order.join(','),
-              folder_id: data.folder_id || data.parent_folder_id,
-              folder_order: folder_order.join(',')
-            };
-            var url = $("#file_context_links ." + data.context_string + "_reorder_attachments_url").attr('href');
-            $.ajaxJSON(url, 'POST', send_data, function(return_data) {
-              $files_content.loadingImage('remove');
-              for(var idx in return_data) {
-                if(return_data[idx].attachment) {
-                  files.updateFile(data.context_string, return_data[idx], false);
-                } else if(return_data[idx].folder) {
-                  files.updateFolder(data.context_string, return_data[idx], false);
-                }
-              }
-              files.reorderContent(data.folder_id, return_data);
-              files.refreshView(data);
-            }, function() {
-              $files_content.loadingImage('remove');
-            });
-          }
-        });
         $("#files_structure_list > li").hide();
+
         $files_structure_list.instTree({
           autoclose: false,
           multi: false,
@@ -1417,33 +1376,40 @@ define([
             $files_content.find(".catcher").addClass('to_be_removed');
             $files_content.find(".file_preview").remove();
             $files_content.find(".message").remove();
+
             var clearExtras = function() {
               $files_content.find(".content_panel.to_be_hidden").hide();
               $files_content.find(".catcher.to_be_removed").remove();
               $files_content.find(".folder_item.to_be_removed").remove();
             };
+
             var data = files.itemData(node);
             var path = encodeURIComponent(files.fullPath(node));
+
             if(location.hash != "#" + path) {
               location.replace("#" + path);
             }
+
             // $swfupload_holder.css('left', -1000);
             if(!data.includes_files && data.full_name) {
               files.getFilesForFolder(data);
             }
+
             if(data.context_string) {
               if(INST) {
                 INST.interaction_context = data.context_string;
               }
               files.updatePageView(data.context_string);
             }
+
             if(node.hasClass('node')) {
               var folder_url = $.replaceTags($("." + data.context_string + "_folder_url").attr('href'), 'id', data.id);
               var cancelled = false;
               var $no_content = $("<li class='message'>" + I18n.t('messages.folder_empty', "Nothing in this Folder") + "</li>");
               if(node.hasClass('folder')) {
                 if(!data || !data.permissions || !data.permissions.read_contents) {
-                  $files_content.find(".content_panel:last").after("<li class='message'>" + I18n.t('messages.access_denied', "You cannot read the contents of this folder.") + "</li>");
+                  $files_content.find(".content_panel:last")
+                                .after("<li class='message'>" + I18n.t('messages.access_denied', "You cannot read the contents of this folder.") + "</li>");
                   cancelled = true;
                 } else {
                   // add a control panel to the top for adding files, folders to this
@@ -1461,8 +1427,10 @@ define([
                   }
 
                   var download_folder_url = $.replaceTags($("." + data.context_string + "_folder_url").attr('href') + "/download", 'id', data.id);
+
                   $(".download_zip_link").attr('href', download_folder_url);
                   $(".upload_zip_link").attr('href', $("." + data.context_string + "_import_url").attr('href') + "?return_to=" + encodeURIComponent(location.href) + "&folder_id=" + data.id);
+
                   data.unlock_at_string = $.parseFromISO(data.unlock_at).datetime_formatted;
                   data.lock_at_string = $.parseFromISO(data.lock_at).datetime_formatted;
                   $panel.find(".lock_after").showIf(data.lock_at);
@@ -1478,53 +1446,52 @@ define([
                   $panel.show();
                   $add_file_link.triggerHandler('show');
                 }
-              } else if(node.hasClass('collaborations')) {
-                var $panel = $("#collaborations_panel");
-                var context = data.context;
-                $panel.find(".header .name").text(context.name);
-                $panel.find(".breadcrumb").empty().append(files.breadcrumb());
-                var collaborations_url = $("." + data.context_string + "_collaborations_url").attr('href');
-                $panel.find(".collaborations_link").attr('href', collaborations_url);
-                $panel.find(".add_collaboration_link").attr('href', collaborations_url);
-                $panel.find(".view_collaborations").showIf(context && context.permissions && context.permissions.manage_grades);
-                $panel.removeClass('to_be_hidden');
-                $panel.toggleClass('addable_content_panel', !!(data.context && data.context.permissions && data.context.permissions.create_collaborations));
-                $panel.data('node', node);
-                $panel.show();
               } else if(node.hasClass('groups')) {
+
                 var $panel = $("#groups_panel");
                 var context = data.context;
                 var groups_url = $("." + data.context_string + "_groups_url").attr('href');
+
                 $panel.find(".category_name").text(data.name);
                 $panel.find(".context_name").text(context.name);
                 $panel.find(".breadcrumb").empty().append(files.breadcrumb());
                 $panel.find(".groups_link").attr('href', groups_url);
                 $panel.removeClass('to_be_hidden');
+
                 if(context && context.permissions && context.permissions.read_roster) {
                   $panel.toggleClass('addable_content_panel', true);
                 }
+
                 $panel.show();
               }
+
               if(!cancelled) {
                 var nodeIdx = 0;
                 var nodeCount = node.children("ul").children("li.node,li.leaf").length;
                 clearExtras.already_cleared = true;
+
                 setTimeout(function() {
                   var added = false;
-                  node.children("ul").children("li.node,li.leaf").each(function() {
-                    nodeIdx++;
-                    if(nodeIdx < files.nodeClumpSize) {
-                      newItem = files.addContentItem($(this), true);
-                      if(newItem) { added = true; }
-                    }
-                  });
+                  node.children("ul")
+                      .children("li.node,li.leaf")
+                      .each(function() {
+                        nodeIdx++;
+                        if(nodeIdx < files.nodeClumpSize) {
+                          newItem = files.addContentItem($(this), true);
+                          if(newItem) { added = true; }
+                        }
+                      });
+
                   $files_content.find("li.folder_item").show();
+
                   if(nodeCount >= files.nodeClumpSize) {
                     files.addScrollCatcher();
                   }
+
                   if(added) {
                     files.refreshContentListeners();
                   }
+
                   if(node.children("ul").children("li.node,li.leaf").length === 0 || (node.hasClass('folder') && !data.includes_files)) {
                     if(node.hasClass('folder') && !data.includes_files) {
                       $no_content.addClass('no_content');
@@ -1537,25 +1504,8 @@ define([
                         }
                       });
                     }
+
                     if($files_content.find(".message.no_content").length === 0) {
-                      if (node.hasClass('collaborations')) {
-                        var find_out_more = "";
-                        if(data.context.permissions.create_collaborations) {
-                          find_out_more = '<p>' + I18n.t('descriptions.collaborations2', 'To find out more about a particular type of collaboration, click &quot;New collaboration&quot; and then choose that type in the dropdown list.') + '</p>';
-                        }
-                        $no_content.html([
-                          '<div class="ui-state-highlight" style="padding:1em;">',
-                            '<p>', I18n.t('descriptions.collaborations',
-                            'Collaborations are a way for you to use web-based tools like ' +
-                            'Google Docs and EtherPad ' +
-                            'to work collaboratively on tasks like group papers or note-taking.  This is a special folder that shows you any collaborations you have created ' +
-                            'so you have an easy place to keep track of and create those collaborations'),
-                            '</p>',
-                            find_out_more,
-                          '</div>',
-                          '<p>', I18n.t('messages.no_collaborations', "There are no collaborations to show"), '</p>'
-                        ].join('').replace('Google Docs', '<a href="http://docs.google.com">Google Docs</a>').replace('EtherPad', '<a href="http://www.etherpad.org">EtherPad</a>'));
-                      }
                       $files_content.append($no_content);
                     }
                   }
@@ -1618,66 +1568,45 @@ define([
                 }
                 $panel.data('node', node);
                 $panel.show();
-                if($preview) {
+                if ($preview) {
                   $preview.addClass('file_preview');
                   $files_content.append($preview);
-                  if (data.permissions && data.permissions.download && $.isPreviewable(data.content_type)) {
+                  var showPreview = function() {
                     $('#doc_preview_holder').loadDocPreview({
                       mimeType: data.content_type,
                       attachment_id: data.id,
                       height: '100%',
+                      crocodoc_session_url: data.crocodocSession,
                       scribd_doc_id: data.scribd_doc && data.scribd_doc.attributes && data.scribd_doc.attributes.doc_id,
                       scribd_access_key: data.scribd_doc && data.scribd_doc.attributes && data.scribd_doc.attributes.access_key
                     });
                     files.viewFile(data.context_string, data.id);
+                  };
+                  if (data.permissions && data.permissions.download && $.isPreviewable(data.content_type)) {
+                    if (data['crocodoc_available?'] && !data.crocodocSession) {
+                      $preview.disableWhileLoading(
+                        $.ajaxJSON(
+                          '/attachments/' + data.id + '/crocodoc_sessions/',
+                          'POST',
+                          {annotations: false},
+                          function(response) {
+                            data.crocodocSession = response.session_url;
+                            showPreview();
+                          },
+                          function() {
+                            data['crocodoc_available?'] = false;
+                            showPreview();
+                          }
+                        )
+                      );
+                    }
+                    else {
+                      showPreview();
+                    }
                   }
                 }
                 $(window).triggerHandler('resize');
-              } else if(node.hasClass('collaboration')) {
-                var $panel = $("#collaboration_panel");
-                $panel.find(".header .name").text(data.name);
-                $panel.removeClass('to_be_hidden');
-                var subdata = {
-                  name: data.name,
-                  updated_at: $.parseFromISO(data.updated_at).datetime_formatted,
-                  collaborator_count: (data.collaborator_ids || "").split(",").length,
-                  description: data.description,
-                  collaborator_ids: data.collaborator_ids
-                };
-                $panel.find(".breadcrumb").empty().append(files.breadcrumb());
-                var collaboration_url = $("." + data.context_string + "_collaboration_url").attr('href');
-                collaboration_url = $.replaceTags(collaboration_url, 'id', data.id);
-                $panel.find(".collaborations_link").attr('href', collaboration_url);
-                $panel.find(".edit_collaboration_link").attr('href', collaboration_url);
-                $panel.find(".delete_collaboration_link").attr('href', collaboration_url);
-                $panel.find(".view_item_link").attr('href', collaboration_url);
-                $panel.data('node', node);
-                var $subpanel = $("#collaboration_sub_panel");
-                $subpanel.find(".subcontent").fillTemplateData({data: subdata});
-                $subpanel.removeClass('to_be_hidden');
-                $subpanel.find(".subcontent .collaboration_icon").hide();
-                $subpanel.find(".subcontent .google_docs_icon").showIf(data.collaboration_type == 'google_docs');
-                $subpanel.find(".subcontent .etherpad_icon").showIf(data.collaboration_type == 'etherpad');
-                $subpanel.find(".view_item_link").attr('href', collaboration_url);
-                $subpanel.find(".collaborators").empty();
-                var ids = (subdata.collaborator_ids || '').split(',');
-                for(var idx in ids) {
-                  var id = ids[idx];
-                  var $user = $("." + data.context_string + "_user_list:first .collaborator_" + id).clone(true);
-                  $user.find(":checkbox").remove();
-                  $subpanel.find(".collaborators").append($user);
-                }
-                $files_content.find(".content_panel:last").after($subpanel); //.prepend($subpanel);
-                $panel.show();
-                $panel.removeClass('editable_content_panel');
-                // show the collaboration control panel with description, link, etc.
-                // show list of participants, delete (two possibles: delete for everyone, just take me off the ACL)
-                if(data && data.permissions && data.permissions.update) {
-                  // show a few more settings for editing, deleting
-                  // managing list of participants
-                  $panel.addClass('editable_content_panel');
-                }
-              }
+              } 
             }
             if(!clearExtras.already_cleared) {
               clearExtras();
@@ -1689,6 +1618,7 @@ define([
           files.expandFolder($("#files_structure_list .context"));
         }
       }, 500);
+
       $(window).bind('resize', function() {
         var top = $files_structure.offset().top;
         var height = $(window).height() - top;
@@ -1701,101 +1631,12 @@ define([
         var panelHeight = $("#file_panel").outerHeight();
         $("#doc_preview_holder").height(contentHeight - panelHeight);
       });
-      $(".folder_item .edit_collaboration_link, #collaboration_panel .edit_collaboration_link").click(function(event) {
-        event.preventDefault();
-        event.stopPropagation();
-        $("#edit_collaboration_form").attr('action', $(this).attr('href'));
-        $("#edit_collaboration_form").attr('method', 'PUT');
-        $("#edit_collaboration_form .submit_button").text(I18n.t('buttons.update_collaboration', "Update Collaboration"));
-        $("#edit_collaboration_form .add_collaboration").hide();
-        if($files_content.find(".add_form:visible").length> 0) { return; };
-        $files_content.children(".message").remove();
-        var data = files.itemData($(this).parents(".folder_item,#collaboration_panel"));
-        var context_string = data.context_string;
-        $("#edit_collaboration_dialog").data('context_string', context_string);
-        var $users = $("." + context_string + "_user_list:first").clone(true);
-        var ids = (data.collaborator_ids || "").split(",");
-        $("#edit_collaboration_form").fillFormData(data, {object_name: 'collaboration'});
-        $users.find(".collaborator input").each(function() {
-          $(this).attr('id', $(this).attr('class'));
-          var id = $(this).parent("li.collaborator").getTemplateData({textValues: ['user_id']}).user_id;
-          if($.inArray(id, ids) != -1) {
-            $(this).attr('checked', true);
-          }
-        });
 
-        $("#edit_collaboration_dialog .collaborator_list").empty().append($users);
-        $("#edit_collaboration_dialog").dialog('close').dialog({
-          autoOpen: false,
-          title: I18n.t('titles.edit_collaboration', 'Edit Collaboration'),
-          width: 500
-        }).dialog('open');
-      });
-      $("#collaborations_panel .add_collaboration_link").click(function(event) {
-        event.preventDefault();
-        $("#edit_collaboration_form").attr('action', $(this).attr('href'));
-        $("#edit_collaboration_form").attr('method', 'POST');
-        $("#edit_collaboration_form .submit_button").text(I18n.t('buttons.add_collaboration', "Add Collaboration"));
-        $("#edit_collaboration_form .add_collaboration").show();
-        $("#collaboration_collaboration_type").triggerHandler('change');
-        if($files_content.find(".add_form:visible").length> 0) { return; };
-        $files_content.children(".message").remove();
-        var data = files.itemData($("#collaborations_panel").data('node'));
-        data.title = "";
-        data.description = "";
-        $("#edit_collaboration_form").fillFormData(data, {object_name: 'collaboration'});
-        var context_string = data.context_string;
-        $("#edit_collaboration_dialog").data('context_string', context_string);
-        var $users = $("." + context_string + "_user_list:first").clone(true);
-        $users.find(".collaborator input").each(function() {
-          $(this).attr('id', $(this).attr('class'));
-        });
-        $("#edit_collaboration_dialog .collaborator_list").empty().append($users);
-        $("#edit_collaboration_dialog").dialog('close').dialog({
-          autoOpen: false,
-          title: I18n.t('titles.add_collaboration', 'Add New Collaboration'),
-          width: 500
-        }).dialog('open');
-      });
       $("#folder_panel .download_zip").click(function(event) {
         event.preventDefault();
         INST.downloadFolderFiles($(this).find(".download_zip_link").attr('href'));
       });
-      $("#edit_collaboration_dialog").find(".select_all_link,.deselect_all_link").click(function(event) {
-        event.preventDefault();
-        var $link = $(this);
-        $("#edit_collaboration_dialog .collaborator_list :checkbox").each(function() {
-          $(this).attr('checked', $link.hasClass('select_all_link'));
-        });
-      });
-      $("#edit_collaboration_dialog .cancel_button").click(function() {
-        $("#edit_collaboration_dialog").dialog('close');
-      });
-      $("#edit_collaboration_form").formSubmit({
-        beforeSubmit: function(data) {
-          $(this).loadingImage();
-        },
-        success: function(data) {
-          var context_string = $("#edit_collaboration_dialog").data('context_string');
-          $("#edit_collaboration_dialog").dialog('close');
-          files.updateCollaboration(context_string, data);
-          $(this).loadingImage('remove');
-        },
-        error: function(data) {
-          $(this).loadingImage('remove');
-          $(this).formErrors(data);
-        }
-      });
-      $("#collaboration_collaboration_type").change(function() {
-        $("#edit_collaboration_dialog .collaboration_description").hide();
-        $("#edit_collaboration_dialog #" + $(this).val() + "_description").show();
-        $("#edit_collaboration_dialog .collaborate_data").show();
-        $("#edit_collaboration_dialog .collaboration_authorization").hide();
-        if($(this).val() == "google_docs" && $("#edit_collaboration_dialog #collaborate_authorize_google_docs").length > 0) {
-          $("#edit_collaboration_dialog .collaborate_data").hide();
-          $("#edit_collaboration_dialog #collaborate_authorize_google_docs").show();
-        }
-      }).triggerHandler('change');
+
       $(".folder_item .edit_item_content_link").click(function(event) {
         event.preventDefault();
         event.stopPropagation();
@@ -1832,6 +1673,7 @@ define([
             }
           }
         });
+
         $.ajax({
           dataType: 'json',
           error: function() {
@@ -1872,13 +1714,24 @@ define([
           url: url.replace(/\/download/, "/contents")
         });
       });
+
       function submitFile() {
         var $dialog = $("#edit_content_dialog");
-        $dialog.find("button").attr('disabled', false).filter(".save_button").text(I18n.t('buttons.update_file', "Update File"));
-        $dialog.find("button").attr('disabled', true).filter(".save_button").text(I18n.t('messages.updating_file', "Updating File..."));
+
+        $dialog.find("button")
+               .attr('disabled', false)
+               .filter(".save_button")
+               .text(I18n.t('buttons.update_file', "Update File"));
+
+        $dialog.find("button")
+               .attr('disabled', true)
+               .filter(".save_button")
+               .text(I18n.t('messages.updating_file', "Updating File..."));
+
         var context_string = files.currentItemData().context_string;
         var $textarea = $dialog.find('textarea');
         var content = $textarea.data('tinyIsVisible') ? $textarea.editorBox('get_code') : $textarea.val()
+
         $.ajaxFileUpload({
           url: $dialog.data('update_url'),
           method: 'PUT',
@@ -1892,20 +1745,28 @@ define([
             }
           },
           success: function(data) {
-            $dialog.find("button").attr('disabled', false).filter(".save_button").text(I18n.t('buttons.update_file', "Update File"));
+            $dialog.find("button")
+                   .attr('disabled', false)
+                   .filter(".save_button")
+                   .text(I18n.t('buttons.update_file', "Update File"));
             files.updateFile(context_string, data);
             $dialog.dialog('close');
           },
           error: function() {
-            $dialog.find("button").attr('disabled', false).filter(".save_button").text(I18n.t('errors.update_file_failed', "Updating File Failed, please try again"));
+            $dialog.find("button")
+                   .attr('disabled', false)
+                   .filter(".save_button")
+                   .text(I18n.t('errors.update_file_failed', "Updating File Failed, please try again"));
           }
         });
       }
+
       $(".folder_item .preview_item_link").click(function(event) {
         event.preventDefault();
         event.stopPropagation();
         files.selectFolder($(this).parents(".folder_item").data('node'));
       });
+
       $(".folder_item .rename_item_link,#file_panel .rename_item_link,#folder_panel .rename_item_link").click(function(event) {
         event.preventDefault();
         event.stopPropagation();
@@ -1916,6 +1777,7 @@ define([
           $("#rename_entry_field").val(name).focus().select();
         $(this).blur();
       });
+
       $("#rename_entry_field").bind('blur', function(event, update) {
         var $item = $(this).parents(".folder_item,#file_panel,#folder_panel");
         if($item.length === 0) { return; }
@@ -1943,16 +1805,17 @@ define([
         $(this).val("").appendTo($("#file_context_links"));
         $(this).triggerHandler('blur', false);
       });
+
       $("#rename_entry_field").keycodes('return esc', function(event) {
         $(this).triggerHandler('blur', event.keyString == 'return');
       });
+
       $(".folder_item .delete_item_link,#folder_panel .delete_item_link,#file_panel .delete_item_link").click(function(event) {
         event.preventDefault();
         event.stopPropagation();
         var data = files.itemData($(this).parents(".folder_item"));
         data = data || files.itemData($(this).parents("#folder_panel,#file_panel").data('node'));
         var item_type = $(this).parents(".folder_item").hasClass('file') ? 'file' : 'folder';
-        if($(this).parents(".folder_item").hasClass('collaboration')) { item_type = 'collaboration'; }
         $(this).parents(".folder_item").confirmDelete({
           message: ($(this).parents(".folder_item").hasClass('folder') || $(this).hasClass('folder_url') ? I18n.t('prompts.delete_folder', "Are you sure you want to delete this folder and all of its contents?") : I18n.t('prompts.delete_file', "Are you sure you want to delete this file?")),
           url: $(this).attr('href'),
@@ -1964,8 +1827,6 @@ define([
             $files_structure.find(".file_" + data.id).remove();
             $files_structure.find(".folder_" + data.id).prev("li.separator").remove();
             $files_structure.find(".folder_" + data.id).remove();
-            $files_structure.find(".collaboration_" + data.id).prev("li.separator").remove();
-            $files_structure.find(".collaboration_" + data.id).remove();
             files.refreshView();
             files.updateQuota();
             $(this).slideUp(function() {
@@ -1974,6 +1835,7 @@ define([
           }
         });
       });
+
       $(".folder_item:not(.add_item)").click(function(event) {
         var $item = $(this);
         event.preventDefault();
@@ -1992,50 +1854,69 @@ define([
             };
             $item.data('node').bind('files_load', refresh);
             $item.data('node').children(".text").click();
-          } else if($item.hasClass('collaboration')) {
-            $item.data('node').children(".text").click();
           } else {
             $item.find(".name").focus();
             location.href = $item.find(".download_url").attr('href');
           }
         }, 50);
       });
+
       $(".folder_item").hover(function(event, scroll) {
         $(".folder_item_hover").removeClass('folder_item_hover');
         $(this).addClass('folder_item_hover');
       }, function() {
       });
+
       $("#folder_panel .add_file_link").click(function(event) {
         event.preventDefault();
         if($files_content.find(".add_form:visible").length> 0) { return; };
-        var $form = $("#add_file_form").clone(true).removeAttr('id');
-        $files_content.children(".message").remove();
+
+        var $form = $("#add_file_form").clone(true)
+                                       .removeAttr('id');
+
+        $files_content.children(".message")
+                      .remove();
+
         $files_content.append($form);
         $files_content.scrollToVisible($form);
+
         var itemData = files.currentItemData();
         $form.fillFormData({folder_id: itemData.id}, {object_name: 'attachment'});
-        $form.find("form").attr('action', $("#file_context_links ." + itemData.context_string + "_attachments_url").attr('href') + ".text");
+        $form.find("form")
+             .attr('action', $("#file_context_links ." + 
+                                itemData.context_string + 
+                                "_attachments_url").attr('href') + 
+                                ".text");
         $form.mouseover();
-        $form.find(":text:first").focus().select();
+        $form.find(":text:first")
+             .focus()
+             .select();
       });
+
       $("#folder_panel .add_folder_link").click(function(event) {
         event.preventDefault();
+
         if($files_content.find(".add_form:visible").length> 0) { return; };
+
         var $form = $("#add_folder_form").clone(true).removeAttr('id');
+
         $files_content.children(".message").remove();
         $files_content.find("#folder_panel.addable_content_panel").after($form);
         $files_content.scrollToVisible($form);
+
         var itemData = files.currentItemData();
         $form.fillFormData({parent_folder_id: itemData.id}, {object_name: 'folder'});
         $form.find("form").attr('action', $("#file_context_links ." + itemData.context_string + "_folders_url").attr('href'));
         $form.mouseover();
         $form.find(":text:first").focus().select();
       });
+
       $("#add_folder_form :text").keycodes('esc', function(event) {
         if(event.keyString == 'esc') {
           $(this).trigger('blur', true);
         }
       });
+
       $("#add_folder_form :text").bind('blur', function(event, isFromEscKey) {
         if (isFromEscKey) {
           $(this).parents("li").remove();
@@ -2043,6 +1924,7 @@ define([
           $(this).parents("form").trigger('submit');
         }
       });
+
       $("#add_folder_form .add_folder_form").formSubmit({
         beforeSubmit: function(data) {
           if($(this).hasClass('submitting')) { return false; }
@@ -2053,22 +1935,37 @@ define([
         },
         success: function(data) {
           $(this).removeClass('submitting');
+
           for(var idx in fileStructureData) {
             if(fileStructureData[idx][0].context_string == $(this).data('root_context_string')) {
               fileStructureData[idx][1].folders.push(data);
             }
           }
+
+          var unsorted_folders = fileStructureData[0][1].folders;
+          fileStructureData[0][1].folders = _.sortBy(
+            // returns adds an empty string to ensure .toLowerCase() isn't calling on an undefined object
+            unsorted_folders, function(obj){ return (obj.folder.name || "").toLowerCase() }
+          );
+
           var folder = data.folder;
-          var $folder = $files_structure.find(".folder_blank").clone(true).removeClass('folder_blank');
+          var $folder = $files_structure.find(".folder_blank")
+                                        .clone(true)
+                                        .removeClass('folder_blank');
+
           $folder.addClass('folder folder_' + folder.id);
           $folder.fillTemplateData({data: {name: folder.name, id: folder.id}});
+
           var $parent = $files_structure.find(".folder_" + folder.parent_folder_id);
 
           $parent.children("ul").append("<li class='separator'/>");
           $parent.children("ul").append($folder.show());
+
           files.updateFolder($(this).data('root_context_string'), data);
+
           $(this).parents("li").remove();
           $folder.find('span').droppable(files.droppable_options);
+
           files.refreshView(folder);
         },
         error: function(data) {
@@ -2076,6 +1973,7 @@ define([
           $(this).formErrors(data);
         }
       });
+
       $("#add_file_form .add_file_form").formSubmit({
         fileUpload: true,
         beforeSubmit: function(data) {
@@ -2092,6 +1990,7 @@ define([
           $(this).formErrors(data);
         }
       });
+
       $("#add_file_form .cancel_button").click(function() {
         $(this).parents("li").remove();
       });
@@ -2099,45 +1998,56 @@ define([
       $(".folder_item .lock_item_link,#file_panel .lock_item_link,#folder_panel .lock_item_link").click(function(event) {
         event.preventDefault();
         event.stopPropagation();
+
         var item_type = 'attachment';
         var $form = $("#lock_attachment_form");
         var $item = $(this).parents(".folder_item,#file_panel,#folder_panel");
         var data = files.itemData($item) || files.itemData($item.data('node'));
         var url = $(this).attr('href');
+
         if($item.hasClass('folder') || $(this).parents("#folder_panel").length > 0) {
           item_type = 'folder';
           $form = $("#lock_folder_form");
         }
+
         $form.attr('action', url);
         $form.data('context_string', data.context_string);
+
         $("#lock_item_dialog form").hide();
+
         $form.show();
         data.lock_at = $.parseFromISO(data.last_lock_at).datetime_formatted;
         data.unlock_at = $.parseFromISO(data.last_unlock_at).datetime_formatted;
         data.locked = (!data.lock_at && !data.unlock_at) ? '1' : '0';
         $("#lock_item_dialog").fillTemplateData({data: {name: data.name}});
+
         $form.fillFormData(data, {
           object_name: item_type
         });
+
         $form.find("#folder_just_hide,#attachment_just_hide").attr('checked', false).change();
         $form.find(".item_type").text(item_type);
-        $("#lock_item_dialog").dialog('close').dialog({
-          autoOpen: true,
+
+        $("#lock_item_dialog").dialog({
           modal: true,
           width: 350,
           title: item_type == 'folder' ? I18n.t('titles.lock_folder', "Lock Folder") : I18n.t('titles.lock_file', 'Lock File')
-        }).dialog('open');
+        });
       });
+
       $("#folder_just_hide,#attachment_just_hide").change(function() {
         $(this).parents("form").find(".full_lock").showIf(!$(this).attr('checked'));
         $(this).parents("form").find(".lock_checkbox").change();
       }).change();
+
       $("#lock_item_dialog .cancel_button").click(function() {
         $("#lock_item_dialog").dialog('close');
       });
+
       $("#lock_item_dialog .lock_checkbox").change(function() {
         $(this).parents("table").find(".lock_range").showIf(!$(this).attr('checked'));
       }).change();
+
       $("#lock_attachment_form").formSubmit({
         processData: function(data) {
           return data;
@@ -2151,6 +2061,7 @@ define([
           files.updateFile($(this).data('context_string'), data);
         }
       });
+
       $("#lock_folder_form").formSubmit({
         processData: function(data) {
           return data;
@@ -2164,19 +2075,23 @@ define([
           files.updateFolder($(this).data('context_string'), {folder: data.folder, already_in_place: true});
         }
       });
+
       $(".folder_item .unlock_item_link,#file_panel .unlock_item_link,#folder_panel .unlock_item_link").click(function(event) {
         event.preventDefault();
         event.stopPropagation();
+
         var item_type = 'attachment';
         var $form = $("#lock_attachment_form");
         var $item = $(this).parents(".folder_item,#file_panel,#folder_panel");
         var item_data = files.itemData($item) || files.itemData($item.data('node'));
         var url = $(this).attr('href');
+
         if($item.hasClass('folder') || $(this).parents("#folder_panel").length > 0) {
           item_type = 'folder';
           $form = $("#lock_folder_form");
           url = $item.find(".folder_url").attr('href');
         }
+
         $item.loadingImage();
         var data = {};
         data['[' + item_type + '][locked]'] = '';
@@ -2184,6 +2099,7 @@ define([
         data['[' + item_type + '][lock_at]'] = '';
         data['[' + item_type + '][unlock_at]'] = '';
         $item.loadingImage();
+
         $.ajaxJSON(url, 'PUT', data, function(data) {
           $item.loadingImage('remove');
           if(item_type == 'attachment') {
@@ -2200,6 +2116,7 @@ define([
         var text = $("#files_structure_list .context:first .name:first").text();
         location.href = "#" + encodeURIComponent(text);
       }
+
       $(document).fragmentChange(function(event, hash) {
         setTimeout(function() {
           files.selectNodeFromPath(hash.substring(1));
@@ -2210,19 +2127,14 @@ define([
       setTimeout(function() {
         $(window).triggerHandler('resize');
         $("#file_swf").uploadify({
-          fileDataName: 'file',
-          uploader: '/flash/uploadify/uploadify.swf',
-          buttonText: 'testing',
-          folder: 'no_idea',
-          script: 's3_url',
-          scriptAccess: 'always',
+          fileObjName: 'file',
+          swf: '/flash/uploadify/uploadify.swf',
+          uploader: 's3_url',
           multi: true,
           auto: false,
-          sizeLimit: 10737418240,
-          simUploadLimit: 1,
+          fileSizeLimit: 10737418240,
           buttonText: "",
           hideButton: true,
-          wmode: 'transparent',
           width: 60,
           height: 22,
           cancelImg: '/images/blank.png',
@@ -2230,14 +2142,11 @@ define([
             $add_file_link.text(I18n.t('links.add_files', "Add Files")).triggerHandler('show');
           },
           onSelect: fileUpload.swfFileQueue,
-          onSelectOnce: fileUpload.swfFileQueueOnce,
           onCancel: fileUpload.swfCancel,
-          onClearQueue: fileUpload.swfQueueClear,
-          onError: fileUpload.swfFileError,
-          onOpen: fileUpload.swfFileOpen,
-          onProgress: fileUpload.swfFileProgress,
-          onComplete: fileUpload.swfFileComplete,
-          onAllComplete: fileUpload.swfQueueComplete
+          onUploadError: fileUpload.swfFileError,
+          onUploadStart: fileUpload.swfFileOpen,
+          onUploadProgress: fileUpload.swfFileProgress,
+          onUploadSuccess: fileUpload.swfFileSuccess
         });
       }, 1000);
     });
@@ -2342,7 +2251,7 @@ define([
     updateUploadCount: function() {
       fileUpload.ajaxUploadCount = fileUpload.queuedAjaxUploads.length;
       if(fileUpload.currentlyUploading) { fileUpload.ajaxUploadCount++; }
-      var count = (fileUpload.swfFiles.length + fileUpload.ajaxUploadCount);
+      var count = (fileUpload.swfPreQueued.length + fileUpload.swfFiles.length + fileUpload.ajaxUploadCount);
       var errorCount = $("#file_uploads .file_upload.errored:visible").length;
       if(count === 0 && errorCount == 0) {
         fileUpload.hideStatus();
@@ -2380,24 +2289,11 @@ define([
         this.debug(ex);
       }
     },
-    fileQueued: function(file) {
-      var $file = fileUpload.initFile(file);
-      $file.data('folder', files.currentItemData());
-      $file.find(".status").text(I18n.t('messages.queue', "Queued"));
-      fileUpload.updateSwfUploadCount(this.getStats().files_queued);
-    },
-    fileQueueError: function(file, error, message) {
-      var $file = fileUpload.initFile(file);
-      $file.find(".status").text(I18n.t('errors.failed', "Failed")).end()
-        .find(".cancel_upload_link").hide();
-      $file.append(message);
-    },
     swfPreQueued: [],
     swfQueuedAndPendingFiles: [],
     swfFiles: [],
     swfFileQueueOnce: function(event, data) {
       var queue = fileUpload.swfPreQueued;
-      fileUpload.swfPreQueued = [];
       var folder = files.currentItemData();
       var filenames = [];
       for (idx in queue) {
@@ -2409,25 +2305,28 @@ define([
             queue[idx].duplicate_handling = method;
           }
         },
+        fileUpload.swfFileQueueNext,
         function() {
           for (idx in queue) {
-            var file = queue[idx];
-            fileUpload.swfFileQueueReal(event, file.id, file);
-          }
-        },
-        function() {
-          for (idx in queue) {
-            $("#file_swf").uploadifyCancel(queue[idx].id);
+            $("#file_swf").uploadify('cancel', queue[idx].id);
           }
         }
       );
     },
-    swfFileQueue: function(event, id, file) {
-      file.id = id;
+    swfFileQueue: function(file) {
       fileUpload.swfPreQueued.push(file);
+      clearTimeout(fileUpload.swfFileQueueOnceTimeout);
+      fileUpload.swfFileQueueOnceTimeout = setTimeout(fileUpload.swfFileQueueOnce, 500);
     },
-    swfFileQueueReal: function(event, id, file) { //onSelect
-      file.id = id;
+    swfFileQueueNext: function() {
+      var file = fileUpload.swfPreQueued.shift();
+      if (file) {
+        fileUpload.swfFileQueueReal(file);
+      } else {
+        fileUpload.swfQueueComplete();
+      }
+    },
+    swfFileQueueReal: function(file) { //onSelect
       var $file = fileUpload.initFile(file);
       $file.data('folder', files.currentItemData());
       $file.find(".status").text(I18n.t('messages.queued', "Queued"));
@@ -2440,14 +2339,9 @@ define([
         'no_redirect': true,
         'attachment[duplicate_handling]': file.duplicate_handling
       };
-      $("#file_swf").uploadifySettings('folder', '' + folder.id);
       fileUpload.updateUploadCount();
       $.ajaxJSON('/files/pending', 'POST', post_params, function(data) {
         file.upload_url = data.proxied_upload_url || data.upload_url;
-        // It seems that the swf uploader is unencoding some of these params, so we need
-        // to encode them now.
-        data.upload_params.key = encodeURIComponent(data.upload_params.key);
-        data.upload_params.Signature = encodeURIComponent(data.upload_params.Signature);
         file.upload_params = data.upload_params;
         $file.data('success_url', data.success_url);
         if(!$file.hasClass('done')) {
@@ -2461,7 +2355,7 @@ define([
           data.base :
           I18n.t('upload_error', 'There was an error uploading your file')
         );
-        $("#file_swf").uploadifyCancel(id);
+        $("#file_swf").uploadify('cancel', file.id);
         $file.find(".cancel_upload_link").hide().end()
           .find(".status").text("Upload Failed");
       }, {skipDefaultError: true});
@@ -2470,15 +2364,14 @@ define([
       if(fileUpload.swfQueuedAndPendingFiles.length > 0) {
         file = fileUpload.swfQueuedAndPendingFiles.shift();
         if(file) {
-          $("#file_swf").uploadifySettings('script', file.upload_url);
-          $("#file_swf").uploadifySettings('scriptData', file.upload_params);
-          $("#file_swf").uploadifyUpload(file.id);
+          $("#file_swf").uploadify('settings', 'uploader', file.upload_url);
+          $("#file_swf").uploadify('settings', 'formData', file.upload_params);
+          $("#file_swf").uploadify('upload', file.id);
         }
       }
       fileUpload.updateUploadCount();
     },
-    swfCancel: function(event, id, file, data) { // onCancel
-      file.id = id;
+    swfCancel: function(file) { // onCancel
       var $file = fileUpload.initFile(file);
       $("#file_uploads_dialog_link").text(I18n.t('errors.uploading', "Uploading Error"));
       $file.addClass('done');
@@ -2487,60 +2380,55 @@ define([
           .find(".status").text("Canceled");
         fileUpload.swfFiles = $.grep(fileUpload.swfFiles, function(f) { return f.id != file.id; });
       }
-      fileUpload.swfUploadNext();
-      return false;
+      //fileUpload.swfUploadNext();
+      //return false;
     },
-    swfQueueClear: function(event, data) { // onClearQueue
-    },
-    swfFileError: function(event, id, file, error, cancelable) { // onError
+    swfFileError: function(file, errorCode, errorMsg, errorString, cancelable) { // onUploadError
       cancelable = typeof(cancelable) != 'undefined' ? cancelable : true;
-      file.id = id;
-      if (error.info == 201 && error.type == "HTTP") {
+      if (errorCode == SWFUpload.UPLOAD_ERROR.HTTP_ERROR && errorMsg == "201") {
         // As of Chrome 21 on Windows, uploadify seems to be calling the error callback when
         // the upload succeeds. Luckily we can see the success in the error code here and
         // intercept it.
         fileUpload.s3Success(file);
         return;
       }
+
       var $file = fileUpload.initFile(file);
       setTimeout(function() {
         $file.addClass('error_cancelled');
-        if(cancelable) $("#file_swf").uploadifyCancel(id);
+        //if(cancelable) $("#file_swf").uploadify('cancel', file.id, true); //TODO: always suppress?
       }, 50);
       fileUpload.swfFiles = $.grep(fileUpload.swfFiles, function(f) { return f.id != file.id; });
       $("#file_uploads_dialog_link").text(I18n.t('errors.uploading', "Uploading Error"));
       fileUpload.showStatus();
       $file.find(".cancel_upload_link").hide().end()
-        .find(".status").text(I18n.t('errors.failed_uploading', "Failed uploading: %{error_info}", {error_info: error.info}));
+        .find(".status").text(I18n.t('errors.failed_uploading', "Failed uploading: %{error_info}", {error_info: errorString}));
       $file.addClass('done').addClass('errored');
-      fileUpload.swfUploadNext();
-      return false;
+      fileUpload.swfFileQueueNext();
     },
-    swfFileOpen: function(event, id, file) { // onOpen
-      file.id = id;
+    swfFileOpen: function(file) { // onUploadStart
       var $file = fileUpload.initFile(file);
-      if(file.upload_url) $("#file_swf").uploadifySettings('script', file.upload_url);
-      if(file.upload_params) $("#file_swf").uploadifySettings('scriptData', file.upload_params);
+      if(file.upload_url) $("#file_swf").uploadify('settings', 'uploader', file.upload_url);
+      if(file.upload_params) $("#file_swf").uploadify('settings', 'formData', file.upload_params);
       fileUpload.swfQueuedAndPendingFiles = $.grep(fileUpload.swfQueuedAndPendingFiles, function(f) { return f.id != file.id; });
       $file.find(".progress_bar").progressbar('value', 1);
       $file.find(".status").text(I18n.t('messages.uploading', "Uploading"));
     },
-    swfFileProgress: function(event, id, file, data) { // onProgress
-      file.id = id;
+    swfFileProgress: function(file, bytesUploaded, bytesTotal, totalBytesUploaded, totalBytesTotal) { // onUploadProgress
       var $file = fileUpload.initFile(file);
-      $file.find(".status").text(I18n.t('messages.uploading_with_speed', "Uploading (%{speed}KB/s)", {speed: parseInt(data.speed, 10)}));
-      $file.find(".cancel_upload_link").showIf(data.percentage < 100);
-      $file.find(".progress_bar").progressbar('value', data.percentage);
+      $file.find(".status").text(I18n.t('messages.uploading', "Uploading"));
+      $file.find(".cancel_upload_link").showIf(totalBytesUploaded < totalBytesTotal);
+      $file.find(".progress_bar").progressbar('value', 100 * totalBytesUploaded / totalBytesTotal);
     },
     s3Success: function(file) {
       var $file = fileUpload.initFile(file);
         $file.find(".status").text(I18n.t('messages.finalizing', "Finalizing"));
         var errored = function() {
-          fileUpload.swfFileError({}, file.id, file, {type: "server", info: I18n.t('errors.unexpected_response', "didn't get back expected response")});
+          fileUpload.swfFileError(file, '', '', I18n.t('errors.unexpected_response', "didn't get back expected response"));
         };
         $.ajaxJSON($file.data('success_url'), 'GET', {}, function(data) {
           if(data && data.attachment) {
-            fileUpload.swfFileComplete({}, file.id, file, JSON.stringify(data), {});
+            fileUpload.swfFileSuccess(file, JSON.stringify(data), true);
             if (data.deleted_attachment_ids) {
               files.deleteAttachmentIds(data.deleted_attachment_ids);
             }
@@ -2549,9 +2437,8 @@ define([
           }
         }, errored);
     },
-    swfFileComplete: function(event, id, file, response, data) { // onComplete
-      file.id = id;
-      if(response.indexOf("<PostResponse>") >= 0) {
+    swfFileSuccess: function(file, data, response) { // onUploadSuccess
+      if(data.indexOf("<PostResponse>") >= 0) {
         // we just got back XML stuff from S3. that means success (?)
         fileUpload.s3Success(file);
         return;
@@ -2568,11 +2455,12 @@ define([
           $file.remove();
         });
       }, 5000);
-      if(response) {
+      if(data) {
         try {
-          var data = $.parseJSON(response);
+          data = $.parseJSON(data);
           if("errors" in data && !jQuery.isEmptyObject(data["errors"])) {
-            fileUpload.swfFileError(event, id, file, {type: "server", info: JSON.stringify(data["errors"])}, false);
+            fileUpload.swfFileError(file, '', '', JSON.stringify(data["errors"]), false);
+            return;
           } else {
             data.swf = true;
             setTimeout(function() {
@@ -2583,14 +2471,15 @@ define([
             }, 500);
           }
         } catch(e) {
-          fileUpload.swfFileError(event, id, file, {type: "JS", info: e.toString()}, false);
+          fileUpload.swfFileError(file, '', '', e.toString(), false);
+          return;
         }
       } else {
         $file.find(".status").text(I18n.t('warnings.file_uploaded_without_response', "File may have uploaded, but the server failed to respond.  Reload the page to confirm."));
       }
-      fileUpload.swfUploadNext();
+      fileUpload.swfFileQueueNext();
     },
-    swfQueueComplete: function(event, data) { // onAllComplete
+    swfQueueComplete: function() {
       fileUpload.updateUploadCount();
     },
     initFile: function(file) {
@@ -2614,7 +2503,7 @@ define([
         $file.find(".cancel_upload_link").click(function(event) {
           event.preventDefault();
           var id = ($(this).parents(".file_upload").attr('id') || "").substring(12);
-          $("#file_swf").uploadifyCancel(file.id);
+          $("#file_swf").uploadify('cancel', file.id);
         });
       }
       $file.find(".file_name").text(file.name);

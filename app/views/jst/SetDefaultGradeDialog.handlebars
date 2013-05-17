@@ -1,8 +1,8 @@
-<form action="{{url}}" method="POST" title="{{#t "dialog_title"}}Default grade for %{assignment.name}{{/t}}">
+<form action="{{url}}" method="POST" title="{{#t "dialog_title"}}Default grade for {{assignment.name}}{{/t}}">
   <input type="hidden" name="assignment_id" class="assignment_id" value="{{assignment.id}}"/> 
   <div>
     {{#t "default_grades"}}
-      Give all students the same grade for <b>%{assignment.name}</b> by entering and submitting a grade value below:
+      Give all students the same grade for <b>{{assignment.name}}</b> by entering and submitting a grade value below:
     {{/t}}
   </div> 
   <p style="text-align: center;" class="grading_box_holder">
@@ -12,5 +12,5 @@
     <input type="checkbox" name="overwrite_existing_grades" id="overwrite_existing_grades_for_{{assignment.id}}"/>
     <label for="overwrite_existing_grades_for_{{assignment.id}}">{{#t "overwrite"}}Overwrite already-entered grades{{/t}}</label>
   </div>
-  <button type="submit" class="button" data-text-while-loading="{{#t "set_grades_button_loading"}}Setting Grades...{{/t}}">{{#t "set_grades_button"}}Set Default Grade{{/t}}</button>
+  <button type="submit" class="btn" data-text-while-loading="{{#t "set_grades_button_loading"}}Setting Grades...{{/t}}">{{#t "set_grades_button"}}Set Default Grade{{/t}}</button>
 </form>

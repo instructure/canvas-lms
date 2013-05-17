@@ -20,8 +20,7 @@ class FacebookController < ApplicationController
   protect_from_forgery :only => []
   before_filter :get_facebook_user
   before_filter :require_facebook_user, :only => [:settings, :notification_preferences, :hide_message]
-  filter_parameter_logging :fb_sig_friends
-  
+
   def notification_preferences
     @cc = @user.communication_channels.find_by_path_type('facebook')
     if @cc
@@ -48,7 +47,7 @@ class FacebookController < ApplicationController
   end
   
   def hide_message
-    @message = Message.for_user(@user.id).to_facebook.find(params[:id])
+    @message = @user.messages.to_facebook.find(params[:id])
     @message.destroy
     render :json => @message.to_json
   end
@@ -61,9 +60,9 @@ class FacebookController < ApplicationController
     flash[:notice] = t :authorization_success, "Authorization successful!  Canvas and Facebook are now friends." if params[:just_authorized]
     @messages = []
     if @user
-      @messages = Message.for_user(@user.id).to_facebook.to_a
+      @messages = @user.messages.to_facebook.to_a
       Facebook.dashboard_clear_count(@service) if @service
-      @domains = @user.pseudonyms.scoped({:include => :account}).to_a.once_per(&:account_id).map{|p| HostUrl.context_host(p.account) }.uniq
+      @domains = @user.pseudonyms.includes(:account).to_a.once_per(&:account_id).map{|p| HostUrl.context_host(p.account) }.uniq
     end
     respond_to do |format|
       format.html { render :action => 'index', :layout => 'facebook' }
@@ -103,26 +102,45 @@ class FacebookController < ApplicationController
 
   def get_facebook_user
     return false if facebook_disabled?
+    @embeddable = true
 
     if params[:signed_request]
       data, sig = Facebook.parse_signed_request(params[:signed_request])
       if data && sig
-        @facebook_user_id = data['user_id']
-        @service = UserService.find_by_service_and_service_user_id('facebook', @facebook_user_id)
-        @service.update_attribute(:token, data['oauth_token']) if @service && !@service.token && data['oauth_token']
-        @user = @service && @service.user
-        session[:facebook_user_id] = @facebook_user_id
+        if @facebook_user_id = data['user_id']
+          Shard.with_each_shard(UserService.associated_shards('facebook', @facebook_user_id)) do
+            @service = UserService.find_by_service_and_service_user_id('facebook', @facebook_user_id)
+            break if @service
+          end
+        end
+        if @service
+          @service.update_attribute(:token, data['oauth_token']) if !@service.token && data['oauth_token']
+          @user = @service.user
+        end
+        session[:facebook_canvas_user_id] = @user.id if @user
         return true
       else
         flash[:error] = t :invalid_signature, "Invalid Facebook signature"
         redirect_to dashboard_url
         return false
       end
+    elsif session[:facebook_canvas_user_id]
+      @user = User.find(session[:facebook_canvas_user_id])
+      @service = @user.user_services.find_by_service('facebook')
     elsif session[:facebook_user_id]
       @facebook_user_id = session[:facebook_user_id]
-      @service = UserService.find_by_service_and_service_user_id('facebook', @facebook_user_id)
+      Shard.with_each_shard(UserService.associated_shards('facebook', @facebook_user_id)) do
+        @service = UserService.find_by_service_and_service_user_id('facebook', @facebook_user_id)
+        break if @service
+      end
       @user = @service && @service.user
-      session[:facebook_user_id] = @facebook_user_id
+      session[:facebook_canvas_user_id] = @user.id if @user
+    elsif params[:force_view] == '1'
+      if @current_user
+        @user = @current_user
+        session[:facebook_canvas_user_id] = @user.id
+        @service = @user.user_services.find_by_service('facebook')
+      end
     end
   end
 end

@@ -19,7 +19,7 @@
 require 'quiz_question_link_migrator'
 
 class QuizQuestion < ActiveRecord::Base
-  attr_accessible :quiz, :quiz_group, :assessment_question, :question_data, :assessment_question_version, :quiz_group, :quiz
+  attr_accessible :quiz, :quiz_group, :assessment_question, :question_data, :assessment_question_version
   attr_readonly :quiz_id
   belongs_to :quiz
   belongs_to :assessment_question
@@ -27,6 +27,7 @@ class QuizQuestion < ActiveRecord::Base
   before_save :infer_defaults
   before_save :create_assessment_question
   before_destroy :delete_assessment_question
+  before_destroy :update_quiz
   validates_presence_of :quiz_id
   serialize :question_data
   after_save :update_quiz
@@ -43,7 +44,7 @@ class QuizQuestion < ActiveRecord::Base
   protected :infer_defaults
   
   def update_quiz
-    Quiz.update_all({:last_edited_at => Time.now.utc}, {:id => self.quiz_id})
+    Quiz.mark_quiz_edited(self.quiz_id)
   end
   
   def question_data=(data)
@@ -140,15 +141,24 @@ class QuizQuestion < ActiveRecord::Base
     unless hash[:prepped_for_import]
       AssessmentQuestion.prep_for_import(hash, context)
     end
+
     question_data = self.connection.quote hash.to_yaml
-    query = "INSERT INTO quiz_questions (quiz_id, quiz_group_id, assessment_question_id, question_data, created_at, updated_at, migration_id, position)"
     aq_id = hash['assessment_question_id'] ? hash['assessment_question_id'] : 'NULL'
     g_id = quiz_group ? quiz_group.id : 'NULL'
     q_id = quiz ? quiz.id : 'NULL'
     position = hash[:position].nil? ? 'NULL' : hash[:position].to_i
-    query += " VALUES (#{q_id}, #{g_id}, #{aq_id},#{question_data},'#{Time.now.to_s(:db)}', '#{Time.now.to_s(:db)}', '#{hash[:migration_id]}', #{position})"
-    id = self.connection.insert(query)
-    hash[:quiz_question_id] = id
+    if id = hash['quiz_question_id']
+      query = "UPDATE quiz_questions"
+      query += " SET quiz_group_id = #{g_id}, assessment_question_id = #{aq_id}, question_data = #{question_data},"
+      query += " created_at = '#{Time.now.to_s(:db)}', updated_at = '#{Time.now.to_s(:db)}',"
+      query += " migration_id = '#{hash[:migration_id]}', position = #{position}"
+      query += " WHERE id = #{id}"
+      self.connection.execute(query)
+    else
+      query = "INSERT INTO quiz_questions (quiz_id, quiz_group_id, assessment_question_id, question_data, created_at, updated_at, migration_id, position)"
+      query += " VALUES (#{q_id}, #{g_id}, #{aq_id},#{question_data},'#{Time.now.to_s(:db)}', '#{Time.now.to_s(:db)}', '#{hash[:migration_id]}', #{position})"
+      id = self.connection.insert(query)
+    end
     hash
   end
 
@@ -157,7 +167,7 @@ class QuizQuestion < ActiveRecord::Base
   end
 
   def self.batch_migrate_file_links(ids)
-    questions = QuizQuestion.find(:all, :include => [:quiz, :assessment_question], :conditions => ['id in (?)', ids])
+    questions = QuizQuestion.includes(:quiz, :assessment_question).where(:id => ids)
     questions.each do |question|
       if question.migrate_file_links
         question.save

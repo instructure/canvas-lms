@@ -781,11 +781,11 @@ describe "security" do
         response.should be_success
       end
 
-      it "manage_jobs" do
+      it "view_jobs" do
         get "/jobs"
         response.should be_redirect
 
-        add_permission :manage_jobs
+        add_permission :view_jobs
 
         get "/jobs"
         response.should be_success
@@ -843,7 +843,7 @@ describe "security" do
 
         get "/courses/#{@course.id}/users"
         response.should be_success
-        response.body.should match /View Student Groups/
+        response.body.should match /View User Groups/
         response.body.should match /View Prior Enrollments/
         response.body.should_not match /Manage Users/
 
@@ -881,7 +881,7 @@ describe "security" do
 
         get "/courses/#{@course.id}/users"
         response.should be_success
-        response.body.should_not match /View Student Groups/
+        response.body.should_not match /View User Groups/
         response.body.should match /View Prior Enrollments/
         response.body.should match /Manage Users/
 
@@ -1122,6 +1122,28 @@ describe "security" do
 
         delete "/courses/#{@course.id}", :event => 'conclude'
         response.status.should == '401 Unauthorized'
+      end
+
+      it 'view_statistics' do
+        course_with_teacher_logged_in(:active_all => 1)
+
+        @student = user :active_all => true
+        @course.enroll_student(@student).tap do |e|
+          e.workflow_state = 'active'
+          e.save!
+        end
+
+        get "/courses/#{@course.id}/users/#{@student.id}"
+        response.should be_success
+
+        get "/users/#{@student.id}"
+        response.status.should == '401 Unauthorized'
+
+        admin = account_admin_user :account => Account.site_admin
+        user_session(admin)
+
+        get "/users/#{@student.id}"
+        response.should be_success
       end
     end
   end

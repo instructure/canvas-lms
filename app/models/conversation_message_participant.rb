@@ -20,15 +20,15 @@ class ConversationMessageParticipant < ActiveRecord::Base
   include SimpleTags
 
   belongs_to :conversation_message
+  belongs_to :user
+  # deprecated
   belongs_to :conversation_participant
   delegate :author, :author_id, :generated, :body, :to => :conversation_message
 
   attr_accessible
 
-  named_scope :for_conversation_and_message, lambda { |conversation_id, message_id|
-    {
-      :joins => "INNER JOIN conversation_participants ON conversation_participants.id = conversation_participant_id",
-      :conditions => ["conversation_id = ? AND conversation_message_id = ?", conversation_id, message_id]
-    }
+  scope :for_conversation_and_message, lambda { |conversation_id, message_id|
+    joins("INNER JOIN conversation_participants ON conversation_participants.id = conversation_participant_id").
+        where(:conversation_id => conversation_id, :conversation_message_id => message_id)
   }
 end

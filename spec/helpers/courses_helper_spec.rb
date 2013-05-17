@@ -21,6 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 describe CoursesHelper do
   include ApplicationHelper
   include CoursesHelper
+  include QuizzesHelper
 
   context "a view with a 'Coming Up' sidebar" do
     before(:each) do
@@ -80,4 +81,29 @@ describe CoursesHelper do
       @icon_class.should eql icon
     end
   end
+
+  context "readable_grade" do
+    it "should return nil if not graded" do
+      submission = Submission.new
+      readable_grade(submission).should be_nil
+    end
+
+    it "should return a capitalized grade without an assignment" do
+      submission = Submission.new(:grade => 'unknown', :workflow_state => 'graded')
+      readable_grade(submission).should == 'Unknown'
+    end
+
+    it "should return nil if not graded" do
+      submission = Submission.new(:grade => 1.33333333, :workflow_state => 'graded')
+      submission.create_assignment(:points_possible => 5, :grading_type => 'points')
+      readable_grade(submission).should == '1.33 out of 5'
+    end
+
+    it "should not raise an error when passing a numeric type but grading_type is not 'points'" do
+      submission = Submission.new(:grade => 1.33333333, :workflow_state => 'graded')
+      submission.create_assignment(:points_possible => 5)
+      readable_grade(submission).should == '1.33333333'
+    end
+  end
+
 end

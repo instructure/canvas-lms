@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011-12 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -27,6 +27,7 @@ describe "courses/settings.html.erb" do
     @course.save!
     assigns[:context] = @course
     assigns[:user_counts] = {}
+    assigns[:all_roles] = Role.custom_roles_and_counts_for_course(@course, @user)
   end
 
   describe "sis_source_id edit box" do
@@ -75,14 +76,55 @@ describe "courses/settings.html.erb" do
     end
   end
 
-  describe "End this course button" do
-    it "should not display if the course has soft-concluded" do
-      @course.update_attribute(:conclude_at, Time.now - 1.week)
-
-      view_context(@course, @user)
-      assigns[:current_user] = @user
+  describe "add user link" do
+    it "should not show add user link for hard concluded course" do
+      admin = account_admin_user(:account => @course.root_account)
+      @course.complete
+      view_context(@course, admin)
+      assigns[:current_user] = admin
       render
-      response.body.should_not match(/End this Course/)
+      response.should_not have_tag('.add_users_link')
+    end
+
+    it "should not show add user link for soft concluded course" do
+      admin = account_admin_user(:account => @course.root_account)
+      @course.conclude_at = 1.day.ago
+      @course.restrict_enrollments_to_course_dates = true
+      @course.save!
+      view_context(@course, admin)
+      assigns[:current_user] = admin
+      render
+      response.should_not have_tag('.add_users_link')
+    end
+
+  end
+
+  describe "quota box" do
+    context "as account admin" do
+      before do
+        admin = account_admin_user
+        view_context(@course, admin)
+        assigns[:current_user] = admin
+      end
+  
+      it "should show quota input box" do
+        render
+        response.should have_tag "input#course_storage_quota_mb"
+      end
+    end
+  
+    context "as teacher" do
+      before do
+        view_context(@course, @teacher)
+        assigns[:current_user] = @teacher
+        @user = @teacher
+      end
+  
+      it "should not show quota input box" do
+        render
+        response.should_not have_tag "input#course_storage_quota_mb"
+      end
     end
   end
+    
 end

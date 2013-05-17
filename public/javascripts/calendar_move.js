@@ -123,8 +123,9 @@ define([
           id = "mini_" + id;
         }
         $day.attr('id', id)
+          .addClass("date_" + month_number + "_" + day_number + "_" + year)
           .find(".day_number").text(day).attr('title', month_number + "/" + day_number + "/" + year)
-          .addClass("date_" + month_number + "_" + day_number + "_" + year);
+          .addClass("date_" + month_number + "_" + day_number + "_" + year); // left here because I don't know what it'll break...
         var $div = $day.children('div');
         if($month.hasClass('mini_month')) {
           $div = $day;

@@ -46,7 +46,9 @@ module Canvas
     end
     
     def default_settings
-      @meta[:settings]
+      settings = @meta[:settings]
+      settings = settings.call if settings.respond_to?(:call)
+      settings
     end
     
     def saved_settings

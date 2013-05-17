@@ -1,0 +1,16 @@
+<h3 class="title">
+  <i class="icon-folder"></i>
+  {{title}}
+</h3>
+<div class="description">
+  {{{description}}}
+</div>
+
+{{#unless readOnly}}
+<a href="#" style="float:right" class="edit_button ui-button ui-widget ui-state-default ui-corner-all" role="button">
+  {{#t "links.edit_outcome_group"}}Edit Outcome Group{{/t}}
+</a>
+<a href="#" style="float:right" class="delete_button ui-button ui-widget ui-state-default ui-corner-all" role="button">
+  {{#t "links.delete_outcome_group"}}Delete Outcome Group{{/t}}
+</a>
+{{/unless}}

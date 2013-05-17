@@ -148,7 +148,7 @@ class CollectionItemsController < ApplicationController
   def index
     pagination_route = api_v1_collection_items_list_url(@collection)
     if authorized_action(@collection, @current_user, :read)
-      @items = Api.paginate(@collection.collection_items.active.newest_first.scoped(:include => :user), self, pagination_route)
+      @items = Api.paginate(@collection.collection_items.active.newest_first.includes(:user), self, pagination_route)
       render :json => collection_items_json(@items, @current_user, session)
     end
   end
@@ -379,6 +379,6 @@ class CollectionItemsController < ApplicationController
   end
 
   def find_upvote
-    @item.collection_item_data.collection_item_upvotes.find_by_user_id(@current_user.id)
+    @current_user.collection_item_upvotes.find_by_collection_item_data_id(@item.collection_item_data_id)
   end
 end

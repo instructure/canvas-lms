@@ -20,6 +20,14 @@ module Delayed
         include Delayed::Backend::Base
         set_table_name :delayed_jobs
 
+        def self.reconnect!
+          connection.reconnect!
+        end
+
+        class << self
+          attr_accessor :batch_size, :select_random
+        end
+
         # be aware that some strand functionality is controlled by triggers on
         # the database. see
         # db/migrate/20110831210257_add_delayed_jobs_next_in_strand.rb
@@ -38,7 +46,7 @@ module Delayed
         # outside rails is *not* safe when using mysql for the queue.
         after_destroy :update_strand_on_destroy
         def update_strand_on_destroy
-          if strand.present? && next_in_strand? && self.class.connection.adapter_name == 'MySQL'
+          if strand.present? && next_in_strand? && %w{MySQL Mysql2}.include?(self.class.connection.adapter_name)
             # this funky sub-sub-select is to force mysql to create a temporary
             # table, otherwise it fails complaining that you can't select from
             # the same table you are updating
@@ -56,49 +64,162 @@ module Delayed
           end
         end
 
-        named_scope :current, lambda {
-          { :conditions => ["run_at <= ?", db_time_now] }
-        }
+        def self.current
+          where("run_at<=?", db_time_now)
+        end
 
-        named_scope :future, lambda {
-          { :conditions => ["run_at > ?", db_time_now] }
-        }
+        def self.future
+          where("run_at>?", db_time_now)
+        end
 
-        named_scope :failed, :conditions => ["failed_at IS NOT NULL"]
+        def self.failed
+          where("failed_at IS NOT NULL")
+        end
 
-        named_scope :running, :conditions => ["locked_at is NOT NULL AND locked_by <> 'on hold'"]
+        def self.running
+          where("locked_at IS NOT NULL AND locked_by<>'on hold'")
+        end
 
         # a nice stress test:
         # 10_000.times { |i| Kernel.send_later_enqueue_args(:system, { :strand => 's1', :run_at => (24.hours.ago + (rand(24.hours.to_i))) }, "echo #{i} >> test1.txt") }
         # 500.times { |i| "ohai".send_later_enqueue_args(:reverse, { :run_at => (12.hours.ago + (rand(24.hours.to_i))) }) }
         # then fire up your workers
         # you can check out strand correctness: diff test1.txt <(sort -n test1.txt)
-        named_scope :ready_to_run, lambda {
-          { :conditions => ["run_at <= ? AND locked_at IS NULL AND next_in_strand = ?", db_time_now, true] }
-        }
-        named_scope :by_priority, :order => 'priority ASC, run_at ASC'
+         def self.ready_to_run
+           where("run_at<=? AND locked_at IS NULL AND next_in_strand=?", db_time_now, true)
+         end
+        def self.by_priority
+          order("priority ASC, run_at ASC")
+        end
 
         # When a worker is exiting, make sure we don't have any locked jobs.
         def self.clear_locks!(worker_name)
-          update_all("locked_by = null, locked_at = null", ["locked_by = ?", worker_name])
+          where(:locked_by => worker_name).update_all(:locked_by => nil, :locked_at => nil)
         end
 
         def self.unlock_expired_jobs(max_run_time = Delayed::Worker.max_run_time)
-          update_all("locked_by = null, locked_at = null", ["locked_by <> 'on hold' AND locked_at < ?", db_time_now - max_run_time])
+          where("locked_by<>'on hold' AND locked_at<?", db_time_now - max_run_time).update_all(:locked_by => nil, :locked_at => nil)
+        end
+
+        def self.strand_size(strand)
+          self.where(:strand => strand).count
+        end
+
+        def self.running_jobs()
+          self.running.order(:locked_at)
+        end
+
+        def self.scope_for_flavor(flavor, query)
+          scope = case flavor.to_s
+          when 'current'
+            self.current
+          when 'future'
+            self.future
+          when 'failed'
+            Delayed::Job::Failed
+          when 'strand'
+            self.where(:strand => query)
+          when 'tag'
+            self.where(:tag => query)
+          else
+            raise ArgumentError, "invalid flavor: #{flavor.inspect}"
+          end
+
+          if %w(current future).include?(flavor.to_s)
+            queue = query.presence || Delayed::Worker.queue
+            scope = scope.where(:queue => queue)
+          end
+
+          scope
+        end
+
+        # get a list of jobs of the given flavor in the given queue
+        # flavor is :current, :future, :failed, :strand or :tag
+        # depending on the flavor, query has a different meaning:
+        # for :current and :future, it's the queue name (defaults to Delayed::Worker.queue)
+        # for :strand it's the strand name
+        # for :tag it's the tag name
+        # for :failed it's ignored
+        def self.list_jobs(flavor,
+                           limit,
+                           offset = 0,
+                           query = nil)
+          scope = self.scope_for_flavor(flavor, query)
+          order = flavor.to_s == 'future' ? 'run_at' : 'id desc'
+          scope.order(order).limit(limit).offset(offset).all
+        end
+
+        # get the total job count for the given flavor
+        # see list_jobs for documentation on arguments
+        def self.jobs_count(flavor,
+                            query = nil)
+          scope = self.scope_for_flavor(flavor, query)
+          scope.count
+        end
+
+        # perform a bulk update of a set of jobs
+        # action is :hold, :unhold, or :destroy
+        # to specify the jobs to act on, either pass opts[:ids] = [list of job ids]
+        # or opts[:flavor] = <some flavor> to perform on all jobs of that flavor
+        def self.bulk_update(action, opts)
+          scope = if opts[:flavor]
+            raise("Can't bulk update failed jobs") if opts[:flavor].to_s == 'failed'
+            self.scope_for_flavor(opts[:flavor], opts[:query])
+          elsif opts[:ids]
+            self.where(:id => opts[:ids])
+          end
+
+          return 0 unless scope
+
+          case action.to_s
+          when 'hold'
+            scope.update_all(:locked_by => ON_HOLD_LOCKED_BY, :locked_at => db_time_now, :attempts => ON_HOLD_COUNT)
+          when 'unhold'
+            now = db_time_now
+            scope.update_all(["locked_by = NULL, locked_at = NULL, attempts = 0, run_at = (CASE WHEN run_at > ? THEN run_at ELSE ? END), failed_at = NULL", now, now])
+          when 'destroy'
+            scope.delete_all
+          end
+        end
+
+        # returns a list of hashes { :tag => tag_name, :count => current_count }
+        # in descending count order
+        # flavor is :current or :all
+        def self.tag_counts(flavor,
+                            limit,
+                            offset = 0)
+          raise(ArgumentError, "invalid flavor: #{flavor}") unless %w(current all).include?(flavor.to_s)
+          scope = case flavor.to_s
+            when 'current'
+              self.current
+            when 'all'
+              self
+            end
+
+          scope = scope.group(:tag).offset(offset).limit(limit)
+          (Rails.version < "3.0" ?
+              scope.count(:tag, :order => "COUNT(tag) DESC") :
+              scope.order("COUNT(tag) DESC").count).map { |t,c| { :tag => t, :count => c } }
         end
 
         def self.get_and_lock_next_available(worker_name,
-                                             queue = nil,
+                                             queue = Delayed::Worker.queue,
                                              min_priority = nil,
                                              max_priority = nil)
 
-          min_priority ||= Delayed::MIN_PRIORITY
-          max_priority ||= Delayed::MAX_PRIORITY
+          check_queue(queue)
+          check_priorities(min_priority, max_priority)
 
-          @batch_size ||= Setting.get_cached('jobs_get_next_batch_size', '5').to_i
+          self.batch_size ||= Setting.get_cached('jobs_get_next_batch_size', '5').to_i
+          if self.select_random.nil?
+            self.select_random = Setting.get_cached('jobs_select_random', 'false') == 'true'
+          end
           loop do
             jobs = find_available(@batch_size, queue, min_priority, max_priority)
             return nil if jobs.empty?
+            if self.select_random
+              jobs = jobs.sort_by { rand }
+            end
             job = jobs.detect do |job|
               job.lock_exclusively!(worker_name)
             end
@@ -107,21 +228,24 @@ module Delayed
         end
 
         def self.find_available(limit,
-                                queue = nil,
+                                queue = Delayed::Worker.queue,
                                 min_priority = nil,
                                 max_priority = nil)
-          all_available(queue, min_priority, max_priority).all(:limit => limit)
+          all_available(queue, min_priority, max_priority).limit(limit).all
         end
 
-        def self.all_available(queue = nil,
+        def self.all_available(queue = Delayed::Worker.queue,
                                min_priority = nil,
                                max_priority = nil)
-          scope = self.ready_to_run
-          scope = scope.scoped(:conditions => ['priority >= ?', min_priority]) if min_priority
-          scope = scope.scoped(:conditions => ['priority <= ?', max_priority]) if max_priority
-          scope = scope.scoped(:conditions => ['queue = ?', queue]) if queue
-          scope = scope.scoped(:conditions => ['queue is null']) unless queue
-          scope.by_priority
+          min_priority ||= Delayed::MIN_PRIORITY
+          max_priority ||= Delayed::MAX_PRIORITY
+
+          check_queue(queue)
+          check_priorities(min_priority, max_priority)
+
+          self.ready_to_run.
+              where(:priority => min_priority..max_priority, :queue => queue).
+              by_priority
         end
 
         # used internally by create_singleton to take the appropriate lock
@@ -133,7 +257,7 @@ module Delayed
               connection.execute(sanitize_sql(["SELECT pg_advisory_xact_lock(half_md5_as_bigint(?))", strand]))
               yield
             end
-          when 'MySQL'
+          when 'MySQL', 'Mysql2'
             self.transaction do
               begin
                 connection.execute("LOCK TABLES #{table_name} WRITE")
@@ -162,7 +286,7 @@ module Delayed
         def self.create_singleton(options)
           strand = options[:strand]
           transaction_for_singleton(strand) do
-            job = self.first(:conditions => ["strand = ? AND locked_at IS NULL", strand], :order => :id)
+            job = self.where(:strand => strand, :locked_at => nil).order(:id).first
             job || self.create(options)
           end
         end
@@ -176,7 +300,7 @@ module Delayed
         def lock_exclusively!(worker)
           now = self.class.db_time_now
           # We don't own this job so we will update the locked_by name and the locked_at
-          affected_rows = self.class.update_all(["locked_at = ?, locked_by = ?", now, worker], ["id = ? and locked_at is null and run_at <= ?", id, now])
+          affected_rows = self.class.where("id=? AND locked_at IS NULL AND run_at<=?", self, now).update_all(:locked_at => now, :locked_by => worker)
           if affected_rows == 1
             mark_as_locked!(now, worker)
             return true
@@ -207,8 +331,9 @@ module Delayed
           attrs['failed_at'] ||= self.class.db_time_now
           attrs.delete('next_in_strand')
           self.class.transaction do
-            Failed.create(attrs)
+            failed_job = Failed.create(attrs)
             self.destroy
+            failed_job
           end
         rescue
           # we got an error while failing the job -- we need to at least get
@@ -216,16 +341,6 @@ module Delayed
           self.destroy
           # re-raise so the worker logs the error, at least
           raise
-        end
-
-        # hold/unhold jobs with a scope
-        def self.hold!
-          update_all({ :locked_by => ON_HOLD_LOCKED_BY, :locked_at => db_time_now, :attempts => ON_HOLD_COUNT })
-        end
-
-        def self.unhold!
-          now = db_time_now
-          update_all(["locked_by = NULL, locked_at = NULL, attempts = 0, run_at = (CASE WHEN run_at > ? THEN run_at ELSE ? END), failed_at = NULL", now, now])
         end
 
         class Failed < Job

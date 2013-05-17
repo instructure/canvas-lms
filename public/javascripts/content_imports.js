@@ -4,6 +4,7 @@ define([
   'jquery' /* $ */,
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_date_and_time' /* parseFromISO, date_field */,
+  'jquery.instructure_forms' /* formSubmit, getFormData, validateForm */,
   'jquery.instructure_misc_plugins' /* showIf */,
   'compiled/jquery.rails_flash_notifications',
   'vendor/date' /* Date.parse */,
@@ -16,17 +17,19 @@ define([
     var populateItem = function ($item, id, name, param_name) {
       pendingPopulates += 1;
       setTimeout(function () {
-        var full_param_name = param_name + "[" + id + "]";
-        $item.find(":checkbox:first")
-                .attr('name', full_param_name)
-                .attr('id', full_param_name.replace(/[\[\]]+/g, "_"));
-        if (name != null) {
+        if ($item != null) {
+          var full_param_name = param_name + "[" + id + "]";
+          $item.find(":checkbox:first")
+            .attr('name', full_param_name)
+            .attr('id', full_param_name.replace(/[\[\]]+/g, "_"));
+          if (name != null) {
+            $item.find("label:first")
+              .text(name);
+          }
           $item.find("label:first")
-                  .text(name);
+            .attr('for', full_param_name.replace(/[\[\]]+/g, "_"));
+          $item.show();
         }
-        $item.find("label:first")
-                .attr('for', full_param_name.replace(/[\[\]]+/g, "_"));
-        $item.show();
         pendingPopulates -= 1;
         if (pendingPopulates <= 0) {
           $("#copy_context_form_loading").hide();
@@ -193,6 +196,7 @@ define([
           $("#copy_files_list").append(folders[folderNames[idx]]);
         }
       }
+      populateItem(null, null, null, null);
       $("#copy_files_list").showIf(file_count > 0);
       $("#copy_context_form .course_name").text(data.name);
       $("#copy_everything").prop('checked', true).change();
@@ -203,15 +207,16 @@ define([
           $(this).triggerHandler('change');
         });
       } else if ($(this).hasClass('copy_everything')) {
-        $("#copy_context_form :checkbox:not(.secondary_checkbox):not(.copy_everything)").prop('checked', $(this).prop('checked')).filter(":not(.copy_all)").each(function () {
+        $("#copy_context_form :checkbox:not(.secondary_checkbox):not(.copy_everything):not(.shift_dates_checkbox)").prop('checked', $(this).prop('checked')).filter(":not(.copy_all)").each(function () {
           $(this).triggerHandler('change');
         });
       } else {
         $(this).parent().find(":checkbox.secondary_checkbox").prop('checked', $(this).prop('checked'));
         if (!$(this).prop('checked')) {
           $(this).parents("ul").each(function () {
-            $(this).prev("h2,h3,h4").find(":checkbox").prop('checked', false);
+            $(this).prevAll("h2,h3,h4").find(":checkbox").prop('checked', false);
           });
+          $("#copy_everything").prop('checked', false);
         }
       }
     });
@@ -242,9 +247,6 @@ define([
       });
     });
 
-    var $frame = $("<iframe id='copy_course_target' name='copy_course_target' src='about:blank'/>");
-    $("body").append($frame.hide());
-    $("#copy_context_form").attr('target', 'copy_course_target');
     $(".copy_progress").progressbar();
     // todo change to formsubmit
     $("#copy_context_form").formSubmit({

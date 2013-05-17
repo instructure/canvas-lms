@@ -16,7 +16,6 @@ courses_002:
   section: "101"
   allow_student_wiki_edits: 
   workflow_state: available
-  allow_student_assignment_edits: 
   created_at: 2009-04-30 23:55:49
 courses_003: 
   name: Hum 200
@@ -34,7 +33,6 @@ courses_003:
   section: "101"
   allow_student_wiki_edits: 
   workflow_state: available
-  allow_student_assignment_edits: 
   created_at: 2009-04-30 23:55:49
 courses_004: 
   name: Chem 105
@@ -52,7 +50,6 @@ courses_004:
   section: "101"
   allow_student_wiki_edits: 
   workflow_state: available
-  allow_student_assignment_edits: 
   created_at: 2009-04-30 23:55:49
 courses_005: 
   name: Biology 100
@@ -70,7 +67,6 @@ courses_005:
   section: "101"
   allow_student_wiki_edits: 
   workflow_state: available
-  allow_student_assignment_edits: 
   created_at: 2009-04-30 23:55:49
 courses_006: 
   name: value for name
@@ -88,7 +84,6 @@ courses_006:
   section: value for section
   allow_student_wiki_edits: t
   workflow_state: created
-  allow_student_assignment_edits: t
   created_at: 2009-04-30 23:55:53
 courses_001: 
   name: Math 115
@@ -106,5 +101,4 @@ courses_001:
   section: "101"
   allow_student_wiki_edits: 
   workflow_state: available
-  allow_student_assignment_edits: 
   created_at: 2009-04-30 23:55:49

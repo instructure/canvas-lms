@@ -41,6 +41,11 @@ def api_call(method, path, params, body_params = {}, headers = {}, opts = {})
     response.should be_success, response.body
   end
 
+  if response.headers['Link']
+    # make sure that the link header is properly formed
+    Api.parse_pagination_links(response.headers['Link'])
+  end
+
   case params[:format]
   when 'json'
     response.header['content-type'].should == 'application/json; charset=utf-8'
@@ -62,10 +67,20 @@ end
 
 # like api_call, but performed by the specified user instead of @user
 def api_call_as_user(user, method, path, params, body_params = {}, headers = {}, opts = {})
-  token = user.access_tokens.first || user.access_tokens.create!(:purpose => 'test')
-  headers['Authorization'] = "Bearer #{token.token}"
+  token = access_token_for_user(user)
+  headers['Authorization'] = "Bearer #{token}"
   user.pseudonyms.create!(:unique_id => "#{user.id}@example.com", :account => opts[:domain_root_account]) unless user.pseudonym(true)
   api_call(method, path, params, body_params, headers, opts)
+end
+
+$spec_api_tokens = {}
+
+def access_token_for_user(user)
+  token = $spec_api_tokens[user]
+  unless token
+    token = $spec_api_tokens[user] = user.access_tokens.create!(:purpose => "test").full_token
+  end
+  token
 end
 
 # like api_call, but don't assume success and a json response.
@@ -75,9 +90,8 @@ def raw_api_call(method, path, params, body_params = {}, headers = {}, opts = {}
     params_from_with_nesting(method, path).should == params
 
     if !params.key?(:api_key) && !params.key?(:access_token) && !headers.key?('Authorization') && @user
-      token = @user.access_tokens.first
-      token ||= @user.access_tokens.create!(:purpose => 'test')
-      headers['Authorization'] = "Bearer #{token.token}"
+      token = access_token_for_user(@user)
+      headers['Authorization'] = "Bearer #{token}"
       @user.pseudonyms.create!(:unique_id => "#{@user.id}@example.com", :account => opts[:domain_root_account]) unless @user.pseudonym(true)
     end
 
@@ -85,6 +99,15 @@ def raw_api_call(method, path, params, body_params = {}, headers = {}, opts = {}
 
     __send__(method, path, params.reject { |k,v| %w(controller action).include?(k.to_s) }.merge(body_params), headers)
   end
+end
+
+def follow_pagination_link(rel, params={})
+  links = Api.parse_pagination_links(response.headers['Link'])
+  link = links.find{ |l| l[:rel] == rel }
+  link.delete(:rel)
+  uri = link.delete(:uri).to_s
+  link.each{ |key,value| params[key.to_sym] = value }
+  api_call(:get, uri, params)
 end
 
 def params_from_with_nesting(method, path)
@@ -104,18 +127,33 @@ def should_translate_user_content(course)
   content = %{
     <p>
       Hello, students.<br>
-      This will explain everything: <img src="/courses/#{course.id}/files/#{attachment.id}/preview" alt="important">
+      This will explain everything: <img id="1" src="/courses/#{course.id}/files/#{attachment.id}/preview" alt="important">
+      This won't explain anything:  <img id="2" src="/courses/#{course.id}/files/#{attachment.id}/download" alt="important">
       Also, watch this awesome video: <a href="/media_objects/qwerty" class="instructure_inline_media_comment video_comment" id="media_comment_qwerty"><img></a>
+      And refer to this <a href="/courses/#{course.id}/wiki/awesome-page">awesome wiki page</a>.
     </p>
   }
   html = yield content
   doc = Nokogiri::HTML::DocumentFragment.parse(html)
-  img = doc.at_css('img')
-  img.should be_present
-  img['src'].should == "http://www.example.com/files/#{attachment.id}/download?verifier=#{attachment.uuid}"
+  img1 = doc.at_css('img#1')
+  img1.should be_present
+  img1['src'].should == "http://www.example.com/courses/#{course.id}/files/#{attachment.id}/preview?verifier=#{attachment.uuid}"
+  img2 = doc.at_css('img#2')
+  img2.should be_present
+  img2['src'].should == "http://www.example.com/courses/#{course.id}/files/#{attachment.id}/download?verifier=#{attachment.uuid}"
   video = doc.at_css('video')
   video.should be_present
   video['poster'].should match(%r{http://www.example.com/media_objects/qwerty/thumbnail})
   video['src'].should match(%r{http://www.example.com/courses/#{course.id}/media_download})
-    video['src'].should match(%r{entryId=qwerty})
+  video['src'].should match(%r{entryId=qwerty})
+  doc.css('a').last['data-api-endpoint'].should match(%r{http://www.example.com/api/v1/courses/#{course.id}/pages/awesome-page})
+  doc.css('a').last['data-api-returntype'].should == 'Page'
+end
+
+def should_process_incoming_user_content(context)
+  attachment_model(:context => context)
+  incoming_content = "<p>content blahblahblah <a href=\"/files/#{@attachment.id}/download?a=1&amp;verifier=2&amp;b=3\">haha</a></p>"
+
+  saved_content = yield incoming_content
+  saved_content.should == "<p>content blahblahblah <a href=\"/#{context.class.to_s.underscore.pluralize}/#{context.id}/files/#{@attachment.id}/download?a=1&amp;b=3\">haha</a></p>"
 end

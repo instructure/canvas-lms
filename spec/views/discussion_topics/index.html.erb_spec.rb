@@ -23,11 +23,7 @@ describe "/discussion_topics/index" do
   it "should render" do
     course_with_teacher
     view_context(@course, @user)
-    @course.discussion_topics.create!(:title => "topic 1")
-    t2 = @course.discussion_topics.create!(:title => "topic 2")
-    t2.discussion_entries.create!(:message => "some message")
-    assigns[:topics] = @course.discussion_topics.paginate(:page => params[:page])
-    assigns[:all_topics] = @course.discussion_topics
+    assigns[:body_classes] = []
     render "discussion_topics/index"
     response.should_not be_nil
   end

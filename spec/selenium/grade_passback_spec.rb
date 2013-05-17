@@ -115,14 +115,14 @@ describe "grade exchange course settings tab" do
     @course.save!
 
     get "/courses/#{@course.id}/settings"
-    driver.find_element(:css, "a#tab-grade-publishing-link").click
+    f("#tab-grade-publishing-link").click
     wait_for_ajaximations
 
-    driver.find_element(:css, "#publish_grades_messages").text.should == "Unpublished - 6"
+    f("#publish_grades_messages").text.should == "Unpublished - 6"
     driver.execute_script "window.confirm = function(msg) { return true; }"
-    driver.find_element(:css, "#publish_grades_link").click
+    f("#publish_grades_link").click
     wait_for_ajaximations
-    driver.find_element(:css, "#publish_grades_messages").text.should == (wait_for_success ? "Publishing - 6" : "Published - 6")
+    f("#publish_grades_messages").text.should == (wait_for_success ? "Publishing - 6" : "Published - 6")
 
     server_thread.join
     post_lines.should == [
@@ -156,6 +156,6 @@ describe "grade exchange course settings tab" do
       "#{getenroll("S4", "S1").id},error,Invalid user",
       "#{Enrollment.find_by_user_id_and_course_section_id(@stud5.user.id, getsection("S3").id).id},error,Invalid user",
       "#{Enrollment.find_by_user_id_and_course_section_id(@stud6.user.id, @sec4.id).id},error,")
-    keep_trying_until { driver.find_element(:css, "#publish_grades_messages").text.strip.split("\n").to_set == "Error: Invalid user - 2\nPublished - 2\nPublished: Grade modified - 1\nError - 1".split("\n").to_set }
+    keep_trying_until { f("#publish_grades_messages").text.strip.split("\n").to_set == "Error: Invalid user - 2\nPublished - 2\nPublished: Grade modified - 1\nError - 1".split("\n").to_set }
   end
 end

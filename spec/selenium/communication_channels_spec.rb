@@ -14,7 +14,7 @@ describe "communication channel selenium tests" do
       f('#identity .logout').should be_present
     end
 
-    it "should allow the user to edit the pseudonym if it's already taken" do
+    it "should allow the user to edit the pseudonym if its already taken" do
       u1 = user_with_communication_channel(:username => 'asdf@qwerty.com', :user_state => 'creation_pending')
       # d'oh, now it's taken
       u2 = user_with_pseudonym(:username => 'asdf@qwerty.com', :active_user => true)

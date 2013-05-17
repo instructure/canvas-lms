@@ -1,6 +1,12 @@
 @import environment.sass
 @import turnitin.sass
 
+// DO NOT ADD ANYTHING TO THIS FILE
+// there is certainly a better place to put whatever it is that you were thinking
+// about putting here. Ask the UX team if you need advice.
+//
+// In fact, you will get a cookie for anything that you safely remove from this.
+
 #instructure_ajax_error_box
   :display none
   :position fixed
@@ -21,12 +27,17 @@
   left: 0
   width: 100%
 
+#flash_message_buffer // contains copies of all static messages so that we reserve enough height in the ui
+  visibility: hidden
+
 #flash_message_holder
+  height: 0
+
+#flash_message_holder, #flash_message_buffer
   top: 0
   list-style: none
   margin: 0
   padding: 0
-  height: 0
   li, .ui-effects-wrapper
     margin: 0 auto !important
   li
@@ -42,11 +53,19 @@
     width: 400px
     &.static_message
       width: auto
+    a
+      text-decoration: underline
+      color: inherit
     a.close_link
       position: absolute
       right: 10px
       top: 50%
-      margin-top: -8px
+      width: 20px
+      height: 20px
+      overflow: hidden
+      margin-top: -11px
+      color: white
+      text-decoration: none
     i
       display: inline-block
       vertical-align: middle
@@ -61,17 +80,6 @@
     &.no_close
       a.close_link
         display: none
-    &.xlarge
-      font-size: 1.5em
-      padding: 8px 40px 8px 8px
-      min-height: 42px
-      i
-        width: 40px
-        height: 40px
-        background-image: url(/images/check_36.png)
-      &.ui-state-error, &.ui-state-warning
-        i
-          background-image: url(/images/warning_36.png)
 
 #unauthorized_message
   border: 1px solid #000
@@ -123,7 +131,7 @@
     &.ui-accordion
       .ui-accordion-header
         margin-bottom: 1px
-.user_content .user_content_iframe
+.user_content iframe
   border: 0
   padding: 0
   margin: 0
@@ -178,7 +186,7 @@
   ul.item_list
     :margin-top 0
     :list-style-type none
-    :padding-left 15px
+    :margin-left 15px
     &.limit_height
       :max-height 150px
       :overflow auto
@@ -233,6 +241,10 @@
       float: right
       font-size: 10px
       font-weight: normal
+      
+      &[class*=icon-]:before, &[class^=icon-]:before
+        font-size: 16px
+        vertical-align: middle
 
   table.assignments
     :width 100%
@@ -352,6 +364,8 @@
 
 table.summary
   width: auto
+  th
+    text-align: left
   th, td
     padding: 2px 8px
     vertical-align: top
@@ -375,8 +389,6 @@ form table.formtable
   :margin 0
   :padding 0
   :width auto
-  input[type='text'], input[type='password']
-    width: 217px
 table.formtable td
   vertical-align: top
   padding: 2px 3px
@@ -423,96 +435,6 @@ span.hint
   :color #666
   :font-size 0.8em
 
-// #sidebar .assignment
-  th
-    :background-color #333
-    :text-align left
-    :color #ccc
-    :padding 0.1em 0.5em
-    :font-size 1.2em
-
-    a
-      :color #ccc
-      :text-decoration none
-
-  td
-    :background-color #ccc
-    :padding 0.1em 0.5em
-    :font-size 1.5em
-
-    &.load_pending
-      :background-image url(/images/ajax-loader-ccc.gif)
-      :background-repeat no-repeat
-      :background-position top left
-
-    a
-      :color #333
-
-    &.grade
-      :width 80px
-      :text-align center
-      :font-weight bold
-      :background-color #333
-      :color #aaa
-      :font-style italic
-      :font-size 0.8em
-
-      .total
-        :margin 0
-        :padding 0
-
-      .grade
-        :display block
-        :line-height 1
-        :margin 0
-        :padding 0
-        :margin-top 0.2em
-        :font-size 20px
-        :color #eee
-        :font-style normal
-
-    &.date
-      :width 80px
-      :text-align center
-      :font-weight bold
-      :background-color #333
-      :color #aaa
-      :font-style italic
-      :font-size 0.8em
-
-      .duedate
-        :display block
-        :line-height 1
-        :margin 0
-        :padding 0
-        :margin-top 0.2em
-        :font-size 20px
-        :color #eee
-        :font-style normal
-
-    &.name
-      :font-size 1.0em
-      :color #000
-
-    &.comments
-      :font-size 0.8em
-      :color #000
-
-    &.today
-      :background-color #FBAD00
-      :color #333
-
-      .duedate
-        :background-color #FBAD00
-        :color #333
-
-  .attachments
-    :width 90px
-    :padding 0
-    :vertical-align middle
-    :text-align center
-    :background-color #999
-
 .event_pending
   +opacity(0.4)
 
@@ -540,10 +462,6 @@ span.hint
   .message
     :font-size 1.5em
     :color #000
-
-.form_text_hint
-  :font-style italic
-  :color #888
 
 .loading_image
   :background-color #fff
@@ -612,7 +530,8 @@ ul.group_list
 
   h3
     :border-bottom 1px solid #aaa
-    :margin 0
+    :margin 0 0 10px
+    :padding-bottom 5px
 
 
   .wizard_content
@@ -620,6 +539,7 @@ ul.group_list
     :border-top 1px solid #888
     :padding 10px
     // :position relative
+    @include clearfix
     box-shadow: 0 0 10px #333
     .links
       float: right
@@ -638,51 +558,42 @@ ul.group_list
       :margin 0px 20px
       :color #444
       :position relative
+      
+      // adding override to link appearance, as javascript depends on there being a .link class here
+      a.link
+        :background-image none
+        :padding 0
+      
       p
         :margin-top 0
 
     .wizard_options_list
       :list-style-type none
       :margin 0 10px 0 0
-      :line-height 1.8em
-      :padding-left 10px
+      :padding-left 5px
+      li
+        line-height: 1.8em
 
       .option
         :cursor pointer
-        :padding-left 25px
-        :color #444
         :font-weight bold
+        :color #444
         +border-radius(3px)
-        :background-image url(/images/person.png)
-        :background-repeat no-repeat
-        :background-position 3px center
 
-        &.information_step
-          :background-image url(/images/information.png)
-        &.assignments_step
-          :background-image url(/images/grading_icon.png)
-        &.content_step
-          :background-image url(/images/file.png)
-        &.calendar_step
-          :background-image url(/images/due_date_icon.png)
-        &.publish_step
-          :background-image url(/images/forward.png)
-        &.add_step
-          :background-image url(/images/add.png)
-        &.quiz_step
-          :background-image url(/images/quiz.png)
-        &.download_step
-          :background-image url(/images/download.png)
-        &.edit_step
-          :background-image url(/images/edit.png)
-        &.delete_step
-          :background-image url(/images/delete.png)
         &:hover
           :background-color #ddd
         &.completed a
           :color #aaa
         &.selected
           :background-color #ccc
+        
+        a[class*=icon-], a[class^=icon-]
+          
+          &:before
+            :font-size 16px
+            :line-height 16px
+            :vertical-align text-top
+            :color #555
 
 #content_tags_dialog
   h3
@@ -728,12 +639,9 @@ ul.group_list
     :margin 0
     :list-style-type none
     :line-height 1.7em
-    :display table
 
     li
-      :display table-row
       span
-        :display table-cell
         :padding 1px 2px
       .keycode
         :font-weight bold
@@ -742,19 +650,6 @@ ul.group_list
         :font-family courier, monospace
         :text-align right
 
-#topic_list
-  .hidden_until_scroll
-    display: none
-  .part_of_clump
-    display: none
-.recent_messages_list
-  .communication_message,.communication_sub_message
-    .context_code
-      display: none
-  &.recent_messages_show_context
-    .communication_message,.communication_sub_message
-      .context_code
-        display: inline
 .communication_messages_list
   .communication_message,.communication_sub_message
     .context_code
@@ -966,7 +861,7 @@ ul.group_list
       margin: 0 10px 10px 0
       padding: 0
     li
-      padding 2px 5px
+      padding: 2px 5px
       margin: 0 0 2px 0
       list-style: none
       background: #e8e8e8
@@ -1196,13 +1091,14 @@ html > body .new_activity_message form textarea
 
 #user_list_boxes
   position: relative
-  height: 152px
+  min-height: 165px
   margin-top: 10px
   #user_list_textarea_container, #user_list_processing, #user_list_parsed
-    height: 152px
+    min-height: 165px
     width: 100%
-    position: absolute
     background-color: white
+    label
+      font-size: 0.8em
   textarea
     width: 98%
     height: 108px
@@ -1261,26 +1157,6 @@ body > #ui-datepicker-div
 
 .communication_message .media_comment_thumbnail
   margin: 3px 0
-.media_comment_thumbnail
-  width: 140px
-  height: 100px
-  margin: 3px 5px
-  background: url(/images/blank.png) no-repeat center center
-  background-color: #222
-  border: 0px solid #000
-  display: block
-  padding: 2px
-  img
-    display: block
-  &.media_comment_thumbnail-small
-    width: 70px
-    height: 50px
-a .media_comment_thumbnail
-  &:hover
-    border-color: #000
-    background-color: #333
-    padding: 2px
-    border-width: 0px
 
 table.side_tabs_table
   border-collapse: collapse
@@ -1424,14 +1300,6 @@ body.padless-content #content,#content.padless
 .custom_search_results_link
   font-size: 1.2em
 
-fieldset
-  border: 1px solid #ccc
-  +border-radius(3px)
-  padding: 5px 10px
-  margin-bottom: 5px
-  legend
-    font-weight: bold
-    margin-left: 20px
 h2.h-margin-top,h3.h-margin-top
   margin-top: 20px
 
@@ -1546,3 +1414,39 @@ form.user_content_post_form
     padding: 15px
     opacity: 0.90
     color: black
+
+.hidden-text
+  overflow: hidden
+  text-indent: -10000px
+  white-space: nowrap
+
+.hidden-inline-text
+  display: inline-block
+  height: 0
+  overflow: hidden
+  text-indent: -10000px
+  white-space: nowrap
+  width: 0
+
+.nav-badge
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25)
+  +border-radius(10px)
+  background-color: $highlight-color
+  padding: 1px 7px
+  font-size: 12px
+  color: white
+  float: right
+
+.unread-grade
+  float: left
+  display: inline-block
+  line-height: 8px
+  width: 8px
+  margin-top: 6px
+  margin-left: -16px
+  background-color: #06a9ee
+  +border-radius(4px)
+
+.clear
+  clear: both
+

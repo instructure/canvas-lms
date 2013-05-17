@@ -26,11 +26,12 @@ define([
   'compiled/grade_calculator',
   'str/htmlEscape',
   'compiled/gradebook2/Turnitin',
-  'jquery.ajaxJSON' /* ajaxJSONFiles, ajaxJSON */,
+  'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.dropdownList' /* dropdownList */,
   'jquery.instructure_date_and_time' /* parseFromISO */,
-  'jquery.instructure_forms' /* formSubmit, getFormData, formErrors, errorBox */,
+  'jquery.instructure_forms' /* ajaxJSONFiles, formSubmit, getFormData, formErrors, errorBox */,
   'jqueryui/dialog',
+  'compiled/jquery/fixDialogButtons' /* fix dialog formatting */,
   'jquery.instructure_misc_helpers' /* replaceTags, /\$\.size/ */,
   'jquery.instructure_misc_plugins' /* fragmentChange, showIf */,
   'jquery.keycodes' /* keycodes */,
@@ -46,6 +47,7 @@ define([
   var grading_scheme = window.grading_scheme;
   var readOnlyGradebook = window.readOnlyGradebook;
   var gradebook = window.gradebook;
+  var speedGraderEnabled = ENV.speed_grader_enabled;
 
   var $loading_gradebook_progressbar = $("#loading_gradebook_progressbar"),
       $default_grade_form = $("#default_grade_form"),
@@ -429,16 +431,17 @@ define([
               $assignment_details_dialog.fillTemplateData({
                   data: data
                 })
-                .dialog('close').dialog({
-                  autoOpen: false,
+                .dialog({
                   title: I18n.beforeLabel('details', "Details") + " " + data.title
-                }).dialog('open')
+                })
                 .find(".assignment_link").attr('href', data.url);
             });
           }
-          addOption('newwin', I18n.t('speed_grader', 'SpeedGrader'), function() {
-            window.location.href = extendedGradebookURL;
-          });
+          if (speedGraderEnabled) {
+            addOption('newwin', I18n.t('speed_grader', 'SpeedGrader'), function() {
+              window.location.href = extendedGradebookURL;
+            });
+          }
 
           var muteLink = {
             elements: {
@@ -600,14 +603,13 @@ define([
                 if(!$box.hasClass('grading_value')) { $input = $box.find(".grading_value"); }
                 $input.attr('name', 'default_grade').show();
                 $default_grade_form.find(".grading_box_holder").empty().append($box);
-                $default_grade_form.dialog('close').dialog({
-                  autoOpen: false,
+                $default_grade_form.dialog({
                   width: 350,
                   height: "auto",
                   open: function() {
                     $default_grade_form.find(".grading_box").focus();
                   }
-                }).dialog('open').dialog('option', 'title', I18n.t('default_grade_for_course', "Default Grade for %{assignment}", {'assignment': title}));
+                }).dialog('option', 'title', I18n.t('default_grade_for_course', "Default Grade for %{assignment}", {'assignment': title}));
               });
               if(columnData.grading_type != 'pass_fail' && columnData.points_possible) {
                 addOption('check', I18n.t('curve_grades', 'Curve Grades'), function() {
@@ -619,15 +621,13 @@ define([
                     .find(".out_of").showIf(data.points_possible || data.points_possible === '0').end()
                     .find("#middle_score").val(parseInt((data.points_possible || 0) * 0.6, 10)).end()
                     .find(".points_possible").text(data.points_possible).end()
-                    .dialog('close').dialog({
-                      autoOpen: false,
+                    .dialog({
                       width: 350,
                       height: "auto",
                       open: function() {
                         gradebook.curve();
                       }
-                    })
-                    .dialog('open').dialog('option', 'title', I18n.t('curve_grade_for_course', "Curve Grade for %{assignment}", {'assignment': title}));
+                    }).dialog('option', 'title', I18n.t('curve_grade_for_course', "Curve Grade for %{assignment}", {'assignment': title}));
                 });
               }
             }
@@ -647,11 +647,10 @@ define([
                 var url = $("#re_upload_submissions_form").find(".re_upload_submissions_url").attr('href');
                 url = $.replaceTags(url, "assignment_id", data.assignment_id);
                 $("#re_upload_submissions_form").attr('action', url);
-                $("#re_upload_submissions_form").dialog('close').dialog({
-                  autoOpen: false,
+                $("#re_upload_submissions_form").dialog({
                   title: I18n.t('reupload_submission_files', "Re-Upload Submission Files"),
                   width: 350
-                }).dialog('open');
+                });
               });
             }
           }
@@ -1168,6 +1167,16 @@ define([
       }).find(".cancel_button").click(function() {
         $curve_grade_dialog.dialog('close');
       });
+
+      if (ENV.total_grade_warning) {
+        $('.assignment_final-grade').not('.assignment_header').each(function() {
+          $('<i/>', {
+            'class': 'icon-warning',
+            title: ENV.total_grade_warning
+          }).prependTo(this);
+        });
+      }
+
     }, 1500);
     
     $('#gradebook_options').live('click', function(event) {
@@ -1184,29 +1193,27 @@ define([
         $(".sort_gradebook").each(function() {
           $(this).attr('disabled', false).text($(this).attr('title'));
         });
-        $("#sort_columns_dialog").dialog('close').dialog({
+        $("#sort_columns_dialog").dialog({
           autoOpen: false,
           width: 400,
           height: 300
-        }).dialog('open');
+        });
       });
 
       addOption('carat-2-n-s', I18n.t('sort_rows_by', 'Sort Rows By...'), function() {
         $(".sort_gradebook").each(function() {
           $(this).attr('disabled', false).text($(this).attr('title'));
         });
-        $("#sort_rows_dialog").dialog('close').dialog({
-          autoOpen: false,
+        $("#sort_rows_dialog").dialog({
           width: 400,
           height: 300
-        }).dialog('open');
+        });
       });
 
       addOption('pencil', I18n.t('set_group_weights', 'Set Group Weights'), function() {
-        $("#groups_data").dialog('close').dialog({
-          title: I18n.t('titles.assignment_groups', "Assignment Groups"),
-          autoOpen: false
-        }).dialog('open').show();
+        $("#groups_data").dialog({
+          title: I18n.t('titles.assignment_groups', "Assignment Groups")
+        }).show();
       });
 
       addOption('clock', I18n.t('view_grading_history', 'View Grading History'), function() {
@@ -1457,7 +1464,7 @@ define([
     $submission.css('visibility', '');
     var submission_stamp = submission && $.parseFromISO(submission.submitted_at).minute_timestamp;
     var assignment_stamp = assignment && $.parseFromISO(assignment.due_at).minute_timestamp;
-    $submission.parent().toggleClass('late', !!(assignment && submission && assignment.due_at && submission.submission_type && submission.submitted_at && submission_stamp > assignment_stamp));
+    $submission.parent().toggleClass('late', !!(submission && submission.late));
     if(submission.grade !== "" && submission.grade == 0) {
       submission.grade = "0";
     }
@@ -1537,7 +1544,7 @@ define([
       data.submission_type = submission.submission_type || "";
       val = emptySubmissionText(data);
     }
-    $parent.find(".grade").show().empty().append(val);
+    $parent.find(".grade").show().empty().append(htmlEscape(val));
   }
 
   function toggleColumn($obj, show) {
@@ -1585,8 +1592,10 @@ define([
     
     url = $.replaceTags(url, 'assignment_id', submission.assignment_id);
     url = $.replaceTags(url, 'user_id', submission.user_id);
-    $view.append($("#submission_view_image").clone(true).removeAttr('id'));
-    $view.append($(" <a href='" + url + "'>" + I18n.t('links.submission_details', "Submission Details") + "</a>"));
+    if (speedGraderEnabled) {
+      $view.append($("#submission_view_image").clone(true).removeAttr('id'));
+      $view.append($(" <a href='" + url + "'>" + I18n.t('links.submission_details', "Submission Details") + "</a>"));
+    }
 
     $type.css({textAlign: "center", fontWeight: "bold", fontSize: "1.2em", marginTop: 5});
     if(submission.submission_type && submission.submission_type != "online_quiz") {
@@ -1665,7 +1674,7 @@ define([
     
     submission.student_id = submission.user_id;
     submission.id = submission.id || "";
-    var late = assignment.due_at && submission.submitted_at && Date.parse(assignment.due_at) < Date.parse(submission.submitted_at);
+    var late = submission.late;
     $submission_information.find(".submitted_at_box").showIf(submission.submitted_at).toggleClass('late_submission', !!late);
     submission.submitted_at_string = $.parseFromISO(submission.submitted_at).datetime_formatted;
     $submission_information.fillTemplateData({
@@ -1696,7 +1705,7 @@ define([
       }
       $submission_information.find(".submission_comments").append($comment.show());
     }
-    $submission_information.show().dialog('close').dialog({
+    $submission_information.show().dialog({
       width: 500,
       height: "auto",
       title: title, 
@@ -1705,9 +1714,8 @@ define([
         $("#gradebook").data('disable_highlight', true);
       }, close: function() {
         $("#gradebook").data('disable_highlight', false);
-      },
-      autoOpen: false
-    }).dialog('open').dialog('option', 'title', title);
+      }
+    }).dialog('option', 'title', title);
   }
 
   function submissionInformation($submission) {
@@ -1716,10 +1724,9 @@ define([
     if(submission && submission.submission_comments) {
       populateSubmissionInformation($submission, submission);
     } else {
-      $("#loading_submission_details_dialog").dialog('close').dialog({
-        autoOpen: false,
+      $("#loading_submission_details_dialog").dialog({
         title: I18n.t('titles.loading', "Loading...")
-      }).dialog('open');
+      });
       var url = $("#loading_submission_details_dialog .submission_details_url").attr('href');
       url = $.replaceTags($.replaceTags(url, 'user_id', submission.user_id), 'assignment_id', submission.assignment_id);
       // Pop up dialog with loading message
@@ -1937,202 +1944,59 @@ define([
     }
   }
 
-  function setGroupData(groups, $group) {
-    if(!$group) { return; }
-    if($group && $group.length === 0) { return; }
-    var data = $group.getTemplateData({textValues: ['assignment_group_id', 'rules']});
-    data = $.extend(data, $group.getFormData());
-    var groupData = groups[data.assignment_group_id] || {};
-    if(!groupData.group_weight) {
-      groupData.group_weight = parseFloat(data.group_weight) / 100.0;
-    }
-    groupData.scores = groupData.scores || [];
-    groupData.full_points = groupData.full_points || [];
-    groupData.count = groupData.count || 0;
-    groupData.submissions = groupData.submissions || [];
-    groupData.scored_submissions = groupData.scored_submissions || [];
-    groupData.sorted_submissions = groupData.sorted_submissions || [];
-    if(groupData.score_total !== null || groupData.full_total !== null) {
-      groupData.calculated_score = (groupData.score_total / groupData.full_total);
-      if(isNaN(groupData.calculated_score) || !isFinite(groupData.calculated_score)) {
-        groupData.calculated_score = 0.0;
-      }
-    }
-    groupData.score_total = groupData.score_total || 0;
-    groupData.full_total = groupData.full_total || 0;
-    if(!groupData.rules) {
-      data.rules = data.rules || "";
-      var rules = {drop_highest: 0, drop_lowest: 0, never_drop: []};
-      var rulesList = data.rules.split("\n");
-      for(var idx in rulesList) {
-        var rule = rulesList[idx].split(":");
-        var drop = null;
-        if(rule.length > 1) {
-          drop = parseInt(rule[1], 10);
-        }
-        if(drop && !isNaN(drop) && isFinite(drop)) {
-          if(rule[0] == 'drop_lowest') {
-            rules['drop_lowest'] = drop;
-          } else if(rule[0] == 'drop_highest') {
-            rules['drop_highest'] = drop;
-          } else if(rule[0] == 'never_drop') {
-            rules['never_drop'].push(drop);
-          }
-        }
-      }
-      groupData.rules = rules;
-    }
-    groups[data.assignment_group_id] = groupData;
-    return groupData;
-  }
-
   function updateStudentGrades(student_id) {
     var $submissions = $(".table_entry.student_" + student_id);
-    if($submissions.length === 0) { return; }
-    var groups = {};
-    var $groups = $("#groups_data .group");
-    $groups.each(function() {
-      setGroupData(groups, $(this));
-    });
-    // Group submission scores by assignment group
-    $submissions.each(function() {
-      var $submission = $(this);
-      if($submission.find(".grade").hasClass('hard_coded')) { return; }
-      var data = objectData($(this).parent());
+    var submissionObjects = _.chain($submissions).reject(function(s) {
+      return $(s).find('.grade').hasClass('hard_coded'); // total columns
+    }).map(function(s) {
+      return objectData($(s).parent());
+    }).value();
 
-      var groupData = groups[data.assignment_group_id];
 
-      if(!groupData) {
-        groupData = setGroupData($("#group_" + data.assignment_group_id));
+    var weightingScheme = $("#class_weighting_policy").attr('checked') ?
+      "percent" :
+      "equal";
+    var groupSums = GradeCalculator.calculate(
+        submissionObjects,
+        ENV.assignment_groups,
+        weightingScheme);
+
+    var currentOrFinal = ignoreUngradedSubmissions ? 'current' : 'final';
+
+    _.each(groupSums.group_sums, function(groupSum) {
+      var sum = groupSum[currentOrFinal];
+      var calculatedScore = sum.score / sum.possible;
+      if(isNaN(calculatedScore) || !isFinite(calculatedScore)) {
+        calculatedScore = 0.0;
       }
-      if(!groupData) { return; }
-      if(ignoreUngradedSubmissions && (data.grade == null || data.grade === "")) {
-        return;
-      }
-      var score = parseFloat(data.score);
-      if(!score || isNaN(score) || !isFinite(score)) {
-        score = 0;
-      }
-      var possible = parseFloat(data.points_possible);
-      if(!possible || isNaN(possible)) {
-        possible = 0;
-      }
-      var percent = score / possible;
-      if(isNaN(percent) || !isFinite(percent)) {
-        percent = 0;
-      }
-      data.calculated_score = score;
-      data.calculated_possible = possible;
-      data.calculated_percent = percent;
-      groupData.submissions.push(data);
-      if(data.score || data.score === 0) {
-        groupData.scored_submissions.push(data);
-      }
-      groups[data.assignment_group_id] = groupData;
-    });
-    // For each group, find any submissions that should be dropped
-    // from scoring based on the drop rules
-    for(var idx in groups) {
-      var groupData = groups[idx];
-      groupData.sorted_submissions = groupData.submissions.sort(function(a, b) {
-        var aa = [a.calculated_percent, (object_data['assignment_' + a.assignment_id] || {}).due_at];
-        var bb = [b.calculated_percent, (object_data['assignment_' + b.assignment_id] || {}).due_at];
-        if(aa > bb) { return 1; }
-        if(aa == bb) { return 0; }
-        return -1;
-      });
-      var lowDrops = 0, highDrops = 0, totalScored = groupData.scored_submissions.length;
-      for(var jdx = 0; jdx < groupData.sorted_submissions.length; jdx++) {
-        groupData.sorted_submissions[jdx].calculated_drop = false;
-      }
-      // drop lowest submissions (unless they're set to never drop)
-      for(var jdx = 0; jdx < groupData.sorted_submissions.length; jdx++) {
-        var submission = groupData.sorted_submissions[jdx];
-        if(!submission.calculated_drop && lowDrops < groupData.rules.drop_lowest && (lowDrops + highDrops + 1) < totalScored && submission.calculated_possible > 0 && $.inArray(submission.assignment_id, groupData.rules.never_drop) == -1) {
-          lowDrops++;
-          submission.calculated_drop = true;
-        }
-        groupData.sorted_submissions[jdx] = submission;
-      }
-      // drop highest submissions (unless they're set to never drop)
-      for(var jdx = groupData.sorted_submissions.length - 1; jdx >= 0; jdx--) {
-        var submission = groupData.sorted_submissions[jdx];
-        if(!submission.calculated_drop && highDrops < groupData.rules.drop_highest && (lowDrops + highDrops + 1) < totalScored && submission.calculated_possible > 0 && $.inArray(submission.assignment_id, groupData.rules.never_drop) == -1) {
-          highDrops++;
-          submission.calculated_drop = true;
-        }
-        groupData.sorted_submissions[jdx] = submission;
-      }
-      for(var jdx = 0; jdx < groupData.sorted_submissions.length; jdx++) {
-        var submission = groupData.sorted_submissions[jdx];
-        if(submission.calculated_drop) {
-          $("#submission_" + submission.user_id + "_" + submission.assignment_id).parent().addClass('dropped');
-        } else {
-          $("#submission_" + submission.user_id + "_" + submission.assignment_id).parent().removeClass('dropped');
-          groupData.scores.push(submission.calculated_score);
-          groupData.full_points.push(submission.calculated_possible);
-          groupData.count++;
-          groupData.score_total += submission.calculated_score;
-          groupData.full_total += submission.calculated_possible;
-        }
-      }
-      groups[idx] = groupData;
-    }
-    var finalWeightedGrade = 0.0, 
-            finalGrade = 0.0, 
-            totalPointsPossible = 0.0, 
-            possibleWeightFromSubmissions = 0.0, 
-            totalUserPoints = 0.0;
-    $.each(groups, function(i, group) {
-      var groupData = setGroupData(groups, $("#group_" + i));
-      var score = Math.round(group.calculated_score * 1000.0) / 10.0;
-      $("#submission_" + student_id + "_group-" + i)
+      calculatedScore = Math.round(calculatedScore * 1000.0) / 10.0;
+
+      $("#submission_" + student_id + "_group-" + groupSum.group.id)
         .css('visibility', '')
-        .attr('data-tip', 'pts: ' +  group.score_total + ' / ' + group.full_total)
-        .find(".grade").text(score).end()
+        .attr('data-tip', 'pts: ' +  sum.score + ' / ' + sum.possible)
+        .find(".grade").text(calculatedScore).end()
         .find(".score").hide().end()
         .find(".pct").text(' %').show();
 
-      var score = group.calculated_score * group.group_weight;
-      if(isNaN(score) || !isFinite(score)) {
-        score = 0;
-      }
-      if(ignoreUngradedSubmissions && group.count > 0) {
-        possibleWeightFromSubmissions += group.group_weight;
-      }
-      finalWeightedGrade += score;
-      totalUserPoints += group.score_total;
-      totalPointsPossible += group.full_total;
+      _.each(sum.submissions, function(s) {
+        var $s = $("#submission_" + student_id + "_" + s.submission.assignment_id).parent();
+        $s.toggleClass('dropped', !!s.drop);
+      });
     });
-    var total = parseFloat($("#groups_data .total_weight").text());
-    if(!$("#class_weighting_policy").attr('checked') || isNaN(total) || !isFinite(total) || total === 0) {
-      // If there's no weighting going on
-      finalGrade = Math.round(1000.0 * totalUserPoints / totalPointsPossible) / 10.0;
-    } else {
-      // If there's weighting, don't adjust for the case where teacher has allotted 
-      // more or less than 100% possible... let them have extra credit if they like
-      var totalPossibleWeight = parseFloat($("#groups_data .total_weight").text()) / 100;
-      if(isNaN(totalPossibleWeight) || !isFinite(totalPossibleWeight) || totalPossibleWeight === 0) {
-        totalPossibleWeight = 1.0;
-      }
-      if(ignoreUngradedSubmissions && possibleWeightFromSubmissions < 1.0) {
-        var possible = totalPossibleWeight < 1.0 ? totalPossibleWeight : 1.0 ;
-        finalWeightedGrade = possible * finalWeightedGrade / possibleWeightFromSubmissions;
-      }
-      
-      finalGrade = finalWeightedGrade;
-      finalGrade = Math.round(finalGrade * 1000.0) / 10.0;
-    }
+
+    var finalGrade = groupSums[currentOrFinal].score / groupSums[currentOrFinal].possible;
+    finalGrade = Math.round(finalGrade * 1000.0) / 10.0;
     if(isNaN(finalGrade) || !isFinite(finalGrade)) {
       finalGrade = 0;
     }
+
     var letterGrade = "";
     if(grading_scheme) {
       letterGrade = GradeCalculator.letter_grade(grading_scheme, finalGrade);
     }
     $("#submission_" + student_id + "_final-grade")
       .css('visibility', '')
-      .attr('data-tip', gradebook.pointCalculations ? ('pts: ' + totalUserPoints + ' / ' + totalPointsPossible) : '')
+      .attr('data-tip', gradebook.pointCalculations ? ('pts: ' + groupSums[currentOrFinal].score + ' / ' + groupSums[currentOrFinal].possible) : '')
       .find(".grade").text(finalGrade).end()
       .find(".score").hide().end()
       .find(".letter_grade").showIf(grading_scheme).text(letterGrade).end()

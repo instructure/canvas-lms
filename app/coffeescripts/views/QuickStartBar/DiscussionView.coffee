@@ -1,7 +1,7 @@
 define [
   'compiled/views/QuickStartBar/BaseItemView'
   'underscore'
-  'compiled/models/Discussion'
+  'compiled/models/DiscussionTopic'
   'jst/quickStartBar/discussion'
   'jquery.instructure_date_and_time'
   'vendor/jquery.placeholder'
@@ -22,9 +22,7 @@ define [
       selector:
         baseData:
           type: 'course'
-        preparer: (postData, data, parent) ->
-          for row in data
-            row.noExpand = true
+        noExpand: true
         browser: false
 
 
@@ -47,7 +45,7 @@ define [
 
       $.when dfds...
 
-    filter: ->
+    afterRender: ->
       super
       @$('.ui-datepicker-trigger').addClass('disabled')
 

@@ -9,7 +9,7 @@
       <%= spanned_group_name %>
     <% end %>
     <% if in_group
-         if !group || group.allow_self_signup?(@current_user) || group.student_organized?
+         if !group || group.grants_right?(@current_user, :leave)
            management_url = context_url @context, :context_group_url, (group ? group.id : '{{ id }}'), :leave => 1
            management_text = t 'actions.leave_group', 'leave this group'
          end
@@ -19,7 +19,7 @@
          # associative
          management_url = context_url @context, :context_group_url, group.id, :join => 1
          management_text =
-           if group.auto_accept?(@current_user)
+           if group.auto_accept?
              t 'actions.join_group', 'join this group'
            elsif group.allow_self_signup?(@current_user)
              if in_categories.include?(group.group_category)

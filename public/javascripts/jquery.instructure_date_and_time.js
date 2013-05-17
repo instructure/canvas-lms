@@ -159,17 +159,27 @@ define([
       return $.parseFromISO.defaults;
     }
   };
+
+  // getUserOffset is used to query the user's timezone offset setting, which is usually
+  // communicated from the server through the #time_zone_offset element
+  $.getUserOffset = function() {
+    return user_offset = parseInt($("#time_zone_offset").text(), 10) * -1; // in minutes
+  }
+
   // fudgeDateForProfileTimezone is used to apply an offset to the date which represents the
   // difference between the user's configured timezone in their profile, and the timezone
   // of the browser. We want to display times in the timezone of their profile. Use
   // unfudgeDateForProfileTimezone to remove the correction before sending dates back to the server.
   $.fudgeDateForProfileTimezone = function(date, unfudge) {
-    var today = new Date();
-    var user_offset = parseInt($("#time_zone_offset").text(), 10) * -1; // in minutes
+    var today, user_offset, minutes_shift, time, newDate;
+
+    if (!date) return null;
+    today = new Date();
+    user_offset = $.getUserOffset();
     if (date.getTimezoneOffset() != today.getTimezoneOffset()) {
       user_offset = user_offset - (date.getTimezoneOffset() - today.getTimezoneOffset());
     }
-    var minutes_shift = user_offset + date.getTimezoneOffset();
+    minutes_shift = user_offset + date.getTimezoneOffset();
 
     if (minutes_shift == 0) {
       return date;
@@ -177,14 +187,15 @@ define([
 
     time = date.getTime(); // in ms
     time += minutes_shift * 60 * 1000 * (unfudge === true ? -1 : 1);
-    var newDate = new Date();
+    newDate = new Date();
     newDate.setTime(time);
     return newDate;
   }
+
   $.unfudgeDateForProfileTimezone = function(date) {
     return $.fudgeDateForProfileTimezone(date, true);
   }
-  
+
   // The following method is simply a helper to use the logic from $.parseFromISO on
   // an existing Date() object. This is not the right solution and should be replaced.
   $.parseFromDateUTC = function(date, datetime_type) {
@@ -278,7 +289,7 @@ define([
       var ampm = inst.input.data('time-ampm') || "";
       var selectedAM = (ampm == "am") ? "selected" : "";
       var selectedPM = (ampm == "pm") ? "selected" : "";
-      html += "<div class='ui-datepicker-time ui-corner-bottom'><label for='ui-datepicker-time-hour'>" + htmlEscape(I18n.beforeLabel('datepicker.time', "Time")) + "</label> <input id='ui-datepicker-time-hour' type='text' value='" + hr + "' title='hr' class='ui-datepicker-time-hour' style='width: 20px;'/>:<input type='text' value='" + min + "' title='min' class='ui-datepicker-time-minute' style='width: 20px;'/> <select class='ui-datepicker-time-ampm' title='" + htmlEscape(I18n.t('datepicker.titles.am_pm', "am/pm")) + "'><option value=''>&nbsp;</option><option value='am' " + selectedAM + ">" + htmlEscape(I18n.t('#time.am', "am")) + "</option><option value='pm' " + selectedPM + ">" + htmlEscape(I18n.t('#time.pm', "pm")) + "</option></select>&nbsp;&nbsp;&nbsp;<button type='button' class='button btn-mini ui-datepicker-ok'>" + htmlEscape(I18n.t('#buttons.done', "Done")) + "</button></div>";
+      html += "<div class='ui-datepicker-time ui-corner-bottom'><label for='ui-datepicker-time-hour'>" + htmlEscape(I18n.beforeLabel('datepicker.time', "Time")) + "</label> <input id='ui-datepicker-time-hour' type='text' value='" + hr + "' title='hr' class='ui-datepicker-time-hour' style='width: 20px;'/>:<input type='text' value='" + min + "' title='min' class='ui-datepicker-time-minute' style='width: 20px;'/> <select class='ui-datepicker-time-ampm un-bootrstrapify' title='" + htmlEscape(I18n.t('datepicker.titles.am_pm', "am/pm")) + "'><option value=''>&nbsp;</option><option value='am' " + selectedAM + ">" + htmlEscape(I18n.t('#time.am', "am")) + "</option><option value='pm' " + selectedPM + ">" + htmlEscape(I18n.t('#time.pm', "pm")) + "</option></select>&nbsp;&nbsp;&nbsp;<button type='button' class='btn btn-mini ui-datepicker-ok'>" + htmlEscape(I18n.t('#buttons.done', "Done")) + "</button></div>";
     }
     return html;
   };
@@ -391,45 +402,50 @@ define([
     this.datetime_field(options);
     return this;
   };
+
+  // add bootstrap's .btn class to the button that opens a datepicker
+  $.datepicker._triggerClass = $.datepicker._triggerClass + ' btn';
+
   $.fn.datetime_field = function(options) {
     options = $.extend({}, options);
     this.each(function() {
-      var $field = $(this);
-      if($field.hasClass('datetime_field_enabled')) { return; }
+      var $field = $(this),
+          $thingToPutSuggestAfter = $field;
+      if ($field.hasClass('datetime_field_enabled')) return;
+
       $field.addClass('datetime_field_enabled');
-      if(!options.timeOnly) {
+      if (!options.timeOnly) {
+        $field.wrap('<div class="input-append" />');
+        $thingToPutSuggestAfter = $field.parent('.input-append');
+
         $field.datepicker({
           timePicker: (!options.dateOnly),
           constrainInput: false,
           dateFormat: 'M d, yy',
           showOn: 'button',
-          buttonImage: '/images/datepicker.gif?1234',
-          buttonImageOnly: true
+          buttonText: '<i class="icon-calendar-month"></i>',
+          buttonImageOnly: false
         });
       }
-      var $after = $(this);
-      if($field.next(".ui-datepicker-trigger").length > 0) { $after = $field.next(); }
-      var $div = $(document.createElement('div')).addClass('datetime_suggest');
-      $after.after($div);
-      $div = $after.next();
+
+      var $suggest = $('<div class="datetime_suggest" />').insertAfter($thingToPutSuggestAfter);
+
       $field.bind("change focus blur keyup", function() {
-        var val = $(this).val();
-        if(options.timeOnly && val && parseInt(val, 10) == val) {
-          if(val < 8) {
-            val += "pm";
-          } else {
-            val += "am";
-          }
+        var $this = $(this),
+            val = $this.val();
+        if (options.timeOnly && val && parseInt(val, 10) == val) {
+          val += (val < 8) ? "pm" : "am";
         }
         var d = Date.parse((val || "").toString().replace(/ (at|by)/, ""));
-        var parse_error_message = I18n.t('errors.not_a_date', "That's not a date!"); 
+        var parse_error_message = I18n.t('errors.not_a_date', "That's not a date!");
         var text = parse_error_message;
-        if(!$(this).val()) { text = ""; }
-        if(d) {
-          $(this).data('date', d);
+        if (!$this.val()) { text = ""; }
+        if (d) {
+          $this.data('date', d);
           if(!options.timeOnly && !options.dateOnly && (d.getHours() || d.getMinutes() || options.alwaysShowTime)) {
             text = d.toString('ddd MMM d, yyyy h:mmtt');
-            $(this).data('time-hour', d.toString('h'))
+            $this
+              .data('time-hour', d.toString('h'))
               .data('time-minute', d.toString('mm'))
               .data('time-ampm', d.toString('tt').toLowerCase());
           } else if(!options.timeOnly) {
@@ -438,15 +454,20 @@ define([
             text = d.toString('h:mmtt').toLowerCase();
           }
         }
-        var $suggest = $(this).parent().children('.datetime_suggest');
-        if($suggest) {
-          $suggest.toggleClass('invalid_datetime', text == parse_error_message);
-          $suggest.text(text);
-        }
+
+        $suggest
+          .toggleClass('invalid_datetime', text == parse_error_message)
+          .text(text);
+
       }).triggerHandler('change');
+      // TEMPORARY FIX: Hide from aria screenreader until the jQuery UI datepicker is updated for accessibility.
+      $field.next().attr('aria-hidden', 'true');
+      $field.next().attr('tabindex', '-1');
     });
     return this;
   };
+
+
   $.datetime = {};
   $.datetime.shortFormat = "MMM d, yyyy";
   $.datetime.defaultFormat = "MMM d, yyyy h:mmtt";

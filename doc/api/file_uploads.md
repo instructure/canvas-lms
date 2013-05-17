@@ -1,6 +1,17 @@
 # Uploading Files
 
-Creating a file is a three step process:
+There are two ways to upload a file to Canvas: either by sending the
+file data in a POST request, or by sending Canvas a publicly
+accessible HTTP or HTTPS URL to the file.
+
+<table id='quicklinks'>
+</table>
+
+<h2 class='api_method_name' name='method.file_uploads.post' data-subtopic="Uploading Files">
+<a name="method.file_uploads.post" href="#method.file_uploads.post">Uploading via POST</a>
+</h2>
+
+There are three steps to uploading a file directly via POST:
 
 1. Notify Canvas that you are uploading a file with a POST to the file
    creation endpoint. This POST will include the file name and file size,
@@ -9,7 +20,7 @@ Creating a file is a three step process:
 3. On successful upload, the API will respond with a redirect. This
    redirect needs to be followed to complete the upload, or the file may not appear.
 
-## Step 1: Telling Canvas about the file upload and getting a token
+### Step 1: Telling Canvas about the file upload and getting a token
 
 The first step is to POST to the relevant API endpoint, depending one where
 you want to create the file. For example, to <a href="courses.html">add a file to a course</a>, you'd
@@ -39,6 +50,7 @@ Example Request:
 
 Example Response:
 
+    !!!javascript
     {
       "upload_url": "https://some-bucket.s3.amazonaws.com/",
       "upload_params": {
@@ -56,7 +68,7 @@ At this point, the file object has been created in Canvas in a "pending"
 state, with no content. It will not appear in any listings in the UI until
 the next two steps are completed.
 
-## Step 2: Upload the file data to the URL given in the previous response
+### Step 2: Upload the file data to the URL given in the previous response
 
 Using the data in the JSON response from Step 1, the application can now
 upload the actual file data, by POSTing a specially formulated request to
@@ -85,6 +97,7 @@ Example Request:
          -F 'Policy=some_opaque_string' \ 
          -F 'Signature=another_opaque_string' \ 
          -F 'Content-Type=image/jpeg' \ 
+         -F '<any other fields returned in upload_params>' \
          -F 'file=@my_local_file.jpg'
 
 The access token is not sent with this request.
@@ -104,7 +117,7 @@ functionality.
 This example assumes there is a file called `my_local_file.jpg` in the
 current directory.
 
-## Step 3: Confirm the upload's success
+### Step 3: Confirm the upload's success
 
 If Step 2 is successful, the response will be a 3XX redirect with a
 Location header set as normal. The application needs to perform a POST to
@@ -121,10 +134,95 @@ Example Request:
 
 Example Response:
 
+    !!!javascript
     {
       'id': 1234,
       'url': '...url to download the file...',
       'content-type': 'image/jpeg',
       'display_name': 'profile_pic.jpg',
       'size': 302185
+    }
+
+<h2 class='api_method_name' name='method.file_uploads.url' data-subtopic="Uploading Files">
+<a name="method.file_uploads.url" href="#method.file_uploads.url">Uploading via URL</a>
+</h2>
+
+If the file is accessible through a public HTTP or HTTPS URL,
+Canvas can download it directly. However, Canvas downloads
+the file in the background, so unlike the POST workflow above, the file
+won't be immediately available when the API call completes. Applications
+can poll the API to check on the status of the upload.
+
+### Step 1: Posting the file URL to Canvas
+
+The first step is the same as with the "Uploading via POST" flow above,
+with the addition of one new parameter:
+
+<dl>
+  <dt>url</dt>
+  <dd>The full URL to the file to be uploaded. This URL must be accessible by Canvas.</dd>
+</dl>
+
+Example Request:
+
+    curl 'https://<canvas>/api/v1/users/self/files' \
+         -F 'url=http://example.com/my_pic.jpg' \
+         -F 'name=profile_pic.jpg' \
+         -F 'size=302185' \
+         -F 'content_type=image/jpeg' \
+         -F 'parent_folder_path=my_files/section1' \
+         -H "Authorization: Bearer <token>"
+
+Example Response:
+
+    !!!javascript
+    {
+      'id': 1234,
+      'upload_status': 'pending',
+      'status_url' '...url to check status...'
+    }
+
+Canvas will return a status_url parameter, which is a Canvas
+API endpoint that the application can periodically poll to check on the
+status of the upload. Note that the id given in the response will be
+treated like a deleted file, until the upload completes successfully.
+
+### Step 2: Check the status_url to see when the upload is complete
+
+If the application needs to know the outcome of the upload, it can check
+the status_url.
+
+Example Request:
+
+    curl 'https://<canvas>/api/v1/files/1234/5678/status' \
+         -H "Authorization: Bearer <token>"
+
+When still pending:
+
+    !!!javascript
+    {
+      'upload_status': 'pending'
+    }
+
+When complete:
+
+    !!!javascript
+    {
+      'upload_status': 'ready',
+      // This is the normal attachment JSON response object
+      'attachment': {
+        'id': 1234,
+        'url': '...url to download the file...',
+        'content-type': 'image/jpeg',
+        'display_name': 'profile_pic.jpg',
+        'size': 302185
+      }
+    }
+
+On error:
+
+    !!!javascript
+    {
+      'upload_status': 'errored',
+      'message': 'Invalid response code, expected 200 got 404'
     }

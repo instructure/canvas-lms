@@ -1,0 +1,231 @@
+# List of Notification types to support. Initial values are set here.
+#
+# * delay_for - The delay in the number of seconds. Can use ERB to
+#               compute the seconds like <%= 3 * 60 %> for 3 minutes.
+#
+# ==== Example:
+#
+#- category: My Category
+#  notifications:
+#    - name: New Notification
+#      delay_for: 0
+#    - name: Old Notification
+#      delay_for: <%= 3 * 60 %>
+#
+- category: Added To Conversation
+  notifications:
+    - name: Added To Conversation
+      delay_for: 0
+
+- category: Alert
+  notifications:
+    - name: Alert
+      delay_for: 0
+
+- category: All Submissions
+  notifications:
+    - name: Assignment Submitted
+      delay_for: 0
+    - name: Assignment Resubmitted
+      delay_for: 0
+
+- category: Announcement
+  notifications:
+    - name: New Announcement
+      delay_for: 0
+
+- category: Appointment Availability
+  notifications:
+    - name: Appointment Group Published
+      delay_for: 0
+    - name: Appointment Group Updated
+      delay_for: 0
+
+- category: Appointment Cancelations
+  notifications:
+    - name: Appointment Deleted For User
+      delay_for: 0
+    - name: Appointment Group Deleted
+      delay_for: 0
+
+- category: Appointment Signups
+  notifications:
+    - name: Appointment Reserved For User
+      delay_for: 0
+
+- category: Calendar
+  notifications:
+    - name: New Event Created
+      delay_for: 0
+    - name: Event Date Changed
+      delay_for: <%= 15*60 %>
+
+- category: Conversation Message
+  notifications:
+    - name: Conversation Message
+      delay_for: 0
+
+- category: Course Content
+  notifications:
+    - name: Assignment Changed
+      delay_for: <%= 30*60 %>
+    - name: Updated Wiki Page
+      delay_for: <%= 15*60 %>
+
+- category: DEPRECATED - Reminder
+  notifications:
+    - name: Assignment Publishing Reminder
+      delay_for: 0
+    - name: Assignment Grading Reminder
+      delay_for: 0
+    - name: Assignment Due Date Reminder
+      delay_for: 0
+
+- category: Discussion
+  notifications:
+    - name: New Discussion Topic
+      delay_for: 0
+
+- category: DiscussionEntry
+  notifications:
+    - name: New Discussion Entry
+      delay_for: 0
+
+- category: Due Date
+  notifications:
+    - name: Assignment Due Date Changed
+      delay_for: <%= 5*60 %>
+    - name: Assignment Created
+      delay_for: 0
+    - name: Assignment Due Date Override Changed
+      delay_for: <%= 2*60 %>
+
+- category: Files
+  notifications:
+    - name: New File Added
+      delay_for: <%= 2*60 %>
+    - name: New Files Added
+      delay_for: <%= 2*60 %>
+
+- category: Grading
+  notifications:
+    - name: Assignment Graded
+      delay_for: <%= 15*60 %>
+    - name: Assignment Unmuted
+      delay_for: 0
+    - name: Submission Graded
+      delay_for: <%= 60*60 %>
+    - name: Submission Grade Changed
+      delay_for: <%= 5*60 %>
+
+- category: Grading Policies
+  notifications:
+    - name: Grade Weight Changed
+      delay_for: <%= 5*60 %>
+
+- category: Invitation
+  notifications:
+    - name: Collaboration Invitation
+      delay_for: 0
+    - name: Web Conference Invitation
+      delay_for: 0
+    - name: New Context Group Membership Invitation
+      delay_for: 0
+    - name: Rubric Assessment Submission Reminder
+      delay_for: 0
+    - name: Rubric Assessment Invitation
+      delay_for: 0
+    - name: Rubric Association Created
+      delay_for: 0
+
+- category: Late Grading
+  notifications:
+    - name: Assignment Submitted Late
+      delay_for: 0
+    - name: Group Assignment Submitted Late
+      delay_for: 0
+
+- category: Membership Update
+  notifications:
+    - name: Enrollment Accepted
+      delay_for: 0
+    - name: New Context Group Membership
+      delay_for: 0
+    - name: Group Membership Accepted
+      delay_for: 0
+    - name: Group Membership Rejected
+      delay_for: 0
+
+- category: Migration
+  notifications:
+    - name: Migration Export Ready
+      delay_for: 0
+    - name: Migration Import Finished
+      delay_for: 0
+    - name: Migration Import Failed
+      delay_for: 0
+    - name: Content Export Finished
+      delay_for: 0
+    - name: Content Export Failed
+      delay_for: 0
+
+- category: Other
+  notifications:
+    - name: New Account User
+      delay_for: 0
+    - name: New Course
+      delay_for: 0
+    - name: Report Generated
+      delay_for: 0
+    - name: Report Generation Failed
+      delay_for: 0
+    - name: New User
+      delay_for: 0
+    - name: New Teacher Registration
+      delay_for: 0
+    - name: New Student Organized Group
+      delay_for: 0
+
+- category: Registration
+  notifications:
+    - name: Confirm Email Communication Channel
+      delay_for: 0
+    - name: Merge Email Communication Channel
+      delay_for: 0
+    - name: Confirm SMS Communication Channel
+      delay_for: 0
+    - name: Pseudonym Registration
+      delay_for: 0
+    - name: Confirm Registration
+      delay_for: 0
+    - name: Forgot Password
+      delay_for: 0
+    - name: Account User Registration
+      delay_for: 0
+    - name: Account User Notification
+      delay_for: 0
+    - name: Enrollment Invitation
+      delay_for: 0
+    - name: Enrollment Registration
+      delay_for: 0
+    - name: Enrollment Notification
+      delay_for: 0
+
+- category: Student Appointment Signups
+  notifications:
+    - name: Appointment Canceled By User
+      delay_for: 0
+    - name: Appointment Reserved By User
+      delay_for: 0
+
+- category: Submission Comment
+  notifications:
+    - name: Submission Comment
+      delay_for: 0
+    - name: Submission Comment For Teacher
+      delay_for: 0
+
+- category: Summaries
+  notifications:
+    - name: Summaries
+      delay_for: 0

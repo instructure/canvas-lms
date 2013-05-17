@@ -1,2 +1,0 @@
-require ['aligned_outcomes']
-

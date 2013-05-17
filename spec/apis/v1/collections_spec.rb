@@ -36,7 +36,7 @@ describe "Collections API", :type => :integration do
         :name => "test3",
         :visibility => 'public',
       })
-      @c3 = Collection.last(:order => :id)
+      @c3 = Collection.order(:id).last
       json.should == collection_json(@c3).merge({
         'id' => @c3.id,
         'name' => 'test3',
@@ -108,7 +108,6 @@ describe "Collections API", :type => :integration do
 
     it "should not allow getting a private collection" do
       json = api_call(:get, "/api/v1/collections/#{@c1.id}", { :controller => "collections", :collection_id => @c1.to_param, :action => "show", :format => "json" }, {}, {}, :expected_status => 401)
-      json['message'].should match /not authorized/
     end
 
     it "should not allow creating a collection" do
@@ -241,7 +240,7 @@ describe "Collections API", :type => :integration do
       describe "item creation" do
         it "should allow creating from a http url" do
           json = api_call(:post, @c1_items_path, @c1_items_path_options.merge(:action => "create"), { :link_url => "http://www.example.com/a/b/c", :user_comment => 'new item' })
-          new_item = @c1.collection_items.last(:order => :id)
+          new_item = @c1.collection_items.order(:id).last
           new_item.collection_item_data.link_url.should == "http://www.example.com/a/b/c"
           new_item.user.should == @user
         end
@@ -249,7 +248,7 @@ describe "Collections API", :type => :integration do
         it "should allow cloning an existing item" do
           json = api_call(:post, @c1_items_path, @c1_items_path_options.merge(:action => "create"), { :link_url => "http://localhost/api/v1/collections/items/#{@i3.id}", :user_comment => 'cloned' })
           json['post_count'].should == 3
-          new_item = @c1.collection_items.last(:order => :id)
+          new_item = @c1.collection_items.order(:id).last
           new_item.collection_item_data.should == @i3.collection_item_data
           new_item.user.should == @user
         end
@@ -274,7 +273,7 @@ describe "Collections API", :type => :integration do
             @item.data.image_pending.should == true
             @att = Attachment.new(:uploaded_data => stub_png_data)
             CutyCapt.expects(:snapshot_attachment_for_url).with(@item.data.link_url).returns(@att)
-            run_job()
+            run_jobs()
 
             @att.reload.context.should == Account.default
 
@@ -290,9 +289,9 @@ describe "Collections API", :type => :integration do
             json = api_call(:post, @c1_items_path, @c1_items_path_options.merge(:action => "create"), { :link_url => "http://www.example.com/a/b/c", :image_url => "http://www.example.com/my/image.png", :user_comment => 'new item' })
             @item = CollectionItem.find(json['id'])
             @item.data.image_pending.should == true
-            http_res = mock('Net::HTTPOK', :body => File.read(Rails.root+"public/images/cancel.png"), :code => 200)
-            Canvas::HTTP.expects(:get).with("http://www.example.com/my/image.png").returns(http_res)
-            run_job()
+            http_res = FakeHttpResponse.new('200', File.read(Rails.root+"public/images/cancel.png"), 'content-type' => 'image/png')
+            Canvas::HTTP.expects(:get).with("http://www.example.com/my/image.png").yields(http_res)
+            run_jobs()
 
             @item.reload.data.image_pending.should == false
             @att = @item.data.image_attachment
@@ -309,9 +308,9 @@ describe "Collections API", :type => :integration do
             @item = CollectionItem.find(json['id'])
             @item.data.image_pending.should == true
             Canvas::Embedly.any_instance.expects(:get_embedly_data).with("http://www.example.com/a/b/c").returns(stub_everything('embedly api', :type => 'test', :images => [{'url' => 'http://www.example.com/image1'}], :html => "<iframe>test</iframe>"))
-            http_res = mock('Net::HTTPOK', :body => File.read(Rails.root+"public/images/cancel.png"), :code => 200)
-            Canvas::HTTP.expects(:get).with("http://www.example.com/image1").returns(http_res)
-            run_job()
+            http_res = FakeHttpResponse.new('200', File.read(Rails.root+"public/images/cancel.png"), 'content-type' => 'image/png')
+            Canvas::HTTP.expects(:get).with("http://www.example.com/image1").yields(http_res)
+            run_jobs()
 
             @item.reload.data.image_pending.should == false
             @att = @item.data.image_attachment
@@ -330,27 +329,27 @@ describe "Collections API", :type => :integration do
           it "should use the embeldy description and title if none are given" do
             Canvas::Embedly.any_instance.stubs(:get_embedly_data).with("http://www.example.com/a/b/c").returns(stub_everything('embedly api', :type => 'html', :description => 'e desc', :title => 'e title'))
             json = api_call(:post, @c1_items_path, @c1_items_path_options.merge(:action => "create"), { :link_url => "http://www.example.com/a/b/c", :user_comment => 'new item' })
-            run_job()
+            run_jobs()
             CollectionItem.find(json['id']).data.attributes.slice('title', 'description').should == { 'title' => "e title", 'description' => "e desc" }
 
             json = api_call(:post, @c1_items_path, @c1_items_path_options.merge(:action => "create"), { :link_url => "http://www.example.com/a/b/c", :user_comment => 'new item', :title => "custom title" })
-            run_job()
+            run_jobs()
             CollectionItem.find(json['id']).data.attributes.slice('title', 'description').should == { 'title' => "custom title", 'description' => "e desc" }
 
             json = api_call(:post, @c1_items_path, @c1_items_path_options.merge(:action => "create"), { :link_url => "http://www.example.com/a/b/c", :user_comment => 'new item', :description => "custom description" })
-            run_job()
+            run_jobs()
             CollectionItem.find(json['id']).data.attributes.slice('title', 'description').should == { 'title' => "e title", 'description' => "custom description" }
           end
 
           it "should use the embedly item type if valid" do
             Canvas::Embedly.any_instance.stubs(:get_embedly_data).with("http://www.example.com/a/b/c").returns(stub_everything('embedly api', :type => 'video'))
             json = api_call(:post, @c1_items_path, @c1_items_path_options.merge(:action => "create"), { :link_url => "http://www.example.com/a/b/c", :user_comment => 'new item' })
-            run_job()
+            run_jobs()
             CollectionItem.find(json['id']).data.item_type.should == 'video'
 
             Canvas::Embedly.any_instance.stubs(:get_embedly_data).with("http://www.example.com/a/b/c").returns(stub_everything('embedly api', :type => 'rtf'))
             json = api_call(:post, @c1_items_path, @c1_items_path_options.merge(:action => "create"), { :link_url => "http://www.example.com/a/b/c", :user_comment => 'new item' })
-            run_job()
+            run_jobs()
             CollectionItem.find(json['id']).data.item_type.should == 'url'
           end
 
@@ -360,12 +359,12 @@ describe "Collections API", :type => :integration do
 
             Canvas::Embedly.any_instance.expects(:get_embedly_data).with("http://www.example.com/a/b/c").returns(stub_everything('embedly api', :type => 'html', :html => iframe_html))
             json = api_call(:post, @c1_items_path, @c1_items_path_options.merge(:action => "create"), { :link_url => "http://www.example.com/a/b/c", :user_comment => 'new item' })
-            run_job()
+            run_jobs()
             CollectionItem.find(json['id']).data.html_preview.should == iframe_html
 
             Canvas::Embedly.any_instance.expects(:get_embedly_data).with("http://www.example.com/a/b/c").returns(stub_everything('embedly api', :type => 'html', :html => div_html))
             json = api_call(:post, @c1_items_path, @c1_items_path_options.merge(:action => "create"), { :link_url => "http://www.example.com/a/b/c", :user_comment => 'new item' })
-            run_job()
+            run_jobs()
             CollectionItem.find(json['id']).data.html_preview.should be_blank
           end
         end
@@ -463,7 +462,7 @@ describe "Collections API", :type => :integration do
         end
 
         it "should allow removing an upvote" do
-          @i3.collection_item_data.collection_item_upvotes.create!(:user => @user)
+          @user.collection_item_upvotes.create!(:collection_item_data => @i3.collection_item_data)
           @i3.reload.collection_item_data.upvote_count.should == 1
           json = api_call(:delete, "#{@unscoped_items_path}/#{@i3.id}/upvotes/self", @unscoped_items_path_options.merge(:action => "remove_upvote", :item_id => @i3.to_param))
           @i3.reload.collection_item_data.upvote_count.should == 0
@@ -604,7 +603,7 @@ describe "Collections API", :type => :integration do
 
         it "should allow creating a new item" do
           json = api_call(:post, @c1_items_path, @c1_items_path_options.merge(:action => "create"), { :link_url => "http://www.example.com/a/b/c", :user_comment => 'new item' })
-          new_item = @c1.collection_items.last(:order => :id)
+          new_item = @c1.collection_items.order(:id).last
           new_item.collection_item_data.link_url.should == "http://www.example.com/a/b/c"
           new_item.user.should == @user
         end

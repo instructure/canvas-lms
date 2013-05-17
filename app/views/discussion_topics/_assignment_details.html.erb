@@ -1,0 +1,63 @@
+<div class="discussion-section discussion-assignment-section alert alert-info">
+  <div class="row-fluid">
+    <div class="span6">
+      <p class="discussion-title">
+        <%= t('graded_discussion_and_points',
+              { :one => 'This is a graded discussion: *1 point possible*',
+                :other => 'This is a graded discussion: *%{count} points possible*' },
+              :count => @assignment.points_possible || 0,
+              :wrapper => "<span class='discussion-points'>\\1</span>") %>
+      </p>
+    </div>
+
+    <div class="span6 right-align">
+      <div class="discussion-pubdate">
+        <% if @assignment.has_active_overrides? && @presenter.can_grade?  %>
+          <a href="#" class="toggle_due_dates"><%= t(:show_due_dates, 'Show Due Dates') %></a>
+
+        <% else %>
+          <b><%= t(:due_date, 'due %{date}',
+                   :date => OverrideListPresenter.new.due_at(@assignment)) %></b>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <% if @topic.for_group_assignment? %>
+    <p>
+      <%= t :separated_conversation_notice, "Since this is a group assignment, each group has its own conversation for this topic. Here are the ones you have access to:" %>
+      <ul>
+        <% @group_topics.each do |group_and_topic| %>
+          <li>
+            <a href="<%= context_url(group_and_topic[:group], :context_discussion_topics_url, :root_discussion_topic_id => @topic.id) %>"><%= group_and_topic[:group].name %></a>
+            <%= render :partial => 'new_and_total_badge', :locals => {
+                       :unread_count => group_and_topic[:topic].unread_count(@current_user),
+                       :reply_count => group_and_topic[:topic].discussion_entries.active.size } if group_and_topic[:topic] %>
+          </li>
+        <% end %>
+      </ul>
+    </p>
+  <% end %>
+
+  <% if @presenter.can_grade? %>
+    <div class="row-fluid">
+      <div class="span12 hidden due_date_wrapper">
+        <table class="discussion-topic-due-dates">
+          <thead>
+            <tr>
+              <th scope="col"><%= t(:due, 'Due') %></th>
+              <th scope="col"><%= t(:for, 'For') %></th>
+              <th scope="col"><%= t(:available_from, 'Available from') %></th>
+              <th scope="col"><%= t(:until, 'Until') %></th>
+            </tr>
+          </thead>
+
+          <%= render 'shared/override_list', :assignment => @assignment, 
+            :user => @current_user %>
+
+        </table>
+      </div>
+    </div>
+  <% end %>
+
+</div>

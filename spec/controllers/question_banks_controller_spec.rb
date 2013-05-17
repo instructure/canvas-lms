@@ -46,4 +46,32 @@ describe QuestionBanksController do
       @bank2.assessment_questions.count.should == 2
     end
   end
+
+  describe "bookmark" do
+    before do
+      course_with_teacher_logged_in
+      @bank = @course.assessment_question_banks.create!
+    end
+
+    it "bookmarks" do
+      post 'bookmark', :course_id => @course.id,
+                       :question_bank_id => @bank.id
+      response.should be_success
+      @teacher.reload.assessment_question_banks.should include @bank
+    end
+
+    it "unbookmarks" do
+      @teacher.assessment_question_banks << @bank
+      @teacher.save!
+
+      # should work even if the bank's context is destroyed
+      @course.destroy
+
+      post 'bookmark', :course_id => @course.id,
+                       :question_bank_id => @bank.id,
+                       :unbookmark => 1
+      response.should be_success
+      @teacher.reload.assessment_question_banks.should_not include @bank
+    end
+  end
 end

@@ -1,27 +1,21 @@
-<form class="discussion-section hide-if-collapsed discussion-reply-form">
-  <span class="notification" data-bind="notification"></span>
+<div class="notification" data-bind="notification"></div>
+<form class="discussion-reply-form">
   <a class="discussion-reply-label hide-if-replying" data-event="addReply" href="#">
-    <label for="reply_message_for_{{id}}">
-      {{#if allowsSideComments}}
-        {{#t "add_side_comment"}}Add a side comment...{{/t}}
-      {{else}}
-        {{#t "write_a_reply"}}Write a reply...{{/t}}
-      {{/if}}
-    </label>
+    {{#t "write_a_reply"}}Reply{{/t}}
   </a>
   <div class="show-if-replying">
     <textarea class="reply-textarea" id="reply_message_for_{{id}}"></textarea>
 
     <div class="clearfix">
       <div class="discussion-reply-buttons">
-        <button class="button small-button" type="submit">{{#t "post_response"}}Post Response{{/t}}</button>
-        <a href="javascript:" class="cancel_button">{{#t "cancel"}}Cancel{{/t}}</a>
+        <button class="btn btn-primary btn-small" type="submit">{{#t "post_response"}}Post Response{{/t}}</button>
+        <a href="javascript:" class="cancel_button btn btn-small">{{#t "cancel"}}Cancel{{/t}}</a>
       </div>
 
       <div class="discussion-reply-attachments-container">
         <ul class="discussion-reply-attachments"></ul>
         {{#if canAttach}}
-          <a href="#" class="discussion-reply-add-attachment" data-event="addReplyAttachment">{{#t "attach_file"}}Attach{{/t}}</a>
+          <a href="#" class="discussion-reply-add-attachment icon-paperclip" data-event="addReplyAttachment">{{#t "attach_file"}}Attach{{/t}}</a>
         {{/if}}
       </div>
     </div>

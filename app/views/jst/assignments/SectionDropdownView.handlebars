@@ -1,0 +1,6 @@
+{{#each sections}}
+<option value="{{id}}"
+  {{selectedIf this.id ../override.course_section_id}}>
+  {{name}}
+</option>
+{{/each}}

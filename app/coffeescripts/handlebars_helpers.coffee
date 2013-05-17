@@ -1,5 +1,5 @@
 define [
-  'ENV'
+  'compiled/util/enrollmentName'
   'vendor/handlebars.vm'
   'i18nObj'
   'jquery'
@@ -7,21 +7,28 @@ define [
   'str/htmlEscape'
   'compiled/util/semanticDateRange'
   'compiled/util/dateSelect'
+  'compiled/util/mimeClass'
+  'compiled/str/convertApiUserContent'
+  'compiled/str/TextHelper'
   'jquery.instructure_date_and_time'
   'jquery.instructure_misc_helpers'
   'jquery.instructure_misc_plugins'
-], (ENV, Handlebars, I18n, $, _, htmlEscape, semanticDateRange, dateSelect) ->
+  'translations/_core_en'
+], (enrollmentName, Handlebars, I18n, $, _, htmlEscape, semanticDateRange, dateSelect, mimeClass, convertApiUserContent, textHelper) ->
 
   Handlebars.registerHelper name, fn for name, fn of {
-    t : (key, defaultValue, options) ->
+    t : (translationKey, defaultValue, options) ->
       wrappers = {}
       options = options?.hash ? {}
+      scope = options.scope
+      delete options.scope
       for key, value of options when key.match(/^w\d+$/)
         wrappers[new Array(parseInt(key.replace('w', '')) + 2).join('*')] = value
         delete options[key]
       options.wrapper = wrappers if wrappers['*']
+      options.needsEscaping = true
       options = $.extend(options, this) unless this instanceof String or typeof this is 'string'
-      I18n.scoped(options.scope).t(key, defaultValue, options)
+      I18n.scoped(scope).t(translationKey, defaultValue, options)
 
     hiddenIf : (condition) -> " display:none; " if condition
 
@@ -32,57 +39,73 @@ define [
 
     friendlyDatetime : (datetime, {hash: {pubdate}}) ->
       return unless datetime?
+
+      # if datetime is already a date convert it back into an ISO string to parseFromISO,
+      # TODO: be smarter about this
+      datetime = $.dateToISO8601UTC(datetime) if _.isDate datetime
+
       parsed = $.parseFromISO(datetime)
       new Handlebars.SafeString "<time title='#{parsed.datetime_formatted}' datetime='#{parsed.datetime.toISOString()}' #{'pubdate' if pubdate}>#{$.friendlyDatetime(parsed.datetime)}</time>"
 
+    # expects: a Date object
+    formattedDate : (datetime, format, {hash: {pubdate}}) ->
+      return unless datetime?
+      new Handlebars.SafeString "<time title='#{datetime}' datetime='#{datetime.toISOString()}' #{'pubdate' if pubdate}>#{datetime.toString(format)}</time>"
+
+    # IMPORTANT: this handlebars helper "fudges", or adjusts the time for the
+    # user's timezone chosen in their preferences using
+    # $.fudgeDateForProfileTimezone. If you use this helper, you need to use
+    # $.unfudgeDateForProfileTimezone before sending to the server!
     datetimeFormatted : (isoString) ->
+      return '' unless isoString
       isoString = $.parseFromISO(isoString) unless isoString.datetime
       isoString.datetime_formatted
+
+    # helper for easily creating icon font markup
+    addIcon : (icontype) ->
+      new Handlebars.SafeString "<i class='icon-#{htmlEscape icontype}'></i>"
 
     # helper for using date.js's custom toString method on Date objects
     dateToString : (date = '', format) ->
       date.toString(format)
 
-    mimeClass: (contentType) -> $.mimeClass(contentType)
+    # convert a date to a string, using the given i18n format in the date.formats namespace
+    tDateToString : (date = '', i18n_format) ->
+      return '' unless date
+      I18n.l "date.formats.#{i18n_format}", date
+
+    # convert a date to a time string, using the given i18n format in the time.formats namespace
+    tTimeToString : (date = '', i18n_format) ->
+      return '' unless date
+      I18n.l "time.formats.#{i18n_format}", date
+
+    tTimeHours : (date = '') ->
+      if date.getMinutes() == 0 and date.getSeconds() == 0
+        I18n.l "time.formats.tiny_on_the_hour", date
+      else
+        I18n.l "time.formats.tiny", date
+
+    # convert an event date and time to a string using the given date and time format specifiers
+    tEventToString : (date = '', i18n_date_format = 'short', i18n_time_format = 'tiny') ->
+      I18n.t 'time.event',
+        date: I18n.l "date.formats.#{i18n_date_format}", date
+        time: I18n.l "time.formats.#{i18n_time_format}", date
+
+    # formats a date as a string, using the given i18n format string
+    strftime : (date = '', fmtstr) ->
+      I18n.strftime date, fmtstr
+
+    mimeClass: mimeClass
 
     # use this method to process any user content fields returned in api responses
     # this is important to handle object/embed tags safely, and to properly display audio/video tags
-    convertApiUserContent: (html) ->
-      $dummy = $('<div />').html(html)
-      # finds any <video/audio class="instructure_inline_media_comment"> and turns them into media comment thumbnails
-      $dummy.find('video.instructure_inline_media_comment,audio.instructure_inline_media_comment').replaceWith ->
-        $node = $("<a id='media_comment_#{$(this).data('media_comment_id')}'
-              data-media_comment_type='#{$(this).data('media_comment_type')}'
-              class='instructure_inline_media_comment' />")
-        $node.html $(this).html()
-        $node
-
-      # remove any embed tags inside an object tag, to avoid repeated translations
-      $dummy.find('object.instructure_user_content embed').remove()
-
-      # find all object/embed tags and convert them into an iframe that posts
-      # to safefiles to display the content (to avoid javascript attacks)
-      #
-      # see the corresponding code in lib/user_content.rb for non-api user
-      # content handling
-      $dummy.find('object.instructure_user_content,embed.instructure_user_content').replaceWith ->
-        $this = $(this)
-        if !$this.data('uc_snippet') || !$this.data('uc_sig')
-          return this
-
-        uuid = _.uniqueId("uc_")
-        action = "/object_snippet"
-        action = "//#{ENV.files_domain}#{action}" if ENV.files_domain
-        $form = $("<form action='#{action}' method='post' class='user_content_post_form' target='#{uuid}' id='form-#{uuid}' />")
-        $form.append($("<input type='hidden'/>").attr({name: 'object_data', value: $this.data('uc_snippet')}))
-        $form.append($("<input type='hidden'/>").attr({name: 's', value: $this.data('uc_sig')}))
-        $('body').append($form)
-        setTimeout((-> $form.submit()), 0)
-        $("<iframe class='user_content_iframe' name='#{uuid}' style='width: #{$this.data('uc_width')}; height: #{$this.data('uc_height')};' frameborder='0' />")
-      new Handlebars.SafeString $dummy.html()
+    convertApiUserContent: (html, {hash}) ->
+      new Handlebars.SafeString convertApiUserContent(html, hash)
 
     newlinesToBreak : (string) ->
       new Handlebars.SafeString htmlEscape(string).replace(/\n/g, "<br />")
+
+    not: (arg) -> !arg
 
     # runs block if all arguments are === to each other
     # usage:
@@ -98,19 +121,35 @@ define [
         previousArg = arg
       fn(this)
 
-    # runs block if all arguments are true-ish
+    # runs block if *ALL* arguments are truthy
     # usage:
     # {{#ifAll arg1 arg2 arg3 arg}}
-    #   everything was true-ish
+    #   everything was truthy
     # {{else}}
-    #   something was false-y
-    # {{/ifEqual}}
+    #   something was falsey
+    # {{/ifAll}}
     ifAll: ->
       [args..., {fn, inverse}] = arguments
       for arg in args
         return inverse(this) unless arg
       fn(this)
 
+    # runs block if *ANY* arguments are truthy
+    # usage:
+    # {{#ifAny arg1 arg2 arg3 arg}}
+    #   something was truthy
+    # {{else}}
+    #   all were falsy
+    # {{/ifAny}}
+    ifAny: ->
+      [args..., {fn, inverse}] = arguments
+      for arg in args
+        return fn(this) if arg
+      inverse(this)
+
+    # {{#eachWithIndex records}}
+    #   <li class="legend_item{{_index}}"><span></span>{{Name}}</li>
+    # {{/each_with_index}}
     eachWithIndex: (context, options) ->
       fn = options.fn
       inverse = options.inverse
@@ -168,6 +207,101 @@ define [
 
     dateSelect: (name, options) ->
       new Handlebars.SafeString dateSelect(name, options.hash).html()
-      
+
+    ##
+    # usage:
+    #   if 'this' is {human: true}
+    #   and you do: {{checkbox "human"}}
+    #   you'll get: <input name="human" type="hidden" value="0" />
+    #               <input type="checkbox"
+    #                      value="1"
+    #                      id="human"
+    #                      checked="true"
+    #                      name="human" >
+    # you can pass custom attributes and use nested properties:
+    #   if 'this' is {likes: {tacos: true}}
+    #   and you do: {{checkbox "likes.tacos" class="foo bar"}}
+    #   you'll get: <input name="likes[tacos]" type="hidden" value="0" />
+    #               <input type="checkbox"
+    #                      value="1"
+    #                      id="likes_tacos"
+    #                      checked="true"
+    #                      name="likes[tacos]"
+    #                      class="foo bar" >
+    checkbox : (propertyName, {hash}) ->
+      splitPropertyName = propertyName.split(/\./)
+      snakeCase = splitPropertyName.join('_')
+      bracketNotation = splitPropertyName[0] + _.chain(splitPropertyName)
+                                                .rest()
+                                                .map((prop) -> "[#{prop}]")
+                                                .value()
+                                                .join('')
+      inputProps = _.extend
+        type: 'checkbox'
+        value: 1
+        id: snakeCase
+        name: bracketNotation
+      , hash
+
+      unless inputProps.checked
+        value = _.reduce splitPropertyName, ((memo, key) -> memo[key]), this
+        inputProps.checked = true if value
+
+      attributes = _.map inputProps, (val, key) -> "#{htmlEscape key}=\"#{htmlEscape val}\""
+      new Handlebars.SafeString """
+        <input name="#{htmlEscape inputProps.name}" type="hidden" value="0" />
+        <input #{attributes.join ' '} />
+      """
+
+    toPercentage: (number) ->
+      parseInt(100 * number) + "%"
+
+    checkedIf: ( thing, thingToCompare, hash ) ->
+      if arguments.length == 3
+        if thing == thingToCompare
+          'checked'
+        else
+          ''
+      else
+        if thing then 'checked' else ''
+
+    selectedIf: ( thing, thingToCompare, hash ) ->
+      if arguments.length == 3
+        if thing == thingToCompare
+          'selected'
+        else
+          ''
+      else
+        if thing then 'selected' else ''
+
+    disabledIf: ( thing, hash ) ->
+      if thing then 'disabled' else ''
+
+    checkedUnless: ( thing ) ->
+      if thing then '' else 'checked'
+
+    join: ( array, separator = ',', hash ) ->
+      return '' unless array
+      array.join(separator)
+
+    ifIncludes: ( array, thing, options ) ->
+      return false unless array
+      if thing in array
+        options.fn( this )
+      else
+        options.inverse( this )
+
+    disabledIfIncludes: ( array, thing ) ->
+      return '' unless array
+      if thing in array
+        'disabled'
+      else
+        ''
+
+    truncate: ( string, max ) ->
+      return textHelper.truncateText( string, { max: max } )
+
+
+    enrollmentName: enrollmentName
   }
   return Handlebars

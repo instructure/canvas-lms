@@ -1,0 +1,18 @@
+<h3 style="margin: 0px;"><%= t('headers.questions', "Questions") %></h3>
+<ul id="question_list" style="max-height: 200px; overflow: auto;" class="<%= 'read_only' if @quiz_presenter.cant_go_back? %>">
+  <% @quiz_presenter.all_questions.each do |q| %>
+    <li id="list_question_<%= q[:id] %>" class="<%= @quiz_presenter.question_class(q) %>">
+    <% if @quiz_presenter.one_question_at_a_time? %>
+      <% if @quiz_presenter.cant_go_back? || @quiz_presenter.require_lockdown_browser? %>
+        <span>
+          <%= q[:question_name] %>
+        <span>
+      <% else %>
+        <%= link_to q[:question_name], @quiz_presenter.question_path(q[:id]), :class => "no-warning" %>
+      <% end %>
+    <% else %>
+      <a class="jump_to_question_link" href="#question_<%= q[:id] %>"><%= q[:question_name] %></a>
+    <% end %>
+    </li>
+  <% end %>
+</ul>

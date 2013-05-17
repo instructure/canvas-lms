@@ -1,0 +1,16 @@
+<tr>
+
+  <td>
+    {{#if isLinkable }}
+      <a href="{{ url }}">{{ truncatedURL }}</a>
+    {{ else }}
+      {{ truncatedURL }}
+    {{/if}}
+  </td>
+
+  <td>{{ tDateToString created_at "date_at_time" }}</td>
+  <td>{{#if participated}}<img src="/images/checked.png" width=12 />{{/if}}</td>
+  <td>{{ readableInteractionTime }}</td>
+  <td title="{{ user_agent }}" class="user_agent">{{ summarizedUserAgent }}</td>
+</tr>
+

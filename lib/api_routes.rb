@@ -38,6 +38,7 @@ YARD::Tags::Library.define_tag("API subtopic", :subtopic)
 YARD::Tags::Library.define_tag("API resource is Beta", :beta)
 YARD::Tags::Library.define_tag("API Object Definition", :object)
 YARD::Tags::Library.define_tag("API Return Type", :returns)
+YARD::Tags::Library.define_tag("API resource is internal", :internal)
 
 module YARD::Templates::Helpers
   module BaseHelper
@@ -50,7 +51,7 @@ module YARD::Templates::Helpers
       when :root, :module, :constant
         false
       when :method, :class
-        !object.tags("API").empty?
+        !object.tags("API").empty? && (ENV['INCLUDE_INTERNAL'] || object.tags('internal').empty?)
       else
         if object.parent.nil?
           false

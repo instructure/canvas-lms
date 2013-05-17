@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -24,23 +24,19 @@ class ConversationParticipant < ActiveRecord::Base
 
   belongs_to :conversation
   belongs_to :user
-  has_many :conversation_message_participants, :dependent => :delete_all
-  has_many :messages, :source => :conversation_message,
-           :through => :conversation_message_participants,
-           :select => "conversation_messages.*, conversation_message_participants.tags",
-           :order => "created_at DESC, id DESC",
-           :conditions => 'conversation_id = #{conversation_id}'
-           # conditions are redundant, but they let us use the best index
+  # deprecated
+  has_many :conversation_message_participants
+  after_destroy :destroy_conversation_message_participants
 
-  named_scope :visible, :conditions => "last_message_at IS NOT NULL"
-  named_scope :default, :conditions => "workflow_state IN ('read', 'unread')"
-  named_scope :unread, :conditions => "workflow_state = 'unread'"
-  named_scope :archived, :conditions => "workflow_state = 'archived'"
-  named_scope :starred, :conditions => "label = 'starred'"
-  named_scope :sent, :conditions => "visible_last_authored_at IS NOT NULL", :order => "visible_last_authored_at DESC, conversation_id DESC"
-  named_scope :for_masquerading_user, lambda { |user|
+  scope :visible, where("last_message_at IS NOT NULL")
+  scope :default, where(:workflow_state => ['read', 'unread'])
+  scope :unread, where(:workflow_state => 'unread')
+  scope :archived, where(:workflow_state => 'archived')
+  scope :starred, where(:label => 'starred')
+  scope :sent, where("visible_last_authored_at IS NOT NULL").order("visible_last_authored_at DESC, conversation_id DESC")
+  scope :for_masquerading_user, lambda { |user|
     # site admins can see everything
-    return {} if Account.site_admin.grants_right?(user, :become_user)
+    return scoped if user.account_users.map(&:account_id).include?(Account.site_admin.id)
 
     # we need to ensure that the user can access *all* of each conversation's
     # accounts (and that each conversation has at least one account). so given
@@ -56,34 +52,117 @@ class ConversationParticipant < ActiveRecord::Base
     #
     # we're also counting on conversations being in the join
 
-    own_root_account_ids = user.associated_root_accounts.select{ |a| a.grants_right?(user, :become_user) }.map(&:id)
+    own_root_account_ids = Shard.default.activate do
+      user.associated_root_accounts.select{ |a| a.grants_right?(user, :become_user) }.map(&:id)
+    end
     id_string = "[" + own_root_account_ids.sort.join("][") + "]"
-    root_account_id_matcher = "'%[' || REPLACE(root_account_ids, ',', ']%[') || ']%'"
-    {:conditions => ["conversations.root_account_ids <> '' AND " + like_condition('?', root_account_id_matcher, false), id_string]}
+    root_account_id_matcher = "'%[' || REPLACE(conversation_participants.root_account_ids, ',', ']%[') || ']%'"
+    where("conversation_participants.root_account_ids <> '' AND " + like_condition('?', root_account_id_matcher, false), id_string)
   }
 
+  # Produces a subscope for conversations in which the given users are
+  # participants (either all or any, depending on options[:mode]).
+  #
+  # The execution of subqueries and general complexity is due to the fact that
+  # the existence of a CP for any given user can only be guaranteed on the
+  # user's shard and the conversation's shard. To get a condition that can be
+  # applied on a single shard (for the scope being constructed) we basically
+  # have to execute this condition immediately and then just limit on the
+  # resulting ids into the scope we're building.
+  #
+  # Performance assumptions:
+  #
+  # * number of unique shards among given user tags is small (there will be one
+  #   query per such shard)
+  # * the number of unique shards on which those users have conversations is
+  #   relatively small (there will be one query per such shard)
+  # * number of found conversations is relatively small (each will be
+  #   instantiated to get id)
+  #
   tagged_scope_handler(/\Auser_(\d+)\z/) do |tags, options|
-    user_ids = tags.map{ |t| t.sub(/\Auser_/, '').to_i }
-    conditions = if options[:mode] == :or || tags.size == 1
-      [<<-SQL, user_ids]
-      EXISTS (
-        SELECT *
-        FROM conversation_participants cp
-        WHERE cp.conversation_id = conversation_participants.conversation_id
-        AND user_id IN (?)
-      )
-      SQL
-    else
-      [<<-SQL, user_ids, user_ids.size]
-      (
-        SELECT COUNT(*)
-        FROM conversation_participants cp
-        WHERE cp.conversation_id = conversation_participants.conversation_id
-        AND user_id IN (?)
-      ) = ?
-      SQL
+    scope_shard = scope(:find, :shard)
+    exterior_user_ids = tags.map{ |t| t.sub(/\Auser_/, '').to_i }
+
+    # which users have conversations on which shards?
+    users_by_conversation_shard =
+      ConversationParticipant.users_by_conversation_shard(exterior_user_ids)
+
+    # invert the map (to get shards-for-each-user rather than
+    # users-for-each-shard), then combine the keys (shards) according to mode.
+    # i.e. if we want conversations with all given users participating,
+    # intersect the set of shards; otherwise union them.
+    conversation_shards_by_user = {}
+    exterior_user_ids.each do |user_id|
+      conversation_shards_by_user[user_id] ||= Set.new
     end
-    sanitize_sql conditions
+    users_by_conversation_shard.each do |shard, user_ids|
+      user_ids.each do |user_id|
+        user_id = shard.relative_id_for(user_id)
+        conversation_shards_by_user[user_id] << shard
+      end
+    end
+    combinator = (options[:mode] == :or) ? :| : :&
+    conversation_shards =
+      conversation_shards_by_user.values.inject(combinator).to_a
+
+    # which conversations from those shards include any/all of the given users
+    # as participants?
+    conditions = Shard.with_each_shard(conversation_shards) do
+      user_ids = users_by_conversation_shard[Shard.current]
+
+      shard_conditions = if options[:mode] == :or || user_ids.size == 1
+        [<<-SQL, user_ids]
+        EXISTS (
+          SELECT *
+          FROM conversation_participants cp
+          WHERE cp.conversation_id = conversations.id
+          AND user_id IN (?)
+        )
+        SQL
+      else
+        [<<-SQL, user_ids, user_ids.size]
+        (
+          SELECT COUNT(*)
+          FROM conversation_participants cp
+          WHERE cp.conversation_id = conversations.id
+          AND user_id IN (?)
+        ) = ?
+        SQL
+      end
+
+      # return arrays because with each shard is gonna try and Array() it
+      # anyways, and 1.8.7 would split up the multiline strings.
+      if Shard.current == scope_shard
+        [sanitize_sql(shard_conditions)]
+      else
+        conversation_ids = Conversation.where(shard_conditions).map do |c|
+          Shard.relative_id_for(c.id, scope_shard)
+        end
+        [sanitize_sql(:conversation_id => conversation_ids)]
+      end
+    end
+
+    # tagged will flatten a [single_condition] or [] into the list of
+    # conditions it's building up, but if we've got multiple conditions here,
+    # we want to make sure they're combined with OR regardless of
+    # options[:mode], since they're results per shard that we want to combine;
+    # each individual condition already takes options[:mode] into account)
+    if conditions.size > 1
+      "(#{conditions.join(' OR ')})"
+    else
+      conditions
+    end
+  end
+
+  tagged_scope_handler(/\A(course|group|section)_(\d+)\z/) do |tags, options|
+    tags.map do |tag|
+      # tags in the database use the id relative to the default shard. ids in
+      # the filters are assumed relative to the current shard and need to be
+      # cast to an id relative to the default shard before use in queries.
+      type, id = ActiveRecord::Base.parse_asset_string(tag)
+      id = Shard.relative_id_for(id, Shard.default)
+      wildcard('conversation_participants.tags', "#{type.underscore}_#{id}", :delimiter => ',')
+    end
   end
 
   cacheable_method :user
@@ -94,7 +173,7 @@ class ConversationParticipant < ActiveRecord::Base
   before_update :update_unread_count_for_update
   before_destroy :update_unread_count_for_destroy
 
-  attr_accessible :subscribed, :starred, :workflow_state
+  attr_accessible :subscribed, :starred, :workflow_state, :user
 
   validates_inclusion_of :label, :in => ['starred'], :allow_nil => true
 
@@ -106,15 +185,35 @@ class ConversationParticipant < ActiveRecord::Base
       :id => conversation_id,
       :workflow_state => workflow_state,
       :last_message => latest ? truncate_text(latest.body, :max_length => 100) : nil,
-      :last_message_at => latest ? latest.created_at : last_message_at,
+      :last_message_at => last_message_at,
       :last_authored_message => latest_authored ? truncate_text(latest_authored.body, :max_length => 100) : nil,
       :last_authored_message_at => latest_authored ? latest_authored.created_at : visible_last_authored_at,
       :message_count => message_count,
       :subscribed => subscribed?,
       :private => private?,
       :starred => starred,
-      :properties => properties(latest)
+      :properties => properties(latest || latest_authored)
     }.with_indifferent_access
+  end
+
+  def messages
+    self.conversation.shard.activate do
+      if self.conversation.shard == self.shard
+        # use a slightly more forgiving backcompat query (since the migration may not have
+        # fully filled in user_id yet)
+        ConversationMessage.shard(self.conversation.shard).
+          select("conversation_messages.*, conversation_message_participants.tags").
+          joins(:conversation_message_participants).
+          where("conversation_id=? AND (user_id=? OR (conversation_participant_id=? AND user_id IS NULL))", self.conversation_id, self.user_id, self).
+          order("created_at DESC, id DESC")
+      else
+        ConversationMessage.shard(self.conversation.shard).
+          select("conversation_messages.*, conversation_message_participants.tags").
+          joins(:conversation_message_participants).
+          where("conversation_id=? AND user_id=?", self.conversation_id, self.user_id).
+          order("created_at DESC, id DESC")
+      end
+    end
   end
 
   def participants(options = {})
@@ -123,7 +222,6 @@ class ConversationParticipant < ActiveRecord::Base
       :include_indirect_participants => false
     }.merge(options)
 
-    context_info = {}
     participants = conversation.participants
     if options[:include_indirect_participants]
       user_ids =
@@ -132,47 +230,53 @@ class ConversationParticipant < ActiveRecord::Base
           |m| m.submission.submission_comments.map(&:author_id) if m.submission
         }.compact.flatten
       user_ids -= participants.map(&:id)
-      participants += User.find(:all, :select => User::MESSAGEABLE_USER_COLUMN_SQL + ", NULL AS common_courses, NULL AS common_groups", :conditions => {:id => user_ids})
+      participants += MessageableUser.available.where(:id => user_ids).all
     end
     return participants unless options[:include_participant_contexts]
+
     # we do this to find out the contexts they share with the user
-    user.messageable_users(:ids => participants.map(&:id), :skip_visibility_checks => true).each { |user|
-      context_info[user.id] = user
-    }
-    participants.each { |user|
-      user.common_courses = user.id == self.user_id ? {} : context_info[user.id].common_courses
-      user.common_groups = user.id == self.user_id ? {} : context_info[user.id].common_groups
-    }
+    user.load_messageable_users(participants, :strict_checks => false)
   end
   memoize :participants
 
   def properties(latest = last_message)
     properties = []
-    properties << :last_author if latest && latest.author_id == user_id
+    properties << :last_author if last_author?(latest)
     properties << :attachments if has_attachments?
     properties << :media_objects if has_media_objects?
     properties
   end
 
-  def add_participants(user_ids, options={})
-    conversation.add_participants(user, user_ids, options)
+  def last_author?(latest = last_message)
+    latest && latest.author_id == user_id
   end
 
-  def add_message(body, options={})
-    conversation.add_message(user, body, options.merge(:generated => false))
+  def add_participants(users, options={})
+    conversation.add_participants(user, users, options)
+  end
+
+  def add_message(body_or_obj, options={})
+    conversation.add_message(user, body_or_obj, options.merge(:generated => false))
   end
 
   def remove_messages(*to_delete)
-    if to_delete == [:all]
-      messages.clear
-    else
-      messages.delete(*to_delete)
-      # if the only messages left are generated ones, e.g. "added
-      # bob to the conversation", delete those too
-      messages.clear if messages.all?(&:generated?)
+    self.conversation.shard.activate do
+      scope = ConversationMessageParticipant.joins(:conversation_message).
+          where(:conversation_messages => { :conversation_id => self.conversation_id },
+                          :user_id => self.user_id)
+      if to_delete == [:all]
+        scope.delete_all
+      else
+        scope.where(:conversation_message_id => to_delete).delete_all
+        # if the only messages left are generated ones, e.g. "added
+        # bob to the conversation", delete those too
+        return remove_messages(:all) unless messages.where(:generated => false).exists?
+      end
     end
-    update_cached_data
-    save
+    unless @destroyed
+      update_cached_data
+      save
+    end
   end
 
   def update_attributes(hash)
@@ -184,7 +288,7 @@ class ConversationParticipant < ActiveRecord::Base
   end
 
   def recent_messages
-    messages.scoped(:limit => 10)
+    messages.limit(10)
   end
 
   def subscribed=(value)
@@ -213,7 +317,7 @@ class ConversationParticipant < ActiveRecord::Base
   end
 
   def one_on_one?
-    conversation.participants.size == 2 && private?
+    conversation.conversation_participants.size == 2 && private?
   end
 
   def other_participants(participants=conversation.participants)
@@ -280,6 +384,10 @@ class ConversationParticipant < ActiveRecord::Base
     save!
   end
 
+  def local_context_tags
+    context_tags
+  end
+
   def context_tags
     read_attribute(:tags) ? tags.grep(/\A(course|group)_\d+\z/) : infer_tags
   end
@@ -290,12 +398,25 @@ class ConversationParticipant < ActiveRecord::Base
 
   def move_to_user(new_user)
     self.class.send :with_exclusive_scope do
-      conversation.conversation_messages.update_all(["author_id = ?", new_user.id], ["author_id = ?", user_id])
-      if existing = conversation.conversation_participants.find_by_user_id(new_user.id)
-        existing.update_attribute(:workflow_state, workflow_state) if unread? || existing.archived?
-        destroy
-      else
-        update_attribute :user_id, new_user.id
+      conversation.shard.activate do
+        old_shard = self.user.shard
+        conversation.conversation_messages.where(:author_id => user_id).update_all(:author_id => new_user)
+        if existing = conversation.conversation_participants.find_by_user_id(new_user)
+          existing.update_attribute(:workflow_state, workflow_state) if unread? || existing.archived?
+          destroy
+        else
+          ConversationMessageParticipant.joins(:conversation_message).
+              where(:conversation_messages => { :conversation_id => self.conversation_id }, :user_id => self.user_id).
+              update_all(:user_id => new_user)
+          update_attribute :user, new_user
+          existing = self
+        end
+        # replicate ConversationParticipant record to the new user's shard
+        if old_shard != new_user.shard && new_user.shard != conversation.shard
+          new_cp = existing.clone
+          new_cp.shard = new_user.shard
+          new_cp.save!
+        end
       end
       conversation.regenerate_private_hash! if private?
     end
@@ -308,24 +429,74 @@ class ConversationParticipant < ActiveRecord::Base
 
   attr_writer :last_authored_message
   def last_authored_message
-    @last_authored_message ||= messages.human.by_user(user_id).first if visible_last_authored_at
+    @last_authored_message ||= self.conversation.shard.activate { messages.human.by_user(user_id).first } if visible_last_authored_at
   end
 
-  def self.preload_latest_messages(conversations, author_id)
+  def self.preload_latest_messages(conversations, author)
     # preload last_message
     ConversationMessage.preload_latest conversations.select(&:last_message_at)
     # preload last_authored_message
-    ConversationMessage.preload_latest conversations.select(&:visible_last_authored_at), author_id
+    ConversationMessage.preload_latest conversations.select(&:visible_last_authored_at), author
   end
 
   def self.conversation_ids
-    scope = current_scoped_methods && current_scoped_methods[:find]
-    raise "conversation_ids needs to be scoped to a user" unless scope && scope[:conditions] =~ /user_id = \d+/
-    scope[:order] ||= "last_message_at DESC"
-    # need to join on conversations in case we use this w/ scopes like for_masquerading_user
-    connection.select_all("SELECT conversation_id FROM conversations, conversation_participants WHERE #{scope[:conditions]} AND conversations.id = conversation_participants.conversation_id ORDER BY #{scope[:order]}").
-      map{ |row| row['conversation_id'].to_i }
+    raise "conversation_ids needs to be scoped to a user" unless scope(:find, :conditions) =~ /user_id = \d+/
+    order = 'last_message_at DESC' unless scoped?(:find, :order)
+    self.order(order).except(:includes).select(:conversation_id).map(&:conversation_id)
   end
+
+  def self.users_by_conversation_shard(user_ids)
+    { Shard.current => user_ids }
+  end
+
+  def update_one(update_params)
+    case update_params[:event]
+
+    when 'mark_as_read'
+      self.workflow_state = 'read'
+    when 'mark_as_unread'
+      self.workflow_state = 'unread'
+    when 'archive'
+      self.workflow_state = 'archived'
+
+    when 'star'
+      self.starred = true
+    when 'unstar'
+      self.starred = false
+
+    when 'destroy'
+      self.remove_messages(:all)
+
+    end
+    self.save!
+  end
+
+  def self.do_batch_update(progress, user, conversation_ids, update_params)
+    progress_runner = ProgressRunner.new(progress)
+    progress_runner.completed_message do |completed_count|
+      t('batch_update_message', {
+          :one => "1 conversation processed",
+          :other => "%{count} conversations processed"
+        },
+        :count => completed_count)
+    end
+
+    progress_runner.do_batch_update(conversation_ids) do |conversation_id|
+      participant = user.all_conversations.find_by_conversation_id(conversation_id)
+      raise t('not_participating', 'The user is not participating in this conversation') unless participant
+      participant.update_one(update_params)
+    end
+  end
+
+  def self.batch_update(user, conversation_ids, update_params)
+    progress = user.progresses.create! :tag => "conversation_batch_update", :completion => 0.0
+    job = ConversationParticipant.send_later(:do_batch_update, progress, user, conversation_ids, update_params)
+    progress.user_id = user.id
+    progress.delayed_job_id = job.id
+    progress.save!
+    progress
+  end
+
 
   protected
   def message_tags
@@ -333,9 +504,15 @@ class ConversationParticipant < ActiveRecord::Base
   end
 
   private
+
+  def destroy_conversation_message_participants
+    @destroyed = true
+    remove_messages(:all) if self.conversation_id
+  end
+
   def update_unread_count(direction=:up, user_id=self.user_id)
-    User.update_all "unread_conversations_count = unread_conversations_count #{direction == :up ? '+' : '-'} 1, updated_at = '#{Time.now.to_s(:db)}'",
-                    :id => user_id
+    User.where(:id => user_id).
+        update_all(["unread_conversations_count = unread_conversations_count + ?, updated_at = ?", direction == :up ? 1 : -1, Time.now.utc])
   end
 
   def update_unread_count_for_update

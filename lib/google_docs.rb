@@ -22,6 +22,7 @@ module GoogleDocs
 
   def google_docs_retrieve_access_token
     consumer = google_consumer
+    return nil unless consumer
     if google_docs_user
       service_token, service_secret = Rails.cache.fetch(['google_docs_tokens', google_docs_user].cache_key) do
         service = google_docs_user.user_services.find_by_service("google_docs")
@@ -94,7 +95,7 @@ module GoogleDocs
 
   def google_docs_download(document_id)
     access_token = google_docs_retrieve_access_token
-    entry = google_doc_list(access_token).files.find{|e| e.document_id == document_id}
+    entry = google_doc_fetch_list(access_token).entries.map{|e| GoogleDocEntry.new(e) }.find{|e| e.document_id == document_id}
     if entry
       response = access_token.get(entry.download_url)
       response = access_token.get(response['Location']) if response.is_a?(Net::HTTPFound)
@@ -104,82 +105,148 @@ module GoogleDocs
     end
   end
 
-  def google_doc_list(access_token=nil, only_extensions=nil)
-    access_token ||= google_docs_retrieve_access_token
-    docs = Atom::Feed.load_feed(access_token.get("https://docs.google.com/feeds/documents/private/full").body)
-    folders = []
-    entries = []
-    docs.entries.each do |entry|
-      folder = entry.categories.find{|c| c.scheme.match(/\Ahttp:\/\/schemas.google.com\/docs\/2007\/folders/)}
-      folders << folder.label if folder
-      entries << GoogleDocEntry.new(entry)
+  class Folder
+    attr_reader :name, :folders, :files
+
+    def initialize(name, folders=[], files=[])
+      @name = name
+      # File objects are GoogleDocEntry objects
+      @folders, @files = folders, files
     end
-    folders.uniq!
-    folders.sort!
-    res = OpenObject.new
-    unless only_extensions.blank?
-      entries.reject! { |e| !only_extensions.include?(e.extension) }
+
+    def add_file(file)
+      @files << file
     end
-    res.files = entries
-    res.folders = folders
-    res
+
+    def add_folder(folder)
+      @folders << folder
+    end
+
+    def select(&block)
+      Folder.new(@name,
+        @folders.map{ |f| f.select(&block) }.select{ |f| !f.files.empty? },
+        @files.select(&block))
+    end
+
+    def map(&block)
+      @folders.map{ |f| f.map(&block) }.flatten +
+        @files.map(&block)
+    end
+
+    def to_hash
+      {
+        "name" => @name,
+        "folders" => @folders.map{ |sf| sf.to_hash },
+        "files" => @files.map{ |f| f.to_hash }
+      }
+    end
   end
 
-  def google_consumer(key=nil, secret=nil)
+  def google_doc_fetch_list(access_token)
+    response = access_token.get('https://docs.google.com/feeds/documents/private/full')
+    Atom::Feed.load_feed(response.body)
+  end
+
+  def google_doc_folderize_list(docs)
+    root = Folder.new('/')
+    folders = { nil => root }
+
+    docs.entries.each do |entry|
+      entry = GoogleDocEntry.new(entry)
+      if !folders.has_key?(entry.folder)
+        folder = Folder.new(entry.folder)
+        root.add_folder folder
+        folders[entry.folder] = folder
+      else
+        folder = folders[entry.folder]
+      end
+      folder.add_file entry
+    end
+
+    return root
+  end
+
+  def google_docs_list(access_token=nil)
+    access_token ||= google_docs_retrieve_access_token
+    google_doc_folderize_list(google_doc_fetch_list(access_token))
+  end
+
+  def google_docs_list_with_extension_filter(extensions, access_token=nil)
+    access_token ||= google_docs_retrieve_access_token
+    list = google_docs_list(access_token)
+    if extensions.present?
+      list = list.select{ |e| extensions.include?(e.extension) }
+    end
+    list
+  end
+
+  def google_consumer(key = nil, secret = nil)
+    if key.nil? || secret.nil?
+      return nil if GoogleDocs.config.nil?
+      key ||= GoogleDocs.config['api_key']
+      secret ||= GoogleDocs.config['secret_key']
+    end
+
     require 'oauth'
     require 'oauth/consumer'
-    key ||= GoogleDocs.config['api_key']
-    secret ||= GoogleDocs.config['secret_key']
-    consumer = OAuth::Consumer.new(key, secret, {
-      :site => "https://www.google.com",
-      :request_token_path => "/accounts/OAuthGetRequestToken",
-      :access_token_path => "/accounts/OAuthGetAccessToken",
-      :authorize_path=> "/accounts/OAuthAuthorizeToken",
-      :signature_method => "HMAC-SHA1"
+
+    OAuth::Consumer.new(key, secret, {
+      :site               => 'https://www.google.com',
+      :request_token_path => '/accounts/OAuthGetRequestToken',
+      :access_token_path  => '/accounts/OAuthGetAccessToken',
+      :authorize_path     => '/accounts/OAuthAuthorizeToken',
+      :signature_method   => 'HMAC-SHA1'
     })
   end
 
   class Google
     class Google::Batch
-    class Google::Batch::Operation
-      attr_accessor :type
-      def initialize(operation_type="insert")
-        self.type = operation_type
-      end
-      def to_xml(*opts)
-        n = XML::Node.new("batch:operation")
-        n['type'] = type
-        n
+      class Google::Batch::Operation
+        attr_accessor :type
+        def initialize(operation_type="insert")
+          self.type = operation_type
+        end
+        def to_xml(*opts)
+          n = XML::Node.new("batch:operation")
+          n['type'] = type
+          n
+        end
       end
     end
-    end
+
     class Google::GAcl
-    class Google::GAcl::Role
-      attr_accessor :role
-      def initialize()
-        self.role = "writer"
+      class Google::GAcl::Role
+        attr_accessor :role
+
+        def initialize()
+          self.role = "writer"
+        end
+
+        def to_xml(*opts)
+          n = XML::Node.new("gAcl:role")
+          n['value'] = role
+          n
+        end
       end
-      def to_xml(*opts)
-        n = XML::Node.new("gAcl:role")
-        n['value'] = role
-        n
+
+      class Google::GAcl::Scope
+        attr_accessor :type, :value
+
+        def initialize(email)
+          self.type = "user"
+          self.value = email
+        end
+
+        def to_xml(*opts)
+          n = XML::Node.new("gAcl:scope")
+          n['type'] = type
+          n['value'] = value
+          n
+        end
       end
-    end
-    class Google::GAcl::Scope
-      attr_accessor :type, :value
-      def initialize(email)
-        self.type = "user"
-        self.value = email
-      end
-      def to_xml(*opts)
-        n = XML::Node.new("gAcl:scope")
-        n['type'] = type
-        n['value'] = value
-        n
-      end
-    end
     end
   end
+
   class Entry < Atom::Entry
     namespace Atom::NAMESPACE
     element "id"
@@ -214,71 +281,99 @@ module GoogleDocs
         category.label = "document"
       end
     end
-    response = access_token.post(url, entry.to_xml, {'Content-Type' => 'application/atom+xml'})
-    entry = GoogleDocEntry.new(Atom::Entry.load_entry(response.body))
+    xml = entry.to_xml
+    begin
+      response = access_token.post(url, xml, {'Content-Type' => 'application/atom+xml'})
+    rescue => e
+      raise "Unable to post to Google API #{url}:\n#{xml}" +
+            "\n\n(" + e.to_s + ")\n"
+    end
+    begin
+      entry = GoogleDocEntry.new(Atom::Entry.load_entry(response.body))
+    rescue => e
+      raise "Unable to load GoogleDocEntry from response: \n" + response.body + 
+            "\n\n(" + e.to_s + ")\n"
+    end
   end
 
-  def google_docs_delete_doc(entry, access_token=nil)
-    url = entry.edit_url
-    access_token ||= google_docs_retrieve_access_token
-    response = access_token.delete(url, {"GData-Version" => "2", "If-Match" => "*"})
+  def google_docs_delete_doc(entry, access_token = google_docs_retrieve_access_token)
+    access_token.delete(entry.edit_url, { 'GData-Version' => '2', 'If-Match' => '*' })
   end
 
   def google_docs_acl_remove(document_id, users)
     access_token = google_docs_retrieve_access_token
-    url = "https://docs.google.com/feeds/acl/private/full/#{document_id}/batch"
+    url          = "https://docs.google.com/feeds/acl/private/full/#{document_id}/batch"
+
+    Struct.new('UserStruct', :id, :gmail, :google_docs_address)
+    users.each_with_index do |user, idx|
+      if user.is_a? String
+        users[idx] = Struct::UserStruct.new(user, user)
+      end
+    end
+
     request_feed = Feed.new do |feed|
       feed.categories << Atom::Category.new{|category|
         category.scheme = "http://schemas.google.com/g/2005#kind"
         category.term = "http://schemas.google.com/acl/2007#accessRule"
       }
       users.each do |user|
-        if user.is_a?(String)
-          user = OpenObject.new(:id => user, :gmail => user)
-        end
+        next unless user_identifier = user.google_docs_address || user.gmail
+
         feed.entries << Entry.new do |entry|
-          user_identifier = user.google_docs_address || user.gmail
-          entry.id = "https://docs.google.com/feeds/acl/private/full/#{CGI.escape(document_id)}/user%3A#{CGI.escape(user_identifier)}"
-          entry.batch_operation = Google::Batch::Operation.new("delete")
-          entry.gAcl_role = Google::GAcl::Role.new
-          entry.gAcl_scope = Google::GAcl::Scope.new(user_identifier)
+          entry.id              = "https://docs.google.com/feeds/acl/private/full/#{CGI.escape(document_id)}/user%3A#{CGI.escape(user_identifier)}"
+          entry.batch_operation = Google::Batch::Operation.new('delete')
+          entry.gAcl_role       = Google::GAcl::Role.new
+          entry.gAcl_scope      = Google::GAcl::Scope.new(user_identifier)
         end
       end
     end
-    response = access_token.post(url, request_feed.to_xml, {'Content-Type' => 'application/atom+xml'})
-    feed = Atom::Feed.load_feed(response.body)
-    res = []
+
+    response = post_for_removal(access_token, url, request_feed.to_xml)
+    feed     = Atom::Feed.load_feed(response.body)
+    res      = []
+
     feed.entries.each do |entry|
       user = users.to_a.find{|u| u.id == entry['http://schemas.google.com/gdata/batch', 'id'][0].to_i}
       res << user if user
     end
+
     res
+  end
+
+  # method added to allow tests to mock properly
+  def post_for_removal(access_token, url, xml)
+    access_token.post(url, xml, {'Content-Type' => 'application/atom+xml'})
   end
 
   def google_docs_acl_add(document_id, users)
     access_token = google_docs_retrieve_access_token
-    url = "https://docs.google.com/feeds/acl/private/full/#{document_id}/batch"
+    url          = "https://docs.google.com/feeds/acl/private/full/#{document_id}/batch"
+
     request_feed = Feed.new do |feed|
-      feed.categories << Atom::Category.new{|category|
+      feed.categories << Atom::Category.new do |category|
         category.scheme = "http://schemas.google.com/g/2005#kind"
-        category.term = "http://schemas.google.com/acl/2007#accessRule"
-      }
-      users.each do |user|
+        category.term   = "http://schemas.google.com/acl/2007#accessRule"
+      end
+
+      users.select { |u| u.google_docs_address || u.gmail }.each do |user|
         feed.entries << Entry.new do |entry|
-          entry.batch_id = user.id
+          entry.batch_id        = user.id
           entry.batch_operation = Google::Batch::Operation.new
-          entry.gAcl_role = Google::GAcl::Role.new
-          entry.gAcl_scope = Google::GAcl::Scope.new(user.google_docs_address || user.gmail)
+          entry.gAcl_role       = Google::GAcl::Role.new
+          entry.gAcl_scope      = Google::GAcl::Scope.new(user.google_docs_address || user.gmail)
         end
       end
     end
+
     response = access_token.post(url, request_feed.to_xml, {'Content-Type' => 'application/atom+xml'})
-    feed = Atom::Feed.load_feed(response.body)
-    res = []
+    feed     = Atom::Feed.load_feed(response.body)
+    res      = []
+
     feed.entries.each do |entry|
       user = users.to_a.find{|u| u.id == entry['http://schemas.google.com/gdata/batch', 'id'][0].to_i}
       res << user if user
     end
+
     res
   end
 

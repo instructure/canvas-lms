@@ -18,6 +18,7 @@ define [
       @server.restore()
       @clock.tick 250 # tick past errorBox animations
       @clock.restore()
+      $('#fixtures').empty()
 
   sendFail = (server, response = '') ->
     server.respond 'POST', '/fail', [

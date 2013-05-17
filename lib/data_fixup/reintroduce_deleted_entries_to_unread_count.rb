@@ -1,7 +1,7 @@
 module DataFixup::ReintroduceDeletedEntriesToUnreadCount
   def self.run
     # Recalculate counts to include deleted entries
-    DiscussionTopicParticipant.find_each(:include => [:discussion_topic, :user]) do |participant|
+    DiscussionTopicParticipant.includes(:discussion_topic, :user).find_each do |participant|
       # since the previous code treated all deleted discussion entries as
       # hidden and not included in unread counts, we're going to update all
       # pre-existing deleted entries to be marked as read for all users
@@ -15,7 +15,7 @@ module DataFixup::ReintroduceDeletedEntriesToUnreadCount
       # in theory this count won't need updating, but race conditions mean it
       # could be out of sync after the above, so we'll update it here. if it
       # doesn't change, the participant won't get re-saved
-      read_count = topic.discussion_entry_participants.scoped(:conditions => { :user_id => participant.user_id, :workflow_state => "read" }).count
+      read_count = topic.discussion_entry_participants.where(:user_id => participant.user_id, :workflow_state => "read").count
       participant.unread_entry_count = topic.discussion_entries.count - read_count
       participant.save
     end

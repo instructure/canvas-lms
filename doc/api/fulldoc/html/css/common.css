@@ -32,6 +32,13 @@ h1 {
   font-size: 1.6em;
   padding: 4px 0 0;
 }
+#content h1 {
+  padding: 0.6em 1em;
+  background-color: #555;
+  border: 1px solid #d8d8e5;
+  border-radius: 5px;
+  color: #eee;
+}
 h2 {
   border-bottom: 1px #aaa solid;
   padding: 0 0 3px;
@@ -79,14 +86,6 @@ h3.beta {
   background-color: white;
   border-right: none;
   padding:12px 26px;
-}
-
-.service h1 {
-  padding: 0.6em 1em;
-  background-color: #555;
-  border: 1px solid #d8d8e5;
-  border-radius: 5px;
-  color: #eee;
 }
 
 .method_details_list h2 {
@@ -191,4 +190,8 @@ table#quicklinks th {
 h2.api_method_name a {
   text-decoration: none;
   color: black;
+}
+
+div.appendix img {
+  max-width: 800px;
 }

@@ -35,7 +35,7 @@ describe ContentZipper do
       Zip::ZipFile.foreach(attachment.full_filename) do |f|
         if f.file?
           f.name.should =~ /some-999-_-1234-guy/
-          f.get_input_stream.read.should match(%r{This submission was a url, we're taking you to the url link now.})
+          f.get_input_stream.read.should match(%r{This submission was a url, we&#39;re taking you to the url link now.})
           f.get_input_stream.read.should be_include("http://www.instructure.com/")
         end
       end
@@ -74,6 +74,22 @@ describe ContentZipper do
       attachment.reload
       # no submissions
       attachment.workflow_state.should == 'errored'
+    end
+  end
+
+  describe "assignment_zip_filename" do
+    it "should use use course and title slugs to keep filename length down" do
+      course(:active_all => true)
+      @course.short_name = "a" * 31
+      @course.save!
+      assignment_model(:course => @course, :title => "b" * 31)
+
+      zipper = ContentZipper.new
+      filename = zipper.assignment_zip_filename(@assignment)
+      filename.should match /#{@course.short_name_slug}/
+      filename.should match /#{@assignment.title_slug}/
+      filename.should_not match /#{@course.short_name}/
+      filename.should_not match /#{@assignment.title}/
     end
   end
 
@@ -176,6 +192,22 @@ describe ContentZipper do
       names = []
       Zip::ZipFile.foreach(attachment.full_filename) {|f| names << f.name if f.file? }
       names.should == ['otherfile.png']
+    end
+  end
+
+  describe "zip_eportfolio" do
+    it "should sanitize the zip file name" do
+      user = User.create!
+      eportfolio = user.eportfolios.create!(:name => '/../../etc/passwd')
+
+      attachment = Attachment.new(:display_name => 'my_download.zip')
+      attachment.user = user
+      attachment.workflow_state = 'to_be_zipped'
+      attachment.context = eportfolio
+      attachment.save!
+      Dir.expects(:mktmpdir).once.yields('/tmp')
+      Zip::ZipFile.expects(:open).once.with('/tmp/etcpasswd.zip', Zip::ZipFile::CREATE)
+      ContentZipper.process_attachment(attachment, user)
     end
   end
 end

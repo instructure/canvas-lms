@@ -13,8 +13,8 @@ $context_module_bg_color: #f2f3f4
   margin-bottom: 15px
   
   .links a, .reorder_module_link, .move_item_link
-    visibility: hidden
     +opacity(0.5)
+    text-decoration: none
     &:hover
       +opacity(1)
   .reorder_module_link, .move_item_link
@@ -23,9 +23,6 @@ $context_module_bg_color: #f2f3f4
     padding-right: 10px
     text-align: right
     white-space: nowrap
-  &.context_module_hover,:hover
-    .reorder_module_link, .header .links a 
-      visibility: visible
   .header 
     background-color: darken($context_module_bg_color, 5%)
     border-bottom: 1px dotted #aaa
@@ -37,11 +34,8 @@ $context_module_bg_color: #f2f3f4
   .completion_status .complete_icon, 
   .locked_icon,
   .progression_details_link,
-  .reorder_module_link,
   .header .links,
   .add_module_item_link,
-  .edit_module_link,
-  .delete_module_link,
   .manage_module,
   .delete_prerequisite_link,
   .expand_module_link,
@@ -55,7 +49,10 @@ $context_module_bg_color: #f2f3f4
     .edit_module_link,
     .delete_module_link,
     .delete_prerequisite_link
-      display: inline  
+      display: inline
+    .delete_prerequisite_link
+      text-decoration: none
+      padding-left: 3px
     .header .links,
     .manage_module
       display: block
@@ -104,7 +101,8 @@ $context_module_bg_color: #f2f3f4
     float: right
   a.add-small
     line-height: normal
-  div.footer 
+  div.footer
+    +clearfix
     padding: 13px 10px 2px
     margin-left: 15px
     color: #666
@@ -116,7 +114,7 @@ $context_module_bg_color: #f2f3f4
     padding: 0.2em 4px
     font-size: 0.8em
     color: #444
-    
+
 .context_module_item 
   border-bottom: 1px dotted #e0e0e0
   &.indent_1
@@ -136,28 +134,39 @@ $context_module_bg_color: #f2f3f4
       padding-right: 100px
   .type_icon
     display: inline-block
-    background: url(/images/file.png) no-repeat left 50%
-  &.attachment 
-    .type_icon
-      background-image: url(/images/file_download.png)
+    i
+      color: #777
+      display: none
+    .icon-document
+      display: inline-block
+  &.attachment
+    .icon-document
+      display: none
+    .icon-download
+      display: inline-block
   &.discussion_topic
-    .type_icon
-      background-image: url(/images/word_bubble.png)
-  &.assignment 
-    .type_icon 
-      background-image: url(/images/assignment.png)
-  &.quiz 
-    .type_icon 
-      background-image: url(/images/quiz.png)
-  &.external_url
-    .type_icon
-      background-image: url(/images/link.png)
-  &.context_external_tool
-    .type_icon
-      background-image: url(/images/link.png)
+    .icon-document
+      display: none
+    .icon-discussion
+      display: inline-block
+  &.assignment
+    .icon-document
+      display: none
+    .icon-assignment
+      display: inline-block
+  &.quiz
+    .icon-document
+      display: none
+    .icon-quiz
+      display: inline-block
+  &.external_url, &.context_external_tool
+    .icon-document
+      display: none
+    .icon-link
+      display: inline-block
   &.context_module_sub_header
-    .type_icon
-      background-image: url(/images/blank.png)
+    .type_icon i
+      display: none
     .completion_status
       display: none
   .completion_requirement
@@ -247,7 +256,7 @@ $context_module_bg_color: #f2f3f4
     .locked_title 
       display: none
   width: 100%
-  .move_item_link 
+  .move_item_link, .links a
     visibility: hidden
     
   .locked_module & 
@@ -267,14 +276,13 @@ $context_module_bg_color: #f2f3f4
       display: inline-block
       font-weight: bold
       color: #888
-  .links 
-    visibility: hidden
+  .links
     width: 80px
     vertical-align: top
     padding-top: 2px
   &.context_module_item_hover, &:hover 
     background-color: darken($context_module_bg_color, 2.5%)
-    .move_item_link, .links, .links a 
+    .move_item_link, .links a
       visibility: visible
 
   td.points_possible_display, td.due_date_display
@@ -300,12 +308,6 @@ $context_module_bg_color: #f2f3f4
   height: 15px
   border: 1px dashed #888
   margin: 3px 0
-
-#add_context_module_form 
-  .criterion 
-    padding: 2px 5px
-    &:hover 
-      background-color: #eee
 
 #student_progression_list 
   .student 
@@ -339,6 +341,8 @@ $context_module_bg_color: #f2f3f4
   
 #student_progression_dialog
   .module_progressions
+    .icon i
+      display: none
     th
       text-align: left
       font-size: 1.2em
@@ -358,18 +362,18 @@ $context_module_bg_color: #f2f3f4
           font-weight: bold
       &.completed
         color: #888
-        td.icon
+        .icon-check
           opacity: 0.5
-          background: transparent url(/images/graded.16px.png) no-repeat center center
+          display: block
       &.locked
-        td.icon
-          background: transparent url(/images/lock.png) no-repeat center center
+        .icon-lock
+          display: block
 
-div.completion_criterion_option 
+div.completion_criterion_option
   select.assignment_picker
     width: 160px
 
 body.ie
-  div.completion_criterion_option 
+  div.completion_criterion_option
     select.assignment_picker
       width: auto

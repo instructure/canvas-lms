@@ -103,7 +103,7 @@ define [
           if unmoved or goesBefore(item, @items[i])
             return null if i > 1 and not @items[i - 1] # i.e. unloaded section
             return i
-      if @items.length is @itemIds.length or @itemIds.length is 0
+      if @items.length is @itemIds?.length or @itemIds?.length is 0
         return @itemIds.length
 
     refreshList: () ->

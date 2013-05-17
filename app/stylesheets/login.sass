@@ -28,18 +28,17 @@ body.modal
     ul
       list-style-type: none
 
-    .button
+    .btn
       float: right
       padding: 10px 36px
-      font-size: 1.1em
       margin: 2px 7px 0 0
-      border-radius: 7px
+      font-size: 15px
 
     .button_box
       text-align: right
       margin-right: 7px
       width: 100%
-      .button
+      .btn
         float: none
 
   #modal-box
@@ -58,7 +57,7 @@ body.modal
         float: none
         width: 220px
     h2
-      background: transparent url(/images/canvas-dark.png) right top no-repeat
+      background: transparent url(/images/canvas-dark.png) right 6px no-repeat
       margin: 0 20px
       padding: 5px 230px 0 0
       min-height: 35px
@@ -70,8 +69,13 @@ body.modal
         border-bottom: 1px solid #fff
         height: 0
     &.login-box
-      background-color: #4B555D
+      background-color: #4b555d
+      
+      // adding support for gradients in IE10
+      background: url('/images/Money_Noise_tm.png'), -ms-radial-gradient(50% -100px, circle cover, rgba(255, 255, 255, 0.6) 0%, transparent 100%), -ms-linear-gradient(top, #59656e, #3e464c)
+      // this Compass include takes care of everything else for the login background
       @include background(image-url("/images/Money_Noise_tm.png"), radial-gradient(50% -100px, circle cover, rgba(255, 255, 255, 0.6) 0%, transparent 100%), linear-gradient(top, #59656e, #3e464c))
+      
       height: 331px
       width: $modal_box_width
       padding: $modal_box_padding
@@ -80,13 +84,13 @@ body.modal
       h1
         height: 107px
         margin: 0 0 50px
-        background: transparent url(/images/canvas.png) 83px 46px no-repeat
+        @include bg-image(canvas, png, no-repeat, 68px, 46px, transparent, 136px, 33px)
         text-indent: -999em
       a
         color: #64b9f9 !important
         &:hover
           text-decoration: underline
-  
+
       input.text
         background: url(/images/login-input-bg.png) no-repeat
         border: 0 none
@@ -123,7 +127,7 @@ body.modal
   #forgot_password_form
     margin: 0 auto
     width: 455px
-    button.button
+    .btn
       margin: 7px 0
       float: none
       padding: 10px 24px
@@ -172,7 +176,7 @@ span.field-with-fancyplaceholder
   background: url(/images/fft_ribbon.png) no-repeat
   padding-top: 10px
   width: 232px
-  height: 53px
+  height: 52px
   right: -13px
   top: 56px
   text-align: center
@@ -207,7 +211,7 @@ span.field-with-fancyplaceholder
       top: 15px
     h2
       height: 41px
-      margin: 0 0 -15px 0
+      margin: 0 0 -5px 0
       padding: 0 0 0 60px
       color: #000
     p

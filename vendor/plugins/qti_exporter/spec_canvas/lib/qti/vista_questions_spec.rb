@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/../../qti_helper'
+require File.expand_path(File.dirname(__FILE__) + '/../../qti_helper')
 if Qti.migration_executable
 describe "Converting Blackboard Vista qti" do
 
@@ -65,6 +65,12 @@ describe "Converting Blackboard Vista qti" do
   it "should convert multiple choice" do
     hash = get_question("ID_4609865476341")
     hash.should == VistaExpected::MULTIPLE_CHOICE
+  end
+
+  it "should not fail with missing response identifier" do
+    lambda {
+      hash = get_question_hash(vista_question_dir, 'no_response_id', delete_answer_ids=true, opts={})
+    }.should_not raise_error
   end
 
   it "should convert images correctly" do

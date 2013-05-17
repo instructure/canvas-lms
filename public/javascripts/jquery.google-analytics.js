@@ -4,7 +4,7 @@ define([
 ], function(INST, $) {
 
   // requires INST global
-  var _gaq = window._gaq = window._gaq || [];
+  window._gaq = window._gaq || [];
   var asyncScriptInserted = false;
 
   /**
@@ -33,14 +33,14 @@ define([
     }
 
     options = $.extend({status_code: 200}, options);
-    _gaq.push(['_setAccount', account_id]);
+    window._gaq.push(['_setAccount', account_id]);
     if (options.domain) {
-      _gaq.push(['_setDomainName', options.domain]);
+      window._gaq.push(['_setDomainName', options.domain]);
     }
-    _gaq.push(['_trackPageview']);
-    _gaq.push(['_trackPageLoadTime']);
+    window._gaq.push(['_trackPageview']);
+    window._gaq.push(['_trackPageLoadTime']);
     if (options.status_code != 200) {
-      _gaq.push(['_trackEvent', 'Errors', options.status_code, 'page: ' + document.location.pathname + document.location.search + ' ref: ' + document.referrer, options.error_id ]);
+      window._gaq.push(['_trackEvent', 'Errors', options.status_code, 'page: ' + document.location.pathname + document.location.search + ' ref: ' + document.referrer, options.error_id ]);
     }
   };
 
@@ -48,7 +48,7 @@ define([
   $.setTrackingVar = function() {
     var args = Array.prototype.slice.call( arguments, 0 );
     args.unshift('_setCustomVar');
-    _gaq.push.apply(_gaq, args);
+    window._gaq.push.apply(window._gaq, args);
   };
 
   /**
@@ -64,7 +64,7 @@ define([
    * see: http://code.google.com/apis/analytics/docs/tracking/eventTrackerGuide.html
    */
   $.trackEvent = function(category, action, label, value) {
-    _gaq.push(['_trackEvent', category, action, label, value]);
+    window._gaq.push(['_trackEvent', category, action, label, value]);
   };
 
   /**
@@ -75,7 +75,7 @@ define([
    * see: http://code.google.com//apis/analytics/docs/gaJS/gaJSApiBasicConfiguration.html#_gat.GA_Tracker_._trackPageview
    */
   $.trackPageview = function(url) {
-    _gaq.push(['_trackPageview', url]);
+    window._gaq.push(['_trackPageview', url]);
   };
 
   // this next part is the only part that is Instructure specific

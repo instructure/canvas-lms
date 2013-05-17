@@ -22,15 +22,15 @@ define([
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_forms' /* formSubmit */,
   'jqueryui/dialog',
+  'compiled/jquery/fixDialogButtons' /* fix dialog formatting */,
   'jquery.templateData' /* fillTemplateData */
 ], function(I18n, $) {
 $(document).ready(function() {
   $("#name_and_email").delegate('.edit_user_link', 'click', function(event) {
     event.preventDefault();
-    $("#edit_student_dialog").dialog('close').dialog({
-      autoOpen: false,
+    $("#edit_student_dialog").dialog({
       width: 450
-    }).dialog('open');
+    }).fixDialogButtons();
     $("#edit_student_form :text:visible:first").focus().select();
   });
   $("#edit_student_form").formSubmit({

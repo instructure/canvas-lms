@@ -1,110 +1,11 @@
-<% content_for :page_title do %><%= join_title t('#titles.discussions', "Discussions"), @context.name %><% end %>
-
-<% content_for :auto_discovery do %>
-  <% if @context_enrollment %>
-    <%= auto_discovery_link_tag(:atom, feeds_forum_format_path(@context_enrollment.feed_code, :atom), {:title => t(:course_discussions_atom_feed_title, "Course Discussions Atom Feed")}) %>
-  <% elsif @context.available? %>
-    <%= auto_discovery_link_tag(:atom, feeds_forum_format_path(@context.feed_code, :atom), {:title => t(:course_discussions_atom_feed_title, "Course Discussions Atom Feed")}) %>
-  <% end %>
-<% end %>
-
-<% content_for :right_side do %>
-  <div id="sidebar_content" class="rs-margin-lr rs-margin-top">
-    <div>
-      <% if can_do(@context.discussion_topics.new, @current_user, :create) %>
-          <a href="#" class="add_topic_link button button-sidebar-wide"><%= image_tag 'add.png', :alt => '' %> <%= t :start_new_topic, "Start a New Topic" %></a>
-          <a href="<%= context_url(@context, :context_announcements_url) %>" class="button button-sidebar-wide" style="display: none;"><%= image_tag 'announcement_icon.png', :alt => '' %> <%= t :manage_announcements, "Manage Announcements" %></a>
-          <% if can_do(@context, @current_user, :moderate_forum) %>
-          <a href="#" class="reorder_topics_link button button-sidebar-wide"><%= image_tag 'move-ns.png', :alt => '' %> <%= t "#buttons.reorder_topics", "Reorder Topics" %></a>
-          <% end %>
-      <% end %>
-    </div>
-    <div>
-      <% if params[:include_announcements] == "1" %>
-        <a href="<%= context_url(@context, :context_discussion_topics_url) %>" class="button button-sidebar-wide"><%= image_tag 'word_bubble.png', :alt => '' %> <%= t :view_only_topics, "View Only Topics" %></a>
-      <% else %>
-        <a href="<%= context_url(@context, :context_discussion_topics_url, :include_announcements => "1") %>" class="button button-sidebar-wide"><%= image_tag 'word_bubble.png', :alt => '' %> <%= t :view_topics_and_announcements, "View Topics and Announcements" %></a>
-      <% end %>
-    </div>
-  </div>
-  <%= render :partial => "shared/wiki_sidebar" %>
-<% end %>
-<h2><%= t "#titles.discussions", "Discussions" %></h2>
 <%
-  js_bundle :topics
-  jammit_css :tinymce
+  @body_classes << 'hide-content-while-scripts-not-loaded'
+
+  content_for :page_title, join_title(t('#titles.discussions', "Discussions"), @context.name)
+
+  feed_code = @context_enrollment.try(:feed_code) || (@context.available? && @context.feed_code)
+  content_for :auto_discovery, auto_discovery_link_tag(:atom, feeds_forum_format_path(@context.feed_code, :atom), {:title => t(:course_discussions_atom_feed_title, "Course Discussions Atom Feed")})
+
+  js_bundle :discussion_topics_index
+  jammit_css :discussions_list
 %>
-
-<%= render :partial => "shared/topics", :object => @topics, :locals => { :topic_type => "discussion_topic" } %>
-<%= will_paginate(@topics) %>
-<% js_block do %>
-  <script type="text/javascript">
-  require([
-    'i18nObj' /* I18n.t */,
-    'jquery' /* $ */,
-    'vendor/jquery.pageless' /* pageless */
-  ], function(I18n, $) {
-
-    $(function(){
-      $('#topic_list').pageless({
-        totalPages: <%= @topics.total_pages %>,
-        url: <%= raw context_url(@context, :context_discussion_topics_url, :format => :json, :only_discussion_topics => params[:only_discussion_topics]).to_json %>,
-        loaderMsg: <%= jt("#discussion_topics.loading_results", "Loading more results") %>,
-        scrape: function(data) {
-          if(typeof(data) == 'string') {
-            try {
-              data = $.parseJSON(data);
-            } catch(e) {
-              data = [];
-            }
-          }
-          for(var idx in data) {
-            var $topic = topics.updateTopic(null, data[idx]);
-          }
-          $("#topic_list").append($("#pageless-loader"));
-          return "";
-        }
-      });
-    });
-  });
-  </script>
-<% end %>
-<div id="reorder_topics_dialog" style="display: none;">
-  <% form_for :discussion_topic, :url => context_url(@context, :reorder_context_discussion_topics_url), :html => {:id => "reorder_topics_form"} do %>
-    <input type="hidden" name="order" value="" id="reorder_topics_ids"/>
-    <%= t :drag_and_drop_notice, "You can manually define the order in which discussions will appear. Click and drag any topic to change where it will appear in the list." %>
-    <ul id="topics_reorder_list" class="unstyled_list">
-      <% @all_topics[0..50].each do |topic| %>
-        <li class="topic topic_<%= topic.id %>"><%= topic.title %></li>
-      <% end %>
-    </ul>
-    <div class="button-container">
-      <button class="button reorder_topics_button" type="submit"><%= t :reorder_topics, "Reorder Topics" %></button>
-      <button class="button button-secondary cancel_button" type="button"><%= t "#buttons.cancel", "Cancel" %></button>
-    </div>
-  <% end %>
-</div>
-
-<% content_for :stylesheets do %>
-<style>
-#topics_reorder_list {
-  max-height: 150px;
-  overflow: auto;
-  margin: 5px 10px;
-}
-#topics_reorder_list li {
-  background-color: #fff;
-  cursor: move;
-  padding: 1px 0;
-}
-#topics_reorder_list li:hover {
-  font-weight: bold;
-}
-</style>
-<% end %>
-
-<% if @context.try_rescue(:module_based?) && !can_do(@context, @current_user, :manage_content) %>
-  <a href="<%= context_url(@context, :context_locks_url) %>" id="discussion_topic_locks_url" style="display: none;">&nbsp;</a>
-  <%= image_tag "lock.png", :style => "display: none;", :id => "discussion_topic_lock_icon", :title => t(:locked_message, "This topic is currently locked.  Visit the topic details page for more information."), :alt => t(:locked_title, "locked") %>
-<% end %>
-

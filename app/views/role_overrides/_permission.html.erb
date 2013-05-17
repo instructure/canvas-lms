@@ -4,21 +4,21 @@
           <% @role_types.each do |enrollment_type| %>
           <td>
             <%= image_tag "locked_small.png", :class => "lock #{ 
-                  RoleOverride.readonly_for(@context, key, enrollment_type[:name]) ? 
+                  RoleOverride.readonly_for(@context, key, enrollment_type[:base_role_name], enrollment_type[:name]) ?
                     'disabled' : ( 
-                      RoleOverride.locked_for(@context, key, enrollment_type[:name]) ?
+                      RoleOverride.locked_for(@context, key, enrollment_type[:base_role_name], enrollment_type[:name]) ?
                       'locked' :
                       ''
                 )}"
             %>
-            <% unless RoleOverride.readonly_for(@context, key, enrollment_type[:name]) %>
+            <% unless RoleOverride.readonly_for(@context, key, enrollment_type[:base_role_name], enrollment_type[:name]) %>
             <input class="locked_input" type="hidden" name="<%= "permissions[#{key}][#{enrollment_type[:name]}][locked]" %>" 
-              value="<%= RoleOverride.locked_for(@context, key, enrollment_type[:name]) %>" />
+              value="<%= RoleOverride.locked_for(@context, key, enrollment_type[:base_role_name], enrollment_type[:name]) %>" />
             <% end %>
-            <span class="six-checkbox <%= RoleOverride.css_class_for(@context, key, enrollment_type[:name]) %>" 
-              title="<%= RoleOverride.title_for(@context, key, enrollment_type[:name]) %>">
+            <span class="six-checkbox <%= RoleOverride.css_class_for(@context, key, enrollment_type[:base_role_name], enrollment_type[:name]) %>"
+              title="<%= RoleOverride.title_for(@context, key, enrollment_type[:base_role_name], enrollment_type[:name]) %>">
               <input type="hidden" name="<%= "permissions[#{key}][#{enrollment_type[:name]}][override]" %>" 
-                value="<%= RoleOverride.hidden_value_for(@context, key, enrollment_type[:name]) %>" />
+                value="<%= RoleOverride.hidden_value_for(@context, key, enrollment_type[:base_role_name], enrollment_type[:name]) %>" />
             </span>
           </td>
           <% end %>

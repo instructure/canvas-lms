@@ -4,3 +4,21 @@ en:
 es:
   locales:
     es: Español
+ru:
+  locales:
+    ru: pу́сский
+fr:
+  locales:
+    fr: Français
+zh:
+  locales:
+    zh: 中文
+ar:
+  locales:
+    ar: العربية
+pt:
+  locales:
+    pt: Português
+ja:
+  locales:
+    ja: 日本語

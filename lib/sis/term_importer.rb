@@ -69,8 +69,14 @@ module SIS
           term.end_at = end_date
         end
 
-        term.save
-        @success_count += 1
+        if term.save
+          @success_count += 1
+        else
+          msg = "A term did not pass validation "
+          msg += "(" + "term: #{term_id} / #{name}, error: "
+          msg += term.errors.full_messages.join(", ") + ")"
+          raise ImportError, msg
+        end
       end
 
     end

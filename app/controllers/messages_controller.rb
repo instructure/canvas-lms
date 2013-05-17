@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011-12 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -24,6 +24,28 @@ class MessagesController < ApplicationController
   end
 
   def index
-    @messages = @context.messages.scoped(:order => 'created_at DESC').paginate(:page => params[:page], :per_page => 20)
+    @messages = @context.messages.order('created_at DESC').paginate(:page => params[:page], :per_page => 20)
+  end
+
+  def create
+    secure_id, message_id = [params[:secure_id], params[:message_id].to_i]
+
+    message = Mail.new
+    message['Content-Type'] = 'text/plain'
+    message['Subject']      = params[:subject]
+    message['From']         = params[:from]
+    message.body            = params[:message]
+
+    IncomingMessageProcessor.process_single(message, secure_id, message_id)
+    render :nothing => true
+  end
+
+  def html_message
+    message = @context.messages.find(params[:message_id])
+    if message.html_body.present?
+      render :inline => message.html_body, :layout => false
+    else
+      render :layout => false
+    end
   end
 end

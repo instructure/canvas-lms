@@ -22,10 +22,8 @@ class PageComment < ActiveRecord::Base
   validates_length_of :message, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   attr_accessible :message
   
-  named_scope :for_user, lambda{|user|
-    {:conditions => ['page_comments.user_id = ?', user.id]}
-  }
-  
+  scope :for_user, lambda { |user| where(:user_id => user) }
+
   def user_name
     self.user.name rescue t(:default_user_name, "Anonymous")
   end

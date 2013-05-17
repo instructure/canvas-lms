@@ -20,205 +20,74 @@ define([
   'INST' /* INST */,
   'i18n!gradebook',
   'jquery' /* $ */,
+  'underscore',
+  'compiled/grade_calculator',
+  'compiled/util/round',
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_forms' /* getFormData */,
   'jquery.instructure_misc_helpers' /* replaceTags, scrollSidebar */,
   'jquery.instructure_misc_plugins' /* showIf */,
   'jquery.templateData' /* fillTemplateData, getTemplateData */,
   'media_comments' /* mediaComment, mediaCommentThumbnail */
-], function(INST, I18n, $) {
+], function(INST, I18n, $, _, GradeCalculator, round) {
 
-  function setGroupData(groups, $group) {
-    if($group.length === 0) { return; }
-    var data = $group.getTemplateData({textValues: ['assignment_group_id', 'rules', 'group_weight']});
-    data = $.extend(data, $group.getFormData());
-    var groupData = groups[data.assignment_group_id] || {};
-    if(!groupData.group_weight) {
-      groupData.group_weight = parseFloat(data.group_weight) / 100.0;
-    }
-    groupData.scores = groupData.scores || [];
-    groupData.full_points = groupData.full_points || [];
-    groupData.count = groupData.count || 0;
-    groupData.submissions = groupData.submissions || [];
-    groupData.sorted_submissions = groupData.sorted_submissions || [];
-    if (isNaN(groupData.score_total)) { groupData.score_total = null; }
-    if (isNaN(groupData.full_total)) { groupData.full_total = null; }
-    if(groupData.score_total !== null || groupData.full_total !== null) {
-      groupData.calculated_score = (groupData.score_total / groupData.full_total);
-      if(isNaN(groupData.calculated_score) || !isFinite(groupData.calculated_score)) {
-        groupData.calculated_score = 0.0;
-      }
-    } else {
-      groupData.score_total = 0;
-      groupData.full_total = 0;
-    }
-    if(!groupData.rules) {
-      data.rules = data.rules || "";
-      var rules = {drop_highest: 0, drop_lowest: 0, never_drop: []};
-      var rulesList = data.rules.split("\n");
-      for(var idx in rulesList) {
-        var rule = rulesList[idx].split(":");
-        var drop = null;
-        if(rule.length > 1) {
-          drop = parseInt(rule[1], 10);
-        }
-        if(drop && !isNaN(drop) && isFinite(drop)) {
-          if(rule[0] == 'drop_lowest') {
-            rules['drop_lowest'] = drop;
-          } else if(rule[0] == 'drop_highest') {
-            rules['drop_highest'] = drop;
-          } else if(rule[0] == 'never_drop') {
-            rules['never_drop'].push(drop);
-          }
-        }
-      }
-      groupData.rules = rules;
-    }
-    groups[data.assignment_group_id] = groupData;
-    return groupData;
-  }
   function updateStudentGrades() {
     var ignoreUngradedSubmissions = $("#only_consider_graded_assignments").attr('checked');
-    var $submissions = $("#grades_summary .student_assignment");
-    var groups = {};
-    var $groups = $(".group_total");
-    $groups.each(function() {
-      setGroupData(groups, $(this));
+    var currentOrFinal = ignoreUngradedSubmissions ? 'current' : 'final';
+
+    var calculatedGrades = GradeCalculator.calculate(
+      ENV.submissions,
+      ENV.assignment_groups,
+      ENV.group_weighting_scheme
+    );
+
+    // mark dropped assignments
+    $('.student_assignment').find('.points_possible').attr('aria-label', '');
+    _.chain(calculatedGrades.group_sums).map(function(groupSum) {
+      return groupSum[currentOrFinal].submissions;
+    }).flatten().each(function(s) {
+      $('#submission_' + s.submission.assignment_id).toggleClass('dropped', !!s.drop);
     });
-    $submissions.removeClass('dropped');
-    $submissions.each(function() {
-      var $submission = $(this),
-          submission;
-      if($submission.hasClass('hard_coded')) { return; }
-      
-      var data = $submission.getTemplateData({textValues: ['assignment_group_id', 'score', 'points_possible', 'assignment_id']});
-      if((!data.score || isNaN(parseFloat(data.score))) && ignoreUngradedSubmissions) {
-        $(this).addClass('dropped');
-        return;
+    $('.dropped').attr('aria-label', I18n.t('titles.dropped_assignment_no_total', 'This assignment will not be considered in the total calculation'));
+
+    var calculateGrade = function(score, possible) {
+      if (possible === 0 || isNaN(score)) {
+        grade = "N/A"
+      } else {
+        grade = Math.round((score / possible) * 1000) / 10;
       }
-      var groupData = groups[data.assignment_group_id];
-      
-      if(!groupData) {
-        groupData = setGroupData(groups, $("#submission_group-" + data.assignment_group_id));
-      }
-      if(!groupData) {
-        return;
-      }
-      var score = parseFloat(data.score);
-      if(!score || isNaN(score) || !isFinite(score)) {
-        score = 0;
-      }
-      var possible = parseFloat(data.points_possible);
-      if(!possible || isNaN(possible)) {
-        possible = 0;
-      }
-      var percent = score / possible;
-      if(isNaN(percent) || !isFinite(percent)) {
-        percent = 0;
-      }
-      data.calculated_score = score;
-      data.calculated_possible = possible;
-      data.calculated_percent = percent;
-      groupData.submissions.push(data);
-      groups[data.assignment_group_id] = groupData;
-    });
-    for(var idx in groups) {
-      var groupData = groups[idx];
-      groupData.sorted_submissions = groupData.submissions.sort(function(a, b) {
-        var aa = [a.calculated_percent];
-        var bb = [b.calculated_percent];
-        if(aa > bb) { return 1; }
-        if(aa == bb) { return 0; }
-        return -1;
-      });
-      var lowDrops = 0, highDrops = 0;
-      for(var jdx = 0; jdx < groupData.sorted_submissions.length; jdx++) {
-        groupData.sorted_submissions[jdx].calculated_drop = false;
-      }
-      for(jdx = 0; jdx < groupData.sorted_submissions.length; jdx++) {
-        submission = groupData.sorted_submissions[jdx];
-        if(!submission.calculated_drop && lowDrops < groupData.rules.drop_lowest && submission.calculated_possible > 0 && $.inArray(submission.assignment_id, groupData.rules.never_drop) == -1) {
-          lowDrops++;
-          submission.calculated_drop = true;
-        }
-        groupData.sorted_submissions[jdx] = submission;
-      }
-      for(jdx = groupData.sorted_submissions.length - 1; jdx >= 0; jdx--) {
-        submission = groupData.sorted_submissions[jdx];
-        if(!submission.calculated_drop && highDrops < groupData.rules.drop_highest && submission.calculated_possible > 0 && $.inArray(submission.assignment_id, groupData.rules.never_drop) == -1) {
-          highDrops++;
-          submission.calculated_drop = true;
-        }
-        groupData.sorted_submissions[jdx] = submission;
-      }
-      for(jdx = 0; jdx < groupData.sorted_submissions.length; jdx++) {
-        submission = groupData.sorted_submissions[jdx];
-        if(submission.calculated_drop) {
-          $("#submission_" + submission.assignment_id).addClass('dropped');
-          lowDrops++;
-        } else {
-          $("#submission_" + submission.assignment_id).removeClass('dropped');
-          groupData.scores.push(submission.calculated_score);
-          groupData.full_points.push(submission.calculated_possible);
-          groupData.count++;
-          groupData.score_total += submission.calculated_score;
-          groupData.full_total += submission.calculated_possible;
-        }
-      }
-      groups[idx] = groupData;
+      return grade;
+    };
+
+    for (var i = 0; i < calculatedGrades.group_sums.length; i++) {
+      var groupSum = calculatedGrades.group_sums[i];
+      var $groupRow = $('#submission_group-' + groupSum.group.id);
+      var groupGradeInfo = groupSum[currentOrFinal];
+      $groupRow.find('.grade').text(
+        calculateGrade(groupGradeInfo.score, groupGradeInfo.possible)
+      );
+      $groupRow.find('.score_teaser').text(
+        round(groupGradeInfo.score, 2) + ' / ' + round(groupGradeInfo.possible, 2)
+      );
     }
-    var finalWeightedGrade = 0.0, 
-            finalGrade = 0.0, 
-            totalPointsPossible = 0.0, 
-            possibleWeightFromSubmissions = 0.0,
-            totalUserPoints = 0.0;
-    $.each(groups, function(i, group) {
-      var groupData = setGroupData(groups, $("#submission_group-" + i));
-      var score = Math.round(group.calculated_score * 1000.0) / 10.0;
-    $("#submission_group-" + i).find(".grade").text(score).end()
-      .find(".score_teaser").text(group.score_total + " / " + group.full_total);
-      
-      score = group.calculated_score * group.group_weight;
-      if(isNaN(score) || !isFinite(score)) {
-        score = 0;
-      }
-      if(ignoreUngradedSubmissions && group.count > 0) {
-        possibleWeightFromSubmissions += group.group_weight;      
-      }
-      finalWeightedGrade += score;
-      totalUserPoints += group.score_total;
-      totalPointsPossible += group.full_total;
-    });
-    var total = parseFloat($("#total_groups_weight").text());
-    if(isNaN(total) || !isFinite(total) || total === 0) { // if not weighting by group percents
-      finalGrade = Math.round(1000.0 * totalUserPoints / totalPointsPossible) / 10.0;
-      $(".student_assignment.final_grade .score_teaser").text(totalUserPoints + ' / ' + totalPointsPossible);
-    } else {
-      var totalPossibleWeight = parseFloat($("#total_groups_weight").text()) / 100;
-      if(isNaN(totalPossibleWeight) || !isFinite(totalPossibleWeight) || totalPossibleWeight === 0) {
-        totalPossibleWeight = 1.0;
-      }
-      if(ignoreUngradedSubmissions && possibleWeightFromSubmissions < 1.0) {
-        var possible = totalPossibleWeight < 1.0 ? totalPossibleWeight : 1.0 ;
-        finalWeightedGrade = possible * finalWeightedGrade / possibleWeightFromSubmissions;
-      }
-      
-      finalGrade = finalWeightedGrade;
-      finalGrade = Math.round(finalGrade * 1000.0) / 10.0;
-      $(".student_assignment.final_grade .score_teaser").text(I18n.t('percent', 'Percent'));
-    }
-    if(isNaN(finalGrade) || !isFinite(finalGrade)) {
-      finalGrade = 0;
-    }
-    $(".student_assignment.final_grade").find(".grade").text(finalGrade);
+
+    var finalScore = calculatedGrades[currentOrFinal].score;
+    var finalPossible = calculatedGrades[currentOrFinal].possible;
+    var finalGrade = calculateGrade(finalScore, finalPossible);
+    var $finalGradeRow = $(".student_assignment.final_grade");
+    $finalGradeRow.find(".grade").text(finalGrade);
+    $finalGradeRow.find(".score_teaser").text(
+      round(finalScore, 2) + ' / ' + round(finalPossible, 2)
+    );
 
     if(window.grading_scheme) {
-      $(".final_letter_grade .grade").text(INST.GradeCalculator.letter_grade(grading_scheme, finalGrade));
+      $(".final_letter_grade .grade").text(GradeCalculator.letter_grade(grading_scheme, finalGrade));
     }
 
     $(".revert_all_scores").showIf($("#grades_summary .revert_score_link").length > 0);
-    var eTime = (new Date()).getTime();
   }
+
+
   $(document).ready(function() {
     updateStudentGrades();
     $(".revert_all_scores_link").click(function(event) {
@@ -238,7 +107,10 @@ define([
     });
     $(".toggle_comments_link").click(function(event) {
       event.preventDefault();
-      $(this).parents("tr.student_assignment").next("tr.comments").toggle();
+      var $row = $( '#' + $(this).attr('aria-controls') );
+
+      $row.toggle();
+      $row.attr('aria-expanded', $row.is(':visible'));
     });
     $(".toggle_rubric_assessments_link").click(function(event) {
       event.preventDefault();
@@ -313,6 +185,9 @@ define([
       if (val === 0) { val = '0.0'; }
       if (val === originalVal) { val = originalScore; }
       $assignment.find('.grade').html(val || $assignment.find('.grade').data('originalValue'));
+      if (update) {
+        updateScoreForAssignment(assignment_id, val);
+      }
       updateStudentGrades();
     });
     $("#grade_entry").blur(function() {
@@ -335,15 +210,18 @@ define([
         .find(".grade").removeClass('changed');
       $assignment.find(".revert_score_link").remove();
       $assignment.find(".score_value").text(val);
+
+      var assignmentId = $assignment.getTemplateValue('assignment_id');
+      updateScoreForAssignment(assignmentId, val);
       if(!skipEval) {
         updateStudentGrades();
       }
     });
     $("#grades_summary:not(.editable) .assignment_score").css('cursor', 'default');
     $("#grades_summary tr").hover(function() {
-      $(this).find("td.title .context").addClass('context_hover');
+      $(this).find("th.title .context").addClass('context_hover');
     }, function() {
-      $(this).find("td.title .context").removeClass('context_hover');
+      $(this).find("th.title .context").removeClass('context_hover');
     });
     $(".show_guess_grades_link").click(function(event) {
       $("#grades_summary .student_entered_score").each(function() {
@@ -369,8 +247,13 @@ define([
       var $parent = $(this).parents(".comment_media"),
           comment_id = $parent.getTemplateData({textValues: ['media_comment_id']}).media_comment_id;
       if(comment_id) {
+        var mediaType = 'any';
+        if ($(this).hasClass('video_comment'))
+          mediaType = 'video';
+        else if ($(this).hasClass('audio_comment'))
+          mediaType = 'audio';
         $parent.children(":not(.media_comment_content)").remove();
-        $parent.find(".media_comment_content").mediaComment('show_inline', comment_id, 'any');
+        $parent.find(".media_comment_content").mediaComment('show_inline', comment_id, mediaType);
       }
     });
     $("#only_consider_graded_assignments").change(function() {
@@ -389,5 +272,11 @@ define([
     });
   });
 
+  function updateScoreForAssignment(assignmentId, score) {
+    var submission = _.find(ENV.submissions, function(s) {
+      return s.assignment_id == assignmentId;
+    });
+    submission.score = score;
+  }
 });
 

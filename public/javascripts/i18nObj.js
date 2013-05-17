@@ -17,8 +17,10 @@ I18n.defaultSeparator = ".";
 
 I18n.locale = document.documentElement.getAttribute('lang');
 
-// Set the placeholder format. Accepts `{{placeholder}}` and `%{placeholder}`.
-I18n.PLACEHOLDER = /(?:\{\{|%\{)(.*?)(?:\}\}?)/gm;
+// Set the placeholder format. Accepts `%{placeholder}` and %h{placeholder}.
+// %h{placeholder} indicate it is an htmlSafe value, (e.g. an input) and
+// anything not already safe should be html-escaped
+I18n.PLACEHOLDER = /%h?\{(.*?)\}/gm;
 
 I18n.isValidNode = function(obj, node) { 
   // handle names like "foo.bar.baz"
@@ -94,18 +96,22 @@ I18n.prepareOptions = function() {
 };
 
 I18n.interpolate = function(message, options) {
-  var placeholder, value, name, matches, needsEscaping = false;
+  var placeholder, value, name, matches, needsEscaping = false, htmlSafe;
 
   options = this.prepareOptions(options);
   if (options.wrapper) {
     needsEscaping = true;
     message = this.applyWrappers(message, options.wrapper);
   }
+  if (options.needsEscaping) {
+    needsEscaping = true;
+  }
 
   matches = message.match(this.PLACEHOLDER) || [];
 
   for (var i = 0; placeholder = matches[i]; i++) {
     name = placeholder.replace(this.PLACEHOLDER, "$1");
+    htmlSafe = (placeholder[1] === 'h'); // e.g. %h{input}
 
     // handle names like "foo.bar.baz"
     var nameParts = name.split('.');
@@ -118,10 +124,10 @@ I18n.interpolate = function(message, options) {
       value = "[missing " + placeholder + " value]";
     }
     if (needsEscaping) {
-      if (!value.htmlSafe) {
+      if (!value.htmlSafe && !htmlSafe) {
         value = htmlEscape(value);
       }
-    } else if (value.htmlSafe) {
+    } else if (value.htmlSafe || htmlSafe) {
       needsEscaping = true;
       message = htmlEscape(message);
     }
@@ -243,11 +249,9 @@ I18n.toTime = function(scope, d) {
 
 I18n.strftime = function(date, format) {
   var options = this.lookup("date");
-
-  if (!options) {
-    return date.toString();
+  if (options) {
+    options.meridian = options.meridian || ["AM", "PM"];
   }
-  options.meridian = options.meridian || ["AM", "PM"];
 
   var weekDay = date.getDay();
   var day = date.getDate();
@@ -293,6 +297,7 @@ I18n.strftime = function(date, format) {
       %W  // week number of year, starting with the first Monday as the first day of the 01st week (00..53)
       %Z  // time zone name
   */
+  var optionsNeeded = false;
   var f = format.replace(/%([DFrRTv])/g, function(str, p1) {
     return {
       D: '%m/%d/%y',
@@ -303,6 +308,21 @@ I18n.strftime = function(date, format) {
       v: '%e-%b-%Y'
     }[p1];
   }).replace(/%(%|\-?[a-zA-Z]|3N)/g, function(str, p1) {
+    // check to see if we need an options object
+    switch (p1) {
+      case 'a':
+      case 'A':
+      case 'b':
+      case 'B':
+      case 'h':
+      case 'p':
+      case 'P':
+        if (options == null) {
+          optionsNeeded = true;
+          return '';
+        }
+    }
+
     switch (p1) {
       case 'a':  return options.abbr_day_names[weekDay];
       case 'A':  return options.day_names[weekDay];
@@ -342,6 +362,10 @@ I18n.strftime = function(date, format) {
       default:   return str;
     }
   });
+
+  if (optionsNeeded) {
+    return date.toString();
+  }
 
   return f;
 };

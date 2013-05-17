@@ -1,6 +1,25 @@
 require File.expand_path(File.dirname(__FILE__) + '/helpers/gradebook2_common')
 describe "group weights" do
-  it_should_behave_like "gradebook2 selenium tests"
+  it_should_behave_like "in-process server selenium tests"
+
+  ASSIGNMENT_1_POINTS = "10"
+  ASSIGNMENT_2_POINTS = "5"
+  ASSIGNMENT_3_POINTS = "50"
+  ATTENDANCE_POINTS = "15"
+
+  STUDENT_NAME_1 = "student 1"
+  STUDENT_NAME_2 = "student 2"
+  STUDENT_NAME_3 = "student 3"
+  STUDENT_SORTABLE_NAME_1 = "1, student"
+  STUDENT_SORTABLE_NAME_2 = "2, student"
+  STUDENT_SORTABLE_NAME_3 = "3, student"
+  STUDENT_1_TOTAL_IGNORING_UNGRADED = "100%"
+  STUDENT_2_TOTAL_IGNORING_UNGRADED = "66.7%"
+  STUDENT_3_TOTAL_IGNORING_UNGRADED = "66.7%"
+  STUDENT_1_TOTAL_TREATING_UNGRADED_AS_ZEROS = "18.8%"
+  STUDENT_2_TOTAL_TREATING_UNGRADED_AS_ZEROS = "12.5%"
+  STUDENT_3_TOTAL_TREATING_UNGRADED_AS_ZEROS = "12.5%"
+  DEFAULT_PASSWORD = "qwerty"
 
   def get_group_points
     group_points_holder = keep_trying_until do
@@ -31,15 +50,14 @@ describe "group weights" do
     end
     group_weight_input = f("#assignment_group_#{assignment_group.id}_weight")
     set_value(group_weight_input, weight_number)
-    save_button = find_with_jquery('.ui-dialog-buttonset .ui-button:contains("Save")')
-    save_button.click
+    fj('.ui-button:contains("Save")').click
     wait_for_ajaximations
     @course.reload.group_weighting_scheme.should == 'percent'
   end
 
   def validate_group_weight_text(assignment_groups, weight_numbers)
     assignment_groups.each_with_index do |ag, i|
-      heading = find_with_jquery(".slick-column-name:contains('#{ag.name}') .assignment-points-possible")
+      heading = fj(".slick-column-name:contains('#{ag.name}') .assignment-points-possible")
       heading.should include_text("#{weight_numbers[i]}% of grade")
     end
   end

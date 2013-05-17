@@ -47,7 +47,7 @@ return {
     // Use prior information on the last name to try and reconstruct it
     // This just checks if prior_surname was provided, and if it matches
     // the trailing words of given_parts
-    if (!surname && prior_surname && !/^\s*$/.test(prior_surname) &&
+    if (!surname && prior_surname && !(/^\s*$/).test(prior_surname) &&
         (prior_surname_parts = prior_surname.split(/\s+/)) &&
         given_parts.length >= prior_surname_parts.length &&
         given_parts.slice(given_parts.length - prior_surname_parts.length).join(' ') === prior_surname_parts.join(' ')) {

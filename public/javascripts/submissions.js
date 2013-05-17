@@ -19,12 +19,14 @@
 define([
   'i18n!submissions',
   'jquery',
-  'jquery.ajaxJSON' /* ajaxJSONFiles, ajaxJSON */,
+  'jquery.ajaxJSON' /* ajaxJSON */,
+  'jquery.instructure_forms' /* ajaxJSONFiles */,
   'jquery.instructure_date_and_time' /* parseFromISO */,
   'jquery.instructure_misc_plugins' /* fragmentChange, showIf */,
   'jquery.loadingImg' /* loadingImg, loadingImage */,
   'jquery.templateData' /* fillTemplateData, getTemplateData */,
-  'media_comments' /* mediaComment, mediaCommentThumbnail */,
+  'media_comments' /* mediaComment */,
+  'compiled/jquery/mediaCommentThumbnail',
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */
 ], function(I18n, $) {
 
@@ -248,7 +250,7 @@ define([
         event.preventDefault();
         var comment_id = $(this).parents(".comment_media").getTemplateData({textValues: ['media_comment_id']}).media_comment_id;
         if(comment_id) {
-          $(this).parents(".comment_media").find(".media_comment_content").mediaComment('show', comment_id, 'audio');
+          $(this).parents(".comment_media").find(".media_comment_content").mediaComment('show', comment_id, 'video');
         }
       })
 

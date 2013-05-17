@@ -21,13 +21,13 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 describe DiscussionTopicsController do
   def course_topic(opts={})
     @topic = @course.discussion_topics.build(:title => "some topic")
-    if @user
+    if @user && !opts[:skip_set_user]
       @topic.user = @user
     end
 
     if opts[:with_assignment]
       @topic.assignment = @course.assignments.build(:submission_types => 'discussion_topic', :title => @topic.title)
-      @topic.assignment.infer_due_at
+      @topic.assignment.infer_times
       @topic.assignment.saved_by = :discussion_topic
     end
 
@@ -44,39 +44,6 @@ describe DiscussionTopicsController do
       get 'index', :course_id => @course.id
       assert_unauthorized
     end
-
-    it "should assign variables" do
-      course_with_student_logged_in(:active_all => true)
-      course_topic
-      get 'index', :course_id => @course.id
-      assigns[:topics].should_not be_nil
-      assigns[:topics].should_not be_empty
-      assigns[:topics][0].should eql(@topic)
-    end
-
-    it "should allow observer by default" do
-      course_with_teacher
-      course_with_observer_logged_in(:course => @course)
-      @user = @teacher
-      course_topic
-      get 'index', :course_id => @course.id
-      assigns[:topics].should_not be_nil
-      assigns[:topics].should_not be_empty
-      assigns[:topics][0].should eql(@topic)
-    end
-
-    it "should reject observer if read_forum role is false" do
-      course_with_teacher
-      course_with_observer_logged_in(:course => @course)
-      RoleOverride.create!(:context => @course.account, :permission => 'read_forum',
-                           :enrollment_type => "ObserverEnrollment", :enabled => false)
-      @user = @teacher
-      course_topic
-      get 'index', :course_id => @course.id
-      assigns[:topics].should_not be_nil
-      assigns[:topics].should_not be_empty
-      assigns[:topics][0].should eql(@topic)
-    end
   end
 
   describe "GET 'show'" do
@@ -85,6 +52,46 @@ describe DiscussionTopicsController do
       course_topic
       get 'show', :course_id => @course.id, :id => @topic.id
       assert_unauthorized
+    end
+
+    context "discussion topic with assignment with overrides" do
+      integrate_views
+
+      before do
+        course(:course_name => "I <3 Discussions")
+        course_topic(:with_assignment => true)
+        @section = @course.course_sections.create!(:name => "I <3 Discusions")
+        @override = assignment_override_model(:assignment => @topic.assignment,
+                                  :due_at => Time.now,
+                                  :set => @section)
+      end
+
+      it "doesn't show overrides to students" do
+        course_with_student_logged_in(:course => @course)
+        get 'show', :course_id => @course.id, :id => @topic.id
+        response.should be_success
+        response.body.should_not match 'discussion-topic-due-dates'
+        due_date = OverrideListPresenter.new.due_at(@topic.assignment)
+        response.body.should match "due #{due_date}"
+      end
+
+      it "doesn't show overrides for observers" do
+        course_with_observer_logged_in(:course => @course)
+        @course.enroll_user(@observer, 'ObserverEnrollment', :section => @section)
+        get 'show', :course_id => @course.id, :id => @topic.id
+        response.should be_success
+        response.body.should_not match 'discussion-topic-due-dates'
+        due_date = OverrideListPresenter.new.due_at(@topic.assignment.overridden_for(@observer))
+        response.body.should match "due #{due_date}"
+      end
+
+      it "does show overrides to teachers" do
+        course_with_teacher_logged_in(:course => @course)
+        get 'show', :course_id => @course.id, :id => @topic.id
+        response.should be_success
+        response.body.should match 'discussion-topic-due-dates'
+      end
+
     end
 
     it "should assign variables" do
@@ -97,6 +104,30 @@ describe DiscussionTopicsController do
       response.should be_success
       assigns[:topic].should_not be_nil
       assigns[:topic].should eql(@topic)
+    end
+
+    it "should display speedgrader when not for a large course" do
+      course_with_teacher_logged_in(:active_all => true)
+      course_topic(:with_assignment => true)
+      get 'show', :course_id => @course.id, :id => @topic.id
+      assigns[:js_env][:DISCUSSION][:SPEEDGRADER_URL_TEMPLATE].should be_true
+    end
+
+    it "should hide speedgrader when for a large course" do
+      course_with_teacher_logged_in(:active_all => true)
+      course_topic(:with_assignment => true)
+      Course.any_instance.stubs(:large_roster?).returns(true)
+      get 'show', :course_id => @course.id, :id => @topic.id
+      assigns[:js_env][:DISCUSSION][:SPEEDGRADER_URL_TEMPLATE].should be_nil
+    end
+
+    it "should mark as read when viewed" do
+      course_with_student_logged_in(:active_all => true)
+      course_topic(:skip_set_user => true)
+
+      @topic.read_state(@student).should == 'unread'
+      get 'show', :course_id => @course.id, :id => @topic.id
+      @topic.reload.read_state(@student).should == 'read'
     end
 
     it "should allow concluded teachers to see discussions" do
@@ -192,227 +223,6 @@ describe DiscussionTopicsController do
 
   end
 
-  describe "POST 'create'" do
-    it "should require authorization" do
-      course_with_teacher(:active_all => true)
-      course_topic
-      post 'create', :course_id => @course.id, :discussion_topic => {:title => "some title"}
-      assert_unauthorized
-    end
-
-    it "should create a message" do
-      course_with_student_logged_in(:active_all => true)
-      course_topic
-      post 'create', :course_id => @course.id, :discussion_topic => {:title => "some title"}
-      assigns[:topic].title.should eql("some title")
-      response.should be_redirect
-    end
-
-    it "should attach a file if authorized" do
-      course_with_teacher_logged_in(:active_all => true)
-      course_topic
-      post 'create', :course_id => @course.id, :discussion_topic => {:title => "some title"}, :attachment => {:uploaded_data => default_uploaded_data}
-      assigns[:topic].title.should eql("some title")
-      assigns[:topic].attachment.should_not be_nil
-      response.should be_redirect
-    end
-
-    it "should not attach a file if not authorized" do
-      course_with_student_logged_in(:active_all => true)
-      course_topic
-      post 'create', :course_id => @course.id, :discussion_topic => {:title => "some title"}, :attachment => {:uploaded_data => default_uploaded_data}
-      assigns[:topic].title.should eql("some title")
-      assigns[:topic].attachment.should be_nil
-      response.should be_redirect
-    end
-  end
-
-  describe "PUT 'update'" do
-    it "should require authorization" do
-      course_with_teacher(:active_all => true)
-      course_topic
-      put 'update', :course_id => @course.id, :id => @topic.id, :discussion_topic => {}
-      assert_unauthorized
-    end
-
-    it "should update the entry" do
-      course_with_teacher_logged_in(:active_all => true)
-      course_topic
-      put 'update', :course_id => @course.id, :id => @topic.id, :discussion_topic => {:title => "new title"}
-      response.should be_redirect
-      assigns[:topic].should eql(@topic)
-      assigns[:topic].title.should eql("new title")
-    end
-
-    it "should attach a new file" do
-      course_with_teacher_logged_in(:active_all => true)
-      course_topic
-      put 'update', :course_id => @course.id, :id => @topic.id, :discussion_topic => {:title => "new title"}, :attachment => {:uploaded_data => default_uploaded_data}
-      response.should be_redirect
-      assigns[:topic].should eql(@topic)
-      assigns[:topic].title.should eql("new title")
-      assigns[:topic].attachment.should_not be_nil
-    end
-
-    it "should replace the attached file" do
-      course_with_teacher_logged_in(:active_all => true)
-      course_topic
-      @a = @course.attachments.create!(:uploaded_data => default_uploaded_data)
-      @topic.attachment = @a
-      @topic.save
-      put 'update', :course_id => @course.id, :id => @topic.id, :discussion_topic => {:title => "new title"}, :attachment => {:uploaded_data => default_uploaded_data}
-      response.should be_redirect
-      assigns[:topic].should eql(@topic)
-      assigns[:topic].title.should eql("new title")
-      assigns[:topic].attachment.should_not be_nil
-      assigns[:topic].attachment.should_not eql(@a)
-    end
-
-    it "should remove the attached file" do
-      course_with_teacher_logged_in(:active_all => true)
-      course_topic
-      @a = @course.attachments.create!(:uploaded_data => default_uploaded_data)
-      @topic.attachment = @a
-      @topic.save
-      put 'update', :course_id => @course.id, :id => @topic.id, :discussion_topic => {:title => "new title", :remove_attachment => '1'}
-      response.should be_redirect
-      assigns[:topic].should eql(@topic)
-      assigns[:topic].title.should eql("new title")
-      assigns[:topic].attachment.should be_nil
-    end
-
-    it "should not attach a new file if not authorized" do
-      course_with_student_logged_in(:active_all => true)
-      course_topic
-      put 'update', :course_id => @course.id, :id => @topic.id, :discussion_topic => {:title => "new title"}, :attachment => {:uploaded_data => default_uploaded_data}
-      response.should be_redirect
-      assigns[:topic].should eql(@topic)
-      assigns[:topic].title.should eql("new title")
-      assigns[:topic].attachment.should be_nil
-    end
-
-    it "should set the editor_id to whoever edited to entry" do
-      course_with_teacher_logged_in(:active_all => true)
-      @teacher = @user
-      @student = user_model
-      @course.enroll_student(@student).accept
-      @topic = @course.discussion_topics.build(:title => "some message", :message => "test")
-      @topic.user = @student
-      @topic.save!
-      @topic.user.should eql(@student)
-      @topic.editor.should eql(nil)
-      put 'update', :course_id => @course.id, :id => @topic.id, :discussion_topic => {:message => "new message"}
-      response.should be_redirect
-      assigns[:topic].editor.should eql(@teacher)
-      assigns[:topic].user.should eql(@student)
-    end
-
-    it "should not duplicate when adding or removing an assignment" do
-      course_with_teacher_logged_in(:active_all => true)
-      course_topic
-
-      put 'update', :course_id => @course.id, :id => @topic.id, :discussion_topic => {:assignment => { :set_assignment => '1' }}
-      @topic.reload
-      @topic.assignment_id.should_not be_nil
-      @topic.old_assignment_id.should_not be_nil
-      old_assignment_id = @topic.old_assignment_id
-      DiscussionTopic.find_all_by_old_assignment_id(old_assignment_id).should == [ @topic ]
-
-      put 'update', :course_id => @course.id, :id => @topic.id, :discussion_topic => {:assignment => { :set_assignment => '0' }}
-      @topic.reload
-      @topic.assignment_id.should be_nil
-      @topic.old_assignment_id.should == old_assignment_id
-      DiscussionTopic.find_all_by_old_assignment_id(old_assignment_id).should == [ @topic ]
-
-      put 'update', :course_id => @course.id, :id => @topic.id, :discussion_topic => {:assignment => { :set_assignment => '1' }}
-      @topic.reload
-      @topic.assignment_id.should == old_assignment_id
-      @topic.old_assignment_id.should == old_assignment_id
-      DiscussionTopic.find_all_by_old_assignment_id(old_assignment_id).should == [ @topic ]
-
-      put 'update', :course_id => @course.id, :id => @topic.id, :discussion_topic => {:assignment => { :set_assignment => '0' }}
-      @topic.reload
-      @topic.assignment_id.should be_nil
-      @topic.old_assignment_id.should == old_assignment_id
-      DiscussionTopic.find_all_by_old_assignment_id(old_assignment_id).should == [ @topic ]
-    end
-
-    it "should not drift when saving delayed_post_at with user-preferred timezone set" do
-      course_with_teacher_logged_in(:active_all => true)
-      course_topic
-
-      @teacher.time_zone = 'Alaska'
-      @teacher.save
-
-      teacher_tz = Time.use_zone(@teacher.time_zone) { Time.zone }
-      time_string = "Fri Aug 26, 2031 8:39AM"
-      expected_time = teacher_tz.parse(time_string)
-
-      put 'update', :course_id => @course.id, :id => @topic.id, :discussion_topic => {
-        :delay_posting => '1',
-        :delayed_post_at => time_string
-      }
-
-      @topic.reload
-      @topic.delayed_post_at.should == expected_time
-    end
-
-    it "should allow unlocking a locked topic" do
-      course_with_teacher_logged_in(:active_all => true)
-      course_topic
-      @topic.lock!
-
-      put 'update', :course_id => @course.id, :id => @topic.id, :discussion_topic => { :event => 'unlock' }
-
-      @topic.reload
-      @topic.should_not be_locked
-    end
-
-    it "should allow locking a topic after due date" do
-      course_with_teacher_logged_in(:active_all => true)
-      course_topic
-      put 'update', :course_id => @course.id, :id => @topic.id, :discussion_topic => {:assignment => { :set_assignment => '1' }}
-      @topic.reload
-      @topic.assignment.update_attribute(:due_at, 1.week.ago)
-      put 'update', :course_id => @course.id, :id => @topic.id, :discussion_topic => { :event => 'lock' }
-      @topic.reload
-      @topic.should be_locked
-      put 'update', :course_id => @course.id, :id => @topic.id, :discussion_topic => { :event => 'unlock' }
-      @topic.reload
-      @topic.should_not be_locked
-    end
-
-    it "should not allow locking a topic before due date" do
-      course_with_teacher_logged_in(:active_all => true)
-      course_topic
-      put 'update', :course_id => @course.id, :id => @topic.id, :discussion_topic => {:assignment => { :set_assignment => '1' }}
-      @topic.reload
-      @topic.assignment.update_attribute(:due_at, 1.week.from_now)
-      lambda {put 'update', :course_id => @course.id, :id => @topic.id, :discussion_topic => { :event => 'lock' }}.should raise_error
-      @topic.reload
-      @topic.should_not be_locked
-    end
-  end
-
-  describe "DELETE 'destroy'" do
-    it "should require authorization" do
-      course_with_teacher(:active_all => true)
-      course_topic
-      delete 'destroy', :course_id => @course.id, :id => @topic.id
-      assert_unauthorized
-    end
-
-    it "should delete the entry" do
-      course_with_teacher_logged_in(:active_all => true)
-      course_topic
-      delete 'destroy', :course_id => @course.id, :id => @topic.id
-      response.should be_redirect
-      assigns[:topic].should be_deleted
-      @course.reload
-      @course.discussion_topics.should_not be_include(@topic)
-    end
-  end
-
   describe "GET 'public_feed.atom'" do
     before(:each) do
       course_with_student(:active_all => true)
@@ -439,5 +249,50 @@ describe DiscussionTopicsController do
       feed.entries.should_not be_empty
       feed.entries.all?{|e| e.authors.present?}.should be_true
     end
+  end
+
+  describe 'POST create:' do
+    before(:each) do
+      Setting.set('enable_page_views', 'db')
+      course_with_student_logged_in :active_all => true
+      controller.stubs(:form_authenticity_token => 'abc', :form_authenticity_param => 'abc')
+      post 'create', :course_id => @course.id, :title => 'Topic Title', :is_announcement => false,
+                     :discussion_type => 'side_comment', :require_initial_post => true, :format => 'json',
+                     :podcast_has_student_posts => false, :delayed_post_at => '', :message => 'Message',
+                     :delay_posting => false, :threaded => false
+    end
+
+    after { Setting.set 'enable_page_views', 'false' }
+
+    describe 'the new topic' do
+      let(:topic) { assigns[:topic] }
+
+      specify { topic.should be_a DiscussionTopic }
+      specify { topic.user.should == @user }
+      specify { topic.current_user.should == @user }
+      specify { topic.delayed_post_at.should be_nil }
+      specify { topic.workflow_state.should == 'active' }
+      specify { topic.id.should_not be_nil }
+      specify { topic.title.should == 'Topic Title' }
+      specify { topic.is_announcement.should be_false }
+      specify { topic.discussion_type.should == 'side_comment' }
+      specify { topic.message.should == 'Message' }
+      specify { topic.threaded.should be_false }
+    end
+
+    it 'logs an asset access record for the discussion topic' do
+      accessed_asset = assigns[:accessed_asset]
+      accessed_asset[:category].should == 'topics'
+      accessed_asset[:level].should == 'participate'
+    end
+
+    it 'registers a page view' do
+      page_view = assigns[:page_view]
+      page_view.should_not be_nil
+      page_view.http_method.should == 'post'
+      page_view.url.should =~ %r{^http://test\.host/api/v1/courses/\d+/discussion_topics}
+      page_view.participated.should be_true
+    end
+
   end
 end

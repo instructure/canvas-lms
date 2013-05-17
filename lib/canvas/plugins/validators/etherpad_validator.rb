@@ -26,7 +26,7 @@ module Canvas::Plugins::Validators::EtherpadValidator
         false
       else
         settings.slice(:domain, :name)
-        settings[:domain] = settings[:domain].sub(/https?:/, '').gsub(/\//, '')
+        settings[:domain] = settings[:domain].sub(/https?:/, '').gsub(/(^\/+)|(\/)+$/,'')
         settings[:name] ||= "EtherPad"
         settings
       end

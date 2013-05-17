@@ -21,13 +21,34 @@ require File.expand_path(File.dirname(__FILE__) + '/../messages/messages_helper'
 
 describe Message do
 
+  describe "#get_template" do
+    it "should get the template with an existing file path" do
+      HostUrl.stubs(:protocol).returns("https")
+      au = AccountUser.create(:account => account_model)
+      msg = generate_message(:account_user_notification, :email, au)
+      template = msg.get_template('alert.email.erb')
+      template.should match(%r{An alert has been triggered})
+    end
+  end
+
+  describe '#populate body' do
+    it 'should save an html body if a template exists' do
+      Message.any_instance.expects(:load_html_template).returns('template')
+      user         = user(:active_all => true)
+      account_user = AccountUser.create!(:account => account_model, :user => user)
+      message      = generate_message(:account_user_notification, :email, account_user)
+
+      message.html_body.should == 'template'
+    end
+  end
+
   describe "parse!" do
     it "should use https when the domain is configured as ssl" do
-      pending("switch messages to use url writing, rather than hard-coded strings")
       HostUrl.stubs(:protocol).returns("https")
       @au = AccountUser.create(:account => account_model)
       msg = generate_message(:account_user_notification, :email, @au)
-      msg.body.should match(%r{https://www.example.com})
+      msg.body.should include('Account Admin')
+      msg.html_body.should include('Account Admin')
     end
   end
 
@@ -37,7 +58,7 @@ describe Message do
       m2 = message_model(:workflow_state => 'sent', :user => user)
       m3 = message_model(:workflow_state => 'sending', :user => user)
       Message.in_state(:bounced).should eql([m1])
-      Message.in_state([:bounced, :sent]).should eql([m1, m2])
+      Message.in_state([:bounced, :sent]).sort_by(&:id).should eql([m1, m2].sort_by(&:id))
       Message.in_state([:bounced, :sent]).should_not be_include(m3)
     end
     
@@ -70,6 +91,19 @@ describe Message do
       Message.staged.should eql([@message])
     end
 
+    it "should have a list of messages that can be cancelled" do
+      Message.any_instance.stubs(:stage_message)
+      Message.workflow_spec.states.each do |state_symbol, state|
+        Message.destroy_all
+        message = message_model(:workflow_state => state_symbol.to_s, :user => user, :to => 'nobody')
+        if state.events.any?{ |event_symbol, event| event.transitions_to == :cancelled }
+          Message.cancellable.should eql([message])
+        else
+          Message.cancellable.should eql([])
+        end
+      end
+    end
+    
     it "should go back to the staged state if sending fails" do
       message_model(:dispatch_at => Time.now - 1, :workflow_state => 'sending', :to => 'somebody', :updated_at => Time.now.utc - 11.minutes, :user => user)
       @message.errored_dispatch
@@ -86,6 +120,39 @@ describe Message do
         @message.deliver.should be_nil
         @message.reload.state.should == :cancelled
       end
+
+      it "should log errors and raise based on error type" do
+        message_model(:dispatch_at => Time.now, :workflow_state => 'staged', :to => 'somebody', :updated_at => Time.now.utc - 11.minutes, :user => user, :path_type => 'email')
+        Mailer.expects(:deliver_message).raises("something went wrong")
+        ErrorReport.expects(:log_exception)
+        expect { @message.deliver }.to raise_exception("something went wrong")
+
+        message_model(:dispatch_at => Time.now, :workflow_state => 'staged', :to => 'somebody', :updated_at => Time.now.utc - 11.minutes, :user => user, :path_type => 'email')
+        Mailer.expects(:deliver_message).raises(Timeout::Error.new)
+        ErrorReport.expects(:log_exception).never
+        expect { @message.deliver }.to raise_exception(Timeout::Error)
+
+        message_model(:dispatch_at => Time.now, :workflow_state => 'staged', :to => 'somebody', :updated_at => Time.now.utc - 11.minutes, :user => user, :path_type => 'email')
+        Mailer.expects(:deliver_message).raises("450 recipient address rejected")
+        ErrorReport.expects(:log_exception).never
+        @message.deliver.should == false
+      end
     end
+
+    describe "infer_defaults" do
+      it "should not break if there is no context" do
+        message_model.root_account_id.should be_nil
+      end
+
+      it "should not break if the context does not have an account" do
+        user_model
+        message_model(:context => @user).root_account_id.should be_nil
+      end
+
+      it "should populate root_account_id if the context can chain back to a root account" do
+        message_model(:context => course_model).root_account_id.should eql Account.default.id
+      end
+    end
+
   end
 end

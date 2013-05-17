@@ -40,6 +40,16 @@ describe ContextModule do
       @module2.prerequisites.should_not be_empty
       @module2.prerequisites[0][:id].should eql(@module.id)
     end
+
+    it "should add prereqs to new module" do
+      course_module
+      @module2 = @course.context_modules.build(:name => "next module")
+      @module2.prerequisites = "module_#{@module.id}"
+      @module2.save!
+      @module2.prerequisites.should be_is_a(Array)
+      @module2.prerequisites.should_not be_empty
+      @module2.prerequisites[0][:id].should eql(@module.id)
+    end
       
     it "should remove invalid prerequisites" do
       course_module
@@ -74,7 +84,8 @@ describe ContextModule do
     it "should not allow adding invalid prerequisites" do
       course_module
       @module2 = @course.context_modules.create!(:name => "next module")
-      @module2.prerequisites = "module_#{@module.id},module_99"
+      invalid = course().context_modules.create!(:name => "nope")
+      @module2.prerequisites = "module_#{@module.id},module_#{invalid.id}"
       @module2.save!
       @module2.prerequisites.should be_is_a(Array)
       @module2.prerequisites.should_not be_empty
@@ -189,7 +200,7 @@ describe ContextModule do
       @progression.requirements_met.should_not be_empty
       @progression.requirements_met[0][:id].should eql(@tag.id)
     end
-    
+
     it "should return nothing if the user isn't a part of the context" do
       course_module
       @user = User.create!(:name => "some name")
@@ -198,6 +209,95 @@ describe ContextModule do
       @module.completion_requirements = {@tag.id => {:type => 'must_view'}}
       @progression = @module.update_for(@user, :read, @tag)
       @progression.should be_nil
+    end
+
+    it "should not generate progressions for non-active modules" do
+      student_in_course :active_all => true
+      tehmod = @course.context_modules.create! :name => "teh module"
+      page = @course.wiki.wiki_pages.create! :title => "view this page"
+      tag = tehmod.add_item(:id => page.id, :type => 'wiki_page')
+      tehmod.completion_requirements = { tag.id => {:type => 'must_view'} }
+      tehmod.workflow_state = 'active'
+      tehmod.save!
+
+      othermods = %w(active unpublished deleted).collect do |state|
+        mod = @course.context_modules.build :name => "other module in state #{state}"
+        mod.workflow_state = state
+        mod.save!
+        mod
+      end
+
+      tehmod.update_for(@student, :read, tag)
+      mods_with_progressions = @student.context_module_progressions.collect(&:context_module_id)
+      mods_with_progressions.should_not be_include othermods[1].id
+      mods_with_progressions.should_not be_include othermods[2].id
+    end
+  end
+
+  describe "prerequisites_satisfied?" do
+    before do
+      @course = course(:active_all => true)
+      @module = @course.context_modules.create!(:name => "some module")
+
+      @assignment = @course.assignments.create!(:title => "some assignment")
+      @tag = @module.add_item({:id => @assignment.id, :type => 'assignment'})
+      @module.completion_requirements = {@tag.id => {:type => 'must_view'}}
+      @module.workflow_state = 'unpublished'
+      @module.save!
+
+      @module2 = @course.context_modules.create!(:name => "another module")
+      @module2.publish
+      @module2.prerequisites = "module_#{@module.id}"
+      @module2.save!
+
+      @module3 = @course.context_modules.create!(:name => "another module again")
+      @module3.publish
+      @module3.save!
+
+      @user = User.create!(:name => "some name")
+      @course.enroll_student(@user)
+    end
+
+    it "should correctly ignore already-calculated context_module_prerequisites" do
+      mp = @user.context_module_progressions.create!(:context_module => @module2)
+      mp.workflow_state = 'locked'
+      mp.save!
+      mp2 = @user.context_module_progressions.create!(:context_module => @module)
+      mp2.workflow_state = 'locked'
+      mp2.save!
+
+      @module2.prerequisites_satisfied?(@user, true).should == true
+    end
+
+    it "should be satisfied if no prereqs" do
+      @module3.prerequisites_satisfied?(@user, true).should == true
+    end
+
+    it "should be satisfied if prereq is unpublished" do
+      @module2.prerequisites_satisfied?(@user, true).should == true
+    end
+
+    it "should be satisfied if prereq's prereq is unpublished" do
+      @module3.prerequisites = "module_#{@module2.id}"
+      @module3.save!
+      @module3.prerequisites_satisfied?(@user, true).should == true
+    end
+
+    it "should be satisfied if dependant on both a published and unpublished module" do
+      @module3.prerequisites = "module_#{@module.id}"
+      @module3.prerequisites = [{:type=>"context_module", :id=>@module.id}, {:type=>"context_module", :id=>@module2.id}]
+      @module3.save!
+      @module3.reload
+      @module3.prerequisites.count.should == 2
+
+      @module3.prerequisites_satisfied?(@user, true).should == true
+    end
+
+    it "should update when publishing or unpublishing" do
+      @module.publish
+      @module2.prerequisites_satisfied?(@user, true).should == false
+      @module.unpublish
+      @module2.prerequisites_satisfied?(@user, true).should == true
     end
   end
   
@@ -232,11 +332,7 @@ describe ContextModule do
       @module.save!
       @user = User.create!(:name => "some name")
       @course.enroll_student(@user)
-      # @progression = @module.evaluate_for(@user, true)
-      # @progression.should_not be_nil
-      # @progression.should be_unlocked
-      # @progression.destroy
-      
+
       @module2 = @course.context_modules.create!(:name => "another module")
       @module2.prerequisites = "module_#{@module.id}"
       @module2.save!
@@ -249,6 +345,33 @@ describe ContextModule do
       @progression = @module2.evaluate_for(@user, true)
       @progression.should_not be_nil
       @progression.should be_locked
+    end
+
+    it "should create an unlocked progression if prerequisites is unpublished" do
+      course_module
+      @assignment = @course.assignments.create!(:title => "some assignment")
+      @tag = @module.add_item({:id => @assignment.id, :type => 'assignment'})
+      @module.completion_requirements = {@tag.id => {:type => 'must_view'}}
+      @module.workflow_state = 'unpublished'
+      @module.save!
+
+      @user = User.create!(:name => "some name")
+      @course.enroll_student(@user)
+
+      @module2 = @course.context_modules.create!(:name => "another module")
+      @module2.publish
+      @module2.prerequisites = "module_#{@module.id}"
+      @module2.save!
+      @module2.prerequisites.should_not be_nil
+      @module2.prerequisites.should_not be_empty
+
+      @progression = @module2.evaluate_for(@user, true)
+      @progression.should_not be_nil
+      @progression.should_not be_locked
+      @progression.destroy
+      @progression = @module2.evaluate_for(@user, true)
+      @progression.should_not be_nil
+      @progression.should_not be_locked
     end
 
     describe "multi-items" do
@@ -589,6 +712,27 @@ describe ContextModule do
       @assignment.locked_for?(@user).should be_false
     end
   end
+
+  describe "after_save" do
+    before do
+      course_module
+      course_with_student(:course => @course, :active_all => true)
+      @assignment = @course.assignments.create!(:title => "some assignment")
+      @tag = @module.add_item({:id => @assignment.id, :type => 'assignment'})
+      @module.completion_requirements = {@tag.id => {:type => 'min_score', :min_score => 90}}
+      @module.save!
+    end
+
+    it "should not recompute everybody's progressions" do
+      new_module = @course.context_modules.build :name => 'new module'
+      new_module.prerequisites = "context_module_#{@module.id}"
+
+      ContextModule.any_instance.expects(:re_evaluate_for).never
+      new_module.save!
+      run_jobs
+    end
+  end
+
   describe "clone_for" do
     it "should clone a context module" do
       course_module
@@ -609,7 +753,7 @@ describe ContextModule do
       @old_assignment = @course.assignments.create!(:title => "my assignment")
       @old_tag = @old_module.add_item({:type => 'assignment', :id => @old_assignment.id})
       ct = @old_module.add_item({ :title => 'Broken url example', :type => 'external_url', :url => 'http://example.com/with%20space' })
-      ContentTag.update_all({:url => "http://example.com/with space"}, "id=#{ct.id}")
+      ContentTag.where(:id => ct).update_all(:url => "http://example.com/with space")
       @old_module.reload
       @old_module.content_tags.length.should eql(2)
       course_model

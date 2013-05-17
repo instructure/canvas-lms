@@ -27,21 +27,16 @@ describe "/quizzes/statistics" do
     assigns[:quiz] = q = @course.quizzes.create!(:quiz_type => 'assignment').tap{|q| q.should be_graded }
     assigns[:submitted_users] = []
     assigns[:statistics] = { :submission_score_high => 20,
-                             :multiple_attempts_exist => false,
-                             :submission_correct_tally => 0,
                              :submission_count => 3,
                              :submission_score_low => 15,
                              :multiple_attempts_included => true,
                              :last_submission_at => Time.now.utc,
                              :submission_duration_average => 0,
-                             :submission_duration_tally => 0,
                              :submission_score_stdev => 2.05480466765634,
                              :submission_user_ids => [4, 3, 2],
                              :questions => [],
-                             :submission_score_tally => 52,
                              :submission_correct_count_average => 3,
                              :submission_incorrect_count_average => 2,
-                             :submission_incorrect_tally => 0,
                              :submission_score_average => 17.3333333333333,
                              :unique_submission_count => 3}
 

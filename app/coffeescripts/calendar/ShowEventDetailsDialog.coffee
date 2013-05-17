@@ -34,7 +34,7 @@ define [
 
       url = event.object.url
       # We can't delete assignments via the synthetic calendar_event
-      if event.object.assignment
+      if event.assignment
         url = $.replaceTags(@event.deleteURL, 'id', @event.object.id)
 
       $("<div />").confirmDelete
@@ -150,9 +150,12 @@ define [
       else if @event.object?.available_slots > 0
         params.availableSlotsText = @event.object.available_slots
 
-      params.showEventLink   = params.can_edit and params.fullDetailsURL()
+      params.showEventLink   = params.fullDetailsURL()
       params.showEventLink or= params.isAppointmentGroupEvent()
       @popover = new Popover(jsEvent, eventDetailsTemplate(params))
+      @popover.el.data('showEventDetailsDialog', @)
+
+      @popover.el.find(".view_event_link").click preventDefault @openShowPage
 
       @popover.el.find(".edit_event_link").click preventDefault @showEditDialog
 
@@ -170,3 +173,13 @@ define [
         new MessageParticipantsDialog(timeslot: @event.calendarEvent).show()
 
       publish('userContent/change')
+
+    close: =>
+      if @popover
+        @popover.el.removeData('showEventDetailsDialog')
+        @popover.hide()
+
+    openShowPage: (jsEvent) =>
+      pieces = $(jsEvent.target).attr('href').split("#")
+      pieces[0] += "?" + $.param({'return_to': window.location.href})
+      window.location.href = pieces.join("#")

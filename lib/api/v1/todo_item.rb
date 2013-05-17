@@ -31,7 +31,7 @@ module Api::V1::TodoItem
         "#{course_assignment_url(assignment.context_id, assignment.id)}#submit"
     }).tap do |hash|
       if todo_type == 'grading'
-        hash['needs_grading_count'] = assignment.needs_grading_count
+        hash['needs_grading_count'] = assignment.needs_grading_count_for_user(user)
       end
     end
   end

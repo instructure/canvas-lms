@@ -1,5 +1,5 @@
 <% define_content :link do %>
-  http://<%= HostUrl.context_host(user.pseudonym.try(:account)) %>
+  <%= HostUrl.protocol %>://<%= HostUrl.context_host(user.pseudonym.try(:account)) %>
 <% end %>
 
 <% define_content :subject do %>
@@ -25,4 +25,4 @@
 
 
 <%= t :notifications_link, "You can change your notification settings by visiting the following page:" %>
-http://<%= HostUrl.context_host(user.pseudonym.try(:account))  %>/profile/communication
+<%= HostUrl.protocol %>://<%= HostUrl.context_host(user.pseudonym.try(:account))  %>/profile/communication

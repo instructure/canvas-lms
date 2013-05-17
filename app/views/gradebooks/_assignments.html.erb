@@ -72,8 +72,7 @@
             <%= @renders[student.asset_string] ||= render(:partial => 'student', :object => student, :locals => { :course => @context }) %>
           </div>
         </td>
-        <% @assignments.each_with_index do |assignment, idx| 
-        %>
+        <% @assignments.each_with_index do |assignment, idx| %>
           <td class="student_assignment  <%= assignment.special_class %>">
             -
           </td>
@@ -110,7 +109,7 @@
     object_data['assignment_<%= assignment.id %>'] = (<%= raw assignment.to_json %>);
   <% end %>
   <% @students.each do |student| %>
-    object_data['student_<%= student.id %>'] = (<%= raw student.to_json %>);
+    object_data['student_<%= student.id %>'] = (<%= raw student.to_json(:except => [:unread_inbox_items_count]) %>);
   <% end %>
   <% end %>
 </script>

@@ -1,0 +1,5 @@
+stylesheets:
+  second_plugin:
+    - public/stylesheets/compiled/second_plugin.css
+  second_plugin_alt:
+    - public/stylesheets/compiled/second_plugin_alt.css

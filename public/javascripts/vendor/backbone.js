@@ -1212,7 +1212,7 @@
     //
     //     {
     //       'mousedown .title':  'edit',
-    //       'click .button':     'save'
+    //       'click .btn':     'save'
     //       'click .open':       function(e) { ... }
     //     }
     //

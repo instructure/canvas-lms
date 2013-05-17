@@ -56,7 +56,7 @@ describe MediaObject do
       MediaObject.create!(:context => user, :media_id => "test")
       expect {
         MediaObject.ensure_media_object("test", {})
-      }.to change(Delayed::Job, :count).by(0)
+      }.to change { Delayed::Job.jobs_count(:future) }.by(0)
     end
 
     it "should not create if the media id doesn't exist in kaltura" do
@@ -64,7 +64,7 @@ describe MediaObject do
       expect {
         MediaObject.ensure_media_object("test", {})
         run_jobs
-      }.to change(MediaObject, :count).by(0)
+      }.to change { Delayed::Job.jobs_count(:future) }.by(0)
     end
 
     it "should create the media object" do
@@ -72,7 +72,7 @@ describe MediaObject do
       expect {
         MediaObject.ensure_media_object("test", { :context => user })
         run_jobs
-      }.to change(MediaObject, :count).by(1)
+      }.to change { Delayed::Job.jobs_count(:future) }.by(1)
       obj = MediaObject.by_media_id("test").first
       obj.context.should == @user
     end

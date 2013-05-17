@@ -53,7 +53,7 @@ define [
         @$row.parents('.time-block-list-body-wrapper').scrollTop(9999)
 
     validateField: (inputName) ->
-      $suggest = @inputs[inputName].$el.nextAll('.datetime_suggest')
+      $suggest = @inputs[inputName].$el.closest('td').find('.datetime_suggest')
       invalidDate = $suggest.hasClass('invalid_datetime')
       @updateDom(inputName, $suggest.text()) unless invalidDate
       @inputs[inputName].$el.toggleClass 'error', invalidDate

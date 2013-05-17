@@ -7,7 +7,7 @@
     <div class="rs-margin-all">
       <div id="sidebar_content">
         <p>
-          <%= link_to(image_tag("edit.png", :alt => "") + " " + t(:edit_link, "Edit Conference"), context_url(@context, :context_conferences_url) + "#conference_#{@conference.id}", :class => "button button-sidebar-wide") %>
+          <%= link_to(image_tag("edit.png", :alt => "") + " " + t(:edit_link, "Edit Conference"), context_url(@context, :context_conferences_url) + "#conference_#{@conference.id}", :class => "btn button-sidebar-wide") %>
         </p>
       </div>
     </div>
@@ -96,12 +96,12 @@
       end 
     %>
     <% if txt %>
-    <a target="_blank" href="<%= context_url(@context, :context_conference_join_url, @conference.id) %>" class="button join_conference_link">
+    <a target="_blank" href="<%= context_url(@context, :context_conference_join_url, @conference.id) %>" class="btn join_conference_link">
       <%= txt %>
     </a>
     <% end %>
     <% if can_do(@conference, @current_user, :close) %>
-    <a href="<%= context_url(@context, :context_conference_close_url, @conference.id) %>" class="button close_conference_link"><%= t('buttons.end', "End it now") %></a>
+    <a href="<%= context_url(@context, :context_conference_close_url, @conference.id) %>" class="btn close_conference_link"><%= t('buttons.end', "End it now") %></a>
     <% end %>
   </div>
 </div>

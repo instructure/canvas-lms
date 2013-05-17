@@ -9,116 +9,18 @@ css_compressor_options:
 # package_assets: always
 # compress_assets: off
 
-
-<%=
-  # pull in the bundles from the various plugins' config/assets.yml extension
-  # files and combine them under a plugins.<plugin> dictionary. so e.g. the
-  # stylesheets bundles from vendor/plugins/myplugin/config/assets.yml will
-  # be added under
-  #
-  # plugins:
-  #   myplugin:
-  #     stylesheets:
-  #       ...
-  #
-  # in this document. additionally, rescope bundle elements defined under public/
-  # (in the context of the plugin) as follows:
-  #
-  #  * public/stylesheets/compiled -> public/stylesheets/compiled/plugins/<plugin>
-  #  * public/* -> public/plugins/<plugin>/*
-  #
-  # i.e. public/x becomes public/plugins/myplugin/x with the exception of
-  # compiled stylesheets, where compass throws them in the more specific
-  # public/stylesheets/compiled/plugins/myplugin/
-  #
-  # to prevent this translation on a bundle element -- to request an element
-  # from canvas-lms in your bundle, for example -- prefix it with "~:". this
-  # prefix will be removed but no other changes made.
-  #
-  # similarly, a prefix of "otherplugin:" just as without a prefix, but the
-  # rescoping will target "otherplugin" rather than "myplugin". this is useful
-  # if myplugin can rely on otherplugin being installed and wishes to reuse
-  # some of the assets from otherplugin.
-  #
-  plugin_assets = {}
-  Dir.glob('vendor/plugins/*/config/assets.yml').each do |asset_file|
-    plugin = asset_file.gsub(%r{^vendor/plugins/(.*)/config/assets\.yml$}, '\\1')
-    assets = YAML.load(File.read(asset_file))
-    assets.each do |type,bundles|
-      bundles.keys.each do |bundle,entries|
-        # the bundle is temporarily renamed to a fully namespaced bundle so
-        # that we can detect and translate that namespace into an anchor in
-        # post-processing.
-        bundles["plugins/#{plugin}/#{type}/#{bundle}"] = bundles.delete(bundle).
-          map do |entry|
-            entry.gsub(%r{^public/stylesheets/compiled/}, "~:public/stylesheets/compiled/plugins/#{plugin}/").
-                  gsub(%r{^public/}, "~:public/plugins/#{plugin}/").
-                  gsub(%r{^(\w+):public/stylesheets/compiled/}, "~:public/stylesheets/compiled/plugins/\\1/").
-                  gsub(%r{^(\w+):public/}, "~:public/plugins/\\1/").
-                  gsub(%r{^~:}, '')
-          end
-      end
-    end
-    plugin_assets[plugin] = assets
-  end
-  subdoc = YAML.dump('plugins' => plugin_assets).gsub(/^---\s?\n/, '')
-
-  # add anchors to the various bundles in the imported plugin asset definitions.
-  # these bundles will be included in the known bundle types below with a
-  # namespaced bundle name. for instance, the bar stylesheet bundle in the foo
-  # plugin will be referred under stylesheets below as "plugins/foo/bar" and
-  # use the corresponding anchor.
-  #
-  # I'd add the anchors programmatically instead of through post-processing of
-  # the serialized document, but I couldn't figure out how
-  anchors = { "stylesheets" => {} }
-  subdoc.gsub!(%r{^( {6})plugins/([^/]*)/([^/]*)/([^:]*): $}) do |match|
-    indent, plugin, type, bundle = $1, $2, $3, $4
-    namespaced_bundle = "plugins_#{plugin}_#{bundle}"
-    anchor = "#{type}_#{namespaced_bundle}"
-    anchors[type][namespaced_bundle] = anchor if anchors[type]
-    "#{indent}#{bundle}: &#{anchor}"
-  end
-
-  # for some reason the serialized document outputs as
-  #
-  # plugins:
-  #   foo:
-  #     stylesheets:
-  #       bar: &anchor
-  #       - value
-  #
-  # instead of
-  #
-  # plugins:
-  #   foo:
-  #     stylesheets:
-  #       bar: &anchor
-  #         - value
-  #
-  # both are equivalent without an anchor on bar, but with an anchor on bar,
-  # the first for adds value to plugins.foo.stylesheets.bar but *not* to
-  # *anchor. the second form adds value to both.
-  subdoc.gsub!(%r{(^ {6})- (.*)$}, '\\1  - \\2')
-
-  subdoc
-%>
+<% require File.expand_path(Jammit::ASSET_ROOT + '/lib/canvas/plugins/plugin_assets') %>
+<% plugin_assets = PluginAssets.new %>
+<%= plugin_assets.bundle_yml %>
 
 javascripts:
 
 stylesheets:
   common:
-    - public/stylesheets/compiled/g_reset.css
     - public/stylesheets/compiled/g_base.css
+    - public/stylesheets/static/mediaelementplayer.css
     - public/stylesheets/compiled/g_instructure.css
-    - public/stylesheets/compiled/ellipsis.css
-    - public/stylesheets/compiled/g_util_misc.css
-    - public/stylesheets/compiled/g_util_fancy_links.css
-    - public/stylesheets/compiled/g_util_inst_tree.css
-    - public/stylesheets/compiled/g_util_chevron_crumbs.css
-    - public/stylesheets/compiled/g_util_ui_listview.css
     - public/stylesheets/compiled/g_assignments.css
-    - public/stylesheets/compiled/g_content_imports.css
     - public/stylesheets/compiled/g_context_inbox.css
     - public/stylesheets/compiled/g_groups.css
     - public/stylesheets/compiled/g_media_comments.css
@@ -127,36 +29,25 @@ stylesheets:
     - public/stylesheets/compiled/g_files.css
     - public/stylesheets/compiled/g_wiki.css
     - public/stylesheets/compiled/g_conference.css
-    - public/stylesheets/compiled/g_forum.css
     - public/stylesheets/compiled/g_rubrics.css
     - public/stylesheets/compiled/g_wiki_sidebar.css
     - public/stylesheets/compiled/g_syllabus.css
     - public/stylesheets/compiled/g_mini_calendar.css
     - public/stylesheets/compiled/helpDialog.css
     - public/stylesheets/compiled/print.css
-  collection_item_save:
-    - public/stylesheets/compiled/collection_item_save.css
-  collections_app:
-    - public/stylesheets/compiled/views/KollectionItems/ShowView.css
-    - public/stylesheets/compiled/views/CommentsView.css
+  context_modules: 
+    - public/stylesheets/compiled/context_modules.css
   dashboard:
-    - public/stylesheets/compiled/dashboard.css
-    - public/stylesheets/compiled/quick_start_bar.css
-    - public/stylesheets/compiled/activity_feed.css
+    - public/stylesheets/compiled/dashboard_messages.css
+    - public/stylesheets/compiled/dashboard_activity.css
   registration:
     - public/stylesheets/compiled/registration.css
   profile_show:
     - public/stylesheets/compiled/profile/show.css
   profile_edit:
     - public/stylesheets/compiled/profile/edit.css
-  group_dashboard:
-    - public/stylesheets/compiled/quick_start_bar.css
-    - public/stylesheets/compiled/activity_feed.css
-    - public/stylesheets/compiled/groups/dashboard.css
   group_settings:
     - public/stylesheets/compiled/groups/edit.css
-  group_profile:
-    - public/stylesheets/compiled/groups/profile.css
   facebook:
     - public/stylesheets/compiled/facebook.css
   speed_grader:
@@ -171,7 +62,6 @@ stylesheets:
     - public/stylesheets/static/calendar.css
   calendar2:
     - public/stylesheets/compiled/fullcalendar.css
-    - public/stylesheets/compiled/Calendar.css
     - public/stylesheets/compiled/mini_calendar.css
     - public/stylesheets/compiled/calendar/sidebar.css
     - public/stylesheets/compiled/calendar/scheduler.css
@@ -182,6 +72,8 @@ stylesheets:
   discussions:
     - public/stylesheets/compiled/ui.selectmenu.css
     - public/stylesheets/compiled/discussions.css
+  discussions_list:
+    - public/stylesheets/compiled/discussions_list.css
   full_files:
     - public/stylesheets/compiled/full_files.css
   datagrid:
@@ -193,10 +85,7 @@ stylesheets:
     - public/stylesheets/compiled/message_students.css
   gradebook2:
     - public/stylesheets/compiled/message_students.css
-    - public/stylesheets/compiled/submissionDetailsDialog.css
-    - public/stylesheets/compiled/AssignmentDetailsDialog.css
     - public/stylesheets/compiled/gradebook2.css
-    - public/stylesheets/compiled/assignment_group_weights_dialog.css
   attendance:
     - public/stylesheets/compiled/attendance.css
   quizzes:
@@ -205,8 +94,8 @@ stylesheets:
     - public/stylesheets/compiled/ui.selectmenu.css
   moderate_quiz:
     - public/stylesheets/compiled/moderate_quiz.css
-  full_assignment:
-    - public/stylesheets/compiled/full_assignment.css
+  assignments:
+    - public/stylesheets/compiled/assignments.css
     - public/stylesheets/compiled/grading_standards.css
     - public/stylesheets/static/embed_content.css
   grading_standards:
@@ -221,11 +110,10 @@ stylesheets:
     - public/stylesheets/compiled/grade_summary.css
   context_list:
     - public/stylesheets/compiled/context_list.css
+  page_views:
+    - public/stylesheets/compiled/page_views.css
   prior_users:
     - public/stylesheets/compiled/prior_users.css
-  popup:
-    - public/stylesheets/compiled/g_reset.css
-    - public/stylesheets/compiled/popup/main.css
   reports:
     - public/stylesheets/compiled/reports.css
   statistics:
@@ -241,6 +129,8 @@ stylesheets:
   account_settings:
     - public/stylesheets/compiled/account_settings.css
     - public/stylesheets/compiled/external_tools.css
+  account_admin_tools:
+    - public/stylesheets/compiled/account_admin_tools.css
   select_content_dialog:
     - public/stylesheets/compiled/select_content_dialog.css
   conversations:
@@ -258,5 +148,16 @@ stylesheets:
     - public/javascripts/tinymce/jscripts/tiny_mce/themes/advanced/skins/default/ui.css
     - public/stylesheets/compiled/tiny_like_ck_with_external_tools.css
     - public/javascripts/tinymce/jscripts/tiny_mce/plugins/inlinepopups/skins/clearlooks2/window.css
-    - public/stylesheets/static/mathquill.css
-  <%= anchors["stylesheets"].map{ |(bundle,anchor)| "#{bundle}: *#{anchor}" }.join("\n  ") %>
+  messages:
+    - public/stylesheets/compiled/messages.css
+  content_imports:
+    - public/stylesheets/compiled/content_imports.css
+  user_notes:
+    - public/stylesheets/compiled/user_notes.css
+  imports:
+    - public/stylesheets/compiled/imports.css
+  styleguide:
+    - public/stylesheets/compiled/styleguide.css
+    - public/stylesheets/compiled/syntax.css
+
+  <%= plugin_assets.anchors_yml %>

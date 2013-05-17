@@ -26,6 +26,9 @@ class AssociateInteraction < AssessmentItemConverter
       get_canvas_matches(match_map)
       get_canvas_answers(match_map)
       attach_feedback_values(@question[:answers])
+    elsif is_crazy_n_squared_match_by_index_thing?
+      get_all_matches_from_body
+      get_all_answers_for_crazy_n_squared_match_by_index_thing
     else
       get_all_matches_from_body
       get_all_answers_from_body
@@ -136,7 +139,7 @@ class AssociateInteraction < AssessmentItemConverter
       matches.css('div').each do |m|
         match = {}
         @question[:matches] << match
-        match[:text] = sanitize_html_string(m.text.strip, true)
+        match[:text] = clear_html(m.text.strip)
         match[:match_id] = unique_local_id
       end
     end
@@ -150,6 +153,45 @@ class AssociateInteraction < AssessmentItemConverter
       answer[:id] = unique_local_id 
       answer[:comments] = ""
       answer[:match_id] = @question[:matches][i][:match_id]
+    end
+  end
+
+
+  def is_crazy_n_squared_match_by_index_thing?
+    # identifies a strange type of Blackboard matching question export as seen in CNVS-1352,
+    # where right-side items don't have intrinsic IDs, but every left-side item gives _all_
+    # of them a (different) complete set of IDs. the index of the matched simpleChoice in
+    # the left side's choiceInteraction corresponds to the index of the matched right-side item.
+    left = @doc.css('div.RESPONSE_BLOCK choiceInteraction').size
+    right = @doc.css('div.RIGHT_MATCH_BLOCK div').size
+    return false unless left > 0 && right >= left
+    return @doc.css('div.RESPONSE_BLOCK div').size == left &&
+           @doc.css('responseProcessing responseCondition match').size == left &&
+           @doc.css('div.RESPONSE_BLOCK choiceInteraction simpleChoice').size == left * right
+  end
+
+  def get_all_answers_for_crazy_n_squared_match_by_index_thing
+    @doc.css('div.RESPONSE_BLOCK choiceInteraction').each_with_index do |ci, i|
+      a = ci.next_element
+      answer = {}
+      extract_answer!(answer, a)
+      answer[:id] = unique_local_id
+      answer[:comments] = ""
+      resp_id = ci['responseIdentifier']
+      match_node = @doc.at_css("responseCondition match baseValue[identifier=#{resp_id}]")
+      choice_id = match_node && match_node.inner_text
+      match_index = nil
+      if choice_id
+        ci.css('simpleChoice').each_with_index do |sc, j|
+          if sc['identifier'] == choice_id
+            match_index = j
+            break
+          end
+        end
+      end
+      match_index ||= i # fall back to get_all_answers_from_body behavior
+      answer[:match_id] = @question[:matches][match_index][:match_id]
+      @question[:answers] << answer
     end
   end
   

@@ -64,12 +64,15 @@ describe SisImportsApiController, :type => :integration do
   end
 
   it 'should kick off a sis import via multipart attachment' do
+    json = nil
+    expect {
     json = api_call(:post,
           "/api/v1/accounts/#{@account.id}/sis_imports.json",
           { :controller => 'sis_imports_api', :action => 'create',
             :format => 'json', :account_id => @account.id.to_s }, 
           { :import_type => 'instructure_csv',
             :attachment => fixture_file_upload("files/sis/test_user_1.csv", 'text/csv') })
+    }.to change { Delayed::Job.strand_size("sis_batch:account:#{@account.id}") }.by(1)
 
     json.has_key?("created_at").should be_true
     json.delete("created_at")
@@ -83,12 +86,10 @@ describe SisImportsApiController, :type => :integration do
           "progress" => 0,
           "id" => batch.id,
           "workflow_state"=>"created" }
-    job = Delayed::Job.last(:conditions => { :tag => 'SisBatch.process_all_for_account' })
-    job.strand.should == "sis_batch:account:#{@account.id}"
 
     SisBatch.count.should == @batch_count + 1
     batch.batch_mode.should be_false
-    run_job(job)
+    run_jobs
     User.count.should == @user_count + 1
     User.last.name.should == "Jamie Kennedy"
     
@@ -122,7 +123,6 @@ describe SisImportsApiController, :type => :integration do
   end
 
   it "should skip the job for skip_sis_jobs_account_ids" do
-    scope = Delayed::Job.scoped(:conditions => { :tag => 'SisBatch.process_all_for_account' })
     Setting.set('skip_sis_jobs_account_ids', "fake,#{@account.global_id}")
     expect {
       api_call(:post,
@@ -131,7 +131,7 @@ describe SisImportsApiController, :type => :integration do
               :format => 'json', :account_id => @account.id.to_s }, 
             { :import_type => 'instructure_csv',
               :attachment => fixture_file_upload("files/sis/test_user_1.csv", 'text/csv') })
-    }.to change(scope, :count).by(0)
+    }.to change { Delayed::Job.strand_size("sis_batch:account:#{@account.id}") }.by(0)
   end
 
   it "should enable batch mode and require selecting a valid term" do
@@ -401,12 +401,11 @@ describe SisImportsApiController, :type => :integration do
   end
 
   it "should allow raw post without charset" do
-    token = @user.access_tokens.create!(:purpose => 'test')
     json = api_call(:post,
-          "/api/v1/accounts/#{@account.id}/sis_imports.json?import_type=instructure_csv&access_token=#{token.token}",
+          "/api/v1/accounts/#{@account.id}/sis_imports.json?import_type=instructure_csv",
           { :controller => 'sis_imports_api', :action => 'create',
             :format => 'json', :account_id => @account.id.to_s,
-            :import_type => 'instructure_csv', :access_token => token.token },
+            :import_type => 'instructure_csv' },
           {},
           { 'content-type' => 'text/csv' })
     batch = SisBatch.last
@@ -415,12 +414,11 @@ describe SisImportsApiController, :type => :integration do
   end
 
   it "should handle raw post content-types with attributes" do
-    token = @user.access_tokens.create!(:purpose => 'test')
     json = api_call(:post,
-          "/api/v1/accounts/#{@account.id}/sis_imports.json?import_type=instructure_csv&access_token=#{token.token}",
+          "/api/v1/accounts/#{@account.id}/sis_imports.json?import_type=instructure_csv",
           { :controller => 'sis_imports_api', :action => 'create',
             :format => 'json', :account_id => @account.id.to_s,
-            :import_type => 'instructure_csv', :access_token => token.token },
+            :import_type => 'instructure_csv' },
           {},
           { 'content-type' => 'text/csv; charset=utf-8' })
     batch = SisBatch.last
@@ -429,12 +427,11 @@ describe SisImportsApiController, :type => :integration do
   end
 
   it "should reject non-utf-8 encodings on content-type" do
-    token = @user.access_tokens.create!(:purpose => 'test')
     json = raw_api_call(:post,
-          "/api/v1/accounts/#{@account.id}/sis_imports.json?import_type=instructure_csv&access_token=#{token.token}",
+          "/api/v1/accounts/#{@account.id}/sis_imports.json?import_type=instructure_csv",
           { :controller => 'sis_imports_api', :action => 'create',
             :format => 'json', :account_id => @account.id.to_s,
-            :import_type => 'instructure_csv', :access_token => token.token },
+            :import_type => 'instructure_csv' },
           {},
           { 'content-type' => 'text/csv; charset=ISO-8859-1-Windows-3.0-Latin-1' })
     response.status.should match(/400/)

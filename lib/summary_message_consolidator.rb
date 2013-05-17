@@ -20,22 +20,46 @@ class SummaryMessageConsolidator
   def self.process
     SummaryMessageConsolidator.new.process
   end
-  
+
   def initialize(n=nil)
-    @logger = RAILS_DEFAULT_LOGGER
+    @logger = Rails.logger
   end
-  
+
   def process
-    cc_ids = ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
-      CommunicationChannel.ids_with_pending_delayed_messages
+    batch_ids = delayed_message_batch_ids
+    dm_id_batches = batch_ids.map do |batch_id|
+      dm_ids = delayed_message_ids_for_batch(batch_id)
+      @logger.info("Scheduled summary with #{dm_ids.length} messages for communication channel id #{batch_id['communication_channel_id']} and root account id #{batch_id['root_account_id'] || 'null'}")
+      dm_ids
     end
-    cc_ids.each do |cc_id|
-      dm_ids = DelayedMessage.ids_for_messages_with_communication_channel_id(cc_id)
-      DelayedMessage.update_all({ :batched_at => Time.now.utc, :workflow_state => 'sent', :updated_at => Time.now.utc },
-                                { :id => dm_ids })
-      DelayedMessage.send_later(:summarize, dm_ids)
-      
-      @logger.info("Scheduled summary with #{dm_ids.length} messages for communication channel id #{cc_id}")
+
+    dm_id_batches.in_groups_of(Setting.get('summary_message_consolidator_batch_size', '500').to_i, false) do |batches|
+      DelayedMessage.where(:id => batches.flatten).
+          update_all(:batched_at => Time.now.utc, :workflow_state => 'sent', :updated_at => Time.now.utc)
+
+      Delayed::Batch.serial_batch do
+        batches.each do |dm_ids|
+          DelayedMessage.send_later_enqueue_args(:summarize, { :priority => Delayed::LOWER_PRIORITY }, dm_ids)
+        end
+      end
+    end
+    dm_id_batches.size
+  end
+
+  def delayed_message_batch_ids
+    Shackles.activate(:slave) do
+      DelayedMessage.connection.select_all(
+        DelayedMessage.scoped.select('communication_channel_id').select('root_account_id').uniq.
+          where("workflow_state = ? AND send_at <= ?", 'pending', Time.now.to_s(:db)).
+          to_sql)
     end
   end
+
+  def delayed_message_ids_for_batch(batch)
+    DelayedMessage.
+      where("workflow_state = ? AND send_at <= ?", 'pending', Time.now.to_s(:db)).
+      where(batch). # hash condition will properly handle the case where root_account_id is null
+      all.map(&:id)
+  end
+
 end

@@ -4,10 +4,6 @@ describe "context_modules" do
   it_should_behave_like "in-process server selenium tests"
 
   context "as a student" do
-    LOCKED_TEXT = 'locked'
-    COMPLETED_TEXT = 'completed'
-    IN_PROGRESS_TEXT = 'in progress'
-
     def create_context_module(module_name)
       context_module = @course.context_modules.create!(:name => module_name, :require_sequential_progress => true)
       context_module
@@ -19,17 +15,21 @@ describe "context_modules" do
     end
 
     def validate_context_module_status_text(module_num, text_to_validate)
-      context_modules_status = driver.find_elements(:css, '.context_module .progression_container')
+      context_modules_status = ff('.context_module .progression_container')
       context_modules_status[module_num].should include_text(text_to_validate)
     end
 
     def navigate_to_module_item(module_num, link_text)
-      context_modules = driver.find_elements(:css, '.context_module')
+      context_modules = ff('.context_module')
       expect_new_page_load { context_modules[module_num].find_element(:link, link_text).click }
       go_to_modules
     end
 
     before (:each) do
+      @locked_text = 'locked'
+      @completed_text = 'completed'
+      @in_progress_text = 'in progress'
+
       course_with_student_logged_in
       #initial module setup
       @module_1 = create_context_module('Module One')
@@ -60,14 +60,27 @@ describe "context_modules" do
       # shouldn't show the teacher's "show student progression" button
       ff('.module_progressions_link').should_not be_present
 
-      context_modules = driver.find_elements(:css, '.context_module')
+      context_modules = ff('.context_module')
       #initial check to make sure everything was setup correctly
-      validate_context_module_status_text(0, IN_PROGRESS_TEXT)
-      validate_context_module_status_text(1, LOCKED_TEXT)
-      validate_context_module_status_text(2, LOCKED_TEXT)
+      validate_context_module_status_text(0, @in_progress_text)
+      validate_context_module_status_text(1, @locked_text)
+      validate_context_module_status_text(2, @locked_text)
 
       context_modules[1].find_element(:css, '.context_module_criterion').should include_text(@module_1.name)
       context_modules[2].find_element(:css, '.context_module_criterion').should include_text(@module_2.name)
+    end
+
+    it "should show overridden due dates for assignments" do
+      override = assignment_override_model(:assignment => @assignment_2)
+      override.override_due_at(4.days.from_now)
+      override.save!
+      override_student = override.assignment_override_students.build
+      override_student.user = @student
+      override_student.save!
+
+      go_to_modules
+      context_modules = ff('.context_module')
+      context_modules[1].find_element(:css, '.due_date_display').text.should_not be_blank
     end
 
     it "should move a student through context modules in sequential order" do
@@ -75,19 +88,27 @@ describe "context_modules" do
 
       #sequential normal validation
       navigate_to_module_item(0, @assignment_1.title)
-      validate_context_module_status_text(0, COMPLETED_TEXT)
-      validate_context_module_status_text(1, IN_PROGRESS_TEXT)
-      validate_context_module_status_text(2, LOCKED_TEXT)
+      validate_context_module_status_text(0, @completed_text)
+      validate_context_module_status_text(1, @in_progress_text)
+      validate_context_module_status_text(2, @locked_text)
 
       navigate_to_module_item(1, @assignment_2.title)
-      validate_context_module_status_text(0, COMPLETED_TEXT)
-      validate_context_module_status_text(1, COMPLETED_TEXT)
-      validate_context_module_status_text(2, IN_PROGRESS_TEXT)
+      validate_context_module_status_text(0, @completed_text)
+      validate_context_module_status_text(1, @completed_text)
+      validate_context_module_status_text(2, @in_progress_text)
 
       navigate_to_module_item(2, @quiz_1.title)
-      validate_context_module_status_text(0, COMPLETED_TEXT)
-      validate_context_module_status_text(1, COMPLETED_TEXT)
-      validate_context_module_status_text(2, COMPLETED_TEXT)
+      validate_context_module_status_text(0, @completed_text)
+      validate_context_module_status_text(1, @completed_text)
+      validate_context_module_status_text(2, @completed_text)
+    end
+    
+    it "should show progression in large_roster courses" do
+      @course.large_roster = true
+      @course.save!
+      go_to_modules
+      navigate_to_module_item(0, @assignment_1.title)
+      validate_context_module_status_text(0, @completed_text)
     end
 
     it "should validate that a student can't get to a locked context module" do
@@ -95,8 +116,17 @@ describe "context_modules" do
 
       #sequential error validation
       get "/courses/#{@course.id}/assignments/#{@assignment_2.id}"
-      driver.find_element(:id, 'content').should include_text("hasn't been unlocked yet")
-      driver.find_element(:id, 'module_prerequisites_list').should be_displayed
+      f('#content').should include_text("hasn't been unlocked yet")
+      f('#module_prerequisites_list').should be_displayed
+    end
+
+    it "should validate that a student can't get to an unpublished context module" do
+      @module_2.workflow_state = 'unpublished'
+      @module_2.save!
+
+      get "/courses/#{@course.id}/assignments/#{@assignment_2.id}"
+      f('#content').should include_text("is not available yet")
+      f('#module_prerequisites_list').should be_nil
     end
 
     it "should allow a student view student to progress through module content" do
@@ -107,26 +137,26 @@ describe "context_modules" do
 
       #sequential error validation
       get "/courses/#{@course.id}/assignments/#{@assignment_2.id}"
-      driver.find_element(:id, 'content').should include_text("hasn't been unlocked yet")
-      driver.find_element(:id, 'module_prerequisites_list').should be_displayed
+      f('#content').should include_text("hasn't been unlocked yet")
+      f('#module_prerequisites_list').should be_displayed
 
       go_to_modules
 
       #sequential normal validation
       navigate_to_module_item(0, @assignment_1.title)
-      validate_context_module_status_text(0, COMPLETED_TEXT)
-      validate_context_module_status_text(1, IN_PROGRESS_TEXT)
-      validate_context_module_status_text(2, LOCKED_TEXT)
+      validate_context_module_status_text(0, @completed_text)
+      validate_context_module_status_text(1, @in_progress_text)
+      validate_context_module_status_text(2, @locked_text)
 
       navigate_to_module_item(1, @assignment_2.title)
-      validate_context_module_status_text(0, COMPLETED_TEXT)
-      validate_context_module_status_text(1, COMPLETED_TEXT)
-      validate_context_module_status_text(2, IN_PROGRESS_TEXT)
+      validate_context_module_status_text(0, @completed_text)
+      validate_context_module_status_text(1, @completed_text)
+      validate_context_module_status_text(2, @in_progress_text)
 
       navigate_to_module_item(2, @quiz_1.title)
-      validate_context_module_status_text(0, COMPLETED_TEXT)
-      validate_context_module_status_text(1, COMPLETED_TEXT)
-      validate_context_module_status_text(2, COMPLETED_TEXT)
+      validate_context_module_status_text(0, @completed_text)
+      validate_context_module_status_text(1, @completed_text)
+      validate_context_module_status_text(2, @completed_text)
     end
 
     describe "sequence footer" do
@@ -138,25 +168,25 @@ describe "context_modules" do
         @after2 = @module_2.add_item(:type => "external_url", :title => "url2", :url => "http://example.com/2")
         get "/courses/#{@course.id}/modules/items/#{@atag1.id}"
         wait_for_ajaximations
-        prev = driver.find_element(:css, '#sequence_footer a.prev')
+        prev = f('#sequence_footer a.prev')
         URI.parse(prev.attribute('href')).path.should == "/courses/#{@course.id}/modules/items/#{@tag_1.id}"
-        nxt = driver.find_element(:css, '#sequence_footer a.next')
+        nxt = f('#sequence_footer a.next')
         URI.parse(nxt.attribute('href')).path.should == "/courses/#{@course.id}/modules/items/#{@after1.id}"
 
         get "/courses/#{@course.id}/modules/items/#{@atag2.id}"
         wait_for_ajaximations
-        prev = driver.find_element(:css, '#sequence_footer a.prev')
+        prev = f('#sequence_footer a.prev')
         URI.parse(prev.attribute('href')).path.should == "/courses/#{@course.id}/modules/items/#{@tag_2.id}"
-        nxt = driver.find_element(:css, '#sequence_footer a.next')
+        nxt = f('#sequence_footer a.next')
         URI.parse(nxt.attribute('href')).path.should == "/courses/#{@course.id}/modules/items/#{@after2.id}"
 
         # if the user didn't get here from a module link, we show no nav,
         # because we can't know which nav to show
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
         wait_for_ajaximations
-        prev = driver.find_element(:css, '#sequence_footer a.prev')
+        prev = f('#sequence_footer a.prev')
         prev.should_not be_displayed
-        nxt = driver.find_element(:css, '#sequence_footer a.next')
+        nxt = f('#sequence_footer a.next')
         nxt.should_not be_displayed
       end
 
@@ -166,9 +196,9 @@ describe "context_modules" do
         @after1 = @module_1.add_item(:type => "external_url", :title => "url1", :url => "http://example.com/1")
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
         wait_for_ajaximations
-        prev = driver.find_element(:css, '#sequence_footer a.prev')
+        prev = f('#sequence_footer a.prev')
         URI.parse(prev.attribute('href')).path.should == "/courses/#{@course.id}/modules/items/#{@tag_1.id}"
-        nxt = driver.find_element(:css, '#sequence_footer a.next')
+        nxt = f('#sequence_footer a.next')
         URI.parse(nxt.attribute('href')).path.should == "/courses/#{@course.id}/modules/items/#{@after1.id}"
       end
 
@@ -186,10 +216,10 @@ describe "context_modules" do
         get "/courses/#{@course.id}/modules/items/#{i2.id}"
         wait_for_ajaximations
 
-        prev = driver.find_element(:css, '#sequence_footer a.prev')
+        prev = f('#sequence_footer a.prev')
         URI.parse(prev.attribute('href')).path.should == "/courses/#{@course.id}/modules/items/#{i1.id}"
 
-        nxt = driver.find_element(:css, '#sequence_footer a.next')
+        nxt = f('#sequence_footer a.next')
         URI.parse(nxt.attribute('href')).path.should == "/courses/#{@course.id}/modules/items/#{i3.id}"
       end
     end

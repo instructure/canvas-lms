@@ -36,19 +36,19 @@ describe DiscussionTopic::MaterializedView do
     it "should return nil and schedule a job if no view" do
       DiscussionTopic::MaterializedView.for(@topic).destroy
       DiscussionTopic::MaterializedView.materialized_view_for(@topic).should == nil
-      Delayed::Job.find_all_by_strand("materialized_discussion:#{@topic.id}").size.should == 1
+      Delayed::Job.strand_size("materialized_discussion:#{@topic.id}").should == 1
     end
 
     it "should return the view if it exists but is out of date" do
       @view.update_materialized_view_without_send_later
       DiscussionTopic::MaterializedView.materialized_view_for(@topic).should be_present
       reply = @topic.reply_from(:user => @user, :text => "new message!")
-      Delayed::Job.delete_all
+      Delayed::Job.find_available(100).each(&:destroy)
       json, participants, entries = DiscussionTopic::MaterializedView.materialized_view_for(@topic)
       json.should be_present
       entries.should_not be_include(reply.id)
       # since the view was out of date, it's returned but a job is queued
-      Delayed::Job.find_all_by_strand("materialized_discussion:#{@topic.id}").size.should == 1
+      Delayed::Job.strand_size("materialized_discussion:#{@topic.id}").should == 1
       # after updating, the view should include the new entry
       @view.update_materialized_view_without_send_later
       json, participants, entries = DiscussionTopic::MaterializedView.materialized_view_for(@topic)
@@ -76,7 +76,7 @@ describe DiscussionTopic::MaterializedView do
     # verify the api_user_content functionality in a non-request context
     html_message = json[0]['replies'][1]['message']
     html = Nokogiri::HTML::DocumentFragment.parse(html_message)
-    html.at_css('a')['href'].should == "http://localhost/files/#{@reply2_attachment.id}/download?verifier=#{@reply2_attachment.uuid}"
+    html.at_css('a')['href'].should == "http://localhost/courses/#{@course.id}/files/#{@reply2_attachment.id}/download?verifier=#{@reply2_attachment.uuid}"
     html.at_css('video')['src'].should == "http://localhost/courses/#{@course.id}/media_download?entryId=0_abcde&redirect=1&type=mp4"
 
     # the deleted entry will be marked deleted and have no summary

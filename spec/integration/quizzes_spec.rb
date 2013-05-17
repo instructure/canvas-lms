@@ -1,6 +1,176 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe QuizzesController do
+  def create_section_override(section, due_at)
+    override = assignment_override_model(:quiz => @quiz)
+    override.set = section
+    override.override_due_at(due_at)
+    override.save!
+  end
+
+  context "#index" do
+    context "with overridden due dates" do
+
+      before :each do
+        course_with_teacher_logged_in(:active_all => true)
+        assignment_model(:course => @course)
+        quiz_model(:course => @course, :assignment_id => @assignment.id)
+      end
+
+      it "should indicate when course sections have multiple due dates" do
+        cs1 = @course.default_section
+        cs2 = @course.course_sections.create!
+
+        create_section_override(cs1, 3.days.from_now)
+        create_section_override(cs2, 4.days.from_now)
+
+        get "courses/#{@course.id}/quizzes"
+
+        doc = Nokogiri::HTML(response.body)
+        doc.css("div.description").text.include?("Multiple Dates").should be_true
+      end
+
+      it "should not indicate multiple due dates if the dates are the same" do
+        pending("needs to ignore base if all visible sections are overridden")
+        cs1 = @course.default_section
+        cs2 = @course.course_sections.create!
+
+        due_at = 3.days.from_now
+        create_section_override(cs1, due_at)
+        create_section_override(cs2, due_at)
+
+        get "courses/#{@course.id}/quizzes"
+
+        doc = Nokogiri::HTML(response.body)
+        doc.css("div.description").text.include?("Due: Multiple Dates").should_not be_true
+        doc.css("div.description").text.include?("Due: #{due_at.strftime('%b %-d')}").should be_true
+      end
+
+      it "should use assignment due date if there are no section overrides" do
+        due_at = 3.days.from_now
+        @quiz.due_at = due_at
+        @quiz.save!
+
+        get "courses/#{@course.id}/quizzes"
+
+        doc = Nokogiri::HTML(response.body)
+        doc.css("div.description").text.include?("Due: Multiple Dates").should_not be_true
+        doc.css("div.description").text.include?("Due: #{due_at.strftime('%b %-d')}").should be_true
+      end
+
+      it "should only use the sections the user is restricted to" do
+        pending("needs to ignore base if all visible sections are overridden")
+        cs1 = @course.default_section
+        cs2 = @course.course_sections.create!
+        cs3 = @course.course_sections.create!
+
+        user_session(user)
+        @course.enroll_user(@user, 'TaEnrollment', :section => cs1, :allow_multiple_enrollments => true, :limit_privileges_to_course_section => true).accept!
+        @course.enroll_user(@user, 'TaEnrollment', :section => cs2, :allow_multiple_enrollments => true, :limit_privileges_to_course_section => true).accept!
+
+        due_at = 3.days.from_now
+        create_section_override(cs1, due_at)
+        create_section_override(cs2, due_at)
+        create_section_override(cs3, due_at + 1.day) # This override should not matter
+
+        get "courses/#{@course.id}/quizzes"
+
+        doc = Nokogiri::HTML(response.body)
+        doc.css("div.description").text.include?("Due: Multiple Dates").should_not be_true
+        doc.css("div.description").text.include?("Due: #{due_at.strftime('%b %-d')}").should be_true
+      end
+    end
+  end
+
+  context "#show" do
+    before :each do
+      course_with_teacher_logged_in(:active_all => true)
+      assignment_model(:course => @course)
+      quiz_model(:course => @course, :assignment_id => @assignment.id)
+      @quiz.update_attribute :due_at, 5.days.from_now
+      @cs1 = @course.default_section
+      @cs2 = @course.course_sections.create!
+    end
+
+    context "with overridden due dates" do
+      include TextHelper
+
+      context "with no overrides" do
+        it "should show a due date for 'Everyone'" do
+          get "courses/#{@course.id}/quizzes/#{@quiz.id}"
+
+          doc = Nokogiri::HTML(response.body)
+          doc.css(".assignment_dates").text.should include "Everyone"
+          doc.css(".assignment_dates").text.should_not include "Everyone else"
+        end
+      end
+
+      context "with some sections overridden" do
+        before do
+          @due_at = 3.days.from_now
+          create_section_override(@cs1, @due_at)
+        end
+
+        it "should show an overridden due date for student" do
+          @course.enroll_user(user, 'StudentEnrollment')
+          user_session(@user)
+
+          get "courses/#{@course.id}/quizzes/#{@quiz.id}"
+
+          doc = Nokogiri::HTML(response.body)
+          doc.css("#quiz_student_details .value").first.text.should include(datetime_string(@due_at))
+        end
+
+        it "should show 'Everyone else' when some sections have a due date override" do
+          get "courses/#{@course.id}/quizzes/#{@quiz.id}"
+
+          doc = Nokogiri::HTML(response.body)
+          doc.css(".assignment_dates").text.should include "Everyone else"
+        end
+      end
+
+      context "with all sections overridden" do
+        before do
+          @due_at1, @due_at2 = 3.days.from_now, 4.days.from_now
+          create_section_override(@cs1, @due_at1)
+          create_section_override(@cs2, @due_at2)
+        end
+
+        it "should show multiple due dates to teachers" do
+          get "courses/#{@course.id}/quizzes/#{@quiz.id}"
+
+          doc = Nokogiri::HTML(response.body)
+          doc.css(".assignment_dates tbody tr").count.should be 2
+          doc.css(".assignment_dates tbody tr > td:first-child").text.
+            should include(datetime_string(@due_at1), datetime_string(@due_at2))
+        end
+
+        it "should not show a date for 'Everyone else'" do
+          get "courses/#{@course.id}/quizzes/#{@quiz.id}"
+
+          doc = Nokogiri::HTML(response.body)
+          doc.css(".assignment_dates").text.should_not include "Everyone"
+        end
+      end
+    end
+
+    context "SpeedGrader" do
+      it "should link to SpeedGrader when not large_roster" do
+        @course.large_roster = false
+        @course.save!
+        get "courses/#{@course.id}/quizzes/#{@quiz.id}"
+        response.body.should match(%r{SpeedGrader})
+      end
+
+      it "should not link to SpeedGrader when large_roster" do
+        @course.large_roster = true
+        @course.save!
+        get "courses/#{@course.id}/quizzes/#{@quiz.id}"
+        response.body.should_not match(%r{SpeedGrader})
+      end
+    end
+  end
+
   context "#history" do
     context "pending_review" do
       def mkquiz

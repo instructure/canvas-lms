@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 require File.expand_path(File.dirname(__FILE__) + '/../../../../spec/spec_helper')
 require 'zip/zipfilesystem'
 
@@ -120,7 +122,7 @@ describe Qti::Converter do
     quiz = @course.quizzes.last
     quiz.should be_present
     quiz.quiz_questions.size.should == 9
-    match_ignoring(quiz.quiz_questions.map(&:question_data), RESPONDUS_QUESTIONS, %w[id assessment_question_id match_id prepped_for_import])
+    match_ignoring(quiz.quiz_questions.map(&:question_data), RESPONDUS_QUESTIONS, %w[id assessment_question_id match_id prepped_for_import question_bank_migration_id])
   end
 
   def match_ignoring(a, b, ignoring = [])
@@ -375,6 +377,10 @@ describe Qti::Converter do
         {"match_id"=>5875, "text"=>"Distractor 1"},
         {"match_id"=>2330, "text"=>"Distractor 2"}],
       "question_text"=>"This is the question text."}]
+if RUBY_VERSION >= '1.9'
+  # handle new nokogiri behavior of NOT turning these utf-8 chars into html entities
+  RESPONDUS_QUESTIONS[0]["question_text"] = "This is the question text.<br>\nThese are some symbol font characters: <span style=\"font-size: 12pt;\">∂♥∃Δƒ</span>"
+end
 end
 
 end

@@ -11,15 +11,14 @@ describe "account" do
 
     it "should allow setting up a secondary ldap server" do
       get "/accounts/#{Account.default.id}/account_authorization_configs"
-      driver.find_element(:id, 'add_auth_select').
-          find_element(:css, 'option[value="ldap"]').click
-      ldap_div = driver.find_element(:id, 'ldap_div')
-      ldap_form = driver.find_element(:css, 'form.ldap_form')
+      click_option('#add_auth_select', 'ldap', :value)
+      ldap_div = f('#ldap_div')
+      ldap_form = f('form.ldap_form')
       ldap_div.should be_displayed
 
       ldap_form.find_element(:id, 'account_authorization_config_0_auth_host').send_keys('primary.host.example.com')
       ldap_form.find_element(:id, 'account_authorization_config_0_auth_port').send_keys('1')
-      ldap_form.find_element(:id, 'account_authorization_config_0_auth_over_tls').click
+      ldap_form.find_element(:id, 'account_authorization_config_0_auth_over_tls_simple_tls').click
       ldap_form.find_element(:id, 'account_authorization_config_0_auth_base').send_keys('primary base')
       ldap_form.find_element(:id, 'account_authorization_config_0_auth_filter').send_keys('primary filter')
       ldap_form.find_element(:id, 'account_authorization_config_0_auth_username').send_keys('primary username')
@@ -32,7 +31,7 @@ describe "account" do
       config = Account.default.account_authorization_configs.first
       config.auth_host.should == 'primary.host.example.com'
       config.auth_port.should == 1
-      config.auth_over_tls.should == true
+      config.auth_over_tls.should == 'simple_tls'
       config.auth_base.should == 'primary base'
       config.auth_filter.should == 'primary filter'
       config.auth_username.should == 'primary username'
@@ -41,9 +40,9 @@ describe "account" do
       config.change_password_url.should == 'http://forgot.password.example.com/'
 
       # now add a secondary ldap config
-      driver.find_element(:css, '.edit_auth_link').click
-      ldap_div = driver.find_element(:id, 'ldap_div')
-      ldap_form = driver.find_element(:css, 'form.ldap_form')
+      f('.edit_auth_link').click
+      ldap_div = f('#ldap_div')
+      ldap_form = f('form.ldap_form')
       ldap_div.find_element(:css, '.add_secondary_ldap_link').click
       ldap_form.find_element(:id, 'account_authorization_config_1_auth_host').send_keys('secondary.host.example.com')
       ldap_form.find_element(:id, 'account_authorization_config_1_auth_port').send_keys('2')
@@ -51,16 +50,18 @@ describe "account" do
       ldap_form.find_element(:id, 'account_authorization_config_1_auth_filter').send_keys('secondary filter')
       ldap_form.find_element(:id, 'account_authorization_config_1_auth_username').send_keys('secondary username')
       ldap_form.find_element(:id, 'account_authorization_config_1_auth_password').send_keys('secondary password')
+
       expect_new_page_load { submit_form(ldap_form) }
 
       Account.default.account_authorization_configs.length.should == 2
       config = Account.default.account_authorization_configs.first
       config.auth_host.should == 'primary.host.example.com'
+      config.auth_over_tls.should == 'simple_tls'
 
       config = Account.default.account_authorization_configs[1]
       config.auth_host.should == 'secondary.host.example.com'
       config.auth_port.should == 2
-      config.auth_over_tls.should == false
+      config.auth_over_tls.should == 'start_tls'
       config.auth_base.should == 'secondary base'
       config.auth_filter.should == 'secondary filter'
       config.auth_username.should == 'secondary username'
@@ -68,13 +69,13 @@ describe "account" do
       config.login_handle_name.should be_nil
       config.change_password_url.should be_nil
 
-      shown_hosts = driver.find_elements(:css, ".auth_info.auth_host")
+      shown_hosts = ff(".auth_info.auth_host")
       shown_hosts[0].text.should == "primary.host.example.com"
       shown_hosts[1].text.should == "secondary.host.example.com"
 
       # test removing the secondary config
-      driver.find_element(:css, '.edit_auth_link').click
-      ldap_form = driver.find_element(:css, 'form.ldap_form')
+      f('.edit_auth_link').click
+      ldap_form = f('form.ldap_form')
       ldap_form.find_element(:css, '.remove_secondary_ldap_link').click
       expect_new_page_load { submit_form(ldap_form) }
 
@@ -82,7 +83,7 @@ describe "account" do
 
       # test removing the entire config
       expect_new_page_load do
-        driver.find_element(:css, '.delete_auth_link').click
+        f('.delete_auth_link').click
         driver.switch_to.alert.accept
         driver.switch_to.default_content
       end
@@ -92,44 +93,43 @@ describe "account" do
 
     it "should show Login and Email fields in add user dialog for delegated auth accounts" do
       get "/accounts/#{Account.default.id}/users"
-      driver.find_element(:css, ".add_user_link").click
-      dialog = driver.find_element(:id, "add_user_dialog")
+      f(".add_user_link").click
+      dialog = f("#add_user_dialog")
       dialog.find_elements(:id, "pseudonym_path").length.should == 0
       dialog.find_element(:id, "pseudonym_unique_id").should be_displayed
 
       Account.default.account_authorization_configs.create(:auth_type => 'cas')
       get "/accounts/#{Account.default.id}/users"
-      driver.find_element(:css, ".add_user_link").click
-      dialog = driver.find_element(:id, "add_user_dialog")
+      f(".add_user_link").click
+      dialog = f("#add_user_dialog")
       dialog.find_element(:id, "pseudonym_path").should be_displayed
       dialog.find_element(:id, "pseudonym_unique_id").should be_displayed
     end
 
     it "should be able to set login labels for delegated auth accounts" do
       get "/accounts/#{Account.default.id}/account_authorization_configs"
-      driver.find_element(:id, 'add_auth_select').
-          find_element(:css, 'option[value="cas"]').click
-      driver.find_element(:id, "account_authorization_config_0_login_handle_name").should be_displayed
+      click_option('#add_auth_select', 'cas', :value)
+      f("#account_authorization_config_0_login_handle_name").should be_displayed
 
-      driver.find_element(:id, "account_authorization_config_0_auth_base").send_keys("cas.example.com")
-      driver.find_element(:id, "account_authorization_config_0_login_handle_name").send_keys("CAS Username")
+      f("#account_authorization_config_0_auth_base").send_keys("cas.example.com")
+      f("#account_authorization_config_0_login_handle_name").send_keys("CAS Username")
       expect_new_page_load { submit_form('#auth_form') }
 
       get "/accounts/#{Account.default.id}/users"
-      driver.find_element(:css, ".add_user_link").click
-      dialog = driver.find_element(:id, "add_user_dialog")
+      f(".add_user_link").click
+      dialog = f("#add_user_dialog")
       dialog.find_element(:css, 'label[for="pseudonym_unique_id"]').text.should == "CAS Username:"
     end
 
     it "should be able to create a new course" do
       get "/accounts/#{Account.default.id}"
-      driver.find_element(:css, '.add_course_link').click
-      driver.find_element(:css, '#add_course_form input[type=text]:first-child').send_keys('Test Course')
-      driver.find_element(:id, 'course_course_code').send_keys('TEST001')
+      f('.add_course_link').click
+      f('#add_course_form input[type=text]:first-child').send_keys('Test Course')
+      f('#course_course_code').send_keys('TEST001')
       submit_form('#add_course_form')
 
       wait_for_ajaximations
-      driver.find_element(:id, 'add_course_dialog').should_not be_displayed
+      f('#add_course_dialog').should_not be_displayed
       assert_flash_notice_message /Test Course successfully added/
     end
 
@@ -137,8 +137,8 @@ describe "account" do
       Account.default.courses.each { |c| c.destroy! }
 
       get "/accounts/#{Account.default.to_param}"
-      driver.find_element(:css, '.add_course_link').click
-      driver.find_element(:css, '#add_course_form').should be_displayed
+      f('.add_course_link').click
+      f('#add_course_form').should be_displayed
     end
 
     it "should be able to update term dates" do
@@ -151,7 +151,7 @@ describe "account" do
       end
 
       get "/accounts/#{Account.default.id}/terms"
-      term = driver.find_element(:css, "tr.term")
+      term = f("tr.term")
       term.find_element(:css, ".edit_term_link").click
       term.find_element(:css, ".editing_term .general_dates .start_date .edit_term input").send_keys("2011-07-01")
       term.find_element(:css, ".editing_term .general_dates .end_date .edit_term input").send_keys("2011-07-31")
@@ -165,7 +165,7 @@ describe "account" do
       })
 
       get "/accounts/#{Account.default.id}/terms"
-      term = driver.find_element(:css, "tr.term")
+      term = f("tr.term")
       term.find_element(:css, ".edit_term_link").click
       term.find_element(:css, ".editing_term .student_enrollment_dates .start_date .edit_term input").send_keys("2011-07-02")
       term.find_element(:css, ".editing_term .student_enrollment_dates .end_date .edit_term input").send_keys("2011-07-30")
@@ -179,7 +179,7 @@ describe "account" do
       })
 
       get "/accounts/#{Account.default.id}/terms"
-      term = driver.find_element(:css, "tr.term")
+      term = f("tr.term")
       term.find_element(:css, ".edit_term_link").click
       term.find_element(:css, ".editing_term .teacher_enrollment_dates .start_date .edit_term input").send_keys("2011-07-03")
       term.find_element(:css, ".editing_term .teacher_enrollment_dates .end_date .edit_term input").send_keys("2011-07-29")
@@ -195,7 +195,7 @@ describe "account" do
       })
 
       get "/accounts/#{Account.default.id}/terms"
-      term = driver.find_element(:css, "tr.term")
+      term = f("tr.term")
       term.find_element(:css, ".edit_term_link").click
       term.find_element(:css, ".editing_term .teacher_enrollment_dates .start_date .edit_term input").clear
       term.find_element(:css, ".editing_term .teacher_enrollment_dates .end_date .edit_term input").clear
@@ -214,10 +214,10 @@ describe "account" do
         aac = Account.default.account_authorization_configs.create!(:auth_type => 'saml')
         get "/accounts/#{Account.default.id}/account_authorization_configs"
 
-        start = driver.find_element(:id, "start_saml_debugging")
-        refresh = driver.find_element(:id, "refresh_saml_debugging")
-        stop = driver.find_element(:id, "stop_saml_debugging")
-        debug_info = driver.find_element(:id, "saml_debug_info")
+        start = f("#start_saml_debugging")
+        refresh = f("#refresh_saml_debugging")
+        stop = f("#stop_saml_debugging")
+        debug_info = f("#saml_debug_info")
 
         start.click
         wait_for_ajax_requests
@@ -231,7 +231,7 @@ describe "account" do
         refresh.click
         wait_for_ajax_requests
 
-        debug_info = driver.find_element(:id, "saml_debug_info")
+        debug_info = f("#saml_debug_info")
 
         aac.debugging_keys.each_with_index do |key, i|
           debug_info.text.should =~ /testvalue#{i}/
@@ -246,17 +246,36 @@ describe "account" do
         end
       end
     end
+
+    it "should configure discovery_url" do
+      auth_url = "http://example.com"
+      @account = Account.default
+      @account.account_authorization_configs.create!(:auth_type => 'saml')
+      @account.account_authorization_configs.create!(:auth_type => 'saml')
+      get "/accounts/#{Account.default.id}/account_authorization_configs"
+      f("#discovery_url_config .admin-links button").click
+      f("#discovery_url_config .admin-links a").click
+      f("#discovery_url_input").send_keys(auth_url)
+      expect_new_page_load { submit_form("#discovery_url_form") }
+
+      @account.reload
+      @account.auth_discovery_url.should == auth_url
+
+      f("#discovery_url_config .admin-links button").click
+      f("#discovery_url_config .delete_url").click
+
+      wait_for_ajax_requests
+
+      f("#discovery_url_input").attribute(:value).should == ''
+      @account.reload
+      @account.auth_discovery_url.should == nil
+    end
   end
 
   describe "user/course search" do
-
-    STUDENT_NAME = 'student@example.com'
-    COURSE_NAME = 'new course'
-    ERROR_TEXT = 'No Results Found'
-
     def submit_input(form_element, input_field_css, input_text, expect_new_page_load = true)
       form_element.find_element(:css, input_field_css).send_keys(input_text)
-      go_button = form_element.find_element(:css, '.button')
+      go_button = form_element.find_element(:css, 'button')
       if expect_new_page_load
         expect_new_page_load { go_button.click }
       else
@@ -265,37 +284,72 @@ describe "account" do
     end
 
     before (:each) do
-      course = Course.create!(:account => Account.default, :name => COURSE_NAME, :course_code => COURSE_NAME)
-      course.reload
-      student_in_course(:name => STUDENT_NAME)
+      @student_name = 'student@example.com'
+      @course_name = 'new course'
+      @error_text = 'No Results Found'
+
+      @course = Course.create!(:account => Account.default, :name => @course_name, :course_code => @course_name)
+      @course.reload
+      student_in_course(:name => @student_name)
       get "/accounts/#{Account.default.id}/courses"
     end
 
     it "should search for an existing course" do
-      find_course_form = driver.find_element(:id, 'new_course')
-      submit_input(find_course_form, '#course_name', COURSE_NAME)
-      driver.find_element(:id, 'section-tabs-header').should include_text(COURSE_NAME)
+      find_course_form = f('#new_course')
+      submit_input(find_course_form, '#course_name', @course_name)
+      f('#section-tabs-header').should include_text(@course_name)
+    end
+
+    it "should correctly autocomplete for courses" do
+      get "/accounts/#{Account.default.id}"
+      f('#course_name').send_keys(@course_name.chop)
+
+      keep_trying_until do
+        ui_auto_complete = f('.ui-autocomplete')
+        ui_auto_complete.should be_displayed
+      end
+
+      element = ff('.ui-autocomplete li a').first
+      element.text.should == @course_name
+      keep_trying_until do
+        driver.execute_script("$('.ui-autocomplete li a').hover().click()")
+        driver.current_url.should include("/courses/#{@course.id}")
+      end
     end
 
     it "should search for an existing user" do
-      find_user_form = driver.find_element(:id, 'new_user')
-      submit_input(find_user_form, '#user_name', STUDENT_NAME, false)
+      find_user_form = f('#new_user')
+      submit_input(find_user_form, '#user_name', @student_name, false)
       wait_for_ajax_requests
-      driver.find_element(:css, '.users').should include_text(STUDENT_NAME)
+      f('.users').should include_text(@student_name)
     end
 
     it "should behave correctly when searching for a course that does not exist" do
-      find_course_form = driver.find_element(:id, 'new_course')
+      find_course_form = f('#new_course')
       submit_input(find_course_form, '#course_name', 'some random course name that will not exist')
       wait_for_ajax_requests
-      driver.find_element(:id, 'content').should include_text(ERROR_TEXT)
-      driver.find_element(:id, 'new_user').find_element(:id, 'user_name').text.should be_empty #verifies bug #5133 is fixed
+      f('#content').should include_text(@error_text)
+      f('#new_user').find_element(:id, 'user_name').text.should be_empty #verifies bug #5133 is fixed
     end
 
     it "should behave correctly when searching for a user that does not exist" do
-      find_user_form = driver.find_element(:id, 'new_user')
+      find_user_form = f('#new_user')
       submit_input(find_user_form, '#user_name', 'this student name will not exist', false)
-      driver.find_element(:id, 'content').should include_text(ERROR_TEXT)
+      f('#content').should include_text(@error_text)
+    end
+  end
+
+  describe "user details view" do
+    def create_sub_account(name = 'sub_account', parent_account = Account.default)
+      Account.create(:name => name, :parent_account => parent_account)
+    end
+
+    it "should be able to view user details from parent account" do
+      user_non_root = user
+      create_sub_account.add_user(user_non_root)
+      get "/accounts/#{Account.default.id}/users/#{user_non_root.id}"
+      #verify user details displayed properly
+      f('.accounts .unstyled_list li').should include_text('sub_account')
     end
   end
 end

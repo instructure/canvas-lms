@@ -22,15 +22,14 @@
 #   into proper dialog buttons (look at fixDialogButtons to see what it does)
 #   <div class="button-container">
 #     <button type="submit">This will Submit the form</button>
-#     <a class="button dialog_closer">This will cause the dialog to close</a>
+#     <a class="btn dialog_closer">This will cause the dialog to close</a>
 #   </div>
 # </form>
 
 define [
   'jquery'
-  'compiled/fn/preventDefault'
   'compiled/jquery/fixDialogButtons'
-], ($, preventDefault) ->
+], ($) ->
 
   updateTextToState = (newStateOfRegion) ->
     return ->
@@ -47,7 +46,7 @@ define [
 
   toggleRegion = ($region, showRegion) ->
     showRegion ?= ($region.is(':ui-dialog:hidden') || ($region.attr('aria-expanded') != 'true'))
-    $allElementsControllingRegion = $(".element_toggler[aria-controls=#{$region.attr('id')}]")
+    $allElementsControllingRegion = $("[aria-controls*=#{$region.attr('id')}]")
 
     # hide/un-hide .element_toggler's that point to this $region that were hidden because they have
     # the data-hide-while-target-shown attribute
@@ -71,18 +70,28 @@ define [
       else if $region.dialog('isOpen')
         $region.dialog('close')
 
-    # move focus to the region if tabbable (to make anything tabbable, just give it a tabindex)
-    $region.focus() if showRegion && $region.is(':focusable')
+    if showRegion
+      # to make things accessable:
+      # move focus to the region if tabbable (or it's first tabbable child).
+      # to make anything tabbable, just give it a tabindex
+      $firstFocusableEl = $region.find('*').andSelf().filter(':focusable').first()
+      $firstFocusableEl.focus() if $firstFocusableEl.length
 
     $allElementsControllingRegion.each updateTextToState( if showRegion then 'Shown' else 'Hidden' )
 
-  $(document).delegate '.element_toggler[aria-controls]', 'click', preventDefault ->
+  $(document).on 'click change', '.element_toggler[aria-controls]', (event) ->
     $this = $(this)
+
+    if $this.is('input[type="checkbox"]')
+      return if event.type is 'click'
+      force = $this.prop('checked')
+
+    event.preventDefault() if event.type is 'click'
 
     # allow .links inside .user_content to be elementTogglers, but only for other elements inside of
     # that .user_content area
     $parent = $this.closest('.user_content')
     $parent = $(document.body) unless $parent.length
 
-    $region = $parent.find("##{$this.attr('aria-controls')}")
-    toggleRegion($region) if $region.length
+    $region = $parent.find("##{$this.attr('aria-controls').replace(/\s/g, ', #')}")
+    toggleRegion($region, force) if $region.length

@@ -20,15 +20,29 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
 describe "/wiki_pages/show" do
-  it "should render" do
+  before do
     course_with_student
     view_context
     assigns[:wiki] = @course.wiki
     assigns[:page] = assigns[:wiki].wiki_page
+    assigns[:page].body = "my awesome content"
     assigns[:page].save!
     assigns[:context] = @course
+  end
+
+  it "should render" do
     render "wiki_pages/show"
-    response.should_not be_nil
+    doc = Nokogiri::HTML(response.body)
+    doc.css('#wiki_body').text.index(assigns[:page].body).should_not be_nil
+  end
+
+  it "should not render user content when editing" do
+    assigns[:editing] = true
+    render "wiki_pages/show"
+
+    doc = Nokogiri::HTML(response.body)
+    doc.css('#wiki_body').text.index(assigns[:page].body).should be_nil
+    doc.css('#wiki_body').text.index('Editing Content').should_not be_nil
   end
 end
 

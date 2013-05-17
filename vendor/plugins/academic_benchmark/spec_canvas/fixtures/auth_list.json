@@ -1,0 +1,46 @@
+{"status":"ok", "itm":[
+  {
+    "title":"United States",
+    "guid":"US",
+    "type":"country",
+    "itm":[
+      {
+        "title":"NGA Center/CCSSO",
+        "guid":"AAA",
+        "type":"authority",
+        "chld":"1"
+      },
+      {
+        "title":"South Carolina",
+        "guid":"CCC",
+        "type":"authority",
+        "chld":"2"
+      },
+      {
+        "title":"Louisiana",
+        "guid":"BBB",
+        "type":"authority",
+        "chld":"3"
+      }
+    ]
+  },
+  {
+    "title":"Canvas Land",
+    "guid":"CL",
+    "type":"country",
+    "itm":[
+      {
+        "title":"Good Standards",
+        "guid":"111",
+        "type":"authority",
+        "chld":"2"
+      },
+      {
+        "title":"Bad Standards",
+        "guid":"222",
+        "type":"authority",
+        "chld":"3"
+      }
+    ]
+  }
+]}

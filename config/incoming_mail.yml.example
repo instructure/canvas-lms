@@ -2,8 +2,8 @@
 # available options.  rails_root will be configured automatically.
 #
 # Currently, there are three ways to process incoming mail:
-#  * Fetch directly from POP3, controlled by the Canvas job server
-#    * Make sure to configure pop3, ignore stdin, and set the poll_interval to 0
+#  * Fetch directly from POP3/IMAP, controlled by the Canvas job server
+#    * Make sure to configure pop3/imap, ignore stdin, and set the poll_interval to 0
 #  * Process messages by piping them to script/process_incoming_messages
 #    * Make sure to not ignore stdin
 #  * Monitor a maildir
@@ -30,3 +30,25 @@ production:
     username: "user"
     password: "password"
     ssl: true
+
+# To configure multiple pop3/imap accounts, configure a pop3/imap section with 
+# default values and add an accounts section that contains an array of 
+# override values for each account. In this case, poll_interval must be set to 0.
+# example:
+
+multiple_inboxes:
+  poll_interval: 0
+  ignore_stdin: true
+  imap:
+    server: "imap.example.com"
+    port: 143
+    ssl: true
+    accounts:
+    - username: "user1@example.com"
+      password: "pass1"
+
+    - username: "user2@example.com"
+      password: "pass2"
+
+    - username: "user3@example.com"
+      password: "pass3"

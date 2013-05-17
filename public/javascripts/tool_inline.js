@@ -34,7 +34,8 @@ if(!$("#tool_form").hasClass('new_tab')) {
 }
 
 var toolName = $("#tool_form").attr('data-tool-id') || "unknown";
-$.trackEvent('tool_launch', toolName);
+var toolPath = $("#tool_form").attr('data-tool-path');
+$.trackEvent('tool_launch', toolName, toolPath);
 
 $("#tool_form:not(.new_tab)").submit().hide();
 $(document).ready(function() {

@@ -20,9 +20,10 @@ define([
   'INST' /* INST */,
   'i18n!select_content_dialog',
   'jquery' /* $ */,
-  'jquery.ajaxJSON' /* ajaxJSONFiles, ajaxJSON */,
-  'jquery.instructure_forms' /* getFormData, errorBox */,
+  'jquery.ajaxJSON' /* ajaxJSON */,
+  'jquery.instructure_forms' /* ajaxJSONFiles, getFormData, errorBox */,
   'jqueryui/dialog',
+  'compiled/jquery/fixDialogButtons' /* fix dialog formatting */,
   'jquery.instructure_misc_helpers' /* replaceTags, getUserServices, findLinkForService */,
   'jquery.instructure_misc_plugins' /* showIf */,
   'jquery.keycodes' /* keycodes */,
@@ -74,22 +75,23 @@ $(document).ready(function() {
     $("#select_context_content_dialog #context_module_sub_headers_select :text").val("");
     $('#add_module_item_select').change();
     $("#select_context_content_dialog .module_item_select").change();
-    $("#select_context_content_dialog").dialog('close').dialog({
-      autoOpen: true,
+    $("#select_context_content_dialog").dialog({
       title: dialog_title,
       width: 400
-    }).dialog('open');
+    }).fixDialogButtons();
     $("#select_context_content_dialog").dialog('option', 'title', dialog_title);
   }
   $("#select_context_content_dialog .cancel_button").click(function() {
-    $("#select_context_content_dialog").dialog('close');
+    $dialog.find('.alert').remove();
+    $dialog.dialog('close');
   });
   $("#select_context_content_dialog .item_title").keycodes('return', function() {
     $(this).parents(".module_item_option").find(".add_item_button").click();
   });
   $("#select_context_content_dialog .add_item_button").click(function() {
     var submit = function(item_data) {
-      $("#select_context_content_dialog").dialog('close');
+      $dialog.dialog('close');
+      $dialog.find('.alert').remove();
       var submitted = $dialog.data('submitted_function');
       if(submitted && $.isFunction(submitted)) {
         submitted(item_data);
@@ -114,7 +116,14 @@ $(document).ready(function() {
       }
       item_data['item[url]'] = $("#external_tool_create_url").val();
       item_data['item[title]'] = $("#external_tool_create_title").val();
-      submit(item_data);   
+      $dialog.find('.alert-error').remove();
+      if (item_data['item[url]'] === '') {
+        var $errorBox = $('<div />', { 'class': 'alert alert-error', role: 'alert' }).css({marginTop: 8 });
+        $errorBox.text(I18n.t('errors.external_tool_url', "An external tool can't be saved without a URL."));
+        $dialog.prepend($errorBox);
+      } else {
+        submit(item_data);
+      }
     } else if(item_type == 'context_module_sub_header') {
       var item_data = {
         'item[type]': $("#add_module_item_select").val(),
@@ -138,8 +147,16 @@ $(document).ready(function() {
           var url = $("#select_context_content_dialog .module_item_option:visible:first .new .add_item_url").attr('href');
           var data = $("#select_context_content_dialog .module_item_option:visible:first").getFormData();
           var callback = function(data) {
+            var obj;
+
+            // discussion_topics will come from real api v1 and so wont be nested behind a `discussion_topic` root object
+            if (item_data['item[type]'] === 'discussion_topic') {
+              obj = data;
+            } else {
+              obj = data[item_data['item[type]']]; // e.g. data['wiki_page'] for wiki pages
+            }
+
             $("#select_context_content_dialog").loadingImage('remove');
-            var obj = data[item_data['item[type]']] // e.g. data['wiki_page'] for wiki pages
             item_data['item[id]'] = obj.id;
             item_data['item[title]'] = $("#select_context_content_dialog .module_item_option:visible:first .item_title").val();
             item_data['item[title]'] = item_data['item[title]'] || obj.display_name
@@ -215,7 +232,7 @@ $(document).ready(function() {
             });
           })
           .bind('selection', function(event, data) {
-            if(data.embed_type == 'basic_lti' && data.url) {
+            if(data.return_type == 'lti_launch_url' && data.url) {
               $("#external_tool_create_url").val(data.url);
               $("#external_tool_create_title").val(data.text || tool.name);
               $("#context_external_tools_select .domain_message").hide();

@@ -81,8 +81,14 @@ module SIS
           group.workflow_state = 'deleted'
         end
 
-        group.save
-        @success_count += 1
+        if group.save
+          @success_count += 1
+        else
+          msg = "A group did not pass validation "
+          msg += "(" + "group: #{group_id}, error: " + 
+          msg += group.errors.full_messages.join(",") + ")"
+          raise ImportError, msg
+        end
       end
 
     end

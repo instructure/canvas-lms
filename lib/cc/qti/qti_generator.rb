@@ -198,6 +198,8 @@ module CC
           q_node.could_be_locked quiz.could_be_locked unless quiz.could_be_locked.nil?
           q_node.time_limit quiz.time_limit unless quiz.time_limit.nil?
           q_node.allowed_attempts quiz.allowed_attempts unless quiz.allowed_attempts.nil?
+          q_node.one_question_at_a_time quiz.one_question_at_a_time?
+          q_node.cant_go_back quiz.cant_go_back?
           q_node.available quiz.available?
           if quiz.assignment && !quiz.assignment.deleted?
             assignment_migration_id = CCHelper.create_key(quiz.assignment)

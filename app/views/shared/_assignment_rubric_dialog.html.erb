@@ -20,11 +20,13 @@
     </div>
     <%= render :partial => "shared/rubric_forms" %>
   <% end %>
-  <a href="#" class="button add_rubric_link" style="margin-top: 20px; <%= hidden if @assignment && @assignment.rubric_association %>"><%= image_tag "rubric.png" %> <%= t 'links.add_rubric', "Add Rubric" %></a>
+  <a href="#" class="btn add_rubric_link" style="margin-top: 20px; <%= hidden if @assignment && @assignment.rubric_association %>"><%= image_tag "rubric.png" %> <%= t 'links.add_rubric', "Add Rubric" %></a>
 </div>
 
 <script>
-  require(['edit_rubric'])
+  window.ENV = window.ENV || {};
+  window.ENV.ROOT_OUTCOME_GROUP = <%= raw @root_outcome_group %>;
+  require(['compiled/bundles/edit_rubric'])
 </script>
 
 

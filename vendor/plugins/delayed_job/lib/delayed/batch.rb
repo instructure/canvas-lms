@@ -23,20 +23,32 @@ module Delayed
     end
 
     class << self
-      def serial_batch
-        prepare_batches(:serial){ yield }
+      def serial_batch(opts = {})
+        prepare_batches(:serial, opts){ yield }
       end
 
       private
-      def prepare_batches(mode)
+      def prepare_batches(mode, opts)
         raise "nested batching is not supported" if Delayed::Job.batches
         Delayed::Job.batches = Hash.new { |h,k| h[k] = [] }
+        batch_enqueue_args = [:queue]
+        batch_enqueue_args << :priority unless opts[:priority]
+        Delayed::Job.batch_enqueue_args = batch_enqueue_args
         yield
       ensure
         batches = Delayed::Job.batches
         Delayed::Job.batches = nil
+        batch_args = opts.slice(:priority)
         batches.each do |enqueue_args, batch|
-          Delayed::Job.enqueue(Delayed::Batch::PerformableBatch.new(mode, batch), enqueue_args)
+          if batch.size == 0
+            next
+          elsif batch.size == 1
+            args = batch.first.merge(batch_args)
+            payload_object = args.delete(:payload_object)
+            Delayed::Job.enqueue(payload_object, args)
+          else
+            Delayed::Job.enqueue(Delayed::Batch::PerformableBatch.new(mode, batch), enqueue_args.merge(batch_args))
+          end
         end
       end
     end

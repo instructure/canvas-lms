@@ -1,0 +1,33 @@
+<% conference = current_conference %>
+<% if conference.active? && can_do(conference, @current_user, :join) %>
+<div class="global-message image-block conference">
+  <div class="image-block-image">
+    <i class="information-icon"></i>
+    <span class="hidden-inline-text">
+      <%= accessible_message_icon_text("information") %>
+    </span>
+  </div>
+  <div class="image-block-content">
+    <div class="message">
+      <p><%=
+          mt(:current_conference_text, "You have been invited to join **[%{conference}](%{link_to_conference})**. It started at %{started_at} and has %{participant_count}.", {
+            :conference => conference.title,
+            :link_to_conference => context_url(@context, :context_conference_url, conference.id),
+            :started_at => time_string(conference.started_at),
+            :participant_count => t(:participant_count, "participant", :count => conference.added_users.length)
+          })
+        %></p>
+    </div>
+    <div class="buttons">
+      <% if can_do(conference, @current_user, :close) %>
+        <a href="<%= context_url(@context, :context_conference_close_url, conference.id) %>" class="btn btn-small close_conference_link">
+          <%= t('#conferences.show.buttons.close', "End it now") %>
+        </a>
+      <% end %>
+      <a target="_blank" href="<%= context_url(@context, :context_conference_join_url, conference.id) %>" class="btn btn-small btn-primary join_conference_link">
+        <%= t('#conferences.show.buttons.join', "Join it now") %>
+      </a>
+    </div>
+  </div>
+</div>
+<% end %>

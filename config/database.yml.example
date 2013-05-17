@@ -1,3 +1,4 @@
+# do not create a queue: section for your test environment
 test:
   adapter: postgresql
   encoding: utf8
@@ -16,15 +17,11 @@ development:
   adapter: postgresql
   encoding: utf8
   database: canvas_development
-  host: localhost
-  username: canvas
   timeout: 5000
   queue:
     adapter: postgresql
     encoding: utf8
     database: canvas_queue_development
-    host: localhost
-    username: canvas
     timeout: 5000
     
 production:

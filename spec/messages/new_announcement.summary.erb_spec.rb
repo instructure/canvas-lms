@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -23,6 +23,9 @@ describe 'new_announcement.summary' do
   it "should render" do
     announcement_model
     @object = @a
-    generate_message(:new_announcement, :summary, @object)
+    @message = generate_message(:new_announcement, :summary, @object)
+    @message.subject.should == "value for title: value for name"
+    @message.url.should match(/\/courses\/\d+\/announcements\/\d+/)
+    @message.body.strip.should == "value for message"
   end
 end

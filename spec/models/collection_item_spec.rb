@@ -35,18 +35,19 @@ describe 'CollectionItem' do
       @user2.visible_stream_item_instances.should be_empty
       items = @user1.visible_stream_item_instances.map(&:stream_item)
       items.size.should == 1
-      items.first.data.type.should == 'CollectionItem'
+      items.first.data.class.name.should == 'CollectionItem'
     end
   end
 
   context "across shards" do
-    it_should_behave_like "sharding"
+    specs_require_sharding
 
     it "should handle user upvotes on another shard" do
       @shard1.activate { @user1 = user_model }
       @shard2.activate { @item = collection_item_model(:collection => group_model.collections.create!, :user => user_model) }
       @upvote = CollectionItemUpvote.create!(:user => @user1, :collection_item_data => @item.data)
       @upvote.shard.should == @user1.shard
+      @upvote.reload.user.should == @user1
       @item.data.reload.upvote_count.should == 1
 
       [ Shard.default, @shard1, @shard2 ].each do |shard|

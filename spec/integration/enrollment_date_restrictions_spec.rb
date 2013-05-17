@@ -52,6 +52,23 @@ describe "enrollment_date_restrictions" do
     page.css(".past_enrollments li").should be_empty
   end
 
+  it "should not show deleted enrollments in past enrollments when course is completed" do
+    @student = user_with_pseudonym
+    e1 = student_in_course(:user => @student, :active_all => 1)
+
+    e1.destroy
+    e1.workflow_state.should == 'deleted'
+
+    @course.complete
+    @course.workflow_state.should == 'completed'
+
+    user_session(@student, @pseudonym)
+
+    get "/courses"
+    page = Nokogiri::HTML(response.body)
+    page.css(".past_enrollments li").should be_empty
+  end
+
   it "should not list groups from inactive enrollments in the menu" do
     @student = user_with_pseudonym
     @course1 = course(:course_name => "Course 1", :active_all => 1)

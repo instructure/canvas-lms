@@ -61,7 +61,7 @@ define [
         @$tokens.resizeTokens(@$tokens)
 
       # key capture input
-      @$input = $('<input />')
+      @$input = $('<input name="token_capture" />')
         .appendTo(@$scroller)
         .css('width', '20px')
         .css('font-size', @$fakeInput.css('font-size'))

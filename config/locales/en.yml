@@ -2,10 +2,13 @@ en:
   date:
     formats:
       weekday: "%A"
+      short_weekday: "%a"
+      medium_with_weekday: "%a %b %-d, %Y"
       medium: "%b %-d, %Y"
       short: "%b %-d"
       short_month: "%b"
       medium_month: "%b %Y"
+      date_at_time: "%b %-d at %l:%M%P"
     days:
       today_lower: "today"
   time:
@@ -17,3 +20,12 @@ en:
       or:
         two_words_connector: ' or '
         last_word_connector: ', or '
+    help_menu:
+      community_support_forums: 'Community Support Forums'
+      contact_support: 'Contact Support'
+      contact_support_sub_text: 'Get assistance with time-sensitive issues.'
+      networking_academy_faqs: 'Networking Academy FAQs'
+      curriculum_assessment_errata: 'Curriculum/Assessment Errata'
+      community_support_description: 'Interact with and get assistance from your peers.'
+      networking_academy_description: 'View Cisco answers to the most commonly asked questions.'
+      curriculum_assessment_errata_description: 'View already reported assessment and curricula errors. Search for "errata."'

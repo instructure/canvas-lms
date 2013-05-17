@@ -1,9 +1,15 @@
-<div style="margin-left: 30px;">
+<%
+   editable ||= false
+%>
+<div>
+  <% value = (@stored_params.present?) ? h(@stored_params["question_#{hash_get(question, :id)}"]) : h(hash_get(user_answer, :text).to_s) %>
 <% if question_type.entry_type == "text_box" %>
-  <input type="text" name="question_<%= hash_get(question, :id) %>" value="<%= h(@stored_params["question_#{hash_get(question, :id)}"]) %>" class="question_input" autocomplete='off'/>
+  <input type="text" name="question_<%= hash_get(question, :id) %>" value="<%= value %>" class="question_input" autocomplete='off' <%= 'readonly="readonly"' unless editable %>/>
 <% elsif question_type.entry_type == "numerical_text_box" %>
-  <input type="text" name="question_<%= hash_get(question, :id) %>" value="<%= h(@stored_params["question_#{hash_get(question, :id)}"]) %>" class="question_input numerical_question_input" autocomplete='off'/>
+  <input type="text" name="question_<%= hash_get(question, :id) %>" value="<%= value %>" class="question_input numerical_question_input" autocomplete='off' <%= 'readonly="readonly"' unless editable %>/>
 <% elsif question_type.entry_type == "textarea" %>
-  <textarea name="question_<%= hash_get(question, :id) %>" class="question_input" style="width: 90%;" autocomplete='off'><%= h(@stored_params["question_#{hash_get(question, :id)}"]) %></textarea>
+  <textarea name="question_<%= hash_get(question, :id) %>" class="question_input" style="width: 90%;" autocomplete='off' <%= 'readonly="readonly"' unless editable %>><%= value %></textarea>
+<% elsif question_type.entry_type == "file" %>
+  <input type="file" name="question_<%= hash_get(question, :id) %>" value="<%= value %>" class="question_input" <%= 'readonly="readonly"' unless editable %>/>
 <% end %>
 </div>

@@ -19,18 +19,21 @@
 define([
   'i18n!assignments' /* I18n.t */,
   'jquery' /* $ */,
+  'compiled/views/GoogleDocsTreeView',
+  'jst/assignments/homework_submission_tool',
   'compiled/jquery.rails_flash_notifications',
-  'jquery.ajaxJSON' /* ajaxJSONPreparedFiles, ajaxJSON */,
+  'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.inst_tree' /* instTree */,
-  'jquery.instructure_forms' /* getFormData */,
+  'jquery.instructure_forms' /* ajaxJSONPreparedFiles, getFormData */,
   'jqueryui/dialog',
   'jquery.instructure_misc_plugins' /* fragmentChange, showIf, /\.log\(/ */,
   'jquery.templateData' /* getTemplateData */,
   'media_comments' /* mediaComment */,
+  'compiled/tinymce',
   'tinymce.editor_box' /* editorBox */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'jqueryui/tabs' /* /\.tabs/ */
-], function(I18n, $) {
+], function(I18n, $, GoogleDocsTreeView, homework_submission_tool) {
 
   window.submissionAttachmentIndex = -1;
 
@@ -42,14 +45,20 @@ define([
     // hasn't entered any content.
     submissionForm.delegate('#submission_comment', 'focus', function(e) {
       var box = $(this);
-      if (box.val().trim() === '') { box.css('height', '72px'); }
+      if (box.val().trim() === '') { box.addClass('focus_or_content'); }
     }).delegate('#submission_comment', 'blur', function(e) {
       var box = $(this);
-      if (box.val().trim() === '') { box.css('height', '16px'); }
+      if (box.val().trim() === '') { box.removeClass('focus_or_content'); }
     });
 
     submissionForm.submit(function(event) {
       var $turnitin = $(this).find(".turnitin_pledge");
+      if($("#external_tool_submission_type").val() == "online_url_to_file") { 
+        event.preventDefault();
+        event.stopPropagation();
+        uploadFileFromUrl();
+        return; 
+      }
       if($turnitin.length > 0 && !$turnitin.attr('checked')) {
         alert(I18n.t('messages.agree_to_pledge', "You must agree to the submission pledge before you can submit this assignment."));
         event.preventDefault();
@@ -100,19 +109,21 @@ define([
             window.location = window.location.href.replace(window.location.hash, "");
           },
           error: function(data) {
-            $(this).find("button[type='submit']").text(I18n.t('messages.submit_failed', "Submit Failed, please try again"));
-            $(this).find("button").attr('disabled', false);
+            submissionForm.find("button[type='submit']").text(I18n.t('messages.submit_failed', "Submit Failed, please try again"));
+            submissionForm.find("button").attr('disabled', false);
           }
         });
       } else {
         submitting = true;
       }
     });
+
     window.onbeforeunload = function() {
       if($("#submit_assignment:visible").length > 0 && !submitting) {
         return I18n.t('messages.not_submitted_yet', "You haven't finished submitting your assignment.  You still need to click \"Submit\" to finish turning it in.  Do you want to leave this page anyway?");
       }
     };
+
     $(document).fragmentChange(function(event, hash) {
       if(hash && hash.indexOf("#submit") == 0) {
         $(".submit_assignment_link").triggerHandler('click', true);
@@ -121,6 +132,7 @@ define([
         }
       }
     });
+
     $(".submit_assignment_link").click(function(event, skipConfirmation) {
       event.preventDefault();
       var late = $(this).hasClass('late');
@@ -134,21 +146,25 @@ define([
         }
         if(!result) { return; }
       }
-      hideFullAssignmentForm();
       $("#submit_assignment").show();
       $(".submit_assignment_link").hide();
       $("html,body").scrollTo($("#submit_assignment"));
       $("#submit_online_text_entry_form textarea:first").editorBox();
+      checkForHomeworkSubmissionTools();
     });
+
     $("#switch_text_entry_submission_views").click(function(event) {
       event.preventDefault();
       $("#submit_online_text_entry_form textarea:first").editorBox('toggle');
     });
+
     $(".submit_assignment_form .cancel_button").click(function() {
       $("#submit_assignment").hide();
       $(".submit_assignment_link").show();
     });
+
     $("#submit_assignment_tabs").tabs();
+
     $("#uploaded_files > ul").instTree({
       autoclose: false,
       multi: true,
@@ -164,22 +180,42 @@ define([
         $("#submission_attachment_ids").val(ids.join(","));
       }
     });
+
     $(".toggle_uploaded_files_link").click(function(event) {
       event.preventDefault();
       $("#uploaded_files").slideToggle();
     });
+
     $(".add_another_file_link").click(function(event) {
       event.preventDefault();
       $('#submission_attachment_blank').clone(true).removeAttr('id').show().insertBefore(this)
         .find("input").attr('name', 'attachments[' + (++submissionAttachmentIndex) + '][uploaded_data]');
       toggleRemoveAttachmentLinks();
     }).click();
+
     $(".remove_attachment_link").click(function(event) {
       event.preventDefault();
       $(this).parents(".submission_attachment").remove();
       checkAllowUploadSubmit();
       toggleRemoveAttachmentLinks();
     });
+
+    $(".submit_online_url_option").click(function(event) {
+      if($(this).attr("href") == '#submit_google_doc_form'){
+        var url = window.location.pathname + "/list_google_docs";
+        $.get(url,{}, function(data, textStatus){
+
+          var tree = new GoogleDocsTreeView({model: data});
+          $('div#google_docs_container').html(tree.el);
+          tree.render();
+          tree.on('activate-file', function(file_id){
+            $("#submit_google_doc_form").find("input[name='google_doc[document_id]']").val(file_id);
+          });
+
+        }, 'json');
+      }
+    });
+
     function toggleRemoveAttachmentLinks(){
       $('#submit_online_upload_form .remove_attachment_link').showIf($('#submit_online_upload_form .submission_attachment:not(#submission_attachment_blank)').length > 1);
     }
@@ -190,42 +226,22 @@ define([
     $(".submission_attachment input[type=file]").live('change', function() {
       if (ENV.SUBMIT_ASSIGNMENT.ALLOWED_EXTENSIONS.length < 1 || $(this).val() == "")
         return;
+
       var ext = $(this).val().split('.').pop().toLowerCase();
       $(this).parent().find('.bad_ext_msg').showIf($.inArray(ext, ENV.SUBMIT_ASSIGNMENT.ALLOWED_EXTENSIONS) < 0);
       checkAllowUploadSubmit();
     });
   });
 
-  $(document).ready(function() {
-    $("#google_docs_tree").instTree({
-      autoclose: false,
-      multi: false,
-      dragdrop: false
-    });
-    $("#google_docs_tree li.file").click(function(event) {
-      if($(event.target).closest(".popout").length > 0) { return; }
-      event.preventDefault();
-      event.stopPropagation();
-      $("#google_docs_tree li.file.active").removeClass('active');
-      $(this).addClass('active');
-      $("#submit_google_doc_form").find("input[name='google_doc[document_id]']").val($(this).attr('id').substring(9));
-    });
-    $("#google_docs_tree li.folder").click(function(event) {
-      if($(event.target).closest('.sign').length == 0 && $(event.target).closest('.file,.folder').hasClass('folder')) {
-        $(this).find(".sign").click();
-      }
-    });
-  });
   $("#submit_google_doc_form").submit(function() {
-    $("#uploading_google_doc_message").dialog('close').dialog({
-      autoOpen: false,
+    $("#uploading_google_doc_message").dialog({
       title: I18n.t('titles.uploading', "Uploading Submission"),
       modal: true,
       overlay: {
         backgroundColor: "#000",
         opacity: 0.7
       }
-    }).dialog('open');
+    });
   });
 
   $(document).ready(function() {
@@ -238,8 +254,141 @@ define([
         $("#submit_media_recording_form .media_comment_type").val(type);
         $("#media_media_recording_submission_holder").children().hide();
         $("#media_media_recording_ready").show();
+        $("#media_comment_submit_button").attr('disabled', false);
         $("#media_media_recording_thumbnail").attr('id', 'media_comment_' + id);
       });
     });
+  });
+  
+  var $tools = $("#submit_from_external_tool_form");
+  // The "More" tab will only appear for users once the API has
+  // returned at least one valid homework submission tool, so
+  // most users will never see it.
+  // TODO: Change this to add the "More" tab for everyone with
+  // a way to browse/suggest tools if the user has none set up
+  function checkForHomeworkSubmissionTools() {
+    if(!checkForHomeworkSubmissionTools.loading) {
+      checkForHomeworkSubmissionTools.loading = true;
+      var url = $("#external_tools_url").attr('href');
+      $.ajaxJSON(url, 'GET', {}, function(data) {
+        if(!data.length) {
+          $tools.find("ul.tools li").text(I18n.t('no_tools_found', 'No tools found'));
+        } else {
+          $(".submit_from_external_tool_option").parent().show();
+          $tools.find("ul.tools").empty();
+          for(var idx = 0; idx < data.length; idx++) {
+            var tool = data[idx];
+            var text = tool.homework_submission.locales && tool.homework_submission.locales[I18n.locale];
+            text = text || tool.homework_submission.locales && tool.homework_submission.locales[I18n.defaultLocale];
+            text = text || tool.homework_submission.text;
+            text = text || tool.name;
+            tool.display_text = text;
+            var html = homework_submission_tool(tool);
+            var $li = $(html).data('tool', tool);
+            $tools.find("ul.tools").append($li);
+          }
+        }
+      }, function() {
+        $tools.find("ul.tools li.none").text(I18n.t('loading_tools_failed', 'Loading tools failed'));
+      });
+    }
+  }
+  function uploadFileFromUrl() {
+    var promise = $.Deferred();
+    function checkFileStatus(url, callback, error) {
+      $.ajaxJSON(url, 'GET', {}, function(data) {
+        if(data.upload_status == 'ready') {
+          callback(data.attachment);
+        } else if(data.upload_status == 'errored') {
+          error(data.message);
+        } else {
+          setTimeout(function() { checkFileStatus(url, callback, error) }, 2500);
+        }
+      }, function(data) {
+        error(data.message);
+      });
+    };
+    var file_params = {url: $("#external_tool_url").val(), name: $("#external_tool_filename").val(), content_type: $("#external_tool_content_type").val()}
+    $.ajaxJSON($("#homework_file_url").attr('href'), 'POST', file_params, function(data) {
+      checkFileStatus(data.status_url, function(file_data) {
+        $("#external_tool_submission_type").val('online_upload');
+        $("#external_tool_file_id").val(file_data.id);
+        promise.resolve();
+        $tools.submit();
+      }, function(message) {
+        promise.resolve();
+        $tools.find(".submit").text(I18n.t('file_retrieval_error', "Retrieving File Failed"));
+        $.flashError(I18n.t("invalid_file_retrieval", "There was a problem retrieving the file sent from this tool."));
+        console.log(message);
+      });
+    }, function(data) {
+      promise.resolve();
+      $tools.find(".submit").text(I18n.t('file_retrieval_error', "Retrieving File Failed"));
+    });
+    $tools.disableWhileLoading(promise, {buttons: {'.submit': I18n.t('getting_file', 'Retrieving File...')}})
+  };
+  $("#submit_from_external_tool_form .tools li").live('click', function(event) {
+    event.preventDefault();
+    var tool = $(this).data('tool');
+    var url = "/courses/" + $("#identity .course_id").text() + "/external_tools/" + tool.id + "/resource_selection?homework=1&assignment_id=" + ENV.SUBMIT_ASSIGNMENT.ID;
+    var width = tool.homework_submission.selection_width;
+    var height = tool.homework_submission.selection_height;
+    var title = tool.display_text;
+    var $div = $("<div/>", {id: "homework_selection_dialog"}).appendTo($("body"));
+    function invalidToolReturn(message) {
+      $.flashError(I18n.t("invalid_tool_return", "The launched tool returned an invalid resource for this assignment"));
+      console.log(message);
+      $div.dialog('close');
+    }
+    $div.append($("<iframe/>", {frameborder: 0, src: url, id: "homework_selection_iframe"}).css({width: width, height: height}))
+      .bind('selection', function(event, data) {
+        var valid_submission = true
+        if(data.return_type == 'url') {
+          if($("#submit_online_url_form").length) {
+            $("#external_tool_url").val(data.url);
+            $("#external_tool_submission_type").val('online_url');
+            $("#submit_from_external_tool_form").addClass('has_submission');
+            var $link = $("<a/>", {href: data.url}).text(data.text || data.title);
+            $("#external_tool_submission_details").empty().append($link).attr('class', 'url_submission');
+          } else {
+            invalidToolReturn("this assignment doesn't accept URL submissions");
+            return;
+          }
+        } else if(data.return_type == 'file') {
+          if($("#submit_online_upload_form").length) {
+            var ext = data.text.split(/\./).pop();
+            if(ENV.SUBMIT_ASSIGNMENT && ENV.SUBMIT_ASSIGNMENT.ALLOWED_EXTENSIONS && ENV.SUBMIT_ASSIGNMENT.ALLOWED_EXTENSIONS.length > 0) {
+              if(!data.text.match(/\./) || $.inArray(ext, ENV.SUBMIT_ASSIGNMENT.ALLOWED_EXTENSIONS) < 0) {
+                valid_submission = false;
+              }
+            }
+            $("#external_tool_url").val(data.url);
+            $("#external_tool_submission_type").val('online_url_to_file');
+            $("#external_tool_filename").val(data.text);
+            $("#external_tool_content_type").val(data.content_type);
+            $("#submit_from_external_tool_form").addClass('has_submission');
+            var $link = $("<a/>", {href: data.url}).text(data.text);
+            $("#external_tool_submission_details").empty().append($link).attr('class', 'file_submission');
+          } else {
+            invalidToolReturn("this assignment doesn't accept file submissions");
+            return;
+          }
+        } else {
+          invalidToolReturn("return_type must be 'link' or 'file'");
+          return;
+        }
+
+        $('#submit_from_external_tool_form .bad_ext_msg').showIf(!valid_submission);
+        $('#submit_from_external_tool_form button[type=submit]').attr('disabled', !valid_submission);
+        $div.dialog('close');
+      })
+      .dialog({
+        width: 'auto',
+        height: 'auto',
+        title: title,
+        close: function() {
+          $div.remove();
+        }
+      });
   });
 });

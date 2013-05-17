@@ -1,0 +1,18 @@
+<% if show_welcome_message? %>
+<div class="global-message image-block">
+  <div class="image-block-image">
+    <i class="information-icon"></i>
+    <span class="hidden-inline-text">
+      <%= accessible_message_icon_text("information") %>
+    </span>
+  </div>
+  <div class="image-block-content">
+    <div class="title">
+      <%= t('welcome_to_happiness', 'Welcome to Canvas!') %>
+    </div>
+    <div class="message">
+      <p><%= welcome_message %></p>
+    </div>
+  </div>
+</div>
+<% end %>

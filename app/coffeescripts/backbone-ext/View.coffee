@@ -1,114 +1,303 @@
 define [
   'use!vendor/backbone'
   'underscore'
-], (Backbone, _) ->
+  'str/htmlEscape'
+  'compiled/util/mixin'
+], (Backbone, _, htmlEscape, mixin) ->
 
   ##
-  # Extends Backbone.View on top of itself with some added features
-  # we use regularly
+  # Extends Backbone.View on top of itself to be 100X more useful
   class Backbone.View extends Backbone.View
 
     ##
-    # Manages child views and renders them whenever the parent view is rendered.
-    # Specify views as key:value pairs of `className: view` where `className` is
-    # a CSS className to find the element in which to to append a rendered
-    # `view.el`
+    # Define default options, options passed in to the view will overwrite these
     #
-    # Be sure to call `super` in the parent view's `render` method _after_ the
-    # html has been set.
-    views: false
-      # example: new ExampleView
+    # @api public
+
+    defaults: {}
 
     ##
-    # Extends render to add support for chid views and element filtering
-    render: (opts = {}) =>
-      @$el.html @template(@toJSON()) if @template
+    # Configures elements to cache after render. Keys are css selector strings,
+    # values are the name of the property to store on the instance.
+    #
+    # Example:
+    #
+    #   class FooView extends Backbone.View
+    #     els:
+    #       '.toolbar': '$toolbar'
+    #       '#main': '$main'
+    #
+    # @api public
 
-      # cacheEls before filter so we have access to elements in filter
-      @cacheEls() if @els
-      @filter() unless opts.noFilter is true
+    els: null
 
-      # its important for renderViews to come last so we don't filter
-      # and cache all the child views elements
-      @renderViews() if @options.views
+    ##
+    # Defines a key on the options object to be added as an instance property
+    # like `model`, `collection`, `el`, etc.
+    #
+    # Example:
+    #   class SomeView extends Backbone.View
+    #     @optionProperty 'foo'
+    #   view = new SomeView foo: 'bar'
+    #   view.foo #=> 'bar'
+    #
+    #  @param {String} property
+    #  @api public
+
+    @optionProperty: (property) ->
+      @__optionProperties__ = (@__optionProperties__ or []).concat [property]
+
+    ##
+    # Avoids subclasses that simply add a new template
+
+    @optionProperty 'template'
+
+    ##
+    # Defines a child view that is automatically rendered with the parent view.
+    # When creating an instance of the parent view the child view is passed in
+    # as an `optionProperty` on the key `name` and its element will be set to
+    # the first match of `selector` in the parent view's template.
+    #
+    # Example:
+    #   class SearchView
+    #     @child 'inputFilterView', '.filter'
+    #     @child 'collectionView', '.results'
+    #
+    #   view = new SearchView
+    #     inputFilterView: new InputFilterView
+    #     collectionView: new CollectionView
+    #   view.inputFilterView? #=> true
+    #   view.collectionView? #=> true
+    #
+    # @param {String} name
+    # @param {String} selector
+    # @api public
+
+    @child: (name, selector) ->
+      @optionProperty name
+      @__childViews__ ?= []
+      @__childViews__ = @__childViews__.concat [{name, selector}]
+
+    ##
+    # Initializes the view.
+    #
+    # - Stores the view in the element data as 'view'
+    # - Sets @model.view and @collection.view to itself
+    #
+    # @param {Object} options
+    # @api public
+
+    initialize: (options) ->
+      @options = _.extend {}, @defaults, @options, options
+      @setOptionProperties()
+      @$el.data 'view', this
+      @model.view = this if @model
+      @collection.view = this if @collection
+      # magic from mixin
+      fn.call this for fn in @__initialize__ if @__initialize__
+      @attach()
       this
+
+    ##
+    # Sets the option properties
+    #
+    # @api private
+
+    setOptionProperties: ->
+      for property in @constructor.__optionProperties__
+        @[property] = @options[property] if @options[property]?
+
+    ##
+    # Renders the view, calls render hooks
+    #
+    # @api public
+
+    render: =>
+      @renderEl()
+      @_afterRender()
+      this
+
+    ##
+    # Renders the HTML for the element
+    #
+    # @api public
+
+    renderEl: ->
+      @$el.html @template(@toJSON()) if @template
 
     ##
     # Caches elements from `els` config
     #
-    #   class Foo extends View
-    #     els:
-    #       '.someSelector': '$somePropertyName'
-    #
-    # After render is called, the `@$somePropertyName` is now available
-    # with the element found in `.someSelector`
+    # @api private
+
     cacheEls: ->
       @[name] = @$(selector) for selector, name of @els if @els
 
     ##
-    # Filters elements to add behavior and bindings. Can be called automatically
-    # in `render`, so be careful not to call it twice
+    # Internal afterRender
+    #
+    # @api private
+
+    _afterRender: ->
+      @cacheEls()
+      @createBindings()
+      # TODO: remove this when `options.views` is removed
+      @renderViews() if @options.views
+      # renderChildViews must come after cacheEls so we don't cache all the
+      # child views elements, bind them to model data, etc.
+      @renderChildViews()
+      @afterRender()
+
+    ##
+    # Define in subclasses to add behavior to your view, ie. creating
+    # datepickers, dialogs, etc.
+    #
+    # Example:
+    #
+    #   class SomeView extends Backbone.View
+    #     els: '.dialog': '$dialog'
+    #     afterRender: ->
+    #       @$dialog.dialog()
+    #
+    # @api private
+
+    afterRender: ->
+      # magic from `mixin`
+      fn.call this for fn in @__afterRender__ if @__afterRender__
+
+    ##
+    # Define in subclasses to attach your collection/model events
+    #
+    # Example:
+    #
+    #   class SomeView extends Backbone.View
+    #     attach: ->
+    #       @model.on 'change', @render
     #
     # @api public
-    filter: ->
-      @$('[data-bind]').each => @createBinding.apply this, arguments
-      #@$('[data-behavior]').each => @_createBehavior.apply this, arguments
+
+    attach: ->
+      # magic from `mixin`
+      fn.call this for fn in @__attach__ if @__attach__
 
     ##
-    # in charge of getting variables ready to pass to handlebars during render
-    # override with your own logic to do something fancy.
+    # Defines the locals for the template with intelligent defaults.
+    #
+    # Order of defaults, highest priority first:
+    #
+    # 1. `@model.present()`
+    # 2. `@model.toJSON()`
+    # 3. `@collection.present()`
+    # 4. `@collection.toJSON()`
+    # 5. `@options`
+    #
+    # Using `present` is encouraged so that when a model or collection is saved
+    # to the app it doesn't send along non-persistent attributes.
+    #
+    # Also adds the view's `cid`.
+    #
+    # @api public
+
     toJSON: ->
-      (@model ? @collection)?.toJSON arguments...
+      model = @model or @collection
+      json = if model
+        if model.present
+          model.present()
+        else
+          model.toJSON()
+      else
+        @options
+      json.cid = @cid
+      json
 
     ##
-    # Renders all child views
+    # Finds, renders, and assigns all child views defined with `View.child`.
     #
     # @api private
-    renderViews: ->
-      _.each @options.views, @renderView
 
-    ##
-    # Renders a single child view and appends its designated element
-    #
-    # @api private
-    renderView: (view, className) =>
-      target = @$('.' + className).first()
-      view.setElement target
-      view.render()
-      @[className] ?= view
+    renderChildViews: ->
+      return unless @constructor.__childViews__
+      for {name, selector} in @constructor.__childViews__
+        console?.warn?("I need a child view '#{name}' but one was not provided") unless @[name]?
+        target = @$ selector
+        @[name].setElement target
+        @[name].render()
+      null
 
     ##
     # Binds a `@model` data to the element's html. Whenever the data changes
-    # the view is updated automatically.
+    # the view is updated automatically. The value will be html-escaped by
+    # default, but the view can define a format method to specify other
+    # formatting behavior with `@format`.
     #
-    # ex:
+    # Example:
+    #
     #   <div data-bind="foo">{I will always mirror @model.get('foo') in here}</div>
     #
-    # @api public
-    createBinding: (index, el) ->
-      $el = $ el
-      attribute = $el.data 'bind'
-      @model.on "change:#{attribute}", (model, value) =>
-        $el.html value
+    # @api private
 
-    #_createBehavior: (index, el) ->
-      # not using this yet
+    createBindings: (index, el) =>
+      @$('[data-bind]').each (index, el) =>
+        $el = $ el
+        attribute = $el.data 'bind'
+        @model.on "change:#{attribute}", (model, value) =>
+          $el.html @format attribute, value
+
+    ##
+    # Formats bound attributes values before inserting into the element when
+    # using `data-bind` in the template.
+    #
+    # @param {String} attribute
+    # @param {String} value
+    # @api private
+
+    format: (attribute, value) ->
+      htmlEscape value
+
+    ##
+    # Use in cases where normal links occur inside elements with events.
+    #
+    # Example:
+    #
+    #   class RecentItemsView
+    #     events:
+    #       'click .header': 'expand'
+    #       'click .header a': 'stopPropagation'
+    #
+    # @param {$Event} event
+    # @api public
+
+    stopPropagation: (event) ->
+      event.stopPropagation()
 
     ##
     # Mixes in objects to a view's definition, being mindful of certain
-    # properties (like events) that need to be merged also
+    # properties (like events) that need to be merged also.
     #
     # @param {Object} mixins...
     # @api public
+
     @mixin: (mixins...) ->
-      for mixin in mixins
-        for key, prop of mixin
-          # don't blow away old events, merge them
-          if key is 'events'
-            _.extend @::[key], prop
-          else
-            @::[key] = prop
-      this # return this to avoid collecting implicit returned array
+      mixin this, mixins...
+
+    ##
+    # DEPRECATED - don't use views option, use `child` constructor method
+    renderViews: ->
+      console?.warn? 'the `views` option is deprecated in favor of @child`'
+      _.each @options.views, @renderView
+
+    ##
+    # DEPRECATED
+    renderView: (view, selector) =>
+      target = @$("##{selector}")
+      target = @$(".#{selector}") unless target.length
+      view.setElement target
+      view.render()
+      @[selector] ?= view
+
+    hide: -> @$el.hide()
+    show: -> @$el.show()
+    toggle: -> @$el.toggle()
 
   Backbone.View
 

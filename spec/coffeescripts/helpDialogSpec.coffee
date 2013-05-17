@@ -2,7 +2,6 @@ require [
   'compiled/helpDialog'
   'vendor/jquery.ba-tinypubsub'
   'helpers/fakeENV'
-
 ], (helpDialog)->
 
   # more tests are in spec/selenium/help_dialog_spec.rb
@@ -26,7 +25,7 @@ require [
       # if we don't close it after each test, subsequent tests get messed up.
       # additionally, closing it starts an animation, so tick past that.
       if helpDialog.$dialog?
-        helpDialog.$dialog.dialog('close') #cleanup
+        helpDialog.$dialog.remove()
         @clock.tick 200
       @clock.restore()
 
@@ -39,6 +38,7 @@ require [
     helpDialog.initTriggers()
     $tester.click()
     ok $('.ui-dialog-content').is(':visible'), "help dialog appears when you click 'help' link"
+    $tester.remove()
 
   test 'teacher feedback', ->
     helpDialog.open()

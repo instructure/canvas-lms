@@ -24,29 +24,22 @@ class Rubric < ActiveRecord::Base
   belongs_to :context, :polymorphic => true
   has_many :rubric_associations, :class_name => 'RubricAssociation', :dependent => :destroy
   has_many :rubric_assessments, :through => :rubric_associations, :dependent => :destroy
-  has_many :learning_outcome_tags, :as => :content, :class_name => 'ContentTag', :conditions => ['content_tags.tag_type = ? AND content_tags.workflow_state != ?', 'learning_outcome', 'deleted'], :include => :learning_outcome
+  has_many :learning_outcome_alignments, :as => :content, :class_name => 'ContentTag', :conditions => ['content_tags.tag_type = ? AND content_tags.workflow_state != ?', 'learning_outcome', 'deleted'], :include => :learning_outcome
   before_save :default_values
-  after_save :update_outcome_tags
+  after_save :update_alignments
   validates_length_of :description, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
-  
+  validates_length_of :title, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
+
   serialize :data
   simply_versioned
   
-  named_scope :publicly_reusable, lambda {
-    {:conditions => {:reusable => true}, :order => :title}
-  }
-  named_scope :matching, lambda {|search|
-    {:order => 'rubrics.association_count DESC', :conditions => wildcard('rubrics.title', search)}
-  }
-  named_scope :before, lambda{|date|
-    {:conditions => ['rubrics.created_at < ?', date]}
-  }
-  named_scope :active, lambda{
-    {:conditions => ['workflow_state != ?', 'deleted'] }
-  }
-  
+  scope :publicly_reusable, where(:reusable => true).order(:title)
+  scope :matching, lambda { |search| where(wildcard('rubrics.title', search)).order("rubrics.association_count DESC") }
+  scope :before, lambda { |date| where("rubrics.created_at<?", date) }
+  scope :active, where("workflow_state<>'deleted'")
+
   set_policy do
-    given {|user, session| self.cached_context_grants_right?(user, session, :manage_grades)}
+    given {|user, session| self.cached_context_grants_right?(user, session, :manage_rubrics)}
     can :read and can :create and can :delete_associations
     
     given {|user, session| self.cached_context_grants_right?(user, session, :manage_assignments)}
@@ -59,13 +52,13 @@ class Rubric < ActiveRecord::Base
     given {|user, session| !self.read_only && self.rubric_associations.for_grading.length < 2 && self.cached_context_grants_right?(user, session, :manage_assignments)}
     can :update and can :delete
     
-    given {|user, session| !self.read_only && self.rubric_associations.for_grading.length < 2 && self.cached_context_grants_right?(user, session, :manage_grades)}
+    given {|user, session| !self.read_only && self.rubric_associations.for_grading.length < 2 && self.cached_context_grants_right?(user, session, :manage_rubrics)}
     can :update and can :delete
 
     given {|user, session| self.cached_context_grants_right?(user, session, :manage_assignments)}
     can :delete
     
-    given {|user, session| self.cached_context_grants_right?(user, session, :manage_grades)}
+    given {|user, session| self.cached_context_grants_right?(user, session, :manage_rubrics)}
     can :delete
 
     given {|user, session| self.cached_context_grants_right?(user, session, :read) }
@@ -97,7 +90,7 @@ class Rubric < ActiveRecord::Base
   
   alias_method :destroy!, :destroy
   def destroy
-    RubricAssociation.update_all({:bookmarked => false, :updated_at => Time.now.utc}, {:rubric_id => self.id})
+    RubricAssociation.where(:rubric_id => self).update_all(:bookmarked => false, :updated_at => Time.now.utc)
     self.workflow_state = 'deleted'
     self.save
   end
@@ -113,26 +106,18 @@ class Rubric < ActiveRecord::Base
   # a rubric_association are 'grading' and 'bookmark'.  Confusing,
   # I know.
   def destroy_for(context)
-    RubricAssociation.update_all({:bookmarked => false, :updated_at => Time.now.utc}, {:rubric_id => self.id, :context_id => context.id, :context_type => context.class.to_s})
-    if RubricAssociation.scoped(:conditions => {:rubric_id => self.id, :bookmarked => true}).count == 0
+    RubricAssociation.where(:rubric_id => self, :context_id => context, :context_type => context.class.to_s).
+        update_all(:bookmarked => false, :updated_at => Time.now.utc)
+    unless RubricAssociation.where(:rubric_id => self, :bookmarked => true).exists?
       self.destroy
     end
   end
-  
-  def update_outcome_tags
-    return unless @outcomes_changed
-    ids = (self.data || []).map{|c| c[:learning_outcome_id] }.compact.map(&:to_i).uniq
-    tags = self.learning_outcome_tags
-    tag_outcome_ids = tags.map(&:learning_outcome_id).compact.uniq
-    outcomes = LearningOutcome.find(ids)
-    missing_ids = ids.select{|id| !tag_outcome_ids.include?(id) }
-    tags_to_delete = tags.select{|t| !ids.include?(t.learning_outcome_id) }
-    missing_ids.each do |id|
-      lot = self.learning_outcome_tags.build(:context => self.context, :tag_type => 'learning_outcome')
-      lot.learning_outcome_id = id
-      lot.save!
-    end
-    tags_to_delete.each{|t| t.destroy }
+
+  attr_accessor :alignments_changed
+  def update_alignments
+    return unless @alignments_changed
+    outcome_ids = (self.data || []).map{|c| c[:learning_outcome_id] }.compact.map(&:to_i).uniq
+    LearningOutcome.update_alignments(self, context, outcome_ids)
     true
   end
   
@@ -233,7 +218,7 @@ class Rubric < ActiveRecord::Base
       if criterion_data[:learning_outcome_id].present?
         outcome = LearningOutcome.find_by_id(criterion_data[:learning_outcome_id])
         if outcome
-          @outcomes_changed = true
+          @alignments_changed = true
           criterion[:learning_outcome_id] = outcome.id
           criterion[:mastery_points] = ((criterion_data[:mastery_points] || outcome.data[:rubric_criterion][:mastery_points]).to_f rescue nil)
           criterion[:ignore_for_scoring] = criterion_data[:ignore_for_scoring] == '1'
@@ -264,18 +249,20 @@ class Rubric < ActiveRecord::Base
 
   def self.process_migration(data, migration)
     rubrics = data['rubrics'] ? data['rubrics']: []
+    migration.outcome_to_id_map ||= {}
     rubrics.each do |rubric|
       if migration.import_object?("rubrics", rubric['migration_id'])
         begin
-          import_from_migration(rubric, migration.context)
+          import_from_migration(rubric, migration)
         rescue
-          migration.add_warning(t('errors.could_not_import', "Couldn't import rubric %{rubric}", :rubric => rubric[:title]), $!)
+          migration.add_import_warning(t('#migration.rubric_type', "Rubric"), rubric[:title], $!)
         end
       end
     end
   end
   
-  def self.import_from_migration(hash, context, item=nil)
+  def self.import_from_migration(hash, migration, item=nil)
+    context = migration.context
     hash = hash.with_indifferent_access
     return nil if hash[:migration_id] && hash[:rubrics_to_import] && !hash[:rubrics_to_import][hash[:migration_id]]
     item ||= find_by_context_id_and_context_type_and_id(context.id, context.class.to_s, hash[:id])
@@ -295,7 +282,10 @@ class Rubric < ActiveRecord::Base
     item.data = hash[:data]
     item.data.each do |crit|
       if crit[:learning_outcome_migration_id]
-        if lo = context.learning_outcomes.find_by_migration_id(crit[:learning_outcome_migration_id])
+        item.alignments_changed = true
+        if migration.respond_to?(:outcome_to_id_map) && id = migration.outcome_to_id_map[crit[:learning_outcome_migration_id]]
+          crit[:learning_outcome_id] = id
+        elsif lo = context.created_learning_outcomes.find_by_migration_id(crit[:learning_outcome_migration_id])
           crit[:learning_outcome_id] = lo.id
         end
         crit.delete :learning_outcome_migration_id

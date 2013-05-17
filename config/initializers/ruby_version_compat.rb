@@ -1,12 +1,11 @@
-if RUBY_VERSION < "1.9."
-  require 'fastercsv'
-else
+require 'csv_compat'
+
+if RUBY_VERSION >= "1.9"
   # ruby 1.9 compatibility fixes
 
-  # 1.9 has a built-in equivalent to fastercsv
-  # make an alias for CSV, which has replaced FasterCSV
-  require 'csv'
-  FasterCSV = CSV
+  if ActiveRecord::Base.configurations[Rails.env]['adapter'] == 'mysql'
+    STDERR.puts "NOTE: It's recommended that you change your database adapter to mysql2 for usage with Ruby 1.9"
+  end
 
   # See http://developer.uservoice.com/entries/how-to-upgrade-a-rails-2.3.14-app-to-ruby-1.9.3/
   # TZInfo needs to be patched.  In particular, you'll need to re-implement the datetime_new! method:
@@ -54,23 +53,65 @@ else
     end
   end
 
-  if Rails.version > "3."
-    raise "These following patches shouldn't be necessary in Rails 3.x"
-  end
+  if Rails.version < "3.0"
 
-  # also https://groups.google.com/forum/#!msg/rubyonrails-core/gb5woRkmDlk/iQ2G7jjNWKkJ
-  MissingSourceFile::REGEXPS << [/^cannot load such file -- (.+)$/i, 1]
+    require "active_support/core_ext/string/output_safety"
+    class ERB
+      module Util
+        # see https://github.com/rails/rails/issues/7430
+        def html_escape(s)
+          s = s.to_s
+          if s.html_safe?
+            s
+          else
+            s.gsub(/[&"'><]/, HTML_ESCAPE).html_safe
+          end
+        end
+   
+        alias h html_escape
+   
+        singleton_class.send(:remove_method, :html_escape)
+        module_function :html_escape, :h
+      end
+    end
 
-  # In Ruby 1.9, respond_to? (which is what proxy_respond_to? REALLY is), chains to
-  # respond_to_missing?.  However, respond_to_missing? is *not* defined on
-  # AssociationProxy because Rails removes *all* methods besides __*, send,
-  # nil?, and object_id, so it hits method_missing, and tries to load the
-  # target.
-  # See https://rails.lighthouseapp.com/projects/8994/tickets/5410-multiple-database-queries-when-chaining-named-scopes-with-rails-238-and-ruby-192
-  # (The patch in that lighthouse bug was not, in fact, merged in).
-  class ActiveRecord::Associations::AssociationProxy
-    def respond_to_missing?(meth, incl_priv)
-      false
+    # also https://groups.google.com/forum/#!msg/rubyonrails-core/gb5woRkmDlk/iQ2G7jjNWKkJ
+    MissingSourceFile::REGEXPS << [/^cannot load such file -- (.+)$/i, 1]
+
+    # In Ruby 1.9, respond_to? (which is what proxy_respond_to? REALLY is), chains to
+    # respond_to_missing?.  However, respond_to_missing? is *not* defined on
+    # AssociationProxy because Rails removes *all* methods besides __*, send,
+    # nil?, and object_id, so it hits method_missing, and tries to load the
+    # target.
+    # See https://rails.lighthouseapp.com/projects/8994/tickets/5410-multiple-database-queries-when-chaining-named-scopes-with-rails-238-and-ruby-192
+    # (The patch in that lighthouse bug was not, in fact, merged in).
+    class ActiveRecord::Associations::AssociationProxy
+      def respond_to_missing?(meth, incl_priv)
+        false
+      end
+    end
+
+    # ActiveSupport::SafeBuffer is a subclass of String, and while string
+    # literals get the encoding of the source file,
+    #
+    # String.new always gets ascii-8bit encoding. This means that depending on
+    # the contents of a template and the data interpolated into the template,
+    # things either work great or you get an incompatible encoding error.
+    #
+    # This patch fixes the problem by giving new SafeBuffers the default encoding
+    # (which in canvas is utf-8)
+    class ActiveSupport::SafeBuffer
+      def initialize(*a)
+        super.force_encoding('utf-8')
+      end
+    end
+
+    # Get rid of the warnings in Rails 2.3 + Ruby 1.9 about unicode
+    # normalization not being supported.
+    module ActiveSupport::Inflector
+      def transliterate(string)
+        I18n.transliterate(string)
+      end
     end
   end
 
@@ -94,7 +135,7 @@ else
           o.force_encoding(Encoding::UTF_8)
           raise ActionController::InvalidByteSequenceErrorFromParams unless o.valid_encoding?
         end
-        if o.respond_to?(:original_filename)
+        if o.respond_to?(:original_filename) && o.original_filename
           o.original_filename.force_encoding(Encoding::UTF_8)
           raise ActionController::InvalidByteSequenceErrorFromParams unless o.original_filename.valid_encoding?
         end
@@ -109,6 +150,37 @@ else
     before_filter :force_utf8_params
   end
 
+  class ActiveRecord::Base
+    # this is basically all potentially affected AR serialized columns that
+    # existed in the DB before Canvas was Ruby 1.9 only. We've verified that
+    # none of these columns should legitimately contain binary data, only text.
+    SERIALIZED_COLUMNS_WITH_POTENTIALLY_INVALID_UTF8 = {
+      'AssessmentQuestion'       => %w[question_data],
+      'ContextExternalTool'      => %w[settings],
+      'EportfolioEntry'          => %w[content],
+      'ErrorReport'              => %w[http_env data],
+      'LearningOutcome'          => %w[data],
+      'Profile'                  => %w[data],
+      'Quiz'                     => %w[quiz_data],
+      'QuizQuestion'             => %w[question_data],
+      'QuizSubmission'           => %w[quiz_data submission_data],
+      'QuizSubmissionSnapshot'   => %w[data],
+      'Rubric'                   => %w[data],
+      'RubricAssessment'         => %w[data],
+      'SisBatch'                 => %w[processing_errors processing_warnings],
+      'StreamItem'               => %w[data]
+    }
+
+    def unserialize_attribute_with_utf8_check(attr_name)
+      value = unserialize_attribute_without_utf8_check(attr_name)
+      if SERIALIZED_COLUMNS_WITH_POTENTIALLY_INVALID_UTF8[self.class.name].try(:include?, attr_name.to_s)
+        TextHelper.recursively_strip_invalid_utf8!(value, true)
+      end
+      value
+    end
+    alias_method_chain :unserialize_attribute, :utf8_check
+  end
+
   # Make sure the flash sets the encoding to UTF-8 as well.
   module ActionController
     module Flash
@@ -121,4 +193,17 @@ else
     end
   end
 
+  # Fix for https://bugs.ruby-lang.org/issues/7278 , which was filling up our logs with these warnings
+  if RUBY_VERSION < "2."
+    require 'net/protocol'
+    class Net::InternetMessageIO
+      def each_crlf_line(src)
+        buffer_filling(@wbuf, src) do
+          while line = @wbuf.slice!(/\A[^\r\n]*(?:\n|\r(?:\n|(?!\z)))/)
+            yield line.chomp("\n") + "\r\n"
+          end
+        end
+      end
+    end
+  end
 end

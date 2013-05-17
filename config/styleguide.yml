@@ -1,0 +1,19 @@
+# required - the file to generate
+out_file: app/views/info/styleguide.html.erb
+
+# required - the files to extract docs from
+glob: app/stylesheets/**/*.scss
+
+# optional - components can display where they are defined, this will be
+# stripped from that definition
+base_dir: app/stylesheets
+
+# optional - mustache template rendered for the `out_file`
+template: doc/styleguide/template.mustache
+
+# optional - Inline DressCode CSS styles, defaults to true
+dress_code_css: true
+
+# optional - Inline DressCode JS, defaults to true
+dress_code_js: true
+

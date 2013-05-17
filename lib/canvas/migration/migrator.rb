@@ -34,13 +34,15 @@ class Migrator
     @course = {:file_map=>{}, :wikis=>[]}
     @course[:name] = @settings[:course_name]
 
-    return if settings[:no_archive_file]
-
-    unless settings[:archive_file]
-      MigratorHelper::download_archive(settings)
+    unless settings[:no_archive_file]
+      unless settings[:archive_file]
+        MigratorHelper::download_archive(settings)
+      end
+      if @archive_file = settings[:archive_file]
+        @archive_file_path = @archive_file.path
+      end
     end
-    @archive_file = settings[:archive_file]
-    @archive_file_path = @archive_file.path 
+    
     config = Setting.from_config('external_migration') || {}
     @unzipped_file_path = Dir.mktmpdir(migration_type.to_s, config[:data_folder].presence)
     @base_export_dir = @settings[:base_download_dir] || find_export_dir

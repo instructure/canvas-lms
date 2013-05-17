@@ -30,31 +30,17 @@ define([
 
   // private variables & methods
   function initEditViewSecondary(){
-    $("#wiki_page_rename_link").click(function(e){
-      e.preventDefault();
-      $("#wiki_page_rename_section").slideToggle("fast", function() {
-        $(this).find(":text:visible:first").focus().select();
-      });
-    });
     wikiSidebar.init();
     wikiSidebar.attachToEditor($("#wiki_page_body"));
   };
-  
+
   function initShowViewSecondary(){
     $("#wiki_show_view_secondary a.edit_link").click(function(event){
       event.preventDefault();
       toggleView();
     });
-    $("#wiki_page_new").find("a.new")
-      .click(function(e){
-        e.preventDefault();
-        $("#wiki_page_new").find("form").slideToggle("fast", function() {
-          $("#wiki_page_new :text:visible:first").focus().select();
-        });
-      }).end()
-      .find("form").hide();
   }
-  
+
   function initForm(){
     // we need to temporarily show the form so that the layout will be computed correctly.
     // this all happens within 1 event loop, so it doesn't cause a flash of content.
@@ -78,14 +64,14 @@ define([
         toggleView();
       });
       $(function(){
-        // trigger its hanlder on page load so that it toggles to the edit view. 
-        // its kinda hoaky because tinymce has to be initialized before the whole dom is loaded and so we have to 
+        // trigger its hanlder on page load so that it toggles to the edit view.
+        // its kinda hoaky because tinymce has to be initialized before the whole dom is loaded and so we have to
         // trigger it in a callback to the domloaded event.
         $("a#page_doesnt_exist_so_start_editing_it_now:not(.dont_click)").triggerHandler("click");
       });
     }
   }
-  
+
   function toggleView(){
     $("#wiki_edit_view_main, #wiki_show_view_main, #wiki_show_view_secondary, #wiki_edit_view_secondary").toggle();
     $("#wiki_edit_view_page_tools").showIf($("#wiki_edit_view_page_tools li").length > 0);
@@ -98,13 +84,13 @@ define([
     init: function(){
       // init up the form now
       initForm();
-      // init the rest on domReady 
+      // init the rest on domReady
       $(function(){
         initEditViewSecondary();
         initShowViewSecondary();
       });
     },
-  
+
     updateComment: function($comment, comment, top) {
       if(!$comment || $comment.length == 0) {
         $comment = $("#wiki_page_comment_blank").clone(true).removeAttr('id');
@@ -126,7 +112,7 @@ define([
       $comment.toggleClass('deletable_comment', !!(comment.permissions && comment.permissions['delete']));
     }
   };
-  
+
   // miscellaneous things to do on domready
   $(document).ready(function() {
     $(document).fragmentChange(function(event, hash){
@@ -148,7 +134,7 @@ define([
         var oldVersion = parseInt($("#wiki_page_version_number").text(), 10);
         var newVersion = data && data && data.wiki_page && data.wiki_page.version_number;
         var changed = oldVersion && newVersion && newVersion > oldVersion;
-        if(changed) { 
+        if(changed) {
           $(".someone_else_edited").slideDown();
           setTimeout(checkForChanges, 240000);
         } else {

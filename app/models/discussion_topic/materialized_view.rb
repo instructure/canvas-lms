@@ -35,8 +35,10 @@ class DiscussionTopic::MaterializedView < ActiveRecord::Base
   end
 
   def self.for(discussion_topic)
-    self.find_by_discussion_topic_id(discussion_topic.id) ||
-      self.create!(:discussion_topic => discussion_topic)
+    unique_constraint_retry do
+      self.find_by_discussion_topic_id(discussion_topic.id) ||
+        self.create!(:discussion_topic => discussion_topic)
+    end
   end
 
   def self.materialized_view_for(discussion_topic, opts = {})
@@ -66,7 +68,7 @@ class DiscussionTopic::MaterializedView < ActiveRecord::Base
       entry_ids = self.entry_ids_array
 
       if opts[:include_new_entries]
-        new_entries = discussion_topic.discussion_entries.all(:conditions => ["updated_at >= ?", (self.generation_started_at || self.updated_at)])
+        new_entries = discussion_topic.discussion_entries.where("updated_at >= ?", (self.generation_started_at || self.updated_at)).all
         participant_ids = (Set.new(participant_ids) + new_entries.map(&:user_id).compact + new_entries.map(&:editor_id).compact).to_a
         entry_ids = (Set.new(entry_ids) + new_entries.map(&:id)).to_a
         new_entries_json_structure = discussion_entry_api_json(new_entries, discussion_topic.context, nil, nil, []).to_json

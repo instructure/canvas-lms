@@ -1,11 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe "external migrations" do
-  it_should_behave_like "forked server selenium tests"
-
-  append_after(:all) do
-    Setting.remove("file_storage_test_override")
-  end
+  it_should_behave_like "in-process server selenium tests"
 
   before(:each) do
     @password = "asdfasdf"
@@ -43,9 +39,9 @@ describe "external migrations" do
     filename, fullpath, data = get_file(file)
 
     click_option('#choose_migration_system', 'Common Cartridge 1.0/1.1/1.2 Package')
-    driver.find_element(:css, '#config_options').find_element(:name, 'export_file').send_keys(fullpath)
+    f('#config_options').find_element(:name, 'export_file').send_keys(fullpath)
     submit_form('#config_options')
-    keep_trying_until { driver.find_element(:css, '#file_uploaded').displayed? }
+    keep_trying_until { f('#file_uploaded').should be_displayed }
 
     ContentMigration.for_context(@course).count.should == 1
     @migration = ContentMigration.for_context(@course).first
@@ -58,7 +54,7 @@ describe "external migrations" do
 
     get "/courses/#{@course.id}/imports/migrate/#{@migration.id}"
     wait_for_ajaximations
-    keep_trying_until { find_with_jquery("#copy_everything").should be_displayed }
+    keep_trying_until { fj("#copy_everything").should be_displayed }
 
     yield driver if block_given?
 
@@ -74,20 +70,20 @@ describe "external migrations" do
     driver.current_url.ends_with?("/courses/#{@course.id}").should == true
     @course.reload
   end
-  
+
   it "should import a common cartridge" do
     run_import("cc_full_test.zip") do |driver|
-      driver.find_element(:id, 'copy_everything').click
-      driver.find_element(:id, 'copy_all_quizzes').click if Qti.migration_executable
-      driver.find_element(:id, 'copy_folders_I_00001_R_').click
-      driver.find_element(:id, 'copy_folders_I_00006_Media_').click
-      driver.find_element(:id, 'copy_folders_I_media_R_').click
-      driver.find_element(:id, 'copy_modules_I_00000_').click
-      driver.find_element(:id, 'copy_topics_I_00009_R_').click
-      driver.find_element(:id, 'copy_topics_I_00006_R_').click
-      driver.find_element(:id, 'copy_external_tools_I_00010_R_').click
+      f('#copy_everything').click
+      f('#copy_all_quizzes').click if Qti.migration_executable
+      f('#copy_folders_I_00001_R_').click
+      f('#copy_folders_I_00006_Media_').click
+      f('#copy_folders_I_media_R_').click
+      f('#copy_modules_I_00000_').click
+      f('#copy_topics_I_00009_R_').click
+      f('#copy_topics_I_00006_R_').click
+      f('#copy_external_tools_I_00010_R_').click
     end
-    
+
     @course.discussion_topics.count.should == 2
     @course.quizzes.count.should == 1 if Qti.migration_executable
     @course.attachments.count.should == 3
@@ -98,15 +94,15 @@ describe "external migrations" do
 
   it "should selectively import a common cartridge" do
     run_import("cc_ark_test.zip") do |driver|
-      driver.find_element(:id, 'copy_everything').click
-      driver.find_element(:id, 'copy_assignments_i183e1527a34b34e8151ffc6dec6cd140_').click
-      driver.find_element(:id, 'copy_quizzes_i2da11ea691f704f9b32ed3fa563af30e_').click
-      driver.find_element(:id, 'copy_files_i6d69d81475a73c4214327e7d4ad5630f_').click
-      driver.find_element(:id, 'copy_modules_i2410bad2b8623a94d9b662ced95406e0_').click
-      driver.find_element(:id, 'copy_topics_icdbdc4aab17bdd59c6b07f0336de1ce0_').click
-      driver.find_element(:id, 'copy_topics_ie28afa86290a7c5dfbe78453cc9b8d28_').click
-      driver.find_element(:id, 'copy_assignment_groups_i0928a83d992c891aa083bcffc1913b67_').click
-      driver.find_element(:id, 'copy_all_external_tools').click
+      f('#copy_assignments_ibcb9ab84f8045f00a3463e8380003e67_').click
+      f('#copy_quizzes_i11ae878a000f370b007a8fe081d0ded9_').click
+      f('#copy_files_ic855ab1cf35ada44a34ce4b852b0c0d0_').click
+      f('#copy_modules_i2df6315abd91395f682eb5213a9d1220_').click
+      f('#copy_topics_i5022718bd70b5298815190094ee482b3_').click
+      f('#copy_topics_i2538e409b017a221d89a5f5c3c182605_').click
+      f('#copy_assignment_groups_i8adfc688d7d74aa856838cc3333a4849_').click
+      f('#copy_assignment_groups_i485520d3863b0e293df4c8f4951ab1e2_').click
+      f('#copy_all_wikis').click
     end
 
     # 2 because the announcement is returned for this too.
@@ -129,6 +125,9 @@ describe "external migrations" do
     dt.message.should == "<p>description</p>"
   end
 
+  it "should load import page for canvas cartridge without any items to select (e.g. only questions)" do
+    run_import("canvas_cc_only_questions.zip")
 
-
+    @course.assessment_questions.count.should == 41
+  end
 end

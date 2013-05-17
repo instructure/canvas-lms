@@ -35,6 +35,7 @@ class SubmissionComment < ActiveRecord::Base
 
   before_save :infer_details
   after_save :update_submission
+  after_save :update_participation
   after_save :check_for_media_object
   after_destroy :delete_other_comments_in_this_group
   after_create :update_participants
@@ -43,9 +44,11 @@ class SubmissionComment < ActiveRecord::Base
 
   serialize :cached_attachments
 
+  scope :for_assignment_id, lambda { |assignment_id| where(:submissions => { :assignment_id => assignment_id }).joins(:submission) }
+
   def delete_other_comments_in_this_group
     return if !self.group_comment_id || @skip_destroy_callbacks
-    SubmissionComment.find_all_by_group_comment_id(self.group_comment_id).select{|c| c != self }.each do |comment|
+    SubmissionComment.for_assignment_id(submission.assignment_id).find_all_by_group_comment_id(self.group_comment_id).select{|c| c != self }.each do |comment|
       comment.skip_destroy_callbacks!
       comment.destroy
     end
@@ -119,7 +122,7 @@ class SubmissionComment < ActiveRecord::Base
   end
 
   def reply_from(opts)
-    return if self.context.root_account.deleted?
+    raise IncomingMessageProcessor::UnknownAddressError if self.context.root_account.deleted?
     user = opts[:user]
     message = opts[:text].strip
     user = nil unless user && self.context.users.include?(user)
@@ -178,11 +181,15 @@ class SubmissionComment < ActiveRecord::Base
 
   def update_submission
     return nil if hidden?
-    comments_count = SubmissionComment.count(:conditions => { :submission_id => submission_id, :hidden => false })
-    Submission.update_all({ :submission_comments_count => comments_count }, { :id => submission_id }) rescue nil
+    comments_count = SubmissionComment.where(:submission_id => submission_id, :hidden => false).count
+    Submission.where(:id => submission_id).update_all(:submission_comments_count => comments_count) rescue nil
   end
 
   def formatted_body(truncate=nil)
+    # stream items pre-serialize the return value of this method
+    if formatted_body = read_attribute(:formatted_body)
+      return formatted_body
+    end
     self.extend TextHelper
     res = format_message(comment).first
     res = truncate_html(res, :max_length => truncate, :words => true) if truncate
@@ -210,12 +217,22 @@ class SubmissionComment < ActiveRecord::Base
     self.ar_to_json(options, &block)
   end
 
-  named_scope :visible, :conditions => { :hidden => false }
+  scope :visible, where(:hidden => false)
 
-  named_scope :after, lambda{|date|
-    {:conditions => ['submission_comments.created_at > ?', date] }
-  }
-  named_scope :for_context, lambda{|context|
-    {:conditions => ['submission_comments.context_id = ? AND submission_comments.context_type = ?', context.id, context.class.to_s] }
-  }
+  scope :after, lambda { |date| where("submission_comments.created_at>?", date) }
+  scope :for_context, lambda { |context| where(:context_id => context, :context_type => context.class.to_s) }
+
+  def update_participation
+    # id_changed? because new_record? is false in after_save callbacks
+    if id_changed? || (hidden_changed? && !hidden?)
+      return if submission.user_id == author_id
+      return if submission.assignment.deleted? || submission.assignment.muted?
+
+      ContentParticipation.create_or_update({
+        :content => submission,
+        :user => submission.user,
+        :workflow_state => "unread",
+      })
+    end
+  end
 end

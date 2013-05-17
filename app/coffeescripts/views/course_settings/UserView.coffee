@@ -12,6 +12,7 @@ define [
   'str/htmlEscape'
   'compiled/jquery.whenAll'
   'compiled/jquery.kylemenu'
+  'compiled/jquery.rails_flash_notifications'
 ], (I18n, $, _, Backbone, EditSectionsView, InvitationsView, LinkToStudentsView, User, userViewTemplate, toUnderscore, h) ->
 
   editSectionsDialog = null
@@ -19,6 +20,10 @@ define [
   invitationDialog = null
 
   class UserView extends Backbone.View
+    initialize: (attributes, options) ->
+      super
+      @role = attributes['role']
+      @role_tag = attributes['role_tag']
 
     tagName: 'li'
 
@@ -38,39 +43,44 @@ define [
         @$el.html userViewTemplate(data)
       this
 
-    getUserData: (id) ->
-      $.get("/api/v1/courses/#{ENV.COURSE_ID}/users/#{id}", include:['enrollments'])
-
     data: ->
       dfd = $.Deferred()
-      dfds = []
       data = $.extend @model.toJSON(),
         url: "#{ENV.COURSE_ROOT_URL}/users/#{@model.get('id')}"
-        permissions: ENV.PERMISSIONS
-        isObserver: @model.hasEnrollmentType('ObserverEnrollment')
-        isPending: @model.pending()
-      for en in data.enrollments
+        isObserver: @model.hasEnrollmentType('ObserverEnrollment', @role)
+        isDesigner: @model.hasEnrollmentType('DesignerEnrollment', @role)
+        isPending: @model.pending(@role)
+      data.canRemove =
+        if _.any(['TeacherEnrollment', 'DesignerEnrollment', 'TaEnrollment'], (et) => @model.hasEnrollmentType(et, @role))
+          ENV.PERMISSIONS.manage_admin_users
+        else
+          ENV.PERMISSIONS.manage_students
+      data.enrollments = _.filter data.enrollments, (en) => en.role == @role
+
+      for en in data.enrollments when ! data.isDesigner
         en.pending = @model.pending()
         en.typeClass = toUnderscore en.type
         section = ENV.CONTEXTS['sections'][en.course_section_id]
         en.sectionTitle = h section.name if section
       if data.isObserver
         users = {}
+
         for en in data.enrollments
-          users[en.associated_user_id] ||= en.enrollment_state in ['creation_pending', 'invited'] if en.associated_user_id
+          if en.observed_user && _.any(en.observed_user.enrollments)
+            user = en.observed_user
+            user.pending = en.enrollment_state in ['creation_pending', 'invited']
+            users[user.id] ||= user
+
         data.enrollments = []
-        for id, pending of users
-          dfds.push @getUserData(id).done (user) =>
-            ob = {pending}
-            ob.sectionTitle = I18n.t('observing_user', '*Observing*: %{user_name}', wrapper: '<i>$1</i>', user_name: user.name)
-            for en in user.enrollments
-              section = ENV.CONTEXTS['sections'][en.course_section_id]
-              ob.sectionTitle += h(I18n.t('#support.array.words_connector') + section.name) if section
-            data.enrollments.push ob
-      # if a dfd fails (e.g. observee was removed from course), we still want
-      # the observer to render (possibly with other observees)
-      $.whenAll(dfds...).then ->
-        dfd.resolve(data)
+        for id, user of users
+          ob = {pending: user.pending}
+          ob.sectionTitle = I18n.t('observing_user', '*Observing*: %{user_name}', wrapper: '<i>$1</i>', user_name: user.name)
+          for en in user.enrollments
+            section = ENV.CONTEXTS['sections'][en.course_section_id]
+            ob.sectionTitle += h(I18n.t('#support.array.words_connector') + section.name) if section
+          data.enrollments.push ob
+
+      dfd.resolve(data)
       dfd.promise()
 
     reload: =>
@@ -86,6 +96,7 @@ define [
     editSections: (e) ->
       editSectionsDialog ||= new EditSectionsView
       editSectionsDialog.model = @model
+      editSectionsDialog.role = @role
       editSectionsDialog.off 'updated'
       editSectionsDialog.on 'updated', @reload
       editSectionsDialog.render().show()
@@ -93,20 +104,21 @@ define [
     linkToStudents: (e) ->
       linkToStudentsDialog ||= new LinkToStudentsView
       linkToStudentsDialog.model = @model
+      linkToStudentsDialog.role = @role
       linkToStudentsDialog.off 'updated'
       linkToStudentsDialog.on 'updated', @reload
       linkToStudentsDialog.render().show()
 
     removeFromCourse: (e) ->
-      return unless confirm I18n.t('links.unenroll_user_course', 'Remove User from Course')
+      return unless confirm I18n.t('delete_confirm', 'Are you sure you want to remove this user?')
       @$el.hide()
       success = =>
-        for e in @model.get('enrollments')
-          e_type = e.typeClass.split('_')[0]
-          c.innerText = parseInt(c.innerText) - 1 for c in $(".#{e_type}_count")
+        $(c).text(parseInt($(c).text()) - 1) for c in $(".#{@role_tag}_count")
+        $.flashMessage I18n.t('flash.removed', 'User successfully removed.')
       failure = =>
         @$el.show()
-      deferreds = _.map @model.get('enrollments'), (e) ->
+        $.flashError I18n.t('flash.removeError', 'Unable to remove the user. Please try again later.')
+      deferreds = _.map @model.allEnrollmentsWithRole(@role), (e) ->
         $.ajaxJSON "#{ENV.COURSE_ROOT_URL}/unenroll/#{e.id}", 'DELETE'
       $.when(deferreds...).then success, failure
 

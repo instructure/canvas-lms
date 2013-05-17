@@ -1,27 +1,63 @@
 <% 
   editable ||= can_do(@context, @current_user, :manage_grades) || can_do(@context, @current_user, :manage_content)
+  workflow_state = context_module && context_module.workflow_state
   @modules ||= []
 %>
-<% cache(['context_module_render_', (context_module.try_rescue(:cache_key) || @context.asset_string), editable].join('/')) do %>
+<% cache_if_module(context_module, editable) do %>
 
-<div class="context_module <%= 'editable_context_module' if editable %>" id="context_module_<%= context_module ? context_module.id : "blank" %>" style="<%= hidden unless context_module %>">
+  <div class="context_module bordered <%= 'unpublished_module' if workflow_state == "unpublished" %> <%= 'editable_context_module' if editable %>" tabindex="0" aria-label="<%= context_module ? context_module.name : "" %>" data-workflow-state="<%= context_module ? context_module.workflow_state : "{{ workflow_state }}"%>" data-module-url="<%= context_url(@context, :context_url) %>/modules/<%= context_module ? context_module.id : "{{ id }}" %>" data-module-id="<%= context_module ? context_module.id : "{{ id }}" %>" id="context_module_<%= context_module ? context_module.id : "blank" %>" style="<%= hidden unless context_module %>">
   <a name="module_<%= context_module.id if context_module %>"></a>
-  <div class="header">
-    <span class="reorder_module_link" title="<%= t('reorder_modules', %{Drag to reorder modules}) %>" style="cursor: move; <%= 'hidden' unless @modules.length > 1 %>"><%= image_tag "move.png" %></span>
-    <span class="completion_status" style="<%= "visibility: hidden;" if !context_module || (context_module.completion_requirements || []).empty? %>">
-      <%= image_tag "pass.png", :alt => t('images.alt.complete', "done"), :title => t('images.title.complete', "Module Completed"), :class => "complete_icon" %>
-      <%= image_tag "blank.png", :alt => t('images.alt.incomplete', "incomplete"), :title => t('images.title.incomplete', "Module Incomplete"), :class => "incomplete_icon" %>
-      <%= image_tag "lock.png", :alt => t('images.alt.locked', "locked"), :title => t('images.title.locked', "Module Locked"), :class => "locked_icon" %>
-    </span>
-    
-    <span class="name"> <%= context_module.try_rescue(:name) || nbsp %></span>
-    <div class="links">
-      <span class="id" style="display: none;"><%= context_module ? context_module.id : nbsp %></span>
-      <span class="unlock_at" style="display: none;"><%= datetime_string(context_module.try_rescue(:unlock_at)) || nbsp %></span>
-      
-      <a href="<%= context_url(@context, :context_url) %>/modules/<%= context_module ? context_module.id : "{{ id }}" %>" class="edit_module_link edit_link no-hover" title="<%= t('links.title.edit_module', %{Edit module settings}) %>"><%= image_tag "edit.png" %></a>
-      <a href="<%= context_url(@context, :context_url) %>/modules/<%= context_module ? context_module.id : "{{ id }}" %>" class="delete_module_link delete_link no-hover" title="<%= t('links.title.delete_module', %{Delete this module}) %>"><%= image_tag "delete.png" %></a>
-    </div>
+  <div class="header context-module-header clearfix">
+
+    <div class="context-module-left-toolbar">
+      <span class="reorder_module_link" title="<%= t('reorder_modules', %{Drag to reorder modules}) %>" style="cursor: move; <%= hidden unless @modules.length > 1 && editable %>"><%= image_tag "move.png", :alt => t('reorder_modules', 'Drag to reorder modules') %></span>
+      <span class="completion_status" style="<%= "visibility: hidden;" if !context_module || (context_module.completion_requirements || []).empty? %>">
+        <%= image_tag "pass.png", :alt => t('images.alt.complete', "done"), :title => t('images.title.complete', "Module Completed"), :class => "complete_icon" %>
+        <%= image_tag "blank.png", :alt => t('images.alt.incomplete', "incomplete"), :title => t('images.title.incomplete', "Module Incomplete"), :class => "incomplete_icon" %>
+        <%= image_tag "lock.png", :alt => t('images.alt.locked', "locked"), :title => t('images.title.locked', "Module Locked"), :class => "locked_icon" %>
+      </span>
+      <span class="name"> <%= context_module.try_rescue(:name) || nbsp %></span>
+      <!--<span class="draft-text <%= 'hide' if workflow_state == "active" %>"><%= t("context_module.draft", "(Draft)") %></span>-->
+    </div><!-- context-module-left-toolbar -->
+
+    <ul class="context-module-toolbar">
+      <% if editable %>
+        <li class="context-module-toolbar-item">
+          <div class="admin-links">
+            <a class="al-trigger" aria-haspopup="true" aria-owns="ui-id-1" tabindex="0"><i class="icon-settings"></i><i class="icon-mini-arrow-down"></i></a>
+            <ul class="al-options">
+              <!--
+              No publishing/unpublishing for now
+              <li>
+                <a href="#" class="change-workflow-state-link">
+                  <span class="workflow-state-icon <%= 'publish-module-link' if workflow_state == "unpublished" %> <%= 'unpublish-module-link' if workflow_state == "active"%>"></span>
+                  <span class="workflow-state-action"><%= workflow_state == "unpublished" ? t('links.publish', %{Publish}) : t('links.unpublish', %{Unpublish}) %>
+                </a>
+              <li>
+              -->
+              <li>
+                <a href="#" rel="<%= context_url(@context, :context_url) %>/modules/<%= context_module ? context_module.id : "{{ id }}" %>/items" class="add_module_item_link icon-plus"><%= t('links.add_item', %{Add Content}) %></a>
+              </li>
+              <li>
+                <a href="<%= context_url(@context, :context_url) %>/modules/<%= context_module ? context_module.id : "{{ id }}" %>" class="icon-edit edit_module_link" title="<%= t('links.title.edit_module', %{Edit}) %>"><%= t('links.text.edit_module', %{Edit}) %></a>
+              </li>
+              <li>
+                <a href="<%= context_url(@context, :context_url) %>/modules/<%= context_module ? context_module.id : "{{ id }}" %>" class="delete_module_link icon-trash" title="<%= t('links.title.delete_module', %{Delete this module}) %>"><%= t('links.text.delete_module', %{Delete}) %></a>
+              </li>
+            </ul>
+          </div>
+        </li>
+      <% end %>
+
+      <li class="context-module-toolbar-item adjust-top">
+        <a href="<%= context_url(@context, :context_url) %>/modules/<%= context_module ? context_module.id : "{{ id }}" %>/collapse" class="expand_module_link icon icon-expand" title="<%= t('links.show_contents', %{Show module contents}) %>"></a>
+        <a href="<%= context_url(@context, :context_url) %>/modules/<%= context_module ? context_module.id : "{{ id }}" %>/collapse" class="collapse_module_link icon icon-collapse" title="<%= t('links.hide_contents', %{Hide module contents}) %>"></a>
+      </li>
+
+      <li class="context-module-toolbar-item"><span class="id" style="display: none;"><%= context_module ? context_module.id : nbsp %></span></li>
+      <li class="context-module-toolbar-item"><span class="unlock_at"><%= datetime_string(context_module.try_rescue(:unlock_at)) || nbsp %></span></li>
+    </ul><!-- end context-module-toolbar -->
+
     <div class="clear"></div>
     <div style="display: none;">
       <span class="require_sequential_progress"><%= context_module.try_rescue(:require_sequential_progress) || nbsp %></span>
@@ -39,43 +75,23 @@
     <div class="collapsed">
     </div>
   </div>
+
   <div class="footer">
-    <div class="show_hide">
-      <a href="<%= context_url(@context, :context_url) %>/modules/<%= context_module ? context_module.id : "{{ id }}" %>/collapse" class="expand_module_link expand-small"><%= t('links.show_contents', %{Show module contents}) %></a>
-      <a href="<%= context_url(@context, :context_url) %>/modules/<%= context_module ? context_module.id : "{{ id }}" %>/collapse" class="collapse_module_link collapse-small"><%= t('links.hide_contents', %{Hide module contents}) %></a>
-    </div>
     <div class="manage_module">
-      <a href="#" rel="<%= context_url(@context, :context_url) %>/modules/<%= context_module ? context_module.id : "{{ id }}" %>/items" class="add_module_item_link add-small"><%= t('links.add_item', %{Add item to module}) %></a>
       <a href="#" class="add_prerequisite_link edit-small" style="display: none;"><%= t('links.settings', %{Module Settings}) %></a>
     </div>
+
     <div class="progression_container">
       <a href="#" class="progression_details_link" title="<%= t('links.title.student_progress', %{See Student Progress for this Module}) %>" style="display: none;">
         <span class="progression_started"><%= t 'progression_started_count', '*%{count}* In Progress', :count => 0, :wrapper => '<span class="progression_started_count">\1</span>' %></span> <span class="progression_complete"><%= t'progression_complete_count', '*%{count}* Complete', :count => 0, :wrapper => '<span class="progression_complete_count">\1</span>' %></span>
       </a>
-      <span class="progression_state" style="<%= hidden if editable || !context_module || ((context_module.prerequisites || []).empty? && (context_module.completion_requirements || []).empty?) %>">
-        &nbsp;
-      </span>
+      <span class="progression_state" style="<%= hidden if editable || !context_module || ((context_module.prerequisites || []).empty? && (context_module.completion_requirements || []).empty?) %>"></span>
       <div class="unlock_details" style="<%= hidden unless context_module && context_module.to_be_unlocked %>"><%= t 'module_will_unlock_at', 'will unlock *%{unlock_date}*', :wrapper => '<span class="unlock_at">\1</span>', :unlock_date => (datetime_string(context_module.try_rescue(:unlock_at)) || nbsp) %></div>
-    </div>
+    </div><!-- progression_container -->
+
     <div class="clear"></div>
-    <div class="prerequisites_footer" style="<%= hidden unless context_module && context_module.prerequisites && !context_module.prerequisites.empty? %>">
-      <div class="prerequisites_message" style="float: left;">
-        <%= before_label('prerequisites', %{Prerequisites}) %> 
-      </div>
-      <div class="prerequisites">
-      <% if context_module %>
-        <% (context_module.prerequisites || []).each do |pre| %>
-          <div class="criterion <%= pre[:type] %>_criterion" style="float: left;">
-            <span class="id" style="display: none;"><%= pre[:id] %></span>
-            <span class="type" style="display: none;"><%= pre[:type] %></span>
-            <span class="name"><%= pre[:name] || t('default_module_name', "module") %></span>
-            <span style="padding-left: 3px;"><a href="#" class="delete_prerequisite_link" title="<%= t('links.title.remove_prerequisite', %{Remove this prerequisite}) %>" style="text-decoration: none;">&#215;</a></span>
-          </div>
-        <% end %>
-      <% end %>
-      </div>
-    </div>
+    <%= render :partial => "context_modules/prerequisits_footer", :locals => {:editable => editable, :context_module => context_module} %>
     <div class="clear"></div>
-  </div>
+  </div><!-- footer -->
 </div>
 <% end %>

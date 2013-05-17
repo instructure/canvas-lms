@@ -1,23 +1,33 @@
 <p>consumer key: <span id="consumer_key"><%= params[:oauth_consumer_key] %></span></p>
 
-<% if params[:selection_directive] == 'embed_content' %>
-  <a id="image_link" class="link" href="<%= @return_url %>?embed_type=image&url=/images/delete.png&width=16&height=16&alt=delete">image embed</a>
+<% if params[:ext_content_intended_use] == 'embed' || params[:ext_content_intended_use] == 'homework' %>
+  <a id="image_link" class="link" href="<%= @return_url %>?return_type=image&url=/images/delete.png&width=16&height=16&alt=delete">image embed</a>
   <br/>
   <a id="link_link" class="link" href="<%= @return_url %>?embed_type=link&url=/images/delete.png&title=delete&text=delete+link">link embed</a>
   <br/>
 <% end %>
-<a id="basic_lti_link" class="link" href="<%= @return_url %>?embed_type=basic_lti&url=http://www.example.com&title=lti+link&text=lti+embedded+link">lti link embed</a>
+<a id="basic_lti_link" class="link" href="<%= @return_url %>?return_type=lti_launch_url&url=http://www.example.com&title=lti+link&text=lti+embedded+link">lti link embed</a>
 <br/>
-<% if params[:selection_directive] == 'embed_content' %>
-  <a id="iframe_link" class="link" href="<%= @return_url %>?embed_type=iframe&url=/images/delete.png&width=100&height=100&title=delete">iframe embed</a>
+<% if params[:ext_content_intended_use] == 'embed' %>
+  <a id="iframe_link" class="link" href="<%= @return_url %>?return_type=iframe&url=/images/delete.png&width=100&height=100&title=delete">iframe embed</a>
   <br/>
-  <a id="oembed_link" class="link" href="<%= @return_url %>?embed_type=oembed&endpoint=<%= CGI.escape("http://www.flickr.com/services/oembed/") %>&url=<%= CGI.escape("http://www.flickr.com/photos/bees/2341623661/") %>">oembed embed</a>
+  <a id="oembed_link" class="link" href="<%= @return_url %>?return_type=oembed&endpoint=<%= CGI.escape("http://www.flickr.com/services/oembed/") %>&url=<%= CGI.escape("http://www.flickr.com/photos/bees/2341623661/") %>">oembed embed</a>
   <br/>
 <% else %>
-  <a id="bad_url_basic_lti_link" class="link" href="<%= @return_url %>?embed_type=basic_lti&url=asdf&title=lti+link&text=lti+embedded+link">bad lti link embed (bad url)</a>
+  <a id="bad_url_basic_lti_link" class="link" href="<%= @return_url %>?return_type=basic_lti&url=asdf&title=lti+link&text=lti+embedded+link">bad lti link embed (bad url)</a>
   <br/>
-  <a id="no_url_basic_lti_link" class="link" href="<%= @return_url %>?embed_type=basic_lti&title=lti+link&text=lti+embedded+link">bad lti link embed (no url)</a>
+  <a id="no_url_basic_lti_link" class="link" href="<%= @return_url %>?return_type=lti_launch_url&title=lti+link&text=lti+embedded+link">bad lti link embed (no url)</a>
   <br/>
-  <a id="no_text_basic_lti_link" class="link" href="<%= @return_url %>?embed_type=basic_lti&url=http://www.example.com">bad lti link embed (no text)</a>
+  <a id="no_text_basic_lti_link" class="link" href="<%= @return_url %>?return_type=basic_lti&url=http://www.example.com">bad lti link embed (no text)</a>
+  <br/>
+<% end %>
+<% if params[:ext_content_intended_use] == 'homework' %>
+  <a id="full_url_link" class="link" href="<%= @return_url %>?return_type=url&url=<%= CGI.escape("#{HostUrl.protocol}://#{HostUrl.default_host}/images/delete.png") %>&text=delete&title=delete">full URL link embed</a>
+  <br/>
+  <a id="file_link" class="link" href="<%= @return_url %>?return_type=file&url=<%= CGI.escape("#{HostUrl.protocol}://#{HostUrl.default_host}/images/delete.png") %>&text=<%= CGI.escape("delete.png") %>">file embed</a>
+  <br/>
+  <a id="mime_type_file_link" class="link" href="<%= @return_url %>?return_type=file&url=<%= CGI.escape("#{HostUrl.protocol}://#{HostUrl.default_host}/robots.txt") %>&text=<%= CGI.escape("robots") %>&content_type=<%= CGI.escape("text/plain") %>">file embed</a>
+  <br/>
+  <a id="bad_file_link" class="link" href="<%= @return_url %>?return_type=file&url=<%= CGI.escape("#{HostUrl.protocol}://#{HostUrl.default_host}/images/delete_404.png") %>&text=<%= CGI.escape("delete.png") %>&content_type=<%= CGI.escape("image/png") %>">bad file embed</a>
   <br/>
 <% end %>

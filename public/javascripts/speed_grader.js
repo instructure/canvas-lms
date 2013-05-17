@@ -27,7 +27,8 @@ define([
   'jst/_turnitinScore',
   'ajax_errors' /* INST.log_error */,
   'jqueryui/draggable' /* /\.draggable/ */,
-  'jquery.ajaxJSON' /* getJSON, ajaxJSONFiles, ajaxJSON */,
+  'jquery.ajaxJSON' /* getJSON, ajaxJSON */,
+  'jquery.instructure_forms' /* ajaxJSONFiles */,
   'jquery.doc_previews' /* loadDocPreview */,
   'jquery.instructure_date_and_time' /* parseFromISO */,
   'jqueryui/dialog',
@@ -36,7 +37,8 @@ define([
   'jquery.keycodes' /* keycodes */,
   'jquery.loadingImg' /* loadingImg, loadingImage */,
   'jquery.templateData' /* fillTemplateData, getTemplateData */,
-  'media_comments' /* mediaComment, mediaCommentThumbnail */,
+  'media_comments' /* mediaComment */,
+  'compiled/jquery/mediaCommentThumbnail',
   'vendor/jquery.ba-hashchange' /* hashchange */,
   'vendor/jquery.elastic' /* elastic */,
   'vendor/jquery.getScrollbarWidth' /* getScrollbarWidth */,
@@ -115,6 +117,7 @@ define([
       $rubric_full = $("#rubric_full"),
       $rubric_full_resizer_handle = $("#rubric_full_resizer_handle"),
       $mute_link = $('#mute_link'),
+      $no_annotation_warning = $('#no_annotation_warning'),
       $selectmenu = null,
       broswerableCssClasses = /^(image|html|code)$/,
       windowLastHeight = null,
@@ -348,27 +351,30 @@ define([
       this.elements.mute.link.append(this.elements.spinner.el);
     },
     createModals: function(){
-      var cancelLabel = I18n.t('cancel_button', 'Cancel'),
-          muteLabel   = I18n.t('mute_assignment', 'Mute Assignment'),
-          buttons     = {};
-      var buttons = {};
-      buttons[muteLabel] = $.proxy(function(){
-        this.toggleMute();
-        this.elements.mute.modal.dialog('close');
-      }, this);
-      buttons[cancelLabel] = $.proxy(function(){ this.elements.mute.modal.dialog('close'); }, this);
       this.elements.settings.form.dialog({
         autoOpen: false,
         modal: true,
         resizable: false,
         width: 400
-      });
+      }).fixDialogButtons();
       // FF hack - when reloading the page, firefox seems to "remember" the disabled state of this
       // button. So here we'll manually re-enable it.
       this.elements.settings.form.find(".submit_button").removeAttr('disabled')
       this.elements.mute.modal.dialog({
         autoOpen: false,
-        buttons: buttons,
+        buttons: [{
+          text: I18n.t('cancel_button', 'Cancel'),
+          click: $.proxy(function(){
+            this.elements.mute.modal.dialog('close');
+          }, this)
+        },{
+          text: I18n.t('mute_assignment', 'Mute Assignment'),
+          'class': 'btn-primary',
+          click: $.proxy(function(){
+            this.toggleMute();
+            this.elements.mute.modal.dialog('close');
+          }, this)
+        }],
         modal: true,
         resizable: false,
         title: this.elements.mute.modal.data('title'),
@@ -390,11 +396,7 @@ define([
     },
 
     showSettingsModal: function(e){
-      this.elements.settings.form.dialog('close').dialog({
-        modal: true,
-        resizeable: false,
-        width: 400
-      }).dialog('open');
+      this.elements.settings.form.dialog('open');
     },
 
     onMuteClick: function(e){
@@ -846,6 +848,11 @@ define([
       header.init();
       initKeyCodes();
 
+      $('#hide_no_annotation_warning').click(function(e){
+        e.preventDefault();
+        $no_annotation_warning.hide();
+      });
+
       $window.bind('hashchange', EG.handleFragmentChange);
       $('#eg_sort_by').val(userSettings.get('eg_sort_by'));
       $('#submit_same_score').click(function(e) {
@@ -1053,10 +1060,9 @@ define([
                           this.currentStudent.submission.submission_history[currentSelectedIndex] &&
                           this.currentStudent.submission.submission_history[currentSelectedIndex].submission
                           || {},
-            dueAt       = jsonData.due_at && $.parseFromISO(jsonData.due_at),
             submittedAt = submission.submitted_at && $.parseFromISO(submission.submitted_at),
             gradedAt    = submission.graded_at && $.parseFromISO(submission.graded_at),
-            scribdableAttachments = [],
+            inlineableAttachments = [],
             browserableAttachments = [];
 
         $single_submission_submitted_at.html(submittedAt && submittedAt.datetime_formatted);
@@ -1077,8 +1083,10 @@ define([
         $turnitinInfoContainer = $("#submission_files_container .turnitin_info_container").empty();
         $.each(submission.versioned_attachments || [], function(i,a){
           var attachment = a.attachment;
-          if (attachment.scribd_doc && attachment.scribd_doc.created) {
-            scribdableAttachments.push(attachment);
+          if (attachment['crocodoc_available?'] ||
+              (attachment.scribd_doc && attachment.scribd_doc.created) ||
+              $.isPreviewable(attachment.content_type, 'google')) {
+            inlineableAttachments.push(attachment);
           }
           if (broswerableCssClasses.test(attachment.mime_class)) {
             browserableAttachments.push(attachment);
@@ -1123,14 +1131,14 @@ define([
         // show the first scridbable doc if there is one
         // then show the first image if there is one,
         // if not load the generic thing for the current submission (by not passing a value)
-        this.loadAttachmentInline(scribdableAttachments[0] || browserableAttachments[0]);
+        this.loadAttachmentInline(inlineableAttachments[0] || browserableAttachments[0]);
 
         // if there is any submissions after this one, show a notice that they are not looking at the newest
         $submission_not_newest_notice.showIf($submission_to_view.filter(":visible").find(":selected").nextAll().length);
 
         // if the submission was after the due date, mark it as late
         this.resizeFullHeight();
-        $submission_late_notice.showIf(dueAt && submittedAt && (submittedAt.minute_timestamp > dueAt.minute_timestamp) );
+        $submission_late_notice.showIf(submission['late']);
       } catch(e) {
         INST.log_error({
           'message': "SG_submissions_" + (e.message || e.description || ""),
@@ -1141,8 +1149,6 @@ define([
     },
 
     refreshSubmissionsToView: function(){
-      var dueAt = jsonData.due_at && $.parseFromISO(jsonData.due_at);
-
       var innerHTML = "";
       if (this.currentStudent.submission.submission_history.length > 0) {
         submissionToSelect = this.currentStudent.submission.submission_history[this.currentStudent.submission.submission_history.length - 1].submission;
@@ -1150,7 +1156,7 @@ define([
         $.each(this.currentStudent.submission.submission_history, function(i, s){
           s = s.submission;
           var submittedAt = s.submitted_at && $.parseFromISO(s.submitted_at),
-              late        = dueAt && submittedAt && submittedAt.timestamp > dueAt.timestamp;
+              late        = s['late'];
 
           innerHTML += "<option " + (late ? "class='late'" : "") + " value='" + i + "' " +
                         (s == submissionToSelect ? "selected='selected'" : "") + ">" +
@@ -1221,6 +1227,7 @@ define([
 
     loadAttachmentInline: function(attachment){
       $submissions_container.children().hide();
+      $no_annotation_warning.hide();
       if (!this.currentStudent.submission || !this.currentStudent.submission.submission_type || this.currentStudent.submission.workflow_state == 'unsubmitted') {
           $this_student_does_not_have_a_submission.show();
       } else if (this.currentStudent.submission && this.currentStudent.submission.submitted_at && jsonData.context.quiz && jsonData.context.quiz.anonymous_submissions) {
@@ -1228,25 +1235,47 @@ define([
       } else {
         $iframe_holder.empty();
 
-        //if it's a scribd doc load it.
-        var scribdDocAvailable = attachment && attachment.scribd_doc && attachment.scribd_doc.created && attachment.workflow_state != 'errored' && attachment.scribd_doc.attributes.doc_id;
-        if ( attachment && (scribdDocAvailable || $.isPreviewable(attachment.content_type, 'google')) ) { 
-          var options = {
-              height: '100%',
-              mimeType: attachment.content_type,
-              attachment_id: attachment.id,
-              submission_id: this.currentStudent.submission.id,
-              ready: function(){
-                EG.resizeFullHeight();
-              }
-            };
+        if (attachment) {
+          var crocodocAvailable = attachment['crocodoc_available?'];
+          var scribdDocAvailable = attachment.scribd_doc && attachment.scribd_doc.created && attachment.workflow_state != 'errored' && attachment.scribd_doc.attributes.doc_id;
+          var previewOptions = {
+            height: '100%',
+            mimeType: attachment.content_type,
+            attachment_id: attachment.id,
+            submission_id: this.currentStudent.submission.id,
+            ready: function(){
+              EG.resizeFullHeight();
+            }
+          };
+        }
+        if (crocodocAvailable) {
+          $iframe_holder.show();
+          $iframe_holder.disableWhileLoading($.ajaxJSON(
+            '/submissions/' + this.currentStudent.submission.id + '/attachments/' + attachment.id + '/crocodoc_sessions/',
+            'POST',
+            {version: this.currentStudent.submission.currentSelectedIndex},
+            function(response) {
+              $iframe_holder.loadDocPreview($.extend(previewOptions, {
+                crocodoc_session_url: response.session_url
+              }));
+            },
+            function() {
+              // pretend there isn't a crocodoc and try again
+              attachment['crocodoc_available?'] = false;
+              EG.handleSubmissionSelectionChange();
+            }
+          ));
+        }
+        else if ( attachment && (scribdDocAvailable || $.isPreviewable(attachment.content_type, 'google')) ) {
+          if (!INST.disableCrocodocPreviews) $no_annotation_warning.show();
+
           if (scribdDocAvailable) {
-            options = $.extend(options, {
+            previewOptions = $.extend(previewOptions, {
               scribd_doc_id: attachment.scribd_doc.attributes.doc_id, 
               scribd_access_key: attachment.scribd_doc.attributes.access_key
             });
           }
-          $iframe_holder.show().loadDocPreview(options);
+          $iframe_holder.show().loadDocPreview(previewOptions);
 	      }
 	      else if (attachment && broswerableCssClasses.test(attachment.mime_class)) {
 	        var src = unescape($submission_file_hidden.find('.display_name').attr('href'))
@@ -1351,7 +1380,7 @@ define([
           }).showIf(commentIsDeleteableByMe);
           
           if (comment.media_comment_type && comment.media_comment_id) {
-            $comment.find(".play_comment_link").show();
+            $comment.find(".play_comment_link").data(comment).show();
           }
           $.each((comment.cached_attachments || comment.attachments), function(){
             var attachment = this.attachment || this;
@@ -1529,9 +1558,8 @@ define([
         EG.resizeFullHeight();
       });
       $right_side.delegate(".play_comment_link", 'click', function() {
-        var comment_id = $(this).parents(".comment").getTemplateData({textValues: ['media_comment_id']}).media_comment_id;
-        if(comment_id) {
-          $(this).parents(".comment").find(".media_comment_content").show().mediaComment('show', comment_id, 'audio');
+        if($(this).data('media_comment_id')) {
+          $(this).parents(".comment").find(".media_comment_content").show().mediaComment('show', $(this).data('media_comment_id'), $(this).data('media_comment_type'));
         }
         return false; // so that it doesn't hit the $("a.instructure_inline_media_comment").live('click' event handler
       });

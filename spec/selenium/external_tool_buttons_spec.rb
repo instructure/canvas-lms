@@ -16,12 +16,19 @@ describe "external tool buttons" do
     }
     tool.save!
     get "/courses/#{@course.id}/discussion_topics"
+    wait_for_ajaximations
 
-    f(".add_topic_link").click
-    f("#topic_content_topic_new_instructure_external_button_#{tool.id}").should be_displayed
-    f("#topic_content_topic_new_instructure_external_button_#{tool.id}").click
+    add_button = keep_trying_until do
+      add_button = f('.btn-primary')
+      add_button.should_not be_nil
+      add_button
+    end
+    expect_new_page_load { add_button.click }
+    external_tool_button = f(".instructure_external_tool_button")
+    external_tool_button.should be_displayed
+    external_tool_button.click
     wait_for_ajax_requests
-    html = driver.execute_script("return $('#topic_content_topic_new').editorBox('get_code')")
+    html = driver.execute_script("return $('textarea[name=message]').editorBox('get_code')")
     html.should == ""
 
     fj("#external_tool_button_dialog").should be_displayed
@@ -30,19 +37,19 @@ describe "external tool buttons" do
       f(element).click
       wait_for_ajax_requests
     end
-    keep_trying_until { !f("#external_tool_button_dialog").displayed? }
+    keep_trying_until { !f("#external_tool_button_dialog").should_not be_displayed }
   end
 
   it "should allow inserting oembed content from external tool buttons" do
     load_selection_test_tool("#oembed_link")
 
-    html = driver.execute_script("return $('#topic_content_topic_new').editorBox('get_code')")
+    html = driver.execute_script("return $('textarea[name=message]').editorBox('get_code')")
     html.should match(/ZB8T0193/)
   end
 
   it "should allow inserting basic lti links from external tool buttons" do
     load_selection_test_tool("#basic_lti_link")
-    html = driver.execute_script("return $('#topic_content_topic_new').editorBox('get_code')")
+    html = driver.execute_script("return $('textarea[name=message]').editorBox('get_code')")
     html.should match(/example/)
     html.should match(/lti link/)
     html.should match(/lti embedded link/)
@@ -50,19 +57,19 @@ describe "external tool buttons" do
 
   it "should allow inserting iframes from external tool buttons" do
     load_selection_test_tool("#iframe_link")
-    html = driver.execute_script("return $('#topic_content_topic_new').editorBox('get_code')")
+    html = driver.execute_script("return $('textarea[name=message]').editorBox('get_code')")
     html.should match(/iframe/)
   end
 
   it "should allow inserting images from external tool buttons" do
     load_selection_test_tool("#image_link")
-    html = driver.execute_script("return $('#topic_content_topic_new').editorBox('get_code')")
+    html = driver.execute_script("return $('textarea[name=message]').editorBox('get_code')")
     html.should match(/delete\.png/)
   end
 
   it "should allow inserting links from external tool buttons" do
     load_selection_test_tool("#link_link")
-    html = driver.execute_script("return $('#topic_content_topic_new').editorBox('get_code')")
+    html = driver.execute_script("return $('textarea[name=message]').editorBox('get_code')")
     html.should match(/delete link/)
   end
 
@@ -80,13 +87,14 @@ describe "external tool buttons" do
     end
 
     get "/courses/#{@course.id}/discussion_topics"
-    f(".add_topic_link").click
-    keep_trying_until { fj("#topic_content_topic_new_instructure_external_button_#{tools[0].id}:visible").should be_displayed }
-    f("#topic_content_topic_new_instructure_external_button_#{tools[1].id}").should be_displayed
-    ff("#topic_content_topic_new_instructure_external_button_#{tools[2].id}").length.should == 0
-    ff("#topic_content_topic_new_instructure_external_button_#{tools[3].id}").length.should == 0
-    f("#topic_content_topic_new_instructure_external_button_clump").should be_displayed
-    f("#topic_content_topic_new_instructure_external_button_clump").click
+    expect_new_page_load { f('.btn-primary').click }
+    # find things whose id *ends* with instructure_external_button_...
+    fj("[id$='instructure_external_button_#{tools[0].id}']").should be_displayed
+    fj("[id$='instructure_external_button_#{tools[1].id}']").should be_displayed
+    fj("[id$='instructure_external_button_#{tools[2].id}']").should be_nil
+    fj("[id$='instructure_external_button_#{tools[3].id}']").should be_nil
+    f(".mce_instructure_external_button_clump").should be_displayed
+    f(".mce_instructure_external_button_clump").click
 
     f("#instructure_dropdown_list").should be_displayed
     ff("#instructure_dropdown_list div.option").length.should == 2
@@ -106,9 +114,9 @@ describe "external tool buttons" do
     end
 
     get "/courses/#{@course.id}/discussion_topics"
-    f(".add_topic_link").click
-    keep_trying_until { fj("#topic_content_topic_new_instructure_external_button_clump:visible").should be_displayed }
-    f("#topic_content_topic_new_instructure_external_button_clump").click
+    expect_new_page_load { f('.btn-primary').click }
+    keep_trying_until { fj(".mce_instructure_external_button_clump").should be_displayed }
+    f(".mce_instructure_external_button_clump").click
 
     f("#instructure_dropdown_list").should be_displayed
     ff("#instructure_dropdown_list div.option").length.should == 2
@@ -124,7 +132,7 @@ describe "external tool buttons" do
 
     wait_for_ajax_requests
     f("#external_tool_button_dialog").should_not be_displayed
-    html = driver.execute_script("return $('#topic_content_topic_new').editorBox('get_code')")
+    html = driver.execute_script("return $('textarea[name=message]').editorBox('get_code')")
     html.should match(/ZB8T0193/)
   end
 end

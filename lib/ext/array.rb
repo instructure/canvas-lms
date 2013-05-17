@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'csv_compat'
+
 class Array
   def to_csv(options = {})
     if all? { |e| e.respond_to?(:to_row) }
@@ -32,7 +34,13 @@ class Array
   end
   
   def cache_key
-    @cache_key ||= self.collect{|element| ActiveSupport::Cache.expand_cache_key(element) }.to_param
+    if @cache_key
+      @cache_key
+    else
+      value = self.collect{|element| ActiveSupport::Cache.expand_cache_key(element) }.to_param
+      @cache_key = value unless self.frozen?
+      value
+    end
   end
   
   def once_per(&block)
@@ -100,7 +108,7 @@ class Array
 
   # backport from ActiveSupport 3.x
   # Like uniq, but using a criteria given by a block, similar to sort_by
-  unless instance_methods.include?('uniq_by')
+  unless method_defined?(:uniq_by)
     def uniq_by
       hash, array = {}, []
       each { |i| hash[yield(i)] ||= (array << i) }

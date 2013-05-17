@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -21,14 +21,11 @@ class GroupCategory < ActiveRecord::Base
   belongs_to :context, :polymorphic => true
   has_many :groups, :dependent => :destroy
   has_many :assignments, :dependent => :nullify
+  validates_length_of :name, :maximum => maximum_string_length, :allow_nil => true, :allow_blank => true
 
-  named_scope :active, lambda {
-    { :conditions => ['group_categories.deleted_at is null'] }
-  }
+  scope :active, where(:deleted_at => nil)
 
-  named_scope :other_than, lambda{ |cat|
-    { :conditions => ['group_categories.id != ?', cat.id || 0] }
-  }
+  scope :other_than, lambda { |cat| where("group_categories.id<>?", cat.id || 0) }
 
   class << self
     def protected_name_for_context?(name, context)
@@ -99,12 +96,6 @@ class GroupCategory < ActiveRecord::Base
     self.student_organized? || self.communities?
   end
 
-  # Communities can be joined by anyone,
-  # otherwise defer to the permission on the context
-  def available_for?(user)
-    self.communities? || (self.context && self.context.grants_right?(user, :participate_in_groups))
-  end
-
   # this is preferred over setting self_signup directly. know that if you set
   # self_signup directly to anything other than nil (or ''), 'restricted', or
   # 'enabled', it will behave as if you used 'enabled'.
@@ -153,4 +144,41 @@ class GroupCategory < ActiveRecord::Base
     self.deleted_at = Time.now
     self.save
   end
+
+  def distribute_members_among_groups(members, groups)
+    return [] if groups.empty?
+    new_memberships = []
+    touched_groups = [].to_set
+
+    groups_by_size = {}
+    groups.each do |group|
+      size = group.users.size
+      groups_by_size[size] ||= []
+      groups_by_size[size] << group
+    end
+    smallest_group_size = groups_by_size.keys.min
+
+    members.sort_by{ rand }.each do |member|
+      group = groups_by_size[smallest_group_size].first
+      membership = group.add_user(member)
+      if membership.valid?
+        new_memberships << membership
+        touched_groups << group.id
+
+        # successfully added member to group, move it to the new size bucket
+        groups_by_size[smallest_group_size].shift
+        groups_by_size[smallest_group_size + 1] ||= []
+        groups_by_size[smallest_group_size + 1] << group
+
+        # was that the last group of that size?
+        if groups_by_size[smallest_group_size].empty?
+          groups_by_size.delete(smallest_group_size)
+          smallest_group_size += 1
+        end
+      end
+    end
+    Group.where(:id => touched_groups.to_a).update_all(:updated_at => Time.now.utc) unless touched_groups.empty?
+    return new_memberships
+  end
+
 end

@@ -49,6 +49,7 @@ module StickySisFields
     end
 
     def stuck_sis_fields=(fields)
+      fields = [fields] if (fields.is_a? String)
       clear_sis_stickiness(*(stuck_sis_fields.to_a))
       add_sis_stickiness(*(fields.map(&:to_sym).to_set))
     end

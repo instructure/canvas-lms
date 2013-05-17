@@ -17,5 +17,23 @@
 
 <h2><%= t('headers.notification_preferences', 'Notification Preferences') %><i id="notifications_save_status"></i></h2>
 
-<div id='notification-preferences'>
+<% unless @current_user.registered? %>
+  <p class="alert alert-info">
+    <%= t "confirm_email_instructions", <<-TEXT, :email => @current_user.email, :wrapper => {'*' => '<a href="' + re_send_confirmation_path(@current_user, @current_user.communication_channel) + '" class="re_send_confirmation_link">\1</a>'}
+      Before you can receive any notifications, you need to verify your email address (%{email}) by clicking the link in the email we sent you.
+      If you don't see it, *click to re-send the email*, and make sure to check your spam box.
+    TEXT
+    %>
+  </p>
+<% end %>
+
+<div id="notification-preferences" class="notification-table-wrapper">
 </div>
+
+<span class='weekly_notification_range'>
+  <% weekly_notification_range = @current_user.weekly_notification_range %>
+  <%= t "weekly_notification_range", "Your weekly notifications will be sent %{weekday} between %{start_time} and %{end_time}.",
+    :weekday => I18n.l(weekly_notification_range.first.in_time_zone.to_date, :format => :weekday),
+    :start_time => time_string(weekly_notification_range.first),
+    :end_time => time_string(weekly_notification_range.last) %>
+</span>

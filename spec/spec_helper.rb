@@ -17,32 +17,29 @@
 #
 
 ENV["RAILS_ENV"] = 'test'
-require File.dirname(__FILE__) + "/../config/environment" unless defined?(RAILS_ROOT)
-require 'spec'
-# require 'spec/autorun'
-require 'spec/rails'
+
+require File.expand_path('../../config/environment', __FILE__) unless defined?(Rails)
+if CANVAS_RAILS3
+  require 'rspec/rails'
+else
+  require 'spec'
+  # require 'spec/autorun'
+  require 'spec/rails'
+end
 require 'webrat'
-require 'mocha'
-require File.dirname(__FILE__) + '/mocha_extensions'
+require 'mocha/api'
+require File.expand_path(File.dirname(__FILE__) + '/mocha_extensions')
 
 Dir.glob("#{File.dirname(__FILE__).gsub(/\\/, "/")}/factories/*.rb").each { |file| require file }
 
-ALL_MODELS = (ActiveRecord::Base.send(:subclasses) +
-    Dir["#{RAILS_ROOT}/app/models/*", "#{RAILS_ROOT}/vendor/plugins/*/app/models/*"].collect { |file|
-      model = File.basename(file, ".*").camelize.constantize
-      next unless model < ActiveRecord::Base
-      model
-    }).compact.uniq.reject { |model| model.superclass != ActiveRecord::Base || (model.respond_to?(:tableless?) && model.tableless?) }
-ALL_MODELS << Version
-ALL_MODELS << Delayed::Backend::ActiveRecord::Job::Failed
-ALL_MODELS << Delayed::Backend::ActiveRecord::Job
-
-
 # rspec aliases :describe to :context in a way that it's pretty much defined
 # globally on every object. :context is already heavily used in our application,
-# so we remove rspec's definition.
-module Spec::DSL::Main
-  remove_method :context
+# so we remove rspec's definition. This does not prevent 'context' from being
+# used within a 'describe' block.
+if defined?(Spec::DSL::Main)
+  module Spec::DSL::Main
+    remove_method :context if respond_to? :context
+  end
 end
 
 def truncate_table(model)
@@ -69,12 +66,21 @@ def truncate_table(model)
 end
 
 def truncate_all_tables
-  models_by_connection = ALL_MODELS.group_by { |m| m.connection }
+  models_by_connection = ActiveRecord::Base.all_models.group_by { |m| m.connection }
   models_by_connection.each do |connection, models|
     if connection.adapter_name == "PostgreSQL"
       connection.execute("TRUNCATE TABLE #{models.map(&:table_name).map { |t| connection.quote_table_name(t) }.join(',')}")
     else
       models.each { |model| truncate_table(model) }
+    end
+  end
+end
+
+def truncate_all_cassandra_tables
+  Canvas::Cassandra::Database.config_names.each do |cass_config|
+    db = Canvas::Cassandra::Database.from_config(cass_config)
+    db.keyspace_information.tables.each do |table|
+      db.execute("TRUNCATE #{table}")
     end
   end
 end
@@ -105,14 +111,37 @@ Spec::Matchers.define :encompass do |expected|
   end
 end
 
+Spec::Matchers.define :match_ignoring_whitespace do |expected|
+  def whitespaceless(str)
+    str.gsub(/\s+/, '')
+  end
+
+  match do |actual|
+    whitespaceless(actual) == whitespaceless(expected)
+  end
+end
+
+module MochaRspecAdapter
+  include Mocha::API
+  def setup_mocks_for_rspec
+    mocha_setup
+  end
+  def verify_mocks_for_rspec
+    mocha_verify
+  end
+  def teardown_mocks_for_rspec
+    mocha_teardown
+  end
+end
+
 Spec::Runner.configure do |config|
   # If you're not using ActiveRecord you should remove these
   # lines, delete config/database.yml and disable :active_record
   # in your config/boot.rb
   config.use_transactional_fixtures = true
   config.use_instantiated_fixtures  = false
-  config.fixture_path = RAILS_ROOT + '/spec/fixtures/'
-  config.mock_with :mocha
+  config.fixture_path = Rails.root+'spec/fixtures/'
+  config.mock_with MochaRspecAdapter
 
   config.include Webrat::Matchers, :type => :views
 
@@ -123,6 +152,7 @@ Spec::Runner.configure do |config|
   end
 
   config.before :each do
+    I18n.locale = :en
     Time.zone = 'UTC'
     Account.clear_special_account_cache!
     Account.default.update_attribute(:default_time_zone, 'UTC')
@@ -131,7 +161,11 @@ Spec::Runner.configure do |config|
     Notification.reset_cache!
     ActiveRecord::Base.reset_any_instantiation!
     Attachment.clear_cached_mime_ids
+    RoleOverride.clear_cached_contexts
+    Delayed::Job.redis.flushdb if Delayed::Job == Delayed::Backend::Redis::Job
+    truncate_all_cassandra_tables
     Rails::logger.try(:info, "Running #{self.class.description} #{@method_name}")
+    Attachment.domain_namespace = nil
   end
 
   # flush redis before the first spec, and before each spec that comes after
@@ -151,8 +185,6 @@ Spec::Runner.configure do |config|
     end
     Canvas.redis_used = false
   end
-
-  def use_remote_services; ENV['ACTUALLY_TALK_TO_REMOTE_SERVICES'].to_i > 0; end
 
   def account_with_cas(opts={})
     @account = opts[:account]
@@ -177,15 +209,18 @@ Spec::Runner.configure do |config|
   end
 
   def course(opts={})
-    @course = Course.create!(:name => opts[:course_name], :account => opts[:account])
-    @course.offer! if opts[:active_course] || opts[:active_all]
-    if opts[:active_all]
-      u = User.create!
-      u.register!
-      e = @course.enroll_teacher(u)
-      e.workflow_state = 'active'
-      e.save!
-      @teacher = u
+    account = opts[:account] || Account.default
+    account.shard.activate do
+      @course = Course.create!(:name => opts[:course_name], :account => account)
+      @course.offer! if opts[:active_course] || opts[:active_all]
+      if opts[:active_all]
+        u = User.create!
+        u.register!
+        e = @course.enroll_teacher(u)
+        e.workflow_state = 'active'
+        e.save!
+        @teacher = u
+      end
     end
     @course
   end
@@ -197,13 +232,17 @@ Spec::Runner.configure do |config|
         account.role_overrides.create(:permission => permission.to_s, :enrollment_type => opts[:membership_type] || 'AccountAdmin', :enabled => enabled)
       end
     end
+    RoleOverride.clear_cached_contexts
     account_admin_user(opts)
   end
 
   def account_admin_user(opts={:active_user => true})
-    @user = opts[:user] || user(opts)
+    account = opts[:account] || Account.default
+    @user = opts[:user] || account.shard.activate{ user(opts) }
     @admin = @user
-    @user.account_users.create(:account => opts[:account] || Account.default, :membership_type => opts[:membership_type] || 'AccountAdmin')
+    account_user = @user.account_users.build(:account => account, :membership_type => opts[:membership_type] || 'AccountAdmin')
+    account_user.shard = account.shard
+    account_user.save!
     @user
   end
 
@@ -215,7 +254,7 @@ Spec::Runner.configure do |config|
   end
 
   def user(opts={})
-    @user = User.create!(:name => opts[:name])
+    @user = User.create!(opts.slice(:name, :short_name))
     @user.register! if opts[:active_user] || opts[:active_all]
     @user.update_attribute :workflow_state, opts[:user_state] if opts[:user_state]
     @user
@@ -283,7 +322,7 @@ Spec::Runner.configure do |config|
 
   def course_with_user(enrollment_type, opts={})
     @course = opts[:course] || course(opts)
-    @user = opts[:user] || user(opts)
+    @user = opts[:user] || @course.shard.activate{ user(opts) }
     @enrollment = @course.enroll_user(@user, enrollment_type, opts)
     @enrollment.course = @course # set the reverse association
     if opts[:active_enrollment] || opts[:active_all]
@@ -378,7 +417,7 @@ Spec::Runner.configure do |config|
 
   VALID_GROUP_ATTRIBUTES = [:name, :context, :max_membership, :group_category, :join_level, :description, :is_public, :avatar_attachment]
   def group(opts={})
-    @group = (opts[:group_context].try(:groups) || Group).create! opts.slice(VALID_GROUP_ATTRIBUTES)
+    @group = (opts[:group_context].try(:groups) || Group).create! opts.slice(*VALID_GROUP_ATTRIBUTES)
   end
 
   def group_with_user(opts={})
@@ -391,6 +430,33 @@ Spec::Runner.configure do |config|
   def group_with_user_logged_in(opts={})
     group_with_user(opts)
     user_session(@user)
+  end
+
+  def custom_role(base, name, opts={})
+    account = opts[:account] || @account
+    role = account.roles.find_by_name(name)
+    role ||= account.roles.create :name => name
+    role.base_role_type = base
+    role.save!
+    role
+  end
+  def custom_student_role(name, opts={})
+    custom_role('StudentEnrollment', name, opts)
+  end
+  def custom_teacher_role(name, opts={})
+    custom_role('TeacherEnrollment', name, opts)
+  end
+  def custom_ta_role(name, opts={})
+    custom_role('TaEnrollment', name, opts)
+  end
+  def custom_designer_role(name, opts={})
+    custom_role('DesignerEnrollment', name, opts)
+  end
+  def custom_observer_role(name, opts={})
+    custom_role('ObserverEnrollment', name, opts)
+  end
+  def custom_account_role(name, opts={})
+    custom_role(AccountUser::BASE_ROLE_NAME, name, opts)
   end
 
   def user_session(user, pseudonym=nil)
@@ -467,7 +533,7 @@ Spec::Runner.configure do |config|
 
     @topic = course.discussion_topics.build(:title => "topic")
     @assignment = course.assignments.build(:submission_types => 'discussion_topic', :title => @topic.title, :group_category => @group1.group_category)
-    @assignment.infer_due_at
+    @assignment.infer_times
     @assignment.saved_by = :discussion_topic
     @topic.assignment = @assignment
     @topic.save!
@@ -507,9 +573,9 @@ Spec::Runner.configure do |config|
   end
 
   def outcome_with_rubric(opts={})
-    @outcome_group ||= LearningOutcomeGroup.default_for(@course)
+    @outcome_group ||= @course.root_outcome_group
     @outcome = @course.created_learning_outcomes.create!(:description => '<p>This is <b>awesome</b>.</p>', :short_description => 'new outcome')
-    @outcome_group.add_item(@outcome)
+    @outcome_group.add_outcome(@outcome)
     @outcome_group.save!
 
     @rubric = Rubric.generate(:context => @course,
@@ -555,13 +621,15 @@ Spec::Runner.configure do |config|
                                       }
                                   }
                               })
-    @rubric.instance_variable_set('@outcomes_changed', true)
+    @rubric.instance_variable_set('@alignments_changed', true)
     @rubric.save!
-    @rubric.update_outcome_tags
+    @rubric.update_alignments
   end
 
-  def grading_standard_for(context)
-    @standard = context.grading_standards.create!(:title => "My Grading Standard", :standard_data => {
+  def grading_standard_for(context, opts={})
+    @standard = context.grading_standards.create!(
+      :title => opts[:title] || "My Grading Standard",
+      :standard_data => {
         "scheme_0" => {:name => "A", :value => "0.9"},
         "scheme_1" => {:name => "B", :value => "0.8"},
         "scheme_2" => {:name => "C", :value => "0.7"}
@@ -582,7 +650,7 @@ Spec::Runner.configure do |config|
 
   def conversation(*users)
     options = users.last.is_a?(Hash) ? users.pop : {}
-    @conversation = (options.delete(:sender) || @me || users.shift).initiate_conversation(users.map(&:id))
+    @conversation = (options.delete(:sender) || @me || users.shift).initiate_conversation(users)
     @message = @conversation.add_message('test')
     @conversation.update_attributes(options)
     @conversation.reload
@@ -597,6 +665,21 @@ Spec::Runner.configure do |config|
     mo.save!
   end
 
+  def message(opts={})
+    m = Message.new
+    m.to = opts[:to] || 'some_user'
+    m.from = opts[:from] || 'some_other_user'
+    m.subject = opts[:subject] || 'a message for you'
+    m.body = opts[:body] || 'nice body'
+    m.sent_at = opts[:sent_at] || 5.days.ago
+    m.workflow_state = opts[:workflow_state] || 'sent'
+    m.user_id = opts[:user_id] || opts[:user].try(:id)
+    m.path_type = opts[:path_type] || 'email'
+    m.root_account_id = opts[:account_id] || Account.default.id
+    m.save!
+    m
+  end
+
   def assert_status(status=500)
     response.status.to_i.should eql(status)
   end
@@ -609,7 +692,7 @@ Spec::Runner.configure do |config|
 
   def assert_require_login
     response.should be_redirect
-    flash[:notice].should eql("You must be logged in to access this page")
+    flash[:warning].should eql("You must be logged in to access this page")
   end
 
   def default_uploaded_data
@@ -677,17 +760,14 @@ Spec::Runner.configure do |config|
   end
 
   # enforce forgery protection, so we can verify usage of the authenticity token
-  def enable_forgery_protection(enable = nil)
-    if enable != false
-      ActionController::Base.class_eval { alias_method :_old_protect, :allow_forgery_protection; def allow_forgery_protection; true; end }
-    end
+  def enable_forgery_protection(enable = true)
+    old_value = ActionController::Base.allow_forgery_protection
+    ActionController::Base.stubs(:allow_forgery_protection).including_subclasses.returns(enable)
 
     yield if block_given?
 
   ensure
-    if enable != true
-      ActionController::Base.class_eval { alias_method :allow_forgery_protection, :_old_protect }
-    end
+    ActionController::Base.stubs(:allow_forgery_protection).including_subclasses.returns(old_value) if block_given?
   end
 
   def start_test_http_server(requests=1)
@@ -747,18 +827,87 @@ Spec::Runner.configure do |config|
     JSON.parse(json_string.sub(%r{^while\(1\);}, ''))
   end
 
-  def s3_storage!
+  # inspired by http://blog.jayfields.com/2007/08/ruby-calling-methods-of-specific.html
+  module AttachmentStorageSwitcher
+    BACKENDS = %w{FileSystem S3}.map { |backend| Technoweenie::AttachmentFu::Backends.const_get(:"#{backend}Backend") }.freeze
+
+    class As #:nodoc:
+      private *instance_methods.select { |m| m !~ /(^__|^\W|^binding$)/ }
+
+      def initialize(subject, ancestor)
+        @subject = subject
+        @ancestor = ancestor
+      end
+
+      def method_missing(sym, *args, &blk)
+        @ancestor.instance_method(sym).bind(@subject).call(*args,&blk)
+      end
+    end
+
+    def self.included(base)
+      base.cattr_accessor :current_backend
+      base.current_backend = (base.ancestors & BACKENDS).first
+
+      # make sure we have all the backends
+      BACKENDS.each do |backend|
+        base.send(:include, backend) unless base.ancestors.include?(backend)
+      end
+      # remove the duplicate callbacks added by multiple backends
+      base.before_update.uniq!
+
+      BACKENDS.map(&:instance_methods).flatten.uniq.each do |method|
+        # overridden by Attachment anyway; don't re-overwrite it
+        next if Attachment.instance_method(method).owner == Attachment
+        if method.to_s[-1..-1] == '='
+          base.class_eval <<-CODE
+          def #{method}(arg)
+            self.as(self.class.current_backend).#{method} arg
+          end
+          CODE
+        else
+          base.class_eval <<-CODE
+          def #{method}(*args, &block)
+            self.as(self.class.current_backend).#{method}(*args, &block)
+          end
+          CODE
+        end
+      end
+    end
+
+    def as(ancestor)
+      @__as ||= {}
+      unless r = @__as[ancestor]
+        r = (@__as[ancestor] = As.new(self, ancestor))
+      end
+      r
+    end
+  end
+
+  def s3_storage!(opts = {:stubs => true})
+    Attachment.send(:include, AttachmentStorageSwitcher) unless Attachment.ancestors.include?(AttachmentStorageSwitcher)
+    Attachment.stubs(:current_backend).returns(Technoweenie::AttachmentFu::Backends::S3Backend)
+
     Attachment.stubs(:s3_storage?).returns(true)
     Attachment.stubs(:local_storage?).returns(false)
-    conn = mock('AWS::S3::Connection')
-    AWS::S3::Base.stubs(:connection).returns(conn)
-    conn.stubs(:access_key_id).returns('stub_id')
-    conn.stubs(:secret_access_key).returns('stub_key')
+    if opts[:stubs]
+      conn = mock('AWS::S3::Client')
+      AWS::S3::S3Object.any_instance.stubs(:client).returns(conn)
+      AWS::Core::Configuration.any_instance.stubs(:access_key_id).returns('stub_id')
+      AWS::Core::Configuration.any_instance.stubs(:secret_access_key).returns('stub_key')
+      AWS::S3::Bucket.any_instance.stubs(:name).returns('no-bucket')
+    else
+      if Attachment.s3_config.blank? || Attachment.s3_config[:access_key_id] == 'access_key'
+        pending "Please put valid S3 credentials in config/amazon_s3.yml"
+      end
+    end
     Attachment.s3_storage?.should eql(true)
     Attachment.local_storage?.should eql(false)
   end
 
   def local_storage!
+    Attachment.send(:include, AttachmentStorageSwitcher) unless Attachment.ancestors.include?(AttachmentStorageSwitcher)
+    Attachment.stubs(:current_backend).returns(Technoweenie::AttachmentFu::Backends::FileSystemBackend)
+
     Attachment.stubs(:s3_storage?).returns(false)
     Attachment.stubs(:local_storage?).returns(true)
     Attachment.local_storage?.should eql(true)
@@ -766,11 +915,7 @@ Spec::Runner.configure do |config|
     Attachment.local_storage?.should eql(true)
   end
 
-  def run_job(job = Delayed::Job.last(:order => :id))
-    case job
-    when Hash
-      job = Delayed::Job.first(:conditions => job, :order => :id)
-    end
+  def run_job(job)
     Delayed::Worker.new.perform(job)
   end
 
@@ -782,6 +927,21 @@ Spec::Runner.configure do |config|
       Delayed::MAX_PRIORITY)
       run_job(job)
     end
+  end
+
+  def track_jobs
+    @jobs_tracking = Delayed::JobTracking.track { yield }
+  end
+
+  def created_jobs
+    @jobs_tracking.created
+  end
+
+  def expects_job_with_tag(tag, count = 1)
+    track_jobs do
+      yield
+    end
+    created_jobs.count { |j| j.tag == tag }.should == count
   end
 
   # send a multipart post request in an integration spec post_params is
@@ -796,6 +956,23 @@ Spec::Runner.configure do |config|
   def run_transaction_commit_callbacks(conn = ActiveRecord::Base.connection)
     conn.after_transaction_commit_callbacks.each { |cb| cb.call }
     conn.after_transaction_commit_callbacks.clear
+  end
+
+  def force_string_encoding(str, encoding = "UTF-8")
+    if str.respond_to?(:force_encoding)
+      str.force_encoding(encoding)
+    end
+    str
+  end
+
+  # from minitest, MIT licensed
+  def capture_io
+    orig_stdout, orig_stderr = $stdout, $stderr
+    $stdout, $stderr = StringIO.new, StringIO.new
+    yield
+    return $stdout.string, $stderr.string
+  ensure
+    $stdout, $stderr = orig_stdout, orig_stderr
   end
 
   def verify_post_matches(post_lines, expected_post_lines)
@@ -813,6 +990,68 @@ Spec::Runner.configure do |config|
     # now check payload
     post_lines[post_lines.index(""),-1].should ==
       expected_post_lines[expected_post_lines.index(""),-1]
+  end
+
+  def compare_json(actual, expected)
+    if actual.is_a?(Hash)
+      actual.each do |k,v|
+        expected_v = expected[k]
+        compare_json(v, expected_v)
+      end
+    elsif actual.is_a?(Array)
+      actual.zip(expected).each do |a,e|
+        compare_json(a,e)
+      end
+    else
+      actual.to_json.should == expected.to_json
+    end
+  end
+
+  class FakeHttpResponse
+    def initialize(code, body = nil, headers={})
+      @code = code
+      @body = body
+      @headers = headers
+    end
+
+    def read_body(io)
+      io << @body
+    end
+
+    def code
+      @code.to_s
+    end
+
+    def [](arg)
+      @headers[arg]
+    end
+
+    def content_type
+      self['content-type']
+    end
+  end
+
+  def intify_timestamps(object)
+    case object
+    when Time
+      object.to_i
+    when Hash
+      object.inject({}) { |memo, (k, v)| memo[intify_timestamps(k)] = intify_timestamps(v); memo }
+    when Array
+      object.map { |v| intify_timestamps(v) }
+    else
+      object
+    end
+  end
+
+  def web_conference_plugin_mock(id, settings)
+    mock = mock("WebConferencePlugin")
+    mock.stubs(:id).returns(id)
+    mock.stubs(:settings).returns(settings)
+    mock.stubs(:valid_settings?).returns(true)
+    mock.stubs(:enabled?).returns(true)
+    mock.stubs(:base).returns(nil)
+    mock
   end
 end
 

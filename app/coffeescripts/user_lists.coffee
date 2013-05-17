@@ -40,7 +40,7 @@ define [
         $.ajaxJSON $form.attr("action"), "POST", $form.getFormData(), UL.success, UL.failure
 
       $form.find("#enrollment_type").change(->
-        $("#limit_privileges_to_course_section_holder").showIf $(this).val() is "TeacherEnrollment" or $(this).val() is "TaEnrollment"
+        $("#limit_privileges_to_course_section_holder").showIf $(this).find(':selected').data("isAdmin")?
       ).change()
 
       $(".unenroll_user_link").click (event) ->
@@ -101,7 +101,7 @@ define [
 
     showResults: (userList) ->
       $form.find(".add_users_button, .go_back_button, #user_list_parsed").show()
-      $form.find(".add_users_button").attr("disabled", false).text I18n.t("add_n_users",
+      $form.find(".add_users_button").attr("disabled", false).focus().text I18n.t("add_n_users",
         one: "OK Looks Good, Add This 1 User"
         other: "OK Looks Good, Add These %{count} Users"
       ,

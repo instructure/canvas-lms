@@ -24,7 +24,7 @@ describe "accounts/settings.html.erb" do
     before do
       @account = Account.default.sub_accounts.create!
       @account.sis_source_id = "so_special_sis_id"
-      @account.save
+      @account.save!
       
       assigns[:context] = @account
       assigns[:account] = @account
@@ -77,4 +77,75 @@ describe "accounts/settings.html.erb" do
       response.should have_tag("div#open_registration_delegated_warning_dialog")
     end
   end
+
+  describe "managed by site admins" do
+    before do
+      @account = Account.default
+      assigns[:account] = @account
+      assigns[:account_users] = []
+      assigns[:root_account] = @account
+      assigns[:associated_courses_count] = 0
+      assigns[:announcements] = []
+    end
+
+    it "should show settings that can only be managed by site admins" do
+      admin = site_admin_user
+      view_context(@account, admin)
+      render
+      response.should have_tag("input#account_settings_global_includes")
+      response.should have_tag("input#account_settings_enable_scheduler")
+      response.should have_tag("input#account_settings_show_scheduler")
+      response.should have_tag("input#account_settings_enable_profiles")
+    end
+
+    it "it should not show settings to regular admin user" do
+      admin = account_admin_user
+      view_context(@account, admin)
+      render
+      response.should_not have_tag("input#account_settings_global_includes")
+      response.should_not have_tag("input#account_settings_enable_scheduler")
+      response.should_not have_tag("input#account_settings_show_scheduler")
+      response.should_not have_tag("input#account_settings_enable_profiles")
+    end
+  end
+  
+  describe "quotas" do
+    before do
+      @account = Account.default
+      assigns[:account] = @account
+      assigns[:account_users] = []
+      assigns[:root_account] = @account
+      assigns[:associated_courses_count] = 0
+      assigns[:announcements] = []
+    end
+    
+    context "with :manage_storage_quotas" do
+      before do
+        admin = account_admin_user
+        view_context(@account, admin)
+        assigns[:current_user] = admin
+      end
+      
+      it "should show quota options" do
+        render
+        response.should have_tag "input#account_default_course_storage_quota"
+        response.should have_tag "input#account_default_user_storage_quota"
+      end
+    end
+    
+    context "without :manage_storage_quotas" do
+      before do
+        admin = account_admin_user_with_role_changes(:account => @account, :role_changes => {'manage_storage_quotas' => false})
+        view_context(@account, admin)
+        assigns[:current_user] = admin
+      end
+      
+      it "should not show quota options" do
+        render
+        response.should_not have_tag "input#account_default_course_storage_quota"
+        response.should_not have_tag "input#account_default_user_storage_quota"
+      end
+    end
+  end
+  
 end

@@ -2,7 +2,10 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/conversations_common
 
 describe "conversations submissions" do
   it_should_behave_like "in-process server selenium tests"
-  it_should_behave_like "conversations selenium tests"
+
+  before (:each) do
+    conversation_setup
+  end
 
   it "should list submission comments in the conversation" do
     @me = @user
@@ -22,7 +25,7 @@ describe "conversations submissions" do
     end
     elements.first.click
     wait_for_ajaximations
-    subs = ff("div#messages .submission")
+    subs = ff("#messages .submission")
     subs.size.should == 2
     subs[0].find_element(:css, '.score').text.should == '0.9 / 1.5'
     subs[1].find_element(:css, '.score').text.should == 'no score'

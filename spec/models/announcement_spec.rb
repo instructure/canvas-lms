@@ -23,6 +23,35 @@ describe Announcement do
     @context = Course.create
     @context.announcements.create!(valid_announcement_attributes)
   end
+
+  describe "locking" do
+    it "should lock if its course has the lock_all_announcements setting" do
+      course = Course.new
+      course.lock_all_announcements = true
+      course.save!
+      announcement = course.announcements.create!(valid_announcement_attributes)
+
+      announcement.should be_locked
+    end
+
+    it "should not lock if its course does not have the lock_all_announcements setting" do
+      course = Course.create!
+      announcement = course.announcements.create!(valid_announcement_attributes)
+
+      announcement.should_not be_locked
+    end
+
+    it "should not automatically lock if it is a delayed post" do
+      course = Course.new
+      course.lock_all_announcements = true
+      course.save!
+      announcement = course.announcements.build(valid_announcement_attributes.merge(:delayed_post_at => Time.now + 1.week))
+      announcement.workflow_state = 'post_delayed'
+      announcement.save!
+
+      announcement.should be_post_delayed
+    end
+  end
   
   context "broadcast policy" do
     it "should sanitize message" do

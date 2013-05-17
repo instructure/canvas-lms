@@ -43,10 +43,10 @@ Hello})
 
     it "should use ssl" do
       http_stub = Net::HTTP.any_instance
-      res = mock('response')
+      res = mock('response', :body => 'test')
       http_stub.expects(:use_ssl=).with(true)
       http_stub.expects(:verify_mode=).with(OpenSSL::SSL::VERIFY_NONE)
-      http_stub.expects(:request).returns(res)
+      http_stub.expects(:request).yields(res)
       Canvas::HTTP.get("https://www.example.com/a/b").should == res
     end
 
@@ -74,25 +74,33 @@ Location: http://www.example2.com/a})
       mock_response("www.example2.com", 80,
 %{HTTP/1.1 301 Moved
 Location: http://www.example3.com/a})
-      expect { Canvas::HTTP.get("http://www.example.com/a", {}, 2) }.to raise_error
+      expect { Canvas::HTTP.get("http://www.example.com/a", {}, 2) }.to raise_error(Canvas::HTTP::TooManyRedirectsError)
     end
   end
 
   describe ".clone_url_as_attachment" do
     it "should reject invalid urls" do
-      Canvas::HTTP.clone_url_as_attachment("ftp://some/stuff").should == nil
+      expect { Canvas::HTTP.clone_url_as_attachment("ftp://some/stuff") }.to raise_error(ArgumentError)
     end
 
-    it "should not clone non-200 responses" do
+    it "should not raise on non-200 responses" do
       url = "http://example.com/test.png"
-      Canvas::HTTP.expects(:get).with(url).returns(mock('code' => '401'))
-      Canvas::HTTP.clone_url_as_attachment(url).should == nil
+      Canvas::HTTP.expects(:get).with(url).yields(stub('code' => '401'))
+      expect { Canvas::HTTP.clone_url_as_attachment(url) }.to raise_error(Canvas::HTTP::InvalidResponseCodeError)
+    end
+
+    it "should use an existing attachment if passed in" do
+      url = "http://example.com/test.png"
+      a = attachment_model
+      Canvas::HTTP.expects(:get).with(url).yields(FakeHttpResponse.new('200', 'this is a jpeg', 'content-type' => 'image/jpeg'))
+      Canvas::HTTP.clone_url_as_attachment(url, :attachment => a)
+      a.save!
+      a.open.read.should == "this is a jpeg"
     end
 
     it "should detect the content_type from the body" do
       url = "http://example.com/test.png"
-      Canvas::HTTP.expects(:get).with(url).returns(mock('code' => '200', 'body' => 'this is a jpeg'))
-      File.expects(:mime_type?).returns('image/jpeg')
+      Canvas::HTTP.expects(:get).with(url).yields(FakeHttpResponse.new('200', 'this is a jpeg', 'content-type' => 'image/jpeg'))
       att = Canvas::HTTP.clone_url_as_attachment(url)
       att.should be_present
       att.should be_new_record

@@ -11,9 +11,9 @@ class PurgeDuplicateDeletedSisEnrollments < ActiveRecord::Migration
           HAVING count(*) > 1 LIMIT 1000")
       break if pairs.empty?
       pairs.each do |(user_id, course_section_id, type)|
-        scope = Enrollment.scoped(:conditions => ["user_id=? AND course_section_id=? AND type=? AND sis_source_id IS NOT NULL AND workflow_state='deleted'", user_id.to_i, course_section_id.to_i, type])
-        keeper = scope.first(:select => :id)
-        scope.delete_all(["id<>?", keeper.id])
+        scope = Enrollment.where("user_id=? AND course_section_id=? AND type=? AND sis_source_id IS NOT NULL AND workflow_state='deleted'", user_id.to_i, course_section_id.to_i, type)
+        keeper = scope.limit(1).pluck(:id).first
+        scope.where("id<>?", keeper).delete_all
       end
     end
   end

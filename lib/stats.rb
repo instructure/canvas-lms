@@ -62,7 +62,9 @@ module Stats
     
     # population variance
     def var
-      @items.empty? ? nil : (sum_of_squares.to_f / @items.size) - (mean**2)
+      return nil if @items.empty?
+      results = (sum_of_squares.to_f / @items.size) - (mean**2)
+      [0, results].max
     end
     alias :variance :var
     

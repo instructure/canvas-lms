@@ -39,15 +39,8 @@ class ContextModuleProgression < ActiveRecord::Base
     (self.requirements_met || []).any?{|r| r[:id] == item.id}
   end
   
-  def collapsed?
-    !!self.collapsed
-  end
-  
   def uncollapse!
-    return if self.collapsed == false
-    progressions = self.context_module.context.context_modules.include_tags_and_progressions.map(&:context_module_progressions).flatten
-    progressions = progressions.select{|p| p.collapsed == false && self.user_id == p.user_id && p != self }
-    ContextModuleProgression.connection.execute("UPDATE context_module_progressions SET collapsed=NULL WHERE id IN (#{progressions.map(&:id).join(',')})") unless progressions.empty?
+    return unless self.collapsed?
     self.collapsed = false
     self.save
   end
@@ -55,7 +48,7 @@ class ContextModuleProgression < ActiveRecord::Base
   def deep_evaluate(mod)
     mod = nil if mod && mod.id != self.context_module_id
     mod ||= self.context_module
-    return if !mod.completion_requirements || mod.completion_requirements.empty?
+    return if mod.completion_requirements.blank?
     tags_hash = mod.content_tags_hash
     met = self.requirements_met || []
     orig_reqs = met.map{|r| "#{r[:id]}_#{r[:type]}"}.sort
@@ -102,14 +95,9 @@ class ContextModuleProgression < ActiveRecord::Base
     self.save if orig_reqs != new_reqs
   end
   
-  named_scope :for_user, lambda{|user|
-    {:conditions => {:user_id => user && user.id} }
-  }
-  named_scope :for_modules, lambda{|mods|
-    mods = Array(mods)
-    {:conditions => {:context_module_id => mods.map(&:id) } }
-  }
-  
+  scope :for_user, lambda { |user| where(:user_id => user) }
+  scope :for_modules, lambda { |mods| where(:context_module_id => mods) }
+
   workflow do
     state :locked
     state :unlocked

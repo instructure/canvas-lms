@@ -19,36 +19,31 @@
 define([
   'i18n!user_logins',
   'jquery' /* $ */,
+  'compiled/models/Pseudonym',
   'jquery.instructure_forms' /* formSubmit, fillFormData, formErrors */,
   'jqueryui/dialog',
+  'compiled/jquery/fixDialogButtons' /* fix dialog formatting */,
   'jquery.instructure_misc_plugins' /* confirmDelete, showIf */,
   'jquery.templateData' /* fillTemplateData, getTemplateData */
-], function(I18n, $) {
+], function(I18n, $, Pseudonym) {
 $(document).ready(function() {
   var $form = $("#edit_pseudonym_form");
-  var passwordable_account_ids = $("#passwordable_account_ids").text().split(",");
   $form.formSubmit({
+    disableWhileLoading: true,
+    formErrors: false,
     processData: function(data) {
       if(!$(this).hasClass('passwordable') || (!data['pseudonym[password]'] && !data['pseudonym[password_confirmation]'])) {
         delete data['pseudonym[password]'];
         delete data['pseudonym[password_confirmation]'];
       }
-      if((data['pseudonym[password]'] || data['pseudonym[password_confirmation]']) && data['pseudonym[password]'] != data['pseudonym[password_confirmation]']) {
-        $(this).formErrors({'pseudonym[password]': I18n.t('errors.passwords_do_not_match', 'passwords do not match')});
-        return false;
-      }
     },
     beforeSubmit: function(data) {
-      $(this).find("button").attr('disabled', true)
-        .filter(".submit_button").text(I18n.t('messages.saving', "Saving..."));
       var select = $(this).find(".account_id select")[0];
       var idx = select && select.selectedIndex;
       $(this).data('account_name', null);
       $(this).data('account_name', select && select.options[idx] && select.options[idx].innerHTML);
     },
     success: function(data) {
-      $(this).find("button").attr('disabled', false)
-        .filter(".submit_button").text(I18n.t('buttons.save', "Save"));
       $(this).dialog('close');
       if($(this).data('unique_id_text')) {
         var $login = $(this).data('unique_id_text').parents(".login");
@@ -67,9 +62,10 @@ $(document).ready(function() {
       $("#login_information .login .delete_pseudonym_link").show();
 			$.flashMessage(I18n.t('save_succeeded', 'Save successful'));
     },
-    error: function(data) {
-      $(this).find("button").attr('disabled', false)
-        .filter(".submit_button").text(I18n.t('errors.save_failed', "Save Failed"));
+    error: function(errors) {
+      var accountId = $(this).find(".account_id select").val();
+      errors = Pseudonym.prototype.normalizeErrors(errors, ENV.PASSWORD_POLICIES[accountId] || ENV.PASSWORD_POLICY);
+      $(this).formErrors(errors);
     }
   });
   $("#edit_pseudonym_form .cancel_button").click(function() {
@@ -97,17 +93,19 @@ $(document).ready(function() {
     $form.toggleClass('passwordable', passwordable);
     $form.find("tr.password").showIf(passwordable);
     $form.find(".account_id").hide();
-    $form.dialog('close').dialog({
-      autoOpen: false,
+    $form.dialog({
       width: 'auto',
       close: function() {
         if($form.data('unique_id_text') && $form.data('unique_id_text').parents(".login").hasClass('blank')) {
           $form.data('unique_id_text').parents(".login").remove();
         }
       }
-    }).dialog('open');
+    }).fixDialogButtons();
     $form.dialog('option', 'title', I18n.t('titles.update_login', 'Update Login'))
       .find(".submit_button").text(I18n.t('buttons.update_login', "Update Login"));
+    $form.dialog('option', 'beforeClose', function(){
+      $('.error_box:visible').click();
+    })
     var $unique_id = $(this).parents(".login").find(".unique_id");
     $form.data('unique_id_text', $unique_id);
     $form.find(":input:visible:first").focus().select();
@@ -142,6 +140,15 @@ $(document).ready(function() {
     $form.find(".account_id").show();
     $form.find(".account_id_select").change();
     $form.data('unique_id_text', null);
+  });
+
+  $(".reset_mfa_link").click(function(event) {
+    var $disable_mfa_link = $(this);
+    $.ajaxJSON($disable_mfa_link.attr('href'), 'DELETE', null, function() {
+      $.flashMessage(I18n.t('notices.mfa_reset', "Multi-factor authentication reset"));
+      $disable_mfa_link.parent().remove();
+    });
+    event.preventDefault();
   });
 });
 });

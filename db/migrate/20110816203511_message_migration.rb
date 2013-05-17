@@ -8,14 +8,14 @@ class MessageMigration < ActiveRecord::Migration
     # in case we need to track/fix any issues post migration
     add_column :conversation_messages, :context_message_id, :integer, :limit => 8
 
-    return if RAILS_ENV == 'test'
+    return if Rails.env.test?
 
     unless connection.adapter_name =~ /postgres|mysql/i
       $stderr.puts "don't know how to migrate conversation data for #{connection.adapter_name}!"
       return
     end
 
-    mysql = connection.adapter_name =~ /mysql/i
+    mysql = %w{MySQL Mysql2}.include?(connection.adapter_name)
     table_opts = mysql ? 'engine=innodb' : 'AS'
 
     # for grouping messages into conversations
