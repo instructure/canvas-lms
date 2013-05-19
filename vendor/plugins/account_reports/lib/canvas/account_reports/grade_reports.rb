@@ -75,20 +75,24 @@ module Canvas::AccountReports
           c.name                 AS "course name",
           c.id                   AS "course id",
           c.sis_source_id        AS "course sis id",
+          s.name                 AS "section name",
+          s.id                   AS "section id",
+          s.sis_source_id        AS "section sis id",
           lo.context_id          AS "outcome context id",
           lo.context_type        AS "outcome context type"}).
         joins(Pseudonym.send(:sanitize_sql, ["
           INNER JOIN users u ON pseudonyms.user_id = u.id
           INNER JOIN (
-            SELECT user_id, course_id
+            SELECT user_id, course_id, course_section_id
             FROM enrollments
             WHERE type = 'StudentEnrollment'
             AND root_account_id = :root_account_id
             " + (@include_deleted ? "" :"AND workflow_state = 'active'") + "
-            GROUP BY user_id, course_id
+            GROUP BY user_id, course_id, course_section_id
           ) e ON pseudonyms.user_id = e.user_id
           INNER JOIN courses c ON c.id = e.course_id
             AND c.root_account_id = :root_account_id
+          INNER JOIN course_sections s ON s.id = e.course_section_id
           INNER JOIN assignments a ON (a.context_id = c.id
                                        AND a.context_type = 'Course')
           INNER JOIN content_tags ct ON (ct.content_id = a.id
@@ -121,7 +125,8 @@ module Canvas::AccountReports
                  'assignment title', 'assignment id', 'submission date',
                  'submission score', 'learning outcome name',
                  'learning outcome id', 'attempt','outcome score',
-                 'course name', 'course id', 'course sis id', 'assignment url']
+                 'course name', 'course id', 'course sis id', 'section name',
+                 'section id', 'section sis id', 'assignment url']
 
       # Generate the CSV report
       filename = Canvas::AccountReports.generate_file(@account_report)
@@ -183,7 +188,7 @@ module Canvas::AccountReports
 
       unless @include_deleted
         students = students.where(
-                         "pseudonyms.workflow_state<>'deleted'
+          "pseudonyms.workflow_state<>'deleted'
                           AND c.workflow_state='available'
                           AND e.workflow_state IN ('active', 'completed')")
       end
