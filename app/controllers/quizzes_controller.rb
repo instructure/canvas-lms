@@ -24,7 +24,7 @@ class QuizzesController < ApplicationController
   add_crumb(proc { t('#crumbs.quizzes', "Quizzes") }) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_quizzes_url }
   before_filter { |c| c.active_tab = "quizzes" }
   before_filter :get_quiz, :only => [:statistics, :edit, :show, :reorder, :history, :update, :destroy, :moderate, :filters, :read_only, :managed_quiz_data]
-
+  before_filter :set_download_submission_dialog_title , only: [:show,:statistics]
   # The number of questions that can display "details". After this number, the "Show details" option is disabled
   # and the data is not even loaded.
   QUIZ_QUESTIONS_DETAIL_LIMIT = 25
@@ -692,4 +692,8 @@ class QuizzesController < ApplicationController
     @any_submissions_pending_review = submitted_with_submissions.where("quiz_submissions.workflow_state = 'pending_review'").count > 0
   end
 
+  def set_download_submission_dialog_title
+    js_env SUBMISSION_DOWNLOAD_DIALOG_TITLE: I18n.t('#quizzes.download_all_quiz_file_upload_submissions',
+                                                    'Download All Quiz File Upload Submissions')
+  end
 end

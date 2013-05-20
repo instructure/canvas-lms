@@ -18,13 +18,8 @@
 
             <a href="<%= context_url(@context, :context_quiz_moderate_url, @quiz.id) %>">
               <i class="icon-settings"></i> <%= @quiz.survey? ? t('links.moderate_this_survey', "Moderate This Survey") : t('links.moderate_this_quiz', "Moderate This Quiz") %>
-            </a>
-
-            <%= render :partial => 'submissions/submission_download' %>
-            <a href="<%= context_url(@context, :context_quiz_quiz_submissions_url, @quiz.id, :zip => 1) %>"
-              id="download_submission_button"
-              class="download_submissions_link icon-download"
-              ><%= t 'links.download_submissions', "Download All Files" %></a>
+          </a>
+          <%= render :partial => 'quizzes/download_file_upload_submissions' %>
           <% end %>
         <% elsif can_do(@quiz, @current_user, :review_grades) %>
           <% if @submitted_student_count && @submitted_student_count > 0 && @context.allows_speed_grader? %>

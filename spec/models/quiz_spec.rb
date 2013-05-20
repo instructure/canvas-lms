@@ -959,4 +959,28 @@ describe Quiz do
       end
     end
   end
+
+  describe "#has_file_upload_question?" do
+
+    let(:quiz) { @course.quizzes.build title: 'File Upload Quiz' }
+
+    it "returns false unless there is quiz data for a quiz" do
+      quiz.stubs(:quiz_data).returns nil
+      quiz.has_file_upload_question?.should be_false
+    end
+
+    it "returns true when there is a file upload question" do
+      quiz.stubs(:quiz_data).returns [
+        {question_type: 'file_upload_question'}
+      ]
+      quiz.has_file_upload_question?.should be_true
+    end
+
+    it "returns false when there isn't a file upload question" do
+      quiz.stubs(:quiz_data).returns [
+        {question_type: 'multiple_choice_question'}
+      ]
+      quiz.has_file_upload_question?.should be_false
+    end
+  end
 end

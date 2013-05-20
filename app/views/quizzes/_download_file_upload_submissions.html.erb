@@ -1,0 +1,7 @@
+<% if @quiz.has_file_upload_question? %>
+  <%= render :partial => 'submissions/submission_download' %>
+  <a href="<%= context_url(@context, :context_quiz_quiz_submissions_url, @quiz.id, :zip => 1) %>"
+    id="download_submission_button"
+    class="download_submissions_link icon-download"
+    ><%= t 'links.download_submissions', "Download All Files" %></a>
+<% end %>

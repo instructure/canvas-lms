@@ -1165,4 +1165,11 @@ class Quiz < ActiveRecord::Base
     survey? && anonymous_submissions
   end
 
+  def has_file_upload_question?
+    return false unless quiz_data.present?
+    !!quiz_data.detect do |data_hash|
+      data_hash[:question_type] == 'file_upload_question'
+    end
+  end
+
 end
