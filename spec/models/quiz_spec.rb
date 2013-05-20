@@ -941,6 +941,28 @@ describe Quiz do
       end
     end
 
+    context "workflow_state" do
+      it "won't validate unpublishing a quiz if there are already submissions" do
+        quiz = @course.quizzes.build title: 'test quiz'
+        quiz.publish!
+        quiz.stubs(:has_student_submissions?).returns true
+        quiz.workflow_state = 'unpublished'
+        quiz.save
+        quiz.should_not be_valid
+        quiz.reload.should be_published
+      end
+
+      it "will allow unpublishing if no student submissions" do
+        quiz = @course.quizzes.build title: 'test quiz'
+        quiz.publish!
+        quiz.stubs(:has_student_submissions?).returns false
+        quiz.workflow_state = 'unpublished'
+        quiz.save
+        quiz.should be_valid
+        quiz.should be_unpublished
+      end
+    end
+
     context "hide_results" do
       it "should not save an invalid hide_results" do
         quiz = @course.quizzes.create! :title => "test quiz"
@@ -981,6 +1003,55 @@ describe Quiz do
         {question_type: 'multiple_choice_question'}
       ]
       quiz.has_file_upload_question?.should be_false
+    end
+  end
+  context "#unpublished?" do
+    before do
+      @quiz = @course.quizzes.build title: 'Test Quiz'
+    end
+
+    it "returns true when workflow_state is unpublished" do
+      @quiz.workflow_state = 'unpublished'
+      @quiz.should be_unpublished
+    end
+
+    it "returns false when quiz has 'available' state" do
+      @quiz.workflow_state = 'available'
+      @quiz.should_not be_unpublished
+    end
+  end
+
+  context "#active?" do
+    before do
+      @quiz = @course.quizzes.build title: 'Test Quiz'
+    end
+
+    it "returns true if workflow_state is available" do
+      @quiz.workflow_state = 'available'
+      @quiz.should be_active
+    end
+
+    it "returns false when workflow_state isn't available" do
+      @quiz.workflow_state = 'deleted'
+      @quiz.should_not be_active
+      @quiz.workflow_state = 'unpublished'
+      @quiz.should_not be_active
+    end
+
+  end
+
+  context "#published?" do
+    before do
+      @quiz = @course.quizzes.build title: 'Test Quiz'
+    end
+
+    it "is just an alias for active?" do
+      @quiz.workflow_state = 'available'
+      @quiz.should be_published
+      @quiz.workflow_state = 'unpublished'
+      @quiz.should_not be_published
+      @quiz.workflow_state = 'deleted'
+      @quiz.should_not be_published
     end
   end
 end

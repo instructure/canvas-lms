@@ -86,7 +86,10 @@
 #       lock_at: null,
 #
 #       // when to unlock the quiz
-#       unlock_at: "2013-01-21T23:59:00-07:00"
+#       unlock_at: "2013-01-21T23:59:00-07:00",
+#
+#       // whether the quiz has a published or unpublished draft state.
+#       published: true
 #
 #     }
 #
@@ -94,7 +97,7 @@ class QuizzesApiController < ApplicationController
   include Api::V1::Quiz
 
   before_filter :require_context
-  before_filter :require_quiz, :only => [:show, :update]
+  before_filter :require_quiz, :only => [:show, :update, :destroy]
 
   @@errors = {
     :quiz_not_found => "Quiz not found"
@@ -213,6 +216,12 @@ class QuizzesApiController < ApplicationController
   #   The day/time the quiz is unlocked for students.
   #   Accepts times in ISO 8601 format, e.g. 2011-10-21T18:48Z.
   #
+  # @argument quiz[published] [Boolean]
+  #   Whether the quiz should have a draft state of published or unpublished.
+  #   NOTE: If students have started taking the quiz, or there are any
+  #   submissions for the quiz, you may not unpublish a quiz and will recieve
+  #   an error.
+  #
   # @returns Quiz
   def create
     if authorized_action(@context.quizzes.new, @current_user, :create)
@@ -241,11 +250,23 @@ class QuizzesApiController < ApplicationController
   def update
     if authorized_action(@quiz, @current_user, :update)
       update_api_quiz(@quiz, params[:quiz])
-      unless @quiz.changed?
+      if @quiz.valid?
         render :json => quiz_json(@quiz, @context, @current_user, session)
       else
-        render :json => {:errors => @quiz.errors.to_json}, :status => 400
+        errors = @quiz.errors.as_json[:errors]
+        errors['published'] = errors.delete('workflow_state') if errors.has_key?('workflow_state')
+        render :json => {:errors => errors.to_json}, :status => 400
       end
+    end
+  end
+
+  # @API Delete a quiz
+  #
+  # @returns Quiz
+  def destroy
+    if authorized_action(@quiz, @current_user, :delete)
+      @quiz.destroy
+      render json: quiz_json(@quiz, @context, @current_user, session)
     end
   end
 

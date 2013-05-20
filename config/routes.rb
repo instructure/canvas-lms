@@ -1090,6 +1090,8 @@ ActionController::Routing::Routes.draw do |map|
       quizzes.post "courses/:course_id/quizzes", :action => :create, :path_name => 'course_quiz_create'
       quizzes.get "courses/:course_id/quizzes/:id", :action => :show, :path_name => 'course_quiz'
       quizzes.put "courses/:course_id/quizzes/:id", :action => :update, :path_name => 'course_quiz_update'
+      quizzes.delete "courses/:course_id/quizzes/:id", action: :destroy,
+        path_name: 'course_quiz_destroy'
     end
 
     api.with_options(:controller => :quiz_reports) do |statistics|

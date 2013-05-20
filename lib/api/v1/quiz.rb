@@ -62,6 +62,7 @@ module Api::V1::Quiz
       due_at
       lock_at
       unlock_at
+      published
       )
   }
 
@@ -74,7 +75,8 @@ module Api::V1::Quiz
   def quiz_json(quiz, context, user, session)
     api_json(quiz, user, session, API_ALLOWED_QUIZ_OUTPUT_FIELDS).merge(
       :html_url => polymorphic_url([context, quiz]),
-      :mobile_url => polymorphic_url([context, quiz], :persist_headless => 1, :force_user => 1)
+      :mobile_url => polymorphic_url([context, quiz], :persist_headless => 1, :force_user => 1),
+      :published => quiz.published?
     )
   end
 
@@ -125,11 +127,15 @@ module Api::V1::Quiz
       end
     end
 
-    if save
-      quiz.update_attributes update_params
-    else
-      quiz.attributes = update_params
+    published = update_params.delete('published') if update_params.has_key?('published')
+    quiz.attributes = update_params
+    unless published.nil? || published.to_s.blank?
+      if quiz.new_record?
+        quiz.save
+      end
+      quiz.workflow_state = Canvas::Plugin.value_to_boolean(published) ? 'available' : 'unpublished'
     end
+    quiz.save if save
 
     quiz
   end
