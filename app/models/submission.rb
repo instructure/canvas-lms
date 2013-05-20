@@ -135,7 +135,6 @@ class Submission < ActiveRecord::Base
   end
 
   attr_reader :group_broadcast_submission
-  attr_reader :assignment_just_published
 
   has_a_broadcast_policy
 
@@ -148,7 +147,6 @@ class Submission < ActiveRecord::Base
       "updated_at",
       "processed",
       "process_attempts",
-      "changed_since_publish",
       "grade_matches_current_submission",
       "published_score",
       "published_grade"
@@ -467,9 +465,6 @@ class Submission < ActiveRecord::Base
     self.workflow_state = 'unsubmitted' if self.submitted? && !self.has_submission?
     self.workflow_state = 'graded' if self.grade && self.score && self.grade_matches_current_submission
     self.workflow_state = 'pending_review' if self.submission_type == 'online_quiz' && self.quiz_submission.try(:latest_submitted_version).try(:pending_review?)
-    if self.graded? && self.graded_at_changed? && self.assignment.available?
-      self.changed_since_publish = true
-    end
     if self.workflow_state_changed? && self.graded?
       self.graded_at = Time.now
     end
@@ -627,17 +622,6 @@ class Submission < ActiveRecord::Base
 
   def assignment_graded_in_the_last_hour?
     self.prior_version && self.prior_version.graded_at && self.prior_version.graded_at > 1.hour.ago
-  end
-
-  def assignment_just_published!
-    @assignment_just_published = true
-    self.changed_since_publish = false
-    self.save!
-    @assignment_just_published = false
-  end
-
-  def changed_since_publish?
-    self.changed_since_publish
   end
 
   def teacher

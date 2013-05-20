@@ -155,7 +155,7 @@ class DiscussionTopic < ActiveRecord::Base
       self.assignment.description = self.message
       self.assignment.submission_types = "discussion_topic"
       self.assignment.saved_by = :discussion_topic
-      self.assignment.workflow_state = 'available' if self.assignment.deleted?
+      self.assignment.workflow_state = 'published' if self.assignment.deleted?
       self.assignment.save
     end
 
@@ -171,7 +171,7 @@ class DiscussionTopic < ActiveRecord::Base
 
   def restore_old_assignment
     return nil unless self.old_assignment && self.old_assignment.deleted?
-    self.old_assignment.workflow_state = 'available'
+    self.old_assignment.workflow_state = 'published'
     self.old_assignment.saved_by = :discussion_topic
     self.old_assignment.save(false)
     self.old_assignment

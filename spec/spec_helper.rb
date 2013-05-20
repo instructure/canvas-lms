@@ -513,7 +513,7 @@ Spec::Runner.configure do |config|
     user = opts[:user] || user(:active_user => true)
     course.enroll_student(user, :enrollment_state => 'active') unless user.enrollments.any? { |e| e.course_id == course.id }
     @assignment = course.assignments.create(:title => "Test Assignment")
-    @assignment.workflow_state = "available"
+    @assignment.workflow_state = "published"
     @assignment.submission_types = "online_quiz"
     @assignment.save
     @quiz = Quiz.find_by_assignment_id(@assignment.id)
@@ -538,7 +538,7 @@ Spec::Runner.configure do |config|
   def survey_with_submission(questions, &block)
     course_with_student(:active_all => true)
     @assignment = @course.assignments.create(:title => "Test Assignment")
-    @assignment.workflow_state = "available"
+    @assignment.workflow_state = "published"
     @assignment.submission_types = "online_quiz"
     @assignment.save
     @quiz = Quiz.find_by_assignment_id(@assignment.id)

@@ -1,0 +1,98 @@
+
+--- 
+courses_002: 
+  name: English 120
+  conclude_at: 
+  updated_at: 2009-04-30 23:55:49
+  account_id: 
+  group_weighting_scheme: 
+  id: "2"
+  old_account_id: 
+  uuid: 5a7b3df0-1810-012c-7a0a-001b632e4c5f
+  start_at: 
+  grading_standard_id: 
+  is_public: 
+  section: "101"
+  allow_student_wiki_edits: 
+  workflow_state: available
+  created_at: 2009-04-30 23:55:49
+courses_003: 
+  name: Hum 200
+  conclude_at: 
+  updated_at: 2009-04-30 23:55:49
+  account_id: 
+  group_weighting_scheme: 
+  id: "3"
+  old_account_id: 
+  uuid: 5a7c6a00-1810-012c-7a0a-001b632e4c5f
+  start_at: 
+  grading_standard_id: 
+  is_public: 
+  section: "101"
+  allow_student_wiki_edits: 
+  workflow_state: available
+  created_at: 2009-04-30 23:55:49
+courses_004: 
+  name: Chem 105
+  conclude_at: 
+  updated_at: 2009-04-30 23:55:49
+  account_id: 
+  group_weighting_scheme: 
+  id: "4"
+  old_account_id: 
+  uuid: 5a7da2f0-1810-012c-7a0a-001b632e4c5f
+  start_at: 
+  grading_standard_id: 
+  is_public: 
+  section: "101"
+  allow_student_wiki_edits: 
+  workflow_state: available
+  created_at: 2009-04-30 23:55:49
+courses_005: 
+  name: Biology 100
+  conclude_at: 
+  updated_at: 2009-04-30 23:55:49
+  account_id: 
+  group_weighting_scheme: 
+  id: "5"
+  old_account_id: 
+  uuid: 5a828480-1810-012c-7a0a-001b632e4c5f
+  start_at: 
+  grading_standard_id: 
+  is_public: 
+  section: "101"
+  allow_student_wiki_edits: 
+  workflow_state: available
+  created_at: 2009-04-30 23:55:49
+courses_006: 
+  name: value for name
+  conclude_at: 2009-04-30 23:57:33
+  updated_at: 2009-04-30 23:55:53
+  account_id: 
+  group_weighting_scheme: value for group_weighting_scheme
+  id: "6"
+  old_account_id: 
+  uuid: 5cf77470-1810-012c-7a0a-001b632e4c5f
+  start_at: 2009-04-30 23:55:53
+  grading_standard_id: 
+  is_public: t
+  section: value for section
+  allow_student_wiki_edits: t
+  workflow_state: created
+  created_at: 2009-04-30 23:55:53
+courses_001: 
+  name: Math 115
+  conclude_at: 
+  updated_at: 2009-04-30 23:55:49
+  account_id: 
+  group_weighting_scheme: 
+  id: "1"
+  old_account_id: 
+  uuid: 5a7a0d10-1810-012c-7a0a-001b632e4c5f
+  start_at: 
+  grading_standard_id: 
+  is_public: 
+  section: "101"
+  allow_student_wiki_edits: 
+  workflow_state: available
+  created_at: 2009-04-30 23:55:49

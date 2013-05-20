@@ -197,7 +197,6 @@ describe CoursesController, :type => :integration do
             'course_code'                          => 'Test Course',
             'start_at'                             => '2011-01-01T00:00:00-0700',
             'end_at'                               => '2011-05-01T00:00:00-0700',
-            'publish_grades_immediately'           => true,
             'is_public'                            => true,
             'public_syllabus'                      => true,
             'allow_wiki_comments'                  => true,
@@ -221,7 +220,7 @@ describe CoursesController, :type => :integration do
         })
         json = api_call(:post, @resource_path, @resource_params, post_params)
         new_course = Course.find(json['id'])
-        [:name, :course_code, :start_at, :end_at, :publish_grades_immediately,
+        [:name, :course_code, :start_at, :end_at,
         :is_public, :public_syllabus, :allow_wiki_comments,
         :open_enrollment, :self_enrollment, :license, :sis_course_id,
         :allow_student_forum_attachments, :public_description,

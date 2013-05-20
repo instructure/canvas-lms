@@ -908,7 +908,7 @@ describe CalendarEventsApiController, :type => :integration do
     context 'date overrides' do
       before :each do
         @default_assignment = @course.assignments.create(:title => 'overridden', :due_at => '2012-01-12 12:00:00')  # out of range
-        @default_assignment.workflow_state = 'available'
+        @default_assignment.workflow_state = 'published'
         @default_assignment.save!
       end
 

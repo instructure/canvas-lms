@@ -231,10 +231,10 @@ class AssignmentOverride < ActiveRecord::Base
   end
 
   def notify_change?
-    self.assignment and
-    self.assignment.context.state == :available and
-    (self.assignment.workflow_state == 'available' || self.assignment.workflow_state == 'published') and
-    self.assignment.created_at < 3.hours.ago and
+    self.assignment &&
+    self.assignment.context.available? &&
+    self.assignment.published? &&
+    self.assignment.created_at < 3.hours.ago &&
     (!self.prior_version ||
       self.workflow_state != self.prior_version.workflow_state ||
       self.due_at_overridden != self.prior_version.due_at_overridden ||

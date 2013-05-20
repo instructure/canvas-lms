@@ -261,7 +261,7 @@ class CoursesController < ApplicationController
             @course,
             @current_user,
             session,
-            [:start_at, course_end, :license, :publish_grades_immediately,
+            [:start_at, course_end, :license,
              :is_public, :public_syllabus, :allow_student_assignment_edits, :allow_wiki_comments,
              :allow_student_forum_attachments, :open_enrollment, :self_enrollment,
              :root_account_id, :account_id, :public_description,
@@ -1045,10 +1045,6 @@ class CoursesController < ApplicationController
     @context_enrollment ||= @pending_enrollment
     if is_authorized_action?(@context, @current_user, :read)
       check_incomplete_registration
-
-      if @current_user && @context.grants_right?(@current_user, session, :manage_grades)
-        @assignments_needing_publishing = @context.assignments.active.need_publishing || []
-      end
 
       add_crumb(@context.short_name, url_for(@context), :id => "crumb_#{@context.asset_string}")
       set_badge_counts_for(@context, @current_user, @current_enrollment)

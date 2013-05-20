@@ -259,7 +259,7 @@ class AssignmentsController < ApplicationController
     params[:assignment][:time_zone_edited] = Time.zone.name if params[:assignment]
     group = get_assignment_group(params[:assignment])
     @assignment ||= @context.assignments.build(params[:assignment])
-    @assignment.workflow_state = "available"
+    @assignment.workflow_state = "published"
     @assignment.updating_user = @current_user
     @assignment.content_being_saved_by(@current_user)
     @assignment.assignment_group = group if group
@@ -348,8 +348,6 @@ class AssignmentsController < ApplicationController
       params[:assignment].delete :overwrite_existing_grades
       if params[:publish]
         @assignment.workflow_state = 'published'
-      elsif params[:unpublish]
-        @assignment.workflow_state = 'available'
       end
       if params[:assignment_type] == "quiz"
         params[:assignment][:submission_types] = "online_quiz"

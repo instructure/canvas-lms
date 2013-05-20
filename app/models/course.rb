@@ -30,7 +30,6 @@ class Course < ActiveRecord::Base
                   :conclude_at,
                   :grading_standard_id,
                   :is_public,
-                  :publish_grades_immediately,
                   :allow_student_wiki_edits,
                   :show_public_context_messages,
                   :syllabus_body,
@@ -650,7 +649,6 @@ class Course < ActiveRecord::Base
     self.account_id ||= self.root_account_id
     self.enrollment_term = nil if self.enrollment_term.try(:root_account_id) != self.root_account_id
     self.enrollment_term ||= self.root_account.default_enrollment_term
-    self.publish_grades_immediately = true if self.publish_grades_immediately == nil
     self.allow_student_wiki_edits = (self.default_wiki_editing_roles || "").split(',').include?('students')
     true
   end
@@ -2390,8 +2388,7 @@ class Course < ActiveRecord::Base
 
   def self.clonable_attributes
     [ :group_weighting_scheme, :grading_standard_id, :is_public,
-      :publish_grades_immediately, :allow_student_wiki_edits,
-      :show_public_context_messages,
+      :allow_student_wiki_edits, :show_public_context_messages,
       :syllabus_body, :allow_student_forum_attachments,
       :default_wiki_editing_roles, :allow_student_organized_groups,
       :default_view, :show_all_discussion_entries, :open_enrollment,

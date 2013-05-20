@@ -128,7 +128,6 @@ describe ContentMigration do
       @copy_from.is_public = false
       @copy_from.name = "haha copy from test &amp;"
       @copy_from.course_code = 'something funny'
-      @copy_from.publish_grades_immediately = false
       @copy_from.allow_student_wiki_edits = true
       @copy_from.show_public_context_messages = false
       @copy_from.allow_student_forum_attachments = false

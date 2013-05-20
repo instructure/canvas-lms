@@ -43,14 +43,14 @@ module BroadcastPolicies
 
     def should_dispatch_submission_graded?
       broadcasting_grades? &&
-      (submission.changed_state_to(:graded) || (grade_updated? && !submission.assignment_just_published && graded_recently?))
+      (submission.changed_state_to(:graded) || (grade_updated? && graded_recently?))
     end
 
     def should_dispatch_submission_grade_changed?
       broadcasting_grades? &&
       submission.graded_at &&
       !graded_recently? &&
-      (submission.assignment_just_published || (grade_updated? && !graded_recently?))
+      grade_updated?
     end
 
     private

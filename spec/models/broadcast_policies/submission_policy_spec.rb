@@ -160,6 +160,7 @@ module BroadcastPolicies
         submission.stubs(:graded_at).returns Time.now
         submission.stubs(:assignment_graded_in_the_last_hour?).returns false
         submission.stubs(:assignment_just_published).returns true
+        submission.stubs(:changed_in_state).with(:graded, :fields => [:score, :grade]).returns true
       end
 
       def wont_send_when

@@ -304,7 +304,7 @@ class Quiz < ActiveRecord::Base
         a.submission_types = "online_quiz"
         a.assignment_group_id = self.assignment_group_id
         a.saved_by = :quiz
-        a.workflow_state = 'available' if a.deleted?
+        a.workflow_state = 'published' if a.deleted?
         a.notify_of_update = @notify_of_update
         a.with_versioning(false) do
           @notify_of_update ? a.save : a.save_without_broadcasting!

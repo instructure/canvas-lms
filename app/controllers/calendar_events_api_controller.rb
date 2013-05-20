@@ -157,8 +157,7 @@
 #       // the context code of the (course) calendar this assignment belongs to
 #       context_code: "course_123",
 #
-#       // Current state of the assignment ("available", "published" or
-#       // "deleted")
+#       // Current state of the assignment ("published" or "deleted")
 #       workflow_state: "published",
 #
 #       // URL for this assignment (note that updating/deleting should be done

@@ -17,15 +17,6 @@
 #
 
 module GradebooksHelper
-  def should_be_published?(students, assignment, submissions)
-    return false if assignment.published?
-    return true if assignment.needs_publishing?
-    submissions = submissions.select{|s| s.assignment_id == assignment.id && s.score}
-    result = (submissions.length.to_f / students.length.to_f) > 0.5 &&
-      !assignment.available?
-    result
-  end
-  
   def display_grade(grade)
     grade.blank? ? "--" : grade
   end
