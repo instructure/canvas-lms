@@ -1,16 +1,16 @@
 define [
   'jquery'
+  'underscore'
   'jst/content_migrations/MigrationConverter'
   'compiled/views/ValidatedFormView'
   'vendor/jquery.ba-tinypubsub'
   'jquery.disableWhileLoading'
-], ($, template, ValidatedFormView) -> 
+], ($, _, template, ValidatedFormView) -> 
 
   # This is an abstract class that is inherited 
   # from by other MigrationConverter views
   class MigrationConverterView extends ValidatedFormView
     @optionProperty 'selectOptions'
-    @child 'progressView', '#progress'
 
     template: template
     
@@ -19,9 +19,9 @@ define [
       '#chooseMigrationConverter' : '$chooseMigrationConverter'
       '.form-actions'             : '$formActions'
 
-    events: 
+    events: _.extend({}, @::events,
       'change #chooseMigrationConverter' : 'selectConverter'
-      'submit' : 'submit'
+    )
 
     toJSON: (json) -> 
       json = super

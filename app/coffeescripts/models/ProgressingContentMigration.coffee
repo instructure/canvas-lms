@@ -3,17 +3,18 @@ define [
   'compiled/models/ContentMigrationProgress'
   'compiled/collections/ContentMigrationIssueCollection'
 ], (Backbone, ProgressModel, IssuesCollection) -> 
+
   # Summary
   #   Represents a model that is progressing through its 
-  #   workflow_state steps. Could be in the following 
-  #   states: 
-  #     pre_processing, failed, completed, running
+  #   workflow_state steps. 
+  
   class ProgressingContentMigration extends Backbone.Model
     initialize: (attr, options) -> 
       super
-      @course_id = @collection.course_id || options.course_id || @get('course_id')
+      @course_id = @collection?.course_id || options?.course_id || @get('course_id')
       @buildChildren()
       @pollIfRunning()
+      @syncProgressUrl()
 
     # Create child associations for this model. Each 
     # ProgressingMigration should have a ProgressModel
@@ -41,4 +42,13 @@ define [
     # @api private
 
     pollIfRunning: -> @progressModel.poll() if @get('workflow_state') == 'running'
+
+    # Sometimes the progress url for this progressing migration might change or 
+    # be added after initialization. If this happens, the @progressModel's url needs
+    # to be updated to reflect the change.
+    #
+    # @api private
+
+    syncProgressUrl: -> 
+      @on 'change:progress_url', => @progressModel.set('url', @get('progress_url'))
 

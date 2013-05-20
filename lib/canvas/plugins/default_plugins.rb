@@ -149,6 +149,7 @@ Canvas::Plugin.register 'course_copy_importer', :export_system, {
         :settings => {
                 :worker => 'CourseCopyWorker',
                 :requires_file_upload => false,
+                :skip_conversion_step => true,
                 :required_options_validator => Canvas::Migration::Validators::CourseCopyValidator,
                 :required_settings => [:source_course_id]
         },

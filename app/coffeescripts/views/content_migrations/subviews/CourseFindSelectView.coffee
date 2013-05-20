@@ -48,7 +48,7 @@ define [
     # @api private
 
     updateSearch: (event) => 
-      value = parseInt event.target.value
+      value = parseInt(event.target.value, 10)
       @setSourceCourseId value
 
       courses = @autocompleteCourses()

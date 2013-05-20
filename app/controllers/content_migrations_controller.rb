@@ -262,7 +262,13 @@ class ContentMigrationsController < ApplicationController
 
     params[:selective_import] = false if @plugin.settings && @plugin.settings[:no_selective_import]
     if Canvas::Plugin.value_to_boolean(params[:selective_import])
-      #todo selective import options
+      @content_migration.migration_settings[:import_immediately] = false
+      if @plugin.settings[:skip_conversion_step]
+        # Mark the migration as 'waiting_for_select' since it doesn't need a conversion
+        # and is selective import
+        @content_migration.workflow_state = 'exported'
+        params[:do_not_run] = true
+      end
     else
       @content_migration.migration_settings[:import_immediately] = true
       @content_migration.copy_options = {:everything => true}

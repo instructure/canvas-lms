@@ -9,3 +9,4 @@ define [
 
     @child 'courseFindSelect', '.courseFindSelect'
     @child 'dateShift', '.dateShift'
+    @child 'selectContent', '.selectContent'

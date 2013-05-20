@@ -7,19 +7,22 @@ define [
   'compiled/views/content_migrations/ContentMigrationIssueView'
   'compiled/views/content_migrations/ProgressBarView'
   'compiled/views/content_migrations/ProgressStatusView'
-], ($, Backbone, template, progressingIssuesTemplate, PaginatedCollectionView, ContentMigrationIssueView, ProgressBarView, ProgressStatusView) -> 
+  'compiled/views/content_migrations/SelectContentView'
+], ($, Backbone, template, progressingIssuesTemplate, PaginatedCollectionView, ContentMigrationIssueView, ProgressBarView, ProgressStatusView, SelectContentView) -> 
   class ProgressingContentMigrationView extends Backbone.View
     template: template
     tagName: 'li'
     className: 'clearfix migrationProgressItem'
 
     events: 
-      'click .showIssues' : 'toggleIssues'
+      'click .showIssues'       : 'toggleIssues'
+      'click .selectContentBtn' : 'showSelectContentDialog'
 
     els: 
-      '.migrationIssues'  : '$migrationIssues'
-      '.changable'        : '$changable'
-      '.progressStatus'   : '$progressStatus'
+      '.migrationIssues'     : '$migrationIssues'
+      '.changable'           : '$changable'
+      '.progressStatus'      : '$progressStatus'
+      '.selectContentDialog' : '$selectContentDialog'
 
     initialize: -> 
       super
@@ -27,6 +30,11 @@ define [
 
       @progress = @model.progressModel
       @issues   = @model.issuesCollection
+
+      # Continue looking for progress after content is selected.
+      @model.on 'continue', =>
+        @progress?.poll()
+        @render()
 
     toJSON: -> 
       json = super
@@ -102,9 +110,9 @@ define [
     # @api private
 
     updateMigrationModel: -> 
-        @model.fetch
-                error: (model, response, option) => console.log 'show some error message'
-                success: (model, response, options) => @render()
+      @model.fetch
+              error: (model, response, option) => console.log 'show some error message'
+              success: (model, response, options) => @render()
 
     # When clicking on the issues button for the first time it needs to fetch all of the issues.
     # This progress view keeps track of if it's fetched issues for this migration with the 
@@ -147,3 +155,21 @@ define [
         @model.set('issuesButtonText', 'Hide Issues')
       else 
         @model.set('issuesButtonText', 'Show Issues')
+
+
+    # Render's a new SelectContentDialog which allows someone to select the migration
+    # content to be migrated. 
+    #
+    # @api private
+
+    showSelectContentDialog: (event) => 
+      event.preventDefault()
+
+      @selectContent ||= new SelectContentView 
+                        model: @model
+                        el: @$selectContentDialog
+                        title: 'Select Content'
+                        width: 600
+                        height: 400
+
+      @selectContent.open()

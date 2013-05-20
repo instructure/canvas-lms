@@ -7,3 +7,4 @@ define [
     template: template
 
     @child 'chooseMigrationFile', '.chooseMigrationFile'
+    @child 'selectContent', '.selectContent'

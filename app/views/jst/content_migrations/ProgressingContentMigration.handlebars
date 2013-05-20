@@ -3,11 +3,12 @@
 <div class="span2 top-margin centerText progressStatus"></div>
 <div class="span3 changable {{#if loading}}top-margin{{/if}}">
   {{#if waiting_for_select}}
-    <button type='button' id='selectContent{{cid}}' class='btn btn-primary'>Select Content</button>
+    <button type='button' title="{{#t "select_content"}}Select Content{{/t}}" class='btn btn-primary selectContentBtn'>{{#t "select_content"}}Select Content{{/t}}</button>
+    <form class="selectContentDialog form-dialog" style="display:none"></form>
   {{else}}
     {{#if migration_issues}}
       <button type='button' id='issueText{{cid}}' class='btn showIssues' href='#issues{{cid}}'>
-        <span class='badge badge-warning' data-bind="migration_issues_count">{{issuesCount}}</span> <span data-bind="issuesButtonText">Show Issues</span>
+        <span class='badge badge-warning' data-bind="migration_issues_count">{{issuesCount}}</span> <span data-bind="issuesButtonText">{{#t "show_issues"}}Show Issues{{/t}}</span>
       </button>
     {{/if}}
   {{/if}}
