@@ -8,7 +8,7 @@
 
         <% if can_do(@quiz, @current_user, :update) %>
           <% if can_do(@quiz, @current_user, :manage) %>
-            <% if @submitted_student_count && @submitted_student_count > 0 && @context.allows_speed_grader? %>
+            <% if @submitted_student_count && @submitted_student_count > 0 %>
               <li>
                 <a href="<%= context_url(@context, :context_quiz_statistics_url, @quiz.id) %>">
                   <i class="icon-stats"></i> <%= @quiz.survey? ? t('links.survey_statistics', "Survey Statistics") : t('links.quiz_statistics', "Quiz Statistics") %>
@@ -18,11 +18,12 @@
 
             <a href="<%= context_url(@context, :context_quiz_moderate_url, @quiz.id) %>">
               <i class="icon-settings"></i> <%= @quiz.survey? ? t('links.moderate_this_survey', "Moderate This Survey") : t('links.moderate_this_quiz', "Moderate This Quiz") %>
-          </a>
-          <%= render :partial => 'quizzes/download_file_upload_submissions' %>
+            </a>
+            <%= render :partial => 'quizzes/download_file_upload_submissions' %>
+
           <% end %>
         <% elsif can_do(@quiz, @current_user, :review_grades) %>
-          <% if @submitted_student_count && @submitted_student_count > 0 && @context.allows_speed_grader? %>
+          <% if @submitted_student_count && @submitted_student_count > 0 %>
             <li>
               <a href="<%= context_url(@context, :context_quiz_statistics_url, @quiz.id) %>">
                 <i class="icon-stats"></i> <%= @quiz.survey? ? t('links.survey_statistics', "Survey Statistics") : t('links.quiz_statistics', "Quiz Statistics") %>
@@ -54,7 +55,7 @@
       </ul>
       <%= render :partial => "quizzes/quiz_right_side", :locals => {:allow_take => false} %>
     <% else %>
-      
+
       <div class="rs-margin-top">
         <% if @submission && @submission.completed? %>
           <%= render :partial => "quizzes/quiz_right_side", :locals => {:allow_take => !@locked} %>
@@ -179,7 +180,7 @@
                       <% if @any_submissions_pending_review %>
                         <i class="icon-warning"></i>
                       <% end %>
-                      <i class="icon-group"></i> 
+                      <i class="icon-group"></i>
                       <span id="quiz_details_text">
                         <%= @quiz.survey? ? t('links.show_student_survey_results', "Show Student Survey Results") : t('links.show_student_quiz_results', "Show Student Quiz Results") %>
                       </span>

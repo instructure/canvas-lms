@@ -76,33 +76,32 @@ class QuizzesController < ApplicationController
   # student_analysis report
   def statistics
     if authorized_action(@quiz, @current_user, :read_statistics)
-      if @context.large_roster?
-        flash[:notice] = t "#application.notices.page_disabled_for_course", "That page has been disabled for this course"
-        redirect_to named_context_url(@context, :context_quiz_url, @quiz)
-        return
-      end
+        respond_to do |format|
+          format.html {
+            all_versions = params[:all_versions] == '1'
+            add_crumb(@quiz.title, named_context_url(@context, :context_quiz_url, @quiz))
+            add_crumb(t(:statistics_crumb, "Statistics"), named_context_url(@context, :context_quiz_statistics_url, @quiz))
 
-      respond_to do |format|
-        format.html {
-          all_versions = params[:all_versions] == '1'
-          add_crumb(@quiz.title, named_context_url(@context, :context_quiz_url, @quiz))
-          add_crumb(t(:statistics_crumb, "Statistics"), named_context_url(@context, :context_quiz_statistics_url, @quiz))
-          @statistics = @quiz.statistics(all_versions)
-          user_ids = @statistics[:submission_user_ids]
-          @submitted_users = User.where(:id => user_ids.to_a).order_by_sortable_name
-          @users = Hash[
-            @submitted_users.map { |u| [u.id, u] }
-          ]
-          js_env :quiz_reports => QuizStatistics::REPORTS.map { |report_type|
-            report = @quiz.current_statistics_for(report_type, :includes_all_versions => all_versions)
-            json = quiz_statistics_json(report, @current_user, session, :include => ['file'])
-            json[:course_id] = @context.id
-            json[:report_name] = report.readable_type
-            json[:progress] = progress_json(report.progress, @current_user, session) if report.progress
-            json
+            if !@context.large_roster?
+              @statistics = @quiz.statistics(all_versions)
+              user_ids = @statistics[:submission_user_ids]
+              @submitted_users = User.where(:id => user_ids.to_a).order_by_sortable_name
+              @users = Hash[
+                @submitted_users.map { |u| [u.id, u] }
+              ]
+            end
+
+            js_env :quiz_reports => QuizStatistics::REPORTS.map { |report_type|
+              report = @quiz.current_statistics_for(report_type, :includes_all_versions => all_versions)
+              json = quiz_statistics_json(report, @current_user, session, :include => ['file'])
+              json[:course_id] = @context.id
+              json[:report_name] = report.readable_type
+              json[:progress] = progress_json(report.progress, @current_user, session) if report.progress
+              json
+            }
           }
-        }
-      end
+        end
+
     end
   end
 
