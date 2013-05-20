@@ -18,6 +18,13 @@
 
 class BigBlueButtonConference < WebConference
 
+  user_setting_field :record, {
+    name: ->{ t('recording_setting', 'Recording') },
+    description: ->{ t('recording_setting_description', 'Record this conference') },
+    type: :boolean,
+    default: false,
+  }
+
   def initiate_conference
     return conference_key if conference_key && !retouch?
     unless self.conference_key
@@ -36,7 +43,8 @@ class BigBlueButtonConference < WebConference
       :voiceBridge => "%020d" % self.global_id,
       :attendeePW => settings[:user_key],
       :moderatorPW => settings[:admin_key],
-      :logoutURL => (settings[:default_return_url] || "http://www.instructure.com")
+      :logoutURL => (settings[:default_return_url] || "http://www.instructure.com"),
+      :record => settings[:record] ? "true" : "false",
     }) or return nil
     save
     conference_key
@@ -58,6 +66,17 @@ class BigBlueButtonConference < WebConference
     join_url(user)
   end
 
+  def recordings
+    fetch_recordings.map do |recording|
+      recording_format = recording.fetch(:playback, {}).fetch(:format, {})
+      {
+        recording_id:     recording[:recordID],
+        duration_minutes: recording_format[:length].to_i,
+        playback_url:     recording_format[:url],
+      }
+    end
+  end
+
   private
 
   def retouch?
@@ -75,6 +94,21 @@ class BigBlueButtonConference < WebConference
       :meetingID => conference_key,
       :password => settings[(type == :user ? :user_key : :admin_key)],
       :userID => user.id
+  end
+
+  def fetch_recordings
+    response = send_request(:getRecordings, {
+      :meetingID => conference_key,
+      })
+    result = response[:recordings] if response
+    Array(result)
+  end
+
+  def delete_recording(recording_id)
+    response = send_request(:deleteRecordings, {
+      :recordID => recording_id,
+      })
+    response[:deleted] if response
   end
 
   def generate_request(action, options)
@@ -100,12 +134,11 @@ class BigBlueButtonConference < WebConference
 
     case res
       when Net::HTTPSuccess
-        response = Nokogiri::XML(res.body).at_css("response").children.
-          inject({}){ |hash, node| hash[node.name.downcase.to_sym] = node.content; hash }
+        response = xml_to_hash(res.body)
         if response[:returncode] == 'SUCCESS'
           return response
         else
-          logger.error "big blue button api error #{response[:message]} (#{response[:messagekey]})"
+          logger.error "big blue button api error #{response[:message]} (#{response[:messageKey]})"
         end
       else
         logger.error "big blue button http error #{res}"
@@ -117,5 +150,34 @@ class BigBlueButtonConference < WebConference
   rescue
     logger.error "big blue button unhandled exception #{$!}"
     nil
+  end
+
+  def xml_to_hash(xml_string)
+    doc = Nokogiri::XML(xml_string)
+    # assumes the top level value will be a hash
+    xml_to_value(doc.root)
+  end
+
+  def xml_to_value(node)
+    child_elements = node.element_children
+
+    # if there are no children at all, then this is an empty node
+    if node.children.empty?
+      nil
+    # If no child_elements, this is probably a text node, so just return its content
+    elsif child_elements.empty?
+      node.content
+    # The BBB API follows the pattern where a plural element (ie <bars>)
+    # contains many singular elements (ie <bar>) and nothing else. Detect this
+    # and return an array to be assigned to the plural element.
+    elsif node.name.singularize == child_elements.first.name
+      child_elements.map { |child| xml_to_value(child) }
+    # otherwise, make a hash of the child elements
+    else
+      child_elements.reduce({}) do |hash, child|
+        hash[child.name.to_sym] = xml_to_value(child)
+        hash
+      end
+    end
   end
 end

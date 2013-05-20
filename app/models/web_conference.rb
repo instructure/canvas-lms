@@ -49,9 +49,9 @@ class WebConference < ActiveRecord::Base
   before_save :merge_user_settings
   def merge_user_settings
     unless user_settings.empty?
-      (type ? type.constantize : self).user_settings.each do |name, data|
-        next if data[:restricted_to] && !data[:restricted_to].call(self)
-        settings[name] = cast_setting(user_settings[name], data[:type])
+      (type ? type.constantize : self).user_setting_fields.each do |name, field_data|
+        next if field_data[:restricted_to] && !field_data[:restricted_to].call(self)
+        settings[name] = cast_setting(user_settings[name], field_data[:type])
       end
       @user_settings = nil
     end
@@ -63,18 +63,10 @@ class WebConference < ActiveRecord::Base
 
   def user_settings
     @user_settings ||= 
-      self.class.user_settings.keys.inject({}){ |hash, key|
+      self.class.user_setting_fields.keys.inject({}){ |hash, key|
         hash[key] = settings[key]
         hash
       }
-  end
-
-  def setting_name(key)
-    user_settings[key][:name].call
-  end
-
-  def setting_description(key)
-    user_settings[key][:description].call
   end
 
   def external_urls_name(key)
@@ -105,18 +97,26 @@ class WebConference < ActiveRecord::Base
 
   def default_settings
     @default_settings ||= 
-    self.class.user_settings.inject({}){ |hash, (name, data)|
+    self.class.user_setting_fields.inject({}){ |hash, (name, data)|
       hash[name] = data[:default] if data[:default]
       hash
     }
   end
 
-  def self.user_setting(name, options)
-    user_settings[name] = options
+  def self.user_setting_field(name, options)
+    user_setting_fields[name] = options
   end
 
-  def self.user_settings
-    read_inheritable_attribute(:user_settings) || write_inheritable_attribute(:user_settings, {})
+  def self.user_setting_fields
+    read_inheritable_attribute(:user_setting_fields) || write_inheritable_attribute(:user_setting_fields, {})
+  end
+
+  def self.user_setting_field_name(key)
+    user_setting_fields[key][:name].call
+  end
+
+  def self.user_setting_field_description(key)
+    user_setting_fields[key][:description].call
   end
 
   def external_urls
@@ -252,10 +252,6 @@ class WebConference < ActiveRecord::Base
     end
   end
   
-  def conference_status
-    raise "not implemented"
-  end
-  
   def restart
     self.start_at ||= Time.now
     self.end_at ||= self.start_at + self.duration_in_seconds if self.duration
@@ -309,18 +305,17 @@ class WebConference < ActiveRecord::Base
     @attendee_key ||= self.conference_key
   end
   
-  def admin_join_url(user, return_to="http://www.instructure.com")
-    raise "not implemented"
-  end
-  
-  def participant_join_url(user, return_to="http://www.instructure.com")
-    raise "not implemented"
-  end
-  
+  # Default implementaiton since not every conference type requires initiation
   def initiate_conference
     true
   end
   
+  # Default implementation since most implemenations don't support recording yet
+  def recordings
+    []
+  end
+
+
   def craft_url(user=nil,session=nil,return_to="http://www.instructure.com")
     user ||= self.user
     initiate_conference and touch or return nil
@@ -406,7 +401,7 @@ class WebConference < ActiveRecord::Base
       plugin.settings.merge(
         :conference_type => plugin.id.classify,
         :class_name => (plugin.base || "#{plugin.id.classify}Conference"),
-        :user_settings => klass.user_settings,
+        :user_setting_fields => klass.user_setting_fields,
         :plugin => plugin
       ).with_indifferent_access
     }.compact

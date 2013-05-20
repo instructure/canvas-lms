@@ -107,18 +107,18 @@ require([
 
   INST.webConferenceUserSettings = <%=
     WebConference.conference_types.map{ |type|
-      type[:user_settings].keys.map{ |setting| "user_settings[#{setting}]" }
+      type[:user_setting_fields].keys.map{ |setting| "user_settings[#{setting}]" }
     }.flatten.to_json.html_safe
   %>;
   INST.webConferenceUserSettingTemplates = <%=
     WebConference.conference_types.inject({}){ |types, type|
-      types[type[:conference_type]] = type[:user_settings].inject({}) {|settings, (name, options)|
+      types[type[:conference_type]] = type[:user_setting_fields].inject({}) {|settings, (name, options)|
         field_name = "web_conference[user_settings][#{name}]"
         settings[name] = options
         settings[name][:html] = case options[:type]
           when :boolean
-            check_box_tag(field_name, "true", options[:default]) + " " + label_tag(field_name, type[:class_name].constantize.setting_description(name))
-        end
+            check_box_tag(field_name, "true", options[:default]) + " " + label_tag(field_name, type[:class_name].constantize.user_setting_field_description(name.to_sym))
+          end
         settings
       }
       types

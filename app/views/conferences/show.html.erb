@@ -32,7 +32,7 @@
     <% if can_do(@conference, @current_user, :update) %>
       <% @conference.user_settings.each do |key, value| %>
       <tr>
-        <th><%=h before_label(@conference.setting_name(key)) %></th>
+        <th><%=h before_label(@conference.class.user_setting_field_name(key)) %></th>
         <td><%=h @conference.friendly_setting(value) %></td>
       </tr>
       <% end %>
