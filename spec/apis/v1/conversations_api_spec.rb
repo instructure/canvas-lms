@@ -1469,4 +1469,13 @@ describe ConversationsController, :type => :integration do
     end
   end
 
+  describe 'unread_count' do
+    it 'should return the number of unread conversations for the current user' do
+      conversation(student_in_course, :workflow_state => 'unread')
+      json = api_call(:get, '/api/v1/conversations/unread_count.json',
+                      {:controller => 'conversations', :action => 'unread_count', :format => 'json'})
+      json.should eql({'unread_count' => '1'})
+    end
+  end
+  
 end

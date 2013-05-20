@@ -927,6 +927,7 @@ ActionController::Routing::Routes.draw do |map|
       conversations.post 'conversations', :action => :create
       conversations.post 'conversations/mark_all_as_read', :action => :mark_all_as_read
       conversations.get 'conversations/batches', :action => :batches, :path_name => 'conversations_batches'
+      conversations.get 'conversations/unread_count', :action => :unread_count
       conversations.get 'conversations/:id', :action => :show
       conversations.put 'conversations/:id', :action => :update # stars, subscribed-ness, workflow_state
       conversations.delete 'conversations/:id', :action => :destroy
