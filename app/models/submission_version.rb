@@ -33,14 +33,6 @@ class SubmissionVersion < ActiveRecord::Base
       connection.bulk_insert(table_name, records) if records.present?
     end
 
-    def reindex_version(version)
-      attributes = extract_version_attributes(version)
-      if attributes
-        attributes.delete(:version_id)
-        SubmissionVersion.where(:version_id => version).update_all(attributes)
-      end
-    end
-
     private
     def extract_version_attributes(version)
       # TODO make context extraction more efficient in bulk case
