@@ -604,6 +604,15 @@ class ConversationsController < ApplicationController
   # Deprecated, see the {api:SearchController#recipients Find recipients endpoint} in the Search API
   def find_recipients; end
 
+  # @API Unread count
+  # Get the number of unread conversations for the current user
+  #
+  # @example_response
+  #   {'unread_count': '7'}
+  def unread_count
+    render(:json => {'unread_count' => @current_user.unread_conversations_count.to_json})
+  end
+  
   def public_feed
     return unless get_feed_context(:only => [:user])
     @current_user = @context
