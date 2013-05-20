@@ -175,42 +175,54 @@ else
     end
   end
 
-  # Handle quoting properly for Infinity and NaN. This fix exists in Rails 3.1
-  # and can be safely removed once we upgrade.
-  #
-  # Adapted from: https://github.com/rails/rails/commit/06c23c4c7ff842f7c6237f3ac43fc9d19509a947
-  #
-  # This patch is covered by tests in spec/initializers/active_record_quoting_spec.rb
   if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
     ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.class_eval do
-      # Quotes PostgreSQL-specific data types for SQL input.
-      def quote(value, column = nil) #:nodoc:
-        if value.kind_of?(String) && column && column.type == :binary
-          "'#{escape_bytea(value)}'"
-        elsif value.kind_of?(String) && column && column.sql_type == 'xml'
-          "xml '#{quote_string(value)}'"
-        elsif value.kind_of?(Float)
+      # Force things with (approximate) integer representations (Floats,
+      # BigDecimals, Times, etc.) into those representations. Raise
+      # ActiveRecord::StatementInvalid for any other non-integer things.
+      def quote_with_integer_enforcement(value, column = nil)
+        if column && column.type == :integer && !value.respond_to?(:quoted_id)
+          case value
+          when String, ActiveSupport::Multibyte::Chars, nil, true, false
+            # these already have branches for column.type == :integer (or don't
+            # need one)
+            quote_without_integer_enforcement(value, column)
+          else
+            if value.respond_to?(:to_i)
+              # quote the value in its integer representation
+              value.to_i.to_s
+            else
+              # doesn't have a (known) integer representation, can't quote it
+              # for an integer column
+              raise ActiveRecord::StatementInvalid, "#{value.inspect} cannot be interpreted as an integer"
+            end
+          end
+        else
+          quote_without_integer_enforcement(value, column)
+        end
+      end
+      alias_method_chain :quote, :integer_enforcement
+
+      # Handle quoting properly for Infinity and NaN. This fix exists in Rails 3.1
+      # and can be safely removed once we upgrade.
+      #
+      # Adapted from: https://github.com/rails/rails/commit/06c23c4c7ff842f7c6237f3ac43fc9d19509a947
+      #
+      # This patch is covered by tests in spec/initializers/active_record_quoting_spec.rb
+      def quote_with_infinity_and_nan(value, column = nil) #:nodoc:
+        if value.kind_of?(Float)
           if value.infinite? && column && column.type == :datetime
             "'#{value.to_s.downcase}'"
           elsif value.infinite? || value.nan?
             "'#{value.to_s}'"
           else
-            super
-          end
-        elsif value.kind_of?(Numeric) && column && column.sql_type == 'money'
-          # Not truly string input, so doesn't require (or allow) escape string syntax.
-          "'#{value.to_s}'"
-        elsif value.kind_of?(String) && column && column.sql_type =~ /^bit/
-          case value
-            when /^[01]*$/
-              "B'#{value}'" # Bit-string notation
-            when /^[0-9A-F]*$/i
-              "X'#{value}'" # Hexadecimal notation
+            quote_without_infinity_and_nan(value, column)
           end
         else
-          super
+          quote_without_infinity_and_nan(value, column)
         end
       end
+      alias_method_chain :quote, :infinity_and_nan
     end
   end
 
