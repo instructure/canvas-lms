@@ -141,8 +141,7 @@ class Submission < ActiveRecord::Base
 
   simply_versioned :explicit => true,
     :when => lambda{ |model| model.new_version_needed? },
-    :on_create => lambda{ |model,version| SubmissionVersion.index_version(version) },
-    :on_update => lambda{ |model,version| SubmissionVersion.reindex_version(version) }
+    :on_create => lambda{ |model,version| SubmissionVersion.index_version(version) }
 
   def new_version_needed?
     turnitin_data_changed? || (changes.keys - [
