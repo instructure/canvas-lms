@@ -1243,6 +1243,7 @@ define([
             mimeType: attachment.content_type,
             attachment_id: attachment.id,
             submission_id: this.currentStudent.submission.id,
+            attachment_view_inline_ping_url: attachment.view_inline_ping_url,
             ready: function(){
               EG.resizeFullHeight();
             }

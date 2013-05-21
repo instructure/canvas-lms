@@ -311,10 +311,10 @@ define([
         // what value is there in knowing the student looked at the file browser,
         // we just care if they access files.
       },
-      viewFile: function(context_string, id) {
+      viewInlinePingUrl: function(context_string, id) {
         var url = $("#file_context_links ." + context_string + "_inline_view_attachment_url").attr('href');
         url = $.replaceTags(url, 'id', id);
-        $.ajaxJSON(url, 'POST', {}, function() { }, function() { });
+        return url;
       },
       selectFolder: function($original_node) {
         if(!files.selectFolder.forceRefresh && ($original_node.hasClass('active-node') || $original_node.hasClass('active-leaf'))) { return; }
@@ -1578,9 +1578,9 @@ define([
                       height: '100%',
                       crocodoc_session_url: data.crocodocSession,
                       scribd_doc_id: data.scribd_doc && data.scribd_doc.attributes && data.scribd_doc.attributes.doc_id,
-                      scribd_access_key: data.scribd_doc && data.scribd_doc.attributes && data.scribd_doc.attributes.access_key
+                      scribd_access_key: data.scribd_doc && data.scribd_doc.attributes && data.scribd_doc.attributes.access_key,
+                      attachment_view_inline_ping_url: files.viewInlinePingUrl(data.context_string, data.id)
                     });
-                    files.viewFile(data.context_string, data.id);
                   };
                   if (data.permissions && data.permissions.download && $.isPreviewable(data.content_type)) {
                     if (data['crocodoc_available?'] && !data.crocodocSession) {

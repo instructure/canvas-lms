@@ -289,6 +289,7 @@ class FilesController < ApplicationController
         generate_new_page_view
         @attachment.context_module_action(@current_user, :read) if @current_user
         log_asset_access(@attachment, 'files', 'files')
+        @attachment.record_inline_view
         render :json => {:ok => true}.to_json
       else
         render_attachment(@attachment)
@@ -313,10 +314,11 @@ class FilesController < ApplicationController
           # Right now we assume if they ask for json data on the attachment
           # which includes the scribd doc data, then that means they have 
           # viewed or are about to view the file in some form.
-          attachment.context_module_action(@current_user, :read) if @current_user && (
-            (feature_enabled?(:scribd) && attachment.scribd_doc) || 
-            (service_enabled?(:google_docs_previews) && attachment.authenticated_s3_url)
-          )
+          if @current_user && ((feature_enabled?(:scribd) && attachment.scribd_doc) ||
+             (service_enabled?(:google_docs_previews) && attachment.authenticated_s3_url))
+            attachment.context_module_action(@current_user, :read)
+            @attachment.record_inline_view
+          end
           options[:methods] = :authenticated_s3_url if service_enabled?(:google_docs_previews) && attachment.authenticated_s3_url
           log_asset_access(@attachment, "files", "files")
         end

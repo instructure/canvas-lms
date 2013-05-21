@@ -1159,6 +1159,10 @@ class Assignment < ActiveRecord::Base
                       :media_comment_type, :media_comment_id,
                       :cached_attachments, :attachments]
 
+    attachment_fields = [:id, :comment_id, :content_type, :context_id, :context_type,
+                         :crocodoc_available?, :display_name, :filename, :mime_class,
+                         :scribd_doc, :scribdable?, :size, :submitter_id, :workflow_state]
+
     res = as_json(
       :include => {
         :context => { :only => :id },
@@ -1197,7 +1201,16 @@ class Assignment < ActiveRecord::Base
             },
             :only => submission_fields,
             :methods => [:versioned_attachments, :late]
-          )
+          ).tap do |s|
+            if s['submission'] && s['submission']['versioned_attachments']
+              s['submission']['versioned_attachments'].map! do |a|
+                a.as_json(
+                  :only => attachment_fields,
+                  :methods => [:view_inline_ping_url]
+                )
+              end
+            end
+          end
         end
       end
       json

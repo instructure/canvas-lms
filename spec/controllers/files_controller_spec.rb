@@ -272,6 +272,7 @@ describe FilesController do
       get 'show', :course_id => @course.id, :id => @file.id, :download => 1
       @module.reload
       @module.evaluate_for(@user, true, true).state.should eql(:completed)
+      @file.reload.last_inline_view.should be_nil
     end
 
     it "should not mark a file as viewed for module progressions if the file is locked" do
@@ -281,6 +282,7 @@ describe FilesController do
       get 'show', :course_id => @course.id, :id => @file.id, :download => 1
       @module.reload
       @module.evaluate_for(@user, true, true).state.should eql(:unlocked)
+      @file.reload.last_inline_view.should be_nil
     end
 
     it "should not mark a file as viewed for module progressions just because the files#show view is rendered" do
@@ -290,6 +292,7 @@ describe FilesController do
       get 'show', :course_id => @course.id, :id => @file.id
       @module.reload
       @module.evaluate_for(@user, true, true).state.should eql(:unlocked)
+      @file.reload.last_inline_view.should be_nil
     end
 
     it "should mark files as viewed for module progressions if the file is previewed inline" do
@@ -298,6 +301,7 @@ describe FilesController do
       json_parse.should == {'ok' => true}
       @module.reload
       @module.evaluate_for(@user, true, true).state.should eql(:completed)
+      @file.reload.last_inline_view.should > 1.minute.ago
     end
 
     it "should mark files as viewed for module progressions if the file data is requested and it includes the scribd_doc data" do
@@ -307,6 +311,7 @@ describe FilesController do
       get 'show', :course_id => @course.id, :id => @file.id, :format => :json
       @module.reload
       @module.evaluate_for(@user, true, true).state.should eql(:completed)
+      @file.reload.last_inline_view.should > 1.minute.ago
     end
 
     it "should not mark files as viewed for module progressions if the file data is requested and it doesn't include the scribd_doc data (meaning it got viewed in scribd inline) and google docs preview is disabled" do
@@ -322,6 +327,7 @@ describe FilesController do
       get 'show', :course_id => @course.id, :id => @file.id, :format => :json
       @module.reload
       @module.evaluate_for(@user, true, true).state.should eql(:unlocked)
+      @file.reload.last_inline_view.should be_nil
     end
 
     it "should redirect to an existing attachment with the same path as a deleted attachment" do

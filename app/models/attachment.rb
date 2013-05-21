@@ -1622,4 +1622,12 @@ class Attachment < ActiveRecord::Base
   def crocodoc_available?
     crocodoc_document.try(:available?)
   end
+
+  def view_inline_ping_url
+    "/#{context_url_prefix}/files/#{self.id}/inline_view"
+  end
+
+  def record_inline_view
+    update_attribute(:last_inline_view, Time.now)
+  end
 end
