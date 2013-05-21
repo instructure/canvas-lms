@@ -1466,6 +1466,7 @@ describe QuizSubmission do
     before do
       Notification.create(:name => 'Submission Graded')
       Notification.create(:name => 'Submission Grade Changed')
+      Notification.create(:name => 'Submission Needs Grading')
       student_in_course
       assignment_quiz([])
       @course.enroll_student(@student)
@@ -1474,9 +1475,9 @@ describe QuizSubmission do
     end
 
     it 'sends a graded notification after grading the quiz submission' do
-      @submission.messages_sent.should be_empty
+      @submission.messages_sent.should_not include 'Submission Graded'
       @submission.grade_submission
-      @submission.reload.messages_sent.keys.should == ['Submission Graded']
+      @submission.reload.messages_sent.keys.should include 'Submission Graded'
     end
 
     it 'sends a grade changed notification after re-grading the quiz submission' do
@@ -1486,15 +1487,29 @@ describe QuizSubmission do
       @submission.reload.messages_sent.keys.should include('Submission Grade Changed')
     end
 
-    it 'does not send any notifications for a submission with essay questions before they have been graded' do
+    it 'does not send any "graded" or "grade changed" notifications for a submission with essay questions before they have been graded' do
       quiz_with_graded_submission([{:question_data => {:name => 'question 1', :points_possible => 1, 'question_type' => 'essay_question'}}])
-      @quiz_submission.reload.messages_sent.should be_empty
+      @quiz_submission.reload.messages_sent.should_not include 'Submission Graded'
+      @quiz_submission.reload.messages_sent.should_not include 'Submission Grade Changed'
     end
 
     it 'sends a notifications for a submission with essay questions before they have been graded if manually graded' do
       quiz_with_graded_submission([{:question_data => {:name => 'question 1', :points_possible => 1, 'question_type' => 'essay_question'}}])
       @quiz_submission.set_final_score(2)
-      @quiz_submission.reload.messages_sent.keys.should == ['Submission Graded']
+      @quiz_submission.reload.messages_sent.keys.should include 'Submission Graded'
+    end
+
+    it 'sends a notification if the submission needs manual review' do
+      teacher_in_course
+      @course.enroll_teacher(@teacher)
+      quiz_with_graded_submission([{:question_data => {:name => 'question 1', :points_possible => 1, 'question_type' => 'essay_question'}}])
+      @quiz_submission.reload.messages_sent.keys.should include 'Submission Needs Grading'
+    end
+    it 'does not send a notification if the submission does not need manual review' do
+      teacher_in_course
+      @course.enroll_teacher(@teacher)
+      @submission.workflow_state = 'completed'; @submission.save!
+      @submission.reload.messages_sent.keys.should_not include 'Submission Needs Grading'
     end
   end
 end

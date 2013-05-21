@@ -74,6 +74,24 @@ module BroadcastPolicies
 
     end
 
+    describe '#should_dispatch_submission_needs_grading?' do
+      before { quiz_submission.stubs(:pending_review?).returns false }
+      def wont_send_when
+        yield
+        policy.should_dispatch_submission_needs_grading?.should be_false
+      end
+      it "is true when quiz is pending review" do
+        quiz_submission.stubs(:pending_review?).returns true
+        policy.should_dispatch_submission_needs_grading?.should == true
+      end
+      specify { wont_send_when { quiz.stubs(:assignment).returns nil } }
+      specify { wont_send_when { quiz.stubs(:muted?).returns true } }
+      specify { wont_send_when { course.stubs(:available?).returns false} }
+      specify { wont_send_when { quiz.stubs(:deleted?).returns true } }
+      specify { wont_send_when { submission.stubs(:graded_at).returns nil }}
+      specify { wont_send_when { submission.stubs(:pending_review?).returns false }}
+    end
+
 
     describe '#should_dispatch_submission_grade_changed?' do
       def wont_send_when
