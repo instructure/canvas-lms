@@ -339,6 +339,7 @@ class UsersController < ApplicationController
   #     'title': 'Stream Item Subject',
   #     'message': 'This is the body text of the activity stream item. It is plain-text, and can be multiple paragraphs.',
   #     'type': 'DiscussionTopic|Conversation|Message|Submission|Conference|Collaboration|...',
+  #     'read_state': false,
   #     'context_type': 'course', // course|group
   #     'course_id': 1,
   #     'group_id': null,
