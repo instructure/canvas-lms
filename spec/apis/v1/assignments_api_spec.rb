@@ -192,6 +192,44 @@ describe AssignmentsApiController, :type => :integration do
       assign['submission'].should ==
         json_parse(@controller.submission_json(submission,assignment,@user,session).to_json)
     end
+
+    describe "draft state" do
+
+      before do
+        Account.default.settings[:enable_draft] = true
+        Account.default.save!
+        @domain_root_account = Account.default
+
+        course_with_student_logged_in(:active_all => true)
+
+        @published = @course.assignments.create!({:name => "published assignment"})
+        @published.workflow_state = 'published'
+        @published.save!
+
+        @unpublished = @course.assignments.create!({:name => "unpublished assignment"})
+        @unpublished.workflow_state = 'unpublished'
+        @unpublished.save!
+      end
+
+      it "only shows published assignments to students" do
+        json = api_get_assignments_index_from_course(@course)
+        json.length.should == 1
+        json[0]['id'].should == @published.id
+      end
+
+      it "shows unpublished assignments to teachers" do
+        user
+        @enrollment = @course.enroll_user(@user, 'TeacherEnrollment')
+        @enrollment.course = @course # set the reverse association
+        user_session(@user, :active_all => true)
+
+        json = api_get_assignments_index_from_course(@course)
+        json.length.should == 2
+        json[0]['id'].should == @published.id
+        json[1]['id'].should == @unpublished.id
+      end
+    end
+
   end
 
 
@@ -243,7 +281,7 @@ describe AssignmentsApiController, :type => :integration do
       @json['muted'].should == true
       @json['lock_at'].should == @assignment.lock_at.iso8601
       @json['unlock_at'].should == @assignment.unlock_at.iso8601
-      @json['automatic_peer_reviews'].should == true 
+      @json['automatic_peer_reviews'].should == true
       @json['peer_reviews'].should == true
       @json['peer_review_count'].should == 2
       @json['peer_reviews_assign_at'].should ==
@@ -423,7 +461,7 @@ describe AssignmentsApiController, :type => :integration do
                "/api/v1/courses/#{@course.id}/assignments.json",
                {
                  :controller => 'assignments_api',
-                 :action => 'create', :format => 'json', 
+                 :action => 'create', :format => 'json',
                  :course_id => @course.id.to_s },
                { :assignment => {
                    'name' => 'some assignment',
@@ -444,6 +482,28 @@ describe AssignmentsApiController, :type => :integration do
 
 
   describe "PUT /courses/:course_id/assignments/:id (#update)" do
+
+    it "should update published/unpublished" do
+      Account.default.settings[:enable_draft] = true
+      Account.default.save!
+      @domain_root_account = Account.default
+
+      course_with_teacher(:active_all => true)
+      @assignment = @course.assignments.create({:name => "some assignment"})
+      @assignment.workflow_state = 'unpublished'
+      @assignment.save!
+
+      #change it to published
+      api_update_assignment_call(@course, @assignment, {'published' => true})
+      @assignment.reload
+      @assignment.workflow_state.should == 'published'
+
+      #change it back to unpublished
+      api_update_assignment_call(@course, @assignment, {'published' => false})
+      @assignment.reload
+      @assignment.workflow_state.should == 'unpublished'
+    end
+
     context "without overrides or frozen attributes" do
       before do
         course_with_teacher(:active_all => true)
@@ -884,9 +944,9 @@ describe AssignmentsApiController, :type => :integration do
           'podcast_has_student_posts' => nil,
           'read_state' => 'unread',
           'unread_count' => 0,
-          'url' => 
+          'url' =>
             "http://www.example.com/courses/#{@course.id}/discussion_topics/#{@topic.id}",
-          'html_url' => 
+          'html_url' =>
             "http://www.example.com/courses/#{@course.id}/discussion_topics/#{@topic.id}",
           'attachments' => [],
           'permissions' => {'delete' => true, 'attach' => true, 'update' => true},
@@ -982,7 +1042,7 @@ describe AssignmentsApiController, :type => :integration do
           end
 
           it "tells the consumer that the assignment is frozen" do
-            @json['frozen'].should == true 
+            @json['frozen'].should == true
           end
 
           it "returns an list of frozen attributes" do
@@ -1069,6 +1129,50 @@ describe AssignmentsApiController, :type => :integration do
             'resource_link_id' => @tool_tag.opaque_identifier(:asset_string)
           }
         end
+      end
+    end
+
+    context "draft state" do
+
+      before do
+        Account.default.settings[:enable_draft] = true
+        Account.default.save!
+        @domain_root_account = Account.default
+
+        course_with_student_logged_in(:active_all => true)
+
+        @assignment = @course.assignments.create!({:name => "unpublished assignment"})
+        @assignment.workflow_state = 'unpublished'
+        @assignment.save!
+      end
+
+
+      it "returns an authorization error to students if an assignment is unpublished" do
+
+        raw_api_call(:get,
+          "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
+          {
+            :controller => 'assignments_api',
+            :action => 'show',
+            :format => 'json',
+            :course_id => @course.id.to_s,
+            :id => @assignment.id.to_s
+          }
+        )
+
+        #should be authorization error
+        response.code.should == '401'
+      end
+
+      it "shows an unpublished assignment to teachers" do
+        user
+        @enrollment = @course.enroll_user(@user, 'TeacherEnrollment')
+        @enrollment.course = @course # set the reverse association
+        user_session(@user, :active_all => true)
+
+        json = api_get_assignment_in_course(@assignment, @course)
+        response.should be_success
+        json['id'].should == @assignment.id
       end
     end
   end

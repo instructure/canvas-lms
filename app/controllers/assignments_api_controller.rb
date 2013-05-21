@@ -272,6 +272,15 @@ class AssignmentsApiController < ApplicationController
           includes(:assignment_group, :rubric_association, :rubric).
           reorder("assignment_groups.position, assignments.position")
 
+      #fake assignment used for checking if the @current_user can read unpublished assignments
+      fake = @context.assignments.new
+      fake.workflow_state = 'unpublished'
+
+      if @domain_root_account.enable_draft? && !fake.grants_right?(@current_user, session, :read)
+        #user is a student and assignment is not published
+        @assignments = @assignments.published
+      end
+
       if Array(params[:include]).include?('submission')
         submissions = Hash[
           @context.submissions.where(:assignment_id => @assignments).
@@ -302,6 +311,13 @@ class AssignmentsApiController < ApplicationController
     if authorized_action(@context, @current_user, :read)
       @assignment = @context.active_assignments.find(params[:id],
           :include => [:assignment_group, :rubric_association, :rubric])
+
+      if @domain_root_account.enable_draft? && !@assignment.grants_right?(@current_user, session, :read)
+        #assignment is not published and user is a student
+        render_unauthorized_action @assignment
+        return
+      end
+
       if Array(params[:include]).include?('submission')
         submission = @assignment.submissions.for_user(@current_user).first
       else
@@ -427,6 +443,11 @@ class AssignmentsApiController < ApplicationController
   # @argument assignment[assignment_overrides] [Optional, [AssignmentOverride]]
   #   List of overrides for the assignment.
   #   NOTE: The assignment overrides feature is in beta.
+  #
+  # @argument assignment[published] [Boolean] [Optional]
+  #   Whether this assignment is published.
+  #   (Only useful if 'enable draft' account setting is on)
+  #   Unpublished assignments are not visible to students.
   #
   # @returns Assignment
   def create

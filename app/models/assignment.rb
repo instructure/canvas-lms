@@ -35,7 +35,7 @@ class Assignment < ActiveRecord::Base
     :notify_of_update, :time_zone_edited, :turnitin_enabled, :turnitin_settings,
     :context, :position, :allowed_extensions, :external_tool_tag_attributes,
     :freeze_on_copy, :assignment_group_id
-    
+
   attr_accessor :original_id, :updating_user, :copying
 
   has_many :submissions, :class_name => 'Submission', :dependent => :destroy
@@ -176,7 +176,7 @@ class Assignment < ActiveRecord::Base
   after_save :remove_assignment_updated_flag # this needs to be after has_a_broadcast_policy for the message to be sent
 
   def validate_assignment_overrides
-    if group_category_id_changed? 
+    if group_category_id_changed?
       # needs to be .each(&:destroy) instead of .update_all(:workflow_state =>
       # 'deleted') so that the override gets versioned properly
       active_assignment_overrides.
@@ -785,7 +785,7 @@ class Assignment < ActiveRecord::Base
       assignment_for_user = self.overridden_for(user)
       if ((assignment_for_user.unlock_at && assignment_for_user.unlock_at > Time.now) ||
           (assignment_for_user.lock_at && assignment_for_user.lock_at <= Time.now))
-        locked = { :asset_string => self.asset_string, 
+        locked = { :asset_string => self.asset_string,
                    :unlock_at    => assignment_for_user.unlock_at,
                    :lock_at      => assignment_for_user.lock_at }
       elsif self.could_be_locked && item = locked_by_module_item?(user, opts[:deep_check_if_needed])
@@ -822,7 +822,9 @@ class Assignment < ActiveRecord::Base
   end
 
   set_policy do
-    given { |user, session| self.cached_context_grants_right?(user, session, :read) }
+    given { |user, session| self.cached_context_grants_right?(user, session, :read) &&
+      (self.published? || self.available?)
+    }
     can :read and can :read_own_submission
 
     given { |user, session| self.submittable_type? &&
@@ -1462,6 +1464,7 @@ class Assignment < ActiveRecord::Base
   scope :order_by_base_due_at, order("assignments.due_at")
 
   scope :unpublished, where(:workflow_state => 'unpublished')
+  scope :published, where(:workflow_state => 'published')
 
   def needs_publishing?
     self.due_at && self.due_at < 1.week.ago && self.available?
@@ -1746,8 +1749,8 @@ class Assignment < ActiveRecord::Base
   end
 
   def allow_google_docs_submission?
-    self.submission_types && 
-      self.submission_types.match(/online_upload/) && 
+    self.submission_types &&
+      self.submission_types.match(/online_upload/) &&
       (self.allowed_extensions.blank? || self.allowed_extensions.grep(/doc|xls|ppt/).present?)
   end
 

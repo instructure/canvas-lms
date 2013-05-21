@@ -290,6 +290,13 @@ module Api::V1::Assignment
       update_params["description"] = process_incoming_html_content(update_params["description"])
     end
 
+    if @domain_root_account.enable_draft?
+      if assignment_params.has_key? "published"
+        published = value_to_boolean(assignment_params['published'])
+        assignment.workflow_state = published ? 'published' : 'unpublished'
+      end
+    end
+
     assignment.updating_user = @current_user
     assignment.attributes = update_params
     assignment.infer_times
