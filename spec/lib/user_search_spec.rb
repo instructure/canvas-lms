@@ -77,14 +77,19 @@ describe UserSearch do
           end
 
           describe 'with the broader role parameter' do
+
             let(:users) { UserSearch.for_user_in_course('Tyler', course, student, :enrollment_role => 'ObserverEnrollment' ).to_a }
 
             before do
               ta = User.create!(:name => 'Tyler Observer')
               ObserverEnrollment.create!(:user => ta, :course => course, :workflow_state => 'active')
+              ta2 = User.create!(:name => 'Tyler Observer 2')
+              ObserverEnrollment.create!(:user => ta2, :course => course, :workflow_state => 'active')
+              student.observers << ta2
             end
 
-            it { should include('Tyler Observer') }
+            it { should_not include('Tyler Observer 2') }
+            it { should_not include('Tyler Observer') }
             it { should_not include('Tyler Teacher') }
             it { should_not include('Rose Tyler') }
           end

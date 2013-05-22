@@ -1878,7 +1878,7 @@ class Assignment < ActiveRecord::Base
       # the needs_grading_count trigger should change self.updated_at, invalidating the cache
       Rails.cache.fetch(['assignment_user_grading_count', self, user].cache_key) do
         case self.context.enrollment_visibility_level_for(user, vis)
-          when :full
+          when :full, :limited
             self.needs_grading_count
           when :sections
             self.submissions.joins("INNER JOIN enrollments e ON e.user_id = submissions.user_id").
