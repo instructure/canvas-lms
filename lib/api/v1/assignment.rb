@@ -47,7 +47,10 @@ module Api::V1::Assignment
     )
   }
 
-  def assignment_json(assignment, user, session,include_discussion_topic = true,submission= nil)
+  def assignment_json(assignment, user, session, include_discussion_topic = true, submission = nil, override_dates = true)
+    if override_dates && !assignment.new_record?
+      assignment = assignment.overridden_for(user)
+    end
     fields = assignment.new_record? ? API_ASSIGNMENT_NEW_RECORD_FIELDS : API_ALLOWED_ASSIGNMENT_OUTPUT_FIELDS
     hash = api_json(assignment, user, session, fields)
     hash['course_id'] = assignment.context_id

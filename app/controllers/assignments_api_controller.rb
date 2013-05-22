@@ -32,14 +32,23 @@
 #       description: "<p>Do the following:</p>...",
 #
 #       // the due date for the assignment. returns null if not present.
+#       // NOTE: If this assignment has assignment overrides, this field
+#       // will be the due date as it applies to the user requesting
+#       // information from the API.
 #       due_at: "2012-07-01T23:59:00-06:00",
 #
 #       // the lock date (assignment is locked after this date). returns
 #       // null if not present.
+#       // NOTE: If this assignment has assignment overrides, this field
+#       // will be the lock date as it applies to the user requesting
+#       // information from the API.
 #       lock_at: "2012-07-01T23:59:00-06:00",
 #
 #       // the unlock date (assignment is unlocked after this date)
 #       // returns null if not present
+#       // NOTE: If this assignment has assignment overrides, this field
+#       // will be the unlock date as it applies to the user requesting
+#       // information from the API.
 #       unlock_at: "2012-07-01T23:59:00-06:00",
 #
 #       // the ID of the course the assignment belongs to
@@ -283,12 +292,10 @@ class AssignmentsApiController < ApplicationController
 
       if Array(params[:include]).include?('submission')
         submissions = Hash[
-          @context.submissions.where(:assignment_id => @assignments).
-                                    except(:includes).
-                                    for_user(@current_user).
-                                    map do |s|
-                                      [s.assignment_id,s]
-                                    end
+          @context.submissions.except(:includes).
+            where(:assignment_id => @assignments).
+            for_user(@current_user).
+            map { |s| [s.assignment_id,s] }
         ]
       else
         submissions = {}

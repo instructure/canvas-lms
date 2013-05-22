@@ -37,6 +37,22 @@ describe AssignmentsApiController, :type => :integration do
       return assignment,submission
   end
 
+  def create_override_for_assignment(assignment=@assignment)
+      override = @assignment.assignment_overrides.build
+      @assignment.any_instantiation.unstub(:overridden_for)
+      override.title = "I am overridden and being returned in the API!"
+      override.set = @section
+      override.set_type = 'CourseSection'
+      override.due_at = Time.now + 2.days
+      override.unlock_at = Time.now + 1.days
+      override.lock_at = Time.now + 3.days
+      override.due_at_overridden = true
+      override.lock_at_overridden = true
+      override.unlock_at_overridden = true
+      override.save!
+      override
+  end
+
   describe "GET /courses/:course_id/assignments (#index)" do
 
     it "sorts the returned list of assignments" do
@@ -191,6 +207,24 @@ describe AssignmentsApiController, :type => :integration do
       assign = json.first
       assign['submission'].should ==
         json_parse(@controller.submission_json(submission,assignment,@user,session).to_json)
+    end
+    it "returns due dates as they apply to the user" do
+        course_with_student(:active_all => true)
+        @user = @student
+        @student.enrollments.map(&:destroy!)
+        @assignment = @course.assignments.create!(
+          :title => "Test Assignment",
+          :description => "public stuff"
+        )
+        @section = @course.course_sections.create! :name => "afternoon delight"
+        @course.enroll_user(@student,'StudentEnrollment',
+                            :section => @section,
+                            :enrollment_state => :active)
+        override = create_override_for_assignment
+        json = api_get_assignments_index_from_course(@course).first
+        json['due_at'].should == override.due_at.iso8601.to_s
+        json['unlock_at'].should == override.unlock_at.iso8601.to_s
+        json['lock_at'].should == override.lock_at.iso8601.to_s
     end
 
     describe "draft state" do
@@ -877,6 +911,7 @@ describe AssignmentsApiController, :type => :integration do
         @assignment.reload.should be_deleted
       end
     end
+
   end
 
   describe "GET /courses/:course_id/assignments/:id (#show)" do
@@ -889,6 +924,8 @@ describe AssignmentsApiController, :type => :integration do
           :title => "Locked Assignment",
           :description => "secret stuff"
         )
+        @assignment.any_instantiation.stubs(:overridden_for).
+          returns @assignment
         @assignment.any_instantiation.stubs(:locked_for?).returns(
           {:asset_string => '', :unlock_at => 1.hour.from_now }
         )
@@ -982,12 +1019,33 @@ describe AssignmentsApiController, :type => :integration do
         mod.evaluate_for(@user).should be_completed
       end
 
+      it "returns the dates for assignment as they apply to the user" do
+        course_with_student(:active_all => true)
+        @user = @student
+        @student.enrollments.map(&:destroy!)
+        @assignment = @course.assignments.create!(
+          :title => "Test Assignment",
+          :description => "public stuff"
+        )
+        @section = @course.course_sections.create! :name => "afternoon delight"
+        @course.enroll_user(@student,'StudentEnrollment',
+                            :section => @section,
+                            :enrollment_state => :active)
+        override = create_override_for_assignment
+        json = api_get_assignment_in_course(@assignment,@course)
+        json['due_at'].should == override.due_at.iso8601.to_s
+        json['unlock_at'].should == override.unlock_at.iso8601.to_s
+        json['lock_at'].should == override.lock_at.iso8601.to_s
+      end
+
       it "does not fulfill requirements when description isn't returned" do
         course_with_student(:active_all => true)
         @assignment = @course.assignments.create!(
           :title => "Locked Assignment",
           :description => "locked!"
         )
+        @assignment.any_instantiation.expects(:overridden_for).
+          returns @assignment
         @assignment.any_instantiation.expects(:locked_for?).returns({
           :asset_string => '',
           :unlock_at => 1.hour.from_now
@@ -1068,6 +1126,7 @@ describe AssignmentsApiController, :type => :integration do
               :title => "Frozen",
               :description => "frozen!"
             })
+            @assignment.any_instantiation.expects(:overridden_for).returns @assignment
             @assignment.any_instantiation.expects(:frozen?).at_least_once.returns false
             @json = api_get_assignment_in_course(@assignment,@course)
           end
@@ -1189,18 +1248,24 @@ describe AssignmentsApiController, :type => :integration do
     end
 
     context "when turnitin_enabled is true on the context" do
-      before { @assignment.context.expects(:turnitin_enabled?).returns(true) }
+      before {
+        @course.any_instantiation.expects(:turnitin_enabled?).
+          at_least_once.returns true
+      }
 
       it "contains a turnitin_enabled key" do
-        result.has_key?( 'turnitin_enabled' ).should == true
+        result.has_key?('turnitin_enabled').should == true
       end
     end
 
     context "when turnitin_enabled is false on the context" do
-      before { @assignment.context.expects(:turnitin_enabled?).returns(false) }
+      before {
+        @course.any_instantiation.expects(:turnitin_enabled?).
+          at_least_once.returns false
+      }
 
       it "does not contain a turnitin_enabled key" do
-        result.has_key?( 'turnitin_enabled' ).should == false
+        result.has_key?('turnitin_enabled').should == false
       end
     end
   end
