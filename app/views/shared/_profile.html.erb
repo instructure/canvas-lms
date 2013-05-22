@@ -23,7 +23,7 @@
         <% end %>
       </p>
       <div class="show-if-editing edit-contact-methods">
-        <h2 class="h1 border border-b"><%= t('#profile.ways_to_contact_me', "Ways to contact me") %></h2>
+        <h2 class="h5 border border-b"><%= t('#profile.ways_to_contact_me', "Ways to contact me") %></h2>
         <% if @user_data[:user_services].present? %>
           <div class="row-fluid">
             <div class="span6">
@@ -53,7 +53,7 @@
         <% end %>
       </div>
       <div class="hide-if-editing">
-        <h2 class="h2 border border-b"><%= t :ways_to_contact_user, "Ways to contact %{name}", :name => @user_data[:short_name] %></h2>
+        <h2 class="h5 border border-b"><%= t :ways_to_contact_user, "Ways to contact %{name}", :name => @user_data[:short_name] %></h2>
         <ul class="social-links">
           <li><a href="<%= message_user_path(@user) %>" class="social message" title="<%= t :message_title, 'Message' %>" data-tooltip><%= t :message_user_canvas, 'Message %{user} in Canvas', :user => @user_data[:short_name] %></a></li>
           <% if @user_data[:user_services].present? %>
