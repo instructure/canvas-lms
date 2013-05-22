@@ -629,7 +629,7 @@ class ContextModule < ActiveRecord::Base
 
     dup.save!
     tag_changes = {}
-    self.content_tags.active.each do |tag|
+    self.content_tags.not_deleted.each do |tag|
       new_tag = tag.clone_for(context, nil, :context_module_id => dup.id)
       if new_tag
         new_tag.context_module_id = dup.id
@@ -728,7 +728,7 @@ class ContextModule < ActiveRecord::Base
     item.save!
     
     item_map = {}
-    @item_migration_position = item.content_tags.active.map(&:position).compact.max || 0
+    @item_migration_position = item.content_tags.not_deleted.map(&:position).compact.max || 0
     (hash[:items] || []).each do |tag_hash|
       begin
         item.add_item_from_migration(tag_hash, 0, context, item_map)
@@ -764,10 +764,14 @@ class ContextModule < ActiveRecord::Base
     hash = hash.with_indifferent_access
     hash[:migration_id] ||= hash[:item_migration_id]
     hash[:migration_id] ||= Digest::MD5.hexdigest(hash[:title]) if hash[:title]
-    item = nil
     existing_item = content_tags.find_by_id(hash[:id]) if hash[:id].present?
     existing_item ||= content_tags.find_by_migration_id(hash[:migration_id]) if hash[:migration_id]
     existing_item ||= content_tags.new(:context => context)
+    if hash[:workflow_state] == 'unpublished'
+      existing_item.workflow_state = 'unpublished'
+    else
+      existing_item.workflow_state = 'active'
+    end
     context.imported_migration_items << existing_item if context.imported_migration_items && existing_item.new_record?
     existing_item.migration_id = hash[:migration_id]
     hash[:indent] = [hash[:indent] || 0, level].max
@@ -860,7 +864,7 @@ class ContextModule < ActiveRecord::Base
       item_map[hash[:migration_id]] = item if hash[:migration_id]
       item.migration_id = hash[:migration_id]
       item.new_tab = hash[:new_tab]
-      item.position = (@item_migration_position ||= self.content_tags.active.map(&:position).compact.max || 0)
+      item.position = (@item_migration_position ||= self.content_tags.not_deleted.map(&:position).compact.max || 0)
       item.workflow_state = 'active'
       @item_migration_position += 1
       item.save!

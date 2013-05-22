@@ -117,12 +117,14 @@ class ContextModuleItemsApiController < ApplicationController
   # Not documented directly; part of an opaque URL returned by above endpoints.
   def redirect
     if authorized_action(@context, @current_user, :read)
-      @tag = @context.context_module_tags.active.find(params[:id])
-      if @tag.content_type == 'ExternalUrl'
-        @tag.context_module_action(@current_user, :read)
-        redirect_to @tag.url
-      else
-        return render(:status => 400, :json => { :message => "incorrect module item type" })
+      @tag = @context.context_module_tags.not_deleted.find(params[:id])
+      if !(@tag.unpublished? || @tag.context_module.unpublished?) || authorized_action(@tag.context_module, @current_user, :update)
+        if @tag.content_type == 'ExternalUrl'
+          @tag.context_module_action(@current_user, :read)
+          redirect_to @tag.url
+        else
+          return render(:status => 400, :json => { :message => "incorrect module item type" })
+        end
       end
     end
   end
@@ -211,7 +213,7 @@ class ContextModuleItemsApiController < ApplicationController
   #   "must_submit", "min_score": Only apply to "Assignment" and "Quiz" types
   #   Inapplicable types will be ignored
   # @argument module_item[completion_requirement][min_score] [Required for completion_requirement type 'min_score'] minimum score required to complete
-  # @undocumented @argument module_item[published] [Optional] Whether the module item is published and visible to students
+  # @argument module_item[published] [Optional] Whether the module item is published and visible to students
   #
   # @example_request
   #
@@ -240,6 +242,7 @@ class ContextModuleItemsApiController < ApplicationController
         else
           @tag.unpublish
         end
+        @tag.save
         @tag.update_asset_workflow_state!
         @tag.context_module.save
       end

@@ -210,7 +210,7 @@ class ContextModulesApiController < ApplicationController
   # @argument module[require_sequential_progress] [Optional] Whether module items must be unlocked in order
   # @argument module[prerequisite_module_ids][] [Optional] IDs of Modules that must be completed before this one is unlocked
   #   Prerequisite modules must precede this module (i.e. have a lower position value), otherwise they will be ignored
-  # @undocumented @argument module[published] [Optional] Whether the module is published and visible to students
+  # @argument module[published] [Optional] Whether the module is published and visible to students
   #
   # @example_request
   #

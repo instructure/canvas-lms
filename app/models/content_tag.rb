@@ -65,11 +65,7 @@ class ContentTag < ActiveRecord::Base
     state :deleted
   end
 
-  scope :active, where("content_tags.workflow_state<>'deleted'")
-  # Note: right now, being unpublished won't affect any
-  # behavior with the content tag itself.
-  # The next step (#CNVS-5491) will be to replace this line with the following:
-  #scope :active, where(:workflow_state => 'active')
+  scope :active, where(:workflow_state => 'active')
   scope :not_deleted, where("content_tags.workflow_state<>'deleted'")
 
   attr_accessor :skip_touch

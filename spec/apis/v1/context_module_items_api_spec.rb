@@ -453,8 +453,7 @@ describe "Module Items API", :type => :integration do
         @assignment_tag.workflow_state.should == 'unpublished'
         @module1.save
 
-        # Uncomment this after implenting stricter content_tags.active scope - #CNVS-5491
-        #@module1.evaluate_for(@student).workflow_state.should == 'unlocked'
+        @module1.evaluate_for(@student).workflow_state.should == 'unlocked'
 
         json = api_call(:put, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@assignment_tag.id}",
                         {:controller => "context_module_items_api", :action => "update", :format => "json",
@@ -486,8 +485,7 @@ describe "Module Items API", :type => :integration do
         @assignment_tag.workflow_state.should == 'unpublished'
 
         @module1.reload
-        # Uncomment this after implenting stricter content_tags.active scope - #CNVS-5491
-        #@module1.evaluate_for(@student).workflow_state.should == 'unlocked'
+        @module1.evaluate_for(@student).workflow_state.should == 'unlocked'
       end
     end
 
@@ -548,7 +546,6 @@ describe "Module Items API", :type => :integration do
     end
 
     it "should not show unpublished items" do
-      pending 'restricting content_tags.active scope - #CNVS-5491'
       @assignment_tag.unpublish
       json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@assignment_tag.id}",
                       {:controller => "context_module_items_api", :action => "show", :format => "json",

@@ -294,11 +294,20 @@ describe ContentMigration do
         page.save!
         mod1.add_item({:id => page.id, :type => 'wiki_page'})
 
+        asmnt1 = @copy_from.assignments.create!(:title => "some assignment")
+        asmnt1.workflow_state = :unpublished
+        asmnt1.save!
+        mod1.add_item({:id => asmnt1.id, :type => 'assignment', :indent => 1})
+
         run_course_copy
 
         mod1_copy = @copy_to.context_modules.find_by_migration_id(mig_id(mod1))
-        mod1_copy.content_tags.count.should == 1
-        mod1_copy.content_tags.first.content #todo
+        mod1_copy.content_tags.count.should == 2
+
+        mod1_copy.content_tags.each do |tag_copy|
+          tag_copy.unpublished?.should == true
+          tag_copy.content.unpublished?.should == true
+        end
       end
 
       it "should copy unpublised wiki pages" do
@@ -487,7 +496,7 @@ describe ContentMigration do
       @copy_to.quizzes.find_by_migration_id(mig_id(quiz)).workflow_state.should == 'created' if Qti.qti_enabled?
       @copy_to.context_external_tools.find_by_migration_id(mig_id(tool)).workflow_state.should == 'public'
       @copy_to.assignment_groups.find_by_migration_id(mig_id(ag)).workflow_state.should == 'available'
-      @copy_to.assignments.find_by_migration_id(mig_id(asmnt)).workflow_state.should == 'available'
+      @copy_to.assignments.find_by_migration_id(mig_id(asmnt)).workflow_state.should == asmnt.workflow_state
       @copy_to.grading_standards.find_by_migration_id(mig_id(gs)).workflow_state.should == 'active'
       @copy_to.calendar_events.find_by_migration_id(mig_id(cal)).workflow_state.should == 'active'
     end

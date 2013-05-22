@@ -582,7 +582,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def infer_state_from_course
-    self.workflow_state = "published" if (self.context.publish_grades_immediately rescue false)
+    self.workflow_state = "published" if !self.unpublished? && (self.context.publish_grades_immediately rescue false)
     if self.assignment_group_id.nil?
       self.context.require_assignment_group
       self.assignment_group = self.context.assignment_groups.active.first
@@ -1603,7 +1603,7 @@ class Assignment < ActiveRecord::Base
     item ||= context.assignments.new #new(:context => context)
     item.title = hash[:title]
     item.migration_id = hash[:migration_id]
-    item.workflow_state = 'available' if item.deleted?
+    item.workflow_state = (hash[:workflow_state] || 'available') if item.new_record? || item.deleted?
     if hash[:instructions_in_html] == false
       self.extend TextHelper
     end

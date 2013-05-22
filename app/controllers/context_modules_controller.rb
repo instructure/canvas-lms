@@ -37,12 +37,14 @@ class ContextModulesController < ApplicationController
 
   def item_redirect
     if authorized_action(@context, @current_user, :read)
-      @tag = @context.context_module_tags.active.find(params[:id])
+      @tag = @context.context_module_tags.not_deleted.find(params[:id])
 
-      reevaluate_modules_if_locked(@tag)
-      @progression = @tag.context_module.evaluate_for(@current_user) if @tag.context_module
-      @progression.uncollapse! if @progression && @progression.collapsed?
-      content_tag_redirect(@context, @tag, :context_context_modules_url)
+      if !(@tag.unpublished? || @tag.context_module.unpublished?) || authorized_action(@tag.context_module, @current_user, :update)
+        reevaluate_modules_if_locked(@tag)
+        @progression = @tag.context_module.evaluate_for(@current_user) if @tag.context_module
+        @progression.uncollapse! if @progression && @progression.collapsed?
+        content_tag_redirect(@context, @tag, :context_context_modules_url)
+      end
     end
   end
   
