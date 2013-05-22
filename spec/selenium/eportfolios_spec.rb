@@ -254,6 +254,12 @@ describe "eportfolios" do
         f('.wizard_details .details').text.should include_text text
       end
     end
+
+    it "should be viewable with a shared link" do
+      destroy_session @pseudonym, false
+      get "/eportfolios/#{@eportfolio.id}?verifier=#{@eportfolio.uuid}"
+      f('#content h2').text.should == "page"
+    end
   end
 end
 

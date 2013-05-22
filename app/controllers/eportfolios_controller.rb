@@ -76,8 +76,10 @@ class EportfoliosController < ApplicationController
       end
       @show_left_side = true
       eportfolio_page_attributes
-      js_env :folder_id => Folder.unfiled_folder(@current_user).id,
-             :context_code => @current_user.asset_string
+      if @current_user
+        js_env :folder_id => Folder.unfiled_folder(@current_user).id,
+               :context_code => @current_user.asset_string
+      end
       render :template => "eportfolios/show"
     end
   end
