@@ -55,6 +55,8 @@ stylesheets:
   speed_grader:
     - public/stylesheets/compiled/ui.selectmenu.css
     - public/stylesheets/compiled/speed_grader.css
+  conferences:
+    - public/stylesheets/compiled/conferences.css
   plugins:
     - public/stylesheets/compiled/plugins.css
   gradebook_uploads:

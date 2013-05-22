@@ -61,6 +61,21 @@ define [
       isoString = $.parseFromISO(isoString) unless isoString.datetime
       isoString.datetime_formatted
 
+    # Strips the time information from the datetime and accounts for the
+    # user's timezone preference.
+    dateString : (isoString) ->
+      return '' unless isoString
+      isoString = $.parseFromISO(isoString) unless isoString.datetime
+      isoString.date_string
+
+
+    # Convert the total amount of minutes into a Hours:Minutes format.
+    minutesToHM : (minutes) ->
+      hours = Math.floor(minutes / 60)
+      real_minutes = minutes % 60
+      real_min_str = (if real_minutes < 10 then "0" + real_minutes else real_minutes)
+      "#{hours}:#{real_min_str}"
+
     # helper for easily creating icon font markup
     addIcon : (icontype) ->
       new Handlebars.SafeString "<i class='icon-#{htmlEscape icontype}'></i>"
@@ -103,6 +118,8 @@ define [
       new Handlebars.SafeString convertApiUserContent(html, hash)
 
     newlinesToBreak : (string) ->
+      # Convert a null to an empty string so it doesn't blow up.
+      string ||= ''
       new Handlebars.SafeString htmlEscape(string).replace(/\n/g, "<br />")
 
     not: (arg) -> !arg

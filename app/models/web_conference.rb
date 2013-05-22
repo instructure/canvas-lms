@@ -238,6 +238,9 @@ class WebConference < ActiveRecord::Base
   def long_running?
     duration.nil?
   end
+  def long_running
+    long_running? ? 1 : 0
+  end
 
   DEFAULT_DURATION = 60
   def duration_in_seconds
@@ -288,6 +291,10 @@ class WebConference < ActiveRecord::Base
       close
     end
     @conference_active
+  rescue Errno::ECONNREFUSED => ex
+    # Account credentials changed, server unreachable/down, bad stuff happened.
+    @conference_active = false
+    @conference_active
   end
 
   def close
@@ -310,7 +317,7 @@ class WebConference < ActiveRecord::Base
     true
   end
   
-  # Default implementation since most implemenations don't support recording yet
+  # Default implementation since most implementations don't support recording yet
   def recordings
     []
   end
@@ -386,7 +393,13 @@ class WebConference < ActiveRecord::Base
   scope :active, scoped
 
   def as_json(options={})
-    super(options.merge(:methods => [:has_advanced_settings]))
+    url = options.delete(:url)
+    join_url = options.delete(:join_url)
+    options.reverse_merge!(:only => %w(id title description conference_type duration started_at ended_at user_ids context_id context_type context_code))
+    result = super(options.merge(:include_root => false, :methods => [:has_advanced_settings, :long_running, :user_settings, :recordings]))
+    result['url'] = url
+    result['join_url'] = join_url
+    result
   end
 
   def self.plugins

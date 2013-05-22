@@ -1,0 +1,35 @@
+<div class="conference table-row">
+  <div class="table-cell conference-title ellipsis" title="{{title}}">
+    {{title}}
+  </div>
+  <div class="table-cell conference-description">
+    {{newlinesToBreak description}}
+  </div>
+
+  <div class="table-cell conference-day align-center">
+    {{dateString ended_at}}
+  </div>
+
+  <div class="table-cell conference-actions align-center">
+    {{#if recording}}
+      <div class="conference-length align-center {{#if has_actions}}has_actions{{/if}}">
+        {{minutesToHM recording.duration_minutes}}
+      </div>
+    {{/if}}
+    <div class="actions">
+      {{#if permissions.delete}}
+        <a class="icon-trash delete_conference_link" href="{{ url }}" aria-label="{{#t "delete"}}Delete{{/t}}"></a>
+      {{/if}}
+    </div>
+  </div>
+
+  <div class="table-cell conference-recording align-right">
+    {{#if recording}}
+      <a href="{{recording.playback_url}}" class="btn btn-small" target="_blank">
+        {{#t "view"}}View{{/t}}
+      </a>
+    {{else}}
+      {{#t "no_recording"}}No&nbsp;Recording{{/t}}
+    {{/if}}
+  </div>
+</div>

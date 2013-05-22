@@ -1,130 +1,53 @@
-<% content_for :page_title do %><%= join_title t(:page_title, "Web Conferences"), @context.name %><% end %>
-
-<% js_bundle :conferences %>
-
-<% content_for :right_side do %>
-  <% if can_do(@context.web_conferences.new, @current_user, :create) %>
-    <div class="rs-margin-lr rs-margin-top"><a href="#" class="add_conference_link btn button-sidebar-wide icon-add"> <%= t :new_conference_link, "Make a New Conference" %></a></div>
-  <% end %>
+<% content_for :page_title do %>
+  <%= join_title t(:page_title, "Web Conferences"), @context.name %>
 <% end %>
-<div id="no_conferences_message" style="<%= hidden unless @conferences.empty? %>">
-  <h2><%= t :title, "Web Conferences" %></h2>
-  <% if can_do(@context.web_conferences.new, @current_user, :create) %>
-    <% if @context.is_a?(Course) %>
-      <p><%= t :description_for_course_admins, "Web conferences let you communicate remotely with class members.  Teachers can present lectures using their webcam and microphone, demonstrate how to use computer tools by broadcasting their computer screen, or even just have remote office hours." %></p>
-    <% else %>
-      <p><%= t :description_for_group_admins, "Web conferences let you communicate remotely with group members.  You can organize meetings or study sessions without having to meet in person using webcams, microphones, sharing your computer screen, or using digital whiteboards." %></p>
-    <% end %>
-    <p><%= t :instructions_for_new, "To start a conference now, click the \"%{link_text}\" link.", :link_text => t(:new_conference_link, "Make a New Conference") %></p>
-  <% else %>
-    <% if @context.is_a?(Course) %>
-      <p><%= t :description_for_course_members, "Web conferences are a way to meet remotely with course members for things like study sessions, virtual office hours, etc.  Web conferencing tools let you share video and audio using your computer's webcam, and also offer additional tools like screen sharing and digital whiteboards." %></p>
-    <% else %>
-      <p><%= t :description_for_group_members, "Web conferences are a way to meet remotely with group members for things like study sessions, virtual office hours, etc.  Web conferencing tools let you share video and audio using your computer's webcam, and also offer additional tools like screen sharing and digital whiteboards." %></p>
-    <% end %>
-  <% end %>
-</div>
 
-<% form_for :web_conference, :url => context_url(@context, :context_conferences_url), :html => {:id => "add_conference_form", :style => "display: none;", :class => "communication_message"} do |f| %>
-  <div class="header">
-    <a href="#" target="_blank" class="advanced_settings" style="float:right" data-base-href="<%= context_url(@context, :context_conference_settings_url, "{{ id }}") %>">
-      <%= t('links.advanced_settings', "Manage Advanced Settings...") %>
-    </a>
-    <span class="title"><%= t :new_conference_heading, "Start a New Conference" %></span>
+<% js_bundle(:conferences)  %>
+<% jammit_css(:conferences) %>
+
+<header class="row-fluid">
+  <div class="span3 offset9 align-right padding-r">
+    <button type="button" class="btn btn-primary new-conference-btn">
+      <%= t(:new_conference, 'New Conference') %>
+    </button>
   </div>
-  <div class="content">
-    <table class="formtable" style="width: 100%;">
-      <tr>
-        <td class="nobr" style="width: 5px;"><%= f.blabel :title, :name, :en => "Name" %></td>
-        <td><%= f.text_field :title, :style => "width: 200px;", :value => t(:default_name, "%{type} Conference", :type => @context.name) %></td>
-      </tr><tr style="<%= hidden unless WebConference.conference_types.length > 1 %>">
-        <td class="nobr" style="width: 5px;"><%= f.blabel :conference_type, :type, :en => "Type" %></td>
-        <td><%= f.select :conference_type, WebConference.conference_types.map{|c| [c[:plugin].name, c[:conference_type]] } %></td>
-      </tr><tr>
-        <td class="nobr" style="width: 5px;"><%= f.blabel :options, :en => "Options" %></td>
-        <td>
-          <div id="web_conference_user_settings"></div>
-          <%= f.check_box :long_running? %>
-          <%= f.label :long_running?, :long_running, :en => "This is a long-running conference and should not be automatically closed" %>
-        </td>
-      </tr><tr>
-        <td class="nobr" style="width: 5px;"><%= f.blabel :duration, :en => "Duration" %></td>
-        <td><div class="form-inline"><%= t :duration_input, "%{text_field} minutes", :text_field => f.text_field(:duration, :style => "width: 25px;", :value => "60") %></div></td>
-      </tr><tr>
-        <td colspan="2">
-          <%= f.blabel :description, :en => "Description" %><br/>
-          <%= f.text_area :description, :style => "display: block; margin: 0 auto; width: 90%; height: 50px;" %>
-        </td>
-      </tr><tr>
-        <td style="vertical-align: top;"><%= before_label :members, "Members" %></td>
-        <td>
-          <div>
-            <%= check_box :user, :all, :checked => true, :class => "all_users_checkbox" %>
-            <% if @context.is_a?(Course) %>
-              <%= label :user, :all, :'labels.all_course_members', :en => "Invite All Course Members" %>
-            <% else %>
-              <%= label :user, :all, :'labels.all_group_members', :en => "Invite All Group Members" %>
-            <% end %>
-            <ul id="members_list" style="display: none;">
-              <% @users.each do |user| %>
-                <li class="member user_<%= user.id %>">
-                  <%= check_box :user, "#{user.id}".to_sym, :value => user.id %>
-                  <%= label :user, "#{user.id}".to_sym, user.last_name_first %>
-                </li>
-              <% end %>
-            </ul>
-          </div>
-        </td>
-      </tr>
-    </table>
-    <div class="form-actions">
-      <button type="button" class="cancel_button btn"><%= t '#buttons.cancel', "Cancel" %></button>
-      <button type="submit" class="btn btn-primary"><%= t 'buttons.create', "Create Conference" %></button>
+</header>
+
+<div class="conference-wrapper item-box">
+  <h2>
+    <a class="element_toggler"
+        href="#"
+        aria-controls="new-conference-list">
+      <i class="icon-arrow-down"></i>
+      <%= t(:new_conferences, 'New Conferences') %>
+    </a>
+  </h2>
+
+  <div class="table" id="new-conference-list" aria-expanded="true">
+    <div class="table-row no-new-conferences">
+      <div class="table-cell">
+        <%= t(:no_new_conferences, 'There are no new conferences') %>
+      </div>
     </div>
   </div>
-<% end %>
-
-<div style="display: none;">
-  <a href="<%= context_url(@context, :context_conferences_url) %>" class="add_conference_url">&nbsp;</a>
 </div>
-<div id="conferences">
-<% @conferences.each do |conference| %>
-  <% if can_do(conference, @current_user, :read) %>
-    <%= render :partial => "shared/conference", :object => conference %>
-  <% end %>
-<% end %>
+<div class="conference-wrapper item-box">
+  <h2>
+    <a class="element_toggler"
+       href="#"
+       aria-controls="concluded-conference-list">
+      <i class="icon-arrow-down"></i>
+      <%= t(:concluded_conferences, 'Concluded Conferences') %>
+    </a>
+  </h2>
+
+  <div class="table" id="concluded-conference-list" aria-expanded="true">
+    <div class="table-row no-concluded-conferences">
+      <div class="table-cell">
+        <%= t(:no_concluded_conferences, 'There are no concluded conferences') %>
+      </div>
+    </div>
+  </div>
 </div>
-<%= render :partial => "shared/conference", :object => nil %>
 
-<% js_block do %>
-<script>
-require([
-  'INST' /* INST */,
-  'jquery' /* $ */,
-  'jqueryui/sortable' /* /\.sortable/ */
-], function(INST, $) {
-
-
-  INST.webConferenceUserSettings = <%=
-    WebConference.conference_types.map{ |type|
-      type[:user_setting_fields].keys.map{ |setting| "user_settings[#{setting}]" }
-    }.flatten.to_json.html_safe
-  %>;
-  INST.webConferenceUserSettingTemplates = <%=
-    WebConference.conference_types.inject({}){ |types, type|
-      types[type[:conference_type]] = type[:user_setting_fields].inject({}) {|settings, (name, options)|
-        field_name = "web_conference[user_settings][#{name}]"
-        settings[name] = options
-        settings[name][:html] = case options[:type]
-          when :boolean
-            check_box_tag(field_name, "true", options[:default]) + " " + label_tag(field_name, type[:class_name].constantize.user_setting_field_description(name.to_sym))
-          end
-        settings
-      }
-      types
-    }.to_json.html_safe
-  %>;
-  INST.webConferenceDefaultDuration = <%= WebConference::DEFAULT_DURATION %>;
-});
-  </script>
-<% end %>
+<div id='add_conference_form'></div>
