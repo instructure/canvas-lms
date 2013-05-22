@@ -267,6 +267,26 @@ describe UserMerge do
       @user2.associated_shards.should == [@shard1, Shard.default]
     end
 
+    it "should associate the user with all shards" do
+      user1 = user_with_pseudonym(:username => 'user1@example.com', :active_all => 1)
+      p1 = @pseudonym
+      cc1 = @cc
+      @shard1.activate do
+        account = Account.create!
+        @p2 = account.pseudonyms.create!(:unique_id => 'user1@exmaple.com', :user => user1)
+      end
+
+      @shard2.activate do
+        account = Account.create!
+        @user2 = user_with_pseudonym(:username => 'user2@example.com', :active_all => 1, :account => account)
+        @p3 = @pseudonym
+        UserMerge.from(user1).into(@user2)
+      end
+
+      @user2.associated_shards.sort_by(&:id).should == [Shard.default, @shard1, @shard2].sort_by(&:id)
+      @user2.all_pseudonyms.sort_by(&:id).should == [p1, @p2, @p3].sort_by(&:id)
+    end
+
     it "should move ccs to the new user (but only if they don't already exist)" do
       user1 = user_model
       @shard1.activate do
