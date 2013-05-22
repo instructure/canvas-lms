@@ -6,81 +6,9 @@ body {
 
 //*********** BEGIN HEADER OVERRIDES **************
 
-h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
-  font-weight: normal;
-}
-h1, h2, .h1, .h2 {
-  font-size: 1.8em;
-}
-h3, .h3 {
-  font-size: 1.5em;
-}
+// make .h1, .h2, ... look like h1, h2, ...
+// see app/stylesheets/bootstrap/_type.scss
 
-//overriding headers from app/stylesheets/_header_reset.scss
-.h1, .h2, .h3, .h4, .h5, .h6 {
-  margin: 0;
-  padding: 0;
-  font-size: 14px;
-  font-weight: bold;
-  line-height: 21px;
-  height: 21px;
-}
-
-//overriding app/stylesheets/base/_layout.sass
-body {
-  &.embedded {
-    .h2 {
-      @include ui-widget-header-bg-and-text;
-      font-size: 14px;
-      font-weight: bold;
-      margin: -0.95em -0.95em 1em;
-      padding: 0.4em 1em;
-      line-height: 20px;
-    }
-
-    &.no-headers .h2 {
-      display: none;
-    }
-  }
-}
-
-//overriding app/stylesheets/bootstrap/_alerts.scss
-.alert .h4 {
-  margin: 0;
-}
-
-//overriding app/stylesheets/bootstrap/_carousel.scss
-.carousel-caption .h4 {
-  color: $white;
-  line-height: $baseLineHeight;
-  margin: 0 0 5px;
-}
-
-//overriding app/stylesheets/bootstrap/_modals.scss
-.modal-header .h3 {
-  margin: 0;
-  line-height: 30px;
-}
-
-//overriding app/stylesheets/bootstrap/_hero-unit.scss
-.hero-unit .h1 {
-  margin-bottom: 0;
-  font-size: 60px;
-  line-height: 1;
-  color: $heroUnitHeadingColor;
-  letter-spacing: -1px;
-}
-
-//overrideing app/stylesheets/bootstrap/_responsive-767px-max.scss
-@media (max-width: 480px) {
-  // Block level the page header small tag for readability
-  .page-header .h1 small {
-    display: block;
-    line-height: $baseLineHeight;
-  }
-}
-
-//overriding app/stylesheets/bootstrap/_type.scss
 .h1, .h2, .h3, .h4, .h5, .h6 {
   margin: ($baseLineHeight / 2) 0;
   font-family: $headingsFontFamily;
@@ -109,6 +37,18 @@ body {
 .h3 small { font-size: $baseFontSize; }
 .h4 small { font-size: $baseFontSize; }
 
+
+// now tweak them all a bit to be less shouty
+
+h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
+  font-weight: normal;
+}
+h1, h2, .h1, .h2 {
+  font-size: 1.8em;
+}
+h3, .h3 {
+  font-size: 1.5em;
+}
 //********** END HEADER OVERRIDES *************
 
 
