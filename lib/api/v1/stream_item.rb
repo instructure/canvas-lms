@@ -122,4 +122,23 @@ module Api::V1::StreamItem
     end
     render :json => items.select(&:stream_item).map { |i| stream_item_json(i, i.stream_item, @current_user, session) }
   end
+
+  def api_render_stream_summary(contexts = nil)
+    opts = {}
+    opts[:contexts] = contexts
+    items = @current_user.shard.activate do
+      # not ideal, but 1. we can't aggregate in the db (boo yml) and
+      # 2. stream_item_json is where categorizing logic lives :(
+      @current_user.visible_stream_item_instances(opts).includes(:stream_item).map { |i|
+        stream_item_json(i, i.stream_item, @current_user, session)
+      }.inject({}) { |result, i|
+        key = [i['type'], i['notification_category']]
+        result[key] ||= {type: i['type'], count: 0, unread_count: 0, notification_category: i['notification_category']}
+        result[key][:count] += 1
+        result[key][:unread_count] += 1 if !i['read_state']
+        result
+      }.values.sort_by{ |i| i[:type] }
+    end
+    render :json => items
+  end
 end

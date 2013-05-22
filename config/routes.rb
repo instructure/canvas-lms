@@ -682,6 +682,7 @@ ActionController::Routing::Routes.draw do |map|
       courses.get 'courses/:course_id/users/:id', :action => :user, :path_name => 'course_user'
       courses.get 'courses/:course_id/search_users', :action => :search_users, :path_name => 'course_search_users'
       courses.get 'courses/:course_id/activity_stream', :action => :activity_stream, :path_name => 'course_activity_stream'
+      courses.get 'courses/:course_id/activity_stream/summary', :action => :activity_stream_summary, :path_name => 'course_activity_stream_summary'
       courses.get 'courses/:course_id/todo', :action => :todo_items
       courses.delete 'courses/:id', :action => :destroy
       courses.post 'courses/:course_id/course_copy', :controller => :content_imports, :action => :copy_course_content
@@ -844,6 +845,7 @@ ActionController::Routing::Routes.draw do |map|
     api.with_options(:controller => :users) do |users|
       users.get 'users/self/activity_stream', :action => :activity_stream, :path_name => 'user_activity_stream'
       users.get 'users/activity_stream', :action => :activity_stream # deprecated
+      users.get 'users/self/activity_stream/summary', :action => :activity_stream_summary, :path_name => 'user_activity_stream_summary'
 
       users.put "users/:user_id/followers/self", :action => :follow
       users.delete "users/:user_id/followers/self", :action => :unfollow
@@ -987,6 +989,7 @@ ActionController::Routing::Routes.draw do |map|
       groups.post 'groups/:group_id/files', :action => :create_file
       groups.post 'group_categories/:group_category_id/groups', :action => :create
       groups.get 'groups/:group_id/activity_stream', :action => :activity_stream, :path_name => 'group_activity_stream'
+      groups.get 'groups/:group_id/activity_stream/summary', :action => :activity_stream_summary, :path_name => 'group_activity_stream_summary'
       groups.put "groups/:group_id/followers/self", :action => :follow
       groups.delete "groups/:group_id/followers/self", :action => :unfollow
 

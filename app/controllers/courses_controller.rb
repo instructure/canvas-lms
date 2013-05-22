@@ -523,6 +523,18 @@ class CoursesController < ApplicationController
     end
   end
 
+  # @API Course activity stream summary
+  # Returns a summary of the current user's course-specific activity stream.
+  #
+  # For full documentation, see the API documentation for the user activity
+  # stream summary, in the user api.
+  def activity_stream_summary
+    get_context
+    if authorized_action(@context, @current_user, :read)
+      api_render_stream_summary([@context])
+    end
+  end
+
   include Api::V1::TodoItem
   # @API Course TODO items
   # Returns the current user's course-specific todo items.

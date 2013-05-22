@@ -434,6 +434,30 @@ class UsersController < ApplicationController
     end
   end
 
+  # @API Activity stream summary
+  # Returns a summary of the current user's global activity stream.
+  #
+  # @example_response
+  #   [
+  #     {
+  #       "type": "DiscussionTopic",
+  #       "unread_count": 2,
+  #       "count": 7
+  #     },
+  #     {
+  #       "type": "Conversation",
+  #       "unread_count": 0,
+  #       "count": 3
+  #     }
+  #   ]
+  def activity_stream_summary
+    if @current_user
+      api_render_stream_summary
+    else
+      render_unauthorize_action
+    end
+  end
+
   def manageable_courses
     get_context
     return unless authorized_action(@context, @current_user, :manage)

@@ -50,6 +50,23 @@ describe UsersController, :type => :integration do
     json.size.should == 1
   end
 
+  it "should return the activity stream summary" do
+    @context = @course
+    discussion_topic_model
+    discussion_topic_model(:user => @user)
+    conversation(User.create, @user)
+    Notification.create(:name => 'Assignment Due Date Changed', :category => "TestImmediately")
+    Assignment.any_instance.stubs(:created_at).returns(4.hours.ago)
+    assignment_model(:course => @course)
+    @assignment.update_attribute(:due_at, 1.week.from_now)
+    json = api_call(:get, "/api/v1/users/self/activity_stream/summary.json",
+                    { :controller => "users", :action => "activity_stream_summary", :format => 'json' })
+    json.should == [{"type" => "Conversation", "count" => 1, "unread_count" => 0, "notification_category" => nil}, # conversations don't currently set the unread state on stream items
+                    {"type" => "DiscussionTopic", "count" => 2, "unread_count" => 1, "notification_category" => nil},
+                    {"type" => "Message", "count" => 1, "unread_count" => 0, "notification_category" => "TestImmediately"} # check a broadcast-policy-based one
+                   ]
+  end
+
   it "should format DiscussionTopic" do
     @context = @course
     discussion_topic_model
