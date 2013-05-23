@@ -28,14 +28,19 @@ end
 def valid_attachment_attributes(opts={})
   @context = opts[:context] || @context
   @context ||= Course.first || course_model(:reusable => true)
-  if @context.respond_to?(:folders)
-    @folder = Folder.root_folders(@context).find{|f| f.name == 'unfiled'} || Folder.root_folders(@context).first
+  if opts[:folder]
+    folder = opts[:folder]
+  else
+    if @context.respond_to?(:folders)
+      @folder = Folder.root_folders(@context).find{|f| f.name == 'unfiled'} || Folder.root_folders(@context).first
+    end
+    @folder ||= folder_model
+    folder = @folder
   end
-  @folder ||= folder_model
   @attributes_res = {
     :context => @context,
     :size => 100,
-    :folder => @folder,
+    :folder => folder,
     :content_type => 'application/loser',
     :filename => 'unknown.loser'
   }

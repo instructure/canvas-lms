@@ -768,6 +768,7 @@ ActionController::Routing::Routes.draw do |map|
       cm.get 'courses/:course_id/content_migrations', :action => :index, :path_name => 'course_content_migration_list'
       cm.post 'courses/:course_id/content_migrations', :action => :create, :path_name => 'course_content_migration_create'
       cm.put 'courses/:course_id/content_migrations/:id', :action => :update, :path_name => 'course_content_migration_update'
+      cm.get 'courses/:course_id/content_migrations/:id/selective_data', :action => :content_list, :path_name => 'course_content_migration_selective_data'
     end
 
     api.with_options(:controller => :migration_issues) do |mi|

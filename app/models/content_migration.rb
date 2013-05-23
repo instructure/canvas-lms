@@ -320,7 +320,7 @@ class ContentMigration < ActiveRecord::Base
     p
   end
 
-  def export_content
+  def queue_migration
     reset_job_progress
     check_quiz_id_prepender
     plugin = Canvas::Plugin.find(migration_type)
@@ -350,7 +350,7 @@ class ContentMigration < ActiveRecord::Base
       self.save
     end
   end
-  alias_method :queue_migration, :export_content
+  alias_method :export_content, :queue_migration
 
   def check_quiz_id_prepender
     if !migration_settings[:id_prepender] && (!migration_settings[:overwrite_questions] || !migration_settings[:overwrite_quizzes])
@@ -562,4 +562,11 @@ class ContentMigration < ActiveRecord::Base
       end
     end
   end
+
+  # returns a list of content for selective content migrations
+  # If no section is specified the top-level areas with content are returned
+  def get_content_list(type=nil)
+    Canvas::Migration::Helpers::SelectiveContentFormatter.new(self).get_content_list(type)
+  end
+
 end

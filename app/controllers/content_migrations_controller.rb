@@ -249,6 +249,58 @@ class ContentMigrationsController < ApplicationController
     render :json => json
   end
 
+  # @undocumented Leaving undocumented for now because format is expected to change
+  # Get list of items in the migration for selective import of content
+  #
+  # If no type is sent you will get a list of the top-level sections in the content
+  # It will look something like this:
+  # [
+  #   {
+  #     "type": "course_settings",
+  #     "property": "copy[all_course_settings]",
+  #     "title": "Course Settings"
+  #   },
+  #   {
+  #     "type": "syllabus_body",
+  #     "property": "copy[all_syllabus_body]",
+  #     "title": "Syllabus Body"
+  #   },
+  #   {
+  #     "type": "context_modules",
+  #     "property": "copy[all_context_modules]",
+  #     "title": "Modules",
+  #     "count": 1
+  #   },
+  #   {
+  #     "type": "discussion_topics",
+  #     "property": "copy[all_discussion_topics]",
+  #     "title": "Discussion Topics",
+  #     "count": 1
+  #   },
+  #   {
+  #     "type": "wiki_pages",
+  #     "property": "copy[all_wiki_pages]",
+  #     "title": "Wiki Pages",
+  #     "count": 1
+  #   },
+  #   {
+  #     "type": "attachments",
+  #     "property": "copy[all_attachments]",
+  #     "title": "Files",
+  #     "count": 1
+  #   }
+  # ]
+  #
+  # If there is no count for an item that means there are no sub-items and you
+  # shouldn't try to fetch them
+  #
+  # @argument type [string] (optional) Return list of specified type
+  #
+  # @returns list of content items
+  def content_list
+    @content_migration = @context.content_migrations.find(params[:id])
+    render :json => @content_migration.get_content_list(params[:type])
+  end
 
   protected
 

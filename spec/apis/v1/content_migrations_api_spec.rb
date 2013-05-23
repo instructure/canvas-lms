@@ -260,6 +260,38 @@ describe ContentMigrationsController, :type => :integration do
     end
   end
 
+  describe 'content selection' do
+    before do
+      @migration_url = "/api/v1/courses/#{@course.id}/content_migrations/#{@migration.id}/selective_data"
+      @params = {:controller => 'content_migrations', :format => 'json', :course_id => @course.id.to_param, :action => 'content_list', :id => @migration.id.to_param}
+
+      course
+      @dt1 = @course.discussion_topics.create!(:message => "hi", :title => "discussion title")
+      @cm = @course.context_modules.create!(:name => "some module")
+      @att = Attachment.create!(:filename => 'first.txt', :uploaded_data => StringIO.new('ohai'), :folder => Folder.unfiled_folder(@course), :context => @course)
+      @wiki = @course.wiki.wiki_pages.create!(:title => "wiki", :body => "ohai")
+      @migration.migration_type = 'course_copy_importer'
+      @migration.migration_settings[:source_course_id] = @course.id
+      @migration.save!
+    end
+
+    it "should return the top-level list" do
+      json = api_call(:get, @migration_url, @params)
+      json.should == [{"type"=>"course_settings", "property"=>"copy[all_course_settings]", "title"=>"Course Settings"},
+                      {"type"=>"syllabus_body", "property"=>"copy[all_syllabus_body]", "title"=>"Syllabus Body"},
+                      {"type"=>"context_modules", "property"=>"copy[all_context_modules]", "title"=>"Modules", "count"=>1},
+                      {"type"=>"discussion_topics", "property"=>"copy[all_discussion_topics]", "title"=>"Discussion Topics", "count"=>1},
+                      {"type"=>"wiki_pages", "property"=>"copy[all_wiki_pages]", "title"=>"Wiki Pages", "count"=>1},
+                      {"type"=>"attachments", "property"=>"copy[all_attachments]", "title"=>"Files", "count"=>1}]
+    end
+
+    it "should return individual types" do
+      json = api_call(:get, @migration_url + '?type=context_modules', @params.merge({type: 'context_modules'}))
+      json.length.should == 1
+      json.first["type"].should == 'context_modules'
+      json.first["title"].should == @cm.name
+    end
+  end
 
 
 end
