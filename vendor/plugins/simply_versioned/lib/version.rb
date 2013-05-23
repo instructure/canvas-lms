@@ -54,11 +54,7 @@ class Version < ActiveRecord::Base #:nodoc:
   protected
   def before_create
     return false unless versionable
-    if versionable.unversioned?
-      self.number = 1
-    else
-      self.number = versionable.versions.maximum( :number ) + 1
-    end
+    self.number = (versionable.versions.maximum( :number ) || 0) + 1
   end
   
 end
