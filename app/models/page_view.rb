@@ -84,7 +84,7 @@ class PageView < ActiveRecord::Base
     # remember the page view method selected at the time of creation, so that
     # we use the right method when saving
     @page_view_method = self.class.page_view_method
-    if cassandra?
+    if cassandra? && new_record?
       self.shard = Shard.birth
     end
   end

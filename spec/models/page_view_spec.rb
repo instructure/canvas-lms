@@ -57,20 +57,20 @@ describe PageView do
     describe "sharding" do
       specs_require_sharding
 
-      it "should always assign the default shard" do
-        PageView.new.shard.should == Shard.default
+      it "should always assign the birth shard" do
+        PageView.new.shard.should == Shard.birth
         pv = nil
         @shard1.activate do
           pv = page_view_model
-          pv.shard.should == Shard.default
+          pv.shard.should == Shard.birth
           pv.save!
           pv = PageView.find(pv.request_id)
           pv.should be_present
-          pv.shard.should == Shard.default
+          pv.shard.should == Shard.birth
         end
         pv = PageView.find(pv.request_id)
         pv.should be_present
-        pv.shard.should == Shard.default
+        pv.shard.should == Shard.birth
         pv.interaction_seconds = 25
         pv.save!
         pv = PageView.find(pv.request_id)
@@ -141,6 +141,17 @@ describe PageView do
         @shard1.activate do
           @pv_user.page_views.paginate(:page => 1, :per_page => 1).first.should == pv
           @user2.page_views.paginate(:page => 1, :per_page => 1).should be_empty
+        end
+      end
+
+      it "should store and load from cassandra when the birth shard is not the default shard" do
+        Shard.stubs(:birth).returns(@shard1)
+        @shard2.activate do
+          expect {
+            @page_view.save!
+          }.to change { PageView::EventStream.database.execute("select count(*) from page_views").fetch_row["count"] }.by(1)
+          PageView.find(@page_view.id).should == @page_view
+          expect { PageView.find("junk") }.to raise_error(ActiveRecord::RecordNotFound)
         end
       end
     end
