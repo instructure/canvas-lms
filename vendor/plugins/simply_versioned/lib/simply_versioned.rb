@@ -173,6 +173,10 @@ module SoftwareHeretics
           end
         end
 
+        def current_version?
+          !@simply_versioned_version_number
+        end
+
         protected
         
         # INSTRUCTURE: If defined on a method, allow a check
