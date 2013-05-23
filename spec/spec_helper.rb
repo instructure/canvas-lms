@@ -16,6 +16,28 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+if ENV['COVERAGE'] == "true"
+  require 'simplecov'
+  SimpleCov.start do
+    SimpleCov.formatter = SimpleCov::Formatter::HTMLFormatter
+    add_filter '/spec/'
+    add_filter '/config/'
+
+    add_group 'Mailers', 'app/mailers'
+    add_group 'Controllers', 'app/controllers'
+    add_group 'Models', 'app/models'
+    add_group 'Helpers', 'app/helpers'
+    add_group 'Libraries', 'lib'
+    add_group 'Plugins', 'vendor/plugins'
+    add_group "Long files" do |src_file|
+      src_file.lines.count > 100
+    end
+    SimpleCov.at_exit do
+      SimpleCov.result.format!
+    end
+  end
+end
+
 ENV["RAILS_ENV"] = 'test'
 
 require File.expand_path('../../config/environment', __FILE__) unless defined?(Rails)
@@ -37,6 +59,7 @@ Dir.glob("#{File.dirname(__FILE__).gsub(/\\/, "/")}/factories/*.rb").each { |fil
 # globally on every object. :context is already heavily used in our application,
 # so we remove rspec's definition. This does not prevent 'context' from being
 # used within a 'describe' block.
+
 if defined?(Spec::DSL::Main)
   module Spec::DSL::Main
     remove_method :context if respond_to? :context
@@ -103,7 +126,7 @@ end
 Spec::Matchers.define :encompass do |expected|
   match do |actual|
     if expected.is_a?(Array) && actual.is_a?(Array)
-      expected.size == actual.size && expected.zip(actual).all?{|e,a| a.slice(*e.keys) == e}
+      expected.size == actual.size && expected.zip(actual).all? { |e, a| a.slice(*e.keys) == e }
     elsif expected.is_a?(Hash) && actual.is_a?(Hash)
       actual.slice(*expected.keys) == expected
     else
@@ -127,7 +150,7 @@ Spec::Runner.configure do |config|
   # lines, delete config/database.yml and disable :active_record
   # in your config/boot.rb
   config.use_transactional_fixtures = true
-  config.use_instantiated_fixtures  = false
+  config.use_instantiated_fixtures = false
   config.fixture_path = Rails.root+'spec/fixtures/'
 
   config.include Webrat::Matchers, :type => :views
@@ -159,10 +182,12 @@ Spec::Runner.configure do |config|
   # one that used redis
   class << Canvas
     attr_accessor :redis_used
+
     def redis_with_track_usage(*a, &b)
       self.redis_used = true
       redis_without_track_usage(*a, &b)
     end
+
     alias_method_chain :redis, :track_usage
     Canvas.redis_used = true
   end
@@ -225,7 +250,7 @@ Spec::Runner.configure do |config|
 
   def account_admin_user(opts={:active_user => true})
     account = opts[:account] || Account.default
-    @user = opts[:user] || account.shard.activate{ user(opts) }
+    @user = opts[:user] || account.shard.activate { user(opts) }
     @admin = @user
     account_user = @user.account_users.build(:account => account, :membership_type => opts[:membership_type] || 'AccountAdmin')
     account_user.shard = account.shard
@@ -309,7 +334,7 @@ Spec::Runner.configure do |config|
 
   def course_with_user(enrollment_type, opts={})
     @course = opts[:course] || course(opts)
-    @user = opts[:user] || @course.shard.activate{ user(opts) }
+    @user = opts[:user] || @course.shard.activate { user(opts) }
     @enrollment = @course.enroll_user(@user, enrollment_type, opts)
     @enrollment.course = @course # set the reverse association
     if opts[:active_enrollment] || opts[:active_all]
@@ -403,6 +428,7 @@ Spec::Runner.configure do |config|
   end
 
   VALID_GROUP_ATTRIBUTES = [:name, :context, :max_membership, :group_category, :join_level, :description, :is_public, :avatar_attachment]
+
   def group(opts={})
     @group = (opts[:group_context].try(:groups) || Group).create! opts.slice(*VALID_GROUP_ATTRIBUTES)
   end
@@ -427,21 +453,27 @@ Spec::Runner.configure do |config|
     role.save!
     role
   end
+
   def custom_student_role(name, opts={})
     custom_role('StudentEnrollment', name, opts)
   end
+
   def custom_teacher_role(name, opts={})
     custom_role('TeacherEnrollment', name, opts)
   end
+
   def custom_ta_role(name, opts={})
     custom_role('TaEnrollment', name, opts)
   end
+
   def custom_designer_role(name, opts={})
     custom_role('DesignerEnrollment', name, opts)
   end
+
   def custom_observer_role(name, opts={})
     custom_role('ObserverEnrollment', name, opts)
   end
+
   def custom_account_role(name, opts={})
     custom_role(AccountUser::BASE_ROLE_NAME, name, opts)
   end
@@ -475,7 +507,7 @@ Spec::Runner.configure do |config|
   def assignment_quiz(questions, opts={})
     course = opts[:course] || course(:active_course => true)
     user = opts[:user] || user(:active_user => true)
-    course.enroll_student(user, :enrollment_state => 'active') unless user.enrollments.any?{|e| e.course_id == course.id}
+    course.enroll_student(user, :enrollment_state => 'active') unless user.enrollments.any? { |e| e.course_id == course.id }
     @assignment = course.assignments.create(:title => "Test Assignment")
     @assignment.workflow_state = "available"
     @assignment.submission_types = "online_quiz"
@@ -619,21 +651,23 @@ Spec::Runner.configure do |config|
 
   def grading_standard_for(context, opts={})
     @standard = context.grading_standards.create!(
-      :title => opts[:title] || "My Grading Standard",
-      :standard_data => {
-        "scheme_0" => {:name => "A", :value => "0.9"},
-        "scheme_1" => {:name => "B", :value => "0.8"},
-        "scheme_2" => {:name => "C", :value => "0.7"}
-    })
+        :title => opts[:title] || "My Grading Standard",
+        :standard_data => {
+            "scheme_0" => {:name => "A", :value => "0.9"},
+            "scheme_1" => {:name => "B", :value => "0.8"},
+            "scheme_2" => {:name => "C", :value => "0.7"}
+        })
   end
 
   def eportfolio(opts={})
     user(opts)
     @portfolio = @user.eportfolios.create!
   end
+
   def eportfolio_with_user(opts={})
     eportfolio(opts)
   end
+
   def eportfolio_with_user_logged_in(opts={})
     eportfolio_with_user(opts)
     user_session(@user)
@@ -698,13 +732,13 @@ Spec::Runner.configure do |config|
 
   def factory_with_protected_attributes(ar_klass, attrs, do_save = true)
     obj = ar_klass.respond_to?(:new) ? ar_klass.new : ar_klass.build
-    attrs.each { |k,v| obj.send("#{k}=", attrs[k]) }
+    attrs.each { |k, v| obj.send("#{k}=", attrs[k]) }
     obj.save! if do_save
     obj
   end
 
   def update_with_protected_attributes!(ar_instance, attrs)
-    attrs.each { |k,v| ar_instance.send("#{k}=", attrs[k]) }
+    attrs.each { |k, v| ar_instance.send("#{k}=", attrs[k]) }
     ar_instance.save!
   end
 
@@ -715,8 +749,8 @@ Spec::Runner.configure do |config|
   def process_csv_data(*lines_or_opts)
     account_model unless @account
 
-    lines = lines_or_opts.reject{|thing| thing.is_a? Hash}
-    opts = lines_or_opts.select{|thing| thing.is_a? Hash}.inject({:allow_printing => false}, :merge)
+    lines = lines_or_opts.reject { |thing| thing.is_a? Hash }
+    opts = lines_or_opts.select { |thing| thing.is_a? Hash }.inject({:allow_printing => false}, :merge)
 
     tmp = Tempfile.new("sis_rspec")
     path = "#{tmp.path}.csv"
@@ -831,7 +865,7 @@ Spec::Runner.configure do |config|
       end
 
       def method_missing(sym, *args, &blk)
-        @ancestor.instance_method(sym).bind(@subject).call(*args,&blk)
+        @ancestor.instance_method(sym).bind(@subject).call(*args, &blk)
       end
     end
 
@@ -912,10 +946,10 @@ Spec::Runner.configure do |config|
 
   def run_jobs
     while job = Delayed::Job.get_and_lock_next_available(
-      'spec run_jobs',
-      Delayed::Worker.queue,
-      0,
-      Delayed::MAX_PRIORITY)
+        'spec run_jobs',
+        Delayed::Worker.queue,
+        0,
+        Delayed::MAX_PRIORITY)
       run_job(job)
     end
   end
@@ -977,19 +1011,19 @@ Spec::Runner.configure do |config|
     post_headers.sort.should == expected_post_headers.sort
 
     # now check payload
-    post_lines[post_lines.index(""),-1].should ==
-      expected_post_lines[expected_post_lines.index(""),-1]
+    post_lines[post_lines.index(""), -1].should ==
+        expected_post_lines[expected_post_lines.index(""), -1]
   end
 
   def compare_json(actual, expected)
     if actual.is_a?(Hash)
-      actual.each do |k,v|
+      actual.each do |k, v|
         expected_v = expected[k]
         compare_json(v, expected_v)
       end
     elsif actual.is_a?(Array)
-      actual.zip(expected).each do |a,e|
-        compare_json(a,e)
+      actual.zip(expected).each do |a, e|
+        compare_json(a, e)
       end
     else
       actual.to_json.should == expected.to_json
@@ -1022,14 +1056,14 @@ Spec::Runner.configure do |config|
 
   def intify_timestamps(object)
     case object
-    when Time
-      object.to_i
-    when Hash
-      object.inject({}) { |memo, (k, v)| memo[intify_timestamps(k)] = intify_timestamps(v); memo }
-    when Array
-      object.map { |v| intify_timestamps(v) }
-    else
-      object
+      when Time
+        object.to_i
+      when Hash
+        object.inject({}) { |memo, (k, v)| memo[intify_timestamps(k)] = intify_timestamps(v); memo }
+      when Array
+        object.map { |v| intify_timestamps(v) }
+      else
+        object
     end
   end
 
@@ -1045,16 +1079,16 @@ Spec::Runner.configure do |config|
 
   def dummy_io
     ActionController::TestUploadedFile.new(
-      File.expand_path(File.dirname(__FILE__) +
-                       '/./fixtures/scribd_docs/doc.doc'),
-                       'application/msword', true)
+        File.expand_path(File.dirname(__FILE__) +
+                             '/./fixtures/scribd_docs/doc.doc'),
+        'application/msword', true)
   end
 
-  def create_attachment_for_file_upload_submission!(submission,opts={})
-      submission.attachments.create! opts.merge(
-        :filename => "doc.doc",
-        :display_name => "doc.doc", :user => @user,
-        :uploaded_data => dummy_io)
+  def create_attachment_for_file_upload_submission!(submission, opts={})
+    submission.attachments.create! opts.merge(
+                                       :filename => "doc.doc",
+                                       :display_name => "doc.doc", :user => @user,
+                                       :uploaded_data => dummy_io)
   end
 
   def course_quiz(active=false)
