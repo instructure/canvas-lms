@@ -227,7 +227,7 @@ module Canvas::Cassandra
 
       def runnable?
         raise "cassandra_cluster is required to be defined" unless respond_to?(:cassandra_cluster) && cassandra_cluster.present?
-        Shard.current.default? && Canvas::Cassandra::Database.configured?(cassandra_cluster)
+        Shard.current == Shard.birth && Canvas::Cassandra::Database.configured?(cassandra_cluster)
       end
     end
 
