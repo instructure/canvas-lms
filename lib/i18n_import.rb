@@ -10,21 +10,50 @@ class I18nImport
     @new_translations = new_translations[language].flatten_keys
   end
 
-  def compile_complete_translations(warning)
-    return nil unless warning.call(missing_keys.sort, "missing translations") if missing_keys.present?
-    return nil unless warning.call(unexpected_keys.sort, "unexpected translations") if unexpected_keys.present?
+  def compare_translations(&warning)
+    [
+      [missing_keys, "missing translations"],
+      [unexpected_keys, "unexpected translations"]
+    ].each do |keys, description|
+      if keys.present?
+        case (action = yield(keys.sort, description))
+        when :abort   then throw(:abort)
+        when :discard then :ok # <-discard and accept are the same in this case
+        when :accept  then :ok # <-/
+        else raise "don't know how to handle #{action}"
+        end
+      end
+    end
+  end
 
+  def compare_mismatches(&warning)
+    # Important to populate @placeholder_mismatches and @markdown_mismatches first
     find_mismatches
 
-    if @placeholder_mismatches.size > 0
-      return nil unless warning.call(mismatch_diff(@placeholder_mismatches), "placeholder mismatches")
+    [
+      [@placeholder_mismatches, "placeholder mismatches"],
+      [@markdown_mismatches, "markdown/wrapper mismatches"],
+    ].each do |mismatches, description|
+      if mismatches.size > 0
+        case (action = yield(mismatch_diff(mismatches), description))
+        when :abort   then throw(:abort)
+        when :discard then
+          @new_translations.delete_if do |k,v|
+            mismatches.keys.include? k
+          end
+        when :accept  then :ok
+        else raise "don't know how to handle #{action}"
+        end
+      end
     end
+  end
 
-    if @markdown_mismatches.size > 0
-      return nil unless warning.call(mismatch_diff(@markdown_mismatches), "markdown/wrapper mismatches")
+  def compile_complete_translations(&warning)
+    catch(:abort) do
+      compare_translations(&warning)
+      compare_mismatches(&warning)
+      complete_translations
     end
-
-    complete_translations
   end
 
   def complete_translations
@@ -57,6 +86,7 @@ class I18nImport
     @placeholder_mismatches = {}
     @markdown_mismatches = {}
     new_translations.keys.each do |key|
+      next unless source_translations[key]
       p1 = placeholders(source_translations[key].to_s)
       p2 = placeholders(new_translations[key].to_s)
       @placeholder_mismatches[key] = [p1, p2] if p1 != p2
@@ -68,18 +98,22 @@ class I18nImport
   end
 
   def markdown_and_wrappers(str)
+    # Since underscores can be wrappers, and underscores can also be inside
+    # placeholders (as placeholder names) we need to be unambiguous about
+    # underscores in placeholders:
+    dashed_str = str.gsub(/%\{([^\}]+)\}/){ |x| x.gsub("_", "-") }
     # some stuff this doesn't check (though we don't use):
     #   blockquotes, e.g. "> some text"
     #   reference links, e.g. "[an example][id]"
     #   indented code
     (
-      scan_and_report(str, /\\[\\`\*_\{\}\[\]\(\)#\+\-\.!]/) +
-      scan_and_report(str, /(\*+|_+|`+)[^\s].*?[^\s]?\1/).map{|m|"#{m}-wrap"} +
-      scan_and_report(str, /(!?\[)[^\]]+\]\(([^\)"']+).*?\)/).map{|m|"link:#{m.last}"} +
-      scan_and_report(str, /^((\s*\*\s*){3,}|(\s*-\s*){3,}|(\s*_\s*){3,})$/).map{"hr"} +
-      scan_and_report(str, /^[^=\-\n]+\n^(=+|-+)$/).map{|m|m.first[0]=='=' ? 'h1' : 'h2'} +
-      scan_and_report(str, /^(\#{1,6})\s+[^#]*#*$/).map{|m|"h#{m.first.size}"} +
-      scan_and_report(str, /^ {0,3}(\d+\.|\*|\+|\-)\s/).map{|m|m.first =~ /\d/ ? "1." : "*"}
+      scan_and_report(dashed_str, /\\[\\`\*_\{\}\[\]\(\)#\+\-\.!]/) +
+      scan_and_report(dashed_str, /(\*+|_+|`+)[^\s].*?[^\s]?\1/).map{|m|"#{m[0]}-wrap"} +
+      scan_and_report(dashed_str, /(!?\[)[^\]]+\]\(([^\)"']+).*?\)/).map{|m|"link:#{m.last}"} +
+      scan_and_report(dashed_str, /^((\s*\*\s*){3,}|(\s*-\s*){3,}|(\s*_\s*){3,})$/).map{"hr"} +
+      scan_and_report(dashed_str, /^[^=\-\n]+\n^(=+|-+)$/).map{|m|m.first[0]=='=' ? 'h1' : 'h2'} +
+      scan_and_report(dashed_str, /^(\#{1,6})\s+[^#]*#*$/).map{|m|"h#{m.first.size}"} +
+      scan_and_report(dashed_str, /^ {0,3}(\d+\.|\*|\+|\-)\s/).map{|m|m.first =~ /\d/ ? "1." : "*"}
     ).sort
   end
 

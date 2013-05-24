@@ -366,22 +366,53 @@ define(['i18nObj', 'jquery'], function(I18n, $) {
 
     import = I18nImport.new(source_translations, new_translations)
 
-    item_warning = lambda { |error_items, description|
+    complete_translations = import.compile_complete_translations do |error_items, description|
       begin
         puts "Warning: #{error_items.size} #{description}. What would you like to do?"
         puts " [C] continue anyway"
         puts " [V] view #{description}"
         puts " [D] debug"
         puts " [Q] quit"
-        command = $stdin.gets.upcase.strip
-        return false if command == 'Q'
-        debugger if command == 'D'
-        puts error_items.join("\n") if command == 'V'
+        case (command = $stdin.gets.upcase.strip)
+        when 'Q' then return :abort
+        when 'D' then debugger
+        when 'V' then puts error_items.join("\n")
+        end
       end while command != 'C'
-      true
-    }
+      :accept
+    end
 
-    complete_translations = import.compile_complete_translations(item_warning)
+    next if complete_translations.nil?
+
+    File.open("config/locales/#{import.language}.yml", "w") { |f|
+      f.write({import.language => complete_translations}.ya2yaml(:syck_compatible => true))
+    }
+  end
+
+  desc "Imports new translations, ignores missing or unexpected keys"
+  task :autoimport, [:translated_file] => :environment do |t, args|
+    require 'ya2yaml'
+    require 'open-uri'
+    Hash.send(:include, I18n::HashExtensions) unless Hash.new.kind_of?(I18n::HashExtensions)
+
+    source_translations = YAML.safe_load(open("config/locales/generated/en.yml"))
+
+    raise "Need translated_file" unless args[:translated_file]
+    new_translations = YAML.safe_load(open(args[:translated_file]))
+
+    import = I18nImport.new(source_translations, new_translations)
+
+    puts import.language
+    complete_translations = import.compile_complete_translations do |error_items, description|
+      if description =~ /mismatches/
+        # Output malformed stuff and don't import them
+        puts error_items.join("\n")
+        :discard
+      else
+        # Import everything else
+        :accept
+      end
+    end
     next if complete_translations.nil?
 
     File.open("config/locales/#{import.language}.yml", "w") { |f|
