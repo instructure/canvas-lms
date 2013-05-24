@@ -264,6 +264,22 @@ describe AssignmentsApiController, :type => :integration do
       end
     end
 
+    it 'returns the url attribute for external tools' do
+      course_with_student(:active_all => true)
+      assignment = @course.assignments.create!
+      @tool_tag = ContentTag.new({:url => 'http://www.example.com', :new_tab=>false})
+      @tool_tag.context = assignment
+      @tool_tag.save!
+      assignment.submission_types = 'external_tool'
+      assignment.save!
+      assignment.external_tool_tag.should_not be_nil
+      @json = api_get_assignments_index_from_course(@course)
+
+      @json[0].should include('url')
+      uri = URI(@json[0]['url'])
+      uri.path.should == "/api/v1/courses/#{@course.id}/external_tools/sessionless_launch"
+      uri.query.should include('assignment_id=')
+    end
   end
 
 
@@ -1187,6 +1203,13 @@ describe AssignmentsApiController, :type => :integration do
             'new_tab' => false,
             'resource_link_id' => @tool_tag.opaque_identifier(:asset_string)
           }
+        end
+
+        it 'includes the assignment_id attribute' do
+          @json.should include('url')
+          uri = URI(@json['url'])
+          uri.path.should == "/api/v1/courses/#{@course.id}/external_tools/sessionless_launch"
+          uri.query.should include('assignment_id=')
         end
       end
     end

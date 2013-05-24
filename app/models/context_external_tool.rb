@@ -31,15 +31,20 @@ class ContextExternalTool < ActiveRecord::Base
     state :deleted
   end
 
-  def create_launch(context, user, return_url, selection_type=nil)
+  def create_launch(context, user, return_url, opts = {})
+    # resolve the url based on selection_type, falling back to the tool url (unless overridden)
+    resource_url = opts[:resource_url]
+    selection_type = opts[:selection_type]
+
+    # if this is an assessment enforce the correct resource_url
     if selection_type
       if self.settings[selection_type.to_sym]
-        resource_url = self.settings[selection_type.to_sym][:url]
-      else
-        raise t('no_selection_type', "This tool has no selection type %{type}", :type => selection_type)
+        resource_url ||= self.settings[selection_type.to_sym][:url] if selection_type
       end
     end
     resource_url ||= self.url
+
+    # generate the launch
     BasicLTI::ToolLaunch.new(:url => resource_url,
                              :tool => self,
                              :user => user,

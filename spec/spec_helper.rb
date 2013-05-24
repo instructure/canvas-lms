@@ -460,6 +460,10 @@ Spec::Runner.configure do |config|
     PseudonymSession.stubs(:find).returns(session)
   end
 
+  def remove_user_session
+    PseudonymSession.unstub(:find)
+  end
+
   def login_as(username = "nobody@example.com", password = "asdfasdf")
     post_via_redirect "/login",
                       "pseudonym_session[unique_id]" => username,

@@ -240,6 +240,7 @@ ActionController::Routing::Routes.draw do |map|
     course.resources :assignment_groups, :collection => {:reorder => :post} do |group|
       group.reorder_assignments 'reorder', :controller => 'assignment_groups', :action => 'reorder_assignments'
     end
+    course.external_tools_sessionless_launch 'external_tools/sessionless_launch', :controller => 'external_tools', :action => 'sessionless_launch'
     course.resources :external_tools, :collection => {:retrieve => :get, :homework_submissions => :get} do |tools|
       tools.resource_selection 'resource_selection', :controller => 'external_tools', :action => 'resource_selection'
       tools.homework_submission 'homework_submission', :controller => 'external_tools', :action => 'homework_submission'
@@ -463,6 +464,7 @@ ActionController::Routing::Routes.draw do |map|
     account.test_ldap_logins 'test_ldap_logins', :controller => 'account_authorization_configs', :action => 'test_ldap_login'
     account.saml_testing 'saml_testing', :controller => 'account_authorization_configs', :action => 'saml_testing'
     account.saml_testing_stop 'saml_testing_stop', :controller => 'account_authorization_configs', :action => 'saml_testing_stop'
+    account.external_tools_sessionless_launch 'external_tools/sessionless_launch', :controller => 'external_tools', :action => 'sessionless_launch'
     account.resources :external_tools do |tools|
       tools.finished 'finished', :controller => 'external_tools', :action => 'finished'
     end
@@ -813,6 +815,7 @@ ActionController::Routing::Routes.draw do |map|
 
     api.with_options(:controller => :external_tools) do |tools|
       def et_routes(route_object, context)
+        route_object.get "#{context}s/:#{context}_id/external_tools/sessionless_launch", :action => :generate_sessionless_launch, :path_name => "#{context}_external_tool_sessionless_launch"
         route_object.get "#{context}s/:#{context}_id/external_tools/:external_tool_id", :action => :show, :path_name => "#{context}_external_tool_show"
         route_object.get "#{context}s/:#{context}_id/external_tools", :action => :index, :path_name => "#{context}_external_tools"
         route_object.post "#{context}s/:#{context}_id/external_tools", :action => :create, :path_name => "#{context}_external_tools_create"

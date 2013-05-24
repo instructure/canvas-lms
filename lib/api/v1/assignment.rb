@@ -19,6 +19,7 @@
 module Api::V1::Assignment
   include Api::V1::Json
   include ApplicationHelper
+  include Api::V1::ExternalTools::UrlHelpers
 
   API_ALLOWED_ASSIGNMENT_OUTPUT_FIELDS = {
     :only => %w(
@@ -83,6 +84,9 @@ module Api::V1::Assignment
         'new_tab' => external_tool_tag.new_tab,
         'resource_link_id' => external_tool_tag.opaque_identifier(:asset_string)
       }
+      hash['url'] = sessionless_launch_url(@context,
+                                           :launch_type => 'assessment',
+                                           :assignment_id => assignment.id)
     end
 
     if assignment.automatic_peer_reviews? && assignment.peer_reviews?

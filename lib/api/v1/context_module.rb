@@ -18,6 +18,7 @@
 module Api::V1::ContextModule
   include Api::V1::Json
   include Api::V1::User
+  include Api::V1::ExternalTools::UrlHelpers
 
   MODULE_JSON_ATTRS = %w(id position name unlock_at)
 
@@ -75,6 +76,8 @@ module Api::V1::ContextModule
       # no context
       when 'Attachment'
         api_url = polymorphic_url([:api_v1, content_tag.content])
+      when 'ContextExternalTool'
+        api_url = sessionless_launch_url(context_module.context, :url => content_tag.url)
     end
     hash['url'] = api_url if api_url
 

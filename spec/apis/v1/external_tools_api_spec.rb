@@ -61,6 +61,12 @@ describe ExternalToolsController, :type => :integration do
     it "should paginate" do
       paginate_call(@course)
     end
+
+    if Canvas.redis_enabled?
+      it 'should allow sessionless launches' do
+        sessionless_launch(@course, 'course')
+      end
+    end
   end
 
   describe "in an account" do
@@ -100,6 +106,12 @@ describe ExternalToolsController, :type => :integration do
     
     it "should paginate" do
       paginate_call(@account, "account")
+    end
+
+    if Canvas.redis_enabled?
+      it 'should allow sessionless launches' do
+        sessionless_launch(@account, 'account')
+      end
     end
   end
   
@@ -242,6 +254,34 @@ describe ExternalToolsController, :type => :integration do
       hash.delete key
     end
     hash
+  end
+
+  def sessionless_launch(context, type)
+    et = context.context_external_tools.create!(
+      :name => 'Example',
+      :url => 'http://www.example.com',
+      :consumer_key => 'key',
+      :shared_secret => 'secret',
+    )
+
+    # initial api call
+    json = api_call(
+      :get,
+      "/api/v1/#{type}s/#{context.id}/external_tools/sessionless_launch?url=http%3A%2F%2Fwww.example.com",
+      {:controller => 'external_tools', :action => 'generate_sessionless_launch', :format => 'json', :"#{type}_id" => context.id.to_s, :url => 'http://www.example.com'}
+    )
+    json.should include('url')
+
+    # remove the user session (it's supposed to be sessionless, after all), and make the request
+    remove_user_session
+
+    # request/verify the lti launch page
+    get json['url']
+    response.code.should == '200'
+
+    doc = Nokogiri::HTML(response.body)
+    doc.at_css('form').should_not be_nil
+    doc.at_css('form')['action'].should == 'http://www.example.com'
   end
   
   def example_json(et=nil)
