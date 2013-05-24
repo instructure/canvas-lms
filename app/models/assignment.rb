@@ -38,6 +38,8 @@ class Assignment < ActiveRecord::Base
 
   attr_accessor :original_id, :updating_user, :copying
 
+  attr_reader :assignment_changed
+
   has_many :submissions, :class_name => 'Submission', :dependent => :destroy
   has_many :attachments, :as => :context, :dependent => :destroy
   has_one :quiz
@@ -429,23 +431,16 @@ class Assignment < ActiveRecord::Base
       # (the AssignmentOverride records will take care of notifying those users)
       participants - participants_with_overridden_due_at
     }
-    p.whenever { |record|
-      record.context.available? &&
-      record.changed_in_state(:published, :fields => :due_at) &&
-      record.prior_version &&
-      !Assignment.due_dates_equal?(record.due_at, record.prior_version.due_at) &&
-      record.created_at < 3.hours.ago
+    p.whenever { |assignment|
+      policy = BroadcastPolicies::AssignmentPolicy.new( assignment )
+      policy.should_dispatch_assignment_due_date_changed?
     }
 
     p.dispatch :assignment_changed
     p.to { participants }
-    p.whenever { |record|
-      record.context.available? &&
-      record.published? &&
-      !record.muted? &&
-      record.created_at < 30.minutes.ago &&
-      record.prior_version &&
-      (record.points_possible != record.prior_version.points_possible || @assignment_changed)
+    p.whenever { |assignment|
+      policy = BroadcastPolicies::AssignmentPolicy.new( assignment )
+      policy.should_dispatch_assignment_changed?
     }
 
     p.dispatch :assignment_created
