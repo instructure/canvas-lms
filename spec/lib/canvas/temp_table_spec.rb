@@ -46,7 +46,7 @@ describe "Canvas::TempTable" do
     temp_table = Canvas::TempTable.new(@scope.connection, @sql)
     table = temp_table.name
 
-    temp_table.execute! do
+    temp_table.execute do
       @scope.connection.select_all("select * from #{table}").length.should == 6
     end
     expect { @scope.connection.select_all("select * from #{table}") }.to raise_error
@@ -54,7 +54,7 @@ describe "Canvas::TempTable" do
 
   it "should give me the length of the table" do
     temp_table = Canvas::TempTable.new(@scope.connection, @sql)
-    temp_table.execute! do
+    temp_table.execute do
       temp_table.size.should == 6
     end
   end

@@ -41,7 +41,8 @@ describe DataFixup::PopulateSubmissionVersions do
     course_with_student
     submission = @user.submissions.build(:assignment => @course.assignments.create!)
     submission.without_versioning{ submission.save! }
-    versions = n.times.map{ Version.create(:versionable => submission, :yaml => submission.attributes.to_yaml) }
+    submission.versions.exists?.should be_false
+    n.times { |x| Version.create(:versionable => submission, :yaml => submission.attributes.to_yaml) }
     lambda{
       DataFixup::PopulateSubmissionVersions.run
     }.should change(SubmissionVersion, :count).by(n)

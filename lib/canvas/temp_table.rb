@@ -5,36 +5,48 @@ module Canvas
       @sql = sql
       @name = '_' + (options.delete(:name) || 'temp_table')
       @index = 'temp_primary_key'
+      @transactional = options[:transactional]
     end
 
     def name
       @name
     end
 
-    def execute!
-      ActiveRecord::Base.transaction do
-        begin
-          @connection.execute "create temporary table #{@name} as #{@sql}"
-          case @connection.adapter_name
-            when 'PostgreSQL'
-              @connection.execute "ALTER TABLE #{@name}
-                                   ADD temp_primary_key SERIAL PRIMARY KEY"
-            when 'MySQL', 'Mysql2'
-              @connection.execute "ALTER TABLE #{@name}
-                                   ADD temp_primary_key MEDIUMINT NOT NULL PRIMARY KEY AUTO_INCREMENT"
-            else
-              raise "Temp tables not supported!"
-          end
-
-          yield self
-        ensure
-          @connection.execute "drop table #{@name}"
+    def execute(&block)
+      if @transactional
+        ActiveRecord::Base.transaction do
+          execute_frd(&block)
         end
+      else
+        execute_frd(&block)
+      end
+    end
+
+    def execute_frd
+      begin
+        @connection.execute "CREATE TEMPORARY TABLE #{@name} AS #{@sql}"
+        case @connection.adapter_name
+        when 'PostgreSQL'
+          @connection.execute "ALTER TABLE #{@name}
+                               ADD temp_primary_key SERIAL PRIMARY KEY"
+        when 'MySQL', 'Mysql2'
+          @connection.execute "ALTER TABLE #{@name}
+                               ADD temp_primary_key MEDIUMINT NOT NULL PRIMARY KEY AUTO_INCREMENT"
+        when 'SQLite'
+          # Sqlite always has an implicit primary key
+          @index = 'rowid'
+        else
+          raise "Temp tables not supported!"
+        end
+
+        yield self
+      ensure
+        @connection.execute "DROP TABLE #{@name}"
       end
     end
 
     def size
-      @connection.select_value("SELECT Count(1) FROM #{@name}").to_i
+      @connection.select_value("SELECT COUNT(1) FROM #{@name}").to_i
     end
 
     def find_each(options)
