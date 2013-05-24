@@ -176,3 +176,164 @@ describe AssignmentGroupsController, :type => :integration do
              :include => ['assignments'])
   end
 end
+
+describe AssignmentGroupsApiController, :type => :integration do
+  include Api
+  include Api::V1::Assignment
+
+  context '#show' do
+
+    before do
+      course_with_teacher(:active_all => true)
+      @group = @course.assignment_groups.create!(:name => 'group')
+    end
+
+    it 'should succeed' do
+      api_call(:get, "/api/v1/courses/#{@course.id}/assignment_groups/#{@group.id}",
+        :controller => 'assignment_groups_api',
+        :action => 'show',
+        :format => 'json',
+        :course_id => @course.id.to_s,
+        :assignment_group_id => @group.id.to_s)
+    end
+
+    it 'should fail if the assignment group does not exist' do
+      not_exist = @group.id + 100
+      raw_api_call(:get, "/api/v1/courses/#{@course.id}/assignment_groups/#{not_exist}",
+        :controller => 'assignment_groups_api',
+        :action => 'show',
+        :format => 'json',
+        :course_id => @course.id.to_s,
+        :assignment_group_id => not_exist.to_s)
+      response.status.to_i.should == 404
+    end
+
+    it 'should include assignments' do
+      @course.assignments.create!(:title => "test", :assignment_group => @group, :points_possible => 10)
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/assignment_groups/#{@group.id}?include[]=assignments",
+        :controller => 'assignment_groups_api',
+        :action => 'show',
+        :format => 'json',
+        :course_id => @course.id.to_s,
+        :assignment_group_id => @group.id.to_s,
+        :include => ['assignments'])
+
+      json['assignments'].should_not be_empty
+    end
+  end
+
+  context '#create' do
+    before do
+      course_with_teacher(:active_all => true)
+    end
+
+    it 'should create an assignment_group' do
+      params = {'name' => 'Some group', 'position' => 1}
+      lambda {
+        api_call(:post, "/api/v1/courses/#{@course.id}/assignment_groups", {
+          :controller => 'assignment_groups_api',
+          :action => 'create',
+          :format => 'json',
+          :course_id => @course.id.to_s},
+          params)
+      }.should change(AssignmentGroup, :count).by(1)
+    end
+  end
+
+  context '#update' do
+    before do
+      course_with_teacher(:active_all => true)
+      @assignment_group = @course.assignment_groups.create!(:name => 'Some group', :position => 1)
+    end
+
+    it 'should update an assignment group' do
+      params = {'name' => 'A different name'}
+      json = api_call(:put, "/api/v1/courses/#{@course.id}/assignment_groups/#{@assignment_group.id}", {
+        :controller => 'assignment_groups_api',
+        :action => 'update',
+        :format => 'json',
+        :course_id => @course.id.to_s,
+        :assignment_group_id => @assignment_group.id.to_s},
+        params)
+
+      json['name'].should == 'A different name'
+      @assignment_group.reload
+      @assignment_group.name.should == 'A different name'
+    end
+
+    it 'should update rules properly' do
+      rules = {'never_drop' => [1,2], 'drop_lowest' => 1, 'drop_highest' => 1}
+      rules_in_db = "drop_lowest:1\ndrop_highest:1\nnever_drop:1\nnever_drop:2\n"
+      params = {'rules' => rules}
+      json = api_call(:put, "/api/v1/courses/#{@course.id}/assignment_groups/#{@assignment_group.id}", {
+        :controller => 'assignment_groups_api',
+        :action => 'update',
+        :format => 'json',
+        :course_id => @course.id.to_s,
+        :assignment_group_id => @assignment_group.id.to_s},
+        params)
+
+      json['rules'].should == rules
+      @assignment_group.reload
+      @assignment_group.rules.should == rules_in_db
+    end
+  end
+
+  context '#destroy' do
+    before do
+      course_with_teacher(:active_all => true)
+      @assignment_group = @course.assignment_groups.create!(:name => 'Some group', :position => 1)
+    end
+
+    it 'should destroy an assignment group' do
+
+      api_call(:delete, "/api/v1/courses/#{@course.id}/assignment_groups/#{@assignment_group.id}",
+        :controller => 'assignment_groups_api',
+        :action => 'destroy',
+        :format => 'json',
+        :course_id => @course.id.to_s,
+        :assignment_group_id => @assignment_group.id.to_s)
+
+      @assignment_group.reload.workflow_state.should == 'deleted'
+    end
+
+    it 'should destroy assignments' do
+      a1 = @course.assignments.create!(:title => "test1", :assignment_group => @assignment_group, :points_possible => 10)
+      a2 = @course.assignments.create!(:title => "test2", :assignment_group => @assignment_group, :points_possible => 12)
+
+      api_call(:delete, "/api/v1/courses/#{@course.id}/assignment_groups/#{@assignment_group.id}",
+        :controller => 'assignment_groups_api',
+        :action => 'destroy',
+        :format => 'json',
+        :course_id => @course.id.to_s,
+        :assignment_group_id => @assignment_group.id.to_s)
+
+      @assignment_group.reload.workflow_state.should == 'deleted'
+      a1.reload.workflow_state.should == 'deleted'
+      a2.reload.workflow_state.should == 'deleted'
+    end
+
+    it 'should move assignments to a specified assignment group' do
+      group2 = @course.assignment_groups.create!(:name => 'Another group', :position => 2)
+      group3 = @course.assignment_groups.create!(:name => 'Yet Another group', :position => 3)
+
+      a1 = @course.assignments.create!(:title => "test1", :assignment_group => @assignment_group, :points_possible => 10)
+      a2 = @course.assignments.create!(:title => "test2", :assignment_group => @assignment_group, :points_possible => 12)
+      a3 = @course.assignments.create!(:title => "test3", :assignment_group => @assignment_group, :points_possible => 8)
+      a4 = @course.assignments.create!(:title => "test4", :assignment_group => @assignment_group, :points_possible => 9)
+
+      api_call(:delete, "/api/v1/courses/#{@course.id}/assignment_groups/#{@assignment_group.id}", {
+        :controller => 'assignment_groups_api',
+        :action => 'destroy',
+        :format => 'json',
+        :course_id => @course.id.to_s,
+        :assignment_group_id => @assignment_group.id.to_s},
+        {:move_assignments_to => group3.id})
+
+      group3.reload
+      group3.assignments.count.should == 4
+      @assignment_group.reload.workflow_state.should == 'deleted'
+    end
+  end
+
+end

@@ -35,39 +35,39 @@ describe AssignmentGroupsController do
       get 'index', :course_id => @course.id
       assert_unauthorized
     end
-    
+
     it "should assign variables" do
-      course_with_student_logged_in(:active_all => true)  
+      course_with_student_logged_in(:active_all => true)
       get 'index', :course_id => @course.id, :format => :json
       assigns[:groups].should_not be_nil
     end
-    
+
     it "should retrieve course groups if they exist" do
       course_with_student_logged_in(:active_all => true)
       course_group
       @group = course_group
-      
+
       get 'index', :course_id => @course.id, :format => :json
-      
+
       assigns[:groups].should_not be_nil
       assigns[:groups].should_not be_empty
       assigns[:groups][1].should eql(@group)
-    end    
+    end
   end
-  
+
   describe "POST 'reorder'" do
     it "should require authorization" do
       course_with_teacher(:active_all => true)
       post 'reorder', :course_id => @course.id
       assert_unauthorized
     end
-    
+
     it "should not allowe students to reorder" do
       course_with_student_logged_in(:active_all => true)
       post 'reorder', :course_id => @course.id
       assert_unauthorized
     end
-    
+
     it "should reorder assignment groups" do
       course_with_teacher_logged_in(:active_all => true)
       g1 = course_group
@@ -81,9 +81,9 @@ describe AssignmentGroupsController do
       g1.position.should eql(2)
       g2.position.should eql(1)
     end
-    
+
   end
-  
+
   describe "GET 'show'" do
     it "should require authorization" do
       course_with_teacher(:active_all => true)
@@ -91,7 +91,7 @@ describe AssignmentGroupsController do
       get 'show', :course_id => @course.id, :id => @group.id
       assert_unauthorized
     end
-    
+
     it "should assign variables" do
       course_with_student_logged_in(:active_all => true)
       course_group
@@ -101,20 +101,20 @@ describe AssignmentGroupsController do
       assigns[:assignment_group].should eql(@group)
     end
   end
-  
+
   describe "POST 'create'" do
     it "should require authorization" do
       course_with_teacher(:active_all => true)
       post 'create', :course_id => @course.id
       assert_unauthorized
     end
-    
+
     it "should not allow students to create" do
       course_with_student_logged_in(:active_all => true)
       post 'create', :course_id => @course.id
       assert_unauthorized
     end
-    
+
     it "should create a new group" do
       course_with_teacher_logged_in(:active_all => true)
       post 'create', :course_id => @course.id, :assignment_group => {:name => "some test group"}
@@ -125,7 +125,7 @@ describe AssignmentGroupsController do
     end
 
   end
-  
+
   describe "PUT 'update'" do
     it "should require authorization" do
       course_with_teacher(:active_all => true)
@@ -133,14 +133,14 @@ describe AssignmentGroupsController do
       put 'update', :course_id => @course.id, :id => @group.id
       assert_unauthorized
     end
-    
+
     it "should not allow students to update" do
       course_with_student_logged_in(:active_all => true)
       course_group
       put 'update', :course_id => @course.id, :id => @group.id
       assert_unauthorized
     end
-    
+
     it "should update group" do
       course_with_teacher_logged_in(:active_all => true)
       course_group
@@ -150,7 +150,7 @@ describe AssignmentGroupsController do
       assigns[:assignment_group].name.should eql("new group name")
     end
   end
-  
+
   describe "DELETE 'destroy'" do
     it "should require authorization" do
       course_with_teacher(:active_all => true)
@@ -158,14 +158,14 @@ describe AssignmentGroupsController do
       delete 'destroy', :course_id => @course.id, :id => @group.id
       assert_unauthorized
     end
-    
+
     it "should not allow students to delete" do
       course_with_student_logged_in(:active_all => true)
       course_group
       delete 'destroy', :course_id => @course.id, :id => @group.id
       assert_unauthorized
     end
-    
+
     it "should delete group" do
       course_with_teacher_logged_in(:active_all => true)
       course_group
@@ -175,7 +175,7 @@ describe AssignmentGroupsController do
       assigns[:assignment_group].should_not be_frozen
       assigns[:assignment_group].should be_deleted
     end
-    
+
     it "should delete assignments in the group" do
       course_with_teacher_logged_in(:active_all => true)
       @group1 = @course.assignment_groups.create!(:name => "group 1")
@@ -187,7 +187,7 @@ describe AssignmentGroupsController do
       @group1.reload.assignments[0].should eql(@assignment1)
       @group1.assignments.active.length.should eql(0)
     end
-    
+
     it "should move assignments to a different group if specified" do
       course_with_teacher_logged_in(:active_all => true)
       @group1 = @course.assignment_groups.create!(:name => "group 1")
@@ -198,9 +198,9 @@ describe AssignmentGroupsController do
       @assignment1.assignment_group_id.should eql(@group1.id)
       @assignment2.position.should eql(1)
       @assignment2.assignment_group_id.should eql(@group2.id)
-      
+
       delete 'destroy', :course_id => @course.id, :id => @group2.id, :move_assignments_to => @group1.id
-      assigns[:new_group].should eql(@group1)
+
       assigns[:assignment_group].should eql(@group2)
       assigns[:assignment_group].should be_deleted
       @group2.reload.assignments.length.should eql(0)
