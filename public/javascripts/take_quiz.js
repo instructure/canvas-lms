@@ -362,7 +362,8 @@ define([
       .delegate(".jump_to_question_link", 'click', function(event) {
         event.preventDefault();
         var $obj = $($(this).attr('href'));
-        $("html,body").scrollTo($obj.parent());
+        var scrollableSelector = ENV.MOBILE_UI ? '#content' : 'html,body';
+        $(scrollableSelector).scrollTo($obj.parent());
         $obj.find(":input:first").focus().select();
       })
       .find(".list_question").bind({

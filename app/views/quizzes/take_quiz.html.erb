@@ -1,4 +1,12 @@
+<% @body_classes << 'assessing' if @body_classes %>
 <% content_for :page_title do %><%= join_title @quiz.readable_type, @quiz.quiz_title %><% end %>
+
+<% content_for :meta_tags do %>
+  <% if params[:persist_headless] %>
+    <meta name="viewport" id="vp" content="initial-scale=1.0,user-scalable=yes,width=device-width">
+    <% js_env :MOBILE_UI => true %>
+  <% end %>
+<% end %>
 
 <% content_for :right_side do %>
   <%= render "quizzes/take_quiz_right_side" %>

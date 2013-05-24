@@ -11,7 +11,7 @@
       <%= score_out_of_points_possible(@submission.score, @quiz.points_possible, :class => 'score_value') %>
     </div>
   <% end %>
-  <div>
+  <div id="quiz-time-elapsed">
     <span class="time_header"><%= before_label(:time_running, "Time Running") %></span>
     <span style="font-size: 0.8em; padding-left: 10px;">
       <a href="#" class="hide_time_link"><%= t('links.hide_time_running', "Hide") %></a>
@@ -23,7 +23,7 @@
       </div>
     <% end %>
     <div class="clear"></div>
+    <div class="time_running"></div>
   </div>
-  <div class="time_running"></div>
 </div>
 
