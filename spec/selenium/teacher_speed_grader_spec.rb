@@ -1,7 +1,16 @@
 require File.expand_path(File.dirname(__FILE__) + '/helpers/speed_grader_common')
 
 describe "speed grader" do
-  it_should_behave_like "speed grader tests"
+  it_should_behave_like "in-process server selenium tests"
+
+  before (:each) do
+    stub_kaltura
+
+    course_with_teacher_logged_in
+    outcome_with_rubric
+    @assignment = @course.assignments.create(:name => 'assignment with rubric', :points_possible => 10)
+    @association = @rubric.associate_with(@assignment, @course, :purpose => 'grading')
+  end
 
   context "as a course limited ta" do
     before(:each) do
@@ -227,7 +236,9 @@ describe "speed grader" do
     f('#comments > .comment').should include_text('grader comment')
 
     #make sure gradebook link works
-    f('#x_of_x_students a').click
+    expect_new_page_load do
+      f('#speed_grader_gradebook_link').click
+    end
     fj('body.grades').should be_displayed
   end
 

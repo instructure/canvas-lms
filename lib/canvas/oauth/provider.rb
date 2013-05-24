@@ -2,11 +2,13 @@ module Canvas::Oauth
   class Provider
     OAUTH2_OOB_URI = 'urn:ietf:wg:oauth:2.0:oob'
 
-    attr_reader :client_id, :redirect_uri
 
-    def initialize(client_id, redirect_uri = "")
+    attr_reader :client_id, :redirect_uri, :scopes
+
+    def initialize(client_id, redirect_uri = "", scopes = [])
       @client_id = client_id
       @redirect_uri = redirect_uri
+      @scopes = scopes
     end
 
     def has_valid_key?
@@ -39,6 +41,19 @@ module Canvas::Oauth
       @key ||= DeveloperKey.find_by_id(@client_id)
     end
 
+    #Checks to see if a token has already been issued to this client and if we can
+    #reissue the same token to that client without asking for user permmission again.
+    def authorized_token?(user)
+      token = nil
+
+      if !self.class.is_oob?(redirect_uri)
+        token = Token.find_userinfo_access_token(user, key, scopes)
+        return !token.nil? && token.remember_access?
+      end
+
+      return false
+    end
+
     def token_for(code)
       Token.new(key, code)
     end
@@ -52,7 +67,7 @@ module Canvas::Oauth
     end
 
     def session_hash
-      { :client_id => key.id, :redirect_uri => redirect_uri }
+      { :client_id => key.id, :redirect_uri => redirect_uri, :scopes => scopes }
     end
 
     def self.is_oob?(uri)

@@ -1,6 +1,7 @@
 class TwitterMessenger
 
   include Twitter
+  include TextHelper
 
   attr_reader :message
   delegate :asset_context, :to => :message
@@ -10,11 +11,11 @@ class TwitterMessenger
   end
 
   def deliver
-    twitter_self_dm(twitter_service, "#{body} #{url}") if twitter_service
+    twitter_self_dm(twitter_service, "#{body}") if twitter_service
   end
 
   def url
-    "http://#{host}/mr/#{id}"
+    message.main_link || message.url || "http://#{host}/mr/#{id}"
   end
 
   def id
@@ -22,7 +23,8 @@ class TwitterMessenger
   end
 
   def body
-    message.body[0, 139 - url.length]
+    truncated_body = strip_and_truncate(message.body, :max_length => (139 - url.length))
+    "#{truncated_body} #{url}"
   end
 
   def host

@@ -4,20 +4,27 @@ $backgroundColor: #dfe9f0
 $borderColor: #AAA
 $questionHeaderBackground: #F5F5F5
 
+#wrapper-container
+  min-width: 1100px
+
+.quizzes-speedgrader #wrapper-container
+  min-width: 1000px
+
+  .update-scores
+    display: block
+    margin: 0 auto
+
 #quiz_show
   .alert
     padding-right: 14px
     .actions
       text-align: right
       line-height: 36px
-    .publish_quiz_button
-      width: 90px
     #preview_quiz_button
       font-weight: normal
       color: #333333
     .unpublished_quiz_warning
       display: block
-
 
   .admin-links
     text-align: left
@@ -42,11 +49,20 @@ $questionHeaderBackground: #F5F5F5
     font-size: 1.3em
 
   #quiz_details
+    // display: none so jquery ui toggles correctly
     display: none
-    clear: both
+    margin: 0 auto 10px auto
+    max-height: 500px
+    overflow: auto
 
-    td
-      vertical-align: top
+    .submitted_list
+      float: left
+      width: 50%
+
+    .name
+      display: block
+      padding: 4px 12px
+      border-top: 1px solid white
 
   .control-group
     margin-bottom: 0px
@@ -89,7 +105,7 @@ $questionHeaderBackground: #F5F5F5
     li
       display: inline-block
 
-      .label
+      .title
         font-weight: bold
         margin-right: 2px
 
@@ -126,6 +142,9 @@ div#content
 .add_question
   border: none
 
+.multiple_dropdowns_question .ui-selectmenu
+  margin: 0.25em 0
+  
 #submit_quiz_form
   .question_holder
     overflow: hidden
@@ -134,21 +153,23 @@ div#content
   .button-container
     padding-right: 10%
     padding-left: 10%
+    .previous-question,
+    .next-question
+      position: relative
+      i
+        position: absolute
+        top: 5px
+    .previous-question
+      i
+        left: 5px
     .next-question
       float: right
-    .next-question:after, .previous-question:before
-      position: absolute
-      font-size: 10px
+      i
+        right: 5px
     .btn-secondary.next-question:after, .btn-secondary.previous-question:before
       color: #666
     .btn-primary.next-question:after, .btn-primary.previous-question:before
       color: #fff
-    .next-question:after
-      content: '▶'
-      right: 5px
-    .previous-question:before
-      content: '◀'
-      left: 5px
 
 #sort_questions
   :max-height 250px
@@ -162,7 +183,11 @@ div#content
   clear: both
   .question
     .header
+      :padding 8px 20px 12px 
       :background-color $questionHeaderBackground
+      .name
+        :display inline-block
+        :padding-top 5px
     .answers
       .answer
         clear: both
@@ -220,10 +245,12 @@ div#content
 #questions.assessing,#questions.assessment_results
   .question_holder
     .question
+      margin: 0.7em 30px 30px 30px
       &.related
         :border-width 2px
       .move
         :display none
+
 
 #questions.assessing
   background: $backgroundColor
@@ -232,6 +259,7 @@ div#content
   .answer
     :padding 5px 5px
     :margin 0
+    @include clearfix
 
     &:last-child
       :border-bottom 0
@@ -261,6 +289,9 @@ div#content
     padding: 5px 10px
     overflow: hidden
     background-color: #eee
+    clear: both
+    .quiz_group_form
+      margin: 0
     &.question_bank_top
       .local_group_links
         display: none
@@ -352,13 +383,17 @@ div#content
     .answer_comment,.question_comment_text
       white-space: pre-wrap
 
+#questions.assessment_results .question_holder .question
+  margin: 0.7em auto 30px auto
+  min-width: 415px
+  width: 80%
+
 .question
   :border 1px solid $borderColor
   :background-color #fff
   :position relative
   :min-height 50px
-  :min-width 415px
-  :width 80%
+  :min-width 515px
   :margin 0.7em auto 30px auto
   :_height 10px
 
@@ -393,6 +428,8 @@ div#content
     :clear left
     :padding 5px 20px
     
+    .button-container
+      :clear both
     .question_text
       :margin-top 1.5em
       :margin-bottom 1.5em
@@ -444,6 +481,8 @@ div#content
 
         .answer_input
           :vertical-align top
+          input[type="radio"], input[type="checkbox"]
+            margin-top: 0
         .answer_label
           :padding-left 0.5em
         .answer_label > label > *:first-child, .answer_label > label + *
@@ -788,6 +827,8 @@ form.question_form
       :color #080
 
 ul#question_list
+  margin: 0 0 13px
+  padding: 0 0 0 40px
   li
     &.answered a
       color: #a1bfe0
@@ -817,15 +858,6 @@ ul#question_list
     :font-size 1.2em
     :font-weight bold
     :color #444
-table#quiz_details 
-  :margin-top 10px
-  h3
-    :font-weight bold
-    :font-size 0.9em
-  ul.student_list
-    :max-height 300px
-    :overflow auto
-    :margin-top 5px     
 
 ul#quiz_versions
   :margin-top 5px
@@ -838,9 +870,7 @@ ul#quiz_versions
 
 #quiz_edit_wrapper
   #quiz_title
-    margin-left: 0
     margin-top: 5px
-    padding: 0.1em 0.1em 0.1em 0.3em
   padding: 1em
   background-color: #ffffff
   #student_submissions_warning,
@@ -1267,8 +1297,6 @@ ul#quiz_versions
       margin: 0
     .question_input
       width: 30px
-      &:focus
-        +transform(scale(1.3))
 
   .short_answer_question
     .answers
@@ -1313,6 +1341,9 @@ ul#quiz_versions
       /* Display persistent correct answer arrow when editing only. */
       &.selectable .form_answers .answer.correct_answer .answer_select .answer_box
         background: url(/images/correct_answer.png) no-repeat 3px 5px
+    .blank_id_select
+      width: auto
+      min-width: 220px
 
 #left-side
   position: absolute
@@ -1322,8 +1353,13 @@ ul#quiz_versions
   margin: 18px 0 -1px
   @include background-image(linear-gradient(#f3f3f3, #e3e3e3))
 
-.quiz_results_list
-  li
-    padding: 4px 12px !important
-  li.student
-    padding: 4px 12px !important
+#quiz_options_holder
+  select
+    width: auto
+    margin-left: 3px
+  input[type="text"]
+    width: 90%
+    margin-left: 3px
+    &.hasDatepicker
+      width: 45%
+      

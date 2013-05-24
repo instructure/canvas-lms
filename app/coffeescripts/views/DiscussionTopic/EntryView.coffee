@@ -30,7 +30,6 @@ define [
       _.each @instances, (view) ->
         view.expand() unless view.model.get 'parent'
 
-
     els:
       '.discussion_entry:first': '$entryContent'
       '.replies:first': '$replies'
@@ -144,6 +143,7 @@ define [
         descendants: descendants
         collection: page
         threaded: @options.threaded
+        showMoreDescendants: @options.showMoreDescendants
       @treeView.render()
 
     renderDescendantsLink: ->

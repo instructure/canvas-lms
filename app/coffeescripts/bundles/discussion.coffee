@@ -15,9 +15,8 @@ require [
   'compiled/jquery/sticky'
 ], (EntryView, DiscussionFilterState, DiscussionToolbarView, DiscussionFilterResultsView, MarkAsReadWatcher, $, Backbone, Entry, MaterializedDiscussionTopic, SideCommentDiscussionTopic, EntryCollection, TopicView, EntriesView) ->
 
-  perPage     = 10
-  descendants = 3
-  children    = 3
+  descendants = 5
+  children    = 10
 
   ##
   # create the objects ...
@@ -28,7 +27,7 @@ require [
                   else
                     new SideCommentDiscussionTopic root_url: ENV.DISCUSSION.ROOT_URL
 
-  entries       = new EntryCollection null, {perPage}
+  entries       = new EntryCollection null
 
   filterModel   = new DiscussionFilterState
 
@@ -57,14 +56,15 @@ require [
   $container = $ window
   $subentries = $ '#discussion_subentries'
 
-
   scrollToTop = ->
     $container.scrollTo $subentries, offset: -49
 
   ##
   # connect them ...
   data.on 'change', ->
-    entries.reset data.get 'entries'
+    entryData = data.get 'entries'
+    entries.options.per_page = entryData.length
+    entries.reset entryData
 
   entriesView.on 'scrollAwayFromEntry', ->
     # prevent scroll to top for non-pushstate browsers when hash changes
@@ -96,15 +96,14 @@ require [
 
   ##
   # routes
-  router.route '*catchall', 'catchall', -> router.navigate '', yes
   router.route 'entry-:id', 'id', entriesView.goToEntry
   router.route 'page-:page', 'page', (page) ->
     entriesView.render page
     # TODO: can get a little bouncy when the page isn't as tall as the previous
     scrollToTop()
-  router.route '', 'root', entriesView.render
   initEntries = (initial_entry) ->
     data.fetch success: ->
+      entriesView.render()
       Backbone.history.start
         pushState: yes
         root: ENV.DISCUSSION.APP_URL + '/'

@@ -125,7 +125,7 @@ class DiscussionTopic < ActiveRecord::Base
     category.groups.active.each do |group|
       group.shard.activate do
         DiscussionTopic.unique_constraint_retry do
-          topic = DiscussionTopic.scoped(:conditions => { :context_id => group.id, :context_type => 'Group', :root_topic_id => self.id }).first
+          topic = DiscussionTopic.where(:context_id => group, :context_type => 'Group', :root_topic_id => self).first
           topic ||= group.discussion_topics.build{ |dt| dt.root_topic = self }
           topic.message = self.message
           topic.title = "#{self.title} - #{group.name}"
@@ -146,7 +146,7 @@ class DiscussionTopic < ActiveRecord::Base
       self.context_module_tags.each { |tag| tag.confirm_valid_module_requirements }
     end
     if @old_assignment_id
-      Assignment.update_all({:workflow_state => 'deleted', :updated_at => Time.now.utc}, {:id => @old_assignment_id, :context_id => self.context_id, :context_type => self.context_type, :submission_types => 'discussion_topic'})
+      Assignment.where(:id => @old_assignment_id, :context_id => self.context_id, :context_type => self.context_type, :submission_types => 'discussion_topic').update_all(:workflow_state => 'deleted', :updated_at => Time.now.utc)
       ContentTag.delete_for(Assignment.find(@old_assignment_id)) if @old_assignment_id
     elsif self.assignment && @saved_by != :assignment && !self.root_topic_id
       self.assignment.title = self.title
@@ -258,12 +258,12 @@ class DiscussionTopic < ActiveRecord::Base
       new_count = (new_state == 'unread' ? self.default_unread_count : 0)
       self.update_or_create_participant(:current_user => current_user, :new_state => new_state, :new_count => new_count)
 
-      entry_ids = self.discussion_entries.map(&:id)
+      entry_ids = self.discussion_entries.pluck(:id)
       if entry_ids.present?
-        existing_entry_participants = DiscussionEntryParticipant.find(:all, :conditions => ["user_id = ? AND discussion_entry_id IN (?)",
-                                                                      current_user.id, entry_ids])
+        existing_entry_participants = DiscussionEntryParticipant.where(:user_id =>current_user, :discussion_entry_id => entry_ids).
+          select([:id, :discussion_entry_id]).all
         existing_ids = existing_entry_participants.map(&:id)
-        DiscussionEntryParticipant.update_all({:workflow_state => new_state}, ["id IN (?)", existing_ids]) if existing_ids.present?
+        DiscussionEntryParticipant.where(:id => existing_ids).update_all(:workflow_state => new_state) if existing_ids.present?
 
         if new_state == "read"
           new_entry_ids = entry_ids - existing_entry_participants.map(&:discussion_entry_id)
@@ -280,14 +280,13 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def default_unread_count
-    self.discussion_entries.count
+    self.discussion_entries.active.count
   end
 
   def unread_count(current_user = nil)
     current_user ||= self.current_user
     return 0 unless current_user # default for logged out users
-    uid = current_user.is_a?(User) ? current_user.id : current_user
-    topic_participant = discussion_topic_participants.find_by_user_id(uid, :lock => true)
+    topic_participant = discussion_topic_participants.lock.find_by_user_id(current_user)
     topic_participant.try(:unread_entry_count) || self.default_unread_count
   end
 
@@ -298,7 +297,7 @@ class DiscussionTopic < ActiveRecord::Base
     topic_participant = nil
     DiscussionTopic.uncached do
       DiscussionTopic.unique_constraint_retry do
-        topic_participant = self.discussion_topic_participants.find(:first, :conditions => ['user_id = ?', current_user.id], :lock => true)
+        topic_participant = self.discussion_topic_participants.where(:user_id => current_user).lock.first
         topic_participant ||= self.discussion_topic_participants.build(:user => current_user,
                                                                        :unread_entry_count => self.unread_count(current_user),
                                                                        :workflow_state => "unread")
@@ -311,32 +310,18 @@ class DiscussionTopic < ActiveRecord::Base
     topic_participant
   end
 
-  def self.search(query)
-    find(:all, :conditions => wildcard('title', 'message', query))
-  end
+  scope :recent, lambda { where("discussion_topics.last_reply_at>?", 2.weeks.ago).order("discussion_topics.last_reply_at DESC") }
+  scope :only_discussion_topics, where(:type => nil)
+  scope :for_subtopic_refreshing, where("discussion_topics.subtopics_refreshed_at IS NOT NULL AND discussion_topics.subtopics_refreshed_at<discussion_topics.updated_at").order("discussion_topics.subtopics_refreshed_at")
+  scope :for_delayed_posting, lambda {
+    where("discussion_topics.workflow_state='post_delayed' AND discussion_topics.delayed_post_at<?", Time.now.utc).order("discussion_topics.delayed_post_at")
+  }
+  scope :active, where("discussion_topics.workflow_state<>'deleted'")
+  scope :for_context_codes, lambda {|codes| where(:context_code => codes) }
 
-  named_scope :recent, lambda{
-    {:conditions => ['discussion_topics.last_reply_at > ?', 2.weeks.ago], :order => 'discussion_topics.last_reply_at DESC'}
-  }
-  named_scope :only_discussion_topics, lambda {
-    {:conditions => ['discussion_topics.type IS NULL'] }
-  }
-  named_scope :for_subtopic_refreshing, lambda {
-    {:conditions => ['discussion_topics.subtopics_refreshed_at IS NOT NULL AND discussion_topics.subtopics_refreshed_at < discussion_topics.updated_at'], :order => 'discussion_topics.subtopics_refreshed_at' }
-  }
-  named_scope :for_delayed_posting, lambda {
-    {:conditions => ['discussion_topics.workflow_state = ? AND discussion_topics.delayed_post_at < ?', 'post_delayed', Time.now.utc], :order => 'discussion_topics.delayed_post_at'}
-  }
-  named_scope :active, :conditions => ['discussion_topics.workflow_state != ?', 'deleted']
-  named_scope :for_context_codes, lambda {|codes|
-    {:conditions => ['discussion_topics.context_code IN (?)', codes] }
-  }
+  scope :before, lambda { |date| where("discussion_topics.created_at<?", date) }
 
-  named_scope :before, lambda {|date|
-    {:conditions => ['discussion_topics.created_at < ?', date]}
-  }
-
-  named_scope :by_position, :order => "discussion_topics.position DESC, discussion_topics.created_at DESC"
+  scope :by_position, order("discussion_topics.position DESC, discussion_topics.created_at DESC")
 
   def try_posting_delayed
     if self.post_delayed? && Time.now >= self.delayed_post_at
@@ -397,8 +382,9 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def user_ids_who_have_posted_and_admins
-    ids = DiscussionEntry.active.scoped(:select => "distinct user_id").find_all_by_discussion_topic_id(self.id).map(&:user_id)
-    ids += self.context.admin_enrollments.active.scoped(:select => 'user_id').map(&:user_id) if self.context.respond_to?(:admin_enrollments)
+    # TODO: In Rails 3, you can use uniq and pluck together
+    ids = DiscussionEntry.active.select(:user_id).uniq.where(:discussion_topic_id => self).map(&:user_id)
+    ids += self.context.admin_enrollments.active.pluck(:user_id) if self.context.respond_to?(:admin_enrollments)
     ids
   end
   memoize :user_ids_who_have_posted_and_admins
@@ -458,8 +444,13 @@ class DiscussionTopic < ActiveRecord::Base
   def restore
     self.workflow_state = 'active'
     self.save
-    if self.for_assignment?
+
+    if self.for_assignment? && self.root_topic_id.blank?
       self.assignment.restore(:discussion_topic)
+    end
+
+    self.child_topics.each do |child|
+      child.restore
     end
   end
 
@@ -722,7 +713,7 @@ class DiscussionTopic < ActiveRecord::Base
         begin
           import_from_migration(event, migration.context)
         rescue
-          migration.add_warning("Couldn't import the announcement \"#{event[:title]}\"", $!)
+          migration.add_import_warning(t('#migration.announcement_type', "Announcement"), event[:title], $!)
         end
       end
     end
@@ -737,7 +728,7 @@ class DiscussionTopic < ActiveRecord::Base
             begin
               import_from_migration(topic.merge({:topic_entries_to_import => topic_entries_to_import}), context)
             rescue
-              migration.add_warning("Couldn't import the topic \"#{topic[:title]}\"", $!)
+              migration.add_import_warning(t('#migration.discussion_topic_type', "Discussion Topic"), topic[:title], $!)
             end
           end
         end
@@ -757,7 +748,9 @@ class DiscussionTopic < ActiveRecord::Base
     end
     item.migration_id = hash[:migration_id]
     item.title = hash[:title]
-    item.message = ImportedHtmlConverter.convert(hash[:description] || hash[:text], context)
+    item.discussion_type = hash[:discussion_type]
+    hash[:missing_links] = []
+    item.message = ImportedHtmlConverter.convert(hash[:description] || hash[:text], context, {:missing_links => (hash[:missing_links])})
     item.message = t('#discussion_topic.empty_message', "No message") if item.message.blank?
     item.posted_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:posted_at]) if hash[:posted_at]
     item.delayed_post_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:delayed_post_at]) if hash[:delayed_post_at]
@@ -792,6 +785,13 @@ class DiscussionTopic < ActiveRecord::Base
     context.migration_results << "" if hash[:peer_rating_type] && hash[:peer_rating_types] != "none" if context.respond_to?(:migration_results)
     hash[:messages] ||= hash[:posts]
     context.imported_migration_items << item if context.respond_to?(:imported_migration_items) && context.imported_migration_items
+
+    if context.respond_to?(:content_migration) && context.content_migration
+      context.content_migration.add_missing_content_links(:class => item.class.to_s,
+        :id => item.id, :missing_links => hash[:missing_links],
+        :url => "/#{context.class.to_s.underscore.pluralize}/#{context.id}/#{item.class.to_s.underscore.pluralize}/#{item.id}")
+    end
+
     item
   end
 

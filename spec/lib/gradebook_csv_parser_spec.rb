@@ -18,6 +18,8 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
+require 'gradebook_csv_parser'
+
 describe CSVParser do
   context "initialize" do
     it "should require contents" do

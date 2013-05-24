@@ -4,7 +4,7 @@ describe "account" do
   it_should_behave_like "in-process server selenium tests"
 
   before (:each) do
-   course_with_admin_logged_in
+    course_with_admin_logged_in
   end
 
   describe "authentication configs" do
@@ -311,9 +311,10 @@ describe "account" do
 
       element = ff('.ui-autocomplete li a').first
       element.text.should == @course_name
-      element.click
-
-      driver.current_url.should include("/courses/#{@course.id}")
+      keep_trying_until do
+        driver.execute_script("$('.ui-autocomplete li a').hover().click()")
+        driver.current_url.should include("/courses/#{@course.id}")
+      end
     end
 
     it "should search for an existing user" do
@@ -335,6 +336,20 @@ describe "account" do
       find_user_form = f('#new_user')
       submit_input(find_user_form, '#user_name', 'this student name will not exist', false)
       f('#content').should include_text(@error_text)
+    end
+  end
+
+  describe "user details view" do
+    def create_sub_account(name = 'sub_account', parent_account = Account.default)
+      Account.create(:name => name, :parent_account => parent_account)
+    end
+
+    it "should be able to view user details from parent account" do
+      user_non_root = user
+      create_sub_account.add_user(user_non_root)
+      get "/accounts/#{Account.default.id}/users/#{user_non_root.id}"
+      #verify user details displayed properly
+      f('.accounts .unstyled_list li').should include_text('sub_account')
     end
   end
 end

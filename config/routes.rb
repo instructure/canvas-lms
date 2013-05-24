@@ -239,8 +239,9 @@ ActionController::Routing::Routes.draw do |map|
     course.resources :assignment_groups, :collection => {:reorder => :post} do |group|
       group.reorder_assignments 'reorder', :controller => 'assignment_groups', :action => 'reorder_assignments'
     end
-    course.resources :external_tools, :collection => {:retrieve => :get} do |tools|
+    course.resources :external_tools, :collection => {:retrieve => :get, :homework_submissions => :get} do |tools|
       tools.resource_selection 'resource_selection', :controller => 'external_tools', :action => 'resource_selection'
+      tools.homework_submission 'homework_submission', :controller => 'external_tools', :action => 'homework_submission'
       tools.finished 'finished', :controller => 'external_tools', :action => 'finished'
     end
     course.resources :submissions
@@ -252,6 +253,7 @@ ActionController::Routing::Routes.draw do |map|
     add_question_banks(course)
     course.quizzes_publish 'quizzes/publish', :controller => 'quizzes', :action => 'publish'
     course.resources :quizzes do |quiz|
+      quiz.managed_quiz_data "managed_quiz_data", :controller => "quizzes", :action => "managed_quiz_data"
       quiz.reorder "reorder", :controller => "quizzes", :action => "reorder"
       quiz.history "history", :controller => "quizzes", :action => "history"
       quiz.statistics "statistics", :controller => 'quizzes', :action => 'statistics'
@@ -274,6 +276,8 @@ ActionController::Routing::Routes.draw do |map|
       quiz.moderate "moderate", :controller => "quizzes", :action => "moderate"
       quiz.lockdown_browser_required "lockdown_browser_required", :controller => "quizzes", :action => "lockdown_browser_required"
     end
+    map.quiz_statistics_download 'quiz_statistics/:quiz_statistics_id/files/:file_id/download',
+      :controller => 'files', :action => 'show', :download => '1'
 
     course.resources :collaborations
 
@@ -364,8 +368,6 @@ ActionController::Routing::Routes.draw do |map|
     feed.forum_format "forums/:feed_code.:format", :controller => "discussion_topics", :action => "public_feed"
     feed.topic "topics/:discussion_topic_id/:feed_code", :controller => "discussion_entries", :action => "public_feed"
     feed.topic_format "topics/:discussion_topic_id/:feed_code.:format", :controller => "discussion_entries", :action => "public_feed"
-    feed.files "files/:feed_code", :controller => "files", :action => "public_feed"
-    feed.files_format "files/:feed_code.:format", :controller => "files", :action => "public_feed"
     feed.announcements "announcements/:feed_code", :controller => "announcements", :action => "public_feed"
     feed.announcements_format "announcements/:feed_code.:format", :controller => "announcements", :action => "public_feed"
     feed.course "courses/:feed_code", :controller => "courses", :action => "public_feed"
@@ -376,7 +378,6 @@ ActionController::Routing::Routes.draw do |map|
     feed.enrollment_format "enrollments/:feed_code.:format", :controller => "courses", :action => "public_feed"
     feed.user "users/:feed_code", :controller => "users", :action => "public_feed"
     feed.user_format "users/:feed_code.:format", :controller => "users", :action => "public_feed"
-    feed.gradebook "gradebooks/:feed_code", :controller => "gradebooks", :action => "public_feed"
     feed.eportfolio "eportfolios/:eportfolio_id.:format", :controller => "eportfolios", :action => "public_feed"
     feed.conversation "conversations/:feed_code", :controller => "conversations", :action => "public_feed"
     feed.conversation_format "conversations/:feed_code.:format", :controller => "conversations", :action => "public_feed"
@@ -426,6 +427,7 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resources :accounts, :member => { :statistics => :get } do |account|
     account.settings 'settings', :controller => 'accounts', :action => 'settings'
+    account.admin_tools 'admin_tools', :controller => 'accounts', :action => 'admin_tools'
     account.add_account_user 'account_users', :controller => 'accounts', :action => 'add_account_user', :conditions => {:method => :post}
     account.remove_account_user 'account_users/:id', :controller => 'accounts', :action => 'remove_account_user', :conditions => {:method => :delete}
 
@@ -544,8 +546,13 @@ ActionController::Routing::Routes.draw do |map|
     user.course_teacher_activity 'teacher_activity/course/:course_id', :controller => 'users', :action => 'teacher_activity'
     user.student_teacher_activity 'teacher_activity/student/:student_id', :controller => 'users', :action => 'teacher_activity'
     user.media_download 'media_download', :controller => 'users', :action => 'media_download'
-    user.resources :messages, :only => [:index, :create]
+    user.resources :messages, :only => [:index, :create] do |message|
+      message.html_message "html_message", :controller => "messages", :action => "html_message", :conditions => {:method => :get}
+    end
   end
+  map.show_message_template 'show_message_template', :controller => 'messages', :action => 'show_message_template'
+  map.message_templates 'message_templates', :controller => 'messages', :action => 'templates'
+
   map.resource :profile, :only => %w(show update),
                :controller => "profile",
                :member => { :update_profile => :put, :communication => :get, :communication_update => :put, :settings => :get } do |profile|
@@ -565,6 +572,7 @@ ActionController::Routing::Routes.draw do |map|
   map.dashboard_sidebar 'dashboard-sidebar', :controller => 'users', :action => 'dashboard_sidebar', :conditions => {:method => :get}
   map.toggle_dashboard 'toggle_dashboard', :controller => 'users', :action => 'toggle_dashboard', :conditions => {:method => :post}
   map.styleguide 'styleguide', :controller => 'info', :action => 'styleguide', :conditions => {:method => :get}
+  map.old_styleguide 'old_styleguide', :controller => 'info', :action => 'old_styleguide', :conditions => {:method => :get}
   map.root :dashboard
   # backwards compatibility with the old /dashboard url
   map.dashboard_redirect 'dashboard', :controller => 'users', :action => 'user_dashboard', :conditions => {:method => :get}
@@ -739,6 +747,7 @@ ActionController::Routing::Routes.draw do |map|
 
     api.with_options(:controller => :gradebook_history_api) do |gradebook_history|
       gradebook_history.get "courses/:course_id/gradebook_history/days", :action => :days, :path_name => 'gradebook_history'
+      gradebook_history.get "courses/:course_id/gradebook_history/feed", :action => :feed, :path_name => 'gradebook_history_feed'
       gradebook_history.get "courses/:course_id/gradebook_history/:date", :action =>:day_details, :path_name => 'gradebook_history_for_day'
       gradebook_history.get "courses/:course_id/gradebook_history/:date/graders/:grader_id/assignments/:assignment_id/submissions", :action => :submissions, :path_name => 'gradebook_history_submissions'
     end
@@ -748,6 +757,19 @@ ActionController::Routing::Routes.draw do |map|
     api.with_options(:controller => :discussion_topics) do |topics|
       topics.get 'courses/:course_id/discussion_topics', :action => :index, :path_name => 'course_discussion_topics'
       topics.get 'groups/:group_id/discussion_topics', :action => :index, :path_name => 'group_discussion_topics'
+    end
+
+    api.with_options(:controller => :content_migrations) do |cm|
+      cm.get 'courses/:course_id/content_migrations/:id', :action => :show, :path_name => 'course_content_migration'
+      cm.get 'courses/:course_id/content_migrations', :action => :index, :path_name => 'course_content_migration_list'
+      cm.get 'courses/:course_id/content_migrations/:id/download_archive', :action => 'download_archive', :conditions => {:method => :get}, :path_name => 'course_content_migration_download'
+    end
+
+    api.with_options(:controller => :migration_issues) do |mi|
+      mi.get 'courses/:course_id/content_migrations/:content_migration_id/migration_issues/:id', :action => :show, :path_name => 'course_content_migration_migration_issue'
+      mi.get 'courses/:course_id/content_migrations/:content_migration_id/migration_issues', :action => :index, :path_name => 'course_content_migration_migration_issue_list'
+      mi.post 'courses/:course_id/content_migrations/:content_migration_id/migration_issues', :action => :create, :path_name => 'course_content_migration_migration_issue_create'
+      mi.put 'courses/:course_id/content_migrations/:content_migration_id/migration_issues/:id', :action => :update, :path_name => 'course_content_migration_migration_issue_update'
     end
 
     api.with_options(:controller => :discussion_topics_api) do |topics|
@@ -847,6 +869,7 @@ ActionController::Routing::Routes.draw do |map|
       accounts.put 'accounts/:id', :action => :update
       accounts.get 'accounts/:account_id/courses', :action => :courses_api, :path_name => 'account_courses'
       accounts.get 'accounts/:account_id/sub_accounts', :action => :sub_accounts, :path_name => 'sub_accounts'
+      accounts.get 'accounts/:account_id/courses/:id', :controller => :courses, :action => :show, :path_name => 'account_course_show'
     end
 
     api.with_options(:controller => :role_overrides) do |roles|
@@ -904,12 +927,17 @@ ActionController::Routing::Routes.draw do |map|
       conversations.post 'conversations/:id/add_recipients', :action => :add_recipients
       conversations.post 'conversations/:id/remove_messages', :action => :remove_messages
       conversations.put 'conversations', :action => :batch_update
+      conversations.delete 'conversations/:id/delete_for_all', :action => :delete_for_all
     end
 
     api.with_options(:controller => :communication_channels) do |channels|
       channels.get 'users/:user_id/communication_channels', :action => :index, :path_name => 'communication_channels'
       channels.post 'users/:user_id/communication_channels', :action => :create
       channels.delete 'users/:user_id/communication_channels/:id', :action => :destroy
+    end
+
+    api.with_options(:controller => :comm_messages_api) do |comm_messages|
+      comm_messages.get 'comm_messages', :action => :index, :path_name => 'comm_messages'
     end
 
     api.with_options(:controller => :services_api) do |services|

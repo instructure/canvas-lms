@@ -1,27 +1,74 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../common')
-require File.expand_path(File.dirname(__FILE__) + '/../../helpers/outcome_specs')
+require File.expand_path(File.dirname(__FILE__) + '/../../helpers/outcome_common')
 
 describe "sub account outcomes" do
-  describe "shared outcome specs" do
-    let(:account) { Account.create(:name => 'sub account from default account', :parent_account => Account.default) }
-    let(:outcome_url) { "/accounts/#{account.id}/outcomes" }
-    let(:who_to_login) { 'admin' }
-    it_should_behave_like "outcome tests"
+  it_should_behave_like "in-process server selenium tests"
 
-    describe "find/import dialog" do
-      it "should not allow importing top level groups" do
-        get outcome_url
-        wait_for_ajaximations
+    describe "account outcome specs" do
+      let(:account) { Account.create(:name => 'sub account from default account', :parent_account => Account.default) }
+      let(:outcome_url) { "/accounts/#{account.id}/outcomes" }
+      let(:who_to_login) { 'admin' }
 
-        f('.find_outcome').click
-        wait_for_ajaximations
-        groups = ff('.outcome-group')
-        groups.size.should == 2
-        groups.each do |g|
-          g.click
-          f('.ui-dialog-buttonpane .btn-primary').should_not be_displayed
+      before (:each) do
+        course_with_admin_logged_in
+      end
+
+      context "create/edit/delete outcomes" do
+
+        it "should create a learning outcome with a new rating (root level)" do
+          should_create_a_learning_outcome_with_a_new_rating_root_level
+        end
+
+        it "should create a learning outcome (nested)" do
+          should_create_a_learning_outcome_nested
+        end
+
+        it "should edit a learning outcome and delete a rating" do
+          should_edit_a_learning_outcome_and_delete_a_rating
+        end
+
+        it "should delete a learning outcome" do
+          should_delete_a_learning_outcome
+        end
+
+        it "should validate mastery points" do
+          should_validate_mastery_points
+        end
+      end
+
+      context "create/edit/delete outcome groups" do
+
+        it "should create an outcome group (root level)" do
+          should_create_an_outcome_group_root_level
+        end
+
+        it "should create a learning outcome with a new rating (nested)" do
+          should_create_a_learning_outcome_with_a_new_rating_nested
+        end
+
+        it "should edit an outcome group" do
+          should_edit_an_outcome_group
+        end
+
+        it "should delete an outcome group" do
+          should_delete_an_outcome_group
+        end
+      end
+
+      describe "find/import dialog" do
+        it "should not allow importing top level groups" do
+          get outcome_url
+          wait_for_ajaximations
+
+          f('.find_outcome').click
+          wait_for_ajaximations
+          groups = ff('.outcome-group')
+          groups.size.should == 2
+          groups.each do |g|
+            g.click
+            f('.ui-dialog-buttonpane .btn-primary').should_not be_displayed
+          end
         end
       end
     end
   end
-end

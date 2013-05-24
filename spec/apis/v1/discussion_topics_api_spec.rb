@@ -104,7 +104,7 @@ describe DiscussionTopicsController, :type => :integration do
       api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics",
                { :controller => "discussion_topics", :action => "create", :format => "json", :course_id => @course.to_param },
                { :title => "test title", :message => "test <b>message</b>" })
-      @topic = @course.discussion_topics.last(:order => :id)
+      @topic = @course.discussion_topics.order(:id).last
       @topic.title.should == "test title"
       @topic.message.should == "test <b>message</b>"
       @topic.threaded?.should be_false
@@ -114,11 +114,22 @@ describe DiscussionTopicsController, :type => :integration do
       @topic.require_initial_post?.should be_false
     end
 
+    it 'should process html content in message on create' do
+      should_process_incoming_user_content(@course) do |content|
+        api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics",
+                 { :controller => "discussion_topics", :action => "create", :format => "json", :course_id => @course.to_param },
+                 { :title => "test title", :message => content })
+
+        @topic = @course.discussion_topics.order(:id).last
+        @topic.message
+      end
+    end
+
     it "should post an announcment" do
       api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics",
                { :controller => "discussion_topics", :action => "create", :format => "json", :course_id => @course.to_param },
                { :title => "test title", :message => "test <b>message</b>", :is_announcement => true })
-      @topic = @course.announcements.last(:order => :id)
+      @topic = @course.announcements.order(:id).last
       @topic.title.should == "test title"
       @topic.message.should == "test <b>message</b>"
     end
@@ -128,7 +139,7 @@ describe DiscussionTopicsController, :type => :integration do
       api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics",
                { :controller => "discussion_topics", :action => "create", :format => "json", :course_id => @course.to_param },
                { :title => "test title", :message => "test <b>message</b>", :discussion_type => "threaded", :delayed_post_at => post_at.as_json, :podcast_has_student_posts => '1', :require_initial_post => '1' })
-      @topic = @course.discussion_topics.last(:order => :id)
+      @topic = @course.discussion_topics.order(:id).last
       @topic.title.should == "test title"
       @topic.message.should == "test <b>message</b>"
       @topic.threaded?.should == true
@@ -144,7 +155,7 @@ describe DiscussionTopicsController, :type => :integration do
       api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics",
                { :controller => "discussion_topics", :action => "create", :format => "json", :course_id => @course.to_param },
                { :title => "test title", :message => "test <b>message</b>", :assignment => { :points_possible => 15, :grading_type => "percent", :due_at => due_date.as_json, :name => "override!" } })
-      @topic = @course.discussion_topics.last(:order => :id)
+      @topic = @course.discussion_topics.order(:id).last
       @topic.title.should == "test title"
       @topic.assignment.should be_present
       @topic.assignment.points_possible.should == 15
@@ -158,7 +169,7 @@ describe DiscussionTopicsController, :type => :integration do
       api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics",
                { :controller => "discussion_topics", :action => "create", :format => "json", :course_id => @course.to_param },
                { :title => "test title", :message => "test <b>message</b>", :assignment => { :set_assignment => 'false' } })
-      @topic = @course.discussion_topics.last(:order => :id)
+      @topic = @course.discussion_topics.order(:id).last
       @topic.title.should == "test title"
       @topic.assignment.should be_nil
     end
@@ -201,6 +212,7 @@ describe DiscussionTopicsController, :type => :integration do
                                    'hidden_for_user' => false,
                                    'created_at' => @attachment.created_at.as_json,
                                    'updated_at' => @attachment.updated_at.as_json,
+                                   'thumbnail_url' => @attachment.thumbnail_url,
                   }],
                   "topic_children"=>[@sub.id],
                   "discussion_type" => 'side_comment',
@@ -258,6 +270,17 @@ describe DiscussionTopicsController, :type => :integration do
         @topic.podcast_enabled?.should == true
         @topic.podcast_has_student_posts?.should == true
         @topic.require_initial_post?.should == true
+      end
+
+      it 'should process html content in message on update' do
+        should_process_incoming_user_content(@course) do |content|
+          api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+                   { :controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param },
+                   { :message => content })
+
+          @topic.reload
+          @topic.message
+        end
       end
 
       it "should set the editor_id to whoever edited to entry" do
@@ -464,6 +487,7 @@ describe DiscussionTopicsController, :type => :integration do
                 'hidden_for_user' => false,
                 'created_at' => attachment.created_at.as_json,
                 'updated_at' => attachment.updated_at.as_json,
+                'thumbnail_url' => attachment.thumbnail_url,
               }],
       "posted_at"=>gtopic.posted_at.as_json,
       "root_topic_id"=>nil,
@@ -1231,7 +1255,7 @@ describe DiscussionTopicsController, :type => :integration do
                  { :controller => "discussion_topics_api", :action => "add_reply", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :entry_id => @sub2.id.to_s },
                  { :message => "ohai" })
         json['parent_id'].should == @sub2.id
-        @sub4 = DiscussionEntry.last(:order => :id)
+        @sub4 = DiscussionEntry.order(:id).last
         @sub4.id.should == json['id']
 
         json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries/#{@entry.id}/replies",
@@ -1326,6 +1350,7 @@ describe DiscussionTopicsController, :type => :integration do
         'hidden_for_user' => false,
         'created_at' => @attachment.created_at.as_json,
         'updated_at' => @attachment.updated_at.as_json,
+        'thumbnail_url' => @attachment.thumbnail_url,
       }
 
       v0 = json['view'][0]
@@ -1354,7 +1379,7 @@ describe DiscussionTopicsController, :type => :integration do
       v0_r1 = v0['replies'][1]
       v0_r1['id'].should         == @reply2.id
       v0_r1['user_id'].should    == @teacher.id
-      v0_r1['message'].should    == "<p><a href=\"http://#{Account.default.domain}/files/#{@reply2_attachment.id}/download?verifier=#{@reply2_attachment.uuid}\">This is a file link</a></p>\n    <p>This is a video:\n      <video poster=\"http://#{Account.default.domain}/media_objects/0_abcde/thumbnail?height=448&amp;type=3&amp;width=550\" data-media_comment_type=\"video\" preload=\"none\" class=\"instructure_inline_media_comment\" data-media_comment_id=\"0_abcde\" controls=\"controls\" src=\"http://#{Account.default.domain}/courses/#{@course.id}/media_download?entryId=0_abcde&amp;redirect=1&amp;type=mp4\">link</video>\n    </p>"
+      v0_r1['message'].should    == "<p><a href=\"http://#{Account.default.domain}/courses/#{@course.id}/files/#{@reply2_attachment.id}/download?verifier=#{@reply2_attachment.uuid}\">This is a file link</a></p>\n    <p>This is a video:\n      <video poster=\"http://#{Account.default.domain}/media_objects/0_abcde/thumbnail?height=448&amp;type=3&amp;width=550\" data-media_comment_type=\"video\" preload=\"none\" class=\"instructure_inline_media_comment\" data-media_comment_id=\"0_abcde\" controls=\"controls\" src=\"http://#{Account.default.domain}/courses/#{@course.id}/media_download?entryId=0_abcde&amp;redirect=1&amp;type=mp4\">link</video>\n    </p>"
       v0_r1['parent_id'].should  == @root1.id
       v0_r1['created_at'].should == @reply2.created_at.as_json
       v0_r1['updated_at'].should == @reply2.updated_at.as_json
@@ -1507,7 +1532,7 @@ describe DiscussionTopicsController, :type => :integration do
     end
 
     it "should mark entries as read on a collection item" do
-      Collection.update_all({ :visibility => 'public' }, { :id => @collection.id })
+      Collection.where(:id => @collection).update_all(:visibility => 'public')
       @collection.reload
       topic = @item.discussion_topic
       topic.save!

@@ -5,7 +5,7 @@ define [
 
   class Pseudonym extends Backbone.Model
 
-    errorMap:
+    errorMap: (policy) ->
       unique_id:
         too_short:    I18n.t("errors.required", "Required")
         too_long:     I18n.t("errors.too_long", "Can't exceed %{max} characters", {max: 100})
@@ -14,13 +14,17 @@ define [
         bad_credentials: I18n.t("errors.bad_credentials", "Invalid username or password")
         not_email:    I18n.t("errors.not_email", "Not a valid email address")
       password:
-        too_short:    I18n.t("errors.too_short", "Must be at least %{min} characters", {min: 6})
+        too_short:    I18n.t("errors.too_short", "Must be at least %{min} characters", {min: policy.min_length})
+        sequence:     I18n.t("errors.sequence", "Can't incude a run of more than %{max} characters (e.g. abcdef)", {max: policy.max_sequence})
+        common:       I18n.t("errors.common", "Can't use common passwords (e.g. \"password\")")
+        repeated:     I18n.t("errors.repeated", "Can't have the same character more than %{max} times in a row", {max: policy.max_repeats})
         confirmation: I18n.t("errors.mismatch", "Doesn't match")
 
-    normalizeErrors: (errors) ->
+    normalizeErrors: (errors, policy) ->
       if errors
         for type in ['unique_id', 'password'] when errors[type]?.length > 1
           # if there are multiple errors and one is "too_short", just show that
+          too_short = null
           too_short = e for e in errors[type] when e.type is 'too_short'
           errors[type] = [too_short] if too_short
-      super errors
+      super errors, policy

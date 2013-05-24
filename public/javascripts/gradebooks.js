@@ -1544,7 +1544,7 @@ define([
       data.submission_type = submission.submission_type || "";
       val = emptySubmissionText(data);
     }
-    $parent.find(".grade").show().empty().append(val);
+    $parent.find(".grade").show().empty().append(htmlEscape(val));
   }
 
   function toggleColumn($obj, show) {

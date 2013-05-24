@@ -56,6 +56,7 @@ module SeleniumTestsHelperMethods
       options = {}
       if browser == :firefox
         profile = Selenium::WebDriver::Firefox::Profile.new
+        profile.load_no_focus_lib=(true)
         if SELENIUM_CONFIG[:firefox_profile].present?
           profile = Selenium::WebDriver::Firefox::Profile.from_name(SELENIUM_CONFIG[:firefox_profile])
         end
@@ -70,6 +71,7 @@ module SeleniumTestsHelperMethods
       caps = SELENIUM_CONFIG[:browser].try(:to_sym) || :firefox
       if caps == :firefox
         profile = Selenium::WebDriver::Firefox::Profile.new
+        profile.load_no_focus_lib=(true)
         if SELENIUM_CONFIG[:firefox_profile].present?
           profile = Selenium::WebDriver::Firefox::Profile.from_name SELENIUM_CONFIG[:firefox_profile]
         end
@@ -127,6 +129,11 @@ module SeleniumTestsHelperMethods
     driver.manage.timeouts.implicit_wait = 10
     driver
   end
+
+  def set_native_events(setting)
+    driver.instance_variable_get(:@bridge).instance_variable_get(:@capabilities).instance_variable_set(:@native_events, setting)
+  end
+
 
   # f means "find" this is a shortcut to finding elements
   def f(selector, scope = nil)
@@ -295,52 +302,6 @@ module SeleniumTestsHelperMethods
     driver.execute_async_script(js)
   end
 
-  def self.start_forked_webrick_server
-    setup_host_and_port
-
-    domain_conf_path = File.expand_path(File.dirname(__FILE__) + '/../../config/domain.yml')
-    domain_conf = YAML.load_file(domain_conf_path)
-    domain_conf[Rails.env] ||= {}
-    old_domain = domain_conf[Rails.env]["domain"]
-    domain_conf[Rails.env]["domain"] = $app_host_and_port
-    File.open(domain_conf_path, 'w') { |f| YAML.dump(domain_conf, f) }
-    server_pid = fork do
-      base = File.expand_path(File.dirname(__FILE__))
-      STDOUT.reopen(File.open("/dev/null", "w"))
-      STDERR.reopen(File.open("#{base}/../../log/test-server.log", "a"))
-      ENV['SELENIUM_WEBRICK_SERVER'] = '1'
-      exec("#{base}/../../script/server", "-p", $server_port.to_s, "-e", Rails.env)
-    end
-    closed = false
-    shutdown = lambda do
-      unless closed
-        Process.kill 'KILL', server_pid
-        Process.wait server_pid
-        domain_conf[Rails.env]["domain"] = old_domain
-        File.open(domain_conf_path, 'w') { |f| YAML.dump(domain_conf, f) }
-        HostUrl.default_host = nil
-        HostUrl.file_host = nil
-        closed = true
-      end
-    end
-    at_exit { shutdown.call }
-    for i in 0..MAX_SERVER_START_TIME
-      begin
-        s = nil
-        Timeout::timeout(5) do
-          s = TCPSocket.open('127.0.0.1', $server_port) rescue nil
-          break if s
-        end
-        break if s
-      rescue Timeout::Error
-        puts "timeout error attempting to connect to forked webrick server"
-      end
-      sleep 1
-    end
-    raise "Failed starting script/server" unless s
-    s.close
-    return shutdown
-  end
 end
 
 shared_examples_for "all selenium tests" do
@@ -357,22 +318,23 @@ shared_examples_for "all selenium tests" do
 
   alias_method :driver, :selenium_driver
 
+  def fill_in_login_form(username, password)
+    user_element = f('#pseudonym_session_unique_id')
+    user_element.send_keys(username)
+    password_element = f('#pseudonym_session_password')
+    password_element.send_keys(password)
+    password_element.submit
+  end
+
   def login_as(username = "nobody@example.com", password = "asdfasdf", expect_success = true)
     # log out (just in case)
     driver.navigate.to(app_host + '/logout')
 
-    log_in = lambda do
-      user_element = f('#pseudonym_session_unique_id')
-      user_element.send_keys(username)
-      password_element = f('#pseudonym_session_password')
-      password_element.send_keys(password)
-      password_element.submit
-    end
     if expect_success
-      expect_new_page_load &log_in
+      expect_new_page_load { fill_in_login_form(username, password) }
       f('#identity .logout').should be_present
     else
-      log_in.call
+      fill_in_login_form(username, password)
     end
   end
 
@@ -386,6 +348,16 @@ shared_examples_for "all selenium tests" do
       PseudonymSession.any_instance.stubs(:record).returns { pseudonym.reload }
       PseudonymSession.any_instance.stubs(:used_basic_auth?).returns(false)
       # PseudonymSession.stubs(:find).returns(@pseudonym_session)
+    end
+  end
+
+  def destroy_session(pseudonym, real_login)
+    if real_login
+      driver.navigate.to(app_host + '/logout')
+    else
+      PseudonymSession.any_instance.unstub :session_credentials
+      PseudonymSession.any_instance.unstub :record
+      PseudonymSession.any_instance.unstub :used_basic_auth?
     end
   end
 
@@ -434,14 +406,14 @@ shared_examples_for "all selenium tests" do
     course = opts[:course] || @course || course(opts)
     get "/courses/#{@course.id}/settings"
     f(".student_view_button").click
-    wait_for_dom_ready
+    wait_for_ajaximations
   end
 
   def expect_new_page_load
     driver.execute_script("INST.still_on_old_page = true;")
     yield
     keep_trying_until { driver.execute_script("return INST.still_on_old_page;") == nil }
-    wait_for_dom_ready
+    wait_for_ajaximations
   end
 
   def check_domready
@@ -766,7 +738,7 @@ shared_examples_for "all selenium tests" do
         :user_agent => user_agent)
 
     page_view.summarized = summarized
-    page_view.request_id = ActiveSupport::SecureRandom.hex(10)
+    page_view.request_id = SecureRandom.hex(10)
     page_view.created_at = opts[:created_at] || Time.now
 
     if opts[:participated]
@@ -781,15 +753,14 @@ shared_examples_for "all selenium tests" do
 
   # you can pass an array to use the rails polymorphic_path helper, example:
   # get [@course, @announcement] => "http://10.0.101.75:65137/courses/1/announcements/1"
-  def get(link, wait_for_dom = true)
+  def get(link, waitforajaximations = true)
     link = polymorphic_path(link) if link.is_a? Array
     driver.get(app_host + link)
-    wait_for_dom_ready if wait_for_dom
+    wait_for_ajaximations if waitforajaximations
   end
 
   def refresh_page
-    driver.navigate.refresh
-    wait_for_dom_ready
+    expect_new_page_load { driver.navigate.refresh }
   end
 
   def make_full_screen
@@ -865,24 +836,21 @@ shared_examples_for "all selenium tests" do
 
   def assert_flash_notice_message(okay_message_regex)
     keep_trying_until do
-      text = f("#flash_message_holder .ui-state-success").text rescue ''
-      raise "server error" if text =~ /The last request didn't work out/
+      text = ff("#flash_message_holder .ui-state-success").map(&:text).join("\n") rescue ''
       text =~ okay_message_regex
     end
   end
 
-  def assert_flash_warning_message(okay_message_regex)
+  def assert_flash_warning_message(warn_message_regex)
     keep_trying_until do
-      text = f("#flash_message_holder .ui-state-warning").text rescue ''
-      raise "server error" if text =~ /The last request didn't work out/
-      text =~ okay_message_regex
+      text = ff("#flash_message_holder .ui-state-warning").map(&:text).join("\n") rescue ''
+      text =~ warn_message_regex
     end
   end
 
   def assert_flash_error_message(fail_message_regex)
     keep_trying_until do
-      text = f("#flash_message_holder .ui-state-error").text rescue ''
-      raise "server error" if text =~ /The last request didn't work out/
+      text = ff("#flash_message_holder .ui-state-error").map(&:text).join("\n") rescue ''
       text =~ fail_message_regex
     end
   end
@@ -943,17 +911,13 @@ shared_examples_for "all selenium tests" do
   append_before (:each) do
     driver.manage.timeouts.implicit_wait = 3
     driver.manage.timeouts.script_timeout = 60
-    EncryptedCookieStore.any_instance.stubs(:secret).returns(ActiveSupport::SecureRandom.hex(64))
+    EncryptedCookieStore.any_instance.stubs(:secret).returns(SecureRandom.hex(64))
+    enable_forgery_protection
   end
 
   append_before (:all) do
     $selenium_driver ||= setup_selenium
     default_url_options[:host] = $app_host_and_port
-    enable_forgery_protection(true)
-  end
-
-  append_after(:all) do
-    enable_forgery_protection(false)
   end
 
   append_before (:all) do
@@ -1029,7 +993,7 @@ def get_file(filename, data = nil)
   [filename, fullpath, data, @file]
 end
 
-def validate_link(link_element, breadcrumb_text)
+def validate_breadcrumb_link(link_element, breadcrumb_text)
   expect_new_page_load { link_element.click }
   if breadcrumb_text != nil
     breadcrumb = f('#breadcrumbs')
@@ -1052,6 +1016,14 @@ def alert_present?
   is_present
 end
 
+def scroll_page_to_top
+  driver.execute_script("window.scrollTo(0, 0")
+end
+
+def scroll_page_to_bottom
+  driver.execute_script("window.scrollTo(0, document.body.scrollHeight)")
+end
+
 # for when you have something like a textarea's value and you want to match it's contents
 # against a css selector.
 # usage:
@@ -1069,23 +1041,26 @@ shared_examples_for "in-process server selenium tests" do
     HostUrl.stubs(:default_host).returns($app_host_and_port)
     HostUrl.stubs(:file_host).returns($app_host_and_port)
   end
+
+  # tricksy tricksy. grab the current connection, and then always return the same one
+  # (even if on a different thread - i.e. the server's thread), so that it will be in
+  # the same transaction and see the same data
   before do
-    conn = ActiveRecord::Base.connection
-    ActiveRecord::ConnectionAdapters::ConnectionPool.any_instance.stubs(:connection).returns(conn)
-  end
-end
+    if self.use_transactional_fixtures
+      @db_connection = ActiveRecord::Base.connection
 
-shared_examples_for "forked server selenium tests" do
-  it_should_behave_like "all selenium tests"
-  self.use_transactional_fixtures = false
+      # synchronize the execute method for a modicum of thread safety
+      if !@db_connection.respond_to?(:execute_without_synchronization)
+        @db_connection.class.class_eval do
+          def execute_with_synchronization(*args)
+            @mutex ||= Mutex.new
+            @mutex.synchronize { execute_without_synchronization(*args) }
+          end
+          alias_method_chain :execute, :synchronization
+        end
+      end
 
-  prepend_before (:all) do
-    $in_proc_webserver_shutdown.try(:call)
-    $in_proc_webserver_shutdown = nil
-    @forked_webserver_shutdown = SeleniumTestsHelperMethods.start_forked_webrick_server
-  end
-
-  append_after(:all) do
-    @forked_webserver_shutdown.call
+      ActiveRecord::ConnectionAdapters::ConnectionPool.any_instance.stubs(:connection).returns(@db_connection)
+    end
   end
 end

@@ -16,11 +16,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'lib/sis/csv/base_importer'
-
 module SIS
   module CSV
-    class GradePublishingResultsImporter < BaseImporter
+    class GradePublishingResultsImporter < CSVBaseImporter
 
       def self.is_grade_publishing_results_csv?(row)
         row.include?('enrollment_id') && row.include?('grade_publishing_status')

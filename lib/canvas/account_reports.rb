@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2012 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -41,8 +41,7 @@ module Canvas::AccountReports
 
   def self.generate_report(account_report)
     account_report.update_attribute(:workflow_state, 'running')
-    account_report.start_at ||= 2.months.ago
-    account_report.end_at ||= Time.now
+    account_report.start_at ||= Time.now
     begin
       REPORTS[account_report.report_type][:proc].call(account_report)
     rescue => e
@@ -52,6 +51,17 @@ module Canvas::AccountReports
     end
   end
 
+  def self.generate_file_name(account_report, ext)
+    "#{account_report.report_type}_#{Time.now.strftime('%d_%b_%Y')}_#{account_report.id}_.#{ext}"
+  end
+
+  def self.generate_file(account_report)
+    temp = Tempfile.open(generate_file_name(account_report, "csv"))
+    filepath = temp.path
+    temp.close
+    filepath
+  end
+
   def self.message_recipient(account_report, message, csv=nil)
     user = account_report.user
     account = account_report.account
@@ -59,11 +69,10 @@ module Canvas::AccountReports
     notification = Notification.by_name("Report Generation Failed") if !csv
     attachment = nil
     if csv.is_a? Hash
-      filename = "#{account_report.report_type}_#{Time.now.strftime('%d_%b_%Y')}_#{account_report.id}_.zip"
+      filename = generate_file_name(account_report, "zip")
       temp = Tempfile.open(filename)
       filepath = temp.path
-      temp.close
-      FileUtils::rm temp.path
+      temp.close!
 
       Zip::ZipFile.open(filepath, Zip::ZipFile::CREATE) do |zipfile|
         csv.each do |report_name, contents|
@@ -75,24 +84,35 @@ module Canvas::AccountReports
     elsif csv
       require 'action_controller'
       require 'action_controller/test_process.rb'
-      filename = "#{account_report.report_type}_#{Time.now.strftime('%d_%b_%Y')}_#{account_report.id}_.csv"
-      f = Tempfile.open(filename)
-      f << csv
-      f.close
-      filepath = f.path
-      filetype = 'text/csv'
+      ext = csv !~ /\n/ && File.extname(csv)
+      case ext
+        when ".csv"
+          filename = File.basename(csv);
+          filepath = csv
+          filetype = 'text/csv'
+        when ".zip"
+          filetype = 'application/zip'
+        else
+          filename = generate_file_name(account_report, "csv")
+          f = Tempfile.open(filename)
+          f << csv
+          f.close
+          filepath = f.path
+          filetype = 'text/csv'
+      end
     end
     if filename
       attachment = account.attachments.create!(
-              :uploaded_data => ActionController::TestUploadedFile.new(filepath, filetype, true),
-              :display_name => filename,
-              :user => user
+        :uploaded_data => ActionController::TestUploadedFile.new(filepath, filetype, true),
+        :display_name => filename,
+        :user => user
       )
     end
     account_report.message = message
     account_report.attachment = attachment
     account_report.workflow_state = csv ? 'complete' : 'error'
     account_report.update_attribute(:progress, 100)
+    account_report.end_at ||= Time.now
     account_report.save
     notification.create_message(account_report, [user])
     message

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<atom:feed xmlns:atom="http://www.w3.org/2005/Atom" xmlns:openSearch="http://a9.com/-/spec/opensearchrss/1.0/" xmlns:gAcl="http://schemas.google.com/acl/2007" xmlns:batch="http://schemas.google.com/gdata/batch">
+    <atom:id>https://docs.google.com/feeds/acl/private/full/document%3A10RabxaKMMU9aSvzfGyvmSvzwQpBPhRnl-zJvCVioJVs/batch/1362693661345</atom:id>
+    <atom:updated>2013-03-07T22:01:02.114Z</atom:updated>
+    <atom:title type="text">Batch Feed</atom:title>
+    <atom:entry>
+        <atom:id>https://docs.google.com/feeds/acl/private/full/document%3A10RabxaKMMU9aSvzfGyvmSvzwQpBPhRnl-zJvCVioJVs/user%3Auser%40example.com</atom:id>
+        <atom:updated>2013-03-07T22:01:02.114Z</atom:updated>
+        <atom:title type="text">Deleted</atom:title>
+        <atom:content type="text">Deleted</atom:content>
+        <batch:status code="200" reason="Success"/>
+        <batch:operation type="delete"/>
+    </atom:entry>
+</atom:feed>

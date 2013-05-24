@@ -323,7 +323,7 @@ describe SIS::CSV::EnrollmentImporter do
       "test_1,user_1,student,,deleted,"
     )
     @course = Course.find_by_sis_source_id('test_1')
-    scope = Enrollment.scoped(:conditions => { :course_id => @course.id })
+    scope = Enrollment.where(:course_id => @course)
     scope.count.should == 1
     @enrollment = scope.first
     @enrollment.should be_deleted

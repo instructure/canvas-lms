@@ -24,6 +24,8 @@ class AssignmentOverride < ActiveRecord::Base
 
   attr_accessible
 
+  attr_accessor :dont_touch_assignment
+
   belongs_to :assignment
   belongs_to :quiz
   belongs_to :set, :polymorphic => true
@@ -65,6 +67,7 @@ class AssignmentOverride < ActiveRecord::Base
   end
 
   after_save :recompute_submission_lateness_later
+  after_save :touch_assignment, :if => :assignment
 
   def recompute_submission_lateness_later
     if due_at_overridden_changed? || due_at_changed?
@@ -73,12 +76,18 @@ class AssignmentOverride < ActiveRecord::Base
     true
   end
 
+  def touch_assignment
+    return true if assignment.nil? || dont_touch_assignment
+    assignment.touch
+  end
+  private :touch_assignment
+
   def assignment?; !!assignment; end
   def quiz?; !!quiz; end
 
   def recompute_submission_lateness    
     if (users = applies_to_students) && assignment
-      submissions = assignment.submissions.where(:user_id => users.map(&:id))
+      submissions = assignment.submissions.where(:user_id => users)
       submissions.each do |s|
         s.compute_lateness
         s.save!
@@ -101,7 +110,7 @@ class AssignmentOverride < ActiveRecord::Base
     end
   end
 
-  named_scope :active, :conditions => { :workflow_state => 'active' }
+  scope :active, where(:workflow_state => 'active')
 
   before_validation :default_values
   def default_values
@@ -129,7 +138,7 @@ class AssignmentOverride < ActiveRecord::Base
 
   def set_with_adhoc
     if self.set_type == 'ADHOC'
-      assignment_override_students.scoped(:include => :user).map(&:user)
+      assignment_override_students.includes(:user).map(&:user)
     else
       set_without_adhoc
     end
@@ -163,7 +172,7 @@ class AssignmentOverride < ActiveRecord::Base
       true
     end
 
-    named_scope "overriding_#{field}", :conditions => { "#{field}_overridden" => true }
+    scope "overriding_#{field}", where("#{field}_overridden" => true)
   end
 
   override :due_at
@@ -247,35 +256,37 @@ class AssignmentOverride < ActiveRecord::Base
     p.whenever { |record| record.notify_change? }
   end
 
-  named_scope :visible_to, lambda{ |admin, course|
+  scope :visible_to, lambda { |admin, course|
     scopes = []
 
     # adhoc overrides for visible students
-    scopes << course.enrollments_visible_to(admin).scoped(
-      :select => "DISTINCT assignment_override_students.assignment_override_id AS id",
-      :joins => "INNER JOIN assignment_override_students ON assignment_override_students.user_id=enrollments.user_id"
-    )
+    scopes << course.enrollments_visible_to(admin).
+        select("assignment_override_students.assignment_override_id AS id").
+        joins("INNER JOIN assignment_override_students ON assignment_override_students.user_id=enrollments.user_id").
+        uniq
 
     # group overrides for visible groups
-    scopes << course.groups_visible_to(admin).scoped(
-      :select => "assignment_overrides.id",
-      :joins => "INNER JOIN assignment_overrides ON assignment_overrides.set_type='Group' AND groups.id=assignment_overrides.set_id"
-    )
+    scopes << course.groups_visible_to(admin).
+        select("assignment_overrides.id").
+        joins("INNER JOIN assignment_overrides ON assignment_overrides.set_type='Group' AND groups.id=assignment_overrides.set_id")
 
     # section overrides for visible sections
-    scopes << course.sections_visible_to(admin).scoped(
-      :select => "assignment_overrides.id",
-      :joins => "INNER JOIN assignment_overrides ON assignment_overrides.set_type='CourseSection' AND course_sections.id=assignment_overrides.set_id"
-    )
+    scopes << course.sections_visible_to(admin).
+        select("assignment_overrides.id").
+        joins("INNER JOIN assignment_overrides ON assignment_overrides.set_type='CourseSection' AND course_sections.id=assignment_overrides.set_id")
 
     # section overrides for visible students
-    scopes << course.enrollments_visible_to(admin).scoped(
-      :select => "assignment_overrides.id",
-      :joins => "INNER JOIN assignment_overrides ON assignment_overrides.set_type='CourseSection' AND enrollments.course_section_id=assignment_overrides.set_id"
-    )
+    scopes << course.enrollments_visible_to(admin).
+        select("assignment_overrides.id").
+        joins("INNER JOIN assignment_overrides ON assignment_overrides.set_type='CourseSection' AND enrollments.course_section_id=assignment_overrides.set_id")
 
     # union the visible override subselects and join against them
-    subselect = scopes.map{ |scope| scope.construct_finder_sql({}) }.join(' UNION ')
-    { :joins => "INNER JOIN (#{subselect}) AS visible_overrides ON visible_overrides.id=assignment_overrides.id" }
+    subselect = scopes.map{ |scope| scope.to_sql }.join(' UNION ')
+    join_clause = "INNER JOIN (#{subselect}) AS visible_overrides ON visible_overrides.id=assignment_overrides.id"
+    if Rails.version < '3'
+      { :joins => join_clause, :readonly => false }
+    else
+      joins(join_clause).readonly(false)
+    end
   }
 end

@@ -42,11 +42,6 @@ module Canvas
     }
     redis = ::Redis::Factory.create(redis_settings[:servers])
     if redis_settings[:database].present?
-      if Rails.env.test?
-        env_test_number = ENV['TEST_ENV_NUMBER']
-        env_test_number = 1 if ENV['TEST_ENV_NUMBER'].blank?
-        redis_settings[:database] = "#{env_test_number}#{redis_settings[:database]}"
-      end
       redis.select(redis_settings[:database])
     end
     redis
@@ -66,6 +61,9 @@ module Canvas
   end
 
   def self.cache_store_config(rails_env = :current, nil_is_nil = false)
+    # this method is called really early in the bootup process, and autoloading
+    # might not be available yet, so we need to manually require Setting
+    require_dependency "app/models/setting"
     cache_store_config = {
       'cache_store' => 'mem_cache_store',
     }.merge(Setting.from_config('cache_store', rails_env) || {})
@@ -79,6 +77,7 @@ module Canvas
       end
     when 'redis_store'
       Bundler.require 'redis'
+      require_dependency 'canvas/redis'
       Canvas::Redis.patch
       # merge in redis.yml, but give precedence to cache_store.yml
       #
@@ -91,10 +90,12 @@ module Canvas
     when 'memory_store'
       config = :memory_store
     when 'nil_store'
-      config = :nil_store
+      require 'nil_store'
+      config = NilStore.new
     end
     if !config && !nil_is_nil
-      config = :nil_store
+      require 'nil_store'
+      config = NilStore.new
     end
     config
   end
@@ -133,7 +134,7 @@ module Canvas
   def self.reloadable_plugin(dirname)
     return unless Rails.env.development?
     base_path = File.expand_path(dirname)
-    ActiveSupport::Dependencies.load_once_paths.reject! { |p|
+    ActiveSupport::Dependencies.autoload_once_paths.reject! { |p|
       p[0, base_path.length] == base_path
     }
   end

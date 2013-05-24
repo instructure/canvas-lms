@@ -22,7 +22,7 @@ class AutoHandle
   class << self
     CHARS = ('0'..'9').to_a + ('a'..'z').to_a + ('A'..'Z').to_a
     def generate_securish_uuid(length = 40)
-      Array.new(length) { CHARS[ActiveSupport::SecureRandom.random_number(CHARS.length)] }.join
+      Array.new(length) { CHARS[SecureRandom.random_number(CHARS.length)] }.join
     end
     
     def generate(purpose = nil, length = 4)

@@ -59,31 +59,31 @@ class ListTest < Test::Unit::TestCase
   end
 
   def test_reordering
-    assert_equal [1, 2, 3, 4], ListMixin.find(:all, :conditions => 'parent_id = 5', :order => 'pos').map(&:id)
+    assert_equal [1, 2, 3, 4], ListMixin.where('parent_id = 5').order('pos').pluck(:id)
 
     ListMixin.find(2).move_lower
-    assert_equal [1, 3, 2, 4], ListMixin.find(:all, :conditions => 'parent_id = 5', :order => 'pos').map(&:id)
+    assert_equal [1, 3, 2, 4], ListMixin.where('parent_id = 5').order('pos').pluck(:id)
 
     ListMixin.find(2).move_higher
-    assert_equal [1, 2, 3, 4], ListMixin.find(:all, :conditions => 'parent_id = 5', :order => 'pos').map(&:id)
+    assert_equal [1, 2, 3, 4], ListMixin.where('parent_id = 5').order('pos').pluck(:id)
 
     ListMixin.find(1).move_to_bottom
-    assert_equal [2, 3, 4, 1], ListMixin.find(:all, :conditions => 'parent_id = 5', :order => 'pos').map(&:id)
+    assert_equal [2, 3, 4, 1], ListMixin.where('parent_id = 5').order('pos').pluck(:id)
 
     ListMixin.find(1).move_to_top
-    assert_equal [1, 2, 3, 4], ListMixin.find(:all, :conditions => 'parent_id = 5', :order => 'pos').map(&:id)
+    assert_equal [1, 2, 3, 4], ListMixin.where('parent_id = 5').order('pos').pluck(:id)
 
     ListMixin.find(2).move_to_bottom
-    assert_equal [1, 3, 4, 2], ListMixin.find(:all, :conditions => 'parent_id = 5', :order => 'pos').map(&:id)
+    assert_equal [1, 3, 4, 2], ListMixin.where('parent_id = 5').order('pos').pluck(:id)
 
     ListMixin.find(4).move_to_top
-    assert_equal [4, 1, 3, 2], ListMixin.find(:all, :conditions => 'parent_id = 5', :order => 'pos').map(&:id)
+    assert_equal [4, 1, 3, 2], ListMixin.where('parent_id = 5').order('pos').pluck(:id)
   end
 
   def test_move_to_bottom_with_next_to_last_item
-    assert_equal [1, 2, 3, 4], ListMixin.find(:all, :conditions => 'parent_id = 5', :order => 'pos').map(&:id)
+    assert_equal [1, 2, 3, 4], ListMixin.where('parent_id = 5').order('pos').pluck(:id)
     ListMixin.find(3).move_to_bottom
-    assert_equal [1, 2, 4, 3], ListMixin.find(:all, :conditions => 'parent_id = 5', :order => 'pos').map(&:id)
+    assert_equal [1, 2, 4, 3], ListMixin.where('parent_id = 5').order('pos').pluck(:id)
   end
 
   def test_next_prev
@@ -157,11 +157,11 @@ class ListTest < Test::Unit::TestCase
   end
 
   def test_delete_middle
-    assert_equal [1, 2, 3, 4], ListMixin.find(:all, :conditions => 'parent_id = 5', :order => 'pos').map(&:id)
+    assert_equal [1, 2, 3, 4], ListMixin.where('parent_id = 5').order('pos').pluck(:id)
 
     ListMixin.find(2).destroy
 
-    assert_equal [1, 3, 4], ListMixin.find(:all, :conditions => 'parent_id = 5', :order => 'pos').map(&:id)
+    assert_equal [1, 3, 4], ListMixin.where('parent_id = 5').order('pos').pluck(:id)
 
     assert_equal 1, ListMixin.find(1).pos
     assert_equal 2, ListMixin.find(3).pos
@@ -169,7 +169,7 @@ class ListTest < Test::Unit::TestCase
 
     ListMixin.find(1).destroy
 
-    assert_equal [3, 4], ListMixin.find(:all, :conditions => 'parent_id = 5', :order => 'pos').map(&:id)
+    assert_equal [3, 4], ListMixin.where('parent_id = 5').order('pos').pluck(:id)
 
     assert_equal 1, ListMixin.find(3).pos
     assert_equal 2, ListMixin.find(4).pos
@@ -185,7 +185,7 @@ class ListTest < Test::Unit::TestCase
   def test_nil_scope
     new1, new2, new3 = ListMixin.create, ListMixin.create, ListMixin.create
     new2.move_higher
-    assert_equal [new2, new1, new3], ListMixin.find(:all, :conditions => 'parent_id IS NULL', :order => 'pos')
+    assert_equal [new2, new1, new3], ListMixin.where('parent_id IS NULL').order('pos').all
   end
   
   
@@ -196,11 +196,11 @@ class ListTest < Test::Unit::TestCase
   end 
   
   def test_remove_from_list_should_set_position_to_nil 
-    assert_equal [1, 2, 3, 4], ListMixin.find(:all, :conditions => 'parent_id = 5', :order => 'pos').map(&:id)
+    assert_equal [1, 2, 3, 4], ListMixin.where('parent_id = 5').order('pos').pluck(:id)
   
     ListMixin.find(2).remove_from_list 
   
-    assert_equal [2, 1, 3, 4], ListMixin.find(:all, :conditions => 'parent_id = 5', :order => 'pos').map(&:id)
+    assert_equal [2, 1, 3, 4], ListMixin.where('parent_id = 5').order('pos').pluck(:id)
   
     assert_equal 1,   ListMixin.find(1).pos
     assert_equal nil, ListMixin.find(2).pos
@@ -209,12 +209,12 @@ class ListTest < Test::Unit::TestCase
   end 
   
   def test_remove_before_destroy_does_not_shift_lower_items_twice 
-    assert_equal [1, 2, 3, 4], ListMixin.find(:all, :conditions => 'parent_id = 5', :order => 'pos').map(&:id)
+    assert_equal [1, 2, 3, 4], ListMixin.where('parent_id = 5').order('pos').pluck(:id)
   
     ListMixin.find(2).remove_from_list 
     ListMixin.find(2).destroy 
   
-    assert_equal [1, 3, 4], ListMixin.find(:all, :conditions => 'parent_id = 5', :order => 'pos').map(&:id)
+    assert_equal [1, 3, 4], ListMixin.where('parent_id = 5').order('pos').pluck(:id)
   
     assert_equal 1, ListMixin.find(1).pos
     assert_equal 2, ListMixin.find(3).pos
@@ -235,31 +235,31 @@ class ListSubTest < Test::Unit::TestCase
   end
 
   def test_reordering
-    assert_equal [1, 2, 3, 4], ListMixin.find(:all, :conditions => 'parent_id = 5000', :order => 'pos').map(&:id)
+    assert_equal [1, 2, 3, 4], ListMixin.where('parent_id = 5000').order('pos').pluck(:id)
 
     ListMixin.find(2).move_lower
-    assert_equal [1, 3, 2, 4], ListMixin.find(:all, :conditions => 'parent_id = 5000', :order => 'pos').map(&:id)
+    assert_equal [1, 3, 2, 4], ListMixin.where('parent_id = 5000').order('pos').pluck(:id)
 
     ListMixin.find(2).move_higher
-    assert_equal [1, 2, 3, 4], ListMixin.find(:all, :conditions => 'parent_id = 5000', :order => 'pos').map(&:id)
+    assert_equal [1, 2, 3, 4], ListMixin.where('parent_id = 5000').order('pos').pluck(:id)
 
     ListMixin.find(1).move_to_bottom
-    assert_equal [2, 3, 4, 1], ListMixin.find(:all, :conditions => 'parent_id = 5000', :order => 'pos').map(&:id)
+    assert_equal [2, 3, 4, 1], ListMixin.where('parent_id = 5000').order('pos').pluck(:id)
 
     ListMixin.find(1).move_to_top
-    assert_equal [1, 2, 3, 4], ListMixin.find(:all, :conditions => 'parent_id = 5000', :order => 'pos').map(&:id)
+    assert_equal [1, 2, 3, 4], ListMixin.where('parent_id = 5000').order('pos').pluck(:id)
 
     ListMixin.find(2).move_to_bottom
-    assert_equal [1, 3, 4, 2], ListMixin.find(:all, :conditions => 'parent_id = 5000', :order => 'pos').map(&:id)
+    assert_equal [1, 3, 4, 2], ListMixin.where('parent_id = 5000').order('pos').pluck(:id)
 
     ListMixin.find(4).move_to_top
-    assert_equal [4, 1, 3, 2], ListMixin.find(:all, :conditions => 'parent_id = 5000', :order => 'pos').map(&:id)
+    assert_equal [4, 1, 3, 2], ListMixin.where('parent_id = 5000').order('pos').pluck(:id)
   end
 
   def test_move_to_bottom_with_next_to_last_item
-    assert_equal [1, 2, 3, 4], ListMixin.find(:all, :conditions => 'parent_id = 5000', :order => 'pos').map(&:id)
+    assert_equal [1, 2, 3, 4], ListMixin.where('parent_id = 5000').order('pos').pluck(:id)
     ListMixin.find(3).move_to_bottom
-    assert_equal [1, 2, 4, 3], ListMixin.find(:all, :conditions => 'parent_id = 5000', :order => 'pos').map(&:id)
+    assert_equal [1, 2, 4, 3], ListMixin.where('parent_id = 5000').order('pos').pluck(:id)
   end
 
   def test_next_prev
@@ -311,11 +311,11 @@ class ListSubTest < Test::Unit::TestCase
   end
 
   def test_delete_middle
-    assert_equal [1, 2, 3, 4], ListMixin.find(:all, :conditions => 'parent_id = 5000', :order => 'pos').map(&:id)
+    assert_equal [1, 2, 3, 4], ListMixin.where('parent_id = 5000').order('pos').pluck(:id)
 
     ListMixin.find(2).destroy
 
-    assert_equal [1, 3, 4], ListMixin.find(:all, :conditions => 'parent_id = 5000', :order => 'pos').map(&:id)
+    assert_equal [1, 3, 4], ListMixin.where('parent_id = 5000').order('pos').pluck(:id)
 
     assert_equal 1, ListMixin.find(1).pos
     assert_equal 2, ListMixin.find(3).pos
@@ -323,7 +323,7 @@ class ListSubTest < Test::Unit::TestCase
 
     ListMixin.find(1).destroy
 
-    assert_equal [3, 4], ListMixin.find(:all, :conditions => 'parent_id = 5000', :order => 'pos').map(&:id)
+    assert_equal [3, 4], ListMixin.where('parent_id = 5000').order('pos').pluck(:id)
 
     assert_equal 1, ListMixin.find(3).pos
     assert_equal 2, ListMixin.find(4).pos

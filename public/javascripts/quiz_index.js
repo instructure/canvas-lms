@@ -19,12 +19,13 @@
 define([
   'i18n!quizzes.index',
   'jquery' /* $ */,
+  'compiled/util/vddTooltip',
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_forms' /* formErrors */,
   'jqueryui/dialog',
   'jquery.instructure_misc_plugins' /* confirmDelete */,
   'jquery.templateData' /* getTemplateData */
-], function(I18n, $) {
+], function(I18n, $, vddTooltip) {
 
 $(document).ready(function() {
   $(".delete_quiz_link").click(function(event) {
@@ -81,6 +82,7 @@ $(document).ready(function() {
       }
     }, function() {});
   }
+  vddTooltip();
 });
 
 });

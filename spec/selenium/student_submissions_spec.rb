@@ -5,7 +5,6 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/submissions_common')
 
 describe "submissions" do
   it_should_behave_like "in-process server selenium tests"
-  it_should_behave_like "submissions selenium tests"
 
   context 'as a student' do
 
@@ -30,10 +29,10 @@ describe "submissions" do
       # open it twice
       open_button.click
       # swf and other stuff load, give it half a second before it starts trying to click
-      sleep 0.5
+      sleep 1
       close_visible_dialog
       open_button.click
-      sleep 0.5
+      sleep 1
       close_visible_dialog
 
       # fire the callback that the flash object fires
@@ -125,19 +124,21 @@ describe "submissions" do
       @assignment.update_attributes(:submission_types => "online_text_entry")
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
       f('.submit_assignment_link').click
+      wait_for_ajaximations
       assignment_form = f('#submit_online_text_entry_form')
       wait_for_tiny(assignment_form)
       submit_form(assignment_form)
+      wait_for_ajaximations
 
       # it should not actually submit and pop up an error message
       f('.error_box').should be_displayed
       Submission.count.should == 0
 
       # now make sure it works
-      expect {
-        type_in_tiny('#submission_body', 'now it is not blank')
-        submit_form(assignment_form)
-      }.to change(Submission, :count).by(1)
+      type_in_tiny('#submission_body', 'now it is not blank')
+      submit_form(assignment_form)
+      wait_for_ajaximations
+      Submission.count.should == 1
     end
 
     it "should not allow a submission with only comments" do
@@ -222,7 +223,7 @@ describe "submissions" do
     end
 
     describe 'uploaded files for submission' do
-      it_should_behave_like "forked server selenium tests"
+      it_should_behave_like "in-process server selenium tests"
 
       def fixture_file_path(file)
         path = ActionController::TestCase.respond_to?(:fixture_path) ? ActionController::TestCase.send(:fixture_path) : nil
@@ -233,53 +234,11 @@ describe "submissions" do
         ActionController::TestUploadedFile.new(fixture_file_path(file), mimetype)
       end
 
-      def login(username, password)
-        resp = SSLCommon.get "#{app_host}/login"
-        resp.code.should == "200"
-        @cookie = resp.response['set-cookie']
-        resp = SSLCommon.post_form("#{app_host}/login", {
-            "pseudonym_session[unique_id]" => username,
-            "pseudonym_session[password]" => password,
-            "redirect_to_ssl" => "0",
-            "pseudonym_session[remember_me]" => "0"},
-                                   {"Cookie" => @cookie})
-        resp.code.should == "302"
-        @cookie = resp.response['set-cookie']
-        login_as username, password
-      end
-
       def add_file(fixture, context, name)
-        if context.is_a?(Course)
-          path = "/courses/#{context.id}/files"
-        elsif context.is_a?(User)
-          path = "/dashboard/files"
-        end
-        context_code = context.asset_string.capitalize
-        resp = SSLCommon.get "#{app_host}#{path}",
-                             "Cookie" => @cookie
-        body = resp.body
-        resp.code.should == "200"
-        body.should =~ /<div id="ajax_authenticity_token">([^<]*)<\/div>/
-        authenticity_token = $1
-        resp= SSLCommon.post_form("#{app_host}/files/pending", {
-            "attachment[folder_id]" => context.folders.active.first.id,
-            "attachment[filename]" => name,
-            "attachment[context_code]" => context_code,
-            "authenticity_token" => authenticity_token,
-            "no_redirect" => true}, {"Cookie" => @cookie})
-        body = resp.body
-        resp.code.should == "200"
-        data = json_parse(body)
-        data["upload_url"] = data["proxied_upload_url"] || data["upload_url"]
-        data["upload_url"] = "#{app_host}#{data["upload_url"]}" if data["upload_url"] =~ /^\//
-        data["success_url"] = "#{app_host}#{data["success_url"]}" if data["success_url"] =~ /^\//
-        data["upload_params"]["file"] = fixture
-        resp = SSLCommon.post_multipart_form(data["upload_url"], data["upload_params"], {"Cookie" => @cookie}, ["bucket", "key", "acl"])
-        body = resp.body
-        resp.code.should =~ /^20/
-        if body =~ /<PostResponse>/
-          resp = SSLCommon.get data["success_url"]
-          resp.code.should == "200"
+        context.attachments.create! do |attachment|
+          attachment.uploaded_data = fixture
+          attachment.filename = name
+          attachment.folder = Folder.root_folders(context).first
         end
       end
 
@@ -288,12 +247,12 @@ describe "submissions" do
       end
 
       it "should allow uploaded files to be used for submission" do
+        local_storage!
 
-        Setting.set("file_storage_test_override", "local")
         user_with_pseudonym :username => "nobody2@example.com",
                             :password => "asdfasdf2"
         course_with_student_logged_in :user => @user
-        login "nobody2@example.com", "asdfasdf2"
+        create_session @pseudonym, false
         add_file(fixture_file_upload('files/html-editing-test.html', 'text/html'),
                  @user, "html-editing-test.html")
         File.read(fixture_file_path("files/html-editing-test.html"))
@@ -305,10 +264,21 @@ describe "submissions" do
         f('.toggle_uploaded_files_link').click
 
         # traverse the tree
-        f('#uploaded_files > ul > li.folder > .sign').click
-        wait_for_animations
-        f('#uploaded_files > ul > li.folder .file .name').click
-        wait_for_animations
+        begin
+          keep_trying_until do
+            f('#uploaded_files > ul > li.folder > .sign').click
+            wait_for_ajaximations
+            f('#uploaded_files > ul > li.folder .file .name').should be_displayed
+          end
+          f('#uploaded_files > ul > li.folder .file .name').click
+          wait_for_ajaximations
+        rescue => err
+          # prevent the confirm dialog that pops up when you navigate away
+          # from the page from showing.
+          # TODO: actually figure out why the spec intermittently fails.
+          driver.execute_script "window.onbeforeunload = null;"
+          raise err
+        end
 
         expect_new_page_load { f('#submit_file_button').click }
 

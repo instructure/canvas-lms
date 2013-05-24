@@ -163,7 +163,7 @@ describe PseudonymSessionsController do
     end
 
     context "sharding" do
-      it_should_behave_like "sharding"
+      specs_require_sharding
 
       it "should login for a user from a different shard" do
         user_with_pseudonym(:username => 'jt@instructure.com', :active_all => 1, :password => 'qwerty', :account => Account.site_admin)
@@ -996,7 +996,8 @@ describe PseudonymSessionsController do
   end
 
   describe 'GET oauth2_auth' do
-    let(:key) { DeveloperKey.create! }
+    let(:key) { DeveloperKey.create! :redirect_uri => 'https://example.com' }
+    let(:user) { User.create! }
 
     it 'renders a 400 when there is no client_id' do
       get :oauth2_auth
@@ -1023,6 +1024,16 @@ describe PseudonymSessionsController do
 
   describe 'GET oauth2_token' do
     let(:key) { DeveloperKey.create! }
+    let(:user) { User.create! }
+    let(:valid_code) {"thecode"}
+    let(:valid_code_redis_key) {"#{Canvas::Oauth::Token::REDIS_PREFIX}#{valid_code}"}
+    let(:redis) do
+      redis = stub('Redis')
+      redis.stubs(:get)
+      redis.stubs(:get).with(valid_code_redis_key).returns(%Q{{"client_id": #{key.id}, "user": #{user.id}}})
+      redis.stubs(:del).with(valid_code_redis_key).returns(%Q{{"client_id": #{key.id}, "user": #{user.id}}})
+      redis
+    end
 
     it 'renders a 400 if theres no client_id' do
       get :oauth2_token
@@ -1037,16 +1048,16 @@ describe PseudonymSessionsController do
     end
 
     it 'renders a 400 if the provided code does not match a token' do
-      Canvas.stubs(:redis => stub(:get => nil))
+      Canvas.stubs(:redis => redis)
       get :oauth2_token, :client_id => key.id, :client_secret => key.api_key, :code => "NotALegitCode"
       response.status.should == '400 Bad Request'
       response.body.should =~ /invalid code/
     end
 
     it 'outputs the token json if everything checks out' do
-      user = User.create!
-      Canvas.stubs(:redis => stub(:get => %Q{{"client_id": #{key.id}, "user": #{user.id}}}))
-      get :oauth2_token, :client_id => key.id, :client_secret => key.api_key, :code => "thecode"
+      redis.expects(:del).with(valid_code_redis_key).at_least_once
+      Canvas.stubs(:redis => redis)
+      get :oauth2_token, :client_id => key.id, :client_secret => key.api_key, :code => valid_code
       response.should be_success
       JSON.parse(response.body).keys.sort.should == ['access_token', 'user']
     end
@@ -1061,9 +1072,21 @@ describe PseudonymSessionsController do
     before { user_session user }
 
     it 'uses the global id of the user for generating the code' do
-      Canvas::Oauth::Token.expects(:generate_code_for).with(user.global_id, key.id).returns('code')
+      Canvas::Oauth::Token.expects(:generate_code_for).with(user.global_id, key.id, {:scopes => nil, :remember_access => nil}).returns('code')
       oauth_accept
       response.should redirect_to(oauth2_auth_url(:code => 'code'))
+    end
+
+    it 'saves the requested scopes with the code' do
+      scopes = 'userinfo'
+      session_hash[:oauth2][:scopes] = scopes
+      Canvas::Oauth::Token.expects(:generate_code_for).with(user.global_id, key.id, {:scopes => scopes, :remember_access => nil}).returns('code')
+      oauth_accept
+    end
+
+    it 'remembers the users access preference with the code' do
+      Canvas::Oauth::Token.expects(:generate_code_for).with(user.global_id, key.id, {:scopes => nil, :remember_access => '1'}).returns('code')
+      post :oauth2_accept, {:remember_access => '1'}, session_hash
     end
 
     it 'removes oauth session info after code generation' do
@@ -1072,6 +1095,12 @@ describe PseudonymSessionsController do
       controller.session.should == {}
     end
 
-  end
+    it 'forwards the oauth state if it was provided' do
+      session_hash[:oauth2][:state] = '1234567890'
+      Canvas::Oauth::Token.stubs(:generate_code_for => 'code')
+      oauth_accept
+      response.should redirect_to(oauth2_auth_url(:code => 'code', :state => '1234567890'))
+    end
 
+  end
 end

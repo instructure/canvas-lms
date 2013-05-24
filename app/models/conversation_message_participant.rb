@@ -27,10 +27,8 @@ class ConversationMessageParticipant < ActiveRecord::Base
 
   attr_accessible
 
-  named_scope :for_conversation_and_message, lambda { |conversation_id, message_id|
-    {
-      :joins => "INNER JOIN conversation_participants ON conversation_participants.id = conversation_participant_id",
-      :conditions => ["conversation_id = ? AND conversation_message_id = ?", conversation_id, message_id]
-    }
+  scope :for_conversation_and_message, lambda { |conversation_id, message_id|
+    joins("INNER JOIN conversation_participants ON conversation_participants.id = conversation_participant_id").
+        where(:conversation_id => conversation_id, :conversation_message_id => message_id)
   }
 end

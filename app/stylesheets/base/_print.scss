@@ -1,0 +1,68 @@
+// # encoding: UTF-8
+@media print {
+
+  // just add this class to anything you dont want to be printed
+  .no-print,
+  #header,
+  #footer,
+  #right-side-wrapper,
+  #left-side {
+    display: none !important; }
+
+  #main,
+  #wrapper {
+    margin: 0 !important;
+    border: 0 none !important; }
+
+  html, body {
+    font-family: Arial, Helvetica, sans-serif;
+    color: black !important;
+    font-size: 10pt;
+    background: transparent none !important; }
+
+  // this is for firefox, if things dont have overflow:visible then it wont print any more than one page.
+  #wrapper-container, #content , #wiki_show_view_main {
+    overflow: visible !important; }
+
+  #content {
+    width: auto;
+    // the padding:0 here is to revert the padding added by .with-scrolling-right-side, &.with-sidebar-pinned-to-bottom
+    padding: 0 !important;
+    .fill_height_div {
+      overflow: visible !important; } }
+
+  a {
+    &:link, &:visited {
+      font-weight: bold;
+      text-decoration: underline; } }
+
+  #breadcrumbs {
+    margin: 0; padding: 0;
+    margin-bottom: 10px;
+    box-shadow: 0 0 0 white;
+    ul {
+      margin: 0; padding: 0;
+      li {
+        margin: 0; padding: 0;
+        padding-left: 10px;
+        &:after {
+          content: "   →   "; }
+        &:last-child:after {
+          content: ""; }
+        &:first-of-type {
+          padding-left: 0; }  
+        &.home {
+          display: none; } }
+      a {
+        text-decoration: none !important;
+        padding-right: 10px; } } }
+
+  a {
+    &:link:after, &:visited:after {
+      content: " (" attr(href) ") ";
+      font-size: 90%; }
+    &[href^="/"]:after, &[href^="#"]:after {
+      content: ""; }
+  }
+  
+}

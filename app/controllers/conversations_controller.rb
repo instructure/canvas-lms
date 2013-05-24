@@ -190,14 +190,14 @@ class ConversationsController < ApplicationController
       end
 
       # reload and preload stuff
-      conversations = ConversationParticipant.find(:all, :conditions => {:id => batch.conversations.map(&:id)}, :include => [:conversation], :order => "visible_last_authored_at DESC, last_message_at DESC, id DESC")
+      conversations = ConversationParticipant.where(:id => batch.conversations).includes(:conversation).order("visible_last_authored_at DESC, last_message_at DESC, id DESC")
       Conversation.preload_participants(conversations.map(&:conversation))
       ConversationParticipant.preload_latest_messages(conversations, @current_user)
       visibility_map = infer_visibility(*conversations) 
       render :json => conversations.map{ |c| conversation_json(c, @current_user, session, :include_participant_avatars => false, :include_participant_contexts => false, :visible => visibility_map[c.conversation_id]) }, :status => :created
     else
       @conversation = @current_user.initiate_conversation(@recipients)
-      @conversation.add_message(message, :tags => @tags)
+      @conversation.add_message(message, :tags => @tags, :update_for_sender => false)
       render :json => [conversation_json(@conversation.reload, @current_user, session, :include_indirect_participants => true, :messages => [message])], :status => :created
     end
   end
@@ -341,7 +341,7 @@ class ConversationsController < ApplicationController
 
     @conversation.update_attribute(:workflow_state, "read") if @conversation.unread? && auto_mark_as_read?
     messages = submissions = nil
-    ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
+    Shackles.activate(:slave) do
       messages = @conversation.messages
       ConversationMessage.send(:preload_associations, messages, :asset)
       submissions = messages.map(&:submission).compact
@@ -425,6 +425,19 @@ class ConversationsController < ApplicationController
   def destroy
     @conversation.remove_messages(:all)
     render :json => conversation_json(@conversation, @current_user, session, :visible => false)
+  end
+
+  # internal api
+  # @example_request
+  #     curl https://<canvas>/api/v1/conversations/:id/delete_for_all \ 
+  #       -X DELETE \ 
+  #       -H 'Authorization: Bearer <token>'
+  def delete_for_all
+    return unless authorized_action(Account.site_admin, @current_user, :become_user)
+
+    Conversation.find(params[:id]).delete_for_all
+
+    render :json => {}
   end
 
   # @API Add recipients
@@ -523,7 +536,7 @@ class ConversationsController < ApplicationController
     get_conversation(true)
     if params[:body].present?
       message = build_message
-      @conversation.add_message message, :tags => @tags
+      @conversation.add_message message, :tags => @tags, :update_for_sender => false
       render :json => conversation_json(@conversation.reload, @current_user, session, :messages => [message])
     else
       render :json => {}, :status => :bad_request
@@ -601,7 +614,7 @@ class ConversationsController < ApplicationController
       f.updated = Time.now
       f.id = conversations_url
     end
-    ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
+    Shackles.activate(:slave) do
       @entries = []
       @conversation_contexts = {}
       @current_user.conversations.each do |conversation|
@@ -683,35 +696,16 @@ class ConversationsController < ApplicationController
         @current_user.conversations.default
     end
 
-    filters = normalize_filters(param_array(:filter))
+    filters = param_array(:filter)
     @conversations_scope = @conversations_scope.for_masquerading_user(@real_current_user) if @real_current_user
     @conversations_scope = @conversations_scope.tagged(*filters) if filters.present?
     @set_visibility = true
   end
 
-  # tags in the database now use the id relative to the default shard. ids in
-  # the filters are assumed relative to the current shard and need to be cast
-  # to an id relative to the default shard before use in queries.
-  #
-  # NOTE: clients providing values for the filter parameter should ensure that
-  # ids emitted are either global or relative to the current shard. if an id is
-  # emitted as a local id relative to some other shard, this will incorrectly
-  # interpret it as being relative to this shard.
-  def normalize_filters(filters)
-    filters.map do |filter|
-      type, id = ActiveRecord::Base.parse_asset_string(filter)
-      id = Shard.relative_id_for(id, Shard.default)
-      "#{type.underscore}_#{id}"
-    end
-  end
-
   def infer_visibility(*conversations)
     result = Hash.new(false)
     visible_conversations = @current_user.shard.activate do
-        @conversations_scope.find(:all,
-          :select => "conversation_id",
-          :conditions => {:conversation_id => conversations.map(&:conversation_id)}
-        )
+        @conversations_scope.select(:conversation_id).where(:conversation_id => conversations.map(&:conversation_id)).all
       end
     visible_conversations.each { |c| result[c.conversation_id] = true }
     if conversations.size == 1
@@ -744,7 +738,7 @@ class ConversationsController < ApplicationController
 
   def get_conversation(allow_deleted = false)
     scope = @current_user.all_conversations
-    scope = scope.scoped(:conditions => "message_count > 0") unless allow_deleted
+    scope = scope.where('message_count>0') unless allow_deleted
     @conversation = scope.find_by_conversation_id(params[:id] || params[:conversation_id] || 0)
     raise ActiveRecord::RecordNotFound unless @conversation
   end

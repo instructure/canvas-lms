@@ -1,0 +1,30 @@
+<% define_content :link do %>
+  <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.group.context) %>/<%= asset.group.context.class.to_s.downcase.pluralize %>/<%= asset.group.context_id %>/groups
+<% end %>
+<% define_content :subject do %>
+  <%= t :subject, "New Group Membership for %{course_or_account}", :course_or_account => asset.group.context.name %>
+<% end %>
+
+<p><%= t :title, "New Group Membership: %{group_name}", :group_name => asset.group.name %></p>
+
+<p>
+<%=
+    case asset.group.context_type
+    when 'Account'
+      t :body_account, "You've been added to a new group for the account %{account}.  The name of the group is %{group_name}.", :account => asset.group.context.name, :group_name => asset.group.name
+    else
+      t :body_course, "You've been added to a new group for the course %{course}.  The name of the group is %{group_name}.", :course => asset.group.context.name, :group_name => asset.group.name
+    end
+%>
+</p>
+
+<p>
+<%=
+    case asset.group.context_type
+    when 'Account'
+      t :html_details_account, "You can see which groups you're a part of for this account by <a href=\"%{link}\">clicking here</a>", :link => content(:link)
+    else
+      t :html_details_course, "You can see which groups you're a part of for this course by <a href=\"%{link}\">clicking here</a>", :link => content(:link)
+    end
+%>
+</p>

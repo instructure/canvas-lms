@@ -1,2 +1,0 @@
-module ExternalToolsHelper
-end

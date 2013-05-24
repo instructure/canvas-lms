@@ -27,14 +27,10 @@ class AssetUserAccess < ActiveRecord::Base
   before_save :infer_defaults
   attr_accessible :user, :asset_code
 
-  named_scope :for_context, lambda{|context|
-    {:conditions => ["asset_user_accesses.context_id = ? AND asset_user_accesses.context_type = ?", context.id, context.class.to_s]}
-  }
-  named_scope :for_user, lambda{ |user|
-    { :conditions => {:user_id => user} }
-  }
-  named_scope :participations, {:conditions => { :action_level => 'participate' }}
-  named_scope :most_recent, {:order => 'updated_at DESC'}
+  scope :for_context, lambda { |context| where(:context_id => context, :context_type => context.class.to_s) }
+  scope :for_user, lambda { |user| where(:user_id => user) }
+  scope :participations, where(:action_level => 'participate')
+  scope :most_recent, order('updated_at DESC')
 
   def category
     self.asset_category

@@ -246,6 +246,20 @@ describe Role do
       end
     end
 
+    describe "Role.role_data" do
+      it "returns the roles with custom roles flattened as siblings to the main roles" do
+        course(:account => @sub_account)
+
+        @base_types.each do |bt|
+          @course.enroll_user(user, bt)
+          @course.enroll_user(user, bt, :role_name => "custom #{bt}")
+        end
+
+        roles = Role.role_data(@course, @course.teachers.first)
+        roles.length.should == 10
+      end
+    end
+
     it "should include inactive roles" do
       @account.roles.each{|r| r.deactivate! }
       all = Role.all_enrollment_roles_for_account(@sub_account, true)

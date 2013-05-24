@@ -5,13 +5,13 @@
   jammit_css 'plugins'
 %>
 
-<h2><%= t :instructure_canvas, "Instructure Canvas" %></h2>
-
-<p>
+<span class="small pull-right">
   Revision: <%= Canvas.revision || t(:canvas_revision_unknown, "Unknown") %>
-</p>
+</span>
 
-<h2><%= t :page_title, "Canvas Plugins" %></h2>
+<h2>
+  <%= t :page_title, "Canvas Plugins" %>
+</h2>
 
 <% if @plugins.any? %>
   <table class="list plugins">
@@ -26,7 +26,7 @@
     </tr>
     <% @plugins.each do |plugin| %>
       <tr class="<%= cycle('odd', 'even') %>">
-        <td class='name'>
+        <td class='name' nowrap="nowrap">
           <% if plugin.has_settings_partial? %>
             <a class="name" href="<%= plugin_path(plugin.id) %>"><%= h plugin.name %></a>
           <% else %>
@@ -38,7 +38,7 @@
         <td class='website'><%= content_tag('span', link_to(image_tag('link.png'), plugin.website), :class => 'url') unless plugin.website.blank? %></td>
         <td class="author"><%= plugin.author_website.blank? ? h(plugin.author) : link_to(h(plugin.author), plugin.author_website) %></td>
         <td class="version"><%= h plugin.version %></td>
-        <td class="configure"><%= link_to(t(:configure_plugin, "Configure"), plugin_path(plugin.id)) if plugin.has_settings_partial? %></td>
+        <td class="configure"><%= link_to("", plugin_path(plugin.id), :class => "btn btn-mini icon-settings") if plugin.has_settings_partial? %></td>
       </tr>
     <% end %>
   </table>

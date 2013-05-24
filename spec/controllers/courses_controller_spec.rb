@@ -51,6 +51,42 @@ describe CoursesController do
         assigns[:current_enrollments].should_not include e
       end
     end
+
+    it "should include unpublished enrollments in future enrollments" do
+      user
+      future_course  = Course.create!(:name => 'future course', :start_at => Time.now + 2.weeks,
+                                      :restrict_enrollments_to_course_dates => true)
+      current_course = Course.create!(:name => 'current course', :start_at => Time.now - 2.weeks)
+
+      current_unpublished_course  = Course.create!(:name => 'future course 2', :start_at => Time.now - 2.weeks)
+      future_unpublished_course  = Course.create!(:name => 'future course 2', :start_at => Time.now + 2.weeks)
+      future_unrestricted_course = Course.create!(:name => 'future course 3', :start_at => Time.now + 2.weeks)
+
+      current_enrollment = StudentEnrollment.create!(:course => current_course, :user => @user)
+      future_enrollment  = StudentEnrollment.create!(:course => future_course, :user => @user)
+      current_unpublished_enrollment = StudentEnrollment.create!(:course => current_unpublished_course, :user => @user)
+      future_unpublished_enrollment = StudentEnrollment.create!(:course => future_unpublished_course, :user => @user)
+      future_unrestricted_enrollment = StudentEnrollment.create!(:course => future_unrestricted_course, :user => @user)
+
+      [future_course, current_course, future_unrestricted_course].each { |course| course.offer }
+      [current_enrollment, future_enrollment, current_unpublished_enrollment, future_unpublished_enrollment, future_unrestricted_enrollment].each { |e| e.accept }
+
+      user_session(@user)
+      get 'index'
+      response.should be_success
+      assigns[:future_enrollments].count.should == 3
+      assigns[:future_enrollments].should include(future_enrollment)
+      assigns[:future_enrollments].should include(current_unpublished_enrollment)
+      assigns[:future_enrollments].should include(future_unpublished_enrollment)
+    end
+  end
+
+  describe "GET 'statistics'" do
+    it 'does not break using new student_ids method from course' do
+      course_with_teacher_logged_in(:active_all => true)
+      get 'statistics', :format => 'json', :course_id => @course.id
+      response.should be_success
+    end
   end
 
   describe "GET 'settings'" do
@@ -260,7 +296,31 @@ describe CoursesController do
       get 'show', :id => @c2.id
       assert_unauthorized
     end
-    
+
+    it "should show unauthorized/authorized to a student for a future course depending on restrict_student_future_view setting" do
+      course_with_student_logged_in(:active_course => 1)
+      a = @course.root_account
+      a.settings[:restrict_student_future_view] = true
+      a.save!
+
+      @course.start_at = Time.now + 2.weeks
+      @course.restrict_enrollments_to_course_dates = true
+      @course.save!
+
+      get 'show', :id => @course.id
+      response.status.should == '401 Unauthorized'
+      assigns[:unauthorized_message].should_not be_nil
+
+      a.settings[:restrict_student_future_view] = false
+      a.save!
+
+      controller.instance_variable_set(:@context_all_permissions, nil)
+
+      get 'show', :id => @course.id
+      response.should be_success
+      assigns[:context].should eql(@course)
+    end
+
     context "show feedback for the current course only on course front page" do
       before(:each) do
         course_with_student_logged_in(:active_all => true)
@@ -525,7 +585,7 @@ describe CoursesController do
     end
   end
 
-  describe "POST 'unenroll'" do
+  describe "POST 'unenroll_user'" do
     it "should require authorization" do
       course_with_teacher(:active_all => true)
       post 'unenroll_user', :course_id => @course.id, :id => @enrollment.id
@@ -634,7 +694,19 @@ describe CoursesController do
       @course.observers.map{|s| s.name}.should be_include("Sam")
       @course.observers.map{|s| s.name}.should be_include("Fred")
     end
-    
+
+    it "will use json for limit_privileges_to_course_section param" do
+      course_with_teacher_logged_in(:active_all => true)
+      post 'enroll_users', :course_id => @course.id,
+        :user_list => "\"Sam\" <sam@yahoo.com>",
+        :enrollment_type => 'TeacherEnrollment',
+        :limit_privileges_to_course_section => true
+      response.should be_success
+      run_jobs
+      enrollment = @course.reload.teachers.select { |t| t.name == 'Sam' }.
+        first.enrollments.first
+      enrollment.limit_privileges_to_course_section.should == true
+    end
   end
   
   describe "PUT 'update'" do
@@ -692,11 +764,9 @@ describe CoursesController do
       put 'update', :id => @course.id, :course => { :lock_all_announcements => 0 }
       assigns[:course].lock_all_announcements.should be_false
     end
-
-
   end
 
-  describe "POST unconclude" do
+  describe "POST 'unconclude'" do
     it "should unconclude the course" do
       course_with_teacher_logged_in(:active_all => true)
       delete 'destroy', :id => @course.id, :event => 'conclude'
@@ -945,11 +1015,99 @@ describe CoursesController do
     end
   end
 
-  describe 'GET statistics' do
-    it 'does not break using new student_ids method from course' do
-      course_with_teacher_logged_in(:active_all => true)
-      get 'statistics', :format => 'json', :course_id => @course.id
-      response.status.to_i.should == 200
+  
+  describe "quotas" do
+    context "with :manage_storage_quotas" do
+      before do
+        @account = Account.default
+        account_admin_user :account => @account
+        user_session @user
+      end
+      
+      describe "create" do
+        it "should set storage_quota" do
+          post 'create', { :account_id => @account.id, :course =>
+              { :name => 'xyzzy', :storage_quota => 111.megabytes } }
+          @course = @account.courses.find_by_name('xyzzy')
+          @course.storage_quota.should == 111.megabytes
+        end
+
+        it "should set storage_quota_mb" do
+          post 'create', { :account_id => @account.id, :course =>
+              { :name => 'xyzpdq', :storage_quota_mb => 111 } }
+          @course = @account.courses.find_by_name('xyzpdq')
+          @course.storage_quota_mb.should == 111
+        end
+      end
+      
+      describe "update" do
+        before do
+          @course = @account.courses.create!
+        end
+        
+        it "should set storage_quota" do
+          post 'update', { :id => @course.id, :course =>
+            { :storage_quota => 111.megabytes } }
+          @course.reload.storage_quota.should == 111.megabytes
+        end
+
+        it "should set storage_quota_mb" do
+          post 'update', { :id => @course.id, :course =>
+            { :storage_quota_mb => 111 } }
+          @course.reload.storage_quota_mb.should == 111
+        end
+      end
+    end
+
+    context "without :manage_storage_quotas" do
+      describe "create" do
+        before do
+          @account = Account.default
+          custom_account_role 'lamer', :account => @account
+          @account.role_overrides.create! :permission => 'manage_courses', :enabled => true,
+                                          :enrollment_type => 'lamer'
+          user
+          @account.add_user @user, 'lamer'
+          user_session @user
+        end
+        
+        it "should ignore storage_quota" do
+          post 'create', { :account_id => @account.id, :course =>
+              { :name => 'xyzzy', :storage_quota => 111.megabytes } }
+          @course = @account.courses.find_by_name('xyzzy')
+          @course.storage_quota.should == @account.default_storage_quota
+        end
+
+        it "should ignore storage_quota_mb" do
+          post 'create', { :account_id => @account.id, :course =>
+              { :name => 'xyzpdq', :storage_quota_mb => 111 } }
+          @course = @account.courses.find_by_name('xyzpdq')
+          @course.storage_quota_mb.should == @account.default_storage_quota / 1.megabyte
+        end
+      end
+
+      describe "update" do
+        before do
+          @account = Account.default
+          course_with_teacher_logged_in(:account => @account, :active_all => true)
+        end
+        
+        it "should ignore storage_quota" do
+          post 'update', { :id => @course.id, :course =>
+              { :public_description => 'wat', :storage_quota => 111.megabytes } }
+          @course.reload
+          @course.public_description.should == 'wat'
+          @course.storage_quota.should == @account.default_storage_quota
+        end
+
+        it "should ignore storage_quota_mb" do
+          post 'update', { :id => @course.id, :course =>
+              { :public_description => 'wat', :storage_quota_mb => 111 } }
+          @course.reload
+          @course.public_description.should == 'wat'
+          @course.storage_quota_mb.should == @account.default_storage_quota / 1.megabyte
+        end
+      end
     end
   end
 end

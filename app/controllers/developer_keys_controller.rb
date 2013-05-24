@@ -29,7 +29,7 @@ class DeveloperKeysController < ApplicationController
   end
 
   def index
-    @keys = DeveloperKey.scoped(:order => 'id DESC', :include => :account)
+    @keys = DeveloperKey.order("id DESC").includes(:account)
     @keys = Api.paginate(@keys, self, developer_keys_url)
     respond_to do |format|
       format.html

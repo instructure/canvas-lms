@@ -19,11 +19,10 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe CollaborationsController do
-  before(:all) do
+  before do
     plugin_setting = PluginSetting.new(:name => "etherpad", :settings => {})
     plugin_setting.save!
   end
-  after(:all) { PluginSetting.all.map(&:destroy) }
 
   describe "GET 'index'" do
     it "should require authorization" do
@@ -69,7 +68,7 @@ describe CollaborationsController do
 
   describe "GET 'show'" do
     let(:collab_course) { course_with_teacher_logged_in(:active_all => true); @course }
-    let(:collaboration) { returning(collab_course.collaborations.create!){ |c| c.update_attribute :url, 'http://www.example.com' } }
+    let(:collaboration) { collab_course.collaborations.create!.tap{ |c| c.update_attribute :url, 'http://www.example.com' } }
 
     before do
       Setting.set('enable_page_views', 'db')

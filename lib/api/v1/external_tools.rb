@@ -26,9 +26,11 @@ module Api::V1::ExternalTools
   end
 
   def external_tool_json(tool, context, user, session)
+    methods = %w[privacy_level custom_fields]
+    methods += ContextExternalTool::EXTENSION_TYPES
     api_json(tool, user, session,
                   :only => %w(id name description url domain consumer_key created_at updated_at),
-                  :methods => %w[privacy_level custom_fields account_navigation user_navigation course_navigation editor_button resource_selection]
+                  :methods => methods
     )
   end
 

@@ -1,34 +1,7 @@
+require 'i18n/hash_extensions'
+require 'json'
+
 namespace :i18n do
-  module HashExtensions
-    def flatten_keys(result={}, prefix='')
-      each_pair do |k, v|
-        if v.is_a?(Hash)
-          v.flatten_keys(result, "#{prefix}#{k}.")
-        else
-          result["#{prefix}#{k}"] = v
-        end
-      end
-      result
-    end
-
-    def expand_keys(result = {})
-      each_pair do |k, v|
-        parts = k.split('.')
-        last = parts.pop
-        parts.inject(result){ |h, k2| h[k2] ||= {}}[last] = v
-      end
-      result
-    end
-
-    def to_ordered
-      keys.sort_by(&:to_s).inject ActiveSupport::OrderedHash.new do |h, k|
-        v = fetch(k)
-        h[k] = v.is_a?(Hash) ? v.to_ordered : v
-        h
-      end
-    end
-  end
-
   def infer_scope(filename)
     case filename
       when /app\/views\/.*\.handlebars\z/
@@ -105,7 +78,7 @@ namespace :i18n do
 
 
     # Ruby
-    files = (Dir.glob('./*') - ['./vendor'] + ['./vendor/plugins'] - ['./guard', './tmp']).map { |d| Dir.glob("#{d}/**/*rb") }.flatten.
+    files = (Dir.glob('./*') - ['./vendor'] + ['./vendor/plugins/*'] - ['./guard', './tmp']).map { |d| Dir.glob("#{d}/**/*rb") }.flatten.
       reject{ |file| file =~ %r{\A\./(rb-fsevent|vendor/plugins/rails_xss|db|spec)/} }
     files &= only if only
     file_count = files.size
@@ -114,7 +87,11 @@ namespace :i18n do
       source = File.read(file)
       source = Erubis::Eruby.new(source).src if file =~ /\.erb\z/
 
-      sexps = RubyParser.new.parse(source)
+      # add a magic comment since that's the best way to convince RubyParser
+      # 3.x it should treat the source as utf-8 (it ignores the source string encoding)
+      # see https://github.com/seattlerb/ruby_parser/issues/101
+      # unforunately this means line numbers in error messages are off by one
+      sexps = RubyParser.for_current_ruby.parse("#encoding:utf-8\n#{source}")
       rb_extractor.scope = infer_scope(file)
       rb_extractor.in_html_view = (file =~ /\.(html|facebook)\.erb\z/)
       rb_extractor.process(sexps)
@@ -163,7 +140,7 @@ namespace :i18n do
     yaml_dir = './config/locales/generated'
     FileUtils.mkdir_p(File.join(yaml_dir))
     yaml_file = File.join(yaml_dir, "en.yml")
-    File.open(File.join(RAILS_ROOT, yaml_file), "w") do |file|
+    File.open(Rails.root.join(yaml_file), "w") do |file|
       file.write({'en' => @translations}.ya2yaml(:syck_compatible => true))
     end
     print "Wrote new #{yaml_file}\n\n"
@@ -181,7 +158,7 @@ namespace :i18n do
     I18n.load_path += Dir[Rails.root.join('config', 'locales', '**', '*.{rb,yml}')] +
                       Dir[Rails.root.join('vendor', 'plugins', '*', 'config', 'locales', '**', '*.{rb,yml}')]
 
-    Hash.send :include, HashExtensions
+    Hash.send :include, I18n::HashExtensions
 
     file_translations = {}
 
@@ -260,7 +237,7 @@ define(['i18nObj', 'jquery'], function(I18n, $) {
 
   desc "Exports new/changed English strings to be translated"
   task :export => :environment do
-    Hash.send :include, HashExtensions
+    Hash.send :include, I18n::HashExtensions
 
     begin
       base_filename = "config/locales/generated/en.yml"
@@ -362,47 +339,32 @@ define(['i18nObj', 'jquery'], function(I18n, $) {
   end
 
   desc "Validates and imports new translations"
-  task :import => :environment do
+  task :import, [:source_file, :translated_file] => :environment do |t, args|
     require 'ya2yaml'
-    Hash.send :include, HashExtensions
+    require 'open-uri'
+    Hash.send(:include, I18n::HashExtensions) unless Hash.new.kind_of?(I18n::HashExtensions)
 
-    def placeholders(str)
-      str.scan(/%h?\{[^\}]+\}/).sort
+    if args[:source_file]
+      source_translations = YAML.safe_load(open(args[:source_file]))
+    else
+      begin
+        puts "Enter path to original en.yml file:"
+        arg = $stdin.gets.strip
+        source_translations = File.exist?(arg) && YAML.safe_load(File.read(arg)) rescue nil
+      end until source_translations
     end
 
-    def markdown_and_wrappers(str)
-      # some stuff this doesn't check (though we don't use):
-      #   blockquotes, e.g. "> some text"
-      #   reference links, e.g. "[an example][id]"
-      #   indented code
-      (
-        str.scan(/\\[\\`\*_\{\}\[\]\(\)#\+\-\.!]/) +
-        str.scan(/(\*+|_+|`+)[^\s].*?[^\s]?\1/).map{|m|"#{m}-wrap"} +
-        str.scan(/(!?\[)[^\]]+\]\(([^\)"']+).*?\)/).map{|m|"link:#{m.last}"} +
-        str.scan(/^((\s*\*\s*){3,}|(\s*-\s*){3,}|(\s*_\s*){3,})$/).map{"hr"} +
-        str.scan(/^[^=\-\n]+\n^(=+|-+)$/).map{|m|m.first[0]=='=' ? 'h1' : 'h2'} +
-        str.scan(/^(\#{1,6})\s+[^#]*#*$/).map{|m|"h#{m.first.size}"} +
-        str.scan(/^ {0,3}(\d+\.|\*|\+|\-)\s/).map{|m|m.first =~ /\d/ ? "1." : "*"}
-      ).sort
+    if args[:translated_file]
+      new_translations = YAML.safe_load(open(args[:translated_file]))
+    else
+      begin
+        puts "Enter path to translated file:"
+        arg = $stdin.gets.strip
+        new_translations = File.exist?(arg) && YAML.safe_load(File.read(arg)) rescue nil
+      end until new_translations
     end
 
-    begin
-      puts "Enter path to original en.yml file:"
-      arg = $stdin.gets.strip
-      source_translations = File.exist?(arg) && YAML.safe_load(File.read(arg)) rescue nil
-    end until source_translations
-    raise "Source does not have any English strings" unless source_translations.keys.include?('en')
-    source_translations = source_translations['en'].flatten_keys
-
-    begin
-      puts "Enter path to translated file:"
-      arg = $stdin.gets.strip
-      new_translations = File.exist?(arg) && YAML.safe_load(File.read(arg)) rescue nil
-    end until new_translations
-    raise "Translation file contains multiple languages" if new_translations.size > 1
-    language = new_translations.keys.first
-    raise "Translation file appears to have only English strings" if language == 'en'
-    new_translations = new_translations[language].flatten_keys
+    import = I18nImport.new(source_translations, new_translations)
 
     item_warning = lambda { |error_items, description|
       begin
@@ -419,38 +381,54 @@ define(['i18nObj', 'jquery'], function(I18n, $) {
       true
     }
 
-    missing_keys = source_translations.keys - new_translations.keys
-    next unless item_warning.call(missing_keys.sort, "missing translations") if missing_keys.present?
+    complete_translations = import.compile_complete_translations(item_warning)
+    next if complete_translations.nil?
 
-    unexpected_keys = new_translations.keys - source_translations.keys
-    next unless item_warning.call(unexpected_keys.sort, "unexpected translations") if unexpected_keys.present?
-
-    placeholder_mismatches = {}
-    markdown_mismatches = {}
-    new_translations.keys.each do |key|
-      p1 = placeholders(source_translations[key].to_s)
-      p2 = placeholders(new_translations[key].to_s)
-      placeholder_mismatches[key] = [p1, p2] if p1 != p2
-
-      m1 = markdown_and_wrappers(source_translations[key].to_s)
-      m2 = markdown_and_wrappers(new_translations[key].to_s)
-      markdown_mismatches[key] = [m1, m2] if m1 != m2
-    end
-
-    if placeholder_mismatches.size > 0
-      next unless item_warning.call(placeholder_mismatches.map{|k,(p1,p2)| "#{k}: expected #{p1.inspect}, got #{p2.inspect}"}.sort, "placeholder mismatches")
-    end
-
-    if markdown_mismatches.size > 0
-      next unless item_warning.call(markdown_mismatches.map{|k,(p1,p2)| "#{k}: expected #{p1.inspect}, got #{p2.inspect}"}.sort, "markdown/wrapper mismatches")
-    end
-
-    I18n.available_locales
-
-    new_translations = (I18n.backend.send(:translations)[language.to_sym] || {}).flatten_keys.merge(new_translations)
-    File.open("config/locales/#{language}.yml", "w") { |f|
-      f.write({language => new_translations.expand_keys}.ya2yaml(:syck_compatible => true))
+    File.open("config/locales/#{import.language}.yml", "w") { |f|
+      f.write({import.language => complete_translations}.ya2yaml(:syck_compatible => true))
     }
   end
+
+  def transifex_languages(languages)
+    if languages
+      languages.split(/\s*,\s*/)
+    else
+      %w(ar zh fr ja pt es ru)
+    end
+  end
+
+  def transifex_download(user, password, languages)
+    transifex_url = "http://www.transifex.com/api/2/project/canvas-lms/"
+    translation_url = transifex_url + "resource/canvas-lms/translation"
+    userpass = "#{user}:#{password}"
+    for lang in languages
+      puts "Downloading tmp/#{lang}.yml"
+      json = `curl --user #{userpass} #{translation_url}/#{lang}/`
+      File.open("tmp/#{lang}.yml", "w") do |file|
+        file.write JSON.parse(json)['content']
+      end
+    end
+  end
+
+  desc "Download language files from Transifex"
+  task :transifex, [:user, :password, :languages] do |t, args|
+    languages = transifex_languages(args[:languages])
+    transifex_download(args[:user], args[:password], languages)
+  end
+
+  desc "Download language files from Transifex and import them"
+  task :transifeximport, [:user, :password, :languages, :source_file] do |t, args|
+    languages = transifex_languages(args[:languages])
+    transifex_download(args[:user], args[:password], languages)
+
+    source_file = args[:source_file] || 'config/locales/generated/en.yml'
+    for lang in languages
+      translated_file = "tmp/#{lang}.yml"
+      puts "Importing #{translated_file}"
+      Rake::Task['i18n:import'].reenable
+      Rake::Task['i18n:import'].invoke(source_file, translated_file)
+    end
+  end
+
 end
 

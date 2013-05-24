@@ -21,7 +21,7 @@ module EportfolioPage
     @portfolio.setup_defaults
     @categories = @portfolio.eportfolio_categories
     if @portfolio.grants_rights?(@current_user, session, :manage)[:manage]
-      @recent_submissions = @current_user.submissions.find(:all, :order => 'created_at DESC') if @current_user && @current_user == @portfolio.user
+      @recent_submissions = @current_user.submissions.order("created_at DESC").all if @current_user && @current_user == @portfolio.user
       @files = @current_user.attachments.to_a
       @folders = @current_user.active_folders_detailed.to_a
     end

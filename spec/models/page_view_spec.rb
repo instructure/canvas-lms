@@ -27,7 +27,7 @@ describe PageView do
   end
 
   describe "sharding" do
-      it_should_behave_like "sharding"
+      specs_require_sharding
 
       it "should not assign the default shard" do
         PageView.new.shard.should == Shard.default
@@ -42,20 +42,20 @@ describe PageView do
     it "should store and load from cassandra" do
       expect {
         @page_view.save!
-      }.to change { PageView.cassandra.execute("select count(*) from page_views").fetch_row["count"] }.by(1)
+      }.to change { PageView::EventStream.database.execute("select count(*) from page_views").fetch_row["count"] }.by(1)
       PageView.find(@page_view.id).should == @page_view
       expect { PageView.find("junk") }.to raise_error(ActiveRecord::RecordNotFound)
     end
 
     it "should not start a db transaction on save" do
-      PageView.expects(:transaction_without_cassandra_check).never
       PageView.new { |p| p.send(:attributes=, { :user => @user, :url => "http://test.one/", :session_id => "phony", :context => @course, :controller => 'courses', :action => 'show', :user_request => true, :render_time => 0.01, :user_agent => 'None', :account_id => Account.default.id, :request_id => "abcdef", :interaction_seconds => 5 }, false) }.store
+      PageView.connection.expects(:transaction).never
       PageView.process_cache_queue
       PageView.find("abcdef").should be_present
     end
 
     describe "sharding" do
-      it_should_behave_like "sharding"
+      specs_require_sharding
 
       it "should always assign the default shard" do
         PageView.new.shard.should == Shard.default
@@ -89,6 +89,32 @@ describe PageView do
         expect { PageView.find(pv.request_id) }.to raise_error(ActiveRecord::RecordNotFound)
       end
 
+      it "should respect the per-shard setting" do
+        pending("needs redis") unless Canvas.redis_enabled?
+
+        begin
+          Shard.default.settings[:page_view_method] = :db
+          Shard.default.save!
+
+          @shard1.activate do
+            course_model
+            pv = page_view_model
+            pv.user = @user
+            pv.context = @course
+            pv.store
+
+            PageView.process_cache_queue
+            pv = PageView.find(pv.request_id)
+            pv.should be_present
+            pv.user.should == @user
+            pv.context.should == @course
+          end
+        ensure
+          Shard.default.settings.delete(:page_view_method)
+          Shard.default.save!
+        end
+      end
+
       it "should handle default shard ids through redis" do
         pending("needs redis") unless Canvas.redis_enabled?
 
@@ -105,7 +131,7 @@ describe PageView do
           pv.request_id
         end
 
-        pv = PageView.find(id)
+        pv = @shard1.activate { PageView.find(id) }
         pv.user.should == @pv_user
         pv.context.should == @course
 
@@ -241,6 +267,16 @@ describe PageView do
       PageView.count.should == 3
     end
 
+    it "should preserve timestamp" do
+      Time.use_zone('Alaska') do
+        pv = PageView.new{ |p| p.send(:attributes=, { :user => @user, :url => "http://test.one/", :session_id => "phony", :context => @course, :controller => 'courses', :action => 'show', :user_request => true, :render_time => 0.01, :user_agent => 'None', :account_id => Account.default.id, :request_id => "abcdef", :interaction_seconds => 5 }, false) }
+        pv.store
+        original_created_at = pv.created_at
+        PageView.process_cache_queue
+        pv.reload.created_at.to_i.should == original_created_at.to_i
+      end
+    end
+
     describe "batch transaction" do
       self.use_transactional_fixtures = false
       it "should not fail the batch if one row fails" do
@@ -351,5 +387,101 @@ describe PageView do
     its(:created_at) { should_not be_nil }
     its(:updated_at) { should_not be_nil }
     its(:http_method) { should == 'get' }
+  end
+
+  describe ".for_request_id" do
+    context "db-backed" do
+      before do
+        Setting.set('enable_page_views', 'db')
+      end
+
+      it "should return use existing page view if any" do
+        pv = page_view_model
+        PageView.for_request_id(pv.request_id).should == pv
+      end
+
+      it "should return nothing with unknown request id" do
+        PageView.for_request_id('unknown').should be_nil
+      end
+    end
+
+    context "cassandra-backed" do
+      it_should_behave_like "cassandra page views"
+      it "should generate a new page view with that request_id" do
+        pv = page_view_model
+        new_pv = PageView.for_request_id(pv.request_id)
+        new_pv.should_not be_nil
+        new_pv.request_id.should == pv.request_id
+        new_pv.url.should_not == pv.url
+      end
+    end
+  end
+
+  describe ".from_attributes" do
+    specs_require_sharding
+
+    before do
+      @attributes = valid_page_view_attributes.stringify_keys
+    end
+
+    it "should return a PageView object" do
+      PageView.from_attributes(@attributes).should be_a(PageView)
+    end
+
+    it "should look like an existing PageView" do
+      PageView.from_attributes(@attributes).should_not be_new_record
+    end
+
+    it "should use the provided attributes" do
+      PageView.from_attributes(@attributes).url.should == @attributes['url']
+    end
+
+    it "should set missing attributes to nil" do
+      PageView.from_attributes(@attributes).user_id.should be_nil
+    end
+
+    context "db-backed" do
+      before do
+        Setting.set('enable_page_views', 'db')
+      end
+
+      it "should interpret ids relative to the current shard" do
+        user_id = 1
+        attributes = @attributes.merge('user_id' => user_id)
+        page_view1 = @shard1.activate{ PageView.from_attributes(attributes) }
+        page_view2 = @shard2.activate{ PageView.from_attributes(attributes) }
+        [@shard1, @shard2].each do |shard|
+          shard.activate do
+            page_view1.user_id.should == @shard1.relative_id_for(user_id)
+            page_view2.user_id.should == @shard2.relative_id_for(user_id)
+          end
+        end
+      end
+
+      it "should not be flagged for cassandra" do
+        PageView.from_attributes(@attributes).should_not be_cassandra
+      end
+    end
+
+    context "cassandra-backed" do
+      it_should_behave_like "cassandra page views"
+
+      it "should interpret ids relative to the default shard" do
+        user_id = 1
+        attributes = @attributes.merge('user_id' => user_id)
+        page_view1 = @shard1.activate{ PageView.from_attributes(attributes) }
+        page_view2 = @shard2.activate{ PageView.from_attributes(attributes) }
+        [@shard1, @shard2].each do |shard|
+          shard.activate do
+            page_view1.user_id.should == Shard.default.relative_id_for(user_id)
+            page_view2.user_id.should == Shard.default.relative_id_for(user_id)
+          end
+        end
+      end
+
+      it "should be flagged for cassandra" do
+        PageView.from_attributes(@attributes).should be_cassandra
+      end
+    end
   end
 end

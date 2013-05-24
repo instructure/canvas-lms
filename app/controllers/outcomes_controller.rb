@@ -45,6 +45,12 @@ class OutcomesController < ApplicationController
   end
 
   def show
+    if @context.respond_to?(:large_roster?) && @context.large_roster?
+      flash[:notice] = t "#application.notices.page_disabled_for_course", "That page has been disabled for this course"
+      redirect_to named_context_url(@context, :context_outcomes_path)
+      return
+    end
+
     @outcome = @context.linked_learning_outcomes.find(params[:id])
     if authorized_action(@context, @current_user, :manage_outcomes)
       codes = [@context].map(&:asset_string)
@@ -52,7 +58,7 @@ class OutcomesController < ApplicationController
         if @context == @outcome.context
           codes = "all"
         else
-          codes = @context.all_courses.scoped({:select => 'id'}).map(&:asset_string)
+          codes = @context.all_courses.select(:id).map(&:asset_string)
         end
       end
       @alignments = @outcome.alignments.active.for_context(@context)
@@ -79,7 +85,7 @@ class OutcomesController < ApplicationController
         if @context == @outcome.context
           codes = "all"
         else
-          codes = @context.all_courses.scoped({:select => 'id'}).map(&:asset_string)
+          codes = @context.all_courses.select(:id).map(&:asset_string)
         end
       end
       @results = @outcome.learning_outcome_results.for_context_codes(codes).custom_ordering(params[:sort]).paginate(:page => params[:page], :per_page => 10)

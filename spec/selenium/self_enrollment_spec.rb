@@ -25,7 +25,7 @@ describe "self enrollment" do
     it "should register a new user" do
       get "/enroll/#{@course.self_enrollment_code}"
       f("#student_email").send_keys('new@example.com')
-      f('#user_type_new').click
+      f('#initial_action input[value=create]').click
       f("#student_name").send_keys('new guy')
       f('#enroll_form input[name="user[terms_of_use]"]').click
       expect_new_page_load {
@@ -40,7 +40,7 @@ describe "self enrollment" do
       user_with_pseudonym(:active_all => true, :username => "existing@example.com", :password => "asdfasdf")
       get "/enroll/#{@course.self_enrollment_code}"
       f("#student_email").send_keys("existing@example.com")
-      f('#user_type_existing').click
+      f('#initial_action input[value=log_in]').click
       f("#student_password").send_keys("asdfasdf")
       expect_new_page_load {
         submit_form("#enroll_form")

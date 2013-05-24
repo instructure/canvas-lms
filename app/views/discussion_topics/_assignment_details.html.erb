@@ -4,7 +4,7 @@
       <p class="discussion-title">
         <%= t('graded_discussion_and_points',
               { :one => 'This is a graded discussion: *1 point possible*',
-                :other => 'This is graded discussion: *%{count} points possible*' },
+                :other => 'This is a graded discussion: *%{count} points possible*' },
               :count => @assignment.points_possible || 0,
               :wrapper => "<span class='discussion-points'>\\1</span>") %>
       </p>

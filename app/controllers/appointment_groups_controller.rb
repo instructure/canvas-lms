@@ -46,6 +46,17 @@
 #       // The address of the appointment group's location
 #       location_address: "Room 234",
 #
+#       // The number of participant who have reserved slots
+#       // (see include[] argument)
+#       participant_count: 2,
+#
+#       // The start and end times of slots reserved by the current user as
+#       // well as the id of the calendar event for the reservation (see
+#       // include[] argument)
+#       reserved_times: [{id: 987,
+#                         start_at: "2012-07-20T15:00:00-06:00",
+#                         start_at: "2012-07-20T15:00:00-06:00"}],
+#
 #       // The context codes (i.e. courses) this appointment group belongs to.
 #       // Only people in these courses will be eligible to sign up.
 #       context_codes: ["course_123"],
@@ -134,8 +145,10 @@ class AppointmentGroupsController < ApplicationController
   #   If true, includes past appointment groups
   # @argument include[] [Optional] Array of additional information to include.
   #   Allowable values include "appointments" (i.e. calendar event time slots
-  #   for this appointment group) and "child_events" (i.e. reservations of those
-  #   time slots)
+  #   for this appointment group), "child_events" (i.e. reservations of those
+  #   time slots), "participant_count" (i.e. number of reservations), and
+  #   "reserved_times" (i.e. the event id, start time and end time of
+  #   reservations the current user has made)
   def index
     unless request.format == :json
       anchor = calendar_fragment :view_name => :scheduler
@@ -156,8 +169,23 @@ class AppointmentGroupsController < ApplicationController
       self,
       api_v1_appointment_groups_url(:scope => params[:scope])
     )
-    AppointmentGroup.send(:preload_associations, groups, :appointments) if params[:include]
-    render :json => groups.map{ |group| appointment_group_json(group, @current_user, session, :include => params[:include]) }
+    if params[:include]
+      AppointmentGroup.send(:preload_associations, groups,
+                            [{:appointments =>
+                               [:parent_event,
+                                {:context =>
+                                  [{:appointment_group_contexts => :context},
+                                   :appointment_group_sub_contexts]},
+                                {:child_events =>
+                                  [:parent_event,
+                                   :context,
+                                   {:child_events =>
+                                     [:parent_event,
+                                      :context]}]}]},
+                             {:appointment_group_contexts => :context},
+                             :appointment_group_sub_contexts])
+    end
+    render :json => groups.map{ |group| appointment_group_json(group, @current_user, session, :include => params[:include]) } 
   end
 
   # @API Create an appointment group

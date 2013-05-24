@@ -7,12 +7,13 @@ define [
   'compiled/calendar/EditAppointmentGroupDialog'
   'compiled/calendar/MessageParticipantsDialog'
   'jst/calendar/deleteItem'
+  'compiled/util/semanticDateRange'
   'jquery.instructure_date_and_time'
   'jqueryui/dialog'
   'jquery.instructure_misc_plugins'
   'vendor/jquery.ba-tinypubsub'
   'vendor/jquery.spin'
-], ($, _, I18n, appointmentGroupListTemplate, schedulerRightSideAdminSectionTemplate, EditAppointmentGroupDialog, MessageParticipantsDialog, deleteItemTemplate) ->
+], ($, _, I18n, appointmentGroupListTemplate, schedulerRightSideAdminSectionTemplate, EditAppointmentGroupDialog, MessageParticipantsDialog, deleteItemTemplate, semanticDateRange) ->
 
   class Scheduler
     constructor: (selector, @calendar) ->
@@ -125,21 +126,8 @@ define [
       if @groups
         groups = []
         for id, group of @groups
-          # set an array of times that the student is signed up for
-          group.signed_up_times = null
-          if group.appointmentEvents
-            for appointmentEvent in group.appointmentEvents when appointmentEvent.object.reserved
-              for childEvent in appointmentEvent.childEvents when childEvent.object.own_reservation
-                group.signed_up_times ?= []
-                group.signed_up_times.push
-                  id: childEvent.id
-                  formatted_time: childEvent.displayTimeString()
-
-          # count how many people have signed up
-          group.signed_up = 0
-          if group.appointmentEvents
-            for appointmentEvent in group.appointmentEvents
-              group.signed_up += appointmentEvent.childEvents.length if appointmentEvent.childEvents
+          for timeId, time of group.reserved_times
+            time.formatted_time = semanticDateRange(time.start_at, time.end_at)
 
           # look up the context names for the group
           group.contexts = _.filter(@contexts, (c) -> c.asset_string in group.context_codes)
@@ -227,8 +215,12 @@ define [
       group = @groups?[$(jsEvent.target).closest(".appointment-group-item").data('appointment-group-id')]
       return unless group
 
-      @createDialog = new EditAppointmentGroupDialog(group, @appointmentGroupContexts, @dialogCloseCB)
-      @createDialog.show()
+      @calendar.dataSource.getEventsForAppointmentGroup group, (events) =>
+        @loadData()
+        @loadingDeferred.done =>
+          group = @groups[group.id]
+          @createDialog = new EditAppointmentGroupDialog(group, @appointmentGroupContexts, @dialogCloseCB)
+          @createDialog.show()
 
     deleteLinkClick: (jsEvent) =>
       jsEvent.preventDefault()

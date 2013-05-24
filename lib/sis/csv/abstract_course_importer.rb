@@ -16,11 +16,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'lib/sis/csv/base_importer'
-
 module SIS
   module CSV
-    class AbstractCourseImporter < BaseImporter
+    class AbstractCourseImporter < CSVBaseImporter
 
       def self.is_abstract_course_csv?(row)
         row.include?('abstract_course_id') && !row.include?('course_id') && row.include?('short_name')

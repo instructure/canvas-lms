@@ -1,4 +1,10 @@
 namespace :css do
+  desc "Generate styleguide"
+  task :styleguide do
+    puts "--> creating styleguide"
+    puts `dress_code config/styleguide.yml`
+  end
+
   desc "Compile css assets."
   task :generate do
     require 'config/initializers/plugin_symlinks'
@@ -11,7 +17,7 @@ namespace :css do
     sass_files = Dir.glob("#{sass_path}/{,plugins/*/}**/[^_]*.s[ac]ss")
 
     # build and execute the compass command
-    compass = Compass::Commands::UpdateProject.new(RAILS_ROOT,
+    compass = Compass::Commands::UpdateProject.new(Rails.root.to_s,
       :environment => :production,
       :sass_files => sass_files,
       :quiet => true,

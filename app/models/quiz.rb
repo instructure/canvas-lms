@@ -40,6 +40,7 @@ class Quiz < ActiveRecord::Base
   has_many :quiz_questions, :dependent => :destroy, :order => 'position'
   has_many :quiz_submissions, :dependent => :destroy
   has_many :quiz_groups, :dependent => :destroy, :order => 'position'
+  has_many :quiz_statistics, :class_name => 'QuizStatistics', :order => 'created_at'
   belongs_to :context, :polymorphic => true
   belongs_to :assignment
   belongs_to :cloned_item
@@ -128,7 +129,7 @@ class Quiz < ActiveRecord::Base
     end
 
     override_students.each do |collection|
-      collection.update_all({:assignment_id => assignment_id,:quiz_id => id})
+      collection.update_all(:assignment_id => assignment_id, :quiz_id => id)
     end
   end
 
@@ -182,9 +183,9 @@ class Quiz < ActiveRecord::Base
     end
 
     # TODO: this is hacky, but we don't want callbacks to run because we're in an after_save. Refactor.
-    Quiz.update_all({ :unpublished_question_count => cnt }, { :id => self.id })
+    Quiz.where(:id => self).update_all(:unpublished_question_count => cnt)
     self.unpublished_question_count = cnt
-  rescue => e
+  rescue
   end
   
   def for_assignment?
@@ -276,7 +277,7 @@ class Quiz < ActiveRecord::Base
       self.context_module_tags.each { |tag| tag.confirm_valid_module_requirements }
     end
     if !self.graded? && (@old_assignment_id || self.last_assignment_id)
-      Assignment.update_all({:workflow_state => 'deleted', :updated_at => Time.now.utc}, {:id => [@old_assignment_id, self.last_assignment_id].compact, :submission_types => 'online_quiz'})
+      Assignment.where(:id => [@old_assignment_id, self.last_assignment_id].compact, :submission_types => 'online_quiz').update_all(:workflow_state => 'deleted', :updated_at => Time.now.utc)
       self.quiz_submissions.each do |qs|
         submission = qs.submission
         qs.submission = nil
@@ -290,7 +291,7 @@ class Quiz < ActiveRecord::Base
     if self.assignment && (@assignment_id_set || self.for_assignment?) && @saved_by != :assignment
       if !self.graded? && @old_assignment_id
       else
-        Quiz.update_all({:workflow_state => 'deleted', :assignment_id => nil, :updated_at => Time.now.utc}, ["assignment_id = ? AND id != ?", self.assignment_id, self.id]) if self.assignment_id
+        Quiz.where("assignment_id=? AND id<>?", self.assignment_id, self).update_all(:workflow_state => 'deleted', :assignment_id => nil, :updated_at => Time.now.utc) if self.assignment_id
         a = self.assignment
         a.points_possible = self.points_possible
         a.description = self.description
@@ -307,7 +308,7 @@ class Quiz < ActiveRecord::Base
           @notify_of_update ? a.save : a.save_without_broadcasting!
         end
         self.assignment_id = a.id
-        Quiz.update_all({:assignment_id => a.id}, {:id => self.id})
+        Quiz.where(:id => self).update_all(:assignment_id => a)
       end
     end
   end
@@ -320,10 +321,10 @@ class Quiz < ActiveRecord::Base
   def update_quiz_submission_end_at_times
     new_end_at = time_limit * 60.0
 
-    update_sql = case ActiveRecord::Base.connection.adapter_name.downcase
-                 when /postgres/
+    update_sql = case ActiveRecord::Base.connection.adapter_name
+                 when 'PostgreSQL'
                    "started_at + INTERVAL '+? seconds'"
-                 when /mysql/
+                 when 'MySQL', 'Mysql2'
                    "started_at + INTERVAL ? SECOND"
                  when /sqlite/
                    "DATETIME(started_at, '+? seconds')"
@@ -340,7 +341,7 @@ class Quiz < ActiveRecord::Base
       #{update_sql} > end_at
     END
 
-    QuizSubmission.update_all(["end_at = #{update_sql}", new_end_at], [where_clause, self.id, new_end_at]);
+    QuizSubmission.where(where_clause, self, new_end_at).update_all(["end_at = #{update_sql}", new_end_at])
   end
 
   workflow do
@@ -454,9 +455,9 @@ class Quiz < ActiveRecord::Base
   
   def generate_submission_question(q)
     @idx ||= 1
-    q[:name] = "Question #{@idx}"
+    q[:name] = t :question_name_counter, "Question %{question_number}", :question_number => @idx
     if q[:question_type] == 'text_only_question'
-      q[:name] = "Spacer"
+      q[:name] = t :default_text_only_question_name, "Spacer"
       @idx -= 1
     elsif q[:question_type] == 'fill_in_multiple_blanks_question'
       text = q[:question_text]
@@ -503,7 +504,6 @@ class Quiz < ActiveRecord::Base
   def find_or_create_submission(user, temporary=false, state=nil)
     s = nil
     state ||= 'untaken'
-    attempts = 0
     if temporary || !user.is_a?(User)
       user_code = "#{user.to_s}"
       user_code = "user_#{user.id}" if user.is_a?(User)
@@ -876,352 +876,34 @@ class Quiz < ActiveRecord::Base
     end
   end
 
-  def submissions_for_statistics(include_all_versions=true)
-    ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
-      for_users = context.student_ids
-      self.quiz_submissions.scoped(:include => [:versions], :conditions => { :user_id => for_users }).
-        map { |qs| if include_all_versions then qs.submitted_versions else qs.latest_submitted_version end }.
-        flatten.
-        compact.
-        select{ |s| s.completed? && s.submission_data.is_a?(Array) }.
-        sort_by(&:updated_at).
-        reverse
-    end
+  def statistics(include_all_versions = true)
+    quiz_statistics.build(
+      :includes_all_versions => include_all_versions
+    ).generate
   end
 
+  # returns the QuizStatistics object that will ultimately contain the csv
+  # (it may be generating in the background)
   def statistics_csv(options={})
-    options ||= {}
-    columns = []
-    columns << t('statistics.csv_columns.name', 'name') unless options[:anonymous]
-    columns << t('statistics.csv_columns.id', 'id') unless options[:anonymous]
-    columns << t('statistics.csv_columns.sis_id', 'sis_id') unless options[:anonymous]
-    columns << t('statistics.csv_columns.section', 'section')
-    columns << t('statistics.csv_columns.section_id', 'section_id')
-    columns << t('statistics.csv_columns.section_sis_id', 'section_sis_id')
-    columns << t('statistics.csv_columns.submitted', 'submitted')
-    columns << t('statistics.csv_columns.attempt', 'attempt') if options[:include_all_versions]
-    first_question_index = columns.length
-    submissions = submissions_for_statistics(options[:include_all_versions])
-    found_question_ids = {}
-    quiz_datas = [quiz_data] + submissions.map(&:quiz_data)
-    quiz_datas.each do |quiz_data|
-      quiz_data.each do |question|
-        next if question['entry_type'] == 'quiz_group'
-        if !found_question_ids[question[:id]]
-          columns << "#{question[:id]}: #{strip_tags(question[:question_text])}"
-          columns << question[:points_possible]
-          found_question_ids[question[:id]] = true
-        end
-      end
-    end
-    last_question_index = columns.length - 1
-    columns << t('statistics.csv_columns.n_correct', 'n correct')
-    columns << t('statistics.csv_columns.n_incorrect', 'n incorrect')
-    columns << t('statistics.csv_columns.score', 'score')
-    rows = []
-    submissions.each do |submission|
-      row = []
-      row << submission.user.name unless options[:anonymous]
-      row << submission.user_id unless options[:anonymous]
-      row << submission.user.sis_pseudonym_for(context.account).try(:sis_user_id) unless options[:anonymous]
-      section_name = []
-      section_id = []
-      section_sis_id = []
-      enrollments = submission.quiz.context.student_enrollments.active.where(:user_id => submission.user_id).each do |enrollment|
-        section_name << enrollment.course_section.name
-        section_id << enrollment.course_section.id
-        section_sis_id << enrollment.course_section.try(:sis_source_id)
-      end
-      row << section_name.join(", ")
-      row << section_id.join(", ")
-      row << section_sis_id.join(", ")
-      row << submission.finished_at
-      row << submission.attempt if options[:include_all_versions]
-      columns[first_question_index..last_question_index].each do |id|
-        next unless id.is_a?(String)
-        id = id.to_i
-        answer = submission.submission_data.detect{|a| a[:question_id] == id }
-        question = submission.quiz_data.detect{|q| q[:id] == id}
-        unless question
-          # if this submission didn't answer this question, fill in with blanks
-          row << ''
-          row << ''
-          next
-        end
-        strip_html_answers(question)
-        answer_item = question && question[:answers].detect{|a| a[:id] == answer[:answer_id]}
-        answer_item ||= answer
-        if question[:question_type] == 'fill_in_multiple_blanks_question'
-          blank_ids = question[:answers].map{|a| a[:blank_id] }.uniq
-          row << blank_ids.map{|blank_id| answer["answer_for_#{blank_id}".to_sym].try(:gsub, /,/, '\,') }.compact.join(',')
-        elsif question[:question_type] == 'multiple_answers_question'
-          row << question[:answers].map{|a| answer["answer_#{a[:id]}".to_sym] == '1' ? a[:text].gsub(/,/, '\,') : nil }.compact.join(',')
-        elsif question[:question_type] == 'multiple_dropdowns_question'
-          blank_ids = question[:answers].map{|a| a[:blank_id] }.uniq
-          answer_ids = blank_ids.map{|blank_id| answer["answer_for_#{blank_id}".to_sym] }
-          row << answer_ids.map{|id| (question[:answers].detect{|a| a[:id] == id } || {})[:text].try(:gsub, /,/, '\,' ) }.compact.join(',')
-        elsif question[:question_type] == 'calculated_question'
-          list = question[:answers][0][:variables].map{|a| [a[:name],a[:value].to_s].map{|str| str.gsub(/=>/, '\=>') }.join('=>') }
-          list << answer[:text]
-          row << list.map{|str| (str || '').gsub(/,/, '\,') }.join(',')
-        elsif question[:question_type] == 'matching_question'
-          answer_ids = question[:answers].map{|a| a[:id] }
-          answer_and_matches = answer_ids.map{|id| [id, answer["answer_#{id}".to_sym].to_i] }
-          row << answer_and_matches.map{|id, match_id| 
-            res = []
-            res << (question[:answers].detect{|a| a[:id] == id } || {})[:text]
-            match = question[:matches].detect{|m| m[:match_id] == match_id } || question[:answers].detect{|m| m[:match_id] == match_id} || {}
-            res << (match[:right] || match[:text])
-            res.map{|s| (s || '').gsub(/=>/, '\=>')}.join('=>').gsub(/,/, '\,') 
-          }.join(',')
-        elsif question[:question_type] == 'numerical_question'
-          row << (answer && answer[:text])
-        else
-          row << ((answer_item && answer_item[:text]) || '')
-        end
-        row << (answer ? answer[:points] : "")
-      end
-      row << submission.submission_data.select{|a| a[:correct] }.length
-      row << submission.submission_data.reject{|a| a[:correct] }.length
-      row << submission.score
-      rows << row
-    end
-    FasterCSV.generate do |csv|
-      columns.each_with_index do |val, idx|
-        r = []
-        r << val
-        r << ''
-        rows.each do |row|
-          r << row[idx]
-        end
-        csv << r
-      end
-    end
-  end
-
-  def statistics(include_all_versions=true)
-    submissions = submissions_for_statistics(include_all_versions)
-    questions = (self.quiz_data || []).map{|q| q[:questions] ? q[:questions] : [q] }.flatten
-    stats = {}
-    found_ids = {}
-    score_counter = Stats::Counter.new
-    question_ids = []
-    questions_hash = {}
-    stats[:questions] = []
-    stats[:multiple_attempts_exist] = submissions.any?{|s| s.attempt && s.attempt > 1 }
-    stats[:multiple_attempts_included] = include_all_versions
-    stats[:submission_user_ids] = []
-    stats[:submission_count] = 0
-    stats[:submission_score_tally] = 0
-    stats[:submission_incorrect_tally] = 0
-    stats[:unique_submission_count] = 0
-    stats[:submission_correct_tally] = 0
-    stats[:submission_duration_tally] = 0
-    submissions.each do |sub|
-      stats[:submission_count] += 1
-      stats[:submission_user_ids] << sub.user_id if sub.user_id > 0
-      if !found_ids[sub.id]
-        stats[:unique_submission_count] += 1
-        found_ids[sub.id] = true
-      end
-      answers = sub.submission_data || []
-      next unless answers.is_a?(Array)
-      points = answers.map{|a| a[:points] }.sum
-      score_counter << points
-      stats[:submission_score_tally] += points
-      stats[:submission_incorrect_tally] += answers.count{|a| a[:correct] == false }
-      stats[:submission_correct_tally] += answers.count{|a| a[:correct] == true }
-      stats[:submission_duration_tally] += ((sub.finished_at - sub.started_at).to_i rescue 30)
-      sub.quiz_data.each do |question|
-        question_ids << question[:id]
-        questions_hash[question[:id]] ||= question
-      end
-    end
-    stats[:submission_score_average] = score_counter.mean
-    stats[:submission_score_high] = score_counter.max
-    stats[:submission_score_low] = score_counter.min
-    stats[:submission_duration_average] = stats[:submission_count] > 0 ? stats[:submission_duration_tally].to_f / stats[:submission_count].to_f : 0
-    stats[:submission_score_stdev] = score_counter.standard_deviation
-    stats[:submission_incorrect_count_average] = stats[:submission_count] > 0 ? stats[:submission_incorrect_tally].to_f / stats[:submission_count].to_f : 0
-    stats[:submission_correct_count_average] = stats[:submission_count] > 0 ? stats[:submission_correct_tally].to_f / stats[:submission_count].to_f : 0
-    assessment_questions = question_ids.empty? ? [] : AssessmentQuestion.find_all_by_id(question_ids).compact
-    question_ids.uniq.each do |id|
-      obj = questions.detect{|q| q[:answers] && q[:id] == id }
-      if !obj && questions_hash[id]
-        obj = questions_hash[id]
-        aq_name = assessment_questions.detect{|q| q.id == obj[:assessment_question_id] }.try(:name)
-        obj[:name] = aq_name || obj[:name]
-      end
-      if obj[:answers] && obj[:question_type] != 'text_only_question'
-        stat = stats_for_question(obj, submissions)
-        stats[:questions] << ['question', stat]
-      end
-    end
-    stats[:last_submission_at] = submissions.map{|s| s.finished_at }.compact.max || self.created_at
-    stats
-  end
-
-  def stats_for_question(question, submissions)
-    res = question
-    res[:responses] = 0
-    res[:response_values] = []
-    res[:unexpected_response_values] = []
-    res[:user_ids] = []
-    res[:answers] = question[:answers].map{|a| 
-      answer = a
-      answer[:responses] = 0
-      answer[:user_ids] = []
-      answer
+    quiz_stats_opts = {
+      :includes_all_versions => options[:include_all_versions],
+      :anonymous => options[:anonymous]
     }
-    strip_html_answers(res)
-    res[:multiple_responses] = true if question[:question_type] == 'calculated_question'
-    if question[:question_type] == 'numerical_question'
-      res[:answers].each do |answer|
-        if answer[:numerical_answer_type] == 'exact_answer'
-          answer[:text] = t('statistics.exact_answer', "%{exact_value} +/- %{margin}", :exact_value => answer[:exact], :margin => answer[:margin])
-        else
-          answer[:text] = t('statistics.inexact_answer', "%{lower_bound} to %{upper_bound}", :lower_bound => answer[:start], :upper_bound => answer[:end])
-        end
-      end
-    end
-    if question[:question_type] == 'matching_question'
-      res[:multiple_responses] = true
-      res[:answers].each_with_index do |answer, idx|
-        res[:answers][idx][:answer_matches] = []
-        (res[:matches] || res[:answers]).each do |right|
-          match_answer = res[:answers].find{|a| a[:match_id].to_i == right[:match_id].to_i }
-          match = {:responses => 0, :text => (right[:right] || right[:text]), :user_ids => [], :id => match_answer ? match_answer[:id] : right[:match_id] }
-          res[:answers][idx][:answer_matches] << match
-        end
-      end
-    elsif ['fill_in_multiple_blanks_question', 'multiple_dropdowns_question'].include?(question[:question_type])
-      res[:multiple_responses] = true
-      answer_keys = {}
-      answers = []
-      res[:answers].each_with_index do |answer, idx|
-        if !answer_keys[answer[:blank_id]]
-          answers << {:id => answer[:blank_id], :text => answer[:blank_id], :blank_id => answer[:blank_id], :answer_matches => [], :responses => 0, :user_ids => []}
-          answer_keys[answer[:blank_id]] = answers.length - 1
-        end
-      end
-      answers.each do |found_answer|
-        res[:answers].select{|a| a[:blank_id] == found_answer[:blank_id] }.each do |sub_answer|
-          correct = sub_answer[:weight] == 100
-          match = {:responses => 0, :text => sub_answer[:text], :user_ids => [], :id => question[:question_type] == 'fill_in_multiple_blanks_question' ? found_answer[:blank_id] : sub_answer[:id], :correct => correct}
-          found_answer[:answer_matches] << match
-        end
-      end
-      res[:answer_sets] = answers
-    end
-    submissions.each do |submission|
-      answers = submission.submission_data || []
-      response = answers.detect{|a| a[:question_id] == question[:id] }
-      if response
-        res[:responses] += 1
-        res[:response_values] << response[:text]
-        res[:user_ids] << submission.user_id
-        if question[:question_type] == 'matching_question'
-          res[:multiple_answers] = true
-          res[:answers].each_with_index do |answer, idx|
-            res[:answers][idx][:responses] += 1 if response[:correct]
-            (res[:matches] || res[:answers]).each_with_index do |right, jdx|
-              if response["answer_#{answer[:id]}".to_sym].to_i == right[:match_id]
-                res[:answers][idx][:answer_matches][jdx][:responses] += 1
-                res[:answers][idx][:answer_matches][jdx][:user_ids] << submission.user_id
-              end
-            end
-          end
-        elsif question[:question_type] == 'fill_in_multiple_blanks_question'
-          res[:multiple_answers] = true
-          res[:answer_sets].each_with_index do |answer, idx|
-            found = false
-            response_hash_id = Digest::MD5.hexdigest(response["answer_for_#{answer[:blank_id]}".to_sym].strip) if !response["answer_for_#{answer[:blank_id]}".to_sym].try(:strip).blank?
-            res[:answer_sets][idx][:responses] += 1 if response[:correct]
-            res[:answer_sets][idx][:answer_matches].each_with_index do |right, jdx|
-              if response["answer_for_#{answer[:blank_id]}".to_sym] == right[:text]
-                found = true
-                res[:answer_sets][idx][:answer_matches][jdx][:responses] += 1
-                res[:answer_sets][idx][:answer_matches][jdx][:user_ids] << submission.user_id
-              end
-            end
-            if !found
-              if response_hash_id
-                answer = {:id => response_hash_id, :responses => 1, :user_ids => [submission.user_id], :text => response["answer_for_#{answer[:blank_id]}".to_sym]}
-                res[:answer_sets][idx][:answer_matches] << answer
-              end
-            end
-          end
-        elsif question[:question_type] == 'multiple_dropdowns_question'
-          res[:multiple_answers] = true
-          res[:answer_sets].each_with_index do |answer, idx|
-            res[:answer_sets][idx][:responses] += 1 if response[:correct]
-            res[:answer_sets][idx][:answer_matches].each_with_index do |right, jdx|
-              if response["answer_id_for_#{answer[:blank_id]}".to_sym] == right[:id]
-                res[:answer_sets][idx][:answer_matches][jdx][:responses] += 1
-                res[:answer_sets][idx][:answer_matches][jdx][:user_ids] << submission.user_id
-              end
-            end
-          end
-        elsif question[:question_type] == 'multiple_answers_question'
-          res[:answers].each_with_index do |answer, idx|
-            if response["answer_#{answer[:id]}".to_sym] == '1'
-              res[:answers][idx][:responses] += 1
-              res[:answers][idx][:user_ids] << submission.user_id
-            end
-          end
-        elsif question[:question_type] == 'calculated_question'
-          found = false
-          response_hash_id = Digest::MD5.hexdigest(response[:text].strip.to_f.to_s) if !response[:text].try(:strip).blank?
-          res[:answers].each_with_index do |answer, idx|
-            if res[:answers][idx][:id] == response[:answer_id] || res[:answers][idx][:id] == response_hash_id
-              found = true
-              res[:answers][idx][:numbers] ||= {}
-              res[:answers][idx][:numbers][response[:text].to_f] ||= {:responses => 0, :user_ids => [], :correct => true}
-              res[:answers][idx][:numbers][response[:text].to_f][:responses] += 1
-              res[:answers][idx][:numbers][response[:text].to_f][:user_ids] << submission.user_id
-              res[:answers][idx][:responses] += 1
-              res[:answers][idx][:user_ids] << submission.user_id
-            end
-          end
-          if !found
-            if ['numerical_question', 'short_answer_question'].include?(question[:question_type]) && response_hash_id
-              answer = {:id => response_hash_id, :responses => 1, :user_ids => [submission.user_id], :text => response[:text].to_f.to_s}
-              res[:answers] << answer
-            end
-          end
-        elsif question[:question_type] == 'text_only_question'
-        elsif question[:question_type] == 'essay_question'
-          res[:essay_responses] ||= []
-          res[:essay_responses] << {:user_id => submission.user_id, :text => response[:text].strip}
-        else
-          found = false
-          response_hash_id = Digest::MD5.hexdigest(response[:text].strip) if !response[:text].try(:strip).blank?
-          res[:answers].each_with_index do |answer, idx|
-            if answer[:id] == response[:answer_id] || answer[:id] == response_hash_id
-              found = true
-              res[:answers][idx][:responses] += 1
-              res[:answers][idx][:user_ids] << submission.user_id
-            end
-          end
-          if !found
 
-            if ['numerical_question', 'short_answer_question'].include?(question[:question_type]) && response_hash_id
-              answer = {:id => response_hash_id, :responses => 1, :user_ids => [submission.user_id], :text => response[:text]}
-              res[:answers] << answer
-            end
-          end
-        end
-      end
+    last_quiz_activity = [
+      published_at || created_at,
+      quiz_submissions.completed.order(:updated_at).pluck(:updated_at).last
+    ].compact.max
+
+    candidate_stats = quiz_statistics.where(quiz_stats_opts).last
+
+    if candidate_stats.nil? || candidate_stats.created_at < last_quiz_activity
+      stats = quiz_statistics.create!(quiz_stats_opts)
+      stats.generate_csv
+      stats
+    else
+      candidate_stats
     end
-    none = {
-      :responses => res[:responses] - res[:answers].map{|a| a[:responses] || 0}.sum,
-      :id => "none",
-      :weight => 0,
-      :text => t('statistics.no_answer', "No Answer"),
-      :user_ids => res[:user_ids] - res[:answers].map{|a| a[:user_ids] }.flatten
-    } rescue nil
-    res[:answers] << none if none && none[:responses] > 0
-    res
   end
 
   def unpublished_changes?
@@ -1269,7 +951,7 @@ class Quiz < ActiveRecord::Base
           assessment[:migration] = migration
           Quiz.import_from_migration(assessment, migration.context, question_data, nil, allow_update)
         rescue
-          migration.add_warning(t('warnings.import_from_migration_failed', "Couldn't import the quiz \"%{quiz_title}\"", :quiz_title => assessment[:title]), $!)
+          migration.add_import_warning(t('#migration.quiz_type', "Quiz"), assessment[:title], $!)
         end
       end
     end
@@ -1296,7 +978,8 @@ class Quiz < ActiveRecord::Base
     item.unlock_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:unlock_at]) if hash[:unlock_at]
     item.due_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:due_at]) if hash[:due_at]
     item.scoring_policy = hash[:which_attempt_to_keep] if hash[:which_attempt_to_keep]
-    item.description = ImportedHtmlConverter.convert(hash[:description], context)
+    hash[:missing_links] = []
+    item.description = ImportedHtmlConverter.convert(hash[:description], context, {:missing_links => hash[:missing_links]})
     [:migration_id, :title, :allowed_attempts, :time_limit,
      :shuffle_answers, :show_correct_answers, :points_possible, :hide_results,
      :access_code, :ip_filter, :scoring_policy, :require_lockdown_browser,
@@ -1307,11 +990,18 @@ class Quiz < ActiveRecord::Base
     end
     
     item.save!
+
+    if context.respond_to?(:content_migration) && context.content_migration
+      context.content_migration.add_missing_content_links(:class => item.class.to_s,
+        :id => item.id, :missing_links => hash[:missing_links],
+        :url => "/#{context.class.to_s.underscore.pluralize}/#{context.id}/#{item.class.to_s.underscore.pluralize}/#{item.id}")
+    end
+
     if question_data
       hash[:questions] ||= []
 
       if question_data[:qq_data]
-        questions_to_update = item.quiz_questions.scoped(:conditions => {:migration_id => question_data[:qq_data].keys})
+        questions_to_update = item.quiz_questions.where(:migration_id => question_data[:qq_data].keys)
         questions_to_update.each do |question_to_update|
           question_data[:qq_data].values.find{|q| q['migration_id'].eql?(question_to_update.migration_id)}['quiz_question_id'] = question_to_update.id
         end
@@ -1397,26 +1087,17 @@ class Quiz < ActiveRecord::Base
     given { |user, session| self.available? && self.cached_context_grants_right?(user, session, :participate_as_student) }#students.include?(user) }
     can :read and can :submit
   end
-  named_scope :include_assignment, lambda{
-    { :include => :assignment }
-  }
-  named_scope :before, lambda{|date|
-    {:conditions => ['quizzes.created_at < ?', date]}
-  }
-  named_scope :active, lambda{
-    {:conditions => ['quizzes.workflow_state != ?', 'deleted'] }
-  }
-  named_scope :not_for_assignment, lambda{
-    {:conditions => ['quizzes.assignment_id IS NULL'] }
-  }
+  scope :include_assignment, includes(:assignment)
+  scope :before, lambda { |date| where("quizzes.created_at<?", date) }
+  scope :active, where("quizzes.workflow_state<>'deleted'")
+  scope :not_for_assignment, where(:assignment_id => nil)
 
   def migrate_file_links
     QuizQuestionLinkMigrator.migrate_file_links_in_quiz(self)
   end
 
   def self.batch_migrate_file_links(ids)
-    quizzes = Quiz.find(:all, :conditions => ['id in (?)', ids])
-    quizzes.each do |quiz|
+    Quiz.where(:id => ids).each do |quiz|
       if quiz.migrate_file_links
         quiz.save
       end
@@ -1446,7 +1127,9 @@ class Quiz < ActiveRecord::Base
   end
 
   def access_code_key_for_user(user)
-    "quiz_#{id}_#{user.id}_entered_access_code"
+    # user might be nil (practice quiz in public course) and isn't really
+    # necessary for this key anyway, but maintain backwards compat
+    "quiz_#{id}_#{user.try(:id)}_entered_access_code"
   end
 
   def group_category_id
@@ -1456,5 +1139,14 @@ class Quiz < ActiveRecord::Base
   def publish!
     self.workflow_state = 'available'
     save!
+  end
+
+  # marks a quiz as having unpublished changes
+  def self.mark_quiz_edited(id)
+    where(:id =>id).update_all(:last_edited_at => Time.now.utc)
+  end
+
+  def anonymous_survey?
+    survey? && anonymous_submissions
   end
 end

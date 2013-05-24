@@ -1,7 +1,7 @@
 module Technoweenie # :nodoc:
   module AttachmentFu # :nodoc:
     @@default_processors = %w(ImageScience Rmagick MiniMagick Gd2 CoreImage)
-    @@tempfile_path      = File.join(RAILS_ROOT, 'tmp', 'attachment_fu')
+    @@tempfile_path      = Rails.root.join('tmp', 'attachment_fu').to_s
     # Instructure: I (ryan shaw) just copied and pasted this from http://github.com/technoweenie/attachment_fu/blob/master/lib/technoweenie/attachment_fu.rb
     @@content_types      = [
       'image/jpeg',
@@ -163,7 +163,7 @@ module Technoweenie # :nodoc:
       end
 
       def self.extended(base)
-        base.class_inheritable_accessor :attachment_options
+        base.class_attribute :attachment_options
         base.before_destroy :destroy_thumbnails
         base.before_validation :set_size_from_temp_path
         base.after_save :after_process_attachment
@@ -223,7 +223,7 @@ module Technoweenie # :nodoc:
 
       # Copies the given file path to a new tempfile, returning the closed tempfile.
       def copy_to_temp_file(file, temp_base_name)
-        returning Tempfile.new(temp_base_name, Technoweenie::AttachmentFu.tempfile_path) do |tmp|
+        Tempfile.new(temp_base_name, Technoweenie::AttachmentFu.tempfile_path).tap do |tmp|
           tmp.close
           FileUtils.cp file, tmp.path
         end
@@ -231,7 +231,7 @@ module Technoweenie # :nodoc:
 
       # Writes the given data to a new tempfile, returning the closed tempfile.
       def write_to_temp_file(data, temp_base_name)
-        returning Tempfile.new(temp_base_name, Technoweenie::AttachmentFu.tempfile_path) do |tmp|
+        Tempfile.new(temp_base_name, Technoweenie::AttachmentFu.tempfile_path).tap do |tmp|
           tmp.binmode
           tmp.write data
           tmp.close
@@ -276,7 +276,7 @@ module Technoweenie # :nodoc:
       # Creates or updates the thumbnail for the current attachment.
       def create_or_update_thumbnail(temp_file, file_name_suffix, *size)
         thumbnailable? || raise(ThumbnailError.new("Can't create a thumbnail if the content type is not an image or there is no parent_id column"))
-        returning find_or_initialize_thumbnail(file_name_suffix) do |thumb|
+        find_or_initialize_thumbnail(file_name_suffix).tap do |thumb|
           thumb.attributes = {
             :content_type             => content_type,
             :filename                 => thumbnail_name_for(file_name_suffix),
@@ -398,8 +398,8 @@ module Technoweenie # :nodoc:
 
       def find_existing_attachment_for_md5
         if self.md5.present? && ns = self.infer_namespace
-          scope = Attachment.scoped(:conditions => ["md5 = ? AND namespace = ? AND root_attachment_id IS NULL AND content_type = ?", md5, ns, content_type])
-          scope = scope.scoped(:conditions => ["id <> ?", id]) unless new_record?
+          scope = Attachment.where(:md5 => md5, :namespace => ns, :root_attachment_id => nil, :content_type => content_type)
+          scope = scope.where("id<>?", self) unless new_record?
           scope.first
         end
       end
@@ -482,7 +482,7 @@ module Technoweenie # :nodoc:
         end
 
         def sanitize_filename(filename)
-          returning filename.strip do |name|
+          filename.strip.tap do |name|
             # NOTE: File.basename doesn't work right with Windows paths on Unix
             # get only the filename, not the whole path
             name.gsub! /^.*(\\|\/)/, ''

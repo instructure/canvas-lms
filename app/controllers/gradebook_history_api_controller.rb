@@ -56,26 +56,18 @@
 #
 # @object SubmissionVersion
 #     {
+#       // A SubmissionVersion object contains all the fields that a Submission
+#       // object does, plus additional fields prefixed with current_* new_* and
+#       // previous_* described below.
+#
 #       // the id of the assignment this submissions is for
 #       assignment_id: 22604
 #
 #       // the name of the assignment this submission is for
 #       assignment_name: "some assignment"
 #
-#       // the id of the primary attachment
-#       attachment_id: null
-#
-#       // other attachment ids
-#       attachment_ids: null
-#
 #       // the body text of the submission
 #       body: "text from the submission"
-#
-#       // the id of the course to which this submission belongs
-#       course_id: 27955
-#
-#       // timestamp for the creation of this submission version
-#       created_at: "2013-01-31T18:16:31Z"
 #
 #       // the most up to date grade for the current version of this submission
 #       current_grade: "100"
@@ -92,19 +84,13 @@
 #       // time stamp for the grading of this version of the submission
 #       graded_at: "2013-01-31T18:16:31Z"
 #
-#       // date on which this version of the submission was graded
-#       graded_on: "2013-01-31"
-#
 #       // the name of the user who graded this version of the submission
 #       grader: "Grader Name"
 #
 #       // the user id of the user who graded this version of the submission
 #       grader_id: 67379
 #
-#       // the id of the group to which this submission belongs
-#       group_id: null
-#
-#       // alias for submission_id, the id of the submission of which this is a version
+#       // the id of the submission of which this is a version
 #       id: 11607
 #
 #       // the updated grade provided in this version of the submission
@@ -125,46 +111,19 @@
 #       // the name of the grader who graded the version of this submission immediately preceding this one
 #       previous_grader: "Graded on submission"
 #
-#       // the number of attempts at processing this submission
-#       process_attempts: 1
-#
-#       // whether the submission was processed or not (boolean)
-#       processed: false
-#
-#       // the final grade retained for publishing in the gradebook
-#       published_grade: "100"
-#
-#       // the final score retained for publishing in the gradebook
-#       published_score: 100
-#
-#       // the grader id (which will be 0 if there isn't one available)
-#       safe_grader_id:=>67379
-#
 #       // the score for this version of the submission
 #       score: 100
 #
-#       // the score entered by the student
-#       student_entered_score: null
-#
-#       // the user ID of the student who created this submission
-#       student_user_id: 67376
-#
-#       // the ID of the submission of which this is a version
-#       submission_id: 11607
-#
 #       // the name of the student who created this submission
-#       student_name: "student@example.com"
+#       user_name: "student@example.com"
 #
 #       // the type of submission
 #       submission_type: 'online'
 #
-#       // the time stamp of the most recent update to this record
-#       updated_at: "2013-01-31T18:16:31Z"
-#
 #       // the url of the submission, if there is one
 #       url: null
 #
-#       // alias for 'student_user_id'
+#       // the user ID of the student who created this submission
 #       user_id: 67376
 #
 #       // the state of the submission at this version
@@ -186,6 +145,7 @@
 
 class GradebookHistoryApiController < ApplicationController
   before_filter :require_context
+  before_filter :require_manage_grades
 
   include Api::V1::GradebookHistory
 
@@ -197,10 +157,8 @@ class GradebookHistoryApiController < ApplicationController
   #
   # @returns [Day]
   def days
-    if authorized_action(@context, @current_user, :manage_grades)
-      days_hash = days_json(@context, api_context(api_v1_gradebook_history_url(@context)))
-      render :json => days_hash.to_json
-    end
+    days_hash = days_json(@context, api_context(api_v1_gradebook_history_url(@context)))
+    render :json => days_hash.to_json
   end
 
   # @API Details for a given date in gradebook history for this course
@@ -216,12 +174,10 @@ class GradebookHistoryApiController < ApplicationController
   #
   # @returns [Grader]
   def day_details
-    if authorized_action(@context, @current_user, :manage_grades)
-      date = Date.strptime(params[:date], '%Y-%m-%d').in_time_zone
-      path = api_v1_gradebook_history_for_day_url(@context, params[:date])
-      day_hash = json_for_date(date, @context, api_context(path))
-      render :json => day_hash.to_json
-    end
+    date = Date.strptime(params[:date], '%Y-%m-%d').in_time_zone
+    path = api_v1_gradebook_history_for_day_url(@context, params[:date])
+    day_hash = json_for_date(date, @context, api_context(path))
+    render :json => day_hash.to_json
   end
 
   # @API Lists submissions
@@ -241,15 +197,63 @@ class GradebookHistoryApiController < ApplicationController
   #
   # @returns [SubmissionHistory]
   def submissions
-    if authorized_action(@context, @current_user, :manage_grades)
-      date = Date.strptime(params[:date], '%Y-%m-%d').in_time_zone
-      path = api_v1_gradebook_history_submissions_url(@context, params[:date], params[:grader_id], params[:assignment_id])
-      submissions_hash = submissions_for(@context, api_context(path), date, params[:grader_id], params[:assignment_id])
-      render :json => submissions_hash.to_json
-    end
+    date = Date.strptime(params[:date], '%Y-%m-%d').in_time_zone
+    path = api_v1_gradebook_history_submissions_url(@context, params[:date], params[:grader_id], params[:assignment_id])
+    submissions_hash = submissions_for(@context, api_context(path), date, params[:grader_id], params[:assignment_id])
+    render :json => submissions_hash.to_json
+  end
+
+  # @API List uncollated submission versions
+  #
+  # Gives a paginated, uncollated list of submission versions for all matching
+  # submissions in the context. This SubmissionVersion objects will not include
+  # the +new_grade+ or +previous_grade+ keys, only the +grade+; same for
+  # +graded_at+ and +grader+.
+  #
+  # @argument course_id [Integer]
+  #   The id of the contextual course for this API call
+  #
+  # @argument assignment_id [Integer, Optional]
+  #   The ID of the assignment for which you want to see submissions. If
+  #   absent, versions of submissions from any assignment in the course are
+  #   included.
+  #
+  # @argument user_id [Integer, Optional]
+  #   The ID of the user for which you want to see submissions. If absent,
+  #   versions of submissions from any user in the course are included.
+  #
+  # @argument ascending [Boolean, Optional]
+  #   Returns submission versions in ascending date order (oldest first). If
+  #   absent, returns submission versions in descending date order (newest
+  #   first).
+  #
+  # @returns [SubmissionVersion]
+  def feed
+    student = api_find(User, params[:user_id]) if params[:user_id]
+    assignment = Assignment.find(params[:assignment_id]) if params[:assignment_id]
+
+    # construct scope of interesting submission versions using index table
+    indexed_versions = SubmissionVersion.
+      where(:context_type => 'Course', :context_id => @context).
+      order(params[:ascending] ? :version_id : 'version_id DESC')
+    indexed_versions = indexed_versions.where(:assignment_id => assignment) if assignment
+    indexed_versions = indexed_versions.where(:user_id => student) if student
+
+    # paginate the indexed scope and then convert to actual Version records
+    path = api_v1_gradebook_history_feed_url(@context, params)
+    indexed_versions = Api.paginate(indexed_versions, self, path)
+    SubmissionVersion.send(:preload_associations, indexed_versions, :version)
+    versions = indexed_versions.map(&:version)
+
+    # render them
+    render :json => versions_json(@context, versions, api_context(nil), :assignment => assignment, :student => student)
   end
 
   private
+  def require_manage_grades
+    authorized_action(@context, @current_user, :manage_grades)
+  end
+
   def api_context(path)
     Api::V1::ApiContext.new(self, path, @current_user, session, params.slice(:page))
   end

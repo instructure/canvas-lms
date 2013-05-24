@@ -47,7 +47,7 @@ class CollectionItemUpvote < ActiveRecord::Base
 
     if increment != 0
       collection_item_data.shard.activate do
-        collection_item_data.class.update_all(['upvote_count = upvote_count + ?', increment], :id => collection_item_data.id)
+        collection_item_data.class.where(:id => collection_item_data).update_all(['upvote_count = upvote_count + ?', increment])
       end
     end
   end

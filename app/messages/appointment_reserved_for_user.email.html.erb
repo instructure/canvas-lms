@@ -1,0 +1,56 @@
+<% define_content :link do %>
+  <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.appointment_group.contexts.first) %>/appointment_groups/<%= asset.appointment_group.id %>
+<% end %>
+
+<% define_content :subject do %>
+  <%= t('subject', 'You have been signed up for "%{appointment_name}"', :appointment_name => asset.title) %>
+<% end %>
+
+<p><%= t :message, '%{user} has signed you up for "%{appointment_name}".', :user => data.updating_user.name, :appointment_name => asset.title %></p>
+
+<p><strong><%= t :details, 'Appointment Details' %>:</strong></p>
+<table border="0" style="font-size: 14px; color: #444444;
+    font-family: 'Open Sans', 'Lucida Grande', 'Segoe UI', Arial, Verdana, 'Lucida Sans Unicode', Tahoma, 'Sans Serif';
+    border-collapse: collapse;">
+    <tr>
+        <td style="padding-right: 10px;" valign="top"><%= t :date_and_time, 'Date/time' %>:</td>
+        <td valign="top"><%= datetime_string(asset.start_at, asset.end_at) %></td>
+    </tr>
+    <% if asset.appointment_group.participant_type == 'Group' -%>
+      <tr>
+          <td style="padding-right: 10px;" valign="top"><%= t :attendees, 'Attendees' %>:</td>
+          <td valign="top"><%= asset.participants.map(&:name).to_sentence %></td>
+      </tr>
+      <tr>
+          <td style="padding-right: 10px;" valign="top"><%= t :group, 'Group' %>:</td>
+          <td valign="top"><%= asset.context.name %></td>
+      </tr>
+    <% else %>
+      <tr>
+          <td style="padding-right: 10px;" valign="top"><%= t :attendee, 'Attendee' %>:</td>
+          <td valign="top"><%= asset.context.name %></td>
+      </tr>
+    <% end %>
+    <tr>
+        <td style="padding-right: 10px;" valign="top"><%= t :course, 'Course' %>:</td>
+        <td valign="top"><%= asset.appointment_group.participant_type == 'Group' ?
+                                 asset.appointment_group.contexts.first.name  :
+                                 asset.appointment_group.contexts_for_user(user).map(&:name).join(", ") %></td>
+    </tr>
+    <% if asset.appointment_group.available_slots -%>
+      <tr>
+          <td style="padding-right: 10px;" valign="top"><%= t :slots_remaining, 'Available time slots' %>:</td>
+          <td valign="top"><%= asset.appointment_group.available_slots %></td>
+      </tr>
+    <% end %>
+</table>
+
+<hr style="border: 0;
+    height: 1px;
+    background: #333;
+    background-image: -webkit-linear-gradient(left, #ddd, #aaa, #eee);
+    background-image:    -moz-linear-gradient(left, #ddd, #aaa, #eee);
+    background-image:     -ms-linear-gradient(left, #ddd, #aaa, #eee);
+    background-image:      -o-linear-gradient(left, #ddd, #aaa, #eee);" />
+
+<p><a href="<%= content :link %>"><%= t :link_text, 'Sign up for a different time slot' %></a></p>

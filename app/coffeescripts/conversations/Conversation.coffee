@@ -5,6 +5,13 @@ define [
 ], (Backbone) ->
 
   class Conversation extends Backbone.Model
+
+    # NOTE: This class should be considered deprecated. Please be careful
+    # when modifying it, especially adding functionality.
+    #
+    # Try adding to app/coffeescripts/models/Conversation.coffee first,
+    # which is a version of this model that uses the API.
+
     defaults:
       audience: []
 

@@ -212,7 +212,8 @@ describe CalendarEventsApiController do
     end
 
     it "should require authorization" do
-      expect { get 'public_feed', :format => 'atom', :feed_code => @user.feed_code + 'x' }.to raise_error
+      get 'public_feed', :format => 'atom', :feed_code => @user.feed_code + 'x'
+      response.should render_template('shared/unauthorized_feed')
     end
 
     it "should include absolute path for rel='self' link" do

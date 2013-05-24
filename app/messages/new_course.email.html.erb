@@ -1,0 +1,33 @@
+<% define_content :link do %><%= HostUrl.protocol %>://<%= HostUrl.context_host(asset) %>/courses/<%= asset.id %><% end %>
+<% define_content :subject do %>
+  <%= t :subject, "New Course" %>
+<% end %>
+
+<p><%= t :title, "New Course for %{account}", :account => asset.root_account.name %></p>
+
+<p><%= t :body, "A course, %{course}, has been added for the account %{account}", :course => asset.name, :account => asset.root_account.name %></p>
+
+<% if !asset.teachers.empty? %>
+  <p>
+    <strong><%= before_label :teachers, "Teachers" %></strong>
+    <ul style="padding: 0; list-style: none;">
+      <% asset.teachers.each do |teacher| %>
+        <li>
+          <a href="<%= HostUrl.protocol %>://<%= HostUrl.context_host(asset) %>/users/<%= teacher.id %>"><%= teacher.name %></a>
+          <% if teacher.email %>(<%= teacher.email %>)<% end %>
+        </li>
+      <% end %>
+    </ul>
+  </p>
+<% end %>
+
+<hr style="border: 0;
+    margin-top: 15px;
+    height: 1px;
+    background: #333;
+    background-image: -webkit-linear-gradient(left, #ddd, #aaa, #eee);
+    background-image:    -moz-linear-gradient(left, #ddd, #aaa, #eee);
+    background-image:     -ms-linear-gradient(left, #ddd, #aaa, #eee);
+    background-image:      -o-linear-gradient(left, #ddd, #aaa, #eee);" />
+
+<p><a href="<%= content :link %>"><%= t :link, "Click here to view the course" %></a></p>

@@ -53,6 +53,9 @@ shared_examples_for "external tools tests" do
       f("#external_tool_#{tool.id} .description").text.should == "Description"
       f("#external_tool_#{tool.id} .vendor_help_link").should be_displayed
       f("#external_tool_#{tool.id} .vendor_help_link").text.should == tool.vendor_help_link
+      ContextExternalTool::EXTENSION_TYPES.each do |type|
+        f("#external_tool_#{tool.id} .#{type}").should be_displayed
+      end
     elsif opts.include? :url
       url = "https://lti-examples.heroku.com/tool_redirect"
       kitten_text = "pictures of kittens to your site"
@@ -170,6 +173,12 @@ shared_examples_for "external tools tests" do
     XML
     f("#external_tool_config_xml").send_keys <<-XML
       <lticm:options name="resource_selection">
+        <lticm:property name="url">https://example.com/wiki</lticm:property>
+        <lticm:property name="text">Build/Link to Wiki Page</lticm:property>
+        <lticm:property name="selection_width">500</lticm:property>
+        <lticm:property name="selection_height">300</lticm:property>
+      </lticm:options>
+      <lticm:options name="homework_submission">
         <lticm:property name="url">https://example.com/wiki</lticm:property>
         <lticm:property name="text">Build/Link to Wiki Page</lticm:property>
         <lticm:property name="selection_width">500</lticm:property>

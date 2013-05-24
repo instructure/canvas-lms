@@ -45,8 +45,8 @@
 #   }
 # end
 #
-# u = User.find(:first)
-# a = Account.find(:first)
+# u = User.first
+# a = Account.first
 # a.check_policy(u)
 
 module Instructure #:nodoc:
@@ -227,7 +227,7 @@ module Instructure #:nodoc:
     module SingletonMethods
 
       def self.extended(klass)
-        klass.send(:class_inheritable_accessor, :broadcast_policy_list)
+        klass.send(:class_attribute, :broadcast_policy_list)
       end
 
       # This stores the policy for broadcasting changes on a class.  It works like a
@@ -318,14 +318,6 @@ module Instructure #:nodoc:
       def changed_in_state(state, opts={})
         fields  = opts[:fields] || []
         fields = [fields] unless fields.is_a?(Array)
-
-        # Come back to this to debug some of the notifications
-        # if fields == [:due_at]
-        #   require 'rubygems'
-        #   require 'ruby-debug'
-        #   debugger
-        #   1 + 1
-        # end
 
         begin
           fields.map {|field| self.prior_version.send(field) != self.send(field) }.include?(true) and

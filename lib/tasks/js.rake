@@ -1,5 +1,20 @@
 namespace :js do
 
+  task :dev do
+    Rake::Task['js:generate_runner'].invoke
+    exec('testem -f config/testem.yml')
+  end
+
+  desc 'generate QUnit runner file @ spec/javascripts/runner.html'
+  task :generate_runner do
+    #Rake::Task['js:generate'].invoke
+    require 'canvas/require_js'
+    require 'erubis'
+    output = Erubis::Eruby.new(File.read("#{Rails.root}/spec/javascripts/runner.html.erb")).
+      result(Canvas::RequireJs.get_binding)
+    File.open("#{Rails.root}/spec/javascripts/runner.html", 'w') { |f| f.write(output) }
+  end
+
   desc 'test javascript specs with PhantomJS'
   task :test do
     quick = ENV["quick"] && ENV["quick"] == "true"
@@ -8,13 +23,7 @@ namespace :js do
       Rake::Task['js:generate'].invoke
     end
     puts "--> executing phantomjs tests"
-
-    require 'canvas/require_js'
-    require 'erubis'
-    output = Erubis::Eruby.new(File.read("#{Rails.root}/spec/javascripts/runner.html.erb")).
-      result(Canvas::RequireJs.get_binding)
-    File.open("#{Rails.root}/spec/javascripts/runner.html", 'w') { |f| f.write(output) }
-
+    Rake::Task['js:generate_runner'].invoke
     phantomjs_output = `phantomjs spec/javascripts/support/qunit/test.js file:///#{Dir.pwd}/spec/javascripts/runner.html`
     exit_status = $?.exitstatus
     puts phantomjs_output
@@ -31,7 +40,9 @@ namespace :js do
     destination = coffee_destination(coffee_file).sub(%r{\.coffee$}, '.js')
     FileUtils.mkdir_p(File.dirname(destination))
     File.open(destination, 'wb') do |out|
-      out.write CoffeeScript.compile(File.open(coffee_file))
+      File.open(coffee_file) do |cfile|
+        out.write CoffeeScript.compile(cfile)
+      end
     end
   end
 
@@ -69,7 +80,7 @@ namespace :js do
           Parallel.each(dirs, :in_threads => Parallel.processor_count) do |dir|
             destination = coffee_destination(dir)
             FileUtils.mkdir_p(destination)
-            system("coffee -c -o #{destination} #{dir}/*.coffee")
+            system("coffee -m -c -o #{destination} #{dir}/*.coffee")
             raise "Unable to compile coffeescripts in #{dir}" if $?.exitstatus != 0
           end
         else

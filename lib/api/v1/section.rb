@@ -26,11 +26,11 @@ module Api::V1::Section
     if includes.include?('students')
       proxy = section.enrollments
       if user_json_is_admin?
-        proxy = proxy.scoped(:include => { :user => :pseudonyms })
+        proxy = proxy.includes(:user => :pseudonyms)
       else
-        proxy = proxy.scoped(:include => :user)
+        proxy = proxy.includes(:user)
       end
-      res['students'] = proxy.all(:conditions => "type = 'StudentEnrollment'").
+      res['students'] = proxy.where(:type => 'StudentEnrollment').
         map { |e| user_json(e.user, user, session, includes) }
     end
     res

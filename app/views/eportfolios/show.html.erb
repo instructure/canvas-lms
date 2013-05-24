@@ -44,14 +44,14 @@
           <li><a class="add_content_link add_file_link" href="#"><%= t('links.file_uload', "Image/File Upload") %></a></li>
         </ul>
         <div class="form_content button-container">
-          <button type="button" class="submit_button btn btn-small btn-primary"><%= t('buttons.save_page', "Save Page") %></button>
+          <button type="button" class="cancel_button btn button-secondary btn-small"><%= t('#buttons.cancel', "Cancel") %></button>
           <button type="button" class="preview_button btn btn-small"><%= t('buttons.preview', "Preview") %></button>
-          <button type="button" class="cancel_button button-secondary"><%= t('#buttons.cancel', "Cancel") %></button>
+          <button type="button" class="submit_button btn btn-small btn-primary"><%= t('buttons.save_page', "Save Page") %></button>
         </div>
         <div class="preview_content button-container">
-          <button type="button" class="submit_button btn btn-small btn-primary"><%= t('buttons.save_page', "Save Page") %></button>
+          <button type="button" class="cancel_button btn button-secondary btn-small"><%= t('#buttons.cancel', "Cancel") %></button>
           <button type="button" class="keep_editing_button btn btn-small"><%= t('buttons.keep_editing', "Keep Editing") %></button>
-          <button type="button" class="cancel_button button-secondary"><%= t('#buttons.cancel', "Cancel") %></button>
+          <button type="button" class="submit_button btn btn-small btn-primary"><%= t('buttons.save_page', "Save Page") %></button>
         </div>
       </div>
     </div>
@@ -107,7 +107,7 @@
   <ul class="submission_list" id="recent_submissions" style="max-height: 200px; overflow: auto;">
     <% @portfolio.user.submissions.each do |submission| %>
       <% already_used = (@used_submission_ids.include?(submission.id) rescue false) %>
-      <li class="submission <%= 'already_used' if already_used %>" title="<%= t('titles.already_used', "This submission is already included in your portfolio") if already_used %>" id="recent_submission_<%= submission.id %>">
+      <li class="clearfix submission <%= 'already_used' if already_used %>" title="<%= t('titles.already_used', "This submission is already included in your portfolio") if already_used %>" id="recent_submission_<%= submission.id %>">
         <a href="<%= eportfolio_entry_preview_submission_path(@portfolio, @page, submission.id) %>" style="display: none;" class="submission_preview_url"></a>
         <div style="float: right; font-size: 0.8em; color: #aaa; margin-right: 20px; margin-top: 0.5em;">
           <%= datetime_string(submission.submitted_at || submission.updated_at) %>
@@ -221,14 +221,14 @@
     </div>
   </div>
   <div class="form_content button-container">
-    <button type="submit" class="btn btn-primary"><%= t('buttons.save_page', "Save Page") %></button>
+    <button type="button" class="cancel_button btn button-secondary"><%= t('#buttons.cancel', "Cancel") %></button>
     <button type="button" class="preview_button btn"><%= t('buttons.preview', "Preview") %></button>
-    <button type="button" class="cancel_button button-secondary"><%= t('#buttons.cancel', "Cancel") %></button>
+    <button type="submit" class="btn btn-primary"><%= t('buttons.save_page', "Save Page") %></button>
   </div>
   <div class="preview_content button-container">
-    <button type="submit" class="btn btn-primary"><%= t('buttons.save_page', "Save Page") %></button>
+    <button type="button" class="cancel_button btn button-secondary"><%= t('#buttons.cancel', "Cancel") %></button>
     <button type="button" class="keep_editing_button btn"><%= t('buttons.keep_editing', "Keep Editing") %></button>
-    <button type="button" class="cancel_button button-secondary"><%= t('#buttons.cancel', "Cancel") %></button>
+    <button type="submit" class="btn btn-primary"><%= t('buttons.save_page', "Save Page") %></button>
   </div>
   <table class="formtable" style="width: 100%; display: none;">
     <tr>
@@ -275,9 +275,9 @@
           </li>
         <% end %>
       </ul>
-      <div class='button-container button-container-right-aligned'>
-        <button type="button" class="select_submission_button btn btn-small"><%= t('buttons.select_submission', "Select Submission") %></button>
-        <button type="button" class="cancel_content_button button-secondary"><%= t('#buttons.cancel', "Cancel") %></button>
+      <div class='button-container button-container-right-aligned clearfix'>
+        <button type="button" class="cancel_content_button btn button-secondary btn-small"><%= t('#buttons.cancel', "Cancel") %></button>
+        <button type="button" class="select_submission_button btn btn-primary btn-small"><%= t('buttons.select_submission', "Select Submission") %></button>
       </div>
     </div>
     <div class="edit_attachment_content form_content" style="display: none;">
@@ -295,7 +295,7 @@
       </div>
       <div class='button-container button-container-right-aligned'>
         <button type="button" class="upload_file_button btn btn-small"><%= t('buttons.upload_file', "Select/Upload File") %></button>
-        <button type="button" class="cancel_content_button button-secondary"><%= t('#buttons.cancel', "Cancel") %></button>
+        <button type="button" class="cancel_content_button btn button-secondary"><%= t('#buttons.cancel', "Cancel") %></button>
       </div>
     </div>
     <div class="loading_submission" style="text-align: center;">
@@ -401,7 +401,7 @@
       }, :count => @portfolio.eportfolio_entries.count) %>
     <div class="button-container">
       <button type="submit" class="btn"><%= t('buttons.delete', "Delete ePortfolio") %></button>
-      <button type="button" class="button-secondary delete_eportfolio_link"><%= t('#buttons.cancel', "Cancel") %></button>
+      <button type="button" class="btn button-secondary delete_eportfolio_link"><%= t('#buttons.cancel', "Cancel") %></button>
     </div>
   <% end %>
 <% end %>

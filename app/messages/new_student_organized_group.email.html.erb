@@ -1,0 +1,21 @@
+<% define_content :link do %>
+  <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.group.context) %>/<%= asset.group.context.class.to_s.downcase.pluralize %>/<%= asset.group.context_id %>/groups/<%= asset.group.id %>
+<% end %>
+<% define_content :subject do %>
+  <%= t :subject, "New Student Group for %{course_or_account}", :course_or_account => asset.group.context.name %>
+<% end %>
+
+<p><%= t :title, "New Student Group: %{group_name}", :group_name => asset.group.name %></p>
+
+<p>
+<%=
+    case asset.group.context_type
+    when 'Account'
+      t :body_account, %{A new student organized group named "%{group_name}" was created for the account %{account}. The first member is %{user}.}, :group_name => asset.group.name, :account => asset.group.context.name, :user => asset.user.name
+    else
+      t :body_course, %{A new student organized group named "%{group_name}" was created for the course %{course}. The first member is %{user}.}, :group_name => asset.group.name, :course => asset.group.context.name, :user => asset.user.name
+    end
+%>
+</p>
+
+<p><a href="<%= content :link %>"><%= t :details, "Click here to see details for this group" %></a></p>

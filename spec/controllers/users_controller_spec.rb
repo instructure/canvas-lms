@@ -428,7 +428,7 @@ describe UsersController do
         post 'create', :format => 'json', :account_id => account.id, :pseudonym => { :unique_id => 'jacob@instructure.com', :send_confirmation => '0' }, :user => { :name => 'Jacob Fugal' }
         response.should be_success
         p = Pseudonym.find_by_unique_id('jacob@instructure.com')
-        Message.find(:first, :conditions => { :communication_channel_id => p.user.email_channel.id, :notification_id => notification.id }).should_not be_nil
+        Message.where(:communication_channel_id => p.user.email_channel, :notification_id => notification).first.should_not be_nil
       end
 
       it "should not notify the user if the merge opportunity can't log in'" do
@@ -445,12 +445,13 @@ describe UsersController do
         post 'create', :format => 'json', :account_id => account.id, :pseudonym => { :unique_id => 'jacob@instructure.com', :send_confirmation => '0' }, :user => { :name => 'Jacob Fugal' }
         response.should be_success
         p = Pseudonym.find_by_unique_id('jacob@instructure.com')
-        Message.find(:first, :conditions => { :communication_channel_id => p.user.email_channel.id, :notification_id => notification.id }).should be_nil
+        Message.where(:communication_channel_id => p.user.email_channel, :notification_id => notification).first.should be_nil
       end
     end
   end
 
   context "GET 'grades'" do
+
     it "should not include designers in the teacher enrollments" do
       # teacher needs to be in two courses to get to the point where teacher
       # enrollments are queried
@@ -466,8 +467,9 @@ describe UsersController do
       get 'grades', :course_id => @course.id
       response.should be_success
 
-      assigns[:teacher_enrollments].should_not be_nil
-      teachers = assigns[:teacher_enrollments].map{ |e| e.user }
+      teacher_enrollments = assigns[:presenter].teacher_enrollments
+      teacher_enrollments.should_not be_nil
+      teachers = teacher_enrollments.map{ |e| e.user }
       teachers.should be_include(@teacher)
       teachers.should_not be_include(@designer)
     end
@@ -497,10 +499,30 @@ describe UsersController do
       run_transaction_commit_callbacks
 
       get 'grades'
-      assigns[:course_grade_summaries][@course.id].should == { :score => 70, :students => 2 }
+      assigns[:presenter].course_grade_summaries[@course.id].should == { :score => 70, :students => 2 }
+    end
+
+    context 'across shards' do
+      specs_require_sharding
+
+      it 'loads courses from all shards' do
+        course_with_teacher_logged_in :active_all => true
+        @shard1.activate do
+          account = Account.create!
+          course = account.courses.create!
+          @e2 = course.enroll_teacher(@teacher)
+          @e2.update_attribute(:workflow_state, 'active')
+        end
+
+        get 'grades'
+        response.should be_success
+        enrollments = assigns[:presenter].teacher_enrollments
+        enrollments.should include(@e2)
+      end
+
     end
   end
-  
+
   describe "GET 'avatar_image'" do
     it "should redirect to no-pic if avatars are disabled" do
       course_with_student_logged_in(:active_all => true)
@@ -647,7 +669,7 @@ describe UsersController do
 
   describe "GET 'show'" do
     context "sharding" do
-      it_should_behave_like "sharding"
+      specs_require_sharding
 
       it "should include enrollments from all shards" do
         course_with_teacher(:active_all => 1)
@@ -663,6 +685,18 @@ describe UsersController do
         response.should be_success
         assigns[:enrollments].sort_by(&:id).should == [@enrollment, @e2]
       end
+    end
+
+    it "should respond to JSON request" do
+      account = Account.create!
+      course_with_student(:active_all => true, :account => account)
+      account_admin_user(:account => account)
+      user_with_pseudonym(:user => @admin, :account => account)
+      user_session(@admin)
+      get 'show', :id  => @student.id, :format => 'json'
+      response.should be_success
+      user = json_parse
+      user['name'].should == @student.name
     end
   end
 end

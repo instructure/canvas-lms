@@ -19,17 +19,8 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe ConferencesController, :type => :integration do
-  before(:all) do
-    WebConference.instance_eval do
-      def plugins
-        [OpenObject.new(:id => "wimba", :settings => {:domain => "wimba.test"}, :valid_settings? => true, :enabled? => true)]
-      end
-    end
-  end
-  after(:all) do
-    WebConference.instance_eval do
-      def plugins; Canvas::Plugin.all_for_tag(:web_conferencing); end
-    end
+  before do
+    WebConference.stubs(:plugins).returns([web_conference_plugin_mock("wimba", {:domain => "wimba.test"})])
   end
 
   it "should notify participants" do

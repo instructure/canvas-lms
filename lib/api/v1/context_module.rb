@@ -59,7 +59,7 @@ module Api::V1::ContextModule
     api_url = nil
     case content_tag.content_type
       # course context
-      when 'Assignment', 'WikiPage', 'DiscussionTopic'
+      when 'Assignment', 'WikiPage', 'DiscussionTopic', 'Quiz'
         api_url = polymorphic_url([:api_v1, context_module.context, content_tag.content])
       # no context
       when 'Attachment'

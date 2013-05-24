@@ -32,6 +32,7 @@ module TextHelper
   # This is still a pretty basic implementation, I'm sure we'll find ways to
   # tweak and improve it as time goes on.
   def html_to_text(html_str)
+    html_str ||= ''
     doc = Nokogiri::HTML::DocumentFragment.parse(html_str.squeeze(" ").squeeze("\n"))
     # translate anchor tags into a markdown-style name/link combo
     doc.css('a').each { |node| next if node.text.strip == node['href']; node.replace("[#{node.text}](#{node['href']})") }

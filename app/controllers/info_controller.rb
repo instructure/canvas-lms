@@ -21,6 +21,10 @@ class InfoController < ApplicationController
   skip_before_filter :load_account, :only => :health_check
   skip_before_filter :load_user, :only => [:health_check, :help_links]
 
+  def styleguide
+    js_bundle :styleguide
+  end
+
   def message_redirect
     m = AssetSignature.find_by_signature(Message, params[:id])
     if m && m.url
@@ -39,9 +43,9 @@ class InfoController < ApplicationController
     error[:user_agent] = request.headers['User-Agent']
     begin
       report_id = error.delete(:id)
-      @report = ErrorReport.find_by_id(report_id) if report_id.present?
+      @report = ErrorReport.find_by_id(report_id.to_i) if report_id.present? && report_id.to_i != 0
       @report ||= ErrorReport.find_by_id(session.delete(:last_error_id)) if session[:last_error_id].present?
-      @report ||= ErrorReport.create()
+      @report ||= ErrorReport.new
       error.delete(:category) if @report.category.present?
       @report.user = @current_user
       @report.account ||= @domain_root_account
@@ -59,12 +63,13 @@ class InfoController < ApplicationController
       ErrorReport.log_exception(:default, e,
         :message => "Error Report Creation failed",
         :user_email => (error[:email] rescue ''),
-        :user_id => (error[:user].id rescue ''))
+        :user_id => @current_user.try(:id)
+      )
     end
     respond_to do |format|
       flash[:notice] = t('notices.error_reported', "Thanks for your help!  We'll get right on this")
       format.html { redirect_to root_url }
-      format.json { render :json => {:logged => true, :id => @report.id}.to_json }
+      format.json { render :json => {:logged => true, :id => @report.try(:id) }.to_json }
     end
   end
 
@@ -81,7 +86,7 @@ class InfoController < ApplicationController
     Account.connection.select_value("SELECT 1")
     Rails.cache.read 'heartbeat'
     Canvas.redis.get('heartbeat') if Canvas.redis_enabled?
-    Tempfile.new("heartbeat").tap { |f| f.write("heartbeat"); f.flush }
+    Tempfile.open("heartbeat", ENV['TMPDIR'] || Dir.tmpdir) { |f| f.write("heartbeat"); f.flush }
 
     respond_to do |format|
       format.html { render :text => 'canvas ok' }

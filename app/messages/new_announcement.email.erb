@@ -6,7 +6,7 @@
   <%= before_label asset.title %> <%= asset.context.name %>
 <% end %>
 
-<%= strip_and_truncate(asset.message, :max_length => 500) %> 
+<%= html_to_text(asset.message) %>
 <% if asset.attachment %><%= before_label :file_included, "File Included" %> <%= asset.attachment.display_name %> - <%= asset.attachment.readable_size %>
   <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.context) %>/<%= asset.context.class.base_ar_class.to_s.downcase.pluralize %>/<%= asset.context_id %>/files/<%= asset.attachment_id %>/download<% end %>
 

@@ -16,11 +16,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'lib/sis/csv/base_importer'
-
 module SIS
   module CSV
-    class TermImporter < BaseImporter
+    class TermImporter < CSVBaseImporter
     
       def self.is_term_csv?(row)
         #This matcher works because a course has long_name/short_name

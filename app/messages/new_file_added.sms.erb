@@ -1,6 +1,7 @@
-New file added for <%= asset.context.name %>:
-<%= asset.title %>
+<% define_content :link do %>
+<%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.context) %>/<%= asset.context.class.to_s.downcase.pluralize %>/<%= asset.context_id %>/files/<%= asset.id %>
+<% end %>
+<%= t('body', 'New file added for %{name}:', :name => asset.context.name) %>
+<%= asset.title %> (<%= asset.readable_size %>)
 
-<%= asset.readable_size %>
-
-More info at <%= HostUrl.context_host(asset.context) %>
+More info at <%= content :link %>

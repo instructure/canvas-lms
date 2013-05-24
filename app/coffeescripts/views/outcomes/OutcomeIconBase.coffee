@@ -151,6 +151,8 @@ define [
           model: $target.data('view').model
           parent: $target.parent().data('view')
         $sidebar.data('drag', dragObject)
+        $target.blur()
+        $target.focus()
 
     # Internal: Cancel a drag and drop action.
     #

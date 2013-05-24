@@ -19,11 +19,8 @@
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
 describe CollaborationsController, :type => :integration do
-  before(:all) do
+  before do
     PluginSetting.new(:name => 'etherpad', :settings => {}).save!
-  end
-
-  before(:each) do
     course_with_teacher(:active_all => true)
     @members = (1..5).map do
       user = user_with_pseudonym(:active_all => true)
@@ -33,10 +30,6 @@ describe CollaborationsController, :type => :integration do
     collaboration_model(:user => @teacher, :context => @course)
     @user = @teacher
     @collaboration.update_members(@members)
-  end
-
-  after(:all) do
-    PluginSetting.all.each(&:destroy)
   end
 
   context '/api/v1/collaborations/:id/members' do

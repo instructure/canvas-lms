@@ -149,11 +149,11 @@ define([
       $("#edit_page_form,#page_content,#page_sidebar").removeClass('previewing');
       $("#page_content .preview_section").remove();
     }).end().find(".cancel_button").click(function() {
+      $('.edit_section').editorBox('destroy');
       $("#edit_page_form,#page_content,#page_sidebar").removeClass('editing');
       $("#page_content .section.unsaved").remove();
       $(".edit_content_link_holder").show();
       $("#edit_page_form .edit_section").each(function() {
-        $(this).editorBox('destroy');
         $(this).remove();
       });
       $("#page_content .section .form_content").remove();
@@ -179,10 +179,10 @@ define([
         return data;
       },
       beforeSubmit: function(data) {
+        $('.edit_section').editorBox('destroy');
         $("#edit_page_form,#page_content,#page_sidebar").removeClass('editing').removeClass('previewing');
         $("#page_content .section.unsaved,#page_content .section .form_content").remove();
         $("#edit_page_form .edit_section").each(function() {
-          $(this).editorBox('destroy');
           $(this).remove();
         });
         $(this).loadingImage();

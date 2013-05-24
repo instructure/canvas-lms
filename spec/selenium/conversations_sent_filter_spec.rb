@@ -2,9 +2,9 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/conversations_common
 
 describe "conversations sent filter" do
   it_should_behave_like "in-process server selenium tests"
-  it_should_behave_like "conversations selenium tests"
 
-  before do
+  before (:each) do
+    conversation_setup
     @course.update_attribute(:name, "the course")
     @course1 = @course
     @s1 = User.create(:name => "student1")
@@ -33,7 +33,7 @@ describe "conversations sent filter" do
     get_conversations.last.click
     get_messages(false)
 
-    submit_message_form(:message => first_message_text)
+    submit_message_form(:message => first_message_text, :existing_conversation => true)
 
     ff(".last_author").length.should == 2
     ff(".last_author")[0].should include_text(first_message_text)
@@ -60,9 +60,8 @@ describe "conversations sent filter" do
     add_recipient("student2")
     add_recipient("student3")
 
-    enable_jobs do
-      submit_message_form(:message => message_text, :add_recipient => false, :group_conversation => false)
-    end
+    ConversationBatch.any_instance.stubs(:mode).returns(:sync)
+    submit_message_form(:message => message_text, :add_recipient => false, :group_conversation => false)
 
     conversations = get_conversations
     conversations.size.should == 3

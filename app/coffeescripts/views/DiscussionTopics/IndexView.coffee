@@ -72,7 +72,6 @@ define [
       @lastPageFetched = true
       @render() if !@collection.length
 
-
     toggleActionsForSelectedDiscussions: =>
       selectedTopics = @selectedTopics()
       atLeastOneSelected = selectedTopics.length > 0

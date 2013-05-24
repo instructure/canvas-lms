@@ -148,7 +148,5 @@ class AccountUser < ActiveRecord::Base
     account_ids_for_user(user).include?(account_id)
   end
   
-  named_scope :for_user, lambda{|user|
-    {:conditions => ['account_users.user_id = ?', user.id] }
-  }
+  scope :for_user, lambda { |user| where(:user_id => user) }
 end

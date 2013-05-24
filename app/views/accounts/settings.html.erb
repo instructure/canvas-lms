@@ -26,8 +26,8 @@
 <div id="account_settings_tabs" style="display:none;" class="ui-tabs-minimal">
   <ul>
     <% if can_do(@context, @current_user, :manage_account_settings) %>
-    <li><a href="#tab-settings"><%= t(:tab_settings, "Settings") %></a></li>
-    <li><a href="#tab-notifications"><%= t(:tab_notifications, "Notifications") %></a></li>
+    <li><a href="#tab-settings" id="tab-settings-link"><%= t(:tab_settings, "Settings") %></a></li>
+    <li><a href="#tab-notifications" id="tab-notifications-link"><%= t(:tab_notifications, "Notifications") %></a></li>
     <% end %>
     <li><a href="#tab-users" id="tab-users-link"><%= t(:tab_admins, "Admins") %></a></li>
     <% if @account.root_account? %>
@@ -67,19 +67,24 @@
                 </td>
               </tr>
             <% end %>
+            <% has_manage_quotas = can_do(@context, @current_user, :manage_storage_quotas) %>
             <tr>
               <td>
                 <%= f.blabel :default_course_storage_quota, :en => "Default Course File Quota" %>
               </td>
-              <td><%= t(:megabytes_field, "%{text_field} megabytes", :text_field => f.text_field(:default_storage_quota_mb, :id => 'account_default_course_storage_quota', :style => "width: 50px;", :title => t(:megabytes_tooltip, "megabytes"))) %></td>
+              <td><%= t(:megabytes_field, "%{text_field} megabytes", :text_field => (has_manage_quotas ?
+                      f.text_field(:default_storage_quota_mb, :id => 'account_default_course_storage_quota', :style => "width: 50px;", :title => t(:megabytes_tooltip, "megabytes")) :
+                      @account.default_storage_quota_mb.to_s)) %></td>
             </tr>
             <% if @account.root_account? && !@account.site_admin? %>
-            <tr>
-              <td>
-                <%= f.blabel :default_user_storage_quota, :en => "Default User File Quota" %>
-              </td>
-              <td><%= t(:megabytes_field, "%{text_field} megabytes", :text_field => f.text_field(:default_user_storage_quota_mb, :id => 'account_default_user_storage_quota', :style => "width: 50px;", :title => t(:megabytes_tooltip, "megabytes"))) %></td>
-            </tr>
+              <tr>
+                <td>
+                  <%= f.blabel :default_user_storage_quota, :en => "Default User File Quota" %>
+                </td>
+                <td><%= t(:megabytes_field, "%{text_field} megabytes", :text_field => (has_manage_quotas ?
+                        f.text_field(:default_user_storage_quota_mb, :id => 'account_default_user_storage_quota', :style => "width: 50px;", :title => t(:megabytes_tooltip, "megabytes")) :
+                        @account.default_user_storage_quota_mb.to_s)) %></td>
+              </tr>
             <% end %>
             <% if available_locales.size > 1 %>
             <tr>
@@ -87,7 +92,7 @@
               <td>
                 <% no_language = t(:no_language_preference, "Not set (defaults to %{language})", :language => available_locales[infer_locale(:context => @context.parent_account)]) %>
                 <%= f.select :default_locale, [[no_language, nil]] + available_locales.invert.sort, :selected => @context.default_locale %>
-                <span><%= mt :transifex_message, <<-TEXT, :transifex_url => "https://www.transifex.com/projects/p/canvas-lms/"
+                <span class="unbreakable"><%= mt :transifex_message, <<-TEXT, :transifex_url => "https://www.transifex.com/projects/p/canvas-lms/"
 Join the [Canvas Translation Community](%{transifex_url})
 TEXT
                 %>
@@ -135,6 +140,11 @@ TEXT
                     <%= settings.label :allow_sending_scores_in_emails, :en => "Students can opt-in to receiving scores in email notifications" %>
                     </td>
                   </tr>
+                  <tr>
+                    <td colspan="2"><%= settings.check_box :restrict_student_future_view, :checked => @account.settings[:restrict_student_future_view] %>
+                      <%= settings.label :restrict_student_future_view, :en => "Restrict students from viewing courses before start date" %>
+                    </td>
+                  </tr>
                 <% end %>
               <% end %>
             <% end %>
@@ -157,14 +167,14 @@ TEXT
               "list of addresses, or an address followed by a mask " +
               "(\"192.168.217.1/24\" or \"192.168.217.1/255.255.255.0\").\"") %>
             </div>
-            <table>
+            <table class="formtable">
               <tbody id="ip_filters">
                 <% ((@account.settings[:ip_filters] || {}).sort_by(&:first) << [nil, nil]).each do |name, filter| %>
                   <tr class="ip_filter <%= raw ' blank" style="display: none;' if name.nil? %>">
                     <td><%= before_label(t(:ip_filter_name_label, "Name")) %></td>
-                    <td><input class="name" value="<%= name %>"/></td>
+                    <td><input type="text" class="name" value="<%= name %>"/></td>
                     <td><%= before_label(t(:ip_filter_filter_label, "Filter")) %></td>
-                    <td><input class="value" value="<%= filter %>" maxlength="255"/></td>
+                    <td><input type="text" class="value" value="<%= filter %>" maxlength="255"/></td>
                     <td>
                       <a href="#" class="delete_filter_link"><i class="icon-end standalone-icon"></i></a>
                     </td>
@@ -184,6 +194,10 @@ TEXT
                 <div>
                   <%= settings.check_box :admins_can_change_passwords, :checked => @account.settings[:admins_can_change_passwords] == true %>
                   <%= settings.label :admins_can_change_passwords, :en => "Password setting by admins" %>
+                </div>
+                <div>
+                  <%= settings.check_box :admins_can_view_notifications, :checked => @account.settings[:admins_can_view_notifications] %>
+                  <%= settings.label :admins_can_view_notifications, :en => "Admins can view notifications" %>
                 </div>
                 <% unless @account.site_admin? %>
                   <div>
@@ -255,6 +269,11 @@ TEXT
                 <%= settings.check_box :users_can_edit_name, :checked => @account.settings[:users_can_edit_name] != false %>
                 <%= settings.label :users_can_edit_name, :en => "Users can edit display name" %>
               </div>
+
+              <div>
+                <%= settings.check_box :edit_institution_email, :checked => @account.edit_institution_email? %>
+                <%= settings.label     :edit_institution_email, :en => "Users can delete their institution-assigned email address" %>
+              </div>
             <% end %>
             <% unless @account.site_admin? %>
               <div>
@@ -307,6 +326,7 @@ TEXT
                 <% ((@account.settings[:custom_help_links] || []) << {}).each_with_index do |help_link, i| %>
                   <div class="custom_help_link <%= raw ' blank" style="display: none;' if help_link.empty? %>">
                     <a href="#" class="delete" title="<%= t(:delete, "delete") %>">&nbsp;</a>
+                    <input type="hidden" name="account[custom_help_links][<%= i %>][state]" value="<%= help_link[:state] || 'active' %>" id="custom_help_links_<%= i %>_state" class="custom_help_link_state"/>
                     <table class="formtable">
                       <tr>
                         <td><label for="custom_help_links_<%= i %>_text"><%= before_label :help_link_text, "Text to display for link" %></label></td>
@@ -672,7 +692,7 @@ TEXT
           </div>
           <div class="button-container">
             <button type="submit" class="btn"><%= image_tag "add.png" %> <%= t(:add_announcement_button, "Add Announcement") %></button>
-            <button type="button" class="element_toggler button-secondary" aria-controls="add_notification_form"><%= t('#buttons.cancel', %{Cancel}) %></button>
+            <button type="button" class="element_toggler btn button-secondary" aria-controls="add_notification_form"><%= t('#buttons.cancel', %{Cancel}) %></button>
           </div>
         <% end %>
       <% end %>

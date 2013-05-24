@@ -14,6 +14,7 @@ define [
         buttons = $.map $buttons.toArray(), (button) ->
           $button = $(button)
           classes = $button.attr('class') ? ''
+          id = $button.attr('id')
 
           # if you add the class 'dialog_closer' to any of the buttons,
           # clicking it will cause the dialog to close
@@ -32,6 +33,7 @@ define [
             "data-text-while-loading": $button.data("textWhileLoading")
             click: -> $button.click()
             class: classes
+            id: id
           }
         # put the primary button(s) on the far right
         buttons = _.sortBy buttons, (button) ->

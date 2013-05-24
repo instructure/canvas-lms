@@ -21,25 +21,50 @@ require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
 describe PseudonymsController do
 
   describe "password changing" do
-    it "should change the password if authorized" do
+    before do
       user_with_pseudonym
-      pword = @pseudonym.crypted_password
-      code = @cc.confirmation_code
-      post 'change_password', :pseudonym_id => @pseudonym.id, :nonce => @cc.confirmation_code, :pseudonym => {:password => '12341234', :password_confirmation => '12341234'}
-      response.should be_redirect
-      assigns[:pseudonym].should eql(@pseudonym)
-      assigns[:pseudonym].crypted_password.should_not eql(pword)
-      assigns[:pseudonym].user.should be_registered
-      assigns[:cc].confirmation_code.should_not eql(code)
-      assigns[:cc].should be_active
+    end
+
+    context "unconfirmed communication channel" do
+      it "should change the password if authorized" do
+        pword = @pseudonym.crypted_password
+        code = @cc.confirmation_code
+        post 'change_password', :pseudonym_id => @pseudonym.id, :nonce => @cc.confirmation_code, :pseudonym => {:password => '12341234', :password_confirmation => '12341234'}
+        response.should be_success
+        assigns[:pseudonym].should eql(@pseudonym)
+        @pseudonym.reload
+        @pseudonym.crypted_password.should_not eql(pword)
+        @pseudonym.user.should be_registered
+        @cc.reload
+        @cc.confirmation_code.should_not eql(code)
+        @cc.should be_active
+      end
+    end
+
+    context "active communication channel" do
+      it "should change the password if authorized" do
+        @cc.confirm
+        @cc.reload
+        @cc.should be_active
+        pword = @pseudonym.crypted_password
+        code = @cc.confirmation_code
+        post 'change_password', :pseudonym_id => @pseudonym.id, :nonce => @cc.confirmation_code, :pseudonym => {:password => '12341234', :password_confirmation => '12341234'}
+        response.should be_success
+        assigns[:pseudonym].should eql(@pseudonym)
+        @pseudonym.reload
+        @pseudonym.crypted_password.should_not eql(pword)
+        @pseudonym.user.should be_registered
+        @cc.reload
+        @cc.confirmation_code.should_not eql(code)
+        @cc.should be_active
+      end
     end
 
     it "should not change the password if unauthorized" do
-      user_with_pseudonym
       pword = @pseudonym.crypted_password
       code = @cc.confirmation_code
       post 'change_password', :pseudonym_id => @pseudonym.id, :nonce => @cc.confirmation_code + 'a', :pseudonym => {:password => '12341234', :password_confirmation => '12341234'}
-      response.should be_redirect
+      response.status.should =~ /400 Bad Request/
       assigns[:pseudonym].should eql(@pseudonym)
       assigns[:pseudonym].crypted_password.should eql(pword)
       assigns[:pseudonym].user.should_not be_registered
@@ -65,7 +90,7 @@ describe PseudonymsController do
       it "should use case insensitive match for CommunicationChannel email" do
         # Setup user with communication channel that has mixed case email
         user_with_pseudonym
-        @cc = communication_channel_model(:user_id => @user.id, :workflow_state => 'active', :path => 'Victoria.Silvstedt@example.com')
+        @cc = communication_channel_model(:workflow_state => 'active', :path => 'Victoria.Silvstedt@example.com')
         get 'forgot_password', :pseudonym_session => {:unique_id_forgot => 'victoria.silvstedt@example.com'}
         response.should be_redirect
         assigns[:ccs].should include(@cc)
@@ -302,7 +327,7 @@ describe PseudonymsController do
   end
 
   context "sharding" do
-    it_should_behave_like "sharding"
+    specs_require_sharding
 
     before do
       user_with_pseudonym(:active_all => 1)

@@ -18,6 +18,6 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 
-shared_examples_for "sharding" do
+def specs_require_sharding
   include Shard::RSpec
 end

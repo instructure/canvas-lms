@@ -15,46 +15,52 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-
 require [
-  'jquery'
-  'underscore'
-  'compiled/collections/UserCollection'
+  'compiled/models/CreateUserList'
+  'compiled/views/courses/roster/CreateUsersView'
+  'compiled/views/SelectView'
+  'jst/courses/roster/rosterUsers'
+  'compiled/collections/RosterUserCollection'
   'compiled/collections/SectionCollection'
-  'compiled/views/courses/RosterView'
-  'jst/courses/Roster'
-], ($, _, UserCollection, SectionCollection, RosterView, roster) ->
+  'compiled/views/InputFilterView'
+  'compiled/views/PaginatedCollectionView'
+  'compiled/views/courses/roster/RosterUserView'
+  'compiled/views/courses/roster/RosterView'
+  'jquery'
+], (CreateUserList, CreateUsersView, SelectView, rosterUsersTemplate, RosterUserCollection, SectionCollection, InputFilterView, PaginatedCollectionView, RosterUserView, RosterView, $) ->
 
-  # Load environment
-  course       = ENV.context_asset_string.split('_')[1]
-  url          = "/api/v1/courses/#{course}/users"
   fetchOptions =
     include: ['avatar_url', 'enrollments', 'email']
     per_page: 50
+  users = new RosterUserCollection null,
+    course_id: ENV.context_asset_string.split('_')[1]
+    sections: new SectionCollection ENV.SECTIONS
+    params: fetchOptions
+  inputFilterView = new InputFilterView
+    collection: users
+  usersView = new PaginatedCollectionView
+    collection: users
+    itemView: RosterUserView
+    buffer: 1000
+    template: rosterUsersTemplate
+  roleSelectView = new SelectView
+    collection: users
+  createUsersView = new CreateUsersView
+    model: new CreateUserList
+      sections: ENV.SECTIONS
+      roles: ENV.ALL_ROLES
+      readURL: ENV.USER_LISTS_URL
+      updateURL: ENV.ENROLL_USERS_URL
+  @app = new RosterView
+    usersView: usersView
+    inputFilterView: inputFilterView
+    roleSelectView: roleSelectView
+    createUsersView: createUsersView
+    collection: users
+    roles: ENV.ALL_ROLES
+    permissions: ENV.permissions
 
-  sections     = new SectionCollection(ENV.SECTIONS)
-  columns =
-    students: $('.roster .student_roster')
-    teachers: $('.roster .teacher_roster')
+  @app.render()
+  @app.$el.appendTo $('#content')
+  users.fetch()
 
-  for roster_data in ENV.COURSE_ROSTERS
-    users = new UserCollection
-    users.url = url
-    users.sections = sections
-    users.roles = roster_data['roles']
-
-    usersOptions = add: false, data: _.extend({}, fetchOptions, enrollment_role: roster_data['roles'])
-
-    column = columns[roster_data['column']]
-    html = roster
-      title: roster_data['title']
-    column.append(html)
-    list = column.find('.user_list').last()
-
-    usersView = new RosterView
-      collection: users
-      el: list
-      fetchOptions: usersOptions
-
-    users.on('reset', usersView.render, usersView)
-    usersView.$el.disableWhileLoading(users.fetch(usersOptions))

@@ -25,13 +25,12 @@ end
 
 def add_file(file_fullpath)
   attachment_field = keep_trying_until do
-    fj('#add_file_link').click # fj to avoid selenium caching
+    driver.execute_script "$('.add_file_link').click()"
     wait_for_ajaximations
     attachment_field = fj('#attachment_uploaded_data')
     attachment_field.should be_displayed
     attachment_field
   end
-  wait_for_ajaximations
   attachment_field.send_keys(file_fullpath)
   wait_for_ajaximations
   f('.add_file_form').submit
@@ -50,9 +49,9 @@ end
 
 def file_setup
   sleep 5
-  @a_filename, a_fullpath, a_data = get_file("a_file.txt")
-  @b_filename, b_fullpath, b_data = get_file("b_file.txt")
-  @c_filename, c_fullpath, c_data = get_file("c_file.txt")
+  @a_filename, a_fullpath, _, @a_tempfile = get_file("a_file.txt")
+  @b_filename, b_fullpath, _, @b_tempfile = get_file("b_file.txt")
+  @c_filename, c_fullpath, _, @c_tempfile = get_file("c_file.txt")
 
   add_file(a_fullpath)
   add_file(c_fullpath)
@@ -60,16 +59,18 @@ def file_setup
 end
 
 describe "common file behaviors" do
-  it_should_behave_like "forked server selenium tests"
+  it_should_behave_like "in-process server selenium tests"
 
   def add_file(file_fullpath)
     attachment_field = keep_trying_until do
-      fj('#add_file_link').click # fj to avoid selenium caching
+      driver.execute_script "$('.add_file_link').click()"
+      wait_for_ajaximations
       attachment_field = fj('#attachment_uploaded_data')
       attachment_field.should be_displayed
       attachment_field
     end
     attachment_field.send_keys(file_fullpath)
+    wait_for_ajaximations
     f('.add_file_form').submit
     wait_for_ajaximations
     wait_for_js
@@ -138,10 +139,13 @@ describe "common file behaviors" do
 
     it "should ignore file name case when alphabetizing" do
       sleep 5 # page does a weird load twice which is causing selenium failures so we sleep and wait for the page
-      amazing_filename, amazing_fullpath, amazing_data = get_file("amazing_file.txt")
-      dog_filename, dog_fullpath, dog_data = get_file("Dog_file.txt")
+      amazing_filename, amazing_fullpath, _, amazing_tempfile = get_file("amazing_file.txt")
+      dog_filename, dog_fullpath, _, dog_tempfile = get_file("Dog_file.txt")
       file_paths = [dog_fullpath, amazing_fullpath]
-      file_paths.each { |name| add_file(name) }
+      file_paths.each do
+        |name| add_file(name)
+        wait_for_ajaximations
+      end
       files = ff('#files_content .file')
       files.first.should include_text('amazing')
       files.last.should include_text('Dog')
@@ -211,42 +215,6 @@ describe "files without s3 and forked tests" do
     wait_for_ajaximations
     f(@folder_css + ' .header img').should have_attribute('alt', 'Locked Folder')
     Folder.last.locked.should be_true
-  end
-end
-
-
-describe "collaborations folder in files menu" do
-  it_should_behave_like "in-process server selenium tests"
-
-  before (:each) do
-    user_with_pseudonym(:active_user => true)
-    course_with_teacher(:user => @user, :active_course => true, :active_enrollment => true)
-    group_category = @course.group_categories.create(:name => "groupage")
-    @group = group_category.groups.create!(:name => "group1", :context => @course)
-  end
-
-  def load_collab_folder
-    get "/groups/#{@group.id}/files"
-    message_node = keep_trying_until do
-      f("li.collaborations span.name").click
-      f("ul.files_content li.message")
-    end
-    message_node.text
-  end
-
-  it "should show add collaboration paragraph to teacher of a course group" do
-    create_session(@pseudonym, false)
-    message = load_collab_folder
-    message.should include_text("New collaboration")
-  end
-
-  it "should show add collaboration paragraph to participating user" do
-    user_with_pseudonym(:active_user => true)
-    student_in_course(:user => @user, :active_enrollment => true)
-    create_session(@pseudonym, false)
-    @group.add_user(@user, 'accepted')
-    message = load_collab_folder
-    message.should include_text("New collaboration")
   end
 end
 

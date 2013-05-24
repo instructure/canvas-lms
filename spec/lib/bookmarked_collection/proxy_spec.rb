@@ -21,7 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 describe "BookmarkedCollection::Proxy" do
   describe "#paginate" do
     before :each do
-      @scope = Course.scoped(:order => :id)
+      @scope = Course.order(:id)
       3.times{ @scope.create! }
 
       @next_bookmark = stub

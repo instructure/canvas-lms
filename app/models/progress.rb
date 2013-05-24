@@ -30,7 +30,7 @@ class Progress < ActiveRecord::Base
       event :start, :transitions_to => :running
     end
     state :running do
-      event :complete, :transitions_to => :completed
+      event(:complete, :transitions_to => :completed) { update_completion! 100 }
       event :fail, :transitions_to => :failed
     end
     state :completed

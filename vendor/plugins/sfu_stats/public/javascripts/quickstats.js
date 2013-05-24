@@ -10,6 +10,7 @@
                     totalOrUnique = el.data('totalorunique'),
                     enrollmentType = toTitleCase(el.data('enrollmenttype')) + 'Enrollment',
                     target = el.parentsUntil('.stats_enrollment_box').prev()[0],
+                    targetText = $(target).text(),
                     spinnerContainer = el.parent().find('.spinner_container'),
                     spinnerOpts = {
                         lines: 11,
@@ -32,14 +33,14 @@
 
                 if (enrollmentCache.hasOwnProperty(term)) {
                     var data = enrollmentCache[term];
-                    fancyCounter(target, parseInt(target.innerText.replace(/\D/g, ''), 10), parseInt(data[totalOrUnique][enrollmentType], 10));
+                    fancyCounter(target, parseInt(targetText.replace(/\D/g, ''), 10), parseInt(data[totalOrUnique][enrollmentType], 10));
                 } else {
 
                     spinnerContainer.spin(spinnerOpts);
                     $.getJSON(url, function(data) {
                         spinnerContainer.spin(false);
                         enrollmentCache[term] = data;
-                        fancyCounter(target, parseInt(target.innerText.replace(/\D/g, ''), 10), parseInt(data[totalOrUnique][enrollmentType], 10));
+                        fancyCounter(target, parseInt(targetText.replace(/\D/g, ''), 10), parseInt(data[totalOrUnique][enrollmentType], 10));
                     });
                 }
             });
@@ -51,10 +52,10 @@
                     duration: 300,
                     easing:'linear',
                     step: function() {
-                        el.innerText = numberWithCommas(Math.floor(this.countNum));
+                        $(el).text(numberWithCommas(Math.floor(this.countNum)));
                     },
                     complete: function() {
-                        el.innerText = numberWithCommas(this.countNum);
+                        $(el).text(numberWithCommas(this.countNum));
                     }
                 });
             }

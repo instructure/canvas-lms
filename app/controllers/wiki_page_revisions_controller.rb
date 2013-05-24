@@ -42,7 +42,7 @@ class WikiPageRevisionsController < ApplicationController
     # else.  It does divulge the page id, and current version number, though.
     # If we're not ok with that, we can add a permission check.
     @version = params[:wiki_page_id].to_i.to_s == params[:wiki_page_id] &&
-      Version.find(:first, :conditions => {:versionable_type => 'WikiPage', :versionable_id => params[:wiki_page_id]}, :order => 'number DESC')
+      Version.where(:versionable_type => 'WikiPage', :versionable_id => params[:wiki_page_id]).order('number DESC').first
     if !@version
       get_context
       get_wiki_page

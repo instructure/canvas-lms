@@ -40,10 +40,10 @@ define(['i18n!quizzes.show', 'jquery'], function(I18n, $) {
         surveyAnswerTpl  = $('<span />', { 'class': 'answer_arrow info' });
 
     $.each([rightTpl, wrongTpl, correctTpl, shortTpl, surveyAnswerTpl], function() {
-      this.css({ left: -128, top: 0 });
+      this.css({ left: -128, top: 5 });
     });
     $.each([unansweredTpl, creditFullTpl, creditNoneTpl, creditPartialTpl], function() {
-      this.css({ left: -108, top: 5 });
+      this.css({ left: -108, top: 9 });
     });
 
 

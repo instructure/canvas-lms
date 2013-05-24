@@ -7,18 +7,18 @@
 </style>
 <% end %>
 <% if !@students || @students.empty? %>
-  <div id="no_students_message" style="padding: 10px 30px; font-size: 1.2em;">
-    <div><%= t(:no_students, "No Students are enrolled in the course.") %></div>
+  <div id="no_students_message" class="pad-box">
+    <p><%= t(:no_students, "No Students are enrolled in the course.") %></p>
     <% if can_do @context, @current_user, :manage_students %>
-      <a href="<%= context_url(@context, :context_details_url) %>#add_students" class="btn add_students"><%= image_tag "add.png" %> <%= t('links.add_students', "Add Students to the Course") %></a>
+      <p><a href="<%= context_url(@context, :context_details_url) %>#add_students" class="btn icon-add add_students"><%= t('links.add_students', "Add Students to the Course") %></a></p>
     <% end %>
   </div>
 <% end %>
 <% if !@just_assignments || @just_assignments.empty? %>
-  <div id="no_assignments_message" style="padding: 10px 30px; font-size: 1.2em">
+  <div id="no_assignments_message" class="pad-box">
     <p><%= t(:no_assignments, "No Assignments created yet for this course.") %></p>
     <% if can_do @context, @current_user, :manage_content, :manage_assignments %>
-      <a href="<%= context_url(@context, :context_assignments_url) %>" style="padding-left: 20px;"><%= t('links.add_assignments', "Add Assignments to the Course") %></a>
+      <p><a href="<%= context_url(@context, :context_assignments_url) %>" class="btn"><%= t('links.add_assignments', "Add Assignments to the Course") %></a></p>
     <% end %>
   </div>
 <% else %>
@@ -98,7 +98,7 @@
     <tr>
       <td colspan="2">
         <button type="button" class="btn normalize_button"><%= t('buttons.normalize', "Make it Total 100%") %></button>
-        <button type="button" class="cancel_button button-secondary"><%= t('buttons.done', "Done") %></button>
+        <button type="button" class="cancel_button btn button-secondary"><%= t('buttons.done', "Done") %></button>
       </td>
     </tr>
   </table>
@@ -118,7 +118,7 @@
     </div>
     <div class="button-container">
       <button type="submit" class="btn"><%= t('buttons.set_grade', "Set Grade") %></button>
-      <button type="button" class="cancel_button button-secondary"><%= t('#buttons.cancel', "Cancel") %></button>
+      <button type="button" class="cancel_button btn button-secondary"><%= t('#buttons.cancel', "Cancel") %></button>
     </div>
     <a href="<%= context_url(@context, :context_assignment_url, "{{ id }}") %>" style="display: none;" class="default_grade_url">&nbsp;</a>
   <% end %>
@@ -164,7 +164,7 @@
     </div>
     <div class="button-container">
       <button type="submit" class="btn"><%= t('buttons.curve_grades', "Curve Grades") %></button>
-      <button type="button" class="cancel_button button-secondary"><%= t('#buttons.cancel', "Cancel") %></button>
+      <button type="button" class="cancel_button btn button-secondary"><%= t('#buttons.cancel', "Cancel") %></button>
     </div>
   </form>
   <div style="display: none;" id="gradebook_urls">
@@ -248,7 +248,7 @@
     </div>
     <div class="button-container save_buttons">
       <button type="button" class="btn update_button"><%= t('buttons.update', "Update") %></button>
-      <button type="button" class="button-secondary cancel_button"><%= t('#buttons.cancel', "Cancel") %></button>
+      <button type="button" class="btn button-secondary cancel_button"><%= t('#buttons.cancel', "Cancel") %></button>
     </div>
   </div>
   <div id="assignment_details_dialog" style="display: none;">

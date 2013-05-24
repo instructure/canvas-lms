@@ -30,9 +30,12 @@ require [
   collections = [
     new SyllabusCalendarEventsCollection [ENV.context_asset_string], 'event'
     new SyllabusCalendarEventsCollection [ENV.context_asset_string], 'assignment'
-    new SyllabusAppointmentGroupsCollection [ENV.context_asset_string], 'reservable'
-    new SyllabusAppointmentGroupsCollection [ENV.context_asset_string], 'manageable'
   ]
+
+  # Don't show appointment groups for non-logged in users
+  if ENV.current_user_id
+    collections.push(new SyllabusAppointmentGroupsCollection [ENV.context_asset_string], 'reservable')
+    collections.push(new SyllabusAppointmentGroupsCollection [ENV.context_asset_string], 'manageable')
 
   # Perform a fetch on each collection
   #   The fetch continues fetching until no next link is returned
@@ -64,6 +67,8 @@ require [
   view = new SyllabusView
     el: '#syllabusContainer'
     collection: acollection
+    can_read: ENV.CAN_READ
+    is_valid_user: if ENV.current_user_id then true else false
 
   # When all of the fetches have completed, render the view and bind behaviors
   $.when.apply(this, deferreds).then ->

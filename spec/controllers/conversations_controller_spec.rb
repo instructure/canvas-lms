@@ -214,6 +214,8 @@ describe ConversationsController do
   
         @new_user2 = User.create
         @course.enroll_student(@new_user2).accept!
+
+        @account_id = @course.account_id
       end
 
       ["1", "true", "yes", "on"].each do |truish|
@@ -231,6 +233,32 @@ describe ConversationsController do
           response.should be_success
     
           Conversation.count.should eql(@old_count + 2)
+        end
+      end
+
+      it "should set the root account id to the participants for group conversations" do
+        post 'create', :recipients => [@new_user1.id.to_s, @new_user2.id.to_s], :body => "yo", :group_conversation => "true"
+        response.should be_success
+
+        json = json_parse(response.body)
+        json.each do |conv|
+          conversation = Conversation.find(conv['id'])
+          conversation.conversation_participants.each do |cp|
+            cp.root_account_ids.should == @account_id.to_s
+          end
+        end
+      end
+
+      it "should set the root account id to the participants for bulk private messages" do
+        post 'create', :recipients => [@new_user1.id.to_s, @new_user2.id.to_s], :body => "yo", :mode => "sync"
+        response.should be_success
+
+        json = json_parse(response.body)
+        json.each do |conv|
+          conversation = Conversation.find(conv['id'])
+          conversation.conversation_participants.each do |cp|
+            cp.root_account_ids.should == @account_id.to_s
+          end
         end
       end
     end
@@ -292,10 +320,14 @@ describe ConversationsController do
     it "should add a message" do
       course_with_student_logged_in(:active_all => true)
       conversation
+      expected_lma = Time.zone.parse('2012-12-21T12:42:00Z')
+      @conversation.last_message_at = expected_lma
+      @conversation.save!
 
       post 'add_message', :conversation_id => @conversation.conversation_id, :body => "hello world"
       response.should be_success
       @conversation.messages.size.should == 2
+      @conversation.reload.last_message_at.should eql expected_lma
     end
 
     it "should generate a user note when requested" do
@@ -448,6 +480,54 @@ describe ConversationsController do
       feed = Atom::Feed.load_feed(response.body) rescue nil
       feed.should_not be_nil
       feed.entries.first.content.should match(/somefile\.doc/)
+    end
+  end
+
+  context "sharding" do
+    specs_require_sharding
+
+    describe 'index' do
+      it "should list conversation_ids across shards" do
+        users = []
+        # Create three users on different shards
+        users << user(:name => 'a')
+        @shard1.activate { users << user(:name => 'b') }
+        @shard2.activate { users << user(:name => 'c') }
+
+        Shard.default.activate do
+          # Default shard conversation
+          conversation = Conversation.initiate(users, false)
+          users.each do |user|
+            conversation.add_message(user, "user '#{user.name}' says HI")
+          end
+        end
+
+        @shard2.activate do
+          # Create logged in user
+          @logged_in_user = users.last
+          course_with_student_logged_in(:user => @logged_in_user, :active_all => true)
+          # Shard 2 conversation
+          conversation = Conversation.initiate(users, false)
+          users.each do |user|
+            conversation.add_message(user, "user '#{user.name}' says HI")
+          end
+        end
+
+        get 'index', :include_all_conversation_ids => true, :format => 'json'
+
+        response.should be_success
+        assigns[:js_env].should be_nil
+        # Should assign :conversations and :conversation_ids in json result
+        json = assigns[:conversations_json][:conversations]
+        ids = assigns[:conversations_json][:conversation_ids]
+        # IDs should match in returned lists
+        ids.sort.should == json.map{|c| c[:id]}.sort
+        # IDs returned should match IDs for user's conversations
+        ids.sort.should == @logged_in_user.conversations.map(&:conversation_id).sort
+        # Expect 2 elements in both groups
+        json.length.should == 2
+        ids.length.should == 2
+      end
     end
   end
 end
