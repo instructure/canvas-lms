@@ -759,6 +759,9 @@ ActionController::Routing::Routes.draw do |map|
     end
 
     api.get 'courses/:course_id/assignment_groups', :controller => :assignment_groups, :action => :index, :path_name => 'course_assignment_groups'
+    api.with_options(:controller => :assignment_groups_api) do |ag|
+      ag.resources :assignment_groups, :path_prefix => "courses/:course_id", :name_prefix => "course_", :except => [:index]
+    end
 
     api.with_options(:controller => :discussion_topics) do |topics|
       topics.get 'courses/:course_id/discussion_topics', :action => :index, :path_name => 'course_discussion_topics'
