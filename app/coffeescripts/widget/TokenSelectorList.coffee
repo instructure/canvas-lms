@@ -239,6 +239,7 @@ define [
 
     onBlur: (e) ->
       $(e.target).removeClass('active')
+      @selector.blur?()
 
     onFocus: (e) ->
       $(e.target).addClass('active')

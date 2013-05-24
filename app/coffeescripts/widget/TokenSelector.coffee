@@ -189,7 +189,11 @@ define [
       @select(null)
 
     blur: ->
-      @close() unless @$container.find(':focus').length > 0
+      # It seems we can't check focus while it is being changed, so check it later.
+      setTimeout =>
+        unless @input.hasFocus() || @$container.find(':focus').length > 0
+          @close()
+      , 0
 
     listExpanded: ->
       if @stack.length then true else false

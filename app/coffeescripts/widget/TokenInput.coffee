@@ -189,6 +189,9 @@ define [
     focus: ->
       @$input.focus()
 
+    hasFocus: ->
+      @active
+
     val: (val) ->
       if val?
         if val isnt @$input.val()
