@@ -20,6 +20,7 @@ class Setting < ActiveRecord::Base
   attr_accessible :name, :value
 
   @@cache = {}
+  @@yaml_cache = {}
 
   def self.get(name, default)
     Setting.find_or_initialize_by_name(name, :value => default).value
@@ -56,6 +57,7 @@ class Setting < ActiveRecord::Base
   
   def self.reset_cache!
     @@cache = {}
+    @@yaml_cache = {}
   end
   
   def self.remove(name)
@@ -63,20 +65,17 @@ class Setting < ActiveRecord::Base
     s = Setting.find_by_name(name)
     s.destroy if s
   end
-  
-  def self.config_key(config_name, with_rails_env=:current)
-    "yaml_config_#{config_name}_#{with_rails_env == :current ? Rails.env : with_rails_env}"
-  end
 
   def self.set_config(config_name, value)
     raise "config settings can only be set via config file" unless Rails.env.test?
-    @@cache[config_key(config_name)] = value
+    @@yaml_cache[config_name] ||= {}
+    @@yaml_cache[config_name][Rails.env] = value
   end
 
   def self.from_config(config_name, with_rails_env=:current)
-    key = config_key(config_name, with_rails_env)
-    
-    return @@cache[key] if @@cache[key] # if the config wasn't found it'll try again
+    with_rails_env = Rails.env if with_rails_env == :current
+
+    return @@yaml_cache[config_name][with_rails_env] if @@yaml_cache[config_name] # if the config wasn't found it'll try again
     
     config = nil
     path = File.join(Rails.root, 'config', "#{config_name}.yml")
@@ -90,11 +89,11 @@ class Setting < ActiveRecord::Base
 
       if config.respond_to?(:with_indifferent_access)
         config = config.with_indifferent_access
-        config = config[with_rails_env == :current ? Rails.env : with_rails_env] if with_rails_env
       else
         config = nil
       end
     end
-    @@cache[key] = config
+    @@yaml_cache[config_name] = config
+    config[with_rails_env] if config
   end
 end
