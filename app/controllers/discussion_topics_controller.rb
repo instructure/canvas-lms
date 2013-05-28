@@ -112,6 +112,10 @@ class DiscussionTopicsController < ApplicationController
   #
   # Returns the paginated list of discussion topics for this course or group.
   #
+  # @argument order_by Determines the order of the discussion topic list. May be one of "position", or "recent_activity". Defaults to "position".
+  #
+  # @argument only_announcements Set to true to get announcements instead of discussions.
+  #
   # @example_request
   #     curl https://<canvas>/api/v1/courses/<course_id>/discussion_topics \ 
   #          -H 'Authorization: Bearer <token>'
@@ -134,11 +138,13 @@ class DiscussionTopicsController < ApplicationController
           end
         end
         format.json do
-          # you can pass ?only_announcements=true to get announcements instead of discussions TODO: document
           scope = (params[:only_announcements] ?
                    @context.active_announcements :
                    @context.active_discussion_topics.only_discussion_topics)
-          scope = scope.by_position
+          scope = case params[:order_by]
+            when 'recent_activity' then scope.by_last_reply_at
+            else scope.by_position
+          end
           @topics = Api.paginate(scope, self, topic_pagination_url(:only_announcements => params[:only_announcements]))
           @topics.each { |t| t.current_user = @current_user }
           if api_request?

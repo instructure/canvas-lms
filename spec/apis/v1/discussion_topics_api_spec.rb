@@ -238,6 +238,41 @@ describe DiscussionTopicsController, :type => :integration do
         json.last["podcast_url"].gsub!(/_[^.]*/, '_randomness')
         json.last.should == @response_json
       end
+
+      it "should order topics by descending position by default" do
+        @topic2 = create_topic(@course, :title => "Topic 2", :message => "<p>content here</p>")
+        @topic3 = create_topic(@course, :title => "Topic 3", :message => "<p>content here</p>")
+        topics = [@topic3, @topic, @topic2, @sub]
+        topics.reverse.each_with_index do |topic, index|
+          topic.position = index + 1
+          topic.save!
+        end
+
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics.json",
+                        {:controller => 'discussion_topics', :action => 'index', :format => 'json', :course_id => @course.id.to_s})
+        json.map {|j| j['id']}.should == topics.map(&:id)
+      end
+
+      it "should order topics by descending last_reply_at when order_by parameter is specified" do
+        @topic2 = create_topic(@course, :title => "Topic 2", :message => "<p>content here</p>")
+        @topic3 = create_topic(@course, :title => "Topic 3", :message => "<p>content here</p>")
+
+        topics = [@topic3, @topic, @topic2, @sub]
+        topic_reply_date = Time.zone.now - 1.day
+        topics.each do |topic|
+          topic.last_reply_at = topic_reply_date
+          topic.save!
+          topic_reply_date -= 1.day
+        end
+
+        # topic that hasn't had a reply yet should be at the top
+        @topic4 = create_topic(@course, :title => "Topic 4", :message => "<p>content here</p>")
+        topics.unshift(@topic4)
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics.json?order_by=recent_activity",
+                        {:controller => 'discussion_topics', :action => 'index', :format => 'json', :course_id => @course.id.to_s, :order_by => 'recent_activity'})
+        json.map {|j| j['id']}.should == topics.map(&:id)
+      end
+
     end
     describe "GET 'show'" do
       it "should return an individual topic" do

@@ -326,6 +326,7 @@ class DiscussionTopic < ActiveRecord::Base
   scope :before, lambda { |date| where("discussion_topics.created_at<?", date) }
 
   scope :by_position, order("discussion_topics.position DESC, discussion_topics.created_at DESC")
+  scope :by_last_reply_at, order("discussion_topics.last_reply_at DESC, discussion_topics.created_at DESC")
 
   def auto_update_workflow
     transition_to_workflow_state(desired_workflow_state)
