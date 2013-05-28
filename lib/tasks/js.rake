@@ -1,3 +1,5 @@
+require 'timeout'
+
 namespace :js do
 
   task :dev do
@@ -17,17 +19,23 @@ namespace :js do
 
   desc 'test javascript specs with PhantomJS'
   task :test do
-    quick = ENV["quick"] && ENV["quick"] == "true"
-    unless quick
-      puts "--> do rake js:test quick=true to skip generating compiled coffeescript and handlebars."
-      Rake::Task['js:generate'].invoke
+    begin
+      Timeout::timeout(300) do
+        quick = ENV["quick"] && ENV["quick"] == "true"
+        unless quick
+          puts "--> do rake js:test quick=true to skip generating compiled coffeescript and handlebars."
+          Rake::Task['js:generate'].invoke
+        end
+        puts "--> executing phantomjs tests"
+        Rake::Task['js:generate_runner'].invoke
+        phantomjs_output = `phantomjs spec/javascripts/support/qunit/test.js file:///#{Dir.pwd}/spec/javascripts/runner.html`
+        exit_status = $?.exitstatus
+        puts phantomjs_output
+        raise "PhantomJS tests failed" if exit_status != 0
+      end
+    rescue Timeout::Error
+      raise "PhantomJS tests reached timeout!"
     end
-    puts "--> executing phantomjs tests"
-    Rake::Task['js:generate_runner'].invoke
-    phantomjs_output = `phantomjs spec/javascripts/support/qunit/test.js file:///#{Dir.pwd}/spec/javascripts/runner.html`
-    exit_status = $?.exitstatus
-    puts phantomjs_output
-    raise "PhantomJS tests failed" if exit_status != 0
   end
 
   def coffee_destination(dir_or_file)
