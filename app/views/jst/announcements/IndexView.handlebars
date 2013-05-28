@@ -14,22 +14,11 @@
       </span>
 
       {{#if options.permissions.create}}
-        <a href="{{new_topic_url}}"
-           class="btn btn-primary icon-plus"
-           id="new-discussion-btn">
-          {{#t "new_discussion"}}
-            <span class="screenreader-only">Start a</span>
-            Discussion
-          {{/t}}
+        <a href="{{new_topic_url}}" class="btn btn-primary" id="new-discussion-btn">
+          <i class="icon-announcement"></i> 
+          {{#t "make_an_announcement"}}Make an announcement{{/t}}
         </a>
       {{/if}}
-
-      <button
-        id="edit_discussions_settings"
-        class="btn"
-        data-tooltip="{{#if options.permissions.create}}top{{else}}left{{/if}}"
-        title='{{#t "edit_settings"}}Edit Discussions Settings{{/t}}'
-      ><i class="icon-settings"></i></button>
     </div>
     <div class="headerBar-left form-inline index_view_filter_form">
       <label class="hidden-inline-text" for="searchTerm">{{#t "search_title_body_or_author"}}Search title, body, or author{{/t}}</label>
@@ -41,39 +30,31 @@
         <input type="checkbox"
                id="onlyUnread"
                {{#if onlyUnread}}checked{{/if}} /><label for="onlyUnread">{{#t "unread"}}Unread{{/t}}</label>
-        <input type="checkbox"
-               id="onlyGraded"
-               {{#if onlyGraded}}checked{{/if}}/><label for="onlyGraded">{{#t "assignments"}}Assignments{{/t}}</label>
       </span>
     </div>
   </div>
-
   <div class="nothingMatchedFilter" style="display:none;">
     <p>
-      {{#t "your_search_did_not_match_any_discussion_topics"}}Your search did not match any discussion topics.{{/t}}
+      {{#t "your_search_did_not_match_any_announcements"}}Your search did not match any announcements.{{/t}}
     </p>
     <p>
     {{#t "suggestions"}}Suggestions:{{/t}}
     <ul>
       <li>{{#t "make_sure_all_search_terms_are_spelled_correctly"}}Make sure all search terms are spelled correctly.{{/t}}</li>
       <li>{{#t "try_different_more_general_or_fewer_keywords"}}Try different, more general, or fewer keywords.{{/t}}</li>
-      <li>{{#t "try_disabling_the_unread_or_assignments_filters"}}Try disabling the "Unread" or "Assignments" filters.{{/t}}</li>
+      <li>{{#t "try_disabling_the_unread_filters"}}Try disabling the "Unread" filter.{{/t}}</li>
     </ul>
   </div>
-
-  <div class="open discussion-list item-group"></div>
-  <div class="locked discussion-list item-group"></div>
-
+  <div class="discussionTopicIndexList"></div>
 {{else}}
-
   {{#if lastPageFetched}}
     <div style="margin:auto; text-align: center; margin-top: 80px">
       <h1>
-        {{#t "there_are_no_discussion_topics_to_show"}}There are no discussion topics to show{{/t}}
+        {{#t "there_are_no_announcements_show"}}There are no announcements to show{{/t}}
       </h1>
       {{#if options.permissions.create}}
         <a href="{{new_topic_url}}" class="btn btn-large btn-primary">
-          {{#t "start_one_now"}}Start One Now{{/t}}
+          {{#t "make_an_announcement_caps"}}Make an Announcement{{/t}}
         </a>
       {{/if}}
     </div>
