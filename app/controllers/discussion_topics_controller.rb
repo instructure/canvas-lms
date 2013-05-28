@@ -120,41 +120,60 @@ class DiscussionTopicsController < ApplicationController
   #     curl https://<canvas>/api/v1/courses/<course_id>/discussion_topics \ 
   #          -H 'Authorization: Bearer <token>'
   def index
-    if authorized_action(@context.discussion_topics.new, @current_user, :read)
-      return child_topic if params[:root_discussion_topic_id] && @context.respond_to?(:context) && @context.context && @context.context.discussion_topics.find(params[:root_discussion_topic_id])
-      log_asset_access("topics:#{@context.asset_string}", "topics", 'other')
-      respond_to do |format|
-        format.html do
-          @active_tab = "discussions"
-          add_crumb t('#crumbs.discussions', "Discussions"), named_context_url(@context, :context_discussion_topics_url)
-          js_env :USER_SETTINGS_URL => api_v1_user_settings_url(@current_user),
-                 :permissions => {
-                   :create => @context.discussion_topics.new.grants_right?(@current_user, session, :create),
-                   :moderate => @context.grants_right?(@current_user, session, :moderate_forum),
-                   :change_settings => user_can_edit_course_settings?
-                 }
-          if user_can_edit_course_settings?
-            js_env :SETTINGS_URL => named_context_url(@context, :api_v1_context_settings_url)
-          end
+    return unless authorized_action(@context.discussion_topics.new, @current_user, :read)
+    return child_topic if is_child_topic?
+
+    log_asset_access("topics:#{@context.asset_string}", 'topics', 'other')
+
+    scope = if params[:only_announcements]
+              @context.active_announcements
+            else
+              @context.active_discussion_topics.only_discussion_topics
+            end
+
+    scope = params[:order_by] == 'recent_activity' ? scope.by_last_reply_at : scope.by_position
+
+    @topics = Api.paginate(scope, self, topic_pagination_url)
+    @topics.reject! { |t| t.locked? || t.locked_for?(@current_user) } if params[:scope] == 'unlocked'
+    @topics.select! { |t| t.locked? || t.locked_for?(@current_user) } if params[:scope] == 'locked'
+    @topics.each { |topic| topic.current_user = @current_user }
+
+    respond_to do |format|
+      format.html do
+        @active_tab = 'discussions'
+        add_crumb(t('#crumbs.discussions', 'Discussions'),
+                  named_context_url(@context, :context_discussion_topics_url))
+
+        locked_topics, open_topics = @topics.partition do |topic|
+          topic.locked? || topic.locked_for?(@current_user)
         end
-        format.json do
-          scope = (params[:only_announcements] ?
-                   @context.active_announcements :
-                   @context.active_discussion_topics.only_discussion_topics)
-          scope = case params[:order_by]
-            when 'recent_activity' then scope.by_last_reply_at
-            else scope.by_position
-          end
-          @topics = Api.paginate(scope, self, topic_pagination_url())
-          @topics.reject! { |t| t.locked? || t.locked_for?(@current_user) } if params[:scope] == 'unlocked'
-          @topics.select! { |t| t.locked? || t.locked_for?(@current_user) } if params[:scope] == 'locked'
-          @topics.each { |t| t.current_user = @current_user }
-          if api_request?
-            render :json => discussion_topics_api_json(@topics, @context, @current_user, session)
-          end
+
+        js_env(USER_SETTINGS_URL: api_v1_user_settings_url(@current_user),
+               openTopics: open_topics,
+               lockedTopics: locked_topics,
+               newTopicURL: named_context_url(@context, :new_context_discussion_topic_url),
+               permissions: {
+                 create: @context.discussion_topics.new.grants_right?(@current_user, session, :create),
+                 moderate: @context.grants_right?(@current_user, session, :moderate_forum),
+                 change_settings: user_can_edit_course_settings?
+               })
+
+        if user_can_edit_course_settings?
+          js_env(SETTINGS_URL: named_context_url(@context, :api_v1_context_settings_url))
         end
       end
+
+      format.json do
+        render json: discussion_topics_api_json(@topics, @context, @current_user, session)
+      end
     end
+  end
+
+  def is_child_topic?
+    root_topic_id = params[:root_discussion_topic_id]
+
+    root_topic_id && @context.respond_to?(:context) &&
+      @context.context && @context.context.discussion_topics.find(root_topic_id)
   end
 
   def new
@@ -534,5 +553,4 @@ class DiscussionTopicsController < ApplicationController
       end
     end
   end
-
 end

@@ -65,3 +65,138 @@
     filter: alpha(opacity=100) !important;
   }
 }
+
+.item-box {
+  background: #e0e5ea;
+  border: 1px solid #c1c7cf;
+  border-radius: 3px;
+  margin-bottom: 16px;
+  padding: 8px 0;
+
+  h1,h2,h3,h4,h5,h6 {
+    font-size: 16px;
+    font-weight: bold;
+    line-height: 20px;
+    margin: 0 0 8px 16px;
+
+    &, a {
+      color: #3a4652;
+      text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.75);
+
+      &:hover {
+        text-decoration: none;
+      }
+    }
+  }
+}
+
+.discussion-list {
+  margin-bottom: 12px;
+
+  .collectionViewItems {
+    margin: 0;
+  }
+
+  .element_toggler {
+    cursor: pointer;
+  }
+
+  .loader {
+    height: 40px;
+  }
+}
+
+
+.discussion {
+  position: relative;
+  display: block;
+  height: auto;
+  background: #fff;
+  border: 1px solid #c1c7cf;
+  border-radius: 3px;
+  color: #696969;
+  padding: 8px 0;
+
+  &:after {
+    clear: both;
+    content: "";
+    display: table;
+  }
+
+  &:hover {
+    background: #eef7ff;
+  }
+
+  a {
+    display: inline;
+    height: auto;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    color: inherit;
+  }
+
+  .avatar {
+    border: 2px solid #d2dbe1;
+    border-radius: 26px;
+    float: left;
+    margin: 0 20px 0 32px;
+
+    &.icon-assignment {
+      border: none;
+      border-radius: 0;
+      height: 50px;
+      width: 50px;
+
+      &:before {
+        font-size: 50px;
+        line-height: 50px;
+      }
+    }
+  }
+
+  .discussion-content {
+    display: table-cell;
+    width: 9999px;
+  }
+
+  .actions {
+    a {
+      color: #bbb;
+    }
+
+    .al-options a {
+      color: #fff;
+    }
+  }
+
+  .title {
+    color: #1f6fc0;
+    display: block;
+    font-size: 14px;
+    font-weight: bold;
+    line-height: 12px;
+  }
+
+  .author {
+    color: #1f6fc0;
+    font-size: 10px;
+  }
+
+  .discussion-unread-container {
+    margin-right: 12px;
+  }
+
+  .summary {
+    /* TODO: make this dynamic somehow */
+    width: 500px;
+  }
+
+
+  &.no-content {
+    display: none;
+    margin: 5px;
+    padding: 8px;
+  }
+}
+

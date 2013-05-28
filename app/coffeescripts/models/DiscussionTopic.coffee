@@ -1,11 +1,12 @@
 define [
+  'i18n!discussion_topics'
   'Backbone'
   'jquery'
   'underscore'
   'compiled/collections/ParticipantCollection'
   'compiled/collections/DiscussionEntriesCollection'
   'compiled/models/Assignment'
-], (Backbone, $, _, ParticipantCollection, DiscussionEntriesCollection, Assignment) ->
+], (I18n, Backbone, $, _, ParticipantCollection, DiscussionEntriesCollection, Assignment) ->
 
   class DiscussionTopic extends Backbone.Model
     resourceName: 'discussion_topics'
@@ -41,9 +42,25 @@ define [
 
     toJSON: ->
       json = super
-      unless json.set_assignment
-        delete json.assignment
-      json
+      delete json.assignment unless json.set_assignment
+      _.extend json,
+        summary: @summary(),
+        unread_count_tooltip: @unreadTooltip(),
+        reply_count_tooltip: @replyTooltip()
+
+    unreadTooltip: ->
+      I18n.t 'unread_count_tooltip', {
+        zero:  'No unread replies'
+        one:   '1 unread reply'
+        other: '%{count} unread replies'
+      }, count: @get('unread_count')
+
+    replyTooltip: ->
+      I18n.t 'reply_count_tooltip', {
+        zero:  'No replies'
+        one:   '1 reply'
+        other: '%{count} replies'
+      }, count: @get('discussion_subentry_count')
 
     ##
     # this is for getting the topic 'full view' from the api
