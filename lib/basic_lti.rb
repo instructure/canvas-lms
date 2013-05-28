@@ -153,7 +153,7 @@ module BasicLTI
       end
       if tool.public?
         hash['custom_canvas_user_id'] = user.id
-        pseudo = user.sis_pseudonym_for(self)
+        pseudo = user.find_pseudonym_for_account(self.root_account)
         if pseudo
           hash['lis_person_sourcedid'] = pseudo.sis_user_id if pseudo.sis_user_id
           hash['custom_canvas_user_login_id'] = pseudo.unique_id
