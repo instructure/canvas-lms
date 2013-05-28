@@ -306,7 +306,7 @@ describe ContextModule do
       course_module
       @user = User.create!(:name => "some name")
       @course.enroll_student(@user)
-      @progression = @module.evaluate_for(@user)
+      @progression = @module.evaluate_for(@user, true)
       @progression.should_not be_nil
       @progression.should be_completed
     end
@@ -319,7 +319,7 @@ describe ContextModule do
       @tag.should_not be_nil
       @course.enroll_student(@user)
       @module.completion_requirements = {@tag.id => {:type => 'must_view'}}
-      @progression = @module.evaluate_for(@user)
+      @progression = @module.evaluate_for(@user, true)
       @progression.should_not be_nil
       @progression.should be_unlocked
     end
@@ -479,7 +479,7 @@ describe ContextModule do
       @course.enroll_teacher(@teacher)
       @user = User.create!(:name => "some name")
       @course.enroll_student(@user)
-      @progression = @module.evaluate_for(@user)
+      @progression = @module.evaluate_for(@user, true)
       @progression.should_not be_nil
       @progression.should be_unlocked
       @assignment.locked_for?(@user).should eql(false)
@@ -544,7 +544,7 @@ describe ContextModule do
       mod.completion_requirements = {tag.id => {:type => 'min_score', :min_score => 5}}
       mod.save!
       
-      p = mod.evaluate_for(@student)
+      p = mod.evaluate_for(@student, true)
       p.requirements_met.should == []
       p.workflow_state.should == 'unlocked'
       
@@ -575,7 +575,7 @@ describe ContextModule do
       @course.enroll_teacher(@teacher)
       @user = User.create!(:name => "some name")
       @course.enroll_student(@user)
-      @progression = @module.evaluate_for(@user)
+      @progression = @module.evaluate_for(@user, true)
       @progression.should_not be_nil
       @progression.should be_unlocked
       @progression.current_position.should eql(@tag.position)
@@ -662,7 +662,7 @@ describe ContextModule do
       @user = User.create!(:name => "some name")
       @course.enroll_student(@user)
       
-      @progression = @module.evaluate_for(@user)
+      @progression = @module.evaluate_for(@user, true)
       @progression.should_not be_nil
       @progression.should be_unlocked
       @progression.current_position.should eql(@tag.position)

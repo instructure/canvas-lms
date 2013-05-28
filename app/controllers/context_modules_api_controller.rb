@@ -75,7 +75,7 @@ class ContextModulesApiController < ApplicationController
       scope = @context.modules_visible_to(@current_user)
       modules = Api.paginate(scope, self, route)
       modules_and_progressions = if @context.grants_right?(@current_user, session, :participate_as_student)
-        modules.map { |m| [m, m.evaluate_for(@current_user)] }
+        modules.map { |m| [m, m.evaluate_for(@current_user, true)] }
       else
         modules.map { |m| [m, nil] }
       end
@@ -95,7 +95,7 @@ class ContextModulesApiController < ApplicationController
   def show
     if authorized_action(@context, @current_user, :read)
       mod = @context.modules_visible_to(@current_user).find(params[:id])
-      prog = @context.grants_right?(@current_user, session, :participate_as_student) ? mod.evaluate_for(@current_user) : nil
+      prog = @context.grants_right?(@current_user, session, :participate_as_student) ? mod.evaluate_for(@current_user, true) : nil
       render :json => module_json(mod, @current_user, session, prog)
     end
   end

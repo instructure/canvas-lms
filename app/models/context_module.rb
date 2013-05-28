@@ -524,7 +524,7 @@ class ContextModule < ActiveRecord::Base
     end
     @cached_tags ||= self.content_tags.active
     tags = @cached_tags
-    if recursive_check || progression.new_record? || progression.updated_at < self.updated_at || Rails.env.test? || User.module_progression_jobs_queued?(user.id)
+    if recursive_check || progression.new_record? || progression.updated_at < self.updated_at || User.module_progression_jobs_queued?(user.id)
       if self.completion_requirements.blank? && active_prerequisites.empty?
         progression.workflow_state = 'completed'
         progression.save

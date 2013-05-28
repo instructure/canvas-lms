@@ -519,7 +519,7 @@ describe "Pages API", :type => :integration do
       # index should not affect anything
       api_call(:get, "/api/v1/courses/#{@course.id}/pages",
                {:controller=>'wiki_pages_api', :action=>'index', :format=>'json', :course_id=>"#{@course.id}"})
-      mod.evaluate_for(@user).workflow_state.should == "unlocked"
+      mod.evaluate_for(@user, true).workflow_state.should == "unlocked"
 
       # show should count as a view
       api_call(:get, "/api/v1/courses/#{@course.id}/pages/#{@front_page.url}",
