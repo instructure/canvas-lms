@@ -1980,10 +1980,6 @@ class User < ActiveRecord::Base
   TAB_EPORTFOLIOS = 3
   TAB_HOME = 4
 
-  def sis_user_id
-    pseudonym.try(:sis_user_id)
-  end
-
   def highest_role
     return 'admin' unless self.accounts.empty?
     return 'teacher' if self.cached_current_enrollments.any?(&:admin?)
