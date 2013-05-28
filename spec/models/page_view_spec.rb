@@ -78,6 +78,7 @@ describe PageView do
         @shard2.settings[:page_view_method] = :cache
         @shard2.save
         @shard2.activate do
+          user
           pv = page_view_model
           pv.shard.should == @shard2
           pv.save!
@@ -291,10 +292,11 @@ describe PageView do
     describe "batch transaction" do
       self.use_transactional_fixtures = false
       it "should not fail the batch if one row fails" do
+        user
         expect {
           PageView.transaction do
-            PageView.process_cache_queue_item('request_id' => '1234')
-            PageView.process_cache_queue_item('request_id' => '1234')
+            PageView.process_cache_queue_item('request_id' => '1234', 'user_id' => @user.id)
+            PageView.process_cache_queue_item('request_id' => '1234', 'user_id' => @user.id)
           end
         }.to change(PageView, :count).by(1)
       end

@@ -30,7 +30,7 @@ class EventStream
   end
 
   def database
-    @database ||= Canvas::Cassandra::Database.from_config(database_name)
+    Canvas::Cassandra::Database.from_config(database_name)
   end
 
   def on_insert(&callback)

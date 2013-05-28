@@ -34,6 +34,13 @@ class PageView < ActiveRecord::Base
 
   attr_accessible :url, :user, :controller, :action, :session_id, :developer_key, :user_agent, :real_user, :context
 
+  # note that currently we never query page views from the perspective of the course;
+  # we simply don't record them for non-logged-in users in a public course
+  # if we ever do either of the above, we'll need to remove this, and figure out
+  # where such page views should belong (currently page views end up on the user's
+  # shard)
+  validates_presence_of :user_id
+
   def self.generate(request, attributes={})
     self.new(attributes).tap do |p|
       p.url = request.url[0,255]
@@ -198,17 +205,21 @@ class PageView < ActiveRecord::Base
   end
 
   def create_without_callbacks
-    return super unless cassandra?
-    self.created_at ||= Time.zone.now
-    PageView::EventStream.insert(self)
-    @new_record = false
-    self.id
+    user.shard.activate do
+      return super unless cassandra?
+      self.created_at ||= Time.zone.now
+      PageView::EventStream.insert(self)
+      @new_record = false
+      self.id
+    end
   end
 
   def update_without_callbacks
-    return super unless cassandra?
-    PageView::EventStream.update(self)
-    true
+    user.shard.activate do
+      return super unless cassandra?
+      PageView::EventStream.update(self)
+      true
+    end
   end
 
   scope :for_context, proc { |ctx| where(:context_type => ctx.class.name, :context_id => ctx) }
@@ -218,10 +229,12 @@ class PageView < ActiveRecord::Base
   # basically, it responds to #paginate and returns a
   # WillPaginate::Collection-like object
   def self.for_user(user)
-    if cassandra?
-      PageView::EventStream.for_user(user)
-    else
-      self.where(:user_id => user).order('created_at desc')
+    user.shard.activate do
+      if cassandra?
+        PageView::EventStream.for_user(user)
+      else
+        self.where(:user_id => user).order('created_at desc')
+      end
     end
   end
 
@@ -410,7 +423,9 @@ class PageView < ActiveRecord::Base
     end
 
     def cassandra
-      PageView::EventStream.database
+      user.shard.activate do
+        PageView::EventStream.database
+      end
     end
 
     def run
