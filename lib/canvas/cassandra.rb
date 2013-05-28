@@ -18,17 +18,22 @@
 #
 module Canvas::Cassandra
   class Database
-    def self.configured?(config_name)
+    def self.configured?(config_name, environment = :current)
       raise ArgumentError, "config name required" if config_name.blank?
-      config = Setting.from_config('cassandra').try(:[], config_name)
+      config = Setting.from_config('cassandra', environment).try(:[], config_name)
       config && config['servers'] && config['keyspace']
     end
 
-    def self.from_config(config_name)
+    def self.from_config(config_name, environment = :current)
       @connections ||= {}
-      @connections[config_name] ||= begin
-        config = Setting.from_config('cassandra').try(:[], config_name)
-        raise ArgumentError, "No configuration for Cassandra for: #{config_name.inspect}" unless config
+      environment = Rails.env if environment == :current
+      key = [config_name, environment]
+      @connections.fetch(key) do
+        config = Setting.from_config('cassandra', environment).try(:[], config_name)
+        unless config
+          @connections[key] = nil
+          return nil
+        end
         servers = Array(config['servers'])
         raise "No Cassandra servers defined for: #{config_name.inspect}" unless servers.present?
         keyspace = config['keyspace']
@@ -38,7 +43,7 @@ module Canvas::Cassandra
         thrift_opts[:retries] = config['retries'] if config['retries']
         thrift_opts[:connect_timeout] = config['connect_timeout'] if config['connect_timeout']
         thrift_opts[:timeout] = config['timeout'] if config['timeout']
-        self.new(servers, opts, thrift_opts)
+        @connections[key] = self.new(servers, opts, thrift_opts)
       end
     end
 
