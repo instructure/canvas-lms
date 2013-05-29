@@ -1,0 +1,15 @@
+<a href="{{htmlUrl}}" class="ig-link {{#if published}}ig-published{{/if}}">
+  <div class="ig-title ellipses">
+    <i class='icon-{{iconType}}'></i>
+    {{name}}
+  </div>
+  <div class="ig-details row-fluid">
+    <div class="span6 ellipses">
+      <!-- TODO: VDD -->
+      {{#if dueAt}}{{#t "due_date"}}Due{{/t}} {{datetimeFormatted dueAt}}{{/if}}
+    </div>
+    <div class="span6 ellipses">
+      {{#if pointsPossible}}{{#t "points_possible"}}{{pointsPossible}} pts{{/t}}{{/if}}
+    </div>
+  </div>
+</a>

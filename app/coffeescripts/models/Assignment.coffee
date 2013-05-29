@@ -13,7 +13,7 @@ define [
     initialize: ->
       overrides = @get('assignment_overrides')
       @set 'assignment_overrides',
-        new AssignmentOverrideCollection( overrides )
+        new AssignmentOverrideCollection(overrides)
       @set 'turnitin_settings', new TurnitinSettings(@get 'turnitin_settings'),
         silent: true
 
@@ -25,38 +25,38 @@ define [
       ! _.include @_submissionTypes(), 'online_quiz', 'discussion_topic',
         'not_graded', 'external_tool'
 
-    assignmentType: ( type ) =>
+    assignmentType: (type) =>
       return @_getAssignmentType() unless arguments.length > 0
       if type == 'assignment'
         @set 'submission_types', [ 'none' ]
       else
         @set 'submission_types', [ type ]
 
-    dueAt: ( date ) =>
+    dueAt: (date) =>
       return @get 'due_at' unless arguments.length > 0
       @set 'due_at', date
 
-    unlockAt: ( date ) =>
+    unlockAt: (date) =>
       return @get 'unlock_at' unless arguments.length > 0
       @set 'unlock_at', date
 
-    lockAt: ( date )  =>
+    lockAt: (date)  =>
       return @get 'lock_at' unless arguments.length > 0
       @set 'lock_at', date
 
-    description: ( newDescription ) =>
+    description: (newDescription) =>
       return @get 'description' unless arguments.length > 0
       @set 'description', newDescription
 
-    name: ( newName ) =>
+    name: (newName) =>
       return @get 'name' unless arguments.length > 0
       @set 'name', newName
 
-    pointsPossible: ( points ) =>
+    pointsPossible: (points) =>
       return @get('points_possible') || 0 unless arguments.length > 0
       @set 'points_possible', points
 
-    assignmentGroupId: ( assignment_group_id ) =>
+    assignmentGroupId: (assignment_group_id) =>
       return @get 'assignment_group_id' unless assignment_group_id
       @set 'assignment_group_id', assignment_group_id
 
@@ -72,13 +72,13 @@ define [
     frozenAttributes: =>
       @get('frozen_attributes') || []
 
-    gradingType: ( gradingType ) =>
+    gradingType: (gradingType) =>
       return @get('grading_type') || 'points' unless gradingType
       @set 'grading_type', gradingType
 
     courseID: => @get('course_id')
 
-    submissionTypes: ( submissionTypes ) =>
+    submissionTypes: (submissionTypes) =>
       return @_submissionTypes() unless arguments.length > 0
       @set 'submission_types', submissionTypes
 
@@ -106,40 +106,40 @@ define [
           thing in ['online', 'online_text_entry',
             'media_recording', 'online_url', 'online_upload']
 
-    peerReviews: ( peerReviewBoolean ) =>
+    peerReviews: (peerReviewBoolean) =>
       return @get 'peer_reviews' unless arguments.length > 0
       @set 'peer_reviews', peerReviewBoolean
 
-    automaticPeerReviews: ( autoPeerReviewBoolean ) =>
+    automaticPeerReviews: (autoPeerReviewBoolean) =>
       return @get 'automatic_peer_reviews' unless arguments.length > 0
       @set 'automatic_peer_reviews', autoPeerReviewBoolean
 
-    peerReviewCount:( peerReviewCount ) =>
+    peerReviewCount:(peerReviewCount) =>
       return @get('peer_review_count') || 0 unless arguments.length > 0
       @set 'peer_review_count', peerReviewCount
 
-    peerReviewsAssignAt: ( date )  =>
+    peerReviewsAssignAt: (date)  =>
       return @get('peer_reviews_assign_at') || null unless arguments.length > 0
       @set 'peer_reviews_assign_at', date
 
-    notifyOfUpdate: ( notifyOfUpdateBoolean ) =>
+    notifyOfUpdate: (notifyOfUpdateBoolean) =>
       return @get 'notify_of_update' unless arguments.length > 0
       @set 'notify_of_update', notifyOfUpdateBoolean
 
     restrictFileExtensions: => !!@allowedExtensions()
 
-    allowedExtensions: ( extensionsList ) =>
+    allowedExtensions: (extensionsList) =>
       return @get('allowed_extensions') unless arguments.length > 0
       @set 'allowed_extensions', extensionsList
 
     turnitinAvailable: =>
       typeof @get('turnitin_enabled') != 'undefined'
 
-    gradeGroupStudentsIndividually: ( setting ) =>
+    gradeGroupStudentsIndividually: (setting) =>
       return @get('grade_group_students_individually') unless arguments.length > 0
       @set 'grade_group_students_individually', setting
 
-    turnitinEnabled: ( setting ) =>
+    turnitinEnabled: (setting) =>
       if arguments.length == 0
         if @get( 'turnitin_enabled' ) == undefined
           false
@@ -148,7 +148,7 @@ define [
       else
         @set( 'turnitin_enabled', setting )
 
-    groupCategoryId: ( id ) =>
+    groupCategoryId: (id) =>
       return @get( 'group_category_id' ) unless arguments.length > 0
       @set 'group_category_id', id
 
@@ -179,6 +179,17 @@ define [
     isLetterGraded: =>
       @gradingType() == 'letter_grade'
 
+    published: (newPublished) =>
+      return @get 'published' unless arguments.length > 0
+      @set 'published', newPublished
+
+    iconType: =>
+      return 'quiz' if @isQuiz()
+      return 'discussion' if @isDiscussionTopic()
+      return 'assignment'
+
+    htmlUrl: => @get 'html_url'
+
     toView: =>
       fields = [
         'name', 'dueAt','description','pointsPossible', 'lockAt', 'unlockAt',
@@ -191,7 +202,8 @@ define [
         'turnitinAvailable','turnitinEnabled',
         'gradeGroupStudentsIndividually', 'groupCategoryId', 'frozen',
         'frozenAttributes', 'freezeOnCopy', 'canFreeze', 'isSimple',
-        'gradingStandardId', 'isLetterGraded', 'assignmentGroupId'
+        'gradingStandardId', 'isLetterGraded', 'assignmentGroupId', 'iconType',
+        'published', 'htmlUrl'
       ]
       hash = {}
       for field in fields

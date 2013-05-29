@@ -142,7 +142,7 @@
           <% if can_do(@quiz, @current_user, :update) || can_do(@quiz, @current_user, :grade) || can_do(@quiz, @current_user, :review_grades) %>
             <div class="admin-links" style="margin-left: 5px">
               <a class="al-trigger btn">
-                <span class="screenreader-only">Manage</span>
+                <span class="screenreader-only"><%= t(:manage, "Manage") %></span>
                 <i class="icon-settings"></i>
                 <i class="icon-mini-arrow-down"></i>
               </a>

@@ -73,6 +73,7 @@
   border: 1px solid darken($wellBackground, 7%);
   padding: 9px;
   border-radius: 3px;
+  margin-bottom: 20px;
 }
 
 .ig-header, .ig-text {
@@ -89,10 +90,16 @@
 
 .ig-header {
   font-weight: bold;
+  padding-top: 5px;
+  padding-bottom: 5px;
 
   .icon-mini-arrow-right {
     position: relative;
     top: -1px;
+  }
+
+  .btn {
+    vertical-align: text-bottom;
   }
 }
 
@@ -107,7 +114,7 @@
   margin: 5px 0;
 }
 
-.ig-list  a {
+.ig-list .ig-link {
   position: relative;
   display: block;
   height: 40px;

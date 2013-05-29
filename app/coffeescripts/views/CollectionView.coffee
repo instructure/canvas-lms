@@ -66,6 +66,7 @@ define [
 
     ##
     # @api public
+
     toJSON: -> @options
 
     ##

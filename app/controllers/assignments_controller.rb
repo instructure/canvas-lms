@@ -31,7 +31,7 @@ class AssignmentsController < ApplicationController
   
   def index
     if @context == @current_user || authorized_action(@context, @current_user, :read)
-      get_all_pertinent_contexts
+      get_all_pertinent_contexts  # NOTE: this crap is crazy.  can we get rid of it?
       get_sorted_assignments
       add_crumb(t('#crumbs.assignments', "Assignments"), (@just_viewing_one_course ? named_context_url(@context, :context_assignments_url) : "/assignments" ))
       @context= (@just_viewing_one_course ? @context : @current_user)
@@ -45,7 +45,13 @@ class AssignmentsController < ApplicationController
             format.html { redirect_to root_url }
           end
         elsif @just_viewing_one_course && @context.assignments.new.grants_right?(@current_user, session, :update)
-          format.html
+          format.html {
+            if @domain_root_account.enable_draft?
+              render :action => :new_teacher_index
+            else
+              render :action => :index
+            end
+          }
         else
           @current_user_submissions ||= @current_user && @current_user.submissions.
               select([:id, :assignment_id, :score, :workflow_state]).

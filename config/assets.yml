@@ -102,6 +102,8 @@ stylesheets:
     - public/stylesheets/compiled/assignments.css
     - public/stylesheets/compiled/grading_standards.css
     - public/stylesheets/static/embed_content.css
+  teacher_assignments:
+    - public/stylesheets/compiled/teacher_assignments.css
   grading_standards:
     - public/stylesheets/compiled/grading_standards.css
   login:

@@ -1,0 +1,40 @@
+<div class="form-inline clearfix">
+  <input
+    type="text"
+    name="search_term"
+    data-view="inputFilter"
+    placeholder='{{#t "search_for_assignment"}}Search for assignment{{/t}}'
+    aria-label='{{#t "search"}}Search{{/t}}'
+  >
+
+  <label
+    class="checkbox"
+    id="weight-groups"
+  >
+    <input type="checkbox" name="weight_groups">
+    {{#t "weight_groups"}}Weight final grade based on assignment groups{{/t}}
+  </label>
+
+  <div class="pull-right">
+    <a
+      class="btn"
+      id="addGroup"
+      title='{{#t "add_group"}}Add Group{{/t}}'
+    >{{#t "add_group"}}Add Group{{/t}}</a>
+
+    <a
+      class="btn btn-primary"
+      id="addAssignment"
+      title='{{#t "add_assignment"}}Add Assignment{{/t}}'
+    >{{#t "add_assignment"}}Add Assignment{{/t}}</a>
+  </div>
+</div>
+
+
+<div class="v-gutter">
+  <div data-view="assignmentGroups"></div>
+</div>
+
+<form data-view="createGroup" class="form-dialog"></form>
+
+<form data-view="createAssignment" class="form-dialog"></form>
