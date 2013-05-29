@@ -273,7 +273,54 @@ describe DiscussionTopicsController, :type => :integration do
         json.map {|j| j['id']}.should == topics.map(&:id)
       end
 
+      it "should only include topics with a given scope when specified" do
+        @topic2 = create_topic(@course, :title => "Topic 2", :message => "<p>content here</p>")
+        @topic3 = create_topic(@course, :title => "Topic 3", :message => "<p>content here</p>")
+        [@topic, @sub, @topic2, @topic3].each do |topic|
+          topic.save!
+        end
+        [@sub, @topic2, @topic3].each(&:lock!)
+        
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics.json?per_page=10&scope=unlocked",
+                        {:controller => 'discussion_topics', :action => 'index', :format => 'json', :course_id => @course.id.to_s, 
+                          :per_page => '10', :scope => 'unlocked'})
+        json.size.should == 1
+        links = response.headers['Link'].split(',')
+        links.each do |link|
+          link.should match('scope=unlocked')
+        end
+
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics.json?per_page=10&scope=locked",
+                        {:controller => 'discussion_topics', :action => 'index', :format => 'json', :course_id => @course.id.to_s, 
+                          :per_page => '10', :scope => 'locked'})
+        json.size.should == 3
+        links = response.headers['Link'].split(',')
+        links.each do |link|
+          link.should match('scope=locked')
+        end
+      end
+      
+      it "should include all parameters in pagination urls" do
+        @topic2 = create_topic(@course, :title => "Topic 2", :message => "<p>content here</p>")
+        @topic3 = create_topic(@course, :title => "Topic 3", :message => "<p>content here</p>")
+        [@topic, @sub, @topic2, @topic3].each do |topic|
+          topic.type = 'Announcement'
+          topic.save!
+        end
+        
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics.json?per_page=2&only_announcements=true&order_by=recent_activity&scope=unlocked",
+                        {:controller => 'discussion_topics', :action => 'index', :format => 'json', :course_id => @course.id.to_s,
+                          :per_page => '2', :order_by => 'recent_activity', :only_announcements => 'true', :scope => 'unlocked'})
+        json.size.should == 2
+        links = response.headers['Link'].split(',')
+        links.each do |link|
+          link.should match('only_announcements=true')
+          link.should match('order_by=recent_activity')
+          link.should match('scope=unlocked')
+        end
+      end
     end
+
     describe "GET 'show'" do
       it "should return an individual topic" do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",

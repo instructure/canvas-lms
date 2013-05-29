@@ -113,8 +113,8 @@ class DiscussionTopicsController < ApplicationController
   # Returns the paginated list of discussion topics for this course or group.
   #
   # @argument order_by Determines the order of the discussion topic list. May be one of "position", or "recent_activity". Defaults to "position".
-  #
-  # @argument only_announcements Set to true to get announcements instead of discussions.
+  # @argument scope [Optional, "locked"|"unlocked"] Only return discussion topics in the given state. Defaults to including locked and unlocked topics. Filtering is done after pagination, so pages may be smaller than requested if topics are filtered
+  # @argument only_announcements [Optional] Boolean, return announcements instead of discussion topics. Defaults to false
   #
   # @example_request
   #     curl https://<canvas>/api/v1/courses/<course_id>/discussion_topics \ 
@@ -145,7 +145,9 @@ class DiscussionTopicsController < ApplicationController
             when 'recent_activity' then scope.by_last_reply_at
             else scope.by_position
           end
-          @topics = Api.paginate(scope, self, topic_pagination_url(:only_announcements => params[:only_announcements]))
+          @topics = Api.paginate(scope, self, topic_pagination_url())
+          @topics.reject! { |t| t.locked? || t.locked_for?(@current_user) } if params[:scope] == 'unlocked'
+          @topics.select! { |t| t.locked? || t.locked_for?(@current_user) } if params[:scope] == 'locked'
           @topics.each { |t| t.current_user = @current_user }
           if api_request?
             render :json => discussion_topics_api_json(@topics, @context, @current_user, session)
