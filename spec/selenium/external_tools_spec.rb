@@ -17,6 +17,7 @@ describe "external tools" do
     # This test has included multiple tests due because there is no need to slow down
     # the testing cycle. All of these tests depend on the prior to pass.
     it "should be able to view app center list and manage a add an app" do
+      pending('resolution brainstorming')
       ff('.app').size.should > 0
       ff('.app').first.click
       wait_for_ajaximations
