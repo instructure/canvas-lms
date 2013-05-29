@@ -30,6 +30,8 @@ define [
       'click [data-edit-external-tool]': 'editTool'
       'click [data-delete-external-tool]': 'deleteTool'
 
+    currentAppCenterPosition: 0
+
     afterRender: ->
       if @options.appCenterEnabled
         @appCenterView.collection.fetch()
@@ -43,6 +45,7 @@ define [
       @$addToolLink.hide()
 
     hideAppCenterView: =>
+      @currentAppCenterPosition = $(document).scrollTop()
       @appCenterView.hide()
       @$viewAppCenterLink.show() if @options.appCenterEnabled
 
@@ -63,6 +66,7 @@ define [
       @hideExternalToolsView()
       @$viewAppCenterLink.hide()
       @appCenterView.show()
+      $(document).scrollTop(@currentAppCenterPosition)
 
     showAppFullView: (event) ->
       @hideExternalToolsView()
