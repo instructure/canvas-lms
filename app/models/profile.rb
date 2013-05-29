@@ -13,7 +13,7 @@ class Profile < ActiveRecord::Base
   validates_format_of :path, :with => /\A[a-z0-9-]+\z/
   validates_uniqueness_of :path, :scope => :root_account_id
   validates_uniqueness_of :context_id, :scope => :context_type
-  validates_inclusion_of :visibility, :in => %w{ public private }
+  validates_inclusion_of :visibility, :in => %w{ public unlisted private }
 
   self.abstract_class = true
 
