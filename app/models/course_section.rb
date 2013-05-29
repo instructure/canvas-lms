@@ -77,22 +77,26 @@ class CourseSection < ActiveRecord::Base
   end
 
   set_policy do
-    given {|user, session| self.cached_context_grants_right?(user, session, :manage_sections) }
+    given { |user, session| self.cached_context_grants_right?(user, session, :manage_sections) }
     can :read and can :create and can :update and can :delete
 
-    given {|user, session| self.cached_context_grants_right?(user, session, :manage_students, :manage_admin_users) }
+    given { |user, session| self.cached_context_grants_right?(user, session, :manage_students, :manage_admin_users) }
     can :read
 
-    given {|user, session| self.course.account_membership_allows(user, session, :read_roster) }
+    given { |user, session| self.course.account_membership_allows(user, session, :read_roster) }
     can :read
 
-    given {|user, session| self.cached_context_grants_right?(user, session, :manage_calendar) }
+    given { |user, session| self.cached_context_grants_right?(user, session, :manage_calendar) }
     can :manage_calendar
 
-    given {|user, session| user && self.enrollments.find_by_user_id(user.id) && self.cached_context_grants_right?(user, session, :read_roster) }
+    given { |user, session|
+      user &&
+      self.course.sections_visible_to(user).scoped.where(:id => self).exists? &&
+      self.cached_context_grants_right?(user, session, :read_roster)
+    }
     can :read
 
-    given {|user, session| self.cached_context_grants_right?(user, session, :read_as_admin) }
+    given { |user, session| self.cached_context_grants_right?(user, session, :read_as_admin) }
     can :read_as_admin
   end
 
