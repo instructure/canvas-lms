@@ -6,6 +6,7 @@
 
     {{#ifEqual recipientGroups.length 1}}
       {{recipientGroups.0.name}}
+      <input type="hidden" name="recipientGroupName" value="{{recipientGroups.0.name}}" />
     {{else}}
       <select name="recipientGroupName" id="message-recipients-group">
         {{#each recipientGroups}}
