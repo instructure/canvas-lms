@@ -305,7 +305,7 @@ class ContentMigration < ActiveRecord::Base
     end
   end
 
-  def reset_job_progress
+  def reset_job_progress(wf_state=:queued)
     self.progress = 0
     if self.job_progress
       p = self.job_progress
@@ -313,7 +313,7 @@ class ContentMigration < ActiveRecord::Base
       p = Progress.new(:context => self, :tag => "content_migration")
       self.job_progress = p
     end
-    p.workflow_state = :queued
+    p.workflow_state = wf_state
     p.completion = 0
     p.user = self.user
     p.save!
@@ -325,22 +325,30 @@ class ContentMigration < ActiveRecord::Base
     check_quiz_id_prepender
     plugin = Canvas::Plugin.find(migration_type)
     if plugin
-      begin
-        if Canvas::Migration::Worker.const_defined?(plugin.settings['worker'])
-          self.workflow_state = :exporting
-          job = Canvas::Migration::Worker.const_get(plugin.settings['worker']).enqueue(self)
-          self.save
-          job
-        else
-          raise NameError
-        end
-      rescue NameError
-        self.workflow_state = 'failed'
-        message = "The migration plugin #{migration_type} doesn't have a worker."
-        migration_settings[:last_error] = message
-        ErrorReport.log_exception(:content_migration, $!)
-        logger.error message
+      if self.workflow_state == 'exported' && !plugin.settings[:skip_conversion_step]
+        # it's ready to be imported
+        self.workflow_state = :importing
         self.save
+        import_content
+      else
+        # find worker and queue for conversion
+        begin
+          if Canvas::Migration::Worker.const_defined?(plugin.settings['worker'])
+            self.workflow_state = :exporting
+            job = Canvas::Migration::Worker.const_get(plugin.settings['worker']).enqueue(self)
+            self.save
+            job
+          else
+            raise NameError
+          end
+        rescue NameError
+          self.workflow_state = 'failed'
+          message = "The migration plugin #{migration_type} doesn't have a worker."
+          migration_settings[:last_error] = message
+          ErrorReport.log_exception(:content_migration, $!)
+          logger.error message
+          self.save
+        end
       end
     else
       self.workflow_state = 'failed'
@@ -384,7 +392,7 @@ class ContentMigration < ActiveRecord::Base
   end
 
   def import_content
-    reset_job_progress unless import_immediately?
+    reset_job_progress(:running) if !import_immediately?
     self.workflow_state = :importing
     self.save
 
@@ -408,6 +416,10 @@ class ContentMigration < ActiveRecord::Base
 
       migration_settings[:migration_ids_to_import] ||= {:copy=>{}}
       self.context.import_from_migration(data, migration_settings[:migration_ids_to_import], self)
+
+      if !self.import_immediately?
+        update_import_progress(100)
+      end
     rescue => e
       self.workflow_state = :failed
       er = ErrorReport.log_exception(:content_migration, e)

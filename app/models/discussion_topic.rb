@@ -768,7 +768,7 @@ class DiscussionTopic < ActiveRecord::Base
         context = Group.find_by_context_id_and_context_type_and_migration_id(migration.context.id, migration.context.class.to_s, topic['group_id']) if topic['group_id']
         context ||= migration.context
         if context
-          if migration.import_object?("topics", topic['migration_id'])
+          if migration.import_object?("discussion_topics", topic['migration_id']) || migration.import_object?("topics", topic['migration_id'])
             begin
               import_from_migration(topic.merge({:topic_entries_to_import => topic_entries_to_import}), context)
             rescue

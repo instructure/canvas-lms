@@ -147,6 +147,14 @@ describe ContentMigrationsController, :type => :integration do
       api_call(:post, @migration_url, @params, {:migration_type => 'course_copy_importer', :settings => {:source_course_id => @course.id.to_param}})
     end
 
+    it "should not queue for course copy and selective_import" do
+      json = api_call(:post, @migration_url, @params, {:migration_type => 'course_copy_importer', :selective_import => '1', :settings => {:source_course_id => @course.id.to_param}})
+      json["workflow_state"].should == 'waiting_for_select'
+      migration = ContentMigration.find json['id']
+      migration.workflow_state.should == "exported"
+      migration.job_progress.should be_nil
+    end
+
     context "migration file upload" do
       it "should set attachment pre-flight data" do
         json = api_call(:post, @migration_url, @params, @post_params)
@@ -243,6 +251,41 @@ describe ContentMigrationsController, :type => :integration do
       p.completion.should == 0
       p.workflow_state.should == 'queued'
     end
+
+    context "selective content" do
+      before do
+        @migration.workflow_state = 'exported'
+        @migration.migration_settings[:import_immediately] = false
+        @migration.save!
+        @post_params = {:copy => {:all_assignments => true}}
+      end
+
+      it "should set the selective data" do
+        json = api_call(:put, @migration_url, @params, @post_params)
+        @migration.reload
+        @migration.migration_settings[:migration_ids_to_import].should == {'copy' => {'all_assignments' => 'true'}}
+        @migration.copy_options.should == {'all_assignments' => 'true'}
+      end
+
+      it "should queue a course copy after selecting content" do
+        @migration.migration_type = 'course_copy_importer'
+        @migration.migration_settings[:source_course_id] = @course.id
+        @migration.save!
+        json = api_call(:put, @migration_url, @params, @post_params)
+        json['workflow_state'].should == 'running'
+        @migration.reload
+        @migration.workflow_state.should == 'exporting'
+      end
+
+      it "should queue a file migration after selecting content" do
+        json = api_call(:put, @migration_url, @params, @post_params)
+        json['workflow_state'].should == 'running'
+        @migration.reload
+        @migration.workflow_state.should == 'importing'
+      end
+
+    end
+
   end
 
   describe 'migration_systems' do

@@ -671,7 +671,7 @@ class ContextModule < ActiveRecord::Base
   def self.process_migration(data, migration)
     modules = data['modules'] ? data['modules'] : []
     modules.each do |mod|
-      if migration.import_object?("modules", mod['migration_id'])
+      if migration.import_object?("context_modules", mod['migration_id']) || migration.import_object?("modules", mod['migration_id'])
         begin
           import_from_migration(mod, migration.context)
         rescue

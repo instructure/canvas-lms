@@ -252,7 +252,7 @@ class Attachment < ActiveRecord::Base
     attachments = data['file_map'] ? data['file_map']: {}
     # TODO i18n
     attachments.values.each do |att|
-      if !att['is_folder'] && migration.import_object?("files", att['migration_id'])
+      if !att['is_folder'] && (migration.import_object?("attachments", att['migration_id']) || migration.import_object?("files", att['migration_id']))
         begin
           import_from_migration(att, migration.context)
         rescue

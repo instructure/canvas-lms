@@ -321,6 +321,10 @@ class ContentMigrationsController < ApplicationController
         @content_migration.workflow_state = 'exported'
         params[:do_not_run] = true
       end
+    elsif params[:copy]
+      @content_migration.migration_settings[:migration_ids_to_import] ||= {}
+      @content_migration.migration_settings[:migration_ids_to_import][:copy] = params[:copy]
+      @content_migration.copy_options = params[:copy]
     else
       @content_migration.migration_settings[:import_immediately] = true
       @content_migration.copy_options = {:everything => true}

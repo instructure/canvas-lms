@@ -365,7 +365,7 @@ class WikiPage < ActiveRecord::Base
         ErrorReport.log_error(:content_migration, :message => "There was a nil wiki page imported for ContentMigration:#{migration.id}")
         next
       end
-      next unless migration.import_object?("wikis", wiki['migration_id'])
+      next unless migration.import_object?("wiki_pages", wiki['migration_id']) || migration.import_object?("wikis", wiki['migration_id'])
       begin
         import_from_migration(wiki, migration.context) if wiki
       rescue

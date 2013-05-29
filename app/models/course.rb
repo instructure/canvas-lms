@@ -1835,7 +1835,7 @@ class Course < ActiveRecord::Base
       path = file['path_name'].starts_with?('/') ? file['path_name'][1..-1] : file['path_name']
       self.attachment_path_id_lookup[path] = file['migration_id']
       self.attachment_path_id_lookup_lower[path.downcase] = file['migration_id']
-      if migration.import_object?("files", file['migration_id'])
+      if migration.import_object?("attachments", file['migration_id']) || migration.import_object?("files", file['migration_id'])
         valid_paths << path
       end
     end
