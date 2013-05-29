@@ -74,7 +74,7 @@ namespace :i18n do
         value
       hash
     }
-    @translations = I18n.backend.send(:translations)[:en].inject({}, &stringifier)
+    @translations = I18n.backend.direct_lookup('en').inject({}, &stringifier)
 
 
     # Ruby
@@ -148,15 +148,9 @@ namespace :i18n do
 
   desc "Generates JS bundle i18n files (non-en) and adds them to assets.yml"
   task :generate_js do
-    require 'bundler'
-    Bundler.setup
-    require 'action_controller'
-    require 'i18n'
-    require 'sexp_processor'
-    require 'jammit'
-    require 'lib/i18n_extraction/js_extractor.rb'
-    I18n.load_path += Dir[Rails.root.join('config', 'locales', '**', '*.{rb,yml}')] +
-                      Dir[Rails.root.join('vendor', 'plugins', '*', 'config', 'locales', '**', '*.{rb,yml}')]
+    ENV['RAILS_LOAD_ALL_LOCALES'] = '1'
+    I18n.load_path += Dir[Rails.root.join('config', 'locales', '*', '*.{rb,yml}')]
+    Rake::Task['environment'].invoke
 
     Hash.send :include, I18n::HashExtensions
 
@@ -168,7 +162,7 @@ namespace :i18n do
     #
     # LOCALES=hi,ja,pt,zh-hans rake i18n:generate_js
     locales = locales + ENV['LOCALES'].split(',') if ENV['LOCALES']
-    all_translations = I18n.backend.send(:translations)
+    all_translations = I18n.backend.direct_lookup
     flat_translations = all_translations.flatten_keys
 
     if locales.empty?

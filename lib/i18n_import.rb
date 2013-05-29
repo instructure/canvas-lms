@@ -58,7 +58,7 @@ class I18nImport
 
   def complete_translations
     I18n.available_locales
-    base = (I18n.backend.send(:translations)[language.to_sym] || {})
+    base = (I18n.backend.direct_lookup(language) || {})
     translations = base.flatten_keys.merge(new_translations)
     fix_plural_keys(translations)
     translations.expand_keys

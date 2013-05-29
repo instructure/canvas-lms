@@ -6,7 +6,9 @@ if skip_locale_loading
 else
   I18n.load_path += Dir[Rails.root.join('vendor', 'plugins', '*', 'config', 'locales', '**', '*.{rb,yml}')]
 end
-I18n::Backend::Simple.send(:include, I18n::Backend::Fallbacks)
+I18n.backend = I18nema::Backend.new
+I18nema::Backend.send(:include, I18n::Backend::Fallbacks)
+I18n.backend.init_translations
 
 module I18nUtilities
   def before_label(text_or_key, default_value = nil, *args)
