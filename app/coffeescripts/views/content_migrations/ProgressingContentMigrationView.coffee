@@ -165,11 +165,11 @@ define [
     showSelectContentDialog: (event) => 
       event.preventDefault()
 
-      @selectContent ||= new SelectContentView 
-                        model: @model
-                        el: @$selectContentDialog
-                        title: 'Select Content'
-                        width: 600
-                        height: 400
+      @selectContentView ||= new SelectContentView 
+                              model: @model
+                              el: @$selectContentDialog
+                              title: 'Select Content'
+                              width: 600
+                              height: 400
 
-      @selectContent.open()
+      @selectContentView.open()
