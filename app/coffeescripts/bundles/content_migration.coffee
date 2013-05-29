@@ -103,6 +103,11 @@ require [
                                    model: ConverterViewControl.getModel()
                                    questionBanks: ENV.QUESTION_BANKS
 
+            dateShift:        new DateShiftView
+                                model: ConverterViewControl.getModel()
+                                collection: daySubCollection
+                                daySubstitution: daySubCollectionView
+
   ConverterViewControl.register
     key: 'canvas_cartridge_importer'
     view: new CanvasExportView
@@ -111,6 +116,11 @@ require [
                                    fileSizeLimit: ENV.UPLOAD_LIMIT
 
             selectContent:       new SelectContentCheckboxView(model: ConverterViewControl.getModel())
+
+            dateShift:        new DateShiftView
+                                model: ConverterViewControl.getModel()
+                                collection: daySubCollection
+                                daySubstitution: daySubCollectionView
 
   ConverterViewControl.register
     key: 'common_cartridge_importer'
@@ -124,6 +134,11 @@ require [
             questionBank:        new QuestionBankView
                                    questionBanks: ENV.QUESTION_BANKS
                                    model: ConverterViewControl.getModel()
+
+            dateShift:        new DateShiftView
+                                model: ConverterViewControl.getModel()
+                                collection: daySubCollection
+                                daySubstitution: daySubCollectionView
 
   ConverterViewControl.register
     key: 'qti_converter'

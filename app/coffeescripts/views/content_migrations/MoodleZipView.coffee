@@ -8,4 +8,5 @@ define [
 
     @child 'chooseMigrationFile', '.chooseMigrationFile'
     @child 'questionBank', '.selectQuestionBank'
+    @child 'dateShift', '.dateShift'
     @child 'selectContent', '.selectContent'
