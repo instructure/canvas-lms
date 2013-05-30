@@ -472,6 +472,12 @@ module Api
       %r{^/users/#{ID}/files/(#{ID})/} => ['File', :api_v1_attachment_url, :id],
       %r{^/files/(#{ID})/} => ['File', :api_v1_attachment_url, :id],
 
+      # List quizzes
+      %r{^/courses/(#{ID})/quizzes$} => ['[Quiz]', :api_v1_course_quizzes_url, :course_id],
+
+      # Get quiz
+      %r{^/courses/(#{ID})/quizzes/(#{ID})$} => ['Quiz', :api_v1_course_quiz_url, :course_id, :id],
+
       # Launch LTI tool
       %r{^/courses/(#{ID})/external_tools/retrieve\?url=(.*)$} => ['SessionlessLaunchUrl', :api_v1_course_external_tool_sessionless_launch_url, :course_id, :url],
   }.freeze
