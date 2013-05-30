@@ -42,7 +42,20 @@ class AppCenterController < ApplicationController
     per_page = params['per_page'] || 15
     endpoint_scope = (@context.is_a?(Account) ? 'account' : 'course')
     base_url = send("api_v1_#{endpoint_scope}_app_center_app_reviews_url")
-    collection = generate_app_api_collection(base_url) {|app_api, page| app_api.get_app_reviews(params[:app_id], page, per_page)}
+    force_refresh = params['force_refresh'] == '1'
+    collection = generate_app_api_collection(base_url) {|app_api, page| app_api.get_app_reviews(params[:app_id], page, per_page, force_refresh)}
     render :json => Api.paginate(collection, self, base_url, :per_page => per_page.to_i)
+  end
+
+  def review
+    app_api = AppCenter::AppApi.new
+    review = app_api.get_app_user_review(params[:app_id], @current_user.try(:uuid))
+    render :json => review
+  end
+
+  def add_review
+    app_api = AppCenter::AppApi.new
+    review = app_api.add_app_review(params[:app_id], @current_user.try(:uuid), @current_user.try(:name), params[:rating], params[:comments], @current_user.try(:avatar_url))
+    render :json => review
   end
 end
