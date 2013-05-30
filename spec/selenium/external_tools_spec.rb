@@ -5,7 +5,7 @@ describe "external tools" do
 
   describe "app center" do
     before (:each) do
-      @plugin_settings = enable_app_center_plugin
+      enable_app_center_plugin
       @account = Account.default
       account_admin_user(:account => @account)
       user_session(@user)
@@ -17,7 +17,6 @@ describe "external tools" do
     # This test has included multiple tests due because there is no need to slow down
     # the testing cycle. All of these tests depend on the prior to pass.
     it "should be able to view app center list and manage a add an app" do
-      pending('resolution brainstorming')
       ff('.app').size.should > 0
       ff('.app').first.click
       wait_for_ajaximations
@@ -639,32 +638,50 @@ describe "external tools" do
   private
 
   def enable_app_center_plugin
-    @plugin = Canvas::Plugin.register('app_center', nil, {
-      :name => lambda{ t :name, 'App Center' },
-      :description => lambda{ t :description, 'App Center for tracking/installing external tools in Canvas' },
-      :settings_partial => 'plugins/app_center_settings',
-      :settings => {
-        :base_url => 'https://www.edu-apps.org',
-        :token => nil,
-        :apps_index_endpoint => '/api/v1/apps',
-        :app_reviews_endpoint => '/api/v1/apps/:id/reviews'
-      },
-      :validator => 'AppCenterValidator'
+    @plugin_settings = PluginSetting.create(:name => 'app_center', :settings => {
+        :base_url => "www.example.com",
+        :apps_index_endpoint => "apps",
+        :app_reviews_endpoint => "/apps/:id"
     })
-    @plugin_setting = PluginSetting.find_by_name(@plugin.id)
-    @plugin_setting ||= PluginSetting.new(
-      :name => @plugin.id, 
-      :settings => @plugin.default_settings
-    )
-    @plugin_setting.disabled = false
-    @plugin_setting.posted_settings = {
-      :token => "blah",
-      :base_url => "https://www.edu-apps.org",
-      :apps_index_endpoint => "/api/v1/apps",
-      :app_reviews_endpoint => "/api/v1/apps/:id/reviews"
-    }
-    @plugin_setting.save
-    @plugin_settings
+
+    AppCenter::AppApi.any_instance.stubs(:get_apps).returns({
+       'meta' => { "next" => "https://www.example.com/api/v1/apps?offset=72"},
+       'current_offset' => 0,
+       'limit' => 72,
+       'objects' => [
+           {
+               'name' => 'First Tool',
+               'id' => 'first_tool',
+               'any_key' => true,
+               'config_url' => ""
+           },
+           {
+               'name' => 'Second Tool',
+               'id' => 'second_tool',
+           }
+       ]
+    })
+
+    AppCenter::AppApi.any_instance.stubs(:get_app_reviews).returns({
+         'meta' => { "next" => "https://www.example.com/api/v1/apps/first_tool/reviews?offset=15"},
+         'current_offset' => 0,
+         'limit' => 15,
+         'objects' => [
+             {
+                 'user_name' => 'Iron Man',
+                 'user_avatar_url' => 'http://www.example.com/rich.ico',
+                 'comments' => 'This tool is so great',
+             },
+             {
+                 'user_name' => 'The Hulk',
+                 'user_avatar_url' => 'http://www.example.com/beefy.ico',
+                 'comments' => 'SMASH!',
+             }
+         ]
+     })
+
+    ContextExternalTool.any_instance.stubs(:process_extended_configuration)
+    ContextExternalTool.any_instance.stubs(:url).returns('www.example.com')
   end
 
 end
