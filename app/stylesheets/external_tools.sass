@@ -49,12 +49,12 @@ $app_height: 145px
       font-size: 12px
 
   .reviews
-    margin-top: 15px
+    margin-top: 5px
     .avatar
       padding-left: 65px
       min-height: 65px
     .review-item
-      border-top: 1px solid #EEEEEE
+      border-top: thin solid #EEEEEE
       padding-top: 10px
     .review-item-header
       margin-top: 0px
@@ -108,7 +108,6 @@ $app_height: 145px
       .app_cancel
         display: block
         margin-top: 5px
-        // font-size: 11px
     .individual-app-right
       h2
         margin: 0px
@@ -116,15 +115,32 @@ $app_height: 145px
         color: #888
         text-align: right
         padding-right: 10px
+      .data-value
+        ul
+          margin: 0px
+          padding: 0px
+          list-style: none
       .star-table
         margin-bottom: 10px
         td
           padding: 0px
+  .add-review
+    margin-top: 20px
+    padding-top: 5px
+    border-top: thin solid #EEEEEE
+    .rate_app
+      font-weight: bold
   .review-item
+    margin: 0 0 10px 0
     td
       &.image-and-stars
         padding: 10px 0 0 10px
         width: 58px
+        img
+          max-width: 50px
       &.review-content
         .review-item-header
           font-size: 12px
+
+fieldset.rate_app_wrapper
+  margin: 0px

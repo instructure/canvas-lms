@@ -21,20 +21,32 @@
           <tbody>
             </tr>
             <tr class="data-row">
-              <td class="data-label">Extensions:</td>
-              <td class="data-value">{{model.attributes.extensions}}</td>
+              <td valign="top" class="data-label">Extensions:</td>
+              <td valign="top" class="data-value">
+                <ul>
+                {{#each model.attributes.extensions}}
+                  <li>{{titleize this}}</li>
+                {{/each}}
+                </ul>
+              </td>
             </tr>
             <tr class="data-row">
-              <td class="data-label">Average Rating:</td>
-              <td class="data-value">{{model.attributes.avg_rating}}</td>
+              <td valign="top" class="data-label">Average Rating:</td>
+              <td valign="top" class="data-value">{{toPrecision model.attributes.avg_rating 2}}</td>
             </tr>
             <tr class="data-row">
-              <td class="data-label">Privacy Level:</td>
-              <td class="data-value">{{model.attributes.privacy_level}}</td>
+              <td valign="top" class="data-label">Privacy Level:</td>
+              <td valign="top" class="data-value">{{titleize model.attributes.privacy_level}}</td>
             </tr>
             <tr class="data-row">
-              <td class="data-label">Education Level(s):</td>
-              <td class="data-value">{{model.attributes.levels}}</td>
+              <td valign="top" class="data-label">Education Level(s):</td>
+              <td valign="top" class="data-value">
+                <ul>
+                {{#each model.attributes.levels}}
+                  <li>{{titleize this}}</li>
+                {{/each}}
+                </ul>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -42,6 +54,11 @@
     </tr>
   </tbody>
 </table>
+
+<div class="add-review">
+  <a href="#" class="rate_app" title="{{#t "rate_tool"}}Rate this tool{{/t}}">{{#t "rate_tool"}}Rate this tool{{/t}}</a>
+  <img src="/images/ajax-loader-linear.gif" style="display: none;" id="rate_app_loader" />
+</div>
 
 <div class="reviews collectionViewItems clearfix"></div>
 <div class="paginatedLoadingIndicator"></div>

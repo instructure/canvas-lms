@@ -273,6 +273,12 @@ define [
     toPercentage: (number) ->
       parseInt(100 * number) + "%"
 
+    toPrecision: (number, precision) ->
+      if number
+        number.toPrecision(precision)
+      else
+        ''
+
     checkedIf: ( thing, thingToCompare, hash ) ->
       if arguments.length == 3
         if thing == thingToCompare
