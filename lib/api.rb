@@ -471,6 +471,9 @@ module Api
       %r{^/groups/#{ID}/files/(#{ID})/} => ['File', :api_v1_attachment_url, :id],
       %r{^/users/#{ID}/files/(#{ID})/} => ['File', :api_v1_attachment_url, :id],
       %r{^/files/(#{ID})/} => ['File', :api_v1_attachment_url, :id],
+
+      # Launch LTI tool
+      %r{^/courses/(#{ID})/external_tools/retrieve\?url=(.*)$} => ['SessionlessLaunchUrl', :api_v1_course_external_tool_sessionless_launch_url, :course_id, :url],
   }.freeze
 
   def api_endpoint_info(protocol, host, url)

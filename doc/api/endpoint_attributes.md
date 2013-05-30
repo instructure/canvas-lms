@@ -23,6 +23,7 @@ The currently supported `data-api-returntype` values are:
 * `Page`
 * `File`
 * `Folder`
+* `SessionlessLaunchUrl`
 
 If the API returns a list of objects instead of a single object, the `data-api-returntype`
 will be wrapped in square brackets, e.g. `[Assignment]`.
