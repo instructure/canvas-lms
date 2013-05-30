@@ -84,13 +84,6 @@ unless ARGV.any? { |a| a =~ /\Agems/ }
       t.spec_files = ParallelExclude::AVAILABLE_FILES
     end
 
-    desc "Run all specs in spec directory with SimpleCov"
-    Spec::Rake::SpecTask.new(:simplecov) do |t|
-      ENV['COVERAGE'] = 'true'
-      t.spec_opts = ['--options', "\"#{Rails.root}/spec/spec.opts\""]
-      t.spec_files = FileList['vendor/plugins/*/spec_canvas/**/*_spec.rb'].exclude('vendor/plugins/*/spec_canvas/selenium/*_spec.rb') + FileList['spec/**/*_spec.rb'].exclude('spec/selenium/**/*_spec.rb')
-    end
-
     desc "Print Specdoc for all specs (excluding plugin specs)"
     Spec::Rake::SpecTask.new(:doc) do |t|
       t.spec_opts = ["--format", "specdoc", "--dry-run"]

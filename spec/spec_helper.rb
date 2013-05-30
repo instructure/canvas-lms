@@ -16,9 +16,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-if ENV['COVERAGE'] == "true"
-  require 'simplecov'
+if ENV['COVERAGE'] == "1"
+  puts "Code Coverage enabled"
   SimpleCov.start do
+    SimpleCov.use_merging true
     SimpleCov.formatter = SimpleCov::Formatter::HTMLFormatter
     add_filter '/spec/'
     add_filter '/config/'
@@ -36,6 +37,8 @@ if ENV['COVERAGE'] == "true"
       SimpleCov.result.format!
     end
   end
+else
+  puts "Code coverage not enabled"
 end
 
 ENV["RAILS_ENV"] = 'test'
