@@ -46,3 +46,6 @@ define [
     equal helpers.titleize('test_string'), 'Test String'
     equal helpers.titleize(null), ''
     equal helpers.titleize('test_ _string'), 'Test String'
+
+  test 'toPrecision', ->
+    equal helpers.toPrecision(3.6666666, 2), '3.7'

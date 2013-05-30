@@ -1165,8 +1165,10 @@ ActionController::Routing::Routes.draw do |map|
     api.with_options(:controller => :app_center) do |app_center|
       ['course', 'account'].each do |context|
         prefix = "#{context}s/:#{context}_id/app_center"
-        app_center.get "#{prefix}/apps", :action => :index, :path_name => "#{context}_app_center_apps"
-        app_center.get "#{prefix}/apps/:app_id/reviews", :action => :reviews, :path_name => "#{context}_app_center_app_reviews"
+        app_center.get  "#{prefix}/apps",                      :action => :index,   :path_name => "#{context}_app_center_apps"
+        app_center.get  "#{prefix}/apps/:app_id/reviews",      :action => :reviews, :path_name => "#{context}_app_center_app_reviews"
+        app_center.get  "#{prefix}/apps/:app_id/reviews/self", :action => :review,  :path_name => "#{context}_app_center_app_review"
+        app_center.post "#{prefix}/apps/:app_id/reviews/self", :action => :add_review
       end
     end
   end

@@ -15,8 +15,7 @@ define [
     events:
       'change #external_tool_config_type': 'onConfigTypeChange'
 
-    render: ->
-      super
+    afterRender: ->
       @$el.dialog
         title: I18n.t 'dialog_title_edit_tool', 'Edit External Tool'
         width: 520
