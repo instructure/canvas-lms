@@ -78,9 +78,9 @@
             <div class="screenreader-only"><%= t :manage_discussion, 'Manage Discussion' %></div>
           </a>
           <ul class="al-options">
-            <li><a href="#" class="mark_all_as_read"><%#= <i class="icon-read" aria-hidden="hidden"></i> %> <%= t :mark_all_as_read, 'Mark All as Read' %></a></li>
+            <li><a href="#" class="mark_all_as_read"><i class="icon-mark-as-read" aria-hidden="hidden"></i> <%= t :mark_all_as_read, 'Mark All as Read' %></a></li>
             <% if false # keep this command out of the interface for now %>
-              <li><a href="#" class="mark_all_as_unread"><%#= <i class="icon-message" aria-hidden="hidden"></i> %> <%= t :mark_all_as_unread, 'Mark All as Unread' %></a></li>
+              <li><a href="#" class="mark_all_as_unread"><%#= <i class="icon-mark-as-unread" aria-hidden="hidden"></i> %> <%= t :mark_all_as_unread, 'Mark All as Unread' %></a></li>
             <% end %>
 
             <% if can_do(@topic, @current_user, :delete) %>
