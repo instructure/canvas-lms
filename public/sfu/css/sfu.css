@@ -113,3 +113,14 @@
     background: #FEC;
     color: #630;
 }
+
+/* !-- Document preview fix -- */
+/* NOTE: This removes multiple extra scroll bars in the Files browser */
+
+#doc_preview_holder {
+    overflow-y: hidden;
+}
+
+#doc_preview_holder > iframe {
+    border: none;
+}
