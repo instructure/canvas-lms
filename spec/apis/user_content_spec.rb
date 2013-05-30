@@ -238,6 +238,7 @@ describe UserContent, :type => :integration do
           <a href='/courses/#{@course.id}/files'>files index</a>
           <a href='/courses/#{@course.id}/files/789/download?verifier=lolcats'>files index</a>
           <a href='/files/789/download?verifier=lolcats'>file</a>
+          <a href='/courses/#{@course.id}/external_tools/retrieve?url=http://lti-tool-provider.example.com/lti_tool'>LTI Launch</a>
         </p>
         HTML
         @wiki_page.workflow_state = 'active'
@@ -256,10 +257,11 @@ describe UserContent, :type => :integration do
           "http://www.example.com/api/v1/courses/#{@course.id}/discussion_topics/456",
           "http://www.example.com/api/v1/courses/#{@course.id}/folders/root",
           "http://www.example.com/api/v1/files/789",
-          "http://www.example.com/api/v1/files/789"
+          "http://www.example.com/api/v1/files/789",
+          "http://www.example.com/api/v1/courses/#{@course.id}/external_tools/sessionless_launch?url=http%3A%2F%2Flti-tool-provider.example.com%2Flti_tool"
         ]
         doc.css('a').collect { |att| att['data-api-returntype'] }.should ==
-            %w([Assignment] Assignment [Page] Page [Discussion] Discussion Folder File File)
+            %w([Assignment] Assignment [Page] Page [Discussion] Discussion Folder File File SessionlessLaunchUrl)
       end
     end
 
