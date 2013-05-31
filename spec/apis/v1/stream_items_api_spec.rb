@@ -311,7 +311,7 @@ describe UsersController, :type => :integration do
       'score' => 12,
       'html_url' => "http://www.example.com/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@user.id}",
       'workflow_state' => 'graded',
-      'late' => nil,
+      'late' => false,
       'assignment' => assign_json,
       'assignment_id' => @assignment.id,
       'attempt' => nil,
@@ -408,7 +408,7 @@ describe UsersController, :type => :integration do
       'score' => nil,
       'html_url' => "http://www.example.com/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@user.id}",
       'workflow_state' => 'unsubmitted',
-      'late' => nil,
+      'late' => false,
 
       'assignment' => assign_json,
       'assignment_id' => @assignment.id,

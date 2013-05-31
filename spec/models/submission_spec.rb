@@ -756,7 +756,7 @@ describe Submission do
     end
   end
 
-  describe "late" do
+  describe "past_due" do
     before do
       u1 = @user
       submission_spec_model
@@ -772,36 +772,24 @@ describe Submission do
       @submission2.reload
     end
 
-    it "should get recomputed when an assignment's due date is changed" do
-      @submission1.should be_late
+    it "should update when an assignment's due date is changed" do
+      @submission1.should be_past_due
       @assignment.reload.update_attribute(:due_at, Time.zone.now + 1.day)
-      @submission1.reload.should_not be_late
+      @submission1.reload.should_not be_past_due
     end
 
-    it "should get recomputed when an applicable override is changed" do
-      @submission1.should be_late
-      @submission2.should be_late
+    it "should update when an applicable override is changed" do
+      @submission1.should be_past_due
+      @submission2.should be_past_due
 
       assignment_override_model :assignment => @assignment,
                                 :due_at => Time.zone.now + 1.day,
                                 :set => @course_section
-      @submission1.reload.should be_late
-      @submission2.reload.should_not be_late
+      @submission1.reload.should be_past_due
+      @submission2.reload.should_not be_past_due
     end
 
-    it "should only call compute_lateness for relevant submissions" do
-      # this is kind of hacky
-      hasnt_been_updated_flag_time = Time.zone.now - 1.year
-      Submission.update_all(:updated_at => hasnt_been_updated_flag_time)
-
-      assignment_override_model :assignment => @assignment,
-                                :due_at => Time.zone.now + 1.day,
-                                :set => @course_section
-      @submission1.reload.updated_at.should eql hasnt_been_updated_flag_time
-      @submission2.reload.updated_at.should_not eql hasnt_been_updated_flag_time
-    end
-
-    it "should give a quiz submission 30 extra seconds before making it late" do
+    it "should give a quiz submission 30 extra seconds before making it past due" do
       quiz_with_graded_submission([{:question_data => {:name => 'question 1', :points_possible => 1, 'question_type' => 'essay_question'}}]) do
         {
           "text_after_answers"            => "",
@@ -819,14 +807,73 @@ describe Submission do
 
       submission = @quiz_submission.submission.reload
       submission.write_attribute(:submitted_at, @assignment.due_at + 3.days)
-      submission.compute_lateness
-      submission.save!
-      submission.should be_late
+      submission.should be_past_due
 
       submission.write_attribute(:submitted_at, @assignment.due_at + 30.seconds)
-      submission.compute_lateness
-      submission.save!
-      submission.should_not be_late
+      submission.should_not be_past_due
+    end
+  end
+
+  describe "late" do
+    before do
+      submission_spec_model
+    end
+
+    it "should be false if not past due" do
+      @submission.submitted_at = 2.days.ago
+      @submission.cached_due_date = 1.day.ago
+      @submission.should_not be_late
+    end
+
+    it "should be false if not submitted, even if past due" do
+      @submission.submission_type = nil # forces submitted_at to be nil
+      @submission.cached_due_date = 1.day.ago
+      @submission.should_not be_late
+    end
+
+    it "should be true if submitted and past due" do
+      @submission.submitted_at = 1.day.ago
+      @submission.cached_due_date = 2.days.ago
+      @submission.should be_late
+    end
+  end
+
+  describe "missing" do
+    before do
+      submission_spec_model
+    end
+
+    it "should be false if not past due" do
+      @submission.submitted_at = 2.days.ago
+      @submission.cached_due_date = 1.day.ago
+      @submission.should_not be_missing
+    end
+
+    it "should be false if submitted, even if past due" do
+      @submission.submitted_at = 1.day.ago
+      @submission.cached_due_date = 2.days.ago
+      @submission.should_not be_missing
+    end
+
+    it "should be true if not submitted and past due" do
+      @submission.submission_type = nil # forces submitted_at to be nil
+      @submission.cached_due_date = 1.day.ago
+      @submission.should be_missing
+    end
+  end
+
+  describe "cached_due_date" do
+    it "should get initialized during submission creation" do
+      @assignment.update_attribute(:due_at, Time.zone.now - 1.day)
+
+      override = @assignment.assignment_overrides.build
+      override.title = "Some Title"
+      override.set = @course.default_section
+      override.override_due_at(Time.zone.now + 1.day)
+      override.save!
+
+      submission = @assignment.submissions.create(:user => @user)
+      submission.cached_due_date.should == override.due_at
     end
   end
 end

@@ -66,14 +66,15 @@ class AssignmentOverride < ActiveRecord::Base
     end
   end
 
-  after_save :recompute_submission_lateness_later
+  after_save :update_cached_due_dates
   after_save :touch_assignment, :if => :assignment
 
-  def recompute_submission_lateness_later
-    if due_at_overridden_changed? || due_at_changed?
-      send_later_if_production :recompute_submission_lateness
+  def update_cached_due_dates
+    if due_at_overridden_changed? ||
+      (due_at_overridden && due_at_changed?) ||
+      (due_at_overridden && workflow_state_changed?)
+      DueDateCacher.recompute(assignment)
     end
-    true
   end
 
   def touch_assignment
@@ -84,17 +85,6 @@ class AssignmentOverride < ActiveRecord::Base
 
   def assignment?; !!assignment; end
   def quiz?; !!quiz; end
-
-  def recompute_submission_lateness    
-    if (users = applies_to_students) && assignment
-      submissions = assignment.submissions.where(:user_id => users)
-      submissions.each do |s|
-        s.compute_lateness
-        s.save!
-      end
-    end
-    true
-  end
 
   workflow do
     state :active

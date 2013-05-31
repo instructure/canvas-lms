@@ -94,6 +94,7 @@ class Submission < ActiveRecord::Base
   before_save :validate_single_submission, :validate_enrollment, :infer_values, :set_context_code
   before_save :prep_for_submitting_to_turnitin
   before_save :check_url_changed
+  before_create :cache_due_date
   after_save :touch_user
   after_save :update_assignment
   after_save :update_attachment_associations
@@ -478,7 +479,6 @@ class Submission < ActiveRecord::Base
       self.attempt ||= 0
       self.attempt += 1 if self.submitted_at_changed?
       self.attempt = 1 if self.attempt < 1
-      compute_lateness if late.nil? || self.submitted_at_changed?
     end
     if self.submission_type == 'media_recording' && !self.media_comment_id
       raise "Can't create media submission without media object"
@@ -507,6 +507,10 @@ class Submission < ActiveRecord::Base
       self.published_grade = self.grade
     end
     true
+  end
+
+  def cache_due_date
+    self.cached_due_date = assignment.overridden_for(user).due_at
   end
 
   def update_admins_if_just_submitted
@@ -933,18 +937,23 @@ class Submission < ActiveRecord::Base
     @group_broadcast_submission = false
   end
 
-  def compute_lateness
-    overridden_assignment = assignment.overridden_for(self.user)
-
-    check_time = submitted_at
+  def past_due?
+    return false if cached_due_date.nil?
+    check_time = submitted_at || Time.now
     check_time -= 60.seconds if submission_type == 'online_quiz'
-
-    late = submitted_at &&
-      overridden_assignment.due_at &&
-      overridden_assignment.due_at < check_time
-
-    write_attribute :late, !!late
+    cached_due_date < check_time
   end
+  alias_method :past_due, :past_due?
+
+  def late?
+    submitted_at.present? && past_due?
+  end
+  alias_method :late, :late?
+
+  def missing?
+    submitted_at.nil? && past_due?
+  end
+  alias_method :missing, :missing?
 
   def graded?
     !!self.score && self.workflow_state == 'graded'

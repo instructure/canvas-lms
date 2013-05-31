@@ -2183,18 +2183,39 @@ describe Assignment do
     end
   end
 
-  describe "recompute_submission_lateness" do
-    it "is called in a delayed job when due_at changes" do
-      assignment = assignment_model
-      assignment.due_at = 1.week.from_now
-      assignment.expects(:send_later_if_production).with(:recompute_submission_lateness)
-      assignment.save
+  describe "updating cached due dates" do
+    before do
+      @assignment = assignment_model
+      @assignment.due_at = 2.weeks.from_now
+      @assignment.save
     end
 
-    it "is not called when due_at doesn't change" do
-      assignment = assignment_model
-      assignment.expects(:send_later_if_production).with(:recompute_submission_lateness).never
-      assignment.save
+    it "triggers when assignment is created" do
+      new_assignment = @course.assignments.build
+      DueDateCacher.expects(:recompute).with(new_assignment)
+      new_assignment.save
+    end
+
+    it "triggers when due_at changes" do
+      DueDateCacher.expects(:recompute).with(@assignment)
+      @assignment.due_at = 1.week.from_now
+      @assignment.save
+    end
+
+    it "triggers when due_at changes to nil" do
+      DueDateCacher.expects(:recompute).with(@assignment)
+      @assignment.due_at = nil
+      @assignment.save
+    end
+
+    it "triggers when assignment deleted" do
+      DueDateCacher.expects(:recompute).with(@assignment)
+      @assignment.destroy
+    end
+
+    it "does not trigger when nothing changed" do
+      DueDateCacher.expects(:recompute).never
+      @assignment.save
     end
   end
 

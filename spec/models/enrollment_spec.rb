@@ -1633,4 +1633,31 @@ describe Enrollment do
       @enrollment.last_activity_at.should.to_s == (now + 11.minutes).to_s
     end
   end
+
+  describe "updating cached due dates" do
+    before do
+      course_with_student
+      @assignments = [
+        assignment_model(:course => @course),
+        assignment_model(:course => @course)
+      ]
+    end
+
+    it "triggers when enrollment is created" do
+      DueDateCacher.expects(:recompute).with(@assignments.first).once
+      DueDateCacher.expects(:recompute).with(@assignments.last).once
+      @course.enrollments.create(:user => user)
+    end
+
+    it "triggers when enrollment is deleted" do
+      DueDateCacher.expects(:recompute).with(@assignments.first).once
+      DueDateCacher.expects(:recompute).with(@assignments.last).once
+      @enrollment.destroy
+    end
+
+    it "does not trigger when nothing changed" do
+      DueDateCacher.expects(:recompute).never
+      @enrollment.save
+    end
+  end
 end

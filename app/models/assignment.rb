@@ -167,7 +167,7 @@ class Assignment < ActiveRecord::Base
                 :schedule_do_auto_peer_review_job_if_automatic_peer_review,
                 :delete_empty_abandoned_children,
                 :validate_assignment_overrides,
-                :recompute_submission_lateness_later
+                :update_cached_due_dates
 
   has_a_broadcast_policy
 
@@ -1818,19 +1818,10 @@ class Assignment < ActiveRecord::Base
     end
   end
 
-  def recompute_submission_lateness_later
-    if due_at_changed?
-      send_later_if_production :recompute_submission_lateness
+  def update_cached_due_dates
+    if due_at_changed? || workflow_state_changed?
+      DueDateCacher.recompute(self)
     end
-    true
-  end
-
-  def recompute_submission_lateness
-    submissions.find_each do |s|
-      s.compute_lateness
-      s.save!
-    end
-    true
   end
 
   def graded?

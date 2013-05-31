@@ -44,6 +44,7 @@ class Enrollment < ActiveRecord::Base
   after_save :clear_email_caches
   after_save :cancel_future_appointments
   after_save :update_linked_enrollments
+  after_save :update_cached_due_dates
 
   attr_accessor :already_enrolled
   attr_accessible :user, :course, :workflow_state, :course_section, :limit_privileges_to_course_section, :already_enrolled
@@ -339,6 +340,14 @@ class Enrollment < ActiveRecord::Base
     # explicitly deleted 
     return nil if enrollment && enrollment.deleted? && workflow_state_was != 'deleted'
     enrollment
+  end
+
+  def update_cached_due_dates
+    if workflow_state_changed? && course
+      course.assignments.each do |assignment|
+        DueDateCacher.recompute(assignment)
+      end
+    end
   end
 
   def update_from(other)

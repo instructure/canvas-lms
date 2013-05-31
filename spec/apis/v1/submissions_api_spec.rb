@@ -64,7 +64,7 @@ describe 'Submissions API', :type => :integration do
       "grade_matches_current_submission"=>nil,
       "score"=>nil,
       "workflow_state"=>nil,
-      "late"=>nil,
+      "late"=>false,
       "graded_at"=>nil,
     }
   end
