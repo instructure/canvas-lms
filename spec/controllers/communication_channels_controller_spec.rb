@@ -45,7 +45,10 @@ describe CommunicationChannelsController do
 
     it "should resurrect retired CCs" do
       user_model
-      cc = @user.communication_channels.create!(:path => 'jt@instructure.com', :path_type => 'email') { |cc| cc.workflow_state = 'retired' }
+      cc = @user.communication_channels.create!(:path => 'jt@instructure.com', :path_type => 'email') { |cc|
+        cc.workflow_state = 'retired'
+        cc.bounce_count = CommunicationChannel::RETIRE_THRESHOLD
+      }
       user_session(@user)
       post 'create', :user_id => @user.id, :communication_channel => { :address => 'jt@instructure.com', :type => 'email' }
       response.should be_success
