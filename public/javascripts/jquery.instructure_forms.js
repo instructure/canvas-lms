@@ -303,7 +303,7 @@ define([
           }, function(data) {
             $(file).attr('name', old_name);
             (options.upload_error || options.error).call($this, data);
-          }, {onlyGivenParameters: data.remote_url });
+          }, {onlyGivenParameters: true });
         } else {
           (options.upload_error || options.error).call($this, data);
         }

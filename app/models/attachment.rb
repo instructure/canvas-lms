@@ -568,7 +568,6 @@ class Attachment < ActiveRecord::Base
     if Attachment.s3_storage?
       res = {
         :upload_url => "#{options[:ssl] ? "https" : "http"}://#{bucket.name}.#{bucket.config.s3_endpoint}/",
-        :remote_url => true,
         :file_param => 'file',
         :success_url => s3_success_url,
         :upload_params => {
@@ -578,7 +577,6 @@ class Attachment < ActiveRecord::Base
     elsif Attachment.local_storage?
       res = {
         :upload_url => local_upload_url,
-        :remote_url => false,
         :file_param => options[:file_param] || 'attachment[uploaded_data]', #uploadify ignores this and uses 'file',
         :upload_params => options[:upload_params] || {}
       }
