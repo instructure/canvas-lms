@@ -615,6 +615,33 @@ describe FilesController do
       assigns[:attachment].should_not be_nil
       assigns[:attachment].context.should == group
     end
+
+    context "sharding" do
+      specs_require_sharding
+
+      it "should create the attachment on the context's shard" do
+        local_storage!
+        @shard1.activate do
+          account = Account.create!
+          course_with_teacher_logged_in(:active_all => true, :account => account)
+        end
+        post 'create_pending', {:attachment => {
+            :context_code => @course.asset_string,
+            :filename => "bob.txt"
+        }}
+        response.should be_success
+        assigns[:attachment].should_not be_nil
+        assigns[:attachment].id.should_not be_nil
+        assigns[:attachment].shard.should == @shard1
+        json = json_parse
+        json.should_not be_nil
+        json['id'].should eql(assigns[:attachment].id)
+        json['upload_url'].should_not be_nil
+        json['upload_params'].should_not be_nil
+        json['upload_params'].should_not be_empty
+        json['remote_url'].should eql(false)
+      end
+    end
   end
 
   describe "POST 'api_create'" do

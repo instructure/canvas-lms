@@ -457,7 +457,7 @@ class FilesController < ApplicationController
   def create_pending
     @context = Context.find_by_asset_string(params[:attachment][:context_code])
     @asset = Context.find_asset_by_asset_string(params[:attachment][:asset_string], @context) if params[:attachment][:asset_string]
-    @attachment = Attachment.new
+    @attachment = @context.attachments.build
     @check_quota = true
     permission_object = @attachment
     permission = :create
@@ -614,7 +614,7 @@ class FilesController < ApplicationController
     if (unattached_attachment_id = params[:attachment].delete(:unattached_attachment_id)) && unattached_attachment_id.present?
       @attachment = @context.attachments.find_by_id_and_workflow_state(unattached_attachment_id, 'unattached')
     end
-    @attachment ||= @context.attachments.new
+    @attachment ||= @context.attachments.build
     if authorized_action(@attachment, @current_user, :create)
       get_quota
       return if (params[:check_quota_after].nil? || params[:check_quota_after] == '1') &&
