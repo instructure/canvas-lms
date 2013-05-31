@@ -18,6 +18,7 @@
 
 if ENV['COVERAGE'] == "1"
   puts "Code Coverage enabled"
+  require 'simplecov'
   SimpleCov.start do
     SimpleCov.use_merging true
     SimpleCov.formatter = SimpleCov::Formatter::HTMLFormatter
