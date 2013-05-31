@@ -1,13 +1,10 @@
 require [
-  'jst/ExternalTools/AppCenterView'
   'compiled/collections/ExternalToolCollection',
   'compiled/collections/PaginatedCollection',
-  'compiled/views/PaginatedCollectionView'
   'compiled/views/ExternalTools/IndexView'
+  'compiled/views/ExternalTools/AppCenterView'
   'compiled/views/ExternalTools/ExternalToolsCollectionView'
-  'compiled/views/ExternalTools/AppThumbnailView'
-  ], (AppCenterTemplate, ExternalToolCollection, PaginatedCollection, PaginatedCollectionView, 
-    IndexView, ExternalToolsCollectionView, AppThumbnailView) ->
+  ], (ExternalToolCollection, PaginatedCollection, IndexView, AppCenterView, ExternalToolsCollectionView) ->
 
     # Collections
     externalTools = new ExternalToolCollection
@@ -16,9 +13,7 @@ require [
     apps.resourceName = 'app_center/apps'
 
     # Views
-    appCenterView = new PaginatedCollectionView
-      template: AppCenterTemplate
-      itemView: AppThumbnailView
+    appCenterView = new AppCenterView
       collection: apps
 
     externalToolsCollectionView = new ExternalToolsCollectionView
