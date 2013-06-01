@@ -54,6 +54,17 @@ describe DiscussionTopicsController do
       assert_unauthorized
     end
 
+    it "should work for announcements in a public course" do
+      course_with_student(:active_all => true)
+      @course.update_attribute(:is_public, true)
+      @announcement = @course.announcements.create!(
+        :title => "some announcement",
+        :message => "some message"
+      )
+      get 'show', :course_id => @course.id, :id => @announcement.id
+      response.should be_success
+    end
+
     context "discussion topic with assignment with overrides" do
       integrate_views
 
