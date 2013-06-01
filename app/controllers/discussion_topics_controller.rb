@@ -270,7 +270,7 @@ class DiscussionTopicsController < ApplicationController
               :MARK_UNREAD_URL => named_context_url(@context, :api_v1_context_discussion_topic_discussion_entry_mark_unread_url, @topic, ':id'),
               :MARK_ALL_READ_URL => named_context_url(@context, :api_v1_context_discussion_topic_mark_all_read_url, @topic),
               :MARK_ALL_UNREAD_URL => named_context_url(@context, :api_v1_context_discussion_topic_mark_all_unread_url, @topic),
-              :MANUAL_MARK_AS_READ => @current_user.manual_mark_as_read?,
+              :MANUAL_MARK_AS_READ => @current_user.try(:manual_mark_as_read?),
               :CURRENT_USER => user_display_json(@current_user),
               :INITIAL_POST_REQUIRED => @initial_post_required,
               :THREADED => @topic.threaded?

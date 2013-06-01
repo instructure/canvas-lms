@@ -59,7 +59,7 @@ class Announcement < DiscussionTopic
     given { |user| self.user == user and self.discussion_entries.active.empty? }
     can :delete
     
-    given { |user, session| self.context.grants_rights?(user, session, :read)[:read] }
+    given { |user, session| self.context.grants_right?(user, session, :read) }
     can :read
     
     given { |user, session| self.context.grants_right?(user, session, :post_to_forum) }
