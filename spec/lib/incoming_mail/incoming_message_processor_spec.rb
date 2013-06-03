@@ -369,7 +369,22 @@ describe IncomingMail::IncomingMessageProcessor do
         IncomingMessageProcessor.process
       end
 
-      it "should move aside messages that have parsing errors" do
+      it "should process messages that have irrelevant parsing errors" do
+        # malformed Received header
+        foo = "Received: one two three; 5 Jun 2013 10:05:43 -0600\r\nTo: me+123-1@fake.fake\r\n\r\nfoo body"
+
+        @mock_mailbox.expects(:connect)
+        @mock_mailbox.expects(:move_message).never
+        @mock_mailbox.expects(:delete_message).with(:foo)
+        @mock_mailbox.expects(:each_message).yields(:foo, foo)
+        @mock_mailbox.expects(:disconnect)
+        imp = IncomingMessageProcessor
+        imp.expects(:process_single).with(kind_of(Mail::Message), "123", 1, anything)
+
+        IncomingMessageProcessor.process
+      end
+
+      it "should move aside messages that have relevant parsing errors" do
         foo = "To: me+123-1@fake.f\n ake\r\n\r\nfoo body" # illegal folding of "to" header
 
         @mock_mailbox.expects(:connect)
