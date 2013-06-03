@@ -342,7 +342,10 @@ class Course < ActiveRecord::Base
         course_ids = courses.map(&:id)
       else
         course_ids = courses_or_course_ids
-        courses = Course.where(:id => course_ids).includes(:course_sections => [:course, :nonxlist_course]).all
+        courses = Course.where(:id => course_ids).
+            includes(:course_sections => [:course, :nonxlist_course]).
+            select([:id, :account_id]).
+            all
       end
       course_ids_to_update_user_account_associations = []
       CourseAccountAssociation.transaction do

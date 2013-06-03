@@ -855,15 +855,43 @@ class Account < ActiveRecord::Base
   def update_account_associations
     self.shard.activate do
       account_chain_cache = {}
-      all_user_ids = []
-      all_user_ids += Course.update_account_associations(self.associated_courses, :skip_user_account_associations => true, :account_chain_cache => account_chain_cache)
+      all_user_ids = Set.new
+
+      # make sure to use the non-associated_courses associations
+      # to catch courses that didn't ever have an association created
+      scopes = if root_account?
+                [all_courses.select([:id, :account_id]),
+                 associated_courses.
+                     where("root_account_id<>?", self).
+                     except(:select).
+                     select("courses.id, courses.account_id").
+                     uniq
+                ]
+              else
+                [courses.select([:id, :account_id]),
+                 associated_courses.
+                    where("courses.account_id<>?", self).
+                    except(:select).
+                    select("courses.id, courses.account_id").
+                    uniq]
+              end
+      # match the "batch" size in Course.update_account_associations
+      scopes.each do |scope|
+        scope.find_in_batches(:batch_size => 500) do |courses|
+          Course.send(:with_exclusive_scope) do
+            all_user_ids.merge Course.update_account_associations(courses, :skip_user_account_associations => true, :account_chain_cache => account_chain_cache)
+          end
+        end
+      end
 
       # Make sure we have all users with existing account associations.
-      # (This should catch users with Pseudonyms associated with the account.)
-      all_user_ids += self.user_account_associations.pluck(:user_id)
+      all_user_ids.merge self.user_account_associations.pluck(:user_id)
+      if root_account?
+        all_user_ids.merge self.pseudonyms.active.pluck(:user_id)
+      end
 
       # Update the users' associations as well
-      User.update_account_associations(all_user_ids.uniq, :account_chain_cache => account_chain_cache)
+      User.update_account_associations(all_user_ids.to_a, :account_chain_cache => account_chain_cache)
     end
   end
   

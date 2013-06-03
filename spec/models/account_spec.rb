@@ -978,4 +978,17 @@ describe Account do
       account.can_see_admin_tools_tab?(@admin).should be_true
     end
   end
+
+  describe "#update_account_associations" do
+    it "should update associations for all courses" do
+      account = Account.create!
+      c1 = account.courses.create!
+      c2 = account.courses.create!
+      account.course_account_associations.delete_all
+      account.associated_courses.should == []
+      account.update_account_associations
+      account.reload
+      account.associated_courses.sort_by(&:id).should == [c1, c2]
+    end
+  end
 end
