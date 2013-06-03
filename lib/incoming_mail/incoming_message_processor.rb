@@ -32,6 +32,8 @@ module IncomingMail
       :pop3 => IncomingMail::Pop3Mailbox,
     }.freeze
 
+    ImportantHeaders = %w(To From Subject Content-Type)
+
     class << self
       attr_accessor :mailbox_accounts, :settings, :deprecated_settings
     end
@@ -200,8 +202,8 @@ module IncomingMail
       error_folder = account.error_folder
       mailbox.connect
       mailbox.each_message do |message_id, raw_contents|
-        message = parse_message(raw_contents)
-        if message && !message.errors.present?
+        message, errors = parse_message(raw_contents)
+        if message && !errors.present?
           process_message(message, account)
           mailbox.delete_message(message_id)
         else
@@ -224,13 +226,24 @@ module IncomingMail
     end
 
     def self.parse_message(raw_contents)
-        message = Mail.new(raw_contents)
-        # access some of the fields to make sure they don't raise errors when accessed
-        message.subject
-        message
+      message = Mail.new(raw_contents)
+      errors = select_relevant_errors(message)
+
+      # access some of the fields to make sure they don't raise errors when accessed
+      message.subject
+
+      return message, errors
     rescue => e
       ErrorReport.log_exception(error_report_category, e)
       nil
+    end
+
+    def self.select_relevant_errors(message)
+      # message.errors is an array of arrays containing header parsing errors:
+      # [["header-name", "header-value", parser_exception], ...]
+      message.errors.select do |error|
+        IncomingMessageProcessor::ImportantHeaders.include?(error[0])
+      end
     end
 
     def self.process_message(message, account)
