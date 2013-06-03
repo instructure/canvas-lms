@@ -890,11 +890,11 @@ ActionController::Routing::Routes.draw do |map|
 
     api.with_options(:controller => :role_overrides) do |roles|
       roles.get 'accounts/:account_id/roles', :action => :api_index, :path_name => 'account_roles'
-      roles.get 'accounts/:account_id/roles/:role', :action => :show
+      roles.get 'accounts/:account_id/roles/:role', :role => /[^\/]+/, :action => :show
       roles.post 'accounts/:account_id/roles', :action => :add_role
-      roles.post 'accounts/:account_id/roles/:role/activate', :action => :activate_role
-      roles.put 'accounts/:account_id/roles/:role', :action => :update
-      roles.delete 'accounts/:account_id/roles/:role', :action => :remove_role
+      roles.post 'accounts/:account_id/roles/:role/activate', :role => /[^\/]+/, :action => :activate_role
+      roles.put 'accounts/:account_id/roles/:role', :role => /[^\/]+/, :action => :update
+      roles.delete 'accounts/:account_id/roles/:role', :role => /[^\/]+/, :action => :remove_role
     end
 
     api.with_options(:controller => :account_reports) do |reports|
