@@ -332,18 +332,22 @@ class StreamItem < ActiveRecord::Base
     user_ids = Set.new
     count = 0
 
-    query = { :conditions => ['updated_at < ?', before_date], :include => [:context] }
-    if touch_users
-      query[:include] << 'stream_item_instances'
-    end
+    scope = where("updated_at<?", before_date).
+        includes(:context).
+        limit(1000)
+    scope = scope.includes(:stream_item_instances) if touch_users
 
-    self.find_each(query) do |item|
-      count += 1
-      if touch_users
-        user_ids.add(item.stream_item_instances.map { |i| i.user_id })
+    while true
+      batch = scope.all
+      batch.each do |item|
+        count += 1
+        if touch_users
+          user_ids.add(item.stream_item_instances.map(&:user_id))
+        end
+        # this will destroy the associated stream_item_instances as well
+        item.destroy
       end
-      # this will destroy the associated stream_item_instances as well
-      item.destroy
+      break if batch.empty?
     end
 
     unless user_ids.empty?
