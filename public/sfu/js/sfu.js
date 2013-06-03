@@ -41,6 +41,19 @@
     }
     // END CANVAS-192
 
+    // FIX (temporary) for no-flash browsers to upload files using the Files tool
+    var hasFlash = false;
+    try {
+        if (new ActiveXObject('ShockwaveFlash.ShockwaveFlash')) hasFlash = true;
+    } catch(e) {
+        if (navigator.mimeTypes ["application/x-shockwave-flash"] != undefined) hasFlash = true;
+    }
+    if (!hasFlash) {
+        // remove the invisible element that is blocking the "Add File" link
+        $('#swfupload_holder').hide();
+    }
+    // END no-flash upload FIX
+
 })(jQuery);
 
 // google analytics
