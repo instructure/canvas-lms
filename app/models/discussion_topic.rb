@@ -676,7 +676,7 @@ class DiscussionTopic < ActiveRecord::Base
   #         the visibility of the topic to the user, only that they are unable to reply.
   #
   # Returns: boolean
-  def locked_for?(user=nil, opts={})
+  def locked_for?(user, opts={})
     return false if opts[:check_policies] && self.grants_right?(user, nil, :update)
     Rails.cache.fetch(locked_cache_key(user), :expires_in => 1.minute) do
       locked = false

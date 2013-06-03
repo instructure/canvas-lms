@@ -246,12 +246,12 @@ class ContentTag < ActiveRecord::Base
     true
   end
 
-  def locked_for?(user, deep_check=false)
-    self.context_module.locked_for?(user, self, deep_check)
+  def locked_for?(user, opts={})
+    self.context_module.locked_for?(user, opts.merge({:tag => self}))
   end
   
-  def available_for?(user, deep_check=false)
-    self.context_module.available_for?(user, self, deep_check)
+  def available_for?(user, opts={})
+    self.context_module.available_for?(user, opts.merge({:tag => self}))
   end
   
   def self.update_for(asset)

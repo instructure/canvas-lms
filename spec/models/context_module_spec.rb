@@ -417,15 +417,15 @@ describe ContextModule do
       @module2.save!
       @module2.prerequisites.should_not be_nil
       @module2.prerequisites.should_not be_empty
-      @module2.available_for?(@user, @tag2, true).should be_false
+      @module2.available_for?(@user, :tag => @tag2, :deep_check_if_needed => true).should be_false
 
       # same with sequential progress enabled
       @module2.update_attribute(:require_sequential_progress, true)
-      @module2.available_for?(@user, @tag2).should be_false
-      @module2.available_for?(@user, @tag2, true).should be_false
+      @module2.available_for?(@user, :tag => @tag2).should be_false
+      @module2.available_for?(@user, :tag => @tag2, :deep_check_if_needed => true).should be_false
       @module.update_attribute(:require_sequential_progress, true)
-      @module2.available_for?(@user, @tag2).should be_false
-      @module2.available_for?(@user, @tag2, true).should be_false
+      @module2.available_for?(@user, :tag => @tag2).should be_false
+      @module2.available_for?(@user, :tag => @tag2, :deep_check_if_needed => true).should be_false
     end
 
     it "should create an unlocked progression if there are prerequisites that are met" do
