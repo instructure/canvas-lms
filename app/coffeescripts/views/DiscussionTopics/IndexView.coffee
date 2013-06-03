@@ -12,14 +12,15 @@ define [
 
     el: '#content'
 
-    @child 'openDiscussionView', '.open.discussion-list'
+    @child 'openDiscussionView',   '.open.discussion-list'
     @child 'lockedDiscussionView', '.locked.discussion-list'
+    @child 'pinnedDiscussionView', '.pinned.discussion-list'
 
     events:
-      'click .ig-header .element_toggler':    'toggleDiscussionList'
-      'click #edit_discussions_settings':     'toggleSettingsView'
-      'change #onlyUnread, #onlyGraded':      'filterResults'
-      'keyup #searchTerm':                    'filterResults'
+      'click .ig-header .element_toggler': 'toggleDiscussionList'
+      'click #edit_discussions_settings':  'toggleSettingsView'
+      'change #onlyUnread, #onlyGraded':   'filterResults'
+      'keyup #searchTerm':                 'filterResults'
 
     filters:
       onlyGraded:
@@ -40,7 +41,11 @@ define [
             model.summary().match(regex)
 
     collections: ->
-      [@options.openDiscussionView.collection, @options.lockedDiscussionView.collection]
+      [
+        @options.openDiscussionView.collection
+        @options.lockedDiscussionView.collection
+        @options.pinnedDiscussionView.collection
+      ]
 
     afterRender: ->
       @$('#discussionsFilter').buttonset()

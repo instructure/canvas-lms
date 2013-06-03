@@ -27,7 +27,7 @@ class DiscussionTopic < ActiveRecord::Base
 
   attr_accessible :title, :message, :user, :delayed_post_at, :lock_at, :assignment,
     :plaintext_message, :podcast_enabled, :podcast_has_student_posts,
-    :require_initial_post, :threaded, :discussion_type, :context
+    :require_initial_post, :threaded, :discussion_type, :context, :pinned
 
   module DiscussionTypes
     SIDE_COMMENT = 'side_comment'
@@ -60,7 +60,9 @@ class DiscussionTopic < ActiveRecord::Base
 
   sanitize_field :message, Instructure::SanitizeField::SANITIZE
   copy_authorized_links(:message) { [self.context, nil] }
-  acts_as_list :scope => :context
+  acts_as_list scope: %q{context_id = #{context_id} AND
+                         context_type = '#{context_type}' AND
+                         pinned = TRUE}
 
   before_create :initialize_last_reply_at
   before_save :default_values

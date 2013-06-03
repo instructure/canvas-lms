@@ -202,6 +202,8 @@ describe DiscussionTopicsController, :type => :integration do
                   "message"=>"<p>content here</p>",
                   "posted_at"=>@topic.posted_at.as_json,
                   "root_topic_id"=>nil,
+                  "pinned"=>false,
+                  "position"=>@topic.position,
                   "url" => "http://www.example.com/courses/#{@course.id}/discussion_topics/#{@topic.id}",
                   "html_url" => "http://www.example.com/courses/#{@course.id}/discussion_topics/#{@topic.id}",
                   "podcast_has_student_posts" => nil,
@@ -526,6 +528,21 @@ describe DiscussionTopicsController, :type => :integration do
         @assignment.should be_deleted
       end
 
+      it "should allow pinning a topic" do
+        api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+                 { controller: 'discussion_topics', action: 'update', format: 'json', course_id: @course.to_param, topic_id: @topic.to_param },
+                 { pinned: true })
+        @topic.reload.should be_pinned
+      end
+
+      it "should allow unpinning a topic" do
+        @topic.update_attribute(:pinned, true)
+        api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+                 { controller: 'discussion_topics', action: 'update', format: 'json', course_id: @course.to_param, topic_id: @topic.to_param },
+                 { pinned: false })
+        @topic.reload.should_not be_pinned
+      end
+
       it "should allow unlocking a locked topic" do
         @topic.lock!
 
@@ -652,6 +669,8 @@ describe DiscussionTopicsController, :type => :integration do
       "user_name"=>@user.name,
       "last_reply_at"=>gtopic.last_reply_at.as_json,
       "message"=>"<p>content here</p>",
+      "pinned"=>false,
+      "position"=>gtopic.position,
       "url" => "http://www.example.com/groups/#{group.id}/discussion_topics/#{gtopic.id}",
       "html_url" => "http://www.example.com/groups/#{group.id}/discussion_topics/#{gtopic.id}",
       "attachments"=>

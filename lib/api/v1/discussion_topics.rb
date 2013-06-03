@@ -52,6 +52,8 @@ module Api::V1::DiscussionTopics
                   :discussion_type => topic.discussion_type,
                   :require_initial_post => topic.require_initial_post?,
                   :podcast_url => url,
+                  :pinned => !!topic.pinned,
+                  :position => topic.position,
                   :read_state => topic.read_state(user),
                   :unread_count => topic.unread_count(user),
                   :topic_children => children,
