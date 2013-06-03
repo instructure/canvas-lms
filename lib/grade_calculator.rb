@@ -44,7 +44,10 @@ class GradeCalculator
 
   # recomputes the scores and saves them to each user's Enrollment
   def compute_scores
-    @submissions = @course.submissions.except(:includes).for_user(@user_ids)
+    @submissions = @course.submissions.
+        except(:includes, :order).
+        for_user(@user_ids).
+        select("submissions.id, user_id, assignment_id, score")
     submissions_by_user = @submissions.group_by(&:user_id)
     @user_ids.map do |user_id|
       user_submissions = submissions_by_user[user_id] || []
