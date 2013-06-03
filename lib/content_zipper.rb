@@ -27,22 +27,6 @@ class ContentZipper
     @check_user = options.has_key?(:check_user) ? options[:check_user] : true
     @logger = Rails.logger
   end
-  
-  def self.send_later_if_production(*args)
-    if Rails.env.production?
-      send_later(*args)
-    else
-      send(*args)
-    end
-  end
-  
-  def send_later_if_production(*args)
-    if Rails.env.production?
-      send_later(*args)
-    else
-      send(*args)
-    end
-  end
 
   # we evaluate some ERB templates from under app/views/ while generating assignment zips
   include I18nUtilities

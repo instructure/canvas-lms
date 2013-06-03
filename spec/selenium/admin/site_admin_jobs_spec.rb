@@ -58,7 +58,7 @@ describe "site admin jobs ui" do
     track_jobs do
       2.times { "present".send_later :reverse }
       "future".send_at Time.now + 30.days, :capitalize
-      job = "failure".send_at Time.now, :downcase
+      job = "failure".send_later_enqueue_args :downcase, no_delay: true
       @failed_job = job.fail!
     end
     @all_jobs = created_jobs.dup
@@ -82,7 +82,7 @@ describe "site admin jobs ui" do
 
     it "should load handler via ajax" do
       Delayed::Job.delete_all
-      job = "test".send_later :to_s
+      job = "test".send_later_enqueue_args :to_s, no_delay: true
       load_jobs_page
       fj('#jobs-grid .slick-row .l0.r0').click()
       fj('#job-id').text.should == job.id.to_s

@@ -3078,7 +3078,9 @@ class Course < ActiveRecord::Base
 
   def self.batch_update(account, user, course_ids, update_params)
     progress = account.progresses.create! :tag => "course_batch_update", :completion => 0.0
-    job = Course.send_later(:do_batch_update, progress, user, course_ids, update_params)
+    job = Course.send_later_enqueue_args(:do_batch_update,
+                                         { no_delay: true },
+                                         progress, user, course_ids, update_params)
     progress.user_id = user.id
     progress.delayed_job_id = job.id
     progress.save!

@@ -1,21 +1,42 @@
 module Delayed
   module MessageSending
     def send_later(method, *args)
-      Delayed::Job.enqueue Delayed::PerformableMethod.new(self, method.to_sym, args)
+      send_later_enqueue_args(method, {}, *args)
     end
 
     def send_later_enqueue_args(method, enqueue_args = {}, *args)
+      enqueue_args = enqueue_args.dup
       # support procs/methods as enqueue arguments
-      duped = false
       enqueue_args.each do |k,v|
         if v.respond_to?(:call)
-          enqueue_args = enqueue_args.dup unless duped
-          duped = true
           enqueue_args[k] = v.call(self)
         end
       end
 
-      Delayed::Job.enqueue(Delayed::PerformableMethod.new(self, method.to_sym, args), enqueue_args)
+      no_delay = enqueue_args.delete(:no_delay)
+      if !no_delay
+        # delay queuing up the job in another database until the results of the current
+        # transaction are visible
+        connection = self.connection if respond_to?(:connection)
+        connection ||= ActiveRecord::Base.connection
+        transactions = 0
+        # specs run in an outer transaction that needs to be ignored
+        transactions += 1 if Rails.env.test?
+
+        if connection.open_transactions > transactions
+          if !Rails.env.test? && (Delayed::Job != Delayed::Backend::ActiveRecord::Job ||
+              connection != Delayed::Job.connection)
+            connection.after_transaction_commit do
+              Delayed::Job.enqueue(Delayed::PerformableMethod.new(self, method.to_sym, args), enqueue_args)
+            end
+            return nil
+          end
+        end
+      end
+
+      result = Delayed::Job.enqueue(Delayed::PerformableMethod.new(self, method.to_sym, args), enqueue_args)
+      result = nil unless no_delay
+      result
     end
 
     def send_later_with_queue(method, queue, *args)

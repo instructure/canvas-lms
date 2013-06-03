@@ -492,7 +492,9 @@ class ConversationParticipant < ActiveRecord::Base
 
   def self.batch_update(user, conversation_ids, update_params)
     progress = user.progresses.create! :tag => "conversation_batch_update", :completion => 0.0
-    job = ConversationParticipant.send_later(:do_batch_update, progress, user, conversation_ids, update_params)
+    job = ConversationParticipant.send_later_enqueue_args(:do_batch_update,
+                                                          { no_delay: true },
+                                                          progress, user, conversation_ids, update_params)
     progress.user_id = user.id
     progress.delayed_job_id = job.id
     progress.save!
