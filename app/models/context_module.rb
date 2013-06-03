@@ -136,14 +136,14 @@ class ContextModule < ActiveRecord::Base
     can :read
   end
   
-  def locked_for?(user, tag=nil, deep_check=false)
+  def locked_for?(user, opts={})
     return false if self.grants_right?(user, nil, :update)
-    available = self.available_for?(user, tag, deep_check)
+    available = self.available_for?(user, opts)
     return true unless available
     self.to_be_unlocked
   end
   
-  def available_for?(user, tag=nil, deep_check=false)
+  def available_for?(user, opts={})
     return true if self.active? && !self.to_be_unlocked && self.prerequisites.blank? && !self.require_sequential_progress
     if self.grants_right?(user, nil, :update)
      return true
@@ -154,11 +154,12 @@ class ContextModule < ActiveRecord::Base
     # if the progression is locked, then position in the progression doesn't
     # matter. we're not available.
 
+    tag = opts[:tag]
     res = progression && !progression.locked?
     if tag && tag.context_module_id == self.id && self.require_sequential_progress
       res = progression && !progression.locked? && progression.current_position && progression.current_position >= tag.position
     end
-    if !res && deep_check
+    if !res && opts[:deep_check_if_needed]
       progression = self.evaluate_for(user, true, true)
       if tag && tag.context_module_id == self.id && self.require_sequential_progress
         res = progression && !progression.locked? && progression.current_position && progression.current_position >= tag.position

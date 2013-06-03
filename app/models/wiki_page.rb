@@ -186,10 +186,10 @@ class WikiPage < ActiveRecord::Base
   scope :visible_to_students, where(:hide_from_students => false)
   scope :order_by_id, order(:id)
 
-  def locked_for?(context, user, opts={})
+  def locked_for?(user, opts={})
     return false unless self.could_be_locked
     Rails.cache.fetch(locked_cache_key(user), :expires_in => 1.minute) do
-      m = context_module_tag_for(context).context_module rescue nil
+      m = context_module_tag_for(opts[:context]).context_module rescue nil
       locked = false
       if (m && !m.available_for?(user))
         locked = {:asset_string => self.asset_string, :context_module => m.attributes}
@@ -227,7 +227,7 @@ class WikiPage < ActiveRecord::Base
     given {|user, session| self.wiki.grants_right?(user, session, :contribute) && can_read_page?(user) }
     can :read
 
-    given {|user, session| self.editing_role?(user) && !self.locked_for?(nil, user) }
+    given {|user, session| self.editing_role?(user) && !self.locked_for?(user) }
     can :read and can :update_content and can :create
 
     given {|user, session| self.wiki.grants_right?(user, session, :manage) }

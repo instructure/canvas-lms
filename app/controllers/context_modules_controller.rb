@@ -74,7 +74,7 @@ class ContextModulesController < ApplicationController
   def reevaluate_modules_if_locked(tag)
     # if the object is locked for this user, reevaluate all the modules and clear the cache so it will be checked again when loaded
     if tag.content && tag.content.respond_to?(:locked_for?)
-      locked = tag.content.is_a?(WikiPage) ? tag.content.locked_for?(@context, @current_user) : tag.content.locked_for?(@current_user) 
+      locked = tag.content.locked_for?(@current_user, :context => @context)
       if locked
         @context.context_modules.active.each { |m| m.evaluate_for(@current_user, true, true) }
         if tag.content.respond_to?(:clear_locked_cache)

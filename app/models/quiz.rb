@@ -652,7 +652,7 @@ class Quiz < ActiveRecord::Base
   end
   alias_method :to_s, :quiz_title
   
-  def locked_for?(user=nil, opts={})
+  def locked_for?(user, opts={})
     return false if opts[:check_policies] && self.grants_right?(user, nil, :update)
     Rails.cache.fetch(locked_cache_key(user), :expires_in => 1.minute) do
       locked = false
