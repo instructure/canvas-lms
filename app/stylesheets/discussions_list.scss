@@ -91,7 +91,24 @@
 }
 
 .discussion-list {
+  box-sizing: border-box;
   margin-bottom: 12px;
+
+
+  &.droppable {
+    outline: 3px dashed #aaa;
+  }
+
+  &.droppable-hover {
+    > * {
+      opacity: 0.5;
+      -moz-transition: 0.2s opacity linear;
+      -ms-transition: 0.2s opacity linear;
+      -o-transition: 0.2s opacity linear;
+      -webkit-transition: 0.2s opacity linear;
+      transition: 0.2s opacity linear;
+    }
+  }
 
   .collectionViewItems {
     margin: 0;
@@ -176,6 +193,11 @@
     font-size: 14px;
     font-weight: bold;
     line-height: 12px;
+
+    &:focus {
+      outline: 0;
+      text-decoration: underline;
+    }
   }
 
   .author {

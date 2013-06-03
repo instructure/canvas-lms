@@ -23,18 +23,31 @@
           </a>
 
           <ul class="al-options">
-            <li>
-              <a href="#" class="icon-lock">
-                {{#if locked}}
-                  {{#t "unlock"}}Unlock{{/t}}
-                {{else}}
-                  {{#t "lock"}}Lock{{/t}}
-                {{/if}}
-              </a>
-            </li>
+            {{#if lockable}}
+              <li>
+                <a href="#" class="icon-lock">
+                  {{#if locked}}
+                    {{#t "unlock"}}Unlock{{/t}}
+                  {{else}}
+                    {{#t "lock"}}Lock{{/t}}
+                  {{/if}}
+                </a>
+              </li>
+            {{/if}}
             <li>
               <a href="#" class="icon-trash">{{#t "delete"}}Delete{{/t}}</a>
             </li>
+            {{#if pinnable}}
+              <li>
+                <a href="#" class="icon-pin">
+                  {{#if pinned}}
+                    {{#t "unpin"}}Unpin{{/t}}
+                  {{else}}
+                    {{#t "pin"}}Pin{{/t}}
+                  {{/if}}
+                </a>
+              </li>
+            {{/if}}
           </ul>
         {{/if}}
       </div>

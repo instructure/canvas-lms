@@ -25,10 +25,15 @@ define [
 
     @optionProperty 'itemView'
 
+    @optionProperty 'itemViewOptions'
+
     className: 'collectionView'
 
     els:
       '.collectionViewItems': '$list'
+
+    defaults:
+      itemViewOptions: {}
 
     ##
     # When using a different template ensure it contains an element with a

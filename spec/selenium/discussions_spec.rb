@@ -31,6 +31,15 @@ describe "discussions" do
       check_permissions
     end
 
+    it "should not allow a student to pin a topic, even if they are the author" do
+      topic = what_to_create == DiscussionTopic ? @course.discussion_topics.create!(:title => 'other users', :user => @other_user) : announcement_model(:title => 'other users', :user => @other_user)
+      login_as(@other_user.primary_pseudonym.unique_id, 'asdfasdf')
+      get(url)
+      wait_for_ajaximations
+      fj("[data-id=#{topic.id}] .al-trigger").click
+      ffj('.icon-pin:visible').length.should == 0
+    end
+
     it "should not allow a student to delete/edit topics if they didn't create any" do
       login_as(@other_user.primary_pseudonym.unique_id, 'asdfasdf')
       check_permissions(0)
@@ -296,7 +305,50 @@ describe "discussions" do
           driver.switch_to.alert.accept
           wait_for_ajaximations
           what_to_create.last.workflow_state.should == 'deleted'
-          f('.discussionTopicIndexList').should be_nil
+          f('.discussion-list li.discussion').should be_nil
+        end
+
+        it "should allow a teacher to pin a topic" do
+          topic = @course.discussion_topics.create!(title: 'Test Discussion', user: @user)
+          get(url)
+          wait_for_ajaximations
+
+          f('.open.discussion-list .al-trigger').click
+          fj('.icon-pin:visible').click
+          wait_for_ajaximations
+          topic.reload.should be_pinned
+          ffj('.pinned.discussion-list li.discussion:visible').length.should == 1
+        end
+
+        it "should allow a teacher to unpin a topic" do
+          topic = @course.discussion_topics.create!(title: 'Test Discussion', user: @user, pinned: true)
+          get(url)
+          wait_for_ajaximations
+
+          f('.pinned.discussion-list .al-trigger').click
+          fj('.icon-pin:visible').click
+          wait_for_ajaximations
+          topic.reload.should_not be_pinned
+          ffj('.open.discussion-list li.discussion:visible').length.should == 1
+        end
+
+        it "should not allow locking a pinned topic" do
+          topic = @course.discussion_topics.create!(title: 'Test Discussion', user: @user, pinned: true)
+          get(url)
+          wait_for_ajaximations
+
+          f('.pinned.discussion-list .al-trigger').click
+          fj('.icon-lock:visible').should be_nil
+        end
+
+        it "should not allow pinning a locked topic" do
+          topic = @course.discussion_topics.create!(title: 'Test Discussion', user: @user)
+          topic.lock!
+          get(url)
+          wait_for_ajaximations
+
+          f('.locked.discussion-list .al-trigger').click
+          fj('.icon-pin:visible').should be_nil
         end
       end
 

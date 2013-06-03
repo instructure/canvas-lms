@@ -87,6 +87,9 @@
 #        // (Optional) An explanation of why this is locked for the user. Present when locked_for_user is true.
 #        "lock_explanation":"This discussion is locked until September 1 at 12:00am",
 #
+#        // whether or not the discussion has been "pinned" by an instructor
+#        "pinned":false,
+#
 #        // The username of the topic creator.
 #        "user_name":"User Name",
 #
@@ -441,7 +444,7 @@ class DiscussionTopicsController < ApplicationController
   end
 
   API_ALLOWED_TOPIC_FIELDS = %w(title message discussion_type delayed_post_at lock_at podcast_enabled
-                                podcast_has_student_posts require_initial_post is_announcement)
+                                podcast_has_student_posts require_initial_post is_announcement pinned)
   def process_discussion_topic(is_new = false)
     discussion_topic_hash = params.slice(*API_ALLOWED_TOPIC_FIELDS)
     model_type = value_to_boolean(discussion_topic_hash.delete(:is_announcement)) && @context.announcements.new.grants_right?(@current_user, session, :create) ? :announcements : :discussion_topics
@@ -496,6 +499,10 @@ class DiscussionTopicsController < ApplicationController
         if params[:position_after] && @context.grants_right?(@current_user, session, :moderate_forum)
           other_topic = @context.discussion_topics.active.find(params[:position_after])
           @topic.insert_at(other_topic.position)
+        end
+
+        if params[:position_at] && @context.grants_right?(@current_user, session, :moderate_forum)
+          @topic.insert_at(params[:position_at].to_i)
         end
 
         # handle creating/removing attachment
