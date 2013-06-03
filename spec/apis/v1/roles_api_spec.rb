@@ -137,6 +137,18 @@ describe "Roles API", :type => :integration do
         json['workflow_state'].should == 'inactive'
       end
 
+      it "should find roles even when the name contains a period" do
+        role = @account.roles.create :name => 'Assistant.Grader'
+        role.base_role_type = 'TaEnrollment'
+        role.save!
+        json = api_call(:get, "/api/v1/accounts/#{@account.id}/roles/Assistant.Grader",
+                        { :controller => 'role_overrides', :action => 'show', :format => 'json', :account_id => @account.id.to_param, :role => 'Assistant.Grader' })
+        json['role'].should == 'Assistant.Grader'
+        json = api_call(:get, "/api/v1/accounts/#{@account.id}/roles/Assistant%2EGrader",
+                        { :controller => 'role_overrides', :action => 'show', :format => 'json', :account_id => @account.id.to_param, :role => 'Assistant.Grader' })
+        json['role'].should == 'Assistant.Grader'
+      end
+
       it "should not show a deleted role" do
         role = @account.roles.create :name => 'Deleted'
         role.base_role_type = 'AccountMembership'
