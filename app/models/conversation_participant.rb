@@ -80,7 +80,7 @@ class ConversationParticipant < ActiveRecord::Base
   #   instantiated to get id)
   #
   tagged_scope_handler(/\Auser_(\d+)\z/) do |tags, options|
-    scope_shard = scope(:find, :shard)
+    scope_shard = scope(:find, :shard) || Shard.current
     exterior_user_ids = tags.map{ |t| t.sub(/\Auser_/, '').to_i }
 
     # which users have conversations on which shards?
@@ -135,10 +135,12 @@ class ConversationParticipant < ActiveRecord::Base
       if Shard.current == scope_shard
         [sanitize_sql(shard_conditions)]
       else
-        conversation_ids = Conversation.where(shard_conditions).map do |c|
-          Shard.relative_id_for(c.id, scope_shard)
+        with_exclusive_scope do
+          conversation_ids = ConversationParticipant.where(shard_conditions).select(:conversation_id).map do |c|
+            Shard.relative_id_for(c.conversation_id, scope_shard)
+          end
+          [sanitize_sql(:conversation_id => conversation_ids)]
         end
-        [sanitize_sql(:conversation_id => conversation_ids)]
       end
     end
 

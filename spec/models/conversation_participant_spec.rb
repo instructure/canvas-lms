@@ -152,6 +152,18 @@ describe ConversationParticipant do
     it "should return conversations that match both the given course and user" do
       @me.conversations.tagged(@u1.asset_string, "course_1", :mode => :and).sort_by(&:id).should eql [@c8]
     end
+
+    context "sharding" do
+      specs_require_sharding
+
+      it "should find conversations for users on different shards" do
+        @shard1.activate do
+          @u3 = user
+          @c9 = conversation_for(@u3)
+        end
+        @me.conversations.tagged(@u3.asset_string).map(&:conversation).should == [@c9.conversation]
+      end
+    end
   end
 
   context "for_masquerading_user scope" do
