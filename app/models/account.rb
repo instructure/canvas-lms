@@ -49,7 +49,6 @@ class Account < ActiveRecord::Base
   has_many :rubrics, :as => :context
   has_many :rubric_associations, :as => :context, :include => :rubric, :dependent => :destroy
   has_many :course_account_associations
-  has_many :associated_courses, :through => :course_account_associations, :source => :course, :select => 'DISTINCT courses.*'
   has_many :child_courses, :through => :course_account_associations, :source => :course, :conditions => ['course_account_associations.depth = 0']
   has_many :attachments, :as => :context, :dependent => :destroy
   has_many :active_assignments, :as => :context, :class_name => 'Assignment', :conditions => ['assignments.workflow_state != ?', 'deleted']
@@ -84,7 +83,6 @@ class Account < ActiveRecord::Base
   has_many :error_reports
   has_many :announcements, :class_name => 'AccountNotification'
   has_many :alerts, :as => :context, :include => :criteria
-  has_many :associated_alerts, :through => :associated_courses, :source => :alerts, :include => :criteria
   has_many :user_account_associations
   has_many :report_snapshots
 
@@ -341,13 +339,17 @@ class Account < ActiveRecord::Base
     @cached_users_name_like[query] ||= self.fast_all_users.name_like(query)
   end
 
+  def associated_courses
+    Course.shard(shard).where("EXISTS (SELECT 1 FROM course_account_associations WHERE course_id=courses.id AND account_id=?)", self)
+  end
+
   def fast_course_base(opts)
     columns = "courses.id, courses.name, courses.workflow_state, courses.course_code, courses.sis_source_id, courses.enrollment_term_id"
     associated_courses = self.associated_courses.active
     associated_courses = associated_courses.with_enrollments if opts[:hide_enrollmentless_courses]
     associated_courses = associated_courses.for_term(opts[:term]) if opts[:term].present?
     associated_courses = yield associated_courses if block_given?
-    associated_courses.limit(opts[:limit]).active_first.except(:select).select(columns).group(columns).all
+    associated_courses.limit(opts[:limit]).active_first.select(columns).all
   end
 
   def fast_all_courses(opts={})
@@ -886,24 +888,17 @@ class Account < ActiveRecord::Base
       # make sure to use the non-associated_courses associations
       # to catch courses that didn't ever have an association created
       scopes = if root_account?
-                [all_courses.select([:id, :account_id]),
+                [all_courses,
                  associated_courses.
-                     where("root_account_id<>?", self).
-                     except(:select).
-                     select("courses.id, courses.account_id").
-                     uniq
-                ]
+                     where("root_account_id<>?", self)]
               else
-                [courses.select([:id, :account_id]),
+                [courses,
                  associated_courses.
-                    where("courses.account_id<>?", self).
-                    except(:select).
-                    select("courses.id, courses.account_id").
-                    uniq]
+                    where("courses.account_id<>?", self)]
               end
       # match the "batch" size in Course.update_account_associations
       scopes.each do |scope|
-        scope.find_in_batches(:batch_size => 500) do |courses|
+        scope.select([:id, :account_id]).find_in_batches(:batch_size => 500) do |courses|
           Course.send(:with_exclusive_scope) do
             all_user_ids.merge Course.update_account_associations(courses, :skip_user_account_associations => true, :account_chain_cache => account_chain_cache)
           end
