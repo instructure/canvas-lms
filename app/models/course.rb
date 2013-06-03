@@ -864,20 +864,25 @@ class Course < ActiveRecord::Base
 
   def self.require_assignment_groups(contexts)
     courses = contexts.select{|c| c.is_a?(Course) }
-    hash = {}
-    courses.each{|c| hash[c.id] = {:found => false, :course => c} }
-    groups = AssignmentGroup.select("id, context_id, context_type").where(:context_type => "Course", :context_id => courses)
-    groups.each{|c| hash[c.context_id][:found] = true }
-    hash.select{|id, obj| !obj[:found] }.each{|id, obj| obj[:course].require_assignment_group rescue nil }
+    groups = Shard.partition_by_shard(courses) do |shard_courses|
+      AssignmentGroup.select("id, context_id, context_type").where(:context_type => "Course", :context_id => shard_courses)
+    end.index_by(&:context_id)
+    courses.each do |course|
+      if !groups[course.id]
+        course.require_assignment_group rescue nil
+      end
+    end
   end
 
   def require_assignment_group
-    has_group = Rails.cache.read(['has_assignment_group', self].cache_key)
-    return if has_group && Rails.env.production?
-    if self.assignment_groups.active.empty?
-      self.assignment_groups.create(:name => t('#assignment_group.default_name', "Assignments"))
+    shard.activate do
+      has_group = Rails.cache.read(['has_assignment_group', self].cache_key)
+      return if has_group && Rails.env.production?
+      if self.assignment_groups.active.empty?
+        self.assignment_groups.create(:name => t('#assignment_group.default_name', "Assignments"))
+      end
+      Rails.cache.write(['has_assignment_group', self].cache_key, true)
     end
-    Rails.cache.write(['has_assignment_group', self].cache_key, true)
   end
 
   def self.create_unique(uuid=nil, account_id=nil, root_account_id=nil)
@@ -974,7 +979,7 @@ class Course < ActiveRecord::Base
 
     # Active admins (Teacher/TA/Designer)
     given { |user, session| (self.available? || self.created? || self.claimed?) && user && user.cached_not_ended_enrollments.any?{|e| e.course_id == self.id && e.participating_admin? } && (!session || !session["role_course_#{self.id}"]) }
-    can :read_as_admin and can :read and can :manage and can :update and can :use_student_view and can :read_outcomes
+    can :read_as_admin and can :read and can :manage and can :update and can :use_student_view and can :read_outcomes and can :view_hidden_items and can :view_unpublished_items
 
     # Teachers and Designers can delete/reset, but not TAs
     given { |user, session| !self.deleted? && !self.sis_source_id && user && user.cached_not_ended_enrollments.any?{|e| e.course_id == self.id && e.participating_content_admin? } && (!session || !session["role_course_#{self.id}"]) }
@@ -1045,7 +1050,7 @@ class Course < ActiveRecord::Base
     can :read_as_admin
 
     given { |user, session| self.account_membership_allows(user, session, :manage_courses) }
-    can :read_as_admin and can :manage and can :update and can :delete and can :use_student_view and can :reset_content
+    can :read_as_admin and can :manage and can :update and can :delete and can :use_student_view and can :reset_content and can :view_hidden_items and can :view_unpublished_items
 
     given { |user, session| self.account_membership_allows(user, session, :read_course_content) }
     can :read and can :read_outcomes
@@ -1346,7 +1351,7 @@ class Course < ActiveRecord::Base
 
   def generate_grade_publishing_csv_output(enrollments, publishing_user, publishing_pseudonym)
     enrollment_ids = []
-    res = FasterCSV.generate do |csv|
+    res = CSV.generate do |csv|
       row = ["publisher_id", "publisher_sis_id", "course_id", "course_sis_id", "section_id", "section_sis_id", "student_id", "student_sis_id", "enrollment_id", "enrollment_status", "score"]
       row << "grade" if self.grading_standard_enabled?
       csv << row
@@ -1405,12 +1410,14 @@ class Course < ActiveRecord::Base
     t 'csv.final_score', 'Final Score'
     t 'csv.final_grade', 'Final Grade'
     t 'csv.points_possible', 'Points Possible'
-    res = FasterCSV.generate do |csv|
+    res = CSV.generate do |csv|
       #First row
       row = ["Student", "ID"]
       row.concat(["SIS User ID", "SIS Login ID"]) if options[:include_sis_id]
       row << "Section"
       row.concat assignments.map(&:title_with_id)
+      include_points = !apply_group_weights?
+      row.concat(["Current Points", "Final Points"]) if include_points
       row.concat(["Current Score", "Final Score"])
       row.concat(["Final Grade"]) if self.grading_standard_enabled?
       csv << row
@@ -1430,6 +1437,7 @@ class Course < ActiveRecord::Base
       row = ["    Points Possible", "", ""]
       row.concat(["", ""]) if options[:include_sis_id]
       row.concat assignments.map(&:points_possible)
+      row.concat [read_only, read_only] if include_points
       row.concat([read_only, read_only])
       row.concat([read_only]) if self.grading_standard_enabled?
       csv << row
@@ -1452,10 +1460,11 @@ class Course < ActiveRecord::Base
         row << student_section
         row.concat(student_submissions)
 
-        current_score, final_score = grades.shift
-        row.concat [current_score, final_score]
+        current_info, final_info = grades.shift
+        row.concat [current_info[:total], final_info[:total]] if include_points
+        row.concat [current_info[:grade], final_info[:grade]]
         if self.grading_standard_enabled?
-          row.concat([score_to_grade(final_score)])
+          row.concat([score_to_grade(final_info[:grade])])
         end
         csv << row
       end
@@ -2514,7 +2523,7 @@ class Course < ActiveRecord::Base
   memoize :section_visibilities_for
 
   def visibility_limited_to_course_sections?(user, visibilities = section_visibilities_for(user))
-    !visibilities.any?{|s| !s[:limit_privileges_to_course_section] }
+    visibilities.all?{|s| s[:limit_privileges_to_course_section] }
   end
 
   # returns a scope, not an array of users/enrollments
@@ -2552,7 +2561,7 @@ class Course < ActiveRecord::Base
     end
     # See also MessageableUser::Calculator (same logic used to get users across multiple courses) (should refactor)
     case enrollment_visibility_level_for(user, visibilities)
-      when :full then scope
+      when :full, :limited then scope
       when :sections then scope.where("enrollments.course_section_id IN (?) OR (enrollments.limit_privileges_to_course_section=? AND enrollments.type IN ('TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment'))", visibilities.map{|s| s[:course_section_id]}, false)
       when :restricted then scope.where(:enrollments => { :user_id  => visibilities.map{|s| s[:associated_user_id]}.compact + [user] })
       else scope.where("?", false)
@@ -2567,6 +2576,7 @@ class Course < ActiveRecord::Base
       when :full then scope
       when :sections then scope.where(:enrollments => { :course_section_id => visibilities.map {|s| s[:course_section_id] } })
       when :restricted then scope.where(:enrollments => { :user_id => (visibilities.map { |s| s[:associated_user_id] }.compact + [user]) })
+      when :limited then scope.where("enrollments.type IN ('StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment', 'StudentViewEnrollment')")
       else scope.where("?", false)
     end
   end
@@ -2575,7 +2585,7 @@ class Course < ActiveRecord::Base
     visibilities = section_visibilities_for(user)
     section_ids = visibilities.map{ |s| s[:course_section_id] }
     case enrollment_visibility_level_for(user, visibilities)
-    when :full
+    when :full, :limited
       if visibilities.all?{ |v| ['StudentEnrollment', 'StudentViewEnrollment', 'ObserverEnrollment'].include? v[:type] }
         sections.where(:id => section_ids)
       else
@@ -2606,10 +2616,13 @@ class Course < ActiveRecord::Base
     permissions = require_message_permission ?
       [:send_messages] :
       [:manage_grades, :manage_students, :manage_admin_users, :read_roster, :view_all_grades]
-    if !self.grants_rights?(user, nil, *permissions).values.any?
+    granted_permissions = self.grants_rights?(user, nil, *permissions).select {|key, value| value}.keys
+    if granted_permissions.empty?
       :restricted # e.g. observer, can only see admins in the course
     elsif visibilities.present? && visibility_limited_to_course_sections?(user, visibilities)
       :sections
+    elsif granted_permissions.eql? [:read_roster]
+      :limited
     else
       :full
     end
@@ -2617,10 +2630,6 @@ class Course < ActiveRecord::Base
 
   def unpublished?
     self.created? || self.claimed?
-  end
-
-  def only_wiki_is_public
-    self.respond_to?(:wiki_is_public) && self.wiki_is_public && !self.is_public
   end
 
   def tab_configuration
@@ -2681,9 +2690,9 @@ class Course < ActiveRecord::Base
         :label => tool.label_for(:course_navigation, opts[:language]),
         :css_class => tool.asset_string,
         :href => :course_external_tool_path,
-        :visibility => tool.settings[:course_navigation][:visibility],
+        :visibility => tool.course_navigation(:visibility),
         :external => true,
-        :hidden => tool.settings[:course_navigation][:default] == 'disabled',
+        :hidden => tool.course_navigation(:default) == 'disabled',
         :args => [self.id, tool.id]
      }
     end

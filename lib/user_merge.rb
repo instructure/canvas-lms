@@ -14,7 +14,9 @@ class UserMerge
     return unless target_user
     return if target_user == from_user
     target_user.save if target_user.changed?
-    target_user.associate_with_shard(from_user.shard)
+    from_user.associated_shards.each do |shard|
+      target_user.associate_with_shard(shard)
+    end
 
     max_position = target_user.communication_channels.last.try(:position) || 0
     to_retire_ids = []

@@ -6,7 +6,7 @@ define [
   'jst/_messageStudentsWhoRecipientList'
   'underscore'
   'compiled/jquery/serializeForm'
-], (I18n,ValidatedFormView, messageStudentsDialog,Conversation,recipientList,_) ->
+], (I18n, ValidatedFormView, messageStudentsDialog, Conversation, recipientList, _) ->
 
   class MessageStudentsDialog extends ValidatedFormView
 
@@ -18,9 +18,9 @@ define [
     #     short_name: String # represents a short version of the user's name
     @optionProperty 'recipientGroups'
 
-    # The title of whatever the message is "for", renders the text as
-    # for <title> when the dialog is rendered.
-    @optionProperty 'title'
+    # The context of whatever the message is "for", renders the text as
+    # Message Students for <context> when the dialog is rendered.
+    @optionProperty 'context'
 
     els:
       '[name=recipientGroupName]': '$recipientGroupName'
@@ -29,13 +29,21 @@ define [
 
     template: messageStudentsDialog
 
+    className: 'validated-form-view form-dialog'
+
     initialize: (opts) ->
       super
+      @title = if @context
+        I18n.t('message_students_for_context', 'Message students for %{context}', {@context})
+      else
+        I18n.t('message_students', 'Message students')
+
       @recipients = @recipientGroups[0].recipients
       @model or= new Conversation
 
     events: _.extend({}, ValidatedFormView::events,
-      'change [name=recipientGroupName]': 'updateListOfRecipients')
+      'change [name=recipientGroupName]': 'updateListOfRecipients'
+      'click .dialog_closer': 'close')
 
     toJSON: =>
       json = {}
@@ -62,3 +70,14 @@ define [
       {recipients} = @_findRecipientGroupByName groupName
       @$messageRecipients.html recipientList recipients: recipients
 
+    onSaveSuccess: ->
+      @close()
+      $.flashMessage(I18n.t('notices.message_sent', "Message Sent!"))
+
+    open: ->
+      @render()
+      @$el.dialog(autoOpen: false, height: 500, width: 500, title: @title).dialog('open')
+
+    close: ->
+      @$el.dialog('close')
+      @remove()

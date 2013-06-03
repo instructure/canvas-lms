@@ -17,12 +17,16 @@
          # a group should always be present if in_group is false, and for the
          # group to be being displayed with in_group false, it must be free
          # associative
+         disabled = false
          management_url = context_url @context, :context_group_url, group.id, :join => 1
          management_text =
            if group.auto_accept?
              t 'actions.join_group', 'join this group'
            elsif group.allow_self_signup?(@current_user)
-             if in_categories.include?(group.group_category)
+             if group.full?
+               disabled = true
+               t 'group_full', 'group full'
+             elsif in_categories.include?(group.group_category)
                t 'actions.switch_group', 'switch to this group'
              else
                t 'actions.join_group', 'join this group'
@@ -32,7 +36,7 @@
            end
        end %>
     <% if management_url %>
-      <span class="management"><%= link_to(management_text, management_url) %></span>
+      <span class="management"><%= disabled ? content_tag(:span, management_text, :class => 'muted') : link_to(management_text, management_url) %></span>
     <% end %>
   </div>
   <div class="group_info">

@@ -648,7 +648,7 @@ describe Course, "gradebook_to_csv" do
     
     csv = @course.gradebook_to_csv
     csv.should_not be_nil
-    rows = FasterCSV.parse(csv)
+    rows = CSV.parse(csv)
     rows.length.should equal(3)
     rows[0][-1].should == "Final Score"
     rows[1][-1].should == "(read only)"
@@ -686,7 +686,7 @@ describe Course, "gradebook_to_csv" do
 
     csv = @course.gradebook_to_csv
     csv.should_not be_nil
-    rows = FasterCSV.parse(csv)
+    rows = CSV.parse(csv)
     rows.length.should equal(3)
     assignments = []
     rows[0].each do |column|
@@ -710,7 +710,7 @@ describe Course, "gradebook_to_csv" do
     
     csv = @course.gradebook_to_csv
     csv.should_not be_nil
-    rows = FasterCSV.parse(csv)
+    rows = CSV.parse(csv)
     rows.length.should equal(3)
     rows[0][-1].should == "Final Grade"
     rows[1][-1].should == "(read only)"
@@ -744,7 +744,7 @@ describe Course, "gradebook_to_csv" do
 
     csv = @course.gradebook_to_csv(:include_sis_id => true)
     csv.should_not be_nil
-    rows = FasterCSV.parse(csv)
+    rows = CSV.parse(csv)
     rows.length.should == 5
     rows[0][1].should == 'ID'
     rows[0][2].should == 'SIS User ID'
@@ -765,6 +765,31 @@ describe Course, "gradebook_to_csv" do
     rows[4][3].should be_nil
   end
 
+  context "accumulated points" do
+    before do
+      student_in_course(:active_all => true)
+      a = @course.assignments.create! :title => "Blah", :points_possible => 10
+      a.grade_student @student, :grade => 8
+    end
+
+    it "includes points for unweighted courses" do
+      csv = CSV.parse(@course.gradebook_to_csv)
+      csv[0][-4].should == "Current Points"
+      csv[0][-3].should == "Final Points"
+      csv[1][-4].should == "(read only)"
+      csv[1][-3].should == "(read only)"
+      csv[2][-4].should == "8"
+      csv[2][-3].should == "8"
+    end
+
+    it "doesn't include points for weighted courses" do
+      @course.update_attribute(:group_weighting_scheme, 'percent')
+      csv = CSV.parse(@course.gradebook_to_csv)
+      csv[0][-4].should_not == "Current Points"
+      csv[0][-3].should_not == "Final Points"
+    end
+  end
+
   it "should only include students once" do
     # students might have multiple enrollments in a course
     course(:active_all => true)
@@ -776,7 +801,7 @@ describe Course, "gradebook_to_csv" do
     StudentEnrollment.create!(:user => @user1, :course => @course, :course_section => @s2)
     @course.reload
     csv = @course.gradebook_to_csv(:include_sis_id => true)
-    rows = FasterCSV.parse(csv)
+    rows = CSV.parse(csv)
     rows.length.should == 4
   end
 
@@ -803,7 +828,7 @@ describe Course, "gradebook_to_csv" do
 
       csv = @course.gradebook_to_csv(:include_sis_id => true)
       csv.should_not be_nil
-      rows = FasterCSV.parse(csv)
+      rows = CSV.parse(csv)
       rows.length.should == 6
       rows[0][1].should == 'ID'
       rows[0][2].should == 'SIS User ID'
@@ -838,7 +863,7 @@ describe Course, "gradebook_to_csv" do
 
     csv = @course.gradebook_to_csv(:user => @teacher)
     csv.should_not be_nil
-    rows = FasterCSV.parse(csv)
+    rows = CSV.parse(csv)
     # two header rows, and one student row
     rows.length.should == 3
     rows[2][1].should == @user2.id.to_s
@@ -2239,14 +2264,14 @@ describe Course, 'grade_publishing' do
 end
 
 describe Course, 'tabs_available' do
-  def new_exernal_tool(context)
+  def new_external_tool(context)
     context.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob", :domain => "example.com")
   end
   
   it "should not include external tools if not configured for course navigation" do
     course_model
-    tool = new_exernal_tool @course
-    tool.settings[:user_navigation] = {:url => "http://www.example.com", :text => "Example URL"}
+    tool = new_external_tool @course
+    tool.user_navigation = {:url => "http://www.example.com", :text => "Example URL"}
     tool.save!
     tool.has_course_navigation.should == false
     @teacher = user_model
@@ -2257,8 +2282,8 @@ describe Course, 'tabs_available' do
   
   it "should include external tools if configured on the course" do
     course_model
-    tool = new_exernal_tool @course
-    tool.settings[:course_navigation] = {:url => "http://www.example.com", :text => "Example URL"}
+    tool = new_external_tool @course
+    tool.course_navigation = {:url => "http://www.example.com", :text => "Example URL"}
     tool.save!
     tool.has_course_navigation.should == true
     @teacher = user_model
@@ -2275,8 +2300,8 @@ describe Course, 'tabs_available' do
     course_model
     @account = @course.root_account.sub_accounts.create!(:name => "sub-account")
     @course.move_to_account(@account.root_account, @account)
-    tool = new_exernal_tool @account
-    tool.settings[:course_navigation] = {:url => "http://www.example.com", :text => "Example URL"}
+    tool = new_external_tool @account
+    tool.course_navigation = {:url => "http://www.example.com", :text => "Example URL"}
     tool.save!
     tool.has_course_navigation.should == true
     @teacher = user_model
@@ -2293,8 +2318,8 @@ describe Course, 'tabs_available' do
     course_model
     @account = @course.root_account.sub_accounts.create!(:name => "sub-account")
     @course.move_to_account(@account.root_account, @account)
-    tool = new_exernal_tool @account.root_account
-    tool.settings[:course_navigation] = {:url => "http://www.example.com", :text => "Example URL"}
+    tool = new_external_tool @account.root_account
+    tool.course_navigation = {:url => "http://www.example.com", :text => "Example URL"}
     tool.save!
     tool.has_course_navigation.should == true
     @teacher = user_model
@@ -2312,8 +2337,8 @@ describe Course, 'tabs_available' do
     @course.offer
     @course.is_public = true
     @course.save!
-    tool = new_exernal_tool @course
-    tool.settings[:course_navigation] = {:url => "http://www.example.com", :text => "Example URL", :visibility => 'admins'}
+    tool = new_external_tool @course
+    tool.course_navigation = {:url => "http://www.example.com", :text => "Example URL", :visibility => 'admins'}
     tool.save!
     tool.has_course_navigation.should == true
     @teacher = user_model
@@ -2338,8 +2363,8 @@ describe Course, 'tabs_available' do
     @course.offer
     @course.is_public = true
     @course.save!
-    tool = new_exernal_tool @course
-    tool.settings[:course_navigation] = {:url => "http://www.example.com", :text => "Example URL", :visibility => 'members'}
+    tool = new_external_tool @course
+    tool.course_navigation = {:url => "http://www.example.com", :text => "Example URL", :visibility => 'members'}
     tool.save!
     tool.has_course_navigation.should == true
     @teacher = user_model
@@ -2361,8 +2386,8 @@ describe Course, 'tabs_available' do
   
   it "should allow reordering external tool position in course navigation" do
     course_model
-    tool = new_exernal_tool @course
-    tool.settings[:course_navigation] = {:url => "http://www.example.com", :text => "Example URL"}
+    tool = new_external_tool @course
+    tool.course_navigation = {:url => "http://www.example.com", :text => "Example URL"}
     tool.save!
     tool.has_course_navigation.should == true
     @teacher = user_model
@@ -2375,8 +2400,8 @@ describe Course, 'tabs_available' do
   
   it "should not show external tools that are hidden in course navigation" do
     course_model
-    tool = new_exernal_tool @course
-    tool.settings[:course_navigation] = {:url => "http://www.example.com", :text => "Example URL"}
+    tool = new_external_tool @course
+    tool.course_navigation = {:url => "http://www.example.com", :text => "Example URL"}
     tool.save!
     tool.has_course_navigation.should == true
     @teacher = user_model
@@ -2393,7 +2418,40 @@ describe Course, 'tabs_available' do
     tabs = @course.tabs_available(@teacher, :for_reordering => true)
     tabs.map{|t| t[:id] }.should be_include(tool.asset_string)
   end
-  
+
+  it "uses extension default values" do
+    course_model
+    tool = new_external_tool @course
+    tool.course_navigation = {}
+    tool.settings[:url] = "http://www.example.com"
+    tool.settings[:visibility] = "members"
+    tool.settings[:default] = "disabled"
+    tool.save!
+
+    tool.course_navigation(:url).should == "http://www.example.com"
+    tool.has_course_navigation.should == true
+
+    settings = @course.external_tool_tabs({}).first
+    settings.should include(:visibility=>"members")
+    settings.should include(:hidden=>true)
+  end
+
+  it "prefers extension settings over default values" do
+    course_model
+    tool = new_external_tool @course
+    tool.course_navigation = {:url => "http://www.example.com", :visibility => "admins", :default => "active" }
+    tool.settings[:visibility] = "members"
+    tool.settings[:default] = "disabled"
+    tool.save!
+
+    tool.course_navigation(:url).should == "http://www.example.com"
+    tool.has_course_navigation.should == true
+
+    settings = @course.external_tool_tabs({}).first
+    settings.should include(:visibility=>"admins")
+    settings.should include(:hidden=>false)
+  end
+
 end
 
 describe Course, 'scoping' do
@@ -3454,4 +3512,27 @@ describe Course do
     Course.deleted.count.should == 1
   end
 
+  describe "visibility_limited_to_course_sections?" do
+    before do
+      course
+      @limited = { :limit_privileges_to_course_section => true }
+      @full = { :limit_privileges_to_course_section => false }
+    end
+
+    it "should be true if all visibilities are limited" do
+      @course.visibility_limited_to_course_sections?(nil, [@limited, @limited]).should be_true
+    end
+
+    it "should be false if only some visibilities are limited" do
+      @course.visibility_limited_to_course_sections?(nil, [@limited, @full]).should be_false
+    end
+
+    it "should be false if no visibilities are limited" do
+      @course.visibility_limited_to_course_sections?(nil, [@full, @full]).should be_false
+    end
+
+    it "should be true if no visibilities are given" do
+      @course.visibility_limited_to_course_sections?(nil, []).should be_true
+    end
+  end
 end

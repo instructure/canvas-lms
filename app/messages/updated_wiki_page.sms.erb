@@ -1,5 +1,3 @@
 <%= t :updated_message, "%{title}, %{user} just updated:", :title => asset.title, :user => asset.context.name %>
 
-<%= strip_and_truncate(asset.body, :max_length => 50) %>
-
 <%= t :more_info, "More info at %{url}", :url => HostUrl.context_host(asset.context) %>

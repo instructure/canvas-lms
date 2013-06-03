@@ -125,7 +125,7 @@ module Canvas::AccountReports
 
       # Generate the CSV report
       filename = Canvas::AccountReports.generate_file(@account_report)
-      FasterCSV.open(filename, "w") do |csv|
+      CSV.open(filename, "w") do |csv|
         csv << headers
         students.find_each_with_temp_table do |row|
           row['assignment url'] =
@@ -192,7 +192,7 @@ module Canvas::AccountReports
       students = add_term_scope(students, 'c')
 
       file = Canvas::AccountReports.generate_file(@account_report)
-      FasterCSV.open(file, "w") do |csv|
+      CSV.open(file, "w") do |csv|
         csv << ['student name', 'student id', 'student sis', 'course',
                 'course id', 'course sis', 'section', 'section id',
                 'section sis', 'term', 'term id', 'term sis','current score',

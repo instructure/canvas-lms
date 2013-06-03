@@ -1279,7 +1279,6 @@ class User < ActiveRecord::Base
     preferences[:send_scores_in_emails] == true
   end
 
-
   def close_announcement(announcement)
     preferences[:closed_notifications] ||= []
     # serialize ids relative to the user
@@ -1288,6 +1287,10 @@ class User < ActiveRecord::Base
     end
     preferences[:closed_notifications].uniq!
     save
+  end
+
+  def manual_mark_as_read?
+    !!preferences[:manual_mark_as_read]
   end
 
   def ignore_item!(asset, purpose, permanent = false)
@@ -1894,7 +1897,7 @@ class User < ActiveRecord::Base
   # Returns an array of context code strings.
   def conversation_context_codes(include_concluded_codes = true)
     Rails.cache.fetch([self, include_concluded_codes, 'conversation_context_codes4'].cache_key, :expires_in => 1.day) do
-      Shard.default.activate do
+      Shard.birth.activate do
         associations = %w{courses concluded_courses current_groups}
         associations.slice!(1) unless include_concluded_codes
 
@@ -2416,5 +2419,13 @@ class User < ActiveRecord::Base
 
   def prefers_gradebook2?
     preferences[:use_gradebook2] != false
+  end
+
+  def stamp_logout_time!
+    if Rails.version < '3.0'
+      User.update_all({ :last_logged_out => Time.zone.now }, :id => self)
+    else
+      User.where(:id => self).update_all(:last_logged_out => Time.zone.now)
+    end
   end
 end

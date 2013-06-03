@@ -132,8 +132,6 @@ describe BasicLTI do
       hash['lis_person_sourcedid'].should == 'testfun'
       hash['launch_presentation_locale'].should == I18n.default_locale.to_s
       hash['launch_presentation_document_target'].should == 'iframe'
-      hash['launch_presentation_width'].should == '600'
-      hash['launch_presentation_height'].should == '400'
       hash['launch_presentation_return_url'].should == 'http://www.google.com'
       hash['tool_consumer_instance_guid'].should == @course.root_account.lti_guid
       hash['tool_consumer_instance_name'].should == @course.root_account.name
@@ -267,6 +265,20 @@ describe BasicLTI do
     hash['custom_canvas_assignment_points_possible'].should == @assignment.points_possible.to_s
   end
 
+  it "gets the correct width and height based on resource type" do
+    @user = user_with_managed_pseudonym(:sis_user_id => 'testfun', :name => "A Name")
+    course_with_teacher_logged_in(:active_all => true, :user => @user, :account => @account)
+    @course.sis_source_id = 'coursesis'
+    @course.save!
+    @tool = @course.context_external_tools.create!(:domain => 'yahoo.com', :consumer_key => '12345', :shared_secret => 'secret', :name => 'tool', :privacy_level => 'public')
+    @tool.editor_button = { :selection_width => 1000, :selection_height => 300, :icon_url => 'www.example.com/icon', :url => 'www.example.com' }
+    @tool.save!
+    hash = BasicLTI.generate(:url => 'http://www.yahoo.com', :tool => @tool, :user => @user, :context => @course,
+                             :link_code => '123456', :return_url => 'http://www.google.com', :resource_type => 'editor_button')
+    hash['launch_presentation_width'].should == '1000'
+    hash['launch_presentation_height'].should == '300'
+  end
+
   context "sharding" do
     specs_require_sharding
 
@@ -311,6 +323,18 @@ describe BasicLTI do
       BasicLTI.user_lti_data(nobody, @course)['role_types'].should == ['urn:lti:sysrole:ims/lis/None']
       BasicLTI.user_lti_data(admin, @course)['role_types'].should == ['urn:lti:instrole:ims/lis/Administrator']
       BasicLTI.user_lti_data(ta, @course)['role_types'].should == ['urn:lti:role:ims/lis/TeachingAssistant']
+    end
+
+    it "should return admin for custom admin" do
+      account = Account.default
+      role_name = 'psuedo_admin'
+      role = account.roles.build(:name => role_name)
+      role.base_role_type = AccountUser::BASE_ROLE_NAME.to_s
+      role.workflow_state = 'active'
+      role.save!
+      admin = user_model
+      account.add_user(admin,role_name)
+      BasicLTI.user_lti_data(admin, account)['role_types'].should == ['urn:lti:instrole:ims/lis/Administrator']
     end
 
     it "should return multiple role types if applicable" do

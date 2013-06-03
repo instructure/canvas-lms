@@ -82,7 +82,7 @@ class SisBatch < ActiveRecord::Base
 
   def process
     process_delay = Setting.get_cached('sis_batch_process_start_delay', '0').to_f
-    job_args = { :singleton => "sis_batch:account:#{Shard.default.activate { self.account_id }}", :priority => Delayed::LOW_PRIORITY }
+    job_args = { :singleton => "sis_batch:account:#{Shard.birth.activate { self.account_id }}", :priority => Delayed::LOW_PRIORITY }
     if process_delay > 0
       job_args[:run_at] = process_delay.seconds.from_now
     end

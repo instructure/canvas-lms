@@ -5,7 +5,6 @@ require [
   'compiled/views/course_settings/tabs/tabUsers'
   'vendor/jquery.cookie'
   'course_settings'
-  'external_tools'
   'grading_standards'
 ], (NavigationView, UserCollectionView, UserCollection) ->
 

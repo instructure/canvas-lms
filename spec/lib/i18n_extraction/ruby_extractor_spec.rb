@@ -156,6 +156,10 @@ describe I18nExtraction::RubyExtractor do
       extract("t '#foo', 'Foo'", 'asdf.', false).should == {'foo' => "Foo"}
     end
 
+    it "should not auto-scope keys with I18n as the receiver" do
+      extract("I18n.t 'foo', 'Foo'", 'asdf.', false).should == {'foo' => 'Foo'}
+    end
+
     it "should auto-scope plugin registration" do
       extract("Canvas::Plugin.register('dim_dim', :web_conferencing, {:name => lambda{ t :name, \"DimDim\" }})", '', false).should ==
         {'plugins' => {'dim_dim' => {'name' => "DimDim"}}}
@@ -188,6 +192,17 @@ describe I18nExtraction::RubyExtractor do
     it "should strip whitespace from all other calls" do
       extract("t 'foo', \"\\n Foo \\t foo!\\n\"").should == {'foo' => "Foo \t foo!"}
       extract("mt 'foo', \"\\n Foo \\t foo!\\n\"").should == {'foo' => "Foo \t foo!"}
+    end
+  end
+
+  context "sanitization" do
+    it "should reject stuff that looks sufficiently html-y" do
+      lambda{ extract "t 'dude', 'this is <em>important</em>'" }.should raise_error /html tags on line 1/
+    end
+
+    it "should generally be ok with angle brackets" do
+      extract("t 'obvious', 'TIL 1 < 2'").should == {'obvious' => 'TIL 1 < 2'}
+      extract("t 'email', 'please enter an email, e.g. Joe User <joe@example.com>'").should == {'email' => 'please enter an email, e.g. Joe User <joe@example.com>'}
     end
   end
 end

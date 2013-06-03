@@ -4,6 +4,7 @@ describe "external migrations" do
   it_should_behave_like "in-process server selenium tests"
 
   before(:each) do
+    pending('193')
     @password = "asdfasdf"
     @teacher = user_with_pseudonym :active_user => true,
                                    :username => "teacher@example.com",

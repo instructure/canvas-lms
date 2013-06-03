@@ -1,7 +1,7 @@
 <%
-   editable ||= false
+    editable ||= false
 %>
-<div>
+<div <%= 'class=file-upload-question-holder' if question_type.entry_type == 'file' %> >
   <% value = (@stored_params.present?) ? h(@stored_params["question_#{hash_get(question, :id)}"]) : h(hash_get(user_answer, :text).to_s) %>
 <% if question_type.entry_type == "text_box" %>
   <input type="text" name="question_<%= hash_get(question, :id) %>" value="<%= value %>" class="question_input" autocomplete='off' <%= 'readonly="readonly"' unless editable %>/>
@@ -10,6 +10,31 @@
 <% elsif question_type.entry_type == "textarea" %>
   <textarea name="question_<%= hash_get(question, :id) %>" class="question_input" style="width: 90%;" autocomplete='off' <%= 'readonly="readonly"' unless editable %>><%= value %></textarea>
 <% elsif question_type.entry_type == "file" %>
-  <input type="file" name="question_<%= hash_get(question, :id) %>" value="<%= value %>" class="question_input" <%= 'readonly="readonly"' unless editable %>/>
+  <% if !editable%>
+    <% attachment = @attachments[user_answer[:attachment_ids].try(:first).to_i] %>
+      <% if attachment %>
+        <a href="<%=attachment.authenticated_s3_url %>">
+          <%= attachment.display_name %>
+        </a>
+      <% end %>
+  <% else %>
+    <div class="control-group">
+      <div class=controls>
+        <label class="control-label upload-label" for=file>
+          <%= t 'upload', 'Upload' %>
+        </label>
+        <%# this is here so FileUploadQuestionView has a place to hook into %>
+        <div class="content-box border border-trbl file-upload-box">
+        </div>
+      </div>
+    </div>
+    <input type="file" name="" value="<%attachment_id_for(question) %>"
+    class="question_input file-upload hidden" <%= 'readonly="readonly"' unless editable %>/>
+    <input type="hidden" class="attachment-id question_input"
+    name="question_<%= question[:id] %>[]"
+    value="<%= attachment_id_for(question) %>"/>
+  <% end %>
 <% end %>
+
 </div>
+

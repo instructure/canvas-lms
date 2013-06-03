@@ -40,7 +40,7 @@ class GradebookImporter
     @contents = contents
   end
   
-  FasterCSV::Converters[:nil] = lambda{|e| (e.nil? ? e : raise) rescue e}
+  CSV::Converters[:nil] = lambda{|e| (e.nil? ? e : raise) rescue e}
   
   def parse!
     @student_columns = 3 # name, user id, section
@@ -48,7 +48,7 @@ class GradebookImporter
     @all_assignments = @context.assignments.active.gradeable.select([:id, :title, :points_possible, :grading_type]).index_by(&:id)
     @all_students = @context.students.select(['users.id', :name, :sortable_name]).index_by(&:id)
 
-    csv = FasterCSV.new(self.contents, :converters => :nil)
+    csv = CSV.new(self.contents, :converters => :nil)
     header = csv.shift
     @assignments = process_header(header)
 

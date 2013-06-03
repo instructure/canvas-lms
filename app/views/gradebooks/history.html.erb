@@ -1,6 +1,8 @@
 <% content_for :page_title do %><%= join_title t(:page_title, "Gradebook History"), @context.name %><% end %>
 <% jammit_css :gradebook_history %>
 
+<h1 class='screenreader-only'><%= t(:page_title, "Gradebook History") %></h1>
+
 <% if !@days %>
   <%# temorary disabling of this page for large contexts %>
   <p>
@@ -12,6 +14,7 @@
 <ul id="gradebook-history">
 <% @days.each do |day| %>
   <li>
+    <h2 class='screenreader-only'><%= t(:grades_for_date, "Grades for Date") %></h2>
     <h3><%= date_string(day.date) %></h3>
     <ul>
     <% day.graders.each do |grader| %>

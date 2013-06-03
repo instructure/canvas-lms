@@ -4,7 +4,6 @@ if RUBY_VERSION < "1.9.3" || RUBY_VERSION >= "2.0"
   raise "Canvas requires Ruby 1.9.3"
 end
 
-ONE_NINE = RUBY_VERSION >= "1.9."
 require File.expand_path("../config/canvas_rails3", __FILE__)
 
 if CANVAS_RAILS3
@@ -28,7 +27,7 @@ end
 gem 'daemons',        '1.1.0'
 gem 'diff-lcs',       '1.1.3',  :require => 'diff/lcs'
 if !CANVAS_RAILS3
-  gem 'encrypted_cookie_store-instructure', '1.0.2', :require => 'encrypted_cookie_store'
+  gem 'encrypted_cookie_store-instructure', '1.0.4', :require => 'encrypted_cookie_store'
 end
 gem 'erubis',         CANVAS_RAILS3 ? '2.6.6' : '2.7.0'
 if !CANVAS_RAILS3
@@ -37,9 +36,6 @@ end
 gem 'ffi',            '1.1.5'
 gem 'hairtrigger',    '0.2.3'
 gem 'sass',           '3.2.3'
-if !ONE_NINE
-  gem 'fastercsv', '1.5.3'
-end
 gem 'hashery',        '1.3.0',  :require => 'hashery/dictionary'
 gem 'highline',       '1.6.1'
 gem 'i18n',           CANVAS_RAILS3 ? '0.5.0' : '0.6.0'
@@ -49,12 +45,7 @@ gem 'json',           '1.5.5'
 # native xml parsing, diigo
 gem 'libxml-ruby',    '2.6.0',  :require => 'xml/libxml'
 gem 'macaddr',        '1.0.0'  # macaddr 1.2.0 tries to require 'systemu' which isn't a dependency
-if ONE_NINE
-  gem 'mail', CANVAS_RAILS3 ? '2.2.19' : '2.5.3'
-else
-  gem 'mail', '2.4.4'
-end
-gem 'mailman',        '0.5.3'
+gem 'mail', CANVAS_RAILS3 ? '2.2.19' : '2.5.3'
 # using this forked gem until https://github.com/37signals/marginalia/pull/15 is in the source gem
 gem 'instructure-marginalia',     '1.1.3',    :require => false
 gem 'mime-types',     '1.17.2',   :require => 'mime/types'
@@ -69,11 +60,7 @@ gem 'rack',           CANVAS_RAILS3 ? '1.2.5' : '1.1.3'
 gem 'rake',           '10.0.4'
 gem 'rdoc',           '3.12'
 gem 'ratom-instructure', '0.6.9', :require => "atom" # custom gem until necessary changes are merged into mainstream
-if !ONE_NINE
-  gem 'rbx-require-relative', '0.0.5'
-end
 gem 'rdiscount',      '1.6.8'
-gem 'require_relative', '1.0.1'
 gem 'ritex',          '1.0.1'
 gem 'rotp',           '1.4.1'
 gem 'rqrcode',        '0.4.2'
@@ -94,6 +81,7 @@ gem 'xml-simple',     '1.0.12', :require => 'xmlsimple'
 gem 'yui-compressor', '0.9.4'
 gem 'foreigner',      '0.9.2'
 gem 'crocodoc-ruby',  '0.0.1', :require => 'crocodoc'
+gem 'regru-premailer', '1.7.7', :require => 'premailer'
 
 group :assets do
   gem 'compass-rails', '1.0.3'
@@ -116,7 +104,8 @@ end
 group :test do
   gem 'bluecloth',    '2.0.10' # for generating api docs
   gem 'mocha',        :git => 'git://github.com/ccutrer/mocha.git', :require => false
-  gem 'parallelized_specs', '0.4.52'
+  gem 'parallelized_specs', '0.4.54'
+  gem 'thin'
   gem 'rcov',         '0.9.9'
   if CANVAS_RAILS3
     gem 'rspec-rails',  '2.13.0'
@@ -129,13 +118,11 @@ group :test do
   gem 'yard',         '0.8.0'
   gem 'yard-appendix',  '>=0.1.8'
   gem 'timecop',      '0.5.9.1'
-  if ONE_NINE
-    gem 'test-unit',  '1.2.3'
-  end
+  gem 'test-unit',  '1.2.3'
 end
 
 group :development do
-  gem 'guard', '1.6.0'
+  gem 'guard', '1.8.0'
   gem 'rb-inotify', '~>0.9.0', :require => false
   gem 'rb-fsevent', :require => false
   gem 'rb-fchange', :require => false
@@ -144,11 +131,7 @@ group :development do
   # The ruby debug gems conflict with the IDE-based debugger gem.
   # Set this option in your dev environment to disable.
   unless ENV['DISABLE_RUBY_DEBUGGING']
-    if ONE_NINE
-      gem 'debugger',     '1.1.3'
-    else
-      gem 'ruby-debug',   '0.10.4'
-    end
+    gem 'debugger',     '1.5.0'
   end
 end
 

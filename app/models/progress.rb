@@ -45,4 +45,7 @@ class Progress < ActiveRecord::Base
     update_completion!(100.0 * current_value / total)
   end
 
+  def pending?
+    queued? || running?
+  end
 end

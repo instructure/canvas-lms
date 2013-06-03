@@ -95,11 +95,11 @@ describe Attachment do
       attachment_obj_with_context(@course, :content_type => 'application/pdf')
       @attachment.context.should eql(@course)
       @attachment.context.scribd_account.should be_nil
-      previous_scribd_account_count = ScribdAccount.all.size
-      @attachment.save!
-      @attachment.context.scribd_account.should_not be_nil
-      @attachment.context.scribd_account.should be_is_a(ScribdAccount)
-      ScribdAccount.all.size.should eql(previous_scribd_account_count + 1)
+      expect {
+        @attachment.save!
+        @attachment.context.scribd_account.should_not be_nil
+        @attachment.context.scribd_account.should be_is_a(ScribdAccount)
+      }.to change(ScribdAccount, :count).by(1)
     end
 
     it "should set the attachment.scribd_account to the context scribd_account" do
@@ -430,9 +430,41 @@ describe Attachment do
   end
 
   context "uploaded_data" do
-    it "should create with uploaded_date" do
+    it "should create with uploaded_data" do
       a = attachment_model(:uploaded_data => default_uploaded_data)
       a.filename.should eql("doc.doc")
+    end
+
+    context "uploading and db transactions" do
+      self.use_transactional_fixtures = false
+
+      before do
+        attachment_model(:context => Group.create!, :filename => 'test.mp4', :content_type => 'video')
+      end
+
+      after do
+        truncate_table(Attachment)
+        truncate_table(Folder)
+        truncate_table(Group)
+      end
+
+      it "should delay upload until the #save transaction is committed" do
+        @attachment.uploaded_data = default_uploaded_data
+        @attachment.connection.expects(:after_transaction_commit).once
+        @attachment.expects(:touch_context_if_appropriate).never
+        @attachment.expects(:build_media_object).never
+        @attachment.save
+      end
+
+      it "should upload immediately when in a non-joinable transaction" do
+        Attachment.connection.transaction(:joinable => false) do
+          @attachment.uploaded_data = default_uploaded_data
+          Attachment.connection.expects(:after_transaction_commit).never
+          @attachment.expects(:touch_context_if_appropriate)
+          @attachment.expects(:build_media_object)
+          @attachment.save
+        end
+      end
     end
   end
 

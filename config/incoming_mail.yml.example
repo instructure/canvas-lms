@@ -1,48 +1,57 @@
-# See http://rubydoc.info/github/titanous/mailman/master/file/USER_GUIDE.md for
-# available options.  rails_root will be configured automatically.
+# Update note: incoming mail processing used to use the mailman gem and accepted
+# mailman configurations. The implementation has changed to accomodate more
+# robust error handling. Some of the mailman features have been removed (such as
+# stdin and maildir processing). Some mailman configuration settings are still
+# accepted but log a deprecation warning. The configuration settings for imap
+# and pop3 are the same as before.
 #
-# Currently, there are three ways to process incoming mail:
-#  * Fetch directly from POP3/IMAP, controlled by the Canvas job server
-#    * Make sure to configure pop3/imap, ignore stdin, and set the poll_interval to 0
-#  * Process messages by piping them to script/process_incoming_messages
-#    * Make sure to not ignore stdin
-#  * Monitor a maildir
-#    * Make sure to ignore stdin
-#    * If poll_interval is 0, it will be run periodically by the Canvas job
-#      server
-#    * If poll_interval is non-0, script/process_incoming_messages will never
-#      return, continually monitoring the directory
+# The mail processor can run in the following ways:
+#  * controlled by the Canvas job server:
+#     * set run_periodically: true
+#  * by running script/process_incoming_emails periodically
+#
+# Incoming mail can be received in the following ways:
+#  * imap
+#     * requires server, username, password
+#     * defaults ssl => true, port => 993, filter => "ALL", error_folder => "errors"
+#     * filter can be an array
+#  * pop3
+#     * requires server, username, password
+#     * defaults ssl => true, port => 995
+#  * directory (read email files from a directory)
+#     * requires folder (relative to rails root, but an absolute path would be best)
+#     * defaults error_folder => "errors"
+# 
+
 
 development:
-  # defaults are to allow reading from stdin
+  # defaults will not read incoming mail from any source
 
 test:
-  maildir: "maildir"
-  ignore_stdin: true
-  poll_interval: 0
+  directory: 
+    folder: "/tmp/maildir"
 
 production:
-  poll_interval: 0
-  ignore_stdin: true
+  run_periodically: true
   pop3:
     server: "pop.example.com"
-    port: 110
+    port: 995
+    ssl: true
     username: "user"
     password: "password"
-    ssl: true
 
-# To configure multiple pop3/imap accounts, configure a pop3/imap section with 
-# default values and add an accounts section that contains an array of 
-# override values for each account. In this case, poll_interval must be set to 0.
+# To configure multiple pop3/imap accounts, configure a pop3/imap/directory
+# section with default values and add an accounts section that contains an
+# array of override values for each account. 
 # example:
 
 multiple_inboxes:
-  poll_interval: 0
-  ignore_stdin: true
+  run_periodically: true
   imap:
     server: "imap.example.com"
-    port: 143
+    port: 993
     ssl: true
+    filter: ALL
     accounts:
     - username: "user1@example.com"
       password: "pass1"

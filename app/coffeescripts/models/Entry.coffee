@@ -23,6 +23,7 @@ define [
       message: I18n.t('no_content', 'No Content')
       user_id: null
       read_state: 'read'
+      forced_read_state: false
       created_at: null
       updated_at: null
       deleted: false
@@ -90,6 +91,7 @@ define [
         'message'
         'user_id'
         'read_state'
+        'forced_read_state'
         'created_at'
         'updated_at'
         'deleted'
@@ -147,6 +149,11 @@ define [
       @set 'read_state', 'read'
       url = ENV.DISCUSSION.MARK_READ_URL.replace /:id/, @get 'id'
       $.ajaxJSON url, 'PUT'
+
+    markAsUnread: ->
+      @set(read_state: 'unread', forced_read_state: true)
+      url = ENV.DISCUSSION.MARK_UNREAD_URL.replace /:id/, @get 'id'
+      $.ajaxJSON url, 'DELETE', forced_read_state: true
 
     hasChildren: ->
       @get('replies').length > 0

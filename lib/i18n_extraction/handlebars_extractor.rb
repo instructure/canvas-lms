@@ -23,7 +23,7 @@ module I18nExtraction
     def process(source, scope)
       @scope = scope
       scan(source, :scope => scope, :strict => true) do |data|
-        add_translation data[:key], data[:value]
+        add_translation data[:key], data[:value], data[:line_number]
       end
     end
 

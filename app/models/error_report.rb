@@ -152,7 +152,6 @@ class ErrorReport < ActiveRecord::Base
   USEFUL_ENV = [
     "HTTP_ACCEPT",
     "HTTP_ACCEPT_ENCODING",
-    "HTTP_COOKIE",
     "HTTP_HOST",
     "HTTP_REFERER",
     "HTTP_USER_AGENT",

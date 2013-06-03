@@ -9,6 +9,7 @@ define [
 ], (CreateUserList, _, I18n, DialogFormView, template, wrapper) ->
 
   class CreateUsersView extends DialogFormView
+    @optionProperty 'rolesCollection'
 
     defaults:
       width: 700
@@ -56,6 +57,9 @@ define [
 
     onSaveSuccess: ->
       @model.incrementStep()
+      if @model.get('step') is 3
+        role = @rolesCollection.where({name: @model.get('enrollment_type')})[0]
+        role.set('count', (role.get('count') + @model.get('users').length) )
 
     validateBeforeSave: (data) ->
       if @model.get('step') is 1 and !data.user_list

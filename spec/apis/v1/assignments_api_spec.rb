@@ -794,6 +794,7 @@ describe AssignmentsApiController, :type => :integration do
           'discussion_subentry_count' => 0,
           'assignment_id' => @assignment.id,
           'delayed_post_at' => nil,
+          'lock_at' => nil,
           'user_name' => @topic.user_name,
           'topic_children' => [],
           'locked' => false,

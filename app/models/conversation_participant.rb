@@ -52,7 +52,7 @@ class ConversationParticipant < ActiveRecord::Base
     #
     # we're also counting on conversations being in the join
 
-    own_root_account_ids = Shard.default.activate do
+    own_root_account_ids = Shard.birth.activate do
       user.associated_root_accounts.select{ |a| a.grants_right?(user, :become_user) }.map(&:id)
     end
     id_string = "[" + own_root_account_ids.sort.join("][") + "]"
@@ -115,7 +115,7 @@ class ConversationParticipant < ActiveRecord::Base
         EXISTS (
           SELECT *
           FROM conversation_participants cp
-          WHERE cp.conversation_id = conversations.id
+          WHERE cp.conversation_id = conversation_participants.conversation_id
           AND user_id IN (?)
         )
         SQL
@@ -124,7 +124,7 @@ class ConversationParticipant < ActiveRecord::Base
         (
           SELECT COUNT(*)
           FROM conversation_participants cp
-          WHERE cp.conversation_id = conversations.id
+          WHERE cp.conversation_id = conversation_participants.conversation_id
           AND user_id IN (?)
         ) = ?
         SQL
@@ -160,7 +160,7 @@ class ConversationParticipant < ActiveRecord::Base
       # the filters are assumed relative to the current shard and need to be
       # cast to an id relative to the default shard before use in queries.
       type, id = ActiveRecord::Base.parse_asset_string(tag)
-      id = Shard.relative_id_for(id, Shard.default)
+      id = Shard.relative_id_for(id, Shard.birth)
       wildcard('conversation_participants.tags', "#{type.underscore}_#{id}", :delimiter => ',')
     end
   end
@@ -442,7 +442,7 @@ class ConversationParticipant < ActiveRecord::Base
   def self.conversation_ids
     raise "conversation_ids needs to be scoped to a user" unless scope(:find, :conditions) =~ /user_id = \d+/
     order = 'last_message_at DESC' unless scoped?(:find, :order)
-    self.order(order).except(:includes).select(:conversation_id).map(&:conversation_id)
+    self.order(order).pluck(:conversation_id)
   end
 
   def self.users_by_conversation_shard(user_ids)

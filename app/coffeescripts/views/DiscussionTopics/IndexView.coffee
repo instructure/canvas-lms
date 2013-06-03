@@ -1,12 +1,13 @@
 define [
   'compiled/views/DiscussionTopics/DiscussionsSettingsView'
+  'compiled/views/DiscussionTopics/UserSettingsView'
   'i18n!discussion_topics'
   'underscore'
   'jst/DiscussionTopics/IndexView'
   'compiled/views/PaginatedView'
   'compiled/views/DiscussionTopics/SummaryView'
   'compiled/collections/AnnouncementsCollection'
-], (DiscussionsSettingsView, I18n, _, template, PaginatedView, DiscussionTopicSummaryView, AnnouncementsCollection) ->
+], (DiscussionsSettingsView, UserSettingsView, I18n, _, template, PaginatedView, DiscussionTopicSummaryView, AnnouncementsCollection) ->
 
   class IndexView extends PaginatedView
 
@@ -31,7 +32,10 @@ define [
       this
 
     toggleSettingsView: ->
-      @settingsView or= new DiscussionsSettingsView()
+      @settingsView or= if @options.permissions.change_settings
+        new DiscussionsSettingsView()
+      else
+        new UserSettingsView()
       @settingsView.toggle()
 
     renderList: =>

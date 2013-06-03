@@ -54,6 +54,17 @@ describe DiscussionTopicsController do
       assert_unauthorized
     end
 
+    it "should work for announcements in a public course" do
+      course_with_student(:active_all => true)
+      @course.update_attribute(:is_public, true)
+      @announcement = @course.announcements.create!(
+        :title => "some announcement",
+        :message => "some message"
+      )
+      get 'show', :course_id => @course.id, :id => @announcement.id
+      response.should be_success
+    end
+
     context "discussion topic with assignment with overrides" do
       integrate_views
 
@@ -258,8 +269,8 @@ describe DiscussionTopicsController do
       controller.stubs(:form_authenticity_token => 'abc', :form_authenticity_param => 'abc')
       post 'create', :course_id => @course.id, :title => 'Topic Title', :is_announcement => false,
                      :discussion_type => 'side_comment', :require_initial_post => true, :format => 'json',
-                     :podcast_has_student_posts => false, :delayed_post_at => '', :message => 'Message',
-                     :delay_posting => false, :threaded => false
+                     :podcast_has_student_posts => false, :delayed_post_at => '', :lock_at => '',
+                     :message => 'Message', :delay_posting => false, :threaded => false
     end
 
     after { Setting.set 'enable_page_views', 'false' }
@@ -271,6 +282,7 @@ describe DiscussionTopicsController do
       specify { topic.user.should == @user }
       specify { topic.current_user.should == @user }
       specify { topic.delayed_post_at.should be_nil }
+      specify { topic.lock_at.should be_nil }
       specify { topic.workflow_state.should == 'active' }
       specify { topic.id.should_not be_nil }
       specify { topic.title.should == 'Topic Title' }

@@ -34,6 +34,7 @@ define [
       '.discussion_entry:first': '$entryContent'
       '.replies:first': '$replies'
       '.headerBadges:first': '$headerBadges'
+      '.discussion-read-state-btn:first': '$readStateToggle'
 
     events:
       'click .loadDescendants': 'loadDescendants'
@@ -58,6 +59,14 @@ define [
       @model.on 'change:deleted', @toggleDeleted
       @model.on 'change:read_state', @toggleReadState
       @model.on 'change:editor', @render
+
+    toggleRead: (e) ->
+      e.preventDefault()
+      if @model.get('read_state') is 'read'
+        @model.markAsUnread()
+      else
+        @model.markAsRead()
+      EntryView.trigger 'readStateChanged', @model, this
 
     handleDeclarativeEvent: (event) ->
       $el = $ event.currentTarget
@@ -89,6 +98,7 @@ define [
       json
 
     toggleReadState: (model, read_state) =>
+      @setToggleTooltip()
       @$entryContent.toggleClass 'unread', read_state is 'unread'
       @$entryContent.toggleClass 'read', read_state is 'read'
 
@@ -120,10 +130,20 @@ define [
         @model.set('updated_at', (new Date).toISOString())
         @model.set('editor', ENV.current_user)
 
+    setToggleTooltip: ->
+      tooltip = if @model.get('read_state') is 'unread'
+        I18n.t('mark_as_read', 'Mark as Read')
+      else
+        I18n.t('mark_as_unread', 'Mark as Unread')
+
+      @$readStateToggle.attr('title', tooltip)
+
+
     afterRender: ->
       super
       @collapse() if @options.collapsed
-      if @model.get('read_state') is 'unread'
+      @setToggleTooltip()
+      if @model.get('read_state') is 'unread' and !@model.get('forced_read_state') and !ENV.DISCUSSION.MANUAL_MARK_AS_READ
         @readMarker ?= new MarkAsReadWatcher this
         # this is throttled so calling it here is okay
         MarkAsReadWatcher.checkForVisibleEntries()
@@ -206,3 +226,4 @@ define [
       else
         htmlEscape value
 
+  _.extend EntryView, Backbone.Events

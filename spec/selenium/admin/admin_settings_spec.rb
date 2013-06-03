@@ -48,14 +48,46 @@ describe "admin settings tabs" do
     end
 
     it "should add url external tool" do
-      #pending("failing because of external dependency")
+      mocked_bti_response = {
+        :description          => "Search publicly available YouTube videos. A new icon will show up in your course rich editor letting you search YouTube and click to embed videos in your course material.",
+        :title                => "YouTube",
+        :url                  => "http://www.edu-apps.org/tool_redirect?id=youtube",
+        :custom_fields        => {},
+        :extensions           => [],
+        :privacy_level        => "anonymous",
+        :domain               => nil,
+        :consumer_key         => nil,
+        :shared_secret        => nil,
+        :tool_id              => "youtube",
+        :assignment_points_possible => nil,
+        :settings => {
+          :editor_button => {
+            :url              => "http://www.edu-apps.org/tool_redirect?id=youtube",
+            :icon_url         => "http://www.edu-apps.org/tools/youtube/icon.png",
+            :text             => "YouTube",
+            :selection_width  => 690,
+            :selection_height => 530,
+            :enabled          => true
+          },
+          :resource_selection => {
+            :url              => "http://www.edu-apps.org/tool_redirect?id=youtube",
+            :icon_url         => "http://www.edu-apps.org/tools/youtube/icon.png",
+            :text             => "YouTube",
+            :selection_width  => 690,
+            :selection_height => 530,
+            :enabled          => true
+          },
+          :icon_url=>"http://www.edu-apps.org/tools/youtube/icon.png"
+        }
+      }
+      CC::Importer::BLTIConverter.any_instance.stubs(:retrieve_and_convert_blti_url).returns(mocked_bti_response)
       add_external_tool :url
     end
 
     it "should delete an external tool" do
       add_external_tool
       hover_and_click(".delete_tool_link:visible")
-      driver.switch_to.alert.accept
+      fj('.ui-dialog button:contains(Delete):visible').click
       wait_for_ajax_requests
       tool = ContextExternalTool.last
       tool.workflow_state.should == "deleted"
@@ -67,11 +99,10 @@ describe "admin settings tabs" do
       new_description = "a different description"
       hover_and_click(".edit_tool_link:visible")
       replace_content(f("#external_tool_description"), new_description)
-      fj(".save_button:visible").click
+      fj('.ui-dialog button:contains(Submit):visible').click
       wait_for_ajax_requests
       tool = ContextExternalTool.last
       tool.description.should == new_description
-      f("#external_tool_#{tool.id} .description").text.should == new_description
     end
   end
 

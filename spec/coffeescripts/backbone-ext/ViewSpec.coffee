@@ -157,3 +157,10 @@ define ['Backbone'], ({View}) ->
     ok mixin1.attach.calledOnce, 'called mixin1 attach'
     ok mixin2.attach.calledOnce, 'called mixin2 attach'
 
+  test 'View.mixin does not merge into parent class', ->
+    mixin = defaults: foo: 'bar'
+    class Foo extends View
+      @mixin mixin
+    equal View::defaults.foo, undefined, 'View::defaults was not appended'
+    equal Foo::defaults.foo, 'bar', 'Foo::defaults was appended'
+

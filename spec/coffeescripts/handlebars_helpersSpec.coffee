@@ -41,3 +41,8 @@ define [
       id: 'likes_tacos'
       name: 'likes[tacos]'
       checked: context.likes.tacos
+
+  test 'titleize', ->
+    equal helpers.titleize('test_string'), 'Test String'
+    equal helpers.titleize(null), ''
+    equal helpers.titleize('test_ _string'), 'Test String'

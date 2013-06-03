@@ -85,9 +85,14 @@ class UsersController < ApplicationController
   include LinkedIn
   include DeliciousDiigo
   include SearchHelper
-  before_filter :require_user, :only => [:grades, :merge, :kaltura_session, :ignore_item, :ignore_stream_item, :close_notification, :mark_avatar_image, :user_dashboard, :toggle_dashboard, :masquerade, :external_tool, :dashboard_sidebar]
-  before_filter :require_registered_user, :only => [:delete_user_service, :create_user_service]
-  before_filter :reject_student_view_student, :only => [:delete_user_service, :create_user_service, :merge, :user_dashboard, :masquerade]
+  before_filter :require_user, :only => [:grades, :merge, :kaltura_session,
+    :ignore_item, :ignore_stream_item, :close_notification, :mark_avatar_image,
+    :user_dashboard, :toggle_dashboard, :masquerade, :external_tool,
+    :dashboard_sidebar, :settings]
+  before_filter :require_registered_user, :only => [:delete_user_service,
+    :create_user_service]
+  before_filter :reject_student_view_student, :only => [:delete_user_service,
+    :create_user_service, :merge, :user_dashboard, :masquerade]
   before_filter :require_self_registration, :only => [:new, :create]
 
   def grades
@@ -273,7 +278,39 @@ class UsersController < ApplicationController
     @stream_items = @current_user.try(:cached_recent_stream_items) || []
   end
 
+  def cached_upcoming_events(user)
+    Rails.cache.fetch(['cached_user_upcoming_events', user].cache_key,
+      :expires_in => 3.minutes) do
+      user.upcoming_events :contexts => ([user] + user.cached_contexts)
+    end
+  end
+
+  def cached_submissions(user, upcoming_events)
+    Rails.cache.fetch(['cached_user_submissions', user].cache_key,
+      :expires_in => 3.minutes) do
+      assignments = upcoming_events.select{ |e| e.is_a?(Assignment) }
+      Shard.partition_by_shard(assignments) do |shard_assignments|
+        Submission.
+          select([:id, :assignment_id, :score, :workflow_state]).
+          where(:assignment_id => shard_assignments, :user_id => user)
+      end
+    end
+  end
+
+  def prepare_current_user_dashboard_items
+    if @current_user
+      @upcoming_events =
+        cached_upcoming_events(@current_user)
+      @current_user_submissions =
+        cached_submissions(@current_user, @upcoming_events)
+    else
+      @upcoming_events = []
+    end
+  end
+
   def dashboard_sidebar
+    prepare_current_user_dashboard_items
+
     if @show_recent_feedback = (@current_user.student_enrollments.active.size > 0)
       @recent_feedback = (@current_user && @current_user.recent_feedback) || []
     end
@@ -453,9 +490,7 @@ class UsersController < ApplicationController
   #     }
   #   ]
   def todo_items
-    unless @current_user
-      return render_unauthorized_action
-    end
+    return render_unauthorized_action unless @current_user
 
     grading = @current_user.assignments_needing_grading().map { |a| todo_item_json(a, @current_user, session, 'grading') }
     submitting = @current_user.assignments_needing_submitting().map { |a| todo_item_json(a, @current_user, session, 'submitting') }
@@ -464,38 +499,83 @@ class UsersController < ApplicationController
 
   include Api::V1::Assignment
   include Api::V1::CalendarEvent
-  # Returns the user's upcoming events
+
+  # @API List upcoming assignments, calendar events
+  # Returns the current user's upcoming events, i.e. the same things shown
+  # in the dashboard 'Coming Up' sidebar.
   #
-  #   [{"type": "Assignment|CalendarEvent", "title": "Some Title", start_at: "2012-06-11T00:00:00-06:00"}]
-  def coming_up_items
-    unless @current_user
-      return render_unauthorized_action
+  # @example_response
+  #   [
+  #     {
+  #       "id"=>597,
+  #       "title"=>"Upcoming Course Event",
+  #       "description"=>"Attendance is correlated with passing!",
+  #       "start_at"=>"2013-04-27T14:33:14Z",
+  #       "end_at"=>"2013-04-27T14:33:14Z",
+  #       "location_name"=>"Red brick house",
+  #       "location_address"=>"110 Top of the Hill Dr.",
+  #       "all_day"=>false,
+  #       "all_day_date"=>nil,
+  #       "created_at"=>"2013-04-26T14:33:14Z",
+  #       "updated_at"=>"2013-04-26T14:33:14Z",
+  #       "workflow_state"=>"active",
+  #       "context_code"=>"course_12938",
+  #       "child_events_count"=>0,
+  #       "child_events"=>[],
+  #       "parent_event_id"=>nil,
+  #       "hidden"=>false,
+  #       "url"=>"http://www.example.com/api/v1/calendar_events/597",
+  #       "html_url"=>"http://www.example.com/calendar?event_id=597&include_contexts=course_12938"
+  #     },
+  #     {
+  #       "id"=>"assignment_9729",
+  #       "title"=>"Upcoming Assignment",
+  #       "description"=>nil,
+  #       "start_at"=>"2013-04-28T14:47:32Z",
+  #       "end_at"=>"2013-04-28T14:47:32Z",
+  #       "all_day"=>false,
+  #       "all_day_date"=>"2013-04-28",
+  #       "created_at"=>"2013-04-26T14:47:32Z",
+  #       "updated_at"=>"2013-04-26T14:47:32Z",
+  #       "workflow_state"=>"published",
+  #       "context_code"=>"course_12942",
+  #       "assignment"=>{
+  #         "id"=>9729,
+  #         "name"=>"Upcoming Assignment",
+  #         "description"=>nil,
+  #         "points_possible"=>10,
+  #         "due_at"=>"2013-04-28T14:47:32Z",
+  #         "assignment_group_id"=>2439,
+  #         "automatic_peer_reviews"=>false,
+  #         "grade_group_students_individually"=>nil,
+  #         "grading_standard_id"=>nil,
+  #         "grading_type"=>"points",
+  #         "group_category_id"=>nil,
+  #         "lock_at"=>nil,
+  #         "peer_reviews"=>false,
+  #         "position"=>1,
+  #         "unlock_at"=>nil,
+  #         "course_id"=>12942,
+  #         "submission_types"=>["none"],
+  #         "muted"=>false,
+  #         "needs_grading_count"=>0,
+  #         "html_url"=>"http://www.example.com/courses/12942/assignments/9729"
+  #       },
+  #       "url"=>"http://www.example.com/api/v1/calendar_events/assignment_9729",
+  #       "html_url"=>"http://www.example.com/courses/12942/assignments/9729"
+  #     }
+  #   ]
+  def upcoming_events
+    return render_unauthorized_action unless @current_user
+
+    prepare_current_user_dashboard_items
+
+    events = @upcoming_events.map do |e|
+      event_json(e, @current_user, session)
     end
 
-    def api_event(event)
-      url =  event.is_a?(CalendarEvent) ? api_v1_calendar_event_url(event) : course_assignment_url(event.context_id, event)
-      {
-        :title => event.title,
-        :start_at => event.start_at,
-        :type => event.class.name,
-        :html_url => url
-      }
-    end
-    render :json => @current_user.upcoming_events.map { |e| api_event(e) }
+    render :json => events
   end
-
-  def recent_feedback
-    unless @current_user
-      return render_unauthorized_action
-    end
-
-    def api_feedback(feedback)
-
-    end
-
-    render :json => @current_user.recent_feedback
-  end
-
 
   def ignore_item
     unless %w[grading submitting].include?(params[:purpose])
@@ -612,7 +692,7 @@ class UsersController < ApplicationController
   def external_tool
     @tool = ContextExternalTool.find_for(params[:id], @domain_root_account, :user_navigation)
     @resource_title = @tool.label_for(:user_navigation)
-    @resource_url = @tool.settings[:user_navigation][:url]
+    @resource_url = @tool.user_navigation(:url)
     @opaque_id = @current_user.opaque_identifier(:asset_string)
     @resource_type = 'user_navigation'
     @return_url = user_profile_url(@current_user, :include_host => true)
@@ -625,14 +705,14 @@ class UsersController < ApplicationController
 
   def new
     return redirect_to(root_url) if @current_user
-    js_env :HIDDEN_FIELDS => @domain_root_account.tracking_fields(params),
-           :USER => {:LOGIN_HANDLE_NAME => @domain_root_account.login_handle_name},
+    js_env :ACCOUNT => account_json(@domain_root_account, nil, session, ['registration_settings']),
            :PASSWORD_POLICY => @domain_root_account.password_policy
     render :layout => 'bare'
   end
 
   include Api::V1::User
   include Api::V1::Avatar
+  include Api::V1::Account
 
   # @API Create a user
   # Create and return a new user and pseudonym for an account.
@@ -772,16 +852,40 @@ class UsersController < ApplicationController
     end
   end
 
-  def registered
-    @pseudonym_session.destroy if @pseudonym_session
-    @pseudonym = Pseudonym.find_by_id(flash[:pseudonym_id]) if flash[:pseudonym_id].present?
-    if flash[:user_id] && (@user = User.find(flash[:user_id]))
-      @email_address = @pseudonym && @pseudonym.communication_channel && @pseudonym.communication_channel.path
-      @email_address ||= @user.email
-      @pseudonym ||= @user.pseudonym
-      @cc = @pseudonym.communication_channel || @user.communication_channel
-    else
-      redirect_to root_url
+  # @API Update user settings.
+  # Update an existing user's settings.
+  #
+  # @argument manual_mark_as_read If true, require user to manually mark discussion posts as read (don't auto-mark as read).
+  #
+  # @example_request
+  #
+  #   curl 'http://<canvas>/api/v1/users/<user_id>/settings \ 
+  #     -X PUT \ 
+  #     -F 'manual_mark_as_read=true'
+  #     -H 'Authorization: Bearer <token>'
+  def settings
+    user = api_find(User, params[:id])
+
+    case request.request_method
+    when :get
+      return unless authorized_action(user, @current_user, :read)
+      render(json: { manual_mark_as_read: @current_user.manual_mark_as_read? })
+    when :put
+      return unless authorized_action(user, @current_user, [:manage, :manage_user_details])
+      unless params[:manual_mark_as_read].nil?
+        mark_as_read = value_to_boolean(params[:manual_mark_as_read])
+        user.preferences[:manual_mark_as_read] = mark_as_read
+      end
+
+      respond_to do |format|
+        format.json {
+          if user.save
+            render(json: { manual_mark_as_read: user.manual_mark_as_read? })
+          else
+            render(json: user.errors, status: :bad_request)
+          end
+        }
+      end
     end
   end
 
@@ -1021,8 +1125,7 @@ class UsersController < ApplicationController
     if authorized_action(@user, @current_user, [:manage, :manage_logins])
       @user.destroy(@user.grants_right?(@current_user, session, :manage_logins))
       if @user == @current_user
-        @pseudonym_session.destroy rescue true
-        reset_session
+        logout_current_user
       end
 
       respond_to do |format|

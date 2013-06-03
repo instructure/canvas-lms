@@ -13,14 +13,14 @@
         <button id="delete" data-tooltip>{{#t "delete"}}Delete{{/t}}</button>
       </span>
 
-      {{#if options.permissions.change_settings}}
-      <button
-        id="edit_discussions_settings"
-        class="btn"
-        data-tooltip
-        title='{{#t "edit_settings"}}Edit Discussions Settings{{/t}}'
-      ><i class="icon-settings"></i></button>
-      {{/if}}
+      {{#unless showingAnnouncements}}
+        <button
+          id="edit_discussions_settings"
+          class="btn"
+          data-tooltip="{{#if options.permissions.create}}top{{else}}left{{/if}}"
+          title='{{#t "edit_settings"}}Edit Discussions Settings{{/t}}'
+        ><i class="icon-settings"></i></button>
+      {{/unless}}
 
       {{#if options.permissions.create}}
         <a href="{{new_topic_url}}" class="btn btn-primary" id="new-discussion-btn">{{#if showingAnnouncements}}

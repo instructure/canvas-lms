@@ -22,8 +22,12 @@ define ['Backbone'], ({Model}) ->
     # Array of states to continue polling for progress
     pollStates: ['queued', 'running']
 
+    isPolling: ->
+      @get('workflow_state') in @pollStates
+
     initialize: ->
       @pollDfd = new $.Deferred
+      @on 'change:url', => @poll() if @isPolling()
 
     url: ->
       @get 'url'
@@ -35,10 +39,8 @@ define ['Backbone'], ({Model}) ->
     # @returns {Deferred}
     # @api public
 
-    poll: ->
-      @fetch().then =>
-        @onPoll()
-      , =>
+    poll: =>
+      @fetch().then @onPoll, =>
         @pollDfd.rejectWith this, arguments
       @pollDfd
 
@@ -46,9 +48,9 @@ define ['Backbone'], ({Model}) ->
     #
     # @api private
 
-    onPoll: ->
-      if @get('workflow_state') in @pollStates
-        setTimeout (=> @poll()), @get('timeout')
+    onPoll: =>
+      if @isPolling()
+        setTimeout @poll, @get('timeout')
       else
         @pollDfd.resolve()
         @trigger 'complete'

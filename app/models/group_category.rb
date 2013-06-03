@@ -22,6 +22,7 @@ class GroupCategory < ActiveRecord::Base
   has_many :groups, :dependent => :destroy
   has_many :assignments, :dependent => :nullify
   validates_length_of :name, :maximum => maximum_string_length, :allow_nil => true, :allow_blank => true
+  validates_numericality_of :group_limit, :greater_than => 1, :allow_nil => true
 
   scope :active, where(:deleted_at => nil)
 

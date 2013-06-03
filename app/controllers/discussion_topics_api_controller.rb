@@ -58,6 +58,10 @@ class DiscussionTopicsApiController < ApplicationController
   #   and avatar_url.
   # * "unread_entries": A list of entry ids that are unread by the current
   #   user. this implies that any entry not in this list is read.
+  # * "forced_entries": A list of entry ids that have forced_read_state set to
+  #   true. This flag is meant to indicate the entry's read_state has been 
+  #   manually set to 'unread' by the user, so the entry should not be
+  #   automatically marked as read.
   # * "view": A threaded view of all the entries in the discussion, containing
   #   the id, user_id, and message.
   # * "new_entries": Because this view is eventually consistent, it's possible
@@ -75,6 +79,7 @@ class DiscussionTopicsApiController < ApplicationController
   # @example_response
   #   {
   #     "unread_entries": [1,3,4],
+  #     "forced_entries": [1],
   #     "participants": [
   #       { "id": 10, "display_name": "user 1", "avatar_image_url": "https://...", "html_url": "https://..." },
   #       { "id": 11, "display_name": "user 2", "avatar_image_url": "https://...", "html_url": "https://..." }
@@ -96,10 +101,19 @@ class DiscussionTopicsApiController < ApplicationController
         user_display_json(user, @context.is_a_context? && @context)
       end
       unread_entries = entry_ids - DiscussionEntryParticipant.read_entry_ids(entry_ids, @current_user)
+      forced_entries = DiscussionEntryParticipant.forced_read_state_entry_ids(entry_ids, @current_user)
       # as an optimization, the view structure is pre-serialized as a json
       # string, so we have to do a bit of manual json building here to fit it
       # into the response.
-      render :json => %[{ "unread_entries": #{unread_entries.to_json}, "participants": #{participant_info.to_json}, "view": #{structure}, "new_entries": #{new_entries_structure} }]
+      fragments = {
+        :unread_entries => unread_entries.to_json,
+        :forced_entries => forced_entries.to_json,
+        :participants   => participant_info.to_json,
+        :view           => structure,
+        :new_entries    => new_entries_structure,
+      }
+      fragments = fragments.map { |k, v| %("#{k}": #{v}) }
+      render :json => "{ #{fragments.join(', ')} }"
     else
       render :nothing => true, :status => 503
     end
@@ -156,6 +170,8 @@ class DiscussionTopicsApiController < ApplicationController
   #
   # @response_field read_state The read state of the entry, "read" or "unread".
   #
+  # @response_field forced_read_state Whether the read_state was forced (was set manually)
+  #
   # @response_field created_at The creation time of the entry, in ISO8601
   #   format.
   #
@@ -181,6 +197,7 @@ class DiscussionTopicsApiController < ApplicationController
   #       "user_name": "nobody@example.com",
   #       "message": "Newer entry",
   #       "read_state": "read",
+  #       "forced_read_state": false,
   #       "created_at": "2011-11-03T21:33:29Z",
   #       "attachment": {
   #         "content-type": "unknown/unknown",
@@ -193,6 +210,7 @@ class DiscussionTopicsApiController < ApplicationController
   #       "user_name": "nobody@example.com",
   #       "message": "first top-level entry",
   #       "read_state": "unread",
+  #       "forced_read_state": false,
   #       "created_at": "2011-11-03T21:32:29Z",
   #       "recent_replies": [
   #         {
@@ -261,6 +279,8 @@ class DiscussionTopicsApiController < ApplicationController
   #
   # @response_field read_state The read state of the entry, "read" or "unread".
   #
+  # @response_field forced_read_state Whether the read_state was forced (was set manually)
+  #
   # @response_field created_at The creation time of the reply, in ISO8601
   #   format.
   #
@@ -271,6 +291,7 @@ class DiscussionTopicsApiController < ApplicationController
   #       "user_name": "nobody@example.com",
   #       "message": "Newer message",
   #       "read_state": "read",
+  #       "forced_read_state": false,
   #       "created_at": "2011-11-03T21:27:44Z" },
   #     {
   #       "id": 1014,
@@ -278,6 +299,7 @@ class DiscussionTopicsApiController < ApplicationController
   #       "user_name": "nobody@example.com",
   #       "message": "Older message",
   #       "read_state": "unread",
+  #       "forced_read_state": false,
   #       "created_at": "2011-11-03T21:26:44Z" } ]
   def replies
     @parent = root_entries(@topic).find(params[:entry_id])
@@ -305,6 +327,8 @@ class DiscussionTopicsApiController < ApplicationController
   # @response_field message The content of the reply.
   #
   # @response_field read_state The read state of the entry, "read" or "unread".
+  #
+  # @response_field forced_read_state Whether the read_state was forced (was set manually)
   #
   # @response_field created_at The creation time of the reply, in ISO8601
   #   format.
@@ -370,6 +394,8 @@ class DiscussionTopicsApiController < ApplicationController
   #
   # No request fields are necessary.
   #
+  # @argument forced_read_state [Optional] A boolean value to set all of the entries' forced_read_state. No change is made if this argument is not specified.
+  # 
   # On success, the response will be 204 No Content with an empty body.
   #
   # @example_request
@@ -379,10 +405,7 @@ class DiscussionTopicsApiController < ApplicationController
   #        -H "Authorization: Bearer <token>" \ 
   #        -H "Content-Length: 0"
   def mark_all_read
-    if authorized_action(@topic, @current_user, :read)
-      @topic.change_all_read_state("read", @current_user)
-      render :json => {}, :status => :no_content
-    end
+    change_topic_all_read_state('read')
   end
 
   # @API Mark all entries as unread
@@ -390,6 +413,8 @@ class DiscussionTopicsApiController < ApplicationController
   #
   # No request fields are necessary.
   #
+  # @argument forced_read_state [Optional] A boolean value to set all of the entries' forced_read_state. No change is made if this argument is not specified.
+  # 
   # On success, the response will be 204 No Content with an empty body.
   #
   # @example_request
@@ -398,16 +423,15 @@ class DiscussionTopicsApiController < ApplicationController
   #        -X DELETE \ 
   #        -H "Authorization: Bearer <token>"
   def mark_all_unread
-    if authorized_action(@topic, @current_user, :read)
-      @topic.change_all_read_state("unread", @current_user)
-      render :json => {}, :status => :no_content
-    end
+    change_topic_all_read_state('unread')
   end
 
   # @API Mark entry as read
   # Mark a discussion entry as read.
   #
   # No request fields are necessary.
+  #
+  # @argument forced_read_state [Optional] A boolean value to set the entry's forced_read_state. No change is made if this argument is not specified.
   #
   # On success, the response will be 204 No Content with an empty body.
   #
@@ -425,6 +449,8 @@ class DiscussionTopicsApiController < ApplicationController
   # Mark a discussion entry as unread.
   #
   # No request fields are necessary.
+  #
+  # @argument forced_read_state [Optional] A boolean value to set the entry's forced_read_state. No change is made if this argument is not specified.
   #
   # On success, the response will be 204 No Content with an empty body.
   #
@@ -519,10 +545,27 @@ class DiscussionTopicsApiController < ApplicationController
     end
   end
 
+  def get_forced_option()
+    opts = {}
+    opts[:forced] = value_to_boolean(params[:forced_read_state]) if params.has_key?(:forced_read_state)    
+    opts
+  end
+
+  def change_topic_all_read_state(new_state)
+    opts = get_forced_option
+
+    if authorized_action(@topic, @current_user, :read)
+      @topic.change_all_read_state(new_state, @current_user, opts)
+      render :json => {}, :status => :no_content
+    end
+  end
+
   def change_entry_read_state(new_state)
     @entry = @topic.discussion_entries.find(params[:entry_id])
+    opts = get_forced_option
+
     if authorized_action(@entry, @current_user, :read)
-      entry_participant = @entry.change_read_state(new_state, @current_user)
+      entry_participant = @entry.change_read_state(new_state, @current_user, opts)
       if entry_participant.present? && (entry_participant == true || entry_participant.errors.blank?)
         render :nothing => true, :status => :no_content
       else

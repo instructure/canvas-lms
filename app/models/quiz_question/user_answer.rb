@@ -25,6 +25,7 @@ class QuizQuestion::UserAnswer < Struct.new(:question_id, :points_possible, :tot
     self.answer_details = { :text => answer_text || "" }
   end
 
+
   def [](k)
     @answer_data["question_#{question_id}_#{k}".to_sym]
   end
@@ -75,3 +76,5 @@ class QuizQuestion::UserAnswer < Struct.new(:question_id, :points_possible, :tot
     end
   end
 end
+
+Dir[Rails.root + "app/models/quiz_question/*_answer.rb"].each { |f| require_dependency f }

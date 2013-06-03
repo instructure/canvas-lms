@@ -63,16 +63,37 @@ shared_examples_for "settings basic tests" do
       f("#account_name").should have_value(new_account_name)
     end
 
-    it "should change the default file quota" do
-      mb = 300
-      quota_input = f("#account_default_course_storage_quota")
-      quota_input.should have_value("500")
-      replace_content(quota_input, mb)
-      click_submit
-      bytes = mb * 1048576
+    it "should change the default quotas" do
+      f('#tab-quotas-link').click
+
+      # update the quotas
+      course_quota = account.default_storage_quota_mb
+      course_quota_input = f('[name="default_storage_quota_mb"]')
+      course_quota_input.should have_value(course_quota.to_s)
+
+      user_quota = account.default_user_storage_quota_mb
+      user_quota_input = f('[name="default_user_storage_quota_mb"]')
+      user_quota_input.should have_value(user_quota.to_s)
+
+      course_quota += 25
+      replace_content(course_quota_input, course_quota.to_s)
+      user_quota += 15
+      replace_content(user_quota_input, user_quota.to_s)
+
+      submit_form('#default-quotas')
+      wait_for_ajax_requests
+
+      # ensure the account was updated properly
       account.reload
-      account.default_storage_quota.should == bytes
-      fj("#account_default_course_storage_quota").should have_value("300") # fj to avoid selenium caching
+      account.default_storage_quota_mb.should == course_quota
+      account.default_storage_quota.should == course_quota * 1048576
+      account.default_user_storage_quota_mb == user_quota
+      account.default_user_storage_quota.should == user_quota * 1048576
+
+      # ensure the new value is reflected after a refresh
+      get account_settings_url
+      fj('[name="default_storage_quota_mb"]').should have_value(course_quota.to_s) # fj to avoid selenium caching
+      fj('[name="default_user_storage_quota_mb"]').should have_value(user_quota.to_s) # fj to avoid selenium caching
     end
 
     it "should change the default language to spanish" do

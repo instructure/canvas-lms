@@ -18,7 +18,7 @@ module Delayed
       attr_writer :current_shard
 
       def current_shard
-        @current_shard || Shard.default
+        @current_shard || Shard.birth
       end
 
       module ClassMethods

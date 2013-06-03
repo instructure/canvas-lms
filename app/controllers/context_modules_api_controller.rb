@@ -56,45 +56,6 @@
 #       // (Optional; present only if the caller is a student)
 #       completed_at: nil
 #     }
-#
-# @object Module Item
-#     {
-#       // the unique identifier for the module item
-#       id: 768,
-#
-#       // the position of this item in the module (1-based)
-#       position: 1,
-#
-#       // the title of this item
-#       title: "Square Roots: Irrational numbers or boxy vegetables?",
-#
-#       // 0-based indent level; module items may be indented to show a hierarchy
-#       indent: 0,
-#
-#       // the type of object referred to
-#       // one of "File", "Page", "Discussion", "Assignment", "Quiz", "SubHeader",
-#       // "ExternalUrl", "ExternalTool"
-#       type: "Assignment",
-#
-#       // link to the item in Canvas
-#       html_url: "https://canvas.example.edu/courses/222/modules/items/768",
-#
-#       // (Optional) link to the Canvas API object, if applicable
-#       url: "https://canvas.example.edu/api/v1/courses/222/assignments/987",
-#
-#       // Completion requirement for this module item
-#       completion_requirement: {
-#         // one of "must_view", "must_submit", "must_contribute", "min_score"
-#         type: "min_score",
-#
-#         // minimum score required to complete (only present when type == 'min_score')
-#         min_score: 10,
-#
-#         // whether the calling user has met this requirement
-#         // (Optional; present only if the caller is a student)
-#         completed: true
-#       }
-#     }
 class ContextModulesApiController < ApplicationController
   before_filter :require_context  
   include Api::V1::ContextModule
@@ -104,7 +65,7 @@ class ContextModulesApiController < ApplicationController
   # List the modules in a course
   #
   # @example_request
-  #     curl -H 'Authorization: Bearer <token>' \ 
+  #     curl -H 'Authorization: Bearer <token>' \
   #          https://<canvas>/api/v1/courses/222/modules
   #
   # @returns [Module]
@@ -127,7 +88,7 @@ class ContextModulesApiController < ApplicationController
   # Get information about a single module
   #
   # @example_request
-  #     curl -H 'Authorization: Bearer <token>' \ 
+  #     curl -H 'Authorization: Bearer <token>' \
   #          https://<canvas>/api/v1/courses/222/modules/123
   #
   # @returns Module
@@ -139,60 +100,7 @@ class ContextModulesApiController < ApplicationController
     end
   end
 
-  # @API List module items
-  #
-  # List the items in a module
-  #
-  # @example_request
-  #     curl -H 'Authorization: Bearer <token>' \ 
-  #          https://<canvas>/api/v1/courses/222/modules/123/items
-  #
-  # @returns [Module Item]
-  def list_module_items
-    if authorized_action(@context, @current_user, :read)
-      mod = @context.modules_visible_to(@current_user).find(params[:module_id])
-      route = polymorphic_url([:api_v1, @context, mod, :items])
-      scope = mod.content_tags.active
-      items = Api.paginate(scope, self, route)
-      prog = @context.grants_right?(@current_user, session, :participate_as_student) ? mod.evaluate_for(@current_user) : nil
-      render :json => items.map { |item| module_item_json(item, @current_user, session, mod, prog) }
-    end
-  end
-
-  # @API Show module item
-  #
-  # Get information about a single module item
-  #
-  # @example_request
-  #     curl -H 'Authorization: Bearer <token>' \ 
-  #          https://<canvas>/api/v1/courses/222/modules/123/items/768
-  #
-  # @returns Module Item
-  def show_module_item
-    if authorized_action(@context, @current_user, :read)
-      mod = @context.modules_visible_to(@current_user).find(params[:module_id])
-      item = mod.content_tags.active.find(params[:id])
-      prog = @context.grants_right?(@current_user, session, :participate_as_student) ? mod.evaluate_for(@current_user) : nil
-      render :json => module_item_json(item, @current_user, session, mod, prog)
-    end
-  end
-
-  # Mark an external URL content tag read for purposes of module progression,
-  # then redirect to the URL (vs. render in an iframe like content_tag_redirect).
-  # Not documented directly; part of an opaque URL returned by above endpoints.
-  def module_item_redirect
-    if authorized_action(@context, @current_user, :read)
-      @tag = @context.context_module_tags.active.find(params[:id])
-      if @tag.content_type == 'ExternalUrl'
-        @tag.context_module_action(@current_user, :read)
-        redirect_to @tag.url
-      else
-        return render(:status => 400, :json => { :message => "incorrect module item type" })
-      end
-    end
-  end
-
-  # @undocumented API Update modules
+  # @undocumented API Update multiple modules
   #
   # Update multiple modules in an account.
   #
@@ -204,7 +112,7 @@ class ContextModulesApiController < ApplicationController
   # @example_request
   #     curl https://<canvas>/api/v1/courses/<course_id>/modules \  
   #       -X PUT \ 
-  #       -H 'Authorization: Bearer <token>' \ 
+  #       -H 'Authorization: Bearer <token>' \
   #       -d 'event=delete' \
   #       -d 'module_ids[]=1' \ 
   #       -d 'module_ids[]=2' 
@@ -241,4 +149,139 @@ class ContextModulesApiController < ApplicationController
     end
   end
 
+  # @API Create a module
+  #
+  # Create and return a new module
+  #
+  # @argument module[name] [Required] The name of the module
+  # @argument module[unlock_at] [Optional] The date the module will unlock
+  # @argument module[position] [Optional] The position of this module in the course (1-based)
+  # @argument module[require_sequential_progress] [Optional] Whether module items must be unlocked in order
+  # @argument module[prerequisite_module_ids][] [Optional] IDs of Modules that must be completed before this one is unlocked
+  #   Prerequisite modules must precede this module (i.e. have a lower position value), otherwise they will be ignored
+  #
+  # @example_request
+  #
+  #     curl https://<canvas>/api/v1/courses/<course_id>/modules \
+  #       -X POST \
+  #       -H 'Authorization: Bearer <token>' \
+  #       -d 'module[name]=module' \
+  #       -d 'module[position]=2' \
+  #       -d 'module[prerequisite_module_ids][]=121' \
+  #       -d 'module[prerequisite_module_ids][]=122'
+  #
+  # @returns Module
+  def create
+    if authorized_action(@context.context_modules.new, @current_user, :create)
+      return render :json => {:message => "missing module parameter"}, :status => :bad_request unless params[:module]
+      return render :json => {:message => "missing module name"}, :status => :bad_request unless params[:module][:name].present?
+
+      module_parameters = params[:module].slice(:name, :unlock_at, :require_sequential_progress)
+
+      @module = @context.context_modules.build(module_parameters)
+
+      if ids = params[:module][:prerequisite_module_ids]
+        @module.prerequisites = ids.map{|id| "module_#{id}"}.join(',')
+      end
+      if @domain_root_account.enable_draft?
+        @module.workflow_state = 'unpublished'
+      else
+        @module.workflow_state = 'active'
+      end
+
+      if @module.save && set_position
+        render :json => module_json(@module, @current_user, session, nil)
+      else
+        render :json => @module.errors.to_json, :status => :bad_request
+      end
+    end
+  end
+
+  # @API Update a module
+  #
+  # Update and return an existing module
+  #
+  # @argument module[name] [Optional] The name of the module
+  # @argument module[unlock_at] [Optional] The date the module will unlock
+  # @argument module[position] [Optional] The position of the module in the course (1-based)
+  # @argument module[require_sequential_progress] [Optional] Whether module items must be unlocked in order
+  # @argument module[prerequisite_module_ids][] [Optional] IDs of Modules that must be completed before this one is unlocked
+  #   Prerequisite modules must precede this module (i.e. have a lower position value), otherwise they will be ignored
+  # @undocumented @argument module[publish] [Optional] Set to publish the module
+  # @undocumented @argument module[unpublish] [Optional] Set to unpublish the module
+  #
+  # @example_request
+  #
+  #     curl https://<canvas>/api/v1/courses/<course_id>/modules/<module_id> \
+  #       -X PUT \
+  #       -H 'Authorization: Bearer <token>' \
+  #       -d 'module[name]=module' \
+  #       -d 'module[position]=2' \
+  #       -d 'module[prerequisite_module_ids][]=121' \
+  #       -d 'module[prerequisite_module_ids][]=122'
+  #
+  # @returns Module
+  def update
+    @module = @context.context_modules.not_deleted.find(params[:id])
+    if authorized_action(@module, @current_user, :update)
+      return render :json => {:message => "missing module parameter"}, :status => :bad_request unless params[:module]
+      module_parameters = params[:module].slice(:name, :unlock_at, :require_sequential_progress)
+
+      if ids = params[:module][:prerequisite_module_ids]
+        if ids.blank?
+          module_parameters[:prerequisites] = []
+        else
+          module_parameters[:prerequisites] = ids.map{|id| "module_#{id}"}.join(',')
+        end
+      end
+
+      if params[:module].delete :publish
+        @module.publish
+      elsif params[:module].delete :unpublish
+        @module.unpublish
+      end
+
+      if @module.update_attributes(module_parameters) && set_position
+        render :json => module_json(@module, @current_user, session, nil)
+      else
+        render :json => @module.errors.to_json, :status => :bad_request
+      end
+    end
+  end
+
+  # @API Delete module
+  #
+  # Delete a module
+  #
+  # @example_request
+  #
+  #     curl https://<canvas>/api/v1/courses/<course_id>/modules/<module_id> \
+  #       -X Delete \
+  #       -H 'Authorization: Bearer <token>'
+  #
+  # @returns Module
+  def destroy
+    @module = @context.context_modules.not_deleted.find(params[:id])
+    if authorized_action(@module, @current_user, :delete)
+      @module.destroy
+      render :json => module_json(@module, @current_user, session, nil)
+    end
+  end
+
+  def set_position
+    return true unless @module && params[:module][:position]
+
+    if @module.insert_at_position(params[:module][:position], @context.context_modules.not_deleted)
+      # see ContextModulesController#reorder
+      @context.touch
+      @context.context_modules.not_deleted.each{|m| m.save_without_touching_context }
+      @context.touch
+
+      @module.reload
+      return true
+    else
+      @module.errors.add(:position, t(:invalid_position, "Invalid position"))
+      return false
+    end
+  end
 end

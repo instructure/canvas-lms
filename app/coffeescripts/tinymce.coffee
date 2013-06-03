@@ -8,6 +8,7 @@ define [
   # instructure plugins
   'tinymce/jscripts/tiny_mce/plugins/instructure_contextmenu/editor_plugin'
   'tinymce/jscripts/tiny_mce/plugins/instructure_embed/editor_plugin'
+  'tinymce/jscripts/tiny_mce/plugins/instructure_image/editor_plugin'
   'tinymce/jscripts/tiny_mce/plugins/instructure_equation/editor_plugin'
   'tinymce/jscripts/tiny_mce/plugins/instructure_equella/editor_plugin'
   'tinymce/jscripts/tiny_mce/plugins/instructure_external_tools/editor_plugin'
@@ -19,6 +20,7 @@ define [
   markScriptsLoaded [
     'plugins/instructure_contextmenu/editor_plugin'
     'plugins/instructure_embed/editor_plugin'
+    'plugins/instructure_image/editor_plugin'
     'plugins/instructure_equation/editor_plugin'
     'plugins/instructure_equella/editor_plugin'
     'plugins/instructure_external_tools/editor_plugin'

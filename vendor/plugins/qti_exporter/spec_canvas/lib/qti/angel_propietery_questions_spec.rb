@@ -72,7 +72,7 @@ describe "Converting Angel QTI" do
     hash.should == AngelPropExpected::ORDER
   end
 
-  it "should flag file response questions as not supported" do
+  it "should convert file response questions" do
     qti_data = file_as_string(angel_question_dir, 'p_offline.xml')
     hash = Qti::AssessmentItemConverter.create_instructure_question(:qti_data=>qti_data, :interaction_type=>'file_upload_question', :custom_type=>'angel')
     hash.should == AngelPropExpected::FILE_RESPONSE
@@ -231,7 +231,7 @@ module AngelPropExpected
           :points_possible=>1,
           :question_type=>"file_upload_question",
           :question_text=>"<div>This is an offline item. I don't know what to do.</div>",
-          :unsupported=>true}
+      }
 
   FIB =
       {

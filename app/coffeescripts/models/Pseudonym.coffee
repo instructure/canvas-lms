@@ -13,6 +13,8 @@ define [
         taken:        I18n.t("errors.taken", "Email already in use")
         bad_credentials: I18n.t("errors.bad_credentials", "Invalid username or password")
         not_email:    I18n.t("errors.not_email", "Not a valid email address")
+      sis_user_id:
+        too_long:     I18n.t("errors.too_long", "Can't exceed %{max} characters", {max: 255})
       password:
         too_short:    I18n.t("errors.too_short", "Must be at least %{min} characters", {min: policy.min_length})
         sequence:     I18n.t("errors.sequence", "Can't incude a run of more than %{max} characters (e.g. abcdef)", {max: policy.max_sequence})

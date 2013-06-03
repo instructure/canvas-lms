@@ -29,7 +29,7 @@ module Canvas::HTTP
       raise(TooManyRedirectsError) if redirect_limit <= 0
 
       url, uri = CustomValidations.validate_url(url_str)
-      request = Net::HTTP::Get.new(uri.path, other_headers)
+      request = Net::HTTP::Get.new(uri.request_uri, other_headers)
       http = Net::HTTP.new(uri.host, uri.port)
       http.use_ssl = true if uri.scheme == 'https'
       http.verify_mode = OpenSSL::SSL::VERIFY_NONE

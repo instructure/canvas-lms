@@ -23,6 +23,24 @@ describe QuizzesHelper do
   include ApplicationHelper
   include QuizzesHelper
 
+  describe "#attachment_id_for" do
+
+    it "returns the attachment id if attachment exists" do
+      question = {:id => 1}
+      @attachments = { 1 => {:id => "11"} }
+      @stored_params = { "question_1" => ["1"]}
+      attachment_id_for(question).should == "11"
+    end
+
+    it "returns empty string when no attachments stored" do
+
+      question = {:id => 1}
+      @stored_params = {}
+      @attachments = {}
+      attachment_id_for(question).should == nil
+    end
+  end
+
   context 'render_score' do
     it 'should render nil scores' do
       render_score(nil).should == '_'
@@ -130,4 +148,5 @@ describe QuizzesHelper do
       html.should == %q|<input name="question_1" 'value=&#39;&gt;&lt;script&gt;alert(&#39;ha!&#39;)&lt;/script&gt;&lt;img' readonly="readonly" />|
     end
   end
+
 end

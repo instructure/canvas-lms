@@ -74,6 +74,29 @@ describe CalendarsController do
       assigns[:contexts][1].should eql(@course)
     end
 
+    it "should retrieve unconcluded course groups for user" do
+      course_with_student_logged_in(:active_all => true)
+      group_with_user(:group_context => @course, :user => @user, :active_all => true)
+      group1 = @group
+
+      course_with_student_logged_in(:active_all => true, :user => @user)
+      group_with_user(:group_context => @course, :user => @user, :active_all => true)
+      group2 = @group
+      @course.update_attribute(:conclude_at, Time.now - 1.week)
+
+      course_with_student_logged_in(:active_all => true, :user => @user)
+      group_with_user(:group_context => @course, :user => @user, :active_all => true)
+      group3 = @group
+      @course.update_attribute('workflow_state', 'completed')
+
+      get 'show', :user_id => @user.id, :include_undated => true
+      response.should be_success
+
+      assigns[:contexts].should include(group1)
+      assigns[:contexts].should_not include(group2)
+      assigns[:contexts].should_not include(group3)
+    end
+
     it "should retrieve events for a given month and year" do
       course_with_student_logged_in(:active_all => true)
       e1 = course_event("Jan 1 2008")

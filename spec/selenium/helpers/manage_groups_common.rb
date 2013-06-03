@@ -8,6 +8,10 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
     enable_self_signup = form.find_element(:css, "#category_enable_self_signup")
     enable_self_signup.click unless !!enable_self_signup.attribute('checked') == !!opts[:enable_self_signup]
 
+    if opts[:enable_self_signup] && opts[:group_limit]
+      replace_content f('#category_group_limit', form), opts[:group_limit]
+    end
+
     restrict_self_signup = form.find_element(:css, "#category_restrict_self_signup")
     restrict_self_signup.click unless !!restrict_self_signup.attribute('checked') == !!opts[:restrict_self_signup]
     if opts[:group_count]
@@ -26,6 +30,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
     keep_trying_until { find_with_jquery("#add_category_form:visible").should be_nil }
     category = course.group_categories.find_by_name(name)
     category.should_not be_nil
+    keep_trying_until { fj("#category_#{category.id} .student_links:visible") }
     category
   end
 

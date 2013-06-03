@@ -171,6 +171,34 @@ describe QuizzesController do
     end
   end
 
+  context "show_student" do 
+    before :each do
+      course_with_student_logged_in(:active_all => true)
+      course_quiz true
+      post "courses/#{@course.id}/quizzes/#{@quiz.id}/take?user_id=#{@student.id}"
+
+      get "courses/#{@course.id}/quizzes/#{@quiz.id}/take"
+    end
+
+    context "Show Center resume button" do
+      it "should show resume button in the center" do
+        get "courses/#{@course.id}/quizzes/#{@quiz.id}"
+
+        doc = Nokogiri::HTML(response.body)
+        doc.css("#not_right_side .take_quiz_button").text.should include "Resume Quiz"
+      end
+    end
+
+    context "Not show right_side resume button" do
+      it "should not show resume button on right_side" do
+        get "courses/#{@course.id}/quizzes/#{@quiz.id}"
+
+        doc = Nokogiri::HTML(response.body)
+        doc.css("#right-side .rs-margin-top").text.should_not include "Resume Quiz"
+      end
+    end
+  end
+
   context "#history" do
     context "pending_review" do
       def mkquiz
@@ -235,5 +263,12 @@ describe QuizzesController do
         response.body.should_not match @student.email
       end
     end
+  end
+
+  def course_quiz(active=false)
+    @quiz = @course.quizzes.create
+    @quiz.workflow_state = "available" if active
+    @quiz.save!
+    @quiz
   end
 end

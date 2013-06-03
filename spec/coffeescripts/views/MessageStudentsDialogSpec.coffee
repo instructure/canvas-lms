@@ -7,7 +7,7 @@ define [
   module "MessageStudentsDialog",
     setup: ->
       @testData =
-        title: 'The Quiz'
+        context: 'The Quiz'
         recipientGroups: [
           {
             name: 'have taken the quiz'
@@ -34,7 +34,7 @@ define [
     deepEqual @dialog.recipients, @testData.recipientGroups[0].recipients,
       'saves first recipientGroups recipients to be displayed'
 
-    deepEqual @dialog.title, @testData.title, 'saves the title to be displayed'
+    ok @dialog.title.match(@testData.context), 'saves the title to be displayed'
 
     ok @dialog.model, 'creates conversation automatically'
 

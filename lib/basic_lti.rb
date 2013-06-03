@@ -61,7 +61,7 @@ module BasicLTI
       data['enrollment_state'] = memberships.any?{|membership| membership.state_based_on_date == :active} ? 'active' : 'inactive'
     end
     if context.respond_to?(:account_chain) && !context.account_chain_ids.empty?
-      memberships += user.account_users.find_all_by_membership_type_and_account_id('AccountAdmin', context.account_chain_ids).uniq
+      memberships += user.account_users.find_all_by_account_id(context.account_chain_ids).uniq
     end
     data['role_types'] = memberships.map{|membership|
       case membership
@@ -178,8 +178,8 @@ module BasicLTI
       hash['context_label'] = context.course_code if context.respond_to?(:course_code)
       hash['launch_presentation_locale'] = I18n.locale || I18n.default_locale.to_s
       hash['launch_presentation_document_target'] = 'iframe'
-      hash['launch_presentation_width'] = 600
-      hash['launch_presentation_height'] = 400
+      hash['launch_presentation_width'] = tool.extension_setting(resource_type, :selection_width) if resource_type
+      hash['launch_presentation_height'] = tool.extension_setting(resource_type, :selection_height) if resource_type
       hash['launch_presentation_return_url'] = return_url
       hash['tool_consumer_instance_guid'] = root_account.lti_guid
       hash['tool_consumer_instance_name'] = root_account.name

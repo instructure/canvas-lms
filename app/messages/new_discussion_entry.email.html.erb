@@ -16,7 +16,7 @@
     background-image:     -ms-linear-gradient(left, #ddd, #aaa, #eee);
     background-image:      -o-linear-gradient(left, #ddd, #aaa, #eee);" />
 
-<p><%= html_to_text(asset.message).gsub(/\n/, '</p><p>') %></p>
+<%= html_to_simple_html(asset.message, :base_url => "#{HostUrl.protocol}://#{HostUrl.context_host(asset.context)}") %>
 
 <hr style="border: 0;
     height: 1px;

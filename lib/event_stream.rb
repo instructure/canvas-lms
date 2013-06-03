@@ -38,10 +38,7 @@ class EventStream
   end
 
   def insert(record)
-    database.batch do
-      database.insert_record(table, { id_column => record.id }, record.attributes)
-      run_callbacks(:insert, record)
-    end
+    execute(:insert, record)
   end
 
   def on_update(&callback)
@@ -49,10 +46,7 @@ class EventStream
   end
 
   def update(record)
-    database.batch do
-      database.update_record(table, { id_column => record.id }, record.changes)
-      run_callbacks(:update, record)
-    end
+    execute(:update, record)
   end
 
   def fetch(ids)
@@ -83,23 +77,44 @@ class EventStream
     index
   end
 
+  def operation_payload(operation, record)
+    if operation == :update
+      record.changes
+    else
+      record.attributes
+    end
+  end
+
+  def identifier
+    "#{database_name}.#{table}"
+  end
+
   private
 
   def fetch_cql
     "SELECT * FROM #{table} WHERE #{id_column} IN (?)"
   end
 
-  def callbacks_for(type)
+  def callbacks_for(operation)
     @callbacks ||= {}
-    @callbacks[type] ||= []
+    @callbacks[operation] ||= []
   end
 
-  def add_callback(type, callback)
-    callbacks_for(type) << callback
+  def execute(operation, record)
+    database.batch do
+      database.send(:"#{operation}_record", table, { id_column => record.id }, operation_payload(operation, record))
+      run_callbacks(operation, record)
+    end
+  rescue Exception => exception
+    EventStream::Failure.log!(operation, self, record, exception)
   end
 
-  def run_callbacks(type, record)
-    callbacks_for(type).each do |callback|
+  def add_callback(operation, callback)
+    callbacks_for(operation) << callback
+  end
+
+  def run_callbacks(operation, record)
+    callbacks_for(operation).each do |callback|
       instance_exec(record, &callback)
     end
   end

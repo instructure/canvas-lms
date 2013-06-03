@@ -31,5 +31,50 @@ describe "acts_as_list" do
       a1.update_order(["SELECT now()", a3.id, "evil stuff"])
     end
   end
+
+  describe "#insert_at_position" do
+    before :each do
+      course
+      @module_1 = @course.context_modules.create!(:name => "another module")
+      @module_2 = @course.context_modules.create!(:name => "another module")
+      @module_3 = @course.context_modules.create!(:name => "another module")
+
+      @modules = [@module_1, @module_2, @module_3]
+    end
+
+    it "should insert in the position correctly" do
+      @modules.map(&:position).should == [1, 2, 3]
+
+      @module_1.insert_at_position(3).should == true
+      @modules.each{|m| m.reload}
+      @modules.map(&:position).should == [3, 1, 2]
+
+      @module_2.insert_at_position(2).should == true
+      @modules.each{|m| m.reload}
+      @modules.map(&:position).should == [3, 2, 1]
+
+      @module_3.insert_at_position(3).should == true
+      @modules.each{|m| m.reload}
+      @modules.map(&:position).should == [2, 1, 3]
+
+      @module_1.insert_at_position(1).should == true
+      @modules.each{|m| m.reload}
+      @modules.map(&:position).should == [1, 2, 3]
+    end
+
+    it "should handle positions outside range" do
+      @module_2.insert_at_position(-10).should == false # do nothing
+      @modules.each{|m| m.reload}
+      @modules.map(&:position).should == [1, 2, 3]
+
+      @module_3.insert_at_position(0).should == false # do nothing
+      @modules.each{|m| m.reload}
+      @modules.map(&:position).should == [1, 2, 3]
+
+      @module_1.insert_at_position(4).should == false # do nothing
+      @modules.each{|m| m.reload}
+      @modules.map(&:position).should == [1, 2, 3]
+    end
+  end
 end
 

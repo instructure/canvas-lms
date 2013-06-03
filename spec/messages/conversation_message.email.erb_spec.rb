@@ -24,7 +24,10 @@ describe 'conversation_message.email' do
     course_with_teacher
     student_in_course
     conversation = @teacher.initiate_conversation([@user])
-    message = conversation.add_message("some message")
+    message = conversation.add_message("this
+is
+a
+message")
     generate_message(:conversation_message, :email, message)
   end
 end

@@ -246,6 +246,7 @@ describe "discussions" do
           type_in_tiny('textarea[name=message]', 'file attachement discussion')
           expect_new_page_load { submit_form('.form-actions') }
           wait_for_ajaximations
+
           f('.zip').should include_text(filename)
         end
 
@@ -420,7 +421,6 @@ describe "discussions" do
           wait_for_ajaximations
 
           f('input[type=checkbox][name=threaded]')[:checked].should == checkbox_state
-          f('input[type=checkbox][name=delay_posting]')[:checked].should == checkbox_state
           f('input[type=checkbox][name=require_initial_post]')[:checked].should == checkbox_state
           f('input[type=checkbox][name=podcast_enabled]')[:checked].should == checkbox_state
           f('input[type=checkbox][name=podcast_has_student_posts]')[:checked].should == checkbox_state
@@ -429,7 +429,6 @@ describe "discussions" do
 
         def toggle(state)
           f('input[type=checkbox][name=threaded]').click
-          f('input[type=checkbox][name=delay_posting]').click
           set_value f('input[name=delayed_post_at]'), 2.weeks.from_now.strftime('%m/%d/%Y') if state == :on
           f('input[type=checkbox][name=require_initial_post]').click
           f('input[type=checkbox][name=podcast_enabled]').click
@@ -564,6 +563,122 @@ describe "discussions" do
           errorBoxes = driver.execute_script("return $('.errorBox').filter('[id!=error_box_template]').toArray();")
           visBoxes, hidBoxes = errorBoxes.partition { |eb| eb.displayed? }
           visBoxes.first.text.should == "Please select a group set for this assignment"
+        end
+      end
+
+      context "locking" do
+        before do
+          @topic = @course.discussion_topics.build(:title => "topic", :user => @user)
+          @topic.save!
+        end
+
+        it "should set as active when removing existing delayed_post_at and lock_at dates" do
+          @topic.delayed_post_at = 10.days.ago
+          @topic.lock_at         = 5.days.ago
+          @topic.workflow_state  = 'locked'
+          @topic.save!
+
+          get "/courses/#{@course.id}/discussion_topics/#{@topic.id}/edit"
+          wait_for_ajaximations
+
+          f('input[type=text][name="delayed_post_at"]').clear
+          f('input[type=text][name="lock_at"]').clear
+
+          expect_new_page_load { f('.form-actions button[type=submit]').click }
+          wait_for_ajaximations
+
+          @topic.reload
+          @topic.delayed_post_at.should be_nil
+          @topic.lock_at.should be_nil
+          @topic.active?.should be_true
+        end
+
+        it "should clear the delayed_post_at and lock_at when manually triggering unlock" do
+          @topic.delayed_post_at = 10.days.ago
+          @topic.lock_at         = 5.days.ago
+          @topic.workflow_state  = 'locked'
+          @topic.save!
+
+          get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+          wait_for_ajaximations
+
+          f("#discussion-toolbar .al-trigger").click
+          expect_new_page_load { f("#ui-id-3").click }
+
+          @topic.reload
+          @topic.delayed_post_at.should be_nil
+          @topic.lock_at.should be_nil
+          @topic.active?.should be_true
+        end
+
+        it "should set workflow to locked when delayed_post_at and lock_at are in past" do
+          @topic.delayed_post_at = nil
+          @topic.lock_at         = nil
+          @topic.workflow_state  = 'active'
+          @topic.save!
+
+          get "/courses/#{@course.id}/discussion_topics/#{@topic.id}/edit"
+          wait_for_ajaximations
+
+          delayed_post_at = Time.zone.now - 10.days
+          lock_at = Time.zone.now - 5.days
+          date_format = '%b %-d, %Y'
+
+          f('input[type=text][name="delayed_post_at"]').send_keys(delayed_post_at.strftime(date_format))
+          f('input[type=text][name="lock_at"]').send_keys(lock_at.strftime(date_format))
+
+          expect_new_page_load { f('.form-actions button[type=submit]').click }
+          wait_for_ajaximations
+
+          @topic.reload
+          @topic.delayed_post_at.strftime(date_format).should == delayed_post_at.strftime(date_format)
+          @topic.lock_at.strftime(date_format).should == lock_at.strftime(date_format)
+          @topic.locked?.should be_true
+        end
+
+        it "should set workflow to post_delayed when delayed_post_at and lock_at are in the future" do
+          @topic.delayed_post_at = nil
+          @topic.lock_at         = nil
+          @topic.workflow_state  = 'active'
+          @topic.save!
+
+          get "/courses/#{@course.id}/discussion_topics/#{@topic.id}/edit"
+          wait_for_ajaximations
+
+          delayed_post_at = Time.zone.now + 5.days
+          date_format = '%b %-d, %Y'
+
+          f('input[type=text][name="delayed_post_at"]').send_keys(delayed_post_at.strftime(date_format))
+
+          expect_new_page_load { f('.form-actions button[type=submit]').click }
+          wait_for_ajaximations
+
+          @topic.reload
+          @topic.delayed_post_at.strftime(date_format).should == delayed_post_at.strftime(date_format)
+          @topic.post_delayed?.should be_true
+        end
+
+        it "should set workflow to active when delayed_post_at in past and lock_at in future" do
+          @topic.delayed_post_at = 5.days.from_now
+          @topic.lock_at         = 10.days.from_now
+          @topic.workflow_state  = 'locked'
+          @topic.save!
+
+          get "/courses/#{@course.id}/discussion_topics/#{@topic.id}/edit"
+          wait_for_ajaximations
+
+          delayed_post_at = Time.zone.now - 5.days
+          date_format = '%b %-d, %Y'
+
+          f('input[type=text][name="delayed_post_at"]').clear
+          f('input[type=text][name="delayed_post_at"]').send_keys(delayed_post_at.strftime(date_format))
+
+          expect_new_page_load { f('.form-actions button[type=submit]').click }
+          wait_for_ajaximations
+
+          @topic.reload
+          @topic.delayed_post_at.strftime(date_format).should == delayed_post_at.strftime(date_format)
+          @topic.active?.should be_true
         end
       end
     end
@@ -856,29 +971,40 @@ describe "discussions" do
 
   context "marking as read" do
     it "should mark things as read" do
-      pending "figure out delayed jobs"
-      reply_count = 3
-      course_with_teacher_logged_in
-      @topic = @course.discussion_topics.create!
-      reply_count.times { @topic.discussion_entries.create!(:message => 'Lorem ipsum dolor sit amet') }
+      reply_count = 2
+      course_with_student
+      course_with_teacher_logged_in(:course => @course)
+      @topic = @course.discussion_topics.create!(:title => 'mark as read test', :message => 'test mark as read', :user => @student)
+      reply_count.times { @topic.discussion_entries.create!(:message => 'Lorem ipsum dolor sit amet', :user => @student) }
+      @topic.create_materialized_view
 
       # make sure everything looks unread
       get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
-      ff('.can_be_marked_as_read.unread').length.should == reply_count + 1
+      ff('.discussion_entry.unread').length.should == reply_count
       f('.new-and-total-badge .new-items').text.should == reply_count.to_s
 
       #wait for the discussionEntryReadMarker to run, make sure it marks everything as .just_read
-      sleep 2
-      ff('.can_be_marked_as_read.unread').should be_empty
-      ff('.can_be_marked_as_read.just_read').length.should == reply_count + 1
+      keep_trying_until { ff('.discussion_entry.unread').should be_empty }
+      ff('.discussion_entry.read').length.should == reply_count + 1 # +1 because the topic also has the .discussion_entry class
+
+      # refresh page and make sure nothing is unread and everthing is .read
+      get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+      ff(".discussion_entry.unread").should be_empty
       f('.new-and-total-badge .new-items').text.should == ''
 
-      # refresh page and make sure nothing is unread/just_read and everthing is .read
+      # Mark one as unread manually, and create a new reply. The new reply 
+      # should be automarked as read, but the manual one should not.
+      f('.discussion-read-state-btn').click
+      wait_for_ajaximations
+      @topic.discussion_entries.create!(:message => 'new lorem ipsum', :user => @student)
+      @topic.create_materialized_view
+
       get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
-      ['unread', 'just_read'].each do |state|
-        ff(".can_be_marked_as_read.#{state}").should be_empty
-      end
-      f('.new-and-total-badge .new-items').text.should == ''
+      ff(".discussion_entry.unread").size.should == 2
+      f('.new-and-total-badge .new-items').text.should == '2'
+      keep_trying_until { ff('.discussion_entry.unread').size < 2 }
+      wait_for_ajaximations
+      ff(".discussion_entry.unread").size.should == 1
     end
   end
 end

@@ -112,7 +112,7 @@ describe ContextModule do
         get @test_url
         response.should be_success
         html = Nokogiri::HTML(response.body)
-        html.css('#test_content').length.should == 0
+        html.css('#test_content').length.should == (@test_content_length || 0)
     
         p1 = @mod1.evaluate_for(@user, true, true)
     
@@ -161,6 +161,7 @@ describe ContextModule do
           discussion = @course.discussion_topics.create!(:title => "topic", :message => content)
           @test_url = "/courses/#{@course.id}/discussion_topics/#{discussion.id}"
           @tag2 = @mod2.add_item(:type => 'discussion_topic', :id => discussion.id)
+          @test_content_length = 1
         end
       end
     end

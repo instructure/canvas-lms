@@ -60,6 +60,11 @@ module StreamItemsHelper
         next if item.context_type == "Assignment"
       end
 
+      if ["DiscussionTopic","Announcement"].include? category
+        item.data.reload
+        next if item.data.try(:visible_for?, user) == false
+      end
+      
       categorized_items[category] << generate_presenter(category, item)
     end
     categorized_items

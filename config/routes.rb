@@ -257,7 +257,6 @@ ActionController::Routing::Routes.draw do |map|
       quiz.reorder "reorder", :controller => "quizzes", :action => "reorder"
       quiz.history "history", :controller => "quizzes", :action => "history"
       quiz.statistics "statistics", :controller => 'quizzes', :action => 'statistics'
-      quiz.formatted_statistics "statistics.:format", :controller => 'quizzes', :action => 'statistics'
       quiz.read_only "read_only", :controller => 'quizzes', :action => 'read_only'
       quiz.filters 'filters', :controller => 'quizzes', :action => 'filters'
       quiz.resources :quiz_submissions, :as => "submissions", :collection => {:backup => :put}, :member => {:record_answer => :post} do |submission|
@@ -511,7 +510,6 @@ ActionController::Routing::Routes.draw do |map|
   map.clear_file_session "file_session/clear", :controller => "pseudonym_sessions", :action => "clear_file_session"
   map.register "register", :controller => "users", :action => "new"
   map.register_from_website "register_from_website", :controller => "users", :action => "new"
-  map.registered "registered", :controller => "users", :action => "registered"
   map.enroll 'enroll/:self_enrollment_code', :controller => 'self_enrollments', :action => 'new', :conditions => {:method => :get}
   map.enroll_frd 'enroll/:self_enrollment_code', :controller => 'self_enrollments', :action => 'create', :conditions => {:method => :post}
   map.services 'services', :controller => 'users', :action => 'services'
@@ -840,8 +838,7 @@ ActionController::Routing::Routes.draw do |map|
       users.delete "users/:user_id/followers/self", :action => :unfollow
 
       users.get 'users/self/todo', :action => :todo_items
-      users.get 'users/self/coming_up', :action => :coming_up_items
-      users.get 'users/self/recent_feedback', :action => :recent_feedback
+      users.get 'users/self/upcoming_events', :action => :upcoming_events
 
       users.delete 'users/self/todo/:asset_string/:purpose', :action => :ignore_item, :path_name => 'users_todo_ignore'
       users.post 'accounts/:account_id/users', :action => :create
@@ -853,6 +850,9 @@ ActionController::Routing::Routes.draw do |map|
 
       users.post 'users/:user_id/folders', :controller => :folders, :action => :create
       users.get 'users/:user_id/folders/:id', :controller => :folders, :action => :show, :path_name => 'user_folder'
+
+      users.get 'users/:id/settings', controller: 'users', action: 'settings'
+      users.put 'users/:id/settings', controller: 'users', action: 'settings', path_name: 'user_settings'
     end
 
     api.with_options(:controller => :pseudonyms) do |pseudonyms|
@@ -920,6 +920,7 @@ ActionController::Routing::Routes.draw do |map|
       conversations.post 'conversations', :action => :create
       conversations.post 'conversations/mark_all_as_read', :action => :mark_all_as_read
       conversations.get 'conversations/batches', :action => :batches, :path_name => 'conversations_batches'
+      conversations.get 'conversations/unread_count', :action => :unread_count
       conversations.get 'conversations/:id', :action => :show
       conversations.put 'conversations/:id', :action => :update # stars, subscribed-ness, workflow_state
       conversations.delete 'conversations/:id', :action => :destroy
@@ -1046,20 +1047,35 @@ ActionController::Routing::Routes.draw do |map|
       favorites.delete "users/self/favorites/courses", :action => :reset_course_favorites
     end
 
-    api.with_options(:controller => :wiki_pages) do |wiki_pages|
-      wiki_pages.get "courses/:course_id/pages", :action => :api_index, :path_name => 'course_wiki_pages'
-      wiki_pages.get "groups/:group_id/pages", :action => :api_index, :path_name => 'group_wiki_pages'
-      wiki_pages.get "courses/:course_id/pages/:url", :action => :api_show, :path_name => 'course_wiki_page'
-      wiki_pages.get "groups/:group_id/pages/:url", :action => :api_show, :path_name => 'group_wiki_page'
+    api.with_options(:controller => :wiki_pages_api) do |wiki_pages|
+      wiki_pages.get "courses/:course_id/pages", :action => :index, :path_name => 'course_wiki_pages'
+      wiki_pages.get "groups/:group_id/pages", :action => :index, :path_name => 'group_wiki_pages'
+      wiki_pages.get "courses/:course_id/pages/:url", :action => :show, :path_name => 'course_wiki_page'
+      wiki_pages.get "groups/:group_id/pages/:url", :action => :show, :path_name => 'group_wiki_page'
+      wiki_pages.post "courses/:course_id/pages", :action => :create
+      wiki_pages.post "groups/:group_id/pages", :action => :create
+      wiki_pages.put "courses/:course_id/pages/:url", :action => :update
+      wiki_pages.put "groups/:group_id/pages/:url", :action => :update
+      wiki_pages.delete "courses/:course_id/pages/:url", :action => :destroy
+      wiki_pages.delete "groups/:group_id/pages/:url", :action => :destroy
     end
 
     api.with_options(:controller => :context_modules_api) do |context_modules|
       context_modules.get "courses/:course_id/modules", :action => :index, :path_name => 'course_context_modules'
       context_modules.get "courses/:course_id/modules/:id", :action => :show, :path_name => 'course_context_module'
-      context_modules.get "courses/:course_id/modules/:module_id/items", :action => :list_module_items, :path_name => 'course_context_module_items'
-      context_modules.get "courses/:course_id/modules/:module_id/items/:id", :action => :show_module_item, :path_name => 'course_context_module_item'
-      context_modules.get "courses/:course_id/module_item_redirect/:id", :action => :module_item_redirect, :path_name => 'course_context_module_item_redirect'
       context_modules.put "courses/:course_id/modules", :action => :batch_update
+      context_modules.post "courses/:course_id/modules", :action => :create, :path_name => 'course_context_module_create'
+      context_modules.put "courses/:course_id/modules/:id", :action => :update, :path_name => 'course_context_module_update'
+      context_modules.delete "courses/:course_id/modules/:id", :action => :destroy
+    end
+
+    api.with_options(:controller => :context_module_items_api) do |context_module_items|
+      context_module_items.get "courses/:course_id/modules/:module_id/items", :action => :index, :path_name => 'course_context_module_items'
+      context_module_items.get "courses/:course_id/modules/:module_id/items/:id", :action => :show, :path_name => 'course_context_module_item'
+      context_module_items.get "courses/:course_id/module_item_redirect/:id", :action => :redirect, :path_name => 'course_context_module_item_redirect'
+      context_module_items.post "courses/:course_id/modules/:module_id/items", :action => :create, :path_name => 'course_context_module_items_create'
+      context_module_items.put "courses/:course_id/modules/:module_id/items/:id", :action => :update, :path_name => 'course_context_module_item_update'
+      context_module_items.delete "courses/:course_id/modules/:module_id/items/:id", :action => :destroy
     end
 
     api.with_options(:controller => :quizzes_api) do |quizzes|
@@ -1067,6 +1083,15 @@ ActionController::Routing::Routes.draw do |map|
       quizzes.post "courses/:course_id/quizzes", :action => :create, :path_name => 'course_quiz_create'
       quizzes.get "courses/:course_id/quizzes/:id", :action => :show, :path_name => 'course_quiz'
       quizzes.put "courses/:course_id/quizzes/:id", :action => :update, :path_name => 'course_quiz_update'
+    end
+
+    api.with_options(:controller => :quiz_reports) do |statistics|
+      statistics.post "courses/:course_id/quizzes/:quiz_id/reports", :action => :create, :path_name => 'course_quiz_reports_create'
+      statistics.get "courses/:course_id/quizzes/:quiz_id/reports/:id", :action => :show, :path_name => 'course_quiz_report'
+    end
+
+    api.with_options(:controller => :quiz_submissions_api) do |quiz_submissions|
+      quiz_submissions.post 'courses/:course_id/quizzes/:quiz_id/quiz_submissions/self/files', :action => :create_file, :path_name => 'quiz_submission_create_file'
     end
 
     api.with_options(:controller => :outcome_groups_api) do |outcome_groups|
@@ -1111,6 +1136,14 @@ ActionController::Routing::Routes.draw do |map|
     api.with_options(:controller => :progress) do |progress|
       progress.get "progress/:id", :action => :show, :path_name => "progress"
     end
+
+    api.with_options(:controller => :app_center) do |app_center|
+      ['course', 'account'].each do |context|
+        prefix = "#{context}s/:#{context}_id/app_center"
+        app_center.get "#{prefix}/apps", :action => :index, :path_name => "#{context}_app_center_apps"
+        app_center.get "#{prefix}/apps/:app_id/reviews", :action => :reviews, :path_name => "#{context}_app_center_app_reviews"
+      end
+    end
   end
 
   # this is not a "normal" api endpoint in the sense that it is not documented
@@ -1140,11 +1173,6 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resources :files do |file|
     file.download 'download', :controller => 'files', :action => 'show', :download => '1'
-  end
-
-  map.resources :apps, :only => [:index, :show] do |app|
-    app.comments 'comments', :controller => 'apps', :action => 'comments', :conditions => {:method => :get}
-    app.post_comment 'comments', :controller => 'apps', :action => 'comment', :conditions => {:method => :post}
   end
 
   map.resources :developer_keys, :only => [:index]

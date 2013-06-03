@@ -35,7 +35,7 @@ class GradeCalculator
     @final_updates = []
     @ignore_muted = opts[:ignore_muted]
   end
-  
+
   def self.recompute_final_score(user_ids, course_id)
     calc = GradeCalculator.new user_ids, course_id
     calc.compute_scores
@@ -67,21 +67,21 @@ class GradeCalculator
   end
 
   private
-  
+
   # The score ignoring unsubmitted assignments
   def calculate_current_score(user_id, submissions)
     group_sums = create_group_sums(submissions)
-    score = calculate_total_from_group_scores(group_sums)
-    @current_updates << "WHEN user_id=#{user_id} THEN #{score || "NULL"}"
-    score
+    info = calculate_total_from_group_scores(group_sums)
+    @current_updates << "WHEN user_id=#{user_id} THEN #{info[:grade] || "NULL"}"
+    info
   end
 
   # The final score for the class, so unsubmitted assignments count as zeros
   def calculate_final_score(user_id, submissions)
     group_sums = create_group_sums(submissions, false)
-    score = calculate_total_from_group_scores(group_sums)
-    @final_updates << "WHEN user_id=#{user_id} THEN #{score || "NULL"}"
-    score
+    info = calculate_total_from_group_scores(group_sums)
+    @final_updates << "WHEN user_id=#{user_id} THEN #{info[:grade] || "NULL"}"
+    info
   end
  
   # returns information about assignments groups in the form:
@@ -263,8 +263,8 @@ class GradeCalculator
   def big_f_worst(q, submissions, cant_drop, keep)
     big_f(q, submissions, cant_drop, keep) { |(a,_),(b,_)| a <=> b }
   end
-  
-  # Calculates the final score from the sums of all the assignment groups
+
+  # returns grade information from all the assignment groups
   def calculate_total_from_group_scores(group_sums)
     if @course.group_weighting_scheme == 'percent'
       relevant_group_sums = group_sums.reject { |gs|
@@ -282,16 +282,20 @@ class GradeCalculator
         final_grade *= 100.0 / full_weight
       end
 
-      final_grade ? final_grade.round(1) : nil
+      {:grade => final_grade.try(:round, 1)}
     else
       total, possible = group_sums.reduce([0,0]) { |(m,n),gs|
         [m + gs[:score], n + gs[:possible]]
       }
       if possible > 0
         final_grade = (total.to_f / possible) * 100
-        final_grade.round(1)
+        {
+          :grade => final_grade.round(1),
+          :total => total.to_f,
+          :possible => possible,
+        }
       else
-        nil
+        {:grade => nil, :total => total.to_f}
       end
     end
   end

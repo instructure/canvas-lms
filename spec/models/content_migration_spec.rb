@@ -271,19 +271,46 @@ describe ContentMigration do
       page_to.body.should == body % [@copy_to.id, tag_to.id]
     end
 
-    it "should copy unpublished modules" do
-      cm = @copy_from.context_modules.create!(:name => "some module")
-      cm.publish
-      cm2 = @copy_from.context_modules.create!(:name => "another module")
-      cm2.unpublish
+    context "unpublished items" do
+      it "should copy unpublished modules" do
+        cm = @copy_from.context_modules.create!(:name => "some module")
+        cm.publish
+        cm2 = @copy_from.context_modules.create!(:name => "another module")
+        cm2.unpublish
 
-      run_course_copy
+        run_course_copy
 
-      @copy_to.context_modules.count.should == 2
-      cm_2 = @copy_to.context_modules.find_by_migration_id(mig_id(cm))
-      cm_2.workflow_state.should == 'active'
-      cm2_2 = @copy_to.context_modules.find_by_migration_id(mig_id(cm2))
-      cm2_2.workflow_state.should == 'unpublished'
+        @copy_to.context_modules.count.should == 2
+        cm_2 = @copy_to.context_modules.find_by_migration_id(mig_id(cm))
+        cm_2.workflow_state.should == 'active'
+        cm2_2 = @copy_to.context_modules.find_by_migration_id(mig_id(cm2))
+        cm2_2.workflow_state.should == 'unpublished'
+      end
+
+      it "should copy links to unpublished items in modules" do
+        mod1 = @copy_from.context_modules.create!(:name => "some module")
+        page = @copy_from.wiki.wiki_pages.create(:title => "some page")
+        page.workflow_state = :unpublished
+        page.save!
+        mod1.add_item({:id => page.id, :type => 'wiki_page'})
+
+        run_course_copy
+
+        mod1_copy = @copy_to.context_modules.find_by_migration_id(mig_id(mod1))
+        mod1_copy.content_tags.count.should == 1
+        mod1_copy.content_tags.first.content #todo
+      end
+
+      it "should copy unpublised wiki pages" do
+        wiki = @copy_from.wiki.wiki_pages.create(:title => "wiki", :body => "ohai")
+        wiki.workflow_state = :unpublished
+        wiki.save!
+
+        run_course_copy
+
+        wiki2 = @copy_to.wiki.wiki_pages.find_by_migration_id(mig_id(wiki))
+        wiki2.workflow_state.should == 'unpublished'
+      end
     end
 
     it "should find and fix wiki links by title or id" do
@@ -1379,6 +1406,39 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
       aq.question_data[:answers][1][:left_html].should == data2[:answers][1][:left_html]
     end
 
+    it "should copy file_upload_questions" do
+      pending unless Qti.qti_enabled?
+      bank = @copy_from.assessment_question_banks.create!(:title => 'Test Bank')
+      data = {:question_type => "file_upload_question",
+              :points_possible => 10,
+              :question_text => "<strong>html for fun</strong>"
+              }.with_indifferent_access
+      bank.assessment_questions.create!(:question_data => data)
+
+      q = @copy_from.quizzes.create!(:title => "survey pub", :quiz_type => "survey")
+      q.quiz_questions.create!(:question_data => data)
+      q.generate_quiz_data
+      q.published_at = Time.now
+      q.workflow_state = 'available'
+      q.save!
+
+      run_course_copy
+
+      @copy_to.assessment_questions.count.should == 2
+      @copy_to.assessment_questions.each do |aq|
+        aq.question_data['question_type'].should == data[:question_type]
+        aq.question_data['question_text'].should == data[:question_text]
+      end
+
+      @copy_to.quizzes.count.should == 1
+      quiz = @copy_to.quizzes.first
+      quiz.quiz_questions.count.should == 1
+
+      qq = quiz.quiz_questions.first
+      qq.question_data['question_type'].should == data[:question_type]
+      qq.question_data['question_text'].should == data[:question_text]
+    end
+
     it "should import calendar events" do
       body_with_link = "<p>Watup? <strong>eh?</strong><a href=\"/courses/%s/assignments\">Assignments</a></p>"
       cal = @copy_from.calendar_events.new
@@ -1639,7 +1699,6 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
 
   context "#prepare_data" do
     it "should strip invalid utf8" do
-      pending("Ruby 1.9 only") if RUBY_VERSION < "1.9"
       data = {
         'assessment_questions' => [{
           'question_name' => "hai\xfbabcd"

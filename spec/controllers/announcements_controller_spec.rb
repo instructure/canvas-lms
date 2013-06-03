@@ -40,7 +40,6 @@ describe AnnouncementsController do
       response.should be_redirect
       flash[:notice].should match(/That page has been disabled/)
     end
-    
   end
 
   describe "GET 'public_feed.atom'" do

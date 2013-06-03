@@ -111,7 +111,7 @@ describe ExternalToolsController, :type => :integration do
                     {:controller => 'external_tools', :action => 'show', :format => 'json',
                      :"#{type}_id" => context.id.to_s, :external_tool_id => et.id.to_s})
 
-    json.should == example_json(et)
+    json.diff(example_json(et)).should == {}
   end
 
   def not_found_call(context, type="course")
@@ -128,7 +128,8 @@ describe ExternalToolsController, :type => :integration do
                     {:controller => 'external_tools', :action => 'index', :format => 'json',
                      :"#{type}_id" => context.id.to_s})
 
-    json.should == [example_json(et)]
+    json.size.should == 1
+    json.first.diff(example_json(et)).should == {}
   end
 
   def create_call(context, type="course")
@@ -138,7 +139,7 @@ describe ExternalToolsController, :type => :integration do
     context.context_external_tools.count.should == 1
 
     et = context.context_external_tools.last
-    json.should == example_json(et)
+    json.diff(example_json(et)).should == {}
   end
 
   def update_call(context, type="course")
@@ -148,7 +149,7 @@ describe ExternalToolsController, :type => :integration do
                     {:controller => 'external_tools', :action => 'update', :format => 'json',
                      :"#{type}_id" => context.id.to_s, :external_tool_id => et.id.to_s}, post_hash)
     et.reload
-    json.should == example_json(et)
+    json.diff(example_json(et)).should == {}
   end
   
   def destroy_call(context, type="course")
@@ -174,15 +175,6 @@ describe ExternalToolsController, :type => :integration do
     json["errors"]["consumer_key"].should_not be_nil
     json["errors"]["url"].first["message"].should == "Either the url or domain should be set."
     json["errors"]["domain"].first["message"].should == "Either the url or domain should be set."
-
-    raw_api_call(:post, "/api/v1/#{type}s/#{context.id}/external_tools.json",
-                 {:controller => 'external_tools', :action => 'create', :format => 'json',
-                  :"#{type}_id" => context.id.to_s},
-                 {:url => "http://www.example.com/ims/lti", :domain => "example.com"})
-    json = JSON.parse response.body
-    response.code.should == "400"
-    json["errors"]["url"].first["message"].should == "Either the url or domain should be set, not both."
-    json["errors"]["domain"].first["message"].should == "Either the url or domain should be set, not both."
   end
   
   def unauthorized_call(context, type="course")
@@ -260,30 +252,34 @@ describe ExternalToolsController, :type => :integration do
      "domain"=>nil,
      "url"=>"http://www.example.com/ims/lti",
      "id"=>et ? et.id : nil,
+     "workflow_state"=>"public",
      "resource_selection"=>
              {"text"=>"",
               "url"=>"http://www.example.com/ims/lti/resource",
               "selection_height"=>50,
-              "selection_width"=>50},
+              "selection_width"=>50,
+              "label"=>""},
      "privacy_level"=>"public",
      "editor_button"=>
              {"icon_url"=>"/images/delete.png",
               "text"=>"editor button",
               "url"=>"http://www.example.com/ims/lti/editor",
               "selection_height"=>50,
-              "selection_width"=>50},
+              "selection_width"=>50,
+              "label"=>"editor button"},
      "homework_submission"=>
              {"text"=>"homework submission",
               "url"=>"http://www.example.com/ims/lti/editor",
               "selection_height"=>50,
-              "selection_width"=>50},
+              "selection_width"=>50,
+              "label"=>"homework submission"},
      "custom_fields"=>{"key1"=>"val1", "key2"=>"val2"},
      "description"=>"For testing stuff",
      "user_navigation"=>
-             {"text"=>"User nav", "url"=>"http://www.example.com/ims/lti/user"},
+             {"text"=>"User nav", "url"=>"http://www.example.com/ims/lti/user", "label"=>"User nav"},
      "course_navigation" =>
-             {"text"=>"Course nav", "url"=>"http://www.example.com/ims/lti/course", "visibility"=>"admins", "default"=> "disabled"},
+             {"text"=>"Course nav", "url"=>"http://www.example.com/ims/lti/course", "visibility"=>"admins", "default"=> "disabled", "label"=>"Course nav"},
      "account_navigation"=>
-             {"text"=>"Account nav", "url"=>"http://www.example.com/ims/lti/account", "custom_fields"=>{"key"=>"value"}}}
+             {"text"=>"Account nav", "url"=>"http://www.example.com/ims/lti/account", "custom_fields"=>{"key"=>"value"}, "label"=>"Account nav"}}
   end
 end

@@ -630,6 +630,32 @@ describe "gradebook2" do
         test_n_students @page_size * 2 + 1
       end
     end
+
+    describe "Total dropdown" do
+      def should_show_percentages
+        ff(".total-column").each { |total| total.text.should =~ /%/ }
+      end
+
+      def toggle_showing_points
+        f("#total_dropdown").click
+        f(".toggle_percent").click
+      end
+
+      it 'should allow toggling display by points or percent' do
+        should_show_percentages
+
+        get "/courses/#{@course.id}/gradebook2"
+        toggle_showing_points
+
+        expected_points = 15, 10, 10
+        ff(".total-column").each { |total|
+          total.text.should =~ /\A#{expected_points.shift}$/
+        }
+
+        toggle_showing_points
+        should_show_percentages
+      end
+    end
   end
 
   context "as an observer" do

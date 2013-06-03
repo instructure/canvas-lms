@@ -60,6 +60,9 @@
 #        // The datetime to publish the topic (if not right away).
 #        "delayed_post_at":null,
 #
+#        // The datetime to lock the topic (if ever).
+#        "lock_at":null,
+#
 #        // whether or not this is locked for students to see.
 #        "locked":false,
 #
@@ -120,13 +123,14 @@ class DiscussionTopicsController < ApplicationController
         format.html do
           @active_tab = "discussions"
           add_crumb t('#crumbs.discussions', "Discussions"), named_context_url(@context, :context_discussion_topics_url)
-          js_env :permissions => {
-            :create => @context.discussion_topics.new.grants_right?(@current_user, session, :create),
-            :moderate => @context.grants_right?(@current_user, session, :moderate_forum),
-            :change_settings => user_can_edit_course_settings?
-          }
+          js_env :USER_SETTINGS_URL => api_v1_user_settings_url(@current_user),
+                 :permissions => {
+                   :create => @context.discussion_topics.new.grants_right?(@current_user, session, :create),
+                   :moderate => @context.grants_right?(@current_user, session, :moderate_forum),
+                   :change_settings => user_can_edit_course_settings?
+                 }
           if user_can_edit_course_settings?
-            js_env :SETTINGS_URL => named_context_url(@context, :api_v1_context_settings_url) #named_context_url( "/api/v1/courses/#{@context.id}/settings"
+            js_env :SETTINGS_URL => named_context_url(@context, :api_v1_context_settings_url)
           end
         end
         format.json do
@@ -136,7 +140,6 @@ class DiscussionTopicsController < ApplicationController
                    @context.active_discussion_topics.only_discussion_topics)
           scope = scope.by_position
           @topics = Api.paginate(scope, self, topic_pagination_url(:only_announcements => params[:only_announcements]))
-          @topics.reject! { |a| a.locked_for?(@current_user, :check_policies => true) }
           @topics.each { |t| t.current_user = @current_user }
           if api_request?
             render :json => discussion_topics_api_json(@topics, @context, @current_user, session)
@@ -208,12 +211,11 @@ class DiscussionTopicsController < ApplicationController
       redirect_to named_context_url(@context, :context_discussion_topics_url)
       return
     end
+
     if authorized_action(@topic, @current_user, :read)
       @headers = !params[:headless]
-      @locked = @topic.locked_for?(@current_user, :check_policies => true, :deep_check_if_needed => true)
-      unless @locked
-        @topic.change_read_state('read', @current_user)
-      end
+      @locked = @topic.locked_for?(@current_user, :check_policies => true, :deep_check_if_needed => true) || @topic.locked?
+      @topic.change_read_state('read', @current_user)
       if @topic.for_group_assignment?
         @groups = @topic.assignment.group_category.groups.active.select{ |g| g.grants_right?(@current_user, session, :read) }
         topics = @topic.child_topics.to_a
@@ -245,10 +247,10 @@ class DiscussionTopicsController < ApplicationController
                 :ID => @topic.id,
               },
               :PERMISSIONS => {
-                :CAN_REPLY => !(@topic.for_group_assignment? || @topic.locked?),
-                :CAN_ATTACH => @topic.grants_right?(@current_user, session, :attach),
-                :CAN_MANAGE_OWN => @context.user_can_manage_own_discussion_posts?(@current_user),
-                :MODERATE => @context.grants_right?(@current_user, session, :moderate_forum)
+                :CAN_REPLY      => @locked ? false : !(@topic.for_group_assignment? || @topic.locked?),     # Can reply
+                :CAN_ATTACH     => @locked ? false : @topic.grants_right?(@current_user, session, :attach), # Can attach files on replies
+                :CAN_MANAGE_OWN => @context.user_can_manage_own_discussion_posts?(@current_user),           # Can moderate their own topics
+                :MODERATE       => @context.grants_right?(@current_user, session, :moderate_forum)          # Can moderate any topic
               },
               :ROOT_URL => named_context_url(@context, :api_v1_context_discussion_topic_view_url, @topic),
               :ENTRY_ROOT_URL => named_context_url(@context, :api_v1_context_discussion_topic_entry_list_url, @topic),
@@ -257,6 +259,8 @@ class DiscussionTopicsController < ApplicationController
               :DELETE_URL => named_context_url(@context, :api_v1_context_discussion_delete_reply_url, @topic, ':id'),
               :UPDATE_URL => named_context_url(@context, :api_v1_context_discussion_update_reply_url, @topic, ':id'),
               :MARK_READ_URL => named_context_url(@context, :api_v1_context_discussion_topic_discussion_entry_mark_read_url, @topic, ':id'),
+              :MARK_UNREAD_URL => named_context_url(@context, :api_v1_context_discussion_topic_discussion_entry_mark_unread_url, @topic, ':id'),
+              :MANUAL_MARK_AS_READ => @current_user.try(:manual_mark_as_read?),
               :CURRENT_USER => user_display_json(@current_user),
               :INITIAL_POST_REQUIRED => @initial_post_required,
               :THREADED => @topic.threaded?
@@ -285,6 +289,7 @@ class DiscussionTopicsController < ApplicationController
   # @argument discussion_type
   #
   # @argument delayed_post_at If a timestamp is given, the topic will not be published until that time.
+  # @argument lock_at If a timestamp is given, the topic will be scheduled to lock at the provided timestamp. If the timestamp is in the past, the topic will be locked.
   #
   # @argument podcast_enabled If true, the topic will have an associated podcast feed.
   # @argument podcast_has_student_posts If true, the podcast will include posts from students as well. Implies podcast_enabled.
@@ -385,7 +390,7 @@ class DiscussionTopicsController < ApplicationController
     end
   end
 
-  API_ALLOWED_TOPIC_FIELDS = %w(title message discussion_type delayed_post_at podcast_enabled
+  API_ALLOWED_TOPIC_FIELDS = %w(title message discussion_type delayed_post_at lock_at podcast_enabled
                                 podcast_has_student_posts require_initial_post is_announcement)
   def process_discussion_topic(is_new = false)
     discussion_topic_hash = params.slice(*API_ALLOWED_TOPIC_FIELDS)
@@ -409,20 +414,23 @@ class DiscussionTopicsController < ApplicationController
       @topic.current_user = @current_user
       @topic.content_being_saved_by(@current_user)
 
-      # handle delayed posting
-      if discussion_topic_hash.has_key? :delayed_post_at
-        @topic.delayed_post_at = discussion_topic_hash[:delayed_post_at]
-        @topic.delayed_post_at = "" if @topic.delayed_post_at && @topic.delayed_post_at < Time.now
-        @topic.workflow_state = 'post_delayed' if @topic.delayed_post_at
-        @topic.workflow_state = 'active' if @topic.post_delayed? && !@topic.delayed_post_at
-      end
-
       if discussion_topic_hash.has_key?(:message)
         discussion_topic_hash[:message] = process_incoming_html_content(discussion_topic_hash[:message])
       end
 
-      #handle locking/unlocking
-      if params.has_key? :locked
+      # Set the delayed_post_at and lock_at if provided. This will be used to determine if the values have changed
+      # in order to know if we should rely on this data to update the workflow state
+      @topic.delayed_post_at = discussion_topic_hash[:delayed_post_at] if params.has_key? :delayed_post_at
+      @topic.lock_at = discussion_topic_hash[:lock_at] if params.has_key? :lock_at
+
+      if @topic.delayed_post_at_changed? || @topic.lock_at_changed?
+        @topic.workflow_state = @topic.desired_workflow_state
+      
+      # Handle locking/unlocking (overrides workflow state if provided). It appears that the locked param as a hash
+      # is from old code and is not being used. Verification requested.
+      elsif params.has_key?(:locked) && !params[:locked].is_a?(Hash)
+        @topic.delayed_post_at = ''
+        @topic.lock_at = ''
         if value_to_boolean(params[:locked])
           @topic.lock
         else

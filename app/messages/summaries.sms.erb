@@ -1,1 +1,4 @@
-<%= t :notifications_sms, "%{notifications_count} new notifications at %{url}", :notifications_count => delayed_messages.length, :url => HostUrl.default_host %>
+<% define_content :link do -%>
+<%= HostUrl.protocol %>://<%= primary_host %>/profile/communication
+<% end %>
+<%= t :notifications_sms, "%{notifications_count} new notifications at %{url}", :notifications_count => delayed_messages.length, :url => content(:link) %>

@@ -25,6 +25,11 @@ describe AssignmentOverrideApplicator do
       @assignment = assignment_model(:course => @course, :due_at => 5.days.from_now)
     end
 
+    it "should be serializable" do
+      override = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @student)
+      lambda { Marshal.dump(override) }.should_not raise_error(TypeError)
+    end
+
     it "should cache by assignment and user" do
       enable_cache do
         overrides1 = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student)
@@ -182,6 +187,13 @@ describe AssignmentOverrideApplicator do
         overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @fake_student)
         overrides.should == [override1, override2]
         AssignmentOverrideApplicator.collapsed_overrides(@assignment, overrides)[:due_at].should == due_at
+      end
+
+      it "should work for students even if :read_roster is disabled" do
+        RoleOverride.create!(:context => @course.root_account, :permission => 'read_roster',
+                             :enrollment_type => "StudentEnrollment", :enabled => false)
+        overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student)
+        overrides.should == [@override]
       end
     end
 

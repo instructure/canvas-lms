@@ -22,6 +22,9 @@ module Api::V1::DiscussionTopics
   include Api::V1::Attachment
 
   def discussion_topics_api_json(topics, context, user, session)
+    # remove the topics which are not visible for the current user from the returned list of topics
+    topics.reject! { |t| !t.visible_for?(user, :check_policies => true) }
+
     topics.map do |topic|
       discussion_topic_api_json(topic, context, user, session)
     end
@@ -42,7 +45,7 @@ module Api::V1::DiscussionTopics
     children = topic.child_topics.pluck(:id)
 
     api_json(topic, user, session, {
-                  :only => %w(id title assignment_id delayed_post_at last_reply_at posted_at root_topic_id podcast_has_student_posts),
+                  :only => %w(id title assignment_id delayed_post_at lock_at last_reply_at posted_at root_topic_id podcast_has_student_posts),
                   :methods => [:user_name, :discussion_subentry_count], }, [:attach, :update, :delete]
     ).tap do |json|
       json.merge! :message => api_user_content(topic.message, context),
@@ -53,7 +56,7 @@ module Api::V1::DiscussionTopics
                   :unread_count => topic.unread_count(user),
                   :topic_children => children,
                   :attachments => attachments,
-                  :locked => topic.locked?,
+                  :locked => (topic.locked_for?(user) || topic.locked?),
                   :author => user_display_json(topic.user, topic.context),
                   :html_url => context.is_a?(CollectionItem) ? nil :
                           named_context_url(context,
@@ -93,7 +96,12 @@ module Api::V1::DiscussionTopics
           json[:attachments] = [json[:attachment]]
         end
       end
-      json[:read_state] = entry.read_state(user) if user
+
+      if user
+        participant = entry.find_existing_participant(user)
+        json[:read_state] = participant.workflow_state
+        json[:forced_read_state] = participant.forced_read_state?
+      end
 
       if includes.include?(:subentries) && entry.root_entry_id.nil?
         replies = entry.flattened_discussion_subentries.active.newest_first.limit(11).all

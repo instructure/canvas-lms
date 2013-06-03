@@ -91,7 +91,7 @@ namespace :i18n do
       # 3.x it should treat the source as utf-8 (it ignores the source string encoding)
       # see https://github.com/seattlerb/ruby_parser/issues/101
       # unforunately this means line numbers in error messages are off by one
-      sexps = RubyParser.for_current_ruby.parse("#encoding:utf-8\n#{source}")
+      sexps = RubyParser.for_current_ruby.parse("#encoding:utf-8\n#{source}", file, 300)
       rb_extractor.scope = infer_scope(file)
       rb_extractor.in_html_view = (file =~ /\.(html|facebook)\.erb\z/)
       rb_extractor.process(sexps)

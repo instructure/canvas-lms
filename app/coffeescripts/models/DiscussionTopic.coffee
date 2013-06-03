@@ -50,8 +50,9 @@ define [
     # see: http://<canvas>/doc/api/discussion_topics.html#method.discussion_topics_api.view
     fetchEntries: ->
       baseUrl = _.result this, 'url'
-      $.get "#{baseUrl}/view", ({unread_entries, participants, view: entries}) =>
+      $.get "#{baseUrl}/view", ({unread_entries, forced_entries, participants, view: entries}) =>
         @unreadEntries = unread_entries
+        @forcedEntries = forced_entries
         @participants.reset participants
 
         # TODO: handle nested replies and 'new_entries' here

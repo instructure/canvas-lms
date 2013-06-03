@@ -99,6 +99,10 @@ class Group < ActiveRecord::Base
       (self.group_category.restricted_self_signup? && self.has_common_section_with_user?(user)))
   end
 
+  def full?
+    group_category && group_category.group_limit && participating_users.size >= group_category.group_limit
+  end
+
   def free_association?(user)
     auto_accept? || allow_join_request? || allow_self_signup?(user)
   end
@@ -319,7 +323,9 @@ class Group < ActiveRecord::Base
     can :read_roster and
     can :send_messages and
     can :send_messages_all and
-    can :follow
+    can :follow and
+    can :view_unpublished_items and
+    can :view_hidden_items
 
     # if I am a member of this group and I can moderate_forum in the group's context
     # (makes it so group members cant edit each other's discussion entries)
@@ -355,7 +361,9 @@ class Group < ActiveRecord::Base
     can :post_to_forum and
     can :read and
     can :read_roster and
-    can :update
+    can :update and
+    can :view_unpublished_items and
+    can :view_hidden_items
 
     given { |user, session| self.context && self.context.grants_right?(user, session, :view_group_pages) }
     can :read and can :read_roster

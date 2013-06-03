@@ -56,7 +56,7 @@ class Assignment < ActiveRecord::Base
   has_one :external_tool_tag, :class_name => 'ContentTag', :as => :context, :dependent => :destroy
   validates_associated :external_tool_tag, :if => :external_tool?
 
-  accepts_nested_attributes_for :external_tool_tag, :reject_if => proc { |attrs|
+  accepts_nested_attributes_for :external_tool_tag, :update_only => true, :reject_if => proc { |attrs|
     # only accept the url and new_tab params, the other accessible
     # params don't apply to an content tag being used as an external_tool_tag
     attrs.slice!(:url, :new_tab)
@@ -196,7 +196,7 @@ class Assignment < ActiveRecord::Base
       elsif due_at
         self.send_later_enqueue_args(:do_auto_peer_review, {
           :run_at => due_at,
-          :singleton => Shard.default.activate { "assignment:auto_peer_review:#{self.id}" }
+          :singleton => Shard.birth.activate { "assignment:auto_peer_review:#{self.id}" }
         })
       end
     end
@@ -780,10 +780,11 @@ class Assignment < ActiveRecord::Base
     Rails.cache.fetch(locked_cache_key(user), :expires_in => 1.minute) do
       locked = false
       assignment_for_user = self.overridden_for(user)
-      if (assignment_for_user.unlock_at && assignment_for_user.unlock_at > Time.now)
-        locked = {:asset_string => self.asset_string, :unlock_at => assignment_for_user.unlock_at}
-      elsif (assignment_for_user.lock_at && assignment_for_user.lock_at <= Time.now)
-        locked = {:asset_string => self.asset_string, :lock_at => assignment_for_user.lock_at}
+      if ((assignment_for_user.unlock_at && assignment_for_user.unlock_at > Time.now) ||
+          (assignment_for_user.lock_at && assignment_for_user.lock_at <= Time.now))
+        locked = { :asset_string => self.asset_string, 
+                   :unlock_at    => assignment_for_user.unlock_at,
+                   :lock_at      => assignment_for_user.lock_at }
       elsif self.could_be_locked && item = locked_by_module_item?(user, opts[:deep_check_if_needed])
         locked = {:asset_string => self.asset_string, :context_module => item.context_module.attributes}
       end
@@ -1009,7 +1010,7 @@ class Assignment < ActiveRecord::Base
     s = nil
     unique_constraint_retry do
       s = Submission.find_or_initialize_by_assignment_id_and_user_id(assignment_id, user_id)
-      s.save_without_broadcast if s.new_record?
+      s.save_without_broadcasting if s.new_record?
     end
     raise "bad" if s.new_record?
     s
@@ -1856,7 +1857,7 @@ class Assignment < ActiveRecord::Base
       # the needs_grading_count trigger should change self.updated_at, invalidating the cache
       Rails.cache.fetch(['assignment_user_grading_count', self, user].cache_key) do
         case self.context.enrollment_visibility_level_for(user, vis)
-          when :full
+          when :full, :limited
             self.needs_grading_count
           when :sections
             self.submissions.joins("INNER JOIN enrollments e ON e.user_id = submissions.user_id").

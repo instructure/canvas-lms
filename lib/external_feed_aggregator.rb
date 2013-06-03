@@ -62,21 +62,6 @@ class ExternalFeedAggregator
         rescue
         end
       end
-    elsif feed.feed_type == 'ical'
-      require 'icalendar'
-      begin
-        cals = Icalendar.parse(body)
-        tally = []
-        entries = []
-        cals.each do |cal|
-          tally += feed.events
-          entries += feed.add_ical_entries(cal)
-        end
-        @logger.info("#{tally.length} ical events found")
-        @logger.info("#{entries.length} new entries added")
-        return true
-      rescue
-      end
     end
     false
   end

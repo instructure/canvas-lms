@@ -103,14 +103,15 @@ module AssignmentOverrideApplicator
 
       overrides += observed_student_overrides.flatten.uniq
 
-      section_ids  = context.sections_visible_to(user).map(&:id)
-      # stupid special case for observers
+      section_ids = context.sections_visible_to(user).map(&:id)
+      # section visibilities is only useful if the user can read_roster in the course.
+      # otherwise, we need to get section ids this way:
       section_ids += context.section_visibilities_for(user).select { |v|
-        v[:type] == 'ObserverEnrollment'
+        ['StudentEnrollment', 'ObserverEnrollment', 'StudentViewEnrollment'].include? v[:type]
       }.map { |v| v[:course_section_id] }
 
       section_overrides = assignment_or_quiz.assignment_overrides.
-        where(:set_type => 'CourseSection', :set_id => section_ids)
+        where(:set_type => 'CourseSection', :set_id => section_ids.uniq)
 
       # TODO add position column to assignment_override, nil for non-section
       # overrides, (assignment_or_quiz, position) unique for section overrides
@@ -160,11 +161,9 @@ module AssignmentOverrideApplicator
     cloned_assignment_or_quiz.overridden = true
     cloned_assignment_or_quiz.readonly!
 
-    # make new_record? match the original (typically always true on AR clones,
-    # at least until saved, which we don't want to do)
-    klass = class << cloned_assignment_or_quiz; self; end
-    klass.send(:define_method, :new_record?) { unoverridden_assignment_or_quiz.new_record? }
-
+    new_record = unoverridden_assignment_or_quiz.instance_variable_get(:@new_record)
+    cloned_assignment_or_quiz.instance_variable_set(:@new_record, new_record)
+    
     cloned_assignment_or_quiz
   end
 

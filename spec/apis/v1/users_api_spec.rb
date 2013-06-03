@@ -543,6 +543,59 @@ describe "Users API", :type => :integration do
     end
   end
 
+  describe "user settings" do
+    before do
+      course_with_student(active_all: true)
+      account_admin_user
+    end
+
+    let(:path) { "/api/v1/users/#{@student.to_param}/settings" }
+    let(:path_options) {
+      { controller: 'users', action: 'settings', format: 'json',
+        id: @student.to_param }
+    }
+
+    context "an admin user" do
+      it "should be able to view other users' settings" do
+        json = api_call(:get, path, path_options)
+        json['manual_mark_as_read'].should be_false
+      end
+
+      it "should be able to update other users' settings" do
+        json = api_call(:put, path, path_options, manual_mark_as_read: true)
+        json['manual_mark_as_read'].should be_true
+
+        json = api_call(:put, path, path_options, manual_mark_as_read: false)
+        json['manual_mark_as_read'].should be_false
+      end
+    end
+
+    context "a student" do
+      before do
+        @user = @student
+      end
+
+      it "should be able to view its own settings" do
+        json = api_call(:get, path, path_options)
+        json['manual_mark_as_read'].should be_false
+      end
+
+      it "should be able to update its own settings" do
+        json = api_call(:put, path, path_options, manual_mark_as_read: true)
+        json['manual_mark_as_read'].should be_true
+
+        json = api_call(:put, path, path_options, manual_mark_as_read: false)
+        json['manual_mark_as_read'].should be_false
+      end
+
+      it "should receive 401 if updating another user's settings" do
+        @course.enroll_student(user).accept!
+        raw_api_call(:put, path, path_options, manual_mark_as_read: true)
+        response.code.should == '401'
+      end
+    end
+  end
+
   describe "user deletion" do
     before do
       @admin = account_admin_user

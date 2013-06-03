@@ -41,7 +41,7 @@
     border-color: #dadada;
   }
   .fc-header {
-    h2 {
+    h2, .h2 {
       font-size: 18px;
       padding: 0 16px;
       line-height: 32px;
@@ -145,7 +145,7 @@
 }
 
 .event-details {
-  h3 {
+  h3, .h3 {
     margin-bottom: 0;
   }
   &.carat-bottom .ui-menu-carat span {

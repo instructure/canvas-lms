@@ -188,12 +188,22 @@ define [
           $text.show()
           $target.hide()
       $pmAction = $message.find('a.send_private_message')
-      pmUrl = $.replaceTags $pmAction.attr('href'),
-        user_id: data.author_id
-        user_name: encodeURIComponent(userName)
-        from_conversation_id: @conversations.active?().id
-      $pmAction.attr('href', pmUrl).click (e) =>
+      $pmAction.on 'click', (e) =>
+        e.preventDefault()
         e.stopPropagation()
+        user = @userCache[data.author_id]
+        # Click the "New Message" button and after a short delay,
+        # add the clicked user's token to the input.
+        $('#action_compose_message').trigger('click')
+        clearTimeout @addUserTokenCb if @addUserTokenCb
+        @addUserTokenCb = setTimeout =>
+          delete @addUserTokenCb
+          @formPane.form.addToken
+            value: user.id
+            text: user.name
+            data: user
+        ,
+          100
       if data.forwarded_messages?.length
         $ul = $('<ul class="messages"></ul>')
         for submessage in data.forwarded_messages
@@ -302,7 +312,6 @@ define [
 
     closeMenus: () ->
       $('#actions .menus > li, #conversation_actions, #conversations .actions').removeClass('selected')
-      $('#conversations li.menu_active').removeClass('menu_active')
 
     openMenu: ($menu) ->
       @closeMenus()

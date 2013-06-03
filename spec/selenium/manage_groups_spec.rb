@@ -137,6 +137,14 @@ describe "manage groups" do
     new_category.groups.size.should == 2
   end
 
+  it "should honor group_limit when adding a self signup category" do
+    @course.enroll_student(user_model(:name => "John Doe"))
+    get "/courses/#{@course.id}/groups"
+    # submit new category form
+    new_category = add_category(@course, 'New Category', :enable_self_signup => true, :group_limit => '2')
+    new_category.group_limit.should == 2
+  end
+
   it "should preserve group to category association when editing a group" do
     groups_student_enrollment 3
     group_category = @course.group_categories.create(:name => "Existing Category")
@@ -161,6 +169,29 @@ describe "manage groups" do
     get "/courses/#{@course.id}/groups"
     f('.add_category_link').should be_displayed
     f('#no_students_message').should be_nil
+  end
+
+  it "should let you message students not in a group" do
+    groups_student_enrollment 3
+    group_category1 = @course.group_categories.create(:name => "Project Groups")
+    group_category2 = @course.group_categories.create(:name => "Self Signup Groups")
+    group_category2.configure_self_signup(true, false)
+    group_category2.save
+    get "/courses/#{@course.id}/groups"
+    wait_for_ajaximations
+
+    ff(".group_category").size.should == 3
+    keep_trying_until { !f("#category_#{group_category1.id} .right_side .loading_members").displayed? }
+    f('.group_category .student_links').should be_displayed
+    f('.group_category .message_students_link').should_not be_displayed # only self signup can do it
+    ff('.ui-tabs-anchor')[1].click
+
+    keep_trying_until { !f("#category_#{group_category2.id} .right_side .loading_members").displayed? }
+    message_students_link =  ff('.group_category .message_students_link')[1]
+    message_students_link.should be_displayed
+    message_students_link.click
+
+    keep_trying_until{ f('.message-students-dialog').should be_displayed }
   end
 
   context "data validation" do

@@ -54,6 +54,16 @@ module Api::V1::ContextModule
           course_context_modules_item_redirect_url(:id => content_tag.id)
       end
     end
+    
+    # add content_id, if applicable
+    # (note that wiki page ids are not exposed by the api)
+    unless %w(WikiPage ContextModuleSubHeader ExternalUrl).include? content_tag.content_type
+      hash['content_id'] = content_tag.content_id
+    end
+
+    if content_tag.content_type == 'WikiPage'
+      hash['page_url'] = content_tag.content.url
+    end
 
     # add data-api-endpoint link, if applicable
     api_url = nil
@@ -66,6 +76,12 @@ module Api::V1::ContextModule
         api_url = polymorphic_url([:api_v1, content_tag.content])
     end
     hash['url'] = api_url if api_url
+
+    # add external_url, if applicable
+    hash['external_url'] = content_tag.url if ['ExternalUrl', 'ContextExternalTool'].include?(content_tag.content_type)
+
+    # add new_tab, if applicable
+    hash['new_tab'] = content_tag.new_tab if content_tag.content_type == 'ContextExternalTool'
 
     # add completion requirements
     if criterion = context_module.completion_requirements && context_module.completion_requirements.detect { |r| r[:id] == content_tag.id }
