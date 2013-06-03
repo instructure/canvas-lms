@@ -169,7 +169,7 @@ define [
                               model: @model
                               el: @$selectContentDialog
                               title: 'Select Content'
-                              width: 600
-                              height: 400
+                              width: 800
+                              height: 600
 
       @selectContentView.open()

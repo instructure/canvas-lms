@@ -58,7 +58,6 @@ require [
   $.subscribe 'migrationCreated', (migrationModelData) -> 
     progressingMigCollection.add migrationModelData
 
-
   # Registers any subviews with any changes that happen 
   # when selecting a converter. Give it the value to
   # look for then the subview to insert. Works like 

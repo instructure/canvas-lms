@@ -5,9 +5,9 @@ define [
   'jst/courses/roster/createUsersWrapper'
   'compiled/views/DialogFormView'
   'compiled/views/CollectionView'
-  'compiled/views/content_migrations/MainCheckboxGroupView'
-  'compiled/collections/content_migrations/MainCheckboxGroupCollection'
-], (Backbone, _,  template, wrapperTemplate, DialogFormView, CollectionView, MainCheckboxGroupView, MainCheckboxGroupCollection) -> 
+  'compiled/collections/content_migrations/ContentCheckboxCollection'
+  'compiled/views/content_migrations/ContentCheckboxView'
+], (Backbone, _,  template, wrapperTemplate, DialogFormView, CollectionView , CheckboxCollection, CheckboxView) -> 
   class SelectContentView extends DialogFormView
 
     els: 
@@ -16,12 +16,6 @@ define [
     template: template
     wrapperTemplate: wrapperTemplate
 
-    # Form data returns nothing since we are syncing it to the model. 
-    #
-    # @api ValidatedFormView override
-
-    getFormData: -> {}
-    
     # Remove attributes from the model that shouldn't be sent by picking
     # them out of the original attributes, clearning the model then
     # re-setting the model. Trigger the models continue event which 
@@ -39,24 +33,25 @@ define [
       dfd?.done => 
         @model.trigger 'continue'
 
-    # Fetch the MainCheckboxGroups then open the dialog. Render the 
-    # checkboxes in the dialog when done loading. Cache the fetch 
-    # so it doesn't try to load more checkboxes every time you open
-    # the dialog box.
-    #
+    # Fetch top level checkboxes that have lower level checkboxes.
+    # If the dialog has been opened before it will cache the old 
+    # dialog window and re-open it instead of fetching the 
+    # check boxes again. 
     # @api private
 
-    open: => 
+    firstOpen: => 
       super
-      @mcgCollection ||= new MainCheckboxGroupCollection null,
-                                   courseID: @model?.course_id
-                                   migrationModel: @model
 
-      @mcgCollectionView ||= new CollectionView
-                               collection: @mcgCollection
-                               itemView: MainCheckboxGroupView
-                               el: @$formDialogContent
+      @checkboxCollection ||= new CheckboxCollection null,
+                                courseID: @model?.course_id
+                                migrationID: @model?.get('id')
 
-      dfd = @mcgCollection.fetch()
+
+      @checkboxCollectionView ||= new CollectionView
+                                    collection: @checkboxCollection
+                                    itemView: CheckboxView
+                                    el: @$formDialogContent
+
+      dfd = @checkboxCollection.fetch()
       @$el.disableWhileLoading dfd
-      @mcgCollectionView.render()
+      @checkboxCollectionView.render()

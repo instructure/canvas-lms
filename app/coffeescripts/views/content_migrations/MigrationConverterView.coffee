@@ -43,7 +43,7 @@ define [
     # This is the actual action for making the view swaps when selecting
     # a different converter view. Ensures that when you select a new view
     # you are resetting the models data to it's dynamic defaults and setting
-    # it's migration_type to the vie wbeing shown. 
+    # it's migration_type to the view being shown. 
     #
     # @api private
 
@@ -60,7 +60,6 @@ define [
     # of returning null. In that case, we don't want to do anything cause there were errors.
     #
     # @expects event
-    # @returns void
     # @api ValidatedFormView override
 
     submit: (event) -> 
