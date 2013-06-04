@@ -551,5 +551,20 @@ describe Group do
       @group.tabs_available(nil).map{|t|t[:id]}.should_not include Group::TAB_CONFERENCES
     end
   end
-  
+
+  describe "quota" do
+    it "should default to Group.default_storage_quota" do
+      @group.quota.should == Group.default_storage_quota
+    end
+
+    it "should be overridden by the account's default_group_storage_quota" do
+      a = @group.account
+      a.default_group_storage_quota = 10.megabytes
+      a.save!
+
+      @group.reload
+      @group.quota.should == 10.megabytes
+    end
+  end
+
 end

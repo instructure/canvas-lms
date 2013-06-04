@@ -427,7 +427,11 @@ class Group < ActiveRecord::Base
   end
 
   def quota
-    self.storage_quota || Setting.get_cached('group_default_quota', 50.megabytes.to_s).to_i
+    return self.storage_quota || self.account.default_group_storage_quota || self.class.default_storage_quota
+  end
+
+  def self.default_storage_quota
+    Setting.get_cached('group_default_quota', 50.megabytes.to_s).to_i
   end
 
   def storage_quota_mb

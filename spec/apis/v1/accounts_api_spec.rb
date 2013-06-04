@@ -22,9 +22,9 @@ describe "Accounts API", :type => :integration do
   before do
     Pseudonym.any_instance.stubs(:works_for_account?).returns(true)
     user_with_pseudonym(:active_all => true)
-    @a1 = account_model(:name => 'root', :default_time_zone => 'UTC', :default_storage_quota_mb => 123, :default_user_storage_quota_mb => 45)
+    @a1 = account_model(:name => 'root', :default_time_zone => 'UTC', :default_storage_quota_mb => 123, :default_user_storage_quota_mb => 45, :default_group_storage_quota_mb => 42)
     @a1.add_user(@user)
-    @a2 = account_model(:name => 'subby', :parent_account => @a1, :root_account => @a1, :sis_source_id => 'sis1', :default_time_zone => 'Alaska', :default_storage_quota_mb => 321, :default_user_storage_quota_mb => 54)
+    @a2 = account_model(:name => 'subby', :parent_account => @a1, :root_account => @a1, :sis_source_id => 'sis1', :default_time_zone => 'Alaska', :default_storage_quota_mb => 321, :default_user_storage_quota_mb => 54, :default_group_storage_quota_mb => 41)
     @a2.add_user(@user)
     @a3 = account_model(:name => 'no-access')
     # even if we have access to it implicitly, it's not listed
@@ -44,6 +44,7 @@ describe "Accounts API", :type => :integration do
           'default_time_zone' => 'UTC',
           'default_storage_quota_mb' => 123,
           'default_user_storage_quota_mb' => 45,
+          'default_group_storage_quota_mb' => 42,
         },
         {
           'id' => @a2.id,
@@ -54,6 +55,7 @@ describe "Accounts API", :type => :integration do
           'default_time_zone' => 'Alaska',
           'default_storage_quota_mb' => 321,
           'default_user_storage_quota_mb' => 54,
+          'default_group_storage_quota_mb' => 41,
         },
       ]
     end
@@ -126,6 +128,7 @@ describe "Accounts API", :type => :integration do
           'default_time_zone' => 'UTC',
           'default_storage_quota_mb' => 123,
           'default_user_storage_quota_mb' => 45,
+          'default_group_storage_quota_mb' => 42,
         }
     end
   end
@@ -237,6 +240,18 @@ describe "Accounts API", :type => :integration do
         @a1.reload
         @a1.default_user_storage_quota_mb.should == 678
       end
+
+      it 'should allow the default group quota to be set' do
+        json = api_call(:put, "/api/v1/accounts/#{@a1.id}", @params, {:account => {:default_group_storage_quota_mb => 678}})
+
+        json.should include({
+          'id' => @a1.id,
+          'default_group_storage_quota_mb' => 678,
+        })
+
+        @a1.reload
+        @a1.default_group_storage_quota_mb.should == 678
+      end
     end
 
     context 'without :manage_storage_quotas' do
@@ -265,6 +280,13 @@ describe "Accounts API", :type => :integration do
 
         @a1.reload
         @a1.default_user_storage_quota_mb.should == 45
+      end
+
+      it 'should not allow the default group quota to be set' do
+        json = api_call(:put, "/api/v1/accounts/#{@a1.id}", @params, {:account => {:default_group_storage_quota_mb => 678}}, {}, {:expected_status => 401})
+
+        @a1.reload
+        @a1.default_group_storage_quota_mb.should == 42
       end
     end
   end

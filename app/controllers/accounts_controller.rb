@@ -166,10 +166,11 @@ class AccountsController < ApplicationController
       end
 
       # quotas (:manage_account_quotas)
-      quota_settings = account_params.select {|k, v| [:default_storage_quota_mb, :default_user_storage_quota_mb].include?(k.to_sym)}.with_indifferent_access
+      quota_settings = account_params.select {|k, v| [:default_storage_quota_mb, :default_user_storage_quota_mb,
+                                                      :default_group_storage_quota_mb].include?(k.to_sym)}.with_indifferent_access
       unless quota_settings.empty?
         if is_authorized_action?(@account, @current_user, :manage_storage_quotas)
-          [:default_storage_quota_mb, :default_user_storage_quota_mb].each do |quota_type|
+          [:default_storage_quota_mb, :default_user_storage_quota_mb, :default_group_storage_quota_mb].each do |quota_type|
             next unless quota_settings.has_key?(quota_type)
 
             quota_value = quota_settings[quota_type].strip
@@ -211,6 +212,7 @@ class AccountsController < ApplicationController
   # @argument account[default_time_zone] [Optional] The default time zone of the account. Allowed time zones are listed in {http://rubydoc.info/docs/rails/ActiveSupport/TimeZone The Ruby on Rails documentation}.
   # @argument account[default_storage_quota_mb] [Optional] The default course storage quota to be used, if not otherwise specified.
   # @argument account[default_user_storage_quota_mb] [Optional] The default user storage quota to be used, if not otherwise specified.
+  # @argument account[default_group_storage_quota_mb] [Optional] The default group storage quota to be used, if not otherwise specified.
   #
   # @example_request
   #   curl https://<canvas>/api/v1/accounts/<account_id> \ 
@@ -229,6 +231,7 @@ class AccountsController < ApplicationController
   #     "root_account_id": null,
   #     "default_storage_quota_mb": 500,
   #     "default_user_storage_quota_mb": 50
+  #     "default_group_storage_quota_mb": 50
   #   }
   def update
     return update_api if api_request?
@@ -250,7 +253,9 @@ class AccountsController < ApplicationController
         allow_sis_import = params[:account].delete :allow_sis_import
         params[:account].delete :default_user_storage_quota_mb unless @account.root_account? && !@account.site_admin?
         unless @account.grants_right? @current_user, :manage_storage_quotas
-          [:storage_quota, :default_storage_quota, :default_storage_quota_mb, :default_user_storage_quota_mb].each { |key| params[:account].delete key }
+          [:storage_quota, :default_storage_quota, :default_storage_quota_mb,
+           :default_user_storage_quota, :default_user_storage_quota_mb,
+           :default_group_storage_quota, :default_group_storage_quota_mb].each { |key| params[:account].delete key }
         end
         if params[:account][:services]
           params[:account][:services].slice(*Account.services_exposed_to_ui_hash(nil, @current_user).keys).each do |key, value|

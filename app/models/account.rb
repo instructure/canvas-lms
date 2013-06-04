@@ -22,7 +22,7 @@ class Account < ActiveRecord::Base
     :turnitin_shared_secret, :turnitin_comments, :turnitin_pledge,
     :default_time_zone, :parent_account, :settings, :default_storage_quota,
     :default_storage_quota_mb, :storage_quota, :ip_filters, :default_locale,
-    :default_user_storage_quota_mb
+    :default_user_storage_quota_mb, :default_group_storage_quota_mb
 
   include Workflow
   belongs_to :parent_account, :class_name => 'Account'
@@ -455,6 +455,25 @@ class Account < ActiveRecord::Base
   
   def default_user_storage_quota_mb=(val)
     self.default_user_storage_quota = val.try(:to_i).try(:megabytes)
+  end
+
+  def default_group_storage_quota
+    read_attribute(:default_group_storage_quota) ||
+        Group.default_storage_quota
+  end
+
+  def default_group_storage_quota=(val)
+    val = val.to_i
+    val = nil if val == Group.default_storage_quota || val <= 0
+    write_attribute(:default_group_storage_quota, val)
+  end
+
+  def default_group_storage_quota_mb
+    default_group_storage_quota / 1.megabyte
+  end
+
+  def default_group_storage_quota_mb=(val)
+    self.default_group_storage_quota = val.try(:to_i).try(:megabytes)
   end
 
   def turnitin_shared_secret=(secret)
