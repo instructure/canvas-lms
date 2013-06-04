@@ -57,7 +57,7 @@ class QuizStatistics::ItemAnalysis < QuizStatistics::Report
             item.variance,
             item.standard_deviation,
             item.difficulty_index,
-            stats.size > MIN_STATS_FOR_ALPHA ? stats.alpha : "N/A"
+            stats.size > MIN_STATS_FOR_ALPHA && stats.alpha ? stats.alpha : "N/A"
           ]
           point_biserial_max_count.times do |i|
             row << item.point_biserials[i]
