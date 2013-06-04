@@ -19,6 +19,7 @@
 module Api::V1::Quiz
   include Api::V1::Json
   include Api::V1::AssignmentOverride
+  include Api::V1::Locked
 
   API_ALLOWED_QUIZ_OUTPUT_FIELDS = {
     :only => %w(
@@ -73,11 +74,13 @@ module Api::V1::Quiz
   end
 
   def quiz_json(quiz, context, user, session)
-    api_json(quiz, user, session, API_ALLOWED_QUIZ_OUTPUT_FIELDS).merge(
+    hash = api_json(quiz, user, session, API_ALLOWED_QUIZ_OUTPUT_FIELDS).merge(
       :html_url => polymorphic_url([context, quiz]),
       :mobile_url => polymorphic_url([context, quiz], :persist_headless => 1, :force_user => 1),
       :published => quiz.published?
     )
+    locked_json(hash, quiz, user, 'quiz', :context => context)
+    hash
   end
 
   def filter_params(quiz_params)

@@ -18,6 +18,7 @@
 
 module Api::V1::Attachment
   include Api::V1::Json
+  include Api::V1::Locked
 
   def attachments_json(files, user, url_options = {}, options = {})
     files.map do |f|
@@ -34,7 +35,7 @@ module Api::V1::Attachment
       file_download_url(attachment, { :verifier => attachment.uuid, :download => '1', :download_frd => '1' }.merge(url_options))
     end
     
-    {
+    hash = {
       'id' => attachment.id,
       'content-type' => attachment.content_type,
       'display_name' => attachment.display_name,
@@ -47,10 +48,11 @@ module Api::V1::Attachment
       'locked' => !!attachment.locked,
       'hidden' => !!attachment.hidden?,
       'lock_at' => attachment.lock_at,
-      'locked_for_user' => can_manage_files ? false : !!attachment.currently_locked,
       'hidden_for_user' => can_manage_files ? false : !!attachment.hidden?,
       'thumbnail_url' => attachment.thumbnail_url
     }
+    locked_json(hash, attachment, user, 'file')
+    hash
   end
 
   # create an attachment in the context based on the AR request, and

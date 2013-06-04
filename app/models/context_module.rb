@@ -139,8 +139,9 @@ class ContextModule < ActiveRecord::Base
   def locked_for?(user, opts={})
     return false if self.grants_right?(user, nil, :update)
     available = self.available_for?(user, opts)
-    return true unless available
-    self.to_be_unlocked
+    return {:asset_string => self.asset_string, :context_module => self.attributes} unless available
+    return {:asset_string => self.asset_string, :context_module => self.attributes, :unlock_at => self.unlock_at} if self.to_be_unlocked
+    false
   end
   
   def available_for?(user, opts={})

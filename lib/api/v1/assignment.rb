@@ -20,6 +20,7 @@ module Api::V1::Assignment
   include Api::V1::Json
   include ApplicationHelper
   include Api::V1::ExternalTools::UrlHelpers
+  include Api::V1::Locked
 
   API_ALLOWED_ASSIGNMENT_OUTPUT_FIELDS = {
     :only => %w(
@@ -94,10 +95,6 @@ module Api::V1::Assignment
       hash['peer_reviews_assign_at'] = assignment.peer_reviews_assign_at
     end
 
-    if hash['lock_info']
-      hash['lock_explanation'] = lock_explanation(hash['lock_info'], 'assignment', assignment.context)
-    end
-
     if assignment.grants_right?(user, :grade)
       hash['needs_grading_count'] = assignment.needs_grading_count_for_user user
     end
@@ -151,6 +148,8 @@ module Api::V1::Assignment
     if submission
       hash['submission'] = submission_json(submission,assignment,user,session)
     end
+
+    locked_json(hash, assignment, user, 'assignment')
 
     hash
   end
