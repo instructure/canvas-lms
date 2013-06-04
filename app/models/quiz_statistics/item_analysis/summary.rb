@@ -77,9 +77,13 @@ class QuizStatistics::ItemAnalysis::Summary
 
   def alpha
     @alpha ||= begin
-      items = @items.values
-      variance_sum = items.map(&:variance).sum
-      items.size / (items.size - 1.0) * (1 - variance_sum / variance)
+      if variance != 0
+        items = @items.values
+        variance_sum = items.map(&:variance).sum
+        items.size / (items.size - 1.0) * (1 - variance_sum / variance)
+      else
+        nil
+      end
     end
   end
 end
