@@ -61,7 +61,22 @@
 #       published: true,
 #
 #       // whether this page is the front page for the wiki
-#       front_page: false
+#       front_page: false,
+#
+#       // Whether or not this is locked for the user.
+#       locked_for_user: false,
+#
+#       // (Optional) Information for the user about the lock. Present when locked_for_user is true.
+#       lock_info: {
+#         // Asset string for the object causing the lock
+#         asset_string: "wiki_page_1",
+#
+#         // (Optional) Context module causing the lock.
+#         context_module: { ... }
+#       },
+#
+#       // (Optional) An explanation of why this is locked for the user. Present when locked_for_user is true.
+#       lock_explanation: "This discussion is locked until September 1 at 12:00am"
 #     }
 class WikiPagesApiController < ApplicationController
   before_filter :require_context
@@ -85,10 +100,7 @@ class WikiPagesApiController < ApplicationController
     if authorized_action(@context.wiki, @current_user, :read)
       pages_route = polymorphic_url([:api_v1, @context, :wiki_pages])
       # omit body from selection, since it's not included in index results
-      scope = @context.wiki.wiki_pages.
-          select(%w(wiki_pages.wiki_id wiki_pages.url wiki_pages.title wiki_pages.created_at wiki_pages.updated_at wiki_pages.hide_from_students wiki_pages.editing_roles wiki_pages.workflow_state wiki_pages.user_id)).
-          includes(:user)
-
+      scope = @context.wiki.wiki_pages.select(WikiPage.column_names - ['body']).includes(:user)
       scope = @context.grants_right?(@current_user, session, :view_unpublished_items) ? scope.not_deleted : scope.active
       scope = scope.visible_to_students unless @context.grants_right?(@current_user, session, :view_hidden_items)
 

@@ -34,6 +34,14 @@
 #       "hidden':false,
 #       "lock_at':null,
 #       "locked_for_user":false,
+#       "lock_info":{
+#         "asset_string":"file_569",
+#         "unlock_at":"2013-01-01T00:00:00-06:00",
+#         "lock_at":"2013-02-01T00:00:00-06:00",
+#         "context_module":{ ... },
+#         "manually_locked":true
+#       },
+#       "lock_explanation":"This assignment is locked until September 1 at 12:00am",
 #       "hidden_for_user":false,
 #       "thumbnail_url":null
 #     }

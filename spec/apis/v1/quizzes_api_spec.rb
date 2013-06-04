@@ -17,8 +17,26 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../locked_spec')
 
 describe QuizzesApiController, :type => :integration do
+  context 'locked api item' do
+    let(:item_type) { 'quiz' }
+
+    let(:locked_item) do
+      @course.quizzes.create!(:title => 'Locked Quiz')
+    end
+
+    def api_get_json
+      api_call(
+        :get,
+        "/api/v1/courses/#{@course.id}/quizzes/#{locked_item.id}",
+        {:controller=>'quizzes_api', :action=>'show', :format=>'json', :course_id=>"#{@course.id}", :id => "#{locked_item.id}"},
+      )
+    end
+
+    it_should_behave_like 'a locked api item'
+  end
 
   describe "GET /courses/:course_id/quizzes (index)" do
     before { teacher_in_course(:active_all => true) }

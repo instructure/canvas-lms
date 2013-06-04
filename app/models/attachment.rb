@@ -1144,7 +1144,7 @@ class Attachment < ActiveRecord::Base
 
   def locked_for?(user, opts={})
     return false if opts[:check_policies] && self.grants_right?(user, nil, :update)
-    return {:manually_locked => true} if self.locked || (self.folder && self.folder.locked?)
+    return {:asset_string => self.asset_string, :manually_locked => true} if self.locked || (self.folder && self.folder.locked?)
     Rails.cache.fetch(locked_cache_key(user), :expires_in => 1.minute) do
       locked = false
       if (self.unlock_at && Time.now < self.unlock_at)

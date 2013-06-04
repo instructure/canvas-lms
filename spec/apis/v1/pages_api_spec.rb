@@ -16,8 +16,31 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../locked_spec')
 
 describe "Pages API", :type => :integration do
+  context 'locked api item' do
+    let(:item_type) { 'page' }
+
+    let(:locked_item) do
+      wiki = @course.wiki
+      front_page = wiki.front_page
+      front_page.workflow_state = 'active'
+      front_page.save!
+      front_page
+    end
+
+    def api_get_json
+      api_call(
+        :get,
+        "/api/v1/courses/#{@course.id}/pages/#{locked_item.url}",
+        {:controller=>'wiki_pages_api', :action=>'show', :format=>'json', :course_id=>"#{@course.id}", :url=>locked_item.url},
+      )
+    end
+
+    it_should_behave_like 'a locked api item'
+  end
+
   before do
     course
     @course.offer!
@@ -117,7 +140,8 @@ describe "Pages API", :type => :integration do
                      "title" => @hidden_page.title,
                      "body" => @hidden_page.body,
                      "published" => true,
-                     "front_page" => false
+                     "front_page" => false,
+                     "locked_for_user" => false,
         }
         json.should == expected
       end
@@ -137,7 +161,8 @@ describe "Pages API", :type => :integration do
                      "title" => page.title,
                      "body" => page.body,
                      "published" => true,
-                     "front_page" => true
+                     "front_page" => true,
+                     "locked_for_user" => false,
         }
         json.should == expected
       end

@@ -17,6 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../locked_spec')
 
 class TestCourseApi
   include Api
@@ -73,6 +74,24 @@ end
 
 describe DiscussionTopicsController, :type => :integration do
   include Api::V1::User
+
+  context 'locked api item' do
+    let(:item_type) { 'discussion_topic' }
+
+    let(:locked_item) do
+      @course.discussion_topics.create!(:message => 'Locked Discussion')
+    end
+
+    def api_get_json
+      api_call(
+        :get,
+        "/api/v1/courses/#{@course.id}/discussion_topics/#{locked_item.id}",
+        {:controller => 'discussion_topics_api', :action => 'show', :format => 'json', :course_id => @course.id.to_s, :topic_id => locked_item.id.to_s},
+      )
+    end
+
+    it_should_behave_like 'a locked api item'
+  end
 
   before(:each) do
     course_with_teacher(:active_all => true, :user => user_with_pseudonym)
@@ -226,6 +245,7 @@ describe DiscussionTopicsController, :type => :integration do
                   "topic_children"=>[@sub.id],
                   "discussion_type" => 'side_comment',
                   "locked"=>false,
+                  "locked_for_user"=>false,
                   "author" => user_display_json(@topic.user, @topic.context).stringify_keys!,
                   "permissions" => { "delete"=>true, "attach"=>true, "update"=>true }}
     end
@@ -696,6 +716,7 @@ describe DiscussionTopicsController, :type => :integration do
       "discussion_type" => 'side_comment',
       "permissions" => {"delete"=>true, "attach"=>true, "update"=>true},
       "locked" => false,
+      "locked_for_user" => false,
       "author" => user_display_json(gtopic.user, gtopic.context).stringify_keys!
     }
     json.should == expected

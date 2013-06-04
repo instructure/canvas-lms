@@ -89,8 +89,28 @@
 #       unlock_at: "2013-01-21T23:59:00-07:00",
 #
 #       // whether the quiz has a published or unpublished draft state.
-#       published: true
+#       published: true,
 #
+#       // Whether or not this is locked for the user.
+#       locked_for_user: false,
+#
+#       // (Optional) Information for the user about the lock. Present when locked_for_user is true.
+#       lock_info: {
+#         // Asset string for the object causing the lock
+#         asset_string: "quiz_5",
+#
+#         // (Optional) Time at which this was/will be unlocked.
+#         unlock_at: "2013-01-01T00:00:00-06:00",
+#
+#         // (Optional) Time at which this was/will be locked.
+#         lock_at: "2013-02-01T00:00:00-06:00",
+#
+#         // (Optional) Context module causing the lock.
+#         context_module: { ... }
+#       },
+#
+#       // (Optional) An explanation of why this is locked for the user. Present when locked_for_user is true.
+#       lock_explanation: "This quiz is locked until September 1 at 12:00am"
 #     }
 #
 class QuizzesApiController < ApplicationController

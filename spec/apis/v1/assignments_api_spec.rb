@@ -17,11 +17,26 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../locked_spec')
 
 describe AssignmentsApiController, :type => :integration do
   include Api
   include Api::V1::Assignment
   include Api::V1::Submission
+
+  context 'locked api item' do
+    let(:item_type) { 'assignment' }
+
+    let(:locked_item) do
+      @course.assignments.create!(:title => 'Locked Assignment')
+    end
+
+    def api_get_json
+      api_get_assignment_in_course(locked_item, @course)
+    end
+
+    it_should_behave_like 'a locked api item'
+  end
 
   def create_submitted_assignment_with_user(user=@user)
       now = Time.zone.now
@@ -994,6 +1009,7 @@ describe AssignmentsApiController, :type => :integration do
           'position' => @topic.position,
           'topic_children' => [],
           'locked' => false,
+          'locked_for_user' => false,
           'root_topic_id' => @topic.root_topic_id,
           'podcast_url' => nil,
           'podcast_has_student_posts' => nil,

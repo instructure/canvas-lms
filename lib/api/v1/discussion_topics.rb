@@ -20,6 +20,7 @@ module Api::V1::DiscussionTopics
   include Api::V1::Json
   include Api::V1::User
   include Api::V1::Attachment
+  include Api::V1::Locked
 
   def discussion_topics_api_json(topics, context, user, session)
     # remove the topics which are not visible for the current user from the returned list of topics
@@ -58,13 +59,14 @@ module Api::V1::DiscussionTopics
                   :unread_count => topic.unread_count(user),
                   :topic_children => children,
                   :attachments => attachments,
-                  :locked => (topic.locked_for?(user) || topic.locked?),
+                  :locked => topic.locked?,
                   :author => user_display_json(topic.user, topic.context),
                   :html_url => context.is_a?(CollectionItem) ? nil :
                           named_context_url(context,
                                             :context_discussion_topic_url,
                                             topic,
                                             :include_host => true)
+      locked_json(json, topic, user, session)
       json[:url] = json[:html_url] # deprecated
       if include_assignment && topic.assignment
         extend Api::V1::Assignment

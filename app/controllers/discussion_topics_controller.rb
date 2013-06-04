@@ -69,6 +69,27 @@
 #        // whether or not the discussion has been "pinned" by an instructor
 #        "pinned":false,
 #
+#        // Whether or not this is locked for the user.
+#        "locked_for_user":true,
+#
+#        // (Optional) Information for the user about the lock. Present when locked_for_user is true.
+#        "lock_info": {
+#          // Asset string for the object causing the lock
+#          "asset_string":"discussion_topic_1",
+#
+#          // (Optional) Time at which this was/will be unlocked.
+#          "unlock_at":"2013-01-01T00:00:00-06:00",
+#
+#          // (Optional) Time at which this was/will be locked.
+#          "lock_at":"2013-02-01T00:00:00-06:00",
+#
+#          // (Optional) Context module causing the lock.
+#          "context_module":{ ... }
+#        },
+#
+#        // (Optional) An explanation of why this is locked for the user. Present when locked_for_user is true.
+#        "lock_explanation":"This discussion is locked until September 1 at 12:00am",
+#
 #        // The username of the topic creator.
 #        "user_name":"User Name",
 #

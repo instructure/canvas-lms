@@ -17,8 +17,28 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../locked_spec')
 
 describe "Files API", :type => :integration do
+  context 'locked api item' do
+    let(:item_type) { 'file' }
+
+    let(:locked_item) do
+      root_folder = Folder.root_folders(@course).first
+      Attachment.create!(:filename => 'test.png', :display_name => 'test-frd.png', :uploaded_data => stub_png_data, :folder => root_folder, :context => @course)
+    end
+
+    def api_get_json
+      api_call(
+        :get,
+        "/api/v1/files/#{locked_item.id}",
+        {:controller=>'files', :action=>'api_show', :format=>'json', :id => locked_item.id.to_s},
+      )
+    end
+
+    it_should_behave_like 'a locked api item'
+  end
+
   before do
     course_with_teacher(:active_all => true, :user => user_with_pseudonym)
   end
