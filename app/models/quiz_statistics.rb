@@ -61,7 +61,8 @@ class QuizStatistics < ActiveRecord::Base
   def generate_csv_in_background
     return if csv_attachment
     start_progress
-    send_later_enqueue_args :generate_csv, :strand => 'quiz_statistics'
+    strand_id = Shard.birth.activate { quiz_id }
+    send_later_enqueue_args :generate_csv, :strand => "quiz_statistics_#{strand_id}"
   end
 
   def start_progress
