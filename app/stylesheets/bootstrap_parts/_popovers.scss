@@ -163,6 +163,19 @@ $popoverArrowDistanceFromCorner: $popoverArrowOuterWidth;
     bottom: $popoverArrowDistanceFromCorner + 1;
   }
   &.top.horizontal:before {
+    margin-top: 0;
     top: $popoverArrowDistanceFromCorner;
+  }
+  &.top.horizontal:after {
+    margin-top: 0;
+    top: $popoverArrowDistanceFromCorner + 1;
+  }
+  &.content-top.horizontal:before {
+    margin-top: 0;
+    top: 35px;
+  }
+  &.content-top.horizontal:after {
+    margin-top: 0;
+    top: 36px;
   }
 }
