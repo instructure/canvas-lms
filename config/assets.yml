@@ -166,5 +166,7 @@ stylesheets:
     - public/stylesheets/compiled/syntax.css
   locale:
     - public/stylesheets/compiled/locale.css
+  mobile_auth:
+    - public/stylesheets/compiled/mobile_auth.css
 
   <%= plugin_assets.anchors_yml %>

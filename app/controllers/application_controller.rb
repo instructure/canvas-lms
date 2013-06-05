@@ -1454,6 +1454,10 @@ class ApplicationController < ActionController::Base
     session[:browser_supported]
   end
 
+  def mobile_device?
+    params[:mobile] || request.user_agent.to_s =~ /ipod|iphone|ipad|Android/i
+  end
+
   def profile_data(profile, viewer, session, includes)
     extend Api::V1::UserProfile
     extend Api::V1::Course
