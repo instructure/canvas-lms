@@ -29,7 +29,11 @@
         {{#t "view"}}View{{/t}}
       </a>
     {{else}}
-      {{#t "no_recording"}}No&nbsp;Recording{{/t}}
+      {{#if user_settings.record}}
+        {{#t "preparing_video"}}Preparing Video{{/t}}
+      {{else}}
+        {{#t "no_recording"}}No Recording{{/t}}
+      {{/if}}
     {{/if}}
   </div>
 </div>

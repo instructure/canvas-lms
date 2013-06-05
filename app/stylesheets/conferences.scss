@@ -113,7 +113,10 @@ header {
 }
 .conference-day       { width: 80px; }
 .conference-length    { width: 70px; }
-.conference-recording { width: 80px; }
+.conference-recording {
+  width: 80px;
+  white-space: nowrap;
+}
 
 .conference-actions .actions a {
   clip: rect(1px, 1px, 1px, 1px);
