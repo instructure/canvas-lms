@@ -143,6 +143,27 @@ describe CalendarsController do
       assigns[:contexts][0].should eql(@user)
       assigns[:contexts][1].should eql(@course)
     end
+
+    specs_require_sharding
+
+    it "should set permissions using contexts from the correct shard" do
+      # non-shard-aware code could use a shard2 id on shard1. this could grab the wrong course,
+      # or no course at all. this sort of aliasing used to break a permission check in show2
+      calendar2_only!
+      user(:active_all => true)
+      user_session(@user)
+      invalid_shard1_course_id = (Course.maximum(:id) || 0) + 1
+      @shard2.activate do
+        account = Account.create!
+        @course = account.courses.build
+        @course.id = invalid_shard1_course_id
+        @course.save!
+        @course.offer!
+        student_in_course(:active_all => true, :user => @user)
+      end
+      get 'show2', :user_id => @user.id
+      response.should be_success
+    end
   end
 
   describe "POST 'switch_calendar'" do
