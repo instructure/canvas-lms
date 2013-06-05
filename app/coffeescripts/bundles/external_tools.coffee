@@ -8,6 +8,7 @@ require [
 
     # Collections
     externalTools = new ExternalToolCollection
+    externalTools.setParam('per_page', 20)
 
     apps = new PaginatedCollection
     apps.resourceName = 'app_center/apps'
