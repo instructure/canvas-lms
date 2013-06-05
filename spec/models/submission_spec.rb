@@ -506,6 +506,39 @@ describe Submission do
       end
     end
 
+    describe "group" do
+      before(:each) do
+        @teacher = User.create(:name => "some teacher")
+        @student = User.create(:name => "a student")
+        @student1 = User.create(:name => "student 1")
+        @context.enroll_teacher(@teacher)
+        @context.enroll_student(@student)
+        @context.enroll_student(@student1)
+
+        @a = assignment_model(:course => @context, :group_category => "Study Groups")
+        @a.submission_types = "online_upload,online_text_entry"
+        @a.turnitin_enabled = true
+        @a.save!
+
+        @group1 = @a.context.groups.create!(:name => "Study Group 1", :group_category => @a.group_category)
+        @group1.add_user(@student)
+        @group1.add_user(@student1)
+      end
+
+      it "should submit to turnitin for the original submitter" do
+        submission = @a.submit_homework @student, :submission_type => "online_text_entry", :body => "blah"
+        submissions = Submission.find_all_by_assignment_id @a.id
+        submissions.each do |s|
+          if s.id == submission.id
+            s.turnitin_data[:last_processed_attempt].should > 0
+          else
+            s.turnitin_data.should == nil
+          end
+        end
+      end
+
+    end
+
     context "report" do
       before do
         @assignment.submission_types = "online_upload,online_text_entry"

@@ -287,7 +287,7 @@ class Submission < ActiveRecord::Base
   def prep_for_submitting_to_turnitin
     last_attempt = self.turnitin_data && self.turnitin_data[:last_processed_attempt]
     @submit_to_turnitin = false
-    if self.turnitinable? && (!last_attempt || last_attempt < self.attempt)
+    if self.turnitinable? && (!last_attempt || last_attempt < self.attempt) && (@group_broadcast_submission || !self.group)
       self.turnitin_data ||= {}
       if self.turnitin_data[:last_processed_attempt] != self.attempt
         self.turnitin_data[:last_processed_attempt] = self.attempt
