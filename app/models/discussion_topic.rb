@@ -331,6 +331,7 @@ class DiscussionTopic < ActiveRecord::Base
   def auto_update_workflow
     transition_to_workflow_state(desired_workflow_state)
   end
+  alias_method :try_posting_delayed, :auto_update_workflow
 
   # Determine the desired workflow_state based on current values of delayed_post_at and lock_at
   #
