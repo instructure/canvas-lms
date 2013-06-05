@@ -20,7 +20,7 @@ define [
       ##
       # Only catch events for the top level "add reply" form,
       # EntriesView handles the clicks for the other replies
-      'click #discussion_topic .discussion-reply-form [data-event]': 'handleEvent'
+      'click #discussion_topic .discussion-reply-action[data-event]': 'handleEvent'
       'click .add_root_reply': 'addRootReply'
       'click .discussion_locked_toggler': 'toggleLocked'
       'click .toggle_due_dates': 'toggleDueDates'
@@ -105,8 +105,10 @@ define [
     render: ->
       # erb renders most of this
       if ENV.DISCUSSION.PERMISSIONS.CAN_REPLY
-        html = replyTemplate @model.toJSON()
-        @$('.entry_content:first').append html
+        modelData = @model.toJSON()
+        modelData.showBoxReplyLink = true
+        html = replyTemplate modelData
+        @$('#discussion_topic').append html
       super
     format: (attr, value) ->
       if attr is 'notification'

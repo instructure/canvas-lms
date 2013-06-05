@@ -44,9 +44,12 @@ define [
 
     computedAttributes: [
       'canModerate'
+      'canReply'
       'speedgraderUrl'
+      'inlineReplyLink'
       { name: 'allowsSideComments', deps: ['parent_id', 'deleted'] }
       { name: 'allowsThreadedReplies', deps: ['deleted'] }
+      { name: 'showBoxReplyLink', deps: ['allowsSideComments'] }
       { name: 'collapsable', deps: ['replies', 'allowsSideComments', 'allowsThreadedReplies'] }
       { name: 'summary', deps: ['message'] }
     ]
@@ -107,6 +110,21 @@ define [
       isAuthorsEntry and ENV.DISCUSSION.PERMISSIONS.CAN_MANAGE_OWN or ENV.DISCUSSION.PERMISSIONS.MODERATE
 
     ##
+    # Computed attribute to determine if the entry can be replied to
+    # by the current user
+    canReply: ->
+      return no if @get 'deleted'
+      return no unless ENV.DISCUSSION.PERMISSIONS.CAN_REPLY
+      yes
+
+    ##
+    # Computed attribute to determine if an inlineReplyLink should be
+    # displayed for the entry.
+    inlineReplyLink: ->
+      return yes if ENV.DISCUSSION.THREADED && (@allowsThreadedReplies() || @allowsSideComments())
+      no
+
+    ##
     # Only threaded discussions get the ability to reply in an EntryView
     # Directed discussions have the reply form in the EntryCollectionView
     allowsThreadedReplies: ->
@@ -121,6 +139,9 @@ define [
       return no if ENV.DISCUSSION.THREADED
       return no if @get 'parent_id'
       yes
+
+    showBoxReplyLink: ->
+      @allowsSideComments()
 
     collapsable: ->
       @hasChildren() or

@@ -214,9 +214,11 @@ define [
         @trigger 'addReply'
 
     addReplyAttachment: (event, $el) ->
+      event.preventDefault()
       @reply.addAttachment($el)
 
     removeReplyAttachment: (event, $el) ->
+      event.preventDefault()
       @reply.removeAttachment($el)
 
     format: (attr, value) ->

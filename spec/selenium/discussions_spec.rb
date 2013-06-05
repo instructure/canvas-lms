@@ -166,7 +166,7 @@ describe "discussions" do
         f("#discussion-toolbar .al-trigger").click
         expect_new_page_load { f(".discussion_locked_toggler").click }
         f('.discussion-fyi').text.should == 'This topic is closed for comments'
-        ff('.discussion-reply-label').should be_empty
+        ff('.discussion-reply-action').should be_empty
         DiscussionTopic.last.workflow_state.should == 'locked'
       end
 
@@ -174,7 +174,7 @@ describe "discussions" do
         create_and_go_to_topic('closed discussion', 'side_comment', true)
         f("#discussion-toolbar .al-trigger").click
         expect_new_page_load { f(".discussion_locked_toggler").click }
-        ff('.discussion-reply-label').should_not be_empty
+        ff('.discussion-reply-action').should_not be_empty
         DiscussionTopic.last.workflow_state.should == 'active'
       end
 
@@ -941,9 +941,10 @@ describe "discussions" do
         get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
         wait_for_ajax_requests
 
-        f('.add-side-comment-wrap .discussion-reply-label').click
-        type_in_tiny '.reply-textarea', side_comment_text
-        submit_form('.add-side-comment-wrap')
+        f('.discussion-entries .discussion-reply-action').click
+        wait_for_animations
+        type_in_tiny 'textarea', side_comment_text
+        submit_form('.discussion-entries .discussion-reply-form')
         wait_for_ajaximations
 
         last_entry = DiscussionEntry.last

@@ -17,10 +17,13 @@ define [
     #
     # @param {view} an EntryView instance
     constructor: (@view, @options={}) ->
-      @el = @view.$ '.discussion-reply-label:first'
-      @showWhileEditing = @el.next()
+      @el = @view.$ '.discussion-reply-action:first'
+      # works for threaded discussion topic and entries
+      @discussionEntry = @el.closest '.discussion_entry'
+      # required for non-threaded reply area at bottom of an entry block
+      @discussionEntry = @el.closest '.entry' if @discussionEntry.length == 0
+      @form = @discussionEntry.find('form:first').submit preventDefault @submit
       @textArea = @getEditingElement()
-      @form = @el.closest('form').submit preventDefault @submit
       @form.find('.cancel_button').click @hide
       @form.on 'click', '.toggle-wrapper a', (e) =>
         e.preventDefault()
@@ -44,8 +47,8 @@ define [
     # @api public
     edit: ->
       @form.addClass 'replying'
+      @discussionEntry.addClass 'replying'
       @textArea.editorBox tinyOptions: width: '100%'
-      @el.hide()
       setTimeout (=> @textArea.editorBox 'focus'), 20 if @options.focus
       @editing = true
       @trigger 'edit', this
@@ -58,8 +61,8 @@ define [
       @content = @textArea._justGetCode()
       @textArea._removeEditor()
       @form.removeClass 'replying'
+      @discussionEntry.removeClass 'replying'
       @textArea.val @content
-      @el.show()
       @editing = false
       @trigger 'hide', this
 
@@ -82,7 +85,6 @@ define [
         multipart: entry.get('attachment')
       @hide()
       @removeAttachments()
-      @el.hide()
 
     ##
     # Get the jQueryEl element on the discussion entry to edit.
@@ -114,7 +116,6 @@ define [
     # @api private
     onPostReplySuccess: (entry) =>
       @view.model.set 'notification', ''
-      @el.show()
       @trigger 'save', entry
 
     ##

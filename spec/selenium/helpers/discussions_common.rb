@@ -50,7 +50,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
 
   def add_reply(message = 'message!', attachment = nil)
     @last_entry ||= f('#discussion_topic')
-    @last_entry.find_element(:css, '.discussion-reply-label').click
+    @last_entry.find_element(:css, '.discussion-reply-action').click
     wait_for_ajaximations
     type_in_tiny 'textarea', message
 
