@@ -75,10 +75,15 @@ class AccountsController < ApplicationController
     if recursive
       @accounts = PaginatedCollection.build do |pager|
         per_page = pager.per_page
-        current_page = pager.current_page.to_i
-        pager.replace(
-          @account.sub_accounts_recursive(per_page, current_page * per_page)
-        )
+        current_page = [pager.current_page.to_i, 1].max
+        sub_accounts = @account.sub_accounts_recursive(per_page + 1, (current_page - 1) * per_page)
+
+        if sub_accounts.length > per_page
+          sub_accounts.pop
+          pager.next_page = current_page + 1
+        end
+
+        pager.replace sub_accounts
       end
     else
       @accounts = @account.sub_accounts.order(:id)

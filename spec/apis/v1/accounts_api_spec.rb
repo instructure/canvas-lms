@@ -81,15 +81,34 @@ describe "Accounts API", :type => :integration do
         'Account 1', 'Account 2']
     end
 
-    it "should return sub accounts recursively" do
-      json = api_call(:get,
-        "/api/v1/accounts/#{@a1.id}/sub_accounts?recursive=1",
-        {:controller => 'accounts', :action => 'sub_accounts',
-         :account_id => @a1.id.to_s, :recursive => "1", :format => 'json'})
+    describe "recursive" do
 
-      json.map { |j| j['name'] }.sort.should == ['subby', 'implicit-access',
-        'Account 1', 'Account 1.1', 'Account 1.2', 'Account 1.2.1',
-        'Account 2', 'Account 2.1', 'Account 2.2', 'Account 2.3'].sort
+      it "returns sub accounts recursively" do
+        json = api_call(:get,
+          "/api/v1/accounts/#{@a1.id}/sub_accounts?recursive=1",
+          {:controller => 'accounts', :action => 'sub_accounts',
+           :account_id => @a1.id.to_s, :recursive => "1", :format => 'json'})
+
+        json.map { |j| j['name'] }.sort.should == ['subby', 'implicit-access',
+          'Account 1', 'Account 1.1', 'Account 1.2', 'Account 1.2.1',
+          'Account 2', 'Account 2.1', 'Account 2.2', 'Account 2.3'].sort
+      end
+
+      it "ignores deleted accounts" do
+        @a1.sub_accounts.create!(:name => "Deleted Account").destroy
+        parent_account = @a1.sub_accounts.create!(:name => "Deleted Parent Account")
+        parent_account.sub_accounts.create!(:name => "Child Account")
+        parent_account.destroy
+
+        json = api_call(:get,
+                        "/api/v1/accounts/#{@a1.id}/sub_accounts?recursive=1",
+                        {:controller => 'accounts', :action => 'sub_accounts',
+                         :account_id => @a1.id.to_s, :recursive => "1", :format => 'json'})
+
+        json.map { |j| j['name'] }.sort.should == ['subby', 'implicit-access',
+                                                   'Account 1', 'Account 1.1', 'Account 1.2', 'Account 1.2.1',
+                                                   'Account 2', 'Account 2.1', 'Account 2.2', 'Account 2.3'].sort
+      end
     end
   end
   

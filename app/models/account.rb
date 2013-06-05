@@ -511,15 +511,18 @@ class Account < ActiveRecord::Base
     if ActiveRecord::Base.configurations[Rails.env]['adapter'] == 'postgresql'
       Account.find_by_sql([<<-SQL, self.id, limit.to_i, offset.to_i])
           WITH RECURSIVE t AS (
-            SELECT * FROM accounts WHERE parent_account_id = ?
+            SELECT * FROM accounts
+            WHERE parent_account_id = ? AND workflow_state <>'deleted'
             UNION
-            SELECT accounts.* FROM accounts INNER JOIN t ON accounts.parent_account_id = t.id
+            SELECT accounts.* FROM accounts
+            INNER JOIN t ON accounts.parent_account_id = t.id
+            WHERE accounts.workflow_state <>'deleted'
           )
           SELECT * FROM t ORDER BY parent_account_id, id LIMIT ? OFFSET ?
       SQL
     else
       account_descendents = lambda do |id|
-        as = Account.where(:parent_account_id => id).order(:id)
+        as = Account.where(:parent_account_id => id).active.order(:id)
         as.empty? ?
           [] :
           as << as.map { |a| account_descendents.call(a.id) }
