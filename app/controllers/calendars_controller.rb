@@ -90,8 +90,8 @@ class CalendarsController < ApplicationController
         :assignment_url => context.respond_to?("assignments") ? named_context_url(context, :api_v1_context_assignment_url, '{{ id }}') : '',
         :assignment_override_url => context.respond_to?(:assignments) ? api_v1_assignment_override_url(:course_id => context.id, :assignment_id => '{{ assignment_id }}', :id => '{{ id }}') : '',
         :appointment_group_url => context.respond_to?("appointment_groups") ? api_v1_appointment_groups_url(:id => '{{ id }}') : '',
-        :can_create_calendar_events => context.respond_to?("calendar_events") && context.calendar_events.new.grants_right?(@current_user, session, :create),
-        :can_create_assignments => context.respond_to?("assignments") && context.assignments.new.grants_right?(@current_user, session, :create),
+        :can_create_calendar_events => context.respond_to?("calendar_events") && CalendarEvent.new.tap{|e| e.context = context}.grants_right?(@current_user, session, :create),
+        :can_create_assignments => context.respond_to?("assignments") && Assignment.new.tap{|a| a.context = context}.grants_right?(@current_user, session, :create),
         :assignment_groups => context.respond_to?("assignments") ? context.assignment_groups.active.select([:id, :name]).map {|g| { :id => g.id, :name => g.name } } : [],
         :can_create_appointment_groups => can_create_ags
       }
