@@ -299,7 +299,8 @@ class ContentMigrationsController < ApplicationController
   # @returns list of content items
   def content_list
     @content_migration = @context.content_migrations.find(params[:id])
-    render :json => @content_migration.get_content_list(params[:type])
+    base_url = api_v1_course_content_migration_selective_data_url(@context, @content_migration)
+    render :json => @content_migration.get_content_list(params[:type], base_url)
   end
 
   protected

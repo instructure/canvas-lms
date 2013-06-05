@@ -18,8 +18,9 @@ module Canvas::Migration::Helpers
             ['attachments', -> { I18n.t('lib.canvas.migration.attachments', 'Files') }],
     ]
 
-    def initialize(migration)
+    def initialize(migration, base_url=nil)
       @migration = migration
+      @base_url = base_url
     end
 
     def get_content_list(type=nil)
@@ -68,7 +69,9 @@ module Canvas::Migration::Helpers
       else
         SELECTIVE_CONTENT_TYPES.each do |type, title|
           if course_data[type] && course_data[type].count > 0
-            content_list << {type: type, property: "copy[all_#{type}]", title: title.call, count: course_data[type].count}
+            hash = {type: type, property: "copy[all_#{type}]", title: title.call, count: course_data[type].count}
+            add_url!(hash, type)
+            content_list << hash
           end
         end
       end
@@ -174,17 +177,28 @@ module Canvas::Migration::Helpers
               content_list << {type: type, property: "copy[all_#{type}]", title: title.call}
             elsif type == 'wiki_pages'
               count = source.wiki.wiki_pages.count
-              content_list << {type: type, property: "copy[all_#{type}]", title: title.call, count: count} if count > 0
+              next if count == 0
+              hash = {type: type, property: "copy[all_#{type}]", title: title.call, count: count}
+              add_url!(hash, type)
+              content_list << hash
             elsif source.respond_to?(type) && source.send(type).respond_to?(:count)
               count = source.send(type).count
               next if count == 0
-              content_list << {type: type, property: "copy[all_#{type}]", title: title.call, count: count}
+              hash = {type: type, property: "copy[all_#{type}]", title: title.call, count: count}
+              add_url!(hash, type)
+              content_list << hash
             end
           end
         end
       end
 
       content_list
+    end
+
+    def add_url!(hash, type)
+      if @base_url
+        hash[:sub_items_url] = @base_url + "?type=#{type}"
+      end
     end
 
     def course_item_hash(type, item)

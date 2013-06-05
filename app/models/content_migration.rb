@@ -577,8 +577,8 @@ class ContentMigration < ActiveRecord::Base
 
   # returns a list of content for selective content migrations
   # If no section is specified the top-level areas with content are returned
-  def get_content_list(type=nil)
-    Canvas::Migration::Helpers::SelectiveContentFormatter.new(self).get_content_list(type)
+  def get_content_list(type=nil, base_url=nil)
+    Canvas::Migration::Helpers::SelectiveContentFormatter.new(self, base_url).get_content_list(type)
   end
 
 end

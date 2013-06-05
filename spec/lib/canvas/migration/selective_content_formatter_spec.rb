@@ -39,17 +39,17 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
                                              'assignment_groups' => [{'title' => 'a1', 'migration_id' => 'a1'}],
                                              'calendar_events' => []
                                      }.to_json)
-      @formatter = Canvas::Migration::Helpers::SelectiveContentFormatter.new(@migration)
+      @formatter = Canvas::Migration::Helpers::SelectiveContentFormatter.new(@migration, "https://example.com")
     end
 
     it "should list top-level items" do
-      @formatter.get_content_list.should == [{:type=>"context_modules", :property=>"copy[all_context_modules]", :title=>"Modules", :count=>1},
-                                             {:type=>"assignments", :property=>"copy[all_assignments]", :title=>"Assignments", :count=>2},
-                                             {:type=>"quizzes", :property=>"copy[all_quizzes]", :title=>"Quizzes", :count=>1},
-                                             {:type=>"wiki_pages", :property=>"copy[all_wiki_pages]", :title=>"Wiki Pages", :count=>1},
-                                             {:type=>"context_external_tools", :property=>"copy[all_context_external_tools]", :title=>"External Tools", :count=>1},
-                                             {:type=>"learning_outcomes", :property=>"copy[all_learning_outcomes]", :title=>"Learning Outcomes", :count=>1},
-                                             {:type=>"attachments", :property=>"copy[all_attachments]", :title=>"Files", :count=>1}]
+      @formatter.get_content_list.should == [{:type=>"context_modules", :property=>"copy[all_context_modules]", :title=>"Modules", :count=>1, :sub_items_url=>"https://example.com?type=context_modules"},
+                                             {:type=>"assignments", :property=>"copy[all_assignments]", :title=>"Assignments", :count=>2, :sub_items_url=>"https://example.com?type=assignments"},
+                                             {:type=>"quizzes", :property=>"copy[all_quizzes]", :title=>"Quizzes", :count=>1, :sub_items_url=>"https://example.com?type=quizzes"},
+                                             {:type=>"wiki_pages", :property=>"copy[all_wiki_pages]", :title=>"Wiki Pages", :count=>1, :sub_items_url=>"https://example.com?type=wiki_pages"},
+                                             {:type=>"context_external_tools", :property=>"copy[all_context_external_tools]", :title=>"External Tools", :count=>1, :sub_items_url=>"https://example.com?type=context_external_tools"},
+                                             {:type=>"learning_outcomes", :property=>"copy[all_learning_outcomes]", :title=>"Learning Outcomes", :count=>1, :sub_items_url=>"https://example.com?type=learning_outcomes"},
+                                             {:type=>"attachments", :property=>"copy[all_attachments]", :title=>"Files", :count=>1, :sub_items_url=>"https://example.com?type=attachments"}]
     end
 
     it "should rename deprecated hash keys" do
