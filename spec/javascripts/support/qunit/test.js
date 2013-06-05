@@ -16,15 +16,23 @@ var page = new WebPage();
 
 // Route "console.log()" calls from within the Page context to the main Phantom context (i.e. current "this")
 var timer;
-var errors = [];
+var errors = 0;
+var completed = false;
+var timeout = 5;
 page.onConsoleMessage = function (msg) {
+  var result = msg.match(/^Took .*, (\d+) failed\.$/);
+  if (result) {
+    errors = parseInt(result[1], 10);
+    completed = true;
+  }
   console.log(msg);
-  if (msg.match(/^Assertion Failed/)) errors.push(msg);
   clearTimeout(timer);
-  // exit after 3 seconds of no messages
+  // exit after <timeout> seconds of no messages
   timer = setTimeout(function () {
-    phantom.exit(errors.length);
-  }, 3000);
+    if (!completed)
+      console.log("Error: test timeout after " + timeout + " seconds");
+    phantom.exit(completed && !errors ? 0 : 1);
+  }, timeout * 1000);
 };
 
 page.open(url, function(status){
