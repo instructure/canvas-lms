@@ -394,10 +394,12 @@ class WikiPage < ActiveRecord::Base
         item = front_page
       end
     end
-    if hash[:workflow_state] == 'active'
-      item.workflow_state = 'active'
-    else
-      item.workflow_state = 'unpublished'
+    if state = hash[:workflow_state]
+      if state == 'active'
+        item.workflow_state = 'active'
+      else
+        item.workflow_state = 'unpublished'
+      end
     end
     context.imported_migration_items << item if context.imported_migration_items && item.new_record?
     item.migration_id = hash[:migration_id]
