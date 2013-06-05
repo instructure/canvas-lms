@@ -114,15 +114,15 @@ class PseudonymSessionsController < ApplicationController
   end
 
   def maybe_render_mobile_login(status = nil)
-    if params[:mobile] || request.user_agent.to_s =~ /ipod|iphone|ipad|Android/i
+    if mobile_device?
       @login_handle_name = @domain_root_account.login_handle_name rescue AccountAuthorizationConfig.default_login_handle_name
       @login_handle_is_email = @login_handle_name == AccountAuthorizationConfig.default_login_handle_name
-      @shared_js_vars = {
+      js_env(
         :GOOGLE_ANALYTICS_KEY => Setting.get_cached('google_analytics_key', nil),
         :RESET_SENT =>  t("password_confirmation_sent", "Password confirmation sent. Make sure you check your spam box."),
         :RESET_ERROR =>  t("password_confirmation_error", "Error sending request.")
-      }
-      render :template => 'pseudonym_sessions/mobile_login', :layout => false, :status => status
+      )
+      render :template => 'pseudonym_sessions/mobile_login', :layout => 'mobile_auth', :status => status
     else
       @request = request
       render :action => 'new', :status => status
@@ -594,6 +594,11 @@ class PseudonymSessionsController < ApplicationController
 
   def oauth2_confirm
     @provider = Canvas::Oauth::Provider.new(session[:oauth2][:client_id], session[:oauth2][:redirect_uri], session[:oauth2][:scopes])
+
+    if mobile_device?
+      js_env :GOOGLE_ANALYTICS_KEY => Setting.get_cached('google_analytics_key', nil)
+      render :layout => 'mobile_auth', :action => 'oauth2_confirm_mobile'
+    end
   end
 
   def oauth2_accept

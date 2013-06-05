@@ -33,6 +33,7 @@ describe PseudonymSessionsController do
 
     def confirm_mobile_layout
       mobile_agents.each do |agent|
+        controller.js_env.clear
         request.env['HTTP_USER_AGENT'] = agent
         yield
         response.should render_template("pseudonym_sessions/mobile_login")
