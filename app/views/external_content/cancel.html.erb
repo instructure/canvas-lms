@@ -11,6 +11,7 @@ while(parentWindow && !parentWindow[callback]) {
   parentWindow = parentWindow.parent;
 }
 if(parentWindow[callback] && parentWindow[callback].cancel) {
+  parentWindow.$(parentWindow).trigger('externalContentCancel');
   parentWindow[callback].cancel();
   setTimeout(function() {
     $("#dialog_message").text("<%= t :popup_success, "Canceled. This popup should close on its own..." %>");

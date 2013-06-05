@@ -42,6 +42,11 @@ module Api::V1::ExternalTools
         json[type]['label'] = tool.label_for(type, user.locale)
         json[type].delete 'labels'
         json.delete 'labels'
+
+        [:selection_width, :selection_height, :icon_url].each do |key|
+          value = tool.extension_setting type, key
+          json[type][key] = value if value
+        end
       end
     end
 

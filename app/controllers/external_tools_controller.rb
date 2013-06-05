@@ -285,7 +285,7 @@ class ExternalToolsController < ApplicationController
     return unless authorized_action(@context, @current_user, :read)
     add_crumb(@context.name, named_context_url(@context, :context_url))
 
-    selection_type = 'resource_selection'
+    selection_type = params[:launch_type] || 'resource_selection'
     selection_type = 'editor_button' if params[:editor]
     selection_type = 'homework_submission' if params[:homework]
 
