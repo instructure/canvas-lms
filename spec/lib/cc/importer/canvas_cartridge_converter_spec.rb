@@ -606,6 +606,7 @@ describe "Canvas Cartridge importing" do
     page_2.hide_from_students.should == page.hide_from_students
     page_2.notify_of_update.should == page.notify_of_update
     page_2.body.should == (body_with_link % [ @copy_to.id, @copy_to.id, @copy_to.id, @copy_to.id, @copy_to.id, mod2.id, @copy_to.id, to_att.id ]).gsub(/png" \/>/, 'png">')
+    page_2.active?.should == true
   end
   
   it "should import migrate inline external tool URLs in wiki pages" do
