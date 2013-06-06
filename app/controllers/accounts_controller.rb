@@ -248,7 +248,7 @@ class AccountsController < ApplicationController
           [:storage_quota, :default_storage_quota, :default_storage_quota_mb, :default_user_storage_quota_mb].each { |key| params[:account].delete key }
         end
         if params[:account][:services]
-          params[:account][:services].slice(*Account.services_exposed_to_ui_hash.keys).each do |key, value|
+          params[:account][:services].slice(*Account.services_exposed_to_ui_hash(nil, @current_user).keys).each do |key, value|
             @account.set_service_availability(key, value == '1')
           end
           params[:account].delete :services
