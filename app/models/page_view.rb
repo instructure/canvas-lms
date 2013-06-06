@@ -292,7 +292,10 @@ class PageView < ActiveRecord::Base
       end
       page_view.save
     end
-  rescue ActiveRecord::StatementInvalid
+  rescue ActiveRecord::StatementInvalid => e
+    logger.error "[CRIT] Failed to record page view!"
+    logger.error "#{e.class}: #{e.message}"
+    e.backtrace.each{ |line| logger.error "\tfrom #{line}" }
   end
 
   class << self
