@@ -1,7 +1,7 @@
 module UserSearch
 
-  def self.for_user_in_course(search_term, course, searcher, options = {})
-    base_scope = scope_for(course, searcher, options.slice(:enrollment_type, :enrollment_role))
+  def self.for_user_in_context(search_term, context, searcher, options = {})
+    base_scope = scope_for(context, searcher, options.slice(:enrollment_type, :enrollment_role))
     if search_term.to_s =~ Api::ID_REGEX
       user = base_scope.find_by_id(search_term)
       return [user] if user
@@ -29,11 +29,11 @@ module UserSearch
     wildcard_pattern(search_term, :type => pattern_type)
   end
 
-  def self.scope_for(course, searcher, options={})
+  def self.scope_for(context, searcher, options={})
     enrollment_role = Array(options[:enrollment_role]) if options[:enrollment_role]
     enrollment_type = Array(options[:enrollment_type]) if options[:enrollment_type]
 
-    users = course.users_visible_to(searcher).uniq.order_by_sortable_name
+    users = context.users_visible_to(searcher).uniq.order_by_sortable_name
 
     if enrollment_role
       users = users.where("COALESCE(enrollments.role_name, enrollments.type) IN (?) ", enrollment_role)

@@ -567,16 +567,35 @@ class GroupsController < ApplicationController
   #
   # Returns a list of users in the group.
   #
+  # @argument search_term (optional)
+  #   The partial name or full ID of the users to match and return in the results list.
+  #   Must be at least 3 characters.
+  #
   # @example_request
-  #     curl https://<canvas>/api/v1/groups/1/users \ 
+  #     curl https://<canvas>/api/v1/groups/1/users \
   #          -H 'Authorization: Bearer <token>'
   #
   # @returns [User]
   def users
     return unless authorized_action(@context, @current_user, :read)
-    @users = Api.paginate(@context.users, self, api_v1_group_users_url)
 
-    render :json => @users.map { |u| user_json(u, @current_user, session) }
+    search_term = params[:search_term]
+    if search_term && search_term.size < 3
+      return render \
+          :json => {
+          "status" => "argument_error",
+          "message" => "search_term of 3 or more characters is required" },
+          :status => :bad_request
+    end
+
+    if search_term
+      users = UserSearch.for_user_in_context(search_term, @context, @current_user)
+    else
+      users = UserSearch.scope_for(@context, @current_user)
+    end
+
+    users = Api.paginate(users, self, api_v1_group_users_url)
+    render :json => users.map { |u| user_json(u, @current_user, session) }
   end
 
   def edit

@@ -394,7 +394,7 @@ class CoursesController < ApplicationController
       end
 
       if search_term
-        users = UserSearch.for_user_in_course(search_term, @context, @current_user, search_params)
+        users = UserSearch.for_user_in_context(search_term, @context, @current_user, search_params)
       else
         users = UserSearch.scope_for(@context, @current_user, search_params)
       end

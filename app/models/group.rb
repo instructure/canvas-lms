@@ -383,6 +383,10 @@ class Group < ActiveRecord::Base
     can :leave
   end
 
+  def users_visible_to(user)
+    grants_rights?(user, :read) ? users : users.where("?", false)
+  end
+
   # Helper needed by several permissions, use grants_right?(user, :participate)
   def can_participate?(user)
     return false unless user.present? && self.context.present?
