@@ -855,6 +855,8 @@ if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
       raise ArgumentError, "Cannot specify custom options with :delay_validation" if options[:options] && options[:delay_validation]
 
       options.delete(:delay_validation) unless supports_delayed_constraint_validation?
+      # pointless if we're in a transaction
+      options.delete(:delay_validation) if open_transactions > 0
       column  = options[:column] || "#{to_table.to_s.singularize}_id"
       foreign_key_name = foreign_key_name(from_table, column, options)
 
