@@ -5,13 +5,15 @@
 <% js_bundle(:conferences)  %>
 <% jammit_css(:conferences) %>
 
-<header class="row-fluid">
-  <div class="span3 offset9 align-right padding-r">
-    <button type="button" class="btn btn-primary new-conference-btn">
-      <%= t(:new_conference, 'New Conference') %>
-    </button>
-  </div>
-</header>
+<% if can_do(WebConference.new(:context => @context), @current_user, :create) %>
+  <header class="row-fluid">
+    <div class="span3 offset9 align-right padding-r">
+      <button type="button" class="btn btn-primary new-conference-btn">
+        <%= t(:new_conference, 'New Conference') %>
+      </button>
+    </div>
+  </header>
+<% end %>
 
 <div class="conference-wrapper item-box">
   <h2>
