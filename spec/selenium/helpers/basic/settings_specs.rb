@@ -51,6 +51,8 @@ shared_examples_for "settings basic tests" do
     end
 
     before (:each) do
+      course_with_admin_logged_in
+      group_model(:context => @course)
       get account_settings_url
     end
 
@@ -103,6 +105,60 @@ shared_examples_for "settings basic tests" do
       fj('[name="default_storage_quota_mb"]').should have_value(course_quota.to_s) # fj to avoid selenium caching
       fj('[name="default_user_storage_quota_mb"]').should have_value(user_quota.to_s) # fj to avoid selenium caching
       fj('[name="default_group_storage_quota_mb"]').should have_value(group_quota.to_s) # fj to avoid selenium caching
+    end
+
+    it "should manually change a course quota" do
+      f('#tab-quotas-link').click
+
+      # find the course by id
+      click_option('#manual_quotas_type', 'course', :value)
+      id_input = f('#manual_quotas_id')
+      replace_content(id_input, @course.id.to_s)
+      f('#manual_quotas_find_button').click
+
+      wait_for_ajaximations
+
+      link = f('#manual_quotas_link')
+      link.should include_text(@course.name)
+
+      quota_input = f('#manual_quotas_quota')
+      quota_input.should have_value(@course.storage_quota_mb.to_s)
+      replace_content(quota_input, '42')
+
+      f('#manual_quotas_submit_button').click
+
+      wait_for_ajax_requests
+
+      # ensure the account was updated properly
+      @course.reload
+      @course.storage_quota_mb.should == 42
+    end
+
+    it "should manually change a group quota" do
+      f('#tab-quotas-link').click
+
+      # find the course by id
+      click_option('#manual_quotas_type', 'group', :value)
+      id_input = f('#manual_quotas_id')
+      replace_content(id_input, @group.id.to_s)
+      f('#manual_quotas_find_button').click
+
+      wait_for_ajaximations
+
+      link = f('#manual_quotas_link')
+      link.should include_text(@group.name)
+
+      quota_input = f('#manual_quotas_quota')
+      quota_input.should have_value(@group.storage_quota_mb.to_s)
+      replace_content(quota_input, '42')
+
+      f('#manual_quotas_submit_button').click
+
+      wait_for_ajax_requests
+
+      # ensure the account was updated properly
+      @group.reload
+      @group.storage_quota_mb.should == 42
     end
 
     it "should change the default language to spanish" do

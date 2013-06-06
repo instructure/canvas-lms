@@ -3,7 +3,8 @@ define [
   'Backbone'
   'compiled/models/Account'
   'compiled/views/accounts/settings/QuotasView'
-], (_, Backbone, Account, QuotasView) ->
+  'compiled/views/accounts/settings/ManualQuotasView'
+], (_, Backbone, Account, QuotasView, ManualQuotasView) ->
 
   if ENV.ACCOUNT
     account = new Account(ENV.ACCOUNT)
@@ -17,3 +18,7 @@ define [
       model: account
     $('#tab-quotas').append(quotasView.el)
     quotasView.render()
+
+    manualQuotasView = new ManualQuotasView()
+    $('#tab-quotas').append(manualQuotasView.el)
+    manualQuotasView.render()

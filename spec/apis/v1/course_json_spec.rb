@@ -85,6 +85,10 @@ module Api
           course_json.methods_to_send.should include('public_syllabus')
         end
 
+        it 'includes the storage_quota_mb field' do
+          course_json.methods_to_send.should include('storage_quota_mb')
+        end
+
         it 'includes the hide_final_grades method if its in the includes array' do
           includes << :hide_final_grades
           course_json.methods_to_send.should include('hide_final_grades')

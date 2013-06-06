@@ -27,8 +27,7 @@ module Api::V1
     end
     
     def methods_to_send
-      methods = ['end_at']
-      methods << 'public_syllabus'
+      methods = ['end_at', 'public_syllabus', 'storage_quota_mb']
       methods << 'hide_final_grades' if @includes.include?(:hide_final_grades)
       methods
     end

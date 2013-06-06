@@ -365,6 +365,7 @@ describe UsersController, :type => :integration do
         'default_view' => 'feed',
         'workflow_state' => 'available',
         'public_syllabus' => false,
+        'storage_quota_mb' => @course.storage_quota_mb,
       },
 
       'user' => {
@@ -462,6 +463,7 @@ describe UsersController, :type => :integration do
         'default_view' => 'feed',
         'workflow_state' => 'available',
         'public_syllabus' => false,
+        'storage_quota_mb' => @course.storage_quota_mb,
       },
 
       'user' => {
