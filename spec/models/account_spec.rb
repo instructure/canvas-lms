@@ -259,11 +259,11 @@ describe Account do
 
     describe "services_exposed_to_ui_hash" do
       it "should return all ui services by default" do
-        Account.services_exposed_to_ui_hash.keys.should == Account.allowable_services.reject { |h,k| !k[:expose_to_ui] }.keys
+        Account.services_exposed_to_ui_hash.keys.should == Account.allowable_services.reject { |h,k| !k[:expose_to_ui] || (k[:expose_to_ui_proc] && !k[:expose_to_ui_proc].call(nil)) }.keys
       end
 
       it "should return services of a type if specified" do
-        Account.services_exposed_to_ui_hash(:setting).keys.should == Account.allowable_services.reject { |h,k| k[:expose_to_ui] != :setting }.keys
+        Account.services_exposed_to_ui_hash(:setting).keys.should == Account.allowable_services.reject { |h,k| k[:expose_to_ui] != :setting || (k[:expose_to_ui_proc] && !k[:expose_to_ui_proc].call(nil)) }.keys
       end
 
       it "should filter based on user if a proc is specified" do
