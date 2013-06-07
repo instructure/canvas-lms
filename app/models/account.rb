@@ -331,7 +331,11 @@ class Account < ActiveRecord::Base
     end
     res
   end
-  
+
+  def users_visible_to(user)
+    self.grants_right?(user, nil, :read) ? self.all_users : self.all_users.where("?", false)
+  end
+
   def users_name_like(query="")
     @cached_users_name_like ||= {}
     @cached_users_name_like[query] ||= self.fast_all_users.name_like(query)
@@ -362,10 +366,10 @@ class Account < ActiveRecord::Base
   end
 
   def users_not_in_groups_sql(groups, opts={})
-    ["SELECT u.id, u.name
-        FROM users u
-       INNER JOIN user_account_associations uaa on uaa.user_id = u.id
-       WHERE uaa.account_id = ? AND u.workflow_state != 'deleted'
+    ["SELECT users.id, users.name
+        FROM users
+       INNER JOIN user_account_associations uaa on uaa.user_id = users.id
+       WHERE uaa.account_id = ? AND users.workflow_state != 'deleted'
        #{Group.not_in_group_sql_fragment(groups)}
        #{"ORDER BY #{opts[:order_by]}" if opts[:order_by].present?}", self.id]
   end
@@ -375,7 +379,7 @@ class Account < ActiveRecord::Base
   end
   
   def paginate_users_not_in_groups(groups, page, per_page = 15)
-    User.paginate_by_sql(users_not_in_groups_sql(groups, :order_by => "#{User.sortable_name_order_by_clause('u')} ASC"),
+    User.paginate_by_sql(users_not_in_groups_sql(groups, :order_by => "#{User.sortable_name_order_by_clause('users')} ASC"),
                          :page => page, :per_page => per_page)
   end
 

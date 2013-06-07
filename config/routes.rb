@@ -1156,6 +1156,7 @@ ActionController::Routing::Routes.draw do |map|
       group_categories.post 'accounts/:account_id/group_categories', :action => :create
       group_categories.post 'courses/:course_id/group_categories', :action => :create
       group_categories.get 'group_categories/:group_category_id/groups', :action => :groups, :path_name => 'group_category_groups'
+      group_categories.get 'group_categories/:group_category_id/users', :action => :users, :path_name => 'group_category_users'
     end
 
     api.with_options(:controller => :progress) do |progress|

@@ -1,7 +1,7 @@
 module UserSearch
 
   def self.for_user_in_context(search_term, context, searcher, options = {})
-    base_scope = scope_for(context, searcher, options.slice(:enrollment_type, :enrollment_role))
+    base_scope = scope_for(context, searcher, options.slice(:enrollment_type, :enrollment_role, :exclude_groups))
     if search_term.to_s =~ Api::ID_REGEX
       user = base_scope.find_by_id(search_term)
       return [user] if user
@@ -32,6 +32,7 @@ module UserSearch
   def self.scope_for(context, searcher, options={})
     enrollment_role = Array(options[:enrollment_role]) if options[:enrollment_role]
     enrollment_type = Array(options[:enrollment_type]) if options[:enrollment_type]
+    exclude_groups = Array(options[:exclude_groups]) if options[:exclude_groups]
 
     users = context.users_visible_to(searcher).uniq.order_by_sortable_name
 
@@ -44,6 +45,11 @@ module UserSearch
       end
       users = users.where(:enrollments => { :type => enrollment_type })
     end
+
+    if exclude_groups
+      users = users.where(Group.not_in_group_sql_fragment(exclude_groups, false))
+    end
+
     users
   end
 

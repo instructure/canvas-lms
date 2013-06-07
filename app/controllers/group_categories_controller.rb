@@ -55,7 +55,7 @@
 class GroupCategoriesController < ApplicationController
   before_filter :get_context
   before_filter :require_context, :only => [:create, :index]
-  before_filter :get_category_context, :only => [:show, :update, :destroy, :groups]
+  before_filter :get_category_context, :only => [:show, :update, :destroy, :groups, :users]
 
   include Api::V1::Attachment
   include Api::V1::GroupCategory
@@ -190,7 +190,7 @@ class GroupCategoriesController < ApplicationController
   # categories can not be deleted, i.e. "communities", "student_organized", and "imported".
   #
   # @example_request
-  #     curl https://<canvas>/api/v1/group_categories/<group_category_id> \ 
+  #     curl https://<canvas>/api/v1/group_categories/<group_category_id> \
   #           -X DELETE \ 
   #           -H 'Authorization: Bearer <token>'
   #
@@ -231,6 +231,57 @@ class GroupCategoriesController < ApplicationController
       @groups = Api.paginate(@groups, self, api_v1_group_category_groups_url)
       render :json => @groups.map { |g| group_json(g, @current_user, session) }
     end
+  end
+
+  include Api::V1::User
+  # @API List users
+  #
+  # Returns a list of users in the group category.
+  #
+  # @argument search_term (optional)
+  #   The partial name or full ID of the users to match and return in the results list.
+  #   Must be at least 3 characters.
+  #
+  # @argument unassigned (optional)
+  #   Set this value to true if you wish only to search unassigned users in the group category
+  #
+  # @example_request
+  #     curl https://<canvas>/api/v1/group_categories/1/users \
+  #          -H 'Authorization: Bearer <token>'
+  #
+  # @returns [User]
+  def users
+    if @context.is_a? Course
+      return unless authorized_action(@context, @current_user, :read_roster)
+    else
+      return unless authorized_action(@context, @current_user, :read)
+    end
+
+    search_term = params[:search_term]
+
+    if search_term && search_term.size < 3
+      return render \
+          :json => {
+          "status" => "argument_error",
+          "message" => "search_term of 3 or more characters is required" },
+          :status => :bad_request
+    end
+
+    search_params = params.slice(:search_term)
+    search_params[:enrollment_role] = "StudentEnrollment" if @context.is_a? Course
+
+    @group_category ||= @context.group_categories.find_by_id(params[:category_id])
+    exclude_groups = params[:unassigned] ? @group_category.groups.active : []
+    search_params[:exclude_groups] = exclude_groups
+
+    if search_term
+      users = UserSearch.for_user_in_context(search_term, @context, @current_user, search_params)
+    else
+      users = UserSearch.scope_for(@context, @current_user, search_params)
+    end
+
+    users = Api.paginate(users, self, api_v1_group_category_users_url)
+    render :json => users.map { |u| user_json(u, @current_user, session, [], @context) }
   end
 
   def populate_group_category_from_params
