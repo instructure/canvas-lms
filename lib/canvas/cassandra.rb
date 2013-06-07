@@ -43,7 +43,7 @@ module Canvas::Cassandra
         thrift_opts[:retries] = config['retries'] if config['retries']
         thrift_opts[:connect_timeout] = config['connect_timeout'] if config['connect_timeout']
         thrift_opts[:timeout] = config['timeout'] if config['timeout']
-        @connections[key] = self.new(servers, opts, thrift_opts)
+        @connections[key] = self.new(config_name, environment, servers, opts, thrift_opts)
       end
     end
 
@@ -51,9 +51,11 @@ module Canvas::Cassandra
       Setting.from_config('cassandra').try(:keys) || []
     end
 
-    def initialize(servers, opts, thrift_opts)
+    def initialize(cluster_name, environment, servers, opts, thrift_opts)
       Bundler.require 'cassandra'
       @db = CassandraCQL::Database.new(servers, opts, thrift_opts)
+      @cluster_name = cluster_name
+      @environment = environment
     end
 
     attr_reader :db
@@ -67,7 +69,7 @@ module Canvas::Cassandra
       ms = Benchmark.ms do
         result = @db.execute(query, *args)
       end
-      Rails.logger.debug("  #{"CQL (%.2fms)" % [ms]}  #{::CassandraCQL::Statement.sanitize(query, args)}")
+      Rails.logger.debug("  #{"CQL (%.2fms)" % [ms]}  #{::CassandraCQL::Statement.sanitize(query, args)} [#{@cluster_name} #{@environment}]")
       result
     end
 
