@@ -21,11 +21,14 @@ module Canvas::Plugins::Validators::BigBlueButtonValidator
     if settings.map(&:last).all?(&:blank?)
       {}
     else
-      if settings.size != 2 || settings.map(&:last).any?(&:blank?)
+      expected_settings = [:domain, :secret, :recording_enabled]
+      if settings.size != expected_settings.size || settings.map(&:last).any?(&:blank?)
         plugin_setting.errors.add_to_base(I18n.t('canvas.plugins.errors.all_fields_required', 'All fields are required'))
         false
       else
-        settings.slice(:domain, :secret)
+        settings.slice!(*expected_settings)
+        settings[:recording_enabled] = Canvas::Plugin.value_to_boolean(settings[:recording_enabled])
+        settings
       end
     end
   end

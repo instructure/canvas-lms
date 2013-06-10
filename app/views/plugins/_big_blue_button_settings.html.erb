@@ -19,5 +19,11 @@
         <%= mt :secret_description, "This is the %{parameter_name} parameter that can be found in the %{filename} config file.", :parameter_name => markdown_safe('**beans.dynamicConferenceService.securitySalt**'), :filename => markdown_safe('**bigbluebutton.properties**') %>
       </td>
     </tr>
+    <tr>
+      <td></td>
+      <td>
+        <%= f.check_box :recording_enabled %> <%= f.label :recording_enabled, :en => "Allow conferences to be recorded." %>
+      </td>
+    </tr>
   </table>
 <% end %>

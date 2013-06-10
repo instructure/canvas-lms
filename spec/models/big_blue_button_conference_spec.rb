@@ -82,6 +82,73 @@ describe BigBlueButtonConference do
 
       conference.craft_url(@user).should match(/\Ahttp:\/\/bbb\.instructure\.com\/bigbluebutton\/api\/join/)
     end
+
+  end
+
+  describe 'plugin setting recording_enabled is enabled' do
+    before do
+      WebConference.stubs(:plugins).returns([
+        web_conference_plugin_mock("big_blue_button", {
+          :domain => "bbb.instructure.com",
+          :secret_dec => "secret",
+          :recording_enabled => true,
+        })
+      ])
+    end
+
+    it "should have visible record user_setting" do
+      BigBlueButtonConference.user_setting_fields[:record][:visible].call.should be_true
+    end
+
+    it "should send record flag if record user_setting is set" do
+      bbb = BigBlueButtonConference.new
+      bbb.user_settings = { :record => true }
+      bbb.save!
+      bbb.expects(:send_request).with do |verb, options|
+        verb.should eql :create
+        options[:record].should eql "true"
+      end
+      bbb.initiate_conference
+    end
+
+    it "should not send record flag if record user setting is unset" do
+      bbb = BigBlueButtonConference.new
+      bbb.user_settings = { :record => false }
+      bbb.save!
+      bbb.expects(:send_request).with do |verb, options|
+        verb.should eql :create
+        options[:record].should eql "false"
+      end
+      bbb.initiate_conference
+    end
+  end
+
+  describe 'plugin setting recording disabled' do
+    before do
+      WebConference.stubs(:plugins).returns([
+        web_conference_plugin_mock("big_blue_button", {
+          :domain => "bbb.instructure.com",
+          :secret_dec => "secret",
+          :recording_enabled => false,
+        })
+      ])
+    end
+
+    it "should have invisible record user_setting" do
+      BigBlueButtonConference.user_setting_fields[:record][:visible].call.should be_false
+    end
+
+    it "should not send record flag even if record user_setting is set" do
+      bbb = BigBlueButtonConference.new
+      bbb.user_settings = { :record => true }
+      bbb.save!
+      bbb.expects(:send_request).with do |verb, options|
+        verb.should eql :create
+        options[:record].should eql "false"
+      end
+      bbb.initiate_conference
+      bbb.user_settings[:record].should be_false
+    end
   end
 
 end
