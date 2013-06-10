@@ -50,6 +50,7 @@ define [
         threaded: @options.threaded
         collapsed: @options.collapsed
       view.render()
+      entry.on('change:editor', @nestEntries)
       return @addNewView view if entry.get 'new'
       if @options.descendants
         view.renderTree()

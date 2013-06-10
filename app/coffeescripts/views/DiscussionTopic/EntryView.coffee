@@ -63,6 +63,7 @@ define [
       @model.on 'change:deleted', @toggleDeleted
       @model.on 'change:read_state', @toggleReadState
       @model.on 'change:editor', @render
+      @model.on 'change:editor', (entry) -> entry.trigger('edited')
 
     toggleRead: (e) ->
       e.preventDefault()
