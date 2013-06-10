@@ -23,6 +23,7 @@ class BigBlueButtonConference < WebConference
     description: ->{ t('recording_setting_description', 'Record this conference') },
     type: :boolean,
     default: false,
+    visible: ->{ WebConference.config(BigBlueButtonConference.to_s)[:recording_enabled] },
   }
 
   def initiate_conference
@@ -37,6 +38,7 @@ class BigBlueButtonConference < WebConference
       settings[:user_key] = 8.times.map{ chars[chars.size * rand] }.join
       settings[:admin_key] = 8.times.map{ chars[chars.size * rand] }.join until settings[:admin_key] && settings[:admin_key] != settings[:user_key]
     end
+    settings[:record] &&= config[:recording_enabled]
     send_request(:create, {
       :meetingID => conference_key,
       :name => title,

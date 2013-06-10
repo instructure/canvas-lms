@@ -17,6 +17,8 @@
 #
 
 class ConferencesController < ApplicationController
+  include Api::V1::Conferences
+
   before_filter :require_context
   add_crumb(proc{ t '#crumbs.conferences', "Conferences"}) { |c| c.send(:named_context_url, c.instance_variable_get("@context"), :context_conferences_url) }
   before_filter { |c| c.active_tab = "conferences" }
@@ -44,22 +46,11 @@ class ConferencesController < ApplicationController
       permissions = {:permissions => {:user => @current_user, :session => session}}
       # exposing the initial data as json embedded on page.
       js_env(
-        current_conferences: @new_conferences.map { |c| c.as_json(permissions.merge(:url => named_context_url(@context, :context_conference_url, c))) },
-        concluded_conferences: @concluded_conferences.map { |c| c.as_json(permissions.merge(:url => named_context_url(@context, :context_conference_url, c))) },
-        default_conference: @context.web_conferences.build(:title => I18n.t(:default_conference_title, "%{course_name} Conference", :course_name => @context.name),
-                                                           :duration => WebConference::DEFAULT_DURATION).
-            as_json(permissions.merge(:url => named_context_url(@context, :context_conferences_url))),
-        conference_user_setting_details: WebConference.conference_types.inject([]) {|type_list, conference_type|
-          type_list << {:name => conference_type[:plugin].name,
-                        :type => conference_type[:conference_type],
-                        :settings => conference_type[:user_setting_fields].map() {|(field, options)|
-                          options.each_pair {|k, v| options[k] = v.call() if v.is_a?(Proc) }
-                          options[:field] = field
-                          options
-                        }
-          }
-        },
-        users: @users.map{|u| {:id => u.id, :name => u.last_name_first}}
+        current_conferences: conferences_json(@new_conferences, @context, @current_user, session),
+        concluded_conferences: conferences_json(@concluded_conferences, @context, @current_user, session),
+        default_conference: default_conference_json(@context, @current_user, session),
+        conference_type_details: conference_types_json(WebConference.conference_types),
+        users: @users.map{|u| {:id => u.id, :name => u.last_name_first}},
       )
 
     end

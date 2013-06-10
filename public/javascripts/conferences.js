@@ -57,7 +57,7 @@ define([
         },
         conferenceData: conferenceData,
         users: ENV.users,
-        conferenceTypes: ENV.conference_user_setting_details.map(function(type){
+        conferenceTypes: ENV.conference_type_details.map(function(type){
           return {name: type.name, type: type.type, selected: (conferenceData.conference_type === type.type)}
         }),
         inviteAll: invite_all
@@ -69,7 +69,7 @@ define([
     var updateConferenceUserSettingDetailsForConference = function(conferenceData){
       var undefined;   // for undefined comparison
       // make handlebars comparisons easy
-      _.each(ENV.conference_user_setting_details, function(conferenceInfo){
+      _.each(ENV.conference_type_details, function(conferenceInfo){
         _.each(conferenceInfo.settings, function(optionObj){
           optionObj['isBoolean'] = (optionObj['type'] == 'boolean');
           if (optionObj.isBoolean) {
@@ -86,7 +86,7 @@ define([
 
     var renderConferenceFormUserSettings = function(conferenceData, selectedConferenceType){
       // Grab the selected entry to pass in for rendering the appropriate user setting options.
-      var selected = _.select(ENV.conference_user_setting_details, function(conference_settings){return conference_settings.type === selectedConferenceType});
+      var selected = _.select(ENV.conference_type_details, function(conference_settings){return conference_settings.type === selectedConferenceType});
       if (selected.length > 0){
         selected = selected[0];
       }
