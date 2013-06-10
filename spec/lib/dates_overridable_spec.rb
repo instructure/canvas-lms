@@ -197,7 +197,7 @@ shared_examples_for "an object whose dates are overridable" do
 
     it "uses the overridden due date as the applicable due date" do
       as_student, _ = overridable.due_dates_for(@student)
-      as_student[:due_at].should == override.due_at
+      as_student[:due_at].to_i.should == override.due_at.to_i
 
       if overridable.is_a?(Assignment)
         as_student[:all_day].should == override.all_day

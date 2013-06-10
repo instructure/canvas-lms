@@ -70,6 +70,7 @@ class AssignmentOverride < ActiveRecord::Base
   after_save :touch_assignment, :if => :assignment
 
   def update_cached_due_dates
+    return unless assignment?
     if due_at_overridden_changed? ||
       (due_at_overridden && due_at_changed?) ||
       (due_at_overridden && workflow_state_changed?)
@@ -83,8 +84,8 @@ class AssignmentOverride < ActiveRecord::Base
   end
   private :touch_assignment
 
-  def assignment?; !!assignment; end
-  def quiz?; !!quiz; end
+  def assignment?; !!assignment_id; end
+  def quiz?; !!quiz_id; end
 
   workflow do
     state :active
