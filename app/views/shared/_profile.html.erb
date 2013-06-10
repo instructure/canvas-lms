@@ -7,7 +7,14 @@
 <% form_tag update_profile_profile_path, { :method => :put, :id => :edit_profile_form, :class => "bootstrap-form form-vertical" } do %>
   <div class="image-block">
     <div class="image-block-image profile-avatar-wrapper">
-      <%= avatar_image @user_data[:id], 128 %>
+      <% if @user_data[:can_edit] %>
+        <a href="<%= settings_profile_path %>" class="profile-link">
+          <%= avatar_image @user_data[:id], 128 %>
+          <i class="icon-edit"></i>
+        </a>
+      <% else %>
+        <%= avatar_image @user_data[:id], 128 %>
+      <% end %>
     </div>
     <div class="image-block-content row-fluid">
       <h1 class="h1">
