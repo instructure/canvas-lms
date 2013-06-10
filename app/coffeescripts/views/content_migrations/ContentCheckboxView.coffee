@@ -3,7 +3,7 @@ define [
   'jst/content_migrations/ContentCheckbox'
   'compiled/collections/content_migrations/ContentCheckboxCollection'
   'compiled/views/CollectionView'
-], (Backbone, template, CheckboxCollection, CollectionView) -> 
+], (Backbone, template, CheckboxCollection, CollectionView) ->
   class ContentCheckboxView extends Backbone.View
     template: template
 
@@ -17,14 +17,18 @@ define [
       super
       @hasSubItemsUrl = !!@model.get('sub_items_url')
       @hasSubItems = !!@model.get('sub_items')
+
+      @$el.on  "click", "#selectAll-#{@cid}", @checkAllChildren
+      @$el.on  "click", "#selectNone-#{@cid}", @uncheckAllChildren
+
       if @hasSubItemsUrl
         @$el.on "change", "#checkbox-#{@cid}", @toplevelCheckboxEvents
-      else
-        @$el.on "change", "#checkbox-#{@cid}", @normalCheckboxEvents
 
     toJSON: -> 
       json = super
       json.hasSubCheckboxes = @hasSubItems || @hasSubItemsUrl
+      json.onlyLabel = @hasSubItems and !@hasSubItemsUrl
+      json.checked = @model.collection?.isTopLevel
       json
 
     # If this checkbox model has sublevel checkboxes, create a new collection view
@@ -36,11 +40,17 @@ define [
         @sublevelCheckboxes = new CheckboxCollection @model.get('sub_items')
         @renderSublevelCheckboxes()
 
-    normalCheckboxEvents: (event) => 
-      if $(event.target).is(':checked')
-        @$el.find('[type=checkbox]').prop('checked', true)
-      else
-        @$el.find('[type=checkbox]').prop('checked', false)
+    # Check/Uncheck all children checkboxes
+    # @api private
+
+    checkAllChildren: => @$el.find('[type=checkbox]').prop('checked', true)
+    uncheckAllChildren: => @$el.find('[type=checkbox]').prop('checked', false)
+
+    #normalCheckboxEvents: (event) => 
+      #if $(event.target).is(':checked')
+        #@$el.find('[type=checkbox]').prop('checked', true)
+      #else
+        #@$el.find('[type=checkbox]').prop('checked', false)
     
     # Determins if we should hide the sublevel checkboxes or 
     # fetch new ones. 
@@ -83,4 +93,3 @@ define [
 
       checkboxCollectionView.render()
 
-    

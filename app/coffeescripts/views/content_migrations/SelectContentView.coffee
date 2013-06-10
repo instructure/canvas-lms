@@ -45,6 +45,7 @@ define [
       @checkboxCollection ||= new CheckboxCollection null,
                                 courseID: @model?.course_id
                                 migrationID: @model?.get('id')
+                                isTopLevel: true
 
 
       @checkboxCollectionView ||= new CollectionView

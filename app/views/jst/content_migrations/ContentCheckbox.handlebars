@@ -1,6 +1,11 @@
-<label class="checkbox">
-  <input type="checkbox" name="{{property}}" id="checkbox-{{cid}}" checked/> <span data-bind="title">{{title}}</span>
-</label>
+{{#if onlyLabel}}
+<label class="control-label">{{title}}</label> <a href="#" id="selectAll-{{cid}}">{{#t 'select_all'}}Select All{{/t}}</a> | <a href="#" id="selectNone-{{cid}}">{{#t 'select_non'}}Select None{{/t}}</a>
+
+{{else}}
+  <label class="checkbox">
+    <input type="checkbox" name="{{property}}" id="checkbox-{{cid}}" {{#if checked}}checked{{/if}}/> <span data-bind="title">{{title}}</span>
+  </label>
+{{/if}}
 
 {{#if hasSubCheckboxes }}
   <ul data-content="sublevelCheckboxes"><ul>
