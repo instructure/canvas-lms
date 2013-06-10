@@ -19,6 +19,8 @@
 class EventStream::Failure < ActiveRecord::Base
   set_table_name :event_stream_failures
 
+  attr_accessible :operation, :event_stream, :record_id, :payload, :exception, :backtrace
+
   serialize :payload, Hash
   serialize :backtrace, Array
 
