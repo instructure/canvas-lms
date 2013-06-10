@@ -170,7 +170,7 @@ module Context
   end
 
   def self.find_by_asset_string(string)
-    opts = string.split("_")
+    opts = string.split("_", -1)
     id = opts.pop
     if ContextTypes.const_defined?(opts.join('_').classify)
       type = ContextTypes.const_get(opts.join('_').classify)
