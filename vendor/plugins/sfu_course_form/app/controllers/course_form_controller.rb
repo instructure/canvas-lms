@@ -1,4 +1,4 @@
-require Pathname(File.dirname(__FILE__)) + "../../../sfu_api/app/model/sfu/course"
+require Pathname(File.dirname(__FILE__)) + "../../../sfu_api/app/model/sfu/sfu"
 
 class CourseFormController < ApplicationController
 
