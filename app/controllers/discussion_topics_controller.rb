@@ -299,6 +299,7 @@ class DiscussionTopicsController < ApplicationController
               :APP_URL => named_context_url(@context, :context_discussion_topic_url, @topic),
               :TOPIC => {
                 :ID => @topic.id,
+                :IS_SUBSCRIBED => @topic.subscribed?(@current_user),
               },
               :PERMISSIONS => {
                 :CAN_REPLY      => @locked ? false : !(@topic.for_group_assignment? || @topic.locked?),     # Can reply
@@ -317,6 +318,9 @@ class DiscussionTopicsController < ApplicationController
               :MARK_ALL_READ_URL => named_context_url(@context, :api_v1_context_discussion_topic_mark_all_read_url, @topic),
               :MARK_ALL_UNREAD_URL => named_context_url(@context, :api_v1_context_discussion_topic_mark_all_unread_url, @topic),
               :MANUAL_MARK_AS_READ => @current_user.try(:manual_mark_as_read?),
+              :CAN_SUBSCRIBE => !@initial_post_required && !@topic.is_a?(Announcement),                    # can subscribe when no initial post required for user and don't show for announcements
+              :SUBSCRIBE_URL => named_context_url(@context, :api_v1_context_discussion_topic_subscribe_url, @topic),
+              :UNSUBSCRIBE_URL => named_context_url(@context, :api_v1_context_discussion_topic_unsubscribe_url, @topic),
               :CURRENT_USER => user_display_json(@current_user),
               :INITIAL_POST_REQUIRED => @initial_post_required,
               :THREADED => @topic.threaded?
@@ -356,7 +360,7 @@ class DiscussionTopicsController < ApplicationController
   #
   # @argument is_announcement If true, this topic is an announcement. It will appear in the announcements section rather than the discussions section. This requires announcment-posting permissions.
   #
-  # @argument position_after By default, discusions are sorted chronologically by creation date, you can pass the id of another topic to have this one show up after the other when they are listed.
+  # @argument position_after By default, discussions are sorted chronologically by creation date, you can pass the id of another topic to have this one show up after the other when they are listed.
   # @example_request
   #     curl https://<canvas>/api/v1/courses/<course_id>/discussion_topics \ 
   #         -F title='my topic' \ 

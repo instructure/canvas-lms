@@ -639,3 +639,15 @@ body.with-right-side.with-left-side {
     text-align: left;
   }
 }
+
+#discussion-toolbar {
+  .topic-subscribe-button { display:none; }
+  .topic-unsubscribe-button { display:none; }
+
+  &.unsubscribed {
+    .topic-subscribe-button { display:inline-block; }
+  }
+  &.subscribed {
+    .topic-unsubscribe-button { display:inline-block; }
+  }
+}

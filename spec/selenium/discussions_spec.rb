@@ -1062,4 +1062,71 @@ describe "discussions" do
       ff('.discussion-entries .read').length.should == reply_count
     end
   end
+
+  context "topic subscription" do
+    before do
+      course_with_student
+      course_with_teacher_logged_in(:course => @course)
+      @topic = @course.discussion_topics.create!(:title => 'mark as read test', :message => 'test mark as read', :user => @student)
+    end
+
+    it "should load with the correct status represented" do
+      @topic.subscribe(@teacher)
+      @topic.create_materialized_view
+
+      get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+      wait_for_animations
+      f('.topic-unsubscribe-button').displayed?.should be_true
+      f('.topic-subscribe-button').displayed?.should be_false
+
+      @topic.unsubscribe(@teacher)
+      @topic.update_materialized_view
+      get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+      wait_for_animations
+      f('.topic-unsubscribe-button').displayed?.should be_false
+      f('.topic-subscribe-button').displayed?.should be_true
+    end
+
+    it "should unsubscribe from topic" do
+      @topic.subscribe(@teacher)
+      @topic.create_materialized_view
+
+      get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+      wait_for_animations
+      f('.topic-unsubscribe-button').click
+      wait_for_ajaximations
+      @topic.reload
+      @topic.subscribed?(@teacher).should == false
+    end
+
+    it "should subscribe to topic" do
+      @topic.unsubscribe(@teacher)
+      @topic.create_materialized_view
+
+      get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+      wait_for_animations
+      f('.topic-subscribe-button').click
+      wait_for_ajaximations
+      @topic.reload
+      @topic.subscribed?(@teacher).should == true
+    end
+
+    it "should prevent subscribing when a student post is required first" do
+      course_with_student_logged_in(:course => @course)
+      new_student_entry_text = 'new student entry'
+      @topic.require_initial_post = true
+      @topic.save
+      get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+      wait_for_ajax_requests
+      # shouldn't see subscribe button until after posting
+      f('.topic-subscribe-button').displayed?.should be_false
+      add_reply new_student_entry_text
+      # now the subscribe button should be available.
+      get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+      wait_for_ajax_requests
+      f('.topic-subscribe-button').displayed?.should be_true
+    end
+
+  end
+
 end

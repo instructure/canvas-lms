@@ -62,6 +62,16 @@
       </div>
 
       <div class="span4 right-align">
+        <a href='#' class='btn topic-subscribe-button' data-tooltip="bottom"
+           title="<%= t('topic_subscribe_tooltip', 'You will be notified when comments are posted to this topic.') %>" >
+          <i class='icon-discussion-check' aria-hidden="hidden"></i>
+          <%= t(:topic_subscribe, 'Subscribe') %>
+        </a>
+        <a href='#' class='btn topic-unsubscribe-button btn-success' data-tooltip="bottom"
+           title="<%= t('topic_unsubscribe_tooltip', 'No longer receive notifications when comments are posted to this topic.') %>" >
+          <i class='icon-discussion-check' aria-hidden="hidden"></i>
+          <%= t(:topic_unsubscribe, 'Unsubscribe') %>
+        </a>
         <% if @topic.grants_right?(@current_user, nil, :update) %>
           <a href="<%= context_url(@topic.context,
                                    :edit_context_discussion_topic_url,

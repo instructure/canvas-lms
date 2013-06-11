@@ -17,6 +17,7 @@ define [
       podcast_has_student_posts: false
       require_initial_post: false
       is_announcement: false
+      subscribed: false
 
     dateAttributes: [
       'last_reply_at'
@@ -39,6 +40,14 @@ define [
     # always include assignment in view presentation
     present: =>
       Backbone.Model::toJSON.call(this)
+
+    topicSubscribe: ->
+      @set 'subscribed', true
+      $.ajaxJSON ENV.DISCUSSION.SUBSCRIBE_URL, 'PUT'
+
+    topicUnsubscribe: ->
+      @set 'subscribed', false
+      $.ajaxJSON ENV.DISCUSSION.UNSUBSCRIBE_URL, 'DELETE'
 
     toJSON: ->
       json = super

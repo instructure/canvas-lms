@@ -25,12 +25,15 @@ define [
       'click .discussion_locked_toggler': 'toggleLocked'
       'click .toggle_due_dates': 'toggleDueDates'
       'click .rte_switch_views_link': 'toggleEditorMode'
+      'click .topic-subscribe-button': 'subscribeTopic'
+      'click .topic-unsubscribe-button': 'unsubscribeTopic'
 
     els:
       '.add_root_reply': '$addRootReply'
       '#discussion_topic': '$topic'
       '.due_date_wrapper': '$dueDates'
       '.reply-textarea:first': '$textarea'
+      '#discussion-toolbar': '$discussionToolbar'
 
     initialize: ->
       @model.set 'id', ENV.DISCUSSION.TOPIC.ID
@@ -39,6 +42,11 @@ define [
       @model.set 'canAttach', ENV.DISCUSSION.PERMISSIONS.CAN_ATTACH
       @filterModel = @options.filterModel
       @filterModel.on 'change', @hideIfFiltering
+      @topic = new DiscussionTopic(id: ENV.DISCUSSION.TOPIC.ID)
+      # get rid of the /view on /api/vl/courses/x/discusison_topics/x/view
+      @topic.url = ENV.DISCUSSION.ROOT_URL.replace /\/view/m, ''
+      # set initial subscribed state
+      @topic.set 'subscribed', ENV.DISCUSSION.TOPIC.IS_SUBSCRIBED
 
     hideIfFiltering: =>
       if @filterModel.hasFilter()
@@ -51,16 +59,14 @@ define [
       $.scrollSidebar() if $(document.body).is('.with-right-side')
       assignmentRubricDialog.initTriggers()
       @$el.toggleClass 'side_comment_discussion', !ENV.DISCUSSION.THREADED
+      @subscriptionStatusChanged()
 
     filter: @::afterRender
 
     toggleLocked: (event) ->
       # this is weird but Topic.coffee was not set up to talk to the API for CRUD
       locked = $(event.currentTarget).data('mark-locked')
-      topic = new DiscussionTopic(id: ENV.DISCUSSION.TOPIC.ID)
-      # get rid of the /view on /api/vl/courses/x/discusison_topics/x/view
-      topic.url = ENV.DISCUSSION.ROOT_URL.replace /\/view/m, ''
-      topic.save({locked: locked}).done -> window.location.reload()
+      @topic.save({locked: locked}).done -> window.location.reload()
 
     toggleDueDates: (event) ->
       event.preventDefault()
@@ -74,6 +80,26 @@ define [
       event.preventDefault()
       event.stopPropagation()
       @$textarea.editorBox('toggle')
+
+    subscribeTopic: (event) ->
+      event.preventDefault()
+      @topic.topicSubscribe()
+      @subscriptionStatusChanged()
+
+    unsubscribeTopic: (event) ->
+      event.preventDefault()
+      @topic.topicUnsubscribe()
+      @subscriptionStatusChanged()
+
+    subscriptionStatusChanged: =>
+      subscribed = @topic.get 'subscribed'
+      @$discussionToolbar.removeClass 'subscribed'
+      @$discussionToolbar.removeClass 'unsubscribed'
+      if ENV.DISCUSSION.CAN_SUBSCRIBE
+        if subscribed
+          @$discussionToolbar.addClass 'subscribed'
+        else
+          @$discussionToolbar.addClass 'unsubscribed'
 
     ##
     # Adds a root level reply to the main topic
