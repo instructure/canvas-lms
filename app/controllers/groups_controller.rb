@@ -98,6 +98,7 @@ class GroupsController < ApplicationController
   include Api::V1::Attachment
   include Api::V1::Group
   include Api::V1::UserFollow
+  include Api::V1::Progress
 
   SETTABLE_GROUP_ATTRIBUTES = %w(name description join_level is_public group_category avatar_attachment storage_quota_mb)
 
@@ -647,16 +648,19 @@ class GroupsController < ApplicationController
     return render(:json => {}, :status => :bad_request) if category.student_organized?
     return render(:json => {}, :status => :bad_request) if @context.is_a?(Course) && category.restricted_self_signup?
 
-    # do the distribution and note the changes
-    groups = category.groups.active
-    potential_members = @context.users_not_in_groups(groups)
-    memberships = category.distribute_members_among_groups(potential_members, groups)
+    if value_to_boolean(params[:async])
+      category.assign_unassigned_members_in_background
+      render :json => progress_json(category.current_progress, @current_user, session)
+    else
+      # do the distribution and note the changes
+      memberships = category.assign_unassigned_members
 
-    # render the changes
-    json = memberships.group_by{ |m| m.group_id }.map do |group_id, new_members|
-      { :id => group_id, :new_members => new_members.map{ |m| m.user.group_member_json(@context) } }
+      # render the changes
+      json = memberships.group_by{ |m| m.group_id }.map do |group_id, new_members|
+        { :id => group_id, :new_members => new_members.map{ |m| m.user.group_member_json(@context) } }
+      end
+      render :json => json
     end
-    render :json => json
   end
 
   # @API Upload a file
