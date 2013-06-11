@@ -212,7 +212,7 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def create_participant
-    self.discussion_topic_participants.create(:user => self.user, :workflow_state => "read", :unread_entry_count => 0) if self.user
+    self.discussion_topic_participants.create(:user => self.user, :workflow_state => "read", :unread_entry_count => 0, :subscribed => true) if self.user
   end
 
   def update_materialized_view
@@ -296,6 +296,31 @@ class DiscussionTopic < ActiveRecord::Base
     topic_participant.try(:unread_entry_count) || self.default_unread_count
   end
 
+  def subscribed?(current_user = nil)
+    current_user ||= self.current_user
+    return false unless current_user # default for logged out user
+    participant = discussion_topic_participants.where(:user_id => current_user.id).first
+    # if there is no explicit subscription, assume the author is subscribed
+    # assume non-authors are not subscribed
+    return current_user == user if participant.try(:subscribed).nil?
+    participant.subscribed
+  end
+  
+  def subscribe(current_user = nil)
+    change_subscribed_state(true, current_user)
+  end
+
+  def unsubscribe(current_user = nil)
+    change_subscribed_state(false, current_user)
+  end
+
+  def change_subscribed_state(new_state, current_user = nil)
+    current_user ||= self.current_user
+    return unless current_user
+    return true if subscribed?(current_user) == new_state
+    update_or_create_participant(:current_user => current_user, :subscribed => new_state)
+  end
+    
   def update_or_create_participant(opts={})
     current_user = opts[:current_user] || self.current_user
     return nil unless current_user
@@ -306,10 +331,12 @@ class DiscussionTopic < ActiveRecord::Base
         topic_participant = self.discussion_topic_participants.where(:user_id => current_user).lock.first
         topic_participant ||= self.discussion_topic_participants.build(:user => current_user,
                                                                        :unread_entry_count => self.unread_count(current_user),
-                                                                       :workflow_state => "unread")
+                                                                       :workflow_state => "unread",
+                                                                       :subscribed => current_user == user)
         topic_participant.workflow_state = opts[:new_state] if opts[:new_state]
         topic_participant.unread_entry_count += opts[:offset] if opts[:offset] && opts[:offset] != 0
         topic_participant.unread_entry_count = opts[:new_count] if opts[:new_count]
+        topic_participant.subscribed = opts[:subscribed] if !opts[:subscribed].nil?
         topic_participant.save
       end
     end
@@ -653,9 +680,20 @@ class DiscussionTopic < ActiveRecord::Base
     end
   end
 
+  def participating_users(user_ids)
+    context.respond_to?(:participating_users) ? context.participating_users(user_ids) : User.find(user_ids)
+  end
+  
+  def subscribers
+    user_ids = discussion_topic_participants.where(:subscribed => true).pluck(:user_id)
+    user_ids.push(user_id) if subscribed?(user)
+    user_ids.uniq!
+    participating_users(user_ids)
+  end
+    
   def posters
     user_ids = discussion_entries.map(&:user_id).push(self.user_id).uniq
-    context.respond_to?(:participating_users) ? context.participating_users(user_ids) : User.find(user_ids)
+    participating_users(user_ids)
   end
 
   def user_name

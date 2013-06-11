@@ -600,6 +600,41 @@ describe DiscussionTopic do
 
   end
 
+  context "subscribers" do
+    before :each do
+      course_with_student(:active_all => true)
+      @context = @course
+      discussion_topic_model(:user => @teacher)
+    end
+    
+    it "should automatically include the author" do
+      @topic.subscribers.should include(@teacher)
+    end
+
+    it "should not include the author if they unsubscribe" do
+      @topic.unsubscribe(@teacher)
+      @topic.subscribers.should_not include(@teacher)
+    end
+
+    it "should not automatically include posters" do
+      @topic.reply_from(:user => @student, :text => "entry")
+      @topic.subscribers.should_not include(@student)
+    end
+
+    it "should include users who subscribe" do
+      @topic.subscribe(@student)
+      @topic.subscribers.should include(@student)
+    end
+
+    it "should not include anyone no longer in the course" do
+      @topic.subscribe(@student)
+      @topic2 = @course.discussion_topics.create!(:title => "student topic", :message => "I'm outta here", :user => @student)
+      @student.enrollments.first.destroy
+      @topic.subscribers.should_not include(@student)
+      @topic2.subscribers.should_not include(@student)
+    end
+  end
+  
   context "posters" do
     before :each do
       @teacher = course_with_teacher(:active_all => true).user
@@ -896,6 +931,53 @@ describe DiscussionTopic do
     end
   end
 
+  context "subscribing" do
+    before :each do
+      course_with_student(:active_all => true)
+      @context = @course
+      discussion_topic_model(:user => @teacher)
+    end
+    
+    it "should allow subscription" do
+      @topic.subscribed?(@student).should be_false
+      @topic.subscribe(@student)
+      @topic.subscribed?(@student).should be_true
+    end
+
+    it "should allow unsubscription" do
+      @topic.subscribed?(@teacher).should be_true
+      @topic.unsubscribe(@teacher)
+      @topic.subscribed?(@teacher).should be_false
+    end
+    
+    it "should be idempotent" do
+      @topic.subscribed?(@student).should be_false
+      @topic.unsubscribe(@student)
+      @topic.subscribed?(@student).should be_false
+    end
+    
+    it "should assume the author is subscribed" do
+      @topic.subscribed?(@teacher).should be_true
+    end
+
+    it "should not assume posters are subscribed" do
+      @topic.reply_from(:user => @student, :text => 'first post!')
+      @topic.subscribed?(@student).should be_false
+    end
+
+    context "when initial_post_required" do
+      it "should unsubscribe a user when all of their posts are deleted" do
+        @topic.require_initial_post = true
+        @topic.save!
+        @entry = @topic.reply_from(:user => @student, :text => 'first post!')
+        @topic.subscribe(@student)
+        @topic.subscribed?(@student).should be_true
+        @entry.destroy
+        @topic.subscribed?(@student).should be_false
+      end
+    end
+  end
+  
   context "materialized view" do
     before do
       topic_with_nested_replies

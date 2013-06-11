@@ -54,6 +54,9 @@
 #        // The count of unread entries of this topic for the current user.
 #        "unread_count":0,
 #
+#        // Whether or not the current user is subscribed to this topic.
+#        "subscribed":true,
+#
 #        // The unique identifier of the assignment if the topic is for grading, otherwise null.
 #        "assignment_id":null,
 #

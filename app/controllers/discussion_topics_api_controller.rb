@@ -25,7 +25,7 @@ class DiscussionTopicsApiController < ApplicationController
 
   before_filter :require_context
   before_filter :require_topic
-  before_filter :require_initial_post, :except => [:add_entry, :mark_topic_read, :mark_topic_unread]
+  before_filter :require_initial_post, :except => [:add_entry, :mark_topic_read, :mark_topic_unread, :unsubscribe_topic]
 
   # @API Get a single topic
   #
@@ -36,7 +36,6 @@ class DiscussionTopicsApiController < ApplicationController
   #     curl https://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id> \ 
   #         -H 'Authorization: Bearer <token>'
   def show
-    return unless authorized_action(@topic, @current_user, :read)
     render :json => discussion_topics_api_json([@topic], @context, @current_user, session).first
   end
 
@@ -93,7 +92,6 @@ class DiscussionTopicsApiController < ApplicationController
   #     ]
   #   }
   def view
-    return unless authorized_action(@topic, @current_user, :read)
     structure, participant_ids, entry_ids, new_entries_structure = @topic.materialized_view(:include_new_entries => params[:include_new_entries] == '1')
 
     if structure
@@ -222,10 +220,8 @@ class DiscussionTopicsApiController < ApplicationController
   #         } ],
   #       "has_more_replies": false } ]
   def entries
-    if authorized_action(@topic, @current_user, :read)
-      @entries = Api.paginate(root_entries(@topic).newest_first, self, entry_pagination_url(@topic))
-      render :json => discussion_entry_api_json(@entries, @context, @current_user, session)
-    end
+    @entries = Api.paginate(root_entries(@topic).newest_first, self, entry_pagination_url(@topic))
+    render :json => discussion_entry_api_json(@entries, @context, @current_user, session)
   end
 
   # @API Post a reply
@@ -252,7 +248,7 @@ class DiscussionTopicsApiController < ApplicationController
   def add_reply
     @parent = all_entries(@topic).find(params[:entry_id])
     @entry = build_entry(@parent.discussion_subentries)
-    if authorized_action(@topic, @current_user, :read) && authorized_action(@entry, @current_user, :create)
+    if authorized_action(@entry, @current_user, :create)
       save_entry
     end
   end
@@ -303,10 +299,8 @@ class DiscussionTopicsApiController < ApplicationController
   #       "created_at": "2011-11-03T21:26:44Z" } ]
   def replies
     @parent = root_entries(@topic).find(params[:entry_id])
-    if authorized_action(@topic, @current_user, :read)
-      @replies = Api.paginate(reply_entries(@parent).newest_first, self, reply_pagination_url(@parent))
-      render :json => discussion_entry_api_json(@replies, @context, @current_user, session)
-    end
+    @replies = Api.paginate(reply_entries(@parent).newest_first, self, reply_pagination_url(@parent))
+    render :json => discussion_entry_api_json(@replies, @context, @current_user, session)
   end
 
   # @API List entries
@@ -348,12 +342,10 @@ class DiscussionTopicsApiController < ApplicationController
   #     { ... entry 3 ... },
   #   ]
   def entry_list
-    if authorized_action(@topic, @current_user, :read)
-      ids = Array(params[:ids])
-      entries = @topic.discussion_entries.find(ids, :order => :id)
-      @entries = Api.paginate(entries, self, entry_pagination_url(@topic))
-      render :json => discussion_entry_api_json(@entries, @context, @current_user, session, [])
-    end
+    ids = Array(params[:ids])
+    entries = @topic.discussion_entries.find(ids, :order => :id)
+    @entries = Api.paginate(entries, self, entry_pagination_url(@topic))
+    render :json => discussion_entry_api_json(@entries, @context, @current_user, session, [])
   end
 
   # @API Mark topic as read
@@ -463,6 +455,33 @@ class DiscussionTopicsApiController < ApplicationController
     change_entry_read_state("unread")
   end
 
+  # @API Subscribe to a topic
+  # Subscribe to a topic to receive notifications about new entries
+  #
+  # On success, the response will be 204 No Content with an empty body
+  #
+  # @example_request
+  #   curl 'http://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/subscribed.json' \ 
+  #        -X PUT \ 
+  #        -H "Authorization: Bearer <token>" \ 
+  #        -H "Content-Length: 0"
+  def subscribe_topic
+    render_state_change_result @topic.subscribe(@current_user)
+  end
+  
+  # @API Unsubscribe from a topic
+  # Unsubscribe from a topic to stop receiving notifications about new entries
+  #
+  # On success, the response will be 204 No Content with an empty body
+  #
+  # @example_request
+  #   curl 'http://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/subscribed.json' \ 
+  #        -X DELETE \ 
+  #        -H "Authorization: Bearer <token>" 
+  def unsubscribe_topic
+    render_state_change_result @topic.unsubscribe(@current_user)
+  end
+  
   protected
   def require_topic
     if params[:topic_id] == "self" && @context.is_a?(CollectionItem)
@@ -534,15 +553,7 @@ class DiscussionTopicsApiController < ApplicationController
   end
 
   def change_topic_read_state(new_state)
-    if authorized_action(@topic, @current_user, :read)
-      topic_participant = @topic.change_read_state(new_state, @current_user)
-      if topic_participant.present? && (topic_participant == true || topic_participant.errors.blank?)
-        render :nothing => true, :status => :no_content
-      else
-        error_json = topic_participant.errors.to_json rescue {}
-        render :json => error_json, :status => :bad_request
-      end
-    end
+    render_state_change_result @topic.change_read_state(new_state, @current_user)
   end
 
   def get_forced_option()
@@ -554,10 +565,8 @@ class DiscussionTopicsApiController < ApplicationController
   def change_topic_all_read_state(new_state)
     opts = get_forced_option
 
-    if authorized_action(@topic, @current_user, :read)
-      @topic.change_all_read_state(new_state, @current_user, opts)
-      render :json => {}, :status => :no_content
-    end
+    @topic.change_all_read_state(new_state, @current_user, opts)
+    render :json => {}, :status => :no_content
   end
 
   def change_entry_read_state(new_state)
@@ -565,13 +574,23 @@ class DiscussionTopicsApiController < ApplicationController
     opts = get_forced_option
 
     if authorized_action(@entry, @current_user, :read)
-      entry_participant = @entry.change_read_state(new_state, @current_user, opts)
-      if entry_participant.present? && (entry_participant == true || entry_participant.errors.blank?)
-        render :nothing => true, :status => :no_content
-      else
-        error_json = entry_participant.errors.to_json rescue {}
-        render :json => error_json, :status => :bad_request
-      end
+      render_state_change_result @entry.change_read_state(new_state, @current_user, opts)
     end
   end
+
+  # the result of several state change functions are the following:
+  #  nil - no current user
+  #  true - state is already set to the requested state
+  #  participant with errors - something went wrong with the participant
+  #  participant with no errors - the change went through
+  # this function renders a 204 No Content for a success, or a Bad Request
+  # for failure with participant errors if there are any
+  def render_state_change_result(result)
+    if result == true || result.try(:errors).blank?
+      render :nothing => true, :status => :no_content
+    else
+      error_json = result.try(:errors).try(:to_json) || {}
+      render :json => error_json, :status => :bad_request
+    end
+  end 
 end

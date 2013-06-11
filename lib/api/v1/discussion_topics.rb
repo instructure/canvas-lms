@@ -57,6 +57,7 @@ module Api::V1::DiscussionTopics
                   :position => topic.position,
                   :read_state => topic.read_state(user),
                   :unread_count => topic.unread_count(user),
+                  :subscribed => topic.subscribed?(user),
                   :topic_children => children,
                   :attachments => attachments,
                   :locked => topic.locked?,

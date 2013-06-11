@@ -209,6 +209,7 @@ describe DiscussionTopicsController, :type => :integration do
                  {"read_state"=>"read",
                   "unread_count"=>0,
                   "podcast_url"=>"/feeds/topics/#{@topic.id}/enrollment_randomness.rss",
+                  "subscribed"=>@topic.subscribed?(@user),
                   "require_initial_post"=>nil,
                   "title"=>"Topic 1",
                   "discussion_subentry_count"=>0,
@@ -258,7 +259,7 @@ describe DiscussionTopicsController, :type => :integration do
         json.size.should == 2
         # get rid of random characters in podcast url
         json.last["podcast_url"].gsub!(/_[^.]*/, '_randomness')
-        json.last.should == @response_json
+        json.last.should == @response_json.merge("subscribed" => @sub.subscribed?(@user))
       end
 
       it "should order topics by descending position by default" do
@@ -350,7 +351,7 @@ describe DiscussionTopicsController, :type => :integration do
 
         # get rid of random characters in podcast url
         json["podcast_url"].gsub!(/_[^.]*/, '_randomness')
-        json.should == @response_json
+        json.should == @response_json.merge("subscribed" => @topic.subscribed?(@user))
       end
     end
 
@@ -677,6 +678,7 @@ describe DiscussionTopicsController, :type => :integration do
     expected = {
       "read_state"=>"read",
       "unread_count"=>0,
+      "subscribed"=>true,
       "podcast_url"=>nil,
       "podcast_has_student_posts"=>nil,
       "require_initial_post"=>nil,
@@ -1471,6 +1473,72 @@ describe DiscussionTopicsController, :type => :integration do
     end
   end
 
+  context "subscribing" do
+    before do
+      student_in_course(:active_all => true)
+      @topic1 = create_topic(@course, :user => @student)
+      @topic2 = create_topic(@course, :user => @teacher, :require_initial_post => true)
+    end
+
+    def call_subscribe(topic, user, course=@course)
+      @user = user
+      raw_api_call(:put, "/api/v1/courses/#{course.id}/discussion_topics/#{topic.id}/subscribed",
+                   { :controller => "discussion_topics_api", :action => "subscribe_topic", :format => "json", :course_id => course.id.to_s, :topic_id => topic.id.to_s})
+      response.status.to_i
+    end
+    
+    def call_unsubscribe(topic, user, course=@course)
+      @user = user
+      raw_api_call(:delete, "/api/v1/courses/#{course.id}/discussion_topics/#{topic.id}/subscribed",
+                   { :controller => "discussion_topics_api", :action => "unsubscribe_topic", :format => "json", :course_id => course.id.to_s, :topic_id => topic.id.to_s})
+      response.status.to_i
+    end
+    
+    it "should allow subscription" do
+      call_subscribe(@topic1, @teacher).should == 204
+      @topic1.subscribed?(@teacher).should be_true
+    end
+
+    it "should allow unsubscription" do
+      call_unsubscribe(@topic2, @teacher).should == 204
+      @topic2.subscribed?(@teacher).should be_false
+    end
+
+    it "should be idempotent" do
+      call_unsubscribe(@topic1, @teacher).should == 204
+      call_subscribe(@topic1, @student).should == 204
+    end
+
+    context "when initial_post_required" do
+      it "should allow subscription with an initial post" do
+        @user = @student
+        create_reply(@topic2, :message => 'first post!')
+        call_subscribe(@topic2, @student).should == 204
+        @topic2.subscribed?(@student).should be_true
+      end
+      
+      it "should not allow subscription without an initial post" do
+        call_subscribe(@topic2, @student).should == 403
+      end
+
+      it "should allow unsubscription even without an initial post" do
+        @topic2.subscribe(@student)
+        @topic2.subscribed?(@student).should be_true
+        call_unsubscribe(@topic2, @student).should == 204
+        @topic2.subscribed?(@student).should be_false
+      end
+
+      it "should unsubscribe a user if all their posts get deleted" do
+        @user = @student
+        @entry = create_reply(@topic2, :message => 'first post!')
+        call_subscribe(@topic2, @student).should == 204
+        @topic2.subscribed?(@student).should be_true
+        @entry.destroy
+        @topic2.subscribed?(@student).should be_false
+      end
+    end
+  end
+  
   describe "threaded discussions" do
     before do
       student_in_course(:active_all => true)

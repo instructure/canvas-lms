@@ -807,6 +807,8 @@ ActionController::Routing::Routes.draw do |map|
         topics.delete "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/read_all", :action => :mark_all_unread, :path_name => "#{context}_discussion_topic_mark_all_unread"
         topics.put "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/entries/:entry_id/read", :action => :mark_entry_read, :path_name => "#{context}_discussion_topic_discussion_entry_mark_read"
         topics.delete "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/entries/:entry_id/read", :action => :mark_entry_unread, :path_name => "#{context}_discussion_topic_discussion_entry_mark_unread"
+        topics.put "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/subscribed", :action => :subscribe_topic, :path_name => "#{context}_discussion_topic_subscribe"
+        topics.delete "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/subscribed", :action => :unsubscribe_topic, :path_name => "#{context}_discussion_topic_unsubscribe"
       end
       topic_routes(topics, "course")
       topic_routes(topics, "group")
