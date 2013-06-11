@@ -514,7 +514,7 @@ class SubmissionsController < ApplicationController
   protected
 
   def submission_zip
-    @attachments = @assignment.attachments.where(:display_name => 'submissions.zip', :workflow_state => ['to_be_zipped', 'zipping', 'zipped', 'errored'], :user_id => @current_user).order(:created_at).all
+    @attachments = @assignment.attachments.where(:display_name => 'submissions.zip', :workflow_state => ['to_be_zipped', 'zipping', 'zipped', 'errored', 'unattached'], :user_id => @current_user).order(:created_at).all
     @attachment = @attachments.pop
     @attachments.each{|a| a.destroy! }
     if @attachment && (@attachment.created_at < 1.hour.ago || @attachment.created_at < (@assignment.submissions.map{|s| s.submitted_at}.compact.max || @attachment.created_at))
