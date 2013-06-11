@@ -1,4 +1,4 @@
-require Pathname(File.dirname(__FILE__)) + "../model/sfu/course"
+require Pathname(File.dirname(__FILE__)) + "../model/sfu/sfu"
 
 class ApiController < ApplicationController
   before_filter :require_user
