@@ -36,7 +36,13 @@ define([
       $(this).val(date);
     });
     $("#add_notification_form").submit(function(event) {
-      var result = $(this).validateForm({
+      var $this = $(this);
+      var $confirmation = $this.find('#confirm_global_announcement:not(:checked)');
+      if ($confirmation.length > 0) {
+        $confirmation.errorBox(I18n.t('confirms.global_announcement', "You must confirm the global announcement"));
+        return false;
+      }
+      var result = $this.validateForm({
         object_name: 'account_notification',
         required: ['start_at', 'end_at', 'subject', 'message'],
         date_fields: ['start_at', 'end_at']

@@ -682,7 +682,13 @@ TEXT
                   <option value="calendar" class="calendar"><%= t(:alert_icon_calendar_option, "calendar") %></option>
                 </select>
               </td>
-            </tr><tr>
+            </tr>
+            <% if @account.site_admin? %>
+              <tr>
+                <td colspan=2><input type=checkbox id=confirm_global_announcement name=confirm_global_announcement> <%= label_tag :confirm_global_announcement, t(:confirm_global_announcement, "This announcement will be shown to *all* Canvas users. Confirm that you want to create it.", :wrapper => '<b>\1</b>') %></td>
+              </tr>
+            <% end %>
+            <tr>
               <td><%= f.blabel :message, :en => "Message" %></td>
             </tr>
           </table>
