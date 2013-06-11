@@ -157,7 +157,7 @@ class FoldersController < ApplicationController
       folder_filename = "#{t :folder_filename, "folder"}.zip"
       
       @attachments = Attachment.find_all_by_context_id_and_context_type_and_display_name_and_user_id(@folder.id, @folder.class.to_s, folder_filename, user_id).
-                                select{|a| ['to_be_zipped', 'zipping', 'zipped'].include?(a.workflow_state) && !a.deleted? }.
+                                select{|a| ['to_be_zipped', 'zipping', 'zipped', 'unattached'].include?(a.workflow_state) && !a.deleted? }.
                                 sort_by{|a| a.created_at }
       @attachment = @attachments.pop
       @attachments.each{|a| a.destroy! }

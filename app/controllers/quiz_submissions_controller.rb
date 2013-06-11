@@ -172,7 +172,7 @@ class QuizSubmissionsController < ApplicationController
   # TODO: this is mostly copied and pasted from submission_controller.rb. pull
   # out common code
   def submission_zip
-    @attachments = @quiz.attachments.where(:display_name => 'submissions.zip', :workflow_state => ['to_be_zipped', 'zipping', 'zipped', 'errored'], :user_id => @current_user).order(:created_at).all
+    @attachments = @quiz.attachments.where(:display_name => 'submissions.zip', :workflow_state => ['to_be_zipped', 'zipping', 'zipped', 'errored', 'unattached'], :user_id => @current_user).order(:created_at).all
     @attachment = @attachments.pop
     @attachments.each{|a| a.destroy! }
     if @attachment && (@attachment.created_at < 1.hour.ago || @attachment.created_at < (@quiz.quiz_submissions.map{|s| s.finished_at}.compact.max || @attachment.created_at))
