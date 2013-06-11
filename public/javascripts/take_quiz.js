@@ -17,6 +17,7 @@
  */
 define([
   'compiled/views/quizzes/FileUploadQuestionView',
+  'compiled/models/File',
   'i18n!quizzes.take_quiz',
   'jquery' /* $ */,
   'quiz_timing',
@@ -33,7 +34,7 @@ define([
   'tinymce.editor_box' /* editorBox */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'compiled/behaviors/quiz_selectmenu'
-], function(FileUploadQuestionView,I18n, $, timing, autoBlurActiveInput, _) {
+], function(FileUploadQuestionView, File, I18n, $, timing, autoBlurActiveInput, _) {
 
   var lastAnswerSelected = null;
   var lastSuccessfulSubmissionData = null;
@@ -589,8 +590,8 @@ define([
     if (val && val !==  0){
       $el.find('.file-upload-box').addClass('file-upload-box-with-file');
     }
-    var model = ENV.ATTACHMENTS[val] || {};
-    new FileUploadQuestionView({el: el,model: model}).render();
+    var model = new File(ENV.ATTACHMENTS[val], {preflightUrl: ENV.UPLOAD_URL});
+    new FileUploadQuestionView({el: el, model: model}).render();
   });
 
 });

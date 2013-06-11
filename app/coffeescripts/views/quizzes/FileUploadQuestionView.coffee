@@ -6,7 +6,7 @@ define [
   'underscore',
   'jquery.instructure_forms',
   'jquery.disableWhileLoading'
-], ({Model,View}, $, template,uploadedOrRemovedTemplate,_) ->
+], ({View}, $, template, uploadedOrRemovedTemplate, _) ->
 
   class FileUploadQuestion extends View
 
@@ -29,30 +29,11 @@ define [
       # get marked as read before the file is uploaded.
       event.preventDefault()
       event.stopPropagation()
-      if val = @$('.file-upload').val()
-        @deferred = new $.Deferred()
+      if val = @$fileUpload.val()
         @removeFileStatusMessage()
-        @$fileUploadBox.disableWhileLoading(@deferred)
-        @uploadAttachment()
-
-    uploadAttachment: =>
-      el = $('.file-upload')[0]
-      name = (el.value || el.name).split(/(\/|\\)/).pop()
-      opts = name: name, on_duplicate: 'rename'
-      $.ajaxJSON ENV.UPLOAD_URL,'POST',opts,
-        # success
-        (data) =>
-          model = new Model data.upload_params
-          $(el).attr('name', data.file_param)
-          model.set('file', el)
-          model.url = -> data.upload_url
-          model.save null,
-            multipart: el
-            onlyGivenParameters: true
-            success: (model) => @processAttachments [model.toJSON()]
-            error: (err) =>
-        ,(err) =>
-          console.log(err)
+        @model.set 'file', @$fileUpload[0]
+        dfrd = @model.save(null, success: @processAttachment)
+        @$fileUploadBox.disableWhileLoading dfrd
 
     openFileBrowser: (event) =>
       event.preventDefault()
@@ -60,30 +41,27 @@ define [
 
     render: =>
       super
-      model = @model || {}
       # This unfortunate bit of browser detection is here because IE9
       # will throw an error if you programatically call "click" on the
       # input file element, get the file element, and submit a form.
       # For now, remove the input rendered in ERB-land, and the template is
       # responsible for rendering a fallback to a regular input type=file
-      model.isIE = !!$.browser.msie
-      if model.isIE
-        @$('.file-upload').remove()
-      @$fileUploadBox.html template model
+      isIE = !!$.browser.msie
+      if isIE
+        @$fileUpload.remove()
+      @$fileUploadBox.html template _.extend({}, @model.toJSON(), {isIE})
       this
 
     removeFileStatusMessage: =>
       @$fileUploadBox.siblings('.file-status').remove()
 
     # For now we'll just process the first one.
-    processAttachments: (attachments) =>
-      @deferred.resolve()
-      [@model,__] = attachments
+    processAttachment: (attachment) =>
       @$attachmentID.val(@model.id).trigger 'change'
       @$fileUploadBox.addClass 'file-upload-box-with-file'
       @render()
       @$fileUploadBox.parent().append uploadedOrRemovedTemplate(
-        _.extend({},@model,{fileUploaded: true})
+        _.extend({}, @model.toJSON(), {fileUploaded: true})
       )
 
     # For now we'll just remove it from the form, but not actually delete it
@@ -93,11 +71,9 @@ define [
       event.preventDefault()
       @$attachmentID.val("").trigger 'change'
       @$fileUploadBox.removeClass 'file-upload-box-with-file'
-      oldModel = @model
-      @model = {}
+      oldModel = @model.toJSON()
+      @model.clear()
       @removeFileStatusMessage()
       @render()
-      @$fileUploadBox.parent().append uploadedOrRemovedTemplate(
-        _.extend({},oldModel,{fileUploaded: false})
-      )
+      @$fileUploadBox.parent().append uploadedOrRemovedTemplate(oldModel)
 
