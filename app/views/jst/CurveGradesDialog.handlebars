@@ -25,6 +25,13 @@
     <input type="checkbox" name="assign_blanks" id="assign_blanks"/>
     <label for="assign_blanks">{{#t "labels.assign_blanks"}}Assign zeroes to unsubmitted students{{/t}}</label>
   </p>
+  <div class="alert alert-danger">
+    <p>
+      {{#t "this_is_permanent"}}
+      Grade curving permanently changes student grades.  This action is irreversible and the former grades cannot be recovered.
+      {{/t}}
+    </p>
+  </div>
   <button data-text-while-loading="{{#t "buttons.curving_grades"}}Curving Grades...{{/t}}" type="submit" class="btn btn-primary">
     {{#t "buttons.curve_grades"}}Curve Grades{{/t}}
   </button>
