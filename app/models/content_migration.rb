@@ -197,6 +197,18 @@ class ContentMigration < ActiveRecord::Base
     migration_settings[:course_archive_download_url] = url
   end
 
+  def skip_job_progress=(val)
+    if val
+      migration_settings[:skip_job_progress] = true
+    else
+      migration_settings.delete(:skip_job_progress)
+    end
+  end
+
+  def skip_job_progress
+    !!migration_settings[:skip_job_progress]
+  end
+
   def root_account
     self.context.root_account rescue nil
   end
@@ -276,7 +288,7 @@ class ContentMigration < ActiveRecord::Base
     end
     add_error(t(:unexpected_error, "There was an unexpected error, please contact support."), opts)
     self.workflow_state = :failed
-    job_progress.fail
+    job_progress.fail unless skip_job_progress
     save
   end
 
@@ -306,6 +318,7 @@ class ContentMigration < ActiveRecord::Base
   end
 
   def reset_job_progress(wf_state=:queued)
+    return if skip_job_progress
     self.progress = 0
     if self.job_progress
       p = self.job_progress
@@ -540,12 +553,14 @@ class ContentMigration < ActiveRecord::Base
 
   def fast_update_progress(val)
     reset_job_progress unless job_progress
-    if val == 100
-      job_progress.completion = 100
-      job_progress.workflow_state = 'completed'
-      job_progress.save!
-    else
-      job_progress.update_completion!(val)
+    unless skip_job_progress
+      if val == 100
+        job_progress.completion = 100
+        job_progress.workflow_state = 'completed'
+        job_progress.save!
+      else
+        job_progress.update_completion!(val)
+      end
     end
     # Until this progress is phased out
     self.progress = val
