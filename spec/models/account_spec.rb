@@ -266,7 +266,7 @@ describe Account do
         Account.services_exposed_to_ui_hash(:setting).keys.should == Account.allowable_services.reject { |h,k| k[:expose_to_ui] != :setting || (k[:expose_to_ui_proc] && !k[:expose_to_ui_proc].call(nil)) }.keys
       end
 
-      it "should filter based on user if a proc is specified" do
+      it "should filter based on user and account if a proc is specified" do
         user1 = User.create!
         user2 = User.create!
         Account.register_service(:myservice, {
@@ -274,11 +274,11 @@ describe Account do
           description: "Nope",
           expose_to_ui: :setting,
           default: false,
-          expose_to_ui_proc: proc { |user| user == user2 },
+          expose_to_ui_proc: proc { |user, account| user == user2 && account == Account.default },
         })
         Account.services_exposed_to_ui_hash(:setting).keys.should_not be_include(:myservice)
-        Account.services_exposed_to_ui_hash(:setting, user1).keys.should_not be_include(:myservice)
-        Account.services_exposed_to_ui_hash(:setting, user2).keys.should be_include(:myservice)
+        Account.services_exposed_to_ui_hash(:setting, user1, Account.default).keys.should_not be_include(:myservice)
+        Account.services_exposed_to_ui_hash(:setting, user2, Account.default).keys.should be_include(:myservice)
       end
     end
 

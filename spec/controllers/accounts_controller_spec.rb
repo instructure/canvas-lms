@@ -293,19 +293,22 @@ describe AccountsController do
 
     it "should allow updating services that appear in the ui for the current user" do
       Account.register_service(:test1, { name: 'test1', description: '', expose_to_ui: :setting, default: false })
-      Account.register_service(:test2, { name: 'test2', description: '', expose_to_ui: :setting, default: false, expose_to_ui_proc: proc { |user| false } })
+      Account.register_service(:test2, { name: 'test2', description: '', expose_to_ui: :setting, default: false, expose_to_ui_proc: proc { |user, account| false } })
       user_session(user)
       @account = Account.create!
+      Account.register_service(:test3, { name: 'test3', description: '', expose_to_ui: :setting, default: false, expose_to_ui_proc: proc { |user, account| account == @account } })
       Account.site_admin.add_user(@user)
       post 'update', id: @account.id, account: {
         services: {
           'test1' => '1',
           'test2' => '1',
+          'test3' => '1',
         }
       }
       @account.reload
       @account.allowed_services.should match(%r{\+test1})
       @account.allowed_services.should_not match(%r{\+test2})
+      @account.allowed_services.should match(%r{\+test3})
     end
 
     describe "quotas" do

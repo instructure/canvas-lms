@@ -42,6 +42,7 @@ describe "settings tabs" do
     notification.start_at.to_s.should include_text today
     notification.end_at.to_s.should include_text tomorrow
     f("#tab-announcements .user_content").text.should == "this is a message"
+    notification
   end
 
   describe "site admin" do
@@ -69,6 +70,16 @@ describe "settings tabs" do
           AccountNotification.count.should == 0
           f("#confirm_global_announcement").click
         end
+      end
+
+      it "should create survey announcements" do
+        notification = add_announcement do
+          f("#account_notification_required_account_service").click
+          get_value("#account_notification_months_in_display_cycle").should == AccountNotification.default_months_in_display_cycle.to_s
+          set_value(f("#account_notification_months_in_display_cycle"), "12")
+        end
+        notification.required_account_service.should == "account_survey_notifications"
+        notification.months_in_display_cycle.should == 12
       end
     end
   end
@@ -162,7 +173,9 @@ describe "settings tabs" do
 
     context "announcements tab" do
       it "should add an announcement" do
-        add_announcement
+        notification = add_announcement
+        notification.required_account_service.should be_nil
+        notification.months_in_display_cycle.should be_nil
       end
 
       it "should delete an announcement" do

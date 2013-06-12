@@ -1123,7 +1123,14 @@ class Account < ActiveRecord::Base
         :description => "",
         :default => false,
         :expose_to_ui => :setting
-      }
+      },
+      :account_survey_notifications => {
+        :name => "Account Surveys",
+        :description => "",
+        :default => false,
+        :expose_to_ui => :setting,
+        :expose_to_ui_proc => proc { |user, account| user && account && account.grants_right?(user, :manage_site_settings) },
+      },
     }.merge(@plugin_services || {}).freeze
   end
 
@@ -1198,12 +1205,12 @@ class Account < ActiveRecord::Base
 
   # if expose_as is nil, all services exposed in the ui are returned
   # if it's :service or :setting, then only services set to be exposed as that type are returned
-  def self.services_exposed_to_ui_hash(expose_as = nil, current_user = nil)
+  def self.services_exposed_to_ui_hash(expose_as = nil, current_user = nil, account = nil)
     if expose_as
       self.allowable_services.reject { |key, setting| setting[:expose_to_ui] != expose_as }
     else
       self.allowable_services.reject { |key, setting| !setting[:expose_to_ui] }
-    end.reject { |key, setting| setting[:expose_to_ui_proc] && !setting[:expose_to_ui_proc].call(current_user) }
+    end.reject { |key, setting| setting[:expose_to_ui_proc] && !setting[:expose_to_ui_proc].call(current_user, account) }
   end
 
   def service_enabled?(service)

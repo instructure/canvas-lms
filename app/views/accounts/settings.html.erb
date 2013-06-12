@@ -282,7 +282,7 @@ TEXT
              <% end %>
           <% end %>
           <% f.fields_for :services do |services| %>
-            <% Account.services_exposed_to_ui_hash(:setting, @current_user).sort_by { |k,h| h[:name] }.each do |key, service| %>
+            <% Account.services_exposed_to_ui_hash(:setting, @current_user, @account).sort_by { |k,h| h[:name] }.each do |key, service| %>
               <div>
                 <%= services.check_box key, :checked => @account.service_enabled?(key) %>
                 <%= services.label key, service[:name] + " " %>
@@ -652,6 +652,16 @@ TEXT
               </span>&nbsp;&nbsp;
               <%= link_to(context_user_name(@account, announcement.user_id), user_path(announcement.user_id)) %>
             </div>
+            <% if announcement.required_account_service %>
+              <div>
+                <%= Account.allowable_services[announcement.required_account_service.to_sym].try(:[], :name) %>
+              </div>
+            <% end %>
+            <% if announcement.months_in_display_cycle %>
+              <div>
+                <%= t :announcement_sent_to_subset, "Sent to 1 / %{denominator} users each month", denominator: announcement.months_in_display_cycle %>
+              </div>
+            <% end %>
             <div class="message user_content">
               <%= user_content(announcement.message) %>
             </div>
@@ -684,8 +694,16 @@ TEXT
               </td>
             </tr>
             <% if @account.site_admin? %>
+              <tr id="confirm_global_announcement_field">
+                <td colspan=2><input type="checkbox" id="confirm_global_announcement" name="confirm_global_announcement"> <%= label_tag :confirm_global_announcement, t(:confirm_global_announcement, "This announcement will be shown to *all* Canvas users. Confirm that you want to create it.", :wrapper => '<b>\1</b>') %></td>
+              </tr>
               <tr>
-                <td colspan=2><input type=checkbox id=confirm_global_announcement name=confirm_global_announcement> <%= label_tag :confirm_global_announcement, t(:confirm_global_announcement, "This announcement will be shown to *all* Canvas users. Confirm that you want to create it.", :wrapper => '<b>\1</b>') %></td>
+                <td colspan=2>
+                  <div id="survey_announcement_field">
+                    <%# don't use the rails check_box helper here, because we don't want the extra hidden element when not checked %>
+                    <input type="checkbox" name="account_notification[required_account_service]" id="account_notification_required_account_service" value="account_survey_notifications" />
+                    <label><%= t :survey_announcement, "This is a survey announcement. It will be sent to 1 / %{denominator} of users in enabled accounts for each month that it's active.", denominator: f.text_field(:months_in_display_cycle, value: AccountNotification.default_months_in_display_cycle, disabled: true) %></label>
+                  </label>
               </tr>
             <% end %>
             <tr>

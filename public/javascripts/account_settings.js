@@ -37,19 +37,29 @@ define([
     });
     $("#add_notification_form").submit(function(event) {
       var $this = $(this);
-      var $confirmation = $this.find('#confirm_global_announcement:not(:checked)');
+      var $confirmation = $this.find('#confirm_global_announcement:visible:not(:checked)');
       if ($confirmation.length > 0) {
         $confirmation.errorBox(I18n.t('confirms.global_announcement', "You must confirm the global announcement"));
         return false;
       }
-      var result = $this.validateForm({
+      var validations = {
         object_name: 'account_notification',
         required: ['start_at', 'end_at', 'subject', 'message'],
-        date_fields: ['start_at', 'end_at']
-      });
+        date_fields: ['start_at', 'end_at'],
+        numbers: []
+      };
+      if ($('#account_notification_months_in_display_cycle').length > 0) {
+        validations.numbers.push('months_in_display_cycle');
+      }
+      var result = $this.validateForm(validations);
       if(!result) {
         return false;
       }
+    });
+    $("#account_notification_required_account_service").click(function(event) {
+      $this = $(this);
+      $("#confirm_global_announcement_field").showIf(!$this.is(":checked"));
+      $("#account_notification_months_in_display_cycle").prop("disabled", !$this.is(":checked"));
     });
     $(".delete_notification_link").click(function(event) {
       event.preventDefault();
