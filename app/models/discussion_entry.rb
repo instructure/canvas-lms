@@ -78,7 +78,7 @@ class DiscussionEntry < ActiveRecord::Base
 
   set_broadcast_policy do |p|
     p.dispatch :new_discussion_entry
-    p.to { posters - [user] }
+    p.to { subscribers - [user] }
     p.whenever { |record|
       record.just_created && record.active?
     }
@@ -150,6 +150,10 @@ class DiscussionEntry < ActiveRecord::Base
 
   def posters
     self.discussion_topic.posters rescue [self.user]
+  end
+
+  def subscribers
+    subscribed_users = self.discussion_topic.subscribers
   end
 
   def plaintext_message=(val)

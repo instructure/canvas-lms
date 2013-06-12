@@ -73,4 +73,10 @@ class Announcement < DiscussionTopic
   end
   
   def is_announcement; true end
+
+  # no one should receive discussion entry notifications for announcements
+  def subscribers
+    []
+  end
+
 end

@@ -70,10 +70,17 @@ describe DiscussionEntry do
       entry = topic.discussion_entries.create!(:user => @student, :message => "Hi I'm a student")
 
       to_users = entry.messages_sent[@notification_name].map(&:user)
-      to_users.should include(@teacher)
+      to_users.should include(@teacher) # teacher is auto-subscribed
       to_users.should_not include(@student)
 
       entry = topic.discussion_entries.create!(:user => @teacher, :message => "Nice to meet you")
+      # student not subscribed so no notification to student
+      # teacher is subscribed, but does not get notification of her own posts
+      entry.messages_sent[@notification_name].should be_blank
+
+      topic.subscribe(@student)
+      entry = topic.discussion_entries.create!(:user => @teacher, :message => "Welcome to the class")
+      # now that the student is subscribed, he should gets notified of posts
       to_users = entry.messages_sent[@notification_name].map(&:user)
       to_users.should_not include(@teacher)
       to_users.should include(@student)
@@ -92,8 +99,11 @@ describe DiscussionEntry do
 
       topic = @group.discussion_topics.create!(:user => @teacher, :message => "Hi there")
       entry = topic.discussion_entries.create!(:user => s1, :message => "Hi I'm a student")
+      # teacher is subscribed but is not in the "participating_users" for this group
       entry.messages_sent[@notification_name].should be_blank
 
+      topic.subscribe(s1)
+      topic.subscribe(s2)
       entry = topic.discussion_entries.create!(:user => s2, :message => "Hi I'm a student")
       to_users = entry.messages_sent[@notification_name].map(&:user)
       to_users.should_not include(@teacher)
@@ -114,6 +124,8 @@ describe DiscussionEntry do
       outsider = @student
 
       topic = course.discussion_topics.create!(:user => teacher, :message => "Hi there")
+      # make sure they all subscribed, somehow
+      [teacher, student1, quitter, outsider].each { |user| topic.subscribe(user) }
 
       entry = topic.discussion_entries.create!(:user => quitter, :message => "Hi, I'm going to drop this class")
       quitter.enrollments.each { |e| e.destroy }
@@ -122,11 +134,19 @@ describe DiscussionEntry do
       entry = topic.discussion_entries.create!(:user => student1, :message => "Hi I'm a student")
 
       to_users = entry.messages_sent[@notification_name].map(&:user)
-      to_users.should include teacher
-      to_users.should_not include outsider
-      to_users.should_not include student1
-      to_users.should_not include quitter
+      to_users.should include teacher      # because teacher is subscribed and enrolled
+      to_users.should_not include outsider # because they're not in the class
+      to_users.should_not include student1 # because they wrote this entry
+      to_users.should_not include quitter  # because they dropped the class
     end
+
+    it "should not send them for announcements" do
+      topic = @course.announcements.create!(:user => @teacher, :message => "This is an important announcement")
+      topic.subscribe(@student)
+      entry = topic.discussion_entries.create!(:user => @teacher, :message => "Oh, and another thing...")
+      entry.messages_sent[@notification_name].should be_blank
+    end
+
   end
 
   context "send_to_inbox" do

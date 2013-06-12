@@ -15,7 +15,7 @@ define [
       @groups =
         Course: ['Due Date', 'Grading Policies', 'Course Content', 'Files', 'Announcement', 'Grading', 'Invitation',
                  'All Submissions', 'Late Grading', 'Submission Comment']
-        Discussions: ['DiscussionEntry', 'Discussion']
+        Discussions: ['Discussion', 'DiscussionEntry']
         Communication: ['Added To Conversation', 'Conversation Message']
         Scheduling: ['Student Appointment Signups', 'Appointment Signups', 'Appointment Cancelations',
                      'Appointment Availability', 'Calendar']
