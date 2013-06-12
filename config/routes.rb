@@ -713,7 +713,7 @@ ActionController::Routing::Routes.draw do |map|
       courses.delete 'courses/:id', :action => :destroy
       courses.post 'courses/:course_id/course_copy', :controller => :content_imports, :action => :copy_course_content
       courses.get 'courses/:course_id/course_copy/:id', :controller => :content_imports, :action => :copy_course_status, :path_name => :course_copy_status
-      courses.post 'courses/:course_id/files', :action => :create_file
+      courses.post 'courses/:course_id/files', :action => :create_file, :path_name => 'course_create_file'
       courses.post 'courses/:course_id/folders', :controller => :folders, :action => :create
       courses.get  'courses/:course_id/folders/:id', :controller => :folders, :action => :show, :path_name => 'course_folder'
       courses.put  'accounts/:account_id/courses', :action => :batch_update

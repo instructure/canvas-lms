@@ -1,8 +1,9 @@
 define [
   'jquery'
+  'underscore'
   'Backbone'
   'jquery.ajaxJSON'
-], ($, {Model}) ->
+], ($, _, {Model}) ->
 
   # Simple model for creating an attachment in canvas
   #
@@ -31,7 +32,8 @@ define [
       dfrd
 
     saveFrd: (data, dfrd, el, options) =>
-      @set data.upload_params
+      @uploadParams = data.upload_params
+      @set @uploadParams
       el.name = data.file_param
       @url = -> data.upload_url
       Model::save.call this, null,
@@ -42,4 +44,10 @@ define [
         error: (error) =>
           dfrd.reject(error)
           options.error?(error)
+
+    toJSON: ->
+      _.pick(@attributes, 'file', _.keys(@uploadParams ? {})...)
+
+    present: ->
+      _.clone(@attributes)
 
