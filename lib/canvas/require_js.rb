@@ -109,6 +109,11 @@ module Canvas
             'uploadify' : {
               deps: ['jquery'],
               attach: '$'
+            },
+
+            'vendor/FileAPI/FileAPI.min': {
+              deps: ['jquery', 'vendor/FileAPI/config'],
+              attach: 'FileAPI'
             }
           }
         JS

@@ -6,7 +6,7 @@ define [
   server = null
   model = null
 
-  module 'Progress',
+  module 'File',
     setup: ->
       server = sinon.fakeServer.create()
       $el = $('<input type="file">')
