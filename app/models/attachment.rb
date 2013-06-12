@@ -54,7 +54,6 @@ class Attachment < ActiveRecord::Base
   before_save :set_need_notify
 
   before_validation :assert_attachment
-  before_destroy :delete_scribd_doc
   acts_as_list :scope => :folder
 
   def self.file_store_config
@@ -315,12 +314,54 @@ class Attachment < ActiveRecord::Base
 
   serialize :scribd_doc, Scribd::Document
 
-  def delete_scribd_doc
-    return true unless self.scribd_doc && ScribdAPI.enabled? && !self.root_attachment_id
-    ScribdAPI.instance.set_user(self.scribd_account)
-    self.scribd_doc.destroy
+  # related_attachments: our root attachment, anyone who shares our root attachment,
+  # and anyone who calls us a root attachment
+  def related_attachments
+    if root_attachment_id
+      Attachment.where("id=? OR root_attachment_id=? OR (root_attachment_id=? AND id<>?)",
+                       root_attachment_id, id, root_attachment_id, id)
+    else
+      Attachment.where(:root_attachment_id => id)
+    end
   end
-  protected :delete_scribd_doc
+
+  # It seems like there are at least three possibilities here:
+  # 1. the root attachment's record has a scribd_doc; the child attachmenent's
+  #    doesn't, and uses the root's implicitly (iow, Attachment#scribd_doc
+  #    loads the parent's if the child doesn't have one).
+  #    -> I cannot find any examples of this; in my experience, the child's
+  #       record always has a scribd_doc explicitly set...
+  #    --> if we trusted this case never to happen, then we could add
+  #        "where scribd_doc is not null" to the condition below
+  # 2. the root attachment and the child attachment each have an explicit
+  #    scribd_doc, specifying the same doc_id
+  #    -> I see plenty of examples of this in the db, but I have
+  #       not seen it happen...
+  # 3. the root attachment and the child attachment each have an explicit
+  #    scribd_doc, specifying different doc_ids (i.e., not sharing)
+  #    -> This is what happens when I upload two copies of the same file.
+  def scribd_doc_shared?
+    return false unless scribd_doc
+    related_attachments.not_deleted.any? do |att|
+      att.scribd_doc && att.scribd_doc.doc_id == scribd_doc.doc_id
+    end
+  end
+
+  # disassociate the scribd_doc from this Attachment
+  # and also delete it from scribd if no other Attachments are using it
+  def delete_scribd_doc
+    return true unless ScribdAPI.enabled? && scribd_doc
+    shared = scribd_doc_shared?
+
+    scribd_doc = self.scribd_doc
+    self.scribd_doc = nil
+    self.workflow_state = 'deleted'  # not file_state :P
+    unless shared
+      ScribdAPI.instance.set_user(self.scribd_account)
+      return false unless scribd_doc.destroy
+    end
+    save
+  end
 
   # This method retrieves a URL to the thumbnail of a document, in a given size, and for any page in that document. Note that docs.getSettings and docs.getList also retrieve thumbnail URLs in default size - this method is really for resizing those. IMPORTANT - it is possible that at some time in the future, Scribd will redesign its image system, invalidating these URLs. So if you cache them, please have an update strategy in place so that you can update them if neceessary.
   #
@@ -1218,6 +1259,7 @@ class Attachment < ActiveRecord::Base
     state :errored do
       event :recycle, :transitions_to => :pending_upload
     end
+    state :deleted
     state :to_be_zipped
     state :zipping
     state :zipped
@@ -1227,7 +1269,7 @@ class Attachment < ActiveRecord::Base
 
   scope :to_be_zipped, where("attachments.workflow_state='to_be_zipped' AND attachments.scribd_attempts<10").order(:created_at)
 
-  scope :active, where("attachments.file_state<>'deleted'")
+  scope :not_deleted, where("attachments.file_state<>'deleted'")
 
   scope :not_hidden, where("attachments.file_state<>'hidden'")
   scope :not_locked, lambda {
@@ -1244,6 +1286,7 @@ class Attachment < ActiveRecord::Base
     self.deleted_at = Time.now
     ContentTag.delete_for(self)
     MediaObject.where(:attachment_id => self).update_all(:workflow_state => 'deleted', :updated_at => Time.now.utc) if self.id && delete_media_object
+    send_later_if_production(:delete_scribd_doc) if scribd_doc
     save!
     # if the attachment being deleted belongs to a user and the uuid (hash of file) matches the avatar_image_url
     # then clear the avatar_image_url value.
