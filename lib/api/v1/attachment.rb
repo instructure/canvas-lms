@@ -28,13 +28,23 @@ module Api::V1::Attachment
 
   def attachment_json(attachment, user, url_options = {}, options = {})
     can_manage_files = options.has_key?(:can_manage_files) ? options[:can_manage_files] : attachment.grants_right?(user, nil, :update)
-    url = if options[:thumbnail_url]
+    downloadable = !attachment.locked_for?(user, check_policies: true)
+
+    url = if options[:thumbnail_url] && downloadable
       # this thumbnail url is a route that redirects to local/s3 appropriately
       thumbnail_image_url(attachment.id, attachment.uuid)
+    elsif !downloadable
+      ''
     else
       file_download_url(attachment, { :verifier => attachment.uuid, :download => '1', :download_frd => '1' }.merge(url_options))
     end
-    
+
+    thumbnail_download_url = if downloadable
+      attachment.thumbnail_url
+    else
+      ''
+    end
+
     hash = {
       'id' => attachment.id,
       'content-type' => attachment.content_type,
@@ -49,7 +59,7 @@ module Api::V1::Attachment
       'hidden' => !!attachment.hidden?,
       'lock_at' => attachment.lock_at,
       'hidden_for_user' => can_manage_files ? false : !!attachment.hidden?,
-      'thumbnail_url' => attachment.thumbnail_url
+      'thumbnail_url' => thumbnail_download_url,
     }
     locked_json(hash, attachment, user, 'file')
     hash
