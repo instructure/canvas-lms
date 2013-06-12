@@ -42,7 +42,7 @@ class PluginsController < ApplicationController
       @plugin_setting.posted_settings = params[:settings] unless @plugin_setting.disabled
       if @plugin_setting.save
         flash[:notice] = t('notices.settings_updated', "Plugin settings successfully updated.")
-        redirect_to plugin_path(@plugin.id)
+        redirect_to plugin_path(@plugin.id, :all => params[:all])
       else
         @settings = @plugin.settings
         flash[:error] = t('errors.setting_update_failed', "There was an error saving the plugin settings.")
