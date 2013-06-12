@@ -1,4 +1,5 @@
 // Instructure's bootstrap mods:
+@import "environment";
 
 body {
   font-size: 13px;
@@ -188,4 +189,161 @@ blockquote p {
   height: 10px;
   margin: 5px 0;
 }
+
+.popover {
+  z-index: 10;
+}
+
+/*
+@styleguide Popovers
+
+Don't do this, we need a more accessible way to handle these cases.
+The screenreaders will read all the html entities and that's just rude.
+
+```html
+<a
+  data-tooltip='{"tooltipClass":"popover right", "position":"right"}'
+  title="<div class='popover-title'>Title of Popover</div><div class='popover-content'><p>Lo-fi next level kale chips narwhal tattooed, tonx YOLO mixtape.</p></div>">
+  Text with popover
+</a>
+<p>
+  <button
+    data-tooltip='{"tooltipClass":"popover top", "position":"top"}'
+    title="<div class='popover-title'>Title of Popover</div><div class='popover-content'><p>Lo-fi next level kale chips narwhal tattooed, tonx YOLO mixtape.</p></div>"
+    class="btn">
+    button with popover
+  </button>
+</p>
+```
+
+*/
+
+.ui-widget.ui-tooltip.popover {
+  padding: 1px;
+  font-size: 14px;
+  max-width: 236px;
+  width: 236px;
+  color: $gray;
+  text-align: left;
+  text-decoration: none;
+  background-color: $popoverBackground;
+  opacity: 1;
+  border: 1px solid #ccc;
+  border: 1px solid rgba(0,0,0,.2);
+  @include border-radius(6px);
+  @include box-shadow(0 5px 10px rgba(0,0,0,.2));
+}
+
+$popoverArrowDistanceFromCorner: $popoverArrowOuterWidth;
+.ui-tooltip.popover {
+  &:before, &:after {
+    border-color: transparent transparent $popoverArrowOuterColor transparent;
+    position: absolute;
+    border-style:solid;
+    border-width: $popoverArrowOuterWidth;
+    width:0;
+    height:0;
+    content: "";
+    top: -$popoverArrowOuterWidth * 2;
+    left: $popoverArrowDistanceFromCorner;
+  }
+  &:after {
+    border-bottom-color: $popoverTitleBackground;
+    border-width: $popoverArrowWidth;
+    top: -$popoverArrowWidth * 2;
+    left: $popoverArrowDistanceFromCorner + 1;
+  }
+  &.right:before {
+    left: auto;
+    right: $popoverArrowDistanceFromCorner;
+  }
+  &.right:after {
+    left: auto;
+    right: $popoverArrowDistanceFromCorner + 1;
+  }
+  &.bottom:before {
+    border-color: $popoverArrowOuterColor transparent transparent transparent;
+    top: auto;
+    bottom: -$popoverArrowOuterWidth * 2;
+  }
+  &.bottom:after {
+    border-color: $popoverArrowColor transparent transparent transparent;
+    top: auto;
+    bottom: -$popoverArrowWidth * 2;
+  }
+  &.center:before {
+    left: 50%;
+    margin-left: -$popoverArrowOuterWidth;
+    right: auto;
+  }
+  &.center:after {
+    left: 50%;
+    margin-left: -$popoverArrowWidth;
+    right: auto;
+  }
+  &.middle:before {
+    top: 50%;
+    margin-top: -$popoverArrowOuterWidth;
+    bottom: auto;
+  }
+  &.middle:after {
+    top: 50%;
+    margin-top: -$popoverArrowWidth;
+    bottom: auto;
+  }
+  &.horizontal:before {
+    top: 50%;
+    margin-top: -$popoverArrowOuterWidth;
+    bottom: auto;
+    left: -$popoverArrowOuterWidth * 2;
+    right: auto;
+    border-color: transparent $popoverArrowOuterColor transparent transparent;
+  }
+  &.horizontal:after {
+    top: 50%;
+    margin-top: -$popoverArrowWidth;
+    bottom: auto;
+    left: -$popoverArrowWidth * 2;
+    right: auto;
+    border-color: transparent $popoverArrowColor transparent transparent;
+  }
+  &.right.horizontal:before {
+    left: auto;
+    right: -$popoverArrowOuterWidth * 2;
+    border-color: transparent transparent transparent $popoverArrowOuterColor;
+  }
+  &.right.horizontal:after {
+    left: auto;
+    right: -$popoverArrowWidth * 2;
+    border-color: transparent transparent transparent $popoverArrowColor;
+  }
+  &.bottom.horizontal:before {
+    top: auto;
+    bottom: $popoverArrowDistanceFromCorner;
+  }
+  &.bottom.horizontal:after {
+    top: auto;
+    bottom: $popoverArrowDistanceFromCorner + 1;
+  }
+  &.top.horizontal:before {
+    margin-top: 0;
+    top: $popoverArrowDistanceFromCorner;
+  }
+  &.top.horizontal:after {
+    margin-top: 0;
+    top: $popoverArrowDistanceFromCorner + 1;
+  }
+  &.content-top.horizontal:before {
+    margin-top: 0;
+    top: 35px;
+  }
+  &.content-top.horizontal:after {
+    margin-top: 0;
+    top: 36px;
+  }
+}
+
+
+
+
 

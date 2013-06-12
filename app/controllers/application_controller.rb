@@ -84,11 +84,9 @@ class ApplicationController < ActionController::Base
         :current_user_id => @current_user.try(:id),
         :current_user => user_display_json(@current_user, :profile),
         :current_user_roles => @current_user.try(:roles),
-        :context_asset_string => @context.try(:asset_string),
         :AUTHENTICITY_TOKEN => form_authenticity_token,
-        :files_domain => HostUrl.file_host(@domain_root_account || Account.default, request.host_with_port)
+        :files_domain => HostUrl.file_host(@domain_root_account || Account.default, request.host_with_port),
       }
-      @js_env[:IS_LARGE_ROSTER] = true if @context.respond_to?(:large_roster?) && @context.large_roster?
     end
 
     hash.each do |k,v|
@@ -98,7 +96,8 @@ class ApplicationController < ActionController::Base
         @js_env[k] = v
       end
     end
-
+    @js_env[:IS_LARGE_ROSTER] = true if !@js_env[:IS_LARGE_ROSTER] && @context.respond_to?(:large_roster?) && @context.large_roster?
+    @js_env[:context_asset_string] = @context.try(:asset_string) if !@js_env[:context_asset_string]
     @js_env
   end
   helper_method :js_env

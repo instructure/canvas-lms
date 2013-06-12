@@ -21,15 +21,17 @@ define(['jquery', 'jqueryui/core', 'vendor/usher/scrollIntoView'], function($) {
     return this;
   }
 
+  Usher.autoStartFromHash = true;
+
   Usher.prototype.defaults = {
     position: true,
     resetStyles: { opacity: 0 },
     offset: {x: 20, y: 20},
     animations: {
-      left:   { left: '-=20px', opacity: 1 },
-      right:  { left: '+=20px', opacity: 1 },
-      bottom: { top: '+=20px',  opacity: 1 },
-      top:    { top: '-=20px',  opacity: 1 }
+      left:   { left: '-=10px', opacity: 1 },
+      right:  { left: '+=10px', opacity: 1 },
+      bottom: { top: '+=10px',  opacity: 1 },
+      top:    { top: '-=10px',  opacity: 1 }
     }
   };
 
@@ -373,7 +375,7 @@ define(['jquery', 'jqueryui/core', 'vendor/usher/scrollIntoView'], function($) {
     this.instances.push(instance);
     if (this.instances.length == 1) {
       this.attachEvents();
-      this.checkHash();
+      if (this.autoStartFromHash) this.checkHash();
     }
   };
 

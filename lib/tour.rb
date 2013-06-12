@@ -61,7 +61,7 @@ module Tour
     dismissed = session[:dismissed_tours] || {}
     return true if dismissed[tour[:name]] == tour[:version]
     dismissed = @current_user.preferences[:dismissed_tours] || {}
-    return true if [tour[:name]] == tour[:version]
+    return true if dismissed[tour[:name]] == tour[:version]
     false
   end
 
