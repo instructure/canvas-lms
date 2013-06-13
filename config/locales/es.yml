@@ -4212,25 +4212,25 @@ es:
         count: "Recuento de alumnos que han respondido"
     bottom: 
       student: 
-        count: "Recuento de alumnos inferior"
+        count: "Recuento de alumnos con notas más bajas"
     correct: 
       bottom: 
         student: 
-          count: "Recuento de alumnos inferior respuesta correcta"
+          count: "Recuento correcto de alumnos con notas más bajas"
       middle: 
         student: 
-          count: "Recuento de alumnos medio respuesta correcta"
+          count: "Recuento correcto de alumnos con notas intemedias"
       student: 
-        count: "Recuento de alumnos correcto"
-        ratio: "Relación de alumnos respuesta correcta"
+        count: "Recuento correcto de alumnos"
+        ratio: "Relación correcta de alumnos"
       top: 
         student: 
-          count: "Recuento de alumnos superior respuesta correcta"
+          count: "Recuento correcto de alumnos con las notas más altas"
     difficulty: 
       index: "Índice de dificultad"
     middle: 
       student: 
-        count: "Recuento de alumnos medio"
+        count: "Recuento de alumnos con notas intermedias"
     point: 
       biserial: "Punto biserial de respuesta correcta"
       distractor: "Punto biserial de respuesta distractora %{num}"
@@ -4244,12 +4244,12 @@ es:
       deviation: "Desviación estándar"
     top: 
       student: 
-        count: "Recuento de alumnos superior"
+        count: "Recuento de alumnos con mejores notas"
     variance: Variancia
     wrong: 
       student: 
-        count: "Recuento de alumnos respuesta errónea"
-        ratio: "Relación de alumnos respuesta errónea"
+        count: "Recuento erróneo de alumnos"
+        ratio: "Relación errónea de alumnos"
   curve_grades_dialog: 
     average_score: "Calificación Promedio"
     buttons: 
