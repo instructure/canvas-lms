@@ -59,5 +59,27 @@ describe "/quizzes/new" do
     end
   end
 
+  context "draft state" do
+    before :each do
+      course_with_teacher_logged_in(:active_all => true)
+      @quiz = course_quiz
+      assigns[:quiz] = @quiz
+      view_context
+    end
+
+    it 'has a published inditactor when the quiz is published' do
+      @quiz.stubs(:published?).returns true
+      render 'quizzes/new'
+      response.should contain("Published")
+      response.should_not contain("Not Published")
+    end
+
+    it 'has a not_published indicator when the quiz is not published' do
+      @quiz.stubs(:published?).returns false
+      render 'quizzes/new'
+      response.should contain("Not Published")
+    end
+  end
+
 end
 

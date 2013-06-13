@@ -37,13 +37,23 @@
     <div class="span6">
       <div class="admin-link-hover-area">
         <div class="admin-links">
+          <% if @quiz.published? %>
+            <span id='quiz-draft-state' class='published'>
+              <i class="icon-publish"></i>
+              <%= t('buttons.published', "Published") %>
+            </span>
+          <% else %>
+            <span id='quiz-draft-state' class='not_published'>
+              <i class="icon-unpublished"></i>
+              <%= t('buttons.not_published', "Not Published") %>
+            </span>
+          <% end %>
           <a class="al-trigger btn">
             <span class="screenreader-only">Manage</span>
             <i class="icon-settings"></i>
             <i class="icon-mini-arrow-down"></i>
           </a>
           <ul class="al-options">
-
             <% if @assignment %>
               <li>
                 <a href="#" rel="<%= context_url(@context, :context_assignment_rubric_url, @assignment.id) %>" class="show_rubric_link">
