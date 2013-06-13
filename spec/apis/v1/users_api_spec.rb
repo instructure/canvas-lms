@@ -314,33 +314,37 @@ describe "Users API", :type => :integration do
       api_call(:get, "/api/v1/accounts/#{@account.id}/users?per_page=12", :controller => "users", :action => "index", :account_id => @account.id.to_param, :format => 'json', :per_page => '12').size.should == 5
     end
 
-    it "should allow query by name" do
-      @account = @user.account
-      user1 = user_with_pseudonym(:active_all => true, :account => @account, :name => "John St. Clair", :sortable_name => "St. Clair, John", :username => 'john@stclair.com')
-      @user.pseudonym.sis_user_id = "user_sis_id_01"
-      @user.pseudonym.save!
-      @user = @admin
-
-      json = api_call(:get, "/api/v1/accounts/#{@account.id}/users",
-                      { :controller => 'users', :action => "index", :format => 'json', :account_id => @account.id.to_param },
-                      { :user => {:name => "John"}})
-      json.length.should == 1
-      json.should == [{
-                        'name' => user1.name,
-                        'sortable_name' => user1.sortable_name,
-                        'sis_user_id' => user1.pseudonym.sis_user_id,
-                        'id' => user1.id,
-                        'short_name' => user1.short_name,
-                        'login_id' => user1.pseudonym.unique_id,
-                        'sis_login_id' => user1.pseudonym.unique_id
-                      }]
-    end
-
     it "should return unauthorized for users without permissions" do
       @account = @student.account
       @user    = @student
       raw_api_call(:get, "/api/v1/accounts/#{@account.id}/users", :controller => "users", :action => "index", :account_id => @account.id.to_param, :format => "json")
       response.code.should eql "401"
+    end
+
+    it "returns an error when search_term is fewer than 3 characters" do
+      @account = Account.default
+      json = api_call(:get, "/api/v1/accounts/#{@account.id}/users", { :controller => 'users', :action => "index", :format => 'json', :account_id => @account.id.to_param }, {:search_term => '12'}, {}, :expected_status => 400)
+      json["status"].should == "argument_error"
+      json["message"].should == "search_term of 3 or more characters is required"
+    end
+
+    it "returns a list of users filtered by search_term" do
+      @account = Account.default
+      expected_keys = %w{id name sortable_name short_name}
+
+      users = []
+      [['Test User1', 'test@example.com'], ['Test User2', 'test2@example.com'], ['Test User3', 'test3@example.com']].each_with_index do |u, i|
+        users << User.create!(:name => u[0])
+        users[i].pseudonyms.create!(:unique_id => u[1], :account => @account) { |p| p.sis_user_id = u[1] }
+      end
+
+      json = api_call(:get, "/api/v1/accounts/#{@account.id}/users", { :controller => 'users', :action => "index", :format => 'json', :account_id => @account.id.to_param }, {:search_term => 'test3@example.com'})
+
+      json.count.should == 1
+      json.each do |user|
+        (user.keys & expected_keys).sort.should == expected_keys.sort
+        users.map(&:id).should include(user['id'])
+      end
     end
   end
 

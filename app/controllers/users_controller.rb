@@ -190,6 +190,10 @@ class UsersController < ApplicationController
   # @API List users
   # Retrieve the list of users associated with this account.
   #
+  # @argument search_term (optional)
+  #   The partial name or full ID of the users to match and return in the results list.
+  #   Must be at least 3 characters.
+  #
   # @returns [User]
   def index
     get_context
@@ -209,9 +213,24 @@ class UsersController < ApplicationController
         end
 
         if api_request?
-          @users ||= User.of_account(@context).active.order_by_sortable_name
-          @users = Api.paginate(@users, self, api_v1_account_users_url, :order => :sortable_name)
-          user_json_preloads(@users)
+          search_term = params[:search_term]
+          if search_term && search_term.size < 3
+            return render \
+              :json => {
+                    "status" => "argument_error",
+                    "message" => "search_term of 3 or more characters is required" },
+              :status => :bad_request
+          end
+
+          if search_term
+            users = UserSearch.for_user_in_context(search_term, @context, @current_user)
+          else
+            users = UserSearch.scope_for(@context, @current_user)
+          end
+
+          users = Api.paginate(users, self, api_v1_account_users_url)
+          user_json_preloads(users)
+          return render :json => users.map { |u| user_json(u, @current_user, session) }
         else
           @users ||= []
           @users = @users.paginate(:page => params[:page], :per_page => @per_page, :total_entries => @users.size)

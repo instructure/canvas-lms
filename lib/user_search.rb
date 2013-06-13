@@ -34,7 +34,12 @@ module UserSearch
     enrollment_type = Array(options[:enrollment_type]) if options[:enrollment_type]
     exclude_groups = Array(options[:exclude_groups]) if options[:exclude_groups]
 
-    users = context.users_visible_to(searcher).uniq.order_by_sortable_name
+    if context.is_a?(Account)
+      users = User.of_account(context).active.select("users.id, users.name, users.short_name, users.sortable_name")
+    else
+      users = context.users_visible_to(searcher).uniq
+    end
+    users = users.order_by_sortable_name
 
     if enrollment_role
       users = users.where("COALESCE(enrollments.role_name, enrollments.type) IN (?) ", enrollment_role)
