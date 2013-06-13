@@ -8,3 +8,4 @@ define [
 
     @child 'chooseMigrationFile', '.chooseMigrationFile'
     @child 'questionBank', '.selectQuestionBank'
+    @child 'overwriteAssessmentContent', '.overwriteAssessmentContent'

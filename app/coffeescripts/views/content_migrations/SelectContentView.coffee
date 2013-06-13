@@ -3,11 +3,12 @@ define [
   'underscore'
   'jst/content_migrations/SelectContent'
   'jst/courses/roster/createUsersWrapper'
+  'jst/content_migrations/ContentCheckboxCollection'
   'compiled/views/DialogFormView'
   'compiled/views/CollectionView'
   'compiled/collections/content_migrations/ContentCheckboxCollection'
   'compiled/views/content_migrations/ContentCheckboxView'
-], (Backbone, _,  template, wrapperTemplate, DialogFormView, CollectionView , CheckboxCollection, CheckboxView) -> 
+], (Backbone, _,  template, wrapperTemplate, checkboxCollectionTemplate, DialogFormView, CollectionView , CheckboxCollection, CheckboxView) -> 
   class SelectContentView extends DialogFormView
 
     els: 
@@ -52,6 +53,7 @@ define [
                                     collection: @checkboxCollection
                                     itemView: CheckboxView
                                     el: @$formDialogContent
+                                    template: checkboxCollectionTemplate
 
       dfd = @checkboxCollection.fetch()
       @$el.disableWhileLoading dfd

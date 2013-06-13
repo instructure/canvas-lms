@@ -160,7 +160,7 @@ module Canvas::Migration::Helpers
                 # We only need the id and name, so don't fetch everything from DB
                 if type == 'learning_outcomes'
                   scope = scope.select(:short_description)
-                elsif type == 'context_modules' || type == 'external_tools'
+                elsif type == 'context_modules' || type == 'context_external_tools'
                   scope = scope.select(:name)
                 else
                   scope = scope.select(:title)

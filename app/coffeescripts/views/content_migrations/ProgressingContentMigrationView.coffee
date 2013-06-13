@@ -19,10 +19,11 @@ define [
       'click .selectContentBtn' : 'showSelectContentDialog'
 
     els: 
-      '.migrationIssues'     : '$migrationIssues'
-      '.changable'           : '$changable'
-      '.progressStatus'      : '$progressStatus'
-      '.selectContentDialog' : '$selectContentDialog'
+      '.migrationIssues'                     : '$migrationIssues'
+      '.changable'                           : '$changable'
+      '.progressStatus'                      : '$progressStatus'
+      '.selectContentDialog'                 : '$selectContentDialog'
+      '[data-bind=migration_issues_count]'  : '$issuesCount'
 
     initialize: -> 
       super
@@ -111,7 +112,7 @@ define [
 
     updateMigrationModel: -> 
       @model.fetch
-              error: (model, response, option) => console.log 'show some error message'
+              error: (model, response, option) => @model.set('status', 'failed')
               success: (model, response, options) => @render()
 
     # When clicking on the issues button for the first time it needs to fetch all of the issues.
@@ -151,11 +152,12 @@ define [
 
     setIssuesButtonText: -> 
       btnText = @model.get('issuesButtonText')
-      if btnText.indexOf("Show Issues") != -1 || btnText.indexOf("Loading...") != -1
+      if btnText.indexOf("issues") != -1 || btnText.indexOf("Loading...") != -1
+        @$issuesCount.hide()
         @model.set('issuesButtonText', 'Hide Issues')
       else 
-        @model.set('issuesButtonText', 'Show Issues')
-
+        @$issuesCount.show()
+        @model.set('issuesButtonText', 'issues')
 
     # Render's a new SelectContentDialog which allows someone to select the migration
     # content to be migrated. 
@@ -169,7 +171,7 @@ define [
                               model: @model
                               el: @$selectContentDialog
                               title: 'Select Content'
-                              width: 800
-                              height: 600
+                              width: 900
+                              height: 700
 
       @selectContentView.open()

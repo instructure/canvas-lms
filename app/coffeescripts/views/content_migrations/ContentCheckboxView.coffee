@@ -1,14 +1,17 @@
 define [
   'Backbone'
   'jst/content_migrations/ContentCheckbox'
+  'jst/content_migrations/ContentCheckboxCollection'
   'compiled/collections/content_migrations/ContentCheckboxCollection'
   'compiled/views/CollectionView'
-], (Backbone, template, CheckboxCollection, CollectionView) ->
+  'compiled/str/TextHelper'
+], (Backbone, template, checkboxCollectionTemplate, CheckboxCollection, CollectionView, TextHelper) ->
   class ContentCheckboxView extends Backbone.View
     template: template
 
     els: 
       '[data-content=sublevelCheckboxes]' : '$sublevelCheckboxes'
+      '.showHide'                         : '$showHide'
 
     # Bind a change event only to top level checkboxes that are 
     # initially loaded.
@@ -29,7 +32,38 @@ define [
       json.hasSubCheckboxes = @hasSubItems || @hasSubItemsUrl
       json.onlyLabel = @hasSubItems and !@hasSubItemsUrl
       json.checked = @model.collection?.isTopLevel
+      json.iconClass = @getIconClass()
+      json.count = @model.get('count')
+      json.showHide = @model.get('count') || (@hasSubItems and @model.get('sub_items').length > 2)
       json
+
+    # This is a map for icon classes depending on the type of checkbox that is being
+    # rendered
+
+    iconClasses:
+      course_settings:              "icon-settings"
+      syllabus_body:                "icon-syllabus"
+      context_modules:              "icon-module"
+      assignments:                  "icon-assignment"
+      quizzes:                      "icon-quiz"
+      assessment_question_banks:    "icon-collection"
+      discussion_topics:            "icon-discussion"
+      wiki_pages:                   "icon-note-light"
+      context_external_tools:       "icon-lti"
+      announcements:                "icon-announcement"
+      calendar_events:              "icon-calendar-days"
+      rubrics:                      "icon-rubric"
+      groups:                       "icon-group"
+      learning_outcomes:            "icon-standards"
+      attachments:                  "icon-document"
+      assignment_groups:            "icon-gradebook"
+      folders:                      "icon-folder"
+
+    
+    # This retreaves the iconClass out of the iconClasses object map
+    # @api private
+
+    getIconClass: -> @iconClasses[@model.get('type')]
 
     # If this checkbox model has sublevel checkboxes, create a new collection view
     # and render the sub-level checkboxes in the collection view. 
@@ -40,18 +74,25 @@ define [
         @sublevelCheckboxes = new CheckboxCollection @model.get('sub_items')
         @renderSublevelCheckboxes()
 
-    # Check/Uncheck all children checkboxes
+    # Check/Uncheck all children checkboxes. Slice(1) ensures that we do not
+    # uncheck/check the toplevel checkbox. Instead we leave that for the user
+    # to do.
     # @api private
 
-    checkAllChildren: => @$el.find('[type=checkbox]').prop('checked', true)
-    uncheckAllChildren: => @$el.find('[type=checkbox]').prop('checked', false)
+    checkAllChildren: (event) => 
+      event.preventDefault()
+      if @model.collection?.isTopLevel
+        @$el.find('[type=checkbox]').slice(1).prop('checked', true)
+      else
+        @$el.find('[type=checkbox]').prop('checked', true)
 
-    #normalCheckboxEvents: (event) => 
-      #if $(event.target).is(':checked')
-        #@$el.find('[type=checkbox]').prop('checked', true)
-      #else
-        #@$el.find('[type=checkbox]').prop('checked', false)
-    
+    uncheckAllChildren: (event) => 
+      event.preventDefault()
+      if @model.collection?.isTopLevel
+        @$el.find('[type=checkbox]').slice(1).prop('checked', false)
+      else
+        @$el.find('[type=checkbox]').prop('checked', false)
+
     # Determins if we should hide the sublevel checkboxes or 
     # fetch new ones. 
     # @returns undefined
@@ -62,8 +103,10 @@ define [
 
       if $(event.target).is(':checked')
         @$sublevelCheckboxes.hide()
+        @$showHide.hide()
       else
         @$sublevelCheckboxes.show()
+        @$showHide.show()
 
         unless @sublevelCheckboxes
           @fetchSublevelCheckboxes()
@@ -90,6 +133,6 @@ define [
                                  collection: @sublevelCheckboxes
                                  itemView: ContentCheckboxView
                                  el: @$sublevelCheckboxes
+                                 template: checkboxCollectionTemplate
 
       checkboxCollectionView.render()
-

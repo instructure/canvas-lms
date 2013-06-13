@@ -1,31 +1,32 @@
-<div class="controls controlMargin">
+<div class="controls">
   <label class="checkbox">
     <input type="checkbox" id="dateShiftCheckbox">
     {{#t "checkbox_label"}}Adjust events and due dates{{/t}}
   </label>
 </div>
-<br />
 
-<div class="dateShiftContent control-group" style="display:none">
-  <label class="control-label">Future course date range</label>
-  <div class="controls">
-    <div class="pull-left"> from <input type="text" id="oldStartDate"></div>
-    <div class="pull-left">&nbsp;to <input type="text" id="oldEndDate"></div>
+<div class="dateShiftContent" style="display:none">
+  <br />
+  <div class="control-group">
+    <label class="control-label"><strong>{{#t "beginning_date"}}Beginning date{{/t}}</strong></label>
+    <div class="controls">
+      <div class="pull-left"><input type="text" id="oldStartDate" class="span2"></div>
+      <div class="pull-left">&nbsp; {{#t "beginning_change_to"}}change to{{/t}} <input type="text" id="newStartDate" class="span2"></div>
+    </div>
   </div>
-</div>
 
-<div class="dateShiftContent control-group" style="display:none">
-  <label class="control-label">This course date range</label>
-  <div class="controls">
-    <div class="pull-left"> from <input type="text" id="newStartDate"></div>
-    <div class="pull-left">&nbsp;to <input type="text" id="newEndDate"></div>
+  <div class="control-group">
+    <label class="control-label"><strong>{{#t "ending_date"}}Ending date{{/t}}</strong></label>
+    <div class="controls">
+      <div class="pull-left"><input type="text" id="oldEndDate" class="span2"></div>
+      <div class="pull-left">&nbsp; {{#t "ending_change_to"}}change to{{/t}} <input type="text" id="newEndDate" class="span2"></div>
+    </div>
   </div>
-</div>
 
-<div class="dateShiftContent control-group" style="display:none">
-  <div class="controls">
-    <p>You can also explicitly define day substitutions to adjust for changing class schedules (i.e. move everything that was on Mondays to now happen on Tuesdays)</p>
-    <a href="#" id='addDaySubstitution' class="add_substitution_link add">Define a day substitution</a>
+  <div class="control-group">
     <div id="daySubstitution"></div>
+    <div class="controls">
+      <button href="#" id='addDaySubstitution' class="btn top-margin bottomMargin"><i class="icon-add"></i> {{#t "substitution"}}Substitution{{/t}}</button>
+    </div>
   </div>
 </div>

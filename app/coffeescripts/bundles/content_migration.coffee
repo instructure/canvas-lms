@@ -23,7 +23,9 @@ require [
   'compiled/views/content_migrations/subviews/DaySubstitutionView'
   'jst/content_migrations/ProgressingContentMigrationCollection'
   'vendor/jquery.ba-tinypubsub'
-], ($, ProgressingContentMigrationCollection, ContentMigrationModel, DaySubstitutionCollection, CollectionView, PaginatedCollectionView, ProgressingContentMigrationView, MigrationConverterView, CommonCartridgeView, ConverterViewControl, ZipFilesView, CopyCourseView, MoodleZipView, CanvasExportView, QTIZipView, ChooseMigrationFileView, FolderPickerView, SelectContentCheckboxView, QuestionBankView, CourseFindSelectView, DateShiftView, DaySubView, progressingMigrationCollectionTemplate, pubsub) ->
+  'jst/content_migrations/subviews/DaySubstitutionCollection'
+  'compiled/views/content_migrations/subviews/OverwriteAssessmentContentView'
+], ($, ProgressingContentMigrationCollection, ContentMigrationModel, DaySubstitutionCollection, CollectionView, PaginatedCollectionView, ProgressingContentMigrationView, MigrationConverterView, CommonCartridgeView, ConverterViewControl, ZipFilesView, CopyCourseView, MoodleZipView, CanvasExportView, QTIZipView, ChooseMigrationFileView, FolderPickerView, SelectContentCheckboxView, QuestionBankView, CourseFindSelectView, DateShiftView, DaySubView, progressingMigrationCollectionTemplate, pubsub, daySubCollectionTemplate, OverwriteAssessmentContentView) ->
   ConverterViewControl.setModel new ContentMigrationModel 
                                  course_id: ENV.COURSE_ID
                                  daySubCollection: daySubCollection
@@ -33,6 +35,7 @@ require [
                                  collection: daySubCollection
                                  emptyTemplate: -> "No Day Substitutions Added"
                                  itemView: DaySubView
+                                 template: daySubCollectionTemplate
 
   progressingMigCollection  = new ProgressingContentMigrationCollection null,
                                  course_id: ENV.COURSE_ID
@@ -147,4 +150,6 @@ require [
                                    model: ConverterViewControl.getModel()
                                    fileSizeLimit: ENV.UPLOAD_LIMIT
 
+            overwriteAssessmentContent: new OverwriteAssessmentContentView(model: ConverterViewControl.getModel())
             questionBank:        new QuestionBankView(questionBanks: ENV.QUESTION_BANKS)
+

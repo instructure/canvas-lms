@@ -44,7 +44,7 @@ module Api::V1::ContentMigration
     json[:migration_issues_count] = migration.migration_issues.count
     if attachment_preflight
       json[:pre_attachment] = attachment_preflight
-    elsif migration.attachment
+    elsif migration.attachment && migration.migration_type != 'course_copy_importer'
       json[:attachment] = attachment_json(migration.attachment, current_user, {}, {:can_manage_files => true})
     end
     if migration.job_progress

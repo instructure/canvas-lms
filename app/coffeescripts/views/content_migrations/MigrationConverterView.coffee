@@ -17,10 +17,11 @@ define [
     els: 
       '#converter'                : '$converter'
       '#chooseMigrationConverter' : '$chooseMigrationConverter'
-      '.form-actions'             : '$formActions'
+      '.form-container'           : '$formActions'
 
     events: _.extend({}, @::events,
       'change #chooseMigrationConverter' : 'selectConverter'
+      'click .cancelBtn'                 : 'resetForm'
     )
 
     toJSON: (json) -> 
