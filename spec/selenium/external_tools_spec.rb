@@ -107,6 +107,10 @@ describe "external tools" do
       keep_trying_until { f("#tab-tools-link").should be_displayed }
       f("#tab-tools-link").click
       f("#external_tool_#{tool.id} .edit_tool_link").click
+      f("#external_tool_name").should have_value "new tool"
+      f("#external_tool_consumer_key").should have_value 'key'
+      f("#external_tool_domain").should have_value 'example.com'
+      f("#external_tool_custom_fields_string").should have_value "a=1\nb=2"
       replace_content(f("#external_tool_name"), "new tool (updated)")
       replace_content(f("#external_tool_consumer_key"), "key (updated)")
       replace_content(f("#external_tool_shared_secret"), "secret (updated)")
