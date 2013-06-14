@@ -103,9 +103,10 @@ module Api::V1::Submission
       hash['body'] = api_user_content(hash['body'], context, user)
     end
 
+    preview_args = { 'preview' => '1' }
+    preview_args['version'] = version_idx if version_idx
     hash['preview_url'] = course_assignment_submission_url(
-      context, assignment, attempt[:user_id], 'preview' => '1',
-      'version' => version_idx)
+      context, assignment, attempt[:user_id], preview_args)
 
     unless attempt.media_comment_id.blank?
       hash['media_comment'] = media_comment_json(:media_id => attempt.media_comment_id, :media_type => attempt.media_comment_type)

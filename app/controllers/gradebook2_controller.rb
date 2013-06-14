@@ -18,7 +18,7 @@ class Gradebook2Controller < ApplicationController
         :change_grade_url => api_v1_course_assignment_submission_url(@context, ":assignment", ":submission"),
         :context_url => named_context_url(@context, :context_url),
         :download_assignment_submissions_url => named_context_url(@context, :context_assignment_submissions_url, "{{ assignment_id }}", :zip => 1),
-        :re_upload_submissions_url => named_context_url(@context, :context_gradebook_submissions_upload_url, "{{ assignment_id }}"),
+        :re_upload_submissions_url => named_context_url(@context, :submissions_upload_context_gradebook_url, "{{ assignment_id }}"),
         :context_id => @context.id,
         :context_code => @context.asset_string,
         :group_weighting_scheme => @context.group_weighting_scheme,

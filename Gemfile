@@ -31,8 +31,9 @@ if !CANVAS_RAILS3
 end
 gem 'erubis',         CANVAS_RAILS3 ? '2.6.6' : '2.7.0'
 if !CANVAS_RAILS3
-  gem 'fake_arel',      '1.0.0'
+  gem 'fake_arel',          '1.0.0'
 end
+gem 'fake_rails3_routes', '1.0.3'
 gem 'ffi',            '1.1.5'
 gem 'hairtrigger',    '0.2.3'
 gem 'sass',           '3.2.3'
@@ -65,6 +66,9 @@ gem 'rdoc',           '3.12'
 gem 'ratom-instructure', '0.6.9', :require => "atom" # custom gem until necessary changes are merged into mainstream
 gem 'rdiscount',      '1.6.8'
 gem 'ritex',          '1.0.1'
+if CANVAS_RAILS3
+  gem 'routing_concerns', '0.1.0'
+end
 gem 'rotp',           '1.4.1'
 gem 'rqrcode',        '0.4.2'
 gem 'rscribd',        '1.2.0'
