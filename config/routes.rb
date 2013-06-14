@@ -621,6 +621,7 @@ FakeRails3Routes.draw do
   match 'login' => 'pseudonym_sessions#create', :via => :post
   match 'logout' => 'pseudonym_sessions#destroy', :as => :logout
   match 'login/cas' => 'pseudonym_sessions#new', :as => :cas_login, :via => :get
+  match 'login/cas' => 'pseudonym_sessions#cas_logout', :as => :cas_logout, :via => :post
   match 'login/otp' => 'pseudonym_sessions#otp_login', :as => :otp_login, :via => [:get, :post]
   match 'login/:account_authorization_config_id' => 'pseudonym_sessions#new', :as => :aac_login, :via => :get
   match 'users/:user_id/mfa' => 'pseudonym_sessions#disable_otp_login', :as => :disable_mfa, :via => :delete

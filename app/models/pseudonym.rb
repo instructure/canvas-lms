@@ -433,4 +433,20 @@ class Pseudonym < ActiveRecord::Base
       self.account.mfa_settings
     end
   end
+
+  def claim_cas_ticket(ticket)
+    return unless Canvas.redis_enabled?
+    Canvas.redis.setex("cas_session:#{ticket}", 1.day, global_id)
+  end
+
+  def self.release_cas_ticket(ticket)
+    return unless Canvas.redis_enabled?
+    redis_key = "cas_session:#{ticket}"
+    if id = Canvas.redis.get(redis_key)
+      pseudonym = Pseudonym.find_by_id(id)
+      Canvas.redis.del(redis_key)
+    end
+    pseudonym.try(:reset_persistence_token!)
+    pseudonym
+  end
 end

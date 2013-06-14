@@ -648,7 +648,7 @@ describe PseudonymSessionsController do
       controller.request.env['canvas.domain_root_account'] = account1
       get 'new', :ticket => 'ST-abcd'
       response.should redirect_to(dashboard_url(:login_success => 1))
-      session[:cas_login].should == true
+      session[:cas_session].should == 'ST-abcd'
       Pseudonym.find(session[:pseudonym_credentials_id]).should == user1.pseudonyms.first
 
       (controller.instance_variables.grep(/@[^_]/) - ['@mock_proxy']).each{ |var| controller.send :remove_instance_variable, var }
@@ -659,7 +659,7 @@ describe PseudonymSessionsController do
       controller.request.env['canvas.domain_root_account'] = account2
       get 'new', :ticket => 'ST-efgh'
       response.should redirect_to(dashboard_url(:login_success => 1))
-      session[:cas_login].should == true
+      session[:cas_session].should == 'ST-efgh'
       Pseudonym.find(session[:pseudonym_credentials_id]).should == user2.pseudonyms.first
     end
   end

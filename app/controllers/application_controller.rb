@@ -39,6 +39,7 @@ class ApplicationController < ActionController::Base
   before_filter :set_user_id_header
   before_filter :set_time_zone
   before_filter :set_page_view
+  before_filter :refresh_cas_ticket
   after_filter :log_page_view
   after_filter :discard_flash_if_xhr
   after_filter :cache_buster
@@ -706,6 +707,12 @@ class ApplicationController < ActionController::Base
     # page_view.
     if (@developer_key && params[:user_request]) || (!@developer_key && @current_user && !request.xhr? && request.method == :get)
       generate_page_view
+    end
+  end
+
+  def refresh_cas_ticket
+    if session[:cas_session] && @current_pseudonym
+      @current_pseudonym.claim_cas_ticket(session[:cas_session])
     end
   end
 
