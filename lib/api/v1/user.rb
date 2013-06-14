@@ -135,6 +135,7 @@ module Api::V1::User
     api_json(enrollment, user, session, :only => API_ENROLLMENT_JSON_OPTS).tap do |json|
       json[:enrollment_state] = json.delete('workflow_state')
       json[:role] = enrollment.role
+      json[:sis_batch_id] = enrollment.sis_batch_id
       if enrollment.student?
         json[:grades] = {
           :html_url => course_student_grades_url(enrollment.course_id, enrollment.user_id),
