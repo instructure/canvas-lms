@@ -121,14 +121,15 @@
                   <%= t('buttons.published', "Published") %>
                 </button>
               <% else %>
-                <button id='quiz-publish-link' data-url='<%=quiz_url%>'
-                  class='btn btn-success quiz-publish-button published' href='#'>
+                <button id='quiz-publish-link' data-id='<%=@quiz.id%>' data-url='<%=quiz_url%>'
+                  class='btn quiz-publish-button published' href='#'>
                   <i class="icon-publish"></i>
                   <%= t('buttons.published', "Published") %>
                 </button>
               <% end %>
             <% else %>
-              <button id='quiz-publish-link' data-url='<%=quiz_url%>' class='btn quiz-publish-button' href='#'>
+              <button id='quiz-publish-link' data-id='<%=@quiz.id%>' data-url='<%=quiz_url%>'
+                      class='btn quiz-publish-button' href='#'>
                 <i class="icon-unpublished"></i>
                 <%= t('buttons.publish', "Publish") %>
               </button>

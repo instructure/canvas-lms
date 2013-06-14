@@ -22,6 +22,8 @@ define([
   'compiled/views/MessageStudentsDialog',
   'quiz_arrows',
   'quiz_inputs',
+  'compiled/models/Publishable',
+  'compiled/views/PublishButtonView',
   'jquery.instructure_date_and_time' /* dateString, time_field, datetime_field */,
   'jqueryui/dialog',
   'compiled/jquery/fixDialogButtons',
@@ -30,62 +32,7 @@ define([
   'jquery.instructure_misc_plugins' /* ifExists, confirmDelete */,
   'jquery.disableWhileLoading',
   'message_students' /* messageStudents */
-], function(I18n, $, MessageStudentsDialog, showAnswerArrows, inputMethods) {
-
-  var QuizPublishButton = (function() {
-    function QuizPublishButton($link) {
-      this.$link = $link;
-    }
-
-    QuizPublishButton.prototype.url = function(){
-      return this.$link.attr('data-url');
-    };
-
-    QuizPublishButton.prototype.newState = function(){
-      return !(this.$link.hasClass('published'));
-    };
-
-    QuizPublishButton.prototype.quizData = function(){
-      return { quiz: { published: this.newState() }};
-    };
-
-    QuizPublishButton.prototype.updateUiToPublished = function(){
-      this.$link.addClass('published');
-      this.$link.addClass('btn-success');
-      this.$link.text(I18n.t('buttons.published', 'Published'));
-      this.$link.prepend('<i class="icon-publish"></i>&nbsp;');
-    };
-
-    QuizPublishButton.prototype.updateUiToPublishable = function(){
-      this.$link.removeClass('published');
-      this.$link.removeClass('btn-success');
-      this.$link.text(I18n.t('buttons.publish', 'Publish'));
-      this.$link.prepend('<i class="icon-unpublished"></i>&nbsp;');
-    };
-
-    QuizPublishButton.prototype.push = function() {
-      var qpb = this;
-      $.ajax(this.url(), {
-        data: this.quizData(),
-        type: 'put',
-        success: function(quiz_data){
-          if(quiz_data.published){
-            qpb.updateUiToPublished();
-          } else {
-            qpb.updateUiToPublishable();
-          }
-        },
-        error: function(error){
-          var message = JSON.parse(JSON.parse(error.responseText).errors).published[0].message;
-          $.flashError(message);
-        }
-      });
-    };
-
-    return QuizPublishButton;
-  })();
-  // END of QuizPublishButton class
-
+], function(I18n, $, MessageStudentsDialog, showAnswerArrows, inputMethods, Publishable, PublishButtonView) {
 
 
   $(document).ready(function () {
@@ -221,17 +168,10 @@ define([
       }
     });
 
-
-    $('#quiz-publish-link').click(function(e){
-      e.preventDefault();
-      var $link = $(this);
-      if($link.hasClass('disabled')){
-        return false;
-      } else {
-        (new QuizPublishButton($link)).push();
-      }
-    });
-
+    var $el = $('#quiz-publish-link');
+    var model = new Publishable({ published: $el.hasClass('published'), id: $el.attr('data-id') },{ url: $el.attr('data-url'), root: 'quiz'});
+    var view = new PublishButtonView({model: model, el: $el});
+    view.render();
   });
 
 });
