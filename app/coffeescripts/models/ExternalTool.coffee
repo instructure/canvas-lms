@@ -10,14 +10,14 @@ define [
 
     computedAttributes: [
       {
-        name: 'custom_field_string'
+        name: 'custom_fields_string'
         deps: ['custom_fields']
       }
     ]
 
     urlRoot: -> @_defaultUrl()
 
-    custom_field_string: ->
+    custom_fields_string: ->
       ("#{k}=#{v}" for k,v of @get('custom_fields')).join("\n")
 
     launchUrl: (launchType, options = {})->
