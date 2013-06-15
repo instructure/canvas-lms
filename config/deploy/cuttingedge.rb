@@ -6,6 +6,7 @@
 #
 #push_app_servers(num_app_nodes, app_node_prefix)
 
+role :app, "canvas-edge.tier2.sfu.ca"
 role :db, "canvas-edge.tier2.sfu.ca", :primary => true
 
 set :rails_env, "production"
