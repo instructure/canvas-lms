@@ -46,8 +46,6 @@ class Account < ActiveRecord::Base
   has_many :users, :through => :account_users
   has_many :pseudonyms, :include => :user
   has_many :role_overrides, :as => :context
-  has_many :rubrics, :as => :context
-  has_many :rubric_associations, :as => :context, :include => :rubric, :dependent => :destroy
   has_many :course_account_associations
   has_many :child_courses, :through => :course_account_associations, :source => :course, :conditions => ['course_account_associations.depth = 0']
   has_many :attachments, :as => :context, :dependent => :destroy
@@ -78,6 +76,7 @@ class Account < ActiveRecord::Base
   end
   
   include LearningOutcomeContext
+  include RubricContext
 
   has_many :context_external_tools, :as => :context, :dependent => :destroy, :order => 'name'
   has_many :error_reports

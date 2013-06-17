@@ -1581,19 +1581,20 @@ class Assignment < ActiveRecord::Base
     # that it is a new record.  We need to know that below, where we add to the list of
     # imported items
     new_record = item.new_record?
-    if hash[:rubric_migration_id]
-      rubric = context.rubrics.find_by_migration_id(hash[:rubric_migration_id])
-      if rubric
-        assoc = rubric.associate_with(item, context, :purpose => 'grading')
-        assoc.use_for_grading = !!hash[:rubric_use_for_grading] if hash.has_key?(:rubric_use_for_grading)
-        assoc.hide_score_total = !!hash[:rubric_hide_score_total] if hash.has_key?(:rubric_hide_score_total)
-        if hash[:saved_rubric_comments]
-          assoc.summary_data ||= {}
-          assoc.summary_data[:saved_comments] ||= {}
-          assoc.summary_data[:saved_comments] = hash[:saved_rubric_comments]
-        end
-        assoc.save
+
+    rubric = nil
+    rubric = context.rubrics.find_by_migration_id(hash[:rubric_migration_id]) if hash[:rubric_migration_id]
+    rubric ||= context.available_rubric(hash[:rubric_id]) if hash[:rubric_id]
+    if rubric
+      assoc = rubric.associate_with(item, context, :purpose => 'grading')
+      assoc.use_for_grading = !!hash[:rubric_use_for_grading] if hash.has_key?(:rubric_use_for_grading)
+      assoc.hide_score_total = !!hash[:rubric_hide_score_total] if hash.has_key?(:rubric_hide_score_total)
+      if hash[:saved_rubric_comments]
+        assoc.summary_data ||= {}
+        assoc.summary_data[:saved_comments] ||= {}
+        assoc.summary_data[:saved_comments] = hash[:saved_rubric_comments]
       end
+      assoc.save
     end
     if hash[:grading_standard_migration_id]
       gs = context.grading_standards.find_by_migration_id(hash[:grading_standard_migration_id])

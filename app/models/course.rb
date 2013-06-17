@@ -108,6 +108,7 @@ class Course < ActiveRecord::Base
   has_many :participating_typical_users, :through => :typical_current_enrollments, :source => :user
 
   include LearningOutcomeContext
+  include RubricContext
 
   has_many :course_account_associations
   has_many :non_unique_associated_accounts, :source => :account, :through => :course_account_associations, :order => 'course_account_associations.depth'
@@ -150,8 +151,6 @@ class Course < ActiveRecord::Base
   has_many :grading_standards, :as => :context, :conditions => ['workflow_state != ?', 'deleted']
   has_one :gradebook_upload, :as => :context, :dependent => :destroy
   has_many :web_conferences, :as => :context, :order => 'created_at DESC', :dependent => :destroy
-  has_many :rubrics, :as => :context
-  has_many :rubric_associations, :as => :context, :include => :rubric, :dependent => :destroy
   has_many :collaborations, :as => :context, :order => 'title, created_at', :dependent => :destroy
   has_one :scribd_account, :as => :scribdable
   has_many :context_modules, :as => :context, :order => :position, :dependent => :destroy
