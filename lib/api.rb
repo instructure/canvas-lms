@@ -358,6 +358,7 @@ module Api
 
   # This removes the verifier parameters that are added to attachment links by api_user_content
   # and adds context (e.g. /courses/:id/) if it is missing
+  # exception: it leaves user-context file links alone
   def process_incoming_html_content(html)
     return html unless html.present?
     # shortcut html documents that definitely don't have anything we're interested in
@@ -367,7 +368,8 @@ module Api
     link_regex = %r{/files/(\d+)/(?:download|preview)}
     verifier_regex = %r{(\?)verifier=[^&]*&?|&verifier=[^&]*}
 
-    context_types = ["Course", "Group", "Account", "User"]
+    context_types = ["Course", "Group", "Account"]
+    skip_context_types = ["User"]
 
     doc = Nokogiri::HTML(html)
     doc.search("*").each do |node|
@@ -376,8 +378,12 @@ module Api
           if link =~ link_regex
             if link.start_with?('/files')
               att_id = $1
-              if (att = Attachment.find_by_id(att_id)) && context_types.include?(att.context_type)
-                link = "/#{att.context_type.underscore.pluralize}/#{att.context_id}" + link
+              att = Attachment.find_by_id(att_id)
+              if att
+                next if skip_context_types.include?(att.context_type)
+                if context_types.include?(att.context_type)
+                  link = "/#{att.context_type.underscore.pluralize}/#{att.context_id}" + link
+                end
               end
             end
             if link.include?('verifier=')

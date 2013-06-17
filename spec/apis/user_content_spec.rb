@@ -378,5 +378,15 @@ describe UserContent, :type => :integration do
       tags[3]['href'].should == '/media_objects/test2'
       tags[3]['id'].should == 'media_comment_test2'
     end
+
+    it "should leave verified user-context file links alone" do
+      user
+      attachment_model :context => @user
+      url = "/files/#{@attachment.id}/download?verifier=#{@attachment.uuid}"
+      link = %Q{<a href="#{url}">what</a>}
+      html = tester.process_incoming_html_content(link)
+      doc = Nokogiri::HTML::DocumentFragment.parse(html)
+      doc.at_css('a')['href'].should == url
+    end
   end
 end
