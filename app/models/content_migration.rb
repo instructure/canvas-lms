@@ -288,7 +288,7 @@ class ContentMigration < ActiveRecord::Base
     end
     add_error(t(:unexpected_error, "There was an unexpected error, please contact support."), opts)
     self.workflow_state = :failed
-    job_progress.fail unless skip_job_progress
+    job_progress.fail if job_progress && !skip_job_progress
     save
   end
 
