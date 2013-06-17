@@ -15,24 +15,23 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-
 if ENV['COVERAGE'] == "1"
   puts "Code Coverage enabled"
   require 'simplecov'
-  SimpleCov.start do
-    SimpleCov.use_merging true
+  SimpleCov.start('rails') do
     SimpleCov.formatter = SimpleCov::Formatter::HTMLFormatter
     add_filter '/spec/'
     add_filter '/config/'
+    add_filter 'spec_canvas'
 
-    add_group 'Mailers', 'app/mailers'
     add_group 'Controllers', 'app/controllers'
     add_group 'Models', 'app/models'
+    add_group 'App', '/app/'
     add_group 'Helpers', 'app/helpers'
-    add_group 'Libraries', 'lib'
+    add_group 'Libraries', '/lib/'
     add_group 'Plugins', 'vendor/plugins'
     add_group "Long files" do |src_file|
-      src_file.lines.count > 100
+      src_file.lines.count > 500
     end
     SimpleCov.at_exit do
       SimpleCov.result.format!
