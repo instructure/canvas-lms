@@ -345,12 +345,12 @@ class FilesController < ApplicationController
 
   def show_relative
     path = params[:file_path]
+    file_id = params[:file_id]
+    file_id = nil unless file_id.to_s =~ Api::ID_REGEX
 
     #if the relative path matches the given file id use that file
-    if params[:file_id].present? && @attachment = @context.attachments.find_by_id(params[:file_id])
-      if @attachment.matches_full_display_path?(path) || @attachment.matches_full_path?(path)
-        params[:id] = params[:file_id]
-      else
+    if file_id && @attachment = @context.attachments.find_by_id(file_id)
+      unless @attachment.matches_full_display_path?(path) || @attachment.matches_full_path?(path)
         @attachment = nil
       end
     end

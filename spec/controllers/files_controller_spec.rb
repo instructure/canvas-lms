@@ -424,6 +424,15 @@ describe FilesController do
       proc { get "show_relative", :course_id => @course.id, :file_path => @file.full_display_path+"blah" }.should raise_error(ActiveRecord::RecordNotFound)
       proc { get "show_relative", :file_id => @file.id, :course_id => @course.id, :file_path => @file.full_display_path+"blah" }.should raise_error(ActiveRecord::RecordNotFound)
     end
+
+    it "should ignore bad file_ids" do
+      course_with_teacher_logged_in(:active_all => true)
+      file_in_a_module
+      get "show_relative", :file_id => @file.id + 1, :course_id => @course.id, :file_path => @file.full_display_path
+      response.should be_redirect
+      get "show_relative", :file_id => "blah", :course_id => @course.id, :file_path => @file.full_display_path
+      response.should be_redirect
+    end
   end
 
   describe "GET 'new'" do
