@@ -125,7 +125,10 @@ class MessageableUser < User
     if common_courses = read_attribute(:common_courses)
       common_courses.to_s.split(',').each do |common_course|
         course_id, role = common_course.split(':')
-        course_id = Shard.global_id_for(course_id.to_i)
+        course_id = course_id.to_i
+        # a course id of 0 indicates admin visibility without an actual shared
+        # course; don't "globalize" it
+        course_id = Shard.global_id_for(course_id) unless course_id.zero?
         @global_common_courses[course_id] ||= []
         @global_common_courses[course_id] << role
       end
@@ -141,6 +144,11 @@ class MessageableUser < User
     end
   end
 
+  def include_common_contexts_from(other)
+    combine_common_contexts(self.global_common_courses, other.global_common_courses)
+    combine_common_contexts(self.global_common_groups, other.global_common_groups)
+  end
+
   private
 
   def common_contexts_on_current_shard(common_contexts)
@@ -149,12 +157,18 @@ class MessageableUser < User
     return local_common_contexts if common_contexts.empty?
     Shard.partition_by_shard(common_contexts.keys) do |sharded_ids|
       sharded_ids.each do |id|
-        global_id = Shard.global_id_for(id)
+        # a context id of 0 indicates admin visibility without an actual shared
+        # context; don't "globalize" it
+        global_id = id == 0 ? id : Shard.global_id_for(id)
         id = global_id unless Shard.current == target_shard
         local_common_contexts[id] = common_contexts[global_id]
       end
     end
     local_common_contexts
+  end
+
+  def combine_common_contexts(left, right)
+    right.each{ |key,values| (left[key] ||= []).concat(values) }
   end
 
   # both bookmark_for and restrict_scope should always be executed on the
