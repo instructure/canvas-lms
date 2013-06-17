@@ -106,6 +106,21 @@ class WikiPagesController < ApplicationController
     end
   end
 
+  def front_page
+    return unless tab_enabled?(@context.class::TAB_PAGES)
+
+    wiki = @context.wiki
+    if wiki.has_front_page?
+      redirect_to named_context_url(@context, :context_wiki_page_url, @context.wiki.get_front_page_url)
+    else
+      redirect_to named_context_url(@context, :context_wiki_pages_url)
+    end
+  end
+
+  def pages_index
+    @padless = true
+  end
+
   protected
 
   def context_wiki_page_url(opts={})

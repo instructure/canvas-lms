@@ -88,7 +88,7 @@ define [
 
     removePreviousItems: (models) =>
       @$list.children().each (index, el) =>
-        @$(el).data('view').remove()
+        @$(el).data('view')?.remove()
 
     renderOnReset: =>
       @removePreviousItems()
@@ -138,7 +138,7 @@ define [
     # @api private
 
     renderItem: (model) =>
-      view = new @itemView $.extend (@itemViewOptions || {}), {model}
+      view = new @itemView $.extend {}, (@itemViewOptions || {}), {model}
       view.render()
       @insertView view
 

@@ -119,11 +119,40 @@ ActionController::Routing::Routes.draw do |map|
   end
 
   def add_wiki(context)
+    ####
+    ## Leaving these routes here for when we need them later :)
+    ##
+    ## Aside from the /wiki route itself, all new routes will be /pages. The /wiki route will be reused to redirect
+    ## the user to the wiki front page, if configured, or the wiki page list otherwise.
+    ####
+    # context.wiki 'wiki', :controller => 'wiki_pages', :action => 'front_page', :conditions => { :method => :get }
+
+    ####
+    ## Placing these routes above the /wiki routes below will cause the helper functions to generate urls and paths
+    ## pointing to /pages rather than the legacy /wiki.
+    ####
+    # context.resources :wiki_pages, :as => 'pages'
+    #   wiki_page.latest_version_number 'revisions/latest', :controller => 'wiki_page_revisions', :action => 'latest_version_number'
+    #   wiki_page.resources :wiki_page_revisions, :as => "revisions"
+    #   wiki_page.resources :wiki_page_comments, :as => "comments"
+    # end
+    #
+    ####
+    ## We'll just do specific routes here until we can swap /pages and /wiki completely.
+    ####
+    context.pages 'pages', :controller => 'wiki_pages', :action => 'pages_index'
+
     context.resources :wiki_pages, :as => 'wiki' do |wiki_page|
       wiki_page.latest_version_number 'revisions/latest', :controller => 'wiki_page_revisions', :action => 'latest_version_number'
       wiki_page.resources :wiki_page_revisions, :as => "revisions"
       wiki_page.resources :wiki_page_comments, :as => "comments"
     end
+
+    ####
+    ## This will cause the helper functions to generate /pages urls, but will still allow /wiki routes to work properly
+    ####
+    #context.named_wiki_page 'pages/:id', :id => /[^\/]+/, :controller => 'wiki_pages', :action => 'show'
+
     context.named_wiki_page 'wiki/:id', :id => /[^\/]+/, :controller => 'wiki_pages', :action => 'show'
   end
 
