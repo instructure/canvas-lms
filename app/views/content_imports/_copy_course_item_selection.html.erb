@@ -134,7 +134,7 @@
 <% end %>
 
 <% if @source_course.context_external_tools.active.length > 0 %>
-  <h3><%= check_box :copy, :all_context_external_tools, :class => "copy_all", :checked => true %><%= label :copy, :all_context_external_tools, t('labels.apps', "Apps for %{course}", :course => @source_course.name) %></h3>
+  <h3><%= check_box :copy, :all_context_external_tools, :class => "copy_all", :checked => true %><%= label :copy, :all_context_external_tools, t('labels.external_tools', "External Tools for %{course}", :course => @source_course.name) %></h3>
   <ul class="unstyled_list asset_list">
     <% @source_course.context_external_tools.active.each do |tool| %>
       <li><%= check_box "copy[context_external_tools]", mig_id(tool) %><%= label "copy[context_external_tools]", mig_id(tool), tool.name %></li>
