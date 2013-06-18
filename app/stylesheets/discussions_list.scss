@@ -90,24 +90,33 @@
   }
 }
 
+.discussion-collections {
+  background: #e8ecef;
+}
+
 .discussion-list {
+  border: none;
+  border-bottom: 2px dashed #c6cacd;
   box-sizing: border-box;
   margin-bottom: 12px;
+  padding: 9px 9px 16px 9px;
 
-
-  &.droppable {
-    outline: 3px dashed #aaa;
+  &:last-child {
+    border-bottom: none;
   }
 
   &.droppable-hover {
     > * {
       opacity: 0.5;
-      -moz-transition: 0.2s opacity linear;
-      -ms-transition: 0.2s opacity linear;
-      -o-transition: 0.2s opacity linear;
-      -webkit-transition: 0.2s opacity linear;
-      transition: 0.2s opacity linear;
     }
+  }
+
+  &.pinned.droppable-hover .no-content {
+    background: #dff0d8;
+  }
+
+  &.locked .title {
+    color: #696969;
   }
 
   .collectionViewItems {
@@ -132,7 +141,7 @@
   border: 1px solid #c1c7cf;
   border-radius: 3px;
   color: #696969;
-  padding: 8px 0;
+  padding: 5px 0 5px 10px;
 
   &:after {
     clear: both;
@@ -153,31 +162,45 @@
     color: inherit;
   }
 
-  .avatar {
-    border: 2px solid #d2dbe1;
-    border-radius: 26px;
-    float: left;
-    margin: 0 20px 0 32px;
+  .discussion-content {
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    display: table;
+    padding-left: 36px;
+    vertical-align: middle;
+    width: 100%;
+  }
 
-    &.icon-assignment {
-      border: none;
-      border-radius: 0;
-      height: 50px;
-      width: 50px;
+  .discussion-row {
+    display: table-row;
 
-      &:before {
-        font-size: 50px;
-        line-height: 50px;
-      }
+    > div {
+      display: table-cell;
+      vertical-align: middle;
     }
   }
 
-  .discussion-content {
-    display: table-cell;
-    width: 9999px;
+  .discussion-due-date {
+    width: 150px;
   }
 
-  .actions {
+  .discussion-status {
+    color: #bbb;
+    width: 40px;
+
+    .icon-discussion-check, .icon-published {
+      color: #5bb75b;
+    }
+  }
+
+  .discussion-unread-status {
+    padding-right: 5px;
+    width: 60px;
+  }
+
+  .discussion-actions {
+    width: 45px;
+
     a {
       color: #bbb;
     }
@@ -192,7 +215,6 @@
     display: block;
     font-size: 14px;
     font-weight: bold;
-    line-height: 12px;
 
     &:focus {
       outline: 0;
@@ -200,25 +222,25 @@
     }
   }
 
-  .author {
-    color: #1f6fc0;
-    font-size: 10px;
-  }
-
-  .discussion-unread-container {
-    margin-right: 12px;
-  }
-
-  .summary {
-    /* TODO: make this dynamic somehow */
-    width: 500px;
-  }
-
-
   &.no-content {
+    border-style: dashed;
+    color: #878d92;
     display: none;
     margin: 5px;
     padding: 8px;
+    text-align: center;
+
+    &:hover {
+      background: #fff;
+    }
+
+    b {
+      font-size: 16px;
+    }
+
+    p {
+      margin: 0;
+    }
   }
 }
 

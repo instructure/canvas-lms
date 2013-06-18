@@ -1,80 +1,81 @@
-{{#if assignment}}
-  <i class="icon-assignment avatar"></i>
-{{else}}
-  <img src="{{author.avatar_image_url}}"
-       alt="{{user_name}}"
-       class="avatar"
-       height="50"
-       width="50" />
-{{/if}}
-
 <div class="discussion-content">
-  <div class="header row-fluid">
-    <div class="span8">
+  <div class="discussion-row">
+    <div class="discussion-title">
       <a href="{{html_url}}" class="title">{{title}}</a>
-      <a href="{{author.html_url}}" class="author">{{user_name}}</a>
-    </div>
-    <div class="span4">
-      <b>{{tDateToString last_reply_at "medium"}}</b>
-      <div class="actions pull-right">
-        {{#if permissions.delete}}
-          <a href="#" class="al-trigger">
-            <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
-          </a>
-
-          <ul class="al-options">
-            {{#if lockable}}
-              <li>
-                <a href="#" class="icon-lock">
-                  {{#if locked}}
-                    {{#t "unlock"}}Unlock{{/t}}
-                  {{else}}
-                    {{#t "lock"}}Lock{{/t}}
-                  {{/if}}
-                </a>
-              </li>
-            {{/if}}
-            <li>
-              <a href="#" class="icon-trash">{{#t "delete"}}Delete{{/t}}</a>
-            </li>
-            {{#if pinnable}}
-              <li>
-                <a href="#" class="icon-pin">
-                  {{#if pinned}}
-                    {{#t "unpin"}}Unpin{{/t}}
-                  {{else}}
-                    {{#t "pin"}}Pin{{/t}}
-                  {{/if}}
-                </a>
-              </li>
-            {{/if}}
-          </ul>
-        {{/if}}
-      </div>
-    </div>
-  </div>
-
-  <div class="row-fluid">
-    <div class="span10">
-      <p class="ellipsis summary">{{summary}}</p>
+      <small>Last post {{tDateToString last_reply_at "medium"}}</small>
     </div>
 
-    <div class="span2">
-      <div class="discussion-unread-container pull-right">
-        <div class="new-and-total-badge">
-          <span class="new-items"
-                title="{{unread_count_tooltip}}"
-                data-tooltip>
-            {{unread_count}}
-          </span>
+    <div class="discussion-due-date">
+      {{#if assignment}}
+        {{#t "due"}}Due{{/t}} {{tDateToString assignment.due_at "medium"}}
+      {{/if}}
+    </div>
 
-          <div class="total-items"
-               title="{{reply_count_tooltip}}"
-               data-tooltip>
-            {{discussion_subentry_count}}
-          </div>
+    <div class="discussion-status">
+      {{#if subscribed}}
+        <i class="icon-discussion-check"
+           data-tooltip
+           title="{{#t "user_subscribed"}}You are subscribed to this topic{{/t}}"></i>
+      {{else}}
+        <i class="icon-discussion"
+           data-tooltip
+           title="{{#t "user_unsubscribed"}}You are not subscribed to this topic{{/t}}"></i>
+      {{/if}}
+
+      <!-- <i class="icon-unpublished"></i> -->
+    </div>
+
+    <div class="discussion-unread-status">
+      <div class="new-and-total-badge pull-right">
+        <span class="new-items"
+              title="{{unread_count_tooltip}}"
+              data-tooltip>
+          {{unread_count}}
+        </span>
+
+        <div class="total-items"
+             title="{{reply_count_tooltip}}"
+             data-tooltip>
+          {{discussion_subentry_count}}
         </div>
       </div>
+    </div>
+
+
+    <div class="discussion-actions">
+      {{#if permissions.delete}}
+        <a href="#" class="al-trigger">
+          <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
+        </a>
+
+        <ul class="al-options">
+          {{#if lockable}}
+            <li>
+              <a href="#" class="icon-lock">
+                {{#if locked}}
+                  {{#t "unlock"}}Unlock{{/t}}
+                {{else}}
+                  {{#t "lock"}}Lock{{/t}}
+                {{/if}}
+              </a>
+            </li>
+          {{/if}}
+          <li>
+            <a href="#" class="icon-trash">{{#t "delete"}}Delete{{/t}}</a>
+          </li>
+          {{#if pinnable}}
+            <li>
+              <a href="#" class="icon-pin">
+                {{#if pinned}}
+                  {{#t "unpin"}}Unpin{{/t}}
+                {{else}}
+                  {{#t "pin"}}Pin{{/t}}
+                {{/if}}
+              </a>
+            </li>
+          {{/if}}
+        </ul>
+      {{/if}}
     </div>
   </div>
 </div>

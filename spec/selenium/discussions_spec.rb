@@ -116,7 +116,7 @@ describe "discussions" do
         title = 'new one'
         new_teacher = teacher_in_course(:course => @course, :active_all => true, :name => user_name)
         what_to_create == DiscussionTopic ? @course.discussion_topics.create!(:title => title, :user => new_teacher.user) : announcement_model(:title => title, :user => new_teacher.user)
-        refresh_and_filter(:string, 'jake', user_name)
+        refresh_and_filter(:string, 'jake', 'new one')
       end
 
       it "should return multiple items in the search" do
