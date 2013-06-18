@@ -220,7 +220,7 @@ ActionController::Routing::Routes.draw do |map|
     course.old_calendar 'calendar', :controller => 'calendars', :action => 'show'
     course.locks 'locks', :controller => 'courses', :action => 'locks'
     add_discussions(course)
-    course.resources :assignments, :collection => {:syllabus => :get, :submissions => :get}, :member => {:list_google_docs => :get, :update_submission => :any} do |assignment|
+    course.resources :assignments, :collection => {:syllabus => :get, :submissions => :get}, :member => {:list_google_docs => :get} do |assignment|
       assignment.resources :submissions do |submission|
         submission.resubmit_to_turnitin 'turnitin/resubmit', :controller => 'submissions', :action => 'resubmit_to_turnitin', :conditions => {:method => :post}
         submission.turnitin_report 'turnitin/:asset_string', :controller => 'submissions', :action => 'turnitin_report'
@@ -262,8 +262,7 @@ ActionController::Routing::Routes.draw do |map|
       quiz.read_only "read_only", :controller => 'quizzes', :action => 'read_only'
       quiz.filters 'filters', :controller => 'quizzes', :action => 'filters'
 
-      quiz.resources :quiz_submissions, :as => "submissions", :collection => {:backup => :put, :index => :get}, :member => {:record_answer => :post} do |submission|
-      end
+      quiz.resources :quiz_submissions, :as => "submissions", :collection => {:backup => :put}, :member => {:record_answer => :post}
       quiz.extensions 'extensions/:user_id', :controller => 'quiz_submissions', :action => 'extensions', :conditions => {:method => :post}
       quiz.resources :quiz_questions, :as => "questions", :only => %w(create update destroy show)
       quiz.resources :quiz_groups, :as => "groups", :only => %w(create update destroy) do |group|
@@ -364,27 +363,25 @@ ActionController::Routing::Routes.draw do |map|
   # that item's uuid.  In config/initializers/active_record.rb you'll
   # find a feed_code method to generate the code, and in
   # application_controller there's a get_feed_context to get it back out.
-  map.resource :feeds do |feed|
-    feed.calendar "calendars/:feed_code", :controller => "calendar_events_api", :action => "public_feed"
-    feed.calendar_format "calendars/:feed_code.:format", :controller => "calendar_events_api", :action => "public_feed"
-    feed.forum "forums/:feed_code", :controller => "discussion_topics", :action => "public_feed"
-    feed.forum_format "forums/:feed_code.:format", :controller => "discussion_topics", :action => "public_feed"
-    feed.topic "topics/:discussion_topic_id/:feed_code", :controller => "discussion_entries", :action => "public_feed"
-    feed.topic_format "topics/:discussion_topic_id/:feed_code.:format", :controller => "discussion_entries", :action => "public_feed"
-    feed.announcements "announcements/:feed_code", :controller => "announcements", :action => "public_feed"
-    feed.announcements_format "announcements/:feed_code.:format", :controller => "announcements", :action => "public_feed"
-    feed.course "courses/:feed_code", :controller => "courses", :action => "public_feed"
-    feed.course_format "courses/:feed_code.:format", :controller => "courses", :action => "public_feed"
-    feed.group "groups/:feed_code", :controller => "groups", :action => "public_feed"
-    feed.group_format "groups/:feed_code.:format", :controller => "groups", :action => "public_feed"
-    feed.enrollment "enrollments/:feed_code", :controller => "courses", :action => "public_feed"
-    feed.enrollment_format "enrollments/:feed_code.:format", :controller => "courses", :action => "public_feed"
-    feed.user "users/:feed_code", :controller => "users", :action => "public_feed"
-    feed.user_format "users/:feed_code.:format", :controller => "users", :action => "public_feed"
-    feed.eportfolio "eportfolios/:eportfolio_id.:format", :controller => "eportfolios", :action => "public_feed"
-    feed.conversation "conversations/:feed_code", :controller => "conversations", :action => "public_feed"
-    feed.conversation_format "conversations/:feed_code.:format", :controller => "conversations", :action => "public_feed"
-  end
+  map.feeds_calendar "feeds/calendars/:feed_code", :controller => "calendar_events_api", :action => "public_feed"
+  map.feeds_calendar_format "feeds/calendars/:feed_code.:format", :controller => "calendar_events_api", :action => "public_feed"
+  map.feeds_forum "feeds/forums/:feed_code", :controller => "discussion_topics", :action => "public_feed"
+  map.feeds_forum_format "feeds/forums/:feed_code.:format", :controller => "discussion_topics", :action => "public_feed"
+  map.feeds_topic "feeds/topics/:discussion_topic_id/:feed_code", :controller => "discussion_entries", :action => "public_feed"
+  map.feeds_topic_format "feeds/topics/:discussion_topic_id/:feed_code.:format", :controller => "discussion_entries", :action => "public_feed"
+  map.feeds_announcements "feeds/announcements/:feed_code", :controller => "announcements", :action => "public_feed"
+  map.feeds_announcements_format "feeds/announcements/:feed_code.:format", :controller => "announcements", :action => "public_feed"
+  map.feeds_course "feeds/courses/:feed_code", :controller => "courses", :action => "public_feed"
+  map.feeds_course_format "feeds/courses/:feed_code.:format", :controller => "courses", :action => "public_feed"
+  map.feeds_group "feeds/groups/:feed_code", :controller => "groups", :action => "public_feed"
+  map.feeds_group_format "feeds/groups/:feed_code.:format", :controller => "groups", :action => "public_feed"
+  map.feeds_enrollment "feeds/enrollments/:feed_code", :controller => "courses", :action => "public_feed"
+  map.feeds_enrollment_format "feeds/enrollments/:feed_code.:format", :controller => "courses", :action => "public_feed"
+  map.feeds_user "feeds/users/:feed_code", :controller => "users", :action => "public_feed"
+  map.feeds_user_format "feeds/users/:feed_code.:format", :controller => "users", :action => "public_feed"
+  map.feeds_eportfolio "feeds/eportfolios/:eportfolio_id.:format", :controller => "eportfolios", :action => "public_feed"
+  map.feeds_conversation "feeds/conversations/:feed_code", :controller => "conversations", :action => "public_feed"
+  map.feeds_conversation_format "feeds/conversations/:feed_code.:format", :controller => "conversations", :action => "public_feed"
 
   map.resources :assessment_questions do |question|
     question.map 'files/:id/download', :controller => 'files', :action => 'assessment_question_show', :download => '1'
@@ -662,7 +659,7 @@ ActionController::Routing::Routes.draw do |map|
   # Routes for course exports
   map.connect 'xsd/:version.xsd', :controller => 'content_exports', :action => 'xml_schema'
 
-  map.resources :jobs, :only => %w(index show), :collection => %w[batch_update]
+  map.resources :jobs, :only => %w(index show), :collection => { :batch_update => :post }
 
   Jammit::Routes.draw(map) if defined?(Jammit)
 
