@@ -38,8 +38,8 @@ define [
       </form>
     """).hide()
 
-    # pass onlyGivenParameters if you need to do an S3 Upload (you probably do)
-    unless options.onlyGivenParameters
+    # pass proxyAttachment if the upload is being proxied through canvas (deprecated)
+    if options.proxyAttachment
       $form.prepend """
         <input type='hidden' name='_method' value='#{httpMethod}' />
         <input type='hidden' name='authenticity_token' value='#{ENV.AUTHENTICITY_TOKEN}' />
