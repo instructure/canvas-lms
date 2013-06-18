@@ -36,7 +36,6 @@ define [
       @url = -> data.upload_url
       Model::save.call this, null,
         multipart: true
-        onlyGivenParameters: data.remote_url
         success: (data) =>
           dfrd.resolve(data)
           options.success?(data)

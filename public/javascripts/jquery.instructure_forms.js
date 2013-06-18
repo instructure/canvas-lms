@@ -231,6 +231,8 @@ define([
           'encoding' : 'multipart/form-data',
           'target' : "frame_" + id
         });
+        // TODO: remove me once we stop proxying file uploads and/or
+        // explicitly calling $.ajaxJSONFiles
         if (options.onlyGivenParameters) {
           $form.find("input[name='_method']").remove();
           $form.find("input[name='authenticity_token']").remove();
@@ -336,7 +338,8 @@ define([
     var $newForm = $(document.createElement("form"));
     $newForm.attr('action', url).attr('method', submit_type);
     if(!formData.authenticity_token) {
-      formData.authenticity_token = $("#ajax_authenticity_token").text();
+      // TODO: remove me once we stop proxying file uploads
+      formData.authenticity_token = ENV.AUTHENTICITY_TOKEN;
     }
     var fileNames = {};
     files.each(function() {
@@ -377,7 +380,8 @@ define([
   }
   $.ajaxFileUpload = function(options) {
     if(!options.data.authenticity_token) {
-      options.data.authenticity_token = ENV.AUTHENTICITY_TOKEN
+      // TODO: remove me once we stop proxying file uploads
+      options.data.authenticity_token = ENV.AUTHENTICITY_TOKEN;
     }
     $.toMultipartForm(options.data, function(params) {
       $.sendFormAsBinary({

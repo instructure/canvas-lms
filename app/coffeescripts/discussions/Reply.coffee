@@ -83,6 +83,7 @@ define [
         success: @onPostReplySuccess
         error: @onPostReplyError
         multipart: entry.get('attachment')
+        proxyAttachment: true
       @hide()
       @removeAttachments()
 
