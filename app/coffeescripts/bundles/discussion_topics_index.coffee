@@ -36,6 +36,7 @@ require [
           lockable: false
           sortable: true
           pinnable: ENV.permissions.change_settings
+          pinned: true
 
     # Public: The index page action.
     index: ->
@@ -78,6 +79,7 @@ require [
         sortable: !!options.sortable
         draggable: !!options.draggable
         destination: options.destination
+        pinned: options.pinned
 
     # Internal: Attach events to the discussion topic collections.
     #

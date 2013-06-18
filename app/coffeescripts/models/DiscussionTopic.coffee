@@ -52,10 +52,19 @@ define [
     toJSON: ->
       json = super
       delete json.assignment unless json.set_assignment
+      assignment = if json.assignment
+        if typeof json.assignment.toJSON is 'function'
+          json.assignment.toJSON()
+        else
+          json.assignment
+      else
+        null
+
       _.extend json,
         summary: @summary(),
         unread_count_tooltip: @unreadTooltip(),
         reply_count_tooltip: @replyTooltip()
+        assignment: assignment
 
     unreadTooltip: ->
       I18n.t 'unread_count_tooltip', {
