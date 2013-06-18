@@ -39,7 +39,9 @@ gem 'sass',           '3.2.3'
 gem 'hashery',        '1.3.0',  :require => 'hashery/dictionary'
 gem 'highline',       '1.6.1'
 gem 'i18n',           CANVAS_RAILS3 ? '0.5.0' : '0.6.0'
-gem 'i18nema',        '0.0.7'
+if !CANVAS_RAILS3
+  gem 'i18nema',        '0.0.7'
+end
 gem 'icalendar',      '1.1.5'
 gem 'jammit',         '0.6.6'
 gem 'json',           '1.8.0'

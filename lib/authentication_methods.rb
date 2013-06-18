@@ -51,7 +51,7 @@ module AuthenticationMethods
   def load_pseudonym_from_access_token
     return unless api_request? || params[:action] == 'oauth2_logout'
 
-    auth_header = ActionController::HttpAuthentication::Basic.authorization(request)
+    auth_header = CANVAS_RAILS3 ? request.authorization : ActionController::HttpAuthentication::Basic.authorization(request)
     token_string = if auth_header.present? && (header_parts = auth_header.split(' ', 2)) && header_parts[0] == 'Bearer'
       header_parts[1]
     elsif params[:access_token].present?

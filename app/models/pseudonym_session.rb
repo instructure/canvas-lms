@@ -56,7 +56,7 @@ class PseudonymSession < Authlogic::Session::Base
       :expires => remember_me_until,
       :domain => controller.cookie_domain,
       :httponly => true,
-      :secure => ActionController::Base.session_options[:secure],
+      :secure => controller.request.session_options[:secure],
     }
   end
 
