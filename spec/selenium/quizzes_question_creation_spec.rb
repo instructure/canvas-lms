@@ -5,8 +5,6 @@ describe "quizzes question creation" do
 
   before (:each) do
     course_with_teacher_logged_in
-    @course.root_account.settings = { :file_upload_quiz_questions => true}
-    @course.root_account.save!
     @last_quiz = start_quiz_question
   end
 
