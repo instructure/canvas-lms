@@ -247,8 +247,14 @@ class ContentMigration < ActiveRecord::Base
     mi.error_message = opts[:error_message]
     mi.fix_issue_html_url = opts[:fix_issue_html_url]
 
-    mi.save!
-    
+    # prevent duplicates
+    if self.migration_issues.where(mi.attributes.slice(
+        "issue_type", "description", "error_message", "fix_issue_html_url")).any?
+      mi.delete
+    else
+      mi.save!
+    end
+
     mi
   end
   
