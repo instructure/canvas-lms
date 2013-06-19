@@ -1005,7 +1005,7 @@ class Quiz < ActiveRecord::Base
      :cant_go_back].each do |attr|
       item.send("#{attr}=", hash[attr]) if hash.key?(attr)
     end
-    
+
     item.save!
 
     if context.respond_to?(:content_migration) && context.content_migration
@@ -1021,6 +1021,13 @@ class Quiz < ActiveRecord::Base
         questions_to_update = item.quiz_questions.where(:migration_id => question_data[:qq_data].keys)
         questions_to_update.each do |question_to_update|
           question_data[:qq_data].values.find{|q| q['migration_id'].eql?(question_to_update.migration_id)}['quiz_question_id'] = question_to_update.id
+        end
+      end
+
+      if question_data[:aq_data]
+        questions_to_update = item.quiz_questions.where(:migration_id => question_data[:aq_data].keys)
+        questions_to_update.each do |question_to_update|
+          question_data[:aq_data].values.find{|q| q['migration_id'].eql?(question_to_update.migration_id)}['quiz_question_id'] = question_to_update.id
         end
       end
 
@@ -1057,8 +1064,7 @@ class Quiz < ActiveRecord::Base
     item.reload # reload to catch question additions
     
     if hash[:assignment] && hash[:available]
-      assignment = Assignment.import_from_migration(hash[:assignment], context)
-      item.assignment = assignment
+      item.assignment = Assignment.import_from_migration(hash[:assignment], context, item.assignment)
     elsif !item.assignment && grading = hash[:grading]
       # The actual assignment will be created when the quiz is published
       item.quiz_type = 'assignment'
