@@ -193,7 +193,7 @@ module Canvas::AccountReports
 
         csv << headers
         courses = root_account.all_courses.includes(:account, :enrollment_term)
-        courses = courses.where("sis_source_id IS NOT NULL") if @sis_format
+        courses = courses.where("courses.sis_source_id IS NOT NULL") if @sis_format
 
         if @include_deleted
           courses = courses.where("courses.workflow_state<>'deleted' OR courses.sis_source_id IS NOT NULL")
