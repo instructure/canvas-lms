@@ -46,7 +46,7 @@ describe 'Submissions API', :type => :integration do
           "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{student.id}.json",
           { :controller => 'submissions_api', :action => 'show',
             :format => 'json', :course_id => @course.id.to_s,
-            :assignment_id => @assignment.id.to_s, :id => student.id.to_s },
+            :assignment_id => @assignment.id.to_s, :user_id => student.id.to_s },
           { :include => %w(submission_history submission_comments rubric_assessment) })
     json.should == {
       "assignment_id" => @assignment.id,
@@ -126,7 +126,7 @@ describe 'Submissions API', :type => :integration do
                       "/api/v1/sections/#{@default_section.id}/assignments/#{@a1.id}/submissions/#{@student1.id}",
       { :controller => 'submissions_api', :action => 'update',
         :format => 'json', :section_id => @default_section.id.to_s,
-        :assignment_id => @a1.id.to_s, :id => @student1.id.to_s },
+        :assignment_id => @a1.id.to_s, :user_id => @student1.id.to_s },
         { :submission => { :posted_grade => '75%' } })
       response.status.should == "404 Not Found"
 
@@ -135,7 +135,7 @@ describe 'Submissions API', :type => :integration do
                       "/api/v1/sections/sis_section_id:my-section-sis-id/assignments/#{@a1.id}/submissions/#{@student1.id}",
       { :controller => 'submissions_api', :action => 'update',
         :format => 'json', :section_id => 'sis_section_id:my-section-sis-id',
-        :assignment_id => @a1.id.to_s, :id => @student1.id.to_s },
+        :assignment_id => @a1.id.to_s, :user_id => @student1.id.to_s },
         { :submission => { :posted_grade => '75%' } })
         # never more than 1 job added, because it's in a Delayed::Batch
       }.to change { Delayed::Job.jobs_count(:current) }.by(1)
@@ -153,7 +153,7 @@ describe 'Submissions API', :type => :integration do
             "/api/v1/sections/sis_section_id:my-section-sis-id/assignments/#{@a1.id}/submissions/#{@student1.id}",
             { :controller => 'submissions_api', :action => 'show',
               :format => 'json', :section_id => 'sis_section_id:my-section-sis-id',
-              :assignment_id => @a1.id.to_s, :id => @student1.id.to_s },
+              :assignment_id => @a1.id.to_s, :user_id => @student1.id.to_s },
             { :include => %w(submission_history submission_comments rubric_assessment) })
       json['user_id'].should == @student1.id
     end
@@ -170,7 +170,7 @@ describe 'Submissions API', :type => :integration do
             "/api/v1/sections/sis_section_id:my-section-sis-id/assignments/#{@a1.id}/submissions/#{@student1.id}",
             { :controller => 'submissions_api', :action => 'show',
               :format => 'json', :section_id => 'sis_section_id:my-section-sis-id',
-              :assignment_id => @a1.id.to_s, :id => @student1.id.to_s },
+              :assignment_id => @a1.id.to_s, :user_id => @student1.id.to_s },
             { :include => %w(submission_comments rubric_assessment) })
 
       %w(score published_grade published_score grade).each do |a|
@@ -186,7 +186,7 @@ describe 'Submissions API', :type => :integration do
             "/api/v1/sections/sis_section_id:my-section-sis-id/assignments/#{@a1.id}/submissions/#{@student1.id}",
             { :controller => 'submissions_api', :action => 'show',
               :format => 'json', :section_id => 'sis_section_id:my-section-sis-id',
-              :assignment_id => @a1.id.to_s, :id => @student1.id.to_s },
+              :assignment_id => @a1.id.to_s, :user_id => @student1.id.to_s },
             { :include => %w(submission_comments rubric_assessment) })
       json["submission_comments"].size.should == 2
       json["grade"].should == "5"
@@ -198,7 +198,7 @@ describe 'Submissions API', :type => :integration do
             "/api/v1/sections/sis_section_id:my-section-sis-id/assignments/#{@a1.id}/submissions/#{@student1.id}",
             { :controller => 'submissions_api', :action => 'show',
               :format => 'json', :section_id => 'sis_section_id:my-section-sis-id',
-              :assignment_id => @a1.id.to_s, :id => @student1.id.to_s },
+              :assignment_id => @a1.id.to_s, :user_id => @student1.id.to_s },
             { :include => %w(submission_comments rubric_assessment) })
       json["submission_comments"].size.should == 2
       json["grade"].should == "5"
@@ -243,7 +243,7 @@ describe 'Submissions API', :type => :integration do
           "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}.json",
           { :controller => 'submissions_api', :action => 'show',
             :format => 'json', :course_id => @course.id.to_s,
-            :assignment_id => @assignment.id.to_s, :id => @student.id.to_s })
+            :assignment_id => @assignment.id.to_s, :user_id => @student.id.to_s })
 
     json['discussion_entries'].sort_by { |h| h['user_id'] }.should ==
       [{
@@ -274,7 +274,7 @@ describe 'Submissions API', :type => :integration do
           "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}",
           { :controller => 'submissions_api', :action => 'show',
             :format => 'json', :course_id => @course.id.to_s,
-            :assignment_id => @assignment.id.to_s, :id => @student.id.to_s },
+            :assignment_id => @assignment.id.to_s, :user_id => @student.id.to_s },
           { :response_fields => SubmissionsApiController::SUBMISSION_JSON_FIELDS })
     json['discussion_entries'].should be_nil
 
@@ -282,7 +282,7 @@ describe 'Submissions API', :type => :integration do
           "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}",
           { :controller => 'submissions_api', :action => 'show',
             :format => 'json', :course_id => @course.id.to_s,
-            :assignment_id => @assignment.id.to_s, :id => @student.id.to_s },
+            :assignment_id => @assignment.id.to_s, :user_id => @student.id.to_s },
           { :exclude_response_fields => %w(discussion_entries) })
     json['discussion_entries'].should be_nil
   end
@@ -310,7 +310,7 @@ describe 'Submissions API', :type => :integration do
           "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}.json",
           { :controller => 'submissions_api', :action => 'show',
             :format => 'json', :course_id => @course.id.to_s,
-            :assignment_id => @assignment.id.to_s, :id => @student.id.to_s })
+            :assignment_id => @assignment.id.to_s, :user_id => @student.id.to_s })
 
     json['discussion_entries'].sort_by { |h| h['user_id'] }.should ==
       [{
@@ -436,7 +436,7 @@ describe 'Submissions API', :type => :integration do
                     "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student1.id}.json",
                     { :controller => "submissions_api", :action => "show",
                       :format => "json", :course_id => @course.id.to_s,
-                      :assignment_id => a1.id.to_s, :id => student1.id.to_s },
+                      :assignment_id => a1.id.to_s, :user_id => student1.id.to_s },
                     { :include => %w(submission_comments) })
 
     json.should == {
@@ -482,7 +482,7 @@ describe 'Submissions API', :type => :integration do
                     "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student1.id}.json",
                     { :controller => "submissions_api", :action => "show",
                       :format => "json", :course_id => @course.id.to_s,
-                      :assignment_id => a1.id.to_s, :id => student1.id.to_s },
+                      :assignment_id => a1.id.to_s, :user_id => student1.id.to_s },
                     { :include => %w(submission_comments) })
     response.status.should =~ /401/
   end
@@ -499,7 +499,7 @@ describe 'Submissions API', :type => :integration do
     json = api_call(:get, "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{@student.id}.json",
                   { :controller => "submissions_api", :action => "show",
                     :format => "json", :course_id => @course.id.to_s,
-                    :assignment_id => a1.id.to_s, :id => @student.id.to_s })
+                    :assignment_id => a1.id.to_s, :user_id => @student.id.to_s })
     json["score"].should == 15
   end
 
@@ -513,7 +513,7 @@ describe 'Submissions API', :type => :integration do
       json = api_call(:get, "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student1.id}.json",
                     { :controller => "submissions_api", :action => "show",
                       :format => "json", :course_id => @course.id.to_s,
-                      :assignment_id => a1.id.to_s, :id => student1.id.to_s })
+                      :assignment_id => a1.id.to_s, :user_id => student1.id.to_s })
       json["body"]
     end
   end
@@ -910,7 +910,7 @@ describe 'Submissions API', :type => :integration do
           "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student.id}.json",
           { :controller => 'submissions_api', :action => 'show',
             :format => 'json', :course_id => @course.id.to_s,
-            :assignment_id => a1.id.to_s, :id => student.id.to_s })
+            :assignment_id => a1.id.to_s, :user_id => student.id.to_s })
     json.should have_key 'turnitin_data'
     sample_turnitin_data.delete :last_processed_attempt
     json['turnitin_data'].should == sample_turnitin_data.with_indifferent_access
@@ -921,7 +921,7 @@ describe 'Submissions API', :type => :integration do
           "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student.id}.json",
           { :controller => 'submissions_api', :action => 'show',
             :format => 'json', :course_id => @course.id.to_s,
-            :assignment_id => a1.id.to_s, :id => student.id.to_s })
+            :assignment_id => a1.id.to_s, :user_id => student.id.to_s })
     json.should_not have_key 'turnitin_data'
 
     # as student after grading
@@ -931,7 +931,7 @@ describe 'Submissions API', :type => :integration do
           "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student.id}.json",
           { :controller => 'submissions_api', :action => 'show',
             :format => 'json', :course_id => @course.id.to_s,
-            :assignment_id => a1.id.to_s, :id => student.id.to_s })
+            :assignment_id => a1.id.to_s, :user_id => student.id.to_s })
     json.should have_key 'turnitin_data'
     json['turnitin_data'].should == sample_turnitin_data.with_indifferent_access
 
@@ -1099,7 +1099,7 @@ describe 'Submissions API', :type => :integration do
           "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student.id}.json",
           { :controller => 'submissions_api', :action => 'update',
             :format => 'json', :course_id => @course.id.to_s,
-            :assignment_id => a1.id.to_s, :id => student.id.to_s },
+            :assignment_id => a1.id.to_s, :user_id => student.id.to_s },
           { :submission => { :posted_grade => 'B' } })
 
     Submission.count.should == 1
@@ -1121,7 +1121,7 @@ describe 'Submissions API', :type => :integration do
           "/api/v1/courses/sis_course_id:my-course-id/assignments/#{a1.id}/submissions/sis_user_id:my-user-id.json",
           { :controller => 'submissions_api', :action => 'update',
             :format => 'json', :course_id => 'sis_course_id:my-course-id',
-            :assignment_id => a1.id.to_s, :id => 'sis_user_id:my-user-id' },
+            :assignment_id => a1.id.to_s, :user_id => 'sis_user_id:my-user-id' },
           { :submission => { :posted_grade => 'B' } })
 
     Submission.count.should == 1
@@ -1143,7 +1143,7 @@ describe 'Submissions API', :type => :integration do
           "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student.id}.json",
           { :controller => 'submissions_api', :action => 'update',
             :format => 'json', :course_id => @course.id.to_s,
-            :assignment_id => a1.id.to_s, :id => student.id.to_s },
+            :assignment_id => a1.id.to_s, :user_id => student.id.to_s },
           { :comment => { :text_comment => 'witty remark' } })
 
     Submission.count.should == 1
@@ -1166,7 +1166,7 @@ describe 'Submissions API', :type => :integration do
           "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student.id}.json",
           { :controller => 'submissions_api', :action => 'update',
             :format => 'json', :course_id => @course.id.to_s,
-            :assignment_id => a1.id.to_s, :id => student.id.to_s },
+            :assignment_id => a1.id.to_s, :user_id => student.id.to_s },
           { :comment => { :text_comment => 'witty remark' },
             :submission => { :posted_grade => 'B' } })
     response.status.should == '401 Unauthorized'
@@ -1184,7 +1184,7 @@ describe 'Submissions API', :type => :integration do
           "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student.id}.json",
           { :controller => 'submissions_api', :action => 'update',
             :format => 'json', :course_id => @course.id.to_s,
-            :assignment_id => a1.id.to_s, :id => student.id.to_s },
+            :assignment_id => a1.id.to_s, :user_id => student.id.to_s },
           { :comment => { :text_comment => 'witty remark' },
             :rubric_assessment => { :criteria => { :points => 5 } } })
     response.status.should == '401 Unauthorized'
@@ -1229,7 +1229,7 @@ describe 'Submissions API', :type => :integration do
           "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student.id}.json",
           { :controller => 'submissions_api', :action => 'update',
             :format => 'json', :course_id => @course.id.to_s,
-            :assignment_id => a1.id.to_s, :id => student.id.to_s },
+            :assignment_id => a1.id.to_s, :user_id => student.id.to_s },
           { :submission => { :posted_grade => 'B' } })
 
     Submission.count.should == 1
@@ -1251,7 +1251,7 @@ describe 'Submissions API', :type => :integration do
     api_call(:put, "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}/submissions/#{student.id}",
       { :controller => 'submissions_api', :action => 'update', :format => 'json',
         :course_id => @course.to_param, :assignment_id => assignment.to_param,
-        :id => student.to_param },
+        :user_id => student.to_param },
       { :comment => { :text_comment => 'hidden comment' } })
     submission.submission_comments.order("id DESC").first.should be_hidden
   end
@@ -1267,7 +1267,7 @@ describe 'Submissions API', :type => :integration do
     api_call(:put, "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}/submissions/#{student.id}",
       { :controller => 'submissions_api', :action => 'update', :format => 'json',
         :course_id => @course.to_param, :assignment_id => assignment.to_param,
-        :id => student.to_param },
+        :user_id => student.to_param },
       { :comment => { :text_comment => 'hidden comment' } })
     submission.submission_comments.order("id DESC").first.should_not be_hidden
   end
@@ -1350,7 +1350,7 @@ describe 'Submissions API', :type => :integration do
           "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student.id}.json",
           { :controller => 'submissions_api', :action => 'update',
             :format => 'json', :course_id => @course.id.to_s,
-            :assignment_id => a1.id.to_s, :id => student.id.to_s },
+            :assignment_id => a1.id.to_s, :user_id => student.id.to_s },
           { :submission => { :posted_grade => param } })
 
     Submission.count.should == 1
@@ -1373,7 +1373,7 @@ describe 'Submissions API', :type => :integration do
           "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student.id}.json",
           { :controller => 'submissions_api', :action => 'update',
             :format => 'json', :course_id => @course.id.to_s,
-            :assignment_id => a1.id.to_s, :id => student.id.to_s },
+            :assignment_id => a1.id.to_s, :user_id => student.id.to_s },
           { :rubric_assessment =>
              { :crit1 => { :points => 7 },
                :crit2 => { :points => 2, :comments => 'Rock on' } } })
@@ -1412,7 +1412,7 @@ describe 'Submissions API', :type => :integration do
           "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{student.id}.json",
           { :controller => 'submissions_api', :action => 'update',
             :format => 'json', :course_id => @course.id.to_s,
-            :assignment_id => @assignment.id.to_s, :id => student.id.to_s },
+            :assignment_id => @assignment.id.to_s, :user_id => student.id.to_s },
           { :comment =>
             { :text_comment => "ohai!" } })
 
@@ -1438,7 +1438,7 @@ describe 'Submissions API', :type => :integration do
           "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{student1.id}.json",
           { :controller => 'submissions_api', :action => 'update',
             :format => 'json', :course_id => @course.id.to_s,
-            :assignment_id => @assignment.id.to_s, :id => student1.id.to_s },
+            :assignment_id => @assignment.id.to_s, :user_id => student1.id.to_s },
           { :comment =>
             { :text_comment => "ohai!", :group_comment => "1" } })
     json['submission_comments'].size.should == 1
@@ -1462,7 +1462,7 @@ describe 'Submissions API', :type => :integration do
           "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{student.id}.json",
           { :controller => 'submissions_api', :action => 'update',
             :format => 'json', :course_id => @course.id.to_s,
-            :assignment_id => @assignment.id.to_s, :id => student.id.to_s },
+            :assignment_id => @assignment.id.to_s, :user_id => student.id.to_s },
           { :comment =>
             { :media_comment_id => '1234', :media_comment_type => 'audio' } })
 
@@ -1485,7 +1485,7 @@ describe 'Submissions API', :type => :integration do
           "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student.id}.json",
           { :controller => 'submissions_api', :action => 'update',
             :format => 'json', :course_id => @course.id.to_s,
-            :assignment_id => a1.id.to_s, :id => student.id.to_s },
+            :assignment_id => a1.id.to_s, :user_id => student.id.to_s },
           { :comment => { :text_comment => "Why U no submit" } })
 
     Submission.count.should == 1
@@ -1512,7 +1512,7 @@ describe 'Submissions API', :type => :integration do
           "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{student.id}.json",
           { :controller => 'submissions_api', :action => 'update',
             :format => 'json', :course_id => @course.id.to_s,
-            :assignment_id => @assignment.id.to_s, :id => student.id.to_s },
+            :assignment_id => @assignment.id.to_s, :user_id => student.id.to_s },
           { :submission => { :posted_grade => '' } })
     Submission.count.should == 1
     @submission = Submission.first
@@ -1532,7 +1532,7 @@ describe 'Submissions API', :type => :integration do
           "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{student.id}.json",
           { :controller => 'submissions_api', :action => 'update',
             :format => 'json', :course_id => @course.id.to_s,
-            :assignment_id => @assignment.id.to_s, :id => student.id.to_s },
+            :assignment_id => @assignment.id.to_s, :user_id => student.id.to_s },
           { :comment => { :text_comment => "This works" } })
     Submission.count.should == 1
     @submission = Submission.first
@@ -1542,7 +1542,7 @@ describe 'Submissions API', :type => :integration do
           "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{student.id}.json",
           { :controller => 'submissions_api', :action => 'update',
             :format => 'json', :course_id => @course.id.to_s,
-            :assignment_id => @assignment.id.to_s, :id => student.id.to_s },
+            :assignment_id => @assignment.id.to_s, :user_id => student.id.to_s },
           { :submission => { :posted_grade => '10' } })
     Submission.count.should == 1
     @submission = Submission.first
@@ -1552,7 +1552,7 @@ describe 'Submissions API', :type => :integration do
           "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{student.id}.json",
           { :controller => 'submissions_api', :action => 'update',
             :format => 'json', :course_id => @course.id.to_s,
-            :assignment_id => @assignment.id.to_s, :id => student.id.to_s },
+            :assignment_id => @assignment.id.to_s, :user_id => student.id.to_s },
           { :comment => { :text_comment => "10/12 ain't bad" } })
     Submission.count.should == 1
     @submission = Submission.first
@@ -1572,7 +1572,7 @@ describe 'Submissions API', :type => :integration do
           "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{student.id}.json",
           { :controller => 'submissions_api', :action => 'update',
             :format => 'json', :course_id => @course.id.to_s,
-            :assignment_id => @assignment.id.to_s, :id => student.id.to_s },
+            :assignment_id => @assignment.id.to_s, :user_id => student.id.to_s },
           { :submission => { :posted_grade => '12' } })
     Submission.count.should == 1
     @submission = Submission.first
@@ -1616,7 +1616,7 @@ describe 'Submissions API', :type => :integration do
           "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{s2.user_id}",
           { :controller => 'submissions_api', :action => 'show',
             :format => 'json', :course_id => @course.id.to_s,
-            :assignment_id => @assignment.id.to_s, :id => s2.user_id.to_s })
+            :assignment_id => @assignment.id.to_s, :user_id => s2.user_id.to_s })
     response.status.should == "404 Not Found"
 
     # try querying the other section directly
@@ -1624,7 +1624,7 @@ describe 'Submissions API', :type => :integration do
           "/api/v1/sections/#{section2.id}/assignments/#{@assignment.id}/submissions/#{s2.user_id}",
           { :controller => 'submissions_api', :action => 'show',
             :format => 'json', :section_id => section2.id.to_s,
-            :assignment_id => @assignment.id.to_s, :id => s2.user_id.to_s })
+            :assignment_id => @assignment.id.to_s, :user_id => s2.user_id.to_s })
     response.status.should == "404 Not Found"
 
     json = api_call(:get,
@@ -1647,7 +1647,7 @@ describe 'Submissions API', :type => :integration do
           "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{s1.user_id}",
           { :controller => 'submissions_api', :action => 'update',
             :format => 'json', :course_id => @course.id.to_s,
-            :assignment_id => @assignment.id.to_s, :id => s1.user_id.to_s },
+            :assignment_id => @assignment.id.to_s, :user_id => s1.user_id.to_s },
           { :submission => { :posted_grade => '10' } })
     @submission = @assignment.submission_for_student(s1.user)
     @submission.should be_present
@@ -1658,7 +1658,7 @@ describe 'Submissions API', :type => :integration do
           "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{s2.user_id}",
           { :controller => 'submissions_api', :action => 'update',
             :format => 'json', :course_id => @course.id.to_s,
-            :assignment_id => @assignment.id.to_s, :id => s2.user_id.to_s },
+            :assignment_id => @assignment.id.to_s, :user_id => s2.user_id.to_s },
           { :submission => { :posted_grade => '10' } })
     response.status.should == "404 Not Found"
 
@@ -1667,7 +1667,7 @@ describe 'Submissions API', :type => :integration do
           "/api/v1/sections/#{section2.id}/assignments/#{@assignment.id}/submissions/#{s2.user_id}",
           { :controller => 'submissions_api', :action => 'update',
             :format => 'json', :section_id => section2.id.to_s,
-            :assignment_id => @assignment.id.to_s, :id => s2.user_id.to_s },
+            :assignment_id => @assignment.id.to_s, :user_id => s2.user_id.to_s },
           { :submission => { :posted_grade => '10' } })
     response.status.should == "404 Not Found"
   end

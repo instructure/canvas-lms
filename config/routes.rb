@@ -739,10 +739,10 @@ ActionController::Routing::Routes.draw do |map|
       def submissions_api(submissions, context)
         submissions.get "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions", :action => :index, :path_name => "#{context}_assignment_submissions"
         submissions.get "#{context.pluralize}/:#{context}_id/students/submissions", :controller => :submissions_api, :action => :for_students, :path_name => "#{context}_student_submissions"
-        submissions.get "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions/:id", :action => :show, :path_name => "#{context}_assignment_submission"
+        submissions.get "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions/:user_id", :action => :show, :path_name => "#{context}_assignment_submission"
         submissions.post "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions", :action => :create, :controller => :submissions
         submissions.post "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions/:user_id/files", :action => :create_file
-        submissions.put "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions/:id", :action => :update, :path_name => "#{context}_assignment_submission"
+        submissions.put "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions/:user_id", :action => :update, :path_name => "#{context}_assignment_submission"
       end
       submissions_api(submissions, "course")
       submissions_api(submissions, "section")
