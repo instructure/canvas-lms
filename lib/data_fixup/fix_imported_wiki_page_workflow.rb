@@ -8,7 +8,9 @@ module DataFixup::FixImportedWikiPageWorkflow
 
   def self.run
     self.broken_wiki_page_scope.find_in_batches do |wiki_pages|
-      WikiPage.where(:id => wiki_pages).update_all(:workflow_state => 'active')
+      WikiPage.send(:with_exclusive_scope) do
+        WikiPage.where(:id => wiki_pages).update_all(:workflow_state => 'active')
+      end
     end
   end
 end
