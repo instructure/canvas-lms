@@ -511,6 +511,13 @@ describe "Default Account Reports" do
                              nil,@default_term.id.to_s,nil,"concluded",nil,nil]
       end
 
+      it "should run the sis report report on a sub account" do
+        parameters = {}
+        parameters["courses"] = true
+        # all I care about is that it didn't throw a database error due to ambiguous columns
+        parsed = ReportSpecHelper.run_report(@sub_account,"sis_export_csv",parameters,3)
+      end
+
       it "should run the provisioning report report on a sub account" do
         parameters = {}
         parameters["courses"] = true
