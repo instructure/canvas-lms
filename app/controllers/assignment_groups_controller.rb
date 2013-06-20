@@ -166,7 +166,7 @@ class AssignmentGroupsController < ApplicationController
   def destroy
     @assignment_group = AssignmentGroup.find(params[:id])
     if authorized_action(@assignment_group, @current_user, :delete)
-      if @assignment_group.has_frozen_assignment_group_id_assignment?(@current_user)
+      if @assignment_group.has_frozen_assignments?(@current_user)
         @assignment_group.errors.add('workflow_state', t('errors.cannot_delete_group', "You can not delete a group with a locked assignment.", :att_name => 'workflow_state'))
         respond_to do |format|
           format.html { redirect_to named_context_url(@context, :context_assignments_url) }
