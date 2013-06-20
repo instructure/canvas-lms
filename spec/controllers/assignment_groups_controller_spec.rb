@@ -211,5 +211,19 @@ describe AssignmentGroupsController do
       @assignment2.reload.position.should eql(2)
       @assignment2.assignment_group_id.should eql(@group1.id)
     end
+
+    it "does not allow users to delete assignment groups with frozen assignments" do
+      PluginSetting.stubs(:settings_for_plugin).returns(title: 'yes')
+      course_with_teacher_logged_in(active_all: true)
+      group = @course.assignment_groups.create!(name: "group 1")
+      assignment = @course.assignments.create!(title: "assignment",
+                                               assignment_group: group,
+                                               freeze_on_copy: true)
+      assignment.position.should == 1
+      assignment.copied = true
+      assignment.save!
+      delete 'destroy', format: :json, course_id: @course.id, id: group.id
+      response.should_not be_success
+    end
   end
 end
