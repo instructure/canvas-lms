@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2013 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -769,6 +769,7 @@ describe CoursesController, type: :request do
       'id' => @course1.enrollment_term_id,
       'name' => @course1.enrollment_term.name,
       'sis_term_id' => nil,
+      'workflow_state' => 'active',
     )
 
     # course2
@@ -779,6 +780,7 @@ describe CoursesController, type: :request do
       'id' => @course2.enrollment_term_id,
       'name' => @course2.enrollment_term.name,
       'sis_term_id' => nil,
+      'workflow_state' => 'active',
     )
   end
 

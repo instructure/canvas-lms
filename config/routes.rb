@@ -877,6 +877,10 @@ routes.draw do
       delete 'courses/:course_id/enrollments/:id', :action => :destroy
     end
 
+    scope(:controller => :terms_api) do
+      get 'accounts/:account_id/terms', :action => :index, :path_name => 'enrollment_terms'
+    end
+
     scope(:controller => :authentication_audit_api) do
       get 'audit/authentication/logins/:login_id', :action => :for_login, :path_name => 'audit_authentication_login'
       get 'audit/authentication/accounts/:account_id', :action => :for_account, :path_name => 'audit_authentication_account'
