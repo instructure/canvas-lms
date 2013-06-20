@@ -705,7 +705,7 @@ class GroupsController < ApplicationController
 
   def find_group
     if api_request?
-      @group = Group.active.find(params[:group_id])
+      @group = api_find(Group.active, params[:group_id])
     else
       @group = @context if @context.is_a?(Group)
       @group ||= (@context ? @context.groups : Group).find(params[:id])

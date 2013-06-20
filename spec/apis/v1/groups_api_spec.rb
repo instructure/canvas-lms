@@ -93,6 +93,7 @@ describe "Groups API", :type => :integration do
                                                   :account_id => @account.to_param))
     json.count.should == 1
     json.first['id'].should == @community.id
+    json.first['sis_source_id'].should == nil
   end
 
   it "should not allow non-admins to view an account's groups" do
@@ -119,6 +120,12 @@ describe "Groups API", :type => :integration do
   it "should allow a member to retrieve the group" do
     @user = @member
     json = api_call(:get, @community_path, @category_path_options.merge(:group_id => @community.to_param, :action => "show"))
+    json.should == group_json(@community, @user)
+  end
+
+  it "should allow searching by SIS ID" do
+    @community.update_attribute(:sis_source_id, 'abc')
+    json = api_call(:get, "/api/v1/groups/sis_group_id:abc", @category_path_options.merge(:group_id => 'sis_group_id:abc', :action => "show"))
     json.should == group_json(@community, @user)
   end
 

@@ -385,7 +385,7 @@ class ApplicationController < ActionController::Base
         @context_membership = @context_enrollment
         @account = @context
       elsif params[:group_id]
-        @context = Group.find(params[:group_id])
+        @context = api_request? ? api_find(Group, params[:group_id]) : Group.find(params[:group_id])
         params[:context_id] = params[:group_id]
         params[:context_type] = "Group"
         @context_enrollment = @context.group_memberships.find_by_user_id(@current_user.id) if @context && @current_user      
