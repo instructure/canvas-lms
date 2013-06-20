@@ -745,6 +745,7 @@ describe CoursesController, :type => :integration do
     courses[0]['term'].should include(
       'id' => @course1.enrollment_term_id,
       'name' => @course1.enrollment_term.name,
+      'sis_term_id' => nil,
     )
 
     # course2
@@ -754,6 +755,7 @@ describe CoursesController, :type => :integration do
     courses[0]['term'].should include(
       'id' => @course2.enrollment_term_id,
       'name' => @course2.enrollment_term.name,
+      'sis_term_id' => nil,
     )
   end
 
