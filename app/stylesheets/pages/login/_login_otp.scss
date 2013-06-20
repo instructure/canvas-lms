@@ -7,6 +7,10 @@ body.modal {
   #login-box .btn {
     float: none;
   }
+
+  li.used_otp {
+    text-decoration: line-through;
+  }
 }
 @media (max-width: 767px) {
   body {
@@ -72,5 +76,11 @@ body.modal {
   }
   #footer {
     padding: 0 20px;
+  }
+}
+
+@media print {
+  #regenerate_backup_codes_link {
+    display: none;
   }
 }

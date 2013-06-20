@@ -729,6 +729,8 @@ CanvasRails::Application.routes.draw do
   get 'login/otp' => 'login/otp#new', as: :otp_login
   post 'login/otp/sms' => 'login/otp#send_via_sms', as: :send_otp_via_sms
   post 'login/otp' => 'login/otp#create'
+  get 'users/self/otps' => 'one_time_passwords#index', as: :one_time_passwords
+  delete 'users/self/otps' => 'one_time_passwords#destroy_all', as: :destroy_all_one_time_passwords
 
   # deprecated redirect
   get 'login/:id' => 'login#new'

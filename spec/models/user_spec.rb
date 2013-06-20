@@ -3162,4 +3162,45 @@ describe User do
       expect(u.feature_enabled?(:new_user_tutorial_on_off)).to be true
     end
   end
+
+  describe "#authenticate_one_time_password" do
+    let(:user) { User.create! }
+    let(:otp) { user.one_time_passwords.create! }
+
+    it "marks it as used" do
+      expect(user.authenticate_one_time_password(otp.code)).to eq otp
+      expect(otp.reload).to be_used
+    end
+
+    it "doesn't allow using a used code" do
+      otp.update_attribute(:used, true)
+      expect(user.authenticate_one_time_password(otp.code)).to be_nil
+    end
+  end
+
+  describe "#generate_one_time_passwords" do
+    let(:user) { User.create! }
+
+    it "generates them" do
+      user.generate_one_time_passwords
+      expect(user.one_time_passwords.count).to eq 10
+    end
+
+    it "doesn't clobber them if they already exist" do
+      user.generate_one_time_passwords
+      otps = user.one_time_passwords.order(:id).to_a
+      user.reload
+      user.generate_one_time_passwords
+      expect(user.one_time_passwords.order(:id).to_a).to eq otps
+    end
+
+    it "does clobber them if you want it to" do
+      user.generate_one_time_passwords
+      otps = user.one_time_passwords.order(:id).to_a
+      user.generate_one_time_passwords(regenerate: true)
+      otps.each do |otp|
+        expect { otp.reload }.to raise_error(ActiveRecord::RecordNotFound)
+      end
+    end
+  end
 end

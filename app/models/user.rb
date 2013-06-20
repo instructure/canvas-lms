@@ -138,6 +138,7 @@ class User < ActiveRecord::Base
   has_one :profile, :class_name => 'UserProfile'
 
   has_many :progresses, :as => :context, :inverse_of => :context
+  has_many :one_time_passwords, -> { order(:id) }, inverse_of: :user
 
   belongs_to :otp_communication_channel, :class_name => 'CommunicationChannel'
 
@@ -2853,5 +2854,20 @@ class User < ActiveRecord::Base
         end
       end
     end
+  end
+
+  def authenticate_one_time_password(code)
+    result = one_time_passwords.where(code: code, used: false).take
+    return unless result
+    # atomically update used
+    return unless one_time_passwords.where(used: false, id: result).update_all(used: true, updated_at: Time.now.utc) == 1
+    result
+  end
+
+  def generate_one_time_passwords(regenerate: false)
+    regenerate ||= !one_time_passwords.exists?
+    return unless regenerate
+    one_time_passwords.scope.delete_all
+    Setting.get('one_time_password_count', 10).to_i.times { one_time_passwords.create! }
   end
 end

@@ -337,6 +337,7 @@ define([
     $.ajaxJSON($disable_mfa_link.attr('href'), 'DELETE', null, function() {
       $.flashMessage(I18n.t('notices.mfa_disabled', "Multi-factor authentication disabled"));
       $disable_mfa_link.remove();
+      $('#otp_backup_codes_link').remove();
     });
     event.preventDefault();
   });

@@ -84,8 +84,10 @@ class Login::OtpController < ApplicationController
     drift = 300 if session[:pending_otp_communication_channel_id] ||
         (!session[:pending_otp_secret_key] && @current_user.otp_communication_channel_id)
 
-    if !force_fail && ROTP::TOTP.new(secret_key).verify_with_drift(verification_code, drift)
+    if !force_fail && ROTP::TOTP.new(secret_key).verify_with_drift(verification_code, drift) ||
+      @current_user.authenticate_one_time_password(verification_code)
       if configuring?
+        @current_user.one_time_passwords.scope.delete_all
         @current_user.otp_secret_key = session.delete(:pending_otp_secret_key)
         @current_user.otp_communication_channel_id = session.delete(:pending_otp_communication_channel_id)
         @current_user.otp_communication_channel.try(:confirm)
@@ -128,6 +130,7 @@ class Login::OtpController < ApplicationController
     user.otp_secret_key = nil
     user.otp_communication_channel = nil
     user.save!
+    user.one_time_passwords.scope.delete_all
 
     render :json => {}
   end
