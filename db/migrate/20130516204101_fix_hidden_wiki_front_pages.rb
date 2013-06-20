@@ -2,7 +2,10 @@ class FixHiddenWikiFrontPages < ActiveRecord::Migration
   tag :postdeploy
 
   def self.up
-    WikiPage.where(:url => 'front-page', :hide_from_students => true).update_all(:hide_from_students => false)
+    WikiPage.find_ids_in_ranges do |first, last|
+      WikiPage.where("url = ? AND hide_from_students = ? AND id >= ? AND id <= ?", 'front-page', true, first, last).
+          update_all(:hide_from_students => false)
+    end
   end
 
   def self.down
