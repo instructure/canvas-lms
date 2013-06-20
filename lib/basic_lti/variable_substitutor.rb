@@ -65,6 +65,21 @@ class VariableSubstitutor
     @launch.tool.include_name? ? @launch.user.first_name : nil
   end
 
+  # $Person.address.timezone
+  def sub_Person_address_timezone
+    Time.zone || nil
+  end
+
+  # $Canvas.user.timezone
+  def sub_Canvas_user_timezone
+    Time.zone || nil
+  end
+
+  # $Canvas.user.timezone.offset
+  def sub_Canvas_user_timezone_offset
+    Time.zone ? Time.zone.formatted_offset : nil
+  end
+
   # returns the same LIS Role values as the default 'roles' parameter,
   # but for concluded enrollments
   # $Canvas.membership.concludedRoles
