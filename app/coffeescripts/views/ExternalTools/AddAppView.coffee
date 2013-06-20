@@ -63,8 +63,10 @@ define [
 
     submit: ->
       formData = @$el.getFormData()
-      @model.set 'name', formData['canvas_app_name'] if formData['canvas_app_name']
       if @validate(formData)
+        @model.set 'name', formData['canvas_app_name'] if formData['canvas_app_name']
+        @model.set 'consumer_key', formData['consumer_key'] if formData['consumer_key']
+        @model.set 'shared_secret', formData['shared_secret'] if formData['shared_secret']
         disablingDfd = new $.Deferred()
         @updateConfigUrl(formData)
         @model.save
@@ -78,6 +80,8 @@ define [
       configUrl = @model.get('config_url')
       queryParams = {}
       queryParams[option['name']] = formData[option['name']] for option in @configOptions when formData[option['name']]
+      delete queryParams['consumer_key']
+      delete queryParams['shared_secret']
       newConfigUrl = @model.get('config_url') + (if configUrl.indexOf('?') != -1 then '&' else '?') + $.param(queryParams)
       @model.set('config_url', newConfigUrl)
 
