@@ -361,6 +361,17 @@ describe "Accounts API", :type => :integration do
     json.first['name'].should eql 'c2'
   end
 
+  it "should return courses filtered by enrollment_term" do
+    term = @a1.enrollment_terms.create!(:name => 'term 2')
+    @a1.courses.create!(:name => 'c1')
+    @a1.courses.create!(:name => 'c2', :enrollment_term => term)
+
+    json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses?enrollment_term_id=#{term.id}",
+                    { :controller => 'accounts', :action => 'courses_api', :account_id => @a1.to_param, :format => 'json', :enrollment_term_id => term.to_param })
+    json.length.should eql 1
+    json.first['name'].should eql 'c2'
+  end
+
   describe "?with_enrollments" do
     before do
       @me = @user

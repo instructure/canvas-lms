@@ -107,6 +107,7 @@ class AccountsController < ApplicationController
   # @argument by_subaccounts[] [optional] List of Account IDs; if supplied, include only courses associated with one of the referenced subaccounts.
   # @argument hide_enrollmentless_courses [optional] If present, only return courses that have at least one enrollment.  Equivalent to 'with_enrollments=true'; retained for compatibility.
   # @argument state[] [optional] If set, only return courses that are in the given state(s). Valid states are "created," "claimed," "available," "completed," and "deleted." By default, all states but "deleted" are returned.
+  # @argument enrollment_term_id [optional] If set, only includes courses from the specified term.
   #
   # @returns [Course]
   def courses_api
@@ -140,6 +141,11 @@ class AccountsController < ApplicationController
     if params[:by_subaccounts].is_a?(Array)
       account_ids = Api.map_ids(params[:by_subaccounts], Account, @domain_root_account).map(&:to_i)
       @courses = @courses.by_associated_accounts(account_ids)
+    end
+
+    if params[:enrollment_term_id]
+      term = api_find(@account.root_account.enrollment_terms, params[:enrollment_term_id])
+      @courses = @courses.for_term(term)
     end
 
     @courses = Api.paginate(@courses, self, api_v1_account_courses_url, :order => :id)
