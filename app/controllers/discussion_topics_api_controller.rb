@@ -95,8 +95,10 @@ class DiscussionTopicsApiController < ApplicationController
     structure, participant_ids, entry_ids, new_entries_structure = @topic.materialized_view(:include_new_entries => params[:include_new_entries] == '1')
 
     if structure
-      participant_info = User.find(participant_ids).map do |user|
-        user_display_json(user, @context.is_a_context? && @context)
+      participant_info = Shard.partition_by_shard(participant_ids) do |shard_ids|
+        User.find(shard_ids).map do |user|
+          user_display_json(user, @context.is_a_context? && @context)
+        end
       end
       unread_entries = entry_ids - DiscussionEntryParticipant.read_entry_ids(entry_ids, @current_user)
       forced_entries = DiscussionEntryParticipant.forced_read_state_entry_ids(entry_ids, @current_user)
