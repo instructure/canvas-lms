@@ -5,8 +5,9 @@ require [
   'compiled/views/conversations/MessageView'
   'compiled/views/conversations/MessageListView'
   'compiled/views/conversations/MessageDetailView'
+  'compiled/views/conversations/MessageFormDialog'
   'jquery.disableWhileLoading'
-], (Backbone, Message, MessageCollection, MessageView, MessageListView, MessageDetailView) ->
+], (Backbone, Message, MessageCollection, MessageView, MessageListView, MessageDetailView, MessageFormDialog) ->
 
   class ConversationsRouter extends Backbone.Router
 
@@ -34,6 +35,7 @@ require [
     _initViews: ->
       @_initListView()
       @_initDetailView()
+      @_initComposeDialog()
 
     _attachEvents: ->
       @list.collection.on('change:selected', @onSelected)
@@ -49,6 +51,12 @@ require [
       @detail = new MessageDetailView
         el: $('.message-detail')
       @detail.render()
+
+    _initComposeDialog: ->
+      @compose = new MessageFormDialog() #this, this.canAddNotesFor, folderId: @options.FOLDER_ID)
+      $('.action-compose-message').on 'click', =>
+        @compose.show()
+
 
   app = new ConversationsRouter
   Backbone.history.start()

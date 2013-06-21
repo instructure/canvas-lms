@@ -146,6 +146,7 @@ stylesheets:
     - public/stylesheets/compiled/slideshow.css
   conversations_new:
     - public/stylesheets/compiled/conversations_new.css
+    - public/stylesheets/compiled/compose_message_dialog.css
   alerts:
     - public/stylesheets/compiled/alerts.css
   developer_keys:
