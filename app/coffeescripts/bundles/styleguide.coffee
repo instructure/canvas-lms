@@ -1,12 +1,13 @@
 require [
   'jquery'
   'compiled/fn/preventDefault'
+  'compiled/views/PublishButtonView'
   'jqueryui/accordion'
   'jqueryui/tabs'
   'jqueryui/button'
   'jqueryui/tooltip'
   'jquery.instructure_date_and_time'
-], ($, preventDefault) ->
+], ($, preventDefault, PublishButtonView) ->
 
   do ->
     dialog = $('#dialog-buttons-dialog').dialog({
@@ -54,6 +55,46 @@ require [
 
   # Button Set
   $("#radio1").buttonset()
+
+
+  # Publish Button
+  # --
+  # Hooks into a 'publishable' Backbone model. The backbone model requires
+  # the 'published' and 'publishable' attributes to determine initial state,
+  # and the  publish() and unpublish() methods that return a deferred objects.
+  #
+  class Publishable extends Backbone.Model
+    defaults:
+      "published":   false
+      "publishable": true
+
+    publish: ->
+      this.set("published", true)
+      deferred = $.Deferred()
+      setTimeout deferred.resolve, 1000
+      deferred
+
+    unpublish: ->
+      this.set("published", false)
+      deferred = $.Deferred()
+      setTimeout deferred.resolve, 1000
+      deferred
+
+  # PublishButtonView doesn't require an element to initialize. It is
+  # passed in here for the style-guide demonstration purposes
+
+  # publish
+  model   = new Publishable(published: false, publishable: true)
+  btnView = new PublishButtonView(model: model, el: "#publish").render()
+
+  # published
+  model   = new Publishable(published: true,  publishable: true)
+  btnView = new PublishButtonView(model: model, el: "#published").render()
+
+  # published & disables
+  model   = new Publishable(published: true,  publishable: false)
+  btnView = new PublishButtonView(model: model, el: "#published-disabled").render()
+
 
   # Progressbar
   $("#progressbar").progressbar(value: 37).width 500

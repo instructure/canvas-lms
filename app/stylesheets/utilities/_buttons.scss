@@ -1,8 +1,41 @@
-/* @styleguide Published Buttons
+/* 
+@styleguide Buttons: Publish
+
+The publish button has two states on click (publish and published) and a hover state of 'Unpublish' once published.
 
 ```html
-<button class="btn btn-success active"><i class="icon-published"></i> Published</button>
+
+<p>
+  <button class="btn" id="publish"></button>
+</p>
+
+<p>
+  <button class="btn" id="published"></button>
+</p>
+
+<p>
+  <button class="btn" id="published-disabled"></button>
+</p>
+
 ```
 
 */
 
+/* publish buttons */
+
+.btn-published,
+.btn-published:hover {
+  background: #35842c;
+  border: 1px solid #2a5325;
+  color: #fff;
+  text-shadow: none;
+  box-shadow: inset 0 0 6px #1b2d19;
+}
+.btn-published.disabled {
+  border: 1px solid #bbbbbb;
+}
+
+.btn-unpublish {
+  @include buttonBackground($btnDangerBackground, $btnDangerBackgroundHighlight);
+  box-shadow: none;
+}
