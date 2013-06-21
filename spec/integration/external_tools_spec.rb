@@ -58,14 +58,14 @@ describe "External Tools" do
       doc.at_css('form#tool_form input#ext_ims_lis_basic_outcome_url')['value'].should == blti_legacy_grade_passback_api_url(@tool)
     end
 
-    it "should not include outcome service params when viewing as teacher" do
+    it "should not include outcome service sourcedid when viewing as teacher" do
       @course.enroll_teacher(user(:active_all => true))
       user_session(@user)
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
       response.should be_success
       doc = Nokogiri::HTML.parse(response.body)
       doc.at_css('form#tool_form input#lis_result_sourcedid').should be_nil
-      doc.at_css('form#tool_form input#lis_outcome_service_url').should be_nil
+      doc.at_css('form#tool_form input#lis_outcome_service_url').should_not be_nil
     end
 
     it "should include time zone in LTI paramaters if included in custom fields" do
