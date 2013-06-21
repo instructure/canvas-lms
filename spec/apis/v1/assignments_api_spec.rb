@@ -163,6 +163,41 @@ describe AssignmentsApiController, :type => :integration do
       ]
     end
 
+    it "should return learning outcome info with rubric criterions if available" do
+      course_with_teacher(:active_all => true)
+      @group = @course.assignment_groups.create!({:name => "some group"})
+      @assignment = @course.assignments.create!(:title => "some assignment",
+                                                :assignment_group => @group,
+                                                :points_possible => 12)
+      @assignment.update_attribute(:submission_types,
+                                   "online_upload,online_text_entry,online_url,media_recording")
+
+      criterion = valid_rubric_attributes[:data].first
+      @outcome = @course.created_learning_outcomes.build(
+          :title => "My Outcome",
+          :description => "Description of my outcome",
+          :vendor_guid => "vendorguid9000"
+      )
+      @outcome.rubric_criterion = criterion
+      @outcome.save!
+
+      rubric_data = [criterion.merge({:learning_outcome_id => @outcome.id})]
+
+      @rubric = rubric_model(:user => @user,
+                             :context => @course,
+                             :data => rubric_data,
+                             :points_possible => 12,
+                             :free_form_criterion_comments => true)
+
+      @assignment.create_rubric_association(:rubric => @rubric,
+                                            :purpose => 'grading',
+                                            :use_for_grading => true)
+      json = api_get_assignments_index_from_course(@course)
+
+      json.first['rubric'].first["outcome_id"].should == @outcome.id
+      json.first['rubric'].first["vendor_guid"].should == "vendorguid9000"
+    end
+
     it "should exclude deleted assignments in the list return" do
       course_with_teacher(:active_all => true)
       @context = @course
