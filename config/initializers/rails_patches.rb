@@ -1,7 +1,3 @@
-if Rails.version < "3.0"
-  ActionController::Base.param_parsers.delete(Mime::XML)
-end
-
 # CVE-2013-0333
 # https://groups.google.com/d/topic/rubyonrails-security/1h2DR63ViGo/discussion
 # With Rails 2.3.16 we could remove this line, but we still prefer JSONGem for performance reasons

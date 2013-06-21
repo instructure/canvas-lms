@@ -13,7 +13,15 @@ if CANVAS_RAILS3
   gem 'rails',        '3.0.20'
   gem 'authlogic',    '3.2.0'
 else
-  gem 'rails',        '2.3.18'
+  # If you have a license to rails lts, you can create a vendor/plugins/*/RAILS_LTS yaml file
+  # with the Gemfile `gem` command to use (pointing to the private repo with your username/password).
+  # Otherwise, the free community version of rails lts will be used.
+  lts_file = Dir.glob(File.expand_path("../vendor/plugins/*/RAILS_LTS", __FILE__)).first
+  if lts_file
+    eval(File.read(lts_file))
+  else
+    gem 'rails', :git => 'https://github.com/makandra/rails.git', :branch => '2-3-lts', :ref => 'e86daf8ff727d5efc0040c876ba00c9444a5d915'
+  end
   gem 'authlogic',    '2.1.3'
 end
 
