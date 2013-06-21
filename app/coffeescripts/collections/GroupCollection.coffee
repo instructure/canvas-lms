@@ -24,3 +24,5 @@ define [
   class GroupCollection extends PaginatedCollection
     model: Group
     comparator: (group) -> group.get('name')
+
+    _defaultUrl: -> "/api/v1/groups"
