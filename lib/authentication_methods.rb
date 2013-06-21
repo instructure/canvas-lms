@@ -86,16 +86,12 @@ module AuthenticationMethods
         # if the session was created before the last time the user explicitly
         # logged out (of any session for any of their pseudonyms), invalidate
         # this session
-        begin
-          if (invalid_before = @current_pseudonym.user.last_logged_out) &&
-            (session_refreshed_at = request.env['encrypted_cookie_store.session_refreshed_at']) &&
-            session_refreshed_at < invalid_before
+        if (invalid_before = @current_pseudonym.user.last_logged_out) &&
+          (session_refreshed_at = request.env['encrypted_cookie_store.session_refreshed_at']) &&
+          session_refreshed_at < invalid_before
 
-            destroy_session
-            @current_pseudonym = nil
-          end
-        rescue => e
-          Rails.logger.error("last_logged_out check fail: #{invalid_before.class} #{invalid_before.inspect} | #{session_refreshed_at.class} #{session_refreshed_at.inspect} | #{@current_pseudonym.user.inspect} #{e.inspect}")
+          destroy_session
+          @current_pseudonym = nil
         end
       end
       if params[:login_success] == '1' && !@current_pseudonym
