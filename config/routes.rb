@@ -440,6 +440,8 @@ ActionController::Routing::Routes.draw do |map|
     group.accept_invitation 'accept_invitation/:uuid', :controller => 'groups', :action => 'accept_invitation', :conditions => {:method => :get}
     group.members 'members.:format', :controller => 'groups', :action => 'context_group_members', :conditions => {:method => :get}
     group.members 'members', :controller => 'groups', :action => 'context_group_members', :conditions => {:method => :get}
+    group.undelete_items 'undelete', :controller => 'context', :action => 'undelete_index'
+    group.undelete_item 'undelete/:asset_string', :controller => 'context', :action => 'undelete_item'
     add_announcements(group)
     add_discussions(group)
     group.resources :calendar_events

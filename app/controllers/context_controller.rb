@@ -436,17 +436,10 @@ class ContextController < ApplicationController
 
   def undelete_index
     if authorized_action(@context, @current_user, :manage_content)
-      @item_types = [
-        @context.discussion_topics,
-        @context.assignments,
-        @context.assignment_groups,
-        @context.enrollments,
-        @context.wiki.wiki_pages,
-        @context.rubrics,
-        @context.collaborations,
-        @context.quizzes,
-        @context.context_modules
-      ]
+      @item_types = [:all_discussion_topics, :assignments, :assignment_groups, :enrollments,
+                     :rubrics, :collaborations, :quizzes, :context_modules].map {|assoc| @context.send(assoc) if @context.respond_to?(assoc)}.compact
+
+      @item_types << @context.wiki.wiki_pages if @context.respond_to? :wiki
       @deleted_items = []
       @item_types.each do |scope|
         @deleted_items += scope.where(:workflow_state => 'deleted').limit(25).all
@@ -463,6 +456,7 @@ class ContextController < ApplicationController
       type = type.join("_")
       scope = @context
       scope = @context.wiki if type == 'wiki_pages'
+      type = 'all_discussion_topic' if type == 'discussion_topic'
       @item = scope.send(type.pluralize).find(id)
       @item.restore
       render :json => @item
