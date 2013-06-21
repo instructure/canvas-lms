@@ -486,6 +486,8 @@ FakeRails3Routes.draw do
     match 'accept_invitation/:uuid' => 'groups#accept_invitation', :as => :accept_invitation, :via => :get
     match 'members.:format' => 'groups#context_group_members', :as => :members, :via => :get
     match 'members' => 'groups#context_group_members', :as => :members, :via => :get
+    match 'undelete' => 'context#undelete_index', :as => :undelete_items
+    match 'undelete/:asset_string' => 'context#undelete_item', :as => :undelete_item
     concerns :announcements
     concerns :discussions
     resources :calendar_events
