@@ -333,6 +333,28 @@ class ActiveRecord::Base
     end
   end
 
+  def self.init_icu
+    return if defined?(@icu)
+    begin
+      Bundler.require 'icu'
+      if !ICU::Lib.respond_to?(:ucol_getRules)
+        suffix = ICU::Lib.figure_suffix(ICU::Lib.version.to_s)
+        ICU::Lib.attach_function(:ucol_getRules, "ucol_getRules#{suffix}", [:pointer, :pointer], :pointer)
+        ICU::Collation::Collator.class_eval do
+          def rules
+            length = FFI::MemoryPointer.new(:int)
+            ptr = ICU::Lib.ucol_getRules(@c, length)
+            ptr.read_array_of_uint16(length.read_int).pack("U*")
+          end
+        end
+      end
+      @icu = true
+      @collation_local_map = {}
+    rescue LoadError
+      @icu = false
+    end
+  end
+
   def self.best_unicode_collation_key(col)
     if ActiveRecord::Base.configurations[Rails.env]['adapter'] == 'postgresql'
       # For PostgreSQL, we can't trust a simple LOWER(column), with any collation, since
@@ -342,7 +364,19 @@ class ActiveRecord::Base
       # but at least it's consistent, and orders commas before letters so you don't end up with
       # Johnson, Bob sorting before Johns, Jimmy
       @collkey ||= connection.select_value("SELECT COUNT(*) FROM pg_proc WHERE proname='collkey'").to_i
-      @collkey == 0 ? "CAST(LOWER(replace(#{col}, '\\', '\\\\')) AS bytea)" : "collkey(#{col}, 'root', true, 2, true)"
+      if @collkey == 0
+        "CAST(LOWER(replace(#{col}, '\\', '\\\\')) AS bytea)"
+      else
+        locale = 'root'
+        init_icu
+        if @icu
+          # only use the actual locale if it differs from root; using a different locale means we
+          # can't use our index, which usually doesn't matter, but sometimes is very important
+          locale = @collation_local_map[I18n.locale] ||= ICU::Collation::Collator.new(I18n.locale.to_s).rules.empty? ? 'root' : I18n.locale
+        end
+
+        "collkey(#{col}, '#{locale}', true, 2, true)"
+      end
     else
       # Not yet optimized for other dbs (MySQL's default collation is case insensitive;
       # SQLite can have custom collations inserted, but probably not worth the effort

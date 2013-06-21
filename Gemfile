@@ -168,6 +168,10 @@ group :statsd do
   gem 'statsd-ruby', '1.0.0', :require => 'statsd'
 end
 
+group :icu do
+  gem 'ffi-icu', '0.1.2'
+end
+
 # Non-standard Canvas extension to Bundler behavior -- load the Gemfiles from
 # plugins.
 Dir[File.join(File.dirname(__FILE__),'vendor/plugins/*/Gemfile')].each do |g|

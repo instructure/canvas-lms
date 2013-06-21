@@ -1753,6 +1753,23 @@ describe User do
       User.create!(:name => "John John")
       User.select([:id, :sortable_name]).order_by_sortable_name(:direction => :descending).all.map(&:sortable_name).should == ["Johnson, John", "John, John"]
     end
+
+    it "should sort by the current locale with pg_collkey if possible" do
+      pending "requires postgres" unless User.connection.adapter_name == 'PostgreSQL'
+      pending "requires pg_collkey on the server" if User.connection.select_value("SELECT COUNT(*) FROM pg_proc WHERE proname='collkey'").to_i == 0
+      begin
+        Bundler.require 'icu'
+      rescue LoadError
+        pending "requires icu locally"
+      end
+      I18n.locale = :es
+      User.sortable_name_order_by_clause.should match /es/
+      User.sortable_name_order_by_clause.should_not match /root/
+      # english has no specific sorting rules, so use root
+      I18n.locale = :en
+      User.sortable_name_order_by_clause.should_not match /es/
+      User.sortable_name_order_by_clause.should match /root/
+    end
   end
 
   describe "quota" do
