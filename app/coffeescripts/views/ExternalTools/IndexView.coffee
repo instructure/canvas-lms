@@ -20,6 +20,7 @@ define [
       '.view_tools_link': '$viewToolsLink'
       '.view_app_center_link': '$viewAppCenterLink'
       '.add_tool_link': '$addToolLink'
+      '#app_center_filter': '$appCenterFilter'
       '[data-view=appFull]': '$appFull'
 
     events:
@@ -29,6 +30,8 @@ define [
       'click .add_tool_link': 'addTool'
       'click [data-edit-external-tool]': 'editTool'
       'click [data-delete-external-tool]': 'deleteTool'
+      'change #app_center_filter': 'filterApps'
+      'keyup #app_center_filter': 'filterApps'
 
     currentAppCenterPosition: 0
 
@@ -47,6 +50,7 @@ define [
     hideAppCenterView: =>
       @currentAppCenterPosition = $(document).scrollTop()
       @appCenterView.hide()
+      @$appCenterFilter.hide()
       @$viewAppCenterLink.show() if @options.appCenterEnabled
 
     removeAppFullView: ->
@@ -66,6 +70,7 @@ define [
       @hideExternalToolsView()
       @$viewAppCenterLink.hide()
       @appCenterView.show()
+      @$appCenterFilter.show()
       $(document).scrollTop(@currentAppCenterPosition)
 
     showAppFullView: (event) ->
@@ -100,6 +105,10 @@ define [
       @editView.remove() if @editView
       @showExternalToolsView()
       $.flashMessage(htmlEscape(I18n.t('app_saved_message', "%{app} saved successfully!", { app: model.get('name') })))
+
+    filterApps: (event) =>
+      @appCenterView.filterText = @$appCenterFilter.val()
+      @appCenterView.render()
 
     deleteTool: (event) ->
       view = @$(event.currentTarget).closest('.external_tool_item').data('view')

@@ -37,6 +37,11 @@ describe QuizStatistics::ItemAnalysis::Summary do
       # alpha: 0.545
       summary.alpha.should be_approximately 0.545
     end
+
+    it "should be nil if #variance is 0" do
+      summary.stubs(:variance).returns(0)
+      summary.alpha.should be_nil
+    end
   end
 
   describe "#variance" do

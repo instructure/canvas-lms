@@ -874,11 +874,11 @@ ActionController::Routing::Routes.draw do |map|
 
     api.with_options(:controller => :role_overrides) do |roles|
       roles.get 'accounts/:account_id/roles', :action => :api_index, :path_name => 'account_roles'
-      roles.get 'accounts/:account_id/roles/:role', :action => :show
+      roles.get 'accounts/:account_id/roles/:role', :role => /[^\/]+/, :action => :show
       roles.post 'accounts/:account_id/roles', :action => :add_role
-      roles.post 'accounts/:account_id/roles/:role/activate', :action => :activate_role
-      roles.put 'accounts/:account_id/roles/:role', :action => :update
-      roles.delete 'accounts/:account_id/roles/:role', :action => :remove_role
+      roles.post 'accounts/:account_id/roles/:role/activate', :role => /[^\/]+/, :action => :activate_role
+      roles.put 'accounts/:account_id/roles/:role', :role => /[^\/]+/, :action => :update
+      roles.delete 'accounts/:account_id/roles/:role', :role => /[^\/]+/, :action => :remove_role
     end
 
     api.with_options(:controller => :account_reports) do |reports|
@@ -1140,8 +1140,10 @@ ActionController::Routing::Routes.draw do |map|
     api.with_options(:controller => :app_center) do |app_center|
       ['course', 'account'].each do |context|
         prefix = "#{context}s/:#{context}_id/app_center"
-        app_center.get "#{prefix}/apps", :action => :index, :path_name => "#{context}_app_center_apps"
-        app_center.get "#{prefix}/apps/:app_id/reviews", :action => :reviews, :path_name => "#{context}_app_center_app_reviews"
+        app_center.get  "#{prefix}/apps",                      :action => :index,   :path_name => "#{context}_app_center_apps"
+        app_center.get  "#{prefix}/apps/:app_id/reviews",      :action => :reviews, :path_name => "#{context}_app_center_app_reviews"
+        app_center.get  "#{prefix}/apps/:app_id/reviews/self", :action => :review,  :path_name => "#{context}_app_center_app_review"
+        app_center.post "#{prefix}/apps/:app_id/reviews/self", :action => :add_review
       end
     end
   end
