@@ -207,7 +207,7 @@ module ApplicationHelper
   # context_url(@context, :controller => :assignments, :action => :show)
   def context_url(context, *opts)
     @context_url_lookup ||= {}
-    context_name = (context ? context.class.base_ar_class : context.class).name.underscore
+    context_name = url_helper_context_from_object(context)
     lookup = [context ? context.id : nil, context_name, *opts]
     return @context_url_lookup[lookup] if @context_url_lookup[lookup]
     res = nil
@@ -229,6 +229,10 @@ module ApplicationHelper
       res = context_name.to_s + opts.to_json.to_s
     end
     @context_url_lookup[lookup] = res
+  end
+
+  def url_helper_context_from_object(context)
+    (context ? context.class.base_ar_class : context.class).name.underscore
   end
 
   def message_user_path(user)
