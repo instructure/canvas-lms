@@ -217,7 +217,7 @@ class AssessmentItemConverter
   end
 
   def clear_html(text)
-    text.gsub(/<\/?[^>\n]*>/, "").gsub(/&#\d+;/) {|m| m[2..-1].to_i.chr rescue '' }.gsub(/&\w+;/, "").gsub(/(?:\\r\\n)+/, "\n")
+    text.gsub(/<\/?[^>\n]*>/, "").gsub(/&#\d+;/) {|m| m[2..-1].to_i.chr(text.encoding) rescue '' }.gsub(/&\w+;/, "").gsub(/(?:\\r\\n)+/, "\n")
   end
   
   def sanitize_html_string(string, remove_extraneous_nodes=false)
