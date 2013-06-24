@@ -4,18 +4,25 @@ require [
   'jquery',
   'compiled/calendar/Calendar'
   'compiled/calendar/MiniCalendar'
+  'compiled/views/calendar/CalendarHeader'
   'compiled/calendar/sidebar'
   'compiled/calendar/EventDataSource'
   'compiled/calendar/UndatedEventsList'
   'compiled/bundles/jquery_ui_menu'
-], ($, Calendar, MiniCalendar, drawSidebar, EventDataSource, UndatedEventsList) ->
+], ($, Calendar, MiniCalendar, CalendarHeader, drawSidebar, EventDataSource, UndatedEventsList) ->
   @eventDataSource = new EventDataSource(ENV.CALENDAR.CONTEXTS)
+  @header = new CalendarHeader(
+    el: "#calendar_header"
+    calendar2Only: ENV.CALENDAR.CAL2_ONLY
+    showScheduler: ENV.CALENDAR.SHOW_SCHEDULER
+    )
   @calendar = new Calendar(
-    "#calendar-app", ENV.CALENDAR.CONTEXTS, ENV.CALENDAR.MANAGE_CONTEXTS, @eventDataSource, 
-    activateEvent: ENV.CALENDAR.ACTIVE_EVENT, 
-    viewStart: ENV.CALENDAR.VIEW_START, 
-    calendar2Only: ENV.CALENDAR.CAL2_ONLY, 
-    showScheduler: ENV.CALENDAR.SHOW_SCHEDULER)
+    "#calendar-app", ENV.CALENDAR.CONTEXTS, ENV.CALENDAR.MANAGE_CONTEXTS, @eventDataSource,
+    activateEvent: ENV.CALENDAR.ACTIVE_EVENT
+    viewStart:     ENV.CALENDAR.VIEW_START
+    showScheduler: ENV.CALENDAR.SHOW_SCHEDULER
+    header:        @header
+    )
   new MiniCalendar("#minical", @calendar)
   new UndatedEventsList("#undated-events", @eventDataSource, @calendar)
   drawSidebar(ENV.CALENDAR.CONTEXTS, ENV.CALENDAR.SELECTED_CONTEXTS, @eventDataSource)

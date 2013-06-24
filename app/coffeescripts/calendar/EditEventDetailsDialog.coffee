@@ -21,6 +21,7 @@ define [
   class
     constructor: (@event) ->
       @currentContextInfo = null
+      dialog.on('dialogclose', @dialogClose)
 
     contextInfoForCode: (code) ->
       for context in @event.possibleContexts()
@@ -62,6 +63,11 @@ define [
     closeCB: () =>
       dialog.dialog('close')
 
+    dialogClose: () =>
+      if @oldFocus?
+        @oldFocus.focus()
+        @oldFocus = null
+
     show: =>
       if @event.isAppointmentGroupEvent()
         new EditApptCalendarEventDialog(@event).show()
@@ -82,4 +88,5 @@ define [
 
         # TODO: select the tab that should be active
 
+        @oldFocus = document.activeElement
         dialog.dialog('open')
