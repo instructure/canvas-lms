@@ -51,6 +51,43 @@ Rails.configuration.to_prepare do
         }
       }
     },
+    'provisioning_csv'=> {
+      :title => 'Provisioning',
+      :parameters_partial => 'sis_export_csv_parameters',
+      :description_partial => true,
+      :parameters => {
+        :users => {
+          :description => 'Get the Provisioning file for users'
+        },
+        :accounts => {
+          :description => 'Get the Provisioning file for accounts'
+        },
+        :terms => {
+          :description => 'Get the Provisioning file for terms'
+        },
+        :courses => {
+          :description => 'Get the Provisioning file for courses'
+        },
+        :sections => {
+          :description => 'Get the Provisioning file for sections'
+        },
+        :enrollments => {
+          :description => 'Get the Provisioning file for enrollments'
+        },
+        :groups => {
+          :description => 'Get the Provisioning file for groups'
+        },
+        :group_membership => {
+          :description => 'Get the Provisioning file for group_membership'
+        },
+        :xlist => {
+          :description => 'Get the Provisioning file for cross listed courses'
+        },
+        :include_deleted => {
+          :description => 'Include deleted objects'
+        }
+      }
+    },
     'sis_export_csv'=> {
       :title => 'SIS Export',
       :parameters_partial => true,
@@ -88,40 +125,26 @@ Rails.configuration.to_prepare do
         }
       }
     },
-    'provisioning_csv'=> {
-      :title => 'Provisioning',
-      :parameters_partial => 'sis_export_csv_parameters',
+    'students_with_no_submissions_csv'=> {
+      :title => 'Students with no submissions',
       :description_partial => true,
+      :parameters_partial => 'term_and_date_pickers_parameters',
       :parameters => {
-        :users => {
-          :description => 'Get the Provisioning file for users'
+        :enrollment_term => {
+          :required => false,
+          :description => 'The term to report on'
         },
-        :accounts => {
-          :description => 'Get the Provisioning file for accounts'
+        :course_id => {
+          :required => false,
+          :description => 'The course to report on'
         },
-        :terms => {
-          :description => 'Get the Provisioning file for terms'
+        :start_at => {
+          :required => true,
+          :description => 'The beginning date for submissions'
         },
-        :courses => {
-          :description => 'Get the Provisioning file for courses'
-        },
-        :sections => {
-          :description => 'Get the Provisioning file for sections'
-        },
-        :enrollments => {
-          :description => 'Get the Provisioning file for enrollments'
-        },
-        :groups => {
-          :description => 'Get the Provisioning file for groups'
-        },
-        :group_membership => {
-          :description => 'Get the Provisioning file for group_membership'
-        },
-        :xlist => {
-          :description => 'Get the Provisioning file for cross listed courses'
-        },
-        :include_deleted => {
-          :description => 'Include deleted objects'
+        :end_at => {
+          :required => true,
+          :description => 'The end date for submissions'
         }
       }
     },

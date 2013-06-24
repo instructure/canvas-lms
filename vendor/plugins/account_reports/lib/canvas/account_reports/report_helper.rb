@@ -96,6 +96,14 @@ module Canvas::AccountReports::ReportHelper
     end
   end
 
+  def add_course_enrollments_scope(scope,table = 'enrollments')
+    if course
+      scope.where(table => { :course_id => course })
+    else
+      scope
+    end
+  end
+
   def add_user_sub_account_scope(scope,table = 'users')
     if account != root_account
       scope.where("EXISTS (SELECT user_id
