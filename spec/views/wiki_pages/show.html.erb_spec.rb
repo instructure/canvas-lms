@@ -24,7 +24,7 @@ describe "/wiki_pages/show" do
     course_with_student
     view_context
     assigns[:wiki] = @course.wiki
-    assigns[:page] = assigns[:wiki].wiki_page
+    assigns[:page] = assigns[:wiki].front_page
     assigns[:page].body = "my awesome content"
     assigns[:page].save!
     assigns[:context] = @course

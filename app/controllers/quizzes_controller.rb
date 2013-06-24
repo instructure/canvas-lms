@@ -24,7 +24,7 @@ class QuizzesController < ApplicationController
   add_crumb(proc { t('#crumbs.quizzes', "Quizzes") }) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_quizzes_url }
   before_filter { |c| c.active_tab = "quizzes" }
   before_filter :get_quiz, :only => [:statistics, :edit, :show, :reorder, :history, :update, :destroy, :moderate, :filters, :read_only, :managed_quiz_data]
-
+  before_filter :set_download_submission_dialog_title , only: [:show,:statistics]
   # The number of questions that can display "details". After this number, the "Show details" option is disabled
   # and the data is not even loaded.
   QUIZ_QUESTIONS_DETAIL_LIMIT = 25
@@ -76,33 +76,32 @@ class QuizzesController < ApplicationController
   # student_analysis report
   def statistics
     if authorized_action(@quiz, @current_user, :read_statistics)
-      if @context.large_roster?
-        flash[:notice] = t "#application.notices.page_disabled_for_course", "That page has been disabled for this course"
-        redirect_to named_context_url(@context, :context_quiz_url, @quiz)
-        return
-      end
+        respond_to do |format|
+          format.html {
+            all_versions = params[:all_versions] == '1'
+            add_crumb(@quiz.title, named_context_url(@context, :context_quiz_url, @quiz))
+            add_crumb(t(:statistics_crumb, "Statistics"), named_context_url(@context, :context_quiz_statistics_url, @quiz))
 
-      respond_to do |format|
-        format.html {
-          all_versions = params[:all_versions] == '1'
-          add_crumb(@quiz.title, named_context_url(@context, :context_quiz_url, @quiz))
-          add_crumb(t(:statistics_crumb, "Statistics"), named_context_url(@context, :context_quiz_statistics_url, @quiz))
-          @statistics = @quiz.statistics(all_versions)
-          user_ids = @statistics[:submission_user_ids]
-          @submitted_users = User.where(:id => user_ids.to_a).order_by_sortable_name
-          @users = Hash[
-            @submitted_users.map { |u| [u.id, u] }
-          ]
-          js_env :quiz_reports => QuizStatistics::REPORTS.map { |report_type|
-            report = @quiz.current_statistics_for(report_type, :includes_all_versions => all_versions)
-            json = quiz_statistics_json(report, @current_user, session, :include => ['file'])
-            json[:course_id] = @context.id
-            json[:report_name] = report.readable_type
-            json[:progress] = progress_json(report.progress, @current_user, session) if report.progress
-            json
+            if !@context.large_roster?
+              @statistics = @quiz.statistics(all_versions)
+              user_ids = @statistics[:submission_user_ids]
+              @submitted_users = User.where(:id => user_ids.to_a).order_by_sortable_name
+              @users = Hash[
+                @submitted_users.map { |u| [u.id, u] }
+              ]
+            end
+
+            js_env :quiz_reports => QuizStatistics::REPORTS.map { |report_type|
+              report = @quiz.current_statistics_for(report_type, :includes_all_versions => all_versions)
+              json = quiz_statistics_json(report, @current_user, session, :include => ['file'])
+              json[:course_id] = @context.id
+              json[:report_name] = report.readable_type
+              json[:progress] = progress_json(report.progress, @current_user, session) if report.progress
+              json
+            }
           }
-        }
-      end
+        end
+
     end
   end
 
@@ -692,4 +691,8 @@ class QuizzesController < ApplicationController
     @any_submissions_pending_review = submitted_with_submissions.where("quiz_submissions.workflow_state = 'pending_review'").count > 0
   end
 
+  def set_download_submission_dialog_title
+    js_env SUBMISSION_DOWNLOAD_DIALOG_TITLE: I18n.t('#quizzes.download_all_quiz_file_upload_submissions',
+                                                    'Download All Quiz File Upload Submissions')
+  end
 end

@@ -106,7 +106,7 @@ describe "course settings" do
 
       f('.course_info').should include_text(course_name)
       f('.course_code').should include_text(course_code)
-      f('.locale').should include_text(locale_text)
+      f('span.locale').should include_text(locale_text)
     end
 
     it "should add a section" do

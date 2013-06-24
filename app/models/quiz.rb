@@ -41,6 +41,7 @@ class Quiz < ActiveRecord::Base
   has_many :quiz_submissions, :dependent => :destroy
   has_many :quiz_groups, :dependent => :destroy, :order => 'position'
   has_many :quiz_statistics, :class_name => 'QuizStatistics', :order => 'created_at'
+  has_many :attachments, :as => :context, :dependent => :destroy
   belongs_to :context, :polymorphic => true
   belongs_to :assignment
   belongs_to :cloned_item
@@ -52,6 +53,7 @@ class Quiz < ActiveRecord::Base
   validate :validate_quiz_type, :if => :quiz_type_changed?
   validate :validate_ip_filter, :if => :ip_filter_changed?
   validate :validate_hide_results, :if => :hide_results_changed?
+  validate :validate_draft_state_change, :if => :workflow_state_changed?
 
   sanitize_field :description, Instructure::SanitizeField::SANITIZE
   copy_authorized_links(:description) { [self.context, nil] }
@@ -355,6 +357,7 @@ class Quiz < ActiveRecord::Base
 
     state :available
     state :deleted
+    state :unpublished
   end
 
   def root_entries_max_position
@@ -649,7 +652,7 @@ class Quiz < ActiveRecord::Base
   end
   alias_method :to_s, :quiz_title
   
-  def locked_for?(user=nil, opts={})
+  def locked_for?(user, opts={})
     return false if opts[:check_policies] && self.grants_right?(user, nil, :update)
     Rails.cache.fetch(locked_cache_key(user), :expires_in => 1.minute) do
       locked = false
@@ -1152,7 +1155,9 @@ class Quiz < ActiveRecord::Base
 
   def publish!
     self.workflow_state = 'available'
+    self.published_at = Time.zone.now
     save!
+    self
   end
 
   # marks a quiz as having unpublished changes
@@ -1162,6 +1167,33 @@ class Quiz < ActiveRecord::Base
 
   def anonymous_survey?
     survey? && anonymous_submissions
+  end
+
+  def has_file_upload_question?
+    return false unless quiz_data.present?
+    !!quiz_data.detect do |data_hash|
+      data_hash[:question_type] == 'file_upload_question'
+    end
+  end
+  def draft_state
+    state = self.workflow_state
+    (state == 'available') ? 'active' : state
+  end
+
+  def active?
+    draft_state == 'active'
+  end
+  alias_method :published?, :active?
+
+  def unpublished?; !published?; end
+
+  def validate_draft_state_change
+    old_draft_state, new_draft_state = self.changes['workflow_state']
+    return if old_draft_state == new_draft_state
+    if new_draft_state == 'unpublished' && has_student_submissions?
+      self.errors.add :workflow_state, I18n.t('#quizzes.cant_unpublish_when_students_submit',
+                                              "Can't unpublish if there are student submissions")
+    end
   end
 
 end

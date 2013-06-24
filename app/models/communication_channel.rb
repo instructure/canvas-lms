@@ -51,6 +51,8 @@ class CommunicationChannel < ActiveRecord::Base
   TYPE_TWITTER  = 'twitter'
   TYPE_FACEBOOK = 'facebook'
 
+  RETIRE_THRESHOLD = 5
+
   def self.sms_carriers
     @sms_carriers ||= (Setting.from_config('sms', false) ||
         { 'AT&T' => 'txt.att.net',
@@ -204,6 +206,7 @@ class CommunicationChannel < ActiveRecord::Base
     else
       self.confirmation_code ||= AutoHandle.generate
     end
+    true
   end
   
   scope :for, lambda { |context|
@@ -291,7 +294,8 @@ class CommunicationChannel < ActiveRecord::Base
   end
   
   def consider_retiring
-    self.retire if self.bounce_count >= 5
+    self.retire if self.bounce_count >= RETIRE_THRESHOLD
+    true
   end
   
   alias_method :destroy!, :destroy
@@ -323,6 +327,7 @@ class CommunicationChannel < ActiveRecord::Base
   def assert_path_type
     pt = self.path_type
     self.path_type = TYPE_EMAIL unless pt == TYPE_EMAIL or pt == TYPE_SMS or pt == TYPE_CHAT or pt == TYPE_FACEBOOK or pt == TYPE_TWITTER
+    true
   end
   protected :assert_path_type
     

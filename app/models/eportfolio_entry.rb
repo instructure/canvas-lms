@@ -134,7 +134,8 @@ class EportfolioEntry < ActiveRecord::Base
     pages = self.eportfolio_category.eportfolio_entries rescue []
     self.name ||= t(:default_name, "Page Name")
     self.slug = self.name.gsub(/[\s]+/, "_").gsub(/[^\w\d]/, "")
-    match_cnt = pages.select{|p| p != self && p.slug && p.slug == self.slug}.length
+    pages = pages.where("id<>?", self) unless self.new_record?
+    match_cnt = pages.where(:slug => self.slug).count
     if match_cnt > 0
       self.slug = self.slug + "_" + (match_cnt + 1).to_s
     end

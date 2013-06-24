@@ -275,7 +275,7 @@ class GroupsController < ApplicationController
         end
         if authorized_action(@group, @current_user, :read)
           set_badge_counts_for(@group, @current_user)
-          @home_page = @group.wiki.wiki_page
+          @home_page = @group.wiki.front_page
         end
       end
       format.json do
@@ -668,6 +668,18 @@ class GroupsController < ApplicationController
     get_context
     if authorized_action(@context, @current_user, :read)
       api_render_stream_for_contexts([@context], :api_v1_group_activity_stream_url)
+    end
+  end
+
+  # @API Group activity stream summary
+  # Returns a summary of the current user's group-specific activity stream.
+  #
+  # For full documentation, see the API documentation for the user activity
+  # stream summary, in the user api.
+  def activity_stream_summary
+    get_context
+    if authorized_action(@context, @current_user, :read)
+      api_render_stream_summary([@context])
     end
   end
 

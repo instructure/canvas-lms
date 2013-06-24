@@ -285,9 +285,12 @@ define([
             var progress = 0;
             if (course_import) {
               progress = Math.max($(".copy_progress").progressbar('option', 'value') || 0, course_import.progress);
+              if( course_import.workflow_state == "exported") {
+                progress = 0;
+              }
               $(".copy_progress").progressbar('option', 'value', progress);
             }
-            if (course_import && course_import.progress >= 100) {
+            if (course_import && course_import.workflow_state == 'imported') {
               $.flashMessage(I18n.t('messages.import_complete', "Import Complete!  Returning to the Course Page..."));
               location.href = $(".course_url").attr('href');
             } else if (course_import && course_import.workflow_state == 'failed') {

@@ -43,6 +43,7 @@ module CC::Importer::Canvas
           item[:url] = get_node_val(item_node, 'url')
           item[:title] = get_node_val(item_node, 'title')
           item[:new_tab] = get_bool_val(item_node, 'new_tab')
+          item[:workflow_state] = get_node_val(item_node, 'workflow_state')
           item[:linked_resource_type] = get_node_val(item_node, 'content_type')
           item[:linked_resource_id] = get_node_val(item_node, 'identifierref')
 

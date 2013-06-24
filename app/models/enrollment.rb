@@ -192,17 +192,19 @@ class Enrollment < ActiveRecord::Base
   scope :not_fake, where("enrollments.type<>'StudentViewEnrollment'")
 
 
-  READABLE_TYPES = {
-    'TeacherEnrollment' => t('#enrollment.roles.teacher', "Teacher"),
-    'TaEnrollment' => t('#enrollment.roles.ta', "TA"),
-    'DesignerEnrollment' => t('#enrollment.roles.designer', "Designer"),
-    'StudentEnrollment' => t('#enrollment.roles.student', "Student"),
-    'StudentViewEnrollment' => t('#enrollment.roles.student', "Student"),
-    'ObserverEnrollment' => t('#enrollment.roles.observer', "Observer")
-  }
+  def self.readable_types
+    {
+      'TeacherEnrollment' => t('#enrollment.roles.teacher', "Teacher"),
+      'TaEnrollment' => t('#enrollment.roles.ta', "TA"),
+      'DesignerEnrollment' => t('#enrollment.roles.designer', "Designer"),
+      'StudentEnrollment' => t('#enrollment.roles.student', "Student"),
+      'StudentViewEnrollment' => t('#enrollment.roles.student', "Student"),
+      'ObserverEnrollment' => t('#enrollment.roles.observer', "Observer")
+    }
+  end
 
   def self.readable_type(type)
-    READABLE_TYPES[type] || READABLE_TYPES['StudentEnrollment']
+    readable_types[type] || readable_types['StudentEnrollment']
   end
 
   SIS_TYPES = {
@@ -228,17 +230,19 @@ class Enrollment < ActiveRecord::Base
     SIS_TYPES.has_key?(type)
   end
 
-  TYPES_WITH_INDEFINITE_ARTICLE = {
-    'TeacherEnrollment' => t('#enrollment.roles.teacher_with_indefinite_article', "A Teacher"),
-    'TaEnrollment' => t('#enrollment.roles.ta_with_indefinite_article', "A TA"),
-    'DesignerEnrollment' => t('#enrollment.roles.designer_with_indefinite_article', "A Designer"),
-    'StudentEnrollment' => t('#enrollment.roles.student_with_indefinite_article', "A Student"),
-    'StudentViewEnrollment' => t('#enrollment.roles.student_with_indefinite_article', "A Student"),
-    'ObserverEnrollment' => t('#enrollment.roles.observer_with_indefinite_article', "An Observer")
-  }
+  def self.types_with_indefinite_article
+    {
+      'TeacherEnrollment' => t('#enrollment.roles.teacher_with_indefinite_article', "A Teacher"),
+      'TaEnrollment' => t('#enrollment.roles.ta_with_indefinite_article', "A TA"),
+      'DesignerEnrollment' => t('#enrollment.roles.designer_with_indefinite_article', "A Designer"),
+      'StudentEnrollment' => t('#enrollment.roles.student_with_indefinite_article', "A Student"),
+      'StudentViewEnrollment' => t('#enrollment.roles.student_with_indefinite_article', "A Student"),
+      'ObserverEnrollment' => t('#enrollment.roles.observer_with_indefinite_article', "An Observer")
+    }
+  end
 
   def self.type_with_indefinite_article(type)
-    TYPES_WITH_INDEFINITE_ARTICLE[type] || TYPES_WITH_INDEFINITE_ARTICLE['StudentEnrollment']
+    types_with_indefinite_article[type] || types_with_indefinite_article['StudentEnrollment']
   end
 
   def should_update_user_account_association?

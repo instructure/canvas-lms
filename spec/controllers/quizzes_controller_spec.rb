@@ -198,13 +198,7 @@ describe QuizzesController do
       course_with_student_logged_in :active_all => true
       course_quiz !!:active
       submission = @quiz.generate_submission @user
-      io = ActionController::TestUploadedFile.new(
-        File.expand_path(File.dirname(__FILE__) +
-                         '/../fixtures/scribd_docs/doc.doc'),
-                         'application/msword', true)
-      submission.attachments.create! :filename => "attachment.png",
-        :display_name => "attachment.png", :user => @user,
-        :uploaded_data => io
+      create_attachment_for_file_upload_submission!(submission)
       get 'show', :course_id => @course.id, :id => @quiz.id
       attachment = submission.attachments.first
       assigns[:js_env][:ATTACHMENTS].should == {
@@ -533,7 +527,7 @@ describe QuizzesController do
         course_quiz(true)
         @quiz.generate_submission(@user)
       end
-      
+
       context "a valid question" do
         it "renders take_quiz" do
           QuizzesController.any_instance.stubs(:valid_question?).returns(true)
@@ -656,7 +650,7 @@ describe QuizzesController do
       @quiz.workflow_state = 'available'
       @quiz.published_at = Time.now
       @quiz.save
-      
+
       @quiz.assignment.should_not be_nil
       @quiz.assignment.mute!
       s = @quiz.generate_submission(u)
@@ -925,14 +919,14 @@ describe QuizzesController do
       response.should render_template('statistics')
     end
 
-    it "should redirect to the quiz show page if the course is a MOOC" do
+    it "should show the statistics page if the course is a MOOC" do
       course_with_teacher_logged_in(:active_all => true)
       @course.large_roster = true
       @course.save!
       course_quiz
       get 'statistics', :course_id => @course.id, :quiz_id => @quiz.id
-      flash[:notice].should == "That page has been disabled for this course"
-      response.should redirect_to course_quiz_url(@course.id, @quiz.id)
+      response.should be_success
+      response.should render_template('statistics')
     end
   end
 

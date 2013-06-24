@@ -1,0 +1,64 @@
+{{#ifAll atLeastOnePageFetched length}}
+  <div class="headerBar clearfix">
+    <div class="headerBar-right form-inline">
+      {{#if options.atom_feed_url}}
+        <a class="btn"
+           href="{{options.atom_feed_url}}"
+           data-tooltip
+           title="{{#t "rss_feed"}}RSS feed{{/t}}"><i class="icon-rss"></i></a>
+      {{/if}}
+      <span id="actionsForSelectedDiscussions" style="display:none;">
+        <input type="checkbox" id="lock" />
+        <label for="lock" data-tooltip>{{#t "lock_for_comments"}}Lock for comments{{/t}}</label>
+        <button id="delete" data-tooltip>{{#t "delete"}}Delete{{/t}}</button>
+      </span>
+
+      {{#if options.permissions.create}}
+        <a href="{{new_topic_url}}" class="btn btn-primary" id="new-discussion-btn">
+          <i class="icon-announcement"></i> 
+          {{#t "make_an_announcement"}}Make an announcement{{/t}}
+        </a>
+      {{/if}}
+    </div>
+    <div class="headerBar-left form-inline index_view_filter_form">
+      <label class="hidden-inline-text" for="searchTerm">{{#t "search_title_body_or_author"}}Search title, body, or author{{/t}}</label>
+      <input id="searchTerm"
+             placeholder="{{#t "search_title_body_or_author"}}Search title, body, or author{{/t}}"
+             value="{{searchTerm}}"
+             type="search">
+      <span id="discussionsFilter">
+        <input type="checkbox"
+               id="onlyUnread"
+               {{#if onlyUnread}}checked{{/if}} /><label for="onlyUnread">{{#t "unread"}}Unread{{/t}}</label>
+      </span>
+    </div>
+  </div>
+  <div class="nothingMatchedFilter" style="display:none;">
+    <p>
+      {{#t "your_search_did_not_match_any_announcements"}}Your search did not match any announcements.{{/t}}
+    </p>
+    <p>
+    {{#t "suggestions"}}Suggestions:{{/t}}
+    <ul>
+      <li>{{#t "make_sure_all_search_terms_are_spelled_correctly"}}Make sure all search terms are spelled correctly.{{/t}}</li>
+      <li>{{#t "try_different_more_general_or_fewer_keywords"}}Try different, more general, or fewer keywords.{{/t}}</li>
+      <li>{{#t "try_disabling_the_unread_filters"}}Try disabling the "Unread" filter.{{/t}}</li>
+    </ul>
+  </div>
+  <div class="discussionTopicIndexList"></div>
+{{else}}
+  {{#if lastPageFetched}}
+    <div style="margin:auto; text-align: center; margin-top: 80px">
+      <h1>
+        {{#t "there_are_no_announcements_show"}}There are no announcements to show{{/t}}
+      </h1>
+      {{#if options.permissions.create}}
+        <a href="{{new_topic_url}}" class="btn btn-large btn-primary">
+          {{#t "make_an_announcement_caps"}}Make an Announcement{{/t}}
+        </a>
+      {{/if}}
+    </div>
+  {{else}}
+    <h2>{{#t "loading"}}Loading...{{/t}}</h2>
+  {{/if}}
+{{/ifAll}}

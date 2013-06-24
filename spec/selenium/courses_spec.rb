@@ -79,6 +79,7 @@ describe "courses" do
       replace_content(quota_input, "10")
       submit_form(form)
       keep_trying_until { f(".loading_image_holder").nil? rescue true }
+      form = f("#course_form")
       form.find_element(:css, ".course_info.storage_quota_mb").text.should == "10"
 
       # then try just saving it (without resetting it)
@@ -88,6 +89,7 @@ describe "courses" do
       form.find_element(:css, ".edit_course_link").click
       submit_form(form)
       keep_trying_until { f(".loading_image_holder").nil? rescue true }
+      form = f("#course_form")
       form.find_element(:css, ".course_info.storage_quota_mb").text.should == "10"
 
       # then make sure it's right after a reload

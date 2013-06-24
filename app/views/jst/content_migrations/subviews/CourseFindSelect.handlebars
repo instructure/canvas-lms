@@ -1,0 +1,13 @@
+<label class="control-label" for="courseSearchField">{{#t "search_label"}}Search for a course{{/t}}</label>
+<div class="controls">
+  <input id="courseSearchField" type="text" placeholder="Course name" name="courseSearchField" />
+  {{#t "or"}}or{{/t}}
+  <select id="courseSelect">
+    <option value="default">{{#t "select_default"}}Select a course{{/t}}</option>
+    {{#each courses}}
+    <option value={{course.id}}>{{course.name}}</option>
+    {{/each}}
+  </select>
+</div>
+
+

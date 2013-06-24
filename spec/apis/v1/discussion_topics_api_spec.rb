@@ -17,6 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../locked_spec')
 
 class TestCourseApi
   include Api
@@ -57,6 +58,9 @@ describe Api::V1::DiscussionTopics do
   end
 
   it "should recognize include_assignment flag" do
+    #set @domain_root_account
+    @test_api.instance_variable_set(:@domain_root_account, Account.default)
+
     data = @test_api.discussion_topic_api_json(@topic, @topic.context, @me, nil)
     data[:assignment].should be_nil
 
@@ -70,6 +74,24 @@ end
 
 describe DiscussionTopicsController, :type => :integration do
   include Api::V1::User
+
+  context 'locked api item' do
+    let(:item_type) { 'discussion_topic' }
+
+    let(:locked_item) do
+      @course.discussion_topics.create!(:message => 'Locked Discussion')
+    end
+
+    def api_get_json
+      api_call(
+        :get,
+        "/api/v1/courses/#{@course.id}/discussion_topics/#{locked_item.id}",
+        {:controller => 'discussion_topics_api', :action => 'show', :format => 'json', :course_id => @course.id.to_s, :topic_id => locked_item.id.to_s},
+      )
+    end
+
+    it_should_behave_like 'a locked api item'
+  end
 
   before(:each) do
     course_with_teacher(:active_all => true, :user => user_with_pseudonym)
@@ -221,6 +243,7 @@ describe DiscussionTopicsController, :type => :integration do
                   "topic_children"=>[@sub.id],
                   "discussion_type" => 'side_comment',
                   "locked"=>false,
+                  "locked_for_user"=>false,
                   "author" => user_display_json(@topic.user, @topic.context).stringify_keys!,
                   "permissions" => { "delete"=>true, "attach"=>true, "update"=>true }}
     end
@@ -235,7 +258,89 @@ describe DiscussionTopicsController, :type => :integration do
         json.last["podcast_url"].gsub!(/_[^.]*/, '_randomness')
         json.last.should == @response_json
       end
+
+      it "should order topics by descending position by default" do
+        @topic2 = create_topic(@course, :title => "Topic 2", :message => "<p>content here</p>")
+        @topic3 = create_topic(@course, :title => "Topic 3", :message => "<p>content here</p>")
+        topics = [@topic3, @topic, @topic2, @sub]
+        topics.reverse.each_with_index do |topic, index|
+          topic.position = index + 1
+          topic.save!
+        end
+
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics.json",
+                        {:controller => 'discussion_topics', :action => 'index', :format => 'json', :course_id => @course.id.to_s})
+        json.map {|j| j['id']}.should == topics.map(&:id)
+      end
+
+      it "should order topics by descending last_reply_at when order_by parameter is specified" do
+        @topic2 = create_topic(@course, :title => "Topic 2", :message => "<p>content here</p>")
+        @topic3 = create_topic(@course, :title => "Topic 3", :message => "<p>content here</p>")
+
+        topics = [@topic3, @topic, @topic2, @sub]
+        topic_reply_date = Time.zone.now - 1.day
+        topics.each do |topic|
+          topic.last_reply_at = topic_reply_date
+          topic.save!
+          topic_reply_date -= 1.day
+        end
+
+        # topic that hasn't had a reply yet should be at the top
+        @topic4 = create_topic(@course, :title => "Topic 4", :message => "<p>content here</p>")
+        topics.unshift(@topic4)
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics.json?order_by=recent_activity",
+                        {:controller => 'discussion_topics', :action => 'index', :format => 'json', :course_id => @course.id.to_s, :order_by => 'recent_activity'})
+        json.map {|j| j['id']}.should == topics.map(&:id)
+      end
+
+      it "should only include topics with a given scope when specified" do
+        @topic2 = create_topic(@course, :title => "Topic 2", :message => "<p>content here</p>")
+        @topic3 = create_topic(@course, :title => "Topic 3", :message => "<p>content here</p>")
+        [@topic, @sub, @topic2, @topic3].each do |topic|
+          topic.save!
+        end
+        [@sub, @topic2, @topic3].each(&:lock!)
+        
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics.json?per_page=10&scope=unlocked",
+                        {:controller => 'discussion_topics', :action => 'index', :format => 'json', :course_id => @course.id.to_s, 
+                          :per_page => '10', :scope => 'unlocked'})
+        json.size.should == 1
+        links = response.headers['Link'].split(',')
+        links.each do |link|
+          link.should match('scope=unlocked')
+        end
+
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics.json?per_page=10&scope=locked",
+                        {:controller => 'discussion_topics', :action => 'index', :format => 'json', :course_id => @course.id.to_s, 
+                          :per_page => '10', :scope => 'locked'})
+        json.size.should == 3
+        links = response.headers['Link'].split(',')
+        links.each do |link|
+          link.should match('scope=locked')
+        end
+      end
+      
+      it "should include all parameters in pagination urls" do
+        @topic2 = create_topic(@course, :title => "Topic 2", :message => "<p>content here</p>")
+        @topic3 = create_topic(@course, :title => "Topic 3", :message => "<p>content here</p>")
+        [@topic, @sub, @topic2, @topic3].each do |topic|
+          topic.type = 'Announcement'
+          topic.save!
+        end
+        
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics.json?per_page=2&only_announcements=true&order_by=recent_activity&scope=unlocked",
+                        {:controller => 'discussion_topics', :action => 'index', :format => 'json', :course_id => @course.id.to_s,
+                          :per_page => '2', :order_by => 'recent_activity', :only_announcements => 'true', :scope => 'unlocked'})
+        json.size.should == 2
+        links = response.headers['Link'].split(',')
+        links.each do |link|
+          link.should match('only_announcements=true')
+          link.should match('order_by=recent_activity')
+          link.should match('scope=unlocked')
+        end
+      end
     end
+
     describe "GET 'show'" do
       it "should return an individual topic" do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
@@ -592,6 +697,7 @@ describe DiscussionTopicsController, :type => :integration do
       "discussion_type" => 'side_comment',
       "permissions" => {"delete"=>true, "attach"=>true, "update"=>true},
       "locked" => false,
+      "locked_for_user" => false,
       "author" => user_display_json(gtopic.user, gtopic.context).stringify_keys!
     }
     json.should == expected
@@ -631,7 +737,7 @@ describe DiscussionTopicsController, :type => :integration do
     @module.save!
     course_with_student(:course => @course)
 
-    @module.evaluate_for(@user).should be_unlocked
+    @module.evaluate_for(@user, true).should be_unlocked
     raw_api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/read",
                  { :controller => 'discussion_topics_api', :action => 'mark_topic_read', :format => 'json',
                    :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
@@ -646,7 +752,7 @@ describe DiscussionTopicsController, :type => :integration do
     @module.save!
     course_with_student(:course => @course)
 
-    @module.evaluate_for(@user).should be_unlocked
+    @module.evaluate_for(@user, true).should be_unlocked
     raw_api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/read_all",
                  { :controller => 'discussion_topics_api', :action => 'mark_all_read', :format => 'json',
                    :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })

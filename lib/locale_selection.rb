@@ -80,5 +80,9 @@ module LocaleSelection
       hash
     end
   end
+
+  def crowdsourced_locales
+    @crowdsourced_locales ||= I18n.available_locales.select{|locale| I18n.send(:t, "crowdsourced", :locale => locale) == true}
+  end
 end
 

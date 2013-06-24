@@ -41,7 +41,7 @@
     <span style="font-size: 1.2em;">
       <%= link_to "Download #{@attachment.display_name}", download_url %>
     </span> (<%= @attachment.readable_size %>)
-    <div id="doc_preview" <%= doc_preview_attributes(@attachment, :attachment_view_inline_ping_url => context_url(@context, :context_file_inline_view_url, @attachment.id)) %>></div>
+    <div id="doc_preview" <%= doc_preview_attributes(@attachment) %>></div>
   <% end %>
 <% end %>
 <%= render :partial => 'shared/sequence_footer', :locals => {:asset => @attachment} %>

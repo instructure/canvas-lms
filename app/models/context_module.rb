@@ -109,6 +109,13 @@ class ContextModule < ActiveRecord::Base
   scope :unpublished, where(:workflow_state => 'unpublished')
   scope :not_deleted, where("context_modules.workflow_state<>'deleted'")
 
+  def publish_items!
+    self.content_tags.select{|t| t.unpublished?}.each do |tag|
+      tag.publish
+      tag.update_asset_workflow_state!
+    end
+  end
+
   def update_student_progressions(user=nil)
     # modules are ordered by position, so running through them in order will
     # automatically handle issues with dependencies loading in the correct
@@ -129,14 +136,15 @@ class ContextModule < ActiveRecord::Base
     can :read
   end
   
-  def locked_for?(user, tag=nil, deep_check=false)
+  def locked_for?(user, opts={})
     return false if self.grants_right?(user, nil, :update)
-    available = self.available_for?(user, tag, deep_check)
-    return true unless available
-    self.to_be_unlocked
+    available = self.available_for?(user, opts)
+    return {:asset_string => self.asset_string, :context_module => self.attributes} unless available
+    return {:asset_string => self.asset_string, :context_module => self.attributes, :unlock_at => self.unlock_at} if self.to_be_unlocked
+    false
   end
   
-  def available_for?(user, tag=nil, deep_check=false)
+  def available_for?(user, opts={})
     return true if self.active? && !self.to_be_unlocked && self.prerequisites.blank? && !self.require_sequential_progress
     if self.grants_right?(user, nil, :update)
      return true
@@ -147,11 +155,12 @@ class ContextModule < ActiveRecord::Base
     # if the progression is locked, then position in the progression doesn't
     # matter. we're not available.
 
+    tag = opts[:tag]
     res = progression && !progression.locked?
     if tag && tag.context_module_id == self.id && self.require_sequential_progress
       res = progression && !progression.locked? && progression.current_position && progression.current_position >= tag.position
     end
-    if !res && deep_check
+    if !res && opts[:deep_check_if_needed]
       progression = self.evaluate_for(user, true, true)
       if tag && tag.context_module_id == self.id && self.require_sequential_progress
         res = progression && !progression.locked? && progression.current_position && progression.current_position >= tag.position
@@ -240,6 +249,14 @@ class ContextModule < ActiveRecord::Base
     write_attribute(:completion_requirements, val)
   end
 
+  def content_tags_visible_to(user)
+    if self.grants_right?(user, :update)
+      self.content_tags.not_deleted
+    else
+      self.content_tags.active
+    end
+  end
+
   def add_item(params, added_item=nil, opts={})
     params[:type] = params[:type].underscore if params[:type]
     position = opts[:position] || (self.content_tags.active.map(&:position).compact.max || 0) + 1
@@ -254,6 +271,8 @@ class ContextModule < ActiveRecord::Base
     elsif params[:type] == "quiz"
       item = opts[:quiz] || self.context.quizzes.active.find_by_id(params[:id])
     end
+    workflow_state = item.workflow_state if item && item.respond_to?(:workflow_state) && ['active', 'unpublished'].include?(item.workflow_state)
+    workflow_state ||= 'active'
     if params[:type] == 'external_url'
       title = params[:title]
       added_item ||= self.content_tags.build(:context => self.context)
@@ -268,7 +287,7 @@ class ContextModule < ActiveRecord::Base
       added_item.content_type = 'ExternalUrl'
       added_item.context_module_id = self.id
       added_item.indent = params[:indent] || 0
-      added_item.workflow_state = 'active'
+      added_item.workflow_state = workflow_state
       added_item.save
       added_item
     elsif params[:type] == 'context_external_tool' || params[:type] == 'external_tool'
@@ -290,7 +309,7 @@ class ContextModule < ActiveRecord::Base
       }
       added_item.context_module_id = self.id
       added_item.indent = params[:indent] || 0
-      added_item.workflow_state = 'active'
+      added_item.workflow_state = workflow_state
       added_item.save
       added_item
     elsif params[:type] == 'context_module_sub_header' || params[:type] == 'sub_header'
@@ -306,7 +325,7 @@ class ContextModule < ActiveRecord::Base
       added_item.content_type = 'ContextModuleSubHeader'
       added_item.context_module_id = self.id
       added_item.indent = params[:indent] || 0
-      added_item.workflow_state = 'active'
+      added_item.workflow_state = workflow_state
       added_item.save
       added_item
     else
@@ -322,7 +341,7 @@ class ContextModule < ActiveRecord::Base
       }
       added_item.context_module_id = self.id
       added_item.indent = params[:indent] || 0
-      added_item.workflow_state = 'active'
+      added_item.workflow_state = workflow_state
       added_item.save
       added_item
     end
@@ -507,7 +526,7 @@ class ContextModule < ActiveRecord::Base
     end
     @cached_tags ||= self.content_tags.active
     tags = @cached_tags
-    if recursive_check || progression.new_record? || progression.updated_at < self.updated_at || Rails.env.test? || User.module_progression_jobs_queued?(user.id)
+    if recursive_check || progression.new_record? || progression.updated_at < self.updated_at || User.module_progression_jobs_queued?(user.id)
       if self.completion_requirements.blank? && active_prerequisites.empty?
         progression.workflow_state = 'completed'
         progression.save
@@ -612,7 +631,7 @@ class ContextModule < ActiveRecord::Base
 
     dup.save!
     tag_changes = {}
-    self.content_tags.active.each do |tag|
+    self.content_tags.not_deleted.each do |tag|
       new_tag = tag.clone_for(context, nil, :context_module_id => dup.id)
       if new_tag
         new_tag.context_module_id = dup.id
@@ -654,7 +673,7 @@ class ContextModule < ActiveRecord::Base
   def self.process_migration(data, migration)
     modules = data['modules'] ? data['modules'] : []
     modules.each do |mod|
-      if migration.import_object?("modules", mod['migration_id'])
+      if migration.import_object?("context_modules", mod['migration_id']) || migration.import_object?("modules", mod['migration_id'])
         begin
           import_from_migration(mod, migration.context)
         rescue
@@ -711,7 +730,7 @@ class ContextModule < ActiveRecord::Base
     item.save!
     
     item_map = {}
-    @item_migration_position = item.content_tags.active.map(&:position).compact.max || 0
+    @item_migration_position = item.content_tags.not_deleted.map(&:position).compact.max || 0
     (hash[:items] || []).each do |tag_hash|
       begin
         item.add_item_from_migration(tag_hash, 0, context, item_map)
@@ -747,10 +766,14 @@ class ContextModule < ActiveRecord::Base
     hash = hash.with_indifferent_access
     hash[:migration_id] ||= hash[:item_migration_id]
     hash[:migration_id] ||= Digest::MD5.hexdigest(hash[:title]) if hash[:title]
-    item = nil
     existing_item = content_tags.find_by_id(hash[:id]) if hash[:id].present?
     existing_item ||= content_tags.find_by_migration_id(hash[:migration_id]) if hash[:migration_id]
     existing_item ||= content_tags.new(:context => context)
+    if hash[:workflow_state] == 'unpublished'
+      existing_item.workflow_state = 'unpublished'
+    else
+      existing_item.workflow_state = 'active'
+    end
     context.imported_migration_items << existing_item if context.imported_migration_items && existing_item.new_record?
     existing_item.migration_id = hash[:migration_id]
     hash[:indent] = [hash[:indent] || 0, level].max
@@ -843,7 +866,7 @@ class ContextModule < ActiveRecord::Base
       item_map[hash[:migration_id]] = item if hash[:migration_id]
       item.migration_id = hash[:migration_id]
       item.new_tab = hash[:new_tab]
-      item.position = (@item_migration_position ||= self.content_tags.active.map(&:position).compact.max || 0)
+      item.position = (@item_migration_position ||= self.content_tags.not_deleted.map(&:position).compact.max || 0)
       item.workflow_state = 'active'
       @item_migration_position += 1
       item.save!

@@ -90,6 +90,7 @@ define [
     initialize: (options) ->
       @options = _.extend {}, @defaults, @options, options
       @setOptionProperties()
+      @storeChildrenViews()
       @$el.data 'view', this
       @model.view = this if @model
       @collection.view = this if @collection
@@ -98,6 +99,16 @@ define [
       @attach()
       this
 
+    # Store all children views for easy access. 
+    #   ie: 
+    #      @view.children # {@view1, @view2}
+    #
+    # @api private
+    
+    storeChildrenViews: -> 
+      return unless @constructor.__childViews__
+      @children = _.map @constructor.__childViews__, (viewObj) => @[viewObj.name]
+    
     ##
     # Sets the option properties
     #

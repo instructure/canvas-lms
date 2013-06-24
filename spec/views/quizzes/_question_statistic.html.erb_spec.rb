@@ -53,5 +53,17 @@ describe "/quizzes/_question_statistic" do
     response.should_not be_nil
     response.body.should_not include @student.name
   end
+
+  it "renders a link to download all quiz submissions for file upload questions" do
+    course_with_student
+    view_context
+    question = {question_type: 'file_upload_question',
+                unexpected_response_values: []}
+    quiz = @course.quizzes.build
+    quiz.stubs(:quiz_data).returns [question]
+    assigns[:quiz] = quiz
+    render :partial => 'quizzes/question_statistic', object: question
+    response.body.should include "Download All Files"
+  end
 end
 

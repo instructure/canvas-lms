@@ -11,6 +11,10 @@ require([
     event.preventDefault();
     $(this).addClass('expanded');
   });
+  $('.download_submissions_link').click(function(event){
+    event.preventDefault();
+    INST.downloadSubmissions($(this).attr('href'));
+  });
   $(".answer,.number_answer").live('click', function(event) {
     var data = $(this).getTemplateData({textValues: ['user_ids'], dataValues: ['responses']});
     var ids = data.user_ids;

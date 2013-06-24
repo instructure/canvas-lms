@@ -46,6 +46,7 @@ ActionController::Routing::Routes.draw do |map|
   map.message_redirect "mr/:id", :controller => 'info', :action => 'message_redirect'
   map.help_links 'help_links', :controller => 'info', :action => 'help_links'
 
+
   def add_question_banks(context)
     context.resources :question_banks do |bank|
       bank.bookmark 'bookmark', :controller => 'question_banks', :action => 'bookmark'
@@ -239,6 +240,7 @@ ActionController::Routing::Routes.draw do |map|
     course.resources :assignment_groups, :collection => {:reorder => :post} do |group|
       group.reorder_assignments 'reorder', :controller => 'assignment_groups', :action => 'reorder_assignments'
     end
+    course.external_tools_sessionless_launch 'external_tools/sessionless_launch', :controller => 'external_tools', :action => 'sessionless_launch'
     course.resources :external_tools, :collection => {:retrieve => :get, :homework_submissions => :get} do |tools|
       tools.resource_selection 'resource_selection', :controller => 'external_tools', :action => 'resource_selection'
       tools.homework_submission 'homework_submission', :controller => 'external_tools', :action => 'homework_submission'
@@ -259,7 +261,8 @@ ActionController::Routing::Routes.draw do |map|
       quiz.statistics "statistics", :controller => 'quizzes', :action => 'statistics'
       quiz.read_only "read_only", :controller => 'quizzes', :action => 'read_only'
       quiz.filters 'filters', :controller => 'quizzes', :action => 'filters'
-      quiz.resources :quiz_submissions, :as => "submissions", :collection => {:backup => :put}, :member => {:record_answer => :post} do |submission|
+
+      quiz.resources :quiz_submissions, :as => "submissions", :collection => {:backup => :put, :index => :get}, :member => {:record_answer => :post} do |submission|
       end
       quiz.extensions 'extensions/:user_id', :controller => 'quiz_submissions', :action => 'extensions', :conditions => {:method => :post}
       quiz.resources :quiz_questions, :as => "questions", :only => %w(create update destroy show)
@@ -329,6 +332,7 @@ ActionController::Routing::Routes.draw do |map|
     course.student_view 'student_view', :controller => 'courses', :action => 'student_view', :conditions => {:method => :post}
     course.student_view 'student_view', :controller => 'courses', :action => 'leave_student_view', :conditions => {:method => :delete}
     course.test_student 'test_student', :controller => 'courses', :action => 'reset_test_student', :conditions => {:method => :delete}
+    course.content_migrations 'content_migrations', :controller => 'content_migrations', :action => 'index', :conditions => {:method => :get}
   end
 
   map.connect '/submissions/:submission_id/attachments/:attachment_id/crocodoc_sessions',
@@ -460,6 +464,7 @@ ActionController::Routing::Routes.draw do |map|
     account.test_ldap_logins 'test_ldap_logins', :controller => 'account_authorization_configs', :action => 'test_ldap_login'
     account.saml_testing 'saml_testing', :controller => 'account_authorization_configs', :action => 'saml_testing'
     account.saml_testing_stop 'saml_testing_stop', :controller => 'account_authorization_configs', :action => 'saml_testing_stop'
+    account.external_tools_sessionless_launch 'external_tools/sessionless_launch', :controller => 'external_tools', :action => 'sessionless_launch'
     account.resources :external_tools do |tools|
       tools.finished 'finished', :controller => 'external_tools', :action => 'finished'
     end
@@ -515,6 +520,8 @@ ActionController::Routing::Routes.draw do |map|
   map.services 'services', :controller => 'users', :action => 'services'
   map.bookmark_search 'search/bookmarks', :controller => 'users', :action => 'bookmark_search'
   map.search_rubrics 'search/rubrics', :controller => "search", :action => "rubrics"
+  map.dismiss_tour 'tours/dismiss/:name', :controller => :tours, :action => :dismiss, :conditions => {:method => :delete}
+  map.dismiss_tour_session 'tours/dismiss/session/:name', :controller => :tours, :action => :dismiss_session, :conditions => {:method => :delete}
   map.resources :users do |user|
     user.masquerade 'masquerade', :controller => 'users', :action => 'masquerade'
     user.delete 'delete', :controller => 'users', :action => 'delete'
@@ -675,6 +682,7 @@ ActionController::Routing::Routes.draw do |map|
       courses.get 'courses/:course_id/users/:id', :action => :user, :path_name => 'course_user'
       courses.get 'courses/:course_id/search_users', :action => :search_users, :path_name => 'course_search_users'
       courses.get 'courses/:course_id/activity_stream', :action => :activity_stream, :path_name => 'course_activity_stream'
+      courses.get 'courses/:course_id/activity_stream/summary', :action => :activity_stream_summary, :path_name => 'course_activity_stream_summary'
       courses.get 'courses/:course_id/todo', :action => :todo_items
       courses.delete 'courses/:id', :action => :destroy
       courses.post 'courses/:course_id/course_copy', :controller => :content_imports, :action => :copy_course_content
@@ -751,6 +759,9 @@ ActionController::Routing::Routes.draw do |map|
     end
 
     api.get 'courses/:course_id/assignment_groups', :controller => :assignment_groups, :action => :index, :path_name => 'course_assignment_groups'
+    api.with_options(:controller => :assignment_groups_api) do |ag|
+      ag.resources :assignment_groups, :path_prefix => "courses/:course_id", :name_prefix => "course_", :except => [:index]
+    end
 
     api.with_options(:controller => :discussion_topics) do |topics|
       topics.get 'courses/:course_id/discussion_topics', :action => :index, :path_name => 'course_discussion_topics'
@@ -758,9 +769,12 @@ ActionController::Routing::Routes.draw do |map|
     end
 
     api.with_options(:controller => :content_migrations) do |cm|
+      cm.get 'courses/:course_id/content_migrations/migrators', :action => :available_migrators, :path_name => 'course_content_migration_migrators_list'
       cm.get 'courses/:course_id/content_migrations/:id', :action => :show, :path_name => 'course_content_migration'
       cm.get 'courses/:course_id/content_migrations', :action => :index, :path_name => 'course_content_migration_list'
-      cm.get 'courses/:course_id/content_migrations/:id/download_archive', :action => 'download_archive', :conditions => {:method => :get}, :path_name => 'course_content_migration_download'
+      cm.post 'courses/:course_id/content_migrations', :action => :create, :path_name => 'course_content_migration_create'
+      cm.put 'courses/:course_id/content_migrations/:id', :action => :update, :path_name => 'course_content_migration_update'
+      cm.get 'courses/:course_id/content_migrations/:id/selective_data', :action => :content_list, :path_name => 'course_content_migration_selective_data'
     end
 
     api.with_options(:controller => :migration_issues) do |mi|
@@ -805,6 +819,7 @@ ActionController::Routing::Routes.draw do |map|
 
     api.with_options(:controller => :external_tools) do |tools|
       def et_routes(route_object, context)
+        route_object.get "#{context}s/:#{context}_id/external_tools/sessionless_launch", :action => :generate_sessionless_launch, :path_name => "#{context}_external_tool_sessionless_launch"
         route_object.get "#{context}s/:#{context}_id/external_tools/:external_tool_id", :action => :show, :path_name => "#{context}_external_tool_show"
         route_object.get "#{context}s/:#{context}_id/external_tools", :action => :index, :path_name => "#{context}_external_tools"
         route_object.post "#{context}s/:#{context}_id/external_tools", :action => :create, :path_name => "#{context}_external_tools_create"
@@ -833,6 +848,7 @@ ActionController::Routing::Routes.draw do |map|
     api.with_options(:controller => :users) do |users|
       users.get 'users/self/activity_stream', :action => :activity_stream, :path_name => 'user_activity_stream'
       users.get 'users/activity_stream', :action => :activity_stream # deprecated
+      users.get 'users/self/activity_stream/summary', :action => :activity_stream_summary, :path_name => 'user_activity_stream_summary'
 
       users.put "users/:user_id/followers/self", :action => :follow
       users.delete "users/:user_id/followers/self", :action => :unfollow
@@ -976,6 +992,7 @@ ActionController::Routing::Routes.draw do |map|
       groups.post 'groups/:group_id/files', :action => :create_file
       groups.post 'group_categories/:group_category_id/groups', :action => :create
       groups.get 'groups/:group_id/activity_stream', :action => :activity_stream, :path_name => 'group_activity_stream'
+      groups.get 'groups/:group_id/activity_stream/summary', :action => :activity_stream_summary, :path_name => 'group_activity_stream_summary'
       groups.put "groups/:group_id/followers/self", :action => :follow
       groups.delete "groups/:group_id/followers/self", :action => :unfollow
 
@@ -1052,12 +1069,18 @@ ActionController::Routing::Routes.draw do |map|
       wiki_pages.get "groups/:group_id/pages", :action => :index, :path_name => 'group_wiki_pages'
       wiki_pages.get "courses/:course_id/pages/:url", :action => :show, :path_name => 'course_wiki_page'
       wiki_pages.get "groups/:group_id/pages/:url", :action => :show, :path_name => 'group_wiki_page'
+      wiki_pages.get "courses/:course_id/front_page", :action => :show
+      wiki_pages.get "groups/:group_id/front_page", :action => :show
       wiki_pages.post "courses/:course_id/pages", :action => :create
       wiki_pages.post "groups/:group_id/pages", :action => :create
       wiki_pages.put "courses/:course_id/pages/:url", :action => :update
       wiki_pages.put "groups/:group_id/pages/:url", :action => :update
+      wiki_pages.put "courses/:course_id/front_page", :action => :update
+      wiki_pages.put "groups/:group_id/front_page", :action => :update
       wiki_pages.delete "courses/:course_id/pages/:url", :action => :destroy
       wiki_pages.delete "groups/:group_id/pages/:url", :action => :destroy
+      wiki_pages.delete "courses/:course_id/front_page", :action => :destroy
+      wiki_pages.delete "groups/:group_id/front_page", :action => :destroy
     end
 
     api.with_options(:controller => :context_modules_api) do |context_modules|
@@ -1083,6 +1106,8 @@ ActionController::Routing::Routes.draw do |map|
       quizzes.post "courses/:course_id/quizzes", :action => :create, :path_name => 'course_quiz_create'
       quizzes.get "courses/:course_id/quizzes/:id", :action => :show, :path_name => 'course_quiz'
       quizzes.put "courses/:course_id/quizzes/:id", :action => :update, :path_name => 'course_quiz_update'
+      quizzes.delete "courses/:course_id/quizzes/:id", action: :destroy,
+        path_name: 'course_quiz_destroy'
     end
 
     api.with_options(:controller => :quiz_reports) do |statistics|
@@ -1183,6 +1208,10 @@ ActionController::Routing::Routes.draw do |map|
     rubric.resources :rubric_assessments, :as => 'assessments'
   end
   map.selection_test 'selection_test', :controller => 'external_content', :action => 'selection_test'
+
+  map.resources :quiz_submissions do |submission|
+    add_files(submission)
+  end
 
   # commenting out all collection urls until collections are live
   # map.resources :collection_items, :only => [:new]

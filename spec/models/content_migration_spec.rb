@@ -294,11 +294,20 @@ describe ContentMigration do
         page.save!
         mod1.add_item({:id => page.id, :type => 'wiki_page'})
 
+        asmnt1 = @copy_from.assignments.create!(:title => "some assignment")
+        asmnt1.workflow_state = :unpublished
+        asmnt1.save!
+        mod1.add_item({:id => asmnt1.id, :type => 'assignment', :indent => 1})
+
         run_course_copy
 
         mod1_copy = @copy_to.context_modules.find_by_migration_id(mig_id(mod1))
-        mod1_copy.content_tags.count.should == 1
-        mod1_copy.content_tags.first.content #todo
+        mod1_copy.content_tags.count.should == 2
+
+        mod1_copy.content_tags.each do |tag_copy|
+          tag_copy.unpublished?.should == true
+          tag_copy.content.unpublished?.should == true
+        end
       end
 
       it "should copy unpublised wiki pages" do
@@ -317,12 +326,12 @@ describe ContentMigration do
       # simulating what happens when the user clicks "link to new page" and enters a title that isn't
       # urlified the same way by the client vs. the server.  this doesn't break navigation because
       # ApplicationController#get_wiki_page can match by urlified title, but it broke import (see #9945)
-      main_page = @copy_from.wiki.wiki_page
+      main_page = @copy_from.wiki.front_page
       main_page.body = %{<a href="/courses/#{@copy_from.id}/wiki/online:-unit-pages">wut</a>}
       main_page.save!
       @copy_from.wiki.wiki_pages.create!(:title => "Online: Unit Pages", :body => %{<a href="/courses/#{@copy_from.id}/wiki/#{main_page.id}">whoa</a>})
       run_course_copy
-      @copy_to.wiki.wiki_page.body.should == %{<a href="/courses/#{@copy_to.id}/wiki/online-unit-pages">wut</a>}
+      @copy_to.wiki.front_page.body.should == %{<a href="/courses/#{@copy_to.id}/wiki/online-unit-pages">wut</a>}
       @copy_to.wiki.wiki_pages.find_by_url!("online-unit-pages").body.should == %{<a href="/courses/#{@copy_to.id}/wiki/#{main_page.url}">whoa</a>}
     end
 
@@ -487,7 +496,7 @@ describe ContentMigration do
       @copy_to.quizzes.find_by_migration_id(mig_id(quiz)).workflow_state.should == 'created' if Qti.qti_enabled?
       @copy_to.context_external_tools.find_by_migration_id(mig_id(tool)).workflow_state.should == 'public'
       @copy_to.assignment_groups.find_by_migration_id(mig_id(ag)).workflow_state.should == 'available'
-      @copy_to.assignments.find_by_migration_id(mig_id(asmnt)).workflow_state.should == 'available'
+      @copy_to.assignments.find_by_migration_id(mig_id(asmnt)).workflow_state.should == asmnt.workflow_state
       @copy_to.grading_standards.find_by_migration_id(mig_id(gs)).workflow_state.should == 'active'
       @copy_to.calendar_events.find_by_migration_id(mig_id(cal)).workflow_state.should == 'active'
     end
@@ -1076,12 +1085,10 @@ describe ContentMigration do
       asmnt.save!
       @copy_from.reload
 
-      @cm.migration_settings[:migration_ids_to_import] = {
-              :copy => {
-                      :shift_dates => true,
-                      :day_substitutions => {today.wday.to_s => (today.wday + 1).to_s}
-              }
-      }
+      @cm.copy_options = @cm.copy_options.merge(
+              :shift_dates => true,
+              :day_substitutions => {today.wday.to_s => (today.wday + 1).to_s}
+      )
       @cm.save!
 
       run_course_copy
@@ -1127,9 +1134,7 @@ describe ContentMigration do
       cm.end_at = old_start + 3.days
       cm.save!
 
-      @cm.migration_settings[:migration_ids_to_import] = {
-              :copy => options
-      }
+      @cm.copy_options = options
       @cm.save!
 
       run_course_copy
@@ -1208,18 +1213,16 @@ describe ContentMigration do
           assignment = @copy_from.assignments.create! :title => 'Assignment', :due_at => old_date
           assignment.save!
 
-          migration_settings = {
-            :copy => {
-              :everything => true,
-              :shift_dates => true,
-              :old_start_date => old_start_date,
-              :old_end_date => old_end_date,
-              :new_start_date => new_start_date,
-              :new_end_date => new_end_date
-            }
+          opts = {
+                  :everything => true,
+                  :shift_dates => true,
+                  :old_start_date => old_start_date,
+                  :old_end_date => old_end_date,
+                  :new_start_date => new_start_date,
+                  :new_end_date => new_end_date
           }
-          migration_settings[:copy][:time_zone] = options[:time_zone].name if options.include?(:time_zone)
-          @cm.migration_settings[:migration_ids_to_import] = migration_settings
+          opts[:time_zone] = options[:time_zone].name if options.include?(:time_zone)
+          @cm.copy_options = @cm.copy_options.merge(opts)
           @cm.save!
 
           run_course_copy
@@ -1757,6 +1760,31 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
   it "should exclude user-hidden migration plugins" do
     ab = Canvas::Plugin.find(:academic_benchmark_importer)
     ContentMigration.migration_plugins(true).include?(ab).should be_false
+  end
+
+  context "zip file import" do
+    it "should import" do
+      course_with_teacher
+      zip_path = File.join(File.dirname(__FILE__) + "/../fixtures/migration/file.zip")
+      cm = ContentMigration.new(:context => @course, :user => @user,)
+      cm.migration_type = 'zip_file_importer'
+      cm.migration_settings[:folder_id] = Folder.root_folders(@course).first.id
+      cm.save!
+
+      attachment = Attachment.new
+      attachment.context = cm
+      attachment.uploaded_data = File.open(zip_path, 'rb')
+      attachment.filename = 'file.zip'
+      attachment.save!
+
+      cm.attachment = attachment
+      cm.save!
+
+      cm.queue_migration
+      run_jobs
+      @course.reload
+      @course.attachments.count.should == 1
+    end
   end
 
 end

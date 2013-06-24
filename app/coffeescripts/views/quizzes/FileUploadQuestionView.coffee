@@ -6,7 +6,7 @@ define [
   'underscore',
   'jquery.instructure_forms',
   'jquery.disableWhileLoading'
-], ({View}, $, template,uploadedOrRemovedTemplate,_) ->
+], ({Model,View}, $, template,uploadedOrRemovedTemplate,_) ->
 
   class FileUploadQuestion extends View
 
@@ -20,7 +20,7 @@ define [
       '.file-upload-box': '$fileUploadBox'
 
     events:
-      'change input.file-upload': 'checkForFileChange'
+      'change input[type=file]': 'checkForFileChange'
       'click .file-upload-btn': 'openFileBrowser'
       'click .delete-attachment': 'deleteAttachment'
 
@@ -29,24 +29,47 @@ define [
       # get marked as read before the file is uploaded.
       event.preventDefault()
       event.stopPropagation()
-      if @$fileUpload.val()
+      if val = @$('.file-upload').val()
         @deferred = new $.Deferred()
         @removeFileStatusMessage()
         @$fileUploadBox.disableWhileLoading(@deferred)
         @uploadAttachment()
 
     uploadAttachment: =>
-      $.ajaxJSONPreparedFiles
-        files: @$fileUpload
-        handle_files: @processAttachments
-        uploadDataUrl: ENV.UPLOAD_URL
+      el = $('.file-upload')[0]
+      name = (el.value || el.name).split(/(\/|\\)/).pop()
+      opts = name: name, on_duplicate: 'rename'
+      $.ajaxJSON ENV.UPLOAD_URL,'POST',opts,
+        # success
+        (data) =>
+          model = new Model data.upload_params
+          $(el).attr('name', data.file_param)
+          model.set('file', el)
+          model.url = -> data.upload_url
+          model.save null,
+            multipart: el
+            onlyGivenParameters: true
+            success: (model) => @processAttachments [model.toJSON()]
+            error: (err) =>
+        ,(err) =>
+          console.log(err)
 
-    openFileBrowser: =>
+    openFileBrowser: (event) =>
+      event.preventDefault()
       @$fileUpload.click()
 
     render: =>
       super
-      @$fileUploadBox.html template @model || {}
+      model = @model || {}
+      # This unfortunate bit of browser detection is here because IE9
+      # will throw an error if you programatically call "click" on the
+      # input file element, get the file element, and submit a form.
+      # For now, remove the input rendered in ERB-land, and the template is
+      # responsible for rendering a fallback to a regular input type=file
+      model.isIE = !!$.browser.msie
+      if model.isIE
+        @$('.file-upload').remove()
+      @$fileUploadBox.html template model
       this
 
     removeFileStatusMessage: =>

@@ -55,4 +55,21 @@ module Api::V1::ExternalTools
       api_v1_account_external_tools_url(@context)
     end
   end
+
+  module UrlHelpers
+    def sessionless_launch_url(context, opts={})
+      uri = URI(api_v1_account_external_tool_sessionless_launch_url(context)) if context.is_a?(Account)
+      uri = URI(api_v1_course_external_tool_sessionless_launch_url(context)) if context.is_a?(Course)
+      return nil unless uri
+
+      query_params = {}
+      query_params[:id] = opts[:id] if opts.include?(:id)
+      query_params[:url] = opts[:url] if opts.include?(:url)
+      query_params[:launch_type] = opts[:launch_type] if opts.include?(:launch_type)
+      query_params[:assignment_id] = opts[:assignment_id] if opts.include?(:assignment_id)
+      uri.query = query_params.to_query
+
+      uri.to_s
+    end
+  end
 end

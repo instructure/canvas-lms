@@ -17,6 +17,8 @@
 #
 
 class ContextController < ApplicationController
+  include SearchHelper
+
   before_filter :require_context, :except => [:inbox, :inbox_item, :destroy_inbox_item, :mark_inbox_as_read, :create_media_object, :kaltura_notifications, :media_object_redirect, :media_object_inline, :media_object_thumbnail, :object_snippet, :discussion_replies]
   before_filter :require_user, :only => [:inbox, :inbox_item, :report_avatar_image, :discussion_replies]
   before_filter :reject_student_view_student, :only => [:inbox, :inbox_item, :discussion_replies]
@@ -26,12 +28,13 @@ class ContextController < ApplicationController
     @context = Context.find_by_asset_string(params[:context_code])
     if authorized_action(@context, @current_user, :read)
       if params[:id] && params[:type] && @context.respond_to?(:media_objects)
+        self.extend TextHelper
         @media_object = @context.media_objects.find_or_initialize_by_media_id_and_media_type(params[:id], params[:type])
-        @media_object.title = params[:title] if params[:title]
+        @media_object.title = truncate_text(params[:title], :max_length => 255) if params[:title]
         @media_object.user = @current_user
         @media_object.media_type = params[:type]
         @media_object.root_account_id = @domain_root_account.id if @domain_root_account && @media_object.respond_to?(:root_account_id)
-        @media_object.user_entered_title = params[:user_entered_title] if params[:user_entered_title] && !params[:user_entered_title].empty?
+        @media_object.user_entered_title = truncate_text(params[:user_entered_title], :max_length => 255) if params[:user_entered_title] && !params[:user_entered_title].empty?
         @media_object.save
       end
       render :json => @media_object.to_json
@@ -304,22 +307,29 @@ class ContextController < ApplicationController
     if @context.is_a?(Course)
       sections = @context.course_sections.select([:id, :name])
       all_roles = Role.role_data(@context, @current_user)
+      load_all_contexts(:context => @context)
       js_env({
         :ALL_ROLES => all_roles,
         :SECTIONS => sections.map { |s| { :id => s.id, :name => s.name } },
         :USER_LISTS_URL => polymorphic_path([@context, :user_lists], :format => :json),
         :ENROLL_USERS_URL => course_enroll_users_url(@context),
+        :SEARCH_URL => search_recipients_url,
+        :COURSE_ROOT_URL => "/courses/#{ @context.id }",
+        :CONTEXTS => @contexts,
+        :resend_invitations_url => course_re_send_invitations_url(@context),
         :permissions => {
           :manage_students => (manage_students = @context.grants_right?(@current_user, session, :manage_students)),
           :manage_admin_users => (manage_admins = @context.grants_right?(@current_user, session, :manage_admin_users)),
           :add_users => manage_students || manage_admins
         },
         :course => {
+          :id => @context.id,
           :completed => (completed = @context.completed?),
           :soft_concluded => (soft_concluded = @context.soft_concluded?),
           :concluded => completed || soft_concluded,
           :teacherless => @context.teacherless?,
-          :available => @context.available?
+          :available => @context.available?,
+          :pendingInvitationsCount => @context.users_visible_to(@current_user).count(:distinct => true, :select => 'users.id', :conditions => ["enrollments.workflow_state = 'invited' AND enrollments.type != 'StudentViewEnrollment'"])
         }
       })
     elsif @context.is_a?(Group)

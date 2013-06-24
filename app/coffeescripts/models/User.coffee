@@ -38,15 +38,28 @@ define [
       terms_of_use:
         accepted:     I18n.t("errors.terms", "You must agree to the terms")
 
+    # first: optional boolean to return only the first match
+    enrollments: (attrs, first) ->
+      _.where @get('enrollments'), attrs, first
+
+    hasEnrollmentType: (type) ->
+      !! @enrollments {type}, true
+
+    hasEnrollmentRole: (role) ->
+      !! @enrollments {role}, true
+
+    findEnrollmentByRole: (role) ->
+      @enrollments {role}, true
+
+    allEnrollmentsByType: (type) ->
+      @enrollments {type}
+
+    allEnrollmentsByRole: (role) ->
+      @enrollments {role}
+
     pending: (role) ->
       _.any @get('enrollments'), (e) -> e.role == role && e.enrollment_state in ['creation_pending', 'invited']
 
-    hasEnrollmentType: (type, role) ->
-      _.any @get('enrollments'), (e) -> e.role == role && e.type == type
-
-    findEnrollmentWithRole: (role) ->
-      _.find @get('enrollments'), (e) -> e.role == role
-
-    allEnrollmentsWithRole: (role) ->
-      _.select @get('enrollments'), (e) -> e.role == role
+    sectionEditableEnrollments: ->
+      _.select @get('enrollments'), (e) -> not _.include(['DesignerEnrollment', 'ObserverEnrollment'], e.type)
 

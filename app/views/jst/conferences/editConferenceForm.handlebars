@@ -1,0 +1,87 @@
+<form action="{{conferenceData.url}}" class="form-dialog form-horizontal" method="{{conferenceData.http_method}}">
+  <input type="hidden" name="_method" value="{{conferenceData.http_method}}">
+  <div style="margin:0;padding:0;display:inline">
+    <input name="authenticity_token" type="hidden" value="{{settings.auth_token}}">
+  </div>
+
+  <div class="control-group">
+    <label class="control-label" for="web_conference_title">{{#t "name"}}Name{{/t}}</label>
+    <div class="controls">
+      <input id="web_conference_title" name="web_conference[title]" type="text" value="{{conferenceData.title}}">
+    </div>
+  </div>
+  <div class="control-group">
+    <label class="control-label" for="web_conference_conference_type">{{#t "conference_type"}}Type{{/t}}</label>
+    <div class="controls">
+      <select id="web_conference_conference_type" name="web_conference[conference_type]" {{# if settings.is_editing}}disabled='disabled'{{/if}}>
+        {{#each conferenceTypes}}
+          <option value="{{type}}" {{#if selected}}selected="selected"{{/if}}>{{name}}</option>
+        {{/each}}
+      </select>
+
+      {{# if settings.is_editing}}
+        {{# if conferenceData.has_advanced_settings}}
+          <a href="{{conferenceData.url}}/settings" target="_blank" class="advanced_settings">
+            {{#t "advanced_settings"}}Manage Advanced Settings...{{/t}}
+          </a>
+        {{/if}}
+      {{/if}}
+    </div>
+  </div>
+  <div class="control-group">
+    <label class="control-label" for="web_conference_duration">{{#t "duration"}}Duration{{/t}}</label>
+    <div class="controls form-inline">
+      <input id="web_conference_duration" name="web_conference[duration]" type="text"
+             data-restore-value="{{conferenceData.restore_duration}}"
+             value="{{conferenceData.duration}}"
+             {{#if settings.disable_duration_changes}}disabled='disabled'{{/if}}> {{#t "duration_in_minutes"}}minutes{{/t}}
+    </div>
+  </div>
+  <div class="control-group">
+    <label class="control-label" for="web_conference_options">{{#t "options"}}Options{{/t}}</label>
+    <div class="controls">
+      <div class="web_conference_user_settings"></div>
+      <label class="checkbox" for="web_conference_long_running">
+        <input name="web_conference[long_running]" type="hidden" value="0">
+        <input id="web_conference_long_running" name="web_conference[long_running]" type="checkbox"
+               value="1" {{#if conferenceData.long_running}}checked{{/if}}
+               {{#if settings.disable_duration_changes}}disabled='disabled'{{/if}}>
+        {{#t "long_running"}}No time limit (for long-running conferences){{/t}}
+      </label>
+    </div>
+  </div>
+  <div class="control-group">
+    <label class="control-label" for="web_conference_description">{{#t "description"}}Description{{/t}}</label>
+    <div class="controls">
+      <textarea cols="40" id="web_conference_description" name="web_conference[description]" rows="6">{{conferenceData.description}}</textarea>
+    </div>
+  </div>
+  <legend>{{#t "members"}}Members{{/t}}</legend>
+  <label class="checkbox" for="user_all">
+    <input name="user[all]" type="hidden" value="0">
+    <input class="all_users_checkbox" id="user_all" name="user[all]" type="checkbox" value="1" {{#if inviteAll}}checked{{/if}}>
+    {{#t "invite_all"}}Invite All Course Members{{/t}}
+  </label>
+  <div>
+    <ul id="members_list" style="border: 1px solid #333; padding: 10px; overflow-y: auto; max-height: 150px;">
+      {{# each users}}
+        <li class="member user_{{id}}">
+          <label class="checkbox" for="user_{{id}}">
+            <input name="user[{{id}}]" type="hidden" value="0">
+            <input id="user_{{id}}" name="user[{{id}}]" type="checkbox" value="1">
+            {{name}}
+          </label>
+        </li>
+      {{/each}}
+    </ul>
+  </div>
+
+  <div class="form-controls">
+    <button type="button" class="cancel_button btn">{{#t "buttons.cancel"}}Cancel{{/t}}</button>
+    {{# if settings.is_adding}}
+      <button type="submit" class="btn btn-primary save-button">{{#t "buttons.create_conference"}}Create Conference{{/t}}</button>
+    {{else}}
+      <button type="submit" class="btn btn-primary save-button">{{#t "buttons.update_condference"}}Update Conference{{/t}}</button>
+    {{/if}}
+  </div>
+</form>

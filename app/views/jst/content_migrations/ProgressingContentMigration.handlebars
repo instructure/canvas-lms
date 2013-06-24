@@ -1,0 +1,16 @@
+<div class="span3 migrationName top-margin">{{display_name}}</div>
+<div class="span3 top-margin centerText">{{datetimeFormatted created_at}}</div>
+<div class="span2 top-margin centerText progressStatus"></div>
+<div class="span3 changable {{#if loading}}top-margin{{/if}}">
+  {{#if waiting_for_select}}
+    <button type='button' title="{{#t "select_content"}}Select Content{{/t}}" class='btn btn-primary selectContentBtn'>{{#t "select_content"}}Select Content{{/t}}</button>
+    <form class="selectContentDialog form-dialog" style="display:none"></form>
+  {{else}}
+    {{#if migration_issues}}
+      <button type='button' id='issueText{{cid}}' class='btn showIssues' href='#issues{{cid}}'>
+        <span class='badge badge-warning' data-bind="migration_issues_count">{{issuesCount}}</span> <span data-bind="issuesButtonText">{{#t "show_issues"}}Show Issues{{/t}}</span>
+      </button>
+    {{/if}}
+  {{/if}}
+</div>
+<div id="#issues{{cid}}" class="migrationIssues clear" style="display: none"></div>

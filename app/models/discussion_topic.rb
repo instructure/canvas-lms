@@ -326,6 +326,7 @@ class DiscussionTopic < ActiveRecord::Base
   scope :before, lambda { |date| where("discussion_topics.created_at<?", date) }
 
   scope :by_position, order("discussion_topics.position DESC, discussion_topics.created_at DESC")
+  scope :by_last_reply_at, order("discussion_topics.last_reply_at DESC, discussion_topics.created_at DESC")
 
   def auto_update_workflow
     transition_to_workflow_state(desired_workflow_state)
@@ -671,16 +672,14 @@ class DiscussionTopic < ActiveRecord::Base
   # Public: Determine if the discussion topic is locked for a specific user. The topic is locked when the 
   #         delayed_post_at is in the future or the group assignment is locked. This does not determine
   #         the visibility of the topic to the user, only that they are unable to reply.
-  #
-  # Returns: boolean
-  def locked_for?(user=nil, opts={})
+  def locked_for?(user, opts={})
     return false if opts[:check_policies] && self.grants_right?(user, nil, :update)
     Rails.cache.fetch(locked_cache_key(user), :expires_in => 1.minute) do
       locked = false
       if (self.delayed_post_at && self.delayed_post_at > Time.now)
         locked = {:asset_string => self.asset_string, :unlock_at => self.delayed_post_at}
       elsif (self.lock_at && self.lock_at < Time.now)
-        locked = true
+        locked = {:asset_string => self.asset_string, :lock_at => self.lock_at}
       elsif (self.assignment && l = self.assignment.locked_for?(user, opts))
         locked = l
       elsif self.could_be_locked && item = locked_by_module_item?(user, opts[:deep_check_if_needed])
@@ -768,7 +767,7 @@ class DiscussionTopic < ActiveRecord::Base
         context = Group.find_by_context_id_and_context_type_and_migration_id(migration.context.id, migration.context.class.to_s, topic['group_id']) if topic['group_id']
         context ||= migration.context
         if context
-          if migration.import_object?("topics", topic['migration_id'])
+          if migration.import_object?("discussion_topics", topic['migration_id']) || migration.import_object?("topics", topic['migration_id'])
             begin
               import_from_migration(topic.merge({:topic_entries_to_import => topic_entries_to_import}), context)
             rescue

@@ -101,7 +101,7 @@ shared_examples_for "settings basic tests" do
       click_submit
       account.reload
       account.default_locale.should == "es"
-      f("label[for='account_name']").text.should include_text("Nombre de Cuenta")
+      get_value('#account_default_locale').should == 'es'
     end
   end
 end

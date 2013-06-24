@@ -19,6 +19,7 @@
 module Api::V1::WikiPage
   include Api::V1::Json
   include Api::V1::User
+  include Api::V1::Locked
 
   WIKI_PAGE_JSON_ATTRS = %w(url title created_at updated_at hide_from_students editing_roles)
 
@@ -28,6 +29,8 @@ module Api::V1::WikiPage
     hash['body'] = api_user_content(wiki_page.body) if include_body
     hash['last_edited_by'] = user_display_json(wiki_page.user, wiki_page.context) if wiki_page.user
     hash['published'] = wiki_page.active?
+    hash['front_page'] = wiki_page.front_page?
+    locked_json(hash, wiki_page, current_user, 'page')
     hash
   end
 

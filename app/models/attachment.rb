@@ -252,7 +252,7 @@ class Attachment < ActiveRecord::Base
     attachments = data['file_map'] ? data['file_map']: {}
     # TODO i18n
     attachments.values.each do |att|
-      if !att['is_folder'] && migration.import_object?("files", att['migration_id'])
+      if !att['is_folder'] && (migration.import_object?("attachments", att['migration_id']) || migration.import_object?("files", att['migration_id']))
         begin
           import_from_migration(att, migration.context)
         rescue
@@ -668,6 +668,7 @@ class Attachment < ActiveRecord::Base
   def self.get_quota(context)
     quota = 0
     quota_used = 0
+    context = context.quota_context if context.respond_to?(:quota_context) && context.quota_context
     if context
       Shackles.activate(:slave) do
         quota = Setting.get_cached('context_default_quota', 50.megabytes.to_s).to_i
@@ -1143,7 +1144,7 @@ class Attachment < ActiveRecord::Base
 
   def locked_for?(user, opts={})
     return false if opts[:check_policies] && self.grants_right?(user, nil, :update)
-    return {:manually_locked => true} if self.locked || (self.folder && self.folder.locked?)
+    return {:asset_string => self.asset_string, :manually_locked => true} if self.locked || (self.folder && self.folder.locked?)
     Rails.cache.fetch(locked_cache_key(user), :expires_in => 1.minute) do
       locked = false
       if (self.unlock_at && Time.now < self.unlock_at)
@@ -1620,5 +1621,13 @@ class Attachment < ActiveRecord::Base
 
   def crocodoc_available?
     crocodoc_document.try(:available?)
+  end
+
+  def view_inline_ping_url
+    "/#{context_url_prefix}/files/#{self.id}/inline_view"
+  end
+
+  def record_inline_view
+    update_attribute(:last_inline_view, Time.now)
   end
 end

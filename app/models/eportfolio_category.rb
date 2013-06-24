@@ -31,7 +31,8 @@ class EportfolioCategory < ActiveRecord::Base
     categories = self.eportfolio.eportfolio_categories
     self.name ||= t(:default_section, "Section Name")
     self.slug = self.name.gsub(/[\s]+/, "_").gsub(/[^\w\d]/, "")
-    match_cnt = categories.select{|c| c != self && c.slug && c.slug == self.slug}.length
+    categories = categories.where("id<>?", self) unless self.new_record?
+    match_cnt = categories.where(:slug => self.slug).count
     if match_cnt > 0
       self.slug = self.slug + "_" + (match_cnt + 1).to_s
     end

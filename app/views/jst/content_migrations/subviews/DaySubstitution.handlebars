@@ -1,0 +1,15 @@
+<div class="content-box-mini">
+  Move everything on 
+  <select class="currentDay pad-box-mini">
+    {{#each weekdays}}
+      <option value="{{index}}">{{name}}</option>
+    {{/each}}
+  </select>
+  to happen on
+  <select class="subDay">
+    {{#each weekdays}}
+      <option value="{{index}}">{{name}}</option>
+    {{/each}}
+  </select>
+  <a href="#" class="pull-right"><span class="ui-icon ui-icon-circle-close"></span></a>
+</div>

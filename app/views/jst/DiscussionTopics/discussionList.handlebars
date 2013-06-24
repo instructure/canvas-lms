@@ -1,0 +1,19 @@
+<div class="ig-header">
+    <span class="element_toggler"
+          aria-controls="{{listID}}"
+          role="button">
+      <i class="icon-mini-arrow-down"></i>
+      {{title}}
+    </span>
+</div>
+
+<ul class="collectionViewItems ig-list"
+    id="{{listID}}"
+    aria-expanded="true">
+</ul>
+
+<div class="no-content discussion">
+  {{#t "there_are_no_discussions_show"}}There are no discussions to show.{{/t}}
+</div>
+
+<div class="loader"></div>

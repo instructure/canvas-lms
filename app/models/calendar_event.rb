@@ -529,7 +529,7 @@ class CalendarEvent < ActiveRecord::Base
   def self.process_migration(data, migration)
     events = data['calendar_events'] ? data['calendar_events']: []
     events.each do |event|
-      if migration.import_object?("events", event['migration_id'])
+      if migration.import_object?("calendar_events", event['migration_id']) || migration.import_object?("events", event['migration_id'])
         begin
           import_from_migration(event, migration.context)
         rescue

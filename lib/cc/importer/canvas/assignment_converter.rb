@@ -50,6 +50,7 @@ module CC::Importer::Canvas
       assignment["grading_standard_migration_id"] = get_node_val(meta_doc, "grading_standard_identifierref")
       assignment["rubric_migration_id"] = get_node_val(meta_doc, "rubric_identifierref")
       assignment["quiz_migration_id"] = get_node_val(meta_doc, "quiz_identifierref")
+      assignment["workflow_state"] = get_node_val(meta_doc, "workflow_state") if meta_doc.at_css("workflow_state")
       if meta_doc.at_css("saved_rubric_comments comment")
         assignment[:saved_rubric_comments] = {}
         meta_doc.css("saved_rubric_comments comment").each do |comment_node|

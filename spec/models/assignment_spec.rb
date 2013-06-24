@@ -2316,6 +2316,17 @@ describe Assignment do
         submission[:late].should == user.submissions.first.late?
       end
     end
+
+    it "should include inline view pingback url for files" do
+      course_with_teacher :active_all => true
+      student_in_course :active_all => true
+      assignment = @course.assignments.create! :submission_types => ['online_upload']
+      attachment = @student.attachments.create! :uploaded_data => dummy_io, :filename => 'doc.doc', :display_name => 'doc.doc', :context => @student
+      submission = assignment.submit_homework @student, :submission_type => :online_upload, :attachments => [attachment]
+      json = assignment.speed_grader_json @teacher
+      attachment_json = json['submissions'][0]['submission_history'][0]['submission']['versioned_attachments'][0]['attachment']
+      attachment_json['view_inline_ping_url'].should match %r{/users/#{@student.id}/files/#{attachment.id}/inline_view\z}
+    end
   end
 
   describe "update_student_submissions" do

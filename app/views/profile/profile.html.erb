@@ -33,7 +33,7 @@
 <% end %>
 <h2 style="padding-top: 0.3em;"><%= t('headers.users_profile', "%{user}'s Settings", :user => @user.short_name) %></h2>
 <div class="clear"></div>
-<% form_for @user, :url => profile_path, :html => {:id => "update_profile_form", :style => "margin-bottom: 20px;"} do |f| %>
+<% form_for @user, :url => profile_path, :html => {:id => "update_profile_form", :style => "margin-bottom: 20px;", :class => 'form-inline'} do |f| %>
 <table class="profile_table">
   <tr>
     <% editable_name = @user.user_can_edit_name? %>
@@ -76,7 +76,8 @@
     <td>
       <% no_language = t(:no_language_preference, "System Default (%{language})", :language => available_locales[infer_locale(:root_account => @domain_root_account, :accept_language => request.headers['Accept-Language'])]) %>
       <span class="locale display_data"><%= @user.locale ? available_locales[@user.locale] : no_language %></span>
-      <span class="edit_data"><%= f.select :locale, [[no_language, nil]] + available_locales.invert.sort, :selected => @user.locale %>
+      <span class="edit_data"><%= f.select :locale, [[no_language, nil]] + available_locales.invert.sort, {:selected => @user.locale}, {:class => 'locale'} %>
+      <%= render :partial => 'shared/locale_warning' %>
       <span style="font-size: 0.8em; color: #888;"><br/><%= t('hints.language', "This will override any browser or account settings.") %></span>
       </span>
     </td>
@@ -93,8 +94,10 @@
     <tr>
       <td colspan="2">
         <div class="edit_data">
-          <%= f.check_box :subscribe_to_emails %>
-          <%= f.label :subscribe_to_emails, :en => "I want to receive information, news and tips from Instructure" %>
+          <label for="user_subscribe_to_emails" class="checkbox">
+            <%= f.check_box :subscribe_to_emails %>
+            <%= t(:subscribe_to_emails, "I want to receive information, news and tips from Instructure") %>
+          </label>
         </div>
       </td>
     </tr>
@@ -102,7 +105,7 @@
   <% if !@password_pseudonyms.empty? %>
   <tr class="edit_data_row select_change_password_row" style="display: none;">
     <td><%= before_label(:password, "Password") %></td>
-    <td><input type="checkbox" id="change_password_checkbox" name="pseudonym[change_password]" value="1"/> <label for="change_password_checkbox"><%= t('labels.change_password', "Change Password") %></label></td>
+    <td><label for="change_password_checkbox" class="checkbox"><input type="checkbox" id="change_password_checkbox" name="pseudonym[change_password]" value="1"/><%= t('labels.change_password', "Change Password") %></label></td>
   </tr>
   <% end %>
   <tr class="change_password_row" style="display: none;">

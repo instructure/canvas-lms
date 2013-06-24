@@ -1,7 +1,8 @@
 define [
+  'jquery'
   'Backbone'
   'jst/collectionView'
-], (Backbone, template) ->
+], ($, Backbone, template) ->
 
   ##
   # Renders a collection of items with an item view. Binds to a handful of
@@ -56,6 +57,7 @@ define [
     render: =>
       super
       @renderItems() if @collection.length
+      this
 
     ##
     # @api public
@@ -131,7 +133,7 @@ define [
     # @api private
 
     renderItem: (model) =>
-      view = new @itemView {model}
+      view = new @itemView $.extend (@itemViewOptions || {}), {model}
       view.render()
       @insertView view
 

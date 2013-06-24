@@ -17,7 +17,7 @@ module AcademicBenchmark
 
     def export
       if content_migration && !Account.site_admin.grants_right?(content_migration.user, :manage_global_outcomes)
-        raise Canvas::Migration::Error.new("User isn't allowed to edit global outcomes")
+        raise Canvas::Migration::Error.new(I18n.t('academic_benchmark.no_perms', "User isn't allowed to edit global outcomes"))
       end
 
       if @archive_file
@@ -31,14 +31,10 @@ module AcademicBenchmark
             convert_guids(@settings[:guids]) if @settings[:guids]
           end
         else
-          message = I18n.t('academic_benchmark.no_api_key', "An API key is required to use Academic Benchmarks")
-          add_warning(message)
-          raise Canvas::Migration::Error.new("no academic benchmarks api key")
+          raise Canvas::Migration::Error.new(I18n.t('academic_benchmark.no_api_key', "An API key is required to use Academic Benchmarks"))
         end
       else
-        message = I18n.t('academic_benchmark.no_file', "No outcome file or authority given")
-        add_warning(message)
-        raise Canvas::Migration::Error.new("No outcome file or authority given")
+        raise Canvas::Migration::Error.new(I18n.t('academic_benchmark.no_file', "No outcome file or authority given"))
       end
 
       save_to_file

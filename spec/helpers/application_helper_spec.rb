@@ -421,6 +421,7 @@ describe ApplicationHelper do
     end
 
     it "should output the translated default" do
+      pending('RAILS_LOAD_ALL_LOCALES=true') unless ENV['RAILS_LOAD_ALL_LOCALES']
       def i18n_scope; "date.days"; end
       (I18n.available_locales - [:en]).each do |locale|
         I18n.locale = locale

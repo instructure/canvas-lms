@@ -117,18 +117,22 @@ module AssignmentOverrideApplicator
       # overrides, (assignment_or_quiz, position) unique for section overrides
       overrides += section_overrides#.order(:position)
 
-      # for each potential override discovered, make sure we look at the
-      # appropriate version
-      overrides = overrides.map do |override|
-        if override.versions.empty?
-          override
-        else
-          override_version = override.versions.detect do |version|
-            model_version = assignment_or_quiz.is_a?(Quiz) ? version.model.quiz_version : version.model.assignment_version
-            next if model_version.nil?
-            model_version <= assignment_or_quiz.version_number
+      # For each potential override discovered, make sure we look at the
+      # appropriate version. If current_version? is true (the common case),
+      # then we know we have the live model already, not a previous version,
+      # and we can skip this check.
+      unless assignment_or_quiz.current_version?
+        overrides = overrides.map do |override|
+          if override.versions.empty?
+            override
+          else
+            override_version = override.versions.detect do |version|
+              model_version = assignment_or_quiz.is_a?(Quiz) ? version.model.quiz_version : version.model.assignment_version
+              next if model_version.nil?
+              model_version <= assignment_or_quiz.version_number
+            end
+            override_version ? override_version.model : nil
           end
-          override_version ? override_version.model : nil
         end
       end
 

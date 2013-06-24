@@ -656,6 +656,16 @@ class QuizSubmission < ActiveRecord::Base
       policy.should_dispatch_submission_grade_changed?
     }
 
+    p.dispatch :submission_needs_grading
+    p.to { teachers }
+    p.whenever { |q_sub|
+      BroadcastPolicies::QuizSubmissionPolicy.new(q_sub).
+        should_dispatch_submission_needs_grading?
+    }
+  end
+
+  def teachers
+    quiz.context.teacher_enrollments.map(&:user)
   end
 
   def assign_validation_token
@@ -672,4 +682,5 @@ class QuizSubmission < ActiveRecord::Base
   # quiz_submissions
   delegate :assignment_id, :assignment, :to => :quiz
   delegate :graded_at, :to => :submission
+  delegate :context, :to => :quiz
 end

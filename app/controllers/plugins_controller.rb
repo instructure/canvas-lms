@@ -25,7 +25,10 @@ class PluginsController < ApplicationController
 
   def show
     if find_plugin_setting
-      @plugin_setting.disabled = true if @plugin_setting.new_record?
+      if @plugin_setting.new_record?
+        @plugin_setting.disabled = true
+        clear_encrypted_plugin_settings
+      end
       @settings = @plugin.settings
     else
       flash[:notice] = t('errors.plugin_doesnt_exist', "The plugin %{id} doesn't exist.", :id => params[:id])
@@ -60,6 +63,14 @@ class PluginsController < ApplicationController
       true
     else
       false
+    end
+  end
+
+  def clear_encrypted_plugin_settings
+    if @plugin_setting.settings && @plugin.encrypted_settings
+      @plugin.encrypted_settings.each do |encrypted_setting_name|
+        @plugin_setting.settings[encrypted_setting_name] = ''
+      end
     end
   end
 

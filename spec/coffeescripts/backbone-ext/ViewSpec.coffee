@@ -30,6 +30,13 @@ define ['Backbone'], ({View}) ->
     view = new Backbone.View foo: 'bar'
     ok !view.foo?, 'parent class property options not poluted'
 
+  test 'children should have a list of child views', -> 
+    class SomeView extends Backbone.View
+      @child 'test', '.test'
+
+    view = new SomeView test: new Backbone.View
+    equal view.children.length, 1, "Creates an array of children view stored on .children"
+
   test 'template optionProperty', ->
     view = new View
       template: -> "hi"

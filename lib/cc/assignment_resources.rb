@@ -87,6 +87,7 @@ module CC
       node.peer_reviews_due_at CCHelper::ims_datetime(assignment.peer_reviews_due_at) if assignment.peer_reviews_due_at
       node.assignment_group_identifierref CCHelper.create_key(assignment.assignment_group)
       node.grading_standard_identifierref CCHelper.create_key(assignment.grading_standard) if assignment.grading_standard
+      node.workflow_state assignment.workflow_state
       if assignment.rubric
         assoc = assignment.rubric_association
         node.rubric_identifierref CCHelper.create_key(assignment.rubric)

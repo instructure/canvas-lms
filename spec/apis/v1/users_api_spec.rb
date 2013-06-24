@@ -294,7 +294,7 @@ describe "Users API", :type => :integration do
         json.should == [{
           'name' => user.name,
           'sortable_name' => user.sortable_name,
-          'sis_user_id' => user.sis_user_id,
+          'sis_user_id' => user.pseudonym.sis_user_id,
           'id' => user.id,
           'short_name' => user.short_name,
           'login_id' => user.pseudonym.unique_id,
@@ -328,7 +328,7 @@ describe "Users API", :type => :integration do
       json.should == [{
                         'name' => user1.name,
                         'sortable_name' => user1.sortable_name,
-                        'sis_user_id' => user1.sis_user_id,
+                        'sis_user_id' => user1.pseudonym.sis_user_id,
                         'id' => user1.id,
                         'short_name' => user1.short_name,
                         'login_id' => user1.pseudonym.unique_id,
@@ -622,7 +622,7 @@ describe "Users API", :type => :integration do
 
       it "should be able to delete a user by SIS ID" do
         @student.pseudonym.update_attribute(:sis_user_id, '12345')
-        id_param = "sis_user_id:#{@student.sis_user_id}"
+        id_param = "sis_user_id:#{@student.pseudonyms.first.sis_user_id}"
 
         path = "/api/v1/accounts/#{Account.default.id}/users/#{id_param}"
         path_options = @path_options.merge(:id => id_param)

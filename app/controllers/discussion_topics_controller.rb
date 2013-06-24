@@ -66,6 +66,27 @@
 #        // whether or not this is locked for students to see.
 #        "locked":false,
 #
+#        // Whether or not this is locked for the user.
+#        "locked_for_user":true,
+#
+#        // (Optional) Information for the user about the lock. Present when locked_for_user is true.
+#        "lock_info": {
+#          // Asset string for the object causing the lock
+#          "asset_string":"discussion_topic_1",
+#
+#          // (Optional) Time at which this was/will be unlocked.
+#          "unlock_at":"2013-01-01T00:00:00-06:00",
+#
+#          // (Optional) Time at which this was/will be locked.
+#          "lock_at":"2013-02-01T00:00:00-06:00",
+#
+#          // (Optional) Context module causing the lock.
+#          "context_module":{ ... }
+#        },
+#
+#        // (Optional) An explanation of why this is locked for the user. Present when locked_for_user is true.
+#        "lock_explanation":"This discussion is locked until September 1 at 12:00am",
+#
 #        // The username of the topic creator.
 #        "user_name":"User Name",
 #
@@ -112,41 +133,68 @@ class DiscussionTopicsController < ApplicationController
   #
   # Returns the paginated list of discussion topics for this course or group.
   #
+  # @argument order_by Determines the order of the discussion topic list. May be one of "position", or "recent_activity". Defaults to "position".
+  # @argument scope [Optional, "locked"|"unlocked"] Only return discussion topics in the given state. Defaults to including locked and unlocked topics. Filtering is done after pagination, so pages may be smaller than requested if topics are filtered
+  # @argument only_announcements [Optional] Boolean, return announcements instead of discussion topics. Defaults to false
+  #
   # @example_request
   #     curl https://<canvas>/api/v1/courses/<course_id>/discussion_topics \ 
   #          -H 'Authorization: Bearer <token>'
   def index
-    if authorized_action(@context.discussion_topics.new, @current_user, :read)
-      return child_topic if params[:root_discussion_topic_id] && @context.respond_to?(:context) && @context.context && @context.context.discussion_topics.find(params[:root_discussion_topic_id])
-      log_asset_access("topics:#{@context.asset_string}", "topics", 'other')
-      respond_to do |format|
-        format.html do
-          @active_tab = "discussions"
-          add_crumb t('#crumbs.discussions', "Discussions"), named_context_url(@context, :context_discussion_topics_url)
-          js_env :USER_SETTINGS_URL => api_v1_user_settings_url(@current_user),
-                 :permissions => {
-                   :create => @context.discussion_topics.new.grants_right?(@current_user, session, :create),
-                   :moderate => @context.grants_right?(@current_user, session, :moderate_forum),
-                   :change_settings => user_can_edit_course_settings?
-                 }
-          if user_can_edit_course_settings?
-            js_env :SETTINGS_URL => named_context_url(@context, :api_v1_context_settings_url)
-          end
+    return unless authorized_action(@context.discussion_topics.new, @current_user, :read)
+    return child_topic if is_child_topic?
+
+    log_asset_access("topics:#{@context.asset_string}", 'topics', 'other')
+
+    scope = if params[:only_announcements]
+              @context.active_announcements
+            else
+              @context.active_discussion_topics.only_discussion_topics
+            end
+
+    scope = params[:order_by] == 'recent_activity' ? scope.by_last_reply_at : scope.by_position
+
+    @topics = Api.paginate(scope, self, topic_pagination_url)
+    @topics.reject! { |t| t.locked? || t.locked_for?(@current_user) } if params[:scope] == 'unlocked'
+    @topics.select! { |t| t.locked? || t.locked_for?(@current_user) } if params[:scope] == 'locked'
+    @topics.each { |topic| topic.current_user = @current_user }
+
+    respond_to do |format|
+      format.html do
+        @active_tab = 'discussions'
+        add_crumb(t('#crumbs.discussions', 'Discussions'),
+                  named_context_url(@context, :context_discussion_topics_url))
+
+        locked_topics, open_topics = @topics.partition do |topic|
+          topic.locked? || topic.locked_for?(@current_user)
         end
-        format.json do
-          # you can pass ?only_announcements=true to get announcements instead of discussions TODO: document
-          scope = (params[:only_announcements] ?
-                   @context.active_announcements :
-                   @context.active_discussion_topics.only_discussion_topics)
-          scope = scope.by_position
-          @topics = Api.paginate(scope, self, topic_pagination_url(:only_announcements => params[:only_announcements]))
-          @topics.each { |t| t.current_user = @current_user }
-          if api_request?
-            render :json => discussion_topics_api_json(@topics, @context, @current_user, session)
-          end
+
+        js_env(USER_SETTINGS_URL: api_v1_user_settings_url(@current_user),
+               openTopics: open_topics,
+               lockedTopics: locked_topics,
+               newTopicURL: named_context_url(@context, :new_context_discussion_topic_url),
+               permissions: {
+                 create: @context.discussion_topics.new.grants_right?(@current_user, session, :create),
+                 moderate: @context.grants_right?(@current_user, session, :moderate_forum),
+                 change_settings: user_can_edit_course_settings?
+               })
+
+        if user_can_edit_course_settings?
+          js_env(SETTINGS_URL: named_context_url(@context, :api_v1_context_settings_url))
         end
       end
+
+      format.json do
+        render json: discussion_topics_api_json(@topics, @context, @current_user, session)
+      end
     end
+  end
+
+  def is_child_topic?
+    root_topic_id = params[:root_discussion_topic_id]
+
+    root_topic_id && @context.respond_to?(:context) &&
+      @context.context && @context.context.discussion_topics.find(root_topic_id)
   end
 
   def new
@@ -260,6 +308,8 @@ class DiscussionTopicsController < ApplicationController
               :UPDATE_URL => named_context_url(@context, :api_v1_context_discussion_update_reply_url, @topic, ':id'),
               :MARK_READ_URL => named_context_url(@context, :api_v1_context_discussion_topic_discussion_entry_mark_read_url, @topic, ':id'),
               :MARK_UNREAD_URL => named_context_url(@context, :api_v1_context_discussion_topic_discussion_entry_mark_unread_url, @topic, ':id'),
+              :MARK_ALL_READ_URL => named_context_url(@context, :api_v1_context_discussion_topic_mark_all_read_url, @topic),
+              :MARK_ALL_UNREAD_URL => named_context_url(@context, :api_v1_context_discussion_topic_mark_all_unread_url, @topic),
               :MANUAL_MARK_AS_READ => @current_user.try(:manual_mark_as_read?),
               :CURRENT_USER => user_display_json(@current_user),
               :INITIAL_POST_REQUIRED => @initial_post_required,
@@ -524,5 +574,4 @@ class DiscussionTopicsController < ApplicationController
       end
     end
   end
-
 end

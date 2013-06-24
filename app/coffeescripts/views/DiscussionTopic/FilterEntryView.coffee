@@ -23,7 +23,7 @@ define [
 
     initialize: ->
       super
-      @model.on 'change:read_state', @toggleReadState
+      @model.on 'change:read_state', @updateReadState
 
     toJSON: ->
       @model.attributes
@@ -33,7 +33,7 @@ define [
 
     afterRender: ->
       super
-      @setToggleTooltip()
+      @updateReadState()
 
     toggleRead: (e) ->
       e.stopPropagation()
@@ -43,12 +43,12 @@ define [
       else
         @model.markAsRead()
 
-    toggleReadState: (model, read_state) =>
-      @setToggleTooltip()
-      @$entryContent.toggleClass 'unread', read_state is 'unread'
-      @$entryContent.toggleClass 'read', read_state is 'read'
+    updateReadState: =>
+      @updateTooltip()
+      @$entryContent.toggleClass 'unread', @model.get('read_state') is 'unread'
+      @$entryContent.toggleClass 'read', @model.get('read_state') is 'read'
 
-    setToggleTooltip: ->
+    updateTooltip: ->
       tooltip = if @model.get('read_state') is 'unread'
         I18n.t('mark_as_read', 'Mark as Read')
       else

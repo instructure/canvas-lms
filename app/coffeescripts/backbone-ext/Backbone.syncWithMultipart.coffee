@@ -35,13 +35,22 @@ define [
       _.flatten(inputs)
     $form = $("""
       <form enctype='multipart/form-data' target='#{iframeId}' action='#{options.url ? model.url()}' method='POST'>
-        <input type='hidden' name='_method' value='#{httpMethod}' />
-        <input type='hidden' name='authenticity_token' value='#{ENV.AUTHENTICITY_TOKEN}' />
       </form>
     """).hide()
 
+    # pass onlyGivenParameters if you need to do an S3 Upload (you probably do)
+    unless options.onlyGivenParameters
+      $form.prepend """
+        <input type='hidden' name='_method' value='#{httpMethod}' />
+        <input type='hidden' name='authenticity_token' value='#{ENV.AUTHENTICITY_TOKEN}' />
+        """
+
     _.each toForm(model.attributes), (el) ->
-      $form.prepend(el) if el
+      return unless el
+      if el.name is 'file' # s3 expects the file param last
+        $form.append(el)
+      else
+        $form.prepend(el)
 
     $(document.body).prepend($iframe, $form)
 
@@ -49,6 +58,9 @@ define [
       # contentDocument doesn't work in IE (7)
       iframeBody = ($iframe[0].contentDocument || $iframe[0].contentWindow.document).body
       response = $.parseJSON($(iframeBody).text())
+      # in case the form redirects after receiving the upload (API uploads),
+      # prevent trying to work with an empty response
+      return unless response
 
       # TODO: Migrate to api v2. Make this check redundant
       response = response.objects ? response

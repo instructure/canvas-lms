@@ -18,6 +18,10 @@ module BroadcastPolicies
       quiz_submission.changed_in_state(:complete, :fields => [:score])
     end
 
+    def should_dispatch_submission_needs_grading?
+      quiz_is_accepting_messages? && quiz_submission.pending_review?
+    end
+
     private
     def quiz
       quiz_submission.quiz

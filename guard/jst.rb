@@ -84,7 +84,7 @@ module Guard
       paths.each do |file|
         javascript = file.sub(%r{\A#{Regexp.escape(@options[:input])}/(.*?)\.handlebars}, "#{@options[:output]}/\\1.js")
         UI.info "Removing: #{javascript}"
-        File.remove(javascript) if File.exists?(javascript)
+        File.delete(javascript) if File.exists?(javascript)
       end
     end
 

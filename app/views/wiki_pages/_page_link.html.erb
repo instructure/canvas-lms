@@ -1,7 +1,7 @@
 <% skip_front_page ||= false; page_link ||= nil; wiki_page = page_link; hidden ||= false %>
 <% if !wiki_page %>
-  <li class="ellipsis" style="<%= 'display: none;' if hidden %>"><%= link_to t('#wiki_pages.front_page', "Front Page"), context_url(@context, :context_wiki_page_url, 'front-page') %></li>  
-<% elsif skip_front_page && wiki_page.url == 'front-page' %>
+  <li class="ellipsis" style="<%= 'display: none;' if hidden %>"><%= link_to t('#wiki_pages.front_page', "Front Page"), context_url(@context, :context_wiki_page_url, @context.wiki.get_front_page_url) %></li>
+<% elsif skip_front_page && wiki_page.front_page? %>
 <% else %>
   <% if !wiki_page.hide_from_students || can_do(@context, @current_user, :manage_content) %>
   <li class="ellipsis" style="<%= 'display: none;' if hidden %><%= 'font-weight: bold;' if @page && wiki_page == @page %><%= 'font-style: italic;' if wiki_page.hide_from_students %>" title="<%= t(:link_hidden_from_students_warning, "Students won't see this link") if wiki_page.hide_from_students %>"><%= link_to wiki_page.title,  context_url(

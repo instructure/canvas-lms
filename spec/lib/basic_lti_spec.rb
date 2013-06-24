@@ -248,6 +248,14 @@ describe BasicLTI do
       hash['lis_person_name_full'].should == @user.name
       hash['lis_person_contact_email_primary'] = @user.email
     end
+
+    it "should provide a custom_canvas_user_login_id without an sis id" do
+      user = user_with_pseudonym(:name => "A Name")
+      course_with_teacher(:active_all => true)
+      @tool = @course.context_external_tools.create!(:domain => 'yahoo.com', :consumer_key => '12345', :shared_secret => 'secret', :name => 'tool', :privacy_level => 'public')
+      hash = BasicLTI.generate(:url => 'http://www.yahoo.com', :tool => @tool, :user => user, :context => @course, :link_code => '123456', :return_url => 'http://www.google.com')
+      hash['custom_canvas_user_login_id'].should == user.pseudonyms.first.unique_id
+    end
   end
 
   it "should include assignment outcome service params" do

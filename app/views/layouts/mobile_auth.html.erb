@@ -1,0 +1,70 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title><%= yield :page_title || t("log_in_to_canvas", "Log In To Canvas") %></title>
+  <meta name="HandheldFriendly" content="True">
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+
+  <script>
+    ENV = <%= raw js_env.to_json %>;
+  </script>
+
+  <% jammit_css :mobile_auth %>
+  <%= include_css_bundles %>
+</head>
+
+<body>
+  <div id="f1_container">
+    <div id="f1_card">
+      <%= yield %>
+    </div>
+  </div>
+  <script>
+    // https://gist.github.com/1183357
+    //scroll to top, hide address bar on mobile devices - 1 for android, 0 for the rest
+    (function( win ){
+      var doc = win.document;
+
+      // If there's a hash, or addEventListener is undefined, stop here
+      if( !location.hash || !win.addEventListener ){
+
+        //scroll to 1
+        window.scrollTo( 0, 1 );
+        var scrollTop = 1,
+          getScrollTop = function(){
+            return "scrollTop" in doc.body ? doc.body.scrollTop : 1;
+          },
+
+          //reset to 0 on bodyready, if needed
+          bodycheck = setInterval(function(){
+            if( doc.body ){
+              clearInterval( bodycheck );
+              scrollTop = getScrollTop();
+              win.scrollTo( 0, scrollTop === 1 ? 0 : 1 );
+            }
+          }, 15 );
+
+        win.addEventListener( "load", function(){
+          setTimeout(function(){
+            //at load, if user hasn't scrolled more than 20 or so...
+            if( getScrollTop() < 20 ){
+              //reset to hide addr bar at onload
+              win.scrollTo( 0, scrollTop === 1 ? 0 : 1 );
+            }
+          }, 0);
+        }, false );
+      }
+
+    })( this );
+
+    // GOOGLE ANALYTICS
+    var _gaq=[["_setAccount",ENV.GOOGLE_ANALYTICS_KEY],["_trackPageview"]];
+    (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];g.async=1;
+    g.src=("https:"==location.protocol?"//ssl":"//www")+".google-analytics.com/ga.js";
+    s.parentNode.insertBefore(g,s)}(document,"script"));
+  </script>
+</body>
+</html>

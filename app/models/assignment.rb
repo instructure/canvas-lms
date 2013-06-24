@@ -35,7 +35,7 @@ class Assignment < ActiveRecord::Base
     :notify_of_update, :time_zone_edited, :turnitin_enabled, :turnitin_settings,
     :context, :position, :allowed_extensions, :external_tool_tag_attributes,
     :freeze_on_copy, :assignment_group_id
-    
+
   attr_accessor :original_id, :updating_user, :copying
 
   has_many :submissions, :class_name => 'Submission', :dependent => :destroy
@@ -176,7 +176,7 @@ class Assignment < ActiveRecord::Base
   after_save :remove_assignment_updated_flag # this needs to be after has_a_broadcast_policy for the message to be sent
 
   def validate_assignment_overrides
-    if group_category_id_changed? 
+    if group_category_id_changed?
       # needs to be .each(&:destroy) instead of .update_all(:workflow_state =>
       # 'deleted') so that the override gets versioned properly
       active_assignment_overrides.
@@ -542,6 +542,9 @@ class Assignment < ActiveRecord::Base
     state :published do
       event :unpublish, :transitions_to => :available
     end
+    state :unpublished do
+      event :publish, :transitions_to => :published
+    end
     state :deleted
   end
 
@@ -579,7 +582,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def infer_state_from_course
-    self.workflow_state = "published" if (self.context.publish_grades_immediately rescue false)
+    self.workflow_state = "published" if !self.unpublished? && (self.context.publish_grades_immediately rescue false)
     if self.assignment_group_id.nil?
       self.context.require_assignment_group
       self.assignment_group = self.context.assignment_groups.active.first
@@ -775,16 +778,15 @@ class Assignment < ActiveRecord::Base
     read_attribute(:all_day) || (self.new_record? && self.due_at && (self.due_at.strftime("%H:%M") == '23:59' || self.due_at.strftime("%H:%M") == '00:00'))
   end
 
-  def locked_for?(user=nil, opts={})
+  def locked_for?(user, opts={})
     return false if opts[:check_policies] && self.grants_right?(user, nil, :update)
     Rails.cache.fetch(locked_cache_key(user), :expires_in => 1.minute) do
       locked = false
       assignment_for_user = self.overridden_for(user)
-      if ((assignment_for_user.unlock_at && assignment_for_user.unlock_at > Time.now) ||
-          (assignment_for_user.lock_at && assignment_for_user.lock_at <= Time.now))
-        locked = { :asset_string => self.asset_string, 
-                   :unlock_at    => assignment_for_user.unlock_at,
-                   :lock_at      => assignment_for_user.lock_at }
+      if (assignment_for_user.unlock_at && assignment_for_user.unlock_at > Time.now)
+        locked = {:asset_string => assignment_for_user.asset_string, :unlock_at => assignment_for_user.unlock_at}
+      elsif (assignment_for_user.lock_at && assignment_for_user.lock_at < Time.now)
+        locked = {:asset_string => assignment_for_user.asset_string, :lock_at => assignment_for_user.lock_at}
       elsif self.could_be_locked && item = locked_by_module_item?(user, opts[:deep_check_if_needed])
         locked = {:asset_string => self.asset_string, :context_module => item.context_module.attributes}
       end
@@ -819,7 +821,9 @@ class Assignment < ActiveRecord::Base
   end
 
   set_policy do
-    given { |user, session| self.cached_context_grants_right?(user, session, :read) }
+    given { |user, session| self.cached_context_grants_right?(user, session, :read) &&
+      (self.published? || self.available?)
+    }
     can :read and can :read_own_submission
 
     given { |user, session| self.submittable_type? &&
@@ -1156,6 +1160,10 @@ class Assignment < ActiveRecord::Base
                       :media_comment_type, :media_comment_id,
                       :cached_attachments, :attachments]
 
+    attachment_fields = [:id, :comment_id, :content_type, :context_id, :context_type,
+                         :crocodoc_available?, :display_name, :filename, :mime_class,
+                         :scribd_doc, :scribdable?, :size, :submitter_id, :workflow_state]
+
     res = as_json(
       :include => {
         :context => { :only => :id },
@@ -1194,7 +1202,16 @@ class Assignment < ActiveRecord::Base
             },
             :only => submission_fields,
             :methods => [:versioned_attachments, :late]
-          )
+          ).tap do |s|
+            if s['submission'] && s['submission']['versioned_attachments']
+              s['submission']['versioned_attachments'].map! do |a|
+                a.as_json(
+                  :only => attachment_fields,
+                  :methods => [:view_inline_ping_url]
+                )
+              end
+            end
+          end
         end
       end
       json
@@ -1445,6 +1462,9 @@ class Assignment < ActiveRecord::Base
 
   scope :order_by_base_due_at, order("assignments.due_at")
 
+  scope :unpublished, where(:workflow_state => 'unpublished')
+  scope :published, where(:workflow_state => 'published')
+
   def needs_publishing?
     self.due_at && self.due_at < 1.week.ago && self.available?
   end
@@ -1582,7 +1602,7 @@ class Assignment < ActiveRecord::Base
     item ||= context.assignments.new #new(:context => context)
     item.title = hash[:title]
     item.migration_id = hash[:migration_id]
-    item.workflow_state = 'available' if item.deleted?
+    item.workflow_state = (hash[:workflow_state] || 'available') if item.new_record? || item.deleted?
     if hash[:instructions_in_html] == false
       self.extend TextHelper
     end
@@ -1728,8 +1748,8 @@ class Assignment < ActiveRecord::Base
   end
 
   def allow_google_docs_submission?
-    self.submission_types && 
-      self.submission_types.match(/online_upload/) && 
+    self.submission_types &&
+      self.submission_types.match(/online_upload/) &&
       (self.allowed_extensions.blank? || self.allowed_extensions.grep(/doc|xls|ppt/).present?)
   end
 

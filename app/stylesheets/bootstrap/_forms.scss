@@ -383,6 +383,20 @@ select:focus:required:invalid {
 // FORM ACTIONS
 // ------------
 
+/*
+@styleguide Forms: Form Actions
+
+This is the standard form actions button bar at the bottom of every content form. Buttons may vary, but the styling or the container and button positions should be consistent
+
+```html
+<div class="form-actions">
+  <button class="btn">Cancel</button>
+  <button type="submit" class="btn btn-primary">Save changes</button>
+</div>
+```
+
+*/
+
 .form-actions {
   padding: ($baseLineHeight - 1) 20px $baseLineHeight;
   margin-top: $baseLineHeight;

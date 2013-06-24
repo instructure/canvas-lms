@@ -19,49 +19,47 @@
 # @API Assignment Groups
 #
 # API for accessing Assignment Group and Assignment information.
+#
+# @object Assignment Group
+#     {
+#       // the id of the Assignment Group
+#       id: 1,
+#
+#       // the name of the Assignment Group
+#       name: "group2",
+#
+#       // the position of the Assignment Group
+#       position: 7,
+#
+#       // the weight of the Assignment Group
+#       group_weight: 20,
+#
+#       // the assignments in this Assignment Group
+#       // (see the Assignment API for a detailed list of fields)
+#       assingments: { ... },
+#
+#       // the grading rules that this Assignment Group has
+#       rules: {
+#         "drop_lowest" => 1,
+#         "drop_highest" => 1,
+#         "never_drop" => [33,17,24]
+#       }
+#     }
+#
 class AssignmentGroupsController < ApplicationController
   before_filter :require_context
 
   include Api::V1::AssignmentGroup
 
   # @API List assignment groups
+  #
   # Returns the list of assignment groups for the current context. The returned
   # groups are sorted by their position field.
   #
-  # @argument include[] ["assignments"] Associations to include with the group.
+  # @argument include[] ["assignments","discussion_topic"] Associations to include with the group.
+  # "discussion_topic" is only valid if "assignments" is also included
   #
-  # @response_field id The unique identifier for the assignment group.
-  # @response_field name The name of the assignment group.
-  # @response_field position [Integer] The sorting order of this group in the
-  #   groups for this context.
-  #
-  # @example_response
-  #   [
-  #     {
-  #       "position": 7,
-  #       "name": "group2",
-  #       "id": 1,
-  #       "group_weight": 20,
-  #       "assignments": [...],
-  #       "rules" : {...}
-  #     },
-  #     {
-  #       "position": 10,
-  #       "name": "group1",
-  #       "id": 2,
-  #       "group_weight": 20,
-  #       "assignments": [...],
-  #       "rules" : {...}
-  #     },
-  #     {
-  #       "position": 12,
-  #       "name": "group3",
-  #       "id": 3,
-  #       "group_weight": 60,
-  #       "assignments": [...],
-  #       "rules" : {...}
-  #     }
-  #   ]
+  # @returns [Assignment Group]
   def index
     @groups = @context.assignment_groups.active
 
@@ -100,7 +98,7 @@ class AssignmentGroupsController < ApplicationController
       end
     end
   end
-  
+
   def reorder_assignments
     @group = @context.assignment_groups.find(params[:assignment_group_id])
     if authorized_action(@group, @current_user, :update)
@@ -116,7 +114,7 @@ class AssignmentGroupsController < ApplicationController
       end
     end
   end
-  
+
   def show
     @assignment_group = @context.assignment_groups.find(params[:id])
     if @assignment_group.deleted?
@@ -178,14 +176,7 @@ class AssignmentGroupsController < ApplicationController
       end
 
       if params[:move_assignments_to]
-        @new_group = @context.assignment_groups.active.find(params[:move_assignments_to])
-        order = @new_group.assignments.active.map(&:id)
-        ids_to_change = @assignment_group.assignments.active.map(&:id)
-        order += ids_to_change
-        Assignment.where(:id => ids_to_change).update_all(:assignment_group_id => @new_group, :updated_at => Time.now.utc) unless ids_to_change.empty?
-        Assignment.find_by_id(order).update_order(order) unless order.empty?
-        @new_group.touch
-        @assignment_group.reload
+        @assignment_group.move_assignments_to params[:move_assignments_to]
       end
       @assignment_group.destroy
 

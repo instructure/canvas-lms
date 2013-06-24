@@ -1667,6 +1667,24 @@ describe CoursesController, :type => :integration do
       json.map{ |el| el['id'] }.should == [@student2.id, @student3.id, @student1.id]
     end
   end
+
+  it "should return the activity stream" do
+    course_with_teacher(:active_all => true, :user => user_with_pseudonym)
+    @context = @course
+    @topic1 = discussion_topic_model
+    json = api_call(:get, "/api/v1/courses/#{@course.id}/activity_stream.json",
+                    { controller: "courses", course_id: @course.id.to_s, action: "activity_stream", format: 'json' })
+    json.size.should == 1
+  end
+
+  it "should return the activity stream summary" do
+    course_with_teacher(:active_all => true, :user => user_with_pseudonym)
+    @context = @course
+    @topic1 = discussion_topic_model
+    json = api_call(:get, "/api/v1/courses/#{@course.id}/activity_stream/summary.json",
+                    { controller: "courses", course_id: @course.id.to_s, action: "activity_stream_summary", format: 'json' })
+    json.should == [{"type" => "DiscussionTopic", "count" => 1, "unread_count" => 1, "notification_category" => nil}]
+  end
 end
 
 def each_copy_option

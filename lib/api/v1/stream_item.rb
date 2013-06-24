@@ -21,7 +21,7 @@ module Api::V1::StreamItem
   include Api::V1::Collection
   include Api::V1::Submission
 
-  def stream_item_json(stream_item, current_user, session)
+  def stream_item_json(stream_item_instance, stream_item, current_user, session)
     data = stream_item.data(current_user.id)
     {}.tap do |hash|
 
@@ -32,6 +32,7 @@ module Api::V1::StreamItem
       hash['title'] = data.respond_to?(:title) ? data.title : nil
       hash['message'] = data.respond_to?(:body) ? data.body : nil
       hash['type'] = stream_item.data.class.name
+      hash['read_state'] = stream_item_instance.read?
       hash.merge!(context_data(stream_item))
       context_type, context_id = stream_item.context_type.try(:underscore), stream_item.context_id
 
@@ -119,6 +120,25 @@ module Api::V1::StreamItem
       scope = @current_user.visible_stream_item_instances(opts).includes(:stream_item)
       Api.paginate(scope, self, self.send(paginate_url, @context)).to_a
     end
-    render :json => items.map(&:stream_item).compact.map { |i| stream_item_json(i, @current_user, session) }
+    render :json => items.select(&:stream_item).map { |i| stream_item_json(i, i.stream_item, @current_user, session) }
+  end
+
+  def api_render_stream_summary(contexts = nil)
+    opts = {}
+    opts[:contexts] = contexts
+    items = @current_user.shard.activate do
+      # not ideal, but 1. we can't aggregate in the db (boo yml) and
+      # 2. stream_item_json is where categorizing logic lives :(
+      @current_user.visible_stream_item_instances(opts).includes(:stream_item).map { |i|
+        stream_item_json(i, i.stream_item, @current_user, session)
+      }.inject({}) { |result, i|
+        key = [i['type'], i['notification_category']]
+        result[key] ||= {type: i['type'], count: 0, unread_count: 0, notification_category: i['notification_category']}
+        result[key][:count] += 1
+        result[key][:unread_count] += 1 if !i['read_state']
+        result
+      }.values.sort_by{ |i| i[:type] }
+    end
+    render :json => items
   end
 end

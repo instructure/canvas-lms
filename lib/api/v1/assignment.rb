@@ -19,6 +19,8 @@
 module Api::V1::Assignment
   include Api::V1::Json
   include ApplicationHelper
+  include Api::V1::ExternalTools::UrlHelpers
+  include Api::V1::Locked
 
   API_ALLOWED_ASSIGNMENT_OUTPUT_FIELDS = {
     :only => %w(
@@ -47,7 +49,10 @@ module Api::V1::Assignment
     )
   }
 
-  def assignment_json(assignment, user, session,include_discussion_topic = true,submission= nil)
+  def assignment_json(assignment, user, session, include_discussion_topic = true, submission = nil, override_dates = true)
+    if override_dates && !assignment.new_record?
+      assignment = assignment.overridden_for(user)
+    end
     fields = assignment.new_record? ? API_ASSIGNMENT_NEW_RECORD_FIELDS : API_ALLOWED_ASSIGNMENT_OUTPUT_FIELDS
     hash = api_json(assignment, user, session, fields)
     hash['course_id'] = assignment.context_id
@@ -80,15 +85,14 @@ module Api::V1::Assignment
         'new_tab' => external_tool_tag.new_tab,
         'resource_link_id' => external_tool_tag.opaque_identifier(:asset_string)
       }
+      hash['url'] = sessionless_launch_url(@context,
+                                           :launch_type => 'assessment',
+                                           :assignment_id => assignment.id)
     end
 
     if assignment.automatic_peer_reviews? && assignment.peer_reviews?
       hash['peer_review_count'] = assignment.peer_review_count
       hash['peer_reviews_assign_at'] = assignment.peer_reviews_assign_at
-    end
-
-    if hash['lock_info']
-      hash['lock_explanation'] = lock_explanation(hash['lock_info'], 'assignment', assignment.context)
     end
 
     if assignment.grants_right?(user, :grade)
@@ -136,9 +140,16 @@ module Api::V1::Assignment
         !:include_assignment)
     end
 
+    #show published/unpublished if account.settings[:enable_draft]
+    if @domain_root_account.enable_draft?
+      hash['published'] = ! assignment.unpublished?
+    end
+
     if submission
       hash['submission'] = submission_json(submission,assignment,user,session)
     end
+
+    locked_json(hash, assignment, user, 'assignment')
 
     hash
   end
@@ -283,6 +294,13 @@ module Api::V1::Assignment
 
     if update_params.has_key?("description")
       update_params["description"] = process_incoming_html_content(update_params["description"])
+    end
+
+    if @domain_root_account.enable_draft?
+      if assignment_params.has_key? "published"
+        published = value_to_boolean(assignment_params['published'])
+        assignment.workflow_state = published ? 'published' : 'unpublished'
+      end
     end
 
     assignment.updating_user = @current_user

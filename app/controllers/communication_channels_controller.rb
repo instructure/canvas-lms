@@ -126,6 +126,7 @@ class CommunicationChannelsController < ApplicationController
     end
 
     @cc.user = @user
+    @cc.re_activate! if @cc.retired?
     @cc.workflow_state = skip_confirmation ? 'active' : 'unconfirmed'
     @cc.build_pseudonym_on_confirm = params[:build_pseudonym].to_i > 0
 

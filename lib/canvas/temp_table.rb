@@ -18,14 +18,13 @@ module Canvas
           case @connection.adapter_name
             when 'PostgreSQL'
               @connection.execute "ALTER TABLE #{@name}
-                                   ADD temp_primary_key SERIAL"
+                                   ADD temp_primary_key SERIAL PRIMARY KEY"
             when 'MySQL', 'Mysql2'
               @connection.execute "ALTER TABLE #{@name}
-                                   ADD temp_primary_key MEDIUMINT NOT NULL AUTO_INCREMENT"
+                                   ADD temp_primary_key MEDIUMINT NOT NULL PRIMARY KEY AUTO_INCREMENT"
             else
               raise "Temp tables not supported!"
           end
-          @connection.execute "create index #{@name}_index ON #{@name}(#{@index})"
 
           yield self
         ensure

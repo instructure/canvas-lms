@@ -38,6 +38,11 @@ module AttachmentHelper
     end
     attrs[:attachment_id] = attachment.id
     attrs[:mimetype] = attachment.mimetype
+    context_name = url_helper_context_from_object(attachment.context)
+    url_helper = "#{context_name}_file_inline_view_url"
+    if self.respond_to?(url_helper)
+      attrs[:attachment_view_inline_ping_url] = self.send(url_helper, attachment.context, attachment.id)
+    end
     attrs.inject("") { |s,(attr,val)| s << "data-#{attr}=#{val} " }
   end
 end

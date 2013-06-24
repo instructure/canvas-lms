@@ -32,14 +32,23 @@
 #       description: "<p>Do the following:</p>...",
 #
 #       // the due date for the assignment. returns null if not present.
+#       // NOTE: If this assignment has assignment overrides, this field
+#       // will be the due date as it applies to the user requesting
+#       // information from the API.
 #       due_at: "2012-07-01T23:59:00-06:00",
 #
 #       // the lock date (assignment is locked after this date). returns
 #       // null if not present.
+#       // NOTE: If this assignment has assignment overrides, this field
+#       // will be the lock date as it applies to the user requesting
+#       // information from the API.
 #       lock_at: "2012-07-01T23:59:00-06:00",
 #
 #       // the unlock date (assignment is unlocked after this date)
 #       // returns null if not present
+#       // NOTE: If this assignment has assignment overrides, this field
+#       // will be the unlock date as it applies to the user requesting
+#       // information from the API.
 #       unlock_at: "2012-07-01T23:59:00-06:00",
 #
 #       // the ID of the course the assignment belongs to
@@ -155,7 +164,29 @@
 #       // Valid if grading_type is "letter_grade".
 #       grading_standard_id: null,
 #
-#       // (Optional) explanation of lock status
+#       // (Only visible if 'enable draft' account setting is on)
+#       // whether the assignment is published
+#       published: true,
+#
+#       // Whether or not this is locked for the user.
+#       locked_for_user: false,
+#
+#       // (Optional) Information for the user about the lock. Present when locked_for_user is true.
+#       lock_info: {
+#         // Asset string for the object causing the lock
+#         asset_string: "assignment_4",
+#
+#         // (Optional) Time at which this was/will be unlocked.
+#         unlock_at: "2013-01-01T00:00:00-06:00",
+#
+#         // (Optional) Time at which this was/will be locked.
+#         lock_at: "2013-02-01T00:00:00-06:00",
+#
+#         // (Optional) Context module causing the lock.
+#         context_module: { ... }
+#       },
+#
+#       // (Optional) An explanation of why this is locked for the user. Present when locked_for_user is true.
 #       lock_explanation: "This assignment is locked until September 1 at 12:00am",
 #
 #       // (Optional) id of the associated quiz (applies only when submission_types is ["online_quiz"])
@@ -268,14 +299,21 @@ class AssignmentsApiController < ApplicationController
           includes(:assignment_group, :rubric_association, :rubric).
           reorder("assignment_groups.position, assignments.position")
 
+      #fake assignment used for checking if the @current_user can read unpublished assignments
+      fake = @context.assignments.new
+      fake.workflow_state = 'unpublished'
+
+      if @domain_root_account.enable_draft? && !fake.grants_right?(@current_user, session, :read)
+        #user is a student and assignment is not published
+        @assignments = @assignments.published
+      end
+
       if Array(params[:include]).include?('submission')
         submissions = Hash[
-          @context.submissions.where(:assignment_id => @assignments).
-                                    except(:includes).
-                                    for_user(@current_user).
-                                    map do |s|
-                                      [s.assignment_id,s]
-                                    end
+          @context.submissions.except(:includes).
+            where(:assignment_id => @assignments).
+            for_user(@current_user).
+            map { |s| [s.assignment_id,s] }
         ]
       else
         submissions = {}
@@ -298,6 +336,13 @@ class AssignmentsApiController < ApplicationController
     if authorized_action(@context, @current_user, :read)
       @assignment = @context.active_assignments.find(params[:id],
           :include => [:assignment_group, :rubric_association, :rubric])
+
+      if @domain_root_account.enable_draft? && !@assignment.grants_right?(@current_user, session, :read)
+        #assignment is not published and user is a student
+        render_unauthorized_action @assignment
+        return
+      end
+
       if Array(params[:include]).include?('submission')
         submission = @assignment.submissions.for_user(@current_user).first
       else
@@ -423,6 +468,11 @@ class AssignmentsApiController < ApplicationController
   # @argument assignment[assignment_overrides] [Optional, [AssignmentOverride]]
   #   List of overrides for the assignment.
   #   NOTE: The assignment overrides feature is in beta.
+  #
+  # @argument assignment[published] [Boolean] [Optional]
+  #   Whether this assignment is published.
+  #   (Only useful if 'enable draft' account setting is on)
+  #   Unpublished assignments are not visible to students.
   #
   # @returns Assignment
   def create

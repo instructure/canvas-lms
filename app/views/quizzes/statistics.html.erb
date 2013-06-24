@@ -2,7 +2,7 @@
 <% js_bundle :quiz_statistics %>
 <% content_for :stylesheets do %>
 <style>
-#statistics { 
+#statistics {
   width: 100%;
   border-collapse: collapse;
 }
@@ -54,9 +54,9 @@ tr.question td .number_answer.correct_answer {
   min-width: 50px;
 }
 #statistics .response_bar {
-  margin: 100px 5px 0; 
-  width: auto; 
-  border: 1px solid #999; 
+  margin: 100px 5px 0;
+  width: auto;
+  border: 1px solid #999;
   background: #bbb;
   height: 0px;
 }
@@ -126,58 +126,60 @@ tr.question td .number_answer.correct_answer {
 </style>
 <% end %>
 <% content_for :right_side do %>
-  <h2><%= @quiz.survey? ?
-    t('headers.users_have_taken_this_survey', "%{count} users have taken this survey", :count => @statistics[:unique_submission_count]) :
-    t('headers.users_have_taken_this_quiz', "%{count} users have taken this quiz", :count => @statistics[:unique_submission_count]) %></h2>
-  <div class="rs-margin-lr rs-margin-bottom">
-    <table id="statistics_summary">
-      <tr>
-        <td><%= before_label(:average_time, "Average Time") %></td>
-        <td><%= time_ago_in_words(Time.now + @statistics[:submission_duration_average]) %></td>
-      </tr>
-    <% if @quiz.graded? %>
-      <tr>
-        <td><%= before_label(:average_correct, "Average Correct") %></td>
-        <td><%= render_score(@statistics[:submission_correct_count_average]) %></td>
-      </tr><tr>
-        <td><%= before_label(:average_incorrect, "Average Incorrect") %></td>
-        <td><%= render_score(@statistics[:submission_incorrect_count_average]) %></td>
-      </tr><tr>
-        <td><%= before_label(:high_score, "High Score") %></td>
-        <td><%= render_score(@statistics[:submission_score_high]) %></td>
-      </tr><tr>
-        <td><%= before_label(:low_score, "Low Score") %></td>
-        <td><%= render_score(@statistics[:submission_score_low]) %></td>
-      </tr><tr>
-        <td><%= before_label(:mean_score, "Mean Score") %></td>
-        <td><%= render_score(@statistics[:submission_score_average]) %></td>
-      </tr><tr>
-        <td><%= before_label(:standard_deviation, "Standard Deviation") %></td>  
-        <td><%= render_score(@statistics[:submission_score_stdev]) %></td>
-      </tr>
-    <% end %>
-    </table>
-  </div>
+  <% if !@context.large_roster? %>
+    <h2><%= @quiz.survey? ?
+      t('headers.users_have_taken_this_survey', "%{count} users have taken this survey", :count => @statistics[:unique_submission_count]) :
+      t('headers.users_have_taken_this_quiz', "%{count} users have taken this quiz", :count => @statistics[:unique_submission_count]) %></h2>
+    <div class="rs-margin-lr rs-margin-bottom">
+      <table id="statistics_summary">
+        <tr>
+          <td><%= before_label(:average_time, "Average Time") %></td>
+          <td><%= time_ago_in_words(Time.now + @statistics[:submission_duration_average]) %></td>
+        </tr>
+      <% if @quiz.graded? %>
+        <tr>
+          <td><%= before_label(:average_correct, "Average Correct") %></td>
+          <td><%= render_score(@statistics[:submission_correct_count_average]) %></td>
+        </tr><tr>
+          <td><%= before_label(:average_incorrect, "Average Incorrect") %></td>
+          <td><%= render_score(@statistics[:submission_incorrect_count_average]) %></td>
+        </tr><tr>
+          <td><%= before_label(:high_score, "High Score") %></td>
+          <td><%= render_score(@statistics[:submission_score_high]) %></td>
+        </tr><tr>
+          <td><%= before_label(:low_score, "Low Score") %></td>
+          <td><%= render_score(@statistics[:submission_score_low]) %></td>
+        </tr><tr>
+          <td><%= before_label(:mean_score, "Mean Score") %></td>
+          <td><%= render_score(@statistics[:submission_score_average]) %></td>
+        </tr><tr>
+          <td><%= before_label(:standard_deviation, "Standard Deviation") %></td>
+          <td><%= render_score(@statistics[:submission_score_stdev]) %></td>
+        </tr>
+      <% end %>
+      </table>
+    </div>
+  <% end %>
   <div class="rs-margin-lr">
     <% if params[:all_versions] %>
-      <% if @statistics[:multiple_attempts_exist] %>
+      <% if (@statistics && @statistics[:multiple_attempts_exist]) || @context.large_roster? %>
         <%= @quiz.survey? ?
           t(:survey_all_version_disclaimer, "This report is showing survey statistics based on all attempts for all users.") :
           t(:quiz_all_version_disclaimer, "This report is showing quiz statistics based on all attempts for all users.") %><br/>
       <% end %>
       <div style="margin-top: 5px;">
-        <% if @statistics[:multiple_attempts_exist] %>
+        <% if (@statistics && @statistics[:multiple_attempts_exist]) || @context.large_roster? %>
           <a href="<%= context_url(@context, :context_quiz_statistics_url, @quiz.id) %>" class="btn button-sidebar-wide"><%= t('links.count_only_latest_attempts', "Count Only Each Latest Attempt") %></a>
         <% end %>
       </div>
     <% else %>
-      <% if @statistics[:multiple_attempts_exist] %>
+      <% if (@statistics && @statistics[:multiple_attempts_exist]) || @context.large_roster? %>
         <%= @quiz.survey? ?
           t(:survey_latest_version_disclaimer, "This report is showing survey statistics based on the latest attempt for each user.") :
           t(:quiz_latest_version_disclaimer, "This report is showing quiz statistics based on the latest attempt for each user.") %><br/>
       <% end %>
       <div style="margin-top: 5px;">
-        <% if @statistics[:multiple_attempts_exist] %>
+        <% if (@statistics && @statistics[:multiple_attempts_exist]) || @context.large_roster? %>
           <a href="<%= context_url(@context, :context_quiz_statistics_url, @quiz.id, :all_versions => '1') %>" class="btn button-sidebar-wide"><%= mt('links.count_all_attempts', "Count **All** Attempts") %></a>
         <% end %>
       </div>
@@ -185,43 +187,48 @@ tr.question td .number_answer.correct_answer {
     <div class="quiz-reports"></div>
   </div>
 <% end %>
-<h2><%= @quiz.survey? ? t('headers.survey_statistics', "Survey Statistics") : t('headers.quiz_statistics', "Quiz Statistics") %></h2> 
-<table id="statistics">
-<% @statistics[:questions].each do |question_type, data| %>
-  <% if question_type == 'group' %>
-    <tr class="group group_row">
-      <td colspan="3" class="group_name"><%= data[:name] %></td>
-    </tr>
-    <% data[:questions].each do |question_type, question| %>
-      <%= render :partial => 'question_statistic', :object => question, :locals => {:in_group => true, :ignore_correct_answers => @quiz.quiz_type == 'survey' || @quiz.quiz_type == 'graded_survey'} %>
-    <% end %>
-    <tr class="group_bottom">
-      <td colspan="3">&nbsp;</td>
-    </tr>
-  <% else %>
-    <%= render :partial => 'question_statistic', :object => data, :locals => {:ignore_correct_answers => @quiz.quiz_type == 'survey' || @quiz.quiz_type == 'graded_survey'} %>
-  <% end %>
-<% end %>
-</table>
-<div id="submitted_users" style="display: none;">
-  <% @submitted_users.each_with_index do |user, idx| %>
-    <div class="user user_<%= user.id %>">
-      <% if @quiz.survey? && @quiz.anonymous_submissions %>
-        <%= t(:student_n, "Student %{n}", :n => idx + 1) %>
-      <% else %>
-        <%= user.short_name %>
-      <% end %>
-    </div>
-  <% end %>
-</div>
-<div id="submitted_users_dialog" style="display: none;">
-  <h2><%= t('headers.for_question', "For %{question_name}", :question_name => raw('<span class="question_name" style="font-style: italic;">&nbsp;</span>')) %></h2>
-  <div><%= before_label(:users_selected_the_answer, "The following users selected the answer, %{answer_text}", :answer_text => raw('<span class="answer_text" style="font-style: italic;">&nbsp;</span>')) %></div>
-  <ul class="users">
-    <li class="user blank" style="display: none;">
-      <a href="#" class="name user">&nbsp;</a>
-      <span class="name uncounted">&nbsp;</span>
-    </li>
-  </ul>
-</div>
 
+<% if !@context.large_roster? %>
+  <h2><%= @quiz.survey? ? t('headers.survey_statistics', "Survey Statistics") : t('headers.quiz_statistics', "Quiz Statistics") %></h2>
+  <table id="statistics">
+  <% @statistics[:questions].each do |question_type, data| %>
+    <% if question_type == 'group' %>
+      <tr class="group group_row">
+        <td colspan="3" class="group_name"><%= data[:name] %></td>
+      </tr>
+      <% data[:questions].each do |question_type, question| %>
+        <%= render :partial => 'question_statistic', :object => question, :locals => {:in_group => true, :ignore_correct_answers => @quiz.quiz_type == 'survey' || @quiz.quiz_type == 'graded_survey'} %>
+      <% end %>
+      <tr class="group_bottom">
+        <td colspan="3">&nbsp;</td>
+      </tr>
+    <% else %>
+      <%= render :partial => 'question_statistic', :object => data, :locals => {:ignore_correct_answers => @quiz.quiz_type == 'survey' || @quiz.quiz_type == 'graded_survey'} %>
+    <% end %>
+  <% end %>
+  </table>
+  <div id="submitted_users" style="display: none;">
+    <% @submitted_users.each_with_index do |user, idx| %>
+      <div class="user user_<%= user.id %>">
+        <% if @quiz.survey? && @quiz.anonymous_submissions %>
+          <%= t(:student_n, "Student %{n}", :n => idx + 1) %>
+        <% else %>
+          <%= user.short_name %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+  <div id="submitted_users_dialog" style="display: none;">
+    <h2><%= t('headers.for_question', "For %{question_name}", :question_name => raw('<span class="question_name" style="font-style: italic;">&nbsp;</span>')) %></h2>
+    <div><%= before_label(:users_selected_the_answer, "The following users selected the answer, %{answer_text}", :answer_text => raw('<span class="answer_text" style="font-style: italic;">&nbsp;</span>')) %></div>
+    <ul class="users">
+      <li class="user blank" style="display: none;">
+        <a href="#" class="name user">&nbsp;</a>
+        <span class="name uncounted">&nbsp;</span>
+      </li>
+    </ul>
+  </div>
+
+<% else %>
+  <p><%= t(:class_too_large, "This course is too large to display statistics. They can still be downloaded from the right hand sidebar.") %></p>
+<% end %>

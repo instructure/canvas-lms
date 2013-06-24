@@ -75,7 +75,7 @@ class ContextModulesApiController < ApplicationController
       scope = @context.modules_visible_to(@current_user)
       modules = Api.paginate(scope, self, route)
       modules_and_progressions = if @context.grants_right?(@current_user, session, :participate_as_student)
-        modules.map { |m| [m, m.evaluate_for(@current_user)] }
+        modules.map { |m| [m, m.evaluate_for(@current_user, true)] }
       else
         modules.map { |m| [m, nil] }
       end
@@ -95,7 +95,7 @@ class ContextModulesApiController < ApplicationController
   def show
     if authorized_action(@context, @current_user, :read)
       mod = @context.modules_visible_to(@current_user).find(params[:id])
-      prog = @context.grants_right?(@current_user, session, :participate_as_student) ? mod.evaluate_for(@current_user) : nil
+      prog = @context.grants_right?(@current_user, session, :participate_as_student) ? mod.evaluate_for(@current_user, true) : nil
       render :json => module_json(mod, @current_user, session, prog)
     end
   end
@@ -136,7 +136,10 @@ class ContextModulesApiController < ApplicationController
       modules.each do |mod|
         case event
           when 'publish'
-            mod.publish unless mod.active?
+            unless mod.active?
+              mod.publish
+              mod.publish_items!
+            end
           when 'unpublish'
             mod.unpublish unless mod.unpublished?
           when 'delete'
@@ -207,8 +210,7 @@ class ContextModulesApiController < ApplicationController
   # @argument module[require_sequential_progress] [Optional] Whether module items must be unlocked in order
   # @argument module[prerequisite_module_ids][] [Optional] IDs of Modules that must be completed before this one is unlocked
   #   Prerequisite modules must precede this module (i.e. have a lower position value), otherwise they will be ignored
-  # @undocumented @argument module[publish] [Optional] Set to publish the module
-  # @undocumented @argument module[unpublish] [Optional] Set to unpublish the module
+  # @argument module[published] [Optional] Whether the module is published and visible to students
   #
   # @example_request
   #
@@ -235,10 +237,13 @@ class ContextModulesApiController < ApplicationController
         end
       end
 
-      if params[:module].delete :publish
-        @module.publish
-      elsif params[:module].delete :unpublish
-        @module.unpublish
+      if params[:module].has_key?(:published)
+        if value_to_boolean(params[:module][:published])
+          @module.publish
+          @module.publish_items!
+        else
+          @module.unpublish
+        end
       end
 
       if @module.update_attributes(module_parameters) && set_position

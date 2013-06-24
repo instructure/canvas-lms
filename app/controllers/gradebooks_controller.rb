@@ -106,7 +106,7 @@ class GradebooksController < ApplicationController
     @enrollment ||= @context.all_student_enrollments.find_by_user_id(@current_user.id) if !@context.grants_right?(@current_user, session, :manage_grades)
     add_crumb t(:crumb, 'Attendance')
     if !@enrollment && @context.grants_right?(@current_user, session, :manage_grades)
-      @assignments = @context.assignments.active.select{|a| a.submission_types == "attendance" }
+      @assignments = @context.assignments.active.where(:submission_types => 'attendance').all
       @students = @context.students_visible_to(@current_user).order_by_sortable_name
       @submissions = @context.submissions
       @at_least_one_due_at = @assignments.any?{|a| a.due_at }
@@ -115,7 +115,7 @@ class GradebooksController < ApplicationController
       # in the list...
       @default_group_id = @assignments.to_a.count_per(&:assignment_group_id).sort_by{|id, cnt| cnt }.reverse.first[0] rescue nil
     elsif @enrollment && @enrollment.grants_right?(@current_user, session, :read_grades)
-      @assignments = @context.assignments.active.select{|a| a.submission_types == "attendance" }
+      @assignments = @context.assignments.active.where(:submission_types => 'attendance').all
       @students = @context.students_visible_to(@current_user).order_by_sortable_name
       @submissions = @context.submissions.find_all_by_user_id(@enrollment.user_id)
       @user = @enrollment.user
@@ -161,7 +161,7 @@ class GradebooksController < ApplicationController
             @new_submissions = @submissions
             if params[:updated]
               d = DateTime.parse(params[:updated])
-              @new_submissions = @submissions.select{|s| s.updated_at > d}
+              @new_submissions = @submissions.where("updated_at>?", d).all
             end
             @enrollments_hash = Hash.new{ |hash,key| hash[key] = [] }
             @context.enrollments.sort_by{|e| [e.state_sortable, e.rank_sortable] }.each{ |e| @enrollments_hash[e.user_id] << e }

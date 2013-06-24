@@ -22,6 +22,11 @@ define [
     attach: ->
       @model.on 'change', @renderOrTeardownResults
 
+    setAllReadState: (newReadState) ->
+      if @collection?
+        @collection.fullCollection.each (entry) ->
+          entry.set 'read_state', newReadState
+
     resetCollection: (models) =>
       collection = new EntryCollection models, perPage: 10
       @collection = collection.getPageAsCollection 0

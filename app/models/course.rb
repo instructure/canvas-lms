@@ -762,7 +762,7 @@ class Course < ActiveRecord::Base
     :singleton => proc { |c| "recompute_student_scores:#{ c.global_id }" }
 
   def home_page
-    self.wiki.wiki_page
+    self.wiki.front_page
   end
 
   def context_code
@@ -1166,7 +1166,7 @@ class Course < ActiveRecord::Base
 
   def account_users_for(user)
     return [] unless user
-    @associated_account_ids ||= (self.associated_accounts + [Account.site_admin]).map { |a| a.active? ? a.id: nil }.compact
+    @associated_account_ids ||= (self.associated_accounts + [Account.site_admin]).map { |a| a.active? ? a.id : nil }.compact
     @account_users ||= {}
     @account_users[user] ||= Shard.partition_by_shard(@associated_account_ids) do |account_chain_ids|
       if account_chain_ids == [Account.site_admin.id]
@@ -1835,7 +1835,7 @@ class Course < ActiveRecord::Base
       path = file['path_name'].starts_with?('/') ? file['path_name'][1..-1] : file['path_name']
       self.attachment_path_id_lookup[path] = file['migration_id']
       self.attachment_path_id_lookup_lower[path.downcase] = file['migration_id']
-      if migration.import_object?("files", file['migration_id'])
+      if migration.import_object?("attachments", file['migration_id']) || migration.import_object?("files", file['migration_id'])
         valid_paths << path
       end
     end
@@ -1849,7 +1849,7 @@ class Course < ActiveRecord::Base
         current += 1
         if (current - last) > 10
           last = current
-          migration.fast_update_progress((current.to_f/total) * 18.0)
+          migration.update_import_progress((current.to_f/total) * 18.0)
         end
       end
       unzip_opts = {
@@ -1866,7 +1866,7 @@ class Course < ActiveRecord::Base
           root_path, migration.context)
       end
       unzipper = UnzipAttachment.new(unzip_opts)
-      migration.fast_update_progress(1.0)
+      migration.update_import_progress(1.0)
       unzipper.process
     end
   end
@@ -1895,42 +1895,42 @@ class Course < ActiveRecord::Base
     if !migration.for_course_copy?
       # These only need to be processed once
       Attachment.skip_media_object_creation do
-        process_migration_files(data, migration); migration.fast_update_progress(18)
-        Attachment.process_migration(data, migration); migration.fast_update_progress(20)
+        process_migration_files(data, migration); migration.update_import_progress(18)
+        Attachment.process_migration(data, migration); migration.update_import_progress(20)
         mo_attachments = self.imported_migration_items.find_all { |i| i.is_a?(Attachment) && i.media_entry_id.present? }
         import_media_objects(mo_attachments, migration)
       end
     end
 
-    migration.fast_update_progress(31)
-    question_data = AssessmentQuestion.process_migration(data, migration); migration.fast_update_progress(35)
-    Group.process_migration(data, migration); migration.fast_update_progress(36)
-    LearningOutcome.process_migration(data, migration); migration.fast_update_progress(37)
-    Rubric.process_migration(data, migration); migration.fast_update_progress(38)
+    migration.update_import_progress(31)
+    question_data = AssessmentQuestion.process_migration(data, migration); migration.update_import_progress(35)
+    Group.process_migration(data, migration); migration.update_import_progress(36)
+    LearningOutcome.process_migration(data, migration); migration.update_import_progress(37)
+    Rubric.process_migration(data, migration); migration.update_import_progress(38)
     @assignment_group_no_drop_assignments = {}
-    AssignmentGroup.process_migration(data, migration); migration.fast_update_progress(39)
-    ExternalFeed.process_migration(data, migration); migration.fast_update_progress(39.5)
-    GradingStandard.process_migration(data, migration); migration.fast_update_progress(40)
-    Quiz.process_migration(data, migration, question_data); migration.fast_update_progress(50)
-    ContextExternalTool.process_migration(data, migration); migration.fast_update_progress(54)
+    AssignmentGroup.process_migration(data, migration); migration.update_import_progress(39)
+    ExternalFeed.process_migration(data, migration); migration.update_import_progress(39.5)
+    GradingStandard.process_migration(data, migration); migration.update_import_progress(40)
+    Quiz.process_migration(data, migration, question_data); migration.update_import_progress(50)
+    ContextExternalTool.process_migration(data, migration); migration.update_import_progress(54)
 
     #These need to be ran twice because they can reference each other
-    DiscussionTopic.process_migration(data, migration);migration.fast_update_progress(55)
-    WikiPage.process_migration(data, migration);migration.fast_update_progress(60)
-    Assignment.process_migration(data, migration);migration.fast_update_progress(65)
-    ContextModule.process_migration(data, migration);migration.fast_update_progress(70)
+    DiscussionTopic.process_migration(data, migration);migration.update_import_progress(55)
+    WikiPage.process_migration(data, migration);migration.update_import_progress(60)
+    Assignment.process_migration(data, migration);migration.update_import_progress(65)
+    ContextModule.process_migration(data, migration);migration.update_import_progress(70)
     # and second time...
-    DiscussionTopic.process_migration(data, migration);migration.fast_update_progress(75)
-    WikiPage.process_migration(data, migration);migration.fast_update_progress(80)
-    Assignment.process_migration(data, migration);migration.fast_update_progress(85)
+    DiscussionTopic.process_migration(data, migration);migration.update_import_progress(75)
+    WikiPage.process_migration(data, migration);migration.update_import_progress(80)
+    Assignment.process_migration(data, migration);migration.update_import_progress(85)
 
     #These aren't referenced by anything, but reference other things
-    CalendarEvent.process_migration(data, migration);migration.fast_update_progress(90)
-    WikiPage.process_migration_course_outline(data, migration);migration.fast_update_progress(95)
+    CalendarEvent.process_migration(data, migration);migration.update_import_progress(90)
+    WikiPage.process_migration_course_outline(data, migration);migration.update_import_progress(95)
 
     everything_selected = !migration.copy_options || migration.is_set?(migration.copy_options[:everything])
     if everything_selected || migration.is_set?(migration.copy_options[:all_course_settings])
-      import_settings_from_migration(data, migration); migration.fast_update_progress(96)
+      import_settings_from_migration(data, migration); migration.update_import_progress(96)
     end
 
     syllabus_should_be_added = everything_selected || migration.copy_options[:syllabus_body]
@@ -1943,8 +1943,7 @@ class Course < ActiveRecord::Base
 
     begin
       #Adjust dates
-      if bool_res(params[:copy][:shift_dates])
-        shift_options = (bool_res(params[:copy][:shift_dates]) rescue false) ? params[:copy] : {}
+      if shift_options = migration.date_shift_options
         shift_options = shift_date_options(self, shift_options)
         @imported_migration_items.each do |event|
           if event.is_a?(Assignment)
@@ -2089,7 +2088,7 @@ class Course < ActiveRecord::Base
     total = attachments.count + 1
 
     attachments.each_with_index do |file, i|
-      cm.fast_update_progress((i.to_f/total) * 18.0) if cm && (i % 10 == 0)
+      cm.update_import_progress((i.to_f/total) * 18.0) if cm && (i % 10 == 0)
 
       if !ce || ce.export_object?(file)
         begin
@@ -2187,7 +2186,7 @@ class Course < ActiveRecord::Base
         added_items << new_tool
       end
     end
-    course.assignments.no_graded_quizzes_or_topics.active.select{|a| a.assignment_group_id }.each do |assignment|
+    course.assignments.no_graded_quizzes_or_topics.active.where("assignment_group_id IS NOT NULL").each do |assignment|
       course_import.tick(15) if course_import
       if bool_res(options[:everything]) || bool_res(options[:all_assignments]) || bool_res(options[assignment.asset_string.to_sym])
         new_assignment = assignment.clone_for(self, nil, :migrate => false)

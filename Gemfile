@@ -41,7 +41,7 @@ gem 'highline',       '1.6.1'
 gem 'i18n',           CANVAS_RAILS3 ? '0.5.0' : '0.6.0'
 gem 'icalendar',      '1.1.5'
 gem 'jammit',         '0.6.0'
-gem 'json',           '1.5.5'
+gem 'json',           '1.8.0'
 # native xml parsing, diigo
 gem 'libxml-ruby',    '2.6.0',  :require => 'xml/libxml'
 gem 'macaddr',        '1.0.0'  # macaddr 1.2.0 tries to require 'systemu' which isn't a dependency
@@ -102,11 +102,11 @@ group :sqlite do
 end
 
 group :test do
+  gem 'simplecov', '0.7.1'
   gem 'bluecloth',    '2.0.10' # for generating api docs
   gem 'mocha',        :git => 'git://github.com/ccutrer/mocha.git', :require => false
   gem 'parallelized_specs', '0.4.54'
-  gem 'thin'
-  gem 'rcov',         '0.9.9'
+  gem 'thin', '1.5.1'
   if CANVAS_RAILS3
     gem 'rspec-rails',  '2.13.0'
   else

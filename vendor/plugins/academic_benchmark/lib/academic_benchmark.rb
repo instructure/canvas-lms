@@ -32,7 +32,7 @@ module AcademicBenchmark
 
   def self.queue_migration_for_guid(guid, user)
     if !Account.site_admin.grants_right?(user, :manage_global_outcomes)
-      raise Canvas::Migration::Error.new("User isn't allowed to edit global outcomes")
+      raise Canvas::Migration::Error.new(I18n.t('academic_benchmark.no_permissions', "User isn't allowed to edit global outcomes"))
     end
 
     cm = ContentMigration.create(:context => Account.site_admin)
@@ -42,6 +42,7 @@ module AcademicBenchmark
     cm.migration_settings[:guids] = [guid]
     cm.migration_settings[:no_archive_file] = true
     cm.migration_settings[:skip_import_notification] = true
+    cm.migration_settings[:skip_job_progress] = true
     cm.strand = "academic_benchmark"
     cm.user = user
     cm.save!

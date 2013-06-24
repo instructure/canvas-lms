@@ -1,5 +1,7 @@
 @import "environment";
 
+$border: #b6babf;
+
 body.with-right-side.with-left-side {
   // toolbar needs it to be this wide
   min-width: 1110px;
@@ -37,12 +39,13 @@ body.with-right-side.with-left-side {
 
   .entry {
     background: white;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    border: 1px solid $border;
+    border-radius: 3px;
     padding: 3px 0;
-    margin: 5px 0 50px 18px;
+    margin: 16px 0 16px 18px;
 
     &.collapsed, .entry {
-      margin: 5px 0 5px 0;
+      margin: 16px 0 16px 18px;
     }
 
     .discussion-header-content {
@@ -69,8 +72,9 @@ body.with-right-side.with-left-side {
     .entry {
       box-shadow: none;
       margin: 0 !important;
-      padding-left: 30px;
-      border-top: solid 1px #e4e5e7;
+      border: none;
+      border-radius: 0;
+      border-top: solid 1px $border;
 
       .discussion_entry {
         margin: 0;
@@ -182,33 +186,38 @@ body.with-right-side.with-left-side {
 .discussion-read-state-btn {
   position: absolute;
   top: 4px;
-  left: -28px;
+  left: -32px;
   bottom: 0;
-  width: 8px;
-  height: 8px;
-  padding: 8px;
+  width: 10px;
+  height: 10px;
+  padding: 12px;
   display: block;
 }
 
-.unread {
-  .discussion-read-state-btn {
-    &:hover .discussion-read-state, &:focus .discussion-read-state {
-      background-position: -4px -32px;
-    }
-  }
-}
-
 .discussion-read-state {
-  width: 8px;
-  height: 8px;
-  background: transparent url(/images/messages/new-replied-icon_sprite.png) -4px -8px no-repeat;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  border: 1px solid #2e89cc;
+  border-radius: 5px;
+  width: 10px;
+  height: 10px;
+  background: #46aaf9;
+  background: -moz-linear-gradient(top, #73d6fc, #2489f7);
+  background: -ms-linear-gradient(top, #73d6fc, #2489f7);
+  background: -o-linear-gradient(top, #73d6fc, #2489f7);
+  background: -webkit-linear-gradient(top, #73d6fc, #2489f7);
+  background: linear-gradient(top, #73d6fc, #2489f7);
 }
 
 .read .discussion-read-state {
-  background-position: -4px -80px;
+  background: #fff;
+  border: 1px solid #8c8d8d;
 }
 
-//.read      .discussion-read-state .read,
+.discussion-read-state-btn {
+  left: -32px;
+}
+
 .discussion-reply-form {
   .show-if-replying {
     display: none;
@@ -303,7 +312,7 @@ body.with-right-side.with-left-side {
 
 .showMore {
   margin: 0;
-  border-top: 1px solid #e4e5e7;
+  border-top: 1px solid $border;
   background: white;
   padding: 10px 10px 13px 10px;
   font-size: 10px;
@@ -393,7 +402,7 @@ body.with-right-side.with-left-side {
   .item {
     display: block;
     padding: 4px 12px 4px 8px;
-    border-right: 1px solid #c5d6e7;
+    border-right: 1px solid $border;
   }
   li:last-child .item {
     border-right: none;
@@ -437,11 +446,6 @@ body.with-right-side.with-left-side {
 .add-side-comment-wrap {
   padding: 10px 10px 10px 41px;
   border-top: solid 1px #e4e5e7;
-}
-
-.entry .entry .discussion-read-state-btn {
-  left: -22px;
-  top: 8px;
 }
 
 .message *:last-child {
@@ -536,7 +540,7 @@ body.with-right-side.with-left-side {
   }
   .headerBar {
     padding: 10px 10px 6px 14px;
-    border-bottom: solid 1px #efefef;
+    border-bottom: solid 1px $border;
     min-height: 33px;
   }
   .sticky {

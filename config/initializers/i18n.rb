@@ -1,6 +1,6 @@
 # loading all the locales has a significant (>30%) impact on the speed of initializing canvas
 # so we skip it in situations where we don't need the locales, such as in development mode and in rails console
-skip_locale_loading = (Rails.env.development? || $0 == 'irb') && !ENV['RAILS_LOAD_ALL_LOCALES']
+skip_locale_loading = (Rails.env.development? || Rails.env.test? || $0 == 'irb') && !ENV['RAILS_LOAD_ALL_LOCALES']
 if skip_locale_loading
   I18n.load_path = I18n.load_path.grep(%r{/(locales|en)\.yml\z})
 else
@@ -210,6 +210,12 @@ ActiveRecord::Base.class_eval do
     end
     alias :t :translate
 
+    # so that we don't load up the locales until we need them
+    LOCALE_LIST = []
+    def LOCALE_LIST.include?(item)
+      I18n.available_locales.map(&:to_s).include?(item)
+    end
+
     def validates_locale(*args)
       options = args.last.is_a?(Hash) ? args.pop : {}
       args << :locale if args.empty?
@@ -221,7 +227,7 @@ ActiveRecord::Base.class_eval do
         end
       end
       args.each do |field|
-        validates_inclusion_of field, options.merge(:in => I18n.available_locales.map(&:to_s))
+        validates_inclusion_of field, options.merge(:in => LOCALE_LIST)
       end
     end
   end

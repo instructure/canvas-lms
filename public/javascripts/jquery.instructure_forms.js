@@ -224,7 +224,6 @@ define([
             priorTarget   = $form.attr('target'),
             priorEnctype  = $form.attr('ENCTYPE'),
             request       = new FakeXHR();
-
         $form.attr({
           'method' : method,
           'action' : action,
@@ -236,7 +235,6 @@ define([
           $form.find("input[name='_method']").remove();
           $form.find("input[name='authenticity_token']").remove();
         }
-
         $.ajaxJSON.storeRequest(request, action, method, formData);
 
         $frame.bind('form_response_loaded', function() {
@@ -309,9 +307,8 @@ define([
         } else {
           (options.upload_error || options.error).call($this, data);
         }
-        } catch(e) {
-          var ex = e;
-        }
+        } finally {}
+        
       }, function() { 
         return (options.upload_error || options.error).apply(this, arguments);
       });

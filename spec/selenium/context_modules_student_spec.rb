@@ -129,6 +129,35 @@ describe "context_modules" do
       f('#module_prerequisites_list').should be_nil
     end
 
+    it "should validate that a student can't see an unpublished context module item" do
+      @assignment_2.workflow_state = 'unpublished'
+      @assignment_2.save!
+
+      module1_unpublished_tag = @module_1.add_item({:id => @assignment_2.id, :type => 'assignment'})
+      @module_1.completion_requirements = {@tag_1.id => {:type => 'must_view'}, module1_unpublished_tag.id => {:type => 'must_view'}}
+      @module_1.save!
+      @module_1.completion_requirements.map{|h| h[:id]}.should include(@tag_1.id)
+      @module_1.completion_requirements.map{|h| h[:id]}.should_not include(module1_unpublished_tag.id)
+
+      module2_published_tag = @module_2.add_item({:id => @quiz_1.id, :type => 'quiz'})
+      @module_2.save!
+
+      go_to_modules
+
+      context_modules = ff('.context_module')
+      context_modules[0].find_element(:css, '.context_module_items').should_not include_text(@assignment_2.name)
+      context_modules[1].find_element(:css, '.context_module_items').should_not include_text(@assignment_2.name)
+
+      # Should go to the next module
+      get "/courses/#{@course.id}/assignments/#{@assignment_1.id}"
+      nxt = f('#sequence_footer a.next')
+      URI.parse(nxt.attribute('href')).path.should == "/courses/#{@course.id}/modules/#{@module_2.id}/items/first"
+
+      # Should redirect to the published item
+      get "/courses/#{@course.id}/modules/#{@module_2.id}/items/first"
+      driver.current_url.should match %r{/courses/#{@course.id}/quizzes/#{@quiz_1.id}}
+    end
+
     it "should allow a student view student to progress through module content" do
       course_with_teacher_logged_in(:course => @course, :active_all => true)
       @fake_student = @course.student_view_student

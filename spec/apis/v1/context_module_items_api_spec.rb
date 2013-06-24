@@ -43,7 +43,7 @@ describe "Module Items API", :type => :integration do
                                                :unlock_at => @christmas,
                                                :require_sequential_progress => true)
     @module2.prerequisites = "module_#{@module1.id}"
-    @wiki_page = @course.wiki.wiki_page
+    @wiki_page = @course.wiki.front_page
     @wiki_page.workflow_state = 'active'; @wiki_page.save!
     @wiki_page_tag = @module2.add_item(:id => @wiki_page.id, :type => 'wiki_page')
     @attachment = attachment_model(:context => @course)
@@ -61,6 +61,7 @@ describe "Module Items API", :type => :integration do
     end
 
     it "should list module items" do
+      @assignment_tag.unpublish
       json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items",
                       :controller => "context_module_items_api", :action => "index", :format => "json",
                       :course_id => "#{@course.id}", :module_id => "#{@module1.id}")
@@ -74,7 +75,8 @@ describe "Module Items API", :type => :integration do
               "url" => "http://www.example.com/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
               "title" => @assignment_tag.title,
               "indent" => 0,
-              "completion_requirement" => { "type" => "must_submit" }
+              "completion_requirement" => { "type" => "must_submit" },
+              "published" => false
           },
           {
               "type" => "Quiz",
@@ -85,7 +87,8 @@ describe "Module Items API", :type => :integration do
               "position" => 2,
               "title" => @quiz_tag.title,
               "indent" => 0,
-              "completion_requirement" => { "type" => "min_score", "min_score" => 10 }
+              "completion_requirement" => { "type" => "min_score", "min_score" => 10 },
+              "published" => true
           },
           {
               "type" => "Discussion",
@@ -96,14 +99,16 @@ describe "Module Items API", :type => :integration do
               "url" => "http://www.example.com/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
               "title" => @topic_tag.title,
               "indent" => 0,
-              "completion_requirement" => { "type" => "must_contribute" }
+              "completion_requirement" => { "type" => "must_contribute" },
+              "published" => true
           },
           {
               "type" => "SubHeader",
               "id" => @subheader_tag.id,
               "position" => 4,
               "title" => @subheader_tag.title,
-              "indent" => 0
+              "indent" => 0,
+              "published" => true
           },
           {
               "type" => "ExternalUrl",
@@ -113,9 +118,29 @@ describe "Module Items API", :type => :integration do
               "position" => 5,
               "title" => @external_url_tag.title,
               "indent" => 1,
-              "completion_requirement" => { "type" => "must_view" }
+              "completion_requirement" => { "type" => "must_view" },
+              "published" => true
           }
       ]
+    end
+
+    it 'should return the url for external tool items' do
+      tool = @course.context_external_tools.create!(:name => "b", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
+      @module1.add_item(:type => 'external_tool', :title => 'Tool', :id => tool.id, :url => 'http://www.google.com', :new_tab => false, :indent => 0)
+      @module1.save!
+
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items",
+                      :controller => "context_module_items_api", :action => "index", :format => "json",
+                      :course_id => "#{@course.id}", :module_id => "#{@module1.id}")
+
+      items = json.select {|item| item['type'] == 'ExternalTool'}
+      items.length.should == 1
+      items.each do |item|
+        item.should include('url')
+        uri = URI(item['url'])
+        uri.path.should == "/api/v1/courses/#{@course.id}/external_tools/sessionless_launch"
+        uri.query.should include('url=')
+      end
     end
 
     it "should show module items individually" do
@@ -131,9 +156,11 @@ describe "Module Items API", :type => :integration do
           "title" => @wiki_page_tag.title,
           "indent" => 0,
           "url" => "http://www.example.com/api/v1/courses/#{@course.id}/pages/#{@wiki_page.url}",
-          "page_url" => @wiki_page.url
+          "page_url" => @wiki_page.url,
+          "published" => true
       }
 
+      @attachment_tag.unpublish
       json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module2.id}/items/#{@attachment_tag.id}",
                       :controller => "context_module_items_api", :action => "show", :format => "json",
                       :course_id => "#{@course.id}", :module_id => "#{@module2.id}",
@@ -146,7 +173,8 @@ describe "Module Items API", :type => :integration do
           "position" => 2,
           "title" => @attachment_tag.title,
           "indent" => 0,
-          "url" => "http://www.example.com/api/v1/files/#{@attachment.id}"
+          "url" => "http://www.example.com/api/v1/files/#{@attachment.id}",
+          "published" => false
       }
     end
 
@@ -414,6 +442,51 @@ describe "Module Items API", :type => :integration do
         req = @module1.completion_requirements.find{|h| h[:id] == json['id'].to_i}
         req.should be_nil
       end
+
+      it "should publish module items" do
+        course_with_student(:course => @course, :active_all => true)
+        @user = @teacher
+
+        @assignment.submit_homework(@student, :body => "done!")
+
+        @assignment_tag.unpublish
+        @assignment_tag.workflow_state.should == 'unpublished'
+        @module1.save
+
+        @module1.evaluate_for(@student).workflow_state.should == 'unlocked'
+
+        json = api_call(:put, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@assignment_tag.id}",
+                        {:controller => "context_module_items_api", :action => "update", :format => "json",
+                         :course_id => "#{@course.id}", :module_id => "#{@module1.id}", :id => "#{@assignment_tag.id}"},
+                        {:module_item => {:published => '1'}}
+        )
+        json['published'].should == true
+
+        @assignment_tag.reload
+        @assignment_tag.workflow_state.should == 'active'
+      end
+
+      it "should unpublish module items" do
+        course_with_student(:course => @course, :active_all => true)
+        @user = @teacher
+
+        @assignment.submit_homework(@student, :body => "done!")
+
+        @module1.evaluate_for(@student).workflow_state.should == 'started'
+
+        json = api_call(:put, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@assignment_tag.id}",
+                        {:controller => "context_module_items_api", :action => "update", :format => "json",
+                         :course_id => "#{@course.id}", :module_id => "#{@module1.id}", :id => "#{@assignment_tag.id}"},
+                        {:module_item => {:published => '0'}}
+        )
+        json['published'].should == false
+
+        @assignment_tag.reload
+        @assignment_tag.workflow_state.should == 'unpublished'
+
+        @module1.reload
+        @module1.evaluate_for(@student).workflow_state.should == 'unlocked'
+      end
     end
 
     it "should delete a module item" do
@@ -434,11 +507,12 @@ describe "Module Items API", :type => :integration do
     end
 
     it "should list module items" do
+      @assignment_tag.unpublish
       json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items",
                       :controller => "context_module_items_api", :action => "index", :format => "json",
                       :course_id => "#{@course.id}", :module_id => "#{@module1.id}")
 
-      json.map{|item| item['id']}.sort.should == @module1.content_tags.map(&:id).sort
+      json.map{|item| item['id']}.sort.should == @module1.content_tags.active.map(&:id).sort
 
       #also for locked modules that have completion requirements
       @assignment2 = @course.assignments.create!(:name => "pls submit", :submission_types => ["online_text_entry"])
@@ -469,6 +543,14 @@ describe "Module Items API", :type => :integration do
                       :course_id => "#{@course.id}", :module_id => "#{@module1.id}",
                       :id => "#{@assignment_tag.id}")
       json['completion_requirement']['completed'].should be_true
+    end
+
+    it "should not show unpublished items" do
+      @assignment_tag.unpublish
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@assignment_tag.id}",
+                      {:controller => "context_module_items_api", :action => "show", :format => "json",
+                      :course_id => "#{@course.id}", :module_id => "#{@module1.id}",
+                      :id => "#{@assignment_tag.id}"}, {}, {}, {:expected_status => 404})
     end
 
     it "should mark viewed and redirect external URLs" do

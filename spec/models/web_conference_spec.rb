@@ -43,84 +43,6 @@ describe WebConference do
     end
   end
 
-  context "dim_dim" do
-    it "should correctly retrieve a config hash" do
-      conference = DimDimConference.new
-      config = conference.config
-      config.should_not be_nil
-      config[:conference_type].should eql('DimDim')
-      config[:class_name].should eql('DimDimConference')
-    end
-    
-    it "should correctly generate join urls" do
-      user_model
-      email = "email@email.com"
-      @user.stubs(:email).returns(email)
-      conference = DimDimConference.create!(:title => "my conference", :user => @user)
-      conference.config.should_not be_nil
-      conference.admin_join_url(@user).should eql("http://dimdim.instructure.com/dimdim/html/envcheck/connect.action?action=host&email=#{CGI::escape(email)}&confKey=#{conference.conference_key}&attendeePwd=#{conference.attendee_key}&presenterPwd=#{conference.presenter_key}&displayName=#{CGI::escape(@user.name)}&meetingRoomName=#{conference.conference_key}&confName=#{CGI::escape(conference.title)}&presenterAV=av&collabUrl=#{CGI::escape("http://#{HostUrl.context_host(conference.context)}/dimdim_welcome.html")}&returnUrl=#{CGI::escape("http://www.instructure.com")}")
-      conference.participant_join_url(@user).should eql("http://dimdim.instructure.com/dimdim/html/envcheck/connect.action?action=join&email=#{CGI::escape(email)}&confKey=#{conference.conference_key}&attendeePwd=#{conference.attendee_key}&displayName=#{CGI::escape(@user.name)}&meetingRoomName=#{conference.conference_key}")
-    end
-    
-    it "should confirm valid config" do
-      DimDimConference.new.should be_valid_config
-      DimDimConference.new(:conference_type => "DimDim").should be_valid_config
-    end
-  end
-
-  context "big_blue_button" do
-    it "should correctly retrieve a config hash" do
-      conference = BigBlueButtonConference.new
-      config = conference.config
-      config.should_not be_nil
-      config[:conference_type].should eql('BigBlueButton')
-      config[:class_name].should eql('BigBlueButtonConference')
-    end
-
-    it "should correctly generate join urls" do
-      user_model
-      email = "email@email.com"
-      @user.stubs(:email).returns(email)
-      conference = BigBlueButtonConference.create!(:title => "my conference", :user => @user)
-      conference.config.should_not be_nil
-
-      # set some vars so it thinks it's been created and doesn't do an api call
-      conference.conference_key = 'test'
-      conference.settings[:admin_key] = 'admin'
-      conference.settings[:user_key] = 'user'
-      conference.save
-
-      params = {:fullName => user.name, :meetingID => conference.conference_key, :userID => user.id}
-      admin_params = params.merge(:password => 'admin').to_query
-      user_params = params.merge(:password => 'user').to_query
-      conference.admin_join_url(@user).should eql("http://bbb.instructure.com/bigbluebutton/api/join?#{admin_params}&checksum=" + Digest::SHA1.hexdigest("join#{admin_params}secret"))
-      conference.participant_join_url(@user).should eql("http://bbb.instructure.com/bigbluebutton/api/join?#{user_params}&checksum=" + Digest::SHA1.hexdigest("join#{user_params}secret"))
-    end
-
-    it "should confirm valid config" do
-      BigBlueButtonConference.new.should be_valid_config
-      BigBlueButtonConference.new(:conference_type => "BigBlueButton").should be_valid_config
-    end
-
-    it "should recreate the conference if it's been empty for too long" do
-      user_model
-      email = "email@email.com"
-      @user.stubs(:email).returns(email)
-      conference = BigBlueButtonConference.create!(:title => "my conference", :user => @user)
-      conference.expects(:send_request).with(:isMeetingRunning, anything).at_least(1).returns({:running => 'false'}, {:running => 'true'}, {:running => 'false'})
-      conference.expects(:send_request).with(:create, anything).twice.returns(true)
-
-      conference.craft_url(@user).should match(/\Ahttp:\/\/bbb\.instructure\.com\/bigbluebutton\/api\/join/)
-      # second one doesn't trigger another create call
-      conference.craft_url(@user).should match(/\Ahttp:\/\/bbb\.instructure\.com\/bigbluebutton\/api\/join/)
-
-      WebConference.where(:id => conference).update_all(:updated_at => 1.day.ago)
-      conference.reload
-
-      conference.craft_url(@user).should match(/\Ahttp:\/\/bbb\.instructure\.com\/bigbluebutton\/api\/join/)
-    end
-  end
-
   context "user settings" do
     it "should ignore invalid user settings" do
       user_model
@@ -134,12 +56,13 @@ describe WebConference do
       user_model
       email = "email@email.com"
       @user.stubs(:email).returns(email)
-      conference = DimDimConference.new(:title => "my conference", :user => @user)
-      conference.settings = {:not => :for_user}
+      conference = BigBlueButtonConference.new(:title => "my conference", :user => @user)
+      conference.settings = {:record => true, :not => :for_user}
       conference.save
       conference.reload
-      conference.user_settings.should be_empty
+      conference.user_settings.should eql({:record => true})
     end
+
   end
 
   context "starting and ending" do

@@ -160,6 +160,56 @@ describe ContentTag do
     @assignment.reload
     @assignment.title.should == 'some assignment (renamed)'
   end
+
+  it "should publish/unpublish the tag if the linked wiki page is published/unpublished" do
+    course
+    @page = @course.wiki.wiki_pages.create!(:title => "some page")
+    @page.workflow_state = 'unpublished'
+    @page.save!
+    @module = @course.context_modules.create!(:name => "module")
+    @tag = @module.add_item({:type => 'WikiPage', :title => 'some page', :id => @page.id})
+    @tag.workflow_state.should == 'unpublished'
+
+    @page.reload
+    @page.workflow_state = 'active'
+    @page.save!
+    @tag.reload
+    @tag.workflow_state.should == 'active'
+
+    @page.reload
+    @page.workflow_state = 'unpublished'
+    @page.save!
+    @tag.reload
+    @tag.workflow_state.should == 'unpublished'
+  end
+
+  it "should publish/unpublish the linked wiki page (and its tags) if the tag is published/unpublished" do
+    course
+    @page = @course.wiki.wiki_pages.create!(:title => "some page")
+    @page.workflow_state = 'unpublished'
+    @page.save!
+    @module = @course.context_modules.create!(:name => "module")
+    @tag = @module.add_item({:type => 'WikiPage', :title => 'some page', :id => @page.id})
+    @tag2 = @module.add_item({:type => 'WikiPage', :title => 'some page', :id => @page.id})
+
+    @tag.reload
+    @tag.workflow_state = 'active'
+    @tag.save!
+    @tag.update_asset_workflow_state!
+    @page.reload
+    @page.workflow_state.should == 'active'
+    @tag2.reload
+    @tag2.workflow_state.should == 'active'
+
+    @tag.reload
+    @tag.workflow_state = 'unpublished'
+    @tag.save!
+    @tag.update_asset_workflow_state!
+    @page.reload
+    @page.workflow_state.should == 'unpublished'
+    @tag2.reload
+    @tag2.workflow_state.should == 'unpublished'
+  end
   
   it "should not rename tag if linked attachment is renamed" do
     course

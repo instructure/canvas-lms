@@ -16,6 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 require [
+  'Backbone'
   'compiled/models/CreateUserList'
   'compiled/models/Role'
   'compiled/views/courses/roster/CreateUsersView'
@@ -28,22 +29,27 @@ require [
   'compiled/views/PaginatedCollectionView'
   'compiled/views/courses/roster/RosterUserView'
   'compiled/views/courses/roster/RosterView'
+  'compiled/views/courses/roster/ResendInvitationsView'
   'jquery'
-], (CreateUserList, Role, CreateUsersView, RoleSelectView, rosterUsersTemplate, RosterUserCollection, RolesCollection, SectionCollection, InputFilterView, PaginatedCollectionView, RosterUserView, RosterView, $) ->
+], ({Model}, CreateUserList, Role, CreateUsersView, RoleSelectView, rosterUsersTemplate, RosterUserCollection, RolesCollection, SectionCollection, InputFilterView, PaginatedCollectionView, RosterUserView, RosterView, ResendInvitationsView, $) ->
 
   fetchOptions =
-    include: ['avatar_url', 'enrollments', 'email']
+    include: ['avatar_url', 'enrollments', 'email', 'observed_users']
     per_page: 50
   users = new RosterUserCollection null,
     course_id: ENV.context_asset_string.split('_')[1]
     sections: new SectionCollection ENV.SECTIONS
     params: fetchOptions
   rolesCollection = new RolesCollection(new Role attributes for attributes in ENV.ALL_ROLES)
+  course = new Model(ENV.course)
   inputFilterView = new InputFilterView
     collection: users
   usersView = new PaginatedCollectionView
     collection: users
     itemView: RosterUserView
+    itemViewOptions:
+      course: ENV.course
+    canViewLoginIdColumn: ENV.permissions.manage_admin_users or ENV.permissions.manage_students
     buffer: 1000
     template: rosterUsersTemplate
   roleSelectView = new RoleSelectView
@@ -57,11 +63,17 @@ require [
       roles: ENV.ALL_ROLES
       readURL: ENV.USER_LISTS_URL
       updateURL: ENV.ENROLL_USERS_URL
+    courseModel: course
+  resendInvitationsView = new ResendInvitationsView
+    model: course
+    resendInvitationsUrl: ENV.resend_invitations_url
+    canResend: ENV.permissions.manage_students or ENV.permissions.manage_admin_users
   @app = new RosterView
     usersView: usersView
     inputFilterView: inputFilterView
     roleSelectView: roleSelectView
     createUsersView: createUsersView
+    resendInvitationsView: resendInvitationsView
     collection: users
     roles: ENV.ALL_ROLES
     permissions: ENV.permissions

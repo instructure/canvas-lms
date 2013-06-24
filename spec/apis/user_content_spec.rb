@@ -213,7 +213,7 @@ describe UserContent, :type => :integration do
 
   it "should not choke on funny email addresses" do
     course_with_teacher(:active_all => true)
-    @wiki_page = @course.wiki.wiki_page
+    @wiki_page = @course.wiki.front_page
     @wiki_page.body = "<a href='mailto:djmankiewicz@homestarrunner,com'>e-nail</a>"
     @wiki_page.workflow_state = 'active'
     @wiki_page.save!
@@ -226,7 +226,7 @@ describe UserContent, :type => :integration do
     context "course context" do
       it "should process links to each type of object" do
         course_with_teacher(:active_all => true)
-        @wiki_page = @course.wiki.wiki_page
+        @wiki_page = @course.wiki.front_page
         @wiki_page.body = <<-HTML
         <p>
           <a href='/courses/#{@course.id}/assignments'>assignments index</a>
@@ -238,6 +238,9 @@ describe UserContent, :type => :integration do
           <a href='/courses/#{@course.id}/files'>files index</a>
           <a href='/courses/#{@course.id}/files/789/download?verifier=lolcats'>files index</a>
           <a href='/files/789/download?verifier=lolcats'>file</a>
+          <a href='/courses/#{@course.id}/quizzes'>quiz index</a>
+          <a href='/courses/#{@course.id}/quizzes/999'>quiz</a>
+          <a href='/courses/#{@course.id}/external_tools/retrieve?url=http://lti-tool-provider.example.com/lti_tool'>LTI Launch</a>
         </p>
         HTML
         @wiki_page.workflow_state = 'active'
@@ -256,17 +259,20 @@ describe UserContent, :type => :integration do
           "http://www.example.com/api/v1/courses/#{@course.id}/discussion_topics/456",
           "http://www.example.com/api/v1/courses/#{@course.id}/folders/root",
           "http://www.example.com/api/v1/files/789",
-          "http://www.example.com/api/v1/files/789"
+          "http://www.example.com/api/v1/files/789",
+          "http://www.example.com/api/v1/courses/#{@course.id}/quizzes",
+          "http://www.example.com/api/v1/courses/#{@course.id}/quizzes/999",
+          "http://www.example.com/api/v1/courses/#{@course.id}/external_tools/sessionless_launch?url=http%3A%2F%2Flti-tool-provider.example.com%2Flti_tool"
         ]
         doc.css('a').collect { |att| att['data-api-returntype'] }.should ==
-            %w([Assignment] Assignment [Page] Page [Discussion] Discussion Folder File File)
+            %w([Assignment] Assignment [Page] Page [Discussion] Discussion Folder File File [Quiz] Quiz SessionlessLaunchUrl)
       end
     end
 
     context "group context" do
       it "should process links to each type of object" do
         group_with_user(:active_all => true)
-        @wiki_page = @group.wiki.wiki_page
+        @wiki_page = @group.wiki.front_page
         @wiki_page.body = <<-HTML
         <p>
           <a href='/groups/#{@group.id}/wiki'>wiki index</a>

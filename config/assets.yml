@@ -16,6 +16,8 @@ css_compressor_options:
 javascripts:
 
 stylesheets:
+  content_migrations: 
+    - public/stylesheets/compiled/content_migrations.css
   common:
     - public/stylesheets/compiled/g_base.css
     - public/stylesheets/static/mediaelementplayer.css
@@ -53,6 +55,8 @@ stylesheets:
   speed_grader:
     - public/stylesheets/compiled/ui.selectmenu.css
     - public/stylesheets/compiled/speed_grader.css
+  conferences:
+    - public/stylesheets/compiled/conferences.css
   plugins:
     - public/stylesheets/compiled/plugins.css
   gradebook_uploads:
@@ -102,6 +106,8 @@ stylesheets:
     - public/stylesheets/compiled/grading_standards.css
   login:
     - public/stylesheets/compiled/login.css
+  roster:
+    - public/stylesheets/compiled/roster.css
   roster_user:
     - public/stylesheets/compiled/roster_user.css
   learning_outcomes:
@@ -159,5 +165,9 @@ stylesheets:
   styleguide:
     - public/stylesheets/compiled/styleguide.css
     - public/stylesheets/compiled/syntax.css
+  locale:
+    - public/stylesheets/compiled/locale.css
+  mobile_auth:
+    - public/stylesheets/compiled/mobile_auth.css
 
   <%= plugin_assets.anchors_yml %>

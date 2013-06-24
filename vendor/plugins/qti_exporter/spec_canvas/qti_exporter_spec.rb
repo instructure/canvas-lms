@@ -168,7 +168,6 @@ describe Qti::Converter do
   def do_migration
     Canvas::Migration::Worker::QtiWorker.new(@migration.id).perform
     @migration.reload
-    @migration.import_content_without_send_later
     @migration.should be_imported
   end
 

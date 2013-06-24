@@ -852,10 +852,17 @@ if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
       raise ArgumentError, "Cannot specify custom options with :delay_validation" if options[:options] && options[:delay_validation]
 
       options.delete(:delay_validation) unless supports_delayed_constraint_validation?
-      options[:options] = 'NOT VALID' if options[:delay_validation]
-
       column  = options[:column] || "#{to_table.to_s.singularize}_id"
       foreign_key_name = foreign_key_name(from_table, column, options)
+
+      if options[:delay_validation]
+        options[:options] = 'NOT VALID'
+        # NOT VALID doesn't fully work through 9.3 at least, so prime the cache to make
+        # it as fast as possible. Note that a NOT EXISTS would be faster, but this is
+        # the query postgres does for the VALIDATE CONSTRAINT, so we want exactly this
+        # query to be warm
+        execute("SELECT fk.#{column} FROM #{from_table} fk LEFT OUTER JOIN #{to_table} pk ON fk.#{column}=pk.id WHERE pk.id IS NULL AND fk.#{column} IS NOT NULL LIMIT 1")
+      end
 
       add_foreign_key_without_delayed_validation(from_table, to_table, options)
 
@@ -1235,16 +1242,15 @@ ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
   # in anticipation of having to re-run migrations due to integrity violations or
   # killing stuff that is holding locks too long
   def add_foreign_key_if_not_exists(from_table, to_table, options = {})
+    column  = options[:column] || "#{to_table.to_s.singularize}_id"
     case self.adapter_name
     when 'SQLite'; return
     when 'PostgreSQL'
-      begin
-        add_foreign_key(from_table, to_table, options)
-      rescue ActiveRecord::StatementInvalid => e
-        raise unless e.message =~ /PG(?:::)?Error: ERROR:.+already exists/
-      end
+      foreign_key_name = foreign_key_name(from_table, column, options)
+      and_valid = " AND convalidated" if supports_delayed_constraint_validation?
+      return if select_value("SELECT conname FROM pg_constraint INNER JOIN pg_namespace ON pg_namespace.oid=connamespace WHERE conname='#{foreign_key_name}' AND nspname=current_schema()#{and_valid}")
+      add_foreign_key(from_table, to_table, options)
     else
-      column  = options[:column] || "#{to_table.to_s.singularize}_id"
       foreign_key_name = foreign_key_name(from_table, column, options)
       return if foreign_keys(from_table).find { |k| k.options[:name] == foreign_key_name }
       add_foreign_key(from_table, to_table, options)

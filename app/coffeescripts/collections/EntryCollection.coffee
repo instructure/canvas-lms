@@ -33,6 +33,10 @@ define [
       page.fullCollection = this
       page
 
+    setAllReadState: (newReadState) ->
+      @each (entry) ->
+        entry.set 'read_state', newReadState
+
     ##
     # This could have been two or three well-named methods, but it doesn't make
     # a whole lot of sense to walk the tree over and over to get each piece of
