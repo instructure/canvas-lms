@@ -1671,5 +1671,4 @@ class Attachment < ActiveRecord::Base
   def record_inline_view
     update_attribute(:last_inline_view, Time.now)
   end
-
 end
