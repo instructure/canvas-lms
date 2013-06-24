@@ -139,7 +139,10 @@ module Instructure #:nodoc:
         /\Amargin-(?:bottom|left|right|top|offset)\z/,
         /\Apadding-(?:bottom|left|right|top)\z/
       ],
-      :transformers => lambda { |env| Instructure::SanitizeField.sanitize_style(env) if env[:node]['style'] }
+      :transformers => lambda { |env|
+        Instructure::SanitizeField.sanitize_style(env) if env[:node]['style']
+        Sanitize.clean_node!(env[:node], {:remove_contents => true}) if env[:node_name] == 'style'
+      }
     }
 
     module ClassMethods
