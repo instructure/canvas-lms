@@ -710,6 +710,7 @@ ActionController::Routing::Routes.draw do |map|
       courses.get 'courses/:course_id/activity_stream', :action => :activity_stream, :path_name => 'course_activity_stream'
       courses.get 'courses/:course_id/activity_stream/summary', :action => :activity_stream_summary, :path_name => 'course_activity_stream_summary'
       courses.get 'courses/:course_id/todo', :action => :todo_items
+      courses.post 'courses/:course_id/preview_html', :action => :preview_html
       courses.delete 'courses/:id', :action => :destroy
       courses.post 'courses/:course_id/course_copy', :controller => :content_imports, :action => :copy_course_content
       courses.get 'courses/:course_id/course_copy/:id', :controller => :content_imports, :action => :copy_course_status, :path_name => :course_copy_status
@@ -1018,6 +1019,7 @@ ActionController::Routing::Routes.draw do |map|
       groups.get 'groups/:group_id/users', :action => :users, :path_name => 'group_users'
       groups.post 'groups/:group_id/invite', :action => :invite
       groups.post 'groups/:group_id/files', :action => :create_file
+      groups.post 'groups/:group_id/preview_html', :action => :preview_html
       groups.post 'group_categories/:group_category_id/groups', :action => :create
       groups.get 'groups/:group_id/activity_stream', :action => :activity_stream, :path_name => 'group_activity_stream'
       groups.get 'groups/:group_id/activity_stream/summary', :action => :activity_stream_summary, :path_name => 'group_activity_stream_summary'

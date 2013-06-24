@@ -615,4 +615,32 @@ describe "Groups API", :type => :integration do
                     { controller: "groups", group_id: @group.id.to_s, action: "activity_stream_summary", format: 'json' })
     json.should == [{"type" => "DiscussionTopic", "count" => 1, "unread_count" => 1, "notification_category" => nil}]
   end
+
+  describe "/preview_html" do
+    before do
+      course_with_teacher_logged_in(:active_all => true)
+      @group = @course.groups.create!(:name => 'Group 1')
+    end
+
+    it "should sanitize html and process links" do
+      @user = @teacher
+      attachment_model(:context => @group)
+      html = %{<p><a href="/files/#{@attachment.id}/download?verifier=huehuehuehue">Click!</a><script></script></p>}
+      json = api_call(:post, "/api/v1/groups/#{@group.id}/preview_html",
+                      { :controller => 'groups', :action => 'preview_html', :group_id => @group.to_param, :format => 'json' },
+                      { :html => html})
+
+      returned_html = json["html"]
+      returned_html.should_not include("<script>")
+      returned_html.should include("/groups/#{@group.id}/files/#{@attachment.id}/download?verifier=#{@attachment.uuid}")
+    end
+
+    it "should require permission to preview" do
+      @user = user
+      api_call(:post, "/api/v1/groups/#{@group.id}/preview_html",
+                      { :controller => 'groups', :action => 'preview_html', :group_id => @group.to_param, :format => 'json' },
+                      { :html => ""}, {}, {:expected_status => 401})
+
+    end
+  end
 end

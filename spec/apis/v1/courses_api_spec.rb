@@ -1669,6 +1669,33 @@ describe CoursesController, :type => :integration do
     end
   end
 
+  describe "/preview_html" do
+    before do
+      course_with_teacher_logged_in(:active_all => true)
+    end
+
+    it "should sanitize html and process links" do
+      @user = @teacher
+      attachment_model(:context => @course)
+      html = %{<p><a href="/files/#{@attachment.id}/download?verifier=huehuehuehue">Click!</a><script></script></p>}
+      json = api_call(:post, "/api/v1/courses/#{@course.id}/preview_html",
+                      { :controller => 'courses', :action => 'preview_html', :course_id => @course.to_param, :format => 'json' },
+                      { :html => html})
+
+      returned_html = json["html"]
+      returned_html.should_not include("<script>")
+      returned_html.should include("/courses/#{@course.id}/files/#{@attachment.id}/download?verifier=#{@attachment.uuid}")
+    end
+
+    it "should require permission to preview" do
+      @user = user
+      api_call(:post, "/api/v1/courses/#{@course.id}/preview_html",
+                      { :controller => 'courses', :action => 'preview_html', :course_id => @course.to_param, :format => 'json' },
+                      { :html => ""}, {}, {:expected_status => 401})
+
+    end
+  end
+
   it "should return the activity stream" do
     course_with_teacher(:active_all => true, :user => user_with_pseudonym)
     @context = @course

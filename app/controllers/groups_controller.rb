@@ -681,6 +681,29 @@ class GroupsController < ApplicationController
     end
   end
 
+  include Api::V1::PreviewHtml
+  # @API Preview processed html
+  #
+  # Preview html content processed for this group
+  #
+  # @argument html The html content to process
+  #
+  # @example_request
+  #     curl https://<canvas>/api/v1/groups/<group_id>/preview_html \
+  #          -F 'html=<p><badhtml></badhtml>processed html</p>' \
+  #          -H 'Authorization: Bearer <token>'
+  #
+  # @example_response
+  #   {
+  #     "html": "<p>processed html</p>"
+  #   }
+  def preview_html
+    get_context
+    if @context && authorized_action(@context, @current_user, :read)
+      render_preview_html
+    end
+  end
+
   include Api::V1::StreamItem
   # @API Group activity stream
   # Returns the current user's group-specific activity stream, paginated.
