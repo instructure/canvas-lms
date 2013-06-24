@@ -172,6 +172,14 @@ define [
       model.updateOneAttribute('position_at', ui.item.index() + 1)
       @_updatePositions()
 
+      # FF 15+ will also fire a click event on the dropped object,
+      # and we want to eat that. This is hacky.
+      # http://forum.jquery.com/topic/jquery-ui-sortable-triggers-a-click-in-firefox-15
+      model.set('preventClick', true)
+      setTimeout =>
+        model.set('preventClick', false)
+      , 0
+
     # Internal: Update the position attributes of all models in the collection
     # to match their DOM position. Do not mirror changes to server.
     #

@@ -94,6 +94,9 @@ define [
     #
     # Returns nothing.
     onClick: (e) ->
+      # Workaround a behavior of FF 15+ where it fires a click
+      # after dropping a sortable item.
+      return if @model.get('preventClick')
       return if _.contains(['A', 'I'], e.target.nodeName)
       window.location = @model.get('html_url')
 
