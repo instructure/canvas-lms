@@ -66,12 +66,11 @@ class MediaObject < ActiveRecord::Base
     files = []
     root_account_id = attachments.map{|a| a.root_account_id }.compact.first
     attachments.select{|a| !a.media_object }.each do |attachment|
-      pseudonym = attachment.user.sis_pseudonym_for(attachment.context)
       files << {
-                  :name                 => attachment.display_name,
-                  :url                  => attachment.cacheable_s3_download_url,
-                  :media_type           => (attachment.content_type || "").match(/\Avideo/) ? 'video' : 'audio',
-                  :partner_data         => %Q[{"attachment_id":"#{attachment.id}","sis_course_id":"#{attachment.context.sis_source_id}","sis_user_id":"#{pseudonym ? pseudonym.sis_user_id : ''}","context_source":"file_upload"}]
+                  :name       => attachment.display_name,
+                  :url        => attachment.cacheable_s3_download_url,
+                  :media_type => (attachment.content_type || "").match(/\Avideo/) ? 'video' : 'audio',
+                  :id         => attachment.id
                }
     end
     res = client.bulkUploadAdd(files)
