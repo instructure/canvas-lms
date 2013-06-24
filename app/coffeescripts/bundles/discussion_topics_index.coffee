@@ -28,7 +28,7 @@ require [
           comparator: 'dateComparator'
           draggable: true
           destination: '.pinned.discussion-list'
-          pinnable: ENV.permissions.change_settings
+          pinnable: ENV.permissions.moderate
         locked: @_createListView 'locked',
           comparator: 'dateComparator'
           pinnable: false
@@ -37,7 +37,7 @@ require [
           destination: '.open.discussion-list'
           lockable: false
           sortable: true
-          pinnable: ENV.permissions.change_settings
+          pinnable: ENV.permissions.moderate
           pinned: true
 
     # Public: The index page action.
