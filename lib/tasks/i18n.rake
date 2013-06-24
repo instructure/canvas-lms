@@ -148,9 +148,23 @@ namespace :i18n do
 
   desc "Generates JS bundle i18n files (non-en) and adds them to assets.yml"
   task :generate_js do
-    ENV['RAILS_LOAD_ALL_LOCALES'] = '1'
-    I18n.load_path += Dir[Rails.root.join('config', 'locales', '*', '*.{rb,yml}')]
-    Rake::Task['environment'].invoke
+    # This is intentially requiring things individually rather than just
+    # loading the rails+canvas environment, because that environment isn't
+    # available during the deploy process. Don't change this out for a call to
+    # the `environment` rake task.
+    require 'bundler'
+    Bundler.setup
+    require 'action_controller'
+    require 'i18n'
+    require 'i18nema'
+    require 'sexp_processor'
+    require 'jammit'
+    require 'lib/i18n_extraction/js_extractor.rb'
+    I18n.load_path += Dir[Rails.root.join('config', 'locales', '**', '*.{rb,yml}')]
+    I18n.load_path += Dir[Rails.root.join('vendor', 'plugins', '*', 'config', 'locales', '**', '*.{rb,yml}')]
+    I18n.backend = I18nema::Backend.new
+    I18nema::Backend.send(:include, I18n::Backend::Fallbacks)
+    I18n.backend.init_translations
 
     Hash.send :include, I18n::HashExtensions
 
