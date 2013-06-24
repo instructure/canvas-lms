@@ -144,6 +144,8 @@ stylesheets:
   conversations:
     - public/stylesheets/compiled/conversations.css
     - public/stylesheets/compiled/slideshow.css
+  conversations_new:
+    - public/stylesheets/compiled/conversations_new.css
   alerts:
     - public/stylesheets/compiled/alerts.css
   developer_keys:

@@ -31,9 +31,12 @@ class ConversationsController < ApplicationController
   before_filter :infer_scope, :only => [:index, :show, :create, :update, :add_recipients, :add_message, :remove_messages]
   before_filter :normalize_recipients, :only => [:create, :add_recipients]
   before_filter :infer_tags, :only => [:create, :add_message, :add_recipients]
+
   # whether it's a bulk private message, or a big group conversation,
   # batch up all delayed jobs to make this more responsive to the user
   batch_jobs_in_actions :only => :create
+
+  API_ALLOWED_FIELDS = %w{workflow_state subscribed starred scope filter}
 
   # @API List conversations
   # Returns the list of conversations for the current user, most recent ones first.
@@ -139,6 +142,11 @@ class ConversationsController < ApplicationController
         :MEDIA_COMMENTS_ENABLED => feature_enabled?(:kaltura),
       })
     end
+  end
+
+  # New Conversations UI. When finished, move back to index action.
+  def index_new
+    return unless authorized_action(Account.site_admin, @current_user, :become_user)
   end
 
   # @API Create a conversation
@@ -390,7 +398,7 @@ class ConversationsController < ApplicationController
   #     "participants": [{"id": 1, "name": "Joe TA"}]
   #   }
   def update
-    if @conversation.update_attributes(params[:conversation])
+    if @conversation.update_attributes(params[:conversation].slice(*API_ALLOWED_FIELDS))
       render :json => conversation_json(@conversation, @current_user, session)
     else
       render :json => @conversation.errors, :status => :bad_request

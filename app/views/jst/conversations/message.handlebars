@@ -1,0 +1,29 @@
+<b class="author">{{participantList}}</b>
+
+<span class="date pull-right">{{friendlyDatetime last_message_at}}</span>
+
+<p class="subject">[[Subject]]</p>
+
+<span class="message-count label">
+  {{message_count}}
+  <span class="screenreader-only">{{#t "total_messages"}}Total messages{{/t}}</span>
+</span>
+
+<div class="summary">{{last_message}}</div>
+
+<ul class="message-actions unstyled">
+  <li>
+    <a href="#" class="star-btn {{#if starred}}active{{/if}}" role="button">
+      <span class="screenreader-only">{{#t "star"}}Star{{/t}}</span>
+    </a>
+  </li>
+  <li>
+    <a href="#" class="read-state {{#unless unread}}read{{/unless}}" role="button">
+      <span class="screenreader-only">{{#t "toggle_read"}}Toggle Read/Unread{{/t}}</span>
+    </a>
+  </li>
+</ul>
+
+<a href="#" class="open-message" role="button">
+  {{#t "open_message"}}Open Message{{/t}}
+</a>

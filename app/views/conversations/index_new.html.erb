@@ -1,0 +1,80 @@
+<% jammit_css :conversations_new %>
+<% js_bundle  :conversations_new %>
+
+<div class="conversations">
+  <header class="panel">
+    <div class="filters">
+      <label for="course-filter" class="screenreader-only">
+        <%= t(:filter_messages_by_course, "Filter messages by course") %>
+      </label>
+      <select class="course-filter" id="course-filter">
+        <option value="">[[Courses]]</option>
+      </select>
+
+      <label for="type-filter" class="screenreader-only">
+        <%= t(:filter_messages_by_type, "Filter messages by type") %>
+      </label>
+      <select class="type-filter" id="type-filter">
+        <option value="">[[Filters]]</option>
+      </select>
+    </div>
+
+    <div class="actions">
+      <button class="btn">
+        <span class="screenreader-only"><%= t(:new_message, "New message") %></span>
+        <i class="icon-compose"></i>
+      </button>
+
+      <div class="btn-group">
+        <button class="btn">
+          <span class="screenreader-only"><%= t(:reply, "Reply") %></span>
+          <i class="icon-replied"></i>
+        </button>
+        <button class="btn">
+          <span class="screenreader-only"><%= t(:reply_all, "Reply all") %></span>
+          <i class="icon-question"></i>
+        </button>
+        <button class="btn">
+          <span class="screenreader-only"><%= t(:delete_conversation, "Delete conversation") %></span>
+          <i class="icon-trash"></i>
+        </button>
+      </div>
+
+      <button class="btn">
+        <span class="screenreader-only"><%= t(:settings, "Settings") %></span>
+        <i class="icon-settings"></i>
+        <i class="icon-mini-arrow-down"></i>
+      </button>
+    </div>
+
+    <div class="search pull-right form-search" role="search">
+      <div class="input-append">
+        <label for="search-query" class="screenreader-only">
+          <%= t(:enter_name_group_or_course, "Enter a name, group, or course") %>
+        </label>
+        <input type="search"
+               id="search-query"
+               class="search-query"
+               placeholder="<%= t(:enter_name_group_or_course, "Enter a name, group, or course") %>" />
+
+        <button class="btn" type="button">
+          <span class="screenreader-only">
+            <%= t(:search_names_groups_courses, "Search names, groups, and courses") %>
+          </span>
+          <i class="icon-address-book"></i>
+        </button>
+      </div>
+
+      <a href="#" class="help-btn">
+        <span class="screenreader-only">Help</span>
+        <i class="icon-question"></i>
+        <i class="icon-mini-arrow-down"></i>
+      </a>
+    </div>
+  </header>
+
+  <div class="row-fluid messaging-wrapper">
+    <div class="span4 message-list"></div>
+    <div class="span8 message-detail"></div>
+  </div>
+</div>
