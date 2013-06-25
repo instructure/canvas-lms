@@ -53,14 +53,13 @@ class Canvas::Migration::Worker::CCWorker < Struct.new(:migration_id)
       cm.update_conversion_progress(100)
 
       if cm.import_immediately?
-        cm.import_content_without_send_later
-        cm.update_import_progress(100)
-        saved = cm.save
-        if converter.respond_to?(:post_process)
-          converter.post_process
-        end
-      end
-
+         cm.import_content_without_send_later
+         cm.update_import_progress(100)
+         saved = cm.save
+         if converter.respond_to?(:post_process)
+           converter.post_process
+         end
+       end
       saved
     rescue Canvas::Migration::Error
       cm.add_error($!.message, :exception => $!)

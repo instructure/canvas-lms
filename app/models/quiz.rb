@@ -947,6 +947,7 @@ class Quiz < ActiveRecord::Base
 
   def self.process_migration(data, migration, question_data)
     assessments = data['assessments'] ? data['assessments']['assessments'] : []
+    assessments ||= []
     assessments.each do |assessment|
       migration_id = assessment['migration_id'] || assessment['assessment_id']
       if migration.import_object?("quizzes", migration_id)
