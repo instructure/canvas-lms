@@ -1028,6 +1028,7 @@ ActionController::Routing::Routes.draw do |map|
 
       groups.with_options(:controller => :group_memberships) do |memberships|
         memberships.resources :memberships, :path_prefix => "groups/:group_id", :name_prefix => "group_", :controller => :group_memberships, :except => [:show]
+        memberships.resources :users, :path_prefix => "groups/:group_id", :name_prefix => "group_", :controller => :group_memberships, :except => [:show, :create]
       end
 
       groups.post 'groups/:group_id/folders', :controller => :folders, :action => :create

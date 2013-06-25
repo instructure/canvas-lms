@@ -328,6 +328,7 @@ describe "Groups API", :type => :integration do
   context "memberships" do
     before do
       @memberships_path = "#{@community_path}/memberships"
+      @alternate_memberships_path = "#{@community_path}/users"
       @memberships_path_options = { :controller => "group_memberships", :format => "json" }
     end
 
@@ -395,6 +396,20 @@ describe "Groups API", :type => :integration do
       json.should == membership_json(@membership)
     end
 
+    it "should allow accepting a join request by a moderator using users/:user_id endpoint" do
+      @user = user_model
+      user_id = @user.id
+      @community.join_level = "parent_context_request"
+      @community.save!
+      @membership = @community.add_user(@user)
+      @user = @moderator
+      json = api_call(:put, "#{@alternate_memberships_path}/#{user_id}", @memberships_path_options.merge(:group_id => @community.to_param, :user_id => user_id.to_param, :action => "update"), {
+          :workflow_state => "accepted"
+      })
+      @membership.reload.should be_active
+      json.should == membership_json(@membership)
+    end
+
     it "should not allow other workflow_state modifications" do
       @user = @moderator
       @membership = @community.group_memberships.find_by_user_id(@member.id)
@@ -414,6 +429,25 @@ describe "Groups API", :type => :integration do
       @membership.reload.should be_active
     end
 
+    it "should not allow other workflow_state modifications using users/:user_id endpoint" do
+      @user = @moderator
+      @membership = @community.group_memberships.find_by_user_id(@member.id)
+      json = api_call(:put, "#{@alternate_memberships_path}/#{@user.id}", @memberships_path_options.merge(:group_id => @community.to_param, :user_id => @user.to_param, :action => "update"), {
+          :workflow_state => "requested"
+      })
+      @membership.reload.should be_active
+
+      json = api_call(:put, "#{@alternate_memberships_path}/#{@user.id}", @memberships_path_options.merge(:group_id => @community.to_param, :user_id => @user.to_param, :action => "update"), {
+          :workflow_state => "invited"
+      })
+      @membership.reload.should be_active
+
+      json = api_call(:put, "#{@alternate_memberships_path}/#{@user.id}", @memberships_path_options.merge(:group_id => @community.to_param, :user_id => @user.to_param, :action => "update"), {
+          :workflow_state => "deleted"
+      })
+      @membership.reload.should be_active
+    end
+
     it "should not allow a member to accept join requests" do
       @user = user_model
       @community.join_level = "parent_context_request"
@@ -422,6 +456,18 @@ describe "Groups API", :type => :integration do
       @user = @member
       api_call(:put, "#{@memberships_path}/#{@membership.id}", @memberships_path_options.merge(:group_id => @community.to_param, :membership_id => @membership.to_param, :action => "update"), {
         :workflow_state => "accepted"
+      }, {}, :expected_status => 401)
+      @membership.reload.should be_requested
+    end
+
+    it "should not allow a member to accept join requests using users/:user_id endpoint" do
+      @user = user_model
+      @community.join_level = "parent_context_request"
+      @community.save!
+      @membership = @community.add_user(@user)
+      @user = @member
+      api_call(:put, "#{@alternate_memberships_path}/#{@user.id}", @memberships_path_options.merge(:group_id => @community.to_param, :user_id => @user.to_param, :action => "update"), {
+          :workflow_state => "accepted"
       }, {}, :expected_status => 401)
       @membership.reload.should be_requested
     end
@@ -440,11 +486,34 @@ describe "Groups API", :type => :integration do
       @membership.reload.moderator.should be_false
     end
 
+    it "should allow changing moderator privileges using users/:user_id endpoint" do
+      @user = @moderator
+      @membership = @community.group_memberships.find_by_user_id(@member.id)
+      api_call(:put, "#{@alternate_memberships_path}/#{@member.id}", @memberships_path_options.merge(:group_id => @community.to_param, :user_id => @member.to_param, :action => "update"), {
+          :moderator => true
+      })
+      @membership.reload.moderator.should be_true
+
+      api_call(:put, "#{@alternate_memberships_path}/#{@member.id}", @memberships_path_options.merge(:group_id => @community.to_param, :user_id => @member.to_param, :action => "update"), {
+          :moderator => false
+      })
+      @membership.reload.moderator.should be_false
+    end
+
     it "should not allow a member to change moderator privileges" do
       @user = @member
       @membership = @community.group_memberships.find_by_user_id(@moderator.id)
       api_call(:put, "#{@memberships_path}/#{@membership.id}", @memberships_path_options.merge(:group_id => @community.to_param, :membership_id => @membership.to_param, :action => "update"), {
         :moderator => false
+      }, {}, :expected_status => 401)
+      @membership.reload.moderator.should be_true
+    end
+
+    it "should not allow a member to change moderator privileges using users/:user_id endpoint" do
+      @user = @member
+      @membership = @community.group_memberships.find_by_user_id(@moderator.id)
+      api_call(:put, "#{@alternate_memberships_path}/#{@user.id}", @memberships_path_options.merge(:group_id => @community.to_param, :user_id => @user.to_param, :action => "update"), {
+          :moderator => false
       }, {}, :expected_status => 401)
       @membership.reload.moderator.should be_true
     end
@@ -457,9 +526,24 @@ describe "Groups API", :type => :integration do
       @membership.workflow_state.should == "deleted"
     end
 
+    it "should allow someone to leave a group using users/:user_id endpoint" do
+      @user = @member
+      @gm = @community.group_memberships.where(:user_id => @user).first
+      api_call(:delete, "#{@alternate_memberships_path}/#{@user.id}", @memberships_path_options.merge(:group_id => @community.to_param, :user_id => @user.to_param, :action => "destroy"))
+      @membership = GroupMembership.where(:user_id => @user, :group_id => @community).first
+      @membership.workflow_state.should == "deleted"
+    end
+
     it "should allow leaving a group using 'self'" do
       @user = @member
       api_call(:delete, "#{@memberships_path}/self", @memberships_path_options.merge(:group_id => @community.to_param, :membership_id => 'self', :action => "destroy"))
+      @membership = GroupMembership.where(:user_id => @user, :group_id => @community).first
+      @membership.workflow_state.should == "deleted"
+    end
+
+    it "should allow leaving a group using 'self' using users/:user_id endpoint" do
+      @user = @member
+      api_call(:delete, "#{@alternate_memberships_path}/self", @memberships_path_options.merge(:group_id => @community.to_param, :user_id => 'self', :action => "destroy"))
       @membership = GroupMembership.where(:user_id => @user, :group_id => @community).first
       @membership.workflow_state.should == "deleted"
     end

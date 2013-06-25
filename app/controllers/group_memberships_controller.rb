@@ -116,6 +116,10 @@ class GroupMembershipsController < ApplicationController
   #     curl https://<canvas>/api/v1/groups/<group_id>/memberships/<membership_id> \ 
   #          -F 'moderator=true'
   #          -H 'Authorization: Bearer <token>'
+  # @example_request
+  #     curl https://<canvas>/api/v1/groups/<group_id>/users/<user_id> \
+  #          -F 'moderator=true'
+  #          -H 'Authorization: Bearer <token>'
   #
   # @returns Group Membership
   def update
@@ -142,6 +146,10 @@ class GroupMembershipsController < ApplicationController
   #     curl https://<canvas>/api/v1/groups/<group_id>/memberships/<membership_id> \ 
   #          -X DELETE \ 
   #          -H 'Authorization: Bearer <token>'
+  # @example_request
+  #     curl https://<canvas>/api/v1/groups/<group_id>/users/<user_id> \
+  #          -X DELETE \
+  #          -H 'Authorization: Bearer <token>'
   def destroy
     find_membership
     if authorized_action(@membership, @current_user, :delete)
@@ -158,10 +166,12 @@ class GroupMembershipsController < ApplicationController
   end
 
   def find_membership
-    if params[:membership_id] == 'self'
-      @membership = @group.group_memberships.where(:user_id => @current_user).first
-    else
+    if (params[:membership_id] && params[:membership_id] == 'self') || (params[:user_id] && params[:user_id] == 'self')
+      @membership = @group.group_memberships.where(:user_id => @current_user).first || not_found
+    elsif params[:membership_id]
       @membership = @group.group_memberships.find(params[:membership_id])
+    else
+      @membership = @group.group_memberships.where(:user_id => params[:user_id]).first || not_found
     end
   end
 end
