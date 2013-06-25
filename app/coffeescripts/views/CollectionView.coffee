@@ -141,6 +141,7 @@ define [
     renderItem: (model) =>
       view = new @itemView $.extend {}, (@itemViewOptions || {}), {model}
       view.render()
+      @attachItemView?(model, view)
       @insertView view
 
     ##
