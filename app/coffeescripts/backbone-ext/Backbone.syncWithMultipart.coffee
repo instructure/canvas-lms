@@ -15,10 +15,10 @@ define [
 
     # Create a hidden form
     httpMethod = {create: 'POST', update: 'PUT', delete: 'DELETE', read: 'GET'}[method]
-    toForm = (object, nested) ->
+    toForm = (object, nested, asArray) ->
       inputs = _.map object, (attr, key) ->
 
-        key = "#{nested}[#{key}]" if nested
+        key = "#{nested}[#{if asArray then '' else key}]" if nested
 
         if _.isElement(attr)
           # leave a copy in the original form, since we're moving it
@@ -26,7 +26,7 @@ define [
           $orig.after($orig.clone(true))
           attr
         else if !_.isEmpty(attr) and (_.isArray(attr) or typeof attr is 'object')
-          toForm(attr, key)
+          toForm(attr, key, _.isArray(attr))
         else if !"#{key}".match(/^_/) and attr? and typeof attr isnt 'object' and typeof attr isnt 'function'
           $el = $ "<input/>",
             name: key
@@ -45,7 +45,7 @@ define [
         <input type='hidden' name='authenticity_token' value='#{ENV.AUTHENTICITY_TOKEN}' />
         """
 
-    _.each toForm(model.attributes), (el) ->
+    _.each toForm(model.toJSON()), (el) ->
       return unless el
       if el.name is 'file' # s3 expects the file param last
         $form.append(el)

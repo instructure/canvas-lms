@@ -240,6 +240,7 @@ describe "discussions" do
           filename, fullpath, data = get_file("testfile5.zip")
           f('input[name=attachment]').send_keys(fullpath)
           type_in_tiny('textarea[name=message]', 'file attachement discussion')
+          yield if block_given?
           expect_new_page_load { submit_form('.form-actions') }
           wait_for_ajaximations
 
@@ -284,7 +285,13 @@ describe "discussions" do
           expect_new_page_load { f('li.discussion .title').click }
           expect_new_page_load { f(".edit-btn").click }
 
-          add_attachment_and_validate
+          add_attachment_and_validate do
+            # should correctly save changes to the assignment
+            set_value f('#discussion_topic_assignment_points_possible'), '123'
+          end
+          if what_to_create == DiscussionTopic
+            Assignment.last.points_possible.should == 123
+          end
         end
 
         it "should edit a topic" do
