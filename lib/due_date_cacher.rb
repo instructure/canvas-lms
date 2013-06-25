@@ -12,30 +12,23 @@ class DueDateCacher
   # expects all assignments to be on the same shard
   def initialize(assignments)
     @assignments = assignments
+    @shard = Shard.shard_for(assignments.first)
   end
 
   def shard
-    @assignments.first.shard
-  end
-
-  def transaction
-    @assignments.first.transaction{ yield }
+    @shard
   end
 
   def submissions
     Submission.where(:assignment_id => @assignments)
   end
 
-  def connection
-    @assignments.first.connection
-  end
-
   def recompute
     # in a transaction on the correct shard:
     shard.activate do
-      transaction do
+      Assignment.transaction do
         # create temporary table
-        connection.execute("CREATE TEMPORARY TABLE calculated_due_ats AS (#{submissions.select([
+        Assignment.connection.execute("CREATE TEMPORARY TABLE calculated_due_ats AS (#{submissions.select([
           "submissions.id AS submission_id",
           "submissions.user_id",
           "submissions.assignment_id",
@@ -63,7 +56,7 @@ class DueDateCacher
           update_all("cached_due_date=calculated_due_ats.due_at")
 
         # clean up
-        connection.execute("DROP TABLE calculated_due_ats")
+        Assignment.connection.execute("DROP TABLE calculated_due_ats")
       end
     end
   end
