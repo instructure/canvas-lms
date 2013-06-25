@@ -148,6 +148,7 @@ class ContentImportsController < ApplicationController
       @content_migration = ContentMigration.find_by_context_id_and_context_type_and_id(@context.id, @context.class.to_s, migration_id) if migration_id.present?
       @content_migration ||= ContentMigration.find_by_context_id_and_context_type(@context.id, @context.class.to_s, :order => "id DESC")
       if request.method == :post
+        @content_migration.set_date_shift_options(params[:copy] || {})
         process_migration_params
         @content_migration.migration_settings[:migration_ids_to_import] = params
         @content_migration.save
