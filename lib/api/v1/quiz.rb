@@ -35,6 +35,8 @@ module Api::V1::Quiz
       scoring_policy
       allowed_attempts
       one_question_at_a_time
+      question_count
+      points_possible
       cant_go_back
       access_code
       ip_filter

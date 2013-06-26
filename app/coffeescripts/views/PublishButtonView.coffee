@@ -16,8 +16,9 @@ define [
 
     events: {'click', 'hover'}
 
-    initialize: ->
-      @disable() unless @model.get('publishable')
+    setElement: ->
+      super
+      @disable() unless @model.get 'publishable'
 
     # events
 
@@ -36,7 +37,7 @@ define [
       @keepState = true
       if @isPublish()
         @publish()
-      else if @isUnpublish()
+      else if @isUnpublish() or @isPublished()
         @unpublish()
 
     # calling publish/unpublish on the model expects a deferred object
@@ -77,10 +78,16 @@ define [
 
     reset: ->
       @$el.removeClass "#{@publishClass} #{@publishedClass} #{@unpublishClass}"
+      @$icon.removeClass 'icon-publish icon-unpublish icon-unpublished'
 
     # render
 
     render: ->
+      @$el.attr 'role', 'button'
+      @$el.html '<i></i><span class="publish-text"></span>'
+      @$icon = @$ 'i'
+      @$span = @$ 'span'
+
       if @model.get('published')
         @renderPublished()
       else
@@ -88,35 +95,34 @@ define [
       @
 
     renderPublish: ->
-      @reset()
-      @$el.addClass @publishClass
-      text = I18n.t('buttons.publish', 'Publish')
-      @$el.attr 'title', text
-      @$el.html "<i class='icon-unpublished'></i><span class='publish-text'>&nbsp;#{text}</span>"
+      text = I18n.t 'buttons.publish', 'Publish'
+      @renderState(text, @publishClass, 'icon-unpublished')
 
     renderPublished: ->
-      @reset()
-      text = I18n.t('buttons.published', 'Published')
-      @$el.addClass @publishedClass
-      @$el.attr 'title', text
-      @$el.html "<i class='icon-publish'></i><span class='publish-text'>&nbsp;#{text}</span>"
+      text = I18n.t 'buttons.published', 'Published'
+      @renderState(text, @publishedClass, 'icon-publish')
 
     renderUnpublish: ->
-      @reset()
-      text = I18n.t('buttons.unpublish', 'Unpublish')
-      @$el.addClass @unpublishClass
-      @$el.attr 'title', text
-      @$el.html "<i class='icon-unpublish'></i><span class='publish-text'>&nbsp;#{text}</span>"
+      text = I18n.t 'buttons.unpublish', 'Unpublish'
+      @renderState(text, @unpublishClass, 'icon-unpublish')
 
     renderPublishing: ->
       @disable()
-      text = I18n.t('buttons.publishing', 'Publishing...')
-      @$el.attr 'title', text
-      @$el.html "<i class='icon-publish'></i><span class='publish-text'>&nbsp;#{text}</span>"
+      text = I18n.t 'buttons.publishing', 'Publishing...'
+      @renderState(text, @publishClass, 'icon-publish')
 
     renderUnpublishing: ->
       @disable()
-      text = I18n.t('buttons.unpublishing', 'Unpublishing...')
-      @$el.attr 'title', text
-      @$el.html "<i class='icon-unpublished'></i><span class='publish-text'>&nbsp;#{text}</span>"
+      text = I18n.t 'buttons.unpublishing', 'Unpublishing...'
+      @renderState(text, @unpublishClass, 'icon-unpublished')
 
+    renderState: (text, buttonClass, iconClass) ->
+      @reset()
+      @$el.addClass buttonClass
+
+      title = if @isDisabled() then @model.disabledMessage() else text
+      @$el.attr 'title', title
+      @$el.attr 'aria-pressed', buttonClass is @publishedClass
+
+      @$icon.addClass iconClass
+      @$span.html "&nbsp;#{text}"

@@ -14,7 +14,7 @@ The publish button has two states on click (publish and published) and a hover s
 </p>
 
 <p>
-  <button class="btn" id="published-disabled"></button>
+  <button class="btn" id="published-disabled" data-tooltip></button>
 </p>
 
 <p>
@@ -81,7 +81,9 @@ The publish button has two states on click (publish and published) and a hover s
   }
 
   .publish-text {
-    display: none;
+    position: absolute !important;
+    clip: rect(1px 1px 1px 1px);
+    clip: rect(1px, 1px, 1px, 1px);
   }
 }
 

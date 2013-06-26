@@ -97,6 +97,36 @@ describe QuizzesController do
     end
   end
 
+  describe "GET 'index' with draft state enabled" do
+    setup do
+      a = Account.default
+      a.settings[:enable_draft] = true
+      a.save!
+    end
+
+    it "should assign variables" do
+      course_with_teacher_logged_in(:active_all => true)
+      get 'index', :course_id => @course.id
+      assigns[:assignment_json].should_not be_nil
+      assigns[:open_json].should_not be_nil
+      assigns[:surveys_json].should_not be_nil
+      assigns[:quiz_options].should_not be_nil
+    end
+
+    it "should filter out unpublished quizzes for student" do
+      course_with_student_logged_in(:active_all => true)
+      course_quiz
+      course_quiz(active = true)
+
+      get 'index', :course_id => @course.id
+
+      assigns[:quizzes].length.should eql 1
+      assigns[:quizzes].map do |quiz|
+        quiz.published?.should be_true
+      end
+    end
+  end
+
   describe "GET 'new'" do
     it "should require authorization" do
       course_with_teacher(:active_all => true)

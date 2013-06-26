@@ -1,0 +1,17 @@
+<div class="ig-header">
+  <a class="element_toggler" href="#"
+     aria-controls="{{listId}}"
+     aria-expanded="true">
+    <i class="icon-mini-arrow-down"></i> {{title}}
+  </a>
+</div>
+
+<ul id="{{listId}}" class="ig-list collectionViewItems"></ul>
+
+<div class="ig-no-content">
+  {{#if isSurvey}}
+    {{#t "no_surveys"}}There are no surveys to show.{{/t}}
+  {{else}}
+    {{#t "no_quizzes"}}There are no quizzes to show.{{/t}}
+  {{/if}}
+</div>

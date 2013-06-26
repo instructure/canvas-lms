@@ -69,6 +69,12 @@
 #       // show one question at a time?
 #       one_question_at_a_time: false,
 #
+#       // the number of questions in the quiz
+#       question_count: 12,
+# 
+#       // The total point value given to the quiz
+#       points_possible: 20,
+#
 #       // lock questions after answering?
 #       // only valid if one_question_at_a_time=true
 #       cant_go_back: false,

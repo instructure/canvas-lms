@@ -74,12 +74,9 @@
   <div class="header-bar">
     <div class="header-bar-right">
       <div class="header-group-left">
-        <button id="quiz-publish-link" data-id='<%= @quiz.id %>'
-          data-base-url='<%= context_url(@context, :context_quizzes_url) %>'
-          class='btn quiz-publish-button <%= "published " if @quiz.published? %> <%= "disabled " unless @quiz.can_unpublish? %>'
-          <% unless @quiz.can_unpublish? %>
-          data-tooltip title="<%= I18n.t('#quizzes.cant_unpublish_when_students_submit', "Can't unpublish if there are student submissions") %>"
-          <% end %>>
+        <button id="quiz-publish-link" 
+          class='btn quiz-publish-button <%= "disabled " unless @quiz.can_unpublish? %>'
+          <%= 'data-tooltip' unless @quiz.can_unpublish? %>>
         </button>
 
         <% link_to context_url(@context, :context_quiz_take_url, @quiz, :preview => 1), :method => :post, :class => 'btn', :id => 'preview_quiz_button' do %>

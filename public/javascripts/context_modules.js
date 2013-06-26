@@ -22,7 +22,7 @@ define([
   'jquery' /* $ */,
   'compiled/views/context_modules/context_modules' /* handles the publish/unpublish state */,
   'compiled/util/vddTooltip',
-  'jst/assignments/VddTooltip',
+  'jst/_vddTooltip',
   'compiled/models/Publishable',
   'compiled/views/PublishButtonView',
   'jquery.ajaxJSON' /* ajaxJSON */,

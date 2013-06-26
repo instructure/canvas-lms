@@ -14,9 +14,14 @@ color with a dashed line between groups.
 
   <div class="item-group-condensed">
     <div class="ig-header">
-      <i class="icon-mini-arrow-right"></i> Item Group Header
+      <a class="element_toggler" href="#"
+         aria-controls="cond_group_1"
+         aria-expanded="true">
+        <i class="icon-mini-arrow-down"></i> Item Group Header
+      </a>
     </div>
-    <ul class="ig-list">
+
+    <ul class="ig-list" id="cond_group_1">
       <li>
         <div class="ig-row">
           <a href="#" class="ig-title ellipses">
@@ -28,10 +33,9 @@ color with a dashed line between groups.
             <div class="span4 ellipses">10 pts</div>
           </div>
           <div class="ig-admin">
-            <a class="ig-publish-btn">
-              <i class="icon-unpublished"></i>
-              <i class="icon-publish"></i>
-            </a>
+            <span id="publish-icon" class="publish-icon publish-icon-published" data-tooltip title="Unpublish">
+              <i class="icon-publish"></i><span class="publish-text">&nbsp;Published</span>
+            </span>
 
             <a class="al-trigger">
               <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
@@ -55,10 +59,9 @@ color with a dashed line between groups.
             <div class="span4 ellipses">10 pts</div>
           </div>
           <div class="ig-admin">
-            <a class="ig-publish-btn">
-              <i class="icon-unpublished"></i>
-              <i class="icon-publish"></i>
-            </a>
+            <span id="publish-icon" class="publish-icon publish-icon-published" data-tooltip title="Unpublish">
+              <i class="icon-publish"></i><span class="publish-text">&nbsp;Published</span>
+            </span>
 
             <a class="al-trigger">
               <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
@@ -82,10 +85,9 @@ color with a dashed line between groups.
             <div class="span4 ellipses">10 pts</div>
           </div>
           <div class="ig-admin">
-            <a class="ig-publish-btn">
-              <i class="icon-unpublished"></i>
-              <i class="icon-publish"></i>
-            </a>
+            <span id="publish-icon" class="publish-icon publish-icon-published" data-tooltip title="Unpublish">
+              <i class="icon-publish"></i><span class="publish-text">&nbsp;Published</span>
+            </span>
 
             <a class="al-trigger">
               <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
@@ -102,9 +104,13 @@ color with a dashed line between groups.
 
   <div class="item-group-condensed">
     <div class="ig-header">
-      <i class="icon-mini-arrow-right"></i> Item Group Header
+      <a class="element_toggler" href="#"
+         aria-controls="cond_group_2"
+         aria-expanded="true">
+        <i class="icon-mini-arrow-down"></i> Item Group Header
+      </a>
     </div>
-    <ul class="ig-list">
+    <ul class="ig-list" id="cond_group_2">
     <li>
       <div class="ig-row">
         <a href="#" class="ig-title ellipses">
@@ -116,10 +122,9 @@ color with a dashed line between groups.
           <div class="span4 ellipses">10 pts</div>
         </div>
         <div class="ig-admin">
-          <a class="ig-publish-btn">
-            <i class="icon-unpublished"></i>
-            <i class="icon-publish"></i>
-          </a>
+          <span id="publish-icon" class="publish-icon publish-icon-published" data-tooltip title="Unpublish">
+            <i class="icon-publish"></i><span class="publish-text">&nbsp;Published</span>
+          </span>
 
           <a class="al-trigger">
             <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
@@ -139,15 +144,20 @@ color with a dashed line between groups.
 
 */
 
+body.with_item_groups #main {
+  background-color: #e8ecef;
+}
 .item-group-container {
   background-color: $wellBackground;
+  padding-bottom: 70px;
 
   .item-group-condensed {
     border-bottom: 1px dashed #c2c8d0;
     padding: 15px;
   }
-  .item-group-condensed:last-child {
-    border-bottom: 1px solid #b6babf;
+  .item-group-condensed:last-child,
+  .item-group-condensed.last {
+    border-bottom: 0;
   }
 }
 
@@ -157,11 +167,19 @@ color with a dashed line between groups.
 
   .ig-header {
     padding-left: 15px;
+
+    a {
+      text-decoration: none;
+      color: #3d454c;
+    }
   }
   .ig-title {
     left: 15px;
   }
 
+  .ig-list {
+    margin-top: 0;
+  }
   .ig-list li {
     margin: 0;
   }

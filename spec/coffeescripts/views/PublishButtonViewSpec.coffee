@@ -4,7 +4,7 @@ define [
   'jquery'
   'helpers/jquery.simulate'
 ], (Backbone, PublishButtonView, $) ->
-###
+
   module 'PublishButtonView',
     setup: ->
       @publishable = class Publishable extends Backbone.Model
@@ -20,6 +20,9 @@ define [
           @set("published", false)
           $.Deferred().resolve()
 
+        disabledMessage: ->
+          "can't unpublish"
+
       @publish   = new Publishable(published: false, publishable: true)
       @published = new Publishable(published: true,  publishable: true)
       @disabled  = new Publishable(published: true,  publishable: false)
@@ -28,18 +31,18 @@ define [
   test 'initialize publish', ->
     btnView = new PublishButtonView(model: @publish).render()
     ok btnView.isPublish()
-    equal btnView.$el.html().match(/<i class="icon-unpublished"><\/i>&nbsp;Publish/).length, 1
+    equal btnView.$el.html().match(/<i class="icon-unpublished"><\/i><span class="publish-text">&nbsp;Publish/).length, 1
 
   test 'initialize published', ->
     btnView = new PublishButtonView(model: @published).render()
     ok btnView.isPublished()
-    equal btnView.$el.html().match(/<i class="icon-publish"><\/i>&nbsp;Published/).length, 1
+    equal btnView.$el.html().match(/<i class="icon-publish"><\/i><span class="publish-text">&nbsp;Published/).length, 1
 
   test 'initialize disabled published', ->
     btnView = new PublishButtonView(model: @disabled).render()
     ok btnView.isPublished()
     ok btnView.isDisabled()
-    equal btnView.$el.html().match(/<i class="icon-publish"><\/i>&nbsp;Published/).length, 1
+    equal btnView.$el.html().match(/<i class="icon-publish"><\/i><span class="publish-text">&nbsp;Published/).length, 1
 
   # state
   test 'disable should add disabled state', ->
@@ -71,7 +74,7 @@ define [
   test 'mouseenter publish button should not change text or icon', ->
     btnView = new PublishButtonView(model: @publish).render()
     btnView.$el.trigger('mouseenter')
-    equal btnView.$el.html().match(/<i class="icon-unpublished"><\/i>&nbsp;Publish/).length, 1
+    equal btnView.$el.html().match(/<i class="icon-unpublished"><\/i><span class="publish-text">&nbsp;Publish/).length, 1
 
   test 'mouseenter published button should remove published state', ->
     btnView = new PublishButtonView(model: @published).render()
@@ -86,7 +89,7 @@ define [
   test 'mouseenter published button should change icon and text', ->
     btnView = new PublishButtonView(model: @published).render()
     btnView.$el.trigger('mouseenter')
-    equal btnView.$el.html().match(/<i class="icon-unpublish"><\/i>&nbsp;Unpublish/).length, 1
+    equal btnView.$el.html().match(/<i class="icon-unpublish"><\/i><span class="publish-text">&nbsp;Unpublish/).length, 1
 
   test 'mouseenter disabled published button should keep published state', ->
     btnView = new PublishButtonView(model: @disabled).render()
@@ -95,7 +98,7 @@ define [
 
   test 'mouseenter disabled published button should not change text or icon', ->
     btnView = new PublishButtonView(model: @disabled).render()
-    equal btnView.$el.html().match(/<i class="icon-publish"><\/i>&nbsp;Published/).length, 1
+    equal btnView.$el.html().match(/<i class="icon-publish"><\/i><span class="publish-text">&nbsp;Published/).length, 1
 
 
   # mouseleave
@@ -115,7 +118,7 @@ define [
     btnView = new PublishButtonView(model: @published).render()
     btnView.$el.trigger('mouseenter')
     btnView.$el.trigger('mouseleave')
-    equal btnView.$el.html().match(/<i class="icon-publish"><\/i>&nbsp;Published/).length, 1
+    equal btnView.$el.html().match(/<i class="icon-publish"><\/i><span class="publish-text">&nbsp;Published/).length, 1
 
 
   # click
@@ -198,4 +201,3 @@ define [
     btnView.$el.trigger('click')
 
     ok !btnView.isPublish()
-###

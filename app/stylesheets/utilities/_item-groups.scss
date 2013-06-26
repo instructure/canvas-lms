@@ -9,9 +9,13 @@ is for items that are not draggable.
 ```html
 <div class="item-group">
   <div class="ig-header">
-    <i class="icon-mini-arrow-right"></i> Item Group Header
+    <a class="element_toggler" href="#"
+       aria-controls="group_1"
+       aria-expanded="true">
+      <i class="icon-mini-arrow-down"></i> Item Group Header
+    </a>
   </div>
-  <ul class="ig-list">
+  <ul class="ig-list" id="group_1">
     <li>
       <div class="ig-row">
         <a href="#" class="ig-title ellipses">
@@ -23,10 +27,9 @@ is for items that are not draggable.
           <div class="span4 ellipses">10 pts</div>
         </div>
         <div class="ig-admin">
-          <a class="ig-publish-btn">
-            <i class="icon-unpublished"></i>
-            <i class="icon-publish"></i>
-          </a>
+          <span id="publish-icon" class="publish-icon publish-icon-published" data-tooltip title="Unpublish">
+            <i class="icon-publish"></i><span class="publish-text">&nbsp;Published</span>
+          </span>
 
           <a class="al-trigger">
             <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
@@ -50,10 +53,10 @@ is for items that are not draggable.
           <div class="span4 ellipses">10 pts</div>
         </div>
         <div class="ig-admin">
-          <a class="ig-publish-btn">
-            <i class="icon-unpublished"></i>
-            <i class="icon-publish"></i>
-          </a>
+          <span id="publish-icon" class="publish-icon publish-icon-published" data-tooltip title="Unpublish">
+            <i class="icon-publish"></i><span class="publish-text">&nbsp;Published</span>
+          </span>
+
           <a class="al-trigger">
             <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
           </a>
@@ -82,10 +85,10 @@ is for items that are not draggable.
           <div class="span4 ellipses">10 pts</div>
         </div>
         <div class="ig-admin">
-          <a class="ig-publish-btn">
-            <i class="icon-unpublished"></i>
-            <i class="icon-publish"></i>
-          </a>
+          <span id="publish-icon" class="publish-icon publish-icon-published" data-tooltip title="Unpublish">
+            <i class="icon-publish"></i><span class="publish-text">&nbsp;Published</span>
+          </span>
+
           <a class="al-trigger">
             <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
           </a>
@@ -129,6 +132,11 @@ is for items that are not draggable.
   padding-top: 5px;
   padding-bottom: 5px;
 
+  a {
+    text-decoration: none;
+    color: #3d454c;
+  }
+
   .icon-mini-arrow-right {
     position: relative;
     top: -1px;
@@ -167,6 +175,9 @@ is for items that are not draggable.
 
   .ellipses {
     color: #7c7c7c;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
   }
 
   &:hover {
@@ -183,37 +194,6 @@ is for items that are not draggable.
   }
 }
 
-.ig-publish-btn {
-  cursor: pointer;
-  white-space: nowrap;
-  margin-right: 22px;
-
-  i[class*=icon-]:before,
-  i[class^=icon-]:before {
-    font-size: 18px;
-  }
-
-  &:hover {
-    text-decoration: none;
-  }
-
-  .icon-unpublished {
-    color: #b4b8bb;
-  }
-  .icon-publish {
-    color: #2f8526;
-    display: none;
-  }
-}
-
-.ig-published {
-  .icon-unpublished {
-    display: none;
-  }
-  .icon-publish {
-    display: inline-block;
-  }
-}
 
 .ig-title {
   position: absolute;
@@ -221,6 +201,7 @@ is for items that are not draggable.
   right: 430px;
   overflow: hidden;
   white-space: nowrap;
+  text-overflow: ellipsis;
   font-weight: bold;
   top: 9px;
 }
@@ -235,11 +216,25 @@ is for items that are not draggable.
 
 .ig-admin {
   position: absolute;
+  white-space: nowrap;
   right: 3px;
   top: 10px;
 
-  a {
+  a.al-trigger {
+    color: #b4b8bb;
+    text-decoration: none;
+  }
+  a.al-trigger:hover {
     color: #4d4d4d;
+  }
+
+  .publish-icon {
+    margin-right: 22px;
+
+    i[class*=icon-]:before,
+    i[class^=icon-]:before {
+      font-size: 18px;
+    }
   }
 }
 
@@ -265,3 +260,13 @@ is for items that are not draggable.
   font-size: 15px;
 }
 
+.ig-no-content {
+  height: 20px;
+  margin-top: 5px;
+  border: 1px dashed #c1c7cf;
+  border-radius: 3px;
+  background: #fff;
+  padding: 10px 17px;
+  color: #878d92;
+  line-height: 20px;
+}

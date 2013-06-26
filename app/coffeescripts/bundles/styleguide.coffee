@@ -81,6 +81,9 @@ require [
       setTimeout deferred.resolve, 1000
       deferred
 
+    disabledMessage: ->
+      "Can't unpublish"
+
   # PublishButtonView doesn't require an element to initialize. It is
   # passed in here for the style-guide demonstration purposes
 
@@ -100,6 +103,12 @@ require [
   model   = new Publishable(published: false,  publishable: true)
   btnView = new PublishIconView(model: model, el: "#publish-icon").render()
 
+
+  # Item groups
+  $('.ig-header .element_toggler').click (e) ->
+    $(e.currentTarget).find('i')
+      .toggleClass('icon-mini-arrow-down')
+      .toggleClass('icon-mini-arrow-right')
 
 
   # Progressbar

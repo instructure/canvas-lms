@@ -1,0 +1,48 @@
+<div id="summary_quiz_{{id}}" class="ig-row {{#if publishable}}ig-publishable{{/if}}
+                                            {{#if published}}ig-published{{/if}}
+                                            {{#if can_update}}ig-editable{{/if}}">
+  <a href="{{url}}" class="ig-title ellipses">
+    <i class="icon-quiz"></i> {{title_label}}
+  </a>
+
+  <div class="ig-details row-fluid">
+    <div class="span4 ellipses description">
+      {{#if multiple_due_dates}}
+        <strong>{{#t "quiz_due"}}Due{{/t}}</strong>
+        {{> vddTooltip}}
+
+      {{else}}
+        {{#if due_at}}
+        <strong>{{#t "quiz_due"}}Due{{/t}}</strong> {{tDateToString due_at "date_at_time"}}
+        {{/if}}
+      {{/if}}
+    </div>
+
+    <div class="span3 ellipses">{{question_count_label}}</div>
+
+    <div class="span3 ellipses">
+      {{#if unlock_at}}
+      <strong>{{#t "quiz_available"}}Available{{/t}}</strong> {{tDateToString unlock_at "short"}}
+      {{/if}}
+    </div>
+    <div class="span2 ellipses">{{possible_points_label}}</div>
+  </div>
+
+  {{#if can_update}}
+  <div class="ig-admin">
+    <span data-view="publish-icon" class="publish-icon"></span>
+
+    <a class="al-trigger">
+      <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
+    </a>
+    <ul class="al-options">
+      <li>
+        <a href="{{edit_url}}" class="icon-edit" title='{{#t "title_edit"}}Edit Quiz{{/t}}'>{{#t "links.edit"}}Edit{{/t}}</a>
+      </li>
+      <li>
+        <a href="{{url}}" class="delete-item icon-trash" title='{{#t "title_delete"}}Delete Quiz{{/t}}'>{{#t "links.delete"}}Delete{{/t}}</a>
+      </li>
+    </ul>
+  </div>
+  {{/if}}
+</div>

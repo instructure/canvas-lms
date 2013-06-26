@@ -1,7 +1,8 @@
 define [
   'Backbone'
   'underscore'
-], (Backbone, _) ->
+  'i18n!publishable'
+], (Backbone, _, I18n) ->
 
   class Publishable extends Backbone.Model
 
@@ -17,6 +18,9 @@ define [
     unpublish: =>
       @set 'published', false
       @save()
+
+    disabledMessage: ->
+      I18n.t('cant_unpublish', "Can't unpublish")
 
     url: ->
       @_url

@@ -1,0 +1,55 @@
+<div class="header-bar">
+  <div class="header-bar-left form-inline">
+    <label class="hidden-inline-text" for="searchTerm">{{#t "search_for_quiz"}}Search for Quiz{{/t}}</label>
+    <input id="searchTerm" placeholder="{{#t "search_for_quiz"}}Search for Quiz{{/t}}" value="" type="search" />
+  </div>
+
+  {{#ifAny permissions.create permissions.manage}}
+  <div class="header-bar-right form-inline">
+    <a href="{{urls.new_quiz_url}}" class="btn btn-primary new-quiz-link" role='button'>
+      {{#t "links.create_new_quiz"}}New Quiz{{/t}}
+    </a>
+
+    <a class="al-trigger btn">
+      <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
+      <span class="screenreader-only">{{#t "links.settings"}}Settings{{/t}}</span>
+    </a>
+
+    <ul class="al-options">
+      {{#ifAll permissions.manage flags.question_banks}}
+      <li>
+        <a href="{{urls.question_banks_url}}" class="icon-question">
+          {{#t "links.manage_question_banks"}}Manage Question Banks{{/t}}
+        </a>
+      </li>
+      {{/ifAll}}
+
+      {{#ifAll permissions.manage flags.publish_multiple}}
+      <li>
+        <a href="#" class="publish_multiple_quizzes_link icon-unpublished">
+          {{#t "links.publish_multiple_quizzes"}}Publish Multiple Quizzes{{/t}}
+        </a>
+      </li>
+      {{/ifAll}}
+    </ul>
+  </div>
+  {{/ifAny}}
+</div>
+
+<div class="item-group-container">
+  {{#if hasNoQuizzes}}
+  <div data-view="no_quizzes" class="item-group-condensed"></div>
+  {{/if}}
+
+  {{#if hasAssignmentQuizzes}}
+  <div data-view="assignment" class="item-group-condensed"></div>
+  {{/if}}
+
+  {{#if hasOpenQuizzes}}
+  <div data-view="open" class="item-group-condensed"></div>
+  {{/if}}
+
+  {{#if hasSurveys}}
+  <div data-view="surveys" class="item-group-condensed"></div>
+  {{/if}}
+</div>
