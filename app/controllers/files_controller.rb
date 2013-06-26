@@ -118,9 +118,11 @@ class FilesController < ApplicationController
   # @API List files
   # Returns the paginated list of files for the folder.
   #
+  # @argument content_types[] [optional] Filter results by content-type. You can specify type/subtype pairs (e.g., 'image/jpeg'), or simply types (e.g., 'image', which will match 'image/gif', 'image/jpeg', etc.).
+  #
   # @example_request
   #
-  #   curl 'https://<canvas>/api/v1/folders/<folder_id>/files' \ 
+  #   curl 'https://<canvas>/api/v1/folders/<folder_id>/files?content_types[]=image&content_types[]=text/plain \
   #         -H 'Authorization: Bearer <token>'
   #
   # @returns [File]
@@ -140,6 +142,11 @@ class FilesController < ApplicationController
       else
         scope = scope.by_display_name
       end
+
+      if params[:content_types].present?
+        scope = scope.by_content_types(Array(params[:content_types]))
+      end
+
       @files = Api.paginate(scope, self, api_v1_list_files_url(@folder))
       render :json => attachments_json(@files, @current_user, {}, :can_manage_files => can_manage_files)
     end

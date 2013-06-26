@@ -527,6 +527,30 @@ describe Attachment do
       Attachment.uploadable.should be_include(Attachment.find(attachments[1].id))
       Attachment.uploadable.should be_include(Attachment.find(attachments[2].id))
     end
+
+    context "by_content_types" do
+      before do
+        course_model
+        @gif = attachment_model :context => @course, :content_type => 'image/gif'
+        @jpg = attachment_model :context => @course, :content_type => 'image/jpeg'
+        @weird = attachment_model :context => @course, :content_type => "%/what's this"
+      end
+
+      it "should match type" do
+        @course.attachments.by_content_types(['image']).pluck(:id).sort.should == [@gif.id, @jpg.id].sort
+      end
+
+      it "should match type/subtype" do
+        @course.attachments.by_content_types(['image/gif']).pluck(:id).should == [@gif.id]
+        @course.attachments.by_content_types(['image/gif', 'image/jpeg']).pluck(:id).sort.should == [@gif.id, @jpg.id].sort
+      end
+
+      it "should escape sql and wildcards" do
+        @course.attachments.by_content_types(['%']).pluck(:id).should == [@weird.id]
+        @course.attachments.by_content_types(["%/what's this"]).pluck(:id).should == [@weird.id]
+        @course.attachments.by_content_types(["%/%"]).pluck(:id).should == []
+      end
+    end
   end
 
   context "uploaded_data" do

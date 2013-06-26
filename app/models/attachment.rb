@@ -1278,6 +1278,18 @@ class Attachment < ActiveRecord::Base
     where("(attachments.locked IS NULL OR attachments.locked=?) AND ((attachments.lock_at IS NULL) OR
       (attachments.lock_at>? OR (attachments.unlock_at IS NOT NULL AND attachments.unlock_at<?)))", false, Time.now.utc, Time.now.utc)
   }
+  scope :by_content_types, lambda { |types|
+    clauses = []
+    types.each do |type|
+      if type.include? '/'
+        clauses << sanitize_sql_array(["(attachments.content_type=?)", type])
+      else
+        clauses << wildcard('attachments.content_type', type + '/', :type => :right)
+      end
+    end
+    condition_sql = clauses.join(' OR ')
+    where(condition_sql)
+  }
 
   alias_method :destroy!, :destroy
   # file_state is like workflow_state, which was already taken
