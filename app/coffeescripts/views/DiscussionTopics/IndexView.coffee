@@ -75,7 +75,7 @@ define [
       @settingsView().toggle()
 
     toggleDiscussionList: (e) ->
-      $(e.target).find('i')
+      $(e.currentTarget).find('i')
         .toggleClass('icon-mini-arrow-down')
         .toggleClass('icon-mini-arrow-right')
 
