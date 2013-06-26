@@ -5,6 +5,10 @@
       <i class="icon-mini-arrow-down"></i>
       {{title}}
     </span>
+
+    {{#if titleHelp}}
+      <span class="pull-right title-help">{{titleHelp}}</span>
+    {{/if}}
 </div>
 
 <div id="{{listID}}" aria-expanded="true">

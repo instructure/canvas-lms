@@ -12,9 +12,11 @@ require [
     # Public: I18n strings.
     messages:
       lists:
-        open:   I18n.t('open_discussions',   'Open Discussions')
-        locked: I18n.t('locked_discussions', 'Locked Discussions')
-        pinned: I18n.t('pinned_discussions', 'Pinned Discussions')
+        open:   I18n.t('discussions',         'Discussions')
+        locked: I18n.t('closed_for_comments', 'Closed for Comments')
+        pinned: I18n.t('pinned_discussions',  'Pinned Discussions')
+      help:
+        title: I18n.t('ordered_by_recent_activity', 'Ordered by Recent Activity')
 
     # Public: Routes to respond to.
     routes:
@@ -74,6 +76,7 @@ require [
         collection: new DiscussionTopicsCollection([], comparator: comparator)
         className: type
         title: @messages.lists[type]
+        titleHelp: (if _.include(['open', 'locked'], type) then @messages.help.title else null)
         listID: "#{type}-discussions"
         itemViewOptions: options
         sortable: !!options.sortable
@@ -105,6 +108,11 @@ require [
     # Returns nothing.
     _onPipelineEnd: =>
       view.collection.trigger('fetched:last') for key, view of @discussions
+      unless @discussions.pinned.collection.length or ENV.permissions.moderate
+        @discussions.pinned.$el.remove()
+
+      if @discussions.pinned.collection.length and !@discussions.open.collection.length and !ENV.permissions.moderate
+        @discussions.open.$el.remove()
 
     # Internal: Sort the given collection into the open, locked, and pinned
     # collections of topics.
