@@ -30,7 +30,11 @@ class Announcement < DiscussionTopic
   validates_presence_of :context_id
   validates_presence_of :context_type
   validates_presence_of :message
-  
+
+  acts_as_list scope: %q{context_id = '#{context_id}' AND
+                         context_type = '#{context_type}' AND
+                         type = 'Announcement'}
+
   def infer_content
     self.title ||= t(:no_title, "No Title")
   end
