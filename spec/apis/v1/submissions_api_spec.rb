@@ -580,7 +580,13 @@ describe 'Submissions API', :type => :integration do
     submit_homework(a1, student1, :media_comment_id => "54321", :media_comment_type => "video")
     sub1 = submit_homework(a1, student1) { |s| s.attachments = [attachment_model(:context => student1, :folder => nil)] }
 
-    sub2 = submit_homework(a1, student2, :url => "http://www.instructure.com") { |s| s.attachment = attachment_model(:context => student2, :filename => 'snapshot.png', :content_type => 'image/png'); s.attachments = [attachment_model(:context => student2, :filename => 'ss2.png', :content_type => 'image/png')] }
+    sub2a1 = attachment_model(:context => student2, :filename => 'snapshot.png', :content_type => 'image/png')
+    sub2a2 = attachment_model(:context => student2, :filename => 'ss2.png', :content_type => 'image/png')
+    sub2 = submit_homework(a1, student2, :url => "http://www.instructure.com") { |s|
+      s.attachment = sub2a1
+
+      s.attachments = [sub2a2]
+    }
 
     media_object(:media_id => "3232", :context => student1, :user => student1, :media_type => "audio")
     a1.grade_student(student1, {:grade => '90%', :comment => "Well here's the thing...", :media_comment_id => "3232", :media_comment_type => "audio", :grader => @teacher})
@@ -781,20 +787,20 @@ describe 'Submissions API', :type => :integration do
                'thumbnail_url' => sub2.attachment.thumbnail_url
               },
              {"content-type" => "image/png",
-              "display_name" => "ss2.png",
-              "filename" => "ss2.png",
-              "url" => "http://www.example.com/files/#{sub2.attachments.first.id}/download?download_frd=1&verifier=#{sub2.attachments.first.uuid}",
-              "id" => sub2.attachments.first.id,
-              "size" => sub2.attachments.first.size,
+              "display_name" => sub2a2.display_name,
+              "filename" => sub2a2.filename,
+              "url" => "http://www.example.com/files/#{sub2a2.id}/download?download_frd=1&verifier=#{sub2a2.uuid}",
+              "id" => sub2a2.id,
+              "size" => sub2a2.size,
               'unlock_at' => nil,
               'locked' => false,
               'hidden' => false,
               'lock_at' => nil,
               'locked_for_user' => false,
               'hidden_for_user' => false,
-              'created_at' => sub2.attachments.first.reload.created_at.as_json,
-              'updated_at' => sub2.attachments.first.updated_at.as_json,
-              'thumbnail_url' => sub2.attachments.first.thumbnail_url,
+              'created_at' => sub2a2.created_at.as_json,
+              'updated_at' => sub2a2.updated_at.as_json,
+              'thumbnail_url' => sub2a2.thumbnail_url,
             }
             ],
            "score"=>9,

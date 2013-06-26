@@ -909,6 +909,27 @@ describe Submission do
       submission.cached_due_date.should == override.due_at
     end
   end
+
+  describe "#bulk_load_versioned_attachments" do
+    it "loads attachments for many submissions at once" do
+      attachments = []
+
+      submissions = 3.times.map { |i|
+        student_in_course(active_all: true)
+        attachments << [
+          attachment_model(filename: "submission#{i}-a.doc", :context => @student),
+          attachment_model(filename: "submission#{i}-b.doc", :context => @student)
+        ]
+
+        @assignment.submit_homework @student, attachments: attachments[i]
+      }
+
+      Submission.bulk_load_versioned_attachments(submissions)
+      submissions.each_with_index { |s, i|
+        s.versioned_attachments.should == attachments[i]
+      }
+    end
+  end
 end
 
 def submission_spec_model(opts={})

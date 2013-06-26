@@ -27,7 +27,26 @@ module Api::V1::Attachment
   end
 
   def attachment_json(attachment, user, url_options = {}, options = {})
-    can_manage_files = options.has_key?(:can_manage_files) ? options[:can_manage_files] : attachment.grants_right?(user, nil, :update)
+    options.reverse_merge!(submission_attachment: false)
+
+    # it takes loads of queries to figure out that a teacher doesn't have
+    # :update permission on submission attachments.  we'll handle the
+    # permissions ourselves instead of using the usual stuff to save thousands
+    # of queries
+    submission_attachment = options[:submission_attachment]
+
+    # this seems like a stupid amount of branching but it's too avoid expensive
+    # permission checks
+    hidden_for_user = if submission_attachment
+                        false
+                      elsif !attachment.hidden?
+                        false
+                      elsif options.has_key?(:can_manage_files)
+                        options[:can_manage_files]
+                      else
+                        !attachment.grants_right?(user, nil, :update)
+                      end
+
     downloadable = !attachment.locked_for?(user, check_policies: true)
 
     url = if options[:thumbnail_url] && downloadable
@@ -56,9 +75,9 @@ module Api::V1::Attachment
       'updated_at' => attachment.updated_at,
       'unlock_at' => attachment.unlock_at,
       'locked' => !!attachment.locked,
-      'hidden' => !!attachment.hidden?,
+      'hidden' => submission_attachment ? false : !!attachment.hidden?,
       'lock_at' => attachment.lock_at,
-      'hidden_for_user' => can_manage_files ? false : !!attachment.hidden?,
+      'hidden_for_user' => hidden_for_user,
       'thumbnail_url' => thumbnail_download_url,
     }
     locked_json(hash, attachment, user, 'file')

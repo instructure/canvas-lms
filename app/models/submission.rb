@@ -161,6 +161,9 @@ class Submission < ActiveRecord::Base
     given { |user| user && user.id == self.user_id && !self.assignment.muted? }
     can :read_grade
 
+    given {|user, session| self.assignment.cached_context_grants_right?(user, session, :view_all_grades) }
+    can :read and can :read_grade
+
     given {|user| self.assignment && self.assignment.context && user && self.user &&
       self.assignment.context.observer_enrollments.find_by_user_id_and_associated_user_id_and_workflow_state(user.id, self.user.id, 'active') }
     can :read and can :read_comments
@@ -171,9 +174,6 @@ class Submission < ActiveRecord::Base
 
     given {|user, session| self.assignment.cached_context_grants_right?(user, session, :manage_grades) }#admins.include?(user) }
     can :read and can :comment and can :make_group_comment and can :read_grade and can :grade
-
-    given {|user, session| self.assignment.cached_context_grants_right?(user, session, :view_all_grades) }
-    can :read and can :read_grade
 
     given {|user| user && self.assessment_requests.map{|a| a.assessor_id}.include?(user.id) }
     can :read and can :comment
@@ -555,20 +555,54 @@ class Submission < ActiveRecord::Base
   end
 
   def attachment_ids
-    read_attribute(:attachment_ids)
+    read_attribute :attachment_ids
+  end
+
+  def attachment_ids=(ids)
+    write_attribute :attachment_ids, ids
   end
 
   def versioned_attachments
-    ids = (self.attachment_ids || "").split(",").map{|id| id.to_i}
-    ids << self.attachment_id if self.attachment_id
-    return [] if ids.empty?
-    Attachment.find_all_by_id(ids).select{|a|
+    if @versioned_attachments
+      @versioned_attachments
+    else
+      ids = (attachment_ids || "").split(",")
+      ids << attachment_id if attachment_id
+      self.versioned_attachments = Attachment.where(:id => ids)
+    end
+  end
+
+  def versioned_attachments=(attachments)
+    @versioned_attachments = Array(attachments).select { |a|
       (a.context_type == 'User' && a.context_id == user_id) ||
       (a.context_type == 'Group' && a.context_id == group_id) ||
       (a.context_type == 'Assignment' && a.context_id == assignment_id && a.available?)
     }
   end
-  memoize :versioned_attachments
+
+  # use this method to pre-load the versioned_attachments for a bunch of
+  # submissions (avoids having O(N) attachment queries)
+  # NOTE: all submissions must belong to the same shard
+  def self.bulk_load_versioned_attachments(submissions)
+    attachment_ids_by_submission = Hash[
+      submissions.map { |s|
+        attachment_ids = (s.attachment_ids || "").split(",").map(&:to_i)
+        [s, attachment_ids]
+      }
+    ]
+
+    bulk_attachment_ids = attachment_ids_by_submission.values.flatten
+
+    attachments_by_id = Attachment.where(:id => bulk_attachment_ids)
+                        .includes(:thumbnail, :media_object)
+                        .group_by(&:id)
+
+    submissions.each { |s|
+      s.versioned_attachments = attachments_by_id.values_at(
+        *attachment_ids_by_submission[s]
+      ).flatten
+    }
+  end
 
   def <=>(other)
     self.updated_at <=> other.updated_at
@@ -639,13 +673,6 @@ class Submission < ActiveRecord::Base
     end
     true
   end
-
-  def attachment_ids=(ids)
-    write_attribute(:attachment_ids, ids)
-  end
-#   def attachment_ids=(ids)
-    # raise "Cannot set attachment id's directly"
-  # end
 
   def attachments=(attachments)
     # Accept attachments that were already approved, those that were just created

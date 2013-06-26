@@ -1183,7 +1183,12 @@ class Attachment < ActiveRecord::Base
     can :download
   end
 
+  # checking if an attachment is locked is expensive and pointless for
+  # submission attachments
+  attr_writer :skip_submission_attachment_lock_checks
+
   def locked_for?(user, opts={})
+    return false if @skip_submission_attachment_lock_checks
     return false if opts[:check_policies] && self.grants_right?(user, nil, :update)
     return {:asset_string => self.asset_string, :manually_locked => true} if self.locked || (self.folder && self.folder.locked?)
     Rails.cache.fetch(locked_cache_key(user), :expires_in => 1.minute) do

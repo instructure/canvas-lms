@@ -2104,13 +2104,6 @@ class User < ActiveRecord::Base
     self.class.where(:id => id).update_all(:unread_conversations_count => conversations.unread.count)
   end
 
-  # association with dynamic, filtered join condition for submissions.
-  # This is messy, but in ActiveRecord 2 this is the only way to do an eager
-  # loading :include condition that has dynamic join conditions. It looks like
-  # there's better solutions in AR 3.
-  # See also e.g., http://makandra.com/notes/983-dynamic-conditions-for-belongs_to-has_many-and-has_one-associations
-  has_many :submissions_for_given_assignments, :include => [:assignment, :submission_comments], :conditions => 'submissions.assignment_id IN (#{Api.assignment_ids_for_students_api.join(",")})', :class_name => 'Submission'
-
   def set_menu_data(enrollment_uuid)
     return @menu_data if @menu_data
     coalesced_enrollments = []

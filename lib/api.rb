@@ -252,9 +252,6 @@ module Api
     }
   end
 
-  # See User.submissions_for_given_assignments and SubmissionsApiController#for_students
-  mattr_accessor :assignment_ids_for_students_api
-
   # a hash of allowed html attributes that represent urls, like { 'a' => ['href'], 'img' => ['src'] }
   UrlAttributes = Instructure::SanitizeField::SANITIZE[:protocols].inject({}) { |h,(k,v)| h[k] = v.keys; h }
 
