@@ -354,6 +354,8 @@ describe Pseudonym do
 
       Account.default.settings = { :canvas_authentication => false }
       Account.default.account_authorization_configs.create!(:auth_type => 'ldap')
+      Account.default.save!
+      @pseudonym.reload
 
       @pseudonym.stubs(:valid_ldap_credentials?).returns(false)
       @pseudonym.valid_arbitrary_credentials?('qwerty').should be_false

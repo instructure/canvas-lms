@@ -308,7 +308,8 @@ Spec::Runner.configure do |config|
     @spec_pseudonym_count += 1 if username =~ /nobody(\+\d+)?@example.com/
     password = opts[:password] || "asdfasdf"
     password = nil if password == :autogenerate
-    @pseudonym = user.pseudonyms.create!(:account => opts[:account] || Account.default, :unique_id => username, :password => password, :password_confirmation => password)
+    account = opts[:account] || Account.default
+    @pseudonym = account.pseudonyms.create!(:user => user, :unique_id => username, :password => password, :password_confirmation => password)
     @pseudonym.communication_channel = communication_channel(user, opts)
     @pseudonym
   end
@@ -316,10 +317,10 @@ Spec::Runner.configure do |config|
   def managed_pseudonym(user, opts={})
     other_account = opts[:account] || account_with_saml
     if other_account.password_authentication?
-      config = AccountAuthorizationConfig.new
+      config = other_account.account_authorization_configs.build
       config.auth_type = "saml"
       config.log_in_url = opts[:saml_log_in_url] if opts[:saml_log_in_url]
-      other_account.account_authorization_configs << config
+      config.save!
     end
     opts[:account] = other_account
     pseudonym(user, opts)

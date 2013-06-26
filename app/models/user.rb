@@ -302,6 +302,8 @@ class User < ActiveRecord::Base
 
   def update_account_associations(opts = nil)
     opts ||= {:all_shards => true}
+    # incremental is only for the current shard
+    return User.update_account_associations([self], opts) if opts[:incremental]
     self.shard.activate do
       User.update_account_associations([self], opts)
     end
@@ -2196,10 +2198,10 @@ class User < ActiveRecord::Base
   def find_pseudonym_for_account(account, allow_implicit = false)
     # try to find one that's already loaded if possible
     if self.pseudonyms.loaded?
-      self.pseudonyms.detect { |p| p.active? && p.works_for_account?(account, allow_implicit) }
-    else
-      self.all_active_pseudonyms.detect { |p| p.works_for_account?(account, allow_implicit) }
+      result = self.pseudonyms.detect { |p| p.active? && p.works_for_account?(account, allow_implicit) }
+      return result if result || self.associated_shards.length == 1
     end
+    self.all_active_pseudonyms.detect { |p| p.works_for_account?(account, allow_implicit) }
   end
 
   # account = the account that you want a pseudonym for

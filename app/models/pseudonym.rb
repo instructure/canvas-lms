@@ -85,7 +85,7 @@ class Pseudonym < ActiveRecord::Base
   
   def update_account_associations_if_account_changed
     return unless self.user && !User.skip_updating_account_associations?
-    if self.new_record?
+    if self.id_was.nil?
       return if %w{creation_pending deleted}.include?(self.user.workflow_state)
       self.user.update_account_associations(:incremental => true, :precalculated_associations => {self.account_id => 0})
     elsif self.account_id_changed?

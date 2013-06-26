@@ -92,7 +92,9 @@ def raw_api_call(method, path, params, body_params = {}, headers = {}, opts = {}
     if !params.key?(:api_key) && !params.key?(:access_token) && !headers.key?('Authorization') && @user
       token = access_token_for_user(@user)
       headers['Authorization'] = "Bearer #{token}"
-      @user.pseudonyms.create!(:unique_id => "#{@user.id}@example.com", :account => opts[:domain_root_account]) unless @user.pseudonym(true)
+      account = opts[:domain_root_account] || Account.default
+      Pseudonym.any_instance.stubs(:works_for_account?).returns(true)
+      account.pseudonyms.create!(:unique_id => "#{@user.id}@example.com", :user => @user) unless @user.all_active_pseudonyms(:reload) && @user.find_pseudonym_for_account(account, true)
     end
 
     LoadAccount.stubs(:default_domain_root_account).returns(opts[:domain_root_account]) if opts.has_key?(:domain_root_account)

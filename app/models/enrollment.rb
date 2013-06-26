@@ -37,7 +37,7 @@ class Enrollment < ActiveRecord::Base
 
   before_save :assign_uuid
   before_save :assert_section
-  before_save :update_user_account_associations_if_necessary
+  after_save :update_user_account_associations_if_necessary
   before_save :audit_groups_for_deleted_enrollments
   before_validation :infer_privileges
   after_create :create_linked_enrollments
@@ -252,7 +252,7 @@ class Enrollment < ActiveRecord::Base
 
   def update_user_account_associations_if_necessary
     return if self.fake_student?
-    if self.new_record?
+    if id_was.nil?
       return if %w{creation_pending deleted}.include?(self.user.workflow_state)
       associations = User.calculate_account_associations_from_accounts([self.course.account_id, self.course_section.course.account_id, self.course_section.nonxlist_course.try(:account_id)].compact.uniq)
       self.user.update_account_associations(:incremental => true, :precalculated_associations => associations)
