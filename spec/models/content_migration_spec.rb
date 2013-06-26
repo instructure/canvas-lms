@@ -864,6 +864,8 @@ describe ContentMigration do
 
     it "should copy discussion topic attributes" do
       topic = @copy_from.discussion_topics.create!(:title => "topic", :message => "<p>bloop</p>", :discussion_type => "threaded")
+      topic.posted_at = 2.days.ago
+      topic.save!
 
       run_course_copy
 
@@ -872,6 +874,9 @@ describe ContentMigration do
 
       attrs = ["title", "message", "discussion_type", "type"]
       topic.attributes.slice(*attrs).should == new_topic.attributes.slice(*attrs)
+
+      new_topic.last_reply_at.to_i.should == new_topic.posted_at.to_i
+      topic.posted_at.to_i.should == new_topic.posted_at.to_i
     end
 
     it "should copy a discussion topic when assignment is selected" do

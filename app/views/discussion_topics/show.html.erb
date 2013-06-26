@@ -157,7 +157,7 @@
         <div class="discussion-header-content right-of-avatar">
 
           <div class="discussion-header-right pull-right">
-            <div class="discussion-pubdate"><%= friendly_datetime @topic.created_at %></div>
+            <div class="discussion-pubdate"><%= friendly_datetime @topic.posted_at %></div>
             <%= render :partial => 'new_and_total_badge', :locals => { :unread_count => @topic.unread_count(@current_user), :reply_count => @topic.discussion_subentry_count } %>
           </div>
           <div class="discussion-title"><%= @topic.title %></div>
