@@ -357,6 +357,51 @@ describe "discussions" do
           f('.locked.discussion-list .al-trigger').click
           fj('.icon-pin:visible').should be_nil
         end
+
+        it "should show subscription icons" do
+          topic = @course.discussion_topics.create!(title: 'Test Discussion', user: @user)
+          topic.subscribed?(@user).should be_true
+          get(url)
+          wait_for_ajaximations
+          f('.discussion .icon-discussion-check').should be_displayed
+          f('.discussion .icon-discussion').should be_nil
+
+          topic.unsubscribe(@user)
+          get(url)
+          wait_for_ajaximations
+          f('.discussion .icon-discussion-check').should be_nil
+          f('.discussion .icon-discussion').should be_displayed
+        end
+
+        it "should allow subscribing to a topic" do
+          topic = @course.discussion_topics.create!(title: 'Test Discussion', user: @user)
+          topic.unsubscribe(@user)
+          get(url)
+          wait_for_ajaximations
+          f('.icon-discussion').should be_displayed
+          f('.subscription-toggler').click
+          wait_for_ajaximations
+          driver.execute_script(%{$('.subscription-toggler').trigger('mouseleave')})
+          f('.icon-discussion').should be_nil
+          f('.icon-discussion-check').should be_displayed
+          topic.reload
+          topic.subscribed?(@user).should be_true
+        end
+
+        it "should allow unsubscribing from a topic" do
+          topic = @course.discussion_topics.create!(title: 'Test Discussion', user: @user)
+          topic.subscribe(@user)
+          get(url)
+          wait_for_ajaximations
+          f('.icon-discussion-check').should be_displayed
+          f('.subscription-toggler').click
+          wait_for_ajaximations
+          driver.execute_script(%{$('.subscription-toggler').trigger('mouseleave')})
+          f('.icon-discussion-check').should be_nil
+          f('.icon-discussion').should be_displayed
+          topic.reload
+          topic.subscribed?(@user).should be_false
+        end
       end
 
       it "should allow teachers to edit discussions settings" do
@@ -771,6 +816,46 @@ describe "discussions" do
       @topic = @course.discussion_topics.create!(:user => @teacher, :message => 'new topic from teacher', :discussion_type => 'side_comment')
       @entry = @topic.discussion_entries.create!(:user => @teacher, :message => 'new entry from teacher')
       user_session(@student)
+    end
+
+    it "should not allow subscribing to a topic that requires an initial post" do
+      @topic.unsubscribe(@student)
+      @topic.require_initial_post = true
+      @topic.save!
+      get "/courses/#{@course.id}/discussion_topics"
+      wait_for_ajaximations
+      f('.icon-discussion').should be_displayed
+      f('.subscription-toggler').click
+      wait_for_ajaximations
+      driver.execute_script(%{$('.subscription-toggler').trigger('mouseleave')})
+      f('.icon-discussion-check').should be_nil
+      f('.icon-discussion').should be_displayed
+      @topic.reload
+      @topic.subscribed?(@student).should be_false
+    end
+
+    it "should display subscription action icons on hover" do
+      @topic.subscribe(@student)
+      get "/courses/#{@course.id}/discussion_topics"
+      wait_for_ajaximations
+      f('.icon-discussion-check').should be_displayed
+      driver.execute_script(%{$('.subscription-toggler').trigger('mouseenter')})
+      f('.icon-discussion-check').should be_nil
+      f('.icon-discussion-x').should be_displayed
+      f('.subscription-toggler').click
+      wait_for_ajaximations
+      f('.icon-discussion-x').should be_nil
+      f('.icon-discussion').should be_displayed
+      driver.execute_script(%{$('.subscription-toggler').trigger('mouseleave')})
+      f('.icon-discussion').should be_displayed
+      @topic.reload
+      @topic.require_initial_post = true
+      @topic.save!
+      get "/courses/#{@course.id}/discussion_topics"
+      wait_for_ajaximations
+      driver.execute_script(%{$('.subscription-toggler').trigger('mouseenter')})
+      f('.icon-discussion').should be_nil
+      f('.icon-discussion-x').should be_displayed
     end
 
     it "should not allow students to create discussions according to setting" do

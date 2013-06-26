@@ -198,8 +198,16 @@
     color: #bbb;
     width: 40px;
 
+    a[class*=icon-] {
+       text-decoration: none;
+    }
+
     .icon-discussion-check, .icon-published {
       color: #5bb75b;
+    }
+
+    .icon-discussion-x {
+      color: #db4f4a;
     }
   }
 

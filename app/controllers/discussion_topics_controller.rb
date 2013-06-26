@@ -319,8 +319,6 @@ class DiscussionTopicsController < ApplicationController
               :MARK_ALL_UNREAD_URL => named_context_url(@context, :api_v1_context_discussion_topic_mark_all_unread_url, @topic),
               :MANUAL_MARK_AS_READ => @current_user.try(:manual_mark_as_read?),
               :CAN_SUBSCRIBE => !@initial_post_required && !@topic.is_a?(Announcement),                    # can subscribe when no initial post required for user and don't show for announcements
-              :SUBSCRIBE_URL => named_context_url(@context, :api_v1_context_discussion_topic_subscribe_url, @topic),
-              :UNSUBSCRIBE_URL => named_context_url(@context, :api_v1_context_discussion_topic_unsubscribe_url, @topic),
               :CURRENT_USER => user_display_json(@current_user),
               :INITIAL_POST_REQUIRED => @initial_post_required,
               :THREADED => @topic.threaded?

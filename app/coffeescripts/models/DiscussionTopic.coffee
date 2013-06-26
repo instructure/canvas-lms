@@ -42,12 +42,14 @@ define [
       Backbone.Model::toJSON.call(this)
 
     topicSubscribe: ->
+      baseUrl = _.result this, 'url'
       @set 'subscribed', true
-      $.ajaxJSON ENV.DISCUSSION.SUBSCRIBE_URL, 'PUT'
+      $.ajaxJSON "#{baseUrl}/subscribed", 'PUT'
 
     topicUnsubscribe: ->
+      baseUrl = _.result this, 'url'
       @set 'subscribed', false
-      $.ajaxJSON ENV.DISCUSSION.UNSUBSCRIBE_URL, 'DELETE'
+      $.ajaxJSON "#{baseUrl}/subscribed", 'DELETE'
 
     toJSON: ->
       json = super
