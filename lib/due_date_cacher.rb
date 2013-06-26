@@ -6,7 +6,8 @@ class DueDateCacher
 
   def self.recompute_batch(assignments)
     new(assignments).send_later_if_production_enqueue_args(:recompute,
-      :strand => "cached_due_date:calculator:batch")
+      :strand => "cached_due_date:calculator:batch:#{Shard.current.id}",
+      :priority => Delayed::LOWER_PRIORITY)
   end
 
   # expects all assignments to be on the same shard

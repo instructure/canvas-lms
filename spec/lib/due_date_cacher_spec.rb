@@ -67,7 +67,8 @@ describe DueDateCacher do
 
     it "should queue a delayed job on a batch-specific singleton strand in production" do
       @instance.expects(:send_later_if_production_enqueue_args).
-        with(:recompute, :strand => "cached_due_date:calculator:batch")
+        with(:recompute, :strand => "cached_due_date:calculator:batch:#{Shard.current.id}",
+             :priority => Delayed::LOWER_PRIORITY)
       DueDateCacher.recompute_batch(@assignments)
     end
   end
