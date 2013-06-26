@@ -141,13 +141,10 @@ define [
     #
     # Returns nothing.
     _onFetchedLast: =>
-      if @options.pinned and @collection.length is 0 and !ENV.permissions.moderate
-        @$el.remove()
-      else
-        @options.showSpinner = false
-        @options.showMessage = true
-        @_stopLoader()
-        @_toggleNoContentMessage()
+      @options.showSpinner = false
+      @options.showMessage = true
+      @_stopLoader()
+      @_toggleNoContentMessage()
 
     # Internal: Enable sorting of the this view's discussions.
     #

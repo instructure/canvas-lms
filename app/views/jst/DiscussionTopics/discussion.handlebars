@@ -1,5 +1,9 @@
 <div class="discussion-content">
   <div class="discussion-row">
+    <div class="discussion-type">
+      {{#if assignment}}<i class="icon-assignment"></i>{{/if}}
+    </div>
+
     <div class="discussion-title">
       <a href="{{html_url}}" class="title">{{title}}</a>
       <small>Last post {{tDateToString last_reply_at "medium"}}</small>
@@ -7,7 +11,11 @@
 
     <div class="discussion-due-date">
       {{#if assignment}}
-        {{#t "due"}}Due{{/t}} {{tDateToString assignment.due_at "medium"}}
+        {{#if assignment.due_at}}
+          {{#t "due"}}Due{{/t}} {{tDateToString assignment.due_at "medium"}}
+        {{else}}
+          {{#t "no_due_date"}}No Due Date{{/t}}
+        {{/if}}
       {{/if}}
     </div>
 
