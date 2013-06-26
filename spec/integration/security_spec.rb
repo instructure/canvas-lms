@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
 
 describe "security" do
 
@@ -362,6 +362,22 @@ describe "security" do
       pers1.should_not == pers2
       get "/", {}, "HTTP_COOKIE" => "pseudonym_credentials=#{creds}"
       response.should redirect_to("https://www.example.com/login")
+    end
+
+    context "sharding" do
+      specs_require_sharding
+
+      it "should work for an out-of-shard user" do
+        @shard1.activate do
+          account = Account.create!
+          user_with_pseudonym(:account => account)
+        end
+        token = SessionPersistenceToken.generate(@pseudonym)
+        get "/", {}, "HTTP_COOKIE" => "pseudonym_credentials=#{token.pseudonym_credentials}"
+        response.should be_success
+        cookies['_normandy_session'].should be_present
+        session[:used_remember_me_token].should be_true
+      end
     end
   end
 
