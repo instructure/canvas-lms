@@ -298,7 +298,7 @@ i[class*=icon-], i[class^=icon-] {
 
 // when an icon is applied directly to a link, add a little left margin to make
 // things look nicer
-a:not(.center-icon)[class*=icon-], a:not(.center-icon)[class^=icon-] {
+a[class*=icon-], a[class^=icon-] {
   &:before { margin-right: 4px; }
 }
 

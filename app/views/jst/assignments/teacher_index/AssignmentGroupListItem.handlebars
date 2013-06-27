@@ -6,15 +6,25 @@
       {{name}}
     </span>
 
-    <div style="position:absolute; right:0; top:0">
-      <ul class="pill">
-        <li>50% of Total</li>
-      </ul>
+    <div class="ag-header-controls">
+      {{#if showPill}}
+        <ul class="pill">
+          {{#if group_weight}}
+            <li>{{#t "group_weight"}}{{group_weight}}% of Total{{/t}}</li>
+          {{/if}}
+          {{#if showRules}}
+            <li>
+              {{#if plural}}{{#t "plural_number_of_rules"}}{{rule_count}} Rules{{/t}}{{/if}}
+              {{#unless plural}}{{#t "number_of_rules"}}{{rule_count}} Rule{{/t}}{{/unless}}
+            </li>
+          {{/if}}
+        </ul>
+      {{/if}}
 
-      <a
-        class="btn icon-plus center-icon"
-        title='{{#t "add_assignment"}}Add Assignment{{/t}}'
-      ></a>
+      <a class="btn add_assignment" title='{{#t "add_assignment_to"}}Add Assignment to {{name}}{{/t}}'>
+        {{! icon is separate from <a> tag because it is the only visible content in the button }}
+        <i class="icon-plus"></i>
+      </a>
 
       <a class="al-trigger btn">
         <span class="screenreader-only">{{#t "manage"}}Manage{{/t}}</span>
@@ -22,6 +32,16 @@
         <i class="icon-mini-arrow-down"></i>
       </a>
       <ul class="al-options">
+        <li id="edit_group" title='{{#t "title_edit"}}Edit Assignment Group{{/t}}'>
+          <a href="#dialog">
+            <i class="icon-edit"></i> {{#t "edit"}}Edit{{/t}}
+          </a>
+        </li>
+        <li id="delete_group" title='{{#t "title_delete"}}Delete Assignment Group{{/t}}'>
+          <a href="#dialog">
+            <i class="icon-trash"></i> {{#t "delete"}}Delete{{/t}}
+          </a>
+        </li>
       </ul>
     </div>
 
