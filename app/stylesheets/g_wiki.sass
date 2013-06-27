@@ -1,17 +1,114 @@
 @import environment.sass
 
-#wiki_page_buttons
-  :padding 1em
-  :border-bottom 1px solid #b6babf
+$subdued-text-color: #696969
+$published-text-color: #34832b
+$unpublished-text-color: $subdued-text-color
 
-#wiki_page_index_content
-  :background #e4e9ed
-  :padding 0 1em 1em
+$published-icon-color: #34832b
+$unpublished-icon-color: #b4b7ba
 
-#wiki_page_index
-  tbody
-    :border 1px solid #dddddd
-    :background #ffffff
+$border-color: #c1c7cf
+$border-radius: 3px
+
+$index-background: #e8ecef
+$item-background: #ffffff
+$item-hover-background: #eef7ff
+
+$shadow: 0 1px 0 rgba(0,0,0,0.1)
+
+.pages
+  #breadcrumbs
+    :border-bottom 1px solid $border-color
+  .toolbar-buttons
+    :position relative
+    :padding 1em
+    :border-bottom 1px solid $border-color
+    :box-shadow $shadow
+    .left-buttons
+      :float left
+    .right-buttons
+      :float right
+
+.pages.index
+  .index-content
+    :background $index-background
+    :padding 0 1em 1em
+
+    .table
+      :border-collapse separate
+      :border-spacing 0
+      td, th
+        &:first-child
+          :padding-left 12px
+        &:last-child
+          :padding-right 12px
+
+    .table thead
+      tr
+        :height 40px
+      th
+        :vertical-align middle
+
+    .table tbody
+      .page_title
+        :font-weight bold
+      .front-page
+        :margin auto 0.5em
+
+      .linkrow
+        :background $item-background
+        :text-decoration inherit
+        :color inherit
+        &:hover
+          :background $item-hover-background
+          :text-decoration inherit
+          :color inherit
+        td:first-child
+          :border-left 1px solid $border-color
+        td:last-child
+          :border-right 1px solid $border-color
+
+      .linkrow:first-child
+        td:first-child
+          :border-top-left-radius $border-radius
+        td:last-child
+          :border-top-right-radius $border-radius
+      .linkrow:last-child
+        td
+          :border-bottom 1px solid $border-color
+        td:first-child
+          :border-bottom-left-radius $border-radius
+        td:last-child
+          :border-bottom-right-radius $border-radius
+
+      td
+        :font-size 11px
+        :color $subdued-text-color
+        :border-top 1px solid $border-color
+
+        .published
+          :color $published-text-color
+        .unpublished
+          :color $unpublished-text-color
+        .published, .unpublished
+          :font-size 13px
+          :font-weight bold
+
+        .icon-publish
+          :color $published-icon-color
+        .icon-unpublished
+          :color $unpublished-icon-color
+
+.pages.show
+  .toolbar-buttons
+    .publish, .unpublish
+      :margin 0 1em
+
+  .show-content
+    :padding 1em
+    .page-title
+      :font-weight bold
+      :margin-top 0
 
 #wiki_show_view_main
   :overflow auto

@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 class WikiPagesController < ApplicationController
+  include Api::V1::WikiPage
+
   before_filter :require_context
   before_filter :get_wiki_page, :except => [:index]
   add_crumb(proc { t '#crumbs.wiki_pages', "Pages"}) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_wiki_pages_url }
@@ -118,7 +120,28 @@ class WikiPagesController < ApplicationController
   end
 
   def pages_index
-    @padless = true
+    if authorized_action(@context, @current_user, :read)
+      @padless = true
+    end
+  end
+
+  def show_page
+    if @page.deleted?
+      flash[:notice] = t('notices.page_deleted', 'The page "%{title}" has been deleted.', :title => @page.title)
+      return front_page # delegate to front_page logic
+    end
+
+    if authorized_action(@page, @current_user, :read)
+      add_crumb(@page.title)
+      @page.increment_view_count(@current_user, @context)
+      log_asset_access(@page, 'wiki', @wiki)
+
+      js_env :wiki_pages_url => polymorphic_url([@context, :pages])
+      js_env :wiki_page => wiki_page_json(@page, @current_user, session)
+
+      @padless = true
+      render
+    end
   end
 
   protected

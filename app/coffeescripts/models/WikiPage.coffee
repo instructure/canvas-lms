@@ -1,22 +1,45 @@
 define [
+  'underscore'
   'Backbone'
+  'compiled/backbone-ext/DefaultUrlMixin'
   'compiled/str/splitAssetString'
-], (Backbone, splitAssetString) ->
+], (_, Backbone, DefaultUrlMixin, splitAssetString) ->
 
   class WikiPage extends Backbone.Model
     resourceName: 'pages'
 
+    @mixin DefaultUrlMixin
+    url: -> "#{@_defaultUrl()}/#{@get('id')}"
+
+    initialize: ->
+      super
+      @contextAssetString = @options?.contextAssetString
+      @set('id', @get('url')) if @get('url') && !@get('id')
+
+    # Flatten the nested data structure required by the api (see @publish and @unpublish)
     parse: (response, options) ->
-      response.id = response.url
+      if response.wiki_page
+        response = _.extend _.omit(response, 'wiki_page'), response.wiki_page
+
+      response.id = response.url if response.url
       response
 
+    # Gives a json representation of the model
+    #
+    # Specifically, the id is removed as the only reason for it's presense is to make Backbone happy
     toJSON: ->
-      json = super
+      _.omit super, 'id'
 
-      assetString = this.collection?.contextAssetString || ENV.context_asset_string
-      resourceName = this.collection?.resourceName || this.resourceName
-      if json.url && assetString && resourceName
-        [contextType, contextId] = splitAssetString assetString
-        json.htmlUrl = "/#{contextType}/#{contextId}/#{resourceName}/#{json.url}"
+    # Uses the api to perform a publish on the page
+    publish: ->
+      attributes =
+        wiki_page:
+          published: true
+      @save attributes, wait: true
 
-      json
+    # Uses the api to perform an unpublish on the page
+    unpublish: ->
+      attributes =
+        wiki_page:
+          published: false
+      @save attributes, wait: true

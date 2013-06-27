@@ -3,6 +3,8 @@ require [
   'compiled/views/wiki/WikiPageIndexView'
 ], (WikiPageCollection, WikiPageIndexView) ->
 
+  $('body').addClass('pages index')
+
   view = new WikiPageIndexView
     collection: new WikiPageCollection
 

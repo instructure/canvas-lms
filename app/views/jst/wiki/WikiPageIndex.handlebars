@@ -1,16 +1,21 @@
-{{> [wiki/wiki_page_buttons]}}
-<div id="wiki_page_index_content">
-  <table id="wiki_page_index" class="table">
-    <thead><tr>
-      <th>PAGE TITLE</th>
-      <th>CREATION DATE</th>
-      <th>LAST EDIT</th>
-      <th></th>
+<div class="toolbar-buttons clearfix">
+  <div class="right-buttons">
+    <button class="btn btn-primary new_page">{{#t 'buttons.new_page'}}New Page{{/t}}</button>
+  </div>
+</div>
+
+<div class="index-content">
+  <table class="table" role="grid">
+    <thead><tr role="row">
+      <th width="52%" role="columnheader">{{#t 'headers.page_title'}}PAGE TITLE{{/t}}</th>
+      <th width="20%" role="columnheader">{{#t 'headers.creation_date'}}CREATION DATE{{/t}}</th>
+      <th width="20%" role="columnheader">{{#t 'headers.last_edit'}}LAST EDIT{{/t}}</th>
+      <th width="8%" role="columnheader"><span class="screenreader-only">{{#t 'headers.published'}}PUBLISHED{{/t}}</span></th>
     </tr></thead>
     <tbody class="collectionViewItems">
       {{#if fetched}}
         {{#unless collection.length}}
-        <tr><td colspan="4">No pages created yet. <a class="new_page" href="#">Add one!</a></td></tr>
+        <tr class="no-pages"><td colspan="4">{{#t 'no_pages'}}No pages created yet.{{/t}} <a class="new_page" href="#">{{#t 'add_page'}}Add one!{{/t}}</a></td></tr>
         {{/unless}}
       {{/if}}
     </tbody>

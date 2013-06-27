@@ -1,0 +1,22 @@
+<div class="toolbar-buttons clearfix">
+  <div class="left-buttons">
+    <a class="btn{{#if front_page}} btn-primary{{/if}} view_all_pages" href="{{wiki_pages_url}}">{{#t 'buttons.view_all_pages'}}View All Pages{{/t}}</a>
+  </div>
+  <div class="right-buttons">
+    {{#if published}}
+      <button class="unpublish btn btn-success active" aria-label="{{#t 'unpublish'}}Unpublish{{/t}}"><i class="icon-publish"></i> {{#t 'buttons.unpublish'}}Published{{/t}}</button>
+    {{else}}
+      <button class="publish btn" aira-label="{{#t 'publish'}}Publish{{/t}}"><i class="icon-unpublished muted"></i> {{#t 'buttons.publish'}}Publish{{/t}}</button>
+    {{/if}}
+    <button class="btn"><i class="icon-edit"></i> {{#t 'buttons.edit'}}Edit{{/t}}</button>
+    <a class="btn al-trigger">
+      <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
+      <span class="screenreader-only">{{#t 'toolbar_menu.settings'}}Settings{{/t}}</span>
+    </a>
+  </div>
+</div>
+
+<div class="show-content">
+  <h2 class="page-title">{{title}}</h2>
+  {{{body}}}
+</div>

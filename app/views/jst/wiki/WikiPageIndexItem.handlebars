@@ -1,4 +1,4 @@
-<td><a href="{{htmlUrl}}" class="{{#if published}}text-success{{else}}muted{{/if}}">{{title}}</a>{{#if front_page}} <span class="label">Front Page</span>{{/if}}</td>
-<td>{{friendlyDatetime created_at}}</td>
-<td>{{friendlyDatetime updated_at}}{{#if last_edited_by}} by {{last_edited_by.display_name}}{{/if}}</td>
-<td><span class="{{#if published}}text-success{{else}}muted{{/if}}"><i class="icon-{{#if published}}publish{{else}}unpublished{{/if}}"></i></span></td>
+<td role="gridcell"><a href="{{html_url}}" class="{{#unless published}}un{{/unless}}published">{{title}}</a>{{#if front_page}} <span class="front-page label">{{#t 'labels.front_page'}}Front Page{{/t}}</span>{{/if}}</td>
+<td role="gridcell">{{tDateToString created_at "medium"}}</td>
+<td role="gridcell">{{tDateToString updated_at "medium"}}{{#if last_edited_by.display_name}} by {{last_edited_by.display_name}}{{/if}}</td>
+<td role="gridcell"><i {{#if published}}class="icon-publish"{{else}}class="icon-unpublished"{{/if}} aria-hidden="true"></i><span id="{{id}}-publish-icon" class="screenreader-only">{{#if published}}{{#t 'published'}}Published{{/t}}{{else}}{{#t 'unpublished'}}Unpublished{{/t}}{{/if}}</span></td>

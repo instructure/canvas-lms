@@ -151,8 +151,11 @@ FakeRails3Routes.draw do
     # end
     #
     ####
-    ## We'll just do specific routes here until we can swap /pages and /wiki completely.
+    ## We'll just do specific routes below until we can swap /pages and /wiki completely.
     ####
+    get 'pages' => 'wiki_pages#pages_index'
+    get 'pages/:wiki_page_id' => 'wiki_pages#show_page', :wiki_page_id => /[^\/]+/, :as => :named_page
+
     resources :wiki_pages, :path => :wiki do
       match 'revisions/latest' => 'wiki_page_revisions#latest_version_number', :as => :latest_version_number
       resources :wiki_page_revisions, :path => :revisions
