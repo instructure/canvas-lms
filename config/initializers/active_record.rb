@@ -938,6 +938,11 @@ if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
 
       execute "CREATE #{index_type} INDEX #{concurrently}#{quote_column_name(index_name)} ON #{quote_table_name(table_name)} (#{quoted_column_names})#{conditions}"
     end
+
+    def set_standard_conforming_strings_with_version_check
+      set_standard_conforming_strings_without_version_check unless postgresql_version >= 90100
+    end
+    alias_method_chain :set_standard_conforming_strings, :version_check
   end
 
 end
