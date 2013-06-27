@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011-2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -525,6 +525,7 @@ class PseudonymSessionsController < ApplicationController
   def successful_login(user, pseudonym, otp_passed = false)
     @current_user = user
     @current_pseudonym = pseudonym
+    Auditors::Authentication.record(@current_pseudonym, 'login')
 
     otp_passed ||= cookies['canvas_otp_remember_me'] &&
         @current_user.validate_otp_secret_key_remember_me_cookie(cookies['canvas_otp_remember_me'])
@@ -575,6 +576,11 @@ class PseudonymSessionsController < ApplicationController
         render :json => @pseudonym_session.errors.to_json, :status => :bad_request
       end
     end
+  end
+
+  def logout_current_user
+    Auditors::Authentication.record(@current_pseudonym, 'logout')
+    super
   end
 
   def oauth2_auth

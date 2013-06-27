@@ -771,7 +771,7 @@ describe PseudonymSessionsController do
 
         @user.otp_secret_key = ROTP::Base32.random_base32
         @user.save!
-        user_session(@user)
+        user_session(@user, @pseudonym)
         session[:pending_otp] = true
       end
 
@@ -812,7 +812,7 @@ describe PseudonymSessionsController do
 
     context "enrollment" do
       before do
-        user_session(@user)
+        user_session(@user, @pseudonym)
       end
 
       it "should generate a secret key" do

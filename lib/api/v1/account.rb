@@ -49,5 +49,9 @@ module Api::V1::Account
       end
     end
   end
+
+  def accounts_json(accounts, user, session, includes)
+    accounts.map{ |account| account_json(account, user, session, includes) }
+  end
 end
 

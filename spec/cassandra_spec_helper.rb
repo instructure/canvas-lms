@@ -27,3 +27,11 @@ shared_examples_for "cassandra page views" do
     end
   end
 end
+
+shared_examples_for "cassandra audit logs" do
+  before do
+    unless Canvas::Cassandra::Database.configured?('auditors')
+      pending "needs cassandra auditors configuration"
+    end
+  end
+end

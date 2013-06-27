@@ -25,7 +25,11 @@ describe EventStream::Index do
     def @database.update_record(*args); end
     def @database.update(*args); end
 
-    @stream = stub('stream', :database => @database, :ttl_seconds => 1.year)
+    @stream = stub('stream',
+      :database => @database,
+      :available? => true,
+      :record_type => EventStream::Record,
+      :ttl_seconds => 1.year)
   end
 
   context "setup block" do
@@ -173,16 +177,17 @@ describe EventStream::Index do
         @id = stub('id', :to_s => '1234567890')
         @key = stub('key', :to_s => 'key_value')
         @timestamp = stub('timestamp', :to_i => 12345)
+        @record = stub('record', :id => @id, :created_at => @timestamp)
       end
 
       it "should use the stream's database" do
         @database.expects(:update).once
-        @index.insert(@id, @key, @timestamp)
+        @index.insert(@record, @key)
       end
 
       it "should use the configured table" do
         @database.expects(:update).once.with(regexp_matches(/ INTO #{@table} /), anything, anything, anything, anything)
-        @index.insert(@id, @key, @timestamp)
+        @index.insert(@record, @key)
       end
 
       it "should combine the key and timestamp bucket into the configured key column" do
@@ -191,25 +196,25 @@ describe EventStream::Index do
         @index.key_column key_column
         @index.expects(:bucket_for_time).once.with(@timestamp).returns(bucket)
         @database.expects(:update).once.with(regexp_matches(/\(#{key_column}, /), "#{@key}/#{bucket}", anything, anything, anything)
-        @index.insert(@id, @key, @timestamp)
+        @index.insert(@record, @key)
       end
 
       it "should take a prefix off the id and the bucket for the ordered_id" do
         prefix = @id.to_s[0,8]
         @database.expects(:update).once.with(regexp_matches(/, ordered_id,/), anything, "#{@timestamp.to_i}/#{prefix}", anything, anything)
-        @index.insert(@id, @key, @timestamp)
+        @index.insert(@record, @key)
       end
 
       it "should pass through the id into the configured id column" do
         id_column = stub(:to_s => "expected_id_column")
         @index.id_column id_column
         @database.expects(:update).once.with(regexp_matches(/, #{id_column}\)/), anything, anything, @id, anything)
-        @index.insert(@id, @key, @timestamp)
+        @index.insert(@record, @key)
       end
 
       it "should include the ttl" do
-        @database.expects(:update).once.with(regexp_matches(/ USING TTL /), anything, anything, anything, @stream.ttl_seconds(@timestamp))
-        @index.insert(@id, @key, @timestamp)
+        @database.expects(:update).once.with(regexp_matches(/ USING TTL /), anything, anything, anything, @stream.ttl_seconds(@record))
+        @index.insert(@record, @key)
       end
     end
 
@@ -219,14 +224,9 @@ describe EventStream::Index do
         @index.scrollback_default @index.bucket_size
         @pager = @index.for_key('key')
 
-        type = Struct.new(:id)
         @ids = (1..4).to_a
-        @typed_results = @ids.map{ |id| type.new(id) }
-        @raw_results = @ids.map{ |id| { 'id' => id, 'ordered_id' => id } }
-      end
-
-      it "should return a bookmarked collection" do
-        @pager.should be_a BookmarkedCollection::Proxy
+        @typed_results = @ids.map{ |id| @stream.record_type.new('id' => id, 'created_at' => id.minutes.ago) }
+        @raw_results = @typed_results.map{ |record| { 'id' => record.id, 'ordered_id' => "#{record.created_at.to_i}/#{record.id}" } }
       end
 
       def setup_fetch(start, requested)
@@ -234,6 +234,16 @@ describe EventStream::Index do
         @raw_results.expects(:fetch).once.multiple_yields(*@raw_results[start, returned].map{ |result| [result] })
         @database.expects(:execute).once.returns(@raw_results)
         @stream.expects(:fetch).once.with(@ids[start, requested]).returns(@typed_results[start, requested])
+      end
+
+      it "should return a bookmarked collection" do
+        @pager.should be_a BookmarkedCollection::Proxy
+      end
+
+      it "should be able to get bookmark from a typed item" do
+        setup_fetch(0, 2)
+        page = @pager.paginate(:per_page => 2)
+        page.bookmark_for(page.last).should == page.next_bookmark
       end
 
       context "one page of results" do

@@ -860,6 +860,12 @@ FakeRails3Routes.draw do
       delete 'courses/:course_id/enrollments/:id', :action => :destroy
     end
 
+    scope(:controller => :authentication_audit_api) do
+      get 'audit/authentication/pseudonyms/:pseudonym_id', :action => :for_pseudonym, :path_name => 'audit_authentication_pseudonym'
+      get 'audit/authentication/accounts/:account_id', :action => :for_account, :path_name => 'audit_authentication_account'
+      get 'audit/authentication/users/:user_id', :action => :for_user, :path_name => 'audit_authentication_user'
+    end
+
     scope(:controller => :assignments_api) do
       get 'courses/:course_id/assignments', :action => :index, :path_name => 'course_assignments'
       get 'courses/:course_id/assignments/:id', :action => :show, :path_name => 'course_assignment'

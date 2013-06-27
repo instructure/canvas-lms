@@ -34,12 +34,21 @@ class EventStream
     Canvas::Cassandra::Database.from_config(database_name)
   end
 
+  def available?
+    Canvas::Cassandra::Database.configured?(database_name)
+  end
+
   def on_insert(&callback)
     add_callback(:insert, callback)
   end
 
   def insert(record)
-    execute(:insert, record)
+    if available?
+      execute(:insert, record)
+      record
+    else
+      nil
+    end
   end
 
   def on_update(&callback)
@@ -47,14 +56,19 @@ class EventStream
   end
 
   def update(record)
-    execute(:update, record)
+    if available?
+      execute(:update, record)
+      record
+    else
+      nil
+    end
   end
 
   def fetch(ids)
     rows = []
-    if ids.present?
+    if available? && ids.present?
       database.execute(fetch_cql, ids).fetch do |row|
-        rows << record_type.from_attributes(row)
+        rows << record_type.from_attributes(row.to_hash)
       end
     end
     rows
@@ -66,7 +80,7 @@ class EventStream
     on_insert do |record|
       if entry = index.entry_proc.call(record)
         key = index.key_proc ? index.key_proc.call(entry) : entry
-        index.insert(record.id, key, record.created_at)
+        index.insert(record, key)
       end
     end
 
@@ -90,8 +104,8 @@ class EventStream
     "#{database_name}.#{table}"
   end
 
-  def ttl_seconds(created_at)
-    ((created_at + time_to_live) - Time.now).to_i
+  def ttl_seconds(record)
+    ((record.created_at + time_to_live) - Time.now).to_i
   end
 
   private
@@ -106,7 +120,7 @@ class EventStream
   end
 
   def execute(operation, record)
-    ttl_seconds = self.ttl_seconds(record.created_at)
+    ttl_seconds = self.ttl_seconds(record)
     return if ttl_seconds < 0
 
     database.batch do
