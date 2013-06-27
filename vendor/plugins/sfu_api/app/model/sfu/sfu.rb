@@ -70,7 +70,7 @@ module SFU
       end
 
       def info(sfuid)
-        REST.json REST.account_url, "&username=#{sfuid}"
+        REST.json(REST.account_url, "&username=#{sfuid}")
       end
 
       def student_only?(sfuid)

@@ -43,10 +43,3 @@
 /public/javascripts/plugins/
 /public/plugins/
 /spec/coffeescripts/plugins/
-
-# SFU-specific ignores
-/config/*.yml.*
-/mnt/*
-/cache
-/public/google*.html
-/config/deploy/vm.rb

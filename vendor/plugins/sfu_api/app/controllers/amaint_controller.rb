@@ -1,4 +1,4 @@
-require Pathname(File.dirname(__FILE__)) + "../model/sfu/course"
+require Pathname(File.dirname(__FILE__)) + "../model/sfu/sfu"
 
 class AmaintController < ApplicationController
   before_filter :require_user
@@ -15,15 +15,19 @@ class AmaintController < ApplicationController
   end
 
   def user_info
-    user_array =[] 
+    user_array =[]
+    sfu_id = params[:sfu_id]
     if params[:property].nil?
       user_hash = {}
-	    user_hash["sfu_id"] = params[:sfu_id]	
-	    user_array << user_hash 
-    elsif params[:filter].nil?
-      user_array = teaching_terms_for params[:sfu_id]  
-    elsif params[:property].to_s.eql? "term"
-	    user_array = courses_for_user(params[:sfu_id], params[:filter])
+	    user_hash["sfu_id"] = sfu_id
+      user_hash["roles"] = SFU::User.roles sfu_id
+	    user_array << user_hash
+    elsif params[:property].to_s.eql? "roles"
+      user_array = SFU::User.roles sfu_id
+    elsif params[:filter].nil? && params[:property].to_s.start_with?("term")
+      user_array = teaching_terms_for sfu_id
+    elsif params[:property].to_s.start_with?("term")
+	    user_array = courses_for_user(sfu_id, params[:filter])
     end
 
     raise(ActiveRecord::RecordNotFound) if user_array.empty?
@@ -110,6 +114,6 @@ class AmaintController < ApplicationController
       term_array.push term
     end
     term_array
-  end 
+  end
 
 end
