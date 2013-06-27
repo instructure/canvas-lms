@@ -53,14 +53,17 @@ class SectionsController < ApplicationController
   # @API List course sections
   # Returns the list of sections for this course.
   #
-  # @argument include[] [optional, "students"] Associations to include with the group.
+  # @argument include[] [optional, "students"] Associations to include with the group. Note: this is only available if you have permission to view users or grades in the course
   # @argument include[] [optional, "avatar_url"] Include the avatar URLs for students returned.
   #
   # @returns [Section]
   def index
-    if authorized_action(@context, @current_user, [:read_roster, :view_all_grades, :manage_grades])
-      includes = Array(params[:include])
+    if authorized_action(@context, @current_user, [:read, :read_roster, :view_all_grades, :manage_grades])
+      if params[:include].present? && !is_authorized_action?(@context, @current_user, [:read_roster, :view_all_grades, :manage_grades])
+        params[:include] = nil
+      end
 
+      includes = Array(params[:include])
       result = @context.active_course_sections.map { |section| section_json(section, @current_user, session, includes) }
 
       render :json => result
