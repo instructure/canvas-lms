@@ -51,7 +51,7 @@ $(document).ready(function() {
       <% end %>
       <% if can_do @context, @current_user, :manage_students %>
         <li class="option students_step <%=  'completed' unless @context.students.first.nil? %>">
-          <a href="<%= context_url(@context, :context_details_url, :wizard => 1) %>#add_students" class="header icon-group-new"><%= t('links.students', %{Add Students to the Course}) %></a>
+          <a href="<%= course_users_path(course_id: @context) %>" class="header icon-group-new"><%= t('links.students', %{Add Students to the Course}) %></a>
           <div class="details" style="display: none;">
             <%= t 'details.students', %{You'll definitely want some of these.  What's the fun of teaching a course if nobody's even listening?} %>
           </div>
