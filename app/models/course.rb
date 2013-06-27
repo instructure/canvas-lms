@@ -602,6 +602,14 @@ class Course < ActiveRecord::Base
     group_weighting_scheme == 'percent'
   end
 
+  def apply_assignment_group_weights=(apply)
+    if apply
+      self.group_weighting_scheme = 'percent'
+    else
+      self.group_weighting_scheme = 'equal'
+    end
+  end
+
   def grade_weight_changed!
     @grade_weight_changed = true
     self.save!

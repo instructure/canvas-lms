@@ -91,7 +91,10 @@ require 'set'
 #         name: 'Default Term',
 #         start_at: "2012-06-01T00:00:00-06:00",
 #         end_at: null
-#       }
+#       },
+#
+#       // weight final grade based on assignment group percentages
+#       apply_assignment_group_weights: true
 #
 #   }
 class CoursesController < ApplicationController
@@ -212,6 +215,7 @@ class CoursesController < ApplicationController
   # @argument course[enroll_me] [Boolean] [optional] Set to true to enroll the current user as the teacher.
   # @argument course[sis_course_id] [String] [optional] The unique SIS identifier.
   # @argument course[hide_final_grades] [Boolean] [optional] If this option is set to true, the totals in student grades summary will be hidden.
+  # @argument course[apply_assignment_group_weights] [Boolean] Set to true to weight final grade based on assignment groups percentages
   # @argument offer [Boolean] [optional] If this option is set to true, the course will be available to students immediately.
   #
   # @returns Course
@@ -233,6 +237,7 @@ class CoursesController < ApplicationController
       end
 
       sis_course_id = params[:course].delete(:sis_course_id)
+      apply_assignment_group_weights = params[:course].delete(:apply_assignment_group_weights)
 
       # accept end_at as an alias for conclude_at. continue to accept
       # conclude_at for legacy support, and return conclude_at only if
@@ -248,9 +253,14 @@ class CoursesController < ApplicationController
         params[:course].delete :storage_quota
         params[:course].delete :storage_quota_mb
       end
-      
+
       @course = (@sub_account || @account).courses.build(params[:course])
       @course.sis_source_id = sis_course_id if api_request? && @account.grants_right?(@current_user, :manage_sis)
+
+      if apply_assignment_group_weights
+        @course.apply_assignment_group_weights = value_to_boolean apply_assignment_group_weights
+      end
+
       respond_to do |format|
         if @course.save
           @course.enroll_user(@current_user, 'TeacherEnrollment', :enrollment_state => 'active') if params[:enroll_me].to_s == 'true'
@@ -1418,6 +1428,9 @@ class CoursesController < ApplicationController
             @course.sis_source_id = sis_id
           end
         end
+      end
+      if params[:course].has_key?(:apply_assignment_group_weights)
+        @course.apply_assignment_group_weights = value_to_boolean params[:course].delete(:apply_assignment_group_weights)
       end
       params[:course][:event] = :offer if params[:offer].present?
 

@@ -366,6 +366,7 @@ describe UsersController, :type => :integration do
         'workflow_state' => 'available',
         'public_syllabus' => false,
         'storage_quota_mb' => @course.storage_quota_mb,
+        'apply_assignment_group_weights' => false
       },
 
       'user' => {
@@ -464,6 +465,7 @@ describe UsersController, :type => :integration do
         'workflow_state' => 'available',
         'public_syllabus' => false,
         'storage_quota_mb' => @course.storage_quota_mb,
+        'apply_assignment_group_weights' => false
       },
 
       'user' => {
