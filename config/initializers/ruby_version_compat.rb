@@ -1,9 +1,5 @@
 # ruby 1.9 compatibility fixes for Rails 2.3
 
-if ActiveRecord::Base.configurations[Rails.env]['adapter'] == 'mysql'
-  STDERR.puts "NOTE: It's recommended that you change your database adapter to mysql2 for usage with Ruby 1.9"
-end
-
 # See http://developer.uservoice.com/entries/how-to-upgrade-a-rails-2.3.14-app-to-ruby-1.9.3/
 # TZInfo needs to be patched.  In particular, you'll need to re-implement the datetime_new! method:
 require 'tzinfo'
