@@ -160,7 +160,7 @@ a.load_members_link, .loading_members {
     <%= t 'messages.no_students', 'No students have been added for this course' %>
     <% if can_do @context, @current_user, :manage_students %>
       <div style="margin: 20px; font-size: 1.2em;">
-        <a href="<%= context_url(@context, :context_details_url) %>#add_students" style="padding-left: 20px;"><%= t 'actions.add_students', 'Add Students to the Course' %></a>
+        <a href="<%= course_users_path(course_id: @context) %>" style="padding-left: 20px;"><%= t 'actions.add_students', 'Add Students to the Course' %></a>
       </div>
     <% end %>
   </div>
