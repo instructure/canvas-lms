@@ -1284,6 +1284,17 @@ describe Attachment do
       Message.find_by_user_id_and_notification_name(@student.id, 'New File Added').should be_nil
       Message.find_by_user_id_and_notification_name(@teacher.id, 'New File Added').should_not be_nil
     end
+
+    it "should not fail if the attachment context does not have participants" do
+      cm = ContentMigration.create!
+      attachment_model(:context => cm, :uploaded_data => stub_file_data('file.txt', nil, 'text/html'), :content_type => 'text/html')
+
+      Attachment.where(:id => @attachment).update_all(:need_notify => true)
+
+      new_time = Time.now + 10.minutes
+      Time.stubs(:now).returns(new_time)
+      Attachment.do_notifications
+    end
   end
 
   context "quota" do
