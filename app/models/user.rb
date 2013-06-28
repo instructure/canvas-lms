@@ -1790,9 +1790,6 @@ class User < ActiveRecord::Base
         include_submitted_count.
         map {|a| a.overridden_for(self)},opts.merge(:time => now)).
       first(opts[:limit])
-    appointment_groups = AppointmentGroup.manageable_by(self, context_codes).intersecting(now, opts[:end_at]).limit(opts[:limit])
-    appointment_groups.each { |ag| ag.context = ag.contexts_for_user(self).first }
-    events += appointment_groups
     events.sort_by{|e| [e.start_at ? 0: 1,e.start_at || 0, e.title] }.uniq.first(opts[:limit])
   end
 

@@ -1566,15 +1566,6 @@ describe User do
     end
 
     describe "upcoming_events" do
-      it "should include manageable appointment groups" do
-        course(:active_all => true)
-        @user = @course.instructors.first
-        ag = AppointmentGroup.create!(:title => 'test appointment', :contexts => [@course], :new_appointments => [[Time.now, Time.now + 1.hour]])
-        events = @user.upcoming_events
-        events.size.should eql 1
-        events.first.title.should eql 'test appointment'
-      end
-
       it "handles assignments where the applied due_at is nil" do
         course_with_teacher_logged_in(:active_all => true)
         assignment = @course.assignments.create!(:title => "Should not throw",
