@@ -305,7 +305,7 @@ class ContextController < ApplicationController
     log_asset_access("roster:#{@context.asset_string}", 'roster', 'other')
 
     if @context.is_a?(Course)
-      sections = @context.course_sections.select([:id, :name])
+      sections = @context.course_sections.active.select([:id, :name])
       all_roles = Role.role_data(@context, @current_user)
       load_all_contexts(:context => @context)
       js_env({
