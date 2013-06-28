@@ -25,3 +25,4 @@ define [
       @assignmentSettingsView.hide()
       # its trigger would not be rendered yet, set it manually
       @assignmentSettingsView.setTrigger @$assignmentSettingsButton
+      @createGroupView.setTrigger @$addGroupButton

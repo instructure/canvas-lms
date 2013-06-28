@@ -1,0 +1,93 @@
+<div class="form-dialog-content">
+  <div class="form-horizontal">
+    <div class="control-group">
+      <label class="control-label" for="ag_{{label_id}}_name">
+        {{#t "group_name"}}Group Name:{{/t}}
+      </label>
+      <div class="controls">
+        <input
+          type="text"
+          id="ag_{{label_id}}_name"
+          name="name"
+          value="{{name}}"
+          placeholder='{{#t "example_group_name"}}e.g., Essay Group 1{{/t}}'
+        />
+      </div>
+    </div>
+    <div class="control-group">
+      <div class="controls">
+        <input
+          type="text"
+          id="ag_{{label_id}}_group_weight"
+          class="span1 group_weight"
+          name="group_weight"
+          value="{{group_weight}}"
+          {{#if disable_weight}}disabled{{/if}}
+        />
+        <label style="display:inline-block" for="ag_{{label_id}}_group_weight">
+          {{#t "percent_of_total"}}% of total grade{{/t}}
+        </label>
+      </div>
+    </div>
+    <hr/>
+    <fieldset>
+      <legend class="drop_rules_section">Number of scores to ignore for each student</legend>
+
+      <div class="control-group">
+        <label class="control-label" for="ag_{{label_id}}_drop_lowest">
+          {{#t "drop_lowest"}}Lowest Scores:{{/t}}
+        </label>
+        <div class="controls">
+          <input
+            type="text"
+            id="ag_{{label_id}}_drop_lowest"
+            class="span1 field"
+            name="rules[drop_lowest]"
+            value="{{drop_lowest}}"
+          />
+        </div>
+      </div>
+      <div class="control-group">
+        <label class="control-label" for="ag_{{label_id}}_drop_highest">
+          {{#t "drop_highest"}}Highest Scores:{{/t}}
+        </label>
+        <div class="controls">
+          <input
+            type="text"
+            id="ag_{{label_id}}_drop_highest"
+            class="span1 field"
+            name="rules[drop_highest]"
+            value="{{drop_highest}}"
+          />
+        </div>
+      </div>
+
+      {{#if editable_never_drop}}
+        <hr/>
+        <div class="control-group">
+          <label class="control-label" id="ag_{{label_id}}_never_drop">
+            {{#t "never_drop"}}Never Drop:{{/t}}
+          </label>
+          <div class="controls never_drop_rules_group">
+            <div class="never_drop"></div>
+            <a href="#" class="add_never_drop icon-add">
+              {{#t "add_first_assignment"}}Add an assignment{{/t}}
+            </a>
+          </div>
+        </div>
+      {{/if}}
+    </fieldset>
+
+  </div>
+</div>
+<div class="form-controls">
+  <button
+    class="cancel_button btn dialog_closer"
+    type="button"
+  >{{#t "cancel"}}Cancel{{/t}}</button>
+  <button
+    class="create_group btn btn-primary"
+    data-text-while-loading='{{#t "validating"}}Creating...{{/t}}'
+    type="submit"
+  >{{#t "save"}}Save{{/t}}</button>
+</div>

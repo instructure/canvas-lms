@@ -148,6 +148,7 @@ describe "assignment groups" do
 
       course_with_teacher_logged_in(:active_all => true)
       @assignment_group = @course.assignment_groups.create!(:name => "Test Group")
+
       get "/courses/#{@course.id}/assignments"
       wait_for_ajaximations
     end
@@ -214,6 +215,65 @@ describe "assignment groups" do
         val_after = @assignment_group.group_weight
         val_after.should_not == val_before
       end
+    end
+
+    it "should create a new assignment group" do
+      count = @course.assignment_groups.count
+      f('#content #addGroup').click
+      wait_for_ajaximations
+
+      replace_content(f('#ag_new_name'), "Assignment Group 1")
+      fj('.create_group:visible').click
+      wait_for_ajaximations
+
+      @course.assignment_groups.count.should > count
+      new_ag = @course.assignment_groups.order(:id).last
+      f("#assignment_group_#{new_ag.id} .ig-header").text.should match "Assignment Group 1"
+    end
+
+    it "should edit an existing assignment group" do
+      ag = @course.assignment_groups.first
+      f("#assignment_group_#{ag.id} .al-trigger").click
+      f("#assignment_group_#{ag.id} .edit_group").click
+      wait_for_ajaximations
+
+      replace_content(f("#ag_#{ag.id}_name"), "Modified Group")
+      fj('.create_group:visible').click
+      wait_for_ajaximations
+
+      ag.reload.name.should == "Modified Group"
+      f("#assignment_group_#{ag.id} .ig-header").text.should match "Modified Group"
+    end
+
+    it "should save drop rules" do
+      ag = @course.assignment_groups.first
+      f("#assignment_group_#{ag.id} .al-trigger").click
+      f("#assignment_group_#{ag.id} .edit_group").click
+      wait_for_ajaximations
+
+      replace_content(f("#ag_#{ag.id}_drop_lowest"), "1")
+      replace_content(f("#ag_#{ag.id}_drop_highest"), "1")
+      fj('.create_group:visible').click
+      wait_for_ajaximations
+
+      ag.reload
+      ag.rules_hash[:drop_lowest].should == 1
+      ag.rules_hash[:drop_highest].should == 1
+      f("#assignment_group_#{ag.id} .ig-header").text.should match "2 Rules"
+    end
+
+    it "should not save drop rules when non are given" do
+      ag = @course.assignment_groups.first
+      f("#assignment_group_#{ag.id} .al-trigger").click
+      f("#assignment_group_#{ag.id} .edit_group").click
+      wait_for_ajaximations
+
+      replace_content(f("#ag_#{ag.id}_name"), "Modified Group")
+      fj('.create_group:visible').click
+      wait_for_ajaximations
+
+      ag.reload.rules_hash.should be_blank
+      f("#assignment_group_#{ag.id} .ig-header").text.should_not match "Rule"
     end
   end
 end

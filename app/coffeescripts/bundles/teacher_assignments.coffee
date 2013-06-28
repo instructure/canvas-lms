@@ -16,24 +16,25 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 require [
-  'underscore'
   'compiled/collections/AssignmentGroupCollection'
   'compiled/models/Course'
   'compiled/views/CollectionView'
   'compiled/views/InputFilterView'
   'compiled/views/assignments/AssignmentGroupListItemView'
+  'compiled/views/assignments/CreateGroupView'
   'compiled/views/assignments/TeacherIndexView'
   'compiled/views/assignments/AssignmentSettingsView'
   'compiled/views/assignments/AssignmentGroupWeightsView'
   'jst/assignments/teacher_index/AssignmentGroupList'
-], (_, AssignmentGroupCollection, Course, CollectionView, InputFilterView, AssignmentGroupListItemView, TeacherIndexView, AssignmentSettingsView, AssignmentGroupWeightsView, assignmentGroupsTemplate) ->
-
-  assignmentGroups = new AssignmentGroupCollection
-  assignmentGroups.fetch() # TODO: reset this instead
+], (AssignmentGroupCollection, Course, CollectionView, InputFilterView, AssignmentGroupListItemView, CreateGroupView, TeacherIndexView, AssignmentSettingsView, AssignmentGroupWeightsView, assignmentGroupsTemplate) ->
 
   course = new Course
   course.url = ENV.COURSE_URL
   course.fetch()
+
+  assignmentGroups = new AssignmentGroupCollection [],
+    course: course
+  assignmentGroups.fetch() # TODO: reset this instead
 
   assignmentSettingsView = new AssignmentSettingsView
     model: course
@@ -53,7 +54,9 @@ require [
     assignmentGroupsView: assignmentGroupsView
     inputFilterView: inputFilterView
     assignmentSettingsView: assignmentSettingsView
-    createGroupView: new Backbone.View
+    createGroupView: new CreateGroupView
+      assignmentGroups: assignmentGroups
+      course: course
 
   @app.render()
   @app.$el.appendTo $('#content')

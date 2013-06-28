@@ -1,9 +1,10 @@
 define [
   'jquery'
   'compiled/views/ValidatedFormView'
+  'compiled/fn/preventDefault'
   'jst/DialogFormWrapper'
   'jqueryui/dialog'
-], ($, ValidatedFormView, wrapper) ->
+], ($, ValidatedFormView, preventDefault, wrapper) ->
 
   ##
   # Creates a form dialog.
@@ -119,7 +120,7 @@ define [
     ##
     # @api private
     attachTrigger: ->
-      @$trigger.on 'click.dialogFormView', @toggle
+      @$trigger.on 'click.dialogFormView', preventDefault(@toggle)
 
     ##
     # @api private
