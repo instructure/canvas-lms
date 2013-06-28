@@ -17,65 +17,26 @@
 #
 require [
   'Backbone'
-  'compiled/models/Assignment'
-  'compiled/collections/AssignmentCollection'
   'compiled/collections/AssignmentGroupCollection'
   'compiled/views/CollectionView'
   'compiled/views/InputFilterView'
-  'jst/assignments/TeacherIndex'
+  'compiled/views/assignments/AssignmentGroupListItemView'
+  'compiled/views/assignments/TeacherIndexView'
   'jst/assignments/teacher_index/AssignmentGroupList'
-  'jst/assignments/teacher_index/AssignmentGroupListItem'
-  'jst/assignments/teacher_index/AssignmentListItem'
-], (Backbone, Assignment, AssignmentCollection, AssignmentGroupCollection, CollectionView, InputFilterView, layoutTemplate, assignmentGroupsTemplate, assignmentGroupTemplate, assignmentTemplate) ->
+], (Backbone, AssignmentGroupCollection, CollectionView, InputFilterView, AssignmentGroupListItemView, TeacherIndexView, assignmentGroupsTemplate) ->
 
   assignmentGroups = new AssignmentGroupCollection
   assignmentGroups.fetch() # TODO: reset this instead
 
-  class EditableAssignmentIndexView extends Backbone.View
-
-    template: layoutTemplate
-
-    @child 'assignmentGroupsView', '[data-view=assignmentGroups]'
-
-    @child 'inputFilterView', '[data-view=inputFilter]'
-
-    @child 'createGroupView', '[data-view=createGroup]'
-
-    @child 'createAssignmentView', '[data-view=createAssignment]'
-
-    els:
-      '#addGroup': '$addGroupButton'
-      '#addAssignment': '$addAssignmentButton'
-
-    afterRender: ->
-      # child views so they get rendered automatically, need to stop it
-      @createGroupView.hide()
-      @createAssignmentView.hide()
-
-
   inputFilterView = new InputFilterView
     collection: assignmentGroups
 
-  class AssignmentView extends Backbone.View
-    tagName: "li"
-    template: assignmentTemplate
-    toJSON: -> @model.toView()
-
-  class AssignmentGroupView extends CollectionView
-    tagName: "li"
-    itemView: AssignmentView
-    template: assignmentGroupTemplate
-    initialize: (options) ->
-      @collection = new AssignmentCollection @model.get('assignments')
-      super
-    toJSON: -> @model.toJSON()
-
   assignmentGroupsView = new CollectionView
     template: assignmentGroupsTemplate
-    itemView: AssignmentGroupView
+    itemView: AssignmentGroupListItemView
     collection: assignmentGroups
 
-  @app = new EditableAssignmentIndexView
+  @app = new TeacherIndexView
     assignmentGroupsView: assignmentGroupsView
     inputFilterView: inputFilterView
     createGroupView: new Backbone.View
