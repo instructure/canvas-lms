@@ -2697,6 +2697,16 @@ describe Course, "section_visibility" do
       @course.users_visible_to(@teacher).sort_by(&:id).should eql [@teacher, @ta, @student1, @student2, @observer]
       @course.users_visible_to(@ta).sort_by(&:id).should      eql [@teacher, @ta, @student1, @observer]
     end
+
+    it "should return student view students to account admins" do
+      @course.student_view_student
+      @admin = account_admin_user
+      @course.enrollments_visible_to(@admin).map(&:user).should be_include(@course.student_view_student)
+    end
+
+    it "should return student view students to student view students" do
+      @course.enrollments_visible_to(@course.student_view_student).map(&:user).should be_include(@course.student_view_student)
+    end
   end
 
   context "sections" do
