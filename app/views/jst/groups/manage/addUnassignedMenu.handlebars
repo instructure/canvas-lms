@@ -1,5 +1,9 @@
 <div class="popover-title">
-  {{#t "add_unassigned_user"}}Add Unassigned Student{{/t}}
+  {{#ifEqual ENV.group_user_type "student"}}
+    {{#t "add_unassigned_student"}}Add Unassigned Student{{/t}}
+  {{else}}
+    {{#t "add_unassigned_user"}}Add Unassigned User{{/t}}
+  {{/ifEqual}}
 </div>
 <div class="popover-content">
   <div class="form-search clearfix">

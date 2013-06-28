@@ -8,27 +8,24 @@ define [
 ], ($, GroupView, GroupUsersView, GroupCollection, GroupUserCollection, Group) ->
 
   view = null
-  groups = null
+  group = null
   users = null
 
   module 'GroupView',
     setup: ->
-      groups = new GroupCollection [
-        new Group
-          id: 42
-          name: 'Foo Group'
-          members_count: 7
-      ]
+      group = new Group
+        id: 42
+        name: 'Foo Group'
+        members_count: 7
       users = new GroupUserCollection [
-        {id: 1, name: "bob"}
-        {id: 2, name: "joe"}
+        {id: 1, name: "bob", sortable_name: "bob"}
+        {id: 2, name: "joe", sortable_name: "joe"}
       ]
-      view = new GroupView
-        model: groups.at 0
-        groupUsersView: new GroupUsersView
-          collection: users
-          groupsCollection: groups
-          canAssignToGroup: true
+      users.loaded = true
+      users.loadedAll = true
+      group.users = -> users
+      groupUsersView = new GroupUsersView {group, collection: users}
+      view = new GroupView {groupUsersView, model: group}
       view.render()
       view.$el.appendTo($(document.body))
 
@@ -36,26 +33,24 @@ define [
       view.remove()
 
   assertContracted = (view) ->
-    ok not view.$('.expand-group').hasClass('hidden'), 'expand visible'
-    ok view.$('.contract-group').hasClass('hidden'), 'contract hidden'
-    ok view.groupUsersView.$el.hasClass('hidden'), 'users hidden'
+    ok view.$el.hasClass('group-collapsed'), 'expand visible'
+    ok not view.$el.hasClass('group-expanded'), 'contract hidden'
 
   assertExpanded = (view) ->
-    ok view.$('.expand-group').hasClass('hidden'), 'expand hidden'
-    ok not view.$('.contract-group').hasClass('hidden'), 'contract visible'
-    ok not view.groupUsersView.$el.hasClass('hidden'), 'users visible'
+    ok not view.$el.hasClass('group-collapsed'), 'expand hidden'
+    ok view.$el.hasClass('group-expanded'), 'contract visible'
 
   test 'initial state should be contracted', ->
     assertContracted view
 
   test 'expand/contract buttons', ->
-    view.$('.expand-group').click()
+    view.$('.toggle-group').eq(0).click()
     assertExpanded view
-    view.$('.contract-group').click()
+    view.$('.toggle-group').eq(0).click()
     assertContracted view
 
   test 'renders groupUsers', ->
-    ok view.$('.groupUser').length
+    ok view.$('.group-user').length
 
   test 'removes the group after successful deletion', ->
     url = "/api/v1/groups/#{view.model.get('id')}"

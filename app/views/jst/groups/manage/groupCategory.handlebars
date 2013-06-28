@@ -1,0 +1,22 @@
+<div data-view="groupCategoryDetail"></div>
+
+{{#if ENV.IS_LARGE_ROSTER}}
+  <div data-view="groups"></div>
+{{else}}
+  <div class="row-fluid">
+    <div class="well span4">
+      <h3 class="h5">
+        <strong>
+          {{#ifEqual ENV.group_user_type "student"}}
+            {{#t "unassigned_students"}}Unassigned Students{{/t}}
+          {{else}}
+            {{#t "unassigned_users"}}Unassigned Users{{/t}}
+          {{/ifEqual}}
+        </strong>
+      </h3>
+      <div data-view="unassignedUsers"></div>
+    </div>
+    <div class="span8" data-view="groups"></div>
+  </div>
+{{/if}}
+

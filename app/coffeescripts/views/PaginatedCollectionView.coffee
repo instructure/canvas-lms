@@ -114,7 +114,7 @@ define [
       distanceToBottom = elementBottom -
         @scrollContainer.scrollTop() -
         @scrollContainer.height()
-      if distanceToBottom < @options.buffer
+      if distanceToBottom < @options.buffer and @collection.canFetch('next')
         @collection.fetch page: 'next'
       else
         @hideLoadingIndicator()

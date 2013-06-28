@@ -1,51 +1,55 @@
 define [
-  'compiled/collections/GroupCategoryUserCollection'
-  'compiled/models/GroupUser'
-  'compiled/views/groups/manage/UnassignedUsersView'
   'jquery'
-], (GroupCategoryUserCollection,
-    GroupUser,
-    UnassignedUsersView,
-    $) ->
+  'compiled/views/groups/manage/UnassignedUsersView'
+  'compiled/views/groups/manage/AssignToGroupMenu'
+  'compiled/collections/GroupCollection'
+  'compiled/collections/GroupUserCollection'
+  'compiled/models/Group'
+], ($, UnassignedUsersView, AssignToGroupMenu, GroupCollection, GroupUserCollection, Group) ->
 
-  server = null
-  waldo = null
-  users = null
+  clock = null
   view = null
-
-  sendResponse = (method, url, json)->
-    server.respond method, url, [200, {
-      'Content-Type': 'application/json'
-    }, JSON.stringify(json)]
+  groups = null
+  users = null
 
   module 'UnassignedUsersView',
     setup: ->
-      server = sinon.fakeServer.create()
-      waldo = new GroupUser id: 4, name: "Waldo"
-      users = new GroupCategoryUserCollection
+      clock = sinon.useFakeTimers()
+      groups = new GroupCollection [
+        new Group name: "a group"
+        new Group name: "another group"
+      ]
+      users = new GroupUserCollection [
+        {id: 1, name: "bob", sortable_name: "bob"}
+        {id: 2, name: "joe", sortable_name: "joe"}
+      ]
+      menu = new AssignToGroupMenu
+        collection: groups
       view = new UnassignedUsersView
         collection: users
-        groupId: 777
-      users.reset([
-        new GroupUser(id: 1, name: "Frank Herbert"),
-        new GroupUser(id: 2, name: "Neal Stephenson"),
-        new GroupUser(id: 3, name: "John Scalzi"),
-        waldo
-      ])
+        groupsCollection: groups
+        assignToGroupMenu: menu
+      view.render()
       view.$el.appendTo($(document.body))
 
     teardown: ->
-      server.restore()
+      clock.restore()
       view.remove()
+      $('.assign-to-group-menu').remove()
 
-  test "updates the user's groupId and removes from unassigned collection", ->
-    equal waldo.get('groupId'), null
-    $links = view.$('.assign-to-group')
-    equal $links.length, 4
+  test 'toggles group class if canAssignToGroup', ->
+    groups.pop() # no change yet, because not empty
+    ok view.$el.attr('class').indexOf('group-category-empty') == -1
 
-    $waldoLink = $links.last()
-    $waldoLink.click()
-    sendResponse 'POST', waldo.createMembershipUrl(777), {}
-    equal waldo.get('groupId'), 777
+    group = groups.pop()
+    ok view.$el.attr('class').indexOf('group-category-empty') >= 0
 
-    ok not users.contains(waldo)
+    groups.push(group)
+    ok view.$el.attr('class').indexOf('group-category-empty') == -1
+
+  test 'opens the assignToGroupMenu', ->
+    view.$('.assign-to-group').eq(0).click()
+    clock.tick(100)
+    $menu = $('.assign-to-group-menu').filter(':visible')
+    equal $menu.length, 1
+    equal $menu.find('.set-group').length, 2

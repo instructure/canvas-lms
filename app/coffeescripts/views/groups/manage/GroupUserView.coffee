@@ -10,7 +10,7 @@ define [
 
     tagName: 'li'
 
-    className: 'groupUser'
+    className: 'group-user'
 
     template: template
 

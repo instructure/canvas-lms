@@ -23,7 +23,6 @@ define [
       ]
       view = new MyCollectionView {collection, itemView: View}
       view.render()
-      console.log view.$el.html()
 
   test 'hides items that don\'t match the filter', ->
     equal view.$list.children().length, 2
@@ -32,7 +31,6 @@ define [
     view.$filter.val("b")
     view.$filter.trigger 'input'
 
-    console.log view.$el.html()
     equal view.$list.children().length, 2
     equal view.$list.children('.hidden').length, 1
 

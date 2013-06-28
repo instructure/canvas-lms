@@ -10,8 +10,8 @@ define [
   module 'GroupUserCollection',
     setup: ->
       users = [
-        new Model(id: 1, name: "bob", groupId: null),
-        new Model(id: 2, name: "joe", groupId: null)
+        new Model(id: 1, name: "bob", sortable_name: "bob", groupId: null),
+        new Model(id: 2, name: "joe", sortable_name: "joe", groupId: null)
       ]
       source = new GroupUserCollection(users, groupId: null)
       target = new GroupUserCollection([], groupId: 1)
@@ -25,7 +25,7 @@ define [
     equal target.length, 1
 
   test "removes user when target group's collection is not yet loaded", ->
-    users[0].set('groupId', 2)
+    users[0].set('groupId', 2) # not the target
     equal source.length, 1
     equal target.length, 0
 

@@ -1,14 +1,21 @@
 <div class="row-fluid">
   <div class="span8">
-    <a href="#" class="expand-group" title="{{#t "expand_group"}}Expand Group{{/t}}"><i class="icon-mini-arrow-up"></i></a>
-    <a href="#" class="contract-group" title="{{#t "contract_group"}}Contract Group{{/t}}"><i class="icon-mini-arrow-down"></i></a>
-    <a href="{{url}}"><strong>{{name}}</strong></a>
+    <a href="#" class="toggle-group" aria-label="{{#t "show_group_details"}}Show group details{{/t}}" title="{{#t "show_group_details"}}Show group details{{/t}}">
+      <i class="group-collapsed-item icon-mini-arrow-up"></i>
+      <i class="group-expanded-item icon-mini-arrow-down"></i>
+      <strong>{{name}}</strong>
+    </a>
   </div>
-  <div class="span2">{{summary}}</div>
   <div class="span2">
-    <a href="#" class="edit-group" title="{{#t "edit_group"}}Edit group{{/t}}"><i class="icon-edit"></i></a>
-    <a href="#" class="delete-group" title="{{#t "delete_group"}}Delete group{{/t}}"><i class="icon-trash"></i></a>
+    <span class="toggle-group group-summary">{{summary}}</span>
+  </div>
+  <div class="span2">
+    {{#if ENV.IS_LARGE_ROSTER}}
+      <a href="#" class="add-user" aria-label="{{#t "add_user_to_group"}}Assign user to group{{/t}}" title="{{#t "add_user_to_group"}}Assign user to group{{/t}}"><i class="icon-add"></i></a>
+    {{/if}}
+    <a href="#" class="edit-group" aria-label="{{#t "edit_group"}}Edit group{{/t}}" title="{{#t "edit_group"}}Edit group{{/t}}"><i class="icon-edit"></i></a>
+    <a href="#" class="delete-group" aria-label="{{#t "delete_group"}}Delete group{{/t}}" title="{{#t "delete_group"}}Delete group{{/t}}"><i class="icon-trash"></i></a>
   </div>
 </div>
 
-<div data-view="groupUsers"></div>
+<div data-view="groupUsers" class="group-users group-expanded-item"></div>

@@ -3,9 +3,9 @@ define [
   'underscore'
   'Backbone'
   'jst/groups/manage/group'
-  'jquery.ajaxJSON'
+  'compiled/views/groups/manage/GroupUsersView'
   'compiled/jquery.rails_flash_notifications'
-], (I18n, _, {View}, template) ->
+], (I18n, _, {View}, template, GroupUsersView) ->
 
   class GroupView extends View
 
@@ -17,15 +17,26 @@ define [
 
     @optionProperty 'expanded'
 
+    @optionProperty 'addUnassignedMenu'
+
     @child 'groupUsersView', '[data-view=groupUsers]'
 
     events:
-      'click .expand-group': 'expand'
-      'click .contract-group': 'contract'
+      'click .toggle-group': 'toggleDetails'
       'click .delete-group': 'deleteGroup'
+      'click .add-user': 'showAddUser'
+      'focus .add-user': 'showAddUser'
+      'blur .add-user': 'hideAddUser'
+
+    els:
+      '.group-summary': '$summary'
 
     attach: ->
+      @expanded = false
+      @users = @model.users()
+      @model.on 'change', @render
       @model.on 'destroy', @remove, this
+      @users.on 'add remove reset', @updateSummary
 
     deleteGroup: (e) =>
       e.preventDefault()
@@ -36,28 +47,36 @@ define [
 
     toJSON: ->
       json = super
-      json.summary = I18n.t "summary", { one: "1 student", other: "%{count} students"}, count: json.members_count
+      json.summary = @summary()
       json
 
-    afterRender: ->
-      @toggleVisibility()
-
-    toggleVisibility: ->
-      if @expanded
-        @$('.expand-group').addClass 'hidden'
-        @$('.contract-group').removeClass 'hidden'
-        @groupUsersView.$el.removeClass 'hidden'
+    summary: ->
+      if ENV.group_user_type is 'student'
+        I18n.t "student_count", "student", count: @model.usersCount()
       else
-        @$('.expand-group').removeClass 'hidden'
-        @$('.contract-group').addClass 'hidden'
-        @groupUsersView.$el.addClass 'hidden'
+        I18n.t "user_count", "user", count: @model.usersCount()
 
-    expand: (e) ->
-      e.preventDefault()
-      @expanded = true
-      @toggleVisibility()
+    updateSummary: =>
+      @$summary.text @summary()
 
-    contract: (e) ->
+    afterRender: ->
+      @$el.toggleClass 'group-expanded', @expanded
+      @$el.toggleClass 'group-collapsed', !@expanded
+
+    toggleDetails: (e) ->
       e.preventDefault()
-      @expanded = false
-      @toggleVisibility()
+      @expanded = not @expanded
+      if @expanded and not @users.loaded
+        @users.load(if @model.usersCount() then 'all' else 'none')
+      @afterRender()
+
+    showAddUser: (e) ->
+      e.preventDefault()
+      e.stopPropagation()
+      $target = $(e.currentTarget)
+      @addUnassignedMenu.groupId = @model.id
+      @addUnassignedMenu.showBy $target, e.type is 'click'
+
+    hideAddUser: (e) ->
+      @addUnassignedMenu.hide()
+

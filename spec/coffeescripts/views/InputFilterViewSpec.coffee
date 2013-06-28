@@ -84,3 +84,11 @@ define [
     simulateKeyup()
     equal view.model.get('filter'), 'foo', 'filter attribute did not change'
 
+  test 'does setParam false when the value is less than the minLength and setParamOnInvalid=true', ->
+    view.model = new Backbone.Model filter: 'foo'
+    view.options.setParamOnInvalid = true
+    setValue 'ab'
+    simulateKeyup()
+    equal view.model.get('filter'), false, 'filter attribute is false'
+
+

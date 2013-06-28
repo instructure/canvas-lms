@@ -65,6 +65,9 @@ define [
         @trigger 'fetch', this, response, options
         @trigger "fetch:#{options.page}", this, response, options if options.page?
         @trigger 'fetched:last', arguments... unless @urls?.next
+        if @loadAll and @urls.next?
+          setTimeout =>
+            @fetch page: 'next' # next tick so we can show loading indicator, etc.
 
     canFetch: (page) ->
       @urls? and @urls[page]?
