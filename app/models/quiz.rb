@@ -1161,10 +1161,21 @@ class Quiz < ActiveRecord::Base
   end
 
   def publish!
+    self.generate_quiz_data
     self.workflow_state = 'available'
     self.published_at = Time.zone.now
     save!
     self
+  end
+
+  def unpublish!
+    self.workflow_state = 'unpublished'
+    save!
+    self
+  end
+
+  def can_unpublish?
+    !has_student_submissions?
   end
 
   # marks a quiz as having unpublished changes

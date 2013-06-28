@@ -118,6 +118,16 @@ define [
 
 
   # click
+  test 'click publish should trigger publish event', ->
+    btnView = new PublishButtonView(model: @publish).render()
+
+    triggered = false
+    btnView.on "publish", ->
+      triggered = true
+
+    btnView.$el.trigger('click')
+    ok triggered
+
   test 'publish event callback should transition to published', ->
     btnView = new PublishButtonView(model: @publish).render()
     ok btnView.isPublish()
@@ -142,6 +152,17 @@ define [
 
     ok  btnView.isPublish()
     ok !btnView.isPublished()
+
+  test 'click published should trigger unpublish event', ->
+    btnView = new PublishButtonView(model: @published).render()
+
+    triggered = false
+    btnView.on "unpublish", ->
+      triggered = true
+
+    btnView.$el.trigger('mouseenter')
+    btnView.$el.trigger('click')
+    ok triggered
 
   test 'published event callback should transition to publish', ->
     btnView = new PublishButtonView(model: @published).render()

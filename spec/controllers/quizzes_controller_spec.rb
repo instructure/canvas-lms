@@ -1086,5 +1086,45 @@ describe QuizzesController do
       assigns[:quiz].should be_deleted
     end
   end
+
+  describe "POST 'publish'" do
+    it "should require authorization" do
+      course_with_teacher(:active_all => true)
+      course_quiz
+      post 'publish', :course_id => @course.id, :quizzes => [@quiz.id]
+      assert_unauthorized
+    end
+
+    it "should publish unpublished quizzes" do
+      course_with_teacher_logged_in(:active_all => true)
+      @quiz = @course.quizzes.build(:title => "New quiz!")
+      @quiz.save!
+
+      @quiz.published?.should be_false
+      post 'publish', :course_id => @course.id, :quizzes => [@quiz.id]
+
+      @quiz.reload.published?.should be_true
+    end
+  end
+
+  describe "POST 'unpublish'" do
+    it "should require authorization" do
+      course_with_teacher(:active_all => true)
+      course_quiz
+      post 'unpublish', :course_id => @course.id, :quizzes => [@quiz.id]
+      assert_unauthorized
+    end
+
+    it "should unpublish published quizzes" do
+      course_with_teacher_logged_in(:active_all => true)
+      @quiz = @course.quizzes.build(:title => "New quiz!")
+      @quiz.publish!
+
+      @quiz.published?.should be_true
+      post 'unpublish', :course_id => @course.id, :quizzes => [@quiz.id]
+
+      @quiz.reload.published?.should be_false
+    end
+  end
 end
 

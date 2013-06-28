@@ -307,7 +307,8 @@ FakeRails3Routes.draw do
     concerns :conferences
     concerns :question_banks
 
-    match 'quizzes/publish' => 'quizzes#publish', :as => :quizzes_publish
+    match 'quizzes/publish'   => 'quizzes#publish',   :as => :quizzes_publish
+    match 'quizzes/unpublish' => 'quizzes#unpublish', :as => :quizzes_unpublish
     resources :quizzes do
       match 'managed_quiz_data' => 'quizzes#managed_quiz_data', :as => :managed_quiz_data
       match 'reorder' => 'quizzes#reorder', :as => :reorder

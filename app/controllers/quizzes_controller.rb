@@ -273,17 +273,35 @@ class QuizzesController < ApplicationController
   def publish
     if authorized_action(@context, @current_user, :manage_assignments)
       @quizzes = @context.quizzes.active.find_all_by_id(params[:quizzes]).compact.select{|q| !q.available? }
-      @quizzes.each do |quiz|
-        quiz.generate_quiz_data
-        quiz.published_at = Time.now
-        quiz.workflow_state = 'available'
-        quiz.save
-      end
+      @quizzes.each(&:publish!)
+
       flash[:notice] = t('notices.quizzes_published',
                          { :one => "1 quiz successfully published!",
                            :other => "%{count} quizzes successfully published!" },
                          :count => @quizzes.length)
-      redirect_to named_context_url(@context, :context_quizzes_url)
+
+
+      respond_to do |format|
+        format.html { redirect_to named_context_url(@context, :context_quizzes_url) }
+        format.json { render :json => {}, :status => :ok }
+      end
+    end
+  end
+
+  def unpublish
+    if authorized_action(@context, @current_user, :manage_assignments)
+      @quizzes = @context.quizzes.active.find_all_by_id(params[:quizzes]).compact.select{|q| q.available? }
+      @quizzes.each(&:unpublish!)
+
+      flash[:notice] = t('notices.quizzes_unpublished',
+                         { :one => "1 quiz successfully unpublished!",
+                           :other => "%{count} quizzes successfully unpublished!" },
+                         :count => @quizzes.length)
+
+      respond_to do |format|
+        format.html { redirect_to named_context_url(@context, :context_quizzes_url) }
+        format.json { render :json => {}, :status => :ok }
+      end
     end
   end
 
@@ -488,12 +506,7 @@ class QuizzesController < ApplicationController
         @quiz.transaction do
           overrides = delete_override_params
           if !@domain_root_account.enable_draft? && params[:activate]
-            @quiz.with_versioning(true) do
-              @quiz.generate_quiz_data
-              @quiz.workflow_state = 'available'
-              @quiz.published_at = Time.now
-              @quiz.save!
-            end
+            @quiz.with_versioning(true) { @quiz.publish! }
           end
           notify_of_update = value_to_boolean(params[:quiz][:notify_of_update])
           params[:quiz][:notify_of_update] = false

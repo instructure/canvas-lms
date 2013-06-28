@@ -45,12 +45,14 @@ define [
     publish: (event) ->
       @renderPublishing()
       @model.publish().always =>
+        @trigger("publish")
         @enable()
         @render()
 
     unpublish: (event) ->
       @renderUnpublishing()
       @model.unpublish().always =>
+        @trigger("unpublish")
         @enable()
         @render()
 

@@ -201,7 +201,7 @@ describe "quizzes questions" do
         wait_for_ajaximations
       end
       expect_new_page_load do
-        f('.publish_quiz_button').click
+        f('.quiz-publish-button').click
         wait_for_ajaximations
       end
       expect_new_page_load do
@@ -272,7 +272,7 @@ describe "quizzes questions" do
       q.generate_quiz_data
       q.save!
       get "/courses/#{@course.id}/quizzes/#{q.id}/edit"
-      f('.publish_quiz_button')
+      f('.quiz-publish-button')
       get "/courses/#{@course.id}/quizzes/#{q.id}/take?user_id=#{@user.id}"
       driver.find_element(:link, 'Take the Quiz').click
 

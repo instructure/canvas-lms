@@ -22,7 +22,7 @@ define([
   'compiled/views/MessageStudentsDialog',
   'quiz_arrows',
   'quiz_inputs',
-  'compiled/models/Publishable',
+  'compiled/models/Quiz',
   'compiled/views/PublishButtonView',
   'jquery.instructure_date_and_time' /* dateString, time_field, datetime_field */,
   'jqueryui/dialog',
@@ -32,7 +32,7 @@ define([
   'jquery.instructure_misc_plugins' /* ifExists, confirmDelete */,
   'jquery.disableWhileLoading',
   'message_students' /* messageStudents */
-], function(I18n, $, MessageStudentsDialog, showAnswerArrows, inputMethods, Publishable, PublishButtonView) {
+], function(I18n, $, MessageStudentsDialog, showAnswerArrows, inputMethods, Quiz, PublishButtonView) {
 
 
   $(document).ready(function () {
@@ -169,8 +169,16 @@ define([
     });
 
     var $el = $('#quiz-publish-link');
-    var model = new Publishable({ published: $el.hasClass('published'), id: $el.attr('data-id') },{ url: $el.attr('data-url'), root: 'quiz'});
+    var model = new Quiz(
+      { id: $el.attr('data-id'), publishable: !$el.hasClass("disabled"), published: $el.hasClass('published') },
+      { baseUrl: $el.data('base-url') }
+    );
     var view = new PublishButtonView({model: model, el: $el});
+    var refresh = function() {
+      location.href = location.href;
+    }
+    view.on("publish", refresh);
+    view.on("unpublish", refresh);
     view.render();
   });
 
