@@ -3,8 +3,10 @@ define [
   'underscore'
   'compiled/fn/preventDefault'
   'compiled/models/Folder'
-  'jst/FolderTreeItem'
-], (Backbone, _, preventDefault, Folder, treeItemTemplate) ->
+  'compiled/views/SharedPaginatedCollectionView'
+  'compiled/views/FileItemView'
+  'jst/FolderTreeCollection'
+], (Backbone, _, preventDefault, Folder, SharedPaginatedCollectionView, FileItemView, collectionTemplate) ->
 
   class FolderTreeView extends Backbone.View
 
@@ -17,8 +19,6 @@ define [
     events:
       'click .folderLabel': 'toggle'
 
-    # you can set an optional `@options.contentTypes` attribute with an array of
-    # content-types files that you want to show
     initialize: ->
       @model.on         'all', @render, this
       @model.files.on   'all', @render, this
@@ -52,21 +52,28 @@ define [
         .toggleClass('loading after', !!@model.isExpanding)
 
     renderContents: ->
-      @$folderContents?.detach()
       if @model.isExpanded
-        @$folderContents = $("<ul role='group' />").appendTo(@$el)
-        _.each @model.contents(), (model) =>
-          node = @["viewFor_#{model.cid}"] ||=
-            if model.constructor is Folder
-              # recycle DOM nodes to prevent zombies that still respond to model events,
-              # sad that I have to attach something to the model though
-              new FolderTreeView(
-                model: model
-                contentTypes: @options.contentTypes
-              ).el
-            else if !@options.contentTypes || (model.get('content-type') in @options.contentTypes)
-              $ treeItemTemplate
-                title: model.get 'display_name'
-                thumbnail_url: model.get 'thumbnail_url'
-                preview_url: @model.previewUrlForFile(model)
-          @$folderContents.append node if node
+        unless @$folderContents
+          @$folderContents = $("<ul role='group' class='folderContents'/>").appendTo(@$el)
+          foldersView = new SharedPaginatedCollectionView(
+            collection: @model.folders
+            itemView: FolderTreeView
+            tagName: 'li'
+            className: 'folders'
+            template: collectionTemplate
+            scrollContainer: @$folderContents.closest('ul[role=tabpanel]')
+          )
+          @$folderContents.append(foldersView.render().el)
+          filesView = new SharedPaginatedCollectionView(
+            collection: @model.files
+            itemView: FileItemView
+            tagName: 'li'
+            className: 'files'
+            template: collectionTemplate
+            scrollContainer: @$folderContents.closest('ul[role=tabpanel]')
+          )
+          @$folderContents.append(filesView.render().el)
+        @$('> .folderContents').removeClass('hidden')
+      else
+        @$('> .folderContents').addClass('hidden')
+
