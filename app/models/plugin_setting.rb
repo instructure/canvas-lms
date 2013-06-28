@@ -97,7 +97,7 @@ class PluginSetting < ActiveRecord::Base
   def enabled?
     read_attribute(:disabled) != true
   end
-  
+
   def self.settings_for_plugin(name, plugin=nil)
     res = Rails.cache.fetch(settings_cache_key(name), :expires_in => 5.minutes) do
       if (plugin_setting = PluginSetting.find_by_name(name.to_s)) && plugin_setting.valid_settings? && plugin_setting.enabled?
