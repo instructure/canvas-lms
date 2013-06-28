@@ -75,7 +75,10 @@ class Setting < ActiveRecord::Base
   def self.from_config(config_name, with_rails_env=:current)
     with_rails_env = Rails.env if with_rails_env == :current
 
-    return @@yaml_cache[config_name][with_rails_env] if @@yaml_cache[config_name] # if the config wasn't found it'll try again
+    if @@yaml_cache[config_name] # if the config wasn't found it'll try again
+      return @@yaml_cache[config_name] if !with_rails_env
+      return @@yaml_cache[config_name][with_rails_env]
+    end
     
     config = nil
     path = File.join(Rails.root, 'config', "#{config_name}.yml")
@@ -94,6 +97,7 @@ class Setting < ActiveRecord::Base
       end
     end
     @@yaml_cache[config_name] = config
-    config[with_rails_env] if config
+    config = config[with_rails_env] if config && with_rails_env
+    config
   end
 end
