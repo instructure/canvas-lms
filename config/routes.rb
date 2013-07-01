@@ -811,9 +811,10 @@ FakeRails3Routes.draw do
   ApiRouteSet::V1.draw(self) do
     scope(:controller => :courses) do
       get 'courses', :action => :index
-      post 'accounts/:account_id/courses', :action => :create
       put 'courses/:id', :action => :update
-      get 'courses/:id', :action => :show
+      get 'courses/:id', :action => :show, :path_name => 'course'
+      delete 'courses/:id', :action => :destroy
+      post 'accounts/:account_id/courses', :action => :create
       get 'courses/:course_id/students', :action => :students
       get 'courses/:course_id/settings', :action => :settings, :path_name => 'course_settings'
       put 'courses/:course_id/settings', :action => :update_settings
@@ -825,7 +826,6 @@ FakeRails3Routes.draw do
       get 'courses/:course_id/activity_stream/summary', :action => :activity_stream_summary, :path_name => 'course_activity_stream_summary'
       get 'courses/:course_id/todo', :action => :todo_items
       post 'courses/:course_id/preview_html', :action => :preview_html
-      delete 'courses/:id', :action => :destroy
       post 'courses/:course_id/course_copy', :controller => :content_imports, :action => :copy_course_content
       get 'courses/:course_id/course_copy/:id', :controller => :content_imports, :action => :copy_course_status, :path_name => :course_copy_status
       post 'courses/:course_id/files', :action => :create_file, :path_name => 'course_create_file'

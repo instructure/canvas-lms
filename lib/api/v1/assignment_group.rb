@@ -32,7 +32,6 @@ module Api::V1::AssignmentGroup
 
     hash = api_json(group, user, session,
                     :only => %w(id name position group_weight))
-    hash['group_weight'] = nil unless group.context.apply_group_weights?
     hash['rules'] = group.rules_hash
 
     if includes.include?('assignments')

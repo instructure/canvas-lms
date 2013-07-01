@@ -47,7 +47,10 @@ class AssignmentsController < ApplicationController
         elsif @just_viewing_one_course && @context.assignments.new.grants_right?(@current_user, session, :update)
           format.html {
             if @domain_root_account.enable_draft?
-              js_env :NEW_ASSIGNMENT_URL => new_polymorphic_url([@context, :assignment])
+              js_env({
+                :NEW_ASSIGNMENT_URL => new_polymorphic_url([@context, :assignment]),
+                :COURSE_URL => api_v1_course_url(@context)
+              })
               render :action => :new_teacher_index
             else
               render :action => :index

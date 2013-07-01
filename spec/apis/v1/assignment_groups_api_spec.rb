@@ -44,21 +44,21 @@ describe AssignmentGroupsController, :type => :integration do
         'name' => 'group2',
         'position' => 7,
         'rules' => {},
-        'group_weight' => nil
+        'group_weight' => 0
       },
       {
         'id' => group1.id,
         'name' => 'group1',
         'position' => 10,
         'rules' => {},
-        'group_weight' => nil
+        'group_weight' => 0
       },
       {
         'id' => group3.id,
         'name' => 'group3',
         'position' => 12,
         'rules' => {},
-        'group_weight' => nil
+        'group_weight' => 0
       }
     ]
   end
@@ -147,7 +147,7 @@ describe AssignmentGroupsController, :type => :integration do
     group['assignments'].first['name'].should == 'test1'
   end
 
-  it "should not return weights that aren't being applied" do
+  it "should return weights that aren't being applied" do
     course_with_teacher(:active_all => true)
     @course.update_attribute(:group_weighting_scheme, 'equal')
 
@@ -158,7 +158,7 @@ describe AssignmentGroupsController, :type => :integration do
                     { :controller => 'assignment_groups', :action => 'index',
                       :format => 'json', :course_id => @course.to_param })
 
-    json.each { |group| group['group_weight'].should be_nil }
+    json.each { |group| group['group_weight'].should == 50 }
   end
 
   it "should not explode on assignments with <objects> with percentile widths" do

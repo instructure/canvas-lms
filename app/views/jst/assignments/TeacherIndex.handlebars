@@ -7,14 +7,6 @@
     aria-label='{{#t "search"}}Search{{/t}}'
   >
 
-  <label
-    class="checkbox"
-    id="weight-groups"
-  >
-    <input type="checkbox" name="weight_groups">
-    {{#t "weight_groups"}}Weight final grade based on assignment groups{{/t}}
-  </label>
-
   <div class="pull-right">
     <a
       href="#"
@@ -30,6 +22,15 @@
       role="button"
       title='{{#t "title_add_assignment"}}Add Assignment{{/t}}'
     >{{#t "add_assignment"}}Add Assignment{{/t}}</a>
+
+    <a
+      class="btn"
+      href="#"
+      id="assignmentSettingsCog"
+      role="button"
+      title='{{#t "assignments_settings"}}Assignments Settings{{/t}}'
+      aria-label="{{#t "assignments_settings_screenreader"}}Assignments Settings{{/t}}"
+    ><i class="icon-settings"></i></a>
   </div>
 </div>
 
@@ -40,3 +41,5 @@
 <form data-view="createGroup" class="form-dialog"></form>
 
 <form data-view="createAssignment" class="form-dialog"></form>
+
+<form data-view="assignmentSettings" class="form-dialog"></form>

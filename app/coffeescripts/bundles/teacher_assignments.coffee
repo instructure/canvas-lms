@@ -16,17 +16,29 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 require [
-  'Backbone'
+  'underscore'
   'compiled/collections/AssignmentGroupCollection'
+  'compiled/models/Course'
   'compiled/views/CollectionView'
   'compiled/views/InputFilterView'
   'compiled/views/assignments/AssignmentGroupListItemView'
   'compiled/views/assignments/TeacherIndexView'
+  'compiled/views/assignments/AssignmentSettingsView'
+  'compiled/views/assignments/AssignmentGroupWeightsView'
   'jst/assignments/teacher_index/AssignmentGroupList'
-], (Backbone, AssignmentGroupCollection, CollectionView, InputFilterView, AssignmentGroupListItemView, TeacherIndexView, assignmentGroupsTemplate) ->
+], (_, AssignmentGroupCollection, Course, CollectionView, InputFilterView, AssignmentGroupListItemView, TeacherIndexView, AssignmentSettingsView, AssignmentGroupWeightsView, assignmentGroupsTemplate) ->
 
   assignmentGroups = new AssignmentGroupCollection
   assignmentGroups.fetch() # TODO: reset this instead
+
+  course = new Course
+  course.url = ENV.COURSE_URL
+  course.fetch()
+
+  assignmentSettingsView = new AssignmentSettingsView
+    model: course
+    assignmentGroups: assignmentGroups
+    weightsView: AssignmentGroupWeightsView
 
   inputFilterView = new InputFilterView
     collection: assignmentGroups
@@ -40,6 +52,7 @@ require [
     addAssignmentUrl: ENV.NEW_ASSIGNMENT_URL
     assignmentGroupsView: assignmentGroupsView
     inputFilterView: inputFilterView
+    assignmentSettingsView: assignmentSettingsView
     createGroupView: new Backbone.View
 
   @app.render()

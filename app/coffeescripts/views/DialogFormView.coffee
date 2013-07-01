@@ -160,6 +160,14 @@ define [
       @$el.fixDialogButtons() if @options.fixDialogButtons
       @dialog = @$el.data 'dialog'
 
+    setDimensions: (width, height) ->
+      width = if width? then width else @options.width
+      height = if height? then height else @options.height
+      opts =
+        width: width
+        height: height
+      @$el.dialog(opts)
+
     ##
     # @api private
     onSaveSuccess: =>
