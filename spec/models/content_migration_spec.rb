@@ -1023,6 +1023,23 @@ describe ContentMigration do
       @copy_to.syllabus_body.should == %{<a href="/courses/#{@copy_to.id}/files/#{new_attachment.id}/download?wrap=1">link</a>}
     end
 
+    it "should copy files into the correct folders when the folders share the same name" do
+      root = Folder.root_folders(@copy_from).first
+      f1 = root.sub_folders.create!(:name => "folder", :context => @copy_from)
+      f2 = f1.sub_folders.create!(:name => "folder", :context => @copy_from)
+
+      atts = []
+      atts << Attachment.create!(:filename => 'dummy1.txt', :uploaded_data => StringIO.new('fakety'), :folder => f2, :context => @copy_from)
+      atts << Attachment.create!(:filename => 'dummy2.txt', :uploaded_data => StringIO.new('fakety'), :folder => f1, :context => @copy_from)
+
+      run_course_copy
+
+      atts.each do |att|
+        new_att = @copy_to.attachments.find_by_migration_id(mig_id(att))
+        new_att.full_path.should == att.full_path
+      end
+    end
+
     it "should add a warning instead of failing when trying to copy an invalid file" do
       att = Attachment.create!(:filename => 'dummy.txt', :uploaded_data => StringIO.new('fakety'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
       Attachment.where(:id => att).update_all(:filename => nil)

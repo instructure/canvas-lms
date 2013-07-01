@@ -2116,7 +2116,7 @@ class Course < ActiveRecord::Base
             old_folders << file.folder
             new_folders = []
             new_folders << old_folders.last.clone_for(self, nil, options.merge({:include_subcontent => false}))
-            while old_folders.last.parent_folder && old_folders.last.parent_folder.parent_folder_id && !merge_mapped_id(old_folders.last.parent_folder)
+            while old_folders.last.parent_folder && old_folders.last.parent_folder.parent_folder_id
               old_folders << old_folders.last.parent_folder
               new_folders << old_folders.last.clone_for(self, nil, options.merge({:include_subcontent => false}))
             end
