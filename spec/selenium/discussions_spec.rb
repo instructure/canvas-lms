@@ -340,23 +340,23 @@ describe "discussions" do
           ffj('.open.discussion-list li.discussion:visible').length.should == 1
         end
 
-        it "should not allow locking a pinned topic" do
+        it "should allow locking a pinned topic" do
           topic = @course.discussion_topics.create!(title: 'Test Discussion', user: @user, pinned: true)
           get(url)
           wait_for_ajaximations
 
           f('.pinned.discussion-list .al-trigger').click
-          fj('.icon-lock:visible').should be_nil
+          ffj('.icon-lock:visible').length.should == 1
         end
 
-        it "should not allow pinning a locked topic" do
+        it "should allow pinning a locked topic" do
           topic = @course.discussion_topics.create!(title: 'Test Discussion', user: @user)
           topic.lock!
           get(url)
           wait_for_ajaximations
 
           f('.locked.discussion-list .al-trigger').click
-          fj('.icon-pin:visible').should be_nil
+          ffj('.icon-pin:visible').length.should == 1
         end
 
         it "should show subscription icons" do

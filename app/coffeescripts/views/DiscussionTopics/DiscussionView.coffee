@@ -42,7 +42,6 @@ define [
 
     # Public: Option defaults.
     defaults:
-      lockable: true
       pinnable: false
 
     els:
@@ -89,8 +88,23 @@ define [
     # Returns nothing.
     toggleLocked: (e) =>
       e.preventDefault()
-      key = if @model.get('locked') then 'lock' else 'unlock'
-      @model.updateOneAttribute('locked', !@model.get('locked'))
+      key    = if @model.get('locked') then 'lock' else 'unlock'
+      locked = !@model.get('locked')
+      pinned = if locked then false else @model.get('pinned')
+      @model.save(locked: locked, pinned: pinned)
+      $(e.target).text(@messages[key])
+
+    # Public: Pin or unpin the model and update it on the server.
+    #
+    # e - Event object.
+    #
+    # Returns nothing.
+    togglePinned: (e) =>
+      e.preventDefault()
+      key = if @model.get('pinned') then 'pin' else 'unpin'
+      pinned = !@model.get('pinned')
+      locked = if pinned then false else @model.get('locked')
+      @model.save(locked: locked, pinned: pinned)
       $(e.target).text(@messages[key])
 
     # Public: Confirm a request to delete and then complete it if needed.
@@ -194,7 +208,11 @@ define [
     #
     # Returns an object.
     toJSON: ->
-      _.extend(@model.toJSON(), @options)
+      base = _.extend(@model.toJSON(), @options)
+      # handle a student locking their own discussion (they should lose permissions).
+      if @model.get('locked') and !_.intersection(ENV.current_user_roles, ['teacher', 'ta', 'admin']).length
+        base.permissions.delete = false
+      base
 
     # Internal: Add event handlers to the model.
     #

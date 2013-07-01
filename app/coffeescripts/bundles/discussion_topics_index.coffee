@@ -27,17 +27,16 @@ require [
         open: @_createListView 'open',
           comparator: 'dateComparator'
           draggable: true
-          destination: '.pinned.discussion-list'
-          pinnable: ENV.permissions.moderate
+          destination: '.pinned.discussion-list, .locked.discussion-list'
         locked: @_createListView 'locked',
           comparator: 'dateComparator'
-          pinnable: false
+          destination: '.pinned.discussion-list, .open.discussion-list'
+          draggable: true
+          locked: true
         pinned: @_createListView 'pinned',
           comparator: 'positionComparator'
-          destination: '.open.discussion-list'
-          lockable: false
+          destination: '.open.discussion-list, .locked.discussion-list'
           sortable: true
-          pinnable: ENV.permissions.moderate
           pinned: true
 
     # Public: The index page action.
@@ -71,18 +70,19 @@ require [
     _createListView: (type, options = {}) ->
       comparator = DiscussionTopicsCollection[options.comparator]
       delete options.comparator
-
       new DiscussionListView
         collection: new DiscussionTopicsCollection([], comparator: comparator)
         className: type
+        destination: options.destination
+        draggable: !!options.draggable
+        itemViewOptions: _.extend(options, pinnable: ENV.permissions.moderate)
+        listID: "#{type}-discussions"
+        locked: !!options.locked
+        pinnable: ENV.permissions.moderate
+        pinned: !!options.pinned
+        sortable: !!options.sortable
         title: @messages.lists[type]
         titleHelp: (if _.include(['open', 'locked'], type) then @messages.help.title else null)
-        listID: "#{type}-discussions"
-        itemViewOptions: options
-        sortable: !!options.sortable
-        draggable: !!options.draggable
-        destination: options.destination
-        pinned: options.pinned
 
     # Internal: Attach events to the discussion topic collections.
     #
