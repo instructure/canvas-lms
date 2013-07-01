@@ -37,10 +37,10 @@ require [
     collection: assignmentGroups
 
   @app = new TeacherIndexView
+    addAssignmentUrl: ENV.NEW_ASSIGNMENT_URL
     assignmentGroupsView: assignmentGroupsView
     inputFilterView: inputFilterView
     createGroupView: new Backbone.View
-    createAssignmentView: new Backbone.View
 
   @app.render()
   @app.$el.appendTo $('#content')
