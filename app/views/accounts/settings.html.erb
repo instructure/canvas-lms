@@ -241,6 +241,10 @@ TEXT
               <% end %>
               <% if @account.canvas_authentication? %>
                 <div>
+                  <%= settings.check_box :self_registration, :checked => @account.self_registration? %>
+                  <%= settings.label :self_registration, :en => "Self Registration" %>
+                </div>
+                <div>
                   <%= settings.check_box :open_registration, :checked => @account.open_registration? %>
                   <%= settings.label :open_registration, :en => "Open Registration" %>
                   <% if @account.delegated_authentication? %>
