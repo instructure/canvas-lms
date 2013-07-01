@@ -778,7 +778,7 @@ class Account < ActiveRecord::Base
   end
 
   def saml_authentication?
-    !!(self.account_authorization_config && self.account_authorization_config.saml_authentication?)
+    !!(self.account_authorization_config && self.account_authorization_config.saml_authentication?) && AccountAuthorizationConfig.saml_enabled
   end
 
   def multi_auth?
