@@ -2,13 +2,16 @@ define [
   'jquery'
   'underscore'
   'Backbone'
+  'compiled/backbone-ext/DefaultUrlMixin'
   'compiled/models/TurnitinSettings'
   'compiled/collections/AssignmentOverrideCollection'
-], ($, _, {Model}, TurnitinSettings, AssignmentOverrideCollection ) ->
+], ($, _, {Model}, DefaultUrlMixin, TurnitinSettings, AssignmentOverrideCollection ) ->
 
   class Assignment extends Model
-
+    @mixin DefaultUrlMixin
     resourceName: 'assignments'
+
+    urlRoot: -> @_defaultUrl()
 
     initialize: ->
       overrides = @get('assignment_overrides')
@@ -57,7 +60,7 @@ define [
       @set 'points_possible', points
 
     assignmentGroupId: (assignment_group_id) =>
-      return @get 'assignment_group_id' unless assignment_group_id
+      return @get 'assignment_group_id' unless arguments.length > 0
       @set 'assignment_group_id', assignment_group_id
 
     canFreeze: =>

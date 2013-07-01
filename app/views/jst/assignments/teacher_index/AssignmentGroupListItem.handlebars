@@ -19,10 +19,12 @@
       {{/ifAny}}
 
       <a
+        href="#"
         class="btn add_assignment"
         title='{{#t "add_assignment_to"}}Add Assignment to {{name}}{{/t}}'
       >
         {{! icon is separate from <a> tag because it is the only visible content in the button }}
+        <span class="screenreader-only">{{#t "add_assignment_to"}}Add Assignment to {{name}}{{/t}}</span>
         <i class="icon-plus"></i>
       </a>
 
@@ -52,5 +54,6 @@
   </div>
 
   <ul class="collectionViewItems ig-list"></ul>
+  <form data-view="createAssignment" class="form-dialog"></form>
   <form data-view="editAssignmentGroup" class="form-dialog"></form>
 </div>

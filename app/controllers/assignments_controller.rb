@@ -28,6 +28,7 @@ class AssignmentsController < ApplicationController
   before_filter :require_context
   add_crumb(proc { t '#crumbs.assignments', "Assignments" }, :except => [:destroy, :syllabus, :index]) { |c| c.send :course_assignments_path, c.instance_variable_get("@context") }
   before_filter { |c| c.active_tab = "assignments" }
+  before_filter :normalize_title_param, :only => [:new, :edit]
   
   def index
     if @context == @current_user || authorized_action(@context, @current_user, :read)
@@ -415,6 +416,12 @@ class AssignmentsController < ApplicationController
     return unless assignment_params
     if (group_id = assignment_params.delete(:assignment_group_id)).present?
       group = @context.assignment_groups.find(group_id)
+    end
+  end
+
+  def normalize_title_param
+    if title = params.delete(:name)
+      params[:title] = title
     end
   end
 

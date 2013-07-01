@@ -4,9 +4,10 @@ define [
   'compiled/collections/AssignmentCollection'
   'compiled/views/CollectionView'
   'compiled/views/assignments/AssignmentListItemView'
+  'compiled/views/assignments/CreateAssignmentView'
   'compiled/views/assignments/CreateGroupView'
   'jst/assignments/teacher_index/AssignmentGroupListItem'
-], (I18n, _, AssignmentCollection, CollectionView, AssignmentListItemView, CreateGroupView, template) ->
+], (I18n, _, AssignmentCollection, CollectionView, AssignmentListItemView, CreateAssignmentView, CreateGroupView, template) ->
 
   class AssignmentGroupListItemView extends CollectionView
 
@@ -14,16 +15,20 @@ define [
     itemView: AssignmentListItemView
     template: template
 
+    @child 'createAssignmentView', '[data-view=createAssignment]'
     @child 'editGroupView', '[data-view=editAssignmentGroup]'
 
     els: _.extend({}, @::els, {
+      '.add_assignment': '$addAssignmentButton'
       '.edit_group': '$editGroupButton'
     })
 
     afterRender: ->
       # child views so they get rendered automatically, need to stop it
+      @createAssignmentView.hide()
       @editGroupView.hide()
       # its trigger would not be rendered yet, set it manually
+      @createAssignmentView.setTrigger @$addAssignmentButton
       @editGroupView.setTrigger @$editGroupButton
 
     initialize: ->
@@ -33,6 +38,9 @@ define [
       @editGroupView = new CreateGroupView
         assignmentGroup: @model
         assignments: @collection.models
+      @createAssignmentView = new CreateAssignmentView
+        assignmentGroup: @model
+        collection: @collection
 
     toJSON: ->
       count = @countRules()

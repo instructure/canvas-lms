@@ -70,6 +70,7 @@ define [
     # @api public
     close: ->
       @dialog.close()
+      @$trigger?.focus()
 
     ##
     # @api public
