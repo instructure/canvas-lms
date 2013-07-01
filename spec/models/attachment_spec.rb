@@ -366,6 +366,7 @@ describe Attachment do
 
   context "scribd cleanup" do
     def fake_scribd_doc(doc_id = String.random(8))
+      ScribdAPI.stubs(:enabled?).returns(true)
       scribd_doc = Scribd::Document.new
       scribd_doc.doc_id = doc_id
       scribd_doc.secret_password = 'asdf'
@@ -374,6 +375,7 @@ describe Attachment do
     end
 
     def attachment_with_scribd_doc(doc = fake_scribd_doc, opts = {})
+      ScribdAPI.stubs(:enabled?).returns(true)
       att = attachment_model(opts)
       att.scribd_doc = doc
       att.save!
@@ -468,6 +470,7 @@ describe Attachment do
       ScribdAPI.stubs(:get_status).returns(:status_from_scribd)
       ScribdAPI.stubs(:set_user).returns(true)
       ScribdAPI.stubs(:upload).returns(Scribd::Document.new)
+      ScribdAPI.stubs(:enabled?).returns(true)
     end
 
     it "should have a default conversion_status of :not_submitted for attachments that haven't been submitted" do
@@ -1363,6 +1366,7 @@ end
 
 # Makes sure we have a value in scribd_mime_types and that the attachment model points to that.
 def scribdable_attachment_model
+  ScribdAPI.stubs(:enabled?).returns(true)
   scribd_mime_type_model(:extension => 'pdf')
   attachment_model(:content_type => 'application/pdf')
 end
