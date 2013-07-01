@@ -390,7 +390,8 @@ describe DiscussionTopicsController, :type => :integration do
       it "should not unlock topic if lock_at changes but is still in the past" do
         lock_at = 1.month.ago
         new_lock_at = 1.week.ago
-        @topic.workflow_state = 'locked'
+        @topic.workflow_state = 'active'
+        @topic.locked = true
         @topic.lock_at = lock_at
         @topic.save!
 
@@ -404,7 +405,8 @@ describe DiscussionTopicsController, :type => :integration do
 
       it "should update workflow_state if delayed_post_at changed to future" do
         post_at = 1.month.from_now
-        @topic.workflow_state = 'locked'
+        @topic.workflow_state = 'active'
+        @topic.locked = true
         @topic.save!
 
         api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
@@ -434,7 +436,8 @@ describe DiscussionTopicsController, :type => :integration do
         old_lock_at = 1.month.ago
         new_lock_at = 1.month.from_now
         @topic.lock_at = old_lock_at
-        @topic.workflow_state = 'locked'
+        @topic.workflow_state = 'active'
+        @topic.locked = true
         @topic.save!
 
         api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
@@ -444,6 +447,7 @@ describe DiscussionTopicsController, :type => :integration do
         @topic.reload
         @topic.lock_at.to_i.should == new_lock_at.to_i
         @topic.should be_active
+        @topic.should_not be_locked
       end
 
       it "should lock the topic if lock_at is changed to the past" do
@@ -474,6 +478,7 @@ describe DiscussionTopicsController, :type => :integration do
         @topic.reload
         @topic.lock_at.should be_nil
         @topic.should be_active
+        @topic.should_not be_locked
       end
 
       it 'should process html content in message on update' do

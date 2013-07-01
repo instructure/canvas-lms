@@ -167,7 +167,7 @@ describe "discussions" do
         expect_new_page_load { f(".discussion_locked_toggler").click }
         f('.discussion-fyi').text.should == 'This topic is closed for comments'
         ff('.discussion-reply-action').should be_empty
-        DiscussionTopic.last.workflow_state.should == 'locked'
+        DiscussionTopic.last.locked?.should be_true
       end
 
       it "should validate reopening the discussion for comments" do
@@ -176,6 +176,7 @@ describe "discussions" do
         expect_new_page_load { f(".discussion_locked_toggler").click }
         ff('.discussion-reply-action').should_not be_empty
         DiscussionTopic.last.workflow_state.should == 'active'
+        DiscussionTopic.last.locked?.should be_false
       end
 
       it "should escape correctly when posting an attachment" do
@@ -652,7 +653,7 @@ describe "discussions" do
         it "should set as active when removing existing delayed_post_at and lock_at dates" do
           @topic.delayed_post_at = 10.days.ago
           @topic.lock_at         = 5.days.ago
-          @topic.workflow_state  = 'locked'
+          @topic.locked          = true
           @topic.save!
 
           get "/courses/#{@course.id}/discussion_topics/#{@topic.id}/edit"
@@ -668,12 +669,13 @@ describe "discussions" do
           @topic.delayed_post_at.should be_nil
           @topic.lock_at.should be_nil
           @topic.active?.should be_true
+          @topic.locked?.should be_false
         end
 
         it "should clear the delayed_post_at and lock_at when manually triggering unlock" do
           @topic.delayed_post_at = 10.days.ago
           @topic.lock_at         = 5.days.ago
-          @topic.workflow_state  = 'locked'
+          @topic.locked          = true
           @topic.save!
 
           get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
@@ -686,6 +688,7 @@ describe "discussions" do
           @topic.delayed_post_at.should be_nil
           @topic.lock_at.should be_nil
           @topic.active?.should be_true
+          @topic.locked?.should be_false
         end
 
         it "should set workflow to locked when delayed_post_at and lock_at are in past" do
@@ -738,7 +741,8 @@ describe "discussions" do
         it "should set workflow to active when delayed_post_at in past and lock_at in future" do
           @topic.delayed_post_at = 5.days.from_now
           @topic.lock_at         = 10.days.from_now
-          @topic.workflow_state  = 'locked'
+          @topic.workflow_state  = 'active'
+          @topic.locked          = nil
           @topic.save!
 
           get "/courses/#{@course.id}/discussion_topics/#{@topic.id}/edit"
@@ -756,6 +760,7 @@ describe "discussions" do
           @topic.reload
           @topic.delayed_post_at.strftime(date_format).should == delayed_post_at.strftime(date_format)
           @topic.active?.should be_true
+          @topic.locked?.should be_false
         end
       end
     end

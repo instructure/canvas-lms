@@ -1438,7 +1438,7 @@ class CoursesController < ApplicationController
       if value_to_boolean(lock_announcements)
         @course.lock_all_announcements = true
         Announcement.where(:context_type => 'Course', :context_id => @course, :workflow_state => 'active').
-            update_all(:workflow_state => 'locked')
+            update_all(:locked => true)
       elsif @course.lock_all_announcements
         @course.lock_all_announcements = false
       end

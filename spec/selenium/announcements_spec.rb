@@ -148,7 +148,7 @@ describe "announcements" do
         f('#lock').click
         wait_for_ajax_requests
         #TODO: check the UI to make sure the topics have a locked symbol
-        what_to_create.where(:workflow_state => 'locked').count.should == 5
+        what_to_create.where(:locked => true).count.should == 5
       end
 
       it "should search by title" do

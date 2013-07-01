@@ -27,7 +27,7 @@ class DiscussionTopic < ActiveRecord::Base
 
   attr_accessible :title, :message, :user, :delayed_post_at, :lock_at, :assignment,
     :plaintext_message, :podcast_enabled, :podcast_has_student_posts,
-    :require_initial_post, :threaded, :discussion_type, :context, :pinned
+    :require_initial_post, :threaded, :discussion_type, :context, :pinned, :locked
 
   module DiscussionTypes
     SIDE_COMMENT = 'side_comment'
@@ -112,8 +112,8 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def schedule_delayed_transitions
-    self.send_at(self.delayed_post_at, :auto_update_workflow) if @should_schedule_delayed_post
-    self.send_at(self.lock_at, :auto_update_workflow) if @should_schedule_lock_at
+    self.send_at(self.delayed_post_at, :update_based_on_date) if @should_schedule_delayed_post
+    self.send_at(self.lock_at, :update_based_on_date) if @should_schedule_lock_at
   end
 
   def update_subtopics
@@ -357,53 +357,51 @@ class DiscussionTopic < ActiveRecord::Base
   scope :by_position, order("discussion_topics.position DESC, discussion_topics.created_at DESC")
   scope :by_last_reply_at, order("discussion_topics.last_reply_at DESC, discussion_topics.created_at DESC")
 
-  def auto_update_workflow
-    transition_to_workflow_state(desired_workflow_state)
-  end
-  alias_method :try_posting_delayed, :auto_update_workflow
-
-  # Determine the desired workflow_state based on current values of delayed_post_at and lock_at
-  #
-  # 'delayed_post' if delayed_post_at < now
-  # 'locked' if lock_at is in the past
-  def desired_workflow_state(time_to_check = Time.now)
-    if self.delayed_post_at && time_to_check < self.delayed_post_at
-      'post_delayed'
-    elsif self.lock_at && self.lock_at < time_to_check
-      'locked'
-    else
-      'active'
-    end
+  def should_lock_yet
+    self.lock_at && self.lock_at < Time.now
   end
 
-  # Attempts to make valid transitions to the desired workflow state.
-  # This can move it forward along delayed -> active -> locked, but not
-  # backward.
-  def transition_to_workflow_state(desired_state)
-    if desired_state != 'post_delayed'
-       self.delayed_post
-     end
-    if desired_state == 'locked'
-      self.lock
-    end
+  def should_not_post_yet
+    self.delayed_post_at && self.delayed_post_at > Time.now
   end
+
+  # There may be delayed jobs that expect to call this to update the topic, so be sure to alias
+  # the old method name if you change it
+  def update_based_on_date
+    lock if should_lock_yet
+    delayed_post unless should_not_post_yet
+  end
+  alias_method :try_posting_delayed, :update_based_on_date
+  alias_method :auto_update_workflow, :update_based_on_date
 
   workflow do
-    state :active do
-      event :lock, :transitions_to => :locked do
-        raise "cannot lock before due date" if self.assignment.try(:due_at) && self.assignment.due_at > Time.now
-      end
-    end
+    state :active
     state :post_delayed do
       event :delayed_post, :transitions_to => :active do
         self.last_reply_at = Time.now
         self.posted_at = Time.now
       end
     end
-    state :locked do
-      event :unlock, :transitions_to => :active
-    end
     state :deleted
+  end
+
+  def lock
+    raise "cannot lock before due date" if self.assignment.try(:due_at) && self.assignment.due_at > Time.now
+    self.locked = true
+    save!
+  end
+  alias_method :lock!, :lock
+
+  def unlock
+    self.locked = false
+    self.workflow_state = 'active' if self.workflow_state == 'locked'
+    save!
+  end
+  alias_method :unlock!, :unlock
+
+  def locked?
+    return workflow_state == 'locked' if locked.nil?
+    locked
   end
 
   def should_send_to_stream
@@ -557,13 +555,13 @@ class DiscussionTopic < ActiveRecord::Base
     given { |user| self.user && self.user == user and self.discussion_entries.active.empty? && !self.locked? && !self.root_topic_id && context.user_can_manage_own_discussion_posts?(user) }
     can :delete
 
-    given { |user, session| (self.active? || self.locked?) && self.cached_context_grants_right?(user, session, :read_forum) }#
+    given { |user, session| self.active? && self.cached_context_grants_right?(user, session, :read_forum) }#
     can :read
 
-    given { |user, session| self.active? && self.cached_context_grants_right?(user, session, :post_to_forum) }#students.include?(user) }
+    given { |user, session| self.active? && !self.locked? && self.cached_context_grants_right?(user, session, :post_to_forum) }#students.include?(user) }
     can :reply and can :read
 
-    given { |user, session| (self.active? || self.locked?) && self.cached_context_grants_right?(user, session, :post_to_forum) }#students.include?(user) }
+    given { |user, session| self.active? && self.cached_context_grants_right?(user, session, :post_to_forum) }#students.include?(user) }
     can :read
 
     given { |user, session|

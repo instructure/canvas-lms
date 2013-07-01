@@ -41,7 +41,7 @@ class Announcement < DiscussionTopic
   protected :infer_content
 
   def respect_context_lock_rules
-    lock if active? &&
+    lock if !locked? &&
             context.is_a?(Course) &&
             context.lock_all_announcements?
   end

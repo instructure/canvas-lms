@@ -9,8 +9,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
   def create_and_go_to_topic(title = 'new topic', discussion_type = 'side_comment', is_locked = false)
     @topic = @course.discussion_topics.create!(:title => title, :discussion_type => discussion_type)
     if is_locked
-      @topic.workflow_state = 'locked'
-      @topic.save!
+      @topic.lock
       @topic.reload
     end
     go_to_topic
