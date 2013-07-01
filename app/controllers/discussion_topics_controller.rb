@@ -243,7 +243,8 @@ class DiscussionTopicsController < ApplicationController
              :GROUP_CATEGORIES => categories.
                                   reject { |category| category.student_organized? }.
                                   map { |category| { :id => category.id, :name => category.name } },
-             :CONTEXT_ID => @context.id
+             :CONTEXT_ID => @context.id,
+             :CONTEXT_ACTION_SOURCE => :discussion_topic
       render :action => "edit"
     end
   end

@@ -140,7 +140,7 @@ class ConversationsController < ApplicationController
         :SHOW_INTRO => !@current_user.watched_conversations_intro?,
         :FOLDER_ID => @current_user.conversation_attachments_folder.id,
         :MEDIA_COMMENTS_ENABLED => feature_enabled?(:kaltura),
-      })
+      }, :CONTEXT_ACTION_SOURCE => :conversation)
     end
   end
 

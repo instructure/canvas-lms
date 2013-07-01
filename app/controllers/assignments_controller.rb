@@ -338,6 +338,7 @@ class AssignmentsController < ApplicationController
       hash[:URL_ROOT] = polymorphic_url([:api_v1, @context, :assignments])
       hash[:CANCEL_TO] = @assignment.new_record? ? polymorphic_url([@context, :assignments]) : polymorphic_url([@context, @assignment])
       hash[:CONTEXT_ID] = @context.id
+      hash[:CONTEXT_ACTION_SOURCE] = :assignments
       js_env(hash)
       render :action => "edit"
     end

@@ -352,6 +352,7 @@ class GradebooksController < ApplicationController
         @headers = false
         @outer_frame = true
         log_asset_access("speed_grader:#{@context.asset_string}", "grades", "other")
+        js_env(:CONTEXT_ACTION_SOURCE => :speed_grader)
         render :action => "speed_grader"
       end
 

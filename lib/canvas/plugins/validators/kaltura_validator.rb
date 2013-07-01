@@ -43,7 +43,7 @@ module Canvas::Plugins::Validators::KalturaValidator
 
       settings.slice(:domain, :resource_domain, :rtmp_domain, :partner_id,
                      :subpartner_id, :secret_key, :user_secret_key,
-                     :player_ui_conf, :kcw_ui_conf, :upload_ui_conf, :cache_play_list_seconds)
+                     :player_ui_conf, :kcw_ui_conf, :upload_ui_conf, :cache_play_list_seconds, :kaltura_sis)
     end
   end
 end

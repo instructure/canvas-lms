@@ -47,6 +47,7 @@ module Kaltura
       if @cache_play_list_seconds = config['cache_play_list_seconds']
         @cache_play_list_seconds = @cache_play_list_seconds.to_i
       end
+      @kaltura_sis = config['kaltura_sis']
     end
 
     def self.config
@@ -267,7 +268,7 @@ module Kaltura
         filename = (file[:name] || "Media File").gsub(/,/, "")
         description = (file[:description] || "no description").gsub(/,/, "")
         url = file[:url]
-        rows << [filename, description, file[:tags] || "", url, file[:media_type] || "video", '', '', '' ,'' ,'' ,'' ,file[:id] || ''] if file[:url]
+        rows << [filename, description, file[:tags] || "", url, file[:media_type] || "video", '', '', '' ,'' ,'' ,'' ,file[:partner_data] || ''] if file[:url]
       end
       res = CSV.generate do |csv|
         rows.each do |row|

@@ -40,7 +40,8 @@ define([
   $.mediaComment.partnerData = function(params) {
     return JSON.stringify({
       context_code: $.mediaComment.contextCode(),
-      root_account_id: domainRootAccountId || (domainRootAccountId = Number($("#domain_root_account_id").text()))
+      root_account_id: domainRootAccountId || (domainRootAccountId = Number($("#domain_root_account_id").text())),
+      context_source: ENV.CONTEXT_ACTION_SOURCE
     });
   }
 
@@ -320,6 +321,8 @@ define([
         licenseType:"CC-0.1",
         maxFileSize: INST.kalturaSettings.max_file_size_bytes / 1048576,
         maxUploads: 1,
+        partnerData: $.mediaComment.partnerData(),
+        partner_data: $.mediaComment.partnerData(),
         uiConfId: INST.kalturaSettings.upload_ui_conf,
         jsDelegate: "$.mediaComment.audio_delegate"
       }

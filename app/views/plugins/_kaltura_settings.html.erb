@@ -94,5 +94,17 @@ TEXT
       </td>
       <td><%= f.text_field :cache_play_list_seconds %></td>
     </tr>
+    <tr>
+      <td colspan="2" class="sub">
+        <h3><%= t('headers.misc_settings', "Misc. Settings") %></h3>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <%= f.blabel :kaltura_sis, :en => "Write SIS data to Kaltura" %>
+        <p style="font-size: 0.8em;"><%= t(:kaltura_sis_explanation, "If checked user and course SIS data will be provided to Kaltura.") %></p>
+      </td>
+      <td><%= f.check_box :kaltura_sis %></td>
+    </tr>
   </table>
 <% end %>
