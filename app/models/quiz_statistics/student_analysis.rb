@@ -130,7 +130,7 @@ class QuizStatistics::StudentAnalysis < QuizStatistics::Report
 
   def to_csv
     start_progress
-
+    context = quiz.context
     columns = []
     columns << I18n.t('statistics.csv_columns.name', 'name') unless anonymous?
     columns << I18n.t('statistics.csv_columns.id', 'id') unless anonymous?
@@ -169,7 +169,7 @@ class QuizStatistics::StudentAnalysis < QuizStatistics::Report
       section_name = []
       section_id = []
       section_sis_id = []
-      submission.quiz.context.student_enrollments.active.where(:user_id => submission.user_id).each do |enrollment|
+      context.student_enrollments.active.where(:user_id => submission.user_id).each do |enrollment|
         section_name << enrollment.course_section.name
         section_id << enrollment.course_section.id
         section_sis_id << enrollment.course_section.try(:sis_source_id)
