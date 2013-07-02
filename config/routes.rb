@@ -890,16 +890,16 @@ FakeRails3Routes.draw do
     end
 
     scope(:controller => :submissions_api) do
-      def submissions_api(context)
-        get "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions", :action => :index, :path_name => "#{context}_assignment_submissions"
-        get "#{context.pluralize}/:#{context}_id/students/submissions", :controller => :submissions_api, :action => :for_students, :path_name => "#{context}_student_submissions"
-        get "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions/:user_id", :action => :show, :path_name => "#{context}_assignment_submission"
+      def submissions_api(context, path_prefix = context)
+        get "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions", :action => :index, :path_name => "#{path_prefix}_assignment_submissions"
+        get "#{context.pluralize}/:#{context}_id/students/submissions", :controller => :submissions_api, :action => :for_students, :path_name => "#{path_prefix}_student_submissions"
+        get "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions/:user_id", :action => :show, :path_name => "#{path_prefix}_assignment_submission"
         post "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions", :action => :create, :controller => :submissions
         post "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions/:user_id/files", :action => :create_file
-        put "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions/:user_id", :action => :update, :path_name => "#{context}_assignment_submission"
+        put "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions/:user_id", :action => :update, :path_name => "#{path_prefix}_assignment_submission"
       end
       submissions_api("course")
-      submissions_api("section")
+      submissions_api("section", "course_section")
     end
 
     scope(:controller => :gradebook_history_api) do
