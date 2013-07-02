@@ -1074,7 +1074,7 @@ describe "security" do
         response.should be_success
         response.body.should_not match /Import Content into this Course/
 
-        get "/courses/#{@course.id}/imports"
+        get "/courses/#{@course.id}/content_migrations"
         response.status.should == '401 Unauthorized'
 
         add_permission :manage_content
@@ -1083,7 +1083,7 @@ describe "security" do
         response.should be_success
         response.body.should match /Import Content into this Course/
 
-        get "/courses/#{@course.id}/imports"
+        get "/courses/#{@course.id}/content_migrations"
         response.should be_success
       end
 

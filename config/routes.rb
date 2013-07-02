@@ -238,24 +238,11 @@ FakeRails3Routes.draw do
     resource :gradebook2, :controller => :gradebook2
     match 'attendance' => 'gradebooks#attendance', :as => :attendance
     match 'attendance/:user_id' => 'gradebooks#attendance', :as => :attendance_user
-    match 'imports' => 'content_imports#intro', :as => :imports
     concerns :zip_file_imports
-    match 'imports/quizzes' => 'content_imports#quizzes', :as => :import_quizzes
-    match 'imports/content' => 'content_imports#content', :as => :import_content
-    match 'imports/choose_course' => 'content_imports#choose_course', :as => :import_choose_course, :via => :get
-    match 'imports/choose_content' => 'content_imports#choose_content', :as => :import_choose_content, :via => :get
-    match 'imports/copy_course_checklist' => 'content_imports#copy_course_checklist', :as => :import_copy_course_checklist, :via => :get
-    match 'imports/copy_course_finish' => 'content_imports#copy_course_finish', :as => :import_copy_course_finish, :via => :get
-    match 'imports/migrate' => 'content_imports#migrate_content', :as => :import_migrate
-    match 'imports/upload' => 'content_imports#migrate_content_upload', :as => :import_upload
-    match 'imports/s3_success' => 'content_imports#migrate_content_s3_success', :as => :import_s3_success
-    match 'imports/copy' => 'content_imports#copy_course_content', :as => :import_copy_content, :via => :post
-    match 'imports/migrate/:id' => 'content_imports#migrate_content_choose', :as => :import_migrate_choose
-    match 'imports/migrate/:id/execute' => 'content_imports#migrate_content_execute', :as => :import_migrate_execute
-    match 'imports/review' => 'content_imports#review', :as => :import_review
+    # DEPRECATED old migration emails pointed the user to this url, leave so the controller can redirect
     match 'imports/list' => 'content_imports#index', :as => :import_list
-    match 'imports/:id' => 'content_imports#copy_course_status', :as => :import_copy_status, :via => :get
-    match 'imports/:id/download_archive' => 'content_imports#download_archive', :as => :download_import_archive, :via => :get
+    # DEPRECATED
+    match 'imports' => 'content_imports#intro', :as => :imports
     resource :gradebook_upload
     match 'grades' => 'gradebooks#grade_summary', :as => :grades, :id => nil
     match 'grading_rubrics' => 'gradebooks#grading_rubrics', :as => :grading_rubrics

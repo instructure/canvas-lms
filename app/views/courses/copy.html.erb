@@ -35,6 +35,12 @@
         </td>
       </tr>
     <% end %>
+    <tr>
+      <td colspan="2">
+        <label class="checkbox" for="selectContentCheckbox">
+          <input name="selective_import" type="checkbox"><%= t('choose_content', 'Choose which items to copy?') %></label>
+      </td>
+    </tr>
   </table>
   <div class='form-actions'>
     <a href="<%= context_url(@context, :context_url) %>" class="btn button-secondary"><%= t '#buttons.cancel', 'Cancel' %></a>

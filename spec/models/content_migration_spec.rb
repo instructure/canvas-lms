@@ -1660,36 +1660,6 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
 
     end
 
-    context "notifications" do
-      before(:each) do
-        Notification.create!(:name => 'Migration Export Ready', :category => 'Migration')
-        Notification.create!(:name => 'Migration Import Failed', :category => 'Migration')
-        Notification.create!(:name => 'Migration Import Finished', :category => 'Migration')
-      end
-
-      it "should send the correct emails" do
-        run_course_copy
-
-        @cm.messages_sent['Migration Export Ready'].should be_blank
-        @cm.messages_sent['Migration Import Finished'].should be_blank
-        @cm.messages_sent['Migration Import Failed'].should be_blank
-      end
-
-      it "should send notifications immediately" do
-        communication_channel_model.confirm!
-        @cm.source_course = nil # so that it's not a course copy
-        @cm.save!
-
-        @cm.workflow_state = 'exported'
-        expect { @cm.save! }.to change(DelayedMessage, :count).by 0
-        @cm.messages_sent['Migration Export Ready'].should_not be_blank
-
-        @cm.workflow_state = 'imported'
-        expect { @cm.save! }.to change(DelayedMessage, :count).by 0
-        @cm.messages_sent['Migration Import Finished'].should_not be_blank
-      end
-    end
-
     context "external tools" do
       append_before do
         @tool_from = @copy_from.context_external_tools.create!(:name => "new tool", :consumer_key => "key", :shared_secret => "secret", :domain => 'example.com', :custom_fields => {'a' => '1', 'b' => '2'})

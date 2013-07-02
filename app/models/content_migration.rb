@@ -28,7 +28,6 @@ class ContentMigration < ActiveRecord::Base
   has_one :content_export
   has_many :migration_issues
   has_one :job_progress, :class_name => 'Progress', :as => :context
-  has_a_broadcast_policy
   serialize :migration_settings
   before_save :infer_defaults
   cattr_accessor :export_file_path
@@ -68,26 +67,6 @@ class ContentMigration < ActiveRecord::Base
     state :importing
     state :imported
     state :failed
-  end
-
-  set_broadcast_policy do |p|
-    p.dispatch :migration_export_ready
-    p.to { [user] }
-    p.whenever {|record|
-      record.changed_state(:exported) && !record.migration_settings[:skip_import_notification]
-    }
-
-    p.dispatch :migration_import_finished
-    p.to { [user] }
-    p.whenever {|record|
-      record.changed_state(:imported) && !record.migration_settings[:skip_import_notification]
-    }
-
-    p.dispatch :migration_import_failed
-    p.to { [user] }
-    p.whenever {|record|
-      record.changed_state(:failed) && !record.migration_settings[:skip_import_notification]
-    }
   end
   
   def self.migration_plugins(exclude_hidden=false)

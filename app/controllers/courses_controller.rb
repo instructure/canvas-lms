@@ -1357,7 +1357,25 @@ class CoursesController < ApplicationController
       @course.workflow_state = 'claimed'
       @course.save
       @course.enroll_user(@current_user, 'TeacherEnrollment', :enrollment_state => 'active')
-      redirect_to course_import_choose_content_url(@course, 'source_course' => @context.id)
+
+      @content_migration = @course.content_migrations.build(:user => @current_user, :context => @course, :migration_type => 'course_copy_importer')
+      @content_migration.migration_settings[:source_course_id] = @context.id
+      @content_migration.workflow_state = 'created'
+
+      if Canvas::Plugin.value_to_boolean(params[:selective_import])
+        @content_migration.migration_settings[:import_immediately] = false
+        @content_migration.workflow_state = 'exported'
+        @content_migration.save
+      else
+        @content_migration.migration_settings[:import_immediately] = true
+        @content_migration.copy_options = {:everything => true}
+        @content_migration.migration_settings[:migration_ids_to_import] = {:copy => {:everything => true}}
+        @content_migration.workflow_state = 'importing'
+        @content_migration.save
+        @content_migration.queue_migration
+      end
+
+      redirect_to course_content_migrations_url(@course)
     end
   end
 
