@@ -28,8 +28,10 @@
         id="edit_discussions_settings"
         class="btn"
         data-tooltip="{{#if options.permissions.create}}top{{else}}left{{/if}}"
-        title='{{#t "edit_settings"}}Edit Discussions Settings{{/t}}'
-      ><i class="icon-settings"></i></button>
+        title='{{#t "edit_settings"}}Edit Discussions Settings{{/t}}'>
+        <i class="icon-settings"></i>
+        <span class="screenreader-only">{{#t "edit_settings"}}Edit Discussions Settings{{/t}}</span>
+      </button>
     </div>
     <div class="headerBar-left form-inline index_view_filter_form">
       <label class="hidden-inline-text" for="searchTerm">{{#t "search_title_body_or_author"}}Search title, body, or author{{/t}}</label>
