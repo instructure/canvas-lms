@@ -247,6 +247,7 @@ zh:
   account_settings: 
     confirms: 
       delete_announcement: 是否确定要删除此通告?
+      global_announcement: 您必须确认全局通告
       remove_account_admin: 是否确定要删除此帐户管理员?
     custom_text_blank: "[自定义文本]"
     links: 
@@ -409,6 +410,7 @@ zh:
             text: "此报告显示某个给定学期的所有课程的状态。在生成的 csv 文件中，每个课程章节将具有一行，并且将在该章节中显示课程、课程状态、学期、有效的开始日期和结束日期以及记录教师。"
           description: 
             header: 例如
+    course_type: 课程
     courses: 
       courses_crumb: 课程
       no_results_message: 未找到结果
@@ -444,6 +446,8 @@ zh:
             header: 开始时间：
     default_account_quotas_not_updated: 未更新默认帐户配额
     default_account_quotas_updated: 默认帐户配额已更新
+    find_not_authorized: "您无权访问该 %{type}"
+    find_not_found: "找不到具有该 ID 的 %{type}"
     google_doc_accounts_csv_description: 
       account_reports: 
         ut_austin: 
@@ -457,6 +461,7 @@ zh:
           description: 
             header: 例如
             text: "此报告显示了所有学生在给定学期中的最终评分结果。最终得出的 csv 文件将每行代表一个注册，并将显示课程评分册中的当前评分和最终评分。"
+    group_type: 组
     include_deleted_parameter: 
       account_reports: 
         default: 
@@ -502,7 +507,15 @@ zh:
             text: "此报告显示某个给定学期中所有测验的测验题、回答问题的用户数以及正确回答问题的用户数。在生成的 csv 文件中，每个测验题将具有一行。"
     quota_integer_required: 必须填整数值
     quota_must_be_positive: 必须为正值
+    quota_not_updated: 未更新配额
     quota_too_large: 值太大
+    quota_updated: 已更新配额
+    recently_deleted_courses_csv_description: 
+      account_reports: 
+        default: 
+          recently_deleted_courses: 
+            header: 例如
+            text: "此报告显示某个给定学期最近 30 天内删除的所有课程。在生成的 csv 文件中，每个课程将具有一行，并且将显示课程 ID、课程 SIS ID、课程简称、课程名称、课程开始日期和结束日期。"
     retry_login: 重试登录
     root_accounts: 
       labels: 
@@ -527,10 +540,12 @@ zh:
       alert_icon_warning_option: 警告
       alert_timespan: "从 %{start_at} 到 %{end_at}"
       alerts_title: 警报
+      announcement_sent_to_subset: "每月发送给 1 / %{denominator} 的用户"
       buttons: 
         add_users: 看起来不错，添加这些用户
         continue: 继续...
         modify_users: 返回编辑用户列表
+      confirm_global_announcement: "此通告将向 *所有* Canvas 用户显示。请确认您要创建该通告。"
       confirm_turnitin_settings_link: "确认 Turnitin 设置"
       create_courses_description: （帐户管理员可随时创建课程）
       create_courses_title: 谁可以创建新课程
@@ -613,6 +628,15 @@ zh:
         add_admins: 添加帐户管理员
         configure_report: 配置...
         run_report: 运行报告
+      manual_quotas: 
+        find_button: 查找
+        manual_quotas_title: 可手动设置的配额
+        megabytes: MB
+        megabytes_tooltip: MB
+        select_type_courses: "课程 ID"
+        select_type_groups: "组 ID"
+        select_type_label: 查找课程或组
+        update_button: 更新配额
       never_allow_self_enrollment_option: 从不
       no_language_preference: "未设置（默认使用 %{language}）"
       notifications: 
@@ -641,6 +665,7 @@ zh:
       quotas: 
         default_account_quota_title: 默认帐户配额
         default_course_storage_quota: 课程配额
+        default_group_storage_quota: 组配额
         default_user_storage_quota: 用户配额
         megabytes: MB
         megabytes_tooltip: MB
@@ -656,10 +681,11 @@ zh:
       self_enroll_for_any_courses_option: 对于任何课程
       self_enroll_for_manually_created_courses_option: 对于手动创建的课程
       settings_crumb: 设置
+      survey_announcement: "这是一个调查通告。它将在处于活动状态的每月发送给已启用帐户中 1 / %{denominator} 的用户。"
       tab_admins: 管理员
       tab_alerts: 警报
       tab_announcements: 通告
-      tab_external_tools: 外部工具
+      tab_external_tools: 应用程序
       tab_notifications: 通知
       tab_quotas: 配额
       tab_reports: 报告
@@ -853,6 +879,12 @@ zh:
     test_ldap_result_ok: 确定
     test_login: 测试登录
     testing: 正在测试...
+    unpublished_courses_csv_description: 
+      account_reports: 
+        default: 
+          unpublishd_courses: 
+            header: 例如
+            text: "此报告显示某个给定学期尚未发布的所有课程。在生成的 csv 文件中，每个课程将具有一行，并且将显示课程 ID、课程 SIS ID、课程简称、课程名称、课程开始日期和结束日期。"
     unrecognized_time_zone: "“%{timezone}”不是可以识别的时区"
     unused_courses_csv_description: 
       account_reports: 
@@ -1003,6 +1035,21 @@ zh:
       feed_title_group: "组通告 Atom 馈送"
       podcast_title_course: 课程通告播客馈送
       podcast_title_group: 组通告播客馈送
+    index_view: 
+      delete: 删除
+      loading: 正在加载...
+      lock_for_comments: 锁定以发表评论
+      make_an_announcement: 进行通告
+      make_an_announcement_caps: 进行通告
+      make_sure_all_search_terms_are_spelled_correctly: 确保所有的搜索词拼写正确。
+      rss_feed: "RSS 信息源"
+      search_title_body_or_author: 搜索标题、正文或作者
+      suggestions: "建议:"
+      there_are_no_announcements_show: 没有要显示的通告
+      try_different_more_general_or_fewer_keywords: 尝试其他、更常用或更少的关键字。
+      try_disabling_the_unread_filters: 尝试禁用“未读”筛选器。
+      unread: 未读
+      your_search_did_not_match_any_announcements: 没有符合您搜索条件的通告。
     podcast_feed_description_course: "任何与课程 \"%{course}\" 中的通告链接或内嵌于其中的媒体文件都会出现在此馈送中。"
     podcast_feed_description_group: "任何与组 \"%{group}\" 中的通告链接或内嵌于其中的媒体文件都会出现在此馈送中。"
     podcast_feed_name: "%{course} 通告播客馈送"
@@ -1140,6 +1187,9 @@ zh:
       created: 作业组已成功创建。
       deleted: 此组已删除
       updated: 作业组已成功更新。
+  assignment_groups_api: 
+    errors: 
+      frozen_assignments_error: 您无法删除一个含有已锁定作业的组。
   assignment_muter: 
     mute_assignment: 屏蔽作业
     muting_assignment: 正在屏蔽作业...
@@ -1207,14 +1257,8 @@ zh:
       assignment_unlocked_from: "此作业锁定至 *%{unlock_at}*"
       assignment_unlocked_from_to: "此作业仅在从 *%{unlock_at}* 至 *%{lock_at}* 解锁"
     assignment_sidebar: 
-      buttons: 
-        publish: 发布此作业
       links: 
         submit: 提交作业
-      titles: 
-        unpublished: 已取消发布
-      warnings: 
-        unpublished: 您应发布已完成评分的作业，以便学生"正视"其评分。
     assignments_content: 
       buttons: 
         delete_group: 删除组
@@ -2386,6 +2430,7 @@ zh:
     concluded_conference: 
       delete: 删除
       no_recording: 无记录
+      preparing_video: 正在准备视频
       view: 查看
     confirm: 
       close: |-
@@ -2541,10 +2586,10 @@ zh:
       descriptions: 
         copy_succeeded: "课程内容导入成功! 您可以在下方查看导入结果。如果您对作业或者事件的日期安排不满意，可以很容易地[在日历中进行拖拽以进行变更](%{url})。"
       labels: 
+        apps: "%{course} 的应用程序"
         assignment: "%{course} 的作业"
         discussions: "与 %{course} 相关的讨论"
         events: "与 %{course} 相关的事件"
-        external_tools: "与 %{course} 相关的外部工具"
         files: "%{course} 的文件"
         modules: "%{course} 的模块"
         quizzes: "%{course} 的考试"
@@ -2557,13 +2602,13 @@ zh:
         what_it_looks_like_now: "%{course} 最新信息"
     copy_course_item_selection: 
       labels: 
+        apps: "%{course} 的应用程序"
         assignment: "%{course} 的作业"
         copy: 包含旧课程的条目
         copy_settings: "%{course} 的设置"
         copy_syllabus: "%{course} 的课程进度说明"
         discussions: "与 %{course} 相关的讨论"
         events: "与 %{course} 相关的事件"
-        external_tools: "与 %{course} 相关的外部工具"
         files: "%{course} 的文件"
         learning_outcomes: "%{course} 的学习结果"
         modules: "%{course} 的模块"
@@ -2806,30 +2851,55 @@ zh:
     unknown: 未知
   content_migrations: 
     bad_migration_type: 无效的迁移类型
+    canvas_export: 
+      options: 选项
+    common_cartridge: 
+      options: 选项
+    content_checkbox: 
+      select_all: 全选
+      select_non: 空出选择
+    copy_course: 
+      options: 选项
     migration_converter: 
-      default_option: 选择要从中迁移内容的系统
+      cancel_migration: 取消
+      default_option: 选择一个
       header: 导入内容
-      import_from_label: 从该位置导入内容
+      import_from_label: 内容类型
+      import_migration: 导入
       subtext: "这将帮助您将已有内容（例如文件、作业和测验）从其他课程管理系统导入 Canvas。"
+    moodle_zip: 
+      options: 选项
     must_upload_file: 需要上传文件
     progressing_content_migration: 
+      issues_text: 问题
       select_content: 选择内容
-      show_issues: 显示问题
     progressing_content_migration_collection: 
       no_items: 尚无任务排队
       progress_label: 当前任务
-    progressing_issues: 
-      no_items: 没有项目。
+    qti_zip: 
+      options: 选项
     select_content: 
       select_content_btn: 选择内容
-      test_checkbox: 测试复选框
     subviews: 
+      choose_migration_file: 
+        migration_text: 来源
       course_find_select: 
         or: 或
         search_label: 搜索课程
         select_default: 选择课程
       date_shift: 
+        beginning_change_to: 更改为
+        beginning_date: 开始日期
         checkbox_label: 调整事件和到期日期
+        ending_change_to: 更改为
+        ending_date: 结束日期
+        substitution: 替换
+      day_substitution: 
+        move_from: 移动自
+        to_happen_on: 到
+      folder_picker: 
+        default_select_folder: 选择文件夹
+        upload_to: 上传至
       overwrite_assessment_content: 
         overwrite_assessment_content: "覆盖具有匹配 ID 的考试内容"
       question_bank: 
@@ -3756,7 +3826,8 @@ zh:
         enrollment_fee: 注册费
         format: 格式
         image: 图像
-        path: 路径
+        path: 课程路径
+        portal_path: 门户路径
         position: 位置
         related_id: "链接 ID"
         self_enrollment: 注册
@@ -3769,6 +3840,7 @@ zh:
       logo: "徽标 (URL)"
       page_title: 课程概况
       path_syntax: 小写字母、数字和短划线
+      portal_path_syntax: 小写字母、数字、短划线和斜线（例如，哈佛/化学）
       private: 隐藏
       public: "在 canvas.net 上列出"
       save_changes: 保存更改
@@ -4018,7 +4090,7 @@ zh:
         grade_publishing: 评分发布
         navigation: 导航
         sections: 节
-        tools: 外部工具
+        tools: 应用程序
         users: 用户
       titles: 
         edit_navigation: 编辑课程导航
@@ -4258,6 +4330,7 @@ zh:
     labels: 
       assign_blanks: 对未提交的学生分配零
     out_of_points_possible: "超出 %{assignment.points_possible}"
+    this_is_permanent: 曲线评分无法撤消。将提供预先进行曲线计算的评分历史记录，但曲线计算操作不可逆。
   d2l_file_description: "D2L export .zip 格式"
   d2l_name: "D2L 转换器"
   dashboard: 
@@ -4458,7 +4531,20 @@ zh:
     create_new_crumb: 新建
     default_discussion_title: 无标题
     deleted_topic_notice: 该主题已删除
+    discussion: 
+      delete: 删除
+      due: 到期日期
+      lock: 锁定
+      pin: 固定
+      unlock: 解锁
+      unpin: 取消固定
+      user_subscribed: 您已订阅此主题
+      user_unsubscribed: 您未订阅此主题
     discussion_feed_title: "%{title} 讨论馈送"
+    discussion_list: 
+      no_pinned_discussions: 您目前没有已固定的讨论
+      pinned_instructions: 将讨论拖到此处，将其固定至学生讨论页面的顶部
+      there_are_no_discussions_show: 没有可显示的讨论。
     discussions_settings_view: 
       allow_student_discussion_editing: 编辑和删除自己的帖子
       allow_student_topics: 创建讨论主题
@@ -4512,21 +4598,16 @@ zh:
       edit_settings: 编辑讨论设置
       loading: 正在加载...
       lock_for_comments: 锁定以发表评论
-      make_an_announcement: 进行通告
-      make_an_announcement_caps: 进行通告
       make_sure_all_search_terms_are_spelled_correctly: 确保所有的搜索词拼写正确。
-      new_discussion: 开始讨论
+      new_discussion: "*开始* 讨论"
       rss_feed: "RSS 信息源"
       search_title_body_or_author: 搜索标题、正文或作者
       start_one_now: 立即开始
       suggestions: "建议:"
-      there_are_no_announcements_show: 没有要显示的通告
       there_are_no_discussion_topics_to_show: 没有要显示的讨论主题
       try_different_more_general_or_fewer_keywords: 尝试其他、更常用或更少的关键字。
-      try_disabling_the_unread_filters: 尝试禁用“未读”筛选器。
       try_disabling_the_unread_or_assignments_filters: 尝试禁用“未读”或“作业”筛选器。
       unread: 未读
-      your_search_did_not_match_any_announcements: 没有符合您搜索条件的通告。
       your_search_did_not_match_any_discussion_topics: 没有符合您搜索条件的讨论主题。
     new_and_total_badge: 
       reply_count_tooltip: 
@@ -4582,6 +4663,10 @@ zh:
       speed_grader: 快速评分器
       topic: 主题
       topic_podcast_feed_link: 主题播客馈送
+      topic_subscribe: 订阅
+      topic_subscribe_tooltip: 当评论发布至此主题时，您将收到通知。
+      topic_unsubscribe: 取消订阅
+      topic_unsubscribe_tooltip: 当评论发布至此主题时，不再收到通知。
       unlock_topic: 开放评论
       unread: 未读
     sub_entry: 
@@ -4603,6 +4688,8 @@ zh:
       my_settings: 我的设置
   discussions: 
     are_your_sure_delete: 是否确定要删除此条目?
+    confirm_delete_discussion_topic: 是否确定要删除此讨论主题？
+    delete: 删除
     edit_settings: 编辑讨论设置
     entry_collection_view: 
       add_reply_to_topic: 将回复添加至主题
@@ -4619,6 +4706,8 @@ zh:
     entry_stats: 
       show_more: 显示更多
     hide_due_dates: 隐藏到期日期
+    lock: 锁定
+    locked_discussions: 已锁定的讨论
     mark_as_read: 标记为已读
     mark_as_unread: 标记为未读
     no_content: 无内容
@@ -4628,8 +4717,11 @@ zh:
       try_different_more_general_or_fewer_keywords: 尝试其他、更常用或更少的关键字。
       try_disabling_the_unread_filter: 尝试禁用“未读”筛选器。
       your_search_did_not_match_any_entries: 您的搜索不匹配任何条目。
+    open_discussions: 打开讨论
     participant: 
       anonymous_user: 匿名
+    pin: 固定
+    pinned_discussions: 已固定的讨论
     reply: 
       error_saving_reply: "*发生错误*，请稍后再填写回复。"
       saving_reply: 正在保存答复...
@@ -4638,7 +4730,7 @@ zh:
     reply_form: 
       attach_file: 附加
       cancel: 取消
-      post_response: 投递响应
+      post_reply: 帖子回复
       switch_views: 切换视图
       write_a_reply: 回复
     results_entry: 
@@ -4652,6 +4744,8 @@ zh:
     uknown_author: 未知作者
     unknown: 未知
     unknown_author: 未知作者
+    unlock: 解锁
+    unpin: 取消固定
   due_dates: 
     due_at: "到期日期: %{assignment_due_date_time}"
     multiple_due_dates: "到期日期: 多个到期日期"
@@ -5070,6 +5164,7 @@ zh:
     app_full_view: 
       add_tool: 添加工具
       back_to_app_center: "返回 App Center"
+      rate_tool: 对此工具评分
     app_review_view: 
       posted_by_on: "由 *%{user_name}* 在 *%{created}* 上发布"
     app_saved_message: "%{app} 已成功保存！"
@@ -5082,6 +5177,7 @@ zh:
     delete: 删除
     dialog_title_add_app: 添加应用程序
     dialog_title_edit_tool: 退出外部工具
+    dialog_title_rate_tool: 您如何对此工具评分？
     edit_view: 
       anonymous: 匿名
       by_url: "通过 URL"
@@ -5128,15 +5224,19 @@ zh:
     generic_error: 处理您的请求时出错
     homework_submission_configured: 已配置家作提交项
     index_view: 
-      add_new_tool: 添加新工具
-      external_tools: 外部工具
-      external_tools_note: "外部工具是向 Canvas 添加新功能的简单方式。这些功能可添加到帐户中的各个课程或所有课程。配置完毕后，您可以通过课程模块与其链接，并为评估工具创建作业。"
+      add_new_tool: 添加新应用程序
+      app_headder: 外部应用程序
+      external_tools_note: "应用程序是向 Canvas 添加新功能的简单方式。这些功能可添加到帐户中的各个课程或所有课程。配置完毕后，您可以通过课程模块与其链接，并为评估工具创建作业。"
       external_tools_references: "单击*此处*查看适用于 Canvas 的某些 LTI 工具。您还可以在**此处**查看有关 LTI 工具的 Canvas 社区主题"
       search_filter: 按名称过滤
       view_app_center: "查看 App Center"
-      view_installed_tools: 查看已安装的工具
+      view_installed_tools: 查看已安装的应用程序
+    missing_stars: 您必须选择一个星级评分
+    rate_tool_view: 
+      rate_tool: 您如何对此工具评分？
     remove_tool: 是否确定要删除此工具？
     resource_selection_configured: 资源选择已配置
+    save_failed: "无法保存审阅：%{message}"
     saving: 正在保存...
     sessionless_launch: 
       load_tool_button: "手动加载 %{tool}"
@@ -6187,6 +6287,13 @@ zh:
       heading_current_groups: 当前组
       no_groups: 无组
     loading: 正在加载组清单...
+    manage: 
+      assign_to_group_menu: 
+        add_to_group: 添加到组
+      group_user: 
+        assign_to_group: 分配到组
+      group_users: 
+        no_users: 无用户。
     member: 
       one: "%{count} 个成员"
       other: "%{count} 个成员"
@@ -6448,6 +6555,8 @@ zh:
       view_all_accounts: 查看所有帐户
       view_all_enrollments: 查看所有课程
       view_all_groups: 查看所有组
+    mobile_auth: 
+      log_in_to_canvas: "登录到 Canvas"
   learning_outcome: 
     no_comment: 无评论
     no_context_found: "无法找到“%{title}”的外部学习结果，创建一个副本。"
@@ -8572,8 +8681,8 @@ zh:
     course_content_display: 课程内容
     discussion_description: 课程中的新讨论主题
     discussion_display: 讨论
-    discussion_entry_description: 您参与过的主题中的新讨论贴
-    discussion_entry_display: 讨论条目
+    discussion_post_description: 您订阅的主题中的新讨论帖
+    discussion_post_display: 讨论帖
     due_date_description: 作业到期日期更改
     due_date_display: 到期日期
     files_description: 添加到课程的新文件
@@ -8910,7 +9019,7 @@ zh:
       description: "App Center 用于在 Canvas 中跟踪/安装外部工具"
       name: "App Center"
     app_center_settings: 
-      description: "App Center 将出现在课程或帐户的设置页上的“外部工具”选项卡中。下面提供的 URL 应指向有效的 App Center 端点（例如，https://lti-examples.heroku.com -- 确保略去末尾斜杠）"
+      description: "App Center 将出现在课程或帐户的设置页上的“应用程序”选项卡中。下面提供的 URL 应指向有效的 App Center 端点（例如，https://lti-examples.heroku.com -- 确保略去末尾斜杠）"
       labels: 
         app_reviews_endpoint: 应用程序显示端点
         apps_index_endpoint: 应用程序索引端点
@@ -8934,6 +9043,7 @@ zh:
       domain_description: "BigBlueButton 安装的**主机名**或 **ip 地址**（例如，bigbluebutton.mycompany.com）"
       labels: 
         domain: 域
+        recording_enabled: 允许记录会议。
         secret: 加密
       secret_description: "这是 %{parameter_name} 参数，可在 %{filename} 配置文件中找到。"
     buttons: 
@@ -9161,6 +9271,8 @@ zh:
     sessions_timeout: 
       labels: 
         session_timeout: "会话到期前的时间（以分钟为单位，最少为 20 分钟）"
+    settings_header: 
+      select_account_prompt: （选择帐户）
     show: 
       back_to_list: 返回插件列表
       labels: 
@@ -9248,8 +9360,6 @@ zh:
         token_never_expires: 从不
       titles: 
         delete_this_token: 删除此令牌
-    alerts: 
-      profile_picture_locked: 您的头像已被管理员锁定，并且无法进行更改。
     buttons: 
       add_file: 添加文件
       adding_file: 正在添加文件...
@@ -9284,16 +9394,12 @@ zh:
       confirmation_failed: 确认失败。请重试。
       generating_token_failed: 生成令牌失败
       invalid_old_passowrd: "登录信息 %{pseudonym} 的旧密码无效"
-      loading_images_failed: 加载图像失败，请重试
       profile_update_failed: 登录信息无法更新
       regenerating_token_failed: 重新生成令牌失败
       registration_failed: 注册失败。检查用户名和密码，然后重试。
-      selecting_image_failed: 选择图像失败，请重试
     facebook_select: 
       facebook: Facebook
     failed_resending: 请求失败。请重试。
-    headers: 
-      loading_images: 正在加载图像...
     links: 
       resend_confirmation: 重新发送确认
       resend_confirmation_failed: 请求失败。请重试。
@@ -9508,6 +9614,14 @@ zh:
     ways_to_contact_me: 我的联系方式
     you_have_no_services: 您尚未注册任何服务，您可以在*设置*页面添加一些服务。
   profiles: 
+    avatar_dialog: 
+      butons: 
+        add_picture_file: 添加文件
+      headers: 
+        loading_images: 正在加载图像...
+      links: 
+        upload_new_image: 上传新图像
+      profile_pictures: 选择您想要用作头像的图像，或上传新图像：
     notification_preferences: 
       captions: 
         notification_preferences: "%{name} 通知活动和设置"
@@ -9558,7 +9672,6 @@ zh:
       buttons: 
         request_password: 请求密码
       dont_know_password: 我不知道我的密码
-      log_in_to_canvas: "登录到 Canvas"
       login: 登录
       login_handle: "输入您的 %{login_handle_name}，我们将向您发送更改密码的链接。"
       password: 密码
@@ -9583,6 +9696,15 @@ zh:
       labels: 
         remember_access: 记住我对此服务的授权
       page_title: 应用程序登录
+    oauth2_confirm_mobile: 
+      cancel: 取消
+      details: 
+        allow_application: "%{app_name} 正在请求访问您的帐户。"
+        email: "您的电子邮件地址为 %{email}。"
+        login_name: "您正在作为 %{user_name} 登录到此应用程序。"
+      login: 登录
+      page_title: 应用程序登录
+      remember_auth: 记住我对此服务的授权
     otp_login: 
       buttons: 
         send: 发送
@@ -10868,6 +10990,7 @@ zh:
     updating: 正在更新...
   rubric: 
     context_name_rubric: "%{course_name} 题目"
+    no_context_found: "无法找到“%{title}”的外部题目，创建一个副本。"
     no_description: 无说明
     unknown_details: 未知详细信息
   rubric_assessment: 
@@ -12551,6 +12674,9 @@ zh:
       no_title: 无标题
       titles: 
         select_folder_for_uploads: 选择文件夹进行文件上传
+    wiki_page_buttons: 
+      buttons: 
+        new_page: 新页面
   wiki_page: 
     atom_author: 维基页面
     atom_entry_title: "维基页面 %{course_or_group_name}: %{page_title}"
@@ -12641,6 +12767,9 @@ zh:
       page_updated: 页面已成功更新。
     page_link: 
       link_hidden_from_students_warning: 学生不会看到此链接
+    pages_index: 
+      titles: 
+        pages: "页面 - %{course}"
     wiki_page_comment: 
       links: 
         delete_comment: 删除评论
