@@ -248,6 +248,7 @@ ja:
   account_settings: 
     confirms: 
       delete_announcement: このアナウンスを削除してもよろしいですか?
+      global_announcement: "グローバル アナウンスを確認する必要があります"
       remove_account_admin: このアカウント管理者を削除してもよろしいですか?
     custom_text_blank: "[カスタム テキスト]"
     links: 
@@ -410,6 +411,7 @@ ja:
             text: "このレポートでは、指定した期間のすべてのコースの状況が示されます。生成される csv ファイルでは、コース セクションごとに 1 行を使用して、そのセクションのコース、コース状況、期間、有効開始日および有効終了日、登録講師が示されます。"
           description: 
             header: 例
+    course_type: コース
     courses: 
       courses_crumb: コース
       no_results_message: 一致するものが見つかりませんでした
@@ -445,6 +447,8 @@ ja:
             header: "開始日:"
     default_account_quotas_not_updated: "デフォルトのアカウント クォータは更新されませんでした"
     default_account_quotas_updated: "デフォルトのアカウント クォータが更新されました"
+    find_not_authorized: "その %{type} にはアクセスする権限がありません"
+    find_not_found: "その ID の %{type} は見つかりませんでした"
     google_doc_accounts_csv_description: 
       account_reports: 
         ut_austin: 
@@ -458,6 +462,7 @@ ja:
           description: 
             header: 例
             text: "このレポートでは、指定した期間のすべての受講生の受講生最終成績結果が示されます。生成される csv ファイルでは、登録ごとに 1 行を使用して、コース成績表に表示される現在と最終の成績が示されます。"
+    group_type: グループ
     include_deleted_parameter: 
       account_reports: 
         default: 
@@ -503,7 +508,15 @@ ja:
             text: "このレポートには、指定した期間のクイズの問題、問題に答えたユーザの数、正解したユーザの数が示されます。生成される csv ファイルでは、クイズの問題がそれぞれ 1 行ずつ示されます。"
     quota_integer_required: 整数の値が必要です
     quota_must_be_positive: 値は正数でなければなりません
+    quota_not_updated: クォータは更新されませんでした
     quota_too_large: 値が大きすぎます
+    quota_updated: クォータが更新されました
+    recently_deleted_courses_csv_description: 
+      account_reports: 
+        default: 
+          recently_deleted_courses: 
+            header: 例
+            text: "このレポートでは、最近 30 日間に削除された、指定した期間のすべてのコースが示されます。生成される csv ファイルでは、コースごとに 1 行を使用して、コース ID、コース SIS ID、コースの省略名、コース名、コースの開始日と終了日が示されます。"
     retry_login: ログインの再試行
     root_accounts: 
       labels: 
@@ -528,10 +541,12 @@ ja:
       alert_icon_warning_option: 警告
       alert_timespan: "開始時刻 %{start_at} 終了時刻 %{end_at}"
       alerts_title: アラート
+      announcement_sent_to_subset: "各月に 1 / %{denominator} のユーザに送信"
       buttons: 
         add_users: "OK です。これらのユーザを追加します"
         continue: 続行...
         modify_users: 前のページに戻ってユーザのリストを編集
+      confirm_global_announcement: "このアナウンスは、*すべての* Canvas ユーザに表示されます。作成してもよいか確認してください。"
       confirm_turnitin_settings_link: "Turnitin の設定の確認"
       create_courses_description: (アカウント管理者はいつでもコースを作成できます)
       create_courses_title: 新しいコースを作成できるのは誰か
@@ -614,6 +629,15 @@ ja:
         add_admins: アカウント管理者の追加
         configure_report: 設定...
         run_report: レポートの実行
+      manual_quotas: 
+        find_button: 検索
+        manual_quotas_title: 手動で設定可能なクォータ
+        megabytes: メガバイト
+        megabytes_tooltip: メガバイト
+        select_type_courses: "コース ID"
+        select_type_groups: "グループ ID"
+        select_type_label: コースまたはグループを検索
+        update_button: クォータの更新
       never_allow_self_enrollment_option: 許可しない
       no_language_preference: "設定なし (デフォルトは %{language})"
       notifications: 
@@ -642,6 +666,7 @@ ja:
       quotas: 
         default_account_quota_title: "デフォルトのアカウント クォータ"
         default_course_storage_quota: "コース クォータ"
+        default_group_storage_quota: "グループ クォータ"
         default_user_storage_quota: "ユーザ クォータ"
         megabytes: メガバイト
         megabytes_tooltip: メガバイト
@@ -657,10 +682,11 @@ ja:
       self_enroll_for_any_courses_option: 任意のコース
       self_enroll_for_manually_created_courses_option: 手動で作成されたコース
       settings_crumb: 設定
+      survey_announcement: "これはサーベイ アナウンスです。アクティブな各月に有効なアカウントの 1 / %{denominator} のユーザに送信されます。"
       tab_admins: 管理者
       tab_alerts: アラート
       tab_announcements: アナウンス
-      tab_external_tools: 外部ツール
+      tab_external_tools: アプリ
       tab_notifications: お知らせ
       tab_quotas: クォータ
       tab_reports: レポート
@@ -851,6 +877,12 @@ ja:
     test_ldap_result_ok: OK
     test_login: "テスト ログイン"
     testing: テストしています...
+    unpublished_courses_csv_description: 
+      account_reports: 
+        default: 
+          unpublishd_courses: 
+            header: 例
+            text: "このレポートでは、指定した期間の公開されていないすべてのコースが示されます。生成される csv ファイルでは、コースごとに 1 行を使用して、コース ID、コース SIS ID、コースの省略名、コース名、コースの開始日と終了日が示されます。"
     unrecognized_time_zone: "'%{timezone}' は有効なタイムゾーンではありません"
     unused_courses_csv_description: 
       account_reports: 
@@ -1001,6 +1033,21 @@ ja:
       feed_title_group: "グループ アナウンスの Atom フィード"
       podcast_title_course: "コース アナウンスのポッドキャスト フィード"
       podcast_title_group: "グループ アナウンスのポッドキャスト フィード"
+    index_view: 
+      delete: 削除
+      loading: 読み込んでいます...
+      lock_for_comments: コメントのロック
+      make_an_announcement: アナウンスの作成
+      make_an_announcement_caps: アナウンスの作成
+      make_sure_all_search_terms_are_spelled_correctly: すべての検索条件について誤入力がないことを確認してください。
+      rss_feed: "RSS フィード"
+      search_title_body_or_author: タイトル、本文、または作成者を検索する
+      suggestions: "提案:"
+      there_are_no_announcements_show: 残念ながら、アナウンスはありません。
+      try_different_more_general_or_fewer_keywords: 異なるキーワード、さらに一般的なキーワード、またはさらに少ないキーワードで試してください。
+      try_disabling_the_unread_filters: "\"未読\" フィルタを無効にしてみてください。"
+      unread: 未読です
+      your_search_did_not_match_any_announcements: 検索に一致するアナウンスはありませんでした。
     podcast_feed_description_course: "\"%{course}\" コースのアナウンス内にリンク元がある、または埋め込まれているメディア ファイルはすべて、このフィードに表示されます。"
     podcast_feed_description_group: "\"%{group}\" グループのアナウンス内にリンク元がある、または埋め込まれているメディア ファイルはすべて、このフィードに表示されます。"
     podcast_feed_name: "%{course} アナウンスのポッドキャスト フィード"
@@ -1138,6 +1185,9 @@ ja:
       created: 課題グループは正常に作成されました
       deleted: このグループは削除されました
       updated: 課題グループは正常に更新されました。
+  assignment_groups_api: 
+    errors: 
+      frozen_assignments_error: ロックされている課題のあるグループは削除できません。
   assignment_muter: 
     mute_assignment: 課題をミュートにする
     muting_assignment: 課題をミュートにしています...
@@ -1205,14 +1255,8 @@ ja:
       assignment_unlocked_from: "*%{unlock_at}* まで、この課題はロックされています"
       assignment_unlocked_from_to: "この課題は *%{unlock_at}* ～*%{lock_at}* の期間のみ、ロック解除されます"
     assignment_sidebar: 
-      buttons: 
-        publish: この課題を公開
       links: 
         submit: 課題の提出
-      titles: 
-        unpublished: 未公開
-      warnings: 
-        unpublished: "受講生が採点を \"公式\" のものであると見なすことができるよう、採点が完了した課題は公開する必要があります。"
     assignments_content: 
       buttons: 
         delete_group: グループの削除
@@ -2386,6 +2430,7 @@ ja:
     concluded_conference: 
       delete: 削除
       no_recording: 記録なし
+      preparing_video: ビデオを準備しています
       view: 表示
     confirm: 
       close: |-
@@ -2545,10 +2590,10 @@ ja:
             課題またはイベントの日付に問題がある場合は、
             [ドラッグしてコース カレンダーにドロップすることで簡単に変更できます](%{url})。
       labels: 
+        apps: "%{course} のアプリ"
         assignment: "%{course} の課題"
         discussions: "%{course} のディスカッション"
         events: "%{course} のイベント"
-        external_tools: "%{course} の外部ツール"
         files: "%{course} のファイル"
         modules: "%{course} のモジュール"
         quizzes: "%{course} のクイズ"
@@ -2561,13 +2606,13 @@ ja:
         what_it_looks_like_now: "%{course} の現在の概略"
     copy_course_item_selection: 
       labels: 
+        apps: "%{course} のアプリ"
         assignment: "%{course} の課題"
         copy: 古いコースのエントリを含める
         copy_settings: "%{course} の設定"
         copy_syllabus: "%{course} からの要綱説明"
         discussions: "%{course} のディスカッション"
         events: "%{course} のイベント"
-        external_tools: "%{course} の外部ツール"
         files: "%{course} のファイル"
         learning_outcomes: "%{course} の学習成果"
         modules: "%{course} のモジュール"
@@ -2810,30 +2855,55 @@ ja:
     unknown: 不明
   content_migrations: 
     bad_migration_type: 無効な移行タイプ
+    canvas_export: 
+      options: オプション
+    common_cartridge: 
+      options: オプション
+    content_checkbox: 
+      select_all: すべて選択
+      select_non: 選択なし
+    copy_course: 
+      options: オプション
     migration_converter: 
-      default_option: 移行元のシステムを選択してください
+      cancel_migration: キャンセル
+      default_option: "1 つを選択"
       header: コンテンツのインポート
-      import_from_label: コンテンツのインポート
+      import_from_label: "コンテンツ タイプ"
+      import_migration: インポート
       subtext: "ファイル、課題、クイズなど、既に手元にあるコンテンツを他のコース管理システムから Canvas にインポートする場合に役立ちます。"
+    moodle_zip: 
+      options: オプション
     must_upload_file: ファイルのアップロードが必要です
     progressing_content_migration: 
+      issues_text: 問題
       select_content: コンテンツの選択
-      show_issues: 問題の表示
     progressing_content_migration_collection: 
       no_items: キューに入っているジョブはありません
       progress_label: 現在のジョブ
-    progressing_issues: 
-      no_items: アイテムがありません。
+    qti_zip: 
+      options: オプション
     select_content: 
       select_content_btn: コンテンツの選択
-      test_checkbox: チェックボックスのテスト
     subviews: 
+      choose_migration_file: 
+        migration_text: ソース
       course_find_select: 
         or: または
         search_label: コースの検索
         select_default: コースの選択
       date_shift: 
+        beginning_change_to: 変更後日付
+        beginning_date: 開始日
         checkbox_label: イベントと期日を調整
+        ending_change_to: 変更後日付
+        ending_date: 終了日
+        substitution: 置き換え
+      day_substitution: 
+        move_from: 移動元
+        to_happen_on: 移動先
+      folder_picker: 
+        default_select_folder: フォルダの選択
+        upload_to: アプロード先
       overwrite_assessment_content: 
         overwrite_assessment_content: "アセスメント コンテンツを、一致する ID で上書きします"
       question_bank: 
@@ -3759,7 +3829,8 @@ ja:
         enrollment_fee: 登録料
         format: 形式
         image: 画像
-        path: パス
+        path: "コース パス"
+        portal_path: "ポータル パス"
         position: 職位
         related_id: "リンク ID"
         self_enrollment: 登録
@@ -3772,6 +3843,7 @@ ja:
       logo: "ロゴ (URL)"
       page_title: コースのプロフィール
       path_syntax: 英小文字、数字、およびダッシュ
+      portal_path_syntax: "英小文字、数字、ダッシュ、およびスラッシュ (例: harvard/chemistry)"
       private: 非表示
       public: "canvas.net に表示"
       save_changes: 変更内容の保存
@@ -4021,7 +4093,7 @@ ja:
         grade_publishing: 成績の公開
         navigation: ナビゲーション
         sections: セクション
-        tools: 外部ツール
+        tools: アプリ
         users: ユーザ
       titles: 
         edit_navigation: "コース ナビゲーションの編集"
@@ -4261,6 +4333,7 @@ ja:
     labels: 
       assign_blanks: 未提出の受講生にゼロを割り当てる
     out_of_points_possible: "配点: %{assignment.points_possible}"
+    this_is_permanent: 分布曲線評価は取り消しできません。分布曲線評価を行う前の成績の履歴は利用できますが、分布曲線評価の処理は取り消すことができません。
   d2l_file_description: "D2L から .zip 形式でエクスポート"
   d2l_name: "D2L コンバータ"
   dashboard: 
@@ -4461,7 +4534,20 @@ ja:
     create_new_crumb: 新規作成
     default_discussion_title: タイトルなし
     deleted_topic_notice: そのトピックは削除されました
+    discussion: 
+      delete: 削除
+      due: 期限
+      lock: ロック
+      pin: 固定
+      unlock: ロックの解除
+      unpin: 固定の解除
+      user_subscribed: このトピックを購読しています
+      user_unsubscribed: このトピックを購読していません
     discussion_feed_title: "%{title} ディスカッション フィード"
+    discussion_list: 
+      no_pinned_discussions: 現在、固定したディスカッションはありません
+      pinned_instructions: "ディスカッションを受講生のディスカッション ページ上部に固定するには、ここにドラッグします。"
+      there_are_no_discussions_show: 表示できるディスカッションはありません。
     discussions_settings_view: 
       allow_student_discussion_editing: 自分の投稿を編集または削除
       allow_student_topics: "ディスカッション トピックを作成する"
@@ -4515,21 +4601,16 @@ ja:
       edit_settings: ディスカッション設定の編集
       loading: 読み込んでいます...
       lock_for_comments: コメントのロック
-      make_an_announcement: アナウンスの作成
-      make_an_announcement_caps: アナウンスの作成
       make_sure_all_search_terms_are_spelled_correctly: すべての検索条件について誤入力がないことを確認してください。
-      new_discussion: ディスカッションを開始する
+      new_discussion: "ディスカッションを *開始する*"
       rss_feed: "RSS フィード"
       search_title_body_or_author: タイトル、本文、または作成者を検索する
       start_one_now: 今すぐ開始する
       suggestions: "提案:"
-      there_are_no_announcements_show: 表示するアナウンスはありません
       there_are_no_discussion_topics_to_show: "表示するディスカッション トピックはありません"
       try_different_more_general_or_fewer_keywords: 異なるキーワード、さらに一般的なキーワード、またはさらに少ないキーワードで試してください。
-      try_disabling_the_unread_filters: "\"未読\" フィルタを無効にしてみてください。"
       try_disabling_the_unread_or_assignments_filters: "\"未読\" または \"課題\" フィルタを無効にしてみてください。"
       unread: 未読です
-      your_search_did_not_match_any_announcements: 検索に一致するアナウンスはありませんでした。
       your_search_did_not_match_any_discussion_topics: "検索に一致するディスカッション トピックはありませんでした。"
     new_and_total_badge: 
       reply_count_tooltip: 
@@ -4585,6 +4666,10 @@ ja:
       speed_grader: SpeedGrader
       topic: トピック
       topic_podcast_feed_link: "トピックのポッドキャスト フィード"
+      topic_subscribe: 定期購読
+      topic_subscribe_tooltip: このトピックにコメントが投稿されたら、通知されます。
+      topic_unsubscribe: 定期購読の中止
+      topic_unsubscribe_tooltip: このトピックにコメントが投稿されたときに通知を受信しません。
       unlock_topic: コメントを受け付ける
       unread: 未読です
     sub_entry: 
@@ -4606,6 +4691,8 @@ ja:
       my_settings: マイ設定
   discussions: 
     are_your_sure_delete: このエントリを削除してもよろしいですか?
+    confirm_delete_discussion_topic: "このディスカッション トピックを削除してもよろしいですか?"
+    delete: 削除
     deleted_entry: 
       deleted: このエントリは削除されました
     edit_settings: ディスカッション設定の編集
@@ -4624,6 +4711,8 @@ ja:
     entry_stats: 
       show_more: 詳細
     hide_due_dates: 期日を非表示
+    lock: ロック
+    locked_discussions: ロックされたディスカッション
     mark_as_read: 既読にする
     mark_as_unread: 未読にする
     no_content: コンテンツなし
@@ -4633,8 +4722,11 @@ ja:
       try_different_more_general_or_fewer_keywords: 異なるキーワード、さらに一般的なキーワード、またはさらに少ないキーワードで試してください。
       try_disabling_the_unread_filter: "\"未読\" フィルタを無効にしてみてください。"
       your_search_did_not_match_any_entries: 検索に一致するエントリはありませんでした。
+    open_discussions: 開かれているディスカッション
     participant: 
       anonymous_user: 匿名
+    pin: 固定
+    pinned_discussions: 固定されたディスカッション
     reply: 
       error_saving_reply: "*エラーが発生しました*。後でもう一度返信を投稿してください"
       saving_reply: 返信を保存しています...
@@ -4643,7 +4735,7 @@ ja:
     reply_form: 
       attach_file: 添付
       cancel: キャンセル
-      post_response: 応答の投稿
+      post_reply: 返信の投稿
       switch_views: ビューの切り替え
       write_a_reply: 返信
     results_entry: 
@@ -4657,6 +4749,8 @@ ja:
     uknown_author: 不明な作成者
     unknown: 不明
     unknown_author: 不明な作成者
+    unlock: ロックの解除
+    unpin: 固定の解除
   due_dates: 
     due_at: "期限: %{assignment_due_date_time}"
     multiple_due_dates: "期限: 複数の期日"
@@ -5075,6 +5169,7 @@ ja:
     app_full_view: 
       add_tool: ツールの追加
       back_to_app_center: "アプリ センターに戻る"
+      rate_tool: このツールを評価
     app_review_view: 
       posted_by_on: "*%{user_name}* によって *%{created}* に投稿"
     app_saved_message: "%{app} が正常に保存されました。"
@@ -5087,6 +5182,7 @@ ja:
     delete: 削除
     dialog_title_add_app: アプリの追加
     dialog_title_edit_tool: 外部ツールの編集
+    dialog_title_rate_tool: このツールの評価
     edit_view: 
       anonymous: 匿名
       by_url: "URL ごと"
@@ -5133,15 +5229,19 @@ ja:
     generic_error: 要求を処理する際にエラーが発生しました
     homework_submission_configured: 宿題の提出が構成されました
     index_view: 
-      add_new_tool: 新しいツールの追加
-      external_tools: 外部ツール
-      external_tools_note: "外部ツールは、Canvas に新しい機能を追加するための簡単な方法です。外部ツールは、個別のコースに追加することも、アカウントのすべてのコースに追加することもできます。設定すると、コース モジュールから外部ツールにリンクして、アセスメント ツール用の課題を作成できます。"
+      add_new_tool: 新しいアプリの追加
+      app_headder: 外部アプリ
+      external_tools_note: "アプリは、Canvas に新しい機能を追加するための簡単な方法です。アプリは、個別のコースに追加することも、アカウントのすべてのコースに追加することもできます。設定すると、コース モジュールから外部ツールにリンクして、アセスメント ツール用の課題を作成できます。"
       external_tools_references: "*ここ* をクリックして Canvas との優れた連携機能を持つ LTI ツールを確認できます。*ここ* をクリックすると、LTI ツールについての Canvas コミュニティのトピックを参照できます"
       search_filter: 名前でフィルタ
       view_app_center: "アプリ センターの表示"
-      view_installed_tools: インストールされたツールの表示
+      view_installed_tools: インストールされたアプリの表示
+    missing_stars: スター評価を選択する必要があります
+    rate_tool_view: 
+      rate_tool: このツールの評価
     remove_tool: このツールを削除してもよろしいですか?
     resource_selection_configured: リソースの選択が構成されました
+    save_failed: "レビューを保存できません: %{message}"
     saving: 保存しています...
     sessionless_launch: 
       load_tool_button: "%{tool} を手動で読み込む"
@@ -6191,6 +6291,13 @@ ja:
       heading_current_groups: 現在のグループ
       no_groups: グループなし
     loading: グループ名簿を読み込んでいます...
+    manage: 
+      assign_to_group_menu: 
+        add_to_group: グループに追加
+      group_user: 
+        assign_to_group: グループに割り当て
+      group_users: 
+        no_users: ユーザなし。
     member: 
       one: "%{count} 人のメンバー"
       other: "%{count} 人のメンバー"
@@ -6452,6 +6559,8 @@ ja:
       view_all_accounts: すべてのアカウントを表示
       view_all_enrollments: すべてのコースを表示
       view_all_groups: すべてのグループを表示
+    mobile_auth: 
+      log_in_to_canvas: "Canvas へのログイン"
   learning_outcome: 
     no_comment: コメントなし
     no_context_found: "\"%{title}\" に対する外部学習成果が見つかりませんでした。コピーを作成します。"
@@ -8562,8 +8671,8 @@ ja:
     course_content_display: コースの内容
     discussion_description: "コースの新しいディスカッション トピック"
     discussion_display: ディスカッション
-    discussion_entry_description: 参加したトピックの新しいディスカッションへの投稿
-    discussion_entry_display: "ディスカッション エントリ"
+    discussion_post_description: 購読しているトピックの新しいディスカッションへの投稿
+    discussion_post_display: ディスカッションへの投稿
     due_date_description: 課題の期日が変更されました
     due_date_display: 期日
     files_description: コースに新しいファイルが追加されました
@@ -8900,7 +9009,7 @@ ja:
       description: "Canvas での外部ツールの追跡/インストールを扱うアプリ センター"
       name: "アプリ センター"
     app_center_settings: 
-      description: "アプリ センターは、コースまたはアカウントの設定ページの [外部ツール] タブに表示されます。以下に示す URL は、有効なアプリ センターのエンドポイントを指す必要があります (たとえば、https://lti-examples.heroku.com -- 末尾のスラッシュは省いてください)。"
+      description: "アプリ センターは、コースまたはアカウントの設定ページの [アプリ] タブに表示されます。以下に示す URL は、有効なアプリ センターのエンドポイントを指す必要があります (たとえば、https://lti-examples.heroku.com -- 末尾のスラッシュは省いてください)。"
       labels: 
         app_reviews_endpoint: アプリの表示エンドポイント
         apps_index_endpoint: "アプリのインデックス エンドポイント"
@@ -8924,6 +9033,7 @@ ja:
       domain_description: "BigBlueButton をインストールする **ホスト名** または **IP アドレス** (例: bigbluebutton.mycompany.com)"
       labels: 
         domain: ドメイン
+        recording_enabled: 会議の記録を許可します。
         secret: シークレット
       secret_description: "これは、構成ファイル %{filename} 内にあるパラメータ %{parameter_name} です。"
     buttons: 
@@ -9151,6 +9261,8 @@ ja:
     sessions_timeout: 
       labels: 
         session_timeout: "分単位でのセッション期限切れまでの時間 (20 分以上)"
+    settings_header: 
+      select_account_prompt: (アカウントの選択)
     show: 
       back_to_list: プラグインのリストに戻る
       labels: 
@@ -9233,8 +9345,6 @@ ja:
         token_never_expires: 一切なし
       titles: 
         delete_this_token: このトークンの削除
-    alerts: 
-      profile_picture_locked: プロフィール画像は管理者によってロックされているため、変更できません。
     buttons: 
       add_file: ファイルの追加
       adding_file: ファイルを追加しています...
@@ -9269,16 +9379,12 @@ ja:
       confirmation_failed: 確認に失敗しました。もう一度、試してください。
       generating_token_failed: トークンの生成に失敗しました
       invalid_old_passowrd: "ログイン情報 %{pseudonym} の古いパスワードが無効です"
-      loading_images_failed: 画像の読み込みに失敗しました。もう一度やり直してください。
       profile_update_failed: ログインの更新が失敗しました
       regenerating_token_failed: トークンの再生成に失敗しました
       registration_failed: 登録に失敗しました。ユーザ名とパスワードを確認して、もう一度試してください。
-      selecting_image_failed: 画像選択に失敗しました。もう一度やり直してください
     facebook_select: 
       facebook: Facebook
     failed_resending: 要求が失敗しました。もう一度、試してください。
-    headers: 
-      loading_images: 画像を読み込んでいます...
     links: 
       resend_confirmation: 確認の再送信
       resend_confirmation_failed: 要求が失敗しました。もう一度、試してください。
@@ -9493,6 +9599,14 @@ ja:
     ways_to_contact_me: 連絡方法
     you_have_no_services: "どのサービスにも登録していません。*設定* ページで追加できます。"
   profiles: 
+    avatar_dialog: 
+      butons: 
+        add_picture_file: ファイルの追加
+      headers: 
+        loading_images: 画像を読み込んでいます...
+      links: 
+        upload_new_image: 新しい画像をアップロードする
+      profile_pictures: "プロフィールとして使用する画像を選択するか、または新しい画像をアップロードしてください:"
     notification_preferences: 
       captions: 
         notification_preferences: "%{name} のお知らせイベントと設定"
@@ -9543,7 +9657,6 @@ ja:
       buttons: 
         request_password: パスワードの要求
       dont_know_password: パスワードが分かりません
-      log_in_to_canvas: "Canvas へのログイン"
       login: ログイン
       login_handle: "%{login_handle_name} を入力してください。パスワード変更用のリンクをお送りします。"
       password: パスワード
@@ -9568,6 +9681,15 @@ ja:
       labels: 
         remember_access: このサービスに関する権限を保存する
       page_title: "アプリケーション ログイン"
+    oauth2_confirm_mobile: 
+      cancel: キャンセル
+      details: 
+        allow_application: "%{app_name} がユーザのアカウントへのアクセスを要求しています。"
+        email: "電子メール アドレスは %{email} です。"
+        login_name: "ユーザは %{user_name} としてこのアプリにログインしています。"
+      login: ログイン
+      page_title: "アプリケーション ログイン"
+      remember_auth: このサービスに関する権限を保存する
     otp_login: 
       buttons: 
         send: 送信
@@ -10853,6 +10975,7 @@ ja:
     updating: 更新しています...
   rubric: 
     context_name_rubric: "%{course_name} の注釈"
+    no_context_found: "\"%{title}\" に対する外部注釈が見つかりませんでした。コピーを作成します。"
     no_description: 説明なし
     unknown_details: 不明の詳細
   rubric_assessment: 
@@ -12533,6 +12656,9 @@ ja:
       no_title: タイトルなし
       titles: 
         select_folder_for_uploads: "ファイル アップロードのためのフォルダを選択します"
+    wiki_page_buttons: 
+      buttons: 
+        new_page: 新しいページ
   wiki_page: 
     atom_author: "Wiki ページ"
     atom_entry_title: "Wiki ページ、%{course_or_group_name}: %{page_title}"
@@ -12623,6 +12749,9 @@ ja:
       page_updated: ページは正常に更新されました。
     page_link: 
       link_hidden_from_students_warning: 受講生にはこのリンクは表示されません
+    pages_index: 
+      titles: 
+        pages: "ページ - %{course}"
     wiki_page_comment: 
       links: 
         delete_comment: コメントの削除
