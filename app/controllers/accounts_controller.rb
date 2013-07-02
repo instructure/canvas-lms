@@ -255,6 +255,7 @@ class AccountsController < ApplicationController
           end
         end
 
+        params[:account][:turnitin_host] = validated_turnitin_host(params[:account][:turnitin_host])
         enable_user_notes = params[:account].delete :enable_user_notes
         allow_sis_import = params[:account].delete :allow_sis_import
         params[:account].delete :default_user_storage_quota_mb unless @account.root_account? && !@account.site_admin?
@@ -406,8 +407,17 @@ class AccountsController < ApplicationController
   
   def turnitin_confirmation 
     if authorized_action(@account, @current_user, :manage_account_settings)
-      turnitin = Turnitin::Client.new(params[:id], params[:shared_secret])
-      render :json => {:success => turnitin.testSettings}.to_json
+      host = validated_turnitin_host(params[:turnitin_host])
+      begin
+        turnitin = Turnitin::Client.new(
+          params[:turnitin_account_id],
+          params[:turnitin_shared_secret],
+          host
+        )
+        render :json => { :success => turnitin.testSettings }.to_json
+      rescue
+        render :json => { :success => false }.to_json
+      end
     end
   end
   
@@ -601,6 +611,15 @@ class AccountsController < ApplicationController
       respond_to do |format|
         format.json {render :json => {:student_report_id=>student_report.id, :success=>true}.to_json}
       end
+    end
+  end
+
+  def validated_turnitin_host(input_host)
+    if input_host.present?
+      _, turnitin_uri = CustomValidations.validate_url(input_host)
+      turnitin_uri.host
+    else
+      nil
     end
   end
 

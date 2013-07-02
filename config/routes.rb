@@ -509,7 +509,7 @@ FakeRails3Routes.draw do
     match 'statistics' => 'accounts#statistics', :as => :statistics
     match 'statistics/over_time/:attribute' => 'accounts#statistics_graph', :as => :statistics_graph
     match 'statistics/over_time/:attribute.:format' => 'accounts#statistics_graph', :as => :formatted_statistics_graph
-    match 'turnitin/:id/:shared_secret' => 'accounts#turnitin_confirmation', :as => :turnitin_confirmation
+    match 'turnitin_confirmation' => 'accounts#turnitin_confirmation', :as => :turnitin_confirmation
     resources :permissions, :controller => :role_overrides, :only => [:index, :create] do
       collection do
         post :add_role

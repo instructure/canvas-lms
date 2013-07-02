@@ -392,9 +392,15 @@ TEXT
                 <td><%= f.text_field :turnitin_shared_secret, :class => "turnitin_account_settings" %></td>
               </tr>
               <tr>
+                <td><%= f.blabel :turnitin_host, :en => "Turnitin Host" %></td>
+                <td><%= f.text_field :turnitin_host, :class => "turnitin_account_settings", :placeholder => "api.turnitin.com" %></td>
+              </tr>
+              <tr>
                 <td>&nbsp;</td>
                 <td>
-                  <a href="<%= account_turnitin_confirmation_path(@account.id, "{{ account_id }}", "{{ shared_secret }}") %>" class="confirm_turnitin_settings_link btn"><%= t(:confirm_turnitin_settings_link, "confirm Turnitin settings") %></a>
+                  <a href="<%= account_turnitin_confirmation_path(@account) %>" class="confirm_turnitin_settings_link btn">
+                    <%= t(:confirm_turnitin_settings_link, "confirm Turnitin settings") %>
+                  </a>
                 </td>
               </tr>
               <tr>
