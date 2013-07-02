@@ -58,4 +58,9 @@ describe "Canvas::TempTable" do
       temp_table.size.should == 6
     end
   end
+
+  it "should be in a transaction by default" do
+    User.connection.expects(:transaction).once
+    User.find_each_with_temp_table
+  end
 end
