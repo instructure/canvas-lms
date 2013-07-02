@@ -28,6 +28,8 @@ define [
       unsubscribe:  I18n.t('unsubscribe', 'Unsubscribe from this topic')
       unsubscribed: I18n.t('unsubscribed', 'Unsubscribed')
       initialPostRequiredToSubscribe: I18n.t('initial_post_required_to_subscribe', 'You must post a reply before subscribing')
+      user_subscribed: I18n.t('subscribed_hint', 'You are subscribed to this topic. Click to unsubscribe.')
+      user_unsubscribed: I18n.t('unsubscribed_hint', 'You are not subscribed to this topic. Click to subscribe.')
 
     events:
       'click .icon-lock':  'toggleLocked'
@@ -45,6 +47,7 @@ define [
 
     els:
       '.subscription-toggler': '$subscriptionToggler'
+      '.screenreader-only': '$title'
 
     # Public: Topic is able to be locked/unlocked.
     @optionProperty 'lockable'
@@ -75,7 +78,7 @@ define [
             if @justChanged
               @messages['unsubscribed']
             else
-              @messages['subscribe']) 
+              @messages['subscribe'])
       @updateSubscriptionIcon()
       this
 
@@ -127,8 +130,10 @@ define [
       @justChanged = true
       if @model.get('subscribed')
         @model.topicUnsubscribe()
+        @$title.text(@messages.user_unsubscribed)
       else if !@model.get('require_initial_post')
         @model.topicSubscribe()
+        @$title.text(@messages.user_subscribed)
       else
         @justChanged = false
       @$subscriptionToggler.tooltip('close')

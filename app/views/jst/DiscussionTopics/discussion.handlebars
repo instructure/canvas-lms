@@ -1,7 +1,10 @@
 <div class="discussion-content">
   <div class="discussion-row">
     <div class="discussion-type">
-      {{#if assignment}}<i class="icon-assignment"></i>{{/if}}
+      {{#if assignment}}
+        <i class="icon-assignment" aria-hidden="true"></i>
+        <span class="screenreader-only">{{#t "graded_discussion"}}Graded discussion{{/t}}</span>
+      {{/if}}
     </div>
 
     <div class="discussion-title">
@@ -20,7 +23,16 @@
     </div>
 
     <div class="discussion-status">
-      <a href="#" class="subscription-toggler"></a>
+      <a href="#" class="subscription-toggler">
+        <span class="screenreader-only">
+          {{#if subscribed}}
+            {{#t "user_subscribed"}}You are subscribed to this topic. Click to unsubscribe.{{/t}}
+          {{else}}
+            {{#t "user_unsubscribed"}}You are not subscribed to this topic. Click to subscribe.{{/t}}
+          {{/if}}
+        </span>
+      </a>
+
       <!-- <i class="icon-unpublished"></i> -->
     </div>
 

@@ -198,6 +198,10 @@
     color: #bbb;
     width: 40px;
 
+    .subscription-toggler:focus {
+      outline: none;
+    }
+
     a[class*=icon-] {
        text-decoration: none;
     }
