@@ -277,6 +277,37 @@ describe AssignmentsApiController, :type => :integration do
         json['lock_at'].should == override.lock_at.iso8601.to_s
     end
 
+    it "returns original assignment due dates" do
+      course_with_student(:active_all => true)
+      @user = @teacher
+      @student.enrollments.map(&:destroy!)
+      @assignment = @course.assignments.create!(
+        :title => "Test Assignment",
+        :description => "public stuff",
+        :due_at => Time.zone.now + 1.days,
+        :unlock_at => Time.zone.now,
+        :lock_at => Time.zone.now + 2.days
+      )
+      @section = @course.course_sections.create! :name => "afternoon delight"
+      @course.enroll_user(@student,'StudentEnrollment',
+                          :section => @section,
+                          :enrollment_state => :active)
+      create_override_for_assignment
+      json = api_call(:get,
+                      "/api/v1/courses/#{@course.id}/assignments.json",
+                      {
+                        :controller => 'assignments_api',
+                        :action => 'index',
+                        :format => 'json',
+                        :course_id => @course.id.to_s
+                      },
+                      :override_assignment_dates => 'false'
+      ).first
+      json['due_at'].should == @assignment.due_at.iso8601.to_s
+      json['unlock_at'].should == @assignment.unlock_at.iso8601.to_s
+      json['lock_at'].should == @assignment.lock_at.iso8601.to_s
+    end
+
     describe "draft state" do
 
       before do
@@ -1106,6 +1137,33 @@ describe AssignmentsApiController, :type => :integration do
         json['due_at'].should == override.due_at.iso8601.to_s
         json['unlock_at'].should == override.unlock_at.iso8601.to_s
         json['lock_at'].should == override.lock_at.iso8601.to_s
+      end
+
+      it "returns original assignment due dates" do
+        course_with_student(:active_all => true)
+        @user = @student
+        @student.enrollments.map(&:destroy!)
+        @assignment = @course.assignments.create!(
+          :title => "Test Assignment",
+          :description => "public stuff",
+          :due_at => Time.zone.now + 1.days,
+          :unlock_at => Time.zone.now,
+          :lock_at => Time.zone.now + 2.days
+        )
+        @section = @course.course_sections.create! :name => "afternoon delight"
+        @course.enroll_user(@student,'StudentEnrollment',
+                            :section => @section,
+                            :enrollment_state => :active)
+        create_override_for_assignment
+        json = api_call(:get,
+                        "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}.json",
+                        { :controller => "assignments_api", :action => "show",
+                          :format => "json", :course_id => @course.id.to_s,
+                          :id => @assignment.id.to_s},
+                        {:override_assignment_dates => 'false'})
+        json['due_at'].should == @assignment.due_at.iso8601.to_s
+        json['unlock_at'].should == @assignment.unlock_at.iso8601.to_s
+        json['lock_at'].should == @assignment.lock_at.iso8601.to_s
       end
 
       it "does not fulfill requirements when description isn't returned" do
