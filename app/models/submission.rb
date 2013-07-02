@@ -593,9 +593,13 @@ class Submission < ActiveRecord::Base
 
     bulk_attachment_ids = attachment_ids_by_submission.values.flatten
 
-    attachments_by_id = Attachment.where(:id => bulk_attachment_ids)
-                        .includes(:thumbnail, :media_object)
-                        .group_by(&:id)
+    if bulk_attachment_ids.empty?
+      attachments_by_id = {}
+    else
+      attachments_by_id = Attachment.where(:id => bulk_attachment_ids)
+                          .includes(:thumbnail, :media_object)
+                          .group_by(&:id)
+    end
 
     submissions.each { |s|
       s.versioned_attachments = attachments_by_id.values_at(
