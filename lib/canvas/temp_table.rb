@@ -6,6 +6,7 @@ module Canvas
       @name = '_' + (options.delete(:name) || 'temp_table')
       @index = 'temp_primary_key'
       @transactional = options[:transactional]
+      @transactional = true if @transactional.nil?
     end
 
     def name
