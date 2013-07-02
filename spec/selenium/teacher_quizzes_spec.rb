@@ -161,6 +161,34 @@ describe "quizzes" do
       end
     end
 
+    it "should republish on save" do
+      Account.default.settings[:enable_draft] = true
+      Account.default.save!
+      get "/courses/#{@course.id}/quizzes"
+      expect_new_page_load { f(".new-quiz-link").click }
+      quiz = Quiz.last
+      expect_new_page_load do
+        click_save_settings_button
+        wait_for_ajax_requests
+      end
+      f('#quiz-publish-link').text.strip.should == 'Publish'
+      quiz.versions.length.should == 1
+      f('#quiz-publish-link').click
+      wait_for_ajax_requests
+      quiz.reload
+      quiz.versions.length.should == 2
+      get "/courses/#{@course.id}/quizzes/#{quiz.id}/edit"
+      expect_new_page_load {
+        f('#quiz-draft-state').text.strip.should == 'Published'
+        expect_new_page_load do
+          click_save_settings_button
+          wait_for_ajax_requests
+        end
+        quiz.reload
+        quiz.versions.length.should == 3
+      }
+    end
+
     it "should create a new question group" do
       get "/courses/#{@course.id}/quizzes/new"
 

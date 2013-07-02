@@ -64,7 +64,6 @@ class QuizzesController < ApplicationController
       @quiz.due_at = params[:due_at] if params[:due_at]
       @quiz.assignment_group_id = params[:assignment_group_id] if params[:assignment_group_id]
       @quiz.save!
-      add_crumb((!@quiz.quiz_title || @quiz.quiz_title.empty? ? t(:default_new_crumb, "New Quiz") : @quiz.quiz_title))
       # this is a weird check... who can create but not update???
       if authorized_action(@quiz, @current_user, :update)
         @assignment = @quiz.assignment
@@ -441,12 +440,6 @@ class QuizzesController < ApplicationController
       @quiz.transaction do
         @quiz.update_attributes!(params[:quiz])
         batch_update_assignment_overrides(@quiz,overrides) unless overrides.nil?
-        if params[:activate]
-          @quiz.generate_quiz_data
-          @quiz.published_at = Time.now
-          @quiz.workflow_state = 'available'
-          @quiz.save!
-        end
       end
       @quiz.did_edit if @quiz.created?
       @quiz.reload
@@ -483,7 +476,7 @@ class QuizzesController < ApplicationController
       respond_to do |format|
         @quiz.transaction do
           overrides = delete_override_params
-          if params[:activate]
+          if !@domain_root_account.enable_draft? && params[:activate]
             @quiz.with_versioning(true) do
               @quiz.generate_quiz_data
               @quiz.workflow_state = 'available'
@@ -491,7 +484,6 @@ class QuizzesController < ApplicationController
               @quiz.save!
             end
           end
-
           notify_of_update = value_to_boolean(params[:quiz][:notify_of_update])
           params[:quiz][:notify_of_update] = false
 
@@ -501,12 +493,18 @@ class QuizzesController < ApplicationController
             old_assignment.id = @quiz.assignment.id
           end
 
-          @quiz.with_versioning(false) do
+          auto_publish = @domain_root_account.enable_draft? && @quiz.published?
+          @quiz.with_versioning(auto_publish) do
             # using attributes= here so we don't need to make an extra
             # database call to get the times right after save!
             @quiz.attributes = params[:quiz]
             @quiz.infer_times
             @quiz.content_being_saved_by(@current_user)
+            if auto_publish
+              @quiz.generate_quiz_data
+              @quiz.workflow_state = 'available'
+              @quiz.published_at = Time.now
+            end
             @quiz.save!
           end
 
