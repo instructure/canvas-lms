@@ -188,6 +188,7 @@ define([
         $(this).loadingImage();
       },
       success: function(data) {
+        $(document).triggerHandler('page_updated', data);
         $(".edit_content_link_holder").show();
         if(data.eportfolio_entry.allow_comments) {
           $("#page_comments_holder").slideDown('fast');
@@ -604,6 +605,15 @@ define([
         id: 'page_' + entry.id,
         hrefValues: ['id', 'slug']
       });
+      // update links (unable to take advantage of fillTemplateData's hrefValues for updates)
+      if(event.type == "page_updated"){
+        var page_url = $("#page_blank .page_url").attr('href');
+        var rename_page_url = $("#page_blank .rename_page_url").attr('href');
+        page_url = $.replaceTags(page_url, 'slug', entry.slug);
+        rename_page_url = $.replaceTags(page_url, 'id', entry.id);
+        $page.find(".page_url").attr('href', page_url);
+        $page.find(".rename_page_url").attr('href', rename_page_url);
+      }
       var $entry = $("#structure_entry_" + entry.id);
       if($entry.length === 0) {
         $entry = $("#structure_entry_blank").clone(true).removeAttr('id');
@@ -613,6 +623,13 @@ define([
         id: 'structure_entry_' + entry.id,
         data: entry
       });
+      var $activePage = $("#eportfolio_entry_" + entry.id);
+      if($activePage.length) {
+        $activePage.fillTemplateData({
+          id: 'eportfolio_entry_' + entry.id,
+          data: entry
+        });
+      }
       countObjects('page');
     });
     $(".manage_pages_link,#section_pages .done_editing_button").click(function(event) {
