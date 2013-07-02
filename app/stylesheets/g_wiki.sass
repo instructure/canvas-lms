@@ -20,7 +20,6 @@ $shadow: 0 1px 0 rgba(0,0,0,0.1)
   #breadcrumbs
     :border-bottom 1px solid $border-color
   .toolbar-buttons
-    :position relative
     :padding 1em
     :border-bottom 1px solid $border-color
     :box-shadow $shadow
@@ -30,6 +29,8 @@ $shadow: 0 1px 0 rgba(0,0,0,0.1)
       :float right
 
 .pages.index
+  .toolbar-buttons
+    :position relative
   .index-content
     :background $index-background
     :padding 0 1em 1em
@@ -125,6 +126,44 @@ $shadow: 0 1px 0 rgba(0,0,0,0.1)
     .page-title
       :font-weight bold
       :margin-top 0
+
+.pages.edit
+  .form-actions
+    :padding-left 1em
+    
+  .toolbar-buttons
+    .published
+      :color $published-text-color
+    .unpublished
+      :color $unpublished-text-color
+
+  .edit-form
+    :margin 0
+
+    .edit-content
+      :padding 1em
+
+      .edit-header
+        :position relative
+        :margin-bottom 1em
+
+      .switch_views
+        :right 5px
+        :bottom 0px
+        :position absolute
+
+      .body
+        :width 98.5%
+
+      .mceLayout
+        :margin 0
+
+      .options
+        :margin-top 1em
+
+    .form-actions
+      :margin-top 0
+      :margin-bottom 0
 
 #wiki_show_view_main
   :overflow auto

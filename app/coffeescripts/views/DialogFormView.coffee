@@ -121,7 +121,7 @@ define [
     ##
     # @api private
     attachTrigger: ->
-      @$trigger.on 'click.dialogFormView', preventDefault(@toggle)
+      @$trigger?.on 'click.dialogFormView', preventDefault(@toggle)
 
     ##
     # @api private
@@ -141,11 +141,11 @@ define [
     # @api private
     getDialogTitle: ->
       @options.title or
-      @$trigger.attr('title') or
+      @$trigger?.attr('title') or
       @getAriaTitle()
 
     getAriaTitle: ->
-      ariaID = @$trigger.attr 'aria-describedby'
+      ariaID = @$trigger?.attr 'aria-describedby'
       $("##{ariaID}").text()
 
     ##

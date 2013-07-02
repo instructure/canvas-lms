@@ -9,11 +9,12 @@ define [
     resourceName: 'pages'
 
     @mixin DefaultUrlMixin
-    url: -> "#{@_defaultUrl()}/#{@get('id')}"
+    url: -> "#{@_defaultUrl()}/#{@get('url')}"
 
-    initialize: ->
+    initialize: (attributes, options) ->
       super
       @contextAssetString = @options?.contextAssetString
+      [@contextName, @contextId] = splitAssetString(@contextAssetString) if @contextAssetString
       @set('id', @get('url')) if @get('url') && !@get('id')
 
     # Flatten the nested data structure required by the api (see @publish and @unpublish)
@@ -29,6 +30,10 @@ define [
     # Specifically, the id is removed as the only reason for it's presense is to make Backbone happy
     toJSON: ->
       _.omit super, 'id'
+
+    # Returns a json representation suitable for presenting
+    present: ->
+      _.extend _.omit(@toJSON(), 'id'), contextName: @contextName, contextId: @contextId
 
     # Uses the api to perform a publish on the page
     publish: ->

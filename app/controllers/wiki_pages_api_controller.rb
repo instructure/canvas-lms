@@ -275,7 +275,7 @@ class WikiPagesApiController < ApplicationController
       
       roles = page_params[:editing_roles]
       if roles.present?
-        page_params[:editing_roles] = roles.split(',').map(&:strip).reject{|role| !%w(teachers students public).include?(role)}.join(',')
+        page_params[:editing_roles] = roles.split(',').map(&:strip).reject{|role| !%w(teachers students members public).include?(role)}.join(',')
       end
     else
       # editing_roles only allow changing content, not title or attributes
