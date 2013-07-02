@@ -1,0 +1,275 @@
+@import 'environment';
+
+/* @styleguide Item Groups
+
+Item groups come either `item-group` or `item-group-condensed` styles.
+The `item-group` style is for draggable tiems and `item-group-condensed`
+is for items that are not draggable.
+
+The outer `item-group-container` div is optional, and adds a background
+color with a dashed line between groups.
+
+```html
+<div class="item-group-container">
+
+  <div class="item-group">
+    <div class="ig-header">
+      <i class="icon-mini-arrow-right"></i> Item Group Header
+    </div>
+    <ul class="ig-list">
+      <li>
+        <div class="ig-row">
+          <a href="#" class="ig-title ellipses">
+            <i class="icon-assignment"></i> Some Assignment
+          </a>
+          <div class="ig-details row-fluid">
+            <div class="span4 ellipses"><b>Due</b> Nov 4, 2012</div>
+            <div class="span4 ellipses"><b>Available</b> Nov 1</div>
+            <div class="span4 ellipses">10 pts</div>
+          </div>
+          <div class="ig-admin">
+            <a class="ig-publish-btn">
+              <i class="icon-unpublished"></i>
+              <i class="icon-publish"></i>
+            </a>
+
+            <a class="al-trigger">
+              <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
+            </a>
+            <ul class="al-options">
+              <li><a href="#">Edit</a></li>
+              <li><a href="#">Delete</a></li>
+            </ul>
+          </div>
+        </div>
+      </li>
+
+      <li>
+        <div class="ig-row ig-published ig-indent1">
+          <a href="#" class="ig-title ellipses">
+            <i class="icon-assignment"></i> Some Assignment
+          </a>
+          <div class="ig-details row-fluid">
+            <div class="span4 ellipses"><b>Due</b> Nov 4, 2012</div>
+            <div class="span4 ellipses"><b>Available</b> Nov 1</div>
+            <div class="span4 ellipses">10 pts</div>
+          </div>
+          <div class="ig-admin">
+            <a class="ig-publish-btn">
+              <i class="icon-unpublished"></i>
+              <i class="icon-publish"></i>
+            </a>
+            <a class="al-trigger">
+              <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
+            </a>
+            <ul class="al-options">
+              <li><a href="#">Edit</a></li>
+              <li><a href="#">Delete</a></li>
+            </ul>
+          </div>
+        </div>
+      </li>
+
+      <li>
+        <div class="ig-text">
+          Greek Civilization Essay
+        </div>
+      </li>
+
+      <li>
+        <div class="ig-row">
+          <a href="#" class="ig-title ellipses">
+            <i class="icon-assignment"></i> Some Assignment
+          </a>
+          <div class="ig-details row-fluid">
+            <div class="span4 ellipses"><b>Due</b> Nov 4, 2012</div>
+            <div class="span4 ellipses"><b>Available</b> Nov 1</div>
+            <div class="span4 ellipses">10 pts</div>
+          </div>
+          <div class="ig-admin">
+            <a class="ig-publish-btn">
+              <i class="icon-unpublished"></i>
+              <i class="icon-publish"></i>
+            </a>
+            <a class="al-trigger">
+              <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
+            </a>
+            <ul class="al-options">
+              <li><a href="#">Edit</a></li>
+              <li><a href="#">Delete</a></li>
+            </ul>
+          </div>
+        </div>
+      </li>
+
+
+    </ul>
+  </div>
+
+</div>
+```
+
+*/
+
+.item-group-container {
+  background-color: $wellBackground;
+
+  .item-group {
+    border-bottom: 1px dashed #c2c8d0;
+    padding: 15px;
+  }
+  .item-group:last-child {
+    border-bottom: 1px solid #b6babf;
+  }
+}
+
+.item-group {
+  padding: 9px;
+}
+
+.ig-header, .ig-text {
+  font-size: 15px;
+  color: #3d454c;
+  text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.5);
+  padding-left: 30px;
+}
+
+.ig-text {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.ig-header {
+  font-weight: bold;
+
+  .icon-mini-arrow-right {
+    position: relative;
+    top: -1px;
+  }
+}
+
+.ig-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  margin-top: 10px;
+}
+
+.ig-list li {
+  margin: 4px 0;
+  border-radius: 3px;
+}
+
+.ig-list .ig-row {
+  position: relative;
+  display: block;
+  height: 40px;
+  background: #fff;
+  border: 1px solid #c1c7cf;
+  border-radius: 3px;
+  box-shadow: 0 1px 0 #dde0e4;
+  color: #696969;
+
+  a.ig-title {
+    color: #696969;
+    text-decoration: none;
+  }
+
+  .ellipses {
+    color: #7c7c7c;
+  }
+
+  &:hover {
+    background-color: #eef7ff;
+  }
+
+  &:before {
+    position: relative;
+    top: -2px;
+  }
+
+  &.ig-published .ig-title {
+    color: #318627;
+  }
+}
+
+.ig-publish-btn {
+  cursor: pointer;
+  white-space: nowrap;
+  margin-right: 22px;
+
+  i[class*=icon-]:before,
+  i[class^=icon-]:before {
+    font-size: 18px;
+  }
+
+  &:hover {
+    text-decoration: none;
+  }
+
+  .icon-unpublished {
+    color: #b4b8bb;
+  }
+  .icon-publish {
+    color: #2f8526;
+    display: none;
+  }
+}
+.ig-published {
+  .icon-unpublished {
+    display: none;
+  }
+  .icon-publish {
+    display: inline-block;
+  }
+}
+
+.ig-title {
+  position: absolute;
+  left: 30px;
+  right: 430px;
+  overflow: hidden;
+  white-space: nowrap;
+  font-weight: bold;
+  top: 9px;
+}
+
+.ig-details {
+  position: absolute;
+  right: 30px;
+  font-size: 11px;
+  width: 370px;
+  top: 10px;
+}
+
+.ig-admin {
+  position: absolute;
+  right: 3px;
+  top: 10px;
+}
+.ig-admin a {
+  color: #4d4d4d;
+}
+
+.ig-details [class^=span] {
+  white-space: nowrap;
+}
+
+[class^=ig-indent] {
+  // anything > 2 is still 60px;
+  margin-left: 60px;
+}
+
+.ig-indent1 {
+  margin-left: 20px;
+}
+
+.ig-indent2 {
+  margin-left: 40px;
+}
+
+.ig-text {
+  color: #3d454c;
+  font-size: 15px;
+}
+

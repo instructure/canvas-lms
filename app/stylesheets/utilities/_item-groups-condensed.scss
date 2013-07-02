@@ -1,0 +1,172 @@
+@import 'environment';
+
+/* @styleguide Item Groups Condensed
+
+Item groups come either `item-group` or `item-group-condensed` styles.
+The `item-group` style is for draggable items and `item-group-condensed`
+is for items that are not draggable.
+
+The outer `item-group-container` div is optional, and adds a background
+color with a dashed line between groups.
+
+```html
+<div class="item-group-container">
+
+  <div class="item-group item-group-condensed">
+    <div class="ig-header">
+      <i class="icon-mini-arrow-right"></i> Item Group Header
+    </div>
+    <ul class="ig-list">
+      <li>
+        <div class="ig-row">
+          <a href="#" class="ig-title ellipses">
+            <i class="icon-assignment"></i> Some Assignment
+          </a>
+          <div class="ig-details row-fluid">
+            <div class="span4 ellipses"><b>Due</b> Nov 4, 2012</div>
+            <div class="span4 ellipses"><b>Available</b> Nov 1</div>
+            <div class="span4 ellipses">10 pts</div>
+          </div>
+          <div class="ig-admin">
+            <a class="ig-publish-btn">
+              <i class="icon-unpublished"></i>
+              <i class="icon-publish"></i>
+            </a>
+
+            <a class="al-trigger">
+              <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
+            </a>
+            <ul class="al-options">
+              <li><a href="#">Edit</a></li>
+              <li><a href="#">Delete</a></li>
+            </ul>
+          </div>
+        </div>
+      </li>
+
+      <li>
+        <div class="ig-row ig-published">
+          <a href="#" class="ig-title ellipses">
+            <i class="icon-assignment"></i> Some Assignment
+          </a>
+          <div class="ig-details row-fluid">
+            <div class="span4 ellipses"><b>Due</b> Nov 4, 2012</div>
+            <div class="span4 ellipses"><b>Available</b> Nov 1</div>
+            <div class="span4 ellipses">10 pts</div>
+          </div>
+          <div class="ig-admin">
+            <a class="ig-publish-btn">
+              <i class="icon-unpublished"></i>
+              <i class="icon-publish"></i>
+            </a>
+
+            <a class="al-trigger">
+              <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
+            </a>
+            <ul class="al-options">
+              <li><a href="#">Edit</a></li>
+              <li><a href="#">Delete</a></li>
+            </ul>
+          </div>
+        </div>
+      </li>
+
+      <li>
+        <div class="ig-row">
+          <a href="#" class="ig-title ellipses">
+            <i class="icon-assignment"></i> Some Assignment
+          </a>
+          <div class="ig-details row-fluid">
+            <div class="span4 ellipses"><b>Due</b> Nov 4, 2012</div>
+            <div class="span4 ellipses"><b>Available</b> Nov 1</div>
+            <div class="span4 ellipses">10 pts</div>
+          </div>
+          <div class="ig-admin">
+            <a class="ig-publish-btn">
+              <i class="icon-unpublished"></i>
+              <i class="icon-publish"></i>
+            </a>
+
+            <a class="al-trigger">
+              <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
+            </a>
+            <ul class="al-options">
+              <li><a href="#">Edit</a></li>
+              <li><a href="#">Delete</a></li>
+            </ul>
+          </div>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <div class="item-group">
+    <div class="ig-header">
+      <i class="icon-mini-arrow-right"></i> Item Group Header
+    </div>
+    <ul class="ig-list">
+    <li>
+      <div class="ig-row">
+        <a href="#" class="ig-title ellipses">
+          <i class="icon-assignment"></i> Some Assignment
+        </a>
+        <div class="ig-details row-fluid">
+          <div class="span4 ellipses"><b>Due</b> Nov 4, 2012</div>
+          <div class="span4 ellipses"><b>Available</b> Nov 1</div>
+          <div class="span4 ellipses">10 pts</div>
+        </div>
+        <div class="ig-admin">
+          <a class="ig-publish-btn">
+            <i class="icon-unpublished"></i>
+            <i class="icon-publish"></i>
+          </a>
+
+          <a class="al-trigger">
+            <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
+          </a>
+          <ul class="al-options">
+            <li><a href="#">Edit</a></li>
+            <li><a href="#">Delete</a></li>
+          </ul>
+        </div>
+      </div>
+    </li>
+    </ul>
+  </div>
+
+</div>
+```
+
+*/
+
+.item-group-condensed {
+  .ig-header {
+    padding-left: 15px;
+  }
+  .ig-title {
+    left: 15px;
+  }
+
+  .ig-list li {
+    margin: 0;
+  }
+  .ig-row {
+    border-top-width: 0;
+    border-bottom: 1px solid #e1e3e4;
+    border-radius: 0;
+    background: #fff;
+  }
+  .ig-list li:first-child {
+    margin-top: 5px;
+  }
+  .ig-list li:first-child .ig-row {
+    border-top: 1px solid #c1c7cf;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+  }
+  .ig-list li:last-child .ig-row {
+    border-bottom: 1px solid #c1c7cf;
+    border-bottom-left-radius: 3px;
+    border-bottom-right-radius: 3px;
+  }
+}
