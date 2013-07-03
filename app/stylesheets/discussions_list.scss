@@ -131,7 +131,13 @@
   }
 
   .element_toggler {
+    color: #3d454c;
     cursor: pointer;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: none;
+    }
   }
 
   .loader {
