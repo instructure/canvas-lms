@@ -394,6 +394,7 @@ describe "discussions" do
           topic.subscribe(@user)
           get(url)
           wait_for_ajaximations
+          driver.execute_script(%{$('.subscription-toggler').trigger('mouseleave')})
           f('.icon-discussion-check').should be_displayed
           f('.subscription-toggler').click
           wait_for_ajaximations
@@ -858,6 +859,7 @@ describe "discussions" do
       @topic.subscribe(@student)
       get "/courses/#{@course.id}/discussion_topics"
       wait_for_ajaximations
+      driver.execute_script(%{$('.subscription-toggler').trigger('mouseleave')})
       f('.icon-discussion-check').should be_displayed
       driver.execute_script(%{$('.subscription-toggler').trigger('mouseenter')})
       f('.icon-discussion-check').should be_nil
