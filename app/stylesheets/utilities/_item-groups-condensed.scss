@@ -12,7 +12,7 @@ color with a dashed line between groups.
 ```html
 <div class="item-group-container">
 
-  <div class="item-group item-group-condensed">
+  <div class="item-group-condensed">
     <div class="ig-header">
       <i class="icon-mini-arrow-right"></i> Item Group Header
     </div>
@@ -100,7 +100,7 @@ color with a dashed line between groups.
     </ul>
   </div>
 
-  <div class="item-group">
+  <div class="item-group-condensed">
     <div class="ig-header">
       <i class="icon-mini-arrow-right"></i> Item Group Header
     </div>
@@ -139,7 +139,22 @@ color with a dashed line between groups.
 
 */
 
+.item-group-container {
+  background-color: $wellBackground;
+
+  .item-group-condensed {
+    border-bottom: 1px dashed #c2c8d0;
+    padding: 15px;
+  }
+  .item-group-condensed:last-child {
+    border-bottom: 1px solid #b6babf;
+  }
+}
+
+
 .item-group-condensed {
+  padding: 9px;
+
   .ig-header {
     padding-left: 15px;
   }
