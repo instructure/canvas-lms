@@ -18,12 +18,40 @@ unless ARGV.any? { |a| a =~ /\Agems/ }
       Rake::Task['parallel:nonseleniumparallel'].invoke(args[:count])
     end
 
-    task :selenium, :count do |t, args|
+    task :selenium, :count, :build_section do |t, args|
       require "parallelized_specs"
-      count = args[:count]
+
+      #used to split selenium builds when :build_section is set split it in two.
       test_files = FileList['spec/selenium/**/*_spec.rb'] + FileList['vendor/plugins/*/spec_canvas/selenium/*_spec.rb']
+      test_files = test_files.to_a.sort_by! {|file| File.size(file)}
+
+      test_files_a_sum = 0
+      test_files_b_sum = 0
+      test_files_a = []
+      test_files_b = []
+      test_files.each do |file|
+        if (test_files_a_sum < test_files_b_sum)
+          test_files_a << file
+          test_files_a_sum += File.size(file)
+        else
+          test_files_b << file
+          test_files_b_sum += File.size(file)
+        end
+      end
+
+      case args[:build_section]
+        when 1
+          #runs upper half of selenium tests
+          test_files = test_files_a
+        when 2
+          #runs lower half of selenium tests
+          test_files = test_files_b
+        else
+          test_files = test_files_a + test_files_b
+      end
+
       test_files.map! { |f| "#{Rails.root}/#{f}" }
-      Rake::Task['parallel:spec'].invoke(count, '', '', test_files.join(' '))
+      Rake::Task['parallel:spec'].invoke(args[:count], '', '', test_files.join(' '))
     end
 
     task :pattern, :count, :file_pattern do |t, args|
