@@ -447,7 +447,7 @@ ja:
             header: "開始日:"
     default_account_quotas_not_updated: "デフォルトのアカウント クォータは更新されませんでした"
     default_account_quotas_updated: "デフォルトのアカウント クォータが更新されました"
-    find_not_authorized: "その %{type} にはアクセスする権限がありません"
+    find_not_authorized: "その %{type} にアクセスする権限がありません"
     find_not_found: "その ID の %{type} は見つかりませんでした"
     google_doc_accounts_csv_description: 
       account_reports: 
@@ -1043,10 +1043,10 @@ ja:
       rss_feed: "RSS フィード"
       search_title_body_or_author: タイトル、本文、または作成者を検索する
       suggestions: "提案:"
-      there_are_no_announcements_show: 残念ながら、アナウンスはありません。
-      try_different_more_general_or_fewer_keywords: 異なるキーワード、さらに一般的なキーワード、またはさらに少ないキーワードで試してください。
+      there_are_no_announcements_show: 表示するアナウンスはありません
+      try_different_more_general_or_fewer_keywords: 別のキーワードや、より一般的なキーワードを指定するか、キーワードの数を減らして試してください。
       try_disabling_the_unread_filters: "\"未読\" フィルタを無効にしてみてください。"
-      unread: 未読です
+      unread: 未読
       your_search_did_not_match_any_announcements: 検索に一致するアナウンスはありませんでした。
     podcast_feed_description_course: "\"%{course}\" コースのアナウンス内にリンク元がある、または埋め込まれているメディア ファイルはすべて、このフィードに表示されます。"
     podcast_feed_description_group: "\"%{group}\" グループのアナウンス内にリンク元がある、または埋め込まれているメディア ファイルはすべて、このフィードに表示されます。"
@@ -2892,10 +2892,10 @@ ja:
         search_label: コースの検索
         select_default: コースの選択
       date_shift: 
-        beginning_change_to: 変更後日付
+        beginning_change_to: 変更後
         beginning_date: 開始日
         checkbox_label: イベントと期日を調整
-        ending_change_to: 変更後日付
+        ending_change_to: 変更後
         ending_date: 終了日
         substitution: 置き換え
       day_substitution: 
@@ -2903,7 +2903,7 @@ ja:
         to_happen_on: 移動先
       folder_picker: 
         default_select_folder: フォルダの選択
-        upload_to: アプロード先
+        upload_to: アップロード先
       overwrite_assessment_content: 
         overwrite_assessment_content: "アセスメント コンテンツを、一致する ID で上書きします"
       question_bank: 
@@ -4667,7 +4667,7 @@ ja:
       topic: トピック
       topic_podcast_feed_link: "トピックのポッドキャスト フィード"
       topic_subscribe: 定期購読
-      topic_subscribe_tooltip: このトピックにコメントが投稿されたら、通知されます。
+      topic_subscribe_tooltip: このトピックにコメントが投稿されたときに通知されます。
       topic_unsubscribe: 定期購読の中止
       topic_unsubscribe_tooltip: このトピックにコメントが投稿されたときに通知を受信しません。
       unlock_topic: コメントを受け付ける
@@ -5182,7 +5182,7 @@ ja:
     delete: 削除
     dialog_title_add_app: アプリの追加
     dialog_title_edit_tool: 外部ツールの編集
-    dialog_title_rate_tool: このツールの評価
+    dialog_title_rate_tool: このツールを評価してください
     edit_view: 
       anonymous: 匿名
       by_url: "URL ごと"
@@ -5231,14 +5231,14 @@ ja:
     index_view: 
       add_new_tool: 新しいアプリの追加
       app_headder: 外部アプリ
-      external_tools_note: "アプリは、Canvas に新しい機能を追加するための簡単な方法です。アプリは、個別のコースに追加することも、アカウントのすべてのコースに追加することもできます。設定すると、コース モジュールから外部ツールにリンクして、アセスメント ツール用の課題を作成できます。"
+      external_tools_note: "アプリを利用すると、Canvas に新しい機能を簡単に追加できます。アプリは、個別のコースに追加することも、アカウントのすべてのコースに追加することもできます。アプリを設定すると、コース モジュールからアプリにリンクして、アセスメント ツール用の課題を作成できます。"
       external_tools_references: "*ここ* をクリックして Canvas との優れた連携機能を持つ LTI ツールを確認できます。*ここ* をクリックすると、LTI ツールについての Canvas コミュニティのトピックを参照できます"
       search_filter: 名前でフィルタ
       view_app_center: "アプリ センターの表示"
       view_installed_tools: インストールされたアプリの表示
-    missing_stars: スター評価を選択する必要があります
+    missing_stars: スター評価を選択してください
     rate_tool_view: 
-      rate_tool: このツールの評価
+      rate_tool: このツールを評価してください
     remove_tool: このツールを削除してもよろしいですか?
     resource_selection_configured: リソースの選択が構成されました
     save_failed: "レビューを保存できません: %{message}"
@@ -8671,7 +8671,7 @@ ja:
     course_content_display: コースの内容
     discussion_description: "コースの新しいディスカッション トピック"
     discussion_display: ディスカッション
-    discussion_post_description: 購読しているトピックの新しいディスカッションへの投稿
+    discussion_post_description: 購読中トピックのディスカッションへの新規投稿
     discussion_post_display: ディスカッションへの投稿
     due_date_description: 課題の期日が変更されました
     due_date_display: 期日
@@ -9033,7 +9033,7 @@ ja:
       domain_description: "BigBlueButton をインストールする **ホスト名** または **IP アドレス** (例: bigbluebutton.mycompany.com)"
       labels: 
         domain: ドメイン
-        recording_enabled: 会議の記録を許可します。
+        recording_enabled: 会議の録音を許可します。
         secret: シークレット
       secret_description: "これは、構成ファイル %{filename} 内にあるパラメータ %{parameter_name} です。"
     buttons: 
@@ -9605,7 +9605,7 @@ ja:
       headers: 
         loading_images: 画像を読み込んでいます...
       links: 
-        upload_new_image: 新しい画像をアップロードする
+        upload_new_image: 新しい画像をアップロード
       profile_pictures: "プロフィールとして使用する画像を選択するか、または新しい画像をアップロードしてください:"
     notification_preferences: 
       captions: 
@@ -9686,7 +9686,7 @@ ja:
       details: 
         allow_application: "%{app_name} がユーザのアカウントへのアクセスを要求しています。"
         email: "電子メール アドレスは %{email} です。"
-        login_name: "ユーザは %{user_name} としてこのアプリにログインしています。"
+        login_name: "現在、%{user_name} としてこのアプリにログインしています。"
       login: ログイン
       page_title: "アプリケーション ログイン"
       remember_auth: このサービスに関する権限を保存する
