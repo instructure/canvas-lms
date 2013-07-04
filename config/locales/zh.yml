@@ -12769,7 +12769,7 @@ zh:
       link_hidden_from_students_warning: 学生不会看到此链接
     pages_index: 
       titles: 
-        pages: "页面 - %{course}"
+        pages: "页 - %{course}"
     wiki_page_comment: 
       links: 
         delete_comment: 删除评论
