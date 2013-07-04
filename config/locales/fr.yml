@@ -247,6 +247,7 @@ fr:
   account_settings: 
     confirms: 
       delete_announcement: "Voulez-vous vraiment supprimer cette annonce ?"
+      global_announcement: "Vous devez confirmer l‘annonce globale."
       remove_account_admin: "Voulez-vous vraiment supprimer cet administrateur de compte ?"
     custom_text_blank: "[Texte personnalisé]"
     links: 
@@ -409,6 +410,7 @@ fr:
             text: "Ce rapport affiche l’état de tous les cours d’un trimestre donné. Le fichier CSV résultant contient une ligne par section de cours et indique le cours, l’état du cours, le trimestre, les dates de début et de fin et un tuteur pour la section."
           description: 
             header: Exemple
+    course_type: cours
     courses: 
       courses_crumb: Cours
       no_results_message: "Aucun résultat trouvé"
@@ -444,6 +446,8 @@ fr:
             header: "Début :"
     default_account_quotas_not_updated: "Les quotas de compte par défaut n’ont pas été mis à jour."
     default_account_quotas_updated: "Les quotas de compte ont été mis à jour."
+    find_not_authorized: "Vous n‘êtes pas autorisé à accéder à ce %{type}."
+    find_not_found: "Impossible de trouver un %{type} avec cet ID"
     google_doc_accounts_csv_description: 
       account_reports: 
         ut_austin: 
@@ -457,6 +461,7 @@ fr:
           description: 
             header: Exemple
             text: "Ce rapport indique les notes finales de tous les étudiants pour un trimestre donné. Le fichier csv résultant contient une ligne par inscription et affiche la note actuelle et finale indiquée dans le carnet de notes du cours."
+    group_type: groupe
     include_deleted_parameter: 
       account_reports: 
         default: 
@@ -502,7 +507,15 @@ fr:
             text: "Ce rapport affiche les questions, le nombre total de réponses et le nombre de réponses correctes de tous les questionnaires d’un trimestre. Le fichier CSV résultant contient une ligne par question."
     quota_integer_required: "Un entier doit être fourni."
     quota_must_be_positive: "La valeur doit être positive."
+    quota_not_updated: "Quota non actualisé"
     quota_too_large: "La valeur est trop grande."
+    quota_updated: "Quota actualisé"
+    recently_deleted_courses_csv_description: 
+      account_reports: 
+        default: 
+          recently_deleted_courses: 
+            header: Exemple
+            text: "Ce rapport indique l‘état de tous les cours pour un trimestre donné et qui ont été supprimés au cours des 30 jours précédents. Le fichier CSV résultant contient une ligne par  cours et indique l‘ID du cours, l‘ID SIS du cours, le nom abrégé du cours et les dates de début et de fin."
     retry_login: "Tenter de se reconnecter"
     root_accounts: 
       labels: 
@@ -527,10 +540,12 @@ fr:
       alert_icon_warning_option: avertissement
       alert_timespan: "de %{start_at} à %{end_at}"
       alerts_title: Alertes
+      announcement_sent_to_subset: "Envoyée à 1 / %{denominator} utilisateurs chaque mois"
       buttons: 
         add_users: "Semble correct. Ajouter ces utilisateurs"
         continue: Continuer...
         modify_users: "Revenir en arrière et modifier la liste des utilisateurs"
+      confirm_global_announcement: "Cette annonce sera visible par *tous* les utilisateurs Canvas. Confirmez que vous souhaitez la créer."
       confirm_turnitin_settings_link: "confirmer les paramètres de Turnitin"
       create_courses_description: "(Les administrateurs pourront toujours créer des cours)"
       create_courses_title: "Utilisateurs autorisés à créer des cours"
@@ -613,6 +628,15 @@ fr:
         add_admins: "Ajouter des administrateurs de compte"
         configure_report: Configurer...
         run_report: "Exécuter le rapport"
+      manual_quotas: 
+        find_button: Rechercher
+        manual_quotas_title: "Quotas réglables manuellement"
+        megabytes: mégaoctets
+        megabytes_tooltip: mégaoctets
+        select_type_courses: "ID de cours"
+        select_type_groups: "ID de groupe"
+        select_type_label: "Trouver un cours ou un groupe"
+        update_button: "Mettre à jour le quota"
       never_allow_self_enrollment_option: Jamais
       no_language_preference: "Non définie (utilise l’%{language} par défaut)"
       notifications: 
@@ -641,6 +665,7 @@ fr:
       quotas: 
         default_account_quota_title: "Quotas de compte par défaut"
         default_course_storage_quota: "Quota du cours"
+        default_group_storage_quota: "Quota du groupe"
         default_user_storage_quota: "Quota de l’utilisateur"
         megabytes: mégaoctets
         megabytes_tooltip: mégaoctets
@@ -656,10 +681,11 @@ fr:
       self_enroll_for_any_courses_option: "Pour tous les cours"
       self_enroll_for_manually_created_courses_option: "Pour les cours créés manuellement"
       settings_crumb: Paramètres
+      survey_announcement: "Ceci est une annonce pour une enquête. Elle sera envoyée à 1 / %{denominator} utilisateurs associés à des comptes activés pendant chaque mois tant qu’elle est active."
       tab_admins: Administrateurs
       tab_alerts: Alertes
       tab_announcements: Annonces
-      tab_external_tools: "Outils externes"
+      tab_external_tools: Applications
       tab_notifications: Notifications
       tab_quotas: Quotas
       tab_reports: Rapports
@@ -853,6 +879,12 @@ fr:
     test_ldap_result_ok: OK
     test_login: "Tester la connexion"
     testing: Test...
+    unpublished_courses_csv_description: 
+      account_reports: 
+        default: 
+          unpublishd_courses: 
+            header: Exemple
+            text: "Ce rapport affiche tous les cours pour un trimestre donné et qui ne sont pas publiés. Le fichier CSV résultant contient une ligne par cours et indique l‘ID du cours, l‘ID SIS du cours, le nom abrégé du cours et les dates de début et de fin."
     unrecognized_time_zone: "'%{timezone}' n’est pas un fuseau horaire reconnu."
     unused_courses_csv_description: 
       account_reports: 
@@ -1001,6 +1033,21 @@ fr:
       feed_title_group: "Flux Atom d’annonces de groupe"
       podcast_title_course: "Flux podcast d’annonces de cours"
       podcast_title_group: "Flux podcast d’annonces de groupe"
+    index_view: 
+      delete: Supprimer
+      loading: Chargement...
+      lock_for_comments: "Verrouiller les commentaires"
+      make_an_announcement: "Passer une annonce"
+      make_an_announcement_caps: "Passer une annonce"
+      make_sure_all_search_terms_are_spelled_correctly: "Vérifiez que tous les termes recherchés sont bien orthographiés."
+      rss_feed: "Flux RSS"
+      search_title_body_or_author: "Rechercher un titre, bloc de texte ou auteur"
+      suggestions: "Suggestions :"
+      there_are_no_announcements_show: "Aucune annonce à afficher"
+      try_different_more_general_or_fewer_keywords: "Essayez avec des mots-clés différents, plus généraux ou moins nombreux."
+      try_disabling_the_unread_filters: "Essayez de désactiver le filtre « Non lu(s) »."
+      unread: "Non lues"
+      your_search_did_not_match_any_announcements: "Votre recherche ne correspond à aucune annonce."
     podcast_feed_description_course: "Tout fichier multimédia lié ou intégré à des annonces dans le cours \"%{course}\" apparaîtra dans ce flux."
     podcast_feed_description_group: "Tout fichier multimédia lié ou intégré à des annonces dans le groupe \"%{group}\" apparaîtra dans ce flux."
     podcast_feed_name: "Flux podcast d’annonces pour %{course}"
@@ -1138,6 +1185,9 @@ fr:
       created: "Le groupe de tâches a été créé."
       deleted: "Ce groupe a été supprimé"
       updated: "Le groupe de tâches a été mis à jour."
+  assignment_groups_api: 
+    errors: 
+      frozen_assignments_error: "Vous ne pouvez pas supprimer un groupe contenant une activité verrouillée."
   assignment_muter: 
     mute_assignment: "Tâche silencieuse"
     muting_assignment: "Tâche en mode silencieux..."
@@ -1204,14 +1254,8 @@ fr:
       assignment_unlocked_from: "Cette tâche est verrouillée jusqu’au *%{unlock_at}*"
       assignment_unlocked_from_to: "Cette tâche est déverrouillée seulement du *%{unlock_at}* au *%{lock_at}*"
     assignment_sidebar: 
-      buttons: 
-        publish: "Publier cette tâche"
       links: 
         submit: "Envoyer une tâche"
-      titles: 
-        unpublished: "Non publié"
-      warnings: 
-        unpublished: "Vous devez publier les tâches dont vous avez terminé la notation afin que les étudiants puissent considérer leurs notes comme étant \"officielles\"."
     assignments_content: 
       buttons: 
         delete_group: "Supprimer le groupe"
@@ -2385,7 +2429,8 @@ fr:
   conferences: 
     concluded_conference: 
       delete: Supprimer
-      no_recording: Pas&nbsp;d’enregistrement
+      no_recording: "Pas d’enregistrement"
+      preparing_video: "Préparation de la vidéo"
       view: Afficher
     confirm: 
       close: |-
@@ -2541,10 +2586,10 @@ fr:
       descriptions: 
         copy_succeeded: "Le contenu du cours a bien été importé ! Vous pouvez consulter les résultats de l’importation ci-dessous.⏎ ⏎ Si vous n’êtes pas satisfait de la date d’une tâche ou d’un événement, vous pouvez facilement⏎ [la modifier par glisser-déplacer sur le calendrier de cours](%{url})."
       labels: 
+        apps: "Applications pour %{course}"
         assignment: "Tâches pour %{course}"
         discussions: "Discussions pour %{course}"
         events: "Événements pour %{course}"
-        external_tools: "Outils externes pour %{course}"
         files: "Fichiers pour %{course}"
         modules: "Modules pour %{course}"
         quizzes: "Quizz pour %{course}"
@@ -2557,13 +2602,13 @@ fr:
         what_it_looks_like_now: "Contenu actuel de %{course}"
     copy_course_item_selection: 
       labels: 
+        apps: "Applications pour %{course}"
         assignment: "Tâches pour %{course}"
         copy: "comprend des entrées de l’ancien cours"
         copy_settings: "Paramètres de %{course}"
         copy_syllabus: "Description du syllabus de %{course}"
         discussions: "Discussions pour %{course}"
         events: "Événements pour %{course}"
-        external_tools: "Outils externes pour %{course}"
         files: "Fichiers pour %{course}"
         learning_outcomes: "Résultats d’apprentissage pour %{course}"
         modules: "Modules pour %{course}"
@@ -2806,30 +2851,55 @@ fr:
     unknown: Inconnu
   content_migrations: 
     bad_migration_type: "migration_type non valide"
+    canvas_export: 
+      options: Options
+    common_cartridge: 
+      options: Options
+    content_checkbox: 
+      select_all: "Sélectionner tout"
+      select_non: "Ne rien sélectionner"
+    copy_course: 
+      options: Options
     migration_converter: 
-      default_option: "Choisir le système à partir duquel effectuer la migration"
+      cancel_migration: Annuler
+      default_option: "Sélectionner un élément"
       header: "Importer du contenu"
-      import_from_label: "Importer du contenu depuis"
+      import_from_label: "Type de contenu"
+      import_migration: Importer
       subtext: "Cela vous permettra d’importer dans Canvas du contenu que vous avez peut-être déjà, par exemple des fichiers, des activités et des questionnaires, à partir d’autres systèmes de gestion de cours."
+    moodle_zip: 
+      options: Options
     must_upload_file: "Le chargement du fichier est requis."
     progressing_content_migration: 
+      issues_text: incidents
       select_content: "Sélectionner du contenu"
-      show_issues: "Afficher les incidents"
     progressing_content_migration_collection: 
       no_items: "Aucune tâche n’a été mise en file d’attente."
       progress_label: "Tâches actuelles"
-    progressing_issues: 
-      no_items: "Aucun élément"
+    qti_zip: 
+      options: Options
     select_content: 
       select_content_btn: "Sélectionner du contenu"
-      test_checkbox: "Case de test"
     subviews: 
+      choose_migration_file: 
+        migration_text: Source
       course_find_select: 
         or: ou
         search_label: "Chercher un cours"
         select_default: "Sélectionner un cours"
       date_shift: 
+        beginning_change_to: "remplacer par"
+        beginning_date: "Date de début"
         checkbox_label: "Adapter les dates d’échéance et d’événements"
+        ending_change_to: "remplacer par"
+        ending_date: "Date de fin"
+        substitution: Substitution
+      day_substitution: 
+        move_from: "Déplacer de"
+        to_happen_on: à
+      folder_picker: 
+        default_select_folder: "Sélectionner le dossier"
+        upload_to: "Télécharger vers"
       overwrite_assessment_content: 
         overwrite_assessment_content: "Remplacer le contenu de l’évaluation par les ID correspondants"
       question_bank: 
@@ -3757,7 +3827,8 @@ fr:
         enrollment_fee: "Frais d’inscription"
         format: Format
         image: Image
-        path: Chemin
+        path: "Emplacement du cours"
+        portal_path: "Emplacement du portail"
         position: Position
         related_id: "Identifiant du lien"
         self_enrollment: Inscription
@@ -3770,6 +3841,7 @@ fr:
       logo: "Logo (URL)"
       page_title: "Profil du cours"
       path_syntax: "lettres minuscules, chiffres et tirets"
+      portal_path_syntax: "lettres minuscules, chiffres, tirets et barres obliques (ex. harvard/chimie)"
       private: Masqué
       public: "Répertorié sur canvas.net"
       save_changes: "Enregistrer les modifications"
@@ -4019,7 +4091,7 @@ fr:
         grade_publishing: "Publication des notes"
         navigation: Navigation
         sections: Sections
-        tools: "Outils externes"
+        tools: Applications
         users: Utilisateurs
       titles: 
         edit_navigation: "Modifier la barre de navigation des cours"
@@ -4259,6 +4331,7 @@ fr:
     labels: 
       assign_blanks: "Attribuer un zéro aux tâches non envoyées"
     out_of_points_possible: "sur %{assignment.points_possible}"
+    this_is_permanent: "La courbe de notation ne peut pas être annulée. Les historiques restent disponibles, mais l’action relative à la courbe est irréversible."
   d2l_file_description: "Format .zip d’exportation D2L"
   d2l_name: "Convertisseur D2L"
   dashboard: 
@@ -4459,7 +4532,20 @@ fr:
     create_new_crumb: "Créer nouveau"
     default_discussion_title: "Sans titre"
     deleted_topic_notice: "Ce sujet a été supprimé"
+    discussion: 
+      delete: Supprimer
+      due: Échéance
+      lock: Verrouiller
+      pin: Épingler
+      unlock: Déverrouiller
+      unpin: Détacher
+      user_subscribed: "Vous êtes inscrit à ce sujet"
+      user_unsubscribed: "Vous n’êtes pas inscrit à ce sujet"
     discussion_feed_title: "Flux de discussion %{title}"
+    discussion_list: 
+      no_pinned_discussions: "Vous n’avez actuellement aucune discussion épinglée"
+      pinned_instructions: "Faites glisser une discussion ici pour l’épingler en haut de la page de discussion des étudiants."
+      there_are_no_discussions_show: "Pas de discussions à afficher."
     discussions_settings_view: 
       allow_student_discussion_editing: "Modifier et supprimer leurs propres contributions"
       allow_student_topics: "Créer des sujets de discussion"
@@ -4513,21 +4599,16 @@ fr:
       edit_settings: "Modifier les paramètres des discussions"
       loading: "Chargement en cours..."
       lock_for_comments: "Verrouiller les commentaires"
-      make_an_announcement: "Passer une annonce"
-      make_an_announcement_caps: "Passer une annonce"
       make_sure_all_search_terms_are_spelled_correctly: "Vérifiez que tous les termes recherchés sont bien orthographiés."
-      new_discussion: "Commencer une discussion"
+      new_discussion: "*Commencer une* discussion"
       rss_feed: "Flux RSS"
       search_title_body_or_author: "Rechercher un titre, corps de texte ou auteur"
       start_one_now: "En lancer un"
       suggestions: "Suggestions :"
-      there_are_no_announcements_show: "Aucune annonce à afficher"
       there_are_no_discussion_topics_to_show: "Aucun sujet de discussion à afficher"
       try_different_more_general_or_fewer_keywords: "Essayez avec des mots-clés différents, plus généraux ou moins nombreux."
-      try_disabling_the_unread_filters: "Essayez de désactiver le filtre « Non lu(s) »."
       try_disabling_the_unread_or_assignments_filters: "Essayez de désactiver les filtres « Non lu(s) » ou « Tâches »."
       unread: "Non lus"
-      your_search_did_not_match_any_announcements: "Votre recherche ne correspond à aucune annonce."
       your_search_did_not_match_any_discussion_topics: "Votre recherche ne correspond à aucun sujet de discussion."
     new_and_total_badge: 
       reply_count_tooltip: 
@@ -4584,6 +4665,10 @@ fr:
       topic: Sujet
       topic_locked: "Les utilisateurs ne pourront pas voir ce sujet avant le *%{date}*."
       topic_podcast_feed_link: "Flux podcast du sujet"
+      topic_subscribe: S’inscrire
+      topic_subscribe_tooltip: "Vous serez averti à chaque nouvelle publication de commentaires à ce sujet."
+      topic_unsubscribe: "Se désinscrire"
+      topic_unsubscribe_tooltip: "Ne plus recevoir de notifications lorsque des commentaires sont publiés à ce sujet"
       unlock_topic: "Ouvrir aux commentaires"
       unread: "Non lus"
     sub_entry: 
@@ -4605,6 +4690,8 @@ fr:
       my_settings: "Mes paramètres"
   discussions: 
     are_your_sure_delete: "Voulez-vous vraiment supprimer cette entrée ?"
+    confirm_delete_discussion_topic: "Voulez-vous vraiment supprimer ce sujet de discussion ?"
+    delete: Supprimer
     edit_settings: "Modifier les paramètres des discussions"
     entry_collection_view: 
       add_reply_to_topic: "Ajouter une réponse au sujet"
@@ -4621,6 +4708,8 @@ fr:
     entry_stats: 
       show_more: "Afficher plus"
     hide_due_dates: "Masquer les dates d’échéance"
+    lock: Verrouiller
+    locked_discussions: "Discussions verrouillées"
     mark_as_read: "Marquer comme lu"
     mark_as_unread: "Marquer comme non lu"
     no_content: "Pas de contenu"
@@ -4630,8 +4719,11 @@ fr:
       try_different_more_general_or_fewer_keywords: "Essayez avec des mots-clés différents, plus généraux ou moins nombreux."
       try_disabling_the_unread_filter: "Essayez de désactiver le filtre « Non lu(s) »."
       your_search_did_not_match_any_entries: "Votre recherche ne correspond à aucune entrée."
+    open_discussions: "Discussions ouvertes"
     participant: 
       anonymous_user: Anonyme
+    pin: Épingler
+    pinned_discussions: "Discussions épinglées"
     reply: 
       error_saving_reply: "*Une erreur s’est produite*. Veuillez renvoyer votre réponse ultérieurement."
       saving_reply: "Enregistrement de la réponse..."
@@ -4640,7 +4732,7 @@ fr:
     reply_form: 
       attach_file: Joindre
       cancel: Annuler
-      post_response: "Publier une réponse"
+      post_reply: "Publier une réponse"
       switch_views: "Changer la vue"
       write_a_reply: Répondre
     results_entry: 
@@ -4654,6 +4746,8 @@ fr:
     uknown_author: "Auteur inconnu"
     unknown: Inconnu
     unknown_author: "Auteur inconnu"
+    unlock: Déverrouiller
+    unpin: Détacher
   due_dates: 
     due_at: "échéance : %{assignment_due_date_time}"
     multiple_due_dates: "échéance : plusieurs dates d’échéance"
@@ -5072,6 +5166,7 @@ fr:
     app_full_view: 
       add_tool: "Ajouter un outil"
       back_to_app_center: "Revenir au centre d’applications"
+      rate_tool: "Évaluer cet outil"
     app_review_view: 
       posted_by_on: "Publié par *%{user_name}* le *%{created}*"
     app_saved_message: "%{app} enregistré !"
@@ -5084,6 +5179,7 @@ fr:
     delete: Supprimer
     dialog_title_add_app: "Ajouter une application"
     dialog_title_edit_tool: "Modifier l’outil externe"
+    dialog_title_rate_tool: "Comment évaluez-vous cet outil ?"
     edit_view: 
       anonymous: Anonyme
       by_url: "Par URL"
@@ -5130,15 +5226,19 @@ fr:
     generic_error: "Erreur lors du traitement de votre demande"
     homework_submission_configured: "L’envoi du travail personnel est maintenant configuré."
     index_view: 
-      add_new_tool: "Ajouter un nouvel outil"
-      external_tools: "Outils externes"
-      external_tools_note: "Les outils externes permettent d’ajouter facilement de nouvelles fonctionnalités à Canvas. Ils peuvent être ajoutés à des cours individuels ou à tous les cours d’un compte. Une fois qu’ils sont configurés, vous pouvez créer un lien vers eux via les modules des cours et créer des activités pour les outils d’évaluation."
+      add_new_tool: "Ajouter une nouvelle application"
+      app_headder: "Applications externes"
+      external_tools_note: "Les applications permettent d’ajouter facilement de nouvelles fonctionnalités à Canvas. Elles peuvent être ajoutées à des cours individuels ou à tous les cours d’un compte. Une fois qu’elles sont configurées, vous pouvez créer un lien vers elles via les modules des cours et créer des activités pour les outils d‘évaluation."
       external_tools_references: "Cliquez *ici* pour afficher quelques outils externes (LTI) qui fonctionnent très bien avec Canvas. Vous pouvez également parcourir **ici** les rubriques de la communauté Canvas qui s’y rapportent."
       search_filter: "Filtrer par nom"
       view_app_center: "Afficher le centre d’applications"
-      view_installed_tools: "Afficher les outils installés"
+      view_installed_tools: "Afficher les applications installées"
+    missing_stars: "Vous devez sélectionner un classement par étoiles"
+    rate_tool_view: 
+      rate_tool: "Comment évaluez-vous cet outil ?"
     remove_tool: "Voulez-vous vraiment supprimer cet outil ?"
     resource_selection_configured: "Sélection de ressources configurée"
+    save_failed: "Impossible d’enregistrer la révision : %{message}"
     saving: Enregistrement...
     sessionless_launch: 
       load_tool_button: "Charger manuellement %{tool}"
@@ -6192,6 +6292,13 @@ fr:
       heading_current_groups: "Groupes actuels"
       no_groups: "Aucun groupe"
     loading: "chargement de la liste des groupes..."
+    manage: 
+      assign_to_group_menu: 
+        add_to_group: "Ajouter au groupe"
+      group_user: 
+        assign_to_group: "Attribuer au groupe"
+      group_users: 
+        no_users: "Pas d‘utilisateurs."
     member: 
       one: "1 membre"
       other: "%{count} membres"
@@ -6453,6 +6560,8 @@ fr:
       view_all_accounts: "Afficher tous les comptes"
       view_all_enrollments: "Afficher tous les cours"
       view_all_groups: "Afficher tous les groupes"
+    mobile_auth: 
+      log_in_to_canvas: "Connexion à Canvas"
   learning_outcome: 
     no_comment: "Aucun commentaire"
     no_context_found: "Les résultats externes sont introuvables pour « %{title} ». Création d’une copie."
@@ -8582,8 +8691,8 @@ fr:
     course_content_display: "Contenu du cours"
     discussion_description: "Nouveau sujet de discussion dans votre cours"
     discussion_display: Discussion
-    discussion_entry_description: "Nouveau billet dans un sujet de discussion auquel vous avez participé"
-    discussion_entry_display: "Sujet de discussion"
+    discussion_post_description: "Nouveau billet dans un sujet de discussion auquel vous êtes inscrit"
+    discussion_post_display: "Billet de discussion"
     due_date_description: "La date d’échéance du travail a changé"
     due_date_display: "Date d’échéance"
     files_description: "Nouveau fichier ajouté à votre cours"
@@ -8921,7 +9030,7 @@ fr:
       description: "Centre d’applications pour le suivi/l’installation des outils externes dans Canvas"
       name: "Centre d’applications"
     app_center_settings: 
-      description: "Le centre d’applications figurera dans l’onglet « Outils externes » de la page des paramètres d’un cours ou d’un compte. L’URL indiquée ci-dessous doit mener à une destination valide du centre d’applications (par exemple, https://lti-examples.heroku.com -- pensez à retirer la barre oblique à la fin)."
+      description: "Le centre d’applications figurera dans l’onglet « Applications » de la page des paramètres d’un cours ou d’un compte. L’URL indiquée ci-dessous doit mener à une destination valide du centre d’applications (par exemple, https://lti-examples.heroku.com -- pensez à retirer la barre oblique à la fin)."
       labels: 
         app_reviews_endpoint: "Terminal d’affichage des applications"
         apps_index_endpoint: "Terminal d’index des applications"
@@ -8947,6 +9056,7 @@ fr:
       domain_description: "**nom de l’hôte** ou **adresse IP** de votre installation BigBlueButton (ex., bigbluebutton.masociété.com)"
       labels: 
         domain: Domaine
+        recording_enabled: "Autoriser l‘enregistrement des conférences"
         secret: Secret
       secret_description: "Paramètre %{parameter_name} qui se trouve dans le fichier de configuration %{filename}."
     buttons: 
@@ -9174,6 +9284,8 @@ fr:
     sessions_timeout: 
       labels: 
         session_timeout: "Délai en minutes avant l’expiration de la session (20 au minimum)"
+    settings_header: 
+      select_account_prompt: "(Sélectionner un compte)"
     show: 
       back_to_list: "Revenir à la liste des logiciels d’extension"
       labels: 
@@ -9261,8 +9373,6 @@ fr:
         token_never_expires: jamais
       titles: 
         delete_this_token: "Supprimer ce jeton"
-    alerts: 
-      profile_picture_locked: "La photo de votre profil a été verrouillée par un administrateur et ne peut pas être modifiée."
     buttons: 
       add_file: "Ajouter un fichier"
       adding_file: "Ajout d’un fichier"
@@ -9297,16 +9407,12 @@ fr:
       confirmation_failed: "Échec de la confirmation. Veuillez réessayer."
       generating_token_failed: "Échec de la génération du jeton"
       invalid_old_passowrd: "Ancien mot de passe non valide pour la connexion %{pseudonym}"
-      loading_images_failed: "Échec du chargement des images, veuillez réessayer"
       profile_update_failed: "Échec de la mise à jour de la connexion."
       regenerating_token_failed: "Échec de la regénération du jeton."
       registration_failed: "Échec de l’enregistrement. Vérifier le nom et le mot de passe utilisateur, puis réessayez."
-      selecting_image_failed: "Échec de la sélection de l’image, veuillez réessayer"
     facebook_select: 
       facebook: Facebook
     failed_resending: "Échec de la demande. Veuillez réessayer."
-    headers: 
-      loading_images: "Chargement des images..."
     links: 
       resend_confirmation: "Renvoyer la confirmation"
       resend_confirmation_failed: "Échec de la demande. Veuillez réessayer."
@@ -9521,6 +9627,14 @@ fr:
     ways_to_contact_me: "Comment me contacter"
     you_have_no_services: "Vous n’avez enregistré aucun service. Vous pouvez en ajouter dans la page *paramètres*."
   profiles: 
+    avatar_dialog: 
+      butons: 
+        add_picture_file: "Ajouter un fichier"
+      headers: 
+        loading_images: "Chargement des images..."
+      links: 
+        upload_new_image: "Charger une nouvelle image"
+      profile_pictures: "Sélectionnez l’image à utiliser pour votre profil ou téléchargez une nouvelle image :"
     notification_preferences: 
       captions: 
         notification_preferences: "Paramètres et événements de notification %{name}"
@@ -9571,7 +9685,6 @@ fr:
       buttons: 
         request_password: "Demander un mot de passe"
       dont_know_password: "Je ne connais mon mot de passe"
-      log_in_to_canvas: "Connexion à Canvas"
       login: Connexion
       login_handle: "Entrez votre %{login_handle_name} et nous vous enverrons un lien pour modifier votre mot de passe."
       password: "Mot de passe"
@@ -9596,6 +9709,15 @@ fr:
       labels: 
         remember_access: "Mémoriser mon autorisation pour ce service"
       page_title: "Connexion à l’application"
+    oauth2_confirm_mobile: 
+      cancel: Annuler
+      details: 
+        allow_application: "%{app_name} demande à accéder à votre compte."
+        email: "Votre adresse e-mail est %{email}."
+        login_name: "Vous vous connectez à cette application en tant que %{user_name}."
+      login: Connexion
+      page_title: "Connexion à l’application"
+      remember_auth: "Mémoriser mon autorisation pour ce service"
     otp_login: 
       buttons: 
         send: Envoyer
@@ -10883,6 +11005,7 @@ fr:
     updating: "Mise à jour..."
   rubric: 
     context_name_rubric: "Barème de %{course_name}"
+    no_context_found: "Le barème externe est introuvable pour « %{title} ». Création d’une copie."
     no_description: "Pas de description"
     unknown_details: "Informations inconnues"
   rubric_assessment: 
@@ -12566,6 +12689,9 @@ fr:
       no_title: "Sans titre"
       titles: 
         select_folder_for_uploads: "Sélectionner le dossier de téléchargement des fichiers"
+    wiki_page_buttons: 
+      buttons: 
+        new_page: "Nouvelle page"
   wiki_page: 
     atom_author: "Page Wiki"
     atom_entry_title: "Page Wiki %{course_or_group_name} : %{page_title}"
@@ -12654,6 +12780,9 @@ fr:
       page_updated: "La page a été mise à jour."
     page_link: 
       link_hidden_from_students_warning: "Les étudiants ne verront pas ce lien"
+    pages_index: 
+      titles: 
+        pages: "Pages - %{course}"
     wiki_page_comment: 
       links: 
         delete_comment: "Supprimer le commentaire"
