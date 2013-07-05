@@ -334,4 +334,7 @@ define [
       titleizedWords = _(words).map (w) -> w[0].toUpperCase() + w.slice(1)
       titleizedWords.join(' ')
   }
+
+  # not a function helper, just a way to make ENV available in any scope
+  Handlebars.helpers.ENV = ENV
   return Handlebars
