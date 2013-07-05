@@ -740,7 +740,7 @@ define([
       // perform ajax request to do the assignment server side
       var url = ENV.assign_unassigned_users_url;
       url = $.replaceTags(url, "category_id", $category.data('category_id'));
-      $.ajaxJSON(url, "POST", null, function(data) {
+      $.ajaxJSON(url, "POST", {'sync': true}, function(data) {
         if (!data.length) {
           // reset visual state
           $unassigned.find(".assign_students_link").show();

@@ -67,7 +67,6 @@ FakeRails3Routes.draw do
     resources :group_categories, :only => [:create, :update, :destroy]
     match 'group_unassigned_members' => 'groups#unassigned_members', :as => :group_unassigned_members, :via => :get
     match 'group_unassigned_members.:format' => 'groups#unassigned_members', :as => :group_unassigned_members, :via => :get
-    match 'group_assign_unassigned_members' => 'groups#assign_unassigned_members', :as => :group_assign_unassigned_members, :via => :post
   end
 
   concern :files do
@@ -1301,6 +1300,7 @@ FakeRails3Routes.draw do
       post 'courses/:course_id/group_categories', :action => :create
       get 'group_categories/:group_category_id/groups', :action => :groups, :path_name => 'group_category_groups'
       get 'group_categories/:group_category_id/users', :action => :users, :path_name => 'group_category_users'
+      post 'group_categories/:group_category_id/assign_unassigned_members', :action => 'assign_unassigned_members', :path_name => 'group_category_assign_unassigned_members'
     end
 
     scope(:controller => :progress) do

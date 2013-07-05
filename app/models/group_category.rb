@@ -197,6 +197,11 @@ class GroupCategory < ActiveRecord::Base
     send_later_enqueue_args :assign_unassigned_members, :priority => Delayed::LOW_PRIORITY
   end
 
+  set_policy do
+    given { |user, session| context.grants_right?(user, session, :read) }
+    can :read
+  end
+
   protected
 
   def start_progress

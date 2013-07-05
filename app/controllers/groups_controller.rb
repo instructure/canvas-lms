@@ -98,7 +98,6 @@ class GroupsController < ApplicationController
   include Api::V1::Attachment
   include Api::V1::Group
   include Api::V1::UserFollow
-  include Api::V1::Progress
 
   SETTABLE_GROUP_ATTRIBUTES = %w(name description join_level is_public group_category avatar_attachment storage_quota_mb)
 
@@ -633,33 +632,6 @@ class GroupsController < ApplicationController
     end
     respond_to do |format|
       format.atom { render :text => feed.to_xml }
-    end
-  end
-
-  def assign_unassigned_members
-    return unless authorized_action(@context, @current_user, :manage_groups)
-
-    # valid category?
-    category = @context.group_categories.find_by_id(params[:category_id])
-    return render(:json => {}, :status => :not_found) unless category
-
-    # option disabled for student organized groups or section-restricted
-    # self-signup groups. (but self-signup is ignored for non-Course groups)
-    return render(:json => {}, :status => :bad_request) if category.student_organized?
-    return render(:json => {}, :status => :bad_request) if @context.is_a?(Course) && category.restricted_self_signup?
-
-    if value_to_boolean(params[:async])
-      category.assign_unassigned_members_in_background
-      render :json => progress_json(category.current_progress, @current_user, session)
-    else
-      # do the distribution and note the changes
-      memberships = category.assign_unassigned_members
-
-      # render the changes
-      json = memberships.group_by{ |m| m.group_id }.map do |group_id, new_members|
-        { :id => group_id, :new_members => new_members.map{ |m| m.user.group_member_json(@context) } }
-      end
-      render :json => json
     end
   end
 
