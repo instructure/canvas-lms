@@ -985,7 +985,42 @@ describe DiscussionTopic do
       end
     end
   end
-  
+
+  context "a group topic subscription" do
+
+    before(:each) do
+      group_discussion_assignment
+      course_with_student(active_all: true)
+    end
+
+    it "should return true if the user is subscribed to a child topic" do
+      @topic.child_topics.first.subscribe(@student)
+      @topic.child_topics.first.subscribed?(@student).should be_true
+      @topic.subscribed?(@student).should be_true
+    end
+
+    it "should subscribe a group user to the child topic" do
+      child_one, child_two = @topic.child_topics
+      child_one.context.add_user(@student)
+      @topic.subscribe(@student)
+
+      child_one.subscribed?(@student).should be_true
+      child_two.subscribed?(@student).should_not be_true
+      @topic.subscribed?(@student).should be_true
+    end
+
+    it "should unsubscribe a group user from the child topic" do
+      child_one, child_two = @topic.child_topics
+      child_one.context.add_user(@student)
+      @topic.subscribe(@student)
+      @topic.unsubscribe(@student)
+
+      child_one.subscribed?(@student).should_not be_true
+      child_two.subscribed?(@student).should_not be_true
+      @topic.subscribed?(@student).should_not be_true
+    end
+  end
+
   context "materialized view" do
     before do
       topic_with_nested_replies

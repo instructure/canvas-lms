@@ -299,13 +299,22 @@ class DiscussionTopic < ActiveRecord::Base
   def subscribed?(current_user = nil)
     current_user ||= self.current_user
     return false unless current_user # default for logged out user
-    participant = discussion_topic_participants.where(:user_id => current_user.id).first
-    # if there is no explicit subscription, assume the author is subscribed
-    # assume non-authors are not subscribed
-    return current_user == user if participant.try(:subscribed).nil?
-    participant.subscribed
+
+    if root_topic?
+      participant = DiscussionTopicParticipant.where(user_id: current_user.id,
+        discussion_topic_id: child_topics.pluck(:id)).first
+    end
+    participant ||= discussion_topic_participants.where(:user_id => current_user.id).first
+
+    if participant.try(:subscribed).nil?
+      # if there is no explicit subscription, assume the author is subscribed
+      # assume non-authors are not subscribed
+      current_user == user
+    else
+      participant.subscribed
+    end
   end
-  
+
   def subscribe(current_user = nil)
     change_subscribed_state(true, current_user)
   end
@@ -318,9 +327,22 @@ class DiscussionTopic < ActiveRecord::Base
     current_user ||= self.current_user
     return unless current_user
     return true if subscribed?(current_user) == new_state
-    update_or_create_participant(:current_user => current_user, :subscribed => new_state)
+
+    if root_topic?
+      change_child_topic_subscribed_state(new_state, current_user)
+    else
+      update_or_create_participant(:current_user => current_user, :subscribed => new_state)
+    end
   end
-    
+
+  def change_child_topic_subscribed_state(new_state, current_user)
+    group_ids = current_user.group_memberships.active.pluck(:group_id) &
+      context.groups.active.pluck(:id)
+    topic = child_topics.where(context_id: group_ids, context_type: 'Group').first
+    topic.update_or_create_participant(current_user: current_user, subscribed: new_state)
+  end
+  protected :change_child_topic_subscribed_state
+
   def update_or_create_participant(opts={})
     current_user = opts[:current_user] || self.current_user
     return nil unless current_user
