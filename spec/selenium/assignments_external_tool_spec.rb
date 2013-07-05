@@ -24,12 +24,12 @@ describe "external tool assignments" do
     expect_new_page_load { f('.more_options_link').click }
     f('#assignment_external_tool_tag_attributes_url').click
     keep_trying_until do
-      fj('#context_external_tools_select td.tools .tool:first-child:visible').click
+      fj('#context_external_tools_select td .tools .tool:first-child:visible').click
       sleep 2 # wait for javascript to execute
       f('#context_external_tools_select input#external_tool_create_url').should have_attribute('value', @t1.url)
     end
     keep_trying_until do
-      ff('#context_external_tools_select td.tools .tool')[1].click
+      ff('#context_external_tools_select td .tools .tool')[1].click
       f('#context_external_tools_select input#external_tool_create_url').should have_attribute('value', @t2.url)
     end
     fj('.add_item_button:visible').click
@@ -54,7 +54,7 @@ describe "external tool assignments" do
     # don't display dialog on page load, since url isn't blank
     f('#context_external_tools_select').should_not be_displayed
     f('#assignment_external_tool_tag_attributes_url').click
-    ff('#context_external_tools_select td.tools .tool')[0].click
+    ff('#context_external_tools_select td .tools .tool')[0].click
     f('#context_external_tools_select input#external_tool_create_url').should have_attribute('value', @t1.url)
     fj('.add_item_button:visible').click
     f('#assignment_external_tool_tag_attributes_url').should have_attribute('value', @t1.url)

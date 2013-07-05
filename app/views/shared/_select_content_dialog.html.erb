@@ -77,14 +77,16 @@
           <i class="icon-link"></i>
           <%= t :external_tool_notice, "Select a tool from the list below, or enter a URL for an external tool you already know is configured with Basic LTI to add a link to it to this *module*.", :wrapper => '<span class="holder_type">\1</span>' %>
         </div>
-        <a href="<%= context_url(@context, :context_external_tools_url, :include_parents => '1') %>" class="external_tools_url" style="display: none;">&nbsp;</a>
+        <a href="<%= context_url(@context, :context_external_tools_url, :include_parents => '1', :per_page => '50') %>" class="external_tools_url" style="display: none;">&nbsp;</a>
         <table>
           <tr>
-            <td colspan="2" class="tools">
-              <div class="message" style="margin: 10px 0;"><%= t :loading, "Loading..." %></div>
-              <div class="tool" style="display: none;">
-                <div class="name"></div>
-                <div class="description"></div>
+            <td colspan="2">
+              <div class="tools" style="max-height: 250px; overflow: auto;">
+                <div class="message" style="margin: 10px 0;"><%= t :loading, "Loading..." %></div>
+                <div class="tool" style="display: none;">
+                  <div class="name"></div>
+                  <div class="description"></div>
+                </div>
               </div>
             </td>
           </tr>
