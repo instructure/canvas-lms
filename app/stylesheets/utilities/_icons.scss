@@ -303,12 +303,6 @@ a[class*=icon-], a[class^=icon-] {
   &:before { margin-right: 4px; }
 }
 
-
-
-// adjust alignment on icons within buttons
-.btn i[class*=icon-], .btn i[class^=icon-] {
-  vertical-align: middle;
-}
 // icons should be a little lighter than the text in a .btn,
 // we're aware and ok that this wont have any effect in ie8
 .btn:not(.btn-primary, .btn-warning, .btn-danger, .btn-success, .btn-info, .btn-inverse) {
