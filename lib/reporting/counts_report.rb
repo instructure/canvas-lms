@@ -46,15 +46,12 @@ class CountsReport
       Shard.with_each_shard do
         Account.root_accounts.active.each do |account|
           next if account.external_status == 'test'
-          activity = CountsReport.last_activity(account.id)
-          next unless activity
 
           data = {}.with_indifferent_access
           data[:generated_at] = @timestamp
           data[:id] = account.id
           data[:name] = account.name
           data[:external_status] = account.external_status
-          data[:last_activity] = activity
 
           course_ids = get_course_ids(account)
           data[:courses] = course_ids.length
@@ -210,10 +207,6 @@ class CountsReport
     @overview[:totals][:media_files] += account[:media_files]
     @overview[:totals][:media_files_size] += account[:media_files_size]
     @overview[:totals][:users] += account[:users]
-  end
-
-  def self.last_activity(account_id)
-    PageView.where(:account_id => account_id).maximum(:created_at)
   end
 
   def get_course_ids(account)
