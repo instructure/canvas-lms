@@ -1274,8 +1274,6 @@ class Attachment < ActiveRecord::Base
     state :unattached_temporary
   end
 
-  scope :to_be_zipped, where("attachments.workflow_state='to_be_zipped' AND attachments.scribd_attempts<10").order(:created_at)
-
   scope :not_deleted, where("attachments.file_state<>'deleted'")
 
   scope :not_hidden, where("attachments.file_state<>'hidden'")
@@ -1563,7 +1561,6 @@ class Attachment < ActiveRecord::Base
 
   def self.serialization_methods; [:mime_class, :scribdable?, :currently_locked, :crocodoc_available?]; end
   cattr_accessor :skip_thumbnails
-
 
   scope :scribdable?, where("scribd_mime_type_id IS NOT NULL")
   scope :recyclable, where("attachments.scribd_attempts<? AND attachments.workflow_state='errored'", MAX_SCRIBD_ATTEMPTS)
