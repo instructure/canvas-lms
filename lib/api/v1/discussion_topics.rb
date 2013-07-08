@@ -61,6 +61,7 @@ module Api::V1::DiscussionTopics
                   :subscribed => topic.subscribed?(user),
                   :topic_children => children,
                   :attachments => attachments,
+                  :published => topic.published?,
                   :locked => topic.locked?,
                   :author => user_display_json(topic.user, topic.context),
                   :html_url => context.is_a?(CollectionItem) ? nil :

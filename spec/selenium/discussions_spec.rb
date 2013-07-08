@@ -672,7 +672,7 @@ describe "discussions" do
           @topic.locked?.should be_false
         end
 
-        it "should clear the delayed_post_at and lock_at when manually triggering unlock" do
+        it "should clear lock_at when manually triggering unlock" do
           @topic.delayed_post_at = 10.days.ago
           @topic.lock_at         = 5.days.ago
           @topic.locked          = true
@@ -685,13 +685,12 @@ describe "discussions" do
           expect_new_page_load { f(".discussion_locked_toggler").click }
 
           @topic.reload
-          @topic.delayed_post_at.should be_nil
           @topic.lock_at.should be_nil
           @topic.active?.should be_true
           @topic.locked?.should be_false
         end
 
-        it "should set workflow to locked when delayed_post_at and lock_at are in past" do
+        it "should be locked when delayed_post_at and lock_at are in past" do
           @topic.delayed_post_at = nil
           @topic.lock_at         = nil
           @topic.workflow_state  = 'active'

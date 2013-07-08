@@ -312,12 +312,34 @@ describe DiscussionTopicsController do
     before(:each) do
       course_with_teacher_logged_in(active_all: true)
       @topic = DiscussionTopic.create!(context: @course, title: 'Test Topic',
-        lock_at: '2013-01-01T00:00:00UTC', locked: true)
+        delayed_post_at: '2013-01-01T00:00:00UTC', lock_at: '2013-01-02T00:00:00UTC')
     end
 
-    it "should unlock discussions with a lock_at attribute" do
+    it "should not clear lock_at if locked is not changed" do
       put('update', course_id: @course.id, topic_id: @topic.id,
-          title: 'Updated Topic', format: 'json', lock_at: @topic.lock_at,
+          title: 'Updated Topic', format: 'json',
+          lock_at: @topic.lock_at, delayed_post_at: @topic.delayed_post_at,
+          locked: false)
+      @topic.reload.should_not be_locked
+      @topic.lock_at.should_not be_nil
+    end
+
+    it "should not clear delayed_post_at if published is not changed" do
+      @topic.workflow_state = 'post_delayed'
+      @topic.save!
+      put('update', course_id: @course.id, topic_id: @topic.id,
+          title: 'Updated Topic', format: 'json',
+          lock_at: @topic.lock_at, delayed_post_at: @topic.delayed_post_at,
+          published: false)
+      @topic.reload.should_not be_published
+      @topic.delayed_post_at.should_not be_nil
+    end
+
+    it "should unlock discussions with a lock_at attribute if lock state changes" do
+      @topic.lock!
+      put('update', course_id: @course.id, topic_id: @topic.id,
+          title: 'Updated Topic', format: 'json',
+          lock_at: @topic.lock_at, delayed_post_at: @topic.delayed_post_at,
           locked: false)
 
       @topic.reload.should_not be_locked
@@ -331,5 +353,16 @@ describe DiscussionTopicsController do
       @topic.reload.should be_locked
       @topic.lock_at.should_not be_nil
     end
+
+    it "should set draft state on discussions with delayed_post_at" do
+      put('update', course_id: @course.id, topic_id: @topic.id,
+          title: 'Updated Topic', format: 'json',
+          lock_at: @topic.lock_at, delayed_post_at: @topic.delayed_post_at,
+          published: false)
+
+      @topic.reload.should_not be_published
+      @topic.delayed_post_at.should be_nil
+    end
+
   end
 end

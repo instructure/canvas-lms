@@ -119,6 +119,12 @@ describe DiscussionTopic do
       @topic.visible_for?(@student).should be_false
     end
 
+    it "should not be visible to students when topic is draft state" do
+      @topic.workflow_state = 'post_delayed'
+      @topic.save!
+      @topic.visible_for?(@student).should be_false
+    end
+
     it "should be visible to students when topic delayed_post_at is in the past" do
       @topic.delayed_post_at = 5.days.ago
       @topic.save!

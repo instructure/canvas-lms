@@ -411,23 +411,27 @@ class DiscussionTopic < ActiveRecord::Base
     state :deleted
   end
 
-  def lock
+  def lock(opts = {})
     raise "cannot lock before due date" if self.assignment.try(:due_at) && self.assignment.due_at > Time.now
     self.locked = true
-    save!
+    save! unless opts[:without_save]
   end
   alias_method :lock!, :lock
 
-  def unlock
+  def unlock(opts = {})
     self.locked = false
     self.workflow_state = 'active' if self.workflow_state == 'locked'
-    save!
+    save! unless opts[:without_save]
   end
   alias_method :unlock!, :unlock
 
   def locked?
     return workflow_state == 'locked' if locked.nil?
     locked
+  end
+
+  def published?
+    workflow_state != 'post_delayed'
   end
 
   def should_send_to_stream
@@ -732,6 +736,8 @@ class DiscussionTopic < ActiveRecord::Base
     return true if user == self.user
     if unlock_at = locked_for?(user, opts).try_rescue(:[], :unlock_at)
       unlock_at < Time.now
+    elsif !published?
+      false
     else
       true
     end

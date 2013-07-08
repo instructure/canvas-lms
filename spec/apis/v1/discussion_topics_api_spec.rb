@@ -130,6 +130,7 @@ describe DiscussionTopicsController, :type => :integration do
       @topic.title.should == "test title"
       @topic.message.should == "test <b>message</b>"
       @topic.threaded?.should be_false
+      @topic.published?.should be_true
       @topic.post_delayed?.should be_false
       @topic.podcast_enabled?.should be_false
       @topic.podcast_has_student_posts?.should be_false
@@ -150,7 +151,7 @@ describe DiscussionTopicsController, :type => :integration do
     it "should post an announcment" do
       api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics",
                { :controller => "discussion_topics", :action => "create", :format => "json", :course_id => @course.to_param },
-               { :title => "test title", :message => "test <b>message</b>", :is_announcement => true })
+               { :title => "test title", :message => "test <b>message</b>", :is_announcement => true, :published => true })
       @topic = @course.announcements.order(:id).last
       @topic.title.should == "test title"
       @topic.message.should == "test <b>message</b>"
@@ -168,11 +169,49 @@ describe DiscussionTopicsController, :type => :integration do
       @topic.message.should == "test <b>message</b>"
       @topic.threaded?.should == true
       @topic.post_delayed?.should == true
+      @topic.published?.should be_false
       @topic.delayed_post_at.to_i.should == post_at.to_i
       @topic.lock_at.to_i.should == lock_at.to_i
       @topic.podcast_enabled?.should == true
       @topic.podcast_has_student_posts?.should == true
       @topic.require_initial_post?.should == true
+    end
+
+    context "publishing" do
+      it "should create a draft state topic" do
+        api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics",
+                 { :controller => "discussion_topics", :action => "create", :format => "json", :course_id => @course.to_param },
+                 { :title => "test title", :message => "test <b>message</b>", :published => "false" })
+        @topic = @course.discussion_topics.order(:id).last
+        @topic.published?.should be_false
+      end
+
+      it "should not allow announcements to be draft state" do
+        result = api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics",
+                 { :controller => "discussion_topics", :action => "create", :format => "json", :course_id => @course.to_param },
+                 { :title => "test title", :message => "test <b>message</b>", :published => "false", :is_announcement => true },
+                 {}, {:expected_status => 400})
+        result["errors"]["published"].should be_present
+      end
+
+      it "should require moderation permissions to create a draft state topic" do
+        course_with_student_logged_in(:course => @course, :active_all => true)
+        result = api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics",
+                 { :controller => "discussion_topics", :action => "create", :format => "json", :course_id => @course.to_param },
+                 { :title => "test title", :message => "test <b>message</b>", :published => "false" },
+                 {}, {:expected_status => 400})
+        result["errors"]["published"].should be_present
+      end
+
+      it "should allow non-moderators to set published" do
+        course_with_student_logged_in(:course => @course, :active_all => true)
+        api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics",
+                 { :controller => "discussion_topics", :action => "create", :format => "json", :course_id => @course.to_param },
+                 { :title => "test title", :message => "test <b>message</b>", :published => "true" })
+        @topic = @course.discussion_topics.order(:id).last
+        @topic.published?.should be_true
+      end
+
     end
 
     it "should allow creating a discussion assignment" do
@@ -215,6 +254,7 @@ describe DiscussionTopicsController, :type => :integration do
                   "title"=>"Topic 1",
                   "discussion_subentry_count"=>0,
                   "assignment_id"=>nil,
+                  "published"=>true,
                   "delayed_post_at"=>nil,
                   "lock_at"=>nil,
                   "id"=>@topic.id,
@@ -482,6 +522,62 @@ describe DiscussionTopicsController, :type => :integration do
         @topic.should_not be_locked
       end
 
+      context "publishing" do
+        it "should publish a draft state topic" do
+          @topic.workflow_state = 'post_delayed'
+          @topic.save!
+          @topic.should_not be_published
+          api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+                   { :controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param },
+                   { :published => "true"})
+          @topic.reload.should be_published
+        end
+
+        it "should not allow announcements to be draft state" do
+          @topic.type = 'Announcement'
+          @topic.save!
+          result = api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+                   { :controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param },
+                   { :published => "false" },
+                   {}, {:expected_status => 400})
+          result["errors"]["published"].should be_present
+        end
+
+
+        it "should allow a topic with no posts to set draft state" do
+          api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+                   { :controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param },
+                   { :published => "false"})
+          @topic.reload.should_not be_published
+        end
+
+        it "should prevent a topic with posts from setting draft state" do
+          create_entry(@topic)
+          api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+                   { :controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param },
+                   { :published => "false"}, {}, {:expected_status => 400})
+          @topic.reload.should be_published
+        end
+
+        it "should require moderation permissions to set draft state" do
+          course_with_student_logged_in(:course => @course, :active_all => true)
+          @topic = create_topic(@course, :user => @student)
+          api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+                   { :controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param },
+                   { :published => "false"}, {}, {:expected_status => 400})
+          @topic.reload.should be_published
+        end
+
+        it "should allow non-moderators to set published" do
+          course_with_student_logged_in(:course => @course, :active_all => true)
+          @topic = create_topic(@course, :user => @student)
+          api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+                   { :controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param },
+                   { :published => "true"})
+          @topic.reload.should be_published
+        end
+      end
+
       it 'should process html content in message on update' do
         should_process_incoming_user_content(@course) do |content|
           api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
@@ -692,6 +788,7 @@ describe DiscussionTopicsController, :type => :integration do
       "title"=>"Group Topic 1",
       "discussion_subentry_count"=>0,
       "assignment_id"=>nil,
+      "published"=>true,
       "delayed_post_at"=>nil,
       "lock_at"=>nil,
       "id"=>gtopic.id,
