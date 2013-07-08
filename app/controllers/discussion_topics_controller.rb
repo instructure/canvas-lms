@@ -487,8 +487,9 @@ class DiscussionTopicsController < ApplicationController
       # Handle locking/unlocking (overrides workflow state if provided). It appears that the locked param as a hash
       # is from old code and is not being used. Verification requested.
       elsif params.has_key?(:locked) && !params[:locked].is_a?(Hash)
-        @topic.delayed_post_at = ''
-        @topic.lock_at = ''
+        discussion_topic_hash[:delayed_post_at] = nil
+        discussion_topic_hash[:lock_at]         = nil
+
         if value_to_boolean(params[:locked])
           @topic.lock
         else
