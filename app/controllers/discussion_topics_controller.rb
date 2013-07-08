@@ -45,6 +45,9 @@
 #        // has made an initial reply. Defaults to false.
 #        "require_initial_post":false,
 #
+#        // Whether or not posts in this topic are visible to the user.
+#       "user_can_see_posts":true,
+#
 #        // The count of entries in the topic.
 #        "discussion_subentry_count":0,
 #

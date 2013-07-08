@@ -1081,6 +1081,7 @@ describe AssignmentsApiController, :type => :integration do
           'podcast_has_student_posts' => nil,
           'read_state' => 'unread',
           'unread_count' => 0,
+          'user_can_see_posts' => @topic.user_can_see_posts?(@user),
           'subscribed' => @topic.subscribed?(@user),
           'url' =>
             "http://www.example.com/courses/#{@course.id}/discussion_topics/#{@topic.id}",

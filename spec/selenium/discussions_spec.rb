@@ -839,6 +839,22 @@ describe "discussions" do
       @topic.subscribed?(@student).should be_false
     end
 
+    it "should allow subscribing after an initial post" do
+      @topic.unsubscribe(@student)
+      @topic.require_initial_post = true
+      @topic.save!
+      @topic.reply_from(:user => @student, :text => 'initial post')
+      @topic.unsubscribe(@student)
+      get "/courses/#{@course.id}/discussion_topics"
+      wait_for_ajaximations
+      f('.icon-discussion').should be_displayed
+      f('.subscription-toggler').click
+      wait_for_ajaximations
+      driver.execute_script(%{$('.subscription-toggler').trigger('mouseleave')})
+      f('.icon-discussion-check').should be_displayed
+      @topic.reload.subscribed?(@student).should be_true
+    end
+
     it "should display subscription action icons on hover" do
       @topic.subscribe(@student)
       get "/courses/#{@course.id}/discussion_topics"

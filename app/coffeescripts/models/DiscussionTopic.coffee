@@ -18,6 +18,7 @@ define [
       require_initial_post: false
       is_announcement: false
       subscribed: false
+      user_can_see_posts: true
 
     dateAttributes: [
       'last_reply_at'

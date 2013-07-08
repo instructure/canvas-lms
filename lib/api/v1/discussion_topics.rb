@@ -52,6 +52,7 @@ module Api::V1::DiscussionTopics
       json.merge! :message => api_user_content(topic.message, context),
                   :discussion_type => topic.discussion_type,
                   :require_initial_post => topic.require_initial_post?,
+                  :user_can_see_posts => topic.user_can_see_posts?(user),
                   :podcast_url => url,
                   :pinned => !!topic.pinned,
                   :position => topic.position,
