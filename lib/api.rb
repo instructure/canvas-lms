@@ -255,7 +255,28 @@ module Api
   # a hash of allowed html attributes that represent urls, like { 'a' => ['href'], 'img' => ['src'] }
   UrlAttributes = Instructure::SanitizeField::SANITIZE[:protocols].inject({}) { |h,(k,v)| h[k] = v.keys; h }
 
-  def api_user_content(html, context = @context, user = @current_user)
+  def api_bulk_load_user_content_attachments(htmls, context = @context, user = @current_user)
+    rewriter = UserContent::HtmlRewriter.new(context, user)
+    attachment_ids = []
+    rewriter.set_handler('files') do |m|
+      attachment_ids << m.obj_id if m.obj_id
+    end
+
+    htmls.each { |html| rewriter.translate_content(html) }
+
+    if attachment_ids.blank?
+      {}
+    else
+      attachments = if context.is_a?(User) || context.nil?
+                      Attachment.where(id: attachment_ids)
+                    else
+                      context.attachments.where(id: attachment_ids)
+                    end
+      attachments.index_by(&:id)
+    end
+  end
+
+  def api_user_content(html, context = @context, user = @current_user, preloaded_attachments = {})
     return html if html.blank?
 
     # if we're a controller, use the host of the request, otherwise let HostUrl
@@ -271,11 +292,12 @@ module Api
     rewriter = UserContent::HtmlRewriter.new(context, user)
     rewriter.set_handler('files') do |match|
       if match.obj_id
-        if match.obj_class == Attachment && context && !context.is_a?(User)
-          obj = context.attachments.find(match.obj_id) rescue nil
-        else
-          obj = match.obj_class.find_by_id(match.obj_id)
-        end
+        obj   = preloaded_attachments[match.obj_id]
+        obj ||= if context.is_a?(User) || context.nil?
+                  Attachment.find_by_id(match.obj_id)
+                else
+                  context.attachments.find_by_id(match.obj_id)
+                end
       end
       next unless obj && rewriter.user_can_view_content?(obj)
 

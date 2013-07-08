@@ -27,16 +27,28 @@ module Api::V1::AssignmentGroup
     rules
   )
 
-  def assignment_group_json(group, user, session, includes = [])
+  def assignment_group_json(group, user, session, includes = [], opts = {})
     includes ||= []
+    opts.reverse_merge! override_assignment_dates: true
 
     hash = api_json(group, user, session,
                     :only => %w(id name position group_weight))
     hash['rules'] = group.rules_hash
 
     if includes.include?('assignments')
-      hash['assignments'] = group.assignments.active.map { |a|
-        assignment_json(a, user, session, include_discussion_topic: includes.include?('discussion_topic'))
+      include_discussion_topic = includes.include?('discussion_topic')
+      user_content_attachments   = opts[:preloaded_user_content_attachments]
+      user_content_attachments ||= api_bulk_load_user_content_attachments(
+        group.active_assignments.map(&:description),
+        group.context,
+        user
+      )
+      hash['assignments'] = group.active_assignments.map { |a|
+        a.context = group.context
+        assignment_json(a, user, session,
+          include_discussion_topic: include_discussion_topic,
+          override_dates: opts[:override_assignment_dates],
+          preloaded_user_content_attachments: user_content_attachments)
       }
     end
 

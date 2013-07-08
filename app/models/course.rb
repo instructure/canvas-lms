@@ -1734,8 +1734,9 @@ class Course < ActiveRecord::Base
   def turnitin_settings
     # check if somewhere up the account chain turnitin is enabled and
     # has valid settings
-    self.account.turnitin_settings
+    account.turnitin_settings
   end
+  memoize :turnitin_settings
 
   def turnitin_pledge
     self.account.closest_turnitin_pledge

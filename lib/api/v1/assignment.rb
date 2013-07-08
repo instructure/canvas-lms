@@ -76,7 +76,10 @@ module Api::V1::Assignment
 
     # use already generated hash['description'] because it is filtered by
     # Assignment#filter_attributes_for_user when the assignment is locked
-    hash['description'] = api_user_content(hash['description'], @context || assignment.context)
+    hash['description'] = api_user_content(hash['description'],
+                                           @context || assignment.context,
+                                           user,
+                                           opts[:preloaded_user_content_attachments] || {})
     hash['muted'] = assignment.muted?
     hash['html_url'] = course_assignment_url(assignment.context_id, assignment)
 

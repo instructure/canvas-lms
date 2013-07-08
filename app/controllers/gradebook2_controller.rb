@@ -10,7 +10,7 @@ class Gradebook2Controller < ApplicationController
       per_page = Setting.get_cached('api_max_per_page', '50').to_i
       js_env  :GRADEBOOK_OPTIONS => {
         :chunk_size => Setting.get_cached('gradebook2.submissions_chunk_size', '35').to_i,
-        :assignment_groups_url => api_v1_course_assignment_groups_url(@context, :include => [:assignments]),
+        :assignment_groups_url => api_v1_course_assignment_groups_url(@context, :include => [:assignments], :override_assignment_dates => "false"),
         :sections_url => api_v1_course_sections_url(@context),
         :students_url => api_v1_course_enrollments_url(@context, :include => [:avatar_url], :type => ['StudentEnrollment', 'StudentViewEnrollment'], :per_page => per_page),
         :students_url_with_concluded_enrollments => api_v1_course_enrollments_url(@context, :include => [:avatar_url], :type => ['StudentEnrollment', 'StudentViewEnrollment'], :state => ['active', 'invited', 'completed'], :per_page => per_page),
