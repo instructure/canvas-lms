@@ -546,9 +546,11 @@ FakeRails3Routes.draw do
     match 'test_ldap_logins' => 'account_authorization_configs#test_ldap_login', :as => :test_ldap_logins
     match 'saml_testing' => 'account_authorization_configs#saml_testing', :as => :saml_testing
     match 'saml_testing_stop' => 'account_authorization_configs#saml_testing_stop', :as => :saml_testing_stop
+
     match 'external_tools/sessionless_launch' => 'external_tools#sessionless_launch', :as => :external_tools_sessionless_launch
     resources :external_tools do
       match 'finished' => 'external_tools#finished', :as => :finished
+      match 'resource_selection' => 'external_tools#resource_selection', :as => :resource_selection
     end
 
     concerns :chats
