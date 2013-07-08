@@ -307,4 +307,20 @@ describe DiscussionTopicsController do
     end
 
   end
+
+  describe "PUT: update" do
+    before(:each) do
+      course_with_teacher_logged_in(active_all: true)
+      @topic = DiscussionTopic.create!(context: @course, title: 'Test Topic',
+        lock_at: '2013-01-01T00:00:00UTC', locked: true)
+    end
+
+    it "should unlock discussions with a lock_at attribute" do
+      put('update', course_id: @course.id, topic_id: @topic.id,
+          title: 'Updated Topic', format: 'json', lock_at: @topic.lock_at,
+          locked: false)
+
+      @topic.reload.should_not be_locked
+    end
+  end
 end
