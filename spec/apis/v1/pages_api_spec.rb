@@ -79,7 +79,30 @@ describe "Pages API", :type => :integration do
         
         urls.should == @wiki.wiki_pages.sort_by(&:id).collect(&:url)
       end
-      
+
+      it "should search for pages by title" do
+        new_pages = []
+        3.times { |i| new_pages << @wiki.wiki_pages.create!(:title => "New Page #{i}") }
+
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/pages?search_term=new",
+                        :controller=>'wiki_pages_api', :action=>'index', :format=>'json', :course_id=>@course.to_param, :search_term => "new")
+        json.size.should == 3
+        json.collect{ |page| page['url'] }.should == new_pages.sort_by(&:id).collect(&:url)
+
+        # Should also paginate
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/pages?search_term=New&per_page=2",
+                        :controller=>'wiki_pages_api', :action=>'index', :format=>'json', :course_id=>@course.to_param, :search_term => "New", :per_page => "2")
+        json.size.should == 2
+        urls = json.collect{ |page| page['url'] }
+
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/pages?search_term=New&per_page=2&page=2",
+                        :controller=>'wiki_pages_api', :action=>'index', :format=>'json', :course_id=>@course.to_param, :search_term => "New", :per_page => "2", :page => "2")
+        json.size.should == 1
+        urls += json.collect{ |page| page['url'] }
+
+        urls.should == new_pages.sort_by(&:id).collect(&:url)
+      end
+
       describe "sorting" do
         it "should sort by title (case-insensitive)" do
           @wiki.wiki_pages.create! :title => 'gIntermediate Page'

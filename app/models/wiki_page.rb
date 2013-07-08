@@ -186,6 +186,10 @@ class WikiPage < ActiveRecord::Base
   scope :visible_to_students, where(:hide_from_students => false)
   scope :order_by_id, order(:id)
 
+  scope :title_like, lambda { |title|
+    where(wildcard('wiki_pages.title', title))
+  }
+
   def locked_for?(user, opts={})
     return false unless self.could_be_locked
     Rails.cache.fetch(locked_cache_key(user), :expires_in => 1.minute) do

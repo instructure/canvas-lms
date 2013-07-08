@@ -90,6 +90,7 @@ class WikiPagesApiController < ApplicationController
   #
   # @argument sort [optional] Sort results by this field: one of 'title', 'created_at', or 'updated_at'
   # @argument order [optional] The sorting order: 'asc' (default) or 'desc'
+  # @argument search_term (optional) The partial title of the pages to match and return.
   #
   # @example_request
   #     curl -H 'Authorization: Bearer <token>' \ 
@@ -103,6 +104,8 @@ class WikiPagesApiController < ApplicationController
       scope = @context.wiki.wiki_pages.select(WikiPage.column_names - ['body']).includes(:user)
       scope = @context.grants_right?(@current_user, session, :view_unpublished_items) ? scope.not_deleted : scope.active
       scope = scope.visible_to_students unless @context.grants_right?(@current_user, session, :view_hidden_items)
+
+      scope = scope.title_like(params[:search_term]) if params[:search_term]
 
       order_clause = case params[:sort]
         when 'title'
