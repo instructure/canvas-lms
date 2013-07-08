@@ -43,7 +43,7 @@ class MakeSisIdsUnique < ActiveRecord::Migration
     remove_index :enrollment_terms, [:sis_source_id, :root_account_id]
     remove_index :enrollment_terms, :root_account_id
     if connection.adapter_name == 'PostgreSQL'
-      #remove_index :pseudonyms, [:unique_id, :account_id]
+      remove_index :pseudonyms, [:unique_id, :account_id]
     end
     remove_index :pseudonyms, [:sis_user_id, :account_id]
     remove_index :pseudonyms, :account_id
