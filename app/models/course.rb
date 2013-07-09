@@ -2911,6 +2911,7 @@ class Course < ActiveRecord::Base
   add_setting :lock_all_announcements, :boolean => true, :default => false
   add_setting :large_roster, :boolean => true, :default => lambda { |c| c.root_account.large_course_rosters? }
   add_setting :public_syllabus, :boolean => true, :default => false
+  add_setting :enable_draft, boolean: true, default: false
 
   def user_can_manage_own_discussion_posts?(user)
     return true if allow_student_discussion_editing?
@@ -3112,5 +3113,12 @@ class Course < ActiveRecord::Base
     self.enrollments.invited.except(:includes).includes(:user => :communication_channels).find_each do |e|
       e.re_send_confirmation! if e.invited?
     end
+  end
+
+  # Public: Determine if draft state is enabled for this course.
+  #
+  # Returns a boolean (default: false).
+  def draft_state_enabled?
+    (root_account.allow_draft? && enable_draft?) || root_account.enable_draft?
   end
 end

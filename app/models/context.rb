@@ -225,4 +225,12 @@ module Context
   def is_a_context?
     true
   end
+
+  # Public: Boolean flag re: whether draft state is enabled or not. This
+  # method should be overridden in classes that include Context.
+  #
+  # Returns false
+  def draft_state_enabled?
+    false
+  end
 end

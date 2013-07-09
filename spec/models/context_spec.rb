@@ -19,6 +19,11 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe Context do
+  it "should not have draft_state_enabled" do
+    class TmpContext; include Context; end
+    TmpContext.new.should_not be_draft_state_enabled
+  end
+
   context "find_by_asset_string" do
     it "should find a valid course" do
       course = Course.create!

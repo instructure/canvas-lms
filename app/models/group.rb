@@ -563,4 +563,11 @@ class Group < ActiveRecord::Base
   def associated_shards
     [Shard.default]
   end
+
+  # Public: Determine if the current context has draft_state enabled.
+  #
+  # Returns a boolean.
+  def draft_state_enabled?
+    context.draft_state_enabled?
+  end
 end

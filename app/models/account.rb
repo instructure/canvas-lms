@@ -150,6 +150,7 @@ class Account < ActiveRecord::Base
   add_setting :open_registration, :boolean => true, :root_only => true
   add_setting :enable_scheduler, :boolean => true, :root_only => true, :default => false
   add_setting :enable_draft, :boolean => true, :root_only => true, :default => false
+  add_setting :allow_draft, :boolean => true, :root_only => true, :default => false
   add_setting :calendar2_only, :boolean => true, :root_only => true, :default => false
   add_setting :show_scheduler, :boolean => true, :root_only => true, :default => false
   add_setting :enable_profiles, :boolean => true, :root_only => true, :default => false
@@ -1313,6 +1314,13 @@ class Account < ActiveRecord::Base
 
   def canvas_network_enabled?
     false
+  end
+
+  # Public: Determine if draft state is enabled for this account.
+  #
+  # Returns a boolean (default: false).
+  def draft_state_enabled?
+    root_account.settings[:enable_draft]
   end
 
   def import_from_migration(data, params, migration)

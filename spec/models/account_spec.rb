@@ -991,4 +991,27 @@ describe Account do
       account.associated_courses.sort_by(&:id).should == [c1, c2]
     end
   end
+
+  describe "#draft_state_enabled?" do
+    context "a root account" do
+      it "should return its own enable_draft setting" do
+        account = Account.create!
+        account.settings[:enable_draft] = true
+
+        account.should be_draft_state_enabled
+      end
+    end
+
+    context "a sub-account" do
+      it "should return its root account's enable_draft setting" do
+        root_account = Account.create!
+        sub_account  = Account.create!
+        sub_account.root_account_id          = root_account.id
+        root_account.settings[:enable_draft] = true
+        root_account.save!
+
+        sub_account.should be_draft_state_enabled
+      end
+    end
+  end
 end

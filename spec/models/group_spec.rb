@@ -568,4 +568,39 @@ describe Group do
     end
   end
 
+  describe "#draft_state_enabled?" do
+    before(:each) do
+      course_with_teacher(active_all: true)
+      @teacher = @user
+      @course.root_account = Account.create!
+      @course.root_account.settings[:allow_draft] = true
+      @course.root_account.save!
+      @course.save!
+    end
+
+    context "a course with draft_state_enabled" do
+      it "should pass its setting on to its groups" do
+        @course.enable_draft = true
+        @course.save!
+
+        group(group_context: @course).should be_draft_state_enabled
+      end
+    end
+
+    context "an account with draft_state_enabled" do
+      it "should pass its setting on to course groups" do
+        @course.root_account.settings[:enable_draft] = true
+        @course.root_account.save!
+
+        group(group_context: @course).should be_draft_state_enabled
+      end
+
+      it "should pass its setting on to account groups" do
+        @course.root_account.settings[:enable_draft] = true
+        @course.root_account.save!
+
+        group(group_context: @course.root_account).should be_draft_state_enabled
+      end
+    end
+  end
 end
