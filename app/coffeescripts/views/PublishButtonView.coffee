@@ -6,35 +6,34 @@ define [
 ], (I18n, $, preventDefault, Backbone) ->
 
   class PublishButton extends Backbone.View
-    DISABLED  = 'disabled'
-    PUBLISH   = 'btn-publish'
-    PUBLISHED = 'btn-published'
-    UNPUBLISH = 'btn-unpublish'
+    disabledClass: 'disabled'
+    publishClass: 'btn-publish'
+    publishedClass: 'btn-published'
+    unpublishClass: 'btn-unpublish'
 
     tagName:   'button'
     className: 'btn'
 
-    events:
-      'click': 'click'
-      'hover': 'hover'
+    events: {'click', 'hover'}
 
     initialize: ->
       @disable() unless @model.get('publishable')
 
     # events
 
-    hover: (event) ->
-      return if @isPublish() or @isDisabled()
-
-      if event.type == 'mouseenter'
+    hover: ({type}) ->
+      if type is 'mouseenter'
+        return if @keepState or @isPublish() or @isDisabled()
         @renderUnpublish()
+        @keepState = true
       else
-        @renderPublished()
+        @keepState = false
+        @renderPublished() unless @isPublish() or @isDisabled()
 
     click: (event) ->
       event.preventDefault()
       return if @isDisabled()
-
+      @keepState = true
       if @isPublish()
         @publish()
       else if @isUnpublish()
@@ -59,25 +58,25 @@ define [
     # state
 
     isPublish: ->
-      @$el.hasClass PUBLISH
+      @$el.hasClass @publishClass
 
     isPublished: ->
-      @$el.hasClass PUBLISHED
+      @$el.hasClass @publishedClass
 
     isUnpublish: ->
-      @$el.hasClass UNPUBLISH
+      @$el.hasClass @unpublishClass
 
     isDisabled: ->
-      @$el.hasClass DISABLED
+      @$el.hasClass @disabledClass
 
     disable: ->
-      @$el.addClass DISABLED
+      @$el.addClass @disabledClass
 
     enable: ->
-      @$el.removeClass DISABLED
+      @$el.removeClass @disabledClass
 
     reset: ->
-      @$el.removeClass "#{PUBLISH} #{PUBLISHED} #{UNPUBLISH}"
+      @$el.removeClass "#{@publishClass} #{@publishedClass} #{@unpublishClass}"
 
     # render
 
@@ -90,23 +89,34 @@ define [
 
     renderPublish: ->
       @reset()
-      @$el.addClass PUBLISH
-      @$el.html "<i class='icon-unpublished'></i>&nbsp;#{I18n.t('buttons.publish', 'Publish')}"
+      @$el.addClass @publishClass
+      text = I18n.t('buttons.publish', 'Publish')
+      @$el.attr 'title', text
+      @$el.html "<i class='icon-unpublished'></i><span class='publish-text'>&nbsp;#{text}</span>"
 
     renderPublished: ->
       @reset()
-      @$el.addClass PUBLISHED
-      @$el.html "<i class='icon-publish'></i>&nbsp;#{I18n.t('buttons.published', 'Published')}"
+      text = I18n.t('buttons.published', 'Published')
+      @$el.addClass @publishedClass
+      @$el.attr 'title', text
+      @$el.html "<i class='icon-publish'></i><span class='publish-text'>&nbsp;#{text}</span>"
 
     renderUnpublish: ->
       @reset()
-      @$el.addClass UNPUBLISH
-      @$el.html "<i class='icon-unpublish'></i>&nbsp;#{I18n.t('buttons.unpublish', 'Unpublish')}"
+      text = I18n.t('buttons.unpublish', 'Unpublish')
+      @$el.addClass @unpublishClass
+      @$el.attr 'title', text
+      @$el.html "<i class='icon-unpublish'></i><span class='publish-text'>&nbsp;#{text}</span>"
 
     renderPublishing: ->
       @disable()
-      @$el.html "<i class='icon-publish'></i>&nbsp;#{I18n.t('buttons.publishing', 'Publishing...')}"
+      text = I18n.t('buttons.publishing', 'Publishing...')
+      @$el.attr 'title', text
+      @$el.html "<i class='icon-publish'></i><span class='publish-text'>&nbsp;#{text}</span>"
 
     renderUnpublishing: ->
       @disable()
-      @$el.html "<i class='icon-unpublish'></i>&nbsp;#{I18n.t('buttons.unpublishing', 'Unpublishing...')}"
+      text = I18n.t('buttons.unpublishing', 'Unpublishing...')
+      @$el.attr 'title', text
+      @$el.html "<i class='icon-unpublished'></i><span class='publish-text'>&nbsp;#{text}</span>"
+

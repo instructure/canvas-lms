@@ -2,12 +2,13 @@ require [
   'jquery'
   'compiled/fn/preventDefault'
   'compiled/views/PublishButtonView'
+  'compiled/views/PublishIconView'
   'jqueryui/accordion'
   'jqueryui/tabs'
   'jqueryui/button'
   'jqueryui/tooltip'
   'jquery.instructure_date_and_time'
-], ($, preventDefault, PublishButtonView) ->
+], ($, preventDefault, PublishButtonView, PublishIconView) ->
 
   do ->
     dialog = $('#dialog-buttons-dialog').dialog({
@@ -94,6 +95,11 @@ require [
   # published & disables
   model   = new Publishable(published: true,  publishable: false)
   btnView = new PublishButtonView(model: model, el: "#published-disabled").render()
+
+  # publish icon
+  model   = new Publishable(published: false,  publishable: true)
+  btnView = new PublishIconView(model: model, el: "#publish-icon").render()
+
 
 
   # Progressbar

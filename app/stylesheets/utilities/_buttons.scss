@@ -17,6 +17,10 @@ The publish button has two states on click (publish and published) and a hover s
   <button class="btn" id="published-disabled"></button>
 </p>
 
+<p>
+  <span id="publish-icon" class="publish-icon"></span>
+</p>
+
 ```
 
 */
@@ -62,3 +66,22 @@ The publish button has two states on click (publish and published) and a hover s
   @include buttonBackground($btnDangerBackground, $btnDangerBackgroundHighlight);
   box-shadow: none;
 }
+
+.publish-icon {
+  display: inline-block;
+  color: #b4b8bb;
+  cursor: pointer;
+
+  &.publish-icon-unpublish {
+    color: $btnDangerBackground;
+  }
+
+  &.publish-icon-published {
+    color: #35842c;
+  }
+
+  .publish-text {
+    display: none;
+  }
+}
+
