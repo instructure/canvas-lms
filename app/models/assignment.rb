@@ -1595,6 +1595,8 @@ class Assignment < ActiveRecord::Base
         assoc.summary_data[:saved_comments] = hash[:saved_rubric_comments]
       end
       assoc.save
+
+      item.points_possible ||= rubric.points_possible if item.infer_grading_type == "points"
     end
     if hash[:grading_standard_migration_id]
       gs = context.grading_standards.find_by_migration_id(hash[:grading_standard_migration_id])
