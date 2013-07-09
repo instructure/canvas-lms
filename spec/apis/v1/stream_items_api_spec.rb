@@ -295,7 +295,8 @@ describe UsersController, :type => :integration do
     json = api_call(:get, "/api/v1/users/activity_stream.json",
                     { :controller => "users", :action => "activity_stream", :format => 'json' })
     @assignment.reload
-    assign_json = assignment_json(@assignment,@user,session,false)
+    assign_json = assignment_json(@assignment, @user, session,
+                                  include_discussion_topic: false)
     assign_json['title'] = @assignment.title
     json.should == [{
       'id' => StreamItem.last.id,
@@ -393,7 +394,8 @@ describe UsersController, :type => :integration do
     json = api_call(:get, "/api/v1/users/activity_stream.json",
                     { :controller => "users", :action => "activity_stream", :format => 'json' })
     @assignment.reload
-    assign_json = assignment_json(@assignment,@user,session,false)
+    assign_json = assignment_json(@assignment, @user, session,
+                                  include_discussion_topic: false)
     assign_json['title'] = @assignment.title
     json.should == [{
       'id' => StreamItem.last.id,

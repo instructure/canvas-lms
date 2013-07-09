@@ -71,7 +71,7 @@ module Api::V1::DiscussionTopics
       json[:url] = json[:html_url] # deprecated
       if include_assignment && topic.assignment
         extend Api::V1::Assignment
-        json[:assignment] = assignment_json(topic.assignment, user, session, !:include_discussion_topic)
+        json[:assignment] = assignment_json(topic.assignment, user, session, include_discussion_topic: false)
       end
       json
     end

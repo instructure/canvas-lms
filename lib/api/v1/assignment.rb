@@ -49,8 +49,10 @@ module Api::V1::Assignment
     )
   }
 
-  def assignment_json(assignment, user, session, include_discussion_topic = true, submission = nil, override_dates = true)
-    if override_dates && !assignment.new_record?
+  def assignment_json(assignment, user, session, opts = {})
+    opts.reverse_merge! include_discussion_topic: true, override_dates: true
+
+    if opts[:override_dates] && !assignment.new_record?
       assignment = assignment.overridden_for(user)
     end
     fields = assignment.new_record? ? API_ASSIGNMENT_NEW_RECORD_FIELDS : API_ALLOWED_ASSIGNMENT_OUTPUT_FIELDS
@@ -134,7 +136,7 @@ module Api::V1::Assignment
       }
     end
 
-    if include_discussion_topic && assignment.discussion_topic
+    if opts[:include_discussion_topic] && assignment.discussion_topic
       extend Api::V1::DiscussionTopics
       hash['discussion_topic'] = discussion_topic_api_json(
         assignment.discussion_topic,
@@ -149,7 +151,7 @@ module Api::V1::Assignment
       hash['published'] = ! assignment.unpublished?
     end
 
-    if submission
+    if submission = opts[:submission]
       hash['submission'] = submission_json(submission,assignment,user,session)
     end
 

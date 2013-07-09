@@ -304,9 +304,8 @@ class AssignmentsApiController < ApplicationController
       fake = @context.assignments.new
       fake.workflow_state = 'unpublished'
 
-      #default the assignment_overrides to true
       override_param = params[:override_assignment_dates] || true
-      assignment_overrides = value_to_boolean(override_param)
+      override_dates = value_to_boolean(override_param)
 
       if @domain_root_account.enable_draft? && !fake.grants_right?(@current_user, session, :read)
         #user is a student and assignment is not published
@@ -326,7 +325,8 @@ class AssignmentsApiController < ApplicationController
 
       hashes = @assignments.map do |assignment|
         submission = submissions[assignment.id]
-        assignment_json(assignment, @current_user, session, true, submission, assignment_overrides)
+        assignment_json(assignment, @current_user, session,
+                        submission: submission, override_dates: override_dates)
       end
 
       render :json => hashes.to_json
@@ -352,16 +352,15 @@ class AssignmentsApiController < ApplicationController
 
       if Array(params[:include]).include?('submission')
         submission = @assignment.submissions.for_user(@current_user).first
-      else
-         submission =  nil
       end
 
-      #default the assignment_overrides to true
       override_param = params[:override_assignment_dates] || true
-      assignment_overrides = value_to_boolean(override_param)
+      override_dates = value_to_boolean(override_param)
 
       @assignment.context_module_action(@current_user, :read) unless @assignment.locked_for?(@current_user, :check_policies => true)
-      render :json => assignment_json(@assignment, @current_user, session, true, submission, assignment_overrides)
+      render :json => assignment_json(@assignment, @current_user, session,
+                                      submission: submission,
+                                      override_dates: override_dates)
     end
   end
 

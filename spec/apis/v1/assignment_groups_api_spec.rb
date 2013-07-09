@@ -106,7 +106,7 @@ describe AssignmentGroupsController, :type => :integration do
         'rules' => {},
         'assignments' => [
           controller.assignment_json(a3,@user,session),
-          controller.assignment_json(a4,@user,session,true)
+          controller.assignment_json(a4,@user,session, include_discussion_topic: true)
         ],
       },
       {
