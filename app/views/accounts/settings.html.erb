@@ -104,7 +104,7 @@ TEXT
                 </td>
               </tr>
               <% f.fields_for :settings do |settings| %>
-                <% if Account.site_admin.grants_right?(@current_user, :manage_site_settings) %>
+                <% if @account.grants_right?(@current_user, :manage_site_settings) %>
                   <tr>
                     <td><%= settings.blabel :mfa_settings, :en => "Multi-Factor Authentication" %></td>
                     <td><%= settings.select :mfa_settings, [[t('select.mfa.disabled', "Disabled"), :disabled],
@@ -185,7 +185,7 @@ TEXT
           <legend><%= t(:features_title, "Features") %></legend>
           <% f.fields_for :settings do |settings| %>
             <% if @account.root_account? %>
-              <% if Account.site_admin.grants_right?(@current_user, :manage_site_settings) %>
+              <% if @account.grants_right?(@current_user, :manage_site_settings) %>
                 <div>
                   <%= settings.check_box :admins_can_change_passwords, :checked => @account.settings[:admins_can_change_passwords] == true %>
                   <%= settings.label :admins_can_change_passwords, :en => "Password setting by admins" %>
