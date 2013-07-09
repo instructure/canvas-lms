@@ -23,6 +23,7 @@ class EventStream
   attr_config :table, :type => String
   attr_config :id_column, :type => String, :default => 'id'
   attr_config :record_type, :default => EventStream::Record
+  attr_config :time_to_live, :type => Fixnum, :default => 1.year
 
   def initialize(&blk)
     instance_exec(&blk) if blk
@@ -89,6 +90,10 @@ class EventStream
     "#{database_name}.#{table}"
   end
 
+  def ttl_seconds(created_at)
+    ((created_at + time_to_live) - Time.now).to_i
+  end
+
   private
 
   def fetch_cql
@@ -101,8 +106,11 @@ class EventStream
   end
 
   def execute(operation, record)
+    ttl_seconds = self.ttl_seconds(record.created_at)
+    return if ttl_seconds < 0
+
     database.batch do
-      database.send(:"#{operation}_record", table, { id_column => record.id }, operation_payload(operation, record))
+      database.send(:"#{operation}_record", table, { id_column => record.id }, operation_payload(operation, record), ttl_seconds)
       run_callbacks(operation, record)
     end
   rescue Exception => exception

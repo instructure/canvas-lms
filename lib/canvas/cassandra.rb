@@ -150,18 +150,18 @@ module Canvas::Cassandra
     # in other words, changes is a hash in either of these formats (mixing is ok):
     #   { "colname" => newvalue }
     #   { "colname" => [oldvalue, newvalue] }
-    def update_record(table_name, primary_key_attrs, changes)
+    def update_record(table_name, primary_key_attrs, changes, ttl_seconds=nil)
       batch do
-        do_update_record(table_name, primary_key_attrs, changes)
+        do_update_record(table_name, primary_key_attrs, changes, ttl_seconds)
       end
     end
 
     # same as update_record, but preferred when doing inserts -- it skips
     # updating columns with nil values, rather than creating tombstone delete
     # records for them
-    def insert_record(table_name, primary_key_attrs, changes)
+    def insert_record(table_name, primary_key_attrs, changes, ttl_seconds=nil)
       changes = changes.reject { |k,v| v.is_a?(Array) ? v.last.nil? : v.nil? }
-      update_record(table_name, primary_key_attrs, changes)
+      update_record(table_name, primary_key_attrs, changes, ttl_seconds)
     end
 
     def select_value(query, *args)
@@ -185,7 +185,7 @@ module Canvas::Cassandra
 
     protected
 
-    def do_update_record(table_name, primary_key_attrs, changes)
+    def do_update_record(table_name, primary_key_attrs, changes, ttl_seconds)
       primary_key_attrs = primary_key_attrs.with_indifferent_access
       changes = changes.with_indifferent_access
       where_clause, where_args = build_where_conditions(primary_key_attrs)
@@ -210,8 +210,13 @@ module Canvas::Cassandra
       # so no need to differentiate here
       if updates.present?
         args = []
+        statement = "UPDATE #{table_name}"
+        if ttl_seconds
+          args << ttl_seconds
+          statement << " USING TTL ?"
+        end
         update_cql = updates.map { |key,val| args << val; "#{key} = ?" }.join(", ")
-        statement = "UPDATE #{table_name} SET #{update_cql} WHERE #{where_clause}"
+        statement << " SET #{update_cql} WHERE #{where_clause}"
         args.concat where_args
         update(statement, *args)
       end

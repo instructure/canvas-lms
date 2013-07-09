@@ -25,7 +25,7 @@ describe EventStream::Index do
     def @database.update_record(*args); end
     def @database.update(*args); end
 
-    @stream = stub('stream', :database => @database)
+    @stream = stub('stream', :database => @database, :ttl_seconds => 1.year)
   end
 
   context "setup block" do
@@ -181,7 +181,7 @@ describe EventStream::Index do
       end
 
       it "should use the configured table" do
-        @database.expects(:update).once.with(regexp_matches(/ INTO #{@table} /), anything, anything, anything)
+        @database.expects(:update).once.with(regexp_matches(/ INTO #{@table} /), anything, anything, anything, anything)
         @index.insert(@id, @key, @timestamp)
       end
 
@@ -190,20 +190,25 @@ describe EventStream::Index do
         key_column = stub(:to_s => "expected_key_column")
         @index.key_column key_column
         @index.expects(:bucket_for_time).once.with(@timestamp).returns(bucket)
-        @database.expects(:update).once.with(regexp_matches(/\(#{key_column}, /), "#{@key}/#{bucket}", anything, anything)
+        @database.expects(:update).once.with(regexp_matches(/\(#{key_column}, /), "#{@key}/#{bucket}", anything, anything, anything)
         @index.insert(@id, @key, @timestamp)
       end
 
       it "should take a prefix off the id and the bucket for the ordered_id" do
         prefix = @id.to_s[0,8]
-        @database.expects(:update).once.with(regexp_matches(/, ordered_id,/), anything, "#{@timestamp.to_i}/#{prefix}", anything)
+        @database.expects(:update).once.with(regexp_matches(/, ordered_id,/), anything, "#{@timestamp.to_i}/#{prefix}", anything, anything)
         @index.insert(@id, @key, @timestamp)
       end
 
       it "should pass through the id into the configured id column" do
         id_column = stub(:to_s => "expected_id_column")
         @index.id_column id_column
-        @database.expects(:update).once.with(regexp_matches(/, #{id_column}\)/), anything, anything, @id)
+        @database.expects(:update).once.with(regexp_matches(/, #{id_column}\)/), anything, anything, @id, anything)
+        @index.insert(@id, @key, @timestamp)
+      end
+
+      it "should include the ttl" do
+        @database.expects(:update).once.with(regexp_matches(/ USING TTL /), anything, anything, anything, @stream.ttl_seconds(@timestamp))
         @index.insert(@id, @key, @timestamp)
       end
     end

@@ -53,11 +53,14 @@ class EventStream::Index
   end
 
   def insert(id, key, timestamp)
+    ttl_seconds = event_stream.ttl_seconds(timestamp)
+    return if ttl_seconds < 0
+
     prefix = id.to_s[0,8]
     bucket = bucket_for_time(timestamp)
     key = "#{key}/#{bucket}"
     ordered_id = "#{timestamp.to_i}/#{prefix}"
-    database.update(insert_cql, key, ordered_id, id)
+    database.update(insert_cql, key, ordered_id, id, ttl_seconds)
   end
 
   def for_key(key)
@@ -80,7 +83,7 @@ class EventStream::Index
   private
 
   def insert_cql
-    "INSERT INTO #{table} (#{key_column}, ordered_id, #{id_column}) VALUES (?, ?, ?)"
+    "INSERT INTO #{table} (#{key_column}, ordered_id, #{id_column}) VALUES (?, ?, ?) USING TTL ?"
   end
 
   def history(key, pager)

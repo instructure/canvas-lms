@@ -97,7 +97,7 @@ describe EventStream do
 
     describe "on_insert" do
       before do
-        @record = stub(:id => stub('id'), :attributes => stub('attributes'))
+        @record = stub(:id => stub('id'), :created_at => Time.now, :attributes => stub('attributes'))
       end
 
       it "should register callback for execution during insert" do
@@ -126,7 +126,7 @@ describe EventStream do
 
     describe "insert" do
       before do
-        @record = stub(:id => stub('id'), :attributes => stub('attributes'))
+        @record = stub(:id => stub('id'), :created_at => Time.now, :attributes => stub('attributes'))
       end
 
       it "should insert into the configured database" do
@@ -135,19 +135,24 @@ describe EventStream do
       end
 
       it "should insert into the configured table" do
-        @database.expects(:insert_record).with(@table.to_s, anything, anything)
+        @database.expects(:insert_record).with(@table.to_s, anything, anything, anything)
         @stream.insert(@record)
       end
 
       it "should insert by the record's id into the configured id column" do
         id_column = stub(:to_s => stub('id_column'))
         @stream.id_column id_column
-        @database.expects(:insert_record).with(anything, { id_column.to_s => @record.id }, anything)
+        @database.expects(:insert_record).with(anything, { id_column.to_s => @record.id }, anything, anything)
         @stream.insert(@record)
       end
 
       it "should insert the record's attributes" do
-        @database.expects(:insert_record).with(anything, anything, @record.attributes)
+        @database.expects(:insert_record).with(anything, anything, @record.attributes, anything)
+        @stream.insert(@record)
+      end
+
+      it "should set the record's ttl" do
+        @database.expects(:insert_record).with(anything, anything, anything, @stream.ttl_seconds(@record.created_at))
         @stream.insert(@record)
       end
 
@@ -163,7 +168,7 @@ describe EventStream do
 
     describe "on_update" do
       before do
-        @record = stub(:id => stub('id'), :changes => stub('changes'))
+        @record = stub(:id => stub('id'), :created_at => Time.now, :changes => stub('changes'))
       end
 
       it "should register callback for execution during update" do
@@ -192,7 +197,7 @@ describe EventStream do
 
     describe "update" do
       before do
-        @record = stub(:id => stub('id'), :changes => stub('changes'))
+        @record = stub(:id => stub('id'), :created_at => Time.now, :changes => stub('changes'))
       end
 
       it "should update in the configured database" do
@@ -201,19 +206,24 @@ describe EventStream do
       end
 
       it "should update in the configured table" do
-        @database.expects(:update_record).with(@table.to_s, anything, anything)
+        @database.expects(:update_record).with(@table.to_s, anything, anything, anything)
         @stream.update(@record)
       end
 
       it "should update by the record's id in the configured id column" do
         id_column = stub(:to_s => stub('id_column'))
         @stream.id_column id_column
-        @database.expects(:update_record).with(anything, { id_column.to_s => @record.id }, anything)
+        @database.expects(:update_record).with(anything, { id_column.to_s => @record.id }, anything, anything)
         @stream.update(@record)
       end
 
       it "should update the record's changes" do
-        @database.expects(:update_record).with(anything, anything, @record.changes)
+        @database.expects(:update_record).with(anything, anything, @record.changes, anything)
+        @stream.update(@record)
+      end
+
+      it "should set the record's ttl" do
+        @database.expects(:update_record).with(anything, anything, anything, @stream.ttl_seconds(@record.created_at))
         @stream.update(@record)
       end
 
@@ -291,7 +301,7 @@ describe EventStream do
         before do
           @record = stub(
             :id => stub('id'),
-            :created_at => stub('created_at', :to_i => 0),
+            :created_at => Time.now,
             :attributes => stub('attributes'),
             :changes => stub('changes'),
             :entry => @entry
@@ -341,6 +351,7 @@ describe EventStream do
         @stream.stubs(:database).returns(@database)
         @record = stub(
           :id => 'id',
+          :created_at => Time.now,
           :attributes => {'attribute' => 'attribute_value'},
           :changes => {'changed_attribute' => 'changed_value'})
         @exception = Exception.new
