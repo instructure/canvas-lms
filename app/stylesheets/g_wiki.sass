@@ -42,6 +42,22 @@ $shadow: 0 1px 0 rgba(0,0,0,0.1)
           :padding-left 12px
         &:last-child
           :padding-right 12px
+          
+      .canvas-sortable-header-row
+        :text-transform uppercase
+        a.canvas-sort-field
+          :cursor pointer
+          :user-select none
+          :color inherit
+          i
+            :color #ccc
+        a.canvas-sort-field:hover
+          :text-decoration none
+          i
+            :color #0088cc
+        a.canvas-sort-field-active
+          i
+            :color black
 
     .table thead
       tr
