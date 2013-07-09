@@ -113,3 +113,91 @@ define [
 
     @optionProperty 'resourceName'
 
+    ##
+    # Overridden to allow recognition of hybrid jsonapi.org/canvas-style
+    # compound documents.
+    #
+    # These compound documents side load related objects as secondary
+    # collections alongside the primary collection, rather than embedded within
+    # the primary collection's objects. But unlike jsonapi.org, foreign keys
+    # relating the primary and secondary objects are left as properties on the
+    # primary object, rather than being encapsulated in a `links' property.
+    # Canvas indicates which collection in the response is primary through the
+    # `meta' property's `primaryCollection' subproperty.
+    #
+    # To adapt this style to Backbone, we check for this property and, if
+    # found, we extract the primary collection and pre-process any declared
+    # side loads into the embedded format that Backbone expects.
+    #
+    # Declaring recognized side loads is done through the `sideLoad' property
+    # on the collection class. The value of this property is an object whose
+    # keys identify the target relation property on the primary objects. The
+    # values for those keys can either be `true', a string, or an object.
+    #
+    # If the value is an object, the foreign key and side loaded collection
+    # name are identified by the `foreignKey' and `collection' properties,
+    # respectively. Absent properties are inferred from the relation name.
+    #
+    # A value is `true' is treated the same as an empty object (side load
+    # defined, but properties to be inferred). A string value is treated as a
+    # hash with a collection name, leaving the foreign key to be inferred.
+    #
+    # For examples, the following are all identical:
+    #
+    #   sideLoad:
+    #     author: true
+    #
+    #   sideLoad:
+    #     author:
+    #       collection: 'authors'
+    #
+    #   sideLoad:
+    #     author:
+    #       foreignKey: 'author_id'
+    #       collection: 'authors'
+    #
+    # If the authors are instead contained in the `people' collection, the
+    # following can be used interchangeably:
+    #
+    #   sideLoad:
+    #     author:
+    #       collection: 'people'
+    #
+    #   sideLoad:
+    #     author:
+    #       foreignKey: 'author_id'
+    #       collection: 'people'
+    #
+    # Alternately, if the collection is `authors' and the target relation
+    # property is `author', but the foreign key is `person_id' (such a silly
+    # API), you can use:
+    #
+    #   sideLoad:
+    #     author:
+    #       foreignKey: 'person_id'
+    #
+    parse: (response, xhr) ->
+      return super unless response.meta?
+
+      primaryCollection = response[response.meta.primaryCollection]
+      _.each (@sideLoad || {}), (meta, relation) ->
+        meta = {} if _.isBoolean(meta) && meta
+        meta = {collection: meta} if _.isString(meta)
+        return unless _.isObject(meta)
+
+        {foreignKey, collection} = meta
+        foreignKey ?= "#{relation}_id"
+        collection ?= "#{relation}s"
+        collection = response[collection] || []
+
+        index = {}
+        _.each collection, (item) ->
+          index[item.id] = item
+        _.each primaryCollection, (item) ->
+          id = item[foreignKey]
+          related = index[id]
+          if id? && related?
+            item[relation] = related
+            delete item[foreignKey]
+
+      super primaryCollection, xhr
