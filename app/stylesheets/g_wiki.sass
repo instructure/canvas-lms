@@ -14,7 +14,7 @@ $index-background: #e8ecef
 $item-background: #ffffff
 $item-hover-background: #eef7ff
 
-$shadow: 0 1px 0 rgba(0,0,0,0.1)
+$shadow: 0 1px 0 rgba(0,0,0,0.15)
 
 .pages
   #breadcrumbs
@@ -29,8 +29,8 @@ $shadow: 0 1px 0 rgba(0,0,0,0.1)
       :float right
 
 .pages.index
-  .toolbar-buttons
-    :position relative
+  .index-content-container
+    :margin-top 1px
   .index-content
     :background $index-background
     :padding 0 1em 1em
@@ -71,8 +71,12 @@ $shadow: 0 1px 0 rgba(0,0,0,0.1)
         :font-weight bold
       .front-page
         :margin auto 0.5em
+      .al-trigger
+        :color #b4b7ba
+      .al-trigger:hover
+        :color #4d4d4d
 
-      .linkrow
+      tr
         :background $item-background
         :text-decoration inherit
         :color inherit
@@ -85,12 +89,12 @@ $shadow: 0 1px 0 rgba(0,0,0,0.1)
         td:last-child
           :border-right 1px solid $border-color
 
-      .linkrow:first-child
+      tr:first-child
         td:first-child
           :border-top-left-radius $border-radius
         td:last-child
           :border-top-right-radius $border-radius
-      .linkrow:last-child
+      tr:last-child
         td
           :border-bottom 1px solid $border-color
         td:first-child

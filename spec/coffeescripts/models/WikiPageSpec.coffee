@@ -34,10 +34,40 @@ define [
     json = wikiPage.toJSON()
     equal json.id, undefined, 'Removes id from serialized json'
 
-  test "parse removes api's wiki_page namespace", ->
+  test 'parse removes wiki_page namespace added by api', ->
     wikiPage = new WikiPage
     namespacedObj = {}
     namespacedObj.wiki_page = wikiPageObj()
     parseResponse = wikiPage.parse(namespacedObj)
 
     ok !_.isObject(parseResponse.wiki_page), "Removes the wiki_page namespace"
+
+  test 'present includes the context information', ->
+    wikiPage = new WikiPage {}, contextAssetString: 'course_31'
+    json = wikiPage.present()
+    equal json.contextName, 'courses', 'contextName'
+    equal json.contextId, 31, 'contextId'
+
+  test 'publish convenience method', 3, ->
+    wikiPage = new WikiPage wikiPageObj()
+    sinon.stub wikiPage, 'save', (attributes, options) ->
+      ok attributes, 'attributes present'
+      ok attributes.wiki_page, 'wiki_page present'
+      strictEqual attributes.wiki_page.published, true, 'published provided correctly'
+    wikiPage.publish()
+
+  test 'unpublish convenience method', 3, ->
+    wikiPage = new WikiPage wikiPageObj()
+    sinon.stub wikiPage, 'save', (attributes, options) ->
+      ok attributes, 'attributes present'
+      ok attributes.wiki_page, 'wiki_page present'
+      strictEqual attributes.wiki_page.published, false, 'published provided correctly'
+    wikiPage.unpublish()
+
+  test 'setAsFrontPage convenience method', 3, ->
+    wikiPage = new WikiPage wikiPageObj()
+    sinon.stub wikiPage, 'save', (attributes, options) ->
+      ok attributes, 'attributes present'
+      ok attributes.wiki_page, 'wiki_page present'
+      strictEqual attributes.wiki_page.front_page, true, 'front_page provided correctly'
+    wikiPage.setAsFrontPage()

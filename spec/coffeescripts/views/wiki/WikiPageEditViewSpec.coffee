@@ -26,7 +26,6 @@ define [
 
   test 'wiki body gets attached to the wikisidebar', ->
     wikiPageEditView = new WikiPageEditView
-    $('#fixtures').append(wikiPageEditView.$el)
     wikiPageEditView.render()
     ok @attachWikiEditorStub.calledOnce, 'Attached wikisidebar to body'
 

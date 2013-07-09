@@ -1,4 +1,19 @@
-<td role="gridcell"><a href="{{html_url}}" class="{{#unless published}}un{{/unless}}published">{{title}}</a>{{#if front_page}} <span class="front-page label">{{#t 'labels.front_page'}}Front Page{{/t}}</span>{{/if}}</td>
+<td role="gridcell">
+  <a href="{{html_url}}" class="wiki-page-link {{#unless published}}un{{/unless}}published">{{title}}</a>
+  {{#if front_page}} <span class="front-page label">{{#t 'labels.front_page'}}Front Page{{/t}}</span>{{/if}}
+</td>
 <td role="gridcell">{{tDateToString created_at "medium"}}</td>
 <td role="gridcell">{{tDateToString updated_at "medium"}}{{#if last_edited_by.display_name}} by {{last_edited_by.display_name}}{{/if}}</td>
-<td role="gridcell"><i {{#if published}}class="icon-publish"{{else}}class="icon-unpublished"{{/if}} aria-hidden="true"></i><span id="{{id}}-publish-icon" class="screenreader-only">{{#if published}}{{#t 'published'}}Published{{/t}}{{else}}{{#t 'unpublished'}}Unpublished{{/t}}{{/if}}</span></td>
+<td role="gridcell" class="publish-cell">
+</td>
+<td role="gridcell">
+  <a class="al-trigger" tabindex="-1" role="button">
+    <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
+    <span class="screenreader-only">Settings</span>
+  </a>
+  <ul class="al-options">
+    <li><a href="{{html_url}}/edit" class="icon-edit" title="{{#t 'menu.edit'}}Edit{{/t}}">{{#t 'menu.edit'}}Edit{{/t}}</a></li>
+    <li><a href="#" class="icon-trash delete-menu-item" title="{{#t 'menu.delete'}}Delete{{/t}}">{{#t 'menu.delete'}}Delete{{/t}}</a></li>
+    <li><a href="#" class="icon-home set-front-page-menu-item" title="{{#t 'menu.set_front_page'}}Set as Front Page{{/t}}">{{#t 'menu.set_front_page'}}Set as Front Page{{/t}}</a></li>
+  </ul>
+</td>

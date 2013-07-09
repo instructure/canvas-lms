@@ -48,3 +48,10 @@ define [
         wiki_page:
           published: false
       @save attributes, wait: true
+
+    # Uses the api to set the page as the front page
+    setAsFrontPage: ->
+      attributes =
+        wiki_page:
+          front_page: true
+      @save attributes, wait: true

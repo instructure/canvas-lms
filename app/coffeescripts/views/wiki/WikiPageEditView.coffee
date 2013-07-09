@@ -28,7 +28,7 @@ define [
 
     initialize: ->
       super
-      @on 'success', (args) => window.location = @model.get('html_url')
+      @on 'success', (args) => window.location.href = @model.get('html_url')
 
     # After the page loads, ensure the that wiki sidebar gets initialized
     # correctly.
@@ -69,7 +69,7 @@ define [
     navigateToPageView: (event) ->
       event?.preventDefault()
       html_url = @model.get('html_url')
-      window.location = html_url if html_url
+      window.location.href = html_url if html_url
 
     deleteWikiPage: (event) ->
       event?.preventDefault()

@@ -1,9 +1,10 @@
 define [
+  'jquery'
   'underscore'
   'compiled/views/DialogFormView'
   'i18n!pages'
   'jst/wiki/WikiPageDeleteDialog'
-], (_, DialogFormView, I18n, wrapperTemplate) ->
+], ($, _, DialogFormView, I18n, wrapperTemplate) ->
 
   dialogDefaults =
     title: I18n.t 'delete_title', 'Delete Wiki Page'
@@ -17,17 +18,29 @@ define [
     @optionProperty 'wiki_pages_url'
 
     initialize: (options) ->
+      modelView = @model?.view
       super _.extend {}, dialogDefaults, options
+      @model?.view = modelView
 
     submit: (event) ->
       event?.preventDefault()
 
+      destroyDfd = @model.destroy(wait: true)
+
+      dfd = $.Deferred()
       page_title = @model.get('title')
       wiki_pages_url = @wiki_pages_url
 
-      dfd = $.Deferred()
-      destroyDfd = @model.destroy()
-      destroyDfd.then -> window.location = wiki_pages_url + "?deleted_page_title=#{encodeURIComponent(page_title)}"
-      destroyDfd.fail -> dfd.reject()
+      destroyDfd.then =>
+        if wiki_pages_url
+          window.location.href = wiki_pages_url + "?deleted_page_title=#{encodeURIComponent(page_title)}"
+        else
+          $.flashMessage I18n.t 'notices.page_deleted', 'The page "%{title}" has been deleted.', title: page_title
+          dfd.resolve()
+          @close()
+
+      destroyDfd.fail =>
+        $.flashError I18n.t 'notices.delete_failed', 'The page "%{title}" could not be deleted.', title: page_title
+        dfd.reject()
 
       @$el.disableWhileLoading dfd
