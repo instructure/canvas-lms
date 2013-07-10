@@ -275,5 +275,71 @@ describe "assignment groups" do
       ag.reload.rules_hash.should be_blank
       f("#assignment_group_#{ag.id} .ig-header").text.should_not match "Rule"
     end
+
+    it "should delete an assignment group with assignments" do
+      @ag2 = @course.assignment_groups.create!(:name => "2nd Group")
+      @course.assignments.create(:name => "Test assignment", :assignment_group => @ag2)
+      refresh_page
+      wait_for_ajaximations
+
+      f("#assignment_group_#{@ag2.id} .al-trigger").click
+      f("#assignment_group_#{@ag2.id} .delete_group").click
+      wait_for_animations
+
+      fj('.delete_group:visible').click
+      wait_for_ajaximations
+
+      @ag2.reload
+      @ag2.workflow_state.should == 'deleted'
+    end
+
+    it "should delete an assignment group without assignments" do
+      @ag2 = @course.assignment_groups.create!(:name => "2nd Group")
+      refresh_page
+      wait_for_ajaximations
+
+      f("#assignment_group_#{@ag2.id} .al-trigger").click
+      f("#assignment_group_#{@ag2.id} .delete_group").click
+
+      driver.switch_to.alert.should_not be nil
+      driver.switch_to.alert.accept
+      wait_for_ajaximations
+
+      @ag2.reload
+      @ag2.workflow_state.should == 'deleted'
+    end
+
+    it "should not delete the last assignment group" do
+
+      f("#assignment_group_#{@assignment_group.id} .al-trigger").click
+      f("#assignment_group_#{@assignment_group.id} .delete_group").click
+
+      driver.switch_to.alert.should_not be nil
+      driver.switch_to.alert.accept
+
+      @assignment_group.reload
+      @assignment_group.should_not be nil
+    end
+
+    it "should move assignments to another assignment group" do
+      before_count = @assignment_group.assignments.count
+      @ag2 = @course.assignment_groups.create!(:name => "2nd Group")
+      @assignment = @course.assignments.create(:name => "Test assignment", :assignment_group => @ag2)
+      refresh_page
+      wait_for_ajaximations
+
+      f("#assignment_group_#{@ag2.id} .al-trigger").click
+      f("#assignment_group_#{@ag2.id} .delete_group").click
+      wait_for_animations
+
+      fj('.assignment_group_move:visible').click
+      click_option('.group_select:visible', @assignment_group.id.to_s, :value)
+
+      fj('.delete_group:visible').click
+      wait_for_ajaximations
+
+      @assignment.reload
+      @assignment.assignment_group.should == @assignment_group
+    end
   end
 end

@@ -26,6 +26,7 @@ require [
   'compiled/views/assignments/AssignmentSettingsView'
   'compiled/views/assignments/AssignmentGroupWeightsView'
   'jst/assignments/teacher_index/AssignmentGroupList'
+
 ], (AssignmentGroupCollection, Course, CollectionView, InputFilterView, AssignmentGroupListItemView, CreateGroupView, TeacherIndexView, AssignmentSettingsView, AssignmentGroupWeightsView, assignmentGroupsTemplate) ->
 
   course = new Course

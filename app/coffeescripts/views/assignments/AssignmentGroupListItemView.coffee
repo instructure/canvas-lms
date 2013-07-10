@@ -6,8 +6,9 @@ define [
   'compiled/views/assignments/AssignmentListItemView'
   'compiled/views/assignments/CreateAssignmentView'
   'compiled/views/assignments/CreateGroupView'
+  'compiled/views/assignments/DeleteGroupView'
   'jst/assignments/teacher_index/AssignmentGroupListItem'
-], (I18n, _, AssignmentCollection, CollectionView, AssignmentListItemView, CreateAssignmentView, CreateGroupView, template) ->
+], (I18n, _, AssignmentCollection, CollectionView, AssignmentListItemView, CreateAssignmentView, CreateGroupView, DeleteGroupView, template) ->
 
   class AssignmentGroupListItemView extends CollectionView
 
@@ -17,9 +18,11 @@ define [
 
     @child 'createAssignmentView', '[data-view=createAssignment]'
     @child 'editGroupView', '[data-view=editAssignmentGroup]'
+    @child 'deleteGroupView', '[data-view=deleteAssignmentGroup]'
 
     els: _.extend({}, @::els, {
       '.add_assignment': '$addAssignmentButton'
+      '.delete_group': '$deleteGroupButton'
       '.edit_group': '$editGroupButton'
     })
 
@@ -36,12 +39,15 @@ define [
       # child views so they get rendered automatically, need to stop it
       @createAssignmentView.hide()
       @editGroupView.hide()
+      @deleteGroupView.hide()
       # its trigger would not be rendered yet, set it manually
       @createAssignmentView.setTrigger @$addAssignmentButton
       @editGroupView.setTrigger @$editGroupButton
+      @deleteGroupView.setTrigger @$deleteGroupButton
 
     initialize: ->
       @collection = new AssignmentCollection @model.get('assignments')
+      @collection.on('add remove', @refreshDeleteDialog)
       super
 
       @editGroupView = new CreateGroupView
@@ -50,6 +56,17 @@ define [
       @createAssignmentView = new CreateAssignmentView
         assignmentGroup: @model
         collection: @collection
+      @deleteGroupView = new DeleteGroupView
+        model: @model
+        assignments: @collection
+
+    # this is the only way to get the number of assignments to update properly
+    # when an assignment is created in a new assignment group (before refreshing the page)
+    refreshDeleteDialog: =>
+      @deleteGroupView.remove()
+      @deleteGroupView = new DeleteGroupView
+        model: @model
+        assignments: @collection
 
     toJSON: ->
       count = @countRules()
