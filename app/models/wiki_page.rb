@@ -198,6 +198,7 @@ class WikiPage < ActiveRecord::Base
       locked = false
       if (m && !m.available_for?(user))
         locked = {:asset_string => self.asset_string, :context_module => m.attributes}
+        locked[:unlock_at] = locked[:context_module]["unlock_at"] if locked[:context_module]["unlock_at"]
       end
       locked
     end

@@ -43,7 +43,7 @@ module HasContentTags
   end
   
   def locked_cache_key(user)
-    ['_locked_for', self, user].cache_key
+    ['_locked_for2', self, user].cache_key
   end
   
   def clear_locked_cache(user)

@@ -1201,6 +1201,7 @@ class Attachment < ActiveRecord::Base
         locked = {:asset_string => self.asset_string, :lock_at => self.lock_at}
       elsif self.could_be_locked && item = locked_by_module_item?(user, opts[:deep_check_if_needed])
         locked = {:asset_string => self.asset_string, :context_module => item.context_module.attributes}
+        locked[:unlock_at] = locked[:context_module]["unlock_at"] if locked[:context_module]["unlock_at"]
       end
       locked
     end
