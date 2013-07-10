@@ -54,6 +54,11 @@ define [
       enrollment.typeLabel = keys[scope][enrollment.type]
       enrollment.permissions = ENV.PERMISSIONS
       enrollment.typeClass = toUnderscore(enrollment.type)
+      # BEGIN CANVAS-224 Only show unenroll button if allowed
+      # User can only be unenrolled if this enrollment is not defined by SIS.
+      enrollment.definedBySis = (enrollment.sis_source_id != null)
+      enrollment.canRemove = enrollment.permissions.manage_students && !enrollment.definedBySis
+      # END CANVAS-224
 
       enrollment
 
