@@ -161,6 +161,21 @@ describe ContentTag do
     @assignment.title.should == 'some assignment (renamed)'
   end
 
+  it "should not attempt to update asset name attribute if it's over the db limit" do
+    course
+    @page = @course.wiki.wiki_pages.create!(:title => "some page")
+    @page.workflow_state = 'unpublished'
+    @page.save!
+    @module = @course.context_modules.create!(:name => "module")
+    @tag = @module.add_item({:type => 'WikiPage', :title => 'oh noes!' * 35, :id => @page.id})
+    @tag.workflow_state.should == 'unpublished'
+
+    @tag.update_asset_name!
+
+    @page.reload
+    @tag.title[0, 250].should == @page.title[0, 250]
+  end
+
   it "should publish/unpublish the tag if the linked wiki page is published/unpublished" do
     course
     @page = @course.wiki.wiki_pages.create!(:title => "some page")
