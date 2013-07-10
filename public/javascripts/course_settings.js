@@ -395,7 +395,7 @@ define([
         $link.text(I18n.t('errors.invitation', "Invitation Failed.  Please try again."));
       });
     });
-    $(".date_entry").date_field();
+    $(".date_entry").datetime_field({alwaysShowTime: true});
 
     $().data('current_default_wiki_editing_roles', $("#course_default_wiki_editing_roles").val());
     $("#course_default_wiki_editing_roles").change(function() {
