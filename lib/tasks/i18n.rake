@@ -394,15 +394,23 @@ namespace :i18n do
   end
 
   desc "Imports new translations, ignores missing or unexpected keys"
-  task :autoimport, [:translated_file] => :environment do |t, args|
-    require 'ya2yaml'
+  task :autoimport, [:translated_file, :source_file] => :environment do |t, args|
     require 'open-uri'
+    if args[:source_file].present?
+      source_translations = YAML.safe_load(open(args[:source_file]))
+    else
+      source_translations = YAML.safe_load(open("config/locales/generated/en.yml"))
+    end
+    new_translations = YAML.safe_load(open(args[:translated_file]))
+    autoimport(source_translations, new_translations)
+  end
+
+  def autoimport(source_translations, new_translations)
+    require 'ya2yaml'
     Hash.send(:include, I18n::HashExtensions) unless Hash.new.kind_of?(I18n::HashExtensions)
 
-    source_translations = YAML.safe_load(open("config/locales/generated/en.yml"))
-
-    raise "Need translated_file" unless args[:translated_file]
-    new_translations = YAML.safe_load(open(args[:translated_file]))
+    raise "Need source translations" unless source_translations
+    raise "Need translated_file" unless new_translations
 
     import = I18nImport.new(source_translations, new_translations)
 
@@ -417,7 +425,7 @@ namespace :i18n do
         :accept
       end
     end
-    next if complete_translations.nil?
+    raise "got no translations" if complete_translations.nil?
 
     File.open("config/locales/#{import.language}.yml", "w") { |f|
       f.write({import.language => complete_translations}.ya2yaml(:syck_compatible => true))
@@ -425,7 +433,7 @@ namespace :i18n do
   end
 
   def transifex_languages(languages)
-    if languages
+    if languages.present?
       languages.split(/\s*,\s*/)
     else
       %w(ar zh fr ja pt es ru)
@@ -452,16 +460,21 @@ namespace :i18n do
   end
 
   desc "Download language files from Transifex and import them"
-  task :transifeximport, [:user, :password, :languages, :source_file] do |t, args|
+  task :transifeximport, [:user, :password, :languages, :source_file] => :environment do |t, args|
+    require 'open-uri'
+
     languages = transifex_languages(args[:languages])
+    source_file = args[:source_file] || 'config/locales/generated/en.yml'
+    source_translations = YAML.safe_load(open(source_file))
+
     transifex_download(args[:user], args[:password], languages)
 
-    source_file = args[:source_file] || 'config/locales/generated/en.yml'
     for lang in languages
       translated_file = "tmp/#{lang}.yml"
       puts "Importing #{translated_file}"
-      Rake::Task['i18n:import'].reenable
-      Rake::Task['i18n:import'].invoke(source_file, translated_file)
+      new_translations = YAML.safe_load(open(translated_file))
+
+      autoimport(source_translations, new_translations)
     end
   end
 
