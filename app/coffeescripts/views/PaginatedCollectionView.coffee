@@ -40,6 +40,11 @@ define [
 
     @optionProperty 'scrollContainer'
 
+    ##
+    # Whether the collection should keep fetching pages until below the
+    # viewport. Defaults to false (i.e. just do one fetch per scroll)
+    @optionProperty 'autoFetch'
+
     template: template
 
     ##
@@ -59,7 +64,10 @@ define [
       @collection.on 'reset', @attachScroll
       @collection.on 'fetched:last', @detachScroll
       @collection.on 'beforeFetch', @showLoadingIndicator
-      @collection.on 'fetch', @hideLoadingIndicator
+      if @autoFetch
+        @collection.on 'fetch', => setTimeout @checkScroll # next tick so events don't stomp on each other
+      else
+        @collection.on 'fetch', @hideLoadingIndicator
 
     ##
     # Sets instance properties regarding the scrollContainer
@@ -69,10 +77,10 @@ define [
     initScrollContainer: ->
       @scrollContainer = $ @scrollContainer
       @heightContainer = if @scrollContainer[0] is window
-        # window has no scrollHeight
-        document.body
+        # window has no position
+        $ document.body
       else
-        @scrollContainer[0]
+        @scrollContainer
 
     ##
     # Attaches scroll event to scrollContainer
@@ -99,12 +107,17 @@ define [
     # @api public
 
     checkScroll: =>
-      return if @fetchingPage
-      distanceToBottom = @heightContainer.scrollHeight -
+      return if @collection.fetchingPage or @collection.fetchingNextPage
+      elementBottom = @$el.position().top +
+        @$el.height() -
+        @heightContainer.position().top
+      distanceToBottom = elementBottom -
         @scrollContainer.scrollTop() -
         @scrollContainer.height()
       if distanceToBottom < @options.buffer
         @collection.fetch page: 'next'
+      else
+        @hideLoadingIndicator()
 
     ##
     # Remove scroll event if view is removed
