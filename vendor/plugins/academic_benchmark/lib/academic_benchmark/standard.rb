@@ -6,8 +6,6 @@ class Standard
     @parent = parent
     @children = []
 
-    return if type == 'course'
-
     if has_items?
       items.each do |itm|
         Standard.new(itm, self)
