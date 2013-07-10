@@ -65,7 +65,7 @@ describe GroupsController do
 
       it "should paginate json" do
         get 'index', :format => 'json', :per_page => 1
-        assigns[:groups].should == [@student.current_groups.order(:id).first]
+        assigns[:groups].should == [@student.current_groups.by_name.first]
         response.headers['Link'].should_not be_nil
       end
     end

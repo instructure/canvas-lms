@@ -193,7 +193,10 @@ class Group < ActiveRecord::Base
     group_memberships.update_all(:workflow_state => 'deleted')
   end
 
+  Bookmarker = BookmarkedCollection::SimpleBookmarker.new(Group, :name, :id)
+
   scope :active, where("groups.workflow_state<>'deleted'")
+  scope :by_name, lambda { order(Bookmarker.order_by) }
 
   def full_name
     res = before_label(self.name) + " "
@@ -557,23 +560,5 @@ class Group < ActiveRecord::Base
 
   def associated_shards
     [Shard.default]
-  end
-
-  class Bookmarker
-    def self.bookmark_for(group)
-      group.id
-    end
-
-    def self.validate(bookmark)
-      bookmark.is_a?(Fixnum)
-    end
-
-    def self.restrict_scope(scope, pager)
-      if bookmark = pager.current_bookmark
-        comparison = (pager.include_bookmark ? 'groups.id >= ?' : 'groups.id > ?')
-        scope = scope.where(comparison, bookmark)
-      end
-      scope.order("groups.id ASC")
-    end
   end
 end

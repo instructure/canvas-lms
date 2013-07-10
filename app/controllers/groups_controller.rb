@@ -155,7 +155,7 @@ class GroupsController < ApplicationController
     return context_index if @context
     respond_to do |format|
       format.html do
-        @groups = @current_user.current_groups.
+        @groups = @current_user.current_groups.by_name.
           with_each_shard{ |scope| scope.includes(:group_category) }
       end
 
@@ -181,7 +181,7 @@ class GroupsController < ApplicationController
   def context_index
     return unless authorized_action(@context, @current_user, :read_roster)
 
-    @groups      = @context.groups.active.order(:name, :created_at)
+    @groups      = @context.groups.active.by_name
     @categories  = @context.group_categories.order("role <> 'student_organized'", :name)
     @user_groups = @current_user.group_memberships_for(@context) if @current_user
 
