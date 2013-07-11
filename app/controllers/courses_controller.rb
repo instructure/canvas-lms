@@ -361,6 +361,8 @@ class CoursesController < ApplicationController
   # @API List users
   # Returns the list of users in this course. And optionally the user's enrollments in the course.
   #
+  # @argument search_term [optional]
+  #   The partial name or full ID of the users to match and return in the results list.
   # @argument enrollment_type [optional, "teacher"|"student"|"ta"|"observer"|"designer"]
   #   When set, only return users where the user is enrolled as this type.
   #   This argument is ignored if enrollment_role is given.
@@ -437,37 +439,6 @@ class CoursesController < ApplicationController
         enrollments = u.not_ended_enrollments if includes.include?('enrollments')
         user_json(u, @current_user, session, includes, @context, enrollments)
       }
-    end
-  end
-
-  # @API Search users
-  # Returns a list of users in this course that match a search term.
-  #
-  # @argument search_term
-  #   The partial name or full ID of the users to match and return in the results list.
-  # @argument enrollment_type [optional, "teacher"|"student"|"ta"|"observer"|"designer"]
-  #   When set, only return users where the user is enrolled as this type.
-  #   This argument is ignored if enrollment_role is given.
-  # @argument enrollment_role [optional]
-  #   When set, only return users enrolled with the specified course-level role.  This can be
-  #   a role created with the {api:RoleOverridesController#add_role Add Role API} or a
-  #   base role type of 'StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment',
-  #   'ObserverEnrollment', or 'DesignerEnrollment'.
-  # @argument include[]
-  #   The same as the List Users API
-  #
-  # @returns [User]
-  def search_users
-    get_context
-    if authorized_action(@context, @current_user, :read_roster)
-      unless params['search_term']
-        return render \
-                :json => {
-            "status" => "argument_error",
-            "message" => "search_term of 3 or more characters is required" },
-                :status => :bad_request
-      end
-      users
     end
   end
 

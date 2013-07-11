@@ -1058,21 +1058,15 @@ describe CoursesController, :type => :integration do
       @student2_enroll = @course1.enroll_user(@student2, 'StudentEnrollment', :section => @section2)
     end
 
-    describe "/search_users" do
-      let(:api_url) { "/api/v1/courses/#{@course1.id}/search_users.json" }
+    describe "search users" do
+      let(:api_url) { "/api/v1/courses/#{@course1.id}/users.json" }
       let(:api_route) do
         {
           :controller => 'courses',
-          :action => 'search_users',
+          :action => 'users',
           :course_id => @course1.id.to_s,
           :format => 'json'
         }
-      end
-
-      it "returns an error when search_term not present" do
-        json = api_call(:get, api_url, api_route, {}, {}, :expected_status => 400)
-        json["status"].should == "argument_error"
-        json["message"].should == "search_term of 3 or more characters is required"
       end
 
       it "returns an error when search_term is fewer than 3 characters" do
@@ -1090,6 +1084,13 @@ describe CoursesController, :type => :integration do
             @course1.users.select{ |u| u.name == 'TAPerson' },
             :only => USER_API_FIELDS)
 
+        sorted_users.should == expected_users
+
+        # this endpoint doesn't exist, but we maintain the route for backwards compat
+        json = api_call(:get, "/api/v1/courses/#{@course1.id}/search_users",
+                        { controller: 'courses', action: 'users', course_id: @course1.to_param, format: 'json' },
+                        :search_term => "TAP")
+        sorted_users = json.sort_by{ |x| x["id"] }
         sorted_users.should == expected_users
       end
 

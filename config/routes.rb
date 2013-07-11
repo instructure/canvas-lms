@@ -822,8 +822,10 @@ FakeRails3Routes.draw do
       put 'courses/:course_id/settings', :action => :update_settings
       get 'courses/:course_id/recent_students', :action => :recent_students, :path_name => 'course_recent_students'
       get 'courses/:course_id/users', :action => :users, :path_name => 'course_users'
+      # this api endpoint has been removed, it was redundant with just courses#users
+      # we keep it around for backward compatibility though
+      get 'courses/:course_id/search_users', :action => :users
       get 'courses/:course_id/users/:id', :action => :user, :path_name => 'course_user'
-      get 'courses/:course_id/search_users', :action => :search_users, :path_name => 'course_search_users'
       get 'courses/:course_id/activity_stream', :action => :activity_stream, :path_name => 'course_activity_stream'
       get 'courses/:course_id/activity_stream/summary', :action => :activity_stream_summary, :path_name => 'course_activity_stream_summary'
       get 'courses/:course_id/todo', :action => :todo_items
