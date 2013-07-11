@@ -447,7 +447,7 @@ div#content
 
   .text
     :clear left
-    :padding 5px 20px
+    :padding 5px 20px 20px 20px
     
     .button-container
       :clear both
@@ -1455,3 +1455,71 @@ ul#quiz_versions
 
 #quiz-draft-state
   padding: 10px
+  font-weight: bold
+  &.published
+    color: #007711
+  &.not_published
+    color: #999999
+
+.regrade-options
+  margin-top: 12px
+  color: #333
+  padding: 2px 10px 13px 10px
+
+  h3
+    margin: 0
+    text-transform: uppercase
+    font-size: 100%
+    font-weight: bold
+
+    span
+      font-weight: normal
+      text-transform: none
+
+  .checkbox
+    padding-left: 12px
+
+    input
+      height: 16px
+      margin: 0 9px 0 0
+
+.regrade-options label
+  display: block
+
+.user-regrade-points
+  color: orange
+
+.regraded-warning
+  margin: 0 0 10px 0
+
+#quiz-submission-version-table
+  margin: 30px 0 0 0
+  @include clearfix
+
+  .desc
+    width: 22%
+    float: left
+    margin-right: 2%
+    text-align: right
+    font-size: 110%
+    color: #555
+
+  table
+    width: 65%
+    float: left
+    border-color: #a7acb3
+
+  td
+    padding: 4px 8px
+    border-color: #a7acb3
+
+  thead td.regraded
+    color: white
+    background-color: #f89508
+    text-shadow: 0 -1px 0 #cf9b47
+    border-top: none
+
+  td.regraded
+    border-top: 1px solid #C4AE90
+    background-color: $warningBackground
+

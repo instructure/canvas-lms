@@ -1,0 +1,29 @@
+  <div class="desc">
+    <%= t 'attempt_history', 'Attempt History' %>
+  </div>
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <td>&nbsp;</td>
+        <td><%= t 'attempt', 'Attempt' %></td>
+        <td><%= t 'time', 'Time' %></td>
+        <td><%= t 'score', 'Score' %></td>
+        <% if submission_has_regrade?(@submission) %>
+        <td class="regraded"><%= t 'regraded', 'Re-Graded' %></td>
+        <% end %>
+      </tr>
+    </thead>
+
+    <tbody>
+      <% if @versions.size > 1 %>
+        <% version, index = @versions.reverse.each_with_index.detect {|k, v| k.score == @submission.kept_score } %>
+        <% if version %>
+          <%= render :partial => "submission_version", :locals => {:version => version, :index => @versions.length - index, :kept => true} %>
+        <% end %>
+      <% end %>
+
+      <% (@versions.reverse!).each_with_index do |version, index| %>
+        <%= render :partial => "submission_version", :locals => {:version => version, :index => @versions.length - index, :kept => false} %>
+      <% end %>
+    </tbody>
+  </table>

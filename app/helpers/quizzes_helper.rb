@@ -453,4 +453,16 @@ module QuizzesHelper
     end
   end
 
+  def has_regraded_version?(versions)
+    versions.detect {|v| v.score_before_regrade.present? }
+  end
+
+  def submission_has_regrade?(submission)
+    submission && submission.score_before_regrade.present?
+  end
+
+  def score_affected_by_regrade?(submission)
+    submission && submission.score_before_regrade != submission.score
+  end
+
 end

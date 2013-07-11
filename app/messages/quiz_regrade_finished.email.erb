@@ -1,0 +1,12 @@
+<% define_content :link do %>
+  <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.quiz.context) %>/<%= polymorphic_path([asset.quiz.context,asset.quiz]) %>
+<% end %>
+
+<% define_content :subject do %>
+  <%= t :subject, "Quiz Regrade Finished: %{quiz}, %{context}", :quiz => asset.quiz.title, :context => asset.quiz.context.name %>
+<% end %>
+
+<%= t :body, "A regrade has finsihed for the quiz %{quiz}", :quiz => asset.quiz %>
+
+<%= t :link_message, "You can view the quiz here:" %>
+<%= content :link %>

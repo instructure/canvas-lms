@@ -227,6 +227,7 @@ class AssessmentQuestion < ActiveRecord::Base
     question = HashWithIndifferentAccess.new
     qdata = qdata.with_indifferent_access
     previous_data = assessment_question.question_data rescue {}
+    question[:regrade_option] = qdata[:regrade_option] if qdata[:regrade_option].present?
     question[:points_possible] = (qdata[:points_possible] || previous_data[:points_possible] || 0.0).to_f
     question[:correct_comments] = check_length(qdata[:correct_comments] || previous_data[:correct_comments] || "", 'correct comments', 5.kilobyte)
     question[:incorrect_comments] = check_length(qdata[:incorrect_comments] || previous_data[:incorrect_comments] || "", 'incorrect comments', 5.kilobyte)

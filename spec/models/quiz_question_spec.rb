@@ -38,6 +38,36 @@ describe QuizQuestion do
     data[:answers][1][:weight].should eql(0.0)
   end
 
+  describe "#question_data=" do
+    before do
+      course_with_teacher
+
+      @quiz = @course.quizzes.create
+
+      @data = {:question_name   => 'test question',
+               :points_possible => '1',
+               :question_type   => 'multiple_choice_question',
+               :answers         => {'answer_0' => {'answer_text' => '1', 'id' => 1},
+                                    'answer_1' => {'answer_text' => '2', 'id' => 2},
+                                    'answer_1' => {'answer_text' => '3', 'id' => 3},
+                                    'answer_1' => {'answer_text' => '4', 'id' => 4}}}
+      @question = @quiz.quiz_questions.create(:question_data => @data)
+    end
+
+    it "should save regrade if passed in regrade option in data hash" do
+      QuizQuestionRegrade.first.should be_nil
+
+      QuizRegrade.create(quiz_id: @quiz.id, user_id: @user.id, quiz_version: @quiz.version_number)
+      @question.question_data = @data.merge(:regrade_option => 'full_credit',
+                                            :regrade_user   => @user)
+      @question.save
+
+      question_regrade = QuizQuestionRegrade.first
+      question_regrade.should be
+      question_regrade.regrade_option.should == 'full_credit'
+    end
+  end
+
   context "migrate_question_hash" do
     before do
       course_with_teacher

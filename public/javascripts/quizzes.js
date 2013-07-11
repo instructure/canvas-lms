@@ -16,6 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 define([
+  'jst/quiz/regrade',
   'i18n!quizzes',
   'underscore',
   'jquery' /* $ */,
@@ -48,8 +49,9 @@ define([
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'jqueryui/sortable' /* /\.sortable/ */,
   'jqueryui/tabs' /* /\.tabs/ */
-], function(I18n,_,$,calcCmd, htmlEscape, pluralize, wikiSidebar,
-            DueDateListView, DueDateOverrideView, Quiz, DueDateList,SectionList,
+], function(regradeTemplate, I18n,_,$,calcCmd, htmlEscape, pluralize,
+            wikiSidebar, DueDateListView, DueDateOverrideView, Quiz,
+            DueDateList,SectionList,
             MissingDateDialog,MultipleChoiceToggle,TextHelper){
 
   var dueDateList, overrideView, quizModel, sectionList;
@@ -888,6 +890,9 @@ define([
     return $answer;
   }
 
+  var REGRADE_DATA = {};
+  var REGRADE_OPTIONS = ENV.REGRADE_OPTIONS || {};
+
   function quizData($question) {
     var $quiz = $("#questions");
     var quiz = {
@@ -899,7 +904,7 @@ define([
     $list.each(function(i) {
       var $question = $(this);
       var questionData = $question.getTemplateData({
-        textValues: ['question_name', 'question_points', 'question_type', 'answer_selection_type', 'assessment_question_id', 'correct_comments', 'incorrect_comments', 'neutral_comments', 'matching_answer_incorrect_matches', 'equation_combinations', 'equation_formulas'],
+        textValues: ['question_name', 'question_points', 'question_type', 'answer_selection_type', 'assessment_question_id', 'correct_comments', 'incorrect_comments', 'neutral_comments', 'matching_answer_incorrect_matches', 'equation_combinations', 'equation_formulas', 'regrade_option'],
         htmlValues: ['question_text', 'text_before_answers', 'text_after_answers', 'correct_comments_html', 'incorrect_comments_html', 'neutral_comments_html']
       });
       questionData = $.extend(questionData, $question.find(".original_question_text").getFormData());
@@ -1001,6 +1006,7 @@ define([
       data[id + '[incorrect_comments]'] = question.incorrect_comments;
       data[id + '[neutral_comments]'] = question.neutral_comments;
       data[id + '[question_text]'] = question.question_text;
+      data[id + '[regrade_option]'] = question.regrade_option;
       data[id + '[position]'] = question.position;
       data[id + '[text_after_answers]'] = question.text_after_answers;
       data[id + '[matching_answer_incorrect_matches]'] = question.matching_answer_incorrect_matches;
@@ -1438,6 +1444,7 @@ define([
     $(document).delegate(".edit_question_link", 'click', function(event) {
       event.preventDefault();
       var $question = $(this).parents(".question");
+      var questionID = $(this).closest('.question_holder').find('.display_question').attr('id');
       var question = $question.getTemplateData({
         textValues: ['question_type', 'correct_comments', 'incorrect_comments', 'neutral_comments', 'question_name', 'question_points', 'answer_selection_type', 'blank_id'],
         htmlValues: ['question_text', 'correct_comments_html', 'incorrect_comments_html', 'neutral_comments_html']
@@ -1550,6 +1557,15 @@ define([
         $formQuestion.find(".question_content").triggerHandler('change');
         $formQuestion.addClass('ready');
       }, 100);
+
+      // show regrade options if question was changed but quiz not saved
+      var $question  = $form.find(".question");
+      var questionID = $form.prev('.display_question').attr('id');
+      var idValue    = questionID.replace("question_", "");
+
+      if (REGRADE_OPTIONS[idValue]) {
+        showRegradeOptions($question,questionID);
+      }
     });
 
     $(".question_form :input[name='question_type']").change(function() {
@@ -1597,7 +1613,11 @@ define([
     $(document).delegate(".select_answer_link", 'click', function(event) {
       event.preventDefault();
       var $question = $(this).parents(".question");
+      var questionID = $(this).closest('.question_holder').find('.display_question').attr('id');
       if (!$question.hasClass('selectable')) { return; }
+      if (!REGRADE_DATA[questionID]){
+        REGRADE_DATA[questionID] = correctAnswerIDs($question)
+      }
       if ($question.find(":input[name='question_type']").val() != "multiple_answers_question") {
         $question.find(".answer:visible").removeClass('correct_answer')
           .find('.select_answer_link').attr('title', clickSetCorrect)
@@ -1618,7 +1638,76 @@ define([
             .find('img').attr('alt', clickSetCorrect);
         }
       }
+
+      showRegradeOptions($question,questionID);
     });
+
+    function showRegradeOptions($el,questionID) {
+      if ($("#student_submissions_warning").length == 0) {
+        return;
+      }
+
+      var regradeOptions = $el.find('.regrade-options')
+      if (regradeOptions.length && answersAreTheSameAsBefore($el)) {
+        regradeOptions.remove();
+        enableQuestionForm();
+        return;
+      }
+      if (!regradeOptions.length){
+        questionID = /question_(\d+)/.exec(questionID.toString());
+        var regradeOption = REGRADE_OPTIONS[questionID[1]];
+
+        $el.find('.button-container').before(regradeTemplate({regradeOption: regradeOption}));
+        clickRegradeOptions();
+      }
+    }
+
+    $(document).delegate(".regrade-options", 'click', clickRegradeOptions);
+
+    function clickRegradeOptions(event) {
+      if ($('input[name="regrade_option"]:checked').length === 0) {
+        disableQuestionForm();
+      } else {
+        enableQuestionForm();
+      }
+    }
+
+    function disableQuestionForm() {
+      $('.question_form').find(".submit_button")
+        .attr('disabled', true)
+        .addClass('disabled')
+        .removeClass('button_primary btn-primary');
+    }
+
+    function enableQuestionForm() {
+      $('.question_form').find(".submit_button")
+        .removeClass('disabled')
+        .removeAttr('disabled')
+        .addClass('button_primary btn-primary');
+    }
+
+    function correctAnswerIDs($el){
+      var answers = [];
+      $el.find('.answer').each(function(index) {
+        if ($(this).hasClass('correct_answer')) answers.push(index);
+      });
+      return answers;
+    }
+
+    function answersAreTheSameAsBefore($el) {
+      var questionID = $el.closest('.question_holder').find('.display_question').attr('id');
+      var idValue    = questionID.replace("question_", "");
+
+      // we don't know 'old answers' if they've updated and returned
+      if (REGRADE_OPTIONS[idValue]) {
+        return false;
+
+      } else {
+        var oldAnswers = REGRADE_DATA[questionID];
+        var newAnswers = correctAnswerIDs($el);
+        return !_.difference(oldAnswers, newAnswers).length;
+      }
+    }
 
     $(".question_form :input").change(function() {
       if ($(this).parents(".answer").length > 0) {
@@ -2115,8 +2204,9 @@ define([
       var $question = $(this).find(".question");
       var answers = [];
       var questionData = $question.getFormData({
-        values: ['question_type', 'question_name', 'question_points', 'correct_comments', 'incorrect_comments', 'neutral_comments',
-          'question_text', 'answer_selection_type', 'text_after_answers', 'matching_answer_incorrect_matches']
+        textValues: ['question_type', 'question_name', 'question_points', 'correct_comments', 'incorrect_comments', 'neutral_comments',
+          'question_text', 'answer_selection_type', 'text_after_answers', 'matching_answer_incorrect_matches',
+          'regrade_option']
       });
 
       // save any open html answers
@@ -2162,6 +2252,7 @@ define([
         var $answer = $(this);
         $answer.show();
         var data = $answer.getFormData();
+        data.id = $answer.find('.id').text();
         data.blank_id = $answer.find(".blank_id").text();
         data.answer_text = $answer.find("input[name='answer_text']:visible").val();
         data.answer_html = $answer.find(".answer_html").html();
@@ -2234,9 +2325,11 @@ define([
         url = $displayQuestion.find(".update_question_url").attr('href');
         method = 'PUT';
       }
+      var oldQuestionData = questionData;
       var questionData = quizData($displayQuestion);
       var formData = generateFormQuiz(questionData);
       var questionData = generateFormQuizQuestion(formData);
+      questionData['question[regrade_option]'] = oldQuestionData.regrade_option;
       if ($displayQuestion.parent(".question_holder").hasClass('group')) {
         var $group = quiz.findContainerGroup($displayQuestion.parent(".question_holder"));
         if ($group) {
@@ -2267,6 +2360,10 @@ define([
         // after save process completed. Used in quizzes_bundle.coffee
         $displayQuestion.trigger('saved');
         $("#unpublished_changes_message").slideDown();
+        if (question) {
+          REGRADE_OPTIONS[question.id] = question.question_data.regrade_option;
+          delete REGRADE_DATA['question_' + question.id];
+        }
       }, function(data) {
         $displayQuestion.formErrors(data);
       });

@@ -332,6 +332,34 @@ describe QuizSubmission do
     s.kept_score.should eql(6.0)
   end
 
+  it "should calculate highest score based on most recent version of an attempt" do
+    q = @course.quizzes.create!(:scoring_policy => "keep_highest")
+    s = q.quiz_submissions.new
+
+    s.workflow_state = "complete"
+    s.score = 5.0
+    s.attempt = 1
+    s.with_versioning(true, &:save!)
+    s.version_number.should eql(1)
+    s.score.should eql(5.0)
+    s.kept_score.should eql(5.0)
+
+    # regrade
+    s.score_before_regrade = 5.0
+    s.score = 4.0
+    s.attempt = 1
+    s.with_versioning(true, &:save!)
+    s.version_number.should eql(2)
+    s.kept_score.should eql(4.0)
+
+    # new attempt
+    s.score = 3.0
+    s.attempt = 2
+    s.with_versioning(true, &:save!)
+    s.version_number.should eql(3)
+    s.kept_score.should eql(4.0)
+  end
+
   describe "with an essay question" do
     before(:each) do
       quiz_with_graded_submission([{:question_data => {:name => 'question 1', :points_possible => 1, 'question_type' => 'essay_question'}}]) do
@@ -1458,6 +1486,80 @@ describe QuizSubmission do
       end
     end
 
+  end
+
+  describe "submitted_versions" do
+    let(:submission) { @quiz.quiz_submissions.build }
+
+    before do
+      submission.grade_submission
+    end
+
+    it "should find regrade versions for a submission" do
+      submission.submitted_versions.length.should == 1
+    end
+  end
+
+  describe "attempt_versions" do
+    let(:quiz)       { @course.quizzes.create! }
+    let(:submission) { quiz.quiz_submissions.new }
+
+    it "should find attempt versions for a submission" do
+      submission.workflow_state = "complete"
+      submission.score = 5.0
+      submission.attempt = 1
+      submission.with_versioning(true, &:save!)
+      submission.version_number.should eql(1)
+      submission.score.should eql(5.0)
+
+      # regrade
+      submission.score_before_regrade = 5.0
+      submission.score = 4.0
+      submission.attempt = 1
+      submission.with_versioning(true, &:save!)
+      submission.version_number.should eql(2)
+
+      # new attempt
+      submission.score = 3.0
+      submission.attempt = 2
+      submission.with_versioning(true, &:save!)
+      submission.version_number.should eql(3)
+
+      attempt_versions = submission.attempt_versions
+      attempt_versions.length.should == 2
+      attempt_versions.first.should be_a(Version)
+    end
+  end
+
+  describe "submitted_attempts" do
+    let(:quiz)       { @course.quizzes.create! }
+    let(:submission) { quiz.quiz_submissions.new }
+
+    it "should find attempt versions for a submission" do
+      submission.workflow_state = "complete"
+      submission.score = 5.0
+      submission.attempt = 1
+      submission.with_versioning(true, &:save!)
+      submission.version_number.should eql(1)
+      submission.score.should eql(5.0)
+
+      # regrade
+      submission.score_before_regrade = 5.0
+      submission.score = 4.0
+      submission.attempt = 1
+      submission.with_versioning(true, &:save!)
+      submission.version_number.should eql(2)
+
+      # new attempt
+      submission.score = 3.0
+      submission.attempt = 2
+      submission.with_versioning(true, &:save!)
+      submission.version_number.should eql(3)
+
+      submitted_attempts = submission.submitted_attempts
+      submitted_attempts.length.should == 2
+      submitted_attempts.first.should be_a(QuizSubmission)
+    end
   end
 
   describe 'broadcast policy' do

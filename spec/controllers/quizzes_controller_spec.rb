@@ -172,9 +172,13 @@ describe QuizzesController do
     it "should assign variables" do
       course_with_teacher_logged_in(:active_all => true)
       course_quiz
+      regrade = @quiz.quiz_regrades.create!(:user_id => @teacher.id, quiz_version: @quiz.version_number)
+      q = @quiz.quiz_questions.create!
+      regrade.quiz_question_regrades.create!(:quiz_question_id => q.id,:regrade_option => 'no_regrade')
       get 'edit', :course_id => @course.id, :id => @quiz.id
       assigns[:quiz].should_not be_nil
       assigns[:quiz].should eql(@quiz)
+      assigns[:js_env][:REGRADE_OPTIONS].should == {q.id => 'no_regrade' }
       response.should render_template("new")
     end
   end
@@ -266,6 +270,19 @@ describe QuizzesController do
         attachment.id => {:id => attachment.id,
                           :display_name => attachment.display_name }
       }
+    end
+
+    it "assigns js_env for versions if submission is present" do
+      require 'action_controller'
+      require 'action_controller/test_process.rb'
+      course_with_student_logged_in :active_all => true
+      course_quiz !!:active
+      submission = @quiz.generate_submission @user
+      create_attachment_for_file_upload_submission!(submission)
+      get 'show', :course_id => @course.id, :id => @quiz.id
+
+      path = "courses/#{@course.id}/quizzes/#{@quiz.id}/submission_versions"
+      assigns[:js_env][:SUBMISSION_VERSIONS_URL].should include(path)
     end
   end
 
@@ -1164,6 +1181,29 @@ describe QuizzesController do
       post 'unpublish', :course_id => @course.id, :quizzes => [@quiz.id]
 
       @quiz.reload.published?.should be_false
+    end
+  end
+
+  describe "GET submission_versions" do
+    it "requires authorization" do
+      course_with_teacher(:active_all => true)
+      course_quiz
+      get 'submission_versions', :course_id => @course.id, :quiz_id => @quiz.id
+      assert_unauthorized
+      assigns[:quiz].should_not be_nil
+      assigns[:quiz].should eql(@quiz)
+    end
+
+    it "assigns variables" do
+      course_with_teacher_logged_in(:active_all => true)
+      course_quiz
+      submission = @quiz.generate_submission @user
+      create_attachment_for_file_upload_submission!(submission)
+      get 'submission_versions', :course_id => @course.id, :quiz_id => @quiz.id
+      assigns[:quiz].should_not be_nil
+      assigns[:quiz].should eql(@quiz)
+      assigns[:submission].should_not be_nil
+      assigns[:versions].should_not be_nil
     end
   end
 end

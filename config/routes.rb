@@ -311,6 +311,7 @@ FakeRails3Routes.draw do
     match 'quizzes/unpublish' => 'quizzes#unpublish', :as => :quizzes_unpublish
     resources :quizzes do
       match 'managed_quiz_data' => 'quizzes#managed_quiz_data', :as => :managed_quiz_data
+      match 'submission_versions' => 'quizzes#submission_versions', :as => :submission_versions
       match 'reorder' => 'quizzes#reorder', :as => :reorder
       match 'history' => 'quizzes#history', :as => :history
       match 'statistics' => 'quizzes#statistics', :as => :statistics

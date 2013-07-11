@@ -1,0 +1,37 @@
+<div class="regrade-options alert border-round">
+  <h3>
+    {{#t "regrade_options"}}
+      Regrade Options <span>(for students who have already answered this question):</span>
+    {{/t}}
+  </h3>
+
+  <label class="checkbox">
+    <input type="radio" name="regrade_option" class="regrade_option" value="current_and_previous_correct" {{checkedIf regradeOption "current_and_previous_correct"}}>
+    {{#t "no_scores_reduced"}}
+      Award points for both corrected and previously correct answers (<em>no scores will be reduced</em>)
+    {{/t}}
+  </label>
+
+  <label class="checkbox">
+    <input type="radio" name="regrade_option" class="regrade_option" value="current_correct_only" {{checkedIf regradeOption "current_correct_only"}} />
+    {{#t "some_scores_reduced"}}
+      Only award points for the correct answer (<em>some students' scores may be reduced</em>)
+    {{/t}}
+  </label>
+
+  <label class="checkbox">
+    <input type="radio" name="regrade_option" class="regrade_option" value="full_credit" {{checkedIf regradeOption "full_credit"}} >
+    {{#t "give_everyone_full_credit"}}
+      Give everyone full credit for this question.
+    {{/t}}
+  </label>
+
+  <label class="checkbox">
+    <input type="radio" name="regrade_option" class="regrade_option" value="no_regrade" {{checkedIf regradeOption "no_regrade"}} >
+    {{#t "update_question_without_regrading"}}
+      Update question without regrading
+    {{/t}}
+  </label>
+
+</div>
+

@@ -18,7 +18,7 @@
 
 class QuizSubmission < ActiveRecord::Base
   include Workflow
-  attr_accessible :quiz, :user, :temporary_user_code, :submission_data
+  attr_accessible :quiz, :user, :temporary_user_code, :submission_data, :score_before_regrade
   attr_readonly :quiz_id, :user_id
   validates_presence_of :quiz_id
 
@@ -341,10 +341,17 @@ class QuizSubmission < ActiveRecord::Base
   end
 
   def highest_score_so_far(exclude_version_id=nil)
-    scores = []
-    scores << self.score if self.score
-    scores += versions.reload.reject{|v| v.id == exclude_version_id}.map{|v| v.model.score || 0.0} rescue []
-    scores.max
+    scores = {}
+    scores[attempt] = self.score if self.score
+
+    versions = self.versions.reload.reject {|v| v.id == exclude_version_id } rescue []
+
+    # only most recent version for each attempt - some have regraded a version
+    versions.sort {|v| v.number }.reverse.each do |ver|
+      scores[ver.model.attempt] ||= ver.model.score || 0.0
+    end
+
+    scores.values.max
   end
   private :highest_score_so_far
 
@@ -445,6 +452,17 @@ class QuizSubmission < ActiveRecord::Base
     end
   end
 
+  def attempt_versions
+    versions = self.versions.order("number desc").each_with_object({}) do |ver, hash|
+      hash[ver.model.attempt] ||= ver
+    end
+    versions.sort.map {|attempt, version| version }
+  end
+
+  def submitted_attempts
+    attempt_versions.map {|ver| ver.model }
+  end
+
   def attempts_left
     return -1 if self.quiz.allowed_attempts < 0
     [0, self.quiz.allowed_attempts - (self.attempt || 0) + (self.extra_attempts || 0)].max
@@ -474,6 +492,7 @@ class QuizSubmission < ActiveRecord::Base
     @user_answers.each do |answer|
       self.workflow_state = "pending_review" if answer[:correct] == "undefined"
     end
+    self.score_before_regrade = nil
     self.finished_at = Time.now
     self.manually_unlocked = nil
     self.finished_at = opts[:finished_at] if opts[:finished_at]
@@ -486,7 +505,12 @@ class QuizSubmission < ActiveRecord::Base
     end
     self.context_module_action
     track_outcomes(self.attempt)
-    true
+    quiz = self.quiz
+    previous_version = quiz.versions.where(number: quiz_version).first
+    if previous_version && quiz_version != quiz.version_number
+      quiz = previous_version.model.reload
+    end
+    QuizRegrader.regrade!(quiz, [self])
   end
 
   # Updates a simply_versioned version instance in-place.  We want
@@ -676,6 +700,11 @@ class QuizSubmission < ActiveRecord::Base
 
   def valid_token?(token)
     self.validation_token.blank? || self.validation_token == token
+  end
+
+  # TODO: this could probably be put in as a convenience method in simply_versioned
+  def save_with_versioning!
+    self.with_versioning(true) { self.save! }
   end
 
   # evizitei: these 3 delegations allow quiz submissions to be used in

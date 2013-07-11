@@ -30,6 +30,12 @@ class Version < ActiveRecord::Base #:nodoc:
     obj.send("force_version_number", self.number)
     obj
   end
+
+  # INSTRUCTURE: Added to allow previous version models to be updated
+  def model=(model)
+    options = model.class.simply_versioned_options
+    self.yaml = model.attributes.except(*options[:exclude]).to_yaml
+  end
   
   # Return the next higher numbered version, or nil if this is the last version
   def next

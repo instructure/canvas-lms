@@ -188,6 +188,18 @@
 <% end %>
 
   <header class="quiz-header">
+    <% if submission_has_regrade?(@submission) %>
+    <div class="ui-state-warning ui-corner-all pad-box-micro text-center regraded-warning">
+      <i class=icon-warning></i>
+      <strong>
+      <% if score_affected_by_regrade?(@submission) %>
+        <%= t 'quiz_regraded_your_score_affected', 'This quiz has been re-graded, your score was affected.' %>
+      <% else %>
+        <%= t 'quiz_regraded_your_score_not_affected', 'This quiz has been re-graded, your score was not affected.' %>
+      <% end %>
+      </strong>
+    </div>
+    <% end %>
 
   <% if @domain_root_account.enable_draft? %>
     <% if needs_unpublished_warning?(@quiz) %>
@@ -391,6 +403,9 @@
         <% end %>
       <% end %>
     <% end %>
+
+    <div id="quiz-submission-version-table"></div>
+
   </header>
 
   <% if @submission && @submission.completed? %>

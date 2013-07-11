@@ -687,6 +687,7 @@ describe ContextModule do
 
       # the quiz keeps the highest score; should still be unlocked
       @submission.score = 50
+      @submission.attempt = 2
       @submission.with_versioning(&:save)
       @submission.kept_score.should == 100
 

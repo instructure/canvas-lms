@@ -25,7 +25,7 @@ class QuizzesController < ApplicationController
   before_filter :require_context
   add_crumb(proc { t('#crumbs.quizzes', "Quizzes") }) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_quizzes_url }
   before_filter { |c| c.active_tab = "quizzes" }
-  before_filter :get_quiz, :only => [:statistics, :edit, :show, :reorder, :history, :update, :destroy, :moderate, :filters, :read_only, :managed_quiz_data]
+  before_filter :get_quiz, :only => [:statistics, :edit, :show, :reorder, :history, :update, :destroy, :moderate, :filters, :read_only, :managed_quiz_data, :submission_versions]
   before_filter :set_download_submission_dialog_title , only: [:show,:statistics]
   # The number of questions that can display "details". After this number, the "Show details" option is disabled
   # and the data is not even loaded.
@@ -158,13 +158,17 @@ class QuizzesController < ApplicationController
         flash[:notice] = t('notices.has_submissions_already', "Keep in mind, some students have already taken or started taking this quiz")
       end
 
+      regrade_options = Hash[@quiz.current_quiz_question_regrades.map do |qqr|
+        [qqr.quiz_question_id, qqr.regrade_option]
+      end]
       sections = @context.course_sections.active
       hash = { :ASSIGNMENT_ID => @assigment.present? ? @assignment.id : nil,
              :ASSIGNMENT_OVERRIDES => assignment_overrides_json(@quiz.overrides_visible_to(@current_user)),
              :QUIZ => quiz_json(@quiz, @context, @current_user, session),
              :SECTION_LIST => sections.map { |section| { :id => section.id, :name => section.name } },
              :QUIZZES_URL => polymorphic_url([@context, :quizzes]),
-             :CONTEXT_ACTION_SOURCE => :quizzes }
+             :CONTEXT_ACTION_SOURCE => :quizzes,
+             :REGRADE_OPTIONS => regrade_options }
       append_sis_data(hash)
       js_env(hash)
       render :action => "new"
@@ -226,11 +230,9 @@ class QuizzesController < ApplicationController
 
       @assignment = @quiz.assignment
       @assignment = @assignment.overridden_for(@current_user) if @assignment
-      @submission = @quiz.quiz_submissions.find_by_user_id(@current_user.id, :order => 'created_at') rescue nil
-      if !@current_user || (params[:preview] && @quiz.grants_right?(@current_user, session, :update))
-        user_code = temporary_user_code
-        @submission = @quiz.quiz_submissions.find_by_temporary_user_code(user_code)
-      end
+
+      @submission = get_submission
+
       @just_graded = false
       if @submission && @submission.needs_grading?(!!params[:take])
         @submission.grade_submission(:finished_at => @submission.end_at)
@@ -240,7 +242,9 @@ class QuizzesController < ApplicationController
       if @submission
         upload_url = api_v1_quiz_submission_create_file_path(:course_id => @context.id, :quiz_id => @quiz.id)
         js_env :UPLOAD_URL => upload_url
+        js_env :SUBMISSION_VERSIONS_URL => polymorphic_url([@context, @quiz, 'submission_versions'])
       end
+
       setup_attachments
       submission_counts if @quiz.grants_right?(@current_user, session, :grade) || @quiz.grants_right?(@current_user, session, :read_statistics)
       @stored_params = (@submission.temporary_data rescue nil) if params[:take] && @submission && (@submission.untaken? || @submission.preview?)
@@ -447,13 +451,14 @@ class QuizzesController < ApplicationController
         end
         @current_submission = @submission
         @version_instances = @submission.submitted_versions.sort_by{|v| v.version_number }
+        @versions = get_versions
         params[:version] ||= @version_instances[0].version_number if @submission.untaken? && !@version_instances.empty?
         @current_version = true
         @version_number = "current"
         if params[:version]
           @version_number = params[:version].to_i
           @unversioned_submission = @submission
-          @submission = @version_instances.detect{|s| s.version_number >= @version_number}
+          @submission = @versions.detect{|s| s.version_number >= @version_number}
           @submission ||= @unversioned_submission.versions.get(params[:version]).model
           @current_version = (@current_submission.version_number == @submission.version_number)
           @version_number = "current" if @current_version
@@ -637,12 +642,39 @@ class QuizzesController < ApplicationController
     @headers = !params[:headless] && !session[:headless_quiz]
   end
 
+  def submission_versions
+    if authorized_action(@quiz, @current_user, :read)
+      @submission = get_submission
+      @versions   = get_versions
+
+      if @versions.size > 0
+        render :layout => false
+      else
+        render :nothing => true
+      end
+    end
+  end
+
   protected
 
   def get_quiz
     @quiz = @context.quizzes.find(params[:id] || params[:quiz_id])
     @quiz_name = @quiz.title
     @quiz
+  end
+
+  def get_submission
+    submission = @quiz.quiz_submissions.find_by_user_id(@current_user.id, :order => 'created_at') rescue nil
+    if !@current_user || (params[:preview] && @quiz.grants_right?(@current_user, session, :update))
+      user_code = temporary_user_code
+      submission = @quiz.quiz_submissions.find_by_temporary_user_code(user_code)
+    end
+
+    submission
+  end
+
+  def get_versions
+    @submission.submitted_attempts
   end
 
   # if this returns false, it's rendering or redirecting, so return from the

@@ -36,6 +36,7 @@
     <!-- Display skipped -->
   <% else %>
     <div class="answer answer_for_<%= hash_get(answer, :blank_id) %> <%= "hide_right_arrow" if hide_right_arrow %> <%= 'skipped' if should_skip %> <%= 'wrong_answer' if wrong_answer && show_correct_answers %> <%= 'no_answer' if no_answer %> <%= "selected_answer" if selected_answer %> <%= correct_answer_class %>" id="answer_<%= hash_get(answer, :id, "template") %>" style="<%= hidden unless answer %>" title="<%= t(:selected_answer, "You selected this answer.") if selected_answer %> <%= t(:correct_answer, "This was the correct answer.") if correct_answer && show_correct_answers %>">
+      <span class='hidden id'><%= answer_id %></span>
     <% if !user_answer || question_type.display_answers != "xsingle" %>
     <div class="select_answer answer_type" <%= hidden(true) unless answer_type == "select_answer" %>>
       <% if %w{radio checkbox}.include?(question_type.entry_type) %>

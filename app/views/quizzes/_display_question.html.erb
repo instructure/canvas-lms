@@ -1,5 +1,5 @@
-<% 
-  question = display_question 
+<%
+  question = display_question
   question_type = answer_type(question)
   user_answer ||= nil
   user_answer_hash ||= {}
@@ -43,16 +43,28 @@
             <% if hash_get(user_answer, :correct) == "undefined" %>
               <%= t(:not_yet_graded, 'Not yet graded') %>
             <% else %>
-              <%= render_score(hash_get(user_answer, :points)) %>
+              <% if hash_get(user_answer,:score_before_regrade)%>
+                <%= t('original_score', 'Original Score:') %>
+                <%= render_score(hash_get(user_answer, :score_before_regrade)) %>
+              <% else %>
+                <%= render_score(hash_get(user_answer, :points)) %>
+              <% end %>
             <% end %>
           <% end %>
           <% question[:points_possible] = 0 if question_type.answer_type == 'none' %>
           <%= t(:points_possible, "%{points_possible} pts", :points_possible => raw("<span class=\"points question_points\"> / #{hash_get(question, :points_possible, "0")}</span>")) %>
+          <% if hash_get(user_answer, :score_before_regrade) %>
+            <span class=user-regrade-points>
+              <%= t('regraded_score', 'Regraded Score:') %>
+              <%= render_score hash_get(user_answer, :points) %>
+              <%= t(:points_possible, "%{points_possible} pts", :points_possible => raw("<span class=\"points question_points\"> / #{hash_get(question, :points_possible, "0")}</span>")) %>
+            </span>
+          <% end %>
         </div>
       <% else %>
         <%= t(:points_possible, "%{points_possible} pts", :points_possible => raw("<span class=\"points question_points\">#{hash_get(question, :points_possible, "0")}</span>")) %>
       <% end %>
-      </span>
+    </span>
       <% if question && hash_get(question, :question_type) != "missing_word_question" && hash_get(question, :question_text) && hash_get(question, :question_text).length < 255 %>
         <span class='ui-helper-hidden-accessible'><%= hash_get(question, :question_text) %></span>
       <% else %> 
@@ -79,7 +91,19 @@
         <textarea style="display: none;" name="question_text" class="textarea_question_text"><%= h(hash_get(question, :question_text)) %></textarea>
       </div>
       <div id="question_<%= hash_get(question, :id, "new") %>_question_text" class="question_text user_content">
+        <% if user_answer && user_answer[:regrade_option] %>
+          <p class="ui-widget">
+            <div class="ui-state-warning ui-corner-all pad-box-micro text-center">
+              <i class=icon-warning></i>
+              <strong>
+                <%= t('submission_was_regraded',
+                      'This question has been regraded. Your score has been updated.') %>
+               </strong>
+            </div>
+          </p>
+        <% end %>
         <% if question && hash_get(question, :question_type) == "missing_word_question" %>
+
           <span class="text_before_answers"><%= user_content(hash_get(question, :question_text)) %></span>
           <select class="answer_select question_input" name="question_<%= hash_get(question, :id, "blank") %>">
             <option value=""><%= t(:default_question_answer, "[ Choose ]") %></option>

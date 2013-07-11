@@ -1104,4 +1104,26 @@ describe Quiz do
       @quiz.should_not be_published
     end
   end
+
+  context "#current_regrade" do
+
+    before { @quiz = @course.quizzes.create! title: 'Test Quiz' }
+
+    it "returns the regrade for the quiz and quiz version" do
+      regrade = QuizRegrade.find_or_create_by_quiz_id_and_quiz_version(@quiz.id,@quiz.version_number) { |qr| qr.user_id = 1 }
+      @quiz.current_regrade.should == regrade
+    end
+  end
+
+  context "#current_regrade_question_ids" do
+
+    before { @quiz = @course.quizzes.create! title: 'Test Quiz' }
+
+    it "returns the correct question ids" do
+      q = @quiz.quiz_questions.create!
+      regrade = QuizRegrade.find_or_create_by_quiz_id_and_quiz_version(@quiz.id,@quiz.version_number) { |qr| qr.user_id = 1 }
+      rq = regrade.quiz_question_regrades.create! quiz_question_id: q.id, regrade_option: 'current_correct_only'
+      @quiz.current_quiz_question_regrades.should == [rq]
+    end
+  end
 end
