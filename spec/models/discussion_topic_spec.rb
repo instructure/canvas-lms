@@ -614,7 +614,7 @@ describe DiscussionTopic do
       @context = @course
       discussion_topic_model(:user => @teacher)
     end
-    
+
     it "should automatically include the author" do
       @topic.subscribers.should include(@teacher)
     end
@@ -624,9 +624,29 @@ describe DiscussionTopic do
       @topic.subscribers.should_not include(@teacher)
     end
 
-    it "should not automatically include posters" do
+    it "should automatically include posters" do
       @topic.reply_from(:user => @student, :text => "entry")
+      @topic.subscribers.should include(@student)
+    end
+
+    it "should include users that have posted entries before subscriptions were added" do
+      @topic.reply_from(:user => @student, :text => "entry")
+      participant = @topic.update_or_create_participant(current_user: @student, subscribed: nil)
+      participant.subscribed.should be_nil
+      @topic.subscribers.map(&:id).should include(@student.id)
+    end
+
+    it "should not include posters if they unsubscribe" do
+      @topic.reply_from(:user => @student, :text => "entry")
+      @topic.unsubscribe(@student)
       @topic.subscribers.should_not include(@student)
+    end
+
+    it "should resubscribe unsubscribed users if they post" do
+      @topic.reply_from(:user => @student, :text => "entry")
+      @topic.unsubscribe(@student)
+      @topic.reply_from(:user => @student, :text => "another entry")
+      @topic.subscribers.should include(@student)
     end
 
     it "should include users who subscribe" do
@@ -968,9 +988,9 @@ describe DiscussionTopic do
       @topic.subscribed?(@teacher).should be_true
     end
 
-    it "should not assume posters are subscribed" do
+    it "should assume posters are subscribed" do
       @topic.reply_from(:user => @student, :text => 'first post!')
-      @topic.subscribed?(@student).should be_false
+      @topic.subscribed?(@student).should be_true
     end
 
     context "when initial_post_required" do
@@ -978,7 +998,6 @@ describe DiscussionTopic do
         @topic.require_initial_post = true
         @topic.save!
         @entry = @topic.reply_from(:user => @student, :text => 'first post!')
-        @topic.subscribe(@student)
         @topic.subscribed?(@student).should be_true
         @entry.destroy
         @topic.subscribed?(@student).should be_false
@@ -996,6 +1015,15 @@ describe DiscussionTopic do
     it "should return true if the user is subscribed to a child topic" do
       @topic.child_topics.first.subscribe(@student)
       @topic.child_topics.first.subscribed?(@student).should be_true
+      @topic.subscribed?(@student).should be_true
+    end
+
+    it "should return true if the user has posted to a child topic" do
+      child_topic = @topic.child_topics.first
+      child_topic.context.add_user(@student)
+      child_topic.reply_from(:user => @student, :text => "post")
+      child_topic_participant = child_topic.update_or_create_participant(:current_user => @student, :subscribed => nil)
+      child_topic_participant.subscribed.should be_nil
       @topic.subscribed?(@student).should be_true
     end
 

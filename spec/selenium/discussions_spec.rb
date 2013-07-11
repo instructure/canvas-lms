@@ -1221,9 +1221,18 @@ describe "discussions" do
       # now the subscribe button should be available.
       get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
       wait_for_ajax_requests
-      f('.topic-subscribe-button').displayed?.should be_true
+      # already subscribed because they posted
+      f('.topic-unsubscribe-button').displayed?.should be_true
     end
 
+    it "should updated subscribed button when user posts to a topic" do
+      course_with_student_logged_in(:course => @course)
+      get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+      wait_for_ajax_requests
+      f('.topic-subscribe-button').displayed?.should be_true
+      add_reply "student posting"
+      f('.topic-unsubscribe-button').displayed?.should be_true
+    end
   end
 
 end

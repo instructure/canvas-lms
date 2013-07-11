@@ -306,12 +306,16 @@ class DiscussionTopic < ActiveRecord::Base
     end
     participant ||= discussion_topic_participants.where(:user_id => current_user.id).first
 
-    if participant.try(:subscribed).nil?
-      # if there is no explicit subscription, assume the author is subscribed
-      # assume non-authors are not subscribed
-      current_user == user
+    if participant
+      if participant.subscribed.nil?
+        # if there is no explicit subscription, assume the author and posters
+        # are subscribed, everyone else is not subscribed
+        current_user == user || participant.discussion_topic.posters.include?(current_user)
+      else
+        participant.subscribed
+      end
     else
-      participant.subscribed
+      current_user == user
     end
   end
 
@@ -358,7 +362,7 @@ class DiscussionTopic < ActiveRecord::Base
         topic_participant.workflow_state = opts[:new_state] if opts[:new_state]
         topic_participant.unread_entry_count += opts[:offset] if opts[:offset] && opts[:offset] != 0
         topic_participant.unread_entry_count = opts[:new_count] if opts[:new_count]
-        topic_participant.subscribed = opts[:subscribed] if !opts[:subscribed].nil?
+        topic_participant.subscribed = opts[:subscribed] if opts.has_key?(:subscribed)
         topic_participant.save
       end
     end
@@ -703,14 +707,18 @@ class DiscussionTopic < ActiveRecord::Base
   def participating_users(user_ids)
     context.respond_to?(:participating_users) ? context.participating_users(user_ids) : User.find(user_ids)
   end
-  
+
   def subscribers
-    user_ids = discussion_topic_participants.where(:subscribed => true).pluck(:user_id)
-    user_ids.push(user_id) if subscribed?(user)
-    user_ids.uniq!
-    participating_users(user_ids)
+    # this duplicates some logic from #subscribed? so we don't have to call 
+    # #posters for each legacy subscriber.
+    sub_ids = discussion_topic_participants.where(:subscribed => true).pluck(:user_id)
+    legacy_sub_ids = discussion_topic_participants.where(:subscribed => nil).pluck(:user_id)
+    poster_ids = posters.map(&:id)
+    legacy_sub_ids &= poster_ids + [user.id]
+    sub_ids += legacy_sub_ids
+    participating_users(sub_ids)
   end
-    
+
   def posters
     user_ids = discussion_entries.map(&:user_id).push(self.user_id).uniq
     participating_users(user_ids)

@@ -392,6 +392,7 @@ class DiscussionEntry < ActiveRecord::Base
                                                                                          :workflow_state => "unread",
                                                                                          :subscribed => self.discussion_topic.subscribed?(self.user))
         end
+        self.discussion_topic.subscribe(self.user)
       end
     end
   end

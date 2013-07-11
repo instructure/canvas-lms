@@ -213,6 +213,7 @@ define [
         @treeView.collection.add entry
         @treeView.collection.fullCollection.add entry
         @trigger 'addReply'
+        EntryView.trigger 'addReply', entry
 
     addReplyAttachment: (event, $el) ->
       event.preventDefault()

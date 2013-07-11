@@ -48,6 +48,9 @@ define [
       # set initial subscribed state
       @topic.set 'subscribed', ENV.DISCUSSION.TOPIC.IS_SUBSCRIBED
 
+      # catch when non-root replies are added so we can twiddle the subscribed button
+      EntryView.on('addReply', => @setSubscribed(true))
+
     hideIfFiltering: =>
       if @filterModel.hasFilter()
         @$topic.addClass 'hidden'
@@ -111,9 +114,17 @@ define [
         @reply = new Reply this, topLevel: true, focus: true
         @reply.on 'edit', => @$addRootReply?.hide()
         @reply.on 'hide', => @$addRootReply?.show()
-        @reply.on 'save', (entry) => @trigger 'addReply', entry
+        @reply.on 'save', (entry) =>
+          @setSubscribed(true)
+          @trigger 'addReply', entry
       @model.set 'notification', ''
       @reply.edit()
+
+    # Update subscribed state without posted. Done when replies are posted and
+    # user is auto-subscribed.
+    setSubscribed: (newValue) ->
+      @topic.set('subscribed', true)
+      @subscriptionStatusChanged()
 
     addReplyAttachment: EntryView::addReplyAttachment
 

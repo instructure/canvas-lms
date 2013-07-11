@@ -59,6 +59,8 @@ describe DiscussionEntry do
     before do
       course_with_teacher(:active_all => true)
       student_in_course(:active_all => true)
+      @non_posting_student = @student
+      student_in_course(:active_all => true)
 
       @notification_name = "New Discussion Entry"
       n = Notification.create(:name => @notification_name, :category => "TestImmediately")
@@ -69,21 +71,24 @@ describe DiscussionEntry do
       topic = @course.discussion_topics.create!(:user => @teacher, :message => "Hi there")
       entry = topic.discussion_entries.create!(:user => @student, :message => "Hi I'm a student")
 
-      to_users = entry.messages_sent[@notification_name].map(&:user)
-      to_users.should include(@teacher) # teacher is auto-subscribed
-      to_users.should_not include(@student)
+      to_users = entry.messages_sent[@notification_name].map(&:user).map(&:id)
+      to_users.should include(@teacher.id) # teacher is auto-subscribed
+      to_users.should_not include(@student.id) # posters are auto-subscribed, but student is not notified of his own post
+      to_users.should_not include(@non_posting_student.id)
 
       entry = topic.discussion_entries.create!(:user => @teacher, :message => "Nice to meet you")
-      # student not subscribed so no notification to student
-      # teacher is subscribed, but does not get notification of her own posts
-      entry.messages_sent[@notification_name].should be_blank
+      to_users = entry.messages_sent[@notification_name].map(&:user).map(&:id)
+      to_users.should_not include(@teacher.id) # author
+      to_users.should include(@student.id)
+      to_users.should_not include(@non_posting_student.id)
 
-      topic.subscribe(@student)
+      topic.subscribe(@non_posting_student)
       entry = topic.discussion_entries.create!(:user => @teacher, :message => "Welcome to the class")
-      # now that the student is subscribed, he should gets notified of posts
-      to_users = entry.messages_sent[@notification_name].map(&:user)
-      to_users.should_not include(@teacher)
-      to_users.should include(@student)
+      # now that the non_posting_student is subscribed, he should get notified of posts
+      to_users = entry.messages_sent[@notification_name].map(&:user).map(&:id)
+      to_users.should_not include(@teacher.id)
+      to_users.should include(@student.id)
+      to_users.should include(@non_posting_student.id)
     end
 
     it "should send them for group discussion topics" do
@@ -100,15 +105,16 @@ describe DiscussionEntry do
       topic = @group.discussion_topics.create!(:user => @teacher, :message => "Hi there")
       entry = topic.discussion_entries.create!(:user => s1, :message => "Hi I'm a student")
       # teacher is subscribed but is not in the "participating_users" for this group
+      # s1 is the author, s2 is not subscribed
       entry.messages_sent[@notification_name].should be_blank
 
-      topic.subscribe(s1)
+      # s1 should be subscribed from posting to the topic
       topic.subscribe(s2)
       entry = topic.discussion_entries.create!(:user => s2, :message => "Hi I'm a student")
       to_users = entry.messages_sent[@notification_name].map(&:user)
       to_users.should_not include(@teacher)
       to_users.should include(s1)
-      to_users.should_not include(s2)
+      to_users.should_not include(s2) # s2 not notified of own post
     end
 
     it "should not send them to irrelevant users" do
