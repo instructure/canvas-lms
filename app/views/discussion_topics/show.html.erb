@@ -33,46 +33,18 @@
   jammit_css :tinymce, :discussions, :learning_outcomes
 %>
 
-<div id="discussion-toolbar" class="toolbarView">
-  <div class="headerBar" data-sticky>
+<div id="discussion-managebar" class="toolbarView">
+  <div class="headerBar">
     <div class="row-fluid form-inline" style="overflow: visible;">
-      <div class="span7">
-        <input
-          id          = "discussion-search"
-          type        = "text"
-          aria-label  = "<%= t("filter_replies", "Filter replies by search term") %>"
-          placeholder = "<%= t("search_entries_placeholder", "Search entries or author") %>"
-          size        = 50
-        >
+      <div class="pull-right">
+        <% if @context.draft_state_enabled? %>
+          <button
+            id="topic_publish_button"
+            data-id='<%= @topic.id %>'
+            class='btn <%= "published" if @topic.published? %> <%= "disabled" if @topic.published? && !@topic.can_unpublish? %>'>
+          </button>
+        <% end %>
 
-        <input
-          type    = "checkbox"
-          id      = "onlyUnread"
-        ><label for="onlyUnread"><%= t('unread', 'Unread') %></label>
-
-        &nbsp; &nbsp;
-        <button id="collapseAll" class="btn disableWhileFiltering" title="<%= t('collapse_replies', 'Collapse replies') %>" aria-label="<%= t('collapse_replies', 'Collapse replies') %>">
-          <%= image_tag 'discussions/collapse_icon.png', :alt => t('collapse_replies', 'Collapse replies') %>
-        </button>
-        <button id="expandAll" class="btn disableWhileFiltering" title="<%= t('expand_replies', 'Expand replies') %>" aria-label="<%= t('expand_replies', 'Expand replies') %>">
-          <%= image_tag 'discussions/expand_icon.png', :alt => t('expand_replies', 'Expand replies') %>
-        </button>
-
-      </div>
-
-      <div class="span5 right-align">
-        <a href='#' class='btn topic-subscribe-button' data-tooltip="bottom"
-           title="<%= t('topic_subscribe_tooltip', 'You are unsubscribed and will not be notified of new comments') %>"
-           aria-label="<%= t('topic_subscribe_tooltip', 'You are unsubscribed and will not be notified of new comments') %>">
-          <i class='icon-discussion-check' aria-hidden="hidden"></i>
-          <%= t(:topic_subscribe, 'Subscribe') %>
-        </a>
-        <a href='#' class='btn topic-unsubscribe-button btn-success' data-tooltip="bottom"
-           title="<%= t('topic_subscribed_tooltip', 'You are subscribed and will be notified of new comments') %>"
-           aria-label="<%= t('topic_subscribed_tooltip', 'You are subscribed and will be notified of new comments') %>">
-          <i class='icon-discussion-check' aria-hidden="hidden"></i>
-          <%= t(:topic_unsubscribe, 'Subscribed') %>
-        </a>
         <% if @topic.grants_right?(@current_user, nil, :update) %>
           <a href="<%= context_url(@topic.context,
                                    :edit_context_discussion_topic_url,
@@ -185,8 +157,10 @@
           <div class="discussion-fyi">
             <% if @topic.is_a? Announcement %>
               <%= t 'announcement_locked', 'This announcement will not be visible to users until *%{date}*', :date => datetime_string(@topic.delayed_post_at) %>
-            <% else %>
+            <% elsif @topic.delayed_post_at %>
               <%= t 'topic_locked', 'This topic will not be visible to users until *%{date}*', :date => datetime_string(@topic.delayed_post_at) %>
+            <% else %>
+              <%= t 'topic_not_visible', 'This topic is not visible to users' %>
             <% end %>
           </div>
         <% end %>
@@ -227,8 +201,51 @@
           </div>
         <% end %>
       </div>
+    </div>
 
+    <div id="discussion-toolbar" class="toolbarView">
+      <div class="headerBar" data-sticky>
+        <div class="row-fluid form-inline" style="overflow: visible;">
+          <div class="span9">
+            <input
+              id          = "discussion-search"
+              type        = "text"
+              aria-label  = "<%= t("filter_replies", "Filter replies by search term") %>"
+              placeholder = "<%= t("search_entries_placeholder", "Search entries or author") %>"
+              size        = 50
+            >
 
+            <input
+              type    = "checkbox"
+              id      = "onlyUnread"
+            ><label for="onlyUnread"><%= t('unread', 'Unread') %></label>
+
+            &nbsp; &nbsp;
+            <button id="collapseAll" class="btn disableWhileFiltering" title="<%= t('collapse_replies', 'Collapse replies') %>" aria-label="<%= t('collapse_replies', 'Collapse replies') %>">
+              <%= image_tag 'discussions/collapse_icon.png', :alt => t('collapse_replies', 'Collapse replies') %>
+            </button>
+            <button id="expandAll" class="btn disableWhileFiltering" title="<%= t('expand_replies', 'Expand replies') %>" aria-label="<%= t('expand_replies', 'Expand replies') %>">
+              <%= image_tag 'discussions/expand_icon.png', :alt => t('expand_replies', 'Expand replies') %>
+            </button>
+
+          </div>
+
+          <div class="span3 right-align">
+            <a href='#' class='btn topic-subscribe-button' data-tooltip="bottom"
+               title="<%= t('topic_subscribe_tooltip', 'You are unsubscribed and will not be notified of new comments') %>"
+               aria-label="<%= t('topic_subscribe_tooltip', 'You are unsubscribed and will not be notified of new comments') %>">
+              <i class='icon-discussion-check' aria-hidden="hidden"></i>
+              <%= t(:topic_subscribe, 'Subscribe') %>
+            </a>
+            <a href='#' class='btn topic-unsubscribe-button btn-success' data-tooltip="bottom"
+               title="<%= t('topic_subscribed_tooltip', 'You are subscribed and will be notified of new comments') %>"
+               aria-label="<%= t('topic_subscribed_tooltip', 'You are subscribed and will be notified of new comments') %>">
+              <i class='icon-discussion-check' aria-hidden="hidden"></i>
+              <%= t(:topic_unsubscribe, 'Subscribed') %>
+            </a>
+          </div>
+        </div>
+      </div>
     </div>
   </article>
 

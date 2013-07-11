@@ -227,7 +227,8 @@ class DiscussionTopicsController < ApplicationController
                 permissions: {
                     create: @context.discussion_topics.new.grants_right?(@current_user, session, :create),
                     moderate: user_can_moderate,
-                    change_settings: user_can_edit_course_settings?
+                    change_settings: user_can_edit_course_settings?,
+                    publish: user_can_moderate && @domain_root_account.enable_draft?
                 }}
         append_sis_data(hash)
 
@@ -351,6 +352,9 @@ class DiscussionTopicsController < ApplicationController
               :TOPIC => {
                 :ID => @topic.id,
                 :IS_SUBSCRIBED => @topic.subscribed?(@current_user),
+                :IS_PUBLISHED => @topic.published?,
+                :CAN_UNPUBLISH => @topic.can_unpublish?,
+
               },
               :PERMISSIONS => {
                 :CAN_REPLY      => @locked ? false : !(@topic.for_group_assignment? || @topic.locked?),     # Can reply
@@ -645,6 +649,8 @@ class DiscussionTopicsController < ApplicationController
           @errors[:published] = t(:error_draft_state_announcement, "This topic cannot be set to draft state because it is an announcement.")
         elsif @topic.discussion_subentry_count > 0
           @errors[:published] = t(:error_draft_state_with_posts, "This topic cannot be set to draft state because it contains posts.")
+        elsif @topic.assignment_id
+          @errors[:published] = t(:error_draft_state_graded, "This topic cannot be set to draft state because it is an assignment")
         elsif user_can_moderate
           discussion_topic_hash[:delayed_post_at] = nil
           @topic.workflow_state = 'post_delayed'

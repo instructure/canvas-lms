@@ -182,7 +182,7 @@ describe "discussions" do
 
       it "should validate closing the discussion for comments" do
         create_and_go_to_topic
-        f("#discussion-toolbar .al-trigger").click
+        f("#discussion-managebar .al-trigger").click
         expect_new_page_load { f(".discussion_locked_toggler").click }
         f('.discussion-fyi').text.should == 'This topic is closed for comments'
         ff('.discussion-reply-action').should be_empty
@@ -191,7 +191,7 @@ describe "discussions" do
 
       it "should validate reopening the discussion for comments" do
         create_and_go_to_topic('closed discussion', 'side_comment', true)
-        f("#discussion-toolbar .al-trigger").click
+        f("#discussion-managebar .al-trigger").click
         expect_new_page_load { f(".discussion_locked_toggler").click }
         ff('.discussion-reply-action').should_not be_empty
         DiscussionTopic.last.workflow_state.should == 'active'
@@ -438,6 +438,74 @@ describe "discussions" do
           f('.icon-discussion').should be_displayed
           topic.reload
           topic.subscribed?(@user).should be_false
+        end
+
+        context "draft state" do
+          before do
+            a = Account.default
+            a.settings[:enable_draft] = true
+            a.save!
+          end
+
+          def click_publish_icon(topic)
+            fj(".discussion[data-id=#{topic.id}] .publish-icon i").click
+            wait_for_ajaximations
+          end
+
+          it "should allow publishing a discussion" do
+            topic = @course.discussion_topics.create!(title: 'Publish me', user: @user)
+            topic.workflow_state = 'post_delayed'
+            topic.save!
+            topic.published?.should be_false
+            get(url)
+            click_publish_icon topic
+            topic.reload
+            topic.published?.should be_true
+          end
+
+          it "should allow unpublishing a discussion without replies" do
+            topic = @course.discussion_topics.create!(title: 'Unpublish me', user: @user)
+            topic.published?.should be_true
+            get(url)
+            click_publish_icon topic
+            topic.reload
+            topic.published?.should be_false
+          end
+
+          it "should not allow unpublishing a discussion with replies" do
+            topic = @course.discussion_topics.create!(title: 'Try to unpublish me', user: @user)
+            topic.reply_from user: @user, text: 'reply'
+            topic.published?.should be_true
+            get(url)
+            click_publish_icon topic
+            topic.reload
+            topic.published?.should be_true
+          end
+
+          it "should not allow unpublishing a graded discussion" do
+            group_discussion_assignment
+            @topic.published?.should be_true
+            get(url)
+            click_publish_icon @topic
+            @topic.reload
+            @topic.published?.should be_true
+          end
+
+          it "should allow publishing and unpublishing from a topic's page" do
+            topic = @course.discussion_topics.create!(title: 'Publish me', user: @user)
+            topic.workflow_state = 'post_delayed'
+            topic.save!
+            topic.published?.should be_false
+            get url + "#{topic.id}"
+            f('#topic_publish_button').click
+            wait_for_ajaximations
+            topic.reload
+            topic.published?.should be_true
+            f('#topic_publish_button').click
+            wait_for_ajaximations
+            topic.reload
+            topic.published?.should be_false
+          end
         end
       end
 
@@ -717,7 +785,7 @@ describe "discussions" do
           get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
           wait_for_ajaximations
 
-          f("#discussion-toolbar .al-trigger").click
+          f("#discussion-managebar .al-trigger").click
           expect_new_page_load { f(".discussion_locked_toggler").click }
 
           @topic.reload
@@ -1229,7 +1297,7 @@ describe "discussions" do
       ff('.discussion-entries .unread').length.should == reply_count
       ff('.discussion-entries .read').length.should == 0
 
-      f("#discussion-toolbar .al-trigger").click
+      f("#discussion-managebar .al-trigger").click
       f('.mark_all_as_read').click
       wait_for_ajaximations
       ff('.discussion-entries .unread').length.should == 0

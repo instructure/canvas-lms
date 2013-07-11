@@ -47,10 +47,13 @@ define [
     # Public: Topic is able to be pinned/unpinned.
     @optionProperty 'pinnable'
 
+    @child 'publishIcon', '[data-view=publishIcon]' if ENV.permissions.publish
+
     @child 'toggleableSubscriptionIcon', '[data-view=toggleableSubscriptionIcon]'
 
     initialize: (options) ->
       @attachModel()
+      options.publishIcon = new PublishIconView(model: @model) if ENV.permissions.publish
       options.toggleableSubscriptionIcon = new ToggleableSubscriptionIconView(model: @model)
       super
 
@@ -132,3 +135,4 @@ define [
     # Returns nothing.
     attachModel: ->
       @model.on('change:hidden', @hide)
+      @model.on('change:published', @render)

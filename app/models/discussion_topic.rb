@@ -456,7 +456,15 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def published?
-    workflow_state != 'post_delayed'
+    if self.assignment
+      self.assignment.published?
+    else
+      workflow_state != 'post_delayed'
+    end
+  end
+
+  def can_unpublish?
+    !self.assignment && self.discussion_subentry_count == 0
   end
 
   def can_unpublish?

@@ -1,6 +1,6 @@
 @import "environment";
 
-$border: #b6babf;
+$border: #C1C7CF;
 $borderRadius: 3px;
 
 body.with-right-side.with-left-side {
@@ -47,10 +47,10 @@ body.with-right-side.with-left-side {
   .entry {
     background: white;
     border: 1px solid $border;
-    border-top-left-radius: $borderRadius;
-    border-top-right-radius: $borderRadius;
+    border-radius: $borderRadius;
     padding: $borderRadius 0 0 0;
     margin: 16px 0 16px 18px;
+    box-shadow: 0 1px 0 #DDE0E4;
 
     &.collapsed, .entry {
       margin: 16px 0 16px 18px;
@@ -113,6 +113,8 @@ body.with-right-side.with-left-side {
   position: relative;
   margin: 0;
   background: white;
+  border-radius: $borderRadius;
+  padding: 6px;
   .al-trigger {
     margin-left: 10px;
     margin-right: 0px;
@@ -144,7 +146,7 @@ body.with-right-side.with-left-side {
 }
 
 .toggle-wrapper {
-  margin-bottom: 11px;
+  margin: 0 11px;
   text-align: right;
 }
 
@@ -259,23 +261,18 @@ body.with-right-side.with-left-side {
   border-top: 1px solid $border;
 }
 
-.topic {
-  .discussion-entry-reply-area {
-    padding: 0 20px;
-    border-top: 1px solid #d4d5d7;
-    border-bottom: 1px solid $border;
-  }
-}
-
 .discussion_entry > .discussion-entry-reply-area {
   padding: 0 0.8em;
-  border-top: 1px solid #d4d5d7;
+  border: 1px solid #d4d5d7;
+  margin: 10px;
+  border-radius: 3px;
 }
 .entry {
   & > .bottom-reply-with-box {
     .discussion-entry-reply-area {
       padding: 0 0.8em;
       border-top: 1px solid #d4d5d7;
+      border-radius: 0 0 3px 3px;
 
       &.reply-box-container {
         padding: 15px 0.8em;
@@ -286,6 +283,14 @@ body.with-right-side.with-left-side {
         }
       }
     }
+  }
+}
+
+.topic {
+  padding: 0;
+  background: transparent;
+  > .discussion-entry-reply-area {
+    margin: 16px 10px 0 28px;
   }
 }
 
@@ -416,7 +421,7 @@ body.with-right-side.with-left-side {
 
 .entry-controls {
   overflow: auto;
-  padding: 0 10px 2px 10px;
+  padding: 10px;
   font-size: 12px;
 
   .new-and-total-badge {
@@ -434,7 +439,8 @@ body.with-right-side.with-left-side {
   overflow: auto;
 
   .entry_content {
-    padding: 10px 10px 0 10px;
+    padding: 10px;
+    background: white;
   }
 }
 
@@ -447,7 +453,7 @@ body.with-right-side.with-left-side {
 }
 
 #main {
-  background: $altBG;
+  background: #E8ECEF;
 }
 
 .discussion_subentries {
@@ -531,13 +537,8 @@ body.with-right-side.with-left-side {
   }
 }
 
-.collapsable {
-  border-bottom: 1px solid white;
-}
-
 .collapsable:hover {
   cursor: pointer;
-  border-color: #e4e5e7;
   &:before {
     display: block;
     content: "";
@@ -598,8 +599,16 @@ body.with-right-side.with-left-side {
 .toolbarView {
   background: white;
   min-height: 50px;
+  &#discussion-toolbar {
+    .headerBar {
+      background: #e3e7ec;
+      border-top: solid 1px $border;
+    }
+  }
   .admin-links {
     text-align: left;
+    float: none;
+    display: inline;
   }
   .al-trigger {
     margin-left: 4px;
@@ -630,6 +639,10 @@ body.with-right-side.with-left-side {
   }
   [disabled] {
     display: none;
+  }
+  .btn-published {
+    box-shadow: none;
+    @include buttonBackground($btnSuccessBackground, $btnSuccessBackgroundHighlight);
   }
 }
 

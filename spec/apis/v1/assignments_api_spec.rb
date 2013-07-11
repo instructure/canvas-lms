@@ -1130,6 +1130,8 @@ describe AssignmentsApiController, :type => :integration do
           'unread_count' => 0,
           'user_can_see_posts' => @topic.user_can_see_posts?(@user),
           'subscribed' => @topic.subscribed?(@user),
+          'published' => @topic.published?,
+          'can_unpublish' => @topic.can_unpublish?,
           'url' =>
             "http://www.example.com/courses/#{@course.id}/discussion_topics/#{@topic.id}",
           'html_url' =>

@@ -1,5 +1,11 @@
 <div class="discussion-content">
-  <div class="discussion-row">
+  <div class="discussion-row{{#if ENV.permissions.publish}} {{#if published}}discussion-published{{else}}discussion-unpublished{{/if}}{{/if}}">
+    {{#if permissions.moderate}}
+      <div class="draggable-handle">
+        <i class="icon-drag-handle"></i>
+      </div>
+    {{/if}}
+
     <div class="discussion-type">
       {{#if assignment}}
         <i class="icon-assignment" aria-hidden="true"></i>
@@ -15,7 +21,7 @@
     <div class="discussion-due-date">
       {{#if assignment}}
         {{#if assignment.due_at}}
-          {{#t "due"}}Due{{/t}} {{tDateToString assignment.due_at "medium"}}
+          <span class="discussion-date-type">{{#t "due"}}Due{{/t}}</span> {{tDateToString assignment.due_at "medium"}}
         {{else}}
           {{#t "no_due_date"}}No Due Date{{/t}}
         {{/if}}
@@ -23,6 +29,8 @@
     </div>
 
     <div class="discussion-status">
+      <span id="publish-icon" class="publish-icon" data-view="publishIcon"></span>
+
       <a href="#" data-view="toggleableSubscriptionIcon" class="subscription-toggler">
         <span class="screenreader-only">
           {{#if subscribed}}
@@ -32,8 +40,6 @@
           {{/if}}
         </span>
       </a>
-
-      <!-- <i class="icon-unpublished"></i> -->
     </div>
 
     <div class="discussion-unread-status">
