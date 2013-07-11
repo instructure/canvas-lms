@@ -16,6 +16,7 @@ class CourseFormController < ApplicationController
   end
 
   def create
+    req_user = User.find(@current_user.id)
     selected_courses = []
     account_id = Account.find_by_name("Simon Fraser University").id
     teacher_username = params[:username]
@@ -38,14 +39,14 @@ class CourseFormController < ApplicationController
 
       selected_courses.compact.uniq.each do |course|
         if course.starts_with? "sandbox"
-          logger.info "[SFU Course Form] Creating sandbox for #{teacher_username} requested by #{@sfuid}"
+          logger.info "[SFU Course Form] Creating sandbox for #{teacher_username} requested by #{req_user}"
           sandbox = sandbox_info(course, teacher_username, teacher_sis_user_id, teacher2_sis_user_id)
 
           course_array.push sandbox["csv"]
           enrollment_array.push sandbox["enrollment_csv_1"]
           enrollment_array.push sandbox["enrollment_csv_2"] unless teacher2_sis_user_id.nil?
         elsif course.starts_with? "ncc"
-          logger.info "[SFU Course Form] Creating ncc course for #{teacher_username} requested by #{@sfuid}"
+          logger.info "[SFU Course Form] Creating ncc course for #{teacher_username} requested by #{req_user}"
           ncc_course = ncc_info(course, teacher_sis_user_id, teacher2_sis_user_id)
 
           course_array.push ncc_course["csv"]
@@ -53,7 +54,7 @@ class CourseFormController < ApplicationController
           enrollment_array.push ncc_course["enrollment_csv_2"] unless teacher2_sis_user_id.nil?
 
         else
-          logger.info "[SFU Course Form] Creating single course container : #{course} requested by #{@sfuid}"
+          logger.info "[SFU Course Form] Creating single course container : #{course} requested by #{req_user}"
           course_info = course_info(course, account_id, teacher_sis_user_id, teacher2_sis_user_id)
 
           # create course csv
@@ -72,7 +73,7 @@ class CourseFormController < ApplicationController
 
     else
 
-      logger.info "[SFU Course Form] Creating cross-list container : #{selected_courses.inspect} requested by #{@sfuid}"
+      logger.info "[SFU Course Form] Creating cross-list container : #{selected_courses.inspect} requested by #{req_user}"
       course_id = ""
       short_name = ""
       long_name = ""
