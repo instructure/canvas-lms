@@ -16,7 +16,7 @@ class CourseFormController < ApplicationController
   end
 
   def create
-    req_user = User.find(@current_user.id)
+    req_user = User.find(@current_user.id).pseudonym.unique_id
     selected_courses = []
     account_id = Account.find_by_name("Simon Fraser University").id
     teacher_username = params[:username]
