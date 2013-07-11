@@ -37,8 +37,23 @@ class CourseFormController < ApplicationController
     unless cross_list
 
       selected_courses.compact.uniq.each do |course|
-        unless course.starts_with? "sandbox"
-          logger.info "[SFU Course Form] Creating single course container : #{course}"
+        if course.starts_with? "sandbox"
+          logger.info "[SFU Course Form] Creating sandbox for #{teacher_username} requested by #{@sfuid}"
+          sandbox = sandbox_info(course, teacher_username, teacher_sis_user_id, teacher2_sis_user_id)
+
+          course_array.push sandbox["csv"]
+          enrollment_array.push sandbox["enrollment_csv_1"]
+          enrollment_array.push sandbox["enrollment_csv_2"] unless teacher2_sis_user_id.nil?
+        elsif course.starts_with? "ncc"
+          logger.info "[SFU Course Form] Creating ncc course for #{teacher_username} requested by #{@sfuid}"
+          ncc_course = ncc_info(course, teacher_sis_user_id, teacher2_sis_user_id)
+
+          course_array.push ncc_course["csv"]
+          enrollment_array.push ncc_course["enrollment_csv_1"]
+          enrollment_array.push ncc_course["enrollment_csv_2"] unless teacher2_sis_user_id.nil?
+
+        else
+          logger.info "[SFU Course Form] Creating single course container : #{course} requested by #{@sfuid}"
           course_info = course_info(course, account_id, teacher_sis_user_id, teacher2_sis_user_id)
 
           # create course csv
@@ -52,20 +67,12 @@ class CourseFormController < ApplicationController
 
           enrollment_array.push course_info["enrollment_csv_1"]
           enrollment_array.push course_info["enrollment_csv_2"] unless teacher2_username.nil?
-
-        else
-          logger.info "[SFU Course Form] Creating sandbox for #{teacher_username}"
-          sandbox = sandbox_info(course, teacher_username, teacher_sis_user_id, teacher2_sis_user_id)
-
-          course_array.push sandbox["csv"]
-          enrollment_array.push sandbox["enrollment_csv_1"]
-          enrollment_array.push sandbox["enrollment_csv_2"] unless teacher2_sis_user_id.nil?
         end
       end
 
     else
 
-      logger.info "[SFU Course Form] Creating cross-list container : #{selected_courses.inspect}"
+      logger.info "[SFU Course Form] Creating cross-list container : #{selected_courses.inspect} requested by #{@sfuid}"
       course_id = ""
       short_name = ""
       long_name = ""
@@ -162,6 +169,7 @@ class CourseFormController < ApplicationController
     course
   end
 
+  # e.g. course_line = sandbox-kipling-71113273
   def sandbox_info(course_line, username, teacher1, teacher2 = nil)
     account_sis_id = "sfu:::sandbox:::instructors"
     course_arr = course_line.split("-")
@@ -174,6 +182,21 @@ class CourseFormController < ApplicationController
     sandbox["enrollment_csv_1"] = "\"#{sandbox["course_id"]}\",\"#{teacher1}\",\"teacher\",\"#{sandbox["default_section_id"]}\",\"active\""
     sandbox["enrollment_csv_1"] = "\"#{sandbox["course_id"]}\",\"#{teacher2}\",\"teacher\",\"#{sandbox["default_section_id"]}\",\"active\"" unless teacher2.nil?
     sandbox
+  end
+
+  # e.g. course_ling = ncc-kipling-71113273-My special course
+  def ncc_info(course_line, teacher1, teacher2 = nil)
+    account_sis_id = "sfu:::ncc"
+    course_arr = course_line.split("-")
+    ncc = {}
+    ncc["course_id"] = "#{course_arr.first(3).join("-")}"
+    ncc["short_long_name"] = course_arr.last
+    ncc["default_section_id"] = ""
+
+    ncc["csv"] = "\"#{ncc["course_id"]}\",\"#{ncc["short_long_name"]}\",\"#{ncc["short_long_name"]}\",\"#{account_sis_id}\",\"\",\"active\""
+    ncc["enrollment_csv_1"] = "\"#{ncc["course_id"]}\",\"#{teacher1}\",\"teacher\",\"#{ncc["default_section_id"]}\",\"active\""
+    ncc["enrollment_csv_1"] = "\"#{ncc["course_id"]}\",\"#{teacher2}\",\"teacher\",\"#{ncc["default_section_id"]}\",\"active\"" unless teacher2.nil?
+    ncc
   end
 
   def sis_user_id(username, account_id)

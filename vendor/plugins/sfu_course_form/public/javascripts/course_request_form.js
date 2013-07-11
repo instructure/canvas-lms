@@ -202,15 +202,23 @@
             function enable_submit_crosslist() {
                 var num_selected_courses = "";
                 var selected_terms = [];
+                var sandobxChecked = false;
+                var nccChecked = false;
                 $('input[type="checkbox"]:checked').each(function() {
                     if ($(this).attr('id').match(/^selected_course_/)) {
                         num_selected_courses++;
                         var checkbox_id_arr = $(this).attr('id').split("_");
                         selected_terms.push(checkbox_id_arr[checkbox_id_arr.length-1]);
+                        if ($(this).attr('id').match(/^selected_course_sandbox_/)) {
+                            sandobxChecked = $(this).is(':checked');
+                        }
+                        if ($(this).attr('id').match(/^selected_course_ncc_/)) {
+                            nccChecked = $(this).is(':checked');
+                        }
                     }
                 }).get();
 
-                if ( (num_selected_courses > 2) || (num_selected_courses > 1 && !$("#selected_course_sandbox").is(':checked')) ) {
+                if ( (num_selected_courses > 2) || (num_selected_courses > 1 && (sandobxChecked || nccChecked)) ) {
                     $("#create_course_btn").removeAttr("disabled");
                     $("#enroll_me").removeAttr("disabled");
                     enable_cross_list(true);
