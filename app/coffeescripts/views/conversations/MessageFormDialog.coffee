@@ -64,7 +64,7 @@ define [
         text: I18n.t '#buttons.cancel', 'Cancel'
         click: @cancel
       ,
-        text: I18n.t '#buttons.send_message', 'Send'
+        text: I18n.t '#buttons.send', 'Send'
         'class' : 'btn-primary send-message'
         'data-track-category': "Compose Message"
         'data-track-action'  : "Edit"
