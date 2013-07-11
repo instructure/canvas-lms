@@ -139,10 +139,17 @@ define [
     # @api private
 
     renderItem: (model) =>
-      view = new @itemView $.extend {}, (@itemViewOptions || {}), {model}
+      view = @createItemView model
       view.render()
       @attachItemView?(model, view)
       @insertView view
+
+    ##
+    # Creates the item view instance, extend this when you need to do things
+    # like instantiate with child views, etc.
+
+    createItemView: (model) ->
+      new @itemView $.extend {}, (@itemViewOptions || {}), {model}
 
     ##
     # Inserts the item view with respect to the collection comparator.
