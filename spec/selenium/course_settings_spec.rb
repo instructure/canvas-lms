@@ -194,7 +194,7 @@ describe "course settings" do
     it "should not include student view student in the statistics count" do
       @fake_student = @course.student_view_student
       get "/courses/#{@course.id}/settings"
-      fj('.summary tr:nth(1)').text.should match /Students:\s*None/
+      fj('.summary tr:nth(0)').text.should match /Students:\s*None/
     end
 
     it "should show the count of custom role enrollments" do
@@ -204,9 +204,9 @@ describe "course settings" do
       course_with_student(:course => @course, :role_name => "weirdo")
       course_with_teacher(:course => @course, :role_name => "teach")
       get "/courses/#{@course.id}/settings"
-      fj('.summary tr:nth(2)').text.should match /weirdo:\s*1/
-      fj('.summary tr:nth(4)').text.should match /teach:\s*1/
-      fj('.summary tr:nth(6)').text.should match /taaaa:\s*None/
+      fj('.summary tr:nth(1)').text.should match /weirdo:\s*1/
+      fj('.summary tr:nth(3)').text.should match /teach:\s*1/
+      fj('.summary tr:nth(5)').text.should match /taaaa:\s*None/
     end
   end
 end

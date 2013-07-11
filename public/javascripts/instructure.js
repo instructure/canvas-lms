@@ -980,7 +980,7 @@ define([
     // happend a lot so rather than duplicating it everywhere I stuck it here
     $("#right-side").delegate(".more_link", "click", function(event) {
       var $this = $(this);
-      var $children = $this.parents("ul").children().show();
+      var $children = $this.parents("ul").children(':hidden').show();
       $this.closest('li').remove();
 
       // if they are using the keyboard to navigate (they hit enter on the link instead of actually

@@ -6,6 +6,8 @@
   content_for :page_title, join_title(translated_title, @context.name)
 %>
 
+<h1 class='screenreader-only'><%= t('#titles.people', 'People') %></h1>
+
 <% content_for :right_side, render(:partial => 'context/roster_right_side') %>
 
 <%= jammit_css :roster %>

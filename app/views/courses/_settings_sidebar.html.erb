@@ -87,13 +87,9 @@
   <% end %>
 
   <table class="summary">
-    <thead>
-      <tr>
-        <th colspan="2">
-          <%= t('headings.current_users', 'Current Users') %>
-        </th>
-      </tr>
-    </thead>
+    <caption>
+      <h3><%= t('headings.current_users', 'Current Users') %></h3>
+    </caption>
 
     <tbody>
       <% @all_roles.each do |base_role| %>
