@@ -7614,11 +7614,11 @@ fr:
         body: "Alerte Canvas - Inscrit : au cours en tant que %{enrollment_type}"
     enrollment_registration: 
       email: 
-        body_designer: "Vous avez été invité à participer à une classe sur %{website}. La classe s’intitule %{course}, et vous avez été invité à y participer en tant que concepteur."
-        body_observer: "Vous avez été invité à participer à une classe sur %{website}. La classe s’intitule %{course}, et vous avez été invité à y participer en tant qu’observateur."
-        body_student: "Vous avez été invité à participer à une classe sur %{website}. La classe s’intitule %{course}, et vous avez été invité à y participer en tant qu’étudiant."
-        body_ta: "Vous avez été invité à participer à une classe sur %{website}. La classe s’intitule %{course}, et vous avez été invité à y participer en tant qu’aide-enseignant."
-        body_teacher: "Vous avez été invité à participer à une classe sur %{website}. La classe s’intitule %{course}, et vous avez été invité à y participer en tant qu’enseignant."
+        body_designer: "Vous avez été invité à participer à une classe sur . La classe s’intitule %{course}, et vous avez été invité à y participer en tant que concepteur."
+        body_observer: "Vous avez été invité à participer à une classe sur . La classe s’intitule %{course}, et vous avez été invité à y participer en tant qu’observateur."
+        body_student: "Vous avez été invité à participer à une classe sur . La classe s’intitule %{course}, et vous avez été invité à y participer en tant qu’étudiant."
+        body_ta: "Vous avez été invité à participer à une classe sur . La classe s’intitule %{course}, et vous avez été invité à y participer en tant qu’aide-enseignant."
+        body_teacher: "Vous avez été invité à participer à une classe sur . La classe s’intitule %{course}, et vous avez été invité à y participer en tant qu’enseignant."
         details: "Vous devez vous enregistrer auprès de Canvas avant de participer à la classe. Pour commencer, consultez la page du cours ici :"
         html: 
           body_designer: "Le cours s’intitule %{course} et vous avez été invité à y participer en tant que concepteur."
