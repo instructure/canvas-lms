@@ -34,6 +34,8 @@ define [
       '.due_date_wrapper': '$dueDates'
       '.reply-textarea:first': '$textarea'
       '#discussion-toolbar': '$discussionToolbar'
+      '.topic-subscribe-button': '$subscribeButton'
+      '.topic-unsubscribe-button': '$unsubscribeButton'
 
     initialize: ->
       @model.set 'id', ENV.DISCUSSION.TOPIC.ID
@@ -88,11 +90,17 @@ define [
       event.preventDefault()
       @topic.topicSubscribe()
       @subscriptionStatusChanged()
+      # focus the toggled button if the toggled button was focused
+      if @$subscribeButton.is(':focus')
+        @$unsubscribeButton.focus()
 
     unsubscribeTopic: (event) ->
       event.preventDefault()
       @topic.topicUnsubscribe()
       @subscriptionStatusChanged()
+      # focus the toggled button if the toggled button was focused
+      if @$unsubscribeButton.is(':focus')
+        @$subscribeButton.focus()
 
     subscriptionStatusChanged: =>
       subscribed = @topic.get 'subscribed'
