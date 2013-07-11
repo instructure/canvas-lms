@@ -3,10 +3,10 @@ define [
   'underscore'
   'compiled/fn/preventDefault'
   'compiled/models/Folder'
-  'compiled/views/SharedPaginatedCollectionView'
+  'compiled/views/PaginatedCollectionView'
   'compiled/views/FileItemView'
   'jst/FolderTreeCollection'
-], (Backbone, _, preventDefault, Folder, SharedPaginatedCollectionView, FileItemView, collectionTemplate) ->
+], (Backbone, _, preventDefault, Folder, PaginatedCollectionView, FileItemView, collectionTemplate) ->
 
   class FolderTreeView extends Backbone.View
 
@@ -27,11 +27,8 @@ define [
       super
 
     render: ->
-      $focusedChild = @$(document.activeElement)
       @renderSelf()
       @renderContents()
-      # restore focus for keyboard users
-      @$el.find($focusedChild).focus() if $focusedChild.length
 
     toggle: (event) ->
       # prevent it from bubbling up to parents and from following link
@@ -55,7 +52,7 @@ define [
       if @model.isExpanded
         unless @$folderContents
           @$folderContents = $("<ul role='group' class='folderContents'/>").appendTo(@$el)
-          foldersView = new SharedPaginatedCollectionView(
+          foldersView = new PaginatedCollectionView(
             collection: @model.folders
             itemView: FolderTreeView
             tagName: 'li'
@@ -64,7 +61,7 @@ define [
             scrollContainer: @$folderContents.closest('ul[role=tabpanel]')
           )
           @$folderContents.append(foldersView.render().el)
-          filesView = new SharedPaginatedCollectionView(
+          filesView = new PaginatedCollectionView(
             collection: @model.files
             itemView: FileItemView
             tagName: 'li'
