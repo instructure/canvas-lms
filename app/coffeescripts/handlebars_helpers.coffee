@@ -336,5 +336,5 @@ define [
   }
 
   # not a function helper, just a way to make ENV available in any scope
-  Handlebars.helpers.ENV = ENV
+  Handlebars.helpers.ENV = @ENV
   return Handlebars
