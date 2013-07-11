@@ -88,7 +88,7 @@ define [
     # @api private
 
     removePreviousItems: (models) =>
-      @$list.children().each (index, el) =>
+      @$list?.children().each (index, el) =>
         @$(el).data('view')?.remove()
 
     renderOnReset: =>

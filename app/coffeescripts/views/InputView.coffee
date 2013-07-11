@@ -25,7 +25,7 @@ define [
       @setupElement()
 
     setupElement: ->
-      @lastValue = @el.value
+      @lastValue = @el?.value
       @modelAttribute = @$el.attr('name') or @options.modelAttribute
 
     attach: ->

@@ -1,14 +1,17 @@
 define [
   'Backbone'
   'jquery'
-  'i18n!notifications_search'
-  'jst/accounts/admin_tools/commMessagesSearchForm'
-  'compiled/collections/CommMessageCollection'
+  'i18n!user_date_range_search'
+  'jst/accounts/admin_tools/userDateRangeSearchForm'
   'compiled/views/ValidatedMixin'
   'jquery.ajaxJSON'
-], (Backbone,$, I18n, template, CommMessageCollection, ValidatedMixin) ->
-  class CommMessagesSearchFormView extends Backbone.View
+  'jquery.instructure_date_and_time'
+], (Backbone,$, I18n, template, ValidatedMixin) ->
+  class UserDateRangeSearchFormView extends Backbone.View
     @mixin ValidatedMixin
+
+    @child 'inputFilterView', '[data-view=inputFilter]'
+    @child 'usersView', '[data-view=users]'
 
     tagName: 'form'
 
@@ -18,14 +21,43 @@ define [
       'submit': 'submit'
 
     els:
-      '#userIdSearchField':   '$userIdSearchField'
-      '#dateStartSearchField': '$dateStartSearchField'
-      '#dateEndSearchField':   '$dateEndSearchField'
+      '.userIdField':          '$userIdField'
+      '.dateStartSearchField': '$dateStartSearchField'
+      '.dateEndSearchField':   '$dateEndSearchField'
+      '.search-controls':      '$searchControls'
+
+    @optionProperty 'formName'
+
+    toJSON: -> @options
+
+    initialize: (options) ->
+      @model = new Backbone.Model
+      super(options)
 
     # Setup the date inputs for javascript use.
     afterRender: ->
       @$dateStartSearchField.datetime_field()
       @$dateEndSearchField.datetime_field()
+      @$searchControls.hide()
+
+    attach: ->
+      @inputFilterView.collection.on 'setParam deleteParam', @fetchUsers
+      @usersView.collection.on 'selectedModelChange', @selectUser
+
+    fetchUsers: =>
+      @selectUser null
+      @lastRequest?.abort()
+      @lastRequest = @inputFilterView.collection.fetch()
+
+    selectUser: (e) =>
+      @usersView.$el.find('tr').each () -> $(this).removeClass('selected')
+      if e
+        @model.set e.attributes
+        @$userIdField.val(e.get 'id')
+        @$searchControls.show()
+      else
+        @$userIdField.val('')
+        @$searchControls.hide()
 
     validityCheck: ->
       json = @$el.toJSON()
@@ -41,7 +73,7 @@ define [
             message: I18n.t('cant_be_blank', "Canvas User ID can't be blank")
             }
           ]
-      # If have both start and end, check for va lues to make sense together.
+      # If have both start and end, check for values to make sense together.
       if json.start_time && json.end_time && (json.start_time > json.end_time)
         valid = false
         errors['end_time'] =
@@ -64,6 +96,7 @@ define [
     updateCollection: ->
       # Update the params (which fetches the collection)
       json = @$el.toJSON()
+      delete json['search_term']
       json.start_time = '' unless json.start_time
       json.end_time = '' unless json.end_time
       @collection.setParams json

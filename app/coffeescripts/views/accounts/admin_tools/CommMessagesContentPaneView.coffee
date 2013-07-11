@@ -17,6 +17,7 @@ define [
 
     attach: ->
       @collection.on 'setParams', @fetchMessages
+
     fetchMessages: =>
       @buildOverviewText()
       @collection.fetch().fail @onFail
@@ -28,20 +29,10 @@ define [
       @resultsView.detachScroll()
 
     buildOverviewText: =>
-      # perform AJAX request to get user's name for visual feedback of who's
-      # data was fetched.
-      dfd = $.ajax
-        url: "/users/#{$('#userIdSearchField').val()}.json"
-        type: 'GET'
-        success: @renderOverviewDisplay
-        error: @$overview.hide()
-      dfd.promise()
-
-    renderOverviewDisplay: (response) =>
       dates = $(@searchForm.el).toJSON()
       @$overview.hide()
       @$overview.html(overviewTemplate(
-        user: response.name
+        user: @searchForm.model.get('name')
         start_date: @getDisplayDateText(dates.start_time,
                                         I18n.t('from_beginning', "the beginning"))
         end_date: @getDisplayDateText(dates.end_time,
