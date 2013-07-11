@@ -126,7 +126,7 @@ describe "course settings" do
       add_section('Delete Section')
       get "/courses/#{@course.id}/settings#tab-sections"
 
-      f('.section_link.delete_section_link').click
+      f('.delete_section_link').click
       keep_trying_until do
         driver.switch_to.alert.should_not be_nil
         driver.switch_to.alert.accept
@@ -141,7 +141,7 @@ describe "course settings" do
       add_section('Edit Section')
       get "/courses/#{@course.id}/settings#tab-sections"
 
-      f('.section_link.edit_section_link').click
+      f('.edit_section_link').click
       section_input = f('#course_section_name')
       keep_trying_until { section_input.should be_displayed }
       replace_content(section_input, edit_text)

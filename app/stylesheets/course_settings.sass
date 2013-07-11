@@ -139,19 +139,15 @@ ul.user_list div.enrollment_type.pending
 #sections .section
   padding: 3px 2px
 
-#sections .section .delete_section_link,
-#sections .section .edit_section_link,
-#sections .section .cant_delete_section_link
-
+#sections .section .section_links
   float: right
-
-#sections .section .section_link
-  +opacity(0.3)
+  a
+    +opacity(0.3)
 
 #sections .section:hover
   background-color: #eee
 
-#sections .section:hover .section_link
+#sections .section:hover .section_links a
   +opacity(1)
 
 #sections .section .users_count
