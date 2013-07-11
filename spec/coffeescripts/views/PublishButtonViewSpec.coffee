@@ -4,6 +4,7 @@ define [
   'jquery'
   'helpers/jquery.simulate'
 ], (Backbone, PublishButtonView, $) ->
+###
   module 'PublishButtonView',
     setup: ->
       @publishable = class Publishable extends Backbone.Model
@@ -197,4 +198,4 @@ define [
     btnView.$el.trigger('click')
 
     ok !btnView.isPublish()
-
+###
