@@ -3,11 +3,17 @@
   <span>
     <a class="al-trigger btn">
       <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
-      <span class="screenreader-only">Settings</span>
+      <span class="screenreader-only">{{#t "category_settings"}}Settings{{/t}}</span>
     </a>
     <ul class="al-options">
-      <li><a href="#" class="icon-edit edit-category">Edit</a></li>
-      <li><a href="#" class="icon-trash delete-category">Delete</a></li>
+      {{#unless studentOrganizedOrSelfSignupRestricted}}
+        <li><a href="#"
+               class="icon-user randomly-assign-members">{{#t "randomly_assign_students_option"}}Randomly Assign Students{{/t}}</a></li>
+      {{/unless}}
+      <li><a href="#"
+             class="icon-edit edit-category">{{#t "edit_category_option"}}Edit{{/t}}</a></li>
+      <li><a href="#"
+             class="icon-trash delete-category">{{#t "delete_category_option"}}Delete{{/t}}</a></li>
     </ul>
   </span>
 </div>
@@ -40,4 +46,3 @@
 {{#if studentOrganized}}
   <div class="alert"><i class="icon-warning-sign"></i> {{#t "self_organized_warning"}}These groups are self-organized by students.  Unlike other types of groups, students can belong to more than one of these groups at a time, so these groups may not be the best solution for graded assignments.{{/t}}</div>
 {{/if}}
-

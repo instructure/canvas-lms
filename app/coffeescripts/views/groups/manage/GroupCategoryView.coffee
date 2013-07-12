@@ -18,6 +18,7 @@ define [
     template: template
 
     @optionProperty 'groupCount'
+    @optionProperty 'randomlyAssignStudentsInProgress'
 
     @child 'groupCategoryDetailView', '[data-view=groupCategoryDetail]'
     @child 'unassignedUsersView', '[data-view=unassignedUsers]'
@@ -35,6 +36,9 @@ define [
         collection: @groups
       options.groupsView ?= @groupsView(options)
       options.unassignedUsersView ?= @unassignedUsersView(options)
+      if progress = @model.get('progress')
+        @model.progressModel.set progress
+        @randomlyAssignStudentsInProgress = true
       super
 
     groupsView: (options) ->
@@ -58,6 +62,15 @@ define [
 
     attach: ->
       @model.on 'destroy', @remove, this
+      @model.progressModel.on 'change:url', =>
+        @model.progressModel.set({'completion': 0})
+        @randomlyAssignStudentsInProgress = true
+      @model.progressModel.on 'change', @render
+      @model.on 'progressResolved', =>
+        @model.groups().fetch()
+        @model.unassignedUsers().fetch()
+        @randomlyAssignStudentsInProgress = false
+        @render()
 
     deleteCategory: (e) =>
       e.preventDefault()
@@ -74,3 +87,9 @@ define [
         @groups.add(new_group)
       @createView.model = new_group
       @createView.toggle()
+
+    toJSON: ->
+      json = @model.present()
+      json.randomlyAssignStudentsInProgress = @randomlyAssignStudentsInProgress
+      json
+

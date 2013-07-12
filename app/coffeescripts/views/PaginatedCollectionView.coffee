@@ -107,7 +107,7 @@ define [
     # @api public
 
     checkScroll: =>
-      return if @collection.fetchingPage or @collection.fetchingNextPage
+      return if @collection.fetchingPage or @collection.fetchingNextPage or not @$el.length
       elementBottom = @$el.position().top +
         @$el.height() -
         @heightContainer.position().top

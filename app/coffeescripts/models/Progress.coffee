@@ -13,6 +13,8 @@ define ['Backbone', 'jquery'], ({Model}, $) ->
 
     defaults:
 
+      completion: 0
+
       # The url to poll
       url: null
 
