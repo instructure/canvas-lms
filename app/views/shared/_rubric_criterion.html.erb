@@ -94,7 +94,9 @@
     </div>
     <div class="criterion_comments">
       <% if !rubric || !rubric.free_form_criterion_comments %>
-        <a href="#" class="no-hover criterion_comments" title="<%= t 'links.additional_comments', "Additional Comments" %>"><%= image_tag "rubric_comment.png" %></a>
+        <a href="#" class="no-hover criterion_comments" title="<%= t 'links.additional_comments', "Additional Comments" %>">
+          <%= image_tag "rubric_comment.png", :alt => t('icons.additional_comments', 'Additional Comments') %>
+        </a>
         <div class="custom_rating" style="display: none;"><%= assessment_rating ? assessment_rating[:comments] : '' %></div>
       <% end %>
     </div>
