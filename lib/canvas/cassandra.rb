@@ -58,6 +58,10 @@ module Canvas::Cassandra
       @environment = environment
     end
 
+    def fingerprint
+      "#@cluster_name:#@environment"
+    end
+
     attr_reader :db
 
     # This just takes a raw query string, and params to replace `?` with.
@@ -69,7 +73,7 @@ module Canvas::Cassandra
       ms = Benchmark.ms do
         result = @db.execute(query, *args)
       end
-      Rails.logger.debug("  #{"CQL (%.2fms)" % [ms]}  #{::CassandraCQL::Statement.sanitize(query, args)} [#{@cluster_name} #{@environment}]")
+      Rails.logger.debug("  #{"CQL (%.2fms)" % [ms]}  #{::CassandraCQL::Statement.sanitize(query, args)} [#{fingerprint}]")
       result
     end
 

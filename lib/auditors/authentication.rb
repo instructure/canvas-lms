@@ -144,7 +144,7 @@ class Auditors::Authentication
       # query from that database, and label it with the database server's id
       # for merge
       collections << [
-        Shard.current.database_server.id,
+        db.fingerprint,
         Auditors::Authentication::Stream.for_user(user)
       ]
     end
