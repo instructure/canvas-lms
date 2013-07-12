@@ -143,11 +143,12 @@ class Assignment < ActiveRecord::Base
   serialize :allowed_extensions, Array
 
   def allowed_extensions=(new_value)
-    if new_value.is_a?(String)
-      # allow both comma and whitespace as separator, and remove the . if they
-      # put it on.
-      new_value = new_value.split(/[\s,]+/).map { |v| v.strip.gsub(/\A\./, '').downcase }
-    end
+    # allow both comma and whitespace as separator
+    new_value = new_value.split(/[\s,]+/) if new_value.is_a?(String)
+
+    # remove the . if they put it on, and extra whitespace
+    new_value.map! { |v| v.strip.gsub(/\A\./, '').downcase } if new_value.is_a?(Array)
+
     write_attribute(:allowed_extensions, new_value)
   end
 
