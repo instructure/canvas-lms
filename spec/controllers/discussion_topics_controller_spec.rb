@@ -321,6 +321,15 @@ describe DiscussionTopicsController do
           locked: false)
 
       @topic.reload.should_not be_locked
+      @topic.lock_at.should be_nil
+    end
+
+    it "should not clear lock_at if lock state hasn't changed" do
+      put('update', course_id: @course.id, topic_id: @topic.id,
+          title: 'Updated Topic', format: 'json', lock_at: @topic.lock_at,
+          locked: true)
+      @topic.reload.should be_locked
+      @topic.lock_at.should_not be_nil
     end
   end
 end
