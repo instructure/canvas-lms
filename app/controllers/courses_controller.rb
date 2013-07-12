@@ -397,13 +397,7 @@ class CoursesController < ApplicationController
       params[:per_page] ||= params.delete(:limit)
 
       search_params = params.slice(:search_term, :enrollment_role, :enrollment_type)
-      if (search_term = search_params[:search_term]) && search_term.size < 3
-        return render \
-            :json => {
-            "status" => "argument_error",
-            "message" => "search_term of 3 or more characters is required" },
-            :status => :bad_request
-      end
+      search_term = search_params[:search_term].presence
 
       if search_term
         users = UserSearch.for_user_in_context(search_term, @context, @current_user, search_params)
@@ -440,6 +434,8 @@ class CoursesController < ApplicationController
         user_json(u, @current_user, session, includes, @context, enrollments)
       }
     end
+  rescue UserSearch::SearchTermTooShort => e
+    render json: e.error_json, status: :bad_request
   end
 
   # @API List recently logged in students

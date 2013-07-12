@@ -213,14 +213,7 @@ class UsersController < ApplicationController
         end
 
         if api_request?
-          search_term = params[:search_term]
-          if search_term && search_term.size < 3
-            return render \
-              :json => {
-                    "status" => "argument_error",
-                    "message" => "search_term of 3 or more characters is required" },
-              :status => :bad_request
-          end
+          search_term = params[:search_term].presence
 
           if search_term
             users = UserSearch.for_user_in_context(search_term, @context, @current_user)
@@ -258,6 +251,8 @@ class UsersController < ApplicationController
         end
       end
     end
+  rescue UserSearch::SearchTermTooShort => e
+    render json: e.error_json, status: :bad_request
   end
 
 

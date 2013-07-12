@@ -91,4 +91,13 @@ define [
     simulateKeyup()
     equal view.model.get('filter'), false, 'filter attribute is false'
 
-
+  test 'updates filter with small number', ->
+    view.model = new Backbone.Model filter: 'foo'
+    view.options.allowSmallerNumbers = false
+    setValue '1'
+    simulateKeyup()
+    equal view.model.get('filter'), 'foo', 'filter attribute did not change'
+    view.options.allowSmallerNumbers = true
+    setValue '2'
+    simulateKeyup()
+    equal view.model.get('filter'), '2', 'filter attribute did change'

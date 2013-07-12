@@ -1,11 +1,34 @@
 module UserSearch
 
+  MIN_SEARCH_TERM_LENGTH = 3
+
+  class SearchTermTooShort < ArgumentError
+    def error_json
+      {
+        "errors" => [{
+          "field" => "search_term",
+          "code" => "invalid",
+          "message" => "#{UserSearch::MIN_SEARCH_TERM_LENGTH} or more characters is required",
+        }]
+      }
+    end
+  end
+
   def self.for_user_in_context(search_term, context, searcher, options = {})
+    search_term = search_term.to_s
     base_scope = scope_for(context, searcher, options.slice(:enrollment_type, :enrollment_role, :exclude_groups))
     if search_term.to_s =~ Api::ID_REGEX
       user = base_scope.find_by_id(search_term)
-      return [user] if user
+      if user
+        return [user]
+      elsif search_term.length < MIN_SEARCH_TERM_LENGTH
+        return []
+      end
       # no user found by id, so lets go ahead with the regular search, maybe this person just has a ton of numbers in their name
+    end
+
+    if search_term.length < MIN_SEARCH_TERM_LENGTH
+      raise SearchTermTooShort
     end
 
     base_scope.where(conditions_statement(search_term))

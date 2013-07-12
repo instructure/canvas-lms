@@ -579,14 +579,7 @@ class GroupsController < ApplicationController
   def users
     return unless authorized_action(@context, @current_user, :read)
 
-    search_term = params[:search_term]
-    if search_term && search_term.size < 3
-      return render \
-          :json => {
-          "status" => "argument_error",
-          "message" => "search_term of 3 or more characters is required" },
-          :status => :bad_request
-    end
+    search_term = params[:search_term].presence
 
     if search_term
       users = UserSearch.for_user_in_context(search_term, @context, @current_user)
@@ -596,6 +589,8 @@ class GroupsController < ApplicationController
 
     users = Api.paginate(users, self, api_v1_group_users_url)
     render :json => users.map { |u| user_json(u, @current_user, session) }
+  rescue UserSearch::SearchTermTooShort => e
+    render json: e.error_json, status: :bad_request
   end
 
   def edit

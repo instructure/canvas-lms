@@ -347,9 +347,9 @@ describe "Users API", :type => :integration do
 
     it "returns an error when search_term is fewer than 3 characters" do
       @account = Account.default
-      json = api_call(:get, "/api/v1/accounts/#{@account.id}/users", { :controller => 'users', :action => "index", :format => 'json', :account_id => @account.id.to_param }, {:search_term => '12'}, {}, :expected_status => 400)
-      json["status"].should == "argument_error"
-      json["message"].should == "search_term of 3 or more characters is required"
+      json = api_call(:get, "/api/v1/accounts/#{@account.id}/users", { :controller => 'users', :action => "index", :format => 'json', :account_id => @account.id.to_param }, {:search_term => 'ab'}, {}, :expected_status => 400)
+      error = json["errors"].first
+      verify_json_error(error, "search_term", "invalid", "3 or more characters is required")
     end
 
     it "returns a list of users filtered by search_term" do
