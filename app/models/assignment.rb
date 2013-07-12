@@ -446,6 +446,7 @@ class Assignment < ActiveRecord::Base
     p.dispatch :assignment_created
     p.to { participants }
     p.whenever { |record|
+      record.context.available? &&
       record.just_created
     }
     p.filter_asset_by_recipient { |record, user|
