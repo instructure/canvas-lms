@@ -1330,6 +1330,13 @@ describe Assignment do
         assignment_model(:context => @course)
         @a.messages_sent.should be_include('Assignment Created')
       end
+
+      it "should not create a message in an unpublished course" do
+        Notification.create(:name => 'Assignment Created')
+        course_with_teacher(:active_user => true)
+        assignment_model(:context => @course)
+        @a.messages_sent.should_not be_include('Assignment Created')
+      end
     end
 
     context "varied due date notifications" do
