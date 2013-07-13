@@ -1108,8 +1108,8 @@ class Assignment < ActiveRecord::Base
     res[:context][:enrollments] = context.enrollments_visible_to(user).
       map{|s| s.as_json(:include_root => false, :only => [:user_id, :course_section_id]) }
     res[:context][:quiz] = self.quiz.as_json(:include_root => false, :only => [:anonymous_submissions])
-    res[:submissions] = submissions.where(:user_id => visible_students).map{|s|
-      json = s.as_json(:include_root => false,
+    res[:submissions] = submissions.where(:user_id => visible_students).map{|sub|
+      json = sub.as_json(:include_root => false,
         :include => {
           :submission_comments => {
             :methods => avatar_methods,
@@ -1123,16 +1123,17 @@ class Assignment < ActiveRecord::Base
         :only => submission_fields
       )
       if json['submission_history']
-        json['submission_history'].map! do |s|
-          s.as_json(
+        json['submission_history'].map! do |version|
+          version.cached_due_date = sub.cached_due_date
+          version.as_json(
             :include => {
               :submission_comments => { :only => comment_fields }
             },
             :only => submission_fields,
             :methods => [:versioned_attachments, :late]
-          ).tap do |s|
-            if s['submission'] && s['submission']['versioned_attachments']
-              s['submission']['versioned_attachments'].map! do |a|
+          ).tap do |version_json|
+            if version_json['submission'] && version_json['submission']['versioned_attachments']
+              version_json['submission']['versioned_attachments'].map! do |a|
                 a.as_json(
                   :only => attachment_fields,
                   :methods => [:view_inline_ping_url]
