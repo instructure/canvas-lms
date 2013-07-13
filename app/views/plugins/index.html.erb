@@ -14,7 +14,7 @@
 </h2>
 
 <% if @plugins.any? %>
-  <table class="list plugins">
+  <table class="table table-striped">
     <tr>
       <th><%= t :name, "Name" %></th>
       <th><%= t :description, "Description" %></th>
@@ -35,7 +35,11 @@
         </td>
         <td class='description'><%= content_tag('span', h(plugin.description), :class => 'description') unless plugin.description.blank? %></td>
         <td class='tag'><%= h plugin.tag %></td>
-        <td class='website'><%= content_tag('span', link_to(image_tag('link.png'), plugin.website), :class => 'url') unless plugin.website.blank? %></td>
+        <td class='website'>
+          <% if plugin.website.present? %>
+            <a href="<%= plugin.website %>" class="icon-link"></a>
+          <% end %>
+      </td>
         <td class="author"><%= plugin.author_website.blank? ? h(plugin.author) : link_to(h(plugin.author), plugin.author_website) %></td>
         <td class="version"><%= h plugin.version %></td>
         <td class="configure"><%= link_to("", plugin_path(plugin.id), :class => "btn btn-mini icon-settings") if plugin.has_settings_partial? %></td>
