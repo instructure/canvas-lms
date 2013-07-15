@@ -1,5 +1,9 @@
 <li>
   <div class="ellipsis" title="{{name}} - {{enrollmentName role}}">{{name}} - {{enrollmentName role}}</div>
-  <a></a>
+  <a href="#" title="{{#t "remove_user_from_course_section"}}Remove user from {{name}}{{/t}}">
+    <span class="screenreader-only">
+      {{#t "remove_user_from_course_section"}}Remove user from {{name}}{{/t}}
+    </span>
+  </a>
   <input type="hidden" name="sections[]" value="section_{{id}}">
 </li>
