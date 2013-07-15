@@ -33,6 +33,12 @@ body.with-right-side.with-left-side {
   }
 }
 
+.avatar img {
+  border-color: #dfe9f0;
+  border-style: solid;
+  border-width: 2px;
+}
+
 .discussion-entries {
   list-style: none;
   margin: 0;
@@ -62,8 +68,9 @@ body.with-right-side.with-left-side {
       padding-top: 10px;
     }
 
-    &.collapsed .discussion-header-content {
-      padding-top: 0;
+    .discussion-header-right {
+      line-height: 10px;
+      padding-top: 6px;
     }
 
     .deleted-discussion-entry .right-of-avatar {
@@ -75,8 +82,8 @@ body.with-right-side.with-left-side {
     }
 
     .avatar img {
-      height: 32px;
-      width: 32px;
+      height: 50px;
+      width: 50px;
     }
 
     .entry {
@@ -92,8 +99,8 @@ body.with-right-side.with-left-side {
       }
 
       .avatar img {
-        height: 16px;
-        width: 16px;
+        height: 32px;
+        width: 32px;
       }
     }
   }
@@ -159,13 +166,13 @@ body.with-right-side.with-left-side {
   }
   .discussion-title {
     font-size: 19px;
+    padding-top: 12px;
   }
 }
 
 .discussion-title {
   font-size: 13px;
   margin: 0;
-  line-height: 23px;
 }
 
 .discussion-subtitle {
