@@ -301,22 +301,28 @@ describe GroupMembership do
     end
 
     it "triggers when membership is created" do
-      DueDateCacher.expects(:recompute).with(@assignments[0]).once
-      DueDateCacher.expects(:recompute).with(@assignments[1]).once
-      DueDateCacher.expects(:recompute).with(@assignments[2]).never
+      DueDateCacher.expects(:recompute).with(@assignments[0].id).once
+      DueDateCacher.expects(:recompute).with(@assignments[1].id).once
+      DueDateCacher.expects(:recompute).with(@assignments[2].id).never
       @group.group_memberships.create(:user => user)
     end
 
     it "triggers when membership is deleted" do
-      DueDateCacher.expects(:recompute).with(@assignments[0]).once
-      DueDateCacher.expects(:recompute).with(@assignments[1]).once
-      DueDateCacher.expects(:recompute).with(@assignments[2]).never
+      DueDateCacher.expects(:recompute).with(@assignments[0].id).once
+      DueDateCacher.expects(:recompute).with(@assignments[1].id).once
+      DueDateCacher.expects(:recompute).with(@assignments[2].id).never
       @membership.destroy
     end
 
     it "does not trigger when nothing changed" do
       DueDateCacher.expects(:recompute).never
       @membership.save
+    end
+
+    it "does not trigger when it's an account group" do
+      DueDateCacher.expects(:recompute).never
+      @group = Account.default.groups.create!(:name => 'Group!')
+      @group.group_memberships.create!(:user => user)
     end
   end
 end
