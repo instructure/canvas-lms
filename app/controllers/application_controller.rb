@@ -986,7 +986,7 @@ class ApplicationController < ActionController::Base
         @page.workflow_state = 'active'
       end
     end
-    if @page.front_page? && @page.new_record?
+    if @page.is_front_page? && @page.new_record?
       @page.body = t "#application.wiki_front_page_default_content_course", "Welcome to your new course wiki!" if @context.is_a?(Course)
       @page.body = t "#application.wiki_front_page_default_content_group", "Welcome to your new group wiki!" if @context.is_a?(Group)
     end

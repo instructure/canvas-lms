@@ -8,7 +8,7 @@
     <div class="someone_else_edited" style="display: none; font-size: 0.8em;">
       <%= mt 'notices.page_edited_while_viewing', 'This page has been updated by someone else since you started viewing it. [Click here to reload the page.](%{link})', :link => request.url %>
     </div>
-    <% if @page.front_page? && can_do(@page, @current_user, :update) %>
+    <% if @page.is_front_page? && can_do(@page, @current_user, :update) %>
       <% if !course_home %>
         <h3><%= t :welcome_message, 'Welcome to the Course Wiki' %></h3>
       <% end %>
@@ -99,11 +99,11 @@ course will see this page first.  You can change that from [the course home page
     <% end %>
     <div id="below_editor">
       <% if can_do(@page, @current_user, :update) %>
-        <div style="text-align: left; <%= hidden if @page.front_page? %>">
+        <div style="text-align: left; <%= hidden if @page.is_front_page? %>">
           <%= f.check_box :hide_from_students %>
           <%= f.label :hide_from_students, :en => "Hide this Page from Students" %>
         </div>
-        <div style="text-align: left; <%= hidden if @page.front_page? %>">
+        <div style="text-align: left; <%= hidden if @page.is_front_page? %>">
           <%
             select_html = if @context.is_a?(Course)
               f.select :editing_roles, [
