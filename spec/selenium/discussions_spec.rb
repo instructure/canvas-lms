@@ -847,6 +847,7 @@ describe "discussions" do
       @topic.unsubscribe(@student)
       get "/courses/#{@course.id}/discussion_topics"
       wait_for_ajaximations
+      driver.execute_script(%{$('.subscription-toggler').trigger('mouseleave')})
       f('.icon-discussion').should be_displayed
       f('.subscription-toggler').click
       wait_for_ajaximations
