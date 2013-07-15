@@ -522,16 +522,20 @@ class AccountsController < ApplicationController
   
   def courses
     if authorized_action(@context, @current_user, :read)
-      load_course_right_side
-      @courses = []
-      @query = (params[:course] && params[:course][:name]) || params[:term]
-      if @context && @context.is_a?(Account) && @query
-        @courses = @context.courses_name_like(@query, :term => @term, :hide_enrollmentless_courses => @hide_enrollmentless_courses)
+      Shackles.activate(:slave) do
+        load_course_right_side
+        @courses = []
+        @query = (params[:course] && params[:course][:name]) || params[:term]
+        if @context && @context.is_a?(Account) && @query
+          @courses = @context.courses_name_like(@query, :term => @term, :hide_enrollmentless_courses => @hide_enrollmentless_courses)
+        end
       end
       respond_to do |format|
         format.html {
-          build_course_stats
-          redirect_to @courses.first if @courses.length == 1
+          return redirect_to @courses.first if @courses.length == 1
+          Shackles.activate(:slave) do
+            build_course_stats
+          end
         }
         format.json  { 
           cancel_cache_buster
