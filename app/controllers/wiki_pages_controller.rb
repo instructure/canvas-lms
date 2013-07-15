@@ -27,7 +27,7 @@ class WikiPagesController < ApplicationController
     @editing = true if Canvas::Plugin.value_to_boolean(params[:edit])
     if @page.deleted?
       flash[:notice] = t('notices.page_deleted', 'The page "%{title}" has been deleted.', :title => @page.title)
-      if @wiki.has_front_page? && !@page.front_page
+      if @wiki.has_front_page? && !@page.is_front_page?
         redirect_to named_context_url(@context, :context_wiki_page_url, @wiki.get_front_page_url)
       else
         redirect_to named_context_url(@context, :context_url)
@@ -90,7 +90,7 @@ class WikiPagesController < ApplicationController
 
   def destroy
     if authorized_action(@page, @current_user, :delete)
-      if !@page.front_page?
+      if !@page.is_front_page?
         flash[:notice] = t('notices.page_deleted', 'The page "%{title}" has been deleted.', :title => @page.title)
         @page.workflow_state = 'deleted'
         @page.save

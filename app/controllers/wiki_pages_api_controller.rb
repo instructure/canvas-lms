@@ -257,7 +257,7 @@ class WikiPagesApiController < ApplicationController
   end
 
   def get_front_page_params
-    @was_front_page = @page.front_page?
+    @was_front_page = @page.is_front_page?
     if params[:wiki_page] && params[:wiki_page].has_key?(:front_page)
       @set_front_page = true
       @set_as_front_page = value_to_boolean(params[:wiki_page].delete(:front_page))
@@ -289,7 +289,7 @@ class WikiPagesApiController < ApplicationController
 
   def process_front_page
     if @set_front_page
-      if @set_as_front_page && !@page.front_page?
+      if @set_as_front_page && !@page.is_front_page?
         return @page.set_as_front_page!
       elsif !@set_as_front_page
         return @wiki.unset_front_page!
@@ -297,7 +297,7 @@ class WikiPagesApiController < ApplicationController
     elsif @was_front_page
       if @page.deleted?
         return @wiki.unset_front_page!
-      elsif !@page.front_page?
+      elsif !@page.is_front_page?
         # if url changes, keep as front page
         return @page.set_as_front_page!
       end

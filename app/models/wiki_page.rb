@@ -40,7 +40,7 @@ class WikiPage < ActiveRecord::Base
   TITLE_LENGTH = WikiPage.columns_hash['title'].limit rescue 255
 
   def validate_front_page_visibility
-    if self.hide_from_students && self.front_page?
+    if self.hide_from_students && self.is_front_page?
       self.errors.add(:hide_from_students, t(:cannot_hide_page, "cannot hide front page"))
     end
   end
@@ -205,7 +205,7 @@ class WikiPage < ActiveRecord::Base
     end
   end
 
-  def front_page?
+  def is_front_page?
     !self.deleted? && self.wiki.has_front_page? && self.url == self.wiki.get_front_page_url
   end
 
@@ -251,7 +251,7 @@ class WikiPage < ActiveRecord::Base
 
   def editing_role?(user)
     context_roles = context.default_wiki_editing_roles rescue nil
-    edit_roles = editing_roles unless self.front_page?
+    edit_roles = editing_roles unless self.is_front_page?
     roles = (edit_roles || context_roles || default_roles).split(",")
     return true if roles.include?('teachers') && context.respond_to?(:teachers) && context.teachers.include?(user)
     return true if !hide_from_students && roles.include?('students') && context.respond_to?(:students) && context.includes_student?(user)
