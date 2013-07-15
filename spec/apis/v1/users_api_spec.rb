@@ -436,6 +436,35 @@ describe "Users API", :type => :integration do
       errors['pseudonym'].should be_present
       errors['pseudonym']['unique_id'].should be_present
     end
+
+    it "should set user's email address via communication_channel[address]" do
+      api_call(:post, "/api/v1/accounts/#{@admin.account.id}/users",
+        { :controller => 'users',
+          :action => 'create',
+          :format => 'json',
+          :account_id => @admin.account.id.to_s
+        },
+        {
+          :user => {
+            :name => "Test User"
+          },
+          :pseudonym => {
+            :unique_id         => "test",
+            :password          => "password123"
+          },
+          :communication_channel => {
+            :address           => "test@example.com"
+          }
+        }
+      )
+      response.status.should eql "200 OK"
+      users = User.find_all_by_name "Test User"
+      users.size.should == 1
+      users.first.pseudonyms.first.unique_id.should == "test"
+      email = users.first.communication_channels.email.first
+      email.path.should == "test@example.com"
+      email.path_type.should == 'email'
+    end
   end
 
   describe "user account updates" do

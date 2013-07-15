@@ -771,6 +771,8 @@ class UsersController < ApplicationController
   # @argument pseudonym[password] [Optional] User's password.
   # @argument pseudonym[sis_user_id] [Optional] [Integer] SIS ID for the user's account. To set this parameter, the caller must be able to manage SIS permissions.
   # @argument pseudonym[send_confirmation] [Optional, 0|1] [Integer] Send user notification of account creation if set to 1.
+  # @argument communication_channel[type] [Optional] The communication channel type, e.g. 'email' or 'sms'.
+  # @argument communication_channel[address] [Optional] The communication channel address, e.g. the user's email address.
   #
   # @returns User
   def create
@@ -788,7 +790,14 @@ class UsersController < ApplicationController
 
     notify = params[:pseudonym].delete(:send_confirmation) == '1'
     notify = :self_registration unless manage_user_logins
-    email = params[:pseudonym].delete(:path) || params[:pseudonym][:unique_id]
+
+    if params[:communication_channel]
+      cc_type = params[:communication_channel][:type] || CommunicationChannel::TYPE_EMAIL
+      cc_addr = params[:communication_channel][:address]
+    else
+      cc_type = CommunicationChannel::TYPE_EMAIL
+      cc_addr = params[:pseudonym].delete(:path) || params[:pseudonym][:unique_id]
+    end
 
     sis_user_id = params[:pseudonym].delete(:sis_user_id)
     sis_user_id = nil unless @context.grants_right?(@current_user, session, :manage_sis)
@@ -847,8 +856,9 @@ class UsersController < ApplicationController
 
     @pseudonym.account = @context
     @pseudonym.workflow_state = 'active'
-    @cc = @user.communication_channels.email.by_path(email).first
-    @cc ||= @user.communication_channels.build(:path => email)
+    @cc =
+      @user.communication_channels.where(:path_type => cc_type).by_path(cc_addr).first ||
+      @user.communication_channels.build(:path_type => cc_type, :path => cc_addr)
     @cc.user = @user
     @cc.workflow_state = 'unconfirmed' unless @cc.workflow_state == 'confirmed'
 
