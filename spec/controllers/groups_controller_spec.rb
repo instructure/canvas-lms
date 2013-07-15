@@ -59,7 +59,7 @@ describe GroupsController do
 
       it "should not paginate non-json" do
         get 'index', :per_page => 1
-        assigns[:groups].should == @student.current_groups
+        assigns[:groups].should == @student.current_groups.by_name
         response.headers['Link'].should be_nil
       end
 
