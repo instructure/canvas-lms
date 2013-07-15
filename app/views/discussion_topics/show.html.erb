@@ -155,7 +155,7 @@
         <%= render :partial => 'assignment_details' %>
       <% end %>
       <header class="discussion-section clearfix">
-        <%= avatar((@topic.user), @context.asset_string) %>
+        <%= avatar((@topic.user), @context.asset_string, 50, image_class: 'img-circle') %>
         <div class="discussion-header-content right-of-avatar">
 
           <div class="discussion-header-right pull-right">
