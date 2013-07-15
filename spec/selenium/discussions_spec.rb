@@ -31,6 +31,15 @@ describe "discussions" do
       check_permissions
     end
 
+    it "should not allow a student to pin a topic, even if they are the author" do
+      topic = what_to_create == DiscussionTopic ? @course.discussion_topics.create!(:title => 'other users', :user => @other_user) : announcement_model(:title => 'other users', :user => @other_user)
+      login_as(@other_user.primary_pseudonym.unique_id, 'asdfasdf')
+      get(url)
+      wait_for_ajaximations
+      fj("[data-id=#{topic.id}] .al-trigger").click
+      ffj('.icon-pin:visible').length.should == 0
+    end
+
     it "should not allow a student to delete/edit topics if they didn't create any" do
       login_as(@other_user.primary_pseudonym.unique_id, 'asdfasdf')
       check_permissions(0)
@@ -107,7 +116,7 @@ describe "discussions" do
         title = 'new one'
         new_teacher = teacher_in_course(:course => @course, :active_all => true, :name => user_name)
         what_to_create == DiscussionTopic ? @course.discussion_topics.create!(:title => title, :user => new_teacher.user) : announcement_model(:title => title, :user => new_teacher.user)
-        refresh_and_filter(:string, 'jake', user_name)
+        refresh_and_filter(:string, 'jake', 'new one')
       end
 
       it "should return multiple items in the search" do
@@ -157,7 +166,7 @@ describe "discussions" do
         f("#discussion-toolbar .al-trigger").click
         expect_new_page_load { f(".discussion_locked_toggler").click }
         f('.discussion-fyi').text.should == 'This topic is closed for comments'
-        ff('.discussion-reply-label').should be_empty
+        ff('.discussion-reply-action').should be_empty
         DiscussionTopic.last.workflow_state.should == 'locked'
       end
 
@@ -165,7 +174,7 @@ describe "discussions" do
         create_and_go_to_topic('closed discussion', 'side_comment', true)
         f("#discussion-toolbar .al-trigger").click
         expect_new_page_load { f(".discussion_locked_toggler").click }
-        ff('.discussion-reply-label').should_not be_empty
+        ff('.discussion-reply-action').should_not be_empty
         DiscussionTopic.last.workflow_state.should == 'active'
       end
 
@@ -231,6 +240,7 @@ describe "discussions" do
           filename, fullpath, data = get_file("testfile5.zip")
           f('input[name=attachment]').send_keys(fullpath)
           type_in_tiny('textarea[name=message]', 'file attachement discussion')
+          yield if block_given?
           expect_new_page_load { submit_form('.form-actions') }
           wait_for_ajaximations
 
@@ -275,7 +285,13 @@ describe "discussions" do
           expect_new_page_load { f('li.discussion .title').click }
           expect_new_page_load { f(".edit-btn").click }
 
-          add_attachment_and_validate
+          add_attachment_and_validate do
+            # should correctly save changes to the assignment
+            set_value f('#discussion_topic_assignment_points_possible'), '123'
+          end
+          if what_to_create == DiscussionTopic
+            Assignment.last.points_possible.should == 123
+          end
         end
 
         it "should edit a topic" do
@@ -296,7 +312,50 @@ describe "discussions" do
           driver.switch_to.alert.accept
           wait_for_ajaximations
           what_to_create.last.workflow_state.should == 'deleted'
-          f('.discussionTopicIndexList').should be_nil
+          f('.discussion-list li.discussion').should be_nil
+        end
+
+        it "should allow a teacher to pin a topic" do
+          topic = @course.discussion_topics.create!(title: 'Test Discussion', user: @user)
+          get(url)
+          wait_for_ajaximations
+
+          f('.open.discussion-list .al-trigger').click
+          fj('.icon-pin:visible').click
+          wait_for_ajaximations
+          topic.reload.should be_pinned
+          ffj('.pinned.discussion-list li.discussion:visible').length.should == 1
+        end
+
+        it "should allow a teacher to unpin a topic" do
+          topic = @course.discussion_topics.create!(title: 'Test Discussion', user: @user, pinned: true)
+          get(url)
+          wait_for_ajaximations
+
+          f('.pinned.discussion-list .al-trigger').click
+          fj('.icon-pin:visible').click
+          wait_for_ajaximations
+          topic.reload.should_not be_pinned
+          ffj('.open.discussion-list li.discussion:visible').length.should == 1
+        end
+
+        it "should allow locking a pinned topic" do
+          topic = @course.discussion_topics.create!(title: 'Test Discussion', user: @user, pinned: true)
+          get(url)
+          wait_for_ajaximations
+
+          f('.pinned.discussion-list .al-trigger').click
+          ffj('.icon-lock:visible').length.should == 1
+        end
+
+        it "should allow pinning a locked topic" do
+          topic = @course.discussion_topics.create!(title: 'Test Discussion', user: @user)
+          topic.lock!
+          get(url)
+          wait_for_ajaximations
+
+          f('.locked.discussion-list .al-trigger').click
+          ffj('.icon-pin:visible').length.should == 1
         end
       end
 
@@ -889,9 +948,10 @@ describe "discussions" do
         get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
         wait_for_ajax_requests
 
-        f('.add-side-comment-wrap .discussion-reply-label').click
-        type_in_tiny '.reply-textarea', side_comment_text
-        submit_form('.add-side-comment-wrap')
+        f('.discussion-entries .discussion-reply-action').click
+        wait_for_animations
+        type_in_tiny 'textarea', side_comment_text
+        submit_form('.discussion-entries .discussion-reply-form')
         wait_for_ajaximations
 
         last_entry = DiscussionEntry.last
@@ -1009,4 +1069,80 @@ describe "discussions" do
       ff('.discussion-entries .read').length.should == reply_count
     end
   end
+
+  context "topic subscription" do
+    before do
+      course_with_student
+      course_with_teacher_logged_in(:course => @course)
+      @topic = @course.discussion_topics.create!(:title => 'mark as read test', :message => 'test mark as read', :user => @student)
+    end
+
+    it "should load with the correct status represented" do
+      @topic.subscribe(@teacher)
+      @topic.create_materialized_view
+
+      get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+      wait_for_animations
+      f('.topic-unsubscribe-button').displayed?.should be_true
+      f('.topic-subscribe-button').displayed?.should be_false
+
+      @topic.unsubscribe(@teacher)
+      @topic.update_materialized_view
+      get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+      wait_for_animations
+      f('.topic-unsubscribe-button').displayed?.should be_false
+      f('.topic-subscribe-button').displayed?.should be_true
+    end
+
+    it "should unsubscribe from topic" do
+      @topic.subscribe(@teacher)
+      @topic.create_materialized_view
+
+      get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+      wait_for_animations
+      f('.topic-unsubscribe-button').click
+      wait_for_ajaximations
+      @topic.reload
+      @topic.subscribed?(@teacher).should == false
+    end
+
+    it "should subscribe to topic" do
+      @topic.unsubscribe(@teacher)
+      @topic.create_materialized_view
+
+      get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+      wait_for_animations
+      f('.topic-subscribe-button').click
+      wait_for_ajaximations
+      @topic.reload
+      @topic.subscribed?(@teacher).should == true
+    end
+
+    it "should prevent subscribing when a student post is required first" do
+      course_with_student_logged_in(:course => @course)
+      new_student_entry_text = 'new student entry'
+      @topic.require_initial_post = true
+      @topic.save
+      get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+      wait_for_ajax_requests
+      # shouldn't see subscribe button until after posting
+      f('.topic-subscribe-button').displayed?.should be_false
+      add_reply new_student_entry_text
+      # now the subscribe button should be available.
+      get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+      wait_for_ajax_requests
+      # already subscribed because they posted
+      f('.topic-unsubscribe-button').displayed?.should be_true
+    end
+
+    it "should updated subscribed button when user posts to a topic" do
+      course_with_student_logged_in(:course => @course)
+      get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+      wait_for_ajax_requests
+      f('.topic-subscribe-button').displayed?.should be_true
+      add_reply "student posting"
+      f('.topic-unsubscribe-button').displayed?.should be_true
+    end
+  end
+
 end

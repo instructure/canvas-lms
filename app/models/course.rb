@@ -30,7 +30,6 @@ class Course < ActiveRecord::Base
                   :conclude_at,
                   :grading_standard_id,
                   :is_public,
-                  :publish_grades_immediately,
                   :allow_student_wiki_edits,
                   :show_public_context_messages,
                   :syllabus_body,
@@ -109,6 +108,7 @@ class Course < ActiveRecord::Base
   has_many :participating_typical_users, :through => :typical_current_enrollments, :source => :user
 
   include LearningOutcomeContext
+  include RubricContext
 
   has_many :course_account_associations
   has_many :non_unique_associated_accounts, :source => :account, :through => :course_account_associations, :order => 'course_account_associations.depth'
@@ -151,8 +151,6 @@ class Course < ActiveRecord::Base
   has_many :grading_standards, :as => :context, :conditions => ['workflow_state != ?', 'deleted']
   has_one :gradebook_upload, :as => :context, :dependent => :destroy
   has_many :web_conferences, :as => :context, :order => 'created_at DESC', :dependent => :destroy
-  has_many :rubrics, :as => :context
-  has_many :rubric_associations, :as => :context, :include => :rubric, :dependent => :destroy
   has_many :collaborations, :as => :context, :order => 'title, created_at', :dependent => :destroy
   has_one :scribd_account, :as => :scribdable
   has_many :context_modules, :as => :context, :order => :position, :dependent => :destroy
@@ -343,7 +341,10 @@ class Course < ActiveRecord::Base
         course_ids = courses.map(&:id)
       else
         course_ids = courses_or_course_ids
-        courses = Course.where(:id => course_ids).includes(:course_sections => [:course, :nonxlist_course]).all
+        courses = Course.where(:id => course_ids).
+            includes(:course_sections => [:course, :nonxlist_course]).
+            select([:id, :account_id]).
+            all
       end
       course_ids_to_update_user_account_associations = []
       CourseAccountAssociation.transaction do
@@ -507,9 +508,9 @@ class Course < ActiveRecord::Base
   end
 
   def users_not_in_groups_sql(groups, opts={})
-    ["SELECT DISTINCT u.id, u.name#{", #{opts[:order_by]}" if opts[:order_by].present?}
-        FROM users u
-       INNER JOIN enrollments e ON e.user_id = u.id
+    ["SELECT DISTINCT users.id, users.name#{", #{opts[:order_by]}" if opts[:order_by].present?}
+        FROM users
+       INNER JOIN enrollments e ON e.user_id = users.id
        WHERE e.course_id = ? AND e.workflow_state NOT IN ('rejected', 'completed', 'deleted') AND e.type = 'StudentEnrollment'
        #{Group.not_in_group_sql_fragment(groups)}
        #{"ORDER BY #{opts[:order_by]}" if opts[:order_by].present?}
@@ -521,7 +522,7 @@ class Course < ActiveRecord::Base
   end
 
   def paginate_users_not_in_groups(groups, page, per_page = 15)
-    User.paginate_by_sql(users_not_in_groups_sql(groups, :order_by => "#{User.sortable_name_order_by_clause('u')}", :order_by_dir => "ASC"),
+    User.paginate_by_sql(users_not_in_groups_sql(groups, :order_by => "#{User.sortable_name_order_by_clause('users')}", :order_by_dir => "ASC"),
                          :page => page, :per_page => per_page)
   end
 
@@ -650,7 +651,6 @@ class Course < ActiveRecord::Base
     self.account_id ||= self.root_account_id
     self.enrollment_term = nil if self.enrollment_term.try(:root_account_id) != self.root_account_id
     self.enrollment_term ||= self.root_account.default_enrollment_term
-    self.publish_grades_immediately = true if self.publish_grades_immediately == nil
     self.allow_student_wiki_edits = (self.default_wiki_editing_roles || "").split(',').include?('students')
     true
   end
@@ -1911,15 +1911,17 @@ class Course < ActiveRecord::Base
     AssignmentGroup.process_migration(data, migration); migration.update_import_progress(39)
     ExternalFeed.process_migration(data, migration); migration.update_import_progress(39.5)
     GradingStandard.process_migration(data, migration); migration.update_import_progress(40)
-    Quiz.process_migration(data, migration, question_data); migration.update_import_progress(50)
-    ContextExternalTool.process_migration(data, migration); migration.update_import_progress(54)
+    ContextExternalTool.process_migration(data, migration); migration.update_import_progress(45)
 
     #These need to be ran twice because they can reference each other
+    Quiz.process_migration(data, migration, question_data); migration.update_import_progress(50)
     DiscussionTopic.process_migration(data, migration);migration.update_import_progress(55)
     WikiPage.process_migration(data, migration);migration.update_import_progress(60)
     Assignment.process_migration(data, migration);migration.update_import_progress(65)
-    ContextModule.process_migration(data, migration);migration.update_import_progress(70)
+
     # and second time...
+    Quiz.process_migration(data, migration, question_data); migration.update_import_progress(70)
+    ContextModule.process_migration(data, migration);migration.update_import_progress(72)
     DiscussionTopic.process_migration(data, migration);migration.update_import_progress(75)
     WikiPage.process_migration(data, migration);migration.update_import_progress(80)
     Assignment.process_migration(data, migration);migration.update_import_progress(85)
@@ -2106,7 +2108,7 @@ class Course < ActiveRecord::Base
             old_folders << file.folder
             new_folders = []
             new_folders << old_folders.last.clone_for(self, nil, options.merge({:include_subcontent => false}))
-            while old_folders.last.parent_folder && old_folders.last.parent_folder.parent_folder_id && !merge_mapped_id(old_folders.last.parent_folder)
+            while old_folders.last.parent_folder && old_folders.last.parent_folder.parent_folder_id
               old_folders << old_folders.last.parent_folder
               new_folders << old_folders.last.clone_for(self, nil, options.merge({:include_subcontent => false}))
             end
@@ -2390,8 +2392,7 @@ class Course < ActiveRecord::Base
 
   def self.clonable_attributes
     [ :group_weighting_scheme, :grading_standard_id, :is_public,
-      :publish_grades_immediately, :allow_student_wiki_edits,
-      :show_public_context_messages,
+      :allow_student_wiki_edits, :show_public_context_messages,
       :syllabus_body, :allow_student_forum_attachments,
       :default_wiki_editing_roles, :allow_student_organized_groups,
       :default_view, :show_all_discussion_entries, :open_enrollment,
@@ -3078,7 +3079,9 @@ class Course < ActiveRecord::Base
 
   def self.batch_update(account, user, course_ids, update_params)
     progress = account.progresses.create! :tag => "course_batch_update", :completion => 0.0
-    job = Course.send_later(:do_batch_update, progress, user, course_ids, update_params)
+    job = Course.send_later_enqueue_args(:do_batch_update,
+                                         { no_delay: true },
+                                         progress, user, course_ids, update_params)
     progress.user_id = user.id
     progress.delayed_job_id = job.id
     progress.save!

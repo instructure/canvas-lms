@@ -54,6 +54,9 @@
 #        // The count of unread entries of this topic for the current user.
 #        "unread_count":0,
 #
+#        // Whether or not the current user is subscribed to this topic.
+#        "subscribed":true,
+#
 #        // The unique identifier of the assignment if the topic is for grading, otherwise null.
 #        "assignment_id":null,
 #
@@ -65,6 +68,9 @@
 #
 #        // whether or not this is locked for students to see.
 #        "locked":false,
+#
+#        // whether or not the discussion has been "pinned" by an instructor
+#        "pinned":false,
 #
 #        // Whether or not this is locked for the user.
 #        "locked_for_user":true,
@@ -293,6 +299,7 @@ class DiscussionTopicsController < ApplicationController
               :APP_URL => named_context_url(@context, :context_discussion_topic_url, @topic),
               :TOPIC => {
                 :ID => @topic.id,
+                :IS_SUBSCRIBED => @topic.subscribed?(@current_user),
               },
               :PERMISSIONS => {
                 :CAN_REPLY      => @locked ? false : !(@topic.for_group_assignment? || @topic.locked?),     # Can reply
@@ -311,6 +318,9 @@ class DiscussionTopicsController < ApplicationController
               :MARK_ALL_READ_URL => named_context_url(@context, :api_v1_context_discussion_topic_mark_all_read_url, @topic),
               :MARK_ALL_UNREAD_URL => named_context_url(@context, :api_v1_context_discussion_topic_mark_all_unread_url, @topic),
               :MANUAL_MARK_AS_READ => @current_user.try(:manual_mark_as_read?),
+              :CAN_SUBSCRIBE => !@initial_post_required && !@topic.is_a?(Announcement),                    # can subscribe when no initial post required for user and don't show for announcements
+              :SUBSCRIBE_URL => named_context_url(@context, :api_v1_context_discussion_topic_subscribe_url, @topic),
+              :UNSUBSCRIBE_URL => named_context_url(@context, :api_v1_context_discussion_topic_unsubscribe_url, @topic),
               :CURRENT_USER => user_display_json(@current_user),
               :INITIAL_POST_REQUIRED => @initial_post_required,
               :THREADED => @topic.threaded?
@@ -350,7 +360,7 @@ class DiscussionTopicsController < ApplicationController
   #
   # @argument is_announcement If true, this topic is an announcement. It will appear in the announcements section rather than the discussions section. This requires announcment-posting permissions.
   #
-  # @argument position_after By default, discusions are sorted chronologically by creation date, you can pass the id of another topic to have this one show up after the other when they are listed.
+  # @argument position_after By default, discussions are sorted chronologically by creation date, you can pass the id of another topic to have this one show up after the other when they are listed.
   # @example_request
   #     curl https://<canvas>/api/v1/courses/<course_id>/discussion_topics \ 
   #         -F title='my topic' \ 
@@ -441,7 +451,7 @@ class DiscussionTopicsController < ApplicationController
   end
 
   API_ALLOWED_TOPIC_FIELDS = %w(title message discussion_type delayed_post_at lock_at podcast_enabled
-                                podcast_has_student_posts require_initial_post is_announcement)
+                                podcast_has_student_posts require_initial_post is_announcement pinned)
   def process_discussion_topic(is_new = false)
     discussion_topic_hash = params.slice(*API_ALLOWED_TOPIC_FIELDS)
     model_type = value_to_boolean(discussion_topic_hash.delete(:is_announcement)) && @context.announcements.new.grants_right?(@current_user, session, :create) ? :announcements : :discussion_topics
@@ -479,12 +489,15 @@ class DiscussionTopicsController < ApplicationController
       # Handle locking/unlocking (overrides workflow state if provided). It appears that the locked param as a hash
       # is from old code and is not being used. Verification requested.
       elsif params.has_key?(:locked) && !params[:locked].is_a?(Hash)
-        @topic.delayed_post_at = ''
-        @topic.lock_at = ''
-        if value_to_boolean(params[:locked])
-          @topic.lock
-        else
-          @topic.unlock
+        should_lock = value_to_boolean(params[:locked])
+        if should_lock != @topic.locked?
+          if should_lock
+            @topic.lock
+          else
+            discussion_topic_hash[:delayed_post_at] = nil
+            discussion_topic_hash[:lock_at] = nil
+            @topic.unlock
+          end
         end
       end
 
@@ -496,6 +509,10 @@ class DiscussionTopicsController < ApplicationController
         if params[:position_after] && @context.grants_right?(@current_user, session, :moderate_forum)
           other_topic = @context.discussion_topics.active.find(params[:position_after])
           @topic.insert_at(other_topic.position)
+        end
+
+        if params[:position_at] && @context.grants_right?(@current_user, session, :moderate_forum)
+          @topic.insert_at(params[:position_at].to_i)
         end
 
         # handle creating/removing attachment

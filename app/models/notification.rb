@@ -358,7 +358,7 @@ class Notification < ActiveRecord::Base
       when 'Discussion'
         t(:discussion_display, 'Discussion')
       when 'DiscussionEntry'
-        t(:discussion_entry_display, 'Discussion Entry')
+        t(:discussion_post_display, 'Discussion Post')
       when 'Due Date'
         t(:due_date_display, 'Due Date')
       when 'Grading'
@@ -415,7 +415,7 @@ EOS
     when 'Discussion'
       t(:discussion_description, 'New discussion topic in your course')
     when 'DiscussionEntry'
-      t(:discussion_entry_description, "New discussion post in a topic you've participated in")
+      t(:discussion_post_description, "New discussion post in a topic you're subscribed to")
     when 'Due Date'
       t(:due_date_description, 'Assignment due date change')
     when 'Grading'

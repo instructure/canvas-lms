@@ -23,6 +23,8 @@ define [
 
     @optionProperty 'permissions'
 
+    @optionProperty 'course'
+
     template: template
 
     els:

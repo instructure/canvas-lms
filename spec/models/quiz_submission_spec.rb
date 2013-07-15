@@ -465,9 +465,7 @@ describe QuizSubmission do
 
   it "should update associated submission" do
     c = factory_with_protected_attributes(Course, :workflow_state => "active")
-    a = c.assignments.new(:title => "some assignment")
-    a.workflow_state = "available"
-    a.save!
+    a = c.assignments.create!(:title => "some assignment")
     u = User.new
     u.workflow_state = "registered"
     u.save!
@@ -1470,7 +1468,6 @@ describe QuizSubmission do
       student_in_course
       assignment_quiz([])
       @course.enroll_student(@student)
-      @assignment.publish!
       @submission = @quiz.generate_submission(@student)
     end
 

@@ -34,7 +34,9 @@ describe "Outcomes API", :type => :integration do
     @account_user = @user.account_users.create(:account => @account)
     @outcome = @account.created_learning_outcomes.create!(
       :title => "My Outcome",
-      :description => "Description of my outcome")
+      :description => "Description of my outcome",
+      :vendor_guid => "vendorguid9000"
+    )
   end
 
   describe "show" do
@@ -103,6 +105,7 @@ describe "Outcomes API", :type => :integration do
         "context_type" => "Account",
         "title" => @outcome.title,
         "url" => api_v1_outcome_path(:id => @outcome.id),
+        "vendor_guid" => "vendorguid9000",
         "can_edit" => true,
         "description" => @outcome.description
       }
@@ -132,6 +135,7 @@ describe "Outcomes API", :type => :integration do
         "context_type" => "Account",
         "title" => @outcome.title,
         "url" => api_v1_outcome_path(:id => @outcome.id),
+        "vendor_guid" => "vendorguid9000",
         "can_edit" => true,
         "description" => @outcome.description,
         "points_possible" => 5,
@@ -237,12 +241,14 @@ describe "Outcomes API", :type => :integration do
                  :id => @outcome.id.to_s,
                  :format => 'json' },
                { :title => "New Title",
-                 :description => "New Description" })
+                 :description => "New Description",
+                 :vendor_guid => "vendorguid9000"})
 
       json.should == {
         "id" => @outcome.id,
         "context_id" => @account.id,
         "context_type" => "Account",
+        "vendor_guid" => "vendorguid9000",
         "title" => "New Title",
         "url" => api_v1_outcome_path(:id => @outcome.id),
         "can_edit" => true,

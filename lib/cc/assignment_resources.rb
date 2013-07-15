@@ -91,6 +91,9 @@ module CC
       if assignment.rubric
         assoc = assignment.rubric_association
         node.rubric_identifierref CCHelper.create_key(assignment.rubric)
+        if assignment.rubric && assignment.rubric.context != assignment.context
+          node.rubric_external_identifier assignment.rubric.id
+        end
         node.rubric_use_for_grading assoc.use_for_grading
         node.rubric_hide_score_total assoc.hide_score_total
         if assoc.summary_data && assoc.summary_data[:saved_comments]

@@ -17,7 +17,7 @@
       <tr>
         <td style="display: none;"></td>
         <% for assignment in @assignments %>
-          <td class="outer_assignment_name assignment_name <%= assignment.special_class %> <%= "unpublished" if should_be_published?(@students, assignment, @submissions) %> <%= "published" if (!assignment || assignment.published?) %> <%= 'attendance' if assignment.attendance? %>" style="cursor: pointer;">
+          <td class="outer_assignment_name assignment_name <%= assignment.special_class %> <%= "published" if (!assignment || assignment.published?) %> <%= 'attendance' if assignment.attendance? %>" style="cursor: pointer;">
             <div id="outer_assignment_<%= assignment.id %>" class="assignment_<%= assignment.id %> student_header">
               <%= @renders[assignment.asset_string] ||= render(:partial => 'assignment', :object => assignment, :locals => { :course => @context, :hide_dropdowns => hide_dropdowns }) %>
             </div>

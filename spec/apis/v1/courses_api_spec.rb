@@ -197,7 +197,6 @@ describe CoursesController, :type => :integration do
             'course_code'                          => 'Test Course',
             'start_at'                             => '2011-01-01T00:00:00-0700',
             'end_at'                               => '2011-05-01T00:00:00-0700',
-            'publish_grades_immediately'           => true,
             'is_public'                            => true,
             'public_syllabus'                      => true,
             'allow_wiki_comments'                  => true,
@@ -217,11 +216,12 @@ describe CoursesController, :type => :integration do
           'start_at' => '2011-01-01T07:00:00Z',
           'end_at' => '2011-05-01T07:00:00Z',
           'workflow_state' => 'available',
-          'default_view' => 'feed'
+          'default_view' => 'feed',
+          'storage_quota_mb' => @account.default_storage_quota_mb
         })
         json = api_call(:post, @resource_path, @resource_params, post_params)
         new_course = Course.find(json['id'])
-        [:name, :course_code, :start_at, :end_at, :publish_grades_immediately,
+        [:name, :course_code, :start_at, :end_at,
         :is_public, :public_syllabus, :allow_wiki_comments,
         :open_enrollment, :self_enrollment, :license, :sis_course_id,
         :allow_student_forum_attachments, :public_description,
@@ -1449,6 +1449,7 @@ describe CoursesController, :type => :integration do
         'default_view' => @course1.default_view,
         'public_syllabus' => @course1.public_syllabus,
         'workflow_state' => @course1.workflow_state,
+        'storage_quota_mb' => @course1.storage_quota_mb
       }
     end
 

@@ -77,14 +77,16 @@
           <i class="icon-link"></i>
           <%= t :external_tool_notice, "Select a tool from the list below, or enter a URL for an external tool you already know is configured with Basic LTI to add a link to it to this *module*.", :wrapper => '<span class="holder_type">\1</span>' %>
         </div>
-        <a href="<%= context_url(@context, :context_external_tools_url, :include_parents => '1') %>" class="external_tools_url" style="display: none;">&nbsp;</a>
+        <a href="<%= context_url(@context, :context_external_tools_url, :include_parents => '1', :per_page => '50') %>" class="external_tools_url" style="display: none;">&nbsp;</a>
         <table>
           <tr>
-            <td colspan="2" class="tools">
-              <div class="message" style="margin: 10px 0;"><%= t :loading, "Loading..." %></div>
-              <div class="tool" style="display: none;">
-                <div class="name"></div>
-                <div class="description"></div>
+            <td colspan="2">
+              <div class="tools" style="max-height: 250px; overflow: auto;">
+                <div class="message" style="margin: 10px 0;"><%= t :loading, "Loading..." %></div>
+                <div class="tool" style="display: none;">
+                  <div class="name"></div>
+                  <div class="description"></div>
+                </div>
               </div>
             </td>
           </tr>
@@ -144,16 +146,10 @@
         </div>
         <div style="margin-top: 5px;">
         <select class="module_item_select" multiple>
-          <% @context.folders.active.limit(200).sort_by{|f| f.full_name}.each do |folder| %>
+          <% includes = @context.grants_right?(@current_user, session, :manage_files) ? :active_file_attachments : :visible_file_attachments %>
+          <% @context.folders.active.limit(200).includes(includes).sort_by{|f| f.full_name}.each do |folder| %>
             <optgroup label="<%= folder.full_name %>">
-              <% 
-              attachments = if @context.grants_right?(@current_user, session, :manage_files)
-                              folder.active_file_attachments.by_position_then_display_name
-                            else
-                              folder.visible_file_attachments.by_position_then_display_name
-                            end
-              %>
-              <% attachments.sort_by{|file| file.display_name }.each do |file| %>
+              <% folder.send(includes).sort_by{|file| file.display_name }.each do |file| %>
                 <option value="<%= file.id %>"><%= file.display_name %></option>
               <% end %>
             </optgroup>
@@ -172,7 +168,7 @@
                 <%= before_label :folder, "Folder" %>
               </td><td>
                 <% Folder.root_folders(@context) %>
-                <% folders = @context.active_folders_with_sub_folders.by_position %>
+                <% folders = @context.active_folders.all %>
                 <% root_folders = folders.select{|f| f.parent_folder_id == nil} %>
                 <select name="attachment[folder_id]" id="attachment_folder_id">
                   <%= folders_as_options(root_folders, :all_folders => folders, :max_depth => 1) %>

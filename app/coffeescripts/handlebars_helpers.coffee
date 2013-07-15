@@ -320,9 +320,11 @@ define [
         'disabled'
       else
         ''
+    truncate_left: ( string, max) ->
+       return textHelper.truncateText( string.split("").reverse().join(""), {max: max}).split("").reverse().join("")
 
-    truncate: ( string, max ) ->
-      return textHelper.truncateText( string, { max: max } )
+    truncate: ( string, max) ->
+      return textHelper.truncateText( string, {max: max})
 
     enrollmentName: enrollmentName
 

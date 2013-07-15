@@ -74,7 +74,7 @@ namespace :i18n do
         value
       hash
     }
-    @translations = I18n.backend.send(:translations)[:en].inject({}, &stringifier)
+    @translations = I18n.backend.direct_lookup('en').inject({}, &stringifier)
 
 
     # Ruby
@@ -148,15 +148,23 @@ namespace :i18n do
 
   desc "Generates JS bundle i18n files (non-en) and adds them to assets.yml"
   task :generate_js do
+    # This is intentially requiring things individually rather than just
+    # loading the rails+canvas environment, because that environment isn't
+    # available during the deploy process. Don't change this out for a call to
+    # the `environment` rake task.
     require 'bundler'
     Bundler.setup
     require 'action_controller'
     require 'i18n'
+    require 'i18nema'
     require 'sexp_processor'
     require 'jammit'
     require 'lib/i18n_extraction/js_extractor.rb'
-    I18n.load_path += Dir[Rails.root.join('config', 'locales', '**', '*.{rb,yml}')] +
-                      Dir[Rails.root.join('vendor', 'plugins', '*', 'config', 'locales', '**', '*.{rb,yml}')]
+    I18n.load_path += Dir[Rails.root.join('config', 'locales', '**', '*.{rb,yml}')]
+    I18n.load_path += Dir[Rails.root.join('vendor', 'plugins', '*', 'config', 'locales', '**', '*.{rb,yml}')]
+    I18n.backend = I18nema::Backend.new
+    I18nema::Backend.send(:include, I18n::Backend::Fallbacks)
+    I18n.backend.init_translations
 
     Hash.send :include, I18n::HashExtensions
 
@@ -168,7 +176,7 @@ namespace :i18n do
     #
     # LOCALES=hi,ja,pt,zh-hans rake i18n:generate_js
     locales = locales + ENV['LOCALES'].split(',') if ENV['LOCALES']
-    all_translations = I18n.backend.send(:translations)
+    all_translations = I18n.backend.direct_lookup
     flat_translations = all_translations.flatten_keys
 
     if locales.empty?
@@ -366,22 +374,53 @@ define(['i18nObj', 'jquery'], function(I18n, $) {
 
     import = I18nImport.new(source_translations, new_translations)
 
-    item_warning = lambda { |error_items, description|
+    complete_translations = import.compile_complete_translations do |error_items, description|
       begin
         puts "Warning: #{error_items.size} #{description}. What would you like to do?"
         puts " [C] continue anyway"
         puts " [V] view #{description}"
         puts " [D] debug"
         puts " [Q] quit"
-        command = $stdin.gets.upcase.strip
-        return false if command == 'Q'
-        debugger if command == 'D'
-        puts error_items.join("\n") if command == 'V'
+        case (command = $stdin.gets.upcase.strip)
+        when 'Q' then return :abort
+        when 'D' then debugger
+        when 'V' then puts error_items.join("\n")
+        end
       end while command != 'C'
-      true
-    }
+      :accept
+    end
 
-    complete_translations = import.compile_complete_translations(item_warning)
+    next if complete_translations.nil?
+
+    File.open("config/locales/#{import.language}.yml", "w") { |f|
+      f.write({import.language => complete_translations}.ya2yaml(:syck_compatible => true))
+    }
+  end
+
+  desc "Imports new translations, ignores missing or unexpected keys"
+  task :autoimport, [:translated_file] => :environment do |t, args|
+    require 'ya2yaml'
+    require 'open-uri'
+    Hash.send(:include, I18n::HashExtensions) unless Hash.new.kind_of?(I18n::HashExtensions)
+
+    source_translations = YAML.safe_load(open("config/locales/generated/en.yml"))
+
+    raise "Need translated_file" unless args[:translated_file]
+    new_translations = YAML.safe_load(open(args[:translated_file]))
+
+    import = I18nImport.new(source_translations, new_translations)
+
+    puts import.language
+    complete_translations = import.compile_complete_translations do |error_items, description|
+      if description =~ /mismatches/
+        # Output malformed stuff and don't import them
+        puts error_items.join("\n")
+        :discard
+      else
+        # Import everything else
+        :accept
+      end
+    end
     next if complete_translations.nil?
 
     File.open("config/locales/#{import.language}.yml", "w") { |f|

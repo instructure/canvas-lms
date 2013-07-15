@@ -14,7 +14,6 @@ module Mutable
       policy.dispatch :assignment_unmuted
       policy.to { participants }
       policy.whenever do |record|
-        !self.suppress_broadcast and
         @recently_unmuted
       end
     end

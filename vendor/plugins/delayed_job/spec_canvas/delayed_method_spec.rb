@@ -282,9 +282,9 @@ shared_examples_for 'random ruby objects' do
   it "should call send later on methods which are wrapped with handle_asynchronously" do
     story = Story.create :text => 'Once upon...'
 
-    job = nil
-    expect { job = story.whatever(1, 5) }.to change { Delayed::Job.jobs_count(:current) }.by(1)
+    expect { story.whatever(1, 5) }.to change { Delayed::Job.jobs_count(:current) }.by(1)
 
+    job = Delayed::Job.list_jobs(:current, 1).first
     job.payload_object.class.should   == Delayed::PerformableMethod
     job.payload_object.method.should  == :whatever_without_send_later
     job.payload_object.args.should    == [1, 5]
@@ -294,9 +294,9 @@ shared_examples_for 'random ruby objects' do
   it "should call send later on methods which are wrapped with handle_asynchronously_with_queue" do
     story = Story.create :text => 'Once upon...'
 
-    job = nil
-    expect { job = story.whatever_else(1, 5) }.to change { Delayed::Job.jobs_count(:current, "testqueue") }.by(1)
+    expect { story.whatever_else(1, 5) }.to change { Delayed::Job.jobs_count(:current, "testqueue") }.by(1)
 
+    job = Delayed::Job.list_jobs(:current, 1, 0, "testqueue").first
     job.payload_object.class.should   == Delayed::PerformableMethod
     job.payload_object.method.should  == :whatever_else_without_send_later
     job.payload_object.args.should    == [1, 5]
@@ -306,10 +306,12 @@ shared_examples_for 'random ruby objects' do
   context "send_later" do
     it "should use the default queue if there is one" do
       set_queue("testqueue") do
-        job = "string".send_later :reverse
+        "string".send_later :reverse
+        job = Delayed::Job.list_jobs(:current, 1).first
         job.queue.should == "testqueue"
 
-        job2 = "string".send_later :reverse, :queue => nil
+        "string".send_later :reverse, :queue => nil
+        job2 = Delayed::Job.list_jobs(:current, 2).last
         job2.queue.should == "testqueue"
       end
     end
@@ -328,12 +330,14 @@ shared_examples_for 'random ruby objects' do
     
     it "should schedule the job in the future" do
       time = 1.hour.from_now
-      job = "string".send_at(time, :length)
+      "string".send_at(time, :length)
+      job = Delayed::Job.list_jobs(:future, 1).first
       job.run_at.to_i.should == time.to_i
     end
     
     it "should store payload as PerformableMethod" do
-      job = "string".send_at(1.hour.from_now, :count, 'r')
+      "string".send_at(1.hour.from_now, :count, 'r')
+      job = Delayed::Job.list_jobs(:future, 1).first
       job.payload_object.class.should   == Delayed::PerformableMethod
       job.payload_object.method.should  == :count
       job.payload_object.args.should    == ['r']
@@ -342,7 +346,8 @@ shared_examples_for 'random ruby objects' do
     
     it "should use the default queue if there is one" do
       set_queue("testqueue") do
-        job = "string".send_at 1.hour.from_now, :reverse
+        "string".send_at 1.hour.from_now, :reverse
+        job = Delayed::Job.list_jobs(:current, 1).first
         job.queue.should == "testqueue"
       end
     end
@@ -357,19 +362,22 @@ shared_examples_for 'random ruby objects' do
     
     it "should schedule the job in the future" do
       time = 1.hour.from_now
-      job = "string".send_at_with_queue(time, :length, "testqueue")
+      "string".send_at_with_queue(time, :length, "testqueue")
+      job = Delayed::Job.list_jobs(:future, 1, 0, "testqueue").first
       job.run_at.to_i.should == time.to_i
     end
     
     it "should override the default queue" do
       set_queue("default_queue") do
-        job = "string".send_at_with_queue(1.hour.from_now, :length, "testqueue")
+        "string".send_at_with_queue(1.hour.from_now, :length, "testqueue")
+        job = Delayed::Job.list_jobs(:future, 1, 0, "testqueue").first
         job.queue.should == "testqueue"
       end
     end
     
     it "should store payload as PerformableMethod" do
-      job = "string".send_at_with_queue(1.hour.from_now, :count, "testqueue", 'r')
+      "string".send_at_with_queue(1.hour.from_now, :count, "testqueue", 'r')
+      job = Delayed::Job.list_jobs(:future, 1, 0, "testqueue").first
       job.payload_object.class.should   == Delayed::PerformableMethod
       job.payload_object.method.should  == :count
       job.payload_object.args.should    == ['r']
@@ -396,7 +404,8 @@ shared_examples_for 'random ruby objects' do
     end
 
     it "should perform immediately if in job" do
-      job = UnlessInJob.send_later :run_later
+      UnlessInJob.send_later :run_later
+      job = Delayed::Job.list_jobs(:current, 1).first
       job.invoke_job
       UnlessInJob.runs.should == 1
     end

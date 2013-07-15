@@ -42,6 +42,90 @@ describe "Group Categories API", :type => :integration do
       @category = GroupCategory.student_organized_for(@course)
     end
 
+    describe "users" do
+      let(:api_url) { "/api/v1/group_categories/#{@category2.id}/users.json" }
+      let(:api_route) do
+        {
+            :controller => 'group_categories',
+            :action => 'users',
+            :group_category_id => @category2.to_param,
+            :format => 'json'
+        }
+      end
+
+      before do
+        @user = user(:name => "joe mcCool")
+        @course.enroll_user(@user,'TeacherEnrollment',:enrollment_state => :active)
+
+        @user_waldo = user(:name => "waldo")
+        @course.enroll_user(@user,'StudentEnrollment',:enrollment_state => :active)
+
+
+        6.times { course_with_student({:course => @course}) }
+        @user = @course.teacher_enrollments.first.user
+
+        json = api_call(:post, "/api/v1/courses/#{@course.id}/group_categories",
+                        @category_path_options.merge(:action => 'create',
+                                                     :course_id => @course.to_param),
+                        { 'name' => @name, 'split_group_count' => 3 })
+
+        @user_antisocial = user(:name => "antisocial")
+        @course.enroll_user(@user,'StudentEnrollment',:enrollment_state => :active)
+
+        @category2 = GroupCategory.find(json["id"])
+
+        @category_users = @category2.groups.inject([]){|result, group| result.concat(group.users)} << @user
+        @category_assigned_users = @category2.groups.active.inject([]){|result, group| result.concat(group.users)}
+        @category_unassigned_users = @category_users - @category_assigned_users
+      end
+
+      it "should return users in a group_category" do
+        expected_keys = %w{id name sortable_name short_name}
+        json = api_call(:get, api_url, api_route)
+        json.count.should == 8
+        json.each do |user|
+          (user.keys & expected_keys).sort.should == expected_keys.sort
+          @category_users.map(&:id).should include(user['id'])
+        end
+      end
+
+      it "should return 401 for users outside the group_category" do
+        user  # ?
+        raw_api_call(:get, api_url, api_route)
+        response.code.should == '401'
+      end
+
+      it "returns an error when search_term is fewer than 3 characters" do
+        json = api_call(:get, api_url, api_route, {:search_term => '12'}, {}, :expected_status => 400)
+        json["status"].should == "argument_error"
+        json["message"].should == "search_term of 3 or more characters is required"
+      end
+
+      it "returns a list of users" do
+        expected_keys = %w{id name sortable_name short_name}
+
+        json = api_call(:get, api_url, api_route, {:search_term => 'waldo'})
+
+        json.count.should == 1
+        json.each do |user|
+          (user.keys & expected_keys).sort.should == expected_keys.sort
+          @category_users.map(&:id).should include(user['id'])
+        end
+      end
+
+      it "returns a list of unassigned users" do
+        expected_keys = %w{id name sortable_name short_name}
+
+        json = api_call(:get, api_url, api_route, {:search_term => 'antisocial', :unassigned => 'true'})
+
+        json.count.should == 1
+        json.each do |user|
+          (user.keys & expected_keys).sort.should == expected_keys.sort
+          @category_unassigned_users.map(&:id).should include(user['id'])
+        end
+      end
+    end
+
     describe "teacher actions with no group" do
       before do
         @name = 'some group name'

@@ -190,6 +190,15 @@ describe "MessageableUser" do
           end
         end
       end
+
+      it "should not translate a 0 key" do
+        user = MessageableUser.prepped(:common_course_column => 0, :common_role_column => "'StudentEnrollment'").first
+        [Shard.default, @shard1, @shard2].each do |shard|
+          shard.activate do
+            user.common_courses.should == {0 => ['StudentEnrollment']}
+          end
+        end
+      end
     end
   end
 
@@ -219,6 +228,32 @@ describe "MessageableUser" do
           end
         end
       end
+    end
+  end
+
+  describe "#include_common_contexts_from" do
+    before do
+      user(:active_all => 1)
+    end
+
+    it "should merge disparate ids" do
+      # e.g. two copies of the user from different shards with course
+      # visibility on each
+      user1 = MessageableUser.prepped(:common_course_column => 1, :common_role_column => "'StudentEnrollment'").first
+      user2 = MessageableUser.prepped(:common_course_column => 2, :common_role_column => "'StudentEnrollment'").first
+      user1.include_common_contexts_from(user2)
+      user1.common_courses[1].should include('StudentEnrollment')
+      user1.common_courses[2].should include('StudentEnrollment')
+    end
+
+    it "should stack coinciding ids" do
+      # e.g. two copies of the user from different shards with admin visibility
+      # on each
+      user1 = MessageableUser.prepped(:common_course_column => 0, :common_role_column => "'StudentEnrollment'").first
+      user2 = MessageableUser.prepped(:common_course_column => 0, :common_role_column => "'TeacherEnrollment'").first
+      user1.include_common_contexts_from(user2)
+      user1.common_courses[0].should include('StudentEnrollment')
+      user1.common_courses[0].should include('TeacherEnrollment')
     end
   end
 end

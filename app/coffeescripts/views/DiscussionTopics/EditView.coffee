@@ -154,7 +154,7 @@ htmlEscape, DiscussionTopic, Announcement, Assignment, $, preventDefault, Missin
         data.assignment = {set_assignment: false}
 
       # these options get passed to Backbone.sync in ValidatedFormView
-      @saveOpts = multipart: !!data.attachment
+      @saveOpts = multipart: !!data.attachment, proxyAttachment: true
 
       data
 

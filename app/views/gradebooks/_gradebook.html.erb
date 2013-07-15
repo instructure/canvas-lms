@@ -10,7 +10,7 @@
   <div id="no_students_message" class="pad-box">
     <p><%= t(:no_students, "No Students are enrolled in the course.") %></p>
     <% if can_do @context, @current_user, :manage_students %>
-      <p><a href="<%= context_url(@context, :context_details_url) %>#add_students" class="btn icon-add add_students"><%= t('links.add_students', "Add Students to the Course") %></a></p>
+      <p><a href="<%= course_users_path(course_id: @context) %>" class="btn icon-add add_students"><%= t('links.add_students', "Add Students to the Course") %></a></p>
     <% end %>
   </div>
 <% end %>

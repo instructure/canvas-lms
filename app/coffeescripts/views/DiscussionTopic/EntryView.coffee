@@ -63,6 +63,7 @@ define [
       @model.on 'change:deleted', @toggleDeleted
       @model.on 'change:read_state', @toggleReadState
       @model.on 'change:editor', @render
+      @model.on 'change:editor', (entry) -> entry.trigger('edited')
 
     toggleRead: (e) ->
       e.preventDefault()
@@ -212,11 +213,14 @@ define [
         @treeView.collection.add entry
         @treeView.collection.fullCollection.add entry
         @trigger 'addReply'
+        EntryView.trigger 'addReply', entry
 
     addReplyAttachment: (event, $el) ->
+      event.preventDefault()
       @reply.addAttachment($el)
 
     removeReplyAttachment: (event, $el) ->
+      event.preventDefault()
       @reply.removeAttachment($el)
 
     format: (attr, value) ->

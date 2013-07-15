@@ -36,22 +36,6 @@ describe SubmissionComment do
     SubmissionComment.create!(@valid_attributes)
   end
 
-  it "should not dispatch notification on create if assignment is not published" do
-    assignment_model
-    @assignment.workflow_state = 'available'
-    @assignment.save
-    @course.offer
-    te = @course.enroll_teacher(user)
-    se = @course.enroll_student(user)
-    @assignment.reload
-    @submission = @assignment.submit_homework(se.user, :body => 'some message')
-    @submission.created_at = Time.now - 60
-    @submission.save
-    Notification.create(:name => 'Submission Comment')
-    @comment = @submission.add_comment(:author => te.user, :comment => "some comment")
-    @comment.messages_sent.should_not be_include('Submission Comment')
-  end
-  
   it "should dispatch notifications on create regardless of how long ago the submission was created" do
     assignment_model
     @assignment.workflow_state = 'published'

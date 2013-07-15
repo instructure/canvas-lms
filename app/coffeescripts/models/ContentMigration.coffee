@@ -83,7 +83,6 @@ define [
 
           tempModel.save null,
             multipart: fileElement 
-            onlyGivenParameters: true
             success: (model, xhr) => 
               return dObject.rejectWith(this, xhr.message) if xhr.message
               this.fetch success: => dObject.resolve() # sets the poll url

@@ -49,3 +49,19 @@ define [
 
   test 'toPrecision', ->
     equal helpers.toPrecision(3.6666666, 2), '3.7'
+
+  module 'truncate'
+  test 'default truncates 30 characters', ->
+    text = "asdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdf"
+    truncText = helpers.truncate text
+    equal truncText.length, 30, "Truncates down to 30 letters"
+
+  test 'expects options for max (length)', ->
+    text = "asdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdf"
+    truncText = helpers.truncate text, 10
+    equal truncText.length, 10, "Truncates down to 10 letters"
+
+  test 'supports truncation left', ->
+    text = "going to the store"
+    truncText = helpers.truncate_left text, 15
+    equal truncText, "...to the store", "Reverse truncates"

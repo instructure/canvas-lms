@@ -17,6 +17,7 @@ define [
       podcast_has_student_posts: false
       require_initial_post: false
       is_announcement: false
+      subscribed: false
 
     dateAttributes: [
       'last_reply_at'
@@ -40,13 +41,30 @@ define [
     present: =>
       Backbone.Model::toJSON.call(this)
 
+    topicSubscribe: ->
+      @set 'subscribed', true
+      $.ajaxJSON ENV.DISCUSSION.SUBSCRIBE_URL, 'PUT'
+
+    topicUnsubscribe: ->
+      @set 'subscribed', false
+      $.ajaxJSON ENV.DISCUSSION.UNSUBSCRIBE_URL, 'DELETE'
+
     toJSON: ->
       json = super
       delete json.assignment unless json.set_assignment
+      assignment = if json.assignment
+        if typeof json.assignment.toJSON is 'function'
+          json.assignment.toJSON()
+        else
+          json.assignment
+      else
+        null
+
       _.extend json,
         summary: @summary(),
         unread_count_tooltip: @unreadTooltip(),
         reply_count_tooltip: @replyTooltip()
+        assignment: assignment
 
     unreadTooltip: ->
       I18n.t 'unread_count_tooltip', {

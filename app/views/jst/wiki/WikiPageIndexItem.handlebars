@@ -1,0 +1,4 @@
+<td><a href="{{htmlUrl}}" class="{{#if published}}text-success{{else}}muted{{/if}}">{{title}}</a>{{#if front_page}} <span class="label">Front Page</span>{{/if}}</td>
+<td>{{friendlyDatetime created_at}}</td>
+<td>{{friendlyDatetime updated_at}}{{#if last_edited_by}} by {{last_edited_by.display_name}}{{/if}}</td>
+<td><span class="{{#if published}}text-success{{else}}muted{{/if}}"><i class="icon-{{#if published}}publish{{else}}unpublished{{/if}}"></i></span></td>

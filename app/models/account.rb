@@ -22,7 +22,7 @@ class Account < ActiveRecord::Base
     :turnitin_shared_secret, :turnitin_comments, :turnitin_pledge,
     :default_time_zone, :parent_account, :settings, :default_storage_quota,
     :default_storage_quota_mb, :storage_quota, :ip_filters, :default_locale,
-    :default_user_storage_quota_mb
+    :default_user_storage_quota_mb, :default_group_storage_quota_mb
 
   include Workflow
   belongs_to :parent_account, :class_name => 'Account'
@@ -46,10 +46,7 @@ class Account < ActiveRecord::Base
   has_many :users, :through => :account_users
   has_many :pseudonyms, :include => :user
   has_many :role_overrides, :as => :context
-  has_many :rubrics, :as => :context
-  has_many :rubric_associations, :as => :context, :include => :rubric, :dependent => :destroy
   has_many :course_account_associations
-  has_many :associated_courses, :through => :course_account_associations, :source => :course, :select => 'DISTINCT courses.*'
   has_many :child_courses, :through => :course_account_associations, :source => :course, :conditions => ['course_account_associations.depth = 0']
   has_many :attachments, :as => :context, :dependent => :destroy
   has_many :active_assignments, :as => :context, :class_name => 'Assignment', :conditions => ['assignments.workflow_state != ?', 'deleted']
@@ -79,12 +76,12 @@ class Account < ActiveRecord::Base
   end
   
   include LearningOutcomeContext
+  include RubricContext
 
   has_many :context_external_tools, :as => :context, :dependent => :destroy, :order => 'name'
   has_many :error_reports
   has_many :announcements, :class_name => 'AccountNotification'
   has_many :alerts, :as => :context, :include => :criteria
-  has_many :associated_alerts, :through => :associated_courses, :source => :alerts, :include => :criteria
   has_many :user_account_associations
   has_many :report_snapshots
 
@@ -169,7 +166,6 @@ class Account < ActiveRecord::Base
   add_setting :self_registration, :boolean => true, :root_only => true, :default => false
   add_setting :large_course_rosters, :boolean => true, :root_only => true, :default => false
   add_setting :edit_institution_email, :boolean => true, :root_only => true, :default => true
-  add_setting :file_upload_quiz_questions, :boolean => true, :root_only => true, :default => false
 
   def settings=(hash)
     if hash.is_a?(Hash)
@@ -331,10 +327,18 @@ class Account < ActiveRecord::Base
     end
     res
   end
-  
+
+  def users_visible_to(user)
+    self.grants_right?(user, nil, :read) ? self.all_users : self.all_users.where("?", false)
+  end
+
   def users_name_like(query="")
     @cached_users_name_like ||= {}
     @cached_users_name_like[query] ||= self.fast_all_users.name_like(query)
+  end
+
+  def associated_courses
+    Course.shard(shard).where("EXISTS (SELECT 1 FROM course_account_associations WHERE course_id=courses.id AND account_id=?)", self)
   end
 
   def fast_course_base(opts)
@@ -343,7 +347,7 @@ class Account < ActiveRecord::Base
     associated_courses = associated_courses.with_enrollments if opts[:hide_enrollmentless_courses]
     associated_courses = associated_courses.for_term(opts[:term]) if opts[:term].present?
     associated_courses = yield associated_courses if block_given?
-    associated_courses.limit(opts[:limit]).active_first.except(:select).select(columns).group(columns).all
+    associated_courses.limit(opts[:limit]).active_first.select(columns).all
   end
 
   def fast_all_courses(opts={})
@@ -362,10 +366,10 @@ class Account < ActiveRecord::Base
   end
 
   def users_not_in_groups_sql(groups, opts={})
-    ["SELECT u.id, u.name
-        FROM users u
-       INNER JOIN user_account_associations uaa on uaa.user_id = u.id
-       WHERE uaa.account_id = ? AND u.workflow_state != 'deleted'
+    ["SELECT users.id, users.name
+        FROM users
+       INNER JOIN user_account_associations uaa on uaa.user_id = users.id
+       WHERE uaa.account_id = ? AND users.workflow_state != 'deleted'
        #{Group.not_in_group_sql_fragment(groups)}
        #{"ORDER BY #{opts[:order_by]}" if opts[:order_by].present?}", self.id]
   end
@@ -375,7 +379,7 @@ class Account < ActiveRecord::Base
   end
   
   def paginate_users_not_in_groups(groups, page, per_page = 15)
-    User.paginate_by_sql(users_not_in_groups_sql(groups, :order_by => "#{User.sortable_name_order_by_clause('u')} ASC"),
+    User.paginate_by_sql(users_not_in_groups_sql(groups, :order_by => "#{User.sortable_name_order_by_clause('users')} ASC"),
                          :page => page, :per_page => per_page)
   end
 
@@ -457,6 +461,25 @@ class Account < ActiveRecord::Base
     self.default_user_storage_quota = val.try(:to_i).try(:megabytes)
   end
 
+  def default_group_storage_quota
+    read_attribute(:default_group_storage_quota) ||
+        Group.default_storage_quota
+  end
+
+  def default_group_storage_quota=(val)
+    val = val.to_i
+    val = nil if val == Group.default_storage_quota || val <= 0
+    write_attribute(:default_group_storage_quota, val)
+  end
+
+  def default_group_storage_quota_mb
+    default_group_storage_quota / 1.megabyte
+  end
+
+  def default_group_storage_quota_mb=(val)
+    self.default_group_storage_quota = val.try(:to_i).try(:megabytes)
+  end
+
   def turnitin_shared_secret=(secret)
     return if secret.blank?
     self.turnitin_crypted_secret, self.turnitin_salt = Canvas::Security.encrypt_password(secret, 'instructure_turnitin_secret_shared')
@@ -511,15 +534,18 @@ class Account < ActiveRecord::Base
     if ActiveRecord::Base.configurations[Rails.env]['adapter'] == 'postgresql'
       Account.find_by_sql([<<-SQL, self.id, limit.to_i, offset.to_i])
           WITH RECURSIVE t AS (
-            SELECT * FROM accounts WHERE parent_account_id = ?
+            SELECT * FROM accounts
+            WHERE parent_account_id = ? AND workflow_state <>'deleted'
             UNION
-            SELECT accounts.* FROM accounts INNER JOIN t ON accounts.parent_account_id = t.id
+            SELECT accounts.* FROM accounts
+            INNER JOIN t ON accounts.parent_account_id = t.id
+            WHERE accounts.workflow_state <>'deleted'
           )
           SELECT * FROM t ORDER BY parent_account_id, id LIMIT ? OFFSET ?
       SQL
     else
       account_descendents = lambda do |id|
-        as = Account.where(:parent_account_id => id).order(:id)
+        as = Account.where(:parent_account_id => id).active.order(:id)
         as.empty? ?
           [] :
           as << as.map { |a| account_descendents.call(a.id) }
@@ -855,15 +881,36 @@ class Account < ActiveRecord::Base
   def update_account_associations
     self.shard.activate do
       account_chain_cache = {}
-      all_user_ids = []
-      all_user_ids += Course.update_account_associations(self.associated_courses, :skip_user_account_associations => true, :account_chain_cache => account_chain_cache)
+      all_user_ids = Set.new
+
+      # make sure to use the non-associated_courses associations
+      # to catch courses that didn't ever have an association created
+      scopes = if root_account?
+                [all_courses,
+                 associated_courses.
+                     where("root_account_id<>?", self)]
+              else
+                [courses,
+                 associated_courses.
+                    where("courses.account_id<>?", self)]
+              end
+      # match the "batch" size in Course.update_account_associations
+      scopes.each do |scope|
+        scope.select([:id, :account_id]).find_in_batches(:batch_size => 500) do |courses|
+          Course.send(:with_exclusive_scope) do
+            all_user_ids.merge Course.update_account_associations(courses, :skip_user_account_associations => true, :account_chain_cache => account_chain_cache)
+          end
+        end
+      end
 
       # Make sure we have all users with existing account associations.
-      # (This should catch users with Pseudonyms associated with the account.)
-      all_user_ids += self.user_account_associations.pluck(:user_id)
+      all_user_ids.merge self.user_account_associations.pluck(:user_id)
+      if root_account?
+        all_user_ids.merge self.pseudonyms.active.pluck(:user_id)
+      end
 
       # Update the users' associations as well
-      User.update_account_associations(all_user_ids.uniq, :account_chain_cache => account_chain_cache)
+      User.update_account_associations(all_user_ids.to_a, :account_chain_cache => account_chain_cache)
     end
   end
   
@@ -1074,7 +1121,14 @@ class Account < ActiveRecord::Base
         :description => "",
         :default => false,
         :expose_to_ui => :setting
-      }
+      },
+      :account_survey_notifications => {
+        :name => "Account Surveys",
+        :description => "",
+        :default => false,
+        :expose_to_ui => :setting,
+        :expose_to_ui_proc => proc { |user, account| user && account && account.grants_right?(user, :manage_site_settings) },
+      },
     }.merge(@plugin_services || {}).freeze
   end
 
@@ -1149,14 +1203,14 @@ class Account < ActiveRecord::Base
 
   # if expose_as is nil, all services exposed in the ui are returned
   # if it's :service or :setting, then only services set to be exposed as that type are returned
-  def self.services_exposed_to_ui_hash(expose_as = nil)
+  def self.services_exposed_to_ui_hash(expose_as = nil, current_user = nil, account = nil)
     if expose_as
       self.allowable_services.reject { |key, setting| setting[:expose_to_ui] != expose_as }
     else
       self.allowable_services.reject { |key, setting| !setting[:expose_to_ui] }
-    end
+    end.reject { |key, setting| setting[:expose_to_ui_proc] && !setting[:expose_to_ui_proc].call(current_user, account) }
   end
-  
+
   def service_enabled?(service)
     service = service.to_sym
     case service

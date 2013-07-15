@@ -40,7 +40,7 @@ class FillInTheBlank < AssessmentItemConverter
     @question[:question_text] = body
 
     @doc.search('responseProcessing responseCondition').each do |cond|
-      cond.css('stringMatch').each do |match|
+      cond.css('stringMatch,substring').each do |match|
         answer = {}
         answer[:text] = match.at_css('baseValue[baseType=string]').text.strip
         unless answer[:text] == ""

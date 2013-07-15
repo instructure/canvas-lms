@@ -248,6 +248,7 @@ en:
   account_settings: 
     confirms: 
       delete_announcement: "Are you sure you want to delete this announcement?"
+      global_announcement: "You must confirm the global announcement"
       remove_account_admin: "Are you sure you want to remove this account admin?"
     custom_text_blank: "[Custom Text]"
     links: 
@@ -410,6 +411,7 @@ en:
             text: "This report shows the status of all the courses for a given term. The resulting csv file will have one row per course section and will show the course, course status, term, effective start and end dates, and a teacher of record in the section."
           description: 
             header: Example
+    course_type: course
     courses: 
       courses_crumb: Courses
       no_results_message: "No Results Found"
@@ -445,6 +447,8 @@ en:
             header: "Start at:"
     default_account_quotas_not_updated: "Default account quotas were not updated"
     default_account_quotas_updated: "Default account quotas updated"
+    find_not_authorized: "You are not authorized to access that %{type}"
+    find_not_found: "Could not find a %{type} with that ID"
     google_doc_accounts_csv_description: 
       account_reports: 
         ut_austin: 
@@ -458,6 +462,7 @@ en:
           description: 
             header: Example
             text: "This report shows the student final grade results for all students in a given term. The resulting csv file will have one row per enrollment, and will show the current and final grade that is displayed in the course gradebook."
+    group_type: group
     include_deleted_parameter: 
       account_reports: 
         default: 
@@ -503,7 +508,15 @@ en:
             text: "This report shows quiz questions, how many users answered the questions, and how many users answered them correctly for all quizzes in a given term. The resulting csv file will have one row per quiz question."
     quota_integer_required: "An integer value is required"
     quota_must_be_positive: "Value must be positive"
+    quota_not_updated: "Quota was not updated"
     quota_too_large: "Value too large"
+    quota_updated: "Quota updated"
+    recently_deleted_courses_csv_description: 
+      account_reports: 
+        default: 
+          recently_deleted_courses: 
+            header: Example
+            text: "This report shows all the courses for a given term that have been deleted in the last 30 days. The resulting csv file will have one row per course and will show the course id, course sis id, course short name, course name, course start and end dates."
     retry_login: "Retry Login"
     root_accounts: 
       labels: 
@@ -528,10 +541,12 @@ en:
       alert_icon_warning_option: warning
       alert_timespan: "from %{start_at} to %{end_at}"
       alerts_title: Alerts
+      announcement_sent_to_subset: "Sent to 1 / %{denominator} users each month"
       buttons: 
         add_users: "OK Looks Good, Add These Users"
         continue: Continue...
         modify_users: "Go back and edit the list of users"
+      confirm_global_announcement: "This announcement will be shown to *all* Canvas users. Confirm that you want to create it."
       confirm_turnitin_settings_link: "confirm Turnitin settings"
       create_courses_description: "(Account Administrators can always create courses)"
       create_courses_title: "Who Can Create New Courses"
@@ -614,6 +629,15 @@ en:
         add_admins: "Add Account Admins"
         configure_report: Configure...
         run_report: "Run Report"
+      manual_quotas: 
+        find_button: Find
+        manual_quotas_title: "Manually Settable Quotas"
+        megabytes: megabytes
+        megabytes_tooltip: megabytes
+        select_type_courses: "Course ID"
+        select_type_groups: "Group ID"
+        select_type_label: "Find course or group"
+        update_button: "Update Quota"
       never_allow_self_enrollment_option: Never
       no_language_preference: "Not set (defaults to %{language})"
       notifications: 
@@ -642,6 +666,7 @@ en:
       quotas: 
         default_account_quota_title: "Default Account Quotas"
         default_course_storage_quota: "Course Quota"
+        default_group_storage_quota: "Group Quota"
         default_user_storage_quota: "User Quota"
         megabytes: megabytes
         megabytes_tooltip: megabytes
@@ -657,10 +682,11 @@ en:
       self_enroll_for_any_courses_option: "For Any Courses"
       self_enroll_for_manually_created_courses_option: "For Manually-Created Courses"
       settings_crumb: Settings
+      survey_announcement: "This is a survey announcement. It will be sent to 1 / %{denominator} of users in enabled accounts for each month that it's active."
       tab_admins: Admins
       tab_alerts: Alerts
       tab_announcements: Announcements
-      tab_external_tools: "External Tools"
+      tab_external_tools: Apps
       tab_notifications: Notifications
       tab_quotas: Quotas
       tab_reports: Reports
@@ -854,6 +880,12 @@ en:
     test_ldap_result_ok: OK
     test_login: "Test Login"
     testing: Testing...
+    unpublished_courses_csv_description: 
+      account_reports: 
+        default: 
+          unpublishd_courses: 
+            header: Example
+            text: "This report shows all the courses for a given term that are not published. The resulting csv file will have one row per course and will show the course id, course sis id, course short name, course name, course start and end dates."
     unrecognized_time_zone: "'%{timezone}' is not a recognized time zone"
     unused_courses_csv_description: 
       account_reports: 
@@ -1004,6 +1036,21 @@ en:
       feed_title_group: "Group Announcements Atom Feed"
       podcast_title_course: "Course Announcements Podcast Feed"
       podcast_title_group: "Group Announcements Podcast Feed"
+    index_view: 
+      delete: Delete
+      loading: Loading...
+      lock_for_comments: "Lock for comments"
+      make_an_announcement: "Make an announcement"
+      make_an_announcement_caps: "Make an Announcement"
+      make_sure_all_search_terms_are_spelled_correctly: "Make sure all search terms are spelled correctly."
+      rss_feed: "RSS feed"
+      search_title_body_or_author: "Search title, body, or author"
+      suggestions: "Suggestions:"
+      there_are_no_announcements_show: "There are no announcements to show"
+      try_different_more_general_or_fewer_keywords: "Try different, more general, or fewer keywords."
+      try_disabling_the_unread_filters: "Try disabling the \"Unread\" filter."
+      unread: Unread
+      your_search_did_not_match_any_announcements: "Your search did not match any announcements."
     podcast_feed_description_course: "Any media files linked from or embedded within announcements in the course \"%{course}\" will appear in this feed."
     podcast_feed_description_group: "Any media files linked from or embedded within announcements in the group \"%{group}\" will appear in this feed."
     podcast_feed_name: "%{course} Announcements Podcast Feed"
@@ -1141,6 +1188,9 @@ en:
       created: "Assignment Group was successfully created."
       deleted: "This group has been deleted"
       updated: "Assignment Group was successfully updated."
+  assignment_groups_api: 
+    errors: 
+      frozen_assignments_error: "You cannot delete a group with a locked assignment."
   assignment_muter: 
     mute_assignment: "Mute Assignment"
     muting_assignment: "Muting Assignment..."
@@ -1208,14 +1258,8 @@ en:
       assignment_unlocked_from: "This assignment is locked until *%{unlock_at}*"
       assignment_unlocked_from_to: "This assignment is only unlocked from *%{unlock_at}* to *%{lock_at}*"
     assignment_sidebar: 
-      buttons: 
-        publish: "Publish this Assignment"
       links: 
         submit: "Submit Assignment"
-      titles: 
-        unpublished: Unpublished
-      warnings: 
-        unpublished: "You should publish assignments that you are finished grading so students can consider their grades \"official.\""
     assignments_content: 
       buttons: 
         delete_group: "Delete Group"
@@ -2404,7 +2448,8 @@ en:
   conferences: 
     concluded_conference: 
       delete: Delete
-      no_recording: No&nbsp;Recording
+      no_recording: "No Recording"
+      preparing_video: "Preparing Video"
       view: View
     confirm: 
       close: |-
@@ -2564,10 +2609,10 @@ en:
             If you're not happy with any of the dates for assignments or events, you can easily
             [change them by dragging and dropping on the course calendar](%{url}).
       labels: 
+        apps: "Apps for %{course}"
         assignment: "Assignments for %{course}"
         discussions: "Discussions for %{course}"
         events: "Events for %{course}"
-        external_tools: "External Tools for %{course}"
         files: "Files for %{course}"
         modules: "Modules for %{course}"
         quizzes: "Quizzes for %{course}"
@@ -2580,13 +2625,13 @@ en:
         what_it_looks_like_now: "What %{course} Looks Like Now"
     copy_course_item_selection: 
       labels: 
+        apps: "Apps for %{course}"
         assignment: "Assignments for %{course}"
         copy: "include entries from the old course"
         copy_settings: "Settings from %{course}"
         copy_syllabus: "Syllabus description from %{course}"
         discussions: "Discussions for %{course}"
         events: "Events for %{course}"
-        external_tools: "External Tools for %{course}"
         files: "Files for %{course}"
         learning_outcomes: "Learning Outcomes for %{course}"
         modules: "Modules for %{course}"
@@ -2830,30 +2875,55 @@ en:
     unknown: Unknown
   content_migrations: 
     bad_migration_type: "Invalid migration_type"
+    canvas_export: 
+      options: Options
+    common_cartridge: 
+      options: Options
+    content_checkbox: 
+      select_all: "Select All"
+      select_non: "Select None"
+    copy_course: 
+      options: Options
     migration_converter: 
-      default_option: "Choose the system you want to migrate from"
+      cancel_migration: Cancel
+      default_option: "Select One"
       header: "Import Content"
-      import_from_label: "Import content from"
+      import_from_label: "Content Type"
+      import_migration: Import
       subtext: "This will help you import content you may already have, such as files, assignments, and quizzes, from other course management systems into Canvas."
+    moodle_zip: 
+      options: Options
     must_upload_file: "File upload is required"
     progressing_content_migration: 
+      issues_text: issues
       select_content: "Select Content"
-      show_issues: "Show Issues"
     progressing_content_migration_collection: 
       no_items: "No jobs have been queued"
       progress_label: "Current Jobs"
-    progressing_issues: 
-      no_items: "No items."
+    qti_zip: 
+      options: Options
     select_content: 
       select_content_btn: "Select Content"
-      test_checkbox: "Test Checkbox"
     subviews: 
+      choose_migration_file: 
+        migration_text: Source
       course_find_select: 
         or: or
         search_label: "Search for a course"
         select_default: "Select a course"
       date_shift: 
+        beginning_change_to: "change to"
+        beginning_date: "Beginning date"
         checkbox_label: "Adjust events and due dates"
+        ending_change_to: "change to"
+        ending_date: "Ending date"
+        substitution: Substitution
+      day_substitution: 
+        move_from: "Move from"
+        to_happen_on: to
+      folder_picker: 
+        default_select_folder: "Select Folder"
+        upload_to: "Upload to"
       overwrite_assessment_content: 
         overwrite_assessment_content: "Overwrite assessment content with matching IDs"
       question_bank: 
@@ -3790,7 +3860,8 @@ en:
         enrollment_fee: "Enrollment Fee"
         format: Format
         image: Image
-        path: Path
+        path: "Course Path"
+        portal_path: "Portal Path"
         position: Position
         related_id: "Link ID"
         self_enrollment: Enrollment
@@ -3803,6 +3874,7 @@ en:
       logo: "Logo (URL)"
       page_title: "Course Profile"
       path_syntax: "lower-case letters, numbers and dashes"
+      portal_path_syntax: "lower-case letters, numbers, dashes and slashes (e.g. harvard/chemistry)"
       private: Hidden
       public: "Listed on canvas.net"
       save_changes: "Save changes"
@@ -4052,7 +4124,7 @@ en:
         grade_publishing: "Grade Publishing"
         navigation: Navigation
         sections: Sections
-        tools: "External Tools"
+        tools: Apps
         users: Users
       titles: 
         edit_navigation: "Edit Course Navigation"
@@ -4292,6 +4364,7 @@ en:
     labels: 
       assign_blanks: "Assign zeroes to unsubmitted students"
     out_of_points_possible: "out of %{assignment.points_possible}"
+    this_is_permanent: "Grade curving cannot be undone. Pre-curved grade histories will be available, but the curving action is irreversible."
   d2l_file_description: "D2L export .zip format"
   d2l_name: "D2L Converter"
   dashboard: 
@@ -4496,7 +4569,20 @@ en:
     create_new_crumb: "Create new"
     default_discussion_title: "No Title"
     deleted_topic_notice: "That topic has been deleted"
+    discussion: 
+      delete: Delete
+      due: Due
+      lock: Lock
+      pin: Pin
+      unlock: Unlock
+      unpin: Unpin
+      user_subscribed: "You are subscribed to this topic"
+      user_unsubscribed: "You are not subscribed to this topic"
     discussion_feed_title: "%{title} Discussion Feed"
+    discussion_list: 
+      no_pinned_discussions: "You currently have no pinned discussions"
+      pinned_instructions: "Drag a discussion here to pin it to the top of students' discussion page."
+      there_are_no_discussions_show: "There are no discussions to show."
     discussions_settings_view: 
       allow_student_discussion_editing: "Edit and delete their own posts"
       allow_student_topics: "Create discussion topics"
@@ -4550,21 +4636,16 @@ en:
       edit_settings: "Edit Discussions Settings"
       loading: Loading...
       lock_for_comments: "Lock for comments"
-      make_an_announcement: "Make an announcement"
-      make_an_announcement_caps: "Make an Announcement"
       make_sure_all_search_terms_are_spelled_correctly: "Make sure all search terms are spelled correctly."
-      new_discussion: "Start a discussion"
+      new_discussion: "*Start a* Discussion"
       rss_feed: "RSS feed"
       search_title_body_or_author: "Search title, body, or author"
       start_one_now: "Start One Now"
       suggestions: "Suggestions:"
-      there_are_no_announcements_show: "There are no announcements to show"
       there_are_no_discussion_topics_to_show: "There are no discussion topics to show"
       try_different_more_general_or_fewer_keywords: "Try different, more general, or fewer keywords."
-      try_disabling_the_unread_filters: "Try disabling the \"Unread\" filter."
       try_disabling_the_unread_or_assignments_filters: "Try disabling the \"Unread\" or \"Assignments\" filters."
       unread: Unread
-      your_search_did_not_match_any_announcements: "Your search did not match any announcements."
       your_search_did_not_match_any_discussion_topics: "Your search did not match any discussion topics."
     new_and_total_badge: 
       reply_count_tooltip: 
@@ -4621,6 +4702,10 @@ en:
       topic: Topic
       topic_locked: "This topic will not be visible to users until *%{date}*"
       topic_podcast_feed_link: "Topic Podcast Feed"
+      topic_subscribe: Subscribe
+      topic_subscribe_tooltip: "You will be notified when comments are posted to this topic."
+      topic_unsubscribe: Unsubscribe
+      topic_unsubscribe_tooltip: "No longer receive notifications when comments are posted to this topic."
       unlock_topic: "Open for Comments"
       unread: Unread
     sub_entry: 
@@ -4642,6 +4727,8 @@ en:
       my_settings: "My Settings"
   discussions: 
     are_your_sure_delete: "Are you sure you want to delete this entry?"
+    confirm_delete_discussion_topic: "Are you sure you want to delete this discussion topic?"
+    delete: Delete
     deleted_entry: 
       deleted: "Deleted by *%{editor_name}* on %{edited_at}"
     edit_settings: "Edit Discussions Settings"
@@ -4660,6 +4747,8 @@ en:
     entry_stats: 
       show_more: "Show more"
     hide_due_dates: "Hide Due Dates"
+    lock: Lock
+    locked_discussions: "Locked Discussions"
     mark_as_read: "Mark as Read"
     mark_as_unread: "Mark as Unread"
     no_content: "No Content"
@@ -4669,8 +4758,11 @@ en:
       try_different_more_general_or_fewer_keywords: "Try different, more general, or fewer keywords."
       try_disabling_the_unread_filter: "Try disabling the \"Unread\" filter."
       your_search_did_not_match_any_entries: "Your search did not match any entries."
+    open_discussions: "Open Discussions"
     participant: 
       anonymous_user: Anonymous
+    pin: Pin
+    pinned_discussions: "Pinned Discussions"
     reply: 
       error_saving_reply: "*An error occured*, please post your reply again later"
       saving_reply: "Saving reply..."
@@ -4679,7 +4771,7 @@ en:
     reply_form: 
       attach_file: Attach
       cancel: Cancel
-      post_response: "Post Response"
+      post_reply: "Post Reply"
       switch_views: "Switch Views"
       write_a_reply: Reply
     results_entry: 
@@ -4693,6 +4785,8 @@ en:
     uknown_author: "Unknown Author"
     unknown: Unknown
     unknown_author: "Unknown Author"
+    unlock: Unlock
+    unpin: Unpin
   due_dates: 
     due_at: "due: %{assignment_due_date_time}"
     multiple_due_dates: "due: Multiple Due Dates"
@@ -5111,6 +5205,7 @@ en:
     app_full_view: 
       add_tool: "Add Tool"
       back_to_app_center: "Back to App Center"
+      rate_tool: "Rate this tool"
     app_review_view: 
       posted_by_on: "Posted by *%{user_name}* on *%{created}*"
     app_saved_message: "%{app} saved successfully!"
@@ -5123,6 +5218,7 @@ en:
     delete: Delete
     dialog_title_add_app: "Add App"
     dialog_title_edit_tool: "Edit External Tool"
+    dialog_title_rate_tool: "How do you rate this tool?"
     edit_view: 
       anonymous: Anonymous
       by_url: "By URL"
@@ -5169,15 +5265,19 @@ en:
     generic_error: "There was an error in processing your request"
     homework_submission_configured: "Homework submission configured"
     index_view: 
-      add_new_tool: "Add New Tool"
-      external_tools: "External Tools"
-      external_tools_note: "External Tools are an easy way to add new features to Canvas. They can be added to individual courses, or to all courses in an account. Once configured, you can link to them through course modules and create assignments for assessment tools."
+      add_new_tool: "Add New App"
+      app_headder: "External Apps"
+      external_tools_note: "Apps are an easy way to add new features to Canvas. They can be added to individual courses, or to all courses in an account. Once configured, you can link to them through course modules and create assignments for assessment tools."
       external_tools_references: "Click *here* to see some LTI tools that work great with Canvas. You can also check out the Canvas Community topics about LTI tools **here**"
       search_filter: "Filter by name"
       view_app_center: "View App Center"
-      view_installed_tools: "View Installed Tools"
+      view_installed_tools: "View Installed Apps"
+    missing_stars: "You must select a star rating"
+    rate_tool_view: 
+      rate_tool: "How do you rate this tool?"
     remove_tool: "Are you sure you want to remove this tool?"
     resource_selection_configured: "Resource selection configured"
+    save_failed: "Unable to save review: %{message}"
     saving: Saving...
     sessionless_launch: 
       load_tool_button: "Load %{tool} manually"
@@ -6235,6 +6335,13 @@ en:
       heading_current_groups: "Current Groups"
       no_groups: "No Groups"
     loading: "loading group roster..."
+    manage: 
+      assign_to_group_menu: 
+        add_to_group: "Add to Group"
+      group_user: 
+        assign_to_group: "Assign to Group"
+      group_users: 
+        no_users: "No users."
     member: 
       one: "1 member"
       other: "%{count} members"
@@ -6497,6 +6604,8 @@ en:
       view_all_accounts: "View all accounts"
       view_all_enrollments: "View all courses"
       view_all_groups: "View all groups"
+    mobile_auth: 
+      log_in_to_canvas: "Log In To Canvas"
   learning_outcome: 
     no_comment: "No Comment"
     no_context_found: "The external Learning Outcome couldn't be found for \"%{title}\", creating a copy."
@@ -8643,8 +8752,8 @@ en:
     course_content_display: "Course Content"
     discussion_description: "New discussion topic in your course"
     discussion_display: Discussion
-    discussion_entry_description: "New discussion post in a topic you've participated in"
-    discussion_entry_display: "Discussion Entry"
+    discussion_post_description: "New discussion post in a topic you're subscribed to"
+    discussion_post_display: "Discussion Post"
     due_date_description: "Assignment due date change"
     due_date_display: "Due Date"
     files_description: "New file added to your course"
@@ -9029,7 +9138,7 @@ en:
       description: "App Center for tracking/installing external tools in Canvas"
       name: "App Center"
     app_center_settings: 
-      description: "App Center will appear in the \"External Tools\" tab on the setings page of either a course or account. The URL provided below should point to a valid App Center endpoint (for example, https://lti-examples.heroku.com -- be sure to omit the trailing slash)"
+      description: "App Center will appear in the \"Apps\" tab on the setings page of either a course or account. The URL provided below should point to a valid App Center endpoint (for example, https://lti-examples.heroku.com -- be sure to omit the trailing slash)"
       labels: 
         app_reviews_endpoint: "App Show Endpoint"
         apps_index_endpoint: "Apps Index Endpoint"
@@ -9055,6 +9164,7 @@ en:
       domain_description: "**hostname** or **ip address** of your BigBlueButton installation (e.g. bigbluebutton.mycompany.com)"
       labels: 
         domain: Domain
+        recording_enabled: "Allow conferences to be recorded."
         secret: Secret
       secret_description: "This is the %{parameter_name} parameter that can be found in the %{filename} config file."
     buttons: 
@@ -9282,6 +9392,8 @@ en:
     sessions_timeout: 
       labels: 
         session_timeout: "Time before session expires in minutes (20 minimum)"
+    settings_header: 
+      select_account_prompt: "(Select Account)"
     show: 
       back_to_list: "Return to plugins list"
       labels: 
@@ -9369,8 +9481,6 @@ en:
         token_never_expires: never
       titles: 
         delete_this_token: "Delete this Token"
-    alerts: 
-      profile_picture_locked: "Your profile picture has been locked by an administrator, and cannot be changed."
     buttons: 
       add_file: "Add File"
       adding_file: "Adding File..."
@@ -9405,16 +9515,12 @@ en:
       confirmation_failed: "Confirmation failed.  Please try again."
       generating_token_failed: "Generating Token Failed"
       invalid_old_passowrd: "Invalid old password for the login %{pseudonym}"
-      loading_images_failed: "Loading Images Failed, please try again"
       profile_update_failed: "Login failed to update"
       regenerating_token_failed: "Regenerating Token Failed"
       registration_failed: "Registration failed. Check the user name and password, and try again."
-      selecting_image_failed: "Selecting image failed, please try again"
     facebook_select: 
       facebook: Facebook
     failed_resending: "Request failed. Try again."
-    headers: 
-      loading_images: "Loading Images..."
     links: 
       resend_confirmation: "Re-Send Confirmation"
       resend_confirmation_failed: "Request failed. Try again."
@@ -9628,6 +9734,14 @@ en:
     ways_to_contact_me: "Ways to contact me"
     you_have_no_services: "You haven't registered any services, you can add some on the *settings* page."
   profiles: 
+    avatar_dialog: 
+      butons: 
+        add_picture_file: "Add File"
+      headers: 
+        loading_images: "Loading Images..."
+      links: 
+        upload_new_image: "Upload a new Image"
+      profile_pictures: "Select the image you would like to use as your profile, or upload a new image:"
     notification_preferences: 
       captions: 
         notification_preferences: "%{name} notification events and settings"
@@ -9678,7 +9792,6 @@ en:
       buttons: 
         request_password: "Request Password"
       dont_know_password: "I don't know my password"
-      log_in_to_canvas: "Log In To Canvas"
       login: Login
       login_handle: "Enter your %{login_handle_name} and we'll send you a link to change your password."
       password: Password
@@ -9703,6 +9816,15 @@ en:
       labels: 
         remember_access: "Remember my authorization for this service"
       page_title: "App Login"
+    oauth2_confirm_mobile: 
+      cancel: Cancel
+      details: 
+        allow_application: "%{app_name} is requesting access to your account."
+        email: "Your email address is %{email}."
+        login_name: "You are logging into this app as %{user_name}."
+      login: "Log In"
+      page_title: "App Login"
+      remember_auth: "Remember my authorization for this service"
     otp_login: 
       buttons: 
         send: Send
@@ -10959,6 +11081,7 @@ en:
     updating: Updating...
   rubric: 
     context_name_rubric: "%{course_name} Rubric"
+    no_context_found: "The external Rubric couldn't be found for \"%{title}\", creating a copy."
     no_description: "No Description"
     unknown_details: "Unknown Details"
   rubric_assessment: 
@@ -12647,6 +12770,9 @@ en:
       no_title: "No title"
       titles: 
         select_folder_for_uploads: "Select folder for file uploads"
+    wiki_page_buttons: 
+      buttons: 
+        new_page: "New Page"
   wiki_page: 
     atom_author: "Wiki Page"
     atom_entry_title: "Wiki Page, %{course_or_group_name}: %{page_title}"
@@ -12737,6 +12863,9 @@ en:
       page_updated: "Page was successfully updated."
     page_link: 
       link_hidden_from_students_warning: "Students won't see this link"
+    pages_index: 
+      titles: 
+        pages: "Pages - %{course}"
     wiki_page_comment: 
       links: 
         delete_comment: "Delete Comment"

@@ -14,10 +14,13 @@ define [
   # DiscussionTopicsCollection().fetch() it will go to
   # /api/v1/courses/1/discussion_topics (since ENV.context_asset_string will
   # be already set)
-  _defaultUrl: ->
+  _contextPath: ->
     assetString = @contextAssetString || ENV.context_asset_string
+    [contextType, contextId] = splitAssetString assetString
+    "#{contextType}/#{contextId}"
+
+  _defaultUrl: ->
     resourceName = @resourceName || @model::resourceName
     throw new Error "Must define a `resourceName` property on collection or model prototype to use defaultUrl" unless resourceName
-    [contextType, contextId] = splitAssetString assetString
-    "/api/v1/#{contextType}/#{contextId}/#{resourceName}"
+    "/api/v1/#{@_contextPath()}/#{resourceName}"
 

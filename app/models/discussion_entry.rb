@@ -78,7 +78,7 @@ class DiscussionEntry < ActiveRecord::Base
 
   set_broadcast_policy do |p|
     p.dispatch :new_discussion_entry
-    p.to { posters - [user] }
+    p.to { subscribers - [user] }
     p.whenever { |record|
       record.just_created && record.active?
     }
@@ -152,6 +152,10 @@ class DiscussionEntry < ActiveRecord::Base
     self.discussion_topic.posters rescue [self.user]
   end
 
+  def subscribers
+    subscribed_users = self.discussion_topic.subscribers
+  end
+
   def plaintext_message=(val)
     self.message = format_message(val).first
   end
@@ -175,6 +179,7 @@ class DiscussionEntry < ActiveRecord::Base
     save!
     update_topic_submission
     decrement_unread_counts_for_this_entry
+    update_topic_subscription
   end
 
   def update_discussion
@@ -219,6 +224,13 @@ class DiscussionEntry < ActiveRecord::Base
         DiscussionTopicParticipant.where(:discussion_topic_id => self.discussion_topic_id, :user_id => users).
             update_all('unread_entry_count = unread_entry_count - 1')
       end
+    end
+  end
+
+  def update_topic_subscription
+    discussion_topic.user_ids_who_have_posted_and_admins(true) # pesky memoization
+    unless discussion_topic.user_can_see_posts?(user)
+      discussion_topic.unsubscribe(user)
     end
   end
 
@@ -377,8 +389,10 @@ class DiscussionEntry < ActiveRecord::Base
           new_count = self.discussion_topic.unread_count(self.user) - 1
           topic_participant = self.discussion_topic.discussion_topic_participants.create(:user => self.user,
                                                                                          :unread_entry_count => new_count,
-                                                                                         :workflow_state => "unread")
+                                                                                         :workflow_state => "unread",
+                                                                                         :subscribed => self.discussion_topic.subscribed?(self.user))
         end
+        self.discussion_topic.subscribe(self.user)
       end
     end
   end

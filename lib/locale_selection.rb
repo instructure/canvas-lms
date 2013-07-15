@@ -70,7 +70,7 @@ module LocaleSelection
     best_locales.first && best_locales.first.first
   end
 
-  # gives you a hash of localized locales, e.g. {:en => "English", :es => "Español" }
+  # gives you a hash of localized locales, e.g. {"en" => "English", "es" => "Español" }
   # if the locale name is not yet translated, it won't be included (even if
   # there are other translations for that locale)
   def available_locales

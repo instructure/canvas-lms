@@ -582,18 +582,77 @@ describe AssignmentOverride do
     end
   end
 
-  describe "recompute_submission_lateness" do
-    it "is called in a delayed job when due_at changes" do
-      override = assignment_override_model
-      override.override_due_at(5.days.from_now)
-      override.expects(:send_later_if_production).with(:recompute_submission_lateness)
-      override.save
+  describe "updating cached due dates" do
+    before do
+      @override = assignment_override_model
+      @override.override_due_at(3.days.from_now)
+      @override.save
     end
 
-    it "is not called when due_at doesn't change" do
-      override = assignment_override_model
-      override.expects(:send_later_if_production).with(:recompute_submission_lateness).never
-      override.save
+    it "triggers when applicable override is created" do
+      DueDateCacher.expects(:recompute).with(@assignment)
+      new_override = @assignment.assignment_overrides.build
+      new_override.title = 'New Override'
+      new_override.override_due_at(3.days.from_now)
+      new_override.save!
+    end
+
+    it "triggers when overridden due_at changes" do
+      DueDateCacher.expects(:recompute).with(@assignment)
+      @override.override_due_at(5.days.from_now)
+      @override.save
+    end
+
+    it "triggers when overridden due_at changes to nil" do
+      DueDateCacher.expects(:recompute).with(@assignment)
+      @override.override_due_at(nil)
+      @override.save
+    end
+
+    it "triggers when due_at_overridden changes" do
+      DueDateCacher.expects(:recompute).with(@assignment)
+      @override.clear_due_at_override
+      @override.save
+    end
+
+    it "triggers when applicable override deleted" do
+      DueDateCacher.expects(:recompute).with(@assignment)
+      @override.destroy
+    end
+
+    it "triggers when applicable override undeleted" do
+      @override.destroy
+
+      DueDateCacher.expects(:recompute).with(@assignment)
+      @override.workflow_state = 'active'
+      @override.save
+    end
+
+    it "does not trigger when non-applicable override is created" do
+      DueDateCacher.expects(:recompute).never
+      @assignment.assignment_overrides.create
+    end
+
+    it "does not trigger when non-applicable override deleted" do
+      @override.clear_due_at_override
+      @override.save
+
+      DueDateCacher.expects(:recompute).never
+      @override.destroy
+    end
+
+    it "does not trigger when non-applicable override undeleted" do
+      @override.clear_due_at_override
+      @override.destroy
+
+      DueDateCacher.expects(:recompute).never
+      @override.workflow_state = 'active'
+      @override.save
+    end
+
+    it "does not trigger when nothing changed" do
+      DueDateCacher.expects(:recompute).never
+      @override.save
     end
   end
 

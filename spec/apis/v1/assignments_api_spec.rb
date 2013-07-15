@@ -58,9 +58,9 @@ describe AssignmentsApiController, :type => :integration do
       override.title = "I am overridden and being returned in the API!"
       override.set = @section
       override.set_type = 'CourseSection'
-      override.due_at = Time.now + 2.days
-      override.unlock_at = Time.now + 1.days
-      override.lock_at = Time.now + 3.days
+      override.due_at = Time.zone.now + 2.days
+      override.unlock_at = Time.zone.now + 1.days
+      override.lock_at = Time.zone.now + 3.days
       override.due_at_overridden = true
       override.lock_at_overridden = true
       override.unlock_at_overridden = true
@@ -161,6 +161,41 @@ describe AssignmentsApiController, :type => :integration do
           ]
         }
       ]
+    end
+
+    it "should return learning outcome info with rubric criterions if available" do
+      course_with_teacher(:active_all => true)
+      @group = @course.assignment_groups.create!({:name => "some group"})
+      @assignment = @course.assignments.create!(:title => "some assignment",
+                                                :assignment_group => @group,
+                                                :points_possible => 12)
+      @assignment.update_attribute(:submission_types,
+                                   "online_upload,online_text_entry,online_url,media_recording")
+
+      criterion = valid_rubric_attributes[:data].first
+      @outcome = @course.created_learning_outcomes.build(
+          :title => "My Outcome",
+          :description => "Description of my outcome",
+          :vendor_guid => "vendorguid9000"
+      )
+      @outcome.rubric_criterion = criterion
+      @outcome.save!
+
+      rubric_data = [criterion.merge({:learning_outcome_id => @outcome.id})]
+
+      @rubric = rubric_model(:user => @user,
+                             :context => @course,
+                             :data => rubric_data,
+                             :points_possible => 12,
+                             :free_form_criterion_comments => true)
+
+      @assignment.create_rubric_association(:rubric => @rubric,
+                                            :purpose => 'grading',
+                                            :use_for_grading => true)
+      json = api_get_assignments_index_from_course(@course)
+
+      json.first['rubric'].first["outcome_id"].should == @outcome.id
+      json.first['rubric'].first["vendor_guid"].should == "vendorguid9000"
     end
 
     it "should exclude deleted assignments in the list return" do
@@ -1005,6 +1040,8 @@ describe AssignmentsApiController, :type => :integration do
           'delayed_post_at' => nil,
           'lock_at' => nil,
           'user_name' => @topic.user_name,
+          'pinned' => !!@topic.pinned,
+          'position' => @topic.position,
           'topic_children' => [],
           'locked' => false,
           'locked_for_user' => false,
@@ -1013,6 +1050,7 @@ describe AssignmentsApiController, :type => :integration do
           'podcast_has_student_posts' => nil,
           'read_state' => 'unread',
           'unread_count' => 0,
+          'subscribed' => @topic.subscribed?(@user),
           'url' =>
             "http://www.example.com/courses/#{@course.id}/discussion_topics/#{@topic.id}",
           'html_url' =>

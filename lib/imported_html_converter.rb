@@ -64,9 +64,7 @@ class ImportedHtmlConverter
             type_for_url = type
             type = 'context_modules' if type == 'modules'
             if type == 'wiki'
-              if page = context.wiki.wiki_pages.find_by_url(migration_id)
-                new_url = URI::escape("#{course_path}/wiki/#{page.url}")
-              end
+              new_url = URI::escape("#{course_path}/wiki/#{migration_id}")
             elsif type == 'attachments'
               if att = context.attachments.find_by_migration_id(migration_id)
                 new_url = URI::escape("#{course_path}/files/#{att.id}/preview")

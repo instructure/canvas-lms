@@ -600,6 +600,61 @@ describe DiscussionTopic do
 
   end
 
+  context "subscribers" do
+    before :each do
+      course_with_student(:active_all => true)
+      @context = @course
+      discussion_topic_model(:user => @teacher)
+    end
+
+    it "should automatically include the author" do
+      @topic.subscribers.should include(@teacher)
+    end
+
+    it "should not include the author if they unsubscribe" do
+      @topic.unsubscribe(@teacher)
+      @topic.subscribers.should_not include(@teacher)
+    end
+
+    it "should automatically include posters" do
+      @topic.reply_from(:user => @student, :text => "entry")
+      @topic.subscribers.should include(@student)
+    end
+
+    it "should include users that have posted entries before subscriptions were added" do
+      @topic.reply_from(:user => @student, :text => "entry")
+      participant = @topic.update_or_create_participant(current_user: @student, subscribed: nil)
+      participant.subscribed.should be_nil
+      @topic.subscribers.map(&:id).should include(@student.id)
+    end
+
+    it "should not include posters if they unsubscribe" do
+      @topic.reply_from(:user => @student, :text => "entry")
+      @topic.unsubscribe(@student)
+      @topic.subscribers.should_not include(@student)
+    end
+
+    it "should resubscribe unsubscribed users if they post" do
+      @topic.reply_from(:user => @student, :text => "entry")
+      @topic.unsubscribe(@student)
+      @topic.reply_from(:user => @student, :text => "another entry")
+      @topic.subscribers.should include(@student)
+    end
+
+    it "should include users who subscribe" do
+      @topic.subscribe(@student)
+      @topic.subscribers.should include(@student)
+    end
+
+    it "should not include anyone no longer in the course" do
+      @topic.subscribe(@student)
+      @topic2 = @course.discussion_topics.create!(:title => "student topic", :message => "I'm outta here", :user => @student)
+      @student.enrollments.first.destroy
+      @topic.subscribers.should_not include(@student)
+      @topic2.subscribers.should_not include(@student)
+    end
+  end
+  
   context "posters" do
     before :each do
       @teacher = course_with_teacher(:active_all => true).user
@@ -893,6 +948,96 @@ describe DiscussionTopic do
       @stream_item = @topic.stream_item
       @stream_item.stream_item_instances.detect{|sii| sii.user_id == @teacher.id}.should be_unread
       @stream_item.stream_item_instances.detect{|sii| sii.user_id == @student.id}.should be_read
+    end
+  end
+
+  context "subscribing" do
+    before :each do
+      course_with_student(:active_all => true)
+      @context = @course
+      discussion_topic_model(:user => @teacher)
+    end
+    
+    it "should allow subscription" do
+      @topic.subscribed?(@student).should be_false
+      @topic.subscribe(@student)
+      @topic.subscribed?(@student).should be_true
+    end
+
+    it "should allow unsubscription" do
+      @topic.subscribed?(@teacher).should be_true
+      @topic.unsubscribe(@teacher)
+      @topic.subscribed?(@teacher).should be_false
+    end
+    
+    it "should be idempotent" do
+      @topic.subscribed?(@student).should be_false
+      @topic.unsubscribe(@student)
+      @topic.subscribed?(@student).should be_false
+    end
+    
+    it "should assume the author is subscribed" do
+      @topic.subscribed?(@teacher).should be_true
+    end
+
+    it "should assume posters are subscribed" do
+      @topic.reply_from(:user => @student, :text => 'first post!')
+      @topic.subscribed?(@student).should be_true
+    end
+
+    context "when initial_post_required" do
+      it "should unsubscribe a user when all of their posts are deleted" do
+        @topic.require_initial_post = true
+        @topic.save!
+        @entry = @topic.reply_from(:user => @student, :text => 'first post!')
+        @topic.subscribed?(@student).should be_true
+        @entry.destroy
+        @topic.subscribed?(@student).should be_false
+      end
+    end
+  end
+
+  context "a group topic subscription" do
+
+    before(:each) do
+      group_discussion_assignment
+      course_with_student(active_all: true)
+    end
+
+    it "should return true if the user is subscribed to a child topic" do
+      @topic.child_topics.first.subscribe(@student)
+      @topic.child_topics.first.subscribed?(@student).should be_true
+      @topic.subscribed?(@student).should be_true
+    end
+
+    it "should return true if the user has posted to a child topic" do
+      child_topic = @topic.child_topics.first
+      child_topic.context.add_user(@student)
+      child_topic.reply_from(:user => @student, :text => "post")
+      child_topic_participant = child_topic.update_or_create_participant(:current_user => @student, :subscribed => nil)
+      child_topic_participant.subscribed.should be_nil
+      @topic.subscribed?(@student).should be_true
+    end
+
+    it "should subscribe a group user to the child topic" do
+      child_one, child_two = @topic.child_topics
+      child_one.context.add_user(@student)
+      @topic.subscribe(@student)
+
+      child_one.subscribed?(@student).should be_true
+      child_two.subscribed?(@student).should_not be_true
+      @topic.subscribed?(@student).should be_true
+    end
+
+    it "should unsubscribe a group user from the child topic" do
+      child_one, child_two = @topic.child_topics
+      child_one.context.add_user(@student)
+      @topic.subscribe(@student)
+      @topic.unsubscribe(@student)
+
+      child_one.subscribed?(@student).should_not be_true
+      child_two.subscribed?(@student).should_not be_true
+      @topic.subscribed?(@student).should_not be_true
     end
   end
 

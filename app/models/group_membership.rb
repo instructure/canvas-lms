@@ -35,6 +35,7 @@ class GroupMembership < ActiveRecord::Base
   after_save :ensure_mutually_exclusive_membership
   after_save :touch_groups
   after_save :check_auto_follow_group
+  after_save :update_cached_due_dates
   after_destroy :touch_groups
   after_destroy :check_auto_follow_group
   
@@ -135,6 +136,14 @@ class GroupMembership < ActiveRecord::Base
     elsif self.destroyed? || (self.workflow_state_changed? && self.deleted?)
       user_follow = self.user.shard.activate { self.user.user_follows.where(:followed_item_id => self.group_id, :followed_item_type => 'Group').first }
       user_follow.try(:destroy)
+    end
+  end
+
+  def update_cached_due_dates
+    if workflow_state_changed? && group.try(:group_category)
+      group.group_category.assignments.each do |assignment|
+        DueDateCacher.recompute(assignment)
+      end
     end
   end
   

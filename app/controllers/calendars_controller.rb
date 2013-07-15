@@ -30,7 +30,9 @@ class CalendarsController < ApplicationController
       return redirect_to(calendar_url_for([@context]))
     end
     get_all_pertinent_contexts(true) # passing true has it return groups too.
-    if params[:event_id]
+    # somewhere there's a bad link that doesn't separate parameters properly.
+    # make sure we don't do a find on a non-numeric id.
+    if params[:event_id] && params[:event_id] =~ Api::ID_REGEX
       event = CalendarEvent.find_by_id(params[:event_id])
       event = nil if event && event.start_at.nil?
       @active_event_id = event.id if event
@@ -66,7 +68,9 @@ class CalendarsController < ApplicationController
     @manage_contexts = @contexts.select{|c| c.grants_right?(@current_user, session, :manage_calendar) }.map(&:asset_string)
     @feed_url = feeds_calendar_url((@context_enrollment || @context).feed_code)
     @selected_contexts = params[:include_contexts].split(",") if params[:include_contexts]
-    if params[:event_id] && (event = CalendarEvent.find_by_id(params[:event_id])) && event.start_at
+    # somewhere there's a bad link that doesn't separate parameters properly.
+    # make sure we don't do a find on a non-numeric id.
+    if params[:event_id] && params[:event_id] =~ Api::ID_REGEX && (event = CalendarEvent.find_by_id(params[:event_id])) && event.start_at
       @active_event_id = event.id
       @view_start = event.start_at.in_time_zone.strftime("%Y-%m-%d")
     end

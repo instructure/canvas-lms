@@ -534,7 +534,6 @@ describe FilesController do
       json['upload_url'].should_not be_nil
       json['upload_params'].should_not be_nil
       json['upload_params'].should_not be_empty
-      json['remote_url'].should eql(false)
     end
 
     it "should create file placeholder (in s3 mode)" do
@@ -553,7 +552,6 @@ describe FilesController do
       json['upload_url'].should_not be_nil
       json['upload_params'].should be_present
       json['upload_params']['AWSAccessKeyId'].should == 'stub_id'
-      json['remote_url'].should eql(true)
     end
 
     it "should not allow going over quota for file uploads" do
@@ -588,7 +586,6 @@ describe FilesController do
       json['upload_url'].should_not be_nil
       json['upload_params'].should be_present
       json['upload_params']['AWSAccessKeyId'].should == 'stub_id'
-      json['remote_url'].should eql(true)
     end
 
     it "should associate assignment submission for a group assignment with the group" do
@@ -639,7 +636,6 @@ describe FilesController do
         json['upload_url'].should_not be_nil
         json['upload_params'].should_not be_nil
         json['upload_params'].should_not be_empty
-        json['remote_url'].should eql(false)
       end
     end
   end

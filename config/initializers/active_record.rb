@@ -465,15 +465,18 @@ class ActiveRecord::Base
     Canvas::TempTable.new(connection, construct_finder_sql({}), options)
   end
 
-  def self.find_in_batches_with_temp_table(options = {})
-    generate_temp_table(options).execute! do |table|
-      table.find_in_batches(options) { |batch| yield batch }
+  def self.find_in_batches_with_temp_table(options = {}, &block)
+    temptable = generate_temp_table(options)
+    with_exclusive_scope do
+      temptable.execute do |table|
+        table.find_in_batches(options, &block)
+      end
     end
   end
 
-  def self.find_each_with_temp_table(options = {})
+  def self.find_each_with_temp_table(options = {}, &block)
     find_in_batches_with_temp_table(options) do |batch|
-      batch.each { |record| yield record }
+      batch.each(&block)
     end
     self
   end
@@ -899,6 +902,11 @@ if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
 
       execute "CREATE #{index_type} INDEX #{concurrently}#{quote_column_name(index_name)} ON #{quote_table_name(table_name)} (#{quoted_column_names})#{conditions}"
     end
+
+    def set_standard_conforming_strings_with_version_check
+      set_standard_conforming_strings_without_version_check unless postgresql_version >= 90100
+    end
+    alias_method_chain :set_standard_conforming_strings, :version_check
   end
 
 end

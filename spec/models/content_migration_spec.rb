@@ -128,7 +128,6 @@ describe ContentMigration do
       @copy_from.is_public = false
       @copy_from.name = "haha copy from test &amp;"
       @copy_from.course_code = 'something funny'
-      @copy_from.publish_grades_immediately = false
       @copy_from.allow_student_wiki_edits = true
       @copy_from.show_public_context_messages = false
       @copy_from.allow_student_forum_attachments = false
@@ -630,6 +629,38 @@ describe ContentMigration do
       new_lo.short_description.should == hash["title"]
     end
 
+    it "should create rubrics in new course if external context not found" do
+      hash = {
+              "reusable"=>false,
+              "public"=>false,
+              "hide_score_total"=>nil,
+              "free_form_criterion_comments"=>nil,
+              "points_possible"=>nil,
+              "data"=>[{"id"=>"1",
+                        "description"=>"Outcome row",
+                        "long_description"=>nil,
+                        "points"=>3,
+                        "mastery_points"=>nil,
+                        "title"=>"Outcome row",
+                        "ratings"=>[{"description"=>"Rockin'",
+                                     "id"=>"2",
+                                     "criterion_id"=>"1", "points"=>3}]}],
+              "read_only"=>false,
+              "description"=>nil,
+              "external_identifier"=>"0",
+              "title"=>"root rubric",
+              "migration_id"=>"id1072dcf40e801c6468d9eaa5774e56d"}
+
+      @cm.outcome_to_id_map = {}
+      Rubric.import_from_migration(hash, @cm)
+
+      @cm.warnings.should == ["The external Rubric couldn't be found for \"root rubric\", creating a copy."]
+
+      new_rubric = @copy_to.rubrics.first
+      new_rubric.id.should_not == 0
+      new_rubric.title.should == hash["title"]
+    end
+
     it "should link rubric (and assignments) to outcomes" do 
       root_group = LearningOutcomeGroup.create!(:title => "contextless group")
       
@@ -674,6 +705,34 @@ describe ContentMigration do
       to_rub.data[0]["learning_outcome_id"].should == lo.id
       to_rub.learning_outcome_alignments.map(&:learning_outcome_id).sort.should == [lo.id, new_lo2.id].sort
       to_assign.learning_outcome_alignments.map(&:learning_outcome_id).sort.should == [lo.id, new_lo2.id].sort
+    end
+
+    it "should link assignments to account rubrics and outcomes" do
+      account = @copy_from.account
+      lo = create_outcome(account)
+
+      rub = Rubric.new(:context => account)
+      rub.data = [
+          {
+              :points => 3,
+              :description => "Outcome row",
+              :id => 1,
+              :ratings => [{:points => 3,:description => "Rockin'",:criterion_id => 1,:id => 2}],
+              :learning_outcome_id => lo.id
+          }
+      ]
+      rub.alignments_changed = true
+      rub.save!
+
+      from_assign = @copy_from.assignments.create!(:title => "some assignment")
+      rub.associate_with(from_assign, @copy_from, :purpose => "grading")
+
+      run_course_copy
+
+      to_assign = @copy_to.assignments.first
+      to_assign.rubric.should == rub
+
+      to_assign.learning_outcome_alignments.map(&:learning_outcome_id).should == [lo.id].sort
     end
 
     it "should copy a quiz when assignment is selected" do
@@ -805,6 +864,8 @@ describe ContentMigration do
 
     it "should copy discussion topic attributes" do
       topic = @copy_from.discussion_topics.create!(:title => "topic", :message => "<p>bloop</p>", :discussion_type => "threaded")
+      topic.posted_at = 2.days.ago
+      topic.save!
 
       run_course_copy
 
@@ -813,6 +874,9 @@ describe ContentMigration do
 
       attrs = ["title", "message", "discussion_type", "type"]
       topic.attributes.slice(*attrs).should == new_topic.attributes.slice(*attrs)
+
+      new_topic.last_reply_at.to_i.should == new_topic.posted_at.to_i
+      topic.posted_at.to_i.should == new_topic.posted_at.to_i
     end
 
     it "should copy a discussion topic when assignment is selected" do
@@ -957,6 +1021,23 @@ describe ContentMigration do
       new_attachment.full_path.should == "course files/dummy.txt"
       new_attachment.folder.should == to_root
       @copy_to.syllabus_body.should == %{<a href="/courses/#{@copy_to.id}/files/#{new_attachment.id}/download?wrap=1">link</a>}
+    end
+
+    it "should copy files into the correct folders when the folders share the same name" do
+      root = Folder.root_folders(@copy_from).first
+      f1 = root.sub_folders.create!(:name => "folder", :context => @copy_from)
+      f2 = f1.sub_folders.create!(:name => "folder", :context => @copy_from)
+
+      atts = []
+      atts << Attachment.create!(:filename => 'dummy1.txt', :uploaded_data => StringIO.new('fakety'), :folder => f2, :context => @copy_from)
+      atts << Attachment.create!(:filename => 'dummy2.txt', :uploaded_data => StringIO.new('fakety'), :folder => f1, :context => @copy_from)
+
+      run_course_copy
+
+      atts.each do |att|
+        new_att = @copy_to.attachments.find_by_migration_id(mig_id(att))
+        new_att.full_path.should == att.full_path
+      end
     end
 
     it "should add a warning instead of failing when trying to copy an invalid file" do

@@ -23,7 +23,9 @@ require [
   'compiled/views/content_migrations/subviews/DaySubstitutionView'
   'jst/content_migrations/ProgressingContentMigrationCollection'
   'vendor/jquery.ba-tinypubsub'
-], ($, ProgressingContentMigrationCollection, ContentMigrationModel, DaySubstitutionCollection, CollectionView, PaginatedCollectionView, ProgressingContentMigrationView, MigrationConverterView, CommonCartridgeView, ConverterViewControl, ZipFilesView, CopyCourseView, MoodleZipView, CanvasExportView, QTIZipView, ChooseMigrationFileView, FolderPickerView, SelectContentCheckboxView, QuestionBankView, CourseFindSelectView, DateShiftView, DaySubView, progressingMigrationCollectionTemplate, pubsub) ->
+  'jst/content_migrations/subviews/DaySubstitutionCollection'
+  'compiled/views/content_migrations/subviews/OverwriteAssessmentContentView'
+], ($, ProgressingContentMigrationCollection, ContentMigrationModel, DaySubstitutionCollection, CollectionView, PaginatedCollectionView, ProgressingContentMigrationView, MigrationConverterView, CommonCartridgeView, ConverterViewControl, ZipFilesView, CopyCourseView, MoodleZipView, CanvasExportView, QTIZipView, ChooseMigrationFileView, FolderPickerView, SelectContentCheckboxView, QuestionBankView, CourseFindSelectView, DateShiftView, DaySubView, progressingMigrationCollectionTemplate, pubsub, daySubCollectionTemplate, OverwriteAssessmentContentView) ->
   ConverterViewControl.setModel new ContentMigrationModel 
                                  course_id: ENV.COURSE_ID
                                  daySubCollection: daySubCollection
@@ -33,6 +35,7 @@ require [
                                  collection: daySubCollection
                                  emptyTemplate: -> "No Day Substitutions Added"
                                  itemView: DaySubView
+                                 template: daySubCollectionTemplate
 
   progressingMigCollection  = new ProgressingContentMigrationCollection null,
                                  course_id: ENV.COURSE_ID
@@ -57,7 +60,6 @@ require [
   # Migration has now started and is being processed at this point. 
   $.subscribe 'migrationCreated', (migrationModelData) -> 
     progressingMigCollection.add migrationModelData
-
 
   # Registers any subviews with any changes that happen 
   # when selecting a converter. Give it the value to
@@ -104,6 +106,11 @@ require [
                                    model: ConverterViewControl.getModel()
                                    questionBanks: ENV.QUESTION_BANKS
 
+            dateShift:        new DateShiftView
+                                model: ConverterViewControl.getModel()
+                                collection: daySubCollection
+                                daySubstitution: daySubCollectionView
+
   ConverterViewControl.register
     key: 'canvas_cartridge_importer'
     view: new CanvasExportView
@@ -112,6 +119,11 @@ require [
                                    fileSizeLimit: ENV.UPLOAD_LIMIT
 
             selectContent:       new SelectContentCheckboxView(model: ConverterViewControl.getModel())
+
+            dateShift:        new DateShiftView
+                                model: ConverterViewControl.getModel()
+                                collection: daySubCollection
+                                daySubstitution: daySubCollectionView
 
   ConverterViewControl.register
     key: 'common_cartridge_importer'
@@ -126,6 +138,11 @@ require [
                                    questionBanks: ENV.QUESTION_BANKS
                                    model: ConverterViewControl.getModel()
 
+            dateShift:        new DateShiftView
+                                model: ConverterViewControl.getModel()
+                                collection: daySubCollection
+                                daySubstitution: daySubCollectionView
+
   ConverterViewControl.register
     key: 'qti_converter'
     view: new QTIZipView
@@ -133,4 +150,6 @@ require [
                                    model: ConverterViewControl.getModel()
                                    fileSizeLimit: ENV.UPLOAD_LIMIT
 
+            overwriteAssessmentContent: new OverwriteAssessmentContentView(model: ConverterViewControl.getModel())
             questionBank:        new QuestionBankView(questionBanks: ENV.QUESTION_BANKS)
+

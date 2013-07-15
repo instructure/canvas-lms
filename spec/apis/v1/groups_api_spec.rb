@@ -524,6 +524,16 @@ describe "Groups API", :type => :integration do
   end
 
   context "users" do
+    let(:api_url) { "/api/v1/groups/#{@community.id}/users.json" }
+    let(:api_route) do
+      {
+          :controller => 'groups',
+          :action => 'users',
+          :group_id => @community.to_param,
+          :format => 'json'
+      }
+    end
+
     it "should return users in a group" do
       expected_keys = %w{id name sortable_name short_name}
       json = api_call(:get, "/api/v1/groups/#{@community.id}/users",
@@ -540,6 +550,24 @@ describe "Groups API", :type => :integration do
       raw_api_call(:get, "/api/v1/groups/#{@community.id}/users",
                          { :controller => 'groups', :action => 'users', :group_id => @community.to_param, :format => 'json' })
       response.code.should == '401'
+    end
+
+    it "returns an error when search_term is fewer than 3 characters" do
+      json = api_call(:get, api_url, api_route, {:search_term => '12'}, {}, :expected_status => 400)
+      json["status"].should == "argument_error"
+      json["message"].should == "search_term of 3 or more characters is required"
+    end
+
+    it "returns a list of users" do
+      expected_keys = %w{id name sortable_name short_name}
+
+      json = api_call(:get, api_url, api_route, {:search_term => 'value'})
+
+      json.count.should == 1
+      json.each do |user|
+        (user.keys & expected_keys).sort.should == expected_keys.sort
+        @community.users.map(&:id).should include(user['id'])
+      end
     end
   end
 

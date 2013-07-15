@@ -77,6 +77,7 @@ require [
     collection: users
     roles: ENV.ALL_ROLES
     permissions: ENV.permissions
+    course: ENV.course
 
   @app.render()
   @app.$el.appendTo $('#content')

@@ -297,6 +297,24 @@ describe "profile" do
       end
       Attachment.last.folder.should == @user.profile_pics_folder
     end
+
+    it "should allow users to choose an avatar from their profile page" do
+      course_with_teacher_logged_in
+
+      account = Account.default
+      account.enable_service('avatars')
+      account.settings[:enable_profiles] = true
+      account.save!
+
+      get "/about/#{@user.to_param}"
+      wait_for_ajaximations
+
+      f('.profile-link').click
+
+      wait_for_ajaximations
+
+      f('#profile_pic_dialog').should_not be_nil
+    end
   end
 
   describe "profile pictures s3 tests" do

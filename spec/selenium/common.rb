@@ -1060,20 +1060,25 @@ shared_examples_for "in-process server selenium tests" do
   before do
     if self.use_transactional_fixtures
       @db_connection = ActiveRecord::Base.connection
+      @dj_connection = Delayed::Backend::ActiveRecord::Job.connection
 
       # synchronize the execute method for a modicum of thread safety
-      if !@db_connection.respond_to?(:execute_without_synchronization)
-        @db_connection.class.class_eval do
-          def execute_with_synchronization(*args)
-            @mutex ||= Mutex.new
-            @mutex.synchronize { execute_without_synchronization(*args) }
-          end
+      [@db_connection, @dj_connection].each do |conn|
+        if !conn.respond_to?(:execute_without_synchronization)
+          conn.class.class_eval do
+            def execute_with_synchronization(*args)
+              @mutex ||= Mutex.new
+              @mutex.synchronize { execute_without_synchronization(*args) }
+            end
 
-          alias_method_chain :execute, :synchronization
+            alias_method_chain :execute, :synchronization
+          end
         end
       end
 
       ActiveRecord::ConnectionAdapters::ConnectionPool.any_instance.stubs(:connection).returns(@db_connection)
+      Delayed::Backend::ActiveRecord::Job.stubs(:connection).returns(@dj_connection)
+      Delayed::Backend::ActiveRecord::Job::Failed.stubs(:connection).returns(@dj_connection)
     end
   end
 end

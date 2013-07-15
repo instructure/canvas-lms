@@ -82,6 +82,7 @@
       <xs:element name="assignment_group_identifierref" type="xs:string" minOccurs="0"/>
       <xs:element name="grading_standard_identifierref" type="xs:string" minOccurs="0"/>
       <xs:element name="rubric_identifierref" type="xs:string" minOccurs="0"/>
+      <xs:element name="rubric_external_identifier" type="xs:string" minOccurs="0"/>
       <xs:element name="rubric_use_for_grading" type="xs:boolean" minOccurs="0"/>
       <xs:element name="rubric_hide_score_total" type="xs:boolean" minOccurs="0"/>
       <xs:element name="quiz_identifierref" type="xs:string" minOccurs="0"/>
@@ -388,6 +389,7 @@
               <xs:element name="points_possible" type="xs:float" minOccurs="0"/>
               <xs:element name="hide_score_total" type="xs:boolean" minOccurs="0"/>
               <xs:element name="free_form_criterion_comments" type="xs:boolean" minOccurs="0"/>
+              <xs:element name="external_identifier" type="xs:string" minOccurs="0"/>
 
               <xs:element name="criteria">
                 <xs:complexType>

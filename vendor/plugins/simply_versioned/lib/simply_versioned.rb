@@ -149,7 +149,7 @@ module SoftwareHeretics
         end
         
         def unversioned?
-          self.versions.nil? || self.versions.size == 0
+          self.versions.nil? || !self.versions.exists?
         end
         
         def versioned?
@@ -166,10 +166,8 @@ module SoftwareHeretics
         def version_number
           if @simply_versioned_version_number
             @simply_versioned_version_number
-          elsif self.versions.empty?
-            0
           else
-            self.versions.current.number
+            self.versions.maximum(:number) || 0
           end
         end
 

@@ -316,10 +316,25 @@ describe ExternalToolsController, :type => :integration do
      "custom_fields"=>{"key1"=>"val1", "key2"=>"val2"},
      "description"=>"For testing stuff",
      "user_navigation"=>
-             {"text"=>"User nav", "url"=>"http://www.example.com/ims/lti/user", "label"=>"User nav"},
+             {"text"=>"User nav",
+              "url"=>"http://www.example.com/ims/lti/user",
+              "label"=>"User nav",
+              "selection_height"=>400,
+              "selection_width"=>800},
      "course_navigation" =>
-             {"text"=>"Course nav", "url"=>"http://www.example.com/ims/lti/course", "visibility"=>"admins", "default"=> "disabled", "label"=>"Course nav"},
+             {"text"=>"Course nav",
+              "url"=>"http://www.example.com/ims/lti/course",
+              "visibility"=>"admins",
+              "default"=> "disabled",
+              "label"=>"Course nav",
+              "selection_height"=>400,
+              "selection_width"=>800},
      "account_navigation"=>
-             {"text"=>"Account nav", "url"=>"http://www.example.com/ims/lti/account", "custom_fields"=>{"key"=>"value"}, "label"=>"Account nav"}}
+             {"text"=>"Account nav",
+              "url"=>"http://www.example.com/ims/lti/account",
+              "custom_fields"=>{"key"=>"value"},
+              "label"=>"Account nav",
+              "selection_height"=>400,
+              "selection_width"=>800}}
   end
 end

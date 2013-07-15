@@ -28,7 +28,7 @@ namespace :js do
         end
         puts "--> executing phantomjs tests"
         Rake::Task['js:generate_runner'].invoke
-        phantomjs_output = `phantomjs spec/javascripts/support/qunit/test.js file:///#{Dir.pwd}/spec/javascripts/runner.html`
+        phantomjs_output = `phantomjs spec/javascripts/support/qunit/test.js file:///#{Dir.pwd}/spec/javascripts/runner.html 2>&1`
         exit_status = $?.exitstatus
         puts phantomjs_output
         raise "PhantomJS tests failed" if exit_status != 0

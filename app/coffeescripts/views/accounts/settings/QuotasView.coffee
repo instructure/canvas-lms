@@ -15,7 +15,7 @@ define [
     tag: 'form'
     id: 'default-quotas'
     className: 'form-horizontal account_settings'
-    integerFields: ['default_storage_quota_mb', 'default_user_storage_quota_mb']
+    integerFields: ['default_storage_quota_mb', 'default_user_storage_quota_mb', 'default_group_storage_quota_mb']
 
     events:
       'submit': 'submit'

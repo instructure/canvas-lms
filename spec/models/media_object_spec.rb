@@ -77,4 +77,53 @@ describe MediaObject do
       obj.context.should == @user
     end
   end
+
+  context "permissions" do
+    context "captions" do
+      it "should allow course admin users to add_captions to userless objects" do
+        course_with_teacher
+        mo = media_object
+
+        mo.user = nil
+        mo.save!
+
+        mo.grants_right?(@teacher, nil, :add_captions).should == true
+        mo.grants_right?(@teacher, nil, :delete_captions).should == true
+      end
+
+      it "should not allow course non-admin users to add_captions to userless objects" do
+        course_with_student
+        mo = media_object
+
+        mo.user = nil
+        mo.save!
+
+        mo.grants_right?(@student, nil, :add_captions).should == false
+        mo.grants_right?(@student, nil, :delete_captions).should == false
+      end
+
+      it "should allow course non-admin users to add_captions to objects belonging to them" do
+        course_with_student
+        mo = media_object
+
+        mo.user = @student
+        mo.save!
+
+        mo.grants_right?(@student, nil, :add_captions).should == true
+        mo.grants_right?(@student, nil, :delete_captions).should == true
+      end
+
+      it "should not allow course non-admin users to add_captions to objects not belonging to them" do
+        course_with_student
+        mo = media_object
+        user
+
+        mo.user = @user
+        mo.save!
+
+        mo.grants_right?(@student, nil, :add_captions).should == false
+        mo.grants_right?(@student, nil, :delete_captions).should == false
+      end
+    end
+  end
 end

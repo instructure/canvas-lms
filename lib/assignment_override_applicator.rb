@@ -123,7 +123,7 @@ module AssignmentOverrideApplicator
       # and we can skip this check.
       unless assignment_or_quiz.current_version?
         overrides = overrides.map do |override|
-          if override.versions.empty?
+          if override.versions.length.zero?
             override
           else
             override_version = override.versions.detect do |version|

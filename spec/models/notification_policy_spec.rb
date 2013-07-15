@@ -36,49 +36,40 @@ describe NotificationPolicy do
 
   it "should cause message dispatch to specified channel on triggered policies" do
     policy_setup
-    @assignment.unpublish!
-    @assignment.previously_published = false
-    @assignment.save
     @default_cc = @student.communication_channels.create(:path => "default@example.com")
     @default_cc.confirm!
     @cc = @student.communication_channels.create(:path => "secondary@example.com")
     @cc.confirm!
     @policy = NotificationPolicy.create(:notification => @notif, :communication_channel => @cc, :frequency => "immediately")
-    @assignment.publish!
-    @assignment.messages_sent.should be_include("Assignment Graded")
-    m = @assignment.messages_sent["Assignment Graded"].find{|m| m.to == "default@example.com"}
+    @assignment = @course.assignments.create!(:title => "test assignment")
+    @assignment.messages_sent.should be_include("Assignment Created")
+    m = @assignment.messages_sent["Assignment Created"].find{|m| m.to == "default@example.com"}
     m.should be_nil
-    m = @assignment.messages_sent["Assignment Graded"].find{|m| m.to == "secondary@example.com"}
+    m = @assignment.messages_sent["Assignment Created"].find{|m| m.to == "secondary@example.com"}
     m.should_not be_nil
   end
   
   it "should prevent message dispatches if set to 'never' on triggered policies" do
     policy_setup
-    @assignment.unpublish!
     @cc = @student.communication_channels.create(:path => "secondary@example.com")
     @cc.confirm!
     @policy = NotificationPolicy.create(:notification => @notif, :communication_channel => @cc, :frequency => "never")
-    @assignment.previously_published = false
-    @assignment.save
-    @assignment.publish!
-    m = @assignment.messages_sent["Assignment Graded"].find{|m| m.to == "default@example.com"}
+    @assignment = @course.assignments.create!(:title => "test assignment")
+    m = @assignment.messages_sent["Assignment Created"].find{|m| m.to == "default@example.com"}
     m.should be_nil
-    m = @assignment.messages_sent["Assignment Graded"].find{|m| m.to == "secondary@example.com"}
+    m = @assignment.messages_sent["Assignment Created"].find{|m| m.to == "secondary@example.com"}
     m.should be_nil
   end
 
   it "should prevent message dispatches if no policy setting exists" do
     policy_setup
-    @assignment.unpublish!
     @cc = @student.communication_channels.create(:path => "secondary@example.com")
     @cc.confirm!
     NotificationPolicy.where(:notification_id => @notif, :communication_channel_id => @cc).delete_all
-    @assignment.previously_published = false
-    @assignment.save
-    @assignment.publish!
-    m = @assignment.messages_sent["Assignment Graded"].find{|m| m.to == "default@example.com"}
+    @assignment = @course.assignments.create!(:title => "test assignment")
+    m = @assignment.messages_sent["Assignment Created"].find{|m| m.to == "default@example.com"}
     m.should be_nil
-    m = @assignment.messages_sent["Assignment Graded"].find{|m| m.to == "secondary@example.com"}
+    m = @assignment.messages_sent["Assignment Created"].find{|m| m.to == "secondary@example.com"}
     m.should be_nil
   end
 
@@ -311,12 +302,11 @@ end
 
 def policy_setup
   @course = factory_with_protected_attributes(Course, :name => "test course", :workflow_state => "available")
-  @assignment = @course.assignments.create(:title => "test assignment")
   @student = factory_with_protected_attributes(User, :name => "student", :workflow_state => "registered")
   e = @course.enroll_student(@student)
   e.accept!
   Notification.all.each{|n| n.destroy }
-  @notif = Notification.create!(:name => "Assignment Graded", :subject => "Test", :category => 'TestNever')
+  @notif = Notification.create!(:name => "Assignment Created", :subject => "Test", :category => 'TestNever')
 end
 
 describe NotificationPolicy, "communication_preference" do

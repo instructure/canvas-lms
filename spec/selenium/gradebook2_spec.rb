@@ -585,12 +585,12 @@ describe "gradebook2" do
       end
     end
 
-    it "should use the late attribute of the submission to determine lateness" do
+    it "should show late submissions" do
       get "/courses/#{@course.id}/gradebook2"
       wait_for_ajaximations
       ff('.late').count.should == 0
 
-      @student_3_submission.write_attribute(:late, true)
+      @student_3_submission.write_attribute(:cached_due_date, 1.week.ago)
       @student_3_submission.save!
       get "/courses/#{@course.id}/gradebook2"
       wait_for_ajaximations

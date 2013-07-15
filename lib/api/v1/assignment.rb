@@ -122,6 +122,10 @@ module Api::V1::Assignment
         row_hash["ratings"] = row[:ratings].map do |c|
           c.slice(:id, :points, :description)
         end
+        if row[:learning_outcome_id] && outcome = LearningOutcome.find_by_id(row[:learning_outcome_id])
+          row_hash["outcome_id"] = outcome.id
+          row_hash["vendor_guid"] = outcome.vendor_guid
+        end
         row_hash
       end
       hash['rubric_settings'] = {

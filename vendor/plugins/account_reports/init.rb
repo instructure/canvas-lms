@@ -124,6 +124,28 @@ Rails.configuration.to_prepare do
           :description => 'Include deleted objects'
         }
       }
+    },
+    'unpublished_courses_csv'=> {
+      :title => 'Unpublished Courses',
+      :description_partial => true,
+      :parameters_partial => 'term_selector_parameters',
+      :parameters => {
+        :enrollment_term => {
+          :required => false,
+          :description => 'The canvas id of the term to get grades from'
+        }
+      }
+    },
+    'recently_deleted_courses_csv'=> {
+      :title => 'Recently Deleted Courses',
+      :description_partial => true,
+      :parameters_partial => 'term_selector_parameters',
+      :parameters => {
+        :enrollment_term => {
+          :required => false,
+          :description => 'The canvas id of the term to get grades from'
+        }
+      }
     }
   }
 end

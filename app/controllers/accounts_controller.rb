@@ -75,10 +75,15 @@ class AccountsController < ApplicationController
     if recursive
       @accounts = PaginatedCollection.build do |pager|
         per_page = pager.per_page
-        current_page = pager.current_page.to_i
-        pager.replace(
-          @account.sub_accounts_recursive(per_page, current_page * per_page)
-        )
+        current_page = [pager.current_page.to_i, 1].max
+        sub_accounts = @account.sub_accounts_recursive(per_page + 1, (current_page - 1) * per_page)
+
+        if sub_accounts.length > per_page
+          sub_accounts.pop
+          pager.next_page = current_page + 1
+        end
+
+        pager.replace sub_accounts
       end
     else
       @accounts = @account.sub_accounts.order(:id)
@@ -102,6 +107,7 @@ class AccountsController < ApplicationController
   # @argument by_subaccounts[] [optional] List of Account IDs; if supplied, include only courses associated with one of the referenced subaccounts.
   # @argument hide_enrollmentless_courses [optional] If present, only return courses that have at least one enrollment.  Equivalent to 'with_enrollments=true'; retained for compatibility.
   # @argument state[] [optional] If set, only return courses that are in the given state(s). Valid states are "created," "claimed," "available," "completed," and "deleted." By default, all states but "deleted" are returned.
+  # @argument enrollment_term_id [optional] If set, only includes courses from the specified term.
   #
   # @returns [Course]
   def courses_api
@@ -137,6 +143,11 @@ class AccountsController < ApplicationController
       @courses = @courses.by_associated_accounts(account_ids)
     end
 
+    if params[:enrollment_term_id]
+      term = api_find(@account.root_account.enrollment_terms, params[:enrollment_term_id])
+      @courses = @courses.for_term(term)
+    end
+
     @courses = Api.paginate(@courses, self, api_v1_account_courses_url, :order => :id)
 
     render :json => @courses.map { |c| course_json(c, @current_user, session, [], nil) }
@@ -161,10 +172,11 @@ class AccountsController < ApplicationController
       end
 
       # quotas (:manage_account_quotas)
-      quota_settings = account_params.select {|k, v| [:default_storage_quota_mb, :default_user_storage_quota_mb].include?(k.to_sym)}.with_indifferent_access
+      quota_settings = account_params.select {|k, v| [:default_storage_quota_mb, :default_user_storage_quota_mb,
+                                                      :default_group_storage_quota_mb].include?(k.to_sym)}.with_indifferent_access
       unless quota_settings.empty?
         if is_authorized_action?(@account, @current_user, :manage_storage_quotas)
-          [:default_storage_quota_mb, :default_user_storage_quota_mb].each do |quota_type|
+          [:default_storage_quota_mb, :default_user_storage_quota_mb, :default_group_storage_quota_mb].each do |quota_type|
             next unless quota_settings.has_key?(quota_type)
 
             quota_value = quota_settings[quota_type].strip
@@ -206,6 +218,7 @@ class AccountsController < ApplicationController
   # @argument account[default_time_zone] [Optional] The default time zone of the account. Allowed time zones are listed in {http://rubydoc.info/docs/rails/ActiveSupport/TimeZone The Ruby on Rails documentation}.
   # @argument account[default_storage_quota_mb] [Optional] The default course storage quota to be used, if not otherwise specified.
   # @argument account[default_user_storage_quota_mb] [Optional] The default user storage quota to be used, if not otherwise specified.
+  # @argument account[default_group_storage_quota_mb] [Optional] The default group storage quota to be used, if not otherwise specified.
   #
   # @example_request
   #   curl https://<canvas>/api/v1/accounts/<account_id> \ 
@@ -224,6 +237,7 @@ class AccountsController < ApplicationController
   #     "root_account_id": null,
   #     "default_storage_quota_mb": 500,
   #     "default_user_storage_quota_mb": 50
+  #     "default_group_storage_quota_mb": 50
   #   }
   def update
     return update_api if api_request?
@@ -245,15 +259,17 @@ class AccountsController < ApplicationController
         allow_sis_import = params[:account].delete :allow_sis_import
         params[:account].delete :default_user_storage_quota_mb unless @account.root_account? && !@account.site_admin?
         unless @account.grants_right? @current_user, :manage_storage_quotas
-          [:storage_quota, :default_storage_quota, :default_storage_quota_mb, :default_user_storage_quota_mb].each { |key| params[:account].delete key }
+          [:storage_quota, :default_storage_quota, :default_storage_quota_mb,
+           :default_user_storage_quota, :default_user_storage_quota_mb,
+           :default_group_storage_quota, :default_group_storage_quota_mb].each { |key| params[:account].delete key }
         end
         if params[:account][:services]
-          params[:account][:services].slice(*Account.services_exposed_to_ui_hash.keys).each do |key, value|
+          params[:account][:services].slice(*Account.services_exposed_to_ui_hash(nil, @current_user, @account).keys).each do |key, value|
             @account.set_service_availability(key, value == '1')
           end
           params[:account].delete :services
         end
-        if Account.site_admin.grants_right?(@current_user, :manage_site_settings)
+        if @account.grants_right?(@current_user, :manage_site_settings)
           # If the setting is present (update is called from 2 different settings forms, one for notifications)
           if params[:account][:settings] && params[:account][:settings][:outgoing_email_default_name_option].present?
             # If set to default, remove the custom name so it doesn't get saved
@@ -405,7 +421,7 @@ class AccountsController < ApplicationController
     end
     associated_courses = @account.associated_courses.active
     associated_courses = associated_courses.for_term(@term) if @term
-    @associated_courses_count = associated_courses.count('DISTINCT course_id')
+    @associated_courses_count = associated_courses.count
     @hide_enrollmentless_courses = params[:hide_enrollmentless_courses] == "1"
   end
   protected :load_course_right_side

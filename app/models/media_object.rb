@@ -51,7 +51,7 @@ class MediaObject < ActiveRecord::Base
 
 
   set_policy do
-    given { |user| self.user && (self.user == user || (self.context && self.context.grants_right?(user, nil, :manage_content))) }
+    given { |user| (self.user && self.user == user) || (self.context && self.context.grants_right?(user, nil, :manage_content)) }
     can :add_captions and can :delete_captions
   end
 

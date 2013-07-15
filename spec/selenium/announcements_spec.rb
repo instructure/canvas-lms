@@ -47,9 +47,10 @@ describe "announcements" do
     get "/courses/#{@course.id}/announcements/#{announcement.id}"
     f('#discussion_subentries span').text.should == "Replies are only visible to those who have posted at least one reply."
     ff('.discussion_entry').each { |entry| entry.should_not include_text(student_2_entry) }
-    f('.discussion-reply-label').click
-    type_in_tiny('.reply-textarea', 'reply')
-    submit_form('.discussion-reply-form')
+    f('.discussion-reply-action').click
+    wait_for_animations
+    type_in_tiny('textarea', 'reply')
+    submit_form('#discussion_topic .discussion-reply-form')
     wait_for_ajaximations
     ff('.discussion_entry .message')[1].should include_text(student_2_entry)
   end

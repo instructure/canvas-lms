@@ -1,15 +1,4 @@
 <div id="sidebar_content">
-  <% if can_do(@assignment, @current_user, :update) && @assignment.needs_publishing? %>
-    <h2><%= t 'titles.unpublished', "Unpublished" %></h2>
-    <div class="rs-margin-lr">
-    <%= image_tag "warning.png" %> <%= t 'warnings.unpublished', 'You should publish assignments that you are finished grading so students can consider their grades "official."' %>
-    <% form_for :assignment, :url => context_url(@context, :context_assignment_url, @assignment.id), :html => {:method => :put, :id => "publish_assignment_form", :style => "margin-bottom: 10px;"} do |f| %>
-      <input type="hidden" name="publish" value="1"/>
-      <button type="submit" class="btn button-sidebar-wide"><%= t 'buttons.publish', "Publish this Assignment" %></button>
-    <% end %>
-    </div>
-  <% end %>
-
   <% if can_do(@assignment, @current_user, :grade) %>
     <%= render :partial => "grade_assignment" if can_do(@assignment, @current_user, :grade) %>
   <% end %>

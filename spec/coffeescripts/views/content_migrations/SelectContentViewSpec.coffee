@@ -1,26 +1,48 @@
 define [
+  'Backbone'
   'compiled/views/content_migrations/SelectContentView'
   'compiled/models/ProgressingContentMigration'
-], (SelectContentView, ProgressingMigration) -> 
-  module 'SelectContentViewSpec',
+], (Backbone, SelectContentView, ProgressingMigration) -> 
+
+  module 'SelectContentView: Main Behaviors',
     setup: -> 
+      @$fixtures = $('#fixtures')
       @model = new ProgressingMigration
                   id: 5
                   course_id: 42
 
       @selectContentView = new SelectContentView 
                               model: @model
-                              el: $('#fixtures')
                               title: 'Select Content'
                               width: 600
                               height: 400
+                              fixDialogButtons: false
 
-    teardown: -> @selectContentView.remove()
+      @server = sinon.fakeServer.create()
+      @$fixtures.append @selectContentView.$el
 
-  #test 'Renders main checkbox groups after open', -> 
-    #@selectContentView.open()
-    ## Todo: * Create sinon server to return a list of main checkboxes
-    #ok 1, 'test should pass'
+    teardown: -> 
+      @server.restore()
+      @selectContentView.remove()
 
-  #test 'Only send checkbox values that have been checked on submit', -> 
-  # Todo: Test that params are being filtered out if they are set to false
+  test 'render top level checkboxes when opened', -> 
+    @server.respondWith('GET', 
+                        '/api/v1/courses/42/content_migrations/5/selective_data', 
+                         [200, { "Content-Type": "application/json" }, JSON.stringify([
+                              {
+                                  "type": "course_settings",
+                                  "property": "copy[all_course_settings]",
+                                  "title": "Course Settings"
+                              },
+                              {
+                                  "type": "syllabus_body",
+                                  "property": "copy[all_syllabus_body]",
+                                  "title": "Syllabus Body"
+                              }
+                          ])]
+    )
+    @selectContentView.open()
+    @server.respond()
+
+    $checkboxes = @selectContentView.$el.find('[type=checkbox]')
+    equal $checkboxes.length, 2, "Renders all checkboxes"

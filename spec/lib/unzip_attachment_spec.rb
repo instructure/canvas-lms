@@ -163,8 +163,14 @@ describe UnzipAttachment do
   end
 
   context "scribdable files" do
-    before { scribd_mime_type_model(:extension => 'docx') }
-    let(:job_queue_size) { Delayed::Job.strand_size('scribd') }
+    before do
+      ScribdAPI.stubs(:config).returns({ key: "a", secret: "b" })
+      scribd_mime_type_model(:extension => 'docx')
+    end
+
+    def job_queue_size
+      Delayed::Job.strand_size('scribd')
+    end
 
     def process_file(name)
       filename = fixture_filename(name)
