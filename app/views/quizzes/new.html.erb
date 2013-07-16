@@ -18,7 +18,62 @@
   </ul>
 <% end %>
 
+<% if @domain_root_account.enable_draft? %>
+<div class="header-bar" id="quiz_edit_header">
+  <div class="header-bar-right">
+    <div class="header-group-left">
+      <span id="quiz_display_points_possible">
+        <%= t(:points_possible, "Points %{n}", :n => raw("<span style=\"margin-left:5px\" class=\"points_possible\">#{@quiz.points_possible}</span>")) %>
+      </span>
+
+      <% if @quiz.published? %>
+        <span id='quiz-draft-state' class='published'>
+          <i class="icon-publish"></i>
+          <%= t('buttons.published', "Published") %>
+        </span>
+      <% else %>
+        <span id='quiz-draft-state' class='not_published'>
+          <i class="icon-unpublished"></i>
+          <%= t('buttons.not_published', "Not Published") %>
+        </span>
+      <% end %>
+    </div>
+
+    <div class="header-group-right">
+      <div class="admin-links">
+        <a class="al-trigger btn">
+          <span class="screenreader-only">Manage</span>
+          <i class="icon-settings"></i>
+          <i class="icon-mini-arrow-down"></i>
+        </a>
+        <ul class="al-options">
+          <% if @assignment %>
+          <li>
+            <a href="#" rel="<%= context_url(@context, :context_assignment_rubric_url, @assignment.id) %>" class="show_rubric_link">
+              <i class="icon-rubric"></i>
+              <%= t('links.show_assignment_rubric', "Show Rubric") %>
+            </a>
+          </li>
+          <a href="<%= context_url(@context, :context_rubrics_url) %>" class="icon-rubric" id="add_rubric_url" style="display:none">&nbsp;</a>
+
+          <% end %>
+          <li>
+            <a href="<%= context_url(@context, :context_quiz_url, @quiz) %>" class="delete_quiz_link">
+              <i class="icon-trash"></i>
+              <%= t('titles.delete', "Delete") %>
+            </a>
+          </li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</div>
+<% end %>
+
 <div id="quiz_edit_wrapper">
+  <div class="form">
+
   <% if @has_student_submissions %>
     <div class="alert alert-info" id="student_submissions_warning">
       <i class="icon-warning"></i> <%= t('warnings.has_student_submissions', <<-TEXT)
@@ -30,6 +85,11 @@
     </div>
   <% end %>
 
+  <% if @domain_root_account.enable_draft? %>
+  <div class="title">
+    <%= text_field :quiz, :title, :placeholder => "Quiz Title", :maxlength => "254" %>
+  </div>
+  <% else %>
   <div class="row-fluid">
     <div class="span6">
     <%= text_field :quiz, :title, :placeholder => "Quiz Title", :maxlength => "254" %>
@@ -37,17 +97,6 @@
     <div class="span6">
       <div class="admin-link-hover-area">
         <div class="admin-links">
-          <% if @quiz.published? %>
-            <span id='quiz-draft-state' class='published'>
-              <i class="icon-publish"></i>
-              <%= t('buttons.published', "Published") %>
-            </span>
-          <% else %>
-            <span id='quiz-draft-state' class='not_published'>
-              <i class="icon-unpublished"></i>
-              <%= t('buttons.not_published', "Not Published") %>
-            </span>
-          <% end %>
           <a class="al-trigger btn">
             <span class="screenreader-only">Manage</span>
             <i class="icon-settings"></i>
@@ -80,6 +129,7 @@
 
     </div>
   </div>
+  <% end %>
 
   <div style="display: none;" id="quiz_urls">
     <a href="<%= context_url(@context, :context_quiz_url, @quiz.id) %>" class="update_quiz_url">&nbsp;</a>
@@ -320,6 +370,27 @@
     </div>
   </div>
 
+  </div>
+
+  <% if @domain_root_account.enable_draft? %>
+  <div class="form-actions" id="quiz_edit_actions">
+    <div class="row-fluid">
+      <div class="span6 notify">
+        <label for="quiz_notify_of_update" class="checkbox">
+          <input type="checkbox" name="quiz[notify_of_update]" id="quiz_notify_of_update" value="1" />
+          <%= t('labels.quiz_notify', 'Notify users this quiz has changed') %>
+        </label>
+      </div>
+      <div class="span6">
+        <% link_to context_url(@context, :context_quiz_url, @quiz), :class => 'btn', :id => 'cancel_button' do %>
+          <%= t('links.cancel', "Cancel") %>
+        <% end %>
+        <button type="submit" class="save_quiz_button btn btn-primary"><%= t('buttons.save', "Save") %></button>
+      </div>
+    </div>
+  </div>
+
+  <% else %>
   <div class="form-actions">
     <div class="row-fluid">
       <div class="span6" style="text-align:left; line-height:28px;">
@@ -334,8 +405,8 @@
       </div>
     </div>
   </div>
+  <% end %>
 </div>
-
 
 <div class="question_generated" style="display: none;">
   <div class="question_generated_description"></div>
