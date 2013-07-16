@@ -490,7 +490,6 @@ describe "assignments" do
         get "/courses/#{@course.id}/assignments"
         wait_for_ajaximations
 
-
         f("#assignment_group_#{ag.id} .add_assignment").click
         wait_for_ajaximations
 
@@ -504,6 +503,34 @@ describe "assignments" do
         a.points_possible.should == 13
 
         f("#assignment_group_#{ag.id} .ig-title").text.should match "Do this"
+      end
+
+      it "should allow quick-adding two assignments to a group (dealing with form re-render)" do
+        ag = @course.assignment_groups.first
+
+        get "/courses/#{@course.id}/assignments"
+        wait_for_ajaximations
+
+        f("#assignment_group_#{ag.id} .add_assignment").click
+        wait_for_ajaximations
+
+        replace_content(f("#ag_#{ag.id}_assignment_name"), "Do this")
+        replace_content(f("#ag_#{ag.id}_assignment_points"), "13")
+        fj('.create_assignment:visible').click
+        wait_for_ajaximations
+
+        f("#assignment_group_#{ag.id} .add_assignment").click
+        wait_for_ajaximations
+
+        get_value("#ag_#{ag.id}_assignment_name").should be_blank
+        get_value("#ag_#{ag.id}_assignment_points").should be_blank
+
+        replace_content(f("#ag_#{ag.id}_assignment_name"), "Another")
+        replace_content(f("#ag_#{ag.id}_assignment_points"), "3")
+        fj('.create_assignment:visible').click
+        wait_for_ajaximations
+
+        ag.reload.assignments.count.should == 2
       end
 
       it "should rembmer entered settings when 'more options' is pressed" do

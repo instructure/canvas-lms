@@ -23,6 +23,15 @@ define [
       '.edit_group': '$editGroupButton'
     })
 
+    # call remove on children so that they can clean up old dialogs.
+    # this should eventually happen at a higher level (eg for all views), but
+    # we need to make sure that all children view are also children dom
+    # elements first.
+    render: ->
+      @createAssignmentView.remove()
+      @editGroupView.remove()
+      super
+
     afterRender: ->
       # child views so they get rendered automatically, need to stop it
       @createAssignmentView.hide()

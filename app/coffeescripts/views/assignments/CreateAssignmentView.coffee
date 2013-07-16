@@ -31,9 +31,6 @@ define [
       super
       @collection.add(@model)
 
-      @generateNewModel()
-      @render()
-
     moreOptions: ->
       data = @getFormData()
       params = ''
@@ -56,7 +53,8 @@ define [
       })
 
     openAgain: ->
+      @generateNewModel()
+      @render()
       super
       if !@$el.find(".datetime_field").hasClass("datetime_field_enabled")
         @$el.find(".datetime_field").datetime_field()
-
