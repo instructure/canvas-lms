@@ -635,6 +635,12 @@ describe DiscussionTopic do
       @topic.subscribers.should include(@student)
     end
 
+    it "should include author when topic was created before subscriptions where added" do
+      participant = @topic.update_or_create_participant(current_user: @topic.user, subscribed: nil)
+      participant.subscribed.should be_nil
+      @topic.subscribers.map(&:id).should include(@teacher.id)
+    end
+
     it "should include users that have posted entries before subscriptions were added" do
       @topic.reply_from(:user => @student, :text => "entry")
       participant = @topic.update_or_create_participant(current_user: @student, subscribed: nil)
