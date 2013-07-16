@@ -365,8 +365,15 @@ describe Attachment do
   end
 
   context "scribd cleanup" do
-    def fake_scribd_doc(doc_id = String.random(8))
+    before do
       ScribdAPI.stubs(:enabled?).returns(true)
+    end
+
+    after do
+      ScribdAPI.unstub(:enabled?)
+    end
+
+    def fake_scribd_doc(doc_id = String.random(8))
       scribd_doc = Scribd::Document.new
       scribd_doc.doc_id = doc_id
       scribd_doc.secret_password = 'asdf'
@@ -375,7 +382,6 @@ describe Attachment do
     end
 
     def attachment_with_scribd_doc(doc = fake_scribd_doc, opts = {})
-      ScribdAPI.stubs(:enabled?).returns(true)
       att = attachment_model(opts)
       att.scribd_doc = doc
       att.save!
@@ -461,6 +467,45 @@ describe Attachment do
         @child.destroy
         @child.reload.workflow_state.should eql 'deleted'
         @child.read_attribute(:scribd_doc).should be_nil
+      end
+    end
+
+    describe "check_rerender_scribd_doc" do
+      before do
+        scribd_mime_type_model(:extension => 'docx')
+      end
+
+      it "should resubmit a deleted scribd doc" do
+        @attachment = attachment_with_scribd_doc(fake_scribd_doc, :filename => 'file.docx', :scribd_attempts => 3)
+        @attachment.scribd_doc.expects(:destroy).once.returns(true)
+        @attachment.delete_scribd_doc
+        expect {
+          @attachment.check_rerender_scribd_doc
+        }.to change(Delayed::Job, :count).by(1)
+        Delayed::Job.find_by_tag('Attachment#submit_to_scribd!').should_not be_nil
+        @attachment.should be_pending_upload
+        @attachment.scribd_attempts.should == 0
+      end
+
+      it "should do nothing if a scribd_doc already exists" do
+        @attachment = attachment_with_scribd_doc(fake_scribd_doc, :filename => 'file.docx')
+        expect {
+          @attachment.check_rerender_scribd_doc
+        }.to change(Delayed::Job, :count).by(0)
+      end
+
+      it "should be invoked on record_inline_view" do
+        @attachment = attachment_model(:filename => 'file.docx')
+        expect {
+          @attachment.record_inline_view
+        }.to change(Delayed::Job, :count).by(1)
+      end
+
+      it "should do nothing on non-scribdable types" do
+        @attachment = attachment_model(:filename => 'file.lolcats')
+        expect {
+          @attachment.check_rerender_scribd_doc
+        }.to change(Delayed::Job, :count).by(0)
       end
     end
   end

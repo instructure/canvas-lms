@@ -1686,5 +1686,15 @@ class Attachment < ActiveRecord::Base
 
   def record_inline_view
     update_attribute(:last_inline_view, Time.now)
+    check_rerender_scribd_doc unless self.scribd_doc
+  end
+
+  def check_rerender_scribd_doc
+    if scribdable? && scribd_doc.nil?
+      self.scribd_attempts = 0
+      self.workflow_state = 'pending_upload'
+      self.save!
+      send_later :submit_to_scribd!
+    end
   end
 end

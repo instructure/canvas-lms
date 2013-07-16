@@ -35,7 +35,7 @@ define([
       "application/vnd.sun.xml.writer":                                            [1, 1],
       "application/excel":                                                         [1, 1],
       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":         [1, 1],
-      "text/rtf":                                                                  [1, false],
+      "text/rtf":                                                                  [1, 1],
       "application/vnd.openxmlformats-officedocument.spreadsheetml.template":      [1, 1],
       "application/vnd.sun.xml.impress":                                           [1, 1],
       "application/vnd.sun.xml.calc":                                              [1, 1],
@@ -90,7 +90,7 @@ define([
         // if I have a url to ping back to the app that I viewed this file inline, ping it.
         if (opts.attachment_view_inline_ping_url) {
           $.ajaxJSON(opts.attachment_view_inline_ping_url, 'POST', {}, function() { }, function() { });
-          $.trackEvent('Doc Previews', serviceUsed, JSON.stringify(opts));
+          $.trackEvent('Doc Previews', serviceUsed, JSON.stringify(opts, ['attachment_id', 'submission_id', 'mimetype', 'crocodoc_session_url', 'scribd_doc_id']));
         }
       }
 
