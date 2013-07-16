@@ -18,16 +18,13 @@
 require [
   'compiled/collections/AssignmentGroupCollection'
   'compiled/models/Course'
-  'compiled/views/CollectionView'
   'compiled/views/InputFilterView'
-  'compiled/views/assignments/AssignmentGroupListItemView'
+  'compiled/views/assignments/AssignmentGroupListView'
   'compiled/views/assignments/CreateGroupView'
   'compiled/views/assignments/TeacherIndexView'
   'compiled/views/assignments/AssignmentSettingsView'
   'compiled/views/assignments/AssignmentGroupWeightsView'
-  'jst/assignments/teacher_index/AssignmentGroupList'
-
-], (AssignmentGroupCollection, Course, CollectionView, InputFilterView, AssignmentGroupListItemView, CreateGroupView, TeacherIndexView, AssignmentSettingsView, AssignmentGroupWeightsView, assignmentGroupsTemplate) ->
+], (AssignmentGroupCollection, Course, InputFilterView, AssignmentGroupListView, CreateGroupView, TeacherIndexView, AssignmentSettingsView, AssignmentGroupWeightsView) ->
 
   course = new Course
   course.url = ENV.COURSE_URL
@@ -35,7 +32,6 @@ require [
 
   assignmentGroups = new AssignmentGroupCollection [],
     course: course
-  assignmentGroups.fetch() # TODO: reset this instead
 
   assignmentSettingsView = new AssignmentSettingsView
     model: course
@@ -45,9 +41,7 @@ require [
   inputFilterView = new InputFilterView
     collection: assignmentGroups
 
-  assignmentGroupsView = new CollectionView
-    template: assignmentGroupsTemplate
-    itemView: AssignmentGroupListItemView
+  assignmentGroupsView = new AssignmentGroupListView
     collection: assignmentGroups
 
   @app = new TeacherIndexView
@@ -60,3 +54,6 @@ require [
       course: course
 
   @app.render()
+
+  # kick it all off
+  assignmentGroups.fetch() # TODO: reset this instead
