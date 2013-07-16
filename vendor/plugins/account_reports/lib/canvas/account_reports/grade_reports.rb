@@ -132,17 +132,19 @@ module Canvas::AccountReports
       filename = Canvas::AccountReports.generate_file(@account_report)
       CSV.open(filename, "w") do |csv|
         csv << headers
-        students.find_each_with_temp_table do |row|
-          row['assignment url'] =
-            "https://#{host}" +
-              "/courses/#{row['course id']}" +
-              "/assignments/#{row['assignment id']}"
-          row['submission date']=default_timezone_format(row['submission date'])
-          csv << headers.map { |h| row[h] }
-          if i % 5 == 0
-            @account_report.update_attribute(:progress, (i.to_f/total)*100)
+        Shackles.activate(:slave) do
+          students.find_each do |row|
+            row['assignment url'] =
+              "https://#{host}" +
+                "/courses/#{row['course id']}" +
+                "/assignments/#{row['assignment id']}"
+            row['submission date']=default_timezone_format(row['submission date'])
+            csv << headers.map { |h| row[h] }
+            if i % 5 == 0
+              @account_report.update_attribute(:progress, (i.to_f/total)*100)
+            end
+            i += 1
           end
-          i += 1
         end
         csv << ['No outcomes found'] if total == 0
       end
@@ -202,23 +204,25 @@ module Canvas::AccountReports
                 'course id', 'course sis', 'section', 'section id',
                 'section sis', 'term', 'term id', 'term sis','current score',
                 'final score']
-        students.find_each_with_temp_table do |student|
-          arr = []
-          arr << student["user_name"]
-          arr << student["user_id"]
-          arr << student["sis_user_id"]
-          arr << student["course_name"]
-          arr << student["course_id"]
-          arr << student["course_sis_id"]
-          arr << student["section_name"]
-          arr << student["course_section_id"]
-          arr << student["section_sis_id"]
-          arr << student["term_name"]
-          arr << student["term_id"]
-          arr << student["term_sis_id"]
-          arr << student["computed_current_score"]
-          arr << student["computed_final_score"]
-          csv << arr
+        Shackles.activate(:slave) do
+          students.find_each do |student|
+            arr = []
+            arr << student["user_name"]
+            arr << student["user_id"]
+            arr << student["sis_user_id"]
+            arr << student["course_name"]
+            arr << student["course_id"]
+            arr << student["course_sis_id"]
+            arr << student["section_name"]
+            arr << student["course_section_id"]
+            arr << student["section_sis_id"]
+            arr << student["term_name"]
+            arr << student["term_id"]
+            arr << student["term_sis_id"]
+            arr << student["computed_current_score"]
+            arr << student["computed_final_score"]
+            csv << arr
+          end
         end
       end
 

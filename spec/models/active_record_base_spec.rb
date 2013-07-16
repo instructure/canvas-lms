@@ -80,26 +80,6 @@ describe ActiveRecord::Base do
       @e6 = c2.enroll_student(u3, :enrollment_state => 'active')
     end
 
-    it "should find each enrollment from course join" do
-      e = Course.active.joins(:enrollments)
-      all_enrollments = []
-      e.useful_find_each(:batch_size => 2) do |e|
-        all_enrollments << e.id
-      end
-      all_enrollments.length.should == 6
-    end
-
-    it "should find in batches all enrollments from course join" do
-      e = Course.active.select("enrollments.id as eid").joins(:enrollments)
-      all_enrollments = []
-      e.useful_find_in_batches(:batch_size => 2) do |batch|
-        batch.each do |e|
-          all_enrollments << e.eid
-        end
-      end
-      all_enrollments.length.should == 6
-    end
-
     it "should find each enrollment from course using temp table" do
       e = Course.active.select("enrollments.id AS e_id").
                         joins(:enrollments).order("e_id asc")
@@ -125,6 +105,16 @@ describe ActiveRecord::Base do
       end
       es.length.should == 6
       es.should == [@e1.id.to_s,@e2.id.to_s,@e3.id.to_s,@e4.id.to_s,@e5.id.to_s,@e6.id.to_s]
+    end
+
+    it "should honor includes when using a cursor" do
+      pending "needs PostgreSQL" unless Account.connection.adapter_name == 'PostgreSQL'
+      Account.default.courses.create!
+      Account.transaction do
+        Account.where(:id => Account.default).includes(:courses).find_each do |a|
+          a.courses.loaded?.should be_true
+        end
+      end
     end
   end
 

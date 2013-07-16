@@ -56,27 +56,30 @@ module Canvas
       end
     end
 
-    def find_in_batches(options = {})
+    def find_in_batches(klass, options = {})
       start = options.delete(:start).to_i || 0
       batch_size = options.delete(:batch_size) || 1000
 
-      batch = @connection.select_all "SELECT *
-                                      FROM #{@name}
-                                      WHERE #{@index} >= #{start}
-                                      ORDER BY #{@index} ASC
-                                      LIMIT #{batch_size}"
+      sql = "SELECT *
+             FROM #{@name}
+             WHERE #{@index} >= #{start}
+             ORDER BY #{@index} ASC
+             LIMIT #{batch_size}"
+      batch = options[:ar_objects] == false ? @connection.select_all(sql) : klass.find_by_sql(sql)
+
       while batch.any?
         yield batch
 
         break if batch.count < batch_size
 
-        last_value = batch.to_a.last[@index]
+        last_value = batch.last[@index]
 
-        batch = @connection.select_all "SELECT *
-                                        FROM #{@name}
-                                        WHERE #{@index} > #{last_value}
-                                        ORDER BY #{@index} ASC
-                                        LIMIT #{batch_size}"
+        sql = "SELECT *
+               FROM #{@name}
+               WHERE #{@index} > #{last_value}
+               ORDER BY #{@index} ASC
+               LIMIT #{batch_size}"
+        batch = options[:ar_objects] == false ? @connection.select_all(sql) : klass.find_by_sql(sql)
       end
     end
   end

@@ -495,6 +495,56 @@ class ActiveRecord::Base
     result.map(&column.to_sym)
   end
 
+  def self.find_in_batches_with_usefulness(options = {}, &block)
+    # already in a transaction (or transactions don't matter); cursor is fine
+    if connection.adapter_name == 'PostgreSQL' && (Shackles.environment == :slave || connection.open_transactions > 0)
+      shard = scope(:find, :shard)
+      if shard
+        shard.activate(shard_category) { find_in_batches_with_cursor(options, &block) }
+      else
+        find_in_batches_with_cursor(options, &block)
+      end
+    elsif scope(:find, :order) || scope(:find, :group)
+      options[:transactional] = false
+      shard = scope(:find, :shard)
+      if shard
+        shard.activate(:shard_category) { find_in_batches_with_temp_table(options, &block) }
+      else
+        find_in_batches_with_temp_table(options, &block)
+      end
+    else
+      find_in_batches_without_usefulness(options) do |batch|
+        with_exclusive_scope { yield batch }
+      end
+    end
+  end
+  class << self
+    alias_method_chain :find_in_batches, :usefulness
+  end
+
+  def self.find_in_batches_with_cursor(options = {}, &block)
+    batch_size = options[:batch_size] || 1000
+    transaction do
+      begin
+        cursor = "#{table_name}_in_batches_cursor"
+        connection.execute("DECLARE #{cursor} CURSOR FOR #{scoped.to_sql}")
+        includes = scope(:find, :include)
+        with_exclusive_scope do
+          batch = find_by_sql("FETCH FORWARD #{batch_size} FROM #{cursor}")
+          while !batch.empty?
+            preload_associations(batch, includes) if includes
+            yield batch
+            break if batch.size < batch_size
+            batch = find_by_sql("FETCH FORWARD #{batch_size} FROM #{cursor}")
+          end
+        end
+        # not ensure; if the transaction rolls back to due another exception, it will
+        # automatically close
+        connection.execute("CLOSE #{cursor}")
+      end
+    end
+  end
+
   def self.generate_temp_table(options = {})
     Canvas::TempTable.new(connection, construct_finder_sql({}), options)
   end
@@ -503,34 +553,16 @@ class ActiveRecord::Base
     temptable = generate_temp_table(options)
     with_exclusive_scope do
       temptable.execute do |table|
-        table.find_in_batches(options, &block)
+        table.find_in_batches(self, options, &block)
       end
     end
   end
 
   def self.find_each_with_temp_table(options = {}, &block)
-    find_in_batches_with_temp_table(options) do |batch|
+    find_in_batches_with_temp_table(options.merge(ar_objects: false)) do |batch|
       batch.each(&block)
     end
     self
-  end
-
-  def self.useful_find_in_batches(options = {})
-    offset = 0
-    batch_size = options[:batch_size] || 1000
-    while true
-      batch = find(:all, :limit => batch_size, :offset => offset)
-      break if batch.empty?
-      with_exclusive_scope { yield batch }
-      break if batch.size < batch_size
-      offset += batch_size
-    end
-  end
-
-  def self.useful_find_each(options = {})
-    useful_find_in_batches(options) do |batch|
-      batch.each { |row| yield row }
-    end
   end
 
   # set up class-specific getters/setters for a polymorphic association, e.g.

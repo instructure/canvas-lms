@@ -897,9 +897,7 @@ class Account < ActiveRecord::Base
       # match the "batch" size in Course.update_account_associations
       scopes.each do |scope|
         scope.select([:id, :account_id]).find_in_batches(:batch_size => 500) do |courses|
-          Course.send(:with_exclusive_scope) do
-            all_user_ids.merge Course.update_account_associations(courses, :skip_user_account_associations => true, :account_chain_cache => account_chain_cache)
-          end
+          all_user_ids.merge Course.update_account_associations(courses, :skip_user_account_associations => true, :account_chain_cache => account_chain_cache)
         end
       end
 

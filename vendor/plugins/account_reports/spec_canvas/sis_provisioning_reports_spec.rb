@@ -713,7 +713,7 @@ describe "Default Account Reports" do
         parameters["enrollments"] = true
         parameters["include_deleted"] = true
         parameters["enrollment_term"] = @term1.id
-        parsed = ReportSpecHelper.run_report(@sub_account,"provisioning_csv",parameters,[3,1])
+        parsed = ReportSpecHelper.run_report(@sub_account,"provisioning_csv",parameters,[3,1,5])
 
         parsed.length.should == 6
 

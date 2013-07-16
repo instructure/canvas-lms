@@ -802,12 +802,10 @@ class Assignment < ActiveRecord::Base
     grade = self.score_to_grade(score)
     submissions_to_save = []
     self.context.students.find_each do |student|
-      User.send(:with_exclusive_scope) do
-        submission = self.find_or_create_submission(student)
-        if !submission.score || options[:overwrite_existing_grades]
-          if submission.score != score
-            submissions_to_save << submission
-          end
+      submission = self.find_or_create_submission(student)
+      if !submission.score || options[:overwrite_existing_grades]
+        if submission.score != score
+          submissions_to_save << submission
         end
       end
     end

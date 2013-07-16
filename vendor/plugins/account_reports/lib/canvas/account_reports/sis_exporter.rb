@@ -71,9 +71,10 @@ module Canvas::AccountReports
           headers = ['canvas_user_id','user_id','login_id','first_name','last_name','email','status']
         end
         csv << headers
-        users = root_account.pseudonyms.includes(:user).select(
+        users = root_account.pseudonyms.except(:includes).joins(:user).select(
           "pseudonyms.id, pseudonyms.sis_user_id, pseudonyms.user_id,
-           pseudonyms.unique_id, pseudonyms.workflow_state").where(
+           pseudonyms.unique_id, pseudonyms.workflow_state, users.sortable_name,
+           users.updated_at AS user_updated_at").where(
           "NOT EXISTS (SELECT user_id
                        FROM enrollments e
                        WHERE e.type = 'StudentViewEnrollment'
@@ -97,9 +98,11 @@ module Canvas::AccountReports
           row << u.sis_user_id
           row << u.unique_id
           row << nil if @sis_format
-          row << u.user.first_name
-          row << u.user.last_name
-          row << u.user.email
+          # build a user object to be able to call methods on it
+          user = User.send(:instantiate, 'id' => u.user_id, 'sortable_name' => u.sortable_name, 'updated_at' => u.user_updated_at)
+          row << user.first_name
+          row << user.last_name
+          row << user.email
           row << u.workflow_state
           csv << row
         end
