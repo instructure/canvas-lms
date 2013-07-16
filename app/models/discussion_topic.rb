@@ -718,7 +718,7 @@ class DiscussionTopic < ActiveRecord::Base
     sub_ids = discussion_topic_participants.where(:subscribed => true).pluck(:user_id)
     legacy_sub_ids = discussion_topic_participants.where(:subscribed => nil).pluck(:user_id)
     poster_ids = posters.map(&:id)
-    legacy_sub_ids &= poster_ids + [user.id]
+    legacy_sub_ids &= poster_ids
     sub_ids += legacy_sub_ids
     participating_users(sub_ids)
   end
