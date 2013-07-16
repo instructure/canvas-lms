@@ -1,10 +1,11 @@
 define [
   'jquery'
   'underscore'
-  'compiled/views/DialogFormView'
   'i18n!pages'
+  'str/htmlEscape'
+  'compiled/views/DialogFormView'
   'jst/wiki/WikiPageDeleteDialog'
-], ($, _, DialogFormView, I18n, wrapperTemplate) ->
+], ($, _, I18n, htmlEscape, DialogFormView, wrapperTemplate) ->
 
   dialogDefaults =
     title: I18n.t 'delete_title', 'Delete Wiki Page'
@@ -33,14 +34,18 @@ define [
 
       destroyDfd.then =>
         if wiki_pages_url
-          window.location.href = wiki_pages_url + "?deleted_page_title=#{encodeURIComponent(page_title)}"
+          expires = new Date
+          expires.setMinutes(expires.getMinutes() + 1)
+          path = '/' # should be wiki_pages_url, but IE will only allow *sub*directries to read the cookie, not the directory itself...
+          $.cookie 'deleted_page_title', page_title, expires: expires, path: path
+          window.location.href = wiki_pages_url
         else
           $.flashMessage I18n.t 'notices.page_deleted', 'The page "%{title}" has been deleted.', title: page_title
           dfd.resolve()
           @close()
 
       destroyDfd.fail =>
-        $.flashError I18n.t 'notices.delete_failed', 'The page "%{title}" could not be deleted.', title: page_title
+        $.flashError htmlEscape(I18n.t('notices.delete_failed', 'The page "%{title}" could not be deleted.', title: page_title))
         dfd.reject()
 
       @$el.disableWhileLoading dfd

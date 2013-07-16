@@ -121,8 +121,6 @@ class WikiPagesController < ApplicationController
 
   def pages_index
     if authorized_action(@context, @current_user, :read)
-      flash[:notice] = t('notices.page_deleted', 'The page "%{title}" has been deleted.', :title => params[:deleted_page_title]) if params.include?(:deleted_page_title)
-
       @padless = true
     end
   end
@@ -138,8 +136,8 @@ class WikiPagesController < ApplicationController
       @page.increment_view_count(@current_user, @context)
       log_asset_access(@page, 'wiki', @wiki)
 
-      js_env :wiki_pages_url => polymorphic_url([@context, :pages])
-      js_env :EDIT_WIKI_PATH => polymorphic_url([@context, :edit_named_page], :wiki_page_id => @page)
+      js_env :wiki_pages_url => polymorphic_path([@context, :pages])
+      js_env :EDIT_WIKI_PATH => polymorphic_path([@context, :edit_named_page], :wiki_page_id => @page)
       js_env :wiki_page => wiki_page_json(@page, @current_user, session)
 
       @padless = true
@@ -156,7 +154,7 @@ class WikiPagesController < ApplicationController
     if authorized_action(@page, @current_user, :read)
       add_crumb(@page.title)
 
-      js_env :wiki_pages_url => polymorphic_url([@context, :pages])
+      js_env :wiki_pages_url => polymorphic_path([@context, :pages])
       js_env :wiki_page => wiki_page_json(@page, @current_user, session)
 
       @padless = true
