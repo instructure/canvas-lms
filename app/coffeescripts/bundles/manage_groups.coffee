@@ -1,2 +1,1 @@
 require ['manage_groups']
-

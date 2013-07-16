@@ -170,6 +170,7 @@ a.load_members_link, .loading_members {
             :list_users_url              => group_members_url("{{ id }}") ,
             :list_unassigned_users_url   => context_url(@context, :context_group_unassigned_members_url),
             :assign_unassigned_users_url => api_v1_group_category_assign_unassigned_members_url(:group_category_id => "{{ category_id }}"),
+            :group_categories_url        => context_url(@context, :api_v1_context_group_categories_path),
             :add_group_url               => context_url(@context, :context_groups_url) %>
 
   <div id="tabs_loading_wrapper" style="display: none;">
