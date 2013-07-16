@@ -487,6 +487,12 @@ describe Attachment do
         @attachment.scribd_attempts.should == 0
       end
 
+      it "should not queue up duplicate render requests for the same document" do
+        @attachment = attachment_model(:filename => 'file.docx', :workflow_state => 'deleted')
+        expect { @attachment.check_rerender_scribd_doc }.to change(Delayed::Job, :count).by(1)
+        expect { @attachment.check_rerender_scribd_doc }.to change(Delayed::Job, :count).by(0)
+      end
+
       it "should do nothing if a scribd_doc already exists" do
         @attachment = attachment_with_scribd_doc(fake_scribd_doc, :filename => 'file.docx')
         expect {
@@ -495,7 +501,7 @@ describe Attachment do
       end
 
       it "should be invoked on record_inline_view" do
-        @attachment = attachment_model(:filename => 'file.docx')
+        @attachment = attachment_model(:filename => 'file.docx', :workflow_state => 'deleted')
         expect {
           @attachment.record_inline_view
         }.to change(Delayed::Job, :count).by(1)
@@ -506,6 +512,22 @@ describe Attachment do
         expect {
           @attachment.check_rerender_scribd_doc
         }.to change(Delayed::Job, :count).by(0)
+      end
+    end
+
+    describe "scribd_render_url" do
+      before do
+        scribd_mime_type_model(:extension => 'docx')
+      end
+
+      it "should return a url to request scribd rerendering" do
+        @attachment = attachment_model(:filename => 'file.docx', :workflow_state => 'deleted')
+        @attachment.scribd_render_url.should == "/#{@attachment.context_url_prefix}/files/#{@attachment.id}/scribd_render"
+      end
+
+      it "should return nil if the scribd doc isn't missing" do
+        @attachment = attachment_with_scribd_doc
+        @attachment.scribd_render_url.should be_nil
       end
     end
   end
@@ -1409,13 +1431,3 @@ def processing_model
   @attachment.submit_to_scribd!
 end
 
-# Makes sure we have a value in scribd_mime_types and that the attachment model points to that.
-def scribdable_attachment_model
-  ScribdAPI.stubs(:enabled?).returns(true)
-  scribd_mime_type_model(:extension => 'pdf')
-  attachment_model(:content_type => 'application/pdf')
-end
-
-def crocodocable_attachment_model
-  attachment_model(:content_type => 'application/pdf')
-end

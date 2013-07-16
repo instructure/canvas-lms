@@ -451,14 +451,16 @@ define([
           var attachment = data && data.attachment,
               scribdDocAttributes = attachment && attachment.scribd_doc && attachment.scribd_doc.attributes;
           $link.loadingImage('remove');
-          if (attachment && (scribdDocAttributes || $.isPreviewable(attachment.content_type, 'google'))) {
+          if (attachment && (attachment['scribdable?'] || $.isPreviewable(attachment.content_type, 'google'))) {
             var $div = $("<span><br /></span>")
               .insertAfter($link.parents(".link_holder:last"))
               .loadDocPreview({
                 scribd_doc_id: scribdDocAttributes && scribdDocAttributes.doc_id,
                 scribd_access_key: scribdDocAttributes && scribdDocAttributes.access_key,
                 mimeType: attachment.content_type,
-                public_url: attachment.authenticated_s3_url
+                public_url: attachment.authenticated_s3_url,
+                attachment_scribd_render_url: attachment.scribd_render_url,
+                attachment_preview_processing: attachment.workflow_state == 'pending_upload' || attachment.workflow_state == 'processing'
               })
               .append(
                 $('<a href="#" style="font-size: 0.8em;" class="hide_file_preview_link">' + htmlEscape(I18n.t('links.minimize_file_preview', 'Minimize File Preview')) + '</a>')

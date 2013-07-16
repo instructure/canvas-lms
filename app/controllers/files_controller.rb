@@ -314,6 +314,18 @@ class FilesController < ApplicationController
     end
   end
 
+  def scribd_render
+    # ApplicationController#get_context doesn't support Assignment
+    if @context.is_a?(User) && params[:assignment_id].present?
+      @context = Assignment.find(params[:assignment_id])
+    end
+    @attachment = @context.attachments.find(params[:file_id])
+    if @attachment.attachment_associations.where(:context_type => 'Submission').any? { |aa| aa.context.grants_right?(@current_user, session, :read) } || authorized_action(@attachment, @current_user, :read)
+      @attachment.check_rerender_scribd_doc
+      render :json => {:ok => true}
+    end
+  end
+
   def render_attachment(attachment)
     respond_to do |format|
       if params[:preview] && attachment.mime_class == 'image'
@@ -327,20 +339,22 @@ class FilesController < ApplicationController
       end
       if request.format == :json
         options = {:permissions => {:user => @current_user}}
-        if @attachment.grants_right?(@current_user, session, :download)
+        if attachment.grants_right?(@current_user, session, :download)
           # Right now we assume if they ask for json data on the attachment
           # which includes the scribd doc data, then that means they have 
           # viewed or are about to view the file in some form.
           if @current_user && ((feature_enabled?(:scribd) && attachment.scribd_doc) ||
              (service_enabled?(:google_docs_previews) && attachment.authenticated_s3_url))
             attachment.context_module_action(@current_user, :read)
-            @attachment.record_inline_view
+            attachment.record_inline_view
           end
-          options[:methods] = :authenticated_s3_url if service_enabled?(:google_docs_previews) && attachment.authenticated_s3_url
-          log_asset_access(@attachment, "files", "files")
+          options[:methods] = []
+          options[:methods] << :authenticated_s3_url if service_enabled?(:google_docs_previews) && attachment.authenticated_s3_url
+          options[:methods] << :scribd_render_url if attachment.scribd_doc_missing?
+          log_asset_access(attachment, "files", "files")
         end
       end
-      format.json { render :json => @attachment.to_json(options) }
+      format.json { render :json => attachment.to_json(options) }
     end
   end
   protected :render_attachment

@@ -1689,12 +1689,26 @@ class Attachment < ActiveRecord::Base
     check_rerender_scribd_doc unless self.scribd_doc
   end
 
+  def scribd_doc_missing?
+    scribdable? && scribd_doc.nil? && !pending_upload? && !processing?
+  end
+
+  def scribd_render_url
+    if scribd_doc_missing?
+      "/#{context_url_prefix}/files/#{self.id}/scribd_render"
+    else
+      nil
+    end
+  end
+
   def check_rerender_scribd_doc
-    if scribdable? && scribd_doc.nil?
+    if scribd_doc_missing?
       self.scribd_attempts = 0
       self.workflow_state = 'pending_upload'
       self.save!
       send_later :submit_to_scribd!
+      return true
     end
+    false
   end
 end

@@ -26,6 +26,10 @@ describe AttachmentHelper do
     "expected_context_url"
   end
 
+  def user_file_scribd_render_url(context, att_id)
+    "expected_scribd_render_url"
+  end
+
   before do
     course_with_student
     @att = attachment_model(:context => @user)
@@ -41,7 +45,21 @@ describe AttachmentHelper do
     asmnt = @course.assignments.create!(:title => "some assignment", :submission_types => 'online_upload')
     @att.context = asmnt
     @att.save!
-
     doc_preview_attributes(@att).should_not =~ %r{data-attachment_view_inline_ping_url}
+  end
+
+  it "should indicate when the file preview is processing" do
+    @att.workflow_state = 'processing'
+    attrs = doc_preview_attributes(@att)
+    attrs.should be_include('data-attachment_preview_processing=true')
+    attrs.should_not be_include('data-attachment_scribd_render_url')
+  end
+
+  it "should include a rerender url if the scribd doc is missing" do
+    @att.workflow_state = 'deleted'
+    @att.stubs(:scribd_doc).returns(nil)
+    attrs = doc_preview_attributes(@att)
+    attrs.should be_include('data-attachment_scribd_render_url=expected_scribd_render_url')
+    attrs.should_not be_include('data-attachment_preview_processing')
   end
 end

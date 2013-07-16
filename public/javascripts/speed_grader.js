@@ -1244,6 +1244,8 @@ define([
             attachment_id: attachment.id,
             submission_id: this.currentStudent.submission.id,
             attachment_view_inline_ping_url: attachment.view_inline_ping_url,
+            attachment_preview_processing: attachment.workflow_state == 'pending_upload' || attachment.workflow_state == 'processing',
+            attachment_scribd_render_url: attachment.scribd_render_url,
             ready: function(){
               EG.resizeFullHeight();
             }
@@ -1267,7 +1269,7 @@ define([
             }
           ));
         }
-        else if ( attachment && (scribdDocAvailable || $.isPreviewable(attachment.content_type, 'google')) ) {
+        else if ( attachment && (attachment['scribdable?'] || $.isPreviewable(attachment.content_type, 'google')) ) {
           if (!INST.disableCrocodocPreviews) $no_annotation_warning.show();
 
           if (scribdDocAvailable) {

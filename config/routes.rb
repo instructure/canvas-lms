@@ -76,6 +76,7 @@ FakeRails3Routes.draw do
       match 'download.:type' => 'files#show', :as => :typed_download, :download => '1'
       match 'preview' => 'files#show', :as => :preview, :preview => '1'
       match 'inline_view' => 'files#show', :as => :inline_view, :inline => '1'
+      match 'scribd_render' => 'files#scribd_render', :as => :scribd_render
       match 'contents' => 'files#attachment_content', :as => :attachment_content
       match ':file_path' => 'files#show_relative', :as => :relative_path, :file_path => /.+/
       collection do
@@ -738,7 +739,12 @@ FakeRails3Routes.draw do
   match 'files/:id/public_url.:format' => 'files#public_url', :as => :public_url
   match 'files/preflight' => 'files#preflight', :as => :file_preflight
   match 'files/pending' => 'files#create_pending', :as => :file_create_pending
-  match 'assignments' => 'assignments#index', :as => :assignments, :via => :get
+  resources :assignments, :only => [:index] do
+    resources :files, :only => [] do
+      match 'inline_view' => 'files#show', :as => :inline_view, :via => :post, :inline => '1'
+      match 'scribd_render' => 'files#scribd_render', :as => :scribd_render, :via => :post
+    end
+  end
 
   resources :appointment_groups, :only => [:index, :show]
 

@@ -1135,7 +1135,7 @@ class Assignment < ActiveRecord::Base
               version_json['submission']['versioned_attachments'].map! do |a|
                 a.as_json(
                   :only => attachment_fields,
-                  :methods => [:view_inline_ping_url]
+                  :methods => [:view_inline_ping_url, :scribd_render_url]
                 )
               end
             end
