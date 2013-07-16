@@ -17,6 +17,7 @@ $item-hover-background: #eef7ff
 $shadow: 0 1px 0 rgba(0,0,0,0.15)
 
 .pages
+
   #breadcrumbs
     :border-bottom 1px solid $border-color
   .toolbar-buttons
@@ -27,6 +28,18 @@ $shadow: 0 1px 0 rgba(0,0,0,0.15)
       :float left
     .right-buttons
       :float right
+
+  .toolbar-buttons.sticky
+    position: fixed
+    z-index: 1000
+    top: 0px
+    right: 0px
+    left: 0px
+    margin-left: $left_side_width + 1px
+    background: white
+    height: 33px
+    max-width: $max_main_width - 26px
+    border-color: $menu-border-color
 
 .pages.index
   .index-content-container

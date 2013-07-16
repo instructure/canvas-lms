@@ -3,9 +3,13 @@ define [
   'Backbone'
   'compiled/str/splitAssetString'
   'jst/wiki/WikiPage'
-], (_, Backbone, splitAssetString, template) ->
+  'compiled/views/StickyHeaderMixin'
+], (_, Backbone, splitAssetString, template, StickyHeaderMixin ) ->
 
   class WikiPageView extends Backbone.View
+
+    @mixin StickyHeaderMixin
+
     template: template
 
     els:

@@ -3,8 +3,9 @@ define [
   'compiled/views/wiki/WikiPageIndexItemView'
   'jst/wiki/WikiPageIndex'
   'jquery'
+  'compiled/views/StickyHeaderMixin'
   'jquery.disableWhileLoading'
-], (PaginatedCollectionView, itemView, template,$) ->
+], (PaginatedCollectionView, itemView, template,$, StickyHeaderMixin) ->
 
   class WikiPageIndexView extends PaginatedCollectionView
     initialize: ->
@@ -20,6 +21,7 @@ define [
         created_at: 'desc'
         updated_at: 'desc'
 
+    @mixin StickyHeaderMixin
     @mixin
       el: '#content'
       template: template
