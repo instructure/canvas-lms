@@ -8,7 +8,7 @@
       <span class="unpublished" aira-label="{{#t 'publish'}}Publish{{/t}}"><i class="icon-unpublished muted"></i> {{#t 'buttons.publish'}}Unpublished{{/t}}</span>
     {{/if}}
     <button class="btn preview">{{#t 'buttons.preview'}}Preview{{/t}}</button>
-    <a class="btn al-trigger">
+    <a class="btn al-trigger" tabindex="0" role="button">
       <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
       <span class="screenreader-only">{{#t 'toolbar_menu.settings'}}Settings{{/t}}</span>
     </a>
@@ -20,7 +20,8 @@
 
 <div class="edit-content">
   <div class="edit-header">
-    <input name="wiki_page[title]" type="text" class="span4 title" value="{{title}}">
+    <label for="wiki_page[title]" class="screenreader-only">{{#t "title_label"}}Page Title{{/t}}</label>
+    <input id="wiki_page[title]" name="wiki_page[title]" type="text" class="span4 title" value="{{title}}" autofocus>
     <a href="#" class="switch_views">{{#t "#editor.switch_views"}}Switch Views{{/t}}</a>
   </div>
 

@@ -38,6 +38,10 @@ define [
       @$wikiPageBody.editorBox()
       @initWikiSidebar()
 
+      unless @firstRender
+        @firstRender = true
+        $ -> $('[autofocus]:not(:focus)').eq(0).focus()
+
     # Initialize the wiki sidebar
     # @api private
     initWikiSidebar: ->
