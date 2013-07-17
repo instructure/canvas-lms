@@ -65,12 +65,7 @@ body.with-right-side.with-left-side {
     }
 
     .discussion-header-content {
-      padding-top: 10px;
-    }
-
-    .discussion-header-right {
-      line-height: 10px;
-      padding-top: 6px;
+      padding-top: 8px;
     }
 
     .deleted-discussion-entry .right-of-avatar {
@@ -93,14 +88,18 @@ body.with-right-side.with-left-side {
       border-radius: 0;
       border-top: solid 1px $border;
 
+      .avatar img {
+        height: 32px;
+        width: 32px;
+      }
+
       .discussion_entry {
         margin: 0;
         border-bottom: none;
       }
 
-      .avatar img {
-        height: 32px;
-        width: 32px;
+      .discussion-header-content {
+        padding-top: 0;
       }
     }
   }
@@ -160,18 +159,21 @@ body.with-right-side.with-left-side {
 .topic {
   h1.discussion-title {
     font-size: 19px;
+    font-weight: normal;
+    line-height: 30px;
   }
   h2.discussion-title {
     font-size: 16px;
   }
   .discussion-title {
     font-size: 19px;
-    padding-top: 12px;
   }
 }
 
 .discussion-title {
   font-size: 13px;
+  font-weight: bold;
+  line-height: 23px;
   margin: 0;
 }
 
@@ -235,23 +237,9 @@ body.with-right-side.with-left-side {
   left: -32px;
 }
 
-.no-touch {
-  .entry-control {
-    visibility: hidden;
-  }
-}
-.touch {
-  .entry-control {
-    visibility: visible;
-  }
-}
-
-.discussion_entry {
-  &:hover {
-    .entry-control {
-      visibility: visible;
-    }
-  }
+.discussion-reply-action, .discussion-reply-action:hover {
+  color: #555;
+  text-decoration: none;
 }
 
 .entry, .discussion_entry {
@@ -334,6 +322,8 @@ body.with-right-side.with-left-side {
 }
 
 .discussion-header-content {
+  padding-top: 5px;
+
   .author.unknown {
     font-style: italic;
   }
@@ -509,12 +499,13 @@ body.with-right-side.with-left-side {
   display: block;
   background-color: #fdfdfd;
   font-size: 11px;
-  color: #636363 !important;
+  color: #aaa;
   padding: 3px 10px;
   cursor: text;
   border: 1px solid #d4d5d7;
   margin: 15px 0;
-  &:hover {
+  &:hover, &:focus {
+    color: #555;
     text-decoration: none;
   }
 }
