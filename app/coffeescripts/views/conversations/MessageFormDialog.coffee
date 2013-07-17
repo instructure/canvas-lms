@@ -37,9 +37,8 @@ define [
 
     els:
       '.media_comment':                 '$mediaComment'
-#      'input[name=media_comment_id]':   '$mediaCommentId'
-#      'input[name=media_comment_type]': '$mediaCommentType'
-#      '.action_media_comment':          '$addMediaComment'
+      'input[name=media_comment_id]':   '$mediaCommentId'
+      'input[name=media_comment_type]': '$mediaCommentType'
       '.recipients':                    '$recipients'
       '.attachment_list':               '$attachments'
       '.attachments-pane':              '$attachmentsPane'
@@ -86,6 +85,7 @@ define [
       @$fullDialog.off 'keydown', '.attachment'
       @$fullDialog.off 'change', '.file_input'
       @$fullDialog.off 'click', '.attach-media'
+      @$fullDialog.off 'click', '.media-comment a.remove_link'
 
     sendMessage: (e) ->
       e.preventDefault()
@@ -106,6 +106,8 @@ define [
 
       # add attachment and media buttons to bottom bar
       @$fullDialog.find('.ui-dialog-buttonpane').prepend composeButtonBarTemplate()
+
+      @$addMediaComment = @$fullDialog.find('.attach-media')
 
     prepareTextarea: ($scope) ->
       $textArea = $scope.find('textarea')
@@ -209,6 +211,9 @@ define [
 
       @$fullDialog.on 'click', '.attach-media', preventDefault =>
         @addMediaComment()
+      @$fullDialog.on 'click', '.media_comment a.remove_link', preventDefault (e) =>
+        @removeMediaComment($(e.currentTarget))
+      @$addMediaComment[if !!INST.kalturaSettings then 'show' else 'hide']()
 
       @$el.formSubmit
         fileUpload: => (@$form.find(".file_input").length > 0)
@@ -306,19 +311,15 @@ define [
         @$mediaCommentType.val(type)
         @$mediaComment.show()
         @$addMediaComment.hide()
-      @updateAttachmentPane()
 
     removeMediaComment: ->
       @$mediaCommentId.val('')
       @$mediaCommentType.val('')
       @$mediaComment.hide()
       @$addMediaComment.show()
-      @updateAttachmentPane()
-
 
     updateAttachmentPane: ->
-      # TODO: add logic for showing/hiding based on having contents
-      @$attachmentsPane.addClass('has-items')
+      @$attachmentsPane[if @$attachmentsPane.find('.attachment').length then 'addClass' else 'removeClass']('has-items')
       @resizeBody()
 
 #    messageData: (data) ->
