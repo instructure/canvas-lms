@@ -34,5 +34,13 @@ module Canvas::AccountReports
     def self.provisioning_csv(account_report)
       SisExporter.new(account_report, {:sis_format => false}).csv
     end
+
+    def self.unpublished_courses_csv(account_report)
+      CourseReports.new(account_report).unpublished_courses
+    end
+
+    def self.recently_deleted_courses_csv(account_report)
+      CourseReports.new(account_report).recently_deleted
+    end
   end
 end

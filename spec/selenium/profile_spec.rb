@@ -142,7 +142,7 @@ describe "profile" do
       edit_form = click_edit
       click_option('#user_locale', 'Español')
       expect_new_page_load { submit_form(edit_form) }
-      f('.profile_table').should include_text('Nombre')
+      get_value('#user_locale').should == 'es'
     end
 
     it "should change the language even if you can't update your name" do
@@ -155,7 +155,7 @@ describe "profile" do
       edit_form.find_elements(:id, 'user_short_name').first.should be_nil
       click_option('#user_locale', 'Español')
       expect_new_page_load { submit_form(edit_form) }
-      f('.profile_table').should include_text('Nombre')
+      get_value('#user_locale').should == 'es'
     end
 
     it "should add another contact method - sms" do
@@ -296,6 +296,24 @@ describe "profile" do
         profile_pic.should have_attribue('src', image_src)
       end
       Attachment.last.folder.should == @user.profile_pics_folder
+    end
+
+    it "should allow users to choose an avatar from their profile page" do
+      course_with_teacher_logged_in
+
+      account = Account.default
+      account.enable_service('avatars')
+      account.settings[:enable_profiles] = true
+      account.save!
+
+      get "/about/#{@user.to_param}"
+      wait_for_ajaximations
+
+      f('.profile-link').click
+
+      wait_for_ajaximations
+
+      f('#profile_pic_dialog').should_not be_nil
     end
   end
 

@@ -2,6 +2,27 @@
 // Tooltips
 // --------------------------------------------------
 
+/*
+@styleguide Tooltips
+
+```html
+<a data-tooltip title="Synth meh ennui messenger bag, organic letterpress intelligentsia Austin blog plaid sartorial chillwave wayfarers pork belly lo-fi. Narwhal banksy VHS deep v, blue bottle messenger bag tousled scenester synth 8-bit lo-fi aesthetic ethnic ethical sustainable.">default tooltip</a> &#124; 
+<a data-tooltip="top" title="tooltip on the top... same as default">top tooltip</a> &#124; 
+<a data-tooltip="bottom" title="tooltip on the bottom">bottom tooltip</a> &#124; 
+<a data-tooltip="right" title="tooltip on the right">right tooltip</a> &#124; 
+<a data-tooltip="left" title="tooltip on the left">left tooltip</a>
+<p>
+  <button data-tooltip title="any type of element can have a tooltip" class="btn">
+    button with tooltip
+  </button>
+</p>
+```
+
+### note
+
+add `data-tooltip` attribute to any element for default tooltip. You can also specify the direction by adding top, bottom, right, or left.
+
+*/
 
 // Base class
 .tooltip {

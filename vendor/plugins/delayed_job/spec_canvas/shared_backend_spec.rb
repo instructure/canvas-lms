@@ -146,12 +146,12 @@ shared_examples_for 'a backend' do
     end
 
     it "should be the method that will be called if its a performable method object" do
-      @job = Story.send_later(:create)
+      @job = Story.send_later_enqueue_args(:create, no_delay: true)
       @job.name.should == "Story.create"
     end
 
     it "should be the instance method that will be called if its a performable method object" do
-      @job = Story.create(:text => "...").send_later(:save)
+      @job = Story.create(:text => "...").send_later_enqueue_args(:save, no_delay: true)
       @job.name.should == 'Story#save'
     end
   end
@@ -444,7 +444,7 @@ shared_examples_for 'a backend' do
   end
 
   it "should set in_delayed_job?" do
-    job = InDelayedJobTest.send_later(:check_in_job)
+    job = InDelayedJobTest.send_later_enqueue_args(:check_in_job, no_delay: true)
     Delayed::Job.in_delayed_job?.should == false
     job.invoke_job
     Delayed::Job.in_delayed_job?.should == false
@@ -522,10 +522,10 @@ shared_examples_for 'a backend' do
 
   it "should return the jobs for a tag" do
     tag_jobs = []
-    3.times { tag_jobs << "test".send_later(:to_s) }
+    3.times { tag_jobs << "test".send_later_enqueue_args(:to_s, :no_delay => true) }
     2.times { "test".send_later(:to_i) }
-    tag_jobs << "test".send_later_enqueue_args(:to_s, :run_at => 5.hours.from_now)
-    tag_jobs << "test".send_later_enqueue_args(:to_s, :strand => "test1")
+    tag_jobs << "test".send_later_enqueue_args(:to_s, :run_at => 5.hours.from_now, :no_delay => true)
+    tag_jobs << "test".send_later_enqueue_args(:to_s, :strand => "test1", :no_delay => true)
     "test".send_later_enqueue_args(:to_i, :strand => "test1")
     create_job
 
@@ -659,18 +659,18 @@ shared_examples_for 'a backend' do
       before do
         @flavor = 'tag'
         @query = 'String#to_i'
-        @affected_jobs << "test".send_later_enqueue_args(:to_i)
-        @affected_jobs << "test".send_later_enqueue_args(:to_i, :strand => 's1')
-        @affected_jobs << "test".send_later_enqueue_args(:to_i, :run_at => 2.hours.from_now)
+        @affected_jobs << "test".send_later_enqueue_args(:to_i, :no_delay => true)
+        @affected_jobs << "test".send_later_enqueue_args(:to_i, :strand => 's1', :no_delay => true)
+        @affected_jobs << "test".send_later_enqueue_args(:to_i, :run_at => 2.hours.from_now, :no_delay => true)
         @ignored_jobs << create_job
         @ignored_jobs << create_job(:run_at => 1.hour.from_now)
       end
     end
 
     it "should hold and un-hold given job ids" do
-      j1 = "test".send_later(:to_i)
+      j1 = "test".send_later_enqueue_args(:to_i, :no_delay => true)
       j2 = create_job(:run_at => 2.hours.from_now)
-      j3 = "test".send_later_enqueue_args(:to_i, :strand => 's1')
+      j3 = "test".send_later_enqueue_args(:to_i, :strand => 's1', :no_delay => true)
       Delayed::Job.bulk_update('hold', :ids => [j1.id, j2.id]).should == 2
       j1.reload.on_hold?.should be_true
       j2.reload.on_hold?.should be_true
@@ -692,13 +692,13 @@ shared_examples_for 'a backend' do
   describe "tag_counts" do
     before do
       @cur = []
-      3.times { @cur << "test".send_later(:to_s) }
-      5.times { @cur << "test".send_later(:to_i) }
-      2.times { @cur << "test".send_later(:upcase) }
-      ("test".send_later :downcase).fail!
+      3.times { @cur << "test".send_later_enqueue_args(:to_s, no_delay: true) }
+      5.times { @cur << "test".send_later_enqueue_args(:to_i, no_delay: true) }
+      2.times { @cur << "test".send_later_enqueue_args(:upcase, no_delay: true) }
+      ("test".send_later_enqueue_args :downcase, no_delay: true).fail!
       @future = []
-      5.times { @future << "test".send_at(3.hours.from_now, :downcase) }
-      @cur << "test".send_later(:downcase)
+      5.times { @future << "test".send_later_enqueue_args(:downcase, run_at: 3.hours.from_now, no_delay: true) }
+      @cur << "test".send_later_enqueue_args(:downcase, no_delay: true)
     end
 
     it "should return a sorted list of popular current tags" do

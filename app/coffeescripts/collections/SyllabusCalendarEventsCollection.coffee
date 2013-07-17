@@ -39,7 +39,8 @@ define [
       super options
 
     # Overridden to make the id unique when aggregated in
-    # a collection with other models
+    # a collection with other models, and to exclude
+    # 'hidden' events
     parse: (resp) =>
       eventType = @type
       switch eventType
@@ -52,12 +53,15 @@ define [
               if !overridden
                 ev.id = "#{ev.id}_override_#{override.id}"
                 overridden = true
+            ev
 
         when "event"
           normalize = (ev) ->
             ev.related_id = ev.id = "#{eventType}_#{ev.id}"
+            ev.related_id = "#{eventType}_#{ev.parent_event_id}" if ev.parent_event_id
+            ev
 
+      result = []
       _.each super, (ev) ->
-        normalize ev
-
-      resp
+        result.push normalize ev unless ev.hidden
+      result

@@ -1,0 +1,134 @@
+.profile_table {
+  td {
+    padding: 2px 5px;
+    vertical-align: top;
+  }
+
+  .edit_data {
+    display: none;
+  }
+
+  &.editing {
+    .edit_data {
+      display: inline;
+    }
+
+    .display_data {
+      display: none
+    }
+  }
+}
+
+#user_bio {
+  height: 200px;
+  width: 100%;
+}
+
+#registered_services {
+  .service {
+    font-size: 1.2em;
+    padding: 2px;
+
+    .delete_service_link {
+      display: none;
+    }
+
+    &.service-hover {
+      background-color: #eee;
+      border-radius: 3px;
+    }
+
+    &.service-hover .delete_service_link {
+      display: inline;
+    }
+  }
+}
+
+#unregistered_services {
+  .btn {
+    margin: 3px;
+    width: 150px;
+
+    img {
+      vertical-align: middle;
+    }
+  }
+
+  .service a {
+    text-align: left;
+  }
+}
+
+.profile_pic_link {
+  position: relative;
+
+  img {
+    max-width: 50px;
+  }
+
+  .icon-edit {
+    background: rgba(0, 0, 0, .75);
+    bottom: 0;
+    color: #fff;
+    padding: 2px;
+    position: absolute;
+    right: 0;
+    visibility: hidden;
+  }
+
+  &:hover .icon-edit {
+    visibility: visible;
+  }
+}
+
+.profile_pic_list {
+  .img {
+    cursor: pointer;
+    display: inline-block;
+    float: left;
+    margin: 2px;
+    overflow: hidden;
+    padding: 4px;
+    width: 50px;
+
+    &.selected {
+      border: 2px solid #444;
+      padding: 2px;
+    }
+
+    &:hover {
+      border: 2px solid #888;
+      padding: 2px;
+    }
+  }
+
+  img {
+    max-height: 75px;
+    max-width: 50px;
+    min-height: 25px;
+    vertical-align: middle;
+  }
+}
+
+#token_details_dialog {
+  table {
+    border-collapse: collapse;
+    width: 100%;
+
+    th {
+      font-weight: bold;
+      vertical-align: top;
+      white-space: nowrap;
+      width: 5%;
+    }
+
+    td, th {
+      border-top: 1px dotted #ccc;
+      padding: 3px 8px;
+    }
+
+    .full_token_warning {
+      font-size: 0.8em;
+    }
+  }
+}

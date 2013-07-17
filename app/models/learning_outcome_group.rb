@@ -18,7 +18,7 @@
 
 class LearningOutcomeGroup < ActiveRecord::Base
   include Workflow
-  attr_accessible :context, :title, :description, :learning_outcome_group
+  attr_accessible :context, :title, :description, :learning_outcome_group, :vendor_guid
   belongs_to :learning_outcome_group
   has_many :child_outcome_groups, :class_name => 'LearningOutcomeGroup', :foreign_key => "learning_outcome_group_id"
   has_many :child_outcome_links, :class_name => 'ContentTag', :as => :associated_asset, :conditions => {:tag_type => 'learning_outcome_association', :content_type => 'LearningOutcome'}
@@ -161,6 +161,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
     copy = child_outcome_groups.build
     copy.title = original.title
     copy.description = original.description
+    copy.vendor_guid = original.vendor_guid
     copy.context = self.context
     copy.save!
 

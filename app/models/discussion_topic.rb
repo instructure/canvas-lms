@@ -25,9 +25,9 @@ class DiscussionTopic < ActiveRecord::Base
   include TextHelper
   include ContextModuleItem
 
-  attr_accessible :title, :message, :user, :delayed_post_at, :assignment,
+  attr_accessible :title, :message, :user, :delayed_post_at, :lock_at, :assignment,
     :plaintext_message, :podcast_enabled, :podcast_has_student_posts,
-    :require_initial_post, :threaded, :discussion_type, :context
+    :require_initial_post, :threaded, :discussion_type, :context, :pinned
 
   module DiscussionTypes
     SIDE_COMMENT = 'side_comment'
@@ -60,15 +60,17 @@ class DiscussionTopic < ActiveRecord::Base
 
   sanitize_field :message, Instructure::SanitizeField::SANITIZE
   copy_authorized_links(:message) { [self.context, nil] }
-  acts_as_list :scope => :context
+  acts_as_list scope: %q{context_id = #{context_id} AND
+                         context_type = '#{context_type}' AND
+                         pinned = TRUE}
 
   before_create :initialize_last_reply_at
   before_save :default_values
-  before_save :set_schedule_delayed_post
+  before_save :set_schedule_delayed_transitions
   after_save :update_assignment
   after_save :update_subtopics
   after_save :touch_context
-  after_save :schedule_delayed_post
+  after_save :schedule_delayed_transitions
   after_create :create_participant
   after_create :create_materialized_view
 
@@ -103,13 +105,15 @@ class DiscussionTopic < ActiveRecord::Base
   end
   protected :default_values
 
-  def set_schedule_delayed_post
-    @should_schedule_delayed_post = self.delayed_post_at_changed?
+  def set_schedule_delayed_transitions
+    @should_schedule_delayed_post = self.delayed_post_at? && self.delayed_post_at_changed?
+    @should_schedule_lock_at = self.lock_at && self.lock_at_changed?
     true
   end
 
-  def schedule_delayed_post
-    self.send_at(self.delayed_post_at, :try_posting_delayed) if @should_schedule_delayed_post
+  def schedule_delayed_transitions
+    self.send_at(self.delayed_post_at, :auto_update_workflow) if @should_schedule_delayed_post
+    self.send_at(self.lock_at, :auto_update_workflow) if @should_schedule_lock_at
   end
 
   def update_subtopics
@@ -153,7 +157,7 @@ class DiscussionTopic < ActiveRecord::Base
       self.assignment.description = self.message
       self.assignment.submission_types = "discussion_topic"
       self.assignment.saved_by = :discussion_topic
-      self.assignment.workflow_state = 'available' if self.assignment.deleted?
+      self.assignment.workflow_state = 'published' if self.assignment.deleted?
       self.assignment.save
     end
 
@@ -169,7 +173,7 @@ class DiscussionTopic < ActiveRecord::Base
 
   def restore_old_assignment
     return nil unless self.old_assignment && self.old_assignment.deleted?
-    self.old_assignment.workflow_state = 'available'
+    self.old_assignment.workflow_state = 'published'
     self.old_assignment.saved_by = :discussion_topic
     self.old_assignment.save(false)
     self.old_assignment
@@ -208,7 +212,7 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def create_participant
-    self.discussion_topic_participants.create(:user => self.user, :workflow_state => "read", :unread_entry_count => 0) if self.user
+    self.discussion_topic_participants.create(:user => self.user, :workflow_state => "read", :unread_entry_count => 0, :subscribed => true) if self.user
   end
 
   def update_materialized_view
@@ -247,9 +251,12 @@ class DiscussionTopic < ActiveRecord::Base
     self.update_or_create_participant(:current_user => current_user, :new_state => new_state)
   end
 
-  def change_all_read_state(new_state, current_user = nil)
+  def change_all_read_state(new_state, current_user = nil, opts = {})
     current_user ||= self.current_user
     return unless current_user
+
+    update_fields = { :workflow_state => new_state }
+    update_fields[:forced_read_state] = opts[:forced] if opts.has_key?(:forced)
 
     transaction do
       self.context_module_action(current_user, :read) if new_state == 'read'
@@ -263,7 +270,7 @@ class DiscussionTopic < ActiveRecord::Base
         existing_entry_participants = DiscussionEntryParticipant.where(:user_id =>current_user, :discussion_entry_id => entry_ids).
           select([:id, :discussion_entry_id]).all
         existing_ids = existing_entry_participants.map(&:id)
-        DiscussionEntryParticipant.where(:id => existing_ids).update_all(:workflow_state => new_state) if existing_ids.present?
+        DiscussionEntryParticipant.where(:id => existing_ids).update_all(update_fields) if existing_ids.present?
 
         if new_state == "read"
           new_entry_ids = entry_ids - existing_entry_participants.map(&:discussion_entry_id)
@@ -271,8 +278,7 @@ class DiscussionTopic < ActiveRecord::Base
             {
               :discussion_entry_id => entry_id,
               :user_id => current_user.id,
-              :workflow_state => new_state
-            }
+            }.merge(update_fields)
           })
         end
       end
@@ -290,6 +296,57 @@ class DiscussionTopic < ActiveRecord::Base
     topic_participant.try(:unread_entry_count) || self.default_unread_count
   end
 
+  def subscribed?(current_user = nil)
+    current_user ||= self.current_user
+    return false unless current_user # default for logged out user
+
+    if root_topic?
+      participant = DiscussionTopicParticipant.where(user_id: current_user.id,
+        discussion_topic_id: child_topics.pluck(:id)).first
+    end
+    participant ||= discussion_topic_participants.where(:user_id => current_user.id).first
+
+    if participant
+      if participant.subscribed.nil?
+        # if there is no explicit subscription, assume the author and posters
+        # are subscribed, everyone else is not subscribed
+        current_user == user || participant.discussion_topic.posters.include?(current_user)
+      else
+        participant.subscribed
+      end
+    else
+      current_user == user
+    end
+  end
+
+  def subscribe(current_user = nil)
+    change_subscribed_state(true, current_user)
+  end
+
+  def unsubscribe(current_user = nil)
+    change_subscribed_state(false, current_user)
+  end
+
+  def change_subscribed_state(new_state, current_user = nil)
+    current_user ||= self.current_user
+    return unless current_user
+    return true if subscribed?(current_user) == new_state
+
+    if root_topic?
+      change_child_topic_subscribed_state(new_state, current_user)
+    else
+      update_or_create_participant(:current_user => current_user, :subscribed => new_state)
+    end
+  end
+
+  def change_child_topic_subscribed_state(new_state, current_user)
+    group_ids = current_user.group_memberships.active.pluck(:group_id) &
+      context.groups.active.pluck(:id)
+    topic = child_topics.where(context_id: group_ids, context_type: 'Group').first
+    topic.update_or_create_participant(current_user: current_user, subscribed: new_state)
+  end
+  protected :change_child_topic_subscribed_state
+
   def update_or_create_participant(opts={})
     current_user = opts[:current_user] || self.current_user
     return nil unless current_user
@@ -300,10 +357,12 @@ class DiscussionTopic < ActiveRecord::Base
         topic_participant = self.discussion_topic_participants.where(:user_id => current_user).lock.first
         topic_participant ||= self.discussion_topic_participants.build(:user => current_user,
                                                                        :unread_entry_count => self.unread_count(current_user),
-                                                                       :workflow_state => "unread")
+                                                                       :workflow_state => "unread",
+                                                                       :subscribed => current_user == user)
         topic_participant.workflow_state = opts[:new_state] if opts[:new_state]
         topic_participant.unread_entry_count += opts[:offset] if opts[:offset] && opts[:offset] != 0
         topic_participant.unread_entry_count = opts[:new_count] if opts[:new_count]
+        topic_participant.subscribed = opts[:subscribed] if opts.has_key?(:subscribed)
         topic_participant.save
       end
     end
@@ -322,10 +381,36 @@ class DiscussionTopic < ActiveRecord::Base
   scope :before, lambda { |date| where("discussion_topics.created_at<?", date) }
 
   scope :by_position, order("discussion_topics.position DESC, discussion_topics.created_at DESC")
+  scope :by_last_reply_at, order("discussion_topics.last_reply_at DESC, discussion_topics.created_at DESC")
 
-  def try_posting_delayed
-    if self.post_delayed? && Time.now >= self.delayed_post_at
-      self.delayed_post
+  def auto_update_workflow
+    transition_to_workflow_state(desired_workflow_state)
+  end
+  alias_method :try_posting_delayed, :auto_update_workflow
+
+  # Determine the desired workflow_state based on current values of delayed_post_at and lock_at
+  #
+  # 'delayed_post' if delayed_post_at < now
+  # 'locked' if lock_at is in the past
+  def desired_workflow_state(time_to_check = Time.now)
+    if self.delayed_post_at && time_to_check < self.delayed_post_at
+      'post_delayed'
+    elsif self.lock_at && self.lock_at < time_to_check
+      'locked'
+    else
+      'active'
+    end
+  end
+
+  # Attempts to make valid transitions to the desired workflow state.
+  # This can move it forward along delayed -> active -> locked, but not
+  # backward.
+  def transition_to_workflow_state(desired_state)
+    if desired_state != 'post_delayed'
+       self.delayed_post
+     end
+    if desired_state == 'locked'
+      self.lock
     end
   end
 
@@ -337,7 +422,6 @@ class DiscussionTopic < ActiveRecord::Base
     end
     state :post_delayed do
       event :delayed_post, :transitions_to => :active do
-        @delayed_just_posted = true
         self.last_reply_at = Time.now
         self.posted_at = Time.now
       end
@@ -372,7 +456,7 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   on_update_send_to_streams do
-    if should_send_to_stream && (@delayed_just_posted || @content_changed || changed_state(:active, :post_delayed))
+    if should_send_to_stream && (@content_changed || changed_state(:active, :post_delayed))
       self.active_participants
     end
   end
@@ -395,7 +479,7 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def reply_from(opts)
-    raise IncomingMessageProcessor::UnknownAddressError if self.context.root_account.deleted?
+    raise IncomingMail::IncomingMessageProcessor::UnknownAddressError if self.context.root_account.deleted?
     user = opts[:user]
     if opts[:html]
       message = opts[:html].strip
@@ -417,7 +501,7 @@ class DiscussionTopic < ActiveRecord::Base
         :user => user,
       })
       if !entry.grants_right?(user, :create)
-        raise IncomingMessageProcessor::ReplyToLockedTopicError
+        raise IncomingMail::IncomingMessageProcessor::ReplyToLockedTopicError
       else
         entry.save!
         entry
@@ -483,7 +567,7 @@ class DiscussionTopic < ActiveRecord::Base
 
   def initialize_last_reply_at
     self.posted_at ||= Time.now
-    self.last_reply_at = Time.now
+    self.last_reply_at ||= Time.now
   end
 
   set_policy do
@@ -622,21 +706,50 @@ class DiscussionTopic < ActiveRecord::Base
     end
   end
 
+  def participating_users(user_ids)
+    context.respond_to?(:participating_users) ? context.participating_users(user_ids) : User.find(user_ids)
+  end
+
+  def subscribers
+    # this duplicates some logic from #subscribed? so we don't have to call 
+    # #posters for each legacy subscriber.
+    sub_ids = discussion_topic_participants.where(:subscribed => true).pluck(:user_id)
+    legacy_sub_ids = discussion_topic_participants.where(:subscribed => nil).pluck(:user_id)
+    poster_ids = posters.map(&:id)
+    legacy_sub_ids &= poster_ids + [user.id]
+    sub_ids += legacy_sub_ids
+    participating_users(sub_ids)
+  end
+
   def posters
     user_ids = discussion_entries.map(&:user_id).push(self.user_id).uniq
-    context.respond_to?(:participating_users) ? context.participating_users(user_ids) : User.find(user_ids)
+    participating_users(user_ids)
   end
 
   def user_name
     self.user ? self.user.name : nil
   end
 
-  def locked_for?(user=nil, opts={})
+  def visible_for?(user=nil, opts={})
+    return true if user == self.user
+    if unlock_at = locked_for?(user, opts).try_rescue(:[], :unlock_at)
+      unlock_at < Time.now
+    else
+      true
+    end
+  end
+
+  # Public: Determine if the discussion topic is locked for a specific user. The topic is locked when the 
+  #         delayed_post_at is in the future or the group assignment is locked. This does not determine
+  #         the visibility of the topic to the user, only that they are unable to reply.
+  def locked_for?(user, opts={})
     return false if opts[:check_policies] && self.grants_right?(user, nil, :update)
     Rails.cache.fetch(locked_cache_key(user), :expires_in => 1.minute) do
       locked = false
       if (self.delayed_post_at && self.delayed_post_at > Time.now)
         locked = {:asset_string => self.asset_string, :unlock_at => self.delayed_post_at}
+      elsif (self.lock_at && self.lock_at < Time.now)
+        locked = {:asset_string => self.asset_string, :lock_at => self.lock_at}
       elsif (self.assignment && l = self.assignment.locked_for?(user, opts))
         locked = l
       elsif self.could_be_locked && item = locked_by_module_item?(user, opts[:deep_check_if_needed])
@@ -724,7 +837,7 @@ class DiscussionTopic < ActiveRecord::Base
         context = Group.find_by_context_id_and_context_type_and_migration_id(migration.context.id, migration.context.class.to_s, topic['group_id']) if topic['group_id']
         context ||= migration.context
         if context
-          if migration.import_object?("topics", topic['migration_id'])
+          if migration.import_object?("discussion_topics", topic['migration_id']) || migration.import_object?("topics", topic['migration_id'])
             begin
               import_from_migration(topic.merge({:topic_entries_to_import => topic_entries_to_import}), context)
             rescue
@@ -753,6 +866,7 @@ class DiscussionTopic < ActiveRecord::Base
     item.message = ImportedHtmlConverter.convert(hash[:description] || hash[:text], context, {:missing_links => (hash[:missing_links])})
     item.message = t('#discussion_topic.empty_message', "No message") if item.message.blank?
     item.posted_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:posted_at]) if hash[:posted_at]
+    item.last_reply_at = item.posted_at if item.new_record? && item.posted_at
     item.delayed_post_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:delayed_post_at]) if hash[:delayed_post_at]
     item.delayed_post_at ||= Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:start_date]) if hash[:start_date]
     item.position = hash[:position] if hash[:position]

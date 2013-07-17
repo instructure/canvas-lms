@@ -98,8 +98,7 @@ describe AcademicBenchmark::Converter do
     @cm.export_content
     run_jobs
     @cm.reload
-    @cm.old_warnings_format.should == []
-    @cm.migration_settings[:last_error].should be_nil
+    @cm.migration_issues.count.should == 0
     @cm.workflow_state.should == 'imported'
 
     verify_full_import()
@@ -112,8 +111,9 @@ describe AcademicBenchmark::Converter do
     run_jobs
     @cm.reload
 
+    @cm.migration_issues.count.should == 1
+    @cm.migration_issues.first.description.should == "User isn't allowed to edit global outcomes"
     @cm.workflow_state.should == 'failed'
-    @cm.migration_settings[:last_error].should =~ /ErrorReport:\d+/
   end
 
   it "should fail if no file or authority set" do
@@ -125,8 +125,8 @@ describe AcademicBenchmark::Converter do
     run_jobs
     @cm.reload
 
-    @cm.old_warnings_format.should == [["No outcome file or authority given", ""]]
-    @cm.migration_settings[:last_error].should_not be_nil
+    @cm.migration_issues.count.should == 1
+    @cm.migration_issues.first.description.should == "No outcome file or authority given"
     @cm.workflow_state.should == 'failed'
   end
 
@@ -144,8 +144,7 @@ describe AcademicBenchmark::Converter do
       run_jobs
       @cm.reload
 
-      @cm.old_warnings_format.should == []
-      @cm.migration_settings[:last_error].should be_nil
+      @cm.migration_issues.count.should == 0
       @cm.workflow_state.should == 'imported'
 
       @root_group = LearningOutcomeGroup.global_root_outcome_group
@@ -160,8 +159,8 @@ describe AcademicBenchmark::Converter do
       run_jobs
       @cm.reload
 
-      @cm.old_warnings_format.should == [["An API key is required to use Academic Benchmarks", ""]]
-      @cm.migration_settings[:last_error].should_not be_nil
+      @cm.migration_issues.count.should == 1
+      @cm.migration_issues.first.description.should == "An API key is required to use Academic Benchmarks"
       @cm.workflow_state.should == 'failed'
     end
 

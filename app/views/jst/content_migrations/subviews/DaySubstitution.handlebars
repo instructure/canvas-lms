@@ -1,0 +1,16 @@
+<label class="control-label"><strong>{{#t "move_from"}}Move from{{/t}}</strong></label>
+<div class="controls">
+  <select class="currentDay span3">
+    {{#each weekdays}}
+      <option value="{{index}}">{{name}}</option>
+    {{/each}}
+  </select>
+  {{#t 'to_happen_on'}}to{{/t}}
+  <select class="subDay span3">
+    {{#each weekdays}}
+      <option value="{{index}}">{{name}}</option>
+    {{/each}}
+  </select>
+  <a href="#"><i class="icon-end plain"></i></a>
+</div>
+<br />

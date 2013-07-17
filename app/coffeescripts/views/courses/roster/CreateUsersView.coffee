@@ -9,6 +9,8 @@ define [
 ], (CreateUserList, _, I18n, DialogFormView, template, wrapper) ->
 
   class CreateUsersView extends DialogFormView
+    @optionProperty 'rolesCollection'
+    @optionProperty 'courseModel'
 
     defaults:
       width: 700
@@ -39,7 +41,8 @@ define [
       @model.on 'change:enrollment_type', @maybeShowPrivileges
 
     maybeShowPrivileges: =>
-      if @model.get('enrollment_type') in ['TeacherEnrollment', 'TaEnrollment']
+      role = _.findWhere(@model.get('roles'), name: @model.get('enrollment_type'))
+      if role and role.base_role_name in ['TeacherEnrollment', 'TaEnrollment']
         @$privileges.show()
       else
         @$privileges.hide()
@@ -56,6 +59,11 @@ define [
 
     onSaveSuccess: ->
       @model.incrementStep()
+      if @model.get('step') is 3
+        role = @rolesCollection.where({name: @model.get('enrollment_type')})[0]
+        role?.increment 'count', @model.get('users').length
+        newUsers = @model.get('users').length
+        @courseModel?.increment 'pendingInvitationsCount', newUsers
 
     validateBeforeSave: (data) ->
       if @model.get('step') is 1 and !data.user_list

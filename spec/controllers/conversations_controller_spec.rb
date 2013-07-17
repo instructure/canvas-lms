@@ -107,6 +107,21 @@ describe ConversationsController do
       assigns[:conversations_json][0][:id].should == @c2.conversation_id
     end
 
+    it "should return conversations matching a user filter" do
+      course_with_student_logged_in(:active_all => true)
+      @c1 = conversation
+      @other_course = course(:active_all => true)
+      enrollment = @other_course.enroll_student(@user)
+      enrollment.workflow_state = 'active'
+      enrollment.save!
+      @user.reload
+      @c2 = conversation(:num_other_users => 1, :course => @other_course)
+
+      get 'index', :filter => @user.asset_string, :format => 'json', :include_all_conversation_ids => 1
+      response.should be_success
+      assigns[:conversations_json].size.should eql 2
+    end
+
     it "should not allow student view student to load inbox" do
       course_with_teacher_logged_in(:active_all => true)
       @fake_student = @course.student_view_student

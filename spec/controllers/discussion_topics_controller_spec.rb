@@ -54,6 +54,17 @@ describe DiscussionTopicsController do
       assert_unauthorized
     end
 
+    it "should work for announcements in a public course" do
+      course_with_student(:active_all => true)
+      @course.update_attribute(:is_public, true)
+      @announcement = @course.announcements.create!(
+        :title => "some announcement",
+        :message => "some message"
+      )
+      get 'show', :course_id => @course.id, :id => @announcement.id
+      response.should be_success
+    end
+
     context "discussion topic with assignment with overrides" do
       integrate_views
 
@@ -258,8 +269,8 @@ describe DiscussionTopicsController do
       controller.stubs(:form_authenticity_token => 'abc', :form_authenticity_param => 'abc')
       post 'create', :course_id => @course.id, :title => 'Topic Title', :is_announcement => false,
                      :discussion_type => 'side_comment', :require_initial_post => true, :format => 'json',
-                     :podcast_has_student_posts => false, :delayed_post_at => '', :message => 'Message',
-                     :delay_posting => false, :threaded => false
+                     :podcast_has_student_posts => false, :delayed_post_at => '', :lock_at => '',
+                     :message => 'Message', :delay_posting => false, :threaded => false
     end
 
     after { Setting.set 'enable_page_views', 'false' }
@@ -271,6 +282,7 @@ describe DiscussionTopicsController do
       specify { topic.user.should == @user }
       specify { topic.current_user.should == @user }
       specify { topic.delayed_post_at.should be_nil }
+      specify { topic.lock_at.should be_nil }
       specify { topic.workflow_state.should == 'active' }
       specify { topic.id.should_not be_nil }
       specify { topic.title.should == 'Topic Title' }
@@ -294,5 +306,30 @@ describe DiscussionTopicsController do
       page_view.participated.should be_true
     end
 
+  end
+
+  describe "PUT: update" do
+    before(:each) do
+      course_with_teacher_logged_in(active_all: true)
+      @topic = DiscussionTopic.create!(context: @course, title: 'Test Topic',
+        lock_at: '2013-01-01T00:00:00UTC', locked: true)
+    end
+
+    it "should unlock discussions with a lock_at attribute" do
+      put('update', course_id: @course.id, topic_id: @topic.id,
+          title: 'Updated Topic', format: 'json', lock_at: @topic.lock_at,
+          locked: false)
+
+      @topic.reload.should_not be_locked
+      @topic.lock_at.should be_nil
+    end
+
+    it "should not clear lock_at if lock state hasn't changed" do
+      put('update', course_id: @course.id, topic_id: @topic.id,
+          title: 'Updated Topic', format: 'json', lock_at: @topic.lock_at,
+          locked: true)
+      @topic.reload.should be_locked
+      @topic.lock_at.should_not be_nil
+    end
   end
 end

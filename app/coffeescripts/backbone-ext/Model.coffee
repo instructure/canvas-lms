@@ -54,3 +54,31 @@ define [
     destroy: ->
       @trigger "destroying"
       super
+
+    ##
+    # Increment an attribute by 1 (or the specified amount)
+    increment: (key, delta = 1) ->
+      @set key, @get(key) + delta
+
+    ##
+    # Decrement an attribute by 1 (or the specified amount)
+    decrement: (key, delta = 1) ->
+      @increment key, -delta
+
+    # Add support for nested attributes on a backbone model. Nested
+    # attributes are indicated by a . to seperate each level. You get
+    # get nested attributes by doing the following.
+    # ie: 
+    #   // given {foo: {bar: 'catz'}} 
+    #   @get 'foo.bar' // returns catz
+    #
+    # @api backbone override
+    deepGet: (property) -> 
+      split = property.split "."
+      value = @get split.shift() 
+
+      # Move through objects until found
+      while next = split.shift()
+        value = value[next]
+
+      value

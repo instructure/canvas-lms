@@ -244,8 +244,8 @@ define [
         @disableGroups()
 
     disableGroups: ->
-      @form.find(".group-signup-checkbox").attr('disabled', true)
-      @form.find("group-signup").hide()
+      @form.find(".group-signup-checkbox").attr('disabled', true).prop('checked', false)
+      @form.find(".group-signup").hide()
 
     enableGroups: (contextInfo) ->
       @form.find(".group-signup-checkbox").attr('disabled', false)
@@ -254,7 +254,6 @@ define [
         name: 'group_category_id'
         collection: contextInfo.group_categories
       @form.find(".group_select").html(genericSelectTemplate(groupsInfo))
-      @form.find("group-signup").show()
 
     toggleContextsMenu: (jsEvent) =>
       $('.ag_contexts_menu').toggleClass('hidden')

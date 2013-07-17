@@ -97,18 +97,6 @@ describe "people" do
       f('#unregistered_services').should be_displayed
     end
 
-    it "should add a teacher, ta, student, and observer" do
-      expect_new_page_load { driver.find_element(:link, 'Manage Users').click }
-      wait_for_ajaximations
-      add_users_button = f('.add_users_link')
-      wait_for_ajaximations
-      add_users_button.click
-      add_user('Teachers', @test_teacher.name, 'ul.user_list.teacher_enrollments')
-      add_user("Students", @student_2.name, 'ul.user_list.student_enrollments')
-      add_user("TAs", @test_ta.name, 'ul.user_list.ta_enrollments')
-      add_user("Observers", @test_observer.name, 'ul.user_list.observer_enrollments')
-    end
-
     it "should make a new set of student groups" do
       create_student_group
     end

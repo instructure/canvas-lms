@@ -465,15 +465,18 @@ class ActiveRecord::Base
     Canvas::TempTable.new(connection, construct_finder_sql({}), options)
   end
 
-  def self.find_in_batches_with_temp_table(options = {})
-    generate_temp_table(options).execute! do |table|
-      table.find_in_batches(options) { |batch| yield batch }
+  def self.find_in_batches_with_temp_table(options = {}, &block)
+    temptable = generate_temp_table(options)
+    with_exclusive_scope do
+      temptable.execute do |table|
+        table.find_in_batches(options, &block)
+      end
     end
   end
 
-  def self.find_each_with_temp_table(options = {})
+  def self.find_each_with_temp_table(options = {}, &block)
     find_in_batches_with_temp_table(options) do |batch|
-      batch.each { |record| yield record }
+      batch.each(&block)
     end
     self
   end
@@ -852,10 +855,17 @@ if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
       raise ArgumentError, "Cannot specify custom options with :delay_validation" if options[:options] && options[:delay_validation]
 
       options.delete(:delay_validation) unless supports_delayed_constraint_validation?
-      options[:options] = 'NOT VALID' if options[:delay_validation]
-
       column  = options[:column] || "#{to_table.to_s.singularize}_id"
       foreign_key_name = foreign_key_name(from_table, column, options)
+
+      if options[:delay_validation]
+        options[:options] = 'NOT VALID'
+        # NOT VALID doesn't fully work through 9.3 at least, so prime the cache to make
+        # it as fast as possible. Note that a NOT EXISTS would be faster, but this is
+        # the query postgres does for the VALIDATE CONSTRAINT, so we want exactly this
+        # query to be warm
+        execute("SELECT fk.#{column} FROM #{from_table} fk LEFT OUTER JOIN #{to_table} pk ON fk.#{column}=pk.id WHERE pk.id IS NULL AND fk.#{column} IS NOT NULL LIMIT 1")
+      end
 
       add_foreign_key_without_delayed_validation(from_table, to_table, options)
 
@@ -892,6 +902,11 @@ if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
 
       execute "CREATE #{index_type} INDEX #{concurrently}#{quote_column_name(index_name)} ON #{quote_table_name(table_name)} (#{quoted_column_names})#{conditions}"
     end
+
+    def set_standard_conforming_strings_with_version_check
+      set_standard_conforming_strings_without_version_check unless postgresql_version >= 90100
+    end
+    alias_method_chain :set_standard_conforming_strings, :version_check
   end
 
 end
@@ -1235,16 +1250,15 @@ ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
   # in anticipation of having to re-run migrations due to integrity violations or
   # killing stuff that is holding locks too long
   def add_foreign_key_if_not_exists(from_table, to_table, options = {})
+    column  = options[:column] || "#{to_table.to_s.singularize}_id"
     case self.adapter_name
     when 'SQLite'; return
     when 'PostgreSQL'
-      begin
-        add_foreign_key(from_table, to_table, options)
-      rescue ActiveRecord::StatementInvalid => e
-        raise unless e.message =~ /PG(?:::)?Error: ERROR:.+already exists/
-      end
+      foreign_key_name = foreign_key_name(from_table, column, options)
+      and_valid = " AND convalidated" if supports_delayed_constraint_validation?
+      return if select_value("SELECT conname FROM pg_constraint INNER JOIN pg_namespace ON pg_namespace.oid=connamespace WHERE conname='#{foreign_key_name}' AND nspname=current_schema()#{and_valid}")
+      add_foreign_key(from_table, to_table, options)
     else
-      column  = options[:column] || "#{to_table.to_s.singularize}_id"
       foreign_key_name = foreign_key_name(from_table, column, options)
       return if foreign_keys(from_table).find { |k| k.options[:name] == foreign_key_name }
       add_foreign_key(from_table, to_table, options)

@@ -53,7 +53,7 @@ module SIS
       end
     
       def csv_rows(csv)
-        FasterCSV.foreach(csv[:fullpath], PARSE_ARGS) do |row|
+        ::CSV.foreach(csv[:fullpath], PARSE_ARGS) do |row|
           yield row
         end
       end

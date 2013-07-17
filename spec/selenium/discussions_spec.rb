@@ -10,9 +10,9 @@ describe "discussions" do
     def check_permissions(number_of_checkboxes = 1)
       get url
       wait_for_ajaximations
-      checkboxes = ff('.toggleSelected')
+      checkboxes = ff('.discussion .al-trigger')
       checkboxes.length.should == number_of_checkboxes
-      ff('.discussion-topic').length.should == what_to_create.count
+      ff('.discussion-list li.discussion').length.should == what_to_create.count
     end
 
     before (:each) do
@@ -29,6 +29,15 @@ describe "discussions" do
       what_to_create == DiscussionTopic ? @course.discussion_topics.create!(:title => 'other users', :user => @other_user) : announcement_model(:title => 'other users', :user => @other_user)
       login_as(@other_user.primary_pseudonym.unique_id, 'asdfasdf')
       check_permissions
+    end
+
+    it "should not allow a student to pin a topic, even if they are the author" do
+      topic = what_to_create == DiscussionTopic ? @course.discussion_topics.create!(:title => 'other users', :user => @other_user) : announcement_model(:title => 'other users', :user => @other_user)
+      login_as(@other_user.primary_pseudonym.unique_id, 'asdfasdf')
+      get(url)
+      wait_for_ajaximations
+      fj("[data-id=#{topic.id}] .al-trigger").click
+      ffj('.icon-pin:visible').length.should == 0
     end
 
     it "should not allow a student to delete/edit topics if they didn't create any" do
@@ -69,40 +78,27 @@ describe "discussions" do
         end
         get url
         wait_for_ajaximations
-        @checkboxes = ff('.toggleSelected')
+        @checkboxes = ff('.discussion .al-trigger')
       end
 
       def update_attributes_and_validate(attribute, update_value, search_term = update_value, expected_results = 1)
         what_to_create.last.update_attributes(attribute => update_value)
         refresh_page # in order to get the new topic information
         replace_content(f('#searchTerm'), search_term)
-        ff('.discussionTopicIndexList .discussion-topic').count.should == expected_results
+        ffj('.discussion-list li.discussion:visible').count.should == expected_results
       end
 
       def refresh_and_filter(filter_type, filter, expected_text, expected_results = 1)
         refresh_page # in order to get the new topic information
         wait_for_ajaximations
-        keep_trying_until { ff('.toggleSelected').count.should == what_to_create.count }
+        keep_trying_until { ff('.discussion .al-trigger').count.should == what_to_create.count }
         filter_type == :css ? driver.execute_script("$('#{filter}').click()") : replace_content(f('#searchTerm'), filter)
-        ff('.discussionTopicIndexList .discussion-topic').count.should == expected_results
-        expected_results > 1 ? ff('.discussionTopicIndexList .discussion-topic').each { |topic| topic.should include_text(expected_text) } : (f('.discussionTopicIndexList .discussion-topic').should include_text(expected_text))
-      end
-
-      it "should bulk delete topics" do
-        5.times { |i| @checkboxes[i].click }
-        f('#delete').click
-        driver.switch_to.alert.accept
-        wait_for_ajax_requests
-        ff('.discussion-topic').count.should == 0
-        what_to_create.where(:workflow_state => 'active').count.should == 0
-      end
-
-      it "should bulk lock topics" do
-        5.times { |i| @checkboxes[i].click }
-        f('#lock').click
-        wait_for_ajax_requests
-        #TODO: check the UI to make sure the topics have a locked symbol
-        what_to_create.where(:workflow_state => 'locked').count.should == 5
+        ffj('.discussion-list li.discussion:visible').count.should == expected_results
+        if expected_results > 1
+          ffj('.discussion-list li.discussion:visible').each { |topic| topic.should include_text(expected_text) }
+        else
+          f('.discussion-list li.discussion').should include_text(expected_text)
+        end
       end
 
       it "should search by title" do
@@ -120,7 +116,7 @@ describe "discussions" do
         title = 'new one'
         new_teacher = teacher_in_course(:course => @course, :active_all => true, :name => user_name)
         what_to_create == DiscussionTopic ? @course.discussion_topics.create!(:title => title, :user => new_teacher.user) : announcement_model(:title => title, :user => new_teacher.user)
-        refresh_and_filter(:string, 'jake', user_name)
+        refresh_and_filter(:string, 'jake', 'new one')
       end
 
       it "should return multiple items in the search" do
@@ -168,17 +164,17 @@ describe "discussions" do
       it "should validate closing the discussion for comments" do
         create_and_go_to_topic
         f("#discussion-toolbar .al-trigger").click
-        expect_new_page_load { f("#ui-id-3").click }
+        expect_new_page_load { f(".discussion_locked_toggler").click }
         f('.discussion-fyi').text.should == 'This topic is closed for comments'
-        ff('.discussion-reply-label').should be_empty
+        ff('.discussion-reply-action').should be_empty
         DiscussionTopic.last.workflow_state.should == 'locked'
       end
 
       it "should validate reopening the discussion for comments" do
         create_and_go_to_topic('closed discussion', 'side_comment', true)
         f("#discussion-toolbar .al-trigger").click
-        expect_new_page_load { f("#ui-id-3").click }
-        ff('.discussion-reply-label').should_not be_empty
+        expect_new_page_load { f(".discussion_locked_toggler").click }
+        ff('.discussion-reply-action').should_not be_empty
         DiscussionTopic.last.workflow_state.should == 'active'
       end
 
@@ -244,8 +240,10 @@ describe "discussions" do
           filename, fullpath, data = get_file("testfile5.zip")
           f('input[name=attachment]').send_keys(fullpath)
           type_in_tiny('textarea[name=message]', 'file attachement discussion')
+          yield if block_given?
           expect_new_page_load { submit_form('.form-actions') }
           wait_for_ajaximations
+
           f('.zip').should include_text(filename)
         end
 
@@ -284,10 +282,16 @@ describe "discussions" do
             what_to_create.last.update_attributes(:assignment => @course.assignments.create!(:name => 'graded topic assignment'))
           end
           get url
-          expect_new_page_load { f('.discussion-title').click }
+          expect_new_page_load { f('li.discussion .title').click }
           expect_new_page_load { f(".edit-btn").click }
 
-          add_attachment_and_validate
+          add_attachment_and_validate do
+            # should correctly save changes to the assignment
+            set_value f('#discussion_topic_assignment_points_possible'), '123'
+          end
+          if what_to_create == DiscussionTopic
+            Assignment.last.points_possible.should == 123
+          end
         end
 
         it "should edit a topic" do
@@ -303,27 +307,55 @@ describe "discussions" do
           what_to_create == DiscussionTopic ? @course.discussion_topics.create!(:title => @topic_title, :user => @user) : announcement_model(:title => @topic_title, :user => @user)
           get url
 
-          f('.toggleSelected').click
-          f('#delete').click
+          f('.al-trigger').click
+          fj('.icon-trash:visible').click
           driver.switch_to.alert.accept
           wait_for_ajaximations
           what_to_create.last.workflow_state.should == 'deleted'
-          f('.discussionTopicIndexList').should be_nil
+          f('.discussion-list li.discussion').should be_nil
         end
 
-        it "should reorder topics" do
-          3.times { |i| what_to_create == DiscussionTopic ? @course.discussion_topics.create!(:title => "new topic #{i}", :user => @user) : announcement_model(:title => "new topic #{i}", :user => @user) }
-          get url
-          wait_for_ajax_requests
+        it "should allow a teacher to pin a topic" do
+          topic = @course.discussion_topics.create!(title: 'Test Discussion', user: @user)
+          get(url)
+          wait_for_ajaximations
 
-          topics = ff('.discussion-topic')
-          driver.action.move_to(topics[0]).perform
-          # drag first topic to second place
-          # (using topics[2] as target to get the dragging to work)
-          driver.action.drag_and_drop(fj('.discussion-drag-handle:visible', topics[0]), topics[2]).perform
-          wait_for_ajax_requests
-          new_topics = ffj('.discussion-topic') # using ffj to avoid selenium caching
-          new_topics[0].should_not include_text('new topic 0')
+          f('.open.discussion-list .al-trigger').click
+          fj('.icon-pin:visible').click
+          wait_for_ajaximations
+          topic.reload.should be_pinned
+          ffj('.pinned.discussion-list li.discussion:visible').length.should == 1
+        end
+
+        it "should allow a teacher to unpin a topic" do
+          topic = @course.discussion_topics.create!(title: 'Test Discussion', user: @user, pinned: true)
+          get(url)
+          wait_for_ajaximations
+
+          f('.pinned.discussion-list .al-trigger').click
+          fj('.icon-pin:visible').click
+          wait_for_ajaximations
+          topic.reload.should_not be_pinned
+          ffj('.open.discussion-list li.discussion:visible').length.should == 1
+        end
+
+        it "should allow locking a pinned topic" do
+          topic = @course.discussion_topics.create!(title: 'Test Discussion', user: @user, pinned: true)
+          get(url)
+          wait_for_ajaximations
+
+          f('.pinned.discussion-list .al-trigger').click
+          ffj('.icon-lock:visible').length.should == 1
+        end
+
+        it "should allow pinning a locked topic" do
+          topic = @course.discussion_topics.create!(title: 'Test Discussion', user: @user)
+          topic.lock!
+          get(url)
+          wait_for_ajaximations
+
+          f('.locked.discussion-list .al-trigger').click
+          ffj('.icon-pin:visible').length.should == 1
         end
       end
 
@@ -348,8 +380,8 @@ describe "discussions" do
         @course.discussion_topics.create!(:title => title, :user => @user, :assignment => @course.assignments.create!(:name => assignment_name))
         get "/courses/#{@course.id}/discussion_topics"
         f('#onlyGraded').click
-        ff('.discussionTopicIndexList .discussion-topic').count.should == 1
-        f('.discussionTopicIndexList .discussion-topic').should include_text(title)
+        ffj('.discussion-list li.discussion:visible').count.should == 1
+        fj('.discussion-list li.discussion:visible').should include_text(title)
       end
 
       it "should filter by unread and assignments" do
@@ -361,8 +393,8 @@ describe "discussions" do
         get "/courses/#{@course.id}/discussion_topics"
         f('#onlyGraded').click
         f('#onlyUnread').click
-        ff('.discussionTopicIndexList .discussion-topic').count.should == 1
-        f('.discussionTopicIndexList .discussion-topic').should include_text(title)
+        ffj('.discussion-list li.discussion:visible').count.should == 1
+        fj('.discussion-list li.discussion:visible').should include_text(title)
       end
 
       it "should validate the discussion reply counter" do
@@ -385,7 +417,8 @@ describe "discussions" do
         f('input[type=checkbox][name=podcast_enabled]').click
         expect_new_page_load { submit_form('.form-actions') }
         get "/courses/#{@course.id}/discussion_topics"
-        f('.discussion-topic .icon-rss').should be_displayed
+        # TODO: talk to UI, figure out what to display here
+        # f('.discussion-topic .icon-rss').should be_displayed
         DiscussionTopic.last.podcast_enabled.should be_true
       end
 
@@ -420,7 +453,6 @@ describe "discussions" do
           wait_for_ajaximations
 
           f('input[type=checkbox][name=threaded]')[:checked].should == checkbox_state
-          f('input[type=checkbox][name=delay_posting]')[:checked].should == checkbox_state
           f('input[type=checkbox][name=require_initial_post]')[:checked].should == checkbox_state
           f('input[type=checkbox][name=podcast_enabled]')[:checked].should == checkbox_state
           f('input[type=checkbox][name=podcast_has_student_posts]')[:checked].should == checkbox_state
@@ -429,7 +461,6 @@ describe "discussions" do
 
         def toggle(state)
           f('input[type=checkbox][name=threaded]').click
-          f('input[type=checkbox][name=delay_posting]').click
           set_value f('input[name=delayed_post_at]'), 2.weeks.from_now.strftime('%m/%d/%Y') if state == :on
           f('input[type=checkbox][name=require_initial_post]').click
           f('input[type=checkbox][name=podcast_enabled]').click
@@ -566,6 +597,122 @@ describe "discussions" do
           visBoxes.first.text.should == "Please select a group set for this assignment"
         end
       end
+
+      context "locking" do
+        before do
+          @topic = @course.discussion_topics.build(:title => "topic", :user => @user)
+          @topic.save!
+        end
+
+        it "should set as active when removing existing delayed_post_at and lock_at dates" do
+          @topic.delayed_post_at = 10.days.ago
+          @topic.lock_at         = 5.days.ago
+          @topic.workflow_state  = 'locked'
+          @topic.save!
+
+          get "/courses/#{@course.id}/discussion_topics/#{@topic.id}/edit"
+          wait_for_ajaximations
+
+          f('input[type=text][name="delayed_post_at"]').clear
+          f('input[type=text][name="lock_at"]').clear
+
+          expect_new_page_load { f('.form-actions button[type=submit]').click }
+          wait_for_ajaximations
+
+          @topic.reload
+          @topic.delayed_post_at.should be_nil
+          @topic.lock_at.should be_nil
+          @topic.active?.should be_true
+        end
+
+        it "should clear the delayed_post_at and lock_at when manually triggering unlock" do
+          @topic.delayed_post_at = 10.days.ago
+          @topic.lock_at         = 5.days.ago
+          @topic.workflow_state  = 'locked'
+          @topic.save!
+
+          get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+          wait_for_ajaximations
+
+          f("#discussion-toolbar .al-trigger").click
+          expect_new_page_load { f(".discussion_locked_toggler").click }
+
+          @topic.reload
+          @topic.delayed_post_at.should be_nil
+          @topic.lock_at.should be_nil
+          @topic.active?.should be_true
+        end
+
+        it "should set workflow to locked when delayed_post_at and lock_at are in past" do
+          @topic.delayed_post_at = nil
+          @topic.lock_at         = nil
+          @topic.workflow_state  = 'active'
+          @topic.save!
+
+          get "/courses/#{@course.id}/discussion_topics/#{@topic.id}/edit"
+          wait_for_ajaximations
+
+          delayed_post_at = Time.zone.now - 10.days
+          lock_at = Time.zone.now - 5.days
+          date_format = '%b %-d, %Y'
+
+          f('input[type=text][name="delayed_post_at"]').send_keys(delayed_post_at.strftime(date_format))
+          f('input[type=text][name="lock_at"]').send_keys(lock_at.strftime(date_format))
+
+          expect_new_page_load { f('.form-actions button[type=submit]').click }
+          wait_for_ajaximations
+
+          @topic.reload
+          @topic.delayed_post_at.strftime(date_format).should == delayed_post_at.strftime(date_format)
+          @topic.lock_at.strftime(date_format).should == lock_at.strftime(date_format)
+          @topic.locked?.should be_true
+        end
+
+        it "should set workflow to post_delayed when delayed_post_at and lock_at are in the future" do
+          @topic.delayed_post_at = nil
+          @topic.lock_at         = nil
+          @topic.workflow_state  = 'active'
+          @topic.save!
+
+          get "/courses/#{@course.id}/discussion_topics/#{@topic.id}/edit"
+          wait_for_ajaximations
+
+          delayed_post_at = Time.zone.now + 5.days
+          date_format = '%b %-d, %Y'
+
+          f('input[type=text][name="delayed_post_at"]').send_keys(delayed_post_at.strftime(date_format))
+
+          expect_new_page_load { f('.form-actions button[type=submit]').click }
+          wait_for_ajaximations
+
+          @topic.reload
+          @topic.delayed_post_at.strftime(date_format).should == delayed_post_at.strftime(date_format)
+          @topic.post_delayed?.should be_true
+        end
+
+        it "should set workflow to active when delayed_post_at in past and lock_at in future" do
+          @topic.delayed_post_at = 5.days.from_now
+          @topic.lock_at         = 10.days.from_now
+          @topic.workflow_state  = 'locked'
+          @topic.save!
+
+          get "/courses/#{@course.id}/discussion_topics/#{@topic.id}/edit"
+          wait_for_ajaximations
+
+          delayed_post_at = Time.zone.now - 5.days
+          date_format = '%b %-d, %Y'
+
+          f('input[type=text][name="delayed_post_at"]').clear
+          f('input[type=text][name="delayed_post_at"]').send_keys(delayed_post_at.strftime(date_format))
+
+          expect_new_page_load { f('.form-actions button[type=submit]').click }
+          wait_for_ajaximations
+
+          @topic.reload
+          @topic.delayed_post_at.strftime(date_format).should == delayed_post_at.strftime(date_format)
+          @topic.active?.should be_true
+        end
+      end
     end
   end
 
@@ -577,8 +724,7 @@ describe "discussions" do
     it "should display empty version of view if there are no topics" do
       get "/courses/#{@course.id}/discussion_topics"
       wait_for_ajaximations
-      f('.btn-large').should be_present
-      f('.btn-large').should be_displayed
+      ff('.no-content').each { |div| div.should be_displayed }
     end
 
     it "should display empty version of view if all pages are empty" do
@@ -592,8 +738,7 @@ describe "discussions" do
 
       get "/courses/#{@course.id}/discussion_topics"
       wait_for_ajaximations
-      f('.btn-large').should be_present
-      f('.btn-large').should be_displayed
+      ff('.no-content').each { |div| div.should be_displayed }
     end
 
     it "should display topics even if first page is blank but later pages have data" do
@@ -636,12 +781,16 @@ describe "discussions" do
       f('#new-discussion-btn').should be_nil
     end
 
-    it "should not show an empty gear menu to students who've created a discussion" do
+    it "should not show admin options in gear menu to students who've created a discussion" do
       @student_topic = @course.discussion_topics.create!(:user => @student, :message => 'student topic', :discussion_type => 'side_comment')
       @student_entry = @student_topic.discussion_entries.create!(:user => @student, :message => 'student entry')
       get "/courses/#{@course.id}/discussion_topics/#{@student_topic.id}"
       wait_for_ajax_requests
-      f('.headerBar .admin-links').should be_nil
+      f('.headerBar .admin-links').should_not be_nil
+      f('.mark_all_as_read').should_not be_nil
+      #f('.mark_all_as_unread').should_not be_nil
+      f('.delete_discussion').should be_nil
+      f('.discussion_locked_toggler').should be_nil
     end
 
     it "should allow students to reply to a discussion even if they cannot create a topic" do
@@ -799,9 +948,10 @@ describe "discussions" do
         get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
         wait_for_ajax_requests
 
-        f('.add-side-comment-wrap .discussion-reply-label').click
-        type_in_tiny '.reply-textarea', side_comment_text
-        submit_form('.add-side-comment-wrap')
+        f('.discussion-entries .discussion-reply-action').click
+        wait_for_animations
+        type_in_tiny 'textarea', side_comment_text
+        submit_form('.discussion-entries .discussion-reply-form')
         wait_for_ajaximations
 
         last_entry = DiscussionEntry.last
@@ -855,30 +1005,144 @@ describe "discussions" do
   end
 
   context "marking as read" do
-    it "should mark things as read" do
-      pending "figure out delayed jobs"
-      reply_count = 3
-      course_with_teacher_logged_in
-      @topic = @course.discussion_topics.create!
-      reply_count.times { @topic.discussion_entries.create!(:message => 'Lorem ipsum dolor sit amet') }
+    before do
+      course_with_student
+      course_with_teacher_logged_in(:course => @course)
+      @topic = @course.discussion_topics.create!(:title => 'mark as read test', :message => 'test mark as read', :user => @student)
+    end
+
+    it "should automatically mark things as read" do
+      reply_count = 2
+      reply_count.times { @topic.discussion_entries.create!(:message => 'Lorem ipsum dolor sit amet', :user => @student) }
+      @topic.create_materialized_view
 
       # make sure everything looks unread
       get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
-      ff('.can_be_marked_as_read.unread').length.should == reply_count + 1
+      ff('.discussion_entry.unread').length.should == reply_count
       f('.new-and-total-badge .new-items').text.should == reply_count.to_s
 
       #wait for the discussionEntryReadMarker to run, make sure it marks everything as .just_read
-      sleep 2
-      ff('.can_be_marked_as_read.unread').should be_empty
-      ff('.can_be_marked_as_read.just_read').length.should == reply_count + 1
+      keep_trying_until { ff('.discussion_entry.unread').should be_empty }
+      ff('.discussion_entry.read').length.should == reply_count + 1 # +1 because the topic also has the .discussion_entry class
+
+      # refresh page and make sure nothing is unread and everthing is .read
+      get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+      ff(".discussion_entry.unread").should be_empty
       f('.new-and-total-badge .new-items').text.should == ''
 
-      # refresh page and make sure nothing is unread/just_read and everthing is .read
+      # Mark one as unread manually, and create a new reply. The new reply 
+      # should be automarked as read, but the manual one should not.
+      f('.discussion-read-state-btn').click
+      wait_for_ajaximations
+      @topic.discussion_entries.create!(:message => 'new lorem ipsum', :user => @student)
+      @topic.create_materialized_view
+
       get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
-      ['unread', 'just_read'].each do |state|
-        ff(".can_be_marked_as_read.#{state}").should be_empty
+      ff(".discussion_entry.unread").size.should == 2
+      f('.new-and-total-badge .new-items').text.should == '2'
+      keep_trying_until { ff('.discussion_entry.unread').size < 2 }
+      wait_for_ajaximations
+      ff(".discussion_entry.unread").size.should == 1
+    end
+
+    it "should mark all as read" do
+      reply_count = 8
+      (reply_count / 2).times do |n|
+        entry = @topic.reply_from(:user => @student, :text => "entry #{n}")
+        entry.reply_from(:user => @student, :text => "sub reply #{n}")
       end
-      f('.new-and-total-badge .new-items').text.should == ''
+      @topic.create_materialized_view
+
+      # so auto mark as read won't mess up this test
+      @teacher.preferences[:manual_mark_as_read] = true
+      @teacher.save!
+
+      go_to_topic
+
+      ff('.discussion-entries .unread').length.should == reply_count
+      ff('.discussion-entries .read').length.should == 0
+
+      f("#discussion-toolbar .al-trigger").click
+      f('.mark_all_as_read').click
+      wait_for_ajaximations
+      ff('.discussion-entries .unread').length.should == 0
+      ff('.discussion-entries .read').length.should == reply_count
     end
   end
+
+  context "topic subscription" do
+    before do
+      course_with_student
+      course_with_teacher_logged_in(:course => @course)
+      @topic = @course.discussion_topics.create!(:title => 'mark as read test', :message => 'test mark as read', :user => @student)
+    end
+
+    it "should load with the correct status represented" do
+      @topic.subscribe(@teacher)
+      @topic.create_materialized_view
+
+      get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+      wait_for_animations
+      f('.topic-unsubscribe-button').displayed?.should be_true
+      f('.topic-subscribe-button').displayed?.should be_false
+
+      @topic.unsubscribe(@teacher)
+      @topic.update_materialized_view
+      get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+      wait_for_animations
+      f('.topic-unsubscribe-button').displayed?.should be_false
+      f('.topic-subscribe-button').displayed?.should be_true
+    end
+
+    it "should unsubscribe from topic" do
+      @topic.subscribe(@teacher)
+      @topic.create_materialized_view
+
+      get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+      wait_for_animations
+      f('.topic-unsubscribe-button').click
+      wait_for_ajaximations
+      @topic.reload
+      @topic.subscribed?(@teacher).should == false
+    end
+
+    it "should subscribe to topic" do
+      @topic.unsubscribe(@teacher)
+      @topic.create_materialized_view
+
+      get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+      wait_for_animations
+      f('.topic-subscribe-button').click
+      wait_for_ajaximations
+      @topic.reload
+      @topic.subscribed?(@teacher).should == true
+    end
+
+    it "should prevent subscribing when a student post is required first" do
+      course_with_student_logged_in(:course => @course)
+      new_student_entry_text = 'new student entry'
+      @topic.require_initial_post = true
+      @topic.save
+      get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+      wait_for_ajax_requests
+      # shouldn't see subscribe button until after posting
+      f('.topic-subscribe-button').displayed?.should be_false
+      add_reply new_student_entry_text
+      # now the subscribe button should be available.
+      get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+      wait_for_ajax_requests
+      # already subscribed because they posted
+      f('.topic-unsubscribe-button').displayed?.should be_true
+    end
+
+    it "should updated subscribed button when user posts to a topic" do
+      course_with_student_logged_in(:course => @course)
+      get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+      wait_for_ajax_requests
+      f('.topic-subscribe-button').displayed?.should be_true
+      add_reply "student posting"
+      f('.topic-unsubscribe-button').displayed?.should be_true
+    end
+  end
+
 end

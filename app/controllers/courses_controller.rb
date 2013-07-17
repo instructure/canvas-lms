@@ -143,6 +143,11 @@ class CoursesController < ApplicationController
   #   When term is given, the information for the enrollment term for each course
   #   is returned.
   #
+  # @argument state[] [optional] If set, only return courses that are in the given state(s).
+  #   Valid states are "unpublished", "available", "completed", and "deleted".
+  #   By default, "available" is returned for students and observers, and
+  #   anything except "deleted", for all other enrollment types
+  #
   # @returns [Course]
   def index
     respond_to do |format|
@@ -159,7 +164,14 @@ class CoursesController < ApplicationController
       }
 
       format.json {
-        enrollments = @current_user.cached_current_enrollments
+        if params[:state]
+          params[:state] += %w(created claimed) if params[:state].include? 'unpublished'
+          enrollments = @current_user.enrollments
+          enrollments = enrollments.reject { |e| !params[:state].include?(e.course.workflow_state) || (%w(StudentEnrollment ObserverEnrollment).include?(e.type) && %w(created claimed).include?(e.course.workflow_state))}
+        else
+          enrollments = @current_user.cached_current_enrollments
+        end
+
         if params[:enrollment_role]
           enrollments = enrollments.reject { |e| (e.role_name || e.class.name) != params[:enrollment_role] }
         elsif params[:enrollment_type]
@@ -249,7 +261,7 @@ class CoursesController < ApplicationController
             @course,
             @current_user,
             session,
-            [:start_at, course_end, :license, :publish_grades_immediately,
+            [:start_at, course_end, :license,
              :is_public, :public_syllabus, :allow_student_assignment_edits, :allow_wiki_comments,
              :allow_student_forum_attachments, :open_enrollment, :self_enrollment,
              :root_account_id, :account_id, :public_description,
@@ -382,7 +394,7 @@ class CoursesController < ApplicationController
       end
 
       if search_term
-        users = UserSearch.for_user_in_course(search_term, @context, @current_user, search_params)
+        users = UserSearch.for_user_in_context(search_term, @context, @current_user, search_params)
       else
         users = UserSearch.scope_for(@context, @current_user, search_params)
       end
@@ -508,6 +520,18 @@ class CoursesController < ApplicationController
     get_context
     if authorized_action(@context, @current_user, :read)
       api_render_stream_for_contexts([@context], :api_v1_course_activity_stream_url)
+    end
+  end
+
+  # @API Course activity stream summary
+  # Returns a summary of the current user's course-specific activity stream.
+  #
+  # For full documentation, see the API documentation for the user activity
+  # stream summary, in the user api.
+  def activity_stream_summary
+    get_context
+    if authorized_action(@context, @current_user, :read)
+      api_render_stream_summary([@context])
     end
   end
 
@@ -644,6 +668,9 @@ class CoursesController < ApplicationController
       @alerts = @context.alerts
       @role_types = []
       add_crumb(t('#crumbs.settings', "Settings"), named_context_url(@context, :context_details_url))
+      js_env :APP_CENTER => {
+        enabled: Canvas::Plugin.find(:app_center).enabled?
+      }
     end
   end
 
@@ -1019,10 +1046,6 @@ class CoursesController < ApplicationController
     if is_authorized_action?(@context, @current_user, :read)
       check_incomplete_registration
 
-      if @current_user && @context.grants_right?(@current_user, session, :manage_grades)
-        @assignments_needing_publishing = @context.assignments.active.need_publishing || []
-      end
-
       add_crumb(@context.short_name, url_for(@context), :id => "crumb_#{@context.asset_string}")
       set_badge_counts_for(@context, @current_user, @current_enrollment)
 
@@ -1032,7 +1055,7 @@ class CoursesController < ApplicationController
       case @course_home_view
       when "wiki"
         @wiki = @context.wiki
-        @page = @wiki.wiki_page
+        @page = @wiki.front_page
       when 'assignments'
         add_crumb(t('#crumbs.assignments', "Assignments"))
         get_sorted_assignments

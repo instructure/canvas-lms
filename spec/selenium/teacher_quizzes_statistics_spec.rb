@@ -49,6 +49,13 @@ describe "quiz statistics" do
           end
         end
       end
+
+      it "should show a special message if the course is a MOOC" do
+        @course.large_roster = true
+        @course.save!
+        get "/courses/#{@course.id}/quizzes/#{@quiz.id}/statistics"
+        f("#content").should include_text "This course is too large to display statistics. They can still be downloaded from the right hand sidebar."
+      end
     end
 
     describe "right side info bar with initial data" do

@@ -130,7 +130,7 @@ define [
     # @api private
 
     hideLoadingIndicator: =>
-      @$loadingIndicator.hide()
+      @$loadingIndicator?.hide()
 
     ##
     # Shows the loading indicator
@@ -138,5 +138,5 @@ define [
     # @api private
 
     showLoadingIndicator: =>
-      @$loadingIndicator.show()
+      @$loadingIndicator?.show()
 

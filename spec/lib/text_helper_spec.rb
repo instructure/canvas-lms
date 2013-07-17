@@ -189,30 +189,14 @@ describe TextHelper do
     it "should split on multi-byte character boundaries" do
       str = "This\ntext\nhere\n获\nis\nutf-8"
       
-      # In ruby 1.8, unicode characters are counted as multiple characters when calculating length.  
-      # In ruby 1.9, a unicode character is still 1 character.  It seems to me the proper path here
-      # is to allow the counting to take it's course, as the real GOAL of this test is not to 
-      # split mid-unicode-character since that was possible in 1.8.
-
-      if RUBY_VERSION >= '1.9'
-        th.truncate_text(str, :max_length => 9).should ==  "This\nt..."
-        th.truncate_text(str, :max_length => 18).should == "This\ntext\nhere\n..."
-        th.truncate_text(str, :max_length => 19).should == "This\ntext\nhere\n获..."
-        th.truncate_text(str, :max_length => 20).should == "This\ntext\nhere\n获\n..."
-        th.truncate_text(str, :max_length => 21).should == "This\ntext\nhere\n获\ni..."
-        th.truncate_text(str, :max_length => 22).should == "This\ntext\nhere\n获\nis..."
-        th.truncate_text(str, :max_length => 23).should == "This\ntext\nhere\n获\nis\n..."
-        th.truncate_text(str, :max_length => 80).should == str
-      else
-        th.truncate_text(str, :max_length => 9).should ==  "This\nt..."
-        th.truncate_text(str, :max_length => 18).should == "This\ntext\nhere\n..."
-        th.truncate_text(str, :max_length => 19).should == "This\ntext\nhere\n..."
-        th.truncate_text(str, :max_length => 20).should == "This\ntext\nhere\n..."
-        th.truncate_text(str, :max_length => 21).should == "This\ntext\nhere\n获..."
-        th.truncate_text(str, :max_length => 22).should == "This\ntext\nhere\n获\n..."
-        th.truncate_text(str, :max_length => 23).should == "This\ntext\nhere\n获\ni..."
-        th.truncate_text(str, :max_length => 80).should == str
-      end
+      th.truncate_text(str, :max_length => 9).should ==  "This\nt..."
+      th.truncate_text(str, :max_length => 18).should == "This\ntext\nhere\n..."
+      th.truncate_text(str, :max_length => 19).should == "This\ntext\nhere\n获..."
+      th.truncate_text(str, :max_length => 20).should == "This\ntext\nhere\n获\n..."
+      th.truncate_text(str, :max_length => 21).should == "This\ntext\nhere\n获\ni..."
+      th.truncate_text(str, :max_length => 22).should == "This\ntext\nhere\n获\nis..."
+      th.truncate_text(str, :max_length => 23).should == "This\ntext\nhere\n获\nis\n..."
+      th.truncate_text(str, :max_length => 80).should == str
     end
 
     it "should split on words if specified" do
@@ -265,6 +249,82 @@ describe TextHelper do
 
     it "should return an empty string if passed a nil value" do
       th.html_to_text(nil).should == ''
+    end
+  end
+
+  describe "simplify html" do
+    before(:each) do
+      @body = <<-END.strip_heredoc.strip
+        <p><strong>This is a bold tag</strong></p>
+        <p><em>This is an em tag</em></p>
+        <p><h1>This is an h1 tag</h1></p>
+        <p><h2>This is an h2 tag</h2></p>
+        <p><h3>This is an h3 tag</h3></p>
+        <p><h4>This is an h4 tag</h4></p>
+        <p><h5>This is an h5 tag</h5></p>
+        <p><h6>This is an h6 tag</h6></p>
+        <p><a href="http://foo.com">Link to Foo</a></p>
+        <p><img src="http://google.com/someimage.png" width="50" height="50" alt="Some Image" title="Some Image" /></p>
+      END
+    end
+
+    it "should convert simple tags to plain text" do
+      text = th.html_to_simple_text(@body)
+      text.should == <<-END.strip_heredoc.strip
+        This is a bold tag
+
+        This is an em tag
+
+        *****************
+        This is an h1 tag
+        *****************
+
+        -----------------
+        This is an h2 tag
+        -----------------
+
+        This is an h3 tag
+        -----------------
+
+        This is an h4 tag
+        -----------------
+
+        This is an h5 tag
+        -----------------
+
+        This is an h6 tag
+        -----------------
+
+        Link to Foo ( http://foo.com )
+      END
+    end
+
+    it "should convert simple tags to minimal html" do
+      html = th.html_to_simple_html(@body).gsub("\r\n", "\n") # gsub only for test matching
+      html.should == <<-END.strip_heredoc.strip
+        <p>This is a bold tag<br/>
+        <br/>
+        This is an em tag<br/>
+        <br/>
+        This is an h1 tag<br/>
+        <br/>
+        This is an h2 tag<br/>
+        <br/>
+        This is an h3 tag<br/>
+        <br/>
+        This is an h4 tag<br/>
+        <br/>
+        This is an h5 tag<br/>
+        <br/>
+        This is an h6 tag<br/>
+        <br/>
+        Link to Foo ( <a href='http://foo.com'>http://foo.com</a> )</p>
+      END
+    end
+
+    it "should convert relative links to absolute links" do
+      html = th.html_to_simple_html("<a href=\"/this/is/a/relative/link\">Relative Link</a>", :base_url => "http://example.com")
+      html.should == "<p>Relative Link ( <a href='http://example.com/this/is/a/relative/link'>http://example.com/this/is/a/relative/link</a> )</p>"
     end
   end
 
@@ -349,16 +409,12 @@ Ad dolore andouille meatball irure, ham hock tail exercitation minim ribeye sint
     }
   
     test_strings.each do |input, output|
-      input = input.dup.force_encoding("UTF-8") if RUBY_VERSION >= '1.9'
+      input = input.dup.force_encoding("UTF-8")
       TextHelper.strip_invalid_utf8(input).should == output
     end
   end
 
   describe "YAML invalid UTF8 stripping" do
-    before do
-      pending("ruby 1.9 only") if RUBY_VERSION < "1.9"
-    end
-
     it "should recursively strip out invalid utf-8" do
       data = YAML.load(%{
 ---

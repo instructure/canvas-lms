@@ -74,6 +74,29 @@ describe CalendarsController do
       assigns[:contexts][1].should eql(@course)
     end
 
+    it "should retrieve unconcluded course groups for user" do
+      course_with_student_logged_in(:active_all => true)
+      group_with_user(:group_context => @course, :user => @user, :active_all => true)
+      group1 = @group
+
+      course_with_student_logged_in(:active_all => true, :user => @user)
+      group_with_user(:group_context => @course, :user => @user, :active_all => true)
+      group2 = @group
+      @course.update_attribute(:conclude_at, Time.now - 1.week)
+
+      course_with_student_logged_in(:active_all => true, :user => @user)
+      group_with_user(:group_context => @course, :user => @user, :active_all => true)
+      group3 = @group
+      @course.update_attribute('workflow_state', 'completed')
+
+      get 'show', :user_id => @user.id, :include_undated => true
+      response.should be_success
+
+      assigns[:contexts].should include(group1)
+      assigns[:contexts].should_not include(group2)
+      assigns[:contexts].should_not include(group3)
+    end
+
     it "should retrieve events for a given month and year" do
       course_with_student_logged_in(:active_all => true)
       e1 = course_event("Jan 1 2008")
@@ -119,6 +142,27 @@ describe CalendarsController do
       assigns[:contexts].should_not be_empty
       assigns[:contexts][0].should eql(@user)
       assigns[:contexts][1].should eql(@course)
+    end
+
+    specs_require_sharding
+
+    it "should set permissions using contexts from the correct shard" do
+      # non-shard-aware code could use a shard2 id on shard1. this could grab the wrong course,
+      # or no course at all. this sort of aliasing used to break a permission check in show2
+      calendar2_only!
+      user(:active_all => true)
+      user_session(@user)
+      invalid_shard1_course_id = (Course.maximum(:id) || 0) + 1
+      @shard2.activate do
+        account = Account.create!
+        @course = account.courses.build
+        @course.id = invalid_shard1_course_id
+        @course.save!
+        @course.offer!
+        student_in_course(:active_all => true, :user => @user)
+      end
+      get 'show2', :user_id => @user.id
+      response.should be_success
     end
   end
 

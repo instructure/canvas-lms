@@ -37,12 +37,14 @@ class ContextModulesController < ApplicationController
 
   def item_redirect
     if authorized_action(@context, @current_user, :read)
-      @tag = @context.context_module_tags.active.find(params[:id])
+      @tag = @context.context_module_tags.not_deleted.find(params[:id])
 
-      reevaluate_modules_if_locked(@tag)
-      @progression = @tag.context_module.evaluate_for(@current_user) if @tag.context_module
-      @progression.uncollapse! if @progression && @progression.collapsed?
-      content_tag_redirect(@context, @tag, :context_context_modules_url)
+      if !(@tag.unpublished? || @tag.context_module.unpublished?) || authorized_action(@tag.context_module, @current_user, :update)
+        reevaluate_modules_if_locked(@tag)
+        @progression = @tag.context_module.evaluate_for(@current_user) if @tag.context_module
+        @progression.uncollapse! if @progression && @progression.collapsed?
+        content_tag_redirect(@context, @tag, :context_context_modules_url)
+      end
     end
   end
   
@@ -72,7 +74,7 @@ class ContextModulesController < ApplicationController
   def reevaluate_modules_if_locked(tag)
     # if the object is locked for this user, reevaluate all the modules and clear the cache so it will be checked again when loaded
     if tag.content && tag.content.respond_to?(:locked_for?)
-      locked = tag.content.is_a?(WikiPage) ? tag.content.locked_for?(@context, @current_user) : tag.content.locked_for?(@current_user) 
+      locked = tag.content.locked_for?(@current_user, :context => @context)
       if locked
         @context.context_modules.active.each { |m| m.evaluate_for(@current_user, true, true) }
         if tag.content.respond_to?(:clear_locked_cache)
@@ -245,7 +247,7 @@ class ContextModulesController < ApplicationController
     @module = @context.modules_visible_to(@current_user).find(params[:id])
     respond_to do |format|
       format.html { redirect_to named_context_url(@context, :context_context_modules_url, :anchor => "module_#{params[:id]}") }
-      format.json { render :json => (@module.content_tags.active.to_json) }
+      format.json { render :json => (@module.content_tags_visible_to(@current_user).to_json) }
     end
   end
   
@@ -330,7 +332,7 @@ class ContextModulesController < ApplicationController
   end
   
   def remove_item
-    @tag = @context.context_module_tags.find(params[:id])
+    @tag = @context.context_module_tags.not_deleted.find(params[:id])
     if authorized_action(@tag.context_module, @current_user, :update)
       @module = @tag.context_module
       @tag.destroy
@@ -340,7 +342,7 @@ class ContextModulesController < ApplicationController
   end
   
   def update_item
-    @tag = @context.context_module_tags.find(params[:id])
+    @tag = @context.context_module_tags.not_deleted.find(params[:id])
     if authorized_action(@tag.context_module, @current_user, :update)
       @tag.title = params[:content_tag][:title] if params[:content_tag] && params[:content_tag][:title]
       @tag.url = params[:content_tag][:url] if %w(ExternalUrl ContextExternalTool).include?(@tag.content_type) && params[:content_tag] && params[:content_tag][:url]
@@ -378,6 +380,7 @@ class ContextModulesController < ApplicationController
     if authorized_action(@module, @current_user, :update)
       if params.delete :publish
         @module.publish
+        @module.publish_items!
       elsif params.delete :unpublish
         @module.unpublish
       end

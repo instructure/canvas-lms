@@ -95,11 +95,11 @@ describe Attachment do
       attachment_obj_with_context(@course, :content_type => 'application/pdf')
       @attachment.context.should eql(@course)
       @attachment.context.scribd_account.should be_nil
-      previous_scribd_account_count = ScribdAccount.all.size
-      @attachment.save!
-      @attachment.context.scribd_account.should_not be_nil
-      @attachment.context.scribd_account.should be_is_a(ScribdAccount)
-      ScribdAccount.all.size.should eql(previous_scribd_account_count + 1)
+      expect {
+        @attachment.save!
+        @attachment.context.scribd_account.should_not be_nil
+        @attachment.context.scribd_account.should be_is_a(ScribdAccount)
+      }.to change(ScribdAccount, :count).by(1)
     end
 
     it "should set the attachment.scribd_account to the context scribd_account" do
@@ -338,6 +338,7 @@ describe Attachment do
     end
 
     it "should use the root attachment scribd doc" do
+      Scribd::Document.any_instance.stubs(:destroy).returns(true)
       a1 = attachment_model(:workflow_state => 'processing')
       a2 = attachment_model(:workflow_state => 'processing', :root_attachment => a1)
       a2.root_attachment.should == a1
@@ -360,6 +361,105 @@ describe Attachment do
       res['attachment']['scribd_doc']['attributes']['secret_password'].should eql('')
       @attachment.scribd_doc.doc_id.should eql('asdf')
       @attachment.scribd_doc.secret_password.should eql('password')
+    end
+  end
+
+  context "scribd cleanup" do
+    def fake_scribd_doc(doc_id = String.random(8))
+      scribd_doc = Scribd::Document.new
+      scribd_doc.doc_id = doc_id
+      scribd_doc.secret_password = 'asdf'
+      scribd_doc.access_key = 'jkl;'
+      scribd_doc
+    end
+
+    def attachment_with_scribd_doc(doc = fake_scribd_doc, opts = {})
+      att = attachment_model(opts)
+      att.scribd_doc = doc
+      att.save!
+      att
+    end
+
+    describe "related_attachments" do
+      it "should include the root attachment" do
+        @root = attachment_model
+        @child = attachment_model :root_attachment => @root
+        @child.related_attachments.map(&:id).should == [@root.id]
+      end
+
+      it "should include child attachments" do
+        @root = attachment_model
+        @child = attachment_model :root_attachment => @root
+        @root.related_attachments.map(&:id).should == [@child.id]
+      end
+
+      it "should include sibling attachments" do
+        @root = attachment_model
+        @child1 = attachment_model :root_attachment => @root
+        @child2 = attachment_model :root_attachment => @root
+        @child1.related_attachments.map(&:id).sort.should == [@root.id, @child2.id].sort
+      end
+    end
+
+    describe "scribd_doc_shared?" do
+      it "should be trivially false if there is no scribd_doc" do
+        attachment_model
+        @attachment.should_not be_scribd_doc_shared
+      end
+
+      it "should be false if there are no related attachments" do
+        attachment_with_scribd_doc.should_not be_scribd_doc_shared
+      end
+
+      it "should be false if related attachments have no scribd_docs" do
+        @root = attachment_model
+        @child1 = attachment_with_scribd_doc(fake_scribd_doc, :root_attachment => @root)
+        @child2 = attachment_with_scribd_doc(nil, :root_attachment => @root)
+        @child1.should_not be_scribd_doc_shared
+      end
+
+      it "should be false if related attachments have different scribd_docs" do
+        @root = attachment_with_scribd_doc(fake_scribd_doc('zero'))
+        @child1 = attachment_with_scribd_doc(fake_scribd_doc('one'), :root_attachment => @root)
+        @child2 = attachment_with_scribd_doc(fake_scribd_doc('two'), :root_attachment => @root)
+        @root.should_not be_scribd_doc_shared
+        @child1.should_not be_scribd_doc_shared
+      end
+
+      it "should be true if related attachment implicitly uses our doc_id" do
+        @root = attachment_with_scribd_doc(fake_scribd_doc('zero'))
+        @child1 = attachment_with_scribd_doc(nil, :root_attachment => @root)
+        @child2 = attachment_with_scribd_doc(nil, :root_attachment => @root)
+        @root.should be_scribd_doc_shared
+        @child1.should be_scribd_doc_shared
+      end
+
+      it "should be true if related attachment explicitly uses our doc_id" do
+        @root = attachment_model
+        @child1 = attachment_with_scribd_doc(fake_scribd_doc('what'), :root_attachment => @root)
+        @child2 = attachment_with_scribd_doc(fake_scribd_doc('what'), :root_attachment => @root)
+        @child1.should be_scribd_doc_shared
+      end
+    end
+
+    describe "delete_scribd_doc" do
+      it "should skip deletion if the scribd_doc is shared" do
+        @root = attachment_with_scribd_doc(fake_scribd_doc('zero'))
+        @child = attachment_with_scribd_doc(fake_scribd_doc('zero'), :root_attachment => @root)
+        @child.scribd_doc.expects(:destroy).never
+        @child.destroy
+        @child.reload.workflow_state.should eql 'deleted'
+        @child.read_attribute(:scribd_doc).should be_nil
+      end
+
+      it "should delete the scribd doc" do
+        @root = attachment_with_scribd_doc(fake_scribd_doc('zero'))
+        @child = attachment_with_scribd_doc(fake_scribd_doc('one'), :root_attachment => @root)
+        @child.scribd_doc.expects(:destroy).once.returns(true)
+        @child.destroy
+        @child.reload.workflow_state.should eql 'deleted'
+        @child.read_attribute(:scribd_doc).should be_nil
+      end
     end
   end
 
@@ -430,9 +530,41 @@ describe Attachment do
   end
 
   context "uploaded_data" do
-    it "should create with uploaded_date" do
+    it "should create with uploaded_data" do
       a = attachment_model(:uploaded_data => default_uploaded_data)
       a.filename.should eql("doc.doc")
+    end
+
+    context "uploading and db transactions" do
+      self.use_transactional_fixtures = false
+
+      before do
+        attachment_model(:context => Group.create!, :filename => 'test.mp4', :content_type => 'video')
+      end
+
+      after do
+        truncate_table(Attachment)
+        truncate_table(Folder)
+        truncate_table(Group)
+      end
+
+      it "should delay upload until the #save transaction is committed" do
+        @attachment.uploaded_data = default_uploaded_data
+        @attachment.connection.expects(:after_transaction_commit).once
+        @attachment.expects(:touch_context_if_appropriate).never
+        @attachment.expects(:build_media_object).never
+        @attachment.save
+      end
+
+      it "should upload immediately when in a non-joinable transaction" do
+        Attachment.connection.transaction(:joinable => false) do
+          @attachment.uploaded_data = default_uploaded_data
+          Attachment.connection.expects(:after_transaction_commit).never
+          @attachment.expects(:touch_context_if_appropriate)
+          @attachment.expects(:build_media_object)
+          @attachment.save
+        end
+      end
     end
   end
 

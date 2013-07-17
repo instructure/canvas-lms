@@ -1,9 +1,27 @@
-<p>
-  {{#t "in_this_course"}}In this course, students can:{{/t}}
-</p>
 <fieldset>
-  {{checkbox "allow_student_discussion_topics"}} <label for="allow_student_discussion_topics">{{#t "allow_student_topics"}}Create discussion topics{{/t}}</label><br/>
-  {{checkbox "allow_student_discussion_editing"}} <label for="allow_student_discussion_editing">{{#t "allow_student_discussion_editing"}}Edit and delete their own posts{{/t}}</label><br/>
-  {{checkbox "allow_student_forum_attachments"}} <label for="allow_student_forum_attachments">{{#t "attach_files"}}Attach files to discussions{{/t}}</label>
+  <p><b>{{#t "my_settings"}}My Settings{{/t}}</b></p>
+
+  <label class="checkbox">
+    {{checkbox "manual_mark_as_read"}}
+    {{#t "manually_mark_as_read"}}Manually mark posts as read{{/t}}
+  </label>
 </fieldset>
 
+<hr />
+
+<p><b>{{#t "student_settings"}}Student Settings{{/t}}</b></p>
+
+<fieldset>
+  <label class="checkbox">
+    {{checkbox "allow_student_discussion_topics"}}
+    {{#t "allow_student_topics"}}Create discussion topics{{/t}}
+  </label>
+  <label class="checkbox">
+    {{checkbox "allow_student_discussion_editing"}}
+    {{#t "allow_student_discussion_editing"}}Edit and delete their own posts{{/t}}
+  </label>
+  <label class="checkbox">
+    {{checkbox "allow_student_forum_attachments"}}
+    {{#t "attach_files"}}Attach files to discussions{{/t}}
+  </label>
+</fieldset>

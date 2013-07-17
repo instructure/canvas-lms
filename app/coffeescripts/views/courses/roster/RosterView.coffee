@@ -17,9 +17,13 @@ define [
 
     @child 'createUsersView', '[data-view=createUsers]'
 
+    @child 'resendInvitationsView', '[data-view=resendInvitations]'
+
     @optionProperty 'roles'
 
     @optionProperty 'permissions'
+
+    @optionProperty 'course'
 
     template: template
 

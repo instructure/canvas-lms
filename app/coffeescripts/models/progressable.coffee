@@ -26,8 +26,7 @@ define [
 
     attachProgressable: ->
       @on 'change:progress_url', (model, url) =>
-        @progressModel.url = url
-        @progressModel.poll()
+        @progressModel.set({url, workflow_state: 'queued'})
       @progressModel.on 'complete', =>
         @fetch success: =>
           @trigger 'progressResolved'

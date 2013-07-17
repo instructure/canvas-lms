@@ -1,8 +1,0 @@
-#!/usr/bin/env ruby
-begin
-  load File.expand_path(File.dirname(__FILE__) + "/../vendor/plugins/cucumber/bin/cucumber")
-rescue LoadError => e
-  raise unless e.to_s =~ /cucumber/  
-  require "rubygems"
-  load File.join(Gem.bindir, "cucumber")
-end

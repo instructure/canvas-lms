@@ -272,6 +272,7 @@ describe FilesController do
       get 'show', :course_id => @course.id, :id => @file.id, :download => 1
       @module.reload
       @module.evaluate_for(@user, true, true).state.should eql(:completed)
+      @file.reload.last_inline_view.should be_nil
     end
 
     it "should not mark a file as viewed for module progressions if the file is locked" do
@@ -281,6 +282,7 @@ describe FilesController do
       get 'show', :course_id => @course.id, :id => @file.id, :download => 1
       @module.reload
       @module.evaluate_for(@user, true, true).state.should eql(:unlocked)
+      @file.reload.last_inline_view.should be_nil
     end
 
     it "should not mark a file as viewed for module progressions just because the files#show view is rendered" do
@@ -290,6 +292,7 @@ describe FilesController do
       get 'show', :course_id => @course.id, :id => @file.id
       @module.reload
       @module.evaluate_for(@user, true, true).state.should eql(:unlocked)
+      @file.reload.last_inline_view.should be_nil
     end
 
     it "should mark files as viewed for module progressions if the file is previewed inline" do
@@ -298,6 +301,7 @@ describe FilesController do
       json_parse.should == {'ok' => true}
       @module.reload
       @module.evaluate_for(@user, true, true).state.should eql(:completed)
+      @file.reload.last_inline_view.should > 1.minute.ago
     end
 
     it "should mark files as viewed for module progressions if the file data is requested and it includes the scribd_doc data" do
@@ -307,6 +311,7 @@ describe FilesController do
       get 'show', :course_id => @course.id, :id => @file.id, :format => :json
       @module.reload
       @module.evaluate_for(@user, true, true).state.should eql(:completed)
+      @file.reload.last_inline_view.should > 1.minute.ago
     end
 
     it "should not mark files as viewed for module progressions if the file data is requested and it doesn't include the scribd_doc data (meaning it got viewed in scribd inline) and google docs preview is disabled" do
@@ -322,6 +327,7 @@ describe FilesController do
       get 'show', :course_id => @course.id, :id => @file.id, :format => :json
       @module.reload
       @module.evaluate_for(@user, true, true).state.should eql(:unlocked)
+      @file.reload.last_inline_view.should be_nil
     end
 
     it "should redirect to an existing attachment with the same path as a deleted attachment" do
@@ -348,7 +354,7 @@ describe FilesController do
     it "should work for quiz_statistics" do
       course_with_teacher_logged_in(:active_all => true)
       quiz_model
-      file = @quiz.statistics_csv.csv_attachment
+      file = @quiz.statistics_csv('student_analysis').csv_attachment
       get 'show', :quiz_statistics_id => file.reload.context.id,
         :file_id => file.id, :download => '1', :verifier => file.uuid
       response.should be_redirect
@@ -528,7 +534,6 @@ describe FilesController do
       json['upload_url'].should_not be_nil
       json['upload_params'].should_not be_nil
       json['upload_params'].should_not be_empty
-      json['remote_url'].should eql(false)
     end
 
     it "should create file placeholder (in s3 mode)" do
@@ -547,7 +552,6 @@ describe FilesController do
       json['upload_url'].should_not be_nil
       json['upload_params'].should be_present
       json['upload_params']['AWSAccessKeyId'].should == 'stub_id'
-      json['remote_url'].should eql(true)
     end
 
     it "should not allow going over quota for file uploads" do
@@ -582,7 +586,6 @@ describe FilesController do
       json['upload_url'].should_not be_nil
       json['upload_params'].should be_present
       json['upload_params']['AWSAccessKeyId'].should == 'stub_id'
-      json['remote_url'].should eql(true)
     end
 
     it "should associate assignment submission for a group assignment with the group" do
@@ -608,6 +611,32 @@ describe FilesController do
 
       assigns[:attachment].should_not be_nil
       assigns[:attachment].context.should == group
+    end
+
+    context "sharding" do
+      specs_require_sharding
+
+      it "should create the attachment on the context's shard" do
+        local_storage!
+        @shard1.activate do
+          account = Account.create!
+          course_with_teacher_logged_in(:active_all => true, :account => account)
+        end
+        post 'create_pending', {:attachment => {
+            :context_code => @course.asset_string,
+            :filename => "bob.txt"
+        }}
+        response.should be_success
+        assigns[:attachment].should_not be_nil
+        assigns[:attachment].id.should_not be_nil
+        assigns[:attachment].shard.should == @shard1
+        json = json_parse
+        json.should_not be_nil
+        json['id'].should eql(assigns[:attachment].id)
+        json['upload_url'].should_not be_nil
+        json['upload_params'].should_not be_nil
+        json['upload_params'].should_not be_empty
+      end
     end
   end
 

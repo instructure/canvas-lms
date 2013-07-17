@@ -15,10 +15,10 @@ define [
 
     # Create a hidden form
     httpMethod = {create: 'POST', update: 'PUT', delete: 'DELETE', read: 'GET'}[method]
-    toForm = (object, nested) ->
+    toForm = (object, nested, asArray) ->
       inputs = _.map object, (attr, key) ->
 
-        key = "#{nested}[#{key}]" if nested
+        key = "#{nested}[#{if asArray then '' else key}]" if nested
 
         if _.isElement(attr)
           # leave a copy in the original form, since we're moving it
@@ -26,7 +26,7 @@ define [
           $orig.after($orig.clone(true))
           attr
         else if !_.isEmpty(attr) and (_.isArray(attr) or typeof attr is 'object')
-          toForm(attr, key)
+          toForm(attr, key, _.isArray(attr))
         else if !"#{key}".match(/^_/) and attr? and typeof attr isnt 'object' and typeof attr isnt 'function'
           $el = $ "<input/>",
             name: key
@@ -35,13 +35,22 @@ define [
       _.flatten(inputs)
     $form = $("""
       <form enctype='multipart/form-data' target='#{iframeId}' action='#{options.url ? model.url()}' method='POST'>
-        <input type='hidden' name='_method' value='#{httpMethod}' />
-        <input type='hidden' name='authenticity_token' value='#{ENV.AUTHENTICITY_TOKEN}' />
       </form>
     """).hide()
 
-    _.each toForm(model.attributes), (el) ->
-      $form.prepend(el) if el
+    # pass proxyAttachment if the upload is being proxied through canvas (deprecated)
+    if options.proxyAttachment
+      $form.prepend """
+        <input type='hidden' name='_method' value='#{httpMethod}' />
+        <input type='hidden' name='authenticity_token' value='#{ENV.AUTHENTICITY_TOKEN}' />
+        """
+
+    _.each toForm(model.toJSON()), (el) ->
+      return unless el
+      if el.name is 'file' # s3 expects the file param last
+        $form.append(el)
+      else
+        $form.prepend(el)
 
     $(document.body).prepend($iframe, $form)
 
@@ -49,6 +58,9 @@ define [
       # contentDocument doesn't work in IE (7)
       iframeBody = ($iframe[0].contentDocument || $iframe[0].contentWindow.document).body
       response = $.parseJSON($(iframeBody).text())
+      # in case the form redirects after receiving the upload (API uploads),
+      # prevent trying to work with an empty response
+      return unless response
 
       # TODO: Migrate to api v2. Make this check redundant
       response = response.objects ? response

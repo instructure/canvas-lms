@@ -40,6 +40,9 @@
 #       // description of the outcome. omitted in the abbreviated form.
 #       "description": "Outcome description",
 #
+#       // A custom GUID for the learning standard.
+#       "vendor_guid": "customid9000",
+#
 #       // maximum points possible. included only if the outcome embeds a
 #       // rubric criterion. omitted in the abbreviated form.
 #       "points_possible": 5,
@@ -96,6 +99,7 @@ class OutcomesApiController < ApplicationController
   #
   # @argument title [Optional] The new outcome title.
   # @argument description [Optional] The new outcome description.
+  # @argument vendor_guid [Optional] A custom GUID for the learning standard.
   # @argument mastery_points [Optional, Integer] The new mastery threshold for the embedded rubric criterion.
   # @argument ratings[][description] [Optional] The description of a new rating level for the embedded rubric criterion.
   # @argument ratings[][points] [Optional, Integer] The points corresponding to a new rating level for the embedded rubric criterion.
@@ -107,7 +111,8 @@ class OutcomesApiController < ApplicationController
   #   curl 'http://<canvas>/api/v1/outcomes/1.json' \ 
   #        -X PUT \ 
   #        -F 'title=Outcome Title' \ 
-  #        -F 'description=Outcome description' \ 
+  #        -F 'description=Outcome description' \
+  #        -F 'vendor_guid=customid9001' \
   #        -F 'mastery_points=3' \ 
   #        -F 'ratings[][description]=Exceeds Expectations' \ 
   #        -F 'ratings[][points]=5' \ 
@@ -124,6 +129,7 @@ class OutcomesApiController < ApplicationController
   #        --data-binary '{
   #              "title": "Outcome Title",
   #              "description": "Outcome description",
+  #              "vendor_guid": "customid9001",
   #              "mastery_points": 3,
   #              "ratings": [
   #                { "description": "Exceeds Expectations", "points": 5 },
@@ -136,7 +142,7 @@ class OutcomesApiController < ApplicationController
   #
   def update
     if authorized_action(@outcome, @current_user, :update)
-      @outcome.update_attributes(params.slice(:title, :description))
+      @outcome.update_attributes(params.slice(:title, :description, :vendor_guid))
       if params[:mastery_points] || params[:ratings]
         criterion = @outcome.data && @outcome.data[:rubric_criterion]
         criterion ||= {}

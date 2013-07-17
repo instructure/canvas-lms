@@ -1,0 +1,10 @@
+<div class="popover-title">
+  {{#t "add_to_group"}}Add to Group{{/t}}
+</div>
+<div class="popover-content">
+  {{#each groups}}
+    <div>
+      <a href="#" class="set-group" data-group-id="{{id}}">{{name}}</a>
+    </div>
+  {{/each}}
+</div>

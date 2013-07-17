@@ -36,4 +36,3 @@ define [
       if role_name == "AccountAdmin" then position_string = "0_#{base_role_type}"
 
       position_string
-      

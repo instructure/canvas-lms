@@ -215,8 +215,7 @@ class MessageableUser
         end
 
         BookmarkedCollection.merge(*collections) do |u1, u2|
-          u1.global_common_courses.merge!(u2.global_common_courses)
-          u1.global_common_groups.merge!(u2.global_common_groups)
+          u1.include_common_contexts_from(u2)
         end
       end
     end
@@ -258,7 +257,7 @@ class MessageableUser
           reverse_lookup = users.index_by(&:id)
           user_ids = reverse_lookup.keys
           visible_enrollment_scope(scope_options).where(:id => user_ids).each do |user|
-            reverse_lookup[user.id].global_common_courses.merge!(user.global_common_courses)
+            reverse_lookup[user.id].include_common_contexts_from(user)
           end
         end
       end
@@ -272,7 +271,7 @@ class MessageableUser
             reverse_lookup = missing_users.index_by(&:id)
             missing_user_ids = reverse_lookup.keys
             enrollment_scope(scope_options).where(:id => missing_user_ids, 'courses.id' => course.id).each do |user|
-              reverse_lookup[user.id].global_common_courses.merge!(user.global_common_courses)
+              reverse_lookup[user.id].include_common_contexts_from(user)
             end
           end
         end
@@ -285,7 +284,7 @@ class MessageableUser
           reverse_lookup = users.index_by(&:id)
           user_ids = reverse_lookup.keys
           visible_account_user_scope(scope_options).where(:id => user_ids).each do |user|
-            reverse_lookup[user.id].global_common_courses.merge!(user.global_common_courses)
+            reverse_lookup[user.id].include_common_contexts_from(user)
           end
         end
       end
@@ -311,7 +310,7 @@ class MessageableUser
           reverse_lookup = users.index_by(&:id)
           user_ids = reverse_lookup.keys
           fully_visible_group_user_scope(scope_options).where(:id => user_ids).each do |user|
-            reverse_lookup[user.id].global_common_groups.merge!(user.global_common_groups)
+            reverse_lookup[user.id].include_common_contexts_from(user)
           end
         end
       end
@@ -325,7 +324,7 @@ class MessageableUser
             reverse_lookup = missing_users.index_by(&:id)
             missing_user_ids = reverse_lookup.keys
             group_user_scope(scope_options).where(:id => missing_user_ids, 'group_memberships.group_id' => group.id).each do |user|
-              reverse_lookup[user.id].global_common_groups.merge!(user.global_common_groups)
+              reverse_lookup[user.id].include_common_contexts_from(user)
             end
           end
         end

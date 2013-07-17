@@ -52,6 +52,9 @@ module CC
           rubrics_node.rubric(:identifier=>migration_id) do |r_node|
             atts = [:read_only, :title, :reusable, :public, :points_possible,
                     :hide_score_total, :free_form_criterion_comments]
+            if rubric.context != @course
+              r_node.external_identifier rubric.id
+            end
             atts.each do |att|
               r_node.tag!(att, rubric.send(att)) if rubric.send(att) == false || !rubric.send(att).blank?
             end

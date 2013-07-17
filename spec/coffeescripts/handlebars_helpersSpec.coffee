@@ -41,3 +41,27 @@ define [
       id: 'likes_tacos'
       name: 'likes[tacos]'
       checked: context.likes.tacos
+
+  test 'titleize', ->
+    equal helpers.titleize('test_string'), 'Test String'
+    equal helpers.titleize(null), ''
+    equal helpers.titleize('test_ _string'), 'Test String'
+
+  test 'toPrecision', ->
+    equal helpers.toPrecision(3.6666666, 2), '3.7'
+
+  module 'truncate'
+  test 'default truncates 30 characters', ->
+    text = "asdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdf"
+    truncText = helpers.truncate text
+    equal truncText.length, 30, "Truncates down to 30 letters"
+
+  test 'expects options for max (length)', ->
+    text = "asdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdf"
+    truncText = helpers.truncate text, 10
+    equal truncText.length, 10, "Truncates down to 10 letters"
+
+  test 'supports truncation left', ->
+    text = "going to the store"
+    truncText = helpers.truncate_left text, 15
+    equal truncText, "...to the store", "Reverse truncates"

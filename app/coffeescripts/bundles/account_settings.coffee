@@ -1,1 +1,4 @@
-require ['account_settings', 'external_tools']
+require [
+  'account_settings'
+  'compiled/bundles/modules/account_quota_settings'
+]

@@ -143,7 +143,7 @@ describe GradeCalculator do
           calc = GradeCalculator.new [@user.id],
                                      @course.id,
                                      :ignore_muted => false
-          calc.compute_scores.should eql [[50.0, 25.0]]
+          calc.compute_scores.first.map { |g| g[:grade] }.should eql [50.0, 25.0]
         end
 
         it "should be impossible to save grades that considered muted assignments" do
@@ -403,8 +403,17 @@ describe GradeCalculator do
 
     calc = GradeCalculator.new([@student2.id, @student1.id], @course)
     grades = calc.compute_scores
-    grades.shift.should == [100, 100]
-    grades.shift.should == [50, 50]
+    grades.shift.map { |g| g[:grade] }.should == [100, 100]
+    grades.shift.map { |g| g[:grade] }.should == [50, 50]
+  end
+
+  it "returns point information for unweighted courses" do
+    course_with_student
+    a = @course.assignments.create! :points_possible => 50
+    a.grade_student @student, :grade => 25
+    calc = GradeCalculator.new([@student.id], @course)
+    ((grade_info, _), _) = calc.compute_scores
+    grade_info.should == {:grade => 50, :total => 25, :possible => 50}
   end
 
   # We should keep this in sync with GradeCalculatorSpec.coffee

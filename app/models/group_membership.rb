@@ -30,10 +30,12 @@ class GroupMembership < ActiveRecord::Base
   before_save :capture_old_group_id
 
   before_validation :verify_section_homogeneity_if_necessary
+  validate :validate_within_group_limit
 
   after_save :ensure_mutually_exclusive_membership
   after_save :touch_groups
   after_save :check_auto_follow_group
+  after_save :update_cached_due_dates
   after_destroy :touch_groups
   after_destroy :check_auto_follow_group
   
@@ -113,6 +115,13 @@ class GroupMembership < ActiveRecord::Base
     end
   end
   protected :verify_section_homogeneity_if_necessary
+
+  def validate_within_group_limit
+    if new_record? && group.full?
+      errors.add(:group_id, t('errors.group_full', 'The group is full.'))
+    end
+  end
+  protected :validate_within_group_limit
   
   attr_accessor :old_group_id
   def capture_old_group_id
@@ -127,6 +136,14 @@ class GroupMembership < ActiveRecord::Base
     elsif self.destroyed? || (self.workflow_state_changed? && self.deleted?)
       user_follow = self.user.shard.activate { self.user.user_follows.where(:followed_item_id => self.group_id, :followed_item_type => 'Group').first }
       user_follow.try(:destroy)
+    end
+  end
+
+  def update_cached_due_dates
+    if workflow_state_changed? && group.try(:group_category)
+      group.group_category.assignments.each do |assignment|
+        DueDateCacher.recompute(assignment)
+      end
     end
   end
   

@@ -204,6 +204,7 @@ describe "zip file uploads" do
     end
 
     it "should allow unzipping into a folder from drag-and-drop courses" do
+      pending("drag and drop issues")
       get @files_url
       next unless driver.execute_script("return $.handlesHTML5Files;") == true
       unzip_into_folder_drag_and_drop

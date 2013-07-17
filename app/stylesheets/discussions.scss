@@ -1,5 +1,8 @@
 @import "environment";
 
+$border: #b6babf;
+$borderRadius: 3px;
+
 body.with-right-side.with-left-side {
   // toolbar needs it to be this wide
   min-width: 1110px;
@@ -32,23 +35,78 @@ body.with-right-side.with-left-side {
 
 .discussion-entries {
   list-style: none;
-  margin: 0 0 0 8px;
+  margin: 0;
   padding: 0;
+
   .entry {
-    padding: 4px 0 0 10px;
-    margin: 5px 0 50px 0;
+    background: white;
+    border: 1px solid $border;
+    border-top-left-radius: $borderRadius;
+    border-top-right-radius: $borderRadius;
+    padding: $borderRadius 0 0 0;
+    margin: 16px 0 16px 18px;
+
     &.collapsed, .entry {
-      margin: 5px 0 5px 0;
+      margin: 16px 0 16px 18px;
+    }
+
+    .deleted-discussion-entry {
+      padding-bottom: $borderRadius;
+
+      &.reply-box-container {
+        padding: 10px 0;
+      }
+    }
+
+    .discussion-header-content {
+      padding-top: 10px;
+    }
+
+    &.collapsed .discussion-header-content {
+      padding-top: 0;
+    }
+
+    .deleted-discussion-entry .right-of-avatar {
+      padding-top: 0 !important;
+    }
+
+    .entry .right-of-avatar {
+      padding-top: 0;
+    }
+
+    .avatar img {
+      height: 32px;
+      width: 32px;
+    }
+
+    .entry {
+      box-shadow: none;
+      margin: 0 !important;
+      border: none;
+      border-radius: 0;
+      border-top: solid 1px $border;
+
+      .discussion_entry {
+        margin: 0;
+        border-bottom: none;
+      }
+
+      .avatar img {
+        height: 16px;
+        width: 16px;
+      }
     }
   }
 }
 
+.side_comment_discussion .entry .entry .replies {
+  display: none;
+}
+
 .discussion_entry {
   position: relative;
-  margin: 5px 0;
-  box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.2);
+  margin: 0;
   background: white;
-  border: 2px solid white;
   .al-trigger {
     margin-left: 10px;
     margin-right: 0px;
@@ -63,16 +121,29 @@ body.with-right-side.with-left-side {
   float: right;
 }
 
-.reply-textarea {
-  width: 100%;
-}
-
 .discussion-section {
   padding: 4px 10px 3px 10px;
   position: relative;
   a {
     color: #396eb2;
   }
+}
+
+.reply-textarea {
+  border-radius: 5px 5px 0 0;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  min-height: 155px;
+  width: 100%;
+
+  @media screen and (min-width: 1100px) {
+    min-height: 129px
+  }
+}
+
+.toggle-wrapper {
+  margin-bottom: 11px;
+  text-align: right;
 }
 
 .due_date_wrapper {
@@ -122,27 +193,62 @@ body.with-right-side.with-left-side {
   color: #777777;
 }
 
-.discussion-read-state {
+.discussion-read-state-btn {
   position: absolute;
-  top: 12px;
-  left: -20px;
+  top: 4px;
+  left: -32px;
   bottom: 0;
-  width: 8px;
-  height: 8px;
-  background: transparent url(/images/messages/new-replied-icon_sprite.png) -4px -8px no-repeat;
-  display: none;
-}
-
-.unread-onload .discussion-read-state {
+  width: 10px;
+  height: 10px;
+  padding: 12px;
   display: block;
 }
 
-.read .discussion-read-state {
-  background-position: -4px -80px;
+.discussion-read-state {
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  border: 1px solid #2e89cc;
+  border-radius: 5px;
+  width: 10px;
+  height: 10px;
+  background: #46aaf9;
+  background: -moz-linear-gradient(top, #73d6fc, #2489f7);
+  background: -ms-linear-gradient(top, #73d6fc, #2489f7);
+  background: -o-linear-gradient(top, #73d6fc, #2489f7);
+  background: -webkit-linear-gradient(top, #73d6fc, #2489f7);
+  background: linear-gradient(top, #73d6fc, #2489f7);
 }
 
-//.read      .discussion-read-state .read,
-.discussion-reply-form {
+.read .discussion-read-state {
+  background: #fff;
+  border: 1px solid #8c8d8d;
+}
+
+.discussion-read-state-btn {
+  left: -32px;
+}
+
+.no-touch {
+  .entry-control {
+    visibility: hidden;
+  }
+}
+.touch {
+  .entry-control {
+    visibility: visible;
+  }
+}
+
+.discussion_entry {
+  &:hover {
+    .entry-control {
+      visibility: visible;
+    }
+  }
+}
+
+.entry, .discussion_entry {
+
   .show-if-replying {
     display: none;
   }
@@ -154,6 +260,47 @@ body.with-right-side.with-left-side {
       display: block;
     }
   }
+}
+
+.discussion-entry-reply-area {
+  background: #f4f5f7;
+  padding: 0 0.8em;
+  border-top: 1px solid $border;
+}
+
+.topic {
+  .discussion-entry-reply-area {
+    padding: 0 20px;
+    border-top: 1px solid #d4d5d7;
+    border-bottom: 1px solid $border;
+  }
+}
+
+.discussion_entry > .discussion-entry-reply-area {
+  padding: 0 0.8em;
+  border-top: 1px solid #d4d5d7;
+}
+.entry {
+  & > .bottom-reply-with-box {
+    .discussion-entry-reply-area {
+      padding: 0 0.8em;
+      border-top: 1px solid #d4d5d7;
+
+      &.reply-box-container {
+        padding: 15px 0.8em;
+        margin: 0;
+
+        .discussion-reply-box {
+          margin: 0;
+        }
+      }
+    }
+  }
+}
+
+.discussion-reply-form {
+  margin: 0;
+  padding-bottom: 1em;
 }
 
 .entry {
@@ -208,11 +355,11 @@ body.with-right-side.with-left-side {
 }
 
 .discussion-reply-attachments-container {
-  float: right;
+  float: left;
 }
 
 .discussion-reply-buttons {
-  float: left;
+  float: right;
 }
 
 .message-notification, .notification {
@@ -235,11 +382,10 @@ body.with-right-side.with-left-side {
 }
 
 .showMore {
-  box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.2);
-  margin-left: 18px;
-  margin-top: 10px;
+  margin: 0;
+  border-top: 1px solid $border;
   background: white;
-  padding: 5px 10px;
+  padding: 10px 10px 13px 10px;
   font-size: 10px;
   font-weight: bold;
   @include clearfix;
@@ -251,17 +397,18 @@ body.with-right-side.with-left-side {
       display: inline-block;
       position: relative;
       left: 4px;
+      top: 2px;
       bottom: 2px;
       height: 0px;
       width: 0px;
       border-style: solid;
-      border-color: transparent transparent transparent $linkColor;
+      border-color: #396eb2 transparent transparent transparent;
       border-width: 5px;
       vertical-align: middle;
     }
   }
   .new-and-total-badge {
-    margin-top: 2px;
+    margin-top: 0;
     float: right;
   }
 }
@@ -276,18 +423,26 @@ body.with-right-side.with-left-side {
 
 .entry-controls {
   overflow: auto;
-  padding: 4px 10px;
+  padding: 0 10px 2px 10px;
   font-size: 12px;
+
   .new-and-total-badge {
     float: left;
     margin: 0;
   }
 }
 
+.side_comment_discussion .entry-controls {
+  display: none;
+}
+
 .topic {
-  padding: 10px;
   margin: 0;
   overflow: auto;
+
+  .entry_content {
+    padding: 10px 10px 0 10px;
+  }
 }
 
 .entry-header {
@@ -321,7 +476,7 @@ body.with-right-side.with-left-side {
   .item {
     display: block;
     padding: 4px 12px 4px 8px;
-    border-right: 1px solid #c5d6e7;
+    border-right: 1px solid $border;
   }
   li:last-child .item {
     border-right: none;
@@ -335,106 +490,25 @@ body.with-right-side.with-left-side {
   }
 }
 
-.highlight .discussion_entry,
-.side_comment_discussion .highlight {
+.highlight .entry_content {
   outline: 3px solid #06a9ee;
 }
 
-.highlight .entry .discussion_entry,
-.side_comment_discussion .highlight .discussion_entry {
+.highlight .entry .entry_content {
   outline: none;
 }
 
-.side_comment_discussion {
-  .entry, .discussion-entries, .showMore {
-    padding-left: 0;
-    margin-left: 0;
-  }
-  .discussion_entry {
-    box-shadow: none;
-    border: none;
-    margin: 0;
-  }
-  .entry {
-    box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.2);
-    margin-left: 18px !important;
-    background: white;
-    &:first-child {
-      margin-top: 5px;
-    }
-    .entry {
-      box-shadow: none;
-      margin: 0 !important;
-      padding-left: 30px;
-      border-top: solid 1px #e4e5e7;
-      .replies {
-        display: none;
-      }
-      .discussion_entry {
-        margin: 0;
-        border-bottom: none;
-      }
-    }
-  }
-  .entry-controls {
-    display: none;
-  }
-  .showMore {
-    box-shadow: none;
-    padding: 10px;
-    padding-bottom: 13px;
-    margin: 0;
-    border-top: solid 1px #e4e5e7;
-    .new-and-total-badge {
-      margin-top: 0;
-    }
-    a:after {
-      border-color: #396eb2 transparent transparent transparent;
-      top: 2px;
-    }
-  }
-  .entry {
-    padding: 3px 0;
-    .avatar img {
-      width: 32px;
-      height: 32px;
-    }
-    .entry .avatar img {
-      width: 16px;
-      height: 16px;
-    }
-    .discussion-header-content {
-      padding-top: 10px;
-    }
-    &.collapsed .discussion-header-content {
-      padding-top: 0px;
-    }
-    .deleted-discussion-entry .right-of-avatar {
-      padding-top: 0px !important;
-    }
-    .entry .right-of-avatar {
-      padding-top: 0px;
-    }
-  }
-}
-
-.side_comment_discussion .discussion-reply-label,
-.topic .discussion-reply-label {
+.discussion-reply-box {
   display: block;
-  background-color: #f4f5f7;
+  background-color: #fdfdfd;
   font-size: 11px;
   color: #636363 !important;
   padding: 3px 10px;
   cursor: text;
-  border: 1px inset #eeeeee;
+  border: 1px solid #d4d5d7;
+  margin: 15px 0;
   &:hover {
     text-decoration: none;
-  }
-}
-
-.topic {
-  .discussion-reply-label {
-    margin-top: 20px;
   }
 }
 
@@ -443,18 +517,13 @@ body.with-right-side.with-left-side {
   border-top: solid 1px #e4e5e7;
 }
 
-.side_comment_discussion .entry .entry .discussion-read-state {
-  left: -14px;
-  top: 14px;
-}
-
 .message *:last-child {
   margin-bottom: 0;
 }
 
 .message_wrapper {
   padding-top: 2px;
-  padding-bottom: 8px;
+  padding-bottom: 2px;
 }
 
 #discussion_container {
@@ -516,7 +585,8 @@ body.with-right-side.with-left-side {
 
 #filterResults {
   .entry {
-    margin: 5px 0;
+    margin-top: 0;
+    margin-bottom: 5px;
   }
   .entry-controls {
     display: block !important;
@@ -539,7 +609,7 @@ body.with-right-side.with-left-side {
   }
   .headerBar {
     padding: 10px 10px 6px 14px;
-    border-bottom: solid 1px #efefef;
+    border-bottom: solid 1px $border;
     min-height: 33px;
   }
   .sticky {
@@ -567,5 +637,17 @@ body.with-right-side.with-left-side {
   th {
     font-weight: bold;
     text-align: left;
+  }
+}
+
+#discussion-toolbar {
+  .topic-subscribe-button { display:none; }
+  .topic-unsubscribe-button { display:none; }
+
+  &.unsubscribed {
+    .topic-subscribe-button { display:inline-block; }
+  }
+  &.subscribed {
+    .topic-unsubscribe-button { display:inline-block; }
   }
 }

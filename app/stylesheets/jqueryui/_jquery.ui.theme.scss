@@ -26,6 +26,42 @@
 
 /* Interaction states
 ----------------------------------*/
+
+/*
+@styleguide Highlights
+
+We use the jQuery UI highlights
+
+```html
+<p class="ui-widget">
+  <div class="ui-state-highlight ui-corner-all pad-box-micro">
+    <strong>Highlight:</strong> Sample ui-state-highlight style
+  </div>
+</p>
+<p class="ui-widget">
+  <div class="ui-state-warning ui-corner-all pad-box-micro">
+    <strong>Warning:</strong> Sample ui-state-warning style.
+  </div>
+</p>
+<p class="ui-widget">
+  <div class="ui-state-error ui-corner-all pad-box-micro">
+    <strong>Alert:</strong> Sample ui-state-error style.
+  </div>
+</p>
+<p class="ui-widget">
+  <div class="ui-state-success ui-corner-all pad-box-micro">
+    <strong>Success:</strong> Sample ui-state-success style.
+  </div>
+</p>
+<p class="ui-widget">
+  <div class="ui-state-default ui-corner-all pad-box-micro">
+    <strong>Default:</strong> Sample ui-state-default style.
+  </div>
+</p>
+```
+
+*/
+
 .ui-state-default,
 // this was here but if you enable it it will break blue icons in dialogs, maybe we can just make the .btn-primary selector more specific?
 //.ui-widget-content .ui-state-default,

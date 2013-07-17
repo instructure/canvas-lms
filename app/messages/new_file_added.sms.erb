@@ -4,4 +4,4 @@
 <%= t('body', 'New file added for %{name}:', :name => asset.context.name) %>
 <%= asset.title %> (<%= asset.readable_size %>)
 
-More info at <%= content :link %>
+<% t('link', 'More info at %{link}', :link => content(:link)) %>

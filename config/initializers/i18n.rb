@@ -1,14 +1,14 @@
-I18n.load_path += Dir[Rails.root.join('config', 'locales', '**', '*.{rb,yml}')] +
-                  Dir[Rails.root.join('vendor', 'plugins', '*', 'config', 'locales', '**', '*.{rb,yml}')]
-I18n.load_path -= Dir[Rails.root.join('config', 'locales', 'generated', '**', '*.{rb,yml}')]
-I18n::Backend::Simple.send(:include, I18n::Backend::Fallbacks)
-
-Gem.loaded_specs.values.each do |spec|
-  path = spec.full_gem_path
-  translations_path = File.expand_path(File.join(path, 'config', 'locales'))
-  next unless File.directory?(translations_path)
-  I18n.load_path += Dir[File.join(translations_path, '**', '*.{rb,yml}')]
+# loading all the locales has a significant (>30%) impact on the speed of initializing canvas
+# so we skip it in situations where we don't need the locales, such as in development mode and in rails console
+skip_locale_loading = (Rails.env.development? || Rails.env.test? || $0 == 'irb') && !ENV['RAILS_LOAD_ALL_LOCALES']
+if skip_locale_loading
+  I18n.load_path = I18n.load_path.grep(%r{/(locales|en)\.yml\z})
+else
+  I18n.load_path += Dir[Rails.root.join('vendor', 'plugins', '*', 'config', 'locales', '**', '*.{rb,yml}')]
 end
+I18n.backend = I18nema::Backend.new
+I18nema::Backend.send(:include, I18n::Backend::Fallbacks)
+I18n.backend.init_translations
 
 module I18nUtilities
   def before_label(text_or_key, default_value = nil, *args)
@@ -212,6 +212,12 @@ ActiveRecord::Base.class_eval do
     end
     alias :t :translate
 
+    # so that we don't load up the locales until we need them
+    LOCALE_LIST = []
+    def LOCALE_LIST.include?(item)
+      I18n.available_locales.map(&:to_s).include?(item)
+    end
+
     def validates_locale(*args)
       options = args.last.is_a?(Hash) ? args.pop : {}
       args << :locale if args.empty?
@@ -223,7 +229,7 @@ ActiveRecord::Base.class_eval do
         end
       end
       args.each do |field|
-        validates_inclusion_of field, options.merge(:in => I18n.available_locales.map(&:to_s))
+        validates_inclusion_of field, options.merge(:in => LOCALE_LIST)
       end
     end
   end

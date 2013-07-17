@@ -1,13 +1,17 @@
+<%
+  current_host = (HostUrl.context_host(asset.merge_candidates.first) rescue nil) || HostUrl.default_host
+  new_host     = (HostUrl.context_host((asset.pseudonym || asset.user.pseudonym).account) rescue nil) || HostUrl.default_host
+%>
+
 <% define_content :link do %>
-  <%= HostUrl.protocol %>://<%= HostUrl.default_host %>/register/<%= asset.confirmation_code %>
+  <%= HostUrl.protocol %>://<%= current_host %>/register/<%= asset.confirmation_code %>
 <% end %>
 
 <% define_content :subject do %>
   <%= t('subject', 'New Canvas Account') %>
 <% end %>
-<% url = (HostUrl.context_host((asset.pseudonym || asset.user.pseudonym).account) rescue nil) || HostUrl.default_host %>
-<%= t :body, <<-BODY, :url => url
-An account has been created for you at %{url}, but you already have a Canvas account.  If you would like to merge them together, please visit the following url:
+<%= t :body, <<-BODY, :host => new_host
+An account has been created for you at %{host}, but you already have a Canvas account.  If you would like to merge them together, please visit the following url:
 BODY
 %>
 <%= content :link %>

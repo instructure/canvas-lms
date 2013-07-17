@@ -18,7 +18,6 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
-if RUBY_VERSION >= "1.9"
 describe 'Time Marshal override' do
   it "should preserve the old marshalling for post-1900 dates" do
     raw_time = Time.zone.parse('2013-02-16 05:43:21.15Z').time
@@ -39,4 +38,3 @@ describe 'Time Marshal override' do
     Marshal.load(Marshal.dump(old_time)).should == old_time
   end
 end
-end # RUBY_VERSION

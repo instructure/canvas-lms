@@ -49,6 +49,41 @@ describe AccountNotification do
     @user.preferences[:closed_notifications].should == []
   end
 
+  describe "survey notifications" do
+    it "should only display for flagged accounts" do
+      flag = AccountNotification::ACCOUNT_SERVICE_NOTIFICATION_FLAGS.first
+      @announcement = Account.site_admin.announcements.create!(message: "hello", required_account_service: flag)
+      @a1 = account_model
+      @a2 = account_model
+      @a2.enable_service(flag)
+      @a2.save!
+      AccountNotification.for_account(@a1).should == []
+      AccountNotification.for_account(@a2).should == [@announcement]
+    end
+
+    describe "display_for_user?" do
+      it "should select each mod value once throughout the cycle" do
+        AccountNotification.display_for_user?(5, 3, Time.zone.parse('2012-04-02')).should == false
+        AccountNotification.display_for_user?(6, 3, Time.zone.parse('2012-04-02')).should == false
+        AccountNotification.display_for_user?(7, 3, Time.zone.parse('2012-04-02')).should == true
+
+        AccountNotification.display_for_user?(5, 3, Time.zone.parse('2012-05-05')).should == true
+        AccountNotification.display_for_user?(6, 3, Time.zone.parse('2012-05-05')).should == false
+        AccountNotification.display_for_user?(7, 3, Time.zone.parse('2012-05-05')).should == false
+
+        AccountNotification.display_for_user?(5, 3, Time.zone.parse('2012-06-04')).should == false
+        AccountNotification.display_for_user?(6, 3, Time.zone.parse('2012-06-04')).should == true
+        AccountNotification.display_for_user?(7, 3, Time.zone.parse('2012-06-04')).should == false
+      end
+
+      it "should shift the mod values each new cycle" do
+        AccountNotification.display_for_user?(7, 3, Time.zone.parse('2012-04-02')).should == true
+        AccountNotification.display_for_user?(7, 3, Time.zone.parse('2012-07-02')).should == false
+        AccountNotification.display_for_user?(7, 3, Time.zone.parse('2012-09-02')).should == true
+      end
+    end
+  end
+
   context "sharding" do
     specs_require_sharding
 

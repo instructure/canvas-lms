@@ -18,8 +18,9 @@
 module Api::V1::ContextModule
   include Api::V1::Json
   include Api::V1::User
+  include Api::V1::ExternalTools::UrlHelpers
 
-  MODULE_JSON_ATTRS = %w(id position name unlock_at workflow_state)
+  MODULE_JSON_ATTRS = %w(id position name unlock_at)
 
   MODULE_ITEM_JSON_ATTRS = %w(id position title indent)
 
@@ -32,6 +33,7 @@ module Api::V1::ContextModule
       hash['state'] = progression.workflow_state
       hash['completed_at'] = progression.completed_at
     end
+    hash['published'] = context_module.active? if context_module.grants_right?(current_user, :update)
     hash
   end
 
@@ -54,6 +56,16 @@ module Api::V1::ContextModule
           course_context_modules_item_redirect_url(:id => content_tag.id)
       end
     end
+    
+    # add content_id, if applicable
+    # (note that wiki page ids are not exposed by the api)
+    unless %w(WikiPage ContextModuleSubHeader ExternalUrl).include? content_tag.content_type
+      hash['content_id'] = content_tag.content_id
+    end
+
+    if content_tag.content_type == 'WikiPage'
+      hash['page_url'] = content_tag.content.url
+    end
 
     # add data-api-endpoint link, if applicable
     api_url = nil
@@ -64,8 +76,16 @@ module Api::V1::ContextModule
       # no context
       when 'Attachment'
         api_url = polymorphic_url([:api_v1, content_tag.content])
+      when 'ContextExternalTool'
+        api_url = sessionless_launch_url(context_module.context, :url => content_tag.url)
     end
     hash['url'] = api_url if api_url
+
+    # add external_url, if applicable
+    hash['external_url'] = content_tag.url if ['ExternalUrl', 'ContextExternalTool'].include?(content_tag.content_type)
+
+    # add new_tab, if applicable
+    hash['new_tab'] = content_tag.new_tab if content_tag.content_type == 'ContextExternalTool'
 
     # add completion requirements
     if criterion = context_module.completion_requirements && context_module.completion_requirements.detect { |r| r[:id] == content_tag.id }
@@ -74,6 +94,8 @@ module Api::V1::ContextModule
       ch['completed'] = !!progression.requirements_met.detect{|r|r[:type] == criterion[:type] && r[:id] == content_tag.id} if progression && progression.requirements_met.present?
       hash['completion_requirement'] = ch
     end
+
+    hash['published'] = content_tag.active? if context_module.grants_right?(current_user, :update)
 
     hash
   end

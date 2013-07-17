@@ -33,3 +33,21 @@ Authlogic::Session::Callbacks.module_eval do
   end
   alias_method_chain :save_record, :ro_check
 end
+
+# i18n fix so the error gets translated at run time, not initialization time.
+# this is fixed in new authlogic
+# https://github.com/jovoto-team/authlogic/commit/db01cf108985bd176e1885a3c85450020d4bcc45
+if Rails.version < '3.0'
+  module Authlogic
+    module ActsAsAuthentic
+      module Login
+        module Config
+          def validates_format_of_login_field_options(value = nil)
+            rw_config(:validates_format_of_login_field_options, value, {:with => Authlogic::Regex.login, :message => lambda {I18n.t('error_messages.login_invalid', "should use only letters, numbers, spaces, and .-_@ please.")}})
+          end
+          alias_method :validates_format_of_login_field_options=, :validates_format_of_login_field_options
+        end
+      end
+    end
+  end
+end

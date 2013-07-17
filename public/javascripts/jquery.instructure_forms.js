@@ -224,7 +224,6 @@ define([
             priorTarget   = $form.attr('target'),
             priorEnctype  = $form.attr('ENCTYPE'),
             request       = new FakeXHR();
-
         $form.attr({
           'method' : method,
           'action' : action,
@@ -232,11 +231,12 @@ define([
           'encoding' : 'multipart/form-data',
           'target' : "frame_" + id
         });
+        // TODO: remove me once we stop proxying file uploads and/or
+        // explicitly calling $.ajaxJSONFiles
         if (options.onlyGivenParameters) {
           $form.find("input[name='_method']").remove();
           $form.find("input[name='authenticity_token']").remove();
         }
-
         $.ajaxJSON.storeRequest(request, action, method, formData);
 
         $frame.bind('form_response_loaded', function() {
@@ -268,14 +268,7 @@ define([
     return this;
   };
 
-  var assert_option = function(data, arg) {
-    if(!data[arg]) {
-      throw arg + " option is required";
-    }
-  };
-
   $.ajaxJSONPreparedFiles = function(options) {
-    assert_option(options, 'context_code');
     var list = [];
     var $this = this;
     var pre_list = options.files || options.file_elements || [];
@@ -312,13 +305,12 @@ define([
           }, function(data) {
             $(file).attr('name', old_name);
             (options.upload_error || options.error).call($this, data);
-          }, {onlyGivenParameters: data.remote_url});
+          }, {onlyGivenParameters: true });
         } else {
           (options.upload_error || options.error).call($this, data);
         }
-        } catch(e) {
-          var ex = e;
-        }
+        } finally {}
+        
       }, function() { 
         return (options.upload_error || options.error).apply(this, arguments);
       });
@@ -327,6 +319,8 @@ define([
       var item = list.shift();
       if(item) {
         uploadFile.call($this, $.extend({
+          'name': item.name,
+          'on_duplicate': 'rename',
           'attachment[folder_id]': options.folder_id,
           'attachment[intent]': options.intent,
           'attachment[asset_string]': options.asset_string,
@@ -344,7 +338,8 @@ define([
     var $newForm = $(document.createElement("form"));
     $newForm.attr('action', url).attr('method', submit_type);
     if(!formData.authenticity_token) {
-      formData.authenticity_token = $("#ajax_authenticity_token").text();
+      // TODO: remove me once we stop proxying file uploads
+      formData.authenticity_token = ENV.AUTHENTICITY_TOKEN;
     }
     var fileNames = {};
     files.each(function() {
@@ -385,7 +380,8 @@ define([
   }
   $.ajaxFileUpload = function(options) {
     if(!options.data.authenticity_token) {
-      options.data.authenticity_token = ENV.AUTHENTICITY_TOKEN
+      // TODO: remove me once we stop proxying file uploads
+      options.data.authenticity_token = ENV.AUTHENTICITY_TOKEN;
     }
     $.toMultipartForm(options.data, function(params) {
       $.sendFormAsBinary({

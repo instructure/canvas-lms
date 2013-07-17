@@ -414,6 +414,16 @@ module QuizzesHelper
       t('#quizzes.links.resume_quiz', 'Resume Quiz')
   end
 
+  def attachment_id_for(question)
+    attach = attachment_for(question)
+    attach[:id] if attach.present?
+  end
+
+  def attachment_for(question)
+    key = "question_#{question[:id]}"
+    @attachments[@stored_params[key].try(:first).to_i]
+  end
+
   def score_to_keep_message(quiz=@quiz)
     quiz.scoring_policy == "keep_highest" ?
       t('#quizzes.links.will_keep_highest_score', "Will keep the highest of all your scores") :

@@ -454,4 +454,32 @@ describe RoleOverride do
       RoleOverride.enabled_for?(Account.site_admin, Account.default, :manage_role_overrides, 'AccountMembership', 'role').should == []
     end
   end
+
+  context "enabled_for_plugin" do
+    before(:each) do
+      account_model
+    end
+
+    it "should not show a permission if the specified plugin does not exist" do
+      RoleOverride.manageable_permissions(@account).keys.should_not include(:manage_frozen_assignments)
+    end
+
+    it "should not show a permission if the specified plugin is not enabled" do
+      p = Canvas::Plugin.register(:assignment_freezer, :assignment_freezer, {
+        :settings => {:foo => true}})
+      s = PluginSetting.new(:name => p.id, :settings => p.default_settings)
+      s.disabled = true
+      s.save!
+      RoleOverride.manageable_permissions(@account).keys.should_not include(:manage_frozen_assignments)
+    end
+
+    it "should include show a permission if the specified plugin is enabled" do
+      p = Canvas::Plugin.register(:assignment_freezer, :assignment_freezer, {
+        :settings => {:foo => true}})
+      s = PluginSetting.new(:name => p.id, :settings => p.default_settings)
+      s.disabled = false
+      s.save!
+      RoleOverride.manageable_permissions(@account).keys.should include(:manage_frozen_assignments)
+    end
+  end
 end

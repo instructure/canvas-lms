@@ -49,6 +49,7 @@ class ApplicationController < ActionController::Base
   before_filter :init_body_classes
   after_filter :set_response_headers
   after_filter :update_enrollment_last_activity_at
+  include Tour
 
   add_crumb(proc { %Q{<i title="#{I18n.t('links.dashboard', "My Dashboard")}" class="icon-home standalone-icon"></i>}.html_safe }, :root_path, :class => "home")
 
@@ -290,7 +291,7 @@ class ApplicationController < ActionController::Base
       @headers = !!@current_user if @headers != false
       @files_domain = @account_domain && @account_domain.host_type == 'files'
       format.html {
-        store_location if request.get?
+        store_location
         return if !@current_user && initiate_delegated_login(request.host_with_port)
         if @context.is_a?(Course) && @context_enrollment
           start_date = @context_enrollment.enrollment_dates.map(&:first).compact.min if @context_enrollment.state_based_on_date == :inactive
@@ -338,18 +339,7 @@ class ApplicationController < ActionController::Base
     return @context != nil
   end
 
-  def clean_return_to(url)
-    return nil if url.blank?
-    uri = URI.parse(url)
-    return nil unless uri.path[0] == ?/
-    return "#{request.protocol}#{request.host_with_port}#{uri.path}#{uri.query && "?#{uri.query}"}#{uri.fragment && "##{uri.fragment}"}"
-  end
   helper_method :clean_return_to
-
-  def return_to(url, fallback)
-    url = clean_return_to(url) || clean_return_to(fallback)
-    redirect_to url
-  end
 
   MAX_ACCOUNT_LINEAGE_TO_SHOW_IN_CRUMBS = 3
 
@@ -421,9 +411,6 @@ class ApplicationController < ActionController::Base
         @context = @current_user
         @context_membership = @context
       end
-      if @context.try_rescue(:only_wiki_is_public) && params[:controller].match(/wiki/) && !@current_user && (!@context.is_a?(Course) || session[:enrollment_uuid_course_id] != @context.id)
-        @show_left_side = false
-      end
       if @context.is_a?(Account) && !@context.root_account?
         account_chain = @context.account_chain.to_a.select {|a| a.grants_right?(@current_user, session, :read) }
         account_chain.slice!(0) # the first element is the current context
@@ -460,8 +447,9 @@ class ApplicationController < ActionController::Base
       # we already know the user can read these courses and groups, so skip
       # the grants_right? check to avoid querying for the various memberships
       # again.
-      courses = @context.current_enrollments.select { |e| e.state_based_on_date == :active }.map(&:course).uniq
-      groups = include_groups ? @context.current_groups : []
+      courses = @context.current_enrollments.with_each_shard.select { |e| e.state_based_on_date == :active }.map(&:course).uniq
+      groups = include_groups ? @context.current_groups.with_each_shard.reject{|g| g.context_type == "Course" &&
+          (g.context.completed? || g.context.soft_concluded?)} : []
       if only_contexts.present?
         # find only those courses and groups passed in the only_contexts
         # parameter, but still scoped by user so we know they have rights to
@@ -469,7 +457,7 @@ class ApplicationController < ActionController::Base
         course_ids = only_contexts.select { |c| c.first == "Course" }.map(&:last)
         courses = course_ids.empty? ? [] : courses.select { |c| course_ids.include?(c.id) }
         group_ids = only_contexts.select { |c| c.first == "Group" }.map(&:last)
-        groups = group_ids.empty? ? [] : groups.find_all_by_id(group_ids) if include_groups
+        groups = group_ids.empty? ? [] : groups.select { |g| group_ids.include?(g.id) } if include_groups
       end
       @contexts.concat courses
       @contexts.concat groups
@@ -523,15 +511,23 @@ class ApplicationController < ActionController::Base
       @groups = @courses.first.assignment_groups.active.includes(:active_assignments)
       @assignments = @groups.map(&:active_assignments).flatten
     else
-      @groups = AssignmentGroup.for_context_codes(@context_codes).active
-      @assignments = Assignment.active.for_course(@courses.map(&:id))
+      assignments_and_groups = Shard.partition_by_shard(@courses) do |courses|
+        [[Assignment.active.for_course(courses).all,
+         AssignmentGroup.active.for_course(courses).order(:position).all]]
+      end
+      @assignments = assignments_and_groups.map(&:first).flatten
+      @groups = assignments_and_groups.map(&:last).flatten
     end
     @assignment_groups = @groups
 
     @courses.each { |course| log_course(course) }
 
-    @submissions = @current_user.try(:submissions).to_a
-    @submissions.each{ |s| s.mute if s.muted_assignment? }
+    if @current_user
+      @submissions = @current_user.submissions.with_each_shard
+      @submissions.each{ |s| s.mute if s.muted_assignment? }
+    else
+      @submissions = []
+    end
 
     @assignments.map! {|a| a.overridden_for(@current_user)}
     sorted = SortsAssignments.by_due_date({
@@ -960,13 +956,13 @@ class ApplicationController < ActionController::Base
   # Retrieving wiki pages needs to search either using the id or 
   # the page title.
   def get_wiki_page
-    page_name = (params[:wiki_page_id] || params[:id] || (params[:wiki_page] && params[:wiki_page][:title]) || "front-page")
+    @wiki = @context.wiki
+    page_name = (params[:wiki_page_id] || params[:id] || (params[:wiki_page] && params[:wiki_page][:title]) || @wiki.get_front_page_url || Wiki::DEFAULT_FRONT_PAGE_URL)
     if(params[:format] && !['json', 'html'].include?(params[:format]))
       page_name += ".#{params[:format]}"
       params[:format] = 'html'
     end
-    return @page if @page 
-    @wiki = @context.wiki
+    return @page if @page
     if params[:action] != 'create'
       @page = @wiki.wiki_pages.deleted_last.find_by_url(page_name.to_s) ||
               @wiki.wiki_pages.deleted_last.find_by_url(page_name.to_s.to_url) ||
@@ -976,7 +972,14 @@ class ApplicationController < ActionController::Base
       :title => page_name.titleize,
       :url => page_name.to_url
     )
-    if page_name == "front-page" && @page.new_record?
+    if @page.new_record?
+      if @domain_root_account.enable_draft?
+        @page.workflow_state = 'unpublished'
+      else
+        @page.workflow_state = 'active'
+      end
+    end
+    if @page.front_page? && @page.new_record?
       @page.body = t "#application.wiki_front_page_default_content_course", "Welcome to your new course wiki!" if @context.is_a?(Course)
       @page.body = t "#application.wiki_front_page_default_content_group", "Welcome to your new group wiki!" if @context.is_a?(Group)
     end
@@ -1024,7 +1027,7 @@ class ApplicationController < ActionController::Base
         return unless require_user
         @return_url = named_context_url(@context, :context_external_tool_finished_url, @tool.id, :include_host => true)
         @launch = BasicLTI::ToolLaunch.new(:url => @resource_url, :tool => @tool, :user => @current_user, :context => @context, :link_code => @opaque_id, :return_url => @return_url)
-        if @assignment && @context.includes_student?(@current_user)
+        if @assignment
           @launch.for_assignment!(@tag.context, lti_grade_passback_api_url(@tool), blti_legacy_grade_passback_api_url(@tool))
         end
         @tool_settings = @launch.generate
@@ -1311,6 +1314,16 @@ class ApplicationController < ActionController::Base
     super
   end
 
+  def destroy_session
+    @pseudonym_session.destroy rescue true
+    reset_session
+  end
+
+  def logout_current_user
+    @current_user.try(:stamp_logout_time!)
+    destroy_session
+  end
+
   def set_layout_options
     @embedded_view = params[:embedded]
     @headers = false if params[:no_headers]
@@ -1439,6 +1452,10 @@ class ApplicationController < ActionController::Base
       session[:browser_supported] = Browser.supported?(request.user_agent)
     end
     session[:browser_supported]
+  end
+
+  def mobile_device?
+    params[:mobile] || request.user_agent.to_s =~ /ipod|iphone|ipad|Android/i
   end
 
   def profile_data(profile, viewer, session, includes)

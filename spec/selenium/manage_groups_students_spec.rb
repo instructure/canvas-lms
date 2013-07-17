@@ -369,21 +369,21 @@ describe "manage groups students" do
 
     it "should give Assigning Students... visual feedback" do
       #pending "causes whatever spec follows this to fail even in different files"
-        assign_students = fj("#category_#{@category.id} .assign_students_link:visible")
-        assign_students.should_not be_nil
-        assign_students.click
-        # Do some magic to make sure the next ajax request doesn't complete until we're ready for it to
-        lock = Mutex.new
-        lock.lock
-        GroupsController.before_filter { lock.lock; lock.unlock; true }
-        confirm_dialog = driver.switch_to.alert
-        confirm_dialog.accept
-        loading = fj("#category_#{@category.id} .group_blank .loading_members:visible")
-        loading.text.should == 'Assigning Students...'
-        lock.unlock
-        GroupsController.filter_chain.pop
-        # make sure we wait before moving on
-        wait_for_ajax_requests
-      end
+      assign_students = fj("#category_#{@category.id} .assign_students_link:visible")
+      assign_students.should_not be_nil
+      assign_students.click
+      # Do some magic to make sure the next ajax request doesn't complete until we're ready for it to
+      lock = Mutex.new
+      lock.lock
+      GroupsController.before_filter { lock.lock; lock.unlock; true }
+      confirm_dialog = driver.switch_to.alert
+      confirm_dialog.accept
+      loading = fj("#category_#{@category.id} .group_blank .loading_members:visible")
+      loading.text.should == 'Assigning Students...'
+      lock.unlock
+      GroupsController.filter_chain.pop
+      # make sure we wait before moving on
+      wait_for_ajax_requests
     end
   end
+end

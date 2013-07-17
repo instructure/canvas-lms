@@ -74,6 +74,20 @@ describe Pseudonym do
     # Should allow creating a new active one if the others are deleted
     Pseudonym.create!(:unique_id => 'cody@instructure.com', :user => u)
   end
+
+  it "should share a root_account_id with its account" do
+    pseudonym = Pseudonym.new
+    pseudonym.stubs(:account).returns(stub(root_account_id: 1, id: 2))
+
+    pseudonym.root_account_id.should == 1
+  end
+
+  it "should use its account_id as a root_account_id if its account has no root" do
+    pseudonym = Pseudonym.new
+    pseudonym.stubs(:account).returns(stub(root_account_id: nil, id: 1))
+
+    pseudonym.root_account_id.should == 1
+  end
   
   it "should find the correct pseudonym for logins" do
     user = User.create!

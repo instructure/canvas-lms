@@ -20,13 +20,19 @@ class DiscussionEntryParticipant < ActiveRecord::Base
   include Workflow
 
   # Be more restrictive if this is ever updatable from user params
-  attr_accessible :discussion_entry, :user, :workflow_state
+  attr_accessible :discussion_entry, :user, :workflow_state, :forced_read_state
 
   belongs_to :discussion_entry
   belongs_to :user
 
   def self.read_entry_ids(entry_ids, user)
-    self.connection.select_values(sanitize_sql_array ["SELECT discussion_entry_id FROM #{connection.quote_table_name(table_name)} WHERE user_id = ? AND discussion_entry_id IN (?) AND workflow_state = ?", user.id, entry_ids, 'read']).map(&:to_i)
+    self.where(:user_id => user, :discussion_entry_id => entry_ids, :workflow_state => 'read').
+      pluck(:discussion_entry_id)
+  end
+
+  def self.forced_read_state_entry_ids(entry_ids, user)
+    self.where(:user_id => user, :discussion_entry_id => entry_ids, :forced_read_state => true).
+      pluck(:discussion_entry_id)
   end
 
   workflow do

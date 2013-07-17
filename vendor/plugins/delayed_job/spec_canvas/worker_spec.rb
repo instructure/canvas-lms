@@ -31,7 +31,7 @@ shared_examples_for 'Delayed::Worker' do
     end
 
     it "should not fail when running a job with a % in the name" do
-      @job = User.send_later(:name_parts, "Some % Name")
+      @job = User.send_later_enqueue_args(:name_parts, { no_delay: true }, "Some % Name")
       @worker.perform(@job.reload)
     end
   end

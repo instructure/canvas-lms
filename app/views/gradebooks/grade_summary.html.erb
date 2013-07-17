@@ -4,6 +4,8 @@
   content_for :page_title, join_title(t(:page_title, "Grades for %{student}", :student => @presenter.student_name), @context.name)
 %>
 
+<h1 class="screenreader-only"><%= t(:page_title, "Grades for %{student}", :student => @presenter.student_name) %></h1>
+
 <% content_for :right_side do %>
   <div class="rs-margin-all">
     <% if @domain_root_account.try_rescue(:enable_user_notes) and can_do(@user, @current_user, :read_user_notes) %>

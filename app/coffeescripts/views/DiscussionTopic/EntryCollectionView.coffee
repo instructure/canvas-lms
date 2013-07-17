@@ -50,6 +50,7 @@ define [
         threaded: @options.threaded
         collapsed: @options.collapsed
       view.render()
+      entry.on('change:editor', @nestEntries)
       return @addNewView view if entry.get 'new'
       if @options.descendants
         view.renderTree()
@@ -59,6 +60,13 @@ define [
         @list.prepend view.el
       else
         @list.append view.el
+      @nestEntries()
+
+    nestEntries: ->
+      $('.entry_content[data-should-position]').each ->
+        $el    = $(this)
+        offset = ($el.parents('li.entry').length - 1) * 30
+        $el.css('padding-left', offset).removeAttr('data-should-position')
 
     addNewView: (view) ->
       view.model.set 'new', false
@@ -66,6 +74,7 @@ define [
         @list.prepend view.el
       else
         @list.append view.el
+      @nestEntries()
       if not @options.root
         view.$el.hide()
         setTimeout =>

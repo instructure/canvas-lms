@@ -20,6 +20,7 @@ var QUnit,
 	hasOwn = Object.prototype.hasOwnProperty,
 	// Keep a local reference to Date (GH-283)
 	Date = window.Date,
+	setTimeout = window.setTimeout,
 	defined = {
 		setTimeout: typeof window.setTimeout !== "undefined",
 		sessionStorage: (function() {
@@ -454,7 +455,7 @@ QUnit = {
 		}
 		// A slight delay, to avoid any current callbacks
 		if ( defined.setTimeout ) {
-			window.setTimeout(function() {
+			setTimeout(function() {
 				if ( config.semaphore > 0 ) {
 					return;
 				}
@@ -477,7 +478,7 @@ QUnit = {
 
 		if ( config.testTimeout && defined.setTimeout ) {
 			clearTimeout( config.timeout );
-			config.timeout = window.setTimeout(function() {
+			config.timeout = setTimeout(function() {
 				QUnit.ok( false, "Test timed out" );
 				config.semaphore = 1;
 				QUnit.start();
@@ -1419,7 +1420,7 @@ function process( last ) {
 		if ( !defined.setTimeout || config.updateRate <= 0 || ( ( new Date().getTime() - start ) < config.updateRate ) ) {
 			config.queue.shift()();
 		} else {
-			window.setTimeout( next, 13 );
+			setTimeout( next, 13 );
 			break;
 		}
 	}

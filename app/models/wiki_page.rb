@@ -32,10 +32,18 @@ class WikiPage < ActiveRecord::Base
   has_many :wiki_page_comments, :order => "created_at DESC"
   acts_as_url :title, :scope => [:wiki_id, :not_deleted], :sync_url => true
 
+  validate :validate_front_page_visibility
+
   before_save :set_revised_at
   before_validation :ensure_unique_title
 
   TITLE_LENGTH = WikiPage.columns_hash['title'].limit rescue 255
+
+  def validate_front_page_visibility
+    if self.hide_from_students && self.front_page?
+      self.errors.add(:hide_from_students, t(:cannot_hide_page, "cannot hide front page"))
+    end
+  end
 
   def ensure_unique_title
     return if deleted?
@@ -60,6 +68,10 @@ class WikiPage < ActiveRecord::Base
     end
   end
 
+  def self.title_order_by_clause
+    best_unicode_collation_key('wiki_pages.title')
+  end  
+  
   def ensure_unique_url
     url_attribute = self.class.url_attribute
     base_url = self.send(url_attribute)
@@ -119,7 +131,12 @@ class WikiPage < ActiveRecord::Base
   after_save :remove_changed_flag
 
   workflow do
-    state :active
+    state :active do
+      event :unpublish, :transitions_to => :unpublished
+    end
+    state :unpublished do
+      event :publish, :transitions_to => :active
+    end
     state :post_delayed do
       event :delayed_post, :transitions_to => :active
     end
@@ -141,7 +158,7 @@ class WikiPage < ActiveRecord::Base
   end
 
   def notify_of_update=(val)
-    @wiki_page_changed = (val == '1' || val == true)
+    @wiki_page_changed = Canvas::Plugin.value_to_boolean(val)
   end
 
   def notify_of_update
@@ -169,16 +186,32 @@ class WikiPage < ActiveRecord::Base
   scope :visible_to_students, where(:hide_from_students => false)
   scope :order_by_id, order(:id)
 
-  def locked_for?(context, user, opts={})
+  def locked_for?(user, opts={})
     return false unless self.could_be_locked
     Rails.cache.fetch(locked_cache_key(user), :expires_in => 1.minute) do
+      context = opts[:context]
+      context ||= self.context if self.respond_to?(:context)
       m = context_module_tag_for(context).context_module rescue nil
+
       locked = false
       if (m && !m.available_for?(user))
         locked = {:asset_string => self.asset_string, :context_module => m.attributes}
       end
       locked
     end
+  end
+
+  def front_page?
+    !self.deleted? && self.wiki.has_front_page? && self.url == self.wiki.get_front_page_url
+  end
+
+  def set_as_front_page!
+    if self.hide_from_students
+      self.errors.add(:front_page, t(:cannot_set_hidden_front_page, "could not set as front page because it is hidden"))
+      return false
+    end
+
+    self.wiki.set_front_page_url!(self.url)
   end
 
   def context_module_tag_for(context)
@@ -197,7 +230,7 @@ class WikiPage < ActiveRecord::Base
     given {|user, session| self.wiki.grants_right?(user, session, :contribute) && can_read_page?(user) }
     can :read
 
-    given {|user, session| self.editing_role?(user) && !self.locked_for?(nil, user) }
+    given {|user, session| self.editing_role?(user) && !self.locked_for?(user) }
     can :read and can :update_content and can :create
 
     given {|user, session| self.wiki.grants_right?(user, session, :manage) }
@@ -209,12 +242,13 @@ class WikiPage < ActiveRecord::Base
   end
 
   def can_read_page?(user)
-    !hide_from_students || (context.respond_to?(:admins) && context.admins.include?(user))
+    (!hide_from_students && self.active?) || (context.respond_to?(:admins) && context.admins.include?(user))
   end
 
   def editing_role?(user)
     context_roles = context.default_wiki_editing_roles rescue nil
-    roles = (editing_roles || context_roles || default_roles).split(",")
+    edit_roles = editing_roles unless self.front_page?
+    roles = (edit_roles || context_roles || default_roles).split(",")
     return true if roles.include?('teachers') && context.respond_to?(:teachers) && context.teachers.include?(user)
     return true if !hide_from_students && roles.include?('students') && context.respond_to?(:students) && context.includes_student?(user)
     return true if !hide_from_students && roles.include?('members') && context.respond_to?(:users) && context.users.include?(user)
@@ -334,7 +368,7 @@ class WikiPage < ActiveRecord::Base
         ErrorReport.log_error(:content_migration, :message => "There was a nil wiki page imported for ContentMigration:#{migration.id}")
         next
       end
-      next unless migration.import_object?("wikis", wiki['migration_id'])
+      next unless migration.import_object?("wiki_pages", wiki['migration_id']) || migration.import_object?("wikis", wiki['migration_id'])
       begin
         import_from_migration(wiki, migration.context) if wiki
       rescue
@@ -355,12 +389,19 @@ class WikiPage < ActiveRecord::Base
       item.only_when_blank = true
     end
     if hash[:root_folder] && ['folder', 'FOLDER_TYPE'].member?(hash[:type])
-      front_page = context.wiki.wiki_page
+      front_page = context.wiki.front_page
       if front_page.id
         hash[:root_folder] = false
       else
         # If there is no id there isn't a front page yet
         item = front_page
+      end
+    end
+    if state = hash[:workflow_state]
+      if state == 'active'
+        item.workflow_state = 'active'
+      else
+        item.workflow_state = 'unpublished'
       end
     end
     context.imported_migration_items << item if context.imported_migration_items && item.new_record?
@@ -488,5 +529,15 @@ class WikiPage < ActiveRecord::Base
 
   def self.comments_enabled?
     !Rails.env.production?
+  end
+
+  def increment_view_count(user, context = nil)
+    unless self.new_record?
+      self.with_versioning(false) do |p|
+        context ||= p.context
+        p.connection.execute("UPDATE wiki_pages SET view_count=COALESCE(view_count, 0) + 1 WHERE id=#{p.id}")
+        p.context_module_action(user, context, :read)
+      end
+    end
   end
 end

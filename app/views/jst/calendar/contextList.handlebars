@@ -1,8 +1,14 @@
 <ul id="context-list">
   {{#each contexts}}
-    <li data-context="{{asset_string}}" class="context_list_context hover-container">
-      <span class="context-list-toggle-box group_{{asset_string}}"></span>
-      {{name}}
+    <li data-context="{{asset_string}}"
+        class="context_list_context hover-container">
+      <span class="context-list-toggle-box group_{{asset_string}}"
+            aria-labelledby="group_{{asset_string}}_checkbox_label"
+            tabindex="0"
+            role="checkbox"></span>
+      <label id="group_{{asset_string}}_checkbox_label">
+        {{name}}
+      </label>
     </li>
   {{/each}}
 </ul>

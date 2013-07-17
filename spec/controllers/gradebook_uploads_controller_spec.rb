@@ -68,7 +68,7 @@ describe GradebookUploadsController do
       @assignment.submissions.first.grade.should == '10'
       @assignment2.submissions.first.grade.should == '8'
       
-      uploaded_csv = FasterCSV.generate do |csv|
+      uploaded_csv = CSV.generate do |csv|
         csv << ["Student", "ID", "SIS User ID", "SIS Login ID", "Section", "Some Assignment", "Some Assignment 2"]
         csv << ["    Points Possible", "", "","", ""]
         csv << ["" , @student.id.to_s, "", "", "", 5, 7]
@@ -96,7 +96,7 @@ describe GradebookUploadsController do
     it "should create new assignments" do
       course_with_graded_student
       
-      uploaded_csv = FasterCSV.generate do |csv|
+      uploaded_csv = CSV.generate do |csv|
         csv << ["Student", "ID", "SIS User ID", "SIS Login ID", "Section", "Some Assignment", "Some Assignment 2", "Third Assignment"]
         csv << ["    Points Possible", "", "","", "", "", "", "15"]
         csv << ["" , @student.id.to_s, "", "", "", 5, 7, 10]

@@ -48,6 +48,21 @@ describe GroupMembership do
     gm2.reload.should be_deleted
   end
 
+  it "should not be valid if the group is full" do
+    course
+    category = @course.group_categories.build(:name => "category 1")
+    category.group_limit = 2
+    category.save!
+    group = category.groups.create!(:context => @course)
+    # when the group is full
+    group.group_memberships.create!(:user => user_model, :workflow_state => 'accepted')
+    group.group_memberships.create!(:user => user_model, :workflow_state => 'accepted')
+    # expect
+    membership = group.group_memberships.build(:user => user_model, :workflow_state => 'accepted')
+    membership.should_not be_valid
+    membership.errors[:group_id].should == "The group is full."
+  end
+
   context "section homogeneity" do
     # can't use 'course' because it is defined in spec_helper, so use 'course1'
     let(:course1) { course_with_teacher(:active_all => true); @course }
@@ -267,6 +282,41 @@ describe GroupMembership do
       @membership = @group.add_user(@user, 'accepted')
       @membership.destroy
       @user.reload.user_follows.find(:first, :conditions => { :followed_item_id => @group.id, :followed_item_type => 'Group' }).should be_nil
+    end
+  end
+
+  describe "updating cached due dates" do
+    before do
+      course
+      @group_category = @course.group_categories.create!(:name => "category")
+      @membership = group_with_user(:group_context => @course, :group_category => @group_category)
+
+      # back-populate associations so we don't need to reload
+      @membership.group = @group
+      @group.group_category = @group_category
+
+      @assignments = 3.times.map{ assignment_model(:course => @course) }
+      @assignments.last.group_category = nil
+      @assignments.last.save!
+    end
+
+    it "triggers when membership is created" do
+      DueDateCacher.expects(:recompute).with(@assignments[0]).once
+      DueDateCacher.expects(:recompute).with(@assignments[1]).once
+      DueDateCacher.expects(:recompute).with(@assignments[2]).never
+      @group.group_memberships.create(:user => user)
+    end
+
+    it "triggers when membership is deleted" do
+      DueDateCacher.expects(:recompute).with(@assignments[0]).once
+      DueDateCacher.expects(:recompute).with(@assignments[1]).once
+      DueDateCacher.expects(:recompute).with(@assignments[2]).never
+      @membership.destroy
+    end
+
+    it "does not trigger when nothing changed" do
+      DueDateCacher.expects(:recompute).never
+      @membership.save
     end
   end
 end

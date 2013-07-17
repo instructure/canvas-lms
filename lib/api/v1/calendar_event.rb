@@ -57,7 +57,9 @@ module Api::V1::CalendarEvent
 
     hash["child_events_count"] = event.child_events.size
     hash['parent_event_id'] = event.parent_calendar_event_id
-    hash['hidden'] = event.hidden?
+    # events are hidden when section-specific events override them
+    # but if nobody is logged in, no sections apply, so show the base event
+    hash['hidden'] = user ? event.hidden? : false
 
     if include.include?('participants')
       if event.context_type == 'User'
@@ -115,7 +117,7 @@ module Api::V1::CalendarEvent
     hash = api_json(assignment, user, session, :only => %w(created_at updated_at title all_day all_day_date workflow_state))
     hash['description'] = api_user_content(assignment.description, assignment.context)
     hash['id'] = "assignment_#{assignment.id}"
-    hash['assignment'] = assignment_json(assignment, user, session)
+    hash['assignment'] = assignment_json(assignment, user, session, true, nil, false)
     hash['context_code'] = assignment.context_code
     hash['start_at'] = hash['end_at'] = assignment.due_at
     hash['url'] = api_v1_calendar_event_url("assignment_#{assignment.id}")

@@ -160,6 +160,9 @@ define [
           ,
           tooltipClass: 'popover left middle horizontal'
       )
+      # set min-width on row <th /> cells
+      $('tbody th[scope=row]').css('min-width', $('h3.group-name').width())
+
       @setupEventBindings()
       null
 

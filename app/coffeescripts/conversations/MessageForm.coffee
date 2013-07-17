@@ -92,6 +92,10 @@ define [
         @resize()
         $attachment.remove()
 
+    addToken: (userData) ->
+      input = @$form.find('.recipients').data('token_input')
+      input.addToken(userData) if input
+
     addMediaComment: ->
       @$mediaComment.mediaComment 'create', 'any', (id, type) =>
         @$mediaCommentId.val(id)

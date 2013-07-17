@@ -12,7 +12,7 @@ define ['compiled/object/unflatten'], (unflatten) ->
     # shortcut for just deparam'ing the current querystring
     if !params or typeof params == 'boolean'
       currentQueryString = window.location.search.replace(/^\?/, '')
-      coerce = params
+      return {} unless currentQueryString
       return deparam currentQueryString, arguments...
 
     obj = {}

@@ -94,8 +94,13 @@ define [
       @input.focus()
 
     captureKeyDown: (e) ->
+      keyCode = e.originalEvent?.keyIdentifier ? e.which
+
       return true if @uiLocked
-      switch e.originalEvent?.keyIdentifier ? e.which
+      if @$menu.find('.no-results').length > 0 and _.include([13, 'Enter'], keyCode)
+        return e.preventDefault()
+
+      switch keyCode
         when 'Backspace', 'U+0008', 8
           if @input.val() is ''
             if @listExpanded()
@@ -184,7 +189,11 @@ define [
       @select(null)
 
     blur: ->
-      @close() unless @$container.find(':focus').length > 0
+      # It seems we can't check focus while it is being changed, so check it later.
+      setTimeout =>
+        unless @input.hasFocus() || @$container.find(':focus').length > 0
+          @close()
+      , 0
 
     listExpanded: ->
       if @stack.length then true else false

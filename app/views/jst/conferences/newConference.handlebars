@@ -1,0 +1,40 @@
+<div class="conference table-row">
+  <div class="table-cell conference-title ellipsis" title="{{title}}">
+    {{title}}
+  </div>
+  <div class="table-cell conference-description">
+    {{newlinesToBreak description}}
+  </div>
+  <div class="table-cell conference-actions align-center">
+    {{#if started_at}}
+      <span class="label label-success {{#if has_actions}}has_actions{{/if}}">{{#t "in_progress"}}In Progress{{/t}}</span>
+    {{/if}}
+
+    <div class="actions">
+      {{#if permissions.update}}
+        <a class="icon-edit edit_conference_link" href="{{ url }}" aria-label="{{#t "edit"}}Edit{{/t}}"></a>
+      {{/if}}
+      {{#if permissions.delete}}
+        <a class="icon-trash delete_conference_link" href="{{ url }}" aria-label="{{#t "delete"}}Delete{{/t}}"></a>
+      {{/if}}
+    </div>
+  </div>
+  <div class="table-cell conference-start align-right {{#if show_end}}show-end-button{{/if}}">
+    {{# if show_end}}
+      <a class='btn btn-small close_conference_link' href="{{ url }}/close">{{#t "end_it_now"}}End{{/t}}</a>
+    {{/if}}
+    {{#if started_at}}
+      {{# if permissions.join}}
+        <a href="{{ join_url }}" class="btn btn-small join-button btn-primary" target="_blank">
+          {{#t "join"}}Join{{/t}}
+        </a>
+      {{/if}}
+   {{else}}
+      {{#if permissions.initiate}}
+        <a href="{{ join_url }}" class="btn btn-small start-button" target="_blank">
+          {{#t "start"}}Start{{/t}}
+        </a>
+      {{/if}}
+   {{/if}}
+  </div>
+</div>

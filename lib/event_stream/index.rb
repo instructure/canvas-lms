@@ -61,7 +61,10 @@ class EventStream::Index
   end
 
   def for_key(key)
-    BookmarkedCollection.build(EventStream::Index::Bookmarker) { |pager| history(key, pager) }
+    shard = Shard.current
+    BookmarkedCollection.build(EventStream::Index::Bookmarker) do |pager|
+      shard.activate { history(key, pager) }
+    end
   end
 
   module Bookmarker

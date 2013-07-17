@@ -17,9 +17,11 @@
 #
 
 class QuizQuestion::FileUploadQuestion < QuizQuestion::Base
+
   def requires_manual_scoring?(user_answer)
     true
   end
+
 
   def stats(responses)
     stats = {:file_upload_responses => []}
@@ -27,11 +29,20 @@ class QuizQuestion::FileUploadQuestion < QuizQuestion::Base
     responses.each do |response|
       stats[:file_upload_responses] << {
         # TODO: what does file upload quiz stats need?
-        # :user_id => response[:user_id],
+        :user_id => response[:user_id]
         # :filename => response[:text].strip
       }
     end
 
     @question_data.merge stats
   end
+
+
+  def score_question(answer_data)
+    user_answer = QuizQuestion::FileUploadAnswer.new(self.question_id,
+                                                     self.points_possible,
+                                                     answer_data)
+    super(answer_data,user_answer)
+  end
+
 end

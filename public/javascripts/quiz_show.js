@@ -101,22 +101,16 @@ $(document).ready(function () {
       var submissionList = ENV.QUIZ_SUBMISSION_LIST;
       var unsubmittedStudents = submissionList.UNSUBMITTED_STUDENTS;
       var submittedStudents = submissionList.SUBMITTED_STUDENTS;
-      var haveTakenQuiz = I18n.t('have_taken_the_quiz', "Have taken the quiz");
-      var haveNotTakenQuiz =
-        I18n.t('have_not_taken_the_quiz', "Have NOT taken the quiz");
+      var haveTakenQuiz = I18n.t('students_who_have_taken_the_quiz', "Students who have taken the quiz");
+      var haveNotTakenQuiz = I18n.t('students_who_have_not_taken_the_quiz', "Students who have NOT taken the quiz");
       var dialog = new MessageStudentsDialog({
-        title: ENV.QUIZ.title,
+        context: ENV.QUIZ.title,
         recipientGroups: [
           { name: haveTakenQuiz, recipients: submittedStudents },
           { name: haveNotTakenQuiz, recipients: unsubmittedStudents }
         ]
       });
-      dialog.onSaveSuccess = function() {
-        dialog.$el.dialog('close');
-        dialog.remove();
-        $.flashMessage(I18n.t('notices.message_sent', "Message Sent!"));
-      };
-      dialog.render().$el.dialog({width: 'auto', modal: 'true'}).fixDialogButtons();
+      dialog.open();
     });
   });
   $.scrollSidebar();

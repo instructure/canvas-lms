@@ -52,7 +52,7 @@ class ConversationParticipant < ActiveRecord::Base
     #
     # we're also counting on conversations being in the join
 
-    own_root_account_ids = Shard.default.activate do
+    own_root_account_ids = Shard.birth.activate do
       user.associated_root_accounts.select{ |a| a.grants_right?(user, :become_user) }.map(&:id)
     end
     id_string = "[" + own_root_account_ids.sort.join("][") + "]"
@@ -80,7 +80,7 @@ class ConversationParticipant < ActiveRecord::Base
   #   instantiated to get id)
   #
   tagged_scope_handler(/\Auser_(\d+)\z/) do |tags, options|
-    scope_shard = scope(:find, :shard)
+    scope_shard = scope(:find, :shard) || Shard.current
     exterior_user_ids = tags.map{ |t| t.sub(/\Auser_/, '').to_i }
 
     # which users have conversations on which shards?
@@ -115,7 +115,7 @@ class ConversationParticipant < ActiveRecord::Base
         EXISTS (
           SELECT *
           FROM conversation_participants cp
-          WHERE cp.conversation_id = conversations.id
+          WHERE cp.conversation_id = conversation_participants.conversation_id
           AND user_id IN (?)
         )
         SQL
@@ -124,7 +124,7 @@ class ConversationParticipant < ActiveRecord::Base
         (
           SELECT COUNT(*)
           FROM conversation_participants cp
-          WHERE cp.conversation_id = conversations.id
+          WHERE cp.conversation_id = conversation_participants.conversation_id
           AND user_id IN (?)
         ) = ?
         SQL
@@ -135,10 +135,12 @@ class ConversationParticipant < ActiveRecord::Base
       if Shard.current == scope_shard
         [sanitize_sql(shard_conditions)]
       else
-        conversation_ids = Conversation.where(shard_conditions).map do |c|
-          Shard.relative_id_for(c.id, scope_shard)
+        with_exclusive_scope do
+          conversation_ids = ConversationParticipant.where(shard_conditions).select(:conversation_id).map do |c|
+            Shard.relative_id_for(c.conversation_id, scope_shard)
+          end
+          [sanitize_sql(:conversation_id => conversation_ids)]
         end
-        [sanitize_sql(:conversation_id => conversation_ids)]
       end
     end
 
@@ -160,7 +162,7 @@ class ConversationParticipant < ActiveRecord::Base
       # the filters are assumed relative to the current shard and need to be
       # cast to an id relative to the default shard before use in queries.
       type, id = ActiveRecord::Base.parse_asset_string(tag)
-      id = Shard.relative_id_for(id, Shard.default)
+      id = Shard.relative_id_for(id, Shard.birth)
       wildcard('conversation_participants.tags', "#{type.underscore}_#{id}", :delimiter => ',')
     end
   end
@@ -490,7 +492,9 @@ class ConversationParticipant < ActiveRecord::Base
 
   def self.batch_update(user, conversation_ids, update_params)
     progress = user.progresses.create! :tag => "conversation_batch_update", :completion => 0.0
-    job = ConversationParticipant.send_later(:do_batch_update, progress, user, conversation_ids, update_params)
+    job = ConversationParticipant.send_later_enqueue_args(:do_batch_update,
+                                                          { no_delay: true },
+                                                          progress, user, conversation_ids, update_params)
     progress.user_id = user.id
     progress.delayed_job_id = job.id
     progress.save!

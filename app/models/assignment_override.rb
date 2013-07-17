@@ -66,14 +66,16 @@ class AssignmentOverride < ActiveRecord::Base
     end
   end
 
-  after_save :recompute_submission_lateness_later
+  after_save :update_cached_due_dates
   after_save :touch_assignment, :if => :assignment
 
-  def recompute_submission_lateness_later
-    if due_at_overridden_changed? || due_at_changed?
-      send_later_if_production :recompute_submission_lateness
+  def update_cached_due_dates
+    return unless assignment?
+    if due_at_overridden_changed? ||
+      (due_at_overridden && due_at_changed?) ||
+      (due_at_overridden && workflow_state_changed?)
+      DueDateCacher.recompute(assignment)
     end
-    true
   end
 
   def touch_assignment
@@ -82,19 +84,8 @@ class AssignmentOverride < ActiveRecord::Base
   end
   private :touch_assignment
 
-  def assignment?; !!assignment; end
-  def quiz?; !!quiz; end
-
-  def recompute_submission_lateness    
-    if (users = applies_to_students) && assignment
-      submissions = assignment.submissions.where(:user_id => users)
-      submissions.each do |s|
-        s.compute_lateness
-        s.save!
-      end
-    end
-    true
-  end
+  def assignment?; !!assignment_id; end
+  def quiz?; !!quiz_id; end
 
   workflow do
     state :active
@@ -231,10 +222,10 @@ class AssignmentOverride < ActiveRecord::Base
   end
 
   def notify_change?
-    self.assignment and
-    self.assignment.context.state == :available and
-    (self.assignment.workflow_state == 'available' || self.assignment.workflow_state == 'published') and
-    self.assignment.created_at < 3.hours.ago and
+    self.assignment &&
+    self.assignment.context.available? &&
+    self.assignment.published? &&
+    self.assignment.created_at < 3.hours.ago &&
     (!self.prior_version ||
       self.workflow_state != self.prior_version.workflow_state ||
       self.due_at_overridden != self.prior_version.due_at_overridden ||

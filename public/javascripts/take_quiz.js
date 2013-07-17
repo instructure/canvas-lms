@@ -16,12 +16,15 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 define([
+  'compiled/views/quizzes/FileUploadQuestionView',
+  'compiled/models/File',
   'i18n!quizzes.take_quiz',
   'jquery' /* $ */,
   'quiz_timing',
   'compiled/behaviors/autoBlurActiveInput',
   'underscore',
   'jquery.ajaxJSON' /* ajaxJSON */,
+  'jquery.toJSON',
   'jquery.instructure_date_and_time' /* friendlyDatetime, friendlyDate */,
   'jquery.instructure_forms' /* getFormData, errorBox */,
   'jqueryui/dialog',
@@ -31,7 +34,7 @@ define([
   'tinymce.editor_box' /* editorBox */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'compiled/behaviors/quiz_selectmenu'
-], function(I18n, $, timing, autoBlurActiveInput, _) {
+], function(FileUploadQuestionView, File, I18n, $, timing, autoBlurActiveInput, _) {
 
   var lastAnswerSelected = null;
   var lastSuccessfulSubmissionData = null;
@@ -276,6 +279,23 @@ define([
 
         quizSubmission.toggleActiveButtonState("#submit_quiz_button", active);
       },
+
+      updateQuestionIndicators: function(answer, questionId){
+        var listSelector = "#list_" + questionId;
+        var questionSelector = "#" + questionId;
+        var combinedId = listSelector + ", " + questionSelector;
+        var $questionIcon = $(listSelector + "> i.placeholder");
+        if(answer) {
+          $(combinedId).addClass('answered');
+          $questionIcon.addClass('icon-check').removeClass('icon-question');
+          $questionIcon.siblings('div.icon-text').text(I18n.t('question_answered',"Answered"))
+        } else {
+          $(combinedId).removeClass('answered');
+          $questionIcon.addClass('icon-question').removeClass('icon-check');
+          $questionIcon.siblings('div.icon-text').text(I18n.t('question_unanswered', "Haven't Answered Yet"))
+        }
+      },
+
       updateNextButtonState: function(id) {
         var $question = $("#" + id);
         quizSubmission.toggleActiveButtonState('button.next-question', $question.hasClass('answered'));
@@ -342,7 +362,8 @@ define([
       .delegate(".jump_to_question_link", 'click', function(event) {
         event.preventDefault();
         var $obj = $($(this).attr('href'));
-        $("html,body").scrollTo($obj.parent());
+        var scrollableSelector = ENV.MOBILE_UI ? '#content' : 'html,body';
+        $(scrollableSelector).scrollTo($obj.parent());
         $obj.find(":input:first").focus().select();
       })
       .find(".list_question").bind({
@@ -427,7 +448,7 @@ define([
 
         if (tagName == "TEXTAREA") {
           val = $this.editorBox('get_code');
-        } else if ($this.attr('type') == "text") {
+        } else if ($this.attr('type') == "text" || $this.attr('type') == 'hidden') {
           val = $this.val();
         } else if (tagName == "SELECT") {
           var $selects = $this.parents(".question").find("select.question_input");
@@ -439,8 +460,8 @@ define([
             }
           });
         }
-        $("#list_" + id + ", #" + id)[val ? 'addClass' : 'removeClass']('answered');
 
+        quizSubmission.updateQuestionIndicators(val, id);
         quizSubmission.updateFinalSubmitButtonState();
         quizSubmission.updateNextButtonState(id);
       })
@@ -563,5 +584,16 @@ define([
     // now that JS has been initialized, enable the next and previous buttons
     $submit_buttons.removeAttr('disabled');
   });
+
+  $('.file-upload-question-holder').each(function(i,el) {
+    var $el = $(el);
+    var val = parseInt($el.find('input.attachment-id').val(),10);
+    if (val && val !==  0){
+      $el.find('.file-upload-box').addClass('file-upload-box-with-file');
+    }
+    var model = new File(ENV.ATTACHMENTS[val], {preflightUrl: ENV.UPLOAD_URL});
+    new FileUploadQuestionView({el: el, model: model}).render();
+  });
+
 });
 

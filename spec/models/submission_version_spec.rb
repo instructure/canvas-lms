@@ -61,39 +61,6 @@ describe SubmissionVersion do
     end
   end
 
-  describe "reindex_version" do
-    before do
-      @index = SubmissionVersion.index_version(@version)
-    end
-
-    it "should not create a new record" do
-      lambda{
-        SubmissionVersion.reindex_version(@version)
-      }.should_not change(SubmissionVersion, :count)
-    end
-
-    it "should update the index record's context" do
-      @submission.assignment.context = new_course = course_model
-      @submission.assignment.save!
-      SubmissionVersion.reindex_version(@version)
-      @index.reload.context_id.should == new_course.id
-    end
-
-    it "should update the index record's user_id" do
-      @submission.user = new_user = user_model
-      @version.yaml = @submission.attributes.to_yaml
-      SubmissionVersion.reindex_version(@version)
-      @index.reload.user_id.should == new_user.id
-    end
-
-    it "should update the index record's assignment_id" do
-      @submission.assignment = new_assignment = assignment_model
-      @version.yaml = @submission.attributes.to_yaml
-      SubmissionVersion.reindex_version(@version)
-      @index.reload.assignment_id.should == new_assignment.id
-    end
-  end
-
   describe "index_versions" do
     it "should create a new record for each version" do
       n = 5
@@ -114,7 +81,6 @@ describe SubmissionVersion do
     @version.update_attribute(:yaml, attrs.to_yaml)
     lambda{
       SubmissionVersion.index_version(@version)
-      SubmissionVersion.reindex_version(@version)
       SubmissionVersion.index_versions([@version])
     }.should_not change(SubmissionVersion, :count)
   end

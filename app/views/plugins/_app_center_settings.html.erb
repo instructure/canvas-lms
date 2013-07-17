@@ -1,0 +1,40 @@
+<% fields_for :settings, OpenObject.new(settings) do |f| %>
+  <table style="width: 500px;" class="formtable">
+    <tr>
+      <td colspan="2">
+        <p><%= t(:description, <<-TEXT)
+          App Center will appear in the "Apps" tab on the setings
+          page of either a course or account. The URL provided below should
+          point to a valid App Center endpoint
+          (for example, https://lti-examples.heroku.com -- be sure to omit 
+          the trailing slash)
+          TEXT
+        %></p>
+      </td>
+    </tr>
+    <tr>
+      <td><%= f.blabel :token, :en => "Access Token" %></td>
+      <td>
+        <%= f.text_field :token %>
+      </td>
+    </tr>
+    <tr>
+      <td><%= f.blabel :base_url, :en => "Base URL" %></td>
+      <td>
+        <%= f.text_field :base_url %>
+      </td>
+    </tr>
+    <tr>
+      <td><%= f.blabel :apps_index_endpoint, :en => "Apps Index Endpoint" %></td>
+      <td>
+        <%= f.text_field :apps_index_endpoint %>
+      </td>
+    </tr>
+    <tr>
+      <td><%= f.blabel :app_reviews_endpoint, :en => "App Show Endpoint" %></td>
+      <td>
+        <%= f.text_field :app_reviews_endpoint %>
+      </td>
+    </tr>
+  </table>
+<% end %>

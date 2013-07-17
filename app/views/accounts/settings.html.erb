@@ -4,6 +4,14 @@
   js_bundle :account_settings
   jammit_css :account_settings, :reports, :tinymce
   content_for :page_title, t(:page_title, "Account Settings")
+  if can_do(@context, @current_user, :manage_storage_quotas)
+    js_env :ACCOUNT => {
+      'id' => @context.id,
+      'default_storage_quota_mb' => @context.default_storage_quota_mb,
+      'default_user_storage_quota_mb' => @context.default_user_storage_quota_mb,
+      'default_group_storage_quota_mb' => @context.default_group_storage_quota_mb
+    }
+  end
 %>
 
 <% content_for :right_side do %>
@@ -27,6 +35,11 @@
   <ul>
     <% if can_do(@context, @current_user, :manage_account_settings) %>
     <li><a href="#tab-settings" id="tab-settings-link"><%= t(:tab_settings, "Settings") %></a></li>
+    <% end %>
+    <% if can_do(@context, @current_user, :manage_storage_quotas) %>
+    <li><a href="#tab-quotas" id="tab-quotas-link"><%= t(:tab_quotas, "Quotas") %></a></li>
+    <% end %>
+    <% if can_do(@context, @current_user, :manage_account_settings) %>
     <li><a href="#tab-notifications" id="tab-notifications-link"><%= t(:tab_notifications, "Notifications") %></a></li>
     <% end %>
     <li><a href="#tab-users" id="tab-users-link"><%= t(:tab_admins, "Admins") %></a></li>
@@ -37,7 +50,7 @@
       <li><a href="#tab-reports" id="tab-reports-link"><%= t(:tab_reports, "Reports") %></a></li>
     <% end %>
     <% if can_do(@context, @current_user, :manage_account_settings) %>
-      <li><a href="#tab-tools" id="tab-tools-link"><%= t(:tab_external_tools, "External Tools") %></a></li>
+      <li><a href="#tab-tools" id="tab-tools-link"><%= t(:tab_external_tools, "Apps") %></a></li>
     <% end %>
     <% if @context.root_account.settings[:enable_alerts] && can_do(@context, @current_user, :manage_interaction_alerts) %>
       <li><a href="#tab-alerts" id="tab-alerts-link"><%= t(:tab_alerts, "Alerts") %></a></li>
@@ -45,7 +58,7 @@
   </ul>
   <% if can_do(@context, @current_user, :manage_account_settings) %>
     <div id="tab-settings">
-      <% form_for :account, :url => account_url(@account), :html => {:method => :put, :id => "account_settings"} do |f| %>
+      <% form_for :account, :url => account_url(@account), :html => {:method => :put, :id => "account_settings", :class => 'account_settings'} do |f| %>
         <fieldset id="account_settings" class="">
           <legend><%= t(:account_settings_title, "Account Settings") %></legend>
           <table class="formtable">
@@ -67,36 +80,18 @@
                 </td>
               </tr>
             <% end %>
-            <% has_manage_quotas = can_do(@context, @current_user, :manage_storage_quotas) %>
-            <tr>
-              <td>
-                <%= f.blabel :default_course_storage_quota, :en => "Default Course File Quota" %>
-              </td>
-              <td><%= t(:megabytes_field, "%{text_field} megabytes", :text_field => (has_manage_quotas ?
-                      f.text_field(:default_storage_quota_mb, :id => 'account_default_course_storage_quota', :style => "width: 50px;", :title => t(:megabytes_tooltip, "megabytes")) :
-                      @account.default_storage_quota_mb.to_s)) %></td>
-            </tr>
-            <% if @account.root_account? && !@account.site_admin? %>
-              <tr>
-                <td>
-                  <%= f.blabel :default_user_storage_quota, :en => "Default User File Quota" %>
-                </td>
-                <td><%= t(:megabytes_field, "%{text_field} megabytes", :text_field => (has_manage_quotas ?
-                        f.text_field(:default_user_storage_quota_mb, :id => 'account_default_user_storage_quota', :style => "width: 50px;", :title => t(:megabytes_tooltip, "megabytes")) :
-                        @account.default_user_storage_quota_mb.to_s)) %></td>
-              </tr>
-            <% end %>
             <% if available_locales.size > 1 %>
             <tr>
               <td><%= f.blabel :default_locale, :default_language, :en => "Default Language" %></td>
               <td>
                 <% no_language = t(:no_language_preference, "Not set (defaults to %{language})", :language => available_locales[infer_locale(:context => @context.parent_account)]) %>
-                <%= f.select :default_locale, [[no_language, nil]] + available_locales.invert.sort, :selected => @context.default_locale %>
-                <span class="unbreakable"><%= mt :transifex_message, <<-TEXT, :transifex_url => "https://www.transifex.com/projects/p/canvas-lms/"
+                <%= f.select :default_locale, [[no_language, nil]] + available_locales.invert.sort, {:selected => @context.default_locale}, {:class => 'locale'} %>
+                <%= render :partial => 'shared/locale_warning' %>
+                <p class="unbreakable"><%= mt :transifex_message, <<-TEXT, :transifex_url => "https://www.transifex.com/projects/p/canvas-lms/"
 Join the [Canvas Translation Community](%{transifex_url})
 TEXT
                 %>
-                </span>
+                </p>
                 <p style="font-size: 0.9em;"><%= t(:default_language_description, "This will override any browser/OS language settings. Preferred languages can still be set at the course/user level.") %></p>
               </td>
             </tr>
@@ -109,7 +104,7 @@ TEXT
                 </td>
               </tr>
               <% f.fields_for :settings do |settings| %>
-                <% if Account.site_admin.grants_right?(@current_user, :manage_site_settings) %>
+                <% if @account.grants_right?(@current_user, :manage_site_settings) %>
                   <tr>
                     <td><%= settings.blabel :mfa_settings, :en => "Multi-Factor Authentication" %></td>
                     <td><%= settings.select :mfa_settings, [[t('select.mfa.disabled', "Disabled"), :disabled],
@@ -190,7 +185,7 @@ TEXT
           <legend><%= t(:features_title, "Features") %></legend>
           <% f.fields_for :settings do |settings| %>
             <% if @account.root_account? %>
-              <% if Account.site_admin.grants_right?(@current_user, :manage_site_settings) %>
+              <% if @account.grants_right?(@current_user, :manage_site_settings) %>
                 <div>
                   <%= settings.check_box :admins_can_change_passwords, :checked => @account.settings[:admins_can_change_passwords] == true %>
                   <%= settings.label :admins_can_change_passwords, :en => "Password setting by admins" %>
@@ -287,7 +282,7 @@ TEXT
              <% end %>
           <% end %>
           <% f.fields_for :services do |services| %>
-            <% Account.services_exposed_to_ui_hash(:setting).sort_by { |k,h| h[:name] }.each do |key, service| %>
+            <% Account.services_exposed_to_ui_hash(:setting, @current_user, @account).sort_by { |k,h| h[:name] }.each do |key, service| %>
               <div>
                 <%= services.check_box key, :checked => @account.service_enabled?(key) %>
                 <%= services.label key, service[:name] + " " %>
@@ -420,11 +415,11 @@ TEXT
           </fieldset>
         <% end %>
 
-        <% if @account.root_account? and not Account.services_exposed_to_ui_hash(:service).empty? %>
+        <% if @account.root_account? and not (exposed_services = Account.services_exposed_to_ui_hash(:service, @current_user)).empty? %>
           <fieldset>
             <legend><%= t(:enabled_web_serices_title, "Enabled Web Services") %></legend>
             <% f.fields_for :services do |services| %>
-              <% Account.services_exposed_to_ui_hash(:service).sort_by { |k,h| h[:name] }.each do |key, service| %>
+              <% exposed_services.sort_by { |k,h| h[:name] }.each do |key, service| %>
                 <div>
                   <%= services.check_box key, :checked => @account.service_enabled?(key) %>
                   <%= services.label key, service[:name] + " " %>
@@ -479,6 +474,10 @@ TEXT
         </div>
       <% end %>
     </div>
+  <% end %>
+
+  <% if can_do(@context, @current_user, :manage_storage_quotas) %>
+    <div id="tab-quotas"></div>
   <% end %>
 
   <% if can_do(@context, @current_user, :manage_account_settings) %>
@@ -653,6 +652,16 @@ TEXT
               </span>&nbsp;&nbsp;
               <%= link_to(context_user_name(@account, announcement.user_id), user_path(announcement.user_id)) %>
             </div>
+            <% if announcement.required_account_service %>
+              <div>
+                <%= Account.allowable_services[announcement.required_account_service.to_sym].try(:[], :name) %>
+              </div>
+            <% end %>
+            <% if announcement.months_in_display_cycle %>
+              <div>
+                <%= t :announcement_sent_to_subset, "Sent to 1 / %{denominator} users each month", denominator: announcement.months_in_display_cycle %>
+              </div>
+            <% end %>
             <div class="message user_content">
               <%= user_content(announcement.message) %>
             </div>
@@ -683,7 +692,21 @@ TEXT
                   <option value="calendar" class="calendar"><%= t(:alert_icon_calendar_option, "calendar") %></option>
                 </select>
               </td>
-            </tr><tr>
+            </tr>
+            <% if @account.site_admin? %>
+              <tr id="confirm_global_announcement_field">
+                <td colspan=2><input type="checkbox" id="confirm_global_announcement" name="confirm_global_announcement"> <%= label_tag :confirm_global_announcement, t(:confirm_global_announcement, "This announcement will be shown to *all* Canvas users. Confirm that you want to create it.", :wrapper => '<b>\1</b>') %></td>
+              </tr>
+              <tr>
+                <td colspan=2>
+                  <div id="survey_announcement_field">
+                    <%# don't use the rails check_box helper here, because we don't want the extra hidden element when not checked %>
+                    <input type="checkbox" name="account_notification[required_account_service]" id="account_notification_required_account_service" value="account_survey_notifications" />
+                    <label><%= t :survey_announcement, "This is a survey announcement. It will be sent to 1 / %{denominator} of users in enabled accounts for each month that it's active.", denominator: f.text_field(:months_in_display_cycle, value: AccountNotification.default_months_in_display_cycle, disabled: true) %></label>
+                  </label>
+              </tr>
+            <% end %>
+            <tr>
               <td><%= f.blabel :message, :en => "Message" %></td>
             </tr>
           </table>
@@ -776,7 +799,6 @@ TEXT
   <% end %>
   <% if can_do(@context, @current_user, :manage_account_settings) %>
       <div id="tab-tools">
-        <h2><%= t(:external_tools_title, "External Tools") %></h2>
         <%= render :partial => 'external_tools/external_tools', :object => @context.context_external_tools.active %>
       </div>
   <% end %>

@@ -37,6 +37,31 @@ module ActiveRecord
           end
           acts_as_list_class.update_all("position=CASE #{updates.join(" ")} ELSE 0 END", "#{scope_condition}") unless updates.empty?
         end
+
+        def insert_at_position(position, list=nil)
+          list ||= acts_as_list_class.find(:all, :conditions => "#{scope_condition}")
+          list = list.sort_by{|o| o.send(position_column) || 999999 }
+          if self_index = list.index{|o| o.id == self.id}
+            list.delete_at(self_index)
+          end
+
+          position = position.to_i - 1 # 1-based
+          if position >= 0 && position <= list.count
+            list.insert(position, self)
+
+            cnt = 1
+            updates = []
+            list.each_with_index do |obj, idx|
+              updates << "WHEN id=#{obj.id} THEN #{cnt}"
+              cnt += 1
+            end
+
+            acts_as_list_class.update_all("position=CASE #{updates.join(" ")} ELSE 0 END", "#{scope_condition}") unless updates.empty?
+            return true
+          else
+            return false
+          end
+        end
       end
     end
   end

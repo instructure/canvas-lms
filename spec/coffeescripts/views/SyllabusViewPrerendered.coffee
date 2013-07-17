@@ -312,6 +312,16 @@ define [], ->
       'url': 'http://localhost/api/v1/calendar_events/1'
       'html_url': 'http://localhost/calendar?event_id=1&include_contexts=course_1'
     }
+    {
+      'id': '4'
+      'title': 'Hidden Event'
+      'workflow_state': 'active'
+      'start_at': '2012-01-01T13:30:00-07:00'
+      'end_at': '2012-01-30T19:30:00-07:00'
+      'url': 'http://localhost/api/v1/calendar_events/4'
+      'html_url': 'http://localhost/calendar?event_id=4&include_contexts=course_1'
+      'hidden': true
+    }
   ]
 
 

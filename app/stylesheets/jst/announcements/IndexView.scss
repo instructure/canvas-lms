@@ -1,0 +1,23 @@
+@import 'environment';
+
+// #TODO move these into their own file
+.headerBar {
+  margin-bottom: 15px;
+  
+  &.pinned {
+    position: fixed;
+    top: 0;
+    width: 1071px;
+    background-color: white;
+    box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.5);
+    margin-left: -12px;
+    padding: 3px 14px;
+    z-index: 100;
+  }
+  .headerBar-right {
+    float: right;
+  }
+}
+#searchTerm {
+  width: 225px;
+}

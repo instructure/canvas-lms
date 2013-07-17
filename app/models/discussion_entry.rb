@@ -78,7 +78,7 @@ class DiscussionEntry < ActiveRecord::Base
 
   set_broadcast_policy do |p|
     p.dispatch :new_discussion_entry
-    p.to { posters - [user] }
+    p.to { subscribers - [user] }
     p.whenever { |record|
       record.just_created && record.active?
     }
@@ -121,7 +121,7 @@ class DiscussionEntry < ActiveRecord::Base
   end
 
   def reply_from(opts)
-    raise IncomingMessageProcessor::UnknownAddressError if self.context.root_account.deleted?
+    raise IncomingMail::IncomingMessageProcessor::UnknownAddressError if self.context.root_account.deleted?
     user = opts[:user]
     if opts[:html]
       message = opts[:html].strip
@@ -143,13 +143,17 @@ class DiscussionEntry < ActiveRecord::Base
         entry.save!
         entry
       else
-        raise IncomingMessageProcessor::ReplyToLockedTopicError
+        raise IncomingMail::IncomingMessageProcessor::ReplyToLockedTopicError
       end
     end
   end
 
   def posters
     self.discussion_topic.posters rescue [self.user]
+  end
+
+  def subscribers
+    subscribed_users = self.discussion_topic.subscribers
   end
 
   def plaintext_message=(val)
@@ -175,6 +179,7 @@ class DiscussionEntry < ActiveRecord::Base
     save!
     update_topic_submission
     decrement_unread_counts_for_this_entry
+    update_topic_subscription
   end
 
   def update_discussion
@@ -219,6 +224,13 @@ class DiscussionEntry < ActiveRecord::Base
         DiscussionTopicParticipant.where(:discussion_topic_id => self.discussion_topic_id, :user_id => users).
             update_all('unread_entry_count = unread_entry_count - 1')
       end
+    end
+  end
+
+  def update_topic_subscription
+    discussion_topic.user_ids_who_have_posted_and_admins(true) # pesky memoization
+    unless discussion_topic.user_can_see_posts?(user)
+      discussion_topic.unsubscribe(user)
     end
   end
 
@@ -377,8 +389,10 @@ class DiscussionEntry < ActiveRecord::Base
           new_count = self.discussion_topic.unread_count(self.user) - 1
           topic_participant = self.discussion_topic.discussion_topic_participants.create(:user => self.user,
                                                                                          :unread_entry_count => new_count,
-                                                                                         :workflow_state => "unread")
+                                                                                         :workflow_state => "unread",
+                                                                                         :subscribed => self.discussion_topic.subscribed?(self.user))
         end
+        self.discussion_topic.subscribe(self.user)
       end
     end
   end
@@ -387,7 +401,7 @@ class DiscussionEntry < ActiveRecord::Base
   def read_state(current_user = nil)
     current_user ||= self.current_user
     return "read" unless current_user # default for logged out users
-    discussion_entry_participants.find_by_user_id(current_user).try(:workflow_state) || "unread"
+    find_existing_participant(current_user).workflow_state
   end
 
   def read?(current_user = nil)
@@ -398,14 +412,25 @@ class DiscussionEntry < ActiveRecord::Base
     !read?(current_user)
   end
 
-  def change_read_state(new_state, current_user = nil)
+  # Public: Change the workflow_state of the entry for the specified user.
+  #
+  # new_state    - The new workflow_state.
+  # current_user - The User to to change state for. This function does nothing
+  #                if nil is passed. (default: self.current_user)
+  # opts         - Additional named arguments (default: {})
+  #                :forced - Also set the forced_read_state to this value.
+  #
+  # Returns nil if current_user is nil, the DiscussionEntryParticipent if the
+  # read_state was changed, or true if the read_state was not changed. If the
+  # read_state is not changed, a participant record will not be created.
+  def change_read_state(new_state, current_user = nil, opts = {})
     current_user ||= self.current_user
     return nil unless current_user
 
     if new_state != self.read_state(current_user)
-      entry_participant = self.update_or_create_participant(:current_user => current_user, :new_state => new_state)
+      entry_participant = self.update_or_create_participant(opts.merge(:current_user => current_user, :new_state => new_state))
       if entry_participant.present? && entry_participant.valid?
-        self.discussion_topic.update_or_create_participant(:current_user => current_user, :offset => (new_state == "unread" ? 1 : -1))
+        self.discussion_topic.update_or_create_participant(opts.merge(:current_user => current_user, :offset => (new_state == "unread" ? 1 : -1)))
       end
       entry_participant
     else
@@ -413,6 +438,18 @@ class DiscussionEntry < ActiveRecord::Base
     end
   end
 
+  # Public: Update and save the DiscussionEntryParticipant for a specified user,
+  # creating it if necessary. This function properly handles race conditions of
+  # calling this function simultaneously in two separate processes.
+  #
+  # opts - The options for this operation
+  #        :current_user - The User that should have its participant updated.
+  #                        (default: self.current_user)
+  #        :new_state    - The new workflow_state for the participant.
+  #        :forced       - The new forced_read_state for the participant.
+  #
+  # Returns the DiscussionEntryParticipant for the specified User, or nil if no
+  # current_user is specified.
   def update_or_create_participant(opts={})
     current_user = opts[:current_user] || self.current_user
     return nil unless current_user
@@ -423,9 +460,36 @@ class DiscussionEntry < ActiveRecord::Base
         entry_participant = self.discussion_entry_participants.where(:user_id => current_user).first
         entry_participant ||= self.discussion_entry_participants.build(:user => current_user, :workflow_state => "unread")
         entry_participant.workflow_state = opts[:new_state] if opts[:new_state]
+        entry_participant.forced_read_state = opts[:forced] if opts.has_key?(:forced)
         entry_participant.save
       end
     end
     entry_participant
   end
+
+  # Public: Find the existing DiscussionEntryParticipant, or create a default
+  # participant, for the specified user.
+  # 
+  # user - The User to lookup the participant for.
+  # 
+  # Returns the DiscussionEntryParticipant for the user, or a participant with
+  # default values set. The returned record is marked as readonly! If you need
+  # to update a participant, use the #update_or_create_participant method
+  # instead.
+  def find_existing_participant(user)
+    participant = discussion_entry_participants.where(:user_id => user).first
+    unless participant
+      # return a temporary record with default values
+      participant = discussion_entry_participants.new({
+        :workflow_state => "unread",
+        :forced_read_state => false,
+        })
+      participant.user = user
+    end
+
+    # Do not save this record. Use update_or_create_participant instead if you need to save it
+    participant.readonly!
+    participant
+  end
+
 end

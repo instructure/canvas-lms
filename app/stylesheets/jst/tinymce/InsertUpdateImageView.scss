@@ -1,0 +1,15 @@
+.insertUpdateImage {
+  .insertUpdateImageTabpane {
+    height: 200px;
+    overflow: auto;
+  }
+  .checkbox.inline { white-space: nowrap; }
+  // fix safari legend margin issue
+  legend {
+     margin-bottom: 0px;
+  }
+  legend + * {
+    margin-top: 20px;
+    -webkit-margin-collapse: separate;
+  }
+}

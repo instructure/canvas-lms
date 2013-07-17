@@ -39,6 +39,9 @@ class Collaboration < ActiveRecord::Base
   after_save :include_author_as_collaborator
   after_save :touch_context
 
+  TITLE_MAX_LENGTH = 255
+  validates_presence_of :title
+  validates_length_of :title, :maximum => TITLE_MAX_LENGTH
   validates_length_of :description, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
 
   serialize :data

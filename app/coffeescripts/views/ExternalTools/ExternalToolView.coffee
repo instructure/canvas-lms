@@ -1,0 +1,29 @@
+define [
+  'jquery'
+  'jst/ExternalTools/ExternalToolView'
+  'i18n!external_tools'
+], ($, template, I18n) ->
+
+  class ExternalToolView extends Backbone.View
+
+    template: template
+    tagName: 'tr'
+    className: 'external_tool_item'
+
+    afterRender: ->
+      @$el.attr('id', 'external_tool_' + @model.get('id'))
+      this
+
+    toJSON: ->
+      extras = [
+        {extension_type: 'editor_button', text: I18n.t 'editor_button_configured', 'Editor button configured'}
+        {extension_type: 'resource_selection', text: I18n.t 'resource_selection_configured', 'Resource selection configured'}
+        {extension_type: 'course_navigation', text: I18n.t 'course_navigation_configured', 'Course navigation configured'}
+        {extension_type: 'account_navigation', text: I18n.t 'account_navigation_configured', 'Account navigation configured'}
+        {extension_type: 'user_navigation', text: I18n.t 'user_navigation_configured', 'User navigation configured'}
+        {extension_type: 'homework_submission', text: I18n.t 'homework_submission_configured', 'Homework submission configured'}
+      ]
+
+      json = super
+      json.extras = (extra for extra in extras when json[extra.extension_type]?)
+      json
