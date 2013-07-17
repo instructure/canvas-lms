@@ -17,10 +17,11 @@
 #
 define [
   'underscore'
+  'compiled/class/cache'
   'compiled/views/CollectionView'
   'compiled/views/assignments/AssignmentGroupListItemView'
   'jst/assignments/teacher_index/AssignmentGroupList'
-], (_, CollectionView, AssignmentGroupListItemView, template) ->
+], (_, Cache, CollectionView, AssignmentGroupListItemView, template) ->
 
   class AssignmentGroupListView extends CollectionView
     template: template
@@ -28,7 +29,13 @@ define [
 
     initialize: ->
       super
+      $.extend true, @, Cache
       @firstResetLanded = @collection.length > 0
+
+    render: ->
+      data = super
+      @collapseFromCache()
+      data
 
     renderOnReset: =>
       @firstResetLanded = true
@@ -39,3 +46,18 @@ define [
       _.extend({}, data,
         firstResetLanded: @firstResetLanded
       )
+
+    # This will be used when we implement searching
+    expandAll: ->
+      for m in @collection.models
+        if !m.groupView.isExpanded()
+            #force expand it
+            #but it will retain it's state in cache
+            m.groupView.toggle()
+
+    #also can be used to collapse after searching
+    collapseFromCache: ->
+      for m in @collection.models
+        if !m.groupView.isExpanded()
+          #collapse it
+          m.groupView.toggle()

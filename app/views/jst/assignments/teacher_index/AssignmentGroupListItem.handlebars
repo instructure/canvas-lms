@@ -1,7 +1,13 @@
 <div id="assignment_group_{{id}}">
   <div class="ig-header" style="position:relative;">
 
-    <span>
+    <span
+      class="element_toggler"
+      aria-controls="assignment_group_{{id}}_assignments"
+      aria-expanded="true"
+      aria-label="{{name}} {{toggleMessage}}"
+      role="button"
+    >
       <i class="icon-mini-arrow-down"></i>
       {{name}}
     </span>
@@ -54,7 +60,9 @@
 
   </div>
 
-  <ul class="collectionViewItems ig-list"></ul>
+  <div id="assignment_group_{{id}}_assignments" >
+    <ul class="collectionViewItems ig-list"></ul>
+  </div>
   <form data-view="createAssignment" class="form-dialog"></form>
   <form data-view="editAssignmentGroup" class="form-dialog"></form>
   <form data-view="deleteAssignmentGroup" class="form-dialog" serialize-radio-value></form>

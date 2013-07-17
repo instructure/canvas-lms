@@ -1,6 +1,7 @@
 define [
   'i18n!assignments'
   'underscore'
+  'compiled/class/cache'
   'compiled/collections/AssignmentCollection'
   'compiled/views/CollectionView'
   'compiled/views/assignments/AssignmentListItemView'
@@ -8,7 +9,7 @@ define [
   'compiled/views/assignments/CreateGroupView'
   'compiled/views/assignments/DeleteGroupView'
   'jst/assignments/teacher_index/AssignmentGroupListItem'
-], (I18n, _, AssignmentCollection, CollectionView, AssignmentListItemView, CreateAssignmentView, CreateGroupView, DeleteGroupView, template) ->
+], (I18n, _, Cache, AssignmentCollection, CollectionView, AssignmentListItemView, CreateAssignmentView, CreateGroupView, DeleteGroupView, template) ->
 
   class AssignmentGroupListItemView extends CollectionView
 
@@ -26,6 +27,12 @@ define [
       '.delete_group': '$deleteGroupButton'
       '.edit_group': '$editGroupButton'
     })
+
+    events:
+      'click .element_toggler': 'toggleArrow'
+
+    messages:
+      toggleMessage: I18n.t('toggle_message',"toggle assignment visibility")
 
     # call remove on children so that they can clean up old dialogs.
     # this should eventually happen at a higher level (eg for all views), but
@@ -45,11 +52,17 @@ define [
       @createAssignmentView.setTrigger @$addAssignmentButton
       @editGroupView.setTrigger @$editGroupButton
       @deleteGroupView.setTrigger @$deleteGroupButton
+      #listen for events that cause auto-expanding
+      @collection.on('add', => if !@isExpanded() then @toggle() )
 
     initialize: ->
       @collection = new AssignmentCollection @model.get('assignments')
       @collection.on('add remove', @refreshDeleteDialog)
       super
+
+      # we need the following line in order to access this view later
+      @model.groupView = @
+      @initCache()
 
       @editGroupView = new CreateGroupView
         assignmentGroup: @model
@@ -69,6 +82,13 @@ define [
         model: @model
         assignments: @collection
 
+    initCache: ->
+      $.extend true, @, Cache
+      @cache.use('localStorage')
+      key = @cacheKey()
+      if !@cache.get(key)?
+        @cache.set(key, true)
+
     toJSON: ->
       count = @countRules()
       showRules = count != 0
@@ -81,6 +101,7 @@ define [
         rulesText: I18n.t('rules_text', "Rule", { count: count })
         showWeight: showWeight
         groupWeight: data.group_weight
+        toggleMessage: @messages.toggleMessage
       })
 
     countRules: ->
@@ -92,3 +113,23 @@ define [
         else
           count++
       count
+
+    isExpanded: ->
+      @cache.get(@cacheKey())
+
+    toggle: (setTo=false) ->
+      @$el.find('.element_toggler').click()
+      @cache.set(@cacheKey(), setTo)
+
+    cacheKey: ->
+      "ag_#{@model.id}_expanded"
+
+    toggleArrow: (ev) ->
+      arrow = $(ev.currentTarget).children('i')
+      arrow.toggleClass('icon-mini-arrow-down').toggleClass('icon-mini-arrow-right')
+      @toggleExpanded()
+
+    toggleExpanded: ->
+      key = @cacheKey()
+      expanded = !@cache.get(key)
+      @cache.set(key, expanded)

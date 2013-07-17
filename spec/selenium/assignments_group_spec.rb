@@ -341,5 +341,14 @@ describe "assignment groups" do
       @assignment.reload
       @assignment.assignment_group.should == @assignment_group
     end
+
+    it "should persist collapsed assignment groups" do
+      selector = "#assignment_group_#{@assignment_group.id} .element_toggler"
+      f(selector).click
+      wait_for_animations
+      refresh_page
+      wait_for_ajaximations
+      f(selector).should have_attribute('aria-expanded', 'false')
+    end
   end
 end
