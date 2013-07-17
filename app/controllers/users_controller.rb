@@ -875,7 +875,7 @@ class UsersController < ApplicationController
           message_sent = true
           @pseudonym.send_confirmation!
         end
-        @user.new_registration((params[:user] || {}).merge({:remote_ip  => request.remote_ip}))
+        @user.new_registration((params[:user] || {}).merge({:remote_ip  => request.remote_ip, :cookies => cookies}))
       elsif notify && !@user.registered?
         message_sent = true
         @pseudonym.send_registration_notification!
