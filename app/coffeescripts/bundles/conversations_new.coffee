@@ -58,5 +58,5 @@ require [
         @compose.show()
 
 
-  app = new ConversationsRouter
+  window.conversationsRouter = new ConversationsRouter
   Backbone.history.start()

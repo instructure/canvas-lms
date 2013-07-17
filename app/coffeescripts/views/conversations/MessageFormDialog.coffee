@@ -83,11 +83,14 @@ define [
     afterClose: ->
       @$fullDialog.off 'click', '.attach-file'
       @$fullDialog.off 'click', '.attachment a.remove_link'
+      @$fullDialog.off 'keydown', '.attachment'
+      @$fullDialog.off 'change', '.file_input'
       @$fullDialog.off 'click', '.attach-media'
 
     sendMessage: (e) ->
       e.preventDefault()
       e.stopPropagation()
+      @removeEmptyAttachments()
       @$el.submit()
 
     initialize: ->
@@ -201,12 +204,14 @@ define [
         @addAttachment()
       @$fullDialog.on 'click', '.attachment a.remove_link', preventDefault (e) =>
         @removeAttachment($(e.currentTarget))
+      @$fullDialog.on 'keydown', '.attachment', @handleAttachmentKeyPress
+      @$fullDialog.on 'change', '.file_input', @handleAttachment
 
       @$fullDialog.on 'click', '.attach-media', preventDefault =>
         @addMediaComment()
 
       @$el.formSubmit
-        fileUpload: => (@$form.find(".file_input:visible").length > 0)
+        fileUpload: => (@$form.find(".file_input").length > 0)
         preparedFileUpload: true
         context_code: "user_" + ENV.current_user_id
         folder_id: @options.folderId
@@ -245,11 +250,47 @@ define [
     addAttachment: ->
       $attachment = $(addAttachmentTemplate())
       @$attachments.append($attachment)
+      $attachment.hide()
+      $attachment.find('input').click()
+
+    imageTypes: ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg']
+
+    handleAttachment: (e) =>
+      input = e.currentTarget
+      $attachment = $(input).closest('.attachment')
+      $attachment.show()
       $attachment.slideDown "fast", =>
         @updateAttachmentPane()
+      $icon = $attachment.find('i')
+      file = input.files[0]
+      name = file.name
+      $attachment.find('.attachment-name').text(name)
+      extension = name.split('.').pop().toLowerCase()
+      if extension in @imageTypes && window.FileReader
+        picReader = new FileReader()
+        picReader.addEventListener("load", (e) ->
+          picFile = e.target
+          $icon.attr('class', '')
+          $icon.empty().append($('<img />').attr('src', picFile.result))
+        )
+        picReader.readAsDataURL(file)
+        return
+      icon = 'paperclip'
+      if extension in @imageTypes then icon = 'image'
+      else if extension == 'pdf' then icon = 'pdf'
+      else if extension in ['doc', 'docx'] then icon = 'ms-word'
+      else if extension in ['xls', 'xlsx'] then icon = 'ms-excel'
+      $icon.attr('class', "icon-#{icon}")
 
-    removeAttachment: ($node) ->
-      $attachment = $node.closest(".attachment")
+    handleAttachmentKeyPress: (e) =>
+      if e.keyCode != 46 && e.keyCode != 68 then return # delete, "d"
+      @removeAttachment(e.currentTarget)
+
+    removeEmptyAttachments: ->
+      _.each(@$attachments.find('input[value=]'), @removeAttachment)
+
+    removeAttachment: (node) =>
+      $attachment = $(node).closest(".attachment")
       $attachment.slideUp "fast", =>
         $attachment.remove()
         @updateAttachmentPane()
