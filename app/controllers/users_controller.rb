@@ -251,8 +251,6 @@ class UsersController < ApplicationController
         end
       end
     end
-  rescue UserSearch::SearchTermTooShort => e
-    render json: e.error_json, status: :bad_request
   end
 
 

@@ -26,6 +26,8 @@ class WikiPage < ActiveRecord::Base
   include CopyAuthorizedLinks
   include ContextModuleItem
 
+  include SearchTermHelper
+
   belongs_to :wiki, :touch => true
   belongs_to :cloned_item
   belongs_to :user
@@ -185,10 +187,6 @@ class WikiPage < ActiveRecord::Base
 
   scope :visible_to_students, where(:hide_from_students => false)
   scope :order_by_id, order(:id)
-
-  scope :title_like, lambda { |title|
-    where(wildcard('wiki_pages.title', title))
-  }
 
   def locked_for?(user, opts={})
     return false unless self.could_be_locked

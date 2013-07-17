@@ -275,8 +275,6 @@ class GroupCategoriesController < ApplicationController
 
     users = Api.paginate(users, self, api_v1_group_category_users_url)
     render :json => users.map { |u| user_json(u, @current_user, session, [], @context) }
-  rescue UserSearch::SearchTermTooShort => e
-    render json: e.error_json, status: :bad_request
   end
 
   # @API Assign unassigned members

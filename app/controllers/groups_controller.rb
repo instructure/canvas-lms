@@ -589,8 +589,6 @@ class GroupsController < ApplicationController
 
     users = Api.paginate(users, self, api_v1_group_users_url)
     render :json => users.map { |u| user_json(u, @current_user, session) }
-  rescue UserSearch::SearchTermTooShort => e
-    render json: e.error_json, status: :bad_request
   end
 
   def edit

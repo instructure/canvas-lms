@@ -813,15 +813,17 @@ class ApplicationController < ActionController::Base
       type = 'default'
       type = '404' if status == '404 Not Found'
 
-      error = ErrorReport.log_exception(type, exception, {
-        :url => request.url,
-        :user => @current_user,
-        :user_agent => request.headers['User-Agent'],
-        :request_context_id => RequestContextGenerator.request_id,
-        :account => @domain_root_account,
-        :request_method => request.method,
-        :format => request.format,
-      }.merge(ErrorReport.useful_http_env_stuff_from_request(request)))
+      unless exception.respond_to?(:skip_error_report?) && exception.skip_error_report?
+        error = ErrorReport.log_exception(type, exception, {
+          :url => request.url,
+          :user => @current_user,
+          :user_agent => request.headers['User-Agent'],
+          :request_context_id => RequestContextGenerator.request_id,
+          :account => @domain_root_account,
+          :request_method => request.method,
+          :format => request.format,
+        }.merge(ErrorReport.useful_http_env_stuff_from_request(request)))
+      end
 
       if api_request?
         rescue_action_in_api(exception, error)
@@ -869,7 +871,20 @@ class ApplicationController < ActionController::Base
   end
 
   def rescue_action_in_api(exception, error_report)
-    status_code = response_code_for_rescue(exception) || 500
+    status_code = exception.response_status if exception.respond_to?(:response_status)
+    status_code ||= response_code_for_rescue(exception) || 500
+
+    data = exception.error_json if exception.respond_to?(:error_json)
+    data ||= api_error_json(exception, status_code)
+
+    if error_report.try(:id)
+      data[:error_report_id] = error_report.id
+    end
+
+    render :json => data, :status => status_code
+  end
+
+  def api_error_json(exception, status_code)
     if status_code.is_a?(Symbol)
       status_code_string = status_code.to_s
     else
@@ -878,21 +893,16 @@ class ApplicationController < ActionController::Base
     end
 
     data = { :status => status_code_string }
-    if error_report.try(:id)
-      data[:error_report_id] = error_report.id
-    end
-
     # inject exception-specific data into the response
     case exception
-    when ActiveRecord::RecordNotFound
-      data[:message] = 'The specified resource does not exist.'
-    when AuthenticationMethods::AccessTokenError
-      add_www_authenticate_header
-      data[:message] = 'Invalid access token.'
+      when ActiveRecord::RecordNotFound
+        data[:message] = 'The specified resource does not exist.'
+      when AuthenticationMethods::AccessTokenError
+        add_www_authenticate_header
+        data[:message] = 'Invalid access token.'
     end
-
     data[:message] ||= "An error occurred."
-    render :json => data, :status => status_code
+    data
   end
 
   def rescue_action_locally(exception)

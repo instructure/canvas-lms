@@ -103,6 +103,14 @@ describe "Pages API", :type => :integration do
         urls.should == new_pages.sort_by(&:id).collect(&:url)
       end
 
+      it "should return an error if the search term is fewer than 3 characters" do
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/pages?search_term=aa",
+                        {:controller=>'wiki_pages_api', :action=>'index', :format=>'json', :course_id=>@course.to_param, :search_term => "aa"},
+                        {}, {}, {:expected_status => 400})
+        error = json["errors"].first
+        verify_json_error(error, "search_term", "invalid", "3 or more characters is required")
+      end
+
       describe "sorting" do
         it "should sort by title (case-insensitive)" do
           @wiki.wiki_pages.create! :title => 'gIntermediate Page'

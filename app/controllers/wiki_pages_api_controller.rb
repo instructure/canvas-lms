@@ -105,7 +105,7 @@ class WikiPagesApiController < ApplicationController
       scope = @context.grants_right?(@current_user, session, :view_unpublished_items) ? scope.not_deleted : scope.active
       scope = scope.visible_to_students unless @context.grants_right?(@current_user, session, :view_hidden_items)
 
-      scope = scope.title_like(params[:search_term]) if params[:search_term]
+      scope = WikiPage.search_by_attribute(scope, :title, params[:search_term])
 
       order_clause = case params[:sort]
         when 'title'

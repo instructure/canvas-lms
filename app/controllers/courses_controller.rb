@@ -434,8 +434,6 @@ class CoursesController < ApplicationController
         user_json(u, @current_user, session, includes, @context, enrollments)
       }
     end
-  rescue UserSearch::SearchTermTooShort => e
-    render json: e.error_json, status: :bad_request
   end
 
   # @API List recently logged in students
