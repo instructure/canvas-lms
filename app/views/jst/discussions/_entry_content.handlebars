@@ -20,14 +20,14 @@
         {{/if}}
       </ul>
     </div>
+    <h2 class="discussion-title">
+      <a {{#if author.html_url}}href="{{author.html_url}}" data-bypass{{/if}} class="author {{#unless author.id}}unknown{{/unless}}" title="{{#t "authors_name"}}Author's name{{/t}}" {{#if author}}{{#if author.url}} href="{{author.url}}" {{/if}}{{/if}} class="author">{{#if author}}{{author.display_name}}{{else}}{{#t "unknown_author"}}Unknown Author{{/t}}{{/if}}</a>
+    </h2>
+    <div class="show-if-collapsed discussion-subtitle summary ellipsis">{{summary}}</div> 
     <div class="discussion-header-right">
-      <div class="discussion-title">
-        <a {{#if author.html_url}}href="{{author.html_url}}" data-bypass{{/if}} class="author {{#unless author.id}}unknown{{/unless}}" title="{{#t "authors_name"}}Author's name{{/t}}" {{#if author}}{{#if author.url}} href="{{author.url}}" {{/if}}{{/if}} class="author">{{#if author}}{{author.display_name}}{{else}}{{#t "unknown_author"}}Unknown Author{{/t}}{{/if}}</a>
-      </div>
       <div class="discussion-pubdate hide-if-collapsed">{{friendlyDatetime updated_at pubdate=true}}</div>
       <div class="headerBadges show-if-collapsed"></div>
     </div>
-    <div class="show-if-collapsed discussion-subtitle summary ellipsis">{{summary}}</div> 
   </div>
 </header>
 <div class="discussion-section message_wrapper hide-if-collapsed">
@@ -47,6 +47,11 @@
 {{#if inlineReplyLink}}
 <div class="entry-controls hide-if-collapsed hide-if-replying">
   <div class="notification" data-bind="notification"></div>
-  <a class='discussion-reply-action entry-control dim-till-hover' data-event="addReply" href='#'><i class='icon-replied standalone-icon'></i></a>
+  <a class="discussion-reply-action entry-control dim-till-hover"
+     data-event="addReply"
+     href="#">
+    <i class="icon-replied standalone-icon"></i>
+    {{#t "write_a_reply"}}Reply{{/t}}
+  </a>
 </div>
 {{/if}}

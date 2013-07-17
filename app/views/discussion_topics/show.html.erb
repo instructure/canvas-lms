@@ -162,7 +162,7 @@
             <div class="discussion-pubdate"><%= friendly_datetime @topic.posted_at %></div>
             <%= render :partial => 'new_and_total_badge', :locals => { :unread_count => @topic.unread_count(@current_user), :reply_count => @topic.discussion_subentry_count } %>
           </div>
-          <div class="discussion-title"><%= @topic.title %></div>
+          <h1 class="discussion-title"><%= @topic.title %></h1>
           <div class="discussion-subtitle">
             <a class="author" href="<%= context_url(@topic.context, :context_user_url, @topic.user_id) %>" title="<%= t :authors_name, "Author's name" %>"><%= context_user_name(@topic.context, @topic.user) %></a>
           </div>
