@@ -1,7 +1,7 @@
 require [
   'jquery'
   'compiled/collections/ModuleCollection',
-  'compiled/views/Modules/ModuleCollectionView',
+  'compiled/views/modules/ModuleCollectionView',
 ], ($, ModuleCollection, ModuleCollectionView) ->
 
   modules = new ModuleCollection null,

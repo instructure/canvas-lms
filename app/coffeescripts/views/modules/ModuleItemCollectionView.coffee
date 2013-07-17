@@ -1,7 +1,7 @@
 define [
   'jquery'
-  'jst/Modules/ModuleItemCollectionView'
-  'compiled/views/Modules/ModuleItemView'
+  'jst/modules/ModuleItemCollectionView'
+  'compiled/views/modules/ModuleItemView'
   'compiled/views/PaginatedCollectionView'
   'i18n!context_modules'
 ], ($, template, ModuleItemView, PaginatedCollectionView, I18n) ->

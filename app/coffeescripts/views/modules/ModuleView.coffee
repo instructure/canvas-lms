@@ -1,8 +1,8 @@
 define [
   'jquery'
   'Backbone'
-  'jst/Modules/ModuleView'
-  'compiled/views/Modules/ModuleItemCollectionView'
+  'jst/modules/ModuleView'
+  'compiled/views/modules/ModuleItemCollectionView'
   'i18n!context_modules'
 ], ($, Backbone, template, ModuleItemCollectionView, I18n) ->
 
