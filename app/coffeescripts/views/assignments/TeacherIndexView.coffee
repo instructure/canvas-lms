@@ -7,6 +7,8 @@ define [
 
     template: template
 
+    el: '#content'
+
     @child 'assignmentGroupsView', '[data-view=assignmentGroups]'
 
     @child 'inputFilterView', '[data-view=inputFilter]'

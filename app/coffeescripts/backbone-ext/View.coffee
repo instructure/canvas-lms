@@ -105,7 +105,7 @@ define [
     #
     # @api private
     
-    storeChildrenViews: -> 
+    storeChildrenViews: ->
       return unless @constructor.__childViews__
       @children = _.map @constructor.__childViews__, (viewObj) => @[viewObj.name]
     

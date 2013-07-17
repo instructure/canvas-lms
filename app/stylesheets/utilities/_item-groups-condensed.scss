@@ -159,6 +159,13 @@ body.with_item_groups #main {
   .item-group-condensed.last {
     border-bottom: 0;
   }
+
+  .ig-list {
+    margin-top: 0;
+  }
+  .ig-list li {
+    margin: 0;
+  }
 }
 
 
@@ -177,12 +184,6 @@ body.with_item_groups #main {
     left: 15px;
   }
 
-  .ig-list {
-    margin-top: 0;
-  }
-  .ig-list li {
-    margin: 0;
-  }
   .ig-row {
     border-top-width: 0;
     border-bottom: 1px solid #e1e3e4;

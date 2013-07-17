@@ -60,4 +60,3 @@ require [
       course: course
 
   @app.render()
-  @app.$el.appendTo $('#content')

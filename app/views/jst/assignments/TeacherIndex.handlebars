@@ -1,27 +1,33 @@
-<div class="form-inline clearfix">
-  <input
-    type="text"
-    name="search_term"
-    data-view="inputFilter"
-    placeholder='{{#t "search_for_assignment"}}Search for assignment{{/t}}'
-    aria-label='{{#t "search"}}Search{{/t}}'
-  >
+<div class="header-bar">
+  <div class="header-bar-left form-inline">
+    <input
+      id="search_term"
+      name="search_term"
+      type="search"
+      value=""
+      data-view="inputFilter"
+      placeholder="{{#t "search_for_assignment"}}Search for Assignment{{/t}}"
+      aria-label="{{#t "search_for_assignment"}}Search for Assignment{{/t}}"
+    >
+  </div>
 
-  <div class="pull-right">
+  <div class="header-bar-right form-inline">
     <a
       href="#"
-      class="btn"
+      class="btn icon-plus"
       id="addGroup"
       role="button"
       title='{{#t "title_add_group"}}Add Assignment Group{{/t}}'
-    >{{#t "add_group"}}Add Group{{/t}}</a>
+      aria-label='{{#t "title_add_group"}}Add Assignment Group{{/t}}'
+    >{{#t "add_group"}}Group{{/t}}</a>
 
     <a
       href="{{addAssignmentUrl}}"
-      class="new_assignment btn btn-primary"
+      class="new_assignment btn btn-primary icon-plus"
       role="button"
       title='{{#t "title_add_assignment"}}Add Assignment{{/t}}'
-    >{{#t "add_assignment"}}Add Assignment{{/t}}</a>
+      aria-label='{{#t "title_add_assignment"}}Add Assignment{{/t}}'
+    >{{#t "add_assignment"}}Assignment{{/t}}</a>
 
     <a
       class="btn"
@@ -34,9 +40,7 @@
   </div>
 </div>
 
-<div class="v-gutter">
-  <div data-view="assignmentGroups"></div>
-</div>
+<div data-view="assignmentGroups" class="item-group-container"></div>
 
 <form data-view="createGroup" class="form-dialog"></form>
 

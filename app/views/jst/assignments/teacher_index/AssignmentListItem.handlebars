@@ -6,7 +6,10 @@
   <div class="ig-details row-fluid">
     <div class="span6 ellipses">
       <!-- TODO: VDD -->
-      {{#if dueAt}}{{#t "due_date"}}Due{{/t}} {{datetimeFormatted dueAt}}{{/if}}
+      {{#if dueAt}}
+        <strong>{{#t "due_date"}}Due{{/t}}</strong>
+        {{datetimeFormatted dueAt}}
+      {{/if}}
     </div>
     <div class="span6 ellipses">
       {{#if pointsPossible}}{{#t "points_possible"}}{{pointsPossible}} pts{{/t}}{{/if}}

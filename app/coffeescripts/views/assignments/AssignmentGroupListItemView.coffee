@@ -13,6 +13,7 @@ define [
   class AssignmentGroupListItemView extends CollectionView
 
     tagName: "li"
+    className: "item-group-condensed"
     itemView: AssignmentListItemView
     template: template
 
