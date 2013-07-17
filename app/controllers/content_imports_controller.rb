@@ -126,8 +126,8 @@ class ContentImportsController < ApplicationController
                                     :source_course => @source_course,
                                     :copy_options => copy_params,
                                     :migration_type => 'course_copy_importer')
+      cm.queue_migration
       cm.workflow_state = 'created'
-      cm.copy_course
       render :json => copy_status_json(cm, @context, @current_user, session)
     end
   end

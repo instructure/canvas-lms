@@ -63,7 +63,8 @@ describe ContentMigration do
     end
 
     def run_course_copy(warnings=[])
-      @cm.copy_course_without_send_later
+      worker = Canvas::Migration::Worker::CourseCopyWorker.new
+      worker.perform(@cm)
       @cm.reload
       if @cm.migration_settings[:last_error]
         er = ErrorReport.last

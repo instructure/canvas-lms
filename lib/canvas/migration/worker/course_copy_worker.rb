@@ -62,7 +62,7 @@ class Canvas::Migration::Worker::CourseCopyWorker < Struct.new(:migration_id)
           cm.context.copy_attachments_from_course(source, :content_export => ce, :content_migration => cm)
           cm.update_import_progress(20)
 
-          cm.import_content_without_send_later
+          cm.import_content
           cm.workflow_state = :imported
           cm.save
           cm.update_import_progress(100)

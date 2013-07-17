@@ -101,6 +101,20 @@ describe ContentMigrationsController, :type => :integration do
       course_with_student_logged_in(:course => @course, :active_all => true)
       api_call(:get, @migration_url, @params, {}, {}, :expected_status => 401)
     end
+
+    it "should not return attachment for course copies course copies" do
+      @migration.migration_type = nil
+      @migration.source_course_id = @course.id
+      @attachment = Attachment.create!(:context => @migration, :filename => "test.zip", :uploaded_data => StringIO.new("test file"))
+      @attachment.file_state = "deleted"
+      @attachment.workflow_state = "unattached"
+      @attachment.save
+      @migration.attachment = @attachment
+      @migration.save!
+
+      json = api_call(:get, @migration_url, @params)
+      json["attachment"].should be_nil
+    end
   end
 
   describe 'create' do
