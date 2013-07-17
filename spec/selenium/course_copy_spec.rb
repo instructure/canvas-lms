@@ -58,7 +58,7 @@ describe "course copy" do
         f('#copy_everything').click
         wait_for_ajaximations
 
-        keep_trying_until { ContentMigration.last.copy_course_without_send_later }
+        keep_trying_until { Canvas::Migration::Worker::CourseCopyWorker.new.perform(ContentMigration.last)}
 
         keep_trying_until { f('#copy_results > h2').should include_text('Copy Succeeded') }
 

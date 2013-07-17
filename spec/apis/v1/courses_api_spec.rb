@@ -1796,8 +1796,8 @@ describe ContentImportsController, :type => :integration do
 
     api_call(:get, status_url, { :controller => 'content_imports', :action => 'copy_course_status', :course_id => @copy_to.to_param, :id => data['id'].to_param, :format => 'json' })
     (JSON.parse(response.body)).tap do |res|
-      res['workflow_state'].should == 'created'
-      res['progress'].should be_nil
+      res['workflow_state'].should == 'started'
+      res['progress'].should == 0
     end
 
     run_jobs
