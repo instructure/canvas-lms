@@ -29,7 +29,7 @@ class QuestionBanksController < ApplicationController
         @question_banks += @current_user.assessment_question_banks.active
       end
       if params[:inherited] == '1' && @context != @current_user && @context.grants_right?(@current_user, nil, :read_question_banks) 
-        @question_banks += @context.inherited_assessment_question_banks
+        @question_banks += @context.inherited_assessment_question_banks.active
       end
       @question_banks = @question_banks.select{|b| b.grants_right?(@current_user, nil, :manage) } if params[:managed] == '1'
       @question_banks = @question_banks.uniq.sort_by{|b| b.title || "zzz" }
