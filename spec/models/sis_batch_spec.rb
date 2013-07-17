@@ -333,6 +333,9 @@ s2,test_1,section2,active},
           :batch_mode => true, :batch_mode_term => @term)
       @user.reload.should be_registered
       @section.reload.should be_deleted
+      @section.enrollments.not_fake.each do |e|
+        e.should be_deleted
+      end
       @course.reload.should be_claimed
 
       # only supply courses
