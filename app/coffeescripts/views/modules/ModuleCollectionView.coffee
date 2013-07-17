@@ -7,6 +7,12 @@ define [
 ], ($, template, ModuleView, PaginatedCollectionView, I18n) ->
 
   class ModulesCollectionView extends PaginatedCollectionView
-
     template: template
     itemView: ModuleView
+
+    @optionProperty 'editable'
+
+    toJSON: ->
+      json = super
+      json.editable = @editable
+      json

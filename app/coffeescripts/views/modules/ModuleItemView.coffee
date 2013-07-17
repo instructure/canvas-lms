@@ -6,5 +6,5 @@ define [
 ], ($, Backbone, template, I18n) ->
 
   class ModuleItemView extends Backbone.View
-
     template: template
+    tagName: 'li'

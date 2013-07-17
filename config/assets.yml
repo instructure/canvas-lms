@@ -38,6 +38,8 @@ stylesheets:
     - public/stylesheets/compiled/print.css
   context_modules: 
     - public/stylesheets/compiled/context_modules.css
+  context_modules2: 
+    - public/stylesheets/compiled/context_modules2.css
   dashboard:
     - public/stylesheets/compiled/dashboard_messages.css
     - public/stylesheets/compiled/dashboard_activity.css

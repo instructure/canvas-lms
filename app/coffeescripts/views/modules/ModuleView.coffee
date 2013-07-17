@@ -9,6 +9,7 @@ define [
   class ModuleView extends Backbone.View
 
     template: template
+    className: 'module item-group-condensed'
 
     els:
       '.module_items': '$items'

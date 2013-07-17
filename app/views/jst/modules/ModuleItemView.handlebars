@@ -1,3 +1,35 @@
-<div>
-  (Item) - <a href="{{html_url}}">{{title}}</a>
+<div class="ig-row">
+  <!-- temporary, anticipating font-icon -->
+  <span class="editable-show" style="color: grey;padding: 10px 8px;position: absolute;">:: </span>
+
+  <a href="{{html_url}}" class="ig-title ellipses indent-1">
+    <!-- span class="type_icon" title="Quiz">
+      <i class="icon-document" aria-label="Item type: Document"></i>
+      <i class="icon-download" aria-label="Item type: Download"></i>
+      <i class="icon-discussion" aria-label="Item type: Discussion"></i>
+      <i class="icon-assignment" aria-label="Item type: Assignment"></i>
+      <i class="icon-quiz" aria-label="Item type: Quiz"></i>
+      <i class="icon-link" aria-label="Item type: Link"></i>
+    </span -->
+    <i class="icon-assignment"></i> {{title}}
+  </a>
+  <div class="ig-details row-fluid">
+    <div class="span4 ellipses"><strong>{{#t "module_item.available"}}Available{{/t}}</strong> Nov 1</div>
+    <div class="span4 ellipses"><strong>{{#t "module_item.due"}}Due{{/t}}</strong> Nov 4, 2012</div>
+    <div class="span4 ellipses">-/10 {{#t "module_item.points_abbreviated"}}pts{{/t}}</div>
+  </div>
+  <div class="ig-admin editable-show">
+    <a class="ig-publish-btn">
+      <i class="icon-unpublished"></i>
+      <i class="icon-publish"></i>
+    </a>
+
+    <a href="#" class="al-trigger">
+      <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
+    </a>
+    <ul class="al-options">
+      <li><a href="#">{{#t "button.edit"}}Edit{{/t}}</a></li>
+      <li><a href="#">{{#t "button.delete"}}Delete{{/t}}</a></li>
+    </ul>
+  </div>
 </div>
