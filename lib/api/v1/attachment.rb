@@ -35,7 +35,7 @@ module Api::V1::Attachment
     # of queries
     submission_attachment = options[:submission_attachment]
 
-    # this seems like a stupid amount of branching but it's too avoid expensive
+    # this seems like a stupid amount of branching but it avoids expensive
     # permission checks
     hidden_for_user = if submission_attachment
                         false
