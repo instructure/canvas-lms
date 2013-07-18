@@ -674,7 +674,7 @@ describe DiscussionTopic do
       @topic2.subscribers.should_not include(@student)
     end
   end
-  
+
   context "posters" do
     before :each do
       @teacher = course_with_teacher(:active_all => true).user
@@ -977,7 +977,7 @@ describe DiscussionTopic do
       @context = @course
       discussion_topic_model(:user => @teacher)
     end
-    
+
     it "should allow subscription" do
       @topic.subscribed?(@student).should be_false
       @topic.subscribe(@student)
@@ -989,13 +989,13 @@ describe DiscussionTopic do
       @topic.unsubscribe(@teacher)
       @topic.subscribed?(@teacher).should be_false
     end
-    
+
     it "should be idempotent" do
       @topic.subscribed?(@student).should be_false
       @topic.unsubscribe(@student)
       @topic.subscribed?(@student).should be_false
     end
-    
+
     it "should assume the author is subscribed" do
       @topic.subscribed?(@teacher).should be_true
     end
@@ -1014,6 +1014,30 @@ describe DiscussionTopic do
         @entry.destroy
         @topic.subscribed?(@student).should be_false
       end
+    end
+  end
+
+  context "subscription holds" do
+    before :each do
+      course_with_student(:active_all => true)
+      @context = @course
+    end
+
+    it "should hold when requiring an initial post" do
+      discussion_topic_model(:user => @teacher, :require_initial_post => true)
+      @topic.subscription_hold(@student, nil, nil).should eql(:initial_post_required)
+    end
+
+    it "should hold when the user is not in a group set" do
+      # i.e. when you check holds on a root topic and no child topics are for groups
+      # the user is in
+      group_discussion_assignment
+      @topic.subscription_hold(@student, nil, nil).should eql(:not_in_group_set)
+    end
+
+    it "should hold when the user is not in a group" do
+      group_discussion_assignment
+      @topic.child_topics.first.subscription_hold(@student, nil, nil).should eql(:not_in_group)
     end
   end
 

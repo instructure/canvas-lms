@@ -83,4 +83,7 @@ class Announcement < DiscussionTopic
     []
   end
 
+  def subscription_hold(user, context_enrollment, session)
+    :topic_is_announcement
+  end
 end

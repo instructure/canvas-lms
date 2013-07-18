@@ -123,7 +123,7 @@ define [
         @reply.on 'edit', => @$addRootReply?.hide()
         @reply.on 'hide', => @$addRootReply?.show()
         @reply.on 'save', (entry) =>
-          @setSubscribed(true)
+          @setSubscribed(true) unless @topic.subscription_hold
           @trigger 'addReply', entry
       @model.set 'notification', ''
       @reply.edit()

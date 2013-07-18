@@ -772,6 +772,7 @@ describe DiscussionTopicsController, :type => :integration do
   it "should work with groups" do
     group_category = @course.group_categories.create(:name => 'watup')
     group = group_category.groups.create!(:name => "group1", :context => @course)
+    group.add_user(@user)
     attachment = create_attachment(group)
     gtopic = create_topic(group, :title => "Group Topic 1", :message => "<p>content here</p>", :attachment => attachment)
 
@@ -1590,14 +1591,14 @@ describe DiscussionTopicsController, :type => :integration do
                    { :controller => "discussion_topics_api", :action => "subscribe_topic", :format => "json", :course_id => course.id.to_s, :topic_id => topic.id.to_s})
       response.status.to_i
     end
-    
+
     def call_unsubscribe(topic, user, course=@course)
       @user = user
       raw_api_call(:delete, "/api/v1/courses/#{course.id}/discussion_topics/#{topic.id}/subscribed",
                    { :controller => "discussion_topics_api", :action => "unsubscribe_topic", :format => "json", :course_id => course.id.to_s, :topic_id => topic.id.to_s})
       response.status.to_i
     end
-    
+
     it "should allow subscription" do
       call_subscribe(@topic1, @teacher).should == 204
       @topic1.subscribed?(@teacher).should be_true
@@ -1620,7 +1621,7 @@ describe DiscussionTopicsController, :type => :integration do
         call_subscribe(@topic2, @student).should == 204
         @topic2.subscribed?(@student).should be_true
       end
-      
+
       it "should not allow subscription without an initial post" do
         call_subscribe(@topic2, @student).should == 403
       end
@@ -1642,7 +1643,35 @@ describe DiscussionTopicsController, :type => :integration do
       end
     end
   end
-  
+
+  context "subscription holds" do
+    it "should hold when an initial post is required" do
+      @topic = create_topic(@course, :require_initial_post => true)
+      student_in_course(:active_all => true)
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics",
+                      { :controller => "discussion_topics", :action => "index", :format => "json", :course_id => @course.id.to_s })
+      json[0]['subscription_hold'].should eql('initial_post_required')
+    end
+
+    it "should hold when the user isn't in a group set" do
+      teacher_in_course(:active_all => true)
+      group_discussion_assignment
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics",
+                      { :controller => "discussion_topics", :action => "index", :format => "json", :course_id => @course.id.to_s })
+      json[0]['subscription_hold'].should  eql('not_in_group_set')
+    end
+
+    it "should hold when the user isn't in a group" do
+      teacher_in_course(:active_all => true)
+      group_discussion_assignment
+      child = @topic.child_topics.first
+      group = child.context
+      json = api_call(:get, "/api/v1/groups/#{group.id}/discussion_topics",
+                      { :controller => "discussion_topics", :action => "index", :format => "json", :group_id => group.id.to_s })
+      json[0]['subscription_hold'].should eql('not_in_group')
+    end
+  end
+
   describe "threaded discussions" do
     before do
       student_in_course(:active_all => true)

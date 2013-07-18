@@ -296,6 +296,22 @@ class DiscussionTopic < ActiveRecord::Base
     topic_participant.try(:unread_entry_count) || self.default_unread_count
   end
 
+  # Cases where you CAN'T subscribe:
+  #  - initial post is required and you haven't made one
+  #  - it's an announcement
+  #  - this is a root level graded group discussion and you aren't in any of the groups
+  #  - this is group level discussion and you aren't in the group
+  def subscription_hold(user, context_enrollment, session)
+    case
+    when initial_post_required?(user, context_enrollment, session)
+      :initial_post_required
+    when root_topic? && !child_topic_for(user)
+      :not_in_group_set
+    when context.is_a?(Group) && !context.has_member?(user)
+      :not_in_group
+    end
+  end
+
   def subscribed?(current_user = nil)
     current_user ||= self.current_user
     return false unless current_user # default for logged out user
@@ -315,7 +331,7 @@ class DiscussionTopic < ActiveRecord::Base
         participant.subscribed
       end
     else
-      current_user == user
+      current_user == user && !why_cant_user_subscribe?(current_user, nil, nil)
     end
   end
 
@@ -339,10 +355,14 @@ class DiscussionTopic < ActiveRecord::Base
     end
   end
 
-  def change_child_topic_subscribed_state(new_state, current_user)
-    group_ids = current_user.group_memberships.active.pluck(:group_id) &
+  def child_topic_for(user)
+    group_ids = user.group_memberships.active.pluck(:group_id) &
       context.groups.active.pluck(:id)
-    topic = child_topics.where(context_id: group_ids, context_type: 'Group').first
+    child_topics.where(context_id: group_ids, context_type: 'Group').first
+  end
+
+  def change_child_topic_subscribed_state(new_state, current_user)
+    topic = child_topic_for(current_user)
     topic.update_or_create_participant(current_user: current_user, subscribed: new_state)
   end
   protected :change_child_topic_subscribed_state
