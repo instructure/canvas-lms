@@ -184,7 +184,7 @@ describe GroupMembership do
       student_group = student_organized.groups.create!(:context => @course, :join_level => "parent_context_auto_join")
       GroupMembership.new(:user => @student, :group => student_group).grants_right?(@student, :create).should be_true
 
-      course_groups = @course.group_categories.create!
+      course_groups = group_category
       course_groups.configure_self_signup(true, false)
       course_groups.save!
       course_group = course_groups.groups.create!(:context => @course, :join_level => "invitation_only")
@@ -194,13 +194,13 @@ describe GroupMembership do
     it "should allow someone to be added to a non-community group" do
       course_with_teacher(:active_all => true)
       student_in_course(:active_all => true)
-      course_groups = @course.group_categories.create!
+      course_groups = group_category
       course_group = course_groups.groups.create!(:context => @course, :join_level => "invitation_only")
       GroupMembership.new(:user => @student, :group => course_group).grants_right?(@teacher, :create).should be_true
 
       @account = @course.root_account
       account_admin_user(:active_all => true, :account => @account)
-      account_groups = @account.group_categories.create!
+      account_groups = group_category(context: @account)
       account_group = account_groups.groups.create!(:context => @account)
       GroupMembership.new(:user => @student, :group => account_group).grants_right?(@admin, :create).should be_true
     end

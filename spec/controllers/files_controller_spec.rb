@@ -613,7 +613,7 @@ describe FilesController do
     it "should associate assignment submission for a group assignment with the group" do
       course_with_teacher(:active_all => true)
       student_in_course(:active_all => true)
-      category = @course.group_categories.create
+      category = group_category
       assignment = @course.assignments.create(:group_category => category, :submission_types => 'online_upload')
       group = category.groups.create(:context => @course)
       group.add_user(@student)

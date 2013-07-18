@@ -85,7 +85,7 @@ describe "announcements" do
     end
 
     it "should allow a group member to create an announcement" do
-      gc = @course.group_categories.create!
+      gc = group_category
       group = gc.groups.create!(:context => @course)
       group.add_user(@student, 'accepted')
 

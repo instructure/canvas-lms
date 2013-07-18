@@ -393,7 +393,7 @@ describe CalendarEvent do
         student_in_course(:course => @course, :active_all => true)
         @student2 = @user
 
-        c1 = @course.group_categories.create
+        c1 = group_category
         @group = c1.groups.create(:context => @course)
         @group.users << @student1 << @student2
 
@@ -557,9 +557,9 @@ describe CalendarEvent do
     it "should enforce the group category" do
       teacher = user(:active_all => true)
       @course.enroll_teacher(teacher).accept!
-      c1 = @course.group_categories.create
+      c1 = group_category
       g1 = c1.groups.create(:context => @course)
-      c2 = @course.group_categories.create
+      c2 = group_category(name: "bar")
       g2 = c2.groups.create(:context => @course)
 
       ag = AppointmentGroup.create(:title => "test", :contexts => [@course], :sub_context_codes => [c1.asset_string],

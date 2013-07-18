@@ -389,7 +389,7 @@ describe AssignmentsApiController, :type => :integration do
       @group = @course.assignment_groups.create!({:name => "some group"})
       @course.assignment_groups.create!({:name => "last group",
         :position => 2})
-      @group_category = @course.group_categories.create!
+      @group_category = @course.group_categories.create!(name: "foo")
       @course.any_instantiation.expects(:turnitin_enabled?).
         at_least_once.returns true
       @json = api_create_assignment_in_course(@course,
@@ -669,7 +669,7 @@ describe AssignmentsApiController, :type => :integration do
                                                   :due_at => nil)
         @assignment.update_attribute(:muted, false)
         @assignment.assignment_group = @start_group
-        @assignment.group_category = @assignment.context.group_categories.create!
+        @assignment.group_category = @assignment.context.group_categories.create!(name: "foo")
         @assignment.save!
 
         @new_grading_standard = grading_standard_for(@course)

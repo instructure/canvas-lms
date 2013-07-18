@@ -21,7 +21,7 @@ module Api::V1::GroupCategory
   include Api::V1::Context
 
   API_GROUP_CATEGORY_JSON_OPTS = {
-      :only => %w(id name role self_signup)
+    :only => %w(id name role self_signup group_limit)
   }
 
   def group_category_json(group_category, user, session, options = {})

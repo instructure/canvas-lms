@@ -430,8 +430,9 @@ describe Group do
   end
 
   it "as_json should include group_category" do
-    group_category = GroupCategory.create(:name => "Something")
-    group = Group.create(:group_category => group_category)
+    course()
+    gc = group_category(name: "Something")
+    group = Group.create(:group_category => gc)
     hash = ActiveSupport::JSON.decode(group.to_json)
     hash["group"]["group_category"].should == "Something"
   end

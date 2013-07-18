@@ -83,7 +83,7 @@ describe AssignmentOverrideApplicator do
 
     context "group overrides" do
       before :each do
-        @category = @course.group_categories.create!
+        @category = group_category
         @group = @category.groups.create!
 
         @assignment.group_category = @category
@@ -198,7 +198,7 @@ describe AssignmentOverrideApplicator do
     end
 
     it "should order adhoc override before group override" do
-      @category = @course.group_categories.create!
+      @category = group_category
       @group = @category.groups.create!
       @membership = @group.add_user(@student)
       @assignment.group_category = @category
@@ -220,7 +220,7 @@ describe AssignmentOverrideApplicator do
     end
 
     it "should order group override before section overrides" do
-      @category = @course.group_categories.create!
+      @category = group_category
       @group = @category.groups.create!
       @membership = @group.add_user(@student)
       @assignment.group_category = @category

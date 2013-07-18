@@ -117,7 +117,7 @@ describe "dashboard" do
       @other_student = @user
       @user = @me
 
-      @group = @course.group_categories.create.groups.create(:context => @course)
+      @group = group_category.groups.create(context: @course)
       @group.users << @other_student << @user
       # appointment group publish notification and signup notification
       appointment_participant_model(:course => @course, :participant => @group, :updating_user => @other_student)

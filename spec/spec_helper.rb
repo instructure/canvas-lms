@@ -449,6 +449,11 @@ Spec::Runner.configure do |config|
     user_session(@user)
   end
 
+  def group_category(opts = {})
+    context = opts[:context] || @course
+    @group_category = context.group_categories.create!(name: opts[:name] || 'foo')
+  end
+
   def custom_role(base, name, opts={})
     account = opts[:account] || @account
     role = account.roles.find_by_name(name)

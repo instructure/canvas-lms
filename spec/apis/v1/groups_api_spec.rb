@@ -575,7 +575,7 @@ describe "Groups API", :type => :integration do
 
     it "should find people when inviting to a group in a non-default account" do
       @account = Account.create!
-      @category = @account.group_categories.create!
+      @category = @account.group_categories.create!(name: "foo")
       @group = group_model(:name => "Blah", :group_category => @category, :context => @account)
 
       @moderator = user_model
@@ -597,7 +597,7 @@ describe "Groups API", :type => :integration do
 
     it "should allow being added to a non-community account group" do
       @account = Account.default
-      @category = @account.group_categories.create!
+      @category = @account.group_categories.create!(name: "foo")
       @group = group_model(:group_category => @category, :context => @account)
 
       @to_add = user_with_pseudonym(:account => @account, :active_all => true)

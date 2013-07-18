@@ -191,7 +191,7 @@ describe AssignmentOverridesController, :type => :integration do
     end
 
     it "should include proper set fields when set is a group" do
-      @assignment.group_category = @course.group_categories.create!
+      @assignment.group_category = @course.group_categories.create!(name: "foo")
       @assignment.save!
 
       @group = @course.groups.create!(:name => 'my group', :group_category => @assignment.group_category)
@@ -379,7 +379,7 @@ describe AssignmentOverridesController, :type => :integration do
       end
 
       it "should error if the assignment is a group assignment" do
-        @assignment.group_category = @course.group_categories.create!
+        @assignment.group_category = @course.group_categories.create!(name: "foo")
         @assignment.save!
 
         raw_api_create_override(@course, @assignment, :assignment_override => { :student_ids => [@student.id], :title => @title })
@@ -389,7 +389,7 @@ describe AssignmentOverridesController, :type => :integration do
 
     context "group" do
       before :each do
-        @assignment.group_category = @course.group_categories.create!
+        @assignment.group_category = @course.group_categories.create!(name: "foo")
         @assignment.save!
         @group = group_model(:context => @course, :group_category => @assignment.group_category)
       end
@@ -438,7 +438,7 @@ describe AssignmentOverridesController, :type => :integration do
       end
 
       it "should not error if the assignment is a group assignment" do
-        @assignment.group_category = @course.group_categories.create!
+        @assignment.group_category = @course.group_categories.create!(name: "foo")
         @assignment.save!
 
         api_create_override(@course, @assignment, :assignment_override => { :course_section_id => @course.default_section.id })
@@ -474,7 +474,7 @@ describe AssignmentOverridesController, :type => :integration do
       end
 
       it "should ignore course_section_id if there is a group_id" do
-        @assignment.group_category = @course.group_categories.create!
+        @assignment.group_category = @course.group_categories.create!(name: "foo")
         @assignment.save!
         @group = group_model(:context => @course, :group_category => @assignment.group_category)
 
@@ -690,7 +690,7 @@ describe AssignmentOverridesController, :type => :integration do
 
     context "group override" do
       before :each do
-        @assignment.group_category = @course.group_categories.create!
+        @assignment.group_category = @course.group_categories.create!(name: "foo")
         @assignment.save!
         @group = group_model(:context => @course, :group_category => @assignment.group_category)
 

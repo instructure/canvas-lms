@@ -68,16 +68,10 @@ describe GroupCategoriesController do
       response.should_not be_success
     end
 
-    it "should default an empty or missing name to 'Study Groups'" do
+    it "should require the group name" do
       course_with_teacher_logged_in(:active_all => true)
       post 'create', :course_id => @course.id, :category => {}
-      response.should be_success
-      assigns[:group_category].name.should == "Study Groups"
-      assigns[:group_category].destroy
-
-      post 'create', :course_id => @course.id, :category => {:name => ''}
-      response.should be_success
-      assigns[:group_category].name.should == "Study Groups"
+      response.should_not be_success
     end
 
     it "should respect enable_self_signup" do
@@ -127,14 +121,6 @@ describe GroupCategoriesController do
       assigns[:group_category].should_not be_nil
       assigns[:group_category].should be_restricted_self_signup
     end
-
-    it "should work when the context is an account and not enable_self_signup and split_groups" do
-      user = account_admin_user
-      user_session(user)
-      post 'create', :account_id => Account.default, :category => {:name => "Study Groups", :split_group_count => 1, :split_groups => '1'}
-      response.should be_success
-      assigns[:group_category].should_not be_nil
-    end
   end
 
   describe "PUT update" do
@@ -164,11 +150,10 @@ describe GroupCategoriesController do
       assigns[:group_category].name.should == "My Category"
     end
 
-    it "should treat a sent but empty name as 'Study Groups'" do
+    it "should not accept a sent but empty name" do
       user_session(@user)
       put 'update', :course_id => @course.id, :id => @group_category.id, :category => {:name => ''}
-      response.should be_success
-      assigns[:group_category].name.should == "Study Groups"
+      response.should_not be_success
     end
 
     it "should error if the name is protected" do

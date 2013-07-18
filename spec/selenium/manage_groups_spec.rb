@@ -208,19 +208,19 @@ describe "manage groups" do
 
     max_length_name = "jkljfdklfjsaklfjasfjlsaklfjsafsaffdafdjasklsajfjskjkljfdklfjsaklfjasfjlsaklfjsafsaffdafdjasklsajfjskjkljfdklfjsaklfjasfjlsaklfjsafsaffdafdjasklsajfjskjkljfdklfjsaklfjasfjlsaklfjsafsaffdafdjasklsajfjskjkljfdklfjsaklfjasfjlsaklfjsafsaffdafdjasklsajfjskfffff"
 
-    it "should create a new student group with a 255 character name when creating groups manually" do
+    it "should create a new group category with a 255 character name when creating groups manually" do
       replace_content(f('#add_category_form input[name="category[name]"]'), max_length_name)
       submit_form(@form)
       wait_for_ajaximations
       GroupCategory.find_by_name(max_length_name).should be_present
     end
 
-    it "should not create a new student group if the name is over 250 characters" do
+    it "should not create a new group category if the generated group names will exceed 255 characters" do
       replace_content(f('#add_category_form input[name="category[name]"]'), max_length_name)
       f('#category_split_groups').click
       submit_form(@form)
       wait_for_ajaximations
-      ff('.error_box').last.text.should == 'Enter a shorter category name to split students into groups'
+      ff('.error_box').last.text.should == 'Enter a shorter category name'
       GroupCategory.find_by_name(max_length_name).should_not be_present
       @form.should be_displayed
     end

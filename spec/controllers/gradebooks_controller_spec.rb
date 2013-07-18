@@ -288,7 +288,7 @@ describe GradebooksController do
       end
 
       it "should reflect group overrides when student is a member" do
-        @assignment.group_category = @course.group_categories.create!
+        @assignment.group_category = group_category
         @assignment.save!
         group = @assignment.group_category.groups.create!(:context => @course)
         group.add_user(@student)
@@ -301,7 +301,7 @@ describe GradebooksController do
       end
 
       it "should not reflect group overrides when student is not a member" do
-        @assignment.group_category = @course.group_categories.create!
+        @assignment.group_category = group_category
         @assignment.save!
         group = @assignment.group_category.groups.create!(:context => @course)
 

@@ -18,13 +18,49 @@
 
 class GroupCategory < ActiveRecord::Base
   attr_accessible :name, :role, :context
+  attr_reader :create_group_count
+  attr_accessor :assign_unassigned_members
+
   belongs_to :context, :polymorphic => true
   has_many :groups, :dependent => :destroy
   has_many :assignments, :dependent => :nullify
   has_many :progresses, :as => 'context', :dependent => :destroy
   has_one :current_progress, :as => 'context', :class_name => 'Progress', :conditions => "workflow_state IN ('queued','running')", :order => 'created_at'
-  validates_length_of :name, :maximum => maximum_string_length, :allow_nil => true, :allow_blank => true
-  validates_numericality_of :group_limit, :greater_than => 1, :allow_nil => true
+
+  after_save :auto_create_groups
+
+  validates_each :name do |record, attr, value|
+    next unless record.name_changed? || value.blank?
+    max_len = maximum_string_length
+    max_len -= record.create_group_count.to_s.length + 1 if record.create_group_count
+
+    if value.blank?
+      record.errors.add attr, t(:name_required, "Name is required")
+    elsif GroupCategory.protected_name_for_context?(value, record.context)
+      record.errors.add attr, t(:name_reserved, "%{name} is a reserved name.", name: value)
+    elsif record.context && record.context.group_categories.other_than(record).find_by_name(value)
+      record.errors.add attr, t(:name_unavailable, "%{name} is already in use.", name: value)
+    elsif value.length > max_len
+      record.errors.add attr, t(:name_too_long, "Enter a shorter category name")
+    end
+  end
+
+  validates_each :group_limit do |record, attr, value|
+    next if value.nil?
+    record.errors.add attr, t(:greater_than_1, "Must be greater than 1") unless value.to_i > 1
+  end
+
+  validates_each :self_signup do |record, attr, value|
+    next unless record.self_signup_changed?
+    next if value.blank?
+    if !record.context.is_a?(Course) && record != communities_for(record.context)
+      record.errors.add :enable_self_signup, t(:self_signup_for_courses, "Self-signup may only be enabled for course groups or communities")
+    elsif value != 'enabled' && value != 'restricted'
+      record.errors.add attr, t(:invalid_self_signup, "Self-signup needs to be one of the following values: %{values}", values: "null, 'enabled', 'restricted'")
+    elsif record.restricted_self_signup? && record.has_heterogenous_group?
+      record.errors.add :restrict_self_signup, t(:cant_restrict_self_signup, "Can't restrict self-signup while a mixed-section group exists in the category")
+    end
+  end
 
   scope :active, where(:deleted_at => nil)
 
@@ -74,8 +110,10 @@ class GroupCategory < ActiveRecord::Base
 
     def role_category_for_context(role, context)
       return unless context and protected_role_for_context?(role, context)
-      context.group_categories.find_by_role(role) ||
-      context.group_categories.create(:name => name_for_role(role), :role => role)
+      category = context.group_categories.find_by_role(role) ||
+                 context.group_categories.build(:name => name_for_role(role), :role => role)
+      category.save(false) if category.new_record?
+      category
     end
   end
 
@@ -185,6 +223,27 @@ class GroupCategory < ActiveRecord::Base
     Group.where(:id => touched_groups.to_a).update_all(:updated_at => Time.now.utc) unless touched_groups.empty?
     complete_progress
     return new_memberships
+  end
+
+  def create_group_count=(num)
+    @create_group_count = num && num > 0 ?
+      [num, Setting.get_cached('max_groups_in_new_category', '200').to_i].min :
+      nil
+  end
+
+  def auto_create_groups
+    create_groups(@create_group_count) if @create_group_count && @create_group_count > 0
+    assign_unassigned_members if @assign_unassigned_members
+    @create_group_count = @assign_unassigned_members = nil
+  end
+
+  def create_groups(num)
+    group_name = name
+    # TODO i18n
+    group_name = group_name.singularize if I18n.locale == :en
+    num.times do |idx|
+      groups.create(name: "#{group_name} #{idx + 1}", :context => context)
+    end
   end
 
   def assign_unassigned_members

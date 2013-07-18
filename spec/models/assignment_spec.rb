@@ -578,7 +578,7 @@ describe Assignment do
 
   it "should destroy group overrides when the group category changes" do
     @assignment = assignment_model
-    @assignment.group_category = @assignment.context.group_categories.create!
+    @assignment.group_category = group_category(context: @assignment.context)
     @assignment.save!
 
     overrides = 5.times.map do
@@ -590,7 +590,7 @@ describe Assignment do
       override
     end
 
-    @assignment.group_category = @assignment.context.group_categories.create!
+    @assignment.group_category = group_category(context: @assignment.context, name: "bar")
     @assignment.save!
 
     overrides.each do |override|

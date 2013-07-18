@@ -1,5 +1,6 @@
 <% form_tag '#', :id => "edit_category_form", :style => "margin-bottom: 1em; display: none;" do %>
   <%= text_field_tag 'category[name]', nil, :style => "font-size: 150%; width: 95%; padding: 0.2em; margin-bottom: 0.2em;" %>
+  <% unless @context.is_a?(Account) %>
   <div style="margin: 0.5em 0;">
     <%= check_box_tag 'category[enable_self_signup]', "1", false, :id => 'category_enable_self_signup' %>
     <%= label_tag :enable_self_signup, t(:allow_self_signup, "Allow self sign-up") %>
@@ -16,6 +17,7 @@
       :wrapper => '<label for="category_group_limit">\1</label>' %>
     <small class="muted"><%= t :group_limit_blank, '(leave blank for no limit)' %></small>
   </div>
+  <% end %>
   <div class="form-actions">
     <button type="button" class="btn cancel_button"><%= t '#buttons.cancel', 'Cancel' %></button>
     <button type="submit" class="btn btn-primary submit_button"><%= t '#buttons.update', 'Update' %></button>

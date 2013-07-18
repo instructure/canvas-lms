@@ -27,7 +27,8 @@ describe "Group Categories API", :type => :integration do
       'role' => category.role,
       'self_signup' => category.self_signup,
       'context_type' => category.context_type,
-      "#{category.context_type.downcase}_id" => category.context_id
+      "#{category.context_type.downcase}_id" => category.context_id,
+      'group_limit' => category.group_limit
     }
   end
 
@@ -67,7 +68,7 @@ describe "Group Categories API", :type => :integration do
         json = api_call(:post, "/api/v1/courses/#{@course.id}/group_categories",
                         @category_path_options.merge(:action => 'create',
                                                      :course_id => @course.to_param),
-                        { 'name' => @name, 'split_group_count' => 3 })
+                        { 'name' => 'category', 'split_group_count' => 3 })
 
         @user_antisocial = user(:name => "antisocial")
         @course.enroll_user(@user,'StudentEnrollment',:enrollment_state => :active)
@@ -201,29 +202,33 @@ describe "Group Categories API", :type => :integration do
         groups.count.should == 3
       end
 
-      it "should not allow both 'enable_self_signup' and 'split_group_count'" do
-        raw_api_call(:post, "/api/v1/courses/#{@course.id}/group_categories",
-                     @category_path_options.merge(:action => 'create',
-                                                  :course_id => @course.to_param),
-                     {
-                       'name' => @name,
-                       'enable_self_signup' => '1',
-                       'split_group_count' => 3
-                     }
+      it "should ignore 'split_group_count' if 'enable_self_signup'" do
+        json = api_call(:post, "/api/v1/courses/#{@course.id}/group_categories",
+                        @category_path_options.merge(:action => 'create',
+                                                     :course_id => @course.to_param),
+                        {
+                          'name' => @name,
+                          'enable_self_signup' => '1',
+                          'split_group_count' => 3
+                        }
         )
-        response.code.should == '400'
+        category = GroupCategory.find(json["id"])
+        category.self_signup.should == "enabled"
+        category.groups.active.should be_empty
       end
 
-      it "should not allow 'create_group_count' without 'enable_self_signup'" do
-        raw_api_call(:post, "/api/v1/courses/#{@course.id}/group_categories",
-                     @category_path_options.merge(:action => 'create',
-                                                  :course_id => @course.to_param),
-                     {
-                       'name' => @name,
-                       'create_group_count' => 3
-                     }
+      it "should prefer 'split_group_count' over 'create_group_count' if not 'enable_self_signup'" do
+        json = api_call(:post, "/api/v1/courses/#{@course.id}/group_categories",
+                        @category_path_options.merge(:action => 'create',
+                                                     :course_id => @course.to_param),
+                        {
+                          'name' => @name,
+                          'create_group_count' => 3,
+                          'split_group_count' => 2
+                        }
         )
-        response.code.should == '400'
+        category = GroupCategory.find(json["id"])
+        category.groups.active.size.should == 2
       end
 
       describe "teacher actions with a group" do
@@ -486,16 +491,17 @@ describe "Group Categories API", :type => :integration do
         json.first['id'].should == @communities.id
       end
 
-      it "should not allow 'split_group_count' for a non course group" do
-        raw_api_call(:post, "/api/v1/accounts/#{@account.id}/group_categories",
-                     @category_path_options.merge(:action => 'create',
-                                                  :account_id => @account.to_param),
-                     {
-                         'name' => @name,
-                         'split_group_count' => 3
-                     }
+      it "should ignore 'split_group_count' for a non course group" do
+        json = api_call(:post, "/api/v1/accounts/#{@account.id}/group_categories",
+                        @category_path_options.merge(:action => 'create',
+                                                     :account_id => @account.to_param),
+                        {
+                            'name' => 'category',
+                            'split_group_count' => 3
+                        }
         )
-        response.code.should == '400'
+        category = GroupCategory.find(json["id"])
+        category.groups.active.should be_empty
       end
 
       it "should allow admins to retrieve a group category" do
