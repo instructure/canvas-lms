@@ -5,6 +5,7 @@ define [
   'compiled/collections/GroupCollection'
   'compiled/collections/GroupUserCollection'
   'compiled/models/Group'
+  'helpers/fakeENV'
 ], ($, UnassignedUsersView, AssignToGroupMenu, GroupCollection, GroupUserCollection, Group) ->
 
   clock = null
