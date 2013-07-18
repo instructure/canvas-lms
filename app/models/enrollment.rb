@@ -875,13 +875,13 @@ class Enrollment < ActiveRecord::Base
     if Rails.version < '3.0'
       {
         :joins => { :user => :communication_channels },
-        :conditions => ["users.workflow_state='creation_pending' AND communication_channels.workflow_state='unconfirmed' AND path_type='email' AND LOWER(path)=?", email.downcase],
+        :conditions => ["users.workflow_state='creation_pending' AND communication_channels.workflow_state='unconfirmed' AND path_type='email' AND LOWER(path)=LOWER(?)", email],
         :select => 'enrollments.*',
         :readonly => false
       }
     else
       joins(:user => :communication_channels).
-          where("users.workflow_state='creation_pending' AND communication_channels.workflow_state='unconfirmed' AND path_type='email' AND LOWER(path)=?", email.downcase).
+          where("users.workflow_state='creation_pending' AND communication_channels.workflow_state='unconfirmed' AND path_type='email' AND LOWER(path)=LOWER(?)", email).
           select("enrollments.*").
           readonly(false)
     end

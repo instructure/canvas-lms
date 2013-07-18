@@ -113,7 +113,7 @@ class Pseudonym < ActiveRecord::Base
     if %w{mysql mysql2}.include?(connection_pool.spec.config[:adapter])
       where(:unique_id => unique_id)
     else
-      where("LOWER(#{quoted_table_name}.unique_id)=?", unique_id.mb_chars.downcase)
+      where("LOWER(#{quoted_table_name}.unique_id)=LOWER(?)", unique_id)
     end
   }
 

@@ -125,7 +125,7 @@ class CommunicationChannel < ActiveRecord::Base
     return if path.nil?
     return if retired?
     return unless user_id
-    conditions = ["LOWER(path)=? AND user_id=? AND path_type=? AND workflow_state IN('unconfirmed', 'active')", path.mb_chars.downcase, user_id, path_type]
+    conditions = ["LOWER(path)=LOWER(?) AND user_id=? AND path_type=? AND workflow_state IN('unconfirmed', 'active')", path, user_id, path_type]
     unless new_record?
       conditions.first << " AND id<>?"
       conditions << id
@@ -224,7 +224,7 @@ class CommunicationChannel < ActiveRecord::Base
     if %{mysql mysql2}.include?(connection_pool.spec.config[:adapter])
       where(:path => path)
     else
-      where("LOWER(communication_channels.path)=?", path.try(:downcase))
+      where("LOWER(communication_channels.path)=LOWER(?)", path)
     end
   }
 
