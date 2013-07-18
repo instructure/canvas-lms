@@ -412,6 +412,12 @@ describe AssignmentOverrideApplicator do
     it "should not cast dates to zoned datetimes" do
       @overridden.all_day_date.class.should == Date
     end
+
+    it "should copy pre-loaded associations" do
+      @overridden.loaded_context?.should == @assignment.loaded_context?
+      @overridden.loaded_rubric?.should == @assignment.loaded_rubric?
+      @overridden.learning_outcome_alignments.loaded? == @assignment.learning_outcome_alignments.loaded?
+    end
   end
 
   describe "collapsed_overrides" do

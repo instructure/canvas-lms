@@ -1386,8 +1386,9 @@ describe AssignmentsApiController, :type => :integration do
 
     context "when turnitin_enabled is true on the context" do
       before {
-        @course.any_instantiation.expects(:turnitin_enabled?).
-          at_least_once.returns true
+        @domain_root_account.update_attributes! turnitin_account_id: 1234,
+                                                turnitin_shared_secret: 'foo',
+                                                turnitin_host: 'example.com'
       }
 
       it "contains a turnitin_enabled key" do
@@ -1396,11 +1397,6 @@ describe AssignmentsApiController, :type => :integration do
     end
 
     context "when turnitin_enabled is false on the context" do
-      before {
-        @course.any_instantiation.expects(:turnitin_enabled?).
-          at_least_once.returns false
-      }
-
       it "does not contain a turnitin_enabled key" do
         result.has_key?('turnitin_enabled').should == false
       end

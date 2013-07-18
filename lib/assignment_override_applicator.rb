@@ -150,6 +150,8 @@ module AssignmentOverrideApplicator
     # ActiveRecord::Base#clone nils out the primary key; put it back
     cloned_assignment_or_quiz = unoverridden_assignment_or_quiz.clone
     cloned_assignment_or_quiz.id = unoverridden_assignment_or_quiz.id
+    self.copy_preloaded_associations_to_clone(assignment_or_quiz,
+                                              cloned_assignment_or_quiz)
 
     # update attributes with overrides
     if overrides
@@ -169,6 +171,13 @@ module AssignmentOverrideApplicator
     cloned_assignment_or_quiz.instance_variable_set(:@new_record, new_record)
     
     cloned_assignment_or_quiz
+  end
+
+  def self.copy_preloaded_associations_to_clone(orig, clone)
+    orig.class.reflections.keys.each do |association|
+      ivar = "@#{association}"
+      clone.instance_variable_set ivar, orig.instance_variable_get(ivar)
+    end
   end
 
   def self.quiz_with_overrides(quiz, overrides)
