@@ -1,9 +1,11 @@
+# encoding: utf-8
+
 require File.expand_path( '../spec_helper' , File.dirname(__FILE__))
 
 describe UserSearch do
 
   describe '.for_user_in_context' do
-    let(:search_names) { ['Rose Tyler', 'Martha Jones', 'Rosemary Giver', 'Martha Stewart', 'Tyler Pickett', 'Jon Stewart', 'Stewart Little'] }
+    let(:search_names) { ['Rose Tyler', 'Martha Jones', 'Rosemary Giver', 'Martha Stewart', 'Tyler Pickett', 'Jon Stewart', 'Stewart Little', 'Ĭńşŧřůćƭǜȑȩ Person'] }
     let(:course) { Course.create! }
     let(:users) { UserSearch.for_user_in_context('Stewart', course, user).to_a }
     let(:names) { users.map(&:name) }
@@ -25,6 +27,15 @@ describe UserSearch do
 
       describe 'with gist setting enabled' do
         before { Setting.set('user_search_with_gist', 'true') }
+
+        it "searches case-insensitively" do
+          UserSearch.for_user_in_context("steWArt", course, user).size.should == 3
+        end
+
+        it "uses postgres lower(), not ruby downcase()" do
+          # ruby 1.9 downcase doesn't handle the downcasing of many multi-byte characters correctly
+          UserSearch.for_user_in_context('Ĭńşŧřůćƭǜȑȩ', course, user).size.should == 1
+        end
 
         it 'returns an enumerable' do
           users.size.should == 3
@@ -180,10 +191,6 @@ describe UserSearch do
   end
 
   describe '.like_string_for' do
-    it 'lowercases the term' do
-      UserSearch.like_string_for("MickyMouse").should =~ /mickymouse/
-    end
-
     it 'uses a prefix if gist is not configured' do
       Setting.set('user_search_with_gist', 'false')
       UserSearch.like_string_for("word").should == 'word%'

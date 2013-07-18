@@ -26,7 +26,7 @@ module UserSearch
 
   def self.like_string_for(search_term)
     pattern_type = (gist_search_enabled? ? :full : :right)
-    wildcard_pattern(search_term, :type => pattern_type)
+    wildcard_pattern(search_term, :type => pattern_type, :case_sensitive => false)
   end
 
   def self.scope_for(context, searcher, options={})
@@ -84,7 +84,7 @@ module UserSearch
   end
 
   def self.like_condition(value)
-    ActiveRecord::Base.like_condition(value)
+    ActiveRecord::Base.like_condition(value, 'lower(?)')
   end
 
   def self.wildcard_pattern(value, options)
