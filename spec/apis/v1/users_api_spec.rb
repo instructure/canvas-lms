@@ -226,27 +226,51 @@ describe "Users API", :type => :integration do
   end
 
   shared_examples_for "page view api" do
-    it "should return page view history" do
-      page_view_model(:user => @student, :created_at => 2.days.ago)
-      page_view_model(:user => @student)
-      page_view_model(:user => @student, :created_at => 1.day.ago)
-      Setting.set('api_max_per_page', '2')
-      json = api_call(:get, "/api/v1/users/#{@student.id}/page_views?per_page=1000",
-                         { :controller => "page_views", :action => "index", :user_id => @student.to_param, :format => 'json', :per_page => '1000' })
-      json.size.should == 2
-      json.each { |j| j['url'].should == "http://www.example.com/courses/1" }
-      json[0]['created_at'].should be > json[1]['created_at']
-      response.headers['Link'].should match /next/
-      response.headers['Link'].should_not match /last/
-      response.headers['Link'].split(',').find { |l| l =~ /<([^>]+)>.+next/ }
-      url = $1
-      page = Rack::Utils.parse_nested_query(url)['page']
-      json = api_call(:get, url,
-                         { :controller => "page_views", :action => "index", :user_id => @student.to_param, :format => 'json', :page => page, :per_page => Setting.get('api_max_per_page', '2') })
-      json.size.should == 1
-      json.each { |j| j['url'].should == "http://www.example.com/courses/1" }
-      response.headers['Link'].should_not match /next/
-      response.headers['Link'].should_not match /last/
+    describe "page view api" do
+      before do
+        @timestamp = Time.zone.at(1.day.ago.to_i)
+        page_view_model(:user => @student, :created_at => @timestamp - 1.day)
+        page_view_model(:user => @student, :created_at => @timestamp + 1.day)
+        page_view_model(:user => @student, :created_at => @timestamp)
+      end
+
+      it "should return page view history" do
+        Setting.set('api_max_per_page', '2')
+        json = api_call(:get, "/api/v1/users/#{@student.id}/page_views?per_page=1000",
+                           { :controller => "page_views", :action => "index", :user_id => @student.to_param, :format => 'json', :per_page => '1000' })
+        json.size.should == 2
+        json.each { |j| j['url'].should == "http://www.example.com/courses/1" }
+        json[0]['created_at'].should be > json[1]['created_at']
+        response.headers['Link'].should match /next/
+        response.headers['Link'].should_not match /last/
+        response.headers['Link'].split(',').find { |l| l =~ /<([^>]+)>.+next/ }
+        url = $1
+        page = Rack::Utils.parse_nested_query(url)['page']
+        json = api_call(:get, url,
+                           { :controller => "page_views", :action => "index", :user_id => @student.to_param, :format => 'json', :page => page, :per_page => Setting.get('api_max_per_page', '2') })
+        json.size.should == 1
+        json.each { |j| j['url'].should == "http://www.example.com/courses/1" }
+        response.headers['Link'].should_not match /next/
+        response.headers['Link'].should_not match /last/
+      end
+
+      it "should recognize start_time parameter" do
+        Setting.set('api_max_per_page', '3')
+        start_time = @timestamp.iso8601
+        json = api_call(:get, "/api/v1/users/#{@student.id}/page_views?start_time=#{start_time}",
+                           { :controller => "page_views", :action => "index", :user_id => @student.to_param, :format => 'json', :start_time => start_time })
+        json.size.should == 2
+        json.each { |j| TimeHelper.try_parse(j['created_at']).to_i.should be >= @timestamp.to_i }
+      end
+
+      it "should recognize end_time parameter" do
+        Setting.set('api_max_per_page', '3')
+        end_time = @timestamp.iso8601
+        json = api_call(:get, "/api/v1/users/#{@student.id}/page_views?end_time=#{end_time}",
+                           { :controller => "page_views", :action => "index", :user_id => @student.to_param, :format => 'json', :end_time => end_time })
+        json.size.should == 2
+        json.each { |j| TimeHelper.try_parse(j['created_at']).to_i.should be <= @timestamp.to_i }
+      end
     end
   end
 

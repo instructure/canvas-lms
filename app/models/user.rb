@@ -181,8 +181,8 @@ class User < ActiveRecord::Base
     all_conversations.visible.order("last_message_at DESC, conversation_id DESC")
   end
 
-  def page_views
-    PageView.for_user(self)
+  def page_views(options={})
+    PageView.for_user(self, options)
   end
 
   scope :of_account, lambda { |account| where("EXISTS (#{account.user_account_associations.select("1").where("user_account_associations.user_id=users.id").to_sql})") }

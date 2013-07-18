@@ -228,12 +228,15 @@ class PageView < ActiveRecord::Base
   # returns a collection with very limited functionality
   # basically, it responds to #paginate and returns a
   # WillPaginate::Collection-like object
-  def self.for_user(user)
+  def self.for_user(user, options={})
     user.shard.activate do
       if cassandra?
-        PageView::EventStream.for_user(user)
+        PageView::EventStream.for_user(user, options)
       else
-        self.where(:user_id => user).order('created_at desc')
+        scope = self.where(:user_id => user).order('created_at desc')
+        scope = scope.where("created_at >= ?", options[:oldest]) if options[:oldest]
+        scope = scope.where("created_at <= ?", options[:newest]) if options[:newest]
+        scope
       end
     end
   end
