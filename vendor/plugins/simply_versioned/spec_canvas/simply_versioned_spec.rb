@@ -1,6 +1,6 @@
 require File.expand_path(File.dirname(__FILE__)+'/../../../../spec/apis/api_spec_helper')
 
-class Woozel< ActiveRecord::Base
+class Woozel < ActiveRecord::Base
   simply_versioned :explicit => true
 end
 
@@ -17,6 +17,7 @@ describe 'simply_versioned' do
   end
 
   describe "explicit versions" do
+    let(:woozel) { Woozel.create!(:name => 'Eeyore') }
     it "should create the first version on save" do
       woozel = Woozel.new(:name => 'Eeyore')
       woozel.should_not be_versioned
@@ -27,7 +28,6 @@ describe 'simply_versioned' do
     end
 
     it "should keep the last version up to date for each save" do
-      woozel = Woozel.create!(:name => 'Eeyore')
       woozel.should be_versioned
       woozel.versions.length.should eql(1)
       woozel.versions.current.model.name.should eql('Eeyore')
@@ -38,7 +38,6 @@ describe 'simply_versioned' do
     end
 
     it "should create a new version when asked to" do
-      woozel = Woozel.create!(:name => 'Eeyore')
       woozel.name = 'Piglet'
       woozel.with_versioning(:explicit => true, &:save!)
       woozel.versions.length.should eql(2)
@@ -47,7 +46,6 @@ describe 'simply_versioned' do
     end
 
     it 'should not create a new version when not explicitly asked to' do
-      woozel = Woozel.create!(:name => 'Eeyore')
       woozel.name = 'Piglet'
       woozel.with_versioning(&:save!)
       woozel.versions.length.should eql(1)
@@ -55,11 +53,30 @@ describe 'simply_versioned' do
     end
 
     it 'should not update the last version when not versioning' do
-      woozel = Woozel.create!(:name => 'Eeyore')
       woozel.name = 'Piglet'
       woozel.without_versioning(&:save!)
       woozel.versions.length.should eql(1)
       woozel.versions.current.model.name.should eql('Eeyore')
+    end
+
+    it 'should not reload one versionable association from the database' do
+      woozel.name = 'Piglet'
+      woozel.with_versioning(&:save!)
+      woozel.versions.loaded?.should == false
+      first = woozel.versions.first
+      Woozel.connection.expects(:select_all).never
+      first.versionable.should == woozel
+    end
+
+    it 'should not reload any versionable associations from the database' do
+      woozel.name = 'Piglet'
+      woozel.with_versioning(&:save!)
+      woozel.versions.loaded?.should == false
+      all = woozel.versions.all
+      Woozel.connection.expects(:select_all).never
+      all.each do |version|
+        version.versionable.should == woozel
+      end
     end
   end
 
@@ -81,6 +98,23 @@ describe 'simply_versioned' do
     it "should be false for the #model of any version" do
       @woozel.versions.current.model.should_not be_current_version
       @woozel.versions.map { |v| v.model.current_version? }.should == [false, false]
+    end
+  end
+
+  context "callbacks" do
+    let(:woozel) { Woozel.create!( name: 'test' ) }
+    context "on_load" do
+      let(:on_load) do
+        lambda { |model, version| model.name = 'test override' }
+      end
+      before do
+        woozel.simply_versioned_options[:on_load] = on_load
+        woozel.reload
+      end
+      it "can modify a version after loading" do
+        YAML::load(woozel.current_version.yaml)['name'].should == 'test'
+        woozel.current_version.model.name.should == 'test override'
+      end
     end
   end
 end

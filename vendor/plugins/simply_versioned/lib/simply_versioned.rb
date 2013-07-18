@@ -25,7 +25,8 @@ module SoftwareHeretics
         # callbacks
         :when => nil,
         :on_create => nil,
-        :on_update => nil
+        :on_update => nil,
+        :on_load => nil
       }
       
       module ClassMethods
@@ -51,6 +52,8 @@ module SoftwareHeretics
         #               that's about to be saved.
         # +on_update+ - callback to allow additional changes to an updated (see
         #               +explicit+ parameter) version that's about to be saved.
+        # +on_load+   - callback to allow processing or changes after loading
+        #               (finding) the version from the database.
         #
         # To save the record without creating a version either set +versioning_enabled+ to false
         # on the model before calling save or, alternatively, use +without_versioning+ and save
@@ -64,9 +67,13 @@ module SoftwareHeretics
           options.reverse_merge!(DEFAULTS)
           options[:exclude] = Array( options[ :exclude ] ).map( &:to_s )
           
-          has_many :versions, :order => 'number DESC', :as => :versionable, :dependent => :destroy, :extend => VersionsProxyMethods
+          has_many :versions, :order => 'number DESC', :as => :versionable,
+                   :dependent => :destroy,
+                   :inverse_of => :versionable,
+                   :extend => VersionsProxyMethods
           # INSTRUCTURE: Added to allow quick access to the most recent version
-          has_one :current_version, :class_name => 'Version', :order => 'number DESC', :as => :versionable, :dependent => :destroy, :extend => VersionsProxyMethods
+          # See 'current_version' below for the common use of current_version_unidirectional
+          has_one :current_version_unidirectional, :class_name => 'Version', :order => 'number DESC', :as => :versionable, :dependent => :destroy, :extend => VersionsProxyMethods
           # INSTRUCTURE: Lets us ignore certain things when deciding whether to store a new version
           before_save :check_if_changes_are_worth_versioning
           after_save :simply_versioned_create_version
@@ -175,6 +182,14 @@ module SoftwareHeretics
           !@simply_versioned_version_number
         end
 
+        # Create a bi-directional current_version association so we don't need
+        # to reload the 'versionable' object each time we access the model
+        def current_version
+          current_version_unidirectional.tap do |version|
+            version.versionable = self
+          end
+        end
+
         protected
         
         # INSTRUCTURE: If defined on a method, allow a check
@@ -212,22 +227,49 @@ module SoftwareHeretics
       end
 
       module VersionsProxyMethods
+        # Anything that returns a Version should have its versionable pre-
+        # populated. This is basically a way of getting around the fact that
+        # ActiveRecord doesn't have a polymorphic :inverse_of option.
+        def method_missing(method, *a, &b)
+          case method
+          when :minimum, :maximum, :exists?, :all, :find_all, :each then
+            populate_versionables(super)
+          when :find then
+            case a.first
+            when :all          then populate_versionables(super)
+            when :first, :last then populate_versionable(super)
+            else super
+            end
+          else
+            super
+          end 
+        end
+
+        def populate_versionables(versions)
+          versions.each{ |v| populate_versionable(v) } if versions.is_a?(Array)
+          versions
+        end
+
+        def populate_versionable(version)
+          version.versionable = proxy_owner if version && !version.frozen?
+          version
+        end
         
         # Get the Version instance corresponding to this models for the specified version number.
         def get_version( number )
-          find_by_number( number )
+          populate_versionable find_by_number( number )
         end
         alias_method :get, :get_version
         
         # Get the first Version corresponding to this model.
         def first_version
-          reorder( 'number ASC' ).first
+          populate_versionable reorder( 'number ASC' ).first
         end
         alias_method :first, :first_version
 
         # Get the current Version corresponding to this model.
         def current_version
-          reorder( 'number DESC' ).first
+          populate_versionable reorder( 'number DESC' ).first
         end
         alias_method :current, :current_version
         
@@ -241,13 +283,13 @@ module SoftwareHeretics
         
         # Return the Version for this model with the next higher version
         def next_version( number )
-          reorder( 'number ASC' ).where( "number > ?", number ).first
+          populate_versionable reorder( 'number ASC' ).where( "number > ?", number ).first
         end
         alias_method :next, :next_version
         
         # Return the Version for this model with the next lower version
         def previous_version( number )
-          reorder( 'number DESC' ).where( "number < ?", number ).first
+          populate_versionable reorder( 'number DESC' ).where( "number < ?", number ).first
         end
         alias_method :previous, :previous_version
       end
