@@ -58,10 +58,10 @@ define [
           ENV.permissions.manage_admin_users
         else
           ENV.permissions.manage_students
-      # BEGIN CANVAS-224 Only show unenroll link if allowed
+      # SFU MOD CANVAS-224 Only show unenroll link if allowed
       # User can only be unenrolled here if all of their enrollments are not defined by SIS
       json.canRemove = _.every(json.enrollments, (en) -> en.sis_source_id == null)
-      # END CANVAS-224
+      # END SFU MOD
 
 
     observerJSON: (json) ->
