@@ -69,6 +69,8 @@ module Api::V1::DiscussionTopics
                                             :context_discussion_topic_url,
                                             topic,
                                             :include_host => true)
+      subscription_hold = topic.subscription_hold(user, @context_enrollment, session)
+      json[:subscription_hold] = subscription_hold if subscription_hold
       locked_json(json, topic, user, session)
       json[:url] = json[:html_url] # deprecated
       if include_assignment && topic.assignment

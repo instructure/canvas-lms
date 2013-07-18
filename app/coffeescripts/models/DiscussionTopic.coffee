@@ -19,6 +19,7 @@ define [
       is_announcement: false
       subscribed: false
       user_can_see_posts: true
+      subscription_hold: null
 
     dateAttributes: [
       'last_reply_at'

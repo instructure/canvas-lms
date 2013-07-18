@@ -60,6 +60,14 @@
 #        // Whether or not the current user is subscribed to this topic.
 #        "subscribed":true,
 #
+#        // (Optional) Why the user cannot subscribe to this topic. Only one reason
+#        // will be returned even if multiple apply. Can be one of:
+#        // 'initial_post_required': The user must post a reply first
+#        // 'not_in_group_set': The user is not in the group set for this graded group discussion
+#        // 'not_in_group': The user is not in this topic's group
+#        // 'topic_is_announcement': This topic is an announcement
+#        "subscription_hold":"not_in_group_set",
+#
 #        // The unique identifier of the assignment if the topic is for grading, otherwise null.
 #        "assignment_id":null,
 #
@@ -325,7 +333,7 @@ class DiscussionTopicsController < ApplicationController
               :MARK_ALL_READ_URL => named_context_url(@context, :api_v1_context_discussion_topic_mark_all_read_url, @topic),
               :MARK_ALL_UNREAD_URL => named_context_url(@context, :api_v1_context_discussion_topic_mark_all_unread_url, @topic),
               :MANUAL_MARK_AS_READ => @current_user.try(:manual_mark_as_read?),
-              :CAN_SUBSCRIBE => !@initial_post_required && !@topic.is_a?(Announcement),                    # can subscribe when no initial post required for user and don't show for announcements
+              :CAN_SUBSCRIBE => !@topic.subscription_hold(@current_user, @context_enrollment, session),
               :CURRENT_USER => user_display_json(@current_user),
               :INITIAL_POST_REQUIRED => @initial_post_required,
               :THREADED => @topic.threaded?
