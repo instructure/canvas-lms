@@ -8,13 +8,13 @@ is for items that are not draggable.
 
 ```html
 <div class="item-group">
-  <div class="ig-header">
+  <h2 class="ig-header">
     <a class="element_toggler" href="#"
        aria-controls="group_1"
        aria-expanded="true">
       <i class="icon-mini-arrow-down"></i> Item Group Header
     </a>
-  </div>
+  </h2>
   <ul class="ig-list" id="group_1">
     <li>
       <div class="ig-row">
@@ -131,12 +131,17 @@ is for items that are not draggable.
   font-weight: bold;
   padding-top: 5px;
   padding-bottom: 5px;
+  line-height: 20px;
+  margin: auto;
 
   a {
     text-decoration: none;
     color: #3d454c;
   }
 
+  i {
+    vertical-align: middle;
+  }
   .icon-mini-arrow-right {
     position: relative;
     top: -1px;
