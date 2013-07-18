@@ -8,6 +8,17 @@ zh:
     bad_per_slot: 您必须允许一个时段至少有一个约会
     context_required: 您需要选择一个日程表
     select_calendars: 选择日程表
+  GroupView: 
+    delete_confirm: 是否确定要删除此组?
+    flash: 
+      removeError: 无法删除该组。请稍后重试。
+      removed: 组已成功删除。
+    student_count: 
+      one: "%{count} 个学生"
+      other: "%{count} 个学生"
+    user_count: 
+      one: "%{count} 个用户"
+      other: "%{count} 个用户"
   academic_benchmark: 
     api_error: "无法更新授权 %{auth} 的标准。"
     bad_ab_file: 提供的学术基准文件有错误。
@@ -621,6 +632,7 @@ zh:
         turnitin: Turnitin
         turnitin_account_id: "Turnitin 帐户 ID"
         turnitin_comments: "Turnitin 提交评论"
+        turnitin_host: "Turnitin 主机"
         turnitin_pledge: "Turnitin 保证"
         turnitin_shared_secret: "Turnitin 共享密钥"
         users_can_edit_name: 用户可以编辑显示名称
@@ -1198,6 +1210,7 @@ zh:
     unmute_dialog: 此作业当前被屏蔽。这意味着学生无法看到其评分和反馈。是否要立即取消屏蔽?
     unmuting_assignment: 正在取消屏蔽作业...
   assignments: 
+    add_another_never_drop_rule: 添加另一个作业
     add_assignment_form: 
       assignment_name: 作业名称
       labels: 
@@ -1233,6 +1246,7 @@ zh:
         no_assignments: "[无作业]"
         weighted_by_points: 按分加权
       percent_of_total_grade: "总评分的 %{percent} %"
+    add_first_never_drop_rule: 添加作业
     assignment_count: 
       one: "%{count} 份作业"
       other: "%{count} 份作业"
@@ -1333,7 +1347,6 @@ zh:
     errors: 
       add_group_failed: 添加组失败
       delete_reminder_failed: 删除失败
-      deleting_group_failed: 删除失败
       google_docs_masquerade_rejected: "无法以伪装用户的身份连接到 Google Docs。"
       reminder_failed: 提醒失败
     external_grader_sidebar: 
@@ -1477,6 +1490,9 @@ zh:
       redirect_message: |-
           此提交为 url，我们立即带您前往 url 链接。  
           [单击此处转到提交文件](%{url})
+    rules_text: 
+      one: "%{count} 个规则"
+      other: "%{count} 个规则"
     select_assignment: "[选择作业]"
     show: 
       assignment_locked: 此作业当前锁定。
@@ -1632,6 +1648,60 @@ zh:
     syllabus_right_side: 
       links: 
         edit_syllabus_description: 编辑提纲说明
+    teacher_index: 
+      add_assignment: 添加作业
+      add_group: 添加组
+      assignment_group_list: 
+        no_assignment_groups: 无作业组。
+      assignment_group_list_item: 
+        add_assignment_to: "将作业添加到 %{name}"
+        delete: 删除
+        edit: 编辑
+        group_weight: "总数的 %{groupWeight}%"
+        manage: 管理
+        title_delete: 删除作业组
+        title_edit: 编辑作业组
+      assignment_list_item: 
+        due_date: 到期日期
+        points_possible: "%{pointsPossible} 分"
+      assignment_settings: 
+        cancel: 取消
+        save: 保存
+        validating: 正在保存...
+        weight_groups: 根据作业组加权最终评分
+      assignments_settings: 作业设置
+      assignments_settings_screenreader: 作业设置
+      create_assignment: 
+        assignment: 作业
+        assignment_due_at: "到期日期:"
+        assignment_name: "名称:"
+        assignment_points: "分数:"
+        assignment_type: "类型:"
+        cancel: 取消
+        discussion_type: 讨论
+        external_tool_type: 外部工具
+        more: 更多选项
+        not_graded_type: 未评分
+        quiz_type: 测验
+        save: 保存
+        saving: 正在保存...
+      create_group: 
+        add_first_assignment: 添加作业
+        cancel: 取消
+        drop_highest: "最高分数:"
+        drop_lowest: "最低分数:"
+        example_group_name: "即，问答题组 1"
+        group_name: "组名称:"
+        never_drop: "不删除:"
+        percent_of_total: "总评分的 %"
+        save: 保存
+        saving: 正在保存...
+      never_drop: 
+        remove_rule: 删除规则
+      search: 搜索
+      search_for_assignment: 搜索作业
+      title_add_assignment: 添加作业
+      title_add_group: 添加作业组
     titles: 
       add_assignment_group: 添加作业组
       uploading: 正在上传提交文件
@@ -1803,6 +1873,7 @@ zh:
     refresh: 刷新
     save: 保存
     search: 搜索
+    send: 发送
     send_message: 发送邮件
     sending: 正在发送...
     sent: 已发送！
@@ -1903,7 +1974,6 @@ zh:
       location: "位置:"
       message_groups: 发送消息到组...
       message_students: 发送消息到学生...
-      my_appointment_groups: 我的约会组
       scheduler_explanation_student_header: 您没有任何要注册的约会组
       scheduler_explanation_student_paragraph_1: 教师可以使用此计划程序工具来为学生安排要注册的事项。例如“办公时间”、“组汇报时段”，或“与校友共进午餐”等。
       scheduler_explanation_student_paragraph_2: "没有哪个教师为您创建任何要注册的约会 ，因此到目前为止，没有您要执行的约会。一旦有任何教师创建了约会，您将会获得通知以便注册。"
@@ -1915,14 +1985,20 @@ zh:
       cancel: 取消
       send_message: 发送
       sending_message: 正在发送...
-    calendar_app: 
+    calendar_header: 
       create_event: 创建新事件
+      done_go_back_to_list: 完成，返回列表
       links: 
         calendar_month: 月
         calendar_scheduler: 计划程序
         calendar_week: 周
+      my_appointment_groups: 我的约会组
       refresh: 刷新
-      use_old_calendar: 返回到旧日历
+      use_old_calendar: 旧日历
+    calendar_navigator: 
+      next: 下一个
+      previous: 上一个
+      today: 今天
     calendar_title: "日历:"
     cancel_appointment: "是否确定要取消您和 %{name} 的约会?"
     confirm_appointment_group_deletion: 是否确定要删除此约会组?
@@ -2455,6 +2531,7 @@ zh:
       name: 名称
       options: 选项
     general_error: 参加会议出错
+    general_error_with_message: "参加会议出错。消息: '%{message}'"
     inactive_error: 该会议当前未活动
     index: 
       concluded_conferences: 已结束的会议
@@ -2523,293 +2600,21 @@ zh:
         all_quizzes: 所有考试
       select_quizzes: 选择需要导出的考试
   content_imports: 
-    assignment: 
-      links: 
-        delete_assignment: 删除作业
-        edit_assignment: 编辑作业
-    assignment_form: 
-      buttons: 
-        save_assignment: 保存作业
-      options: 
-        assignment: 作业
-        discussion: 讨论
-        file_upload: 文件上传
-        new_group: "[新组]"
-        not_graded: 未评分
-        quiz: 测验
-    assignment_groups: 
-      labels: 
-        total: 总计
-        weight_groups: 按组加权最终评分
-      links: 
-        add_group: 添加作业组
-        delete_group: 删除组
-        edit_group: 编辑组名称
-      titles: 
-        assignment_groups: 作业组
-    buttons: 
-      import: 导入课程
-    choose_content: 
-      buttons: 
-        import: 导入课程内容
-      check_everything: 全部
-      crumbs: 
-        choose_content: 选择内容
-        choose_course: 选择课程
-      descriptions: 
-        copy_content: 选择您希望复制到本课程的内容。
-      labels: 
-        check: 检查
-        copy_everything: "从 %{course} 复制所有内容"
-      page_title: 选择复制内容
-      titles: 
-        copy_from_course: "从 %{course} 复制内容"
-      uncheck_everything: 无
-    choose_course: 
-      buttons: 
-        copy_from_course: 从本课程复制
-      crumbs: 
-        copy_from: 选择课程
-      descriptions: 
-        copy_from: 选择您想复制的课程。然后指定要复制的具体内容。
-      labels: 
-        search_for_course: 搜索课程
-        select_course: 或者从列表中选择
-      options: 
-        select_course: "[选择课程]"
-      page_title: 选择课程
-      titles: 
-        copy_from: 从另一门课程复制
-    copy_course_finish: 
-      crumbs: 
-        copy_from_course: "从 %{course} 复制"
-      descriptions: 
-        copy_succeeded: "课程内容导入成功! 您可以在下方查看导入结果。如果您对作业或者事件的日期安排不满意，可以很容易地[在日历中进行拖拽以进行变更](%{url})。"
-      labels: 
-        apps: "%{course} 的应用程序"
-        assignment: "%{course} 的作业"
-        discussions: "与 %{course} 相关的讨论"
-        events: "与 %{course} 相关的事件"
-        files: "%{course} 的文件"
-        modules: "%{course} 的模块"
-        quizzes: "%{course} 的考试"
-        wiki_ages: "属于 %{course} 的 维基页面"
-      links: 
-        back: "返回到 %{course} 的主页"
-      page_title: "从 %{course} 复制成绩"
-      titles: 
-        copy_succeeded: 成功复制课程
-        what_it_looks_like_now: "%{course} 最新信息"
-    copy_course_item_selection: 
-      labels: 
-        apps: "%{course} 的应用程序"
-        assignment: "%{course} 的作业"
-        copy: 包含旧课程的条目
-        copy_settings: "%{course} 的设置"
-        copy_syllabus: "%{course} 的课程进度说明"
-        discussions: "与 %{course} 相关的讨论"
-        events: "与 %{course} 相关的事件"
-        files: "%{course} 的文件"
-        learning_outcomes: "%{course} 的学习结果"
-        modules: "%{course} 的模块"
-        question_banks: "%{course} 的题库"
-        quizzes: "%{course} 的考试"
-        rubrics: "%{course} 题目"
-        wiki_ages: "属于 %{course} 的 维基页面"
-    crumbs: 
-      content_imports: 内容导入
-    date_shift_form: 
-      descriptions: 
-        day_substitutions: 您也可以明确定义日期替换以根据变化的班级日程表进行调整（例如将周一的所有事务改在周二）
-      from_to: "*从* %{start_date} **到** %{end_date}"
-      labels: 
-        dates_range: "%{course} 日期范围"
-        shift_dates: 调整事件和到期日期
-        this_course_date_range: "**此课程**日期范围"
-      links: 
-        add_day_substitution: 定义日期替换
-      move_from_to: "将 %{old_day} 的所有事务改在 %{new_day}"
     errors: 
       failed: "课程导入失败，错误如下:"
       import_failed: "在导入过程中发生错误。请通知系统管理员，并向其提供如下代码: \"%{code}\""
       no_only_and_except: 无法同时使用"仅"和"除外"选项。
-      upload_failed: 上传失败，请重试
     files: 
       buttons: 
         skip: 跳过此步骤
       description: "可以将压缩的文件集上传至您的课程，我们将为您全部解压缩。这是一种将文件从其他系统移到 Canvas 的简便方式。"
-      instructions: 
-        webct: 
-          ? "1"
-          : "登录到 WebCT 并转至文件管理器"
-          ? "2"
-          : 选择要导出的所有文件
-          ? "3"
-          : 单击压缩选项以存档文件
-          ? "4"
-          : 保存文件到本地计算机
-      links: 
-        zip_from_webct: "如何从 WebCT 获取 .zip 文件?"
       page_title: 导入文件
-    index: 
-      crumbs: 
-        migrations: 迁移
-      failed_migration_with_error: "%{plugin_type} 迁移 - %{error_message}"
-      migration_in_progress: "%{plugin_type} 迁移 – 此迁移正在处理。"
-      migration_needing_action: "%{plugin_type} 迁移 - *单击此处选择要导入的内容。*"
-      page_title: 活动的迁移
-      successful_migration: "%{plugin_type} 迁移 – 此迁移已成功导入。"
-      titles: 
-        failed_migrations: 失败的迁移
-        migrations_in_progress: 迁移正在处理
-        migrations_needing_action: 迁移需要操作
-        successful_migrations: 成功的迁移
-    intro: 
-      description: "如果从其他课程管理系统转换到 Canvas，则可能还有文件、测验、作业和事项需要移动。此向导应可轻松地完成此过程。"
-      if_any: （如有）
-      links: 
-        copy_course: "从**其他 Canvas 课程**复制内容"
-        import_files: 导入文件
-        import_package: 从**内容包**或**其他系统**导入内容
-        import_quizzes: 导入测验
-      page_title: 导入向导
-      skip_steps: 可以跳过任何不适用的步骤。
-      titles: 
-        you_can_also: "也可以:"
     messages: 
       copying: "正在复制... 可能需要几分钟"
       import_complete: "导入完成! 正在返回到课程页面..."
       importing_button: "导入中... 这可能需要一些时间"
-      uploading: 正在上传课程导出...
-    migrate_content: 
-      buttons: 
-        import: 导入课程
-      choose_file: "选择要导入的 %{file_extension} 文件"
-      details: 
-        selective_import: 我们只提取您在下面选择的区域。并非所有课程都有这些功能。在完成提取之后，您可以精确选择要从每个区域导入课程的项目。
-      errors: 
-        choos_file: "必须选择要上传的 .zip 文件"
-      instructions: 
-        selective_import: 选择课程中要迁移的部分
-      labels: 
-        question_banks: 题库
-        quizzes: 测验和考试
-      links: 
-        view_migrations: 查看迁移
-      messages: 
-        import_started: "**谢谢！ **我们将开始导出您的课程，导出完成时您会收到一封电子邮件，然后您可以选择要导入的部分。"
-      options: 
-        source_system: 选择要从中迁移内容的系统
-      page_details: 我们已与其他学习管理系统集成，可以提供简单而自动化的迁移过程。如果在列表中看到您的当前系统，请选择该选项并提供要求的信息。我们将从您的课程中提取内容，然后您可以指定要将哪些部分添加到新课程。
-      page_title: 从其他系统迁移
-      previous_migrations: "具有此课程之前的迁移版本:"
-      question_bank_configuration: 题库配置
-      selective_import: 选择性导入
-    migrate_content_choose: 
-      buttons: 
-        import: 导入课程内容
-      crumbs: 
-        migrate: 从其他系统迁移
-      descriptions: 
-        day_substitutions: 您也可以明确定义日期替换以根据变化的班级日程表进行调整（例如将周一的所有事务改在周二）
-      from_to: "*从* %{start_date} **到** %{end_date}"
-      instructions: 选择要复制到此课程的内容。如果您已转入新学期，在底部还可以选择调整已迁移项目的所有日期。
-      labels: 
-        assignment_groups: 作业组
-        content_folders: 内容文件夹
-        copy_all_question_banks: 复制所有题库
-        copy_everything: 复制所有内容
-        dates_range: "%{course} 日期范围"
-        include_posts: 同时导入此主题中的留言
-        shift_dates: 调整事件和到期日期
-        this_course_date_range: "**此课程**日期范围"
-      links: 
-        add_day_substitution: 定义日期替换
-        back: 返回课程页面
-      messages: 
-        import_started: 导入过程已开始！大型课程可能需要几小时，因此尽可离开此页面。我们会在导入完成时向您发送电子邮件。
-        importing: "**谢谢！ **我们将从 %{course} 导入选择的内容，并在此过程完成时向您发送电子邮件。此过程通常会在一个小时内完成。"
-        loading: 正在加载已迁移资源的列表...
-      move_from_to: "将 %{old_day} 的所有事务改在 %{new_day}"
-      page_title: 从其他系统迁移
-      special_schools: 我们将与一组选择的学校合作提供更简单、更自动化的迁移过程，从其他学习管理系统迁移内容。如果您的学校显示在列表中，您只需向我们提供登录名和密码。我们将从您的课程中提取内容，然后您可以指定要将哪些部分添加到新课程。
-      titles: 
-        copy_from: "从 %{course} 复制"
-    migration_warnings: 
-      labels: 
-        last_error: 上次的错误
-        warnings: 警告
-      links: 
-        warnings: 警告/错误
-    notices: 
-      already_imported: 该提取内容已导入到课程中
-      choose_a_course: 请选择需要复制的课程
-      no_archive: 此内容迁移未存档
-    outcome_group_item_selection: 
-      external_outcome: （外部）
-    question_bank_config: 
-      instructions: 
-        overwrite_questions: "覆盖具有匹配 ID 的考试内容"
-        overwrite_questions_long: "有些系统对每个新导出循环使用其 ID。因此，如果您导出两个不同的题库，它们将具有相同的 ID。为防止丢失考试数据，尽管这些对象的 ID 相同，但我们将其视为不同的对象。选择此选项将会禁用此安全功能，允许考试数据覆盖具有相同 ID 的现有数据。"
-      labels: 
-        default_question_bank: 如果未在导出中指定，问题将进入题库
-        new_question_bank: 新题库名称
-      options: 
-        new_question_bank: "[新题库]"
-    quizzes: 
-      buttons: 
-        back: 我已完成导入，返回课程。
-        import: 导入测验
-        import_more: "导入其他 QTI 文件"
-      defaults: 
-        unnamed_quiz: 未命名测验
-      details: "Canvas 能够以 IMS QTI 格式导入测验。大多数系统允许您以此格式导出测验。您也可以使用常用的测验工具（如 Respondus）创建和导出 IMS QTI。上传下面的文件，您在导入完成时将会收到一封电子邮件。"
-      errors: 
-        choose_file: "必须选择要上传的 .zip 文件"
-        upload_failed: 上传失败，请重试
-      instructions: 
-        respondus: 
-          ? "1"
-          : "打开 Respondus 并选择您当前使用的系统"
-          ? "2"
-          : 单击"检索并报告"选项卡，然后单击左边的"检索试题"
-          ? "3"
-          : 选择或设置您当前系统的配置
-          ? "4"
-          : 单击"检索"按钮
-          ? "5"
-          : 返回单击"开始"选项卡
-          ? "6"
-          : "将\"当前特性\"改为 \"IMS QTI 1.1+\""
-          ? "7"
-          : "单击\"预览并发布\"选项卡，然后单击\"保存 QTI XML 文件\""
-          ? "8"
-          : "为设置选择\"点用作小数位\"和\"QTI xml zip 文件\""
-          ? "9"
-          : "单击\"另存为\"，然后保存 zip 文件到本地计算机"
-      links: 
-        quiz_from_respondus: "如何使用 Respondus 保存测验?"
-      messages: 
-        choose_file: "请选择 .zip 文件"
-        file_uploaded: "**谢谢！ **我们将开始导入您的 QTI 数据，在完成时向您发送电子邮件。此过程通常会在 10 分钟内完成。"
-        uploading: "正在上传和处理您的 zip 文件，如果文件很大，可能需要一段时间。"
-        uploading_button: "正在上传 QTI 文件..."
-      page_title: 导入测验
-      question_bank_configuration: 题库配置
-      question_count: 
-        one: "%{count} 个问题"
-        other: "%{count} 个问题"
-      titles: 
-        current_quizzes: 当前测验
-        uploading: 正在上传，请稍候。
-      upload_qti_file: "选择 QTI .zip 文件包"
     titles: 
       home_page: 主页
-    wizard_secondary_nav: 
-      wizard_steps: 
-        import_files: 导入文件
-        import_quizzes: 导入测验
-        intro: 简介
   content_locks: 
     buttons: 
       ok_thanks: 好，谢谢
@@ -2858,6 +2663,8 @@ zh:
     content_checkbox: 
       select_all: 全选
       select_non: 空出选择
+    content_migration_issue: 
+      error_report: 错误报告
     copy_course: 
       options: 选项
     migration_converter: 
@@ -3250,7 +3057,6 @@ zh:
       links: 
         add_item: 添加内容
         hide_contents: 隐藏单元内容
-        publish: 发布
         settings: 单元设置
         show_contents: 显示单元内容
         text: 
@@ -3260,7 +3066,6 @@ zh:
           delete_module: 删除此单元
           edit_module: 编辑
           student_progress: 查看学生学习此单元的进度
-        unpublish: 取消发布
       module_will_unlock_at: "解锁日期 *%{unlock_date}*"
       progression_complete_count: "*%{count}* 完成"
       progression_started_count: "*%{count}* 进行中"
@@ -3344,6 +3149,14 @@ zh:
       student_progress: 学生学习单元的进度
   context_modules_api: 
     invalid_position: 位置无效
+  conversation_dialog: 
+    enrollments_everyone: 每个人
+    errors: 
+      field_is_required: 此字段为必填字段
+    people_count: 
+      one: "%{count} 个人"
+      other: "%{count} 个人"
+    select_all: 全选
   conversation_message: 
     subject: "私人消息 %{timestamp}"
     users_added: 
@@ -3364,6 +3177,13 @@ zh:
       add_people: 填加人员
       send_message: 发送
     cannot_be_empty: 消息不能为空
+    compose_button_bar: 
+      titles: 
+        add_attachment: 添加附件
+        record_media_comment: 记录音频或视频评论
+    compose_title_bar: 
+      buttons: 
+        close: 关闭
     confirm: 
       delete_message: "是否确定要删除您拥有的此消息的副本? 此操作将不可恢复。"
       delete_messages: "是否确定要删除您拥有的这些消息的副本? 此操作将不可恢复。"
@@ -3432,6 +3252,21 @@ zh:
         submission_author: 提交文件作者
         submission_score: 提交文件得分
         view_submission: 在新窗口中打开提交文件。
+    index_new: 
+      delete_conversation: 删除会话
+      enter_name_group_or_course: 输入名称、组或课程
+      filter_messages_by_course: 按课程过滤消息
+      filter_messages_by_type: 按类型过滤消息
+      new_message: 新消息
+      reply: 回复
+      reply_all: 全部回复
+      search_names_groups_courses: 搜索名称、组和课程
+      settings: 设置
+    message: 
+      open_message: 打开消息
+      star: 标记
+      toggle_read: 切换已读/未读
+      total_messages: 总消息数
     message_form: 
       buttons: 
         send_message: 发送
@@ -3453,10 +3288,32 @@ zh:
         media_comment: 已记录媒体评论
         record_media_comment: 记录音频或视频评论
         remove_media_comment: 移除媒体评论
+    message_form_dialog: 
+      headings: 
+        new_message: 新消息
+      inbox_actions: 
+        add_people: 添加人员
+      labels: 
+        add_to_faculty_journal: 添加为教师日志条目
+        course: 课程
+        group_conversation: 这是组会话。参与将会看到每个人的回复
+        subject: 主题
+        to: 至
+      links: 
+        media_comment: 记录
+      media_comment: 媒体评论
+      titles: 
+        media_comment: 已记录媒体评论
+        record_media_comment: 记录音频或视频评论
+        remove_media_comment: 移除媒体评论
+    message_list: 
+      messages: 消息
     message_progress_bar_text: 
       done_sending_message: "已将 *%{message_preview}* 发送至 *%{num_people}*"
       error_sending_message: "发送消息时出现错误:"
       sending_message: "正在发送 *%{message_preview}* 至 *%{num_people}*"
+    no_message: 
+      no_conversations_selected: 未选择会话
     no_recipients_choose_another_group: 该组中没有收件人。请另选一组。
     not_applicable: 不适用
     not_scored: 没有分数
@@ -3723,7 +3580,7 @@ zh:
         other: "%{count} 个需要评分"
       points_possible: "超出 %{points_possible}"
     canvasnet_instructor: 
-      avatar_url: "头像 (URL)"
+      avatar_url: 头像
       biography: 个人简介
       instructor_name: 名称
       job_title: 标题
@@ -3746,6 +3603,7 @@ zh:
     copy: 
       buttons: 
         create_course: 创建课程
+      choose_content: 选择要复制的项?
       details: 输入以下详细信息开始创建此课程的副本。
       headings: 
         copy_course: "复制 %{course}"
@@ -3837,7 +3695,7 @@ zh:
         title: 标题
         visibility: 可见性
       leave_blank_if_free: 如果是免费课程则留空
-      logo: "徽标 (URL)"
+      logo: 徽标
       page_title: 课程概况
       path_syntax: 小写字母、数字和短划线
       portal_path_syntax: 小写字母、数字、短划线和斜线（例如，哈佛/化学）
@@ -4265,7 +4123,6 @@ zh:
     question_banks: 题库
     quizzes: 测验
     registered_services: 注册的服务
-    results: 结果
     revisions: 修订版
     rubrics: 题目
     settings: 设置
@@ -4532,14 +4389,16 @@ zh:
     default_discussion_title: 无标题
     deleted_topic_notice: 该主题已删除
     discussion: 
+      close_for_comments: 关闭评论
       delete: 删除
       due: 到期日期
-      lock: 锁定
+      graded_discussion: 评分的讨论
+      no_due_date: 无到期日期
+      open_to_comments: 开放评论
       pin: 固定
-      unlock: 解锁
       unpin: 取消固定
-      user_subscribed: 您已订阅此主题
-      user_unsubscribed: 您未订阅此主题
+      user_subscribed: 您已订阅此主题。单击可取消订阅。
+      user_unsubscribed: 您未订阅此主题。单击可订阅。
     discussion_feed_title: "%{title} 讨论馈送"
     discussion_list: 
       no_pinned_discussions: 您目前没有已固定的讨论
@@ -4585,6 +4444,9 @@ zh:
       show_more_entries: 
         one: "再显示 %{count} 个条目"
         other: "再显示 %{count} 个条目"
+    error_draft_state_announcement: 此主题无法设置为草稿状态，因为这是一个通告。
+    error_draft_state_unauthorized: 您无权将此主题设置为草稿状态。
+    error_draft_state_with_posts: 此主题不能设置为草稿状态，因为它包含帖子。
     group_assignment_discussion_entry: 
       posts: 
         one: "%{count} 条公告"
@@ -4595,6 +4457,7 @@ zh:
     index_view: 
       assignments: 作业
       delete: 删除
+      discussion_topics: 讨论主题
       edit_settings: 编辑讨论设置
       loading: 正在加载...
       lock_for_comments: 锁定以发表评论
@@ -4664,9 +4527,9 @@ zh:
       topic: 主题
       topic_podcast_feed_link: 主题播客馈送
       topic_subscribe: 订阅
-      topic_subscribe_tooltip: 当评论发布至此主题时，您将收到通知。
-      topic_unsubscribe: 取消订阅
-      topic_unsubscribe_tooltip: 当评论发布至此主题时，不再收到通知。
+      topic_subscribe_tooltip: 您已取消订阅，将不再收到新评论
+      topic_subscribed_tooltip: 您已订阅，将收到新评论
+      topic_unsubscribe: 已订阅
       unlock_topic: 开放评论
       unread: 未读
     sub_entry: 
@@ -4688,8 +4551,10 @@ zh:
       my_settings: 我的设置
   discussions: 
     are_your_sure_delete: 是否确定要删除此条目?
+    closed_for_comments: 关闭评论
     confirm_delete_discussion_topic: 是否确定要删除此讨论主题？
     delete: 删除
+    discussions: 讨论
     edit_settings: 编辑讨论设置
     entry_collection_view: 
       add_reply_to_topic: 将回复添加至主题
@@ -4706,8 +4571,8 @@ zh:
     entry_stats: 
       show_more: 显示更多
     hide_due_dates: 隐藏到期日期
+    initial_post_required_to_subscribe: 您必须在订阅前发布回复
     lock: 锁定
-    locked_discussions: 已锁定的讨论
     mark_as_read: 标记为已读
     mark_as_unread: 标记为未读
     no_content: 无内容
@@ -4717,7 +4582,7 @@ zh:
       try_different_more_general_or_fewer_keywords: 尝试其他、更常用或更少的关键字。
       try_disabling_the_unread_filter: 尝试禁用“未读”筛选器。
       your_search_did_not_match_any_entries: 您的搜索不匹配任何条目。
-    open_discussions: 打开讨论
+    ordered_by_recent_activity: 按最近活动排序
     participant: 
       anonymous_user: 匿名
     pin: 固定
@@ -4741,11 +4606,17 @@ zh:
       one: "显示所有 %{count} 个回复"
       other: "显示所有 %{count} 个回复"
     show_due_dates: 显示到期日期
+    subscribe: 订阅此主题
+    subscribed: 已订阅
+    subscribed_hint: 您已订阅此主题。单击可取消订阅。
     uknown_author: 未知作者
     unknown: 未知
     unknown_author: 未知作者
     unlock: 解锁
     unpin: 取消固定
+    unsubscribe: 取消订阅此主题
+    unsubscribed: 取消订阅
+    unsubscribed_hint: 您未订阅此主题。单击可订阅。
   due_dates: 
     due_at: "到期日期: %{assignment_due_date_time}"
     multiple_due_dates: "到期日期: 多个到期日期"
@@ -6244,6 +6115,7 @@ zh:
       messages: 
         no_students: 尚未添加学生到此课程
       page_title: 课程组
+    delete_confirm: 是否确定要删除此组类别?
     edit: 
       buttons: 
         update: 更新组
@@ -6268,6 +6140,9 @@ zh:
       unknown: 发生意外错误。
       update_failed: 更新失败，请重试
     feed_title: "%{course_or_account_name} 馈送"
+    flash: 
+      removeError: 无法删除该组类别。请稍后重试。
+      removed: 组类别已成功删除。
     group: 
       actions: 
         ask_to_join_group: 要求加入此组
@@ -6282,18 +6157,56 @@ zh:
       no_members: 无成员
       one: "1 个组"
       other: "%{count} 个组"
+    group_count: 
+      one: "%{count} 个组"
+      other: "%{count} 个组"
     group_name: 组名称
     index: 
       heading_current_groups: 当前组
       no_groups: 无组
     loading: 正在加载组清单...
     manage: 
+      add_unassigned_menu: 
+        add_unassigned_student: 添加未分配的学生
+        add_unassigned_user: 添加未分配的用户
+        search: 搜索
+        search_people: 搜索人员
+      add_unassigned_user: 
+        assign_to_group: 分配到组
+      add_unassigned_users: 
+        no_users_found: 未发现用户
+        too_short: 请输入具有三个或更多字符的搜索条件
       assign_to_group_menu: 
         add_to_group: 添加到组
+        assign_user_to_group: 将用户分配到此组
+      group: 
+        add_user_to_group: 将用户分配到组
+        delete_group: 删除组
+        edit_group: 编辑组
+        show_group_details: 显示组详细信息
+      group_category: 
+        unassigned_students: 未分配的学生
+        unassigned_users: 未分配的用户
+      group_category_detail: 
+        add_group: 添加组
+        group_limit_blurb: "组仅限 *%{count}* 个成员"
+        restricted_self_signup_blurb: 组内所有学生需要在相同的章节中
+        search: 搜索
+        self_organized_warning: 这些组是学生自发组织的。与其他类型的组不同，在这些组中，学生可以同时属于多个组，因此，这些组未必是评分作业的最佳解决方案。
+        self_signup_blurb: 对这些组启用自行注册。
+        self_signup_help_tooltip: 什么是自行注册组?
+        student_group_instructions: (拖动学生以分配)
+        user_group_instructions: (拖动用户生以分配)
       group_user: 
         assign_to_group: 分配到组
       group_users: 
-        no_users: 无用户。
+        no_students: 无学生
+        no_users: 无用户
+      groups: 
+        groups: 组
+        no_groups: 无组。
+        search: 搜索
+        search_groups: 搜索组
     member: 
       one: "%{count} 个成员"
       other: "%{count} 个成员"
@@ -6378,6 +6291,13 @@ zh:
       x_new_in_discussions: 
         one: "*%{count}* 个讨论"
         other: "*%{count}* 个讨论"
+  images: 
+    error_checking_color: 检查图像颜色时出错
+    invalid_background_color: "背景色必须为 %{color}"
+    invalid_dimensions: "图像尺寸无效 (当前为 %{actual}，预期为: %{expected})"
+    invalid_file_size: "图像文件大小太大 (最大为 %{max} 字节，当前为 %{actual})"
+    invalid_file_type: "图像类型 %{type} 无效。允许的类型包括: %{type_list}"
+    not_an_image: 所选文件不是图像
   info: 
     notices: 
       error_reported: 感谢您的帮助！我们马上解决。
@@ -6503,21 +6423,7 @@ zh:
       job_handler: 任务处理程序
       last_error: 上次的错误
   labels: 
-    announcements: 通告
-    assignments: 作业
-    calendar_events: 日历事件
-    discussions: 讨论
-    external_tools: 外部工具
-    files: 文件
-    goals: 目标
-    groups: 组
-    learning_modules: 学习单元
     lock_module_until: 锁定单元至指定日期
-    quizzes: 测验
-    rubrics: 题目
-    tasks: 任务
-    web_links: "Web 链接"
-    wikis: 维基
   layouts: 
     application: 
       instructure_description: "Instructure 是开源学习管理系统 Canvas 的制造商"
@@ -6660,6 +6566,7 @@ zh:
   locales: 
     en: 英语
     zh: 中文
+  logged_out_user: "注销的用户 %{user_counter}"
   m2c_file_description: "Moodle 1.9 .zip 文件"
   m2c_name: "Moodle 导入程序"
   manage_avatars: 
@@ -7971,27 +7878,6 @@ zh:
           link_message2: 单击*此链接*选择要导入的内容项
           subject: "课程提取就绪: %{course_name}"
         subject: "课程提取就绪: %{course_name}"
-    migration_import_failed: 
-      email: 
-        html: 
-          body: "将某些内容导入您的课程 %{destination} 时出现问题。"
-          notify_admin2: 请通知您的系统管理员，将其指向您的*导入信息页面*
-          subject: "内容导入失败: %{course_name}"
-        subject: "内容导入失败: %{course_name}"
-    migration_import_finished: 
-      email: 
-        body_no_warnings: "将 %{source} 导入到 %{destination} 中已完成。您选择的所有内容现在应该均已导入到课程中。"
-        body_with_warnings: "将 %{source} 导入到 %{destination} 中已完成，但并非所有内容均成功导入: %{warnings}"
-        html: 
-          body_no_warnings: "将 %{source} 导入 %{destination} 已完成。您选择的所有内容现在应当已导入您的课程。"
-          body_with_warnings: "将 %{source} 导入 %{destination} 已完成，但并非所有内容均已成功导入："
-          link: 单击以查看课程
-          subject: "课程导入已完成: %{course_name}"
-        subject: "课程导入已完成: %{course_name}"
-      summary: 
-        body_no_warnings: "将 %{source} 导入到 %{target} 中已完成。您选择的所有内容现在应该均已导入到课程中。"
-        body_with_warnings: "将 %{source} 导入到 %{target} 中已完成，但并非所有内容均成功导入: %{warnings}"
-        subject: "课程导入已完成: %{course_name}"
     new_account_user: 
       email: 
         body: "%{account} 的新帐户管理员"
@@ -8627,6 +8513,9 @@ zh:
   migration_issues: 
     errors: 
       valid_workflow_state: 必须发送有效的工作流状态
+  modules: 
+    module_collection_view: 
+      course_modules: 课程单元
   mute_dialog: 
     curving_assignments: 曲线作业
     grade_change_notifications: 评分更改通知
@@ -8992,6 +8881,11 @@ zh:
         time: 时间
         url: URL
         user_agent: 用户代理
+  pages: 
+    delete_confirmation: 是否确定要删除此维基页面?
+    delete_title: 删除维基页面
+    errors: 
+      require_title: 您必须输入标题
   paginated_collection: 
     no_items: 没有项目。
   paginated_list: 
@@ -9201,14 +9095,17 @@ zh:
         account_settings: 帐户设置
         canvas_settings: "Canvas 设置"
         domain_settings: 域设置
+        misc_settings: 杂项设置
         ui_conf_ids: "UI 配置 ID"
       hints: 
         domain: 对于托管的帐户，使用"www.kaltura.com"
         resource_domain: 对于托管的帐户，使用"cdn.kaltura.com"
         rtmp_domain: 对于托管的帐户，使用"www.kaltura.com"
+      kaltura_sis_explanation: "如果选中用户和课程，将向 Kaltura 提供 SIS 数据。"
       labels: 
         cache_play_list_seconds: "缓存播放列表 URL 的秒数"
         domain: 域
+        kaltura_sis: "将 SIS 数据写入 Kaltura"
         kcw_ui_conf: "KCW UI 配置 ID"
         partner_id: "合作伙伴 ID"
         player_ui_conf: "播放器 UI 配置 ID"
@@ -9272,6 +9169,9 @@ zh:
       labels: 
         session_timeout: "会话到期前的时间（以分钟为单位，最少为 20 分钟）"
     settings_header: 
+      prompt_change_for_all_line1: 此时将对所有帐户更改设置!
+      prompt_change_for_all_line2: 是否完全确定要执行此操作?
+      prompt_delete_account_setting: 是否确定要删除用户配置?
       select_account_prompt: （选择帐户）
     show: 
       back_to_list: 返回插件列表
@@ -9606,9 +9506,17 @@ zh:
       sent_confirmation_sms: "我们已发送四个字符的确认代码到 %{sms_number}。在下面输入该代码以激活此短信号码。"
       titles: 
         confirm_email_address: 确认电子邮件地址
+        confirm_email_address_alt: 确认电子邮件地址
+        confirm_email_address_aria_label: 确认电子邮件地址
         default_email_address: 默认电子邮件地址
+        default_email_address_alt: 默认电子邮件地址
+        default_email_address_aria_label: 默认电子邮件地址
         merge_users: 其他用户已有相同的电子邮件地址。单击此处以合并用户帐户。
+        merge_users_alt: 其他用户已有相同的电子邮件地址。单击此处以合并用户帐户。
+        merge_users_aria_label: 其他用户已有相同的电子邮件地址。单击此处以合并用户帐户。
         remove_email_address: 删除电子邮件地址
+        remove_email_address_alt: 删除电子邮件地址
+        remove_email_address_aria_label: 删除电子邮件地址
       validations: 
         should_be_10_digits: "应为 10 位数字"
     ways_to_contact_me: 我的联系方式
@@ -9756,6 +9664,13 @@ zh:
       email_sent: "确认电子邮件已发送到 %{email}，确保检查您的垃圾邮件箱"
       link_invalid: 您所使用的链接不再有效。如果您无法登录，请单击“不知道您的密码？”来重置密码。
       password_changed: 密码已更改
+  publish_btn_module: 
+    buttons: 
+      publish: 发布
+      published: 已发布
+      publishing: 正在发布...
+      unpublish: 取消发布
+      unpublishing: 正在取消发布...
   purchases: 
     new: 
       payment_info: 付款信息
@@ -9942,7 +9857,6 @@ zh:
     default_answer_comments_on_match: 学生匹配此答案时响应
     default_comments_on_wrong_match: 用户遗漏此匹配时响应
     default_history_crumb: 历史记录
-    default_new_crumb: 新测验
     default_quesiton_name: 问题
     default_question_name: 问题
     default_quiz_title: 测验
@@ -10223,6 +10137,7 @@ zh:
       links: 
         back_to_quiz: 返回测验
         back_to_survey: 返回调查
+      logged_out_user: "注销的用户 %{index}"
       named_quiz_results: "%{user} 的 %{quiz_name} 结果"
       no_more_attempts: "%{user} 没有剩余尝试次数"
       page_title_quiz: "%{user} 的测验历史记录"
@@ -10305,7 +10220,8 @@ zh:
         download_lockdown: "[下载 Respondus LockDown Browser]"
       requires_lockdown: "此测验需要 Respondus LockDown Browser。请启动 Respondus LockDown Browser 以进行此测验或查看您的测验结果。"
     managed_quiz_data: 
-      anonymous_student: "学生 %{n}"
+      anonymous_student: "学生 %{user_counter}"
+      logged_out_user: "注销的用户 %{user_counter}"
       titles: 
         submission_needs_review: 此提交文件需要审阅
     message_students: 向学生发送消息
@@ -10379,6 +10295,8 @@ zh:
       allowed_attempts: 允许尝试的次数
       anonymous_submissions: 提交文件保持匿名
       buttons: 
+        not_published: 未发布
+        published: 已发布
         save: 保存
       cant_go_back: 回答后锁定问题
       code: 访问代码
@@ -10442,6 +10360,9 @@ zh:
       quizzes_published: 
         one: "%{count} 个测验已成功发布！"
         other: "%{count} 个测验已成功发布！"
+      quizzes_unpublished: 
+        one: "%{count} 个测验已成功发布!"
+        other: "%{count} 个测验已成功发布!"
     practice_quiz: 练习测验
     question_colon: 问题：
     question_group: 
@@ -10642,10 +10563,10 @@ zh:
         unanswered: 未回答
         you_answered: 您已回答
       buttons: 
+        already_published: 已发布！
         lock_quiz: 立即锁定此测验
         lock_survey: 立即锁定此调查
         publish: 发布
-        published: 已发布!
         publishing: 正在发布...
         republish: 重新发布
         unlock_quiz: 立即允许学生进行此测验
@@ -10674,6 +10595,7 @@ zh:
         show_student_quiz_results: 显示学生测验结果
         show_student_survey_results: 显示学生调查结果
         survey_statistics: 调查统计
+      manage: 管理
       only_registered_users: 只有注册的登记用户才能进行评分测验
       speed_grader: SpeedGrader™
       students_submitted_so_far: 
@@ -10715,7 +10637,6 @@ zh:
       page_title: 统计
       quiz_all_version_disclaimer: 此报告基于所有用户的所有尝试显示测验统计。
       quiz_latest_version_disclaimer: 此报告基于每位用户的最新尝试显示测验统计。
-      student_n: "学生 %{n}"
       survey_all_version_disclaimer: 此报告基于所有用户的所有尝试显示调查统计。
       survey_latest_version_disclaimer: 此报告基于每位用户的最新尝试显示调查统计。
       titles: 
@@ -10773,6 +10694,7 @@ zh:
         twelve_hours_left: 剩余十二小时
       question_answered: 已回答
       question_unanswered: 尚未回答
+      quiz_instructions: 测验说明
       saved_at: "在 %{t} 保存测验"
       saving: 正在保存...
       seconds_count: 
@@ -12202,6 +12124,7 @@ zh:
     aligned_items: 调整的项目
     announcement: 通告
     announcements: 通告
+    assignments: 作业
     discussion: 讨论
     discussions: 讨论
     error_reports: 错误报告
@@ -12674,9 +12597,60 @@ zh:
       no_title: 无标题
       titles: 
         select_folder_for_uploads: 选择文件夹进行文件上传
-    wiki_page_buttons: 
+    wiki_page: 
+      buttons: 
+        edit: 编辑
+        publish: 发布
+        unpublish: 已发布
+        view_all_pages: 查看所有页面
+      publish: 发布
+      toolbar_menu: 
+        settings: 设置
+      unpublish: 取消发布
+    wiki_page_delete_dialog: 
+      cancel: 取消
+      delete_page: 删除
+      deleting: 正在删除...
+    wiki_page_edit: 
+      buttons: 
+        cancel: 取消
+        preview: 预览
+        publish: 已取消发布
+        save: 保存
+        unpublish: 已发布
+      course_editing_roles: 
+        anyone: 任何人
+        only_teachers: 仅教师
+        teachers_and_students: 教师和学生
+      delete_wiki: 删除
+      editing_roles: 
+        anyone: 任何人
+        can_edit_page: 可以编辑此页面
+        only_members: 仅成员
+      hide_from_students: 对学生隐藏此页面
+      notify_users_text: 通知用户此内容已更改
+      options_label: 选项
+      publish: 发布
+      toolbar_menu: 
+        settings: 设置
+      unpublish: 取消发布
+    wiki_page_index: 
+      add_page: 添加一个!
       buttons: 
         new_page: 新页面
+      headers: 
+        creation_date: 创建日期
+        last_edit: 最后编辑
+        page_title: 页面标题
+        published: 已发布
+        sort_ascending: 升序排序
+        sort_descending: 降序排序
+      no_pages: 尚未创建页面。
+    wiki_page_index_item: 
+      labels: 
+        front_page: 首页
+      published: 已发布
+      unpublished: 已取消发布
   wiki_page: 
     atom_author: 维基页面
     atom_entry_title: "维基页面 %{course_or_group_name}: %{page_title}"
@@ -12769,7 +12743,7 @@ zh:
       link_hidden_from_students_warning: 学生不会看到此链接
     pages_index: 
       titles: 
-        pages: "页 - %{course}"
+        pages: 页面
     wiki_page_comment: 
       links: 
         delete_comment: 删除评论
@@ -12805,8 +12779,6 @@ zh:
     external_urls: 
       archive: 存档
       archive_link: 查看存档
-  wizard: 
-    step: "步骤 %{number}"
   zip_argument_error: ".zip 上传需要目标上传文件夹。"
   zip_file_description: "用于将纯 .zip 文件解压为课程的迁移插件"
   zip_file_file_description: "将 .zip 文件解压为文件夹"
