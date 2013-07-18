@@ -12,7 +12,6 @@ define [
 ], (I18n, _, Cache, AssignmentCollection, CollectionView, AssignmentListItemView, CreateAssignmentView, CreateGroupView, DeleteGroupView, template) ->
 
   class AssignmentGroupListItemView extends CollectionView
-
     tagName: "li"
     className: "item-group-condensed"
     itemView: AssignmentListItemView
@@ -57,6 +56,7 @@ define [
 
     initialize: ->
       @collection = new AssignmentCollection @model.get('assignments')
+      @collection.each (assign) -> assign.doNotParse()
       @collection.on('add remove', @refreshDeleteDialog)
       super
 

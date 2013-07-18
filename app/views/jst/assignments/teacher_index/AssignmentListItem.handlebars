@@ -1,4 +1,4 @@
-<div class="ig-row {{#if published}}ig-published{{/if}}">
+<div id="assignment_{{id}}" class="ig-row {{#if published}}ig-published{{/if}}">
   <a href="{{htmlUrl}}" class="ig-title ellipses">
     <i class='icon-{{iconType}}'></i>
     {{name}}
@@ -15,4 +15,7 @@
       {{#if pointsPossible}}{{#t "points_possible"}}{{pointsPossible}} pts{{/t}}{{/if}}
     </div>
   </div>
-</a>
+  <div class="ig-admin">
+    <span class="publish-icon" data-view="publish-icon"></span>
+  </div>
+</div>

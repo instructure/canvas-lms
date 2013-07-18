@@ -32,6 +32,9 @@ require [
 
   assignmentGroups = new AssignmentGroupCollection [],
     course: course
+    params:
+      include: ["assignments"]
+      override_assignment_dates: false
 
   assignmentSettingsView = new AssignmentSettingsView
     model: course

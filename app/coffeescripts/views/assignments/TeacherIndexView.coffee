@@ -4,17 +4,12 @@ define [
 ], (Backbone, template) ->
 
   class TeacherIndexView extends Backbone.View
-
     template: template
-
     el: '#content'
 
     @child 'assignmentGroupsView', '[data-view=assignmentGroups]'
-
     @child 'inputFilterView', '[data-view=inputFilter]'
-
     @child 'createGroupView', '[data-view=createGroup]'
-
     @child 'assignmentSettingsView', '[data-view=assignmentSettings]'
 
     els:

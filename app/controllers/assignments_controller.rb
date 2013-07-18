@@ -102,7 +102,6 @@ class AssignmentsController < ApplicationController
         @current_user_submission.send_later(:context_module_action) if @current_user_submission
       end
 
-
       begin
         @google_docs_token = google_docs_retrieve_access_token
       rescue RuntimeError => ex; end
@@ -293,6 +292,7 @@ class AssignmentsController < ApplicationController
   
   def new
     @assignment ||= @context.assignments.new
+    @assignment.workflow_state = 'unpublished' if @context.root_account.enable_draft?
     add_crumb t :create_new_crumb, "Create new"
 
     if params[:submission_types] == 'online_quiz'
@@ -333,7 +333,8 @@ class AssignmentsController < ApplicationController
           {:id => section.id, :name => section.name }
         }),
         :ASSIGNMENT_OVERRIDES =>
-          (assignment_overrides_json(@assignment.overrides_visible_to(@current_user)))
+          (assignment_overrides_json(@assignment.overrides_visible_to(@current_user))),
+        :ASSIGNMENT_INDEX_URL => polymorphic_url([@context, :assignments]),
       }
       hash[:ASSIGNMENT] = assignment_json(@assignment, @current_user, session, override_dates: false)
       hash[:URL_ROOT] = polymorphic_url([:api_v1, @context, :assignments])
@@ -341,6 +342,7 @@ class AssignmentsController < ApplicationController
       hash[:CONTEXT_ID] = @context.id
       hash[:CONTEXT_ACTION_SOURCE] = :assignments
       js_env(hash)
+      @padless = true
       render :action => "edit"
     end
   end

@@ -13,12 +13,15 @@ define [
 
     urlRoot: -> @_defaultUrl()
 
+    defaults:
+      "publishable": true
+
     initialize: ->
-      overrides = @get('assignment_overrides')
-      @set 'assignment_overrides',
-        new AssignmentOverrideCollection(overrides)
-      @set 'turnitin_settings', new TurnitinSettings(@get 'turnitin_settings'),
-        silent: true
+      if (overrides = @get('assignment_overrides'))?
+        @set 'assignment_overrides', new AssignmentOverrideCollection(overrides)
+      if (turnitin_settings = @get('turnitin_settings'))?
+        @set 'turnitin_settings', new TurnitinSettings(turnitin_settings),
+          silent: true
 
     isQuiz: => @_hasOnlyType 'online_quiz'
     isDiscussionTopic: => @_hasOnlyType 'discussion_topic'
@@ -172,12 +175,13 @@ define [
       @set 'external_tool_tag_attributes', tagAttributes
 
     isSimple: =>
+      overrides = @get('assignment_overrides')
       @gradingType() == 'points' and
         @submissionType() == 'none' and
         !@groupCategoryId() and
         !@peerReviews() and
         !@frozen() and
-        @get('assignment_overrides').isSimple()
+        (!overrides or overrides.isSimple())
 
     isLetterGraded: =>
       @gradingType() == 'letter_grade'
@@ -208,7 +212,7 @@ define [
         'gradingStandardId', 'isLetterGraded', 'assignmentGroupId', 'iconType',
         'published', 'htmlUrl'
       ]
-      hash = {}
+      hash = id: @get 'id'
       for field in fields
         hash[field] = @[field]()
       hash
@@ -219,14 +223,20 @@ define [
       if @alreadyScoped then data else { assignment: data }
 
     parse: (data) ->
-      overrides = data.assignment_overrides
-      if overrides?
-        data.assignment_overrides =
-          new AssignmentOverrideCollection overrides
-      else
-        data.assignment_overrides = new AssignmentOverrideCollection
-      data.turnitin_settings = new TurnitinSettings data.turnitin_settings
+      data = super data
+      if (overrides = data.assignment_overrides)?
+        data.assignment_overrides = new AssignmentOverrideCollection overrides
+      if (turnitin_settings = data.turnitin_settings)?
+        data.turnitin_settings = new TurnitinSettings turnitin_settings
       data
+
+    # Update the Assignment model instance to not parse results from the
+    # server. This is a hack to work around the fact that the server will
+    # always return an overridden due date after a successful PUT request. If
+    # that is parsed and set on the model, and then another save() is called,
+    # the assignments default due date will be updated accidentally. Ugh.
+    doNotParse: ->
+      @parse = -> {}
 
     # @api private
     _submissionTypes: =>
@@ -266,3 +276,6 @@ define [
       @lockAt null
       @unlockAt null
       this
+
+    publish: -> @save("published", true)
+    unpublish: -> @save("published", false)

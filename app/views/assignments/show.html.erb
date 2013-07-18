@@ -24,6 +24,13 @@
         </h2>
       </div>
       <div class='edit-content'>
+        <% if @domain_root_account.enable_draft? %>
+          <button
+            id="assignment_publish_button"
+            data-id='<%= @assignment.id %>'
+            class='btn <%= "published" if @assignment.published? %>'>
+          </button>
+        <% end %>
         <a href="<%= edit_polymorphic_path([@context, @assignment]) %>" class='btn edit_assignment_link'>
           <i class='icon-edit'></i> <%= t('links.edit', 'Edit') %>
         </a>

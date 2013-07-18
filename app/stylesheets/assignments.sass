@@ -12,7 +12,12 @@
       width: 100%
       height: 72px
 
+#edit_assignment_wrapper
+  padding: 1em
+
 #edit_assignment_form
+  margin: 0
+
   .advanced-togglable-true
     margin-top: 18px
     border-top: 1px solid #ccc
@@ -58,7 +63,7 @@
     display: table-cell
     vertical-align: bottom
     text-align: right
-    min-width: 200px
+    min-width: 250px
     padding-bottom: 12px
 
   .undo-main-margins
@@ -120,3 +125,12 @@
     .controls .value
       display: block
       padding-top: 5px
+
+#assignment-draft-state
+  padding: 10px
+  line-height: 33px
+  &.published
+    color: #007711
+    font-weight: bold
+  &.unpublished
+    color: #999999

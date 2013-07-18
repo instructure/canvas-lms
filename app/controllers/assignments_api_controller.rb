@@ -485,12 +485,13 @@ class AssignmentsApiController < ApplicationController
   #
   # @argument assignment[published] [Boolean] [Optional]
   #   Whether this assignment is published.
-  #   (Only useful if 'enable draft' account setting is on)
+  #   (Only uaeful if 'enable draft' account setting is on)
   #   Unpublished assignments are not visible to students.
   #
   # @returns Assignment
   def create
     @assignment = @context.assignments.build
+    @assignment.workflow_state = 'unpublished' if @context.root_account.enable_draft?
 
     if authorized_action(@assignment, @current_user, :create)
       save_and_render_response
