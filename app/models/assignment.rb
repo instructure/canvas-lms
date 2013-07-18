@@ -1124,7 +1124,6 @@ class Assignment < ActiveRecord::Base
       )
       if json['submission_history']
         json['submission_history'].map! do |version|
-          version.cached_due_date = sub.cached_due_date
           version.as_json(
             :include => {
               :submission_comments => { :only => comment_fields }
