@@ -8,10 +8,16 @@ define [
     rCRLF = /\r?\n/g
     rinput = /^(?:color|date|datetime|datetime-local|email|hidden|month|number|password|range|search|tel|text|time|url|week|checkbox|radio|file)$/i
 
-    rcheckboxOrRadio = /checkbox/i if this.is('[serialize-radio-value]')
-
     isInput = (el) ->
       el.name && !el.disabled && rselectTextarea.test(el.nodeName) or rinput.test(el.type)
+
+    if this.is('[serialize-radio-value]')
+      rcheckboxOrRadio = /checkbox/i # return val for radio boxes
+      rRadio = /radio/i
+
+      _isInput = isInput
+      isInput = (el) -> # only include the checked radio input
+        _isInput(el) && (!rRadio.test(el.type) || el.checked)
 
     getValue = (el) ->
       resultFor = (val) ->
