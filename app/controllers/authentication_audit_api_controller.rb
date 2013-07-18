@@ -53,10 +53,15 @@ class AuthenticationAuditApiController < ApplicationController
   #
   # List authentication events for a given pseudonym.
   #
+  # @argument start_time [Datetime] [optional] The beginning of the time range
+  #   from which you want events.
+  # @argument end_time [Datetime] [optional] The end of the time range
+  #   from which you want events.
+  #
   def for_pseudonym
     @pseudonym = Pseudonym.active.find(params[:pseudonym_id])
     if account_visible(@pseudonym.account) || account_visible(Account.site_admin)
-      events = Auditors::Authentication.for_pseudonym(@pseudonym)
+      events = Auditors::Authentication.for_pseudonym(@pseudonym, date_options)
       render_events(events, @pseudonym)
     else
       render_unauthorized_action(@pseudonym)
@@ -67,10 +72,15 @@ class AuthenticationAuditApiController < ApplicationController
   #
   # List authentication events for a given account.
   #
+  # @argument start_time [Datetime] [optional] The beginning of the time range
+  #   from which you want events.
+  # @argument end_time [Datetime] [optional] The end of the time range
+  #   from which you want events.
+  #
   def for_account
     @account = api_find(Account.active, params[:account_id])
     if account_visible(@account) || account_visible(Account.site_admin)
-      events = Auditors::Authentication.for_account(@account)
+      events = Auditors::Authentication.for_account(@account, date_options)
       render_events(events, @account)
     else
       render_unauthorized_action(@account)
@@ -81,10 +91,15 @@ class AuthenticationAuditApiController < ApplicationController
   #
   # List authentication events for a given user.
   #
+  # @argument start_time [Datetime] [optional] The beginning of the time range
+  #   from which you want events.
+  # @argument end_time [Datetime] [optional] The end of the time range
+  #   from which you want events.
+  #
   def for_user
     @user = api_find(User.active, params[:user_id])
     if @user == @current_user || account_visible(Account.site_admin)
-      events = Auditors::Authentication.for_user(@user)
+      events = Auditors::Authentication.for_user(@user, date_options)
       render_events(events, @user)
     else
       accounts = Shard.with_each_shard(@user.associated_shards) do
@@ -95,13 +110,13 @@ class AuthenticationAuditApiController < ApplicationController
       end
       visible_accounts = accounts.select{ |a| account_visible(a) }
       if visible_accounts == accounts
-        events = Auditors::Authentication.for_user(@user)
+        events = Auditors::Authentication.for_user(@user, date_options)
         render_events(events, @user)
       elsif visible_accounts.present?
         pseudonyms = Shard.partition_by_shard(visible_accounts) do |shard_accounts|
           @user.active_pseudonyms.where(:account_id => shard_accounts).all
         end
-        events = Auditors::Authentication.for_pseudonyms(pseudonyms)
+        events = Auditors::Authentication.for_pseudonyms(pseudonyms, date_options)
         render_events(events, @user)
       else
         render_unauthorized_action(@user)
@@ -119,5 +134,15 @@ class AuthenticationAuditApiController < ApplicationController
     route = polymorphic_url([:api_v1, :audit_authentication, context])
     events = Api.paginate(events, self, route)
     render :json => authentication_events_compound_json(events, @current_user, session)
+  end
+
+  def date_options
+    start_time = TimeHelper.try_parse(params[:start_time])
+    end_time = TimeHelper.try_parse(params[:end_time])
+
+    options = {}
+    options[:oldest] = start_time if start_time
+    options[:newest] = end_time if end_time
+    options
   end
 end

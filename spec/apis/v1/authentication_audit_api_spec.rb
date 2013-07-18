@@ -33,24 +33,37 @@ describe "AuthenticationAudit API", type: :integration do
     type = context.class.to_s.downcase
     id = context.id.to_s
 
-    path = "/api/v1/audit/authentication/#{type.pluralize}/#{id}"
     arguments = { controller: 'authentication_audit_api', action: "for_#{type}", :"#{type}_id" => id, format: 'json' }
+    query_string = []
+
     if per_page = options.delete(:per_page)
-      path += "?per_page=#{per_page}"
       arguments[:per_page] = per_page.to_s
+      query_string << "per_page=#{arguments[:per_page]}"
     end
 
+    if start_time = options.delete(:start_time)
+      arguments[:start_time] = start_time.iso8601
+      query_string << "start_time=#{arguments[:start_time]}"
+    end
+
+    if end_time = options.delete(:end_time)
+      arguments[:end_time] = end_time.iso8601
+      query_string << "end_time=#{arguments[:end_time]}"
+    end
+
+    path = "/api/v1/audit/authentication/#{type.pluralize}/#{id}"
+    path += "?" + query_string.join('&') if query_string.present?
     api_call_as_user(@viewing_user, :get, path, arguments, {}, {}, options.slice(:expected_status))
   end
 
-  def expect_event_for_context(context, event)
-    json = fetch_for_context(context)
+  def expect_event_for_context(context, event, options={})
+    json = fetch_for_context(context, options)
     json['events'].map{ |e| [Shard.global_id_for(e['pseudonym_id']), e['event_type']] }.
       should include([event.pseudonym_id, event.event_type])
   end
 
-  def forbid_event_for_context(context, event)
-    json = fetch_for_context(context)
+  def forbid_event_for_context(context, event, options={})
+    json = fetch_for_context(context, options)
     json['events'].map{ |e| [e['pseudonym_id'], e['event_type']] }.
       should_not include([event.pseudonym_id, event.event_type])
   end
@@ -180,6 +193,49 @@ describe "AuthenticationAudit API", type: :integration do
 
     it "should not include cross-user events at user endpoint" do
       forbid_event_for_context(@user, @event)
+    end
+  end
+
+  describe "start_time and end_time" do
+    before do
+      @event2 = @pseudonym.shard.activate do
+        record = Auditors::Authentication::Record.new(
+          'id' => UUIDSingleton.instance.generate,
+          'created_at' => 1.day.ago,
+          'pseudonym' => @pseudonym,
+          'event_type' => 'logout')
+        Auditors::Authentication::Stream.insert(record)
+      end
+    end
+
+    it "should recognize :start_time for pseudonyms" do
+      expect_event_for_context(@pseudonym, @event, start_time: 12.hours.ago)
+      forbid_event_for_context(@pseudonym, @event2, start_time: 12.hours.ago)
+    end
+
+    it "should recognize :newest for pseudonyms" do
+      expect_event_for_context(@pseudonym, @event2, end_time: 12.hours.ago)
+      forbid_event_for_context(@pseudonym, @event, end_time: 12.hours.ago)
+    end
+
+    it "should recognize :start_time for accounts" do
+      expect_event_for_context(@account, @event, start_time: 12.hours.ago)
+      forbid_event_for_context(@account, @event2, start_time: 12.hours.ago)
+    end
+
+    it "should recognize :newest for accounts" do
+      expect_event_for_context(@account, @event2, end_time: 12.hours.ago)
+      forbid_event_for_context(@account, @event, end_time: 12.hours.ago)
+    end
+
+    it "should recognize :start_time for users" do
+      expect_event_for_context(@user, @event, start_time: 12.hours.ago)
+      forbid_event_for_context(@user, @event2, start_time: 12.hours.ago)
+    end
+
+    it "should recognize :newest for users" do
+      expect_event_for_context(@user, @event2, end_time: 12.hours.ago)
+      forbid_event_for_context(@user, @event, end_time: 12.hours.ago)
     end
   end
 
