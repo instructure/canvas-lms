@@ -586,6 +586,7 @@ class Quiz < ActiveRecord::Base
     submission.finished_at = nil
     submission.submission_data = {}
     submission.workflow_state = 'preview' if preview
+    submission.was_preview = preview
     if preview || submission.untaken?
       submission.save
     else
