@@ -881,6 +881,25 @@ describe DiscussionTopicsController, :type => :integration do
     @module.evaluate_for(@user).should be_completed
   end
 
+  it "should fulfill module viewed requirements when re-marking a topic read" do
+    @module = @course.context_modules.create!(:name => "some module")
+    @topic = create_topic(@course, :title => "Topic 1", :message => "<p>content here</p>")
+    course_with_student(:course => @course)
+    raw_api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/read",
+                 { :controller => 'discussion_topics_api', :action => 'mark_topic_read', :format => 'json',
+                   :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
+
+    tag = @module.add_item(:id => @topic.id, :type => 'discussion_topic')
+    @module.completion_requirements = { tag.id => {:type => 'must_view'} }
+    @module.save!
+
+    @module.evaluate_for(@user, true).should be_unlocked
+    raw_api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/read",
+                 { :controller => 'discussion_topics_api', :action => 'mark_topic_read', :format => 'json',
+                   :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
+    @module.evaluate_for(@user).should be_completed
+  end
+
   it "should fulfill module viewed requirements when marking a topic and all its entries read" do
     @module = @course.context_modules.create!(:name => "some module")
     @topic = create_topic(@course, :title => "Topic 1", :message => "<p>content here</p>")

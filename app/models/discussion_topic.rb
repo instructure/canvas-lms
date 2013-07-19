@@ -245,9 +245,10 @@ class DiscussionTopic < ActiveRecord::Base
   def change_read_state(new_state, current_user = nil)
     current_user ||= self.current_user
     return nil unless current_user
+    self.context_module_action(current_user, :read) if new_state == 'read'
+    
     return true if new_state == self.read_state(current_user)
 
-    self.context_module_action(current_user, :read) if new_state == 'read'
     StreamItem.update_read_state_for_asset(self, new_state, current_user.id)
     self.update_or_create_participant(:current_user => current_user, :new_state => new_state)
   end
