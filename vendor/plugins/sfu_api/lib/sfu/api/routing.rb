@@ -12,7 +12,11 @@ module SFU #:nodoc:
         end
 
 	      def v1_urls
-          @set.add_route("/sfu/api/v1/terms/:term", {:controller => "api", :action => "terms", :term => nil, :format => 'json'})
+          @set.add_route("/sfu/api/v1/terms", {:controller => "term", :action => "all_terms", :format => 'json'})
+          @set.add_route("/sfu/api/v1/terms/current", {:controller => "term", :action => "current_term", :format => 'json'})
+          @set.add_route("/sfu/api/v1/terms/next/:num_terms", {:controller => "term", :action => "next_terms", :num_terms => 1, :format => 'json'})
+          @set.add_route("/sfu/api/v1/terms/previous/:num_terms", {:controller => "term", :action => "next_terms", :num_terms => 1, :format => 'json'})
+          @set.add_route("/sfu/api/v1/terms/:sis_id", {:controller => "term", :action => "term_by_sis_id", :format => 'json'})
           @set.add_route("/sfu/api/v1/course/:sis_id/:property", {:controller => "api", :action => "course", :property => nil, :format => 'json'})
           @set.add_route("/sfu/api/v1/user/:sfu_id/:property", {:controller => "api", :action => "user", :property => nil, :format => 'json'})
           @set.add_route("/sfu/api/v1/course-data/:term/:query", {:controller => "course_data", :action => "search", :query => nil, :format => 'json'})
