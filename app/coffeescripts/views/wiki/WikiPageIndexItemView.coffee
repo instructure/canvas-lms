@@ -35,7 +35,7 @@ define [
       # attach/re-attach the publish icon
       unless @publishIconView
         @publishIconView = new PublishIconView model: @model
-        @publishIconView.view = @
+        @model.view = @
       @publishIconView.$el.appendTo(@$publishCell)
       @publishIconView.render()
 

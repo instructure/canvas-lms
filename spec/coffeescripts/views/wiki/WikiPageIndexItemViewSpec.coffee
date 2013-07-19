@@ -9,8 +9,9 @@ define [
     model = new WikiPage
     view = new WikiPageIndexItemView
       model: model
-    view.render()
 
+    strictEqual model.view, view, 'model.view is set to the item view'
+    view.render()
     strictEqual model.view, view, 'model.view is set to the item view'
 
   test 'detach/reattach the publish icon view', ->
