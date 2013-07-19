@@ -33,8 +33,9 @@ module AssignmentOverrideApplicator
     context = result_assignment_or_quiz.context
     if context && result_assignment_or_quiz.grants_right?(user, nil, :delete)
 
-      overridden_section_ids = assignment_or_quiz.active_assignment_overrides.
-        where(:set_type => 'CourseSection').map(&:set_id)
+      overridden_section_ids = result_assignment_or_quiz
+        .applied_overrides.select { |o| o.set_type == "CourseSection" }
+        .map(&:set_id)
       course_section_ids = context.active_course_sections.map(&:id)
 
       result_assignment_or_quiz.due_at =
