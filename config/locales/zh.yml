@@ -1690,10 +1690,10 @@ zh:
         cancel: 取消
         drop_highest: "最高分数:"
         drop_lowest: "最低分数:"
-        example_group_name: "即，问答题组 1"
+        example_group_name: "例如，问答题组 1"
         group_name: "组名称:"
         never_drop: "不删除:"
-        percent_of_total: "总评分的 %"
+        percent_of_total: 总评分的百分比
         save: 保存
         saving: 正在保存...
       never_drop: 
@@ -2531,7 +2531,7 @@ zh:
       name: 名称
       options: 选项
     general_error: 参加会议出错
-    general_error_with_message: "参加会议出错。消息: '%{message}'"
+    general_error_with_message: "参加会议时出错。消息: '%{message}'"
     inactive_error: 该会议当前未活动
     index: 
       concluded_conferences: 已结束的会议
@@ -3296,7 +3296,7 @@ zh:
       labels: 
         add_to_faculty_journal: 添加为教师日志条目
         course: 课程
-        group_conversation: 这是组会话。参与将会看到每个人的回复
+        group_conversation: 这是组会话。参与者将会看到每个人的回复
         subject: 主题
         to: 至
       links: 
@@ -3305,7 +3305,7 @@ zh:
       titles: 
         media_comment: 已记录媒体评论
         record_media_comment: 记录音频或视频评论
-        remove_media_comment: 移除媒体评论
+        remove_media_comment: 删除媒体评论
     message_list: 
       messages: 消息
     message_progress_bar_text: 
@@ -4446,7 +4446,7 @@ zh:
         other: "再显示 %{count} 个条目"
     error_draft_state_announcement: 此主题无法设置为草稿状态，因为这是一个通告。
     error_draft_state_unauthorized: 您无权将此主题设置为草稿状态。
-    error_draft_state_with_posts: 此主题不能设置为草稿状态，因为它包含帖子。
+    error_draft_state_with_posts: 此主题无法设置为草稿状态，因为它包含帖子。
     group_assignment_discussion_entry: 
       posts: 
         one: "%{count} 条公告"
@@ -4527,8 +4527,8 @@ zh:
       topic: 主题
       topic_podcast_feed_link: 主题播客馈送
       topic_subscribe: 订阅
-      topic_subscribe_tooltip: 您已取消订阅，将不再收到新评论
-      topic_subscribed_tooltip: 您已订阅，将收到新评论
+      topic_subscribe_tooltip: 您已取消订阅，将不再收到新评论的通知
+      topic_subscribed_tooltip: 您已订阅，将收到新评论的通知
       topic_unsubscribe: 已订阅
       unlock_topic: 开放评论
       unread: 未读
@@ -6174,7 +6174,7 @@ zh:
       add_unassigned_user: 
         assign_to_group: 分配到组
       add_unassigned_users: 
-        no_users_found: 未发现用户
+        no_users_found: 未找到用户
         too_short: 请输入具有三个或更多字符的搜索条件
       assign_to_group_menu: 
         add_to_group: 添加到组
@@ -6192,11 +6192,11 @@ zh:
         group_limit_blurb: "组仅限 *%{count}* 个成员"
         restricted_self_signup_blurb: 组内所有学生需要在相同的章节中
         search: 搜索
-        self_organized_warning: 这些组是学生自发组织的。与其他类型的组不同，在这些组中，学生可以同时属于多个组，因此，这些组未必是评分作业的最佳解决方案。
+        self_organized_warning: 这些组是学生自发组织的。与其他类型的组不同，在这些组中，学生可以同时属于多个组，因此这些组未必是评分作业的最佳解决方案。
         self_signup_blurb: 对这些组启用自行注册。
         self_signup_help_tooltip: 什么是自行注册组?
         student_group_instructions: (拖动学生以分配)
-        user_group_instructions: (拖动用户生以分配)
+        user_group_instructions: (拖动用户以分配)
       group_user: 
         assign_to_group: 分配到组
       group_users: 
@@ -6296,7 +6296,7 @@ zh:
     invalid_background_color: "背景色必须为 %{color}"
     invalid_dimensions: "图像尺寸无效 (当前为 %{actual}，预期为: %{expected})"
     invalid_file_size: "图像文件大小太大 (最大为 %{max} 字节，当前为 %{actual})"
-    invalid_file_type: "图像类型 %{type} 无效。允许的类型包括: %{type_list}"
+    invalid_file_type: "文件类型 %{type} 无效。允许的类型包括: %{type_list}"
     not_an_image: 所选文件不是图像
   info: 
     notices: 
@@ -9169,9 +9169,9 @@ zh:
       labels: 
         session_timeout: "会话到期前的时间（以分钟为单位，最少为 20 分钟）"
     settings_header: 
-      prompt_change_for_all_line1: 此时将对所有帐户更改设置!
+      prompt_change_for_all_line1: 这将针对所有帐户更改设置!
       prompt_change_for_all_line2: 是否完全确定要执行此操作?
-      prompt_delete_account_setting: 是否确定要删除用户配置?
+      prompt_delete_account_setting: 是否确定要删除帐户配置?
       select_account_prompt: （选择帐户）
     show: 
       back_to_list: 返回插件列表
@@ -10361,8 +10361,8 @@ zh:
         one: "%{count} 个测验已成功发布！"
         other: "%{count} 个测验已成功发布！"
       quizzes_unpublished: 
-        one: "%{count} 个测验已成功发布!"
-        other: "%{count} 个测验已成功发布!"
+        one: "%{count} 个测验已成功取消发布!"
+        other: "%{count} 个测验已成功取消发布!"
     practice_quiz: 练习测验
     question_colon: 问题：
     question_group: 
@@ -10563,7 +10563,7 @@ zh:
         unanswered: 未回答
         you_answered: 您已回答
       buttons: 
-        already_published: 已发布！
+        already_published: 已发布!
         lock_quiz: 立即锁定此测验
         lock_survey: 立即锁定此调查
         publish: 发布
