@@ -5,15 +5,11 @@ define [
   $.fn.serializeForm = ->
     rselectTextarea = /^(?:select|textarea)/i
     rcheckboxOrRadio = /checkbox|radio/i
-    rradio = /(?:radio)/i
     rCRLF = /\r?\n/g
     rinput = /^(?:color|date|datetime|datetime-local|email|hidden|month|number|password|range|search|tel|text|time|url|week|checkbox|radio|file)$/i
 
     isInput = (el) ->
       el.name && !el.disabled && rselectTextarea.test(el.nodeName) or rinput.test(el.type)
-
-    isRadioChecked = (el) ->
-      !rradio.test(el.type) || $(el).is(':checked')
 
     if this.is('[serialize-radio-value]')
       rcheckboxOrRadio = /checkbox/i # return val for radio boxes
@@ -52,6 +48,5 @@ define [
 
     _.chain(this[0].elements || this.find(':input'))
       .filter(isInput)
-      .filter(isRadioChecked)
       .map(getValue)
       .value()
