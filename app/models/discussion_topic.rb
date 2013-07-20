@@ -866,6 +866,7 @@ class DiscussionTopic < ActiveRecord::Base
     item.migration_id = hash[:migration_id]
     item.title = hash[:title]
     item.discussion_type = hash[:discussion_type]
+    item.pinned = !!hash[:pinned] if hash[:pinned]
     hash[:missing_links] = []
     item.message = ImportedHtmlConverter.convert(hash[:description] || hash[:text], context, {:missing_links => (hash[:missing_links])})
     item.message = t('#discussion_topic.empty_message', "No message") if item.message.blank?

@@ -98,7 +98,7 @@ module CC
         end
       end
     end
-    
+
     def create_canvas_topic(doc, topic)
       doc.topic_id CCHelper.create_key(topic)
       doc.title topic.title
@@ -113,6 +113,7 @@ module CC
         doc.tag!('type', 'topic')
       end
       doc.discussion_type topic.discussion_type
+      doc.pinned 'true' if topic.pinned
       if topic.assignment && !topic.assignment.deleted?
         assignment_migration_id = CCHelper.create_key(topic.assignment)
         doc.assignment(:identifier=>assignment_migration_id) do |a|
