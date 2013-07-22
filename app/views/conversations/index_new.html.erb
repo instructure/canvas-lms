@@ -1,5 +1,6 @@
 <% jammit_css :conversations_new %>
 <% js_bundle  :conversations_new %>
+<% @body_classes << 'full-width' %>
 
 <div class="conversations">
   <header class="panel">
@@ -20,21 +21,21 @@
     </div>
 
     <div class="actions">
-      <button class="btn action-compose-message">
+      <button class="btn" id="compose-btn">
         <span class="screenreader-only"><%= t(:new_message, "New message") %></span>
         <i class="icon-compose"></i>
       </button>
 
       <div class="btn-group">
-        <button class="btn">
+        <button class="btn" id="reply-btn" disabled>
           <span class="screenreader-only"><%= t(:reply, "Reply") %></span>
           <i class="icon-replied"></i>
         </button>
-        <button class="btn">
+        <button class="btn" id="reply-all-btn" disabled>
           <span class="screenreader-only"><%= t(:reply_all, "Reply all") %></span>
           <i class="icon-question"></i>
         </button>
-        <button class="btn">
+        <button class="btn" id="delete-btn" disabled>
           <span class="screenreader-only"><%= t(:delete_conversation, "Delete conversation") %></span>
           <i class="icon-trash"></i>
         </button>

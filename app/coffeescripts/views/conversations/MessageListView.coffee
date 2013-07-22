@@ -19,4 +19,4 @@ define [
 
     onClick: (e) ->
       return unless e.target is @el
-      @collection.find((m) -> m.get('selected')).set('selected', false)
+      @collection.each((m) -> m.set('selected', false))

@@ -50,6 +50,10 @@
     &:focus, &:hover {
       color: #333;
     }
+
+    &[disabled], &[disabled]:focus, &[disabled]:hover {
+      color: #a6a6a6;
+    }
   }
 
   .btn-group {

@@ -20,6 +20,7 @@ define [
       'click .read-state': 'toggleRead'
 
     initialize: ->
+      super
       @attachModel()
 
     attachModel: ->
@@ -29,6 +30,7 @@ define [
 
     select: (e) ->
       return if e.target.className.match(/star|read/)
+      @model.collection.each((m) -> m.set('selected', false))
       @model.set('selected', true)
       @model.set('workflow_state', 'read') if @model.unread()
 

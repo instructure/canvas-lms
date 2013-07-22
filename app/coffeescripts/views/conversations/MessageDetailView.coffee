@@ -1,9 +1,10 @@
 define [
   'i18n!conversations'
+  'underscore'
   'Backbone'
   'jst/conversations/messageDetail'
   'jst/conversations/noMessage'
-], (I18n, {View}, template, noMessage) ->
+], (I18n, _, {View}, template, noMessage) ->
 
   class MessageDetailView extends View
 
@@ -21,4 +22,7 @@ define [
         @$el.html(noMessage())
 
     selectMessage: (e) ->
-      $(e.target).parents('li[data-id]').toggleClass('active')
+      selectedMessage = $(e.currentTarget)
+      messageObject   = _.find(@model.get('messages'), (m) -> m.id == selectedMessage.data('id'))
+      messageObject.selected = !messageObject.selected
+      selectedMessage.toggleClass('active', messageObject.selected)
