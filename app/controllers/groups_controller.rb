@@ -146,25 +146,30 @@ class GroupsController < ApplicationController
   #
   # Returns a list of active groups for the current user.
   #
+  # @argument context_type [Optional] only include groups that are in this type of
+  #  context. Can be 'Account' or 'Course'
+  #
   # @example_request
-  #     curl https://<canvas>/api/v1/users/self/groups \ 
+  #     curl https://<canvas>/api/v1/users/self/groups?context_type=Account \ 
   #          -H 'Authorization: Bearer <token>'
   #
   # @returns [Group]
   def index
     return context_index if @context
+    groups_scope = @current_user.current_groups
+    groups_scope = groups_scope.where(:context_type => params[:context_type]) if params[:context_type]
     respond_to do |format|
       format.html do
-        @groups = @current_user.current_groups.by_name.
+        @groups = groups_scope.by_name.
           with_each_shard{ |scope| scope.includes(:group_category) }
       end
 
       format.json do
         @groups = BookmarkedCollection.with_each_shard(
           Group::Bookmarker,
-          @current_user.current_groups) { |scope| scope.includes(:group_category) }
+          groups_scope) { |scope| scope.includes(:group_category) }
         @groups = Api.paginate(@groups, self, api_v1_current_user_groups_url)
-        render :json => @groups.map { |g| group_json(g, @current_user, session) }
+        render :json => (@groups.map { |g| group_json(g, @current_user, session) })
       end
     end
   end

@@ -73,6 +73,20 @@ describe "Groups API", :type => :integration do
     links.all?{ |l| l =~ /api\/v1\/users\/self\/groups/ }.should be_true
   end
 
+  it "should allow listing all a user's group in a given context_type" do
+    @account = Account.default
+    course_with_student(:user => @member)
+    @group = @course.groups.create!(:name => "My Group")
+    @group.add_user(@member, 'accepted', true)
+
+    @user = @member
+    json = api_call(:get, "/api/v1/users/self/groups?context_type=Course", @category_path_options.merge(:action => "index", :context_type => 'Course'))
+    json.should == [group_json(@group, @user)]
+
+    json = api_call(:get, "/api/v1/users/self/groups?context_type=Account", @category_path_options.merge(:action => "index", :context_type => 'Account'))
+    json.should == [group_json(@community, @user)]
+  end
+
   it "should allow listing all of a course's groups" do
     course_with_teacher(:active_all => true)
     @group = @course.groups.create!(:name => 'New group')
