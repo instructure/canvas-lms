@@ -76,6 +76,11 @@
 #       // return a timestamp representing the last time the user logged in to
 #       // canvas.
 #       "last_login": "2012-05-30T17:45:25Z",
+#
+#       // Optional: This field is only returned in ceratin API calls, and will
+#       // return the IANA time zone name of
+#       // the user's preferred timezone
+#       "time_zone": "America/Denver",
 #     }
 class UsersController < ApplicationController
 
@@ -757,8 +762,8 @@ class UsersController < ApplicationController
   # @argument user[name] [Optional] The full name of the user. This name will be used by teacher for grading.
   # @argument user[short_name] [Optional] User's name as it will be displayed in discussions, messages, and comments.
   # @argument user[sortable_name] [Optional] User's name as used to sort alphabetically in lists.
-  # @argument user[time_zone] [Optional] The time zone for the user. Allowed time zones are listed in {http://rubydoc.info/docs/rails/2.3.8/ActiveSupport/TimeZone The Ruby on Rails documentation}.
-  # @argument user[locale] [Optional] The user's preferred language as a two-letter ISO 639-1 code. Current supported languages are English ("en") and Spanish ("es").
+  # @argument user[time_zone] [Optional] The time zone for the user. Allowed time zones are {http://www.iana.org/time-zones IANA time zones} or friendlier {http://api.rubyonrails.org/classes/ActiveSupport/TimeZone.html Ruby on Rails time zones}.
+  # @argument user[locale] [Optional] The user's preferred language as a two-letter ISO 639-1 code.
   # @argument user[birthdate] [Optional] The user's birth date.
   # @argument pseudonym[unique_id] User's login ID.
   # @argument pseudonym[password] [Optional] User's password.
@@ -942,8 +947,8 @@ class UsersController < ApplicationController
   # @argument user[name] [Optional] The full name of the user. This name will be used by teacher for grading.
   # @argument user[short_name] [Optional] User's name as it will be displayed in discussions, messages, and comments.
   # @argument user[sortable_name] [Optional] User's name as used to sort alphabetically in lists.
-  # @argument user[time_zone] [Optional] The time zone for the user. Allowed time zones are listed in {http://rubydoc.info/docs/rails/2.3.8/ActiveSupport/TimeZone The Ruby on Rails documentation}.
-  # @argument user[locale] [Optional] The user's preferred language as a two-letter ISO 639-1 code. Current supported languages are English ("en") and Spanish ("es").
+  # @argument user[time_zone] [Optional] The time zone for the user. Allowed time zones are {http://www.iana.org/time-zones IANA time zones} or friendlier {http://api.rubyonrails.org/classes/ActiveSupport/TimeZone.html Ruby on Rails time zones}.
+  # @argument user[locale] [Optional] The user's preferred language as a two-letter ISO 639-1 code.
   # @argument user[avatar][token] [Optional] A unique representation of the avatar record to assign as the user's current avatar. This token can be obtained from the user avatars endpoint. This supersedes the user[avatar][url] argument, and if both are included the url will be ignored. Note: this is an internal representation and is subject to change without notice. It should be consumed with this api endpoint and used in the user update endpoint, and should not be constructed by the client.
   # @argument user[avatar][url] [Optional] To set the user's avatar to point to an external url, do not include a token and instead pass the url here. Warning: For maximum compatibility, please use 128 px square images.
   #

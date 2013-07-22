@@ -31,6 +31,8 @@ class User < ActiveRecord::Base
 
   before_save :infer_defaults
   serialize :preferences
+  include TimeZoneHelper
+  time_zone_attribute :time_zone
   include Workflow
 
   # Internal: SQL fragments used to return enrollments in their respective workflow

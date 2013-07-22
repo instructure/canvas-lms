@@ -3,6 +3,7 @@
 ActionView::Helpers::InstanceTag.class_eval do
   def time_zone_options_for_select(selected = nil, priority_zones = nil, model = ::ActiveSupport::TimeZone)
     zone_options = ""
+    selected = selected.name if selected && selected.is_a?(::ActiveSupport::TimeZone)
 
     zones = model.all
     convert_zones = lambda { |list| list.map { |z| [ "#{z.name} (#{z.formatted_offset})", z.name ] } }

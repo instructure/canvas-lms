@@ -92,6 +92,8 @@ class Account < ActiveRecord::Base
   after_create :default_enrollment_term
   
   serialize :settings, Hash
+  include TimeZoneHelper
+  time_zone_attribute :default_time_zone, default: "America/Denver"
 
   validates_locale :default_locale, :allow_nil => true
   validate :account_chain_loop, :if => :parent_account_id_changed?
@@ -625,10 +627,6 @@ class Account < ActiveRecord::Base
   
   def self_and_all_sub_accounts
     @self_and_all_sub_accounts ||= Account.where("root_account_id=? OR parent_account_id=?", self, self).pluck(:id).uniq + [self.id]
-  end
-  
-  def default_time_zone
-    read_attribute(:default_time_zone) || "Mountain Time (US & Canada)"
   end
   
   workflow do

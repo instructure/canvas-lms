@@ -215,7 +215,7 @@ class AccountsController < ApplicationController
   # Update an existing account.
   #
   # @argument account[name] [optional] Updates the account name
-  # @argument account[default_time_zone] [Optional] The default time zone of the account. Allowed time zones are listed in {http://rubydoc.info/docs/rails/ActiveSupport/TimeZone The Ruby on Rails documentation}.
+  # @argument account[default_time_zone] [Optional] The default time zone of the account. Allowed time zones are {http://www.iana.org/time-zones IANA time zones} or friendlier {http://api.rubyonrails.org/classes/ActiveSupport/TimeZone.html Ruby on Rails time zones}.
   # @argument account[default_storage_quota_mb] [Optional] The default course storage quota to be used, if not otherwise specified.
   # @argument account[default_user_storage_quota_mb] [Optional] The default user storage quota to be used, if not otherwise specified.
   # @argument account[default_group_storage_quota_mb] [Optional] The default group storage quota to be used, if not otherwise specified.
@@ -232,7 +232,7 @@ class AccountsController < ApplicationController
   #   {
   #     "id": "1",
   #     "name": "New account name",
-  #     "default_time_zone": "Mountain Time (US & Canada)",
+  #     "default_time_zone": "America/Denver",
   #     "parent_account_id": null,
   #     "root_account_id": null,
   #     "default_storage_quota_mb": 500,

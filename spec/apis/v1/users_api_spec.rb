@@ -381,7 +381,7 @@ describe "Users API", :type => :integration do
             :name          => "Test User",
             :short_name    => "Test",
             :sortable_name => "User, T.",
-            :time_zone     => "Mountain Time (United States & Canada)",
+            :time_zone     => "Mountain Time (US & Canada)",
             :locale        => 'en'
           },
           :pseudonym => {
@@ -398,7 +398,7 @@ describe "Users API", :type => :integration do
       user.name.should eql "Test User"
       user.short_name.should eql "Test"
       user.sortable_name.should eql "User, T."
-      user.time_zone.should eql "Mountain Time (United States & Canada)"
+      user.time_zone.name.should eql "Mountain Time (US & Canada)"
       user.locale.should eql 'en'
 
       user.pseudonyms.count.should eql 1
@@ -528,7 +528,7 @@ describe "Users API", :type => :integration do
           'sis_login_id' => 'student@example.com',
           'locale' => 'en'
         }
-        user.time_zone.should eql 'Tijuana'
+        user.time_zone.name.should eql 'Tijuana'
       end
 
       it "should allow updating without any params" do

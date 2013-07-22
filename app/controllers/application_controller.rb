@@ -139,8 +139,8 @@ class ApplicationController < ActionController::Base
   def set_time_zone
     if @current_user && !@current_user.time_zone.blank?
       Time.zone = @current_user.time_zone
-      if Time.zone && Time.zone.name == "UTC" && @current_user.time_zone && @current_user.time_zone.match(/\s/)
-        Time.zone = @current_user.time_zone.split(/\s/)[1..-1].join(" ") rescue nil
+      if Time.zone && Time.zone.name == "UTC" && @current_user.time_zone && @current_user.time_zone.name.match(/\s/)
+        Time.zone = @current_user.time_zone.name.split(/\s/)[1..-1].join(" ") rescue nil
       end
     else
       Time.zone = @domain_root_account && @domain_root_account.default_time_zone

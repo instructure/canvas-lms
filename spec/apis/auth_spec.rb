@@ -555,6 +555,7 @@ describe "API Authentication", :type => :integration do
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" },
         'title' => nil,
         'bio' => nil,
+        'time_zone' => 'Etc/UTC',
       }
 
       # as_user_id is ignored if it's not allowed
@@ -574,6 +575,7 @@ describe "API Authentication", :type => :integration do
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" },
         'bio' => nil,
         'title' => nil,
+        'time_zone' => 'Etc/UTC',
       }
 
       # as_user_id is ignored if it's blank
@@ -591,6 +593,7 @@ describe "API Authentication", :type => :integration do
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" },
         'title' => nil,
         'bio' => nil,
+        'time_zone' => 'Etc/UTC',
       }
     end
 
@@ -616,6 +619,7 @@ describe "API Authentication", :type => :integration do
         'bio' => nil,
         'title' => nil,
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" },
+        'time_zone' => 'Etc/UTC',
       }
     end
 

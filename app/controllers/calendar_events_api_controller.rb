@@ -250,7 +250,7 @@ class CalendarEventsApiController < ApplicationController
   # @argument calendar_event[end_at] [Optional] End date/time of the event
   # @argument calendar_event[location_name] [Optional] Location name of the event
   # @argument calendar_event[location_address] [Optional] Location address
-  # @argument calendar_event[time_zone_edited] [Optional] Time zone of the user editing the event. Allowed time zones are listed in {http://rubydoc.info/docs/rails/2.3.8/ActiveSupport/TimeZone The Ruby on Rails documentation}.
+  # @argument calendar_event[time_zone_edited] [Optional] Time zone of the user editing the event. Allowed time zones are {http://www.iana.org/time-zones IANA time zones} or friendlier {http://api.rubyonrails.org/classes/ActiveSupport/TimeZone.html Ruby on Rails time zones}.
   # @argument calendar_event[child_event_data][X][start_at] [Optional] Section-level start time(s) if this is a course event. X can be any identifier, provided that it is consistent across the start_at, end_at and context_code
   # @argument calendar_event[child_event_data][X][end_at] [Optional] Section-level end time(s) if this is a course event.
   # @argument calendar_event[child_event_data][X][context_code] [Optional] Context code(s) corresponding to the section-level start and end time(s).
@@ -342,7 +342,7 @@ class CalendarEventsApiController < ApplicationController
   # @argument calendar_event[end_at] [Optional] End date/time of the event
   # @argument calendar_event[location_name] [Optional] Location name of the event
   # @argument calendar_event[location_address] [Optional] Location address
-  # @argument calendar_event[time_zone_edited] [Optional] Time zone of the user editing the event. Allowed time zones are listed in {http://rubydoc.info/docs/rails/2.3.8/ActiveSupport/TimeZone The Ruby on Rails documentation}.
+  # @argument calendar_event[time_zone_edited] [Optional] Time zone of the user editing the event. Allowed time zones are {http://www.iana.org/time-zones IANA time zones} or friendlier {http://api.rubyonrails.org/classes/ActiveSupport/TimeZone.html Ruby on Rails time zones}.
   # @argument calendar_event[child_event_data][X][start_at] [Optional] Section-level start time(s) if this is a course event. X can be any identifier, provided that it is consistent across the start_at, end_at and context_code. Note that if any child_event_data is specified, it will replace any existing child events.
   # @argument calendar_event[child_event_data][X][end_at] [Optional] Section-level end time(s) if this is a course event.
   # @argument calendar_event[child_event_data][X][context_code] [Optional] Context code(s) corresponding to the section-level start and end time(s).
