@@ -473,7 +473,7 @@ describe "Default Account Reports" do
 
       it "should run the SIS report with sis term and deleted courses" do
         parameters = {}
-        parameters["enrollment_term"] = "sis_term_id:fall12"
+        parameters["enrollment_term_id"] = "sis_term_id:fall12"
         parameters["include_deleted"] = true
         parameters["courses"] = true
         parsed = ReportSpecHelper.run_report(@account,"sis_export_csv",parameters)
@@ -532,7 +532,7 @@ describe "Default Account Reports" do
 
       it "should run the provisioning report report with the default term" do
         parameters = {}
-        parameters["enrollment_term"] = @default_term.id
+        parameters["enrollment_term_id"] = @default_term.id
         parameters["courses"] = true
         parsed = ReportSpecHelper.run_report(@account,"sis_export_csv",parameters)
 
@@ -550,7 +550,7 @@ describe "Default Account Reports" do
 
       it "should run the SIS report for a term" do
         parameters = {}
-        parameters["enrollment_term"] = @default_term.id
+        parameters["enrollment_term_id"] = @default_term.id
         parameters["sections"] = true
         parsed = ReportSpecHelper.run_report(@account,"sis_export_csv",parameters)
 
@@ -658,7 +658,7 @@ describe "Default Account Reports" do
 
       it "should run sis report for a term" do
         parameters = {}
-        parameters["enrollment_term"] = @default_term.id
+        parameters["enrollment_term_id"] = @default_term.id
         parameters["enrollments"] = true
         parsed = ReportSpecHelper.run_report(@account,"sis_export_csv",parameters,[1,0])
         parsed.length.should == 4
@@ -712,7 +712,7 @@ describe "Default Account Reports" do
         parameters = {}
         parameters["enrollments"] = true
         parameters["include_deleted"] = true
-        parameters["enrollment_term"] = @term1.id
+        parameters["enrollment_term_id"] = @term1.id
         parsed = ReportSpecHelper.run_report(@sub_account,"provisioning_csv",parameters,[3,1,5])
 
         parsed.length.should == 6
@@ -740,7 +740,7 @@ describe "Default Account Reports" do
 
       it "should run the SIS report" do
         parameters = {}
-        parameters["enrollment_term"] = @default_term.id
+        parameters["enrollment_term_id"] = @default_term.id
         parameters["groups"] = true
         parsed = ReportSpecHelper.run_report(@account,"sis_export_csv",parameters,2)
         parsed.length.should == 2
@@ -791,7 +791,7 @@ describe "Default Account Reports" do
 
       it "should run the sis report" do
         parameters = {}
-        parameters["enrollment_term"] = @default_term.id
+        parameters["enrollment_term_id"] = @default_term.id
         parameters["group_membership"] = true
         parsed = ReportSpecHelper.run_report(@account,"sis_export_csv",parameters)
         parsed.length.should == 2
@@ -845,7 +845,7 @@ describe "Default Account Reports" do
 
       it "should run the sis report with the default term" do
         parameters = {}
-        parameters["enrollment_term"] = @default_term.id
+        parameters["enrollment_term_id"] = @default_term.id
         parameters["xlist"] = true
         parsed = ReportSpecHelper.run_report(@account,"sis_export_csv",parameters)
         parsed.length.should == 1
@@ -902,7 +902,7 @@ describe "Default Account Reports" do
       create_some_accounts()
 
       parameters = {}
-      parameters["enrollment_term"] = @default_term.id
+      parameters["enrollment_term_id"] = @default_term.id
       parameters["accounts"] = true
       parameters["users"] = true
       parameters["courses"] = true

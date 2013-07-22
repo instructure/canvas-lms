@@ -177,4 +177,174 @@ describe 'Student reports' do
                            @course2.id.to_s, nil, 'Math 101']
     end
   end
+
+  describe 'zero activity report' do
+    before(:each) do
+      @type = 'zero_activity_csv'
+
+      @course1.enroll_user(@user3, 'StudentEnrollment', {:enrollment_state => 'active'})
+      @course3.enroll_user(@user3, 'StudentEnrollment', {:enrollment_state => 'active'})
+
+      @asset1 = factory_with_protected_attributes(
+        AssetUserAccess, :user => @user1, :context => @course1,
+        :asset_code => @assignment1.asset_string
+      )
+      @asset2 = factory_with_protected_attributes(
+        AssetUserAccess, :user => @user2, :context => @course2,
+        :asset_code => @assignment2.asset_string
+      )
+      @asset3 = factory_with_protected_attributes(
+        AssetUserAccess, :user => @user3, :context => @course3,
+        :asset_code => @assignment3.asset_string
+      )
+      @asset4 = factory_with_protected_attributes(
+        AssetUserAccess, :user => @user3, :context => @course3,
+        :asset_code => @assignment4.asset_string
+      )
+    end
+
+    it 'should run the zero activity report for course' do
+      param = {}
+      param['course'] = @course1.id
+      parsed = ReportSpecHelper.run_report(@account,@type,param,[1,5])
+      parsed.length.should == 2
+      parsed[0].should == [@user2.id.to_s, 'user_sis_id_02',
+                           'Bolton, Michael', @section1.id.to_s,
+                           @section1.sis_source_id, @section1.name,
+                           @course1.id.to_s, 'SIS_COURSE_ID_1', 'English 101']
+      parsed[1].should == [@user3.id.to_s, 'user_sis_id_03',
+                           @user3.sortable_name, @section1.id.to_s,
+                           @section1.sis_source_id, @section1.name,
+                           @course1.id.to_s, 'SIS_COURSE_ID_1', 'English 101']
+    end
+
+    it 'should run the zero activity report for term' do
+      @term1 = EnrollmentTerm.create(:name => 'Fall')
+      @term1.root_account = @account
+      @term1.sis_source_id = 'fall12'
+      @term1.save!
+      @course1.enrollment_term = @term1
+      @course1.save
+      param = {}
+      param['enrollment_term'] = 'sis_term_id:fall12'
+      parsed = ReportSpecHelper.run_report(@account,@type,param,[1,5])
+      parsed.length.should == 2
+      parsed[0].should == [@user2.id.to_s, 'user_sis_id_02',
+                           'Bolton, Michael', @section1.id.to_s,
+                           @section1.sis_source_id, @section1.name,
+                           @course1.id.to_s, 'SIS_COURSE_ID_1', 'English 101']
+      parsed[1].should == [@user3.id.to_s, 'user_sis_id_03',
+                           @user3.sortable_name, @section1.id.to_s,
+                           @section1.sis_source_id, @section1.name,
+                           @course1.id.to_s, 'SIS_COURSE_ID_1', 'English 101']
+    end
+
+    it 'should run the zero activity report with no params' do
+      parsed = ReportSpecHelper.run_report(@account,@type,{},[1,5])
+      parsed.length.should == 3
+
+      parsed[0].should == [@user1.id.to_s, 'user_sis_id_01',
+                           @user1.sortable_name, @section2.id.to_s,
+                           @section2.sis_source_id, @section2.name,
+                           @course2.id.to_s, nil, 'Math 101']
+      parsed[1].should == [@user2.id.to_s, 'user_sis_id_02',
+                           'Bolton, Michael', @section1.id.to_s,
+                           @section1.sis_source_id, @section1.name,
+                           @course1.id.to_s, 'SIS_COURSE_ID_1', 'English 101']
+      parsed[2].should == [@user3.id.to_s, 'user_sis_id_03',
+                           @user3.sortable_name, @section1.id.to_s,
+                           @section1.sis_source_id, @section1.name,
+                           @course1.id.to_s, 'SIS_COURSE_ID_1', 'English 101']
+    end
+
+    it 'should run zero activity report on a sub account' do
+      sub_account = Account.create(:parent_account => @account,:name => 'Math')
+      @course2.account = sub_account
+      @course2.save!
+
+      parsed = ReportSpecHelper.run_report(sub_account,@type,{},[1,5])
+      parsed.length.should == 1
+      parsed[0].should == [@user1.id.to_s, 'user_sis_id_01',
+                           @user1.sortable_name, @section2.id.to_s,
+                           @section2.sis_source_id, @section2.name,
+                           @course2.id.to_s, nil, 'Math 101']
+    end
+
+    it 'should ignore everything before the start date' do
+      AssetUserAccess.where(:id => @asset1).
+        update_all(:updated_at => 6.days.ago)
+      parameter = {}
+      parameter['start_at'] = 3.days.ago
+      parsed = ReportSpecHelper.run_report(@account,@type,parameter,[1,5])
+
+      parsed.length.should == 4
+      parsed[0].should == [@user1.id.to_s, 'user_sis_id_01',
+                           @user1.sortable_name, @section1.id.to_s,
+                           @section1.sis_source_id, @section1.name,
+                           @course1.id.to_s, 'SIS_COURSE_ID_1', 'English 101']
+      parsed[1].should == [@user1.id.to_s, 'user_sis_id_01',
+                           @user1.sortable_name, @section2.id.to_s,
+                           @section2.sis_source_id, @section2.name,
+                           @course2.id.to_s, nil, 'Math 101']
+      parsed[2].should == [@user2.id.to_s, 'user_sis_id_02',
+                           'Bolton, Michael', @section1.id.to_s,
+                           @section1.sis_source_id, @section1.name,
+                           @course1.id.to_s, 'SIS_COURSE_ID_1', 'English 101']
+      parsed[3].should == [@user3.id.to_s, 'user_sis_id_03',
+                           @user3.sortable_name, @section1.id.to_s,
+                           @section1.sis_source_id, @section1.name,
+                           @course1.id.to_s, 'SIS_COURSE_ID_1', 'English 101']
+    end
+  end
+
+  describe 'last user access report' do
+    before(:each) do
+      @type = 'last_user_access_csv'
+      @last_login_time = 1.week.ago
+      @last_login_time2 = 8.days.ago
+      @p1 = @user1.pseudonyms.first
+      @p1.last_login_at = @last_login_time2
+      @p1.last_request_at = @last_login_time2
+      @p1.save
+      @p2 = @user2.pseudonyms.first
+      @p2.last_login_at = @last_login_time
+      @p2.last_request_at = @last_login_time
+      @p2.save
+      @p3 = @user3.pseudonyms.first
+      @p3.last_login_at = @last_login_time2
+      @p3.last_request_at = @last_login_time2
+      @p3.save
+    end
+
+    it 'should run the last user access report' do
+      parsed = ReportSpecHelper.run_report(@account,@type)
+      parsed.length.should == 3
+      parsed[0].should == [@user1.id.to_s, 'user_sis_id_01', 'Clair, John St.', @last_login_time2.iso8601, @p1.current_login_ip]
+      parsed[1].should == [@user2.id.to_s, 'user_sis_id_02', 'Bolton, Michael', @last_login_time.iso8601, @p2.current_login_ip]
+      parsed[2].should == [@user3.id.to_s, 'user_sis_id_03', 'Astley, Rick', @last_login_time2.iso8601, @p3.current_login_ip]
+    end
+
+    it 'should run the last user access report for a term' do
+      @term1 = EnrollmentTerm.create(:name => 'Fall')
+      @term1.root_account = @account
+      @term1.save!
+      @course1.enrollment_term = @term1
+      @course1.save
+      param = {}
+      param['enrollment_term'] = @term1.id
+      parsed = ReportSpecHelper.run_report(@account,@type,param)
+      parsed.length.should == 2
+      parsed[0].should == [@user1.id.to_s, 'user_sis_id_01', 'Clair, John St.', @last_login_time2.iso8601, @p1.current_login_ip]
+      parsed[1].should == [@user2.id.to_s, 'user_sis_id_02', 'Bolton, Michael', @last_login_time.iso8601, @p2.current_login_ip]
+    end
+
+    it 'should run the last user access report for a course' do
+      param = {}
+      param['course'] = @course.id
+      parsed = ReportSpecHelper.run_report(@account,@type,param)
+      parsed.length.should == 2
+      parsed[0].should == [@user1.id.to_s, 'user_sis_id_01', 'Clair, John St.', @last_login_time2.iso8601, @p1.current_login_ip]
+      parsed[1].should == [@user2.id.to_s, 'user_sis_id_02', 'Bolton, Michael', @last_login_time.iso8601, @p2.current_login_ip]
+    end
+  end
 end

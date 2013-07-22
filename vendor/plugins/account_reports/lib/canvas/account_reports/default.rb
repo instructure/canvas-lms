@@ -47,5 +47,13 @@ module Canvas::AccountReports
       StudentReports.new(account_report).students_with_no_submissions
     end
 
+    def self.zero_activity_csv(account_report)
+      StudentReports.new(account_report).zero_activity
+    end
+
+    def self.last_user_access_csv(account_report)
+      StudentReports.new(account_report).last_user_access
+    end
+
   end
 end
