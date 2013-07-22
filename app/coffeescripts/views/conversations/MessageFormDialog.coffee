@@ -81,11 +81,13 @@ define [
     # detach events that were dynamically added when the dialog is closed.
     afterClose: ->
       @$fullDialog.off 'click', '.attach-file'
-      @$fullDialog.off 'click', '.attachment a.remove_link'
+      @$fullDialog.off 'click', '.attachment .remove_link'
       @$fullDialog.off 'keydown', '.attachment'
+      @$fullDialog.off 'click', '.attachment'
+      @$fullDialog.off 'dblclick', '.attachment'
       @$fullDialog.off 'change', '.file_input'
       @$fullDialog.off 'click', '.attach-media'
-      @$fullDialog.off 'click', '.media-comment a.remove_link'
+      @$fullDialog.off 'click', '.media-comment .remove_link'
 
     sendMessage: (e) ->
       e.preventDefault()
@@ -204,14 +206,16 @@ define [
 
       @$fullDialog.on 'click', '.attach-file', preventDefault =>
         @addAttachment()
-      @$fullDialog.on 'click', '.attachment a.remove_link', preventDefault (e) =>
+      @$fullDialog.on 'click', '.attachment .remove_link', preventDefault (e) =>
         @removeAttachment($(e.currentTarget))
-      @$fullDialog.on 'keydown', '.attachment', @handleAttachmentKeyPress
+      @$fullDialog.on 'keydown', '.attachment', @handleAttachmentKeyDown
+      @$fullDialog.on 'click', '.attachment', @handleAttachmentClick
+      @$fullDialog.on 'dblclick', '.attachment', @handleAttachmentDblClick
       @$fullDialog.on 'change', '.file_input', @handleAttachment
 
       @$fullDialog.on 'click', '.attach-media', preventDefault =>
         @addMediaComment()
-      @$fullDialog.on 'click', '.media_comment a.remove_link', preventDefault (e) =>
+      @$fullDialog.on 'click', '.media_comment .remove_link', preventDefault (e) =>
         @removeMediaComment($(e.currentTarget))
       @$addMediaComment[if !!INST.kalturaSettings then 'show' else 'hide']()
 
@@ -257,26 +261,39 @@ define [
       @$attachments.append($attachment)
       $attachment.hide()
       $attachment.find('input').click()
+      @focusAddAttachment()
 
     imageTypes: ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg']
+
+    handleAttachmentClick: (e) =>
+      # IE doesn't do this automatically
+      $(e.currentTarget).focus()
+
+    handleAttachmentDblClick: (e) =>
+      $(e.currentTarget).find('input').click()
 
     handleAttachment: (e) =>
       input = e.currentTarget
       $attachment = $(input).closest('.attachment')
-      $attachment.show()
-      $attachment.slideDown "fast", =>
-        @updateAttachmentPane()
-      $icon = $attachment.find('i')
+      @updateAttachmentPane()
+      if !input.value
+        $attachment.hide()
+        return
+      $attachment.slideDown "fast"
+      $icon = $attachment.find('.attachment-icon i')
+      $icon.empty()
       file = input.files[0]
       name = file.name
       $attachment.find('.attachment-name').text(name)
+      remove = $attachment.find('.remove_link')
+      remove.attr('aria-label', remove.attr('title')+': '+name)
       extension = name.split('.').pop().toLowerCase()
       if extension in @imageTypes && window.FileReader
         picReader = new FileReader()
         picReader.addEventListener("load", (e) ->
           picFile = e.target
           $icon.attr('class', '')
-          $icon.empty().append($('<img />').attr('src', picFile.result))
+          $icon.append($('<img />').attr('src', picFile.result))
         )
         picReader.readAsDataURL(file)
         return
@@ -287,18 +304,46 @@ define [
       else if extension in ['xls', 'xlsx'] then icon = 'ms-excel'
       $icon.attr('class', "icon-#{icon}")
 
-    handleAttachmentKeyPress: (e) =>
-      if e.keyCode != 46 && e.keyCode != 68 then return # delete, "d"
+    handleAttachmentKeyDown: (e) =>
+      if e.keyCode == 37 # left
+        return @focusPrevAttachment($(e.currentTarget))
+      if e.keyCode == 39 # right
+        return @focusNextAttachment($(e.currentTarget))
+      if (e.keyCode == 13 || e.keyCode == 32) && !$(e.target).hasClass('remove_link') # enter, space
+        @handleAttachmentDblClick(e)
+        return false
+      # delete, "d", enter, space
+      if e.keyCode != 46 && e.keyCode != 68 && e.keyCode != 13 && e.keyCode != 32
+        return
       @removeAttachment(e.currentTarget)
+      return false
 
     removeEmptyAttachments: ->
       _.each(@$attachments.find('input[value=]'), @removeAttachment)
 
     removeAttachment: (node) =>
       $attachment = $(node).closest(".attachment")
+
+      if !@focusNextAttachment($attachment)
+        if !@focusPrevAttachment($attachment)
+          @focusAddAttachment()
+
       $attachment.slideUp "fast", =>
         $attachment.remove()
         @updateAttachmentPane()
+        
+    focusPrevAttachment: ($attachment) =>
+      $newTarget = $attachment.prevAll(':visible').first()
+      if !$newTarget.length then return false
+      $newTarget.focus()
+
+    focusNextAttachment: ($attachment) =>
+      $newTarget = $attachment.nextAll(':visible').first()
+      if !$newTarget.length then return false
+      $newTarget.focus()
+
+    focusAddAttachment: () ->
+      @$fullDialog.find('.attach-file').focus()
 
 #    addToken: (userData) ->
 #      input = @$el.find('.recipients').data('token_input')
@@ -319,7 +364,7 @@ define [
       @$addMediaComment.show()
 
     updateAttachmentPane: ->
-      @$attachmentsPane[if @$attachmentsPane.find('.attachment').length then 'addClass' else 'removeClass']('has-items')
+      @$attachmentsPane[if @$attachmentsPane.find('input:not([value=])').length then 'addClass' else 'removeClass']('has-items')
       @resizeBody()
 
 #    messageData: (data) ->
