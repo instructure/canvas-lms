@@ -193,6 +193,17 @@ Rails.configuration.to_prepare do
         }
       }
     },
+    'unused_courses_csv'=> {
+      :title => 'Unused Courses',
+      :description_partial => true,
+      :parameters_partial => 'term_selector_parameters',
+      :parameters => {
+        :enrollment_term_id => {
+          :required => false,
+          :description => 'The canvas id of the term to get courses from'
+        }
+      }
+    },
     'zero_activity_csv'=> {
       :title => 'Zero Activity',
       :description_partial => true,
