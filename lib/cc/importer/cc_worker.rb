@@ -52,7 +52,7 @@ class Canvas::Migration::Worker::CCWorker < Struct.new(:migration_id)
       saved = cm.save
       cm.update_conversion_progress(100)
 
-      if cm.import_immediately?
+      if cm.import_immediately? && !cm.for_course_copy?
          cm.import_content
          cm.update_import_progress(100)
          saved = cm.save

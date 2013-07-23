@@ -30,6 +30,7 @@ describe ContentMigration do
 
       @cm = ContentMigration.new(:context => @copy_to, :user => @user, :source_course => @copy_from, :copy_options => {:everything => "1"})
       @cm.user = @user
+      @cm.migration_settings[:import_immediately] = true
       @cm.save!
     end
 
