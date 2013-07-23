@@ -108,17 +108,17 @@ class Wiki < ActiveRecord::Base
   end
 
   set_policy do
-    given {|user| self.context.is_public }
+    given {|user| self.context.is_public}
     can :read
 
-    given {|user, session| self.cached_context_grants_right?(user, session, :read) }#students.include?(user) }
+    given {|user, session| self.cached_context_grants_right?(user, session, :read)}
     can :read
 
     given {|user, session| self.cached_context_grants_right?(user, session, :participate_as_student) && self.context.allow_student_wiki_edits}
-    can :contribute and can :read and can :update and can :delete and can :create and can :create_page and can :update_page
+    can :read and can :create_page and can :update_page and can :update_page_content
 
-    given {|user, session| self.cached_context_grants_right?(user, session, :manage_wiki) }#admins.include?(user) }
-    can :manage and can :read and can :update and can :create and can :delete and can :create_page and can :update_page
+    given {|user, session| self.cached_context_grants_right?(user, session, :manage_wiki)}
+    can :manage and can :read and can :update and can :create_page and can :delete_page and can :delete_unpublished_page and can :update_page and can :update_page_content
   end
 
   def self.wiki_for_context(context)

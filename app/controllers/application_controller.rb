@@ -989,7 +989,7 @@ class ApplicationController < ActionController::Base
       :url => page_name.to_url
     )
     if @page.new_record?
-      if @domain_root_account.enable_draft?
+      if @domain_root_account.enable_draft? && !@context.is_a?(Group)
         @page.workflow_state = 'unpublished'
       else
         @page.workflow_state = 'active'

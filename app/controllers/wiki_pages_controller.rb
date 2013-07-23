@@ -55,37 +55,48 @@ class WikiPagesController < ApplicationController
   def update
     if authorized_action(@page, @current_user, :update_content)
       unless @page.grants_right?(@current_user, session, :update)
-        params[:wiki_page] = {:body => params[:wiki_page][:body], :title => params[:wiki_page][:title]}
+        params[:wiki_page] = {:body => params[:wiki_page][:body]}
       end
-      if @page.deleted? && @domain_root_account.enable_draft?
-        @page.workflow_state = 'unpublished'
-      elsif @page.deleted?
-        @page.workflow_state = 'active'
-      end
-      if @page.update_attributes(params[:wiki_page].merge(:user_id => @current_user.id))
-        log_asset_access(@page, "wiki", @wiki, 'participate')
-        generate_new_page_view
-        @page.context_module_action(@current_user, @context, :contributed)
-        flash[:notice] = t('notices.page_updated', 'Page was successfully updated.')
-        respond_to do |format|
-          format.html { return_to(params[:return_to], context_wiki_page_url(:edit => params[:action] == 'create')) }
-          format.json {
-            json = @page.as_json
-            json[:success_url] = context_wiki_page_url(:edit => params[:action] == 'create')
-            render :json => json
-          }
-        end
-      else
-        respond_to do |format|
-          format.html { render :action => "show" }
-          format.json { render :json => @page.errors.to_json, :status => :bad_request }
-        end
-      end
+      perform_update
     end
   end
 
   def create
-    update
+    if authorized_action(@page, @current_user, :create)
+      perform_update
+      unless @wiki.grants_right?(@current_user, session, :manage)
+        @page.workflow_state = 'active'
+        @page.editing_roles = (@context.default_wiki_editing_roles rescue nil) || @page.default_roles
+        @page.save!
+      end
+    end
+  end
+
+  def perform_update
+    if @page.deleted? && @domain_root_account.enable_draft? && !@context.is_a?(Group)
+      @page.workflow_state = 'unpublished'
+    elsif @page.deleted?
+      @page.workflow_state = 'active'
+    end
+    if @page.update_attributes(params[:wiki_page].merge(:user_id => @current_user.id))
+      log_asset_access(@page, "wiki", @wiki, 'participate')
+      generate_new_page_view
+      @page.context_module_action(@current_user, @context, :contributed)
+      flash[:notice] = t('notices.page_updated', 'Page was successfully updated.')
+      respond_to do |format|
+        format.html { return_to(params[:return_to], context_wiki_page_url(:edit => params[:action] == 'create')) }
+        format.json {
+          json = @page.as_json
+          json[:success_url] = context_wiki_page_url(:edit => params[:action] == 'create')
+          render :json => json
+        }
+      end
+    else
+      respond_to do |format|
+        format.html { render :action => "show" }
+        format.json { render :json => @page.errors.to_json, :status => :bad_request }
+      end
+    end
   end
 
   def destroy
@@ -120,7 +131,7 @@ class WikiPagesController < ApplicationController
   end
 
   def pages_index
-    if authorized_action(@context, @current_user, :read)
+    if authorized_action(@context.wiki, @current_user, :read)
       @padless = true
     end
   end
@@ -151,7 +162,7 @@ class WikiPagesController < ApplicationController
       return front_page # delegate to front_page logic
     end
 
-    if authorized_action(@page, @current_user, :read)
+    if is_authorized_action?(@page, @current_user, [:update, :update_content])
       add_crumb(@page.title)
 
       js_env :wiki_pages_url => polymorphic_path([@context, :pages])
@@ -159,6 +170,11 @@ class WikiPagesController < ApplicationController
 
       @padless = true
       render
+    else
+      if authorized_action(@page, @current_user, :read)
+        flash[:error] = t('notices.cannot_edit', 'You are not allowed to edit the page "%{title}".', :title => @page.title)
+        redirect_to polymorphic_url([@context, :named_page], :wiki_page_id => @page)
+      end
     end
   end
 
