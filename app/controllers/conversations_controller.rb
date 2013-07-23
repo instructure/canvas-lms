@@ -22,6 +22,7 @@
 class ConversationsController < ApplicationController
   include ConversationsHelper
   include SearchHelper
+  include KalturaHelper
   include Api::V1::Conversation
   include Api::V1::Progress
 
@@ -132,15 +133,17 @@ class ConversationsController < ApplicationController
       load_all_contexts :permissions => [:manage_user_notes]
       notes_enabled = @current_user.associated_accounts.any?{|a| a.enable_user_notes }
       can_add_notes_for_account = notes_enabled && @current_user.associated_accounts.any?{|a| a.grants_right?(@current_user, nil, :manage_students) }
-      js_env(:CONVERSATIONS => {
-        :USER => conversation_users_json([@current_user], @current_user, session, :include_participant_contexts => false).first,
-        :CONTEXTS => @contexts,
-        :NOTES_ENABLED => notes_enabled,
-        :CAN_ADD_NOTES_FOR_ACCOUNT => can_add_notes_for_account,
-        :SHOW_INTRO => !@current_user.watched_conversations_intro?,
-        :FOLDER_ID => @current_user.conversation_attachments_folder.id,
-        :MEDIA_COMMENTS_ENABLED => feature_enabled?(:kaltura),
-      }, :CONTEXT_ACTION_SOURCE => :conversation)
+      hash = {:CONVERSATIONS => {
+          :USER => conversation_users_json([@current_user], @current_user, session, :include_participant_contexts => false).first,
+          :CONTEXTS => @contexts,
+          :NOTES_ENABLED => notes_enabled,
+          :CAN_ADD_NOTES_FOR_ACCOUNT => can_add_notes_for_account,
+          :SHOW_INTRO => !@current_user.watched_conversations_intro?,
+          :FOLDER_ID => @current_user.conversation_attachments_folder.id,
+          :MEDIA_COMMENTS_ENABLED => feature_enabled?(:kaltura),
+      }, :CONTEXT_ACTION_SOURCE => :conversation}
+      append_sis_data(hash)
+      js_env(hash)
     end
   end
 

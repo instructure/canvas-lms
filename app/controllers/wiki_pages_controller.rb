@@ -17,6 +17,7 @@
 #
 class WikiPagesController < ApplicationController
   include Api::V1::WikiPage
+  include KalturaHelper
 
   before_filter :require_context
   before_filter :get_wiki_page, :except => [:index]
@@ -24,6 +25,9 @@ class WikiPagesController < ApplicationController
   before_filter { |c| c.active_tab = "pages" }
 
   def show
+    hash = { :CONTEXT_ACTION_SOURCE => :wiki }
+    append_sis_data(hash)
+    js_env(hash)
     @editing = true if Canvas::Plugin.value_to_boolean(params[:edit])
     if @page.deleted?
       flash[:notice] = t('notices.page_deleted', 'The page "%{title}" has been deleted.', :title => @page.title)
