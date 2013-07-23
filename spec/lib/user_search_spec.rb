@@ -1,6 +1,6 @@
 # encoding: utf-8
 
-require File.expand_path( '../spec_helper' , File.dirname(__FILE__))
+require File.expand_path( '../sharding_spec_helper' , File.dirname(__FILE__))
 
 describe UserSearch do
 
@@ -152,6 +152,17 @@ describe UserSearch do
         describe 'searching by a DB ID' do
           it 'matches against the database id' do
             UserSearch.for_user_in_context(user.id, course, user).should == [user]
+          end
+
+          describe "cross-shard users" do
+            specs_require_sharding
+
+            it 'matches against the database id of a cross-shard user' do
+              user = @shard1.activate { user_model }
+              course.enroll_student(user)
+              UserSearch.for_user_in_context(user.global_id, course, user).should == [user]
+              UserSearch.for_user_in_context(user.global_id, course.account, user).should == [user]
+            end
           end
         end
       end

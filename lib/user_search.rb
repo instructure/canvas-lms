@@ -4,7 +4,8 @@ module UserSearch
     search_term = search_term.to_s
     base_scope = scope_for(context, searcher, options.slice(:enrollment_type, :enrollment_role, :exclude_groups))
     if search_term.to_s =~ Api::ID_REGEX
-      user = base_scope.find_by_id(search_term)
+      db_id = Shard.relative_id_for(search_term)
+      user = base_scope.where(id: db_id).first
       if user
         return [user]
       elsif !SearchTermHelper.valid_search_term?(search_term)
