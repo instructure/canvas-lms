@@ -350,5 +350,31 @@ describe "assignment groups" do
       wait_for_ajaximations
       f(selector).should have_attribute('aria-expanded', 'false')
     end
+
+    context "modules" do
+      before do
+        @module = @course.context_modules.create!(:name => "module 1")
+        @assignment = @course.assignments.create!(:name => 'assignment 1', :assignment_group => @assignment_group)
+        @module.add_item :type => 'assignment', :id => @assignment.id
+      end
+
+      it "should show a single module's name" do
+        refresh_page
+        wait_for_ajaximations
+        f("#assignment_group_#{@assignment_group.id} .ig-row .ig-details .modules").text.should == "#{@module.name} Module"
+      end
+
+      it "should correctly display multiple modules" do
+        @a2 = @course.assignments.create!(:name => 'assignment 2', :assignment_group => @assignment_group)
+        @m2 = @course.context_modules.create!(:name => "module 2")
+        @module.add_item :type => 'assignment', :id => @a2.id
+        @m2.add_item :type => 'assignment', :id => @a2.id
+        refresh_page
+        wait_for_ajaximations
+        anchor = fj("[data-item-id=#{@a2.id}] .modules .tooltip_link")
+        anchor.text.should == "Multiple Modules"
+        anchor.should have_attribute('title', "#{@module.name},#{@m2.name}")
+      end
+    end
   end
 end

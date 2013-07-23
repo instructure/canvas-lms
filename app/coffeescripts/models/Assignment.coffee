@@ -197,6 +197,13 @@ define [
 
     htmlUrl: => @get 'html_url'
 
+    modules: (names)  =>
+      return @get 'modules' unless arguments.length > 0
+      @set 'modules', names
+
+    labelId: =>
+      return @id
+
     toView: =>
       fields = [
         'name', 'dueAt','description','pointsPossible', 'lockAt', 'unlockAt',
@@ -210,7 +217,7 @@ define [
         'gradeGroupStudentsIndividually', 'groupCategoryId', 'frozen',
         'frozenAttributes', 'freezeOnCopy', 'canFreeze', 'isSimple',
         'gradingStandardId', 'isLetterGraded', 'assignmentGroupId', 'iconType',
-        'published', 'htmlUrl'
+        'published', 'htmlUrl', 'modules', 'labelId'
       ]
       hash = id: @get 'id'
       for field in fields

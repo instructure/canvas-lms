@@ -1,17 +1,35 @@
-<div id="assignment_{{id}}" class="ig-row {{#if published}}ig-published{{/if}}">
+<div id="assignment_{{id}}" class="ig-row {{#if published}}ig-published{{/if}}" data-item-id="{{labelId}}">
   <a href="{{htmlUrl}}" class="ig-title ellipses">
     <i class='icon-{{iconType}}'></i>
     {{name}}
   </a>
   <div class="ig-details row-fluid">
-    <div class="span6 ellipses">
+    <div class="span4 ellipses modules">
+        {{#ifEqual module_count 1}}
+          {{module_name}} {{#t "module"}}Module{{/t}}
+        {{else}}
+          {{#if has_modules}}
+            <a href='#' title='{{joined_names}}' class="tooltip_link" data-tooltip-selector="#module_tooltip_{{labelId}}">
+              {{#t "multiple_modules"}}Multiple Modules{{/t}}
+            </a>
+          {{/if}}
+        {{/ifEqual}}
+    </div>
+    {{#if has_modules}}
+      <div id="module_tooltip_{{labelId}}" style="display:none;">
+        {{#each modules}}
+          <span>{{this}}</span><br/>
+        {{/each}}
+      </div>
+    {{/if}}
+    <div class="span4 ellipses">
       <!-- TODO: VDD -->
       {{#if dueAt}}
         <strong>{{#t "due_date"}}Due{{/t}}</strong>
         {{datetimeFormatted dueAt}}
       {{/if}}
     </div>
-    <div class="span6 ellipses">
+    <div class="span4 ellipses">
       {{#if pointsPossible}}{{#t "points_possible"}}{{pointsPossible}} pts{{/t}}{{/if}}
     </div>
   </div>

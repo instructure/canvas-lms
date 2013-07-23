@@ -56,8 +56,12 @@ define [
 
     initialize: ->
       @collection = new AssignmentCollection @model.get('assignments')
-      @collection.each (assign) -> assign.doNotParse()
       @collection.on('add remove', @refreshDeleteDialog)
+      modules = @model.collection.modules
+      @collection.each (assign) ->
+        assign.doNotParse()
+        #set modules
+        assign.modules modules[assign.id]
       super
 
       # we need the following line in order to access this view later

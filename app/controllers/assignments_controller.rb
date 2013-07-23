@@ -29,7 +29,7 @@ class AssignmentsController < ApplicationController
   add_crumb(proc { t '#crumbs.assignments', "Assignments" }, :except => [:destroy, :syllabus, :index]) { |c| c.send :course_assignments_path, c.instance_variable_get("@context") }
   before_filter { |c| c.active_tab = "assignments" }
   before_filter :normalize_title_param, :only => [:new, :edit]
-  
+
   def index
     if @context == @current_user || authorized_action(@context, @current_user, :read)
       get_all_pertinent_contexts  # NOTE: this crap is crazy.  can we get rid of it?
@@ -48,10 +48,18 @@ class AssignmentsController < ApplicationController
         elsif @just_viewing_one_course && @context.assignments.new.grants_right?(@current_user, session, :update)
           format.html {
             if @domain_root_account.enable_draft?
+              #get modules
+              if @context.context_modules.count > 0
+                @modules = get_module_names
+              else
+                @modules = {}
+              end
+
               @padless = true
               js_env({
                 :NEW_ASSIGNMENT_URL => new_polymorphic_url([@context, :assignment]),
-                :COURSE_URL => api_v1_course_url(@context)
+                :COURSE_URL => api_v1_course_url(@context),
+                :MODULES => @modules
               })
               render :action => :new_teacher_index
             else
@@ -87,7 +95,6 @@ class AssignmentsController < ApplicationController
       @locked = @assignment.locked_for?(@current_user, :check_policies => true, :deep_check_if_needed => true)
       @locked.delete(:lock_at) if @locked.is_a?(Hash) && @locked.has_key?(:unlock_at) # removed to allow proper translation on show page
       @unlocked = !@locked || @assignment.grants_rights?(@current_user, session, :update)[:update]
-      @assignment_module = ContextModuleItem.find_tag_with_preferred([@assignment], params[:module_item_id])
       @assignment.context_module_action(@current_user, :read) if @unlocked && !@assignment.new_record?
 
       if @assignment.grants_right?(@current_user, session, :grade)
@@ -431,6 +438,22 @@ class AssignmentsController < ApplicationController
 
   def index_edit_params
     params.slice(*[:title, :due_at, :points_possible, :assignment_group_id])
+  end
+
+  def get_module_names
+    @context.assignments.active.each_with_object({}) do |a, hash|
+      tags = nil
+      if a.submission_types == "online_quiz"
+        tags = a.quiz.try(:context_module_tags)
+      elsif a.submission_types == "discussion_topic"
+        tags = a.discussion_topic.try(:context_module_tags)
+      else
+        tags = a.context_module_tags
+      end
+
+      modules = ContextModule.where(:id => tags.map(&:context_module_id)).pluck(:name)
+      hash[a.id] = modules
+    end
   end
 
 end
