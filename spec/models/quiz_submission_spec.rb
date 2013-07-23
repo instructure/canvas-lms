@@ -1121,7 +1121,7 @@ describe QuizSubmission do
       user_answer = QuizSubmission.score_question(fill_in_multiple_blanks_question_one_blank_data, { "question_2_10ca8479f89652b254a5c6ec90ab9ab8" => " DUmB \n " })
       user_answer.should ==
         { :question_id => 2, :correct => true, :points => 3.75, :text => "",
-          :answer_for_myblank => "dumb",
+          :answer_for_myblank => " DUmB \n ",
           :answer_id_for_myblank => 1235, }
 
       user_answer = QuizSubmission.score_question(fill_in_multiple_blanks_question_one_blank_data, { "question_2_10ca8479f89652b254a5c6ec90ab9ab8" => "wut" })

@@ -212,6 +212,8 @@
               <% answers = hash_get(question, :answers, []).select{|a| hash_get(a, :blank_id) == variable } %>
               <% user_answer[:text] = hash_get(user_answer, "answer_for_#{variable}")
                  user_answer[:text] = nil if user_answer[:text].blank?
+                 user_answer[:answer_id] = hash_get(user_answer, "answer_id_for_#{variable}")
+                 user_answer[:answer_id] = nil if user_answer[:answer_id].blank?
                  matched_answer = answers.find{|a| hash_get(a, :text) == hash_get(user_answer, :text) || hash_get(a, :id) == hash_get(user_answer, :answer_id) }
               %>
               <div class="answer_group">
@@ -224,7 +226,7 @@
                      answer_classes << 'no_answer' if hash_get(user_answer, :text).blank?
                   %>
                   <div class='answer <%= answer_classes.compact.join(' ') %>'>
-                    <%= hash_get(user_answer, :text) || t(:you_left_this_blank, "(You left this blank)") %>
+                    <%= hash_get(matched_answer || user_answer, :text) || t(:you_left_this_blank, "(You left this blank)") %>
                     <% if matched_answer && comment_get(matched_answer, :comments).present? %>
                       <div class="hide_right_arrow <%= "correct_answer" if display_correct_answers %>">
                         <div class="quiz_comment">
@@ -238,7 +240,6 @@
                     <%= render :partial => "quizzes/display_answer", :collection => answers, :locals => {:assessment_results => assessment_results, :question_type => question_type, :user_answer => user_answer, :question => question, :skip_if_correct => true, :matched_answer => matched_answer} %>
                   <% end %>
                 <% else %>
-                  <% user_answer[:answer_id] = hash_get(user_answer, "answer_id_for_#{variable}") %>
                   <% if user_answer[:answer_id].nil? %>
                     <div class='answer selected_answer wrong_answer no_answer'>
                       <%= t(:you_left_this_blank, "(You left this blank)") %>
