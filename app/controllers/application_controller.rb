@@ -508,7 +508,7 @@ class ApplicationController < ActionController::Base
     @context = @courses.first
 
     if @just_viewing_one_course
-      @groups = @courses.first.assignment_groups.active.includes(:active_assignments)
+      @groups = @context.assignment_groups.active.includes(:active_assignments)
       @assignments = @groups.map(&:active_assignments).flatten
     else
       assignments_and_groups = Shard.partition_by_shard(@courses) do |courses|

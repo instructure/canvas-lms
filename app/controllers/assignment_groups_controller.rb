@@ -79,9 +79,8 @@ class AssignmentGroupsController < ApplicationController
           assignment_descriptions, @context, @current_user
         )
 
-        params[:override_assignment_dates] ||= true
-        override_dates = value_to_boolean(params[:override_assignment_dates])
-
+        override_param = params[:override_assignment_dates] || true
+        override_dates = value_to_boolean(override_param)
         if override_dates
           assignments_with_overrides = @context.assignments.active.except(:order)
                                        .joins(:assignment_overrides)

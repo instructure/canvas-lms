@@ -8,7 +8,7 @@ define [
   'compiled/views/assignments/CreateAssignmentView'
   'compiled/views/assignments/CreateGroupView'
   'compiled/views/assignments/DeleteGroupView'
-  'jst/assignments/teacher_index/AssignmentGroupListItem'
+  'jst/assignments/AssignmentGroupListItem'
 ], (I18n, _, Cache, AssignmentCollection, CollectionView, AssignmentListItemView, CreateAssignmentView, CreateGroupView, DeleteGroupView, template) ->
 
   class AssignmentGroupListItemView extends CollectionView

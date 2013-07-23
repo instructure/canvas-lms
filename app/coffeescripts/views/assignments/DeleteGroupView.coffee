@@ -3,7 +3,7 @@ define [
   'underscore'
   'compiled/models/AssignmentGroup'
   'compiled/views/DialogFormView'
-  'jst/assignments/teacher_index/DeleteGroup'
+  'jst/assignments/DeleteGroup'
   'jst/EmptyDialogFormWrapper'
 ], (I18n, _, AssignmentGroup, DialogFormView, template, wrapper) ->
 

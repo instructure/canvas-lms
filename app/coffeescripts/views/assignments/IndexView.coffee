@@ -1,9 +1,10 @@
 define [
   'Backbone'
-  'jst/assignments/TeacherIndex'
+  'jst/assignments/IndexView'
 ], (Backbone, template) ->
 
-  class TeacherIndexView extends Backbone.View
+  class IndexView extends Backbone.View
+
     template: template
     el: '#content'
 

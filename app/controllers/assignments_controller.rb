@@ -31,11 +31,38 @@ class AssignmentsController < ApplicationController
   before_filter :normalize_title_param, :only => [:new, :edit]
 
   def index
+    return old_index if @context == @current_user || !@domain_root_account.enable_draft?
+
+    if authorized_action(@context, @current_user, :read)
+      return unless tab_enabled?(@context.class::TAB_ASSIGNMENTS)
+
+      if @context.grants_right?(@current_user, :update)
+        js_env({
+          :URLS => {
+            :new_assignment_url => new_polymorphic_url([@context, :assignment]),
+            :course_url => api_v1_course_url(@context),
+          },
+          :MODULES => get_module_names
+        })
+
+        respond_to do |format|
+          format.html do
+            @padless = true
+            render :action => :new_index
+          end
+        end
+      else
+        old_index
+      end
+    end
+  end
+
+  def old_index
     if @context == @current_user || authorized_action(@context, @current_user, :read)
       get_all_pertinent_contexts  # NOTE: this crap is crazy.  can we get rid of it?
       get_sorted_assignments
       add_crumb(t('#crumbs.assignments', "Assignments"), (@just_viewing_one_course ? named_context_url(@context, :context_assignments_url) : "/assignments" ))
-      @context= (@just_viewing_one_course ? @context : @current_user)
+      @context = (@just_viewing_one_course ? @context : @current_user)
       return if @just_viewing_one_course && !tab_enabled?(@context.class::TAB_ASSIGNMENTS)
 
       respond_to do |format|
@@ -47,30 +74,13 @@ class AssignmentsController < ApplicationController
           end
         elsif @just_viewing_one_course && @context.assignments.new.grants_right?(@current_user, session, :update)
           format.html {
-            if @domain_root_account.enable_draft?
-              #get modules
-              if @context.context_modules.count > 0
-                @modules = get_module_names
-              else
-                @modules = {}
-              end
-
-              @padless = true
-              js_env({
-                :NEW_ASSIGNMENT_URL => new_polymorphic_url([@context, :assignment]),
-                :COURSE_URL => api_v1_course_url(@context),
-                :MODULES => @modules
-              })
-              render :action => :new_teacher_index
-            else
-              render :action => :index
-            end
+            render :action => :index
           }
         else
           @current_user_submissions ||= @current_user && @current_user.submissions.
               select([:id, :assignment_id, :score, :workflow_state]).
               where(:assignment_id => @upcoming_assignments)
-          format.html { render :action => "student_index" }
+          format.html { render :action => :student_index }
         end
         # TODO: eager load the rubric associations
         format.json { render :json => @assignments.to_json(:include => [ :rubric_association, :rubric ]) }
@@ -441,6 +451,7 @@ class AssignmentsController < ApplicationController
   end
 
   def get_module_names
+    return {} if @context.context_modules.count == 0
     @context.assignments.active.each_with_object({}) do |a, hash|
       tags = nil
       if a.submission_types == "online_quiz"

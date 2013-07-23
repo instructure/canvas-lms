@@ -2,7 +2,7 @@ define [
   'Backbone'
   'underscore'
   'compiled/views/PublishIconView'
-  'jst/assignments/teacher_index/AssignmentListItem'
+  'jst/assignments/AssignmentListItem'
 ], (Backbone, _, PublishIconView, template) ->
 
   class AssignmentListItemView extends Backbone.View

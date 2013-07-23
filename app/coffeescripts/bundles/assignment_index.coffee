@@ -21,13 +21,13 @@ require [
   'compiled/views/InputFilterView'
   'compiled/views/assignments/AssignmentGroupListView'
   'compiled/views/assignments/CreateGroupView'
-  'compiled/views/assignments/TeacherIndexView'
+  'compiled/views/assignments/IndexView'
   'compiled/views/assignments/AssignmentSettingsView'
   'compiled/views/assignments/AssignmentGroupWeightsView'
-], (AssignmentGroupCollection, Course, InputFilterView, AssignmentGroupListView, CreateGroupView, TeacherIndexView, AssignmentSettingsView, AssignmentGroupWeightsView) ->
+], (AssignmentGroupCollection, Course, InputFilterView, AssignmentGroupListView, CreateGroupView, IndexView, AssignmentSettingsView, AssignmentGroupWeightsView) ->
 
   course = new Course
-  course.url = ENV.COURSE_URL
+  course.url = ENV.URLS.course_url
   course.fetch()
 
   assignmentGroups = new AssignmentGroupCollection [],
@@ -48,8 +48,7 @@ require [
   assignmentGroupsView = new AssignmentGroupListView
     collection: assignmentGroups
 
-  @app = new TeacherIndexView
-    addAssignmentUrl: ENV.NEW_ASSIGNMENT_URL
+  @app = new IndexView
     assignmentGroupsView: assignmentGroupsView
     inputFilterView: inputFilterView
     assignmentSettingsView: assignmentSettingsView

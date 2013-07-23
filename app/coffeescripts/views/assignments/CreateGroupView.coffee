@@ -4,7 +4,7 @@ define [
   'compiled/models/AssignmentGroup'
   'compiled/views/assignments/NeverDropView'
   'compiled/views/DialogFormView'
-  'jst/assignments/teacher_index/CreateGroup'
+  'jst/assignments/CreateGroup'
   'jst/EmptyDialogFormWrapper'
 ], (I18n, _, AssignmentGroup, NeverDropView, DialogFormView, template, wrapper) ->
 

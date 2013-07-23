@@ -1,6 +1,6 @@
 define [
   'Backbone'
-  'jst/assignments/teacher_index/AssignmentGroupWeights'
+  'jst/assignments/AssignmentGroupWeights'
 ], (Backbone, AssignmentGroupWeightsTemplate) ->
 
   class AssignmentGroupWeightsView extends Backbone.View

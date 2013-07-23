@@ -307,9 +307,6 @@ class AssignmentsApiController < ApplicationController
       fake = @context.assignments.new
       fake.workflow_state = 'unpublished'
 
-      override_param = params[:override_assignment_dates] || true
-      override_dates = value_to_boolean(override_param)
-
       if @domain_root_account.enable_draft? && !fake.grants_right?(@current_user, session, :read)
         #user is a student and assignment is not published
         @assignments = @assignments.published
@@ -326,6 +323,8 @@ class AssignmentsApiController < ApplicationController
         submissions = {}
       end
 
+      override_param = params[:override_assignment_dates] || true
+      override_dates = value_to_boolean(override_param)
       if override_dates
         assignments_with_overrides = @assignments.joins(:assignment_overrides)
           .select("assignments.id")

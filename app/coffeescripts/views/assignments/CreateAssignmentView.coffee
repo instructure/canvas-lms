@@ -2,7 +2,7 @@ define [
   'underscore'
   'compiled/views/DialogFormView'
   'compiled/models/Assignment'
-  'jst/assignments/teacher_index/CreateAssignment'
+  'jst/assignments/CreateAssignment'
   'jst/EmptyDialogFormWrapper'
   'jquery.instructure_date_and_time'
 ], (_, DialogFormView, Assignment, template, wrapper) ->
@@ -40,7 +40,7 @@ define [
           params += "#{separator}#{field}=#{data[field]}"
           separator = '&' if separator == '?'
 
-      window.location = "#{ENV.NEW_ASSIGNMENT_URL}#{params}"
+      window.location = "#{ENV.URLS.new_assignment_url}#{params}"
 
     generateNewModel: ->
       @model = new Assignment

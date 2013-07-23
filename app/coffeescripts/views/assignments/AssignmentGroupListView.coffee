@@ -20,7 +20,7 @@ define [
   'compiled/class/cache'
   'compiled/views/CollectionView'
   'compiled/views/assignments/AssignmentGroupListItemView'
-  'jst/assignments/teacher_index/AssignmentGroupList'
+  'jst/assignments/AssignmentGroupList'
 ], (_, Cache, CollectionView, AssignmentGroupListItemView, template) ->
 
   class AssignmentGroupListView extends CollectionView

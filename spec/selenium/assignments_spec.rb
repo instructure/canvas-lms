@@ -482,6 +482,9 @@ describe "assignments" do
         wait_for_ajaximations
 
         expect_new_page_load { f('.new_assignment').click }
+        wait_for_ajaximations
+
+        f('#edit_assignment_form').should be_present
       end
 
       it "should allow quick-adding an assignment to a group" do
@@ -533,7 +536,7 @@ describe "assignments" do
         ag.reload.assignments.count.should == 2
       end
 
-      it "should rembmer entered settings when 'more options' is pressed" do
+      it "should remembmer entered settings when 'more options' is pressed" do
         ag = @course.assignment_groups.first
 
         get "/courses/#{@course.id}/assignments"

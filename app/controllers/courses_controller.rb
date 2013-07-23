@@ -634,7 +634,6 @@ class CoursesController < ApplicationController
   #     "allow_student_forum_attachments": false,
   #     "allow_student_discussion_editing": true
   #   }
-  include Api::V1::Course
   def settings
     get_context
     if authorized_action(@context, @current_user, :read_as_admin)

@@ -1,6 +1,6 @@
 define [
   'Backbone'
-  'jst/assignments/teacher_index/NeverDrop'
+  'jst/assignments/NeverDrop'
 ], (Backbone, neverDropTemplate) ->
 
   class NeverDrop extends Backbone.View
