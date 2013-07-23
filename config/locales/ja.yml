@@ -1691,7 +1691,7 @@ ja:
         example_group_name: "例: 小論文グループ 1"
         group_name: "グループ名:"
         never_drop: "決して下げない:"
-        percent_of_total: 総合成績の割合
+        percent_of_total: "% (総合成績中)"
         save: 保存
         saving: 保存しています...
       never_drop: 
@@ -1986,7 +1986,7 @@ ja:
       sending_message: 送信しています...
     calendar_header: 
       create_event: 新しいイベントの作成
-      done_go_back_to_list: 完了、リストに戻る
+      done_go_back_to_list: 完了し、リストに戻る
       links: 
         calendar_month: 月
         calendar_scheduler: スケジューラ
@@ -6294,7 +6294,7 @@ ja:
   images: 
     error_checking_color: 画像の色の確認でエラーが発生しました
     invalid_background_color: "背景色は %{color} にする必要があります"
-    invalid_dimensions: "無効な画像の寸法 (指定された値: %{actual}、予期される値: %{expected})"
+    invalid_dimensions: "画像の寸法が無効です (指定された値: %{actual}、指定可能な値: %{expected})"
     invalid_file_size: "画像ファイルのサイズが大きすぎます (最大: %{max} バイト、指定されたサイズ: %{actual})"
     invalid_file_type: "無効なファイル タイプです: %{type}。指定可能なタイプ: %{type_list}"
     not_an_image: 選択されたファイルは画像ではありません
@@ -12623,7 +12623,7 @@ ja:
         published: 公開済み
         sort_ascending: 昇順に並べ替え
         sort_descending: 降順に並べ替え
-      no_pages: まだページは作成されていません。
+      no_pages: まだページが作成されていません。
     wiki_page_index_item: 
       labels: 
         front_page: "トップ ページ"
