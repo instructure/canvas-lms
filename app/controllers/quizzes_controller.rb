@@ -20,6 +20,8 @@ class QuizzesController < ApplicationController
   include Api::V1::Quiz
   include Api::V1::QuizStatistics
   include Api::V1::AssignmentOverride
+  include KalturaHelper
+
   before_filter :require_context
   add_crumb(proc { t('#crumbs.quizzes', "Quizzes") }) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_quizzes_url }
   before_filter { |c| c.active_tab = "quizzes" }
@@ -157,11 +159,14 @@ class QuizzesController < ApplicationController
       end
 
       sections = @context.course_sections.active
-      js_env :ASSIGNMENT_ID => @assigment.present? ? @assignment.id : nil,
+      hash = { :ASSIGNMENT_ID => @assigment.present? ? @assignment.id : nil,
              :ASSIGNMENT_OVERRIDES => assignment_overrides_json(@quiz.overrides_visible_to(@current_user)),
              :QUIZ => quiz_json(@quiz, @context, @current_user, session),
              :SECTION_LIST => sections.map { |section| { :id => section.id, :name => section.name } },
-             :QUIZZES_URL => polymorphic_url([@context, :quizzes])
+             :QUIZZES_URL => polymorphic_url([@context, :quizzes]),
+             :CONTEXT_ACTION_SOURCE => :quizzes }
+      append_sis_data(hash)
+      js_env(hash)
       render :action => "new"
     end
   end
@@ -241,11 +246,14 @@ class QuizzesController < ApplicationController
       @stored_params = (@submission.temporary_data rescue nil) if params[:take] && @submission && (@submission.untaken? || @submission.preview?)
       @stored_params ||= {}
       log_asset_access(@quiz, "quizzes", "quizzes")
-      js_env :QUIZZES_URL => polymorphic_url([@context, :quizzes]),
+      hash = { :QUIZZES_URL => polymorphic_url([@context, :quizzes]),
              :IS_SURVEY => @quiz.survey?,
              :QUIZ => quiz_json(@quiz,@context,@current_user,session),
              :LOCKDOWN_BROWSER => @quiz.require_lockdown_browser?,
-             :ATTACHMENTS => Hash[@attachments.map { |_,a| [a.id,attachment_hash(a)]}]
+             :ATTACHMENTS => Hash[@attachments.map { |_,a| [a.id,attachment_hash(a)]}],
+             :CONTEXT_ACTION_SOURCE => :quizzes  }
+      append_sis_data(hash)
+      js_env(hash)
       if params[:take] && can_take_quiz?
         # allow starting the quiz via a GET request, but only when using a lockdown browser
         if request.post? || (@quiz.require_lockdown_browser? && !quiz_submission_active?)

@@ -38,11 +38,19 @@ define([
 
   var domainRootAccountId;
   $.mediaComment.partnerData = function(params) {
-    return JSON.stringify({
-      context_code: $.mediaComment.contextCode(),
-      root_account_id: domainRootAccountId || (domainRootAccountId = Number($("#domain_root_account_id").text())),
-      context_source: ENV.CONTEXT_ACTION_SOURCE
-    });
+
+      var hash = {
+          context_code: $.mediaComment.contextCode(),
+          root_account_id: domainRootAccountId || (domainRootAccountId = Number($("#domain_root_account_id").text())),
+          context_source: ENV.CONTEXT_ACTION_SOURCE
+      }
+      if(ENV.SIS_SOURCE_ID){
+          hash['sis_source_id'] = ENV.SIS_SOURCE_ID
+      }
+      if(ENV.SIS_USER_ID){
+          hash['sis_user_id'] = ENV.SIS_USER_ID
+      }
+    return JSON.stringify(hash);
   }
 
   $.mediaComment.contextCode = function() {

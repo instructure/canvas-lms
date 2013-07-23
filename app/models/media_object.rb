@@ -214,20 +214,6 @@ class MediaObject < ActiveRecord::Base
   def media_sources
     Kaltura::ClientV3.new.media_sources(self.media_id)
   end
-
-  def update_partner_data
-    client = Kaltura::ClientV3.new
-    client.startSession(Kaltura::SessionType::ADMIN)
-    entry = client.mediaGet(self.media_id)
-    partner_data = entry[:partnerData] && entry[:partnerData].length >=2 ?JSON.parse(entry[:partnerData]) : {}
-    pseudonym = self.user.sis_pseudonym_for(self.context)
-    sis_source_id = self.context.sis_source_id
-    partner_data[:sis_source_id] = sis_source_id if sis_source_id
-    partner_data[:sis_user_id] = pseudonym.sis_user_id if pseudonym && pseudonym.sis_user_id
-    if partner_data[:sis_user_id].present? || partner_data[:sis_source_id].present?
-      res = client.mediaUpdate(self.media_id, :partnerData => partner_data.to_json)
-    end
-  end
   
   def retrieve_details_ensure_codecs(attempt=0)
     retrieve_details

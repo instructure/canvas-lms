@@ -148,6 +148,7 @@ class DiscussionTopicsController < ApplicationController
   include Api::V1::DiscussionTopics
   include Api::V1::Assignment
   include Api::V1::AssignmentOverride
+  include KalturaHelper
 
   # @API List discussion topics
   #
@@ -191,16 +192,18 @@ class DiscussionTopicsController < ApplicationController
         locked_topics, open_topics = @topics.partition do |topic|
           topic.locked? || topic.locked_for?(@current_user)
         end
+        hash = {USER_SETTINGS_URL: api_v1_user_settings_url(@current_user),
+                openTopics: open_topics,
+                lockedTopics: locked_topics,
+                newTopicURL: named_context_url(@context, :new_context_discussion_topic_url),
+                permissions: {
+                    create: @context.discussion_topics.new.grants_right?(@current_user, session, :create),
+                    moderate: user_can_moderate,
+                    change_settings: user_can_edit_course_settings?
+                }}
+        append_sis_data(hash)
 
-        js_env(USER_SETTINGS_URL: api_v1_user_settings_url(@current_user),
-               openTopics: open_topics,
-               lockedTopics: locked_topics,
-               newTopicURL: named_context_url(@context, :new_context_discussion_topic_url),
-               permissions: {
-                 create: @context.discussion_topics.new.grants_right?(@current_user, session, :create),
-                 moderate: user_can_moderate,
-                 change_settings: user_can_edit_course_settings?
-               })
+        js_env(hash)
 
         if user_can_edit_course_settings?
           js_env(SETTINGS_URL: named_context_url(@context, :api_v1_context_settings_url))
@@ -255,13 +258,15 @@ class DiscussionTopicsController < ApplicationController
 
       categories = @context.respond_to?(:group_categories) ? @context.group_categories : []
       sections = @context.respond_to?(:course_sections) ? @context.course_sections.active : []
-      js_env :DISCUSSION_TOPIC => hash,
-             :SECTION_LIST => sections.map { |section| { :id => section.id, :name => section.name } },
-             :GROUP_CATEGORIES => categories.
-                                  reject { |category| category.student_organized? }.
-                                  map { |category| { :id => category.id, :name => category.name } },
-             :CONTEXT_ID => @context.id,
-             :CONTEXT_ACTION_SOURCE => :discussion_topic
+      js_hash = {:DISCUSSION_TOPIC => hash,
+                 :SECTION_LIST => sections.map { |section| { :id => section.id, :name => section.name } },
+                 :GROUP_CATEGORIES => categories.
+                     reject { |category| category.student_organized? }.
+                     map { |category| { :id => category.id, :name => category.name } },
+                 :CONTEXT_ID => @context.id,
+                 :CONTEXT_ACTION_SOURCE => :discussion_topic}
+      append_sis_data(js_hash)
+      js_env(js_hash)
       render :action => "edit"
     end
   end
@@ -348,7 +353,11 @@ class DiscussionTopicsController < ApplicationController
                                                                       :assignment_id => @topic.assignment.id,
                                                                       :anchor => {:student_id => ":student_id"}.to_json)
             end
-            js_env :DISCUSSION => env_hash
+
+            js_hash = {:DISCUSSION => env_hash}
+            js_hash[:CONTEXT_ACTION_SOURCE] = :discussion_topic
+            append_sis_data(js_hash)
+            js_env(js_hash)
 
           end
         end

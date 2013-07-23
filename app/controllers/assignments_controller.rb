@@ -25,6 +25,7 @@ class AssignmentsController < ApplicationController
   include Api::V1::Outcome
 
   include GoogleDocs
+  include KalturaHelper
   before_filter :require_context
   add_crumb(proc { t '#crumbs.assignments', "Assignments" }, :except => [:destroy, :syllabus, :index]) { |c| c.send :course_assignments_path, c.instance_variable_get("@context") }
   before_filter { |c| c.active_tab = "assignments" }
@@ -262,6 +263,10 @@ class AssignmentsController < ApplicationController
         @syllabus_body = api_user_content(@context.syllabus_body, @context, nil)
       end
 
+      hash = { :CONTEXT_ACTION_SOURCE => :syllabus }
+      append_sis_data(hash)
+      js_env(hash)
+
       log_asset_access("syllabus:#{@context.asset_string}", "syllabus", 'other')
       respond_to do |format|
         format.html
@@ -358,6 +363,7 @@ class AssignmentsController < ApplicationController
       hash[:CANCEL_TO] = @assignment.new_record? ? polymorphic_url([@context, :assignments]) : polymorphic_url([@context, @assignment])
       hash[:CONTEXT_ID] = @context.id
       hash[:CONTEXT_ACTION_SOURCE] = :assignments
+      append_sis_data(hash)
       js_env(hash)
       @padless = true
       render :action => "edit"
