@@ -7,9 +7,11 @@ define [
   'compiled/views/groups/manage/UnassignedUsersView'
   'compiled/views/groups/manage/AddUnassignedMenu'
   'compiled/views/groups/manage/AssignToGroupMenu'
+  'compiled/views/groups/manage/GroupEditView'
+  'compiled/models/Group'
   'jst/groups/manage/groupCategory'
   'compiled/jquery.rails_flash_notifications'
-], (I18n, _, {View}, GroupCategoryDetailView, GroupsView, UnassignedUsersView, AddUnassignedMenu, AssignToGroupMenu, template) ->
+], (I18n, _, {View}, GroupCategoryDetailView, GroupsView, UnassignedUsersView, AddUnassignedMenu, AssignToGroupMenu, GroupEditView, Group, template) ->
 
   class GroupCategoryView extends View
 
@@ -23,6 +25,7 @@ define [
 
     events:
       'click .delete-category': 'deleteCategory'
+      'click .add-group': 'addGroup'
 
     initialize: (options) ->
       @groups = @model.groups()
@@ -62,3 +65,12 @@ define [
       @model.destroy
         success: -> $.flashMessage I18n.t('flash.removed', 'Group category successfully removed.')
         failure: -> $.flashError I18n.t('flash.removeError', 'Unable to remove the group category. Please try again later.')
+
+    addGroup: (e) ->
+      e.preventDefault()
+      @createView ?= new GroupEditView(editing: false)
+      new_group = new Group(group_category_id: @model.id)
+      new_group.on 'sync', _.once =>
+        @groups.add(new_group)
+      @createView.model = new_group
+      @createView.toggle()

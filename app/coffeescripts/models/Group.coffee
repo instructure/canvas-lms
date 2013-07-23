@@ -19,9 +19,9 @@
 define [
   'Backbone'
   'compiled/collections/GroupUserCollection'
-], ({Model}, GroupUserCollection) ->
+], (Backbone, GroupUserCollection) ->
 
-  class Group extends Model
+  class Group extends Backbone.Model
     modelType: 'group'
     resourceName: 'groups'
 
@@ -38,5 +38,12 @@ define [
       else
         @get('members_count')
 
-    url: ->
-      "/api/v1/groups/#{@id}"
+    sync: (method, model, options = {}) ->
+      options.url = @urlFor(method)
+      Backbone.sync method, model, options
+
+    urlFor: (method) ->
+      if method is 'create'
+        "/api/v1/group_categories/#{@get('group_category_id')}/groups"
+      else
+        "/api/v1/groups/#{@id}"

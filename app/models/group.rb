@@ -68,6 +68,8 @@ class Group < ActiveRecord::Base
   include StickySisFields
   are_sis_sticky :name
 
+  validates_length_of :name, :maximum => maximum_string_length, :allow_nil => true, :allow_blank => true
+
   alias_method :participating_users_association, :participating_users
 
   def participating_users(user_ids = nil)

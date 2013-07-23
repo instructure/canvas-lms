@@ -35,6 +35,12 @@ define [
       submit: 'submit'
 
     ##
+    # Default options to pass when saving the model.
+    saveOpts:
+      # wait for server success response before updating model attributes locally
+      wait: true
+
+    ##
     # Sets the model data from the form and saves it. Called when the form
     # submits, or can be called programatically.
     # set @saveOpts in your view to to pass opts to Backbone.sync (like multipart: true if you have
