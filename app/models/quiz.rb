@@ -26,6 +26,7 @@ class Quiz < ActiveRecord::Base
   extend ActionView::Helpers::SanitizeHelper::ClassMethods
   include ContextModuleItem
   include DatesOverridable
+  include SearchTermHelper
 
   attr_accessible :title, :description, :points_possible, :assignment_id, :shuffle_answers,
     :show_correct_answers, :time_limit, :allowed_attempts, :scoring_policy, :quiz_type,

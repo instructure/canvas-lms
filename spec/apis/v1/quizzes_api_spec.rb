@@ -51,6 +51,18 @@ describe QuizzesApiController, :type => :integration do
       quiz_ids.should == quizzes.map(&:id)
     end
 
+    it "should search for quizzes by title" do
+      2.times{ |i| @course.quizzes.create! :title => "first_#{i}" }
+      ids = @course.quizzes.map(&:id)
+      2.times{ |i| @course.quizzes.create! :title => "second_#{i}" }
+
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/quizzes?search_term=fir",
+                      :controller=>"quizzes_api", :action=>"index", :format=>"json", :course_id=>"#{@course.id}",
+                      :search_term => 'fir')
+
+      json.map{|h| h['id'] }.sort.should == ids.sort
+    end
+
     it "should return unauthorized if the quiz tab is disabled" do
       @course.tab_configuration = [ { :id => Course::TAB_QUIZZES, :hidden => true } ]
       student_in_course(:active_all => true, :course => @course)

@@ -24,6 +24,7 @@ class DiscussionTopic < ActiveRecord::Base
   include CopyAuthorizedLinks
   include TextHelper
   include ContextModuleItem
+  include SearchTermHelper
 
   attr_accessible :title, :message, :user, :delayed_post_at, :lock_at, :assignment,
     :plaintext_message, :podcast_enabled, :podcast_has_student_posts,

@@ -291,6 +291,7 @@ class AssignmentsApiController < ApplicationController
   # @API List assignments
   # Returns the list of assignments for the current context.
   # @argument include[] ["submission"] Associations to include with the assignment.
+  # @argument search_term (optional) The partial title of the assignments to match and return.
   # @argument override_assignment_dates [Optional, Boolean]
   #   Apply assignment overrides for each assignment, defaults to true.
   # @returns [Assignment]
@@ -299,6 +300,8 @@ class AssignmentsApiController < ApplicationController
       @assignments = @context.active_assignments.
           includes(:assignment_group, :rubric_association, :rubric).
           reorder("assignment_groups.position, assignments.position")
+
+      @assignments = Assignment.search_by_attribute(@assignments, :title, params[:search_term])
 
       #fake assignment used for checking if the @current_user can read unpublished assignments
       fake = @context.assignments.new

@@ -116,6 +116,24 @@ describe AssignmentsApiController, :type => :integration do
                           assignment4)
     end
 
+    it "should search for assignments by title" do
+      course_with_teacher(:active_all => true)
+      2.times {|i| @course.assignments.create!(:title => "first_#{i}") }
+      ids = @course.assignments.map(&:id)
+      2.times {|i| @course.assignments.create!(:title => "second_#{i}") }
+
+      json = api_call(:get,
+                      "/api/v1/courses/#{@course.id}/assignments.json?search_term=fir",
+                      {
+                          :controller => 'assignments_api',
+                          :action => 'index',
+                          :format => 'json',
+                          :course_id => @course.id.to_s,
+                          :search_term => 'fir'
+                      })
+      json.map{|h| h['id']}.sort.should == ids.sort
+    end
+
     it "should return the assignments list with API-formatted Rubric data" do
       # the API changes the structure of the data quite a bit, to hide
       # implementation details and ease API use.

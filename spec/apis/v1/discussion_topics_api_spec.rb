@@ -303,6 +303,17 @@ describe DiscussionTopicsController, :type => :integration do
         json.last.should == @response_json.merge("subscribed" => @sub.subscribed?(@user))
       end
 
+      it "should search discussion topics by title" do
+        ids = @course.discussion_topics.map(&:id)
+        create_topic(@course, :title => "ignore me", :message => "<p>i'm subversive</p>")
+        create_topic(@course, :title => "ignore me2", :message => "<p>i'm subversive</p>")
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics.json?search_term=topic",
+                        {:controller => 'discussion_topics', :action => 'index', :format => 'json', :course_id => @course.id.to_s,
+                         :search_term => 'topic'})
+
+        json.map{|h| h['id']}.sort.should == ids.sort
+      end
+
       it "should order topics by descending position by default" do
         @topic2 = create_topic(@course, :title => "Topic 2", :message => "<p>content here</p>")
         @topic3 = create_topic(@course, :title => "Topic 3", :message => "<p>content here</p>")

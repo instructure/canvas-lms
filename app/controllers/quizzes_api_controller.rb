@@ -133,6 +133,8 @@ class QuizzesApiController < ApplicationController
   #
   # Returns the list of Quizzes in this course.
   #
+  # @argument search_term (optional) The partial title of the quizzes to match and return.
+  #
   # @example_request    
   #     curl https://<canvas>/api/v1/courses/<course_id>/quizzes \ 
   #          -H 'Authorization: Bearer <token>'
@@ -141,7 +143,8 @@ class QuizzesApiController < ApplicationController
   def index
     if authorized_action(@context, @current_user, :read) && tab_enabled?(@context.class::TAB_QUIZZES)
       api_route = polymorphic_url([:api, :v1, @context, :quizzes])
-      @quizzes = Api.paginate(@context.quizzes.active, self, api_route)
+      scope = Quiz.search_by_attribute(@context.quizzes.active, :title, params[:search_term])
+      @quizzes = Api.paginate(scope, self, api_route)
       render :json => quizzes_json(@quizzes, @context, @current_user, session)
     end
   end

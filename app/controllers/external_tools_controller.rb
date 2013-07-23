@@ -31,6 +31,7 @@ class ExternalToolsController < ApplicationController
   # Returns the paginated list of external tools for the current context.
   # See the get request docs for a single tool for a list of properties on an external tool.
   #
+  # @argument search_term (optional) The partial name of the tools to match and return.
   #
   # @example_response
   #     [
@@ -70,6 +71,7 @@ class ExternalToolsController < ApplicationController
       else
         @tools = @context.context_external_tools.active
       end
+      @tools = ContextExternalTool.search_by_attribute(@tools, :name, params[:search_term])
       respond_to do |format|
           @tools = Api.paginate(@tools, self, tool_pagination_url)
           format.json {render :json => external_tools_json(@tools, @context, @current_user, session)}

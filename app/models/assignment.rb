@@ -26,6 +26,7 @@ class Assignment < ActiveRecord::Base
   include Mutable
   include ContextModuleItem
   include DatesOverridable
+  include SearchTermHelper
 
   attr_accessible :title, :name, :description, :due_at, :points_possible,
     :min_score, :max_score, :mastery_score, :grading_type, :submission_types,
