@@ -16,7 +16,11 @@
         <%= t(:filter_messages_by_type, "Filter messages by type") %>
       </label>
       <select class="type-filter" id="type-filter">
-        <option value="">[[Filters]]</option>
+        <option value="inbox"><%= t(:inbox, "Inbox") %></option>
+        <option value="unread"><%= t(:unread, "Unread") %></option>
+        <option value="starred"><%= t(:starred, "Starred") %></option>
+        <option value="sent"><%= t(:sent, "Sent") %></option>
+        <option value="archived"><%= t(:archived, "Archived") %></option>
       </select>
     </div>
 

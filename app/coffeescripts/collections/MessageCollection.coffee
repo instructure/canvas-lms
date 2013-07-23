@@ -8,3 +8,6 @@ define [
     model: Message
 
     url: '/api/v1/conversations'
+
+    params:
+      scope: 'inbox'

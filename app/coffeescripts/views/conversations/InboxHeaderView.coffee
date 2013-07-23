@@ -9,12 +9,14 @@ define [
       '#reply-btn': '$replyBtn'
       '#reply-all-btn': '$replyAllBtn'
       '#delete-btn': '$deleteBtn'
+      '#type-filter': '$typeFilter'
 
     events:
       'click #compose-btn':   'onCompose'
       'click #reply-btn':     'onReply'
       'click #reply-all-btn': 'onReplyAll'
       'click #delete-btn':    'onDelete'
+      'change #type-filter':  'onTypeChange'
 
     onCompose:  (e) -> @trigger('compose')
 
@@ -23,6 +25,8 @@ define [
     onReplyAll: (e) -> @trigger('reply-all')
 
     onDelete:   (e) -> @trigger('delete')
+
+    onTypeChange: (e) -> @trigger('type-filter', @$typeFilter.val())
 
     toggleMessageBtns: (value) ->
       @toggleReplyBtn(value)

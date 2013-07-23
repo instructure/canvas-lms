@@ -61,6 +61,12 @@ require [
     onCompose: (e) =>
       @compose.show()
 
+    onTypeFilter: (new_type) =>
+      @selectConversation(null)
+      @list.collection.reset()
+      @list.collection.setParam('scope', new_type)
+      @list.collection.fetch()
+
     _initViews: ->
       @_initListView()
       @_initDetailView()
@@ -73,6 +79,7 @@ require [
       @header.on('reply',     @onReply)
       @header.on('reply-all', @onReplyAll)
       @header.on('delete',    @onDelete)
+      @header.on('type-filter', @onTypeFilter)
 
     _initListView: ->
       @list = new MessageListView
