@@ -530,12 +530,12 @@ class ActiveRecord::Base
         connection.execute("DECLARE #{cursor} CURSOR FOR #{scoped.to_sql}")
         includes = scope(:find, :include)
         with_exclusive_scope do
-          batch = find_by_sql("FETCH FORWARD #{batch_size} FROM #{cursor}")
+          batch = connection.uncached { find_by_sql("FETCH FORWARD #{batch_size} FROM #{cursor}") }
           while !batch.empty?
             preload_associations(batch, includes) if includes
             yield batch
             break if batch.size < batch_size
-            batch = find_by_sql("FETCH FORWARD #{batch_size} FROM #{cursor}")
+            batch = connection.uncached { find_by_sql("FETCH FORWARD #{batch_size} FROM #{cursor}") }
           end
         end
         # not ensure; if the transaction rolls back to due another exception, it will

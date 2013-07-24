@@ -28,5 +28,21 @@ module ActiveRecord
       end
     end
 
+    describe "find_in_batches" do
+      describe "with cursor" do
+        before do
+          pending "needs PostgreSQL" unless Account.connection.adapter_name == 'PostgreSQL'
+        end
+
+        it "should iterate through all selected rows" do
+          users = Set.new
+          3.times { users << user_model }
+          found = Set.new
+          User.connection.cache { User.find_each(batch_size: 1) { |u| found << u } }
+          found.should == users
+        end
+      end
+    end
+
   end
 end
