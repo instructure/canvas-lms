@@ -1,10 +1,13 @@
 define [
+  'jquery'
   'Backbone'
   'underscore'
   'jst/content_migrations/subviews/CourseFindSelect'
-], (Backbone, _, template) -> 
+  'jquery.ajaxJSON'
+  'jquery.disableWhileLoading'
+], ($, Backbone, _, template) -> 
   class CourseFindSelectView extends Backbone.View
-    @optionProperty 'courses'
+    @optionProperty 'current_user_id'
     template: template
 
     els: 
@@ -13,24 +16,64 @@ define [
 
     events: 
       'change #courseSelect' : 'updateSearch'
+      'change [name=include_completed_courses]' : 'toggleConcludedCourses'
 
+    render: ->
+      dfd = @getManageableCourses()
+      dfd.done (data) =>
+        @courses = data
+        @coursesByTerms = _.groupBy data, (course) -> course.term
+        super
+      
     afterRender: ->
       @$courseSearchField.autocomplete 
-        source: @autocompleteCourses()
+        source: @manageableCourseUrl()
         select: @updateSelect
 
     toJSON: -> 
       json = super
-      json.courses = @courses
+      json.terms = @coursesByTerms
+      json.include_concluded = @includeConcludedCourses
       json
+
+    # Grab a list of courses from the server via the managebleCourseUrl. Disable
+    # this view and re-render.
+    # @api private
+
+    getManageableCourses: ->
+      dfd = $.ajaxJSON @manageableCourseUrl(), 'GET', {}, {}, {}, {}
+      @$el.disableWhileLoading dfd
+      dfd
+
+    # Turn on a param that lets this view know to filter terms with concluded
+    # courses. Also, automatically update the dropdown menu with items 
+    # that include concluded courses.
+
+    toggleConcludedCourses: ->
+      @includeConcludedCourses = if @includeConcludedCourses then false else true
+      @$courseSearchField.autocomplete 'option', 'source', @manageableCourseUrl()
+      @render()
+
+    # Generate a url from the current_user_id that is used to find courses
+    # that this user can manage. jQuery autocomplete will add the param
+    # "term=typed in stuff" automagically so we don't have to worry about
+    # refining the search term
+
+    manageableCourseUrl: ->
+      params = $.param "include[]": 'concluded' if @includeConcludedCourses
+      if params
+        "/users/#{@current_user_id}/manageable_courses?#{params}"
+      else
+        "/users/#{@current_user_id}/manageable_courses"
 
     # Build a list of courses that our template and autocomplete can use
     # objects look like
     #   {label: 'Plant Science', value: 'Plant Science', id: 42}
     # @api private
 
-    autocompleteCourses: -> 
-      _.map @courses, ({course}) -> {label: course.name, id: course.id, value: course.name}
+    autocompleteCourses: ->
+      _.map @courses, (course) -> 
+        {label: course.label, id: course.id, value: course.label}
 
     # After finding a course by searching via autocomplete, update the 
     # select menu to keep both input fields in sync. Also sets the 

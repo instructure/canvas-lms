@@ -1,13 +1,23 @@
 <label class="control-label" for="courseSearchField"><strong>{{#t "search_label"}}Search for a course{{/t}}</strong></label>
+
 <div class="controls">
   <select id="courseSelect" class="span3">
     <option value="default">{{#t "select_default"}}Select a course{{/t}}</option>
-    {{#each courses}}
-    <option value={{course.id}}>{{course.name}}</option>
-    {{/each}}
+     {{#eachProp terms}}
+     <optgroup label="{{property}}">
+         {{#each value}}
+           <option value="{{id}}">{{label}}</option>
+         {{/each}}
+       </optgroup>
+     {{/eachProp}}
   </select>
   {{#t "or"}}or{{/t}}
   <input id="courseSearchField" type="text" placeholder="Course name" name="courseSearchField" class='span3'/>
+  <br>
+  <label class="checkbox">
+    <input type="checkbox" name="include_completed_courses" {{#if include_concluded}}checked{{/if}}>
+    {{#t 'include_completed_courses'}}Include completed courses{{/t}}
+  </label>
 </div>
 
 
