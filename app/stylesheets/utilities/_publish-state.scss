@@ -93,9 +93,7 @@ The publish button has two states on click (publish and published) and a hover s
   }
 
   .publish-text {
-    position: absolute !important;
-    clip: rect(1px 1px 1px 1px);
-    clip: rect(1px, 1px, 1px, 1px);
+    display: none;
   }
 }
 

@@ -16,6 +16,11 @@ define [
 
     events: {'click', 'hover'}
 
+    els:
+      'i':             '$icon'
+      '.publish-text': '$text'
+      '.desc':         '$desc'
+
     setElement: ->
       super
       @disable() unless @model.get 'publishable'
@@ -84,9 +89,12 @@ define [
 
     render: ->
       @$el.attr 'role', 'button'
-      @$el.html '<i></i><span class="publish-text"></span>'
-      @$icon = @$ 'i'
-      @$span = @$ 'span'
+      @$el.html '<i></i><span class="publish-text"></span><span class="desc"></span>'
+      @cacheEls()
+
+      # don't read text of button with screenreader
+      @$text.attr 'role', 'presentation'
+      @$text.attr 'tabindex', '-1'
 
       if @model.get('published')
         @renderPublished()
@@ -95,34 +103,67 @@ define [
       @
 
     renderPublish: ->
-      text = I18n.t 'buttons.publish', 'Publish'
-      @renderState(text, @publishClass, 'icon-unpublished')
+      @renderState
+        text:        I18n.t 'buttons.publish', 'Publish'
+        description: I18n.t 'buttons.publish_desc', 'Unpublished. Click to publish'
+        buttonClass: @publishClass
+        iconClass:   'icon-unpublished'
 
     renderPublished: ->
-      text = I18n.t 'buttons.published', 'Published'
-      @renderState(text, @publishedClass, 'icon-publish')
+      @renderState
+        text:        I18n.t 'buttons.published', 'Published'
+        description: I18n.t 'buttons.published_desc', 'Published. Click to unpublish'
+        buttonClass: @publishedClass
+        iconClass:   'icon-publish'
 
     renderUnpublish: ->
       text = I18n.t 'buttons.unpublish', 'Unpublish'
-      @renderState(text, @unpublishClass, 'icon-unpublish')
+      @renderState
+        text:        text
+        buttonClass: @unpublishClass
+        iconClass:   'icon-unpublish'
 
     renderPublishing: ->
       @disable()
       text = I18n.t 'buttons.publishing', 'Publishing...'
-      @renderState(text, @publishClass, 'icon-publish')
+      @renderState
+        text:        text
+        buttonClass: @publishClass
+        iconClass:   'icon-publish'
 
     renderUnpublishing: ->
       @disable()
       text = I18n.t 'buttons.unpublishing', 'Unpublishing...'
-      @renderState(text, @unpublishClass, 'icon-unpublished')
+      @renderState
+        text:        text
+        buttonClass: @unpublishClass
+        iconClass:   'icon-unpublished'
 
-    renderState: (text, buttonClass, iconClass) ->
+    renderState: (options) ->
       @reset()
-      @$el.addClass buttonClass
+      @$el.addClass options.buttonClass
+      @$el.attr 'aria-pressed', options.buttonClass is @publishedClass
 
-      title = if @model.get('publishable') then text else @model.disabledMessage()
-      @$el.attr 'title', title
-      @$el.attr 'aria-pressed', buttonClass is @publishedClass
+      @$icon.addClass options.iconClass
+      @$text.html "&nbsp;#{options.text}"
 
-      @$icon.addClass iconClass
-      @$span.html "&nbsp;#{text}"
+      descId = "button-desc-#{@model.id}"
+      @$desc.attr 'id', descId
+      @$desc.addClass 'screenreader-only'
+      @$el.attr 'aria-describedby', descId
+
+      # publishable
+      if @model.get 'publishable'
+        @$el.attr 'title', options.text
+
+        # description for screen readers
+        if options.description
+          @$desc.html options.description
+        else
+          @$el.removeAttr 'aria-describedby'
+
+      # disabled
+      else
+        @$el.attr 'aria-disabled', true
+        @$el.attr 'title', @model.disabledMessage()
+        @$desc.html  @model.disabledMessage()

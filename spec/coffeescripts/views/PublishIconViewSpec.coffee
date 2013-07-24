@@ -31,7 +31,8 @@ define [
   test 'initialize publish', ->
     btnView = new PublishIconView(model: @publish).render()
     ok btnView.isPublish()
-    equal btnView.$el.html().match(/<i class="icon-unpublished"><\/i><span class="publish-text">&nbsp;Publish/).length, 1
+    equal btnView.$text.html().match(/Publish/).length, 1
+    ok !btnView.$text.html().match(/Published/)
 
   test 'initialize publish adds tooltip', ->
     btnView = new PublishIconView(model: @publish).render()
@@ -41,7 +42,7 @@ define [
   test 'initialize published', ->
     btnView = new PublishIconView(model: @published).render()
     ok btnView.isPublished()
-    equal btnView.$el.html().match(/<i class="icon-publish"><\/i><span class="publish-text">&nbsp;Published/).length, 1
+    equal btnView.$text.html().match(/Published/).length, 1
 
   test 'initialize published adds tooltip', ->
     btnView = new PublishIconView(model: @published).render()
@@ -52,7 +53,7 @@ define [
     btnView = new PublishIconView(model: @disabled).render()
     ok btnView.isPublished()
     ok btnView.isDisabled()
-    equal btnView.$el.html().match(/<i class="icon-publish"><\/i><span class="publish-text">&nbsp;Published/).length, 1
+    equal btnView.$text.html().match(/Published/).length, 1
 
   test 'initialize disabled adds tooltip', ->
     btnView = new PublishIconView(model: @disabled).render()

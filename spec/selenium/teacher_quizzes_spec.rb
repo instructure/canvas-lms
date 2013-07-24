@@ -171,7 +171,10 @@ describe "quizzes" do
         click_save_settings_button
         wait_for_ajax_requests
       end
-      f('#quiz-publish-link').text.strip.should == 'Publish'
+
+      f('#quiz-publish-link').should_not include_text("Published")
+      f('#quiz-publish-link').should include_text("Publish")
+
       quiz.versions.length.should == 1
       f('#quiz-publish-link').click
       wait_for_ajax_requests
@@ -705,6 +708,7 @@ describe "quizzes" do
         q.unpublish!
 
         get "/courses/#{@course.id}/quizzes/#{q.id}"
+        f('#quiz-publish-link').should_not include_text("Published")
         f('#quiz-publish-link').should include_text("Publish")
 
         expect_new_page_load do
@@ -734,6 +738,7 @@ describe "quizzes" do
         # move mouse to not be hover over the button
         driver.mouse.move_to f('#footer')
 
+        f('#quiz-publish-link').should_not include_text("Published")
         f('#quiz-publish-link').should include_text("Publish")
       end
 
