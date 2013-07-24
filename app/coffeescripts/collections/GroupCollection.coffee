@@ -24,5 +24,3 @@ define [
   class GroupCollection extends PaginatedCollection
     model: Group
     comparator: (group) -> group.get('name').toLowerCase()
-
-    _defaultUrl: -> "/api/v1/groups"
