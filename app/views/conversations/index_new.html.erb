@@ -45,11 +45,15 @@
         </button>
       </div>
 
-      <button class="btn">
+      <button class="al-trigger btn" id="admin-btn" disabled>
         <span class="screenreader-only"><%= t(:settings, "Settings") %></span>
         <i class="icon-settings"></i>
         <i class="icon-mini-arrow-down"></i>
       </button>
+      <ul class="al-options" id="admin-menu">
+        <li><a href="#" id="mark-unread-btn"><%= t(:mark_as_unread, "Mark as unread") %></a></li>
+        <li><a href="#" id="forward-btn"><%= t(:forward, "Forward") %></a></li>
+      </ul>
     </div>
 
     <div class="search pull-right form-search" role="search">

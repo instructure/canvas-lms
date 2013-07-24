@@ -25,14 +25,14 @@ require [
       @_attachEvents()
 
     onSelected: (model) =>
+      @header.onModelChange(model, @model)
+      @model = model
       unless model.get('selected')
         if model.id == @detail.model?.id
-          @header.toggleMessageBtns(true)
           delete @detail.model
           return @detail.render()
         return
 
-      @header.toggleMessageBtns(false)
       if model.get('messages')
         @selectConversation(model)
       else
@@ -67,6 +67,18 @@ require [
       @list.collection.setParam('scope', new_type)
       @list.collection.fetch()
 
+    onMarkUnread: =>
+      @detail.model.toggleReadState(false)
+      @detail.model.save()
+      @header.hideMarkUnreadBtn(true)
+
+    onForward: =>
+      # TODO: do something with these options/come up with a better way to
+      # specify options. forwarding requires that context and subject be
+      # the same as the original message and not changeable. 'to' field
+      # should be empty
+      @compose.show(@detail.model, 'disabled': ['context', 'subject'])
+
     _initViews: ->
       @_initListView()
       @_initDetailView()
@@ -75,11 +87,13 @@ require [
 
     _attachEvents: ->
       @list.collection.on('change:selected', @onSelected)
-      @header.on('compose',   @onCompose)
-      @header.on('reply',     @onReply)
-      @header.on('reply-all', @onReplyAll)
-      @header.on('delete',    @onDelete)
+      @header.on('compose',     @onCompose)
+      @header.on('reply',       @onReply)
+      @header.on('reply-all',   @onReplyAll)
+      @header.on('delete',      @onDelete)
       @header.on('type-filter', @onTypeFilter)
+      @header.on('mark-unread', @onMarkUnread)
+      @header.on('forward',     @onForward)
 
     _initListView: ->
       @list = new MessageListView

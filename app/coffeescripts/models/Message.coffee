@@ -17,11 +17,9 @@ define [
     unread: ->
       @get('workflow_state') is 'unread'
 
-    toggleReadState: ->
-      if @get('workflow_state') is 'read'
-        @set('workflow_state', 'unread')
-      else
-        @set('workflow_state', 'read')
+    toggleReadState: (set_read) ->
+      set_read ?= @unread()
+      @set('workflow_state', if set_read then 'read' else 'unread')
 
     toJSON: ->
       { conversation: _.extend(super, participantList: @participantList(), unread: @unread()) }
