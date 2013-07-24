@@ -190,6 +190,10 @@ define [
       return @get 'published' unless arguments.length > 0
       @set 'published', newPublished
 
+    position: (newPosition) ->
+      return @get('position') || 0 unless arguments.length > 0
+      @set 'position', newPosition
+
     iconType: =>
       return 'quiz' if @isQuiz()
       return 'discussion' if @isDiscussionTopic()
@@ -213,7 +217,7 @@ define [
         'gradeGroupStudentsIndividually', 'groupCategoryId', 'frozen',
         'frozenAttributes', 'freezeOnCopy', 'canFreeze', 'isSimple',
         'gradingStandardId', 'isLetterGraded', 'assignmentGroupId', 'iconType',
-        'published', 'htmlUrl', 'labelId'
+        'published', 'htmlUrl', 'labelId', 'position'
       ]
       hash = id: @get 'id'
       for field in fields

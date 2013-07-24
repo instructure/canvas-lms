@@ -43,6 +43,8 @@ class AssignmentsController < ApplicationController
         :URLS => {
           :new_assignment_url => new_polymorphic_url([@context, :assignment]),
           :course_url => api_v1_course_url(@context),
+          :sort_url => reorder_course_assignment_groups_url,
+          :assignment_sort_base_url => course_assignment_groups_url
         },
         :PERMISSIONS => permissions,
         :MODULES => get_module_names

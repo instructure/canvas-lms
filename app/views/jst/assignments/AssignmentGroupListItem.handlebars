@@ -1,5 +1,10 @@
-<div id="assignment_group_{{id}}">
+<div id="assignment_group_{{id}}" data-id="{{id}}">
   <h2 class="ig-header" style="position:relative;">
+    {{#if ENV.PERMISSIONS.manage}}
+      <span class="sortable-handle">
+        <a href="#" class="icon-updown"></a>
+      </span>
+    {{/if}}
     <span
       class="ig-header-title element_toggler"
       aria-controls="assignment_group_{{id}}_assignments"
@@ -62,19 +67,7 @@
   </h2>
 
   <div id="assignment_group_{{id}}_assignments" >
-    {{#if hasAssignments}}
-      <ul class="collectionViewItems ig-list"></ul>
-    {{else}}
-      <ul class="ig-list">
-        <li>
-          <div class="ig-row ig-row-empty">
-            <div class="ig-empty-msg">
-              {{#t "no_assignments_in_this_group"}}No assignments in this group{{/t}}
-            </div>
-          </div>
-        </li>
-      </ul>
-    {{/if}}
+    <ul class="collectionViewItems ig-list draggable"></ul>
   </div>
 
   {{#if ENV.PERMISSIONS.manage}}

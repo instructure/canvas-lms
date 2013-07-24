@@ -4,6 +4,11 @@
   data-item-id="{{labelId}}"
 >
   <a href="{{htmlUrl}}" class="ig-title ellipses">
+    {{#if ENV.PERMISSIONS.manage}}
+      <span class="draggable-handle">
+        <i class="icon-updown"></i>
+      </span>
+    {{/if}}
     <i class='icon-{{iconType}}'></i>
     {{name}}
   </a>

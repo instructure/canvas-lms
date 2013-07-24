@@ -17,25 +17,49 @@
 #
 define [
   'underscore'
+  'Backbone'
   'compiled/class/cache'
-  'compiled/views/CollectionView'
+  'compiled/views/SortableCollectionView'
   'compiled/views/assignments/AssignmentGroupListItemView'
   'jst/assignments/AssignmentGroupList'
-], (_, Cache, CollectionView, AssignmentGroupListItemView, template) ->
+  'jst/assignments/NoAssignmentsListItem'
+], (_, Backbone, Cache, SortableCollectionView, AssignmentGroupListItemView, template, NoAssignmentsListItem) ->
 
-  class AssignmentGroupListView extends CollectionView
+  class AssignmentGroupListView extends SortableCollectionView
     template: template
     itemView: AssignmentGroupListItemView
+
+    @optionProperty 'assignment_sort_base_url'
 
     initialize: ->
       super
       $.extend true, this, Cache
+
+    render: ->
+      super(ENV.PERMISSIONS.manage)
 
     renderItem: (model) ->
       view = super
       unless model.groupView.isExpanded()
         model.groupView.toggle()
       view
+
+    createItemView: (model) ->
+      options =
+        parentCollection: @collection
+        childKey: 'assignments'
+        groupKey: 'assignment_group_id'
+        groupId: model.id
+        reorderURL: @createReorderURL(model.id)
+        noItemTemplate: NoAssignmentsListItem
+      new @itemView $.extend {}, (@itemViewOptions || {}), {model}, options
+
+    createReorderURL: (id) ->
+      @assignment_sort_base_url + "/" + id + "/reorder"
+
+    renderOnReset: =>
+      @firstResetLanded = true
+      super
 
     toJSON: ->
       data = super
@@ -51,3 +75,16 @@ define [
           # but it will retain its state in cache
           m.groupView.toggle()
 
+    _initSort: ->
+      super
+      @$list.on('sortstart', @collapse)
+      @$list.on('sortstop', @expand)
+
+    collapse: (e, ui) =>
+      id = ui.item.children(":first").data('id')
+      ui.item.find("#assignment_group_#{id}_assignments").slideUp(100)
+      ui.item.css("height", "auto")
+
+    expand: (e, ui) =>
+      id = ui.item.children(":first").data('id')
+      ui.item.find("#assignment_group_#{id}_assignments").slideDown(100)

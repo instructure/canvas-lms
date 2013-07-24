@@ -44,6 +44,8 @@ require [
 
   assignmentGroupsView = new AssignmentGroupListView
     collection: assignmentGroups
+    sortURL: ENV.URLS.sort_url
+    assignment_sort_base_url: ENV.URLS.assignment_sort_base_url
 
   assignmentSettingsView = false
   createGroupView = false

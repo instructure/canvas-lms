@@ -2,15 +2,16 @@ define [
   'i18n!assignments'
   'underscore'
   'compiled/class/cache'
-  'compiled/views/CollectionView'
+  'compiled/collections/AssignmentCollection'
+  'compiled/views/DraggableCollectionView'
   'compiled/views/assignments/AssignmentListItemView'
   'compiled/views/assignments/CreateAssignmentView'
   'compiled/views/assignments/CreateGroupView'
   'compiled/views/assignments/DeleteGroupView'
   'jst/assignments/AssignmentGroupListItem'
-], (I18n, _, Cache, CollectionView, AssignmentListItemView, CreateAssignmentView, CreateGroupView, DeleteGroupView, template) ->
+], (I18n, _, Cache, AssignmentCollection, DraggableCollectionView, AssignmentListItemView, CreateAssignmentView, CreateGroupView, DeleteGroupView, template) ->
 
-  class AssignmentGroupListItemView extends CollectionView
+  class AssignmentGroupListItemView extends DraggableCollectionView
     tagName: "li"
     className: "item-group-condensed"
     itemView: AssignmentListItemView
@@ -40,7 +41,7 @@ define [
       @createAssignmentView.remove() if @createAssignmentView
       @editGroupView.remove() if @editGroupView
       @deleteGroupView.remove() if @deleteGroupView
-      super
+      super(ENV.PERMISSIONS.manage)
 
     afterRender: ->
       # need to hide child views and set trigger manually
@@ -100,7 +101,6 @@ define [
       showWeight = @model.collection.course?.get('apply_assignment_group_weights') and data.group_weight?
 
       attributes = _.extend(data, {
-        hasAssignments: @model.get('assignments')?.length > 0
         showRules: showRules
         rulesText: I18n.t('rules_text', "Rule", { count: count })
         showWeight: showWeight

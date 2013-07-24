@@ -24,9 +24,9 @@ define [
       @publishIconView = false
       if ENV.PERMISSIONS.manage
         @publishIconView = new PublishIconView(model: @model)
-        @model.on('change:published', @upatePublishState)
+        @model.on('change:published', @updatePublishState)
 
-    upatePublishState: =>
+    updatePublishState: =>
       @$('.ig-row').toggleClass('ig-published', @model.get('published'))
 
     afterRender: ->
@@ -47,7 +47,7 @@ define [
       data = @model.toView()
       if modules = ENV.MODULES[data.id]
         moduleName = modules[0]
-        has_modules = if modules.length > 0 then true else false
+        has_modules = modules.length > 0
         joinedNames = modules.join(",")
         _.extend data, {
           modules: modules
