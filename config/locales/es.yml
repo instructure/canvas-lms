@@ -12,7 +12,7 @@ es:
     delete_confirm: "¿Está seguro de que desea eliminar este grupo?"
     flash: 
       removeError: "No se ha podido eliminar el grupo. Por favor, inténtelo de nuevo más tarde."
-      removed: "El grupo ha sio eliminado correctamente."
+      removed: "El grupo ha sido eliminado correctamente."
     student_count: 
       one: "1 alumno"
       other: "%{count} alumnos"
@@ -1649,8 +1649,8 @@ es:
       links: 
         edit_syllabus_description: "Editar la Descripción del Programa de Estudio"
     teacher_index: 
-      add_assignment: "Agregar Tarea"
-      add_group: "Agregar Grupo"
+      add_assignment: "Agregar tarea"
+      add_group: "Agregar grupo"
       assignment_group_list: 
         no_assignment_groups: "No hay grupos de trabajo."
       assignment_group_list_item: 
@@ -1658,8 +1658,8 @@ es:
         delete: Borrar
         edit: Editar
         group_weight: "%{groupWeight}% del total"
-        manage: Manejar
-        title_delete: "Borrar el Grupo de Tareas"
+        manage: Administrar
+        title_delete: "Borrar grupo de trabajo"
         title_edit: "Editar grupo de trabajo"
       assignment_list_item: 
         due_date: "Fecha Límite"
@@ -1668,28 +1668,28 @@ es:
         cancel: Cancelar
         save: Guardar
         validating: Guardando...
-        weight_groups: "Nota media final basada en el grupo de trabajo"
+        weight_groups: "Calificación media final basada en el grupo de trabajo"
       assignments_settings: "Configuración de tareas"
       assignments_settings_screenreader: "Configuración de tareas"
       create_assignment: 
         assignment: Tarea
-        assignment_due_at: "Vence:"
+        assignment_due_at: "Fecha límite:"
         assignment_name: "Nombre:"
         assignment_points: "Puntos:"
         assignment_type: "Tipo:"
         cancel: Cancelar
-        discussion_type: Discusión
-        external_tool_type: "Herramienta Externa"
+        discussion_type: Debate
+        external_tool_type: "Herramienta externa"
         more: "Más opciones"
-        not_graded_type: "No Calificado"
+        not_graded_type: "No calificado"
         quiz_type: Evaluación
         save: Guardar
         saving: Guardando...
       create_group: 
         add_first_assignment: "Agregar una tarea"
         cancel: Cancelar
-        drop_highest: "Notas más altas:"
-        drop_lowest: "Notas más bajas:"
+        drop_highest: "Calificaciones más altas:"
+        drop_lowest: "Calificaciones más bajas:"
         example_group_name: "p.ej. Trabajo del grupo 1"
         group_name: "Nombre del grupo:"
         never_drop: "No eliminar nunca:"
@@ -1700,8 +1700,8 @@ es:
         remove_rule: "Eliminar regla"
       search: Buscar
       search_for_assignment: "Buscar tarea"
-      title_add_assignment: "Agregar Tarea"
-      title_add_group: "Agregar Grupo de Trabajo"
+      title_add_assignment: "Agregar tarea"
+      title_add_group: "Agregar grupo de trabajo"
     titles: 
       add_assignment_group: "Añadir grupo de trabajo"
       uploading: "Cargando el envío"
@@ -1992,8 +1992,8 @@ es:
         calendar_month: Mes
         calendar_scheduler: Programador
         calendar_week: Semana
-      my_appointment_groups: "Mi Grupo de Citas"
-      refresh: Refrescar
+      my_appointment_groups: "Mi grupo de citas"
+      refresh: Actualizar
       use_old_calendar: "Calendario anterior"
     calendar_navigator: 
       next: Siguiente
@@ -2528,7 +2528,7 @@ es:
       name: Nombre
       options: Opciones
     general_error: "Hubo un error al unirse a la conferencia"
-    general_error_with_message: "Se ha producido un error al intentar entrar en la conferencia. Message: '%{message}'"
+    general_error_with_message: "Se ha producido un error al intentar entrar en la conferencia. Mensaje: '%{message}'"
     inactive_error: "Esa conferencia no está activa actualmente"
     index: 
       concluded_conferences: "Conferencias finalizadas"
@@ -3150,11 +3150,11 @@ es:
   conversation_dialog: 
     enrollments_everyone: Todos
     errors: 
-      field_is_required: "Este campo es requerido"
+      field_is_required: "Este campo es obligatorio"
     people_count: 
       one: "1 persona"
       other: "%{count} personas"
-    select_all: "Seleccionar Todo"
+    select_all: "Seleccionar todo"
   conversation_message: 
     subject: "Mensaje privado, %{timestamp}"
     users_added: 
@@ -3178,7 +3178,7 @@ es:
     compose_button_bar: 
       titles: 
         add_attachment: "Adjuntar un archivo"
-        record_media_comment: "Grabar un comentario de audio o video"
+        record_media_comment: "Grabar un comentario de audio o vídeo"
     compose_title_bar: 
       buttons: 
         close: cerrar
@@ -3263,7 +3263,7 @@ es:
     message: 
       open_message: "Abrir mensaje"
       star: Señalar
-      toggle_read: "Cambiar de Leído a No leído"
+      toggle_read: "Alternar de leído a no leído"
       total_messages: "Total de mensajes"
     message_form: 
       buttons: 
@@ -3288,22 +3288,22 @@ es:
         remove_media_comment: "Eliminar comentario de contenido audiovisual"
     message_form_dialog: 
       headings: 
-        new_message: "Mensaje Nuevo"
+        new_message: "Mensaje nuevo"
       inbox_actions: 
-        add_people: "Agregar Personas"
+        add_people: "Agregar personas"
       labels: 
-        add_to_faculty_journal: "Agregar con una entrada a la revista de los profesores"
+        add_to_faculty_journal: "Agregar como entrada del historial para profesores"
         course: Curso
         group_conversation: "Esta es una conversación de grupo. Los participantes verán todos los mensajes"
         subject: Tema
         to: A
       links: 
-        media_comment: Registrar
-      media_comment: "Comentario de Media"
+        media_comment: Grabar
+      media_comment: "Comentario audiovisual"
       titles: 
-        media_comment: "Comentario grabado de contenido audiovisual"
-        record_media_comment: "Grabar un comentario de audio o video"
-        remove_media_comment: "Remover comentario de contenido audiovisual"
+        media_comment: "Comentario audiovisual grabado"
+        record_media_comment: "Grabar un comentario de audio o vídeo"
+        remove_media_comment: "Elminar un comentario audiovisual"
     message_list: 
       messages: Mensajes
     message_progress_bar_text: 
@@ -4389,7 +4389,7 @@ es:
       delete: Borrar
       due: "Fecha Límite"
       graded_discussion: "Debate con calificación"
-      no_due_date: "No Hay Fecha Límite"
+      no_due_date: "No hay fecha límite"
       open_to_comments: "Admite comentarios"
       pin: Anclar
       unpin: Desanclar
@@ -4551,7 +4551,7 @@ es:
     closed_for_comments: "No admite comentarios"
     confirm_delete_discussion_topic: "¿Está seguro de que desea borrar este tema de debate?"
     delete: Borrar
-    discussions: Discusiones
+    discussions: Debates
     edit_settings: "Editar la configuración de los debates"
     entry_collection_view: 
       add_reply_to_topic: "Agregar respuesta al tema"
@@ -6184,13 +6184,13 @@ es:
         unassigned_students: "Alumnos no asignados"
         unassigned_users: "Usuarios no asignados"
       group_category_detail: 
-        add_group: "Agregar Grupo"
+        add_group: "Agregar grupo"
         group_limit_blurb: "Los grupos están limitados a un máximo de *%{count}* miembros"
-        restricted_self_signup_blurb: "Todos los estudiantes en un grupo deben estar en una misma sección."
+        restricted_self_signup_blurb: "Todos los estudiantes de un mismo grupo deben estar en la misma sección."
         search: buscar
-        self_organized_warning: "Estos grupos son organizados por los estudiantes. A diferencia a otros tipos de grupos, los estudiantes pueden pertenecer a más de un grupo a la vez, entonces estos grupos puede que no sean la mejor solución para tareas con calificación."
-        self_signup_blurb: "La auto-inscripción está activa para estos grupos."
-        self_signup_help_tooltip: "¿Que son Grupos con Auto-inscripción?"
+        self_organized_warning: "Los alumnos organizan este tipo de grupo. A diferencia a otros tipos de grupos, los alumnos pueden pertenecer a más de un grupo a la vez, por lo que es posible que estos grupos no sean la mejor solución para su calificación."
+        self_signup_blurb: "Estos grupos permiten la inscripción automática."
+        self_signup_help_tooltip: "¿Qué son los grupos con inscripción automática?"
         student_group_instructions: "(arrastrar alumnos para asignarlos)"
         user_group_instructions: "(arrastrar usuarios para asignarlos)"
       group_user: 
@@ -8507,7 +8507,7 @@ es:
       valid_workflow_state: "Debe enviar un estado de flujo de trabajo válido"
   modules: 
     module_collection_view: 
-      course_modules: "Módulos del Curso"
+      course_modules: "Módulos del curso"
   mute_dialog: 
     curving_assignments: "Aplicando Curvas a tareas"
     grade_change_notifications: "Notificaciones de Cambios de Calificaciones"
@@ -9484,17 +9484,17 @@ es:
       sent_confirmation_sms: " Enviamos una código de confirmación de cuatro caracteres a %{sms_number}. Ingrese el código abajo para activar este número de SMS. "
       titles: 
         confirm_email_address: "Confirmar el correo electrónico"
-        confirm_email_address_alt: "Confirmar el correo electrónico"
-        confirm_email_address_aria_label: "Confirmar el correo electrónico"
+        confirm_email_address_alt: "Confirmar correo electrónico"
+        confirm_email_address_aria_label: "Confirmar correo electrónico"
         default_email_address: "Dirección de correo electrónico predeterminado"
-        default_email_address_alt: "Dirección de correo electrónico predeterminado"
-        default_email_address_aria_label: "Dirección de correo electrónico predeterminado"
+        default_email_address_alt: "Dirección de correo electrónico predeterminada"
+        default_email_address_aria_label: "Dirección de correo electrónico predeterminada"
         merge_users: "Otro usuario tiene la misma dirección de correo electrónico. Haga clic aquí para combinar cuentas de usuario."
-        merge_users_alt: "Otro usuario tiene el mismo correo electrónico. Haga click aquí para combinar cuentas de usuario."
-        merge_users_aria_label: "Otro usuario tiene el mismo correo electrónico. Haga click aquí para combinar cuentas de usuario."
+        merge_users_alt: "Otro usuario tiene la misma dirección de correo electrónico. Haga clic aquí para combinar cuentas de usuario."
+        merge_users_aria_label: "Otro usuario tiene la misma dirección de correo electrónico. Haga clic aquí para combinar cuentas de usuario."
         remove_email_address: "Remover la dirección de correo electrónico"
-        remove_email_address_alt: "Remover la dirección de correo electrónico"
-        remove_email_address_aria_label: "Remover la dirección de correo electrónico"
+        remove_email_address_alt: "Eliminar la dirección de correo electrónico"
+        remove_email_address_aria_label: "Eliminar la dirección de correo electrónico"
       validations: 
         should_be_10_digits: "debería ser un número de 10 dígitos"
     ways_to_contact_me: "Formas para contactarme"
@@ -10559,7 +10559,7 @@ es:
         show_student_quiz_results: "Mostrar los Resultados de Evaluaciones de Estudiantes"
         show_student_survey_results: "Mostrar los Resultados de la Encuesta de Estudiantes"
         survey_statistics: "Estadísticas de la Encuesta"
-      manage: Manejar
+      manage: Administrar
       only_registered_users: "Sólo usuarios registrados e inscritos pueden tomar evaluaciones calificadas"
       speed_grader: "Calificador Rápido™"
       students_submitted_so_far: 
@@ -10658,7 +10658,7 @@ es:
         twelve_hours_left: "Doce Horas Restantes"
       question_answered: Contestado
       question_unanswered: "No han respondido todavía"
-      quiz_instructions: "Instrucciones de la Evaluación"
+      quiz_instructions: "Instrucciones de la evaluación"
       saved_at: "Evaluación guardada en %{t}"
       saving: Guardando...
       seconds_count: 
@@ -12567,7 +12567,7 @@ es:
     wiki_page_edit: 
       buttons: 
         cancel: Cancelar
-        preview: "Vista Previa"
+        preview: "Vista previa"
         publish: "No publicado"
         save: Guardar
         unpublish: Publicado
@@ -12581,7 +12581,7 @@ es:
         can_edit_page: "puede(n) editar esta página"
         only_members: "Solo miembros"
       hide_from_students: "Ocultar esta página a los alumnos"
-      notify_users_text: "Notificar usuarios de que este contenido ha cambiado"
+      notify_users_text: "Notificar a los usuarios que este contenido ha cambiado"
       options_label: Opciones
       publish: Publicar
       toolbar_menu: 
@@ -12590,7 +12590,7 @@ es:
     wiki_page_index: 
       add_page: "Agregar uno"
       buttons: 
-        new_page: "Página Nueva"
+        new_page: "Nueva página"
       headers: 
         creation_date: "Fecha de creación"
         last_edit: "Última edición"
