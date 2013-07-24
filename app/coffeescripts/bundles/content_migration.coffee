@@ -83,7 +83,7 @@ require [
     key: 'course_copy_importer'
     view: new CopyCourseView
             courseFindSelect: new CourseFindSelectView 
-                                courses: ENV.COURSES
+                                current_user_id: ENV.current_user_id
                                 model: ConverterViewControl.getModel()
 
             selectContent:    new SelectContentCheckboxView(model: ConverterViewControl.getModel())
