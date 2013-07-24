@@ -53,7 +53,7 @@ class TermController < ApplicationController
 
   private
   def select_fields
-    "name, sis_source_id, start_at, end_at"
+    "id, name, sis_source_id, start_at, end_at"
   end
 
 end
