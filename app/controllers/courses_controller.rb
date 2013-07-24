@@ -1294,6 +1294,9 @@ class CoursesController < ApplicationController
     authorized_action(@context, @current_user, :read) &&
       authorized_action(@context, @current_user, :read_as_admin) &&
       authorized_action(@domain_root_account.manually_created_courses_account, @current_user, [:create_courses, :manage_courses])
+    # For prepopulating the date fields
+    js_env(:OLD_START_DATE => datetime_string(@context.start_at, :verbose, nil, true))
+    js_env(:OLD_END_DATE => datetime_string(@context.conclude_at, :verbose, nil, true))
   end
 
   def copy_course
@@ -1326,6 +1329,7 @@ class CoursesController < ApplicationController
       @content_migration = @course.content_migrations.build(:user => @current_user, :context => @course, :migration_type => 'course_copy_importer')
       @content_migration.migration_settings[:source_course_id] = @context.id
       @content_migration.workflow_state = 'created'
+      @content_migration.set_date_shift_options(params[:date_shift_options])
 
       if Canvas::Plugin.value_to_boolean(params[:selective_import])
         @content_migration.migration_settings[:import_immediately] = false
