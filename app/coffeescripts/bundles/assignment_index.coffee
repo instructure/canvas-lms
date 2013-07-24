@@ -35,12 +35,7 @@ require [
     modules: ENV.MODULES
     params:
       include: ["assignments"]
-      override_assignment_dates: false
-
-  assignmentSettingsView = new AssignmentSettingsView
-    model: course
-    assignmentGroups: assignmentGroups
-    weightsView: AssignmentGroupWeightsView
+      override_assignment_dates: !ENV.PERMISSIONS.manage
 
   inputFilterView = new InputFilterView
     collection: assignmentGroups
@@ -48,13 +43,24 @@ require [
   assignmentGroupsView = new AssignmentGroupListView
     collection: assignmentGroups
 
+  assignmentSettingsView = false
+  createGroupView = false
+
+  if ENV.PERMISSIONS.manage
+    assignmentSettingsView = new AssignmentSettingsView
+      model: course
+      assignmentGroups: assignmentGroups
+      weightsView: AssignmentGroupWeightsView
+
+    createGroupView = new CreateGroupView
+      assignmentGroups: assignmentGroups
+      course: course
+
   @app = new IndexView
     assignmentGroupsView: assignmentGroupsView
     inputFilterView: inputFilterView
     assignmentSettingsView: assignmentSettingsView
-    createGroupView: new CreateGroupView
-      assignmentGroups: assignmentGroups
-      course: course
+    createGroupView: createGroupView
 
   @app.render()
 

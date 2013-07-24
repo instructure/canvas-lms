@@ -38,19 +38,25 @@ define [
     # we need to make sure that all children view are also children dom
     # elements first.
     render: ->
-      @createAssignmentView.remove()
-      @editGroupView.remove()
+      @createAssignmentView.remove() if @createAssignmentView
+      @editGroupView.remove() if @editGroupView
       super
 
     afterRender: ->
-      # child views so they get rendered automatically, need to stop it
-      @createAssignmentView.hide()
-      @editGroupView.hide()
-      @deleteGroupView.hide()
-      # its trigger would not be rendered yet, set it manually
-      @createAssignmentView.setTrigger @$addAssignmentButton
-      @editGroupView.setTrigger @$editGroupButton
-      @deleteGroupView.setTrigger @$deleteGroupButton
+      # need to hide child views and set trigger manually
+
+      if @createAssignmentView
+        @createAssignmentView.hide()
+        @createAssignmentView.setTrigger @$addAssignmentButton
+
+      if @editGroupView
+        @editGroupView.hide()
+        @editGroupView.setTrigger @$editGroupButton
+
+      if @deleteGroupView
+        @deleteGroupView.hide()
+        @deleteGroupView.setTrigger @$deleteGroupButton
+
       #listen for events that cause auto-expanding
       @collection.on('add', => if !@isExpanded() then @toggle() )
 
@@ -68,23 +74,29 @@ define [
       @model.groupView = @
       @initCache()
 
-      @editGroupView = new CreateGroupView
-        assignmentGroup: @model
-        assignments: @collection.models
-      @createAssignmentView = new CreateAssignmentView
-        assignmentGroup: @model
-        collection: @collection
-      @deleteGroupView = new DeleteGroupView
-        model: @model
-        assignments: @collection
+      @editGroupView = false
+      @createAssignmentView = false
+      @deleteGroupView = false
+
+      if ENV.PERMISSIONS.manage
+        @editGroupView = new CreateGroupView
+          assignmentGroup: @model
+          assignments: @collection.models
+        @createAssignmentView = new CreateAssignmentView
+          assignmentGroup: @model
+          collection: @collection
+        @deleteGroupView = new DeleteGroupView
+          model: @model
+          assignments: @collection
 
     # this is the only way to get the number of assignments to update properly
     # when an assignment is created in a new assignment group (before refreshing the page)
     refreshDeleteDialog: =>
-      @deleteGroupView.remove()
-      @deleteGroupView = new DeleteGroupView
-        model: @model
-        assignments: @collection
+      if @deleteGroupView
+        @deleteGroupView.remove()
+        @deleteGroupView = new DeleteGroupView
+          model: @model
+          assignments: @collection
 
     initCache: ->
       $.extend true, @, Cache
@@ -95,7 +107,7 @@ define [
 
     toJSON: ->
       count = @countRules()
-      showRules = count != 0
+      showRules = count != 0 and ENV.PERMISSIONS.manage
 
       data = @model.toJSON()
       showWeight = @model.collection.course?.get('apply_assignment_group_weights')

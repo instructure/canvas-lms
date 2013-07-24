@@ -258,6 +258,32 @@ describe "assignments" do
         f('.submit_online_upload_option').should be_displayed
       end
     end
+
+    context "draft state" do
+      before do
+        Account.default.settings[:enable_draft] = true
+        Account.default.save!
+        @domain_root_account = Account.default
+
+        get "/courses/#{@course.id}/assignments"
+        wait_for_ajaximations
+      end
+
+      it "should list the assignments" do
+        ag = @course.assignment_groups.first
+        ag_el = f("#assignment_group_#{ag.id}")
+        ag_el.should be_present
+        ag_el.text.should match @assignment.name
+      end
+
+      it "should not show add/edit/delete buttons" do
+        ag = @course.assignment_groups.first
+        f('.new_assignment').should be_nil
+        f('#addGroup').should be_nil
+        f('.add_assignment').should be_nil
+        f("ag_#{ag.id}_manage_link").should be_nil
+      end
+    end
   end
 
   context "as observer" do

@@ -36,14 +36,24 @@ module Api::V1::AssignmentGroup
     hash['rules'] = group.rules_hash
 
     if includes.include?('assignments')
+      assignment_scope = group.active_assignments
+
+      # fake assignment used for checking if the @current_user can read unpublished assignments
+      fake = group.context.assignments.new
+      fake.workflow_state = 'unpublished'
+      if @domain_root_account.enable_draft? && !fake.grants_right?(user, session, :read)
+        # user should not see unpublished assignments
+        assignment_scope = assignment_scope.published
+      end
+
       include_discussion_topic = includes.include?('discussion_topic')
       user_content_attachments   = opts[:preloaded_user_content_attachments]
       user_content_attachments ||= api_bulk_load_user_content_attachments(
-        group.active_assignments.map(&:description),
+        assignment_scope.map(&:description),
         group.context,
         user
       )
-      hash['assignments'] = group.active_assignments.map { |a|
+      hash['assignments'] = assignment_scope.map { |a|
         a.context = group.context
         assignment_json(a, user, session,
           include_discussion_topic: include_discussion_topic,

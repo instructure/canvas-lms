@@ -23,38 +23,40 @@
         </ul>
       {{/ifAny}}
 
-      <a
-        href="#"
-        class="btn add_assignment"
-        title='{{#t "add_assignment_to"}}Add Assignment to {{name}}{{/t}}'
-      >
-        {{! icon is separate from <a> tag because it is the only visible content in the button }}
-        <span class="screenreader-only">{{#t "add_assignment_to"}}Add Assignment to {{name}}{{/t}}</span>
-        <i class="icon-plus"></i>
-      </a>
+      {{#if ENV.PERMISSIONS.manage}}
+        <a
+          href="#"
+          class="btn add_assignment"
+          title='{{#t "add_assignment_to"}}Add Assignment to {{name}}{{/t}}'
+        >
+          {{! icon is separate from <a> tag because it is the only visible content in the button }}
+          <span class="screenreader-only">{{#t "add_assignment_to"}}Add Assignment to {{name}}{{/t}}</span>
+          <i class="icon-plus"></i>
+        </a>
 
-      <a id="ag_{{id}}_manage_link" class="al-trigger btn">
-        <span class="screenreader-only">{{#t "manage"}}Manage{{/t}}</span>
-        <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
-      </a>
-      <ul class="al-options">
-        <li>
-          <a
-            href="#"
-            class="edit_group icon-edit"
-            title='{{#t "title_edit"}}Edit Assignment Group{{/t}}'
-            data-focus-returns-to="ag_{{id}}_manage_link"
-          >{{#t "edit"}}Edit{{/t}}</a>
-        </li>
-        <li>
-          <a
-            href="#"
-            class="delete_group icon-trash"
-            title='{{#t "title_delete"}}Delete Assignment Group?{{/t}}'
-            data-focus-returns-to="ag_{{id}}_manage_link"
-          >{{#t "delete"}}Delete{{/t}}</a>
-        </li>
-      </ul>
+        <a id="ag_{{id}}_manage_link" class="al-trigger btn">
+          <span class="screenreader-only">{{#t "manage"}}Manage{{/t}}</span>
+          <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
+        </a>
+        <ul class="al-options">
+          <li>
+            <a
+              href="#"
+              class="edit_group icon-edit"
+              title='{{#t "title_edit"}}Edit Assignment Group{{/t}}'
+              data-focus-returns-to="ag_{{id}}_manage_link"
+            >{{#t "edit"}}Edit{{/t}}</a>
+          </li>
+          <li>
+            <a
+              href="#"
+              class="delete_group icon-trash"
+              title='{{#t "title_delete"}}Delete Assignment Group?{{/t}}'
+              data-focus-returns-to="ag_{{id}}_manage_link"
+            >{{#t "delete"}}Delete{{/t}}</a>
+          </li>
+        </ul>
+      {{/if}}
     </div>
 
   </h2>
@@ -62,7 +64,10 @@
   <div id="assignment_group_{{id}}_assignments" >
     <ul class="collectionViewItems ig-list"></ul>
   </div>
-  <form data-view="createAssignment" class="form-dialog"></form>
-  <form data-view="editAssignmentGroup" class="form-dialog"></form>
-  <form data-view="deleteAssignmentGroup" class="form-dialog" serialize-radio-value></form>
+
+  {{#if ENV.PERMISSIONS.manage}}
+    <form data-view="createAssignment" class="form-dialog"></form>
+    <form data-view="editAssignmentGroup" class="form-dialog"></form>
+    <form data-view="deleteAssignmentGroup" class="form-dialog" serialize-radio-value></form>
+  {{/if}}
 </div>

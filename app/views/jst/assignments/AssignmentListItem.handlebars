@@ -4,24 +4,25 @@
     {{name}}
   </a>
   <div class="ig-details row-fluid">
-    <div class="span4 ellipses modules">
-        {{#ifEqual module_count 1}}
-          {{module_name}} {{#t "module"}}Module{{/t}}
-        {{else}}
-          {{#if has_modules}}
+    {{#if ENV.PERMISSIONS.manage}}
+      <div class="span4 ellipses modules">
+        {{#if has_modules}}
+          {{#ifEqual module_count 1}}
+            {{module_name}} {{#t "module"}}Module{{/t}}
+          {{else}}
             <a href='#' title='{{joined_names}}' class="tooltip_link" data-tooltip-selector="#module_tooltip_{{labelId}}">
               {{#t "multiple_modules"}}Multiple Modules{{/t}}
             </a>
-          {{/if}}
-        {{/ifEqual}}
-    </div>
-    {{#if has_modules}}
-      <div id="module_tooltip_{{labelId}}" style="display:none;">
-        {{#each modules}}
-          <span>{{this}}</span><br/>
-        {{/each}}
+          {{/ifEqual}}
+          <div id="module_tooltip_{{labelId}}" style="display:none;">
+            {{#each modules}}
+              <span>{{this}}</span><br/>
+            {{/each}}
+          </div>
+        {{/if}}
       </div>
     {{/if}}
+
     <div class="span4 ellipses">
       <!-- TODO: VDD -->
       {{#if dueAt}}
@@ -29,11 +30,15 @@
         {{datetimeFormatted dueAt}}
       {{/if}}
     </div>
+
     <div class="span4 ellipses">
       {{#if pointsPossible}}{{#t "points_possible"}}{{pointsPossible}} pts{{/t}}{{/if}}
     </div>
   </div>
-  <div class="ig-admin">
-    <span class="publish-icon" data-view="publish-icon"></span>
-  </div>
+
+  {{#if ENV.PERMISSIONS.manage}}
+    <div class="ig-admin">
+      <span class="publish-icon" data-view="publish-icon"></span>
+    </div>
+  {{/if}}
 </div>

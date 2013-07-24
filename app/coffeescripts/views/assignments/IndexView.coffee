@@ -18,9 +18,12 @@ define [
       '#assignmentSettingsCog': '$assignmentSettingsButton'
 
     afterRender: ->
-      # child views so they get rendered automatically, need to stop it
-      @createGroupView.hide()
-      @assignmentSettingsView.hide()
-      # its trigger would not be rendered yet, set it manually
-      @assignmentSettingsView.setTrigger @$assignmentSettingsButton
-      @createGroupView.setTrigger @$addGroupButton
+      # need to hide child views and set trigger manually
+
+      if @createGroupView
+        @createGroupView.hide()
+        @createGroupView.setTrigger @$addGroupButton
+
+      if @assignmentSettingsView
+        @assignmentSettingsView.hide()
+        @assignmentSettingsView.setTrigger @$assignmentSettingsButton

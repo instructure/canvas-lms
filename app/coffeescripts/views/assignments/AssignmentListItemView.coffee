@@ -13,8 +13,11 @@ define [
 
     initialize: ->
       super
-      @publishIconView = new PublishIconView(model: @model)
-      @model.on('change:published', @upatePublishState)
+
+      @publishIconView = false
+      if ENV.PERMISSIONS.manage
+        @publishIconView = new PublishIconView(model: @model)
+        @model.on('change:published', @upatePublishState)
 
     upatePublishState: =>
       @$('.ig-row').toggleClass('ig-published', @model.get('published'))

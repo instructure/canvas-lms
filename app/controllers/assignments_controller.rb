@@ -37,23 +37,22 @@ class AssignmentsController < ApplicationController
     if authorized_action(@context, @current_user, :read)
       return unless tab_enabled?(@context.class::TAB_ASSIGNMENTS)
 
-      if @context.grants_right?(@current_user, :update)
-        js_env({
-          :URLS => {
-            :new_assignment_url => new_polymorphic_url([@context, :assignment]),
-            :course_url => api_v1_course_url(@context),
-          },
-          :MODULES => get_module_names
-        })
+      permissions = @context.grants_rights?(@current_user, :manage_assignments, :manage_grades)
+      permissions[:manage] = permissions[:manage_assignments] || permissions[:manage_grades]
+      js_env({
+        :URLS => {
+          :new_assignment_url => new_polymorphic_url([@context, :assignment]),
+          :course_url => api_v1_course_url(@context),
+        },
+        :PERMISSIONS => permissions,
+        :MODULES => get_module_names
+      })
 
-        respond_to do |format|
-          format.html do
-            @padless = true
-            render :action => :new_index
-          end
+      respond_to do |format|
+        format.html do
+          @padless = true
+          render :action => :new_index
         end
-      else
-        old_index
       end
     end
   end
