@@ -326,6 +326,14 @@ class AssignmentsApiController < ApplicationController
         submissions = {}
       end
 
+      if override_dates
+        assignments_with_overrides = @assignments.joins(:assignment_overrides)
+          .select("assignments.id")
+        @assignments = @assignments.all
+        assignments_without_overrides = @assignments - assignments_with_overrides
+        assignments_without_overrides.each { |a| a.has_no_overrides = true }
+      end
+
       hashes = @assignments.map do |assignment|
         submission = submissions[assignment.id]
         assignment_json(assignment, @current_user, session,

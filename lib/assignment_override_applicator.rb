@@ -23,6 +23,12 @@ module AssignmentOverrideApplicator
   def self.assignment_overridden_for(assignment_or_quiz, user)
     return assignment_or_quiz if assignment_or_quiz.overridden_for?(user)
 
+    # this is a cheap hack to avoid unnecessary work (especially stupid
+    # simply_versioned queries)
+    if assignment_or_quiz.has_no_overrides
+      return setup_overridden_clone(assignment_or_quiz)
+    end
+
     overrides = self.overrides_for_assignment_and_user(assignment_or_quiz, user)
 
     result_assignment_or_quiz = self.assignment_with_overrides(assignment_or_quiz, overrides)
@@ -85,7 +91,7 @@ module AssignmentOverrideApplicator
       # NOT exclude deleted overrides, yet
       key = assignment_or_quiz.is_a?(Quiz) ? :quiz_id : :assignment_id
       adhoc_membership = AssignmentOverrideStudent.where(key => assignment_or_quiz, :user_id => user).first
-      
+
       overrides << adhoc_membership.assignment_override if adhoc_membership
 
       if assignment_or_quiz.is_a?(Assignment) && assignment_or_quiz.group_category && group = user.current_groups.where(:group_category_id => assignment_or_quiz.group_category_id).first
@@ -143,35 +149,45 @@ module AssignmentOverrideApplicator
     end
   end
 
+  # really takes an assignment or quiz but who wants to type out
+  # assignment_or_quiz all the time?
+  def self.setup_overridden_clone(assignment, overrides = [])
+    clone = assignment.clone
+
+    # ActiveRecord::Base#clone nils out the primary key; put it back
+    clone.id = assignment.id
+    self.copy_preloaded_associations_to_clone(assignment,
+                                              clone)
+    yield(clone) if block_given?
+
+    clone.applied_overrides = overrides
+    clone.without_overrides = assignment
+    clone.overridden = true
+    clone.readonly!
+
+    new_record = assignment.instance_variable_get(:@new_record)
+    clone.instance_variable_set(:@new_record, new_record)
+
+    clone
+  end
+
   # apply the overrides calculated by collapsed_overrides to a clone of the
   # assignment or quiz which can then be used in place of the original object.
   # the clone is marked readonly to prevent saving
   def self.assignment_with_overrides(assignment_or_quiz, overrides)
     unoverridden_assignment_or_quiz = assignment_or_quiz.without_overrides
-    # ActiveRecord::Base#clone nils out the primary key; put it back
-    cloned_assignment_or_quiz = unoverridden_assignment_or_quiz.clone
-    cloned_assignment_or_quiz.id = unoverridden_assignment_or_quiz.id
-    self.copy_preloaded_associations_to_clone(assignment_or_quiz,
-                                              cloned_assignment_or_quiz)
 
-    # update attributes with overrides
-    if overrides
-      self.collapsed_overrides(unoverridden_assignment_or_quiz, overrides).each do |field,value|
-        # for any times in the value set, bring them back from raw UTC into the
-        # current Time.zone before placing them in the assignment
-        value = value.in_time_zone if value && value.respond_to?(:in_time_zone) && !value.is_a?(Date)
-        cloned_assignment_or_quiz.write_attribute(field, value)
+    self.setup_overridden_clone(unoverridden_assignment_or_quiz,
+                                overrides) do |cloned_assignment_or_quiz|
+      if overrides
+        self.collapsed_overrides(unoverridden_assignment_or_quiz, overrides).each do |field,value|
+          # for any times in the value set, bring them back from raw UTC into the
+          # current Time.zone before placing them in the assignment
+          value = value.in_time_zone if value && value.respond_to?(:in_time_zone) && !value.is_a?(Date)
+          cloned_assignment_or_quiz.write_attribute(field, value)
+        end
       end
     end
-    cloned_assignment_or_quiz.applied_overrides = overrides
-    cloned_assignment_or_quiz.without_overrides = unoverridden_assignment_or_quiz
-    cloned_assignment_or_quiz.overridden = true
-    cloned_assignment_or_quiz.readonly!
-
-    new_record = unoverridden_assignment_or_quiz.instance_variable_get(:@new_record)
-    cloned_assignment_or_quiz.instance_variable_set(:@new_record, new_record)
-    
-    cloned_assignment_or_quiz
   end
 
   def self.copy_preloaded_associations_to_clone(orig, clone)

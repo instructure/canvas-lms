@@ -830,7 +830,28 @@ describe AssignmentOverrideApplicator do
       @unoverridden_assignment.overridden_for_user.should == nil
     end
   end
-  
+
+  describe "Overridable#has_no_overrides" do
+    before do
+      student_in_course
+      @assignment = assignment_model(:course => @course,
+                                     :due_at => 1.week.from_now)
+      o = assignment_override_model(:assignment => @assignment,
+                                    :due_at => 1.week.ago)
+      o.assignment_override_students.create! user: @student
+    end
+
+    it "makes assignment_overridden_for lie!" do
+      truly_overridden_assignment = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @student)
+
+      @assignment.has_no_overrides = true
+      fake_overridden_assignment = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @student)
+      fake_overridden_assignment.overridden.should be_true
+      fake_overridden_assignment.due_at.should_not == truly_overridden_assignment.due_at
+      fake_overridden_assignment.due_at.should == @assignment.due_at
+    end
+  end
+
   it "should use the full stack" do
     student_in_course
     original_due_at = 3.days.from_now

@@ -81,6 +81,16 @@ class AssignmentGroupsController < ApplicationController
 
         params[:override_assignment_dates] ||= true
         override_dates = value_to_boolean(params[:override_assignment_dates])
+
+        if override_dates
+          assignments_with_overrides = @context.assignments.active.except(:order)
+                                       .joins(:assignment_overrides)
+                                       .select("assignments.id")
+                                       .uniq
+          assignments_without_overrides = @groups.flat_map(&:active_assignments) -
+            assignments_with_overrides
+          assignments_without_overrides.each { |a| a.has_no_overrides = true }
+        end
       end
 
       respond_to do |format|
