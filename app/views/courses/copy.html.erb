@@ -5,60 +5,56 @@
 <p>
   <%= t('details', %{Please enter the details for the new course.}) %>
 </p>
-<% form_for :course, :url => course_copy_course_url(@context), :html => {} do |f| %>
-  <table class="formtable">
-    <tr>
-      <td><%= f.label :name, :en => "Name" %></td>
-      <td><%= f.text_field :name, :value => @context.name %></td>
-    </tr>
-    <tr>
-      <td><%= f.label :course_code, :en => "Course Code" %></td>
-      <td><%= f.text_field :course_code, :value => @context.course_code %></td>
-    </tr>
-    <tr>
-      <td><%= f.label :start_at, :en => "Start Date" %></td>
-      <td><div><%= f.text_field :start_at, :class => 'datetime_field', :style => "width: 165px;", :value => @context.start_at %></div></td>
-    </tr>
-    <tr>
-      <td><%= f.label :conclude_at, :en => "End Date" %></td>
-      <td><div><%= f.text_field :conclude_at, :class => 'datetime_field', :style => "width: 165px;", :value => @context.conclude_at %></div></td>
-    </tr>
-    <% if can_do(@context.account, @current_user, :manage_courses) %>
-      <tr>
-        <td><%= f.label :enrollment_term_id, :en => "Term" %></td>
-        <td>
-          <select name="course[enrollment_term_id]" id="course_enrollment_term_id">
-            <% @context.root_account.enrollment_terms.sort_by{|t| t.start_at || Time.parse("Jan 1 2000")}.each do |term| %>
-              <option value="<%= term.id %>" <%= 'selected' if term.id == @context.enrollment_term_id %>><%= term.name %></option>
-            <% end %>
-          </select>
-        </td>
-      </tr>
-    <% end %>
-    <tr>
-      <td colspan="2">
-        <label class="checkbox" for="selectContentCheckbox">
-          <input name="selective_import" type="checkbox"><%= t('choose_content', 'Choose which items to copy?') %></label>
-      </td>
-    </tr>
-  </table>
+<% form_for :course, :url => course_copy_course_url(@context), :html => {:class => "form-horizontal"} do |f| %>
+
+  <div class="control-group">
+    <label class="control-label"><strong><%= t('name', 'Name') %></strong></label>
+    <div class="controls"><%= f.text_field :name, :value => @context.name %></div>
+  </div>
+
+  <div class="control-group">
+    <label class="control-label"><strong><%= t('course_code', 'Course Code') %></strong></label>
+    <div class="controls"><%= f.text_field :course_code, :value => @context.course_code %></div>
+  </div>
+  <div class="control-group">
+    <label class="control-label"><strong><%= t('start_at', 'Start Date') %></strong></label>
+    <div class="controls"><%= f.text_field :start_at, :class => 'datetime_field', :style => "width: 165px;", :value => datetime_string(@context.start_at, :verbose, nil, true) %></div>
+  </div>
+  <div class="control-group">
+    <label class="control-label"><strong><%= t('conclude_at', 'End Date') %></strong></label>
+    <div class="controls"><%= f.text_field :conclude_at, :class => 'datetime_field', :style => "width: 165px;", :value => datetime_string(@context.conclude_at, :verbose, nil, true) %></div>
+  </div>
+  <% if can_do(@context.account, @current_user, :manage_courses) %>
+    <div class="control-group">
+      <label class="control-label"><strong><%= t('enrollment_term_id', 'Term') %></strong></label>
+
+      <div class="controls">
+        <select name="course[enrollment_term_id]" id="course_enrollment_term_id">
+          <% @context.root_account.enrollment_terms.sort_by { |t| t.start_at || Time.parse("Jan 1 2000") }.each do |term| %>
+            <option value="<%= term.id %>" <%= 'selected' if term.id == @context.enrollment_term_id %>><%= term.name %></option>
+          <% end %>
+        </select>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="control-group">
+    <div class="controls">
+      <label class="checkbox" for="selectContentCheckbox">
+        <input name="selective_import" type="checkbox"><%= t('choose_content', 'Choose which items to copy') %>
+      </label>
+    </div>
+  </div>
+
+  <div class="control-group">
+    <div id="date_shift"></div>
+  </div>
+
   <div class='form-actions'>
     <a href="<%= context_url(@context, :context_url) %>" class="btn button-secondary"><%= t '#buttons.cancel', 'Cancel' %></a>
     <button type="submit" class="btn btn-primary"><%= t('buttons.create_course', %{Create Course}) %></button>
   </div>
+
 <% end %>
 
-<% js_block do %>
-<script>
-require([
-  'jquery' /* $ */,
-  'jquery.instructure_date_and_time' /* time_field, datetime_field */
-], function($) {
-
-$(document).ready(function() {
-  $(".datetime_field").datetime_field();
-});
-
-});
-</script>
-<% end %>
+<% js_bundle :copy_course %>
