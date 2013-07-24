@@ -237,6 +237,10 @@ Either use `<a>` with icon desired icon class added or insert `<i>` inside `<but
   <span class="span3"><i class="icon-syllabus"></i> icon-syllabus</span>
   <span class="span3"><i class="icon-settings-2"></i> icon-settings-2</span>
 </div>
+<div class="row-fluid">
+  <span class="span3"><i class="icon-reply-2"></i> icon-reply-2</span>
+  <span class="span3"><i class="icon-reply-all-2"></i> icon-reply-all-2</span>
+</div>
 */
 
 // add icon font
@@ -473,6 +477,8 @@ h1, h2, h3, h4, .h1, .h2, .h3, .h4, p {
 .icon-more:before { content: "\e100" }
 .icon-syllabus:before { content: "\e101" }
 .icon-settings-2:before { content: "\e102" }
+.icon-reply-2:before { content: "\e103" }
+.icon-reply-all-2:before { content: "\e104" }
 
 // deprecated in favor of .screenreader-only, which is meant to be usable anywhere
 span.screen-reader-text {
