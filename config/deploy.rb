@@ -23,10 +23,6 @@ def push_app_servers(num_app_nodes, app_node_prefix)
   range.each { |x| role :app, "#{app_node_prefix}#{x}.tier2.sfu.ca" }
 end
 
-def is_hotfix?
-  ENV.has_key?('hotfix') && ENV['hotfix'].downcase == "true"
-end
-
 if (ENV.has_key?('gateway') && ENV['gateway'].downcase == "true")
   set :gateway, "welcome.its.sfu.ca"
   set :stats_server, "stats.its.sfu.ca"
@@ -40,6 +36,7 @@ ssh_options[:keys] = [File.join(ENV["HOME"], ".ssh", "id_rsa_canvas")]
 namespace :deploy do
 	task :start do ; end
 	task :stop do ; end
+
 	desc 'Signal Passenger to restart the application.'
  	task :restart, :except => { :no_release => true } do
 		run "touch #{current_path}/tmp/restart.txt"
@@ -68,7 +65,7 @@ namespace :canvas do
 
     desc "Copy config files from /mnt/data/canvasconfig/config"
     task :copy_config do
-      run "sudo /etc/init.d/canvasconfig start"
+      run "sudo CANVASDIR=#{latest_release} /etc/init.d/canvasconfig start"
     end
 
     desc "Clone QTIMigrationTool"
@@ -79,14 +76,19 @@ namespace :canvas do
     desc "Compile static assets"
     task :compile_assets, :on_error => :continue do
       # On remote: bundle exec rake canvas:compile_assets
-      run "cd #{latest_release} && #{rake} RAILS_ENV=#{rails_env} canvas:compile_assets[false] --quiet"
+      run "cd #{latest_release} && #{rake} RAILS_ENV=#{rails_env} canvas:compile_assets[false]"
       run "cd #{latest_release} && chown -R canvasuser:canvasuser ."
+    end
+
+    desc "Run predeploy db migration task"
+    task "migrate_predeploy", :roles => :db, :only => { :primary => true } do
+      run "cd #{latest_release} && #{rake} RAILS_ENV=#{rails_env} db:migrate:predeploy"
     end
 
     desc "Load new notification types"
     task :load_notifications, :roles => :db, :only => { :primary => true } do
       # On remote: RAILS_ENV=production bundle exec rake db:load_notifications
-      run "cd #{latest_release} && #{rake} RAILS_ENV=#{rails_env} db:load_notifications --quiet"
+      run "cd #{latest_release} && #{rake} RAILS_ENV=#{rails_env} db:load_notifications"
     end
 
     desc "Restart delayed jobs workers"
@@ -103,6 +105,8 @@ namespace :canvas do
 
     desc "Tasks that run before create_symlink"
     task :before_create_symlink do
+      copy_config
+      migrate_predeploy
       clone_qtimigrationtool
       symlink_canvasfiles
       compile_assets
@@ -110,9 +114,8 @@ namespace :canvas do
 
     desc "Tasks that run after create_symlink"
     task :after_create_symlink do
-      copy_config
-      deploy.migrate unless is_hotfix?
-      load_notifications unless is_hotfix?
+      load_notifications
+      deploy.migrate
     end
 
     desc "Tasks that run after the deploy completes"
@@ -121,15 +124,14 @@ namespace :canvas do
       log_deploy
     end
 
+    desc "Ping the canvas server to actually restart the app"
+    task :ping do
+      system "curl -m 10 --silent #{fetch(:canvas_url)}/sfu/api/v1/terms/current"
+    end
 end
 
-
-
-before(:deploy, "deploy:web:disable") unless is_hotfix?
 before("deploy:create_symlink", "canvas:before_create_symlink")
 after("deploy:create_symlink", "canvas:after_create_symlink")
+after("deploy:restart", "canvas:ping")
 after(:deploy, "canvas:after_deploy")
 after(:deploy, "deploy:cleanup")
-after(:deploy, "deploy:web:enable") unless is_hotfix?
-
-
