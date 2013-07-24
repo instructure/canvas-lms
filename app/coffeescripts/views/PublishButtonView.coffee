@@ -120,7 +120,7 @@ define [
       @reset()
       @$el.addClass buttonClass
 
-      title = if @isDisabled() then @model.disabledMessage() else text
+      title = if @model.get('publishable') then text else @model.disabledMessage()
       @$el.attr 'title', title
       @$el.attr 'aria-pressed', buttonClass is @publishedClass
 
