@@ -25,7 +25,7 @@ define [
   class OutcomeGroupCollection extends PaginatedCollection
     model: OutcomeGroup
 
-    parse: (response, xhr) ->
-      super response, xhr
+    parse: (response) ->
+      super
       _.reject response, (groupObj) ->
         groupObj.id is ENV.COMMON_CORE_GROUP_ID

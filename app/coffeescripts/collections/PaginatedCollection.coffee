@@ -37,30 +37,29 @@ define [
     perPageRegex: /\per_page=(\d+)/
 
     ##
-    # have to do this stuff here or else 'reset' and other events are fired
-    # before _setStateAfterFetch has happened, so the state is just barely off
-    parse: (response, xhr) ->
-      @_urlCache ?= []
-      @_lastFetchOptions ?= {}
-      @_setStateAfterFetch xhr, @_lastFetchOptions
-      @_urlCache.push @_lastFetchOptions.url unless @_lastFetchOptions.url in @_urlCache
-      delete @_lastFetchOptions
-      super
-
-    ##
     # options.page: 'next', 'prev', 'first', 'last', 'top', 'bottom'
     fetch: (options = {}) ->
       exclusionFlag = "fetching#{capitalize options.page}Page"
       @[exclusionFlag] = true
       if options.page?
         options.url = @urls[options.page] if @urls?
-        options.add = true unless options.add?
+        options.remove = false unless options.remove?
         # API keeps params intact, kill data here to avoid appending in super
         options.data = ''
-      @_lastFetchOptions = options
+      else
+        # we want the first fetch to reset (since a lot of existing code wants a reset event)
+        options.reset = true unless options.reset?
       @trigger 'beforeFetch', this, options
       @trigger "beforeFetch:#{options.page}", this, options if options.page?
-      super(options).done (response, text, xhr) =>
+
+      # have to do this stuff here or else 'reset' and other events are fired
+      # before _setStateAfterFetch has happened, so the state is just barely off
+      xhr = null
+      options.dataFilter = (data) =>
+        @_setStateAfterFetch(xhr, options)
+        data
+
+      xhr = super(options).done (response, text, xhr) =>
         @[exclusionFlag] = false
         @trigger 'fetch', this, response, options
         @trigger "fetch:#{options.page}", this, response, options if options.page?
@@ -72,8 +71,10 @@ define [
     canFetch: (page) ->
       @urls? and @urls[page]?
 
-    _setStateAfterFetch: (xhr, options={}) =>
+    _setStateAfterFetch: (xhr, options) =>
+      @_urlCache ?= []
       urlIsNotCached = options.url not in @_urlCache
+      @_urlCache.push options.url if not urlIsNotCached
       firstRequest = !@urls?
       setBottom = firstRequest or (options.page in ['next', 'bottom'] and urlIsNotCached)
       setTop = firstRequest or (options.page in ['prev', 'top'] and urlIsNotCached)

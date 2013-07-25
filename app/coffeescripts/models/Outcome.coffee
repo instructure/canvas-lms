@@ -32,7 +32,7 @@ define [
       !@has('description')
 
     # overriding to work with both outcome and outcome link responses
-    parse: (resp, xhr) ->
+    parse: (resp) ->
       if resp.outcome # it's an outcome link
         @outcomeLink = resp
         @outcomeGroup = resp.outcome_group

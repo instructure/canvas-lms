@@ -28,8 +28,8 @@ define [
 
     model: Folder
 
-    parse: (response, xhr) ->
+    parse: (response) ->
       if response
         _.each response, (folder) =>
           folder.contentTypes = @parentFolder.contentTypes
-      super response, xhr
+      super

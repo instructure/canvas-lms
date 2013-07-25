@@ -29,7 +29,7 @@ define [
 
     fetch: (options) ->
       options ?= {}
-      options['add'] ?= true
+      options.remove ?= false
 
       options['data'] ?= {}
       options['data']['type'] = @type

@@ -40,7 +40,7 @@ define [
       success = options.success
       delete options.success
 
-      error = Backbone.wrapError(options.error, model, options)
+      error = options.error ? ->
       delete options.error
 
       if @get('id')
@@ -52,7 +52,7 @@ define [
         [syncResp, syncStatus, syncXhr] = syncArgs
         [sectionsResp] = sectionArgs
         calEventData = CalendarEvent.mergeSectionsIntoCalendarEvent(syncResp, _.sortBy(sectionsResp, 'id'))
-        return false unless model.set(model.parse(calEventData, syncXhr), options)
+        return false unless model.set(model.parse(calEventData), options)
         success?(model, calEventData)
 
       $.when(syncDfd, sectionsDfd)
