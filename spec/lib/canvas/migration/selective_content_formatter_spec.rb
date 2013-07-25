@@ -131,6 +131,8 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
       @cm = @course.context_modules.create!(:name => "some module")
       attachment_model(:context => @course, :filename => 'a5.html')
       @wiki = @course.wiki.wiki_pages.create!(:title => "wiki", :body => "ohai")
+      category = @course.group_categories.create(:name => "other category")
+      group1 = Group.create!(:name=>"group1", :group_category => category, :context => @course)
       @migration = mock()
       @migration.stubs(:migration_type).returns('course_copy_importer')
       @migration.stubs(:source_course).returns(@course)
@@ -138,6 +140,7 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
     end
 
     it "should list top-level items" do
+      #groups should not show up even though there are some
       @formatter.get_content_list.should == [{:type=>"course_settings", :property=>"copy[all_course_settings]", :title=>"Course Settings"},
                                              {:type=>"syllabus_body", :property=>"copy[all_syllabus_body]", :title=>"Syllabus Body"},
                                              {:type=>"context_modules", :property=>"copy[all_context_modules]", :title=>"Modules", :count=>1},
