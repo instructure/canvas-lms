@@ -1,8 +1,8 @@
 class LoadSubmissionNeedsGradingNotification < ActiveRecord::Migration
-
-  tag :postdeploy
+  tag :predeploy
 
   def self.up
+    return unless Shard.current == Shard.default
     Canvas::MessageHelper.create_notification({
       name: 'Submission Needs Grading',
       delay_for: 0,
@@ -11,6 +11,7 @@ class LoadSubmissionNeedsGradingNotification < ActiveRecord::Migration
   end
 
   def self.down
+    return unless Shard.current == Shard.default
     Notification.find_by_name('Submission Needs Grading').destroy
   end
 end
