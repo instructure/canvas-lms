@@ -1054,6 +1054,16 @@ describe DiscussionTopic do
       @topic.subscription_hold(@teacher, nil, nil).should eql(:not_in_group_set)
       @topic.subscribed?(@teacher).should be_false
     end
+
+    it "should set the topic participant subscribed field to false when there is a hold" do
+      teacher_in_course(:active_all => true)
+      group_discussion_assignment
+      group_discussion = @topic.child_topics.first
+      group_discussion.user = @teacher
+      group_discussion.save!
+      group_discussion.change_read_state('read', @teacher) # quick way to make a participant
+      group_discussion.discussion_topic_participants.where(:user_id => @teacher.id).first.subscribed.should == false
+    end
   end
 
   context "a group topic subscription" do
