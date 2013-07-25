@@ -1,18 +1,25 @@
 <div class="toolbar-buttons clearfix" data-sticky>
   <div class="left-buttons">
-    <a class="btn{{#if front_page}} btn-primary{{/if}} view_all_pages" href="{{wiki_pages_url}}">{{#t 'buttons.view_all_pages'}}View All Pages{{/t}}</a>
+    <a class="btn{{#if front_page}} btn-primary{{/if}} view_all_pages" href="{{wiki_pages_path}}">{{#t 'buttons.view_all_pages'}}View All Pages{{/t}}</a>
   </div>
   <div class="right-buttons">
-    {{#if published}}
-      <button class="unpublish btn btn-success active" aria-label="{{#t 'unpublish'}}Unpublish{{/t}}"><i class="icon-publish"></i> {{#t 'buttons.unpublish'}}Published{{/t}}</button>
-    {{else}}
-      <button class="publish btn" aira-label="{{#t 'publish'}}Publish{{/t}}"><i class="icon-unpublished muted"></i> {{#t 'buttons.publish'}}Publish{{/t}}</button>
+    {{#ifEqual contextName "courses"}}
+      {{#if WIKI_RIGHTS.manage}}
+        <span class="publish-button"></span>
+      {{/if}}
+    {{/ifEqual}}
+    {{#ifAny PAGE_RIGHTS.update PAGE_RIGHTS.update_content}}
+      <a href="{{wiki_page_edit_path}}" class="btn edit-wiki"><i class="icon-edit"></i> {{#t 'buttons.edit'}}Edit{{/t}}</a>
+    {{/ifAny}}
+    {{#if PAGE_RIGHTS.delete}}
+      <a class="btn al-trigger" tabindex="0" role="button">
+        <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
+        <span class="screenreader-only">{{#t 'toolbar_menu.settings'}}Settings{{/t}}</span>
+      </a>
+      <ul class="al-options">
+        <li><a href="#" class="icon-trash delete_page">{{#t "delete_wiki"}}Delete{{/t}}</a></li>
+      </ul>
     {{/if}}
-    <a href="{{edit_wiki_path}}" class="btn edit-wiki"><i class="icon-edit"></i> {{#t 'buttons.edit'}}Edit{{/t}}</a>
-    <a class="btn al-trigger">
-      <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
-      <span class="screenreader-only">{{#t 'toolbar_menu.settings'}}Settings{{/t}}</span>
-    </a>
   </div>
 </div>
 

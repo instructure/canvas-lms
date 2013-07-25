@@ -71,3 +71,11 @@ define [
       ok attributes.wiki_page, 'wiki_page present'
       strictEqual attributes.wiki_page.front_page, true, 'front_page provided correctly'
     wikiPage.setAsFrontPage()
+
+  test 'removeAsFrontPage convenience method', 3, ->
+    wikiPage = new WikiPage wikiPageObj()
+    sinon.stub wikiPage, 'save', (attributes, options) ->
+      ok attributes, 'attributes present'
+      ok attributes.wiki_page, 'wiki_page present'
+      strictEqual attributes.wiki_page.front_page, false, 'front_page provided correctly'
+    wikiPage.removeAsFrontPage()

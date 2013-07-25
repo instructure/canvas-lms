@@ -232,7 +232,7 @@ describe "Pages API", :type => :integration do
       it "should set as front page" do
         json = api_call(:post, "/api/v1/courses/#{@course.id}/pages",
                         { :controller => 'wiki_pages_api', :action => 'create', :format => 'json', :course_id => @course.to_param },
-                        { :wiki_page => { :title => 'New Wiki Page!', :body => 'hello new page', :front_page => true}})
+                        { :wiki_page => { :title => 'New Wiki Page!', :body => 'hello new page', :published => true, :front_page => true}})
 
         page = @course.wiki.wiki_pages.find_by_url!(json['url'])
         page.is_front_page?.should be_true

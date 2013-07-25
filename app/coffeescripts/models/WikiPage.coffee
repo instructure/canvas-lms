@@ -13,7 +13,7 @@ define [
 
     initialize: (attributes, options) ->
       super
-      @contextAssetString = @options?.contextAssetString
+      @contextAssetString = options?.contextAssetString
       [@contextName, @contextId] = splitAssetString(@contextAssetString) if @contextAssetString
       @set('id', @get('url')) if @get('url') && !@get('id')
 
@@ -54,4 +54,11 @@ define [
       attributes =
         wiki_page:
           front_page: true
+      @save attributes, wait: true
+
+    # Uses the api to remove the page as the front page
+    removeAsFrontPage: ->
+      attributes =
+        wiki_page:
+          front_page: false
       @save attributes, wait: true

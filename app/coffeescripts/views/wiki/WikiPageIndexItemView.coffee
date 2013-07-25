@@ -20,11 +20,21 @@ define [
         'click .al-options .icon-edit': 'editPage'
         'click a.delete-menu-item': 'deletePage'
         'click a.set-front-page-menu-item': 'setAsFrontPage'
+        'click a.remove-front-page-menu-item': 'removeAsFrontPage'
+
+    @optionProperty 'WIKI_RIGHTS'
+    @optionProperty 'contextName'
 
     initialize: ->
       super
       @model.set('publishable', true)
       @model.on 'change', => @render()
+
+    toJSON: ->
+      json = super
+      json.WIKI_RIGHTS = @WIKI_RIGHTS
+      json.contextName = @contextName
+      json
 
     render: ->
       # detach the publish icon to preserve data/events
@@ -57,3 +67,7 @@ define [
     setAsFrontPage: (ev) ->
       ev?.preventDefault()
       @model.setAsFrontPage()
+
+    removeAsFrontPage: (ev) ->
+      ev?.preventDefault()
+      @model.removeAsFrontPage()

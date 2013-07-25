@@ -156,19 +156,26 @@ describe WikiPage do
     end
   end
 
-  describe '#editing_role?' do
+  describe '#can_edit_page?' do
     it 'is true if the editing roles include teachers and the user is a teacher' do
       course_with_teacher(:active_all => true)
       page = @course.wiki.wiki_pages.create(:title => "some page", :editing_roles => 'teachers', :hide_from_students => true)
       teacher = @course.teachers.first
-      page.editing_role?(teacher).should be_true
+      page.can_edit_page?(teacher).should be_true
     end
 
     it 'is true for students who are in the course' do
       course_with_student(:active_all => true)
       page = @course.wiki.wiki_pages.create(:title => "some page", :editing_roles => 'students', :hide_from_students => false)
       student = @course.students.first
-      page.editing_role?(student).should be_true
+      page.can_edit_page?(student).should be_true
+    end
+
+    it 'is true for users who are not in the course' do
+      course(:active_all => true)
+      page = @course.wiki.wiki_pages.create(:title => "some page", :editing_roles => 'public', :hide_from_students => false)
+      user(:active_all => true)
+      page.can_edit_page?(@user).should be_true
     end
   end
 
