@@ -13,13 +13,15 @@ color with a dashed line between groups.
 <div class="item-group-container">
 
   <div class="item-group-condensed">
-    <h2 class="ig-header">
-      <a class="ig-header-title element_toggler" href="#"
+    <div class="ig-header">
+      <h2 class="ig-header-title element_toggler"
          aria-controls="cond_group_1"
-         aria-expanded="true">
+         aria-expanded="true"
+         aria-label="Item Group Header toggle item visibility"
+         role="button">
         <i class="icon-mini-arrow-down"></i> Item Group Header
-      </a>
-    </h2>
+      </h2>
+    </div>
 
     <ul class="ig-list" id="cond_group_1">
       <li>
@@ -106,13 +108,15 @@ color with a dashed line between groups.
   </div>
 
   <div class="item-group-condensed">
-    <h2 class="ig-header">
-      <a class="ig-header-title element_toggler" href="#"
+    <div class="ig-header">
+      <h2 class="ig-header-title element_toggler"
          aria-controls="cond_group_2"
-         aria-expanded="true">
+         aria-expanded="true"
+         aria-label="Item Group Header toggle item visibility"
+         role="button">
         <i class="icon-mini-arrow-down"></i> Item Group Header
-      </a>
-    </h2>
+      </h2>
+    </div>
     <ul class="ig-list" id="cond_group_2">
     <li>
       <div class="ig-row">
@@ -150,13 +154,13 @@ color with a dashed line between groups.
   </div>
 
   <div class="item-group-condensed">
-    <h2 class="ig-header">
-      <a class="ig-header-title element_toggler" href="#"
+    <div class="ig-header">
+      <h2 class="ig-header-title element_toggler"
          aria-controls="cond_group_3"
          aria-expanded="true">
         <i class="icon-mini-arrow-down"></i> Item Group Header
-      </a>
-    </h2>
+      </h2>
+    </div>
     <ul class="ig-list" id="cond_group_3">
       <li>
         <div class="ig-row ig-row-empty">

@@ -17,6 +17,7 @@ require [
         pinned: I18n.t('pinned_discussions',  'Pinned Discussions')
       help:
         title: I18n.t('ordered_by_recent_activity', 'Ordered by Recent Activity')
+      toggleMessage: I18n.t('toggle_message', 'toggle discussion visibility')
 
     # Public: Routes to respond to.
     routes:
@@ -83,6 +84,7 @@ require [
         sortable: !!options.sortable
         title: @messages.lists[type]
         titleHelp: (if _.include(['open', 'locked'], type) then @messages.help.title else null)
+        toggleMessage: @messages.toggleMessage
 
     # Internal: Attach events to the discussion topic collections.
     #

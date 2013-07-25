@@ -8,13 +8,15 @@ is for items that are not draggable.
 
 ```html
 <div class="item-group">
-  <h2 class="ig-header">
-    <a class="ig-header-title element_toggler" href="#"
+  <div class="ig-header">
+    <h2 class="ig-header-title element_toggler"
        aria-controls="group_1"
-       aria-expanded="true">
+       aria-expanded="true"
+       aria-label="Item Group Header toggle item visibility"
+       role="button">
       <i class="icon-mini-arrow-down"></i> Item Group Header
-    </a>
-  </h2>
+    </h2>
+  </div>
   <ul class="ig-list" id="group_1">
     <li>
       <div class="ig-row">
@@ -125,13 +127,13 @@ is for items that are not draggable.
 </div>
 
 <div class="item-group">
-  <h2 class="ig-header">
-    <a class="ig-header-title element_toggler" href="#"
+  <div class="ig-header">
+    <h2 class="ig-header-title element_toggler"
        aria-controls="group_2"
        aria-expanded="true">
       <i class="icon-mini-arrow-down"></i> Item Group Header
-    </a>
-  </h2>
+    </h2>
+  </div>
   <ul class="ig-list" id="group_2">
     <li>
       <div class="ig-row ig-row-empty">
@@ -170,12 +172,14 @@ is for items that are not draggable.
   font-weight: bold;
   padding-top: 5px;
   padding-bottom: 5px;
-  line-height: 20px;
-  margin: auto;
 
   .ig-header-title {
     text-decoration: none;
-    color: #3d454c;
+    font-size: 15px;
+    font-weight: bold;
+    line-height: 20px;
+    margin: auto;
+    display: inline-block;
   }
 
   i {

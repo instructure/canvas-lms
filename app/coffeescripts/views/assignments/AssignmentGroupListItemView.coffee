@@ -31,7 +31,7 @@ define [
       'click .element_toggler': 'toggleArrow'
 
     messages:
-      toggleMessage: I18n.t('toggle_message',"toggle assignment visibility")
+      toggleMessage: I18n.t('toggle_message', "toggle assignment visibility")
 
     # call remove on children so that they can clean up old dialogs.
     # this should eventually happen at a higher level (eg for all views), but

@@ -106,8 +106,8 @@ require [
     btnView = new PublishIconView(model: model, el: $el).render()
 
 
-  # Item groups
-  $('.ig-header .element_toggler').click (e) ->
+  # Element Toggler
+  $('.element_toggler').click (e) ->
     $(e.currentTarget).find('i')
       .toggleClass('icon-mini-arrow-down')
       .toggleClass('icon-mini-arrow-right')

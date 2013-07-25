@@ -45,7 +45,7 @@ define [
     #
     # Returns nothing.
     _updateSort: (e, ui) =>
-      e.stopPropagation();
+      e.stopPropagation()
       positions = {}
       id = @_getItemId(ui.item)
       positions[id] = ui.item.index() + 1
