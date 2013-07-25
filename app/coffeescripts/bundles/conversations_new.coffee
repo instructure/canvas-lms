@@ -9,18 +9,20 @@ require [
   'compiled/views/conversations/MessageDetailView'
   'compiled/views/conversations/MessageFormDialog'
   'compiled/views/conversations/InboxHeaderView'
+  'compiled/util/deparam'
   'jquery.disableWhileLoading'
-], (I18n, _, Backbone, Message, MessageCollection, MessageView, MessageListView, MessageDetailView, MessageFormDialog, InboxHeaderView) ->
+], (I18n, _, Backbone, Message, MessageCollection, MessageView, MessageListView, MessageDetailView, MessageFormDialog, InboxHeaderView, deparam) ->
 
   class ConversationsRouter extends Backbone.Router
 
     routes:
       '': 'index'
+      'filter?:state': 'filter'
 
     messages:
       confirmDelete: I18n.t('confirm.delete_conversation', 'Are you sure you want to delete your copy of this conversation? This action cannot be undone.')
 
-    index: ->
+    initialize: ->
       @_initViews()
       @_attachEvents()
 
@@ -61,10 +63,16 @@ require [
     onCompose: (e) =>
       @compose.show()
 
-    onTypeFilter: (new_type) =>
+    index: ->
+      @filter('')
+
+    filter: (state) ->
+      filters = deparam(state)
+      @header.displayState(filters)
       @selectConversation(null)
       @list.collection.reset()
-      @list.collection.setParam('scope', new_type)
+      @list.collection.setParam('scope', filters.type)
+      @list.collection.setParam('filter', if filters.course then 'course_'+filters.course else '')
       @list.collection.fetch()
 
     onMarkUnread: =>
@@ -79,6 +87,12 @@ require [
       # should be empty
       @compose.show(@detail.model, 'disabled': ['context', 'subject'])
 
+    onFilter: (filters) =>
+      @navigate('filter?'+$.param(filters), {trigger: true})
+
+    onCourse: (course) =>
+      @list.updateCourse(course)
+
     _initViews: ->
       @_initListView()
       @_initDetailView()
@@ -91,7 +105,8 @@ require [
       @header.on('reply',       @onReply)
       @header.on('reply-all',   @onReplyAll)
       @header.on('delete',      @onDelete)
-      @header.on('type-filter', @onTypeFilter)
+      @header.on('filter',      @onFilter)
+      @header.on('course',      @onCourse)
       @header.on('mark-unread', @onMarkUnread)
       @header.on('forward',     @onForward)
 
@@ -100,7 +115,6 @@ require [
         collection: new MessageCollection
         el: $('.message-list')
       @list.render()
-      @list.collection.fetch()
 
     _initDetailView: ->
       @detail = new MessageDetailView(el: $('.message-detail'))

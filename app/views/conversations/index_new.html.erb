@@ -2,20 +2,27 @@
 <% js_bundle  :conversations_new %>
 <% @body_classes << 'full-width' %>
 
+<% content_for :page_title, t('titles.conversations', "Conversations") %>
+
 <div class="conversations">
   <header class="panel">
     <div class="filters">
       <label for="course-filter" class="screenreader-only">
         <%= t(:filter_messages_by_course, "Filter messages by course") %>
       </label>
-      <select class="course-filter" id="course-filter">
-        <option value="">[[Courses]]</option>
+      <select class="course-filter show-tick" id="course-filter">
+        <option value=""><%= t(:all_courses, "All Courses") %></option>
+        <% menu_courses_locals[:collection].each do |course| %>
+          <option value="<%= course[:id] %>" data-code="<%= course[:courseCode] %>"><%= course[:shortName] %></option>
+        <% end %>
+        <optgroup label="<%= t(:more_courses, "More Courses") %>" data-url="/api/v1/courses"></optgroup>
+        <optgroup label="<%= t(:concluded, "Concluded") %>" data-url="/api/v1/courses?state=[completed]" data-search=""></optgroup>
       </select>
 
       <label for="type-filter" class="screenreader-only">
         <%= t(:filter_messages_by_type, "Filter messages by type") %>
       </label>
-      <select class="type-filter" id="type-filter">
+      <select class="type-filter show-tick" id="type-filter">
         <option value="inbox"><%= t(:inbox, "Inbox") %></option>
         <option value="unread"><%= t(:unread, "Unread") %></option>
         <option value="starred"><%= t(:starred, "Starred") %></option>

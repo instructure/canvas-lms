@@ -653,6 +653,7 @@ module ApplicationHelper
       {
         :longName => "#{course.name} - #{course.short_name}",
         :shortName => course.name,
+        :courseCode => course.course_code,
         :href => course_path(course, :invitation => course.read_attribute(:invitation)),
         :term => term || nil,
         :subtitle => subtitle,

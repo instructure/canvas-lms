@@ -148,6 +148,7 @@ stylesheets:
     - public/stylesheets/compiled/conversations.css
     - public/stylesheets/compiled/slideshow.css
   conversations_new:
+    - public/javascripts/vendor/bootstrap-select/bootstrap-select.css
     - public/stylesheets/compiled/conversations_new.css
     - public/stylesheets/compiled/compose_message_dialog.css
   alerts:

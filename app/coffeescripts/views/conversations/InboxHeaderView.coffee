@@ -1,6 +1,9 @@
 define [
+  'underscore'
   'Backbone'
-], ({View}) ->
+  'use!vendor/bootstrap/bootstrap-dropdown'
+  'use!vendor/bootstrap-select/bootstrap-select'
+], (_, {View}) ->
 
   class InboxHeaderView extends View
 
@@ -10,18 +13,26 @@ define [
       '#reply-all-btn':   '$replyAllBtn'
       '#delete-btn':      '$deleteBtn'
       '#type-filter':     '$typeFilter'
+      '#course-filter':   '$courseFilter'
       '#admin-btn':       '$adminBtn'
       '#mark-unread-btn': '$markUnreadBtn'
       '#admin-menu':      '$adminMenu'
 
     events:
-      'click #compose-btn':     'onCompose'
-      'click #reply-btn':       'onReply'
-      'click #reply-all-btn':   'onReplyAll'
-      'click #delete-btn':      'onDelete'
-      'change #type-filter':    'onTypeChange'
-      'click #mark-unread-btn': 'onMarkUnread'
-      'click #forward-btn':     'onForward'
+      'click #compose-btn':       'onCompose'
+      'click #reply-btn':         'onReply'
+      'click #reply-all-btn':     'onReplyAll'
+      'click #delete-btn':        'onDelete'
+      'change #type-filter':      'onFilterChange'
+      'change #course-filter':    'onFilterChange'
+      'mouseover #course-filter': 'onCourseHover'
+      'click #mark-unread-btn':   'onMarkUnread'
+      'click #forward-btn':       'onForward'
+
+    render: () ->
+      super()
+      @$typeFilter.selectpicker()
+      @$courseFilter.selectpicker().next().on('mouseover', @onCourseHover)
 
     onCompose:     (e) -> @trigger('compose')
 
@@ -30,8 +41,6 @@ define [
     onReplyAll:    (e) -> @trigger('reply-all')
 
     onDelete:      (e) -> @trigger('delete')
-
-    onTypeChange:  (e) -> @trigger('type-filter', @$typeFilter.val())
 
     onMarkUnread: (e) ->
       e.preventDefault()
@@ -49,6 +58,36 @@ define [
 
     onReadStateChange: (msg) ->
       @hideMarkUnreadBtn(msg.unread())
+
+    filterObj: (obj) -> _.object(_.filter(_.pairs(obj), (x) -> !!x[1]))
+
+    onFilterChange: (e) ->
+      @trigger('filter', @filterObj({type: @$typeFilter.val(), course: @$courseFilter.val()}))
+
+    displayState: (state) ->
+      @$typeFilter.val(state.type)
+      @$courseFilter.val(state.course)
+      @$typeFilter.selectpicker('render')
+      @$courseFilter.selectpicker('render')
+      course = @$courseFilter.find('option:selected')
+      @trigger('course', {name: course.text(), code: course.data('code')})
+
+    didCourseLoad: false
+    onCourseHover: () =>
+      return if @didCourseLoad
+      @didCourseLoad = true
+      _.each(@$courseFilter.find('optgroup'), (optgroup) =>
+        $optgroup = $(optgroup)
+        url = $optgroup.data('url')
+        if !url then return
+        $.ajax(url).done((data) =>
+          _.each(data, (course) =>
+            if @$courseFilter.find('option[value='+course.id+']').length then return
+            $optgroup.append($('<option />').text(course.name).attr('value', course.id).attr('data-code', course.course_code))
+          )
+          @$courseFilter.selectpicker('refresh')
+        )
+      )
 
     toggleMessageBtns: (value) ->
       @toggleReplyBtn(value)

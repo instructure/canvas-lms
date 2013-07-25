@@ -20,3 +20,11 @@ define [
     onClick: (e) ->
       return unless e.target is @el
       @collection.each((m) -> m.set('selected', false))
+
+    course: {}
+    updateCourse: (course) ->
+      @course = course
+    render: ->
+      super()
+      @$('.current-context').text(@course.name || '')
+      @$('.current-context-code').text(@course.code || '')
