@@ -80,18 +80,6 @@ describe ActiveRecord::Base do
       @e6 = c2.enroll_student(u3, :enrollment_state => 'active')
     end
 
-    it "should find each enrollment from course using temp table" do
-      e = Course.active.select("enrollments.id AS e_id").
-                        joins(:enrollments).order("e_id asc")
-      es = []
-      e.find_each_with_temp_table(:batch_size => 2) do |record|
-        es << record["e_id"]
-      end
-      es.length.should == 6
-      es.should == [@e1.id.to_s,@e2.id.to_s,@e3.id.to_s,@e4.id.to_s,@e5.id.to_s,@e6.id.to_s]
-
-    end
-
     it "should find all enrollments from course join in batches" do
       e = Course.active.select("enrollments.id AS e_id").
                         joins(:enrollments).order("e_id asc")
@@ -100,11 +88,11 @@ describe ActiveRecord::Base do
       e.find_in_batches_with_temp_table(:batch_size => batch_size) do |batch|
         batch.size.should == batch_size
         batch.each do |r|
-          es << r["e_id"]
+          es << r["e_id"].to_i
         end
       end
       es.length.should == 6
-      es.should == [@e1.id.to_s,@e2.id.to_s,@e3.id.to_s,@e4.id.to_s,@e5.id.to_s,@e6.id.to_s]
+      es.should == [@e1.id,@e2.id,@e3.id,@e4.id,@e5.id,@e6.id]
     end
 
     it "should honor includes when using a cursor" do

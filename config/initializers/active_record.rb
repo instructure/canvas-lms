@@ -505,7 +505,6 @@ class ActiveRecord::Base
         find_in_batches_with_cursor(options, &block)
       end
     elsif scope(:find, :order) || scope(:find, :group)
-      options[:transactional] = false
       shard = scope(:find, :shard)
       if shard
         shard.activate(:shard_category) { find_in_batches_with_temp_table(options, &block) }
@@ -538,31 +537,58 @@ class ActiveRecord::Base
             batch = connection.uncached { find_by_sql("FETCH FORWARD #{batch_size} FROM #{cursor}") }
           end
         end
-        # not ensure; if the transaction rolls back to due another exception, it will
+        # not ensure; if the transaction rolls back due to another exception, it will
         # automatically close
         connection.execute("CLOSE #{cursor}")
       end
     end
   end
 
-  def self.generate_temp_table(options = {})
-    Canvas::TempTable.new(connection, construct_finder_sql({}), options)
-  end
-
-  def self.find_in_batches_with_temp_table(options = {}, &block)
-    temptable = generate_temp_table(options)
-    with_exclusive_scope do
-      temptable.execute do |table|
-        table.find_in_batches(self, options, &block)
+  def self.find_in_batches_with_temp_table(options = {})
+    batch_size = options[:batch_size] || 1000
+    table = "#{table_name}_find_in_batches_temporary_table"
+    connection.execute "CREATE TEMPORARY TABLE #{table} AS #{scoped.to_sql}"
+    begin
+      index = "temp_primary_key"
+      case connection.adapter_name
+      when 'PostgreSQL'
+        connection.execute "ALTER TABLE #{table}
+                               ADD temp_primary_key SERIAL PRIMARY KEY"
+      when 'MySQL', 'Mysql2'
+        connection.execute "ALTER TABLE #{table}
+                               ADD temp_primary_key MEDIUMINT NOT NULL PRIMARY KEY AUTO_INCREMENT"
+      when 'SQLite'
+        # Sqlite always has an implicit primary key
+        index = 'rowid'
+      else
+        raise "Temp tables not supported!"
       end
-    end
-  end
 
-  def self.find_each_with_temp_table(options = {}, &block)
-    find_in_batches_with_temp_table(options.merge(ar_objects: false)) do |batch|
-      batch.each(&block)
+      includes = scope(:find, :include)
+      sql = "SELECT *
+             FROM #{table}
+             ORDER BY #{index} ASC
+             LIMIT #{batch_size}"
+      with_exclusive_scope do
+        batch = find_by_sql(sql)
+        while !batch.empty?
+          preload_associations(batch, includes) if includes
+          yield batch
+          break if batch.size < batch_size
+          last_value = batch.last[index]
+
+          sql = "SELECT *
+               FROM #{table}
+               WHERE #{index} > #{last_value}
+               ORDER BY #{index} ASC
+               LIMIT #{batch_size}"
+          batch = find_by_sql(sql)
+        end
+      end
+    ensure
+      temporary = "TEMPORARY " if connection.adapter_name == 'Mysql2'
+      connection.execute "DROP #{temporary}TABLE #{table}"
     end
-    self
   end
 
   # set up class-specific getters/setters for a polymorphic association, e.g.
