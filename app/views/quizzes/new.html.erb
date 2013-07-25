@@ -27,12 +27,12 @@
       </span>
 
       <% if @quiz.published? %>
-        <span id='quiz-draft-state' class='published'>
+        <span id='quiz-draft-state' class='published-status published'>
           <i class="icon-publish"></i>
           <%= t('buttons.published', "Published") %>
         </span>
       <% else %>
-        <span id='quiz-draft-state' class='not_published'>
+        <span id='quiz-draft-state' class='published-status unpublished'>
           <i class="icon-unpublished"></i>
           <%= t('buttons.not_published', "Not Published") %>
         </span>

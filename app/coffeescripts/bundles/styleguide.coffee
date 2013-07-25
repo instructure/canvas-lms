@@ -1,5 +1,6 @@
 require [
   'jquery'
+  'underscore'
   'compiled/fn/preventDefault'
   'compiled/views/PublishButtonView'
   'compiled/views/PublishIconView'
@@ -8,7 +9,7 @@ require [
   'jqueryui/button'
   'jqueryui/tooltip'
   'jquery.instructure_date_and_time'
-], ($, preventDefault, PublishButtonView, PublishIconView) ->
+], ($, _, preventDefault, PublishButtonView, PublishIconView) ->
 
   do ->
     dialog = $('#dialog-buttons-dialog').dialog({
@@ -100,8 +101,9 @@ require [
   btnView = new PublishButtonView(model: model, el: "#published-disabled").render()
 
   # publish icon
-  model   = new Publishable(published: false,  publishable: true)
-  btnView = new PublishIconView(model: model, el: "#publish-icon").render()
+  _.each $('.publish-icon'), ($el) ->
+    model   = new Publishable(published: false,  publishable: true)
+    btnView = new PublishIconView(model: model, el: $el).render()
 
 
   # Item groups
@@ -128,5 +130,3 @@ require [
   $("#repeat").buttonset()
 
   $(".styleguide-datetime_field-example").datetime_field()
-
-

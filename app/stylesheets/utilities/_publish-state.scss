@@ -1,5 +1,5 @@
 /*
-@styleguide Buttons: Publish
+@styleguide Publish State
 
 The publish button has two states on click (publish and published) and a hover state of 'Unpublish' once published.
 
@@ -18,7 +18,19 @@ The publish button has two states on click (publish and published) and a hover s
 </p>
 
 <p>
-  <span id="publish-icon" class="publish-icon"></span>
+  <span class="publish-icon"></span>
+</p>
+
+<p>
+  <span class='published-status published'>
+    <i class="icon-publish"></i> Published
+  </span>
+</p>
+
+<p>
+  <span class='published-status unpublished'>
+    <i class="icon-unpublished"></i> Not Published
+  </span>
 </p>
 
 ```
@@ -87,3 +99,14 @@ The publish button has two states on click (publish and published) and a hover s
   }
 }
 
+.published-status {
+  &.published {
+    font-weight: bold;
+    color: #007711;
+  }
+
+  &.unpublished {
+    font-weight: normal;
+    color: #999999;
+  }
+}
