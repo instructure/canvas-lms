@@ -30,9 +30,15 @@ class Wiki < ActiveRecord::Base
   attr_accessible :title
 
   has_many :wiki_pages, :dependent => :destroy
+  before_create :default_front_page
   after_save :update_contexts
 
   DEFAULT_FRONT_PAGE_URL = 'front-page'
+
+  def default_front_page
+    has_no_front_page = front_page_url.nil? if has_no_front_page.nil?
+  end
+  private :default_front_page
 
   def update_contexts
     self.context.try(:touch)
@@ -56,6 +62,12 @@ class Wiki < ActiveRecord::Base
         p.save
       end
     end
+  end
+
+  def check_has_front_page
+    return unless self.has_no_front_page.nil?
+    self.has_no_front_page = !self.wiki_pages.where(:url => self.front_page_url || DEFAULT_FRONT_PAGE_URL).exists?
+    self.save
   end
   
   def front_page

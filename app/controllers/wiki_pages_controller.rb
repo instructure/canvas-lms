@@ -20,9 +20,23 @@ class WikiPagesController < ApplicationController
   include KalturaHelper
 
   before_filter :require_context
-  before_filter :get_wiki_page, :except => [:index]
-  add_crumb(proc { t '#crumbs.wiki_pages', "Pages"}) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_wiki_pages_url }
+  before_filter :get_wiki_page
+  before_filter :set_js_rights, :only => [:pages_index, :show_page, :edit_page]
+  before_filter :set_js_wiki_data, :only => [:pages_index, :show_page, :edit_page]
+  add_crumb(proc { t '#crumbs.wiki_pages', "Pages"}) do |c|
+    context = c.instance_variable_get('@context')
+    domain_root_account = c.instance_variable_get('@domain_root_account')
+    if domain_root_account.enable_draft?
+      c.send :polymorphic_path, [context, :pages]
+    else
+      c.send :named_context_url, c.instance_variable_get("@context"), :context_wiki_pages_url
+    end
+  end
   before_filter { |c| c.active_tab = "pages" }
+
+  def js_rights
+    [:wiki, :page]
+  end
 
   def show
     hash = { :CONTEXT_ACTION_SOURCE => :wiki }
@@ -53,7 +67,12 @@ class WikiPagesController < ApplicationController
 
   def index
     return unless tab_enabled?(@context.class::TAB_PAGES)
-    redirect_to named_context_url(@context, :context_wiki_page_url, @context.wiki.get_front_page_url || Wiki::DEFAULT_FRONT_PAGE_URL)
+
+    if @domain_root_account.enable_draft?
+      front_page
+    else
+      redirect_to named_context_url(@context, :context_wiki_page_url, @context.wiki.get_front_page_url || Wiki::DEFAULT_FRONT_PAGE_URL)
+    end
   end
 
   def update
@@ -126,11 +145,10 @@ class WikiPagesController < ApplicationController
   def front_page
     return unless tab_enabled?(@context.class::TAB_PAGES)
 
-    wiki = @context.wiki
-    if wiki.has_front_page?
-      redirect_to named_context_url(@context, :context_wiki_page_url, @context.wiki.get_front_page_url)
+    if @context.wiki.has_front_page?
+      redirect_to polymorphic_url([@context, :named_page], :wiki_page_id => @context.wiki.front_page)
     else
-      redirect_to named_context_url(@context, :context_wiki_pages_url)
+      redirect_to polymorphic_url([@context, :pages])
     end
   end
 
@@ -151,10 +169,6 @@ class WikiPagesController < ApplicationController
       @page.increment_view_count(@current_user, @context)
       log_asset_access(@page, 'wiki', @wiki)
 
-      js_env :wiki_pages_url => polymorphic_path([@context, :pages])
-      js_env :EDIT_WIKI_PATH => polymorphic_path([@context, :edit_named_page], :wiki_page_id => @page)
-      js_env :wiki_page => wiki_page_json(@page, @current_user, session)
-
       @padless = true
       render
     end
@@ -168,9 +182,6 @@ class WikiPagesController < ApplicationController
 
     if is_authorized_action?(@page, @current_user, [:update, :update_content])
       add_crumb(@page.title)
-
-      js_env :wiki_pages_url => polymorphic_path([@context, :pages])
-      js_env :wiki_page => wiki_page_json(@page, @current_user, session)
 
       @padless = true
       render
@@ -192,5 +203,18 @@ class WikiPagesController < ApplicationController
     end
    res
   end
- 
+
+  def set_js_wiki_data
+    hash = {}
+
+    hash[:WIKI_PAGES_PATH] = polymorphic_path([@context, :pages])
+
+    if @page
+      hash[:WIKI_PAGE] = wiki_page_json(@page, @current_user, session)
+      hash[:WIKI_PAGE_SHOW_PATH] = polymorphic_path([@context, :named_page], :wiki_page_id => @page)
+      hash[:WIKI_PAGE_EDIT_PATH] = polymorphic_path([@context, :edit_named_page], :wiki_page_id => @page)
+    end
+
+    js_env hash
+  end
 end

@@ -982,12 +982,16 @@ class ApplicationController < ActionController::Base
   # the page title.
   def get_wiki_page
     @wiki = @context.wiki
-    page_name = (params[:wiki_page_id] || params[:id] || (params[:wiki_page] && params[:wiki_page][:title]) || @wiki.get_front_page_url || Wiki::DEFAULT_FRONT_PAGE_URL)
+    @wiki.check_has_front_page
+
+    page_name = params[:wiki_page_id] || params[:id] || (params[:wiki_page] && params[:wiki_page][:title])
+    page_name ||= (@wiki.get_front_page_url || Wiki::DEFAULT_FRONT_PAGE_URL) unless @domain_root_account.enable_draft?
     if(params[:format] && !['json', 'html'].include?(params[:format]))
       page_name += ".#{params[:format]}"
       params[:format] = 'html'
     end
-    return @page if @page
+    return if @page || !page_name
+
     if params[:action] != 'create'
       @page = @wiki.wiki_pages.deleted_last.find_by_url(page_name.to_s) ||
               @wiki.wiki_pages.deleted_last.find_by_url(page_name.to_s.to_url) ||
@@ -1539,5 +1543,19 @@ class ApplicationController < ActionController::Base
 
   def not_found
     raise ActionController::RoutingError.new('Not Found')
+  end
+
+  def set_js_rights
+    if respond_to?(:js_rights)
+      hash = {}
+      js_rights.each do |instance_symbol|
+        instance_name = instance_symbol.to_s
+        obj = instance_variable_get("@#{instance_name}")
+        policy = obj.check_policy(@current_user, session) unless obj.nil? || !obj.respond_to?(:check_policy)
+        hash["#{instance_name.upcase}_RIGHTS".to_sym] = HashWithIndifferentAccess[policy.map { |right| [right, true] }] unless policy.nil?
+      end
+
+      js_env hash
+    end
   end
 end

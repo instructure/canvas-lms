@@ -1,5 +1,6 @@
 define [
   'jquery'
+  'underscore'
   'Backbone'
   'wikiSidebar'
   'jst/wiki/WikiPageEdit'
@@ -8,7 +9,7 @@ define [
   'i18n!pages'
   'compiled/tinymce'
   'tinymce.editor_box'
-], ($, Backbone, wikiSidebar, template, ValidatedFormView, WikiPageDeleteDialog, I18n) ->
+], ($, _, Backbone, wikiSidebar, template, ValidatedFormView, WikiPageDeleteDialog, I18n) ->
 
   class WikiPageEditView extends ValidatedFormView
     @mixin
@@ -24,11 +25,19 @@ define [
         'click .delete_page': 'deleteWikiPage'
         'click .form-actions .cancel': 'navigateToPageView'
 
-    @optionProperty 'wiki_pages_url'
+    @optionProperty 'wiki_pages_path'
+    @optionProperty 'WIKI_RIGHTS'
+    @optionProperty 'PAGE_RIGHTS'
 
     initialize: ->
       super
       @on 'success', (args) => window.location.href = @model.get('html_url')
+
+    toJSON: ->
+      json = super
+      json.WIKI_RIGHTS = @WIKI_RIGHTS
+      json.PAGE_RIGHTS = @PAGE_RIGHTS
+      json
 
     # After the page loads, ensure the that wiki sidebar gets initialized
     # correctly.
@@ -60,7 +69,7 @@ define [
     validateFormData: (data) -> 
       errors = {}
 
-      unless data.wiki_page.title 
+      if data.wiki_page?.title == ''
         errors["wiki_page[title]"] = [
           {
             type: 'required'
@@ -80,5 +89,5 @@ define [
 
       deleteDialog = new WikiPageDeleteDialog
         model: @model
-        wiki_pages_url: @wiki_pages_url
+        wiki_pages_path: @wiki_pages_path
       deleteDialog.open()

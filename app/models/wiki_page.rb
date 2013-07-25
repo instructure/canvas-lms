@@ -230,25 +230,25 @@ class WikiPage < ActiveRecord::Base
     given {|user, session| self.wiki.grants_right?(user, session, :read) && can_read_page?(user, session)}
     can :read
 
-    given {|user, session| self.editing_role?(user) && !self.locked_for?(user)}
+    given {|user, session| self.can_edit_page?(user)}
     can :read
 
-    given {|user, session| user && self.editing_role?(user) && !self.locked_for?(user)}
+    given {|user, session| user && self.can_edit_page?(user)}
     can :update_content
 
-    given {|user, session| user && self.editing_role?(user) && self.wiki.grants_right?(user, session, :create_page)}
+    given {|user, session| user && self.can_edit_page?(user) && self.wiki.grants_right?(user, session, :create_page)}
     can :create
 
-    given {|user, session| user && self.editing_role?(user) && self.wiki.grants_right?(user, session, :update_page)}
+    given {|user, session| user && self.can_edit_page?(user) && self.wiki.grants_right?(user, session, :update_page)}
     can :update
 
-    given {|user, session| user && self.editing_role?(user) && self.active? && self.wiki.grants_right?(user, session, :update_page_content)}
+    given {|user, session| user && self.can_edit_page?(user) && self.active? && self.wiki.grants_right?(user, session, :update_page_content)}
     can :update_content
 
-    given {|user, session| user && self.editing_role?(user) && self.active? && self.wiki.grants_right?(user, session, :delete_page)}
+    given {|user, session| user && self.can_edit_page?(user) && self.active? && self.wiki.grants_right?(user, session, :delete_page)}
     can :delete
 
-    given {|user, session| user && self.editing_role?(user) && self.workflow_state == 'unpublished' && self.wiki.grants_right?(user, session, :delete_unpublished_page)}
+    given {|user, session| user && self.can_edit_page?(user) && self.workflow_state == 'unpublished' && self.wiki.grants_right?(user, session, :delete_unpublished_page)}
     can :delete
   end
 
@@ -256,7 +256,7 @@ class WikiPage < ActiveRecord::Base
     self.wiki.grants_right?(user, session, :manage) || (!hide_from_students && self.active?)
   end
 
-  def editing_role?(user, session=nil)
+  def can_edit_page?(user, session=nil)
     context_roles = context.default_wiki_editing_roles rescue nil
     roles = (editing_roles || context_roles || default_roles).split(",")
 
@@ -265,7 +265,7 @@ class WikiPage < ActiveRecord::Base
 
     return true if roles.include?('teachers') && context.respond_to?(:teachers) && context.teachers.include?(user)
     # the remaining edit roles all require read access, so just check here
-    return false unless can_read_page?(user, session)
+    return false unless can_read_page?(user, session) && !self.locked_for?(user)
     return true if roles.include?('students') && context.respond_to?(:students) && context.includes_student?(user)
     return true if roles.include?('members') && context.respond_to?(:users) && context.users.include?(user)
     return true if roles.include?('public')

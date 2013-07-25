@@ -1,6 +1,8 @@
 <div class="toolbar-buttons clearfix" data-sticky>
   <div class="right-buttons">
-    <button class="btn btn-primary new_page">{{#t 'buttons.new_page'}}New Page{{/t}}</button>
+    {{#if WIKI_RIGHTS.create_page}}
+      <button class="btn btn-primary new_page">{{#t 'buttons.new_page'}}New Page{{/t}}</button>
+    {{/if}}
   </div>
 </div>
 
@@ -8,7 +10,7 @@
   <div class="index-content">
     <table class="table" role="grid">
       <thead><tr role="row" class="canvas-sortable-header-row">
-        <th width="52%" role="columnheader" aria-label="{{#t 'headers.page_title'}}Page title{{/t}}">
+        <th width="{{#if WIKI_RIGHTS.manage}}{{#ifEqual contextName "courses"}}52%{{else}}56%{{/ifEqual}}{{else}}60%{{/if}}" role="columnheader" aria-label="{{#t 'headers.page_title'}}Page title{{/t}}">
           <a href="#" data-sort-field="title" tabindex="0" role="button" aria-label="{{#ifEqual nextSortOrders.created_at "desc"}}{{#t 'headers.sort_descending'}}Sort descending{{/t}}{{else}}{{#t 'headers.sort_ascending'}}Sort ascending{{/t}}{{/ifEqual}}" class="canvas-sort-field {{#ifEqual sortField "title"}}canvas-sort-field-active{{/ifEqual}}">{{#t 'headers.page_title'}}Page title{{/t}} <i class="icon-mini-arrow-{{#ifEqual sortOrders.title "desc"}}down{{else}}up{{/ifEqual}}"></i></a>
         </th>
         <th width="20%" role="columnheader" aria-label="{{#t 'headers.creation_date'}}Creation date{{/t}}">
@@ -17,13 +19,17 @@
         <th width="20%" role="columnheader" aria-label="{{#t 'headers.last_edit'}}Last edit{{/t}}">
           <a href="#" data-sort-field="updated_at" tabindex="0" role="button" aria-label="{{#ifEqual nextSortOrders.creation_date "desc"}}{{#t 'headers.sort_descending'}}Sort descending{{/t}}{{else}}{{#t 'headers.sort_ascending'}}Sort ascending{{/t}}{{/ifEqual}}" class="canvas-sort-field {{#ifEqual sortField "updated_at"}}canvas-sort-field-active{{/ifEqual}}">{{#t 'headers.last_edit'}}Last edit{{/t}} <i class="icon-mini-arrow-{{#ifEqual sortOrders.updated_at "desc"}}down{{else}}up{{/ifEqual}}"></i></a>
         </th>
-        <th width="4%" role="columnheader"><span class="screenreader-only">{{#t 'headers.published'}}Published{{/t}}</span></th>
-        <th width="4%" role="columnheader"><span class="screenreader-only">{{#t 'headers.settings'}}Settings{{/t}}</span></th>
+        {{#if WIKI_RIGHTS.manage}}
+          {{#ifEqual contextName "courses"}}
+            <th width="4%" role="columnheader"><span class="screenreader-only">{{#t 'headers.published'}}Published{{/t}}</span></th>
+          {{/ifEqual}}
+          <th width="4%" role="columnheader"><span class="screenreader-only">{{#t 'headers.settings'}}Settings{{/t}}</span></th>
+        {{/if}}
       </tr></thead>
       <tbody class="collectionViewItems">
         {{#if fetched}}
           {{#unless collection.length}}
-          <tr class="no-pages"><td colspan="4">{{#t 'no_pages'}}No pages created yet.{{/t}} <a class="new_page" href="#">{{#t 'add_page'}}Add one!{{/t}}</a></td></tr>
+          <tr class="no-pages"><td colspan="{{#if WIKI_RIGHTS.manage}}5{{else}}3{{/if}}">{{#t 'no_pages'}}No pages created yet.{{/t}} <a class="new_page" href="#">{{#t 'add_page'}}Add one!{{/t}}</a></td></tr>
           {{/unless}}
         {{/if}}
       </tbody>

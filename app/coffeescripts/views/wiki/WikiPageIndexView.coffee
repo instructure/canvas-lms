@@ -4,11 +4,24 @@ define [
   'jst/wiki/WikiPageIndex'
   'jquery'
   'compiled/views/StickyHeaderMixin'
+  'compiled/str/splitAssetString'
   'jquery.disableWhileLoading'
-], (PaginatedCollectionView, itemView, template,$, StickyHeaderMixin) ->
+], (PaginatedCollectionView, itemView, template,$, StickyHeaderMixin, splitAssetString) ->
 
   class WikiPageIndexView extends PaginatedCollectionView
-    initialize: ->
+    @mixin StickyHeaderMixin
+    @mixin
+      el: '#content'
+      template: template
+      itemView: itemView
+
+      events:
+        'click .new_page': 'createNewPage'
+        'click .canvas-sortable-header-row a[data-sort-field]': 'sort'
+
+    @optionProperty 'WIKI_RIGHTS'
+
+    initialize: (options) ->
       super
       @sortOrders =
         title: 'asc'
@@ -21,15 +34,12 @@ define [
         created_at: 'desc'
         updated_at: 'desc'
 
-    @mixin StickyHeaderMixin
-    @mixin
-      el: '#content'
-      template: template
-      itemView: itemView
+      @itemViewOptions ||= {}
+      @itemViewOptions.WIKI_RIGHTS = @WIKI_RIGHTS
 
-      events:
-        'click .new_page': 'createNewPage'
-        'click .canvas-sortable-header-row a[data-sort-field]': 'sort'
+      contextAssetString = options?.contextAssetString
+      [@contextName, @contextId] = splitAssetString(contextAssetString) if contextAssetString
+      @itemViewOptions.contextName = @contextName
 
     sort: (event) ->
       currentTarget = $(event.currentTarget)
@@ -53,6 +63,8 @@ define [
 
     toJSON: ->
       json = super
+      json.WIKI_RIGHTS = @WIKI_RIGHTS
+      json.contextName = @contextName
       json.fetched = @fetched
       json.sortField = @collection.options.params?.sort or "title"
       json.sortOrders = @sortOrders
