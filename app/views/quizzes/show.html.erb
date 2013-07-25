@@ -92,15 +92,15 @@
         </a>
         <% end %>
 
-        <a class="al-trigger btn">
-          <span class="screenreader-only"><%= t(:manage, "Manage") %></span>
+        <a class="al-trigger btn" role="button" aria-haspopup="true" aria-owns="toolbar-1" tabindex="-1">
           <i class="icon-settings"></i>
           <i class="icon-mini-arrow-down"></i>
+          <span class="screenreader-only"><%= t(:manage, "Manage") %></span>
         </a>
-        <ul class="al-options">
+        <ul id="toolbar-1" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false">
           <% if can_do(@quiz, @current_user, :update) && @assignment %>
-            <li>
-              <a href="#" rel="<%= context_url(@context, :context_assignment_rubric_url, @assignment.id) %>" class="show_rubric_link">
+            <li role="presentation">
+              <a href="#" rel="<%= context_url(@context, :context_assignment_rubric_url, @assignment.id) %>" class="show_rubric_link" tabindex="-1" role="menuitem">
                 <i class="icon-rubric"></i>
                 <%= t('links.show_assignment_rubric', "Show Rubric") %>
               </a>
@@ -109,8 +109,8 @@
           <% end %>
 
           <% if can_do(@quiz, @current_user, :update) && !needs_unpublished_warning? %>
-            <li>
-              <a href="<%= polymorphic_path([@context, @quiz, :take], :preview => 1) %>" class="preview_link" data-method="post">
+            <li role="presentation">
+              <a href="<%= polymorphic_path([@context, @quiz, :take], :preview => 1) %>" class="preview_link" data-method="post" tabindex="-1" role="menuitem">
                 <i class="icon-quiz"></i>
                 <%= t('links.preview', "Preview") %>
               </a>
@@ -133,8 +133,8 @@
                   </label>
                 </div>
               <% end %>
-              <li>
-                <a href="#" id="let_students_take_this_quiz_button">
+              <li role="presentation">
+                <a href="#" id="let_students_take_this_quiz_button" tabindex="-1" role="menuitem">
                   <i class="icon-unlock"></i> <%= @quiz.survey? ? t('buttons.unlock_survey', "Let Students Take this Survey Now") : t('buttons.unlock_quiz', "Let Students Take this Quiz Now") %>
                 </a>
               </li>
@@ -142,8 +142,8 @@
               <% form_for @quiz, :url => context_url(@context, :context_quiz_url, @quiz.id), :html => { :id => 'quiz_lock_form' } do |f| %>
                 <%= hidden_field_tag 'quiz[locked]', true %>
               <% end %>
-              <li>
-                <a href="#" id="lock_this_quiz_now_link">
+              <li role="presentation">
+                <a href="#" id="lock_this_quiz_now_link" tabindex="-1" role="menuitem">
                   <i class="icon-lock"></i> <%= @quiz.survey? ? t('buttons.lock_survey', "Lock this Survey Now") : t('buttons.lock_quiz', "Lock this Quiz Now") %>
                 </a>
               </li>
@@ -151,8 +151,8 @@
           <% end %>
 
           <% if (can_do(@quiz, @current_user, :grade) || can_do(@quiz, @current_user, :review_grades)) && @quiz.available? %>
-            <li>
-              <a href="#" class="quiz_details_link">
+            <li role="presentation">
+              <a href="#" class="quiz_details_link" tabindex="-1" role="menuitem">
                 <% if @any_submissions_pending_review %>
                   <i class="icon-warning"></i>
                 <% end %>
@@ -166,15 +166,15 @@
           <% end %>
 
           <% if can_do(@quiz, @current_user, :grade) && can_do(@context, @current_user, :send_messages) && @quiz.available? && !@quiz.anonymous_submissions? && @quiz.graded? %>
-            <li>
-              <a href="#" class="message_students_link">
+            <li role="presentation">
+              <a href="#" class="message_students_link" tabindex="-1" role="menuitem">
                 <i class="icon-email"></i> <%= t('links.message_students_who', "Message Students Who...") %>
               </a>
             </li>
           <% end %>
 
-          <li>
-            <a href="<%= context_url(@context, :context_quiz_url, @quiz) %>" class="delete_quiz_link">
+          <li role="presentation">
+            <a href="<%= context_url(@context, :context_quiz_url, @quiz) %>" class="delete_quiz_link" tabindex="-1" role="menuitem">
               <i class="icon-trash"></i> <%= t('titles.delete', "Delete") %>
             </a>
           </li>

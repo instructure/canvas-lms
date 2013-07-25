@@ -42,7 +42,7 @@ The publish button has two states on click (publish and published) and a hover s
 }
 .btn-publish {
   i:before {
-    color: #b4b8bb;
+    color: #bbb;
   }
 }
 
@@ -69,7 +69,7 @@ The publish button has two states on click (publish and published) and a hover s
 
 .publish-icon {
   display: inline-block;
-  color: #b4b8bb;
+  color: #bbb;
   cursor: pointer;
 
   &.publish-icon-unpublish {

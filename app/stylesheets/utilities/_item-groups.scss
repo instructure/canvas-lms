@@ -31,12 +31,19 @@ is for items that are not draggable.
             <i class="icon-publish"></i><span class="publish-text">&nbsp;Published</span>
           </span>
 
-          <a class="al-trigger">
-            <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
+          <a class="al-trigger al-trigger-gray" role="button" aria-haspopup="true" aria-owns="content-1" tabindex="-1">
+            <i class="icon-settings"></i>
+            <i class="icon-mini-arrow-down"></i>
+            <span class="screenreader-only">Settings</span>
           </a>
-          <ul class="al-options">
-            <li><a href="#">Edit</a></li>
-            <li><a href="#">Delete</a></li>
+
+          <ul id="content-1" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="content-2">
+            <li role="presentation">
+              <a href="#" class="icon-edit" id="content-2" tabindex="-1" role="menuitem" title="Edit">Edit</a>
+            </li>
+            <li role="presentation">
+              <a href="#" class="icon-trash" id="content-3" tabindex="-1" role="menuitem" title="Delete this module">Delete</a>
+            </li>
           </ul>
         </div>
       </div>
@@ -57,12 +64,19 @@ is for items that are not draggable.
             <i class="icon-publish"></i><span class="publish-text">&nbsp;Published</span>
           </span>
 
-          <a class="al-trigger">
-            <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
+          <a class="al-trigger al-trigger-gray" role="button" aria-haspopup="true" aria-owns="content-1" tabindex="-1">
+            <i class="icon-settings"></i>
+            <i class="icon-mini-arrow-down"></i>
+            <span class="screenreader-only">Settings</span>
           </a>
-          <ul class="al-options">
-            <li><a href="#">Edit</a></li>
-            <li><a href="#">Delete</a></li>
+
+          <ul id="content-1" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="content-2">
+            <li role="presentation">
+              <a href="#" class="icon-edit" id="content-2" tabindex="-1" role="menuitem" title="Edit">Edit</a>
+            </li>
+            <li role="presentation">
+              <a href="#" class="icon-trash" id="content-3" tabindex="-1" role="menuitem" title="Delete this module">Delete</a>
+            </li>
           </ul>
         </div>
       </div>
@@ -89,12 +103,19 @@ is for items that are not draggable.
             <i class="icon-publish"></i><span class="publish-text">&nbsp;Published</span>
           </span>
 
-          <a class="al-trigger">
-            <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
+          <a class="al-trigger al-trigger-gray" role="button" aria-haspopup="true" aria-owns="content-1" tabindex="-1">
+            <i class="icon-settings"></i>
+            <i class="icon-mini-arrow-down"></i>
+            <span class="screenreader-only">Settings</span>
           </a>
-          <ul class="al-options">
-            <li><a href="#">Edit</a></li>
-            <li><a href="#">Delete</a></li>
+
+          <ul id="content-1" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="content-2">
+            <li role="presentation">
+              <a href="#" class="icon-edit" id="content-2" tabindex="-1" role="menuitem" title="Edit">Edit</a>
+            </li>
+            <li role="presentation">
+              <a href="#" class="icon-trash" id="content-3" tabindex="-1" role="menuitem" title="Delete this module">Delete</a>
+            </li>
           </ul>
         </div>
       </div>
@@ -224,15 +245,6 @@ is for items that are not draggable.
   white-space: nowrap;
   right: 3px;
   top: 10px;
-
-  a.al-trigger {
-    color: #b4b8bb;
-    text-decoration: none;
-  }
-  a.al-trigger:hover {
-    color: #4d4d4d;
-    text-decoration: none;
-  }
 
   .publish-icon {
     margin-right: 22px;

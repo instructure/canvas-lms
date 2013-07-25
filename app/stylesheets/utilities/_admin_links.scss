@@ -13,14 +13,21 @@ Cogs, *AKA admin links*, are generally floated to the right, make sure it's the 
 
 ```html
 <div>
-  <a class="al-trigger btn">
-    <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
+  <a class="al-trigger btn" role="button" aria-haspopup="true" aria-owns="toolbar-1" tabindex="-1">
+    <i class="icon-settings"></i>
+    <i class="icon-mini-arrow-down"></i>
     <span class="screenreader-only">Settings</span>
   </a>
-  <ul class="al-options">
-    <li><a href="#" class="icon-edit">Edit</a></li>
-    <li><a href="#" class="icon-trash">Delete</a></li>
-    <li><a href="#" class="icon-lock">Lock</a></li>
+  <ul id="toolbar-1" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="toolbar-2">
+    <li role="presentation">
+      <a href="#" class="icon-edit" id="toolbar-2" tabindex="-1" role="menuitem">Edit</a>
+    </li>
+    <li role="presentation">
+      <a href="#" class="icon-trash" id="toolbar-3" tabindex="-1" role="menuitem">Delete</a>
+    </li>
+    <li role="presentation">
+      <a href="#" class="icon-lock" id="toolbar-4" tabindex="-1" role="menuitem">Lock</a>
+    </li>
   </ul>
 </div>
 ```
@@ -29,13 +36,19 @@ Cogs, *AKA admin links*, are generally floated to the right, make sure it's the 
 
 ```html
 <div>
-  <a class="al-trigger">
-    <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
+  <a class="al-trigger al-trigger-gray" role="button" aria-haspopup="true" aria-owns="content-1" tabindex="-1">
+    <i class="icon-settings"></i>
+    <i class="icon-mini-arrow-down"></i>
+    <span class="screenreader-only">Settings</span>
   </a>
-  <ul class="al-options">
-    <li><a href="#" class="icon-plus">Add</a></li>
-    <li><a href="#" class="icon-edit" title="Edit">Edit</a></li>
-    <li><a href="#" class="icon-trash" title="Delete this module">Delete</a></li>
+
+  <ul id="content-1" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="content-2">
+    <li role="presentation">
+      <a href="#" class="icon-edit" id="content-2" tabindex="-1" role="menuitem" title="Edit">Edit</a>
+    </li>
+    <li role="presentation">
+      <a href="#" class="icon-trash" id="content-3" tabindex="-1" role="menuitem" title="Delete this module">Delete</a>
+    </li>
   </ul>
 </div>
 ```
@@ -79,22 +92,23 @@ Cogs, *AKA admin links*, are generally floated to the right, make sure it's the 
 }
 
 .al-trigger-gray, .al-trigger-gray:hover {
-  color: #000;
-  @include opacity(0.6);
+  color: #bbb;
 }
 
 .admin-link-hover-area:hover .al-trigger,
 .admin-link-hover-area.active .al-trigger,
 .al-trigger.ui-state-active,
 .al-trigger:focus,
-.al-trigger:hover{
-  @include opacity(1);
+.al-trigger:hover {
+  color: #4d4d4d;
+  text-decoration: none;
 }
 
 .al-trigger {
   padding: 4px;
   cursor: pointer;
   white-space: nowrap;
+  text-decoration: none;
 }
 
 .al-hover-container .al-trigger {
