@@ -160,7 +160,7 @@ module Canvas::Migration::Helpers
                 # We only need the id and name, so don't fetch everything from DB
                 if type == 'learning_outcomes'
                   scope = scope.select(:short_description)
-                elsif type == 'context_modules' || type == 'context_external_tools'
+                elsif type == 'context_modules' || type == 'context_external_tools' || type == 'groups'
                   scope = scope.select(:name)
                 else
                   scope = scope.select(:title)
@@ -173,6 +173,8 @@ module Canvas::Migration::Helpers
           end
         else
           SELECTIVE_CONTENT_TYPES.each do |type, title|
+            next if type == 'groups'
+
             if type == 'course_settings' || type == 'syllabus_body'
               content_list << {type: type, property: "copy[all_#{type}]", title: title.call}
             elsif type == 'wiki_pages'
