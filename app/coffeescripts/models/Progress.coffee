@@ -1,4 +1,4 @@
-define ['Backbone'], ({Model}) ->
+define ['Backbone', 'jquery'], ({Model}, $) ->
 
   # Works with the progress API. Will poll its url until the `workflow_state`
   # is completed.
@@ -28,6 +28,9 @@ define ['Backbone'], ({Model}) ->
     initialize: ->
       @pollDfd = new $.Deferred
       @on 'change:url', => @poll() if @isPolling()
+      # don't try to do any ajax when we're leaving the page
+      # workaround for https://code.google.com/p/chromium/issues/detail?id=263981
+      $(window).on 'beforeunload', => clearTimeout(@timeout)
 
     url: ->
       @get 'url'
@@ -50,7 +53,7 @@ define ['Backbone'], ({Model}) ->
 
     onPoll: =>
       if @isPolling()
-        setTimeout @poll, @get('timeout')
+        @timeout = setTimeout(@poll, @get('timeout'))
       else
         @pollDfd.resolve()
         @trigger 'complete'
