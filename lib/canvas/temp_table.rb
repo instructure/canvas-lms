@@ -42,7 +42,8 @@ module Canvas
 
         yield self
       ensure
-        @connection.execute "DROP TABLE #{@name}"
+        temporary = "TEMPORARY " if @connection.adapter_name == 'Mysql2'
+        @connection.execute "DROP #{temporary}TABLE #{@name}"
       end
     end
 
