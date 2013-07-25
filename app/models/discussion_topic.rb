@@ -332,7 +332,7 @@ class DiscussionTopic < ActiveRecord::Base
         participant.subscribed
       end
     else
-      current_user == user && !why_cant_user_subscribe?(current_user, nil, nil)
+      current_user == user && !subscription_hold(current_user, nil, nil)
     end
   end
 
