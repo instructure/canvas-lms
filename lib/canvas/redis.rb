@@ -29,18 +29,22 @@ module Canvas::Redis
     Setting.get_cached('ignore_redis_failures', 'true') == 'true'
   end
 
-  def self.redis_failure?
-    return false unless @last_redis_failure
+  def self.redis_failure?(redis_name)
+    return false unless last_redis_failure[redis_name]
     # i feel this dangling rescue is justifiable, given the try-to-be-failsafe nature of this code
-    return (Time.now - @last_redis_failure) < (Setting.get_cached('redis_failure_time', '300').to_i rescue 300)
+    return (Time.now - last_redis_failure[redis_name]) < (Setting.get_cached('redis_failure_time', '300').to_i rescue 300)
+  end
+
+  def self.last_redis_failure
+    @last_redis_failure ||= {}
   end
 
   def self.reset_redis_failure
-    @last_redis_failure = nil
+    @last_redis_failure = {}
   end
 
   def self.handle_redis_failure(failure_retval, redis_name)
-    return failure_retval if redis_failure?
+    return failure_retval if redis_failure?(redis_name)
     yield
   rescue Redis::BaseConnectionError => e
     Canvas::Statsd.increment("redis.errors.all")
@@ -48,7 +52,7 @@ module Canvas::Redis
     Rails.logger.error "Failure handling redis command on #{redis_name}: #{e.inspect}"
     if self.ignore_redis_failures?
       ErrorReport.log_exception(:redis, e)
-      @last_redis_failure = Time.now
+      last_redis_failure[redis_name] = Time.now
       failure_retval
     else
       raise
