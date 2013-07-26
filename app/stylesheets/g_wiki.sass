@@ -95,7 +95,7 @@ $shadow: 0 1px 0 rgba(0,0,0,0.15)
         :background $item-background
         :text-decoration inherit
         :color inherit
-        &:hover
+        &.clickable:hover
           :background $item-hover-background
           :text-decoration inherit
           :color inherit
@@ -136,6 +136,9 @@ $shadow: 0 1px 0 rgba(0,0,0,0.15)
         .icon-unpublished
           :color $unpublished-icon-color
 
+    .table .no-pages .no-pages-cell
+      :border 1px dashed $border-color
+
 .pages.show
   .toolbar-buttons
     .publish-button
@@ -158,6 +161,9 @@ $shadow: 0 1px 0 rgba(0,0,0,0.15)
       :color $published-text-color
     .unpublished
       :color $unpublished-text-color
+    .published, .unpublished
+      :display inline-block
+      :margin 5px 8px 5px 5px
 
   .edit-form
     :margin 0

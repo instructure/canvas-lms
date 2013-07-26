@@ -96,11 +96,8 @@ class WikiPagesController < ApplicationController
   end
 
   def perform_update
-    if @page.deleted? && @domain_root_account.enable_draft? && !@context.is_a?(Group)
-      @page.workflow_state = 'unpublished'
-    elsif @page.deleted?
-      @page.workflow_state = 'active'
-    end
+    initialize_wiki_page
+
     if @page.update_attributes(params[:wiki_page].merge(:user_id => @current_user.id))
       log_asset_access(@page, "wiki", @wiki, 'participate')
       generate_new_page_view
@@ -207,6 +204,7 @@ class WikiPagesController < ApplicationController
   def set_js_wiki_data
     hash = {}
 
+    hash[:DEFAULT_EDITING_ROLES] = @context.default_wiki_editing_roles if @context.respond_to?(:default_wiki_editing_roles)
     hash[:WIKI_PAGES_PATH] = polymorphic_path([@context, :pages])
 
     if @page

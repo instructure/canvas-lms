@@ -10,6 +10,7 @@ define [
     @mixin
       template: template
       tagName: 'tr'
+      className: 'clickable'
       attributes:
         role: 'row'
       els:
