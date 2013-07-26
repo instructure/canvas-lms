@@ -737,6 +737,17 @@ describe ContentMigration do
       to_assign.learning_outcome_alignments.map(&:learning_outcome_id).should == [lo.id].sort
     end
 
+    it "should link assignments to assignment groups on selective copy" do
+      g = @copy_from.assignment_groups.create!(:name => "group")
+      from_assign = @copy_from.assignments.create!(:title => "some assignment", :assignment_group_id => g.id)
+
+      @cm.copy_options = {:all_assignments => true}
+      run_course_copy
+
+      to_assign = @copy_to.assignments.find_by_migration_id(mig_id(from_assign))
+      to_assign.assignment_group.should == @copy_to.assignment_groups.find_by_migration_id(mig_id(g))
+    end
+
     it "should copy a quiz when assignment is selected" do
       pending unless Qti.qti_enabled?
       @quiz = @copy_from.quizzes.create!

@@ -26,11 +26,13 @@ describe "Canvas Cartridge importing" do
     ag1.position = 1
     ag1.group_weight = 77.7
     ag1.save!
+
     ag2 = @copy_from.assignment_groups.new
     ag2.name = "Super not boring assignments"
     ag2.position = 2
     ag2.group_weight = 20
     ag2.save!
+
     a = ag2.assignments.new
     a.title = "Can't drop me"
     a.context = @copy_from
@@ -38,15 +40,39 @@ describe "Canvas Cartridge importing" do
     ag2.rules = "drop_lowest:2\ndrop_highest:5\nnever_drop:%s\n" % a.id
     ag2.save!
 
+    ag3 = @copy_from.assignment_groups.create!(:name => 'group to import implicitly')
+    ag4 = @copy_from.assignment_groups.create!(:name => 'group to not import implicitly')
+
     #export to xml
     builder = Builder::XmlMarkup.new(:indent=>2)
     @resource.create_assignment_groups(builder)
     #convert to json
     doc = Nokogiri::XML(builder.target!)
-    hash = @converter.convert_assignment_groups(doc)
+    ag_hash = @converter.convert_assignment_groups(doc)
+    data = {
+      'assignment_groups' => ag_hash,
+      'assignments' => [
+          # just a dummy assignment, but will implicitly import ag3
+          {'migration_id' => 42, 'assignment_group_migration_id' => CC::CCHelper.create_key(ag3)},
+          {'migration_id' => 43, 'assignment_group_migration_id' => CC::CCHelper.create_key(ag4)}
+      ]
+    }
+
+    @migration.migration_ids_to_import = {
+      :copy => {
+        'assignments' => {42 => true},
+        'assignment_groups' => {
+          CC::CCHelper.create_key(ag1) => true,
+          CC::CCHelper.create_key(ag2) => true,
+        }
+      }
+    }
+    @migration.import_object?('assignment_group', CC::CCHelper.create_key(ag3)).should == false
+    @migration.import_object?('assignment_group', CC::CCHelper.create_key(ag4)).should == false
+
     #import json into new course
     @copy_to.assignment_group_no_drop_assignments = {}
-    AssignmentGroup.process_migration({'assignment_groups'=>hash}, @migration)
+    AssignmentGroup.process_migration(data, @migration)
     @copy_to.save!
 
     #compare settings
@@ -61,6 +87,9 @@ describe "Canvas Cartridge importing" do
     ag2_2.position.should == ag2.position
     ag2_2.group_weight.should == ag2.group_weight
     ag2_2.rules.should == "drop_lowest:2\ndrop_highest:5\n"
+
+    @copy_to.assignment_groups.find_by_migration_id(CC::CCHelper.create_key(ag3)).should_not be_nil
+    @copy_to.assignment_groups.find_by_migration_id(CC::CCHelper.create_key(ag4)).should be_nil
 
     #import assignment
     hash = {:migration_id=>CC::CCHelper.create_key(a),
