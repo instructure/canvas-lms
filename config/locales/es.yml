@@ -6309,7 +6309,7 @@ es:
       unrecognized: "Navegador no reconocido"
     buttons: 
       next_module: "Siguiente Módulo"
-      previous_module: "Module Anterior"
+      previous_module: "Módulo Anterior"
       search: Buscar
       search_by_tag: "Buscar por Etiqueta"
     confirms: 
