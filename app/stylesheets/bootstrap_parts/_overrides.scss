@@ -69,6 +69,11 @@ label { display: inline-block; }
 // dont need to add the .bootstrap-form class if you already have the .form-horizontal class.
 .form-horizontal label, .bootstrap-form label { display: block;}
 
+// make labels in paragraphs the same size as regular text (as opposed to slightly larger)
+p label {
+  font-size: inherit;
+}
+
 //remove default bottom margin on a bootstrap form
 .bootstrap-form.no-margin {
   margin-bottom: 0;
