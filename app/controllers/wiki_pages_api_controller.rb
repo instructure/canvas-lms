@@ -267,6 +267,8 @@ class WikiPagesApiController < ApplicationController
   end
   
   def get_update_params(allowed_fields=Set[])
+    initialize_wiki_page
+
     # normalize parameters
     page_params = params[:wiki_page] || {}
 

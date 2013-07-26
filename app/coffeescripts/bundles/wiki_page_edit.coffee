@@ -15,4 +15,8 @@ require [
     PAGE_RIGHTS: ENV.PAGE_RIGHTS
   $('#content').append(wikiPageEditView.$el)
 
+  wikiPageEditView.on 'cancel', ->
+    html_url = wikiPage.get('html_url')
+    window.location.href = html_url if html_url
+
   wikiPageEditView.render()

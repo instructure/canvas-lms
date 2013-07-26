@@ -25,12 +25,12 @@
 
 <div class="edit-content">
   <div class="edit-header">
-    {{#if PAGE_RIGHTS.update}}
+    {{#ifAny new_record PAGE_RIGHTS.update}}
       <label for="wiki_page[title]" class="screenreader-only">{{#t "title_label"}}Page Title{{/t}}</label>
-      <input id="wiki_page[title]" name="wiki_page[title]" type="text" class="span4 title" value="{{title}}" autofocus>
+      <input id="wiki_page[title]" name="wiki_page[title]" type="text" class="span4 title" value="{{title}}" maxlength="255" autofocus>
     {{else}}
       <h2>{{title}}</h2>
-    {{/if}}
+    {{/ifAny}}
     <a href="#" class="switch_views">{{#t "#editor.switch_views"}}Switch Views{{/t}}</a>
   </div>
 
@@ -72,7 +72,7 @@
       <input id="notify_of_update" type="checkbox" name="wiki_page[notify_of_update]">
       {{#t "notify_users_text"}}Notify users that this content has changed{{/t}}
     </label>
-    <button class="btn cancel">{{#t "buttons.cancel"}}Cancel{{/t}}</button>
+    <a class="btn cancel" tabindex="0" role="button">{{#t "buttons.cancel"}}Cancel{{/t}}</a>
     <button class="btn btn-primary submit">{{#t "buttons.save"}}Save{{/t}}</button>
   </div>
 </div>

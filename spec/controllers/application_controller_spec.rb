@@ -194,4 +194,210 @@ describe ApplicationController do
       @controller.send(:complete_request_uri).should == "https://example.com/api/v1/courses?password=[FILTERED]&test=5&Xaccess_token=13&access_token=[FILTERED]"
     end
   end
+
+  describe 'initialize_wiki_page' do
+    context 'course' do
+      before(:each) do
+        @domain_root_account = mock()
+        @stub_enable_draft = @domain_root_account.stubs(:enable_draft?)
+
+        course_with_teacher_logged_in
+        @page = @course.wiki.wiki_pages.build(:title => 'Front Page', :url => 'front-page')
+
+        @controller.instance_variable_set(:@domain_root_account, @domain_root_account)
+        @controller.instance_variable_set(:@current_user, @teacher)
+        @controller.instance_variable_set(:@context, @course)
+        @controller.instance_variable_set(:@wiki, @course.wiki)
+        @controller.instance_variable_set(:@page, @page)
+      end
+
+      it 'should set the front page body' do
+        @page.body.should be_nil
+        @controller.send :initialize_wiki_page
+        @page.body.should_not be_empty
+      end
+
+      context 'draft not enabled' do
+        before(:each) do
+          @stub_enable_draft.returns(false)
+        end
+
+        it 'should initialize a new page' do
+          @page.should be_new_record
+
+          @page.expects(:workflow_state=).with('active')
+          @controller.send :initialize_wiki_page
+        end
+
+        it 'should initialize a deleted page' do
+          @page.workflow_state = 'deleted'
+          @page.save!
+          @page.should be_deleted
+
+          @page.expects(:workflow_state=).with('active')
+          @controller.send :initialize_wiki_page
+        end
+
+        it 'should not initialize an unpublished page' do
+          @page.workflow_state = 'unpublished'
+          @page.save!
+          @page.should be_unpublished
+
+          @page.expects(:workflow_state=).never
+          @controller.send :initialize_wiki_page
+        end
+
+        it 'should not initialize an active page' do
+          @page.workflow_state = 'active'
+          @page.save!
+          @page.should be_active
+
+          @page.expects(:workflow_state=).never
+          @controller.send :initialize_wiki_page
+        end
+      end
+
+      context 'draft enabled' do
+        before(:each) do
+          @stub_enable_draft.returns(true)
+        end
+
+        it 'should initialize a new page' do
+          @page.should be_new_record
+
+          @page.expects(:workflow_state=).with('unpublished')
+          @controller.send :initialize_wiki_page
+        end
+
+        it 'should initialize a deleted page' do
+          @page.workflow_state = 'deleted'
+          @page.save!
+          @page.should be_deleted
+
+          @page.expects(:workflow_state=).with('unpublished')
+          @controller.send :initialize_wiki_page
+        end
+
+        it 'should not initialize an unpublished page' do
+          @page.workflow_state = 'unpublished'
+          @page.save!
+          @page.should be_unpublished
+
+          @page.expects(:workflow_state=).never
+          @controller.send :initialize_wiki_page
+        end
+
+        it 'should not initialize an active page' do
+          @page.workflow_state = 'active'
+          @page.save!
+          @page.should be_active
+
+          @page.expects(:workflow_state=).never
+          @controller.send :initialize_wiki_page
+        end
+      end
+    end
+
+    context 'group' do
+      before(:each) do
+        @domain_root_account = mock()
+        @stub_enable_draft = @domain_root_account.stubs(:enable_draft?)
+
+        group_with_user_logged_in
+        @page = @group.wiki.wiki_pages.build(:title => 'Front Page', :url => 'front-page')
+
+        @controller.instance_variable_set(:@domain_root_account, @domain_root_account)
+        @controller.instance_variable_set(:@current_user, @user)
+        @controller.instance_variable_set(:@context, @group)
+        @controller.instance_variable_set(:@wiki, @group.wiki)
+        @controller.instance_variable_set(:@page, @page)
+      end
+
+      it 'should set the front page body' do
+        @page.body.should be_nil
+        @controller.send :initialize_wiki_page
+        @page.body.should_not be_empty
+      end
+
+      context 'draft not enabled' do
+        before(:each) do
+          @stub_enable_draft.returns(false)
+        end
+
+        it 'should initialize a new page' do
+          @page.should be_new_record
+
+          @page.expects(:workflow_state=).with('active')
+          @controller.send :initialize_wiki_page
+        end
+
+        it 'should initialize a deleted page' do
+          @page.workflow_state = 'deleted'
+          @page.save!
+          @page.should be_deleted
+
+          @page.expects(:workflow_state=).with('active')
+          @controller.send :initialize_wiki_page
+        end
+
+        it 'should not initialize an unpublished page' do
+          @page.workflow_state = 'unpublished'
+          @page.save!
+          @page.should be_unpublished
+
+          @page.expects(:workflow_state=).never
+          @controller.send :initialize_wiki_page
+        end
+
+        it 'should not initialize an active page' do
+          @page.workflow_state = 'active'
+          @page.save!
+          @page.should be_active
+
+          @page.expects(:workflow_state=).never
+          @controller.send :initialize_wiki_page
+        end
+      end
+
+      context 'draft enabled' do
+        before(:each) do
+          @stub_enable_draft.returns(true)
+        end
+
+        it 'should initialize a new page' do
+          @page.should be_new_record
+
+          @page.expects(:workflow_state=).with('active')
+          @controller.send :initialize_wiki_page
+        end
+
+        it 'should initialize a deleted page' do
+          @page.workflow_state = 'deleted'
+          @page.save!
+          @page.should be_deleted
+
+          @page.expects(:workflow_state=).with('active')
+          @controller.send :initialize_wiki_page
+        end
+
+        it 'should not initialize an unpublished page' do
+          @page.workflow_state = 'unpublished'
+          @page.save!
+          @page.should be_unpublished
+
+          @page.expects(:workflow_state=).never
+          @controller.send :initialize_wiki_page
+        end
+
+        it 'should not initialize an active page' do
+          @page.workflow_state = 'active'
+          @page.save!
+          @page.should be_active
+
+          @page.expects(:workflow_state=).never
+          @controller.send :initialize_wiki_page
+        end
+      end
+    end
+  end
 end

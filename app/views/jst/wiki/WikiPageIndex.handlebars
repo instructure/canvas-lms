@@ -1,7 +1,7 @@
 <div class="toolbar-buttons clearfix" data-sticky>
   <div class="right-buttons">
     {{#if WIKI_RIGHTS.create_page}}
-      <button class="btn btn-primary new_page">{{#t 'buttons.new_page'}}New Page{{/t}}</button>
+      <a class="btn btn-primary icon-plus new_page" role="button" tabindex="0" aria-label="{{#t 'buttons.new_page_label'}}Add a page{{/t}}">{{#t 'buttons.new_page'}}Page{{/t}}</a>
     {{/if}}
   </div>
 </div>
@@ -29,7 +29,7 @@
       <tbody class="collectionViewItems">
         {{#if fetched}}
           {{#unless collection.length}}
-          <tr class="no-pages"><td colspan="{{#if WIKI_RIGHTS.manage}}5{{else}}3{{/if}}">{{#t 'no_pages'}}No pages created yet.{{/t}} <a class="new_page" href="#">{{#t 'add_page'}}Add one!{{/t}}</a></td></tr>
+          <tr class="no-pages{{#if WIKI_RIGHTS.create_page}} clickable{{/if}}"><td class="no-pages-cell" colspan="{{#if WIKI_RIGHTS.manage}}5{{else}}3{{/if}}">{{#t 'no_pages'}}No pages created yet.{{/t}}{{#if WIKI_RIGHTS.create_page}} <a class="new_page" href="#">{{#t 'add_page'}}Add one!{{/t}}</a>{{/if}}</td></tr>
           {{/unless}}
         {{/if}}
       </tbody>

@@ -1001,14 +1001,23 @@ class ApplicationController < ActionController::Base
       :title => page_name.titleize,
       :url => page_name.to_url
     )
-    if @page.new_record?
-      if @domain_root_account.enable_draft? && !@context.is_a?(Group)
-        @page.workflow_state = 'unpublished'
-      else
-        @page.workflow_state = 'active'
-      end
+    initialize_wiki_page
+  end
+
+  # Initializes the state of @page, but only if it is a new page
+  def initialize_wiki_page
+    return unless @page.new_record? || @page.deleted?
+
+    is_privileged_user = is_authorized_action?(@page.wiki, @current_user, :manage)
+    if is_privileged_user && @domain_root_account.enable_draft? && !@context.is_a?(Group)
+      @page.workflow_state = 'unpublished'
+    else
+      @page.workflow_state = 'active'
     end
-    if @page.is_front_page? && @page.new_record?
+
+    @page.editing_roles = (@context.default_wiki_editing_roles rescue nil) || @page.default_roles
+
+    if @page.is_front_page?
       @page.body = t "#application.wiki_front_page_default_content_course", "Welcome to your new course wiki!" if @context.is_a?(Course)
       @page.body = t "#application.wiki_front_page_default_content_group", "Welcome to your new group wiki!" if @context.is_a?(Group)
     end

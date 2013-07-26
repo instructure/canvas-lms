@@ -23,7 +23,7 @@ define [
       events:
         'click a.switch_views': 'switchViews'
         'click .delete_page': 'deleteWikiPage'
-        'click .form-actions .cancel': 'navigateToPageView'
+        'click .form-actions .cancel': 'cancel'
 
     @optionProperty 'wiki_pages_path'
     @optionProperty 'WIKI_RIGHTS'
@@ -59,6 +59,8 @@ define [
           wikiSidebar.init()
           $.scrollSidebar()
           wikiSidebar.attachToEditor(@$wikiPageBody).show()
+      $ ->
+        wikiSidebar.show()
 
     switchViews: (event) ->
       event?.preventDefault()
@@ -79,10 +81,9 @@ define [
 
       errors
 
-    navigateToPageView: (event) ->
+    cancel: (event) ->
       event?.preventDefault()
-      html_url = @model.get('html_url')
-      window.location.href = html_url if html_url
+      @trigger('cancel')
 
     deleteWikiPage: (event) ->
       event?.preventDefault()
