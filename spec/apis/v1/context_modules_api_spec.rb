@@ -22,7 +22,7 @@ describe "Modules API", :type => :integration do
     course.offer!
 
     @module1 = @course.context_modules.create!(:name => "module1")
-    @assignment = @course.assignments.create!(:name => "pls submit", :submission_types => ["online_text_entry"])
+    @assignment = @course.assignments.create!(:name => "pls submit", :submission_types => ["online_text_entry"], :points_possible => 42)
     @assignment_tag = @module1.add_item(:id => @assignment.id, :type => 'assignment')
     @quiz = @course.quizzes.create!(:title => "score 10")
     @quiz_tag = @module1.add_item(:id => @quiz.id, :type => 'quiz')
@@ -109,6 +109,14 @@ describe "Modules API", :type => :integration do
         json.map { |mod| mod['items'].size }.should == [5, 2, 0]
       end
 
+      it "should include item content details if requested" do
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/modules?include[]=items&include[]=content_details",
+                        :controller => "context_modules_api", :action => "index", :format => "json",
+                        :course_id => "#{@course.id}", :include => %w(items content_details))
+        json.find{|h| h['id'] == @module1.id}['items'].find{|h| h['id'] == @assignment_tag.id
+          }['content_details'].should == {'points_possible' => @assignment.points_possible}
+      end
+
       it "should skip items for modules that have too many" do
         Setting.set('api_max_per_page', '3')
         json = api_call(:get, "/api/v1/courses/#{@course.id}/modules?include[]=items",
@@ -153,6 +161,14 @@ describe "Modules API", :type => :integration do
           "items_count" => 2,
           "items_url" => "http://www.example.com/api/v1/courses/#{@course.id}/modules/#{@module2.id}/items"
         }
+      end
+
+      it "should include item content details if requested" do
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}?include[]=items&include[]=content_details",
+                        :controller => "context_modules_api", :action => "show", :format => "json",
+                        :course_id => "#{@course.id}", :include => %w(items content_details), :id => "#{@module1.id}")
+        json['items'].find{|h| h['id'] == @assignment_tag.id}['content_details'].should ==
+          {'points_possible' => @assignment.points_possible}
       end
 
       it "should show a single unpublished module" do

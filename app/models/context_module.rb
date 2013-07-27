@@ -250,10 +250,18 @@ class ContextModule < ActiveRecord::Base
   end
 
   def content_tags_visible_to(user)
-    if self.grants_right?(user, :update)
-      self.content_tags.not_deleted
+    if self.content_tags.loaded?
+      if self.grants_right?(user, :update)
+        self.content_tags.select{|tag| tag.workflow_state != 'deleted'}
+      else
+        self.content_tags.select{|tag| tag.workflow_state == 'active'}
+      end
     else
-      self.content_tags.active
+      if self.grants_right?(user, :update)
+        self.content_tags.not_deleted
+      else
+        self.content_tags.active
+      end
     end
   end
 

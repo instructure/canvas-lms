@@ -40,8 +40,9 @@ module Api::V1::ContextModule
     hash['items_count'] = count
     hash['items_url'] = polymorphic_url([:api_v1, context_module.context, context_module, :items])
     if includes.include?('items') && count <= Setting.get_cached('api_max_per_page', '50').to_i
+      item_includes = includes & ['content_details']
       hash['items'] = tags.map do |tag|
-        module_item_json(tag, current_user, session, context_module, progression, :has_update_rights => has_update_rights)
+        module_item_json(tag, current_user, session, context_module, progression, item_includes, :has_update_rights => has_update_rights)
       end
     end
     hash
@@ -49,7 +50,7 @@ module Api::V1::ContextModule
 
   # optionally pass context_module to avoid redundant queries when rendering multiple items
   # optionally pass progression to include completion status
-  def module_item_json(content_tag, current_user, session, context_module = nil, progression = nil, opts = {})
+  def module_item_json(content_tag, current_user, session, context_module = nil, progression = nil, includes = [], opts = {})
     context_module ||= content_tag.context_module
 
     hash = api_json(content_tag, current_user, session, :only => MODULE_ITEM_JSON_ATTRS)
@@ -112,6 +113,23 @@ module Api::V1::ContextModule
     end
     hash['published'] = content_tag.active? if has_update_rights
 
+    hash['content_details'] = content_details(content_tag, current_user) if includes.include?('content_details')
+
     hash
+  end
+
+  def content_details(content_tag, current_user)
+    details = {}
+    item = content_tag.content
+
+    item = item.assignment if item.is_a?(DiscussionTopic) && item.assignment
+    item = item.overridden_for(current_user) if item.respond_to?(:overridden_for)
+
+    [:due_at, :unlock_at, :lock_at, :points_possible].each do |attr|
+      if item.respond_to?(attr) && val = item.try(attr)
+        details[attr] = val
+      end
+    end
+    details
   end
 end

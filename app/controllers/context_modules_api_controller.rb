@@ -83,6 +83,8 @@ class ContextModulesApiController < ApplicationController
   #    too numerous to return inline. Callers must be prepared to use the
   #    {api:ContextModuleItemsApiController#index List Module Items API}
   #    if items are not returned.
+  # @argument include[] ["content_details"] (Requires include['items']) Returns additional details with module items specific to their associated content items.
+  #    Refer to the {api:Modules:Module%20Item Module Item specification} for more details.
   #
   # @example_request
   #     curl -H 'Authorization: Bearer <token>' \
@@ -94,12 +96,15 @@ class ContextModulesApiController < ApplicationController
       route = polymorphic_url([:api_v1, @context, :context_modules])
       scope = @context.modules_visible_to(@current_user)
       modules = Api.paginate(scope, self, route)
+      includes = Array(params[:include])
+      ContextModule.send(:preload_associations, modules, {:content_tags => :content}) if includes.include?('items')
+
       modules_and_progressions = if @context.grants_right?(@current_user, session, :participate_as_student)
         modules.map { |m| [m, m.evaluate_for(@current_user, true)] }
       else
         modules.map { |m| [m, nil] }
       end
-      render :json => modules_and_progressions.map { |mod, prog| module_json(mod, @current_user, session, prog, Array(params[:include])) }
+      render :json => modules_and_progressions.map { |mod, prog| module_json(mod, @current_user, session, prog, includes) }
     end
   end
 
@@ -109,6 +114,8 @@ class ContextModulesApiController < ApplicationController
   #
   # @argument include[] ["items"] Return module items inline if possible.
   #     Please refer to the caveats outlined in the {api:ContextModulesApiController#index List modules endpoint}.
+  # @argument include[] ["content_details"] If module items are included, also returns additional details specific to their associated content items.
+  #    Refer to the {api:Modules:Module%20Item Module Item specification} for more details.
   #
   # @example_request
   #     curl -H 'Authorization: Bearer <token>' \
@@ -118,8 +125,10 @@ class ContextModulesApiController < ApplicationController
   def show
     if authorized_action(@context, @current_user, :read)
       mod = @context.modules_visible_to(@current_user).find(params[:id])
+      includes = Array(params[:include])
+      ContextModule.send(:preload_associations, mod, {:content_tags => :content}) if includes.include?('items')
       prog = @context.grants_right?(@current_user, session, :participate_as_student) ? mod.evaluate_for(@current_user, true) : nil
-      render :json => module_json(mod, @current_user, session, prog, Array(params[:include]))
+      render :json => module_json(mod, @current_user, session, prog, includes)
     end
   end
 

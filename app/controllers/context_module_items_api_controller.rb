@@ -68,7 +68,17 @@
 #         // whether the calling user has met this requirement
 #         // (Optional; present only if the caller is a student)
 #         completed: true
+#       },
+#
+#       // (Present only if requested through include[]=content_details)
+#       // If applicable, returns additional details specific to the associated object
+#       content_details: {
+#         points_possible: 20,
+#         due_at: "2012-12-31T06:00:00-06:00",
+#         unlock_at: "2012-12-31T06:00:00-06:00",
+#         lock_at: "2012-12-31T06:00:00-06:00"
 #       }
+#
 #     }
 class ContextModuleItemsApiController < ApplicationController
   before_filter :require_context
@@ -78,6 +88,9 @@ class ContextModuleItemsApiController < ApplicationController
   #
   # List the items in a module
   #
+  # @argument include[] ["content_details"] If included, will return additional details specific to the content associated with each item.
+  #    Refer to the {api:Modules:Module%20Item Module Item specification} for more details.
+  #
   # @example_request
   #     curl -H 'Authorization: Bearer <token>' \
   #          https://<canvas>/api/v1/courses/222/modules/123/items
@@ -86,17 +99,21 @@ class ContextModuleItemsApiController < ApplicationController
   def index
     if authorized_action(@context, @current_user, :read)
       mod = @context.modules_visible_to(@current_user).find(params[:module_id])
+      ContextModule.send(:preload_associations, mod, {:content_tags => :content})
       route = polymorphic_url([:api_v1, @context, mod, :items])
       scope = mod.content_tags_visible_to(@current_user)
       items = Api.paginate(scope, self, route)
       prog = @context.grants_right?(@current_user, session, :participate_as_student) ? mod.evaluate_for(@current_user) : nil
-      render :json => items.map { |item| module_item_json(item, @current_user, session, mod, prog) }
+      render :json => items.map { |item| module_item_json(item, @current_user, session, mod, prog, Array(params[:include])) }
     end
   end
 
   # @API Show module item
   #
   # Get information about a single module item
+  #
+  # @argument include[] ["content_details"] If included, will return additional details specific to the content associated with this item.
+  #    Refer to the {api:Modules:Module%20Item Module Item specification} for more details.
   #
   # @example_request
   #     curl -H 'Authorization: Bearer <token>' \
@@ -108,7 +125,7 @@ class ContextModuleItemsApiController < ApplicationController
       mod = @context.modules_visible_to(@current_user).find(params[:module_id])
       item = mod.content_tags_visible_to(@current_user).find(params[:id])
       prog = @context.grants_right?(@current_user, session, :participate_as_student) ? mod.evaluate_for(@current_user) : nil
-      render :json => module_item_json(item, @current_user, session, mod, prog)
+      render :json => module_item_json(item, @current_user, session, mod, prog, Array(params[:include]))
     end
   end
 
