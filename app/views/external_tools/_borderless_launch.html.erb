@@ -1,9 +1,9 @@
 <div><% t :redirecting_to_lti, 'Redirecting to LTI app, please wait...' %></div>
-<form id="tool_form" action="<%= @launch_url %>" method="POST">
+<form id="tool_form" action="<%= @resource_url %>" method="POST">
   <% @tool_settings.each do |key, value| %>
     <%= hidden_field_tag key, value %>
   <% end %>
-  <button class='btn' type='submit'><%= t :load_tool_button, 'Load %{tool} manually', :tool => @tool_name %></button>
+  <button class='btn' type='submit'><%= t :load_tool_button, 'Load %{tool} manually', :tool => @resource_title %></button>
 </form>
 
 <script type="text/javascript">
