@@ -6,7 +6,8 @@ define [
   'i18n!context_modules'
   'compiled/views/modules/AddModuleItemDialog'
   'compiled/ModuleItemTypes'
-], ($, Backbone, template, ModuleItemCollectionView, I18n, AddModuleItemDialog, MODULE_ITEM_TYPES) ->
+  'compiled/views/modules/ModuleItemViewRegister'
+], ($, Backbone, template, ModuleItemCollectionView, I18n, AddModuleItemDialog, MODULE_ITEM_TYPES, ModuleItemViewRegister) ->
 
   class ModuleView extends Backbone.View
 

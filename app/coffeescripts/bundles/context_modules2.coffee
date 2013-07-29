@@ -1,8 +1,10 @@
 require [
-  'jquery'
+  'jquery',
   'compiled/collections/ModuleCollection',
   'compiled/views/modules/ModuleCollectionView',
-], ($, ModuleCollection, ModuleCollectionView) ->
+  'compiled/views/modules/ModuleItemViewRegister'
+  'compiled/views/modules/item_types/SelectFileView'
+], ($, ModuleCollection, ModuleCollectionView, ModuleItemViewRegister, SelectFileView) ->
 
   $(document.body).addClass 'context_modules2'
 
@@ -14,5 +16,8 @@ require [
     editable: ENV.CAN_MANAGE_MODULES
     collection: modules
     el: '#modules'
-
+ 
+  ModuleItemViewRegister.register
+                          key: 'File'
+                          view: new SelectFileView
   modulesView.render()
