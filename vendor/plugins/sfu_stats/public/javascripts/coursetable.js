@@ -7,7 +7,8 @@
                 sis_source_id: 1,
                 name: 2,
                 course_code: 3,
-                workflow_state: 4
+                workflow_state: 4,
+                account_id: 5
             };
             var tableOptions = {
                 sAjaxSource: '/sfu/stats/courses/current.json',
@@ -22,7 +23,7 @@
                 bInfo: true,
                 bAutoWidth: false,
                 aoColumnDefs: [
-                    { bVisible: false, aTargets: [cols.id, cols.sis_source_id] },
+                    { bVisible: false, aTargets: [cols.id, cols.sis_source_id, cols.account_id] },
                     {
                         mData: function(data) { return { id: data[cols.id], name: data[cols.name] }; },
                         mRender: function(data) {
