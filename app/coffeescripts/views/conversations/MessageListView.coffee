@@ -28,3 +28,4 @@ define [
       super()
       @$('.current-context').text(@course.name || '')
       @$('.current-context-code').text(@course.code || '')
+      @$('.list-header')[if @course.name then 'show' else 'hide']()

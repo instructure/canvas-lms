@@ -27,8 +27,9 @@ define [
   'jst/conversations/composeButtonBar'
   'jst/conversations/addAttachment'
   'compiled/views/conversations/AutocompleteView'
+  'compiled/views/conversations/CourseSelectionView'
   'compiled/widget/ContextSearch'
-], (I18n, _, DialogBaseView, template, MessageProgressTracker, preventDefault, composeTitleBarTemplate, composeButtonBarTemplate, addAttachmentTemplate, AutocompleteView) ->
+], (I18n, _, DialogBaseView, template, MessageProgressTracker, preventDefault, composeTitleBarTemplate, composeButtonBarTemplate, addAttachmentTemplate, AutocompleteView, CourseSelectionView) ->
 
   ##
   # reusable message composition dialog
@@ -37,6 +38,7 @@ define [
     template: template
 
     els:
+      '.message_course':                '$messageCourse'
       '.media_comment':                 '$mediaComment'
       'input[name=media_comment_id]':   '$mediaCommentId'
       'input[name=media_comment_type]': '$mediaCommentType'
@@ -89,6 +91,7 @@ define [
       @$fullDialog.off 'change', '.file_input'
       @$fullDialog.off 'click', '.attach-media'
       @$fullDialog.off 'click', '.media-comment .remove_link'
+      @trigger('close')
 
     sendMessage: (e) ->
       e.preventDefault()
@@ -120,11 +123,27 @@ define [
           false
 
     initializeTokenInputs: ($scope) ->
-      new AutocompleteView(el: @$recipients).render()
+      @recipientView = new AutocompleteView(el: @$recipients).render()
+
+    onCourse: (course) =>
+      @recipientView.setCourse(course)
+
+    defaultCourse: null
+    setDefaultCourse: (course) ->
+      @defaultCourse = course
 
     initializeForm: ->
       @prepareTextarea(@$el)
       @initializeTokenInputs(@$el)
+
+      @courseView = new CourseSelectionView(
+        el: @$messageCourse,
+        courses: @options.courses,
+        defaultOption: I18n.t('select_course', 'Select course')
+      )
+      @courseView.on('course', @onCourse)
+      @courseView.setValue(@defaultCourse)
+      @courseView.focus()
 
       if @tokenInput = @$el.find('.recipients').data('token_input')
         # since it doesn't infer percentage widths, just whatever the current pixels are

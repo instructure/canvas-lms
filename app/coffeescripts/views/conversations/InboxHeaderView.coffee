@@ -1,9 +1,10 @@
 define [
   'underscore'
   'Backbone'
+  'compiled/views/conversations/CourseSelectionView'
   'use!vendor/bootstrap/bootstrap-dropdown'
   'use!vendor/bootstrap-select/bootstrap-select'
-], (_, {View}) ->
+], (_, {View}, CourseSelectionView) ->
 
   class InboxHeaderView extends View
 
@@ -25,14 +26,13 @@ define [
       'click #delete-btn':        'onDelete'
       'change #type-filter':      'onFilterChange'
       'change #course-filter':    'onFilterChange'
-      'mouseover #course-filter': 'onCourseHover'
       'click #mark-unread-btn':   'onMarkUnread'
       'click #forward-btn':       'onForward'
 
     render: () ->
       super()
       @$typeFilter.selectpicker()
-      @$courseFilter.selectpicker().next().on('mouseover', @onCourseHover)
+      @courseView = new CourseSelectionView(el: @$courseFilter, courses: @options.courses)
 
     onCompose:     (e) -> @trigger('compose')
 
@@ -65,29 +65,11 @@ define [
       @trigger('filter', @filterObj({type: @$typeFilter.val(), course: @$courseFilter.val()}))
 
     displayState: (state) ->
-      @$typeFilter.val(state.type)
-      @$courseFilter.val(state.course)
-      @$typeFilter.selectpicker('render')
-      @$courseFilter.selectpicker('render')
+      @$typeFilter.selectpicker('val', state.type)
+      @courseView.setValue(state.course)
       course = @$courseFilter.find('option:selected')
-      @trigger('course', {name: course.text(), code: course.data('code')})
-
-    didCourseLoad: false
-    onCourseHover: () =>
-      return if @didCourseLoad
-      @didCourseLoad = true
-      _.each(@$courseFilter.find('optgroup'), (optgroup) =>
-        $optgroup = $(optgroup)
-        url = $optgroup.data('url')
-        if !url then return
-        $.ajax(url).done((data) =>
-          _.each(data, (course) =>
-            if @$courseFilter.find('option[value='+course.id+']').length then return
-            $optgroup.append($('<option />').text(course.name).attr('value', course.id).attr('data-code', course.course_code))
-          )
-          @$courseFilter.selectpicker('refresh')
-        )
-      )
+      courseObj = if state.course then {name: course.text(), code: course.data('code')} else {}
+      @trigger('course', courseObj)
 
     toggleMessageBtns: (value) ->
       @toggleReplyBtn(value)
@@ -104,6 +86,9 @@ define [
     toggleAdminBtn:    (value) -> @_toggleBtn(@$adminBtn, value)
 
     hideMarkUnreadBtn: (hide) -> if hide then @$markUnreadBtn.parent().detach() else @$adminMenu.prepend(@$markUnreadBtn.parent())
+
+    focusCompose: ->
+      @$composeBtn.focus()
 
     _toggleBtn: (btn, value) ->
       value = if typeof value is 'undefined' then !btn.prop('disabled') else value

@@ -565,6 +565,8 @@
                 $(':focus').click();
                 $parent.addClass('open');
                 $(document).data('keycount',0);
+                // INSTRUCTURE
+                return false;
             }
         },
 

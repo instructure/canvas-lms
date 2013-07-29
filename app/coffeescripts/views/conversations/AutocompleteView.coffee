@@ -23,8 +23,10 @@ define [
     # Internal: Currently selected model.
     selectedModel: null
 
+    course: null
+
     # Internal: Construct the search URL for the given term.
-    url: (term) -> "/api/v1/search/recipients/?search=#{term}&per_page=5"
+    url: (term) -> "/api/v1/search/recipients/?search=#{term}&per_page=5&context=course_#{@course}"
 
     # Internal: Map of key names to codes.
     keys:
@@ -240,3 +242,10 @@ define [
         @collection[@collection.length - 1]
       $el = @$resultList.find("[data-id=#{@selectedModel.id}]")
       @$input.attr('aria-activedescendant', $el.addClass('selected').attr('id'))
+
+    setCourse: (course) ->
+      return if course == @course
+      @course = course
+      @$input.attr('disabled', !course)
+      @$inputBox.toggleClass('disabled', !course)
+      @$tokenList.find('li.ac-token').remove()

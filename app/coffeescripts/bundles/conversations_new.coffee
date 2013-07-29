@@ -10,8 +10,11 @@ require [
   'compiled/views/conversations/MessageFormDialog'
   'compiled/views/conversations/InboxHeaderView'
   'compiled/util/deparam'
+  'compiled/collections/CourseCollection'
+  'compiled/collections/FavoriteCourseCollection'
   'jquery.disableWhileLoading'
-], (I18n, _, Backbone, Message, MessageCollection, MessageView, MessageListView, MessageDetailView, MessageFormDialog, InboxHeaderView, deparam) ->
+], (I18n, _, Backbone, Message, MessageCollection, MessageView, MessageListView, MessageDetailView, MessageFormDialog,
+ InboxHeaderView, deparam, CourseCollection, FavoriteCourseCollection) ->
 
   class ConversationsRouter extends Backbone.Router
 
@@ -23,6 +26,7 @@ require [
       confirmDelete: I18n.t('confirm.delete_conversation', 'Are you sure you want to delete your copy of this conversation? This action cannot be undone.')
 
     initialize: ->
+      @_initCollections()
       @_initViews()
       @_attachEvents()
 
@@ -63,6 +67,9 @@ require [
     onCompose: (e) =>
       @compose.show()
 
+    onCloseCompose: (e) =>
+      @header.focusCompose()
+
     index: ->
       @filter('')
 
@@ -74,6 +81,7 @@ require [
       @list.collection.setParam('scope', filters.type)
       @list.collection.setParam('filter', if filters.course then 'course_'+filters.course else '')
       @list.collection.fetch()
+      @compose.setDefaultCourse(filters.course)
 
     onMarkUnread: =>
       @detail.model.toggleReadState(false)
@@ -93,6 +101,12 @@ require [
     onCourse: (course) =>
       @list.updateCourse(course)
 
+    _initCollections: () ->
+      @courses = 
+        favorites: new FavoriteCourseCollection()
+        all: new CourseCollection()
+      @courses.favorites.fetch()
+
     _initViews: ->
       @_initListView()
       @_initDetailView()
@@ -109,6 +123,7 @@ require [
       @header.on('course',      @onCourse)
       @header.on('mark-unread', @onMarkUnread)
       @header.on('forward',     @onForward)
+      @compose.on('close',      @onCloseCompose)
 
     _initListView: ->
       @list = new MessageListView
@@ -121,11 +136,11 @@ require [
       @detail.render()
 
     _initHeaderView: ->
-      @header = new InboxHeaderView(el: $('header.panel'))
+      @header = new InboxHeaderView(el: $('header.panel'), courses: @courses)
       @header.render()
 
     _initComposeDialog: ->
-      @compose = new MessageFormDialog() #this, this.canAddNotesFor, folderId: @options.FOLDER_ID)
+      @compose = new MessageFormDialog(courses: @courses) #this, this.canAddNotesFor, folderId: @options.FOLDER_ID)
 
 
   window.conversationsRouter = new ConversationsRouter
