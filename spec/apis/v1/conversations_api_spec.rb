@@ -395,6 +395,7 @@ describe ConversationsController, :type => :integration do
             p.delete("avatar_url")
           }
         }
+        json.each {|c| c["messages"].each {|m| m["participating_user_ids"].sort!}}
         conversation = @me.all_conversations.order("conversation_id DESC").first
         json.should eql [
           {
@@ -420,7 +421,7 @@ describe ConversationsController, :type => :integration do
               {"id" => @bob.id, "name" => @bob.name, "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}}
             ],
             "messages" => [
-              {"id" => conversation.messages.first.id, "created_at" => conversation.messages.first.created_at.to_json[1, 20], "body" => "test", "author_id" => @me.id, "generated" => false, "media_comment" => nil, "forwarded_messages" => [], "attachments" => []}
+              {"id" => conversation.messages.first.id, "created_at" => conversation.messages.first.created_at.to_json[1, 20], "body" => "test", "author_id" => @me.id, "generated" => false, "media_comment" => nil, "forwarded_messages" => [], "attachments" => [], "participating_user_ids" => [@me.id, @bob.id].sort}
             ]
           }
         ]
@@ -436,6 +437,7 @@ describe ConversationsController, :type => :integration do
             p.delete("avatar_url")
           }
         }
+        json.each {|c| c["messages"].each {|m| m["participating_user_ids"].sort!}}
         conversation = @me.all_conversations.order("conversation_id DESC").first
         json.should eql [
           {
@@ -462,7 +464,7 @@ describe ConversationsController, :type => :integration do
               {"id" => @bob.id, "name" => @bob.name, "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}}
             ],
             "messages" => [
-              {"id" => conversation.messages.first.id, "created_at" => conversation.messages.first.created_at.to_json[1, 20], "body" => "test", "author_id" => @me.id, "generated" => false, "media_comment" => nil, "forwarded_messages" => [], "attachments" => []}
+              {"id" => conversation.messages.first.id, "created_at" => conversation.messages.first.created_at.to_json[1, 20], "body" => "test", "author_id" => @me.id, "generated" => false, "media_comment" => nil, "forwarded_messages" => [], "attachments" => [], "participating_user_ids" => [@me.id, @billy.id, @bob.id].sort}
             ]
           }
         ]
@@ -482,6 +484,7 @@ describe ConversationsController, :type => :integration do
             p.delete("avatar_url")
           }
         }
+        json.each {|c| c["messages"].each {|m| m["participating_user_ids"].sort!}} 
         json.should eql [
           {
             "id" => conversation.conversation_id,
@@ -506,7 +509,7 @@ describe ConversationsController, :type => :integration do
               {"id" => @bob.id, "name" => @bob.name, "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}}
             ],
             "messages" => [
-              {"id" => conversation.messages.first.id, "created_at" => conversation.messages.first.created_at.to_json[1, 20], "body" => "test", "author_id" => @me.id, "generated" => false, "media_comment" => nil, "forwarded_messages" => [], "attachments" => []}
+              {"id" => conversation.messages.first.id, "created_at" => conversation.messages.first.created_at.to_json[1, 20], "body" => "test", "author_id" => @me.id, "generated" => false, "media_comment" => nil, "forwarded_messages" => [], "attachments" => [], "participating_user_ids" => [@me.id, @bob.id].sort}
             ]
           }
         ]
@@ -568,6 +571,7 @@ describe ConversationsController, :type => :integration do
             p.delete("avatar_url")
           }
         }
+        json.each {|c| c["messages"].each {|m| m["participating_user_ids"].sort!}}
         conversation = @me.all_conversations.order("last_message_at DESC, conversation_id DESC").first
         json.should eql [
           {
@@ -595,7 +599,7 @@ describe ConversationsController, :type => :integration do
             ],
             "messages" => [
               {
-                "id" => conversation.messages.first.id, "created_at" => conversation.messages.first.created_at.to_json[1, 20], "body" => "test", "author_id" => @me.id, "generated" => false, "media_comment" => nil, "attachments" => [],
+                "id" => conversation.messages.first.id, "created_at" => conversation.messages.first.created_at.to_json[1, 20], "body" => "test", "author_id" => @me.id, "generated" => false, "media_comment" => nil, "attachments" => [], "participating_user_ids" => [@me.id, @billy.id].sort,
                 "forwarded_messages" => [
                   {
                           "id" => forwarded_message.id, "created_at" => forwarded_message.created_at.to_json[1, 20], "body" => "test", "author_id" => @bob.id, "generated" => false, "media_comment" => nil, "forwarded_messages" => [],
@@ -608,7 +612,7 @@ describe ConversationsController, :type => :integration do
                                              'hidden_for_user' => false,
                                              'created_at' => attachment.created_at.as_json,
                                              'updated_at' => attachment.updated_at.as_json, 
-                                             'thumbnail_url' => attachment.thumbnail_url }]
+                                             'thumbnail_url' => attachment.thumbnail_url }], "participating_user_ids" => [@me.id, @bob.id].sort
                   }
                 ]
               }
@@ -640,6 +644,7 @@ describe ConversationsController, :type => :integration do
       json["participants"].each{ |p|
         p.delete("avatar_url")
       }
+      json["messages"].each {|m| m["participating_user_ids"].sort!}
       json.should eql({
         "id" => conversation.conversation_id,
         "workflow_state" => "read",
@@ -695,9 +700,10 @@ describe ConversationsController, :type => :integration do
                 'updated_at' => attachment.updated_at.as_json,
                 'thumbnail_url' => attachment.thumbnail_url
               }
-            ]
+            ],
+            "participating_user_ids" => [@me.id, @bob.id].sort
           },
-          {"id" => conversation.messages.last.id, "created_at" => conversation.messages.last.created_at.to_json[1, 20], "body" => "test", "author_id" => @me.id, "generated" => false, "media_comment" => nil, "forwarded_messages" => [], "attachments" => []}
+          {"id" => conversation.messages.last.id, "created_at" => conversation.messages.last.created_at.to_json[1, 20], "body" => "test", "author_id" => @me.id, "generated" => false, "media_comment" => nil, "forwarded_messages" => [], "attachments" => [], "participating_user_ids" => [@me.id, @bob.id].sort}
         ],
         "submissions" => []
       })
@@ -724,6 +730,7 @@ describe ConversationsController, :type => :integration do
         json["participants"].each{ |p|
           p.delete("avatar_url")
         }
+        json["messages"].each {|m| m["participating_user_ids"].sort!}
         expected = {
           "id" => @conversation.conversation_id,
           "workflow_state" => "read",
@@ -747,7 +754,7 @@ describe ConversationsController, :type => :integration do
               {"id" => @bob.id, "name" => @bob.name, "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}}
           ],
           "messages" => [
-              {"id" => @conversation.messages.last.id, "created_at" => @conversation.messages.last.created_at.to_json[1, 20], "body" => "test", "author_id" => @me.id, "generated" => false, "media_comment" => nil, "forwarded_messages" => [], "attachments" => []}
+              {"id" => @conversation.messages.last.id, "created_at" => @conversation.messages.last.created_at.to_json[1, 20], "body" => "test", "author_id" => @me.id, "generated" => false, "media_comment" => nil, "forwarded_messages" => [], "attachments" => [], "participating_user_ids" => [@me.id, @bob.id].sort}
           ],
           "submissions" => []
         }
@@ -865,6 +872,7 @@ describe ConversationsController, :type => :integration do
       json["participants"].each{ |p|
         p.delete("avatar_url")
       }
+      json["messages"].each {|m| m["participating_user_ids"].sort!}
       json.should eql({
         "id" => conversation.conversation_id,
         "workflow_state" => "read",
@@ -888,7 +896,7 @@ describe ConversationsController, :type => :integration do
           {"id" => @bob.id, "name" => @bob.name, "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}}
         ],
         "messages" => [
-          {"id" => conversation.messages.first.id, "created_at" => conversation.messages.first.created_at.to_json[1, 20], "body" => "another", "author_id" => @me.id, "generated" => false, "media_comment" => nil, "forwarded_messages" => [], "attachments" => []}
+          {"id" => conversation.messages.first.id, "created_at" => conversation.messages.first.created_at.to_json[1, 20], "body" => "another", "author_id" => @me.id, "generated" => false, "media_comment" => nil, "forwarded_messages" => [], "attachments" => [], "participating_user_ids" => [@me.id, @bob.id].sort}
         ]
       })
     end
@@ -920,6 +928,7 @@ describe ConversationsController, :type => :integration do
       json["participants"].each{ |p|
         p.delete("avatar_url")
       }
+      json["messages"].each {|m| m["participating_user_ids"].sort!}
       json.should eql({
         "id" => conversation.conversation_id,
         "workflow_state" => "read",
@@ -947,7 +956,7 @@ describe ConversationsController, :type => :integration do
           {"id" => @tommy.id, "name" => @tommy.name, "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}}
         ],
         "messages" => [
-          {"id" => conversation.messages.first.id, "created_at" => conversation.messages.first.created_at.to_json[1, 20], "body" => "jane, joe, and tommy were added to the conversation by nobody@example.com", "author_id" => @me.id, "generated" => true, "media_comment" => nil, "forwarded_messages" => [], "attachments" => []}
+          {"id" => conversation.messages.first.id, "created_at" => conversation.messages.first.created_at.to_json[1, 20], "body" => "jane, joe, and tommy were added to the conversation by nobody@example.com", "author_id" => @me.id, "generated" => true, "media_comment" => nil, "forwarded_messages" => [], "attachments" => [], "participating_user_ids" => [@me.id, @billy.id, @bob.id, @jane.id, @joe.id, @tommy.id].sort}
         ]
       })
     end
