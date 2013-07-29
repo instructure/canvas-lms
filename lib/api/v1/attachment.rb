@@ -173,4 +173,9 @@ module Api::V1::Attachment
     new_atts[:hidden] = value_to_boolean(params[:hidden]) if params.has_key?(:hidden)
     new_atts
   end
+
+  def context_files_url
+    # change if context_api_index route is expanded to other contexts besides courses
+    api_v1_course_files_url(@context)
+  end
 end

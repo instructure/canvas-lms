@@ -219,6 +219,18 @@ describe "Module Items API", :type => :integration do
       ids.should == module3.content_tags.sort_by(&:position).collect(&:id)
     end
 
+    it "should search for module items by name" do
+      module3 = @course.context_modules.create!(:name => "module with lots of items")
+      tags = []
+      2.times { |i| tags << module3.add_item(:type => 'context_module_sub_header', :title => "specific tag #{i}") }
+      2.times { |i| module3.add_item(:type => 'context_module_sub_header', :title => "other tag #{i}") }
+
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{module3.id}/items?search_term=spec",
+                      :controller => "context_module_items_api", :action => "index", :format => "json",
+                      :course_id => "#{@course.id}", :module_id => "#{module3.id}", :search_term => 'spec')
+      json.map{ |mod| mod['id'] }.sort.should == tags.map(&:id).sort
+    end
+
     describe "POST 'create'" do
       it "should create a module item" do
         assignment = @course.assignments.create!(:name => "pls submit", :submission_types => ["online_text_entry"])

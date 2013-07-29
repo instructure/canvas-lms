@@ -25,6 +25,7 @@ class Attachment < ActiveRecord::Base
   attr_accessible :context, :folder, :filename, :display_name, :user, :locked, :position, :lock_at, :unlock_at, :uploaded_data, :hidden
   include HasContentTags
   include ContextModuleItem
+  include SearchTermHelper
 
   attr_accessor :podcast_associated_asset, :submission_attachment
 
@@ -1277,6 +1278,7 @@ class Attachment < ActiveRecord::Base
     state :unattached_temporary
   end
 
+  scope :visible, where(['attachments.file_state in (?, ?)', 'available', 'public'])
   scope :not_deleted, where("attachments.file_state<>'deleted'")
 
   scope :not_hidden, where("attachments.file_state<>'hidden'")

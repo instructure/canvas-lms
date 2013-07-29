@@ -5,7 +5,11 @@ module SearchTermHelper
     def search_by_attribute(scope, attr, search_term)
       if search_term.present?
         SearchTermHelper.validate_search_term(search_term)
-        scope = scope.where(wildcard("#{self.table_name}.#{attr}", search_term))
+        if scope.respond_to?(:where)
+          scope = scope.where(wildcard("#{self.table_name}.#{attr}", search_term))
+        else
+          scope = scope.select{|item| item.matches_attribute?(attr, search_term)}
+        end
       end
       scope
     end
@@ -41,5 +45,9 @@ module SearchTermHelper
 
   def self.validate_search_term(search_term)
     raise SearchTermTooShortError unless valid_search_term?(search_term)
+  end
+
+  def matches_attribute?(attr, search_term)
+    self[attr].to_s.downcase.include?(search_term.downcase)
   end
 end

@@ -25,7 +25,7 @@ module Api::V1::ContextModule
   MODULE_ITEM_JSON_ATTRS = %w(id position title indent)
 
   # optionally pass progression to include 'state', 'completed_at'
-  def module_json(context_module, current_user, session, progression = nil, includes = [])
+  def module_json(context_module, current_user, session, progression = nil, includes = [], opts = {})
     hash = api_json(context_module, current_user, session, :only => MODULE_JSON_ATTRS)
     hash['require_sequential_progress'] = !!context_module.require_sequential_progress
     hash['prerequisite_module_ids'] = context_module.prerequisites.reject{|p| p[:type] != 'context_module'}.map{|p| p[:id]}
@@ -40,6 +40,10 @@ module Api::V1::ContextModule
     hash['items_count'] = count
     hash['items_url'] = polymorphic_url([:api_v1, context_module.context, context_module, :items])
     if includes.include?('items') && count <= Setting.get_cached('api_max_per_page', '50').to_i
+      if opts[:search_term].present? && !context_module.matches_attribute?(:name, opts[:search_term])
+        tags = ContentTag.search_by_attribute(tags, :title, opts[:search_term])
+        return nil if tags.count == 0
+      end
       item_includes = includes & ['content_details']
       hash['items'] = tags.map do |tag|
         module_item_json(tag, current_user, session, context_module, progression, item_includes, :has_update_rights => has_update_rights)

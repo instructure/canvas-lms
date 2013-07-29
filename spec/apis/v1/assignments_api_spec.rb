@@ -118,7 +118,7 @@ describe AssignmentsApiController, :type => :integration do
 
     it "should search for assignments by title" do
       course_with_teacher(:active_all => true)
-      2.times {|i| @course.assignments.create!(:title => "first_#{i}") }
+      2.times {|i| @course.assignments.create!(:title => "First_#{i}") }
       ids = @course.assignments.map(&:id)
       2.times {|i| @course.assignments.create!(:title => "second_#{i}") }
 

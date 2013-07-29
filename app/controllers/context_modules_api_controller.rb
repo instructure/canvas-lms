@@ -85,6 +85,7 @@ class ContextModulesApiController < ApplicationController
   #    if items are not returned.
   # @argument include[] ["content_details"] (Requires include['items']) Returns additional details with module items specific to their associated content items.
   #    Refer to the {api:Modules:Module%20Item Module Item specification} for more details.
+  # @argument search_term (optional) The partial name of the modules (and module items, if include['items'] is specified) to match and return.
   #
   # @example_request
   #     curl -H 'Authorization: Bearer <token>' \
@@ -95,8 +96,11 @@ class ContextModulesApiController < ApplicationController
     if authorized_action(@context, @current_user, :read)
       route = polymorphic_url([:api_v1, @context, :context_modules])
       scope = @context.modules_visible_to(@current_user)
-      modules = Api.paginate(scope, self, route)
+
       includes = Array(params[:include])
+      scope = ContextModule.search_by_attribute(scope, :name, params[:search_term]) unless includes.include?('items')
+      modules = Api.paginate(scope, self, route)
+
       ContextModule.send(:preload_associations, modules, {:content_tags => :content}) if includes.include?('items')
 
       modules_and_progressions = if @context.grants_right?(@current_user, session, :participate_as_student)
@@ -104,7 +108,12 @@ class ContextModulesApiController < ApplicationController
       else
         modules.map { |m| [m, nil] }
       end
-      render :json => modules_and_progressions.map { |mod, prog| module_json(mod, @current_user, session, prog, includes) }
+      opts = {}
+      if includes.include?('items') && params[:search_term].present?
+        SearchTermHelper.validate_search_term(params[:search_term])
+        opts[:search_term] = params[:search_term]
+      end
+      render :json => modules_and_progressions.map { |mod, prog| module_json(mod, @current_user, session, prog, includes, opts) }.compact
     end
   end
 

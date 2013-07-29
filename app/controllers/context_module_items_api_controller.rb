@@ -90,6 +90,7 @@ class ContextModuleItemsApiController < ApplicationController
   #
   # @argument include[] ["content_details"] If included, will return additional details specific to the content associated with each item.
   #    Refer to the {api:Modules:Module%20Item Module Item specification} for more details.
+  # @argument search_term (optional) The partial title of the items to match and return.
   #
   # @example_request
   #     curl -H 'Authorization: Bearer <token>' \
@@ -102,6 +103,7 @@ class ContextModuleItemsApiController < ApplicationController
       ContextModule.send(:preload_associations, mod, {:content_tags => :content})
       route = polymorphic_url([:api_v1, @context, mod, :items])
       scope = mod.content_tags_visible_to(@current_user)
+      scope = ContentTag.search_by_attribute(scope, :title, params[:search_term])
       items = Api.paginate(scope, self, route)
       prog = @context.grants_right?(@current_user, session, :participate_as_student) ? mod.evaluate_for(@current_user) : nil
       render :json => items.map { |item| module_item_json(item, @current_user, session, mod, prog, Array(params[:include])) }

@@ -18,6 +18,7 @@
 
 class ContextModule < ActiveRecord::Base
   include Workflow
+  include SearchTermHelper
   attr_accessible :context, :name, :unlock_at, :require_sequential_progress, :completion_requirements, :prerequisites
   belongs_to :context, :polymorphic => true
   belongs_to :cloned_item

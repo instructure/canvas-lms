@@ -143,6 +143,47 @@ describe "Modules API", :type => :integration do
 
         ids.should == @course.context_modules.not_deleted.sort_by(&:position).collect(&:id)
       end
+
+      it "should search for modules by name" do
+        mods = []
+        2.times { |i| mods << @course.context_modules.create!(:name => "spurious module #{i}") }
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/modules?search_term=spur",
+                        :controller => "context_modules_api", :action => "index", :format => "json",
+                        :course_id => "#{@course.id}", :search_term => "spur")
+        json.size.should == 2
+        json.map{ |mod| mod['id'] }.sort.should == mods.map(&:id).sort
+      end
+
+      it "should search for modules and items by name" do
+        matching_mods = []
+        nonmatching_mods = []
+        # modules to include because their name matches
+        # which means that all their (non-matching) items should be returned
+        2.times do |i|
+          mod = @course.context_modules.create!(:name => "spurious module #{i}")
+          mod.add_item(:type => 'context_module_sub_header', :title => 'non-matching item')
+          matching_mods << mod
+        end
+        # modules to include because they have a matching item
+        # which means that their non-matching items should *not* be included
+        2.times do |i|
+          mod = @course.context_modules.create!(:name => "non-matching module #{i}")
+          mod.add_item(:type => 'context_module_sub_header', :title => 'spurious item')
+          mod.add_item(:type => 'context_module_sub_header', :title => 'non-matching item to ignore')
+          nonmatching_mods << mod
+        end
+
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/modules?include[]=items&search_term=spur",
+                        :controller => "context_modules_api", :action => "index", :format => "json",
+                        :course_id => "#{@course.id}", :include => %w{items}, :search_term => "spur")
+        json.size.should == 4
+        json.map{ |mod| mod['id'] }.sort.should == (matching_mods + nonmatching_mods).map(&:id).sort
+
+        json.each do |mod|
+          mod['items'].count.should == 1
+          mod['items'].first['title'].should_not include('ignore')
+        end
+      end
     end
 
     describe "show" do

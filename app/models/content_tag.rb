@@ -25,6 +25,7 @@ class ContentTag < ActiveRecord::Base
     end 
   end
   include Workflow
+  include SearchTermHelper
   belongs_to :content, :polymorphic => true
   belongs_to :context, :polymorphic => true
   belongs_to :associated_asset, :polymorphic => true

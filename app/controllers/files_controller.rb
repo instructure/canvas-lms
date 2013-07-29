@@ -116,9 +116,10 @@ class FilesController < ApplicationController
   end
 
   # @API List files
-  # Returns the paginated list of files for the folder.
+  # Returns the paginated list of files for the folder or course.
   #
   # @argument content_types[] [optional] Filter results by content-type. You can specify type/subtype pairs (e.g., 'image/jpeg'), or simply types (e.g., 'image', which will match 'image/gif', 'image/jpeg', etc.).
+  # @argument search_term (optional) The partial name of the files to match and return.
   #
   # @example_request
   #
@@ -127,16 +128,34 @@ class FilesController < ApplicationController
   #
   # @returns [File]
   def api_index
-    folder = Folder.find(params[:id])
+    get_context
+    if @context
+      folder = Folder.root_folders(@context).first
+      raise ActiveRecord::RecordNotFound unless folder
+      context_index = true
+    else
+      folder = Folder.find(params[:id])
+    end
+
     if authorized_action(folder, @current_user, :read_contents)
-      @context = folder.context
+      @context = folder.context unless context_index
       can_manage_files = @context.grants_right?(@current_user, session, :manage_files)
 
-      if can_manage_files
-        scope = folder.active_file_attachments
+      if context_index
+        if can_manage_files
+          scope = @context.attachments.not_deleted
+        else
+          scope = @context.attachments.visible.not_hidden.not_locked.where(
+              :folder_id => @context.active_folders.not_hidden.not_locked)
+        end
       else
-        scope = folder.visible_file_attachments.not_hidden.not_locked
+        if can_manage_files
+          scope = folder.active_file_attachments
+        else
+          scope = folder.visible_file_attachments.not_hidden.not_locked
+        end
       end
+      scope = Attachment.search_by_attribute(scope, :display_name, params[:search_term])
       if params[:sort_by] == 'position'
         scope = scope.by_position_then_display_name
       else
@@ -147,7 +166,8 @@ class FilesController < ApplicationController
         scope = scope.by_content_types(Array(params[:content_types]))
       end
 
-      @files = Api.paginate(scope, self, api_v1_list_files_url(@folder))
+      url = context_index ? context_files_url : api_v1_list_files_url(folder)
+      @files = Api.paginate(scope, self, url)
       render :json => attachments_json(@files, @current_user, {}, :can_manage_files => can_manage_files)
     end
   end

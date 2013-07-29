@@ -837,6 +837,7 @@ FakeRails3Routes.draw do
       post 'courses/:course_id/preview_html', :action => :preview_html
       post 'courses/:course_id/course_copy', :controller => :content_imports, :action => :copy_course_content
       get 'courses/:course_id/course_copy/:id', :controller => :content_imports, :action => :copy_course_status, :path_name => :course_copy_status
+      get  'courses/:course_id/files', :controller => :files, :action => :api_index, :path_name => 'course_files'
       post 'courses/:course_id/files', :action => :create_file, :path_name => 'course_create_file'
       post 'courses/:course_id/folders', :controller => :folders, :action => :create
       get  'courses/:course_id/folders/:id', :controller => :folders, :action => :show, :path_name => 'course_folder'
