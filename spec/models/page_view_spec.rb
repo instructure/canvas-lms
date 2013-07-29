@@ -382,11 +382,11 @@ describe PageView do
     let(:params) { {'action' => 'path', 'controller' => 'some'} }
     let(:headers) { {'User-Agent' => 'Mozilla'} }
     let(:session) { {:id => 42} }
-    let(:request) { stub(:url => 'host.com/some/path', :path_parameters => params, :headers => headers, :session_options => session, :method => :get) }
+    let(:request) { stub(:url => (@url || 'host.com/some/path'), :path_parameters => params, :headers => headers, :session_options => session, :method => :get) }
     let(:user) { User.new }
     let(:attributes) { {:real_user => user, :user => user } }
 
-    before { RequestContextGenerator.stubs( :request_id => 9 ) }
+    before { RequestContextGenerator.stubs( :request_id => 'xyz' ) }
     after { RequestContextGenerator.unstub :request_id }
 
     subject { PageView.generate(request, attributes) }
@@ -402,6 +402,19 @@ describe PageView do
     its(:created_at) { should_not be_nil }
     its(:updated_at) { should_not be_nil }
     its(:http_method) { should == 'get' }
+
+    it "should filter sensitive url params" do
+      @url = 'http://canvas.example.com/api/v1/courses/1?access_token=SUPERSECRET'
+      pv = PageView.generate(request, attributes)
+      pv.url.should ==  'http://canvas.example.com/api/v1/courses/1?access_token=[FILTERED]'
+    end
+
+    it "should filter sensitive url params on the way out" do
+      pv = PageView.generate(request, attributes)
+      pv.update_attribute(:url, 'http://canvas.example.com/api/v1/courses/1?access_token=SUPERSECRET')
+      pv.reload
+      pv.url.should ==  'http://canvas.example.com/api/v1/courses/1?access_token=[FILTERED]'
+    end
   end
 
   describe ".for_request_id" do

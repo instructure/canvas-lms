@@ -43,7 +43,7 @@ class PageView < ActiveRecord::Base
 
   def self.generate(request, attributes={})
     self.new(attributes).tap do |p|
-      p.url = request.url[0,255]
+      p.url = LoggingFilter.filter_uri(request.url)[0,255]
       p.http_method = request.method.to_s
       p.controller = request.path_parameters['controller']
       p.action = request.path_parameters['action']
@@ -62,6 +62,11 @@ class PageView < ActiveRecord::Base
     else
       new{ |p| p.request_id = request_id }
     end
+  end
+
+  def url
+    url = read_attribute(:url)
+    url && LoggingFilter.filter_uri(url)
   end
 
   def ensure_account
