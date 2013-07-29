@@ -1,0 +1,35 @@
+<%
+  content_for :page_title, t('updated_terms_of_use', 'Updated Terms of Use')
+
+  js_bundle :reaccept_terms
+  jammit_css :login
+  @headers = false
+  @body_classes ||= []
+  @body_classes << "modal"
+%>
+
+<form id="modal-box" class="reaccept_terms clearfix" action="/api/v1/users/self" method="PUT">
+  <h2><%= t 'updated_terms_of_use', 'Updated Terms of Use' %></h2>
+  <p>
+    <%= t 'terms_have_changed',
+          'The *terms of use* have changed. Please take a moment to review them before you continue using Canvas.',
+          wrapper: link_to('\1', @domain_root_account.terms_of_use_url, target: '_blank')
+    %>
+  </p>
+  <p>
+    <label class="checkbox">
+      <input type="checkbox" name="user[terms_of_use]" value="1">
+      <%= t 'agree_to_terms_and_pp',
+            'You agree to the *terms of use* and acknowledge the **privacy policy**.',
+            wrapper: {
+              '*' => link_to('\1', @domain_root_account.terms_of_use_url, target: '_blank'),
+              '**' => link_to('\1', @domain_root_account.privacy_policy_url, target: '_blank')
+            }
+      %>
+    </label>
+  </p>
+  <p>
+    <button type="submit" class="btn btn-primary"><%= t "#buttons.submit", "Submit" %></button>
+    <a class="btn logout" href="/logout"><%= t "#buttons.cancel", "Cancel" %></a>
+  </p>
+</form>

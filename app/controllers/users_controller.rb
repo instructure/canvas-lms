@@ -981,6 +981,7 @@ class UsersController < ApplicationController
 
     managed_attributes = []
     managed_attributes.concat [:name, :short_name, :sortable_name] if @user.grants_right?(@current_user, nil, :rename)
+    managed_attributes << :terms_of_use if @user == (@real_current_user || @current_user)
     if @user.grants_right?(@current_user, nil, :manage_user_details)
       managed_attributes.concat([:time_zone, :locale])
     end
@@ -1016,12 +1017,17 @@ class UsersController < ApplicationController
         @user.avatar_state = 'submitted'
       end
 
+      if session[:require_terms]
+        @user.require_acceptance_of_terms = true
+      end
+
       respond_to do |format|
         if @user.update_attributes(user_params)
           if admin_avatar_update
             @user.avatar_state = (old_avatar_state == :locked ? old_avatar_state : 'approved')
             @user.save
           end
+          session.delete(:require_terms)
           flash[:notice] = t('user_updated', 'User was successfully updated.')
           format.html { redirect_to user_url(@user) }
           format.json {

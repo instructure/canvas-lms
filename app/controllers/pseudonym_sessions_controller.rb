@@ -21,6 +21,7 @@ class PseudonymSessionsController < ApplicationController
   before_filter :forbid_on_files_domain, :except => [ :clear_file_session ]
   before_filter :require_password_session, :only => [ :otp_login, :disable_otp_login ]
   before_filter :require_user, :only => [ :otp_login ]
+  skip_before_filter :require_reacceptance_of_terms
 
   def new
     if @current_user && !params[:re_login] && !params[:confirm] && !params[:expected_user_id] && !session[:used_remember_me_token]
@@ -547,6 +548,8 @@ class PseudonymSessionsController < ApplicationController
         return otp_login(true)
       end
     end
+
+    session[:require_terms] = true if @domain_root_account.require_acceptance_of_terms?(@current_user)
 
     respond_to do |format|
       if session[:oauth2]

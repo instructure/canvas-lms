@@ -40,6 +40,7 @@ class ApplicationController < ActionController::Base
   before_filter :set_time_zone
   before_filter :set_page_view
   before_filter :refresh_cas_ticket
+  before_filter :require_reacceptance_of_terms
   after_filter :log_page_view
   after_filter :discard_flash_if_xhr
   after_filter :cache_buster
@@ -712,6 +713,13 @@ class ApplicationController < ActionController::Base
   def refresh_cas_ticket
     if session[:cas_session] && @current_pseudonym
       @current_pseudonym.claim_cas_ticket(session[:cas_session])
+    end
+  end
+
+  def require_reacceptance_of_terms
+    if session[:require_terms] && !api_request? && request.get?
+      render :template => "shared/terms_required", :layout => "application", :status => :unauthorized
+      false
     end
   end
 

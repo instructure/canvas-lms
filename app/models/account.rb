@@ -241,6 +241,16 @@ class Account < ActiveRecord::Base
     Setting.get('terms_required', false)
   end
 
+  def require_acceptance_of_terms?(user)
+    return false if !terms_required?
+    return true if user.nil? || user.new_record?
+    terms_changed_at = settings[:terms_changed_at]
+    last_accepted = user.preferences[:accepted_terms]
+    return false if terms_changed_at.nil?
+    return false if last_accepted && last_accepted > terms_changed_at
+    true
+  end
+
   def ip_filters=(params)
     filters = {}
     require 'ipaddr'

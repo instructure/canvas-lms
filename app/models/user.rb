@@ -281,6 +281,7 @@ class User < ActiveRecord::Base
 
   before_save :assign_uuid
   before_save :update_avatar_image
+  before_save :record_acceptance_of_terms
   after_save :update_account_associations_if_necessary
   after_save :self_enroll_if_necessary
 
@@ -1078,6 +1079,12 @@ class User < ActiveRecord::Base
           end
         end
       end
+    end
+  end
+
+  def record_acceptance_of_terms
+    if @require_acceptance_of_terms && @terms_of_use
+      preferences[:accepted_terms] = Time.now.utc
     end
   end
 
