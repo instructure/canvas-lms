@@ -159,6 +159,8 @@ class Account < ActiveRecord::Base
   add_setting :admins_can_view_notifications, :boolean => true, :root_only => true, :default => false
   add_setting :outgoing_email_default_name
   add_setting :external_notification_warning, :boolean => true, :default => false
+  # Terms of Use and Privacy Policy settings for the root account
+  add_setting :terms_changed_at, :root_only => true
   # When a user is invited to a course, do we let them see a preview of the
   # course even without registering?  This is part of the free-for-teacher
   # account perks, since anyone can invite anyone to join any course, and it'd
@@ -225,6 +227,18 @@ class Account < ActiveRecord::Base
 
   def self_registration?
     !!settings[:self_registration] && canvas_authentication?
+  end
+
+  def terms_of_use_url
+    Setting.get('terms_of_use_url', 'http://www.instructure.com/terms-of-use')
+  end
+
+  def privacy_policy_url
+    Setting.get('privacy_policy_url', 'http://www.instructure.com/privacy-policy')
+  end
+
+  def terms_required?
+    Setting.get('terms_required', false)
   end
 
   def ip_filters=(params)

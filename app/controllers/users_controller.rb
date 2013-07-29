@@ -205,6 +205,7 @@ class UsersController < ApplicationController
     if authorized_action(@context, @current_user, :read_roster)
       @root_account = @context.root_account
       @query = (params[:user] && params[:user][:name]) || params[:term]
+      js_env :ACCOUNT => account_json(@domain_root_account, nil, session, ['registration_settings'])
       Shackles.activate(:slave) do
         if @context && @context.is_a?(Account) && @query
           @users = @context.users_name_like(@query)

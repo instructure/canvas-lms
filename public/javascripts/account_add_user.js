@@ -12,7 +12,7 @@ require([
     event.preventDefault();
     $("#add_user_form :text").val("");
     var $dialog = $("#add_user_dialog"),
-        $privacy = $('<a>', {href: "http://www.instructure.com/privacy-policy", style: "padding-left: 1em; line-height: 3em", 'class': 'privacy_policy_link', target: "_blank"}),
+        $privacy = $('<a>', {href: ENV.ACCOUNT.privacy_policy_url, style: "padding-left: 1em; line-height: 3em", 'class': 'privacy_policy_link', target: "_blank"}),
         $buttonPane;
     $dialog.dialog({
       title: I18n.t('add_user_dialog_title', "Add a New User"),
