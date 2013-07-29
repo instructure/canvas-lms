@@ -90,7 +90,11 @@ module Api::V1::ContextModule
       when 'Attachment'
         api_url = polymorphic_url([:api_v1, content_tag.content])
       when 'ContextExternalTool'
-        api_url = sessionless_launch_url(context_module.context, :url => content_tag.url)
+        if content_tag.content && content_tag.content.tool_id
+          api_url = sessionless_launch_url(context_module.context, :id => content_tag.content.id, :url => content_tag.content.url)
+        else
+          api_url = sessionless_launch_url(context_module.context, :url => content_tag.content.url)
+        end
     end
     hash['url'] = api_url if api_url
 
