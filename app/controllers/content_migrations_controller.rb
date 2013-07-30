@@ -98,7 +98,7 @@ class ContentMigrationsController < ApplicationController
     if api_request?
       render :json => content_migration_json_hash
     else
-      @plugins = ContentMigration.migration_plugins(true)
+      @plugins = ContentMigration.migration_plugins(true).sort_by {|p| [p.metadata(:sort_order) || 100, p.metadata(:select_text)]}
 
       options = @plugins.map{|p| {:label => p.metadata(:select_text), :id => p.id}}
 
