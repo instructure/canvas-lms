@@ -82,7 +82,7 @@ describe ContentMigrationsController, :type => :integration do
       json["migration_issues_count"].should == 0
       json["attachment"]["url"].should =~ %r{/files/#{@migration.attachment.id}/download}
       json['progress_url'].should == "http://www.example.com/api/v1/progress/#{progress.id}"
-      json['migration_type_title'].should == 'Common Cartridge Importer'
+      json['migration_type_title'].should == 'Common Cartridge'
     end
 
     it "should return waiting_for_select when it's supposed to" do
@@ -102,7 +102,7 @@ describe ContentMigrationsController, :type => :integration do
       api_call(:get, @migration_url, @params, {}, {}, :expected_status => 401)
     end
 
-    it "should not return attachment for course copies course copies" do
+    it "should not return attachment for course copies" do
       @migration.migration_type = nil
       @migration.source_course_id = @course.id
       @attachment = Attachment.create!(:context => @migration, :filename => "test.zip", :uploaded_data => StringIO.new("test file"))
@@ -114,6 +114,16 @@ describe ContentMigrationsController, :type => :integration do
 
       json = api_call(:get, @migration_url, @params)
       json["attachment"].should be_nil
+    end
+
+    it "should return source course info for course copy" do
+      @migration.migration_type = nil
+      @migration.source_course_id = @course.id
+      @migration.save!
+
+      json = api_call(:get, @migration_url, @params)
+      json['settings']['source_course_id'].should == @course.id
+      json['settings']['source_course_name'].should == @course.name
     end
   end
 

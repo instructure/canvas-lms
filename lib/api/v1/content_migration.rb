@@ -47,11 +47,23 @@ module Api::V1::ContentMigration
     elsif migration.attachment && !migration.for_course_copy?
       json[:attachment] = attachment_json(migration.attachment, current_user, {}, {:can_manage_files => true})
     end
+
+    if migration.for_course_copy?
+      if source = migration.source_course || (migration.migration_settings[:source_course_id] && Course.find(migration.migration_settings[:source_course_id]))
+        json[:settings] = {}
+        json[:settings][:source_course_id] = source.id
+        json[:settings][:source_course_name] = source.name
+        json[:settings][:source_course_html_url] = course_url(source.id)
+      end
+    end
+
     if migration.job_progress
       json['progress_url'] = polymorphic_url([:api_v1, migration.job_progress])
     end
     if plugin = Canvas::Plugin.find(migration.migration_type)
-      if plugin.meta[:name] && plugin.meta[:name].respond_to?(:call)
+      if plugin.meta[:display_name] && plugin.meta[:display_name].respond_to?(:call)
+        json['migration_type_title'] = plugin.meta[:display_name].call
+      elsif plugin.meta[:name] && plugin.meta[:name].respond_to?(:call)
         json['migration_type_title'] = plugin.meta[:name].call
       end
     end

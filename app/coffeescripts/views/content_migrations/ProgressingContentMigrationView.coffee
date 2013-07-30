@@ -8,7 +8,8 @@ define [
   'compiled/views/content_migrations/ProgressBarView'
   'compiled/views/content_migrations/ProgressStatusView'
   'compiled/views/content_migrations/SelectContentView'
-], ($, Backbone, template, progressingIssuesTemplate, PaginatedCollectionView, ContentMigrationIssueView, ProgressBarView, ProgressStatusView, SelectContentView) -> 
+  'compiled/views/content_migrations/SourceLinkView'
+], ($, Backbone, template, progressingIssuesTemplate, PaginatedCollectionView, ContentMigrationIssueView, ProgressBarView, ProgressStatusView, SelectContentView, SourceLinkView) ->
   class ProgressingContentMigrationView extends Backbone.View
     template: template
     tagName: 'li'
@@ -24,6 +25,7 @@ define [
       '.progressStatus'                      : '$progressStatus'
       '.selectContentDialog'                 : '$selectContentDialog'
       '[data-bind=migration_issues_count]'  : '$issuesCount'
+      '.sourceLink'                         : '$sourceLink'
 
     initialize: -> 
       super
@@ -75,6 +77,12 @@ define [
                          el: @$progressStatus
 
       progressStatus.render()
+
+      sourceLink = new SourceLinkView
+                         model: @model
+                         el: @$sourceLink
+
+      sourceLink.render()
 
       this
 
