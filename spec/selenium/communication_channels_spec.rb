@@ -14,6 +14,25 @@ describe "communication channel selenium tests" do
       f('#identity .logout').should be_present
     end
 
+    it "should require the terms if configured to do so" do
+      Setting.set('terms_required', true)
+      u1 = user_with_communication_channel(:user_state => 'creation_pending')
+      get "/register/#{u1.communication_channel.confirmation_code}"
+      f('input[name="user[terms_of_use]"]').should be_present
+      f('#registration_confirmation_form').submit
+      wait_for_ajaximations
+      assert_error_box 'input[name="user[terms_of_use]"]:visible'
+    end
+
+    it "should not require the terms if the user has already accepted them" do
+      Setting.set('terms_required', true)
+      u1 = user_with_communication_channel(:user_state => 'creation_pending')
+      u1.preferences[:accepted_terms] = Time.now.utc
+      u1.save
+      get "/register/#{u1.communication_channel.confirmation_code}"
+      f('input[name="user[terms_of_use]"]').should_not be_present
+    end
+
     it "should allow the user to edit the pseudonym if its already taken" do
       u1 = user_with_communication_channel(:username => 'asdf@qwerty.com', :user_state => 'creation_pending')
       # d'oh, now it's taken

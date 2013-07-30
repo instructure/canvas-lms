@@ -824,7 +824,7 @@ class UsersController < ApplicationController
       end
     end
     if !manage_user_logins # i.e. a new user signing up
-      @user.require_acceptance_of_terms = true
+      @user.require_acceptance_of_terms = @domain_root_account.terms_required?
       @user.require_presence_of_name = true
       @user.require_self_enrollment_code = self_enrollment
       @user.validation_root_account = @domain_root_account

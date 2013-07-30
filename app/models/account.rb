@@ -246,8 +246,8 @@ class Account < ActiveRecord::Base
     return true if user.nil? || user.new_record?
     terms_changed_at = settings[:terms_changed_at]
     last_accepted = user.preferences[:accepted_terms]
-    return false if terms_changed_at.nil?
-    return false if last_accepted && last_accepted > terms_changed_at
+    return false if terms_changed_at.nil? && user.registered? # make sure existing users are grandfathered in
+    return false if last_accepted && (terms_changed_at.nil? || last_accepted > terms_changed_at)
     true
   end
 

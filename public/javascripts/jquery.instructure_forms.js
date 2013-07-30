@@ -954,7 +954,7 @@ define([
     var errorDetails = {};
     $('#aria_alerts').empty();
     $.each(errors, function(name, msg) {
-      var $obj = $form.find(":input[name='" + name + "'],:input[name*='[" + name + "]']").filter(":first");
+      var $obj = $form.find(":input[name='" + name + "'],:input[name*='[" + name + "]']").filter(":visible").first();
       if(!$obj || $obj.length === 0 || name == "general") {
         $obj = $form;
       }

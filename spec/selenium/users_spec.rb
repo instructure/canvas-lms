@@ -196,6 +196,34 @@ describe "users" do
       a.save!
     end
 
+    it "should not require terms if not configured to do so" do
+      get '/register'
+
+      %w{teacher student parent}.each do |type|
+        f("#signup_#{type}").click
+        form = fj('.ui-dialog:visible form')
+        f('input[name="user[terms_of_use]"]', form).should be_nil
+        fj('.ui-dialog-titlebar-close:visible').click
+      end
+    end
+
+    it "should require terms if configured to do so" do
+      Setting.set('terms_required', true)
+
+      get "/register"
+
+      %w{teacher student parent}.each do |type|
+        f("#signup_#{type}").click
+        form = fj('.ui-dialog:visible form')
+        input = f('input[name="user[terms_of_use]"]', form)
+        input.should_not be_nil
+        form.submit
+        wait_for_ajaximations
+        assert_error_box 'input[name="user[terms_of_use]"]:visible'
+        fj('.ui-dialog-titlebar-close:visible').click
+      end
+    end
+
     it "should register a student with a join code" do
       course(:active_all => true)
       @course.update_attribute :self_enrollment, true
@@ -209,8 +237,6 @@ describe "users" do
       f('#student_username').send_keys('student')
       f('#student_password').send_keys('asdfasdf')
       f('#student_password_confirmation').send_keys('asdfasdf')
-      form.find_element(:css, 'input[name="user[terms_of_use]"]').click
-      wait_for_ajaximations
 
       expect_new_page_load { form.submit }
       # confirm the user is authenticated into the dashboard
@@ -221,13 +247,10 @@ describe "users" do
     it "should register a teacher" do
       get '/register'
       f('#signup_teacher').click
-      wait_for_ajaximations
 
       form = fj('.ui-dialog:visible form')
       f('#teacher_name').send_keys('teacher!')
       f('#teacher_email').send_keys('teacher@example.com')
-      form.find_element(:css, 'input[name="user[terms_of_use]"]').click
-      wait_for_ajaximations
 
       expect_new_page_load { form.submit }
       # confirm the user is authenticated into the dashboard
@@ -240,15 +263,12 @@ describe "users" do
 
       get '/register'
       f('#signup_parent').click
-      wait_for_ajaximations
 
       form = fj('.ui-dialog:visible form')
       f('#parent_name').send_keys('parent!')
       f('#parent_email').send_keys('parent@example.com')
       f('#parent_child_username').send_keys(@pseudonym.unique_id)
       f('#parent_child_password').send_keys('lolwut')
-      form.find_element(:css, 'input[name="user[terms_of_use]"]').click
-      wait_for_ajaximations
 
       expect_new_page_load { form.submit }
       # confirm the user is authenticated into the dashboard

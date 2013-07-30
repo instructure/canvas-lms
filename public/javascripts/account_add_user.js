@@ -1,28 +1,23 @@
 require([
   'i18n!accounts' /* I18n.t */,
   'jquery' /* $ */,
+  'compiled/util/addPrivacyLinkToDialog',
   'user_sortable_name',
   'jquery.instructure_forms' /* formSubmit */,
   'jqueryui/dialog',
   'compiled/jquery/fixDialogButtons' /* fix dialog formatting */,
   'compiled/jquery.rails_flash_notifications'
-], function(I18n, $) {
+], function(I18n, $, addPrivacyLinkToDialog) {
 
   $(".add_user_link").click(function(event) {
     event.preventDefault();
     $("#add_user_form :text").val("");
-    var $dialog = $("#add_user_dialog"),
-        $privacy = $('<a>', {href: ENV.ACCOUNT.privacy_policy_url, style: "padding-left: 1em; line-height: 3em", 'class': 'privacy_policy_link', target: "_blank"}),
-        $buttonPane;
+    var $dialog = $("#add_user_dialog");
     $dialog.dialog({
       title: I18n.t('add_user_dialog_title', "Add a New User"),
       width: 500
     }).fixDialogButtons();
-    $buttonPane = $dialog.closest('.ui-dialog').find('.ui-dialog-buttonpane');
-    if (!$buttonPane.find('.privacy_policy_link').length) {
-      $privacy.text(I18n.t('#site.view_privacy_policy', 'View Privacy Policy'));
-      $dialog.closest('.ui-dialog').find('.ui-dialog-buttonpane').append($privacy);
-    }
+    addPrivacyLinkToDialog($dialog);
     $("#add_user_form :text:visible:first").focus().select();
   });
   $("#add_user_form").formSubmit({

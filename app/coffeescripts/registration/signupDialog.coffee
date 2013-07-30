@@ -6,10 +6,11 @@ define [
   'jst/registration/teacherDialog'
   'jst/registration/studentDialog'
   'jst/registration/parentDialog'
+  'compiled/util/addPrivacyLinkToDialog'
   'compiled/jquery/validate'
   'jquery.instructure_forms'
   'jquery.instructure_date_and_time'
-], (_, I18n, preventDefault, registrationErrors, teacherDialog, studentDialog, parentDialog) ->
+], (_, I18n, preventDefault, registrationErrors, teacherDialog, studentDialog, parentDialog, addPrivacyLinkToDialog) ->
 
   $nodes = {}
   templates = {teacherDialog, studentDialog, parentDialog}
@@ -19,6 +20,7 @@ define [
     $node = $nodes[id] ?= $('<div />')
     $node.html templates[id](
       account: ENV.ACCOUNT.registration_settings
+      terms_required: ENV.ACCOUNT.terms_required
       terms_url: ENV.ACCOUNT.terms_of_use_url
       privacy_url: ENV.ACCOUNT.privacy_policy_url
     )
@@ -49,6 +51,8 @@ define [
         $(this).find(':input').eq(0).focus()
       close: -> $('.error_box').filter(':visible').remove()
     $node.fixDialogButtons()
+    unless ENV.ACCOUNT.terms_required # term verbiage has a link to PP, so this would be redundant
+      addPrivacyLinkToDialog($node)
 
   signupDialog.templates = templates
   signupDialog

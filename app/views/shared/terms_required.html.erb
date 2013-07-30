@@ -19,13 +19,7 @@
   <p>
     <label class="checkbox">
       <input type="checkbox" name="user[terms_of_use]" value="1">
-      <%= t 'agree_to_terms_and_pp',
-            'You agree to the *terms of use* and acknowledge the **privacy policy**.',
-            wrapper: {
-              '*' => link_to('\1', @domain_root_account.terms_of_use_url, target: '_blank'),
-              '**' => link_to('\1', @domain_root_account.privacy_policy_url, target: '_blank')
-            }
-      %>
+      <%= agree_to_terms %>
     </label>
   </p>
   <p>

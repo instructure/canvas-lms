@@ -275,7 +275,8 @@ describe UsersController do
         p.user.communication_channels.first.path.should == 'jacob@instructure.com'
       end
 
-      it "should validate acceptance of the terms" do
+      it "should validate acceptance of the terms if required" do
+        Setting.set('terms_required', true)
         post 'create', :pseudonym => { :unique_id => 'jacob@instructure.com' }, :user => { :name => 'Jacob Fugal' }
         response.status.should =~ /400 Bad Request/
         json = JSON.parse(response.body)
