@@ -1641,6 +1641,38 @@ describe Assignment do
       a1.reload
       a1.locked_for?(@user).should be_true
     end
+
+    it "should be locked when associated discussion topic is part of a locked module" do
+      course :active_all => true
+      student_in_course
+      a1 = assignment_model(:course => @course, :submission_types => "discussion_topic")
+      a1.reload
+      a1.locked_for?(@user).should be_false
+
+      m = @course.context_modules.create!
+      m.add_item(:id => a1.discussion_topic.id, :type => 'discussion_topic')
+
+      m.unlock_at = Time.now.in_time_zone + 1.day
+      m.save
+      a1.reload
+      a1.locked_for?(@user).should be_true
+    end
+
+    it "should be locked when associated quiz is part of a locked module" do
+      course :active_all => true
+      student_in_course
+      a1 = assignment_model(:course => @course, :submission_types => "online_quiz")
+      a1.reload
+      a1.locked_for?(@user).should be_false
+
+      m = @course.context_modules.create!
+      m.add_item(:id => a1.quiz.id, :type => 'quiz')
+
+      m.unlock_at = Time.now.in_time_zone + 1.day
+      m.save
+      a1.reload
+      a1.locked_for?(@user).should be_true
+    end
   end
 
   context "group_students" do

@@ -776,7 +776,7 @@ class DiscussionTopic < ActiveRecord::Base
         locked = {:asset_string => self.asset_string, :unlock_at => self.delayed_post_at}
       elsif (self.lock_at && self.lock_at < Time.now)
         locked = {:asset_string => self.asset_string, :lock_at => self.lock_at}
-      elsif (self.assignment && l = self.assignment.locked_for?(user, opts))
+      elsif !opts[:skip_assignment] && (self.assignment && l = self.assignment.locked_for?(user, opts))
         locked = l
       elsif self.could_be_locked && item = locked_by_module_item?(user, opts[:deep_check_if_needed])
         locked = {:asset_string => self.asset_string, :context_module => item.context_module.attributes}

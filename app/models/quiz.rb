@@ -669,7 +669,7 @@ class Quiz < ActiveRecord::Base
         if !sub || !sub.manually_unlocked
           locked = {:asset_string => self.asset_string, :lock_at => quiz_for_user.lock_at}
         end
-      elsif (self.for_assignment? && l = self.assignment.locked_for?(user, opts))
+      elsif !opts[:skip_assignment] && (self.for_assignment? && l = self.assignment.locked_for?(user, opts))
         sub = user && quiz_submissions.find_by_user_id(user.id)
         if !sub || !sub.manually_unlocked
           locked = l

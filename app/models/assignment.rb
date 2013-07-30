@@ -723,6 +723,12 @@ class Assignment < ActiveRecord::Base
         locked = {:asset_string => assignment_for_user.asset_string, :lock_at => assignment_for_user.lock_at}
       elsif self.could_be_locked && item = locked_by_module_item?(user, opts[:deep_check_if_needed])
         locked = {:asset_string => self.asset_string, :context_module => item.context_module.attributes}
+      elsif self.submission_types == 'discussion_topic' && self.discussion_topic &&
+          topic_locked = self.discussion_topic.locked_for?(user, opts.merge(:skip_assignment => true))
+        locked = topic_locked
+      elsif self.submission_types == 'online_quiz' && self.quiz &&
+          quiz_locked = self.quiz.locked_for?(user, opts.merge(:skip_assignment => true))
+        locked = quiz_locked
       end
       locked
     end
