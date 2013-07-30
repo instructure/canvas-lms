@@ -76,7 +76,8 @@ describe "Module Items API", :type => :integration do
               "title" => @assignment_tag.title,
               "indent" => 0,
               "completion_requirement" => { "type" => "must_submit" },
-              "published" => false
+              "published" => false,
+              "module_id" => @module1.id
           },
           {
               "type" => "Quiz",
@@ -88,7 +89,8 @@ describe "Module Items API", :type => :integration do
               "title" => @quiz_tag.title,
               "indent" => 0,
               "completion_requirement" => { "type" => "min_score", "min_score" => 10 },
-              "published" => true
+              "published" => true,
+              "module_id" => @module1.id
           },
           {
               "type" => "Discussion",
@@ -100,7 +102,8 @@ describe "Module Items API", :type => :integration do
               "title" => @topic_tag.title,
               "indent" => 0,
               "completion_requirement" => { "type" => "must_contribute" },
-              "published" => true
+              "published" => true,
+              "module_id" => @module1.id
           },
           {
               "type" => "SubHeader",
@@ -108,7 +111,8 @@ describe "Module Items API", :type => :integration do
               "position" => 4,
               "title" => @subheader_tag.title,
               "indent" => 0,
-              "published" => true
+              "published" => true,
+              "module_id" => @module1.id
           },
           {
               "type" => "ExternalUrl",
@@ -119,7 +123,8 @@ describe "Module Items API", :type => :integration do
               "title" => @external_url_tag.title,
               "indent" => 1,
               "completion_requirement" => { "type" => "must_view" },
-              "published" => true
+              "published" => true,
+              "module_id" => @module1.id
           }
       ]
     end
@@ -164,7 +169,8 @@ describe "Module Items API", :type => :integration do
           "indent" => 0,
           "url" => "http://www.example.com/api/v1/courses/#{@course.id}/pages/#{@wiki_page.url}",
           "page_url" => @wiki_page.url,
-          "published" => true
+          "published" => true,
+          "module_id" => @module2.id
       }
 
       @attachment_tag.unpublish
@@ -181,7 +187,8 @@ describe "Module Items API", :type => :integration do
           "title" => @attachment_tag.title,
           "indent" => 0,
           "url" => "http://www.example.com/api/v1/files/#{@attachment.id}",
-          "published" => false
+          "published" => false,
+          "module_id" => @module2.id
       }
     end
 
@@ -501,6 +508,56 @@ describe "Module Items API", :type => :integration do
 
         @module1.reload
         @module1.evaluate_for(@student).workflow_state.should == 'unlocked'
+      end
+
+      describe "moving items between modules" do
+        it "should move a module item" do
+          old_updated_ats = []
+          Timecop.freeze(1.minute.ago) do
+            @module2.touch; old_updated_ats << @module2.updated_at
+            @module3.touch; old_updated_ats << @module3.updated_at
+          end
+          api_call(:put, "/api/v1/courses/#{@course.id}/modules/#{@module2.id}/items/#{@wiki_page_tag.id}",
+                   {:controller => "context_module_items_api", :action => "update", :format => "json",
+                    :course_id => "#{@course.id}", :module_id => "#{@module2.id}", :id => "#{@wiki_page_tag.id}"},
+                   {:module_item => {:module_id => @module3.id}})
+
+          @module2.reload.content_tags.map(&:id).should_not be_include @wiki_page_tag.id
+          @module2.updated_at.should > old_updated_ats[0]
+          @module3.reload.content_tags.map(&:id).should == [@wiki_page_tag.id]
+          @module3.updated_at.should > old_updated_ats[1]
+        end
+
+        it "should move completion requirements" do
+          old_updated_ats = []
+          Timecop.freeze(1.minute.ago) do
+            @module1.touch; old_updated_ats << @module1.updated_at
+            @module2.touch; old_updated_ats << @module2.updated_at
+          end
+          api_call(:put, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@assignment_tag.id}",
+              {:controller => "context_module_items_api", :action => "update", :format => "json",
+               :course_id => "#{@course.id}", :module_id => "#{@module1.id}", :id => "#{@assignment_tag.id}"},
+              {:module_item => {:module_id => @module2.id, :position => 2}})
+
+          @module1.reload.content_tags.map(&:id).should_not be_include @assignment_tag.id
+          @module1.updated_at.should > old_updated_ats[0]
+          @module1.completion_requirements.size.should == 3
+          @module1.completion_requirements.detect { |req| req[:id] == @assignment_tag.id }.should be_nil
+
+          @module2.reload.content_tags.sort_by(&:position).map(&:id).should == [@wiki_page_tag.id, @assignment_tag.id, @attachment_tag.id]
+          @module2.updated_at.should > old_updated_ats[1]
+          @module2.completion_requirements.detect { |req| req[:id] == @assignment_tag.id }.should_not be_nil
+        end
+
+        it "should verify the target module is in the course" do
+          course_with_teacher
+          mod = @course.context_modules.create!
+          item = mod.add_item(:type => 'context_module_sub_header', :title => 'blah')
+          api_call(:put, "/api/v1/courses/#{@course.id}/modules/#{mod.id}/items/#{item.id}",
+                   {:controller => "context_module_items_api", :action => "update", :format => "json",
+                    :course_id => @course.to_param, :module_id => mod.to_param, :id => item.to_param},
+                   {:module_item => {:module_id => @module1.id}}, {}, {:expected_status => 400})
+        end
       end
     end
 

@@ -56,6 +56,8 @@ module Api::V1::ContextModule
     hash = api_json(content_tag, current_user, session, :only => MODULE_ITEM_JSON_ATTRS)
     hash['type'] = Api::API_DATA_TYPE[content_tag.content_type] || content_tag.content_type
 
+    hash['module_id'] = content_tag.context_module_id
+
     # add canvas web url
     unless content_tag.content_type == 'ContextModuleSubHeader'
       hash['html_url'] = case content_tag.content_type
