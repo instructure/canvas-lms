@@ -48,7 +48,23 @@
           <label for="compose-message-recipients">{{#t "labels.to"}}To{{/t}}</label>
         </div>
         <div class='message-header-input'>
-          <input type="text" id="compose-message-recipients" name="recipients" data-finder_url="/conversations/find_recipients" class="recipients">
+          <div class="ac">
+            <div class="ac-input-box">
+              <ul class="ac-token-list"></ul>
+              <input type="search"
+                     class="ac-input"
+                     id="compose-message-recipients"
+                     aria-expanded="false"
+                     aria-activedescendant="ac-result-list"
+                     aria-owns="ac-result-list-1"
+                     aria-autocomplete="list"
+                     role="combobox" />
+            </div>
+
+            <ul class="ac-result-list"
+                id="ac-result-list-1"
+                aria-hidden="true"></ul>
+          </div>
         </div>
       </div>
 

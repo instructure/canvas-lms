@@ -26,8 +26,9 @@ define [
   'jst/conversations/composeTitleBar'
   'jst/conversations/composeButtonBar'
   'jst/conversations/addAttachment'
+  'compiled/views/conversations/AutocompleteView'
   'compiled/widget/ContextSearch'
-], (I18n, _, DialogBaseView, template, MessageProgressTracker, preventDefault, composeTitleBarTemplate, composeButtonBarTemplate, addAttachmentTemplate) ->
+], (I18n, _, DialogBaseView, template, MessageProgressTracker, preventDefault, composeTitleBarTemplate, composeButtonBarTemplate, addAttachmentTemplate, AutocompleteView) ->
 
   ##
   # reusable message composition dialog
@@ -39,7 +40,7 @@ define [
       '.media_comment':                 '$mediaComment'
       'input[name=media_comment_id]':   '$mediaCommentId'
       'input[name=media_comment_type]': '$mediaCommentType'
-      '.recipients':                    '$recipients'
+      '.ac':                            '$recipients'
       '.attachment_list':               '$attachments'
       '.attachments-pane':              '$attachmentsPane'
       '.conversation_body':             '$conversationBody'
@@ -119,71 +120,7 @@ define [
           false
 
     initializeTokenInputs: ($scope) ->
-      everyoneText  = I18n.t('enrollments_everyone', "Everyone")
-      selectAllText = I18n.t('select_all', "Select All")
-
-      @$recipients.contextSearch
-        contexts: @contexts
-        added: (data, $token, newToken) =>
-          data.id = "#{data.id}"
-          if newToken and data.rootId
-            $token.append("<input type='hidden' name='tags[]' value='#{data.rootId}'>")
-          if newToken and data.type
-            $token.addClass(data.type)
-            if data.user_count?
-              $token.addClass('details')
-              $details = $('<span />')
-              $details.text(I18n.t('people_count', 'person', {count: data.user_count}))
-              $token.append($details)
-              $token.data('user_count', data.user_count)
-          unless data.id.match(/^(course|group)_/)
-            data = $.extend({}, data)
-            delete data.avatar_url # since it's the wrong size and possibly a blank image
-            currentData = @userCache[data.id] ? {}
-            @userCache[data.id] = $.extend(currentData, data)
-        canToggle: (data) ->
-          data.type is 'user' or data.permissions?.send_messages_all
-        selector:
-          showToggles: true
-          includeEveryoneOption: (postData, parent) =>
-            # i.e. we are listing synthetic contexts under a course or section
-            if postData.context?.match(/^(course|section)_\d+$/)
-              everyoneText
-          includeSelectAllOption: (postData, parent) =>
-            # i.e. we are listing all users in a group or synthetic context
-            if postData.context?.match(/^((course|section)_\d+_.*|group_\d+)$/) and not postData.context?.match(/^(course|section)_\d+$/) and not postData.context?.match(/^course_\d+_(groups|sections)$/) and parent.data('user_data').permissions.send_messages_all
-              selectAllText
-          baseData:
-            permissions: ["send_messages_all"]
-
-      return if $scope
-
-#      @filterNameMap = {}
-#      $('#context_tags').contextSearch
-#        contexts: @contexts
-#        prefixUserIds: true
-#        added: (data, $token, newToken) =>
-#          $token.prevAll().remove() # only one token at a time
-#        tokenWrapBuffer: 80
-#        selector:
-#          includeEveryoneOption: (postData, parent) =>
-#            if postData.context?.match(/^course_\d+$/)
-#              everyoneText
-#          includeFilterOption: (postData) =>
-#            if postData.context?.match(/^course_\d+$/)
-#              I18n.t('filter_by_course', 'Filter by this course')
-#            else if postData.context?.match(/^group_\d+$/)
-#              I18n.t('filter_by_group', 'Filter by this group')
-#          baseData:
-#            synthetic_contexts: 1
-#            types: ['course', 'user', 'group']
-#            include_inactive: true
-#      filterInput = $('#context_tags').data('token_input')
-#      filterInput.change = (tokenValues) =>
-#        filters = for pair in filterInput.tokenPairs()
-#          @filterNameMap[pair[0]] = pair[1]
-#          pair[0]
-#        @updateHashData filter: filters
+      new AutocompleteView(el: @$recipients).render()
 
     initializeForm: ->
       @prepareTextarea(@$el)
