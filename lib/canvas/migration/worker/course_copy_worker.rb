@@ -22,6 +22,7 @@ class Canvas::Migration::Worker::CourseCopyWorker < Struct.new(:migration_id)
     cm.workflow_state = :pre_processing
     cm.reset_job_progress
     cm.migration_settings[:skip_import_notification] = true
+    cm.migration_settings[:import_immediately] = true
     cm.save
     cm.job_progress.start
 
