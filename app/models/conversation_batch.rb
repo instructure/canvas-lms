@@ -4,6 +4,7 @@ class ConversationBatch < ActiveRecord::Base
 
   belongs_to :user
   belongs_to :root_conversation_message, :class_name => 'ConversationMessage'
+  belongs_to :context, :polymorphic => true
 
   before_save :serialize_conversation_message_ids
   after_create :queue_delivery
@@ -25,7 +26,7 @@ class ConversationBatch < ActiveRecord::Base
     ModelCache.with_cache(:conversations => existing_conversations, :users => {:id => user_map}) do
       recipient_ids.each_slice(chunk_size) do |ids|
         ids.each do |id|
-          @conversations << conversation = user.initiate_conversation([user_map[id]], nil, :subject=>subject)
+          @conversations << conversation = user.initiate_conversation([user_map[id]], nil, :subject => subject, :context_type => context_type, :context_id => context_id)
           message = conversation.add_message(root_conversation_message.clone,
                                              :update_for_sender => false,
                                              :tags => tags)
@@ -115,6 +116,8 @@ class ConversationBatch < ActiveRecord::Base
     batch.root_conversation_message = root_message
     batch.user_id = root_message.author_id
     batch.recipient_ids = recipients.map(&:id)
+    batch.context_type = options[:context_type]
+    batch.context_id = options[:context_id]
     batch.tags = options[:tags]
     batch.subject = options[:subject]
     user_map = recipients.index_by(&:id)

@@ -188,17 +188,28 @@ class ConversationsController < ApplicationController
   # @argument filter [optional, course_id|group_id|user_id]
   #   Used when generating "visible" in the API response. See the explanation
   #   under the {api:ConversationsController#index index API action}
+  # @argument context_code [optional] The course or group that is the context
+  #   for this conversation. Same format as courses or groups in the recipients
+  #   argument
   def create
     return render_error('recipients', 'blank') if params[:recipients].blank?
     return render_error('recipients', 'invalid') if @recipients.blank?
     return render_error('body', 'blank') if params[:body].blank?
+    context_type = nil
+    context_id = nil
+    if params[:context_code]
+      context = Context.find_by_asset_string(params[:context_code])
+      return render_error('context_code', 'invalid') if context.nil?
+      context_type = context.class.name
+      context_id = context.id
+    end
 
     batch_private_messages = !value_to_boolean(params[:group_conversation]) && @recipients.size > 1
 
     message = build_message
     if batch_private_messages
       mode = params[:mode] == 'async' ? :async : :sync
-      batch = ConversationBatch.generate(message, @recipients, mode, :tags => @tags, :subject=>params[:subject])
+      batch = ConversationBatch.generate(message, @recipients, mode, :subject => params[:subject], :context_type => context_type, :context_id => context_id, :tags => @tags)
       if mode == :async
         headers['X-Conversation-Batch-Id'] = batch.id.to_s
         return render :json => [], :status => :accepted
@@ -211,7 +222,7 @@ class ConversationsController < ApplicationController
       visibility_map = infer_visibility(*conversations) 
       render :json => conversations.map{ |c| conversation_json(c, @current_user, session, :include_participant_avatars => false, :include_participant_contexts => false, :visible => visibility_map[c.conversation_id]) }, :status => :created
     else
-      @conversation = @current_user.initiate_conversation(@recipients, nil, :subject=>params[:subject])
+      @conversation = @current_user.initiate_conversation(@recipients, nil, :subject => params[:subject], :context_type => context_type, :context_id => context_id)
       @conversation.add_message(message, :tags => @tags, :update_for_sender => false)
       render :json => [conversation_json(@conversation.reload, @current_user, session, :include_indirect_participants => true, :messages => [message])], :status => :created
     end

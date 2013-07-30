@@ -431,6 +431,13 @@ describe ConversationsController, :type => :integration do
         ]
       end
 
+      it "should add a context to a private conversation" do
+        json = api_call(:post, "/api/v1/conversations",
+                { :controller => 'conversations', :action => 'create', :format => 'json' },
+                { :recipients => [@bob.id], :body => "test", :context_code => "course_#{@course.id}" })
+        conversation(@bob).conversation.context.should eql(@course)
+      end
+
       it "should create a group conversation" do
         json = api_call(:post, "/api/v1/conversations",
                 { :controller => 'conversations', :action => 'create', :format => 'json' },
@@ -542,6 +549,24 @@ describe ConversationsController, :type => :integration do
         @joe.conversations.size.should eql(1)
       end
 
+      it "should set the context on new synchronous bulk private conversations" do
+        # set up one private conversation in advance
+        conversation(@bob)
+
+        json = api_call(:post, "/api/v1/conversations",
+                { :controller => 'conversations', :action => 'create', :format => 'json' },
+                { :recipients => [@bob.id, @joe.id, @billy.id], :body => "test", :context_code => "course_#{@course.id}" })
+        json.size.should eql 3
+        json.map{ |c| c['id'] }.sort.should eql @me.all_conversations.map(&:conversation_id).sort
+
+        batch = ConversationBatch.first
+        batch.should_not be_nil
+        batch.should be_sent
+
+        [@me, @bob].each {|u| u.conversations.first.conversation.context.should be_nil} # an existing conversation does not get a context
+        [@billy, @joe].each {|u| u.conversations.first.conversation.context.should eql(@course)}
+      end
+
       it "should create/update bulk private conversations asynchronously" do
         # set up one private conversation in advance
         conversation(@bob)
@@ -561,6 +586,24 @@ describe ConversationsController, :type => :integration do
         @bob.conversations.size.should eql(1)
         @billy.conversations.size.should eql(1)
         @joe.conversations.size.should eql(1)
+      end
+
+      it "should set the context on new asynchronous bulk private conversations" do
+        # set up one private conversation in advance
+        conversation(@bob)
+
+        json = api_call(:post, "/api/v1/conversations",
+                { :controller => 'conversations', :action => 'create', :format => 'json' },
+                { :recipients => [@bob.id, @joe.id, @billy.id], :body => "test", :mode => "async", :context_code => "course_#{@course.id}" })
+        json.should eql([])
+
+        batch = ConversationBatch.first
+        batch.should_not be_nil
+        batch.should be_created
+        batch.deliver
+
+       [@me, @bob].each {|u| u.conversations.first.conversation.context.should be_nil} # an existing conversation does not get a context
+        [@billy, @joe].each {|u| u.conversations.first.conversation.context.should eql(@course)}
       end
 
       it "should create a conversation with forwarded messages" do
