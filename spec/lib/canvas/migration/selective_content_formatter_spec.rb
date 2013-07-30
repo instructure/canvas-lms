@@ -127,12 +127,13 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
   context "course copy" do
     before do
       course_model
-      @dt1 = @course.discussion_topics.create!(:message => "hi", :title => "discussion title")
+      @topic = @course.discussion_topics.create!(:message => "hi", :title => "discussion title")
       @cm = @course.context_modules.create!(:name => "some module")
       attachment_model(:context => @course, :filename => 'a5.html')
       @wiki = @course.wiki.wiki_pages.create!(:title => "wiki", :body => "ohai")
-      category = @course.group_categories.create(:name => "other category")
-      group1 = Group.create!(:name=>"group1", :group_category => category, :context => @course)
+      @category = @course.group_categories.create(:name => "other category")
+      @group = Group.create!(:name=>"group1", :group_category => @category, :context => @course)
+      @announcement = announcement_model
       @migration = mock()
       @migration.stubs(:migration_type).returns('course_copy_importer')
       @migration.stubs(:source_course).returns(@course)
@@ -146,14 +147,47 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
                                              {:type=>"context_modules", :property=>"copy[all_context_modules]", :title=>"Modules", :count=>1},
                                              {:type=>"discussion_topics", :property=>"copy[all_discussion_topics]", :title=>"Discussion Topics", :count=>1},
                                              {:type=>"wiki_pages", :property=>"copy[all_wiki_pages]", :title=>"Wiki Pages", :count=>1},
+                                             {:type=>"announcements", :property=>"copy[all_announcements]", :title=>"Announcements", :count=>1},
                                              {:type=>"attachments", :property=>"copy[all_attachments]", :title=>"Files", :count=>1}]
     end
 
-    it "should individual types" do
+    it "should list individual types" do
       @formatter.get_content_list('wiki_pages').length.should == 1
       @formatter.get_content_list('context_modules').length.should == 1
       @formatter.get_content_list('attachments').length.should == 1
       @formatter.get_content_list('discussion_topics').length.should == 1
+      @formatter.get_content_list('announcements').length.should == 1
+    end
+
+    context "deleted objects" do
+      append_before do
+        @cm.destroy
+        @attachment.destroy
+        @wiki.destroy
+        @announcement.destroy
+        @topic.destroy
+        assignment_model.destroy
+        quiz_model.destroy
+        calendar_event_model.destroy
+        rubric_model.destroy
+      end
+
+      it "should ignore in top-level list" do
+        @formatter.get_content_list.should == [{:type=>"course_settings", :property=>"copy[all_course_settings]", :title=>"Course Settings"},
+                                             {:type=>"syllabus_body", :property=>"copy[all_syllabus_body]", :title=>"Syllabus Body"}]
+      end
+
+      it "should ignore in specific item request" do
+        @formatter.get_content_list('wiki_pages').length.should == 0
+        @formatter.get_content_list('context_modules').length.should == 0
+        @formatter.get_content_list('attachments').length.should == 0
+        @formatter.get_content_list('discussion_topics').length.should == 0
+        @formatter.get_content_list('announcements').length.should == 0
+        @formatter.get_content_list('assignments').length.should == 0
+        @formatter.get_content_list('quizzes').length.should == 0
+        @formatter.get_content_list('calendar_events').length.should == 0
+        @formatter.get_content_list('rubrics').length.should == 0
+      end
     end
 
     it "should group files by folders" do
