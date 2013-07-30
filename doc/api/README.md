@@ -11,9 +11,11 @@ information below and the page on <a href="oauth.html">Authentication using OAut
 Schema
 ------
 
-All API access is over HTTPS, against your normal canvas domain.
+All API access is over HTTPS, against your normal Canvas domain.
 
 All API responses are in <a href="http://www.json.org/">JSON format</a>.
+
+All integer ids in Canvas are 64 bit integers.
 
 For POST and PUT requests, parameters are sent using standard
 <a href="http://www.w3.org/TR/html4/interact/forms.html#h-17.13.4">HTML form
