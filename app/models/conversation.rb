@@ -67,7 +67,7 @@ class Conversation < ActiveRecord::Base
     })
   end
 
-  def self.initiate(users, private)
+  def self.initiate(users, private, options = {})
     users = users.uniq_by(&:id)
     user_ids = users.map(&:id)
     private_hash = private ? private_hash_for(users) : nil
@@ -85,6 +85,7 @@ class Conversation < ActiveRecord::Base
         conversation.has_attachments = false
         conversation.has_media_objects = false
         conversation.tags = []
+        conversation.subject = options[:subject]
         conversation.save!
 
         # TODO: transaction on these shards as well?

@@ -2010,10 +2010,10 @@ class User < ActiveRecord::Base
     accounts.size == 0 || accounts.any?{ |a| a.settings[:enable_eportfolios] != false }
   end
 
-  def initiate_conversation(users, private = nil)
+  def initiate_conversation(users, private = nil, options = {})
     users = ([self] + users).uniq_by(&:id)
     private = users.size <= 2 if private.nil?
-    Conversation.initiate(users, private).conversation_participants.find_by_user_id(self)
+    Conversation.initiate(users, private, options).conversation_participants.find_by_user_id(self)
   end
 
   def messageable_user_calculator

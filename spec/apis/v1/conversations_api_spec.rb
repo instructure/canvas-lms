@@ -55,6 +55,7 @@ describe ConversationsController, :type => :integration do
       json.should eql [
         {
           "id" => @c2.conversation_id,
+          "subject" => nil,
           "workflow_state" => "unread",
           "last_message" => "test",
           "last_message_at" => @c2.last_message_at.to_json[1, 20],
@@ -79,6 +80,7 @@ describe ConversationsController, :type => :integration do
         },
         {
           "id" => @c1.conversation_id,
+          "subject" => nil,
           "workflow_state" => "read",
           "last_message" => "test",
           "last_message_at" => @c1.last_message_at.to_json[1, 20],
@@ -140,6 +142,7 @@ describe ConversationsController, :type => :integration do
       json.should eql [
         {
           "id" => @c2.conversation_id,
+          "subject" => nil,
           "workflow_state" => "unread",
           "last_message" => "test",
           "last_message_at" => @c2.last_message_at.to_json[1, 20],
@@ -400,6 +403,7 @@ describe ConversationsController, :type => :integration do
         json.should eql [
           {
             "id" => conversation.conversation_id,
+            "subject" => nil,
             "workflow_state" => "read",
             "last_message" => nil,
             "last_message_at" => nil,
@@ -442,6 +446,7 @@ describe ConversationsController, :type => :integration do
         json.should eql [
           {
             "id" => conversation.conversation_id,
+            "subject" => nil,
             "workflow_state" => "read",
             "last_message" => nil,
             "last_message_at" => nil,
@@ -488,6 +493,7 @@ describe ConversationsController, :type => :integration do
         json.should eql [
           {
             "id" => conversation.conversation_id,
+            "subject" => nil,
             "workflow_state" => "read",
             "last_message" => "test",
             "last_message_at" => conversation.last_message_at.to_json[1, 20],
@@ -581,6 +587,7 @@ describe ConversationsController, :type => :integration do
         json.should eql [
           {
             "id" => conversation.conversation_id,
+            "subject" => nil,
             "workflow_state" => "read",
             "last_message" => nil,
             "last_message_at" => nil,
@@ -625,6 +632,59 @@ describe ConversationsController, :type => :integration do
           }
         ]
       end
+
+      it "should set subject" do
+        json = api_call(:post, "/api/v1/conversations",
+                { :controller => 'conversations', :action => 'create', :format => 'json' },
+                { :recipients => [@bob.id], :body => "test", :subject => "lunch" })
+        json.each { |c|
+          c.delete("avatar_url")
+          c["participants"].each{ |p|
+            p.delete("avatar_url")
+          }
+        }
+        json.each {|c| c["messages"].each {|m| m["participating_user_ids"].sort!}}
+        conversation = @me.all_conversations.order("conversation_id DESC").first
+        json.should eql [
+          {
+            "id" => conversation.conversation_id,
+            "subject" => "lunch",
+            "workflow_state" => "read",
+            "last_message" => nil,
+            "last_message_at" => nil,
+            "last_authored_message" => "test",
+            "last_authored_message_at" => conversation.last_authored_at.to_json[1, 20],
+            "message_count" => 1,
+            "subscribed" => true,
+            "private" => true,
+            "starred" => false,
+            "properties" => ["last_author"],
+            "visible" => false,
+            "audience" => [@bob.id],
+            "audience_contexts" => {
+              "groups" => {},
+              "courses" => {@course.id.to_s => ["StudentEnrollment"]}
+            },
+            "participants" => [
+              {"id" => @me.id, "name" => @me.name, "common_courses" => {}, "common_groups" => {}},
+              {"id" => @bob.id, "name" => @bob.name, "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}}
+            ],
+            "messages" => [
+              {"id" => conversation.messages.first.id, "created_at" => conversation.messages.first.created_at.to_json[1, 20], "body" => "test", "author_id" => @me.id, "generated" => false, "media_comment" => nil, "forwarded_messages" => [], "attachments" => [], "participating_user_ids" => [@me.id, @bob.id].sort}
+            ]
+          }
+        ]
+      end
+
+      it "should set subject on batch conversations" do
+        json = api_call(:post, "/api/v1/conversations",
+                { :controller => 'conversations', :action => 'create', :format => 'json' },
+                { :recipients => [@bob.id, @joe.id], :body => "test", :subject => "dinner" })
+        json.size.should eql 2
+        json.each { |c|
+          c["subject"].should eql 'dinner'
+        }
+      end
     end
   end
 
@@ -652,6 +712,7 @@ describe ConversationsController, :type => :integration do
       json["messages"].each {|m| m["participating_user_ids"].sort!}
       json.should eql({
         "id" => conversation.conversation_id,
+        "subject" => nil,
         "workflow_state" => "read",
         "last_message" => "another",
         "last_message_at" => conversation.last_message_at.to_json[1, 20],
@@ -738,6 +799,7 @@ describe ConversationsController, :type => :integration do
         json["messages"].each {|m| m["participating_user_ids"].sort!}
         expected = {
           "id" => @conversation.conversation_id,
+          "subject" => nil,
           "workflow_state" => "read",
           "last_message" => "test",
           "last_message_at" => @conversation.last_message_at.to_json[1, 20],
@@ -880,6 +942,7 @@ describe ConversationsController, :type => :integration do
       json["messages"].each {|m| m["participating_user_ids"].sort!}
       json.should eql({
         "id" => conversation.conversation_id,
+        "subject" => nil,
         "workflow_state" => "read",
         "last_message" => "another",
         "last_message_at" => conversation.last_message_at.to_json[1, 20],
@@ -936,6 +999,7 @@ describe ConversationsController, :type => :integration do
       json["messages"].each {|m| m["participating_user_ids"].sort!}
       json.should eql({
         "id" => conversation.conversation_id,
+        "subject" => nil,
         "workflow_state" => "read",
         "last_message" => "test",
         "last_message_at" => conversation.last_message_at.to_json[1, 20],
@@ -979,6 +1043,7 @@ describe ConversationsController, :type => :integration do
       }
       json.should eql({
         "id" => conversation.conversation_id,
+        "subject" => nil,
         "workflow_state" => "archived",
         "last_message" => "test",
         "last_message_at" => conversation.last_message_at.to_json[1, 20],
@@ -1044,6 +1109,7 @@ describe ConversationsController, :type => :integration do
       }
       json.should eql({
         "id" => conversation.conversation_id,
+        "subject" => nil,
         "workflow_state" => "read",
         "last_message" => "test",
         "last_message_at" => conversation.last_message_at.to_json[1, 20],
@@ -1078,6 +1144,7 @@ describe ConversationsController, :type => :integration do
       }
       json.should eql({
         "id" => conversation.conversation_id,
+        "subject" => nil,
         "workflow_state" => "read",
         "last_message" => nil,
         "last_message_at" => nil,

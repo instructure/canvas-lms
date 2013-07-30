@@ -64,6 +64,7 @@ class ConversationsController < ApplicationController
   #   ids of all conversations under this scope/filter in the same order.
   #
   # @response_field id The unique identifier for the conversation.
+  # @response_field subject The subject of the conversation.
   # @response_field workflow_state The current state of the conversation
   #   (read, unread or archived)
   # @response_field last_message A <=100 character preview from the most
@@ -101,6 +102,7 @@ class ConversationsController < ApplicationController
   #   [
   #     {
   #       "id": 2,
+  #       "subject": "conversations api example",
   #       "workflow_state": "unread",
   #       "last_message": "sure thing, here's the file",
   #       "last_message_at": "2011-09-02T12:00:00Z",
@@ -160,6 +162,8 @@ class ConversationsController < ApplicationController
   # @argument recipients[] An array of recipient ids. These may be user ids
   #   or course/group ids prefixed with "course_" or "group_" respectively,
   #   e.g. recipients[]=1&recipients[]=2&recipients[]=course_3
+  # @argument subject [optional] The subject of the conversation.
+  #   This is ignored when reusing a conversation.
   # @argument body The message to be sent
   # @argument group_conversation [true|false] Ignored if there is just one
   #   recipient, defaults to false. If true, this will be a group conversation
@@ -194,7 +198,7 @@ class ConversationsController < ApplicationController
     message = build_message
     if batch_private_messages
       mode = params[:mode] == 'async' ? :async : :sync
-      batch = ConversationBatch.generate(message, @recipients, mode, :tags => @tags)
+      batch = ConversationBatch.generate(message, @recipients, mode, :tags => @tags, :subject=>params[:subject])
       if mode == :async
         headers['X-Conversation-Batch-Id'] = batch.id.to_s
         return render :json => [], :status => :accepted
@@ -207,7 +211,7 @@ class ConversationsController < ApplicationController
       visibility_map = infer_visibility(*conversations) 
       render :json => conversations.map{ |c| conversation_json(c, @current_user, session, :include_participant_avatars => false, :include_participant_contexts => false, :visible => visibility_map[c.conversation_id]) }, :status => :created
     else
-      @conversation = @current_user.initiate_conversation(@recipients)
+      @conversation = @current_user.initiate_conversation(@recipients, nil, :subject=>params[:subject])
       @conversation.add_message(message, :tags => @tags, :update_for_sender => false)
       render :json => [conversation_json(@conversation.reload, @current_user, session, :include_indirect_participants => true, :messages => [message])], :status => :created
     end
@@ -222,6 +226,7 @@ class ConversationsController < ApplicationController
   #   [
   #     {
   #       "id": 1,
+  #       "subject": "conversations api example",
   #       "workflow_state": "created",
   #       "completion": 0.1234,
   #       "tags": [],
@@ -289,6 +294,7 @@ class ConversationsController < ApplicationController
   # @example_response
   #   {
   #     "id": 2,
+  #     "subject": "conversations api example",
   #     "workflow_state": "unread",
   #     "last_message": "sure thing, here's the file",
   #     "last_message_at": "2011-09-02T12:00:00-06:00",
@@ -374,6 +380,7 @@ class ConversationsController < ApplicationController
   # @API Edit a conversation
   # Updates attributes for a single conversation.
   #
+  # @argument conversation[subject] Change the subject of this conversation
   # @argument conversation[workflow_state] ["read"|"unread"|"archived"] Change the state of this conversation
   # @argument conversation[subscribed] [true|false] Toggle the current user's subscription to the conversation (only valid for group conversations). If unsubscribed, the user will still have access to the latest messages, but the conversation won't be automatically flagged as unread, nor will it jump to the top of the inbox.
   # @argument conversation[starred] [true|false] Toggle the starred state of the current user's view of the conversation.
@@ -387,6 +394,7 @@ class ConversationsController < ApplicationController
   # @example_response
   #   {
   #     "id": 2,
+  #     "subject": "conversations api example",
   #     "workflow_state": "read",
   #     "last_message": "sure thing, here's the file",
   #     "last_message_at": "2011-09-02T12:00:00-06:00",
@@ -424,6 +432,7 @@ class ConversationsController < ApplicationController
   # @example_response
   #   {
   #     "id": 2,
+  #     "subject": "conversations api example",
   #     "workflow_state": "read",
   #     "last_message": null,
   #     "last_message_at": null,
@@ -463,6 +472,7 @@ class ConversationsController < ApplicationController
   # @example_response
   #   {
   #     "id": 2,
+  #     "subject": "conversations api example",
   #     "workflow_state": "read",
   #     "last_message": "let's talk this over with jim",
   #     "last_message_at": "2011-09-02T12:00:00-06:00",
@@ -516,6 +526,7 @@ class ConversationsController < ApplicationController
   # @example_response
   #   {
   #     "id": 2,
+  #     "subject": "conversations api example",
   #     "workflow_state": "unread",
   #     "last_message": "let's talk this over with jim",
   #     "last_message_at": "2011-09-02T12:00:00-06:00",
@@ -563,6 +574,7 @@ class ConversationsController < ApplicationController
   # @example_response
   #   {
   #     "id": 2,
+  #     "subject": "conversations api example",
   #     "workflow_state": "read",
   #     "last_message": "sure thing, here's the file",
   #     "last_message_at": "2011-09-02T12:00:00-06:00",
