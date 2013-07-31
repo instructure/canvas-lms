@@ -239,7 +239,9 @@ class OutcomeGroupsApiController < ApplicationController
         return
       end
       begin
+        @outcome_group.skip_tag_touch = true
         @outcome_group.destroy
+        @context.try(:touch)
         render :json => outcome_group_json(@outcome_group, @current_user, session)
       rescue ActiveRecord::RecordNotSaved
         render :json => 'error'.to_json, :status => :bad_request

@@ -52,4 +52,19 @@ describe LearningOutcomeGroup do
     group.child_outcome_groups.count.should == 1
     @root.child_outcome_groups.count.should == 1
   end
+
+  it "should allowing touching the context to be skipped" do
+    group = @course.learning_outcome_groups.create!(:title => 'groupage')
+    group.add_outcome @course.created_learning_outcomes.create!(:title => 'o1')
+    group.add_outcome @course.created_learning_outcomes.create!(:title => 'o2')
+    group.add_outcome @course.created_learning_outcomes.create!(:title => 'o3')
+
+    time = 1.hour.ago
+    Course.where(:id => @course).update_all(:updated_at => time)
+
+    group.skip_tag_touch = true
+    group.destroy
+
+    @course.reload.updated_at.to_i.should == time.to_i
+  end
 end
