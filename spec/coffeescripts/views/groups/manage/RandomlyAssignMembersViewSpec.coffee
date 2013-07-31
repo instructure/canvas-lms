@@ -170,17 +170,17 @@ define [
 
     ##
     # click the options cog to reveal the options menu
-    $cog = $('.icon-mini-arrow-down')[0]
+    $cog = $('.icon-mini-arrow-down')
     $cog.click()
 
     ##
     # click the randomly assign students option to open up the confirmation dialog view
-    $assignOptionLink = $('.randomly-assign-members')[0]
+    $assignOptionLink = $('.randomly-assign-members')
     $assignOptionLink.click()
 
     ##
     # click the confirm button to run the assignment process
-    $confirmAssignButton = $('.randomly-assign-members-confirm')[0]
+    $confirmAssignButton = $('.randomly-assign-members-confirm')
     $confirmAssignButton.click()
 
     ##

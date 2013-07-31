@@ -10,7 +10,7 @@ sinon.fakeServer.respond = (function () {
 
   if (args.length > 0) this.respondWith.apply(this, args);
 
-  if (options["cascade"] && options["cascade"] === false) {
+  if (options.cascade === false) {
     queue = this.queue.splice(0, queue.length);
   }
 
