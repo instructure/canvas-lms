@@ -213,10 +213,13 @@ class Assignment < ActiveRecord::Base
   end
 
   def update_student_submissions
-    submissions.graded.find_each do |submission|
-      submission.grade = score_to_grade(submission.score)
-      submission.graded_at = Time.zone.now
-      submission.with_versioning(:explicit => true) { submission.save! }
+    graded_at = Time.zone.now
+    submissions.graded.includes(:user).find_each do |s|
+      s.grade = score_to_grade(s.score)
+      s.graded_at = graded_at
+      s.assignment = self
+      s.assignment_changed_not_sub = true
+      s.with_versioning(:explicit => true) { s.save! }
     end
   end
 

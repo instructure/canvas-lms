@@ -89,9 +89,10 @@ class Submission < ActiveRecord::Base
 
   sanitize_field :body, Instructure::SanitizeField::SANITIZE
 
-  attr_accessor :saved_by
+  attr_accessor :saved_by,
+                :assignment_changed_not_sub
   before_save :update_if_pending
-  before_save :validate_single_submission, :infer_values, :set_context_code
+  before_save :validate_single_submission, :infer_values
   before_save :prep_for_submitting_to_turnitin
   before_save :check_url_changed
   before_create :cache_due_date
@@ -383,16 +384,12 @@ class Submission < ActiveRecord::Base
   end
 
   def turnitinable?
-    if self.submission_type == 'online_upload' || self.submission_type == 'online_text_entry'
-      if self.assignment.turnitin_enabled?
-        return true
-      end
-    end
-    false
+    %w(online_upload online_text_entry).include?(submission_type) &&
+      assignment.turnitin_enabled?
   end
 
   def update_assignment
-    self.send_later(:context_module_action)
+    self.send_later(:context_module_action) unless @assignment_changed_not_sub
     true
   end
   protected :update_assignment
@@ -421,6 +418,7 @@ class Submission < ActiveRecord::Base
   end
 
   def update_attachment_associations
+    return if @assignment_changed_not_sub
     associations = self.attachment_associations
     association_ids = associations.map(&:attachment_id)
     ids = (Array(self.attachment_ids || "").join(',')).split(",").map{|id| id.to_i}
@@ -453,14 +451,11 @@ class Submission < ActiveRecord::Base
     end
   end
 
-  def set_context_code
-    self.context_code = self.assignment.context_code rescue nil
-  end
-
   def infer_values
-    if self.assignment
+    if assignment
       self.score = self.assignment.max_score if self.assignment.max_score && self.score && self.score > self.assignment.max_score
       self.score = self.assignment.min_score if self.assignment.min_score && self.score && self.score < self.assignment.min_score
+      self.context_code = assignment.context_code
     end
     self.submitted_at ||= Time.now if self.has_submission? || (self.submission_type && !self.submission_type.empty?)
     self.quiz_submission.reload if self.quiz_submission
@@ -489,13 +484,11 @@ class Submission < ActiveRecord::Base
       self.quiz_submission ||= QuizSubmission.find_by_user_id_and_quiz_id(self.user_id, self.assignment.quiz.id) rescue nil
     end
     @just_submitted = self.submitted? && self.submission_type && (self.new_record? || self.workflow_state_changed?)
-    if self.score_changed?
+    if score_changed?
       @score_changed = true
-      if self.assignment
-        self.grade = self.assignment.score_to_grade(self.score, self.grade)
-      else
-        self.grade = self.score.to_s
-      end
+      self.grade = assignment ?
+        assignment.score_to_grade(score, grade) :
+        score.to_s
     end
 
     self.process_attempts ||= 0
@@ -690,15 +683,19 @@ class Submission < ActiveRecord::Base
     write_attribute(:attachment_ids, attachments.select{|a| a && a.id && old_ids.include?(a.id) || (a.recently_created? && a.context == self.assignment) || a.context != self.assignment }.map{|a| a.id}.join(","))
   end
 
+  # someday code-archaeologists will wonder how this method came to be named
+  # validate_single_submission.  their guess is as good as mine
   def validate_single_submission
     @full_url = nil
     if read_attribute(:url) && read_attribute(:url).length > 250
       self.body = read_attribute(:url)
       self.url = read_attribute(:url)[0..250]
     end
-    self.submission_type ||= "online_url" if self.url
-    self.submission_type ||= "online_text_entry" if self.body
-    self.submission_type ||= "online_upload" if !self.attachments.empty?
+    unless submission_type
+      self.submission_type ||= "online_url" if self.url
+      self.submission_type ||= "online_text_entry" if self.body
+      self.submission_type ||= "online_upload" if !self.attachments.empty?
+    end
     true
   end
   private :validate_single_submission
@@ -1127,10 +1124,11 @@ class Submission < ActiveRecord::Base
   end
 
   def update_participation
+    # TODO: can we do this in bulk?
     return if assignment.deleted? || assignment.muted?
     return unless self.user_id
 
-    if self.score_changed? || self.grade_changed?
+    if score_changed? || grade_changed?
       ContentParticipation.create_or_update({
         :content => self,
         :user => self.user,

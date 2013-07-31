@@ -976,7 +976,12 @@ class Course < ActiveRecord::Base
     can :read and can :read_outcomes
 
     # Active students
-    given { |user| self.available? && user && user.cached_current_enrollments.any?{|e| e.course_id == self.id && e.participating_student? } }
+    given { |user|
+      available?  && user &&
+        user.cached_current_enrollments.any? { |e|
+        e.course_id == id && e.participating_student?
+      }
+    }
     can :read and can :participate_as_student and can :read_grades and can :read_outcomes
 
     given { |user| (self.available? || self.completed?) && user && user.cached_not_ended_enrollments.any?{|e| e.course_id == self.id && e.participating_observer? && e.associated_user_id} }
