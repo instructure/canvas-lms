@@ -87,7 +87,7 @@ describe "profile" do
       add_email_link
 
       f('#communication_channels a[href="#register_sms_number"]').click
-      replace_content(f('#register_sms_number #communication_channel_address'), 'test@example.com')
+      replace_content(f('#register_sms_number #communication_channel_sms_email'), 'test@example.com')
       f('#register_sms_number button[type="submit"]').should be_displayed
       f('#communication_channels a[href="#register_email_address"]').click
       form = f("#register_email_address")

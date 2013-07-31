@@ -42,7 +42,7 @@ $(document).ready(function() {
     var view = "email";
     $("#communication_channels").show().dialog({
       title:  I18n.t('titles.register_communication', "Register Communication") ,
-      width: 430,
+      width: 600,
       resizable: false,
       modal: true,
       open: function() {
