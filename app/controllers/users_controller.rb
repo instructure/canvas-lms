@@ -492,7 +492,11 @@ class UsersController < ApplicationController
     render :json => @courses.map { |c|
       { :label => c.name, :id => c.id, :term => c.enrollment_term.name,
         :enrollment_start => c.enrollment_term.start_at,
-        :account_name => c.enrollment_term.root_account.name, :account_id => c.enrollment_term.root_account.id }
+        :account_name => c.enrollment_term.root_account.name,
+        :account_id => c.enrollment_term.root_account.id,
+        :start_at => datetime_string(c.start_at, :verbose, nil, true),
+        :end_at => datetime_string(c.conclude_at, :verbose, nil, true)
+      }
     }.to_json
   end
 
