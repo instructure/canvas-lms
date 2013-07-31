@@ -92,6 +92,9 @@ require [
                                 model: ConverterViewControl.getModel()
                                 collection: daySubCollection
                                 daySubstitution: daySubCollectionView
+                                oldStartDate: ENV.OLD_START_DATE
+                                oldEndDate: ENV.OLD_END_DATE
+
 
   ConverterViewControl.register
     key: 'moodle_converter'
@@ -110,6 +113,8 @@ require [
                                 model: ConverterViewControl.getModel()
                                 collection: daySubCollection
                                 daySubstitution: daySubCollectionView
+                                oldStartDate: ENV.OLD_START_DATE
+                                oldEndDate: ENV.OLD_END_DATE
 
   ConverterViewControl.register
     key: 'canvas_cartridge_importer'
@@ -124,6 +129,8 @@ require [
                                 model: ConverterViewControl.getModel()
                                 collection: daySubCollection
                                 daySubstitution: daySubCollectionView
+                                oldStartDate: ENV.OLD_START_DATE
+                                oldEndDate: ENV.OLD_END_DATE
 
   ConverterViewControl.register
     key: 'common_cartridge_importer'
@@ -142,6 +149,8 @@ require [
                                 model: ConverterViewControl.getModel()
                                 collection: daySubCollection
                                 daySubstitution: daySubCollectionView
+                                oldStartDate: ENV.OLD_START_DATE
+                                oldEndDate: ENV.OLD_END_DATE
 
   ConverterViewControl.register
     key: 'qti_converter'

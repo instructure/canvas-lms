@@ -25,6 +25,8 @@ require [
                                 model: new ContentMigration
                                 collection: daySubCollection
                                 daySubstitution: daySubCollectionView
+                                oldStartDate: ENV.OLD_START_DATE
+                                oldEndDate: ENV.OLD_END_DATE
 
   $('#date_shift').html dateShiftView.render().el
   dateShiftView.$oldStartDate.val ENV.OLD_START_DATE

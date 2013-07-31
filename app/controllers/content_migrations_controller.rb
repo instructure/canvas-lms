@@ -107,6 +107,8 @@ class ContentMigrationsController < ApplicationController
       js_env :QUESTION_BANKS => @context.assessment_question_banks.except(:include).select([:title, :id]).active
       js_env :COURSE_ID => @context.id
       js_env :CONTENT_MIGRATIONS => content_migration_json_hash
+      js_env(:OLD_START_DATE => datetime_string(@context.start_at, :verbose, nil, true))
+      js_env(:OLD_END_DATE => datetime_string(@context.conclude_at, :verbose, nil, true))
     end
   end
 

@@ -9,6 +9,8 @@ define [
     template: template
 
     @child 'daySubstitution', '#daySubstitution'
+    @optionProperty 'oldStartDate'
+    @optionProperty 'oldEndDate'
 
     els: 
       ".dateShiftContent"  : "$dateShiftContent"
@@ -37,6 +39,8 @@ define [
       @$oldEndDate.on 'change', (event) => @model.setDateShiftOptions property:'old_end_date', value: event.target.value
       @$newStartDate.on 'change', (event) => @model.setDateShiftOptions property: 'new_start_date', value: event.target.value
       @$newEndDate.on 'change', (event) => @model.setDateShiftOptions property: 'new_end_date', value: event.target.value
+      @$newStartDate.val @oldStartDate
+      @$newEndDate.val @oldEndDate
 
     # Toggle content. Show's content when checked 
     # and hides content when unchecked. Sets date_shift_options
@@ -59,3 +63,7 @@ define [
     createDaySubView: (event) => 
       event.preventDefault()
       @collection.add new DaySubModel
+
+    updateNewDates: (course) =>
+      @$oldStartDate.val course.start_at
+      @$oldEndDate.val course.end_at

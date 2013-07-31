@@ -19,12 +19,14 @@ define [
       'change [name=include_completed_courses]' : 'toggleConcludedCourses'
 
     render: ->
+      super
       dfd = @getManageableCourses()
+      @$el.disableWhileLoading dfd
       dfd.done (data) =>
         @courses = data
         @coursesByTerms = _.groupBy data, (course) -> course.term
         super
-      
+
     afterRender: ->
       @$courseSearchField.autocomplete 
         source: @manageableCourseUrl()
@@ -102,8 +104,11 @@ define [
     # @input int
     # @api private
 
-    setSourceCourseId: (id) -> @model.set('settings', {source_course_id: id})
-    
+    setSourceCourseId: (id) ->
+      @model.set('settings', {source_course_id: id})
+      if course = _.find(@courses, (c) -> c.id == id)
+        @trigger 'course_changed', course
+
     # Validates this form element. This validates method is a convention used 
     # for all sub views.
     # ie:
