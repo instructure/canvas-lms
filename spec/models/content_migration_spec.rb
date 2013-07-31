@@ -913,6 +913,19 @@ describe ContentMigration do
       @copy_to.discussion_topics.find_by_migration_id(mig_id(topic)).should_not be_nil
     end
 
+    it "should copy selected announcements" do
+      ann = @copy_from.announcements.create!(:message => "howdy", :title => "announcement title")
+
+      @cm.copy_options = {
+          :announcements => {mig_id(ann) => "1"},
+      }
+      @cm.save!
+
+      run_course_copy
+
+      @copy_to.announcements.find_by_migration_id(mig_id(ann)).should_not be_nil
+    end
+
     it "should not copy deleted assignment attached to topic" do
       topic = @copy_from.discussion_topics.build(:title => "topic")
       assignment = @copy_from.assignments.build(:submission_types => 'discussion_topic', :title => topic.title)

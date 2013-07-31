@@ -122,6 +122,18 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
 
     end
 
+    it "should show announcements separate from discussion topics" do
+      @migration.stubs(:read).returns({
+                                          'discussion_topics' => [
+                                              {'title' => 'a1', 'migration_id' => 'a1'},
+                                              {'title' => 'a2', 'migration_id' => 'a1', 'type' => 'announcement'},
+                                          ]}.to_json)
+      @formatter.get_content_list('discussion_topics').count.should == 1
+      @formatter.get_content_list('discussion_topics').first[:title].should == 'a1'
+      @formatter.get_content_list('announcements').count.should == 1
+      @formatter.get_content_list('announcements').first[:title].should == 'a2'
+    end
+
   end
 
   context "course copy" do
