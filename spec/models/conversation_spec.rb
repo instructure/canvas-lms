@@ -198,6 +198,18 @@ describe Conversation do
         @sender.conversations.first.reload.message_count.should eql 1
         @recipient.conversations.first.reload.message_count.should eql 2
       end
+
+      it "should decrement when deleting messages" do
+        root_convo = Conversation.initiate([@sender, @recipient], false)
+        root_convo.add_message(@sender, 'test')
+        msg = root_convo.add_message(@sender, 'test2')
+        @sender.conversations.first.message_count.should eql 2
+        @recipient.conversations.first.message_count.should eql 2
+
+        @sender.conversations.first.delete_messages(msg)
+        @sender.conversations.first.reload.message_count.should eql 1
+        @recipient.conversations.first.reload.message_count.should eql 2
+      end
     end
 
     it_should_behave_like "message counts"
@@ -484,6 +496,36 @@ describe Conversation do
       asset.expects(:conversation_message_data).returns({:created_at => Time.now.utc, :author => u1, :body => "asdf"})
       Conversation.update_all_for_asset asset, :update_message => true, :only_existing => true
       conversation.conversation_messages.size.should eql 1
+    end
+
+    it "should undelete visible soft-deleted message participants" do
+      u1 = user
+      u2 = user
+      conversation = Conversation.initiate([u1, u2], true)
+      # a message to keep the conversation visible to u2 after remove_messages on the asset's message
+      previous_message = conversation.add_message(u1, 'hello')
+      message = conversation.add_message(u1, 'test message')
+
+      # make u1's conversation invisible so they won't be updated.
+      u1.conversations.first.remove_messages(previous_message, message)
+      u1.conversations.should be_empty
+
+      # u2 only deletes the asset's message, but conversations is still visible
+      u2.conversations.first.remove_messages(message)
+      u2.conversations.first.messages.size.should eql 1
+
+      asset = Submission.new(:user => u1)
+      asset.expects(:conversation_groups).returns([[u1, u2]])
+      asset.expects(:lock!).returns(true)
+      asset.expects(:conversation_messages).at_least_once.returns([message])
+      asset.expects(:conversation_message_data).returns({:created_at => Time.now.utc, :author => u1, :body => "asdf"})
+
+      Conversation.update_all_for_asset asset, :update_message => true, :only_existing => true
+      conversation.conversation_messages.size.should eql 2
+      u1.conversations.should be_empty
+      # but u1 should still have the soft-deleted participant
+      u1.all_conversations.first.all_messages.size.should eql 2
+      u2.conversations.first.messages.size.should eql 2
     end
 
     context "sharding" do

@@ -45,7 +45,8 @@ class ConversationMessage < ActiveRecord::Base
     Shard.partition_by_shard(conversation_participants, lambda { |cp| cp.conversation_id }) do |shard_participants|
       base_conditions = "(#{shard_participants.map { |cp|
           "(conversation_id=#{cp.conversation_id} AND user_id=#{cp.user_id})" }.join(" OR ")
-        }) AND NOT generated"
+        }) AND NOT generated
+        AND (conversation_message_participants.workflow_state <> 'deleted' OR conversation_message_participants.workflow_state IS NULL)"
       base_conditions << sanitize_sql([" AND author_id = ?", author.id]) if author
 
       # limit it for non-postgres so we can reduce the amount of extra data we
@@ -132,7 +133,7 @@ class ConversationMessage < ActiveRecord::Base
 
   def delete_from_participants
     conversation.conversation_participants.each do |p|
-      p.remove_messages(self) # ensures cached stuff gets updated, etc.
+      p.delete_messages(self) # ensures cached stuff gets updated, etc.
     end
   end
 

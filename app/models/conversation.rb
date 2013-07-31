@@ -340,7 +340,7 @@ class Conversation < ActiveRecord::Base
   # * <tt>:tags</tt> - Array of tags for the message data.
   def add_message_to_participants(message, options = {})
     unless options[:new_message]
-      skip_users = message.conversation_message_participants.select(:user_id).all
+      skip_users = message.conversation_message_participants.active.select(:user_id).all
     end
 
     self.conversation_participants.with_each_shard do |cps|
@@ -356,7 +356,7 @@ class Conversation < ActiveRecord::Base
 
       if self.shard == Shard.current
         all_new_tags = options[:tags] || []
-        message_data = []
+        message_participant_data = []
         ConversationMessage.preload_latest(cps) if private? && !all_new_tags.present?
         cps.each do |cp|
           next unless cp.user
@@ -375,15 +375,22 @@ class Conversation < ActiveRecord::Base
               end
             end
           end
-          message_data << {
+          message_participant_data << {
             :conversation_message_id => message.id,
             :conversation_participant_id => cp.id,
             :user_id => cp.user_id,
-            :tags => message_tags ? serialized_tags(message_tags) : nil
+            :tags => message_tags ? serialized_tags(message_tags) : nil,
+            :workflow_state => 'active'
           }
         end
-
-        connection.bulk_insert "conversation_message_participants", message_data
+        # some of the participants we're about to insert may have been soft-deleted,
+        # so we'll hard-delete them before reinserting. It would probably be better
+        # to update them instead, but meh.
+        inserting_user_ids = message_participant_data.map { |d| d[:user_id] }
+        ConversationMessageParticipant.where(
+          :conversation_message_id => message.id, :user_id => inserting_user_ids
+          ).delete_all
+        connection.bulk_insert "conversation_message_participants", message_participant_data
       end
     end
   end
