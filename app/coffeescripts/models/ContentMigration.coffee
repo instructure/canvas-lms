@@ -107,7 +107,7 @@ define [
     # @api private
 
     addDaySubsitutions: (json) => 
-      collection = this.get('daySubCollection')
+      collection = @daySubCollection
       json.date_shift_options ||= {}
       json.date_shift_options.day_substitutions = collection.toJSON() if collection
 
