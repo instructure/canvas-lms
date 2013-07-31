@@ -98,7 +98,7 @@ describe "Default Account Reports" do
 
     it "should run the Student Competency report" do
 
-      parsed = ReportSpecHelper.run_report(@account,'student_assignment_outcome_map_csv',{},1)
+      parsed = ReportSpecHelper.run_report(@account, 'student_assignment_outcome_map_csv', {}, 1)
       parsed.length.should == 2
 
       parsed[0][0].should == @student.sortable_name
@@ -145,7 +145,7 @@ describe "Default Account Reports" do
 
       parameters = {}
       parameters["enrollment_term"] = @term1.id
-      parsed = ReportSpecHelper.run_report(@account,'student_assignment_outcome_map_csv',parameters)
+      parsed = ReportSpecHelper.run_report(@account, 'student_assignment_outcome_map_csv', parameters)
       parsed.length.should == 1
       parsed[0].should == ["No outcomes found"]
 
@@ -155,7 +155,7 @@ describe "Default Account Reports" do
       sub_account = Account.create(:parent_account => @account, :name => 'English')
 
       parameters = {}
-      parsed = ReportSpecHelper.run_report(sub_account,'student_assignment_outcome_map_csv',parameters)
+      parsed = ReportSpecHelper.run_report(sub_account, 'student_assignment_outcome_map_csv', parameters)
       parsed.length.should == 1
       parsed[0].should == ["No outcomes found"]
 
@@ -169,7 +169,7 @@ describe "Default Account Reports" do
       @outcome.save!
 
       param = {}
-      parsed = ReportSpecHelper.run_report(sub_account,'student_assignment_outcome_map_csv',param,1)
+      parsed = ReportSpecHelper.run_report(sub_account, 'student_assignment_outcome_map_csv', param, 1)
       parsed.length.should == 2
       parsed[0].should == [@student.sortable_name, @student.id.to_s, "user_sis_id_01", @assignment.title, @assignment.id.to_s,
                            @submission.submitted_at.iso8601, @submission.grade.to_s, @outcome.short_description,
@@ -189,7 +189,7 @@ describe "Default Account Reports" do
 
       param = {}
       param["include_deleted"] = true
-      parsed = ReportSpecHelper.run_report(@account,'student_assignment_outcome_map_csv',param,1)
+      parsed = ReportSpecHelper.run_report(@account, 'student_assignment_outcome_map_csv', param, 1)
       parsed.length.should == 2
 
       parsed[0].should == [@student.sortable_name, @student.id.to_s, "user_sis_id_01", @assignment.title, @assignment.id.to_s,
@@ -228,7 +228,7 @@ describe "Default Account Reports" do
       @user4 = user_with_managed_pseudonym(:active_all => true, :username => 'jason@donovan.com',
                                            :name => 'Jason Donovan', :account => @account,
                                            :sis_user_id => "user_sis_id_04")
-      @user5 = user_with_managed_pseudonym(:active_all => true,:username => 'john@smith.com',
+      @user5 = user_with_managed_pseudonym(:active_all => true, :username => 'john@smith.com',
                                            :name => 'John Smith', :sis_user_id => "user_sis_id_05",
                                            :account => @account)
 
@@ -241,7 +241,7 @@ describe "Default Account Reports" do
       @enrollment1 = @course1.enroll_user(@user1, 'StudentEnrollment', :enrollment_state => :active)
       @enrollment1.computed_final_score = 88
       @enrollment1.save!
-      @enrollment2 = @course1.enroll_user(@user2, 'StudentEnrollment', :enrollment_state => :active)
+      @enrollment2 = @course1.enroll_user(@user2, 'StudentEnrollment', :enrollment_state => :completed)
       @enrollment2.computed_final_score = 90
       @enrollment2.save!
       @enrollment3 = @course2.enroll_user(@user2, 'StudentEnrollment', :enrollment_state => :active)
@@ -253,89 +253,89 @@ describe "Default Account Reports" do
       @enrollment5 = @course2.enroll_user(@user4, 'StudentEnrollment', :enrollment_state => :active)
       @enrollment5.computed_final_score = 99
       @enrollment5.save!
-      @enrollment6 = @course1.enroll_user(@user5,'TeacherEnrollment',:enrollment_state => :active)
-      @enrollment7 = @course2.enroll_user(@user5,'TaEnrollment',:enrollment_state => :active)
+      @enrollment6 = @course1.enroll_user(@user5, 'TeacherEnrollment', :enrollment_state => :active)
+      @enrollment7 = @course2.enroll_user(@user5, 'TaEnrollment', :enrollment_state => :active)
     end
 
     it "should run grade export for a term" do
 
       parameters = {}
       parameters["enrollment_term"] = @term1.id
-      parsed = ReportSpecHelper.run_report(@account,'grade_export_csv',parameters,13)
+      parsed = ReportSpecHelper.run_report(@account, 'grade_export_csv', parameters, 13)
       parsed.length.should == 3
 
       parsed[0].should == ["John St. Clair", @user1.id.to_s, "user_sis_id_01", "English 101", @course1.id.to_s,
                            "SIS_COURSE_ID_1", "English 101", @course1.course_sections.first.id.to_s, nil, "Fall",
-                           @term1.id.to_s, "fall12", nil, "88"]
+			   @term1.id.to_s, "fall12", nil, "88", "active"]
       parsed[1].should == ["Michael Bolton", @user2.id.to_s, "user_sis_id_02", "English 101", @course1.id.to_s,
                            "SIS_COURSE_ID_1", "English 101", @course1.course_sections.first.id.to_s, nil, "Fall",
-                           @term1.id.to_s, "fall12", nil, "90"]
+			   @term1.id.to_s, "fall12", nil, "90", "concluded"]
       parsed[2].should == ["Rick Astley", @user3.id.to_s, "user_sis_id_03", "English 101", @course1.id.to_s,
                            "SIS_COURSE_ID_1", "English 101", @course1.course_sections.first.id.to_s, nil, "Fall",
-                           @term1.id.to_s, "fall12", nil, "97"]
+			   @term1.id.to_s, "fall12", nil, "97", "active"]
     end
 
     it "should run grade export for a term using sis_id" do
 
       parameters = {}
       parameters["enrollment_term"] = "sis_term_id:fall12"
-      parsed = ReportSpecHelper.run_report(@account,'grade_export_csv',parameters,13)
+      parsed = ReportSpecHelper.run_report(@account, 'grade_export_csv', parameters, 13)
 
       parsed[0].should == ["John St. Clair", @user1.id.to_s, "user_sis_id_01", "English 101", @course1.id.to_s,
                            "SIS_COURSE_ID_1", "English 101", @course1.course_sections.first.id.to_s, nil, "Fall",
-                           @term1.id.to_s, "fall12", nil, "88"]
+			   @term1.id.to_s, "fall12", nil, "88", "active"]
       parsed[1].should == ["Michael Bolton", @user2.id.to_s, "user_sis_id_02", "English 101", @course1.id.to_s,
                            "SIS_COURSE_ID_1", "English 101", @course1.course_sections.first.id.to_s, nil, "Fall",
-                           @term1.id.to_s, "fall12", nil, "90"]
+			   @term1.id.to_s, "fall12", nil, "90", "concluded"]
       parsed[2].should == ["Rick Astley", @user3.id.to_s, "user_sis_id_03", "English 101", @course1.id.to_s,
                            "SIS_COURSE_ID_1", "English 101", @course1.course_sections.first.id.to_s, nil, "Fall",
-                           @term1.id.to_s, "fall12", nil, "97"]
+			   @term1.id.to_s, "fall12", nil, "97", "active"]
     end
 
     it "should run grade export with no parameters" do
 
-      parsed = ReportSpecHelper.run_report(@account,'grade_export_csv',{},13)
+      parsed = ReportSpecHelper.run_report(@account, 'grade_export_csv', {}, 13)
       parsed.length.should == 5
 
       parsed[0].should == ["John St. Clair", @user1.id.to_s, "user_sis_id_01", "English 101", @course1.id.to_s,
                            "SIS_COURSE_ID_1", "English 101", @course1.course_sections.first.id.to_s, nil, "Fall",
-                           @term1.id.to_s, "fall12", nil, "88"]
+			   @term1.id.to_s, "fall12", nil, "88", "active"]
       parsed[1].should == ["Michael Bolton", @user2.id.to_s, "user_sis_id_02", "English 101", @course1.id.to_s,
                            "SIS_COURSE_ID_1", "English 101", @course1.course_sections.first.id.to_s, nil, "Fall",
-                           @term1.id.to_s, "fall12", nil, "90"]
+			   @term1.id.to_s, "fall12", nil, "90", "concluded"]
       parsed[2].should == ["Michael Bolton", @user2.id.to_s, "user_sis_id_02", "Math 101", @course2.id.to_s,
                            nil, "Math 101", @course2.course_sections.first.id.to_s, nil, "Default Term",
-                           @default_term.id.to_s, nil, nil, "93"]
+			   @default_term.id.to_s, nil, nil, "93", "active"]
       parsed[3].should == ["Rick Astley", @user3.id.to_s, "user_sis_id_03", "English 101", @course1.id.to_s,
                            "SIS_COURSE_ID_1", "English 101", @course1.course_sections.first.id.to_s, nil, "Fall",
-                           @term1.id.to_s, "fall12", nil, "97"]
+			   @term1.id.to_s, "fall12", nil, "97", "active"]
       parsed[4].should == ["Jason Donovan", @user4.id.to_s, "user_sis_id_04", "Math 101", @course2.id.to_s,
                            nil, "Math 101", @course2.course_sections.first.id.to_s, nil, "Default Term",
-                           @default_term.id.to_s, nil, nil, "99"]
+			   @default_term.id.to_s, nil, nil, "99", "active"]
     end
 
     it "should run grade export with empty string parameter" do
 
       parameters = {}
       parameters["enrollment_term"] = ""
-      parsed = ReportSpecHelper.run_report(@account,'grade_export_csv',parameters,13)
+      parsed = ReportSpecHelper.run_report(@account, 'grade_export_csv', parameters, 13)
       parsed.length.should == 5
 
       parsed[0].should == ["John St. Clair", @user1.id.to_s, "user_sis_id_01", "English 101", @course1.id.to_s,
                            "SIS_COURSE_ID_1", "English 101", @course1.course_sections.first.id.to_s, nil, "Fall",
-                           @term1.id.to_s, "fall12", nil, "88"]
+			   @term1.id.to_s, "fall12", nil, "88", "active"]
       parsed[1].should == ["Michael Bolton", @user2.id.to_s, "user_sis_id_02", "English 101", @course1.id.to_s,
                            "SIS_COURSE_ID_1", "English 101", @course1.course_sections.first.id.to_s, nil, "Fall",
-                           @term1.id.to_s, "fall12", nil, "90"]
+			   @term1.id.to_s, "fall12", nil, "90", "concluded"]
       parsed[2].should == ["Michael Bolton", @user2.id.to_s, "user_sis_id_02", "Math 101", @course2.id.to_s,
                            nil, "Math 101", @course2.course_sections.first.id.to_s, nil, "Default Term",
-                           @default_term.id.to_s, nil, nil, "93"]
+			   @default_term.id.to_s, nil, nil, "93", "active"]
       parsed[3].should == ["Rick Astley", @user3.id.to_s, "user_sis_id_03", "English 101", @course1.id.to_s,
                            "SIS_COURSE_ID_1", "English 101", @course1.course_sections.first.id.to_s, nil, "Fall",
-                           @term1.id.to_s, "fall12", nil, "97"]
+			   @term1.id.to_s, "fall12", nil, "97", "active"]
       parsed[4].should == ["Jason Donovan", @user4.id.to_s, "user_sis_id_04", "Math 101", @course2.id.to_s,
                            nil, "Math 101", @course2.course_sections.first.id.to_s, nil, "Default Term",
-                           @default_term.id.to_s, nil, nil, "99"]
+			   @default_term.id.to_s, nil, nil, "99", "active"]
     end
 
     it "should run grade export with deleted users" do
@@ -345,24 +345,24 @@ describe "Default Account Reports" do
 
       parameters = {}
       parameters["include_deleted"] = true
-      parsed = ReportSpecHelper.run_report(@account,'grade_export_csv',parameters,13)
+      parsed = ReportSpecHelper.run_report(@account, 'grade_export_csv', parameters, 13)
       parsed.length.should == 5
 
       parsed[0].should == ["John St. Clair", @user1.id.to_s, "user_sis_id_01", "English 101", @course1.id.to_s,
                            "SIS_COURSE_ID_1", "English 101", @course1.course_sections.first.id.to_s, nil, "Fall",
-                           @term1.id.to_s, "fall12", nil, "88"]
+			   @term1.id.to_s, "fall12", nil, "88", "deleted"]
       parsed[1].should == ["Michael Bolton", @user2.id.to_s, "user_sis_id_02", "English 101", @course1.id.to_s,
                            "SIS_COURSE_ID_1", "English 101", @course1.course_sections.first.id.to_s, nil, "Fall",
-                           @term1.id.to_s, "fall12", nil, "90"]
+			   @term1.id.to_s, "fall12", nil, "90", "concluded"]
       parsed[2].should == ["Michael Bolton", @user2.id.to_s, "user_sis_id_02", "Math 101", @course2.id.to_s,
                            nil, "Math 101", @course2.course_sections.first.id.to_s, nil, "Default Term",
-                           @default_term.id.to_s, nil, nil, "93"]
+			   @default_term.id.to_s, nil, nil, "93", "deleted"]
       parsed[3].should == ["Rick Astley", @user3.id.to_s, "user_sis_id_03", "English 101", @course1.id.to_s,
                            "SIS_COURSE_ID_1", "English 101", @course1.course_sections.first.id.to_s, nil, "Fall",
-                           @term1.id.to_s, "fall12", nil, "97"]
+			   @term1.id.to_s, "fall12", nil, "97", "active"]
       parsed[4].should == ["Jason Donovan", @user4.id.to_s, "user_sis_id_04", "Math 101", @course2.id.to_s,
                            nil, "Math 101", @course2.course_sections.first.id.to_s, nil, "Default Term",
-                           @default_term.id.to_s, nil, nil, "99"]
+			   @default_term.id.to_s, nil, nil, "99", "deleted"]
     end
 
     it "should run grade export on a sub account" do
@@ -371,15 +371,15 @@ describe "Default Account Reports" do
       @course2.save!
 
       parameters = {}
-      parsed = ReportSpecHelper.run_report(sub_account,'grade_export_csv',parameters,13)
+      parsed = ReportSpecHelper.run_report(sub_account, 'grade_export_csv', parameters, 13)
       parsed.length.should == 2
 
       parsed[0].should == ["Michael Bolton", @user2.id.to_s, "user_sis_id_02", "Math 101", @course2.id.to_s,
                            nil, "Math 101", @course2.course_sections.first.id.to_s, nil, "Default Term",
-                           @default_term.id.to_s, nil, nil, "93"]
+			   @default_term.id.to_s, nil, nil, "93", "active"]
       parsed[1].should == ["Jason Donovan", @user4.id.to_s, "user_sis_id_04", "Math 101", @course2.id.to_s,
                            nil, "Math 101", @course2.course_sections.first.id.to_s, nil, "Default Term",
-                           @default_term.id.to_s, nil, nil, "99"]
+			   @default_term.id.to_s, nil, nil, "99", "active"]
     end
   end
 

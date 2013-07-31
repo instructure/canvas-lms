@@ -347,7 +347,7 @@ module Canvas::AccountReports
                        WHEN enrollments.workflow_state = 'active' THEN 'active'
                        WHEN enrollments.workflow_state = 'completed' THEN 'concluded'
                        WHEN enrollments.workflow_state = 'deleted' THEN 'deleted'
-                       WHEN courses.workflow_state = 'rejected' THEN 'rejected' END AS enrol_state").
+		       WHEN enrollments.workflow_state = 'rejected' THEN 'rejected' END AS enroll_state").
           joins("INNER JOIN course_sections cs ON cs.id = enrollments.course_section_id
                  INNER JOIN courses ON courses.id = cs.course_id
                  INNER JOIN pseudonyms ON pseudonyms.user_id=enrollments.user_id
@@ -395,7 +395,7 @@ module Canvas::AccountReports
             row << e.sis_role
             row << e.course_section_id unless @sis_format
             row << e.course_section_sis_id
-            row << e.enrol_state
+	    row << e.enroll_state
             row << e.associated_user_id unless @sis_format
             row << e.ob_sis_id
             csv << row
