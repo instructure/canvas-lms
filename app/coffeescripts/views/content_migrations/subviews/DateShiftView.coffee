@@ -50,6 +50,7 @@ define [
     toggleContent: (event) => 
       dateShift = $(event.target).is(':checked')
       @model.setDateShiftOptions property: 'shift_dates', value: dateShift
+      @model.daySubCollection = if dateShift then @collection else null
       @$dateShiftContent.toggle()
 
     # Display's a new DaySubstitutionView by adding it to the collection. 

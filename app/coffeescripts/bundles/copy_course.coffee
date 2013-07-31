@@ -23,7 +23,6 @@ require [
 
   dateShiftView = new DateShiftView
                                 model: new ContentMigration
-                                           daySubCollection: daySubCollection
                                 collection: daySubCollection
                                 daySubstitution: daySubCollectionView
 
