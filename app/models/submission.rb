@@ -91,7 +91,7 @@ class Submission < ActiveRecord::Base
 
   attr_accessor :saved_by
   before_save :update_if_pending
-  before_save :validate_single_submission, :validate_enrollment, :infer_values, :set_context_code
+  before_save :validate_single_submission, :infer_values, :set_context_code
   before_save :prep_for_submitting_to_turnitin
   before_save :check_url_changed
   before_create :cache_due_date
@@ -701,16 +701,6 @@ class Submission < ActiveRecord::Base
     true
   end
   private :validate_single_submission
-
-  def validate_enrollment
-    begin
-      assignment.context.includes_student?(user)
-      true
-    rescue => e
-      raise ArgumentError, "Cannot submit to an assignment when the student is not properly enrolled."
-    end
-  end
-  private :validate_enrollment
 
   include Workflow
 

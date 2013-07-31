@@ -727,7 +727,7 @@ describe DiscussionTopic do
     end
 
     def build_submitted_assignment
-      student_in_course(:active_all => true)
+      student_in_course(name: 'student in course', active_all: true)
       @assignment = @course.assignments.create!(:title => "some discussion assignment")
       @assignment.submission_types = 'discussion_topic'
       @assignment.save!
@@ -740,7 +740,7 @@ describe DiscussionTopic do
     end
 
     it "should not re-flag graded discussion as needs grading if student make another comment" do
-      student_in_course(:name => 'student in course')
+      student_in_course(name: 'student in course', active_all: true)
       assignment = @course.assignments.create(:title => "discussion assignment", :points_possible => 20)
       topic = @course.discussion_topics.create!(:title => 'discussion topic 1', :message => "this is a new discussion topic", :assignment => assignment)
       topic.discussion_entries.create!(:message => "student message for grading", :user => @student)

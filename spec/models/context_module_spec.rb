@@ -537,6 +537,7 @@ describe ContextModule do
     it "should mark progression completed for min_score on discussion topic assignment" do
       asmnt = assignment_model(:submission_types => "discussion_topic", :points_possible => 10)
       topic = asmnt.discussion_topic
+      @course.offer
       course_with_student(:active_all => true, :course => @course)
       mod = @course.context_modules.create!(:name => "some module")
       

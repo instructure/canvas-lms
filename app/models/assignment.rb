@@ -764,9 +764,10 @@ class Assignment < ActiveRecord::Base
     given { |user, session| self.cached_context_grants_right?(user, session, :read) && self.published? }
     can :read and can :read_own_submission
 
-    given { |user, session| self.submittable_type? &&
-      self.cached_context_grants_right?(user, session, :participate_as_student) &&
-      !self.locked_for?(user)
+    given { |user, session|
+      (submittable_type? || submission_types == "discussion_topic") &&
+      cached_context_grants_right?(user, session, :participate_as_student) &&
+      !locked_for?(user)
     }
     can :submit and can :attach_submission_comment_files
 
@@ -1008,7 +1009,6 @@ class Assignment < ActiveRecord::Base
       opts.delete(k) unless [:body, :url, :attachments, :submission_type, :comment, :media_comment_id, :media_comment_type, :group_comment].include?(k.to_sym)
     }
     raise "Student Required" unless original_student
-    raise "User must be enrolled in the course as a student to submit homework" unless context.student_enrollments.except(:includes).where(:user_id => original_student).exists?
     comment = opts.delete(:comment)
     group_comment = opts.delete(:group_comment)
     group, students = group_students(original_student)
