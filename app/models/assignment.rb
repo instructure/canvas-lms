@@ -606,7 +606,7 @@ class Assignment < ActiveRecord::Base
     when %r{%$}
       # interpret as a percentage
       percentage = grade.to_f / 100.0
-      (points_possible * percentage * 100.0).round / 100.0
+      (points_possible.to_f * percentage * 100.0).round / 100.0
     when %r{[\d\.]+}
       # interpret as a numerical score
       (grade.to_f * 100.0).round / 100.0

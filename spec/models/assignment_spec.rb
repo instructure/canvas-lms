@@ -390,6 +390,10 @@ describe Assignment do
     it "should return nil when no grade was entered and assignment uses a grading standard (letter grade)" do
       Assignment.interpret_grade("", 20, GradingStandard.default_grading_standard).should be_nil
     end
+
+    it "should allow grading an assignment with nil points_possible as percent" do
+      Assignment.interpret_grade("100%", nil).should == 0
+    end
   end
 
   it "should create a new version for each submission" do
