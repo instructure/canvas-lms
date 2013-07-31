@@ -42,6 +42,7 @@ module Canvas::Migration::Helpers
       course_data = Rails.cache.fetch(['migration_selective_cache', @migration.shard, @migration].cache_key, :expires_in => 5.minutes) do
         att = @migration.overview_attachment.open
         data = JSON.parse(att.read)
+        data = separate_announcements(data)
         data['attachments'] ||= data['file_map'] ? data['file_map'].values : nil
         data['quizzes'] ||= data['assessments']
         data['context_modules'] ||= data['modules']
@@ -253,6 +254,17 @@ module Canvas::Migration::Helpers
       end
     end
 
+    def separate_announcements(course_data)
+      return course_data unless course_data['discussion_topics']
 
+      announcements, topics = course_data['discussion_topics'].partition{|topic_hash| topic_hash['type'] == 'announcement'}
+
+      if announcements.any?
+        course_data['announcements'] ||= []
+        course_data['announcements'] += announcements
+        course_data['discussion_topics'] = topics
+      end
+      course_data
+    end
   end
 end
