@@ -840,6 +840,7 @@ class ApplicationController < ActionController::Base
   def render_rescue_action(exception, error, status, status_code)
     clear_crumbs
     @headers = nil
+    load_account unless @domain_root_account
     session[:last_error_id] = error.id rescue nil
     if request.xhr? || request.format == :text
       render :status => status_code, :json => {
