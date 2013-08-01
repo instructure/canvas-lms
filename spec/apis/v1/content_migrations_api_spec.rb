@@ -58,6 +58,12 @@ describe ContentMigrationsController, :type => :integration do
       course_with_student_logged_in(:course => @course, :active_all => true)
       api_call(:get, @migration_url, @params, {}, {}, :expected_status => 401)
     end
+
+    it "should create the course root folder" do
+      @course.folders.should be_empty
+      api_call(:get, @migration_url, @params)
+      @course.reload.folders.should_not be_empty
+    end
   end
 
   describe 'show' do
