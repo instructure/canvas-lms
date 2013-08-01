@@ -32,7 +32,6 @@ require [
 
   assignmentGroups = new AssignmentGroupCollection [],
     course: course
-    modules: ENV.MODULES
     params:
       include: ["assignments"]
       override_assignment_dates: !ENV.PERMISSIONS.manage

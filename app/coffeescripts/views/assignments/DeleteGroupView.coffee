@@ -13,6 +13,10 @@ define [
       width: 500
       height: 275
 
+    els:
+      '.assignment_count': '$assignmentCount'
+      '.group_select': '$groupSelect'
+
     events: _.extend({}, @::events,
       'click .dialog_closer': 'close'
       'click .delete_group': 'destroy'
@@ -23,6 +27,12 @@ define [
     wrapperTemplate: wrapper
 
     @optionProperty 'assignments'
+
+    initialize: ->
+      super
+      @assignments.on 'add remove', @updateAssignmentCount
+      @model.collection.on 'add', @addToGroupOptions
+      @model.collection.on 'remove', @removeFromGroupOptions
 
     toJSON: ->
       data = super
@@ -36,6 +46,21 @@ define [
         groups: groups_json
         label_id: data.id
       })
+
+    updateAssignmentCount: =>
+      @$assignmentCount.text(@assignments.length)
+
+    addToGroupOptions: (model) =>
+      id = model.get('id')
+      $opt = $('<option>')
+      $opt.val(id)
+      $opt.addClass("ag_#{id}")
+      $opt.text(model.get('name'))
+      @$groupSelect.append $opt
+
+    removeFromGroupOptions: (model) =>
+      id = model.get('id')
+      @$groupSelect.find("move_to_ag_#{id}").remove()
 
     destroy: ->
       data = @getFormData()

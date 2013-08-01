@@ -351,6 +351,52 @@ describe "assignment groups" do
       f(selector).should have_attribute('aria-expanded', 'false')
     end
 
+    it "should update delete dialog properly" do
+      @ag2 = @course.assignment_groups.create!(:name => "2nd Group")
+      @course.assignments.create(:name => "Test assignment", :assignment_group => @ag2)
+      refresh_page
+      wait_for_ajaximations
+
+      # open the delete dialog the first time
+      f("#assignment_group_#{@ag2.id} .al-trigger").click
+      f("#assignment_group_#{@ag2.id} .delete_group").click
+      wait_for_animations
+
+      # check assignment count and move to options
+      fj('.assignment_count:visible').text.should == "1"
+      ffj('.group_select:visible option').count.should == 2 # default + ag1
+      fj('.cancel_button:visible').click
+
+      # now create a new assignment
+      f("#assignment_group_#{@ag2.id} .add_assignment").click
+      wait_for_ajaximations
+
+      replace_content(f("#ag_#{@ag2.id}_assignment_name"), "Do this")
+      replace_content(f("#ag_#{@ag2.id}_assignment_points"), "13")
+      fj('.create_assignment:visible').click
+      wait_for_ajaximations
+
+      # and a new group
+      f('#content #addGroup').click
+      wait_for_ajaximations
+
+      replace_content(f('#ag_new_name'), "Assignment Group 1")
+      fj('.create_group:visible').click
+      wait_for_ajaximations
+
+      # and then open the delete dialog again and see if options are updated
+      keep_trying_until do
+        f("#assignment_group_#{@ag2.id} .al-trigger").click
+        f("#assignment_group_#{@ag2.id} .delete_group").click
+        wait_for_animations
+        fj('.assignment_count:visible').present?
+      end
+
+      fj('.assignment_count:visible').text.should == "2"
+      ffj('.group_select:visible option').count.should == 3 # default + ag1 + ag3
+      fj('.cancel_button:visible').click
+    end
+
     context "modules" do
       before do
         @module = @course.context_modules.create!(:name => "module 1")

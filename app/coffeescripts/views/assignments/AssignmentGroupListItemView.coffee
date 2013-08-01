@@ -40,11 +40,11 @@ define [
     render: ->
       @createAssignmentView.remove() if @createAssignmentView
       @editGroupView.remove() if @editGroupView
+      @deleteGroupView.remove() if @deleteGroupView
       super
 
     afterRender: ->
       # need to hide child views and set trigger manually
-
       if @createAssignmentView
         @createAssignmentView.hide()
         @createAssignmentView.setTrigger @$addAssignmentButton
@@ -57,23 +57,23 @@ define [
         @deleteGroupView.hide()
         @deleteGroupView.setTrigger @$deleteGroupButton
 
-      #listen for events that cause auto-expanding
-      @collection.on('add', => if !@isExpanded() then @toggle() )
-
     initialize: ->
-      @collection = new AssignmentCollection @model.get('assignments')
-      @collection.on('add remove', @refreshDeleteDialog)
-      modules = @model.collection.modules
-      @collection.each (assign) ->
-        assign.doNotParse()
-        #set modules
-        assign.modules modules[assign.id]
+      @initializeCollection()
       super
+      @initializeChildViews()
 
       # we need the following line in order to access this view later
       @model.groupView = @
       @initCache()
 
+    initializeCollection: ->
+      @collection = new AssignmentCollection @model.get('assignments')
+      @collection.each (assign) ->
+        assign.doNotParse()
+
+      @collection.on 'add', @expand
+
+    initializeChildViews: ->
       @editGroupView = false
       @createAssignmentView = false
       @deleteGroupView = false
@@ -85,15 +85,6 @@ define [
         @createAssignmentView = new CreateAssignmentView
           assignmentGroup: @model
           collection: @collection
-        @deleteGroupView = new DeleteGroupView
-          model: @model
-          assignments: @collection
-
-    # this is the only way to get the number of assignments to update properly
-    # when an assignment is created in a new assignment group (before refreshing the page)
-    refreshDeleteDialog: =>
-      if @deleteGroupView
-        @deleteGroupView.remove()
         @deleteGroupView = new DeleteGroupView
           model: @model
           assignments: @collection
@@ -132,6 +123,9 @@ define [
 
     isExpanded: ->
       @cache.get(@cacheKey())
+
+    expand: =>
+      @toggle if !@isExpanded()
 
     toggle: (setTo=false) ->
       @$el.find('.element_toggler').click()

@@ -38,12 +38,13 @@ define [
 
     toJSON: ->
       data = @model.toView()
-      if data.modules
-        moduleName = data.modules[0]
-        has_modules = if data.modules.length > 0 then true else false
-        joinedNames = data.modules.join(",")
+      if modules = ENV.MODULES[data.id]
+        moduleName = modules[0]
+        has_modules = if modules.length > 0 then true else false
+        joinedNames = modules.join(",")
         _.extend data, {
-          module_count: data.modules.length
+          modules: modules
+          module_count: modules.length
           module_name: moduleName
           has_modules: has_modules
           joined_names: joinedNames
