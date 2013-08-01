@@ -585,7 +585,6 @@ FakeRails3Routes.draw do
     match 'courses.:format' => 'accounts#courses', :as => :courses_formatted
     match 'courses/:id' => 'accounts#courses_redirect', :as => :courses_redirect
     match 'user_notes' => 'user_notes#user_notes', :as => :user_notes
-    match 'run_report' => 'accounts#run_report', :as => :run_report
     resources :alerts
     resources :question_banks do
       match 'bookmark' => 'question_banks#bookmark', :as => :bookmark
@@ -1060,7 +1059,7 @@ FakeRails3Routes.draw do
       get 'accounts/:account_id/reports/:report', :action => :index
       get 'accounts/:account_id/reports', :action => :available_reports
       get 'accounts/:account_id/reports/:report/:id', :action => :show
-      post 'accounts/:account_id/reports/:report', :action => :create
+      post 'accounts/:account_id/reports/:report', :action => :create, :path_name => 'account_create_report'
       delete 'accounts/:account_id/reports/:report/:id', :action => :destroy
     end
 

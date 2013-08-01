@@ -608,19 +608,6 @@ class AccountsController < ApplicationController
     end
   end
 
-  def run_report
-    if authorized_action(@context, @current_user, :read_reports)
-      student_report = AccountReport.new(:user=>@current_user, :account=>@account, :report_type=>params[:report_type], :parameters=>params[:parameters])
-      student_report.workflow_state = :running
-      student_report.progress = 0
-      student_report.save
-      student_report.run_report
-      respond_to do |format|
-        format.json {render :json => {:student_report_id=>student_report.id, :success=>true}.to_json}
-      end
-    end
-  end
-
   def validated_turnitin_host(input_host)
     if input_host.present?
       _, turnitin_uri = CustomValidations.validate_url(input_host)
