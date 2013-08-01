@@ -571,7 +571,12 @@ describe ConversationsController, :type => :integration do
             p.delete("avatar_url")
           }
         }
-        json.each {|c| c["messages"].each {|m| m["participating_user_ids"].sort!}}
+        json.each do |c|
+          c["messages"].each do |m|
+            m["participating_user_ids"].sort!
+            m["forwarded_messages"].each {|fm| fm["participating_user_ids"].sort!}
+          end
+        end
         conversation = @me.all_conversations.order("last_message_at DESC, conversation_id DESC").first
         json.should eql [
           {
