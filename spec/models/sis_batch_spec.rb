@@ -375,4 +375,25 @@ s2,test_1,section2,active},
       @section2.reload.should_not be_deleted
     end
   end
+
+  it "should limit the # of warnings/errors" do
+    Setting.set('sis_batch_max_messages', '3')
+    batch = SisBatch.create! # doesn't error when nil
+    batch.processing_warnings = [ ['testfile.csv', 'test warning'] ] * 3
+    batch.processing_errors = [ ['testfile.csv', 'test error'] ] * 3
+    batch.save!
+    batch.reload
+    batch.processing_warnings.size.should == 3
+    batch.processing_warnings.last.should == ['testfile.csv', 'test warning']
+    batch.processing_errors.size.should == 3
+    batch.processing_errors.last.should == ['testfile.csv', 'test error']
+    batch.processing_warnings = [ ['testfile.csv', 'test warning'] ] * 5
+    batch.processing_errors = [ ['testfile.csv', 'test error'] ] * 5
+    batch.save!
+    batch.reload
+    batch.processing_warnings.size.should == 3
+    batch.processing_warnings.last.should == ['', 'There were 3 more warnings']
+    batch.processing_errors.size.should == 3
+    batch.processing_errors.last.should == ['', 'There were 3 more errors']
+  end
 end
