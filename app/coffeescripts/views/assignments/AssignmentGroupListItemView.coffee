@@ -97,9 +97,10 @@ define [
       showRules = count != 0 and ENV.PERMISSIONS.manage
 
       data = @model.toJSON()
-      showWeight = @model.collection.course?.get('apply_assignment_group_weights')
+      showWeight = @model.collection.course?.get('apply_assignment_group_weights') and data.group_weight?
 
       attributes = _.extend(data, {
+        hasAssignments: @model.get('assignments')?.length > 0
         showRules: showRules
         rulesText: I18n.t('rules_text', "Rule", { count: count })
         showWeight: showWeight
@@ -128,7 +129,7 @@ define [
       @cache.set(@cacheKey(), setTo)
 
     cacheKey: ->
-      "ag_#{@model.id}_expanded"
+      "ag_#{@model.get('id')}_expanded"
 
     toggleArrow: (ev) ->
       arrow = $(ev.currentTarget).children('i')

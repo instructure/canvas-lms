@@ -62,7 +62,19 @@
   </h2>
 
   <div id="assignment_group_{{id}}_assignments" >
-    <ul class="collectionViewItems ig-list"></ul>
+    {{#if hasAssignments}}
+      <ul class="collectionViewItems ig-list"></ul>
+    {{else}}
+      <ul class="ig-list">
+        <li>
+          <div class="ig-row">
+            <span class="ig-title ellipses">
+              {{#t "no_assignments"}}No assignments{{/t}}
+            </span>
+          </div>
+        </li>
+      </ul>
+    {{/if}}
   </div>
 
   {{#if ENV.PERMISSIONS.manage}}

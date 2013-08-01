@@ -12,6 +12,7 @@ define [
     @child 'inputFilterView', '[data-view=inputFilter]'
     @child 'createGroupView', '[data-view=createGroup]'
     @child 'assignmentSettingsView', '[data-view=assignmentSettings]'
+    @child 'showByView', '[data-view=showBy]'
 
     els:
       '#addGroup': '$addGroupButton'
