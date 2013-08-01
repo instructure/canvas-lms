@@ -92,6 +92,8 @@ class ContentMigrationsController < ApplicationController
   def index
     return unless authorized_action(@context, @current_user, :manage_content)
 
+    Folder.root_folders(@context) # ensure course root folder exists so file imports can run
+
     @migrations = Api.paginate(@context.content_migrations.order("id DESC"), self, api_v1_course_content_migration_list_url(@context))
     content_migration_json_hash = content_migrations_json(@migrations, @current_user, session)
 
