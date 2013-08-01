@@ -277,14 +277,15 @@ describe ActiveRecord::Base do
       u = User.create
       User.cache do
         User.first
-        query_cache = User.connection.instance_variable_get(:@query_cache)
-        keys = query_cache.keys
-        keys.should be_present
+        User.connection.expects(:select).never
+        User.first
+        User.connection.unstub(:select)
 
         u2 = User.new
         u2.id = u.id
         lambda{ u2.save! }.should raise_error(ActiveRecord::Base::UniqueConstraintViolation)
-        (query_cache.keys & keys).should eql []
+        User.connection.expects(:select).once.returns([])
+        User.first
       end
     end
   end
