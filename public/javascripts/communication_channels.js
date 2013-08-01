@@ -180,7 +180,7 @@ $(document).ready(function() {
         title: confirm_title,
         width: 350,
         open: function() {
-          $(this).find(":text:first").focus().select();
+          $(this).closest('.ui-dialog').focus()
         }
       });
     }
