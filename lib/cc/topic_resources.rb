@@ -20,7 +20,11 @@ module CC
     
     def add_topics
       @course.discussion_topics.active.each do |topic|
-        next unless export_object?(topic) || export_object?(topic.assignment) || (topic.is_announcement && export_object?(topic, 'announcements'))
+        if topic.is_announcement
+          next unless export_object?(topic, 'announcements')
+        else
+          next unless export_object?(topic) || export_object?(topic.assignment)
+        end
 
         title = topic.title rescue I18n.t('course_exports.unknown_titles.topic', "Unknown topic")
 

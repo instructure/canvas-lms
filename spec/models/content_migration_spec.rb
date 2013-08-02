@@ -399,7 +399,8 @@ describe ContentMigration do
 
       # only select one of each type
       @cm.copy_options = {
-              :discussion_topics => {mig_id(dt1) => "1", mig_id(dt3) => "1"},
+              :discussion_topics => {mig_id(dt1) => "1"},
+              :announcements => {mig_id(dt3) => "1"},
               :context_modules => {mig_id(cm) => "1", mig_id(cm2) => "0"},
               :attachments => {mig_id(att) => "1", mig_id(att2) => "0"},
               :wiki_pages => {mig_id(wiki) => "1", mig_id(wiki2) => "0"},
@@ -924,6 +925,19 @@ describe ContentMigration do
       run_course_copy
 
       @copy_to.announcements.find_by_migration_id(mig_id(ann)).should_not be_nil
+    end
+
+    it "should not copy announcements if not selected" do
+      ann = @copy_from.announcements.create!(:message => "howdy", :title => "announcement title")
+
+      @cm.copy_options = {
+          :all_discussion_topics => "1", :all_announcements => "0"
+      }
+      @cm.save!
+
+      run_course_copy
+
+      @copy_to.announcements.find_by_migration_id(mig_id(ann)).should be_nil
     end
 
     it "should not copy deleted assignment attached to topic" do
