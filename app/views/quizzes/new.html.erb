@@ -41,14 +41,15 @@
 
     <div class="header-group-right">
       <div class="admin-links">
-        <a class="al-trigger btn">
-          <span class="screenreader-only">Manage</span>
-          <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
+        <a class="al-trigger btn" role="button" aria-haspopup="true" aria-owns="manage-toolbar" tabindex="-1">
+          <i class="icon-settings"></i>
+          <i class="icon-mini-arrow-down"></i>
+          <span class="screenreader-only"><%= t('manage', 'Manage') %></span>
         </a>
-        <ul class="al-options">
+        <ul id="manage-toolbar" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false">
           <% if @assignment %>
-          <li>
-            <a href="#" rel="<%= context_url(@context, :context_assignment_rubric_url, @assignment.id) %>" class="show_rubric_link">
+          <li role="presentation">
+            <a href="#" rel="<%= context_url(@context, :context_assignment_rubric_url, @assignment.id) %>" class="show_rubric_link" tabindex="-1" role="menuitem">
               <i class="icon-rubric"></i>
               <%= t('links.show_assignment_rubric', "Show Rubric") %>
             </a>
@@ -56,8 +57,8 @@
           <a href="<%= context_url(@context, :context_rubrics_url) %>" class="icon-rubric" id="add_rubric_url" style="display:none">&nbsp;</a>
 
           <% end %>
-          <li>
-            <a href="<%= context_url(@context, :context_quiz_url, @quiz) %>" class="delete_quiz_link">
+          <li role="presentation">
+            <a href="<%= context_url(@context, :context_quiz_url, @quiz) %>" class="delete_quiz_link" tabindex="-1" role="menuitem">
               <i class="icon-trash"></i>
               <%= t('titles.delete', "Delete") %>
             </a>
@@ -97,15 +98,15 @@
     <div class="span6">
       <div class="admin-link-hover-area">
         <div class="admin-links">
-          <a class="al-trigger btn">
-            <span class="screenreader-only">Manage</span>
+          <a class="al-trigger btn" role="button" aria-haspopup="true" aria-owns="manage-toolbar" tabindex="-1">
             <i class="icon-settings"></i>
             <i class="icon-mini-arrow-down"></i>
+            <span class="screenreader-only"><%= t('manage', 'Manage') %></span>
           </a>
-          <ul class="al-options">
+          <ul id="manage-toolbar" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false">
             <% if @assignment %>
-              <li>
-                <a href="#" rel="<%= context_url(@context, :context_assignment_rubric_url, @assignment.id) %>" class="show_rubric_link">
+              <li role="presentation">
+                <a href="#" rel="<%= context_url(@context, :context_assignment_rubric_url, @assignment.id) %>" class="show_rubric_link" tabindex="-1" role="menuitem">
                   <i class="icon-rubric"></i>
                   <%= t('links.show_assignment_rubric', "Show Rubric") %>
                 </a>
@@ -113,8 +114,8 @@
               <a href="<%= context_url(@context, :context_rubrics_url) %>" class="icon-rubric" id="add_rubric_url" style="display:none">&nbsp;</a>
             <% end %>
 
-            <li>
-              <a href="<%= context_url(@context, :context_quiz_url, @quiz) %>" class="delete_quiz_link">
+            <li role="presentation">
+              <a href="<%= context_url(@context, :context_quiz_url, @quiz) %>" class="delete_quiz_link" tabindex="-1" role="menuitem">
                 <i class="icon-trash"></i>
                 <%= t('titles.delete', "Delete") %>
               </a>
