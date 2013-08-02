@@ -246,6 +246,11 @@ class Enrollment < ActiveRecord::Base
     types_with_indefinite_article[type] || types_with_indefinite_article['StudentEnrollment']
   end
 
+  def reload(options = nil)
+    @enrollment_dates = nil
+    super
+  end
+
   def should_update_user_account_association?
     self.new_record? || self.course_id_changed? || self.course_section_id_changed? || self.root_account_id_changed?
   end
@@ -543,7 +548,8 @@ class Enrollment < ActiveRecord::Base
   end
 
   def enrollment_dates
-    Canvas::Builders::EnrollmentDateBuilder.build(self)
+    Canvas::Builders::EnrollmentDateBuilder.preload([self]) unless @enrollment_dates
+    @enrollment_dates
   end
 
   def state_based_on_date
