@@ -118,8 +118,6 @@ module Canvas::AccountReports
       students = add_course_sub_account_scope(students, 'c')
       students = add_term_scope(students, 'c')
 
-      total = students.count
-      i = 0
       host = root_account.domain
       headers = ['student name', 'student id', 'student sis id',
                  'assignment title', 'assignment id', 'submission date',
@@ -133,6 +131,8 @@ module Canvas::AccountReports
       CSV.open(filename, "w") do |csv|
         csv << headers
         Shackles.activate(:slave) do
+          @total = students.count
+          i = 0
           students.find_each do |row|
             row['assignment url'] =
               "https://#{host}" +
@@ -140,13 +140,16 @@ module Canvas::AccountReports
                 "/assignments/#{row['assignment id']}"
             row['submission date']=default_timezone_format(row['submission date'])
             csv << headers.map { |h| row[h] }
+
             if i % 5 == 0
-              @account_report.update_attribute(:progress, (i.to_f/total)*100)
+              Shackles.activate(:master) do
+                @account_report.update_attribute(:progress, (i.to_f/@total)*100)
+              end
             end
             i += 1
           end
         end
-        csv << ['No outcomes found'] if total == 0
+        csv << ['No outcomes found'] if @total == 0
       end
 
       send_report(filename)
