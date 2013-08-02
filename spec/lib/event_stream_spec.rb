@@ -127,7 +127,8 @@ describe EventStream do
 
     describe "insert" do
       before do
-        @record = stub(:id => stub('id'), :created_at => Time.now, :attributes => stub('attributes'))
+        @timestamp = Time.now
+        @record = stub(:id => stub('id'), :created_at => @timestamp, :attributes => stub('attributes'))
       end
 
       it "should insert into the configured database" do
@@ -153,7 +154,7 @@ describe EventStream do
       end
 
       it "should set the record's ttl" do
-        @database.expects(:insert_record).with(anything, anything, anything, @stream.ttl_seconds(@record))
+        @database.expects(:insert_record).with(anything, anything, anything, @stream.ttl_seconds(@timestamp))
         @stream.insert(@record)
       end
 
@@ -198,7 +199,8 @@ describe EventStream do
 
     describe "update" do
       before do
-        @record = stub(:id => stub('id'), :created_at => Time.now, :changes => stub('changes'))
+        @timestamp = Time.now
+        @record = stub(:id => stub('id'), :created_at => @timestamp, :changes => stub('changes'))
       end
 
       it "should update in the configured database" do
@@ -224,7 +226,7 @@ describe EventStream do
       end
 
       it "should set the record's ttl" do
-        @database.expects(:update_record).with(anything, anything, anything, @stream.ttl_seconds(@record))
+        @database.expects(:update_record).with(anything, anything, anything, @stream.ttl_seconds(@timestamp))
         @stream.update(@record)
       end
 

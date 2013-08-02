@@ -60,7 +60,7 @@ class EventStream::Index
   end
 
   def insert(record, key)
-    ttl_seconds = event_stream.ttl_seconds(record)
+    ttl_seconds = event_stream.ttl_seconds(record.created_at)
     return if ttl_seconds < 0
 
     bucket, ordered_id = bookmark_for(record)
