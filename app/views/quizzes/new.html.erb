@@ -86,6 +86,7 @@
 
   <% if @domain_root_account.enable_draft? %>
   <div class="title">
+    <label for="quiz_title" class="screenreader-only"><%= t('quiz_title', 'Quiz Title') %></label>
     <%= text_field :quiz, :title, :placeholder => "Quiz Title", :maxlength => "254" %>
   </div>
   <% else %>
