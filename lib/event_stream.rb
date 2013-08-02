@@ -89,6 +89,10 @@ class EventStream
       index.for_key(key, options)
     end
 
+    singleton_class.send(:define_method, "#{name}_index") do
+      index
+    end
+
     index
   end
 
