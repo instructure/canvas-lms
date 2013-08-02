@@ -1554,6 +1554,10 @@ class User < ActiveRecord::Base
 
           unless options[:include_completed_courses]
             enrollments = Enrollment.where(:id => courses.map(&:primary_enrollment_id)).all
+            courses_hash = courses.index_by(&:id)
+            # prepopulate the reverse association
+            enrollments.each { |e| e.course = courses_hash[e.course_id] }
+            Canvas::Builders::EnrollmentDateBuilder.preload(enrollments)
             date_restricted_ids = enrollments.select{ |e| e.completed? || e.inactive? }.map(&:id)
             courses.reject! { |course| date_restricted_ids.include?(course.primary_enrollment_id.to_i) }
           end

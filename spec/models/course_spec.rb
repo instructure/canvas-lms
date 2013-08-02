@@ -214,6 +214,7 @@ describe Course do
       @enrollment.start_at = 4.days.ago
       @enrollment.end_at = 2.days.ago
       @enrollment.save!
+      @enrollment.reload
       @enrollment.state_based_on_date.should == :completed
     end
 
@@ -252,7 +253,7 @@ describe Course do
       @enrollment.start_at = 4.days.ago
       @enrollment.end_at = 2.days.ago
       @enrollment.save!
-      @enrollment.state_based_on_date.should == :completed
+      @enrollment.reload.state_based_on_date.should == :completed
       @course.prior_enrollments.should == []
       @course.grants_right?(@designer, nil, :read_as_admin).should be_true
       @course.grants_right?(@designer, nil, :read_roster).should be_true
@@ -311,7 +312,7 @@ describe Course do
       course_with_teacher(:active_user => 1)
       @course.enrollment_term.update_attributes(:start_at => 2.days.from_now, :end_at => 4.days.from_now)
       @enrollment.update_attribute(:workflow_state, 'active')
-      @enrollment.state_based_on_date.should == :inactive
+      @enrollment.reload.state_based_on_date.should == :inactive
       @course.grants_right?(:read, @teacher).should be_false
     end
 
@@ -2575,7 +2576,7 @@ describe Course, "conclusions" do
     @user.reload
     @user.cached_current_enrollments(:reload)
 
-    enrollment.state.should == :active
+    enrollment.reload.state.should == :active
     enrollment.state_based_on_date.should == :completed
     enrollment.should_not be_participating_student
 
