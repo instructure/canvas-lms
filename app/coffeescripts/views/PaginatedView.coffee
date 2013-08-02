@@ -71,12 +71,12 @@ define [
       $(@paginationScrollContainer).off ".pagination#{@cid}"
 
     fetchNextPageIfNeeded: ->
-      return if @collection.fetchingNextPage
-      if !@collection.urls or !@collection.urls.next
-        @stopPaginationListener() if @collection.length
-        return
       # let the call stack play out before checking the scroll position.
       setTimeout =>
+        return if @collection.fetchingNextPage
+        if !@collection.urls or !@collection.urls.next
+          @stopPaginationListener() if @collection.length
+          return
         if $(@paginationScrollContainer).is(':visible') and @distanceToBottom() < @distanceTillFetchNextPage
           @collection.fetch _.extend({page: 'next'}, @fetchOptions)
       , 0
