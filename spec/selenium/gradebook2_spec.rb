@@ -585,12 +585,12 @@ describe "gradebook2" do
       end
     end
 
-    it "should use the late attribute of the submission to determine lateness" do
+    it "should show late submissions" do
       get "/courses/#{@course.id}/gradebook2"
       wait_for_ajaximations
       ff('.late').count.should == 0
 
-      @student_3_submission.write_attribute(:late, true)
+      @student_3_submission.write_attribute(:cached_due_date, 1.week.ago)
       @student_3_submission.save!
       get "/courses/#{@course.id}/gradebook2"
       wait_for_ajaximations
@@ -628,6 +628,32 @@ describe "gradebook2" do
 
       it "should work for >2 pages" do
         test_n_students @page_size * 2 + 1
+      end
+    end
+
+    describe "Total dropdown" do
+      def should_show_percentages
+        ff(".total-column").each { |total| total.text.should =~ /%/ }
+      end
+
+      def toggle_showing_points
+        f("#total_dropdown").click
+        f(".toggle_percent").click
+      end
+
+      it 'should allow toggling display by points or percent' do
+        should_show_percentages
+
+        get "/courses/#{@course.id}/gradebook2"
+        toggle_showing_points
+
+        expected_points = 15, 10, 10
+        ff(".total-column").each { |total|
+          total.text.should =~ /\A#{expected_points.shift}$/
+        }
+
+        toggle_showing_points
+        should_show_percentages
       end
     end
   end

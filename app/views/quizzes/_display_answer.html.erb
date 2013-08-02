@@ -9,11 +9,12 @@
   # Also show if not on results page and no answers (i.e. when teacher editing quiz)
   show_correct_answers = @quiz && @quiz.display_correct_answers?(@current_user, @submission) || (!assessment_results && !user_answer)
   show_correct_answers = false if @quiz.try(:survey?)
-  selected_answer = user_answer && answer && hash_get(user_answer, :answer_id) == hash_get(answer, :id)
+  answer_id = hash_get(answer, :id)
+  selected_answer = user_answer && answer && hash_get(user_answer, :answer_id) == answer_id
   selected_answer = true if user_answer && question_type.answer_type == "matching_answer"
   selected_answer = (hash_get(user_answer, "answer_#{answer[:id]}")  == "1") if user_answer && hash_get(question, :question_type) == "multiple_answers_question"
   selected_answer = false if question_type && question_type.display_answers == "single"
-  selected_answer = true if hash_get(question, :question_type) == "fill_in_multiple_blanks_question" && hash_get(matched_answer, :id) == hash_get(answer, :id)
+  selected_answer = true if hash_get(question, :question_type) == "fill_in_multiple_blanks_question" && hash_get(matched_answer, :id) == answer_id
   correct_answer = answer && hash_get(answer, :weight) == 100
   correct_answer = (hash_get(user_answer, "answer_#{answer[:id]}").to_i == hash_get(answer, :match_id).to_i) if user_answer && answer && question_type && question_type.answer_type == "matching_answer"
   correct_answer = false if !user_answer && question && hash_get(question, :question_type) == "matching_question"
@@ -38,10 +39,12 @@
     <% if !user_answer || question_type.display_answers != "xsingle" %>
     <div class="select_answer answer_type" <%= hidden(true) unless answer_type == "select_answer" %>>
       <% if %w{radio checkbox}.include?(question_type.entry_type) %>
-        <input type="<%= question_type.entry_type %>" <%= 'checked' if selected_answer %> class="question_input" />
+        <input id="answer-<%= answer_id %>" type="<%= question_type.entry_type %>" <%= 'checked' if selected_answer %> class="question_input" />&nbsp;
       <% end %>
-      <div class="answer_text" <%= hidden(true) if hash_get(answer, :html).present? %>><%= hash_get(answer, :text) %></div>
-      <div class="answer_html"><%= hash_get(answer, :html).to_s.html_safe %></div>
+      <label for="answer-<%= answer_id %>">
+        <div class="answer_text" <%= hidden(true) if hash_get(answer, :html).present? %>><%= hash_get(answer, :text) %></div>
+        <div class="answer_html"><%= hash_get(answer, :html).to_s.html_safe %></div>
+      </label>
     </div>
     <div class="answer_type short_answer" <%= hidden(true) unless answer_type == "short_answer" %>>
       <input name="answer_text" type="text" style="width: 200px; margin-bottom: 5px; color: #000;" disabled="true" value="<%= hash_get(answer, :text) %>"/>
@@ -53,7 +56,7 @@
       <div class="answer_match_right">
         <% if user_answer %>
           <% if answer_type == 'matching_answer'
-               user_answer_choice = hash_get(user_answer, "answer_#{hash_get(answer, :id)}".to_sym).to_i
+               user_answer_choice = hash_get(user_answer, "answer_#{answer_id}".to_sym).to_i
                display_choice = hash_get(question, :matches).find {|m| hash_get(m, :match_id) == user_answer_choice }
           %>
             <select class="question_input" readonly='readonly' style="max-width: 90%;">
@@ -62,9 +65,9 @@
             <% show_comment = wrong_answer %>
           <% else %>
             <% if hash_get(user_answer, "answer_#{hash_get(answer,:id)}").to_i == hash_get(answer, :match_id).to_i %>
-              <%= (hash_get(answer, :right) || (question && hash_get(question, :matches, []).find{|m| hash_get(m, :match_id).to_i == hash_get(user_answer, "answer_#{hash_get(answer, :id)}").to_i}[:text] rescue '')) %>
+              <%= (hash_get(answer, :right) || (question && hash_get(question, :matches, []).find{|m| hash_get(m, :match_id).to_i == hash_get(user_answer, "answer_#{answer_id}").to_i}[:text] rescue '')) %>
             <% else %>
-              <% matched = (hash_get(question, :matches) || hash_get(question, :answers, [])).find{|a| hash_get(a, :match_id).to_i == hash_get(user_answer, "answer_#{hash_get(answer, :id)}").to_i} %>
+              <% matched = (hash_get(question, :matches) || hash_get(question, :answers, [])).find{|a| hash_get(a, :match_id).to_i == hash_get(user_answer, "answer_#{answer_id}").to_i} %>
               <span class="text_box_answer <%= 'correct_text_box_answer' if matched && matched[:weight] == 100 %>">
                       <%= before_label(:your_answer, 'Your Answer') %>
                 <% user_text = (hash_get(matched, :right) || hash_get(matched, :text))
@@ -87,7 +90,7 @@
     <div style="display: none;">
       <span class="numerical_answer_type"><%= hash_get(answer, :numerical_answer_type, "exact_answer") %></span>
       <span class="blank_id"><%= hash_get(answer, :blank_id, "none") %></span>
-      <span class="id"><%= hash_get(answer, :id) %></span>
+      <span class="id"><%= answer_id %></span>
       <span class="match_id"><%= hash_get(answer, :match_id) %></span>
     </div>
     <% if show_correct_answers %>

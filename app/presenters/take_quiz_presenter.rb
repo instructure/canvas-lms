@@ -85,6 +85,10 @@ class TakeQuizPresenter
     question_index(question) <= question_index(current_question)
   end
 
+  def question_answered?(question)
+    submission.question_answered?(question[:id])
+  end
+
   def question_index(question)
     all_questions.index { |q| q[:id] == question[:id] }
   end

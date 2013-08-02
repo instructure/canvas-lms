@@ -24,6 +24,8 @@ class AccountsController < ApplicationController
 
   include Api::V1::Account
 
+  INTEGER_REGEX = /\A[+-]?\d+\z/
+
   # @API List accounts
   # List accounts that the current user can view or manage.  Typically,
   # students and even teachers will get an empty list in response, only
@@ -73,10 +75,15 @@ class AccountsController < ApplicationController
     if recursive
       @accounts = PaginatedCollection.build do |pager|
         per_page = pager.per_page
-        current_page = pager.current_page.to_i
-        pager.replace(
-          @account.sub_accounts_recursive(per_page, current_page * per_page)
-        )
+        current_page = [pager.current_page.to_i, 1].max
+        sub_accounts = @account.sub_accounts_recursive(per_page + 1, (current_page - 1) * per_page)
+
+        if sub_accounts.length > per_page
+          sub_accounts.pop
+          pager.next_page = current_page + 1
+        end
+
+        pager.replace sub_accounts
       end
     else
       @accounts = @account.sub_accounts.order(:id)
@@ -100,6 +107,7 @@ class AccountsController < ApplicationController
   # @argument by_subaccounts[] [optional] List of Account IDs; if supplied, include only courses associated with one of the referenced subaccounts.
   # @argument hide_enrollmentless_courses [optional] If present, only return courses that have at least one enrollment.  Equivalent to 'with_enrollments=true'; retained for compatibility.
   # @argument state[] [optional] If set, only return courses that are in the given state(s). Valid states are "created," "claimed," "available," "completed," and "deleted." By default, all states but "deleted" are returned.
+  # @argument enrollment_term_id [optional] If set, only includes courses from the specified term.
   #
   # @returns [Course]
   def courses_api
@@ -135,9 +143,72 @@ class AccountsController < ApplicationController
       @courses = @courses.by_associated_accounts(account_ids)
     end
 
+    if params[:enrollment_term_id]
+      term = api_find(@account.root_account.enrollment_terms, params[:enrollment_term_id])
+      @courses = @courses.for_term(term)
+    end
+
     @courses = Api.paginate(@courses, self, api_v1_account_courses_url, :order => :id)
 
     render :json => @courses.map { |c| course_json(c, @current_user, session, [], nil) }
+  end
+
+  # Delegated to by the update action (when the request is an api_request?)
+  def update_api
+    if authorized_action(@account, @current_user, [:manage_account_settings, :manage_storage_quotas])
+      account_params = params[:account] || {}
+      unauthorized = false
+
+      # account settings (:manage_account_settings)
+      account_settings = account_params.select {|k, v| [:name, :default_time_zone].include?(k.to_sym)}.with_indifferent_access
+      unless account_settings.empty?
+        if is_authorized_action?(@account, @current_user, :manage_account_settings)
+          @account.errors.add(:name, t(:account_name_required, 'The account name cannot be blank')) if account_params.has_key?(:name) && account_params[:name].blank?
+          @account.errors.add(:default_time_zone, t(:unrecognized_time_zone, "'%{timezone}' is not a recognized time zone", :timezone => account_params[:default_time_zone])) if account_params.has_key?(:default_time_zone) && ActiveSupport::TimeZone.new(account_params[:default_time_zone]).nil?
+        else
+          account_settings.each {|k, v| @account.errors.add(k.to_sym, t(:cannot_manage_account, 'You are not allowed to manage account settings'))}
+          unauthorized = true
+        end
+      end
+
+      # quotas (:manage_account_quotas)
+      quota_settings = account_params.select {|k, v| [:default_storage_quota_mb, :default_user_storage_quota_mb,
+                                                      :default_group_storage_quota_mb].include?(k.to_sym)}.with_indifferent_access
+      unless quota_settings.empty?
+        if is_authorized_action?(@account, @current_user, :manage_storage_quotas)
+          [:default_storage_quota_mb, :default_user_storage_quota_mb, :default_group_storage_quota_mb].each do |quota_type|
+            next unless quota_settings.has_key?(quota_type)
+
+            quota_value = quota_settings[quota_type].strip
+            if INTEGER_REGEX !~ quota_value.to_s
+              @account.errors.add(quota_type, t(:quota_integer_required, 'An integer value is required'))
+            else
+              @account.errors.add(quota_type, t(:quota_must_be_positive, 'Value must be positive')) if quota_value.to_i < 0
+              @account.errors.add(quota_type, t(:quota_too_large, 'Value too large')) if quota_value.to_i >= 2**62 / 1.megabytes
+            end
+          end
+        else
+          quota_settings.each {|k, v| @account.errors.add(k.to_sym, t(:cannot_manage_quotas, 'You are not allowed to manage quota settings'))}
+          unauthorized = true
+        end
+      end
+
+      if unauthorized
+        # Attempt to modify something without sufficient permissions
+        render :json => @account.errors, :status => :unauthorized
+      else
+        success = @account.errors.empty?
+        success &&= @account.update_attributes(account_settings.merge(quota_settings)) rescue false
+
+        if success
+          # Successfully completed
+          render :json => account_json(@account, @current_user, session, params[:includes] || [])
+        else
+          # Failed (hopefully with errors)
+          render :json => @account.errors, :status => :bad_request
+        end
+      end
+    end
   end
 
   # @API Update an account
@@ -145,13 +216,17 @@ class AccountsController < ApplicationController
   #
   # @argument account[name] [optional] Updates the account name
   # @argument account[default_time_zone] [Optional] The default time zone of the account. Allowed time zones are listed in {http://rubydoc.info/docs/rails/ActiveSupport/TimeZone The Ruby on Rails documentation}.
+  # @argument account[default_storage_quota_mb] [Optional] The default course storage quota to be used, if not otherwise specified.
+  # @argument account[default_user_storage_quota_mb] [Optional] The default user storage quota to be used, if not otherwise specified.
+  # @argument account[default_group_storage_quota_mb] [Optional] The default group storage quota to be used, if not otherwise specified.
   #
   # @example_request
   #   curl https://<canvas>/api/v1/accounts/<account_id> \ 
   #     -X PUT \ 
   #     -H 'Authorization: Bearer <token>' \ 
   #     -d 'account[name]=New account name' \ 
-  #     -d 'account[default_time_zone]=Mountain Time (US & Canada)'
+  #     -d 'account[default_time_zone]=Mountain Time (US & Canada)' \ 
+  #     -d 'account[default_storage_quota_mb]=450'
   #
   # @example_response
   #   {
@@ -159,24 +234,15 @@ class AccountsController < ApplicationController
   #     "name": "New account name",
   #     "default_time_zone": "Mountain Time (US & Canada)",
   #     "parent_account_id": null,
-  #     "root_account_id": null
+  #     "root_account_id": null,
+  #     "default_storage_quota_mb": 500,
+  #     "default_user_storage_quota_mb": 50
+  #     "default_group_storage_quota_mb": 50
   #   }
   def update
+    return update_api if api_request?
+
     if authorized_action(@account, @current_user, :manage_account_settings)
-      if api_request?
-        account_params = params[:account] || {}
-        account_params.reject!{|k, v| ![:name, :default_time_zone].include?(k.to_sym)}
-
-        @account.errors.add(:name, "The account name cannot be blank") if account_params.has_key?(:name) && account_params[:name].blank?
-        @account.errors.add(:default_time_zone, "'#{account_params[:default_time_zone]}' is not a recognized time zone") if account_params.has_key?(:default_time_zone) && ActiveSupport::TimeZone.new(account_params[:default_time_zone]).nil?
-        if @account.errors.empty? && @account.update_attributes(account_params)
-          render :json => account_json(@account, @current_user, session, params[:includes] || [])
-        else
-          render :json => @account.errors, :status => :bad_request
-        end
-        return
-      end
-
       respond_to do |format|
 
         custom_help_links = params[:account].delete :custom_help_links
@@ -193,15 +259,17 @@ class AccountsController < ApplicationController
         allow_sis_import = params[:account].delete :allow_sis_import
         params[:account].delete :default_user_storage_quota_mb unless @account.root_account? && !@account.site_admin?
         unless @account.grants_right? @current_user, :manage_storage_quotas
-          [:storage_quota, :default_storage_quota, :default_storage_quota_mb, :default_user_storage_quota_mb].each { |key| params[:account].delete key }
+          [:storage_quota, :default_storage_quota, :default_storage_quota_mb,
+           :default_user_storage_quota, :default_user_storage_quota_mb,
+           :default_group_storage_quota, :default_group_storage_quota_mb].each { |key| params[:account].delete key }
         end
         if params[:account][:services]
-          params[:account][:services].slice(*Account.services_exposed_to_ui_hash.keys).each do |key, value|
+          params[:account][:services].slice(*Account.services_exposed_to_ui_hash(nil, @current_user, @account).keys).each do |key, value|
             @account.set_service_availability(key, value == '1')
           end
           params[:account].delete :services
         end
-        if Account.site_admin.grants_right?(@current_user, :manage_site_settings)
+        if @account.grants_right?(@current_user, :manage_site_settings)
           # If the setting is present (update is called from 2 different settings forms, one for notifications)
           if params[:account][:settings] && params[:account][:settings][:outgoing_email_default_name_option].present?
             # If set to default, remove the custom name so it doesn't get saved
@@ -278,6 +346,9 @@ class AccountsController < ApplicationController
       @announcements = @account.announcements
       @alerts = @account.alerts
       @role_types = RoleOverride.account_membership_types(@account)
+      js_env :APP_CENTER => {
+        enabled: Canvas::Plugin.find(:app_center).enabled?
+      }
     end
   end
 
@@ -350,7 +421,7 @@ class AccountsController < ApplicationController
     end
     associated_courses = @account.associated_courses.active
     associated_courses = associated_courses.for_term(@term) if @term
-    @associated_courses_count = associated_courses.count('DISTINCT course_id')
+    @associated_courses_count = associated_courses.count
     @hide_enrollmentless_courses = params[:hide_enrollmentless_courses] == "1"
   end
   protected :load_course_right_side
@@ -378,7 +449,7 @@ class AccountsController < ApplicationController
       respond_to do |format|
         format.json { render :json => @items.to_json }
         format.csv { 
-          res = FasterCSV.generate do |csv|
+          res = CSV.generate do |csv|
             csv << ['Timestamp', 'Value']
             @items.each do |item|
               csv << [item[0]/1000, item[1]]

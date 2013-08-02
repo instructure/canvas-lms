@@ -23,6 +23,7 @@ define [
       message: I18n.t('no_content', 'No Content')
       user_id: null
       read_state: 'read'
+      forced_read_state: false
       created_at: null
       updated_at: null
       deleted: false
@@ -43,9 +44,12 @@ define [
 
     computedAttributes: [
       'canModerate'
+      'canReply'
       'speedgraderUrl'
+      'inlineReplyLink'
       { name: 'allowsSideComments', deps: ['parent_id', 'deleted'] }
       { name: 'allowsThreadedReplies', deps: ['deleted'] }
+      { name: 'showBoxReplyLink', deps: ['allowsSideComments'] }
       { name: 'collapsable', deps: ['replies', 'allowsSideComments', 'allowsThreadedReplies'] }
       { name: 'summary', deps: ['message'] }
     ]
@@ -90,6 +94,7 @@ define [
         'message'
         'user_id'
         'read_state'
+        'forced_read_state'
         'created_at'
         'updated_at'
         'deleted'
@@ -103,6 +108,21 @@ define [
     canModerate: ->
       isAuthorsEntry = @get('user_id') is ENV.DISCUSSION.CURRENT_USER.id
       isAuthorsEntry and ENV.DISCUSSION.PERMISSIONS.CAN_MANAGE_OWN or ENV.DISCUSSION.PERMISSIONS.MODERATE
+
+    ##
+    # Computed attribute to determine if the entry can be replied to
+    # by the current user
+    canReply: ->
+      return no if @get 'deleted'
+      return no unless ENV.DISCUSSION.PERMISSIONS.CAN_REPLY
+      yes
+
+    ##
+    # Computed attribute to determine if an inlineReplyLink should be
+    # displayed for the entry.
+    inlineReplyLink: ->
+      return yes if ENV.DISCUSSION.THREADED && (@allowsThreadedReplies() || @allowsSideComments())
+      no
 
     ##
     # Only threaded discussions get the ability to reply in an EntryView
@@ -119,6 +139,9 @@ define [
       return no if ENV.DISCUSSION.THREADED
       return no if @get 'parent_id'
       yes
+
+    showBoxReplyLink: ->
+      @allowsSideComments()
 
     collapsable: ->
       @hasChildren() or
@@ -147,6 +170,11 @@ define [
       @set 'read_state', 'read'
       url = ENV.DISCUSSION.MARK_READ_URL.replace /:id/, @get 'id'
       $.ajaxJSON url, 'PUT'
+
+    markAsUnread: ->
+      @set(read_state: 'unread', forced_read_state: true)
+      url = ENV.DISCUSSION.MARK_UNREAD_URL.replace /:id/, @get 'id'
+      $.ajaxJSON url, 'DELETE', forced_read_state: true
 
     hasChildren: ->
       @get('replies').length > 0

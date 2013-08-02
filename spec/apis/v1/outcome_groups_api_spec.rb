@@ -31,7 +31,7 @@ describe "Outcome Groups API", :type => :integration do
   def create_outcome(opts={})
     group = opts.delete(:group) || @group
     account = opts.delete(:account) || @account
-    outcome = account.created_learning_outcomes.create!({:title => 'new outcome'}.merge(opts))
+    outcome = account.created_learning_outcomes.create!({:title => 'new outcome', :vendor_guid => "vendorguid9000"}.merge(opts))
     group.add_outcome(outcome)
   end
 
@@ -198,6 +198,7 @@ describe "Outcome Groups API", :type => :integration do
         json.should == {
           "id" => group.id,
           "title" => group.title,
+          "vendor_guid" => group.vendor_guid,
           "url" => polymorphic_path([:api_v1, :global, :outcome_group], :id => group.id),
           "can_edit" => true,
           "subgroups_url" => polymorphic_path([:api_v1, :global, :outcome_group_subgroups], :id => group.id),
@@ -213,7 +214,9 @@ describe "Outcome Groups API", :type => :integration do
         parent_group = LearningOutcomeGroup.global_root_outcome_group
         group = parent_group.child_outcome_groups.create!(
           :title => 'Group Name',
-          :description => 'Group Description')
+          :description => 'Group Description',
+          :vendor_guid => "vendorguid9001"
+        )
 
         json = api_call(:get, "/api/v1/global/outcome_groups/#{group.id}",
                      :controller => 'outcome_groups_api',
@@ -224,6 +227,7 @@ describe "Outcome Groups API", :type => :integration do
         json.should == {
           "id" => group.id,
           "title" => group.title,
+          "vendor_guid" => group.vendor_guid,
           "url" => polymorphic_path([:api_v1, :global, :outcome_group], :id => group.id),
           "can_edit" => true,
           "subgroups_url" => polymorphic_path([:api_v1, :global, :outcome_group_subgroups], :id => group.id),
@@ -232,6 +236,7 @@ describe "Outcome Groups API", :type => :integration do
           "parent_outcome_group" => {
             "id" => parent_group.id,
             "title" => parent_group.title,
+            "vendor_guid" => parent_group.vendor_guid,
             "url" => polymorphic_path([:api_v1, :global, :outcome_group], :id => parent_group.id),
             "subgroups_url" => polymorphic_path([:api_v1, :global, :outcome_group_subgroups], :id => parent_group.id),
             "outcomes_url" => polymorphic_path([:api_v1, :global, :outcome_group_outcomes], :id => parent_group.id),
@@ -272,6 +277,7 @@ describe "Outcome Groups API", :type => :integration do
         json.should == {
           "id" => group.id,
           "title" => group.title,
+          "vendor_guid" => group.vendor_guid,
           "url" => polymorphic_path([:api_v1, @account, :outcome_group], :id => group.id),
           "can_edit" => true,
           "subgroups_url" => polymorphic_path([:api_v1, @account, :outcome_group_subgroups], :id => group.id),
@@ -411,10 +417,13 @@ describe "Outcome Groups API", :type => :integration do
                  :id => @group.id.to_s,
                  :format => 'json' },
                { :title => "New Title",
-                 :description => "New Description" })
+                 :description => "New Description",
+                 :vendor_guid => "vendorguid9002"
+               })
 
       json.should == {
         "id" => @group.id,
+        "vendor_guid" => "vendorguid9002",
         "title" => "New Title",
         "url" => polymorphic_path([:api_v1, @account, :outcome_group], :id => @group.id),
         "can_edit" => true,
@@ -424,6 +433,7 @@ describe "Outcome Groups API", :type => :integration do
         "parent_outcome_group" => {
           "id" => @root_group.id,
           "title" => @root_group.title,
+          "vendor_guid" => @root_group.vendor_guid,
           "url" => polymorphic_path([:api_v1, @account, :outcome_group], :id => @root_group.id),
           "subgroups_url" => polymorphic_path([:api_v1, @account, :outcome_group_subgroups], :id => @root_group.id),
           "outcomes_url" => polymorphic_path([:api_v1, @account, :outcome_group_outcomes], :id => @root_group.id),
@@ -441,7 +451,7 @@ describe "Outcome Groups API", :type => :integration do
       @account = Account.default
       @account_user = @user.account_users.create(:account => @account)
       @root_group = @account.root_outcome_group
-      @group = @root_group.child_outcome_groups.create!(:title => 'subgroup')
+      @group = @root_group.child_outcome_groups.create!(:title => 'subgroup', :vendor_guid => "vendorguid9001")
     end
 
     it "should require permission" do
@@ -501,6 +511,7 @@ describe "Outcome Groups API", :type => :integration do
 
       json.should == {
         "id" => @group.id,
+        "vendor_guid" => @group.vendor_guid,
         "title" => 'subgroup',
         "url" => polymorphic_path([:api_v1, @account, :outcome_group], :id => @group.id),
         "can_edit" => true,
@@ -510,6 +521,7 @@ describe "Outcome Groups API", :type => :integration do
         "parent_outcome_group" => {
           "id" => @root_group.id,
           "title" => @root_group.title,
+          "vendor_guid" => @root_group.vendor_guid,
           "url" => polymorphic_path([:api_v1, @account, :outcome_group], :id => @root_group.id),
           "subgroups_url" => polymorphic_path([:api_v1, @account, :outcome_group_subgroups], :id => @root_group.id),
           "outcomes_url" => polymorphic_path([:api_v1, @account, :outcome_group_outcomes], :id => @root_group.id),
@@ -556,6 +568,7 @@ describe "Outcome Groups API", :type => :integration do
           "outcome_group" => {
             "id" => @group.id,
             "title" => @group.title,
+            "vendor_guid" => @group.vendor_guid,
             "url" => polymorphic_path([:api_v1, @account, :outcome_group], :id => @group.id),
             "subgroups_url" => polymorphic_path([:api_v1, @account, :outcome_group_subgroups], :id => @group.id),
             "outcomes_url" => polymorphic_path([:api_v1, @account, :outcome_group_outcomes], :id => @group.id),
@@ -563,6 +576,7 @@ describe "Outcome Groups API", :type => :integration do
           },
           "outcome" => {
             "id" => outcome.id,
+            "vendor_guid" => outcome.vendor_guid,
             "context_type" => "Account",
             "context_id" => @account.id,
             "title" => outcome.title,
@@ -634,7 +648,7 @@ describe "Outcome Groups API", :type => :integration do
       @account = Account.default
       @account_user = @user.account_users.create(:account => @account)
       @group = @account.root_outcome_group
-      @outcome = LearningOutcome.global.create!(:title => 'subgroup')
+      @outcome = LearningOutcome.global.create!(:title => 'subgroup', :vendor_guid => "vendorguid9000")
     end
 
     it "should require permission" do
@@ -703,6 +717,7 @@ describe "Outcome Groups API", :type => :integration do
         "outcome_group" => {
           "id" => @group.id,
           "title" => @group.title,
+          "vendor_guid" => @group.vendor_guid,
           "url" => polymorphic_path([:api_v1, @account, :outcome_group], :id => @group.id),
           "subgroups_url" => polymorphic_path([:api_v1, @account, :outcome_group_subgroups], :id => @group.id),
           "outcomes_url" => polymorphic_path([:api_v1, @account, :outcome_group_outcomes], :id => @group.id),
@@ -710,6 +725,7 @@ describe "Outcome Groups API", :type => :integration do
         },
         "outcome" => {
           "id" => @outcome.id,
+          "vendor_guid" => @outcome.vendor_guid,
           "context_type" => nil,
           "context_id" => nil,
           "title" => @outcome.title,
@@ -801,7 +817,7 @@ describe "Outcome Groups API", :type => :integration do
       @account = Account.default
       @account_user = @user.account_users.create(:account => @account)
       @group = @account.root_outcome_group
-      @outcome = LearningOutcome.global.create!(:title => 'outcome')
+      @outcome = LearningOutcome.global.create!(:title => 'outcome', :vendor_guid => "vendorguid9000")
       @group.add_outcome(@outcome)
     end
 
@@ -885,6 +901,7 @@ describe "Outcome Groups API", :type => :integration do
         "outcome_group" => {
           "id" => @group.id,
           "title" => @group.title,
+          "vendor_guid" => @group.vendor_guid,
           "url" => polymorphic_path([:api_v1, @account, :outcome_group], :id => @group.id),
           "subgroups_url" => polymorphic_path([:api_v1, @account, :outcome_group_subgroups], :id => @group.id),
           "outcomes_url" => polymorphic_path([:api_v1, @account, :outcome_group_outcomes], :id => @group.id),
@@ -892,6 +909,7 @@ describe "Outcome Groups API", :type => :integration do
         },
         "outcome" => {
           "id" => @outcome.id,
+          "vendor_guid" => @outcome.vendor_guid,
           "context_type" => nil,
           "context_id" => nil,
           "title" => @outcome.title,
@@ -922,7 +940,7 @@ describe "Outcome Groups API", :type => :integration do
 
     def create_subgroup(opts={})
       group = opts.delete(:group) || @group
-      group.child_outcome_groups.create!({:title => 'subgroup'}.merge(opts))
+      group.child_outcome_groups.create!({:title => 'subgroup', :vendor_guid => 'blahblah'}.merge(opts))
     end
 
     it "should return the subgroups under the group" do
@@ -940,6 +958,7 @@ describe "Outcome Groups API", :type => :integration do
           "url" => polymorphic_path([:api_v1, @account, :outcome_group], :id => subgroup.id),
           "subgroups_url" => polymorphic_path([:api_v1, @account, :outcome_group_subgroups], :id => subgroup.id),
           "outcomes_url" => polymorphic_path([:api_v1, @account, :outcome_group_outcomes], :id => subgroup.id),
+          "vendor_guid" => subgroup.vendor_guid,
           "can_edit" => true
         }
       end.sort_by{ |subgroup| subgroup['id'] }
@@ -1053,7 +1072,9 @@ describe "Outcome Groups API", :type => :integration do
                  :id => @group.id.to_s,
                  :format => 'json' },
                { :title => "My Subgroup",
-                 :description => "Description of my subgroup" })
+                 :description => "Description of my subgroup",
+                 :vendor_guid => "vendorguid9000"
+               })
       @subgroup = @group.child_outcome_groups.active.first
       json.should == {
         "id" => @subgroup.id,
@@ -1066,6 +1087,7 @@ describe "Outcome Groups API", :type => :integration do
         "parent_outcome_group" => {
           "id" => @group.id,
           "title" => @group.title,
+          "vendor_guid" => @group.vendor_guid,
           "url" => polymorphic_path([:api_v1, @account, :outcome_group], :id => @group.id),
           "subgroups_url" => polymorphic_path([:api_v1, @account, :outcome_group_subgroups], :id => @group.id),
           "outcomes_url" => polymorphic_path([:api_v1, @account, :outcome_group_outcomes], :id => @group.id),
@@ -1073,6 +1095,7 @@ describe "Outcome Groups API", :type => :integration do
         },
         "context_id" => @account.id,
         "context_type" => "Account",
+        "vendor_guid" => "vendorguid9000",
         "description" => @subgroup.description
       }
     end
@@ -1084,7 +1107,9 @@ describe "Outcome Groups API", :type => :integration do
       @account_user = @user.account_users.create(:account => @account)
       @source_group = LearningOutcomeGroup.global_root_outcome_group.child_outcome_groups.create!(
         :title => "Source Group",
-        :description => "Description of source group")
+        :description => "Description of source group",
+        :vendor_guid => "vendorguid9000"
+      )
       @target_group = @account.root_outcome_group
     end
 
@@ -1165,7 +1190,7 @@ describe "Outcome Groups API", :type => :integration do
       @subgroup = @target_group.child_outcome_groups.active.first
       json.should == {
         "id" => @subgroup.id,
-        "title" => @subgroup.title,
+        "title" => @source_group.title,
         "url" => polymorphic_path([:api_v1, @account, :outcome_group], :id => @subgroup.id),
         "can_edit" => true,
         "subgroups_url" => polymorphic_path([:api_v1, @account, :outcome_group_subgroups], :id => @subgroup.id),
@@ -1174,6 +1199,7 @@ describe "Outcome Groups API", :type => :integration do
         "parent_outcome_group" => {
           "id" => @target_group.id,
           "title" => @target_group.title,
+          "vendor_guid" => @target_group.vendor_guid,
           "url" => polymorphic_path([:api_v1, @account, :outcome_group], :id => @target_group.id),
           "subgroups_url" => polymorphic_path([:api_v1, @account, :outcome_group_subgroups], :id => @target_group.id),
           "outcomes_url" => polymorphic_path([:api_v1, @account, :outcome_group_outcomes], :id => @target_group.id),
@@ -1181,7 +1207,8 @@ describe "Outcome Groups API", :type => :integration do
         },
         "context_id" => @account.id,
         "context_type" => "Account",
-        "description" => @subgroup.description
+        "vendor_guid" => @source_group.vendor_guid,
+        "description" => @source_group.description
       }
     end
   end

@@ -1,4 +1,4 @@
 <% define_content :link do -%>
-<%= HostUrl.protocol %>://<%= HostUrl.context_host(user.pseudonym.try(:account)) %>/profile/communication
+<%= HostUrl.protocol %>://<%= primary_host %>/profile/communication
 <% end %>
 <%= t :tweet, "Canvas Alert - %{notification_count} new notifications", :notification_count => delayed_messages.length %>

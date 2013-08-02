@@ -17,8 +17,28 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../locked_spec')
 
 describe "Files API", :type => :integration do
+  context 'locked api item' do
+    let(:item_type) { 'file' }
+
+    let(:locked_item) do
+      root_folder = Folder.root_folders(@course).first
+      Attachment.create!(:filename => 'test.png', :display_name => 'test-frd.png', :uploaded_data => stub_png_data, :folder => root_folder, :context => @course)
+    end
+
+    def api_get_json
+      api_call(
+        :get,
+        "/api/v1/files/#{locked_item.id}",
+        {:controller=>'files', :action=>'api_show', :format=>'json', :id => locked_item.id.to_s},
+      )
+    end
+
+    it_should_behave_like 'a locked api item'
+  end
+
   before do
     course_with_teacher(:active_all => true, :user => user_with_pseudonym)
   end
@@ -46,11 +66,15 @@ describe "Files API", :type => :integration do
       @attachment.save!
     end
 
+    def call_create_success
+      api_call(:post, "/api/v1/files/#{@attachment.id}/create_success?uuid=#{@attachment.uuid}",
+               {:controller => "files", :action => "api_create_success", :format => "json", :id => @attachment.to_param, :uuid => @attachment.uuid})
+    end
+
     it "should set the attachment to available (local storage)" do
       local_storage!
       upload_data
-      json = api_call(:post, "/api/v1/files/#{@attachment.id}/create_success?uuid=#{@attachment.uuid}",
-                   { :controller => "files", :action => "api_create_success", :format => "json", :id => @attachment.to_param, :uuid => @attachment.uuid })
+      json = call_create_success
       @attachment.reload
       json.should == {
         'id' => @attachment.id,
@@ -80,8 +104,7 @@ describe "Files API", :type => :integration do
                                           :content_length => 1234,
                                       })
 
-      json = api_call(:post, "/api/v1/files/#{@attachment.id}/create_success?uuid=#{@attachment.uuid}",
-                   { :controller => "files", :action => "api_create_success", :format => "json", :id => @attachment.to_param, :uuid => @attachment.uuid })
+      json = call_create_success
       @attachment.reload
       json.should == {
         'id' => @attachment.id,
@@ -117,6 +140,29 @@ describe "Files API", :type => :integration do
                    { :controller => "files", :action => "api_create_success", :format => "json", :id => @attachment.to_param, :uuid => @attachment.uuid })
       response.status.to_i.should == 400
     end
+
+    context "upload success context callback" do
+      before do
+        Course.any_instance.stubs(:file_upload_success_callback)
+        Course.any_instance.expects(:file_upload_success_callback).with(@attachment)
+      end
+
+      it "should call back for s3" do
+        s3_storage!
+         AWS::S3::S3Object.any_instance.expects(:head).returns({
+                                          :content_type => 'text/plain',
+                                          :content_length => 1234,
+                                      })
+        json = call_create_success
+      end
+
+      it "should call back for local storage" do
+        local_storage!
+        upload_data
+        json = call_create_success
+      end
+    end
+
   end
 
   describe "#index" do
@@ -244,7 +290,15 @@ describe "Files API", :type => :integration do
       json['hidden_for_user'].should be_false
       json['locked_for_user'].should be_false
     end
-    
+
+    def should_be_locked(json)
+      json['url'].should == ""
+      json['thumbnail_url'].should == ""
+      json['hidden'].should be_true
+      json['hidden_for_user'].should be_true
+      json['locked_for_user'].should be_true
+    end
+
     it "should be locked/hidden for a student" do
       course_with_student(:course => @course)
       att2 = Attachment.create!(:filename => 'test.txt', :display_name => "test.txt", :uploaded_data => StringIO.new('file'), :folder => @root, :context => @course, :locked => true)
@@ -252,9 +306,22 @@ describe "Files API", :type => :integration do
       att2.save!
       json = api_call(:get, "/api/v1/files/#{att2.id}", {:controller => "files", :action => "api_show", :format => "json", :id => att2.id.to_param}, {})
       json['locked'].should be_true
-      json['hidden'].should be_true
-      json['hidden_for_user'].should be_true
-      json['locked_for_user'].should be_true
+      should_be_locked(json)
+
+      att2.locked = false
+      att2.unlock_at = 2.days.from_now
+      att2.lock_at = 2.days.ago
+      att2.save!
+      json = api_call(:get, "/api/v1/files/#{att2.id}", {:controller => "files", :action => "api_show", :format => "json", :id => att2.id.to_param}, {})
+      json['locked'].should be_false
+      should_be_locked(json)
+
+      att2.lock_at = att2.unlock_at = nil
+      att2.save!
+      json = api_call(:get, "/api/v1/files/#{att2.id}", {:controller => "files", :action => "api_show", :format => "json", :id => att2.id.to_param}, {})
+      json['url'].should == file_download_url(att2, :verifier => att2.uuid, :download => '1', :download_frd => '1')
+      json['locked'].should be_false
+      json['locked_for_user'].should be_false
     end
 
     it "should return not found error" do

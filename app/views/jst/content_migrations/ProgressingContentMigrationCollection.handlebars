@@ -1,0 +1,10 @@
+<strong>{{#t "progress_label"}}Current Jobs{{/t}}</strong>
+<hr>
+
+{{#if collection.length}}
+<ul class="unstyled collectionViewItems row-fluid"></ul>
+{{else}}
+<p>
+  {{#t "no_items"}}No jobs have been queued{{/t}}
+</p>
+{{/if}}

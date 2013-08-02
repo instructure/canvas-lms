@@ -21,7 +21,24 @@
 .ui-dialog .ui-resizable-se { width: 14px; height: 14px; right: 3px; bottom: 3px; }
 .ui-draggable .ui-dialog-titlebar { cursor: move; }
 
+/*
+@styleguide Modal Dialog
 
+We don't use Bootstraps modal dialog, please use jQuery UI `ui-dialog` with our normal bootstrap style buttons
+
+```html
+<button class="btn element_toggler" aria-controls="testdialog">Show Dialog</button>
+
+<form id="testdialog" data-turn-into-dialog='{"width":600,"modal":true}' style="display:none" title="Title Goes Here">
+  <p> Leggings etsy aesthetic hella viral blog literally, squid you probably haven't heard of them synth raw denim 90's mlkshk odd future try-hard. Lo-fi next level kale chips narwhal tattooed, tonx YOLO mixtape. Locavore vice disrupt yr ethnic. Biodiesel messenger bag cardigan american apparel. DIY four loko tumblr pickled yr scenester.</p>
+  <div class="button-container">
+    <button type="submit" class="btn btn-primary">submit</button>
+    <a class="btn dialog_closer">cancel</a>
+  </div>
+</form>
+```
+
+*/
 
 //our overrides
 

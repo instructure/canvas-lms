@@ -60,6 +60,10 @@ require([
             <%= t :group_structure_self_signup, "*Create* %{number_of_groups} *groups now*",
               :number_of_groups => '<input type="text" name="category[create_group_count]" id="category_create_group_count" value="0" style="width: 25px;"/>'.html_safe,
               :wrapper => '<label for="category_create_group_count">\1</label>' %><br/>
+            <%= t :group_structure_group_limit, "*Limit groups to* %{group_limit} members",
+              :group_limit => '<input type="number" name="category[group_limit]" id="category_group_limit" class="input-mini">'.html_safe,
+              :wrapper => '<label for="category_group_limit">\1</label>' %>
+            <small class="muted"><%= t :group_limit_blank, '(leave blank for no limit)' %></small>
           </div>
         </td>
       </tr>

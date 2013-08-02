@@ -16,18 +16,20 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
 
 describe AssignmentsController do
   # it "should use AssignmentsController" do
   #   controller.should be_an_instance_of(AssignmentsController)
   # end
 
-  def course_assignment
-    @group = @course.assignment_groups.create(:name => "some group")
-    @assignment = @course.assignments.create(:title => "some assignment", :assignment_group => @group)
+  def course_assignment(course = nil)
+    course ||= @course
+    @group = course.assignment_groups.create(:name => "some group")
+    @assignment = course.assignments.create(:title => "some assignment", :assignment_group => @group)
     @assignment.assignment_group.should eql(@group)
     @group.assignments.should be_include(@assignment)
+    @assignment
   end
 
   describe "GET 'index'" do
@@ -80,6 +82,28 @@ describe AssignmentsController do
       assigns[:assignment_groups].should_not be_nil
       assigns[:assignment_groups].should_not be_empty
       assigns[:assignment_groups][0].name.should eql("Assignments")
+    end
+
+    context "sharding" do
+      specs_require_sharding
+
+      it "should show assignments for all shards" do
+        course_with_student_logged_in(:active_all => true)
+        @assignment1 = course_assignment
+
+        @shard2.activate do
+          account = Account.create!
+          course2 = account.courses.create!
+          course2.offer!
+          @assignment2 = course_assignment(course2)
+          course2.enroll_student(@user).accept!
+        end
+
+        get 'index'
+        assigns[:assignments].length.should == 2
+        assigns[:assignments].should be_include(@assignment1)
+        assigns[:assignments].should be_include(@assignment2)
+      end
     end
   end
   

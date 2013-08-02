@@ -16,6 +16,7 @@ require([
   }
   function dataReady(data) {
     if(parentWindow[callback] && parentWindow[callback].ready) {
+      parentWindow.$(parentWindow).trigger('externalContentReady', data);
       parentWindow[callback].ready(data);
       setTimeout(function() {
         $("#dialog_message").text("<%= t :popup_success, "Success! This popup should close on its own..." %>");

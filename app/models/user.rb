@@ -185,7 +185,7 @@ class User < ActiveRecord::Base
     PageView.for_user(self)
   end
 
-  scope :of_account, lambda { |account| joins(:user_account_associations).where(:user_account_associations => { :account_id => account }) }
+  scope :of_account, lambda { |account| where("EXISTS (#{account.user_account_associations.select("1").where("user_account_associations.user_id=users.id").to_sql})") }
   scope :recently_logged_in, lambda {
     includes(:pseudonyms).
         where("pseudonyms.current_login_at>?", 1.month.ago).
@@ -1036,13 +1036,15 @@ class User < ActiveRecord::Base
     end
   end
 
+  # only used by ContextModuleProgression#deep_evaluate
   def submitted_submission_for(assignment_id)
-    @submissions ||= self.submissions.having_submission.to_a
+    @submissions ||= self.submissions.having_submission.except(:includes).select([:id, :score, :assignment_id]).all
     @submissions.detect{|s| s.assignment_id == assignment_id }
   end
 
+  # only used by ContextModuleProgression#deep_evaluate
   def attempted_quiz_submission_for(quiz_id)
-    @quiz_submissions ||= self.quiz_submissions.select{|s| !s.settings_only? }
+    @quiz_submissions ||= self.quiz_submissions.select([:id, :kept_score, :quiz_id, :workflow_state]).select{|s| !s.settings_only? }
     @quiz_submissions.detect{|qs| qs.quiz_id == quiz_id }
   end
 
@@ -1279,7 +1281,6 @@ class User < ActiveRecord::Base
     preferences[:send_scores_in_emails] == true
   end
 
-
   def close_announcement(announcement)
     preferences[:closed_notifications] ||= []
     # serialize ids relative to the user
@@ -1288,6 +1289,10 @@ class User < ActiveRecord::Base
     end
     preferences[:closed_notifications].uniq!
     save
+  end
+
+  def manual_mark_as_read?
+    !!preferences[:manual_mark_as_read]
   end
 
   def ignore_item!(asset, purpose, permanent = false)
@@ -1894,7 +1899,7 @@ class User < ActiveRecord::Base
   # Returns an array of context code strings.
   def conversation_context_codes(include_concluded_codes = true)
     Rails.cache.fetch([self, include_concluded_codes, 'conversation_context_codes4'].cache_key, :expires_in => 1.day) do
-      Shard.default.activate do
+      Shard.birth.activate do
         associations = %w{courses concluded_courses current_groups}
         associations.slice!(1) unless include_concluded_codes
 
@@ -1974,10 +1979,6 @@ class User < ActiveRecord::Base
   TAB_FILES = 2
   TAB_EPORTFOLIOS = 3
   TAB_HOME = 4
-
-  def sis_user_id
-    pseudonym.try(:sis_user_id)
-  end
 
   def highest_role
     return 'admin' unless self.accounts.empty?
@@ -2416,5 +2417,13 @@ class User < ActiveRecord::Base
 
   def prefers_gradebook2?
     preferences[:use_gradebook2] != false
+  end
+
+  def stamp_logout_time!
+    if Rails.version < '3.0'
+      User.update_all({ :last_logged_out => Time.zone.now }, :id => self)
+    else
+      User.where(:id => self).update_all(:last_logged_out => Time.zone.now)
+    end
   end
 end

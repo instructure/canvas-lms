@@ -1,1 +1,102 @@
-<assessmentItem identifier="" title="Fill in the blank(s)"><outcomeDeclaration identifier="SCORE" baseType="float" cardinality="single"><defaultValue><value>0</value></defaultValue></outcomeDeclaration><itemBody><![CDATA[<div>The ]]><textEntryInteraction responseIdentifier="l1" expectedLength="10" /><![CDATA[ brown ]]><textEntryInteraction responseIdentifier="l2" expectedLength="10" /><![CDATA[ jumped over the lazy ]]><textEntryInteraction responseIdentifier="l3" expectedLength="10" /><![CDATA[.</div>]]><![CDATA[<div></div>]]></itemBody><responseDeclaration identifier="l1" cardinality="single" baseType="string" /><outcomeDeclaration identifier="l1_score" cardinality="single" baseType="float"><defaultValue><value>0</value></defaultValue></outcomeDeclaration><responseDeclaration identifier="l2" cardinality="single" baseType="string" /><outcomeDeclaration identifier="l2_score" cardinality="single" baseType="float"><defaultValue><value>0</value></defaultValue></outcomeDeclaration><responseDeclaration identifier="l3" cardinality="single" baseType="string" /><outcomeDeclaration identifier="l3_score" cardinality="single" baseType="float"><defaultValue><value>0</value></defaultValue></outcomeDeclaration><responseProcessing><responseCondition><responseIf><stringMatch caseSensitive="false"><baseValue baseType="string">quick</baseValue><variable identifier="l1" /></stringMatch><setOutcomeValue identifier="l1_score"><baseValue baseType="float">0.2</baseValue></setOutcomeValue><setOutcomeValue identifier="SCORE"><sum><variable identifier="SCORE" /><baseValue baseType="float">0.2</baseValue></sum></setOutcomeValue></responseIf></responseCondition><responseCondition><responseIf><stringMatch caseSensitive="false"><baseValue baseType="string">fox</baseValue><variable identifier="l2" /></stringMatch><setOutcomeValue identifier="l2_score"><baseValue baseType="float">0.2</baseValue></setOutcomeValue><setOutcomeValue identifier="SCORE"><sum><variable identifier="SCORE" /><baseValue baseType="float">0.2</baseValue></sum></setOutcomeValue></responseIf></responseCondition><responseCondition><responseIf><stringMatch caseSensitive="false"><baseValue baseType="string">dog</baseValue><variable identifier="l3" /></stringMatch><setOutcomeValue identifier="l3_score"><baseValue baseType="float">0.6</baseValue></setOutcomeValue><setOutcomeValue identifier="SCORE"><sum><variable identifier="SCORE" /><baseValue baseType="float">0.6</baseValue></sum></setOutcomeValue></responseIf></responseCondition><responseCondition><responseIf><lt><variable identifier="SCORE" /><baseValue baseType="float">0</baseValue></lt><setOutcomeValue identifier="SCORE"><baseValue baseType="float">0</baseValue></setOutcomeValue></responseIf><responseElseIf><gt><variable identifier="SCORE" /><baseValue baseType="float">1</baseValue></gt><setOutcomeValue identifier="SCORE"><baseValue baseType="float">1</baseValue></setOutcomeValue></responseElseIf></responseCondition></responseProcessing></assessmentItem>
+<assessmentItem identifier="" title="Fill in the blank(s)">
+  <outcomeDeclaration identifier="SCORE" baseType="float" cardinality="single">
+    <defaultValue>
+      <value>0</value>
+    </defaultValue>
+  </outcomeDeclaration>
+  <itemBody><![CDATA[<div>The ]]><textEntryInteraction responseIdentifier="l1" expectedLength="10"/><![CDATA[ brown ]]>
+    <textEntryInteraction responseIdentifier="l2" expectedLength="10"/><![CDATA[ jumped over the lazy ]]>
+    <textEntryInteraction responseIdentifier="l3" expectedLength="10"/><![CDATA[.</div>]]><![CDATA[<div></div>]]>
+  </itemBody>
+  <responseDeclaration identifier="l1" cardinality="single" baseType="string"/>
+  <outcomeDeclaration identifier="l1_score" cardinality="single" baseType="float">
+    <defaultValue>
+      <value>0</value>
+    </defaultValue>
+  </outcomeDeclaration>
+  <responseDeclaration identifier="l2" cardinality="single" baseType="string"/>
+  <outcomeDeclaration identifier="l2_score" cardinality="single" baseType="float">
+    <defaultValue>
+      <value>0</value>
+    </defaultValue>
+  </outcomeDeclaration>
+  <responseDeclaration identifier="l3" cardinality="single" baseType="string"/>
+  <outcomeDeclaration identifier="l3_score" cardinality="single" baseType="float">
+    <defaultValue>
+      <value>0</value>
+    </defaultValue>
+  </outcomeDeclaration>
+  <responseProcessing>
+    <responseCondition>
+      <responseIf>
+        <stringMatch caseSensitive="false">
+          <baseValue baseType="string">quick</baseValue>
+          <variable identifier="l1"/>
+        </stringMatch>
+        <setOutcomeValue identifier="l1_score">
+          <baseValue baseType="float">0.2</baseValue>
+        </setOutcomeValue>
+        <setOutcomeValue identifier="SCORE">
+          <sum>
+            <variable identifier="SCORE"/>
+            <baseValue baseType="float">0.2</baseValue>
+          </sum>
+        </setOutcomeValue>
+      </responseIf>
+    </responseCondition>
+    <responseCondition>
+      <responseIf>
+        <stringMatch caseSensitive="false">
+          <baseValue baseType="string">fox</baseValue>
+          <variable identifier="l2"/>
+        </stringMatch>
+        <setOutcomeValue identifier="l2_score">
+          <baseValue baseType="float">0.2</baseValue>
+        </setOutcomeValue>
+        <setOutcomeValue identifier="SCORE">
+          <sum>
+            <variable identifier="SCORE"/>
+            <baseValue baseType="float">0.2</baseValue>
+          </sum>
+        </setOutcomeValue>
+      </responseIf>
+    </responseCondition>
+    <responseCondition>
+      <responseIf>
+        <substring caseSensitive="false">
+          <baseValue baseType="string">dog</baseValue>
+          <variable identifier="l3"/>
+        </substring>
+        <setOutcomeValue identifier="l3_score">
+          <baseValue baseType="float">0.6</baseValue>
+        </setOutcomeValue>
+        <setOutcomeValue identifier="SCORE">
+          <sum>
+            <variable identifier="SCORE"/>
+            <baseValue baseType="float">0.6</baseValue>
+          </sum>
+        </setOutcomeValue>
+      </responseIf>
+    </responseCondition>
+    <responseCondition>
+      <responseIf>
+        <lt>
+          <variable identifier="SCORE"/>
+          <baseValue baseType="float">0</baseValue>
+        </lt>
+        <setOutcomeValue identifier="SCORE">
+          <baseValue baseType="float">0</baseValue>
+        </setOutcomeValue>
+      </responseIf>
+      <responseElseIf>
+        <gt>
+          <variable identifier="SCORE"/>
+          <baseValue baseType="float">1</baseValue>
+        </gt>
+        <setOutcomeValue identifier="SCORE">
+          <baseValue baseType="float">1</baseValue>
+        </setOutcomeValue>
+      </responseElseIf>
+    </responseCondition>
+  </responseProcessing>
+</assessmentItem>

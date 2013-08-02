@@ -7,6 +7,61 @@
 // --------------------------------------------------
 
 // Core
+
+/*
+@styleguide Buttons
+
+### Button Styles
+
+To change button styles, add an additional class:; `.btn-primary`, `.btn-info`, `.btn-success`, `btn-warning`, `btn-danger`, `btn-inverse`, `btn-link`. Apply to `<button>` and `<a>`
+
+```html
+<p>
+  <button class="btn" type="button">Default Button</button>
+</p>
+<p>
+  <button class="btn btn-primary" type="button">Primary button</button>
+</p>
+<p>
+  <button class="btn btn-info" type="button">Info button</button>
+</p>
+<p>
+  <button class="btn btn-success" type="button">Success button</button>
+</p>
+<p>
+  <button class="btn btn-warning" type="button">Warning button</button>
+</p>
+<p>
+  <button class="btn btn-danger" type="button">Danger button</button>
+</p>
+<p>
+  <button class="btn btn-inverse" type="button">Inverse button</button>
+</p>
+<p>
+  <button class="btn btn-link" type="button">Link button</button>
+</p>
+```
+
+### Button Sizes
+
+Add an additional class `.btn-large`, `.btn-small`, `.btn-mini` to change button sizes
+
+```html
+<p>
+  <button class="btn btn-large" type="button">Large button</button>
+</p>
+<p>
+  <button class="btn" type="button">Default button</button>
+</p>
+<p>
+  <button class="btn btn-small" type="button">Small button</button>
+</p>
+<p>
+  <button class="btn btn-mini" type="button">Mini button</button>
+</p>
+```
+*/
+
 .btn {
   display: inline-block;
   @include ie7-inline-block();

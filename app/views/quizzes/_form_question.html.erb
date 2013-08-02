@@ -22,9 +22,7 @@
       <option value="calculated_question"><%= t('question_type.calculated', "Formula Question") %></option>
       <option value="missing_word_question" class="missing_word"><%= t('question_type.missing_word', "Missing Word") %></option>
       <option value="essay_question"><%= t('question_type.essay', "Essay Question") %></option>
-      <% if @domain_root_account.file_upload_quiz_questions? %>
-        <option value="file_upload_question"><%= t('question_type.file_upload', "File Upload Question") %></option>
-      <% end %>
+      <option value="file_upload_question"><%= t('question_type.file_upload', "File Upload Question") %></option>
       <option value="text_only_question"><%= t('question_type.text_only', "Text (no question)") %></option>
     </select>
     <span class="question_points_holder">

@@ -269,6 +269,36 @@ describe SubmissionsController do
       assigns[:submission].submission_comments[0].attachments.map{|a| a.display_name}.should be_include("doc.doc")
       assigns[:submission].submission_comments[0].attachments.map{|a| a.display_name}.should be_include("xls.xls")
     end
+
+    it "should allow setting 'student_entered_grade'" do
+      course_with_student_logged_in(:active_all => true)
+      @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "online_url,online_upload")
+      @submission = @assignment.submit_homework(@user)
+      put 'update', {
+        :course_id => @course.id,
+        :assignment_id => @assignment.id,
+        :id => @user.id,
+        :submission => {
+          :student_entered_score => '2'
+        }
+      }
+      @submission.reload.student_entered_score.should == 2.0
+    end
+
+    it "should round 'student_entered_grade'" do
+      course_with_student_logged_in(:active_all => true)
+      @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "online_url,online_upload")
+      @submission = @assignment.submit_homework(@user)
+      put 'update', {
+        :course_id => @course.id,
+        :assignment_id => @assignment.id,
+        :id => @user.id,
+        :submission => {
+          :student_entered_score => '2.0000000020'
+        }
+      }
+      @submission.reload.student_entered_score.should == 2.0
+    end
   end
 
   def course_with_student_and_submitted_homework

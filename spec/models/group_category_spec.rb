@@ -289,4 +289,114 @@ describe GroupCategory do
       @category.group_for(@student).should == group2
     end
   end
+
+  context "#distribute_members_among_groups" do
+    it "should prefer groups with fewer users" do
+      course_with_teacher_logged_in(:active_all => true)
+      category = @course.group_categories.create(:name => "Group Category")
+      group1 = category.groups.create(:name => "Group 1", :context => @course)
+      group2 = category.groups.create(:name => "Group 2", :context => @course)
+      student1 = @course.enroll_student(user_model).user
+      student2 = @course.enroll_student(user_model).user
+      student3 = @course.enroll_student(user_model).user
+      student4 = @course.enroll_student(user_model).user
+      student5 = @course.enroll_student(user_model).user
+      student6 = @course.enroll_student(user_model).user
+      group1.add_user(student1)
+      group1.add_user(student2)
+
+      groups = category.groups.active
+      potential_members = @course.users_not_in_groups(groups)
+      memberships = category.distribute_members_among_groups(potential_members, groups)
+      student_ids = [student3.id, student4.id, student5.id, student6.id]
+      memberships.map { |m| m.user_id }.sort.should == student_ids.sort
+
+      grouped_memberships = memberships.group_by { |m| m.group_id }
+      grouped_memberships[group1.id].size.should == 1
+      grouped_memberships[group2.id].size.should == 3
+    end
+  end
+
+  context "#assign_unassigned_members_in_background" do
+    it "should use the progress object" do
+      course_with_teacher_logged_in(:active_all => true)
+      category = @course.group_categories.create(:name => "Group Category")
+      group1 = category.groups.create(:name => "Group 1", :context => @course)
+      group2 = category.groups.create(:name => "Group 2", :context => @course)
+      student1 = @course.enroll_student(user_model).user
+      student2 = @course.enroll_student(user_model).user
+      group2.add_user(student1)
+
+      category.assign_unassigned_members_in_background
+      category.current_progress.completion.should == 0
+
+      run_jobs
+
+      category.progresses.last.should be_completed
+    end
+  end
+
+  context "#assign_unassigned_members" do
+    it "should not assign users to inactive groups" do
+      course_with_teacher_logged_in(:active_all => true)
+      category = @course.group_categories.create(:name => "Group Category")
+      group1 = category.groups.create(:name => "Group 1", :context => @course)
+      group2 = category.groups.create(:name => "Group 2", :context => @course)
+      student1 = @course.enroll_student(user_model).user
+      student2 = @course.enroll_student(user_model).user
+      group2.add_user(student1)
+      group1.destroy
+
+      # group1 now has fewer students, and would be favored if it weren't
+      # destroyed. make sure the unassigned student (student2) is assigned to
+      # group2 instead of group1
+      memberships = category.assign_unassigned_members
+      memberships.size.should == 1
+      memberships.first.group_id.should == group2.id
+    end
+
+    it "should not assign users already in group in the category" do
+      course_with_teacher_logged_in(:active_all => true)
+      category = @course.group_categories.create(:name => "Group Category")
+      group1 = category.groups.create(:name => "Group 1", :context => @course)
+      group2 = category.groups.create(:name => "Group 2", :context => @course)
+      student1 = @course.enroll_student(user_model).user
+      student2 = @course.enroll_student(user_model).user
+      group2.add_user(student1)
+
+      # student1 shouldn't get assigned, already being in a group
+      memberships = category.assign_unassigned_members
+      memberships.map { |m| m.user }.should_not include(student1)
+    end
+
+    it "should otherwise assign ungrouped users to groups in the category" do
+      course_with_teacher_logged_in(:active_all => true)
+      category = @course.group_categories.create(:name => "Group Category")
+      group1 = category.groups.create(:name => "Group 1", :context => @course)
+      group2 = category.groups.create(:name => "Group 2", :context => @course)
+      student1 = @course.enroll_student(user_model).user
+      student2 = @course.enroll_student(user_model).user
+      group2.add_user(student1)
+
+      # student2 should get assigned, not being in a group
+      memberships = category.assign_unassigned_members
+      memberships.map { |m| m.user }.should include(student2)
+    end
+  end
+
+  context "#current_progress" do
+    it "should return a new progress if the other progresses are completed" do
+      course_with_teacher_logged_in(:active_all => true)
+      category = @course.group_categories.create!(:name => "Group Category")
+      # given existing completed progress
+      category.current_progress.should be_nil
+      category.send :start_progress
+      category.send :complete_progress
+      category.progresses.count.should == 1
+      category.current_progress.should be_nil
+      # expect new progress
+      category.send :start_progress
+      category.progresses.count.should == 2
+    end
+  end
 end

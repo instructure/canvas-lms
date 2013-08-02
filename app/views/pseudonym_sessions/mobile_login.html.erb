@@ -1,164 +1,26 @@
-<!doctype html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <title><%= t "log_in_to_canvas", "Log In To Canvas" %></title>
-  <meta name="HandheldFriendly" content="True">
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
-  <style>
-    * {
-      margin: 0px;
-      padding: 0px;
-    }
-    html, body {
-      height: 100%;
-    }
+<% form_for :pseudonym_session, :url => login_path, :html => {:id => "login_form", :class => "front face", :novalidate => 'novalidate'} do |f| %>
+  <input class="input-block-level" <%= 'type=email' if @login_handle_is_email %> name="pseudonym_session[unique_id]" value="<%= params[:pseudonym_session].try(:[], :unique_id) %>" placeholder="<%= @login_handle_name %>">
+  <input class="input-block-level" type="password" name="pseudonym_session[password]" placeholder="<%= t :password, "Password" %>">
+  <% if request.post? && flash[:error] %>
+    <div class="error"><%= flash[:error] %></div>
+  <% end %>
+  <button type="submit" class="btn btn-primary btn-large"><%= t('login', 'Login') %></button>
+  <% if url = params[:canvas_login].blank? && @domain_root_account.try(:forgot_password_external_url) %>
+    <%= link_to t('dont_know_password', "I don't know my password"), url, :class => 'btn btn-large forgot-password' %>
+  <% else %>
+    <a class="btn btn-large btn-inverse flip-to-back"><%= t('dont_know_password', "I don't know my password") %></a>
+  <% end %>
+<% end %>
+<% form_for :pseudonym_session, :url => forgot_password_path, :html => {:id => "forgot_password_form", :class => 'back face'} do |f| %>
+  <label for="pseudonym_session_unique_id_forgot"><%= t('login_handle', "Enter your %{login_handle_name} and we'll send you a link to change your password.", :login_handle_name => @login_handle_name) %></label>
+  <input class="input-block-level" <%= 'type=email' if @login_handle_is_email %> name="pseudonym_session[unique_id_forgot]" value="<%= @unauthorized_user.try :email %>" placeholder="<%= @login_handle_name %>" id="pseudonym_session_unique_id_forgot" />
+  <button type="submit" class="btn btn-primary btn-large" data-text-while-loading="<%= t :sending, "Sending..." %>" class="request-password-button"><%= t('buttons.request_password', 'Request Password') %></button>
+  <a class="btn btn-large btn-inverse flip-to-front"><%= t('back_to_login', "Back to Login") %></a>
+<% end %>
+<%= # for plugin use
+  render "shared/login_trailer" %>
 
-    html {
-      margin: 0;
-      padding: 0;
-      background-color: black;
-      background: url('/images/Money_Noise_tm.png?1348625397'),
-                  -webkit-gradient(radial, 50% 0px, 0, 50% 0px, 0, color-stop(0%, rgba(255, 255, 255, 0.4)), color-stop(100%, transparent)),
-                  -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #2B2B2B), color-stop(100%, black));
-      background: url('/images/Money_Noise_tm.png?1348625397'),
-                  -webkit-radial-gradient(50% 0px, circle cover, rgba(255, 255, 255, 0.4) 0%, transparent 100%),
-                  -webkit-linear-gradient(top, #2B2B2B, black);
-      background: url('/images/Money_Noise_tm.png?1348625397'),
-                  radial-gradient(50% -100px, circle cover, rgba(255, 255, 255, 0.6) 0%, transparent 100%),
-                  linear-gradient(top, #2B2B2B, black);
-      min-height: 420px;  /* this is a workaround to be high enough on an iphone */
-      font-size: 114%;
-      font-family: Helvetica;
-    }
-    .face {
-      background: #1a1b1a;
-      border-radius: 1em;
-      color: white;
-    }
-    #f1_container {
-      position: relative;
-      margin: 0 auto;
-      padding: 110px 0;
-      width: 300px;
-      height: 198px;
-      z-index: 1;
-      background-image: url("/images/canvas_logo_for_mobile_login.png?1");
-      background-position: center 30px;
-      background-repeat: no-repeat;
-      background-size: 270px 48px;
-    }
-
-    #f1_card {
-      width: 100%;
-      height: 100%;
-    }
-
-    .face {
-      position: absolute;
-      width: 100%;
-      padding: 0;
-    }
-
-    .face.back {
-      display: none;
-    }
-
-    .flipped .face.back {
-      display: block;
-    }
-
-    .flipped .face.front {
-      display: none;
-    }
-
-    input, button, .btn{
-      display: block;
-      border: none;
-      border-radius: 10px;
-      padding: 10px 15px;
-      text-shadow: 1px 1px 3px rgba(255,255,255, 0.5);
-      font-family: Helvetica;
-      background-color: #e1e1e1;
-      width: 240px;
-      margin: 15px 15px;
-      font-size: 20px;
-    }
-    label {
-      padding: 10px 15px;
-      display: block;
-      font-size: 15px;
-    }
-    button, .btn{
-      text-align: center;
-      background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #7ac0f8), color-stop(100%, #2e96e2));
-      -webkit-box-shadow: black 0px 0px 2px 0px;
-      border: 2px solid black;
-      text-shadow: 0px 1px 1px rgba(255,255,255,0.4);
-      color: #36629b;
-      width: 272px;
-      margin: 20px 13px;
-
-    }
-    .flip-to-back, .flip-to-front, .forgot-password {
-      background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #262626), color-stop(100%, #404141));
-      color: #c2c2c2;
-      margin-top: 30px;
-      font-size: 15px;
-      border-width: 1px;
-      text-shadow: 0px 1px 1px rgba(0,0,0,0.4);
-      margin-bottom: 15px;
-      width: 240px;
-    }
-    .forgot-password {
-      display: block;
-      text-decoration: none;
-    }
-    input::-webkit-input-placeholder {
-      color: #898989;
-    }
-    .error {
-      background: #faa;
-      color: #a00;
-      font-size: 20px;
-      text-shadow: 0px 1px 1px rgba(255,255,255,0.4);
-      margin: 15px;
-      padding: 10px 5px;
-      border-radius: 10px;
-      text-align: center;
-    }
-  </style>
-</head>
-
-<body>
-  <div id="f1_container">
-    <div id="f1_card">
-      <% form_for :pseudonym_session, :url => login_path, :html => {:id => "login_form", :class => "front face", :novalidate => 'novalidate'} do |f| %>
-        <input <%= 'type=email' if @login_handle_is_email %> name="pseudonym_session[unique_id]" value="<%= params[:pseudonym_session].try(:[], :unique_id) %>" placeholder="<%= @login_handle_name %>">
-        <input type="password" name="pseudonym_session[password]" placeholder="<%= t :password, "Password" %>">
-        <% if request.post? && flash[:error] %>
-          <div class="error"><%= flash[:error] %></div>
-        <% end %>
-        <button type="submit"><%= t('login', 'Login') %></button>
-        <% if url = params[:canvas_login].blank? && @domain_root_account.try(:forgot_password_external_url) %>
-          <%= link_to t('dont_know_password', "I don't know my password"), url, :class => 'btn forgot-password' %>
-        <% else %>
-          <a class="btn flip-to-back"><%= t('dont_know_password', "I don't know my password") %></a>
-        <% end %>
-      <% end %>
-      <% form_for :pseudonym_session, :url => forgot_password_path, :html => {:id => "forgot_password_form", :class => 'back face'} do |f| %>
-        <label for="pseudonym_session_unique_id_forgot"><%= t('login_handle', "Enter your %{login_handle_name} and we'll send you a link to change your password.", :login_handle_name => @login_handle_name) %></label>
-        <input <%= 'type=email' if @login_handle_is_email %> name="pseudonym_session[unique_id_forgot]" value="<%= @unauthorized_user.try :email %>" placeholder="<%= @login_handle_name %>" id="pseudonym_session_unique_id_forgot" />
-        <button type="submit" data-text-while-loading="<%= t :sending, "Sending..." %>" class="request-password-button"><%= t('buttons.request_password', 'Request Password') %></button>
-        <a class="btn flip-to-front"><%= t('back_to_login', "Back to Login") %></a>
-      <% end %>
-    </div>
-  </div>
-  <%= render "shared/login_trailer" %>
 <script>
-  var SHARED_JS_VARS = <%= @shared_js_vars.to_json.html_safe %>;
   var eventToBindTo = ('ontouchstart' in window) ? 'touchstart' : 'click';
 
   document.addEventListener('DOMContentLoaded', function(){
@@ -194,10 +56,10 @@
               '&pseudonym_session%5Bunique_id_forgot%5D=' +
               encodeURIComponent(uniqueId),
         success: function(response){
-          alert(SHARED_JS_VARS.RESET_SENT);
+          alert(ENV.RESET_SENT);
         },
         error: function(){
-          alert(SHARED_JS_VARS.RESET_ERROR);
+          alert(ENV.RESET_ERROR);
         },
         complete: function(){
           $button.textContent = originalText;
@@ -241,49 +103,4 @@
     xhr.send(options.data);
     return xhr;
   }
-
-  // https://gist.github.com/1183357
-  //scroll to top, hide address bar on mobile devices - 1 for android, 0 for the rest
-  (function( win ){
-    var doc = win.document;
-
-    // If there's a hash, or addEventListener is undefined, stop here
-    if( !location.hash || !win.addEventListener ){
-
-      //scroll to 1
-      window.scrollTo( 0, 1 );
-      var scrollTop = 1,
-        getScrollTop = function(){
-          return "scrollTop" in doc.body ? doc.body.scrollTop : 1;
-        },
-
-        //reset to 0 on bodyready, if needed
-        bodycheck = setInterval(function(){
-          if( doc.body ){
-            clearInterval( bodycheck );
-            scrollTop = getScrollTop();
-            win.scrollTo( 0, scrollTop === 1 ? 0 : 1 );
-          }
-        }, 15 );
-
-      win.addEventListener( "load", function(){
-        setTimeout(function(){
-          //at load, if user hasn't scrolled more than 20 or so...
-          if( getScrollTop() < 20 ){
-            //reset to hide addr bar at onload
-            win.scrollTo( 0, scrollTop === 1 ? 0 : 1 );
-          }
-        }, 0);
-      }, false );
-    }
-
-  })( this );
-
-  // GOOGLE ANALYTICS
-  var _gaq=[["_setAccount",SHARED_JS_VARS.GOOGLE_ANALYTICS_KEY],["_trackPageview"]];
-  (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];g.async=1;
-  g.src=("https:"==location.protocol?"//ssl":"//www")+".google-analytics.com/ga.js";
-  s.parentNode.insertBefore(g,s)}(document,"script"));
 </script>
-</body>
-</html>

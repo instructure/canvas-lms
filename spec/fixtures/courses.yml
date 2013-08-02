@@ -3,7 +3,6 @@
 courses_002: 
   name: English 120
   conclude_at: 
-  publish_grades_immediately: 
   updated_at: 2009-04-30 23:55:49
   account_id: 
   group_weighting_scheme: 
@@ -20,7 +19,6 @@ courses_002:
 courses_003: 
   name: Hum 200
   conclude_at: 
-  publish_grades_immediately: 
   updated_at: 2009-04-30 23:55:49
   account_id: 
   group_weighting_scheme: 
@@ -37,7 +35,6 @@ courses_003:
 courses_004: 
   name: Chem 105
   conclude_at: 
-  publish_grades_immediately: 
   updated_at: 2009-04-30 23:55:49
   account_id: 
   group_weighting_scheme: 
@@ -54,7 +51,6 @@ courses_004:
 courses_005: 
   name: Biology 100
   conclude_at: 
-  publish_grades_immediately: 
   updated_at: 2009-04-30 23:55:49
   account_id: 
   group_weighting_scheme: 
@@ -71,7 +67,6 @@ courses_005:
 courses_006: 
   name: value for name
   conclude_at: 2009-04-30 23:57:33
-  publish_grades_immediately: t
   updated_at: 2009-04-30 23:55:53
   account_id: 
   group_weighting_scheme: value for group_weighting_scheme
@@ -88,7 +83,6 @@ courses_006:
 courses_001: 
   name: Math 115
   conclude_at: 
-  publish_grades_immediately: 
   updated_at: 2009-04-30 23:55:49
   account_id: 
   group_weighting_scheme: 

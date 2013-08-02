@@ -125,28 +125,62 @@ Canvas::Plugin.register('tinychat', nil, {
 })
 require_dependency 'cc/importer/cc_worker'
 Canvas::Plugin.register 'canvas_cartridge_importer', :export_system, {
-  :name => lambda{ t :name, 'Canvas Cartridge Importer' },
+  :name => lambda{ I18n.t 'canvas_cartridge_name', 'Canvas Cartridge Importer' },
   :author => 'Instructure',
   :author_website => 'http://www.instructure.com',
-  :description => lambda{ t :description, 'This enables converting a canvas export to the intermediary json format to be imported' },
+  :description => lambda{ I18n.t :canvas_cartridge_description, 'This enables converting a canvas export to the intermediary json format to be imported' },
   :version => '1.0.0',
-  :select_text => lambda{ t :file_description, "Canvas Course Export Package" },
+  :select_text => lambda{ I18n.t :canvas_cartridge_file_description, "Canvas Course Export Package" },
   :settings => {
     :worker => 'CCWorker',
     :migration_partial => 'canvas_config',
+    :requires_file_upload => true,
     :provides =>{:canvas_cartridge => CC::Importer::Canvas::Converter}
   },
 }
+require_dependency 'canvas/migration/worker/course_copy_worker'
+Canvas::Plugin.register 'course_copy_importer', :export_system, {
+        :name => lambda { I18n.t :course_copy_name, 'Copy Canvas Course' },
+        :author => 'Instructure',
+        :author_website => 'http://www.instructure.com',
+        :description => lambda { I18n.t :course_copy_description, 'Migration plugin for copying canvas courses' },
+        :version => '1.0.0',
+        :select_text => lambda { I18n.t :course_copy_file_description, "Copy a Canvas Course" },
+        :settings => {
+                :worker => 'CourseCopyWorker',
+                :requires_file_upload => false,
+                :skip_conversion_step => true,
+                :required_options_validator => Canvas::Migration::Validators::CourseCopyValidator,
+                :required_settings => [:source_course_id]
+        },
+}
+require_dependency 'canvas/migration/worker/zip_file_worker'
+Canvas::Plugin.register 'zip_file_importer', :export_system, {
+        :name => lambda { I18n.t :zip_file_name, '.zip file' },
+        :author => 'Instructure',
+        :author_website => 'http://www.instructure.com',
+        :description => lambda { I18n.t :zip_file_description, 'Migration plugin for unpacking plain .zip files into a course' },
+        :version => '1.0.0',
+        :select_text => lambda { I18n.t :zip_file_file_description, "Unzip .zip file into folder" },
+        :settings => {
+                :worker => 'ZipFileWorker',
+                :requires_file_upload => true,
+                :no_selective_import => true,
+                :required_options_validator => Canvas::Migration::Validators::ZipImporterValidator,
+                :required_settings => [:source_folder_id]
+        },
+}
 Canvas::Plugin.register 'common_cartridge_importer', :export_system, {
-  :name => lambda{ t :name, 'Common Cartridge Importer' },
+  :name => lambda{ I18n.t :common_cartridge_name, 'Common Cartridge Importer' },
   :author => 'Instructure',
   :author_website => 'http://www.instructure.com',
-  :description => lambda{ t :description, 'This enables converting a Common Cartridge packages in the intermediary json format to be imported' },
+  :description => lambda{ I18n.t :common_cartridge_description, 'This enables converting a Common Cartridge packages in the intermediary json format to be imported' },
   :version => '1.0.0',
-  :select_text => lambda{ t :file_description, "Common Cartridge 1.0/1.1/1.2 Package" },
+  :select_text => lambda{ I18n.t :common_cartridge_file_description, "Common Cartridge 1.0/1.1/1.2 Package" },
   :settings => {
     :worker => 'CCWorker',
     :migration_partial => 'cc_config',
+    :requires_file_upload => true,
     :provides =>{:common_cartridge=>CC::Importer::Standard::Converter, 
                  :common_cartridge_1_0=>CC::Importer::Standard::Converter, 
                  :common_cartridge_1_1=>CC::Importer::Standard::Converter, 
@@ -232,4 +266,16 @@ Canvas::Plugin.register('account_reports', nil, {
   :settings_partial => 'plugins/account_report_settings',
   :settings => nil,
   :validator => 'AccountReportsValidator'
+})
+Canvas::Plugin.register('app_center', nil, {
+    :name => lambda{ t :name, 'App Center' },
+    :description => lambda{ t :description, 'App Center for tracking/installing external tools in Canvas' },
+    :settings_partial => 'plugins/app_center_settings',
+    :settings => {
+        :base_url => 'https://www.edu-apps.org',
+        :token => nil,
+        :apps_index_endpoint => '/api/v1/apps',
+        :app_reviews_endpoint => '/api/v1/apps/:id/reviews'
+    },
+    :validator => 'AppCenterValidator'
 })

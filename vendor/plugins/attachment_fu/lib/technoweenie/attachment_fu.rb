@@ -170,7 +170,7 @@ module Technoweenie # :nodoc:
         base.after_destroy :destroy_file
         base.after_validation :process_attachment
         if defined?(::ActiveSupport::Callbacks)
-          base.define_callbacks :after_resize, :after_attachment_saved, :before_thumbnail_saved
+          base.define_callbacks :after_resize, :before_attachment_saved, :after_attachment_saved, :before_thumbnail_saved, :after_save_and_attachment_processing
         end
       end
 
@@ -515,6 +515,7 @@ module Technoweenie # :nodoc:
         # Stub for a #process_attachment method in a processor
         def process_attachment
           @saved_attachment = save_attachment?
+          callback :before_attachment_saved if @saved_attachment
         end
 
         # Cleans up after processing.  Thumbnails are created, the attachment is stored to the backend, and the temp_paths are cleared.
@@ -526,10 +527,35 @@ module Technoweenie # :nodoc:
             #   temp_file = temp_path || create_temp_file
             #   attachment_options[:thumbnails].each { |suffix, size| create_or_update_thumbnail(temp_file, suffix, *size) }
             # end
-            save_to_storage
-            @temp_paths.clear
-            @saved_attachment = nil
-            callback :after_attachment_saved
+
+            # In normal attachment upload usage, the only transaction we should
+            # be inside is the AR#save transaction. If that's the case, defer
+            # the upload and callbacks until after the transaction commits. If
+            # the upload fails, that will leave this attachment in an
+            # unattached state, but that's already the case in other error
+            # situations as well.
+            #
+            # If there is no transaction, or more than one transaction, then
+            # just upload immediately. This can happen if
+            # after_process_attachment is called directly, or if we're inside
+            # an rspec test run (which is wrapped in an outer transaction).
+            # It can also happen if somebody explicitly uploads file data
+            # inside a .transaction block, which we normally shouldn't do.
+            save_and_callbacks = proc do
+              save_to_storage
+              @temp_paths.clear
+              @saved_attachment = nil
+              callback :after_attachment_saved
+              callback :after_save_and_attachment_processing
+            end
+
+            if connection.open_transactions == 1
+              connection.after_transaction_commit(&save_and_callbacks)
+            else
+              save_and_callbacks.call()
+            end
+          else
+            callback :after_save_and_attachment_processing
           end
         end
 

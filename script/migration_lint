@@ -37,6 +37,10 @@ migrations.each do |migration|
   if data =~ /concurrent\W/
     add_error("you misspelled concurrently. that's not gonna work")
   end
+
+  if data =~ /\Wid(?:\s*=>\s*|:\s+)false/
+    add_warning("Please please please always have a primary key")
+  end
 end
 
 @warnings.each do |warning|

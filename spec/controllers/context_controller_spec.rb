@@ -188,6 +188,18 @@ describe ContextController do
       @media_object.media_type.should == "audio"
       @media_object.title.should == "title"
     end
+
+    it "should truncate the title and user_entered_title" do
+      post :create_media_object,
+        :context_code => "user_#{@user.id}",
+        :id => "new_object",
+        :type => "audio",
+        :title => 'x' * 300,
+        :user_entered_title => 'y' * 300
+      @media_object = @user.reload.media_objects.last
+      @media_object.title.size.should <= 255
+      @media_object.user_entered_title.size.should <= 255
+    end
   end
 
   describe "GET 'prior_users" do

@@ -19,6 +19,8 @@ define([
   'i18n!groups',
   'jquery' /* $ */,
   'underscore',
+  'compiled/fn/preventDefault',
+  'compiled/views/MessageStudentsDialog',
   'jqueryui/draggable' /* /\.draggable/ */,
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_forms' /* formSubmit, fillFormData, formErrors */,
@@ -31,7 +33,7 @@ define([
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'jqueryui/droppable' /* /\.droppable/ */,
   'jqueryui/tabs' /* /\.tabs/ */
-], function(I18n, $, _) {
+], function(I18n, $, _, preventDefault, MessageStudentsDialog) {
 
   window.contextGroups = {
     autoLoadGroupThreshold: 15,
@@ -49,7 +51,7 @@ define([
     },
 
     loadMembersForGroup: function($group) {
-      var url = $("#manage_group_urls .list_users_url").attr('href');
+      var url = ENV.list_users_url;
       var id = $group.getTemplateData({textValues: ['group_id']}).group_id;
       url = $.replaceTags(url, "id", id)
 
@@ -98,7 +100,7 @@ define([
 
       // This is lots of duplicated code from above, with tweaks. TODO: Refactor
       var category_id = $group.closest(".group_category").data('category_id');
-      var url = $("#manage_group_urls .list_unassigned_users_url").attr('href');
+      var url = ENV.list_unassigned_users_url;
       url += "?category_id=" + category_id + "&page=" + page;
 
       $group.find(".load_members_link").hide();
@@ -110,6 +112,7 @@ define([
         $group.find(".user_count_hidden").text(data['total_entries'] - data['users'].length);
         $group.find(".group_user_count").show();
         $group.find(".student").remove();
+        $group.find(".student_links").showIf(data['total_entries'] > 0);
 
         var $user_template = $(".user_template");
         var users = data['users'];
@@ -139,10 +142,10 @@ define([
       var id = $group.getTemplateData({textValues: ['group_id']}).group_id;
       var user_id = $student.getTemplateData({textValues: ['user_id']}).user_id;
       var $original_group = $student.parents(".group");
-      var url = $("#manage_group_urls .add_user_url").attr('href');
+      var url = ENV.add_user_url;
       method = "POST";
       if(!id || id.length == 0) {
-        url = $("#manage_group_urls .remove_user_url").attr('href');
+        url = ENV.remove_user_url;
         method = "DELETE";
         id = $original_group.getTemplateData({textValues: ['group_id']}).group_id;
       }
@@ -203,6 +206,8 @@ define([
           // attempted group membership claims the user was unacceptable for
           // some reason (probably section).
           message = data.errors.user_id[0].message;
+        } else if (data.errors && data.errors.group_id) {
+          message = data.errors.group_id[0].message;
         } else {
           message = I18n.t('errors.unknown', 'An unexpected error occurred.');
         }
@@ -244,8 +249,10 @@ define([
 
     updateCategoryCounts: function($category) {
       $category.find(".group").each(function() {
-        var userCount = $(this).find(".student_list .student").length + parseInt($(this).find(".user_count_hidden").text());
-        $(this).find(".user_count").text(I18n.t('category.student', 'student', {count: userCount}));
+        var $this = $(this);
+        var userCount = $this.find(".student_list .student").length + parseInt($this.find(".user_count_hidden").text());
+        $this.find(".user_count").text(I18n.t('category.student', 'student', {count: userCount}));
+        $this.find(".student_links").showIf(userCount > 0);
       });
 
       var groupCount = $category.find(".group:not(.group_blank)").length;
@@ -315,6 +322,10 @@ define([
       $category.find('.self_signup_text').showIf(category.self_signup);
       $category.find('.restricted_self_signup_text').showIf(category.self_signup === 'restricted');
       $category.find('.assign_students_link').showIf(category.self_signup !== 'restricted');
+      $category.find('.group_limit_blurb').showIf(category.group_limit);
+      $category.find('.group_limit, .group_limit_text').text(category.group_limit || '');
+      $category.find('.students_link_separator').showIf(category.self_signup && category.self_signup !== 'restricted');
+      $category.find('.message_students_link').showIf(category.self_signup);
     },
 
     addGroupToSidebar: function(group) {
@@ -364,6 +375,7 @@ define([
       var $category = $(this).parents(".group_category");
       var $group = $("#category_template").find(".group_blank").clone(true);
       $group.removeAttr('id');
+      $group.find(".student_links").remove();
       $group.find(".student_list").empty();
       $group.removeClass('group_blank');
       $group.find(".load-more").hide();
@@ -419,7 +431,7 @@ define([
       if($group.attr('id')) {
         $form.attr('method', 'PUT').attr('action', $group.find(".edit_group_link").attr('href'));
       } else {
-        $form.attr('method', 'POST').attr('action', $("#manage_group_urls .add_group_url").attr('href'));
+        $form.attr('method', 'POST').attr('action', ENV.add_group_url);
       }
       if($group.length > 0) {
         $group.parents(".group_category").scrollTo($group);
@@ -452,6 +464,12 @@ define([
           if(found) {
             return I18n.t('errors.category_in_use', "\"%{category_name}\" is already in use", {category_name: val});
           }
+        },
+        'group_limit': function(val, data) {
+          if (parseInt(val) <= 1) {
+            return I18n.t('errors.group_limit', 'Group limit must be blank or greater than 1')
+          }
+          return false;
         }
       },
       beforeSubmit: function(data) {
@@ -483,14 +501,16 @@ define([
       var $form = $("#edit_category_form").clone(true);
 
       // fill out form given the current category values
-      var data = $category.getTemplateData({textValues: ['category_name', 'self_signup', 'heterogenous']});
+      var data = $category.getTemplateData({textValues: ['category_name', 'self_signup', 'heterogenous', 'group_limit']});
       var form_data = {
         name: data.category_name,
         enable_self_signup: data.self_signup !== null && data.self_signup !== '',
-        restrict_self_signup: data.self_signup == 'restricted'
+        restrict_self_signup: data.self_signup == 'restricted',
+        group_limit: data.group_limit
       };
       $form.fillFormData(form_data, { object_name: 'category' });
       $form.find("#category_restrict_self_signup").prop('disabled', !form_data.enable_self_signup || data.heterogenous == 'true');
+      $form.find("#group_structure_self_signup_subcontainer").showIf( $form.find('#category_enable_self_signup').is(':checked') );
 
       $category.addClass('editing');
       $category.prepend($form.show());
@@ -589,6 +609,8 @@ define([
         $category.find('.self_signup_text').showIf(group_category.self_signup);
         $category.find('.restricted_self_signup_text').showIf(group_category.self_signup == 'restricted');
         $category.find('.assign_students_link').showIf(group_category.self_signup !== 'restricted');
+        $category.find('.students_link_separator').showIf(group_category.self_signup && group_category.self_signup !== 'restricted');
+        $category.find('.message_students_link').showIf(group_category.self_signup);
 
         var newIndex = $("#group_tabs").tabs('length');
         if ($("li.category").last().hasClass('student_organized')) {
@@ -616,6 +638,12 @@ define([
           if(found) {
             return I18n.t('errors.category_in_use', "\"%{category_name}\" is already in use", {category_name: val});
           }
+        },
+        'category[group_limit]': function(val, data) {
+          if (parseInt(val) <= 1) {
+            return I18n.t('errors.group_limit', 'Group limit must be blank or greater than 1')
+          }
+          return false;
         }
       },
       beforeSubmit: function(data) {
@@ -662,6 +690,7 @@ define([
       var heterogenous = $(this).parents('.group_category').find('.heterogenous').text() == 'true';
       var disable_restrict = !self_signup || heterogenous;
       $("#edit_category_form #category_restrict_self_signup").prop('disabled', disable_restrict);
+      $("#edit_category_form #group_structure_self_signup_subcontainer").showIf(self_signup);
       if (disable_restrict) {
         $("#edit_category_form #category_restrict_self_signup").prop('checked', false);
       }
@@ -709,7 +738,7 @@ define([
       $unassigned.find(".loading_members").show();
 
       // perform ajax request to do the assignment server side
-      var url = $("#manage_group_urls .assign_unassigned_users_url").attr('href');
+      var url = ENV.assign_unassigned_users_url;
       url = $.replaceTags(url, "category_id", $category.data('category_id'));
       $.ajaxJSON(url, "POST", null, function(data) {
         if (!data.length) {
@@ -804,6 +833,44 @@ define([
       contextGroups.updateCategoryCounts($(this));
     });
     $("#tabs_loading_wrapper").show();
+
+
+    function loadUnassignedStudentsFor(categoryId) {
+      var $studentsDfrd = $.Deferred();
+      var students = [];
+      var baseUrl = ENV.list_unassigned_users_url + "?no_html=1&category_id=" + categoryId + "&per_page=100&page=";
+
+      var fetch = function(url) {
+        $.ajaxJSON(url, 'GET', null, function(data) {
+          _.each(data.users, function(user) {
+            students.push({id: user.user_id, short_name: user.display_name});
+          });
+          if (data.next_page)
+            fetch(baseUrl + data.next_page);
+          else
+            $studentsDfrd.resolve(students);
+        }, function() { $studentsDfrd.reject(); });
+      };
+
+      fetch(baseUrl + "1");
+      return $studentsDfrd;
+    }
+
+    $(".message_students_link").click(preventDefault(function() {
+      // jQuery sadness until we rewrite public/javascripts/manage_groups.js :(
+      var $category = $(this).closest('.group_category');
+      var categoryName = $category.find('.category_name').first().text();
+      var categoryId = $category.data('category_id');
+
+      loadUnassignedStudentsFor(categoryId).then(function(students) {
+        var dialog = new MessageStudentsDialog({
+          context: categoryName,
+          recipientGroups: [
+            {name: I18n.t('students_who_have_not_joined_a_group', 'Students who have not joined a group'), recipients: students}
+          ]});
+        dialog.open();
+      });
+    }));
   });
 });
 

@@ -1,0 +1,12 @@
+<% define_content :link do %>
+  <%= HostUrl.protocol %>://<%= polymorphic_path([asset.quiz.context,asset.quiz,:history],:quiz_submission_id => asset.id) %>
+<% end %>
+
+<% define_content :subject do %>
+  <%= t :subject, "Quiz Submitted: %{quiz}, %{context}", :quiz => asset.assignment.title, :context => asset.assignment.context.name %>
+<% end %>
+
+<%= t :body, "A submission has been turned in for your quiz, *%{title}*, and it requires manual grading.", :title => asset.quiz.title, :wrapper => "<b><a href=\"#{content :link}\">\\1</a></b>" %>
+
+<%= t :submitted_date, "submitted: %{date}", :date => datetime_string(force_zone(asset.finished_at))  %>
+

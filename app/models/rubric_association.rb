@@ -149,7 +149,7 @@ class RubricAssociation < ActiveRecord::Base
     assessment_request ||= self.assessment_requests.build(:user => assessee, :assessor => assessor)
     assessment_request.workflow_state = "assigned" if assessment_request.new_record?
     assessment_request.asset = asset
-    invite ? assessment_request.send_invitation! : assessment_request.save!
+    invite ? assessment_request.send_reminder! : assessment_request.save!
     assessment_request
   end
   

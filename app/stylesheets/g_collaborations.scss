@@ -7,7 +7,7 @@ $highlight-blue: #00b5fe;
 .collaborations-header {
   overflow: hidden;
 
-  h1    { float: left; }
+  h1, .h1    { float: left; }
   a.btn { float: right; }
 }
 
@@ -28,7 +28,7 @@ $highlight-blue: #00b5fe;
     line-height: 0.8em;
   }
 
-  h3 {
+  h3, .h3 {
     font-family: arial, sans-serif;
     font-size: 1.2em;
     border-bottom: 1px solid #cccccc;

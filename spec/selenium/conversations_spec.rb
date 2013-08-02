@@ -121,6 +121,43 @@ describe "conversations" do
     end
   end
 
+  context "New message... link" do
+    before :each do
+      @me = @user
+      @other = user(:name => 'Some OtherDude')
+      @course.enroll_student(@other)
+      conversation(@me, @other, :workflow_state => 'unread')
+      @participant_me = @conversation
+      @convo = @participant_me.conversation
+      @convo.add_message(@other, "Hey bud!")
+      @convo.add_message(@me, "Howdy friend!")
+      get '/conversations'
+      f('.unread').click
+      wait_for_ajaximations
+    end
+
+    it "should not display on my own message" do
+      # Hover over own message
+      driver.execute_script("$('.message.self:first .send_private_message').focus()")
+      f(".message.self .send_private_message").displayed?.should be_false
+    end
+
+    it "should display on messages from others" do
+      # Hover over the message from the other writer to display link
+      driver.execute_script("$('.message.other .send_private_message').focus()")
+      f(".message.other .send_private_message").displayed?.should be_true
+    end
+
+    it "should start new message to the user" do
+      f(".message.other .send_private_message").click()
+      wait_for_ajaximations
+      # token gets added after brief delay
+      sleep(0.4)
+      # create "token" with the 'other' user
+      f("#create_message_form .token_input ul").text().should == @other.name
+    end
+  end
+
   context 'messages' do
     before(:each) do
       @me = @user

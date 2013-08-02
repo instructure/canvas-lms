@@ -23,6 +23,24 @@ describe QuizzesHelper do
   include ApplicationHelper
   include QuizzesHelper
 
+  describe "#attachment_id_for" do
+
+    it "returns the attachment id if attachment exists" do
+      question = {:id => 1}
+      @attachments = { 1 => {:id => "11"} }
+      @stored_params = { "question_1" => ["1"]}
+      attachment_id_for(question).should == "11"
+    end
+
+    it "returns empty string when no attachments stored" do
+
+      question = {:id => 1}
+      @stored_params = {}
+      @attachments = {}
+      attachment_id_for(question).should == nil
+    end
+  end
+
   context 'render_score' do
     it 'should render nil scores' do
       render_score(nil).should == '_'
@@ -109,13 +127,6 @@ describe QuizzesHelper do
     end
   end
 
-  context 'duration_in_minutes' do
-    it 'should work in russian when count == 1' do
-      I18n.locale = "ru"
-      duration_in_minutes(60.6).should == "1 минута"
-    end
-  end
-
   context 'fill_in_multiple_blanks_question' do
     it 'should sanitize user input' do
       def user_content(stuff); stuff; end
@@ -130,4 +141,5 @@ describe QuizzesHelper do
       html.should == %q|<input name="question_1" 'value=&#39;&gt;&lt;script&gt;alert(&#39;ha!&#39;)&lt;/script&gt;&lt;img' readonly="readonly" />|
     end
   end
+
 end

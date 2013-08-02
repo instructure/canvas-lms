@@ -1,0 +1,20 @@
+<p><%= t('account_reports.default.recently_deleted_courses.text',
+         %{This report shows all the courses for a given term that have been
+  deleted in the last 30 days. The resulting csv file will have one row per
+  course and will show the course id, course sis id, course short name, course
+  name, course start and end dates.}) %></p>
+
+<h3><%= t('account_reports.default.recently_deleted_courses.header', %{Example}) %></h3>
+
+<table class="report_example">
+  <thead>
+  <tr><th>id</th><th>sis id</th><th>short name</th><th>name</th>
+    <th>start date</th><th>end date</th></tr>
+  </thead>
+  <tbody>
+  <tr><td>345</td><td>c342</td><td>MATH101</td><td>Mathematics 101</td>
+    <td>2012-09-26T00:00:00-05:00</td><td>2012-12-21T11:00:00-05:00</td>
+  </tr>
+  </tbody>
+</table>
+

@@ -23,12 +23,15 @@ class QuizSubmissionsController < ApplicationController
 
   def index
     @quiz = @context.quizzes.find(params[:quiz_id])
-    redirect_to named_context_url(@context, :context_quiz_url, @quiz.id)
+    if params[:zip] && authorized_action(@quiz, @current_user, :grade)
+      submission_zip
+    else
+      redirect_to named_context_url(@context, :context_quiz_url, @quiz.id)
+    end
   end
   
   # submits the quiz as final
   def create
-    redirect_params = {}
     @quiz = @context.quizzes.find(params[:quiz_id])
     if @quiz.access_code.present?
       session.delete(@quiz.access_code_key_for_user(@current_user))
@@ -36,16 +39,18 @@ class QuizSubmissionsController < ApplicationController
     if @quiz.ip_filter && !@quiz.valid_ip?(request.remote_ip)
       flash[:error] = t('errors.protected_quiz', "This quiz is protected and is only available from certain locations.  The computer you are currently using does not appear to be at a valid location for taking this quiz.")
     elsif @quiz.grants_right?(@current_user, :submit)
-      @submission = @quiz.quiz_submissions.find_by_user_id(@current_user.id) if @current_user
       # If the submission is a preview, we don't add it to the user's submission history,
       # and it actually gets keyed by the temporary_user_code column instead of 
-      preview = params[:preview] && @quiz.grants_right?(@current_user, session, :update)
-      @submission = nil if preview
-      if !@current_user || preview
+      if @current_user.nil? || is_previewing?
         @submission = @quiz.quiz_submissions.find_by_temporary_user_code(temporary_user_code(false))
-        @submission ||= @quiz.generate_submission(temporary_user_code(false) || @current_user, preview)
+        @submission ||= @quiz.generate_submission(temporary_user_code(false) || @current_user, is_previewing?)
       else
-        @submission ||= @quiz.generate_submission(@current_user, preview)
+        @submission = @quiz.quiz_submissions.find_by_user_id(@current_user.id) if @current_user.present?
+        @submission ||= @quiz.generate_submission(@current_user, is_previewing?)
+        if @submission.present? && !@submission.valid_token?(params[:validation_token])
+          flash[:error] = t('errors.invalid_submissions', "This quiz submission could not be verified as belonging to you.  Please try again.")
+          return redirect_to course_quiz_url(@context, @quiz, previewing_params)
+        end
       end
 
       sanitized_params = @submission.sanitize_params(params)
@@ -59,28 +64,32 @@ class QuizSubmissionsController < ApplicationController
         flash[:notice] = t('errors.late_quiz', "You submitted this quiz late, and your answers may not have been recorded.") if @submission.overdue?
         @submission.grade_submission
       end
-      if preview
-        redirect_params[:preview] = 1
-      end
     end
     if session.delete('lockdown_browser_popup')
       return render(:action => 'close_quiz_popup_window')
     end
-    redirect_to course_quiz_url(@context, @quiz, redirect_params)
+    redirect_to course_quiz_url(@context, @quiz, previewing_params)
   end
   
   def backup
     @quiz = @context.quizzes.find(params[:quiz_id])
     if authorized_action(@quiz, @current_user, :submit)
-      preview = params[:preview] && @quiz.grants_right?(@current_user, session, :update)
-      if @current_user.blank? || preview
+      if @current_user.nil? || is_previewing?
         @submission = @quiz.quiz_submissions.find_by_temporary_user_code(temporary_user_code(false))
       else
         @submission = @quiz.quiz_submissions.find_by_user_id(@current_user.id)
+        if @submission.present? && !@submission.valid_token?(params[:validation_token])
+          if params[:action] == 'record_answer'
+            flash[:error] = t('errors.invalid_submissions', "This quiz submission could not be verified as belonging to you.  Please try again.")
+            return redirect_to polymorphic_path([@context, @quiz])
+          else
+            return render_json_unauthorized
+          end
+        end
       end
 
       if @quiz.ip_filter && !@quiz.valid_ip?(request.remote_ip)
-      elsif preview || (@submission && @submission.temporary_user_code == temporary_user_code(false)) || (@submission && @submission.grants_right?(@current_user, session, :update))
+      elsif is_previewing? || (@submission && @submission.temporary_user_code == temporary_user_code(false)) || (@submission && @submission.grants_right?(@current_user, session, :update))
         if !@submission.completed? && !@submission.overdue?
           if params[:action] == 'record_answer'
             if last_question = params[:last_question_id]
@@ -89,7 +98,7 @@ class QuizSubmissionsController < ApplicationController
 
             @submission.backup_submission_data(params)
             next_page = params[:next_question_path] || course_quiz_take_path(@context, @quiz)
-            redirect_to next_page and return
+            return redirect_to next_page
           else
             @submission.backup_submission_data(params)
             render :json => {:backup => true, :end_at => @submission && @submission.end_at}.to_json
@@ -150,4 +159,53 @@ class QuizSubmissionsController < ApplicationController
     end
   end
 
+  protected
+
+  def is_previewing?
+    @previewing ||= params[:preview] && @quiz.grants_right?(@current_user, session, :update)
+  end
+
+  def previewing_params
+    is_previewing? ? { :preview => 1 } : {}
+  end
+
+  # TODO: this is mostly copied and pasted from submission_controller.rb. pull
+  # out common code
+  def submission_zip
+    @attachments = @quiz.attachments.where(:display_name => 'submissions.zip', :workflow_state => ['to_be_zipped', 'zipping', 'zipped', 'errored', 'unattached'], :user_id => @current_user).order(:created_at).all
+    @attachment = @attachments.pop
+    @attachments.each{|a| a.destroy! }
+    if @attachment && (@attachment.created_at < 1.hour.ago || @attachment.created_at < (@quiz.quiz_submissions.map{|s| s.finished_at}.compact.max || @attachment.created_at))
+      @attachment.destroy!
+      @attachment = nil
+    end
+    if !@attachment
+      @attachment = @quiz.attachments.build(:display_name => 'submissions.zip')
+      @attachment.workflow_state = 'to_be_zipped'
+      @attachment.file_state = '0'
+      @attachment.user = @current_user
+      @attachment.save!
+      ContentZipper.send_later_enqueue_args(:process_attachment, { :priority => Delayed::LOW_PRIORITY, :max_attempts => 1 }, @attachment)
+      render :json => @attachment.to_json
+    else
+      respond_to do |format|
+        if @attachment.zipped?
+          if Attachment.s3_storage?
+            format.html { redirect_to @attachment.cacheable_s3_inline_url }
+            format.zip { redirect_to @attachment.cacheable_s3_inline_url }
+          else
+            cancel_cache_buster
+            format.html { send_file(@attachment.full_filename, :type => @attachment.content_type_with_encoding, :disposition => 'inline') }
+            format.zip { send_file(@attachment.full_filename, :type => @attachment.content_type_with_encoding, :disposition => 'inline') }
+          end
+          format.json { render :json => @attachment.to_json(:methods => :readable_size) }
+        else
+          flash[:notice] = t('still_zipping', "File zipping still in process...")
+          format.html { redirect_to named_context_url(@context, :context_quiz_url, @quiz.id) }
+          format.zip { redirect_to named_context_url(@context, :context_quiz_url, @quiz.id) }
+          format.json { render :json => @attachment.to_json }
+        end
+      end
+    end
+  end
 end

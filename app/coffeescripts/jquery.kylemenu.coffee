@@ -41,6 +41,13 @@ define [
         @$placeholder = $('<span style="display:none;">').insertAfter(@$menu)
         @$menu.bind 'click', => @$placeholder.trigger arguments...
 
+      # passing a noifyMenuActiveOn option when initializing a kylemenu helps
+      # get around issue of page-specific parent elements needing to know when the menu
+      # is active and removed. The value of the option is a CSS selector for a parent
+      # element of the trigger.
+      if @opts.notifyMenuActiveOnParent
+        @$notifyParent = @$trigger.closest(@opts.notifyMenuActiveOnParent)
+
       @$menu.on
         menuselect: @select
         popupopen: @onOpen
@@ -49,6 +56,7 @@ define [
     onOpen: (event) =>
       @adjustCarat event
       @$menu.addClass 'ui-state-open'
+      @$notifyParent.addClass('menu_active') if @opts.notifyMenuActiveOnParent
 
     open: ->
       @$menu.popup 'open'
@@ -63,6 +71,7 @@ define [
       @$menu.insertBefore(@$placeholder) if @opts.appendMenuTo
       @$trigger.removeClass 'ui-state-active'
       @$menu.removeClass "ui-state-open"
+      @$notifyParent.removeClass('menu_active') if @opts.notifyMenuActiveOnParent
 
     keepButtonActive: =>
       @$trigger.addClass('ui-state-active') if @$menu.is('.ui-state-open') && @$trigger.is('.btn, .ui-button')

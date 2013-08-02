@@ -18,7 +18,7 @@
 
 <p><strong><%= asset.title %></strong></p>
 
-<p><%= strip_and_truncate(asset.message, :max_length => 5000).gsub(/\n/, '</p><p>') %></p>
+<%= html_to_simple_html(asset.message, :base_url => "#{HostUrl.protocol}://#{HostUrl.context_host(asset.context)}") %>
 
 <hr style="border: 0;
     height: 1px;

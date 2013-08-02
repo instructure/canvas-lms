@@ -81,7 +81,7 @@ describe Course do
     added_migration_ids.should eql(migration_ids)
     course.wiki.wiki_pages.length.should eql(migration_ids.length)
     # front page
-    page = course.wiki.wiki_page
+    page = course.wiki.front_page
     page.should_not be_nil
     page.migration_id.should eql("1865116206002")
     page.body.should_not be_nil

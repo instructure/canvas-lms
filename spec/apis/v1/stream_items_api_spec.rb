@@ -50,6 +50,23 @@ describe UsersController, :type => :integration do
     json.size.should == 1
   end
 
+  it "should return the activity stream summary" do
+    @context = @course
+    discussion_topic_model
+    discussion_topic_model(:user => @user)
+    conversation(User.create, @user)
+    Notification.create(:name => 'Assignment Due Date Changed', :category => "TestImmediately")
+    Assignment.any_instance.stubs(:created_at).returns(4.hours.ago)
+    assignment_model(:course => @course)
+    @assignment.update_attribute(:due_at, 1.week.from_now)
+    json = api_call(:get, "/api/v1/users/self/activity_stream/summary.json",
+                    { :controller => "users", :action => "activity_stream_summary", :format => 'json' })
+    json.should == [{"type" => "Conversation", "count" => 1, "unread_count" => 0, "notification_category" => nil}, # conversations don't currently set the unread state on stream items
+                    {"type" => "DiscussionTopic", "count" => 2, "unread_count" => 1, "notification_category" => nil},
+                    {"type" => "Message", "count" => 1, "unread_count" => 0, "notification_category" => "TestImmediately"} # check a broadcast-policy-based one
+                   ]
+  end
+
   it "should format DiscussionTopic" do
     @context = @course
     discussion_topic_model
@@ -64,6 +81,7 @@ describe UsersController, :type => :integration do
       'title' => "value for title",
       'message' => 'value for message',
       'type' => 'DiscussionTopic',
+      'read_state' => StreamItemInstance.last.read?,
       'context_type' => "Course",
       'created_at' => StreamItem.last.created_at.as_json,
       'updated_at' => StreamItem.last.updated_at.as_json,
@@ -93,6 +111,7 @@ describe UsersController, :type => :integration do
       'title' => "No Title",
       'message' => nil,
       'type' => 'DiscussionTopic',
+      'read_state' => StreamItemInstance.last.read?,
       'context_type' => "CollectionItem",
       'created_at' => StreamItem.last.created_at.as_json,
       'updated_at' => StreamItem.last.updated_at.as_json,
@@ -177,6 +196,7 @@ describe UsersController, :type => :integration do
       'title' => "value for title",
       'message' => 'value for message',
       'type' => 'Announcement',
+      'read_state' => StreamItemInstance.last.read?,
       'context_type' => "Course",
       'created_at' => StreamItem.last.created_at.as_json,
       'updated_at' => StreamItem.last.updated_at.as_json,
@@ -227,6 +247,7 @@ describe UsersController, :type => :integration do
       'id' => StreamItem.last.id,
       'conversation_id' => @conversation.id,
       'type' => 'Conversation',
+      'read_state' => StreamItemInstance.last.read?,
       'created_at' => StreamItem.last.created_at.as_json,
       'updated_at' => StreamItem.last.updated_at.as_json,
       'title' => nil,
@@ -249,6 +270,7 @@ describe UsersController, :type => :integration do
       'title' => "value for subject",
       'message' => 'value for body',
       'type' => 'Message',
+      'read_state' => StreamItemInstance.last.read?,
       'created_at' => StreamItem.last.created_at.as_json,
       'updated_at' => StreamItem.last.updated_at.as_json,
 
@@ -259,6 +281,9 @@ describe UsersController, :type => :integration do
   end
 
   it "should format graded Submission with comments" do
+    #set @domain_root_account
+    @domain_root_account = Account.default
+
     @assignment = @course.assignments.create!(:title => 'assignment 1', :description => 'hai', :points_possible => '14.2', :submission_types => 'online_text_entry')
     @teacher = User.create!(:name => 'teacher')
     @course.enroll_teacher(@teacher)
@@ -277,6 +302,7 @@ describe UsersController, :type => :integration do
       'title' => "assignment 1",
       'message' => nil,
       'type' => 'Submission',
+      'read_state' => StreamItemInstance.last.read?,
       'created_at' => StreamItem.last.created_at.as_json,
       'updated_at' => StreamItem.last.updated_at.as_json,
       'grade' => '12',
@@ -285,7 +311,7 @@ describe UsersController, :type => :integration do
       'score' => 12,
       'html_url' => "http://www.example.com/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@user.id}",
       'workflow_state' => 'graded',
-      'late' => nil,
+      'late' => false,
       'assignment' => assign_json,
       'assignment_id' => @assignment.id,
       'attempt' => nil,
@@ -339,6 +365,7 @@ describe UsersController, :type => :integration do
         'default_view' => 'feed',
         'workflow_state' => 'available',
         'public_syllabus' => false,
+        'storage_quota_mb' => @course.storage_quota_mb,
       },
 
       'user' => {
@@ -351,6 +378,9 @@ describe UsersController, :type => :integration do
   end
   
   it "should format ungraded Submission with comments" do
+    #set @domain_root_account
+    @domain_root_account = Account.default
+
     @assignment = @course.assignments.create!(:title => 'assignment 1', :description => 'hai', :points_possible => '14.2', :submission_types => 'online_text_entry')
     @teacher = User.create!(:name => 'teacher')
     @course.enroll_teacher(@teacher)
@@ -369,6 +399,7 @@ describe UsersController, :type => :integration do
       'title' => "assignment 1",
       'message' => nil,
       'type' => 'Submission',
+      'read_state' => StreamItemInstance.last.read?,
       'created_at' => StreamItem.last.created_at.as_json,
       'updated_at' => StreamItem.last.updated_at.as_json,
       'grade' => nil,
@@ -377,7 +408,7 @@ describe UsersController, :type => :integration do
       'score' => nil,
       'html_url' => "http://www.example.com/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@user.id}",
       'workflow_state' => 'unsubmitted',
-      'late' => nil,
+      'late' => false,
 
       'assignment' => assign_json,
       'assignment_id' => @assignment.id,
@@ -432,6 +463,7 @@ describe UsersController, :type => :integration do
         'default_view' => 'feed',
         'workflow_state' => 'available',
         'public_syllabus' => false,
+        'storage_quota_mb' => @course.storage_quota_mb,
       },
 
       'user' => {
@@ -481,6 +513,7 @@ describe UsersController, :type => :integration do
       'title' => "hey",
       'message' => nil,
       'type' => 'Collaboration',
+      'read_state' => StreamItemInstance.last.read?,
       'context_type' => 'Course',
       'course_id' => @course.id,
       'html_url' => "http://www.example.com/courses/#{@course.id}/collaborations/#{@collaboration.id}",
@@ -501,6 +534,7 @@ describe UsersController, :type => :integration do
       'web_conference_id' => @conference.id,
       'title' => "myconf",
       'type' => 'WebConference',
+      'read_state' => StreamItemInstance.last.read?,
       'message' => 'mydesc',
       'context_type' => 'Course',
       'course_id' => @course.id,
@@ -525,6 +559,7 @@ describe UsersController, :type => :integration do
       'id' => StreamItem.last.id,
       'title' => @item.data.title,
       'type' => 'CollectionItem',
+      'read_state' => StreamItemInstance.last.read?,
       'message' => @item.data.description,
       'created_at' => StreamItem.last.created_at.as_json,
       'updated_at' => StreamItem.last.updated_at.as_json,

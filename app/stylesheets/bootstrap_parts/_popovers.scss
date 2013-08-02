@@ -3,6 +3,27 @@
 // Popovers
 // --------------------------------------------------
 
+/*
+@styleguide Popovers
+
+```html
+<a
+  data-tooltip='{"tooltipClass":"popover", "position":"right"}'
+  title="<div class='popover-title'>Title of Popover</div><div class='popover-content'><p>Lo-fi next level kale chips narwhal tattooed, tonx YOLO mixtape.</p></div>">
+  Text with popover
+</a>
+<p>
+  <button
+    data-tooltip='{"tooltipClass":"popover", "position":"top"}'
+    title="<div class='popover-title'>Title of Popover</div><div class='popover-content'><p>Lo-fi next level kale chips narwhal tattooed, tonx YOLO mixtape.</p></div>"
+    class="btn">
+    button with popover
+  </button>
+</p>
+```
+
+*/
+
 // Greater specificity on selection to help override default tooltip styles.
 .popover.ui-widget.ui-tooltip,
 .popover {
@@ -142,6 +163,19 @@ $popoverArrowDistanceFromCorner: $popoverArrowOuterWidth;
     bottom: $popoverArrowDistanceFromCorner + 1;
   }
   &.top.horizontal:before {
+    margin-top: 0;
     top: $popoverArrowDistanceFromCorner;
+  }
+  &.top.horizontal:after {
+    margin-top: 0;
+    top: $popoverArrowDistanceFromCorner + 1;
+  }
+  &.content-top.horizontal:before {
+    margin-top: 0;
+    top: 35px;
+  }
+  &.content-top.horizontal:after {
+    margin-top: 0;
+    top: 36px;
   }
 }

@@ -73,6 +73,7 @@ class AssignmentsController < ApplicationController
       js_env :ROOT_OUTCOME_GROUP => outcome_group_json(@context.root_outcome_group, @current_user, session)
 
       @locked = @assignment.locked_for?(@current_user, :check_policies => true, :deep_check_if_needed => true)
+      @locked.delete(:lock_at) if @locked.is_a?(Hash) && @locked.has_key?(:unlock_at) # removed to allow proper translation on show page
       @unlocked = !@locked || @assignment.grants_rights?(@current_user, session, :update)[:update]
       @assignment_module = ContextModuleItem.find_tag_with_preferred([@assignment], params[:module_item_id])
       @assignment.context_module_action(@current_user, :read) if @unlocked && !@assignment.new_record?
@@ -258,7 +259,7 @@ class AssignmentsController < ApplicationController
     params[:assignment][:time_zone_edited] = Time.zone.name if params[:assignment]
     group = get_assignment_group(params[:assignment])
     @assignment ||= @context.assignments.build(params[:assignment])
-    @assignment.workflow_state = "available"
+    @assignment.workflow_state = "published"
     @assignment.updating_user = @current_user
     @assignment.content_being_saved_by(@current_user)
     @assignment.assignment_group = group if group
@@ -322,7 +323,7 @@ class AssignmentsController < ApplicationController
         :ASSIGNMENT_OVERRIDES =>
           (assignment_overrides_json(@assignment.overrides_visible_to(@current_user)))
       }
-      hash[:ASSIGNMENT] = assignment_json(@assignment, @current_user, session)
+      hash[:ASSIGNMENT] = assignment_json(@assignment, @current_user, session, true, nil, false)
       hash[:URL_ROOT] = polymorphic_url([:api_v1, @context, :assignments])
       hash[:CANCEL_TO] = @assignment.new_record? ? polymorphic_url([@context, :assignments]) : polymorphic_url([@context, @assignment])
       hash[:CONTEXT_ID] = @context.id
@@ -347,8 +348,6 @@ class AssignmentsController < ApplicationController
       params[:assignment].delete :overwrite_existing_grades
       if params[:publish]
         @assignment.workflow_state = 'published'
-      elsif params[:unpublish]
-        @assignment.workflow_state = 'available'
       end
       if params[:assignment_type] == "quiz"
         params[:assignment][:submission_types] = "online_quiz"

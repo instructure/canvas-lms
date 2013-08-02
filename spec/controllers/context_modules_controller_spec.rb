@@ -135,7 +135,36 @@ describe ContextModulesController do
       assert_unauthorized
     end
 
-    it "should still redirect for unpublished modules"
+    it "should still redirect for unpublished modules if teacher" do
+      course_with_teacher_logged_in(:active_all => true)
+
+      @module = @course.context_modules.create!
+      ag = @course.assignment_groups.create!
+      assignment1 = ag.assignments.create!(:context => @course)
+
+      assignmentTag1 = @module.add_item :type => 'assignment', :id => assignment1.id
+
+      assignmentTag1.unpublish
+
+      get 'item_redirect', :course_id => @course.id, :id => assignmentTag1.id
+      response.should be_redirect
+      response.should redirect_to course_assignment_url(@course, assignment1, :module_item_id => assignmentTag1.id)
+    end
+
+    it "should not redirect for unpublished modules if student" do
+      course_with_student_logged_in(:active_all => true)
+
+      @module = @course.context_modules.create!
+      ag = @course.assignment_groups.create!
+      assignment1 = ag.assignments.create!(:context => @course)
+
+      assignmentTag1 = @module.add_item :type => 'assignment', :id => assignment1.id
+
+      assignmentTag1.unpublish
+
+      get 'item_redirect', :course_id => @course.id, :id => assignmentTag1.id
+      assert_unauthorized
+    end
     
     it "should find a matching tool" do
       course_with_student_logged_in(:active_all => true)
@@ -239,7 +268,7 @@ describe ContextModulesController do
       tag = @module.add_item :type => 'external_url', :url => 'http://lolcats', :title => 'lol'
       @module.completion_requirements = { tag.id => { :type => 'must_view' }}
       @module.save!
-      @module.evaluate_for(@user).should be_unlocked
+      @module.evaluate_for(@user, true).should be_unlocked
       get 'item_redirect', :course_id => @course.id, :id => tag.id
       requirements_met = @module.evaluate_for(@user).requirements_met
       requirements_met[0][:type].should == 'must_view'

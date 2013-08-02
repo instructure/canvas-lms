@@ -23,7 +23,7 @@ module TextHelper
 
   def strip_tags(text)
     text ||= ""
-    text.gsub(/<\/?[^>\n]*>/, "").gsub(/&#\d+;/) {|m| puts m; m[2..-1].to_i.chr rescue '' }.gsub(/&\w+;/, "")
+    text.gsub(/<\/?[^>\n]*>/, "").gsub(/&#\d+;/) {|m| puts m; m[2..-1].to_i.chr(text.encoding) rescue '' }.gsub(/&\w+;/, "")
   end
 
   # Converts a string of html to plain text, preserving as much of the
@@ -41,6 +41,22 @@ module TextHelper
     # append a line break to br and p tags, so they retain a line break after stripping tags
     doc.css('br, p').each { |node| node.after("\n\n") }
     doc.text.strip
+  end
+
+  # Converts a string of html to plain text using the Premailer gem.
+  def html_to_simple_text(html_str, opts={})
+    return "" if html_str.blank?
+    pm = Premailer.new(html_str, { :with_html_string => true, :input_encoding => 'UTF-8', :adapter => :nokogiri }.merge(opts))
+    pm.to_plain_text
+  end
+
+  def html_to_simple_html(html_str, opts={})
+    return "" if html_str.blank?
+    text = html_to_simple_text(html_str, opts)
+    text.gsub!(/^([\*\-]+\n*)$/, '') # Remove the H tag markers
+    text.gsub!(/\n{3,}/, "\n\n")     # Remove the triple breaks left by the H tag marker removals
+    html = format_message(text).first
+    "<p>#{html}</p>".html_safe
   end
 
   def quote_clump(quote_lines)
@@ -73,7 +89,8 @@ module TextHelper
   }xi
 
   # Converts a plaintext message to html, with newlinification, quotification, and linkification
-  def format_message(message, url=nil, notification_id=nil)
+  def format_message(message, opts={ :url => nil, :notification_id => nil })
+    return '' unless message
     # insert placeholders for the links we're going to generate, before we go and escape all the html
     links = []
     placeholder_blocks = []
@@ -85,7 +102,7 @@ module TextHelper
         s = $1
         link = s
         link = "http://#{link}" if link[0,3] == 'www'
-        link = add_notification_to_link(link, notification_id) if notification_id
+        link = add_notification_to_link(link, opts[:notification_id]) if opts[:notification_id]
         link = URI.escape(link).gsub("'", "%27")
         links << link
         "<a href='#{ERB::Util.h(link)}'>#{ERB::Util.h(s)}</a>"
@@ -116,11 +133,11 @@ module TextHelper
     end
     processed_lines << quote_clump(quote_block) if !quote_block.empty?
     message = processed_lines.join("\n")
-    if url
-      url = add_notification_to_link(url, notification_id) if notification_id
-      links.unshift url
+    if opts[:url]
+      url = add_notification_to_link(opts[:url], opts[:notification_id]) if opts[:notification_id]
+      links.unshift opts[:url]
     end
-    links.unshift message
+    links.unshift message.html_safe
   end
 
   def add_notification_to_link(url, notification_id)

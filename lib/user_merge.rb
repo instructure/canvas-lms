@@ -14,7 +14,9 @@ class UserMerge
     return unless target_user
     return if target_user == from_user
     target_user.save if target_user.changed?
-    target_user.associate_with_shard(from_user.shard)
+    from_user.associated_shards.each do |shard|
+      target_user.associate_with_shard(shard)
+    end
 
     max_position = target_user.communication_channels.last.try(:position) || 0
     to_retire_ids = []
@@ -181,9 +183,10 @@ class UserMerge
           # on the table, and if both the old user and the new user
           # have a submission for the same assignment there will be
           # a conflict.
-          already_there_ids = table.to_s.classify.constantize.find_all_by_user_id(target_user.id).map(&unique_id)
-          already_there_ids = [0] if already_there_ids.empty?
-          table.to_s.classify.constantize.where("user_id=? AND #{unique_id} NOT IN (?)", from_user, already_there_ids).update_all(:user_id => target_user)
+          already_there_ids = table.to_s.classify.constantize.where(:user_id => target_user).pluck(unique_id)
+          scope = table.to_s.classify.constantize.where(:user_id => from_user)
+          scope = scope.where("#{unique_id} NOT IN (?)", already_there_ids) unless already_there_ids.empty?
+          scope.update_all(:user_id => target_user)
         rescue => e
           logger.error "migrating #{table} column user_id failed: #{e.to_s}"
         end

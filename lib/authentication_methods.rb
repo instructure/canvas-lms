@@ -32,21 +32,17 @@ module AuthenticationMethods
   end
 
   def load_pseudonym_from_policy
-    skip_session_save = false
-    if session.to_hash.empty? && # if there's already some session data, defer to normal auth
-        (policy_encoded = params['Policy']) &&
+    if (policy_encoded = params['Policy']) &&
         (signature = params['Signature']) &&
         signature == Base64.encode64(OpenSSL::HMAC.digest(OpenSSL::Digest::Digest.new('sha1'), Attachment.shared_secret, policy_encoded)).gsub(/\n/, '') &&
         (policy = JSON.parse(Base64.decode64(policy_encoded)) rescue nil) &&
         policy['conditions'] &&
         (credential = policy['conditions'].detect{ |cond| cond.is_a?(Hash) && cond.has_key?("pseudonym_id") })
-      skip_session_save = true
       @policy_pseudonym_id = credential['pseudonym_id']
       # so that we don't have to explicitly skip verify_authenticity_token
       params[self.class.request_forgery_protection_token] ||= form_authenticity_token
     end
     yield if block_given?
-    session.destroy if skip_session_save
   end
 
   class AccessTokenError < Exception
@@ -84,9 +80,19 @@ module AuthenticationMethods
     if !@current_pseudonym
       if @policy_pseudonym_id
         @current_pseudonym = Pseudonym.find_by_id(@policy_pseudonym_id)
-      else
-        @pseudonym_session = PseudonymSession.find
-        @current_pseudonym = @pseudonym_session && @pseudonym_session.record
+      elsif @pseudonym_session = PseudonymSession.find
+        @current_pseudonym = @pseudonym_session.record
+
+        # if the session was created before the last time the user explicitly
+        # logged out (of any session for any of their pseudonyms), invalidate
+        # this session
+        if (invalid_before = @current_pseudonym.user.last_logged_out) &&
+          (session_refreshed_at = request.env['encrypted_cookie_store.session_refreshed_at']) &&
+          session_refreshed_at < invalid_before
+
+          destroy_session
+          @current_pseudonym = nil
+        end
       end
       if params[:login_success] == '1' && !@current_pseudonym
         # they just logged in successfully, but we can't find the pseudonym now?
@@ -100,7 +106,7 @@ module AuthenticationMethods
         # just using an app session
         # this basic auth support is deprecated and marked for removal in 2012
         if @pseudonym_session.try(:used_basic_auth?) && params[:api_key].present?
-          Shard.default.activate { @developer_key = DeveloperKey.find_by_api_key(params[:api_key]) }
+          Shard.birth.activate { @developer_key = DeveloperKey.find_by_api_key(params[:api_key]) }
         end
         @developer_key || request.get? || !allow_forgery_protection || form_authenticity_token == form_authenticity_param || form_authenticity_token == request.headers['X-CSRF-Token'] || raise(AccessTokenError)
       end
@@ -178,9 +184,22 @@ module AuthenticationMethods
   end
   protected :require_user
 
+  def clean_return_to(url)
+    return nil if url.blank?
+    uri = URI.parse(url)
+    return nil unless uri.path[0] == ?/
+    return "#{request.protocol}#{request.host_with_port}#{uri.path}#{uri.query && "?#{uri.query}"}#{uri.fragment && "##{uri.fragment}"}"
+  end
+
+  def return_to(url, fallback)
+    url = clean_return_to(url) || clean_return_to(fallback)
+    redirect_to url
+  end
+
   def store_location(uri=nil, overwrite=true)
     if overwrite || !session[:return_to]
-      session[:return_to] = uri || request.request_uri
+      uri ||= request.get? ? request.request_uri : request.referrer
+      session[:return_to] = clean_return_to(uri)
     end
   end
   protected :store_location

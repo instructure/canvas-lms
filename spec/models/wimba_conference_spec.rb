@@ -17,8 +17,14 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+require_relative('web_conference_spec_helper')
 
 describe WimbaConference do
+  it_should_behave_like 'WebConference'
+  
+  # implements this WebConference option:
+  it { should respond_to :admin_settings_url }
+
   before(:all) do
     WimbaConference.class_eval do
       # set up a simple mock that mimics basic API functionality

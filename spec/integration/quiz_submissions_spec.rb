@@ -39,19 +39,19 @@ describe QuizSubmissionsController do
 
   def record_answer_1
     post "/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions/#{@qs.id}/record_answer",
-         :question_1 => 'blah', :last_question_id => 1
+         :question_1 => 'blah', :last_question_id => 1, :validation_token => @qs.validation_token
     response.should be_redirect
   end
 
   def backup_answer_1
     put  "/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions/backup",
-         :question_1 => 'blah_overridden'
+         :question_1 => 'blah_overridden', :validation_token => @qs.validation_token
     response.should be_success
   end
 
   def record_answer_2
     post "/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions/#{@qs.id}/record_answer",
-         :question_2 => 'M&Ms', :last_question_id => 2
+         :question_2 => 'M&Ms', :last_question_id => 2, :validation_token => @qs.validation_token
     response.should be_redirect
   end
 
@@ -72,7 +72,7 @@ describe QuizSubmissionsController do
 
   def submit_quiz
     post "/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions/",
-         :question_1 => 'password', :attempt => 1
+         :question_1 => 'password', :attempt => 1, :validation_token => @qs.validation_token
     response.should be_redirect
   end
 

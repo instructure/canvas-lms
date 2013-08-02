@@ -17,8 +17,26 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../locked_spec')
 
 describe QuizzesApiController, :type => :integration do
+  context 'locked api item' do
+    let(:item_type) { 'quiz' }
+
+    let(:locked_item) do
+      @course.quizzes.create!(:title => 'Locked Quiz')
+    end
+
+    def api_get_json
+      api_call(
+        :get,
+        "/api/v1/courses/#{@course.id}/quizzes/#{locked_item.id}",
+        {:controller=>'quizzes_api', :action=>'show', :format=>'json', :course_id=>"#{@course.id}", :id => "#{locked_item.id}"},
+      )
+    end
+
+    it_should_behave_like 'a locked api item'
+  end
 
   describe "GET /courses/:course_id/quizzes (index)" do
     before { teacher_in_course(:active_all => true) }
@@ -55,8 +73,8 @@ describe QuizzesApiController, :type => :integration do
                         :controller=>"quizzes_api", :action=>"show", :format=>"json", :course_id=>"#{@course.id}", :id => "#{@quiz.id}")
       end
 
-      Api::V1::Quiz::API_ALLOWED_QUIZ_OUTPUT_FIELDS[:only].each do |field|
-        it "includes #{field}" do
+      it "includes the allowed quiz output fields" do
+        Api::V1::Quiz::API_ALLOWED_QUIZ_OUTPUT_FIELDS[:only].each do |field|
           @json.should have_key field.to_s
           @json[field.to_s].should == @quiz.send(field)
         end
@@ -68,6 +86,10 @@ describe QuizzesApiController, :type => :integration do
 
       it "includes mobile_url" do
         @json['mobile_url'].should == polymorphic_url([@course, @quiz], :persist_headless => 1, :force_user => 1)
+      end
+
+      it "includes published" do
+        @json['published'].should == false
       end
     end
 
@@ -103,6 +125,11 @@ describe QuizzesApiController, :type => :integration do
     it "doesn't allow setting fields not in the whitelist" do
       api_create_quiz({ 'assignment_id' => 123 })
       new_quiz.assignment_id.should be_nil
+    end
+
+    it "allows creating a published quiz" do
+      api_create_quiz('published' => true)
+      new_quiz.should be_published
     end
 
     it "renders an error when the title is too long" do
@@ -189,9 +216,21 @@ describe QuizzesApiController, :type => :integration do
     end
   end
 
+  describe "DELETE /courses/:course_id/quizzes/id (destroy)" do
+    it "deletes a quiz" do
+      teacher_in_course active_all: true
+      quiz = course_quiz !!:active
+      api_call(:delete, "/api/v1/courses/#{@course.id}/quizzes/#{quiz.id}",
+               {controller: 'quizzes_api', action: 'destroy',
+                format: 'json', course_id: @course.id.to_s,
+                id: quiz.id.to_s})
+      quiz.reload.should be_deleted
+    end
+  end
+
   describe "PUT /courses/:course_id/quizzes/:id (update)" do
     def api_update_quiz(quiz_params, api_params, opts={})
-      @quiz = @course.quizzes.create!({:title => 'title'}.merge(quiz_params))
+      @quiz ||= @course.quizzes.create!({:title => 'title'}.merge(quiz_params))
       api_call(:put, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}",
               {:controller=>"quizzes_api", :action => "update", :format=>"json", :course_id=>"#{@course.id}", :id=>"#{@quiz.id}"},
               {:quiz => api_params}, {}, opts)
@@ -217,6 +256,26 @@ describe QuizzesApiController, :type => :integration do
       json = api_update_quiz({}, {'title' => long_title}, :expected_status => 400 )
       json.should have_key 'errors'
       updated_quiz.title.should == 'title'
+    end
+
+    context "draft state changes" do
+
+      it "allows un/publishing an unpublished quiz" do
+        api_update_quiz({},{})
+        @quiz.reload.should_not be_published # in 'created' state by default
+        api_update_quiz({}, {published: false})
+        @quiz.reload.should be_unpublished
+        api_update_quiz({}, {published: true})
+        @quiz.reload.should be_published
+        api_update_quiz({},{published: nil}) # nil shouldn't change published
+        @quiz.reload.should be_published
+        @quiz.any_instantiation.stubs(:has_student_submissions?).returns true
+        json = api_update_quiz({}, {published: false}, {expected_status: 400})
+        json['errors']['published'].should_not be_nil
+        ActiveRecord::Base.reset_any_instantiation!
+        @quiz.reload.should be_published
+      end
+
     end
 
     describe "validations" do

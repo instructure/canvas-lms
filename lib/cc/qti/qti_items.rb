@@ -110,8 +110,8 @@ module CC
             end
             presentation_options(pres_node, question)
           end # presentation
-          
-          if question['question_type'] != 'text_only_question'
+
+          unless ['text_only_question', 'file_upload_question'].include?(question['question_type'])
             item_node.resprocessing do |res_node|
               res_node.outcomes do |out_node|
                 out_node.decvar(

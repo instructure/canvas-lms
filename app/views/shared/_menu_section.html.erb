@@ -1,7 +1,7 @@
 <% max_to_show ||= nil; link_text ||= nil; custom ||= nil %>
 <% if collection && !collection.empty? %>
   <td class="menu-item-drop-column">
-    <span class="h2"><%= title %></span>
+    <span class="menu-item-heading"><%= title %></span>
     <ul class="menu-item-drop-column-list">
       <%= render :partial => partial, :collection => max_to_show ? collection.first(max_to_show) : collection, :locals => {:title => title } %>
       <% if link_text %>

@@ -240,33 +240,33 @@ describe "Standard Common Cartridge importing" do
       @course = course
       @migration = ContentMigration.create(:context => @course)
       @migration.migration_settings[:migration_ids_to_import] = {
-              :copy => {"topics" => {"I_00006_R" => true},
+              :copy => {"discussion_topics" => {"I_00006_R" => true},
                         "everything" => "0",
                         "folders" =>
                                 {"I_00006_Media" => true,
                                  "6a35b0974f59819404dc86d48fe39fc3" => true,
                                  "I_00001_R" => true},
                         "all_quizzes" => "1",
-                        "all_external_tools" => "0",
+                        "all_context_external_tools" => "0",
                         "all_groups" => "0",
-                        "all_modules" => "0",
+                        "all_context_modules" => "0",
                         "all_rubrics" => "0",
                         "assessment_questions" => "1",
-                        "all_wikis" => "0",
-                        "all_files" => "0",
+                        "all_wiki_pages" => "0",
+                        "all_attachments" => "0",
                         "all_assignments" => "1",
                         "topic_entries" => {"undefined" => true},
-                        "external_tools" => {"I_00011_R" => true},
+                        "context_external_tools" => {"I_00011_R" => true},
                         "shift_dates" => "0",
-                        "all_topics" => "0",
+                        "all_discussion_topics" => "0",
                         "all_announcements" => "0",
-                        "files" =>
+                        "attachments" =>
                                 {"I_00006_Media" => true,
                                  "7acb90d1653008e73753aa2cafb16298" => true,
                                  "6a35b0974f59819404dc86d48fe39fc3" => true,
                                  "I_00003_R_IMAGERESOURCE" => true,
                                  "I_00001_R" => true},
-                        "modules" => {"I_00000" => true},
+                        "context_modules" => {"I_00000" => true},
                         "all_assignment_groups" => "0"}}.with_indifferent_access
 
       @course.import_from_migration(@course_data, nil, @migration)

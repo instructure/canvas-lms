@@ -269,7 +269,7 @@ describe ConversationMessage do
         :subject => "an email reply",
         :html => "body",
         :text => "body"
-      }) }.should raise_error(IncomingMessageProcessor::UnknownAddressError)
+      }) }.should raise_error(IncomingMail::IncomingMessageProcessor::UnknownAddressError)
     end
   end
 end

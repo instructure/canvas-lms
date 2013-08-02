@@ -191,6 +191,21 @@ describe QuizzesController do
       get 'show', :course_id => @course.id, :id => @quiz.id
       assigns[:headers].should be_false
     end
+
+    it "assigns js_env for attachments if submission is present" do
+      require 'action_controller'
+      require 'action_controller/test_process.rb'
+      course_with_student_logged_in :active_all => true
+      course_quiz !!:active
+      submission = @quiz.generate_submission @user
+      create_attachment_for_file_upload_submission!(submission)
+      get 'show', :course_id => @course.id, :id => @quiz.id
+      attachment = submission.attachments.first
+      assigns[:js_env][:ATTACHMENTS].should == {
+        attachment.id => {:id => attachment.id,
+                          :display_name => attachment.display_name }
+      }
+    end
   end
 
   describe "GET 'managed_quiz_data'" do
@@ -206,7 +221,6 @@ describe QuizzesController do
       course_quiz
       @sub1 = @quiz.generate_submission(@user1)
       @sub2 = @quiz.generate_submission(@user2)
-
       user_session @teacher
       get 'managed_quiz_data', :course_id => @course.id, :quiz_id => @quiz.id
       assigns[:submissions][@sub1.user_id].should == @sub1
@@ -513,7 +527,7 @@ describe QuizzesController do
         course_quiz(true)
         @quiz.generate_submission(@user)
       end
-      
+
       context "a valid question" do
         it "renders take_quiz" do
           QuizzesController.any_instance.stubs(:valid_question?).returns(true)
@@ -636,7 +650,7 @@ describe QuizzesController do
       @quiz.workflow_state = 'available'
       @quiz.published_at = Time.now
       @quiz.save
-      
+
       @quiz.assignment.should_not be_nil
       @quiz.assignment.mute!
       s = @quiz.generate_submission(u)
@@ -734,6 +748,21 @@ describe QuizzesController do
       assigns[:quiz].should_not be_nil
       assigns[:quiz].should eql(@quiz)
       assigns[:quiz].title.should eql("some quiz")
+    end
+
+    it "should be able to change ungraded survey to quiz without error" do
+      # aka should handle the case where the quiz's assignment is nil/not present.
+      course_with_teacher_logged_in(active_all: true)
+      course_quiz
+      @quiz.update_attributes(quiz_type: 'ungraded_survey')
+      # make sure the assignment doesn't exist
+      @quiz.assignment.should_not be_present
+      post 'update', course_id: @course.id, id: @quiz.id, activate: true,
+        quiz: {quiz_type: 'assignment'}
+      response.should be_redirect
+      @quiz.reload.quiz_type.should == 'assignment'
+      @quiz.should be_available
+      @quiz.assignment.should be_present
     end
 
     it "should lock and unlock without removing assignment" do
@@ -884,36 +913,20 @@ describe QuizzesController do
     it "should allow concluded teachers to see a quiz's statistics" do
       course_with_teacher_logged_in(:active_all => true)
       course_quiz
-      get 'statistics', :course_id => @course.id, :quiz_id => @quiz.id
-      response.should be_success
-      response.should render_template('statistics')
-
       @enrollment.conclude
       get 'statistics', :course_id => @course.id, :quiz_id => @quiz.id
       response.should be_success
       response.should render_template('statistics')
     end
 
-    it "should redirect to the quiz show page if the course is a MOOC" do
+    it "should show the statistics page if the course is a MOOC" do
       course_with_teacher_logged_in(:active_all => true)
       @course.large_roster = true
       @course.save!
       course_quiz
       get 'statistics', :course_id => @course.id, :quiz_id => @quiz.id
-      flash[:notice].should == "That page has been disabled for this course"
-      response.should redirect_to course_quiz_url(@course.id, @quiz.id)
-    end
-  end
-
-  describe "GET 'statistics.csv'" do
-    it "redirects to the attachment url" do
-      course_with_teacher_logged_in
-      course_quiz
-      get 'statistics', :course_id => @course.id, :quiz_id => @quiz.id,
-        :format => 'csv'
-      @quiz.quiz_statistics.size.should == 1
-      stats = @quiz.quiz_statistics.first
-      response.should redirect_to stats.csv_attachment.cacheable_s3_download_url
+      response.should be_success
+      response.should render_template('statistics')
     end
   end
 

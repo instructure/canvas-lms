@@ -26,6 +26,8 @@ class Attachment < ActiveRecord::Base
   include HasContentTags
   include ContextModuleItem
 
+  attr_accessor :podcast_associated_asset, :submission_attachment
+
   MAX_SCRIBD_ATTEMPTS = 3
   MAX_CROCODOC_ATTEMPTS = 2
   # This value is used as a flag for when we are skipping the submit to scribd for this attachment
@@ -52,12 +54,48 @@ class Attachment < ActiveRecord::Base
   before_save :set_need_notify
 
   before_validation :assert_attachment
-  before_destroy :delete_scribd_doc
   acts_as_list :scope => :folder
-  after_save :touch_context_if_appropriate
-  after_save :build_media_object
 
-  attr_accessor :podcast_associated_asset, :submission_attachment
+  def self.file_store_config
+    # Return existing value, even if nil, as long as it's defined
+    @file_store_config ||= Setting.from_config('file_store')
+    @file_store_config ||= { 'storage' => 'local' }
+    @file_store_config['path_prefix'] ||= @file_store_config['path'] || 'tmp/files'
+    @file_store_config['path_prefix'] = nil if @file_store_config['path_prefix'] == 'tmp/files' && @file_store_config['storage'] == 's3'
+    return @file_store_config
+  end
+
+  def self.s3_config
+    # Return existing value, even if nil, as long as it's defined
+    return @s3_config if defined?(@s3_config)
+    @s3_config ||= Setting.from_config('amazon_s3')
+  end
+
+  def self.s3_storage?
+    (file_store_config['storage'] rescue nil) == 's3' && s3_config
+  end
+
+  def self.local_storage?
+    rv = !s3_storage?
+    raise "Unknown storage type!" if rv && file_store_config['storage'] != 'local'
+    rv
+  end
+
+  # Haaay... you're changing stuff here? Don't forget about the Thumbnail model
+  # too, it cares about local vs s3 storage.
+  has_attachment(
+      :storage => (local_storage? ? :file_system : :s3),
+      :path_prefix => file_store_config['path_prefix'],
+      :s3_access => :private,
+      :thumbnails => { :thumb => '128x128' },
+      :thumbnail_class => 'Thumbnail'
+  )
+
+  # These callbacks happen after the attachment data is saved to disk/s3, or
+  # immediately after save if no data is being uploading during this save cycle.
+  # That means you can't rely on these happening in the same transaction as the save.
+  after_save_and_attachment_processing :touch_context_if_appropriate
+  after_save_and_attachment_processing :build_media_object
 
   # this mixin can be added to a has_many :attachments association, and it'll
   # handle finding replaced attachments. In other words, if an attachment fond
@@ -109,6 +147,11 @@ class Attachment < ActiveRecord::Base
     end
   end
 
+  def before_attachment_saved
+    @after_attachment_saved_workflow_state = self.workflow_state
+    self.workflow_state = 'unattached'
+  end
+
   # this is a magic method that gets run by attachment-fu after it is done sending to s3,
   # that is the moment that we also want to submit it to scribd.
   # note, that the time it takes to send to s3 is the bad guy.
@@ -116,11 +159,22 @@ class Attachment < ActiveRecord::Base
   # it to scribd from that point does not make the user wait since that
   # does happen asynchronously and the data goes directly from s3 to scribd.
   def after_attachment_saved
+    if workflow_state == 'unattached' && @after_attachment_saved_workflow_state
+      self.workflow_state = @after_attachment_saved_workflow_state
+      @after_attachment_saved_workflow_state = nil
+    end
+
     if scribdable? && !Attachment.skip_3rd_party_submits?
       send_later_enqueue_args(:submit_to_scribd!,
                               {:n_strand => 'scribd', :max_attempts => 1})
-    else
-      self.process
+    elsif %w(pending_upload processing).include?(workflow_state)
+      # we don't call .process here so that we don't have to go through another whole save cycle
+      self.workflow_state = 'processed'
+    end
+
+    # directly update workflow_state so we don't trigger another save cycle
+    if self.workflow_state_changed?
+      self.class.where(:id => self).update_all(:workflow_state => self.workflow_state)
     end
 
     # try an infer encoding if it would be useful to do so
@@ -197,7 +251,7 @@ class Attachment < ActiveRecord::Base
     attachments = data['file_map'] ? data['file_map']: {}
     # TODO i18n
     attachments.values.each do |att|
-      if !att['is_folder'] && migration.import_object?("files", att['migration_id'])
+      if !att['is_folder'] && (migration.import_object?("attachments", att['migration_id']) || migration.import_object?("files", att['migration_id']))
         begin
           import_from_migration(att, migration.context)
         rescue
@@ -260,12 +314,54 @@ class Attachment < ActiveRecord::Base
 
   serialize :scribd_doc, Scribd::Document
 
-  def delete_scribd_doc
-    return true unless self.scribd_doc && ScribdAPI.enabled? && !self.root_attachment_id
-    ScribdAPI.instance.set_user(self.scribd_account)
-    self.scribd_doc.destroy
+  # related_attachments: our root attachment, anyone who shares our root attachment,
+  # and anyone who calls us a root attachment
+  def related_attachments
+    if root_attachment_id
+      Attachment.where("id=? OR root_attachment_id=? OR (root_attachment_id=? AND id<>?)",
+                       root_attachment_id, id, root_attachment_id, id)
+    else
+      Attachment.where(:root_attachment_id => id)
+    end
   end
-  protected :delete_scribd_doc
+
+  # It seems like there are at least three possibilities here:
+  # 1. the root attachment's record has a scribd_doc; the child attachmenent's
+  #    doesn't, and uses the root's implicitly (iow, Attachment#scribd_doc
+  #    loads the parent's if the child doesn't have one).
+  #    -> I cannot find any examples of this; in my experience, the child's
+  #       record always has a scribd_doc explicitly set...
+  #    --> if we trusted this case never to happen, then we could add
+  #        "where scribd_doc is not null" to the condition below
+  # 2. the root attachment and the child attachment each have an explicit
+  #    scribd_doc, specifying the same doc_id
+  #    -> I see plenty of examples of this in the db, but I have
+  #       not seen it happen...
+  # 3. the root attachment and the child attachment each have an explicit
+  #    scribd_doc, specifying different doc_ids (i.e., not sharing)
+  #    -> This is what happens when I upload two copies of the same file.
+  def scribd_doc_shared?
+    return false unless scribd_doc
+    related_attachments.not_deleted.any? do |att|
+      att.scribd_doc && att.scribd_doc.doc_id == scribd_doc.doc_id
+    end
+  end
+
+  # disassociate the scribd_doc from this Attachment
+  # and also delete it from scribd if no other Attachments are using it
+  def delete_scribd_doc
+    return true unless ScribdAPI.enabled? && scribd_doc
+    shared = scribd_doc_shared?
+
+    scribd_doc = self.scribd_doc
+    self.scribd_doc = nil
+    self.workflow_state = 'deleted'  # not file_state :P
+    unless shared
+      ScribdAPI.instance.set_user(self.scribd_account)
+      return false unless scribd_doc.destroy
+    end
+    save
+  end
 
   # This method retrieves a URL to the thumbnail of a document, in a given size, and for any page in that document. Note that docs.getSettings and docs.getList also retrieve thumbnail URLs in default size - this method is really for resizing those. IMPORTANT - it is possible that at some time in the future, Scribd will redesign its image system, invalidating these URLs. So if you cache them, please have an update strategy in place so that you can update them if neceessary.
   #
@@ -513,7 +609,6 @@ class Attachment < ActiveRecord::Base
     if Attachment.s3_storage?
       res = {
         :upload_url => "#{options[:ssl] ? "https" : "http"}://#{bucket.name}.#{bucket.config.s3_endpoint}/",
-        :remote_url => true,
         :file_param => 'file',
         :success_url => s3_success_url,
         :upload_params => {
@@ -523,7 +618,6 @@ class Attachment < ActiveRecord::Base
     elsif Attachment.local_storage?
       res = {
         :upload_url => local_upload_url,
-        :remote_url => false,
         :file_param => options[:file_param] || 'attachment[uploaded_data]', #uploadify ignores this and uses 'file',
         :upload_params => options[:upload_params] || {}
       }
@@ -613,6 +707,7 @@ class Attachment < ActiveRecord::Base
   def self.get_quota(context)
     quota = 0
     quota_used = 0
+    context = context.quota_context if context.respond_to?(:quota_context) && context.quota_context
     if context
       Shackles.activate(:slave) do
         quota = Setting.get_cached('context_default_quota', 50.megabytes.to_s).to_i
@@ -668,31 +763,6 @@ class Attachment < ActiveRecord::Base
     self.content_type.match(/\Atext/) || self.extension == '.html' || self.extension == '.htm' || self.extension == '.swf'
   end
 
-  def self.s3_config
-    # Return existing value, even if nil, as long as it's defined
-    return @s3_config if defined?(@s3_config)
-    @s3_config ||= Setting.from_config('amazon_s3')
-  end
-
-  def self.file_store_config
-    # Return existing value, even if nil, as long as it's defined
-    @file_store_config ||= Setting.from_config('file_store')
-    @file_store_config ||= { 'storage' => 'local' }
-    @file_store_config['path_prefix'] ||= @file_store_config['path'] || 'tmp/files'
-    @file_store_config['path_prefix'] = nil if @file_store_config['path_prefix'] == 'tmp/files' && @file_store_config['storage'] == 's3'
-    return @file_store_config
-  end
-
-  def self.s3_storage?
-    (file_store_config['storage'] rescue nil) == 's3' && s3_config
-  end
-
-  def self.local_storage?
-    rv = !s3_storage?
-    raise "Unknown storage type!" if rv && file_store_config['storage'] != 'local'
-    rv
-  end
-
   def self.shared_secret
     raise 'Cannot call Attachment.shared_secret when configured for s3 storage' if s3_storage?
     "local_storage" + Canvas::Security.encryption_key
@@ -705,16 +775,6 @@ class Attachment < ActiveRecord::Base
   def downloadable?
     !!(self.authenticated_s3_url rescue false)
   end
-
-  # Haaay... you're changing stuff here? Don't forget about the Thumbnail model
-  # too, it cares about local vs s3 storage.
-  has_attachment(
-      :storage => (local_storage? ? :file_system : :s3),
-      :path_prefix => file_store_config['path_prefix'],
-      :s3_access => :private,
-      :thumbnails => { :thumb => '128x128' },
-      :thumbnail_class => 'Thumbnail'
-  )
 
   def local_storage_path
     "#{HostUrl.context_host(context)}/#{context_type.underscore.pluralize}/#{context_id}/files/#{id}/download?verifier=#{uuid}"
@@ -1123,7 +1183,7 @@ class Attachment < ActiveRecord::Base
 
   def locked_for?(user, opts={})
     return false if opts[:check_policies] && self.grants_right?(user, nil, :update)
-    return {:manually_locked => true} if self.locked || (self.folder && self.folder.locked?)
+    return {:asset_string => self.asset_string, :manually_locked => true} if self.locked || (self.folder && self.folder.locked?)
     Rails.cache.fetch(locked_cache_key(user), :expires_in => 1.minute) do
       locked = false
       if (self.unlock_at && Time.now < self.unlock_at)
@@ -1199,6 +1259,7 @@ class Attachment < ActiveRecord::Base
     state :errored do
       event :recycle, :transitions_to => :pending_upload
     end
+    state :deleted
     state :to_be_zipped
     state :zipping
     state :zipped
@@ -1208,7 +1269,7 @@ class Attachment < ActiveRecord::Base
 
   scope :to_be_zipped, where("attachments.workflow_state='to_be_zipped' AND attachments.scribd_attempts<10").order(:created_at)
 
-  scope :active, where("attachments.file_state<>'deleted'")
+  scope :not_deleted, where("attachments.file_state<>'deleted'")
 
   scope :not_hidden, where("attachments.file_state<>'hidden'")
   scope :not_locked, lambda {
@@ -1225,6 +1286,7 @@ class Attachment < ActiveRecord::Base
     self.deleted_at = Time.now
     ContentTag.delete_for(self)
     MediaObject.where(:attachment_id => self).update_all(:workflow_state => 'deleted', :updated_at => Time.now.utc) if self.id && delete_media_object
+    send_later_if_production(:delete_scribd_doc) if scribd_doc
     save!
     # if the attachment being deleted belongs to a user and the uuid (hash of file) matches the avatar_image_url
     # then clear the avatar_image_url value.
@@ -1600,5 +1662,13 @@ class Attachment < ActiveRecord::Base
 
   def crocodoc_available?
     crocodoc_document.try(:available?)
+  end
+
+  def view_inline_ping_url
+    "/#{context_url_prefix}/files/#{self.id}/inline_view"
+  end
+
+  def record_inline_view
+    update_attribute(:last_inline_view, Time.now)
   end
 end

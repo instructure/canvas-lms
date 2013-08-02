@@ -714,6 +714,7 @@ class RoleOverride < ActiveRecord::Base
         :label => lambda { t('permissions.manage_frozen_assignment', "Manage (edit / delete) frozen assignments") },
         :true_for => %w(AccountAdmin),
         :available_to => %w(AccountAdmin AccountMembership),
+        :enabled_for_plugin => :assignment_freezer
       }
     })
 
@@ -727,6 +728,8 @@ class RoleOverride < ActiveRecord::Base
     permissions.reject!{ |k, p| p[:account_only] == :root } unless context.root_account?
     permissions.reject!{ |k, p| !p[:available_to].include?(base_role_type)} unless base_role_type.nil?
     permissions.reject!{ |k, p| p[:account_allows] && !p[:account_allows].call(context)}
+    permissions.reject!{ |k, p| p[:enabled_for_plugin] &&
+      !((plugin = Canvas::Plugin.find(p[:enabled_for_plugin])) && plugin.enabled?)}
     permissions
   end
 

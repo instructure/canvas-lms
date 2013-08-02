@@ -30,6 +30,13 @@ define ['Backbone'], ({View}) ->
     view = new Backbone.View foo: 'bar'
     ok !view.foo?, 'parent class property options not poluted'
 
+  test 'children should have a list of child views', -> 
+    class SomeView extends Backbone.View
+      @child 'test', '.test'
+
+    view = new SomeView test: new Backbone.View
+    equal view.children.length, 1, "Creates an array of children view stored on .children"
+
   test 'template optionProperty', ->
     view = new View
       template: -> "hi"
@@ -156,4 +163,11 @@ define ['Backbone'], ({View}) ->
     ok mixin2.afterRender.calledOnce, 'called mixin2 afterRender'
     ok mixin1.attach.calledOnce, 'called mixin1 attach'
     ok mixin2.attach.calledOnce, 'called mixin2 attach'
+
+  test 'View.mixin does not merge into parent class', ->
+    mixin = defaults: foo: 'bar'
+    class Foo extends View
+      @mixin mixin
+    equal View::defaults.foo, undefined, 'View::defaults was not appended'
+    equal Foo::defaults.foo, 'bar', 'Foo::defaults was appended'
 

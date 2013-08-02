@@ -4,12 +4,14 @@
 
 define [
   'i18n!discussions'
+  'jquery'
   'underscore'
   'Backbone'
   'compiled/util/BackoffPoller'
   'compiled/arr/walk'
   'compiled/arr/erase'
-], (I18n, {each}, Backbone, BackoffPoller, walk, erase) ->
+  'jquery.ajaxJSON'
+], (I18n, $, {each}, Backbone, BackoffPoller, walk, erase) ->
 
   UNKNOWN_AUTHOR =
     avatar_image_url: null
@@ -23,6 +25,7 @@ define [
       entries: []
       new_entries: []
       unread_entries: []
+      forced_entries: []
 
     url: ->
       "#{@get 'root_url'}?include_new_entries=1"
@@ -43,6 +46,18 @@ define [
         maxAttempts: 12
         backoffFactor: 1.6
       loader.start()
+
+    markAllAsRead: ->
+      $.ajaxJSON ENV.DISCUSSION.MARK_ALL_READ_URL, 'PUT', forced_read_state: false
+      @setAllReadState('read')
+
+    markAllAsUnread: ->
+      $.ajaxJSON ENV.DISCUSSION.MARK_ALL_UNREAD_URL, 'DELETE', forced_read_state: false
+      @setAllReadState('unread')
+
+    setAllReadState: (newReadState) ->
+      each @flattened, (entry) ->
+        entry.read_state = newReadState
 
     parse: (data, status, xhr) ->
       @data = data
@@ -77,6 +92,7 @@ define [
       parent = @flattened[entry.parent_id]
       entry.parent = parent
       entry.read_state = 'unread' if entry.id in @data.unread_entries
+      entry.forced_read_state = true if entry.id in @data.forced_entries
 
       @setEntryAuthor(entry)
 

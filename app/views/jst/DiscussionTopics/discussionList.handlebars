@@ -1,0 +1,30 @@
+<div class="ig-header">
+    <span class="element_toggler"
+          aria-controls="{{listID}}"
+          role="button">
+      <i class="icon-mini-arrow-down"></i>
+      {{title}}
+    </span>
+
+    {{#if titleHelp}}
+      <span class="pull-right title-help">{{titleHelp}}</span>
+    {{/if}}
+</div>
+
+<div id="{{listID}}" aria-expanded="true">
+  <ul class="collectionViewItems ig-list">
+  </ul>
+
+<div class="no-content discussion">
+  {{#if pinned}}
+    <b>{{#t "no_pinned_discussions"}}You currently have no pinned discussions{{/t}}</b>
+    <p>{{#t "pinned_instructions"}}Drag a discussion here to pin it to the top of students' discussion page.{{/t}}</p>
+  {{else}}
+    {{#t "there_are_no_discussions_show"}}There are no discussions to show.{{/t}}
+  {{/if}}
+</div>
+
+  {{#if showSpinner}}
+    <div class="loader"></div>
+  {{/if}}
+</div>

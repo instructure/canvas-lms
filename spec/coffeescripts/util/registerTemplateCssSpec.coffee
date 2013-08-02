@@ -14,7 +14,7 @@ define [
 
   test 'should append <style> node to bottom of <head>', ->
     registerTemplateCss testTemplateId, testRule
-    equal $('head style:last').text(), "/* From: #{testTemplateId} */\n#{testRule}"
+    ok $('head style:last').text().indexOf("/* From: #{testTemplateId} */\n#{testRule}") >= 0
 
   test 'should remove all styles when you call clear()', ->
     registerTemplateCss testTemplateId, testRule

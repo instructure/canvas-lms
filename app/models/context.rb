@@ -58,11 +58,7 @@ module Context
     WikiPage = ::WikiPage
 
     def self.get_for_string(str)
-      if RUBY_VERSION >= "1.9."
-        self.const_defined?(str, false) ? self.const_get(str, false) : nil
-      else
-        self.const_defined?(str) ? self.const_get(str) : nil
-      end
+      self.const_defined?(str, false) ? self.const_get(str, false) : nil
     end
   end
 
@@ -174,7 +170,7 @@ module Context
   end
 
   def self.find_by_asset_string(string)
-    opts = string.split("_")
+    opts = string.split("_", -1)
     id = opts.pop
     if ContextTypes.const_defined?(opts.join('_').classify)
       type = ContextTypes.const_get(opts.join('_').classify)

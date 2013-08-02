@@ -47,6 +47,7 @@ class CollaborationsController < ApplicationController
     @collaborations = @context.collaborations.active
     log_asset_access("collaborations:#{@context.asset_string}", "collaborations", "other")
     @google_docs = google_docs_verify_access_token rescue false
+    js_env :TITLE_MAX_LEN => Collaboration::TITLE_MAX_LENGTH
   end
 
   def show
@@ -74,9 +75,10 @@ class CollaborationsController < ApplicationController
     @collaboration = Collaboration.typed_collaboration_instance(params[:collaboration].delete(:collaboration_type))
     @collaboration.context = @context
     @collaboration.attributes = params[:collaboration]
-    @collaboration.update_members(users, group_ids)
     respond_to do |format|
       if @collaboration.save
+        # After saved, update the members
+        @collaboration.update_members(users, group_ids)
         format.html { redirect_to @collaboration.url }
         format.json { render :json => @collaboration.to_json(:methods => [:collaborator_ids], :permissions => {:user => @current_user, :session => session}) }
       else

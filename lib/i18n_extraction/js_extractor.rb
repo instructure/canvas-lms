@@ -231,7 +231,7 @@ module I18nExtraction
             raise "interpolation value not provided for #{i_key.inspect} (#{sub_key.inspect} on line #{offset})"
           end
         end
-        add_translation sub_key, str
+        add_translation sub_key, str, offset
       end
       sub_calls
     end

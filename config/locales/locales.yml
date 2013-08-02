@@ -22,3 +22,11 @@ pt:
 ja:
   locales:
     ja: 日本語
+nl:
+  locales:
+    nl: Nederlands (crowd-sourced)
+  crowdsourced: true
+ko:
+  locales:
+    ko: 한국말 (crowd-sourced)
+  crowdsourced: true

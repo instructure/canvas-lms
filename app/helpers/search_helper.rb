@@ -55,7 +55,7 @@ module SearchHelper
             :name => section.name,
             :type => :section,
             :term => contexts[:courses][section.course_id][:term],
-            :state => contexts[:courses][section.course_id][:state],
+            :state => section.active? ? :active : :inactive,
             :parent => {:course => section.course_id},
             :context_name =>  contexts[:courses][section.course_id][:name]
             # if we decide to return permissions here, we should ensure those

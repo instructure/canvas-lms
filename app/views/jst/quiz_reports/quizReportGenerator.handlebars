@@ -1,0 +1,20 @@
+{{#if file}}
+  <a href="{{file.url}}" class="btn button-sidebar-wide "target="_blank">
+    <i class="icon-download"></i>
+    {{#t "download_report_name"}}Download {{report_name}}{{/t}}<br>
+    <small>{{#t "generated_at_date_time"}}Generated {{dateAndTime}}{{/t}}</small>
+  </a>
+{{else}}
+  {{#if progress}}
+    {{#t "generating_report_name"}}Generating {{report_name}}...{{/t}}
+    <div class="progress progress-small progress-striped {{#ifEqual "completed" progress.workflow_state}}progress-success{{else}}active{{/ifEqual}}" style="margin: 0 0 10px">
+      <div class="bar" style="width:{{progress.completion}}%;"></div>
+    </div>
+  {{else}}
+    <a href="javascript:void(0)" class="create-report btn button-sidebar-wide">
+      <i class="icon-ms-excel"></i>
+      {{#t "generate_report_name"}}Generate {{report_name}}{{/t}}
+    </a>
+  {{/if}}
+{{/if}}
+

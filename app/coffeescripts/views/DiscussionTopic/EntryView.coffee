@@ -30,10 +30,15 @@ define [
       _.each @instances, (view) ->
         view.expand() unless view.model.get 'parent'
 
+    @setAllReadState = (newReadState) ->
+      _.each @instances, (view) ->
+        view.model.set 'read_state', newReadState
+
     els:
       '.discussion_entry:first': '$entryContent'
       '.replies:first': '$replies'
       '.headerBadges:first': '$headerBadges'
+      '.discussion-read-state-btn:first': '$readStateToggle'
 
     events:
       'click .loadDescendants': 'loadDescendants'
@@ -58,6 +63,15 @@ define [
       @model.on 'change:deleted', @toggleDeleted
       @model.on 'change:read_state', @toggleReadState
       @model.on 'change:editor', @render
+      @model.on 'change:editor', (entry) -> entry.trigger('edited')
+
+    toggleRead: (e) ->
+      e.preventDefault()
+      if @model.get('read_state') is 'read'
+        @model.markAsUnread()
+      else
+        @model.markAsRead()
+      EntryView.trigger 'readStateChanged', @model, this
 
     handleDeclarativeEvent: (event) ->
       $el = $ event.currentTarget
@@ -89,6 +103,7 @@ define [
       json
 
     toggleReadState: (model, read_state) =>
+      @setToggleTooltip()
       @$entryContent.toggleClass 'unread', read_state is 'unread'
       @$entryContent.toggleClass 'read', read_state is 'read'
 
@@ -120,10 +135,20 @@ define [
         @model.set('updated_at', (new Date).toISOString())
         @model.set('editor', ENV.current_user)
 
+    setToggleTooltip: ->
+      tooltip = if @model.get('read_state') is 'unread'
+        I18n.t('mark_as_read', 'Mark as Read')
+      else
+        I18n.t('mark_as_unread', 'Mark as Unread')
+
+      @$readStateToggle.attr('title', tooltip)
+
+
     afterRender: ->
       super
       @collapse() if @options.collapsed
-      if @model.get('read_state') is 'unread'
+      @setToggleTooltip()
+      if @model.get('read_state') is 'unread' and !@model.get('forced_read_state') and !ENV.DISCUSSION.MANUAL_MARK_AS_READ
         @readMarker ?= new MarkAsReadWatcher this
         # this is throttled so calling it here is okay
         MarkAsReadWatcher.checkForVisibleEntries()
@@ -188,11 +213,14 @@ define [
         @treeView.collection.add entry
         @treeView.collection.fullCollection.add entry
         @trigger 'addReply'
+        EntryView.trigger 'addReply', entry
 
     addReplyAttachment: (event, $el) ->
+      event.preventDefault()
       @reply.addAttachment($el)
 
     removeReplyAttachment: (event, $el) ->
+      event.preventDefault()
       @reply.removeAttachment($el)
 
     format: (attr, value) ->
@@ -206,3 +234,4 @@ define [
       else
         htmlEscape value
 
+  _.extend EntryView, Backbone.Events

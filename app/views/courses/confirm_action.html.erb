@@ -8,8 +8,8 @@
 <div style="margin: 10px auto; width: 600px;">
   <% if params[:event] == "delete" %>
     <h2><%= t('headings.confirm_delete', %{Confirm Course Deletion}) %></h2>
-    <%= t 'details.confirm_delete', %{Are you sure you want to delete this course?  Once it is deleted students and teachers will no longer have access to it.  If you just want to remove it from the course dropdown then you should *conclude the course instead*.}, :wrapper => link_to('\1', context_url(@context, :context_confirm_action_url, :event => 'conclude')) %>
-
+    <%= t 'details.confirm_delete', %{Are you sure you want to delete this course? Once it is deleted, students and teachers will no longer have access to it. If you just want to remove it from the course drop-down menu, you should *conclude the course instead*.}, :wrapper => link_to('\1', context_url(@context, :context_confirm_action_url, :event => 'conclude')) %>
+    <%= t 'details.confirm_delete_addendum', %{If you do not have permission to conclude the course, you can *change the course end date*, or ask your administrator to conclude the course. }, :wrapper => link_to('\1', course_settings_url(@context)) %>
     <% form_tag context_url(@context, :context_url), {:method => :delete} do %>
       <input type="hidden" name="event" value="delete"/>
       <div class="form-actions">

@@ -444,13 +444,13 @@ class SubmissionsController < ApplicationController
     @assignment = @context.assignments.active.find(params[:assignment_id])
     @user = @context.all_students.find(params[:id])
     @submission = @assignment.find_or_create_submission(@user)
-    if params[:submission][:student_entered_score] && @submission.grants_right?(@current_user, session, :comment)#&& @submission.user == @current_user
-      @submission.student_entered_score = params[:submission][:student_entered_score].to_f
-      @submission.student_entered_score = nil if !params[:submission][:student_entered_score] || params[:submission][:student_entered_score] == "" || params[:submission][:student_entered_score] == "null"
-      @submission.save
+
+    if params[:submission][:student_entered_score] && @submission.grants_right?(@current_user, session, :comment)
+      update_student_entered_score(params[:submission][:student_entered_score])
       render :json => @submission.to_json
       return
     end
+
     if authorized_action(@submission, @current_user, :comment)
       params[:submission][:commenter] = @current_user
       admin_in_context = !@context_enrollment || @context_enrollment.admin?
@@ -514,7 +514,7 @@ class SubmissionsController < ApplicationController
   protected
 
   def submission_zip
-    @attachments = @assignment.attachments.where(:display_name => 'submissions.zip', :workflow_state => ['to_be_zipped', 'zipping', 'zipped', 'errored'], :user_id => @current_user).order(:created_at).all
+    @attachments = @assignment.attachments.where(:display_name => 'submissions.zip', :workflow_state => ['to_be_zipped', 'zipping', 'zipped', 'errored', 'unattached'], :user_id => @current_user).order(:created_at).all
     @attachment = @attachments.pop
     @attachments.each{|a| a.destroy! }
     if @attachment && (@attachment.created_at < 1.hour.ago || @attachment.created_at < (@assignment.submissions.map{|s| s.submitted_at}.compact.max || @attachment.created_at))
@@ -549,5 +549,14 @@ class SubmissionsController < ApplicationController
         end
       end
     end
+  end
+
+  def update_student_entered_score(score)
+    if score.present? && score != "null"
+      @submission.student_entered_score = score.to_f.round(2)
+    else
+      @submission.student_entered_score = nil
+    end
+    @submission.save
   end
 end

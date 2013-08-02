@@ -24,7 +24,7 @@ module Api::V1::Outcome
   # can_edit. full expands on that by adding description and criterion values
   # (if any).
   def outcome_json(outcome, user, session, style=:full)
-    api_json(outcome, user, session, :only => %w(id context_type context_id), :methods => [:title]).tap do |hash|
+    api_json(outcome, user, session, :only => %w(id context_type context_id vendor_guid), :methods => [:title]).tap do |hash|
       hash['url'] = api_v1_outcome_path :id => outcome.id
       hash['can_edit'] = outcome.context_id ?
         outcome.context.grants_right?(user, session, :manage_outcomes) :
@@ -47,7 +47,7 @@ module Api::V1::Outcome
   # context id and type, and description.
   def outcome_group_json(outcome_group, user, session, style=:full)
     path_context = outcome_group.context || :global
-    api_json(outcome_group, user, session, :only => %w(id title)).tap do |hash|
+    api_json(outcome_group, user, session, :only => %w(id title vendor_guid)).tap do |hash|
       hash['url'] = polymorphic_path [:api_v1, path_context, :outcome_group], :id => outcome_group.id
       hash['subgroups_url'] = polymorphic_path [:api_v1, path_context, :outcome_group_subgroups], :id => outcome_group.id
       hash['outcomes_url'] = polymorphic_path [:api_v1, path_context, :outcome_group_outcomes], :id => outcome_group.id

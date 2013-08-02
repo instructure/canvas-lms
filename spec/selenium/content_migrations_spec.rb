@@ -46,8 +46,8 @@ describe "external migrations" do
     ContentMigration.for_context(@course).count.should == 1
     @migration = ContentMigration.for_context(@course).first
     @migration.attachment.should_not be_nil
-    job = @migration.export_content
-    job.invoke_job
+    @migration.export_content
+    run_jobs
 
     @migration.reload
     @migration.workflow_state.should == 'exported'

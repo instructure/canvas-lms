@@ -44,6 +44,7 @@ describe "Default Account Reports" do
       @student1 = user_with_pseudonym(:active_all => true, :username => 'micheal@michaelbolton.com', :name => 'Michael Bolton', :account => @account)
       @course.enroll_user(@student, "StudentEnrollment", :enrollment_state => 'active')
       @enrollment2 = @course.enroll_user(@student1, "StudentEnrollment", :enrollment_state => 'active')
+      @section = @course.course_sections.first
       assignment_model(:course => @course, :title => 'Engrish Assignment')
       @outcome = @account.created_learning_outcomes.create!(:short_description => 'Spelling')
       @rubric = Rubric.create!(:context => @course)
@@ -113,8 +114,11 @@ describe "Default Account Reports" do
       parsed[0][10].should == '2'
       parsed[0][11].should == @course.name
       parsed[0][12].should == @course.id.to_s
-      parsed[0][13].should == @course.sis_course_id
-      parsed[0][14].should == "https://#{HostUrl.context_host(@course)}/courses/#{@course.id}/assignments/#{@assignment.id}"
+      parsed[0][13].should == @course.sis_source_id
+      parsed[0][14].should == @section.name
+      parsed[0][15].should == @section.id.to_s
+      parsed[0][16].should == @section.sis_source_id
+      parsed[0][17].should == "https://#{HostUrl.context_host(@course)}/courses/#{@course.id}/assignments/#{@assignment.id}"
 
       parsed[1][0].should == @student1.sortable_name
       parsed[1][1].should == @student1.id.to_s
@@ -129,8 +133,11 @@ describe "Default Account Reports" do
       parsed[1][10].should == nil
       parsed[1][11].should == @course.name
       parsed[1][12].should == @course.id.to_s
-      parsed[1][13].should == @course.sis_course_id
-      parsed[1][14].should == "https://#{HostUrl.context_host(@course)}/courses/#{@course.id}/assignments/#{@assignment.id}"
+      parsed[1][13].should == @course.sis_source_id
+      parsed[1][14].should == @section.name
+      parsed[1][15].should == @section.id.to_s
+      parsed[1][16].should == @section.sis_source_id
+      parsed[1][17].should == "https://#{HostUrl.context_host(@course)}/courses/#{@course.id}/assignments/#{@assignment.id}"
 
     end
 
@@ -166,11 +173,13 @@ describe "Default Account Reports" do
       parsed.length.should == 2
       parsed[0].should == [@student.sortable_name, @student.id.to_s, "user_sis_id_01", @assignment.title, @assignment.id.to_s,
                            @submission.submitted_at.iso8601, @submission.grade.to_s, @outcome.short_description,
-                           @outcome.id.to_s, '1', '2', @course.name, @course.id.to_s, @course.sis_course_id,
+                           @outcome.id.to_s, '1', '2', @course.name, @course.id.to_s, @course.sis_source_id,
+                           @section.name, @section.id.to_s, @section.sis_source_id,
                            "https://#{HostUrl.context_host(@course)}/courses/#{@course.id}/assignments/#{@assignment.id}"]
 
       parsed[1].should == [@student1.sortable_name, @student1.id.to_s, nil, @assignment.title, @assignment.id.to_s, nil, nil,
-                           @outcome.short_description, @outcome.id.to_s, nil, nil, @course.name, @course.id.to_s, @course.sis_course_id,
+                           @outcome.short_description, @outcome.id.to_s, nil, nil, @course.name, @course.id.to_s, @course.sis_source_id,
+                           @section.name, @section.id.to_s, @section.sis_source_id,
                            "https://#{HostUrl.context_host(@course)}/courses/#{@course.id}/assignments/#{@assignment.id}"]
 
     end
@@ -185,11 +194,13 @@ describe "Default Account Reports" do
 
       parsed[0].should == [@student.sortable_name, @student.id.to_s, "user_sis_id_01", @assignment.title, @assignment.id.to_s,
                            @submission.submitted_at.iso8601, @submission.grade.to_s, @outcome.short_description,
-                           @outcome.id.to_s, '1', '2', @course.name, @course.id.to_s, @course.sis_course_id,
+                           @outcome.id.to_s, '1', '2', @course.name, @course.id.to_s, @course.sis_source_id,
+                           @section.name, @section.id.to_s, @section.sis_source_id,
                            "https://#{HostUrl.context_host(@course)}/courses/#{@course.id}/assignments/#{@assignment.id}"]
 
       parsed[1].should == [@student1.sortable_name, @student1.id.to_s, nil, @assignment.title, @assignment.id.to_s, nil, nil,
-                           @outcome.short_description, @outcome.id.to_s, nil, nil, @course.name, @course.id.to_s, @course.sis_course_id,
+                           @outcome.short_description, @outcome.id.to_s, nil, nil, @course.name, @course.id.to_s, @course.sis_source_id,
+                           @section.name, @section.id.to_s, @section.sis_source_id,
                            "https://#{HostUrl.context_host(@course)}/courses/#{@course.id}/assignments/#{@assignment.id}"]
 
     end

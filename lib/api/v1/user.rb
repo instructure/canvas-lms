@@ -135,6 +135,7 @@ module Api::V1::User
     api_json(enrollment, user, session, :only => API_ENROLLMENT_JSON_OPTS).tap do |json|
       json[:enrollment_state] = json.delete('workflow_state')
       json[:role] = enrollment.role
+      json[:sis_source_id] = enrollment.sis_source_id # SFU MOD - CANVAS-224
       json[:sis_batch_id] = enrollment.sis_batch_id
       if enrollment.student?
         json[:grades] = {
@@ -156,7 +157,7 @@ module Api::V1::User
         json[:locked] = lockedbysis
       end
       if includes.include?('observed_users') && enrollment.observer? && enrollment.associated_user
-        json[:observed_user] = user_json(enrollment.associated_user, user, session, user_includes, @context, enrollment.associated_user.not_ended_enrollments.all_student)
+        json[:observed_user] = user_json(enrollment.associated_user, user, session, user_includes, @context, enrollment.associated_user.not_ended_enrollments.all_student.where(:course_id => enrollment.course_id))
       end
     end
   end

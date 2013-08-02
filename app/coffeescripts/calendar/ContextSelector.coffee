@@ -93,27 +93,33 @@ define [
         item.render($contextsList)
         @contextSelectorItems[item.context.asset_string] = item
 
-      if @apptGroup.sub_context_codes.length > 0
-        if @apptGroup.sub_context_codes[0].match /^group_category_/
-          for c, item of @contextSelectorItems
+      # if groups can sign up, then we only have one context (course) and one sub-context (group)
+      # a context without sub-contexts means the whole context is selected
+      # a context with sub-contexts means that under that context, only those sub-contexts are selected
+      # there can be a mix of contexts with and without sub-contexts
+      if @apptGroup.sub_context_codes.length > 0 and @apptGroup.sub_context_codes[0].match /^group_category_/
+        for c, item of @contextSelectorItems
+          if c == @apptGroup.context_codes[0]
+            item.setState('on')
+          item.lock()
+      else
+        contextsBySubContext = {}
+        for c in @contexts
+          for section in c.course_sections
+            contextsBySubContext[section.asset_string] = c.asset_string
+
+        for subContextCode in @apptGroup.sub_context_codes
+          $("[value='#{subContextCode}']").prop('checked', true)
+          context = contextsBySubContext[subContextCode]
+          item = @contextSelectorItems[context]
+          item.sectionChange()
+          item.lock()
+
+        for contextCode in @apptGroup.context_codes
+          item = @contextSelectorItems[contextCode]
+          if item.state == 'off'
             item.setState('on')
             item.lock()
-        else
-          contextsBySubContext = {}
-          for c in @contexts
-            for section in c.course_sections
-              contextsBySubContext[section.asset_string] = c.asset_string
-
-          for subContextCode in @apptGroup.sub_context_codes
-            $("[value='#{subContextCode}']").prop('checked', true)
-            context = contextsBySubContext[subContextCode]
-            item = @contextSelectorItems[context]
-            item.sectionChange()
-            item.lock()
-      else
-        for contextCode in @apptGroup.context_codes when @contextSelectorItems[contextCode]
-          @contextSelectorItems[contextCode].setState('on')
-          @contextSelectorItems[contextCode].lock()
 
       $('.ag_contexts_done').click preventDefault closeCB
 

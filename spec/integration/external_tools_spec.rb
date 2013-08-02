@@ -58,14 +58,46 @@ describe "External Tools" do
       doc.at_css('form#tool_form input#ext_ims_lis_basic_outcome_url')['value'].should == blti_legacy_grade_passback_api_url(@tool)
     end
 
-    it "should not include outcome service params when viewing as teacher" do
+    it "should not include outcome service sourcedid when viewing as teacher" do
       @course.enroll_teacher(user(:active_all => true))
       user_session(@user)
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
       response.should be_success
       doc = Nokogiri::HTML.parse(response.body)
       doc.at_css('form#tool_form input#lis_result_sourcedid').should be_nil
-      doc.at_css('form#tool_form input#lis_outcome_service_url').should be_nil
+      doc.at_css('form#tool_form input#lis_outcome_service_url').should_not be_nil
+    end
+
+    it "should include time zone in LTI paramaters if included in custom fields" do
+      @tool.custom_fields = {
+        "custom_time_zone" => "$Person.address.timezone",
+        "custom_user_time_zone" => "$Canvas.user.timezone",
+        "custom_user_offset" => "$Canvas.user.timezone.offset"
+      }
+      @tool.save!
+      student_in_course(:course => @course, :active_all => true)
+      user_session(@user)
+
+      account = @course.root_account
+      account.default_time_zone = 'Alaska'
+      account.save!
+
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+      response.should be_success
+      doc = Nokogiri::HTML.parse(response.body)
+      doc.at_css('form#tool_form input#custom_time_zone')['value'].should == "(GMT-09:00) Alaska"
+      doc.at_css('form#tool_form input#custom_user_time_zone')['value'].should == "(GMT-09:00) Alaska"
+      doc.at_css('form#tool_form input#custom_user_offset')['value'].should == "-09:00"
+
+      @user.time_zone = "Hawaii"
+      @user.save!
+
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+      response.should be_success
+      doc = Nokogiri::HTML.parse(response.body)
+      doc.at_css('form#tool_form input#custom_time_zone')['value'].should == "(GMT-10:00) Hawaii"
+      doc.at_css('form#tool_form input#custom_user_time_zone')['value'].should == "(GMT-10:00) Hawaii"
+      doc.at_css('form#tool_form input#custom_user_offset')['value'].should == "-10:00"
     end
 
     it "should redirect if the tool can't be configured" do
@@ -90,7 +122,7 @@ describe "External Tools" do
     
     it "should render user navigation tools with a full return url" do
       tool = @course.root_account.context_external_tools.build(:shared_secret => 'test_secret', :consumer_key => 'test_key', :name => 'my grade passback test tool', :domain => 'example.com', :privacy_level => 'public')
-      tool.settings[:user_navigation] = {:url => "http://www.example.com", :text => "Example URL"}
+      tool.user_navigation = {:url => "http://www.example.com", :text => "Example URL"}
       tool.save!
       
       student_in_course(:active_all => true)
@@ -108,7 +140,7 @@ describe "External Tools" do
     course_with_teacher_logged_in(:active_all => true)
 
     @tool = @course.context_external_tools.create!(:shared_secret => 'test_secret', :consumer_key => 'test_key', :name => 'my grade passback test tool', :domain => 'example.com')
-    @tool.settings[:course_navigation] = {:url => "http://www.example.com", :text => "Example URL"}
+    @tool.course_navigation = {:url => "http://www.example.com", :text => "Example URL"}
     @tool.save!
 
     get "/courses/#{@course.id}/external_tools/#{@tool.id}"

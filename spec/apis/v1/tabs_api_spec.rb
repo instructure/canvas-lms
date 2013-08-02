@@ -117,6 +117,36 @@ describe TabsController, :type => :integration do
       ]
     end
 
+    it 'should include external tools' do
+      course_with_teacher(:active_all => true)
+      @tool = @course.context_external_tools.new({
+        :name => 'Example',
+        :url => 'http://www.example.com',
+        :consumer_key => 'key',
+        :shared_secret => 'secret',
+      })
+      @tool.settings.merge!({
+        :course_navigation => {
+          :enabled => 'true',
+          :url => 'http://www.example.com',
+        },
+      })
+      @tool.save!
+
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/tabs",
+                      { :controller => 'tabs', :action => 'index', :course_id => @course.to_param, :format => 'json'},
+                      { :include => ['external']})
+
+      external_tabs = json.select {|tab| tab['type'] == 'external'}
+      external_tabs.length.should == 1
+      external_tabs.each do |tab|
+        tab.should include('url')
+        uri = URI(tab['url'])
+        uri.path.should == "/api/v1/courses/#{@course.id}/external_tools/sessionless_launch"
+        uri.query.should include('id=')
+      end
+    end
+
     it 'should list navigation tabs for a group' do
       group_with_user(:active_all => true)
       json = api_call(:get, "/api/v1/groups/#{@group.id}/tabs",

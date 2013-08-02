@@ -1,0 +1,33 @@
+<fieldset class="quota_settings">
+  <legend>{{#t "manual_quotas_title"}}Manually Settable Quotas{{/t}}</legend>
+  <div class="control-group">
+    <label class="control-label" for="manual_quotas_type">{{#t "select_type_label"}}Find course or group{{/t}}</label>
+    <div class="controls">
+      <select id="manual_quotas_type" class="span2">
+        <option value="course">{{#t "select_type_courses"}}Course ID{{/t}}</option>
+        <option value="group">{{#t "select_type_groups"}}Group ID{{/t}}</option>
+      </select>
+      <input id="manual_quotas_id" type="text" class="span2" maxlength="13">
+      <button id="manual_quotas_find_button" type="button" class="btn">{{#t "find_button"}}Find{{/t}}</button>
+    </div>
+  </div>
+  <div id="manual_quotas_result">
+    <hr/>
+    <div class="control-group">
+      <label class="control-label" for="manual_quotas_quota">
+        <a id="manual_quotas_link" href="#" target="_blank"></a>
+      </label>
+      <div class="controls">
+        <div class="input-append">
+          <input id="manual_quotas_quota" type="text" class="span2" title="{{#t "megabytes_tooltip"}}megabytes{{/t}}" maxlength="13">
+          <span class="add-on">{{#t "megabytes"}}megabytes{{/t}}</span>
+        </div>
+      </div>
+    </div>
+    <div class="button-container">
+      <div class="controls">
+        <button id="manual_quotas_submit_button" type="submit" class="btn">{{#t "update_button"}}Update Quota{{/t}}</button>
+      </div>
+    </div>
+  </div>
+</fieldset>

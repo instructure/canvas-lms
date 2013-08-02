@@ -51,7 +51,7 @@ define [
       topOfViewport = $window.scrollTop()
       bottomOfViewport = topOfViewport + $window.height()
       for entry in @unread
-        continue if entry.ignore
+        continue if entry.ignore or entry.view.model.get('forced_read_state')
         topOfElement = entry.view.$el.offset().top
         inView = (topOfElement < bottomOfViewport) &&
                  (topOfElement + entry.view.$el.height() > topOfViewport)

@@ -7,16 +7,16 @@ end
 Woozel.establish_connection(:adapter => 'sqlite3', :database => ':memory:')
 
 describe 'simply_versioned' do
-  describe "explicit versions" do
-    before do
-      Woozel.connection.create_table :woozels, :force => true do |t|
-        t.string :name
-      end
+  before do
+    Woozel.connection.create_table :woozels, :force => true do |t|
+      t.string :name
     end
-    after do
-      Woozel.connection.drop_table :woozels
-    end
+  end
+  after do
+    Woozel.connection.drop_table :woozels
+  end
 
+  describe "explicit versions" do
     it "should create the first version on save" do
       woozel = Woozel.new(:name => 'Eeyore')
       woozel.should_not be_versioned
@@ -60,6 +60,27 @@ describe 'simply_versioned' do
       woozel.without_versioning(&:save!)
       woozel.versions.length.should eql(1)
       woozel.versions.current.model.name.should eql('Eeyore')
+    end
+  end
+
+  describe "#current_version?" do
+    before do
+      @woozel = Woozel.create! name: 'test'
+      @woozel.with_versioning(explicit: true, &:save!)
+    end
+
+    it "should always be true for models loaded directly from AR" do
+      @woozel.should be_current_version
+      @woozel = Woozel.find(@woozel.id)
+      @woozel.should be_current_version
+      @woozel.reload
+      @woozel.should be_current_version
+      Woozel.new(name: 'test2').should be_current_version
+    end
+
+    it "should be false for the #model of any version" do
+      @woozel.versions.current.model.should_not be_current_version
+      @woozel.versions.map { |v| v.model.current_version? }.should == [false, false]
     end
   end
 end

@@ -58,7 +58,7 @@ module Canvas::AccountReports
   def self.generate_file(account_report)
     temp = Tempfile.open(generate_file_name(account_report, "csv"))
     filepath = temp.path
-    temp.close
+    temp.close!
     filepath
   end
 

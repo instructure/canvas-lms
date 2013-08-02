@@ -44,6 +44,7 @@ class Enrollment < ActiveRecord::Base
   after_save :clear_email_caches
   after_save :cancel_future_appointments
   after_save :update_linked_enrollments
+  after_save :update_cached_due_dates
 
   attr_accessor :already_enrolled
   attr_accessible :user, :course, :workflow_state, :course_section, :limit_privileges_to_course_section, :already_enrolled
@@ -192,17 +193,19 @@ class Enrollment < ActiveRecord::Base
   scope :not_fake, where("enrollments.type<>'StudentViewEnrollment'")
 
 
-  READABLE_TYPES = {
-    'TeacherEnrollment' => t('#enrollment.roles.teacher', "Teacher"),
-    'TaEnrollment' => t('#enrollment.roles.ta', "TA"),
-    'DesignerEnrollment' => t('#enrollment.roles.designer', "Designer"),
-    'StudentEnrollment' => t('#enrollment.roles.student', "Student"),
-    'StudentViewEnrollment' => t('#enrollment.roles.student', "Student"),
-    'ObserverEnrollment' => t('#enrollment.roles.observer', "Observer")
-  }
+  def self.readable_types
+    {
+      'TeacherEnrollment' => t('#enrollment.roles.teacher', "Teacher"),
+      'TaEnrollment' => t('#enrollment.roles.ta', "TA"),
+      'DesignerEnrollment' => t('#enrollment.roles.designer', "Designer"),
+      'StudentEnrollment' => t('#enrollment.roles.student', "Student"),
+      'StudentViewEnrollment' => t('#enrollment.roles.student', "Student"),
+      'ObserverEnrollment' => t('#enrollment.roles.observer', "Observer")
+    }
+  end
 
   def self.readable_type(type)
-    READABLE_TYPES[type] || READABLE_TYPES['StudentEnrollment']
+    readable_types[type] || readable_types['StudentEnrollment']
   end
 
   SIS_TYPES = {
@@ -228,17 +231,19 @@ class Enrollment < ActiveRecord::Base
     SIS_TYPES.has_key?(type)
   end
 
-  TYPES_WITH_INDEFINITE_ARTICLE = {
-    'TeacherEnrollment' => t('#enrollment.roles.teacher_with_indefinite_article', "A Teacher"),
-    'TaEnrollment' => t('#enrollment.roles.ta_with_indefinite_article', "A TA"),
-    'DesignerEnrollment' => t('#enrollment.roles.designer_with_indefinite_article', "A Designer"),
-    'StudentEnrollment' => t('#enrollment.roles.student_with_indefinite_article', "A Student"),
-    'StudentViewEnrollment' => t('#enrollment.roles.student_with_indefinite_article', "A Student"),
-    'ObserverEnrollment' => t('#enrollment.roles.observer_with_indefinite_article', "An Observer")
-  }
+  def self.types_with_indefinite_article
+    {
+      'TeacherEnrollment' => t('#enrollment.roles.teacher_with_indefinite_article', "A Teacher"),
+      'TaEnrollment' => t('#enrollment.roles.ta_with_indefinite_article', "A TA"),
+      'DesignerEnrollment' => t('#enrollment.roles.designer_with_indefinite_article', "A Designer"),
+      'StudentEnrollment' => t('#enrollment.roles.student_with_indefinite_article', "A Student"),
+      'StudentViewEnrollment' => t('#enrollment.roles.student_with_indefinite_article', "A Student"),
+      'ObserverEnrollment' => t('#enrollment.roles.observer_with_indefinite_article', "An Observer")
+    }
+  end
 
   def self.type_with_indefinite_article(type)
-    TYPES_WITH_INDEFINITE_ARTICLE[type] || TYPES_WITH_INDEFINITE_ARTICLE['StudentEnrollment']
+    types_with_indefinite_article[type] || types_with_indefinite_article['StudentEnrollment']
   end
 
   def should_update_user_account_association?
@@ -337,6 +342,14 @@ class Enrollment < ActiveRecord::Base
     enrollment
   end
 
+  def update_cached_due_dates
+    if workflow_state_changed? && course
+      course.assignments.each do |assignment|
+        DueDateCacher.recompute(assignment)
+      end
+    end
+  end
+
   def update_from(other)
     self.course_id = other.course_id
     self.workflow_state = other.workflow_state
@@ -351,7 +364,7 @@ class Enrollment < ActiveRecord::Base
   def clear_email_caches
     if self.workflow_state_changed? && (self.workflow_state_was == 'invited' || self.workflow_state == 'invited')
       if Enrollment.cross_shard_invitations?
-        Shard.default.activate do
+        Shard.birth.activate do
           self.user.communication_channels.email.unretired.each { |cc| Rails.cache.delete([cc.path, 'all_invited_enrollments'].cache_key)}
         end
       else
@@ -875,7 +888,7 @@ class Enrollment < ActiveRecord::Base
   }
   def self.cached_temporary_invitations(email)
     if Enrollment.cross_shard_invitations?
-      Shard.default.activate do
+      Shard.birth.activate do
         invitations = Rails.cache.fetch([email, 'all_invited_enrollments'].cache_key) do
           Shard.with_each_shard(CommunicationChannel.associated_shards(email)) do
             Enrollment.invited.for_email(email).to_a

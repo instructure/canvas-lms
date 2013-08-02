@@ -35,7 +35,8 @@ module SFU
 
       def section_tutorials(course_code, term_code, section_code)
         details = info(course_code, term_code)
-        main_section = section_code[0..2].downcase
+        # Used to match against sections starting with e.g. 'd1' for 'd100'
+        main_section = section_code[0..1].downcase 
         sections = ""
 
         unless details == "[]"

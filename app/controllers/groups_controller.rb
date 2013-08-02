@@ -98,6 +98,7 @@ class GroupsController < ApplicationController
   include Api::V1::Attachment
   include Api::V1::Group
   include Api::V1::UserFollow
+  include Api::V1::Progress
 
   SETTABLE_GROUP_ATTRIBUTES = %w(name description join_level is_public group_category avatar_attachment storage_quota_mb)
 
@@ -116,24 +117,28 @@ class GroupsController < ApplicationController
     category = @context.group_categories.find_by_id(params[:category_id])
     return render :json => {}, :status => :not_found unless category
     page = (params[:page] || 1).to_i rescue 1
+    per_page = [[(params[:per_page] || 15).to_i, 1].max, 100].min
     if category && !category.student_organized?
       groups = category.groups.active
     else
       groups = []
     end
-    users = @context.paginate_users_not_in_groups(groups, page)
+    users = @context.paginate_users_not_in_groups(groups, page, per_page)
 
     if authorized_action(@context, @current_user, :manage)
       respond_to do |format|
-        format.json { render :json => {
-          :pages => users.total_pages,
-          :current_page => users.current_page,
-          :next_page => users.next_page,
-          :previous_page => users.previous_page,
-          :total_entries => users.total_entries,
-          :pagination_html => render_to_string(:partial => 'user_pagination', :locals => { :users => users }),
-          :users => users.map { |u| u.group_member_json(@context) }
-        } }
+        format.json {
+          json = {
+            :pages => users.total_pages,
+            :current_page => users.current_page,
+            :next_page => users.next_page,
+            :previous_page => users.previous_page,
+            :total_entries => users.total_entries,
+            :users => users.map { |u| u.group_member_json(@context) }
+          }
+          json[:pagination_html] = render_to_string(:partial => 'user_pagination', :locals => { :users => users }) unless params[:no_html]
+          render :json => json
+        }
       end
     end
   end
@@ -245,6 +250,11 @@ class GroupsController < ApplicationController
         @current_conferences = @group.web_conferences.select{|c| c.active? && c.users.include?(@current_user) } rescue []
         @stream_items = @current_user.try(:cached_recent_stream_items, { :contexts => @context }) || []
         if params[:join] && @group.grants_right?(@current_user, :join)
+          if @group.full?
+            flash[:error] = t('errors.group_full', 'The group is full.')
+            redirect_to course_groups_url(@group.context)
+            return
+          end
           @group.request_user(@current_user)
           if !@group.grants_right?(@current_user, session, :read)
             render :action => 'membership_pending'
@@ -266,7 +276,7 @@ class GroupsController < ApplicationController
         end
         if authorized_action(@group, @current_user, :read)
           set_badge_counts_for(@group, @current_user)
-          @home_page = @group.wiki.wiki_page
+          @home_page = @group.wiki.front_page
         end
       end
       format.json do
@@ -558,16 +568,35 @@ class GroupsController < ApplicationController
   #
   # Returns a list of users in the group.
   #
+  # @argument search_term (optional)
+  #   The partial name or full ID of the users to match and return in the results list.
+  #   Must be at least 3 characters.
+  #
   # @example_request
-  #     curl https://<canvas>/api/v1/groups/1/users \ 
+  #     curl https://<canvas>/api/v1/groups/1/users \
   #          -H 'Authorization: Bearer <token>'
   #
   # @returns [User]
   def users
     return unless authorized_action(@context, @current_user, :read)
-    @users = Api.paginate(@context.users, self, api_v1_group_users_url)
 
-    render :json => @users.map { |u| user_json(u, @current_user, session) }
+    search_term = params[:search_term]
+    if search_term && search_term.size < 3
+      return render \
+          :json => {
+          "status" => "argument_error",
+          "message" => "search_term of 3 or more characters is required" },
+          :status => :bad_request
+    end
+
+    if search_term
+      users = UserSearch.for_user_in_context(search_term, @context, @current_user)
+    else
+      users = UserSearch.scope_for(@context, @current_user)
+    end
+
+    users = Api.paginate(users, self, api_v1_group_users_url)
+    render :json => users.map { |u| user_json(u, @current_user, session) }
   end
 
   def edit
@@ -619,16 +648,19 @@ class GroupsController < ApplicationController
     return render(:json => {}, :status => :bad_request) if category.student_organized?
     return render(:json => {}, :status => :bad_request) if @context.is_a?(Course) && category.restricted_self_signup?
 
-    # do the distribution and note the changes
-    groups = category.groups.active
-    potential_members = @context.users_not_in_groups(groups)
-    memberships = category.distribute_members_among_groups(potential_members, groups)
+    if value_to_boolean(params[:async])
+      category.assign_unassigned_members_in_background
+      render :json => progress_json(category.current_progress, @current_user, session)
+    else
+      # do the distribution and note the changes
+      memberships = category.assign_unassigned_members
 
-    # render the changes
-    json = memberships.group_by{ |m| m.group_id }.map do |group_id, new_members|
-      { :id => group_id, :new_members => new_members.map{ |m| m.user.group_member_json(@context) } }
+      # render the changes
+      json = memberships.group_by{ |m| m.group_id }.map do |group_id, new_members|
+        { :id => group_id, :new_members => new_members.map{ |m| m.user.group_member_json(@context) } }
+      end
+      render :json => json
     end
-    render :json => json
   end
 
   # @API Upload a file
@@ -659,6 +691,18 @@ class GroupsController < ApplicationController
     get_context
     if authorized_action(@context, @current_user, :read)
       api_render_stream_for_contexts([@context], :api_v1_group_activity_stream_url)
+    end
+  end
+
+  # @API Group activity stream summary
+  # Returns a summary of the current user's group-specific activity stream.
+  #
+  # For full documentation, see the API documentation for the user activity
+  # stream summary, in the user api.
+  def activity_stream_summary
+    get_context
+    if authorized_action(@context, @current_user, :read)
+      api_render_stream_summary([@context])
     end
   end
 

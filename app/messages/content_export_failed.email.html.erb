@@ -6,8 +6,8 @@
 <% end %>
 
 <p>
-<%= t :body, <<-BODY, :course => asset.course.name
-There was a problem exporting the course <em>%{course}</em>.
+<%= t :body2, <<-BODY, :course => asset.course.name, :wrapper => '<em>\1</em>'
+There was a problem exporting the course *%{course}*.
 Please notify your system administrator, and give them the following export identifier:
 BODY
 %>

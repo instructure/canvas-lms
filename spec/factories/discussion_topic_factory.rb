@@ -58,5 +58,5 @@ def topic_with_nested_replies(opts = {})
   @reply1.destroy
   @all_entries = [@root1, @root2, @reply1, @reply2, @reply_reply1, @reply_reply2, @reply3]
   @all_entries.each &:reload
-  @topic
+  @topic.reload
 end

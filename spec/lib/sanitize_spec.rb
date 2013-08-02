@@ -93,6 +93,12 @@ describe Sanitize do
     res.should == %{<font face="Comic Sans MS" color="blue" size="3">hello</font>}
   end
 
+  it "should remove and not escape contents of style tags" do
+    str = %{<p><style type="text/css">pleaseignoreme: blahblahblah</style>but not me</p>}
+    res = Sanitize.clean(str, Instructure::SanitizeField::SANITIZE)
+    res.should == "<p>but not me</p>"
+  end
+
   Dir.glob(Rails.root.join('spec', 'fixtures', 'xss', '*.xss')) do |filename|
     name = File.split(filename).last
     it "should sanitize xss attempts for #{name}" do

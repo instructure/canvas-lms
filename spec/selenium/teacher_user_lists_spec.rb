@@ -50,45 +50,5 @@ eolist
       end
       enrollment
     end
-
-    it "should support adding an enrollment to an enrollmentless course" do
-      user_logged_in
-      Account.default.add_user(@user)
-      course
-      get "/courses/#{@course.id}/details"
-      f("#tab-users-link").click
-      f("#tab-users a.add_users_link").click
-      add_users_to_user_list(true, 'StudentEnrollment', true)
-    end
-
-    context "enrollments by email addresses and user names on course details page" do
-      before(:each) do
-        course_with_teacher_logged_in(:active_all => true)
-        get "/courses/#{@course.id}/details"
-        f("#tab-users-link").click
-        wait_for_ajaximations
-        f("#tab-users a.add_users_link").click
-      end
-
-      it "should support adding student enrollments" do
-        add_users_to_user_list(true, 'StudentEnrollment', true)
-      end
-
-      it "should support adding teacher enrollments" do
-        add_users_to_user_list(true, 'TeacherEnrollment', true)
-      end
-
-      it "should support adding Ta enrollments" do
-        add_users_to_user_list(true, 'TaEnrollment', true)
-      end
-
-      it "should support adding observer enrollments" do
-        add_users_to_user_list(true, 'ObserverEnrollment', true)
-      end
-
-      it "should support adding designer enrollments" do
-        add_users_to_user_list(true, 'DesignerEnrollment', true)
-      end
-    end
   end
 end

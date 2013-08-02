@@ -102,6 +102,51 @@ describe DiscussionTopic do
     (@entry.check_policy(@student) & relevant_permissions).map(&:to_s).sort.should == ['read', 'reply'].sort
   end
 
+  describe "visiblity" do
+    before(:each) do
+      course_with_teacher(:active_all => 1)
+      student_in_course(:active_all => 1)
+      @topic = @course.discussion_topics.create!(:user => @teacher)
+    end
+
+    it "should be visible to students when topic is not locked" do
+      @topic.visible_for?(@student).should be_true
+    end
+
+    it "should not be visible to students when topic delayed_post_at is in the future" do
+      @topic.delayed_post_at = 5.days.from_now
+      @topic.save!
+      @topic.visible_for?(@student).should be_false
+    end
+
+    it "should be visible to students when topic delayed_post_at is in the past" do
+      @topic.delayed_post_at = 5.days.ago
+      @topic.save!
+      @topic.visible_for?(@student).should be_true
+    end
+
+    it "should be visible to students when topic delayed_post_at is nil" do
+      @topic.delayed_post_at = nil
+      @topic.save!
+      @topic.visible_for?(@student).should be_true
+    end
+
+    it "should not be visible when no delayed_post but assignment unlock date in future" do
+      @topic.delayed_post_at = nil
+      group_category = @course.group_categories.create(:name => "category")
+      @topic.assignment = @course.assignments.build(:submission_types => 'discussion_topic', 
+        :title => @topic.title, 
+        :group_category => group_category,
+        :unlock_at => 10.days.from_now,
+        :lock_at => 30.days.from_now)
+      @topic.assignment.infer_times
+      @topic.assignment.saved_by = :discussion_topic
+      @topic.save
+      
+      @topic.visible_for?(@student).should be_false
+    end
+  end
+
   describe "allow_student_discussion_topics setting" do
 
     before(:each) do
@@ -151,11 +196,16 @@ describe DiscussionTopic do
   end
 
   context "delayed posting" do
-    def delayed_discussion_topic(opts = {})
+    def discussion_topic(opts = {})
+      workflow_state = opts.delete(:workflow_state)
       @topic = @course.discussion_topics.build(opts)
-      @topic.workflow_state = 'post_delayed'
+      @topic.workflow_state = workflow_state if workflow_state
       @topic.save!
       @topic
+    end
+
+    def delayed_discussion_topic(opts = {})
+      discussion_topic({:workflow_state => 'post_delayed'}.merge(opts))
     end
 
     it "shouldn't send to streams on creation or update if it's delayed" do
@@ -184,6 +234,96 @@ describe DiscussionTopic do
       topic.workflow_state = 'active'
       topic.save!
       topic.stream_item.should_not be_nil
+    end
+
+     describe "#auto_update_workflow" do
+      before do
+        course_with_student(:active_all => true)
+        @user.register
+      end
+
+      it "should be active when delayed_post_at is in the past" do
+        topic = delayed_discussion_topic(:title => "title",
+                                         :message => "content here",
+                                         :delayed_post_at => Time.now - 1.day,
+                                         :lock_at => nil)
+          topic.auto_update_workflow
+          topic.workflow_state.should eql 'active'
+      end
+
+      it "should be post_delayed when delayed_post_at is in the future" do
+        topic = delayed_discussion_topic(:title => "title",
+                                         :message => "content here",
+                                         :delayed_post_at => Time.now + 1.day,
+                                         :lock_at => nil)
+        topic.auto_update_workflow
+        topic.workflow_state.should eql 'post_delayed'
+      end
+
+      it "should be locked when lock_at is in the past" do
+        topic = delayed_discussion_topic(:title => "title",
+                                         :message => "content here",
+                                         :delayed_post_at => nil,
+                                         :lock_at => Time.now - 1.day)
+        topic.auto_update_workflow
+        topic.workflow_state.should eql 'locked'
+      end
+
+      it "should be active when lock_at is in the future" do
+        topic = delayed_discussion_topic(:title => "title",
+                                         :message => "content here",
+                                         :delayed_post_at => nil,
+                                         :lock_at => Time.now + 1.day)
+        topic.auto_update_workflow
+        topic.workflow_state.should eql 'active'
+      end
+
+      it "should be active when now is between delayed_post_at and lock_at" do
+        topic = delayed_discussion_topic(:title => "title",
+                                         :message => "content here",
+                                         :delayed_post_at => Time.now - 1.day,
+                                         :lock_at => Time.now + 1.day)
+        topic.auto_update_workflow
+        topic.workflow_state.should eql 'active'
+      end
+
+      it "should be post_delayed when delayed_post_at and lock_at are in the future" do
+        topic = delayed_discussion_topic(:title           => "title",
+                                         :message         => "content here",
+                                         :delayed_post_at => Time.now + 1.day,
+                                         :lock_at         => Time.now + 3.days)
+        topic.auto_update_workflow
+        topic.workflow_state.should eql 'post_delayed'
+      end
+
+      it "should be locked when delayed_post_at and lock_at are in the past" do
+        topic = delayed_discussion_topic(:title           => "title",
+                                         :message         => "content here",
+                                         :delayed_post_at => Time.now - 3.days,
+                                         :lock_at         => Time.now - 1.day)
+        topic.auto_update_workflow
+        topic.workflow_state.should eql 'locked'
+      end
+
+      it "should not unlock a topic even if the lock date is in the future" do
+        topic = discussion_topic(:title           => "title",
+                                 :message         => "content here",
+                                 :workflow_state  => 'locked',
+                                 :delayed_post_at => nil,
+                                 :lock_at         => Time.now + 1.day)
+        topic.auto_update_workflow
+        topic.workflow_state.should eql 'locked'
+      end
+
+      it "should not mark a topic with post_delayed even if delayed_post_at even is in the future" do
+        topic = discussion_topic(:title           => "title",
+                                 :message         => "content here",
+                                 :workflow_state  => 'active',
+                                 :delayed_post_at => Time.now + 1.day,
+                                 :lock_at         => nil)
+        topic.auto_update_workflow
+        topic.workflow_state.should eql 'active'
+      end
     end
   end
 
@@ -460,6 +600,61 @@ describe DiscussionTopic do
 
   end
 
+  context "subscribers" do
+    before :each do
+      course_with_student(:active_all => true)
+      @context = @course
+      discussion_topic_model(:user => @teacher)
+    end
+
+    it "should automatically include the author" do
+      @topic.subscribers.should include(@teacher)
+    end
+
+    it "should not include the author if they unsubscribe" do
+      @topic.unsubscribe(@teacher)
+      @topic.subscribers.should_not include(@teacher)
+    end
+
+    it "should automatically include posters" do
+      @topic.reply_from(:user => @student, :text => "entry")
+      @topic.subscribers.should include(@student)
+    end
+
+    it "should include users that have posted entries before subscriptions were added" do
+      @topic.reply_from(:user => @student, :text => "entry")
+      participant = @topic.update_or_create_participant(current_user: @student, subscribed: nil)
+      participant.subscribed.should be_nil
+      @topic.subscribers.map(&:id).should include(@student.id)
+    end
+
+    it "should not include posters if they unsubscribe" do
+      @topic.reply_from(:user => @student, :text => "entry")
+      @topic.unsubscribe(@student)
+      @topic.subscribers.should_not include(@student)
+    end
+
+    it "should resubscribe unsubscribed users if they post" do
+      @topic.reply_from(:user => @student, :text => "entry")
+      @topic.unsubscribe(@student)
+      @topic.reply_from(:user => @student, :text => "another entry")
+      @topic.subscribers.should include(@student)
+    end
+
+    it "should include users who subscribe" do
+      @topic.subscribe(@student)
+      @topic.subscribers.should include(@student)
+    end
+
+    it "should not include anyone no longer in the course" do
+      @topic.subscribe(@student)
+      @topic2 = @course.discussion_topics.create!(:title => "student topic", :message => "I'm outta here", :user => @student)
+      @student.enrollments.first.destroy
+      @topic.subscribers.should_not include(@student)
+      @topic2.subscribers.should_not include(@student)
+    end
+  end
+  
   context "posters" do
     before :each do
       @teacher = course_with_teacher(:active_all => true).user
@@ -694,23 +889,40 @@ describe DiscussionTopic do
       @topic.unread_count(@student).should == 0
     end
 
-    it "should allow mark all as unread" do
+    it "should allow mark all as unread with forced_read_state" do
       @entry = @topic.discussion_entries.create!(:message => "Hello!", :user => @teacher)
-      @topic.change_all_read_state("unread", @teacher)
-      @topic.reload
+      @reply = @entry.reply_from(:user => @student, :text => "ohai!")
+      @reply.change_read_state('read', @teacher, :forced => false)
 
-      @topic.read?(@student).should be_false
-      @entry.read?(@student).should be_false
-      @topic.unread_count(@student).should == 1
+      @topic.change_all_read_state("unread", @teacher, :forced => true)
+      @topic.reload
+      @topic.read?(@teacher).should be_false
+
+      @entry.read?(@teacher).should be_false
+      @entry.find_existing_participant(@teacher).should be_forced_read_state
+
+      @reply.read?(@teacher).should be_false
+      @reply.find_existing_participant(@teacher).should be_forced_read_state
+
+      @topic.unread_count(@teacher).should == 2
     end
 
-    it "should allow mark all as read" do
+    it "should allow mark all as read without forced_read_state" do
       @entry = @topic.discussion_entries.create!(:message => "Hello!", :user => @teacher)
+      @reply = @entry.reply_from(:user => @student, :text => "ohai!")
+      @reply.change_read_state('unread', @student, :forced => true)
+
       @topic.change_all_read_state("read", @student)
       @topic.reload
 
       @topic.read?(@student).should be_true
+
       @entry.read?(@student).should be_true
+      @entry.find_existing_participant(@student).should_not be_forced_read_state
+
+      @reply.read?(@student).should be_true
+      @reply.find_existing_participant(@student).should be_forced_read_state
+
       @topic.unread_count(@student).should == 0
     end
 
@@ -736,6 +948,96 @@ describe DiscussionTopic do
       @stream_item = @topic.stream_item
       @stream_item.stream_item_instances.detect{|sii| sii.user_id == @teacher.id}.should be_unread
       @stream_item.stream_item_instances.detect{|sii| sii.user_id == @student.id}.should be_read
+    end
+  end
+
+  context "subscribing" do
+    before :each do
+      course_with_student(:active_all => true)
+      @context = @course
+      discussion_topic_model(:user => @teacher)
+    end
+    
+    it "should allow subscription" do
+      @topic.subscribed?(@student).should be_false
+      @topic.subscribe(@student)
+      @topic.subscribed?(@student).should be_true
+    end
+
+    it "should allow unsubscription" do
+      @topic.subscribed?(@teacher).should be_true
+      @topic.unsubscribe(@teacher)
+      @topic.subscribed?(@teacher).should be_false
+    end
+    
+    it "should be idempotent" do
+      @topic.subscribed?(@student).should be_false
+      @topic.unsubscribe(@student)
+      @topic.subscribed?(@student).should be_false
+    end
+    
+    it "should assume the author is subscribed" do
+      @topic.subscribed?(@teacher).should be_true
+    end
+
+    it "should assume posters are subscribed" do
+      @topic.reply_from(:user => @student, :text => 'first post!')
+      @topic.subscribed?(@student).should be_true
+    end
+
+    context "when initial_post_required" do
+      it "should unsubscribe a user when all of their posts are deleted" do
+        @topic.require_initial_post = true
+        @topic.save!
+        @entry = @topic.reply_from(:user => @student, :text => 'first post!')
+        @topic.subscribed?(@student).should be_true
+        @entry.destroy
+        @topic.subscribed?(@student).should be_false
+      end
+    end
+  end
+
+  context "a group topic subscription" do
+
+    before(:each) do
+      group_discussion_assignment
+      course_with_student(active_all: true)
+    end
+
+    it "should return true if the user is subscribed to a child topic" do
+      @topic.child_topics.first.subscribe(@student)
+      @topic.child_topics.first.subscribed?(@student).should be_true
+      @topic.subscribed?(@student).should be_true
+    end
+
+    it "should return true if the user has posted to a child topic" do
+      child_topic = @topic.child_topics.first
+      child_topic.context.add_user(@student)
+      child_topic.reply_from(:user => @student, :text => "post")
+      child_topic_participant = child_topic.update_or_create_participant(:current_user => @student, :subscribed => nil)
+      child_topic_participant.subscribed.should be_nil
+      @topic.subscribed?(@student).should be_true
+    end
+
+    it "should subscribe a group user to the child topic" do
+      child_one, child_two = @topic.child_topics
+      child_one.context.add_user(@student)
+      @topic.subscribe(@student)
+
+      child_one.subscribed?(@student).should be_true
+      child_two.subscribed?(@student).should_not be_true
+      @topic.subscribed?(@student).should be_true
+    end
+
+    it "should unsubscribe a group user from the child topic" do
+      child_one, child_two = @topic.child_topics
+      child_one.context.add_user(@student)
+      @topic.subscribe(@student)
+      @topic.unsubscribe(@student)
+
+      child_one.subscribed?(@student).should_not be_true
+      child_two.subscribed?(@student).should_not be_true
+      @topic.subscribed?(@student).should_not be_true
     end
   end
 
@@ -820,7 +1122,7 @@ describe DiscussionTopic do
       @context = @course
       discussion_topic_model(:user => @teacher)
       account.destroy
-      lambda { @topic.reply_from(:user => @teacher, :text => "entry") }.should raise_error(IncomingMessageProcessor::UnknownAddressError)
+      lambda { @topic.reply_from(:user => @teacher, :text => "entry") }.should raise_error(IncomingMail::IncomingMessageProcessor::UnknownAddressError)
     end
 
     it "should prefer html to text" do
@@ -835,7 +1137,7 @@ describe DiscussionTopic do
       course_with_teacher
       discussion_topic_model
       @topic.lock!
-      lambda { @topic.reply_from(:user => @teacher, :text => "reply") }.should raise_error(IncomingMessageProcessor::ReplyToLockedTopicError)
+      lambda { @topic.reply_from(:user => @teacher, :text => "reply") }.should raise_error(IncomingMail::IncomingMessageProcessor::ReplyToLockedTopicError)
     end
 
   end

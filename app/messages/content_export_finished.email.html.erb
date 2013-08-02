@@ -4,6 +4,6 @@
 <% define_content :subject do %>
   <%= t :subject, "Course Export Finished: %{course}", :course => asset.course.name %>
 <% end %>
-<p><%= t :body, %{Your course export for <em>%{course}</em> has finished.}, :course => asset.course.name %></p>
+<p><%= t :body2, %{Your course export for *%{course}* has finished.}, :course => asset.course.name, :wrapper => '<em>\1</em>' %></p>
 
 <p><a href="<%= content :link %>"><%= t :link, "Click to view exports" %></a></p>

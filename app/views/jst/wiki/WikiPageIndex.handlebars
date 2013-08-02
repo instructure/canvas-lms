@@ -1,0 +1,18 @@
+{{> [wiki/wiki_page_buttons]}}
+<div id="wiki_page_index_content">
+  <table id="wiki_page_index" class="table">
+    <thead><tr>
+      <th>PAGE TITLE</th>
+      <th>CREATION DATE</th>
+      <th>LAST EDIT</th>
+      <th></th>
+    </tr></thead>
+    <tbody class="collectionViewItems">
+      {{#if fetched}}
+        {{#unless collection.length}}
+        <tr><td colspan="4">No pages created yet. <a class="new_page" href="#">Add one!</a></td></tr>
+        {{/unless}}
+      {{/if}}
+    </tbody>
+  </table>
+</div>

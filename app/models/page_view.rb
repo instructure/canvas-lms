@@ -34,6 +34,13 @@ class PageView < ActiveRecord::Base
 
   attr_accessible :url, :user, :controller, :action, :session_id, :developer_key, :user_agent, :real_user, :context
 
+  # note that currently we never query page views from the perspective of the course;
+  # we simply don't record them for non-logged-in users in a public course
+  # if we ever do either of the above, we'll need to remove this, and figure out
+  # where such page views should belong (currently page views end up on the user's
+  # shard)
+  validates_presence_of :user_id
+
   def self.generate(request, attributes={})
     self.new(attributes).tap do |p|
       p.url = request.url[0,255]
@@ -84,8 +91,8 @@ class PageView < ActiveRecord::Base
     # remember the page view method selected at the time of creation, so that
     # we use the right method when saving
     @page_view_method = self.class.page_view_method
-    if cassandra?
-      self.shard = Shard.default
+    if cassandra? && new_record?
+      self.shard = Shard.birth
     end
   end
 
@@ -144,7 +151,7 @@ class PageView < ActiveRecord::Base
 
   def self.from_attributes(attrs, new_record=false)
     @blank_template ||= columns.inject({}) { |h,c| h[c.name] = nil; h }
-    shard = cassandra? ? Shard.default : Shard.current
+    shard = cassandra? ? Shard.birth : Shard.current
     page_view = shard.activate do
       if new_record
         new{ |pv| pv.send(:attributes=, attrs, false) }
@@ -198,17 +205,21 @@ class PageView < ActiveRecord::Base
   end
 
   def create_without_callbacks
-    return super unless cassandra?
-    self.created_at ||= Time.zone.now
-    PageView::EventStream.insert(self)
-    @new_record = false
-    self.id
+    user.shard.activate do
+      return super unless cassandra?
+      self.created_at ||= Time.zone.now
+      PageView::EventStream.insert(self)
+      @new_record = false
+      self.id
+    end
   end
 
   def update_without_callbacks
-    return super unless cassandra?
-    PageView::EventStream.update(self)
-    true
+    user.shard.activate do
+      return super unless cassandra?
+      PageView::EventStream.update(self)
+      true
+    end
   end
 
   scope :for_context, proc { |ctx| where(:context_type => ctx.class.name, :context_id => ctx) }
@@ -218,10 +229,12 @@ class PageView < ActiveRecord::Base
   # basically, it responds to #paginate and returns a
   # WillPaginate::Collection-like object
   def self.for_user(user)
-    if cassandra?
-      PageView::EventStream.for_user(user)
-    else
-      self.where(:user_id => user).order('created_at desc')
+    user.shard.activate do
+      if cassandra?
+        PageView::EventStream.for_user(user)
+      else
+        self.where(:user_id => user).order('created_at desc')
+      end
     end
   end
 
@@ -279,7 +292,10 @@ class PageView < ActiveRecord::Base
       end
       page_view.save
     end
-  rescue ActiveRecord::StatementInvalid
+  rescue ActiveRecord::StatementInvalid => e
+    logger.error "[CRIT] Failed to record page view!"
+    logger.error "#{e.class}: #{e.message}"
+    e.backtrace.each{ |line| logger.error "\tfrom #{line}" }
   end
 
   class << self
@@ -410,7 +426,9 @@ class PageView < ActiveRecord::Base
     end
 
     def cassandra
-      PageView::EventStream.database
+      user.shard.activate do
+        PageView::EventStream.database
+      end
     end
 
     def run

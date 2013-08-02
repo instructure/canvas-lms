@@ -3,6 +3,7 @@ require [
   'Backbone'
   'compiled/widget/courseList'
   'compiled/helpDialog'
+  'compiled/tours'
 
   # modules that do their own thing on every page that simply need to
   # be required
@@ -45,9 +46,10 @@ require [
   'vendor/jquery.pageless'
   'vendor/jquery.scrollTo'
   'compiled/badge_counts'
-], (Backbone, courseList, helpDialog) ->
+], (Backbone, courseList, helpDialog, tours) ->
   courseList.init()
   helpDialog.initTriggers()
+  tours.init()
 
   # Make the font-based icons work in IE8,
   # it needs to be told to redraw pseudo elements on page load

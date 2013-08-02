@@ -20,6 +20,13 @@ module Api::V1::AssignmentGroup
   include Api::V1::Json
   include Api::V1::Assignment
 
+  API_ALLOWED_ASSIGNMENT_GROUP_INPUT_FIELDS = %w(
+    name
+    position
+    group_weight
+    rules
+  )
+
   def assignment_group_json(group, user, session, includes = [])
     includes ||= []
 
@@ -36,5 +43,19 @@ module Api::V1::AssignmentGroup
     end
 
     hash
+  end
+
+  def update_assignment_group(assignment_group, params)
+    return nil unless params.is_a?(Hash)
+
+    update_params = params.slice(*API_ALLOWED_ASSIGNMENT_GROUP_INPUT_FIELDS)
+
+    if rules = update_params.delete('rules')
+      assignment_group.rules_hash = rules
+    end
+
+    assignment_group.attributes = update_params
+
+    assignment_group.save
   end
 end

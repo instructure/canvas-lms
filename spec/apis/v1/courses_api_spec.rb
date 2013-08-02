@@ -197,7 +197,6 @@ describe CoursesController, :type => :integration do
             'course_code'                          => 'Test Course',
             'start_at'                             => '2011-01-01T00:00:00-0700',
             'end_at'                               => '2011-05-01T00:00:00-0700',
-            'publish_grades_immediately'           => true,
             'is_public'                            => true,
             'public_syllabus'                      => true,
             'allow_wiki_comments'                  => true,
@@ -217,11 +216,12 @@ describe CoursesController, :type => :integration do
           'start_at' => '2011-01-01T07:00:00Z',
           'end_at' => '2011-05-01T07:00:00Z',
           'workflow_state' => 'available',
-          'default_view' => 'feed'
+          'default_view' => 'feed',
+          'storage_quota_mb' => @account.default_storage_quota_mb
         })
         json = api_call(:post, @resource_path, @resource_params, post_params)
         new_course = Course.find(json['id'])
-        [:name, :course_code, :start_at, :end_at, :publish_grades_immediately,
+        [:name, :course_code, :start_at, :end_at,
         :is_public, :public_syllabus, :allow_wiki_comments,
         :open_enrollment, :self_enrollment, :license, :sis_course_id,
         :allow_student_forum_attachments, :public_description,
@@ -837,7 +837,79 @@ describe CoursesController, :type => :integration do
     end
   end
 
-  describe "students" do
+  describe "course state" do
+    before do
+      @course3 = course
+      @course3.enroll_user(@me, 'TeacherEnrollment', { :role_name => 'SuperTeacher', :active_all => true })
+      @course4 = course
+      @course4.enroll_user(@me, 'TaEnrollment')
+      @course4.workflow_state = 'created'
+      @course4.save
+    end
+    
+    it "should return only courses with state available on ?state[]=available" do
+      json = api_call(:get, "/api/v1/courses.json",
+                      { :controller => 'courses', :action => 'index', :format => 'json' },
+                      { :state => ['available'] })
+      json.collect{ |c| c['id'].to_i }.sort.should == [@course1.id, @course2.id].sort
+      json.collect{ |c| c['workflow_state']}.each do |s|
+        %w{available}.should include(s)
+      end
+    end
+
+    it "should return only courses with state unpublished on ?state[]=unpublished" do
+      json = api_call(:get, "/api/v1/courses.json",
+                      { :controller => 'courses', :action => 'index', :format => 'json' },
+                      { :state => ['unpublished'] })
+      json.collect{ |c| c['id'].to_i }.sort.should == [@course3.id,@course4.id].sort
+      json.collect{ |c| c['workflow_state']}.each do |s|
+        %w{unpublished}.should include(s)
+      end
+    end
+
+    it "should return only courses with state unpublished and available on ?state[]=unpublished, available" do
+      json = api_call(:get, "/api/v1/courses.json",
+                      { :controller => 'courses', :action => 'index', :format => 'json' },
+                      { :state => ['unpublished','available'] })
+      json.collect{ |c| c['id'].to_i }.sort.should == [@course1.id, @course2.id, @course3.id, @course4.id].sort
+      json.collect{ |c| c['workflow_state']}.each do |s|
+        %w{available unpublished}.should include(s)
+      end
+    end
+
+    it "should return courses by custom role and state unpublished" do
+      json = api_call(:get, "/api/v1/courses.json?enrollment_role=SuperTeacher",
+                      { :controller => 'courses', :action => 'index', :format => 'json', :enrollment_role => 'SuperTeacher' },
+                      { :state => ['unpublished'] })
+      json.collect{ |c| c['id'].to_i }.should == [@course3.id]
+      json[0]['enrollments'].should == [{ 'type' => 'teacher', 'role' => 'SuperTeacher' }]
+      json.collect{ |c| c['workflow_state']}.each do |s|
+        %w{unpublished}.should include(s)
+      end
+    end
+
+    it "should not return courses with StudentEnrollment or ObserverEnrollment when state[] param" do
+      @course4.enrollments.each do |e|
+        e.type = 'StudentEnrollment'
+        e.save
+      end
+      json = api_call(:get, "/api/v1/courses.json",
+                      { :controller => 'courses', :action => 'index', :format => 'json' },
+                      { :state => ['unpublished'] })
+      json.collect{ |c| c['id'].to_i }.sort.should ==[@course3.id]
+
+      @course3.enrollments.each do |e|
+        e.type = 'ObserverEnrollment'
+        e.save
+      end
+      json = api_call(:get, "/api/v1/courses.json",
+                      { :controller => 'courses', :action => 'index', :format => 'json' },
+                      { :state => ['unpublished'] })
+      json.collect{ |c| c['id'].to_i }.should ==[]
+    end
+  end
+
+  describe "/students" do
     it "should return the list of students for the course" do
       first_user = @user
       new_user = User.create!(:name => 'Zombo')
@@ -1377,6 +1449,7 @@ describe CoursesController, :type => :integration do
         'default_view' => @course1.default_view,
         'public_syllabus' => @course1.public_syllabus,
         'workflow_state' => @course1.workflow_state,
+        'storage_quota_mb' => @course1.storage_quota_mb
       }
     end
 
@@ -1594,6 +1667,24 @@ describe CoursesController, :type => :integration do
                       { :controller => 'courses', :action => 'recent_students', :course_id => @course.to_param, :format => 'json' })
       json.map{ |el| el['id'] }.should == [@student2.id, @student3.id, @student1.id]
     end
+  end
+
+  it "should return the activity stream" do
+    course_with_teacher(:active_all => true, :user => user_with_pseudonym)
+    @context = @course
+    @topic1 = discussion_topic_model
+    json = api_call(:get, "/api/v1/courses/#{@course.id}/activity_stream.json",
+                    { controller: "courses", course_id: @course.id.to_s, action: "activity_stream", format: 'json' })
+    json.size.should == 1
+  end
+
+  it "should return the activity stream summary" do
+    course_with_teacher(:active_all => true, :user => user_with_pseudonym)
+    @context = @course
+    @topic1 = discussion_topic_model
+    json = api_call(:get, "/api/v1/courses/#{@course.id}/activity_stream/summary.json",
+                    { controller: "courses", course_id: @course.id.to_s, action: "activity_stream_summary", format: 'json' })
+    json.should == [{"type" => "DiscussionTopic", "count" => 1, "unread_count" => 1, "notification_category" => nil}]
   end
 end
 

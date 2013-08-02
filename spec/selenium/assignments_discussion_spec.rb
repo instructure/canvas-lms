@@ -13,7 +13,8 @@ describe "discussion assignments" do
       get "/courses/#{@course.id}/assignments"
       build_assignment_with_type("Discussion", :submit => true)
       expect_new_page_load { f("#left-side .discussions").click }
-      ff(".discussionTopicIndexList .discussion-topic").should_not be_empty
+      wait_for_ajaximations
+      ffj('.discussion-list li.discussion:visible').should_not be_empty
     end
 
     it "should redirect to the discussion topic" do

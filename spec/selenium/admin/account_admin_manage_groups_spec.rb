@@ -234,6 +234,7 @@ describe "account admin manage groups" do
       form.find_element(:id, "category_enable_self_signup").click
       wait_for_ajaximations
       is_checked('#category_enable_self_signup').should be_true
+      f('#group_structure_self_signup_subcontainer').should be_displayed
       submit_form(form)
       wait_for_ajaximations
       driver.find_element(:css, "#category_#{@courses_group_category.id} .self_signup_text").should include_text "Self sign-up is enabled"

@@ -25,6 +25,10 @@ class Shard
     @default ||= Shard.new
   end
 
+  def self.birth
+    default
+  end
+
   def self.current
     default
   end

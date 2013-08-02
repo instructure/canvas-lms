@@ -22,7 +22,7 @@ describe "Canvas::Redis::Cassandra" do
   let(:db) do
     @cql_db = mock()
     CassandraCQL::Database.stubs(:new).returns(@cql_db)
-    Canvas::Cassandra::Database.new([], {}, {})
+    Canvas::Cassandra::Database.new("test", "test", [], {}, {})
   end
 
   describe "#batch" do

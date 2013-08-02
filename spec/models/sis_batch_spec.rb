@@ -341,5 +341,35 @@ s2,test_1,section2,active},
           :batch_mode => true, :batch_mode_term => @term)
       @course.reload.should be_deleted
     end
+
+    it "should treat crosslisted sections as belonging to their original course" do
+      @term1 = @account.enrollment_terms.first
+      @term2 = @account.enrollment_terms.create!(:name => 'term2')
+      @term2.sis_source_id = 'term2'; @term2.save!
+      @previous_batch = SisBatch.create!
+
+      @course1 = @account.courses.build
+      @course1.sis_source_id = 'c1'
+      @course1.save!
+      @course2 = @account.courses.build
+      @course2.sis_source_id = 'c2'
+      @course2.enrollment_term = @term2
+      @course2.save!
+      @section1 = @course1.course_sections.build
+      @section1.sis_source_id = 's1'
+      @section1.sis_batch_id = @previous_batch.id
+      @section1.save!
+      @section2 = @course2.course_sections.build
+      @section2.sis_source_id = 's2'
+      @section2.sis_batch_id = @previous_batch.id
+      @section2.save!
+      @section2.crosslist_to_course(@course1)
+
+      process_csv_data(
+          ['section_id,course_id,name,status}'],
+          :batch_mode => true, :batch_mode_term => @term1)
+      @section1.reload.should be_deleted
+      @section2.reload.should_not be_deleted
+    end
   end
 end

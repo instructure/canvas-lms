@@ -312,6 +312,25 @@ describe Group do
     end
   end
 
+  context "#full?" do
+    it "returns true when category group_limit has been met" do
+      @group.group_category = @course.group_categories.build(:name => 'foo')
+      @group.group_category.group_limit = 1
+      @group.add_user user_model, 'accepted'
+      @group.should be_full
+    end
+
+    it "returns false when category group_limit has not been met" do
+      # no category
+      @group.should_not be_full
+      # not full
+      @group.group_category = @course.group_categories.build(:name => 'foo')
+      @group.group_category.group_limit = 2
+      @group.add_user user_model, 'accepted'
+      @group.should_not be_full
+    end
+  end
+
   context "has_member?" do
     it "should be true for accepted memberships, regardless of moderator flag" do
       @user1 = user_model
@@ -532,5 +551,20 @@ describe Group do
       @group.tabs_available(nil).map{|t|t[:id]}.should_not include Group::TAB_CONFERENCES
     end
   end
-  
+
+  describe "quota" do
+    it "should default to Group.default_storage_quota" do
+      @group.quota.should == Group.default_storage_quota
+    end
+
+    it "should be overridden by the account's default_group_storage_quota" do
+      a = @group.account
+      a.default_group_storage_quota = 10.megabytes
+      a.save!
+
+      @group.reload
+      @group.quota.should == 10.megabytes
+    end
+  end
+
 end

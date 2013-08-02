@@ -56,7 +56,10 @@ define [
       @$holder.find('.context_list_context').each (i, li) =>
         $li = $(li)
         visible = $li.data('context') in @contexts
-        $li.toggleClass('checked', visible).toggleClass('not-checked', !visible)
+        $li.toggleClass('checked', visible)
+           .toggleClass('not-checked', !visible)
+           .find('.context-list-toggle-box')
+           .attr('aria-checked', visible)
 
   return sidebar = (contexts, selectedContexts, dataSource) ->
 

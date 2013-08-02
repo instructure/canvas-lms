@@ -675,8 +675,9 @@ define([
         }
         $dialog.find("button").attr('disabled', false).filter(".delete_button").text(I18n.t('buttons.delete_group', "Delete Group"));
         $dialog.dialog('close');
-      }, function() {
-        $dialog.find("button").attr('disabled', false).filter(".delete_button").text(I18n.t('errors.deleting_group_failed', "Delete Failed"));
+      }, function(err) {
+        $.flashError(err.errors.workflow_state[0].message);
+        $dialog.find(".delete_button").attr('disabled', false);
       });
     }).delegate('.cancel_button', 'click', function() {
       $("#delete_assignments_dialog").dialog('close');

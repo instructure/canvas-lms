@@ -25,7 +25,10 @@ class PluginsController < ApplicationController
 
   def show
     if find_plugin_setting
-      @plugin_setting.disabled = true if @plugin_setting.new_record?
+      if @plugin_setting.new_record?
+        @plugin_setting.disabled = true
+        clear_encrypted_plugin_settings
+      end
       @settings = @plugin.settings
     else
       flash[:notice] = t('errors.plugin_doesnt_exist', "The plugin %{id} doesn't exist.", :id => params[:id])
@@ -39,7 +42,7 @@ class PluginsController < ApplicationController
       @plugin_setting.posted_settings = params[:settings] unless @plugin_setting.disabled
       if @plugin_setting.save
         flash[:notice] = t('notices.settings_updated', "Plugin settings successfully updated.")
-        redirect_to plugin_path(@plugin.id)
+        redirect_to plugin_path(@plugin.id, :all => params[:all])
       else
         @settings = @plugin.settings
         flash[:error] = t('errors.setting_update_failed', "There was an error saving the plugin settings.")
@@ -60,6 +63,14 @@ class PluginsController < ApplicationController
       true
     else
       false
+    end
+  end
+
+  def clear_encrypted_plugin_settings
+    if @plugin_setting.settings && @plugin.encrypted_settings
+      @plugin.encrypted_settings.each do |encrypted_setting_name|
+        @plugin_setting.settings[encrypted_setting_name] = ''
+      end
     end
   end
 

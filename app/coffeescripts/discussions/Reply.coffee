@@ -17,11 +17,17 @@ define [
     #
     # @param {view} an EntryView instance
     constructor: (@view, @options={}) ->
-      @el = @view.$ '.discussion-reply-label:first'
-      @showWhileEditing = @el.next()
-      @textarea = @showWhileEditing.find('.reply-textarea')
-      @form = @el.closest('form').submit preventDefault @submit
+      @el = @view.$ '.discussion-reply-action:first'
+      # works for threaded discussion topic and entries
+      @discussionEntry = @el.closest '.discussion_entry'
+      # required for non-threaded reply area at bottom of an entry block
+      @discussionEntry = @el.closest '.entry' if @discussionEntry.length == 0
+      @form = @discussionEntry.find('form:first').submit preventDefault @submit
+      @textArea = @getEditingElement()
       @form.find('.cancel_button').click @hide
+      @form.on 'click', '.toggle-wrapper a', (e) =>
+        e.preventDefault()
+        @textArea.editorBox('toggle')
       @form.delegate '.alert .close', 'click', preventDefault @hideNotification
       @editing = false
 
@@ -41,9 +47,9 @@ define [
     # @api public
     edit: ->
       @form.addClass 'replying'
-      @textarea.editorBox tinyOptions: width: '100%'
-      @el.hide()
-      setTimeout (=> @textarea.editorBox 'focus'), 20 if @options.focus
+      @discussionEntry.addClass 'replying'
+      @textArea.editorBox tinyOptions: width: '100%'
+      setTimeout (=> @textArea.editorBox 'focus'), 20 if @options.focus
       @editing = true
       @trigger 'edit', this
 
@@ -52,11 +58,11 @@ define [
     #
     # @api public
     hide: =>
-      @content = @textarea._justGetCode()
-      @textarea._removeEditor()
+      @content = @textArea._justGetCode()
+      @textArea._removeEditor()
       @form.removeClass 'replying'
-      @textarea.val @content
-      @el.show()
+      @discussionEntry.removeClass 'replying'
+      @textArea.val @content
       @editing = false
       @trigger 'hide', this
 
@@ -70,16 +76,23 @@ define [
     # @api private
     submit: =>
       @hide()
-      @textarea._setContentCode ''
+      @textArea._setContentCode ''
       @view.model.set 'notification', "<div class='alert alert-info'>#{I18n.t 'saving_reply', 'Saving reply...'}</div>"
       entry = new Entry @getModelAttributes()
       entry.save null,
         success: @onPostReplySuccess
         error: @onPostReplyError
         multipart: entry.get('attachment')
+        proxyAttachment: true
       @hide()
       @removeAttachments()
-      @el.hide()
+
+    ##
+    # Get the jQueryEl element on the discussion entry to edit.
+    #
+    # @api private
+    getEditingElement: ->
+      @view.$('.reply-textarea:first')
 
     ##
     # Computes the model's attributes before saving it to the server
@@ -104,7 +117,6 @@ define [
     # @api private
     onPostReplySuccess: (entry) =>
       @view.model.set 'notification', ''
-      @el.show()
       @trigger 'save', entry
 
     ##
@@ -113,7 +125,7 @@ define [
     # @api private
     onPostReplyError: (entry) =>
       @view.model.set 'notification', "<div class='alert alert-info'>#{I18n.t 'error_saving_reply', "*An error occured*, please post your reply again later", wrapper: '<strong>$1</strong>'}</div>"
-      @textarea.val entry.get('message')
+      @textArea.val entry.get('message')
       @edit()
 
     ##

@@ -128,8 +128,9 @@ describe "accounts/settings.html.erb" do
       
       it "should show quota options" do
         render
-        response.should have_tag "input#account_default_course_storage_quota"
-        response.should have_tag "input#account_default_user_storage_quota"
+        @controller.js_env.include?(:ACCOUNT).should be_true
+        response.should have_tag '#tab-quotas-link'
+        response.should have_tag '#tab-quotas'
       end
     end
     
@@ -142,8 +143,9 @@ describe "accounts/settings.html.erb" do
       
       it "should not show quota options" do
         render
-        response.should_not have_tag "input#account_default_course_storage_quota"
-        response.should_not have_tag "input#account_default_user_storage_quota"
+        @controller.js_env.include?(:ACCOUNT).should be_false
+        response.should_not have_tag '#tab-quotas-link'
+        response.should_not have_tag '#tab-quotas'
       end
     end
   end

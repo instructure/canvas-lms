@@ -9,6 +9,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
 
     before (:each) do
       course_with_teacher_logged_in
+      @blank_page = @course.wiki.wiki_pages.create! :title => 'blank'
     end
 
     after(:each) do
@@ -141,44 +142,67 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
       check_image(f('#wiki_body img'))
     end
 
-    it "should add image from flickr" do
-      get "/courses/#{@course.id}/wiki"
-
-      #add image from flickr to rce
-      f('.wiki_switch_views_link').click
-      clear_wiki_rce
-      f('.wiki_switch_views_link').click
-      add_flickr_image(driver)
-      in_frame "wiki_page_body_ifr" do
-        f('#tinymce img').should be_displayed
+    it "should add image via url" do
+      get "/courses/#{@course.id}/wiki/blank"
+      wait_for_ajaximations
+      f('.edit_link').click
+      add_url_image(driver, 'http://example.com/image.png', 'alt text')
+      submit_form("#edit_wiki_page_#{@blank_page.id}")
+      keep_trying_until { f('#wiki_body').displayed? }
+      check_element_attrs(f('#wiki_body img'), :src => 'http://example.com/image.png', :alt => 'alt text')
+    end
+    
+    describe "canvas images" do
+      before do
+        @course_root = Folder.root_folders(@course).first
+        @course_attachment = @course_root.attachments.create! :uploaded_data => jpeg_data_frd, :filename => 'course.jpg', :display_name => 'course.jpg', :context => @course
+        @teacher_root = Folder.root_folders(@teacher).first
+        @teacher_attachment = @teacher_root.attachments.create! :uploaded_data => jpeg_data_frd, :filename => 'teacher.jpg', :display_name => 'teacher.jpg', :context => @teacher
+        get "/courses/#{@course.id}/wiki/blank"
+        wait_for_ajaximations
+        f('.edit_link').click
       end
-
-      submit_form('#new_wiki_page')
-      wait_for_ajax_requests
-      get "/courses/#{@course.id}/wiki" #can't just wait for the dom, for some reason it stays in edit mode
-      wait_for_ajax_requests
-
-      check_image(f('#wiki_body img'))
+      
+      it "should add a course image" do
+        add_canvas_image(driver, 'Course files', 'course.jpg')
+        submit_form("#edit_wiki_page_#{@blank_page.id}")
+        keep_trying_until { f('#wiki_body').displayed? }
+        check_element_attrs(f('#wiki_body img'), :src => /\/files\/#{@course_attachment.id}/, :alt => 'course.jpg')
+      end
+      
+      it "should add a user image" do
+        add_canvas_image(driver, 'My files', 'teacher.jpg')
+        submit_form("#edit_wiki_page_#{@blank_page.id}")
+        keep_trying_until { f('#wiki_body').displayed? }
+        check_element_attrs(f('#wiki_body img'), :src => /\/files\/#{@teacher_attachment.id}/, :alt => 'teacher.jpg')
+      end
     end
 
-
-    it "should put flickr images into the right editor" do
+    it "should put images into the right editor" do
+      @course_root = Folder.root_folders(@course).first
+      @course_attachment = @course_root.attachments.create!(:context => @course, :uploaded_data => jpeg_data_frd, :filename => 'course.jpg', :display_name => 'course.jpg')
+      @course_attachment2 = @course_root.attachments.create!(:context => @course, :uploaded_data => jpeg_data_frd, :filename => 'course2.jpg', :display_name => 'course2.jpg')
       get "/courses/#{@course.id}/quizzes"
+      wait_for_ajaximations
       f(".new-quiz-link").click
-      keep_trying_until { f(".mce_instructure_embed").should be_displayed }
-      add_flickr_image(driver)
+      keep_trying_until { f(".mce_instructure_image").displayed? }
+      add_canvas_image(driver, 'Course files', 'course2.jpg')
 
       click_questions_tab
       click_new_question_button
       wait_for_animations
-      add_flickr_image(f("#question_content_0_parent"))
-      in_frame "quiz_description_ifr" do
-        f("#tinymce").find_elements(:css, "a").length.should == 1
-      end
+      add_canvas_image(f("#question_content_0_parent"), 'Course files', 'course.jpg')
+
       in_frame "question_content_0_ifr" do
-        f("#tinymce").find_elements(:css, "a").length.should == 1
+        f("#tinymce").find_elements(:css, "img").length.should == 1
+        check_element_attrs(f('#tinymce img'), :src => /\/files\/#{@course_attachment.id}/, :alt => 'course.jpg')
+      end
+
+      click_settings_tab
+      in_frame "quiz_description_ifr" do
+        f("#tinymce").find_elements(:css, "img").length.should == 1
+        check_element_attrs(f('#tinymce img'), :src => /\/files\/#{@course_attachment2.id}/, :alt => 'course2.jpg')
       end
     end
   end
 end
-

@@ -25,6 +25,7 @@ describe "account admin outcomes" do
         end
 
         it "should edit a learning outcome and delete a rating" do
+          pending('193')
           should_edit_a_learning_outcome_and_delete_a_rating
         end
 

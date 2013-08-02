@@ -26,11 +26,10 @@ describe ZipFileImport do
     zf.attachment = attachment_model(:uploaded_data => stub_file_data("attachments.zip", File.read(Rails.root+"spec/fixtures/attachments.zip"), "application/zip"))
     zf.attachment.update_attributes(:context => zf)
     zf.save!
-    job = zf.process
-    job.should be_is_a(Delayed::Job)
+    zf.process
     zf.reload.progress.should be_nil
     zf.state.should == :created
-    run_job(job)
+    run_jobs
     zf.reload.state.should == :imported
     zf.progress.should == 1.0
     folder.attachments.active.map(&:display_name).should == ["first_entry.txt"]

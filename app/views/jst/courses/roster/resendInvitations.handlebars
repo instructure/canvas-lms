@@ -1,0 +1,18 @@
+{{#ifAll canResend pendingInvitationsCount}}
+  <p>
+    {{#t "pending_invitations"}}
+      {{pendingInvitationsCount}} invitations haven't been accepted.
+    {{/t}}
+    {{#if available}}
+      {{#if sending}}
+        <a href="javascript:void(0)">
+          {{#t "re_sending_invitations"}}Resending...{{/t}}
+        </a>
+      {{else}}
+        <a href="javascript:void(0)" class="resend-pending-invitations">
+          {{#t "re_send_invitations"}}Resend{{/t}}
+        </a>
+      {{/if}}
+    {{/if}}
+  </p>
+{{/ifAll}}

@@ -91,6 +91,7 @@ class DiscussionEntriesController < ApplicationController
     # unused attributes during update
     params[:discussion_entry].delete(:discussion_topic_id)
     params[:discussion_entry].delete(:parent_id)
+    params[:discussion_entry][:message] = process_incoming_html_content(params[:discussion_entry][:message])
 
     @entry = (@topic || @context).discussion_entries.find(params[:id])
     raise(ActiveRecord::RecordNotFound) if @entry.deleted?

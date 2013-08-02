@@ -35,8 +35,10 @@ class Assignment < ActiveRecord::Base
     :notify_of_update, :time_zone_edited, :turnitin_enabled, :turnitin_settings,
     :context, :position, :allowed_extensions, :external_tool_tag_attributes,
     :freeze_on_copy, :assignment_group_id
-    
+
   attr_accessor :original_id, :updating_user, :copying
+
+  attr_reader :assignment_changed
 
   has_many :submissions, :class_name => 'Submission', :dependent => :destroy
   has_many :attachments, :as => :context, :dependent => :destroy
@@ -56,7 +58,7 @@ class Assignment < ActiveRecord::Base
   has_one :external_tool_tag, :class_name => 'ContentTag', :as => :context, :dependent => :destroy
   validates_associated :external_tool_tag, :if => :external_tool?
 
-  accepts_nested_attributes_for :external_tool_tag, :reject_if => proc { |attrs|
+  accepts_nested_attributes_for :external_tool_tag, :update_only => true, :reject_if => proc { |attrs|
     # only accept the url and new_tab params, the other accessible
     # params don't apply to an content tag being used as an external_tool_tag
     attrs.slice!(:url, :new_tab)
@@ -149,10 +151,7 @@ class Assignment < ActiveRecord::Base
     write_attribute(:allowed_extensions, new_value)
   end
 
-  before_create :infer_state_from_course
-
   before_save   :set_old_assignment_group_id,
-                :deliver_messages_if_publishing,
                 :infer_grading_type,
                 :process_if_quiz,
                 :default_values,
@@ -165,18 +164,17 @@ class Assignment < ActiveRecord::Base
                 :update_grading_standard,
                 :update_quiz_or_discussion_topic,
                 :update_submissions_later,
-                :clear_unannounced_grading_changes_if_just_unpublished,
                 :schedule_do_auto_peer_review_job_if_automatic_peer_review,
                 :delete_empty_abandoned_children,
                 :validate_assignment_overrides,
-                :recompute_submission_lateness_later
+                :update_cached_due_dates
 
   has_a_broadcast_policy
 
   after_save :remove_assignment_updated_flag # this needs to be after has_a_broadcast_policy for the message to be sent
 
   def validate_assignment_overrides
-    if group_category_id_changed? 
+    if group_category_id_changed?
       # needs to be .each(&:destroy) instead of .update_all(:workflow_state =>
       # 'deleted') so that the override gets versioned properly
       active_assignment_overrides.
@@ -196,7 +194,7 @@ class Assignment < ActiveRecord::Base
       elsif due_at
         self.send_later_enqueue_args(:do_auto_peer_review, {
           :run_at => due_at,
-          :singleton => Shard.default.activate { "assignment:auto_peer_review:#{self.id}" }
+          :singleton => Shard.birth.activate { "assignment:auto_peer_review:#{self.id}" }
         })
       end
     end
@@ -328,13 +326,6 @@ class Assignment < ActiveRecord::Base
     self.all_day ? self.all_day_date : self.due_at
   end
 
-  def clear_unannounced_grading_changes_if_just_unpublished
-    if @workflow_state_was == 'published' && self.available?
-      Submission.where(:assignment_id => self).update_all(:changed_since_publish => false)
-    end
-    true
-  end
-
   def delete_empty_abandoned_children
     if @submission_types_was != self.submission_types
       unless self.submission_types == 'discussion_topic'
@@ -346,28 +337,22 @@ class Assignment < ActiveRecord::Base
     end
   end
 
-  attr_accessor :updated_submissions
   def update_submissions_later
     if @old_assignment_group_id != self.assignment_group_id
       AssignmentGroup.find_by_id(@old_assignment_group_id).try(:touch) if @old_assignment_group_id.present?
     end
     self.assignment_group.touch if self.assignment_group
-    if @notify_graded_students_of_grading
-      send_later_if_production(:update_submissions, true)
-    elsif @points_possible_was != self.points_possible #|| self.published?
+    if @points_possible_was != self.points_possible
       send_later_if_production(:update_submissions)
     end
   end
 
-  def update_submissions(just_published=false)
+  attr_accessor :updated_submissions # for testing
+  def update_submissions
     @updated_submissions ||= []
     self.submissions.find_each do |submission|
       @updated_submissions << submission
-      if just_published
-        submission.assignment_just_published!
-      else
-        submission.save!
-      end
+      submission.save!
     end
   end
 
@@ -424,7 +409,6 @@ class Assignment < ActiveRecord::Base
     tag_info
   end
 
-
   # call this to perform notifications on an Assignment that is not being saved
   # (useful when a batch of overrides associated with a new assignment have been saved)
   def do_notifications!(prior_version=nil, notify=false)
@@ -447,56 +431,30 @@ class Assignment < ActiveRecord::Base
       # (the AssignmentOverride records will take care of notifying those users)
       participants - participants_with_overridden_due_at
     }
-    p.whenever { |record|
-      !self.suppress_broadcast and
-      record.context.state == :available and record.changed_in_states([:available,:published], :fields => :due_at) and
-      record.prior_version && !Assignment.due_dates_equal?(record.due_at, record.prior_version.due_at) and
-      record.created_at < 3.hours.ago
+    p.whenever { |assignment|
+      policy = BroadcastPolicies::AssignmentPolicy.new( assignment )
+      policy.should_dispatch_assignment_due_date_changed?
     }
 
     p.dispatch :assignment_changed
     p.to { participants }
-    p.whenever { |record|
-      !self.suppress_broadcast and
-      !record.muted? and
-      record.created_at < 30.minutes.ago and
-      record.context.state == :available and [:available, :published].include?(record.state) and
-      record.prior_version and (record.points_possible != record.prior_version.points_possible || @assignment_changed)
+    p.whenever { |assignment|
+      policy = BroadcastPolicies::AssignmentPolicy.new( assignment )
+      policy.should_dispatch_assignment_changed?
     }
 
     p.dispatch :assignment_created
     p.to { participants }
     p.whenever { |record|
-      !self.suppress_broadcast and
-      record.context.state == :available and record.just_created
+      record.just_created
     }
     p.filter_asset_by_recipient { |record, user|
       record.overridden_for(user)
     }
 
-    p.dispatch :assignment_graded
-    p.to { @students_whose_grade_just_changed }
-    p.whenever {|record|
-      !self.suppress_broadcast and
-      !record.muted? and
-      @notify_affected_students_of_grading_change and
-      record.context.state == :available and
-      @students_whose_grade_just_changed and !@students_whose_grade_just_changed.empty?
-    }
-
-    p.dispatch :assignment_graded
-    p.to { participants }
-    p.whenever {|record|
-      !self.suppress_broadcast and
-      !record.muted? and
-      @notify_all_students_of_grading and
-      record.context.state == :available
-    }
-
     p.dispatch :assignment_unmuted
     p.to { participants }
     p.whenever { |record|
-      !self.suppress_broadcast and
       record.recently_unmuted
     }
 
@@ -515,32 +473,17 @@ class Assignment < ActiveRecord::Base
     true
   end
 
-  attr_accessor :suppress_broadcast
-
-  def deliver_messages_if_publishing
-    @notify_graded_students_of_grading = false
-    @notify_all_students_of_grading = false
-    if self.workflow_state == 'published' && self.workflow_state_was == 'available'
-      if self.previously_published
-        @notify_graded_students_of_grading = true
-      else
-        @notify_all_students_of_grading = true
-      end
-    end
-    self.previously_published = true if self.workflow_state == 'published' || self.workflow_state_was == 'published'
-  end
 
   def points_uneditable?
     (self.submission_types == 'online_quiz') # && self.quiz && (self.quiz.edited? || self.quiz.available?))
   end
 
   workflow do
-    state :available do
-      event :publish, :transitions_to => :published
-    end
-    # 'published' means the grades have been published, and are now viewable to students
     state :published do
-      event :unpublish, :transitions_to => :available
+      event :unpublish, :transitions_to => :unpublished
+    end
+    state :unpublished do
+      event :publish, :transitions_to => :published
     end
     state :deleted
   end
@@ -577,15 +520,6 @@ class Assignment < ActiveRecord::Base
       overridden_users.concat(o.applies_to_students)
     end
   end
-
-  def infer_state_from_course
-    self.workflow_state = "published" if (self.context.publish_grades_immediately rescue false)
-    if self.assignment_group_id.nil?
-      self.context.require_assignment_group
-      self.assignment_group = self.context.assignment_groups.active.first
-    end
-  end
-  protected :infer_state_from_course
 
   attr_accessor :saved_by
   def process_if_quiz
@@ -775,15 +709,15 @@ class Assignment < ActiveRecord::Base
     read_attribute(:all_day) || (self.new_record? && self.due_at && (self.due_at.strftime("%H:%M") == '23:59' || self.due_at.strftime("%H:%M") == '00:00'))
   end
 
-  def locked_for?(user=nil, opts={})
+  def locked_for?(user, opts={})
     return false if opts[:check_policies] && self.grants_right?(user, nil, :update)
     Rails.cache.fetch(locked_cache_key(user), :expires_in => 1.minute) do
       locked = false
       assignment_for_user = self.overridden_for(user)
       if (assignment_for_user.unlock_at && assignment_for_user.unlock_at > Time.now)
-        locked = {:asset_string => self.asset_string, :unlock_at => assignment_for_user.unlock_at}
-      elsif (assignment_for_user.lock_at && assignment_for_user.lock_at <= Time.now)
-        locked = {:asset_string => self.asset_string, :lock_at => assignment_for_user.lock_at}
+        locked = {:asset_string => assignment_for_user.asset_string, :unlock_at => assignment_for_user.unlock_at}
+      elsif (assignment_for_user.lock_at && assignment_for_user.lock_at < Time.now)
+        locked = {:asset_string => assignment_for_user.asset_string, :lock_at => assignment_for_user.lock_at}
       elsif self.could_be_locked && item = locked_by_module_item?(user, opts[:deep_check_if_needed])
         locked = {:asset_string => self.asset_string, :context_module => item.context_module.attributes}
       end
@@ -818,7 +752,7 @@ class Assignment < ActiveRecord::Base
   end
 
   set_policy do
-    given { |user, session| self.cached_context_grants_right?(user, session, :read) }
+    given { |user, session| self.cached_context_grants_right?(user, session, :read) && self.published? }
     can :read and can :read_own_submission
 
     given { |user, session| self.submittable_type? &&
@@ -861,31 +795,29 @@ class Assignment < ActiveRecord::Base
     context.participants
   end
 
-  def notify_affected_students_of_grading_change!
-    @notify_affected_students_of_grading_change = true
-    self.save! if @students_whose_grade_just_changed && !@students_whose_grade_just_changed
-    @notify_affected_students_of_grading_change = false
-  end
-
   def set_default_grade(options={})
     score = self.grade_to_score(options[:default_grade])
     grade = self.score_to_grade(score)
     submissions_to_save = []
-    @students_whose_grade_just_changed = []
     self.context.students.find_each do |student|
       User.send(:with_exclusive_scope) do
         submission = self.find_or_create_submission(student)
         if !submission.score || options[:overwrite_existing_grades]
           if submission.score != score
             submissions_to_save << submission
-            @students_whose_grade_just_changed << student
           end
         end
       end
     end
 
-    changed_since_publish = !!self.available?
-    Submission.where(:id => submissions_to_save).update_all(:score => score, :grade => grade, :published_score => score, :published_grade => grade, :changed_since_publish => changed_since_publish, :workflow_state => 'graded', :graded_at => Time.now.utc) unless submissions_to_save.empty?
+    Submission.where(:id => submissions_to_save).update_all({
+      :score => score,
+      :grade => grade,
+      :published_score => score,
+      :published_grade => grade,
+      :workflow_state => 'graded',
+      :graded_at => Time.now.utc
+    }) unless submissions_to_save.empty?
 
     self.context.recompute_student_scores
     student_ids = context.student_ids
@@ -1009,7 +941,7 @@ class Assignment < ActiveRecord::Base
     s = nil
     unique_constraint_retry do
       s = Submission.find_or_initialize_by_assignment_id_and_user_id(assignment_id, user_id)
-      s.save_without_broadcast if s.new_record?
+      s.save_without_broadcasting if s.new_record?
     end
     raise "bad" if s.new_record?
     s
@@ -1155,6 +1087,10 @@ class Assignment < ActiveRecord::Base
                       :media_comment_type, :media_comment_id,
                       :cached_attachments, :attachments]
 
+    attachment_fields = [:id, :comment_id, :content_type, :context_id, :context_type,
+                         :crocodoc_available?, :display_name, :filename, :mime_class,
+                         :scribd_doc, :scribdable?, :size, :submitter_id, :workflow_state]
+
     res = as_json(
       :include => {
         :context => { :only => :id },
@@ -1171,8 +1107,8 @@ class Assignment < ActiveRecord::Base
     res[:context][:enrollments] = context.enrollments_visible_to(user).
       map{|s| s.as_json(:include_root => false, :only => [:user_id, :course_section_id]) }
     res[:context][:quiz] = self.quiz.as_json(:include_root => false, :only => [:anonymous_submissions])
-    res[:submissions] = submissions.where(:user_id => visible_students).map{|s|
-      json = s.as_json(:include_root => false,
+    res[:submissions] = submissions.where(:user_id => visible_students).map{|sub|
+      json = sub.as_json(:include_root => false,
         :include => {
           :submission_comments => {
             :methods => avatar_methods,
@@ -1186,14 +1122,24 @@ class Assignment < ActiveRecord::Base
         :only => submission_fields
       )
       if json['submission_history']
-        json['submission_history'].map! do |s|
-          s.as_json(
+        json['submission_history'].map! do |version|
+          version.cached_due_date = sub.cached_due_date
+          version.as_json(
             :include => {
               :submission_comments => { :only => comment_fields }
             },
             :only => submission_fields,
             :methods => [:versioned_attachments, :late]
-          )
+          ).tap do |version_json|
+            if version_json['submission'] && version_json['submission']['versioned_attachments']
+              version_json['submission']['versioned_attachments'].map! do |a|
+                a.as_json(
+                  :only => attachment_fields,
+                  :methods => [:view_inline_ping_url]
+                )
+              end
+            end
+          end
         end
       end
       json
@@ -1430,10 +1376,6 @@ class Assignment < ActiveRecord::Base
 
   scope :gradeable, where("assignments.submission_types<>'not_graded'")
 
-  scope :need_publishing, lambda {
-    where("assignments.due_at<? AND assignments.workflow_state='available'", 1.week.ago)
-  }
-
   scope :active, where("assignments.workflow_state<>'deleted'")
   scope :before, lambda { |date| where("assignments.created_at<?", date) }
 
@@ -1444,9 +1386,8 @@ class Assignment < ActiveRecord::Base
 
   scope :order_by_base_due_at, order("assignments.due_at")
 
-  def needs_publishing?
-    self.due_at && self.due_at < 1.week.ago && self.available?
-  end
+  scope :unpublished, where(:workflow_state => 'unpublished')
+  scope :published, where(:workflow_state => 'published')
 
   def overdue?
     due_at && due_at <= Time.now
@@ -1478,7 +1419,7 @@ class Assignment < ActiveRecord::Base
   end
   protected :readable_submission_type
 
-  CLONE_FOR_EXCLUDE_ATTRIBUTES = [:id, :assignment_group_id, :group_category, :peer_review_count, :peer_reviews_assigned, :previously_published, :needs_grading_count]
+  CLONE_FOR_EXCLUDE_ATTRIBUTES = [:id, :assignment_group_id, :group_category, :peer_review_count, :peer_reviews_assigned, :needs_grading_count]
 
   attr_accessor :clone_updated
   def clone_for(context, dup=nil, options={}) #migrate=true)
@@ -1581,7 +1522,7 @@ class Assignment < ActiveRecord::Base
     item ||= context.assignments.new #new(:context => context)
     item.title = hash[:title]
     item.migration_id = hash[:migration_id]
-    item.workflow_state = 'available' if item.deleted?
+    item.workflow_state = (hash[:workflow_state] || 'published') if item.new_record? || item.deleted?
     if hash[:instructions_in_html] == false
       self.extend TextHelper
     end
@@ -1641,19 +1582,22 @@ class Assignment < ActiveRecord::Base
     # that it is a new record.  We need to know that below, where we add to the list of
     # imported items
     new_record = item.new_record?
-    if hash[:rubric_migration_id]
-      rubric = context.rubrics.find_by_migration_id(hash[:rubric_migration_id])
-      if rubric
-        assoc = rubric.associate_with(item, context, :purpose => 'grading')
-        assoc.use_for_grading = !!hash[:rubric_use_for_grading] if hash.has_key?(:rubric_use_for_grading)
-        assoc.hide_score_total = !!hash[:rubric_hide_score_total] if hash.has_key?(:rubric_hide_score_total)
-        if hash[:saved_rubric_comments]
-          assoc.summary_data ||= {}
-          assoc.summary_data[:saved_comments] ||= {}
-          assoc.summary_data[:saved_comments] = hash[:saved_rubric_comments]
-        end
-        assoc.save
+
+    rubric = nil
+    rubric = context.rubrics.find_by_migration_id(hash[:rubric_migration_id]) if hash[:rubric_migration_id]
+    rubric ||= context.available_rubric(hash[:rubric_id]) if hash[:rubric_id]
+    if rubric
+      assoc = rubric.associate_with(item, context, :purpose => 'grading')
+      assoc.use_for_grading = !!hash[:rubric_use_for_grading] if hash.has_key?(:rubric_use_for_grading)
+      assoc.hide_score_total = !!hash[:rubric_hide_score_total] if hash.has_key?(:rubric_hide_score_total)
+      if hash[:saved_rubric_comments]
+        assoc.summary_data ||= {}
+        assoc.summary_data[:saved_comments] ||= {}
+        assoc.summary_data[:saved_comments] = hash[:saved_rubric_comments]
       end
+      assoc.save
+
+      item.points_possible ||= rubric.points_possible if item.infer_grading_type == "points"
     end
     if hash[:grading_standard_migration_id]
       gs = context.grading_standards.find_by_migration_id(hash[:grading_standard_migration_id])
@@ -1727,8 +1671,8 @@ class Assignment < ActiveRecord::Base
   end
 
   def allow_google_docs_submission?
-    self.submission_types && 
-      self.submission_types.match(/online_upload/) && 
+    self.submission_types &&
+      self.submission_types.match(/online_upload/) &&
       (self.allowed_extensions.blank? || self.allowed_extensions.grep(/doc|xls|ppt/).present?)
   end
 
@@ -1856,7 +1800,7 @@ class Assignment < ActiveRecord::Base
       # the needs_grading_count trigger should change self.updated_at, invalidating the cache
       Rails.cache.fetch(['assignment_user_grading_count', self, user].cache_key) do
         case self.context.enrollment_visibility_level_for(user, vis)
-          when :full
+          when :full, :limited
             self.needs_grading_count
           when :sections
             self.submissions.joins("INNER JOIN enrollments e ON e.user_id = submissions.user_id").
@@ -1878,19 +1822,10 @@ class Assignment < ActiveRecord::Base
     end
   end
 
-  def recompute_submission_lateness_later
-    if due_at_changed?
-      send_later_if_production :recompute_submission_lateness
+  def update_cached_due_dates
+    if due_at_changed? || workflow_state_changed?
+      DueDateCacher.recompute(self)
     end
-    true
-  end
-
-  def recompute_submission_lateness
-    submissions.find_each do |s|
-      s.compute_lateness
-      s.save!
-    end
-    true
   end
 
   def graded?
@@ -1899,5 +1834,13 @@ class Assignment < ActiveRecord::Base
 
   def active?
     workflow_state != 'deleted'
+  end
+
+  def available?
+    if Rails.env.production?
+      published?
+    else
+      raise "Assignment#available? is deprecated. Use #published?"
+    end
   end
 end

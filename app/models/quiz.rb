@@ -41,6 +41,7 @@ class Quiz < ActiveRecord::Base
   has_many :quiz_submissions, :dependent => :destroy
   has_many :quiz_groups, :dependent => :destroy, :order => 'position'
   has_many :quiz_statistics, :class_name => 'QuizStatistics', :order => 'created_at'
+  has_many :attachments, :as => :context, :dependent => :destroy
   belongs_to :context, :polymorphic => true
   belongs_to :assignment
   belongs_to :cloned_item
@@ -52,6 +53,7 @@ class Quiz < ActiveRecord::Base
   validate :validate_quiz_type, :if => :quiz_type_changed?
   validate :validate_ip_filter, :if => :ip_filter_changed?
   validate :validate_hide_results, :if => :hide_results_changed?
+  validate :validate_draft_state_change, :if => :workflow_state_changed?
 
   sanitize_field :description, Instructure::SanitizeField::SANITIZE
   copy_authorized_links(:description) { [self.context, nil] }
@@ -302,7 +304,7 @@ class Quiz < ActiveRecord::Base
         a.submission_types = "online_quiz"
         a.assignment_group_id = self.assignment_group_id
         a.saved_by = :quiz
-        a.workflow_state = 'available' if a.deleted?
+        a.workflow_state = 'published' if a.deleted?
         a.notify_of_update = @notify_of_update
         a.with_versioning(false) do
           @notify_of_update ? a.save : a.save_without_broadcasting!
@@ -355,6 +357,7 @@ class Quiz < ActiveRecord::Base
 
     state :available
     state :deleted
+    state :unpublished
   end
 
   def root_entries_max_position
@@ -649,7 +652,7 @@ class Quiz < ActiveRecord::Base
   end
   alias_method :to_s, :quiz_title
   
-  def locked_for?(user=nil, opts={})
+  def locked_for?(user, opts={})
     return false if opts[:check_policies] && self.grants_right?(user, nil, :update)
     Rails.cache.fetch(locked_cache_key(user), :expires_in => 1.minute) do
       locked = false
@@ -878,16 +881,22 @@ class Quiz < ActiveRecord::Base
 
   def statistics(include_all_versions = true)
     quiz_statistics.build(
+      :report_type => 'student_analysis',
       :includes_all_versions => include_all_versions
-    ).generate
+    ).report.generate
   end
 
-  # returns the QuizStatistics object that will ultimately contain the csv
-  # (it may be generating in the background)
-  def statistics_csv(options={})
+  # finds or initializes a QuizStatistics for the given report_type and
+  # options
+  def current_statistics_for(report_type, options = {})
+    # item analysis always takes the first attempt (not necessarily the
+    # most recent), thus we say it always cares about all versions
+    options[:includes_all_versions] = true if report_type == 'item_analysis'
+
     quiz_stats_opts = {
-      :includes_all_versions => options[:include_all_versions],
-      :anonymous => options[:anonymous]
+      :report_type => report_type,
+      :includes_all_versions => options[:includes_all_versions],
+      :anonymous => anonymous_submissions?
     }
 
     last_quiz_activity = [
@@ -895,15 +904,23 @@ class Quiz < ActiveRecord::Base
       quiz_submissions.completed.order(:updated_at).pluck(:updated_at).last
     ].compact.max
 
-    candidate_stats = quiz_statistics.where(quiz_stats_opts).last
+    candidate_stats = quiz_statistics.report_type(report_type).where(quiz_stats_opts).last
 
     if candidate_stats.nil? || candidate_stats.created_at < last_quiz_activity
-      stats = quiz_statistics.create!(quiz_stats_opts)
-      stats.generate_csv
-      stats
+      quiz_statistics.build(quiz_stats_opts)
     else
       candidate_stats
     end
+  end
+
+  # returns the QuizStatistics object that will ultimately contain the csv
+  # (it may be generating in the background)
+  def statistics_csv(report_type, options = {})
+    stats = current_statistics_for(report_type, options)
+    return stats unless stats.new_record?
+    stats.save!
+    options[:async] ? stats.generate_csv_in_background : stats.generate_csv
+    stats
   end
 
   def unpublished_changes?
@@ -988,7 +1005,7 @@ class Quiz < ActiveRecord::Base
      :cant_go_back].each do |attr|
       item.send("#{attr}=", hash[attr]) if hash.key?(attr)
     end
-    
+
     item.save!
 
     if context.respond_to?(:content_migration) && context.content_migration
@@ -1004,6 +1021,13 @@ class Quiz < ActiveRecord::Base
         questions_to_update = item.quiz_questions.where(:migration_id => question_data[:qq_data].keys)
         questions_to_update.each do |question_to_update|
           question_data[:qq_data].values.find{|q| q['migration_id'].eql?(question_to_update.migration_id)}['quiz_question_id'] = question_to_update.id
+        end
+      end
+
+      if question_data[:aq_data]
+        questions_to_update = item.quiz_questions.where(:migration_id => question_data[:aq_data].keys)
+        questions_to_update.each do |question_to_update|
+          question_data[:aq_data].values.find{|q| q['migration_id'].eql?(question_to_update.migration_id)}['quiz_question_id'] = question_to_update.id
         end
       end
 
@@ -1040,8 +1064,7 @@ class Quiz < ActiveRecord::Base
     item.reload # reload to catch question additions
     
     if hash[:assignment] && hash[:available]
-      assignment = Assignment.import_from_migration(hash[:assignment], context)
-      item.assignment = assignment
+      item.assignment = Assignment.import_from_migration(hash[:assignment], context, item.assignment)
     elsif !item.assignment && grading = hash[:grading]
       # The actual assignment will be created when the quiz is published
       item.quiz_type = 'assignment'
@@ -1138,7 +1161,9 @@ class Quiz < ActiveRecord::Base
 
   def publish!
     self.workflow_state = 'available'
+    self.published_at = Time.zone.now
     save!
+    self
   end
 
   # marks a quiz as having unpublished changes
@@ -1149,4 +1174,32 @@ class Quiz < ActiveRecord::Base
   def anonymous_survey?
     survey? && anonymous_submissions
   end
+
+  def has_file_upload_question?
+    return false unless quiz_data.present?
+    !!quiz_data.detect do |data_hash|
+      data_hash[:question_type] == 'file_upload_question'
+    end
+  end
+  def draft_state
+    state = self.workflow_state
+    (state == 'available') ? 'active' : state
+  end
+
+  def active?
+    draft_state == 'active'
+  end
+  alias_method :published?, :active?
+
+  def unpublished?; !published?; end
+
+  def validate_draft_state_change
+    old_draft_state, new_draft_state = self.changes['workflow_state']
+    return if old_draft_state == new_draft_state
+    if new_draft_state == 'unpublished' && has_student_submissions?
+      self.errors.add :workflow_state, I18n.t('#quizzes.cant_unpublish_when_students_submit',
+                                              "Can't unpublish if there are student submissions")
+    end
+  end
+
 end

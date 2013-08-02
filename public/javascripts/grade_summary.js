@@ -126,7 +126,7 @@ define([
       $(this).find('.grade').empty().append($("#grade_entry"));
       $(this).find('.score_value').hide();
       var val = $(this).parents('.student_assignment').find('.score').text();
-      $('#grade_entry').val(parseFloat(val)).show().focus().select();
+      $('#grade_entry').val(parseFloat(val) || '0').show().focus().select();
     });
     $("#grade_entry").keydown(function(event) {
       if(event.keyCode == 13) {
@@ -149,6 +149,7 @@ define([
       if (isNaN(val)) { val = null; }
       if (!val && val !== 0) { val = originalVal; }
       isChanged = (originalVal != val);
+      if (val || val === 0) { val = round(val, 2); }
       if (val == parseInt(val, 10)) {
         val = val + '.0';
       }
@@ -192,7 +193,6 @@ define([
     });
     $("#grade_entry").blur(function() {
       var $assignment = $(this).parents(".student_assignment");
-      $assignment.find(".score").text($(this).val());
       $assignment.triggerHandler('score_change', true);
     });
     $("#grades_summary").delegate('.revert_score_link', 'click', function(event, skipEval) {
@@ -237,7 +237,7 @@ define([
     });
     $("#grades_summary .student_entered_score").each(function() {
       var val = parseFloat($(this).text(), 10);
-      if(!isNaN(val) && val) {
+      if(!isNaN(val) && (val || val === 0)) {
         $(".show_guess_grades").show().addClass('exists');
       }
     });
@@ -276,7 +276,7 @@ define([
     var submission = _.find(ENV.submissions, function(s) {
       return s.assignment_id == assignmentId;
     });
-    submission.score = score;
+    if (submission) { submission.score = score; }
   }
 });
 

@@ -148,7 +148,7 @@ class SubmissionsApiController < ApplicationController
   # @argument include[] ["submission_history"|"submission_comments"|"rubric_assessment"] Associations to include with the group.
   def show
     @assignment = @context.assignments.active.find(params[:assignment_id])
-    @user = get_user_considering_section(params[:id])
+    @user = get_user_considering_section(params[:user_id])
     @submission = @assignment.submission_for_student(@user)
 
     if authorized_action(@submission, @current_user, :read)
@@ -250,7 +250,7 @@ class SubmissionsApiController < ApplicationController
   #       rubric_assessment[crit1][points]=3&rubric_assessment[crit2][points]=5&rubric_assessment[crit2][comments]=Well%20Done.
   def update
     @assignment = @context.assignments.active.find(params[:assignment_id])
-    @user = get_user_considering_section(params[:id])
+    @user = get_user_considering_section(params[:user_id])
 
     authorized = false
     if params[:submission] || params[:rubric_assessment]

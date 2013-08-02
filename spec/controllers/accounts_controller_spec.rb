@@ -290,7 +290,27 @@ describe AccountsController do
       @account.admins_can_change_passwords?.should be_true
       @account.admins_can_view_notifications?.should be_true
     end
-    
+
+    it "should allow updating services that appear in the ui for the current user" do
+      Account.register_service(:test1, { name: 'test1', description: '', expose_to_ui: :setting, default: false })
+      Account.register_service(:test2, { name: 'test2', description: '', expose_to_ui: :setting, default: false, expose_to_ui_proc: proc { |user, account| false } })
+      user_session(user)
+      @account = Account.create!
+      Account.register_service(:test3, { name: 'test3', description: '', expose_to_ui: :setting, default: false, expose_to_ui_proc: proc { |user, account| account == @account } })
+      Account.site_admin.add_user(@user)
+      post 'update', id: @account.id, account: {
+        services: {
+          'test1' => '1',
+          'test2' => '1',
+          'test3' => '1',
+        }
+      }
+      @account.reload
+      @account.allowed_services.should match(%r{\+test1})
+      @account.allowed_services.should_not match(%r{\+test2})
+      @account.allowed_services.should match(%r{\+test3})
+    end
+
     describe "quotas" do
       before do
         @account = Account.create!
@@ -298,6 +318,7 @@ describe AccountsController do
         user_session(@user)
         @account.default_storage_quota_mb = 123
         @account.default_user_storage_quota_mb = 45
+        @account.default_group_storage_quota_mb = 9001
         @account.storage_quota = 555.megabytes
         @account.save!
       end
@@ -315,11 +336,13 @@ describe AccountsController do
         it "should allow setting default quota (mb)" do
           post 'update', :id => @account.id, :account => {
               :default_storage_quota_mb => 999,
-              :default_user_storage_quota_mb => 99
+              :default_user_storage_quota_mb => 99,
+              :default_group_storage_quota_mb => 9999
           }
           @account.reload
           @account.default_storage_quota_mb.should == 999
           @account.default_user_storage_quota_mb.should == 99
+          @account.default_group_storage_quota_mb.should == 9999
         end
         
         it "should allow setting default quota (bytes)" do
@@ -351,11 +374,13 @@ describe AccountsController do
           post 'update', :id => @account.id, :account => {
               :default_storage_quota => 999,
               :default_user_storage_quota_mb => 99,
+              :default_group_storage_quota_mb => 9,
               :default_time_zone => 'Alaska'
           }
           @account.reload
           @account.default_storage_quota_mb.should == 123
           @account.default_user_storage_quota_mb.should == 45
+          @account.default_group_storage_quota_mb.should == 9001
           @account.default_time_zone.should == 'Alaska'
         end
 

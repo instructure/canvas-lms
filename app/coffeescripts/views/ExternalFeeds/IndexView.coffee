@@ -33,4 +33,4 @@ define [
 
     submit: preventDefault (event) ->
       data = @$('#add_external_feed_form').toJSON()
-      @$el.disableWhileLoading @collection.create data
+      @$el.disableWhileLoading @collection.create data, wait: true

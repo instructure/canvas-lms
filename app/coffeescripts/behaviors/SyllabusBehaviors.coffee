@@ -163,13 +163,15 @@ define [
     $course_syllabus = $('#course_syllabus')
     $course_syllabus_details = $('#course_syllabus_details')
 
+    $course_syllabus.data('syllabus_body', ENV.SYLLABUS_BODY)
+
     wikiSidebar and wikiSidebar.init()
     $edit_course_syllabus_form.on 'edit', ->
       $edit_course_syllabus_form.show()
       $course_syllabus.hide()
       $course_syllabus_details.hide()
       $course_syllabus_body.editorBox()
-      $course_syllabus_body.editorBox 'set_code', $course_syllabus.html()
+      $course_syllabus_body.editorBox 'set_code', $course_syllabus.data('syllabus_body')
       if wikiSidebar
         wikiSidebar.attachToEditor $course_syllabus_body
         wikiSidebar.show()
@@ -210,6 +212,7 @@ define [
 
       success: (data) ->
         $course_syllabus.loadingImage('remove').html data.course.syllabus_body
+        $course_syllabus.data('syllabus_body', data.course.syllabus_body)
         $course_syllabus_details.hide()
 
       error: (data) ->

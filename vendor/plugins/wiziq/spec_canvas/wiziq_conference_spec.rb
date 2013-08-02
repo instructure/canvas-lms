@@ -1,9 +1,12 @@
 require File.expand_path(File.dirname(__FILE__)+'/../../../../spec/spec_helper')
+require_relative('../../../../spec/models/web_conference_spec_helper')
 
 module Wiziq
 
 describe WiziqConference do
   include Wiziq
+
+  it_should_behave_like 'WebConference'
 
   before(:each) do
     PluginSetting.create!(:name => 'wiziq', :settings => { :api_url => 'http://wiziq.com/', :access_key => 'test_access_key', :secret_key => 'test_secret_key' })
