@@ -264,12 +264,13 @@ describe ActiveRecord::Base do
       User.create
       User.cache do
         User.first
-        query_cache = User.connection.instance_variable_get(:@query_cache)
-        keys = query_cache.keys
-        keys.should be_present
+        User.connection.expects(:select).never
+        User.first
+        User.connection.unstub(:select)
 
         User.create!
-        (query_cache.keys & keys).should eql []
+        User.connection.expects(:select).once.returns([])
+        User.first
       end
     end
 
