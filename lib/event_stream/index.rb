@@ -96,11 +96,15 @@ class EventStream::Index
     end
   end
 
-  private
+  def select_cql
+    "SELECT ordered_id, #{id_column} FROM #{table} WHERE #{key_column} = ?"
+  end
 
   def insert_cql
     "INSERT INTO #{table} (#{key_column}, ordered_id, #{id_column}) VALUES (?, ?, ?) USING TTL ?"
   end
+
+  private
 
   def history(key, pager, options)
     # get the bucket to start at from the bookmark
@@ -145,7 +149,7 @@ class EventStream::Index
       else
         ordered_id_clause = nil
       end
-      qs = "SELECT ordered_id, #{id_column} FROM #{table} WHERE #{key_column} = ? AND ordered_id >= ? #{ordered_id_clause} ORDER BY ordered_id DESC LIMIT #{limit}"
+      qs = "#{select_cql} AND ordered_id >= ? #{ordered_id_clause} ORDER BY ordered_id DESC LIMIT #{limit}"
 
       # execute the query collecting the results. set the bookmark iff there
       # was a result after the full page
