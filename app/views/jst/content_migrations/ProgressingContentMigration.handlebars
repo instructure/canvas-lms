@@ -1,7 +1,8 @@
 <div class="span3 migrationName top-margin">{{display_name}}</div>
-<div class="span3 top-margin centerText">{{datetimeFormatted created_at}}</div>
+<div class="span3 sourceLink top-margin"></div>
+<div class="span2 top-margin centerText">{{datetimeFormatted created_at}}</div>
 <div class="span2 top-margin rightAlign progressStatus"></div>
-<div class="span3 changable {{#if migration_issues}}top-margin{{/if}}">
+<div class="span2 changable {{#if migration_issues}}top-margin{{/if}}">
   {{#if waiting_for_select}}
     <button type='button' title="{{#t "select_content"}}Select Content{{/t}}" class='btn btn-small btn-primary selectContentBtn'>{{#t "select_content"}}Select Content{{/t}}</button>
     <form class="selectContentDialog form-dialog" style="display:none"></form>

@@ -20,7 +20,7 @@
           <a href="#" class="edit_page_link" title="<%= t('titles.rename_page', "Rename Page") %>">
             <i class="icon-edit standalone-icon"></i>
           </a>
-          <a class="page_url no-hover" href="<%= eportfolio_named_category_entry_path(@portfolio,@category.slug, e.slug) %>">
+          <a class="page_url no-hover" href="<%= eportfolio_named_category_entry_path(@portfolio, @category.slug, e.slug) %>">
             <span class="name"><%= e.name %></span>
           </a>
           <a class="rename_page_url" href="<%= eportfolio_entry_path(@portfolio, e.id) %>" style="display: none;">&nbsp;</a>

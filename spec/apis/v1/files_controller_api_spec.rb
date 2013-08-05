@@ -233,6 +233,27 @@ describe "Files API", :type => :integration do
       links.find{ |l| l.match(/rel="first"/)}.should =~ /page=1/
       links.find{ |l| l.match(/rel="last"/)}.should =~ /page=3/
     end
+
+    context "content_types" do
+      before do
+        txt = attachment_model :display_name => 'thing.txt', :content_type => 'text/plain', :context => @course, :folder => @f1
+        png = attachment_model :display_name => 'thing.png', :content_type => 'image/png', :context => @course, :folder => @f1
+        gif = attachment_model :display_name => 'thing.gif', :content_type => 'image/gif', :context => @course, :folder => @f1
+      end
+
+      it "should match one content-type" do
+        json = api_call(:get, @files_path + "?content_types=image", @files_path_options.merge(:content_types => 'image'), {})
+        res = json.map{|f|f['display_name']}
+        res.should == %w(thing.gif thing.png)
+      end
+
+      it "should match multiple content-types" do
+        json = api_call(:get, @files_path + "?content_types[]=text&content_types[]=image/gif",
+                        @files_path_options.merge(:content_types => ['text', 'image/gif']))
+        res = json.map{|f|f['display_name']}
+        res.should == %w(thing.gif thing.txt)
+      end
+    end
   end
   
   describe "#show" do

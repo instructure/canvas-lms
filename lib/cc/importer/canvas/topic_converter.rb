@@ -50,6 +50,7 @@ module CC::Importer::Canvas
         topic['title'] = get_node_val(meta_doc, 'title')
         topic['type'] = get_node_val(meta_doc, 'type')
         topic['discussion_type'] = get_node_val(meta_doc, 'discussion_type')
+        topic['pinned'] = get_bool_val(meta_doc, 'pinned')
         topic['external_feed_migration_id'] = get_node_val(meta_doc, 'external_feed_identifierref')
         topic['attachment_migration_id'] = get_node_val(meta_doc, 'attachment_identifierref')
         topic['posted_at'] = get_time_val(meta_doc, 'posted_at')

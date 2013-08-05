@@ -52,27 +52,46 @@ class EventStream::Index
     time.to_i - (time.to_i % bucket_size)
   end
 
-  def insert(id, key, timestamp)
-    prefix = id.to_s[0,8]
-    bucket = bucket_for_time(timestamp)
+  def bookmark_for(record)
+    prefix = record.id.to_s[0,8]
+    bucket = bucket_for_time(record.created_at)
+    ordered_id = "#{record.created_at.to_i}/#{prefix}"
+    [bucket, ordered_id]
+  end
+
+  def insert(record, key)
+    ttl_seconds = event_stream.ttl_seconds(record)
+    return if ttl_seconds < 0
+
+    bucket, ordered_id = bookmark_for(record)
     key = "#{key}/#{bucket}"
-    ordered_id = "#{timestamp.to_i}/#{prefix}"
-    database.update(insert_cql, key, ordered_id, id)
+    database.update(insert_cql, key, ordered_id, record.id, ttl_seconds)
   end
 
   def for_key(key)
     shard = Shard.current
-    BookmarkedCollection.build(EventStream::Index::Bookmarker) do |pager|
-      shard.activate { history(key, pager) }
+    bookmarker = EventStream::Index::Bookmarker.new(self)
+    BookmarkedCollection.build(bookmarker) do |pager|
+      if event_stream.available?
+        shard.activate { history(key, pager) }
+      end
     end
   end
 
-  module Bookmarker
-    def self.bookmark_for(item)
-      [item['bucket'], item['ordered_id']]
+  class Bookmarker
+    def initialize(index)
+      @index = index
     end
 
-    def self.validate(bookmark)
+    def bookmark_for(item)
+      if item.is_a?(@index.event_stream.record_type)
+        @index.bookmark_for(item)
+      else
+        [item['bucket'], item['ordered_id']]
+      end
+    end
+
+    def validate(bookmark)
       bookmark.is_a?(Array) && bookmark.size == 2
     end
   end
@@ -80,7 +99,7 @@ class EventStream::Index
   private
 
   def insert_cql
-    "INSERT INTO #{table} (#{key_column}, ordered_id, #{id_column}) VALUES (?, ?, ?)"
+    "INSERT INTO #{table} (#{key_column}, ordered_id, #{id_column}) VALUES (?, ?, ?) USING TTL ?"
   end
 
   def history(key, pager)
@@ -120,9 +139,6 @@ class EventStream::Index
         end
       end
 
-      # possible optimization: query page_views_counters_by_context_and_day ,
-      # and use it as a secondary index to skip days where the user didn't
-      # have any page views
       ordered_id = nil
       bucket -= bucket_size
     end

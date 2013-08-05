@@ -1,0 +1,11 @@
+{{#if this}}
+  {{#if avatar_image_url}}
+    <a {{#if url}} href="{{url}}" {{/if}}
+        class="avatar"
+        {{#if display_name}} title="{{display_name}}" {{/if}}>
+      <img src="{{avatar_image_url}}"
+           alt="{{display_name}}"
+           class="img-circle"></img>
+    </a>
+  {{/if}}
+{{/if}}

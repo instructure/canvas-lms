@@ -169,7 +169,10 @@ module Technoweenie # :nodoc:
         base.after_save :after_process_attachment
         base.after_destroy :destroy_file
         base.after_validation :process_attachment
-        if defined?(::ActiveSupport::Callbacks)
+        if CANVAS_RAILS3
+          base.define_model_callbacks :resize, :attachment_saved, :save_and_attachment_processing, only: [:after]
+          base.define_model_callbacks :attachment_saved, :thumbnail_saved, only: [:before]
+        else
           base.define_callbacks :after_resize, :before_attachment_saved, :after_attachment_saved, :before_thumbnail_saved, :after_save_and_attachment_processing
         end
       end

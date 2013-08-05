@@ -941,10 +941,12 @@ class Attachment < ActiveRecord::Base
         if record.context.is_a?(Course) && (record.folder.locked? || record.context.tab_hidden?(Course::TAB_FILES))
           # only notify course students if they are able to access it
           to_list = record.context.participating_admins - [record.user]
-        else
+        elsif record.context.respond_to?(:participants)
           to_list = record.context.participants - [record.user]
         end
         recipient_keys = (to_list || []).compact.map(&:asset_string)
+        next if recipient_keys.empty?
+
         asset_context = record.context
         data = { :count => count }
         DelayedNotification.send_later_if_production_enqueue_args(
@@ -1181,7 +1183,12 @@ class Attachment < ActiveRecord::Base
     can :download
   end
 
+  # checking if an attachment is locked is expensive and pointless for
+  # submission attachments
+  attr_writer :skip_submission_attachment_lock_checks
+
   def locked_for?(user, opts={})
+    return false if @skip_submission_attachment_lock_checks
     return false if opts[:check_policies] && self.grants_right?(user, nil, :update)
     return {:asset_string => self.asset_string, :manually_locked => true} if self.locked || (self.folder && self.folder.locked?)
     Rails.cache.fetch(locked_cache_key(user), :expires_in => 1.minute) do
@@ -1267,14 +1274,24 @@ class Attachment < ActiveRecord::Base
     state :unattached_temporary
   end
 
-  scope :to_be_zipped, where("attachments.workflow_state='to_be_zipped' AND attachments.scribd_attempts<10").order(:created_at)
-
   scope :not_deleted, where("attachments.file_state<>'deleted'")
 
   scope :not_hidden, where("attachments.file_state<>'hidden'")
   scope :not_locked, lambda {
     where("(attachments.locked IS NULL OR attachments.locked=?) AND ((attachments.lock_at IS NULL) OR
       (attachments.lock_at>? OR (attachments.unlock_at IS NOT NULL AND attachments.unlock_at<?)))", false, Time.now.utc, Time.now.utc)
+  }
+  scope :by_content_types, lambda { |types|
+    clauses = []
+    types.each do |type|
+      if type.include? '/'
+        clauses << sanitize_sql_array(["(attachments.content_type=?)", type])
+      else
+        clauses << wildcard('attachments.content_type', type + '/', :type => :right)
+      end
+    end
+    condition_sql = clauses.join(' OR ')
+    where(condition_sql)
   }
 
   alias_method :destroy!, :destroy
@@ -1544,7 +1561,6 @@ class Attachment < ActiveRecord::Base
 
   def self.serialization_methods; [:mime_class, :scribdable?, :currently_locked, :crocodoc_available?]; end
   cattr_accessor :skip_thumbnails
-
 
   scope :scribdable?, where("scribd_mime_type_id IS NOT NULL")
   scope :recyclable, where("attachments.scribd_attempts<? AND attachments.workflow_state='errored'", MAX_SCRIBD_ATTEMPTS)

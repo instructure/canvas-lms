@@ -16,6 +16,9 @@ define ['compiled/models/User'], (User) ->
     sections: ->
       return [] unless @collection?.sections?
       {sections} = @collection
+      user_sections = []
       for {course_section_id} in @get('enrollments')
-        sections.get(course_section_id).attributes
+        user_section = sections.get(course_section_id)
+        user_sections.push(user_section.attributes) if user_section
+      user_sections
 

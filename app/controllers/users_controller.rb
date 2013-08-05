@@ -493,7 +493,11 @@ class UsersController < ApplicationController
     render :json => @courses.map { |c|
       { :label => c.name, :id => c.id, :term => c.enrollment_term.name,
         :enrollment_start => c.enrollment_term.start_at,
-        :account_name => c.enrollment_term.root_account.name, :account_id => c.enrollment_term.root_account.id }
+        :account_name => c.enrollment_term.root_account.name,
+        :account_id => c.enrollment_term.root_account.id,
+        :start_at => datetime_string(c.start_at, :verbose, nil, true),
+        :end_at => datetime_string(c.conclude_at, :verbose, nil, true)
+      }
     }.to_json
   end
 
@@ -870,12 +874,12 @@ class UsersController < ApplicationController
           message_sent = true
           @pseudonym.send_confirmation!
         end
-        @user.new_registration((params[:user] || {}).merge({:remote_ip  => request.remote_ip}))
+        @user.new_registration((params[:user] || {}).merge({:remote_ip  => request.remote_ip, :cookies => cookies}))
       elsif notify && !@user.registered?
         message_sent = true
         @pseudonym.send_registration_notification!
       else
-        @cc.send_merge_notification! if @cc.merge_candidates.length != 0
+        @cc.send_merge_notification! if @cc.has_merge_candidates?
       end
 
       data = { :user => @user, :pseudonym => @pseudonym, :channel => @cc, :observee => @observee, :message_sent => message_sent, :course => @user.self_enrollment_course }

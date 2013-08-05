@@ -110,6 +110,16 @@ describe ExternalToolsController do
       assigns[:tool_settings]['custom_canvas_enrollment_state'].should == 'active'
     end
 
+    it "should find account-level tools" do
+      @user = account_admin_user
+      user_session(@user)
+
+      tool = new_valid_tool(Account.default)
+      get 'resource_selection', :account_id => Account.default.id, :external_tool_id => tool.id
+      response.should be_success
+      assigns[:tool].should == tool
+    end
+
     it "should be accessible even after course is soft-concluded" do
       course_with_student_logged_in(:active_all => true)
       @course.conclude_at = 1.day.ago

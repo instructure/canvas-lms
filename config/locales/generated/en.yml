@@ -8,6 +8,17 @@ en:
     bad_per_slot: "You must allow at least one appointment per time slot"
     context_required: "You need to select a calendar"
     select_calendars: "Select Calendars"
+  GroupView: 
+    delete_confirm: "Are you sure you want to remove this group?"
+    flash: 
+      removeError: "Unable to remove the group. Please try again later."
+      removed: "Group successfully removed."
+    student_count: 
+      one: "1 student"
+      other: "%{count} students"
+    user_count: 
+      one: "1 user"
+      other: "%{count} users"
   academic_benchmark: 
     api_error: "Couldn't update standards for authority %{auth}."
     bad_ab_file: "The provided Academic Benchmark file has an error."
@@ -622,6 +633,7 @@ en:
         turnitin: Turnitin
         turnitin_account_id: "Turnitin Account ID"
         turnitin_comments: "Submission Comments"
+        turnitin_host: "Turnitin Host"
         turnitin_pledge: "Turnitin Pledge"
         turnitin_shared_secret: "Turnitin Shared Secret"
         users_can_edit_name: "Users can edit display name"
@@ -1199,6 +1211,7 @@ en:
     unmute_dialog: "This assignment is currently muted. That means students can't see their grades and feedback. Would you like to unmute now?"
     unmuting_assignment: "Unmuting Assignment..."
   assignments: 
+    add_another_never_drop_rule: "Add another assignment"
     add_assignment_form: 
       assignment_name: "Assignment Name"
       labels: 
@@ -1234,6 +1247,7 @@ en:
         no_assignments: "[No Assignments]"
         weighted_by_points: "Weighted By Points"
       percent_of_total_grade: "% of total grade"
+    add_first_never_drop_rule: "Add an assignment"
     assignment_count: 
       one: "1 Assignment"
       other: "%{count} Assignments"
@@ -1334,7 +1348,6 @@ en:
     errors: 
       add_group_failed: "Add Group Failed"
       delete_reminder_failed: "Delete failed"
-      deleting_group_failed: "Delete Failed"
       google_docs_masquerade_rejected: "Unable to connect to Google Docs as a masqueraded user."
       reminder_failed: "Reminder failed"
     external_grader_sidebar: 
@@ -1478,6 +1491,9 @@ en:
       redirect_message: |-
           This submission was a url, we're taking you to the url link now.  
           [Click Here to go to the submission](%{url})
+    rules_text: 
+      one: "1 Rule"
+      other: "%{count} Rules"
     select_assignment: "[Select Assignment]"
     show: 
       assignment_locked: "This assignment is currently locked."
@@ -1633,6 +1649,60 @@ en:
     syllabus_right_side: 
       links: 
         edit_syllabus_description: "Edit Syllabus Description"
+    teacher_index: 
+      add_assignment: "Add Assignment"
+      add_group: "Add Group"
+      assignment_group_list: 
+        no_assignment_groups: "No Assignment Groups."
+      assignment_group_list_item: 
+        add_assignment_to: "Add Assignment to %{name}"
+        delete: Delete
+        edit: Edit
+        group_weight: "%{groupWeight}% of Total"
+        manage: Manage
+        title_delete: "Delete Assignment Group"
+        title_edit: "Edit Assignment Group"
+      assignment_list_item: 
+        due_date: Due
+        points_possible: "%{pointsPossible} pts"
+      assignment_settings: 
+        cancel: Cancel
+        save: Save
+        validating: Saving...
+        weight_groups: "Weight final grade based on assignment groups"
+      assignments_settings: "Assignments Settings"
+      assignments_settings_screenreader: "Assignments Settings"
+      create_assignment: 
+        assignment: Assignment
+        assignment_due_at: "Due:"
+        assignment_name: "Name:"
+        assignment_points: "Points:"
+        assignment_type: "Type:"
+        cancel: Cancel
+        discussion_type: Discussion
+        external_tool_type: "External Tool"
+        more: "More Options"
+        not_graded_type: "Not Graded"
+        quiz_type: Quiz
+        save: Save
+        saving: Saving...
+      create_group: 
+        add_first_assignment: "Add an assignment"
+        cancel: Cancel
+        drop_highest: "Highest Scores:"
+        drop_lowest: "Lowest Scores:"
+        example_group_name: "e.g., Essay Group 1"
+        group_name: "Group Name:"
+        never_drop: "Never Drop:"
+        percent_of_total: "% of total grade"
+        save: Save
+        saving: Saving...
+      never_drop: 
+        remove_rule: "Remove Rule"
+      search: Search
+      search_for_assignment: "Search for assignment"
+      title_add_assignment: "Add Assignment"
+      title_add_group: "Add Assignment Group"
     titles: 
       add_assignment_group: "Add Assignment Group"
       uploading: "Uploading Submission"
@@ -1804,6 +1874,7 @@ en:
     refresh: refresh
     save: Save
     search: Search
+    send: Send
     send_message: "Send Message"
     sending: Sending...
     sent: Sent!
@@ -1904,7 +1975,6 @@ en:
       location: "Location:"
       message_groups: "Message Groups Who..."
       message_students: "Message Students Who..."
-      my_appointment_groups: "My Appointment Groups"
       scheduler_explanation_student_header: "You do not have any appointment groups to sign up for"
       scheduler_explanation_student_paragraph_1: "Teachers can use this scheduler tool to schedule things for their students to sign up for. Things like: \"office hours\", \"group presentation time-slots\" or \"lunch with an alumnus\"."
       scheduler_explanation_student_paragraph_2: "None of your teachers have made any appointments you can sign up for so there is not anything for you do to now. You will be notified if anyone does create something so you can come sign up for it."
@@ -1919,14 +1989,20 @@ en:
       cancel: Cancel
       send_message: Send
       sending_message: Sending...
-    calendar_app: 
+    calendar_header: 
       create_event: "Create New Event"
+      done_go_back_to_list: "Done, Go Back To List"
       links: 
         calendar_month: Month
         calendar_scheduler: Scheduler
         calendar_week: Week
+      my_appointment_groups: "My Appointment Groups"
       refresh: Refresh
       use_old_calendar: "Old Calendar"
+    calendar_navigator: 
+      next: Next
+      previous: Previous
+      today: Today
     calendar_title: "Calendar:"
     cancel_appointment: "Are you sure you want to cancel your appointment with %{name}?"
     confirm_appointment_group_deletion: "Are you sure you want to delete this appointment group?"
@@ -2474,6 +2550,7 @@ en:
       name: Name
       options: Options
     general_error: "There was an error joining the conference"
+    general_error_with_message: "There was an error joining the conference. Message: '%{message}'"
     inactive_error: "That conference is not currently active"
     index: 
       concluded_conferences: "Concluded Conferences"
@@ -2542,298 +2619,21 @@ en:
         all_quizzes: "All Quizzes"
       select_quizzes: "Select Quizzes to Export"
   content_imports: 
-    assignment: 
-      links: 
-        delete_assignment: "Delete Assignment"
-        edit_assignment: "Edit Assignment"
-    assignment_form: 
-      buttons: 
-        save_assignment: "Save Assignment"
-      options: 
-        assignment: Assignment
-        discussion: Discussion
-        file_upload: "File Upload"
-        new_group: "[ New Group ]"
-        not_graded: "Not Graded"
-        quiz: Quiz
-    assignment_groups: 
-      labels: 
-        total: Total
-        weight_groups: "Weight final grade by groups"
-      links: 
-        add_group: "Add Assignment Group"
-        delete_group: "Delete Group"
-        edit_group: "Edit Group Name"
-      titles: 
-        assignment_groups: "Assignment Groups"
-    buttons: 
-      import: "Import Course"
-    choose_content: 
-      buttons: 
-        import: "Import Course Content"
-      check_everything: All
-      crumbs: 
-        choose_content: "Choose Content"
-        choose_course: "Choose Course"
-      descriptions: 
-        copy_content: "Select the content you'd like copied into this course."
-      labels: 
-        check: Check
-        copy_everything: "Copy everything from %{course}"
-      page_title: "Choose Content to Copy"
-      titles: 
-        copy_from_course: "Copy Content From %{course}"
-      uncheck_everything: None
-    choose_course: 
-      buttons: 
-        copy_from_course: "Copy From this Course"
-      crumbs: 
-        copy_from: "Choose Course"
-      descriptions: 
-        copy_from: "Select the course you want to copy from. Then you can specify what exactly you want copied over."
-      labels: 
-        search_for_course: "Search for Course"
-        select_course: "Or Select from the List"
-      options: 
-        select_course: "[Select Course]"
-      page_title: "Choose Course"
-      titles: 
-        copy_from: "Copy From another Course"
-    copy_course_finish: 
-      crumbs: 
-        copy_from_course: "Copy From %{course}"
-      descriptions: 
-        copy_succeeded: |-
-            Course content successfully imported!  You can review the results of the import below.
-            
-            If you're not happy with any of the dates for assignments or events, you can easily
-            [change them by dragging and dropping on the course calendar](%{url}).
-      labels: 
-        apps: "Apps for %{course}"
-        assignment: "Assignments for %{course}"
-        discussions: "Discussions for %{course}"
-        events: "Events for %{course}"
-        files: "Files for %{course}"
-        modules: "Modules for %{course}"
-        quizzes: "Quizzes for %{course}"
-        wiki_ages: "Wiki Pages for %{course}"
-      links: 
-        back: "Back to the %{course} Home Page"
-      page_title: "Copy Results From %{course}"
-      titles: 
-        copy_succeeded: "Course Copy Succeeded"
-        what_it_looks_like_now: "What %{course} Looks Like Now"
-    copy_course_item_selection: 
-      labels: 
-        apps: "Apps for %{course}"
-        assignment: "Assignments for %{course}"
-        copy: "include entries from the old course"
-        copy_settings: "Settings from %{course}"
-        copy_syllabus: "Syllabus description from %{course}"
-        discussions: "Discussions for %{course}"
-        events: "Events for %{course}"
-        files: "Files for %{course}"
-        learning_outcomes: "Learning Outcomes for %{course}"
-        modules: "Modules for %{course}"
-        question_banks: "Question Banks for %{course}"
-        quizzes: "Quizzes for %{course}"
-        rubrics: "Rubrics for %{course}"
-        wiki_ages: "Wiki Pages for %{course}"
-    crumbs: 
-      content_imports: "Content Imports"
-    date_shift_form: 
-      descriptions: 
-        day_substitutions: "You can also explicitly define day substitutions to adjust for changing class schedules (i.e. move everything that was on Mondays to now happen on Tuesdays)"
-      from_to: "*from* %{start_date} **to** %{end_date}"
-      labels: 
-        dates_range: "*%{course}* dates range"
-        shift_dates: "Adjust events and due dates"
-        this_course_date_range: "**This Course** dates range"
-      links: 
-        add_day_substitution: "Define a day substitution"
-      move_from_to: "Move everything on %{old_day} to happen on %{new_day}"
     errors: 
       failed: "Course Import failed with the following error:"
       import_failed: "There was an error during your migration import.  Please notify your system administrator and give them the following code: \"%{code}\""
       no_only_and_except: "You can not use \"only\" and \"except\" options at the same time."
-      upload_failed: "Upload Failed, please try again"
     files: 
       buttons: 
         skip: "Skip this Step"
       description: "You can upload a zipped collection of files into your course and we'll extract them all out for you. This is an easy way to move files from another system into Canvas."
-      instructions: 
-        webct: 
-          ? "1"
-          : "Log in to WebCT and go to the File Manager"
-          ? "2"
-          : "Select all the files you want to export"
-          ? "3"
-          : "Click the zip option to archive the files"
-          ? "4"
-          : "Save the file to your local computer"
-      links: 
-        zip_from_webct: "How do I get a .zip file from WebCT?"
       page_title: "Import Files"
-    index: 
-      crumbs: 
-        migrations: Migrations
-      failed_migration: "%{plugin_type} migration - There was an error with this migration. Please let support know through the help button at the top of the page."
-      failed_migration_with_error: "%{plugin_type} migration - %{error_message}"
-      migration_in_progress: "%{plugin_type} migration - This migration is being processed."
-      migration_needing_action: "%{plugin_type} migration - *Click here to choose the content to import.*"
-      page_title: "Active Migrations"
-      successful_migration: "%{plugin_type} migration - This migration was successfully imported."
-      titles: 
-        failed_migrations: "Failed Migrations"
-        migrations_in_progress: "Migrations Being Processed"
-        migrations_needing_action: "Migrations Needing Action"
-        successful_migrations: "Successful Migrations"
-    intro: 
-      description: "If you're moving to Canvas from another course management system, then chances are there are files, quizzes, assignments and things over there that you're going to want moved over here. This wizard should make that process pretty easy."
-      if_any: "(if any)"
-      links: 
-        copy_course: "Copy content from **another Canvas course**"
-        import_files: "Import Files"
-        import_package: "Import content from a **content package** or from **another system**"
-        import_quizzes: "Import Quizzes"
-      page_title: "Import Wizard"
-      skip_steps: "You may skip any steps that don't apply."
-      titles: 
-        you_can_also: "You can also:"
     messages: 
       copying: "Copying... this will take a few minutes"
       import_complete: "Import Complete!  Returning to the Course Page..."
       importing_button: "Importing... this could take a while"
-      uploading: "Uploading Course Export..."
-    migrate_content: 
-      buttons: 
-        import: "Import Course"
-      choose_file: "Choose a %{file_extension} file to import"
-      details: 
-        selective_import: "We'll only extract the areas you select below. Not all courses will have all these features. After we've finished extracting, you can decide exactly which items from each area to import into your course."
-      errors: 
-        choos_file: "You must choose a .zip file to upload"
-      instructions: 
-        selective_import: "Choose which parts of the course to migrate"
-      labels: 
-        question_banks: "Question Banks"
-        quizzes: "Quizzes and Assessments"
-      links: 
-        view_migrations: "View Migrations"
-      messages: 
-        import_started: "**Thank you!** We'll start importing your course, you'll get an email when it's done and you'll be able to select the sections you'd like to import."
-      options: 
-        source_system: "Choose the system you want to migrate from"
-      page_details: "We have integrated with other Learning Management Systems to provide a simple and automated migration process. If you see your current system in the list select that option and provide the requested information. We'll extract the content from your course, and you can then specify which parts you'd like to have added to your new course."
-      page_title: "Migrate from Another System"
-      previous_migrations: "There are previous migrations for this course:"
-      question_bank_configuration: "Question Bank Configuration"
-      selective_import: "Selective import"
-    migrate_content_choose: 
-      buttons: 
-        import: "Import Course Content"
-      crumbs: 
-        migrate: "Migrate From Another System"
-      descriptions: 
-        day_substitutions: "You can also explicitly define day substitutions to adjust for changing class schedules (i.e. move everything that was on Mondays to now happen on Tuesdays)"
-      from_to: "*from* %{start_date} **to** %{end_date}"
-      instructions: "Select the content you'd like copied into this course. At the bottom you can also choose to adjust all dates for migrated items in case you've moved on to a new semester."
-      labels: 
-        assignment_groups: "Assignment Groups"
-        content_folders: "Content Folders"
-        copy_all_question_banks: "Copy All Question Banks"
-        copy_everything: "Copy Everything"
-        dates_range: "%{course} dates range"
-        include_posts: "also import posts in this topic"
-        shift_dates: "Adjust events and due dates"
-        this_course_date_range: "**This Course** dates range"
-      links: 
-        add_day_substitution: "Define a day substitution"
-        back: "Back to Course Page"
-      messages: 
-        import_started: "The import process has started! This can take a few hours for large courses, so feel free to leave this page. We'll send you an email when the import process is completed."
-        importing: "**Thank you!**  We'll import the selected content from %{course}, and send you an email when the process is complete.  The process normally finishes within one hour."
-        loading: "Loading list of migrated resources..."
-      move_from_to: "Move everything on %{old_day} to happen on %{new_day}"
-      page_title: "Migrate from Another System"
-      special_schools: "We're working with a select set of schools to provide a simpler, more automated migration process from other learning management systems. If your school shows up on the list, all you need to do is provide us with your login and password. We'll extract the content from your course, and you can then specify which parts you'd like to have added to your new course."
-      titles: 
-        copy_from: "Copy From %{course}"
-    migration_warnings: 
-      labels: 
-        last_error: "Last Error"
-        warnings: Warnings
-      links: 
-        warnings: Warnings/Errors
-    notices: 
-      already_imported: "That extraction has already been imported into the course"
-      choose_a_course: "Choose a course to copy"
-      no_archive: "There is no archive for this content migration"
-    outcome_group_item_selection: 
-      external_outcome: (external)
-    question_bank_config: 
-      instructions: 
-        overwrite_questions: "Overwrite assessment content with matching IDs"
-        overwrite_questions_long: "Some systems recycle their IDs for each new export. As a result, if you export two separate question banks they will have the same IDs. To prevent losing assessment data we treat these objects as different despite the IDs. Choosing this option will disable this safety feature and allow assessment data to overwrite existing data with the same IDs."
-      labels: 
-        default_question_bank: "If not specified in the export, questions will go in this question bank"
-        new_question_bank: "New question bank name"
-      options: 
-        new_question_bank: "[ New Question Bank ]"
-    quizzes: 
-      buttons: 
-        back: "I'm Done Importing, back to the Course."
-        import: "Import Quiz"
-        import_more: "Import another QTI file"
-      defaults: 
-        unnamed_quiz: "Unnamed Quiz"
-      details: "Canvas can import quizzes in the IMS QTI format. Most systems allow you to export your quizzes in this format. You can also use popular quiz tools like Respondus to create and export IMS QTI. Upload the file below and you'll receive an email when the importing is complete."
-      errors: 
-        choose_file: "You must choose a .zip file to upload"
-        upload_failed: "Upload Failed, please try again"
-      instructions: 
-        respondus: 
-          ? "1"
-          : "Open Respondus and select the system you're currently using"
-          ? "2"
-          : "Click the \"Retrieval & Reports\" tab, then \"Retrieve Questions\" on the left"
-          ? "3"
-          : "Select or setup your current system's configuration"
-          ? "4"
-          : "Click the \"Retrieve\" button"
-          ? "5"
-          : "Click back on the \"Start\" tab"
-          ? "6"
-          : "Change \"Current Personality\" to \"IMS QTI 1.1+\""
-          ? "7"
-          : "Click the \"Preview & Publish\" tab, then \"Save QTI XML File\""
-          ? "8"
-          : "Select \"Points as decimal numbers\" and \"QTI xml zip file\" for the settings"
-          ? "9"
-          : "Click \"Save As\" and save the zipped file to your local computer"
-      links: 
-        quiz_from_respondus: "How do I save a quiz using Respondus?"
-      messages: 
-        choose_file: "Please Choose a .zip file"
-        file_uploaded: "**Thank you!**  We'll start importing your QTI data and send you an email when it's complete. The process normally finishes within 10 minutes."
-        uploading: "Uploading and processing your zip file, if it is large it may take a while."
-        uploading_button: "Uploading QTI File..."
-      page_title: "Import Quizzes"
-      question_bank_configuration: "Question Bank Configuration"
-      question_count: 
-        one: "1 Question"
-        other: "%{count} Questions"
-      titles: 
-        current_quizzes: "Current Quizzes"
-        uploading: "Uploading, Please Wait."
-      upload_qti_file: "Choose a QTI .zip package"
     titles: 
       home_page: "Home Page"
-    wizard_secondary_nav: 
-      wizard_steps: 
-        import_files: "Import Files"
-        import_quizzes: "Import Quizzes"
-        intro: Intro
   content_locks: 
     buttons: 
       ok_thanks: "Ok, Thanks"
@@ -2882,6 +2682,8 @@ en:
     content_checkbox: 
       select_all: "Select All"
       select_non: "Select None"
+    content_migration_issue: 
+      error_report: "Error Report"
     copy_course: 
       options: Options
     migration_converter: 
@@ -3283,7 +3085,6 @@ en:
       links: 
         add_item: "Add Content"
         hide_contents: "Hide module contents"
-        publish: Publish
         settings: "Module Settings"
         show_contents: "Show module contents"
         text: 
@@ -3293,7 +3094,6 @@ en:
           delete_module: "Delete this module"
           edit_module: Edit
           student_progress: "See Student Progress for this Module"
-        unpublish: Unpublish
       module_will_unlock_at: "will unlock *%{unlock_date}*"
       progression_complete_count: "*%{count}* Complete"
       progression_started_count: "*%{count}* In Progress"
@@ -3377,6 +3177,14 @@ en:
       student_progress: "Student Progress for Module"
   context_modules_api: 
     invalid_position: "Invalid position"
+  conversation_dialog: 
+    enrollments_everyone: Everyone
+    errors: 
+      field_is_required: "This field is required"
+    people_count: 
+      one: "1 person"
+      other: "%{count} people"
+    select_all: "Select All"
   conversation_message: 
     subject: "Private message, %{timestamp}"
     users_added: 
@@ -3397,6 +3205,13 @@ en:
       add_people: "Add People"
       send_message: Send
     cannot_be_empty: "Message cannot be blank"
+    compose_button_bar: 
+      titles: 
+        add_attachment: "Add an attachment"
+        record_media_comment: "Record an audio or video comment"
+    compose_title_bar: 
+      buttons: 
+        close: close
     confirm: 
       delete_message: "Are you sure you want to delete your copy of this message? This action cannot be undone."
       delete_messages: "Are you sure you want to delete your copy of these messages? This action cannot be undone."
@@ -3465,6 +3280,21 @@ en:
         submission_author: "Submission Author"
         submission_score: "Submission Score"
         view_submission: "Open submission in new window."
+    index_new: 
+      delete_conversation: "Delete conversation"
+      enter_name_group_or_course: "Enter a name, group, or course"
+      filter_messages_by_course: "Filter messages by course"
+      filter_messages_by_type: "Filter messages by type"
+      new_message: "New message"
+      reply: Reply
+      reply_all: "Reply all"
+      search_names_groups_courses: "Search names, groups, and courses"
+      settings: Settings
+    message: 
+      open_message: "Open Message"
+      star: Star
+      toggle_read: "Toggle Read/Unread"
+      total_messages: "Total messages"
     message_form: 
       buttons: 
         send_message: Send
@@ -3486,10 +3316,32 @@ en:
         media_comment: "Recorded media comment"
         record_media_comment: "Record an audio or video comment"
         remove_media_comment: "Remove media comment"
+    message_form_dialog: 
+      headings: 
+        new_message: "New Message"
+      inbox_actions: 
+        add_people: "Add People"
+      labels: 
+        add_to_faculty_journal: "Add as a Faculty Journal entry"
+        course: Course
+        group_conversation: "This is a group conversation. Participants will see everyone's replies"
+        subject: Subject
+        to: To
+      links: 
+        media_comment: Record
+      media_comment: "Media Comment"
+      titles: 
+        media_comment: "Recorded media comment"
+        record_media_comment: "Record an audio or video comment"
+        remove_media_comment: "Remove media comment"
+    message_list: 
+      messages: Messages
     message_progress_bar_text: 
       done_sending_message: "Sent *%{message_preview}* to *%{num_people}*"
       error_sending_message: "Error sending message:"
       sending_message: "Sending *%{message_preview}* to *%{num_people}*"
+    no_message: 
+      no_conversations_selected: "No Conversations Selected"
     no_recipients_choose_another_group: "No recipients are in this group. Please choose another group."
     not_applicable: N/A
     not_scored: "no score"
@@ -3756,7 +3608,7 @@ en:
         other: "%{count} need grading"
       points_possible: "out of %{points_possible}"
     canvasnet_instructor: 
-      avatar_url: "Avatar (URL)"
+      avatar_url: Avatar
       biography: Bio
       instructor_name: Name
       job_title: Title
@@ -3780,6 +3632,7 @@ en:
     copy: 
       buttons: 
         create_course: "Create Course"
+      choose_content: "Choose which items to copy?"
       details: "Please enter the details for the new course."
       headings: 
         copy_course: "Copy %{course}"
@@ -3871,7 +3724,7 @@ en:
         title: Title
         visibility: Visibility
       leave_blank_if_free: "leave blank if this is a free course"
-      logo: "Logo (URL)"
+      logo: Logo
       page_title: "Course Profile"
       path_syntax: "lower-case letters, numbers and dashes"
       portal_path_syntax: "lower-case letters, numbers, dashes and slashes (e.g. harvard/chemistry)"
@@ -4299,7 +4152,6 @@ en:
     question_banks: "Question Banks"
     quizzes: Quizzes
     registered_services: "Registered Services"
-    results: Results
     revisions: Revisions
     rubrics: Rubrics
     settings: Settings
@@ -4570,14 +4422,16 @@ en:
     default_discussion_title: "No Title"
     deleted_topic_notice: "That topic has been deleted"
     discussion: 
+      close_for_comments: "Close for comments"
       delete: Delete
       due: Due
-      lock: Lock
+      graded_discussion: "Graded discussion"
+      no_due_date: "No Due Date"
+      open_to_comments: "Open to comments"
       pin: Pin
-      unlock: Unlock
       unpin: Unpin
-      user_subscribed: "You are subscribed to this topic"
-      user_unsubscribed: "You are not subscribed to this topic"
+      user_subscribed: "You are subscribed to this topic. Click to unsubscribe."
+      user_unsubscribed: "You are not subscribed to this topic. Click to subscribe."
     discussion_feed_title: "%{title} Discussion Feed"
     discussion_list: 
       no_pinned_discussions: "You currently have no pinned discussions"
@@ -4623,6 +4477,9 @@ en:
       show_more_entries: 
         one: "Show 1 More Entry"
         other: "Show %{count} More Entries"
+    error_draft_state_announcement: "This topic cannot be set to draft state because it is an announcement."
+    error_draft_state_unauthorized: "You do not have permission to set this topic to draft state."
+    error_draft_state_with_posts: "This topic cannot be set to draft state because it contains posts."
     group_assignment_discussion_entry: 
       posts: 
         one: "1 Post"
@@ -4633,6 +4490,7 @@ en:
     index_view: 
       assignments: Assignments
       delete: Delete
+      discussion_topics: "Discussion Topics"
       edit_settings: "Edit Discussions Settings"
       loading: Loading...
       lock_for_comments: "Lock for comments"
@@ -4703,9 +4561,9 @@ en:
       topic_locked: "This topic will not be visible to users until *%{date}*"
       topic_podcast_feed_link: "Topic Podcast Feed"
       topic_subscribe: Subscribe
-      topic_subscribe_tooltip: "You will be notified when comments are posted to this topic."
-      topic_unsubscribe: Unsubscribe
-      topic_unsubscribe_tooltip: "No longer receive notifications when comments are posted to this topic."
+      topic_subscribe_tooltip: "You are unsubscribed and will not be notified of new comments"
+      topic_subscribed_tooltip: "You are subscribed and will be notified of new comments"
+      topic_unsubscribe: Subscribed
       unlock_topic: "Open for Comments"
       unread: Unread
     sub_entry: 
@@ -4727,10 +4585,12 @@ en:
       my_settings: "My Settings"
   discussions: 
     are_your_sure_delete: "Are you sure you want to delete this entry?"
+    closed_for_comments: "Closed for Comments"
     confirm_delete_discussion_topic: "Are you sure you want to delete this discussion topic?"
     delete: Delete
     deleted_entry: 
       deleted: "Deleted by *%{editor_name}* on %{edited_at}"
+    discussions: Discussions
     edit_settings: "Edit Discussions Settings"
     entry_collection_view: 
       add_reply_to_topic: "Add Reply to Topic"
@@ -4747,8 +4607,8 @@ en:
     entry_stats: 
       show_more: "Show more"
     hide_due_dates: "Hide Due Dates"
+    initial_post_required_to_subscribe: "You must post a reply before subscribing"
     lock: Lock
-    locked_discussions: "Locked Discussions"
     mark_as_read: "Mark as Read"
     mark_as_unread: "Mark as Unread"
     no_content: "No Content"
@@ -4758,7 +4618,7 @@ en:
       try_different_more_general_or_fewer_keywords: "Try different, more general, or fewer keywords."
       try_disabling_the_unread_filter: "Try disabling the \"Unread\" filter."
       your_search_did_not_match_any_entries: "Your search did not match any entries."
-    open_discussions: "Open Discussions"
+    ordered_by_recent_activity: "Ordered by Recent Activity"
     participant: 
       anonymous_user: Anonymous
     pin: Pin
@@ -4782,11 +4642,17 @@ en:
       one: "Show one reply"
       other: "Show all %{count} replies"
     show_due_dates: "Show Due Dates"
+    subscribe: "Subscribe to this topic"
+    subscribed: Subscribed
+    subscribed_hint: "You are subscribed to this topic. Click to unsubscribe."
     uknown_author: "Unknown Author"
     unknown: Unknown
     unknown_author: "Unknown Author"
     unlock: Unlock
     unpin: Unpin
+    unsubscribe: "Unsubscribe from this topic"
+    unsubscribed: Unsubscribed
+    unsubscribed_hint: "You are not subscribed to this topic. Click to subscribe."
   due_dates: 
     due_at: "due: %{assignment_due_date_time}"
     multiple_due_dates: "due: Multiple Due Dates"
@@ -6292,6 +6158,7 @@ en:
       messages: 
         no_students: "No students have been added for this course"
       page_title: "Course Groups"
+    delete_confirm: "Are you sure you want to remove this group category?"
     edit: 
       buttons: 
         update: "Update Group"
@@ -6316,6 +6183,9 @@ en:
       unknown: "An unexpected error occurred."
       update_failed: "Update Failed, Try Again"
     feed_title: "%{course_or_account_name} Feed"
+    flash: 
+      removeError: "Unable to remove the group category. Please try again later."
+      removed: "Group category successfully removed."
     group: 
       actions: 
         ask_to_join_group: "ask to join this group"
@@ -6330,18 +6200,56 @@ en:
       no_members: "No members"
       one: "1 Group"
       other: "%{count} Groups"
+    group_count: 
+      one: "1 group"
+      other: "%{count} groups"
     group_name: "Group Name"
     index: 
       heading_current_groups: "Current Groups"
       no_groups: "No Groups"
     loading: "loading group roster..."
     manage: 
+      add_unassigned_menu: 
+        add_unassigned_student: "Add Unassigned Student"
+        add_unassigned_user: "Add Unassigned User"
+        search: Search
+        search_people: "Search people"
+      add_unassigned_user: 
+        assign_to_group: "Assign to Group"
+      add_unassigned_users: 
+        no_users_found: "No users found"
+        too_short: "Please enter a search term of 3 or more characters"
       assign_to_group_menu: 
         add_to_group: "Add to Group"
+        assign_user_to_group: "Assign user to this group"
+      group: 
+        add_user_to_group: "Assign user to group"
+        delete_group: "Delete group"
+        edit_group: "Edit group"
+        show_group_details: "Show group details"
+      group_category: 
+        unassigned_students: "Unassigned Students"
+        unassigned_users: "Unassigned Users"
+      group_category_detail: 
+        add_group: "Add Group"
+        group_limit_blurb: "Groups are limited to *%{count}* members"
+        restricted_self_signup_blurb: "All students in a group are required to be in the same section."
+        search: search
+        self_organized_warning: "These groups are self-organized by students. Unlike other types of groups, students can belong to more than one of these groups at a time, so these groups may not be the best solution for graded assignments."
+        self_signup_blurb: "Self sign-up is enabled for these groups."
+        self_signup_help_tooltip: "What Are Self Sign-Up Groups?"
+        student_group_instructions: "(drag students to assign)"
+        user_group_instructions: "(drag users to assign)"
       group_user: 
         assign_to_group: "Assign to Group"
       group_users: 
-        no_users: "No users."
+        no_students: "No students"
+        no_users: "No users"
+      groups: 
+        groups: Groups
+        no_groups: "No groups."
+        search: Search
+        search_groups: "Search groups"
     member: 
       one: "1 member"
       other: "%{count} members"
@@ -6427,6 +6335,13 @@ en:
       x_new_in_discussions: 
         one: "*1* Discussion"
         other: "*%{count}* Discussions"
+  images: 
+    error_checking_color: "Error checking image color"
+    invalid_background_color: "Background color must be %{color}"
+    invalid_dimensions: "Invalid image dimensions (got %{actual}, expected: %{expected})"
+    invalid_file_size: "Image file size is too large (max %{max} bytes, got %{actual})"
+    invalid_file_type: "Invalid file type %{type}. Allowed types include: %{type_list}"
+    not_an_image: "Selected file is not an image"
   info: 
     notices: 
       error_reported: "Thanks for your help!  We'll get right on this"
@@ -6552,21 +6467,7 @@ en:
       job_handler: "Job Handler"
       last_error: "Last Error"
   labels: 
-    announcements: Announcements
-    assignments: Assignments
-    calendar_events: "Calendar Events"
-    discussions: Discussions
-    external_tools: "External Tools"
-    files: Files
-    goals: Goals
-    groups: Groups
-    learning_modules: "Learning Modules"
     lock_module_until: "lock module until a given date"
-    quizzes: Quizzes
-    rubrics: Rubrics
-    tasks: Tasks
-    web_links: "Web Links"
-    wikis: Wikis
   layouts: 
     application: 
       instructure_description: "Instructure, makers of the open source learning management system Canvas"
@@ -6710,6 +6611,7 @@ en:
     switch_views: "Switch Views"
   locales: 
     en: English
+  logged_out_user: "Logged Out User %{user_counter}"
   m2c_file_description: "Moodle 1.9 .zip file"
   m2c_name: "Moodle Importer"
   manage_avatars: 
@@ -8026,30 +7928,6 @@ en:
           subject: "Your content for \"%{course_name}\" is ready to be imported"
         link_message: "Click this link to choose which items of your content to import:"
         subject: "Your content for \"%{course_name}\" is ready to be imported"
-    migration_import_failed: 
-      email: 
-        body: |-
-            There was a problem importing some content into your course "%{destination}". 
-                Please notify your system administrator, and point them to your import's info page: %{error_url}
-        html: 
-          body: "There was a problem importing some content into your course %{destination}."
-          notify_admin2: "Please notify your system administrator, and point them to your *import info page*"
-          subject: "Content Import Failed: %{course_name}"
-        subject: "Content Import Failed: %{course_name}"
-    migration_import_finished: 
-      email: 
-        body_no_warnings: "Importing %{source} into %{destination} has finished.  Everything you selected should now be imported into your course."
-        body_with_warnings: "Importing %{source} into %{destination} has finished, but not everything was imported successfully: %{warnings}"
-        html: 
-          body_no_warnings: "Importing %{source} into %{destination} has finished. Everything you selected should now be imported into your course."
-          body_with_warnings: "Importing %{source} into %{destination} has finished, but not everything was imported successfully:"
-          link: "Click to view the course"
-          subject: "Course Import Finished: %{course_name}"
-        subject: "Course Import Finished: %{course_name}"
-      summary: 
-        body_no_warnings: "Importing %{source} into %{target} has finished.  Everything you selected should now be imported into your course."
-        body_with_warnings: "Importing %{source} into %{target} has finished, but not everything was imported successfully: %{warnings}"
-        subject: "Course Import Finished: %{course_name}"
     new_account_user: 
       email: 
         body: "New Account Admin for %{account}"
@@ -8685,6 +8563,9 @@ en:
   migration_issues: 
     errors: 
       valid_workflow_state: "Must send a valid workflow state"
+  modules: 
+    module_collection_view: 
+      course_modules: "Course Modules"
   mute_dialog: 
     curving_assignments: "Curving assignments"
     grade_change_notifications: "Grade change notifications"
@@ -9111,6 +8992,11 @@ en:
         time: Time
         url: URL
         user_agent: "User Agent"
+  pages: 
+    delete_confirmation: "Are you sure you wish to delete this wiki page?"
+    delete_title: "Delete Wiki Page"
+    errors: 
+      require_title: "You must enter a title"
   paginated_collection: 
     no_items: "No items."
   paginated_list: 
@@ -9322,14 +9208,17 @@ en:
         account_settings: "Account Settings"
         canvas_settings: "Canvas Settings"
         domain_settings: "Domain Settings"
+        misc_settings: "Misc. Settings"
         ui_conf_ids: "UI Conf IDs"
       hints: 
         domain: "For hosted accounts, use \"www.kaltura.com\""
         resource_domain: "For hosted accounts, use \"cdn.kaltura.com\""
         rtmp_domain: "For hosted accounts, use \"www.kaltura.com\""
+      kaltura_sis_explanation: "If checked user and course SIS data will be provided to Kaltura."
       labels: 
         cache_play_list_seconds: "Seconds to cache playlist URL"
         domain: Domain
+        kaltura_sis: "Write SIS data to Kaltura"
         kcw_ui_conf: "KCW UI Conf ID"
         partner_id: "Partner ID"
         player_ui_conf: "Player UI Conf ID"
@@ -9393,6 +9282,9 @@ en:
       labels: 
         session_timeout: "Time before session expires in minutes (20 minimum)"
     settings_header: 
+      prompt_change_for_all_line1: "This changes the settings for ALL ACCOUNTS!"
+      prompt_change_for_all_line2: "Are you absolutely certain you want to do this?"
+      prompt_delete_account_setting: "Are you sure you want to delete the Account Config?"
       select_account_prompt: "(Select Account)"
     show: 
       back_to_list: "Return to plugins list"
@@ -9726,9 +9618,17 @@ en:
       sent_confirmation_sms: "We sent a four-character confirmation code to %{sms_number}. Enter the code below to activate this sms number."
       titles: 
         confirm_email_address: "Confirm Email Address"
+        confirm_email_address_alt: "Confirm Email Address"
+        confirm_email_address_aria_label: "Confirm Email Address"
         default_email_address: "Default email address"
+        default_email_address_alt: "Default email address"
+        default_email_address_aria_label: "Default email address"
         merge_users: "Another user has the same email address. Click here to combine user accounts."
+        merge_users_alt: "Another user has the same email address. Click here to combine user accounts."
+        merge_users_aria_label: "Another user has the same email address. Click here to combine user accounts."
         remove_email_address: "Remove email address"
+        remove_email_address_alt: "Remove email address"
+        remove_email_address_aria_label: "Remove email address"
       validations: 
         should_be_10_digits: "should be 10-digit number"
     ways_to_contact_me: "Ways to contact me"
@@ -9879,6 +9779,13 @@ en:
       email_sent: "Confirmation email sent to %{email}, make sure to check your spam box"
       link_invalid: "The link you used is no longer valid.  If you can't log in, click \"Don't know your password?\" to reset your password."
       password_changed: "Password changed"
+  publish_btn_module: 
+    buttons: 
+      publish: Publish
+      published: Published
+      publishing: Publishing...
+      unpublish: Unpublish
+      unpublishing: Unpublishing...
   purchases: 
     new: 
       payment_info: "Payment Information"
@@ -10065,7 +9972,6 @@ en:
     default_answer_comments_on_match: "Response if the student matches this answer"
     default_comments_on_wrong_match: "Response if the user misses this match"
     default_history_crumb: History
-    default_new_crumb: "New Quiz"
     default_quesiton_name: Question
     default_question_name: Question
     default_quiz_title: Quiz
@@ -10314,6 +10220,7 @@ en:
       links: 
         back_to_quiz: "Back to Quiz"
         back_to_survey: "Back to Survey"
+      logged_out_user: "Logged Out User %{index}"
       named_quiz_results: "%{quiz_name} Results for %{user}"
       no_more_attempts: "%{user} has no attempts left"
       page_title_quiz: "%{user}'s Quiz History"
@@ -10396,7 +10303,8 @@ en:
         download_lockdown: "[Download Respondus LockDown Browser]"
       requires_lockdown: "This quiz requires Respondus LockDown Browser. Please launch Respondus LockDown Browser to take this quiz or view your quiz results."
     managed_quiz_data: 
-      anonymous_student: "Student %{n}"
+      anonymous_student: "Student %{user_counter}"
+      logged_out_user: "Logged Out User %{user_counter}"
       titles: 
         submission_needs_review: "This submission needs review"
     message_students: "Message students"
@@ -10470,6 +10378,8 @@ en:
       allowed_attempts: "Number of allowed attempts"
       anonymous_submissions: "Keep Submissions Anonymous"
       buttons: 
+        not_published: "Not Published"
+        published: Published
         save: Save
       cant_go_back: "Lock questions after answering"
       code: "Access Code"
@@ -10533,6 +10443,9 @@ en:
       quizzes_published: 
         one: "1 quiz successfully published!"
         other: "%{count} quizzes successfully published!"
+      quizzes_unpublished: 
+        one: "1 quiz successfully unpublished!"
+        other: "%{count} quizzes successfully unpublished!"
     practice_quiz: "Practice Quiz"
     question_colon: "Question:"
     question_group: 
@@ -10733,10 +10646,10 @@ en:
         unanswered: Unanswered
         you_answered: "You Answered"
       buttons: 
+        already_published: Published!
         lock_quiz: "Lock this Quiz Now"
         lock_survey: "Lock this Survey Now"
         publish: Publish
-        published: Published!
         publishing: Publishing...
         republish: Re-Publish
         unlock_quiz: "Let Students Take this Quiz Now"
@@ -10765,6 +10678,7 @@ en:
         show_student_quiz_results: "Show Student Quiz Results"
         show_student_survey_results: "Show Student Survey Results"
         survey_statistics: "Survey Statistics"
+      manage: Manage
       only_registered_users: "Only registered, enrolled users can take graded quizzes"
       speed_grader: SpeedGrader™
       students_submitted_so_far: 
@@ -10806,7 +10720,7 @@ en:
       page_title: Statistics
       quiz_all_version_disclaimer: "This report is showing quiz statistics based on all attempts for all users."
       quiz_latest_version_disclaimer: "This report is showing quiz statistics based on the latest attempt for each user."
-      student_n: "Student %{n}"
+      student_n: "Student %{student_counter}"
       survey_all_version_disclaimer: "This report is showing survey statistics based on all attempts for all users."
       survey_latest_version_disclaimer: "This report is showing survey statistics based on the latest attempt for each user."
       titles: 
@@ -10864,6 +10778,7 @@ en:
         twelve_hours_left: "Twelve Hours Left"
       question_answered: Answered
       question_unanswered: "Haven't Answered Yet"
+      quiz_instructions: "Quiz Instructions"
       saved_at: "Quiz saved at %{t}"
       saving: Saving...
       seconds_count: 
@@ -12291,6 +12206,7 @@ en:
     aligned_items: "Aligned Items"
     announcement: Announcement
     announcements: Announcements
+    assignments: Assignments
     discussion: Discussion
     discussions: Discussions
     error_reports: "Error Reports"
@@ -12770,9 +12686,60 @@ en:
       no_title: "No title"
       titles: 
         select_folder_for_uploads: "Select folder for file uploads"
-    wiki_page_buttons: 
+    wiki_page: 
+      buttons: 
+        edit: Edit
+        publish: Publish
+        unpublish: Published
+        view_all_pages: "View All Pages"
+      publish: Publish
+      toolbar_menu: 
+        settings: Settings
+      unpublish: Unpublish
+    wiki_page_delete_dialog: 
+      cancel: Cancel
+      delete_page: Delete
+      deleting: Deleting...
+    wiki_page_edit: 
+      buttons: 
+        cancel: Cancel
+        preview: Preview
+        publish: Unpublished
+        save: Save
+        unpublish: Published
+      course_editing_roles: 
+        anyone: Anyone
+        only_teachers: "Only teachers"
+        teachers_and_students: "Teachers and students"
+      delete_wiki: Delete
+      editing_roles: 
+        anyone: Anyone
+        can_edit_page: "can edit this page"
+        only_members: "Only members"
+      hide_from_students: "Hide this page from students"
+      notify_users_text: "Notify users that this content has changed"
+      options_label: Options
+      publish: Publish
+      toolbar_menu: 
+        settings: Settings
+      unpublish: Unpublish
+    wiki_page_index: 
+      add_page: "Add one!"
       buttons: 
         new_page: "New Page"
+      headers: 
+        creation_date: "Creation date"
+        last_edit: "Last edit"
+        page_title: "Page title"
+        published: Published
+        sort_ascending: "Sort ascending"
+        sort_descending: "Sort descending"
+      no_pages: "No pages created yet."
+    wiki_page_index_item: 
+      labels: 
+        front_page: "Front Page"
+      published: Published
+      unpublished: Unpublished
   wiki_page: 
     atom_author: "Wiki Page"
     atom_entry_title: "Wiki Page, %{course_or_group_name}: %{page_title}"
@@ -12865,7 +12832,7 @@ en:
       link_hidden_from_students_warning: "Students won't see this link"
     pages_index: 
       titles: 
-        pages: "Pages - %{course}"
+        pages: Pages
     wiki_page_comment: 
       links: 
         delete_comment: "Delete Comment"
@@ -12901,8 +12868,6 @@ en:
     external_urls: 
       archive: Archive
       archive_link: "View archive(s)"
-  wizard: 
-    step: "Step %{number}"
   zip_argument_error: "A .zip upload requires a folder to upload to."
   zip_file_description: "Migration plugin for unpacking plain .zip files into a course"
   zip_file_file_description: "Unzip .zip file into folder"

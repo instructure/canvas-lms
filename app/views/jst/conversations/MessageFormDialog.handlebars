@@ -1,0 +1,139 @@
+<form method="post"
+  {{#if conversation}}
+      action="/conversations/{{conversation.id}}/add_message" class="form-horizontal"
+  {{else}}
+      action="/conversations" class="form-horizontal new"
+  {{/if}}
+  >
+  <div class="message-header">
+    <input type="hidden" name="from_conversation_id" value="{{from_conversation_id}}">
+    <input type="hidden" name="mode" value="async">
+    <input type="hidden" name="scope" value="{{scope}}">
+    <input type="hidden" name="filter" value="{{filter}}">
+
+    <ul class="conversations" style='display:none;'>
+      <li>
+      <span class="audience">
+        {{#if conversation}}
+          {{{audience}}}
+        {{else}}
+          <!--{{#t "headings.new_message"}}New Message{{/t}}-->
+        {{/if}}
+      </span>
+        {{#if addRecipientsEnabled}}
+          <a href="/conversations/{{id}}/add_recipients" class="action_add_recipients">{{#t "inbox_actions.add_people"}}Add People{{/t}}</a>
+        {{/if}}
+      </li>
+    </ul>
+
+    <div class='message-header'>
+      <div class='message-header-row'>
+        <div class='message-header-label'>
+          <label for="compose-message-course">{{#t "labels.course"}}Course{{/t}}</label>
+        </div>
+        <div class='message-header-input'>
+          <select id="compose-message-course" name="course"
+                  data-track-category="Compose Course"
+                  data-track-action="Edit"
+                  data-track-label="Course"
+                  class="message_course"
+                  value="{{course}}">
+            <option>[[Course]]</option>
+          </select>
+        </div>
+      </div>
+
+      <div class='message-header-row'>
+        <div class='message-header-label'>
+          <label for="compose-message-recipients">{{#t "labels.to"}}To{{/t}}</label>
+        </div>
+        <div class='message-header-input'>
+          <input type="text" id="compose-message-recipients" name="recipients" data-finder_url="/conversations/find_recipients" class="recipients">
+        </div>
+      </div>
+
+      <div class='message-header-row'>
+        <div class='message-header-label'>
+          <label for="compose-message-subject">{{#t "labels.subject"}}Subject{{/t}}</label>
+        </div>
+        <div class='message-header-input'>
+          <input type="text" id="compose-message-subject" name="subject"
+                 data-track-category="Compose Subject"
+                 data-track-action="Edit"
+                 data-track-label="Subject"
+                 class="message_subject"
+                 value="{{subject}}">
+        </div>
+      </div>
+
+      <div class='message-header-row'>
+        <div class='message-header-label'></div>
+        <div class='message-header-input'>
+          <div class="media_comment" style="display: none;" title="{{#t "titles.media_comment"}}Recorded media comment{{/t}}">
+            <img src="/images/messages/media-gray.png">
+            {{#t "media_comment"}}Media Comment{{/t}}
+            <a href="#" class="remove_link black" style="float: right;" title="{{#t "titles.remove_media_comment"}}Remove media comment{{/t}}"><i class="icon-end"></i> </a>
+            <div class="clear"></div>
+          </div>
+          <input type="hidden" name="media_comment_id">
+          <input type="hidden" name="media_comment_type">
+          {{#if mediaCommentsEnabled}}
+            <a class="action_media_comment"
+               href="#"
+               data-track-category="Compose Message"
+               data-track-action="Edit"
+               data-track-label="Audio Recording"
+               title="{{#t "titles.record_media_comment"}}Record an audio or video comment{{/t}}">
+              <i class="icon-media"></i> {{#t "links.media_comment"}}Record{{/t}}
+            </a>
+          {{/if}}
+        </div>
+      </div>
+
+      {{#unless conversation}}
+        <div class='message-header-row group_conversation_info' style="display: none" >
+          <div class='message-header-label'></div>
+          <div class='message-header-input'>
+            <label class="checkbox" for="compose-message-group_conversation">
+              <input type="checkbox" id="compose-message-group_conversation"
+                     name="group_conversation"
+                     value="1"
+                     class="group_conversation">
+              {{#t "labels.group_conversation"}}This is a group conversation. Participants will see everyone's replies{{/t}}
+            </label>
+          </div>
+        </div>
+      {{/unless}}
+
+      <div class='message-header-row user_note_info' style="display: none">
+        <div class='message-header-label'></div>
+        <div class='message-header-input'>
+          <label class="checkbox" for="compose-message-user_note">
+            <input type="checkbox"
+                   name="user_note"
+                   id="compose-message-user_note"
+                   value="1"
+                   data-track-category="Compose Message"
+                   data-track-action="Edit"
+                   data-track-label="Faculty Journal"
+                   class="user_note" />
+            {{#t "labels.add_to_faculty_journal"}}Add as a Faculty Journal entry{{/t}}
+          </label>
+        </div>
+      </div>
+    </div>
+    <hr class='header-separator' />
+  </div>
+
+  <div class='message-body'>
+    <textarea name="body"
+              data-track-category="Compose Message"
+              data-track-action="Edit"
+              data-track-label="Body"
+              class="conversation_body">{{message}}</textarea>
+  </div>
+
+  <div class='attachments-pane'>
+    <ul class='attachment_list'></ul>
+  </div>
+</form>

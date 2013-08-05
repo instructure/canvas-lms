@@ -68,6 +68,7 @@ stylesheets:
     - public/stylesheets/compiled/mini_calendar.css
     - public/stylesheets/compiled/calendar/sidebar.css
     - public/stylesheets/compiled/calendar/scheduler.css
+    - public/stylesheets/compiled/calendar/calendarHeader.css
   course_settings:
     - public/stylesheets/compiled/course_settings.css
     - public/stylesheets/compiled/external_tools.css
@@ -102,6 +103,8 @@ stylesheets:
     - public/stylesheets/compiled/assignments.css
     - public/stylesheets/compiled/grading_standards.css
     - public/stylesheets/static/embed_content.css
+  teacher_assignments:
+    - public/stylesheets/compiled/teacher_assignments.css
   grading_standards:
     - public/stylesheets/compiled/grading_standards.css
   login:
@@ -142,6 +145,9 @@ stylesheets:
   conversations:
     - public/stylesheets/compiled/conversations.css
     - public/stylesheets/compiled/slideshow.css
+  conversations_new:
+    - public/stylesheets/compiled/conversations_new.css
+    - public/stylesheets/compiled/compose_message_dialog.css
   alerts:
     - public/stylesheets/compiled/alerts.css
   developer_keys:

@@ -56,7 +56,7 @@ describe "quizzes" do
         def validate_resume_button_text(text)
           f('#not_right_side .take_quiz_button').text.should == text
         end
-        
+
         before do
           @resume_text = 'Resume Quiz'
         end
@@ -78,6 +78,11 @@ describe "quizzes" do
           update_quiz_lock(Time.now - 5.minutes, nil)
           get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
           f('#not_right_side .take_quiz_button').should_not be_present
+        end
+
+        it "should not see the publish button" do
+          get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
+          f('#quiz-publish-link').should_not be_present
         end
       end
     end

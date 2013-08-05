@@ -3,7 +3,9 @@ define [
   'underscore'
   'Backbone'
   'jst/DiscussionTopics/discussion'
-], (I18n, _, {View}, template) ->
+  'compiled/views/PublishIconView'
+  'compiled/views/ToggleableSubscriptionIconView'
+], (I18n, _, {View}, template, PublishIconView, ToggleableSubscriptionIconView) ->
 
   class DiscussionView extends View
     # Public: View template (discussion).
@@ -17,12 +19,14 @@ define [
 
     # Public: I18n translations.
     messages:
-      confirm: I18n.t('confirm_delete_discussion_topic', 'Are you sure you want to delete this discussion topic?')
-      delete:  I18n.t('delete', 'Delete')
-      lock:    I18n.t('lock', 'Lock')
-      unlock:  I18n.t('unlock', 'Unlock')
-      pin:     I18n.t('pin', 'Pin')
-      unpin:   I18n.t('unpin', 'Unpin')
+      confirm:     I18n.t('confirm_delete_discussion_topic', 'Are you sure you want to delete this discussion topic?')
+      delete:       I18n.t('delete', 'Delete')
+      lock:         I18n.t('lock', 'Lock')
+      unlock:       I18n.t('unlock', 'Unlock')
+      pin:          I18n.t('pin', 'Pin')
+      unpin:        I18n.t('unpin', 'Unpin')
+      user_subscribed: I18n.t('subscribed_hint', 'You are subscribed to this topic. Click to unsubscribe.')
+      user_unsubscribed: I18n.t('unsubscribed_hint', 'You are not subscribed to this topic. Click to subscribe.')
 
     events:
       'click .icon-lock':  'toggleLocked'
@@ -34,14 +38,20 @@ define [
     defaults:
       pinnable: false
 
+    els:
+      '.screenreader-only': '$title'
+
     # Public: Topic is able to be locked/unlocked.
     @optionProperty 'lockable'
 
     # Public: Topic is able to be pinned/unpinned.
     @optionProperty 'pinnable'
 
+    @child 'toggleableSubscriptionIcon', '[data-view=toggleableSubscriptionIcon]'
+
     initialize: (options) ->
       @attachModel()
+      options.toggleableSubscriptionIcon = new ToggleableSubscriptionIconView(model: @model)
       super
 
     render: ->

@@ -58,6 +58,7 @@ describe 'Models' do
     (ignore_classes << RemoveQuizDataIds::QuizQuestion) rescue nil
     (ignore_classes << Woozel) rescue nil
     ActiveRecord::Base.send(:subclasses).each do |subclass|
+      next unless subclass.name # unnamed class, probably from specs
       subclass.should protect_attributes unless ignore_classes.include?(subclass)
     end
   end

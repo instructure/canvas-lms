@@ -38,9 +38,40 @@ describe Quiz do
   describe "#publish!" do
     it "sets the workflow state to available and save!s the quiz" do
       quiz = Quiz.new(:title => "hello")
+      quiz.expects(:generate_quiz_data).once
       quiz.expects(:save!).once
       quiz.publish!
       quiz.workflow_state.should == 'available'
+    end
+  end
+
+  describe "#unpublish!" do
+    it "sets the workflow state to unpublished and save!s the quiz" do
+      quiz = Quiz.new(:title => "hello")
+      quiz.expects(:save!).once
+      quiz.publish!
+      quiz.workflow_state.should == 'available'
+
+      quiz.expects(:save!).once
+      quiz.unpublish!
+      quiz.workflow_state.should == 'unpublished'
+    end
+
+    it "should fail validation with student submissions" do
+      quiz = @course.quizzes.build title: 'test quiz'
+      quiz.publish!
+      quiz.stubs(:has_student_submissions?).returns true
+
+      expect { quiz.unpublish! }.to raise_exception(ActiveRecord::RecordInvalid)
+    end
+
+    it "should pass validation without student submissions" do
+      quiz = @course.quizzes.build title: 'test quiz'
+      quiz.publish!
+      quiz.stubs(:has_student_submissions?).returns false
+
+      quiz.unpublish!
+      quiz.published?.should be_false
     end
   end
 
@@ -233,7 +264,7 @@ describe Quiz do
     q.save
     q.assignment_id.should eql(nil)
   end
-  
+
   it "should not create an assignment for ungraded quizzes" do
     g = @course.assignment_groups.create!(:name => "new group")
     q = @course.quizzes.build(:title => "some quiz", :quiz_type => "survey", :assignment_group_id => g.id)
@@ -242,7 +273,7 @@ describe Quiz do
     q.should be_available
     q.assignment_id.should be_nil
   end
-  
+
   it "should not create the assignment if unpublished" do
     g = @course.assignment_groups.create!(:name => "new group")
     q = @course.quizzes.build(:title => "some quiz", :quiz_type => "assignment", :assignment_group_id => g.id)
@@ -251,7 +282,7 @@ describe Quiz do
     q.assignment_id.should be_nil
     q.assignment_group_id.should eql(g.id)
   end
-  
+
   it "should create the assignment if created in published state" do
     g = @course.assignment_groups.create!(:name => "new group")
     q = @course.quizzes.build(:title => "some quiz", :quiz_type => "assignment", :assignment_group_id => g.id)
@@ -262,7 +293,7 @@ describe Quiz do
     q.assignment_group_id.should eql(g.id)
     q.assignment.assignment_group_id.should eql(g.id)
   end
-  
+
   it "should create the assignment if published after being created" do
     g = @course.assignment_groups.create!(:name => "new group")
     q = @course.quizzes.build(:title => "some quiz", :quiz_type => "assignment", :assignment_group_id => g.id)
@@ -277,7 +308,7 @@ describe Quiz do
     q.assignment_group_id.should eql(g.id)
     q.assignment.assignment_group_id.should eql(g.id)
   end
-  
+
   it "should return a zero question count but valid unpublished question count until the quiz is generated" do
     q = @course.quizzes.create!(:title => "new quiz")
     g = q.quiz_groups.create!(:name => "group 1", :pick_count => 1)
@@ -291,7 +322,7 @@ describe Quiz do
     q.question_count.should eql(0)
     q.unpublished_question_count.should eql(3)
   end
-  
+
   it "should return processed root entries for each question/group" do
     q = @course.quizzes.create!(:title => "new quiz")
     g = q.quiz_groups.create!(:name => "group 1", :pick_count => 1, :question_points => 2)
@@ -307,14 +338,14 @@ describe Quiz do
     q.quiz_questions.length.should eql(4)
     q.quiz_groups.length.should eql(1)
     g.quiz_questions(true).length.should eql(2)
-    
+
     entries = q.root_entries(true)
     entries.length.should eql(3)
     entries[0][:questions].should_not be_nil
     entries[1][:answers].should_not be_nil
     entries[2][:answers].should_not be_nil
   end
-  
+
   it "should generate valid quiz data" do
     q = @course.quizzes.create!(:title => "new quiz")
     g = q.quiz_groups.create!(:name => "group 1", :pick_count => 1, :question_points => 2)
@@ -329,7 +360,7 @@ describe Quiz do
     data = q.quiz_data rescue nil
     data.should_not be_nil
   end
-  
+
   it "should return quiz data once the quiz is generated" do
     q = @course.quizzes.create!(:title => "new quiz")
     g = q.quiz_groups.create!(:name => "group 1", :pick_count => 1, :question_points => 2)
@@ -340,21 +371,21 @@ describe Quiz do
     q.quiz_data.should be_nil
     q.generate_quiz_data
     q.save
-    
+
     data = q.stored_questions
     data.length.should eql(3)
     data[0][:questions].should_not be_nil
     data[1][:answers].should_not be_nil
     data[2][:answers].should_not be_nil
   end
-  
+
   it "should shuffle answers for the questions" do
     q = @course.quizzes.create!(:title => "new quiz", :shuffle_answers => true)
     q.quiz_questions.create!(:question_data => {:name => 'test 3', 'question_type' => 'multiple_choice_question', 'answers' => {'answer_0' => {'answer_text' => '1'}, 'answer_1' => {'answer_text' => '2'}, 'answer_2' => {'answer_text' => '3'},'answer_3' => {'answer_text' => '4'},'answer_4' => {'answer_text' => '5'},'answer_5' => {'answer_text' => '6'},'answer_6' => {'answer_text' => '7'},'answer_7' => {'answer_text' => '8'},'answer_8' => {'answer_text' => '9'},'answer_9' => {'answer_text' => '10'}}})
     q.quiz_data.should be_nil
     q.generate_quiz_data
     q.save
-    
+
     data = q.stored_questions
     data.length.should eql(1)
     data[0][:answers].should_not be_empty
@@ -374,7 +405,7 @@ describe Quiz do
     same = false if data[0][:answers][9][:text] != '10'
     same.should eql(false)
   end
-  
+
   it "should shuffle questions for the quiz groups" do
     q = @course.quizzes.create!(:title => "new quiz")
     g = q.quiz_groups.create!(:name => "some group", :pick_count => 10, :question_points => 10)
@@ -392,7 +423,7 @@ describe Quiz do
     q.reload
     q.generate_quiz_data
     q.save
-    
+
     data = q.stored_questions
     data.length.should eql(1)
     data = data[0][:questions]
@@ -420,14 +451,14 @@ describe Quiz do
     q.quiz_data.should be_nil
     q.generate_quiz_data
     q.save
-    
+
     data = q.stored_questions
     data.length.should eql(3)
     data[0][:questions].should_not be_nil
     data[1][:answers].should_not be_nil
     data[2][:answers].should_not be_nil
   end
-  
+
   context "#generate_submission" do
 
     it "should generate a valid submission for a given user" do
@@ -448,7 +479,7 @@ describe Quiz do
       q.quiz_data.should be_nil
       q.generate_quiz_data
       q.save
-      
+
       s = q.generate_submission(u)
       s.state.should eql(:untaken)
       s.attempt.should eql(1)
@@ -456,7 +487,7 @@ describe Quiz do
       s.quiz_version.should eql(q.version_number)
       s.finished_at.should be_nil
       s.submission_data.should eql({})
-      
+
     end
 
     it "sets end_at to lock_at when end_at is nil or after lock_at" do
@@ -484,19 +515,19 @@ describe Quiz do
       sub2.end_at.should be_nil
     end
   end
-  
+
   it "should return a default title if the quiz is untitled" do
     q = @course.quizzes.create!
     q.quiz_title.should eql("Unnamed Quiz")
-  end  
-  
+  end
+
   it "should return the assignment title if the quiz is linked to an assignment" do
     a = @course.assignments.create!(:title => "some assignment")
     q = @course.quizzes.create!(:assignment_id => a.id)
     a.reload
     q.quiz_title.should eql(a.title)
   end
-  
+
   it "should delete the associated assignment if it is deleted" do
     a = @course.assignments.create!(:title => "some assignment")
     q = @course.quizzes.create!(:assignment_id => a.id, :quiz_type => "assignment")
@@ -509,7 +540,7 @@ describe Quiz do
     a.reload
     a.should be_deleted
   end
-  
+
   it "should reattach existing graded quiz submissions to the new assignment after a graded -> ungraded -> graded transition" do
     # create a quiz
     q = @course.quizzes.new
@@ -571,7 +602,7 @@ describe Quiz do
       new_q.quiz_questions.first.question_data[:id].should be_nil
       new_q.quiz_questions.first.data[:id].should == new_q.quiz_questions.first.id
     end
-    
+
     it "should set the related assignment's group correctly" do
       ag = @course.assignment_groups.create!(:name => 'group')
       a = @course.assignments.create!(:title => "some assignment", :points_possible => 5, :assignment_group => ag)
@@ -580,7 +611,7 @@ describe Quiz do
       q = @course.quizzes.build(:assignment_id => a.id, :title => "some quiz", :points_possible => 10)
       q.workflow_state = 'available'
       q.save
-      
+
       course
       new_q = q.clone_for(@course)
       new_q.context.should eql(@course)
@@ -588,7 +619,7 @@ describe Quiz do
       new_q.assignment.assignment_group.should_not eql(ag)
       new_q.assignment.assignment_group.context.should eql(@course)
     end
-    
+
     it "should not blow up when a quiz question has a link to the quiz it's in" do
       q = @course.quizzes.create!(:title => "some quiz")
       question_text = "<a href='/courses/#{@course.id}/quizzes/#{q.id}/edit'>hi</a>"
@@ -599,7 +630,7 @@ describe Quiz do
       new_q = q.clone_for(@course)
       new_q.quiz_questions.first.question_data[:question_text].should match /\/courses\/#{@course.id}\/quizzes\/#{new_q.id}\/edit/
     end
-    
+
     it "should only create one associated assignment for a graded quiz" do
       q = @course.quizzes.create!(:title => "graded quiz", :quiz_type => 'assignment')
       q.workflow_state = 'available'
@@ -610,7 +641,7 @@ describe Quiz do
       }.to change(@course.assignments, :count).by(1)
     end
   end
-  
+
   describe "Quiz with QuestionGroup pointing to QuestionBank" do
     before(:each) do
       course_with_student
@@ -626,7 +657,7 @@ describe Quiz do
       @quiz.save!
       @quiz.reload
     end
-  
+
     it "should create a submission" do
       submission = @quiz.generate_submission(@user)
       submission.quiz_data.length.should == 3
@@ -635,7 +666,7 @@ describe Quiz do
       texts.member?('gq2').should be_true
       texts.member?('qq1').should be_true
     end
-  
+
     it "should get the correct points possible" do
       @quiz.current_points_possible.should == 15
     end
@@ -649,7 +680,7 @@ describe Quiz do
       @quiz.generate_quiz_data
       @quiz.save!
       @quiz.reload
-  
+
       submission = @quiz.generate_submission(@user)
       submission.quiz_data.length.should == 3
       texts = submission.quiz_data.map{|q|q[:question_text]}

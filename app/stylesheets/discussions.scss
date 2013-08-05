@@ -33,6 +33,12 @@ body.with-right-side.with-left-side {
   }
 }
 
+.avatar img {
+  border-color: #dfe9f0;
+  border-style: solid;
+  border-width: 2px;
+}
+
 .discussion-entries {
   list-style: none;
   margin: 0;
@@ -59,11 +65,7 @@ body.with-right-side.with-left-side {
     }
 
     .discussion-header-content {
-      padding-top: 10px;
-    }
-
-    &.collapsed .discussion-header-content {
-      padding-top: 0;
+      padding-top: 8px;
     }
 
     .deleted-discussion-entry .right-of-avatar {
@@ -75,8 +77,8 @@ body.with-right-side.with-left-side {
     }
 
     .avatar img {
-      height: 32px;
-      width: 32px;
+      height: 50px;
+      width: 50px;
     }
 
     .entry {
@@ -86,14 +88,18 @@ body.with-right-side.with-left-side {
       border-radius: 0;
       border-top: solid 1px $border;
 
+      .avatar img {
+        height: 32px;
+        width: 32px;
+      }
+
       .discussion_entry {
         margin: 0;
         border-bottom: none;
       }
 
-      .avatar img {
-        height: 16px;
-        width: 16px;
+      .discussion-header-content {
+        padding-top: 0;
       }
     }
   }
@@ -153,6 +159,8 @@ body.with-right-side.with-left-side {
 .topic {
   h1.discussion-title {
     font-size: 19px;
+    font-weight: normal;
+    line-height: 30px;
   }
   h2.discussion-title {
     font-size: 16px;
@@ -164,8 +172,9 @@ body.with-right-side.with-left-side {
 
 .discussion-title {
   font-size: 13px;
-  margin: 0;
+  font-weight: bold;
   line-height: 23px;
+  margin: 0;
 }
 
 .discussion-subtitle {
@@ -228,23 +237,9 @@ body.with-right-side.with-left-side {
   left: -32px;
 }
 
-.no-touch {
-  .entry-control {
-    visibility: hidden;
-  }
-}
-.touch {
-  .entry-control {
-    visibility: visible;
-  }
-}
-
-.discussion_entry {
-  &:hover {
-    .entry-control {
-      visibility: visible;
-    }
-  }
+.discussion-reply-action, .discussion-reply-action:hover {
+  color: #555;
+  text-decoration: none;
 }
 
 .entry, .discussion_entry {
@@ -327,6 +322,8 @@ body.with-right-side.with-left-side {
 }
 
 .discussion-header-content {
+  padding-top: 5px;
+
   .author.unknown {
     font-style: italic;
   }
@@ -502,12 +499,13 @@ body.with-right-side.with-left-side {
   display: block;
   background-color: #fdfdfd;
   font-size: 11px;
-  color: #636363 !important;
+  color: #aaa;
   padding: 3px 10px;
   cursor: text;
   border: 1px solid #d4d5d7;
   margin: 15px 0;
-  &:hover {
+  &:hover, &:focus {
+    color: #555;
     text-decoration: none;
   }
 }

@@ -16,6 +16,7 @@ define [
   'compiled/calendar/ShowEventDetailsDialog'
   'compiled/calendar/EditEventDetailsDialog'
   'compiled/calendar/Scheduler'
+  'compiled/views/calendar/CalendarNavigator'
   'compiled/calendar/CalendarDefaults'
   'vendor/fullcalendar'
 
@@ -23,7 +24,7 @@ define [
   'jquery.instructure_misc_plugins'
   'vendor/jquery.ba-tinypubsub'
   'jqueryui/button'
-], (I18n, $, _, userSettings, hsvToRgb, calendarAppTemplate, EventDataSource, commonEventFactory, ShowEventDetailsDialog, EditEventDetailsDialog, Scheduler, calendarDefaults) ->
+], (I18n, $, _, userSettings, hsvToRgb, calendarAppTemplate, EventDataSource, commonEventFactory, ShowEventDetailsDialog, EditEventDetailsDialog, Scheduler, CalendarNavigator, calendarDefaults) ->
 
   class Calendar
     constructor: (selector, @contexts, @manageContexts, @dataSource, @options) ->
@@ -57,11 +58,10 @@ define [
         </span>'
       """
 
+      @header = @options.header
+
       fullCalendarParams = _.defaults(
-        header:
-          left:   'prev,today,next,title'
-          center: ''
-          right:  ''
+        header: false
         editable: true
         columnFormat:
           month: 'dddd'
@@ -101,14 +101,15 @@ define [
           fullCalendarParams.month = date.getMonth()
           fullCalendarParams.date = date.getDate()
 
-      @el = $(selector).html calendarAppTemplate(
-        calendar2Only: @options.calendar2Only,
-        showScheduler: @options.showScheduler)
+      @el = $(selector).html calendarAppTemplate()
+
+      @schedulerNavigator = new CalendarNavigator(el: $('.scheduler_navigator'))
+      @schedulerNavigator.hide()
 
       data.view_name = 'agendaWeek' if data.view_name == 'week'
       if data.view_name == 'month' || data.view_name == 'agendaWeek'
-        radioId = if data.view_name == 'agendaWeek' then 'week' else 'month'
-        $("##{radioId}").click()
+        viewName = if data.view_name == 'agendaWeek' then 'week' else 'month'
+        @header.selectView(viewName)
         fullCalendarParams.defaultView = data.view_name
 
       if data.show && data.show != ''
@@ -118,11 +119,6 @@ define [
 
       $(document).fragmentChange(@fragmentChange)
 
-      @el.find('#calendar_views').buttonset().find('input').change (event) =>
-        @loadView $(event.target).attr('id')
-
-      @$refresh_calendar_link = @el.find('#refresh_calendar_link').click @reloadClick
-      @$create_new_event_link = @el.find('#create_new_event_link').click @addEventClick
       @colorizeContexts()
 
       @scheduler = new Scheduler(".scheduler-wrapper", this)
@@ -133,15 +129,32 @@ define [
           required = 0
           for group in data
             required += 1 if group.requiring_action
-          @el.find("#calendar-header .counter-badge")
-            .toggle(required > 0)
-            .text(required)
+          @header.setSchedulerBadgeCount(required)
+
+      @connectHeaderEvents()
+      @connectSchedulerNavigatorEvents()
 
       window.setTimeout =>
         if data.view_name == 'scheduler'
-          $("#scheduler").click()
+          @header.selectView('scheduler')
           if data.appointment_group_id
             @scheduler.viewCalendarForGroupId data.appointment_group_id
+
+    connectHeaderEvents: ->
+      @header.on('navigatePrev',  => @calendar.fullCalendar('prev'))
+      @header.on('navigateToday', => @calendar.fullCalendar('today'))
+      @header.on('navigateNext',  => @calendar.fullCalendar('next'))
+      @header.on('week', => @loadView('week'))
+      @header.on('month', => @loadView('month'))
+      @header.on('scheduler', => @loadView('scheduler'))
+      @header.on('createNewEvent', @addEventClick)
+      @header.on('refreshCalendar', @reloadClick)
+      @header.on('done', @schedulerSingleDoneClick)
+
+    connectSchedulerNavigatorEvents: ->
+      @schedulerNavigator.on('navigatePrev',  => @calendar.fullCalendar('prev'))
+      @schedulerNavigator.on('navigateToday', => @calendar.fullCalendar('today'))
+      @schedulerNavigator.on('navigateNext',  => @calendar.fullCalendar('next'))
 
     # FullCalendar callbacks
 
@@ -339,6 +352,8 @@ define [
 
     viewDisplay: (view) =>
       @updateFragment view_start: $.dateToISO8601UTC(view.start)
+      @header.setHeaderText(view.title)
+      @schedulerNavigator.setTitle(view.title)
 
     # event triggered by items being dropped from outside the calendar
     drop: (date, allDay, jsEvent, ui) =>
@@ -386,7 +401,7 @@ define [
           @calendar.fullCalendar('gotoDate', date)
 
     reloadClick: (event) =>
-      event.preventDefault()
+      event?.preventDefault()
       if @activeAjax == 0
         @dataSource.clearCache()
         if @currentView == 'scheduler'
@@ -447,11 +462,11 @@ define [
 
     ajaxStarted: () =>
       @activeAjax += 1
-      @$refresh_calendar_link.addClass('loading')
+      @header.animateLoading(true)
 
     ajaxEnded: () =>
       @activeAjax -= 1
-      @$refresh_calendar_link.removeClass('loading') unless @activeAjax
+      @header.animateLoading(@activeAjax > 0)
 
     refetchEvents: () =>
       @calendar.fullCalendar('refetchEvents')
@@ -469,16 +484,29 @@ define [
         @calendar.removeClass('scheduler-mode')
         @displayAppointmentEvents = null
         @scheduler.hide()
-        @$create_new_event_link.show()
         @calendar.show()
+        @header.showNavigator()
+        @schedulerNavigator.hide()
         @calendar.fullCalendar('refetchEvents')
         @calendar.fullCalendar('changeView', if view == 'week' then 'agendaWeek' else 'month')
       else
         @currentView = 'scheduler'
         @calendar.addClass('scheduler-mode')
-        @$create_new_event_link.hide()
         @calendar.hide()
+        @header.showSchedulerTitle()
+        @schedulerNavigator.hide()
         @scheduler.show()
+
+    showSchedulerSingle: ->
+      @calendar.show()
+      @calendar.fullCalendar('changeView', 'agendaWeek')
+      @header.showDoneButton()
+      @schedulerNavigator.show()
+
+    schedulerSingleDoneClick: =>
+      @scheduler.doneClick()
+      @header.showSchedulerTitle()
+      @schedulerNavigator.hide()
 
     # Private
 

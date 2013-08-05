@@ -360,16 +360,6 @@ describe "dashboard" do
       assignment_menu.should include_text(assignment.title)
     end
 
-    it "should display appointment groups in todo list" do
-      ag = AppointmentGroup.create! :title => "appointment group",
-                                    :contexts => [@course],
-                                    :new_appointments => [[Time.now.utc + 2.hour, Time.now.utc + 3.hour]]
-      student_in_course(:course => @course, :active_all => true)
-      ag.appointments.first.reserve_for(@student, @student)
-      get "/"
-      f('#right-side .events_list').text.should include 'appointment group'
-    end
-
     it "should show submitted essay quizzes in the todo list" do
       quiz_title = 'new quiz'
       student_in_course(:active_all => true)

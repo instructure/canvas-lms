@@ -1,0 +1,13 @@
+{{#if term}}
+  {{#if users.length}}
+    <ul class="collectionViewItems unstyled"></ul>
+  {{else}}
+    <div>{{#t "no_users_found"}}No users found{{/t}}</div>
+  {{/if}}
+{{else}}
+  {{#if termError}}
+  <div class="text-error">
+    {{#t "too_short"}}Please enter a search term of 3 or more characters{{/t}}
+  </div>
+  {{/if}}
+{{/if}}

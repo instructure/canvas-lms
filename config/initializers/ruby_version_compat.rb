@@ -1,7 +1,36 @@
 # ruby 1.9 compatibility fixes for Rails 2.3
 
-if ActiveRecord::Base.configurations[Rails.env]['adapter'] == 'mysql'
-  STDERR.puts "NOTE: It's recommended that you change your database adapter to mysql2 for usage with Ruby 1.9"
+if RUBY_VERSION < '2.0'
+  # see https://bugs.ruby-lang.org/issues/7547
+  # the fix was only applied in 2.0
+  module Dir::Tmpname
+    def create(basename, *rest)
+      if opts = Hash.try_convert(rest[-1])
+        opts = opts.dup if rest.pop.equal?(opts)
+        max_try = opts.delete(:max_try)
+        opts = [opts]
+      else
+        opts = []
+      end
+      tmpdir, = *rest
+      if $SAFE > 0 and tmpdir.tainted?
+        tmpdir = '/tmp'
+      else
+        tmpdir ||= tmpdir()
+      end
+      n = nil
+      begin
+        path = File.join(tmpdir, make_tmpname(basename, n))
+        yield(path, n, *opts)
+      rescue Errno::EEXIST
+        n ||= 0
+        n += 1
+        retry if !max_try or n < max_try
+        raise "cannot generate temporary name using `#{basename}' under `#{tmpdir}'"
+      end
+      path
+    end
+  end
 end
 
 # See http://developer.uservoice.com/entries/how-to-upgrade-a-rails-2.3.14-app-to-ruby-1.9.3/

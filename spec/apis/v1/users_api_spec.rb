@@ -440,6 +440,9 @@ describe "Users API", :type => :integration do
 
   describe "user account updates" do
     before do
+      # an outer before sets this
+      @student.pseudonym.update_attribute(:sis_user_id, nil)
+
       @admin = account_admin_user
       course_with_student(:user => user_with_pseudonym(:name => 'Student', :username => 'student@example.com'))
       @student = @user

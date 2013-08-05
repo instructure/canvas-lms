@@ -30,8 +30,15 @@ describe "calendar2" do
     f('.calendar .fc-week1 .fc-wed')
   end
 
-  def change_calendar(css_selector = '.fc-button-next')
-    f('.calendar .fc-header-left ' + css_selector).click
+  def change_calendar(direction = :next)
+    css_selector = case direction
+      when :next then '.navigate_next'
+      when :prev then '.navigate_prev'
+      when :today then '.navigate_today'
+      else raise "unrecognized direction #{direction}"
+    end
+
+    f('.calendar_header ' + css_selector).click
     wait_for_ajax_requests
   end
 
@@ -106,13 +113,13 @@ describe "calendar2" do
         end
 
         it "should change the main calendars month on click" do
-          title_selector = "#calendar-app .fc-header-title"
+          title_selector = ".navigation_title"
           get "/calendar2"
 
-          orig_title = f(title_selector).text
+          orig_titles = ff(title_selector).map(&:text)
           f("#minical .fc-other-month").click
 
-          orig_title.should_not == f(title_selector)
+          orig_titles.should_not == ff(title_selector).map(&:text)
         end
       end
 
@@ -167,7 +174,7 @@ describe "calendar2" do
     describe "main calendar" do
 
       def get_header_text
-        header = f('.calendar .fc-header .fc-header-title')
+        header = f('.calendar_header .navigation_title')
         header.text
       end
 
@@ -194,7 +201,7 @@ describe "calendar2" do
         account = Account.default.tap { |a| a.settings[:show_scheduler] = false; a.save! }
         get "/calendar2"
         wait_for_ajaximations
-        ff("#calendar_views .ui-button").length.should == 2
+        ff(".calendar_view_buttons .ui-button").length.should == 2
       end
 
       it "should drag and drop an event" do
@@ -395,7 +402,7 @@ describe "calendar2" do
         header_buttons[0].click
         wait_for_ajaximations
         old_header_title = get_header_text
-        change_calendar('.fc-button-prev')
+        change_calendar(:prev)
         old_header_title.should_not == get_header_text
       end
 
@@ -406,7 +413,7 @@ describe "calendar2" do
 
         change_calendar
         get_header_text.should_not == current_month
-        f('.fc-button-today').click
+        change_calendar(:today)
         get_header_text.should == (current_month + ' ' + Time.now.year.to_s)
       end
 
@@ -693,7 +700,7 @@ describe "calendar2" do
 
         get "/courses/#{@course.id}/calendar_events/#{event.id}?calendar=1"
         wait_for_ajaximations
-        fj('#calendar-app h2').text.should == 'Julio 2012'
+        fj('.calendar_header .navigation_title').text.should == 'Julio 2012'
         fj('#calendar-app .fc-sun').text.should == 'Domingo'
         fj('#calendar-app .fc-mon').text.should == 'Lunes'
         fj('#calendar-app .fc-tue').text.should == 'Martes'

@@ -302,6 +302,8 @@ class User < ActiveRecord::Base
 
   def update_account_associations(opts = nil)
     opts ||= {:all_shards => true}
+    # incremental is only for the current shard
+    return User.update_account_associations([self], opts) if opts[:incremental]
     self.shard.activate do
       User.update_account_associations([self], opts)
     end
@@ -1788,9 +1790,6 @@ class User < ActiveRecord::Base
         include_submitted_count.
         map {|a| a.overridden_for(self)},opts.merge(:time => now)).
       first(opts[:limit])
-    appointment_groups = AppointmentGroup.manageable_by(self, context_codes).intersecting(now, opts[:end_at]).limit(opts[:limit])
-    appointment_groups.each { |ag| ag.context = ag.contexts_for_user(self).first }
-    events += appointment_groups
     events.sort_by{|e| [e.start_at ? 0: 1,e.start_at || 0, e.title] }.uniq.first(opts[:limit])
   end
 
@@ -2102,13 +2101,6 @@ class User < ActiveRecord::Base
     self.class.where(:id => id).update_all(:unread_conversations_count => conversations.unread.count)
   end
 
-  # association with dynamic, filtered join condition for submissions.
-  # This is messy, but in ActiveRecord 2 this is the only way to do an eager
-  # loading :include condition that has dynamic join conditions. It looks like
-  # there's better solutions in AR 3.
-  # See also e.g., http://makandra.com/notes/983-dynamic-conditions-for-belongs_to-has_many-and-has_one-associations
-  has_many :submissions_for_given_assignments, :include => [:assignment, :submission_comments], :conditions => 'submissions.assignment_id IN (#{Api.assignment_ids_for_students_api.join(",")})', :class_name => 'Submission'
-
   def set_menu_data(enrollment_uuid)
     return @menu_data if @menu_data
     coalesced_enrollments = []
@@ -2196,10 +2188,10 @@ class User < ActiveRecord::Base
   def find_pseudonym_for_account(account, allow_implicit = false)
     # try to find one that's already loaded if possible
     if self.pseudonyms.loaded?
-      self.pseudonyms.detect { |p| p.active? && p.works_for_account?(account, allow_implicit) }
-    else
-      self.all_active_pseudonyms.detect { |p| p.works_for_account?(account, allow_implicit) }
+      result = self.pseudonyms.detect { |p| p.active? && p.works_for_account?(account, allow_implicit) }
+      return result if result || self.associated_shards.length == 1
     end
+    self.all_active_pseudonyms.detect { |p| p.works_for_account?(account, allow_implicit) }
   end
 
   # account = the account that you want a pseudonym for

@@ -199,7 +199,7 @@
   <% if can_do(@portfolio, @current_user, :manage) %>
   <div style="float: right; display: none;"><a href="#" class="edit_content_link icon-edit"><%= edit_link_text %></a></div>
   <% end %>
-  <h2><%= @page.name %></h2>
+  <h2 id="eportfolio_entry_<%= @page.id %>"><span class="name"><%= @page.name %></span></h2>
   <% idx = 1 %>
   <% form_for @page, :url => eportfolio_entry_url(@portfolio, @page), :html => {:id => "edit_page_form" } do |f| %>
   <div class="form_content">

@@ -165,17 +165,25 @@ class ContentTag < ActiveRecord::Base
   def content_or_self
     content || self
   end
-  
+
+  def asset_safe_title(column)
+    name = self.title.to_s
+    if (limit = self.content.class.try(:columns_hash)[column].try(:limit)) && name.length > limit
+      name = name[0, limit][/.{0,#{limit}}/mu]
+    end
+    name
+  end
+
   def update_asset_name!
     return unless self.sync_title_to_asset_title?
     correct_context = self.content && self.content.respond_to?(:context) && self.content.context == self.context
     if correct_context
       if self.content.respond_to?("name=") && self.content.respond_to?("name") && self.content.name != self.title
-        self.content.update_attribute(:name, self.title)
+        self.content.update_attribute(:name, asset_safe_title('name'))
       elsif self.content.respond_to?("title=") && self.content.title != self.title
-        self.content.update_attribute(:title, self.title)
+        self.content.update_attribute(:title, asset_safe_title('title'))
       elsif self.content.respond_to?("display_name=") && self.content.display_name != self.title
-        self.content.update_attribute(:display_name, self.title)
+        self.content.update_attribute(:display_name, asset_safe_title('display_name'))
       end
     end
   end

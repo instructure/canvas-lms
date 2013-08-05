@@ -1,6 +1,6 @@
 <div class="controls">
   <label class="checkbox">
-    <input type="checkbox" id="dateShiftCheckbox">
+    <input type="checkbox" id="dateShiftCheckbox" name="date_shift_options[shift_dates]">
     {{#t "checkbox_label"}}Adjust events and due dates{{/t}}
   </label>
 </div>
@@ -10,16 +10,16 @@
   <div class="control-group">
     <label class="control-label"><strong>{{#t "beginning_date"}}Beginning date{{/t}}</strong></label>
     <div class="controls">
-      <div class="pull-left"><input type="text" id="oldStartDate" class="span2"></div>
-      <div class="pull-left">&nbsp; {{#t "beginning_change_to"}}change to{{/t}} <input type="text" id="newStartDate" class="span2"></div>
+      <div class="pull-left"><input type="text" name="date_shift_options[old_start_date]" id="oldStartDate" class="span2"></div>
+      <div class="pull-left">&nbsp; {{#t "beginning_change_to"}}change to{{/t}} <input type="text" name="date_shift_options[new_start_date]" id="newStartDate" class="span2"></div>
     </div>
   </div>
 
   <div class="control-group">
     <label class="control-label"><strong>{{#t "ending_date"}}Ending date{{/t}}</strong></label>
     <div class="controls">
-      <div class="pull-left"><input type="text" id="oldEndDate" class="span2"></div>
-      <div class="pull-left">&nbsp; {{#t "ending_change_to"}}change to{{/t}} <input type="text" id="newEndDate" class="span2"></div>
+      <div class="pull-left"><input type="text" name="date_shift_options[old_end_date]" id="oldEndDate" class="span2"></div>
+      <div class="pull-left">&nbsp; {{#t "ending_change_to"}}change to{{/t}} <input type="text" name="date_shift_options[new_end_date]" id="newEndDate" class="span2"></div>
     </div>
   </div>
 

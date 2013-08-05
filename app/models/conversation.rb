@@ -675,7 +675,7 @@ class Conversation < ActiveRecord::Base
   end
 
   def delete_for_all
-    stream_item.destroy_stream_item_instances
+    stream_item.try(:destroy_stream_item_instances)
     # bare scoped call avoid Rails 2 HasManyAssociation loading all objects
     shard.activate { conversation_message_participants.scoped.delete_all }
     conversation_participants.with_each_shard { |scope| scope.scoped.delete_all; nil }

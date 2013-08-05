@@ -78,11 +78,12 @@ module QuizzesHelper
     end
   end
 
-  def submitted_students_title(quiz, students)
+  def submitted_students_title(quiz, students, logged_out)
+    length = students.length + logged_out.length
     if quiz.survey?
-      submitted_students_survey_title(students.length)
+      submitted_students_survey_title(length)
     else
-      submitted_students_quiz_title(students.length)
+      submitted_students_quiz_title(length)
     end
   end
 

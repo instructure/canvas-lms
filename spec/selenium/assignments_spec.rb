@@ -470,5 +470,59 @@ describe "assignments" do
         fj("#assignment_#{@asmnt.id} .delete_assignment_link").should be_nil
       end
     end
+
+    context "draft state" do
+      before do
+        @course.root_account.tap{ |a| a.settings[:enable_draft] = true }.save!
+        @course.require_assignment_group
+      end
+
+      it "should go to the new assignment page from 'Add Assignment'" do
+        get "/courses/#{@course.id}/assignments"
+        wait_for_ajaximations
+
+        expect_new_page_load { f('.new_assignment').click }
+      end
+
+      it "should allow quick-adding an assignment to a group" do
+        ag = @course.assignment_groups.first
+
+        get "/courses/#{@course.id}/assignments"
+        wait_for_ajaximations
+
+
+        f("#assignment_group_#{ag.id} .add_assignment").click
+        wait_for_ajaximations
+
+        replace_content(f("#ag_#{ag.id}_assignment_name"), "Do this")
+        replace_content(f("#ag_#{ag.id}_assignment_points"), "13")
+        fj('.create_assignment:visible').click
+        wait_for_ajaximations
+
+        a = ag.reload.assignments.first
+        a.name.should == "Do this"
+        a.points_possible.should == 13
+
+        f("#assignment_group_#{ag.id} .ig-title").text.should match "Do this"
+      end
+
+      it "should rembmer entered settings when 'more options' is pressed" do
+        ag = @course.assignment_groups.first
+
+        get "/courses/#{@course.id}/assignments"
+        wait_for_ajaximations
+
+
+        f("#assignment_group_#{ag.id} .add_assignment").click
+        wait_for_ajaximations
+
+        replace_content(f("#ag_#{ag.id}_assignment_name"), "Do this")
+        replace_content(f("#ag_#{ag.id}_assignment_points"), "13")
+        expect_new_page_load { fj('.more_options:visible').click }
+
+        get_value("#assignment_name").should == "Do this"
+        get_value("#assignment_points_possible").should == "13"
+      end
+    end
   end
 end

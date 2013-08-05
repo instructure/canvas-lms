@@ -23,6 +23,9 @@
   float: left;
   padding: 0 10px;
   border-right: solid 1px rgba(0, 0, 0, 0.25);
+  font-size: 12px;
+  line-height: 12px;
+
   &:first-child {
     padding-left: 10px;
   }
@@ -31,4 +34,3 @@
     border-right: none;
   }
 }
-

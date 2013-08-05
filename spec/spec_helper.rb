@@ -15,24 +15,23 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-
 if ENV['COVERAGE'] == "1"
   puts "Code Coverage enabled"
   require 'simplecov'
-  SimpleCov.start do
-    SimpleCov.use_merging true
+  SimpleCov.start('rails') do
     SimpleCov.formatter = SimpleCov::Formatter::HTMLFormatter
     add_filter '/spec/'
     add_filter '/config/'
+    add_filter 'spec_canvas'
 
-    add_group 'Mailers', 'app/mailers'
     add_group 'Controllers', 'app/controllers'
     add_group 'Models', 'app/models'
+    add_group 'App', '/app/'
     add_group 'Helpers', 'app/helpers'
-    add_group 'Libraries', 'lib'
+    add_group 'Libraries', '/lib/'
     add_group 'Plugins', 'vendor/plugins'
     add_group "Long files" do |src_file|
-      src_file.lines.count > 100
+      src_file.lines.count > 500
     end
     SimpleCov.at_exit do
       SimpleCov.result.format!
@@ -308,7 +307,8 @@ Spec::Runner.configure do |config|
     @spec_pseudonym_count += 1 if username =~ /nobody(\+\d+)?@example.com/
     password = opts[:password] || "asdfasdf"
     password = nil if password == :autogenerate
-    @pseudonym = user.pseudonyms.create!(:account => opts[:account] || Account.default, :unique_id => username, :password => password, :password_confirmation => password)
+    account = opts[:account] || Account.default
+    @pseudonym = account.pseudonyms.create!(:user => user, :unique_id => username, :password => password, :password_confirmation => password)
     @pseudonym.communication_channel = communication_channel(user, opts)
     @pseudonym
   end
@@ -316,10 +316,10 @@ Spec::Runner.configure do |config|
   def managed_pseudonym(user, opts={})
     other_account = opts[:account] || account_with_saml
     if other_account.password_authentication?
-      config = AccountAuthorizationConfig.new
+      config = other_account.account_authorization_configs.build
       config.auth_type = "saml"
       config.log_in_url = opts[:saml_log_in_url] if opts[:saml_log_in_url]
-      other_account.account_authorization_configs << config
+      config.save!
     end
     opts[:account] = other_account
     pseudonym(user, opts)

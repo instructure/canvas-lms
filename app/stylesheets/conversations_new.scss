@@ -1,0 +1,279 @@
+@import "environment";
+@import "bootstrap/button-groups";
+
+#wrapper-container, #wrapper, #main, #not_right_side,
+#content-wrapper, #content, .conversations {
+  height: 100%;
+}
+
+#content.container-fluid {
+  padding: 0;
+}
+
+.conversations {
+  min-width: 960px;
+}
+
+.panel {
+  background: #f1f1f1;
+  background: -moz-linear-gradient(top, #fff, #e6e6e6);
+  background: -ms-linear-gradient(top, #fff, #e6e6e6);
+  background: -o-linear-gradient(top, #fff, #e6e6e6);
+  background: -webkit-linear-gradient(top, #fff, #e6e6e6);
+  background: linear-gradient(top, #fff, #e6e6e6);
+  border-bottom: 1px solid #acacac;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, .2);
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  height: 50px;
+  padding: 9px 12px 0 12px;
+
+  > div {
+    display: inline-block;
+  }
+}
+
+.filters {
+  margin-right: 50px;
+
+  /* TODO: make sure we still need this with the frd filters (may not be selects) */
+  select {
+    margin-bottom: 0;
+    width: 150px;
+  }
+}
+
+.actions {
+  button {
+    color: #a6a6a6;
+
+    &:focus, &:hover {
+      color: #333;
+    }
+  }
+
+  .btn-group {
+    display: inline-block;
+  }
+}
+
+.search {
+  .help-btn {
+    color: #333;
+    position: relative;
+    left: 8px;
+
+    &:hover, &:focus {
+      color: #0088cc;
+      text-decoration: none;
+    }
+
+    .icon-mini-arrow-down {
+      position: relative;
+      right: 5px;
+    }
+  }
+}
+
+.messaging-wrapper {
+  height: 100%;
+}
+
+.message-list {
+  border-right: 1px solid #bfbfbf;
+  height: 100%;
+  overflow: auto;
+
+  .list-header {
+    background: #f3f3f3;
+    border-bottom: 1px solid #bfbfbf;
+    color: #7f7f7f;
+    padding: 0 12px;
+  }
+
+  .messages > li {
+    background: #fff;
+    background: -moz-linear-gradient(top, #fff, #fafafa);
+    background: -ms-linear-gradient(top, #fff, #fafafa);
+    background: -o-linear-gradient(top, #fff, #fafafa);
+    background: -webkit-linear-gradient(top, #fff, #fafafa);
+    background: linear-gradient(top, #fff, #fafafa);
+    border-bottom: 1px solid #bfbfbf;
+    cursor: pointer;
+    padding: 8px 12px 8px 32px;
+    position: relative;
+
+    &.active {
+      background: #e5f3ff;
+    }
+
+    &:hover .message-actions a, .message-actions a:focus {
+      left: 0;
+      outline: none;
+    }
+
+  }
+
+  .date {
+    color: #2571bd;
+  }
+
+  .summary {
+    color: #7f7f7f;
+    margin: 0 12px 0 0;
+  }
+
+  p {
+    font-size: 12px;
+    line-height: 16px;
+    margin-bottom: 8px;
+  }
+
+}
+
+.message-count {
+  font-size: 11px;
+  position: absolute;
+  right: 8px;
+  top: 43%;
+}
+
+.message-actions {
+  left: 8px;
+  position: absolute;
+  top: 8px;
+
+  a {
+    position: relative;
+  }
+
+  li {
+    margin-bottom: 8px;
+  }
+
+  .read-state {
+    background: #46aaf9;
+    background: -moz-linear-gradient(top, #73d6fc, #2489f7);
+    background: -ms-linear-gradient(top, #73d6fc, #2489f7);
+    background: -o-linear-gradient(top, #73d6fc, #2489f7);
+    background: -webkit-linear-gradient(top, #73d6fc, #2489f7);
+    background: linear-gradient(top, #73d6fc, #2489f7);
+    border: 1px solid #2e89cc;
+    border-radius: 4px;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    display: inline-block;
+    height: 8px;
+    margin: 4px 5px;
+    width: 8px;
+
+    &.read {
+      background: #fff;
+      border: 1px solid #8c8d8d;
+      left: -9999px;
+    }
+  }
+
+  .star-btn {
+    background: url(/images/messages/star.png);
+    display: inline-block;
+    height: 19px;
+    left: -9999px;
+    width: 19px;
+
+    &:focus {
+      left: 0;
+    }
+
+    &.active {
+      background: url(/images/messages/star-lit.png);
+      left: 0;
+    }
+  }
+}
+
+.open-message {
+  left: -9999px;
+  position: absolute;
+}
+
+
+.message-detail.span8 {
+  margin-left: 0;
+  width: 68.08511%;
+
+  &:focus {
+    outline: none;
+  }
+
+  .no-messages {
+    color: #bbbbbb;
+    display: block;
+    font-size: 20px;
+    font-weight: bold;
+    margin-top: 15%;
+    text-align: center;
+
+    i {
+      display: block;
+      line-height: 120px;
+      margin-bottom: 120px;
+      text-align: center;
+      width: 100%;
+
+      &:before {
+        font-size: 120px;
+      }
+    }
+  }
+
+  .message-header {
+    border-bottom: 1px solid #bfbfbf;
+    height: 40px;
+    line-height: 40px;
+    padding: 0 12px;
+
+    .label {
+      margin-top: 12px;
+    }
+  }
+
+  .message-content li {
+    border-bottom: 1px solid #bfbfbf;
+    margin: 0 12px;
+    padding: 32px 0 12px 0;
+
+    &.active {
+      background: #e5f3ff;
+      padding: 32px 6px 12px 6px;
+    }
+  }
+
+  .message-info {
+    margin-bottom: 12px;
+  }
+
+  .user-info {
+    .avatar {
+      border-radius: 25px;
+      height: 50px;
+      margin-right: 8px;
+      width: 50px;
+    }
+
+    .username {
+      color: #2571bd;
+      font-weight: bold;
+    }
+
+    .context {
+      color: #7f7f7f;
+      display: block;
+    }
+  }
+
+  .date {
+    color: #7f7f7f;
+  }
+}
+

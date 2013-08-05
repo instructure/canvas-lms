@@ -14,7 +14,7 @@
     <select name="folder_id">
       <%= folders_as_options(Folder.root_folders(@context), :all_folders => @context.folders.active, :selected_folder_id => params[:folder_id].to_i) %>
     </select>
-    <%= hidden_field_tag 'return_to', qti_or_content_link %>
+    <%= hidden_field_tag 'return_to', return_or_context_url %>
   </div>
   <div class="button-container">
     <a class="cancel_button btn" href="#"><%= t '#buttons.cancel', 'Cancel' %></a>

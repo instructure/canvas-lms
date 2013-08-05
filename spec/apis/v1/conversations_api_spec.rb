@@ -1034,7 +1034,7 @@ describe ConversationsController, :type => :integration do
         "last_message" => "test",
         "last_message_at" => conversation.last_message_at.to_json[1, 20],
         "last_authored_message" => "test",
-        "last_authored_message_at" => conversation.last_authored_at.to_json[1, 20],
+        "last_authored_message_at" => conversation.last_authored_message.created_at.to_json[1, 20],
         "message_count" => 1,
         "subscribed" => true,
         "private" => true,
@@ -1379,10 +1379,12 @@ describe ConversationsController, :type => :integration do
       account_admin_user_with_role_changes(:account => Account.site_admin, :role_changes => { :become_user => false })
       json = raw_api_call(:delete, "/api/v1/conversations/#{conv.id}/delete_for_all",
         {:controller => 'conversations', :action => 'delete_for_all', :format => 'json', :id => conv.id.to_s},
-        {})
+        {:domain_root_account => Account.site_admin})
       response.status.should eql "401 Unauthorized"
 
-      user_session(account_admin_user)
+      account_admin_user
+      p = Account.default.pseudonyms.create!(:unique_id => 'admin', :user => @user)
+      user_session(@user, p)
       json = raw_api_call(:delete, "/api/v1/conversations/#{conv.id}/delete_for_all",
         {:controller => 'conversations', :action => 'delete_for_all', :format => 'json', :id => conv.id.to_s},
         {})

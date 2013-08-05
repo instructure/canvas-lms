@@ -18,6 +18,8 @@ define [
       require_initial_post: false
       is_announcement: false
       subscribed: false
+      user_can_see_posts: true
+      subscription_hold: null
 
     dateAttributes: [
       'last_reply_at'
@@ -42,12 +44,14 @@ define [
       Backbone.Model::toJSON.call(this)
 
     topicSubscribe: ->
+      baseUrl = _.result this, 'url'
       @set 'subscribed', true
-      $.ajaxJSON ENV.DISCUSSION.SUBSCRIBE_URL, 'PUT'
+      $.ajaxJSON "#{baseUrl}/subscribed", 'PUT'
 
     topicUnsubscribe: ->
+      baseUrl = _.result this, 'url'
       @set 'subscribed', false
-      $.ajaxJSON ENV.DISCUSSION.UNSUBSCRIBE_URL, 'DELETE'
+      $.ajaxJSON "#{baseUrl}/subscribed", 'DELETE'
 
     toJSON: ->
       json = super

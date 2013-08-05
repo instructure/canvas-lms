@@ -36,15 +36,18 @@ define [
 
     updateModel: ->
       {value} = @el
+      # TODO this needs to be refactored out into some validation
+      # rules or something
+      if value and value.length < @options.minLength
+        return unless @options.setParamOnInvalid
+        value = false
+      @setParam value
+
+    setParam: (value) ->
+      @model?.set @modelAttribute, value
       if value is ''
-        @model?.set @modelAttribute, value
         @collection?.deleteParam @modelAttribute
-      else if value.length < @options.minLength
-        # TODO this needs to be refactored out into some validation
-        # rules or something
-        return
       else
-        @model?.set @modelAttribute, value
         @collection?.setParam @modelAttribute, value
 
 

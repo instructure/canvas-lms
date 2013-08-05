@@ -139,4 +139,141 @@ describe "assignment groups" do
       get_assignment_groups[0].find_element(:css, '.delete_group_link').should_not be_displayed
     end
   end
+
+  context "draft state" do
+    before do
+      Account.default.settings[:enable_draft] = true
+      Account.default.save!
+      @domain_root_account = Account.default
+
+      course_with_teacher_logged_in(:active_all => true)
+      @assignment_group = @course.assignment_groups.create!(:name => "Test Group")
+
+      get "/courses/#{@course.id}/assignments"
+      wait_for_ajaximations
+    end
+
+    context "assignment settings modal" do
+      def set_to(apply)
+        @course.apply_assignment_group_weights=apply
+        @course.save
+        @course.reload
+      end
+
+      def reset_flag_to_true
+        #reset the course's flag and the page
+        set_to(true)
+        get "/courses/#{@course.id}/assignments"
+        wait_for_ajaximations
+
+        #now start the test
+        f('#assignmentSettingsCog').click
+        wait_for_ajaximations
+      end
+
+      before do
+        set_to(false)
+        f('#assignmentSettingsCog').click
+        wait_for_ajaximations
+      end
+
+      it "should check the box on open" do
+        reset_flag_to_true
+        is_checked('#apply_assignment_group_weights')
+      end
+
+      it "should change a course's apply_assignment_group_weights flag" do
+        flag_before = @course.apply_group_weights?
+
+        f('#apply_assignment_group_weights').click
+        f('#update-assignment-settings').click
+        wait_for_ajaximations
+
+        @course.reload
+        flag_after = @course.apply_group_weights?
+        flag_after.should_not == flag_before
+      end
+
+      it "should hide the weights table" do
+        reset_flag_to_true
+        f('#apply_assignment_group_weights').click
+        f('#assignment_groups_weights').should_not be_displayed
+      end
+
+      it "should show the weights table" do
+        f('#apply_assignment_group_weights').click
+        f('#assignment_groups_weights').should be_displayed
+      end
+
+      it "should save an assignment group's weight" do
+        f('#apply_assignment_group_weights').click
+        val_before = @assignment_group.group_weight
+        replace_content(f('.group_weight_value'), '10')
+        f('#update-assignment-settings').click
+        wait_for_ajaximations
+        @assignment_group.reload
+        val_after = @assignment_group.group_weight
+        val_after.should_not == val_before
+      end
+    end
+
+    it "should create a new assignment group" do
+      count = @course.assignment_groups.count
+      f('#content #addGroup').click
+      wait_for_ajaximations
+
+      replace_content(f('#ag_new_name'), "Assignment Group 1")
+      fj('.create_group:visible').click
+      wait_for_ajaximations
+
+      @course.assignment_groups.count.should > count
+      new_ag = @course.assignment_groups.order(:id).last
+      f("#assignment_group_#{new_ag.id} .ig-header").text.should match "Assignment Group 1"
+    end
+
+    it "should edit an existing assignment group" do
+      ag = @course.assignment_groups.first
+      f("#assignment_group_#{ag.id} .al-trigger").click
+      f("#assignment_group_#{ag.id} .edit_group").click
+      wait_for_ajaximations
+
+      replace_content(f("#ag_#{ag.id}_name"), "Modified Group")
+      fj('.create_group:visible').click
+      wait_for_ajaximations
+
+      ag.reload.name.should == "Modified Group"
+      f("#assignment_group_#{ag.id} .ig-header").text.should match "Modified Group"
+    end
+
+    it "should save drop rules" do
+      ag = @course.assignment_groups.first
+      f("#assignment_group_#{ag.id} .al-trigger").click
+      f("#assignment_group_#{ag.id} .edit_group").click
+      wait_for_ajaximations
+
+      replace_content(f("#ag_#{ag.id}_drop_lowest"), "1")
+      replace_content(f("#ag_#{ag.id}_drop_highest"), "1")
+      fj('.create_group:visible').click
+      wait_for_ajaximations
+
+      ag.reload
+      ag.rules_hash[:drop_lowest].should == 1
+      ag.rules_hash[:drop_highest].should == 1
+      f("#assignment_group_#{ag.id} .ig-header").text.should match "2 Rules"
+    end
+
+    it "should not save drop rules when non are given" do
+      ag = @course.assignment_groups.first
+      f("#assignment_group_#{ag.id} .al-trigger").click
+      f("#assignment_group_#{ag.id} .edit_group").click
+      wait_for_ajaximations
+
+      replace_content(f("#ag_#{ag.id}_name"), "Modified Group")
+      fj('.create_group:visible').click
+      wait_for_ajaximations
+
+      ag.reload.rules_hash.should be_blank
+      f("#assignment_group_#{ag.id} .ig-header").text.should_not match "Rule"
+    end
+  end
 end

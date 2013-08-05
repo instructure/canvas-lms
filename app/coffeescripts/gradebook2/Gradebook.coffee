@@ -55,7 +55,6 @@ define [
       @chunk_start = 0
       @students = {}
       @rows = []
-      @sortFn = (student) -> student.sortable_name
       @assignmentsToHide = userSettings.contextGet('hidden_columns') || []
       @sectionToShow = userSettings.contextGet 'grading_show_only_section'
       @show_attendance = userSettings.contextGet 'show_attendance'
@@ -266,7 +265,6 @@ define [
     # a full redraw
     buildRows: =>
       @rows.length = 0
-      sortables = {}
 
       for id, column of @gradeGrid.getColumns() when ''+column.object?.submission_types is "attendance"
         column.unselectable = !@show_attendance
@@ -278,12 +276,11 @@ define [
         if @rowFilter(student)
           @rows.push(student)
           @calculateStudentGrade(student)
-          sortables[student.id] = @sortFn(student)
 
       @rows.sort (a, b) ->
-        if sortables[a.id] < sortables[b.id] then -1
-        else if sortables[a.id] > sortables[b.id] then 1
-        else 0
+        a.sortable_name.localeCompare(b.sortable_name,
+          window.I18n.locale,
+          { sensitivity: 'accent', ignorePunctuation: true, numeric: true})
 
       student.row = i for student, i in @rows
       @multiGrid.invalidate()

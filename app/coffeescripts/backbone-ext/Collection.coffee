@@ -71,7 +71,7 @@ define [
 
     setOptionProperties: ->
       for property in @constructor.__optionProperties__
-        @[property] = @options[property] if @options[property]?
+        @[property] = @options[property] if @options[property] isnt undefined
 
     ##
     # `options` will be merged into @defaults. Some options will become direct

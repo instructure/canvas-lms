@@ -4,8 +4,11 @@ $canvas_tasks_loaded = true
 
 def check_syntax(files)
   quick = ENV["quick"] && ENV["quick"] == "true"
-
+  puts "--> Checking Syntax...."
   show_stoppers = []
+  raise "jsl needs to be in your $PATH, download from: javascriptlint.com" if `which jsl`.empty?
+  puts "--> Found jsl..."
+
   Array(files).each do |js_file|
     js_file.strip!
     # only lint things in public/javascripts that are not in /vendor, /compiled, etc.
@@ -34,7 +37,6 @@ def check_syntax(files)
         end
       end
 
-      raise "jsl needs to be in your $PATH, download from: javascriptlint.com" if `which jsl`.empty?
       jsl_output = `jsl -process "#{file_path}" -nologo -conf "#{File.join(Rails.root, 'config', 'jslint.conf')}"`
       exit_status = $?.exitstatus
       if exit_status != 0
@@ -50,7 +52,11 @@ def check_syntax(files)
       end
     end
   end
-  raise "Fatal JavaScript errors found" unless show_stoppers.empty?
+  if show_stoppers.empty?
+    puts " --> No JavaScript errors found using jsl"
+  else
+    raise "FATAL JavaScript errors found using jsl"
+  end
 end
 
 

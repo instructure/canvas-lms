@@ -296,12 +296,12 @@ i[class*=icon-], i[class^=icon-] {
 
 }
 
+
 // when an icon is applied directly to a link, add a little left margin to make
 // things look nicer
 a[class*=icon-], a[class^=icon-] {
   &:before { margin-right: 4px; }
 }
-
 
 // icons should be a little lighter than the text in a .btn,
 // we're aware and ok that this wont have any effect in ie8

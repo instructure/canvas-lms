@@ -28,4 +28,13 @@ describe Canvas::Migration::Worker::CCWorker do
     worker.perform().should == true
     cm.reload.migration_settings[:worker_class].should == 'CC::Importer::Canvas::Converter'
   end
+
+  it "should honor skip_job_progress" do
+    cm = ContentMigration.create!(:migration_settings => { :no_archive_file => true, :skip_job_progress => true })
+    Canvas::Migration::Worker.expects(:get_converter).with(anything).returns(CC::Importer::Canvas::Converter)
+    CC::Importer::Canvas::Converter.any_instance.expects(:export).returns({})
+    worker = Canvas::Migration::Worker::CCWorker.new(cm.id)
+    worker.perform().should == true
+    cm.skip_job_progress.should be_true
+  end
 end

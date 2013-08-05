@@ -161,6 +161,34 @@ describe "quizzes" do
       end
     end
 
+    it "should republish on save" do
+      Account.default.settings[:enable_draft] = true
+      Account.default.save!
+      get "/courses/#{@course.id}/quizzes"
+      expect_new_page_load { f(".new-quiz-link").click }
+      quiz = Quiz.last
+      expect_new_page_load do
+        click_save_settings_button
+        wait_for_ajax_requests
+      end
+      f('#quiz-publish-link').text.strip.should == 'Publish'
+      quiz.versions.length.should == 1
+      f('#quiz-publish-link').click
+      wait_for_ajax_requests
+      quiz.reload
+      quiz.versions.length.should == 2
+      get "/courses/#{@course.id}/quizzes/#{quiz.id}/edit"
+      expect_new_page_load {
+        f('#quiz-draft-state').text.strip.should == 'Published'
+        expect_new_page_load do
+          click_save_settings_button
+          wait_for_ajax_requests
+        end
+        quiz.reload
+        quiz.versions.length.should == 3
+      }
+    end
+
     it "should create a new question group" do
       get "/courses/#{@course.id}/quizzes/new"
 
@@ -249,15 +277,14 @@ describe "quizzes" do
     end
 
     it "should flag a quiz question while taking a quiz as a teacher" do
-      quiz_with_new_questions
-      expect_new_page_load do
-        click_save_settings_button
-        wait_for_ajax_requests
-      end
-      f('.publish_quiz_button').click
-      wait_for_ajax_requests
+      quiz_with_new_questions(false)
 
-      expect_new_page_load { driver.find_element(:link, 'Take the Quiz').click }
+      get "/courses/#{@course.id}/quizzes/#{@q.id}"
+
+      expect_new_page_load do
+        driver.find_element(:link, 'Take the Quiz').click
+        wait_for_ajaximations
+      end
 
       #flag first question
       hover_and_click("#question_#{@quest1.id} .flag_question")
@@ -664,6 +691,51 @@ describe "quizzes" do
       wait_for_ajaximations
       fj('#rubrics .add_rubric_link:visible').click
       fj('.rubric_grading:visible').should be_nil
+    end
+
+    context "with draft state" do
+      before(:each) do
+        Account.default.settings[:enable_draft] = true
+        Account.default.save!
+      end
+
+      it "should click the publish button to publish a quiz" do
+        @context = @course
+        q = quiz_model
+        q.unpublish!
+
+        get "/courses/#{@course.id}/quizzes/#{q.id}"
+        f('#quiz-publish-link').should include_text("Publish")
+
+        expect_new_page_load do
+          f('.quiz-publish-button').click
+          wait_for_ajaximations
+        end
+
+        # move mouse to not be hover over the button
+        driver.mouse.move_to f('#footer')
+
+        f('#quiz-publish-link').should include_text("Published")
+      end
+
+      it "should click the unpublish button to unpublish a quiz" do
+        @context = @course
+        q = quiz_model
+        q.publish!
+
+        get "/courses/#{@course.id}/quizzes/#{q.id}"
+        f('#quiz-publish-link').should include_text("Published")
+
+        expect_new_page_load do
+          f('.quiz-publish-button').click
+          wait_for_ajaximations
+        end
+
+        # move mouse to not be hover over the button
+        driver.mouse.move_to f('#footer')
+
+        f('#quiz-publish-link').should include_text("Publish")
+      end
     end
   end
 end

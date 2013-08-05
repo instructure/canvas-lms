@@ -17,26 +17,14 @@
 #
 
 module ContentImportsHelper
-  def question_banks_select_list
-    question_banks = @context.assessment_question_banks.active.order(:title).pluck(:title)
-    question_banks.delete AssessmentQuestionBank.default_imported_title
-    question_banks.insert 0, AssessmentQuestionBank.default_imported_title
-    question_banks
-  end
-
-  def qti_enabled?
-    Qti.qti_enabled?
-  end
 
   def exports_enabled?
     ContentMigration.migration_plugins(true).any?
   end
 
-  def qti_or_content_link
+  def return_or_context_url
     if params[:return_to]
       clean_return_to(params[:return_to])
-    elsif qti_enabled?
-      context_url(@context, :context_import_quizzes_url)
     else
       context_url(@context, :context_url)
     end

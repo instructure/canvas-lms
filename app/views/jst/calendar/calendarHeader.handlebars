@@ -1,0 +1,28 @@
+<div class="calendar_header header-table">
+  <div class="header-table-row">
+    <div class="header-table-cell header-table-left">
+      <div class="calendar_navigator"></div>
+      <h2 class="appointment_group_title">{{#t "my_appointment_groups"}}My Appointment Groups{{/t}}</h2>
+      <button class="btn scheduler_done_button">{{#t "done_go_back_to_list"}}Done, Go Back To List{{/t}}</button>
+    </div>
+    <div class="calendar_view_buttons header-table-cell header-table-middle">
+      <input type="radio" id="week"      name="calendar_view" /><label for="week">{{#t "links.calendar_week"}}Week{{/t}}</label>
+      <input type="radio" id="month"     name="calendar_view" checked="checked" /><label for="month">{{#t "links.calendar_month"}}Month{{/t}}</label>
+      {{#if showScheduler}}
+      <input type="radio" id="scheduler" name="calendar_view" /><label for="scheduler">{{#t "links.calendar_scheduler"}}Scheduler{{/t}} <span stye="display: none" class="counter-badge"></span></label>
+      {{/if}}
+    </div>
+    <div class="calendar_action_buttons header-table-cell header-table-right">
+      <a href="http://guides.instructure.com/s/2204/m/4152/l/59600-how-is-the-new-calendar-different-from-the-old-calendar" class="whats-new ">What's new?</a>
+      {{#unless calendar2Only}}
+      <a id="change-calendar-version" href="/switch_calendar/1" data-method="post" rel="nofollow" class="btn ">{{#t "use_old_calendar"}}Old Calendar{{/t}}</a>
+      {{/unless}}
+      <a href="#" id="create_new_event_link" class="icon-add " title="{{#t "create_event"}}Create New Event{{/t}}" data-tooltip>
+        <span class="screenreader-only">{{#t "create_event"}}Create New Event{{/t}}</span>
+      </a>
+      <a href="#" id="refresh_calendar_link" class="" title="{{#t "refresh"}}Refresh{{/t}}" data-tooltip>
+        <span class="screenreader-only">{{#t "refresh"}}Refresh{{/t}}</span>
+      </a>
+    </div>
+  </div>
+</div>

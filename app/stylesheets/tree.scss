@@ -7,6 +7,9 @@ $triangle-edge-size: 5px;
     @include reset-list;
   }
   ul { margin-left: 8px; }
+  .folderContents ul.hidden {
+    display: none;
+  }
   li a {
     padding: 1px 7px 1px 35px;
     display: block;

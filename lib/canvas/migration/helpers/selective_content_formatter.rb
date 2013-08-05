@@ -42,6 +42,7 @@ module Canvas::Migration::Helpers
       course_data = Rails.cache.fetch(['migration_selective_cache', @migration.shard, @migration].cache_key, :expires_in => 5.minutes) do
         att = @migration.overview_attachment.open
         data = JSON.parse(att.read)
+        data = separate_announcements(data)
         data['attachments'] ||= data['file_map'] ? data['file_map'].values : nil
         data['quizzes'] ||= data['assessments']
         data['context_modules'] ||= data['modules']
@@ -147,11 +148,11 @@ module Canvas::Migration::Helpers
             when 'attachments'
               course_attachments_data(content_list, source)
             when 'wiki_pages'
-              source.wiki.wiki_pages.select("id, title").each do |item|
+              source.wiki.wiki_pages.not_deleted.select("id, title").each do |item|
                 content_list << course_item_hash(type, item)
               end
             when 'discussion_topics'
-              source.discussion_topics.select("id, title, user_id").except(:user).each do |item|
+              source.discussion_topics.active.only_discussion_topics.select("id, title, user_id").except(:user).each do |item|
                 content_list << course_item_hash(type, item)
               end
             else
@@ -160,10 +161,16 @@ module Canvas::Migration::Helpers
                 # We only need the id and name, so don't fetch everything from DB
                 if type == 'learning_outcomes'
                   scope = scope.select(:short_description)
-                elsif type == 'context_modules' || type == 'context_external_tools'
+                elsif type == 'context_modules' || type == 'context_external_tools' || type == 'groups'
                   scope = scope.select(:name)
                 else
                   scope = scope.select(:title)
+                end
+
+                if scope.respond_to?(:not_deleted)
+                  scope = scope.not_deleted
+                elsif scope.respond_to?(:active)
+                  scope = scope.active
                 end
 
                 scope.each do |item|
@@ -173,21 +180,30 @@ module Canvas::Migration::Helpers
           end
         else
           SELECTIVE_CONTENT_TYPES.each do |type, title|
+            next if type == 'groups'
+
+            count = 0
             if type == 'course_settings' || type == 'syllabus_body'
               content_list << {type: type, property: "copy[all_#{type}]", title: title.call}
+              next
             elsif type == 'wiki_pages'
-              count = source.wiki.wiki_pages.count
-              next if count == 0
-              hash = {type: type, property: "copy[all_#{type}]", title: title.call, count: count}
-              add_url!(hash, type)
-              content_list << hash
+              count = source.wiki.wiki_pages.not_deleted.count
+            elsif type == 'discussion_topics'
+              count = source.discussion_topics.active.only_discussion_topics.count
             elsif source.respond_to?(type) && source.send(type).respond_to?(:count)
-              count = source.send(type).count
-              next if count == 0
-              hash = {type: type, property: "copy[all_#{type}]", title: title.call, count: count}
-              add_url!(hash, type)
-              content_list << hash
+              scope = source.send(type)
+              if scope.respond_to?(:not_deleted)
+                scope = scope.not_deleted
+              elsif scope.respond_to?(:active)
+                scope = scope.active
+              end
+              count = scope.count
             end
+
+            next if count == 0
+            hash = {type: type, property: "copy[all_#{type}]", title: title.call, count: count}
+            add_url!(hash, type)
+            content_list << hash
           end
         end
       end
@@ -215,10 +231,10 @@ module Canvas::Migration::Helpers
     end
 
     def course_assignment_data(content_list, source_course)
-      source_course.assignment_groups.includes(:assignments).select("id, name").each do |group|
+      source_course.assignment_groups.active.includes(:assignments).select("id, name").each do |group|
         item = course_item_hash('assignment_groups', group)
         content_list << item
-        group.assignments.select(:id).select(:title).each do |asmnt|
+        group.assignments.active.select(:id).select(:title).each do |asmnt|
           item[:sub_items] ||= []
           item[:sub_items] << course_item_hash('assignments', asmnt)
         end
@@ -238,6 +254,17 @@ module Canvas::Migration::Helpers
       end
     end
 
+    def separate_announcements(course_data)
+      return course_data unless course_data['discussion_topics']
 
+      announcements, topics = course_data['discussion_topics'].partition{|topic_hash| topic_hash['type'] == 'announcement'}
+
+      if announcements.any?
+        course_data['announcements'] ||= []
+        course_data['announcements'] += announcements
+        course_data['discussion_topics'] = topics
+      end
+      course_data
+    end
   end
 end

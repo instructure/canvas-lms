@@ -24,7 +24,6 @@ require [
 
     # click to show it
     @$trigger.click()
-    ok @$target.is('[aria-expanded=true]:visible:focus'), "target is shown (and focused since it has a tabindex)"
     msg = 'Handles `data-html-while-target-shown`'
     equal @$trigger.text(), 'Hide Thing', msg
     equal @$otherTrigger.text(), 'while shown', msg

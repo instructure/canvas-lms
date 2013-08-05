@@ -366,6 +366,7 @@ describe Attachment do
 
   context "scribd cleanup" do
     def fake_scribd_doc(doc_id = String.random(8))
+      ScribdAPI.stubs(:enabled?).returns(true)
       scribd_doc = Scribd::Document.new
       scribd_doc.doc_id = doc_id
       scribd_doc.secret_password = 'asdf'
@@ -374,6 +375,7 @@ describe Attachment do
     end
 
     def attachment_with_scribd_doc(doc = fake_scribd_doc, opts = {})
+      ScribdAPI.stubs(:enabled?).returns(true)
       att = attachment_model(opts)
       att.scribd_doc = doc
       att.save!
@@ -468,6 +470,7 @@ describe Attachment do
       ScribdAPI.stubs(:get_status).returns(:status_from_scribd)
       ScribdAPI.stubs(:set_user).returns(true)
       ScribdAPI.stubs(:upload).returns(Scribd::Document.new)
+      ScribdAPI.stubs(:enabled?).returns(true)
     end
 
     it "should have a default conversion_status of :not_submitted for attachments that haven't been submitted" do
@@ -526,6 +529,30 @@ describe Attachment do
       Attachment.uploadable.size.should eql(2)
       Attachment.uploadable.should be_include(Attachment.find(attachments[1].id))
       Attachment.uploadable.should be_include(Attachment.find(attachments[2].id))
+    end
+
+    context "by_content_types" do
+      before do
+        course_model
+        @gif = attachment_model :context => @course, :content_type => 'image/gif'
+        @jpg = attachment_model :context => @course, :content_type => 'image/jpeg'
+        @weird = attachment_model :context => @course, :content_type => "%/what's this"
+      end
+
+      it "should match type" do
+        @course.attachments.by_content_types(['image']).pluck(:id).sort.should == [@gif.id, @jpg.id].sort
+      end
+
+      it "should match type/subtype" do
+        @course.attachments.by_content_types(['image/gif']).pluck(:id).should == [@gif.id]
+        @course.attachments.by_content_types(['image/gif', 'image/jpeg']).pluck(:id).sort.should == [@gif.id, @jpg.id].sort
+      end
+
+      it "should escape sql and wildcards" do
+        @course.attachments.by_content_types(['%']).pluck(:id).should == [@weird.id]
+        @course.attachments.by_content_types(["%/what's this"]).pluck(:id).should == [@weird.id]
+        @course.attachments.by_content_types(["%/%"]).pluck(:id).should == []
+      end
     end
   end
 
@@ -1284,6 +1311,17 @@ describe Attachment do
       Message.find_by_user_id_and_notification_name(@student.id, 'New File Added').should be_nil
       Message.find_by_user_id_and_notification_name(@teacher.id, 'New File Added').should_not be_nil
     end
+
+    it "should not fail if the attachment context does not have participants" do
+      cm = ContentMigration.create!
+      attachment_model(:context => cm, :uploaded_data => stub_file_data('file.txt', nil, 'text/html'), :content_type => 'text/html')
+
+      Attachment.where(:id => @attachment).update_all(:need_notify => true)
+
+      new_time = Time.now + 10.minutes
+      Time.stubs(:now).returns(new_time)
+      Attachment.do_notifications
+    end
   end
 
   context "quota" do
@@ -1328,6 +1366,7 @@ end
 
 # Makes sure we have a value in scribd_mime_types and that the attachment model points to that.
 def scribdable_attachment_model
+  ScribdAPI.stubs(:enabled?).returns(true)
   scribd_mime_type_model(:extension => 'pdf')
   attachment_model(:content_type => 'application/pdf')
 end

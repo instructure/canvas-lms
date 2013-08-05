@@ -74,9 +74,11 @@ class AccountAuthorizationConfigsController < ApplicationController
       render :json => aacs_json(@account.account_authorization_configs)
     else
       @account_configs = @account.account_authorization_configs.to_a
-      @saml_identifiers = Onelogin::Saml::NameIdentifiers::ALL_IDENTIFIERS
-      @saml_login_attributes = AccountAuthorizationConfig.saml_login_attributes
-      @saml_authn_contexts = [["No Value", nil]] + Onelogin::Saml::AuthnContexts::ALL_CONTEXTS.sort
+      if AccountAuthorizationConfig.saml_enabled
+        @saml_identifiers = Onelogin::Saml::NameIdentifiers::ALL_IDENTIFIERS
+        @saml_login_attributes = AccountAuthorizationConfig.saml_login_attributes
+        @saml_authn_contexts = [["No Value", nil]] + Onelogin::Saml::AuthnContexts::ALL_CONTEXTS.sort
+      end
     end
   end
 

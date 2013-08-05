@@ -28,10 +28,11 @@ class AssignmentsController < ApplicationController
   before_filter :require_context
   add_crumb(proc { t '#crumbs.assignments', "Assignments" }, :except => [:destroy, :syllabus, :index]) { |c| c.send :course_assignments_path, c.instance_variable_get("@context") }
   before_filter { |c| c.active_tab = "assignments" }
+  before_filter :normalize_title_param, :only => [:new, :edit]
   
   def index
     if @context == @current_user || authorized_action(@context, @current_user, :read)
-      get_all_pertinent_contexts
+      get_all_pertinent_contexts  # NOTE: this crap is crazy.  can we get rid of it?
       get_sorted_assignments
       add_crumb(t('#crumbs.assignments', "Assignments"), (@just_viewing_one_course ? named_context_url(@context, :context_assignments_url) : "/assignments" ))
       @context= (@just_viewing_one_course ? @context : @current_user)
@@ -45,7 +46,17 @@ class AssignmentsController < ApplicationController
             format.html { redirect_to root_url }
           end
         elsif @just_viewing_one_course && @context.assignments.new.grants_right?(@current_user, session, :update)
-          format.html
+          format.html {
+            if @domain_root_account.enable_draft?
+              js_env({
+                :NEW_ASSIGNMENT_URL => new_polymorphic_url([@context, :assignment]),
+                :COURSE_URL => api_v1_course_url(@context)
+              })
+              render :action => :new_teacher_index
+            else
+              render :action => :index
+            end
+          }
         else
           @current_user_submissions ||= @current_user && @current_user.submissions.
               select([:id, :assignment_id, :score, :workflow_state]).
@@ -323,10 +334,11 @@ class AssignmentsController < ApplicationController
         :ASSIGNMENT_OVERRIDES =>
           (assignment_overrides_json(@assignment.overrides_visible_to(@current_user)))
       }
-      hash[:ASSIGNMENT] = assignment_json(@assignment, @current_user, session, true, nil, false)
+      hash[:ASSIGNMENT] = assignment_json(@assignment, @current_user, session, override_dates: false)
       hash[:URL_ROOT] = polymorphic_url([:api_v1, @context, :assignments])
       hash[:CANCEL_TO] = @assignment.new_record? ? polymorphic_url([@context, :assignments]) : polymorphic_url([@context, @assignment])
       hash[:CONTEXT_ID] = @context.id
+      hash[:CONTEXT_ACTION_SOURCE] = :assignments
       js_env(hash)
       render :action => "edit"
     end
@@ -405,6 +417,12 @@ class AssignmentsController < ApplicationController
     return unless assignment_params
     if (group_id = assignment_params.delete(:assignment_group_id)).present?
       group = @context.assignment_groups.find(group_id)
+    end
+  end
+
+  def normalize_title_param
+    if title = params.delete(:name)
+      params[:title] = title
     end
   end
 

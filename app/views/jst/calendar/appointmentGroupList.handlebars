@@ -1,8 +1,4 @@
 {{#if appointment_groups}}
-  <div class="scheduler-header">
-    <h2 id="appointment-group-list-header">{{#t "my_appointment_groups"}}My Appointment Groups{{/t}}</h2>
-    <button class="btn single_item_done_button">Done, Go Back To List</button>
-  </div>
   <ul class="scheduler-content" id="appointment-group-list">
     {{#each appointment_groups}}
       <li class='appointment-group-item admin-link-hover-area {{#if requiring_action}}requiring-action{{/if}} {{#unless published}}unpublished-ag{{/unless}}' data-appointment-group-id='{{id}}'>

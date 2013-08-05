@@ -282,7 +282,7 @@ describe "scheduler" do
       fj('.fc-event:visible').click
 
       keep_trying_until { ff('#attendees li').size.should == 1 }
-      f('.single_item_done_button').click
+      f('.scheduler_done_button').click
     end
 
     it "should allow removing individual appointment groups" do
@@ -323,7 +323,7 @@ describe "scheduler" do
       wait_for_ajaximations
       fj('.fc-event:visible').click
       ff('#attendees li').size.should == 1
-      f('.single_item_done_button').click
+      f('.scheduler_done_button').click
     end
 
     it "should allow me to create a course with multiple contexts" do

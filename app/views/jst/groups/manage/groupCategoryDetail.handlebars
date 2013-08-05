@@ -1,0 +1,43 @@
+<div class="pull-right">
+  <a href="#" class="btn add-group">{{#t "add_group"}}Add Group{{/t}}</a>
+  <span>
+    <a class="al-trigger btn">
+      <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
+      <span class="screenreader-only">Settings</span>
+    </a>
+    <ul class="al-options">
+      <li><a href="#" class="icon-edit edit-category">Edit</a></li>
+      <li><a href="#" class="icon-trash delete-category">Delete</a></li>
+    </ul>
+  </span>
+</div>
+
+{{#if mooc}}
+  <input type="text" class="input-medium search-query" placeholder="{{#t "search"}}search{{/t}}">
+{{/if}}
+
+<div>{{groupCountText}}
+  {{#ifEqual ENV.group_user_type "student"}}
+    {{#t "student_group_instructions"}}(drag students to assign){{/t}}
+  {{else}}
+    {{#t "user_group_instructions"}}(drag users to assign){{/t}}
+  {{/ifEqual}}
+</div>
+
+{{#if selfSignup}}
+  <div>
+    {{#t "self_signup_blurb"}}Self sign-up is enabled for these groups.{{/t}}
+    <a href="#" class="self_signup_help_link" title="{{#t "self_signup_help_tooltip"}}What Are Self Sign-Up Groups?{{/t}}"><i class="icon-question-sign"></i></a>
+    {{#if restrictedSelfSignup}}
+      <span>{{#t "restricted_self_signup_blurb"}}All students in a group are required to be in the same section.{{/t}}</span>
+    {{/if}}
+    {{#if groupLimit}}
+      <p>{{#t "group_limit_blurb"}}Groups are limited to <strong>{{count}}</strong> members{{/t}}</p>
+    {{/if}}
+  </div>
+{{/if}}
+
+{{#if studentOrganized}}
+  <div class="alert"><i class="icon-warning-sign"></i> {{#t "self_organized_warning"}}These groups are self-organized by students.  Unlike other types of groups, students can belong to more than one of these groups at a time, so these groups may not be the best solution for graded assignments.{{/t}}</div>
+{{/if}}
+

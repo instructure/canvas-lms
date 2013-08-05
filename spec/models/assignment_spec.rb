@@ -1330,6 +1330,13 @@ describe Assignment do
         assignment_model(:context => @course)
         @a.messages_sent.should be_include('Assignment Created')
       end
+
+      it "should not create a message in an unpublished course" do
+        Notification.create(:name => 'Assignment Created')
+        course_with_teacher(:active_user => true)
+        assignment_model(:context => @course)
+        @a.messages_sent.should_not be_include('Assignment Created')
+      end
     end
 
     context "varied due date notifications" do
@@ -2258,6 +2265,32 @@ describe Assignment do
       a.save!
       a.external_tool_tag.url.should == "http://example.com/launch2"
       a.external_tool_tag.should == tag
+    end
+  end
+
+  describe "allowed_extensions=" do
+    it "should accept a string as input" do
+      a = Assignment.new
+      a.allowed_extensions = "doc,xls,txt"
+      a.allowed_extensions.should == ["doc", "xls", "txt"]
+    end
+
+    it "should accept an array as input" do
+      a = Assignment.new
+      a.allowed_extensions = ["doc", "xls", "txt"]
+      a.allowed_extensions.should == ["doc", "xls", "txt"]
+    end
+
+    it "should sanitize the string" do
+      a = Assignment.new
+      a.allowed_extensions = ".DOC, .XLS, .TXT"
+      a.allowed_extensions.should == ["doc", "xls", "txt"]
+    end
+
+    it "should sanitize the array" do
+      a = Assignment.new
+      a.allowed_extensions = [".DOC", " .XLS", " .TXT"]
+      a.allowed_extensions.should == ["doc", "xls", "txt"]
     end
   end
 end

@@ -1,0 +1,164 @@
+@import "environment.sass";
+@import "utilities/context_search";
+
+$subtleBorderColor: #e5e5e5;
+
+.compose-message-dialog {
+
+  .ui-dialog-titlebar {
+    border-bottom: 1px solid $subtleBorderColor;
+    background-color: #f5f5f5;
+    background-image: none;
+
+  }
+
+  .ui-dialog-buttonset.attachments {
+    float: left;
+
+    .ui-button {
+      padding: 4px 5px;
+      color: #555555;
+      margin: .5em 0;
+    }
+  }
+
+  .ui-widget-header a {
+    color: #555555;
+  }
+  .ui-widget-header a:hover {
+    color: #000000;
+  }
+
+  .ui-dialog-titlebar-close {
+
+  }
+
+  .ui-dialog-buttonpane {
+    box-shadow: none;
+    padding-left: 1em;
+  }
+
+  .ui-dialog-buttonset {
+    .send-message {
+      min-width: 80px;
+    }
+  }
+}
+
+#compose-new-message {
+  padding-top: 1em;
+  padding-bottom: 0 !important;
+  overflow: hidden;
+  margin: 0;
+
+  form {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+  }
+
+  .form-horizontal .controls {
+    margin-left: 100px;
+  }
+
+  #compose-message-subject {
+    width: 100%;
+  }
+
+  .header-separator {
+    margin: 10px -14px 15px -14px;
+  }
+
+  .control-group {
+    margin-bottom: 5px;
+  }
+
+  .control-label {
+    width: 80px;
+  }
+
+  .form-dialog-content {
+    bottom: 20px;
+  }
+
+  .message-header {
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+  }
+
+  .message-body {
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    width: 100%;
+  }
+
+  .attachments-pane {
+    border: none;
+    height: 0;
+
+    &.has-items {
+      border-top: 1px solid $subtleBorderColor;
+      min-height: 100px;
+      margin: .5em -1em 0;
+    }
+  }
+
+  .conversation_body {
+    max-height: none;
+    width: 100%;
+    bottom: 0;
+    resize: none;
+    overflow-y: auto;
+    border: none;
+    box-shadow: none;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+  }
+
+  .token_input {
+    min-width: 260px;
+    padding: 4px 6px;
+    border: 1px solid #cccccc;
+    line-height: inherit;
+
+    @include border-radius(4px);
+    a.browser {
+      top: 4px;
+      right: 5px;
+    }
+    &.browsable > div {
+      padding-right: 25px;
+    }
+    &.active {
+      border-color: rgba(82, 168, 236, 0.8);
+      box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(82, 168, 236, 0.6);
+    }
+  }
+
+  .message-header {
+    display: table;
+    width: 100%;
+
+    .message-header-row {
+      display: table-row;
+    }
+    .message-header-label {
+      display: table-cell;
+      box-sizing: border-box;
+      -moz-box-sizing: border-box;
+      padding: 5px 15px 5px 5px;
+      text-align: right;
+      width: 90px;
+    }
+
+    .message-header-input {
+      display: table-cell;
+
+      input {
+        box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        height: auto;
+      }
+    }
+  }
+}

@@ -79,7 +79,30 @@ describe "Pages API", :type => :integration do
         
         urls.should == @wiki.wiki_pages.sort_by(&:id).collect(&:url)
       end
-      
+
+      it "should search for pages by title" do
+        new_pages = []
+        3.times { |i| new_pages << @wiki.wiki_pages.create!(:title => "New Page #{i}") }
+
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/pages?search_term=new",
+                        :controller=>'wiki_pages_api', :action=>'index', :format=>'json', :course_id=>@course.to_param, :search_term => "new")
+        json.size.should == 3
+        json.collect{ |page| page['url'] }.should == new_pages.sort_by(&:id).collect(&:url)
+
+        # Should also paginate
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/pages?search_term=New&per_page=2",
+                        :controller=>'wiki_pages_api', :action=>'index', :format=>'json', :course_id=>@course.to_param, :search_term => "New", :per_page => "2")
+        json.size.should == 2
+        urls = json.collect{ |page| page['url'] }
+
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/pages?search_term=New&per_page=2&page=2",
+                        :controller=>'wiki_pages_api', :action=>'index', :format=>'json', :course_id=>@course.to_param, :search_term => "New", :per_page => "2", :page => "2")
+        json.size.should == 1
+        urls += json.collect{ |page| page['url'] }
+
+        urls.should == new_pages.sort_by(&:id).collect(&:url)
+      end
+
       describe "sorting" do
         it "should sort by title (case-insensitive)" do
           @wiki.wiki_pages.create! :title => 'gIntermediate Page'
@@ -135,6 +158,7 @@ describe "Pages API", :type => :integration do
                      "editing_roles" => "teachers",
                      "last_edited_by" => user_display_json(@teacher, @course).stringify_keys!,
                      "url" => @hidden_page.url,
+                     "html_url" => "http://www.example.com/courses/#{@course.id}/wiki/#{@hidden_page.url}",
                      "created_at" => @hidden_page.created_at.as_json,
                      "updated_at" => @hidden_page.updated_at.as_json,
                      "title" => @hidden_page.title,
@@ -156,6 +180,7 @@ describe "Pages API", :type => :integration do
         expected = { "hide_from_students" => false,
                      "editing_roles" => "teachers",
                      "url" => page.url,
+                     "html_url" => "http://www.example.com/courses/#{@course.id}/wiki/#{page.url}",
                      "created_at" => page.created_at.as_json,
                      "updated_at" => page.updated_at.as_json,
                      "title" => page.title,
@@ -202,7 +227,7 @@ describe "Pages API", :type => :integration do
                         { :wiki_page => { :title => 'New Wiki Page!', :body => 'hello new page', :front_page => true}})
 
         page = @course.wiki.wiki_pages.find_by_url!(json['url'])
-        page.front_page?.should be_true
+        page.is_front_page?.should be_true
 
         wiki = @course.wiki
         wiki.reload
@@ -282,7 +307,7 @@ describe "Pages API", :type => :integration do
                                    :body => 'Information wants to be free', :front_page => true }})
         no_longer_hidden_page = @hidden_page
         no_longer_hidden_page.reload
-        no_longer_hidden_page.front_page?.should be_true
+        no_longer_hidden_page.is_front_page?.should be_true
 
         wiki.reload
         wiki.front_page.should == no_longer_hidden_page
@@ -301,7 +326,7 @@ describe "Pages API", :type => :integration do
                                    :body => 'Information wants to be free', :front_page => false }})
 
         front_page.reload
-        front_page.front_page?.should be_false
+        front_page.is_front_page?.should be_false
 
         wiki.reload
         wiki.front_page.should be_nil
@@ -319,7 +344,7 @@ describe "Pages API", :type => :integration do
                  { :wiki_page => { :url => 'noooo' }})
 
         page.reload
-        page.front_page?.should be_true
+        page.is_front_page?.should be_true
 
         wiki = @course.wiki
         wiki.reload
@@ -335,7 +360,7 @@ describe "Pages API", :type => :integration do
                  {:expected_status => 400})
 
         @hidden_page.reload
-        @hidden_page.front_page?.should_not be_true
+        @hidden_page.is_front_page?.should_not be_true
       end
 
       context "with unpublished page" do

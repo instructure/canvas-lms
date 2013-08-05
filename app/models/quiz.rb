@@ -947,6 +947,7 @@ class Quiz < ActiveRecord::Base
 
   def self.process_migration(data, migration, question_data)
     assessments = data['assessments'] ? data['assessments']['assessments'] : []
+    assessments ||= []
     assessments.each do |assessment|
       migration_id = assessment['migration_id'] || assessment['assessment_id']
       if migration.import_object?("quizzes", migration_id)
@@ -1160,10 +1161,21 @@ class Quiz < ActiveRecord::Base
   end
 
   def publish!
+    self.generate_quiz_data
     self.workflow_state = 'available'
     self.published_at = Time.zone.now
     save!
     self
+  end
+
+  def unpublish!
+    self.workflow_state = 'unpublished'
+    save!
+    self
+  end
+
+  def can_unpublish?
+    !has_student_submissions?
   end
 
   # marks a quiz as having unpublished changes

@@ -30,9 +30,13 @@ define [
     updateModelData: -> 
       sub_data = {}
       sub_data[@$currentDay.val()] = @$subDay.val()
+      @updateName()
 
       @model.clear()
       @model.set sub_data
+
+    updateName: ->
+      @$subDay.attr 'name', "date_shift_options[day_substitutions][#{@$currentDay.val()}]"
       
     # Remove the model from both the view and 
     # the collection it belongs to.

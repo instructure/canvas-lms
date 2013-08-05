@@ -103,6 +103,26 @@ describe "Canvas::Redis" do
       end
     end
 
+    it "should fail separate servers separately" do
+      Redis::Client.any_instance.unstub(:ensure_connected)
+
+      cache = ActiveSupport::Cache::RedisStore.new([Canvas.redis.id, 'redis://nonexistent:1234/0'])
+      client = cache.instance_variable_get(:@data)
+      key2 = 2
+      while client.node_for('1') == client.node_for(key2.to_s)
+        key2 += 1
+      end
+      key2 = key2.to_s
+      client.node_for('1').should_not == client.node_for(key2)
+      client.nodes.last.id.should == 'redis://nonexistent:1234/0'
+      client.nodes.last.client.expects(:ensure_connected).raises(Redis::TimeoutError).once
+
+      cache.write('1', true)
+      cache.write(key2, true)
+      # one returned nil, one returned true; we don't know which one which key ended up on
+      [cache.fetch('1'), cache.fetch(key2)].compact.should == [true]
+    end
+
     it "should not fail raw redis commands" do
       Canvas.redis.setnx('my_key', 5).should == nil
     end

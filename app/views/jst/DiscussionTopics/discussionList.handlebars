@@ -1,17 +1,18 @@
 <div class="ig-header">
-    <span class="element_toggler"
-          aria-controls="{{listID}}"
-          role="button">
+    <a class="element_toggler"
+       href="#"
+       aria-controls="{{listID}}"
+       aria-expanded="true">
       <i class="icon-mini-arrow-down"></i>
       {{title}}
-    </span>
+    </a>
 
     {{#if titleHelp}}
       <span class="pull-right title-help">{{titleHelp}}</span>
     {{/if}}
 </div>
 
-<div id="{{listID}}" aria-expanded="true">
+<div id="{{listID}}">
   <ul class="collectionViewItems ig-list">
   </ul>
 

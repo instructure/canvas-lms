@@ -46,7 +46,7 @@ class SessionPersistenceToken < ActiveRecord::Base
   def self.generate(pseudonym)
     salt = SecureRandom.hex(8)
     token = SecureRandom.hex(32)
-    self.create!(:pseudonym => pseudonym,
+    pseudonym.session_persistence_tokens.create!(
                  :token_salt => salt,
                  :uncrypted_token => token,
                  :crypted_token => self.hashed_token(salt, token))

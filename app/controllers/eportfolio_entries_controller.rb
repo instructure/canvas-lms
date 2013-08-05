@@ -69,7 +69,7 @@ class EportfolioEntriesController < ApplicationController
     @portfolio = Eportfolio.find(params[:eportfolio_id])
     if authorized_action(@portfolio, @current_user, :update)
       @entry = @portfolio.eportfolio_entries.find(params[:id])
-      @entry.parse_content(params)
+      @entry.parse_content(params) if params[:section_count]
       category_id = params[:eportfolio_entry].delete(:eportfolio_category_id)
       if category_id && category_id.to_i != @entry.eportfolio_category_id
         category = @portfolio.eportfolio_categories.find(category_id)

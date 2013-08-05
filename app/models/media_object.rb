@@ -66,11 +66,17 @@ class MediaObject < ActiveRecord::Base
     files = []
     root_account_id = attachments.map{|a| a.root_account_id }.compact.first
     attachments.select{|a| !a.media_object }.each do |attachment|
+      pseudonym = attachment.user.sis_pseudonym_for(attachment.context) if attachment.user
+      sis_source_id, sis_user_id = "", ""
+      if Kaltura::ClientV3.config['kaltura_sis'].present? && Kaltura::ClientV3.config['kaltura_sis'] == "1"
+        sis_source_id = %Q[,"sis_source_id":"#{attachment.context.sis_source_id}"] if attachment.context.respond_to?('sis_source_id') && attachment.context.sis_source_id
+        sis_user_id = %Q[,"sis_user_id":"#{pseudonym ? pseudonym.sis_user_id : ''}"] if pseudonym
+      end
       files << {
                   :name       => attachment.display_name,
                   :url        => attachment.cacheable_s3_download_url,
                   :media_type => (attachment.content_type || "").match(/\Avideo/) ? 'video' : 'audio',
-                  :id         => attachment.id
+                  :partner_data  => %Q[{"attachment_id":"#{attachment.id}","context_source":"file_upload" #{sis_source_id} #{sis_user_id}}]
                }
     end
     res = client.bulkUploadAdd(files)
@@ -126,7 +132,14 @@ class MediaObject < ActiveRecord::Base
   def self.build_media_objects(data, root_account_id)
     root_account = Account.find_by_id(root_account_id)
     data[:entries].each do |entry|
-      attachment = Attachment.find_by_id(entry[:originalId]) if entry[:originalId].present?
+      attachment_id = nil
+      if entry[:originalId].present? && (Integer(entry[:originalId]).is_a?(Integer) rescue false)
+        attachment_id = entry[:originalId]
+      elsif entry[:originalId].present? && entry[:originalId].length >= 2
+        partner_data = JSON.parse(entry[:originalId]).with_indifferent_access
+        attachment_id = partner_data[:attachment_id] if partner_data[:attachment_id].present?
+      end
+      attachment = Attachment.find_by_id(attachment_id) if attachment_id
       mo = MediaObject.find_or_initialize_by_media_id(entry[:entryId])
       mo.root_account ||= root_account || Account.default
       mo.title ||= entry[:name]
@@ -200,6 +213,20 @@ class MediaObject < ActiveRecord::Base
 
   def media_sources
     Kaltura::ClientV3.new.media_sources(self.media_id)
+  end
+
+  def update_partner_data
+    client = Kaltura::ClientV3.new
+    client.startSession(Kaltura::SessionType::ADMIN)
+    entry = client.mediaGet(self.media_id)
+    partner_data = entry[:partnerData] && entry[:partnerData].length >=2 ?JSON.parse(entry[:partnerData]) : {}
+    pseudonym = self.user.sis_pseudonym_for(self.context)
+    sis_source_id = self.context.sis_source_id
+    partner_data[:sis_source_id] = sis_source_id if sis_source_id
+    partner_data[:sis_user_id] = pseudonym.sis_user_id if pseudonym && pseudonym.sis_user_id
+    if partner_data[:sis_user_id].present? || partner_data[:sis_source_id].present?
+      res = client.mediaUpdate(self.media_id, :partnerData => partner_data.to_json)
+    end
   end
   
   def retrieve_details_ensure_codecs(attempt=0)

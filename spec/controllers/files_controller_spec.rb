@@ -424,6 +424,15 @@ describe FilesController do
       proc { get "show_relative", :course_id => @course.id, :file_path => @file.full_display_path+"blah" }.should raise_error(ActiveRecord::RecordNotFound)
       proc { get "show_relative", :file_id => @file.id, :course_id => @course.id, :file_path => @file.full_display_path+"blah" }.should raise_error(ActiveRecord::RecordNotFound)
     end
+
+    it "should ignore bad file_ids" do
+      course_with_teacher_logged_in(:active_all => true)
+      file_in_a_module
+      get "show_relative", :file_id => @file.id + 1, :course_id => @course.id, :file_path => @file.full_display_path
+      response.should be_redirect
+      get "show_relative", :file_id => "blah", :course_id => @course.id, :file_path => @file.full_display_path
+      response.should be_redirect
+    end
   end
 
   describe "GET 'new'" do
@@ -686,6 +695,53 @@ describe FilesController do
       @attachment.save!
       post "api_create", params[:upload_params].merge(:file => @content)
       response.status.to_i.should == 400
+    end
+  end
+
+  describe "public_url" do
+    before do
+      course_with_student :active_all => true
+      assignment_model :course => @course, :submission_types => %w(online_upload)
+      attachment_model :context => @student
+      @submission = @assignment.submit_homework @student, :attachments => [@attachment]
+    end
+
+    context "with direct rights" do
+      before do
+        user_session @student
+      end
+
+      it "should give a download url" do
+        get "public_url", :id => @attachment.id
+        response.should be_success
+        data = json_parse
+        data.should == { "public_url" => @attachment.authenticated_s3_url }
+      end
+    end
+
+    context "without direct rights" do
+      before do
+        teacher_in_course :active_all => true
+        user_session @teacher
+      end
+
+      it "should fail if no submission_id is given" do
+        get "public_url", :id => @attachment.id
+        assert_unauthorized
+      end
+
+      it "should allow a teacher to download a student's submission" do
+        get "public_url", :id => @attachment.id, :submission_id => @submission.id
+        response.should be_success
+        data = json_parse
+        data.should == { "public_url" => @attachment.authenticated_s3_url }
+      end
+
+      it "should verify that the requested file belongs to the submission" do
+        otherfile = attachment_model
+        get "public_url", :id => otherfile, :submission_id => @submission.id
+        assert_unauthorized
+      end
     end
   end
 end

@@ -90,6 +90,7 @@ class WikiPagesApiController < ApplicationController
   #
   # @argument sort [optional] Sort results by this field: one of 'title', 'created_at', or 'updated_at'
   # @argument order [optional] The sorting order: 'asc' (default) or 'desc'
+  # @argument search_term (optional) The partial title of the pages to match and return.
   #
   # @example_request
   #     curl -H 'Authorization: Bearer <token>' \ 
@@ -103,6 +104,8 @@ class WikiPagesApiController < ApplicationController
       scope = @context.wiki.wiki_pages.select(WikiPage.column_names - ['body']).includes(:user)
       scope = @context.grants_right?(@current_user, session, :view_unpublished_items) ? scope.not_deleted : scope.active
       scope = scope.visible_to_students unless @context.grants_right?(@current_user, session, :view_hidden_items)
+
+      scope = scope.title_like(params[:search_term]) if params[:search_term]
 
       order_clause = case params[:sort]
         when 'title'
@@ -254,7 +257,7 @@ class WikiPagesApiController < ApplicationController
   end
 
   def get_front_page_params
-    @was_front_page = @page.front_page?
+    @was_front_page = @page.is_front_page?
     if params[:wiki_page] && params[:wiki_page].has_key?(:front_page)
       @set_front_page = true
       @set_as_front_page = value_to_boolean(params[:wiki_page].delete(:front_page))
@@ -272,7 +275,7 @@ class WikiPagesApiController < ApplicationController
       
       roles = page_params[:editing_roles]
       if roles.present?
-        page_params[:editing_roles] = roles.split(',').map(&:strip).reject{|role| !%w(teachers students public).include?(role)}.join(',')
+        page_params[:editing_roles] = roles.split(',').map(&:strip).reject{|role| !%w(teachers students members public).include?(role)}.join(',')
       end
     else
       # editing_roles only allow changing content, not title or attributes
@@ -286,7 +289,7 @@ class WikiPagesApiController < ApplicationController
 
   def process_front_page
     if @set_front_page
-      if @set_as_front_page && !@page.front_page?
+      if @set_as_front_page && !@page.is_front_page?
         return @page.set_as_front_page!
       elsif !@set_as_front_page
         return @wiki.unset_front_page!
@@ -294,7 +297,7 @@ class WikiPagesApiController < ApplicationController
     elsif @was_front_page
       if @page.deleted?
         return @wiki.unset_front_page!
-      elsif !@page.front_page?
+      elsif !@page.is_front_page?
         # if url changes, keep as front page
         return @page.set_as_front_page!
       end

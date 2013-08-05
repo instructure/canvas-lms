@@ -142,6 +142,9 @@ class ConferencesController < ApplicationController
         redirect_to named_context_url(@context, :context_url)
       end
     end
+  rescue StandardError => e
+    flash[:error] = t(:general_error_with_message, "There was an error joining the conference. Message: '%{message}'", :message => e.message)
+    redirect_to named_context_url(@context, :context_conferences_url)
   end
 
   def close

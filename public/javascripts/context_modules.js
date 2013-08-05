@@ -23,6 +23,8 @@ define([
   'compiled/views/context_modules/context_modules' /* handles the publish/unpublish state */,
   'compiled/util/vddTooltip',
   'jst/assignments/VddTooltip',
+  'compiled/models/Publishable',
+  'compiled/views/PublishButtonView',
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_date_and_time' /* parseFromISO, time_field, datetime_field */,
   'jquery.instructure_forms' /* formSubmit, fillFormData, formErrors, errorBox */,
@@ -36,7 +38,7 @@ define([
   'vendor/date' /* Date.parse */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'jqueryui/sortable' /* /\.sortable/ */
-], function(INST, I18n, $, ContextModulesView, vddTooltip, vddTooltipView) {
+], function(INST, I18n, $, ContextModulesView, vddTooltip, vddTooltipView, Publishable, PublishButtonView) {
 
   // TODO: AMD don't export global, use as module
   window.modules = (function() {
@@ -1260,6 +1262,14 @@ define([
         $module.find(".expand_module_link:first").triggerHandler('click', true);
       }
     });
+
+    $('.module-publish-link').each(function(i, element){
+      var $el = $(element);
+      var model = new Publishable({ published: $el.hasClass('published'), id: $el.attr('data-id') }, { url: $el.attr('data-url'), root: 'module' });
+      var view = new PublishButtonView({model: model, el: $el});
+      view.render();
+    });
+
   });
 
   return modules;

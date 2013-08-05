@@ -92,22 +92,25 @@ class ContentMigrationsController < ApplicationController
   def index
     return unless authorized_action(@context, @current_user, :manage_content)
 
+    Folder.root_folders(@context) # ensure course root folder exists so file imports can run
+
     @migrations = Api.paginate(@context.content_migrations.order("id DESC"), self, api_v1_course_content_migration_list_url(@context))
     content_migration_json_hash = content_migrations_json(@migrations, @current_user, session)
 
     if api_request?
       render :json => content_migration_json_hash
     else
-      @plugins = ContentMigration.migration_plugins(true)
+      @plugins = ContentMigration.migration_plugins(true).sort_by {|p| [p.metadata(:sort_order) || 100, p.metadata(:select_text)]}
 
       options = @plugins.map{|p| {:label => p.metadata(:select_text), :id => p.id}}
 
       js_env :UPLOAD_LIMIT => @context.storage_quota
       js_env :SELECT_OPTIONS => options
       js_env :QUESTION_BANKS => @context.assessment_question_banks.except(:include).select([:title, :id]).active
-      js_env :COURSES => @context.account.courses.active.all
       js_env :COURSE_ID => @context.id
       js_env :CONTENT_MIGRATIONS => content_migration_json_hash
+      js_env(:OLD_START_DATE => datetime_string(@context.start_at, :verbose, nil, true))
+      js_env(:OLD_END_DATE => datetime_string(@context.conclude_at, :verbose, nil, true))
     end
   end
 

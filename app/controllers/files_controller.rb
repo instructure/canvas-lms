@@ -118,9 +118,11 @@ class FilesController < ApplicationController
   # @API List files
   # Returns the paginated list of files for the folder.
   #
+  # @argument content_types[] [optional] Filter results by content-type. You can specify type/subtype pairs (e.g., 'image/jpeg'), or simply types (e.g., 'image', which will match 'image/gif', 'image/jpeg', etc.).
+  #
   # @example_request
   #
-  #   curl 'https://<canvas>/api/v1/folders/<folder_id>/files' \ 
+  #   curl 'https://<canvas>/api/v1/folders/<folder_id>/files?content_types[]=image&content_types[]=text/plain \
   #         -H 'Authorization: Bearer <token>'
   #
   # @returns [File]
@@ -140,6 +142,11 @@ class FilesController < ApplicationController
       else
         scope = scope.by_display_name
       end
+
+      if params[:content_types].present?
+        scope = scope.by_content_types(Array(params[:content_types]))
+      end
+
       @files = Api.paginate(scope, self, api_v1_list_files_url(@folder))
       render :json => attachments_json(@files, @current_user, {}, :can_manage_files => can_manage_files)
     end
@@ -218,9 +225,9 @@ class FilesController < ApplicationController
         # if the attachment is part of a submisison, its 'context' will be the student that submmited the assignment.  so if  @current_user is a 
         # teacher authorized_action(@attachment, @current_user, :download) will be false, we need to actually check if they have perms to see the 
         # submission.
-        if params[:submission_id] && (@submission = Submission.find(params[:submission_id]))
-          @attachment ||= @submission.submission_history.map(&:versioned_attachments).flatten.find{|a| a.id == params[:download].to_i }
-        end
+        @submission = Submission.find(params[:submission_id]) if params[:submission_id]
+        # verify that the requested attachment belongs to the submission
+        return render_unauthorized_action(@attachment) if @submission && !@submission.attachments.where(:id => params[:id]).any?
         if @submission ? authorized_action(@submission, @current_user, :read) : authorized_action(@attachment, @current_user, :download)
           render :json  => { :public_url => @attachment.authenticated_s3_url(:secure => request.ssl?) }
         end
@@ -338,12 +345,12 @@ class FilesController < ApplicationController
 
   def show_relative
     path = params[:file_path]
+    file_id = params[:file_id]
+    file_id = nil unless file_id.to_s =~ Api::ID_REGEX
 
     #if the relative path matches the given file id use that file
-    if params[:file_id].present? && @attachment = @context.attachments.find_by_id(params[:file_id])
-      if @attachment.matches_full_display_path?(path) || @attachment.matches_full_path?(path)
-        params[:id] = params[:file_id]
-      else
+    if file_id && @attachment = @context.attachments.find_by_id(file_id)
+      unless @attachment.matches_full_display_path?(path) || @attachment.matches_full_path?(path)
         @attachment = nil
       end
     end

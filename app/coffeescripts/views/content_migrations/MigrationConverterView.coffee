@@ -13,6 +13,10 @@ define [
     @optionProperty 'selectOptions'
 
     template: template
+
+    initialize: -> 
+      super
+      $.subscribe 'resetForm', @resetForm
     
     els: 
       '#converter'                : '$converter'
@@ -76,7 +80,7 @@ define [
     #
     # @api private
 
-    resetForm: -> 
+    resetForm: => 
       @$formActions.hide()
       @$converter.empty()
       @$chooseMigrationConverter.val('none')

@@ -116,7 +116,8 @@ define [
 
     setOptionProperties: ->
       for property in @constructor.__optionProperties__
-        @[property] = @options[property] if @options[property]?
+        @[property] = @options[property] if @options[property] isnt undefined
+
 
     ##
     # Renders the view, calls render hooks
@@ -230,6 +231,7 @@ define [
       return unless @constructor.__childViews__
       for {name, selector} in @constructor.__childViews__
         console?.warn?("I need a child view '#{name}' but one was not provided") unless @[name]?
+        continue unless @[name] # don't blow up if the view isn't present (or it's explicitly set to false)
         target = @$ selector
         @[name].setElement target
         @[name].render()

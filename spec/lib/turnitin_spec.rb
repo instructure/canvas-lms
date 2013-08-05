@@ -34,6 +34,16 @@ describe Turnitin::Client do
     @submission.reload
   end
 
+  describe "initialize" do
+    it "should default to using api.turnitin.com" do
+      Turnitin::Client.new('test_account', 'sekret').host.should == "api.turnitin.com"
+    end
+
+    it "should allow the endpoint to be configurable" do
+      Turnitin::Client.new('test_account', 'sekret', 'www.blah.com').host.should == "www.blah.com"
+    end
+  end
+
   describe "create assignment" do
     before(:each) do
       turnitin_assignment

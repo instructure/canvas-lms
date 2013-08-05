@@ -405,6 +405,49 @@ describe AccountsController do
         end
       end
     end
-  end
 
+    context "turnitin" do
+      before do
+        account_with_admin_logged_in
+      end
+
+      it "should allow setting turnitin values" do
+        post 'update', :id => @account.id, :account => {
+          :turnitin_account_id => '123456',
+          :turnitin_shared_secret => 'sekret',
+          :turnitin_host => 'secret.turnitin.com',
+          :turnitin_pledge => 'i will do it',
+          :turnitin_comments => 'good work',
+        }
+
+        @account.reload
+        @account.turnitin_account_id.should == '123456'
+        @account.turnitin_shared_secret.should == 'sekret'
+        @account.turnitin_host.should == 'secret.turnitin.com'
+        @account.turnitin_pledge.should == 'i will do it'
+        @account.turnitin_comments.should == 'good work'
+      end
+
+      it "should pull out the host from a valid url" do
+        post 'update', :id => @account.id, :account => {
+          :turnitin_host => 'https://secret.turnitin.com/'
+        }
+        @account.reload.turnitin_host.should == 'secret.turnitin.com'
+      end
+
+      it "should nil out the host if blank is passed" do
+        post 'update', :id => @account.id, :account => {
+          :turnitin_host => ''
+        }
+        @account.reload.turnitin_host.should be_nil
+      end
+
+      it "should error on an invalid host" do
+        post 'update', :id => @account.id, :account => {
+          :turnitin_host => 'blah'
+        }
+        response.should_not be_success
+      end
+    end
+  end
 end

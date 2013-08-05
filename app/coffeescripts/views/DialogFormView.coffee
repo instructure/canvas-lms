@@ -1,9 +1,10 @@
 define [
   'jquery'
   'compiled/views/ValidatedFormView'
+  'compiled/fn/preventDefault'
   'jst/DialogFormWrapper'
   'jqueryui/dialog'
-], ($, ValidatedFormView, wrapper) ->
+], ($, ValidatedFormView, preventDefault, wrapper) ->
 
   ##
   # Creates a form dialog.
@@ -69,6 +70,7 @@ define [
     # @api public
     close: ->
       @dialog.close()
+      @$trigger?.focus()
 
     ##
     # @api public
@@ -119,7 +121,7 @@ define [
     ##
     # @api private
     attachTrigger: ->
-      @$trigger.on 'click.dialogFormView', @toggle
+      @$trigger?.on 'click.dialogFormView', preventDefault(@toggle)
 
     ##
     # @api private
@@ -139,11 +141,11 @@ define [
     # @api private
     getDialogTitle: ->
       @options.title or
-      @$trigger.attr('title') or
+      @$trigger?.attr('title') or
       @getAriaTitle()
 
     getAriaTitle: ->
-      ariaID = @$trigger.attr 'aria-describedby'
+      ariaID = @$trigger?.attr 'aria-describedby'
       $("##{ariaID}").text()
 
     ##
@@ -159,6 +161,14 @@ define [
       @$el.dialog(opts)
       @$el.fixDialogButtons() if @options.fixDialogButtons
       @dialog = @$el.data 'dialog'
+
+    setDimensions: (width, height) ->
+      width = if width? then width else @options.width
+      height = if height? then height else @options.height
+      opts =
+        width: width
+        height: height
+      @$el.dialog(opts)
 
     ##
     # @api private

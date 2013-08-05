@@ -58,22 +58,38 @@ class AssignmentGroupsController < ApplicationController
   #
   # @argument include[] ["assignments","discussion_topic"] Associations to include with the group.
   # "discussion_topic" is only valid if "assignments" is also included
+  # @argument override_assignment_dates [Optional, Boolean]
+  #   Apply assignment overrides for each assignment, defaults to true.
   #
   # @returns [Assignment Group]
   def index
-    @groups = @context.assignment_groups.active
-
-    params[:include] = Array(params[:include])
-    if params[:include].include? 'assignments'
-      params[:include] << "discussion_topic"
-      @groups = @groups.includes(:assignments => [:rubric, :discussion_topic])
-    end
-
     if authorized_action(@context.assignment_groups.new, @current_user, :read)
+      @groups = @context.assignment_groups.active
+
+      params[:include] = Array(params[:include])
+      if params[:include].include? 'assignments'
+        assignment_includes = [:rubric, :quiz, :external_tool_tag]
+        assignment_includes.concat(params[:include] & [:discussion_topic])
+        @groups = @groups.includes(:active_assignments => assignment_includes)
+
+        assignment_descriptions = @groups
+          .flat_map(&:active_assignments)
+          .map(&:description)
+        user_content_attachments = api_bulk_load_user_content_attachments(
+          assignment_descriptions, @context, @current_user
+        )
+
+        params[:override_assignment_dates] ||= true
+        override_dates = value_to_boolean(params[:override_assignment_dates])
+      end
+
       respond_to do |format|
         format.json {
           json = @groups.map { |g|
-            assignment_group_json(g, @current_user, session, params[:include])
+            g.context = @context
+            assignment_group_json(g, @current_user, session, params[:include],
+                                  override_assignment_dates: override_dates,
+                                  preloaded_user_content_attachments: user_content_attachments)
           }
           render :json => json
         }

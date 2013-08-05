@@ -39,6 +39,7 @@ class ApplicationController < ActionController::Base
   before_filter :set_user_id_header
   before_filter :set_time_zone
   before_filter :set_page_view
+  before_filter :refresh_cas_ticket
   after_filter :log_page_view
   after_filter :discard_flash_if_xhr
   after_filter :cache_buster
@@ -709,6 +710,12 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def refresh_cas_ticket
+    if session[:cas_session] && @current_pseudonym
+      @current_pseudonym.claim_cas_ticket(session[:cas_session])
+    end
+  end
+
   def generate_page_view
     attributes = { :user => @current_user, :developer_key => @developer_key, :real_user => @real_current_user }
     @page_view = PageView.generate(request, attributes)
@@ -979,7 +986,7 @@ class ApplicationController < ActionController::Base
         @page.workflow_state = 'active'
       end
     end
-    if @page.front_page? && @page.new_record?
+    if @page.is_front_page? && @page.new_record?
       @page.body = t "#application.wiki_front_page_default_content_course", "Welcome to your new course wiki!" if @context.is_a?(Course)
       @page.body = t "#application.wiki_front_page_default_content_group", "Welcome to your new group wiki!" if @context.is_a?(Group)
     end
@@ -1510,5 +1517,9 @@ class ApplicationController < ActionController::Base
         action.call
       end
     end
+  end
+
+  def not_found
+    raise ActionController::RoutingError.new('Not Found')
   end
 end
