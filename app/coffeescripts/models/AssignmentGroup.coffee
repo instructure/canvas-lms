@@ -1,13 +1,18 @@
 define [
   'Backbone'
   'compiled/backbone-ext/DefaultUrlMixin'
-], (Backbone, DefaultUrlMixin) ->
+  'compiled/collections/AssignmentCollection'
+], (Backbone, DefaultUrlMixin, AssignmentCollection) ->
 
   class AssignmentGroup extends Backbone.Model
     @mixin DefaultUrlMixin
     resourceName: 'assignment_groups'
 
     urlRoot: -> @_defaultUrl()
+
+    initialize: ->
+      if (assignments = @get('assignments'))?
+        @set 'assignments', new AssignmentCollection(assignments)
 
     name: (newName) ->
       return @get 'name' unless arguments.length > 0

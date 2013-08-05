@@ -9,7 +9,7 @@
 {{#unless chosen}}
   <select name="rules[never_drop][]" aria-labelledby="ag_{{label_id}}_never_drop">
     {{#each assignments}}
-      <option value="{{id}}">{{attributes.name}}</option>
+      <option value="{{id}}">{{name}}</option>
     {{/each}}
   </select>
 {{/unless}}

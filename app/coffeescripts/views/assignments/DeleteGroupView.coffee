@@ -26,11 +26,9 @@ define [
     template: template
     wrapperTemplate: wrapper
 
-    @optionProperty 'assignments'
-
     initialize: ->
       super
-      @assignments.on 'add remove', @updateAssignmentCount
+      @model.get('assignments').on 'add remove', @updateAssignmentCount
       @model.collection.on 'add', @addToGroupOptions
       @model.collection.on 'remove', @removeFromGroupOptions
 
@@ -42,13 +40,13 @@ define [
         model.toJSON()
 
       _.extend(data, {
-        assignment_count: @assignments.length
+        assignment_count: @model.get('assignments').length
         groups: groups_json
         label_id: data.id
       })
 
     updateAssignmentCount: =>
-      @$assignmentCount.text(@assignments.length)
+      @$assignmentCount.text(@model.get('assignments').length)
 
     addToGroupOptions: (model) =>
       id = model.get('id')
@@ -92,7 +90,7 @@ define [
       # make sure there is more than one assignment group
       if @model.collection.models.length > 1
         # check if it has assignments
-        if @assignments.length > 0
+        if @model.get('assignments').length > 0
           super
         else
           # no assignments, so just confirm

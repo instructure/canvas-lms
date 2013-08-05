@@ -245,6 +245,29 @@ describe "assignment groups" do
       f("#assignment_group_#{ag.id} .ig-header").text.should match "Modified Group"
     end
 
+    it "should not remove new assignments when editing a group" do
+      ag = @course.assignment_groups.first
+
+      f("#assignment_group_#{ag.id} .add_assignment").click
+      wait_for_ajaximations
+
+      replace_content(f("#ag_#{ag.id}_assignment_name"), "Disappear")
+      fj('.create_assignment:visible').click
+      wait_for_ajaximations
+
+      f("#assignment_group_#{ag.id} .ig-title").text.should match "Disappear"
+
+      f("#assignment_group_#{ag.id} .al-trigger").click
+      f("#assignment_group_#{ag.id} .edit_group").click
+      wait_for_ajaximations
+
+      replace_content(f("#ag_#{ag.id}_name"), "Modified Group")
+      fj('.create_group:visible').click
+      wait_for_ajaximations
+
+      f("#assignment_group_#{ag.id} .ig-title").text.should match "Disappear"
+    end
+
     it "should save drop rules" do
       ag = @course.assignment_groups.first
       f("#assignment_group_#{ag.id} .al-trigger").click

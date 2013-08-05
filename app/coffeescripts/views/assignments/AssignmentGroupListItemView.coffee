@@ -2,14 +2,13 @@ define [
   'i18n!assignments'
   'underscore'
   'compiled/class/cache'
-  'compiled/collections/AssignmentCollection'
   'compiled/views/CollectionView'
   'compiled/views/assignments/AssignmentListItemView'
   'compiled/views/assignments/CreateAssignmentView'
   'compiled/views/assignments/CreateGroupView'
   'compiled/views/assignments/DeleteGroupView'
   'jst/assignments/AssignmentGroupListItem'
-], (I18n, _, Cache, AssignmentCollection, CollectionView, AssignmentListItemView, CreateAssignmentView, CreateGroupView, DeleteGroupView, template) ->
+], (I18n, _, Cache, CollectionView, AssignmentListItemView, CreateAssignmentView, CreateGroupView, DeleteGroupView, template) ->
 
   class AssignmentGroupListItemView extends CollectionView
     tagName: "li"
@@ -67,10 +66,10 @@ define [
       @initCache()
 
     initializeCollection: ->
-      @collection = new AssignmentCollection @model.get('assignments')
-      @collection.each (assign) ->
+      @model.get('assignments').each (assign) ->
         assign.doNotParse()
 
+      @collection = @model.get('assignments')
       @collection.on 'add', @expand
 
     initializeChildViews: ->
@@ -81,13 +80,10 @@ define [
       if ENV.PERMISSIONS.manage
         @editGroupView = new CreateGroupView
           assignmentGroup: @model
-          assignments: @collection.models
         @createAssignmentView = new CreateAssignmentView
           assignmentGroup: @model
-          collection: @collection
         @deleteGroupView = new DeleteGroupView
           model: @model
-          assignments: @collection
 
     initCache: ->
       $.extend true, @, Cache
