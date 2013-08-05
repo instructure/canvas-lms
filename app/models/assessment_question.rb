@@ -556,6 +556,13 @@ class AssessmentQuestion < ActiveRecord::Base
          :id => hash['assessment_question_id'], :field => field, :missing_links => missing_links,
          :url => "/#{context.class.to_s.underscore.pluralize}/#{context.id}/question_banks/#{bank.id}#question_#{hash['assessment_question_id']}_question_text")
       end
+      if hash[:import_warnings]
+        hash[:import_warnings].each do |warning|
+          context.content_migration.add_warning(warning, {
+              :fix_issue_html_url => "/#{context.class.to_s.underscore.pluralize}/#{context.id}/question_banks/#{bank.id}#question_#{hash['assessment_question_id']}_question_text"
+          })
+        end
+      end
     end
     hash.delete(:missing_links)
     hash
