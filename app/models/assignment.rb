@@ -1520,7 +1520,7 @@ class Assignment < ActiveRecord::Base
   end
 
 
-  def self.import_from_migration(hash, context, item=nil)
+  def self.import_from_migration(hash, context, item=nil, quiz=nil)
     hash = hash.with_indifferent_access
     return nil if hash[:migration_id] && hash[:assignments_to_import] && !hash[:assignments_to_import][hash[:migration_id]]
     item ||= find_by_context_type_and_context_id_and_id(context.class.to_s, context.id, hash[:id])
@@ -1609,14 +1609,18 @@ class Assignment < ActiveRecord::Base
       gs = context.grading_standards.find_by_migration_id(hash[:grading_standard_migration_id])
       item.grading_standard = gs if gs
     end
-    if hash[:quiz_migration_id]
-      if quiz = context.quizzes.find_by_migration_id(hash[:quiz_migration_id])
-        # the quiz is published because it has an assignment
-        quiz.assignment = item
-        quiz.generate_quiz_data
-        quiz.published_at = Time.now
-        quiz.workflow_state = 'available'
-        quiz.save
+    if quiz
+      item.quiz = quiz
+    elsif hash[:quiz_migration_id]
+      if q = context.quizzes.find_by_migration_id(hash[:quiz_migration_id])
+        if !item.quiz || item.quiz.id == q.id
+          # the quiz is published because it has an assignment
+          q.assignment = item
+          q.generate_quiz_data
+          q.published_at = Time.now
+          q.workflow_state = 'available'
+          q.save
+        end
       end
       item.submission_types = 'online_quiz'
       item.saved_by = :quiz

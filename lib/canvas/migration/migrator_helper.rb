@@ -194,6 +194,10 @@ module MigratorHelper
   def prepend_id_to_assessments(assessments, prepend_value=nil)
     assessments.each do |a|
       a[:migration_id] = prepend_id(a[:migration_id], prepend_value)
+      if h = a[:assignment]
+        h[:migration_id] = prepend_id(h[:migration_id], prepend_value)
+      end
+
       a[:questions].each do |q|
         if q[:question_type] == "question_reference"
           q[:migration_id] = prepend_id(q[:migration_id], prepend_value)

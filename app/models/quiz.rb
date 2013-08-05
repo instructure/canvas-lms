@@ -1067,7 +1067,8 @@ class Quiz < ActiveRecord::Base
     item.reload # reload to catch question additions
     
     if hash[:assignment] && hash[:available]
-      item.assignment = Assignment.import_from_migration(hash[:assignment], context, item.assignment)
+      hash[:assignment][:migration_id] += "_#{item.id}" if hash[:assignment][:migration_id]
+      item.assignment = Assignment.import_from_migration(hash[:assignment], context, item.assignment, item)
     elsif !item.assignment && grading = hash[:grading]
       # The actual assignment will be created when the quiz is published
       item.quiz_type = 'assignment'
