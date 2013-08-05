@@ -1,16 +1,16 @@
 <label class="control-label"><strong>{{#t "move_from"}}Move from{{/t}}</strong></label>
 <div class="controls">
-  <select class="currentDay span3">
+  <select class="currentDay span3" title="{{#t "move_from_select_title"}}Move from day of the week{{/t}}" aria-label="{{#t "move_from_select_label"}}Move from day of the week{{/t}}"> 
     {{#each weekdays}}
       <option value="{{index}}">{{name}}</option>
     {{/each}}
   </select>
   {{#t 'to_happen_on'}}to{{/t}}
-  <select class="subDay span3">
+  <select class="subDay span3" title="{{#t "move_to_select_title"}}Move to day of the week{{/t}}" aria-label="{{#t "move_to_select_label"}}Move to day of the week{{/t}}">
     {{#each weekdays}}
       <option value="{{index}}">{{name}}</option>
     {{/each}}
   </select>
-  <a href="#"><i class="icon-end plain"></i></a>
+  <a href="#" aria-label="{{#t "remove_day_substitution_link_label"}}Remove day substitution{{/t}}" title="{{#t "remove_day_substitution_link"}}Remove day substitution{{/t}}"><i class="icon-end plain"></i></a>
 </div>
 <br />
