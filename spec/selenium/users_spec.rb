@@ -197,6 +197,8 @@ describe "users" do
     end
 
     it "should not require terms if not configured to do so" do
+      Setting.set('terms_required', 'false')
+
       get '/register'
 
       %w{teacher student parent}.each do |type|
@@ -208,8 +210,6 @@ describe "users" do
     end
 
     it "should require terms if configured to do so" do
-      Setting.set('terms_required', true)
-
       get "/register"
 
       %w{teacher student parent}.each do |type|
@@ -237,6 +237,7 @@ describe "users" do
       f('#student_username').send_keys('student')
       f('#student_password').send_keys('asdfasdf')
       f('#student_password_confirmation').send_keys('asdfasdf')
+      f('input[name="user[terms_of_use]"]', form).click
 
       expect_new_page_load { form.submit }
       # confirm the user is authenticated into the dashboard
@@ -251,6 +252,7 @@ describe "users" do
       form = fj('.ui-dialog:visible form')
       f('#teacher_name').send_keys('teacher!')
       f('#teacher_email').send_keys('teacher@example.com')
+      f('input[name="user[terms_of_use]"]', form).click
 
       expect_new_page_load { form.submit }
       # confirm the user is authenticated into the dashboard
@@ -269,6 +271,7 @@ describe "users" do
       f('#parent_email').send_keys('parent@example.com')
       f('#parent_child_username').send_keys(@pseudonym.unique_id)
       f('#parent_child_password').send_keys('lolwut')
+      f('input[name="user[terms_of_use]"]', form).click
 
       expect_new_page_load { form.submit }
       # confirm the user is authenticated into the dashboard

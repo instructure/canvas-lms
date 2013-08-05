@@ -133,16 +133,18 @@ Which is you?", :count => @merge_opportunities.length %>
         </div>
       </div>
       <% end %>
-      <% if require_terms? %>
       <div class="control-group">
         <div class="controls">
-          <label for="user_terms_of_use">
-            <%= check_box :user, :terms_of_use %>
-            <%= agree_to_terms %>
-          </label>
+          <% if require_terms? %>
+            <label for="user_terms_of_use">
+              <%= check_box :user, :terms_of_use %>
+              <%= agree_to_terms %>
+            </label>
+          <% else %>
+            <a href="<%= @domain_root_account.privacy_policy_url %>" target="_blank"><%= t "#site.view_privacy_policy", "View Privacy Policy" %></a>
+          <% end %>
         </div>
       </div>
-      <% end %>
       <div class="control-group">
         <div class="controls">
           <% unless @merge_opportunities.empty? %>

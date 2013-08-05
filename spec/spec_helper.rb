@@ -270,7 +270,10 @@ Spec::Runner.configure do |config|
 
   def user(opts={})
     @user = User.create!(opts.slice(:name, :short_name))
-    @user.register! if opts[:active_user] || opts[:active_all]
+    if opts[:active_user] || opts[:active_all]
+      @user.accept_terms
+      @user.register!
+    end
     @user.update_attribute :workflow_state, opts[:user_state] if opts[:user_state]
     @user
   end

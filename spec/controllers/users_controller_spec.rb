@@ -275,12 +275,17 @@ describe UsersController do
         p.user.communication_channels.first.path.should == 'jacob@instructure.com'
       end
 
-      it "should validate acceptance of the terms if required" do
-        Setting.set('terms_required', true)
+      it "should validate acceptance of the terms" do
         post 'create', :pseudonym => { :unique_id => 'jacob@instructure.com' }, :user => { :name => 'Jacob Fugal' }
         response.status.should =~ /400 Bad Request/
         json = JSON.parse(response.body)
         json["errors"]["user"]["terms_of_use"].should be_present
+      end
+
+      it "should not validate acceptance of the terms if not required" do
+        Setting.set('terms_required', 'false')
+        post 'create', :pseudonym => { :unique_id => 'jacob@instructure.com' }, :user => { :name => 'Jacob Fugal' }
+        response.should be_success
       end
 
       it "should require email pseudonyms by default" do
