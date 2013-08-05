@@ -74,12 +74,13 @@ require [
       @filter('')
 
     filter: (state) ->
-      filters = deparam(state)
+      filters = @filters = deparam(state)
       @header.displayState(filters)
       @selectConversation(null)
       @list.collection.reset()
       @list.collection.setParam('scope', filters.type)
-      @list.collection.setParam('filter', if filters.course then 'course_'+filters.course else '')
+      filter = @_currentFilter()
+      @list.collection.setParam('filter', @_currentFilter())
       @list.collection.fetch()
       @compose.setDefaultCourse(filters.course)
 
@@ -123,7 +124,21 @@ require [
       @header.on('course',      @onCourse)
       @header.on('mark-unread', @onMarkUnread)
       @header.on('forward',     @onForward)
+      @header.on('search',      @onSearch)
       @compose.on('close',      @onCloseCompose)
+
+    _currentFilter: ->
+      return @searchTokens if @searchTokens
+      return "course_#{@filters.course}" if @filters.course
+      ''
+
+    onSearch: (tokens) =>
+      @list.collection.reset()
+      # commenting this out for now because multiple filters don't work.
+      # tokens.push("course_#{@courseFilter}") if @courseFilter
+      @searchTokens = if tokens.length then tokens else null
+      @list.collection.setParam('filter', @_currentFilter())
+      @list.collection.fetch()
 
     _initListView: ->
       @list = new MessageListView
@@ -141,7 +156,6 @@ require [
 
     _initComposeDialog: ->
       @compose = new MessageFormDialog(courses: @courses) #this, this.canAddNotesFor, folderId: @options.FOLDER_ID)
-
 
   window.conversationsRouter = new ConversationsRouter
   Backbone.history.start()

@@ -2,22 +2,24 @@ define [
   'underscore'
   'Backbone'
   'compiled/views/conversations/CourseSelectionView'
+  'compiled/views/conversations/SearchView'
   'use!vendor/bootstrap/bootstrap-dropdown'
   'use!vendor/bootstrap-select/bootstrap-select'
-], (_, {View}, CourseSelectionView) ->
+], (_, {View}, CourseSelectionView, SearchView) ->
 
   class InboxHeaderView extends View
 
     els:
-      '#compose-btn':     '$composeBtn'
-      '#reply-btn':       '$replyBtn'
-      '#reply-all-btn':   '$replyAllBtn'
-      '#delete-btn':      '$deleteBtn'
-      '#type-filter':     '$typeFilter'
-      '#course-filter':   '$courseFilter'
-      '#admin-btn':       '$adminBtn'
-      '#mark-unread-btn': '$markUnreadBtn'
-      '#admin-menu':      '$adminMenu'
+      '#compose-btn'     : '$composeBtn'
+      '#reply-btn'       : '$replyBtn'
+      '#reply-all-btn'   : '$replyAllBtn'
+      '#delete-btn'      : '$deleteBtn'
+      '#type-filter'     : '$typeFilter'
+      '#course-filter'   : '$courseFilter'
+      '#admin-btn'       : '$adminBtn'
+      '#mark-unread-btn' : '$markUnreadBtn'
+      '#admin-menu'      : '$adminMenu'
+      '[role=search]'    : '$search'
 
     events:
       'click #compose-btn':       'onCompose'
@@ -33,6 +35,10 @@ define [
       super()
       @$typeFilter.selectpicker()
       @courseView = new CourseSelectionView(el: @$courseFilter, courses: @options.courses)
+      @searchView = new SearchView(el: @$search)
+      @searchView.on('search', @onSearch)
+
+    onSearch:      (tokens) => @trigger('search', tokens)
 
     onCompose:     (e) -> @trigger('compose')
 
@@ -61,7 +67,8 @@ define [
 
     filterObj: (obj) -> _.object(_.filter(_.pairs(obj), (x) -> !!x[1]))
 
-    onFilterChange: (e) ->
+    onFilterChange: (e) =>
+      @searchView.autocompleteView.course = @$courseFilter.val() if @searchView
       @trigger('filter', @filterObj({type: @$typeFilter.val(), course: @$courseFilter.val()}))
 
     displayState: (state) ->

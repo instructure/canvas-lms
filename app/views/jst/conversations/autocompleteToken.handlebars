@@ -1,5 +1,15 @@
 <li class="ac-token">
   {{name}}
+
+  <a href="#"
+     class="ac-token-remove-btn">
+    <i class="icon-x"></i>
+    <span class="screenreader-only">
+      {{#t "remove_recipient"}}Remove recipient{{/t}}
+    </span>
+  </a>
+
+
   <input type="hidden"
          name="recipients[]"
          value="{{id}}" />

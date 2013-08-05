@@ -88,22 +88,45 @@
       </ul>
     </div>
 
-    <div class="search pull-right form-search" role="search">
-      <div class="input-append">
-        <label for="search-query" class="screenreader-only">
-          <%= t(:enter_name_group_or_course, "Enter a name, group, or course") %>
-        </label>
-        <input type="search"
-               id="search-query"
-               class="search-query"
-               placeholder="<%= t(:enter_name_group_or_course, "Enter a name, group, or course") %>" />
+    <div role="search" class="search pull-right form-search">
+      <div class="ac" id="search-autocomplete">
+        <div class="ac-input-box">
+          <ul class="ac-token-list"></ul>
+          <input type="search"
+                 class="ac-input"
+                 id="compose-message-recipients"
+                 aria-expanded="false"
+                 aria-activedescendant=""
+                 aria-owns="ac-result-list-2"
+                 aria-labelledby="ac-placeholder-1"
+                 aria-autocomplete="list"
+                 role="combobox" />
 
-        <button class="btn" type="button">
+          <span class="ac-placeholder" id="ac-placeholder-1">
+            <%= t(:enter_name_group_or_course, "Enter a name, group, or course") %>
+          </span>
+
+          <a href="#"
+             class="ac-clear"
+             title="<%= t(:clear_search, "Clear search results") %>">
+            <i class="icon-x"></i>
+            <span class="screenreader-only">
+              <%= t(:clear_search, "Clear search results") %>
+            </span>
+          </a>
+        </div>
+
+        <button class="btn" id="search-btn" type="button">
+          <i class="icon-address-book"></i>
           <span class="screenreader-only">
             <%= t(:search_names_groups_courses, "Search names, groups, and courses") %>
           </span>
-          <i class="icon-address-book"></i>
         </button>
+
+        <ul class="ac-result-list"
+            id="ac-result-list-2"
+            aria-hidden="true" />
+        </ul>
       </div>
     </div>
   </header>
