@@ -61,23 +61,27 @@
   }
 }
 
-.search {
-  .help-btn {
-    color: #333;
+#help-btn {
+  color: #333;
+  position: relative;
+  left: 8px;
+  float: right;
+
+  &:hover, &:focus {
+    color: #0088cc;
+    text-decoration: none;
+  }
+
+  .icon-mini-arrow-down {
     position: relative;
-    left: 8px;
-
-    &:hover, &:focus {
-      color: #0088cc;
-      text-decoration: none;
-    }
-
-    .icon-mini-arrow-down {
-      position: relative;
-      right: 5px;
-    }
+    right: 5px;
   }
 }
+
+#help-menu-items > li > a {
+  color: #fff;
+}
+
 
 .messaging-wrapper {
   height: 100%;

@@ -131,6 +131,7 @@ class ConversationsController < ApplicationController
       render :json => @conversations_json
     else
       return redirect_to conversations_path(:scope => params[:redirect_scope]) if params[:redirect_scope]
+      return render :template => 'conversations/index_new' if @current_user.use_new_conversations?
       @current_user.reset_unread_conversations_counter
       load_all_contexts :permissions => [:manage_user_notes]
       notes_enabled = @current_user.associated_accounts.any?{|a| a.enable_user_notes }
@@ -152,6 +153,12 @@ class ConversationsController < ApplicationController
   # New Conversations UI. When finished, move back to index action.
   def index_new
     return unless authorized_action(Account.site_admin, @current_user, :become_user)
+  end
+
+  def toggle_new_conversations
+    @current_user.preferences[:use_new_conversations] = value_to_boolean(params[:use_new_conversations])
+    @current_user.save!
+    redirect_to action: 'index'
   end
 
   # @API Create a conversation

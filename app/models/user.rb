@@ -1306,6 +1306,10 @@ class User < ActiveRecord::Base
     !!preferences[:manual_mark_as_read]
   end
 
+  def use_new_conversations?
+    preferences[:use_new_conversations] == true
+  end
+
   def ignore_item!(asset, purpose, permanent = false)
     begin
       # more likely this doesn't exist, so try the create first

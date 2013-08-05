@@ -530,6 +530,42 @@ describe ConversationsController do
     end
   end
 
+  describe "POST 'toggle_new_conversations'" do
+    before :each do
+      course_with_student_logged_in(:active_all => true)
+    end
+
+    it "should enable new conversations for a user" do
+      @user.preferences[:use_new_conversations] = false
+      @user.save!
+      @user.use_new_conversations?.should be_false
+      post 'toggle_new_conversations', :use_new_conversations => true
+      @user.reload
+      @user.use_new_conversations?.should be_true
+    end
+
+    it "should disable new conversations for a user" do
+      @user.preferences[:use_new_conversations] = true
+      @user.save!
+      post 'toggle_new_conversations'
+      @user.reload
+      @user.use_new_conversations?.should be_false
+    end
+
+    it "should be idempotent" do
+      @user.use_new_conversations?.should be_false
+      post 'toggle_new_conversations'
+      @user.reload
+      @user.use_new_conversations?.should be_false
+      post 'toggle_new_conversations', :use_new_conversations => 1
+      @user.reload
+      @user.use_new_conversations?.should be_true
+      post 'toggle_new_conversations', :use_new_conversations => 1
+      @user.reload
+      @user.use_new_conversations?.should be_true
+    end
+  end
+
   context "sharding" do
     specs_require_sharding
 

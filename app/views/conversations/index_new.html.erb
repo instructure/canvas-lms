@@ -56,6 +56,38 @@
       </ul>
     </div>
 
+    <div class="admin-link pull-right">
+      <a id="help-btn"
+         class="al-trigger help-btn"
+         href="#"
+         role="button"
+         aria-haspopup="true"
+         aria-owns="help-menu-items"
+         tabindex="-1">
+        <i class="icon-question"></i>
+        <i class="icon-mini-arrow-down"></i>
+        <span class="screenreader-only"><%= t(:help, "Help") %></span>
+      </a>
+
+      <ul id="help-menu-items"
+          class="al-options"
+          role="menu"
+          tabindex="0"
+          aria-hidden="true"
+          aria-expanded="false"
+          aria-activedescendant="switch-to-old-conversations-menu-item">
+        <li role="presentation">
+          <a id="switch-to-old-conversations-menu-item"
+             href="/conversations/toggle_new_conversations"
+             data-method="post"
+             rel="nofollow"
+             tabindex="-1"
+             role="menuitem"
+             title="<%= t(:switch_to_old_conversations, "Switch Back to Old Conversations") %>"><%= t(:switch_to_old_conversations, "Switch Back to Old Conversations")%></a>
+        </li>
+      </ul>
+    </div>
+
     <div class="search pull-right form-search" role="search">
       <div class="input-append">
         <label for="search-query" class="screenreader-only">
@@ -73,12 +105,6 @@
           <i class="icon-address-book"></i>
         </button>
       </div>
-
-      <a href="#" class="help-btn">
-        <span class="screenreader-only">Help</span>
-        <i class="icon-question"></i>
-        <i class="icon-mini-arrow-down"></i>
-      </a>
     </div>
   </header>
 

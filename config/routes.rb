@@ -27,6 +27,7 @@ FakeRails3Routes.draw do
   match 'conversations/mark_all_as_read' => 'conversations#mark_all_as_read', :as => :conversations_mark_all_as_read, :via => :post
   match 'conversations/watched_intro' => 'conversations#watched_intro', :as => :conversations_watched_intro, :via => :post
   match 'conversations/batches' => 'conversations#batches', :as => :conversation_batches
+  match 'conversations/toggle_new_conversations' => 'conversations#toggle_new_conversations', :as => :toggle_new_conversations, :via => :post
   resources :conversations, :only => [:index, :show, :update, :create, :destroy] do
     match 'add_recipients' => 'conversations#add_recipients', :as => :add_recipients, :via => :post
     match 'add_message' => 'conversations#add_message', :as => :add_message, :via => :post

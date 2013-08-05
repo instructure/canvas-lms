@@ -15,7 +15,6 @@ body {
   background: #a3a3a3 url(/images/messages/messages-background.png) 0 0 repeat;
   min-height: 425px;
   a {
-    color: #2571bd;
     &.black {
       color: #000000;
     }
@@ -950,11 +949,22 @@ form {
   vertical-align: middle;
 }
 
-#help_crumb {
+#help-btn {
+  color: #333;
   position: absolute;
-  right: 12px;
-  top: 12px;
+  right: 0px;
+  top: 8px;
   z-index: 3;
+
+  &:hover, &:focus {
+    color: #0088cc;
+    text-decoration: none;
+  }
+
+  .icon-mini-arrow-down {
+    position: relative;
+    right: 5px;
+  }
 }
 
 .spin_holder {
