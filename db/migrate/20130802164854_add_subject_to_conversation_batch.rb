@@ -1,6 +1,5 @@
 class AddSubjectToConversationBatch < ActiveRecord::Migration
   tag :predeploy
-  self.transactional = false
 
   def self.up
     add_column :conversation_batches, :subject, :string
