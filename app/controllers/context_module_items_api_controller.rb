@@ -256,9 +256,10 @@ class ContextModuleItemsApiController < ApplicationController
       @tag.indent = params[:module_item][:indent] if params[:module_item][:indent]
       @tag.new_tab = value_to_boolean(params[:module_item][:new_tab]) if params[:module_item][:new_tab]
       if target_module_id = params[:module_item][:module_id]
-        return render :json => {:message => "invalid module_id"}, :status => :bad_request unless @context.context_modules.where(:id => target_module_id).exists?
+        target_module = @context.context_modules.find_by_id(target_module_id)
+        return render :json => {:message => "invalid module_id"}, :status => :bad_request unless target_module
         old_module = @context.context_modules.find(@tag.context_module_id)
-        @tag.context_module_id = target_module_id
+        @tag.context_module = target_module
         if req_index = old_module.completion_requirements.find_index { |req| req[:id] == @tag.id }
           old_module.completion_requirements_will_change!
           req = old_module.completion_requirements.delete_at(req_index)

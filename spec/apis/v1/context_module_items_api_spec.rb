@@ -549,7 +549,27 @@ describe "Module Items API", :type => :integration do
           api_call(:put, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@assignment_tag.id}",
               {:controller => "context_module_items_api", :action => "update", :format => "json",
                :course_id => "#{@course.id}", :module_id => "#{@module1.id}", :id => "#{@assignment_tag.id}"},
-              {:module_item => {:module_id => @module2.id, :position => 2}})
+              {:module_item => {:module_id => @module2.id}})
+
+          @module1.reload.content_tags.map(&:id).should_not be_include @assignment_tag.id
+          @module1.updated_at.should > old_updated_ats[0]
+          @module1.completion_requirements.size.should == 3
+          @module1.completion_requirements.detect { |req| req[:id] == @assignment_tag.id }.should be_nil
+
+          @module2.reload.updated_at.should > old_updated_ats[1]
+          @module2.completion_requirements.detect { |req| req[:id] == @assignment_tag.id }.should_not be_nil
+        end
+
+        it "should set the position in the target module" do
+          old_updated_ats = []
+          Timecop.freeze(1.minute.ago) do
+            @module1.touch; old_updated_ats << @module1.updated_at
+            @module2.touch; old_updated_ats << @module2.updated_at
+          end
+          api_call(:put, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@assignment_tag.id}",
+                   {:controller => "context_module_items_api", :action => "update", :format => "json",
+                    :course_id => "#{@course.id}", :module_id => "#{@module1.id}", :id => "#{@assignment_tag.id}"},
+                   {:module_item => {:module_id => @module2.id, :position => 2}})
 
           @module1.reload.content_tags.map(&:id).should_not be_include @assignment_tag.id
           @module1.updated_at.should > old_updated_ats[0]
