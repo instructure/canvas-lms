@@ -30,13 +30,13 @@ A generic, accessible autocomplete widget.
 ```
 */
 
-ul[class*=ac] {
+ul[class*=ac-] {
   list-style: none;
   margin: 0;
   padding: 0;
 }
 
-[class*=ac][aria-hidden=true] {
+[class*=ac-][aria-hidden=true] {
   display: none;
 }
 
