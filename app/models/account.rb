@@ -238,7 +238,7 @@ class Account < ActiveRecord::Base
   end
 
   def terms_required?
-    Setting.get('terms_required', false)
+    Setting.get('terms_required', 'true') == 'true'
   end
 
   def require_acceptance_of_terms?(user)

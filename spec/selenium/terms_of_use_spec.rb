@@ -4,7 +4,6 @@ describe "terms of use test" do
   it_should_behave_like "in-process server selenium tests"
 
   before do
-    Setting.set 'terms_required', true
     user_with_pseudonym(active_user: true)
   end
 

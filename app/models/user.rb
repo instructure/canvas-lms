@@ -1083,9 +1083,11 @@ class User < ActiveRecord::Base
   end
 
   def record_acceptance_of_terms
-    if @require_acceptance_of_terms && @terms_of_use
-      preferences[:accepted_terms] = Time.now.utc
-    end
+    accept_terms if @require_acceptance_of_terms && @terms_of_use
+  end
+
+  def accept_terms
+    preferences[:accepted_terms] = Time.now.utc
   end
 
   def self.max_messages_per_day
