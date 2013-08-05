@@ -194,7 +194,9 @@ class SisBatch < ActiveRecord::Base
       end
       scope = scope.where(:courses => { :enrollment_term_id => self.batch_mode_term })
       scope.find_each do |section|
-        section.destroy
+        CourseSection.send(:with_exclusive_scope) do
+          section.destroy
+        end
       end
     end
 
