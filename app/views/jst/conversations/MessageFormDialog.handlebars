@@ -138,8 +138,8 @@
         </div>
       </div>
     </div>
-    <hr class='header-separator' />
   </div>
+  <hr class='header-separator' />
 
   <div class='message-body'>
     <textarea name="body"
@@ -147,9 +147,11 @@
               data-track-action="Edit"
               data-track-label="Body"
               class="conversation_body">{{message}}</textarea>
+    <div class='context_messages'></div>
   </div>
 
   <div class='attachments-pane'>
     <ul class='attachment_list' aria-label='{{#t "labels.attachments"}}Attachments{{/t}}' aria-live='polite'></ul>
   </div>
+
 </form>

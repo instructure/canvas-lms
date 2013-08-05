@@ -1,0 +1,14 @@
+<div class="context-date pull-right">{{friendlyDatetime created_at}}</div>
+<div class="context-author">{{author.name}}</div>
+<div class="context-body" aria-live="polite">
+  {{body}}
+  {{#if isCondensable}}
+    <a class="context-more pull-right" href="#">
+      {{#if isCondensed}}
+        {{#t "labels.more"}}more...{{/t}}
+      {{else}}
+        {{#t "labels.less"}}less...{{/t}}
+      {{/if}}
+    </a>
+  {{/if}}
+</div>

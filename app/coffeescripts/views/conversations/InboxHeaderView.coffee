@@ -57,13 +57,13 @@ define [
       @trigger('forward')
 
     onModelChange: (newModel, oldModel) ->
-      @toggleMessageBtns(!newModel.get('selected'))
+      @toggleMessageBtns(!newModel || !newModel.get('selected'))
       oldModel.off(null, null, this) if oldModel
       @onReadStateChange(newModel)
-      newModel.on('change:workflow_state', @onReadStateChange, this)
+      newModel.on('change:workflow_state', @onReadStateChange, this) if newModel
 
     onReadStateChange: (msg) ->
-      @hideMarkUnreadBtn(msg.unread())
+      @hideMarkUnreadBtn(!msg || msg.unread())
 
     filterObj: (obj) -> _.object(_.filter(_.pairs(obj), (x) -> !!x[1]))
 

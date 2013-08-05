@@ -31,7 +31,7 @@ require [
       @_attachEvents()
 
     onSelected: (model) =>
-      @header.onModelChange(model, @model)
+      @header.onModelChange(null, @model)
       @model = model
       unless model.get('selected')
         if model.id == @detail.model?.id
@@ -45,18 +45,15 @@ require [
         @detail.$el.disableWhileLoading(model.fetch(success: @selectConversation))
 
     selectConversation: (model) =>
+      @header.onModelChange(model, null)
       @detail.model = model
       @detail.render()
 
     onReply: =>
-      messages = @detail.model.get('messages')
-      @compose.show(_.find(messages, (m) -> m.selected) or messages[0])
+      @compose.show(@detail.model, to: 'reply')
 
     onReplyAll: =>
-      # TODO: passing the conversation model here, but @compose.show() doesn't
-      # know what to do with it. we need to get the autocomplete working in the
-      # modal.
-      @compose.show(@detail.model)
+      @compose.show(@detail.model, to: 'replyAll')
 
     onDelete: =>
       return unless confirm(@messages.confirmDelete)
@@ -90,11 +87,7 @@ require [
       @header.hideMarkUnreadBtn(true)
 
     onForward: =>
-      # TODO: do something with these options/come up with a better way to
-      # specify options. forwarding requires that context and subject be
-      # the same as the original message and not changeable. 'to' field
-      # should be empty
-      @compose.show(@detail.model, 'disabled': ['context', 'subject'])
+      @compose.show(@detail.model, to: 'forward')
 
     onFilter: (filters) =>
       @navigate('filter?'+$.param(filters), {trigger: true})

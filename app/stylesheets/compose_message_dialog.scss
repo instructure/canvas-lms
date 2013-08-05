@@ -36,6 +36,7 @@ $subtleBorderColor: #e5e5e5;
   .ui-dialog-buttonpane {
     box-shadow: none;
     padding-left: 1em;
+    margin-top: 0;
   }
 
   .ui-dialog-buttonset {
@@ -46,8 +47,7 @@ $subtleBorderColor: #e5e5e5;
 }
 
 #compose-new-message {
-  padding-top: 1em;
-  padding-bottom: 0 !important;
+  padding: 0;
   overflow: hidden;
   margin: 0;
 
@@ -66,7 +66,7 @@ $subtleBorderColor: #e5e5e5;
   }
 
   .header-separator {
-    margin: 10px -14px 15px -14px;
+    margin: 0;
   }
 
   .control-group {
@@ -100,7 +100,7 @@ $subtleBorderColor: #e5e5e5;
     &.has-items {
       border-top: 1px solid $subtleBorderColor;
       min-height: 120px;
-      margin: .5em -1em 0;
+      margin: 0;
     }
   }
 
@@ -182,8 +182,13 @@ $subtleBorderColor: #e5e5e5;
     color: #fff;
   }
 
+  .message-body {
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
   .conversation_body {
-    max-height: none;
+    min-height: 200px;
     width: 100%;
     bottom: 0;
     resize: none;
@@ -217,6 +222,7 @@ $subtleBorderColor: #e5e5e5;
   .message-header {
     display: table;
     width: 100%;
+    padding: 0.25em 0.5em;
 
     .message-header-row {
       display: table-row;
@@ -227,7 +233,8 @@ $subtleBorderColor: #e5e5e5;
       -moz-box-sizing: border-box;
       padding: 5px 15px 5px 5px;
       text-align: right;
-      width: 90px;
+      width: 1px;
+      white-space: nowrap;
     }
 
     .message-header-input {
@@ -240,4 +247,24 @@ $subtleBorderColor: #e5e5e5;
       }
     }
   }
+
+  .context_messages .collectionViewItems {
+    list-style: none;
+    margin: 0;
+
+    li {
+      border-top: 1px solid $subtleBorderColor;
+      padding: 14px;
+      clear: right;
+    }
+
+    .context-date, .context-body {
+      color: #777;
+    }
+
+    .context-body {
+      margin-top: 7px;
+    }
+  }
+
 }

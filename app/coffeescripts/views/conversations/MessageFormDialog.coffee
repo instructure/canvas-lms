@@ -19,6 +19,7 @@
 define [
   'i18n!conversation_dialog'
   'underscore'
+  'Backbone'
   'compiled/views/DialogBaseView'
   'jst/conversations/MessageFormDialog'
   'compiled/conversations/MessageProgressTracker'
@@ -28,8 +29,10 @@ define [
   'jst/conversations/addAttachment'
   'compiled/views/conversations/AutocompleteView'
   'compiled/views/conversations/CourseSelectionView'
+  'compiled/views/conversations/ContextMessagesView'
   'compiled/widget/ContextSearch'
-], (I18n, _, DialogBaseView, template, MessageProgressTracker, preventDefault, composeTitleBarTemplate, composeButtonBarTemplate, addAttachmentTemplate, AutocompleteView, CourseSelectionView) ->
+  'vendor/jquery.elastic'
+], (I18n, _, {Collection}, DialogBaseView, template, MessageProgressTracker, preventDefault, composeTitleBarTemplate, composeButtonBarTemplate, addAttachmentTemplate, AutocompleteView, CourseSelectionView, ContextMessagesView) ->
 
   ##
   # reusable message composition dialog
@@ -39,12 +42,15 @@ define [
 
     els:
       '.message_course':                '$messageCourse'
+      '.message_subject':               '$messageSubject'
+      '.context_messages':              '$contextMessages'
       '.media_comment':                 '$mediaComment'
       'input[name=media_comment_id]':   '$mediaCommentId'
       'input[name=media_comment_type]': '$mediaCommentType'
       '.ac':                            '$recipients'
       '.attachment_list':               '$attachments'
       '.attachments-pane':              '$attachmentsPane'
+      '.message-body':                  '$messageBody'
       '.conversation_body':             '$conversationBody'
 
     dialogOptions: ->
@@ -74,7 +80,12 @@ define [
         click: (e) => @sendMessage(e)
       ]
 
-    show: ->
+    show: (model, options) ->
+      if @model = model
+        messages = @model.get('messages')
+        @message = _.find(messages, (m) -> m.selected) or messages[0]
+      @to = options.to if options
+
       @render()
       super
       @initializeForm()
@@ -83,6 +94,7 @@ define [
     ##
     # detach events that were dynamically added when the dialog is closed.
     afterClose: ->
+      @$fullDialog.off 'click', '.message-body'
       @$fullDialog.off 'click', '.attach-file'
       @$fullDialog.off 'click', '.attachment .remove_link'
       @$fullDialog.off 'keydown', '.attachment'
@@ -121,6 +133,7 @@ define [
         if e.which is 13 and e.shiftKey
           $(e.target).closest('form').submit()
           false
+      $textArea.elastic()
 
     initializeTokenInputs: ($scope) ->
       @recipientView = new AutocompleteView(el: @$recipients).render()
@@ -156,10 +169,19 @@ define [
                 value: data[0].id
                 text: data[0].name
                 data: data[0]
+      #TODO: populate recipients based on @to
 
       if @tokenInput
         @tokenInput.change = @recipientIdsChanged
 
+      @$messageSubject.attr('disabled', !!@model)
+      @$messageSubject.val(@model?.get('subject'))
+
+      if messages = @model?.get('messages')
+        contextView = new ContextMessagesView(el: @$contextMessages, collection: new Collection(messages))
+        contextView.render()
+
+      @$fullDialog.on 'click', '.message-body', @handleBodyClick
       @$fullDialog.on 'click', '.attach-file', preventDefault =>
         @addAttachment()
       @$fullDialog.on 'click', '.attachment .remove_link', preventDefault (e) =>
@@ -210,7 +232,7 @@ define [
       # place the attachment pane at the bottom of the form
       @$attachmentsPane.css('top', @$attachmentsPane.height())
       # Compute desired height of body
-      @$conversationBody.height( (@$el.offset().top + @$el.height()) - @$conversationBody.offset().top - @$attachmentsPane.height())
+      @$messageBody.height( (@$el.offset().top + @$el.height()) - @$messageBody.offset().top - @$attachmentsPane.height())
 
     addAttachment: ->
       $attachment = $(addAttachmentTemplate())
@@ -220,6 +242,9 @@ define [
       @focusAddAttachment()
 
     imageTypes: ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg']
+
+    handleBodyClick: (e) =>
+      @$conversationBody.focus() if e.target == e.currentTarget
 
     handleAttachmentClick: (e) =>
       # IE doesn't do this automatically
