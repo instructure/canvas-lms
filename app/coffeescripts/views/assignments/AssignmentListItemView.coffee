@@ -1,15 +1,22 @@
 define [
+  'i18n!assignments'
   'Backbone'
   'underscore'
   'compiled/views/PublishIconView'
   'jst/assignments/AssignmentListItem'
-], (Backbone, _, PublishIconView, template) ->
+], (I18n, Backbone, _, PublishIconView, template) ->
 
   class AssignmentListItemView extends Backbone.View
     tagName: "li"
     template: template
 
     @child 'publishIconView', '[data-view=publish-icon]'
+
+    events:
+      'click .delete_assignment': 'onDelete'
+
+    messages:
+      confirm: I18n.t('confirms.delete_assignment', 'Are you sure you want to delete this assignment?')
 
     initialize: ->
       super
@@ -51,3 +58,11 @@ define [
         }
       else
         data
+
+    onDelete: (e) =>
+      e.preventDefault()
+      @delete() if confirm(@messages.confirm)
+
+    delete: ->
+      @model.destroy()
+      @$el.remove()
