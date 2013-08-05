@@ -222,6 +222,9 @@ The screenreaders will read all the html entities and that's just rude.
 ```
 
 */
+.ui-widget.ui-tooltip {
+  word-wrap: break-word;
+}
 
 .ui-widget.ui-tooltip.popover {
   padding: 1px;
