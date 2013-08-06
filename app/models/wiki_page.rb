@@ -234,16 +234,16 @@ class WikiPage < ActiveRecord::Base
     can :read
 
     given {|user, session| user && self.can_edit_page?(user)}
-    can :update_content
+    can :update_content and can :read_revisions
 
     given {|user, session| user && self.can_edit_page?(user) && self.wiki.grants_right?(user, session, :create_page)}
     can :create
 
     given {|user, session| user && self.can_edit_page?(user) && self.wiki.grants_right?(user, session, :update_page)}
-    can :update
+    can :update and can :read_revisions
 
     given {|user, session| user && self.can_edit_page?(user) && self.active? && self.wiki.grants_right?(user, session, :update_page_content)}
-    can :update_content
+    can :update_content and can :read_revisions
 
     given {|user, session| user && self.can_edit_page?(user) && self.active? && self.wiki.grants_right?(user, session, :delete_page)}
     can :delete

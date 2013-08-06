@@ -19,7 +19,7 @@
 # @API Pages
 #
 # Pages are rich content associated with Courses and Groups in Canvas.
-# The Pages API allows you to create, retrieve, update, and delete ages.
+# The Pages API allows you to create, retrieve, update, and delete pages.
 #
 # @object Page
 #     {
@@ -76,7 +76,37 @@
 #       },
 #
 #       // (Optional) An explanation of why this is locked for the user. Present when locked_for_user is true.
-#       lock_explanation: "This discussion is locked until September 1 at 12:00am"
+#       lock_explanation: "This page is locked until September 1 at 12:00am"
+#     }
+#
+# @object PageRevision
+#     {
+#       // an identifier for this revision of the page
+#       revision_id: 7,
+#
+#       // the time when this revision was saved
+#       updated_at: '2012-08-07T11:23:58-06:00',
+#
+#       // the User who saved this revision, if applicable
+#       // (this may not be present if the page was imported from another system)
+#       edited_by: {
+#         id: 1123,
+#         display_name: "Leonardo Fibonacci",
+#         avatar_image_url: "https://canvas.example.com/images/thumbnails/bWVhbmluZ2xlc3M=",
+#         html_url: "https://canvas.example.com/courses/789/users/1123"
+#       }
+#
+#       // the following fields are not included in the index action
+#       // and may be omitted from the show action via summary=1
+#
+#       // the historic url of the page
+#       url: "old-page-title",
+#
+#       // the historic page title
+#       title: "Old Page Title",
+#
+#       // the historic page contents
+#       body: "<p>Old Page Content</p>"
 #     }
 class WikiPagesApiController < ApplicationController
   before_filter :require_context
@@ -138,7 +168,7 @@ class WikiPagesApiController < ApplicationController
   #
   # @example_request
   #     curl -H 'Authorization: Bearer <token>' \
-  #          https://<canvas>/api/v1/courses/123/front_page
+  #          https://<canvas>/api/v1/groups/456/front_page
   #
   # @returns Page
   def show
@@ -242,7 +272,90 @@ class WikiPagesApiController < ApplicationController
       end
     end
   end
-  
+
+  # @API List revisions
+  #
+  # List the revisions of a page. Callers must have update rights on the page in order to see page history.
+  #
+  # @argument url the unique identifier for a page
+  #
+  # @example_request
+  #     curl -H 'Authorization: Bearer <token>' \
+  #     https://<canvas>/api/v1/courses/123/pages/the-page-url/revisions
+  #
+  # @returns [PageRevision]
+  def revisions
+    if authorized_action(@page, @current_user, :read_revisions)
+      route = polymorphic_url([:api_v1, @context, @page, :revisions])
+      scope = @page.versions
+      revisions = Api.paginate(scope, self, route)
+      render :json => wiki_page_revisions_json(revisions, @current_user, session)
+    end
+  end
+
+  # @API Show revision
+  #
+  # Retrieve the metadata and optionally content of a revision of the page.
+  # Note that retrieving historic versions of pages requires edit rights.
+  #
+  # @argument url the unique identifier for a page
+  # @argument summary [optional] [boolean] if set, exclude page content from results
+  #
+  # @example_request
+  #     curl -H 'Authorization: Bearer <token>' \
+  #     https://<canvas>/api/v1/courses/123/pages/the-page-url/revisions/latest
+  #
+  # @example_request
+  #     curl -H 'Authorization: Bearer <token>' \
+  #     https://<canvas>/api/v1/courses/123/pages/the-page-url/revisions/4
+  #
+  # @returns PageRevision
+  def show_revision
+    if params.has_key?(:revision_id)
+      permission = :read_revisions
+      revision = @page.versions.find_by_number!(params[:revision_id].to_i)
+    else
+      permission = :read
+      revision = @page.versions.current
+    end
+    if authorized_action(@page, @current_user, permission)
+      include_content = if params.has_key?(:summary)
+                          !value_to_boolean(params[:summary])
+                        else
+                          true
+                        end
+      render :json => wiki_page_revision_json(revision, @current_user, session, include_content)
+    end
+  end
+
+  # @API Revert to revision
+  #
+  # Revert a page to a prior revision.
+  #
+  # @argument url the unique identifier for the page
+  # @argument revision_id the revision to revert to (use the {api:WikiPagesApiController#revisions List Revisions API} to see available revisions)
+  #
+  # @example_request
+  #    curl -X POST -H 'Authorization: Bearer <token>' \
+  #    https://<canvas>/api/v1/courses/123/pages/the-page-url/revisions/6
+  #
+  # @returns PageRevision
+  def revert
+    if authorized_action(@page, @current_user, :read_revisions) && authorized_action(@page, @current_user, :update)
+      revision_id = params[:revision_id].to_i
+      @revision = @page.versions.find_by_number!(revision_id).model
+      @page.body = @revision.body
+      @page.title = @revision.title
+      @page.url = @revision.url
+      @page.user_id = @current_user.id if @current_user
+      if @page.save
+        render :json => wiki_page_revision_json(@page.versions.current, @current_user, session, true)
+      else
+        render :json => @page.errors.to_json, :status => :bad_request
+      end
+    end
+  end
+
   protected
   
   def get_wiki_page

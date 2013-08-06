@@ -1233,6 +1233,14 @@ FakeRails3Routes.draw do
       get "groups/:group_id/pages/:url", :action => :show, :path_name => 'group_wiki_page'
       get "courses/:course_id/front_page", :action => :show
       get "groups/:group_id/front_page", :action => :show
+      get "courses/:course_id/pages/:url/revisions", :action => :revisions, :path_name => 'course_wiki_page_revisions'
+      get "groups/:group_id/pages/:url/revisions", :action => :revisions, :path_name => 'group_wiki_page_revisions'
+      get "courses/:course_id/pages/:url/revisions/latest", :action => :show_revision
+      get "groups/:group_id/pages/:url/revisions/latest", :action => :show_revision
+      get "courses/:course_id/pages/:url/revisions/:revision_id", :action => :show_revision
+      get "groups/:group_id/pages/:url/revisions/:revision_id", :action => :show_revision
+      post "courses/:course_id/pages/:url/revisions/:revision_id", :action => :revert
+      post "groups/:group_id/pages/:url/revisions/:revision_id", :action => :revert
       post "courses/:course_id/pages", :action => :create
       post "groups/:group_id/pages", :action => :create
       put "courses/:course_id/pages/:url", :action => :update
