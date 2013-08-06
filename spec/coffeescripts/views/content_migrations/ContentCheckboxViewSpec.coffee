@@ -12,9 +12,9 @@ define [
       checkboxModel = new CheckboxModel options
 
       # Set defaults
-      checkboxModel.property ||= "copy[all_course_settings]"
-      checkboxModel.title ||= "Course Settings"
-      checkboxModel.type ||= "course_settings"
+      checkboxModel.property ||= "copy[all_assignments]"
+      checkboxModel.title ||= "Assignments"
+      checkboxModel.type ||= "assignments"
 
       checkboxCollection = new CheckboxCollection [checkboxModel],
                                isTopLevel: true
@@ -51,7 +51,11 @@ define [
                                                           "type": "assignments",
                                                           "property": "copy[assignments][i4af043da2399a5ec221f666b38714fa8]",
                                                           "title": "Unnamed Quiz",
-                                                          "migration_id": "i4af043da2399a5ec221f666b38714fa8"
+                                                          "migration_id": "i4af043da2399a5ec221f666b38714fa8",
+                                                          "linked_resource": {
+                                                            "type": "assignments",
+                                                            "migration_id": "i7af74171d7c7207f1578328d8bbf9dae"
+                                                          }
                                                       }
                                                   ]
                                               }
@@ -61,10 +65,10 @@ define [
     teardown: -> CheckboxHelper.teardown()
 
   test 'renders a checkbox with name set from model property', -> 
-    CheckboxHelper.renderView(property: 'copy[all_course_settings]')
+    CheckboxHelper.renderView(property: 'copy[all_assignments]')
     nameValue = CheckboxHelper.$checkbox().prop('name')
 
-    equal nameValue, 'copy[all_course_settings]', 'Adds the correct name attribute from property'
+    equal nameValue, 'copy[all_assignments]', 'Adds the correct name attribute from property'
 
   test 'toplevel checkbox is checked by default', -> 
     CheckboxHelper.renderView()
@@ -76,69 +80,48 @@ define [
 
   module "Sublevel Content Checkbox Behaviors",
     setup: ->
+      @url = '/api/v1/courses/42/content_migrations/5/selective_data?type=assignments'
+      @clock = sinon.useFakeTimers()
       @server = sinon.fakeServer.create()
+      @server.respondWith('GET', @url, CheckboxHelper.serverResponse())
+      CheckboxHelper.renderView(sub_items_url: @url)
+      CheckboxHelper.$checkbox().click()
+      @server.respond()
+      @clock.tick 1
     teardown: -> 
       @server.restore()
+      @clock.restore()
       CheckboxHelper.teardown()
-  test 'unchecking a checkbox with a url attribute creates a sub-level collection with that url', -> 
-    url = "http://www.google.com"
-    CheckboxHelper.renderView(sub_items_url: url)
-    CheckboxHelper.$checkbox().click()
-    checkboxView = CheckboxHelper.checkboxView
-
-    equal checkboxView.sublevelCheckboxes.url, url, "Sets a sublevel checkbox collections url"
-
-  test 'unchecking a checkbox calls fetch on a CheckboxCollection', -> 
-    fetch = sinon.spy(CheckboxCollection.prototype, 'fetch')
-    url = "http://www.google.com"
-    CheckboxHelper.renderView(sub_items_url: url)
-    CheckboxHelper.$checkbox().click()
-    ok fetch.calledOnce, "Calls fetch on the CheckboxCollection"
 
   test 'renders sublevel checkboxes', ->
-    url = '/api/v1/courses/42/content_migrations/5/selective_data?type=assignments'
-    @server.respondWith('GET', url, CheckboxHelper.serverResponse())
-
-    CheckboxHelper.renderView(sub_items_url: url)
-    CheckboxHelper.$checkbox().click()
-    @server.respond()
-
     equal CheckboxHelper.checkboxView.$el.find('.collectionViewItems').last().find('[type=checkbox]').length, 3,  "Renders all sublevel checkboxes"
 
   test 'checkboxes with sublevel checkboxes and no url only display labels', ->
-    url = '/api/v1/courses/42/content_migrations/5/selective_data?type=assignments'
-    @server.respondWith('GET', url, CheckboxHelper.serverResponse())
-
-    CheckboxHelper.renderView(sub_items_url: url)
-    CheckboxHelper.$checkbox().click()
-    @server.respond()
     equal CheckboxHelper.checkboxView.$el.find('ul').first().find('[type=checkbox]').length, 3, "Doesn't include checkbox"
 
   test 'clicking Select All, checks all sublevel checkboxes', ->
-    url = '/api/v1/courses/42/content_migrations/5/selective_data?type=assignments'
-    @server.respondWith('GET', url, CheckboxHelper.serverResponse())
-
-    CheckboxHelper.renderView(sub_items_url: url)
-    CheckboxHelper.$checkbox().click()
-    @server.respond()
-
     CheckboxHelper.checkboxView.$el.find("a").first().click()
 
-    $subCheckboxes = CheckboxHelper.checkboxView.$el.find('ul').last().find('[type=checkbox]')
+    $subCheckboxes = CheckboxHelper.checkboxView.$el.find('ul').first().find('[type=checkbox]')
+    equal $subCheckboxes.length, 3
     $subCheckboxes.each ->
       ok $(this).is(':checked'), "Checked child checkboxes"
 
   test 'clicking Select None, unchecks all sublevel checkboxes', ->
-    url = '/api/v1/courses/42/content_migrations/5/selective_data?type=assignments'
-    @server.respondWith('GET', url, CheckboxHelper.serverResponse())
-
-    CheckboxHelper.renderView(sub_items_url: url)
-    CheckboxHelper.$checkbox().click()
-    @server.respond()
-
-    $subCheckboxes = CheckboxHelper.checkboxView.$el.find('ul').last().find('[type=checkbox]')
-    $subCheckboxes.each -> $(this).prop('checked', true) # Setup by checking all checkboxes
+    $subCheckboxes = CheckboxHelper.checkboxView.$el.find('ul').first().find('[type=checkbox]')
+    equal $subCheckboxes.length, 3
 
     CheckboxHelper.checkboxView.$el.find("a").last().click()
     $subCheckboxes.each ->
       ok !$(this).is(':checked'), "Unchecked child checkboxes"
+
+  test 'clicking on a checkbox should unmark and mark linked checkbox', ->
+    $subCheckboxes = CheckboxHelper.checkboxView.$el.find('ul').first().find('[type=checkbox]')
+    equal $subCheckboxes.length, 3
+
+    $subCheckboxes[2].click()
+
+    ok !$($subCheckboxes[1]).is(':checked'), "Unchecked linked resource"
+
+    $subCheckboxes[2].click()
+    ok $($subCheckboxes[1]).is(':checked'), "Checked linked resource"

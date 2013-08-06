@@ -133,9 +133,24 @@ module Canvas::Migration::Helpers
         hash[:title] = item['file_name']
       end
 
+      hash = add_linked_resource(type, item, hash)
       hash
     end
 
+    def add_linked_resource(type, item, hash)
+      if type == 'assignments'
+        if mig_id = item['quiz_migration_id']
+          hash[:linked_resource] = {:type => 'quizzes', :migration_id => mig_id}
+        elsif mig_id = item['topic_migration_id']
+          hash[:linked_resource] = {:type => 'discussion_topics', :migration_id => mig_id}
+        end
+      elsif type == 'discussion_topics' && mig_id = item['assignment_migration_id']
+        hash[:linked_resource] = {:type => 'assignments', :migration_id => mig_id}
+      elsif type == 'quizzes' && mig_id = item['assignment_migration_id']
+        hash[:linked_resource] = {:type => 'assignments', :migration_id => mig_id}
+      end
+      hash
+    end
 
     # returns lists of available content from a source course
     def get_content_from_course(type=nil)
@@ -152,13 +167,16 @@ module Canvas::Migration::Helpers
                 content_list << course_item_hash(type, item)
               end
             when 'discussion_topics'
-              source.discussion_topics.active.only_discussion_topics.select("id, title, user_id").except(:user).each do |item|
+              source.discussion_topics.active.only_discussion_topics.select("id, title, user_id, assignment_id").except(:user).each do |item|
                 content_list << course_item_hash(type, item)
               end
             else
               if source.respond_to?(type)
                 scope = source.send(type).select(:id)
                 # We only need the id and name, so don't fetch everything from DB
+
+                scope = scope.select(:assignment_id) if type == 'quizzes'
+
                 if type == 'learning_outcomes'
                   scope = scope.select(:short_description)
                 elsif type == 'context_modules' || type == 'context_external_tools' || type == 'groups'
@@ -227,7 +245,40 @@ module Canvas::Migration::Helpers
       title ||= item.short_description if item.respond_to?(:short_description)
       title ||= ''
 
-      {type: type, property: "copy[#{type}][#{mig_id}]", title: title, migration_id: mig_id}
+      hash = {type: type, property: "copy[#{type}][#{mig_id}]", title: title, migration_id: mig_id}
+      hash = course_linked_resource(item, hash)
+
+      hash
+    end
+
+    def course_linked_resource(item, hash)
+      if item.is_a?(Assignment)
+        if item.quiz
+          mig_id = CC::CCHelper.create_key(item.quiz)
+          hash[:linked_resource] = {:type => 'quizzes', :migration_id => mig_id,
+              :message => I18n.t('linked_quiz_message', "linked with Quiz '%{title}'", :title => item.quiz.title)
+          }
+        elsif item.discussion_topic
+          mig_id = CC::CCHelper.create_key(item.discussion_topic)
+          hash[:linked_resource] = {:type => 'discussion_topics', :migration_id => mig_id,
+            :message => I18n.t('linked_discussion_topic_message', "linked with Discussion Topic '%{title}'",
+                               :title => item.discussion_topic.title)
+          }
+        end
+      elsif item.is_a?(DiscussionTopic) && item.assignment
+        mig_id = CC::CCHelper.create_key(item.assignment)
+        hash[:linked_resource] = {:type => 'assignments', :migration_id => mig_id,
+          :message => I18n.t('linked_assignment_message', "linked with Assignment '%{title}'",
+                              :title => item.assignment.title)
+        }
+      elsif item.is_a?(Quiz) && item.assignment
+        mig_id = CC::CCHelper.create_key(item.assignment)
+        hash[:linked_resource] = {:type => 'assignments', :migration_id => mig_id,
+          :message => I18n.t('linked_assignment_message', "linked with Assignment '%{title}'",
+                              :title => item.assignment.title)
+        }
+      end
+      hash
     end
 
     def course_assignment_data(content_list, source_course)

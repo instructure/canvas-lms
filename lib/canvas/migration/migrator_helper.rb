@@ -273,6 +273,9 @@ module MigratorHelper
           assmnt[:max_points] = a[:max_points]
           assmnt[:duration] = a[:duration]
           assmnt[:error_message] = a[:error_message] if a[:error_message]
+          if a[:assignment] && a[:assignment][:migration_id]
+            assmnt[:assignment_migration_id] = a[:assignment][:migration_id]
+          end
         end
       end
     end
@@ -333,6 +336,8 @@ module MigratorHelper
         assign[:title] = a[:title]
         assign[:due_date] = a[:due_date]
         assign[:migration_id] = a[:migration_id]
+        assign[:quiz_migration_id] = a[:quiz_migration_id] if a[:quiz_migration_id]
+        assign[:assignment_group_migration_id] = a[:assignment_group_migration_id] if a[:assignment_group_migration_id]
         assign[:error_message] = a[:error_message] if a[:error_message]
       end
     end
@@ -350,6 +355,12 @@ module MigratorHelper
         topic[:topic_type] = t[:type]
         topic[:migration_id] = t[:migration_id]
         topic[:error_message] = t[:error_message] if t[:error_message]
+        if t[:assignment] && a_mig_id = t[:assignment][:migration_id]
+          if assign = @overview[:assignments].find{|a| a[:migration_id] == a_mig_id}
+            assign[:topic_migration_id] = t[:migration_id]
+            topic[:assignment_migration_id] = a_mig_id
+          end
+        end
       end
     end
     if @course[:assignment_groups]

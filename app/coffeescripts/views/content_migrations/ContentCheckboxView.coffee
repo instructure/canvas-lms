@@ -20,6 +20,7 @@ define [
       super
       @hasSubItemsUrl = !!@model.get('sub_items_url')
       @hasSubItems = !!@model.get('sub_items')
+      @linkedTarget = @model.collection?.linkedTarget
 
       @$el.on  "click", "#selectAll-#{@cid}", @checkAllChildren
       @$el.on  "click", "#selectNone-#{@cid}", @uncheckAllChildren
@@ -27,14 +28,21 @@ define [
       if @hasSubItemsUrl
         @$el.on "change", "#checkbox-#{@cid}", @toplevelCheckboxEvents
 
+      if @model.get('linked_resource')
+        @$el.on "change", "#checkbox-#{@cid}", @syncWithLinkedResource
+
     toJSON: -> 
       json = super
       json.hasSubCheckboxes = @hasSubItems || @hasSubItemsUrl
       json.onlyLabel = @hasSubItems and !@hasSubItemsUrl
       json.checked = @model.collection?.isTopLevel
+      json.checked ||= true if @model.collection?.linkedTarget
       json.iconClass = @getIconClass()
       json.count = @model.get('count')
       json.showHide = @model.get('count') || (@hasSubItems and @model.get('sub_items').length > 2)
+      linkedItem = @model.get('linked_resource')
+      if linkedItem && linkedItem.message
+        json.linkedMessage = linkedItem.message
       json
 
     # This is a map for icon classes depending on the type of checkbox that is being
@@ -69,9 +77,16 @@ define [
     # and render the sub-level checkboxes in the collection view. 
     # @api custom backbone override
 
-    afterRender: -> 
+    afterRender: ->
+      if @model.get('linked_resource')
+        if @linkedTarget && @model.get('property') == @linkedTarget
+          @$el.find("#checkbox-#{@cid}").prop('checked', false)
+        else
+          @$el.find("#checkbox-#{@cid}").prop('checked', true)
+          @syncWithLinkedResource()
       if @hasSubItems
         @sublevelCheckboxes = new CheckboxCollection @model.get('sub_items')
+        @sublevelCheckboxes.linkedTarget = @linkedTarget if @linkedTarget
         @renderSublevelCheckboxes()
 
     # Check/Uncheck all children checkboxes. Slice(1) ensures that we do not
@@ -82,16 +97,16 @@ define [
     checkAllChildren: (event) => 
       event.preventDefault()
       if @model.collection?.isTopLevel
-        @$el.find('[type=checkbox]').slice(1).prop('checked', true)
+        @$el.find('[type=checkbox]').slice(1).prop('checked', true).trigger('change')
       else
-        @$el.find('[type=checkbox]').prop('checked', true)
+        @$el.find('[type=checkbox]').prop('checked', true).trigger('change')
 
     uncheckAllChildren: (event) => 
       event.preventDefault()
       if @model.collection?.isTopLevel
-        @$el.find('[type=checkbox]').slice(1).prop('checked', false)
+        @$el.find('[type=checkbox]').slice(1).prop('checked', false).trigger('change')
       else
-        @$el.find('[type=checkbox]').prop('checked', false)
+        @$el.find('[type=checkbox]').prop('checked', false).trigger('change')
 
     # Determins if we should hide the sublevel checkboxes or 
     # fetch new ones. 
@@ -101,7 +116,9 @@ define [
     toplevelCheckboxEvents: (event) => 
       return unless @hasSubItemsUrl
 
-      if $(event.target).is(':checked')
+      $target = $(event.target)
+      if $target.is(':checked')
+        @$el.find('[type=checkbox]').slice(1).prop('checked', true).trigger('change')
         @$sublevelCheckboxes.hide()
         @$showHide.hide()
       else
@@ -109,6 +126,8 @@ define [
         @$showHide.show()
 
         unless @sublevelCheckboxes
+          @linkedTarget = $target.data('linkedTarget')
+
           @fetchSublevelCheckboxes()
           @renderSublevelCheckboxes()
     
@@ -119,6 +138,7 @@ define [
     fetchSublevelCheckboxes: -> 
       @sublevelCheckboxes = new CheckboxCollection
       @sublevelCheckboxes.url = @model.get('sub_items_url')
+      @sublevelCheckboxes.linkedTarget = @linkedTarget if @linkedTarget
 
       dfd = @sublevelCheckboxes.fetch()
       @$el.disableWhileLoading dfd
@@ -128,7 +148,7 @@ define [
     # be on each of these models. 
     # @api private
 
-    renderSublevelCheckboxes: -> 
+    renderSublevelCheckboxes: ->
       checkboxCollectionView = new CollectionView
                                  collection: @sublevelCheckboxes
                                  itemView: ContentCheckboxView
@@ -136,3 +156,16 @@ define [
                                  template: checkboxCollectionTemplate
 
       checkboxCollectionView.render()
+
+    syncWithLinkedResource: =>
+      linkedItem = @model.get('linked_resource')
+      checked = @$el.find("#checkbox-#{@cid}").is(':checked')
+
+      linkedProperty = "copy[#{linkedItem.type}][#{linkedItem.migration_id}]"
+
+      $collection_box = $("[name=\"copy[all_#{linkedItem.type}]\"]")
+      if !checked && $collection_box.is(':checked')
+        $collection_box.data('linkedTarget', linkedProperty).prop('checked', false).trigger('change')
+
+      if $linked_el = $("[name=\"#{linkedProperty}\"]")
+        $linked_el.prop('checked', checked)
