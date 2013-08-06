@@ -323,6 +323,25 @@ describe Quiz do
     q.unpublished_question_count.should eql(3)
   end
 
+  it "should return an available question count for unpublished questions" do
+    q = @course.quizzes.create!(:title => "new quiz")
+    q.quiz_questions.create!
+    q.quiz_questions.create!
+    q.save
+
+    q.reload.available_question_count.should eql(2)
+  end
+
+  it "should return an available question count for published questions" do
+    q = @course.quizzes.create!(:title => "new quiz")
+    q.quiz_questions.create!
+    q.quiz_questions.create!
+    q.save
+    q.publish!
+
+    q.reload.available_question_count.should eql(2)
+  end
+
   it "should return processed root entries for each question/group" do
     q = @course.quizzes.create!(:title => "new quiz")
     g = q.quiz_groups.create!(:name => "group 1", :pick_count => 1, :question_points => 2)

@@ -412,7 +412,11 @@ class Quiz < ActiveRecord::Base
     end
     question_count || 0
   end
-  
+
+  def available_question_count
+    published? ? question_count : unpublished_question_count
+  end
+
   # Returns data for the SAVED version of the quiz.  That is, not
   # the version found by gathering relationships on the Quiz data models,
   # but the version being held in Quiz.quiz_data.  Caches the result
