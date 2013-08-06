@@ -200,6 +200,7 @@ class Rubric < ActiveRecord::Base
     false
   end
   
+  CriteriaData = Struct.new(:criteria, :points_possible, :title)
   def generate_criteria(params)
     @used_ids = {}
     title = params[:title] || t('context_name_rubric', "%{course_name} Rubric", :course_name => context.name)
@@ -239,8 +240,8 @@ class Rubric < ActiveRecord::Base
       points_possible += criterion[:points] unless criterion[:ignore_for_scoring]
       criteria[idx.to_i] = criterion
     end
-    criteria = criteria.select{|c| c}
-    OpenObject.new(:criteria => criteria, :points_possible => points_possible, :title => title)
+    criteria = criteria.compact
+    CriteriaData.new(criteria, points_possible, title)
   end
   
   def update_assessments_for_new_criteria(new_criteria)

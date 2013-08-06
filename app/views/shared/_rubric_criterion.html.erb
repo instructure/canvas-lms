@@ -1,17 +1,28 @@
-<% criterion = rubric_criterion || nil; assessing ||= false; rubric ||= nil; rubric_association ||= nil; edit_view ||= false; assessment_rating ||= nil %>
-<tr id="criterion_<%= criterion ? criterion.id : "blank" %>" class="criterion <%= "blank" unless criterion %> <%= 'ignore_criterion_for_scoring' if criterion && criterion.ignore_for_scoring %> <%= 'learning_outcome_criterion' if criterion && criterion.learning_outcome_id %>" style="<%= hidden unless criterion %>">
+<%
+  criterion = rubric_criterion || nil
+  assessing ||= false
+  rubric ||= nil
+  rubric_association ||= nil
+  edit_view ||= false
+  assessment_rating ||= nil
+
+  learning_outcome_criterion = criterion.try(:learning_outcome_id)
+  description = criterion.try(:description) || t('defaults.description', "Description of criterion")
+%>
+
+<tr id="criterion_<%= criterion ? criterion.id : "blank" %>" class="criterion <%= "blank" unless criterion %> <%= 'ignore_criterion_for_scoring' if criterion && criterion.ignore_for_scoring %> <%= 'learning_outcome_criterion' if learning_outcome_criterion %>" style="<%= hidden unless criterion %>">
   <td class="criterion_description hover-container">
     <div class="container">
       <div class="links editing">
         <a href="#" class="edit_criterion_link hide-till-hover"><i class="icon-edit standalone-icon"></i></a>
       </div>
       <%= image_tag "flagged_question.png", :class => "learning_outcome_flag", :title => t('titles.linked_to_learning_outcome', "This criterion is linked to a Learning Outcome") %>
-      <span class="description criterion_description_value"><%= criterion.description rescue t('defaults.description', "Description of criterion") %></span>
-      <span class="learning_outcome_id" style="display: none;"><%= criterion.learning_outcome_id rescue nbsp %></span>
-      <span class="criterion_id" style="display: none;"><%= criterion && criterion.id %></span>
-      <div class="long_description_holder editing <%= 'empty' if !criterion || !criterion.long_description || criterion.long_description.empty? %>">
+      <span class="description criterion_description_value"><%= description %></span>
+      <span class="learning_outcome_id" style="display: none;"><%= criterion.try(:learning_outcome_id) %></span>
+      <span class="criterion_id" style="display: none;"><%= criterion.try(:id) %></span>
+      <div class="long_description_holder editing <%= 'empty' if !criterion || criterion.long_description.blank? %>">
         <a href="#" class="long_description_link"><%= t 'links.view_longer_description', "view longer description" %></a>
-        <textarea class="long_description" style="display: none;"><%= h((criterion.long_description rescue '')) %></textarea>
+        <textarea class="long_description" style="display: none;"><%= h((criterion.try(:long_description) || '')) %></textarea>
       </div>
       <div class="threshold">
         <%= before_label :threshold, "threshold" %>
