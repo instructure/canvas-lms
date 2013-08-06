@@ -108,11 +108,11 @@ class EventStream
     ((record.created_at + time_to_live) - Time.now).to_i
   end
 
-  private
-
   def fetch_cql
     "SELECT * FROM #{table} WHERE #{id_column} IN (?)"
   end
+
+  private
 
   def callbacks_for(operation)
     @callbacks ||= {}
