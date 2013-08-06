@@ -801,7 +801,7 @@ class ConversationsController < ApplicationController
       :forwarded_message_ids => params[:forwarded_message_ids],
       :root_account_id => @domain_root_account.id,
       :media_comment => infer_media_comment,
-      :generate_user_note => params[:user_note]
+      :generate_user_note => value_to_boolean(params[:user_note])
     )
   end
 

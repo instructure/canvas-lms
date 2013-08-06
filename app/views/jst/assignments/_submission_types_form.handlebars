@@ -32,22 +32,20 @@
 
     <div class="controls">
       <label class="checkbox">
-        <input id="assignment_text_entry"
+        {{checkbox "acceptsOnlineTextEntries"
+          id="assignment_text_entry"
           name="online_submission_types[online_text_entry]"
-          type="checkbox"
-          {{checkedIf acceptsOnlineTextEntries}}
-          {{disabledIfIncludes frozenAttributes "submission_types"}}/>
+          disabled=submissionTypesFrozen}}
         {{#t "labels.allow_text_entry"}}Allow Text Entry{{/t}}
       </label>
     </div>
 
     <div class="controls">
       <label class="checkbox">
-        <input id="assignment_online_url"
+        {{checkbox "acceptsOnlineURL"
+          id="assignment_online_url"
           name="online_submission_types[online_url]"
-          type="checkbox"
-          {{checkedIf acceptsOnlineURL}}
-          {{disabledIfIncludes frozenAttributes "submission_types"}}/>
+          disabled=submissionTypesFrozen}}
         {{#t "labels.allow_url"}}Allow Website URL{{/t}}
       </label>
     </div>
@@ -55,11 +53,10 @@
     <div class="controls">
       {{#if kalturaEnabled}}
         <label class="checkbox">
-          <input id="assignment_media_recording"
+          {{checkbox "acceptsMediaRecording"
+            id="assignment_media_recording"
             name="online_submission_types[media_recording]"
-            type="checkbox"
-            {{checkedIf acceptsMediaRecording}}
-            {{disabledIfIncludes frozenAttributes "submission_types"}}/>
+            disabled=submissionTypesFrozen}}
           {{#t "labels.allow_media_recordings"}}Allow Media Recordings{{/t}}
         </label>
       {{/if}}
@@ -67,12 +64,11 @@
 
     <div class="controls">
       <label class="checkbox" for="assignment_online_upload">
-        <input id="assignment_online_upload"
+        {{checkbox "acceptsOnlineUpload"
+          id="assignment_online_upload"
           name="online_submission_types[online_upload]"
-          type="checkbox"
           aria-controls="restrict_file_extensions_container"
-          {{checkedIf acceptsOnlineUpload}}
-          {{disabledIfIncludes frozenAttributes "submission_types"}}/>
+          disabled=submissionTypesFrozen}}
         {{#t "labels.allow_file_uploads"}}Allow File Uploads{{/t}}
       </label>
     </div>
@@ -82,12 +78,11 @@
       style="{{hiddenUnless acceptsOnlineUpload}}">
       <div class="controls">
         <label class="checkbox" for="assignment_restrict_file_extensions">
-          <input id="assignment_restrict_file_extensions"
+          {{checkbox "restrictFileExtensions"
+            id="assignment_restrict_file_extensions"
             name="restrict_file_extensions"
-            type="checkbox"
             aria-controls="allowed_extensions_container"
-            {{checkedIf restrictFileExtensions}}
-            {{disabledIfIncludes frozenAttributes "submission_types"}}/>
+            disabled=submissionTypesFrozen}}
           {{#t "labels.restrict_file_extensions"}}
             Restrict Upload File Types
           {{/t}}
@@ -118,12 +113,11 @@
 
     <div class="controls" style="{{hiddenUnless turnitinAvailable}}">
       <label for="assignment_turnitin_enabled" class="checkbox">
-        <input id="assignment_turnitin_enabled"
+        {{checkbox "turnitinEnabled"
+          id="assignment_turnitin_enabled"
           name="turnitin_enabled"
-          type="checkbox"
           aria-controls="advanced_turnitin_settings_link"
-          {{checkedIf turnitinEnabled}}
-          {{disabledIfIncludes frozenAttributes "submission_types"}}/>
+          disabled=submissionTypesFrozen}}
         {{#t "label.turnitin_enabled"}}Enable Turnitin Submissions{{/t}}
       </label>
 
@@ -155,11 +149,10 @@
     <div class="control-group">
       <div class="controls">
         <label for="assignment_external_tool_tag_attributes_new_tab" class="checkbox">
-          <input id="assignment_external_tool_tag_attributes_new_tab"
+          {{checkbox "externalToolNewTab"
+            id="assignment_external_tool_tag_attributes_new_tab"
             name="external_tool_tag_attributes[new_tab]"
-            type="checkbox"
-            {{checkedIf externalToolNewTab}}
-            {{disabledIfIncludes frozenAttributes "submission_types"}}/>
+            disabled=submissionTypesFrozen}}
           {{#t "label.external_tool_new_tab"}}Load This Tool In A New Tab{{/t}}
         </label>
       </div>

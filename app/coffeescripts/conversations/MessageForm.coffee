@@ -128,7 +128,7 @@ define [
       for key, enabled of options
         $node = @$form.find(".#{key}_info")
         $node.showIf(enabled)
-        $node.find("input[name=#{key}]").prop('checked', false) unless enabled
+        $node.find("input[type=checkbox][name=#{key}]").prop('checked', false) unless enabled
 
     toggle: (state) ->
       @$form[if state then 'addClass' else 'removeClass']('disabled')

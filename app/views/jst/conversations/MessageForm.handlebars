@@ -39,7 +39,7 @@
       <th></th>
       <td>
         <label>
-          <input type="checkbox" name="group_conversation" value="1" class="group_conversation">
+          {{checkbox "group_conversation" class="group_conversation"}}
           {{#t "labels.group_conversation"}}This is a group conversation. Participants will see everyone's replies{{/t}}
         </label>
       </td>
@@ -49,13 +49,11 @@
       <th></th>
       <td>
         <label>
-          <input type="checkbox"
-                 name="user_note"
-                 value="1"
-                  data-track-category="Compose Message"
-                  data-track-action="Edit"
-                  data-track-label="Faculty Journal"
-                 class="user_note" />
+          {{checkbox "user_note"
+            data-track-category="Compose Message"
+            data-track-action="Edit"
+            data-track-label="Faculty Journal"
+            class="user_note"}}
           {{#t "labels.add_to_faculty_journal"}}Add as a Faculty Journal entry{{/t}}
         </label>
       </td>

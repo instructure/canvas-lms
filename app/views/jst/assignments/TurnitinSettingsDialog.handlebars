@@ -46,37 +46,28 @@
     <div class="control-group">
       <div class="controls">
         <label class="checkbox">
-          <input id="s_paper_check"
-            name="s_paper_check"
-            {{checkedIf sPaperCheck}}
-            type="checkbox"/>
-            {{#t "turnitin_settings.labels.student_paper_check"}}
-              Other Student Papers
-            {{/t}}
+          {{checkbox "s_paper_check" checked=sPaperCheck}}
+          {{#t "turnitin_settings.labels.student_paper_check"}}
+            Other Student Papers
+          {{/t}}
         </label>
       </div>
 
       <div class="controls">
         <label class="checkbox">
-          <input id="internet_check"
-          name="internet_check"
-            {{checkedIf internetCheck}}
-            type="checkbox"/>
-            {{#t "turnitin_settings.labels.internet_check"}}
-              Internet Database
-            {{/t}}
+          {{checkbox "internet_check" checked=internetCheck}}
+          {{#t "turnitin_settings.labels.internet_check"}}
+            Internet Database
+          {{/t}}
         </label>
       </div>
 
       <div class="controls">
         <label class="checkbox">
-          <input id="journal_check"
-            name="journal_check"
-            type="checkbox"
-            {{checkedIf journalCheck}}/>
-            {{#t "turnitin_settings.labels.journal_check"}}
-              Journals, Periodicals, and Publications
-            {{/t}}
+          {{checkbox "journal_check" checked=journalCheck}}
+          {{#t "turnitin_settings.labels.journal_check"}}
+            Journals, Periodicals, and Publications
+          {{/t}}
         </label>
       </div>
     </div>
@@ -91,36 +82,27 @@
     <div class="control-group">
       <div class="controls">
         <label class="checkbox">
-          <input id="exclude_biblio"
-            name="exclude_biblio"
-            type="checkbox"
-            {{checkedIf excludeBiblio}}/>
-            {{#t "turnitin_settings.labels.exclude_biblio"}}
-              Bibliographic Material
-            {{/t}}
+          {{checkbox "exclude_biblio" checked=excludeBiblio}}
+          {{#t "turnitin_settings.labels.exclude_biblio"}}
+            Bibliographic Material
+          {{/t}}
         </label>
       </div>
       <div class="controls">
         <label class="checkbox">
-          <input id="exclude_quoted"
-            name="exclude_quoted"
-            type="checkbox"
-            {{checkedIf excludeQuoted}}/>
-            {{#t "turnitin_settings.labels.exclude_quoted"}}
-              Quoted Material
-            {{/t}}
+          {{checkbox "exclude_quoted" checked=excludeQuoted}}
+          {{#t "turnitin_settings.labels.exclude_quoted"}}
+            Quoted Material
+          {{/t}}
         </label>
       </div>
 
       <div class="controls">
         <label class="checkbox">
-          <input id="exclude_small_matches"
-            name="exclude_small_matches"
-            type="checkbox"
-            {{checkedIf excludesSmallMatches}}/>
-            {{#t "assignments.turnitin_settings.labels.exclude_small_matches"}}
-              Small Matches
-            {{/t}}
+          {{checkbox "exclude_small_matches" checked=excludesSmallMatches}}
+          {{#t "assignments.turnitin_settings.labels.exclude_small_matches"}}
+            Small Matches
+          {{/t}}
         </label>
         <div class="controls js-exclude-small-matches-options"
           style="{{hiddenUnless excludesSmallMatches}}">

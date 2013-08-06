@@ -40,7 +40,7 @@
       {{#if CAN.EDIT_HIDE}}
         <div class="controls">
           <label for="hide_from_students" class="checkbox">
-            <input id="hide_from_students" type="checkbox" name="wiki_page[hide_from_students]" {{#if hide_from_students}}checked{{/if}}>
+            {{checkbox "hide_from_students" prefix="wiki_page"}}
             {{#t "hide_from_students"}}Hide this page from students{{/t}}
           </label>
         </div>
@@ -67,7 +67,7 @@
 <div class="form-actions clearfix">
   <div style="height:30px">
     <label for="notify_of_update" class="checkbox clearfix pull-left" style="margin-top:5px">
-      <input id="notify_of_update" type="checkbox" name="wiki_page[notify_of_update]">
+      {{checkbox "notify_of_update" prefix="wiki_page"}}
       {{#t "notify_users_text"}}Notify users that this content has changed{{/t}}
     </label>
     <a class="btn cancel" tabindex="0" role="button">{{#t "buttons.cancel"}}Cancel{{/t}}</a>

@@ -245,9 +245,14 @@ define [
     #                      checked="true"
     #                      name="likes[tacos]"
     #                      class="foo bar" >
-    checkbox : (propertyName, {hash}) ->
+    checkbox: (propertyName, {hash}) ->
       splitPropertyName = propertyName.split(/\./)
       snakeCase = splitPropertyName.join('_')
+
+      if hash.prefix
+        splitPropertyName.unshift hash.prefix
+        delete hash.prefix
+
       bracketNotation = splitPropertyName[0] + _.chain(splitPropertyName)
                                                 .rest()
                                                 .map((prop) -> "[#{prop}]")
@@ -260,11 +265,19 @@ define [
         name: bracketNotation
       , hash
 
-      unless inputProps.checked
-        value = _.reduce splitPropertyName, ((memo, key) -> memo[key]), this
+      unless inputProps.checked?
+        value = _.reduce(splitPropertyName, ((memo, key) -> memo[key] if memo?), this)
         inputProps.checked = true if value
 
-      attributes = _.map inputProps, (val, key) -> "#{htmlEscape key}=\"#{htmlEscape val}\""
+      for prop in ['checked', 'disabled']
+        if inputProps[prop]
+          inputProps[prop] = prop
+        else
+          delete inputProps[prop]
+
+      attributes = for key, val of inputProps when val?
+        "#{htmlEscape key}=\"#{htmlEscape val}\""
+
       new Handlebars.SafeString """
         <input name="#{htmlEscape inputProps.name}" type="hidden" value="0" />
         <input #{attributes.join ' '} />

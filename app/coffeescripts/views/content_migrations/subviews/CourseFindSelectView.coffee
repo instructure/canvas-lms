@@ -16,7 +16,7 @@ define [
 
     events: 
       'change #courseSelect' : 'updateSearch'
-      'change [name=include_completed_courses]' : 'toggleConcludedCourses'
+      'change #include_completed_courses' : 'toggleConcludedCourses'
 
     render: ->
       super

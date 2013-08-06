@@ -49,22 +49,17 @@
     <div class="controls">
       {{#if isTopic}}
         <label class="checkbox">
-          <input name="threaded" type="hidden" value="0" />
-          <input type="checkbox"
-                 {{#ifEqual discussion_type "threaded"}}checked{{/ifEqual}}
-                 name="threaded">
+          {{checkbox "threaded"}}
           {{#t "allow_threaded_replies"}}Allow threaded replies{{/t}}
         </label>
       {{/if}}
       {{#if contextIsCourse}}
         {{#if isAnnouncement}}
           <label class="checkbox">
-            <input name="delay_posting" type="hidden" value="0" />
-            <input type="checkbox"
-                   {{#if delayed_post_at}}checked{{/if}}
-                   name="delay_posting"
-                   class="element_toggler"
-                   aria-controls="discussion_topic_delay_post_container">
+            {{checkbox "delay_posting"
+              checked=delayed_post_at
+              class="element_toggler"
+              aria-controls="discussion_topic_delay_post_container"}}
             {{#t "delay_posting"}}Delay posting{{/t}}
           </label>
           <label id="discussion_topic_delay_post_container"
@@ -85,12 +80,10 @@
       {{/if}}
       {{#if canModerate}}
         <label class="checkbox">
-          <input name="podcast_enabled" type="hidden" value="0" />
-          <input type="checkbox"
-                 {{#if podcast_url}}checked{{/if}}
-                 name="podcast_enabled"
-                 class="element_toggler"
-                 aria-controls="podcast_has_student_posts_container">
+          {{checkbox "podcast_enabled"
+            checked=podcast_url
+            class="element_toggler"
+            aria-controls="podcast_has_student_posts_container"}}
           {{#t "enable_podcast_feed"}}Enable podcast feed{{/t}}
         </label>
   
@@ -103,14 +96,11 @@
       {{/if}}
       {{#if showAssignment}}
         <label class="checkbox">
-          <input name="assignment[set_assignment]" type="hidden" value="0" />
-          <input type="checkbox"
-                 id="use_for_grading"
-                 class="element_toggler"
-                 aria-controls="assignment_options"
-                 name="assignment[set_assignment]"
-                 {{checkedIf set_assignment}}
-                 value="1">
+          {{checkbox "assignment.set_assignment"
+            id="use_for_grading"
+            class="element_toggler"
+            aria-controls="assignment_options"
+            checked=set_assignment}}
           {{#t "use_for_grading"}}Graded{{/t}}
         </label>
       {{/if}}
