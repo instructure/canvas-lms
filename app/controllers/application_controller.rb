@@ -88,6 +88,7 @@ class ApplicationController < ActionController::Base
         :AUTHENTICITY_TOKEN => form_authenticity_token,
         :files_domain => HostUrl.file_host(@domain_root_account || Account.default, request.host_with_port),
       }
+      @js_env[:lolcalize] = true if ENV['LOLCALIZE']
     end
 
     hash.each do |k,v|

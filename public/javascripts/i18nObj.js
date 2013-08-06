@@ -3,8 +3,9 @@ define([
   'str/htmlEscape',
   'str/pluralize',
   'str/escapeRegex',
+  'compiled/str/i18nLolcalize',
   'vendor/date' /* Date.parse, Date.UTC */
-], function($, htmlEscape, pluralize, escapeRegex) {
+], function($, htmlEscape, pluralize, escapeRegex, i18nLolcalize) {
 
 // Instantiate the object, export globally for tinymce/specs
 var I18n = window.I18n = {};
@@ -532,6 +533,11 @@ I18n.l = I18n.localize;
 I18n.p = I18n.pluralize;
 
 
+var normalizeDefault = function(str) { return str };
+if (ENV && ENV.lolcalize) {
+  normalizeDefault = i18nLolcalize;
+}
+
 I18n.scoped = function(scope, callback) {
   var i18n_scope = new I18n.scope(scope);
   if (callback) {
@@ -558,7 +564,7 @@ I18n.scope.prototype = {
     if (typeof(options.count) != 'undefined' && typeof(defaultValue) == "string" && defaultValue.match(/^[\w\-]+$/)) {
       defaultValue = pluralize.withCount(options.count, defaultValue);
     }
-    options.defaultValue = defaultValue;
+    options.defaultValue = normalizeDefault(defaultValue);
     return I18n.translate(this.resolveScope(scope), options);
   },
   localize: function(scope, value) {

@@ -10,6 +10,8 @@ unless CANVAS_RAILS3
   I18n.backend.init_translations
 end
 
+I18n.send :extend, I18n::Lolcalize if ENV['LOLCALIZE']
+
 module I18nUtilities
   def before_label(text_or_key, default_value = nil, *args)
     if default_value
