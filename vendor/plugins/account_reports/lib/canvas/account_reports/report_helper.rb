@@ -74,7 +74,7 @@ module Canvas::AccountReports::ReportHelper
 
   def course
     if (course_id = (@account_report.has_parameter? "course_id") || (@account_report.has_parameter? "course"))
-      @course ||= api_find(root_account.courses, course_id)
+      @course ||= api_find(root_account.all_courses, course_id)
     end
   end
 
