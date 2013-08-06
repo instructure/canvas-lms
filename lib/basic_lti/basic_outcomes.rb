@@ -116,7 +116,7 @@ module BasicLTI::BasicOutcomes
     def self.envelope
       return @envelope if @envelope
       @envelope = Nokogiri::XML.parse <<-XML
-      <imsx_POXEnvelopeResponse xmlns = "http://www.imsglobal.org/lis/oms1p0/pox">
+      <imsx_POXEnvelopeResponse xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
         <imsx_POXHeader>
           <imsx_POXResponseHeaderInfo>
             <imsx_version>V1.0</imsx_version>
