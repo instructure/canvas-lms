@@ -18,7 +18,13 @@
 
 module QuizzesHelper
   def needs_unpublished_warning?(quiz=@quiz)
+    return false if quiz.available? && !can_publish(quiz)
+
     !quiz.available? || quiz.unpublished_changes?
+  end
+
+  def can_publish(quiz)
+    can_do(quiz, @current_user, :update) || can_do(quiz, @current_user, :manage)
   end
 
   def unpublished_quiz_warning

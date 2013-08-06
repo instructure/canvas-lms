@@ -190,7 +190,7 @@
   <header class="quiz-header">
 
   <% if @domain_root_account.enable_draft? %>
-    <% if needs_unpublished_warning? %>
+    <% if needs_unpublished_warning?(@quiz) %>
     <div class="alert unpublished_warning">
       <% if !@quiz.available? %>
         <%= unpublished_quiz_warning %>
@@ -206,7 +206,7 @@
 
   <% else %>
 
-    <% if needs_unpublished_warning? %>
+    <% if needs_unpublished_warning?(@quiz) %>
       <div class="alert">
         <div class='row-fluid'>
           <div class='span8 unpublished_warning'>
