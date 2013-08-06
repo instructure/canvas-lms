@@ -754,12 +754,26 @@ class DiscussionTopic < ActiveRecord::Base
     self.user ? self.user.name : nil
   end
 
-  def visible_for?(user=nil, opts={})
+  # Public: Determine if the given user can view this discussion topic.
+  #
+  # user - The user attempting to view the topic (default: nil).
+  # options - Options passed to the locked_for? call (default: {}).
+  #
+  # Returns a boolean.
+  def visible_for?(user = nil, options = {})
+    # user is the topic's author
     return true if user == self.user
-    if unlock_at = locked_for?(user, opts).try_rescue(:[], :unlock_at)
+
+    # user is an admin in the context (teacher/ta/designer)
+    return true if context.grants_right?(user, :manage, nil)
+
+    # unlock date exists and has passed
+    if unlock_at = locked_for?(user, options).try_rescue(:[], :unlock_at)
       unlock_at < Time.now
+    # topic is not published
     elsif !published?
       false
+    # everything else
     else
       true
     end

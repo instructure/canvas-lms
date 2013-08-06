@@ -151,6 +151,13 @@ describe DiscussionTopic do
       
       @topic.visible_for?(@student).should be_false
     end
+
+    it "should be visible to all teachers in the course" do
+      @topic.update_attribute(:delayed_post_at, Time.now + 1.day)
+      new_teacher = user
+      @course.enroll_teacher(new_teacher).accept!
+      @topic.visible_for?(new_teacher).should be_true
+    end
   end
 
   describe "allow_student_discussion_topics setting" do
