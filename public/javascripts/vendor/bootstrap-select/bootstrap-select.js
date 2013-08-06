@@ -40,6 +40,8 @@
             this.$element.hide();
             this.multiple = this.$element.prop('multiple');
             var id = this.$element.attr('id');
+            // INSTRUCTURE
+            this.id = id ? id+'-bs' : 'bs-'+((window.$ || window).guid++);
             this.$newElement = this.createView();
             this.$element.after(this.$newElement);
             this.$menu = this.$newElement.find('> .dropdown-menu');
@@ -52,6 +54,12 @@
                     _this.button.focus();
                 })
             }
+
+            // INSTRUCTURE
+            this.$menu.attr('id', this.id);
+            this.button.attr('aria-owns', this.id);
+            this.button.attr('aria-label', this.$element.attr('aria-label'));
+            this.button.attr('aria-labelledby', this.$element.attr('aria-labelledby'));
 
             //If we are multiple, then add the show-tick class by default
             if (this.multiple) {
@@ -147,22 +155,22 @@
                             _liA.push(
                                 '<div class="div-contain"><div class="divider"></div></div>'+
                                 '<dt>'+label+'</dt>'+
-                                _this.createA(text, "opt " + optionClass, inline )
+                                _this.createA(text, "opt " + optionClass, inline, index )
                                 );
                         } else {
                             _liA.push(
                                 '<dt>'+label+'</dt>'+
-                                _this.createA(text, "opt " + optionClass, inline ));
+                                _this.createA(text, "opt " + optionClass, inline, index ));
                         }
                     } else {
-                         _liA.push( _this.createA(text, "opt " + optionClass, inline )  );
+                         _liA.push( _this.createA(text, "opt " + optionClass, inline, index )  );
                     }
                 } else if ($this.data('divider') == true) {
                     _liA.push('<div class="div-contain"><div class="divider"></div></div>');
                 } else if ($(this).data('hidden') == true) {
                     _liA.push('');
                 } else {
-                    _liA.push( _this.createA(text, optionClass, inline ) );
+                    _liA.push( _this.createA(text, optionClass, inline, index ) );
                 }
             });
 
@@ -178,8 +186,9 @@
             return $(_liHtml);
         },
 
-        createA: function(text, classes, inline) {
-         return '<a tabindex="0" class="'+classes+'" style="'+inline+'">' +
+        createA: function(text, classes, inline, index) {
+          // INSTRUCTURE: added role and id
+         return '<a tabindex="-1" class="'+classes+'" style="'+inline+'" id="' + this.id+'-'+index + '" role="menuitemcheckbox">' +
                  text +
                  '<i class="icon-ok check-mark"></i>' +
                  '</a>';
@@ -363,13 +372,16 @@
             } else {
                 this.$menu.find('li').eq(index).removeClass('selected');
             }
+            // INSTRUCTURE
+            this.$menu.find('a').eq(index).attr('aria-checked', selected ? 'true' : 'false');
         },
 
         setDisabled: function(index, disabled) {
             if (disabled) {
                 this.$menu.find('li').eq(index).addClass('disabled').find('a').attr('href','#').attr('tabindex',-1);
             } else {
-                this.$menu.find('li').eq(index).removeClass('disabled').find('a').removeAttr('href').attr('tabindex',0);
+                // INSTRUCTURE: remove tabindex
+                this.$menu.find('li').eq(index).removeClass('disabled').find('a').removeAttr('href');
             }
         },
 

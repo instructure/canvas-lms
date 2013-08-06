@@ -17,6 +17,7 @@
  * limitations under the License.
  * ============================================================ */
 
+// INSTRUCTURE modified
 
 !function ($) {
 
@@ -30,7 +31,8 @@
     , Dropdown = function (element) {
         var $el = $(element).on('click.dropdown.data-api', this.toggle)
         $('html').on('click.dropdown.data-api', function () {
-          $el.parent().removeClass('open')
+          // INSTRUCTURE added aria-expanded
+          $el.parent().removeClass('open').attr('aria-expanded', 'false')
         })
       }
 
@@ -56,7 +58,8 @@
           // if mobile we we use a backdrop because click events don't delegate
           $('<div class="dropdown-backdrop"/>').insertBefore($(this)).on('click', clearMenus)
         }
-        $parent.toggleClass('open')
+        // INSTRUCTURE added aria-expanded
+        $parent.toggleClass('open').attr('aria-expanded', 'true')
       }
 
       $this.focus()
@@ -71,6 +74,9 @@
         , $parent
         , isActive
         , index
+
+      // INSTRUCTURE
+      if (e.keyCode == 9) return clearMenus()
 
       if (!/(38|40|27)/.test(e.keyCode)) return
 
@@ -100,17 +106,20 @@
       if (e.keyCode == 40 && index < $items.length - 1) index++                        // down
       if (!~index) index = 0
 
-      $items
-        .eq(index)
-        .focus()
+      // INSTRUCTURE
+      var $item = $items.eq(index)
+      $item.focus()
+      if ($item.attr('id')) {
+        $this.attr('aria-activedescendant', $item.attr('id'))
+      }
     }
-
   }
 
   function clearMenus() {
     $('.dropdown-backdrop').remove()
     $(toggle).each(function () {
-      getParent($(this)).removeClass('open')
+      // INSTRUCTURE added aria-expanded
+      getParent($(this)).removeClass('open').attr('aria-expanded', 'false')
     })
   }
 
