@@ -14,7 +14,7 @@ color with a dashed line between groups.
 
   <div class="item-group-condensed">
     <h2 class="ig-header">
-      <a class="element_toggler" href="#"
+      <a class="ig-header-title element_toggler" href="#"
          aria-controls="cond_group_1"
          aria-expanded="true">
         <i class="icon-mini-arrow-down"></i> Item Group Header
@@ -104,7 +104,7 @@ color with a dashed line between groups.
 
   <div class="item-group-condensed">
     <h2 class="ig-header">
-      <a class="element_toggler" href="#"
+      <a class="ig-header-title element_toggler" href="#"
          aria-controls="cond_group_2"
          aria-expanded="true">
         <i class="icon-mini-arrow-down"></i> Item Group Header
@@ -181,12 +181,8 @@ body.with_item_groups #main {
 
   .ig-header {
     padding-left: 15px;
-
-    a {
-      text-decoration: none;
-      color: #3d454c;
-    }
   }
+
   .ig-title {
     left: 15px;
   }
