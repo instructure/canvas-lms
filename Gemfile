@@ -129,7 +129,7 @@ group :test do
   gem 'webrat',       '0.7.3'
   gem 'yard',         '0.8.0'
   gem 'yard-appendix',  '>=0.1.8'
-  gem 'timecop',      '0.5.9.1'
+  gem 'timecop',      '0.6.3'
   gem 'test-unit',  '1.2.3'
 end
 
