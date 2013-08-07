@@ -570,6 +570,7 @@ class Submission < ActiveRecord::Base
       ids = (attachment_ids || "").split(",")
       ids << attachment_id if attachment_id
       self.versioned_attachments = Attachment.where(:id => ids)
+      @versioned_attachments
     end
   end
 

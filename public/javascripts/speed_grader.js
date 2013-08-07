@@ -119,7 +119,7 @@ define([
       $mute_link = $('#mute_link'),
       $no_annotation_warning = $('#no_annotation_warning'),
       $selectmenu = null,
-      broswerableCssClasses = /^(image|html|code)$/,
+      browserableCssClasses = /^(image|html|code)$/,
       windowLastHeight = null,
       resizeTimeOut = null,
       iframes = {},
@@ -1088,7 +1088,7 @@ define([
               $.isPreviewable(attachment.content_type, 'google')) {
             inlineableAttachments.push(attachment);
           }
-          if (broswerableCssClasses.test(attachment.mime_class)) {
+          if (browserableCssClasses.test(attachment.mime_class)) {
             browserableAttachments.push(attachment);
           }
           $submission_file = $submission_file_hidden.clone(true).fillTemplateData({
@@ -1280,7 +1280,7 @@ define([
           }
           $iframe_holder.show().loadDocPreview(previewOptions);
 	      }
-	      else if (attachment && broswerableCssClasses.test(attachment.mime_class)) {
+	      else if (attachment && browserableCssClasses.test(attachment.mime_class)) {
 	        var src = unescape($submission_file_hidden.find('.display_name').attr('href'))
 	                  .replace("{{submissionId}}", this.currentStudent.submission.user_id)
 	                  .replace("{{attachmentId}}", attachment.id);
