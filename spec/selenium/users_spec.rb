@@ -191,6 +191,7 @@ describe "users" do
 
   context "registration" do
     before :each do
+      Setting.set('terms_required', 'true')
       a = Account.default
       a.settings = {:self_registration => true}
       a.save!

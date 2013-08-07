@@ -162,6 +162,7 @@ Spec::Runner.configure do |config|
     # so before(:all)'s don't get confused
     Account.clear_special_account_cache!
     Notification.after_create { Notification.reset_cache! }
+    Setting.set("terms_required", "false")
   end
 
   config.before :each do
