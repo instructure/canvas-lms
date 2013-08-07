@@ -38,6 +38,7 @@ describe ContentMigration do
       ce = ContentExport.new
       ce.export_type = ContentExport::COMMON_CARTRIDGE
       ce.content_migration = @cm
+      ce.course = @course
       @cm.content_export = ce
       ce.save!
 
@@ -1952,7 +1953,8 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
 
   context "import_object?" do
     before do
-      @cm = ContentMigration.new
+      course
+      @cm = ContentMigration.new(context: @course)
     end
 
     it "should return true for everything if there are no copy options" do

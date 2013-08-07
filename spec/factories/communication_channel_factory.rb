@@ -22,9 +22,10 @@ def communication_channel_model(opts={})
 end
 
 def communication_channel_valid_attributes
+  user = @user || User.create!
   {
     :path => "value for path",
-    :user => @user,
+    :user => user,
     :pseudonym_id => "1"
   }
 end

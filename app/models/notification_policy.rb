@@ -26,6 +26,7 @@ class NotificationPolicy < ActiveRecord::Base
   attr_accessible :notification, :communication_channel, :frequency, :notification_id, :communication_channel_id
 
   validates_presence_of :communication_channel_id
+  validates_inclusion_of :broadcast, in: [true, false]
   
   # This is for choosing a policy for another context, so:
   # NotificationPolicy.for(notification) or

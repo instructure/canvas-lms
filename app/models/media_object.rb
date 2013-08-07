@@ -22,7 +22,7 @@ class MediaObject < ActiveRecord::Base
   belongs_to :context, :polymorphic => true
   belongs_to :attachment
   belongs_to :root_account, :class_name => 'Account'
-  validates_presence_of :media_id
+  validates_presence_of :media_id, :workflow_state
   has_many :media_tracks, :dependent => :destroy, :order => 'locale'
   after_create :retrieve_details_later
   after_save :update_title_on_kaltura_later

@@ -25,7 +25,8 @@ class ContentExport < ActiveRecord::Base
   has_many :attachments, :as => :context, :dependent => :destroy
   has_a_broadcast_policy
   serialize :settings
-  attr_accessible
+  attr_accessible :course
+  validates_presence_of :course_id, :workflow_state
 
   alias_method :context, :course
 

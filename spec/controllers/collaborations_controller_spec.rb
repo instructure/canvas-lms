@@ -68,7 +68,7 @@ describe CollaborationsController do
 
   describe "GET 'show'" do
     let(:collab_course) { course_with_teacher_logged_in(:active_all => true); @course }
-    let(:collaboration) { collab_course.collaborations.create!.tap{ |c| c.update_attribute :url, 'http://www.example.com' } }
+    let(:collaboration) { collab_course.collaborations.create!(title: "my collab", user: @teacher).tap{ |c| c.update_attribute :url, 'http://www.example.com' } }
 
     before do
       Setting.set('enable_page_views', 'db')

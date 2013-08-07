@@ -24,6 +24,7 @@ class Collection < ActiveRecord::Base
   belongs_to :context, :polymorphic => true
   has_many :collection_items
   has_many :following_user_follows, :class_name => 'UserFollow', :as => :followed_item
+  validates_presence_of :context_id, :context_type, :workflow_state
 
   after_save :touch_context
 

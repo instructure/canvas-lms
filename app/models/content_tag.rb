@@ -39,6 +39,7 @@ class ContentTag < ActiveRecord::Base
   # context_id and context_type set, but still allows validating when
   # context is not yet saved.
   validates_presence_of :context, :unless => proc { |tag| tag.context_id && tag.context_type }
+  validates_presence_of :workflow_state
   validates_length_of :comments, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   before_save :default_values
   after_save :update_could_be_locked

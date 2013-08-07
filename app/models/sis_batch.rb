@@ -28,6 +28,8 @@ class SisBatch < ActiveRecord::Base
 
   before_save :limit_size_of_messages
 
+  validates_presence_of :account_id, :workflow_state
+
   attr_accessor :zip_path
   attr_accessible :batch_mode, :batch_mode_term
 

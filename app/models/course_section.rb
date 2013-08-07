@@ -36,7 +36,7 @@ class CourseSection < ActiveRecord::Base
   has_many :calendar_events, :as => :context
 
   before_validation :infer_defaults, :verify_unique_sis_source_id
-  validates_presence_of :course_id
+  validates_presence_of :course_id, :root_account_id, :workflow_state
 
   before_save :set_update_account_associations_if_changed
   before_save :maybe_touch_all_enrollments

@@ -31,6 +31,7 @@ def valid_collaboration_attributes
     :user_id => User.create!.id,
     :context => @course || course_model,
     :url => "value for url",
+    :title => "My Collaboration",
     :data => %{<?xml version="1.0" encoding="UTF-8"?>
     <entry xmlns="http://www.w3.org/2005/Atom" xmlns:ns1="http://schemas.google.com/g/2005" xmlns:ns2="http://schemas.google.com/docs/2007">
       <title>Biology 100 Collaboration</title>

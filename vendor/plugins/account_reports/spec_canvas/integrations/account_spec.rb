@@ -29,8 +29,7 @@ describe "Account Reports" , :type => :integration do
     @account = Account.default
 
     csv = Attachment.create!(:filename => 'grades_export.csv', :uploaded_data => StringIO.new('sometextstuffgoeshere'), :context => @account)
-    @report = Account.default.account_reports.create!
-    report = Account.default.account_reports.last
+    report = Account.default.account_reports.create!(user: @admin)
     report.workflow_state = "complete"
     report.report_type = "student_assignment_outcome_map_csv"
     report.parameters = {}

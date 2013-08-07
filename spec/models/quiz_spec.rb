@@ -823,12 +823,12 @@ describe Quiz do
     end
 
     it 'is false if the user is not part of this course' do
-      @user.student_enrollments.delete_all
+      @user.student_enrollments.scoped.delete_all
       @quiz.has_student_submissions?.should be_false
     end
 
     it 'is false if there are no submissions' do
-      @quiz.quiz_submissions.delete_all
+      @quiz.quiz_submissions.scoped.delete_all
       @quiz.has_student_submissions?.should be_false
     end
 
@@ -965,6 +965,7 @@ describe Quiz do
 
       it "should not validate quiz_type if not changed" do
         quiz = @course.quizzes.build :title => "test quiz", :quiz_type => 'invalid'
+        quiz.workflow_state = 'created'
         quiz.save(false).should be_true  # save without validation
         quiz.reload
         quiz.save.should be_true
@@ -983,6 +984,7 @@ describe Quiz do
 
       it "should not validate ip_filter if not changed" do
         quiz = @course.quizzes.build :title => "test quiz", :ip_filter => '123.fourfivesix'
+        quiz.workflow_state = 'created'
         quiz.save(false).should be_true  # save without validation
         quiz.reload
         quiz.save.should be_true
@@ -1023,6 +1025,7 @@ describe Quiz do
 
       it "should not validate hide_results if not changed" do
         quiz = @course.quizzes.build :title => "test quiz", :hide_results => 'invalid'
+        quiz.workflow_state = 'created'
         quiz.save(false).should be_true  # save without validation
         quiz.reload
         quiz.save.should be_true

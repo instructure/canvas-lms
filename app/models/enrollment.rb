@@ -29,14 +29,14 @@ class Enrollment < ActiveRecord::Base
   has_many :pseudonyms, :primary_key => :user_id, :foreign_key => :user_id
   has_many :course_account_associations, :foreign_key => 'course_id', :primary_key => 'course_id'
 
-  validates_presence_of :user_id, :course_id
+  validates_presence_of :user_id, :course_id, :type, :root_account_id, :course_section_id, :workflow_state
   validates_inclusion_of :limit_privileges_to_course_section, :in => [true, false]
   validates_inclusion_of :associated_user_id, :in => [nil],
                          :unless => lambda { |enrollment| enrollment.type == 'ObserverEnrollment' },
                          :message => "only ObserverEnrollments may have an associated_user_id"
 
   before_save :assign_uuid
-  before_save :assert_section
+  before_validation :assert_section
   after_save :update_user_account_associations_if_necessary
   before_save :audit_groups_for_deleted_enrollments
   before_validation :infer_privileges
@@ -443,8 +443,8 @@ class Enrollment < ActiveRecord::Base
   end
 
   def assert_section
-    self.course_section ||= self.course.default_section if self.course
-    self.root_account_id = self.course.root_account_id rescue nil
+    self.course_section = self.course.default_section if !self.course_section_id && self.course
+    self.root_account_id ||= self.course.root_account_id rescue nil
   end
 
   def infer_privileges

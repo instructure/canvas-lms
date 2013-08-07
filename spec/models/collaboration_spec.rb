@@ -62,6 +62,7 @@ describe Collaboration do
     end
 
     it "should be able to get the title from the data" do
+      @collaboration.title = nil
       @collaboration.title.should eql('Biology 100 Collaboration')
     end
 

@@ -9,6 +9,8 @@ class ConversationBatch < ActiveRecord::Base
   before_save :serialize_conversation_message_ids
   after_create :queue_delivery
 
+  validates_presence_of :user_id, :workflow_state, :root_conversation_message_id
+
   scope :in_progress, where(:workflow_state => ['created', 'sending'])
 
   attr_accessible
@@ -113,6 +115,9 @@ class ConversationBatch < ActiveRecord::Base
   def self.generate(root_message, recipients, mode = :async, options = {})
     batch = new
     batch.mode = mode
+    # normally the association would do this for us, but the validation
+    # fails beforehand
+    root_message.save! if root_message.new_record?
     batch.root_conversation_message = root_message
     batch.user_id = root_message.author_id
     batch.recipient_ids = recipients.map(&:id)

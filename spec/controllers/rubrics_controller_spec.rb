@@ -195,7 +195,7 @@ describe RubricsController do
     it "should not update the rubric if not updateable (should make a new one instead)" do
       course_with_teacher_logged_in(:active_all => true)
       rubric_association_model(:user => @user, :context => @course, :purpose => 'grading')
-      @rubric.rubric_associations.create!(:purpose => 'grading')
+      @rubric.rubric_associations.create!(:purpose => 'grading', :context => @course, :association => @course)
       put 'update', :course_id => @course.id, :id => @rubric.id, :rubric => {:title => "new title"}, :rubric_association_id => @rubric_association.id
       assigns[:rubric].should_not eql(@rubric)
       assigns[:rubric].should_not be_new_record
@@ -233,7 +233,7 @@ describe RubricsController do
       }
       @rubric.update_criteria(params)
       @rubric.save!
-      @rubric.rubric_associations.create!(:purpose => 'grading')
+      @rubric.rubric_associations.create!(:purpose => 'grading', :context => @course, :association => @course)
       criteria = @rubric.criteria
       put 'update', :course_id => @course.id, :id => @rubric.id, :rubric => params, :rubric_association_id => @rubric_association.id
       assigns[:rubric].should eql(@rubric)
@@ -481,7 +481,7 @@ describe RubricsController do
       Account.default.add_user(@user, 'AccountAdmin')
 
       @rubric = Rubric.create!(:user => @user, :context => @course)
-      RubricAssociation.create!(:rubric => @rubric, :context => @course, :purpose => :bookmark)
+      RubricAssociation.create!(:rubric => @rubric, :context => @course, :purpose => :bookmark, :association => @course)
       @course.rubric_associations.bookmarked.include_rubric.to_a.select(&:rubric_id).once_per(&:rubric_id).sort_by{|a| a.rubric.title }.map(&:rubric).should == [@rubric]
 
       delete 'destroy', :course_id => @course.id, :id => @rubric.id
@@ -497,8 +497,8 @@ describe RubricsController do
       @user.reload
 
       @rubric = Rubric.create!(:user => @user, :context => Account.default)
-      RubricAssociation.create!(:rubric => @rubric, :context => @course, :purpose => :bookmark)
-      RubricAssociation.create!(:rubric => @rubric, :context => Account.default, :purpose => :bookmark)
+      RubricAssociation.create!(:rubric => @rubric, :context => @course, :purpose => :bookmark, :association => @course)
+      RubricAssociation.create!(:rubric => @rubric, :context => Account.default, :purpose => :bookmark, :association => @course)
       @course.rubric_associations.bookmarked.include_rubric.to_a.select(&:rubric_id).once_per(&:rubric_id).sort_by{|a| a.rubric.title }.map(&:rubric).should == [@rubric]
       
       delete 'destroy', :course_id => @course.id, :id => @rubric.id

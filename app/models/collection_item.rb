@@ -28,7 +28,7 @@ class CollectionItem < ActiveRecord::Base
 
   attr_accessible :collection, :collection_item_data, :user_comment, :user
 
-  validates_presence_of :collection, :collection_item_data, :user
+  validates_presence_of :collection, :collection_item_data, :user, :workflow_state
   validates_associated :collection_item_data
   validates_as_readonly :collection_item_data_id, :collection_id
 

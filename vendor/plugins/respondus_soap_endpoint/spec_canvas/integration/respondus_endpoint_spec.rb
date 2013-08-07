@@ -229,7 +229,7 @@ Implemented for: Canvas LMS}
                                             ['clearState', ''])
     status.should == "Success"
 
-    mock_migration = ContentMigration.create!
+    mock_migration = ContentMigration.create!(context: @course)
     def mock_migration.export_content
       self.workflow_state = 'imported'
       self.migration_settings[:imported_assets] = ["quiz_xyz"]
@@ -260,7 +260,7 @@ Implemented for: Canvas LMS}
                                               ['clearState', ''])
       status.should == "Success"
 
-      @mock_migration = ContentMigration.create!
+      @mock_migration = ContentMigration.create!(context: @course)
       def @mock_migration.export_content
         self.workflow_state = 'importing'
       end

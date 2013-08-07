@@ -29,6 +29,7 @@ class GroupMembership < ActiveRecord::Base
   before_save :auto_join
   before_save :capture_old_group_id
 
+  validates_presence_of :group_id, :user_id, :workflow_state
   before_validation :verify_section_homogeneity_if_necessary
   validate :validate_within_group_limit
 

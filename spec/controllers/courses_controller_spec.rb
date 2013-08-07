@@ -500,7 +500,8 @@ describe CoursesController do
       it "should auto-redirect to registration page when it's a self-enrollment" do
         course_with_student(:active_course => 1)
         @user = User.new
-        @user.communication_channels.build(:path => "jt@instructure.com")
+        cc = @user.communication_channels.build(:path => "jt@instructure.com")
+        cc.user = @user
         @user.workflow_state = 'creation_pending'
         @user.save!
         @enrollment = @course.enroll_student(@user)

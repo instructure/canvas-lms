@@ -175,13 +175,14 @@ class Course < ActiveRecord::Base
   include Profile::Association
 
   before_save :assign_uuid
-  before_save :assert_defaults
+  before_validation :assert_defaults
   before_save :set_update_account_associations_if_changed
   before_save :update_enrollments_later
   after_save :update_final_scores_on_weighting_scheme_change
   after_save :update_account_associations_if_changed
   after_save :set_self_enrollment_code
   before_validation :verify_unique_sis_source_id
+  validates_presence_of :account_id, :root_account_id, :enrollment_term_id, :workflow_state
   validates_length_of :syllabus_body, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :name, :maximum => maximum_string_length, :allow_nil => true, :allow_blank => true
   validates_length_of :course_code, :maximum => maximum_string_length, :allow_nil => true, :allow_blank => true

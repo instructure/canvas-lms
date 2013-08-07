@@ -28,7 +28,7 @@ module ReportSpecHelper
   def report(type = @type, options = {})
     account = options[:account] || @account
     parameters = options[:params] || {}
-    account_report = AccountReport.new(:user => @admin,
+    account_report = AccountReport.new(:user => @admin || user,
                                        :account => account,
                                        :report_type => type)
     account_report.parameters = {}
@@ -60,10 +60,10 @@ module ReportSpecHelper
 
   def self.run_report(account, report_type, parameters = {}, sort_column_or_columns = [0, 1], headers = false)
     sort_columns = Array(sort_column_or_columns)
-    account_report = AccountReport.new(:user => @admin, :account => account, :report_type => report_type)
+    account_report = AccountReport.new(:user => account_admin_user(account: account), :account => account, :report_type => report_type)
     account_report.parameters = {}
     account_report.parameters = parameters
-    account_report.save
+    account_report.save!
     csv_report = Canvas::AccountReports.for_account(account)[report_type][:proc].call(account_report)
     row_range = headers ? (0..-1) : (1..-1)
     if csv_report.is_a? Hash

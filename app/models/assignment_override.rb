@@ -32,7 +32,7 @@ class AssignmentOverride < ActiveRecord::Base
   has_many :assignment_override_students, :dependent => :destroy
 
   validates_presence_of :assignment_version, :if => :assignment
-  validates_presence_of :title
+  validates_presence_of :title, :workflow_state
   validates_inclusion_of :set_type, :in => %w(CourseSection Group ADHOC)
   validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true
 

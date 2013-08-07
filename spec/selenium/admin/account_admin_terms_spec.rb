@@ -65,9 +65,7 @@ describe "account admin terms" do
 
     it "should delete a term" do
       term_name = "delete term"
-      term = EnrollmentTerm.create!(:name => term_name)
-      term.root_account_id = @course.root_account_id
-      term.save!
+      term = @course.root_account.enrollment_terms.create!(:name => term_name)
       get "/accounts/#{Account.default.id}/terms"
 
       validate_term_display(0, term_name, 0, 0)

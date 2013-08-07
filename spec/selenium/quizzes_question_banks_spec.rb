@@ -19,7 +19,7 @@ describe "quizzes question banks" do
   it "should tally up question bank question points" do
     quiz = @course.quizzes.create!(:title => "My Quiz")
     bank = AssessmentQuestionBank.create!(:context => @course)
-    3.times { bank.assessment_questions << assessment_question_model }
+    3.times { assessment_question_model(bank: bank) }
     harder = bank.assessment_questions.last
     harder.question_data[:points_possible] = 15
     harder.save!
@@ -42,7 +42,7 @@ describe "quizzes question banks" do
     @course.save
     quiz = @course.quizzes.create!(:title => "My Quiz")
     bank = AssessmentQuestionBank.create!(:context => @course.account)
-    bank.assessment_questions << assessment_question_model
+    assessment_question_model(bank: bank)
 
     get "/courses/#{@course.id}/quizzes/#{quiz.id}/edit"
     click_questions_tab
@@ -78,8 +78,8 @@ describe "quizzes question banks" do
     @course.account = Account.default
     @course.save
     quiz = @course.quizzes.create!(:title => "My Quiz")
-    bank = AssessmentQuestionBank.create!(:context => Course.create)
-    bank.assessment_questions << assessment_question_model
+    bank = AssessmentQuestionBank.create!(:context => Course.create!)
+    assessment_question_model(bank: bank)
     @user.assessment_question_banks << bank
 
     get "/courses/#{@course.id}/quizzes/#{quiz.id}/edit"
@@ -121,10 +121,10 @@ describe "quizzes question banks" do
     quiz = @course.quizzes.create!(:title => "My Quiz")
 
     course_bank = AssessmentQuestionBank.create!(:context => @course)
-    course_bank.assessment_questions << assessment_question_model
+    assessment_question_model(bank: course_bank)
 
     account_bank = AssessmentQuestionBank.create!(:context => @course.account)
-    account_bank.assessment_questions << assessment_question_model
+    assessment_question_model(bank: account_bank)
 
     get "/courses/#{@course.id}/quizzes/#{quiz.id}/edit"
     click_questions_tab

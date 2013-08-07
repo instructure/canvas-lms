@@ -33,6 +33,7 @@ class InboxItem < ActiveRecord::Base
   after_save        :update_user_inbox_items_count
 
   # Validations
+  validates_presence_of :user_id, :sender_id, :asset_id, :asset_type, :workflow_state
   validates_length_of :subject, :maximum => 255
 
   # Access control

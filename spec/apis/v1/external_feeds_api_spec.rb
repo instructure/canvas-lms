@@ -27,7 +27,7 @@ describe 'ExternalFeedsController', :type => :integration do
     it "should not allow access to unauthorized users" do
       api_call_as_user(@denied_user, :get, @url_base, @url_params, {}, {}, :expected_status => 401)
       api_call_as_user(@denied_user, :post, @url_base, @url_params.merge(:action => "create"), { :url => "http://www.example.com/feed" }, {}, :expected_status => 401)
-      @feed = external_feed_model(:context => @course)
+      @feed = external_feed_model(:context => @context)
       api_call_as_user(@denied_user, :delete, @url_base+"/#{@feed.id}", @url_params.merge(:action => "destroy", :external_feed_id => @feed.to_param), {}, {}, :expected_status => 401)
     end
 
@@ -45,7 +45,7 @@ describe 'ExternalFeedsController', :type => :integration do
 
     it "should allow listing feeds" do
       @feeds = (0...3).map { |i| external_feed_model(:url => "http://www.example.com/feed#{i}", :context => @context, :user => @allowed_user) }
-      @feeds[1].external_feed_entries.create!
+      @feeds[1].external_feed_entries.create!(user: @allowed_user)
       external_feed_model(:context => Course.create!)
       json = api_call_as_user(@allowed_user, :get, @url_base, @url_params, { :per_page => 2 })
       json.should == @feeds[0,2].map { |f| feed_json(f) }

@@ -23,7 +23,8 @@ end
 def delayed_message_valid_attributes(opts={})
   opts[:notification] ||= @notification
   opts[:notification] ||= notification_model
-  cc = opts.delete(:cc) || CommunicationChannel.create!(:path => "delayed_message@example.com")
+  user = opts[:user] || @user || User.create!
+  cc = opts.delete(:cc) || user.communication_channels.first || user.communication_channels.create!(:path => "delayed_message@example.com")
   np = cc.notification_policies.create!(:notification => opts[:notification])
   {
     :notification_id => opts[:notification].id,

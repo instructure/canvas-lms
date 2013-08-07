@@ -27,7 +27,7 @@ class DelayedMessage < ActiveRecord::Base
     :communication_channel_id, :context, :workflow_state, :root_account_id
 
   validates_length_of :summary, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
-  validates_presence_of :communication_channel_id
+  validates_presence_of :communication_channel_id, :workflow_state
 
   before_save :set_send_at
   

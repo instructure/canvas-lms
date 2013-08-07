@@ -21,7 +21,10 @@ require 'socket'
 
 describe Course do
   before(:each) do
-    @course = Course.new
+    @course = Account.default.courses.build
+    @course.workflow_state = 'claimed'
+    @course.root_account = Account.default
+    @course.enrollment_term = Account.default.default_enrollment_term
   end
 
   it "should propery determine if group weights are active" do
@@ -34,7 +37,7 @@ describe Course do
   end
 
   it "should know if it has been soft-concluded" do
-    @course.enrollment_term = EnrollmentTerm.create!
+    @course.enrollment_term = Account.default.enrollment_terms.create!
 
     # Both course and term end_at dates are nil
     @course.should_not be_soft_concluded
@@ -2794,8 +2797,9 @@ describe Course, ".import_from_migration" do
     # no course imports
     @course.should_not have_open_course_imports
 
+    course2 = @course.account.courses.create!
     # created course import
-    @course.course_imports.create!
+    @course.course_imports.create!(source: course2, import_type: 'test')
     @course.should have_open_course_imports
 
     # started course import
@@ -3153,8 +3157,8 @@ describe Course do
       end
 
       it 'can be read by a prior user' do
-        user.enrollments.create!(:workflow_state => 'completed', :course => @course)
-        @course.check_policy(user).should == [:read, :read_outcomes]
+        user.student_enrollments.create!(:workflow_state => 'completed', :course => @course)
+        @course.check_policy(user).should == [:read, :read_outcomes, :read_grades, :read_forum]
       end
 
       it 'can have its forum read by an observer' do

@@ -41,6 +41,7 @@ class AppointmentGroup < ActiveRecord::Base
     appointment_group_sub_contexts.map &:sub_context
   end
 
+  validates_presence_of :workflow_state
   before_validation :default_values
   before_validation :update_contexts_and_sub_contexts
   before_save :update_cached_values

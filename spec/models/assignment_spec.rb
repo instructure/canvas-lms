@@ -587,7 +587,7 @@ describe Assignment do
 
     overrides = 5.times.map do
       override = @assignment.assignment_overrides.build
-      override.set = @assignment.group_category.groups.create!
+      override.set = @assignment.group_category.groups.create!(context: @assignment.context)
       override.save!
 
       override.workflow_state.should == 'active'
@@ -1734,7 +1734,7 @@ describe Assignment do
       e.update_attribute :workflow_state, 'active'
 
       gc = @course.group_categories.create! name: "Homework Groups"
-      group = gc.groups.create! name: "Group 1"
+      group = gc.groups.create! name: "Group 1", context: @course
       group.add_user(s1)
       group.add_user(s2)
 
@@ -2147,7 +2147,7 @@ describe Assignment do
     it 'returns "groups" instead of students for group assignments' do
       course_with_teacher active_all: true
       gc = @course.group_categories.create! name: "Assignment Groups"
-      groups = 2.times.map { |i| gc.groups.create! name: "Group #{i}" }
+      groups = 2.times.map { |i| gc.groups.create! name: "Group #{i}", context: @course }
       students = 4.times.map { student_in_course(active_all: true); @student }
       students.each_with_index { |s, i| groups[i % groups.length].add_user(s) }
       assignment = @course.assignments.create!(
@@ -2412,7 +2412,7 @@ describe Assignment do
       gc = @course.group_categories.create! name: "Homework Groups"
       @assignment.update_attributes group_category_id: gc.id,
                                     grade_group_students_individually: false
-      g1, g2 = 2.times.map { |i| gc.groups.create! name: "Group #{i}" }
+      g1, g2 = 2.times.map { |i| gc.groups.create! name: "Group #{i}", context: @course }
       g1.add_user(s1)
       g1.add_user(s2)
 

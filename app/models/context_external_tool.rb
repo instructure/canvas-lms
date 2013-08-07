@@ -10,10 +10,9 @@ class ContextExternalTool < ActiveRecord::Base
                   :course_navigation, :account_navigation, :user_navigation,
                   :resource_selection, :editor_button, :homework_submission,
                   :config_type, :config_url, :config_xml, :tool_id
-  validates_presence_of :name
+  validates_presence_of :context_id, :context_type, :workflow_state
+  validates_presence_of :name, :consumer_key, :shared_secret
   validates_length_of :name, :maximum => maximum_string_length
-  validates_presence_of :consumer_key
-  validates_presence_of :shared_secret
   validates_presence_of :config_url, :if => lambda { |t| t.config_type == "by_url" }
   validates_presence_of :config_xml, :if => lambda { |t| t.config_type == "by_xml" }
   validates_length_of :domain, :maximum => 253, :allow_blank => true

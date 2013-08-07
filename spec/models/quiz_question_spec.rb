@@ -23,7 +23,9 @@ describe QuizQuestion do
   it "should deserialize its json data" do
     answers = {'answer_0' => {'id' => 1}, 'answer_1' => {'id' => 2}}
     qd = {'name' => 'test question', 'question_type' => 'multiple_choice_question', 'answers' => answers}
-    a = AssessmentQuestion.create!
+    course
+    bank = @course.assessment_question_banks.create!
+    a = bank.assessment_questions.create!
     q = QuizQuestion.create(:question_data => qd, :assessment_question => a)
     q.question_data.should_not be_nil
     q.question_data.class.should == HashWithIndifferentAccess

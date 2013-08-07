@@ -33,6 +33,7 @@ class ContextModule < ActiveRecord::Base
   before_save :validate_prerequisites
   before_save :confirm_valid_requirements
   after_save :touch_context
+  validates_presence_of :workflow_state, :context_id, :context_type
 
   def self.module_positions(context)
     # Keep a cached hash of all modules for a given context and their

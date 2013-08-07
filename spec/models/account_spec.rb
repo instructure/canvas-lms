@@ -984,7 +984,7 @@ describe Account do
       account = Account.create!
       c1 = account.courses.create!
       c2 = account.courses.create!
-      account.course_account_associations.delete_all
+      account.course_account_associations.scoped.delete_all
       account.associated_courses.should == []
       account.update_account_associations
       account.reload

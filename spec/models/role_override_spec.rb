@@ -62,7 +62,7 @@ describe RoleOverride do
 
   it "should not fail when a context's associated accounts are missing" do
     group_model
-    @group.account.should be_nil
+    @group.stubs(:account).returns(nil)
     lambda {
       RoleOverride.permission_for(@group, :read_course_content, "TeacherEnrollment")
     }.should_not raise_error

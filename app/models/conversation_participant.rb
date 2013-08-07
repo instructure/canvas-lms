@@ -179,6 +179,7 @@ class ConversationParticipant < ActiveRecord::Base
 
   attr_accessible :subscribed, :starred, :workflow_state, :user
 
+  validates_presence_of :conversation_id, :user_id, :workflow_state
   validates_inclusion_of :label, :in => ['starred'], :allow_nil => true
 
   def as_json(options = {})

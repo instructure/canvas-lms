@@ -1330,7 +1330,7 @@ describe QuizSubmission do
   end
 
   describe "question" do
-    let(:submission) { QuizSubmission.new }
+    let(:submission) { @quiz.quiz_submissions.build }
     let(:question1) { {:id => 1} }
     let(:question2) { {:id => 2} }
     let(:questions) { [question1, question2] }
@@ -1363,7 +1363,7 @@ describe QuizSubmission do
   end
 
   describe "question_answered?" do
-    let(:submission) { QuizSubmission.new }
+    let(:submission) { @quiz.quiz_submissions.build }
 
     before do
       submission.stubs(:temporary_data).returns \
@@ -1461,7 +1461,7 @@ describe QuizSubmission do
   end
 
   describe "update_submission_version" do
-    let(:submission) { QuizSubmission.new }
+    let(:submission) { @quiz.quiz_submissions.create! }
 
     before do
       submission.with_versioning(true) do |s|

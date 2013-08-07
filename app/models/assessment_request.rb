@@ -27,6 +27,7 @@ class AssessmentRequest < ActiveRecord::Base
   belongs_to :rubric_association
   has_many :submission_comments
   belongs_to :rubric_assessment
+  validates_presence_of :user_id, :asset_id, :asset_type, :workflow_state
   validates_length_of :comments, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
 
   before_save :infer_uuid

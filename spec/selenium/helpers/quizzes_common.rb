@@ -91,10 +91,8 @@ shared_examples_for "quizzes selenium tests" do
     @context = @course
     bank = @course.assessment_question_banks.create!(:title => 'Test Bank')
     @q = quiz_model
-    a = AssessmentQuestion.create!
-    b = AssessmentQuestion.create!
-    bank.assessment_questions << a
-    bank.assessment_questions << b
+    a = bank.assessment_questions.create!
+    b = bank.assessment_questions.create!
     answers = {'answer_0' => {'id' => 1}, 'answer_1' => {'id' => 2}, 'answer_2' => {'id' => 3}}
     @quest1 = @q.quiz_questions.create!(:question_data => {:name => "first question", 'question_type' => 'multiple_choice_question', 'answers' => answers, :points_possible => 1}, :assessment_question => a)
     @quest2 = @q.quiz_questions.create!(:question_data => {:name => "second question", 'question_type' => 'multiple_choice_question', 'answers' => answers, :points_possible => 1}, :assessment_question => b)

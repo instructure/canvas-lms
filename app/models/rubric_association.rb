@@ -32,7 +32,7 @@ class RubricAssociation < ActiveRecord::Base
   
   has_a_broadcast_policy
 
-  validates_presence_of :purpose
+  validates_presence_of :purpose, :rubric_id, :association_id, :association_type, :context_id, :context_type
   validates_length_of :description, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
 
   before_save :update_assignment_points

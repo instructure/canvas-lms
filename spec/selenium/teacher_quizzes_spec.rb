@@ -327,8 +327,7 @@ describe "quizzes" do
 
     it "should validate numerical input data" do
       @quiz = quiz_with_new_questions do |bank, quiz|
-        aq = AssessmentQuestion.create!
-        bank.assessment_questions << aq
+        aq = bank.assessment_questions.create!
         quiz.quiz_questions.create!(:question_data => {:name => "numerical", 'question_type' => 'numerical_question', 'answers' => [], :points_possible => 1}, :assessment_question => aq)
       end
       take_quiz do
@@ -352,10 +351,8 @@ describe "quizzes" do
 
     it "should mark questions as answered when the window loses focus" do
       @quiz = quiz_with_new_questions do |bank, quiz|
-        aq1 = AssessmentQuestion.create!
-        aq2 = AssessmentQuestion.create!
-        bank.assessment_questions << aq1
-        bank.assessment_questions << aq2
+        aq1 = bank.assessment_questions.create!
+        aq2 = bank.assessment_questions.create!
         quiz.quiz_questions.create!(:question_data => {:name => "numerical", 'question_type' => 'numerical_question', 'answers' => [], :points_possible => 1}, :assessment_question => aq1)
         quiz.quiz_questions.create!(:question_data => {:name => "essay", 'question_type' => 'essay_question', 'answers' => [], :points_possible => 1}, :assessment_question => aq2)
       end
@@ -438,10 +435,8 @@ describe "quizzes" do
       @context = @course
       bank = @course.assessment_question_banks.create!(:title => 'Test Bank')
       q = quiz_model
-      a = AssessmentQuestion.create!
-      b = AssessmentQuestion.create!
-      bank.assessment_questions << a
-      bank.assessment_questions << b
+      a = bank.assessment_questions.create!
+      b = bank.assessment_questions.create!
       answers = {'answer_0' => {'id' => 1}, 'answer_1' => {'id' => 2}}
       question = q.quiz_questions.create!(:question_data => {
           :name => "first question",
@@ -501,10 +496,8 @@ describe "quizzes" do
       @context = @course
       bank = @course.assessment_question_banks.create!(:title => 'Test Bank')
       q = quiz_model
-      a = AssessmentQuestion.create!
-      b = AssessmentQuestion.create!
-      bank.assessment_questions << a
-      bank.assessment_questions << b
+      a = bank.assessment_questions.create!
+      b = bank.assessment_questions.create!
       answers = {'answer_0' => {'id' => 1}, 'answer_1' => {'id' => 2}}
       @question = q.quiz_questions.create!(:question_data => {
           :name => "first question",
@@ -554,10 +547,8 @@ describe "quizzes" do
       @context = @course
       bank = @course.assessment_question_banks.create!(:title => 'Test Bank')
       q = quiz_model
-      a = AssessmentQuestion.create!
-      b = AssessmentQuestion.create!
-      bank.assessment_questions << a
-      bank.assessment_questions << b
+      a = bank.assessment_questions.create!
+      b = bank.assessment_questions.create!
       answers = {'answer_0' => {'id' => 1}, 'answer_1' => {'id' => 2}}
       question = q.quiz_questions.create!(:question_data => {
           :name => "first question",
