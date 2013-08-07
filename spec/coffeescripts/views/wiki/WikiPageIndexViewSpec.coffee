@@ -37,17 +37,50 @@ define [
 
   module 'WikiPageIndexView:JSON'
 
-  test 'WIKI_RIGHTS', ->
-    collection = new WikiPageCollection
-    view = new WikiPageIndexView
-      collection: collection
-      WIKI_RIGHTS:
-        good: true
-    strictEqual view.toJSON().WIKI_RIGHTS.good, true, 'WIKI_RIGHTS represented in toJSON'
+  testRights = (subject, options) ->
+    test "#{subject}", ->
+      collection = new WikiPageCollection
+      view = new WikiPageIndexView
+        collection: collection
+        contextAssetString: options.contextAssetString
+        WIKI_RIGHTS: options.WIKI_RIGHTS
+      json = view.toJSON()
+      for key of options.CAN
+        strictEqual json.CAN[key], options.CAN[key], "CAN.#{key}"
 
-  test 'contextName', ->
-    collection = new WikiPageCollection
-    view = new WikiPageIndexView
-      collection: collection
-      contextAssetString: 'group_73'
-    strictEqual view.toJSON().contextName, 'groups', 'contextName represented in toJSON'
+  testRights 'CAN (manage course)',
+    contextAssetString: 'course_73'
+    WIKI_RIGHTS:
+      read: true
+      create_page: true
+      manage: true
+    CAN:
+      CREATE: true
+      MANAGE: true
+      PUBLISH: true
+
+  testRights 'CAN (manage group)',
+    contextAssetString: 'group_73'
+    WIKI_RIGHTS:
+      read: true
+      create_page: true
+      manage: true
+    CAN:
+      CREATE: true
+      MANAGE: true
+      PUBLISH: false
+
+  testRights 'CAN (read)',
+    contextAssetString: 'course_73'
+    WIKI_RIGHTS:
+      read: true
+    CAN:
+      CREATE: false
+      MANAGE: false
+      PUBLISH: false
+
+  testRights 'CAN (null)',
+    CAN:
+      CREATE: false
+      MANAGE: false
+      PUBLISH: false

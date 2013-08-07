@@ -273,6 +273,24 @@ describe "Pages API", :type => :integration do
         page.should be_unpublished
         json['published'].should be_false
       end
+
+      it 'should allow teachers to set editing_roles' do
+        @course.default_wiki_editing_roles = 'teachers'
+        @course.save
+        api_call(:post, "/api/v1/courses/#{@course.id}/pages",
+                 { :controller => 'wiki_pages_api', :action => 'create', :format => 'json', :course_id => @course.to_param },
+                 { :wiki_page => { :title => 'New Wiki Page!', :body => 'hello new page', :editing_roles => 'teachers,students,public' } })
+      end
+
+      it 'should not allow students to set editing_roles' do
+        course_with_student(:course => @course, :active_all => true)
+        @course.default_wiki_editing_roles = 'teachers,students'
+        @course.save
+        api_call(:post, "/api/v1/courses/#{@course.id}/pages",
+                 { :controller => 'wiki_pages_api', :action => 'create', :format => 'json', :course_id => @course.to_param },
+                 { :wiki_page => { :title => 'New Wiki Page!', :body => 'hello new page', :editing_roles => 'teachers,students,public' } },
+                 {}, {:expected_status => 401})
+      end
     end
 
     describe "update" do
@@ -622,11 +640,22 @@ describe "Pages API", :type => :integration do
                    :url => @editable_page.url },
                  { :wiki_page => { :title => 'Broken Links' }},
                  {}, {:expected_status => 401})
+        api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{@editable_page.url}",
+                 { :controller => 'wiki_pages_api', :action => 'update', :format => 'json', :course_id => @course.to_param,
+                   :url => @editable_page.url },
+                 { :wiki_page => { :editing_roles => 'teachers' }},
+                 {}, {:expected_status => 401})
+        api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{@editable_page.url}",
+                 { :controller => 'wiki_pages_api', :action => 'update', :format => 'json', :course_id => @course.to_param,
+                   :url => @editable_page.url },
+                 { :wiki_page => { :editing_roles => 'teachers,students,public' }},
+                 {}, {:expected_status => 401})
 
         @editable_page.reload
         @editable_page.should be_active
         @editable_page.title.should == 'Editable Page'
         @editable_page.user_id.should_not == @student.id
+        @editable_page.editing_roles.should == 'students'
       end
 
       it "should fulfill module completion requirements" do

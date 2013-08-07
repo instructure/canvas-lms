@@ -169,7 +169,7 @@ class WikiPagesApiController < ApplicationController
     @page = @context.wiki.wiki_pages.build
     @wiki = @context.wiki
     if authorized_action(@page, @current_user, :create)
-      update_params = get_update_params(Set[:title, :body, :editing_roles])
+      update_params = get_update_params(Set[:title, :body])
       if !update_params.is_a?(Symbol) && @page.update_attributes(update_params) && process_front_page
         log_asset_access(@page, "wiki", @wiki, 'participate')
         render :json => wiki_page_json(@page, @current_user, session)
@@ -300,20 +300,20 @@ class WikiPagesApiController < ApplicationController
     else
       rejected_fields << :published if workflow_state && workflow_state != @page.workflow_state
 
+      if editing_roles
+        existing_editing_roles = (@page.editing_roles || '').split(',')
+        editing_roles_changed = existing_editing_roles.reject{|role| editing_roles.include?(role)}.length > 0
+        editing_roles_changed |= editing_roles.reject{|role| existing_editing_roles.include?(role)}.length > 0
+        rejected_fields << :editing_roles if editing_roles_changed
+      end
+
+      rejected_fields << :hide_from_students if page_params.include?(:hide_from_students) && value_to_boolean(page_params[:hide_from_students]) != @page.hide_from_students
+
       unless @page.grants_right?(@current_user, session, :update)
         allowed_fields << :body
-
         rejected_fields << :title if page_params.include?(:title) && page_params[:title] != @page.title
-        rejected_fields << :hide_from_students if page_params.include?(:hide_from_students) && value_to_boolean(page_params[:hide_from_students]) != @page.hide_from_students
 
         rejected_fields << :front_page if change_front_page && !@wiki.grants_right?(@current_user, session, :update)
-
-        if editing_roles
-          existing_editing_roles = (@page.editing_roles || '').split(',')
-          editing_roles_changed = existing_editing_roles.reject{|role| editing_roles.include?(role)}.length > 0
-          editing_roles_changed |= editing_roles.reject{|role| existing_editing_roles.include?(role)}.length > 0
-          rejected_fields << :editing_roles if editing_roles_changed
-        end
       end
     end
 

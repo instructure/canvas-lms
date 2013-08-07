@@ -1,8 +1,9 @@
 define [
   'jquery'
+  'compiled/models/WikiPage'
   'compiled/views/wiki/WikiPageEditView'
   'wikiSidebar'
-], ($, WikiPageEditView, wikiSidebar) ->
+], ($, WikiPage, WikiPageEditView, wikiSidebar) ->
 
   module 'WikiPageEditView:Init',
     setup: ->
@@ -49,14 +50,140 @@ define [
 
   module 'WikiPageEditView:JSON'
 
-  test 'WIKI_RIGHTS', ->
-    view = new WikiPageEditView
-      WIKI_RIGHTS:
-        good: true
-    strictEqual view.toJSON().WIKI_RIGHTS.good, true, 'WIKI_RIGHTS represented in toJSON'
+  testRights = (subject, options) ->
+    test "#{subject}", ->
+      model = new WikiPage options.attributes, contextAssetString: options.contextAssetString
+      view = new WikiPageEditView
+        model: model
+        WIKI_RIGHTS: options.WIKI_RIGHTS
+        PAGE_RIGHTS: options.PAGE_RIGHTS
+      json = view.toJSON()
+      if options.IS
+        for key of options.IS
+          strictEqual json.IS[key], options.IS[key], "IS.#{key}"
+      if options.CAN
+        for key of options.CAN
+          strictEqual json.CAN[key], options.CAN[key], "CAN.#{key}"
+      if options.SHOW
+        for key of options.SHOW
+          strictEqual json.SHOW[key], options.SHOW[key], "SHOW.#{key}"
 
-  test 'PAGE_RIGHTS', ->
-    view = new WikiPageEditView
-      PAGE_RIGHTS:
-        good: true
-    strictEqual view.toJSON().PAGE_RIGHTS.good, true, 'PAGE_RIGHTS represented in toJSON'
+  testRights 'IS (teacher)',
+    attributes:
+      editing_roles: 'teachers'
+    IS:
+      TEACHER_ROLE: true
+      STUDENT_ROLE: false
+      MEMBER_ROLE: false
+      ANYONE_ROLE: false
+
+  testRights 'IS (student)',
+    attributes:
+      editing_roles: 'teachers,students'
+    IS:
+      TEACHER_ROLE: false
+      STUDENT_ROLE: true
+      MEMBER_ROLE: false
+      ANYONE_ROLE: false
+
+  testRights 'IS (members)',
+    attributes:
+      editing_roles: 'members'
+    IS:
+      TEACHER_ROLE: false
+      STUDENT_ROLE: false
+      MEMBER_ROLE: true
+      ANYONE_ROLE: false
+
+  testRights 'IS (course anyone)',
+    attributes:
+      editing_roles: 'teachers,students,public'
+    IS:
+      TEACHER_ROLE: false
+      STUDENT_ROLE: false
+      MEMBER_ROLE: false
+      ANYONE_ROLE: true
+
+  testRights 'IS (group anyone)',
+    attributes:
+      editing_roles: 'members,public'
+    IS:
+      TEACHER_ROLE: false
+      STUDENT_ROLE: false
+      MEMBER_ROLE: false
+      ANYONE_ROLE: true
+
+  testRights 'IS (null)',
+    IS:
+      TEACHER_ROLE: true
+      STUDENT_ROLE: false
+      MEMBER_ROLE: false
+      ANYONE_ROLE: false
+
+  testRights 'CAN/SHOW (manage course)',
+    contextAssetString: 'course_73'
+    attributes:
+      url: 'test'
+    WIKI_RIGHTS:
+      manage: true
+    PAGE_RIGHTS:
+      read: true
+      update: true
+      delete: true
+    CAN:
+      PUBLISH: true
+      DELETE: true
+      EDIT_TITLE: true
+      EDIT_HIDE: true
+      EDIT_ROLES: true
+    SHOW:
+      OPTIONS: true
+      COURSE_ROLES: true
+
+  testRights 'CAN/SHOW (manage group)',
+    contextAssetString: 'group_73'
+    WIKI_RIGHTS:
+      manage: true
+    PAGE_RIGHTS:
+      read: true
+    CAN:
+      PUBLISH: false
+      DELETE: false
+      EDIT_TITLE: true # new record
+      EDIT_HIDE: false
+      EDIT_ROLES: true
+    SHOW:
+      OPTIONS: true
+      COURSE_ROLES: false
+
+  testRights 'CAN/SHOW (update_content)',
+    contextAssetString: 'course_73'
+    attributes:
+      url: 'test'
+    WIKI_RIGHTS:
+      read: true
+    PAGE_RIGHTS:
+      read: true
+      update_content: true
+    CAN:
+      PUBLISH: false
+      DELETE: false
+      EDIT_TITLE: false
+      EDIT_HIDE: false
+      EDIT_ROLES: false
+    SHOW:
+      OPTIONS: false
+      #COURSE_ROLES: false # intentionally omitted as EDIT_ROLES === false
+
+  testRights 'CAN/SHOW (null)',
+    attributes:
+      url: 'test'
+    CAN:
+      PUBLISH: false
+      DELETE: false
+      EDIT_TITLE: false
+      EDIT_HIDE: false
+      EDIT_ROLES: false
+    SHOW:
+      OPTIONS: false
+      #COURSE_ROLES: false # intentionally omitted as EDIT_ROLES === false

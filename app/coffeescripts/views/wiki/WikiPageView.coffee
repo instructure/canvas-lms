@@ -29,6 +29,8 @@ define [
       @model.set('publishable', true)
       @model.on 'change', => @render()
       super
+      @WIKI_RIGHTS ||= {}
+      @PAGE_RIGHTS ||= {}
 
     render: ->
       # detach the publish button to preserve data/events
@@ -55,6 +57,9 @@ define [
       json = super
       json.wiki_pages_path = @wiki_pages_path
       json.wiki_page_edit_path = @wiki_page_edit_path
-      json.WIKI_RIGHTS = @WIKI_RIGHTS
-      json.PAGE_RIGHTS = @PAGE_RIGHTS
+      json.CAN =
+        VIEW_PAGES: !!@WIKI_RIGHTS.read
+        PUBLISH: !!@WIKI_RIGHTS.manage && json.contextName == 'courses'
+        UPDATE_CONTENT: !!@PAGE_RIGHTS.update || !!@PAGE_RIGHTS.update_content
+        DELETE: !!@PAGE_RIGHTS.delete
       json

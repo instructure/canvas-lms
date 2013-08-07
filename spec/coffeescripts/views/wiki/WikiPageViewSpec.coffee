@@ -45,18 +45,59 @@ define [
       wiki_page_edit_path: '/groups/73/pages/37'
     strictEqual view.toJSON().wiki_page_edit_path, '/groups/73/pages/37', 'wiki_page_edit_path represented in toJSON'
 
-  test 'WIKI_RIGHTS', ->
-    model = new WikiPage
-    view = new WikiPageView
-      model: model
-      WIKI_RIGHTS:
-        good: true
-    strictEqual view.toJSON().WIKI_RIGHTS.good, true, 'WIKI_RIGHTS represented in toJSON'
+  testRights = (subject, options) ->
+    test "#{subject}", ->
+      model = new WikiPage options.attributes, contextAssetString: options.contextAssetString
+      view = new WikiPageView
+        model: model
+        WIKI_RIGHTS: options.WIKI_RIGHTS
+        PAGE_RIGHTS: options.PAGE_RIGHTS
+      json = view.toJSON()
+      for key of options.CAN
+        strictEqual json.CAN[key], options.CAN[key], "#{subject} - CAN.#{key}"
 
-  test 'PAGE_RIGHTS', ->
-    model = new WikiPage
-    view = new WikiPageView
-      model: model
-      PAGE_RIGHTS:
-        good: true
-    strictEqual view.toJSON().PAGE_RIGHTS.good, true, 'PAGE_RIGHTS represented in toJSON'
+  testRights 'CAN (manage)',
+    contextAssetString: 'course_73'
+    WIKI_RIGHTS:
+      read: true
+      manage: true
+    PAGE_RIGHTS:
+      update: true
+      delete: true
+    CAN:
+      VIEW_PAGES: true
+      PUBLISH: true
+      UPDATE_CONTENT: true
+      DELETE: true
+
+  testRights 'CAN (update)',
+    contextAssetString: 'group_73'
+    WIKI_RIGHTS:
+      read: true
+      manage: true
+    PAGE_RIGHTS:
+      update_content: true
+    CAN:
+      VIEW_PAGES: true
+      PUBLISH: false
+      UPDATE_CONTENT: true
+      DELETE: false
+
+  testRights 'CAN (read)',
+    contextAssetString: 'course_73'
+    WIKI_RIGHTS:
+      read: true
+    PAGE_RIGHTS:
+      read: true
+    CAN:
+      VIEW_PAGES: true
+      PUBLISH: false
+      UPDATE_CONTENT: false
+      DELETE: false
+
+  testRights 'CAN (null)',
+    CAN:
+      VIEW_PAGES: false
+      PUBLISH: false
+      UPDATE_CONTENT: false
+      DELETE: false

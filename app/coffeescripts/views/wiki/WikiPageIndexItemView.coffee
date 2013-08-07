@@ -7,34 +7,35 @@ define [
 ], (Backbone, WikiPageDeleteDialog, PublishIconView, template) ->
 
   class WikiPageIndexItemView extends Backbone.View
-    @mixin
-      template: template
-      tagName: 'tr'
-      className: 'clickable'
-      attributes:
-        role: 'row'
-      els:
-        '.wiki-page-link': '$wikiPageLink'
-        '.publish-cell': '$publishCell'
-      events:
-        'click a.al-trigger': 'settingsMenu'
-        'click .al-options .icon-edit': 'editPage'
-        'click a.delete-menu-item': 'deletePage'
-        'click a.set-front-page-menu-item': 'setAsFrontPage'
-        'click a.remove-front-page-menu-item': 'removeAsFrontPage'
+    template: template
+    tagName: 'tr'
+    className: 'clickable'
+    attributes:
+      role: 'row'
+    els:
+      '.wiki-page-link': '$wikiPageLink'
+      '.publish-cell': '$publishCell'
+    events:
+      'click a.al-trigger': 'settingsMenu'
+      'click .al-options .icon-edit': 'editPage'
+      'click a.delete-menu-item': 'deletePage'
+      'click a.set-front-page-menu-item': 'setAsFrontPage'
+      'click a.remove-front-page-menu-item': 'removeAsFrontPage'
 
     @optionProperty 'WIKI_RIGHTS'
     @optionProperty 'contextName'
 
     initialize: ->
       super
+      @WIKI_RIGHTS ||= {}
       @model.set('publishable', true)
       @model.on 'change', => @render()
 
     toJSON: ->
       json = super
-      json.WIKI_RIGHTS = @WIKI_RIGHTS
-      json.contextName = @contextName
+      json.CAN =
+        MANAGE: !!@WIKI_RIGHTS.manage
+        PUBLISH: !!@WIKI_RIGHTS.manage && @contextName == 'courses'
       json
 
     render: ->

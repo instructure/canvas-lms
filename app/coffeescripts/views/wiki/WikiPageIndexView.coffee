@@ -14,9 +14,6 @@ define [
   class WikiPageIndexView extends PaginatedCollectionView
     @mixin StickyHeaderMixin
     @mixin
-      template: template
-      itemView: itemView
-
       events:
         'click .new_page': 'createNewPage'
         'click .canvas-sortable-header-row a[data-sort-field]': 'sort'
@@ -25,11 +22,15 @@ define [
         '.no-pages': '$noPages'
         '.no-pages a:first-child': '$noPagesLink'
 
+    template: template
+    itemView: itemView
+
     @optionProperty 'default_editing_roles'
     @optionProperty 'WIKI_RIGHTS'
 
     initialize: (options) ->
       super
+      @WIKI_RIGHTS ||= {}
       @sortOrders =
         title: 'asc'
         created_at: 'desc'
@@ -97,8 +98,10 @@ define [
 
     toJSON: ->
       json = super
-      json.WIKI_RIGHTS = @WIKI_RIGHTS
-      json.contextName = @contextName
+      json.CAN =
+        CREATE: !!@WIKI_RIGHTS.create_page
+        MANAGE: !!@WIKI_RIGHTS.manage
+        PUBLISH: !!@WIKI_RIGHTS.manage && @contextName == 'courses'
       json.fetched = @fetched
       json.sortField = @collection.options.params?.sort or "title"
       json.sortOrders = @sortOrders
