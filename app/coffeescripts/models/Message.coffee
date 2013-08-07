@@ -9,10 +9,17 @@ define [
       if data.messages
         _.each data.messages, (message) ->
           message.author = _.find(data.participants, (p) -> p.id is message.author_id)
+          message.participants = _.chain(message.participating_user_ids)
+            .map((id) ->
+              return null if id == message.author_id
+              _.find(data.participants, (p) -> p.id == id).name
+            )
+            .reject((message) -> _.isNull(message))
+            .value()
+          if message.participants.length > 2
+            message.summarizedParticipants = message.participants.slice(0, 2)
+            message.hiddenParticipantCount = message.participants.length - 2
       data
-
-    participantList: ->
-      names = _.pluck(@get('participants'), 'name').join(', ')
 
     unread: ->
       @get('workflow_state') is 'unread'
@@ -22,4 +29,4 @@ define [
       @set('workflow_state', if set_read then 'read' else 'unread')
 
     toJSON: ->
-      { conversation: _.extend(super, participantList: @participantList(), unread: @unread()) }
+      { conversation: _.extend(super, unread: @unread()) }

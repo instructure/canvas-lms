@@ -2,27 +2,25 @@ define [
   'i18n!conversations'
   'underscore'
   'Backbone'
+  'compiled/models/Message'
+  'compiled/views/conversations/MessageItemView'
   'jst/conversations/messageDetail'
   'jst/conversations/noMessage'
-], (I18n, _, {View}, template, noMessage) ->
+], (I18n, _, {View}, Message, MessageItemView, template, noMessage) ->
 
   class MessageDetailView extends View
 
     tagName: 'div'
 
-    template: template
-
-    events:
-      'click li[data-id]': 'selectMessage'
-
     render: ->
+      super
       if @model
-        @$el.html(template(@model.toJSON().conversation))
+        context   = @model.toJSON().conversation
+        $template = $(template(context))
+        _.each context.messages, (message) ->
+          childView = new MessageItemView(model: new Message(message)).render()
+          $template.find('.message-content').append(childView.$el)
       else
-        @$el.html(noMessage())
-
-    selectMessage: (e) ->
-      selectedMessage = $(e.currentTarget)
-      messageObject   = _.find(@model.get('messages'), (m) -> m.id == selectedMessage.data('id'))
-      messageObject.selected = !messageObject.selected
-      selectedMessage.toggleClass('active', messageObject.selected)
+        $template = noMessage()
+      @$el.html($template)
+      this

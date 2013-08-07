@@ -166,7 +166,14 @@
     line-height: 16px;
     margin-bottom: 8px;
   }
+}
 
+.message-full-participants {
+	display: none;
+}
+
+.message-summarized-participants:focus, .message-full-participants:focus {
+	outline: 0;
 }
 
 .message-count {

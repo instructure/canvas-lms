@@ -1,25 +1,13 @@
-<div class="message-header">
-  <b class="subject">{{subject}}</b>
+<div>
+  <div class="message-header">
+    <b class="subject">
+      {{#if subject}}
+        {{subject}}
+      {{else}}
+        ({{#t "no_subject"}}No subject{{/t}})
+      {{/if}}
+    </b>
+  </div>
+
+  <ul class="message-content unstyled"></ul>
 </div>
-
-<ul class="message-content unstyled">
-  {{#each messages}}
-    <li data-id="{{id}}">
-      <div class="row-fluid message-info">
-        <div class="span8 user-info">
-          <img src="{{author.avatar_url}}" alt="" class="avatar pull-left" />
-          <a href="#" class="username">{{author.name}}</a>
-          <span class="context">[[Context Name]]</span>
-        </div>
-
-        <div class="span4">
-          <div class="date pull-right">
-            {{friendlyDatetime created_at}}
-          </div>
-        </div>
-      </div>
-
-      <p>{{this.body}}</p>
-    </li>
-  {{/each}}
-</ul>

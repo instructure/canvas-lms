@@ -328,6 +328,33 @@ define [
 
     enrollmentName: enrollmentName
 
+    # Public: Print an array as a comma-separated list.
+    #
+    # separator - The string to separate values with (default: ', ')
+    # propName - If array elements are objects, this is the object property
+    #            that should be printed (default: null).
+    # limit - Only display the first n results of the list, following by "end." (default: null)
+    # end - If the list is truncated, display this string at the end of the list (default: '...').
+    #
+    # Examples
+    #   values = [1,2,3]
+    #   complexValues = [{ id: 1 }, { id: 2 }, { id: 3 }]
+    #   {{list values}} #=> 1, 2, 3
+    #   {{list values separator=";"}} #=> 1;2;3
+    #   {{list complexValues propName="id"}} #=> 1, 2, 3
+    #   {{list values limit=2}} #=> 1, 2...
+    #   {{list values limit=2 end="!"}} #=> 1, 2!
+    #
+    # Returns a string.
+    list: (value, options) ->
+      _.defaults(options.hash, separator: ', ', propName: null, limit: null, end: '...')
+      {propName, limit, end, separator} = options.hash
+      result = _.map value, (item) ->
+        if propName then item[propName] else item
+      result = result.slice(0, limit) if limit
+      string = result.join(separator)
+      if limit and value.length > limit then "#{string}#{end}" else string
+
     titleize: (str) ->
       return '' unless str
       words = str.split(/[ _]+/)

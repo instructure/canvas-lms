@@ -1,0 +1,34 @@
+<div class="row-fluid message-info">
+	<div class="span10 user-info">
+		<img src="{{author.avatar_url}}" alt="" class="avatar pull-left" />
+		<a href="#" class="username">{{author.name}}{{#if participants.length}},{{/if}}</a>
+
+		<span class="message-participants-wrapper">
+			<span class="message-participants"
+				    aria-live="polite"></span>
+
+			<div class="hidden">
+				<span class="summarized-message-participants">
+					{{list summarizedParticipants}}...
+				</span>
+				<span class="full-message-participants">
+					{{list participants}}
+				</span>
+			</div>
+
+			{{#if summarizedParticipants}}
+				<a href="#" class="message-participants-toggle"></a>
+			{{/if}}
+		</span>
+
+		<span class="context">[[Context Name]]</span>
+	</div>
+
+	<div class="span2">
+		<div class="date pull-right">
+			{{friendlyDatetime created_at}}
+		</div>
+	</div>
+</div>
+
+<p>{{body}}</p>
