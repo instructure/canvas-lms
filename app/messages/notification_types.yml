@@ -28,6 +28,8 @@
       delay_for: 0
     - name: Assignment Resubmitted
       delay_for: 0
+    - name: Submission Needs Grading
+      delay_for: 0
 
 - category: Announcement
   notifications:
@@ -117,8 +119,6 @@
       delay_for: <%= 60*60 %>
     - name: Submission Grade Changed
       delay_for: <%= 5*60 %>
-    - name: Submission Needs Grading
-      delay_for: 0
 
 - category: Grading Policies
   notifications:
