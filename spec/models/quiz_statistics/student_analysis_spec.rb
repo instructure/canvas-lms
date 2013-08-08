@@ -63,6 +63,38 @@ describe QuizStatistics::StudentAnalysis do
   end
 
   context "csv" do
+
+    def temporary_user_code
+      "tmp_#{Digest::MD5.hexdigest("#{Time.now.to_i.to_s}_#{rand.to_s}")}"
+    end
+
+    def survey_with_logged_out_submission
+      course_with_teacher_logged_in(:active_all => true)
+
+      @assignment = @course.assignments.create(:title => "Test Assignment")
+      @assignment.workflow_state = "available"
+      @assignment.submission_types = "online_quiz"
+      @assignment.save
+      @quiz = Quiz.find_by_assignment_id(@assignment.id)
+      @quiz.anonymous_submissions = false
+      @quiz.quiz_type = "survey"
+
+      #make questions
+      questions = [{:question_data => { :name => "test 1" }},
+        {:question_data => { :name => "test 2" }},
+        {:question_data => { :name => "test 3" }},
+        {:question_data => { :name => "test 4" }}]
+
+      @questions = questions.map { |q| @quiz.quiz_questions.create!(q) }
+      @quiz.generate_quiz_data
+      @quiz.save!
+
+      @quiz_submission = @quiz.generate_submission(temporary_user_code)
+      @quiz_submission.mark_completed
+      @quiz_submission.grade_submission
+      @quiz_submission.save!
+    end
+
     before(:each) do
       student_in_course(:active_all => true)
       @quiz = @course.quizzes.create!
@@ -85,6 +117,14 @@ describe QuizStatistics::StudentAnalysis do
       # format for row is row_name, '', data1, data2, ...
       stats.first.length.should == 3
       stats[0][0].should == "section"
+    end
+
+    it 'should succeed with logged-out user submissions' do
+      survey_with_logged_out_submission
+      stats = CSV.parse(csv(:include_all_versions => true))
+      stats[0][1].should == ''
+      stats[1][1].should == ''
+      stats[2][1].should == ''
     end
 
     it 'should have sections in quiz statistics_csv' do
