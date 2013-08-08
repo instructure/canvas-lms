@@ -61,6 +61,8 @@ describe QuizzesController do
     @quiz_submission = @quiz.generate_submission(user)
     @quiz_submission.mark_completed
     @quiz_submission.submission_data = yield if block_given?
+    @quiz_submission.grade_submission
+    @quiz_submission.save!
   end
 
   describe "GET 'index'" do
@@ -1028,31 +1030,39 @@ describe QuizzesController do
       response.should render_template('statistics')
     end
 
-    it "should include logged_out users' submissions in a public course" do
-      #logged_out user
-      user = temporary_user_code
+    context "logged out submissions" do
+      integrate_views
 
-      #make questions
-      questions = [{:question_data => { :name => "test 1" }},
-        {:question_data => { :name => "test 2" }},
-        {:question_data => { :name => "test 3" }},
-        {:question_data => { :name => "test 4" }}]
+      it "should include logged_out users' submissions in a public course" do
+        #logged_out user
+        user = temporary_user_code
 
-      logged_out_survey_with_submission user, questions
+        #make questions
+        questions = [{:question_data => { :name => "test 1" }},
+          {:question_data => { :name => "test 2" }},
+          {:question_data => { :name => "test 3" }},
+          {:question_data => { :name => "test 4" }}]
 
-      #non logged_out submissions
-      @user1 = user_with_pseudonym(:active_all => true, :name => 'Student1', :username => 'student1@instructure.com')
-      @quiz_submission1 = @quiz.generate_submission(@user1)
-      @quiz_submission1.mark_completed
+        logged_out_survey_with_submission user, questions
 
-      @user2 = user_with_pseudonym(:active_all => true, :name => 'Student2', :username => 'student2@instructure.com')
-      @quiz_submission2 = @quiz.generate_submission(@user2)
-      @quiz_submission2.mark_completed
+        #non logged_out submissions
+        @user1 = user_with_pseudonym(:active_all => true, :name => 'Student1', :username => 'student1@instructure.com')
+        @quiz_submission1 = @quiz.generate_submission(@user1)
+        @quiz_submission1.grade_submission
+
+        @user2 = user_with_pseudonym(:active_all => true, :name => 'Student2', :username => 'student2@instructure.com')
+        @quiz_submission2 = @quiz.generate_submission(@user2)
+        @quiz_submission2.grade_submission
+
+        @course.large_roster = false
+        @course.save!
 
 
-      get 'statistics', :course_id => @course.id, :quiz_id => @quiz.id
-      response.should be_success
-      response.should render_template('statistics')
+        get 'statistics', :course_id => @course.id, :quiz_id => @quiz.id, :all_versions => '1'
+        response.should be_success
+        response.body.should match /Logged Out User/
+        response.should render_template('statistics')
+      end
     end
 
     it "should show the statistics page if the course is a MOOC" do
