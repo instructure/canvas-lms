@@ -116,11 +116,11 @@ class QuizzesController < ApplicationController
               @statistics = @quiz.statistics(all_versions)
               user_ids = @statistics[:submission_user_ids]
               @submitted_users = User.where(:id => user_ids.to_a).order_by_sortable_name
+              #include logged out users
+              @submitted_users += @statistics[:submission_logged_out_users]
               @users = Hash[
                 @submitted_users.map { |u| [u.id, u] }
               ]
-              #include logged out users
-              @submitted_users += @statistics[:submission_logged_out_users]
             end
 
             js_env :quiz_reports => QuizStatistics::REPORTS.map { |report_type|
