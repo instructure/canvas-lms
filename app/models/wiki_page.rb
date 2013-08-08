@@ -40,6 +40,7 @@ class WikiPage < ActiveRecord::Base
   before_validation :ensure_unique_title
 
   TITLE_LENGTH = WikiPage.columns_hash['title'].limit rescue 255
+  SIMPLY_VERSIONED_EXCLUDE_FIELDS = [:workflow_state, :hide_from_students, :editing_roles, :notify_of_update]
 
   def validate_front_page_visibility
     if self.hide_from_students && self.is_front_page?
@@ -129,7 +130,11 @@ class WikiPage < ActiveRecord::Base
   end
 
   has_a_broadcast_policy
-  simply_versioned
+  simply_versioned :exclude => SIMPLY_VERSIONED_EXCLUDE_FIELDS, :when => Proc.new { |wp|
+    # :user_id and :updated_at do not merit creating a version, but should be saved
+    exclude_fields = [:user_id, :updated_at].concat(SIMPLY_VERSIONED_EXCLUDE_FIELDS).map(&:to_s)
+    (wp.changes.keys.map(&:to_s) - exclude_fields).present?
+  }
   after_save :remove_changed_flag
 
   workflow do

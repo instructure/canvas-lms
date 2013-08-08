@@ -59,6 +59,76 @@ describe "Pages API", :type => :integration do
     @hidden_page = @wiki.wiki_pages.create!(:title => "Hidden Page", :hide_from_students => true, :body => "Body of hidden page")
   end
 
+  context 'versions' do
+    before :each do
+      @page = @wiki.wiki_pages.create!(:title => 'Test Page', :body => 'Test content')
+    end
+
+    example 'creates initial version of the page' do
+      @page.versions.count.should == 1
+      version = @page.current_version.model
+      version.title.should == 'Test Page'
+      version.body.should == 'Test content'
+    end
+
+    example 'creates a version when the title changes' do
+      @page.title = 'New Title'
+      @page.save!
+      @page.versions.count.should == 2
+      version = @page.current_version.model
+      version.title.should == 'New Title'
+      version.body.should == 'Test content'
+    end
+
+    example 'creates a verison when the body changes' do
+      @page.body = 'New content'
+      @page.save!
+      @page.versions.count.should == 2
+      version = @page.current_version.model
+      version.title.should == 'Test Page'
+      version.body.should == 'New content'
+    end
+
+    example 'does not create a version when workflow_state changes' do
+      @page.workflow_state = 'active'
+      @page.save!
+      @page.versions.count.should == 1
+    end
+
+    example 'does not create a version when hide_from_students changes' do
+      @page.hide_from_students = true
+      @page.save!
+      @page.versions.count.should == 1
+    end
+
+    example 'does not create a version when editing_roles changes' do
+      @page.editing_roles = 'teachers,students,public'
+      @page.save!
+      @page.versions.count.should == 1
+    end
+
+    example 'does not create a version when notify_of_update changes' do
+      @page.notify_of_update = true
+      @page.save!
+      @page.versions.count.should == 1
+    end
+
+    example 'does not create a version when just the user_id changes' do
+      user1 = user(:active_all => true)
+      @page.user_id = user1.id
+      @page.title = 'New Title'
+      @page.save!
+      @page.versions.count.should == 2
+      current_version = @page.current_version.model
+      current_version.user_id.should == user1.id
+
+      user2 = user(:active_all => true)
+      @page.user_id = user2.id
+      @page.save!
+      @page.versions.count.should == 2
+    end
+  end
+
   context "as a teacher" do
     before :each do
       course_with_teacher(:course => @course, :active_all => true)
@@ -590,7 +660,7 @@ describe "Pages API", :type => :integration do
               update_attribute(:frequency, 'immediately')
         end
         
-        it "should notify iff the notify_on_update flag is sent" do
+        it "should notify iff the notify_of_update flag is sent" do
           api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{@front_page.url}?wiki_page[body]=updated+front+page",
                    :controller => 'wiki_pages_api', :action => 'update', :format => 'json', :course_id => @course.to_param,
                    :url => @front_page.url, :wiki_page => { "body" => "updated front page" })
