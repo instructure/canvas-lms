@@ -35,8 +35,8 @@
 
 <div id="discussion-toolbar" class="toolbarView">
   <div class="headerBar" data-sticky>
-    <div class="row-fluid form-inline">
-      <div class="span8">
+    <div class="row-fluid form-inline" style="overflow: visible;">
+      <div class="span7">
         <label
           class="hidden-inline-text"
           for="discussion-search"
@@ -61,7 +61,7 @@
 
       </div>
 
-      <div class="span4 right-align">
+      <div class="span5 right-align">
         <a href='#' class='btn topic-subscribe-button' data-tooltip="bottom"
            title="<%= t('topic_subscribe_tooltip', 'You are unsubscribed and will not be notified of new comments') %>"
            aria-label="<%= t('topic_subscribe_tooltip', 'You are unsubscribed and will not be notified of new comments') %>">
@@ -86,7 +86,7 @@
 
         <% if @current_user.present? %>
           <div class="admin-links">
-            <a class="al-trigger btn" data-kyle-menu-options='{"appendMenuTo": "body"}'>
+            <a class="al-trigger btn" href="#">
               <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
               <div class="screenreader-only"><%= t :manage_discussion, 'Manage Discussion' %></div>
             </a>
@@ -151,7 +151,7 @@
 </div>
 
 <div id="discussion_container">
-  <article id="discussion_topic" class="admin-link-hover-area topic discussion_entry <%= @topic.class.to_s.underscore %> <%= 'has_podcast' if @topic.podcast_enabled %> <%= 'has_unread_entries' if @topic.unread_count(@current_user) > 0 %> can_be_marked_as_read <%= @topic.read_state(@current_user) %>" data-mark-read-url="<%= context_url(@topic.context, :api_v1_context_discussion_topic_mark_read_url, @topic) %>">
+  <article id="discussion_topic" tabindex="-1" class="admin-link-hover-area topic discussion_entry <%= @topic.class.to_s.underscore %> <%= 'has_podcast' if @topic.podcast_enabled %> <%= 'has_unread_entries' if @topic.unread_count(@current_user) > 0 %> can_be_marked_as_read <%= @topic.read_state(@current_user) %>" data-mark-read-url="<%= context_url(@topic.context, :api_v1_context_discussion_topic_mark_read_url, @topic) %>">
     <div class="entry_content">
       <% if @topic.for_assignment? %>
         <%= render :partial => 'assignment_details' %>

@@ -602,6 +602,9 @@ body.with-right-side.with-left-side {
 .toolbarView {
   background: white;
   min-height: 50px;
+  .admin-links {
+    text-align: left;
+  }
   .al-trigger {
     margin-left: 4px;
   }
@@ -609,6 +612,12 @@ body.with-right-side.with-left-side {
     padding: 10px 10px 6px 14px;
     border-bottom: solid 1px $border;
     min-height: 33px;
+    overflow: visible;
+  }
+  .headerBar:after {
+    clear: both;
+    content: "";
+    display: block;
   }
   .sticky {
     position: fixed;

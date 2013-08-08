@@ -56,6 +56,9 @@ define [
 
     className: 'entry'
 
+    attributes:
+      tabindex: -1
+
     initialize: ->
       super
       @constructor.instances[@cid] = this

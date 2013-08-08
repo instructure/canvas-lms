@@ -37,8 +37,9 @@ color with a dashed line between groups.
               <i class="icon-publish"></i><span class="publish-text">&nbsp;Published</span>
             </span>
 
-            <a class="al-trigger al-trigger-gray">
+            <a class="al-trigger al-trigger-gray" href="#">
               <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
+              <span class="screenreader-only"><%= t('manage', 'Manage') %></span>
             </a>
             <ul class="al-options">
               <li><a href="#">Edit</a></li>
@@ -63,8 +64,9 @@ color with a dashed line between groups.
               <i class="icon-publish"></i><span class="publish-text">&nbsp;Published</span>
             </span>
 
-            <a class="al-trigger al-trigger-gray">
+            <a class="al-trigger al-trigger-gray" href="#">
               <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
+              <span class="screenreader-only"><%= t('manage', 'Manage') %></span>
             </a>
             <ul class="al-options">
               <li><a href="#">Edit</a></li>
@@ -89,8 +91,9 @@ color with a dashed line between groups.
               <i class="icon-publish"></i><span class="publish-text">&nbsp;Published</span>
             </span>
 
-            <a class="al-trigger al-trigger-gray">
+            <a class="al-trigger al-trigger-gray" href="#">
               <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
+              <span class="screenreader-only"><%= t('manage', 'Manage') %></span>
             </a>
             <ul class="al-options">
               <li><a href="#">Edit</a></li>
@@ -126,7 +129,7 @@ color with a dashed line between groups.
             <i class="icon-publish"></i><span class="publish-text">&nbsp;Published</span>
           </span>
 
-          <a class="al-trigger al-trigger-gray" role="button" aria-haspopup="true" aria-owns="content-1" tabindex="-1">
+          <a class="al-trigger al-trigger-gray" role="button" aria-haspopup="true" aria-owns="content-1" href="#">
             <i class="icon-settings"></i>
             <i class="icon-mini-arrow-down"></i>
             <span class="screenreader-only">Settings</span>
