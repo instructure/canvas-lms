@@ -218,7 +218,7 @@
                     }
                 }).get();
 
-                if ( (num_selected_courses > 2) || (num_selected_courses > 1 && (sandobxChecked || nccChecked)) ) {
+                if ( num_selected_courses > 1 && !(sandobxChecked || nccChecked))  {
                     $("#create_course_btn").removeAttr("disabled");
                     $("#enroll_me").removeAttr("disabled");
                     enable_cross_list(true);
