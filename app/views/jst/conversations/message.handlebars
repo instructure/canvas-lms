@@ -2,7 +2,13 @@
 
 <span class="date pull-right">{{friendlyDatetime last_message_at}}</span>
 
-<p class="subject">{{subject}}</p>
+<p class="subject">
+  {{#if subject}}
+    {{subject}}
+  {{else}}
+    ({{#t "no_subject"}}No subject{{/t}})
+  {{/if}}
+</p>
 
 <span class="message-count label">
   {{message_count}}
