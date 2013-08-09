@@ -308,7 +308,7 @@ module Kaltura
       result = sendRequest(:flavorAsset, :getDownloadUrl,
                            :ks => @ks,
                            :id => assetId)
-      return result.content
+      return result.content if result
     end
 
     # This is not a true Kaltura API call, but generates the url for a "playlist"
