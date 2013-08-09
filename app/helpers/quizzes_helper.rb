@@ -437,4 +437,20 @@ module QuizzesHelper
       t('#quizzes.links.will_keep_latest_score', "Will keep the latest of all your scores")
   end
 
+  def quiz_edit_text(quiz=@quiz)
+    if quiz.survey?
+      I18n.t('titles.edit_survey', 'Edit Survey')
+    else
+      I18n.t('titles.edit_quiz', 'Edit Quiz')
+    end
+  end
+
+  def quiz_delete_text(quiz=@quiz)
+    if quiz.survey?
+      I18n.t('titles.delete_survey', 'Delete Survey')
+    else
+      I18n.t('titles.delete_quiz', 'Delete Quiz')
+    end
+  end
+
 end

@@ -142,4 +142,30 @@ describe QuizzesHelper do
     end
   end
 
+  describe "#quiz_edit_text" do
+
+    it "returns correct string for survey" do
+      quiz = stub(:survey? => true)
+      quiz_edit_text(quiz).should == "Edit Survey"
+    end
+
+    it "returns correct string for quiz" do
+      quiz = stub(:survey? => false)
+      quiz_edit_text(quiz).should == "Edit Quiz"
+    end
+  end
+
+  describe "#quiz_delete_text" do
+
+    it "returns correct string for survey" do
+      quiz = stub(:survey? => true)
+      quiz_delete_text(quiz).should == "Delete Survey"
+    end
+
+    it "returns correct string for quiz" do
+      quiz = stub(:survey? => false)
+      quiz_delete_text(quiz).should == "Delete Quiz"
+    end
+  end
+
 end
