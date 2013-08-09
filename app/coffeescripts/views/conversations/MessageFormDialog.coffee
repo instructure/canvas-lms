@@ -22,7 +22,6 @@ define [
   'Backbone'
   'compiled/views/DialogBaseView'
   'jst/conversations/MessageFormDialog'
-  'compiled/conversations/MessageProgressTracker'
   'compiled/fn/preventDefault'
   'jst/conversations/composeTitleBar'
   'jst/conversations/composeButtonBar'
@@ -32,7 +31,7 @@ define [
   'compiled/views/conversations/ContextMessagesView'
   'compiled/widget/ContextSearch'
   'vendor/jquery.elastic'
-], (I18n, _, {Collection}, DialogBaseView, template, MessageProgressTracker, preventDefault, composeTitleBarTemplate, composeButtonBarTemplate, addAttachmentTemplate, AutocompleteView, CourseSelectionView, ContextMessagesView) ->
+], (I18n, _, {Collection}, DialogBaseView, template, preventDefault, composeTitleBarTemplate, composeButtonBarTemplate, addAttachmentTemplate, AutocompleteView, CourseSelectionView, ContextMessagesView) ->
 
   ##
   # reusable message composition dialog
@@ -52,6 +51,7 @@ define [
       '.attachments-pane':              '$attachmentsPane'
       '.message-body':                  '$messageBody'
       '.conversation_body':             '$conversationBody'
+      '.compose_form':                  '$form'
 
     dialogOptions: ->
       id: 'compose-new-message'
@@ -109,7 +109,7 @@ define [
       e.preventDefault()
       e.stopPropagation()
       @removeEmptyAttachments()
-      @$el.submit()
+      @$form.submit()
 
     initialize: ->
       super
@@ -197,8 +197,8 @@ define [
         @removeMediaComment($(e.currentTarget))
       @$addMediaComment[if !!INST.kalturaSettings then 'show' else 'hide']()
 
-      @$el.formSubmit
-        fileUpload: => (@$form.find(".file_input").length > 0)
+      @$form.formSubmit
+        fileUpload: => (@$fullDialog.find(".file_input").length > 0)
         preparedFileUpload: true
         context_code: "user_" + ENV.current_user_id
         folder_id: @options.folderId
@@ -212,14 +212,13 @@ define [
           data.attachment_ids = (a.attachment.id for a in attachments)
           data
         onSubmit: (@request, submitData) =>
-          data = @messageData(submitData)
-          @tracker.track(data, @request)
           # close dialog after submitting the message
           @close()
           # update conversation when message confirmed sent
-          $.when(@request).then (data) =>
-            data = [data] unless data.length?
-            @app.updatedConversation(data)
+          # TODO: construct the new message object and pass it to the MessageDetailView which will need to create a MessageItemView for it
+          #$.when(@request).then (data) =>
+          #  data = [data] unless data.length?
+          #  @app.updatedConversation(data)
 
     recipientIdsChanged: (recipientIds) =>
       if recipientIds.length > 1 or recipientIds[0]?.match(/^(course|group)_/)
