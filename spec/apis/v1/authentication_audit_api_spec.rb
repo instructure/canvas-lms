@@ -402,6 +402,43 @@ describe "AuthenticationAudit API", type: :integration do
     end
   end
 
+  describe "per-account with sharding when fetching by user" do
+    specs_require_sharding
+
+    before do
+      @shard2.activate do
+        @account = account_model
+        user_with_pseudonym(user: @user, account: @account, active_all: true)
+        @event2 = Auditors::Authentication.record(@pseudonym, 'logout')
+      end
+    end
+
+    it "should see events on both shards" do
+      expect_event_for_context(@user, @event)
+      expect_event_for_context(@user, @event2)
+    end
+
+    context "with permission on only a subset of accounts" do
+      before do
+        @user, @viewing_user = @user, @shard2.activate{ user_model }
+        @user, _ = @user, @shard2.activate do
+          account_admin_user_with_role_changes(
+            :account => @account, :user => @viewing_user,
+            :membership_type => 'CustomAdmin',
+            :role_changes => {:manage_user_logins => true})
+        end
+      end
+
+      it "should include events from visible accounts" do
+        expect_event_for_context(@user, @event2)
+      end
+
+      it "should not include events from non-visible accounts" do
+        forbid_event_for_context(@user, @event)
+      end
+    end
+  end
+
   describe "pagination" do
     before do
       # 3 events total

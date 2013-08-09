@@ -114,7 +114,7 @@ class AuthenticationAuditApiController < ApplicationController
         render_events(events, @user)
       elsif visible_accounts.present?
         pseudonyms = Shard.partition_by_shard(visible_accounts) do |shard_accounts|
-          @user.active_pseudonyms.where(:account_id => shard_accounts).all
+          Pseudonym.active.where(user_id: @user, account_id: shard_accounts).all
         end
         events = Auditors::Authentication.for_pseudonyms(pseudonyms, date_options)
         render_events(events, @user)
