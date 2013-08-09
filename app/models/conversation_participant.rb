@@ -171,6 +171,8 @@ class ConversationParticipant < ActiveRecord::Base
   cacheable_method :conversation
 
   delegate :private?, :to => :conversation
+  delegate :context_name, :to => :conversation
+  delegate :context_components, :to => :conversation
 
   before_update :update_unread_count_for_update
   before_destroy :update_unread_count_for_destroy

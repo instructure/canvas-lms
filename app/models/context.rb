@@ -169,6 +169,22 @@ module Context
     res
   end
 
+  # [[context_type, context_id], ...] -> {[context_type, context_id] => name, ...}
+  def self.names_by_context_types_and_ids(context_types_and_ids)
+    ids_by_type = Hash.new([])
+    context_types_and_ids.each do |type, id|
+      next unless type && ContextTypes.const_defined?(type)
+      ids_by_type[type] += [id]
+    end
+
+    result = Hash.new
+    ids_by_type.each do |type, ids|
+      klass = ContextTypes.const_get(type)
+      klass.where(:id => ids).select([:id, :name]).map {|c| result[[type, c.id]] = c.name}
+    end
+    result
+  end
+
   def self.find_by_asset_string(string)
     opts = string.split("_", -1)
     id = opts.pop

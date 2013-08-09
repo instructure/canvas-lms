@@ -115,7 +115,8 @@ class ConversationsController < ApplicationController
   #       "audience_contexts": {"courses": {"1": ["StudentEnrollment"]}, "groups": {}},
   #       "avatar_url": "https://canvas.instructure.com/images/messages/avatar-group-50.png",
   #       "participants": [{"id": 1, "name": "Joe TA"}, {"id": 2, "name": "Jane Teacher"}],
-  #       "visible": true
+  #       "visible": true,
+  #       "context_name": "Canvas 101"
   #     }
   #   ]
   def index
@@ -123,7 +124,13 @@ class ConversationsController < ApplicationController
       conversations = Api.paginate(@conversations_scope, self, api_v1_conversations_url)
       # optimize loading the most recent messages for each conversation into a single query
       ConversationParticipant.preload_latest_messages(conversations, @current_user)
-      @conversations_json = conversations.map{ |c| conversation_json(c, @current_user, session, :include_participant_avatars => false, :include_participant_contexts => false, :visible => true) }
+      @conversations_json = conversations_json(conversations,
+                                               @current_user,
+                                               session,
+                                               :include_participant_avatars => false,
+                                               :include_participant_contexts => false,
+                                               :visible => true,
+                                               :include_context_name => true) 
   
       if params[:include_all_conversation_ids]
         @conversations_json = {:conversations => @conversations_json, :conversation_ids => @conversations_scope.conversation_ids}
@@ -392,7 +399,8 @@ class ConversationsController < ApplicationController
                                       session,
                                       :include_indirect_participants => true,
                                       :messages => messages,
-                                      :submissions => submissions)
+                                      :submissions => submissions,
+                                      :include_context_name => true)
   end
 
   # @API Edit a conversation

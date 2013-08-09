@@ -395,6 +395,23 @@ class Conversation < ActiveRecord::Base
     end
   end
 
+  def context_components
+    if context_type.nil? && context_tags.first
+      ActiveRecord::Base.parse_asset_string(context_tags.first)
+    else
+      [context_type, context_id]
+    end
+  end
+
+  def context_name
+    name = context.try(:name)
+    name ||= Context.find_by_asset_string(context_tags.first).try(:name) if context_tags.first
+  end
+
+  def context_tags
+    tags.grep(/\A(course|group)_\d+\z/)
+  end
+
   def infer_new_tags_for(participant, all_new_tags)
     active_tags   = participant.user.conversation_context_codes(false)
     context_codes = active_tags.present? ? active_tags : participant.user.conversation_context_codes

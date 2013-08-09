@@ -76,7 +76,8 @@ describe ConversationsController, :type => :integration do
             {"id" => @me.id, "name" => @me.name},
             {"id" => @billy.id, "name" => @billy.name},
             {"id" => @bob.id, "name" => @bob.name}
-          ]
+          ],
+          "context_name" => @c2.context_name
         },
         {
           "id" => @c1.conversation_id,
@@ -100,7 +101,8 @@ describe ConversationsController, :type => :integration do
           "participants" => [
             {"id" => @me.id, "name" => @me.name},
             {"id" => @bob.id, "name" => @bob.name}
-          ]
+          ],
+          "context_name" => @c1.context_name
         }
       ]
     end
@@ -163,9 +165,46 @@ describe ConversationsController, :type => :integration do
             {"id" => @me.id, "name" => @me.name},
             {"id" => @billy.id, "name" => @billy.name},
             {"id" => @bob.id, "name" => @bob.name}
-          ]
+          ],
+          "context_name" => @c2.context_name
         }
       ]
+    end
+
+    describe "context_name" do
+      before :each do
+        @c1 = conversation(@bob, :workflow_state => 'read') # implicit tag from shared context
+        @c2 = conversation(@bob, @billy, :workflow_state => 'unread', :subscribed => false) # manually specified context which would not be implied
+        course_with_student(:course_name => 'the other course')
+        conversation = @c2.conversation
+        conversation.context = @course
+        conversation.save!
+        @c2.save!
+        @c3 = conversation(@student) # no context
+        @user = @me
+      end
+
+      describe 'index' do
+        it "should prefer the context but fall back to the first context tag" do
+          json = api_call(:get, "/api/v1/conversations.json",
+                          { :controller => 'conversations', :action => 'index', :format => 'json' })
+          json.map{|c| c["context_name"]}.should eql([nil, 'the other course', 'the course'])
+        end
+      end
+
+      describe 'show' do
+        it "should prefer the context but fall back to the first context tag" do
+          json = api_call(:get, "/api/v1/conversations/#{@c1.conversation.id}",
+                          { :controller => 'conversations', :action => 'show', :id => @c1.conversation.id.to_s, :format => 'json' })
+          json["context_name"].should eql('the course')
+          json = api_call(:get, "/api/v1/conversations/#{@c2.conversation.id}",
+                          { :controller => 'conversations', :action => 'show', :id => @c2.conversation.id.to_s, :format => 'json' })
+          json["context_name"].should eql('the other course')
+          json = api_call(:get, "/api/v1/conversations/#{@c3.conversation.id}",
+                          { :controller => 'conversations', :action => 'show', :id => @c3.conversation.id.to_s, :format => 'json' })
+          json["context_name"].should be_nil
+        end
+      end        
     end
 
     context "filtering by tags" do
@@ -814,7 +853,8 @@ describe ConversationsController, :type => :integration do
           },
           {"id" => conversation.messages.last.id, "created_at" => conversation.messages.last.created_at.to_json[1, 20], "body" => "test", "author_id" => @me.id, "generated" => false, "media_comment" => nil, "forwarded_messages" => [], "attachments" => [], "participating_user_ids" => [@me.id, @bob.id].sort}
         ],
-        "submissions" => []
+        "submissions" => [],
+        "context_name" => conversation.context_name
       })
     end
 
@@ -866,7 +906,8 @@ describe ConversationsController, :type => :integration do
           "messages" => [
               {"id" => @conversation.messages.last.id, "created_at" => @conversation.messages.last.created_at.to_json[1, 20], "body" => "test", "author_id" => @me.id, "generated" => false, "media_comment" => nil, "forwarded_messages" => [], "attachments" => [], "participating_user_ids" => [@me.id, @bob.id].sort}
           ],
-          "submissions" => []
+          "submissions" => [],
+          "context_name" => @conversation.context_name
         }
         json.should == expected
       end

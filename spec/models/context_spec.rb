@@ -91,4 +91,19 @@ describe Context do
       @course.find_asset("").should eql(nil)
     end
   end
+
+  context "self.names_by_context_types_and_ids" do
+    it "should find context names" do
+      contexts = []
+      contexts << course1 = Course.create!(:name => "a course")
+      contexts << course2 = Course.create!(:name => "another course")
+      contexts << group1 = Group.create!(:name => "a group")
+      contexts << group2 = Group.create!(:name => "another group")
+      contexts << user = User.create!(:name => "a user")
+      names = Context.names_by_context_types_and_ids(contexts.map{|c| [c.class.name, c.id]})
+      contexts.each do |c|
+        names[[c.class.name, c.id]].should eql(c.name)
+      end
+    end
+  end
 end

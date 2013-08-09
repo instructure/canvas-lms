@@ -19,6 +19,7 @@ define [
           if message.participants.length > 2
             message.summarizedParticipants = message.participants.slice(0, 2)
             message.hiddenParticipantCount = message.participants.length - 2
+          message.context_name = data.context_name
       data
 
     unread: ->
