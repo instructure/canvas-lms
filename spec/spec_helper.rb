@@ -18,7 +18,7 @@
 if ENV['COVERAGE'] == "1"
   puts "Code Coverage enabled"
   require 'simplecov'
-  SimpleCov.start('rails') do
+  SimpleCov.start do
     SimpleCov.formatter = SimpleCov::Formatter::HTMLFormatter
     add_filter '/spec/'
     add_filter '/config/'
