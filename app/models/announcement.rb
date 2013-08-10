@@ -57,25 +57,25 @@ class Announcement < DiscussionTopic
   end
 
   set_policy do
-    given { |user| self.user == user }
+    given { |user| self.user.present? && self.user == user }
     can :update and can :reply and can :read
-    
-    given { |user| self.user == user and self.discussion_entries.active.empty? }
+
+    given { |user| self.user.present? && self.user == user && self.discussion_entries.active.empty? }
     can :delete
-    
+
     given { |user, session| self.context.grants_right?(user, session, :read) }
     can :read
-    
+
     given { |user, session| self.context.grants_right?(user, session, :post_to_forum) }
     can :reply
-    
+
     given { |user, session| self.context.is_a?(Group) && self.context.grants_right?(user, session, :post_to_forum) }
     can :create
 
     given { |user, session| self.context.grants_right?(user, session, :moderate_forum) } #admins.include?(user) }
     can :update and can :delete and can :reply and can :create and can :read and can :attach
   end
-  
+
   def is_announcement; true end
 
   # no one should receive discussion entry notifications for announcements

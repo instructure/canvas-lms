@@ -65,6 +65,13 @@ describe DiscussionTopicsController do
       response.should be_success
     end
 
+    it "should not display announcements in private courses to users who aren't logged in" do
+      course(active_all: true)
+      announcement = @course.announcements.create!(title: 'Test announcement', message: 'Message')
+      get('show', course_id: @course.id, id: announcement.id)
+      response.code.should == '401'
+    end
+
     context "discussion topic with assignment with overrides" do
       integrate_views
 
