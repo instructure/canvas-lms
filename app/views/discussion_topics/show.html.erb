@@ -84,65 +84,67 @@
           </a>
         <% end %>
 
-        <div class="admin-links">
-          <a class="al-trigger btn" data-kyle-menu-options='{"appendMenuTo": "body"}'>
-            <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
-            <div class="screenreader-only"><%= t :manage_discussion, 'Manage Discussion' %></div>
-          </a>
-          <ul class="al-options">
-            <li><a href="#" class="mark_all_as_read"><i class="icon-mark-as-read" aria-hidden="hidden"></i> <%= t :mark_all_as_read, 'Mark All as Read' %></a></li>
-            <% if false # keep this command out of the interface for now %>
-              <li><a href="#" class="mark_all_as_unread"><%#= <i class="icon-mark-as-unread" aria-hidden="hidden"></i> %> <%= t :mark_all_as_unread, 'Mark All as Unread' %></a></li>
-            <% end %>
-
-            <% if can_do(@topic, @current_user, :delete) %>
-              <li><a href="<%= context_url(@context, :context_discussion_topic_url, @topic.id) %>" class="delete_discussion" data-method="delete" rel="nofollow" data-confirm="<%= t :confirm_delete_discussion, 'Are you sure you want to delete this discussion?' %>"><i class="icon-trash"></i> <%= t :delete, 'Delete' %></a></li>
-            <% end %>
-
-            <% if @presenter.can_grade?(@current_user) && @presenter.allows_speed_grader? %>
-              <li><a href="<%= context_url(@topic.assignment.context,
-                                           :speed_grader_context_gradebook_url,
-                                           :assignment_id => @topic.assignment.id) %>">
-                <i class="icon-speed-grader" aria-hidden="hidden"></i>
-                <%= t :speed_grader, "Speed Grader" %>
-              </a></li>
-            <% end %>
-
-            <% if @presenter.show_peer_reviews?(@current_user) %>
-              <li><a class="peer-review assignment_peer_reviews_link"
-                 href="<%= context_url(@topic.assignment.context,
-                                       :context_assignment_peer_reviews_url,
-                                       @topic.assignment.id) %>">
-                <i class="icon-peer-review" aria-hidden="hidden"></i>
-                <%= t 'links.peer_reviews', "Peer Reviews" %>
-              </a></li>
-            <% end %>
-
-            <% if @presenter.should_show_rubric?(@current_user) %>
-              <li>
-                <%# HACK! this is here because edit_rubric.js expects there to be a #add_rubric_url on the page and sets it's <form action="..."> to it %>
-                <% if can_do(@topic.assignment, @current_user, :update) %>
-                  <a href="<%= context_url(@topic.assignment.context, :context_rubrics_url) %>" id="add_rubric_url" style="display: none;"></a>
-                <% end %>
-
-                <a class="rubric_dialog_trigger rubric" href="#" data-no-rubric-exists="<%= !@presenter.has_attached_rubric? %>" data-url="<%= context_url(@topic.assignment.context, :context_assignment_rubric_url, @topic.assignment.id) %>">
-                  <i class="icon-rubric" aria-hidden="hidden"></i>
-                  <%= @presenter.has_attached_rubric? ? t(:show_rubric, "Show Rubric") : t(:add_rubric, "Add Rubric") %>
-                </a>
-              </li>
-            <% end %>
-
-            <% unless @presenter.comments_disabled? %>
-              <% if @locked %>
-                <% if can_do(@context, @current_user, :moderate_forum) %>
-                  <li><a href="#" data-mark-locked="false" class="discussion_locked_toggler"><i class="icon-unlock"></i> <%= t(:unlock_topic, %{Open for Comments}) %></a></li>
-                <% end %>
-              <% elsif can_do(@context, @current_user, :moderate_forum) && (!@topic.assignment.try(:due_at) || @topic.assignment.due_at <= Time.now) %>
-                <li><a href="#" data-mark-locked="true" class="discussion_locked_toggler"><i class="icon-lock"></i> <%= t(:lock_topic, %{Close for Comments}) %></a></li>
+        <% if @current_user.present? %>
+          <div class="admin-links">
+            <a class="al-trigger btn" data-kyle-menu-options='{"appendMenuTo": "body"}'>
+              <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
+              <div class="screenreader-only"><%= t :manage_discussion, 'Manage Discussion' %></div>
+            </a>
+            <ul class="al-options">
+              <li><a href="#" class="mark_all_as_read"><i class="icon-mark-as-read" aria-hidden="hidden"></i> <%= t :mark_all_as_read, 'Mark All as Read' %></a></li>
+              <% if false # keep this command out of the interface for now %>
+                <li><a href="#" class="mark_all_as_unread"><%#= <i class="icon-mark-as-unread" aria-hidden="hidden"></i> %> <%= t :mark_all_as_unread, 'Mark All as Unread' %></a></li>
               <% end %>
-            <% end %>
-          </ul>
-        </div>
+
+              <% if can_do(@topic, @current_user, :delete) %>
+                <li><a href="<%= context_url(@context, :context_discussion_topic_url, @topic.id) %>" class="delete_discussion" data-method="delete" rel="nofollow" data-confirm="<%= t :confirm_delete_discussion, 'Are you sure you want to delete this discussion?' %>"><i class="icon-trash"></i> <%= t :delete, 'Delete' %></a></li>
+              <% end %>
+
+              <% if @presenter.can_grade?(@current_user) && @presenter.allows_speed_grader? %>
+                <li><a href="<%= context_url(@topic.assignment.context,
+                                             :speed_grader_context_gradebook_url,
+                                             :assignment_id => @topic.assignment.id) %>">
+                  <i class="icon-speed-grader" aria-hidden="hidden"></i>
+                  <%= t :speed_grader, "Speed Grader" %>
+                </a></li>
+              <% end %>
+
+              <% if @presenter.show_peer_reviews?(@current_user) %>
+                <li><a class="peer-review assignment_peer_reviews_link"
+                   href="<%= context_url(@topic.assignment.context,
+                                         :context_assignment_peer_reviews_url,
+                                         @topic.assignment.id) %>">
+                  <i class="icon-peer-review" aria-hidden="hidden"></i>
+                  <%= t 'links.peer_reviews', "Peer Reviews" %>
+                </a></li>
+              <% end %>
+
+              <% if @presenter.should_show_rubric?(@current_user) %>
+                <li>
+                  <%# HACK! this is here because edit_rubric.js expects there to be a #add_rubric_url on the page and sets it's <form action="..."> to it %>
+                  <% if can_do(@topic.assignment, @current_user, :update) %>
+                    <a href="<%= context_url(@topic.assignment.context, :context_rubrics_url) %>" id="add_rubric_url" style="display: none;"></a>
+                  <% end %>
+
+                  <a class="rubric_dialog_trigger rubric" href="#" data-no-rubric-exists="<%= !@presenter.has_attached_rubric? %>" data-url="<%= context_url(@topic.assignment.context, :context_assignment_rubric_url, @topic.assignment.id) %>">
+                    <i class="icon-rubric" aria-hidden="hidden"></i>
+                    <%= @presenter.has_attached_rubric? ? t(:show_rubric, "Show Rubric") : t(:add_rubric, "Add Rubric") %>
+                  </a>
+                </li>
+              <% end %>
+
+              <% unless @presenter.comments_disabled? %>
+                <% if @locked %>
+                  <% if can_do(@context, @current_user, :moderate_forum) %>
+                    <li><a href="#" data-mark-locked="false" class="discussion_locked_toggler"><i class="icon-unlock"></i> <%= t(:unlock_topic, %{Open for Comments}) %></a></li>
+                  <% end %>
+                <% elsif can_do(@context, @current_user, :moderate_forum) && (!@topic.assignment.try(:due_at) || @topic.assignment.due_at <= Time.now) %>
+                  <li><a href="#" data-mark-locked="true" class="discussion_locked_toggler"><i class="icon-lock"></i> <%= t(:lock_topic, %{Close for Comments}) %></a></li>
+                <% end %>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
       </div>
     </div>
   </div>
