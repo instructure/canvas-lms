@@ -51,6 +51,25 @@ Rails.configuration.to_prepare do
         }
       }
     },
+    'outcome_results_csv'=> {
+      :title => 'Outcome Results',
+      :parameters_partial => true,
+      :description_partial => true,
+      :parameters => {
+        :enrollment_term_id => {
+          :required => false,
+          :description => 'The canvas id of the term of courses to report on'
+        },
+        :order => {
+          :required => false,
+          :description => "The sort order for the csv, Options: 'users', 'courses', 'outcomes'",
+        },
+        :include_deleted => {
+          :required => false,
+          :description => 'Include deleted objects'
+        }
+      }
+    },
     'provisioning_csv'=> {
       :title => 'Provisioning',
       :parameters_partial => 'sis_export_csv_parameters',

@@ -1,12 +1,9 @@
-<p><%= t('account_reports.student_assignment_map.description.text', %{This
-report shows the learning outcome results for all students. The
-resulting csv file will have one row per user-outcome-result pair, and will
-show the details of the result including the associated assignment.
-This report only shows outcome results for assignments and does not include
-outcomes tied to question banks.}) %></p>
+<p><%= t('account_reports.outcomes.description.text', %{This report shows the
+ learning outcome results for all students. The resulting csv file will have
+ one row per user-outcome-result pair, and will show the details of the result
+ including the associated assignment.}) %></p>
 
-<h3><%= t('account_reports.student_assignment_map.description.header',
-          %{Example}) %></h3>
+<h3><%= t('account_reports.outcomes.description.header', %{Example}) %></h3>
 
 <table class="report_example">
   <thead>
@@ -14,21 +11,20 @@ outcomes tied to question banks.}) %></p>
     <th>student name</th>
     <th>student id</th>
     <th>student sis id</th>
-    <th>assignment title</th>
-    <th>assignment id</th>
+    <th>assessment title</th>
+    <th>assessment id</th>
+    <th>assessment type</th>
     <th>submission date</th>
     <th>submission score</th>
     <th>learning outcome name</th>
     <th>learning outcome id</th>
     <th>attempt</th>
     <th>outcome score</th>
+    <th>assessment question</th>
+    <th>assessment question id</th>
     <th>course name</th>
     <th>course id</th>
     <th>course sis id</th>
-    <th>section name</th>
-    <th>section id</th>
-    <th>section sis id</th>
-    <th>assignment url</th>
   </tr>
   </thead>
   <tbody>
@@ -38,39 +34,37 @@ outcomes tied to question banks.}) %></p>
     <td>u16450</td>
     <td>Assignment 1</td>
     <td>3217</td>
+    <td>assignment</td>
     <td>01 Apr 2011 18:16:12 UTC</td>
     <td>85</td>
     <td>Can write basic Ruby</td>
     <td>1</td>
     <td>1</td>
     <td>4</td>
+    <td></td>
+    <td></td>
     <td>computer science 101</td>
     <td>46489</td>
     <td>c500190</td>
-    <td>Section1</td>
-    <td>678435</td>
-    <td>s5001901</td>
-    <td>https://example.com/courses/46489/assignments/3217</td>
   </tr>
   <tr>
     <td>smith, kacie</td>
     <td>104837</td>
     <td>u50214</td>
-    <td>Assignment 1</td>
-    <td>3217</td>
+    <td>Quiz 1</td>
+    <td>4565</td>
+    <td>quiz</td>
     <td>02 Apr 2011 17:24:30 UTC</td>
     <td>93</td>
-    <td>Can write basic Ruby</td>
+    <td>Can understand basic Ruby</td>
     <td>1</td>
     <td>1</td>
     <td>4</td>
+    <td>Question 1</td>
+    <td>4558</td>
     <td>computer science 101</td>
     <td>46489</td>
     <td>c500190</td>
-    <td>Section1</td>
-    <td>678435</td>
-    <td>s5001901</td>
-    <td>https://example.com/courses/46489/assignments/3217</td>
   </tr>
   </tbody>
 </table>  
