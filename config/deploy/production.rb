@@ -1,4 +1,4 @@
-num_app_nodes = 6
+num_app_nodes = 10
 app_node_prefix = "canvas-ap"
 set :canvas_url, 'https://canvas.sfu.ca'
 
