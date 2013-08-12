@@ -12,7 +12,6 @@
 
 /.bundle/
 /.yardoc/
-/.project
 /app/views/info/styleguide.html.erb
 /config/*.yml
 /config/build.js

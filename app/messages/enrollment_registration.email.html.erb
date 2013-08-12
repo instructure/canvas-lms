@@ -7,24 +7,25 @@
 <% end %>
 
 <% website = HostUrl.context_host(asset.course) %>
+<p><%= t :participate_in_class, "You've been invited to participate in a class at %{website}", :website => website %></p>
 <p>
 <%=
     case asset.type
     when 'TeacherEnrollment'
-      t :body_teacher, "You've been invited to participate in a class at %{website}. The class is called %{course}, and you've been invited to participate as a teacher.",
-        :course => asset.course.name, :website => website
+      t :body_teacher, "The class is called %{course}, and you've been invited to participate as a teacher.",
+        :course => asset.course.name
     when 'TaEnrollment'
-      t :body_ta, "You've been invited to participate in a class at %{website}. The class is called %{course}, and you've been invited to participate as a TA.",
-        :course => asset.course.name, :website => website
+      t :body_ta, "The class is called %{course}, and you've been invited to participate as a TA.",
+        :course => asset.course.name
     when 'ObserverEnrollment'
-      t :body_observer, "You've been invited to participate in a class at %{website}. The class is called %{course}, and you've been invited to participate as a observer.",
-        :course => asset.course.name, :website => website
+      t :body_observer, "The class is called %{course}, and you've been invited to participate as a observer.",
+        :course => asset.course.name
     when 'DesignerEnrollment'
-      t :body_designer, "You've been invited to participate in a class at %{website}. The class is called %{course}, and you've been invited to participate as a designer.",
-        :course => asset.course.name, :website => website
+      t :body_designer, "The class is called %{course}, and you've been invited to participate as a designer.",
+        :course => asset.course.name
     else
-      t :body_student, "You've been invited to participate in a class at %{website}. The class is called %{course}, and you've been invited to participate as a student.",
-        :course => asset.course.name, :website => website
+      t :body_student, "The class is called %{course}, and you've been invited to participate as a student.",
+        :course => asset.course.name
     end
 %>
 </p>
