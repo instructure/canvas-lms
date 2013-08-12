@@ -34,7 +34,7 @@
     display: inline-block;
   }
 
-  .btn, a {
+  .btn {
     color: #555;
   }
 }
@@ -76,10 +76,6 @@
     position: relative;
     right: 5px;
   }
-}
-
-#help-menu-items > li > a {
-  color: #fff;
 }
 
 .search .ac {
