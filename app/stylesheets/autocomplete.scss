@@ -8,24 +8,29 @@
 A generic, accessible autocomplete widget.
 
 ```html
-<div class="ac" role="application">
-  <label for="ac-1">To</label>
+<div class="ac">
   <div class="ac-input-box">
     <ul class="ac-token-list"></ul>
     <input type="search"
            class="ac-input"
+           aria-expanded="false"
            aria-activedescendant=""
-           aria-owns="ac-list-1"
-           id="ac-1"
-           aria-autocomplete="list"
+           aria-owns="ac-result-list-1"
+           auto-autocomplete="list"
            role="combobox" />
+
+    <span class="ac-placeholder">Search for results</span>
   </div>
+
+  <button class="btn ac-search-btn"
+          type="button">
+    <i class="icon-address-book"></i>
+    <span class="screenreader-only">Search</span>
+  </button>
 
   <ul class="ac-result-list"
       id="ac-result-list-1"
-      aria-expanded="false"
-      aria-hidden="true">
-  </ul>
+      aria-hidden="true"></ul>
 </div>
 ```
 */
