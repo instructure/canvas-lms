@@ -19,6 +19,7 @@
 class GradebooksController < ApplicationController
   include ActionView::Helpers::NumberHelper
   include GradebooksHelper
+  include KalturaHelper
   include Api::V1::AssignmentGroup
   include Api::V1::Submission
 
@@ -161,7 +162,7 @@ class GradebooksController < ApplicationController
             @new_submissions = @submissions
             if params[:updated]
               d = DateTime.parse(params[:updated])
-              @new_submissions = @submissions.where("updated_at>?", d).all
+              @new_submissions = @submissions.where("submissions.updated_at>?", d).all
             end
             @enrollments_hash = Hash.new{ |hash,key| hash[key] = [] }
             @context.enrollments.sort_by{|e| [e.state_sortable, e.rank_sortable] }.each{ |e| @enrollments_hash[e.user_id] << e }
@@ -352,6 +353,9 @@ class GradebooksController < ApplicationController
         @headers = false
         @outer_frame = true
         log_asset_access("speed_grader:#{@context.asset_string}", "grades", "other")
+        hash = {:CONTEXT_ACTION_SOURCE => :speed_grader}
+        append_sis_data(hash)
+        js_env(hash)
         render :action => "speed_grader"
       end
 

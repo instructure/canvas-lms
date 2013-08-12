@@ -18,7 +18,7 @@
 class Canvas::Migration::Worker::CCWorker < Struct.new(:migration_id)
   def perform
     cm = ContentMigration.find_by_id migration_id
-    cm.job_progress.start
+    cm.job_progress.start unless cm.skip_job_progress
     begin
       cm.update_conversion_progress(1)
       settings = cm.migration_settings.clone
@@ -52,20 +52,19 @@ class Canvas::Migration::Worker::CCWorker < Struct.new(:migration_id)
       saved = cm.save
       cm.update_conversion_progress(100)
 
-      if cm.import_immediately?
-        cm.import_content_without_send_later
-        cm.update_import_progress(100)
-        saved = cm.save
-        if converter.respond_to?(:post_process)
-          converter.post_process
-        end
-      end
-
+      if cm.import_immediately? && !cm.for_course_copy?
+         cm.import_content
+         cm.update_import_progress(100)
+         saved = cm.save
+         if converter.respond_to?(:post_process)
+           converter.post_process
+         end
+       end
       saved
     rescue Canvas::Migration::Error
       cm.add_error($!.message, :exception => $!)
       cm.workflow_state = :failed
-      cm.job_progress.fail
+      cm.job_progress.fail unless cm.skip_job_progress
       cm.save
     rescue => e
       cm.fail_with_error!(e) if cm

@@ -13,7 +13,15 @@ if CANVAS_RAILS3
   gem 'rails',        '3.0.20'
   gem 'authlogic',    '3.2.0'
 else
-  gem 'rails',        '2.3.18'
+  # If you have a license to rails lts, you can create a vendor/plugins/*/RAILS_LTS yaml file
+  # with the Gemfile `gem` command to use (pointing to the private repo with your username/password).
+  # Otherwise, the free community version of rails lts will be used.
+  lts_file = Dir.glob(File.expand_path("../vendor/plugins/*/RAILS_LTS", __FILE__)).first
+  if lts_file
+    eval(File.read(lts_file))
+  else
+    gem 'rails', :git => 'https://github.com/makandra/rails.git', :branch => '2-3-lts', :ref => 'e86daf8ff727d5efc0040c876ba00c9444a5d915'
+  end
   gem 'authlogic',    '2.1.3'
 end
 
@@ -22,7 +30,7 @@ gem 'barby',          '0.5.0'
 gem 'bcrypt-ruby',    '3.0.1'
 gem 'builder',        '2.1.2'
 if !CANVAS_RAILS3
-  gem 'canvas_connect', '0.1.0'
+  gem 'canvas_connect', '0.1.1'
 end
 gem 'daemons',        '1.1.0'
 gem 'diff-lcs',       '1.1.3',  :require => 'diff/lcs'
@@ -31,15 +39,18 @@ if !CANVAS_RAILS3
 end
 gem 'erubis',         CANVAS_RAILS3 ? '2.6.6' : '2.7.0'
 if !CANVAS_RAILS3
-  gem 'fake_arel',      '1.0.0'
+  gem 'fake_arel',          '1.0.0'
 end
+gem 'fake_rails3_routes', '1.0.3'
 gem 'ffi',            '1.1.5'
 gem 'hairtrigger',    '0.2.3'
 gem 'sass',           '3.2.3'
 gem 'hashery',        '1.3.0',  :require => 'hashery/dictionary'
 gem 'highline',       '1.6.1'
 gem 'i18n',           CANVAS_RAILS3 ? '0.5.0' : '0.6.0'
-gem 'i18nema',        '0.0.7'
+if !CANVAS_RAILS3
+  gem 'i18nema',        '0.0.7'
+end
 gem 'icalendar',      '1.1.5'
 gem 'jammit',         '0.6.6'
 gem 'json',           '1.8.0'
@@ -58,11 +69,14 @@ gem 'nokogiri',       '1.5.6'
 # oauth gem, with rails3 fixes rolled in
 gem 'oauth-instructure', '0.4.9', :require => 'oauth'
 gem 'rack',           CANVAS_RAILS3 ? '1.2.5' : '1.1.3'
-gem 'rake',           '10.0.4'
+gem 'rake',           '10.1.0'
 gem 'rdoc',           '3.12'
 gem 'ratom-instructure', '0.6.9', :require => "atom" # custom gem until necessary changes are merged into mainstream
 gem 'rdiscount',      '1.6.8'
 gem 'ritex',          '1.0.1'
+if CANVAS_RAILS3
+  gem 'routing_concerns', '0.1.0'
+end
 gem 'rotp',           '1.4.1'
 gem 'rqrcode',        '0.4.2'
 gem 'rscribd',        '1.2.0'
@@ -88,7 +102,6 @@ group :assets do
 end
 
 group :mysql do
-  gem 'mysql',        '2.8.1'
   gem 'mysql2',       '0.2.18'
 end
 
@@ -101,7 +114,7 @@ group :sqlite do
 end
 
 group :test do
-  gem 'simplecov', '0.7.1'  # for coverage reporting
+  gem 'simplecov', '0.7.1' if ENV['COVERAGE'] != nil && ENV['COVERAGE'] == "1" # for coverage reporting
   gem 'bluecloth',    '2.0.10' # for generating api docs
   gem 'mocha',        :git => 'git://github.com/ccutrer/mocha.git', :require => false
   gem 'parallelized_specs', '0.4.59'
@@ -161,6 +174,10 @@ end
 
 group :statsd do
   gem 'statsd-ruby', '1.0.0', :require => 'statsd'
+end
+
+group :icu do
+  gem 'ffi-icu', '0.1.2'
 end
 
 # Non-standard Canvas extension to Bundler behavior -- load the Gemfiles from

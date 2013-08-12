@@ -52,6 +52,7 @@ module Api::V1::DiscussionTopics
       json.merge! :message => api_user_content(topic.message, context),
                   :discussion_type => topic.discussion_type,
                   :require_initial_post => topic.require_initial_post?,
+                  :user_can_see_posts => topic.user_can_see_posts?(user),
                   :podcast_url => url,
                   :pinned => !!topic.pinned,
                   :position => topic.position,
@@ -60,6 +61,7 @@ module Api::V1::DiscussionTopics
                   :subscribed => topic.subscribed?(user),
                   :topic_children => children,
                   :attachments => attachments,
+                  :published => topic.published?,
                   :locked => topic.locked?,
                   :author => user_display_json(topic.user, topic.context),
                   :html_url => context.is_a?(CollectionItem) ? nil :
@@ -67,11 +69,13 @@ module Api::V1::DiscussionTopics
                                             :context_discussion_topic_url,
                                             topic,
                                             :include_host => true)
+      subscription_hold = topic.subscription_hold(user, @context_enrollment, session)
+      json[:subscription_hold] = subscription_hold if subscription_hold
       locked_json(json, topic, user, session)
       json[:url] = json[:html_url] # deprecated
       if include_assignment && topic.assignment
         extend Api::V1::Assignment
-        json[:assignment] = assignment_json(topic.assignment, user, session, !:include_discussion_topic)
+        json[:assignment] = assignment_json(topic.assignment, user, session, include_discussion_topic: false)
       end
       json
     end

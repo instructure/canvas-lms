@@ -42,7 +42,7 @@
       </tr>
       <tr>
         <th><%= before_label('time_zone', 'Time Zone') %></th>
-        <td class="time_zone"><%= @user.time_zone || t('none', "None") %></td>
+        <td class="time_zone"><%= @user.time_zone.try(:name) || t('none', "None") %></td>
       </tr>
       <% if can_manage_admin_users || (!@enrollments.any?(&:admin?) && !@user.sis_pseudonym_for(@context.root_account) && can_do(@context, @current_user, :manage_students)) %>
         <td class="links" colspan="2" style="text-align: right; font-size: 0.8em; padding-top: 10px;">

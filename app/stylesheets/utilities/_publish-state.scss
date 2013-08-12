@@ -1,0 +1,110 @@
+/*
+@styleguide Publish State
+
+The publish button has two states on click (publish and published) and a hover state of 'Unpublish' once published.
+
+```html
+
+<p>
+  <button class="btn" id="publish"></button>
+</p>
+
+<p>
+  <button class="btn" id="published"></button>
+</p>
+
+<p>
+  <button class="btn" id="published-disabled" data-tooltip></button>
+</p>
+
+<p>
+  <span class="publish-icon"></span>
+</p>
+
+<p>
+  <span class='published-status published'>
+    <i class="icon-publish"></i> Published
+  </span>
+</p>
+
+<p>
+  <span class='published-status unpublished'>
+    <i class="icon-unpublished"></i> Not Published
+  </span>
+</p>
+
+```
+
+*/
+
+/* publish buttons */
+.btn-publish,
+.btn-published,
+.btn-unpublish {
+  padding-left: 9px;
+
+  i {
+    margin-right: 2px;
+    vertical-align: text-top;
+    line-height: 17px;
+  }
+  i:before {
+    font-size: 17px;
+  }
+}
+.btn-publish {
+  i:before {
+    color: #bbb;
+  }
+}
+
+.btn-published,
+.btn-published:hover {
+  background: #35842c;
+  border: 1px solid #2a5325;
+  color: #fff;
+  text-shadow: none;
+  box-shadow: inset 0 0 6px #1b2d19;
+}
+.btn-published.disabled,
+.btn-published.disabled:hover {
+  border: 1px solid #256f1e;
+  background: #35842c;
+  box-shadow: none;
+  color: #fff;
+}
+
+.btn-unpublish {
+  @include buttonBackground($btnDangerBackground, $btnDangerBackgroundHighlight);
+  box-shadow: none;
+}
+
+.publish-icon {
+  display: inline-block;
+  color: #bbb;
+  cursor: pointer;
+
+  &.publish-icon-unpublish {
+    color: $btnDangerBackground;
+  }
+
+  &.publish-icon-published {
+    color: #35842c;
+  }
+
+  .publish-text {
+    display: none;
+  }
+}
+
+.published-status {
+  &.published {
+    font-weight: bold;
+    color: #007711;
+  }
+
+  &.unpublished {
+    font-weight: normal;
+    color: #999999;
+  }
+}

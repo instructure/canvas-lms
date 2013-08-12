@@ -3,6 +3,87 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/quizzes_common')
 describe "quiz statistics" do
   it_should_behave_like "quizzes selenium tests"
 
+  describe "item analysis" do
+
+    def create_course_with_teacher_and_student
+      course
+      @course.offer!
+      @teacher = user_with_pseudonym({:unique_id => 'teacher@example.com', :password => 'asdfasdf'})
+      @course.enroll_user(@teacher, 'TeacherEnrollment').accept!
+      @student = user_with_pseudonym({:unique_id => 'otheruser@example.com', :password => 'asdfasdf'})
+      @course.enroll_user(@student, 'StudentEnrollment').accept!
+    end
+
+    def create_quiz
+      @quiz = @course.quizzes.create
+      @quiz.title = "Ganondorf"
+      @quiz.save!
+    end
+
+    def quiz_question(name, question, id)
+      answers = {
+        :a => {:weight=>100, :answer_text=>"A", :answer_comments=>"", :id=>1490},
+        :b => {:weight=>0, :answer_text=>"B", :answer_comments=>"", :id=>1020},
+        :c => {:weight=>0, :answer_text=>"C", :answer_comments=>"", :id=>7051}
+      }
+      data = { :question_name=>name, :points_possible=>1, :question_text=>question,
+        :answers=>answers, :question_type=>"multiple_choice_question"
+      }
+      @quiz.quiz_questions.create!(:question_data => data)
+    end
+
+    def preview_the_quiz
+      login_as(@teacher.primary_pseudonym.unique_id, 'asdfasdf')
+      get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
+      f("#preview_quiz_button").click
+      wait_for_ajaximations
+      answer_question
+      submit_quiz
+    end
+
+    def publish_the_quiz
+      @quiz.workflow_state = "available"
+      @quiz.generate_quiz_data
+      @quiz.published_at = Time.now
+      @quiz.save!
+    end
+
+    def take_the_quiz_as_a_student
+      login_as(@student.primary_pseudonym.unique_id, 'asdfasdf')
+      get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
+      expect_new_page_load { fj("a:contains('Take the Quiz')").click }
+      answer_question
+      submit_quiz
+    end
+
+    def generate_item_analysis
+      @quiz.reload
+      QuizStatistics::ItemAnalysis::Summary.new(@quiz)
+    end
+
+    def answer_question
+      f('.question_input').click
+    end
+
+    def submit_quiz
+      expect_new_page_load { f('#submit_quiz_button').click }
+    end
+
+    before :each do
+      create_course_with_teacher_and_student
+      create_quiz
+      quiz_question("Question 1", "How does one reach the Dark World?", 1)
+    end
+
+    it "should not include teacher previews" do
+      preview_the_quiz
+      publish_the_quiz
+      take_the_quiz_as_a_student
+      generate_item_analysis.length.should == 1
+    end
+
+  end
+
   context "as a teacher" do
 
     def update_quiz_submission_scores(question_score = '1')

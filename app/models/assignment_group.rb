@@ -65,14 +65,11 @@ class AssignmentGroup < ActiveRecord::Base
   end
 
   set_policy do
-    given { |user, session| self.context.grants_rights?(user, session, :read, :view_all_grades, :manage_grades).any?(&:last) }
+    given { |user, session| self.context.grants_rights?(user, session, :read, :view_all_grades).any?(&:last) }
     can :read
 
-    given { |user, session| self.context.grants_right?(user, session, :manage_assignments) }
-    can :update and can :delete and can :create and can :read
-
-    given { |user, session| self.context.grants_right?(user, session, :manage_grades) }
-    can :update and can :delete and can :create and can :read
+    given { |user, session| self.context.grants_rights?(user, session, :manage_assignments, :manage_grades).any?(&:last) }
+    can :read and can :create and can :update and can :delete
   end
 
   workflow do
@@ -193,6 +190,7 @@ class AssignmentGroup < ActiveRecord::Base
   end
 
   def self.process_migration(data, migration)
+    add_groups_for_imported_assignments(data, migration)
     groups = data['assignment_groups'] ? data['assignment_groups']: []
     groups.each do |group|
       if migration.import_object?("assignment_groups", group['migration_id'])
@@ -201,6 +199,21 @@ class AssignmentGroup < ActiveRecord::Base
         rescue
           migration.add_import_warning(t('#migration.assignment_group_type', "Assignment Group"), group[:title], $!)
         end
+      end
+    end
+  end
+
+  def self.add_groups_for_imported_assignments(data, migration)
+    return unless data['assignments'] && migration.migration_settings[:migration_ids_to_import] &&
+      migration.migration_settings[:migration_ids_to_import][:copy] &&
+      migration.migration_settings[:migration_ids_to_import][:copy].length > 0
+
+    migration.migration_settings[:migration_ids_to_import][:copy]['assignment_groups'] ||= {}
+    data['assignments'].each do |assignment_hash|
+      a_hash = assignment_hash.with_indifferent_access
+      if migration.import_object?("assignments", a_hash['migration_id']) &&
+          group_mig_id = a_hash['assignment_group_migration_id']
+        migration.migration_settings[:migration_ids_to_import][:copy]['assignment_groups'][group_mig_id] = true
       end
     end
   end

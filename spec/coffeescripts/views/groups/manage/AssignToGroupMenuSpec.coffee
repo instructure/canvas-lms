@@ -2,15 +2,15 @@ define [
   'compiled/views/groups/manage/AssignToGroupMenu'
   'compiled/collections/GroupCollection'
   'compiled/models/Group'
-  'Backbone'
-], (AssignToGroupMenu, GroupCollection, Group, {Model}) ->
+  'compiled/models/GroupUser'
+], (AssignToGroupMenu, GroupCollection, Group, GroupUser) ->
 
   view = null
   user = null
 
   module 'AssignToGroupMenu',
     setup: ->
-      user = new Model(id: 1, name: "bob", groupId: null)
+      user = new GroupUser(id: 1, name: "bob", groupId: null)
       groups = new GroupCollection [
         new Group id: 1, name: "a group"
       ]

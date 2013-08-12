@@ -26,6 +26,7 @@ class Assignment < ActiveRecord::Base
   include Mutable
   include ContextModuleItem
   include DatesOverridable
+  include SearchTermHelper
 
   attr_accessible :title, :name, :description, :due_at, :points_possible,
     :min_score, :max_score, :mastery_score, :grading_type, :submission_types,
@@ -143,11 +144,12 @@ class Assignment < ActiveRecord::Base
   serialize :allowed_extensions, Array
 
   def allowed_extensions=(new_value)
-    if new_value.is_a?(String)
-      # allow both comma and whitespace as separator, and remove the . if they
-      # put it on.
-      new_value = new_value.split(/[\s,]+/).map { |v| v.strip.gsub(/\A\./, '').downcase }
-    end
+    # allow both comma and whitespace as separator
+    new_value = new_value.split(/[\s,]+/) if new_value.is_a?(String)
+
+    # remove the . if they put it on, and extra whitespace
+    new_value.map! { |v| v.strip.gsub(/\A\./, '').downcase } if new_value.is_a?(Array)
+
     write_attribute(:allowed_extensions, new_value)
   end
 
@@ -446,6 +448,7 @@ class Assignment < ActiveRecord::Base
     p.dispatch :assignment_created
     p.to { participants }
     p.whenever { |record|
+      record.context.available? &&
       record.just_created
     }
     p.filter_asset_by_recipient { |record, user|
@@ -800,12 +803,10 @@ class Assignment < ActiveRecord::Base
     grade = self.score_to_grade(score)
     submissions_to_save = []
     self.context.students.find_each do |student|
-      User.send(:with_exclusive_scope) do
-        submission = self.find_or_create_submission(student)
-        if !submission.score || options[:overwrite_existing_grades]
-          if submission.score != score
-            submissions_to_save << submission
-          end
+      submission = self.find_or_create_submission(student)
+      if !submission.score || options[:overwrite_existing_grades]
+        if submission.score != score
+          submissions_to_save << submission
         end
       end
     end
@@ -1107,8 +1108,8 @@ class Assignment < ActiveRecord::Base
     res[:context][:enrollments] = context.enrollments_visible_to(user).
       map{|s| s.as_json(:include_root => false, :only => [:user_id, :course_section_id]) }
     res[:context][:quiz] = self.quiz.as_json(:include_root => false, :only => [:anonymous_submissions])
-    res[:submissions] = submissions.where(:user_id => visible_students).map{|s|
-      json = s.as_json(:include_root => false,
+    res[:submissions] = submissions.where(:user_id => visible_students).map{|sub|
+      json = sub.as_json(:include_root => false,
         :include => {
           :submission_comments => {
             :methods => avatar_methods,
@@ -1122,19 +1123,19 @@ class Assignment < ActiveRecord::Base
         :only => submission_fields
       )
       if json['submission_history']
-        json['submission_history'].map! do |s|
-          s.as_json(
+        json['submission_history'].map! do |version|
+          version.as_json(
             :include => {
               :submission_comments => { :only => comment_fields }
             },
             :only => submission_fields,
             :methods => [:versioned_attachments, :late]
-          ).tap do |s|
-            if s['submission'] && s['submission']['versioned_attachments']
-              s['submission']['versioned_attachments'].map! do |a|
+          ).tap do |version_json|
+            if version_json['submission'] && version_json['submission']['versioned_attachments']
+              version_json['submission']['versioned_attachments'].map! do |a|
                 a.as_json(
                   :only => attachment_fields,
-                  :methods => [:view_inline_ping_url]
+                  :methods => [:view_inline_ping_url, :scribd_render_url]
                 )
               end
             end
@@ -1595,6 +1596,8 @@ class Assignment < ActiveRecord::Base
         assoc.summary_data[:saved_comments] = hash[:saved_rubric_comments]
       end
       assoc.save
+
+      item.points_possible ||= rubric.points_possible if item.infer_grading_type == "points"
     end
     if hash[:grading_standard_migration_id]
       gs = context.grading_standards.find_by_migration_id(hash[:grading_standard_migration_id])

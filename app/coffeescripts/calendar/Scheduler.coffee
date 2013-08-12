@@ -22,8 +22,6 @@ define [
 
       @listDiv = @div.find(".appointment-list")
 
-      @div.delegate('.single_item_done_button', 'click', @doneClick)
-
       @div.delegate('.view_calendar_link', 'click', @viewCalendarLinkClick)
       @listDiv.delegate('.edit_link', 'click', @editLinkClick)
       @listDiv.delegate('.message_link', 'click', @messageLinkClick)
@@ -187,9 +185,7 @@ define [
       @loadingDeferred.done =>
         @div.addClass('showing-single')
 
-        @calendar.calendar.show()
-        @calendar.calendar.fullCalendar('changeView', 'agendaWeek')
-
+        @calendar.showSchedulerSingle();
         if @viewingGroup.start_at
           @calendar.gotoDate($.parseFromISO(@viewingGroup.start_at).time)
         else
@@ -200,7 +196,7 @@ define [
         @redraw()
 
     doneClick: (jsEvent) =>
-      jsEvent.preventDefault()
+      jsEvent?.preventDefault()
       @toggleListMode(true)
 
     showList: =>

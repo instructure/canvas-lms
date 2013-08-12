@@ -58,6 +58,12 @@ describe ContentMigrationsController, :type => :integration do
       course_with_student_logged_in(:course => @course, :active_all => true)
       api_call(:get, @migration_url, @params, {}, {}, :expected_status => 401)
     end
+
+    it "should create the course root folder" do
+      @course.folders.should be_empty
+      api_call(:get, @migration_url, @params)
+      @course.reload.folders.should_not be_empty
+    end
   end
 
   describe 'show' do
@@ -82,7 +88,7 @@ describe ContentMigrationsController, :type => :integration do
       json["migration_issues_count"].should == 0
       json["attachment"]["url"].should =~ %r{/files/#{@migration.attachment.id}/download}
       json['progress_url'].should == "http://www.example.com/api/v1/progress/#{progress.id}"
-      json['migration_type_title'].should == 'Common Cartridge Importer'
+      json['migration_type_title'].should == 'Common Cartridge'
     end
 
     it "should return waiting_for_select when it's supposed to" do
@@ -100,6 +106,30 @@ describe ContentMigrationsController, :type => :integration do
     it "should 401" do
       course_with_student_logged_in(:course => @course, :active_all => true)
       api_call(:get, @migration_url, @params, {}, {}, :expected_status => 401)
+    end
+
+    it "should not return attachment for course copies" do
+      @migration.migration_type = nil
+      @migration.source_course_id = @course.id
+      @attachment = Attachment.create!(:context => @migration, :filename => "test.zip", :uploaded_data => StringIO.new("test file"))
+      @attachment.file_state = "deleted"
+      @attachment.workflow_state = "unattached"
+      @attachment.save
+      @migration.attachment = @attachment
+      @migration.save!
+
+      json = api_call(:get, @migration_url, @params)
+      json["attachment"].should be_nil
+    end
+
+    it "should return source course info for course copy" do
+      @migration.migration_type = nil
+      @migration.source_course_id = @course.id
+      @migration.save!
+
+      json = api_call(:get, @migration_url, @params)
+      json['settings']['source_course_id'].should == @course.id
+      json['settings']['source_course_name'].should == @course.name
     end
   end
 

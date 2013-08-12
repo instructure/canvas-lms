@@ -1,0 +1,208 @@
+#
+# Copyright (C) 2013 Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+
+module Canvas::AccountReports
+
+  class StudentReports
+    include Api
+    include Canvas::AccountReports::ReportHelper
+
+    def initialize(account_report)
+      @account_report = account_report
+      extra_text_term(@account_report)
+    end
+
+    def students_with_no_submissions()
+      file = Canvas::AccountReports.generate_file(@account_report)
+      CSV.open(file, "w") do |csv|
+
+        condition = [""]
+        if start_at
+          condition.first << " AND submitted_at > ?"
+          condition << start_at
+          @account_report.parameters["extra_text"] << " Start At: #{start_at};"
+        end
+
+        if end_at
+          condition.first << " AND submitted_at < ?"
+          condition << end_at
+          @account_report.parameters["extra_text"] << " End At: #{end_at};"
+        end
+
+        time_span_join = Pseudonym.send(:sanitize_sql, condition)
+
+        no_subs = root_account.all_courses.active.
+          select("p.user_id, p.sis_user_id, courses.id AS course_id,
+                  u.sortable_name, courses.name AS course_name,
+                  courses.sis_source_id AS course_sis_id, cs.id AS section_id,
+                  cs.sis_source_id AS section_sis_id, cs.name AS section_name").
+          joins("INNER JOIN enrollments e ON e.course_id = courses.id
+                   AND e.root_account_id = courses.root_account_id
+                   AND e.type = 'StudentEnrollment'
+                 INNER JOIN course_sections cs ON cs.id = e.course_section_id
+                 INNER JOIN pseudonyms p ON e.user_id = p.user_id
+                   AND courses.root_account_id = p.account_id
+                 INNER JOIN users u ON u.id = p.user_id").
+          where("NOT EXISTS (SELECT user_id
+                             FROM submissions s
+                             INNER JOIN assignments a ON s.assignment_id = a.id
+                             INNER JOIN courses c ON a.context_id = c.id
+                               AND a.context_type = 'Course'
+                             WHERE s.user_id = p.user_id
+                             AND c.id = courses.id
+                             #{time_span_join})")
+
+        no_subs = add_term_scope(no_subs)
+        no_subs = add_course_enrollments_scope(no_subs, 'e')
+        no_subs = add_course_sub_account_scope(no_subs)
+
+        csv << ['user id','user sis id','user name','section id',
+                'section sis id', 'section name','course id',
+                'course sis id', 'course name']
+        Shackles.activate(:slave) do
+          no_subs.find_each do |u|
+            row = []
+            row << u["user_id"]
+            row << u["sis_user_id"]
+            row << u["sortable_name"]
+            row << u["section_id"]
+            row << u["section_sis_id"]
+            row << u["section_name"]
+            row << u["course_id"]
+            row << u["course_sis_id"]
+            row << u["course_name"]
+            csv << row
+          end
+        end
+      end
+      send_report(file)
+    end
+
+    def zero_activity
+      file = Canvas::AccountReports.generate_file(@account_report)
+      CSV.open(file, "w") do |csv|
+
+        data = root_account.enrollments.active.
+          select("c.id AS course_id, c.sis_source_id AS course_sis_id,
+                  c.name AS course_name, s.id AS section_id,
+                  s.sis_source_id AS section_sis_id, s.name AS section_name,
+                  p.user_id, p.sis_user_id, u.sortable_name").
+          joins("INNER JOIN courses c ON c.id = enrollments.course_id
+                   AND c.workflow_state = 'available'
+                 INNER JOIN course_sections s ON s.id = enrollments.course_section_id
+                   AND s.workflow_state = 'active'
+                 INNER JOIN pseudonyms p ON p.user_id = enrollments.user_id
+                   AND p.account_id = enrollments.root_account_id
+                   AND p.workflow_state = 'active'
+                 INNER JOIN users u ON u.id = p.user_id").
+          where("enrollments.type = 'StudentEnrollment'
+                 AND enrollments.workflow_state = 'active'")
+
+        param = {}
+
+        if start_at
+          @account_report.parameters["extra_text"] << " Start At: #{start_at};"
+          param[:start_at] = start_at
+          start = " AND aua.updated_at > :start_at"
+        else
+          start = ""
+        end
+
+        data = data.
+          where("NOT EXISTS (SELECT user_id, context_id
+                             FROM asset_user_accesses aua
+                             WHERE aua.user_id = enrollments.user_id
+                               AND aua.context_id = enrollments.course_id
+                               AND aua.context_type = 'Course'
+                             #{start})",param)
+
+        if course
+          data = data.where(:enrollments => { :course_id => course })
+          @account_report.parameters['extra_text'] << " For Course: #{course.id};"
+        end
+
+        data = add_term_scope(data, 'c')
+        data = add_course_sub_account_scope(data, 'c') unless course
+
+        csv << ['user id','user sis id','name','section id','section sis id',
+                'section name','course id','course sis id','course name']
+        Shackles.activate(:slave) do
+          data.find_each do |u|
+            row = []
+            row << u['user_id']
+            row << u['sis_user_id']
+            row << u['sortable_name']
+            row << u['section_id']
+            row << u['section_sis_id']
+            row << u['section_name']
+            row << u['course_id']
+            row << u['course_sis_id']
+            row << u['course_name']
+            csv << row
+          end
+        end
+
+      end
+      send_report(file)
+    end
+
+    def last_user_access
+      file = Canvas::AccountReports.generate_file(@account_report)
+      CSV.open(file, "w") do |csv|
+
+        students = root_account.pseudonyms.active.
+          select('pseudonyms.last_request_at, pseudonyms.user_id,
+                  pseudonyms.sis_user_id, users.sortable_name,
+                  pseudonyms.current_login_ip').
+          joins('INNER JOIN users ON users.id = pseudonyms.user_id')
+
+        students = add_user_sub_account_scope(students)
+
+        if term
+          students = students.
+            joins('INNER JOIN enrollments e ON e.user_id = pseudonyms.user_id
+                   INNER JOIN courses c on c.id = e.course_id')
+          students = add_term_scope(students, 'c')
+        end
+
+        if course
+          students = students.
+            joins('INNER JOIN enrollments e ON e.user_id = pseudonyms.user_id
+                   INNER JOIN courses c on c.id = e.course_id').
+            where('c.id = ?', course)
+          @account_report.parameters['extra_text'] << " For Course: #{course.id};"
+        end
+
+        csv << ['user id','user sis id','user name','last access at','last ip']
+        Shackles.activate(:slave) do
+          students.find_each do |u|
+            row = []
+            row << u.user_id
+            row << u.sis_user_id
+            row << u.sortable_name
+            row << default_timezone_format(u.last_request_at)
+            row << u.current_login_ip
+            csv << row
+          end
+        end
+      end
+      send_report(file)
+    end
+
+  end
+end

@@ -153,7 +153,9 @@ define [
       calendarMonths.changeMonth $mini_month, $.datepicker.formatDate 'mm/dd/yy', new Date
       highlightDaysWithEvents()
 
-      $('html, body').scrollTo $lastBefore or $('tr.date:first')
+      $lastBefore ||= $('tr.date:first')
+      $('html, body').scrollTo $lastBefore
+      $lastBefore.find('a').focus() if ev.screenX == 0
       highlightDate todayString
 
   # Binds to edit syllabus dom events

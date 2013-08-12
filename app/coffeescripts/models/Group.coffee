@@ -18,8 +18,32 @@
 
 define [
   'Backbone'
-], ({Model}) ->
+  'compiled/collections/GroupUserCollection'
+], (Backbone, GroupUserCollection) ->
 
-  class Group extends Model
+  class Group extends Backbone.Model
     modelType: 'group'
     resourceName: 'groups'
+
+    users: ->
+      @_users = new GroupUserCollection(null, groupId: @id)
+      @_users.group = this
+      @_users.url = "/api/v1/groups/#{@id}/users?per_page=50"
+      @users = -> @_users
+      @_users
+
+    usersCount: ->
+      if @_users?.loadedAll
+        @_users.length
+      else
+        @get('members_count')
+
+    sync: (method, model, options = {}) ->
+      options.url = @urlFor(method)
+      Backbone.sync method, model, options
+
+    urlFor: (method) ->
+      if method is 'create'
+        "/api/v1/group_categories/#{@get('group_category_id')}/groups"
+      else
+        "/api/v1/groups/#{@id}"

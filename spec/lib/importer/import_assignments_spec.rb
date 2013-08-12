@@ -44,5 +44,21 @@ describe "Importing assignments" do
       end
     end
   end
+
+  it "should import grading information when rubric is included" do
+    file_data = get_import_data('', 'assignment')
+    context = get_import_context('')
+
+    assignment_hash = file_data.find{|h| h['migration_id'] == '4469882339231'}.with_indifferent_access
+
+    rubric = rubric_model(:context => context)
+    rubric.migration_id = assignment_hash[:grading][:rubric_id]
+    rubric.points_possible = 42
+    rubric.save!
+
+    Assignment.import_from_migration(assignment_hash, context)
+    a = Assignment.find_by_migration_id(assignment_hash[:migration_id])
+    a.points_possible.should == rubric.points_possible
+  end
   
 end

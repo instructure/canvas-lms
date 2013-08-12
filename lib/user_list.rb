@@ -148,11 +148,13 @@ class UserList
     # Search for matching pseudonyms
     Shard.partition_by_shard(all_account_ids) do |account_ids|
       Pseudonym.active.
-          select('unique_id AS address, users.name AS name, user_id, account_id').
+          select('unique_id AS address, users.name AS name, user_id, account_id, sis_user_id').
           joins(:user).
-          where("pseudonyms.workflow_state='active' AND LOWER(unique_id) IN (?) AND account_id IN (?)", @addresses.map {|x| x[:address].downcase}, account_ids).
+          where("pseudonyms.workflow_state='active' AND (LOWER(unique_id) IN (?) OR sis_user_id IN (?)) AND account_id IN (?)", @addresses.map {|x| x[:address].downcase}, @addresses.map {|x| x[:address]}, account_ids).
           map { |pseudonym| pseudonym.attributes.symbolize_keys }.each do |login|
-        addresses = @addresses.select { |a| a[:address].downcase == login[:address].downcase }
+        addresses = @addresses.select { |a| a[:address].downcase == login[:address].downcase ||
+            a[:address] ==  login[:sis_user_id]}
+        login.delete(:sis_user_id)
         addresses.each do |address|
           # already found a matching pseudonym
           if address[:user_id]

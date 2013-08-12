@@ -16,9 +16,15 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'onelogin/saml'
-
 class AccountAuthorizationConfig < ActiveRecord::Base
+  cattr_accessor :saml_enabled
+  begin
+    require 'onelogin/saml'
+    self.saml_enabled = true
+  rescue LoadError
+    self.saml_enabled = false
+  end
+
   belongs_to :account
   acts_as_list :scope => :account
 

@@ -119,19 +119,31 @@
     color: #696969;
   }
 
+  .title-help {
+    color: #686868;
+    font-size: 11px;
+    font-style: italic;
+    font-weight: 300;
+  }
+
   .collectionViewItems {
     margin: 0;
   }
 
   .element_toggler {
+    color: #3d454c;
     cursor: pointer;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: none;
+    }
   }
 
   .loader {
     height: 40px;
   }
 }
-
 
 .discussion {
   position: relative;
@@ -166,7 +178,6 @@
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     display: table;
-    padding-left: 36px;
     vertical-align: middle;
     width: 100%;
   }
@@ -180,6 +191,11 @@
     }
   }
 
+  .discussion-type {
+    text-align: center;
+    width: 36px;
+  }
+
   .discussion-due-date {
     width: 150px;
   }
@@ -188,8 +204,20 @@
     color: #bbb;
     width: 40px;
 
-    .icon-discussion-check, .icon-published {
-      color: #5bb75b;
+    .subscription-toggler:focus {
+      outline: none;
+    }
+
+    a[class*=icon-] {
+       text-decoration: none;
+    }
+
+    .icon-discussion-check {
+      color: #35842c;
+    }
+
+    .icon-discussion-x {
+      color: $btnDangerBackground;
     }
   }
 

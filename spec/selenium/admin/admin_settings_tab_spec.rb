@@ -84,7 +84,7 @@ describe "admin settings tab" do
     it "should change the default time zone to Lima" do
       f("#account_default_time_zone option[value='Lima']").click
       click_submit
-      Account.default.default_time_zone.should == "Lima"
+      Account.default.default_time_zone.name.should == "Lima"
       f("#account_default_time_zone option[value='Lima']").attribute("selected").should be_true
     end
 

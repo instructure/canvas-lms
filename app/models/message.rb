@@ -312,6 +312,8 @@ class Message < ActiveRecord::Base
   #
   # Returns an HTML template (or nil).
   def apply_html_template(_binding)
+    orig_i18n_scope = @i18n_scope
+    @i18n_scope = "#{@i18n_scope}.html"
     return nil unless template = load_html_template
 
     # Add the attribute 'inner_html' with the value of inner_html into the _binding
@@ -321,6 +323,8 @@ class Message < ActiveRecord::Base
 
     layout_path = Canvas::MessageHelper.find_message_path('_layout.email.html.erb')
     RailsXss::Erubis.new(File.read(layout_path)).result(_binding)
+  ensure
+    @i18n_scope = orig_i18n_scope
   end
 
   def load_html_template

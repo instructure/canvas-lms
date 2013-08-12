@@ -1,0 +1,30 @@
+{{#if collection.length}}
+
+<table class="roster table table-hover table-striped table-condensed table-vertically-center">
+  <thead>
+    <tr>
+      <th></th>
+      <th>{{#t "name"}}Name{{/t}}</th>
+      <th>{{#t "login_name_or_sis_id"}}Login / SIS ID{{/t}}</th>
+    </tr>
+  </thead>
+  <tbody class="collectionViewItems"></tbody>
+</table>
+<div class="paginatedLoadingIndicator"></div>
+
+{{else}}
+
+  {{#if collection.atLeastOnePageFetched}}
+  <div class="alert alert-info">
+    <p class="lead">{{#t "no_people_found"}}No people found{{/t}}</p>
+    <p>{{#t "you_can_search_by"}}You can search by:{{/t}}</p>
+    <ul>
+      <li>{{#t "name"}}Name{{/t}}</li>
+      <li>{{#t "login_name_or_sis_id"}}Login / SIS ID{{/t}}</li>
+    </ul>
+  </div>
+  {{else}}
+  <div class="paginatedLoadingIndicator"></div>
+  {{/if}}
+
+{{/if}}

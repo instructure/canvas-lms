@@ -22,7 +22,7 @@ describe "Modules API", :type => :integration do
     course.offer!
 
     @module1 = @course.context_modules.create!(:name => "module1")
-    @assignment = @course.assignments.create!(:name => "pls submit", :submission_types => ["online_text_entry"])
+    @assignment = @course.assignments.create!(:name => "pls submit", :submission_types => ["online_text_entry"], :points_possible => 42)
     @assignment_tag = @module1.add_item(:id => @assignment.id, :type => 'assignment')
     @quiz = @course.quizzes.create!(:title => "score 10")
     @quiz_tag = @module1.add_item(:id => @quiz.id, :type => 'quiz')
@@ -60,88 +60,189 @@ describe "Modules API", :type => :integration do
       course_with_teacher(:course => @course, :active_all => true)
     end
 
-    it "should list published and unpublished modules" do
-      json = api_call(:get, "/api/v1/courses/#{@course.id}/modules",
-                      :controller => "context_modules_api", :action => "index", :format => "json",
-                      :course_id => "#{@course.id}")
-      json.should == [
-          {
-             "name" => @module1.name,
-             "unlock_at" => nil,
-             "position" => 1,
-             "require_sequential_progress" => false,
-             "prerequisite_module_ids" => [],
-             "id" => @module1.id,
-             "published" => true
-          },
-          {
-             "name" => @module2.name,
-             "unlock_at" => @christmas.as_json,
-             "position" => 2,
-             "require_sequential_progress" => true,
-             "prerequisite_module_ids" => [@module1.id],
-             "id" => @module2.id,
-             "published" => true
-          },
-          {
-             "name" => @module3.name,
-             "unlock_at" => nil,
-             "position" => 3,
-             "require_sequential_progress" => false,
-             "prerequisite_module_ids" => [],
-             "id" => @module3.id,
-             "published" => false
-          }
-      ]
+    describe "index" do
+      it "should list published and unpublished modules" do
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/modules",
+                        :controller => "context_modules_api", :action => "index", :format => "json",
+                        :course_id => "#{@course.id}")
+        json.should == [
+            {
+               "name" => @module1.name,
+               "unlock_at" => nil,
+               "position" => 1,
+               "require_sequential_progress" => false,
+               "prerequisite_module_ids" => [],
+               "id" => @module1.id,
+               "published" => true,
+               "items_count" => 5,
+               "items_url" => "http://www.example.com/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items"
+            },
+            {
+               "name" => @module2.name,
+               "unlock_at" => @christmas.as_json,
+               "position" => 2,
+               "require_sequential_progress" => true,
+               "prerequisite_module_ids" => [@module1.id],
+               "id" => @module2.id,
+               "published" => true,
+               "items_count" => 2,
+               "items_url" => "http://www.example.com/api/v1/courses/#{@course.id}/modules/#{@module2.id}/items"
+            },
+            {
+               "name" => @module3.name,
+               "unlock_at" => nil,
+               "position" => 3,
+               "require_sequential_progress" => false,
+               "prerequisite_module_ids" => [],
+               "id" => @module3.id,
+               "published" => false,
+               "items_count" => 0,
+               "items_url" => "http://www.example.com/api/v1/courses/#{@course.id}/modules/#{@module3.id}/items"
+            }
+        ]
+      end
+
+      it "should include items if requested" do
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/modules?include[]=items",
+                        :controller => "context_modules_api", :action => "index", :format => "json",
+                        :course_id => "#{@course.id}", :include => %w(items))
+        json.map { |mod| mod['items'].size }.should == [5, 2, 0]
+      end
+
+      it "should include item content details if requested" do
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/modules?include[]=items&include[]=content_details",
+                        :controller => "context_modules_api", :action => "index", :format => "json",
+                        :course_id => "#{@course.id}", :include => %w(items content_details))
+        json.find{|h| h['id'] == @module1.id}['items'].find{|h| h['id'] == @assignment_tag.id
+          }['content_details'].should == {'points_possible' => @assignment.points_possible}
+      end
+
+      it "should skip items for modules that have too many" do
+        Setting.set('api_max_per_page', '3')
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/modules?include[]=items",
+                        :controller => "context_modules_api", :action => "index", :format => "json",
+                        :course_id => "#{@course.id}", :include => %w(items))
+        json.map { |mod| mod['items'].try(:size) }.should == [nil, 2, 0]
+      end
+
+      it "should paginate the module list" do
+        # 3 modules already exist
+        2.times { |i| @course.context_modules.create!(:name => "spurious module #{i}") }
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/modules?per_page=3",
+                        :controller => "context_modules_api", :action => "index", :format => "json",
+                        :course_id => "#{@course.id}", :per_page => "3")
+        response.headers["Link"].should be_present
+        json.size.should == 3
+        ids = json.collect{ |mod| mod['id'] }
+
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/modules?per_page=3&page=2",
+                        :controller => "context_modules_api", :action => "index", :format => "json",
+                        :course_id => "#{@course.id}", :page => "2", :per_page => "3")
+        json.size.should == 2
+        ids += json.collect{ |mod| mod['id'] }
+
+        ids.should == @course.context_modules.not_deleted.sort_by(&:position).collect(&:id)
+      end
+
+      it "should search for modules by name" do
+        mods = []
+        2.times { |i| mods << @course.context_modules.create!(:name => "spurious module #{i}") }
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/modules?search_term=spur",
+                        :controller => "context_modules_api", :action => "index", :format => "json",
+                        :course_id => "#{@course.id}", :search_term => "spur")
+        json.size.should == 2
+        json.map{ |mod| mod['id'] }.sort.should == mods.map(&:id).sort
+      end
+
+      it "should search for modules and items by name" do
+        matching_mods = []
+        nonmatching_mods = []
+        # modules to include because their name matches
+        # which means that all their (non-matching) items should be returned
+        2.times do |i|
+          mod = @course.context_modules.create!(:name => "spurious module #{i}")
+          mod.add_item(:type => 'context_module_sub_header', :title => 'non-matching item')
+          matching_mods << mod
+        end
+        # modules to include because they have a matching item
+        # which means that their non-matching items should *not* be included
+        2.times do |i|
+          mod = @course.context_modules.create!(:name => "non-matching module #{i}")
+          mod.add_item(:type => 'context_module_sub_header', :title => 'spurious item')
+          mod.add_item(:type => 'context_module_sub_header', :title => 'non-matching item to ignore')
+          nonmatching_mods << mod
+        end
+
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/modules?include[]=items&search_term=spur",
+                        :controller => "context_modules_api", :action => "index", :format => "json",
+                        :course_id => "#{@course.id}", :include => %w{items}, :search_term => "spur")
+        json.size.should == 4
+        json.map{ |mod| mod['id'] }.sort.should == (matching_mods + nonmatching_mods).map(&:id).sort
+
+        json.each do |mod|
+          mod['items'].count.should == 1
+          mod['items'].first['title'].should_not include('ignore')
+        end
+      end
     end
 
-    it "should show a single module" do
-      json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module2.id}",
-                      :controller => "context_modules_api", :action => "show", :format => "json",
-                      :course_id => "#{@course.id}", :id => "#{@module2.id}")
-      json.should == {
-        "name" => @module2.name,
-        "unlock_at" => @christmas.as_json,
-        "position" => 2,
-        "require_sequential_progress" => true,
-        "prerequisite_module_ids" => [@module1.id],
-        "id" => @module2.id,
-        "published" => true
-      }
-    end
+    describe "show" do
+      it "should show a single module" do
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module2.id}",
+                        :controller => "context_modules_api", :action => "show", :format => "json",
+                        :course_id => "#{@course.id}", :id => "#{@module2.id}")
+        json.should == {
+          "name" => @module2.name,
+          "unlock_at" => @christmas.as_json,
+          "position" => 2,
+          "require_sequential_progress" => true,
+          "prerequisite_module_ids" => [@module1.id],
+          "id" => @module2.id,
+          "published" => true,
+          "items_count" => 2,
+          "items_url" => "http://www.example.com/api/v1/courses/#{@course.id}/modules/#{@module2.id}/items"
+        }
+      end
 
-    it "should show a single unpublished module" do
-      json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module3.id}",
-                      :controller => "context_modules_api", :action => "show", :format => "json",
-                      :course_id => "#{@course.id}", :id => @module3.id.to_param)
-      json.should == {
-        "name" => @module3.name,
-        "unlock_at" => nil,
-        "position" => 3,
-        "require_sequential_progress" => false,
-        "prerequisite_module_ids" => [],
-        "id" => @module3.id,
-        "published" => false
-      }
-    end
+      it "should include item content details if requested" do
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}?include[]=items&include[]=content_details",
+                        :controller => "context_modules_api", :action => "show", :format => "json",
+                        :course_id => "#{@course.id}", :include => %w(items content_details), :id => "#{@module1.id}")
+        json['items'].find{|h| h['id'] == @assignment_tag.id}['content_details'].should ==
+          {'points_possible' => @assignment.points_possible}
+      end
 
-    it "should paginate the module list" do
-      # 3 modules already exist
-      2.times { |i| @course.context_modules.create!(:name => "spurious module #{i}") }
-      json = api_call(:get, "/api/v1/courses/#{@course.id}/modules?per_page=3",
-                      :controller => "context_modules_api", :action => "index", :format => "json",
-                      :course_id => "#{@course.id}", :per_page => "3")
-      response.headers["Link"].should be_present
-      json.size.should == 3
-      ids = json.collect{ |mod| mod['id'] }
+      it "should show a single unpublished module" do
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module3.id}",
+                        :controller => "context_modules_api", :action => "show", :format => "json",
+                        :course_id => "#{@course.id}", :id => @module3.id.to_param)
+        json.should == {
+          "name" => @module3.name,
+          "unlock_at" => nil,
+          "position" => 3,
+          "require_sequential_progress" => false,
+          "prerequisite_module_ids" => [],
+          "id" => @module3.id,
+          "published" => false,
+          "items_count" => 0,
+          "items_url" => "http://www.example.com/api/v1/courses/#{@course.id}/modules/#{@module3.id}/items"
+        }
+      end
 
-      json = api_call(:get, "/api/v1/courses/#{@course.id}/modules?per_page=3&page=2",
-                      :controller => "context_modules_api", :action => "index", :format => "json",
-                      :course_id => "#{@course.id}", :page => "2", :per_page => "3")
-      json.size.should == 2
-      ids += json.collect{ |mod| mod['id'] }
+      it "should include items if requested" do
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}?include[]=items",
+                        :controller => "context_modules_api", :action => "show", :format => "json",
+                        :course_id => "#{@course.id}", :id => @module1.id.to_param, :include => %w(items))
+        json['items'].map{|item|item['type']}.should == %w(Assignment Quiz Discussion SubHeader ExternalUrl)
+      end
 
-      ids.should == @course.context_modules.not_deleted.sort_by(&:position).collect(&:id)
+      it "should not include items if there are too many" do
+        Setting.set('api_max_per_page', '3')
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}?include[]=items",
+                        :controller => "context_modules_api", :action => "show", :format => "json",
+                        :course_id => "#{@course.id}", :id => @module1.id.to_param, :include => %w(items))
+        json['items'].should be_nil
+      end
     end
 
     describe "batch update" do
@@ -197,7 +298,10 @@ describe "Modules API", :type => :integration do
       end
 
       it "should 404 if no modules exist with the given ids" do
-        @modules_to_update.each { |m| m.destroy! }
+        @modules_to_update.each do |m|
+          m.content_tags.scoped.delete_all
+          m.destroy!
+        end
         api_call(:put, @path, @path_opts, { :event => 'publish', :module_ids => @ids_to_update },
                  {}, { :expected_status => 404 })
       end

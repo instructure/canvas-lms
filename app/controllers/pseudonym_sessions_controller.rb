@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011-2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -17,10 +17,11 @@
 #
 
 class PseudonymSessionsController < ApplicationController
-  protect_from_forgery :except => [:create, :destroy, :saml_consume, :oauth2_token, :oauth2_logout]
+  protect_from_forgery :except => [:create, :destroy, :saml_consume, :oauth2_token, :oauth2_logout, :cas_logout]
   before_filter :forbid_on_files_domain, :except => [ :clear_file_session ]
   before_filter :require_password_session, :only => [ :otp_login, :disable_otp_login ]
   before_filter :require_user, :only => [ :otp_login ]
+  skip_before_filter :require_reacceptance_of_terms
 
   def new
     if @current_user && !params[:re_login] && !params[:confirm] && !params[:expected_user_id] && !session[:used_remember_me_token]
@@ -66,7 +67,8 @@ class PseudonymSessionsController < ApplicationController
           if @pseudonym
             # Successful login and we have a user
             @domain_root_account.pseudonym_sessions.create!(@pseudonym, false)
-            session[:cas_login] = true
+            session[:cas_session] = params[:ticket]
+            @pseudonym.claim_cas_ticket(params[:ticket])
             @user = @pseudonym.login_assertions_for_user
 
             successful_login(@user, @pseudonym)
@@ -216,7 +218,7 @@ class PseudonymSessionsController < ApplicationController
         logout_current_user
         flash[:message] = t('errors.logout_errors.no_idp_found', "Canvas was unable to log you out at your identity provider")
       end
-    elsif @domain_root_account.cas_authentication? and session[:cas_login]
+    elsif @domain_root_account.cas_authentication? and session[:cas_session]
       logout_current_user
       session[:delegated_message] = message if message
       redirect_to(cas_client.logout_url(cas_login_url))
@@ -236,6 +238,19 @@ class PseudonymSessionsController < ApplicationController
       end
       format.json { render :json => "OK".to_json, :status => :ok }
     end
+  end
+
+  def cas_logout
+    if !Canvas.redis_enabled?
+      # NOT SUPPORTED without redis
+      return render :text => "NOT SUPPORTED", :status => :method_not_allowed
+    elsif params['logoutRequest'] &&
+        params['logoutRequest'] =~ %r{^<samlp:LogoutRequest.*?<samlp:SessionIndex>(.*)</samlp:SessionIndex>}m
+      # we *could* validate the timestamp here, but the whole request is easily spoofed anyway, so there's no
+      # point. all the security is in the ticket being secret and non-predictable
+      return render :text => "OK", :status => :ok if Pseudonym.release_cas_ticket($1)
+    end
+    render :text => "NO SESSION FOUND", :status => :not_found
   end
 
   def clear_file_session
@@ -456,12 +471,22 @@ class PseudonymSessionsController < ApplicationController
 
     return render :action => 'otp_login' unless params[:otp_login].try(:[], :verification_code)
 
+    verification_code = params[:otp_login][:verification_code]
+    if Canvas.redis_enabled?
+      key = "otp_used:#{verification_code}"
+      if Canvas.redis.get(key)
+        force_fail = true
+      else
+        Canvas.redis.setex(key, 10.minutes, '1')
+      end
+    end
+
     drift = 30
     # give them 5 minutes to enter an OTP sent via SMS
     drift = 300 if session[:pending_otp_communication_channel_id] ||
         (!session[:pending_otp_secret_key] && @current_user.otp_communication_channel_id)
 
-    if ROTP::TOTP.new(secret_key).verify_with_drift(params[:otp_login][:verification_code], drift)
+    if !force_fail && ROTP::TOTP.new(secret_key).verify_with_drift(verification_code, drift)
       if session[:pending_otp_secret_key]
         @current_user.otp_secret_key = session.delete(:pending_otp_secret_key)
         @current_user.otp_communication_channel_id = session.delete(:pending_otp_communication_channel_id)
@@ -511,6 +536,7 @@ class PseudonymSessionsController < ApplicationController
   def successful_login(user, pseudonym, otp_passed = false)
     @current_user = user
     @current_pseudonym = pseudonym
+    Auditors::Authentication.record(@current_pseudonym, 'login')
 
     otp_passed ||= cookies['canvas_otp_remember_me'] &&
         @current_user.validate_otp_secret_key_remember_me_cookie(cookies['canvas_otp_remember_me'])
@@ -522,6 +548,8 @@ class PseudonymSessionsController < ApplicationController
         return otp_login(true)
       end
     end
+
+    session[:require_terms] = true if @domain_root_account.require_acceptance_of_terms?(@current_user)
 
     respond_to do |format|
       if session[:oauth2]
@@ -561,6 +589,11 @@ class PseudonymSessionsController < ApplicationController
         render :json => @pseudonym_session.errors.to_json, :status => :bad_request
       end
     end
+  end
+
+  def logout_current_user
+    Auditors::Authentication.record(@current_pseudonym, 'logout')
+    super
   end
 
   def oauth2_auth

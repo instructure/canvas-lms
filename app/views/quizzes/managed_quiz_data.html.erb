@@ -2,7 +2,7 @@
   <table class="table">
     <thead>
       <th>
-        <%= submitted_students_title(@quiz, @submitted_students) %>
+        <%= submitted_students_title(@quiz, @submitted_students, @submissions_from_logged_out) %>
       </th>
       <th>
         <%= unsubmitted_students_title(@quiz, @unsubmitted_students) %>
@@ -10,14 +10,17 @@
     </thead>
     <tbody>
       <%
-        [@submitted_students.size, @unsubmitted_students.size, 1].max.times do |index|
+        [(@submitted_students.size + @submissions_from_logged_out.size), @unsubmitted_students.size, 1].max.times do |index|
           student = @submitted_students[index]
           unsubmitted_student = @unsubmitted_students[index]
-          submission = student.present? ? @submissions[student.id] : nil
+          submission = student.present? ? @submissions_from_users[student.id] : nil
+          #logged out users are displayed after all students
+          anon_index = index - @submitted_students.size
+          logged_out = @submissions_from_logged_out[anon_index] if anon_index >= 0
       %>
       <tr>
         <td>
-          <% if @submitted_students.empty? && index == 0 %>
+          <% if @submitted_students.empty? && @submissions_from_logged_out.empty? && index == 0 %>
             <%= no_submitted_students_msg(@quiz) %>
           <% elsif student.present? && submission.present? %>
             <% if submission.pending_review? %>
@@ -26,11 +29,15 @@
             <% end %>
           <a href="<%= polymorphic_path([@context, @quiz, :history], :quiz_submission_id => submission.id) %>" class="name">
             <% if @quiz.anonymous_survey? %>
-              <%= t(:anonymous_student, "Student %{n}", :n => index + 1) %>
+              <%= t(:anonymous_student, "Student %{user_counter}", :user_counter => index + 1) %>
             <% else %>
               <%= student.name %>
             <% end %>
           </a>
+          <% elsif logged_out.present? %>
+            <a href="<%= polymorphic_path([@context, @quiz, :history], :quiz_submission_id => logged_out.id) %>&u_index=<%= anon_index + 1 %>" class="name">
+              <%= t(:logged_out_user, "Logged Out User %{user_counter}", :user_counter => anon_index + 1) %>
+            </a>
           <% end %>
         </td>
         <td>

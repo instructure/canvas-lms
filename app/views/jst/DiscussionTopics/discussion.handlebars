@@ -1,5 +1,12 @@
 <div class="discussion-content">
   <div class="discussion-row">
+    <div class="discussion-type">
+      {{#if assignment}}
+        <i class="icon-assignment" aria-hidden="true"></i>
+        <span class="screenreader-only">{{#t "graded_discussion"}}Graded discussion{{/t}}</span>
+      {{/if}}
+    </div>
+
     <div class="discussion-title">
       <a href="{{html_url}}" class="title">{{title}}</a>
       <small>Last post {{tDateToString last_reply_at "medium"}}</small>
@@ -7,20 +14,24 @@
 
     <div class="discussion-due-date">
       {{#if assignment}}
-        {{#t "due"}}Due{{/t}} {{tDateToString assignment.due_at "medium"}}
+        {{#if assignment.due_at}}
+          {{#t "due"}}Due{{/t}} {{tDateToString assignment.due_at "medium"}}
+        {{else}}
+          {{#t "no_due_date"}}No Due Date{{/t}}
+        {{/if}}
       {{/if}}
     </div>
 
     <div class="discussion-status">
-      {{#if subscribed}}
-        <i class="icon-discussion-check"
-           data-tooltip
-           title="{{#t "user_subscribed"}}You are subscribed to this topic{{/t}}"></i>
-      {{else}}
-        <i class="icon-discussion"
-           data-tooltip
-           title="{{#t "user_unsubscribed"}}You are not subscribed to this topic{{/t}}"></i>
-      {{/if}}
+      <a href="#" data-view="toggleableSubscriptionIcon" class="subscription-toggler">
+        <span class="screenreader-only">
+          {{#if subscribed}}
+            {{#t "user_subscribed"}}You are subscribed to this topic. Click to unsubscribe.{{/t}}
+          {{else}}
+            {{#t "user_unsubscribed"}}You are not subscribed to this topic. Click to subscribe.{{/t}}
+          {{/if}}
+        </span>
+      </a>
 
       <!-- <i class="icon-unpublished"></i> -->
     </div>
@@ -29,12 +40,14 @@
       <div class="new-and-total-badge pull-right">
         <span class="new-items"
               title="{{unread_count_tooltip}}"
+              aria-label="{{unread_count_tooltip}}"
               data-tooltip>
           {{unread_count}}
         </span>
 
         <div class="total-items"
              title="{{reply_count_tooltip}}"
+             aria-label="{{reply_count_tooltip}}"
              data-tooltip>
           {{discussion_subentry_count}}
         </div>
@@ -49,17 +62,15 @@
         </a>
 
         <ul class="al-options">
-          {{#if lockable}}
-            <li>
-              <a href="#" class="icon-lock">
-                {{#if locked}}
-                  {{#t "unlock"}}Unlock{{/t}}
-                {{else}}
-                  {{#t "lock"}}Lock{{/t}}
-                {{/if}}
-              </a>
-            </li>
-          {{/if}}
+          <li>
+            <a href="#" class="icon-lock">
+              {{#if locked}}
+                {{#t "open_to_comments"}}Open to comments{{/t}}
+              {{else}}
+                {{#t "close_for_comments"}}Close for comments{{/t}}
+              {{/if}}
+            </a>
+          </li>
           <li>
             <a href="#" class="icon-trash">{{#t "delete"}}Delete{{/t}}</a>
           </li>

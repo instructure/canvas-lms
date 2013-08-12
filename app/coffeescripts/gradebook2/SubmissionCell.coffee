@@ -4,8 +4,9 @@ define [
   'jquery'
   'underscore'
   'compiled/gradebook2/Turnitin'
+  'compiled/util/round'
   'jquery.ajaxJSON'
-], (GRADEBOOK_TRANSLATIONS, htmlEscape,$, _, {extractData}) ->
+], (GRADEBOOK_TRANSLATIONS, htmlEscape,$, _, {extractData},round) ->
 
   class SubmissionCell
 
@@ -57,7 +58,12 @@ define [
       { valid: true, msg: null }
 
     @formatter: (row, col, submission, assignment) ->
-      this.prototype.cellWrapper(submission.grade, {submission: submission, assignment: assignment, editable: false})
+      grade = parseFloat submission.grade
+      grade = if isNaN(grade)
+        submission.grade
+      else
+        round(grade,round.DEFAULT)
+      this.prototype.cellWrapper(grade, {submission: submission, assignment: assignment, editable: false})
 
     cellWrapper: (innerContents, options = {}) ->
       opts = $.extend({}, {

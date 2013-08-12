@@ -980,7 +980,7 @@ describe Enrollment do
 
       # set up a group category in that course with restricted self sign-up and
       # put both users in one of its groups
-      category = @course.group_categories.build
+      category = group_category
       category.configure_self_signup(true, true)
       category.save
       group = category.groups.create(:context => @course)
@@ -1015,7 +1015,7 @@ describe Enrollment do
 
       # set up a group category in that course *without* restrictions on self
       # sign-up and put both users in one of its groups
-      category = @course.group_categories.build
+      category = group_category
       category.configure_self_signup(true, false)
       category.save
       group = category.groups.create(:context => @course)
@@ -1044,7 +1044,7 @@ describe Enrollment do
 
       # set up a group category in that course with restricted self sign-up and
       # put the user in one of its groups
-      category = @course.group_categories.build
+      category = group_category
       category.configure_self_signup(true, false)
       category.save
       group = category.groups.create(:context => @course)
@@ -1068,7 +1068,7 @@ describe Enrollment do
 
       # set up a group category in that course with restricted self sign-up and
       # put the user in one of its groups
-      category = @course.group_categories.build
+      category = group_category
       category.configure_self_signup(true, false)
       category.save
       group = category.groups.create(:context => @course)

@@ -25,6 +25,7 @@ class Conversation < ActiveRecord::Base
   has_many :conversation_messages, :order => "created_at DESC, id DESC", :dependent => :delete_all
   has_many :conversation_message_participants, :through => :conversation_messages
   has_one :stream_item, :as => :asset
+  belongs_to :context, :polymorphic => true
 
   # see also MessageableUser
   def participants(reload = false)
@@ -59,14 +60,15 @@ class Conversation < ActiveRecord::Base
         :conversation_id => self.id,
         :workflow_state => 'read',
         :has_attachments => has_attachments?,
-        :has_media_objects => has_media_objects?
+        :has_media_objects => has_media_objects?,
+        :root_account_ids => self.root_account_ids
     }.merge(options)
     connection.bulk_insert('conversation_participants', user_ids.map{ |user_id|
       options.merge({:user_id => user_id})
     })
   end
 
-  def self.initiate(users, private)
+  def self.initiate(users, private, options = {})
     users = users.uniq_by(&:id)
     user_ids = users.map(&:id)
     private_hash = private ? private_hash_for(users) : nil
@@ -83,7 +85,10 @@ class Conversation < ActiveRecord::Base
         conversation.private_hash = private_hash
         conversation.has_attachments = false
         conversation.has_media_objects = false
+        conversation.context_type = options[:context_type]
+        conversation.context_id = options[:context_id]
         conversation.tags = []
+        conversation.subject = options[:subject]
         conversation.save!
 
         # TODO: transaction on these shards as well?
@@ -276,7 +281,12 @@ class Conversation < ActiveRecord::Base
       Shard.birth.activate do
         self.root_account_ids |= [message.root_account_id] if message.root_account_id
       end
-      options[:root_account_ids] = read_attribute(:root_account_ids) if self.root_account_ids_changed?
+
+      # we should not need to update participants' root_account_ids unless the conversations
+      # ids have changed, but the participants' root_account_ids were not being set for
+      # a long time so we set them all the time for fixing up purposes
+      # add this check back in when the data is fixed or we decide to run a fixup.
+      options[:root_account_ids] = read_attribute(:root_account_ids)# if self.root_account_ids_changed?
       save! if new_tags.present? || root_account_ids_changed?
 
       # so we can take advantage of other preloaded associations
@@ -284,6 +294,7 @@ class Conversation < ActiveRecord::Base
       message.save!
 
       add_message_to_participants(message, options.merge(:tags => new_tags, :new_message => true))
+
       if options[:update_participants]
         update_participants(message, options)
       end
@@ -333,6 +344,8 @@ class Conversation < ActiveRecord::Base
     end
 
     self.conversation_participants.with_each_shard do |cps|
+      cps.update_all(:root_account_ids => options[:root_account_ids]) if options[:root_account_ids].present?
+
       cps = cps.visible if options[:only_existing]
 
       unless options[:new_message]
@@ -421,10 +434,6 @@ class Conversation < ActiveRecord::Base
       else
         User.where("id IN (SELECT user_id FROM conversation_participants cp WHERE #{cp_conditions})").
             update_all('unread_conversations_count = unread_conversations_count + 1')
-      end
-
-      if options[:root_account_ids].present?
-        conversation_participants.update_all(:root_account_ids => options[:root_account_ids])
       end
 
       conversation_participants.where("(last_message_at IS NULL OR subscribed) AND user_id NOT IN (?)", skip_ids).
@@ -675,7 +684,7 @@ class Conversation < ActiveRecord::Base
   end
 
   def delete_for_all
-    stream_item.destroy_stream_item_instances
+    stream_item.try(:destroy_stream_item_instances)
     # bare scoped call avoid Rails 2 HasManyAssociation loading all objects
     shard.activate { conversation_message_participants.scoped.delete_all }
     conversation_participants.with_each_shard { |scope| scope.scoped.delete_all; nil }

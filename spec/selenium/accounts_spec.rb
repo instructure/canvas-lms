@@ -134,7 +134,7 @@ describe "account" do
     end
 
     it "should be able to create a new course when no other courses exist" do
-      Account.default.courses.each { |c| c.destroy! }
+      Account.default.courses.each { |c| c.enrollments.scoped.delete_all; c.destroy! }
 
       get "/accounts/#{Account.default.to_param}"
       f('.add_course_link').click

@@ -26,6 +26,8 @@ class WikiPage < ActiveRecord::Base
   include CopyAuthorizedLinks
   include ContextModuleItem
 
+  include SearchTermHelper
+
   belongs_to :wiki, :touch => true
   belongs_to :cloned_item
   belongs_to :user
@@ -40,7 +42,7 @@ class WikiPage < ActiveRecord::Base
   TITLE_LENGTH = WikiPage.columns_hash['title'].limit rescue 255
 
   def validate_front_page_visibility
-    if self.hide_from_students && self.front_page?
+    if self.hide_from_students && self.is_front_page?
       self.errors.add(:hide_from_students, t(:cannot_hide_page, "cannot hide front page"))
     end
   end
@@ -196,12 +198,13 @@ class WikiPage < ActiveRecord::Base
       locked = false
       if (m && !m.available_for?(user))
         locked = {:asset_string => self.asset_string, :context_module => m.attributes}
+        locked[:unlock_at] = locked[:context_module]["unlock_at"] if locked[:context_module]["unlock_at"]
       end
       locked
     end
   end
 
-  def front_page?
+  def is_front_page?
     !self.deleted? && self.wiki.has_front_page? && self.url == self.wiki.get_front_page_url
   end
 
@@ -224,35 +227,48 @@ class WikiPage < ActiveRecord::Base
   end
 
   set_policy do
-    given {|user, session| self.wiki.grants_right?(user, session, :read) && can_read_page?(user) }
+    given {|user, session| self.wiki.grants_right?(user, session, :read) && can_read_page?(user, session)}
     can :read
 
-    given {|user, session| self.wiki.grants_right?(user, session, :contribute) && can_read_page?(user) }
+    given {|user, session| self.editing_role?(user) && !self.locked_for?(user)}
     can :read
 
-    given {|user, session| self.editing_role?(user) && !self.locked_for?(user) }
-    can :read and can :update_content and can :create
+    given {|user, session| user && self.editing_role?(user) && !self.locked_for?(user)}
+    can :update_content
 
-    given {|user, session| self.wiki.grants_right?(user, session, :manage) }
-    can :create and can :read and can :update and can :delete and can :update_content
+    given {|user, session| user && self.editing_role?(user) && self.wiki.grants_right?(user, session, :create_page)}
+    can :create
 
-    given {|user, session| self.wiki.grants_right?(user, session, :manage_content) }
-    can :create and can :read and can :update and can :delete and can :update_content
+    given {|user, session| user && self.editing_role?(user) && self.wiki.grants_right?(user, session, :update_page)}
+    can :update
 
+    given {|user, session| user && self.editing_role?(user) && self.active? && self.wiki.grants_right?(user, session, :update_page_content)}
+    can :update_content
+
+    given {|user, session| user && self.editing_role?(user) && self.active? && self.wiki.grants_right?(user, session, :delete_page)}
+    can :delete
+
+    given {|user, session| user && self.editing_role?(user) && self.workflow_state == 'unpublished' && self.wiki.grants_right?(user, session, :delete_unpublished_page)}
+    can :delete
   end
 
-  def can_read_page?(user)
-    (!hide_from_students && self.active?) || (context.respond_to?(:admins) && context.admins.include?(user))
+  def can_read_page?(user, session=nil)
+    self.wiki.grants_right?(user, session, :manage) || (!hide_from_students && self.active?)
   end
 
-  def editing_role?(user)
+  def editing_role?(user, session=nil)
     context_roles = context.default_wiki_editing_roles rescue nil
-    edit_roles = editing_roles unless self.front_page?
-    roles = (edit_roles || context_roles || default_roles).split(",")
+    roles = (editing_roles || context_roles || default_roles).split(",")
+
+    # managers are always allowed to edit
+    return true if wiki.grants_right?(user, session, :manage)
+
     return true if roles.include?('teachers') && context.respond_to?(:teachers) && context.teachers.include?(user)
-    return true if !hide_from_students && roles.include?('students') && context.respond_to?(:students) && context.includes_student?(user)
-    return true if !hide_from_students && roles.include?('members') && context.respond_to?(:users) && context.users.include?(user)
-    return true if !hide_from_students && roles.include?('public')
+    # the remaining edit roles all require read access, so just check here
+    return false unless can_read_page?(user, session)
+    return true if roles.include?('students') && context.respond_to?(:students) && context.includes_student?(user)
+    return true if roles.include?('members') && context.respond_to?(:users) && context.users.include?(user)
+    return true if roles.include?('public')
     false
   end
 

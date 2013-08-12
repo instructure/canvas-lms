@@ -28,12 +28,17 @@ class AssignmentGroupsApiController < ApplicationController
   # Returns the assignment group with the given id.
   #
   # @argument include[] ["assignments","discussion_topic"] Associations to include with the group. "discussion_topic" is only valid if "assignments" is also included
+  # @argument override_assignment_dates [Optional, Boolean]
+  #   Apply assignment overrides for each assignment, defaults to true.
   #
   # @returns Assignment Group
   def show
     if authorized_action(@assignment_group, @current_user, :read)
       includes = Array(params[:include])
-      render :json => assignment_group_json(@assignment_group, @current_user, session, includes)
+      override_dates = value_to_boolean(params[:override_assignment_dates] || true)
+      render :json => assignment_group_json(@assignment_group, @current_user, session, includes, {
+        override_dates: override_dates
+      })
     end
   end
 

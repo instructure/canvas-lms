@@ -171,9 +171,13 @@ define([
       var $link = $(this);
       var url = $link.attr('href');
       var account = $("#account_settings").getFormData({object_name: 'account'});
-      url = $.replaceTags($.replaceTags(url, 'account_id', account.turnitin_account_id), 'shared_secret', account.turnitin_shared_secret);
+      var turnitin_data = {
+        turnitin_account_id: account.turnitin_account_id,
+        turnitin_shared_secret: account.turnitin_shared_secret,
+        turnitin_host: account.turnitin_host
+      }
       $link.text(I18n.t('notices.turnitin.checking_settings', "checking Turnitin settings..."));
-      $.ajaxJSON(url, 'GET', {}, function(data) {
+      $.getJSON(url, turnitin_data, function(data) {
         if(data && data.success) {
           $link.text(I18n.t('notices.turnitin.setings_confirmed', "Turnitin settings confirmed!"));
         } else {
@@ -216,7 +220,7 @@ define([
       },
       success: function(data) {
         $(this).loadingImage('remove');
-        var report = $(this).find('input[name="report_type"]').val();
+        var report = $(this).attr('id').replace('_form', '');
         $("#" + report).find('.run_report_link').hide()
           .end().find('.configure_report_link').hide()
           .end().find('.running_report_message').show();

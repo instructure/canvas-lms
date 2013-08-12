@@ -246,6 +246,7 @@ describe CommunicationChannel do
       Account.default.pseudonyms.create!(:user => user2, :unique_id => 'user2')
 
       cc1.merge_candidates.should == [user2]
+      cc1.has_merge_candidates?.should be_true
     end
 
     it "should not return users without an active pseudonym" do
@@ -257,6 +258,7 @@ describe CommunicationChannel do
       cc2.confirm!
 
       cc1.merge_candidates.should == []
+      cc1.has_merge_candidates?.should be_false
     end
 
     it "should not return users that match on an unconfirmed cc" do
@@ -268,6 +270,24 @@ describe CommunicationChannel do
       Account.default.pseudonyms.create!(:user => user2, :unique_id => 'user2')
 
       cc1.merge_candidates.should == []
+      cc1.has_merge_candidates?.should be_false
+    end
+
+    it "should only check one user for boolean result" do
+      user1 = User.create!
+      cc1 = user1.communication_channels.create!(:path => 'jt@instructure.com')
+
+      user2 = User.create!
+      cc2 = user2.communication_channels.create!(:path => 'jt@instructure.com')
+      cc2.confirm!
+      Account.default.pseudonyms.create!(:user => user2, :unique_id => 'user2')
+      user3 = User.create!
+      cc3 = user3.communication_channels.create!(:path => 'jt@instructure.com')
+      cc3.confirm!
+      Account.default.pseudonyms.create!(:user => user3, :unique_id => 'user3')
+
+      User.any_instance.expects(:all_active_pseudonyms).once.returns([true])
+      cc1.has_merge_candidates?.should be_true
     end
 
     context "sharding" do
@@ -289,6 +309,7 @@ describe CommunicationChannel do
         pending if CommunicationChannel.associated_shards('jt@instructure.com') == [Shard.default]
 
         cc1.merge_candidates.should == [@user2]
+        cc1.has_merge_candidates?.should be_true
       end
 
       it "should search a non-default shard *only*" do

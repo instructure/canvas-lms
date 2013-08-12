@@ -49,7 +49,7 @@ define [
       isIE = !!$.browser.msie
       if isIE
         @$fileUpload.remove()
-      @$fileUploadBox.html template _.extend({}, @model.toJSON(), {isIE})
+      @$fileUploadBox.html template _.extend({}, @model.present(), {isIE})
       this
 
     removeFileStatusMessage: =>
@@ -61,7 +61,7 @@ define [
       @$fileUploadBox.addClass 'file-upload-box-with-file'
       @render()
       @$fileUploadBox.parent().append uploadedOrRemovedTemplate(
-        _.extend({}, @model.toJSON(), {fileUploaded: true})
+        _.extend({}, @model.present(), {fileUploaded: true})
       )
 
     # For now we'll just remove it from the form, but not actually delete it
@@ -71,7 +71,7 @@ define [
       event.preventDefault()
       @$attachmentID.val("").trigger 'change'
       @$fileUploadBox.removeClass 'file-upload-box-with-file'
-      oldModel = @model.toJSON()
+      oldModel = @model.present()
       @model.clear()
       @removeFileStatusMessage()
       @render()

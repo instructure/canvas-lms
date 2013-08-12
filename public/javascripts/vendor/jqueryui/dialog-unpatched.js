@@ -324,18 +324,18 @@ $.widget("ui.dialog", {
 					return;
 				}
 
-				// ! 328 patched from https://github.com/larowlan/jquery-ui/blob/bb2c897f128e42dc8ad485719ee260d86e56befe/ui/jquery.ui.dialog.js
-				var tabbables = $( ":tabbable", this.uiDialog ),
-					first = tabbables.filter( ":first" ),
-					last  = tabbables.filter( ":last" );
-
-				if ( event.target === last[0] && !event.shiftKey ) {
-					first.focus( 1 );
-					return false;
-				} else if ( event.target === first[0] && event.shiftKey ) {
-					last.focus( 1 );
-					return false;
-				}
+				// INSTRUCTURE
+				// Constrain tabbing to within the modal.
+				// Safari was shift-tabbing from a control in the
+				// middle of the new conversations compose dialog
+				// to a background control, killing focus
+				var tabbables = $( ":tabbable", this.uiDialog );
+				var index = $.inArray( event.target, tabbables );
+				if ( index == -1 ) {return;}
+				var targetIndex = index + (event.shiftKey ? -1 : 1);
+				targetIndex = (targetIndex + tabbables.length) % tabbables.length;
+				tabbables.eq(targetIndex).focus();
+				return false;
 			}});
 		}
 

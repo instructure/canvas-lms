@@ -23,4 +23,4 @@ define [
 
   class GroupCollection extends PaginatedCollection
     model: Group
-    comparator: (group) -> group.get('name')
+    comparator: (group) -> group.get('name').toLowerCase()

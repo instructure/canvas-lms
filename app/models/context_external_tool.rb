@@ -1,5 +1,7 @@
 class ContextExternalTool < ActiveRecord::Base
   include Workflow
+  include SearchTermHelper
+
   has_many :content_tags, :as => :content
   belongs_to :context, :polymorphic => true
   belongs_to :cloned_item

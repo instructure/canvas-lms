@@ -315,6 +315,38 @@ describe ConversationsController do
       # course1 inferred from group1, course2 inferred from synthetic context,
       # group1 explicit, group2 not present (even though it's shared by everyone)
     end
+
+    it "should populate subject" do
+      course_with_student_logged_in(:active_all => true)
+
+      new_user = User.create
+      enrollment = @course.enroll_student(new_user)
+      enrollment.workflow_state = 'active'
+      enrollment.save
+      post 'create', :recipients => [new_user.id.to_s], :body => "yo", :subject => "greetings"
+      response.should be_success
+      assigns[:conversation].conversation.subject.should_not be_nil
+    end
+
+    it "should populate subject on batch conversations" do
+      course_with_student_logged_in(:active_all => true)
+
+      new_user1 = User.create
+      enrollment1 = @course.enroll_student(new_user1)
+      enrollment1.workflow_state = 'active'
+      enrollment1.save
+      new_user2 = User.create
+      enrollment2 = @course.enroll_student(new_user2)
+      enrollment2.workflow_state = 'active'
+      enrollment2.save
+      post 'create', :recipients => [new_user1.id.to_s, new_user2.id.to_s], :body => "later", :subject => "farewell"
+      response.should be_success
+      json = json_parse(response.body)
+      json.size.should eql 2
+      json.each { |c|
+        c["subject"].should_not be_nil
+      }
+    end
   end
 
   describe "POST 'update'" do

@@ -36,7 +36,7 @@ module CC
               "xsi:schemaLocation"=> "#{CCHelper::CANVAS_NAMESPACE} #{CCHelper::XSD_URI}"
       ) do |groups_node|
         @course.assignment_groups.active.each do |group|
-          next unless export_object?(group)
+          next unless export_object?(group) || group.assignments.any?{|a| export_object?(a)}
           migration_id = CCHelper.create_key(group)
           groups_node.assignmentGroup(:identifier=>migration_id) do |group_node|
             group_node.title group.name

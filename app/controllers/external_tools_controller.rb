@@ -31,6 +31,7 @@ class ExternalToolsController < ApplicationController
   # Returns the paginated list of external tools for the current context.
   # See the get request docs for a single tool for a list of properties on an external tool.
   #
+  # @argument search_term (optional) The partial name of the tools to match and return.
   #
   # @example_response
   #     [
@@ -70,6 +71,7 @@ class ExternalToolsController < ApplicationController
       else
         @tools = @context.context_external_tools.active
       end
+      @tools = ContextExternalTool.search_by_attribute(@tools, :name, params[:search_term])
       respond_to do |format|
           @tools = Api.paginate(@tools, self, tool_pagination_url)
           format.json {render :json => external_tools_json(@tools, @context, @current_user, session)}
@@ -107,7 +109,12 @@ class ExternalToolsController < ApplicationController
       @return_url = url_for(@context)
       @launch = BasicLTI::ToolLaunch.new(:url => @resource_url, :tool => @tool, :user => @current_user, :context => @context, :link_code => @opaque_id, :return_url => @return_url, :resource_type => @resource_type)
       @tool_settings = @launch.generate
-      render :template => 'external_tools/tool_show'
+
+      if params[:borderless]
+        render :partial => 'external_tools/borderless_launch'
+      else
+        render :template => 'external_tools/tool_show'
+      end
     end
   end
 
@@ -219,11 +226,11 @@ class ExternalToolsController < ApplicationController
 
     launch_settings = JSON.parse(launch_settings)
 
-    @launch_url = launch_settings['launch_url']
-    @tool_name = launch_settings['tool_name']
+    @resource_url = launch_settings['launch_url']
+    @resource_title = launch_settings['tool_name']
     @tool_settings = launch_settings['tool_settings']
 
-    render :partial => 'external_tools/sessionless_launch'
+    render :partial => 'external_tools/borderless_launch'
   end
 
   # @API Get a single external tool

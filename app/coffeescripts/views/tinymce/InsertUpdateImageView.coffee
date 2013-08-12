@@ -52,11 +52,9 @@ define [
         when 'tabUploaded'
           loadTab (done) =>
             require [
-              'compiled/views/FileBrowserView',
-              'compiled/util/mimeClass'
-            ], (FileBrowserView, mimeClass) =>
-              contentTypes = _.compact _.map mimeClass.mimeClasses, (val, key) -> key if val is 'image'
-              new FileBrowserView({contentTypes}).render().$el.appendTo(ui.panel)
+              'compiled/views/FileBrowserView'
+            ], (FileBrowserView) =>
+              new FileBrowserView(contentTypes: 'image').render().$el.appendTo(ui.panel)
               done()
         when 'tabFlickr'
           loadTab (done) =>

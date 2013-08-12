@@ -182,9 +182,11 @@ class ConversationParticipant < ActiveRecord::Base
   def as_json(options = {})
     latest = last_message
     latest_authored = last_authored_message
+    subject = self.conversation.subject
     options[:include_context_info] ||= private?
     {
       :id => conversation_id,
+      :subject => subject,
       :workflow_state => workflow_state,
       :last_message => latest ? truncate_text(latest.body, :max_length => 100) : nil,
       :last_message_at => last_message_at,

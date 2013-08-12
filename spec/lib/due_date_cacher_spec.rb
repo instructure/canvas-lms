@@ -67,7 +67,8 @@ describe DueDateCacher do
 
     it "should queue a delayed job on a batch-specific singleton strand in production" do
       @instance.expects(:send_later_if_production_enqueue_args).
-        with(:recompute, :strand => "cached_due_date:calculator:batch")
+        with(:recompute, :strand => "cached_due_date:calculator:batch:#{Shard.current.id}",
+             :priority => Delayed::LOWER_PRIORITY)
       DueDateCacher.recompute_batch(@assignments)
     end
   end
@@ -210,7 +211,7 @@ describe DueDateCacher do
         @student2 = user
         @course.enroll_student(@student2, :enrollment_state => 'active')
 
-        @assignment.group_category = @course.group_categories.create
+        @assignment.group_category = group_category
         @assignment.save!
 
         group_with_user(

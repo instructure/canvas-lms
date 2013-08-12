@@ -37,7 +37,9 @@ class ToolLaunch < Struct.new(:url, :tool, :user, :context, :link_code, :return_
     end
 
     def for_assignment!(assignment, outcome_service_url, legacy_outcome_service_url)
-      hash['lis_result_sourcedid'] = BasicLTI::BasicOutcomes.encode_source_id(tool, context, assignment, user)
+      if context.includes_student?(user)
+        hash['lis_result_sourcedid'] = BasicLTI::BasicOutcomes.encode_source_id(tool, context, assignment, user)
+      end
       hash['lis_outcome_service_url'] = outcome_service_url
       hash['ext_ims_lis_basic_outcome_url'] = legacy_outcome_service_url
       hash['ext_outcome_data_values_accepted'] = ['url', 'text'].join(',')

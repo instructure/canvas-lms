@@ -47,6 +47,7 @@ module Kaltura
       if @cache_play_list_seconds = config['cache_play_list_seconds']
         @cache_play_list_seconds = @cache_play_list_seconds.to_i
       end
+      @kaltura_sis = config['kaltura_sis']
     end
 
     def self.config

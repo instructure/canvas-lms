@@ -22,7 +22,7 @@ describe "Module Items API", :type => :integration do
     course.offer!
 
     @module1 = @course.context_modules.create!(:name => "module1")
-    @assignment = @course.assignments.create!(:name => "pls submit", :submission_types => ["online_text_entry"])
+    @assignment = @course.assignments.create!(:name => "pls submit", :submission_types => ["online_text_entry"], :points_possible => 20)
     @assignment_tag = @module1.add_item(:id => @assignment.id, :type => 'assignment')
     @quiz = @course.quizzes.create!(:title => "score 10")
     @quiz_tag = @module1.add_item(:id => @quiz.id, :type => 'quiz')
@@ -76,7 +76,8 @@ describe "Module Items API", :type => :integration do
               "title" => @assignment_tag.title,
               "indent" => 0,
               "completion_requirement" => { "type" => "must_submit" },
-              "published" => false
+              "published" => false,
+              "module_id" => @module1.id
           },
           {
               "type" => "Quiz",
@@ -88,7 +89,8 @@ describe "Module Items API", :type => :integration do
               "title" => @quiz_tag.title,
               "indent" => 0,
               "completion_requirement" => { "type" => "min_score", "min_score" => 10 },
-              "published" => true
+              "published" => true,
+              "module_id" => @module1.id
           },
           {
               "type" => "Discussion",
@@ -100,7 +102,8 @@ describe "Module Items API", :type => :integration do
               "title" => @topic_tag.title,
               "indent" => 0,
               "completion_requirement" => { "type" => "must_contribute" },
-              "published" => true
+              "published" => true,
+              "module_id" => @module1.id
           },
           {
               "type" => "SubHeader",
@@ -108,7 +111,8 @@ describe "Module Items API", :type => :integration do
               "position" => 4,
               "title" => @subheader_tag.title,
               "indent" => 0,
-              "published" => true
+              "published" => true,
+              "module_id" => @module1.id
           },
           {
               "type" => "ExternalUrl",
@@ -119,9 +123,17 @@ describe "Module Items API", :type => :integration do
               "title" => @external_url_tag.title,
               "indent" => 1,
               "completion_requirement" => { "type" => "must_view" },
-              "published" => true
+              "published" => true,
+              "module_id" => @module1.id
           }
       ]
+    end
+
+    it "should include item content details for index" do
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items?include[]=content_details",
+                      :controller => "context_module_items_api", :action => "index", :format => "json",
+                      :course_id => "#{@course.id}", :module_id => "#{@module1.id}", :include => ['content_details'])
+      json.find{|h| h["id"] == @assignment_tag.id}['content_details'].should == {'points_possible' => @assignment.points_possible}
     end
 
     it 'should return the url for external tool items' do
@@ -157,7 +169,8 @@ describe "Module Items API", :type => :integration do
           "indent" => 0,
           "url" => "http://www.example.com/api/v1/courses/#{@course.id}/pages/#{@wiki_page.url}",
           "page_url" => @wiki_page.url,
-          "published" => true
+          "published" => true,
+          "module_id" => @module2.id
       }
 
       @attachment_tag.unpublish
@@ -174,8 +187,17 @@ describe "Module Items API", :type => :integration do
           "title" => @attachment_tag.title,
           "indent" => 0,
           "url" => "http://www.example.com/api/v1/files/#{@attachment.id}",
-          "published" => false
+          "published" => false,
+          "module_id" => @module2.id
       }
+    end
+
+    it "should include item content details for show" do
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@assignment_tag.id}?include[]=content_details",
+                      :controller => "context_module_items_api", :action => "show", :format => "json",
+                      :course_id => "#{@course.id}", :module_id => "#{@module1.id}", :include => ['content_details'],
+                      :id => "#{@assignment_tag.id}")
+      json['content_details'].should == {'points_possible' => @assignment.points_possible}
     end
 
     it "should paginate the module item list" do
@@ -195,6 +217,18 @@ describe "Module Items API", :type => :integration do
       ids += json.collect{ |tag| tag['id'] }
 
       ids.should == module3.content_tags.sort_by(&:position).collect(&:id)
+    end
+
+    it "should search for module items by name" do
+      module3 = @course.context_modules.create!(:name => "module with lots of items")
+      tags = []
+      2.times { |i| tags << module3.add_item(:type => 'context_module_sub_header', :title => "specific tag #{i}") }
+      2.times { |i| module3.add_item(:type => 'context_module_sub_header', :title => "other tag #{i}") }
+
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{module3.id}/items?search_term=spec",
+                      :controller => "context_module_items_api", :action => "index", :format => "json",
+                      :course_id => "#{@course.id}", :module_id => "#{module3.id}", :search_term => 'spec')
+      json.map{ |mod| mod['id'] }.sort.should == tags.map(&:id).sort
     end
 
     describe "POST 'create'" do
@@ -487,6 +521,56 @@ describe "Module Items API", :type => :integration do
         @module1.reload
         @module1.evaluate_for(@student).workflow_state.should == 'unlocked'
       end
+
+      describe "moving items between modules" do
+        it "should move a module item" do
+          old_updated_ats = []
+          Timecop.freeze(1.minute.ago) do
+            @module2.touch; old_updated_ats << @module2.updated_at
+            @module3.touch; old_updated_ats << @module3.updated_at
+          end
+          api_call(:put, "/api/v1/courses/#{@course.id}/modules/#{@module2.id}/items/#{@wiki_page_tag.id}",
+                   {:controller => "context_module_items_api", :action => "update", :format => "json",
+                    :course_id => "#{@course.id}", :module_id => "#{@module2.id}", :id => "#{@wiki_page_tag.id}"},
+                   {:module_item => {:module_id => @module3.id}})
+
+          @module2.reload.content_tags.map(&:id).should_not be_include @wiki_page_tag.id
+          @module2.updated_at.should > old_updated_ats[0]
+          @module3.reload.content_tags.map(&:id).should == [@wiki_page_tag.id]
+          @module3.updated_at.should > old_updated_ats[1]
+        end
+
+        it "should move completion requirements" do
+          old_updated_ats = []
+          Timecop.freeze(1.minute.ago) do
+            @module1.touch; old_updated_ats << @module1.updated_at
+            @module2.touch; old_updated_ats << @module2.updated_at
+          end
+          api_call(:put, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@assignment_tag.id}",
+              {:controller => "context_module_items_api", :action => "update", :format => "json",
+               :course_id => "#{@course.id}", :module_id => "#{@module1.id}", :id => "#{@assignment_tag.id}"},
+              {:module_item => {:module_id => @module2.id, :position => 2}})
+
+          @module1.reload.content_tags.map(&:id).should_not be_include @assignment_tag.id
+          @module1.updated_at.should > old_updated_ats[0]
+          @module1.completion_requirements.size.should == 3
+          @module1.completion_requirements.detect { |req| req[:id] == @assignment_tag.id }.should be_nil
+
+          @module2.reload.content_tags.sort_by(&:position).map(&:id).should == [@wiki_page_tag.id, @assignment_tag.id, @attachment_tag.id]
+          @module2.updated_at.should > old_updated_ats[1]
+          @module2.completion_requirements.detect { |req| req[:id] == @assignment_tag.id }.should_not be_nil
+        end
+
+        it "should verify the target module is in the course" do
+          course_with_teacher
+          mod = @course.context_modules.create!
+          item = mod.add_item(:type => 'context_module_sub_header', :title => 'blah')
+          api_call(:put, "/api/v1/courses/#{@course.id}/modules/#{mod.id}/items/#{item.id}",
+                   {:controller => "context_module_items_api", :action => "update", :format => "json",
+                    :course_id => @course.to_param, :module_id => mod.to_param, :id => item.to_param},
+                   {:module_item => {:module_id => @module1.id}}, {}, {:expected_status => 400})
+        end
+      end
     end
 
     it "should delete a module item" do
@@ -504,6 +588,17 @@ describe "Module Items API", :type => :integration do
   context "as a student" do
     before :each do
       course_with_student_logged_in(:course => @course, :active_all => true)
+    end
+
+    def override_assignment
+      @due_at = Time.zone.now + 2.days
+      @unlock_at = Time.zone.now + 1.days
+      @lock_at = Time.zone.now + 3.days
+      @override = assignment_override_model(:assignment => @assignment, :due_at => @due_at, :unlock_at => @unlock_at, :lock_at => @lock_at)
+      @override_student = @override.assignment_override_students.build
+      @override_student.user = @student
+      @override_student.save!
+      overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student)
     end
 
     it "should list module items" do
@@ -526,6 +621,36 @@ describe "Module Items API", :type => :integration do
                       :course_id => "#{@course.id}", :module_id => "#{@module2.id}")
 
       json.map{|item| item['id']}.sort.should == @module2.content_tags.map(&:id).sort
+    end
+
+    it "should include user specific content details on index" do
+      @assignment_tag.unpublish
+      override_assignment
+
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items?include[]=content_details",
+                      :controller => "context_module_items_api", :action => "index", :format => "json",
+                      :course_id => "#{@course.id}", :module_id => "#{@module1.id}", :include => ['content_details'])
+
+      json.find{|item| item['id'] == @assignment_tag.id}['content_details'].should == {
+          'points_possible' => @assignment.points_possible, 'due_at' => @due_at.iso8601,
+          'unlock_at' => @unlock_at.iso8601, 'lock_at' => @lock_at.iso8601
+      }
+    end
+
+    it "should include user specific content details on show" do
+      @assignment_tag.unpublish
+      override_assignment
+
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@assignment_tag.id}?include[]=content_details",
+                      :controller => "context_module_items_api", :action => "show", :format => "json",
+                      :course_id => "#{@course.id}", :module_id => "#{@module1.id}", :include => ['content_details'],
+                      :id => "#{@assignment_tag.id}"
+      )
+
+      json['content_details'].should == {
+          'points_possible' => @assignment.points_possible, 'due_at' => @due_at.iso8601,
+          'unlock_at' => @unlock_at.iso8601, 'lock_at' => @lock_at.iso8601
+      }
     end
 
     it "should show module item completion" do

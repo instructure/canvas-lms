@@ -83,7 +83,6 @@ define [
 
           tempModel.save null,
             multipart: fileElement 
-            onlyGivenParameters: true
             success: (model, xhr) => 
               return dObject.rejectWith(this, xhr.message) if xhr.message
               this.fetch success: => dObject.resolve() # sets the poll url
@@ -108,7 +107,7 @@ define [
     # @api private
 
     addDaySubsitutions: (json) => 
-      collection = this.get('daySubCollection')
+      collection = @daySubCollection
       json.date_shift_options ||= {}
       json.date_shift_options.day_substitutions = collection.toJSON() if collection
 

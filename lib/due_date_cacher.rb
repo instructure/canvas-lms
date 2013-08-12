@@ -1,46 +1,41 @@
 class DueDateCacher
   def self.recompute(assignment)
     new([assignment]).send_later_if_production_enqueue_args(:recompute,
-      :singleton => "cached_due_date:calculator:#{assignment.global_id}")
+      :singleton => "cached_due_date:calculator:#{Shard.global_id_for(assignment)}")
   end
 
   def self.recompute_batch(assignments)
     new(assignments).send_later_if_production_enqueue_args(:recompute,
-      :strand => "cached_due_date:calculator:batch")
+      :strand => "cached_due_date:calculator:batch:#{Shard.current.id}",
+      :priority => Delayed::LOWER_PRIORITY)
   end
 
   # expects all assignments to be on the same shard
   def initialize(assignments)
     @assignments = assignments
+    @shard = Shard.shard_for(assignments.first)
   end
 
   def shard
-    @assignments.first.shard
-  end
-
-  def transaction
-    @assignments.first.transaction{ yield }
+    @shard
   end
 
   def submissions
     Submission.where(:assignment_id => @assignments)
   end
 
-  def connection
-    @assignments.first.connection
-  end
-
   def recompute
     # in a transaction on the correct shard:
     shard.activate do
-      transaction do
+      Assignment.transaction do
         # create temporary table
-        connection.execute("CREATE TEMPORARY TABLE calculated_due_ats AS (#{submissions.select([
+        cast = Submission.connection.adapter_name == 'Mysql2' ? 'UNSIGNED INTEGER' : 'BOOL'
+        Assignment.connection.execute("CREATE TEMPORARY TABLE calculated_due_ats AS (#{submissions.select([
           "submissions.id AS submission_id",
           "submissions.user_id",
           "submissions.assignment_id",
           "assignments.due_at",
-          "CAST(#{Submission.sanitize(false)} AS BOOL) AS overridden"
+          "CAST(#{Submission.sanitize(false)} AS #{cast}) AS overridden"
         ]).joins(:assignment).to_sql})")
 
         # create an ActiveRecord class around that temp table for the update_all
@@ -63,7 +58,8 @@ class DueDateCacher
           update_all("cached_due_date=calculated_due_ats.due_at")
 
         # clean up
-        connection.execute("DROP TABLE calculated_due_ats")
+        temporary = "TEMPORARY " if Assignment.connection.adapter_name == 'Mysql2'
+        Assignment.connection.execute("DROP #{temporary}TABLE calculated_due_ats")
       end
     end
   end

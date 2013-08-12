@@ -18,23 +18,14 @@
   h3, .h3
     margin-top: 0px
 
-.scheduler-header
-  min-height: 27px
-  margin-bottom: 10px
-
 .scheduler-wrapper
   /* extra padding stops final dropdown from getting cut off */
   padding-bottom: 25px
 
-/* the 'button' part is to beat g_util_button's specificity */
-button.single_item_done_button
-  display: none
 .showing-single
-  .appointment-group-item,
-  #appointment-group-list-header
+  .appointment-group-item
     display: none
-  .appointment-group-item.active,
-  .single_item_done_button
+  .appointment-group-item.active
     display: block
   .appointment-group-item
     border-top: none
@@ -45,10 +36,6 @@ button.single_item_done_button
 
 #appointment-group-list
   list-style: none
-#appointment-group-list-header
-  font-size: 18px
-  line-height: 32px
-  margin-top: 0px
 .appointment-group-item
   border-top: 1px solid #ccc
   min-height: 68px

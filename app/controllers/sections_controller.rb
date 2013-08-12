@@ -53,14 +53,17 @@ class SectionsController < ApplicationController
   # @API List course sections
   # Returns the list of sections for this course.
   #
-  # @argument include[] [optional, "students"] Associations to include with the group.
+  # @argument include[] [optional, "students"] Associations to include with the group. Note: this is only available if you have permission to view users or grades in the course
   # @argument include[] [optional, "avatar_url"] Include the avatar URLs for students returned.
   #
   # @returns [Section]
   def index
-    if authorized_action(@context, @current_user, [:read_roster, :view_all_grades, :manage_grades])
-      includes = Array(params[:include])
+    if authorized_action(@context, @current_user, [:read, :read_roster, :view_all_grades, :manage_grades])
+      if params[:include].present? && !is_authorized_action?(@context, @current_user, [:read_roster, :view_all_grades, :manage_grades])
+        params[:include] = nil
+      end
 
+      includes = Array(params[:include])
       result = @context.active_course_sections.map { |section| section_json(section, @current_user, session, includes) }
 
       render :json => result
@@ -83,6 +86,7 @@ class SectionsController < ApplicationController
       @section.sis_source_id = sis_section_id if api_request? && sis_section_id.present? && @context.root_account.grants_right?(@current_user, session, :manage_sis)
       respond_to do |format|
         if @section.save
+          @context.touch
           flash[:notice] = t('section_created', "Section successfully created!")
           format.html { redirect_to course_settings_url(@context) }
           format.json { render :json => (api_request? ? section_json(@section, @current_user, session, []) : @section.to_json) }
@@ -185,6 +189,7 @@ class SectionsController < ApplicationController
       end
       respond_to do |format|
         if @section.update_attributes(params[:course_section])
+          @context.touch
           flash[:notice] = t('section_updated', "Section successfully updated!")
           format.html { redirect_to course_section_url(@context, @section) }
           format.json { render :json => (api_request? ? section_json(@section, @current_user, session, []) : @section.to_json) }
@@ -230,6 +235,7 @@ class SectionsController < ApplicationController
       respond_to do |format|
         if @section.enrollments.not_fake.empty?
           @section.destroy
+          @context.touch
           flash[:notice] = t('section_deleted', "Course section successfully deleted!")
           format.html { redirect_to course_settings_url(@context) }
           format.json { render :json => (api_request? ? section_json(@section, @current_user, session, []) : @section.to_json) }

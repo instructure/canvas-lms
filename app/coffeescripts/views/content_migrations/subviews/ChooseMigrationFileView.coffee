@@ -23,7 +23,7 @@ define [
     #   Handle cases for file size from IE browsers
     # @api private
 
-    fileSize: (fileElement) -> fileElement.files[0].size
+    fileSize: (fileElement) -> fileElement.files?[0].size
 
     # Validates this form element. This validates method is a convention used 
     # for all sub views.
@@ -45,7 +45,7 @@ define [
                     type: "required"
                     message: "You must select a file to import content from"
 
-      if fileElement?.files[0].size > @fileSizeLimit
+      if @fileSize(fileElement) > @fileSizeLimit
         fileErrors.push
                     type: "upload_limit_exceeded"
                     message: "You're migration cannot exceed #{@humanReadableSize(@fileSizeLimit)}"

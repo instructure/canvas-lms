@@ -27,7 +27,8 @@ describe "Group Categories API", :type => :integration do
       'role' => category.role,
       'self_signup' => category.self_signup,
       'context_type' => category.context_type,
-      "#{category.context_type.downcase}_id" => category.context_id
+      "#{category.context_type.downcase}_id" => category.context_id,
+      'group_limit' => category.group_limit
     }
   end
 
@@ -67,7 +68,7 @@ describe "Group Categories API", :type => :integration do
         json = api_call(:post, "/api/v1/courses/#{@course.id}/group_categories",
                         @category_path_options.merge(:action => 'create',
                                                      :course_id => @course.to_param),
-                        { 'name' => @name, 'split_group_count' => 3 })
+                        { 'name' => 'category', 'split_group_count' => 3 })
 
         @user_antisocial = user(:name => "antisocial")
         @course.enroll_user(@user,'StudentEnrollment',:enrollment_state => :active)
@@ -96,9 +97,9 @@ describe "Group Categories API", :type => :integration do
       end
 
       it "returns an error when search_term is fewer than 3 characters" do
-        json = api_call(:get, api_url, api_route, {:search_term => '12'}, {}, :expected_status => 400)
-        json["status"].should == "argument_error"
-        json["message"].should == "search_term of 3 or more characters is required"
+        json = api_call(:get, api_url, api_route, {:search_term => 'ab'}, {}, :expected_status => 400)
+        error = json["errors"].first
+        verify_json_error(error, "search_term", "invalid", "3 or more characters is required")
       end
 
       it "returns a list of users" do
@@ -201,29 +202,33 @@ describe "Group Categories API", :type => :integration do
         groups.count.should == 3
       end
 
-      it "should not allow both 'enable_self_signup' and 'split_group_count'" do
-        raw_api_call(:post, "/api/v1/courses/#{@course.id}/group_categories",
-                     @category_path_options.merge(:action => 'create',
-                                                  :course_id => @course.to_param),
-                     {
-                       'name' => @name,
-                       'enable_self_signup' => '1',
-                       'split_group_count' => 3
-                     }
+      it "should ignore 'split_group_count' if 'enable_self_signup'" do
+        json = api_call(:post, "/api/v1/courses/#{@course.id}/group_categories",
+                        @category_path_options.merge(:action => 'create',
+                                                     :course_id => @course.to_param),
+                        {
+                          'name' => @name,
+                          'enable_self_signup' => '1',
+                          'split_group_count' => 3
+                        }
         )
-        response.code.should == '400'
+        category = GroupCategory.find(json["id"])
+        category.self_signup.should == "enabled"
+        category.groups.active.should be_empty
       end
 
-      it "should not allow 'create_group_count' without 'enable_self_signup'" do
-        raw_api_call(:post, "/api/v1/courses/#{@course.id}/group_categories",
-                     @category_path_options.merge(:action => 'create',
-                                                  :course_id => @course.to_param),
-                     {
-                       'name' => @name,
-                       'create_group_count' => 3
-                     }
+      it "should prefer 'split_group_count' over 'create_group_count' if not 'enable_self_signup'" do
+        json = api_call(:post, "/api/v1/courses/#{@course.id}/group_categories",
+                        @category_path_options.merge(:action => 'create',
+                                                     :course_id => @course.to_param),
+                        {
+                          'name' => @name,
+                          'create_group_count' => 3,
+                          'split_group_count' => 2
+                        }
         )
-        response.code.should == '400'
+        category = GroupCategory.find(json["id"])
+        category.groups.active.size.should == 2
       end
 
       describe "teacher actions with a group" do
@@ -369,6 +374,103 @@ describe "Group Categories API", :type => :integration do
         response.code.should == '401'
       end
     end
+
+    describe "POST 'assign_unassigned_members'" do
+      it "should require :manage_groups permission" do
+        course_with_teacher(:active_all => true)
+        student = @course.enroll_student(user_model).user
+        category = @course.group_categories.create(:name => "Group Category")
+
+        user_session(student)
+        raw_api_call :post, "/api/v1/group_categories/#{category.id}/assign_unassigned_members",
+                     @category_path_options.merge(:action => 'assign_unassigned_members',
+                                                  :group_category_id => category.to_param),
+                     {'sync' => true}
+        response.status.should == '401 Unauthorized'
+      end
+
+      it "should require valid group :category_id" do
+        course_with_teacher_logged_in(:active_all => true)
+        category = @course.group_categories.create(:name => "Group Category")
+
+        raw_api_call :post, "/api/v1/group_categories/#{category.id + 1}/assign_unassigned_members",
+                     @category_path_options.merge(:action => 'assign_unassigned_members',
+                                                  :group_category_id => (category.id + 1).to_param),
+                     {'sync' => true}
+        response.status.should == '404 Not Found'
+      end
+
+      it "should fail for student organized groups" do
+        course_with_teacher_logged_in(:active_all => true)
+        category = GroupCategory.student_organized_for(@course)
+
+        raw_api_call :post, "/api/v1/group_categories/#{category.id}/assign_unassigned_members",
+                     @category_path_options.merge(:action => 'assign_unassigned_members',
+                                                  :group_category_id => category.to_param),
+                     {'sync' => true}
+        response.status.should == '400 Bad Request'
+      end
+
+      it "should fail for restricted self signup groups" do
+        course_with_teacher_logged_in(:active_all => true)
+        category = @course.group_categories.build(:name => "Group Category")
+        category.configure_self_signup(true, true)
+        category.save
+
+        raw_api_call :post, "/api/v1/group_categories/#{category.id}/assign_unassigned_members",
+                     @category_path_options.merge(:action => 'assign_unassigned_members',
+                                                  :group_category_id => category.to_param),
+                     {'sync' => true}
+        response.status.should == '400 Bad Request'
+
+        category.configure_self_signup(true, false)
+        category.save
+
+        raw_api_call :post, "/api/v1/group_categories/#{category.id}/assign_unassigned_members",
+                     @category_path_options.merge(:action => 'assign_unassigned_members',
+                                                  :group_category_id => category.to_param),
+                     {'sync' => true}
+        response.should be_success
+      end
+
+      it "should otherwise assign ungrouped users to groups in the category" do
+        course_with_teacher_logged_in(:active_all => true)
+        teacher = @user
+        category = @course.group_categories.create(:name => "Group Category")
+        group1 = category.groups.create(:name => "Group 1", :context => @course)
+        group2 = category.groups.create(:name => "Group 2", :context => @course)
+        student1 = @course.enroll_student(user_model).user
+        student2 = @course.enroll_student(user_model).user # not in a group
+        group2.add_user(student1)
+
+        @user = teacher
+        raw_api_call :post, "/api/v1/group_categories/#{category.id}/assign_unassigned_members",
+                     @category_path_options.merge(:action => 'assign_unassigned_members',
+                                                  :group_category_id => category.to_param)
+
+        response.should be_success
+
+        run_jobs
+
+        group1.reload.users.should include(student2)
+      end
+
+      it "should render progress_json" do
+        course_with_teacher_logged_in(:active_all => true)
+        category = @course.group_categories.create(:name => "Group Category")
+
+        expect {
+          raw_api_call :post, "/api/v1/group_categories/#{category.id}/assign_unassigned_members",
+                       @category_path_options.merge(:action => 'assign_unassigned_members',
+                                                    :group_category_id => category.to_param)
+
+          response.should be_success
+          json = JSON.parse(response.body)
+          json['url'].should =~ Regexp.new("http://www.example.com/api/v1/progress/\\d+")
+          json['completion'].should == 0
+        }.to change(Delayed::Job, :count).by(1)
+      end
+    end
   end
 
   describe "account group categories" do
@@ -389,16 +491,17 @@ describe "Group Categories API", :type => :integration do
         json.first['id'].should == @communities.id
       end
 
-      it "should not allow 'split_group_count' for a non course group" do
-        raw_api_call(:post, "/api/v1/accounts/#{@account.id}/group_categories",
-                     @category_path_options.merge(:action => 'create',
-                                                  :account_id => @account.to_param),
-                     {
-                         'name' => @name,
-                         'split_group_count' => 3
-                     }
+      it "should ignore 'split_group_count' for a non course group" do
+        json = api_call(:post, "/api/v1/accounts/#{@account.id}/group_categories",
+                        @category_path_options.merge(:action => 'create',
+                                                     :account_id => @account.to_param),
+                        {
+                            'name' => 'category',
+                            'split_group_count' => 3
+                        }
         )
-        response.code.should == '400'
+        category = GroupCategory.find(json["id"])
+        category.groups.active.should be_empty
       end
 
       it "should allow admins to retrieve a group category" do

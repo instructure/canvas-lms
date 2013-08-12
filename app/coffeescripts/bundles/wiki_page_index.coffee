@@ -1,7 +1,16 @@
 require [
+  'i18n!pages'
+  'str/htmlEscape'
   'compiled/collections/WikiPageCollection'
   'compiled/views/wiki/WikiPageIndexView'
-], (WikiPageCollection, WikiPageIndexView) ->
+], (I18n, htmlEscape, WikiPageCollection, WikiPageIndexView) ->
+
+  deleted_page_title = $.cookie('deleted_page_title')
+  if deleted_page_title
+    $.cookie('deleted_page_title', null)
+    $.flashMessage htmlEscape(I18n.t('notices.page_deleted', 'The page "%{title}" has been deleted.', title: deleted_page_title))
+
+  $('body').addClass('pages index')
 
   view = new WikiPageIndexView
     collection: new WikiPageCollection

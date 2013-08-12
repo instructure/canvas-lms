@@ -26,6 +26,7 @@ class Quiz < ActiveRecord::Base
   extend ActionView::Helpers::SanitizeHelper::ClassMethods
   include ContextModuleItem
   include DatesOverridable
+  include SearchTermHelper
 
   attr_accessible :title, :description, :points_possible, :assignment_id, :shuffle_answers,
     :show_correct_answers, :time_limit, :allowed_attempts, :scoring_policy, :quiz_type,
@@ -585,6 +586,7 @@ class Quiz < ActiveRecord::Base
     submission.finished_at = nil
     submission.submission_data = {}
     submission.workflow_state = 'preview' if preview
+    submission.was_preview = preview
     if preview || submission.untaken?
       submission.save
     else
@@ -947,6 +949,7 @@ class Quiz < ActiveRecord::Base
 
   def self.process_migration(data, migration, question_data)
     assessments = data['assessments'] ? data['assessments']['assessments'] : []
+    assessments ||= []
     assessments.each do |assessment|
       migration_id = assessment['migration_id'] || assessment['assessment_id']
       if migration.import_object?("quizzes", migration_id)
@@ -1005,7 +1008,7 @@ class Quiz < ActiveRecord::Base
      :cant_go_back].each do |attr|
       item.send("#{attr}=", hash[attr]) if hash.key?(attr)
     end
-    
+
     item.save!
 
     if context.respond_to?(:content_migration) && context.content_migration
@@ -1021,6 +1024,13 @@ class Quiz < ActiveRecord::Base
         questions_to_update = item.quiz_questions.where(:migration_id => question_data[:qq_data].keys)
         questions_to_update.each do |question_to_update|
           question_data[:qq_data].values.find{|q| q['migration_id'].eql?(question_to_update.migration_id)}['quiz_question_id'] = question_to_update.id
+        end
+      end
+
+      if question_data[:aq_data]
+        questions_to_update = item.quiz_questions.where(:migration_id => question_data[:aq_data].keys)
+        questions_to_update.each do |question_to_update|
+          question_data[:aq_data].values.find{|q| q['migration_id'].eql?(question_to_update.migration_id)}['quiz_question_id'] = question_to_update.id
         end
       end
 
@@ -1057,8 +1067,7 @@ class Quiz < ActiveRecord::Base
     item.reload # reload to catch question additions
     
     if hash[:assignment] && hash[:available]
-      assignment = Assignment.import_from_migration(hash[:assignment], context)
-      item.assignment = assignment
+      item.assignment = Assignment.import_from_migration(hash[:assignment], context, item.assignment)
     elsif !item.assignment && grading = hash[:grading]
       # The actual assignment will be created when the quiz is published
       item.quiz_type = 'assignment'
@@ -1154,10 +1163,21 @@ class Quiz < ActiveRecord::Base
   end
 
   def publish!
+    self.generate_quiz_data
     self.workflow_state = 'available'
     self.published_at = Time.zone.now
     save!
     self
+  end
+
+  def unpublish!
+    self.workflow_state = 'unpublished'
+    save!
+    self
+  end
+
+  def can_unpublish?
+    !has_student_submissions?
   end
 
   # marks a quiz as having unpublished changes

@@ -25,7 +25,7 @@ module Api::V1::ContextModule
   MODULE_ITEM_JSON_ATTRS = %w(id position title indent)
 
   # optionally pass progression to include 'state', 'completed_at'
-  def module_json(context_module, current_user, session, progression = nil)
+  def module_json(context_module, current_user, session, progression = nil, includes = [], opts = {})
     hash = api_json(context_module, current_user, session, :only => MODULE_JSON_ATTRS)
     hash['require_sequential_progress'] = !!context_module.require_sequential_progress
     hash['prerequisite_module_ids'] = context_module.prerequisites.reject{|p| p[:type] != 'context_module'}.map{|p| p[:id]}
@@ -33,17 +33,34 @@ module Api::V1::ContextModule
       hash['state'] = progression.workflow_state
       hash['completed_at'] = progression.completed_at
     end
-    hash['published'] = context_module.active? if context_module.grants_right?(current_user, :update)
+    has_update_rights = context_module.grants_right?(current_user, :update)
+    hash['published'] = context_module.active? if has_update_rights
+    tags = context_module.content_tags_visible_to(@current_user)
+    count = tags.count
+    hash['items_count'] = count
+    hash['items_url'] = polymorphic_url([:api_v1, context_module.context, context_module, :items])
+    if includes.include?('items') && count <= Setting.get_cached('api_max_per_page', '50').to_i
+      if opts[:search_term].present? && !context_module.matches_attribute?(:name, opts[:search_term])
+        tags = ContentTag.search_by_attribute(tags, :title, opts[:search_term])
+        return nil if tags.count == 0
+      end
+      item_includes = includes & ['content_details']
+      hash['items'] = tags.map do |tag|
+        module_item_json(tag, current_user, session, context_module, progression, item_includes, :has_update_rights => has_update_rights)
+      end
+    end
     hash
   end
 
   # optionally pass context_module to avoid redundant queries when rendering multiple items
   # optionally pass progression to include completion status
-  def module_item_json(content_tag, current_user, session, context_module = nil, progression = nil)
+  def module_item_json(content_tag, current_user, session, context_module = nil, progression = nil, includes = [], opts = {})
     context_module ||= content_tag.context_module
 
     hash = api_json(content_tag, current_user, session, :only => MODULE_ITEM_JSON_ATTRS)
     hash['type'] = Api::API_DATA_TYPE[content_tag.content_type] || content_tag.content_type
+
+    hash['module_id'] = content_tag.context_module_id
 
     # add canvas web url
     unless content_tag.content_type == 'ContextModuleSubHeader'
@@ -77,7 +94,11 @@ module Api::V1::ContextModule
       when 'Attachment'
         api_url = polymorphic_url([:api_v1, content_tag.content])
       when 'ContextExternalTool'
-        api_url = sessionless_launch_url(context_module.context, :url => content_tag.url)
+        if content_tag.content && content_tag.content.tool_id
+          api_url = sessionless_launch_url(context_module.context, :id => content_tag.content.id, :url => content_tag.content.url)
+        else
+          api_url = sessionless_launch_url(context_module.context, :url => content_tag.content.url)
+        end
     end
     hash['url'] = api_url if api_url
 
@@ -95,8 +116,30 @@ module Api::V1::ContextModule
       hash['completion_requirement'] = ch
     end
 
-    hash['published'] = content_tag.active? if context_module.grants_right?(current_user, :update)
+    has_update_rights = if opts.has_key? :has_update_rights
+      opts[:has_update_rights]
+    else
+      context_module.grants_right?(current_user, :update)
+    end
+    hash['published'] = content_tag.active? if has_update_rights
+
+    hash['content_details'] = content_details(content_tag, current_user) if includes.include?('content_details')
 
     hash
+  end
+
+  def content_details(content_tag, current_user)
+    details = {}
+    item = content_tag.content
+
+    item = item.assignment if item.is_a?(DiscussionTopic) && item.assignment
+    item = item.overridden_for(current_user) if item.respond_to?(:overridden_for)
+
+    [:due_at, :unlock_at, :lock_at, :points_possible].each do |attr|
+      if item.respond_to?(attr) && val = item.try(attr)
+        details[attr] = val
+      end
+    end
+    details
   end
 end

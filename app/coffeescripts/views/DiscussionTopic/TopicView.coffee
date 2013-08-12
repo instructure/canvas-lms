@@ -34,6 +34,8 @@ define [
       '.due_date_wrapper': '$dueDates'
       '.reply-textarea:first': '$textarea'
       '#discussion-toolbar': '$discussionToolbar'
+      '.topic-subscribe-button': '$subscribeButton'
+      '.topic-unsubscribe-button': '$unsubscribeButton'
 
     initialize: ->
       @model.set 'id', ENV.DISCUSSION.TOPIC.ID
@@ -47,6 +49,9 @@ define [
       @topic.url = ENV.DISCUSSION.ROOT_URL.replace /\/view/m, ''
       # set initial subscribed state
       @topic.set 'subscribed', ENV.DISCUSSION.TOPIC.IS_SUBSCRIBED
+
+      # catch when non-root replies are added so we can twiddle the subscribed button
+      EntryView.on('addReply', => @setSubscribed(true))
 
     hideIfFiltering: =>
       if @filterModel.hasFilter()
@@ -85,11 +90,17 @@ define [
       event.preventDefault()
       @topic.topicSubscribe()
       @subscriptionStatusChanged()
+      # focus the toggled button if the toggled button was focused
+      if @$subscribeButton.is(':focus')
+        @$unsubscribeButton.focus()
 
     unsubscribeTopic: (event) ->
       event.preventDefault()
       @topic.topicUnsubscribe()
       @subscriptionStatusChanged()
+      # focus the toggled button if the toggled button was focused
+      if @$unsubscribeButton.is(':focus')
+        @$subscribeButton.focus()
 
     subscriptionStatusChanged: =>
       subscribed = @topic.get 'subscribed'
@@ -111,9 +122,17 @@ define [
         @reply = new Reply this, topLevel: true, focus: true
         @reply.on 'edit', => @$addRootReply?.hide()
         @reply.on 'hide', => @$addRootReply?.show()
-        @reply.on 'save', (entry) => @trigger 'addReply', entry
+        @reply.on 'save', (entry) =>
+          @setSubscribed(true) unless @topic.subscription_hold
+          @trigger 'addReply', entry
       @model.set 'notification', ''
       @reply.edit()
+
+    # Update subscribed state without posted. Done when replies are posted and
+    # user is auto-subscribed.
+    setSubscribed: (newValue) ->
+      @topic.set('subscribed', true)
+      @subscriptionStatusChanged()
 
     addReplyAttachment: EntryView::addReplyAttachment
 

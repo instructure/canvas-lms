@@ -117,7 +117,7 @@ describe "dashboard" do
       @other_student = @user
       @user = @me
 
-      @group = @course.group_categories.create.groups.create(:context => @course)
+      @group = group_category.groups.create(context: @course)
       @group.users << @other_student << @user
       # appointment group publish notification and signup notification
       appointment_participant_model(:course => @course, :participant => @group, :updating_user => @other_student)
@@ -358,16 +358,6 @@ describe "dashboard" do
       driver.action.move_to(assignment_menu).perform
       assignment_menu.should include_text("To Grade")
       assignment_menu.should include_text(assignment.title)
-    end
-
-    it "should display appointment groups in todo list" do
-      ag = AppointmentGroup.create! :title => "appointment group",
-                                    :contexts => [@course],
-                                    :new_appointments => [[Time.now.utc + 2.hour, Time.now.utc + 3.hour]]
-      student_in_course(:course => @course, :active_all => true)
-      ag.appointments.first.reserve_for(@student, @student)
-      get "/"
-      f('#right-side .events_list').text.should include 'appointment group'
     end
 
     it "should show submitted essay quizzes in the todo list" do

@@ -1,1 +1,0 @@
-require ['content_migration_deprecated']

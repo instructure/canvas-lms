@@ -27,18 +27,38 @@ module Api::V1::AssignmentGroup
     rules
   )
 
-  def assignment_group_json(group, user, session, includes = [])
+  def assignment_group_json(group, user, session, includes = [], opts = {})
     includes ||= []
+    opts.reverse_merge! override_assignment_dates: true
 
     hash = api_json(group, user, session,
                     :only => %w(id name position group_weight))
-    hash['group_weight'] = nil unless group.context.apply_group_weights?
     hash['rules'] = group.rules_hash
 
-    include_discussion_topic = includes.include?('discussion_topic')
     if includes.include?('assignments')
-      hash['assignments'] = group.assignments.active.map { |a|
-        assignment_json(a, user, session, include_discussion_topic)
+      assignment_scope = group.active_assignments
+
+      # fake assignment used for checking if the @current_user can read unpublished assignments
+      fake = group.context.assignments.new
+      fake.workflow_state = 'unpublished'
+      if @domain_root_account.enable_draft? && !fake.grants_right?(user, session, :read)
+        # user should not see unpublished assignments
+        assignment_scope = assignment_scope.published
+      end
+
+      include_discussion_topic = includes.include?('discussion_topic')
+      user_content_attachments   = opts[:preloaded_user_content_attachments]
+      user_content_attachments ||= api_bulk_load_user_content_attachments(
+        assignment_scope.map(&:description),
+        group.context,
+        user
+      )
+      hash['assignments'] = assignment_scope.map { |a|
+        a.context = group.context
+        assignment_json(a, user, session,
+          include_discussion_topic: include_discussion_topic,
+          override_dates: opts[:override_assignment_dates],
+          preloaded_user_content_attachments: user_content_attachments)
       }
     end
 

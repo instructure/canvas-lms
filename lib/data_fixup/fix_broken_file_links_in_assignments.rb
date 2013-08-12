@@ -11,10 +11,8 @@ module DataFixup::FixBrokenFileLinksInAssignments
     broken_assignment_scope.find_in_batches do |assignments|
       # When the topic is saved it can't find the assignment because the
       # find_in_batches scope is still in effect, make it have an exclusive scope
-      Assignment.send(:with_exclusive_scope) do
-        assignments.each do |assignment|
-          check_and_fix_assignment_description(assignment)
-        end
+      assignments.each do |assignment|
+        check_and_fix_assignment_description(assignment)
       end
     end
   end

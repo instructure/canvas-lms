@@ -304,6 +304,19 @@ describe FilesController do
       @file.reload.last_inline_view.should > 1.minute.ago
     end
 
+    it "should record the inline view when a teacher previews a student's submission" do
+      course_with_student :active_all => true
+      @assignment = @course.assignments.create!(:title => 'upload_assignment', :submission_types => 'online_upload')
+      attachment_model :context => @student
+      @assignment.submit_homework @student, :attachments => [@attachment]
+
+      teacher_in_course :active_all => true
+      user_session @teacher
+      get 'show', :user_id => @student.id, :id => @attachment.id, :inline => 1
+      response.should be_success
+      @attachment.reload.last_inline_view.should > 1.minute.ago
+    end
+
     it "should mark files as viewed for module progressions if the file data is requested and it includes the scribd_doc data" do
       file_in_a_module
       @file.scribd_doc = Scribd::Document.new
@@ -423,6 +436,15 @@ describe FilesController do
       file_in_a_module
       proc { get "show_relative", :course_id => @course.id, :file_path => @file.full_display_path+"blah" }.should raise_error(ActiveRecord::RecordNotFound)
       proc { get "show_relative", :file_id => @file.id, :course_id => @course.id, :file_path => @file.full_display_path+"blah" }.should raise_error(ActiveRecord::RecordNotFound)
+    end
+
+    it "should ignore bad file_ids" do
+      course_with_teacher_logged_in(:active_all => true)
+      file_in_a_module
+      get "show_relative", :file_id => @file.id + 1, :course_id => @course.id, :file_path => @file.full_display_path
+      response.should be_redirect
+      get "show_relative", :file_id => "blah", :course_id => @course.id, :file_path => @file.full_display_path
+      response.should be_redirect
     end
   end
 
@@ -591,7 +613,7 @@ describe FilesController do
     it "should associate assignment submission for a group assignment with the group" do
       course_with_teacher(:active_all => true)
       student_in_course(:active_all => true)
-      category = @course.group_categories.create
+      category = group_category
       assignment = @course.assignments.create(:group_category => category, :submission_types => 'online_upload')
       group = category.groups.create(:context => @course)
       group.add_user(@student)
@@ -686,6 +708,53 @@ describe FilesController do
       @attachment.save!
       post "api_create", params[:upload_params].merge(:file => @content)
       response.status.to_i.should == 400
+    end
+  end
+
+  describe "public_url" do
+    before do
+      course_with_student :active_all => true
+      assignment_model :course => @course, :submission_types => %w(online_upload)
+      attachment_model :context => @student
+      @submission = @assignment.submit_homework @student, :attachments => [@attachment]
+    end
+
+    context "with direct rights" do
+      before do
+        user_session @student
+      end
+
+      it "should give a download url" do
+        get "public_url", :id => @attachment.id
+        response.should be_success
+        data = json_parse
+        data.should == { "public_url" => @attachment.authenticated_s3_url }
+      end
+    end
+
+    context "without direct rights" do
+      before do
+        teacher_in_course :active_all => true
+        user_session @teacher
+      end
+
+      it "should fail if no submission_id is given" do
+        get "public_url", :id => @attachment.id
+        assert_unauthorized
+      end
+
+      it "should allow a teacher to download a student's submission" do
+        get "public_url", :id => @attachment.id, :submission_id => @submission.id
+        response.should be_success
+        data = json_parse
+        data.should == { "public_url" => @attachment.authenticated_s3_url }
+      end
+
+      it "should verify that the requested file belongs to the submission" do
+        otherfile = attachment_model
+        get "public_url", :id => otherfile, :submission_id => @submission.id
+        assert_unauthorized
+      end
     end
   end
 end

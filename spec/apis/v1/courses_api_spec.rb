@@ -63,6 +63,10 @@ describe Api::V1::Course do
       @test_api.course_json(@course1, @me, {}, ['needs_grading_count'], [@designer_enrollment]).has_key?("needs_grading_count").should be_false
     end
 
+    it 'should include apply_assignment_group_weights' do
+      @test_api.course_json(@course1, @me, {}, [], []).has_key?("apply_assignment_group_weights").should be_true
+    end
+
     context "total_scores" do
       before do
         @enrollment.computed_current_score = 95.0;
@@ -205,6 +209,7 @@ describe CoursesController, :type => :integration do
             'self_enrollment'                      => true,
             'restrict_enrollments_to_course_dates' => true,
             'hide_final_grades'                     => true,
+            'apply_assignment_group_weights'       => true,
             'license'                              => 'Creative Commons',
             'sis_course_id'                        => '12345',
             'public_description'                   => 'Nature is lethal but it doesn\'t hold a candle to man.',
@@ -267,7 +272,16 @@ describe CoursesController, :type => :integration do
         new_course = Course.find(json['id'])
         new_course.sis_source_id.should == '9999'
       end
-      
+
+      it "should set the apply_assignment_group_weights flag" do
+        json = api_call(:post, @resource_path,
+          @resource_params,
+          { :account_id => @account.id, :course => { :name => 'Test Course', :apply_assignment_group_weights => true } }
+        )
+        new_course = Course.find(json['id'])
+        new_course.apply_group_weights?.should be_true
+      end
+
       it "should set the storage quota" do
         json = api_call(:post, @resource_path,
                         @resource_params,
@@ -346,6 +360,7 @@ describe CoursesController, :type => :integration do
         'open_enrollment' => true,
         'self_enrollment' => true,
         'hide_final_grades' => false,
+        'apply_assignment_group_weights' => true,
         'restrict_enrollments_to_course_dates' => true,
         'default_view' => 'new default view'
       }, 'offer' => true }
@@ -378,6 +393,7 @@ describe CoursesController, :type => :integration do
         @course.self_enrollment.should be_true
         @course.restrict_enrollments_to_course_dates.should be_true
         @course.workflow_state.should == 'available'
+        @course.apply_group_weights?.should == true
         @course.default_view.should == 'new default view'
       end
 
@@ -410,6 +426,14 @@ describe CoursesController, :type => :integration do
         @course.reload
         @course.storage_quota_mb.should == 123
       end
+
+      it "should update the apply_assignment_group_weights flag from true to false" do
+        @course.apply_assignment_group_weights = true
+        @course.save
+        json = api_call(:put, @path, @params, :course => { :apply_assignment_group_weights =>  false})
+        @course.reload
+        @course.apply_group_weights?.should be_false
+      end
     end
 
     context "a teacher" do
@@ -428,6 +452,7 @@ describe CoursesController, :type => :integration do
         json['start_at'].should eql @new_values['course']['start_at']
         json['end_at'].should eql @new_values['course']['end_at']
         json['default_view'].should eql @new_values['course']['default_view']
+        json['apply_assignment_group_weights'].should eql @new_values['course']['apply_assignment_group_weights']
       end
 
       it 'should process html content in syllabus_body on update' do
@@ -613,6 +638,7 @@ describe CoursesController, :type => :integration do
       end
 
       it "should deal gracefully with an invalid course id" do
+        @course2.enrollments.scoped.delete_all
         @course2.destroy!
         json = api_call(:put, @path + "?event=offer&course_ids[]=#{@course1.id}&course_ids[]=#{@course2.id}",
                         @params.merge(:event => 'offer', :course_ids => [@course1.id.to_s, @course2.id.to_s]))
@@ -669,6 +695,7 @@ describe CoursesController, :type => :integration do
       end
       
       it "should report a failure if no updates succeeded" do
+        @course2.enrollments.scoped.delete_all
         @course2.destroy!
         json = api_call(:put, @path + "?event=offer&course_ids[]=#{@course2.id}",
                         @params.merge(:event => 'offer', :course_ids => [@course2.id.to_s]))
@@ -718,6 +745,7 @@ describe CoursesController, :type => :integration do
     courses[0]['term'].should include(
       'id' => @course1.enrollment_term_id,
       'name' => @course1.enrollment_term.name,
+      'sis_term_id' => nil,
     )
 
     # course2
@@ -727,6 +755,7 @@ describe CoursesController, :type => :integration do
     courses[0]['term'].should include(
       'id' => @course2.enrollment_term_id,
       'name' => @course2.enrollment_term.name,
+      'sis_term_id' => nil,
     )
   end
 
@@ -1031,27 +1060,21 @@ describe CoursesController, :type => :integration do
       @student2_enroll = @course1.enroll_user(@student2, 'StudentEnrollment', :section => @section2)
     end
 
-    describe "/search_users" do
-      let(:api_url) { "/api/v1/courses/#{@course1.id}/search_users.json" }
+    describe "search users" do
+      let(:api_url) { "/api/v1/courses/#{@course1.id}/users.json" }
       let(:api_route) do
         {
           :controller => 'courses',
-          :action => 'search_users',
+          :action => 'users',
           :course_id => @course1.id.to_s,
           :format => 'json'
         }
       end
 
-      it "returns an error when search_term not present" do
-        json = api_call(:get, api_url, api_route, {}, {}, :expected_status => 400)
-        json["status"].should == "argument_error"
-        json["message"].should == "search_term of 3 or more characters is required"
-      end
-
       it "returns an error when search_term is fewer than 3 characters" do
-        json = api_call(:get, api_url, api_route, {:search_term => '12'}, {}, :expected_status => 400)
-        json["status"].should == "argument_error"
-        json["message"].should == "search_term of 3 or more characters is required"
+        json = api_call(:get, api_url, api_route, {:search_term => 'ab'}, {}, :expected_status => 400)
+        error = json["errors"].first
+        verify_json_error(error, "search_term", "invalid", "3 or more characters is required")
       end
 
       it "returns a list of users" do
@@ -1063,6 +1086,13 @@ describe CoursesController, :type => :integration do
             @course1.users.select{ |u| u.name == 'TAPerson' },
             :only => USER_API_FIELDS)
 
+        sorted_users.should == expected_users
+
+        # this endpoint doesn't exist, but we maintain the route for backwards compat
+        json = api_call(:get, "/api/v1/courses/#{@course1.id}/search_users",
+                        { controller: 'courses', action: 'users', course_id: @course1.to_param, format: 'json' },
+                        :search_term => "TAP")
+        sorted_users = json.sort_by{ |x| x["id"] }
         sorted_users.should == expected_users
       end
 
@@ -1449,7 +1479,8 @@ describe CoursesController, :type => :integration do
         'default_view' => @course1.default_view,
         'public_syllabus' => @course1.public_syllabus,
         'workflow_state' => @course1.workflow_state,
-        'storage_quota_mb' => @course1.storage_quota_mb
+        'storage_quota_mb' => @course1.storage_quota_mb,
+        'apply_assignment_group_weights' => false
       }
     end
 
@@ -1669,6 +1700,33 @@ describe CoursesController, :type => :integration do
     end
   end
 
+  describe "/preview_html" do
+    before do
+      course_with_teacher_logged_in(:active_all => true)
+    end
+
+    it "should sanitize html and process links" do
+      @user = @teacher
+      attachment_model(:context => @course)
+      html = %{<p><a href="/files/#{@attachment.id}/download?verifier=huehuehuehue">Click!</a><script></script></p>}
+      json = api_call(:post, "/api/v1/courses/#{@course.id}/preview_html",
+                      { :controller => 'courses', :action => 'preview_html', :course_id => @course.to_param, :format => 'json' },
+                      { :html => html})
+
+      returned_html = json["html"]
+      returned_html.should_not include("<script>")
+      returned_html.should include("/courses/#{@course.id}/files/#{@attachment.id}/download?verifier=#{@attachment.uuid}")
+    end
+
+    it "should require permission to preview" do
+      @user = user
+      api_call(:post, "/api/v1/courses/#{@course.id}/preview_html",
+                      { :controller => 'courses', :action => 'preview_html', :course_id => @course.to_param, :format => 'json' },
+                      { :html => ""}, {}, {:expected_status => 401})
+
+    end
+  end
+
   it "should return the activity stream" do
     course_with_teacher(:active_all => true, :user => user_with_pseudonym)
     @context = @course
@@ -1740,8 +1798,8 @@ describe ContentImportsController, :type => :integration do
 
     api_call(:get, status_url, { :controller => 'content_imports', :action => 'copy_course_status', :course_id => @copy_to.to_param, :id => data['id'].to_param, :format => 'json' })
     (JSON.parse(response.body)).tap do |res|
-      res['workflow_state'].should == 'created'
-      res['progress'].should be_nil
+      res['workflow_state'].should == 'started'
+      res['progress'].should == 0
     end
 
     run_jobs

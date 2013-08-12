@@ -379,7 +379,8 @@ describe NotificationMessageCreator do
       notification_set
       Message.any_instance.stubs(:get_template).returns('template')
       @shard1.activate do
-        user_with_pseudonym(:active_all => 1)
+        account = Account.create!
+        user_with_pseudonym(:active_all => 1, :account => account)
         messages = NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message
         messages.length.should >= 1
         messages.each { |m| m.shard.should == @shard1 }

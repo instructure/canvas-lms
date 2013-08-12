@@ -124,7 +124,7 @@ define [
         ,
           text: I18n.t 'buttons.delete', 'Delete'
           click: =>
+            tool.on('sync', => @externalToolsView.collection.fetch())
             tool.destroy()
-            @externalToolsView.collection.fetch()
             dialog.dialog 'close'
         ]

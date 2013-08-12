@@ -27,11 +27,11 @@
     <% end %>
     <% if @presenter.editable? %>
         <div class="show_guess_grades" style="display: none; margin-bottom: 10px; font-size: 0.8em;">
-          <button type="button" class="btn button-sidebar-wide show_guess_grades_link"><%= image_tag "grading_icon.png" %> <%= t('buttons.show_what_if', "Show Saved \"What-If\" Scores") %></button>
+          <button type="button" class="btn button-sidebar-wide show_guess_grades_link"><%= image_tag "grading_icon.png", :alt => "" %> <%= t('buttons.show_what_if', "Show Saved \"What-If\" Scores") %></button>
         </div>
         <div class="revert_all_scores" style="font-size: 0.8em; padding-left: 10px; display: none;">
           <%= t(:not_official, "*NOTE*: This is NOT your official score.") %><br/>
-          <a href="#" class="btn revert_all_scores_link"><%= image_tag "back.png" %> <%= t('links.revert_score', "Revert to Actual Score") %></a>
+          <a href="#" class="btn revert_all_scores_link"><%= image_tag "back.png", :alt => "" %> <%= t('links.revert_score', "Revert to Actual Score") %></a>
         </div>
     <% end %>
     <div class="show_all_details" style="font-size: 0.8em; margin-top: 10px;">
@@ -205,7 +205,7 @@
           <span class="tooltip_wrap right">
             <span class="tooltip_text"><%= t(:see_rubric_results, "See rubric results") %></span>
           </span>
-          <%= image_tag "rubric.png" %>
+          <%= image_tag "rubric.png", :alt => t('icons.rubric_results', 'See rubric results') %>
         </a>
         <% if @presenter.turnitin_enabled? %>
           <%
@@ -222,7 +222,7 @@
             end
           %>
           <a class="tooltip" title="<%= t('titles.turnitin_score', "Turnitin similarity score -- more information") %>" href="<%= url %>" style="<%= 'visibility: hidden;' if !turnitin %>" target="_blank">
-            <%= turnitin ? image_tag("turnitin_#{turnitin && turnitin[:state]}_score.png") : image_tag("blank.png", :alt => '') %>
+            <%= turnitin ? image_tag("turnitin_#{turnitin && turnitin[:state]}_score.png", :alt => t('icons.turnitin_results', 'See Turnitin results')) : image_tag("blank.png", :alt => '') %>
             <span class="tooltip_wrap right">
               <span class="tooltip_text"><%= t(:see_turnitin_results, "See Turnitin results") %></span>
             </span>
@@ -305,7 +305,7 @@
                 <div style="text-align: right; font-size: 0.8em; margin-right: 10px; clear: both;">
                   <% comment.attachments.each do |attachment| %>
                     <div>
-                      <a href="<%= context_url(@context, :context_assignment_submission_url, submission.assignment_id, submission.user_id, :download => attachment.id, :comment_id => comment.id) %>"><%= image_tag "file.png", :style => "height: 12px;" %><%= t('links.download', "Download %{attachment}", :attachment => attachment.display_name) %></a>
+                      <a href="<%= context_url(@context, :context_assignment_submission_url, submission.assignment_id, submission.user_id, :download => attachment.id, :comment_id => comment.id) %>"><%= image_tag "file.png", :style => "height: 12px;", :alt => "" %><%= t('links.download', "Download %{attachment}", :attachment => attachment.display_name) %></a>
                     </div>
                   <% end %>
                 </div>
@@ -331,12 +331,12 @@
   <% end %>
 </table>
 <% if @presenter.has_muted_assignments? %>
-  <small><%= image_tag "sound_mute.png" %><%= t(:student_mute_legend, "Your instructor is working on grades. While your instructor is working on grades, grade and comment information is unavailable.") %></small>
+  <small><%= image_tag "sound_mute.png", :alt => "" %><%= t(:student_mute_legend, "Your instructor is working on grades. While your instructor is working on grades, grade and comment information is unavailable.") %></small>
 <% end %>
 <div id="total_groups_weight" style="display: none;"><%= @presenter.total_weight %></div>
 <%= render :partial => "shared/rubric_criterion_dialog" %>
 <input type="text" style="width: 40px; display: none;" id="grade_entry"/>
-<a href="#" id="revert_score_template" class="revert_score_link" title="<%= t('titles.revert_score', "Revert to original score") %>"><%= image_tag "back.png" %></a>
+<a href="#" id="revert_score_template" class="revert_score_link" title="<%= t('titles.revert_score', "Revert to original score") %>"><%= image_tag "back.png", :alt => "" %></a>
 <a href="<%= context_url(@context, :context_assignment_submission_url, "{{ assignment_id }}", @presenter.student_id) %>" class="update_submission_url" style="display: none;">&nbsp;</a>
 <% if @context.grading_standard_enabled? %>
   <% js_block do %>

@@ -13,20 +13,6 @@
   position: relative;
 }
 
-#calendar-header {
-  position: absolute;
-  right: 0;
-  top: 0;
-  width: 55%;
-  &.with-scheduler {
-    width: 58%;
-  }
-}
-
-#change-calendar-version {
-  float: right;
-}
-
 .calendar {
   .fc-content {
     background-color: white;
@@ -110,38 +96,6 @@
     display: inline;
   }
   background-color: white;
-}
-
-.counter-badge {
-  @include border-radius(8px);
-  background-color: #3cb5fb;
-  color: white;
-  text-shadow: 1px 0px 1px rgba(0, 0, 0, 0.3);
-  box-shadow: inset 1px 0px 1px rgba(0, 0, 0, 0.3);
-  padding: 1px 6px;
-}
-
-#refresh_calendar_link {
-  @include hide_text;
-  width: 16px;
-  height: 16px;
-  float: right;
-  background-image: url("/images/ajax-loader-black-on-white-static.gif");
-  background-position: 50% 50%;
-  margin-left: 3px;
-  position: relative;
-  top: 7px;
-  &.loading {
-    background-image: url("/images/ajax-loader-black-on-white.gif");
-  }
-}
-
-#create_new_event_link {
-  float: right;
-  position: relative;
-  top: 3px;
-  color: #444444;
-  margin-left: 5px;
 }
 
 .event-details {
@@ -289,13 +243,6 @@
   .max-participants {
     width: 40px;
   }
-}
-
-.whats-new {
-  float: right;
-  margin-right: 10px;
-  line-height: 32px;
-  font-size: 11px;
 }
 
 .event_button {

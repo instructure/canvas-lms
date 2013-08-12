@@ -22,8 +22,13 @@
   js_bundle :assignment_edit
 %>
 
-<form id="edit_assignment_form" class="form-horizontal bootstrap-form">
-</form>
+<div id="edit_assignment_header" class="header-bar">
+</div>
+
+<div id="edit_assignment_wrapper">
+  <form id="edit_assignment_form" class="form-horizontal bootstrap-form">
+  </form>
+</div>
 
 <%= render "groups/add_group_category" %>
 <%= render "shared/select_content_dialog", :only => [:external_tools] %>

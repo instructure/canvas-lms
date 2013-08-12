@@ -1,0 +1,19 @@
+<div class="{{#if editable}}editable{{/if}}">
+  <h2 class="page-header screenreader-only">{{#t "course_modules"}}Course Modules{{/t}}</h2>
+  <div class="modules-toolbar">
+    <div class="pull-right editable-show">
+      <a href="#" class="btn preview-modules-button">
+        {{#t "button.preview"}}Preview{{/t}}
+      </a>
+      <a href="#" class="btn btn-primary add-module-button">
+        <i class="icon-plus"></i> {{#t "header.module"}}Module{{/t}}
+      </a>
+      <a href="#" class="btn modules-settings-button">
+        <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
+      </a>
+    </div>
+    <input type="search" placeholder="Search for module or item inside module" class="module-search" />
+  </div>
+  <div class="item-group-container modules collectionViewItems"></div>
+</div>
+<!-- div class="paginatedLoadingIndicator" style="display: none"></div -->

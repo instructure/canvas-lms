@@ -4,7 +4,7 @@ define [
   'i18n!create_users_view'
   'compiled/views/DialogFormView'
   'jst/courses/roster/createUsers'
-  'jst/courses/roster/createUsersWrapper'
+  'jst/EmptyDialogFormWrapper'
   'vendor/jquery.placeholder'
 ], (CreateUserList, _, I18n, DialogFormView, template, wrapper) ->
 

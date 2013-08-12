@@ -63,14 +63,16 @@
 
       <div class="span4 right-align">
         <a href='#' class='btn topic-subscribe-button' data-tooltip="bottom"
-           title="<%= t('topic_subscribe_tooltip', 'You will be notified when comments are posted to this topic.') %>" >
+           title="<%= t('topic_subscribe_tooltip', 'You are unsubscribed and will not be notified of new comments') %>"
+           aria-label="<%= t('topic_subscribe_tooltip', 'You are unsubscribed and will not be notified of new comments') %>">
           <i class='icon-discussion-check' aria-hidden="hidden"></i>
           <%= t(:topic_subscribe, 'Subscribe') %>
         </a>
         <a href='#' class='btn topic-unsubscribe-button btn-success' data-tooltip="bottom"
-           title="<%= t('topic_unsubscribe_tooltip', 'No longer receive notifications when comments are posted to this topic.') %>" >
+           title="<%= t('topic_subscribed_tooltip', 'You are subscribed and will be notified of new comments') %>"
+           aria-label="<%= t('topic_subscribed_tooltip', 'You are subscribed and will be notified of new comments') %>">
           <i class='icon-discussion-check' aria-hidden="hidden"></i>
-          <%= t(:topic_unsubscribe, 'Unsubscribe') %>
+          <%= t(:topic_unsubscribe, 'Subscribed') %>
         </a>
         <% if @topic.grants_right?(@current_user, nil, :update) %>
           <a href="<%= context_url(@topic.context,
@@ -153,14 +155,14 @@
         <%= render :partial => 'assignment_details' %>
       <% end %>
       <header class="discussion-section clearfix">
-        <%= avatar((@topic.user), @context.asset_string) %>
+        <%= avatar((@topic.user), @context.asset_string, 50, image_class: 'img-circle') %>
         <div class="discussion-header-content right-of-avatar">
 
           <div class="discussion-header-right pull-right">
-            <div class="discussion-pubdate"><%= friendly_datetime @topic.created_at %></div>
+            <div class="discussion-pubdate"><%= friendly_datetime @topic.posted_at %></div>
             <%= render :partial => 'new_and_total_badge', :locals => { :unread_count => @topic.unread_count(@current_user), :reply_count => @topic.discussion_subentry_count } %>
           </div>
-          <div class="discussion-title"><%= @topic.title %></div>
+          <h1 class="discussion-title"><%= @topic.title %></h1>
           <div class="discussion-subtitle">
             <a class="author" href="<%= context_url(@topic.context, :context_user_url, @topic.user_id) %>" title="<%= t :authors_name, "Author's name" %>"><%= context_user_name(@topic.context, @topic.user) %></a>
           </div>

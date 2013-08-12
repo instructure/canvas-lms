@@ -12,9 +12,11 @@ require [
     # Public: I18n strings.
     messages:
       lists:
-        open:   I18n.t('open_discussions',   'Open Discussions')
-        locked: I18n.t('locked_discussions', 'Locked Discussions')
-        pinned: I18n.t('pinned_discussions', 'Pinned Discussions')
+        open:   I18n.t('discussions',         'Discussions')
+        locked: I18n.t('closed_for_comments', 'Closed for Comments')
+        pinned: I18n.t('pinned_discussions',  'Pinned Discussions')
+      help:
+        title: I18n.t('ordered_by_recent_activity', 'Ordered by Recent Activity')
 
     # Public: Routes to respond to.
     routes:
@@ -25,17 +27,16 @@ require [
         open: @_createListView 'open',
           comparator: 'dateComparator'
           draggable: true
-          destination: '.pinned.discussion-list'
-          pinnable: ENV.permissions.change_settings
+          destination: '.pinned.discussion-list, .locked.discussion-list'
         locked: @_createListView 'locked',
           comparator: 'dateComparator'
-          pinnable: false
+          destination: '.pinned.discussion-list, .open.discussion-list'
+          draggable: true
+          locked: true
         pinned: @_createListView 'pinned',
           comparator: 'positionComparator'
-          destination: '.open.discussion-list'
-          lockable: false
+          destination: '.open.discussion-list, .locked.discussion-list'
           sortable: true
-          pinnable: ENV.permissions.change_settings
           pinned: true
 
     # Public: The index page action.
@@ -69,17 +70,19 @@ require [
     _createListView: (type, options = {}) ->
       comparator = DiscussionTopicsCollection[options.comparator]
       delete options.comparator
-
       new DiscussionListView
         collection: new DiscussionTopicsCollection([], comparator: comparator)
         className: type
-        title: @messages.lists[type]
-        listID: "#{type}-discussions"
-        itemViewOptions: options
-        sortable: !!options.sortable
-        draggable: !!options.draggable
         destination: options.destination
-        pinned: options.pinned
+        draggable: !!options.draggable
+        itemViewOptions: _.extend(options, pinnable: ENV.permissions.moderate)
+        listID: "#{type}-discussions"
+        locked: !!options.locked
+        pinnable: ENV.permissions.moderate
+        pinned: !!options.pinned
+        sortable: !!options.sortable
+        title: @messages.lists[type]
+        titleHelp: (if _.include(['open', 'locked'], type) then @messages.help.title else null)
 
     # Internal: Attach events to the discussion topic collections.
     #
@@ -105,6 +108,11 @@ require [
     # Returns nothing.
     _onPipelineEnd: =>
       view.collection.trigger('fetched:last') for key, view of @discussions
+      unless @discussions.pinned.collection.length or ENV.permissions.moderate
+        @discussions.pinned.$el.remove()
+
+      if @discussions.pinned.collection.length and !@discussions.open.collection.length and !ENV.permissions.moderate
+        @discussions.open.$el.remove()
 
     # Internal: Sort the given collection into the open, locked, and pinned
     # collections of topics.

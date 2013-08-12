@@ -31,6 +31,10 @@ describe PseudonymSessionsController do
   end
 
   context "cas" do
+    before do
+      account_with_cas(account: Account.default)
+    end
+
     def stubby(stub_response)
       @cas_client = CASClient::Client.new({:cas_base_url => @account.account_authorization_config.auth_base})
       @cas_client.instance_variable_set(:@stub_response, stub_response)
@@ -41,7 +45,6 @@ describe PseudonymSessionsController do
     end
 
     it "should log in and log out a user CAS has validated" do
-      account_with_cas({:account => Account.default})
       user = user_with_pseudonym({:active_all => true})
 
       stubby("yes\n#{user.pseudonyms.first.unique_id}\n")
@@ -51,15 +54,13 @@ describe PseudonymSessionsController do
 
       get cas_login_url :ticket => 'ST-abcd'
       response.should redirect_to(dashboard_url(:login_success => 1))
-      session[:cas_login].should == true
+      session[:cas_session].should == 'ST-abcd'
 
       get logout_url
       response.should redirect_to(@cas_client.logout_url(cas_login_url))
     end
 
     it "should inform the user CAS validation denied" do
-      account_with_cas({:account => Account.default})
-
       stubby("no\n\n")
 
       get login_url
@@ -71,8 +72,6 @@ describe PseudonymSessionsController do
     end
 
     it "should inform the user CAS validation failed" do
-      account_with_cas({:account => Account.default})
-
       stubby('')
       def @cas_client.validate_service_ticket(st)
         raise "Nope"
@@ -87,8 +86,6 @@ describe PseudonymSessionsController do
     end
 
     it "should inform the user that CAS account doesn't exist" do
-      account_with_cas({:account => Account.default})
-
       stubby("yes\nnonexistentuser\n")
 
       get login_url
@@ -101,7 +98,6 @@ describe PseudonymSessionsController do
     end
 
     it "should login case insensitively" do
-      account_with_cas({:account => Account.default})
       user = user_with_pseudonym({:active_all => true})
 
       stubby("yes\n#{user.pseudonyms.first.unique_id.capitalize}\n")
@@ -111,7 +107,81 @@ describe PseudonymSessionsController do
 
       get cas_login_url :ticket => 'ST-abcd'
       response.should redirect_to(dashboard_url(:login_success => 1))
-      session[:cas_login].should == true
+      session[:cas_session].should == 'ST-abcd'
+    end
+
+    context "single sign out" do
+      before do
+        pending "needs redis" unless Canvas.redis_enabled?
+      end
+
+      it "should do a single sign out" do
+        user = user_with_pseudonym({:active_all => true})
+
+        stubby("yes\n#{user.pseudonyms.first.unique_id}\n")
+
+        get login_url
+        redirect_until(@cas_client.add_service_to_login_url(cas_login_url))
+
+        get cas_login_url :ticket => 'ST-abcd'
+        response.should redirect_to(dashboard_url(:login_success => 1))
+        session[:cas_session].should == 'ST-abcd'
+        Canvas.redis.get("cas_session:ST-abcd").should == @pseudonym.global_id.to_s
+
+        # pretend we lost the cache somehow
+        Canvas.redis.del("cas_session:ST-abcd")
+        Canvas.redis.get("cas_session:ST-abcd").should == nil
+
+        back_channel = open_session
+
+        # single-sign-out from CAS server has no effect now
+        back_channel.post cas_logout_url, :logoutRequest => <<-SAML
+<samlp:LogoutRequest xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" ID="1371236167rDkbdl8FGzbqwBhICvi" Version="2.0" IssueInstant="Fri, 14 Jun 2013 12:56:07 -0600">
+<saml:NameID></saml:NameID>
+<samlp:SessionIndex>ST-abcd</samlp:SessionIndex>
+</samlp:LogoutRequest>
+        SAML
+        back_channel.response.status.should == '404 Not Found'
+
+        # this should refresh it
+        get dashboard_url
+        response.should be_success
+        Canvas.redis.get("cas_session:ST-abcd").should == @pseudonym.global_id.to_s
+
+        # unrelated logout should have no effect
+        back_channel.post cas_logout_url :garbage => 1
+        back_channel.response.status.should == '404 Not Found'
+
+        back_channel.post cas_logout_url :logoutRequest => "garbage"
+        back_channel.response.status.should == '404 Not Found'
+
+        back_channel.post cas_logout_url :logoutRequest => <<-SAML
+<samlp:LogoutRequest xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" ID="1371236167rDkbdl8FGzbqwBhICvi" Version="2.0" IssueInstant="Fri, 14 Jun 2013 12:56:07 -0600">
+<saml:NameID></saml:NameID>
+<samlp:SessionIndex>ST-abc</samlp:SessionIndex>
+</samlp:LogoutRequest>
+        SAML
+        back_channel.response.status.should == '404 Not Found'
+
+        # still logged in
+        get dashboard_url
+        response.should be_success
+        Canvas.redis.get("cas_session:ST-abcd").should == @pseudonym.global_id.to_s
+
+        # this time it works
+        back_channel.post cas_logout_url :logoutRequest => <<-SAML
+<samlp:LogoutRequest xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" ID="1371236167rDkbdl8FGzbqwBhICvi" Version="2.0" IssueInstant="Fri, 14 Jun 2013 12:56:07 -0600">
+<saml:NameID></saml:NameID>
+<samlp:SessionIndex>ST-abcd</samlp:SessionIndex>
+</samlp:LogoutRequest>
+        SAML
+        back_channel.response.should be_success
+        Canvas.redis.get("cas_session:ST-abcd").should == nil
+
+        # logged out!
+        get dashboard_url
+        redirect_until(@cas_client.add_service_to_login_url(cas_login_url))
+      end
     end
   end
 

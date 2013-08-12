@@ -27,6 +27,7 @@ describe EventStream do
     def @database.insert_record(*args); end
     def @database.update(*args); end
     ::Canvas::Cassandra::Database.stubs(:from_config).with(@database_name.to_s).returns(@database)
+    ::Canvas::Cassandra::Database.stubs(:configured?).with(@database_name.to_s).returns(true)
   end
 
   context "setup block" do
@@ -97,7 +98,7 @@ describe EventStream do
 
     describe "on_insert" do
       before do
-        @record = stub(:id => stub('id'), :attributes => stub('attributes'))
+        @record = stub(:id => stub('id'), :created_at => Time.now, :attributes => stub('attributes'))
       end
 
       it "should register callback for execution during insert" do
@@ -126,7 +127,7 @@ describe EventStream do
 
     describe "insert" do
       before do
-        @record = stub(:id => stub('id'), :attributes => stub('attributes'))
+        @record = stub(:id => stub('id'), :created_at => Time.now, :attributes => stub('attributes'))
       end
 
       it "should insert into the configured database" do
@@ -135,19 +136,24 @@ describe EventStream do
       end
 
       it "should insert into the configured table" do
-        @database.expects(:insert_record).with(@table.to_s, anything, anything)
+        @database.expects(:insert_record).with(@table.to_s, anything, anything, anything)
         @stream.insert(@record)
       end
 
       it "should insert by the record's id into the configured id column" do
         id_column = stub(:to_s => stub('id_column'))
         @stream.id_column id_column
-        @database.expects(:insert_record).with(anything, { id_column.to_s => @record.id }, anything)
+        @database.expects(:insert_record).with(anything, { id_column.to_s => @record.id }, anything, anything)
         @stream.insert(@record)
       end
 
       it "should insert the record's attributes" do
-        @database.expects(:insert_record).with(anything, anything, @record.attributes)
+        @database.expects(:insert_record).with(anything, anything, @record.attributes, anything)
+        @stream.insert(@record)
+      end
+
+      it "should set the record's ttl" do
+        @database.expects(:insert_record).with(anything, anything, anything, @stream.ttl_seconds(@record))
         @stream.insert(@record)
       end
 
@@ -163,7 +169,7 @@ describe EventStream do
 
     describe "on_update" do
       before do
-        @record = stub(:id => stub('id'), :changes => stub('changes'))
+        @record = stub(:id => stub('id'), :created_at => Time.now, :changes => stub('changes'))
       end
 
       it "should register callback for execution during update" do
@@ -192,7 +198,7 @@ describe EventStream do
 
     describe "update" do
       before do
-        @record = stub(:id => stub('id'), :changes => stub('changes'))
+        @record = stub(:id => stub('id'), :created_at => Time.now, :changes => stub('changes'))
       end
 
       it "should update in the configured database" do
@@ -201,19 +207,24 @@ describe EventStream do
       end
 
       it "should update in the configured table" do
-        @database.expects(:update_record).with(@table.to_s, anything, anything)
+        @database.expects(:update_record).with(@table.to_s, anything, anything, anything)
         @stream.update(@record)
       end
 
       it "should update by the record's id in the configured id column" do
         id_column = stub(:to_s => stub('id_column'))
         @stream.id_column id_column
-        @database.expects(:update_record).with(anything, { id_column.to_s => @record.id }, anything)
+        @database.expects(:update_record).with(anything, { id_column.to_s => @record.id }, anything, anything)
         @stream.update(@record)
       end
 
       it "should update the record's changes" do
-        @database.expects(:update_record).with(anything, anything, @record.changes)
+        @database.expects(:update_record).with(anything, anything, @record.changes, anything)
+        @stream.update(@record)
+      end
+
+      it "should set the record's ttl" do
+        @database.expects(:update_record).with(anything, anything, anything, @stream.ttl_seconds(@record))
         @stream.update(@record)
       end
 
@@ -258,11 +269,12 @@ describe EventStream do
       it "should map the returned rows to the configured record type" do
         record_type = stub('record_type')
         raw_result = stub('raw_result')
+        cql_result = stub('cql_result', :to_hash => raw_result)
         typed_result = stub('typed_result')
         record_type.expects(:from_attributes).with(raw_result).returns(typed_result)
 
         @stream.record_type record_type
-        @results.expects(:fetch).yields(raw_result)
+        @results.expects(:fetch).yields(cql_result)
         @database.expects(:execute).once.returns(@results)
         results = @stream.fetch([1])
         results.should == [typed_result]
@@ -291,20 +303,20 @@ describe EventStream do
         before do
           @record = stub(
             :id => stub('id'),
-            :created_at => stub('created_at', :to_i => 0),
+            :created_at => Time.now,
             :attributes => stub('attributes'),
             :changes => stub('changes'),
             :entry => @entry
           )
         end
 
-        it "should insert the record with id and created_at" do
-          @index.expects(:insert).once.with(@record.id, anything, @record.created_at)
+        it "should insert the provided record into the index" do
+          @index.expects(:insert).once.with(@record, anything)
           @stream.insert(@record)
         end
 
         it "should translate the record through the entry_proc for the key" do
-          @index.expects(:insert).once.with(anything, @entry, anything)
+          @index.expects(:insert).once.with(anything, @entry)
           @stream.insert(@record)
         end
 
@@ -316,21 +328,27 @@ describe EventStream do
 
         it "should translate the result of the entry_proc through the key_proc if present" do
           @index.key_proc lambda{ |entry| entry.key }
-          @index.expects(:insert).once.with(anything, @key, anything)
+          @index.expects(:insert).once.with(anything, @key)
           @stream.insert(@record)
         end
       end
 
       describe "generated for_thing method" do
         it "should forward argument to index's for_key" do
-          @index.expects(:for_key).once.with(@entry)
+          @index.expects(:for_key).once.with(@entry, {})
           @stream.for_thing(@entry)
         end
 
         it "should translate argument through key_proc if present" do
           @index.key_proc lambda{ |entry| entry.key }
-          @index.expects(:for_key).once.with(@key)
+          @index.expects(:for_key).once.with(@key, {})
           @stream.for_thing(@entry)
+        end
+
+        it "should permit and forward options" do
+          options = {oldest: 1.day.ago}
+          @index.expects(:for_key).once.with(@entry, options)
+          @stream.for_thing(@entry, options)
         end
       end
     end
@@ -341,6 +359,7 @@ describe EventStream do
         @stream.stubs(:database).returns(@database)
         @record = stub(
           :id => 'id',
+          :created_at => Time.now,
           :attributes => {'attribute' => 'attribute_value'},
           :changes => {'changed_attribute' => 'changed_value'})
         @exception = Exception.new

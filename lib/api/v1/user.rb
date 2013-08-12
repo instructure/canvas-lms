@@ -75,6 +75,10 @@ module Api::V1::User
     end
   end
 
+  def users_json(users, current_user, session, includes = [], context = @context, enrollments = nil)
+    users.map{ |user| user_json(user, current_user, session, includes, context, enrollments) }
+  end
+
   # this mini-object is used for secondary user responses, when we just want to
   # provide enough information to display a user.
   # for instance, discussion entries return this json as a sub-object.

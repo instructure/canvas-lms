@@ -244,6 +244,16 @@ describe AssignmentsController do
       get 'new', :course_id => @course.id
       assert_unauthorized
     end
+
+    it "should default to unpublished for draft state" do
+      course_with_student(:active_all => true)
+      @course.root_account.tap{ |a| a.settings[:enable_draft] = true }.save!
+      @course.require_assignment_group
+
+      get 'new', :course_id => @course.id
+
+      assigns[:assignment].workflow_state.should == 'unpublished'
+    end
   end
   
   describe "POST 'create'" do

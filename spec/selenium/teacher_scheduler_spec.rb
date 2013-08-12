@@ -162,7 +162,7 @@ describe "scheduler" do
     end
 
     it "should send messages to appropriate participants" do
-      gc = @course.group_categories.create!
+      gc = group_category
       ug1 = @course.groups.create!(:group_category => gc)
       ug1.users << student1 = student_in_course(:course => @course, :active_all => true).user
       ug1.users << student2 = student_in_course(:course => @course, :active_all => true).user
@@ -282,7 +282,7 @@ describe "scheduler" do
       fj('.fc-event:visible').click
 
       keep_trying_until { ff('#attendees li').size.should == 1 }
-      f('.single_item_done_button').click
+      f('.scheduler_done_button').click
     end
 
     it "should allow removing individual appointment groups" do
@@ -323,7 +323,7 @@ describe "scheduler" do
       wait_for_ajaximations
       fj('.fc-event:visible').click
       ff('#attendees li').size.should == 1
-      f('.single_item_done_button').click
+      f('.scheduler_done_button').click
     end
 
     it "should allow me to create a course with multiple contexts" do

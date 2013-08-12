@@ -29,7 +29,7 @@ module Canvas::AccountReports
       if @account_report.has_parameter? "include_deleted"
         @include_deleted = @account_report.parameters["include_deleted"]
         @account_report.parameters["extra_text"] << I18n.t(
-          'account_reports.grades.deleted',' Include Deleted Objects: true;')
+          'account_reports.grades.deleted', ' Include Deleted Objects: true;')
       end
     end
 
@@ -87,7 +87,7 @@ module Canvas::AccountReports
             FROM enrollments
             WHERE type = 'StudentEnrollment'
             AND root_account_id = :root_account_id
-            " + (@include_deleted ? "" :"AND workflow_state = 'active'") + "
+	    " + (@include_deleted ? "" : "AND workflow_state = 'active'") + "
             GROUP BY user_id, course_id, course_section_id
           ) e ON pseudonyms.user_id = e.user_id
           INNER JOIN courses c ON c.id = e.course_id
@@ -124,7 +124,7 @@ module Canvas::AccountReports
       headers = ['student name', 'student id', 'student sis id',
                  'assignment title', 'assignment id', 'submission date',
                  'submission score', 'learning outcome name',
-                 'learning outcome id', 'attempt','outcome score',
+                 'learning outcome id', 'attempt', 'outcome score',
                  'course name', 'course id', 'course sis id', 'section name',
                  'section id', 'section sis id', 'assignment url']
 
@@ -132,17 +132,19 @@ module Canvas::AccountReports
       filename = Canvas::AccountReports.generate_file(@account_report)
       CSV.open(filename, "w") do |csv|
         csv << headers
-        students.find_each_with_temp_table do |row|
-          row['assignment url'] =
-            "https://#{host}" +
-              "/courses/#{row['course id']}" +
-              "/assignments/#{row['assignment id']}"
-          row['submission date']=default_timezone_format(row['submission date'])
-          csv << headers.map { |h| row[h] }
-          if i % 5 == 0
-            @account_report.update_attribute(:progress, (i.to_f/total)*100)
+        Shackles.activate(:slave) do
+          students.find_each do |row|
+            row['assignment url'] =
+              "https://#{host}" +
+                "/courses/#{row['course id']}" +
+                "/assignments/#{row['assignment id']}"
+            row['submission date']=default_timezone_format(row['submission date'])
+            csv << headers.map { |h| row[h] }
+            if i % 5 == 0
+              @account_report.update_attribute(:progress, (i.to_f/total)*100)
+            end
+            i += 1
           end
-          i += 1
         end
         csv << ['No outcomes found'] if total == 0
       end
@@ -168,6 +170,7 @@ module Canvas::AccountReports
     # - term sis id
     # - student current score
     # - student final score
+    # - enrollment status
 
     def grade_export()
       students = root_account.pseudonyms.except(:includes).
@@ -177,7 +180,10 @@ module Canvas::AccountReports
                 e.course_section_id, s.sis_source_id AS section_sis_id,
                 t.name AS term_name, t.id AS term_id,
                 t.sis_source_id AS term_sis_id, e.computed_current_score,
-                e.computed_final_score").
+		            e.computed_final_score,
+		       CASE WHEN e.workflow_state = 'active' THEN 'active'
+		            WHEN e.workflow_state = 'completed' THEN 'concluded'
+		            WHEN e.workflow_state = 'deleted' THEN 'deleted' END AS enroll_state").
         order("t.id, c.id, e.id").
         joins("INNER JOIN users u ON pseudonyms.user_id = u.id
                INNER JOIN enrollments e ON pseudonyms.user_id = e.user_id
@@ -186,11 +192,13 @@ module Canvas::AccountReports
                INNER JOIN enrollment_terms t ON c.enrollment_term_id = t.id
                INNER JOIN course_sections s ON e.course_section_id = s.id")
 
-      unless @include_deleted
+      if @include_deleted
+        students = students.where("e.workflow_state IN ('active', 'completed', 'deleted')")
+      else
         students = students.where(
           "pseudonyms.workflow_state<>'deleted'
-                          AND c.workflow_state='available'
-                          AND e.workflow_state IN ('active', 'completed')")
+	     AND c.workflow_state='available'
+	     AND e.workflow_state IN ('active', 'completed')")
       end
 
       students = add_course_sub_account_scope(students, 'c')
@@ -200,25 +208,28 @@ module Canvas::AccountReports
       CSV.open(file, "w") do |csv|
         csv << ['student name', 'student id', 'student sis', 'course',
                 'course id', 'course sis', 'section', 'section id',
-                'section sis', 'term', 'term id', 'term sis','current score',
-                'final score']
-        students.find_each_with_temp_table do |student|
-          arr = []
-          arr << student["user_name"]
-          arr << student["user_id"]
-          arr << student["sis_user_id"]
-          arr << student["course_name"]
-          arr << student["course_id"]
-          arr << student["course_sis_id"]
-          arr << student["section_name"]
-          arr << student["course_section_id"]
-          arr << student["section_sis_id"]
-          arr << student["term_name"]
-          arr << student["term_id"]
-          arr << student["term_sis_id"]
-          arr << student["computed_current_score"]
-          arr << student["computed_final_score"]
-          csv << arr
+                'section sis', 'term', 'term id', 'term sis', 'current score',
+                'final score', 'enrollment state']
+        Shackles.activate(:slave) do
+          students.find_each do |student|
+            arr = []
+            arr << student["user_name"]
+            arr << student["user_id"]
+            arr << student["sis_user_id"]
+            arr << student["course_name"]
+            arr << student["course_id"]
+            arr << student["course_sis_id"]
+            arr << student["section_name"]
+            arr << student["course_section_id"]
+            arr << student["section_sis_id"]
+            arr << student["term_name"]
+            arr << student["term_id"]
+            arr << student["term_sis_id"]
+            arr << student["computed_current_score"]
+            arr << student["computed_final_score"]
+            arr << student["enroll_state"]
+            csv << arr
+          end
         end
       end
 

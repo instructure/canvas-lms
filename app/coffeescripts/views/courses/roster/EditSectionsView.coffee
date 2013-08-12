@@ -33,6 +33,8 @@ define [
       @$('#section_input').contextSearch
         contexts: ENV.CONTEXTS
         placeholder: I18n.t 'edit_sections_placeholder', 'Enter a section name'
+        title: I18n.t 'edit_sections_title', 'Section name'
+        onNewToken: @onNewToken
         added: (data, $token, newToken) =>
           @$('#user_sections').append $token
         selector:
@@ -46,9 +48,9 @@ define [
               per_page: 100
               type: 'section'
               search_all_contexts: true
-      input = @$('#section_input').data('token_input')
-      input.$fakeInput.css('width', '100%')
-      input.tokenValues = =>
+      @input = @$('#section_input').data('token_input')
+      @input.$fakeInput.css('width', '100%')
+      @input.tokenValues = =>
         input.value for input in @$('#user_sections input')
 
       $sections = @$('#user_sections')
@@ -56,6 +58,13 @@ define [
         if section = ENV.CONTEXTS['sections'][e.course_section_id]
           $sections.append sectionTemplate(id: section.id, name: section.name, role: e.role)
 
+    onNewToken: ($token) =>
+      $link = $token.find('a')
+      $link.attr('href', '#')
+      $link.attr('title', I18n.t("remove_user_from_course_section", "Remove user from %{course_section}", course_section: $token.find('div').attr('title')))
+      $screenreader_span = $('<span class="screenreader-only"></span>').append(I18n.t("remove_user_from_course_section",
+        "Remove user from %{course_section}", course_section: $token.find('div').attr('title')))
+      $link.append($screenreader_span)
 
     update: (e) =>
       e.preventDefault()
@@ -95,6 +104,8 @@ define [
         .always => @close())
 
     removeSection: (e) ->
+      e.preventDefault()
       $token = $(e.currentTarget).closest('li')
       if $token.closest('ul').children().length > 1
         $token.remove()
+      @input.$input.focus()

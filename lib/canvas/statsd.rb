@@ -35,6 +35,11 @@
 #
 # If statsd isn't configured and enabled, then calls to Canvas::Statsd.* will do nothing and return nil
 module Canvas::Statsd
+  # replace "." in key names with another character to avoid creating spurious sub-folders in graphite
+  def self.escape(str, replacement = '_')
+    str.gsub('.', replacement)
+  end
+
   def self.hostname
     @hostname ||= Socket.gethostname.split(".").first
   end

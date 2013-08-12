@@ -22,6 +22,7 @@ class Canvas::Migration::Worker::CourseCopyWorker < Struct.new(:migration_id)
     cm.workflow_state = :pre_processing
     cm.reset_job_progress
     cm.migration_settings[:skip_import_notification] = true
+    cm.migration_settings[:import_immediately] = true
     cm.save
     cm.job_progress.start
 
@@ -62,7 +63,7 @@ class Canvas::Migration::Worker::CourseCopyWorker < Struct.new(:migration_id)
           cm.context.copy_attachments_from_course(source, :content_export => ce, :content_migration => cm)
           cm.update_import_progress(20)
 
-          cm.import_content_without_send_later
+          cm.import_content
           cm.workflow_state = :imported
           cm.save
           cm.update_import_progress(100)

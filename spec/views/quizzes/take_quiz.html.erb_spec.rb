@@ -23,13 +23,15 @@ describe "/quizzes/take_quiz" do
   it "should render" do
     course_with_student
     view_context
-    assigns[:quiz] = @course.quizzes.create!
+    assigns[:quiz] = @course.quizzes.create!(:description => "Hello")
     assigns[:submission] = assigns[:quiz].generate_submission(@user)
     assigns[:quiz_presenter] = TakeQuizPresenter.new(assigns[:quiz],
                                                      assigns[:submission],
                                                      params
                                                     )
     render "quizzes/take_quiz"
+    doc = Nokogiri::HTML(response.body)
+    doc.css('#quiz-instructions').first.content.strip.should == "Hello"
     response.should_not be_nil
   end
 end

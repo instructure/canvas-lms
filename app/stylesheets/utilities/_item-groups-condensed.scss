@@ -1,0 +1,213 @@
+@import 'environment';
+
+/* @styleguide Item Groups Condensed
+
+Item groups come either `item-group` or `item-group-condensed` styles.
+The `item-group` style is for draggable items and `item-group-condensed`
+is for items that are not draggable.
+
+The outer `item-group-container` div is optional, and adds a background
+color with a dashed line between groups.
+
+```html
+<div class="item-group-container">
+
+  <div class="item-group-condensed">
+    <h2 class="ig-header">
+      <a class="element_toggler" href="#"
+         aria-controls="cond_group_1"
+         aria-expanded="true">
+        <i class="icon-mini-arrow-down"></i> Item Group Header
+      </a>
+    </h2>
+
+    <ul class="ig-list" id="cond_group_1">
+      <li>
+        <div class="ig-row">
+          <a href="#" class="ig-title ellipses">
+            <i class="icon-assignment"></i> Some Assignment
+          </a>
+          <div class="ig-details row-fluid">
+            <div class="span4 ellipses"><b>Due</b> Nov 4, 2012</div>
+            <div class="span4 ellipses"><b>Available</b> Nov 1</div>
+            <div class="span4 ellipses">10 pts</div>
+          </div>
+          <div class="ig-admin">
+            <span class="publish-icon publish-icon-published" data-tooltip title="Unpublish">
+              <i class="icon-publish"></i><span class="publish-text">&nbsp;Published</span>
+            </span>
+
+            <a class="al-trigger al-trigger-gray">
+              <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
+            </a>
+            <ul class="al-options">
+              <li><a href="#">Edit</a></li>
+              <li><a href="#">Delete</a></li>
+            </ul>
+          </div>
+        </div>
+      </li>
+
+      <li>
+        <div class="ig-row ig-published">
+          <a href="#" class="ig-title ellipses">
+            <i class="icon-assignment"></i> Some Assignment
+          </a>
+          <div class="ig-details row-fluid">
+            <div class="span4 ellipses"><b>Due</b> Nov 4, 2012</div>
+            <div class="span4 ellipses"><b>Available</b> Nov 1</div>
+            <div class="span4 ellipses">10 pts</div>
+          </div>
+          <div class="ig-admin">
+            <span class="publish-icon publish-icon-published" data-tooltip title="Unpublish">
+              <i class="icon-publish"></i><span class="publish-text">&nbsp;Published</span>
+            </span>
+
+            <a class="al-trigger al-trigger-gray">
+              <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
+            </a>
+            <ul class="al-options">
+              <li><a href="#">Edit</a></li>
+              <li><a href="#">Delete</a></li>
+            </ul>
+          </div>
+        </div>
+      </li>
+
+      <li>
+        <div class="ig-row">
+          <a href="#" class="ig-title ellipses">
+            <i class="icon-assignment"></i> Some Assignment
+          </a>
+          <div class="ig-details row-fluid">
+            <div class="span4 ellipses"><b>Due</b> Nov 4, 2012</div>
+            <div class="span4 ellipses"><b>Available</b> Nov 1</div>
+            <div class="span4 ellipses">10 pts</div>
+          </div>
+          <div class="ig-admin">
+            <span class="publish-icon publish-icon-published" data-tooltip title="Unpublish">
+              <i class="icon-publish"></i><span class="publish-text">&nbsp;Published</span>
+            </span>
+
+            <a class="al-trigger al-trigger-gray">
+              <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
+            </a>
+            <ul class="al-options">
+              <li><a href="#">Edit</a></li>
+              <li><a href="#">Delete</a></li>
+            </ul>
+          </div>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <div class="item-group-condensed">
+    <h2 class="ig-header">
+      <a class="element_toggler" href="#"
+         aria-controls="cond_group_2"
+         aria-expanded="true">
+        <i class="icon-mini-arrow-down"></i> Item Group Header
+      </a>
+    </h2>
+    <ul class="ig-list" id="cond_group_2">
+    <li>
+      <div class="ig-row">
+        <a href="#" class="ig-title ellipses">
+          <i class="icon-assignment"></i> Some Assignment
+        </a>
+        <div class="ig-details row-fluid">
+          <div class="span4 ellipses"><b>Due</b> Nov 4, 2012</div>
+          <div class="span4 ellipses"><b>Available</b> Nov 1</div>
+          <div class="span4 ellipses">10 pts</div>
+        </div>
+        <div class="ig-admin">
+          <span class="publish-icon publish-icon-published" data-tooltip title="Unpublish">
+            <i class="icon-publish"></i><span class="publish-text">&nbsp;Published</span>
+          </span>
+
+          <a class="al-trigger al-trigger-gray" role="button" aria-haspopup="true" aria-owns="content-1" tabindex="-1">
+            <i class="icon-settings"></i>
+            <i class="icon-mini-arrow-down"></i>
+            <span class="screenreader-only">Settings</span>
+          </a>
+
+          <ul id="content-1" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="content-2">
+            <li role="presentation">
+              <a href="#" class="icon-edit" id="content-2" tabindex="-1" role="menuitem" title="Edit">Edit</a>
+            </li>
+            <li role="presentation">
+              <a href="#" class="icon-trash" id="content-3" tabindex="-1" role="menuitem" title="Delete this module">Delete</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </li>
+    </ul>
+  </div>
+
+</div>
+```
+
+*/
+
+body.with_item_groups #main {
+  background-color: #e8ecef;
+}
+.item-group-container {
+  background-color: $wellBackground;
+  padding-bottom: 70px;
+
+  .item-group-condensed {
+    border-bottom: 1px dashed #c2c8d0;
+    padding: 15px;
+  }
+  .item-group-condensed:last-child,
+  .item-group-condensed.last {
+    border-bottom: 0;
+  }
+
+  .ig-list {
+    margin-top: 0;
+  }
+  .ig-list li {
+    margin: 0;
+  }
+}
+
+
+.item-group-condensed {
+  padding: 9px;
+
+  .ig-header {
+    padding-left: 15px;
+
+    a {
+      text-decoration: none;
+      color: #3d454c;
+    }
+  }
+  .ig-title {
+    left: 15px;
+  }
+
+  .ig-row {
+    border-top-width: 0;
+    border-bottom: 1px solid #e1e3e4;
+    border-radius: 0;
+    background: #fff;
+  }
+  .ig-list li:first-child {
+    margin-top: 5px;
+  }
+  .ig-list li:first-child .ig-row {
+    border-top: 1px solid #c1c7cf;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+  }
+  .ig-list li:last-child .ig-row {
+    border-bottom: 1px solid #c1c7cf;
+    border-bottom-left-radius: 3px;
+    border-bottom-right-radius: 3px;
+  }
+}

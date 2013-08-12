@@ -37,7 +37,7 @@ describe AppointmentGroup do
       AppointmentGroup.new(
         :title => "test",
         :contexts => [@course],
-        :sub_context_codes => [GroupCategory.create.asset_string]
+        :sub_context_codes => [GroupCategory.create(name: "foo").asset_string]
       ).should_not be_valid
     end
 
@@ -77,7 +77,7 @@ describe AppointmentGroup do
 
     it "should not add contexts when it has a group category" do
       course1 = course
-      gc = course1.group_categories.create!
+      gc = group_category(context: course1)
       ag = AppointmentGroup.create!(:title => 'test',
                                     :contexts => [course1],
                                     :sub_context_codes => [gc.asset_string])
@@ -179,7 +179,7 @@ describe AppointmentGroup do
       section2 = @course.course_sections.create!
       section3 = @course.course_sections.create!
       other_course = Course.create!
-      gc = @course.group_categories.create!
+      gc = group_category
       @user_group = @course.groups.create!(:group_category => gc)
 
       student_in_course(:course => @course, :active_all => true)

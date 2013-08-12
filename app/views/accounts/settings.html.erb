@@ -104,7 +104,7 @@ TEXT
                 </td>
               </tr>
               <% f.fields_for :settings do |settings| %>
-                <% if Account.site_admin.grants_right?(@current_user, :manage_site_settings) %>
+                <% if @account.grants_right?(@current_user, :manage_site_settings) %>
                   <tr>
                     <td><%= settings.blabel :mfa_settings, :en => "Multi-Factor Authentication" %></td>
                     <td><%= settings.select :mfa_settings, [[t('select.mfa.disabled', "Disabled"), :disabled],
@@ -185,7 +185,7 @@ TEXT
           <legend><%= t(:features_title, "Features") %></legend>
           <% f.fields_for :settings do |settings| %>
             <% if @account.root_account? %>
-              <% if Account.site_admin.grants_right?(@current_user, :manage_site_settings) %>
+              <% if @account.grants_right?(@current_user, :manage_site_settings) %>
                 <div>
                   <%= settings.check_box :admins_can_change_passwords, :checked => @account.settings[:admins_can_change_passwords] == true %>
                   <%= settings.label :admins_can_change_passwords, :en => "Password setting by admins" %>
@@ -240,6 +240,10 @@ TEXT
                 <% end %>
               <% end %>
               <% if @account.canvas_authentication? %>
+                <div>
+                  <%= settings.check_box :self_registration, :checked => @account.self_registration? %>
+                  <%= settings.label :self_registration, :en => "Self Registration" %>
+                </div>
                 <div>
                   <%= settings.check_box :open_registration, :checked => @account.open_registration? %>
                   <%= settings.label :open_registration, :en => "Open Registration" %>
@@ -392,9 +396,15 @@ TEXT
                 <td><%= f.text_field :turnitin_shared_secret, :class => "turnitin_account_settings" %></td>
               </tr>
               <tr>
+                <td><%= f.blabel :turnitin_host, :en => "Turnitin Host" %></td>
+                <td><%= f.text_field :turnitin_host, :class => "turnitin_account_settings", :placeholder => "api.turnitin.com" %></td>
+              </tr>
+              <tr>
                 <td>&nbsp;</td>
                 <td>
-                  <a href="<%= account_turnitin_confirmation_path(@account.id, "{{ account_id }}", "{{ shared_secret }}") %>" class="confirm_turnitin_settings_link btn"><%= t(:confirm_turnitin_settings_link, "confirm Turnitin settings") %></a>
+                  <a href="<%= account_turnitin_confirmation_path(@account) %>" class="confirm_turnitin_settings_link btn">
+                    <%= t(:confirm_turnitin_settings_link, "confirm Turnitin settings") %>
+                  </a>
                 </td>
               </tr>
               <tr>
@@ -768,13 +778,12 @@ TEXT
               <% if parameters_partial %>
                 <div style="display: none">
                   <div class="report_dialog">
-                    <form id="<%= report %>_form" class="run_report_form" action="<%= account_run_report_path %>">
+                    <form id="<%= report %>_form" class="run_report_form" action="<%= api_v1_account_create_report_path(@account, report) %>">
                       <div class="report_parameters">
                         <%= render :partial => parameters_partial if parameters_partial %>
                       </div>
                       <br />
-                      <input type="hidden" name="report_type" value="<%= report %>" />
-                        <a href="#" id="run_<%= report %>" class="btn btn-primary btn-small run_report_link"><%= t 'links.run_report', 'Run Report' %></a>
+                      <a href="#" id="run_<%= report %>" class="btn btn-primary btn-small run_report_link"><%= t 'links.run_report', 'Run Report' %></a>
                     </form>
                   </div>
                 </div>
@@ -783,8 +792,7 @@ TEXT
                 </span>
                 <a href="#" id="configure_<%= report %>" style="<%= hidden if in_progress %>" class="btn btn-small configure_report_link"><%= t 'links.configure_report', 'Configure...' %></a>
               <% else %>
-                <form id="<%= report %>_form" class="run_report_form" action="<%= account_run_report_path %>">
-                  <input type="hidden" name="report_type" value="<%= report %>" />
+                <form id="<%= report %>_form" class="run_report_form" action="<%= api_v1_account_create_report_path(@account, report) %>">
                   <span class="running_report_message" style="<%= hidden unless in_progress %>">
                     <%= t('report_running', 'The report is running.*You\'ll receive an email when it is done.*', :wrapper => '<div>\1</div>') %>
                   </span>

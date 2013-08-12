@@ -28,7 +28,6 @@ class ContentMigration < ActiveRecord::Base
   has_one :content_export
   has_many :migration_issues
   has_one :job_progress, :class_name => 'Progress', :as => :context
-  has_a_broadcast_policy
   serialize :migration_settings
   before_save :infer_defaults
   cattr_accessor :export_file_path
@@ -68,26 +67,6 @@ class ContentMigration < ActiveRecord::Base
     state :importing
     state :imported
     state :failed
-  end
-
-  set_broadcast_policy do |p|
-    p.dispatch :migration_export_ready
-    p.to { [user] }
-    p.whenever {|record|
-      record.changed_state(:exported) && !record.migration_settings[:skip_import_notification]
-    }
-
-    p.dispatch :migration_import_finished
-    p.to { [user] }
-    p.whenever {|record|
-      record.changed_state(:imported) && !record.migration_settings[:skip_import_notification]
-    }
-
-    p.dispatch :migration_import_failed
-    p.to { [user] }
-    p.whenever {|record|
-      record.changed_state(:failed) && !record.migration_settings[:skip_import_notification]
-    }
   end
   
   def self.migration_plugins(exclude_hidden=false)
@@ -144,6 +123,10 @@ class ContentMigration < ActiveRecord::Base
 
   def strand
     migration_settings[:strand]
+  end
+
+  def n_strand
+    ["migrations:import_content", self.root_account.try(:global_id) || "global"]
   end
   
   def migration_ids_to_import=(val)
@@ -247,8 +230,14 @@ class ContentMigration < ActiveRecord::Base
     mi.error_message = opts[:error_message]
     mi.fix_issue_html_url = opts[:fix_issue_html_url]
 
-    mi.save!
-    
+    # prevent duplicates
+    if self.migration_issues.where(mi.attributes.slice(
+        "issue_type", "description", "error_message", "fix_issue_html_url")).any?
+      mi.delete
+    else
+      mi.save!
+    end
+
     mi
   end
   
@@ -338,17 +327,25 @@ class ContentMigration < ActiveRecord::Base
     check_quiz_id_prepender
     plugin = Canvas::Plugin.find(migration_type)
     if plugin
+      queue_opts = {:priority => Delayed::LOW_PRIORITY, :max_attempts => 1}
+      if self.strand
+        queue_opts[:strand] = self.strand
+      else
+        queue_opts[:n_strand] = self.n_strand
+      end
+
       if self.workflow_state == 'exported' && !plugin.settings[:skip_conversion_step]
         # it's ready to be imported
         self.workflow_state = :importing
         self.save
-        import_content
+        self.send_later_enqueue_args(:import_content, queue_opts)
       else
         # find worker and queue for conversion
         begin
           if Canvas::Migration::Worker.const_defined?(plugin.settings['worker'])
             self.workflow_state = :exporting
-            job = Canvas::Migration::Worker.const_get(plugin.settings['worker']).enqueue(self)
+            worker_class = Canvas::Migration::Worker.const_get(plugin.settings['worker'])
+            job = Delayed::Job.enqueue(worker_class.new(self.id), queue_opts)
             self.save
             job
           else
@@ -444,7 +441,7 @@ class ContentMigration < ActiveRecord::Base
       clear_migration_data
     end
   end
-  handle_asynchronously :import_content, :priority => Delayed::LOW_PRIORITY, :max_attempts => 1
+  alias_method :import_content_without_send_later, :import_content
 
   def prepare_data(data)
     data = data.with_indifferent_access if data.is_a? Hash
@@ -476,12 +473,6 @@ class ContentMigration < ActiveRecord::Base
     self.migration_settings[:date_shift_options]
   end
 
-  def copy_course
-    worker = Canvas::Migration::Worker::CourseCopyWorker.new
-    worker.perform(self)
-  end
-  handle_asynchronously :copy_course, :priority => Delayed::LOW_PRIORITY, :max_attempts => 1
-  
   scope :for_context, lambda { |context| where(:context_id => context, :context_type => context.class.to_s) }
 
   scope :successful, where(:workflow_state => 'imported')

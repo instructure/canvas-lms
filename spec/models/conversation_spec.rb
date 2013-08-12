@@ -44,6 +44,11 @@ describe Conversation do
       Conversation.initiate(users, false)
     end
 
+    it "should populate subject if provided" do
+      users = 2.times.map{ user }
+      Conversation.initiate(users, nil, :subject => 'lunch').subject.should == 'lunch'
+    end
+
     context "sharding" do
       specs_require_sharding
 

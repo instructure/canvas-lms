@@ -1,0 +1,87 @@
+@import "environment";
+
+#calendar_header {
+  .header-table {
+    display: table;
+    width: 100%;
+    margin-bottom: 12px;
+  }
+
+  .header-table-row {
+    display: table-row;
+  }
+
+  .header-table-cell {
+    display: table-cell;
+    vertical-align: middle;
+  }
+
+  .header-table-left {
+    width: 42%;
+  }
+
+  .header-table-middle {
+    text-align: center;
+  }
+
+  .header-table-right {
+    width: 30%;
+    text-align: right;
+  }
+}
+
+.scheduler_navigator {
+  margin-bottom: 12px;
+}
+
+.calendar-navigator {
+  display: inline-block;
+}
+
+.navigation_buttons {
+  position: relative;
+  bottom: 3px;
+}
+
+.navigation_title, .appointment_group_title {
+  display: inline;
+  font-size: 18px;
+  line-height: 32px;
+  padding-left: 5px;
+  white-space: nowrap;
+}
+
+#refresh_calendar_link {
+  background-image: url("/images/ajax-loader-black-on-white-static.gif");
+  background-position: 50% 50%;
+  display: block;
+  float: right;
+  height: 16px;
+  margin-left: 3px;
+  position: relative;
+  top: 8px;
+  width: 16px;
+  &.loading {
+    background-image: url("/images/ajax-loader-black-on-white.gif");
+  }
+}
+
+#create_new_event_link {
+  color: #444444;
+  margin-left: 5px;
+}
+
+.whats-new {
+  font-size: 11px;
+  line-height: 32px;
+  margin-right: 0px;
+}
+
+.counter-badge {
+  @include border-radius(8px);
+  background-color: #3cb5fb;
+  color: white;
+  text-shadow: 1px 0px 1px rgba(0, 0, 0, 0.3);
+  box-shadow: inset 1px 0px 1px rgba(0, 0, 0, 0.3);
+  padding: 1px 6px;
+}

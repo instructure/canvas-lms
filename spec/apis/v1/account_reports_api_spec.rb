@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 Instructure, Inc.
+# Copyright (C) 2012 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -89,7 +89,9 @@ describe 'Account Reports API', :type => :integration do
       json['id'].should == @report.id
       json['status'].should == @report.workflow_state
       json['progress'].should == @report.progress
-      json['file_url'].should == "https://#{HostUrl.context_host(@admin.account)}/accounts/#{@admin.account.id}/files/#{@report.attachment.id}/download"
+      json['file_url'].should == "https://#{HostUrl.context_host(@admin.account)}/accounts/#{@admin.account.id}/files/#{@report.attachment_id}/download"
+      #test that attachment object is here, no need to test attachment json
+      json['attachment']['id'].should == @report.attachment_id
       @report.parameters.each do |key, value|
         json['parameters'][key].should == value
       end

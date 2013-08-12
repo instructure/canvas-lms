@@ -21,7 +21,7 @@ input[type=text].loading {
   background-position: 98% center;
 }
 
-.paginatedLoadingIndicator {
+.loadingIndicator, .paginatedLoadingIndicator {
   background-image: url('/images/ajax-reload-animated.gif');
   background-repeat: no-repeat;
   background-position: center center;

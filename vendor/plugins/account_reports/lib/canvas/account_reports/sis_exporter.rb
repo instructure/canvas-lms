@@ -71,9 +71,10 @@ module Canvas::AccountReports
           headers = ['canvas_user_id','user_id','login_id','first_name','last_name','email','status']
         end
         csv << headers
-        users = root_account.pseudonyms.includes(:user).select(
+        users = root_account.pseudonyms.except(:includes).joins(:user).select(
           "pseudonyms.id, pseudonyms.sis_user_id, pseudonyms.user_id,
-           pseudonyms.unique_id, pseudonyms.workflow_state").where(
+           pseudonyms.unique_id, pseudonyms.workflow_state, users.sortable_name,
+           users.updated_at AS user_updated_at").where(
           "NOT EXISTS (SELECT user_id
                        FROM enrollments e
                        WHERE e.type = 'StudentViewEnrollment'
@@ -91,17 +92,21 @@ module Canvas::AccountReports
 
         users = add_user_sub_account_scope(users)
 
-        users.find_each do |u|
-          row = []
-          row << u.user_id unless @sis_format
-          row << u.sis_user_id
-          row << u.unique_id
-          row << nil if @sis_format
-          row << u.user.first_name
-          row << u.user.last_name
-          row << u.user.email
-          row << u.workflow_state
-          csv << row
+        Shackles.activate(:slave) do
+          users.find_each do |u|
+            row = []
+            row << u.user_id unless @sis_format
+            row << u.sis_user_id
+            row << u.unique_id
+            row << nil if @sis_format
+            # build a user object to be able to call methods on it
+            user = User.send(:instantiate, 'id' => u.user_id, 'sortable_name' => u.sortable_name, 'updated_at' => u.user_updated_at)
+            row << user.first_name
+            row << user.last_name
+            row << user.email
+            row << u.workflow_state
+            csv << row
+          end
         end
       end
       list_csv
@@ -136,15 +141,17 @@ module Canvas::AccountReports
           accounts = accounts.where(:accounts => { :parent_account_id => account })
         end
 
-        accounts.find_each do |a|
-          row = []
-          row << a.id unless @sis_format
-          row << a.sis_source_id
-          row << a.parent_id unless @sis_format
-          row << a.parent_sis_source_id
-          row << a.name
-          row << a.workflow_state
-          csv << row
+        Shackles.activate(:slave) do
+          accounts.find_each do |a|
+            row = []
+            row << a.id unless @sis_format
+            row << a.sis_source_id
+            row << a.parent_id unless @sis_format
+            row << a.parent_sis_source_id
+            row << a.name
+            row << a.workflow_state
+            csv << row
+          end
         end
       end
       list_csv
@@ -167,15 +174,17 @@ module Canvas::AccountReports
           terms = terms.where("workflow_state<>'deleted'")
         end
 
-        terms.each do |t|
-          row = []
-          row << t.id unless @sis_format
-          row << t.sis_source_id
-          row << t.name
-          row << t.workflow_state
-          row << default_timezone_format(t.start_at)
-          row << default_timezone_format(t.end_at)
-          csv << row
+        Shackles.activate(:slave) do
+          terms.each do |t|
+            row = []
+            row << t.id unless @sis_format
+            row << t.sis_source_id
+            row << t.name
+            row << t.workflow_state
+            row << default_timezone_format(t.start_at)
+            row << default_timezone_format(t.end_at)
+            csv << row
+          end
         end
       end
       list_csv
@@ -193,7 +202,7 @@ module Canvas::AccountReports
 
         csv << headers
         courses = root_account.all_courses.includes(:account, :enrollment_term)
-        courses = courses.where("sis_source_id IS NOT NULL") if @sis_format
+        courses = courses.where("courses.sis_source_id IS NOT NULL") if @sis_format
 
         if @include_deleted
           courses = courses.where("courses.workflow_state<>'deleted' OR courses.sis_source_id IS NOT NULL")
@@ -208,34 +217,36 @@ module Canvas::AccountReports
                             'completed' => 'concluded', 'deleted' => 'deleted',
                             'available' => 'active'}
 
-        courses.find_each do |c|
-          row = []
-          row << c.id unless @sis_format
-          row << c.sis_source_id
-          row << c.course_code
-          row << c.name
-          row << c.account_id unless @sis_format
-          row << c.account.try(:sis_source_id)
-          row << c.enrollment_term_id unless @sis_format
-          row << c.enrollment_term.try(:sis_source_id)
-          #for sis import format 'claimed', 'created', and 'available' are all considered active
-          if @sis_format
-            if c.workflow_state == 'deleted' || c.workflow_state == 'completed'
-              row << course_state_sub[c.workflow_state]
+        Shackles.activate(:slave) do
+          courses.find_each do |c|
+            row = []
+            row << c.id unless @sis_format
+            row << c.sis_source_id
+            row << c.course_code
+            row << c.name
+            row << c.account_id unless @sis_format
+            row << c.account.try(:sis_source_id)
+            row << c.enrollment_term_id unless @sis_format
+            row << c.enrollment_term.try(:sis_source_id)
+            #for sis import format 'claimed', 'created', and 'available' are all considered active
+            if @sis_format
+              if c.workflow_state == 'deleted' || c.workflow_state == 'completed'
+                row << course_state_sub[c.workflow_state]
+              else
+                row << 'active'
+              end
             else
-              row << 'active'
+              row << course_state_sub[c.workflow_state]
             end
-          else
-            row << course_state_sub[c.workflow_state]
+            if c.restrict_enrollments_to_course_dates
+              row << default_timezone_format(c.start_at)
+              row << default_timezone_format(c.conclude_at)
+            else
+              row << nil
+              row << nil
+            end
+            csv << row
           end
-          if c.restrict_enrollments_to_course_dates
-            row << default_timezone_format(c.start_at)
-            row << default_timezone_format(c.conclude_at)
-          else
-            row << nil
-            row << nil
-          end
-          csv << row
         end
       end
       list_csv
@@ -279,36 +290,38 @@ module Canvas::AccountReports
         sections = add_course_sub_account_scope(sections,'rc')
         sections = add_term_scope(sections, 'rc')
 
-        sections.find_each do |s|
-          row = []
-          row << s.id unless @sis_format
-          row << s.sis_source_id
-          if s.nonxlist_course_id == nil
-            row << s.course_id unless @sis_format
-            row << s.course_sis_id
-          else
-            row << s.non_x_course_id unless @sis_format
-            row << s.non_x_course_sis_id
-          end
-          row << s.name
-          row << s.workflow_state
-          if s.restrict_enrollments_to_section_dates
-            row << default_timezone_format(s.start_at)
-            row << default_timezone_format(s.end_at)
-          else
-            row << nil
-            row << nil
-          end
-          unless @sis_format
+        Shackles.activate(:slave) do
+          sections.find_each do |s|
+            row = []
+            row << s.id unless @sis_format
+            row << s.sis_source_id
             if s.nonxlist_course_id == nil
-              row << s.r_account_id
-              row << s.r_account_sis_id
+              row << s.course_id unless @sis_format
+              row << s.course_sis_id
             else
-              row << s.nx_account_id
-              row << s.nx_account_sis_id
+              row << s.non_x_course_id unless @sis_format
+              row << s.non_x_course_sis_id
             end
+            row << s.name
+            row << s.workflow_state
+            if s.restrict_enrollments_to_section_dates
+              row << default_timezone_format(s.start_at)
+              row << default_timezone_format(s.end_at)
+            else
+              row << nil
+              row << nil
+            end
+            unless @sis_format
+              if s.nonxlist_course_id == nil
+                row << s.r_account_id
+                row << s.r_account_sis_id
+              else
+                row << s.nx_account_id
+                row << s.nx_account_sis_id
+              end
+            end
+            csv << row
           end
-          csv << row
         end
       end
       list_csv
@@ -334,7 +347,7 @@ module Canvas::AccountReports
                        WHEN enrollments.workflow_state = 'active' THEN 'active'
                        WHEN enrollments.workflow_state = 'completed' THEN 'concluded'
                        WHEN enrollments.workflow_state = 'deleted' THEN 'deleted'
-                       WHEN courses.workflow_state = 'rejected' THEN 'rejected' END AS enrol_state").
+		       WHEN enrollments.workflow_state = 'rejected' THEN 'rejected' END AS enroll_state").
           joins("INNER JOIN course_sections cs ON cs.id = enrollments.course_section_id
                  INNER JOIN courses ON courses.id = cs.course_id
                  INNER JOIN pseudonyms ON pseudonyms.user_id=enrollments.user_id
@@ -367,24 +380,26 @@ module Canvas::AccountReports
         enrol = add_course_sub_account_scope(enrol)
         enrol = add_term_scope(enrol)
 
-        enrol.find_each do |e|
-          row = []
-          if e.nxc_id == nil
-            row << e.course_id unless @sis_format
-            row << e.course_sis_id
-          else
-            row << e.nxc_id unless @sis_format
-            row << e.nxc_sis_id
+        Shackles.activate(:slave) do
+          enrol.find_each do |e|
+            row = []
+            if e.nxc_id == nil
+              row << e.course_id unless @sis_format
+              row << e.course_sis_id
+            else
+              row << e.nxc_id unless @sis_format
+              row << e.nxc_sis_id
+            end
+            row << e.user_id unless @sis_format
+            row << e.pseudonym_sis_id
+            row << e.sis_role
+            row << e.course_section_id unless @sis_format
+            row << e.course_section_sis_id
+	    row << e.enroll_state
+            row << e.associated_user_id unless @sis_format
+            row << e.ob_sis_id
+            csv << row
           end
-          row << e.user_id unless @sis_format
-          row << e.pseudonym_sis_id
-          row << e.sis_role
-          row << e.course_section_id unless @sis_format
-          row << e.course_section_sis_id
-          row << e.enrol_state
-          row << e.associated_user_id unless @sis_format
-          row << e.ob_sis_id
-          csv << row
         end
       end
       list_csv
@@ -418,15 +433,17 @@ module Canvas::AccountReports
           groups = groups.where(:groups => { :context_id => account, :context_type => 'Account' })
         end
 
-        groups.find_each do |g|
-          row = []
-          row << g.id unless @sis_format
-          row << g.sis_source_id
-          row << g.account_id unless @sis_format
-          row << g.account_sis_id
-          row << g.name
-          row << g.workflow_state
-          csv << row
+        Shackles.activate(:slave) do
+          groups.find_each do |g|
+            row = []
+            row << g.id unless @sis_format
+            row << g.sis_source_id
+            row << g.account_id unless @sis_format
+            row << g.account_sis_id
+            row << g.name
+            row << g.workflow_state
+            csv << row
+          end
         end
       end
       list_csv
@@ -469,14 +486,16 @@ module Canvas::AccountReports
           gm = gm.where(:groups => { :context_id => account, :context_type => 'Account' })
         end
 
-        gm.find_each do |gm|
-          row = []
-          row << gm.group_id  unless @sis_format
-          row << gm.sis_source_id
-          row << gm.user_id  unless @sis_format
-          row << gm.user_sis_id
-          row << gm.workflow_state
-          csv << row
+        Shackles.activate(:slave) do
+          gm.find_each do |gm|
+            row = []
+            row << gm.group_id  unless @sis_format
+            row << gm.sis_source_id
+            row << gm.user_id  unless @sis_format
+            row << gm.user_sis_id
+            row << gm.workflow_state
+            csv << row
+          end
         end
       end
       list_csv
@@ -517,14 +536,16 @@ module Canvas::AccountReports
         xl = add_course_sub_account_scope(xl)
         xl = add_term_scope(xl)
 
-        xl.find_each do |x|
-          row = []
-          row << x.course_id unless @sis_format
-          row << x.course_sis_id
-          row << x.id unless @sis_format
-          row << x.sis_source_id
-          row << x.workflow_state
-          csv << row
+        Shackles.activate(:slave) do
+          xl.find_each do |x|
+            row = []
+            row << x.course_id unless @sis_format
+            row << x.course_sis_id
+            row << x.id unless @sis_format
+            row << x.sis_source_id
+            row << x.workflow_state
+            csv << row
+          end
         end
       end
       list_csv

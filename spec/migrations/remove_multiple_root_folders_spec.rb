@@ -42,6 +42,7 @@ describe 'DataFixup::RemoveMultipleRootFolders' do
         f.attachments.delete_all
       end
       c.folders.scoped.delete_all
+      c.enrollment_terms.scoped.delete_all if c.is_a?(Account)
       c.delete
     end
     RemoveMultipleRootFolders.up

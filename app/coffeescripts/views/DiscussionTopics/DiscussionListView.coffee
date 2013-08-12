@@ -76,6 +76,7 @@ define [
       @_cacheElements()
       @_toggleNoContentMessage()
       @_initSort() if @options.sortable
+      @$el.data('view', this) unless @$el.data('view')
       if @options.showSpinner then @_startLoader() else @_stopLoader()
       this
 
@@ -141,23 +142,20 @@ define [
     #
     # Returns nothing.
     _onFetchedLast: =>
-      if @options.pinned and @collection.length is 0 and !ENV.permissions.moderate
-        @$el.remove()
-      else
-        @options.showSpinner = false
-        @options.showMessage = true
-        @_stopLoader()
-        @_toggleNoContentMessage()
+      @options.showSpinner = false
+      @options.showMessage = true
+      @_stopLoader()
+      @_toggleNoContentMessage()
 
     # Internal: Enable sorting of the this view's discussions.
     #
     # Returns nothing.
     _initSort: ->
       return unless ENV.permissions.moderate
-      @$list.sortable(_.extend({}, @sortOptions, scope: @cid))
+      @$list.sortable(_.extend({}, @sortOptions))
       @$list.on('sortupdate', @_updateSort)
       $(@options.destination)
-        .droppable(_.extend({}, @dropOptions, scope: @cid))
+        .droppable(_.extend({}, @dropOptions))
         .on('drop', @_onDrop)
 
     # Internal: On a user's sort action, update the sort order on the server.
@@ -171,6 +169,14 @@ define [
       return unless model?.get('pinned')
       model.updateOneAttribute('position_at', ui.item.index() + 1)
       @_updatePositions()
+
+      # FF 15+ will also fire a click event on the dropped object,
+      # and we want to eat that. This is hacky.
+      # http://forum.jquery.com/topic/jquery-ui-sortable-triggers-a-click-in-firefox-15
+      model.set('preventClick', true)
+      setTimeout =>
+        model.set('preventClick', false)
+      , 0
 
     # Internal: Update the position attributes of all models in the collection
     # to match their DOM position. Do not mirror changes to server.
@@ -188,9 +194,9 @@ define [
     _initDrag: (view) ->
       throw new Error('must have destination') unless @options.destination
       return unless ENV.permissions.moderate
-      view.$el.draggable(_.extend({}, @dragOptions, scope: @cid))
+      view.$el.draggable(_.extend({}, @dragOptions))
       $(@options.destination)
-        .droppable(_.extend({}, @dropOptions, scope: @cid))
+        .droppable(_.extend({}, @dropOptions))
         .on('drop', @_onDrop)
 
     # Internal: Handle drop events by pinning/unpinning the topic.
@@ -202,4 +208,7 @@ define [
     _onDrop: (e, ui) =>
       model = @collection.get(ui.draggable.data('id'))
       return unless model
-      model.save(pinned: !model.get('pinned'))
+      [newGroup, currentGroup] = [$(e.currentTarget).data('view'), this]
+      pinned = !!newGroup.options.pinned
+      locked = !!newGroup.options.locked
+      model.save(pinned: pinned, locked: locked)

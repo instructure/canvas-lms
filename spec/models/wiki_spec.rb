@@ -76,4 +76,64 @@ describe Wiki do
       page.should == @wiki.front_page
     end
   end
+
+  context 'set policy' do
+    before :each do
+      @course.offer!
+      user :active_all => true
+      user_session(@user)
+    end
+
+    it 'should give read rights to public courses' do
+      @course.is_public = true
+      @course.save!
+      @course.wiki.grants_right?(@user, :read).should be_true
+    end
+
+    it 'should give manage rights to teachers' do
+      course_with_teacher
+      @course.wiki.grants_right?(@teacher, :manage).should be_true
+    end
+
+    it 'should give manage rights to admins' do
+      account_admin_user
+      @course.wiki.grants_right?(@admin, :manage).should be_true
+    end
+
+    context 'allow student wiki edits' do
+      before :each do
+        course_with_student :course => @course, :user => @user, :active_all => true
+        @course.default_wiki_editing_roles = 'teachers,students'
+        @course.save!
+      end
+
+      it 'should not give manage rights to students' do
+        @course.wiki.grants_right?(@user, :manage).should be_false
+      end
+
+      it 'should not give update rights to students' do
+        @course.wiki.grants_right?(@user, :update).should be_false
+      end
+
+      it 'should give read rights to students' do
+        @course.wiki.grants_right?(@user, :read).should be_true
+      end
+
+      it 'should give create_page rights to students' do
+        @course.wiki.grants_right?(@user, :create_page).should be_true
+      end
+
+      it 'should not give delete_page rights to students' do
+        @course.wiki.grants_right?(@user, :delete_page).should be_false
+      end
+
+      it 'should give update_page rights to students' do
+        @course.wiki.grants_right?(@user, :update_page).should be_true
+      end
+
+      it 'should give update_page_content rights to students' do
+        @course.wiki.grants_right?(@user, :update_page_content).should be_true
+      end
+    end
+  end
 end

@@ -602,6 +602,14 @@ class Course < ActiveRecord::Base
     group_weighting_scheme == 'percent'
   end
 
+  def apply_assignment_group_weights=(apply)
+    if apply
+      self.group_weighting_scheme = 'percent'
+    else
+      self.group_weighting_scheme = 'equal'
+    end
+  end
+
   def grade_weight_changed!
     @grade_weight_changed = true
     self.save!
@@ -1726,8 +1734,9 @@ class Course < ActiveRecord::Base
   def turnitin_settings
     # check if somewhere up the account chain turnitin is enabled and
     # has valid settings
-    self.account.turnitin_settings
+    account.turnitin_settings
   end
+  memoize :turnitin_settings
 
   def turnitin_pledge
     self.account.closest_turnitin_pledge
@@ -1911,15 +1920,17 @@ class Course < ActiveRecord::Base
     AssignmentGroup.process_migration(data, migration); migration.update_import_progress(39)
     ExternalFeed.process_migration(data, migration); migration.update_import_progress(39.5)
     GradingStandard.process_migration(data, migration); migration.update_import_progress(40)
-    Quiz.process_migration(data, migration, question_data); migration.update_import_progress(50)
-    ContextExternalTool.process_migration(data, migration); migration.update_import_progress(54)
+    ContextExternalTool.process_migration(data, migration); migration.update_import_progress(45)
 
     #These need to be ran twice because they can reference each other
+    Quiz.process_migration(data, migration, question_data); migration.update_import_progress(50)
     DiscussionTopic.process_migration(data, migration);migration.update_import_progress(55)
     WikiPage.process_migration(data, migration);migration.update_import_progress(60)
     Assignment.process_migration(data, migration);migration.update_import_progress(65)
-    ContextModule.process_migration(data, migration);migration.update_import_progress(70)
+
     # and second time...
+    Quiz.process_migration(data, migration, question_data); migration.update_import_progress(70)
+    ContextModule.process_migration(data, migration);migration.update_import_progress(72)
     DiscussionTopic.process_migration(data, migration);migration.update_import_progress(75)
     WikiPage.process_migration(data, migration);migration.update_import_progress(80)
     Assignment.process_migration(data, migration);migration.update_import_progress(85)
@@ -2106,7 +2117,7 @@ class Course < ActiveRecord::Base
             old_folders << file.folder
             new_folders = []
             new_folders << old_folders.last.clone_for(self, nil, options.merge({:include_subcontent => false}))
-            while old_folders.last.parent_folder && old_folders.last.parent_folder.parent_folder_id && !merge_mapped_id(old_folders.last.parent_folder)
+            while old_folders.last.parent_folder && old_folders.last.parent_folder.parent_folder_id
               old_folders << old_folders.last.parent_folder
               new_folders << old_folders.last.clone_for(self, nil, options.merge({:include_subcontent => false}))
             end
@@ -2554,11 +2565,14 @@ class Course < ActiveRecord::Base
     if opts[:section_ids]
       scope = scope.where('enrollments.course_section_id' => opts[:section_ids].to_a)
     end
-    unless visibilities.any?{|v|v[:admin]}
+    visibility_level = enrollment_visibility_level_for(user, visibilities)
+    account_admin = visibility_level == :full && visibilities.empty?
+    # teachers, account admins, and student view students can see student view students
+    if !visibilities.any?{|v|v[:admin] || v[:type] == 'StudentViewEnrollment' } && !account_admin
       scope = scope.where("enrollments.type<>'StudentViewEnrollment'")
     end
     # See also MessageableUser::Calculator (same logic used to get users across multiple courses) (should refactor)
-    case enrollment_visibility_level_for(user, visibilities)
+    case visibility_level
       when :full, :limited then scope
       when :sections then scope.where("enrollments.course_section_id IN (?) OR (enrollments.limit_privileges_to_course_section=? AND enrollments.type IN ('TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment'))", visibilities.map{|s| s[:course_section_id]}, false)
       when :restricted then scope.where(:enrollments => { :user_id  => visibilities.map{|s| s[:associated_user_id]}.compact + [user] })

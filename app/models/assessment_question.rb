@@ -437,6 +437,7 @@ class AssessmentQuestion < ActiveRecord::Base
     # we want to put it in a bank named after the assessment it's in
     bank_map = {}
     assessments = data['assessments'] ? data['assessments']['assessments'] : []
+    assessments ||= []
     assessments.each do |assmnt|
       next unless assmnt['questions']
       assmnt['questions'].each do |q|

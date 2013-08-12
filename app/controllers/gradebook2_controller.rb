@@ -10,7 +10,7 @@ class Gradebook2Controller < ApplicationController
       per_page = Setting.get_cached('api_max_per_page', '50').to_i
       js_env  :GRADEBOOK_OPTIONS => {
         :chunk_size => Setting.get_cached('gradebook2.submissions_chunk_size', '35').to_i,
-        :assignment_groups_url => api_v1_course_assignment_groups_url(@context, :include => [:assignments]),
+        :assignment_groups_url => api_v1_course_assignment_groups_url(@context, :include => [:assignments], :override_assignment_dates => "false"),
         :sections_url => api_v1_course_sections_url(@context),
         :students_url => api_v1_course_enrollments_url(@context, :include => [:avatar_url], :type => ['StudentEnrollment', 'StudentViewEnrollment'], :per_page => per_page),
         :students_url_with_concluded_enrollments => api_v1_course_enrollments_url(@context, :include => [:avatar_url], :type => ['StudentEnrollment', 'StudentViewEnrollment'], :state => ['active', 'invited', 'completed'], :per_page => per_page),
@@ -18,7 +18,7 @@ class Gradebook2Controller < ApplicationController
         :change_grade_url => api_v1_course_assignment_submission_url(@context, ":assignment", ":submission"),
         :context_url => named_context_url(@context, :context_url),
         :download_assignment_submissions_url => named_context_url(@context, :context_assignment_submissions_url, "{{ assignment_id }}", :zip => 1),
-        :re_upload_submissions_url => named_context_url(@context, :context_gradebook_submissions_upload_url, "{{ assignment_id }}"),
+        :re_upload_submissions_url => named_context_url(@context, :submissions_upload_context_gradebook_url, "{{ assignment_id }}"),
         :context_id => @context.id,
         :context_code => @context.asset_string,
         :group_weighting_scheme => @context.group_weighting_scheme,

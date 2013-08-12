@@ -6,6 +6,7 @@ define [
 ], ($, PaginatedCollection, PaginatedCollectionView, fakePage) ->
 
   server = null
+  clock = null
   collection = null
   view = null
   fixtures = $ '#fixtures'
@@ -23,15 +24,16 @@ define [
     template: ({id}) -> id
     initialize: ->
       # make some scrolly happen
-      @$el.css 'height', 100
+      @$el.css 'height', 500
 
   class TestCollection extends PaginatedCollection
     url: '/test'
 
   module 'PaginatedCollectionView',
     setup: ->
-      fixtures.css height: 100, overflow: 'auto'
+      fixtures.css height: 500, overflow: 'auto'
       createServer()
+      clock = sinon.useFakeTimers()
       collection = new TestCollection
       view = new PaginatedCollectionView
         collection: collection
@@ -42,6 +44,7 @@ define [
 
     teardown: ->
       server.restore()
+      clock.restore()
       fixtures.attr 'style', ''
       view.remove()
 
@@ -50,7 +53,11 @@ define [
     ok $match.length, 'item found'
 
   scrollToBottom = ->
-    fixtures[0].scrollTop = fixtures[0].scrollHeight
+    # scroll within 100px of the bottom of the current list (<500 triggers a fetch)
+    fixtures[0].scrollTop = view.$el.position().top +
+      view.$el.height() -
+      fixtures.position().top -
+      100
     ok fixtures[0].scrollTop > 0
 
   test 'renders items', ->
@@ -74,6 +81,34 @@ define [
     # scroll event isn't firing in the test :( manually calling checkScroll
     view.checkScroll()
     ok collection.fetchingNextPage, 'collection is fetching'
+    server.sendPage fakePage(2), collection.urls.next
+    assertItemRendered '3'
+    assertItemRendered '4'
+
+  test 'doesn\'t fetch if already fetching', ->
+    sinon.spy collection, 'fetch'
+    sinon.spy view, 'hideLoadingIndicator'
+    collection.fetch()
+    view.checkScroll()
+    ok collection.fetch.calledOnce, 'fetch called once'
+    ok !view.hideLoadingIndicator.called, 'hideLoadingIndicator not called'
+
+  test 'auto-fetches visible pages', ->
+    view.remove()
+    view = new PaginatedCollectionView
+      collection: collection
+      itemView: ItemView
+      scrollContainer: fixtures
+      autoFetch: true
+    view.$el.appendTo fixtures
+    view.render()
+    fixtures.css height: 1000 # it will autofetch the second page, since we're within the threshold
+
+    collection.fetch()
+    server.sendPage fakePage(), collection.url
+    assertItemRendered '1'
+    assertItemRendered '2'
+    clock.tick(0)
     server.sendPage fakePage(2), collection.urls.next
     assertItemRendered '3'
     assertItemRendered '4'

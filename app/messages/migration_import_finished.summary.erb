@@ -1,9 +1,0 @@
-<% define_content :subject do %>
-  <%= t :subject, "Course Import Finished: %{course_name}", :course_name => asset.context.name %>
-<% end %>
-      
-<% if asset.warnings.blank? %>
-  <%= t :body_no_warnings, "Importing %{source} into %{target} has finished.  Everything you selected should now be imported into your course.", :source => asset.migration_settings[:course_name], :target => asset.context.name %>
-<% else %>
-  <%= t :body_with_warnings, "Importing %{source} into %{target} has finished, but not everything was imported successfully: %{warnings}", :source => asset.migration_settings[:course_name], :target => asset.context.name, :warnings => "\n\n#{asset.warnings.join("\n")}" %>
-<% end %>

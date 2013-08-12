@@ -1,7 +1,36 @@
+<% content_for :page_title, t(:page_titles, "Quizzes") %>
+
+<% if @domain_root_account.enable_draft? %>
+
+<% jammit_css :quizzes %>
+<% js_bundle :quizzes_index %>
+
 <%
-  js_bundle :quizzes_index
-  content_for :page_title, t(:page_titles, "Quizzes")
+  @body_classes << 'with_item_groups'
+
+  js_env(:QUIZZES => {
+    :assignment => @assignment_json,
+    :open       => @open_json,
+    :surveys    => @surveys_json,
+    :options    => @quiz_options
+  },
+  :URLS => {
+    :new_quiz_url       => context_url(@context, :new_context_quiz_url, :fresh => 1),
+    :question_banks_url => context_url(@context, :context_question_banks_url)
+  },
+  :PERMISSIONS => {
+    :create  => can_do(@context.quizzes.new, @current_user, :create),
+    :manage  => can_do(@context, @current_user, :manage_assignments)
+  },
+  :FLAGS => {
+    :question_banks => feature_enabled?(:question_banks)
+  })
 %>
+
+<% else %>
+
+<% js_bundle :quizzes_index_legacy %>
+
 <% content_for :right_side do %>
   <% if can_do(@context.quizzes.new, @current_user, :create) %>
     <div class="rs-margin-lr rs-margin-top">
@@ -89,4 +118,5 @@ ul.quiz_list li.quiz div.description {
   <a href="<%= context_url(@context, :context_locks_url) %>" id="quiz_locks_url" style="display: none;">&nbsp;</a>
   <%= image_tag "lock_small.png", :style => "display: none;", :class => "content_lock_icon", :id => "quiz_lock_icon", :title => t('titles.this_quiz_is_locked', "This quiz is currently locked.  Click for more details."), :alt => "locked" %>
   <a href="<%= context_url(@context, :context_context_modules_url) %>" id="context_modules_url" style="display: none;">&nbsp;</a>
+<% end %>
 <% end %>

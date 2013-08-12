@@ -39,8 +39,25 @@ module Canvas::AccountReports
       CourseReports.new(account_report).unpublished_courses
     end
 
+    def self.unused_courses_csv(account_report)
+      CourseReports.new(account_report).unused_courses
+    end
+
     def self.recently_deleted_courses_csv(account_report)
       CourseReports.new(account_report).recently_deleted
     end
+
+    def self.students_with_no_submissions_csv(account_report)
+      StudentReports.new(account_report).students_with_no_submissions
+    end
+
+    def self.zero_activity_csv(account_report)
+      StudentReports.new(account_report).zero_activity
+    end
+
+    def self.last_user_access_csv(account_report)
+      StudentReports.new(account_report).last_user_access
+    end
+
   end
 end

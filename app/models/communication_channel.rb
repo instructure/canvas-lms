@@ -125,7 +125,7 @@ class CommunicationChannel < ActiveRecord::Base
     return if path.nil?
     return if retired?
     return unless user_id
-    conditions = ["LOWER(path)=? AND user_id=? AND path_type=? AND workflow_state IN('unconfirmed', 'active')", path.mb_chars.downcase, user_id, path_type]
+    conditions = ["LOWER(path)=LOWER(?) AND user_id=? AND path_type=? AND workflow_state IN('unconfirmed', 'active')", path, user_id, path_type]
     unless new_record?
       conditions.first << " AND id<>?"
       conditions << id
@@ -224,7 +224,7 @@ class CommunicationChannel < ActiveRecord::Base
     if %{mysql mysql2}.include?(connection_pool.spec.config[:adapter])
       where(:path => path)
     else
-      where("LOWER(communication_channels.path)=?", path.try(:downcase))
+      where("LOWER(communication_channels.path)=LOWER(?)", path)
     end
   }
 
@@ -337,12 +337,23 @@ class CommunicationChannel < ActiveRecord::Base
     [Shard.default]
   end
 
-  def merge_candidates
+  def merge_candidates(break_on_first_found = false)
     shards = self.class.associated_shards(self.path) if Enrollment.cross_shard_invitations?
     shards ||= [self.shard]
     scope = CommunicationChannel.active.by_path(self.path).of_type(self.path_type)
+    merge_candidates = {}
     Shard.with_each_shard(shards) do
-      scope.where("user_id<>?", self.user_id).includes(:user).map(&:user)
-    end.uniq.select { |u| u.all_active_pseudonyms.length != 0 }
+      scope.where("user_id<>?", self.user_id).includes(:user).map(&:user).select do |u|
+        result = merge_candidates.fetch(u.global_id) do
+          merge_candidates[u.global_id] = (u.all_active_pseudonyms.length != 0)
+        end
+        return [u] if result && break_on_first_found
+        result
+      end
+    end.uniq
+  end
+
+  def has_merge_candidates?
+    !merge_candidates(true).empty?
   end
 end

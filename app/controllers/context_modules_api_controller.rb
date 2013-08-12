@@ -47,6 +47,17 @@
 #       // IDs of Modules that must be completed before this one is unlocked
 #       prerequisite_module_ids: [121, 122],
 #
+#       // The number of items in the module
+#       items_count: 10,
+#
+#       // The API URL to retrive this module's items
+#       items_url: 'https://canvas.example.com/api/v1/modules/123/items',
+#
+#       items: [ ... ]
+#       // The contents of this module, as an array of Module Items.
+#       // (Present only if requested via include[]=items
+#       //  AND the module is not deemed too large by Canvas.)
+#
 #       // The state of this Module for the calling user
 #       // one of 'locked', 'unlocked', 'started', 'completed'
 #       // (Optional; present only if the caller is a student)
@@ -64,6 +75,18 @@ class ContextModulesApiController < ApplicationController
   #
   # List the modules in a course
   #
+  # @argument include[] ["items"] Return module items inline if possible.
+  #    This parameter suggests that Canvas return module items directly
+  #    in the Module object JSON, to avoid having to make separate API
+  #    requests for each module when enumerating modules and items. Canvas
+  #    is free to omit 'items' for any particular module if it deems them
+  #    too numerous to return inline. Callers must be prepared to use the
+  #    {api:ContextModuleItemsApiController#index List Module Items API}
+  #    if items are not returned.
+  # @argument include[] ["content_details"] (Requires include['items']) Returns additional details with module items specific to their associated content items.
+  #    Refer to the {api:Modules:Module%20Item Module Item specification} for more details.
+  # @argument search_term (optional) The partial name of the modules (and module items, if include['items'] is specified) to match and return.
+  #
   # @example_request
   #     curl -H 'Authorization: Bearer <token>' \
   #          https://<canvas>/api/v1/courses/222/modules
@@ -73,19 +96,35 @@ class ContextModulesApiController < ApplicationController
     if authorized_action(@context, @current_user, :read)
       route = polymorphic_url([:api_v1, @context, :context_modules])
       scope = @context.modules_visible_to(@current_user)
+
+      includes = Array(params[:include])
+      scope = ContextModule.search_by_attribute(scope, :name, params[:search_term]) unless includes.include?('items')
       modules = Api.paginate(scope, self, route)
+
+      ContextModule.send(:preload_associations, modules, {:content_tags => :content}) if includes.include?('items')
+
       modules_and_progressions = if @context.grants_right?(@current_user, session, :participate_as_student)
         modules.map { |m| [m, m.evaluate_for(@current_user, true)] }
       else
         modules.map { |m| [m, nil] }
       end
-      render :json => modules_and_progressions.map { |mod, prog| module_json(mod, @current_user, session, prog) }
+      opts = {}
+      if includes.include?('items') && params[:search_term].present?
+        SearchTermHelper.validate_search_term(params[:search_term])
+        opts[:search_term] = params[:search_term]
+      end
+      render :json => modules_and_progressions.map { |mod, prog| module_json(mod, @current_user, session, prog, includes, opts) }.compact
     end
   end
 
   # @API Show module
   #
   # Get information about a single module
+  #
+  # @argument include[] ["items"] Return module items inline if possible.
+  #     Please refer to the caveats outlined in the {api:ContextModulesApiController#index List modules endpoint}.
+  # @argument include[] ["content_details"] If module items are included, also returns additional details specific to their associated content items.
+  #    Refer to the {api:Modules:Module%20Item Module Item specification} for more details.
   #
   # @example_request
   #     curl -H 'Authorization: Bearer <token>' \
@@ -95,8 +134,10 @@ class ContextModulesApiController < ApplicationController
   def show
     if authorized_action(@context, @current_user, :read)
       mod = @context.modules_visible_to(@current_user).find(params[:id])
+      includes = Array(params[:include])
+      ContextModule.send(:preload_associations, mod, {:content_tags => :content}) if includes.include?('items')
       prog = @context.grants_right?(@current_user, session, :participate_as_student) ? mod.evaluate_for(@current_user, true) : nil
-      render :json => module_json(mod, @current_user, session, prog)
+      render :json => module_json(mod, @current_user, session, prog, includes)
     end
   end
 

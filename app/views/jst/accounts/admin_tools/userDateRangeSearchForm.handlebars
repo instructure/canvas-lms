@@ -1,0 +1,49 @@
+<style type="text/css">
+  #userIdSearchField { width: 8em; }
+</style>
+<div class="control-group">
+  <input
+    type="text"
+    name="search_term"
+    data-view="inputFilter"
+    placeholder='{{#t "search_people"}}Search people{{/t}}'
+    aria-label='{{#t "search"}}Search{{/t}}'
+  >
+
+  <input
+    type="hidden"
+    class="userIdField"
+    name="user_id"
+  >
+</div>
+
+<div class="v-gutter">
+  <div data-view="users"></div>
+</div>
+
+<div class="pad-box border border-trbl search-controls">
+  <h4>{{#t "generate_activity_username"}}Generate Activity for <span data-bind="name">{{user}}</span>{{/t}}</h4>
+  <h5>{{#t "generate_activity_userid"}}User ID: <span data-bind="id">{{user_id}}</span>{{/t}}</h5>
+  <hr>
+
+  <div class="control-group">
+    <label class="control-label" for="{{formName}}-dateStartSearchField">{{#t "message_date_from"}}From Date{{/t}}</label>
+    <div class="controls">
+      <input type="text" id="{{formName}}-dateStartSearchField" class="dateStartSearchField" name="start_time" placeholder="{{#t "message_date_from"}}From Date{{/t}}" />
+    </div>
+  </div>
+  <div class="control-group">
+    <label class="control-label" for="{{formName}}-dateEndSearchField">{{#t "message_date_to"}}To Date{{/t}}</label>
+    <div class="controls">
+      <input type="text" id="{{formName}}-dateEndSearchField" class="dateEndSearchField" name="end_time" placeholder="{{#t "message_date_to"}}To Date{{/t}}" />
+    </div>
+  </div>
+
+  <div class="control-group">
+    <div class="controls">
+      <button type="submit" class="btn btn-primary userDateRangeSearchBtn">
+        {{#t "find"}}Find{{/t}}
+      </button>
+    </div>
+  </div>
+</div>

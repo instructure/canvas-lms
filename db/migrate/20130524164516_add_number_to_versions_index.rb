@@ -10,15 +10,15 @@ class AddNumberToVersionsIndex < ActiveRecord::Migration
       # number DESC so that dups in earlier numbers don't alter the dups in later numbers,
       # since we've already cached them in a temp table
       order("number DESC").
-      find_each_with_temp_table(:transactional => false) do |row|
-        versionable_object_scope = Version.where(:versionable_id => row['versionable_id'],
-                                                 :versionable_type => row['versionable_type'])
+      find_each do |version|
+        versionable_object_scope = Version.where(:versionable_id => version.versionable_id,
+                                                 :versionable_type => version.versionable_type)
         dups = versionable_object_scope.where(:number => row['number']).order(:created_at, :id).all
         # leave the first one alone
         dups.shift
         next if dups.empty? # ???
         # move later versions out of the way
-        versionable_object_scope.where("number>?", row['number']).update_all("number=number+#{dups.length}")
+        versionable_object_scope.where("number>?", version.number).update_all("number=number+#{dups.length}")
         dups.each_with_index do |dup, idx|
           dup.number += idx + 1
           dup.save!

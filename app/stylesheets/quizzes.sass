@@ -7,12 +7,29 @@ $questionHeaderBackground: #F5F5F5
 #wrapper-container
   min-width: 1100px
 
+.with_item_groups #wrapper-container 
+  min-width: 940px
+
 .quizzes-speedgrader #wrapper-container
   min-width: 1000px
 
   .update-scores
     display: block
     margin: 0 auto
+
+// quiz index
+li.quiz
+  cursor: pointer
+
+  .ellipses
+    color: #7c7c7c
+
+  .ig-title
+    right: 554px
+
+  .ig-details
+    right: 110px
+    width: 415px
 
 #quiz_show
   .alert
@@ -126,7 +143,11 @@ div#content
 .quiz-header
   border-bottom: 1px solid #a4a4a4
   overflow: hidden
-  padding: 16px
+  padding: 15px
+
+  h2
+    margin-top: 0
+    font-weight: 500
 
 .quiz-submission, .question_editing
   background: $backgroundColor
@@ -868,13 +889,38 @@ ul#quiz_versions
     &.selected
       :font-weight bold
 
+#quiz_edit_header
+  #quiz_display_points_possible
+    line-height: 33px
+    font-size: 1.1em
+    text-align: right
 
+#quiz_edit_actions
+  border: 1px solid #b6babf
+  border-width: 1px 0
+  background: #f5f5f5
+  padding: 12px 13px
+  text-align: right
+
+  .notify
+    text-align: left
+    .checkbox
+      margin-bottom: 0
+      margin-top: 5px
+      min-height: 18px
+
+  #cancel_button
+    margin-right: 6px
 
 #quiz_edit_wrapper
+  background-color: #ffffff
+
+  .form
+    padding: 1em
   #quiz_title
     margin-top: 5px
-  padding: 1em
-  background-color: #ffffff
+  .title #quiz_title
+    width: 430px
   #student_submissions_warning,
   #unpublished_changes_message
     padding: 12px
@@ -1407,7 +1453,5 @@ ul#quiz_versions
   .controls
     margin: 0 auto 30px auto
 
-.no-headers
-
-
-
+#quiz-draft-state
+  padding: 10px
