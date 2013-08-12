@@ -27,7 +27,7 @@
       <div id="combo_box_container"></div>
       <a href="#" class="next"><%= t('links.next', "Next") %></a>
       <div id='x_of_x_students'>
-        (<%= t(:student_index_of_total, "student %{index} of %{total_students}", :index => raw('<span>???</span>'), :total_students => @assignment.context.students_visible_to(@current_user).count(:id, :distinct => true)) %>)<br />
+        <span id='x_of_x_students_frd'></span><br>
         <a href="<%= gradebook_url_for(@current_user, @context, @assignment) %>" id="speed_grader_gradebook_link">
           <%= t('links.gradebook', "Gradebook") %>
         </a>
@@ -41,7 +41,7 @@
         | <%= help_link %>
       <% end %>
       <div>
-        <span id="x_of_x_graded"><%= t(:portion_graded, "%{x} / %{y} Graded", :x => raw('<span>0</span>'), :y => raw("<span>#{@assignment.context.students.length}</span>")) %></span>
+        <span id="x_of_x_graded"></span>
         <span id='average_score_wrapper' style='display:none; padding-left: 10px;'><%= before_label(:average, "Avg") %> <span id='average_score'>0.0</span></span>
       </div>
     </div>
@@ -62,7 +62,13 @@
       </div>
       <div id='submissions_container'>
         <div id="this_student_does_not_have_a_submission">
-          <h3><%= t('headers.no_submission', "This student does not have a submission for this assignment") %></h3>
+          <h3>
+            <% if @assignment.grade_as_group? %>
+              <%= t('headers.no_group_submission', "This group does not have a submission for this assignment") %>
+            <% else %>
+              <%= t('headers.no_submission', "This student does not have a submission for this assignment") %>
+            <% end %>
+          </h3>
         </div>
         <div id="this_student_has_a_submission">
           <h3>

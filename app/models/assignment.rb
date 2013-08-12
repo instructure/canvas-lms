@@ -1108,16 +1108,42 @@ class Assignment < ActiveRecord::Base
       },
       :include_root => false
     )
-    avatar_methods = avatars ? [:avatar_path] : []
+
+    avatar_methods = (avatars && !grade_as_group?) ? [:avatar_path] : []
     visible_students = context.students_visible_to(user).order_by_sortable_name.uniq
-    res[:context][:students] = visible_students.
-      map{|u| u.as_json(:include_root => false, :methods => avatar_methods, :only => [:name, :id])}
+
+    res[:context][:rep_for_student] = {}
+
+    students = if grade_as_group?
+                 group_category.groups.includes(:group_memberships => :user).map { |g|
+                   [g.name, g.users]
+                 }.map { |group_name, group_students|
+                   representative, *others = (group_students & visible_students)
+                   next unless representative
+
+                   representative.readonly!
+                   representative.name = group_name
+
+                   others.each { |s|
+                     res[:context][:rep_for_student][s.id] = representative.id
+                   }
+                   representative
+                 }.compact
+               else
+                 visible_students
+               end
+
+    res[:context][:students] = students.map { |u|
+      u.as_json(:include_root => false,
+                :methods => avatar_methods,
+                :only => [:name, :id])
+    }
     res[:context][:active_course_sections] = context.sections_visible_to(user).
       map{|s| s.as_json(:include_root => false, :only => [:id, :name]) }
     res[:context][:enrollments] = context.enrollments_visible_to(user).
-      map{|s| s.as_json(:include_root => false, :only => [:user_id, :course_section_id]) }
+        map{|s| s.as_json(:include_root => false, :only => [:user_id, :course_section_id]) }
     res[:context][:quiz] = self.quiz.as_json(:include_root => false, :only => [:anonymous_submissions])
-    res[:submissions] = submissions.where(:user_id => visible_students).map{|sub|
+    res[:submissions] = submissions.where(:user_id => students).map{|sub|
       json = sub.as_json(:include_root => false,
         :include => {
           :submission_comments => {
@@ -1153,9 +1179,14 @@ class Assignment < ActiveRecord::Base
       end
       json
     }
+    res[:GROUP_GRADING_MODE] = grade_as_group?
     res
   ensure
     Attachment.skip_thumbnails = nil
+  end
+
+  def grade_as_group?
+    has_group_category? && !grade_group_students_individually?
   end
 
   def visible_rubric_assessments_for(user)

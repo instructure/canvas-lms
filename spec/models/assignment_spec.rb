@@ -2109,6 +2109,31 @@ describe Assignment do
       attachment_json = json['submissions'][0]['submission_history'][0]['submission']['versioned_attachments'][0]['attachment']
       attachment_json['view_inline_ping_url'].should match %r{/users/#{@student.id}/files/#{attachment.id}/inline_view\z}
     end
+
+    it "should not be in group mode for non-group assignments" do
+      setup_assignment_with_homework
+      json = @assignment.speed_grader_json(@teacher)
+      json["GROUP_GRADING_MODE"].should_not be_true
+    end
+
+    it 'returns "groups" instead of students for group assignments' do
+      course_with_teacher active_all: true
+      gc = @course.group_categories.create! name: "Assignment Groups"
+      groups = 2.times.map { |i| gc.groups.create! name: "Group #{i}" }
+      students = 4.times.map { student_in_course(active_all: true); @student }
+      students.each_with_index { |s, i| groups[i % groups.length].add_user(s) }
+      assignment = @course.assignments.create!(
+        group_category_id: gc.id,
+        grade_group_students_individually: false,
+        submission_types: %w(text_entry)
+      )
+      json = assignment.speed_grader_json(@teacher)
+      groups.each do |group|
+        j = json["context"]["students"].find { |g| g["name"] == group.name }
+        group.users.map(&:id).should include j["id"]
+      end
+      json["GROUP_GRADING_MODE"].should be_true
+    end
   end
 
   describe "update_student_submissions" do
