@@ -1,7 +1,7 @@
 <tr>
   <!--Select the term to run the report on-->
   <td><%= t('account_reports.default.parameters.header', %{Term}) %>
-    <select name="parameters[enrollment_term]">
+    <select name="parameters[enrollment_term_id]">
       <% if all_terms_option %>
         <option value="" <%= 'selected' unless @term %>><%= t(:all_terms, "All Terms") %></option>
       <%end%>
