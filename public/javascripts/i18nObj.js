@@ -534,7 +534,7 @@ I18n.p = I18n.pluralize;
 
 
 var normalizeDefault = function(str) { return str };
-if (ENV && ENV.lolcalize) {
+if (window.ENV && window.ENV.lolcalize) {
   normalizeDefault = i18nLolcalize;
 }
 
