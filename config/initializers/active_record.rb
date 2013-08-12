@@ -552,8 +552,13 @@ class ActiveRecord::Base
       index = "temp_primary_key"
       case connection.adapter_name
       when 'PostgreSQL'
-        connection.execute "ALTER TABLE #{table}
+        begin
+          old_proc = connection.raw_connection.set_notice_processor {}
+          connection.execute "ALTER TABLE #{table}
                                ADD temp_primary_key SERIAL PRIMARY KEY"
+        ensure
+          connection.raw_connection.set_notice_processor(&old_proc) if old_proc
+        end
       when 'MySQL', 'Mysql2'
         connection.execute "ALTER TABLE #{table}
                                ADD temp_primary_key MEDIUMINT NOT NULL PRIMARY KEY AUTO_INCREMENT"
