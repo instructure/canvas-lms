@@ -89,6 +89,10 @@ require [
     onForward: =>
       @compose.show(@detail.model, to: 'forward')
 
+    onStarToggle: =>
+      @detail.model.toggleStarred()
+      @detail.model.save()
+
     onFilter: (filters) =>
       @navigate('filter?'+$.param(filters), {trigger: true})
 
@@ -117,6 +121,7 @@ require [
       @header.on('course',      @onCourse)
       @header.on('mark-unread', @onMarkUnread)
       @header.on('forward',     @onForward)
+      @header.on('star-toggle', @onStarToggle)
       @header.on('search',      @onSearch)
       @compose.on('close',      @onCloseCompose)
 

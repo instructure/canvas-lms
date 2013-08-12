@@ -1,11 +1,12 @@
 define [
+  'i18n!conversations'
   'underscore'
   'Backbone'
   'compiled/views/conversations/CourseSelectionView'
   'compiled/views/conversations/SearchView'
   'use!vendor/bootstrap/bootstrap-dropdown'
   'use!vendor/bootstrap-select/bootstrap-select'
-], (_, {View}, CourseSelectionView, SearchView) ->
+], (I18n, _, {View}, CourseSelectionView, SearchView) ->
 
   class InboxHeaderView extends View
 
@@ -18,6 +19,7 @@ define [
       '#course-filter'   : '$courseFilter'
       '#admin-btn'       : '$adminBtn'
       '#mark-unread-btn' : '$markUnreadBtn'
+      '#star-toggle-btn' : '$starToggleBtn'
       '#admin-menu'      : '$adminMenu'
       '[role=search]'    : '$search'
 
@@ -30,6 +32,11 @@ define [
       'change #course-filter':    'onFilterChange'
       'click #mark-unread-btn':   'onMarkUnread'
       'click #forward-btn':       'onForward'
+      'click #star-toggle-btn':   'onStarToggle'
+
+    messages:
+      star: I18n.t('star', 'Star')
+      unstar: I18n.t('unstar', 'Unstar')
 
     render: () ->
       super()
@@ -56,14 +63,35 @@ define [
       e.preventDefault()
       @trigger('forward')
 
+    onStarToggle: (e) ->
+      e.preventDefault()
+      @trigger('star-toggle')
+
     onModelChange: (newModel, oldModel) ->
+      @detachModelEvents(oldModel)
+      @attachModelEvents(newModel)
+      @updateUi(newModel)
+
+    updateUi: (newModel) ->
       @toggleMessageBtns(!newModel || !newModel.get('selected'))
-      oldModel.off(null, null, this) if oldModel
       @onReadStateChange(newModel)
-      newModel.on('change:workflow_state', @onReadStateChange, this) if newModel
+      @onStarStateChange(newModel)
+
+    detachModelEvents: (oldModel) ->
+      oldModel.off(null, null, this) if oldModel
+
+    attachModelEvents: (newModel) ->
+      if newModel
+        newModel.on('change:workflow_state', @onReadStateChange, this)
+        newModel.on('change:starred', @onStarStateChange, this)
 
     onReadStateChange: (msg) ->
       @hideMarkUnreadBtn(!msg || msg.unread())
+
+    onStarStateChange: (msg) ->
+      if msg
+        key = if msg.starred() then 'unstar' else 'star'
+        @$starToggleBtn.text(@messages[key])
 
     filterObj: (obj) -> _.object(_.filter(_.pairs(obj), (x) -> !!x[1]))
 

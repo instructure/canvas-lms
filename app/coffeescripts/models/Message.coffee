@@ -24,9 +24,16 @@ define [
     unread: ->
       @get('workflow_state') is 'unread'
 
+    starred: ->
+      @get('starred')
+
     toggleReadState: (set_read) ->
       set_read ?= @unread()
       @set('workflow_state', if set_read then 'read' else 'unread')
+
+    toggleStarred: (setStarred) ->
+      setStarred ?= !@starred()
+      @set('starred', setStarred)
 
     toJSON: ->
       { conversation: _.extend(super, unread: @unread()) }

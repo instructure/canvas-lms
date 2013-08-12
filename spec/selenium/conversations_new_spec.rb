@@ -4,7 +4,7 @@ describe "conversations new" do
   it_should_behave_like "in-process server selenium tests"
 
   def conversations_url
-    "/conversations/beta"
+    "/conversations"
   end
 
   def get_conversations
@@ -44,18 +44,24 @@ describe "conversations new" do
     wait_for_ajaximations
   end
 
+  def click_star_toggle_menu_item()
+    f('#admin-btn').click
+    f("#star-toggle-btn").click
+    wait_for_ajaximations
+  end
+
   before do
-    # TODO: to work around temporary authentication restrictions
-    ConversationsController.any_instance.stubs(:authorized_action).returns(true)
     conversation_setup
+    @teacher.preferences[:use_new_conversations] = true
+    @teacher.save!
+
+    @s1 = user(name: "first student")
+    @s2 = user(name: "second student")
+    [@s1, @s2].each { |s| @course.enroll_student(s).update_attribute(:workflow_state, 'active') }
   end
 
   describe "view filter" do
     before do
-      @s1 = user(name: "first student")
-      @s2 = user(name: "second student")
-      [@s1, @s2].each { |s| @course.enroll_student(s).update_attribute(:workflow_state, 'active') }
-
       conversation(@teacher, @s1, @s2, workflow_state: 'unread')
       conversation(@teacher, @s1, @s2, workflow_state: 'read', starred: true)
       conversation(@teacher, @s1, @s2, workflow_state: 'archived', starred: true)
@@ -102,12 +108,67 @@ describe "conversations new" do
       select_course(@course.id.to_s)
       conversation_elements.size.should eql 2 
     end
-    
+
     it "should filter by course plus view" do
       get_conversations
       select_course(@course.id.to_s)
       select_view('unread')
       conversation_elements.size.should eql 1 
+    end
+  end
+
+  describe "starred" do
+    before do
+      @conv_unstarred = conversation(@teacher, @s1, @s2)
+      @conv_starred = conversation(@teacher, @s1, @s2)
+      @conv_starred.starred = true
+      @conv_starred.save!
+    end
+
+    it "should star via star icon" do
+      get_conversations
+      unstarred_elt = conversation_elements[1]
+      star_btn = f('.star-btn', unstarred_elt)
+      star_btn.should be_present
+      f('.active', unstarred_elt).should be_nil
+
+      star_btn.click
+      wait_for_ajaximations
+      f('.active', unstarred_elt).should be_present
+      @conv_unstarred.reload.starred.should be_true
+    end
+
+    it "should unstar via star icon" do
+      get_conversations
+      starred_elt = conversation_elements[0]
+      star_btn = f('.star-btn', starred_elt)
+      star_btn.should be_present
+      f('.active', starred_elt).should be_present
+
+      star_btn.click
+      wait_for_ajaximations
+      f('.active', starred_elt).should be_nil
+      @conv_starred.reload.starred.should be_false
+    end
+
+    it "should star via gear menu" do
+      get_conversations
+      unstarred_elt = conversation_elements[1]
+      unstarred_elt.click
+      wait_for_ajaximations
+      click_star_toggle_menu_item
+      f('.active', unstarred_elt).should be_present
+      @conv_unstarred.reload.starred.should be_true
+    end
+
+    it "should unstar via gear menu" do
+      get_conversations
+      starred_elt = conversation_elements[0]
+      starred_elt.click
+      wait_for_ajaximations
+      click_star_toggle_menu_item
+      f('.active', starred_elt).should be_nil
+      @conv_starred.reload.starred.should be_false
     end
   end
 
