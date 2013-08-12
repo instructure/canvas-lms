@@ -106,6 +106,8 @@ module Kaltura
               next
             end
 
+            hash[:hasWarnings] = true if asset[:description] && asset[:description].include?("warnings")
+
             sources << hash
           else
             # if it was deleted or if it did not convert because it did not need to
@@ -134,9 +136,11 @@ module Kaltura
     # preferring converted assets over the original (since they're likely to stream better)
     # and sorting by descending bitrate for identical file types.
     def sort_source_list(sources)
-      sources.sort_by do |a|
-        [a[:isOriginal] == '0' ? 0 : 1, PREFERENCE.index(a[:fileExt]) || PREFERENCE.size + 1, 0 - a[:bitrate].to_i]
+      sources = sources.sort_by do |a|
+        [a[:hasWarnings] ? 1 : 0, a[:isOriginal] == '0' ? 0 : 1, PREFERENCE.index(a[:fileExt]) || PREFERENCE.size + 1, 0 - a[:bitrate].to_i]
       end
+      sources.each{|a| a.delete(:hasWarnings)}
+      sources
     end
 
     def thumbnail_url(entryId, opts = {})
