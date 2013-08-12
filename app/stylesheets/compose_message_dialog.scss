@@ -231,14 +231,19 @@ $subtleBorderColor: #e5e5e5;
       display: table-cell;
       box-sizing: border-box;
       -moz-box-sizing: border-box;
-      padding: 5px 15px 5px 5px;
+      padding: 10px 15px 10px 5px;
       text-align: right;
       width: 1px;
       white-space: nowrap;
+
+      label {
+        margin: 0;
+      }
     }
 
     .message-header-input {
       display: table-cell;
+      vertical-align: middle;
 
       input {
         box-sizing: border-box;
