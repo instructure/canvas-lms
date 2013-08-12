@@ -91,7 +91,7 @@ $(document).ready(function() {
       <% end %>
       <% if can_do @context, @current_user, :manage_admin_users %>
         <li class="option ta_step <%= 'completed' unless @context.tas.empty? %>">
-          <a href="<%= context_url(@context, :context_details_url, :wizard => 1) %>#add_tas" class="header icon-user-add"><%= t('links.tas', %{Add TAs to the Course}) %></a>
+          <a href="<%= course_users_path(:course_id => @context) %>" class="header icon-user-add"><%= t('links.tas', %{Add TAs to the Course}) %></a>
           <div class="details" style="display: none;">
             <%= t 'details.tas', %{You may want to assign some TAs to help you with the course.  TAs can grade student submissions, help moderate the discussions and even update due dates and assignment details for you.} %>
           </div>
