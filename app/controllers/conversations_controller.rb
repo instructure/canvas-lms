@@ -48,10 +48,16 @@ class ConversationsController < ApplicationController
   #   The default behavior is to return all non-archived conversations (i.e.
   #   read and unread).
   #
-  # @argument filter [Optional, String]
-  #   When set, only return conversations for the specified course, group
-  #   or user. The id should be prefixed with its type, e.g. "user_123" or
-  #   "course_456"
+  # @argument filter[] [Optional, String, course_id|group_id|user_id]
+  #   When set, only return conversations for the specified courses, groups
+  #   or users. The id should be prefixed with its type, e.g. "user_123" or
+  #   "course_456". Can be an array (by setting "filter[]") or single value
+  #   (by setting "filter")
+  #
+  # @argument filter_mode [optional, "and"|"or", default "or"]
+  #   When filter[] contains multiple filters, combine them with this mode,
+  #   filtering conversations that at have at least all of the contexts ("and")
+  #   or at least one of the contexts ("or")
   #
   # @argument interleave_submissions [Boolean] Default is false. If true, the
   #   message_count will also include these submission-based messages in the
@@ -221,8 +227,10 @@ class ConversationsController < ApplicationController
   # @argument scope [Optional, String, "unread"|"starred"|"archived"]
   #   Used when generating "visible" in the API response. See the explanation
   #   under the {api:ConversationsController#index index API action}
-  #
-  # @argument filter [Optional, String]
+  # @argument filter[] [Optional, String, course_id|group_id|user_id]
+  #   Used when generating "visible" in the API response. See the explanation
+  #   under the {api:ConversationsController#index index API action}
+  # @argument filter_mode [optional, "and"|"or", default "or"]
   #   Used when generating "visible" in the API response. See the explanation
   #   under the {api:ConversationsController#index index API action}
   #
@@ -314,8 +322,10 @@ class ConversationsController < ApplicationController
   # @argument scope [Optional, String, "unread"|"starred"|"archived"]
   #   Used when generating "visible" in the API response. See the explanation
   #   under the {api:ConversationsController#index index API action}
-  #
-  # @argument filter [Optional, String]
+  # @argument filter[] [Optional, String, course_id|group_id|user_id]
+  #   Used when generating "visible" in the API response. See the explanation
+  #   under the {api:ConversationsController#index index API action}
+  # @argument filter_mode [optional, "and"|"or", default "or"]
   #   Used when generating "visible" in the API response. See the explanation
   #   under the {api:ConversationsController#index index API action}
   #
@@ -451,8 +461,10 @@ class ConversationsController < ApplicationController
   # @argument scope [Optional, String, "unread"|"starred"|"archived"]
   #   Used when generating "visible" in the API response. See the explanation
   #   under the {api:ConversationsController#index index API action}
-  #
-  # @argument filter [Optional, String]
+  # @argument filter[] [Optional, String, course_id|group_id|user_id]
+  #   Used when generating "visible" in the API response. See the explanation
+  #   under the {api:ConversationsController#index index API action}
+  # @argument filter_mode [optional, "and"|"or", default "or"]
   #   Used when generating "visible" in the API response. See the explanation
   #   under the {api:ConversationsController#index index API action}
   #
@@ -790,6 +802,9 @@ class ConversationsController < ApplicationController
   end
 
   def infer_scope
+    filter_mode = (params[:filter_mode].respond_to?(:to_sym) && params[:filter_mode].to_sym) || :or
+    return render_error('filter_mode', 'invalid') if ![:or, :and].include?(filter_mode)
+
     @conversations_scope = case params[:scope]
       when 'unread'
         @current_user.conversations.unread
@@ -806,7 +821,7 @@ class ConversationsController < ApplicationController
 
     filters = param_array(:filter)
     @conversations_scope = @conversations_scope.for_masquerading_user(@real_current_user) if @real_current_user
-    @conversations_scope = @conversations_scope.tagged(*filters) if filters.present?
+    @conversations_scope = @conversations_scope.tagged(*filters, :mode => filter_mode) if filters.present?
     @set_visibility = true
   end
 

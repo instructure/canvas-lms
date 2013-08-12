@@ -76,8 +76,8 @@ require [
       @selectConversation(null)
       @list.collection.reset()
       @list.collection.setParam('scope', filters.type)
-      filter = @_currentFilter()
       @list.collection.setParam('filter', @_currentFilter())
+      @list.collection.setParam('filter_mode', 'and')
       @list.collection.fetch()
       @compose.setDefaultCourse(filters.course)
 
@@ -135,14 +135,12 @@ require [
       @detail.addMessage(message)
 
     _currentFilter: ->
-      return @searchTokens if @searchTokens
-      return "course_#{@filters.course}" if @filters.course
-      ''
+      filter = @searchTokens || []
+      filter = filter.concat("course_#{@filters.course}") if @filters.course
+      filter
 
     onSearch: (tokens) =>
       @list.collection.reset()
-      # commenting this out for now because multiple filters don't work.
-      # tokens.push("course_#{@courseFilter}") if @courseFilter
       @searchTokens = if tokens.length then tokens else null
       @list.collection.setParam('filter', @_currentFilter())
       @list.collection.fetch()

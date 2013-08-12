@@ -107,6 +107,34 @@ describe ConversationsController do
       assigns[:conversations_json][0][:id].should == @c2.conversation_id
     end
 
+    it "should use the boolean operation in filter_mode when combining multiple filters" do
+      course_with_student_logged_in(:active_all => true)
+      @course1 = @course
+      @c1 = conversation(:course => @course1)
+      @course2 = course(:active_all => true)
+      enrollment = @course2.enroll_student(@user)
+      enrollment.workflow_state = 'active'
+      enrollment.save!
+      @c2 = conversation(:course => @course2)
+      @c3 = conversation(:course => @course2)
+
+      get 'index', :filter => [@course1.asset_string, @course2.asset_string], :filter_mode => 'or', :format => 'json'
+      response.should be_success
+      assigns[:conversations_json].map{|c| c[:id]}.sort.should eql [@c1, @c2, @c3].map(&:conversation_id).sort
+
+      get 'index', :filter => [@course2.asset_string, @user.asset_string], :filter_mode => 'or', :format => 'json'
+      response.should be_success
+      assigns[:conversations_json].map{|c| c[:id]}.sort.should eql [@c1, @c2, @c3].map(&:conversation_id).sort
+
+      get 'index', :filter => [@course2.asset_string, @user.asset_string], :filter_mode => 'and', :format => 'json'
+      response.should be_success
+      assigns[:conversations_json].map{|c| c[:id]}.sort.should eql [@c2, @c3].map(&:conversation_id).sort
+
+      get 'index', :filter => [@course1.asset_string, @course2.asset_string], :filter_mode => 'and', :format => 'json'
+      response.should be_success
+      assigns[:conversations_json].should eql []
+    end
+
     it "should return conversations matching a user filter" do
       course_with_student_logged_in(:active_all => true)
       @c1 = conversation
