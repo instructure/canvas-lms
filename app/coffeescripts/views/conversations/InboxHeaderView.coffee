@@ -115,7 +115,7 @@ define [
     toggleReplyBtn:    (value) -> @_toggleBtn(@$replyBtn, value)
 
     toggleReplyAllBtn: (value) -> @_toggleBtn(@$replyAllBtn, value)
-
+    
     toggleDeleteBtn:   (value) -> @_toggleBtn(@$deleteBtn, value)
 
     toggleAdminBtn:    (value) -> @_toggleBtn(@$adminBtn, value)

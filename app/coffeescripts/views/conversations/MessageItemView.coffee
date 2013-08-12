@@ -24,13 +24,14 @@ define [
 
     initialize: ->
       super
-      @summarized = @model.get('summarizedParticipants')
+      @summarized = @model.get('summarizedParticipantNames')
+      @listenTo(@model, 'change:selected', @onModelSelect)
 
     # Internal: Serialize the model for the view.
     #
     # Returns the model's "conversation" key object.
     toJSON: ->
-      @model.toJSON().conversation
+      @model.toJSON()
 
     # Internal: Update participant lists after render.
     #
@@ -60,6 +61,8 @@ define [
     onSelect: (e) ->
       e.preventDefault()
       @model.set('selected', !@model.get('selected'))
+
+    onModelSelect: () ->
       @$el.toggleClass('active', @model.get('selected'))
 
     # Internal: Handle toggle events between the full and summarized lists.

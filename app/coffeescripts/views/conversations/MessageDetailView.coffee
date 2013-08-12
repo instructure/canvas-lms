@@ -17,8 +17,8 @@ define [
       if @model
         context   = @model.toJSON().conversation
         $template = $(template(context))
-        _.each context.messages, (message) ->
-          childView = new MessageItemView(model: new Message(message)).render()
+        @model.messageCollection.each (message) ->
+          childView = new MessageItemView(model: message).render()
           $template.find('.message-content').append(childView.$el)
       else
         $template = noMessage()

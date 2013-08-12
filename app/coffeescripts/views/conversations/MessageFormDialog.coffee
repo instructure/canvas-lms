@@ -82,9 +82,9 @@ define [
 
     show: (model, options) ->
       if @model = model
-        messages = @model.get('messages')
-        @message = _.find(messages, (m) -> m.selected) or messages[0]
-      @to = options.to if options
+        messages = @model.messageCollection
+        @message = messages.find((m) -> m.get('selected')) or messages.at(0)
+      @to = options?.to
 
       @render()
       super
@@ -149,13 +149,18 @@ define [
       @prepareTextarea(@$el)
       @initializeTokenInputs(@$el)
 
+      @$messageCourse.prop('disabled', !!@model)
       @courseView = new CourseSelectionView(
         el: @$messageCourse,
         courses: @options.courses,
         defaultOption: I18n.t('select_course', 'Select course')
       )
       @courseView.on('course', @onCourse)
-      @courseView.setValue(@defaultCourse)
+      if @model
+        # TODO: I imagine we'll be changing this
+        @courseView.setValue(_.keys(@model.get('audience_contexts').courses)[0])
+      else
+        @courseView.setValue(@defaultCourse)
       @courseView.focus()
 
       if @tokenInput = @$el.find('.recipients').data('token_input')
@@ -169,16 +174,24 @@ define [
                 value: data[0].id
                 text: data[0].name
                 data: data[0]
-      #TODO: populate recipients based on @to
+
+      if @to && @to != 'forward' && @message
+        tokens = [] 
+        tokens.push(@message.get('author'))
+        if @to == 'replyAll' || ENV.current_user_id == @message.get('author').id
+          tokens = tokens.concat(@message.get('participants'))
+          if tokens.length > 1
+            tokens = _.filter(tokens, (t) -> t.id != ENV.current_user_id)
+        @recipientView.setTokens(tokens)
 
       if @tokenInput
         @tokenInput.change = @recipientIdsChanged
 
-      @$messageSubject.attr('disabled', !!@model)
+      @$messageSubject.prop('disabled', !!@model)
       @$messageSubject.val(@model?.get('subject'))
 
-      if messages = @model?.get('messages')
-        contextView = new ContextMessagesView(el: @$contextMessages, collection: new Collection(messages))
+      if messages = @model?.messageCollection
+        contextView = new ContextMessagesView(el: @$contextMessages, collection: messages)
         contextView.render()
 
       @$fullDialog.on 'click', '.message-body', @handleBodyClick

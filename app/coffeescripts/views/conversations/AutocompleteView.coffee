@@ -284,7 +284,7 @@ define [
     # model - Result model (user or course)
     #
     # Returns nothing.
-    _addToken: (model) ->
+    _addToken: (model) =>
       @tokens.push(model.id)
       @$tokenList.append(tokenTemplate(model))
       @toggleResultList(false)
@@ -342,3 +342,6 @@ define [
       @$inputBox.toggleClass('disabled', !course)
       @$tokenList.find('li.ac-token').remove()
       @tokens = []
+
+    setTokens: (tokens) ->
+      _.each(tokens, @_addToken)
