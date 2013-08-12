@@ -283,10 +283,13 @@ describe ConversationsController do
       @course1 = @course
       @course2 = course(:active_all => true)
       @course2.enroll_teacher(@user).accept
+      @course3 = course(:active_all => true)
       @group1 = @course1.groups.create!
       @group2 = @course1.groups.create!
+      @group3 = @course3.groups.create!
       @group1.users << @user
       @group2.users << @user
+      @group3.users << @user
 
       new_user1 = User.create
       enrollment1 = @course1.enroll_student(new_user1)
@@ -307,13 +310,14 @@ describe ConversationsController do
       enrollment3.workflow_state = 'active'
       enrollment3.save
 
-      post 'create', :recipients => [@course2.asset_string + "_students", @group1.asset_string], :body => "yo", :group_conversation => true
+      post 'create', :recipients => [@course2.asset_string + "_students", @group1.asset_string], :body => "yo", :group_conversation => true, :context_code => @group3.asset_string
       response.should be_success
 
       c = Conversation.first
-      c.tags.sort.should eql [@course1.asset_string, @course2.asset_string, @group1.asset_string].sort
+      c.tags.sort.should eql [@course1.asset_string, @course2.asset_string, @group1.asset_string, @course3.asset_string, @group3.asset_string].sort
       # course1 inferred from group1, course2 inferred from synthetic context,
       # group1 explicit, group2 not present (even though it's shared by everyone)
+      # group3 from context_code, course3 inferred from group3
     end
 
     it "should populate subject" do

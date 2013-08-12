@@ -838,7 +838,7 @@ class ConversationsController < ApplicationController
   end
 
   def infer_tags
-    tags = param_array(:tags).concat(param_array(:recipients))
+    tags = param_array(:tags).concat(param_array(:recipients)).concat([params[:context_code]])
     tags = SimpleTags.normalize_tags(tags)
     tags += tags.grep(/\Agroup_(\d+)\z/){ g = Group.find_by_id($1.to_i) and g.context.asset_string }.compact
     @tags = tags.uniq

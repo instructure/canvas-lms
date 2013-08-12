@@ -87,7 +87,8 @@ class Conversation < ActiveRecord::Base
         conversation.has_media_objects = false
         conversation.context_type = options[:context_type]
         conversation.context_id = options[:context_id]
-        conversation.tags = []
+        conversation.tags = [conversation.context_string].compact
+        conversation.tags += [conversation.context.context.asset_string] if conversation.context_type == "Group"
         conversation.subject = options[:subject]
         conversation.save!
 
