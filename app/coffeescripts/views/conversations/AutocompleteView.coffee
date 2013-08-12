@@ -57,6 +57,7 @@ define [
       '.ac-result-list' : '$resultList'
       '.ac-placeholder' : '$placeholder'
       '.ac-clear'       : '$clearBtn'
+      '.ac-search-btn'  : '$searchBtn'
 
     # Internal: Event map.
     events:
@@ -64,6 +65,7 @@ define [
       'click     .ac-input-box'        : '_onWidgetClick'
       'click     .ac-clear'            : '_onClearTokens'
       'click     .ac-token-remove-btn' : '_onRemoveToken'
+      'click     .ac-search-btn'       : '_onSearch'
       'focus     .ac-input'            : '_onInputFocus'
       'input     .ac-input'            : '_onSearchTermChange'
       'keydown   .ac-input'            : '_onInputAction'
@@ -268,6 +270,15 @@ define [
       e.preventDefault()
       @_removeToken($(e.currentTarget).siblings('input').val())
 
+    # Internal: Handle clicks to the search button.
+    #
+    # e - Event object.
+    #
+    # Returns nothing.
+    _onSearch: (e) ->
+      @_fetchResults(true)
+      @$input.focus()
+
     # Internal: Add the given model to the token list.
     #
     # model - Result model (user or course)
@@ -282,6 +293,7 @@ define [
       if @options.single
         @$clearBtn.show().focus()
         @$input.prop('disabled', true)
+        @$searchBtn.prop('disabled', true)
         @trigger('disabled')
       @trigger('changeToken', @tokenParams())
 
@@ -297,6 +309,7 @@ define [
       @$clearBtn.hide() unless @tokens.length
       if @options.single and !@tokens.length
         @$input.prop('disabled', false)
+        @$searchBtn.prop('disabled', false)
         @trigger('enabled')
       @trigger('changeToken', @tokenParams()) unless silent
 
@@ -324,6 +337,8 @@ define [
     setCourse: (course) ->
       return if course == @course
       @course = course
-      @$input.attr('disabled', !course)
+      @$input.prop('disabled', !course)
+      @$searchBtn.prop('disabled', !course)
       @$inputBox.toggleClass('disabled', !course)
       @$tokenList.find('li.ac-token').remove()
+      @tokens = []

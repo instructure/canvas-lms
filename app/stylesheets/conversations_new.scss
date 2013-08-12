@@ -49,7 +49,7 @@
   }
 }
 
-.conversations .panel {
+.conversations .panel, .message-header {
   button {
     &[disabled], &[disabled]:focus, &[disabled]:hover {
       color: #a6a6a6;
@@ -83,7 +83,6 @@
   width: 250px;
 
   .ac-input-box {
-    border-right: none;
     border-radius: 16px 0 0 16px;
     float: left;
     width: 205px;
@@ -321,6 +320,11 @@
 .bootstrap-select.btn-group, .bootstrap-select.btn-group[class*="span"] {
   margin-bottom: 0;
 }
+
 .icon-ok:before {
   content: "\e015";
+}
+
+.message-header-row .ac-input-box {
+  width: 93%;
 }
