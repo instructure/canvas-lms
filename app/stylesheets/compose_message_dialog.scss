@@ -273,3 +273,16 @@ $subtleBorderColor: #e5e5e5;
   }
 
 }
+
+::-webkit-input-placeholder { 
+    color: #666;
+    opacity: 1;
+}
+::-moz-placeholder { 
+    color: #666;
+    opacity: 1;
+}
+:-ms-input-placeholder { 
+    color: #666;
+    opacity: 1;
+}
