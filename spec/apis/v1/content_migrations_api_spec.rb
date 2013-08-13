@@ -131,6 +131,19 @@ describe ContentMigrationsController, :type => :integration do
       json['settings']['source_course_id'].should == @course.id
       json['settings']['source_course_name'].should == @course.name
     end
+
+    it "should mark as failed if stuck in pre_processing" do
+      @migration.workflow_state = 'pre_processing'
+      @migration.save!
+      ContentMigration.where(:id => @migration.id).update_all(:updated_at => Time.now.utc - 2.hours)
+
+      json = api_call(:get, @migration_url, @params)
+      json['workflow_state'].should == 'failed'
+      json['migration_issues_count'].should == 1
+      @migration.reload
+      @migration.should be_failed
+      @migration.migration_issues.first.description.should == "The file upload process timed out."
+    end
   end
 
   describe 'create' do

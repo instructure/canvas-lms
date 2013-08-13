@@ -297,6 +297,7 @@ class ContentMigration < ActiveRecord::Base
   def file_upload_success_callback(att)
     if att.file_state == "available"
       self.attachment = att
+      self.migration_issues.delete_all if self.migration_issues.any?
       self.workflow_state = :pre_processed
       self.save
       self.queue_migration
@@ -587,4 +588,13 @@ class ContentMigration < ActiveRecord::Base
     Canvas::Migration::Helpers::SelectiveContentFormatter.new(self, base_url).get_content_list(type)
   end
 
+  UPLOAD_TIMEOUT = 1.hour
+  def check_for_pre_processing_timeout
+    if self.pre_processing? && (self.updated_at.utc + UPLOAD_TIMEOUT) < Time.now.utc
+      add_error(t(:upload_timeout_error, "The file upload process timed out."))
+      self.workflow_state = :failed
+      job_progress.fail if job_progress && !skip_job_progress
+      self.save
+    end
+  end
 end

@@ -95,6 +95,7 @@ class ContentMigrationsController < ApplicationController
     Folder.root_folders(@context) # ensure course root folder exists so file imports can run
 
     @migrations = Api.paginate(@context.content_migrations.order("id DESC"), self, api_v1_course_content_migration_list_url(@context))
+    @migrations.each{|mig| mig.check_for_pre_processing_timeout }
     content_migration_json_hash = content_migrations_json(@migrations, @current_user, session)
 
     if api_request?
@@ -126,6 +127,7 @@ class ContentMigrationsController < ApplicationController
   # @returns ContentMigration
   def show
     @content_migration = @context.content_migrations.find(params[:id])
+    @content_migration.check_for_pre_processing_timeout
     render :json => content_migration_json(@content_migration, @current_user, session)
   end
 
@@ -229,6 +231,7 @@ class ContentMigrationsController < ApplicationController
   # @returns ContentMigration
   def update
     @content_migration = @context.content_migrations.find(params[:id])
+    @content_migration.check_for_pre_processing_timeout
     @plugin = Canvas::Plugin.find(@content_migration.migration_type)
 
     update_migration
