@@ -5,7 +5,8 @@ define [
   'vendor/jquery.ba-tinypubsub'
   'vendor/mediaelement-and-player'
   'jquery'
-], (I18n, _, pubsub, mejs, $) ->
+  'compiled/util/kalturaAnalytics'
+], (I18n, _, pubsub, mejs, $, kalturaAnalytics) ->
 
   isIE9 = () -> $("body").hasClass("ie9")
   isMobileDevice = () ->
@@ -33,6 +34,8 @@ define [
     # problems with the canPlayType call.
     mode: if isIE9() then 'shim' else 'auto_plugin'
     success: (mediaElement, domObject) ->
+      kalturaAnalytics(this.mediaCommentId, mediaElement, INST.kalturaSettings)
+
       if(mediaElement.pluginType == 'flash')
         mediaElement.play()
 
@@ -96,7 +99,7 @@ define [
           if sourcesAndTracks.sources.length
             mediaPlayerOptions =
                can_add_captions: sourcesAndTracks.can_add_captions
-               mediaCommendId: id
+               mediaCommentId: id
                googleAnalyticsTitle: id
 
             $mediaTag = createMediaTag({sourcesAndTracks, mediaPlayerOptions, mediaType, height, width})
@@ -145,7 +148,7 @@ define [
           if sourcesAndTracks.sources.length
             mediaPlayerOptions = 
               can_add_captions: sourcesAndTracks.can_add_captions
-              mediaCommendId: id
+              mediaCommentId: id
               googleAnalyticsTitle: id
 
             $mediaTag = createMediaTag({sourcesAndTracks, mediaPlayerOptions, mediaType, height: height-spaceNeededForControls, width})
