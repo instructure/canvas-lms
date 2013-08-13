@@ -148,7 +148,6 @@ FakeRails3Routes.draw do
     # resources :wiki_pages, :path => :pages do
     #   match 'revisions/latest' => 'wiki_page_revisions#latest_version_number', :as => :latest_version_number
     #   resources :wiki_page_revisions, :as => "revisions"
-    #   resources :wiki_page_comments, :as => "comments"
     # end
     #
     ####
@@ -161,7 +160,6 @@ FakeRails3Routes.draw do
     resources :wiki_pages, :path => :wiki do
       match 'revisions/latest' => 'wiki_page_revisions#latest_version_number', :as => :latest_version_number
       resources :wiki_page_revisions, :path => :revisions
-      resources :wiki_page_comments, :path => :comments
     end
 
     ####

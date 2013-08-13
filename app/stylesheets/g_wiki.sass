@@ -212,54 +212,8 @@ $shadow: 0 1px 0 rgba(0,0,0,0.15)
 
 #page_history
   :float right
-#wiki_page_comments
-  margin-top: 50px
-  textarea
-    width: 97%
-    +border-radius(4px)
-    border: 1px solid #aaa
-    height: 50px
-  .wiki_page_comment
-    margin-bottom: 20px
-    .commenting
-      display: none
-    &.commenting
-      .commenting
-        display: block
-      .formatted_body .not_commenting
-        display: none
-    .header
-      border-bottom: 1px solid #ccc
-      margin-bottom: 2px
-      color: #888
-      font-size: 0.8em
-      .user_name
-        float: left
-      .links
-        float: right
-        .delete_comment_link
-          display: none
-    &.deletable_comment
-      .header 
-        .links .delete_comment_link
-          display: inline
-          opacity: 0.5
-        &:hover
-          .links .delete_comment_link
-            opacity: 1.0
-    .formatted_body
-      margin: 0 10px
-      .add_comment_link
-        width: 97%
-        +border-radius(4px)
-        border: 1px solid #aaa
-        cursor: text
-        display: block
-        padding: 2px 4px
-        text-decoration: none
-        color: #888
-        
-// this is to fix a bug that was reported that if you shrink your browser window width to something small 
+
+// this is to fix a bug that was reported that if you shrink your browser window width to something small
 // that it would just cut off the right side of the tiny WYSIWYG editor box and make it dissapear beind the right side.
 #wiki_page_body_parent.mceEditor
   display: block

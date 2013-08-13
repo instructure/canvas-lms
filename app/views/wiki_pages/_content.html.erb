@@ -156,49 +156,4 @@ course will see this page first.  You can change that from [the course home page
   </script>
 <% end %>
 </div>
-<% if WikiPage.comments_enabled? && @context.allow_wiki_comments && !@page.new_record? %>
-<div id="wiki_page_comments">
-  <h2><%= t 'headings.page_comments', "Page Comments" %></h2>
-  <% comments = @page.wiki_page_comments.active.current_first.paginate(:page => 1, :per_page => 5) %>
-  <% if @context.allow_wiki_comments || can_do(@context, @current_user, :manage_wiki) %>
-    <%= render :partial => "wiki_pages/wiki_page_comment_form" %>
-  <% end %>
-  <%= render :partial => "wiki_pages/wiki_page_comment", :collection => comments %>
-  <% js_block do %>
-    <script type="text/javascript">
-    require([
-      'i18nObj',
-      'jquery' /* $ */,
-      'wiki',
-      'vendor/jquery.pageless' /* pageless */
-    ], function(I18n, $, wikiPage) {
-
-      $(function(){
-        $('#wiki_page_comments').pageless({
-          totalPages: <%= comments.total_pages %>,
-          url: "<%= context_url(@context, :context_wiki_page_wiki_page_comments_url, @page.id, :format => :json) %>",
-          loaderMsg: <%= jt('#wiki_pages.loading_comments', "Loading more results") %>,
-          scrape: function(data) {
-            if(typeof(data) == 'string') {
-              try {
-                data = $.parseJSON(data);
-              } catch(e) {
-                data = [];
-              }
-            }
-            for(var idx in data) {
-              var $comment = wikiPage.updateComment(null, data[idx].wiki_page_comment);
-            }
-            return "";
-          }
-        });
-      });
-    });
-    </script>
-  <% end %>
-  <!-- will_paginate the rest -->
-  <%= render :partial => "wiki_pages/wiki_page_comment" %>
-  <%= will_paginate(comments) %>
-</div>
-<% end %>
 <div id="wiki_page_version_number" style="display: none;"><%= @page.version_number %></div>

@@ -31,7 +31,6 @@ class WikiPage < ActiveRecord::Base
   belongs_to :wiki, :touch => true
   belongs_to :cloned_item
   belongs_to :user
-  has_many :wiki_page_comments, :order => "created_at DESC"
   acts_as_url :title, :scope => [:wiki_id, :not_deleted], :sync_url => true
 
   validate :validate_front_page_visibility
@@ -546,10 +545,6 @@ class WikiPage < ActiveRecord::Base
       end
       return item
     end
-  end
-
-  def self.comments_enabled?
-    !Rails.env.production?
   end
 
   def increment_view_count(user, context = nil)
