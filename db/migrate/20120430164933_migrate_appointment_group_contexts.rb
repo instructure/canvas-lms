@@ -13,7 +13,7 @@ class MigrateAppointmentGroupContexts < ActiveRecord::Migration
       }
     }
 
-    bulk_insert :appointment_group_contexts, records
+    AppointmentGroupContext.bulk_insert records
   end
 
   def self.down

@@ -30,7 +30,7 @@ class SubmissionVersion < ActiveRecord::Base
 
     def index_versions(versions)
       records = versions.map{ |version| extract_version_attributes(version) }.compact
-      connection.bulk_insert(table_name, records) if records.present?
+      bulk_insert(records) if records.present?
     end
 
     private

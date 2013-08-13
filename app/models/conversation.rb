@@ -63,7 +63,7 @@ class Conversation < ActiveRecord::Base
         :has_media_objects => has_media_objects?,
         :root_account_ids => self.root_account_ids
     }.merge(options)
-    connection.bulk_insert('conversation_participants', user_ids.map{ |user_id|
+    ConversationParticipant.bulk_insert(user_ids.map{ |user_id|
       options.merge({:user_id => user_id})
     })
   end
@@ -390,7 +390,7 @@ class Conversation < ActiveRecord::Base
         ConversationMessageParticipant.where(
           :conversation_message_id => message.id, :user_id => inserting_user_ids
           ).delete_all
-        connection.bulk_insert "conversation_message_participants", message_participant_data
+        ConversationMessageParticipant.bulk_insert message_participant_data
       end
     end
   end

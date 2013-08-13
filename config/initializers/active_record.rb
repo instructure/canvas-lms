@@ -784,22 +784,26 @@ class ActiveRecord::Base
     end
     alias_method_chain :delete_all, :joins
   end
+
+  def self.bulk_insert(records)
+    return if records.empty?
+    transaction do
+      connection.bulk_insert(table_name, records)
+    end
+  end
 end
 
 ActiveRecord::ConnectionAdapters::AbstractAdapter.class_eval do
   def bulk_insert(table_name, records)
-    return if records.empty?
-    transaction do
-      keys = records.first.keys
-      quoted_keys = keys.map{ |k| quote_column_name(k) }.join(', ')
-      records.each do |record|
-        execute <<-SQL
-          INSERT INTO #{quote_table_name(table_name)}
-            (#{quoted_keys})
-          VALUES
-            (#{keys.map{ |k| quote(record[k]) }.join(', ')})
-        SQL
-      end
+    keys = records.first.keys
+    quoted_keys = keys.map{ |k| quote_column_name(k) }.join(', ')
+    records.each do |record|
+      execute <<-SQL
+        INSERT INTO #{quote_table_name(table_name)}
+          (#{quoted_keys})
+        VALUES
+          (#{keys.map{ |k| quote(record[k]) }.join(', ')})
+      SQL
     end
   end
 end
@@ -884,13 +888,10 @@ module MySQLAdapterExtensions
   end
 
   def bulk_insert(table_name, records)
-    return if records.empty?
-    transaction do
-      keys = records.first.keys
-      quoted_keys = keys.map{ |k| quote_column_name(k) }.join(', ')
-      execute "INSERT INTO #{quote_table_name(table_name)} (#{quoted_keys}) VALUES" <<
-                  records.map{ |record| "(#{keys.map{ |k| quote(record[k]) }.join(', ')})" }.join(',')
-    end
+    keys = records.first.keys
+    quoted_keys = keys.map{ |k| quote_column_name(k) }.join(', ')
+    execute "INSERT INTO #{quote_table_name(table_name)} (#{quoted_keys}) VALUES" <<
+                records.map{ |record| "(#{keys.map{ |k| quote(record[k]) }.join(', ')})" }.join(',')
   end
 
   def add_column_with_foreign_key_check(table, name, type, options = {})
@@ -923,16 +924,13 @@ end
 if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
   ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.class_eval do
     def bulk_insert(table_name, records)
-      return if records.empty?
-      transaction do
-        keys = records.first.keys
-        quoted_keys = keys.map{ |k| quote_column_name(k) }.join(', ')
-        execute "COPY #{quote_table_name(table_name)} (#{quoted_keys}) FROM STDIN"
-        raw_connection.put_copy_data records.inject(''){ |result, record|
-          result << keys.map{ |k| quote_text(record[k]) }.join("\t") << "\n"
-        }
-        raw_connection.put_copy_end
-      end
+      keys = records.first.keys
+      quoted_keys = keys.map{ |k| quote_column_name(k) }.join(', ')
+      execute "COPY #{quote_table_name(table_name)} (#{quoted_keys}) FROM STDIN"
+      raw_connection.put_copy_data records.inject(''){ |result, record|
+        result << keys.map{ |k| quote_text(record[k]) }.join("\t") << "\n"
+      }
+      raw_connection.put_copy_end
     end
 
     def quote_text(value)
