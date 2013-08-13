@@ -65,13 +65,14 @@ class CommMessagesApiController < ApplicationController
   # 
   # Retrieve messages sent to a user.
   # 
-  # @argument user_id The user id for whom you want to retrieve CommMessages
+  # @argument user_id [String]
+  #   The user id for whom you want to retrieve CommMessages
   #
-  # @argument start_time [optional] The beginning of the time range you want to
-  #   retrieve message from.
+  # @argument start_time [Optional, DateTime]
+  #   The beginning of the time range you want to retrieve message from.
   #
-  # @argument end_time [optional] The end of the time range you want to retrieve
-  #   messages for.
+  # @argument end_time [Optional, DateTime]
+  #   The end of the time range you want to retrieve messages for.
   #
   # @returns [CommMessage]
   def index
