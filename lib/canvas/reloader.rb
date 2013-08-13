@@ -20,6 +20,7 @@
 module Canvas::Reloader
   def self.reload!
     Setting.reset_cache!
+    Canvas::RequestThrottle.reload!
   end
 
   def self.trap_signal

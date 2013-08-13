@@ -48,15 +48,23 @@ module AuthenticationMethods
   class AccessTokenError < Exception
   end
 
+  def self.access_token(request, params_method = :params)
+    auth_header = CANVAS_RAILS3 ? request.authorization : ActionController::HttpAuthentication::Basic.authorization(request)
+    if auth_header.present? && (header_parts = auth_header.split(' ', 2)) && header_parts[0] == 'Bearer'
+      header_parts[1]
+    else
+      request.send(params_method)['access_token'].presence
+    end
+  end
+
+  def self.user_id(request)
+    request.session[:user_id]
+  end
+
   def load_pseudonym_from_access_token
     return unless api_request? || params[:action] == 'oauth2_logout'
 
-    auth_header = CANVAS_RAILS3 ? request.authorization : ActionController::HttpAuthentication::Basic.authorization(request)
-    token_string = if auth_header.present? && (header_parts = auth_header.split(' ', 2)) && header_parts[0] == 'Bearer'
-      header_parts[1]
-    elsif params[:access_token].present?
-      params[:access_token]
-    end
+    token_string = AuthenticationMethods.access_token(request)
 
     if token_string
       @access_token = AccessToken.authenticate(token_string)
@@ -116,6 +124,9 @@ module AuthenticationMethods
       @current_pseudonym = nil
       @current_user = nil
     end
+
+    # required by the user throttling middleware
+    session[:user_id] = @current_user.global_id if @current_user
 
     if @current_user && %w(become_user_id me become_teacher become_student).any? { |k| params.key?(k) }
       request_become_user = nil
