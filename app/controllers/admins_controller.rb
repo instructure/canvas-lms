@@ -44,11 +44,15 @@ class AdminsController < ApplicationController
   #
   # Flag an existing user as an admin within the account.
   #
-  # @argument user_id The id of the user to promote.
+  # @argument user_id [String]
+  #   The id of the user to promote.
   #
-  # @argument role [Optional] The user's admin relationship with the account will be created with the given role. Defaults to 'AccountAdmin'.
+  # @argument role [Optional, String]
+  #   The user's admin relationship with the account will be created with the
+  #   given role. Defaults to 'AccountAdmin'.
   #
-  # @argument send_confirmation [Optional] [0|1] Send a notification email to the new admin if set to '1'; send no email if set to '0'. Default is '1'.
+  # @argument send_confirmation [Optional, Boolean] Send a notification email to
+  #   the new admin if true. Default is true.
   #
   # @returns Admin
   def create
@@ -63,7 +67,9 @@ class AdminsController < ApplicationController
   #
   # Remove the rights associated with an account admin role from a user.
   #
-  # @argument role [Optional] Account role to remove from the user. Defaults to 'AccountAdmin'. Any other account role must be specified explicitly.
+  # @argument role [Optional, String]
+  #   Account role to remove from the user. Defaults to 'AccountAdmin'. Any
+  #   other account role must be specified explicitly.
   #
   # @returns Admin
   def destroy
