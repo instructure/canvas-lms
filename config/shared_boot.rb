@@ -149,3 +149,13 @@ if defined?(PhusionPassenger)
     end
   end
 end
+
+if defined?(PhusionPassenger)
+ PhusionPassenger.on_event(:after_installing_signal_handlers) do
+  Canvas::Reloader.trap_signal
+ end
+else
+  config.to_prepare do
+    Canvas::Reloader.trap_signal
+  end
+end
