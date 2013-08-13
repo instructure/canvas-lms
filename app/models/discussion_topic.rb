@@ -276,7 +276,7 @@ class DiscussionTopic < ActiveRecord::Base
 
         if new_state == "read"
           new_entry_ids = entry_ids - existing_entry_participants.map(&:discussion_entry_id)
-          connection.bulk_insert('discussion_entry_participants', new_entry_ids.map { |entry_id|
+          DiscussionEntryParticipant.bulk_insert(new_entry_ids.map { |entry_id|
             {
               :discussion_entry_id => entry_id,
               :user_id => current_user.id,

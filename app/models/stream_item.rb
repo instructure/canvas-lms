@@ -246,7 +246,7 @@ class StreamItem < ActiveRecord::Base
         }
       end
 
-      StreamItemInstance.connection.bulk_insert('stream_item_instances', inserts)
+      StreamItemInstance.bulk_insert(inserts)
 
       #reset caches manually because the observer wont trigger off of the above mass inserts
       user_ids_subset.each do |user_id|
