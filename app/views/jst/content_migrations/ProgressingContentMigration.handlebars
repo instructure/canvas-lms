@@ -1,17 +1,22 @@
-<div class="span3 migrationName top-margin">{{display_name}}</div>
+<div class="span3 migrationName top-margin" tabindex="0">{{display_name}}</div>
 <div class="span3 sourceLink top-margin"></div>
-<div class="span2 top-margin centerText">{{datetimeFormatted created_at}}</div>
-<div class="span2 top-margin rightAlign progressStatus"></div>
+<div class="span2 top-margin centerText" tabindex="0">{{datetimeFormatted created_at}}</div>
+<div class="span2 top-margin rightAlign progressStatus" tabindex="0"></div>
 <div class="span2 changable {{#if migration_issues}}top-margin{{/if}}">
   {{#if waiting_for_select}}
     <button type='button' title="{{#t "select_content"}}Select Content{{/t}}" class='btn btn-small btn-primary selectContentBtn'>{{#t "select_content"}}Select Content{{/t}}</button>
     <form class="selectContentDialog form-dialog" style="display:none"></form>
   {{else}}
     {{#if migration_issues}}
-      <a id='issueText{{cid}}' class='showIssues' href='#issues{{cid}}'><span data-bind="migration_issues_count">{{issuesCount}}</span> <span data-bind="issuesButtonText">{{#t "issues_text"}}issues{{/t}}</span></a>
+      <a id='issueText{{cid}}' class='showIssues' href='#issues{{cid}}' aria-controls='issues{{cid}}'
+         aria-label="{{#t "show_issues"}}Show Issues{{/t}}" title="{{#t "show_issues"}}Show Issues{{/t}}"
+         aria-haspopup="true" aria-owns="issues{{cid}}">
+        <span aria-hidden='true' data-bind="migration_issues_count">{{issuesCount}}</span>
+        <span aria-hidden='true' id="issuesButtonText{{cid}}" data-bind="issuesButtonText">{{#t "issues_text"}}issues{{/t}}</span>
+      </a>
     {{/if}}
   {{/if}}
 </div>
-<div id="#issues{{cid}}" class="migrationIssues clear" style="display: none"></div>
+<div id="issues{{cid}}" class="migrationIssues clear" style="display: none" aria-expanded="false" tabindex="0"></div>
 <br />
 <hr />
