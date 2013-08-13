@@ -37,7 +37,7 @@ define [
       @model.on 'change:use_section_dates', @toggleUsingSectionClass
 
     render: =>
-      @$el.html @template(@model.toJSON('forView'))
+      super
 
       @$(".date_field").date_field()
       @$(".time_field").time_field()

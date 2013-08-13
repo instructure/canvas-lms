@@ -26,12 +26,11 @@ define [
       # has a date, and either has both a start and end time or neither
       o.start_date && (!!o.start_time == !!o.end_time)
 
-    toJSON: (forView) ->
-      json = super
-      if forView
-        json
-      else
-        {calendar_event: @_filterAttributes(json)}
+    toJSON: ->
+      {calendar_event: @_filterAttributes(super)}
+
+    present: ->
+      Backbone.Model::toJSON.call(this)
 
     fetch: (options = {}) ->
       options =  _.clone(options)
