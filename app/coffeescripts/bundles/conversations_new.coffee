@@ -153,7 +153,7 @@ require [
       @header.render()
 
     _initComposeDialog: ->
-      @compose = new MessageFormDialog(courses: @courses) #this, this.canAddNotesFor, folderId: @options.FOLDER_ID)
+      @compose = new MessageFormDialog(courses: @courses, folderId: ENV.CONVERSATIONS.ATTACHMENTS_FOLDER_ID)
 
   window.conversationsRouter = new ConversationsRouter
   Backbone.history.start()

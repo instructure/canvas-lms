@@ -198,7 +198,8 @@ define [
       @$addMediaComment[if !!INST.kalturaSettings then 'show' else 'hide']()
 
       @$form.formSubmit
-        fileUpload: => (@$fullDialog.find(".file_input").length > 0)
+        fileUpload: => (@$fullDialog.find(".attachment_list").length > 0)
+        files: => (@$fullDialog.find(".file_input")) 
         preparedFileUpload: true
         context_code: "user_" + ENV.current_user_id
         folder_id: @options.folderId

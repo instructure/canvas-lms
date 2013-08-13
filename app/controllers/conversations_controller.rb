@@ -138,27 +138,36 @@ class ConversationsController < ApplicationController
       render :json => @conversations_json
     else
       return redirect_to conversations_path(:scope => params[:redirect_scope]) if params[:redirect_scope]
-      return render :template => 'conversations/index_new' if @current_user.use_new_conversations?
-      @current_user.reset_unread_conversations_counter
-      load_all_contexts :permissions => [:manage_user_notes]
-      notes_enabled = @current_user.associated_accounts.any?{|a| a.enable_user_notes }
-      can_add_notes_for_account = notes_enabled && @current_user.associated_accounts.any?{|a| a.grants_right?(@current_user, nil, :manage_students) }
-      hash = {:CONVERSATIONS => {
-          :USER => conversation_users_json([@current_user], @current_user, session, :include_participant_contexts => false).first,
-          :CONTEXTS => @contexts,
-          :NOTES_ENABLED => notes_enabled,
-          :CAN_ADD_NOTES_FOR_ACCOUNT => can_add_notes_for_account,
-          :SHOW_INTRO => !@current_user.watched_conversations_intro?,
-          :FOLDER_ID => @current_user.conversation_attachments_folder.id,
-          :MEDIA_COMMENTS_ENABLED => feature_enabled?(:kaltura),
-      }, :CONTEXT_ACTION_SOURCE => :conversation}
-      append_sis_data(hash)
-      js_env(hash)
+      if @current_user.use_new_conversations?
+        js_env(:CONVERSATIONS => {
+                 :ATTACHMENTS_FOLDER_ID => @current_user.conversation_attachments_folder.id
+               })
+        return render :template => 'conversations/index_new'
+      else
+        @current_user.reset_unread_conversations_counter
+        load_all_contexts :permissions => [:manage_user_notes]
+        notes_enabled = @current_user.associated_accounts.any?{|a| a.enable_user_notes }
+        can_add_notes_for_account = notes_enabled && @current_user.associated_accounts.any?{|a| a.grants_right?(@current_user, nil, :manage_students) }
+        hash = {:CONVERSATIONS => {
+            :USER => conversation_users_json([@current_user], @current_user, session, :include_participant_contexts => false).first,
+            :CONTEXTS => @contexts,
+            :NOTES_ENABLED => notes_enabled,
+            :CAN_ADD_NOTES_FOR_ACCOUNT => can_add_notes_for_account,
+            :SHOW_INTRO => !@current_user.watched_conversations_intro?,
+            :FOLDER_ID => @current_user.conversation_attachments_folder.id,
+            :MEDIA_COMMENTS_ENABLED => feature_enabled?(:kaltura),
+          }, :CONTEXT_ACTION_SOURCE => :conversation}
+        append_sis_data(hash)
+        js_env(hash)
+      end
     end
   end
 
   # New Conversations UI. When finished, move back to index action.
   def index_new
+    js_env(:CONVERSATIONS => {
+             :ATTACHMENTS_FOLDER_ID => @current_user.conversation_attachments_folder.id
+           })
     return unless authorized_action(Account.site_admin, @current_user, :become_user)
   end
 
