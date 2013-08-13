@@ -31,7 +31,8 @@ class ExternalToolsController < ApplicationController
   # Returns the paginated list of external tools for the current context.
   # See the get request docs for a single tool for a list of properties on an external tool.
   #
-  # @argument search_term (optional) The partial name of the tools to match and return.
+  # @argument search_term [Optional, String]
+  #   The partial name of the tools to match and return.
   #
   # @example_response
   #     [
@@ -123,10 +124,17 @@ class ExternalToolsController < ApplicationController
   #
   # Either the id or url must be provided.
   #
-  # @argument id [optional] The external id of the tool to launch.
-  # @argument url [string] [optional] The LTI launch url for the external tool.
-  # @argument assignment_id [optional] The assignment id for an assignment launch.
-  # @argument launch_type [string] [optional] The type of launch to perform on the external tool.
+  # @argument id [Optional, String]
+  #   The external id of the tool to launch.
+  #
+  # @argument url [Optional, String]
+  #   The LTI launch url for the external tool.
+  #
+  # @argument assignment_id [Optional, String]
+  #   The assignment id for an assignment launch.
+  #
+  # @argument launch_type [Optional, String]
+  #   The type of launch to perform on the external tool.
   #
   # @response_field id The id for the external tool to be launched.
   # @response_field name The name of the external tool to be launched.
@@ -338,40 +346,119 @@ class ExternalToolsController < ApplicationController
   # Create an external tool in the specified course/account.
   # The created tool will be returned, see the "show" endpoint for an example.
   #
-  # @argument name [string] The name of the tool
-  # @argument privacy_level [string] What information to send to the external tool, "anonymous", "name_only", "public"
-  # @argument consumer_key [string] The consumer key for the external tool
-  # @argument shared_secret [string] The shared secret with the external tool
-  # @argument description [string] [optional] A description of the tool
-  # @argument url [string] [optional] The url to match links against. Either "url" or "domain" should be set, not both.
-  # @argument domain [string] [optional] The domain to match links against. Either "url" or "domain" should be set, not both.
-  # @argument icon_url [string] [optional] The url of the icon to show for this tool
-  # @argument text [string] [optional] The default text to show for this tool
-  # @argument custom_fields [string] [optional] Custom fields that will be sent to the tool consumer, specified as custom_fields[field_name]
-  # @argument account_navigation[url] [string] [optional] The url of the external tool for account navigation
-  # @argument account_navigation[enabled] [boolean] [optional] Set this to enable this feature
-  # @argument account_navigation[text] [string] [optional] The text that will show on the left-tab in the account navigation
-  # @argument user_navigation[url] [string] [optional] The url of the external tool for user navigation
-  # @argument user_navigation[enabled] [boolean] [optional] Set this to enable this feature
-  # @argument user_navigation[text] [string] [optional] The text that will show on the left-tab in the user navigation
-  # @argument course_navigation[url] [string] [optional] The url of the external tool for course navigation
-  # @argument course_navigation[enabled] [boolean] [optional] Set this to enable this feature
-  # @argument course_navigation[text] [string] [optional] The text that will show on the left-tab in the course navigation
-  # @argument course_navigation[visibility] [string] [optional] Who will see the navigation tab. "admins" for course admins, "members" for students, null for everyone
-  # @argument course_navigation[default] [boolean] [optional] Whether the navigation option will show in the course by default or whether the teacher will have to explicitly enable it
-  # @argument editor_button[url] [string] [optional] The url of the external tool
-  # @argument editor_button[enabled] [boolean] [optional] Set this to enable this feature
-  # @argument editor_button[icon_url] [string] [optional] The url of the icon to show in the WYSIWYG editor
-  # @argument editor_button[selection_width] [string] [optional] The width of the dialog the tool is launched in
-  # @argument editor_button[selection_height] [string] [optional] The height of the dialog the tool is launched in
-  # @argument resource_selection[url] [string] [optional] The url of the external tool
-  # @argument resource_selection[enabled] [boolean] [optional] Set this to enable this feature
-  # @argument resource_selection[icon_url] [string] [optional] The url of the icon to show in the module external tool list
-  # @argument resource_selection[selection_width] [string] [optional] The width of the dialog the tool is launched in
-  # @argument resource_selection[selection_height] [string] [optional] The height of the dialog the tool is launched in
-  # @argument config_type [string] [optional] Configuration can be passed in as CC xml instead of using query parameters. If this value is "by_url" or "by_xml" then an xml configuration will be expected in either the "config_xml" or "config_url" parameter. Note that the name parameter overrides the tool name provided in the xml
-  # @argument config_xml [string] [optional] XML tool configuration, as specified in the CC xml specification. This is required if "config_type" is set to "by_xml"
-  # @argument config_url [string] [optional] URL where the server can retrieve an XML tool configuration, as specified in the CC xml specification. This is required if "config_type" is set to "by_url"
+  # @argument name [String]
+  #   The name of the tool
+  #
+  # @argument privacy_level [String, "anonymous"|"name_only"|"public"]
+  #   What information to send to the external tool.
+  #
+  # @argument consumer_key [String]
+  #   The consumer key for the external tool
+  #
+  # @argument shared_secret [String]
+  #   The shared secret with the external tool
+  #
+  # @argument description [Optional, String]
+  #   A description of the tool
+  #
+  # @argument url [Optional, String]
+  #   The url to match links against. Either "url" or "domain" should be set,
+  #   not both.
+  #
+  # @argument domain [Optional, String]
+  #   The domain to match links against. Either "url" or "domain" should be
+  #   set, not both.
+  #
+  # @argument icon_url [Optional, String]
+  #   The url of the icon to show for this tool
+  #
+  # @argument text [Optional, String]
+  #   The default text to show for this tool
+  #
+  # @argument custom_fields [Optional, String]
+  #   Custom fields that will be sent to the tool consumer, specified as
+  #   custom_fields[field_name]
+  #
+  # @argument account_navigation[url] [Optional, String]
+  #   The url of the external tool for account navigation
+  #
+  # @argument account_navigation[enabled] [Optional, Boolean]
+  #   Set this to enable this feature
+  #
+  # @argument account_navigation[text] [Optional, String]
+  #   The text that will show on the left-tab in the account navigation
+  #
+  # @argument user_navigation[url] [Optional, String]
+  #   The url of the external tool for user navigation
+  #
+  # @argument user_navigation[enabled] [Optional, Boolean]
+  #   Set this to enable this feature
+  #
+  # @argument user_navigation[text] [Optional, String]
+  #   The text that will show on the left-tab in the user navigation
+  #
+  # @argument course_navigation[url] [Optional, String]
+  #   The url of the external tool for course navigation
+  #
+  # @argument course_navigation[enabled] [Optional, Boolean]
+  #   Set this to enable this feature
+  #
+  # @argument course_navigation[text] [Optional, String]
+  #   The text that will show on the left-tab in the course navigation
+  #
+  # @argument course_navigation[visibility] [Optional, String, "admins"|"members"]
+  #   Who will see the navigation tab. "admins" for course admins, "members" for
+  #   students, null for everyone
+  #
+  # @argument course_navigation[default] [Optional, Boolean]
+  #   Whether the navigation option will show in the course by default or
+  #   whether the teacher will have to explicitly enable it
+  #
+  # @argument editor_button[url] [Optional, String]
+  #   The url of the external tool
+  #
+  # @argument editor_button[enabled] [Optional, Boolean]
+  #   Set this to enable this feature
+  #
+  # @argument editor_button[icon_url] [Optional, String]
+  #   The url of the icon to show in the WYSIWYG editor
+  #
+  # @argument editor_button[selection_width] [Optional, String]
+  #   The width of the dialog the tool is launched in
+  #
+  # @argument editor_button[selection_height] [Optional, String]
+  #   The height of the dialog the tool is launched in
+  #
+  # @argument resource_selection[url] [Optional, String]
+  #   The url of the external tool
+  #
+  # @argument resource_selection[enabled] [Optional, Boolean]
+  #   Set this to enable this feature
+  #
+  # @argument resource_selection[icon_url] [Optional, String]
+  #   The url of the icon to show in the module external tool list
+  #
+  # @argument resource_selection[selection_width] [Optional, String]
+  #   The width of the dialog the tool is launched in
+  #
+  # @argument resource_selection[selection_height] [Optional, String]
+  #   The height of the dialog the tool is launched in
+  #
+  # @argument config_type [Optional, String]
+  #   Configuration can be passed in as CC xml instead of using query
+  #   parameters. If this value is "by_url" or "by_xml" then an xml
+  #   configuration will be expected in either the "config_xml" or "config_url"
+  #   parameter. Note that the name parameter overrides the tool name provided
+  #   in the xml
+  #
+  # @argument config_xml [Optional, String]
+  #   XML tool configuration, as specified in the CC xml specification. This is
+  #   required if "config_type" is set to "by_xml"
+  #
+  # @argument config_url [Optional, String]
+  #   URL where the server can retrieve an XML tool configuration, as specified
+  #   in the CC xml specification. This is required if "config_type" is set to
+  #   "by_url"
   #
   # @example_request
   #
