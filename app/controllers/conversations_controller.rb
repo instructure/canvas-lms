@@ -42,22 +42,22 @@ class ConversationsController < ApplicationController
   # @API List conversations
   # Returns the list of conversations for the current user, most recent ones first.
   #
-  # @argument scope [optional, "unread"|"starred"|"archived"]
+  # @argument scope [Optional, String, "unread"|"starred"|"archived"]
   #   When set, only return conversations of the specified type. For example,
   #   set to "unread" to return only conversations that haven't been read.
   #   The default behavior is to return all non-archived conversations (i.e.
   #   read and unread).
   #
-  # @argument filter [optional, course_id|group_id|user_id]
+  # @argument filter [Optional, String]
   #   When set, only return conversations for the specified course, group
   #   or user. The id should be prefixed with its type, e.g. "user_123" or
   #   "course_456"
   #
-  # @argument interleave_submissions Boolean, default false. If true, the
+  # @argument interleave_submissions [Boolean] Default is false. If true, the
   #   message_count will also include these submission-based messages in the
   #   total. See the show action for more information.
   #
-  # @argument include_all_conversation_ids Boolean, default false. If true,
+  # @argument include_all_conversation_ids [Boolean] Default is false. If true,
   #   the top-level element of the response will be an object rather than
   #   an array, and will have the keys "conversations" which will contain the
   #   paged conversation data, and "conversation_ids" which will contain the
@@ -182,38 +182,53 @@ class ConversationsController < ApplicationController
   # an existing private conversation with the given recipients, it will be
   # reused.
   #
-  # @argument recipients[] An array of recipient ids. These may be user ids
-  #   or course/group ids prefixed with "course_" or "group_" respectively,
-  #   e.g. recipients[]=1&recipients[]=2&recipients[]=course_3
-  # @argument subject [optional] The subject of the conversation.
-  #   This is ignored when reusing a conversation.
-  # @argument body The message to be sent
-  # @argument group_conversation [true|false] Ignored if there is just one
-  #   recipient, defaults to false. If true, this will be a group conversation
-  #   (i.e. all recipients will see all messages and replies). If false,
-  #   individual private conversations will be started with each recipient.
-  # @argument attachment_ids[] An array of attachments ids. These must be
-  #   files that have been previously uploaded to the sender's "conversation
-  #   attachments" folder.
-  # @argument media_comment_id Media comment id of an audio of video file to
-  #   be associated with this message.
-  # @argument media_comment_type ["audio"|"video"] Type of the associated
-  #   media file
-  # @argument mode ["sync"|"async"] Determines whether the messages will be
-  #   created/sent synchronously or asynchronously. Defaults to sync, and this
-  #   option is ignored if this is a group conversation or there is just one
-  #   recipient (i.e. it must be a bulk private message). When sent async, the
-  #   response will be an empty array (batch status can be queried via the
-  #   {api:ConversationsController#batches batches API})
-  # @argument scope [optional, "unread"|"starred"|"archived"]
+  # @argument recipients[] [String]
+  #   An array of recipient ids. These may beuser ids or course/group ids
+  #   prefixed with "course_" or "group_" respectively, e.g.
+  #   recipients[]=1&recipients[]=2&recipients[]=course_3
+  #
+  # @argument subject [Optional, String]
+  #   The subject of the conversation. This is ignored when reusing a
+  #   conversation.
+  #
+  # @argument body [String]
+  #   The message to be sent
+  #
+  # @argument group_conversation [Boolean]
+  #   Ignored if there is just one recipient, defaults to false. If true, this
+  #   will be a group conversation (i.e. all recipients will see all messages
+  #   and replies). If false, individual private conversations will be started
+  #   with each recipient.
+  #
+  # @argument attachment_ids[] [String]
+  #   An array of attachments ids. These must be files that have been previously
+  #   uploaded to the sender's "conversation attachments" folder.
+  #
+  # @argument media_comment_id [String]
+  #   Media comment id of an audio of video file to be associated with this
+  #   message.
+  #
+  # @argument media_comment_type [String, "audio"|"video"]
+  #   Type of the associated media file
+  #
+  # @argument mode [String, "sync"|"async"]
+  #   Determines whether the messages will be created/sent synchronously or
+  #   asynchronously. Defaults to sync, and this option is ignored if this is a
+  #   group conversation or there is just one recipient (i.e. it must be a bulk
+  #   private message). When sent async, the response will be an empty array
+  #   (batch status can be queried via the {api:ConversationsController#batches batches API})
+  #
+  # @argument scope [Optional, String, "unread"|"starred"|"archived"]
   #   Used when generating "visible" in the API response. See the explanation
   #   under the {api:ConversationsController#index index API action}
-  # @argument filter [optional, course_id|group_id|user_id]
+  #
+  # @argument filter [Optional, String]
   #   Used when generating "visible" in the API response. See the explanation
   #   under the {api:ConversationsController#index index API action}
-  # @argument context_code [optional] The course or group that is the context
-  #   for this conversation. Same format as courses or groups in the recipients
-  #   argument
+  #
+  # @argument context_code [Optional, String]
+  #   The course or group that is the context for this conversation. Same format
+  #   as courses or groups in the recipients argument.
   def create
     return render_error('recipients', 'blank') if params[:recipients].blank?
     return render_error('recipients', 'invalid') if @recipients.blank?
@@ -290,18 +305,21 @@ class ConversationsController < ApplicationController
   # fields that are present in the list/index action, as well as messages,
   # submissions, and extended participant information.
   #
-  # @argument interleave_submissions Boolean, default false. If true,
+  # @argument interleave_submissions [Boolean] Default false. If true,
   #   submission data will be returned as first class messages interleaved
   #   with other messages. The submission details (comments, assignment, etc.)
   #   will be stored as the submission property on the message. Note that if
   #   set, the message_count will also include these messages in the total.
-  # @argument scope [optional, "unread"|"starred"|"archived"]
+  #
+  # @argument scope [Optional, String, "unread"|"starred"|"archived"]
   #   Used when generating "visible" in the API response. See the explanation
   #   under the {api:ConversationsController#index index API action}
-  # @argument filter [optional, course_id|group_id|user_id]
+  #
+  # @argument filter [Optional, String]
   #   Used when generating "visible" in the API response. See the explanation
   #   under the {api:ConversationsController#index index API action}
-  # @argument auto_mark_as_read Boolean, default true. If true, unread
+  #
+  # @argument auto_mark_as_read [Boolean] Default true. If true, unread
   #   conversations will be automatically marked as read. This will default
   #   to false in a future API release, so clients should explicitly send
   #   true if that is the desired behavior.
@@ -415,14 +433,26 @@ class ConversationsController < ApplicationController
   # @API Edit a conversation
   # Updates attributes for a single conversation.
   #
-  # @argument conversation[subject] Change the subject of this conversation
-  # @argument conversation[workflow_state] ["read"|"unread"|"archived"] Change the state of this conversation
-  # @argument conversation[subscribed] [true|false] Toggle the current user's subscription to the conversation (only valid for group conversations). If unsubscribed, the user will still have access to the latest messages, but the conversation won't be automatically flagged as unread, nor will it jump to the top of the inbox.
-  # @argument conversation[starred] [true|false] Toggle the starred state of the current user's view of the conversation.
-  # @argument scope [optional, "unread"|"starred"|"archived"]
+  # @argument conversation[subject] [String]
+  #   Change the subject of this conversation
+  #
+  # @argument conversation[workflow_state] [String, "read"|"unread"|"archived"]
+  #   Change the state of this conversation
+  #
+  # @argument conversation[subscribed] [Boolean]
+  #   Toggle the current user's subscription to the conversation (only valid for
+  #   group conversations). If unsubscribed, the user will still have access to
+  #   the latest messages, but the conversation won't be automatically flagged
+  #   as unread, nor will it jump to the top of the inbox.
+  #
+  # @argument conversation[starred] [Boolean]
+  #   Toggle the starred state of the current user's view of the conversation.
+  #
+  # @argument scope [Optional, String, "unread"|"starred"|"archived"]
   #   Used when generating "visible" in the API response. See the explanation
   #   under the {api:ConversationsController#index index API action}
-  # @argument filter [optional, course_id|group_id|user_id]
+  #
+  # @argument filter [Optional, String]
   #   Used when generating "visible" in the API response. See the explanation
   #   under the {api:ConversationsController#index index API action}
   #
@@ -500,9 +530,10 @@ class ConversationsController < ApplicationController
   # the GET/show action, except that omits submissions and only includes the
   # latest message (e.g. "joe was added to the conversation by bob")
   #
-  # @argument recipients[] An array of recipient ids. These may be user ids
-  #   or course/group ids prefixed with "course_" or "group_" respectively,
-  #   e.g. recipients[]=1&recipients[]=2&recipients[]=course_3
+  # @argument recipients[] [String]
+  #   An array of recipient ids. These may be user ids or course/group ids
+  #   prefixed with "course_" or "group_" respectively, e.g.
+  #   recipients[]=1&recipients[]=2&recipients[]=course_3
   #
   # @example_response
   #   {
@@ -549,14 +580,19 @@ class ConversationsController < ApplicationController
   # GET/show action, except that omits submissions and only includes the
   # latest message (i.e. what we just sent)
   #
-  # @argument body The message to be sent
-  # @argument attachment_ids[] An array of attachments ids. These must be
-  #   files that have been previously uploaded to the sender's "conversation
-  #   attachments" folder.
-  # @argument media_comment_id Media comment id of an audio of video file to
-  #   be associated with this message.
-  # @argument media_comment_type ["audio"|"video"] Type of the associated
-  #   media file
+  # @argument body [String]
+  #   The message to be sent.
+  #
+  # @argument attachment_ids[] [String]
+  #   An array of attachments ids. These must be files that have been previously
+  #   uploaded to the sender's "conversation attachments" folder.
+  #
+  # @argument media_comment_id [String]
+  #   Media comment id of an audio of video file to be associated with this
+  #   message.
+  #
+  # @argument media_comment_type [String, "audio"|"video"]
+  #   Type of the associated media file.
   #
   # @example_response
   #   {
@@ -601,10 +637,12 @@ class ConversationsController < ApplicationController
   end
 
   # @API Delete a message
-  # Delete messages from this conversation. Note that this only affects this user's view of the conversation.
-  # If all messages are deleted, the conversation will be as well (equivalent to DELETE)
+  # Delete messages from this conversation. Note that this only affects this
+  # user's view of the conversation. If all messages are deleted, the
+  # conversation will be as well (equivalent to DELETE)
   #
-  # @argument remove Array of message ids to be deleted
+  # @argument remove[] [String]
+  #   Array of message ids to be deleted
   #
   # @example_response
   #   {
@@ -630,8 +668,11 @@ class ConversationsController < ApplicationController
   # Perform a change on a set of conversations. Operates asynchronously; use the {api:ProgressController#show progress endpoint}
   # to query the status of an operation.
   #
-  # @argument conversation_ids[] List of conversations to update. Limited to 500 conversations.
-  # @argument event The action to take on each conversation. Must be one of 'mark_as_read', 'mark_as_unread', 'star', 'unstar', 'archive', 'destroy'
+  # @argument conversation_ids[] [String]
+  #   List of conversations to update. Limited to 500 conversations.
+  #
+  # @argument event [String, "mark_as_read"|"mark_as_unread"|"star"|"unstar"|"archive"|"destroy"]
+  #   The action to take on each conversation.
   #
   # @example_request
   #     curl https://<canvas>/api/v1/conversations \ 

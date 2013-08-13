@@ -109,45 +109,43 @@ class CoursesController < ApplicationController
   # @API List your courses
   # Returns the list of active courses for the current user.
   #
-  # @argument enrollment_type [optional, "teacher"|"student"|"ta"|"observer"|"designer"]
+  # @argument enrollment_type [Optional, String, "teacher"|"student"|"ta"|"observer"|"designer"]
   #   When set, only return courses where the user is enrolled as this type. For
   #   example, set to "teacher" to return only courses where the user is
   #   enrolled as a Teacher.  This argument is ignored if enrollment_role is given.
   #
-  # @argument enrollment_role [optional]
+  # @argument enrollment_role [Optional, String]
   #   When set, only return courses where the user is enrolled with the specified
   #   course-level role.  This can be a role created with the
   #   {api:RoleOverridesController#add_role Add Role API} or a base role type of
   #   'StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment', 'ObserverEnrollment',
   #   or 'DesignerEnrollment'.
   #
-  # @argument include[] ["needs_grading_count"] Optional information to include with each Course.
-  #   When needs_grading_count is given, and the current user has grading
-  #   rights, the total number of submissions needing grading for all
-  #   assignments is returned.
+  # @argument include[] [String, "needs_grading_count"|"syllabus_body"|"total_scores"|"term"]
+  #   - "needs_grading_count": Optional information to include with each Course.
+  #     When needs_grading_count is given, and the current user has grading
+  #     rights, the total number of submissions needing grading for all
+  #     assignments is returned.
+  #   - "syllabus_body": Optional information to include with each Course.
+  #     When syllabus_body is given the user-generated html for the course
+  #     syllabus is returned.
+  #   - "total_scores": Optional information to include with each Course.
+  #     When total_scores is given, any enrollments with type 'student' will also
+  #     include the fields 'calculated_current_score', 'calculated_final_score',
+  #     'calculated_current_grade', and 'calculated_final_grade'.
+  #     calculated_current_score is the student's score in the course, ignoring
+  #     ungraded assignments. calculated_final_score is the student's score in
+  #     the course including ungraded assignments with a score of 0.
+  #     calculated_current_grade is the letter grade equivalent of
+  #     calculated_current_score (if available). calculated_final_grade is the
+  #     letter grade equivalent of calculated_final_score (if available). This
+  #     argument is ignored if the course is configured to hide final grades.
+  #   - "term": Optional information to include with each Course. When
+  #     term is given, the information for the enrollment term for each course
+  #     is returned.
   #
-  # @argument include[] ["syllabus_body"] Optional information to include with each Course.
-  #   When syllabus_body is given the user-generated html for the course
-  #   syllabus is returned.
-  #
-  # @argument include[] ["total_scores"] Optional information to include with each Course.
-  #   When total_scores is given, any enrollments with type 'student' will also
-  #   include the fields 'calculated_current_score', 'calculated_final_score',
-  #   'calculated_current_grade', and 'calculated_final_grade'.
-  #   calculated_current_score is the student's score in the course, ignoring
-  #   ungraded assignments. calculated_final_score is the student's score in
-  #   the course including ungraded assignments with a score of 0.
-  #   calculated_current_grade is the letter grade equivalent of
-  #   calculated_current_score (if available). calculated_final_grade is the
-  #   letter grade equivalent of calculated_final_score (if available). This
-  #   argument is ignored if the course is configured to hide final grades.
-  #
-  # @argument include[] ["term"] Optional information to include with each Course.
-  #   When term is given, the information for the enrollment term for each course
-  #   is returned.
-  #
-  # @argument state[] [optional] If set, only return courses that are in the given state(s).
-  #   Valid states are "unpublished", "available", "completed", and "deleted".
+  # @argument state[] [Optional, String, "unpublished"|"available"|"completed"|"deleted"]
+  #   If set, only return courses that are in the given state(s).
   #   By default, "available" is returned for students and observers, and
   #   anything except "deleted", for all other enrollment types
   #
@@ -197,26 +195,78 @@ class CoursesController < ApplicationController
   # @API Create a new course
   # Create a new course
   #
-  # @argument account_id [Integer] The unique ID of the account to create to course under.
-  # @argument course[name] [String] [optional] The name of the course. If omitted, the course will be named "Unnamed Course."
-  # @argument course[course_code] [String] [optional] The course code for the course.
-  # @argument course[start_at] [Datetime] [optional] Course start date in ISO8601 format, e.g. 2011-01-01T01:00Z
-  # @argument course[end_at] [Datetime] [optional] Course end date in ISO8601 format. e.g. 2011-01-01T01:00Z
-  # @argument course[license] [String] [optional] The name of the licensing. Should be one of the following abbreviations (a descriptive name is included in parenthesis for reference): 'private' (Private Copyrighted); 'cc_by_nc_nd' (CC Attribution Non-Commercial No Derivatives); 'cc_by_nc_sa' (CC Attribution Non-Commercial Share Alike); 'cc_by_nc' (CC Attribution Non-Commercial); 'cc_by_nd' (CC Attribution No Derivatives); 'cc_by_sa' (CC Attribution Share Alike); 'cc_by' (CC Attribution); 'public_domain' (Public Domain).
-  # @argument course[is_public] [Boolean] [optional] Set to true if course if public.
-  # @argument course[public_syllabus] [Boolean] [optional] Set to true to make the course syllabus public.
-  # @argument course[public_description] [String] [optional] A publicly visible description of the course.
-  # @argument course[allow_student_wiki_edits] [Boolean] [optional] If true, students will be able to modify the course wiki.
-  # @argument course[allow_wiki_comments] [Boolean] [optional] If true, course members will be able to comment on wiki pages.
-  # @argument course[allow_student_forum_attachments] [Boolean] [optional] If true, students can attach files to forum posts.
-  # @argument course[open_enrollment] [Boolean] [optional] Set to true if the course is open enrollment.
-  # @argument course[self_enrollment] [Boolean] [optional] Set to true if the course is self enrollment.
-  # @argument course[restrict_enrollments_to_course_dates] [Boolean] [optional] Set to true to restrict user enrollments to the start and end dates of the course.
-  # @argument course[enroll_me] [Boolean] [optional] Set to true to enroll the current user as the teacher.
-  # @argument course[sis_course_id] [String] [optional] The unique SIS identifier.
-  # @argument course[hide_final_grades] [Boolean] [optional] If this option is set to true, the totals in student grades summary will be hidden.
-  # @argument course[apply_assignment_group_weights] [Boolean] Set to true to weight final grade based on assignment groups percentages
-  # @argument offer [Boolean] [optional] If this option is set to true, the course will be available to students immediately.
+  # @argument account_id [Integer]
+  #   The unique ID of the account to create to course under.
+  #
+  # @argument course[name] [Optional, String]
+  #   The name of the course. If omitted, the course will be named "Unnamed
+  #   Course."
+  #
+  # @argument course[course_code] [Optional, String]
+  #   The course code for the course.
+  #
+  # @argument course[start_at] [Optional, DateTime]
+  #   Course start date in ISO8601 format, e.g. 2011-01-01T01:00Z
+  #
+  # @argument course[end_at] [Optional, DateTime]
+  #   Course end date in ISO8601 format. e.g. 2011-01-01T01:00Z
+  #
+  # @argument course[license] [Optional, String]
+  #   The name of the licensing. Should be one of the following abbreviations
+  #   (a descriptive name is included in parenthesis for reference):
+  #   - 'private' (Private Copyrighted)
+  #   - 'cc_by_nc_nd' (CC Attribution Non-Commercial No Derivatives)
+  #   - 'cc_by_nc_sa' (CC Attribution Non-Commercial Share Alike)
+  #   - 'cc_by_nc' (CC Attribution Non-Commercial)
+  #   - 'cc_by_nd' (CC Attribution No Derivatives)
+  #   - 'cc_by_sa' (CC Attribution Share Alike)
+  #   - 'cc_by' (CC Attribution)
+  #   - 'public_domain' (Public Domain).
+  #
+  # @argument course[is_public] [Optional, Boolean]
+  #   Set to true if course if public.
+  #
+  # @argument course[public_syllabus] [Optional, Boolean]
+  #   Set to true to make the course syllabus public.
+  #
+  # @argument course[public_description] [Optional, String]
+  #   A publicly visible description of the course.
+  #
+  # @argument course[allow_student_wiki_edits] [Optional, Boolean]
+  #   If true, students will be able to modify the course wiki.
+  #
+  # @argument course[allow_wiki_comments] [Optional, Boolean]
+  #   If true, course members will be able to comment on wiki pages.
+  #
+  # @argument course[allow_student_forum_attachments] [Optional, Boolean]
+  #   If true, students can attach files to forum posts.
+  #
+  # @argument course[open_enrollment] [Optional, Boolean]
+  #   Set to true if the course is open enrollment.
+  #
+  # @argument course[self_enrollment] [Optional, Boolean]
+  #   Set to true if the course is self enrollment.
+  #
+  # @argument course[restrict_enrollments_to_course_dates] [Optional, Boolean]
+  #   Set to true to restrict user enrollments to the start and end dates of the
+  #   course.
+  #
+  # @argument course[enroll_me] [Optional, Boolean]
+  #   Set to true to enroll the current user as the teacher.
+  #
+  # @argument course[sis_course_id] [Optional, String]
+  #   The unique SIS identifier.
+  #
+  # @argument course[hide_final_grades] [Optional, Boolean]
+  #   If this option is set to true, the totals in student grades summary will
+  #   be hidden.
+  #
+  # @argument course[apply_assignment_group_weights] [Optional, Boolean]
+  #   Set to true to weight final grade based on assignment groups percentages.
+  #
+  # @argument offer [Optional, Boolean]
+  #   If this option is set to true, the course will be available to students
+  #   immediately.
   #
   # @returns Course
   def create
@@ -361,30 +411,33 @@ class CoursesController < ApplicationController
   # @API List users
   # Returns the list of users in this course. And optionally the user's enrollments in the course.
   #
-  # @argument search_term [optional]
+  # @argument search_term [Optional, String]
   #   The partial name or full ID of the users to match and return in the results list.
-  # @argument enrollment_type [optional, "teacher"|"student"|"ta"|"observer"|"designer"]
+  #
+  # @argument enrollment_type [Optional, String, "teacher"|"student"|"ta"|"observer"|"designer"]
   #   When set, only return users where the user is enrolled as this type.
   #   This argument is ignored if enrollment_role is given.
-  # @argument enrollment_role [optional]
+  #
+  # @argument enrollment_role [Optional, String]
   #   When set, only return users enrolled with the specified course-level role.  This can be
   #   a role created with the {api:RoleOverridesController#add_role Add Role API} or a
   #   base role type of 'StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment',
   #   'ObserverEnrollment', or 'DesignerEnrollment'.
   #
-  # @argument include[] ["email"] Optional user email.
-  # @argument include[] ["enrollments"]
+  # @argument include[] [String, "email"|"enrollments"|"locked"|"avatar_url"|"test_student"]
+  #   - "email": Optional user email.
+  #   - "enrollments":
   #   Optionally include with each Course the user's current and invited
   #   enrollments. If the user is enrolled as a student, and the account has
   #   permission to manage or view all grades, each enrollment will include a
   #   'grades' key with 'current_score', 'final_score', 'current_grade' and
   #   'final_grade' values.
-  # @argument include[] ["locked"] Optionally include whether an enrollment is locked.
-  # @argument include[] ["avatar_url"] Optionally include avatar_url.
-  # @argument include[] ["test_student"] Optionally include the course's Test Student,
+  #   - "locked": Optionally include whether an enrollment is locked.
+  #   - "avatar_url": Optionally include avatar_url.
+  #   - "test_student": Optionally include the course's Test Student,
   #   if present. Default is to not include Test Student.
   #
-  # @argument user_id [optional]
+  # @argument user_id [Optional, String]
   #   If included, the user will be queried and if the user is part of the
   #   users set, the page parameter will be modified so that the page
   #   containing user_id will be returned.
@@ -550,7 +603,8 @@ class CoursesController < ApplicationController
   # @API Conclude a course
   # Delete or conclude an existing course
   #
-  # @argument event [String] ["delete"|"conclude"] The action to take on the course. available options are 'delete' and 'conclude.'
+  # @argument event [String, "delete"|"conclude"]
+  #   The action to take on the course.
   def destroy
     @context = api_request? ? api_find(Course, params[:id]) : Course.find(params[:id])
     if api_request? && !['delete', 'conclude'].include?(params[:event])
@@ -674,9 +728,9 @@ class CoursesController < ApplicationController
   # @API Update course settings
   # Can update the following course settings:
   #
-  # - `allow_student_discussion_topics` (true|false)
-  # - `allow_student_forum_attachments` (true|false)
-  # - `allow_student_discussion_editing` (true|false)
+  # @argument allow_student_discussion_topics [Boolean]
+  # @argument allow_student_forum_attachments [Boolean]
+  # @argument allow_student_discussion_editing [Boolean]
   #
   # @example_request
   #   curl https://<canvas>/api/v1/courses/<course_id>/settings \ 
