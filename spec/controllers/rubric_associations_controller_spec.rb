@@ -125,5 +125,20 @@ describe RubricAssociationsController do
       assigns[:association].should_not be_nil
       assigns[:association].should be_frozen
     end
+
+    it "should remove aligments links" do
+      course_with_teacher_logged_in(:active_all => true)
+      outcome_with_rubric
+      rubric_association_model(:user => @user, :context => @course, :rubric => @rubric)
+
+      @rubric_association_object.reload.learning_outcome_alignments.count.should == 1
+      @rubric.reload.learning_outcome_alignments.count.should == 1
+
+      delete 'destroy', :course_id => @course.id, :id => @rubric_association.id
+
+      @rubric.reload.deleted?.should be_true
+      @rubric_association_object.reload.learning_outcome_alignments.count.should == 0
+      @rubric.reload.learning_outcome_alignments.count.should == 0
+    end
   end
 end

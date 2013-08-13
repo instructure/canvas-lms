@@ -432,7 +432,6 @@ describe "speed grader" do
                                        :learning_outcome_id => @ignored.id,
                                        :ignore_for_scoring => '1',
                                    }]
-    @rubric.alignments_changed = true
     @rubric.save!
 
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"

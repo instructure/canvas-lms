@@ -691,7 +691,6 @@ describe ContentMigration do
           :learning_outcome_id => lo2.id
         }
       ]
-      rub.alignments_changed = true
       rub.save!
       rub.associate_with(@copy_from, @copy_from)
 
@@ -724,7 +723,6 @@ describe ContentMigration do
               :learning_outcome_id => lo.id
           }
       ]
-      rub.alignments_changed = true
       rub.save!
 
       from_assign = @copy_from.assignments.create!(:title => "some assignment")

@@ -1090,39 +1090,6 @@ class Submission < ActiveRecord::Base
     hash
   end
 
-  def create_outcome_result(alignment, explicit_mastery=false)
-    # find or create the user's unique LearningOutcomeResult for this alignment
-    # of the submission's assignment.
-    result = alignment.learning_outcome_results.
-      for_association(assignment).
-      find_or_initialize_by_user_id(user.id)
-
-    # force the context and artifact
-    result.artifact = self
-    result.context = alignment.context
-
-    # mastery
-    result.possible = assignment.points_possible
-    result.score = score
-    if alignment.tag == "points_mastery"
-      result.mastery = result.score && assignment.mastery_score && result.score >= assignment.mastery_score
-    elsif alignment.tag == "explicit_mastery"
-      result.mastery = explicit_mastery
-    else
-      result.mastery = nil
-    end
-
-    # attempt
-    result.attempt = attempt
-
-    # title
-    result.title = "#{user.name}, #{assignment.title}"
-
-    result.assessed_at = Time.now
-    result.save_to_version(result.attempt)
-    result
-  end
-
   def update_participation
     # TODO: can we do this in bulk?
     return if assignment.deleted? || assignment.muted?

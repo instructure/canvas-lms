@@ -897,7 +897,7 @@ class Assignment < ActiveRecord::Base
 
     students.each do |student|
       submission_updated = false
-      submission = self.find_or_create_submission(student) #submissions.find_or_create_by_user_id(student.id) #(:first, :conditions => {:assignment_id => self.id, :user_id => student.id})
+      submission = self.find_or_create_submission(student)
       if student == original_student || !grade_group_students_individually
         previously_graded = submission.grade.present?
         submission.attributes = opts
@@ -923,12 +923,6 @@ class Assignment < ActiveRecord::Base
         submission.group = group
         submission.graded_at = Time.zone.now if did_grade
         previously_graded ? submission.with_versioning(:explicit => true) { submission.save! } : submission.save!
-
-        unless self.rubric_association
-          self.learning_outcome_alignments.each do |alignment|
-            submission.create_outcome_result(alignment)
-          end
-        end
       end
       submission.add_comment(comment) if comment && (group_comment == "1" || student == original_student)
       submissions << submission if group_comment == "1" || student == original_student || submission_updated

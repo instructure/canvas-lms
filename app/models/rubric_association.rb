@@ -27,7 +27,7 @@ class RubricAssociation < ActiveRecord::Base
   belongs_to :association, :polymorphic => true
 
   belongs_to :context, :polymorphic => true
-  has_many :rubric_assessments, :dependent => :destroy
+  has_many :rubric_assessments
   has_many :assessment_requests, :dependent => :destroy
   
   has_a_broadcast_policy
@@ -41,8 +41,9 @@ class RubricAssociation < ActiveRecord::Base
   after_create :link_to_assessments
   before_save :update_old_rubric
   after_destroy :update_rubric
+  after_destroy :update_alignments
   after_save :assert_uniqueness
-  after_save :update_outcome_relations
+  after_save :update_alignments
   serialize :summary_data
 
   ValidAssociationModels = {
@@ -96,9 +97,12 @@ class RubricAssociation < ActiveRecord::Base
     end
   end
 
-  def update_outcome_relations
+  def update_alignments
     return unless assignment
-    outcome_ids = rubric.learning_outcome_alignments.map(&:learning_outcome_id)
+    outcome_ids = []
+    unless self.destroyed?
+      outcome_ids = rubric.learning_outcome_alignments.map(&:learning_outcome_id)
+    end
     LearningOutcome.update_alignments(assignment, context, outcome_ids)
     true
   end

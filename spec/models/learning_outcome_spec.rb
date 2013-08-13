@@ -46,7 +46,6 @@ describe LearningOutcome do
           :learning_outcome_id => @outcome.id
         }
       ]
-      @rubric.instance_variable_set('@alignments_changed', true)
       @rubric.save!
       @rubric.should_not be_new_record
       @rubric.reload
@@ -80,7 +79,6 @@ describe LearningOutcome do
           :learning_outcome_id => @outcome.id
         }
       ]
-      @rubric.instance_variable_set('@alignments_changed', true)
       @rubric.save!
       @rubric.should_not be_new_record
       @rubric.reload
@@ -157,7 +155,6 @@ describe LearningOutcome do
           :learning_outcome_id => @outcome2.id
         }
       ]
-      @rubric.instance_variable_set('@alignments_changed', true)
       @rubric.save!
       @rubric.reload
       @rubric.should_not be_new_record
@@ -191,7 +188,6 @@ describe LearningOutcome do
           :learning_outcome_id => @outcome.id
         }
       ]
-      @rubric.instance_variable_set('@alignments_changed', true)
       @rubric.save!
       @rubric.reload
       @rubric.should_not be_new_record
@@ -277,7 +273,6 @@ describe LearningOutcome do
           :learning_outcome_id => @outcome.id
         }
       ]
-      @rubric.instance_variable_set('@alignments_changed', true)
       @rubric.save!
       @rubric.reload
       @rubric.should_not be_new_record
@@ -321,6 +316,7 @@ describe LearningOutcome do
       @result.mastery.should eql(false)
       n = @result.version_number
     end
+
     it "should not override rubric-based alignments with non-rubric-based alignments for the same assignment" do
       assignment_model
       @outcome = @course.created_learning_outcomes.create!(:title => 'outcome')
@@ -347,7 +343,6 @@ describe LearningOutcome do
           :learning_outcome_id => @outcome.id
         }
       ]
-      @rubric.instance_variable_set('@alignments_changed', true)
       @rubric.save!
       @rubric.reload
       @rubric.should_not be_new_record
@@ -387,37 +382,6 @@ describe LearningOutcome do
       @result.original_possible.should eql(3.0)
       @result.mastery.should eql(false)
       n = @result.version_number
-    end
-    it "should build an outcome result for a non-rubric alignment" do
-      assignment_model
-      @assignment.mastery_score = 2
-      @assignment.save!
-      @outcome = @course.created_learning_outcomes.create!(:title => 'outcome')
-      @alignment = @outcome.align(@assignment, @course, :mastery_type => "points")
-      @alignment.should_not be_nil
-      @alignment.content.should eql(@assignment)
-      @alignment.context.should eql(@course)
-
-      @user = user(:active_all => true)
-      @e = @course.enroll_student(@user)
-      @alignment.rubric_association_id.should eql(nil)
-      @assignment.reload
-      @assignment.learning_outcome_alignments.should_not be_empty
-      @assignment.learning_outcome_alignments.length.should eql(1)
-      @assignment.learning_outcome_alignments.map(&:learning_outcome_id).uniq.should eql([@outcome.id])
-      
-      @submission = @assignment.grade_student(@user, :grade => "10").first
-      @outcome.learning_outcome_results.should_not be_empty
-      @outcome.learning_outcome_results.length.should eql(1)
-
-      @result = @outcome.learning_outcome_results.select{|r| r.artifact_type == 'Submission'}.first
-      @result.should_not be_nil
-      @result.user_id.should eql(@user.id)
-      @result.possible.should eql(1.5)
-      @result.score.should eql(10.0)
-      @result.original_score.should eql(10.0)
-      @result.original_possible.should eql(1.5)
-      @result.mastery.should eql(true)
     end
   end
 

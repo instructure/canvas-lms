@@ -47,7 +47,6 @@ describe Rubric do
           :learning_outcome_id => @outcome.id
         }
       ]
-      @rubric.instance_variable_set('@alignments_changed', true)
       @rubric.save!
       @rubric.should_not be_new_record
       @rubric.learning_outcome_alignments(true).should_not be_empty
@@ -80,7 +79,6 @@ describe Rubric do
           :learning_outcome_id => @outcome.id
         }
       ]
-      @rubric.instance_variable_set('@alignments_changed', true)
       @rubric.save!
       @rubric.should_not be_new_record
       @rubric.learning_outcome_alignments(true).should_not be_empty
@@ -107,6 +105,7 @@ describe Rubric do
       @rubric.save!
       @rubric.learning_outcome_alignments.active.should be_empty
     end
+
     it "should create learning outcome associations for multiple outcome rows" do
       assignment_model
       @outcome = @course.created_learning_outcomes.create!(:title => 'outcome')
@@ -154,12 +153,12 @@ describe Rubric do
           :learning_outcome_id => @outcome2.id
         }
       ]
-      @rubric.instance_variable_set('@alignments_changed', true)
       @rubric.save!
       @rubric.should_not be_new_record
       @rubric.learning_outcome_alignments(true).should_not be_empty
       @rubric.learning_outcome_alignments.map(&:learning_outcome_id).sort.should eql([@outcome.id, @outcome2.id].sort)
     end
+
     it "should create outcome results when outcome-aligned rubrics are assessed" do
       assignment_model
       @outcome = @course.created_learning_outcomes.create!(:title => 'outcome')
@@ -186,7 +185,6 @@ describe Rubric do
           :learning_outcome_id => @outcome.id
         }
       ]
-      @rubric.instance_variable_set('@alignments_changed', true)
       @rubric.save!
       @rubric.should_not be_new_record
       @rubric.learning_outcome_alignments(true).should_not be_empty

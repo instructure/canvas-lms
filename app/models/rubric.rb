@@ -113,11 +113,14 @@ class Rubric < ActiveRecord::Base
     end
   end
 
-  attr_accessor :alignments_changed
   def update_alignments
-    return unless @alignments_changed
-    outcome_ids = (self.data || []).map{|c| c[:learning_outcome_id] }.compact.map(&:to_i).uniq
-    LearningOutcome.update_alignments(self, context, outcome_ids)
+    if data_changed? || workflow_state_changed?
+      outcome_ids = []
+      unless deleted?
+        outcome_ids = (data || []).map{|c| c[:learning_outcome_id] }.compact.map(&:to_i).uniq
+      end
+      LearningOutcome.update_alignments(self, context, outcome_ids)
+    end
     true
   end
   
@@ -205,7 +208,6 @@ class Rubric < ActiveRecord::Base
       if criterion_data[:learning_outcome_id].present?
         outcome = LearningOutcome.find_by_id(criterion_data[:learning_outcome_id])
         if outcome
-          @alignments_changed = true
           criterion[:learning_outcome_id] = outcome.id
           criterion[:mastery_points] = ((criterion_data[:mastery_points] || outcome.data[:rubric_criterion][:mastery_points]).to_f rescue nil)
           criterion[:ignore_for_scoring] = criterion_data[:ignore_for_scoring] == '1'
@@ -282,7 +284,6 @@ class Rubric < ActiveRecord::Base
       item.data = hash[:data]
       item.data.each do |crit|
         if crit[:learning_outcome_migration_id]
-          item.alignments_changed = true
           if migration.respond_to?(:outcome_to_id_map) && id = migration.outcome_to_id_map[crit[:learning_outcome_migration_id]]
             crit[:learning_outcome_id] = id
           elsif lo = context.created_learning_outcomes.find_by_migration_id(crit[:learning_outcome_migration_id])
@@ -302,15 +303,4 @@ class Rubric < ActiveRecord::Base
     
     item
   end
-  
-  def self.generate(opts={})
-    context = opts[:context]
-    raise "Context required for rubrics" unless context
-    rubric = context.rubrics.build(:user => opts[:user])
-    user = opts[:user]
-    params = opts[:data]
-    rubric.update_criteria(params)
-    rubric
-  end
-  
 end
