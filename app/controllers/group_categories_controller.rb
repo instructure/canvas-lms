@@ -294,7 +294,7 @@ class GroupCategoriesController < ApplicationController
     search_params[:exclude_groups] = exclude_groups
 
     if search_term
-      users = UserSearch.for_user_in_context(search_term, @context, @current_user, search_params)
+      users = UserSearch.for_user_in_context(search_term, @context, @current_user, session, search_params)
     else
       users = UserSearch.scope_for(@context, @current_user, search_params)
     end

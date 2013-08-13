@@ -591,7 +591,7 @@ class GroupsController < ApplicationController
     search_term = params[:search_term].presence
 
     if search_term
-      users = UserSearch.for_user_in_context(search_term, @context, @current_user)
+      users = UserSearch.for_user_in_context(search_term, @context, @current_user, session)
     else
       users = UserSearch.scope_for(@context, @current_user)
     end

@@ -1329,19 +1329,53 @@ describe CoursesController, :type => :integration do
         json.map { |u| u['login_id'] }.sort.should == ["nobody@example.com", "nobody2@example.com"].sort
       end
 
-      it "should not return email addresses if the requestor is a student" do
-        user
-        @course1.enroll_student(user).accept!
-        json = api_call(:get, "/api/v1/courses/#{@course1.to_param}/users",
-                        { :controller => 'courses', :action => 'users',
-                        :course_id => @course1.to_param, :format => 'json' },
-                        { :include => %w{email} })
-        json.each do |u|
-          if u['id'] == @user.id
-            u['email'].should == @user.email
-          else
-            u.keys.should_not include(:email)
+      describe "as a student" do
+        append_before do
+          @other_user = user_with_pseudonym(:name => 'Waldo', :username => 'dontfindme@example.com')
+          @other_user.pseudonym.update_attribute(:sis_user_id, '8675309')
+          @course1.enroll_student(@other_user).accept!
+
+          @user = user
+          @course1.enroll_student(@user).accept!
+        end
+
+        it "should not return email addresses" do
+          json = api_call(:get, "/api/v1/courses/#{@course1.to_param}/users",
+                          { :controller => 'courses', :action => 'users',
+                          :course_id => @course1.to_param, :format => 'json' },
+                          { :include => %w{email} })
+          json.each do |u|
+            if u['id'] == @user.id
+              u['email'].should == @user.email
+            else
+              u.keys.should_not include(:email)
+            end
           end
+        end
+
+        it "should search by name" do
+          json = api_call(:get, "/api/v1/courses/#{@course1.to_param}/users",
+                          { :controller => 'courses', :action => 'users',
+                            :course_id => @course1.to_param, :format => 'json' },
+                          { :search_term => 'wal' })
+          json.count.should == 1
+          json.first['id'].should == @other_user.id
+        end
+
+        it "should not search by email address" do
+          json = api_call(:get, "/api/v1/courses/#{@course1.to_param}/users",
+                          { :controller => 'courses', :action => 'users',
+                            :course_id => @course1.to_param, :format => 'json' },
+                          { :search_term => 'dont' })
+          json.should be_empty
+        end
+
+        it "should not search by sis id" do
+          json = api_call(:get, "/api/v1/courses/#{@course1.to_param}/users",
+                          { :controller => 'courses', :action => 'users',
+                            :course_id => @course1.to_param, :format => 'json' },
+                          { :search_term => '867' })
+          json.should be_empty
         end
       end
 
