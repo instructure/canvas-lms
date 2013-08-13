@@ -3886,7 +3886,7 @@ if (typeof jQuery != 'undefined') {
 				.click(function(e){
 					e.preventDefault();
 					require(['compiled/widget/UploadMediaTrackForm'], function(UploadMediaTrackForm){
-						new UploadMediaTrackForm(t.options.mediaCommendId, t.media.src);
+						new UploadMediaTrackForm(t.options.mediaCommentId, t.media.src);
 					});
 				});
 			t.adjustLanguageBox();
