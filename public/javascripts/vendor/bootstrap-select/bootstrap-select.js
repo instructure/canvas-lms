@@ -116,6 +116,8 @@
         createLi: function() {
             var _this = this,
                 _liA = [],
+                _subLiA = [],
+                _optgroup = null,
                 _liHtml = '';
 
             this.$element.find('option').each(function(index) {
@@ -151,7 +153,13 @@
                         var labelIcon = $this.parent().data('icon') ? '<i class="'+$this.parent().data('icon')+'"></i> ' : '';
                         label = labelIcon + '<span class="text">' + label + labelSubtext + '</span>';
 
-                        if ($this[0].index != 0) {
+                        // INSTRUCTURE
+                        if (_this.options.useSubmenus) {
+                          _liA.push('<a role="menuitem" aria-haspopup="true" tabindex="-1" href="#">'+label+'</a>'+
+                            '<ul class="dropdown-menu" role="group">'
+                            );
+                          _subLiA.push(_this.createA(text, "opt " + optionClass, inline, index ));
+                        } else if ($this[0].index != 0) {
                             _liA.push(
                                 '<div class="div-contain"><div class="divider"></div></div>'+
                                 '<dt>'+label+'</dt>'+
@@ -163,7 +171,9 @@
                                 _this.createA(text, "opt " + optionClass, inline, index ));
                         }
                     } else {
-                         _liA.push( _this.createA(text, "opt " + optionClass, inline, index )  );
+                         // INSTRUCTURE
+                         var container = _this.options.useSubmenus ? _subLiA : _liA;
+                         container.push( _this.createA(text, "opt " + optionClass, inline, index )  );
                     }
                 } else if ($this.data('divider') == true) {
                     _liA.push('<div class="div-contain"><div class="divider"></div></div>');
@@ -172,10 +182,22 @@
                 } else {
                     _liA.push( _this.createA(text, optionClass, inline, index ) );
                 }
+
+                if (_subLiA.length && !$this.next().length) {
+                  var group = _liA.pop();
+                  $.each(_subLiA, function(i, item) {
+                      group += "<li rel='" + i + "'>" + item + "</li>";
+                  });
+                  group += '</ul>'; 
+                  _liA.push(group);
+                  _subLiA = [];
+                }
             });
 
             $.each(_liA, function(i, item) {
-                _liHtml += "<li rel=" + i + ">" + item + "</li>";
+                // INSTRUCTURE
+                var isMenu = item.indexOf('<ul') != -1;
+                _liHtml += "<li rel='" + i + "'" + (isMenu ? " class='dropdown-submenu'" : "") + ">" + item + "</li>";
             });
 
             //If we are not multiple, and we dont have a selected item, and we dont have a title, select the first element so something is set in the button
@@ -301,8 +323,8 @@
                     } else {
                         minHeight = 0;
                     }
-                    menu.css({'max-height' : menuHeight + 'px', 'overflow' : 'hidden', 'min-height' : minHeight + 'px'});
-                    menuInner.css({'max-height' : (menuHeight - menuPadding) + 'px', 'overflow-y' : 'auto'});
+                    menu.css({'max-height' : menuHeight + 'px', 'overflow' : 'visible', 'min-height' : minHeight + 'px'});
+                    menuInner.css({'max-height' : (menuHeight - menuPadding) + 'px', 'overflow-y' : 'visible'});
             }
                 getSize();
                 $(window).resize(getSize);
@@ -367,13 +389,14 @@
         },
 
         setSelected: function(index, selected) {
+            var link = this.$menu.find('a[role=menuitemcheckbox]').eq(index);
             if (selected) {
-                this.$menu.find('li').eq(index).addClass('selected');
+                link.parent().addClass('selected');
             } else {
-                this.$menu.find('li').eq(index).removeClass('selected');
+                link.parent().removeClass('selected');
             }
             // INSTRUCTURE
-            this.$menu.find('a').eq(index).attr('aria-checked', selected ? 'true' : 'false');
+            link.attr('aria-checked', selected ? 'true' : 'false');
         },
 
         setDisabled: function(index, disabled) {
@@ -424,7 +447,7 @@
             });
 
             this.$menu.on('click', 'li a', function(e) {
-                var clickedIndex = $(this).parent().index(),
+                var clickedIndex = _this.$newElement.find('a[role=menuitemcheckbox]').index(this),
                     $this = $(this).parent(),
                     prevValue = _this.$element.val();
 
@@ -508,13 +531,40 @@
                 first,
                 last,
                 prev,
-                nextPrev;
+                nextPrev,
+                $target,
+                $list;
 
             $this = $(this);
-
             $parent = $this.parent();
+            $target = $(e.target);
 
-            $items = $('[role=menu] li:not(.divider):visible a', $parent);
+            // INSTRUCTURE
+            // left
+            if (e.keyCode == 37) {
+              $list = $target.parent().parent();
+              $list.css({display: ''});
+              if ($list.is('[role=group]')) {
+                $list.prev().focus();
+              }
+            }
+            // right 
+            if (e.keyCode == 39) {
+              $list = $target.next();
+              $list.css({display: 'block'});
+              if ($list.is('[role=group]')) {
+                $list.find('> li:not(.divider):visible > a').eq(0).focus();
+                e.preventDefault();
+              }
+            }
+
+            // INSTRUCTURE
+            if ($target.is('a')) {
+              $list = $(e.target).closest('ul');
+            } else {
+              $list = $('[role=menu]', $parent);
+            }
+            $items = $('> li:not(.divider):visible > a', $list);
 
             if (!$items.length) return;
 
@@ -646,7 +696,9 @@
         container: false,
         hideDisabled: false,
         showSubtext: false,
-        showIcon: true
+        showIcon: true,
+        // INSTRUCTURE
+        useSubmenus: false
     }
 
     $(document)
