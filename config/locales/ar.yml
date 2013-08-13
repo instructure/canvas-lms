@@ -1365,7 +1365,7 @@ ar:
       due_date: "موعد الاستحقاق"
       module: الوحدة
       multiple_modules: "وحدات متعددة"
-      points_possible: "%{pointsPossible} نقطة"
+      points_possible: "%{pointsPossible} نقاط"
     assignment_locked: 
       assignment_locked: "تم تأمين هذه المهمة مثل *%{lock_at}*"
       assignment_unlocked_from: "تم تأمين هذه المهمة حتى *%{unlock_at}*"
@@ -1430,12 +1430,12 @@ ar:
       delete_assignment: "هل ترغب بالتأكيد في حذف هذه المهمة؟"
     create_assignment: 
       assignment: المهمة
-      assignment_due_at: "الاستحقاق:"
+      assignment_due_at: "موعد الاستحقاق:"
       assignment_name: "الاسم:"
       assignment_points: "النقاط:"
       assignment_type: "النوع:"
       cancel: إلغاء
-      discussion_type: المناقشات
+      discussion_type: المناقشة
       external_tool_type: "الأداة الخارجية"
       more: "مزيد من الخيارات:"
       not_graded_type: "لم يتم تقييم درجات"
@@ -1459,14 +1459,14 @@ ar:
       delete: "حذف المجموعة"
       deleting: "جارٍ الحذف..."
       labels: 
-        delete_assignments_in_group: "حذف مهامه"
-        move_assignments_to: "نقل مهامه إلى"
+        delete_assignments_in_group: "حذف مهامها"
+        move_assignments_to: "نقل مهامها إلى"
       options: 
         select_group: "تحديد مجموعة"
       tooltips: 
         target_group: "تحديد مجموعة لنقل هذه المهمة إليها"
       warnings: 
-        delete_assignment_group: "أنت على وشك حذف *%{name}*، الذي يحتوي على *%{assignment_count}* مهام."
+        delete_assignment_group: "أنت على وشك حذف *%{name}*، التي تحتوي على *%{assignment_count}* مهام بداخلها."
       would_you_like: "هل ترغب في:"
     drop_highest_scores: "إسقاط أعلى %{number} نقطة/نقاط"
     drop_lowest_scores: "إسقاط أقل %{number} نقطة/نقاط"
@@ -2851,9 +2851,9 @@ ar:
         default_select_folder: "تحديد مجلد"
         upload_to: "تحميل إلى"
       overwrite_assessment_content: 
-        assessment_help_alt: "\"رمز تعليمات استبدال المهمة\""
+        assessment_help_alt: "\"رمز تعليمات استبدال التقييم\""
         assessment_help_text: "تقوم بعض الأنظمة بإعادة استخدام المعرفات الخاصة بها مع كل عملية تصدير جديدة. نتيجة لذلك، عند تصدير بنكي أسئلة اثنين منفصلين فسيكون لهما نفس المعرفات. لتجنب فقدان بيانات التقييم فإننا نعامل هذه الكائنات على أنها مختلفة رغم المعرفات. إن اختيار هذا الخيار سيعطل ميزة السلامة هذه ويسمح لبيانات التقييم بالكتابة فوق البيانات الموجودة بنفس المعرفات."
-        assessment_help_title: "\"تعليمات استبدال المهمة\""
+        assessment_help_title: "\"تعليمات استبدال التقييم\""
         overwrite_assessment_content: "استبدال محتوى التقييم بمعرفات متطابقة"
       question_bank: 
         create_new_question: "-- إنشاء بنك أسئلة جديد --"
@@ -4815,7 +4815,7 @@ ar:
       my_settings: إعداداتي
   discussions: 
     are_your_sure_delete: "هل ترغب بالتأكيد في حذف هذا الإدخال؟"
-    cant_subscribe_not_in_group: "يجب أن تكون من هذه المجموعة للاشتراك"
+    cant_subscribe_not_in_group: "يجب أن تكون ضمن هذه المجموعة للاشتراك"
     cant_subscribe_not_in_group_set: "يجب أن تكون في مجموعة مرتبطة للاشتراك"
     closed_for_comments: "التعليقات مغلقة"
     confirm_delete_discussion_topic: "هل تريد بالتأكيد حذف موضوع المناقشة هذا؟"
@@ -5322,7 +5322,7 @@ ar:
     app_saved_message: "تم حفظ %{app} بنجاح"
     borderless_launch: 
       load_tool_button: "تحميل %{tool} يدويًا"
-      redirecting_to_lti: "إعادة التوجيه إلى تطبيق LTI، الرجاء الانتظار..."
+      redirecting_to_lti: "جارٍ إعادة التوجيه إلى تطبيق LTI، الرجاء الانتظار..."
     buttons: 
       cancel: إلغاء
       delete: حذف
@@ -6547,7 +6547,7 @@ ar:
       group_categories: 
         group_set_create: "إضافة تعيين المجموعة"
       group_category: 
-        randomly_assigning_students: "يتم تعيين الطلاب عشوائيًا"
+        randomly_assigning_students: "تعيين الطلاب عشوائيًا"
         unassigned_students: "الطلاب غير المعينين"
         unassigned_users: "المستخدمون غير المعينين"
       group_category_detail: 
@@ -6583,7 +6583,7 @@ ar:
       randomly_assign_members: 
         add_more_users: إلغاء
         close: موافق
-        randomly_assign_students_dialog: "سيقوم هذا الإجراء عشوائيًا بتعيين جميع الطلاب غير المعينين بالتساوي بقدر الإمكان على مجموعات الطلاب الموجودة."
+        randomly_assign_students_dialog: "سيقوم هذا الإجراء تلقائيًا بتعيين جميع الطلاب غير المعينين بالتساوي بقدر الإمكان بين مجموعات الطلاب الموجودة."
     member: 
       few: "%{count} من الأعضاء"
       many: "%{count} من الأعضاء"
@@ -6609,7 +6609,7 @@ ar:
       students_assigned: "تم تعيين الطلاب إلى مجموعات."
       update_success: "تم تحديث المجموعة بنجاح."
       welcome: "مرحبًا بك في مجموعة %{group_name}!"
-    randomly_assigning_members: "يتم تعيين الطلاب عشوائيًا"
+    randomly_assigning_members: "تعيين الطلاب عشوائيًا"
     show: 
       coming_up: متطور
       group_atom_feed: "موجز Atom للمجموعة"
@@ -8981,7 +8981,7 @@ ar:
       valid_workflow_state: "يجب إرسال حالة سير عمل صالحة"
   module_item_types: 
     assignment: المهمة
-    disuccsion: المناقشات
+    disuccsion: المناقشة
     external_tool: "الأداة الخارجية"
     external_url: "عنوان URL خارجي"
     file: ملف
@@ -8995,7 +8995,7 @@ ar:
       Save: حفظ
       cancel: إلغاء
       creating: "جارٍ الإنشاء..."
-    dialog_title: "إذافة عنصر إلى %{moduleName}"
+    dialog_title: "إضافة عنصر إلى %{moduleName}"
     module_collection_view: 
       button: 
         preview: المعاينة
@@ -13518,7 +13518,7 @@ ar:
     notices: 
       add_comment_failed: "فشل إضافة تعليق، الرجاء المحاولة مرة أخرى"
       adding_comment: "جارٍ إضافة التعليق..."
-      cannot_edit: "لا يُسمح لك بتحرير الصفحة \"%{title}\"."
+      cannot_edit: "غير مسموح لك بتحرير الصفحة \"%{title}\"."
       page_deleted: "تم حذف \"%{title}\" الصفحة."
       page_updated: "تم تحديث الصفحة بنجاح."
     page_link: 
@@ -13556,9 +13556,9 @@ ar:
       wiki_description_for_group: "اعتبره مكانًا مفتوحًا لوضع المحتوى فيه بحرية.  يمكنك استخدامه لوصف المجموعة، أو لإرسال تفسيرات مفيدة للموضوعات الصعبة، أو حتى للسماح للأعضاء بالعمل معًا في كتابة المشروعات."
       wiki_description_header: "ما الهدف من وجود wiki؟"
   wiki_pages_api: 
-    cannot_update_editing_roles: "لا يُسمح لك بتحديث أدوار التحرير لصفحة wiki هذه"
+    cannot_update_editing_roles: "غير مسموح لك بتحديث أدوار التحرير لصفحة wiki هذه"
     cannot_update_front_page: "غير مسموح لك بتغيير صفحة wiki الأمامية"
-    cannot_update_hide_from_students: "غير مسموح لك بتحديث ما تم إخفاؤه من علامة الطلاب الخاصة بصفحة wiki هذه"
+    cannot_update_hide_from_students: "غير مسموح لك بتحديث علامة المخفي من الطلاب الخاصة بصفحة wiki هذه"
     cannot_update_published: "غير مسموح لك بتحديث الحالة المنشورة لصفحة wiki هذه"
     cannot_update_title: "غير مسموح لك بتحديث عنوان صفحة wiki هذه"
     invalid_editing_roles: "أدوار التحرير المتوفرة غير صالحة"
