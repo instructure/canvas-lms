@@ -23,9 +23,12 @@ define [
       if @model
         context   = @model.toJSON().conversation
         $template = $(template(context))
-        @model.messageCollection.each (message) ->
+        @model.messageCollection.each (message) =>
+          message.set('conversation_id', context.id) unless message.get('conversation_id')
           childView = new MessageItemView(model: message).render()
           $template.find('.message-content').append(childView.$el)
+          @listenTo(childView, 'reply',   => @trigger('reply', message))
+          @listenTo(childView, 'forward', => @trigger('forward', message))
       else
         $template = noMessage()
       @$el.html($template)

@@ -49,11 +49,20 @@ require [
       @detail.model = model
       @detail.render()
 
-    onReply: =>
-      @compose.show(@detail.model, to: 'reply')
+    onReply: (message) =>
+      model = if message
+        model = @detail.model.clone()
+        model.set 'messages', _.filter model.get('messages'), (m) ->
+          m.id == message.id or (_.include(m.participating_user_ids, message.author_id) and m.created_at < message.created_at)
+        trigger = $(".message-item-view[data-id=#{message.id}] .reply-btn")
+        model
+      else
+        trigger = $('#reply-btn')
+        @detail.model
+      @compose.show(model, to: 'reply', trigger: trigger)
 
     onReplyAll: =>
-      @compose.show(@detail.model, to: 'replyAll')
+      @compose.show(@detail.model, to: 'replyAll', trigger: $('#reply-all-btn'))
 
     onDelete: =>
       return unless confirm(@messages.confirmDelete)
@@ -62,10 +71,7 @@ require [
       @detail.render()
 
     onCompose: (e) =>
-      @compose.show()
-
-    onCloseCompose: (e) =>
-      @header.focusCompose()
+      @compose.show(null, trigger: $('#compose-btn'))
 
     index: ->
       @filter('')
@@ -86,8 +92,17 @@ require [
       @detail.model.save()
       @header.hideMarkUnreadBtn(true)
 
-    onForward: =>
-      @compose.show(@detail.model, to: 'forward')
+    onForward: (message) =>
+      model = if message
+        model = @detail.model.clone()
+        model.set 'messages', _.filter model.get('messages'), (m) ->
+          m.id == message.id or (_.include(m.participating_user_ids, message.author_id) and m.created_at < message.created_at)
+        trigger = $(".message-item-view[data-id=#{message.id}] .al-trigger")
+        model
+      else
+        trigger = $('#admin-btn')
+        @detail.model
+      @compose.show(model, to: 'forward', trigger: trigger)
 
     onStarToggle: =>
       @detail.model.toggleStarred()
@@ -127,6 +142,8 @@ require [
       @compose.on('addMessage', @onAddMessage)
       @compose.on('addMessage', @list.updateMessage)
       @compose.on('submitting', @onSubmit)
+      @detail.on('reply',       @onReply)
+      @detail.on('forward',     @onForward)
 
     onSubmit: (dfd) =>
       @detail.$el.disableWhileLoading(dfd)

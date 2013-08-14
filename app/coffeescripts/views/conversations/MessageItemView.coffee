@@ -1,8 +1,9 @@
 define [
   'i18n!conversations'
+  'underscore'
   'Backbone'
   'jst/conversations/messageItem'
-], (I18n, {View}, template) ->
+], (I18n, _, {View}, template) ->
 
   class MessageItemView extends View
 
@@ -17,10 +18,20 @@ define [
       '.message-participants'            : '$participants'
       '.summarized-message-participants' : '$summarized'
       '.full-message-participants'       : '$full'
+      '.message-metadata'                : '$metadata'
 
     events:
+      'blur .actions a'                    : 'onActionBlur'
       'click'                              : 'onSelect'
+      'click .al-trigger'                  : 'onMenuOpen'
+      'click .delete-btn'                  : 'onDelete'
+      'click .forward-btn'                 : 'onForward'
       'click .message-participants-toggle' : 'onToggle'
+      'click .reply-btn'                   : 'onReply'
+      'focus .actions a'                   : 'onActionFocus'
+
+    messages:
+      confirmDelete: I18n.t('confirm.delete_message', 'Are you sure you want to delete your copy of this message? This action cannot be undone.')
 
     initialize: ->
       super
@@ -39,6 +50,7 @@ define [
     afterRender: ->
       super
       @updateParticipants(@summarized)
+      @$el.attr('data-id', @model.id)
 
     # Public: Update participant and toggle link text 
     #
@@ -59,6 +71,7 @@ define [
     #
     # Returns nothing.
     onSelect: (e) ->
+      return if _.include(['A', 'I'], e.target.nodeName)
       e.preventDefault()
       @model.set('selected', !@model.get('selected'))
 
@@ -71,5 +84,59 @@ define [
     #
     # Returns nothing.
     onToggle: (e) ->
-      e.preventDefault() and e.stopPropagation()
+      e.preventDefault()
       @updateParticipants(@summarized = !@summarized)
+
+    # Internal: Reply to this message.
+    #
+    # e - Event Object.
+    #
+    # Returns nothing.
+    onReply: (e) ->
+      e.preventDefault()
+      @trigger('reply')
+
+    # Internal: Delete this message.
+    #
+    # e - Event object.
+    #
+    # Returns nothing.
+    onDelete: (e) ->
+      e.preventDefault()
+      return unless confirm(@messages.confirmDelete)
+      url = "/api/v1/conversations/#{@model.get('conversation_id')}/remove_messages"
+      $.ajaxJSON(url, 'POST', remove: [@model.id])
+      @remove()
+
+    # Internal: Forward this message.
+    #
+    # e - Event object.
+    #
+    # Returns nothing.
+    onForward: (e) ->
+      e.preventDefault()
+      @trigger('forward')
+
+    # Internal: Stop any route changes when opening a message's menu.
+    #
+    # e - Event object.
+    #
+    # Returns nothing.
+    onMenuOpen: (e) ->
+      e.preventDefault()
+
+    # Internal: Manage visibility of date/message actions when using keyboard.
+    #
+    # e - Event object.
+    #
+    # Returns nothing.
+    onActionFocus: (e) ->
+      @$metadata.addClass('hover')
+
+    # Internal: Manage visibility of date/message actions when using keyboard.
+    #
+    # e - Event object.
+    #
+    # Returns nothing.
+    onActionBlur: (e) ->
+      @$metadata.removeClass('hover')

@@ -89,6 +89,7 @@ define [
         messages = @model.messageCollection
         @message = messages.find((m) -> m.get('selected')) or messages.at(0)
       @to = options?.to
+      @returnFocusTo = options.trigger if options.trigger
 
       @render()
       super
@@ -108,6 +109,9 @@ define [
       @$fullDialog.off 'click', '.attach-media'
       @$fullDialog.off 'click', '.media-comment .remove_link'
       @trigger('close')
+      if @returnFocusTo
+        @returnFocusTo.focus()
+        delete @returnFocusTo
 
     sendMessage: (e) ->
       e.preventDefault()

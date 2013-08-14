@@ -237,7 +237,6 @@
   position: absolute;
 }
 
-
 .message-detail.span8 {
   margin-left: 0;
   width: 68.08511%;
@@ -312,8 +311,60 @@
     }
   }
 
+  .span2 {
+    position: relative;
+  }
+
   .date {
     color: #7f7f7f;
+    position: absolute;
+    right: 0;
+    top: 0;
+  }
+
+  .actions {
+    right: 9999em;
+    position: relative;
+    top: 0;
+  }
+
+  .actions li {
+    border: none;
+    float: left;
+    margin: 0 0 0 8px;
+    padding: 0;
+  }
+
+  .actions li a {
+    color: #7f7f7f;
+
+    &:hover, &:focus {
+      color: #333;
+      outline: none;
+      text-decoration: none;
+    }
+  }
+}
+
+.touch .message-detail .actions {
+  right: -7px;
+  top: 24px;
+}
+
+.touch .message-item-view:hover, .touch .message-metadata.hover {
+  .date {
+    right: 0;
+  }
+}
+
+.message-item-view:hover, .message-metadata.hover {
+  .date {
+    right: 9999em;
+  }
+
+  .actions {
+    display: block;
+    right: -7px;
   }
 }
 

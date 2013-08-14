@@ -24,10 +24,37 @@
 		<span class="context">{{context_name}}</span>
 	</div>
 
-	<div class="span2">
+	<div class="span2 message-metadata">
 		<div class="date pull-right">
 			{{friendlyDatetime created_at}}
 		</div>
+
+    <ul class="actions pull-right unstyled">
+      <li>
+        <a href="#" class="icon-reply-2 reply-btn">
+          <span class="screenreader-only">{{#t "reply"}}Reply{{/t}}</span>
+        </a>
+      </li>
+      <li>
+        <a href="#" class="icon-trash delete-btn">
+          <span class="screenreader-only">{{#t "delete_message"}}Delete message{{/t}}</span>
+        </a>
+      </li>
+      <li>
+        <a href="#"
+           data-kyle-menu-options='{"appendMenuTo": "body"}'
+           class="al-trigger">
+          <i class="icon-settings"></i>
+          <i class="icon-mini-arrow-down"></i>
+          <span class="screenreader-only">{{#t "message_actions"}}Message actions{{/t}}</span>
+        </a>
+        <ul class="al-options">
+          <li>
+            <a href="#" class="forward-btn">{{#t "forward"}}Forward{{/t}}</a>
+          </li>
+        </ul>
+      </li>
+    </ul>
 	</div>
 </div>
 
