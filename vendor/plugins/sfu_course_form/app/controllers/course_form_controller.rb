@@ -181,7 +181,7 @@ class CourseFormController < ApplicationController
 
     sandbox["csv"] = "\"#{sandbox["course_id"]}\",\"#{sandbox["short_long_name"]}\",\"#{sandbox["short_long_name"]}\",\"#{account_sis_id}\",\"\",\"active\""
     sandbox["enrollment_csv_1"] = "\"#{sandbox["course_id"]}\",\"#{teacher1}\",\"teacher\",\"#{sandbox["default_section_id"]}\",\"active\""
-    sandbox["enrollment_csv_1"] = "\"#{sandbox["course_id"]}\",\"#{teacher2}\",\"teacher\",\"#{sandbox["default_section_id"]}\",\"active\"" unless teacher2.nil?
+    sandbox["enrollment_csv_2"] = "\"#{sandbox["course_id"]}\",\"#{teacher2}\",\"teacher\",\"#{sandbox["default_section_id"]}\",\"active\"" unless teacher2.nil?
     sandbox
   end
 
@@ -196,7 +196,7 @@ class CourseFormController < ApplicationController
 
     ncc["csv"] = "\"#{ncc["course_id"]}\",\"#{ncc["short_long_name"]}\",\"#{ncc["short_long_name"]}\",\"#{account_sis_id}\",\"\",\"active\""
     ncc["enrollment_csv_1"] = "\"#{ncc["course_id"]}\",\"#{teacher1}\",\"teacher\",\"#{ncc["default_section_id"]}\",\"active\""
-    ncc["enrollment_csv_1"] = "\"#{ncc["course_id"]}\",\"#{teacher2}\",\"teacher\",\"#{ncc["default_section_id"]}\",\"active\"" unless teacher2.nil?
+    ncc["enrollment_csv_2"] = "\"#{ncc["course_id"]}\",\"#{teacher2}\",\"teacher\",\"#{ncc["default_section_id"]}\",\"active\"" unless teacher2.nil?
     ncc
   end
 
