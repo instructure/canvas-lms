@@ -107,7 +107,7 @@ class PageView < ActiveRecord::Base
   attr_writer :page_view_method
 
   def self.redis_queue?
-    %w(cache cassandra).include?(page_view_method.to_s)
+    self.page_view_method == :cache || (cassandra? && cassandra_uses_redis?)
   end
 
   # checks the class-level page_view_method
@@ -117,6 +117,10 @@ class PageView < ActiveRecord::Base
   # checks the instance var page_view_method
   def cassandra?
     self.page_view_method == :cassandra
+  end
+
+  def self.cassandra_uses_redis?
+    Setting.get_cached('page_view_cassandra_uses_redis', 'false') == 'true'
   end
 
   EventStream = ::EventStream.new do
@@ -175,10 +179,14 @@ class PageView < ActiveRecord::Base
     result = case page_view_method
     when :log
       Rails.logger.info "PAGE VIEW: #{self.attributes.to_json}"
-    when :cache, :cassandra
-      json = self.attributes.as_json
-      json['is_update'] = true if self.is_update
-      Canvas.redis.rpush(PageView.cache_queue_name, json.to_json)
+    when :cache
+      self.save_to_redis
+    when :cassandra
+      if PageView.cassandra_uses_redis?
+        self.save_to_redis
+      else
+        self.save
+      end
     when :db
       self.save
     end
@@ -186,6 +194,12 @@ class PageView < ActiveRecord::Base
     self.store_page_view_to_user_counts
 
     result
+  end
+
+  def save_to_redis
+    json = self.attributes.as_json
+    json['is_update'] = true if self.is_update
+    Canvas.redis.rpush(PageView.cache_queue_name, json.to_json)
   end
 
   def do_update(params = {})
