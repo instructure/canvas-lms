@@ -119,9 +119,14 @@ class WikiPagesApiController < ApplicationController
   #
   # List the wiki pages associated with a course or group
   #
-  # @argument sort [optional] Sort results by this field: one of 'title', 'created_at', or 'updated_at'
-  # @argument order [optional] The sorting order: 'asc' (default) or 'desc'
-  # @argument search_term (optional) The partial title of the pages to match and return.
+  # @argument sort [Optional, String, "title"|"created_at"|"updated_at"]
+  #   Sort results by this field.
+  #
+  # @argument order [Optional, String, "asc"|"desc"]
+  #   The sorting order. Defaults to 'asc'.
+  #
+  # @argument search_term [Optional, String]
+  #   The partial title of the pages to match and return.
   #
   # @example_request
   #     curl -H 'Authorization: Bearer <token>' \ 
@@ -160,7 +165,8 @@ class WikiPagesApiController < ApplicationController
   #
   # Retrieve the content of a wiki page
   #
-  # @argument url the unique identifier for a page.
+  # @argument url [String]
+  #   The unique identifier for a page.
   #
   # @example_request
   #     curl -H 'Authorization: Bearer <token>' \ 
@@ -183,12 +189,23 @@ class WikiPagesApiController < ApplicationController
   #
   # Create a new wiki page
   #
-  # @argument wiki_page[title] the title for the new page.
-  # @argument wiki_page[body] the content for the new page.
-  # @argument wiki_page[hide_from_students] [boolean] whether the page should be hidden from students.
-  # @argument wiki_page[notify_of_update] [boolean] whether participants should be notified when this page changes.
-  # @argument wiki_page[published] [optional] [boolean] whether the page is published (true) or draft state (false).
-  # @argument wiki_page[front_page] [optional] [boolean] set an unhidden page as the front page (if true)
+  # @argument wiki_page[title] [String]
+  #   The title for the new page.
+  #
+  # @argument wiki_page[body] [String]
+  #   The content for the new page.
+  #
+  # @argument wiki_page[hide_from_students] [Boolean]
+  #   Whether the page should be hidden from students.
+  #
+  # @argument wiki_page[notify_of_update] [Boolean]
+  #   Whether participants should be notified when this page changes.
+  #
+  # @argument wiki_page[published] [Optional, Boolean]
+  #   Whether the page is published (true) or draft state (false).
+  #
+  # @argument wiki_page[front_page] [Optional, Boolean]
+  #   Set an unhidden page as the front page (if true)
   #
   # @example_request
   #     curl -X POST -H 'Authorization: Bearer <token>' \ 
@@ -213,14 +230,27 @@ class WikiPagesApiController < ApplicationController
   #
   # Update the title or contents of a wiki page
   #
-  # @argument url the unique identifier for a page.
-  # @argument wiki_page[title] [optional] the new title for the page.
-  #     NOTE: changing a page's title will change its url. The updated url will be returned in the result.
-  # @argument wiki_page[body] [optional] the new content for the page.
-  # @argument wiki_page[hide_from_students] [optional] boolean; whether the page should be hidden from students.
-  # @argument wiki_page[notify_of_update] [optional] [boolean] notify participants that the wiki page has been changed.
-  # @argument wiki_page[published] [optional] [boolean] whether the page is published (true) or draft state (false)
-  # @argument wiki_page[front_page] [optional] [boolean] set an unhidden page as the front page (if true), or un-set it (if false)
+  # @argument url [String]
+  #   The unique identifier for a page.
+  #
+  # @argument wiki_page[title] [String]
+  #   The title for the new page. NOTE: changing a page's title will change its
+  #   url. The updated url will be returned in the result.
+  #
+  # @argument wiki_page[body] [String]
+  #   The content for the new page.
+  #
+  # @argument wiki_page[hide_from_students] [Boolean]
+  #   Whether the page should be hidden from students.
+  #
+  # @argument wiki_page[notify_of_update] [Boolean]
+  #   Whether participants should be notified when this page changes.
+  #
+  # @argument wiki_page[published] [Optional, Boolean]
+  #   Whether the page is published (true) or draft state (false).
+  #
+  # @argument wiki_page[front_page] [Optional, Boolean]
+  #   Set an unhidden page as the front page (if true)
   #
   # @example_request
   #     curl -X PUT -H 'Authorization: Bearer <token>' \ 
@@ -248,7 +278,8 @@ class WikiPagesApiController < ApplicationController
   #
   # Delete a wiki page
   #
-  # @argument url the unique identifier for a page.
+  # @argument url [String]
+  #   the unique identifier for a page.
   #
   # @example_request
   #     curl -X DELETE -H 'Authorization: Bearer <token>' \ 
@@ -277,7 +308,8 @@ class WikiPagesApiController < ApplicationController
   #
   # List the revisions of a page. Callers must have update rights on the page in order to see page history.
   #
-  # @argument url the unique identifier for a page
+  # @argument url [String]
+  #   The unique identifier for a page
   #
   # @example_request
   #     curl -H 'Authorization: Bearer <token>' \
@@ -298,8 +330,11 @@ class WikiPagesApiController < ApplicationController
   # Retrieve the metadata and optionally content of a revision of the page.
   # Note that retrieving historic versions of pages requires edit rights.
   #
-  # @argument url the unique identifier for a page
-  # @argument summary [optional] [boolean] if set, exclude page content from results
+  # @argument url [String]
+  #   The unique identifier for a page
+  #
+  # @argument summary [Optional, Boolean]
+  #   If set, exclude page content from results
   #
   # @example_request
   #     curl -H 'Authorization: Bearer <token>' \
@@ -332,8 +367,13 @@ class WikiPagesApiController < ApplicationController
   #
   # Revert a page to a prior revision.
   #
-  # @argument url the unique identifier for the page
-  # @argument revision_id the revision to revert to (use the {api:WikiPagesApiController#revisions List Revisions API} to see available revisions)
+  # @argument url [String]
+  #   The unique identifier for the page
+  #
+  # @argument revision_id [Integer]
+  #   The revision to revert to (use the
+  #   {api:WikiPagesApiController#revisions List Revisions API} to see
+  #   available revisions)
   #
   # @example_request
   #    curl -X POST -H 'Authorization: Bearer <token>' \
