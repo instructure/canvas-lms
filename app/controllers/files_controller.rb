@@ -118,8 +118,13 @@ class FilesController < ApplicationController
   # @API List files
   # Returns the paginated list of files for the folder or course.
   #
-  # @argument content_types[] [optional] Filter results by content-type. You can specify type/subtype pairs (e.g., 'image/jpeg'), or simply types (e.g., 'image', which will match 'image/gif', 'image/jpeg', etc.).
-  # @argument search_term (optional) The partial name of the files to match and return.
+  # @argument content_types[] [Optional, String]
+  #   Filter results by content-type. You can specify type/subtype pairs (e.g.,
+  #   'image/jpeg'), or simply types (e.g., 'image', which will match
+  #   'image/gif', 'image/jpeg', etc.).
+  #
+  # @argument search_term [Optional, String]
+  #   The partial name of the files to match and return.
   #
   # @example_request
   #
@@ -760,14 +765,25 @@ class FilesController < ApplicationController
   # @API Update file
   # Update some settings on the specified file
   #
-  # @argument name The new display name of the file
-  # @argument parent_folder_id The id of the folder to move this file into. 
+  # @argument name [String]
+  #   The new display name of the file
+  #
+  # @argument parent_folder_id [String]
+  #   The id of the folder to move this file into. 
   #   The new folder must be in the same context as the original parent folder. 
   #   If the file is in a context without folders this does not apply.
-  # @argument lock_at The datetime to lock the file at
-  # @argument unlock_at The datetime to unlock the file at
-  # @argument locked Flag the file as locked
-  # @argument hidden Flag the file as hidden
+  #
+  # @argument lock_at [DateTime]
+  #   The datetime to lock the file at
+  #
+  # @argument unlock_at [DateTime]
+  #   The datetime to unlock the file at
+  #
+  # @argument locked [Boolean]
+  #   Flag the file as locked
+  #
+  # @argument hidden [Boolean]
+  #   Flag the file as hidden
   #
   # @example_request
   #
