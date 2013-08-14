@@ -39,8 +39,9 @@ define [
       @$oldEndDate.on 'change', (event) => @model.setDateShiftOptions property:'old_end_date', value: event.target.value
       @$newStartDate.on 'change', (event) => @model.setDateShiftOptions property: 'new_start_date', value: event.target.value
       @$newEndDate.on 'change', (event) => @model.setDateShiftOptions property: 'new_end_date', value: event.target.value
-      @$newStartDate.val @oldStartDate
-      @$newEndDate.val @oldEndDate
+
+      @$newStartDate.val(@oldStartDate).trigger('change') if @oldStartDate
+      @$newEndDate.val(@oldEndDate).trigger('change') if @oldEndDate
 
     # Toggle content. Show's content when checked 
     # and hides content when unchecked. Sets date_shift_options
@@ -65,5 +66,5 @@ define [
       @collection.add new DaySubModel
 
     updateNewDates: (course) =>
-      @$oldStartDate.val course.start_at
-      @$oldEndDate.val course.end_at
+      @$oldStartDate.val(course.start_at).trigger('change')
+      @$oldEndDate.val(course.end_at).trigger('change')
