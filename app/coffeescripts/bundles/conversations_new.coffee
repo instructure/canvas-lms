@@ -124,6 +124,15 @@ require [
       @header.on('star-toggle', @onStarToggle)
       @header.on('search',      @onSearch)
       @compose.on('close',      @onCloseCompose)
+      @compose.on('addMessage', @onAddMessage)
+      @compose.on('addMessage', @list.updateMessage)
+      @compose.on('submitting', @onSubmit)
+
+    onSubmit: (dfd) =>
+      @detail.$el.disableWhileLoading(dfd)
+
+    onAddMessage: (message) =>
+      @detail.addMessage(message)
 
     _currentFilter: ->
       return @searchTokens if @searchTokens

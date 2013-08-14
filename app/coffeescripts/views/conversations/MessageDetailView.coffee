@@ -12,6 +12,12 @@ define [
 
     tagName: 'div'
 
+    addMessage: (message) =>
+      message.participants = _.map message.participating_user_ids, (id) =>
+        _.findWhere(@model.get('participants'), id: id).name
+      @model.get('messages').unshift(message)
+      @render()
+
     render: ->
       super
       if @model

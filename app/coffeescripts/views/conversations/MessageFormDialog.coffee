@@ -26,12 +26,13 @@ define [
   'jst/conversations/composeTitleBar'
   'jst/conversations/composeButtonBar'
   'jst/conversations/addAttachment'
+  'compiled/models/Message'
   'compiled/views/conversations/AutocompleteView'
   'compiled/views/conversations/CourseSelectionView'
   'compiled/views/conversations/ContextMessagesView'
   'compiled/widget/ContextSearch'
   'vendor/jquery.elastic'
-], (I18n, _, {Collection}, DialogBaseView, template, preventDefault, composeTitleBarTemplate, composeButtonBarTemplate, addAttachmentTemplate, AutocompleteView, CourseSelectionView, ContextMessagesView) ->
+], (I18n, _, {Collection}, DialogBaseView, template, preventDefault, composeTitleBarTemplate, composeButtonBarTemplate, addAttachmentTemplate, Message, AutocompleteView, CourseSelectionView, ContextMessagesView) ->
 
   ##
   # reusable message composition dialog
@@ -52,6 +53,9 @@ define [
       '.message-body':                  '$messageBody'
       '.conversation_body':             '$conversationBody'
       '.compose_form':                  '$form'
+
+    messages:
+      flashSuccess: I18n.t('message_sent', 'Message sent!')
 
     dialogOptions: ->
       id: 'compose-new-message'
@@ -227,12 +231,23 @@ define [
           data
         onSubmit: (@request, submitData) =>
           # close dialog after submitting the message
+          dfd = $.Deferred()
+          @trigger('submitting', dfd)
           @close()
           # update conversation when message confirmed sent
           # TODO: construct the new message object and pass it to the MessageDetailView which will need to create a MessageItemView for it
-          #$.when(@request).then (data) =>
-          #  data = [data] unless data.length?
-          #  @app.updatedConversation(data)
+          $.when(@request).then (response) =>
+            dfd.resolve()
+            $.flashMessage(@messages.flashSuccess)
+            if @to
+              message = response.messages[0]
+              message.author =
+                name: ENV.current_user.display_name
+                avatar_url: ENV.current_user.avatar_image_url
+              message.participating_user_ids = _.reject message.participating_user_ids, (id) ->
+                id == ENV.current_user_id
+              @trigger('addMessage', message, response)
+            @to = null
 
     recipientIdsChanged: (recipientIds) =>
       if recipientIds.length > 1 or recipientIds[0]?.match(/^(course|group)_/)
