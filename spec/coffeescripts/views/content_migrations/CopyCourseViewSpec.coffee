@@ -1,14 +1,18 @@
 define [
   'Backbone'
+  'compiled/models/ContentMigration'
   'compiled/views/content_migrations/CopyCourseView'
   'compiled/views/content_migrations/subviews/DateShiftView'
-], (Backbone, CopyCourseView, DateShiftView) ->
+], (Backbone, ContentMigration, CopyCourseView, DateShiftView) ->
   module 'CopyCourseView: Initializer'
   test 'after init, calls updateNewDates when @courseFindSelect.triggers "course_changed" event', ->
 
     copyCourseView = new CopyCourseView
                          courseFindSelect: new Backbone.View
                          dateShift: new DateShiftView
+                            model: new ContentMigration
+
+
 
     $('#fixtures').html copyCourseView.render().el
     sinonSpy = sinon.spy(copyCourseView.dateShift, 'updateNewDates')
