@@ -1,1 +1,10 @@
-<option value="{{id}}" data-code="{{course_code}}">{{name}}</option>
+<option value="{{id}}" data-code="{{course_code}}"
+{{#if truncated_name}}
+  aria-label="{{name}}" data-content="<abbr class='text' data-value='{{id}}' title='{{name}}'>{{truncated_name}}</abbr>"
+  >
+  {{truncated_name}}
+{{else}}
+  >
+  {{name}}
+{{/if}}
+</option>

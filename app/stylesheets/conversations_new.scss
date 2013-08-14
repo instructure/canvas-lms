@@ -47,6 +47,10 @@
     margin-bottom: 0;
     width: 150px;
   }
+
+  .course-filter abbr {
+    cursor: pointer;
+  }
 }
 
 .conversations .panel, .message-header {

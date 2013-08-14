@@ -126,7 +126,7 @@
                 //Get the class and text for the option
                 var optionClass = $this.attr("class") || '';
                 var inline = $this.attr("style") || '';
-                var text =  $this.html();
+                var text =  $this.data('content') ? $this.data('content') : $this.html(); 
                 var subtext = $this.data('subtext') !== undefined ? '<small class="muted">' + $this.data('subtext') + '</small>' : '';
                 var icon = $this.data('icon') !== undefined ? '<i class="'+$this.data('icon')+'"></i> ' : '';
                 if (icon !== '' && ($this.is(':disabled') || $this.parent().is(':disabled'))) {
@@ -140,8 +140,10 @@
                   value = text;
                 }
 
-                //Prepend any icon and append any subtext to the main text.
-                text = icon + '<span class="text" data-value="'+value+'">' + text + subtext + '</span>';
+                if (!$this.data('content')) {
+                  //Prepend any icon and append any subtext to the main text.
+                  text = icon + '<span class="text" data-value="'+value+'">' + text + subtext + '</span>';
+                } 
 
                 if (_this.options.hideDisabled && ($this.is(':disabled') || $this.parent().is(':disabled'))) {
                     _liA.push('<a style="min-height: 0; padding: 0"></a>');
@@ -158,29 +160,29 @@
                           _liA.push('<a role="menuitem" aria-haspopup="true" tabindex="-1" href="#">'+label+'</a>'+
                             '<ul class="dropdown-menu" role="group">'
                             );
-                          _subLiA.push(_this.createA(text, "opt " + optionClass, inline, index ));
+                          _subLiA.push(_this.createA(text, "opt " + optionClass, inline, index, $this ));
                         } else if ($this[0].index != 0) {
                             _liA.push(
                                 '<div class="div-contain"><div class="divider"></div></div>'+
                                 '<dt>'+label+'</dt>'+
-                                _this.createA(text, "opt " + optionClass, inline, index )
+                                _this.createA(text, "opt " + optionClass, inline, index, $this )
                                 );
                         } else {
                             _liA.push(
                                 '<dt>'+label+'</dt>'+
-                                _this.createA(text, "opt " + optionClass, inline, index ));
+                                _this.createA(text, "opt " + optionClass, inline, index, $this ));
                         }
                     } else {
                          // INSTRUCTURE
                          var container = _this.options.useSubmenus ? _subLiA : _liA;
-                         container.push( _this.createA(text, "opt " + optionClass, inline, index )  );
+                         container.push( _this.createA(text, "opt " + optionClass, inline, index, $this )  );
                     }
                 } else if ($this.data('divider') == true) {
                     _liA.push('<div class="div-contain"><div class="divider"></div></div>');
                 } else if ($(this).data('hidden') == true) {
                     _liA.push('');
                 } else {
-                    _liA.push( _this.createA(text, optionClass, inline, index ) );
+                    _liA.push( _this.createA(text, optionClass, inline, index, $this ) );
                 }
 
                 if (_subLiA.length && !$this.next().length) {
@@ -208,9 +210,13 @@
             return $(_liHtml);
         },
 
-        createA: function(text, classes, inline, index) {
-          // INSTRUCTURE: added role and id
-         return '<a tabindex="-1" class="'+classes+'" style="'+inline+'" id="' + this.id+'-'+index + '" role="menuitemcheckbox">' +
+        createA: function(text, classes, inline, index, $option) {
+          // INSTRUCTURE: added role and id and aria-label and the $option parameter
+          var ariaLabel = ''
+          if ($option.attr('aria-label') !== undefined) {
+            ariaLabel = ' aria-label="' + $option.attr('aria-label') + '"'
+          }
+         return '<a tabindex="-1" class="'+classes+'" style="'+inline+'" id="' + this.id+'-'+index + '" role="menuitemcheckbox"' + ariaLabel + '>' +
                  text +
                  '<i class="icon-ok check-mark"></i>' +
                  '</a>';
@@ -234,7 +240,9 @@
                 } else {
                     subtext = '';
                 }
-                if ($this.attr('title') != undefined) {
+                if ($this.data('content') && _this.options.showContent) {
+                    return $this.data('content');
+                } else if ($this.attr('title') != undefined) { 
                     return $this.attr('title');
                 } else {
                     return icon + $this.html() + subtext;
@@ -697,6 +705,7 @@
         hideDisabled: false,
         showSubtext: false,
         showIcon: true,
+        showContent: true,
         // INSTRUCTURE
         useSubmenus: false
     }

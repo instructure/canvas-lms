@@ -13,25 +13,29 @@ describe "conversations new" do
   end
 
   def conversation_elements
-    ffj('.messages > li')
+    ff('.messages > li')
   end
 
   def get_view_filter
-    fj('.type-filter.bootstrap-select')
+    f('.type-filter.bootstrap-select')
   end
 
   def get_course_filter
-    pending('course filter selector fails intermittently')
-    fj('.course-filter.bootstrap-select')
+    pending('course filter selector fails intermittently (stale element reference), probably due to dynamic loading and refreshing')
+    #try to make it load the courses first so it doesn't randomly refresh
+    selector = '.course-filter.bootstrap-select'
+    driver.execute_script(%{$('#{selector}').focus();})
+    wait_for_ajaximations
+    f(selector)
   end
 
   def get_bootstrap_select_value(element)
-    fj('.selected .text', element).attribute('data-value')
+    f('.selected .text', element).attribute('data-value')
   end
 
   def set_bootstrap_select_value(element, new_value)
-    fj('.dropdown-toggle', element).click()
-    fj('.text[data-value="'+new_value+'"]', element).click()
+    f('.dropdown-toggle', element).click()
+    f(%{.text[data-value="#{new_value}"]}, element).click()
   end
 
   def select_view(new_view)
@@ -103,15 +107,26 @@ describe "conversations new" do
       conversation_elements.size.should eql 2
     end
 
+    it "should truncate long course names" do
+      @course.name = "this is a very long course name that will be truncated"
+      @course.save!
+      get_conversations
+      select_course(@course.id)
+      button_text = f('.filter-option', get_course_filter).text
+      button_text.should_not eql @course.name
+      button_text[0...5].should eql @course.name[0...5]
+      button_text[-5..-1].should eql @course.name[-5..-1]
+    end
+
     it "should filter by course" do
       get_conversations
-      select_course(@course.id.to_s)
+      select_course(@course.id)
       conversation_elements.size.should eql 2 
     end
 
     it "should filter by course plus view" do
       get_conversations
-      select_course(@course.id.to_s)
+      select_course(@course.id)
       select_view('unread')
       conversation_elements.size.should eql 1 
     end
@@ -128,6 +143,9 @@ describe "conversations new" do
     it "should star via star icon" do
       get_conversations
       unstarred_elt = conversation_elements[1]
+      # make star button visible via mouse over
+      driver.mouse.move_to(unstarred_elt)
+      wait_for_ajaximations
       star_btn = f('.star-btn', unstarred_elt)
       star_btn.should be_present
       f('.active', unstarred_elt).should be_nil
