@@ -5,7 +5,7 @@ namespace :i18n do
   def infer_scope(filename)
     case filename
       when /app\/views\/.*\.handlebars\z/
-        filename.gsub(/.*app\/views\/jst\/_?|\.handlebars\z/, '').underscore.gsub(/\/_?/, '.')
+        filename.gsub(/.*app\/views\/jst\/_?|\.handlebars\z/, '').gsub(/plugins\/([^\/]*)\//, '').underscore.gsub(/\/_?/, '.')
       when /app\/controllers\//
         scope = filename.gsub(/.*app\/controllers\/|controller.rb/, '').gsub(/\/_?|_\z/, '.')
         scope == 'application.' ? '' : scope
@@ -99,8 +99,8 @@ namespace :i18n do
 
 
     # JavaScript
-    files = (Dir.glob('./public/javascripts/**/*.js') + Dir.glob('./app/views/**/*.erb')).
-      reject{ |file| file =~ /\A\.\/public\/javascripts\/(i18nObj.js|i18n.js|jst\/|translations\/|compiled\/handlebars_helpers.js|tinymce\/jscripts\/tiny_mce(.*\/langs|\/tiny_mce\w*\.js))/ }
+    files = (Dir.glob('./public/javascripts/{,**/*/**/}*.js') + Dir.glob('./app/views/**/*.erb')).
+      reject{ |file| file =~ /\A\.\/public\/javascripts\/(i18nObj.js|i18n.js|.*jst\/|translations\/|compiled\/handlebars_helpers.js|tinymce\/jscripts\/tiny_mce(.*\/langs|\/tiny_mce\w*\.js))/ }
     files &= only if only
     js_extractor = I18nExtraction::JsExtractor.new(:translations => @translations)
     process_files(files) do |file|
@@ -113,7 +113,7 @@ namespace :i18n do
 
 
     # Handlebars
-    files = Dir.glob('./app/views/jst/**/*.handlebars')
+    files = Dir.glob('./app/views/jst/{,**/*/**/}*.handlebars')
     files &= only if only
     handlebars_extractor = I18nExtraction::HandlebarsExtractor.new(:translations => @translations)
     process_files(files) do |file|
@@ -207,13 +207,13 @@ namespace :i18n do
     end
 
     # JavaScript
-    files = Dir.glob('./public/javascripts/**/*.js').
-      reject{ |file| file =~ /\A\.\/public\/javascripts\/(i18nObj.js|i18n.js|jst\/|translations\/|compiled\/handlebars_helpers.js|tinymce\/jscripts\/tiny_mce(.*\/langs|\/tiny_mce\w*\.js))/ }
+    files = Dir.glob('./public/javascripts/{,**/*/**/}*.js').
+      reject{ |file| file =~ /\A\.\/public\/javascripts\/(i18nObj.js|i18n.js|.*jst\/|translations\/|compiled\/handlebars_helpers.js|tinymce\/jscripts\/tiny_mce(.*\/langs|\/tiny_mce\w*\.js))/ }
     js_extractor = I18nExtraction::JsExtractor.new
     process_files.call(js_extractor, files, lambda{ |file| [{:filename => file}] } )
 
     # Handlebars
-    files = Dir.glob('./app/views/jst/**/*.handlebars')
+    files = Dir.glob('./app/views/jst/{,**/*/**/}*.handlebars')
     handlebars_extractor = I18nExtraction::HandlebarsExtractor.new
     process_files.call(handlebars_extractor, files, lambda{ |file| [infer_scope(file)] } )
 
