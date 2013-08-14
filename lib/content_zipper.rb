@@ -70,28 +70,31 @@ class ContentZipper
   def zip_assignment(zip_attachment, assignment)
     mark_attachment_as_zipping!(zip_attachment)
     filename = assignment_zip_filename(assignment)
-    submissions = assignment.submissions
-    if zip_attachment.user && assignment.context.enrollment_visibility_level_for(zip_attachment.user) != :full
-      visible_student_ids = assignment.context.enrollments_visible_to(zip_attachment.user).pluck(:user_id)
-      submissions = submissions.where(:user_id => visible_student_ids)
-    end
+
+    user = zip_attachment.user
+    context = assignment.context
+
+    students = assignment.representatives(user).index_by(&:id)
+    submissions = assignment.submissions.where(:user_id => students.keys)
+
     make_zip_tmpdir(filename) do |zip_name|
       @logger.debug("creating #{zip_name}")
-      submissions_added = 0
       Zip::ZipFile.open(zip_name, Zip::ZipFile::CREATE) do |zipfile|
         count = submissions.length
         submissions.each_with_index do |submission, idx|
-          submissions_added += 1
           @assignment = assignment
           @submission = submission
           @context = assignment.context
           @logger.debug(" checking submission for #{(submission.user.name rescue nil)}")
 
-          # it's necessary to replace _\d+_ because we use that pattern to infer the user/attachment ids when teachers
-          # upload graded submissions
-          users_name = submission.user.last_name_first.gsub(/[_ ](\d+)[_ ]/, '-\1-')
+          # pulling out of this hash to get group names for group assignments
+          # and to avoid extra queries
+          users_name = students[submission.user_id].sortable_name
+          # necessary because we use /_\d+_/ to infer the user/attachment
+          # ids when teachers upload graded submissions
+          users_name.gsub! /[_ ](\d+)[_ ]/, '-\1-'
 
-          filename = users_name + (submission.late? ? " LATE " : " ") + submission.user_id.to_s
+          filename = users_name + (submission.late? ? " LATE-" : "-") + submission.user_id.to_s
           filename = filename.gsub(/ /, "_").gsub(/[^-\w]/, "").downcase
           content = nil
           if submission.submission_type == "online_upload"
@@ -127,12 +130,12 @@ class ContentZipper
           update_progress(zip_attachment, idx, count)
         end
       end
-      @logger.debug("added #{submissions_added} submissions")
+      @logger.debug("added #{submissions.size} submissions")
       assignment.increment!(:submissions_downloads)
       complete_attachment!(zip_attachment, zip_name)
     end
   end
-  
+
   def self.zip_eportfolio(*args)
     ContentZipper.new.zip_eportfolio(*args)
   end

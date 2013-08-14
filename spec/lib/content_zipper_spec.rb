@@ -23,7 +23,7 @@ describe ContentZipper do
     it "sanitizes user names" do
       s1, s2 = 2.times.map { course_with_student ; @student }
       s1.update_attribute :sortable_name, 'some_999_, _1234_guy'
-      s2.update_attribute :sortable_name, 'other 567 , guy'
+      s2.update_attribute :sortable_name, 'other 567, guy 8'
       [s1, s2].each { |s| submission_model(:user => s) }
       attachment = Attachment.new(:display_name => 'my_download.zip')
       attachment.user = @teacher
@@ -32,7 +32,7 @@ describe ContentZipper do
       attachment.save!
       ContentZipper.process_attachment(attachment, @teacher)
       expected_file_patterns = [
-        /other-567-_guy/,
+        /other-567-_guy-8-/,
         /some-999-_-1234-guy/,
       ]
       Zip::ZipFile.foreach(attachment.reload.full_filename).each { |f|
@@ -94,6 +94,34 @@ describe ContentZipper do
       attachment.reload
       # no submissions
       attachment.workflow_state.should == 'errored'
+    end
+
+    it "only includes one submission per group" do
+      teacher_in_course active_all: true
+      gc = @course.group_categories.create! name: "Homework Groups"
+      groups = 2.times.map { |i| gc.groups.create! name: "Group #{i}" }
+      students = 4.times.map { student_in_course(active_all: true); @student }
+      students.each_with_index { |s, i| groups[i % groups.size].add_user(s) }
+      a = @course.assignments.create! group_category_id: gc.id,
+                                      grade_group_students_individually: false,
+                                      submission_types: %w(text_entry)
+      a.submit_homework(students.first, body: "group 1 submission")
+      a.submit_homework(students.second, body: "group 2 submission")
+
+      attachment = Attachment.new(:display_name => 'my_download.zip')
+      attachment.user = @teacher
+      attachment.workflow_state = 'to_be_zipped'
+      attachment.context = a
+      attachment.save!
+
+      ContentZipper.process_attachment(attachment, @teacher)
+      sub_count = 0
+      expected_file_names = [/group_0/, /group_1/]
+      Zip::ZipFile.foreach(attachment.full_filename) do |f|
+        f.name.should =~ expected_file_names.shift
+        sub_count += 1
+      end
+      sub_count.should == 2
     end
   end
 

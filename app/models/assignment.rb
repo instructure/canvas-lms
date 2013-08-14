@@ -859,13 +859,10 @@ class Assignment < ActiveRecord::Base
   def group_students(student)
     group = nil
     students = [student]
-    if self.has_group_category?
-      group = self.group_category.group_for(student)
-      if group
-        students = group.users.joins("INNER JOIN enrollments ON enrollments.user_id=users.id").
-          where(:enrollments => { :course_id => self.context}).
-          where(Course.reflections[:student_enrollments].options[:conditions]).all
-      end
+    if has_group_category? && group = group_category.group_for(student)
+      students = group.users.joins("INNER JOIN enrollments ON enrollments.user_id=users.id").
+        where(:enrollments => { :course_id => self.context}).
+        where(Course.reflections[:student_enrollments].options[:conditions]).all
     end
     [group, students]
   end
@@ -1110,28 +1107,14 @@ class Assignment < ActiveRecord::Base
     )
 
     avatar_methods = (avatars && !grade_as_group?) ? [:avatar_path] : []
-    visible_students = context.students_visible_to(user).order_by_sortable_name.uniq
 
     res[:context][:rep_for_student] = {}
 
-    students = if grade_as_group?
-                 group_category.groups.includes(:group_memberships => :user).map { |g|
-                   [g.name, g.users]
-                 }.map { |group_name, group_students|
-                   representative, *others = (group_students & visible_students)
-                   next unless representative
-
-                   representative.readonly!
-                   representative.name = group_name
-
-                   others.each { |s|
-                     res[:context][:rep_for_student][s.id] = representative.id
-                   }
-                   representative
-                 }.compact
-               else
-                 visible_students
-               end
+    students = representatives(user) do |rep, others|
+      others.each { |s|
+        res[:context][:rep_for_student][s.id] = rep.id
+      }
+    end
 
     res[:context][:students] = students.map { |u|
       u.as_json(:include_root => false,
@@ -1187,6 +1170,37 @@ class Assignment < ActiveRecord::Base
 
   def grade_as_group?
     has_group_category? && !grade_group_students_individually?
+  end
+
+  # for group assignments, returns a single "student" for each
+  # group's submission.  the students name will be changed to the group's
+  # name.  for non-group assignments this just returns all visible users
+  def representatives(user)
+    visible_students = (
+      user ?
+        context.students_visible_to(user) :
+        context.participating_students
+    ).order_by_sortable_name.uniq
+
+    if grade_as_group?
+      group_category.groups.includes(:group_memberships => :user).map { |g|
+        [g.name, g.users]
+      }.map { |group_name, group_students|
+        representative, *others = (group_students & visible_students)
+        next unless representative
+
+        representative.readonly!
+        representative.name = group_name
+        representative.sortable_name = group_name
+        representative.short_name = group_name
+
+        yield representative, others if block_given?
+
+        representative
+      }.compact
+    else
+      visible_students
+    end
   end
 
   def visible_rubric_assessments_for(user)
