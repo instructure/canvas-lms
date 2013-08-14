@@ -35,22 +35,22 @@ class SubmissionsApiController < ApplicationController
   #
   # Get all existing submissions for an assignment.
   #
-  # @argument include[] ["submission_history"|"submission_comments"|"rubric_assessment"|"assignment"] Associations to include with the group.
+  # @argument include[] [String, "submission_history"|"submission_comments"|"rubric_assessment"|"assignment"]
+  #   Associations to include with the group.
   #
-  # Fields include:
-  # assignment_id:: The unique identifier for the assignment.
-  # user_id:: The id of the user who submitted the assignment.
-  # grader_id:: The id of the user who graded the assignment.
-  # submitted_at:: The timestamp when the assignment was submitted, if an actual submission has been made.
-  # score:: The raw score for the assignment submission.
-  # attempt:: If multiple submissions have been made, this is the attempt number.
-  # body:: The content of the submission, if it was submitted directly in a text field.
-  # grade:: The grade for the submission, translated into the assignment grading scheme (so a letter grade, for example).
-  # grade_matches_current_submission:: A boolean flag which is false if the student has re-submitted since the submission was last graded.
-  # preview_url:: Link to the URL in canvas where the submission can be previewed. This will require the user to log in.
-  # submitted_at:: Timestamp when the submission was made.
-  # url:: If the submission was made as a URL.
-  # late:: Whether the submission was made after the applicable due date.
+  # @response_field assignment_id The unique identifier for the assignment.
+  # @response_field user_id The id of the user who submitted the assignment.
+  # @response_field grader_id The id of the user who graded the assignment.
+  # @response_field submitted_at The timestamp when the assignment was submitted, if an actual submission has been made.
+  # @response_field score The raw score for the assignment submission.
+  # @response_field attempt If multiple submissions have been made, this is the attempt number.
+  # @response_field body The content of the submission, if it was submitted directly in a text field.
+  # @response_field grade The grade for the submission, translated into the assignment grading scheme (so a letter grade, for example).
+  # @response_field grade_matches_current_submission A boolean flag which is false if the student has re-submitted since the submission was last graded.
+  # @response_field preview_url Link to the URL in canvas where the submission can be previewed. This will require the user to log in.
+  # @response_field submitted_at Timestamp when the submission was made.
+  # @response_field url If the submission was made as a URL.
+  # @response_field late Whether the submission was made after the applicable due date.
   def index
     if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
       @assignment = @context.assignments.active.find(params[:assignment_id])
@@ -68,10 +68,23 @@ class SubmissionsApiController < ApplicationController
   #
   # Get all existing submissions for a given set of students and assignments.
   #
-  # @argument student_ids[] List of student ids to return submissions for. If this argument is omitted, return submissions for the calling user. Students may only list their own submissions. Observers may only list those of associated students.
-  # @argument assignment_ids[] List of assignments to return submissions for. If none are given, submissions for all assignments are returned.
-  # @argument grouped If this argument is present, the response will be grouped by student, rather than a flat array of submissions.
-  # @argument include[] ["submission_history"|"submission_comments"|"rubric_assessment"|"assignment"|"total_scores"] Associations to include with the group. `total_scores` requires the `grouped` argument.
+  # @argument student_ids[] [String]
+  #   List of student ids to return submissions for. If this argument is
+  #   omitted, return submissions for the calling user. Students may only list
+  #   their own submissions. Observers may only list those of associated
+  #   students.
+  #
+  # @argument assignment_ids[] [String]
+  #   List of assignments to return submissions for. If none are given,
+  #   submissions for all assignments are returned.
+  #
+  # @argument grouped [Boolean]
+  #   If this argument is present, the response will be grouped by student,
+  #   rather than a flat array of submissions.
+  #
+  # @argument include[] [String, "submission_history"|"submission_comments"|"rubric_assessment"|"assignment"|"total_scores"]
+  #   Associations to include with the group. `total_scores` requires the
+  #   `grouped` argument.
   #
   # @example_response
   #     # Without grouped:
@@ -181,7 +194,8 @@ class SubmissionsApiController < ApplicationController
   #
   # Get a single submission, based on user id.
   #
-  # @argument include[] ["submission_history"|"submission_comments"|"rubric_assessment"] Associations to include with the group.
+  # @argument include[] [String, "submission_history"|"submission_comments"|"rubric_assessment"]
+  #   Associations to include with the group.
   def show
     @assignment = @context.assignments.active.find(params[:assignment_id])
     @user = get_user_considering_section(params[:user_id])
@@ -226,33 +240,56 @@ class SubmissionsApiController < ApplicationController
   # must have permission to manage grades in the appropriate context (course or
   # section).
   #
-  # @argument comment[text_comment] Add a textual comment to the submission.
+  # @argument comment[text_comment] [String]
+  #   Add a textual comment to the submission.
   #
-  # @argument comment[group_comment] [Boolean] Whether or not this comment should be sent to the entire group (defaults to false). Ignored if this is not a group assignment or if no text_comment is provided.
+  # @argument comment[group_comment] [Optional, Boolean]
+  #   Whether or not this comment should be sent to the entire group (defaults
+  #   to false). Ignored if this is not a group assignment or if no text_comment
+  #   is provided.
   #
-  # @argument comment[media_comment_id] Add an audio/video comment to the submission.
-  #   Media comments can be added via this API, however, note that there
-  #   is not yet an API to generate or list existing media comments, so this
-  #   functionality is currently of limited use.
+  # @argument comment[media_comment_id] [Integer]
+  #   Add an audio/video comment to the submission. Media comments can be added
+  #   via this API, however, note that there is not yet an API to generate or
+  #   list existing media comments, so this functionality is currently of
+  #   limited use.
   #
-  # @argument comment[media_comment_type] ["audio"|"video"] The type of media comment being added.
+  # @argument comment[media_comment_type] [String, "audio"|"video"]
+  #   The type of media comment being added.
   #
-  # @argument submission[posted_grade] Assign a score to the submission,
-  #   updating both the "score" and "grade" fields on the submission record.
-  #   This parameter can be passed in a few different formats:
-  #   points:: A floating point or integral value, such as "13.5". The grade will be interpreted directly as the score of the assignment. Values above assignment.points_possible are allowed, for awarding extra credit.
-  #   percentage:: A floating point value appended with a percent sign, such as "40%". The grade will be interpreted as a percentage score on the assignment, where 100% == assignment.points_possible. Values above 100% are allowed, for awarding extra credit.
-  #   letter grade:: A letter grade, following the assignment's defined letter grading scheme. For example, "A-". The resulting score will be the high end of the defined range for the letter grade. For instance, if "B" is defined as 86% to 84%, a letter grade of "B" will be worth 86%. The letter grade will be rejected if the assignment does not have a defined letter grading scheme. For more fine-grained control of scores, pass in points or percentage rather than the letter grade.
-  #   "pass/complete/fail/incomplete":: A string value of "pass" or "complete" will give a score of 100%. "fail" or "incomplete" will give a score of 0.
+  # @argument submission[posted_grade] [String]
+  #   Assign a score to the submission, updating both the "score" and "grade"
+  #   fields on the submission record. This parameter can be passed in a few
+  #   different formats:
+  #
+  #   points:: A floating point or integral value, such as "13.5". The grade
+  #     will be interpreted directly as the score of the assignment.
+  #     Values above assignment.points_possible are allowed, for awarding
+  #     extra credit.
+  #   percentage:: A floating point value appended with a percent sign, such as
+  #      "40%". The grade will be interpreted as a percentage score on the
+  #      assignment, where 100% == assignment.points_possible. Values above 100%
+  #      are allowed, for awarding extra credit.
+  #   letter grade:: A letter grade, following the assignment's defined letter
+  #      grading scheme. For example, "A-". The resulting score will be the high
+  #      end of the defined range for the letter grade. For instance, if "B" is
+  #      defined as 86% to 84%, a letter grade of "B" will be worth 86%. The
+  #      letter grade will be rejected if the assignment does not have a defined
+  #      letter grading scheme. For more fine-grained control of scores, pass in
+  #      points or percentage rather than the letter grade.
+  #   "pass/complete/fail/incomplete":: A string value of "pass" or "complete"
+  #      will give a score of 100%. "fail" or "incomplete" will give a score of
+  #      0.
   #
   #   Note that assignments with grading_type of "pass_fail" can only be
   #   assigned a score of 0 or assignment.points_possible, nothing inbetween. If
   #   a posted_grade in the "points" or "percentage" format is sent, the grade
   #   will only be accepted if the grade equals one of those two values.
   #
-  # @argument rubric_assessment Assign a rubric assessment to this assignment
-  #   submission. The sub-parameters here depend on the rubric for the
-  #   assignment. The general format is, for each row in the rubric:
+  # @argument rubric_assessment [RubricAssessment]
+  #   Assign a rubric assessment to this assignment submission. The
+  #   sub-parameters here depend on the rubric for the assignment. The general
+  #   format is, for each row in the rubric:
   #
   #   rubric_assessment[criterion_id][points]:: The points awarded for this row.
   #   rubric_assessment[criterion_id][comments]:: Comments to add for this row.

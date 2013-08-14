@@ -43,21 +43,38 @@ class SearchController < ApplicationController
   #
   # Pagination is supported.
   #
-  # @argument search Search terms used for matching users/courses/groups (e.g.
-  #   "bob smith"). If multiple terms are given (separated via whitespace),
-  #   only results matching all terms will be returned.
-  # @argument context Limit the search to a particular course/group (e.g.
-  #   "course_3" or "group_4").
-  # @argument exclude[] Array of ids to exclude from the search. These may be
-  #   user ids or course/group ids prefixed with "course_" or "group_" respectively,
+  # @argument search [String]
+  #   Search terms used for matching users/courses/groups (e.g. "bob smith"). If
+  #   multiple terms are given (separated via whitespace), only results matching
+  #   all terms will be returned.
+  #
+  # @argument context [String]
+  #   Limit the search to a particular course/group (e.g. "course_3" or "group_4").
+  #
+  # @argument exclude[] [String]
+  #   Array of ids to exclude from the search. These may be user ids or
+  #   course/group ids prefixed with "course_" or "group_" respectively,
   #   e.g. exclude[]=1&exclude[]=2&exclude[]=course_3
-  # @argument type ["user"|"context"] Limit the search just to users or contexts (groups/courses).
-  # @argument user_id [Integer] Search for a specific user id. This ignores the other above parameters, and will never return more than one result.
-  # @argument from_conversation_id [Integer] When searching by user_id, only users that could be normally messaged by this user will be returned. This parameter allows you to specify a conversation that will be referenced for a shared context -- if both the current user and the searched user are in the conversation, the user will be returned. This is used to start new side conversations.
-  # @argument permissions[] Array of permission strings to be checked for each
-  #   matched context (e.g. "send_messages"). This argument determines which
-  #   permissions may be returned in the response; it won't prevent contexts
-  #   from being returned if they don't grant the permission(s)
+  #
+  # @argument type [String, "user"|"context"]
+  #   Limit the search just to users or contexts (groups/courses).
+  #
+  # @argument user_id [Integer]
+  #   Search for a specific user id. This ignores the other above parameters,
+  #   and will never return more than one result.
+  #
+  # @argument from_conversation_id [Integer]
+  #   When searching by user_id, only users that could be normally messaged by
+  #   this user will be returned. This parameter allows you to specify a
+  #   conversation that will be referenced for a shared context -- if both the
+  #   current user and the searched user are in the conversation, the user will
+  #   be returned. This is used to start new side conversations.
+  #
+  # @argument permissions[] [String]
+  #   Array of permission strings to be checked for each matched context (e.g.
+  #   "send_messages"). This argument determines which permissions may be
+  #   returned in the response; it won't prevent contexts from being returned if
+  #   they don't grant the permission(s).
   #
   # @example_response
   #   [
