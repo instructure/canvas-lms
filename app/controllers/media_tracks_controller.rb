@@ -26,9 +26,14 @@ class MediaTracksController < ApplicationController
   #
   # Create a new media track to be used as captions for different languages or deaf users. for more info, {https://developer.mozilla.org/en-US/docs/HTML/HTML_Elements/track read the MDN docs}
   #
-  # @argument kind one of: [subtitles, captions, descriptions, chapters, metadata]. default: 'subtitles'
-  # @argument locale Language code of the track being uploaded, examples: ["en", "es", "ru"]
-  # @argument content The contets of the track, in SRT or WebVTT format
+  # @argument kind [String, "subtitles"|"captions"|"descriptions"|"chapters"|"metadata"]
+  #   Default is 'subtitles'.
+  #
+  # @argument locale [String]
+  #   Language code of the track being uploaded, examples: ["en", "es", "ru"]
+  #
+  # @argument content [String]
+  #   The contets of the track, in SRT or WebVTT format
   #
   # @example_request
   #     curl https://<canvas>/media_objects/<media_object_id>/media_tracks \

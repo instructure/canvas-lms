@@ -53,9 +53,9 @@ class GroupMembershipsController < ApplicationController
   #
   # List the members of a group.
   #
-  # @argument filter_states[] [Optional] Only list memberships with the given
-  #   workflow_states. Allowed values are "accepted", "invited", and
-  #   "requested". By default it will return all memberships.
+  # @argument filter_states[] [Optional, String, "accepted"|"invited"|"requested"]
+  #   Only list memberships with the given workflow_states. By default it will
+  #   return all memberships.
   #
   # @example_request
   #     curl https://<canvas>/api/v1/groups/<group_id>/memberships \ 
@@ -85,7 +85,7 @@ class GroupMembershipsController < ApplicationController
   # group.  If the membership or join request already exists, then it is simply
   # returned
   #
-  # @argument user_id
+  # @argument user_id [String]
   #
   # @example_request
   #     curl https://<canvas>/api/v1/groups/<group_id>/memberships \ 
@@ -109,7 +109,9 @@ class GroupMembershipsController < ApplicationController
   #
   # Accept a membership request, or add/remove moderator rights.
   #
-  # @argument workflow_state Currently, the only allowed value is "accepted"
+  # @argument workflow_state [Optional, String, "accepted"]
+  #   Currently, the only allowed value is "accepted"
+  #
   # @argument moderator
   #
   # @example_request
