@@ -32,10 +32,11 @@ class PageViewsController < ApplicationController
   # available CSV download. Pagination is used as described in API basics
   # section. Page views are returned in descending order, newest to oldest.
   #
-  # @argument start_time [Datetime] [optional] The beginning of the time range
-  #   from which you want page views.
-  # @argument end_time [Datetime] [optional] The end of the time range
-  #   from which you want page views.
+  # @argument start_time [Optional, DateTime]
+  #   The beginning of the time range from which you want page views.
+  #
+  # @argument end_time [Optional, DateTime]
+  #   The end of the time range from which you want page views.
   #
   # @response_field interaction_seconds The number of seconds the user actively interacted with the page. This is a best guess, using heuristics such as browser input events.
   # @response_field url The full canvas URL of the page view.

@@ -70,8 +70,12 @@ class QuizReportsController < ApplicationController
   # generated report matches the arguments and is still current (i.e.
   # there have been no new submissions), it will be returned.
   #
-  # @argument quiz_report[report_type] The type of report to be generated. One of "student_analysis", "item_analysis"
-  # @argument quiz_report[includes_all_versions] [Optional] Whether the report should consider all submissions or only the most recent. Defaults to false, ignored for item_analysis.
+  # @argument quiz_report[report_type] [String, "student_analysis"|"item_analysis"]
+  #   The type of report to be generated.
+  #
+  # @argument quiz_report[includes_all_versions] [Optional, Boolean]
+  #   Whether the report should consider all submissions or only the most
+  #   recent. Defaults to false, ignored for item_analysis.
   #
   # @returns QuizReport
 
