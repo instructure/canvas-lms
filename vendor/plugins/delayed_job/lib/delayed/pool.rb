@@ -204,7 +204,11 @@ class Pool
           say "ran auditor: #{worker}"
         else
           say "child exited: #{child}, restarting", :info
-          unlock_orphaned_jobs(worker, child)
+          # fork to handle unlocking (to prevent polluting the parent with worker objects)
+          unlock_pid = fork_with_reconnects do
+            unlock_orphaned_jobs(worker, child)
+          end
+          Process.wait unlock_pid
           spawn_worker(worker.config)
         end
       end
