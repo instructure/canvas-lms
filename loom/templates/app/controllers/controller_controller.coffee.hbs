@@ -1,0 +1,19 @@
+define ['Ember'], (Ember) ->
+
+  # http://emberjs.com/guides/controllers/
+  # http://emberjs.com/api/classes/Ember.Controller.html
+  # http://emberjs.com/api/classes/Ember.ArrayController.html
+  # http://emberjs.com/api/classes/Ember.ObjectController.html
+
+  {{objectName}} = Ember.{{type}}.extend
+
+    sampleProp: 'foo'
+
+    computedProp: (->
+      @get('sampleProp') + 'bar'
+    ).property('sampleProp')
+
+    observer: (->
+      console.log @get('computedProp')
+    ).observes('computedProp')
+

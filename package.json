@@ -3,6 +3,9 @@
   "version": "0.0.0",
   "devDependencies": {
     "requirejs": "*"
+  },
+  "dependencies": {
+    "loom": "~2.0.0",
+    "fleck": "~0.5.1"
   }
 }
-
