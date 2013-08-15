@@ -38,10 +38,6 @@ I18n.lookup = function(scope, options) {
   var messages = translations[I18n.currentLocale()];
   options = this.prepareOptions(options);
 
-  if (!messages) {
-    return;
-  }
-
   if (typeof(scope) == "object") {
     scope = scope.join(this.defaultSeparator);
   }
@@ -52,13 +48,9 @@ I18n.lookup = function(scope, options) {
 
   scope = scope.split(this.defaultSeparator);
 
-  while (scope.length > 0) {
+  while (messages && scope.length > 0) {
     var currentScope = scope.shift();
     messages = messages[currentScope];
-
-    if (!messages) {
-      break;
-    }
   }
 
   if (!messages && this.isValidNode(options, "defaultValue")) {
