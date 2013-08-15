@@ -60,9 +60,7 @@ class ExternalContentController < ApplicationController
     url = params[:url]
     uri = URI.parse(endpoint + (endpoint.match(/\?/) ? '&url=' : '?url=') + CGI.escape(url) + '&format=json')
     # SFU MOD: CANVAS-231 fix for HTTPS oEmbed endpoints
-    http = Net::HTTP.new(uri.host, uri.port);
-    http.use_ssl = true if uri.scheme == 'https'
-    res = http.get(uri.request_uri) rescue "{}"
+    res = Canvas::HTTP.get(uri.to_s) rescue '{}'
     data = JSON.parse(res.body) rescue {}
     # END SFU MOD
     if data['type']
