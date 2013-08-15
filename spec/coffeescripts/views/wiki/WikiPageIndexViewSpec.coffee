@@ -4,35 +4,49 @@ define [
   'jquery'
   'jquery.disableWhileLoading'
 ], (WikiPageCollection,WikiPageIndexView,$) ->
+
   module 'WikiPageIndexView:sort',
     setup: ->
-      @collection = new WikiPageCollection null,
-        contextAssetString: 'course_1'
+      @collection = new WikiPageCollection
       @view = new WikiPageIndexView
         collection: @collection
 
-      @a = $('<a>')
-      @a.data 'sort-field', 'created_at'
-      @a.data 'sort-order', 'desc'
-    
-      @e = jQuery.Event "click"
-      @e.currentTarget = @a.get(0)
+      @$a = $('<a/>')
+      @$a.data 'sort-field', 'created_at'
 
-  test 'sort param changes based on sort data field', ->
-    @view.sort @e
-    equal @collection.options.params?.sort, 'created_at'
-    equal @collection.options.params?.order, 'desc'
+      @ev = $.Event('click')
+      @ev.currentTarget = @$a.get(0)
 
-  # overkill, but for instructional value
-  test 'calls disableWhileLoading while sorting', ->
+  test 'sort delegates to the collection sortByField', ->
+    sortByFieldStub = sinon.stub(@collection, 'sortByField')
+
+    @view.sort(@ev)
+    ok sortByFieldStub.calledOnce, 'collection sortByField called once'
+
+  test 'view disabled while sorting', ->
     dfd = $.Deferred()
-    dfdStub = sinon.stub(@collection, 'fetch').returns(dfd)
-
+    fetchStub = sinon.stub(@collection, 'fetch').returns(dfd)
     disableWhileLoadingStub = sinon.stub(@view.$el, 'disableWhileLoading')
-    @view.sort @e
-    ok disableWhileLoadingStub.calledWith(dfd), "Calls disableWhileLoading on el once"
-    disableWhileLoadingStub.restore()
-    dfdStub.restore()
+
+    @view.sort(@ev)
+    ok disableWhileLoadingStub.calledOnce, 'disableWhileLoading called once'
+    ok disableWhileLoadingStub.calledWith(dfd), 'disableWhileLoading called with correct deferred object'
+
+  test 'view disabled while sorting again', ->
+    dfd = $.Deferred()
+    fetchStub = sinon.stub(@collection, 'fetch').returns(dfd)
+    disableWhileLoadingStub = sinon.stub(@view.$el, 'disableWhileLoading')
+
+    @view.sort(@ev)
+    ok disableWhileLoadingStub.calledOnce, 'disableWhileLoading called once'
+    ok disableWhileLoadingStub.calledWith(dfd), 'disableWhileLoading called with correct deferred object'
+
+  test 'renderSortHeaders called when sorting changes', ->
+    renderSortHeadersStub = sinon.stub(@view, 'renderSortHeaders')
+
+    @collection.trigger('sortChanged', 'created_at')
+    ok renderSortHeadersStub.calledOnce, 'renderSortHeaders called once'
+    equal @view.currentSortField, 'created_at', 'currentSortField set correctly'
 
 
   module 'WikiPageIndexView:JSON'
