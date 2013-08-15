@@ -4,15 +4,7 @@ describe "terms of use test" do
   it_should_behave_like "in-process server selenium tests"
 
   before do
-    Setting.set('terms_required', 'true')
     user_with_pseudonym(active_user: true)
-  end
-
-  it "should require a user to accept the terms if the user has never accepted the terms" do
-    password = "asdfasdf"
-    waldo = user_with_pseudonym({:unique_id => 'waldo@example.com', :password => password})
-    login_as(waldo.primary_pseudonym.unique_id, password)
-    f('.reaccept_terms').should be_present
   end
 
   it "should not require a user to accept the terms if they haven't changed" do
