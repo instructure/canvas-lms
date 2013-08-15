@@ -54,13 +54,15 @@ class ExternalContentController < ApplicationController
     params[:return_type] = return_types[params[:return_type]] if return_types.key? params[:return_type]
 
   end
-  
+
   def oembed_retrieve
     endpoint = params[:endpoint]
     url = params[:url]
     uri = URI.parse(endpoint + (endpoint.match(/\?/) ? '&url=' : '?url=') + CGI.escape(url) + '&format=json')
-    res = Net::HTTP.get(uri) rescue "{}"
-    data = JSON.parse(res) rescue {}
+    http = Net::HTTP.new(uri.host, uri.port);
+    http.use_ssl = true if uri.scheme == 'https'
+    res = http.get(uri.request_uri) rescue "{}"
+    data = JSON.parse(res.body) rescue {}
     if data['type']
       if data['type'] == 'photo' && data['url'].try(:match, /^http/)
         @retrieved_data = {
@@ -106,7 +108,7 @@ class ExternalContentController < ApplicationController
     end
     @headers = false
   end
-  
+
   def cancel
     @headers = false
   end
