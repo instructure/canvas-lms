@@ -73,15 +73,6 @@ module SFU
       def info(sfuid)
         REST.json(REST.account_url, "&username=#{sfuid}")
       end
-
-      def student_only?(sfuid)
-        result = roles sfuid
-        if result.to_a.join("").eql? "undergrad"
-          return true
-        end
-        false
-      end
-
     end
   end
 
