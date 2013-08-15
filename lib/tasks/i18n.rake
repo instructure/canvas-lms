@@ -219,7 +219,7 @@ namespace :i18n do
 
     dump_translations = lambda do |translation_name, translations|
       file = "public/javascripts/translations/#{translation_name}.js"
-      content = I18n::Utils.dump_js(translations)
+      content = I18n::Utils.dump_js(translations, locales)
       if !File.exist?(file) || File.read(file) != content
         File.open(file, "w"){ |f| f.write content }
       end
