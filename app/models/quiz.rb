@@ -1024,17 +1024,21 @@ class Quiz < ActiveRecord::Base
     if question_data
       hash[:questions] ||= []
 
+      if question_data[:qq_data] || question_data[:aq_data]
+        existing_questions = item.quiz_questions.where("migration_id IS NOT NULL").select([:id, :migration_id]).index_by(&:migration_id)
+      end
+
       if question_data[:qq_data]
-        questions_to_update = item.quiz_questions.where(:migration_id => question_data[:qq_data].keys)
-        questions_to_update.each do |question_to_update|
-          question_data[:qq_data].values.find{|q| q['migration_id'].eql?(question_to_update.migration_id)}['quiz_question_id'] = question_to_update.id
+        question_data[:qq_data].values.each do |q|
+          existing_question = existing_questions[q['migration_id']]
+          q['quiz_question_id'] = existing_question.id if existing_question
         end
       end
 
       if question_data[:aq_data]
-        questions_to_update = item.quiz_questions.where(:migration_id => question_data[:aq_data].keys)
-        questions_to_update.each do |question_to_update|
-          question_data[:aq_data].values.find{|q| q['migration_id'].eql?(question_to_update.migration_id)}['quiz_question_id'] = question_to_update.id
+        question_data[:aq_data].values.each do |q|
+          existing_question = existing_questions[q['migration_id']]
+          q['quiz_question_id'] = existing_question.id if existing_question
         end
       end
 
