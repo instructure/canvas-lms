@@ -9,7 +9,7 @@ class Periodic
   end
 
   def self.yaml_new(klass, tag, val)
-    self.scheduled[val] || raise(ArgumentError, "job #{val} is no longer scheduled")
+    self.scheduled[val] || raise(NameError, "job #{val} is no longer scheduled")
   end
 
   cattr_accessor :scheduled
