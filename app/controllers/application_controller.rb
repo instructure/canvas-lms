@@ -1002,7 +1002,7 @@ class ApplicationController < ActionController::Base
       :title => page_name.titleize,
       :url => page_name.to_url
     )
-    initialize_wiki_page
+    initialize_wiki_page if @page.new_record?
   end
 
   # Initializes the state of @page, but only if it is a new page

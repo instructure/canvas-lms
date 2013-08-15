@@ -129,6 +129,16 @@ describe WikiPagesController do
       assert_unauthorized
     end
 
+    it "should not resurrect a deleted page" do
+      course_with_teacher_logged_in :active_all => true
+      page = @course.wiki.wiki_pages.create! :title => 'deleted page'
+      page.workflow_state = 'deleted'
+      page.save!
+      get 'show', :course_id => @course.id, :id => page.url
+      response.should be_redirect
+      flash[:notice].should be_include 'deleted'
+      assigns[:page].should be_deleted
+    end
   end
 
   # describe "GET 'revisions'" do
