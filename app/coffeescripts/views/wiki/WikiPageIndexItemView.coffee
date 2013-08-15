@@ -1,10 +1,11 @@
 define [
   'Backbone'
+  'compiled/views/wiki/WikiPageIndexEditDialog'
   'compiled/views/wiki/WikiPageDeleteDialog'
   'compiled/views/PublishIconView'
   'jst/wiki/WikiPageIndexItem'
   'compiled/jquery/redirectClickTo'
-], (Backbone, WikiPageDeleteDialog, PublishIconView, template) ->
+], (Backbone, WikiPageIndexEditDialog, WikiPageDeleteDialog, PublishIconView, template) ->
 
   class WikiPageIndexItemView extends Backbone.View
     template: template
@@ -17,11 +18,13 @@ define [
       '.publish-cell': '$publishCell'
     events:
       'click a.al-trigger': 'settingsMenu'
-      'click .al-options .icon-edit': 'editPage'
-      'click a.delete-menu-item': 'deletePage'
-      'click a.set-front-page-menu-item': 'setAsFrontPage'
-      'click a.remove-front-page-menu-item': 'removeAsFrontPage'
+      'click .edit-menu-item': 'editPage'
+      'click .delete-menu-item': 'deletePage'
+      'click .set-front-page-menu-item': 'setAsFrontPage'
+      'click .remove-front-page-menu-item': 'removeAsFrontPage'
 
+    @optionProperty 'indexView'
+    @optionProperty 'collection'
     @optionProperty 'WIKI_RIGHTS'
     @optionProperty 'contextName'
 
@@ -58,7 +61,18 @@ define [
       ev?.preventDefault()
 
     editPage: (ev) ->
-      ev?.stopPropagation()
+      ev?.preventDefault()
+      editDialog = new WikiPageIndexEditDialog
+        model: @model
+      editDialog.open()
+
+      indexView = @indexView
+      collection = @collection
+      editDialog.on 'success', ->
+        indexView.currentSortField = null
+        indexView.renderSortHeaders()
+
+        collection.fetch page: 'current'
 
     deletePage: (ev) ->
       ev?.preventDefault()

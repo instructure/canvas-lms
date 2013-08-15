@@ -35,6 +35,8 @@ define [
       @WIKI_RIGHTS ||= {}
 
       @itemViewOptions ||= {}
+      @itemViewOptions.indexView = @
+      @itemViewOptions.collection = @collection
       @itemViewOptions.WIKI_RIGHTS = @WIKI_RIGHTS
 
       @contextAssetString = options?.contextAssetString
