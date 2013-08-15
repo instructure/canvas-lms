@@ -1,0 +1,77 @@
+input[type="checkbox"] {
+  margin-right: 0.25em; // give me a some room...
+}
+
+.step h1 {
+  font-size: 1.5em;
+}
+.step h2 {
+  font-size: 1.3em;
+}
+
+div.actions {
+  margin: 1em 0;
+}
+div.actions.choices button {
+  min-height: 40px; // taller buttons for major choices
+  margin: 0 0.25em;
+}
+
+.username-display {
+  font-weight: bold;
+  font-style: italic;
+}
+
+#chk-enroll_me {
+  margin-top: 0px;
+}
+#sel-enroll_me_as {
+  margin: 0 0.25em;
+}
+
+// -- Calendar Course --
+
+.term.tag {
+  padding: 0.25em 0.5em;
+  background: #EEEEEE;
+  font-size: 0.8em;
+  text-transform: uppercase;
+}
+
+#step-3-calendar label {
+  font-size: 1em; // make font-size more consistent throughout the step
+}
+
+.courses li {
+  margin: 0.5em 0;
+}
+.courses label {
+  display: inline;
+}
+
+// these rules fix the alignment of checkboxes to the bullets
+.courses input[type="checkbox"] {
+  margin-top: 0px;
+}
+.courses input[type="checkbox"]+label {
+  vertical-align: -1px;
+}
+
+.tutorial_sections {
+  margin-left: 1.5em;
+  font-style: italic;
+  color: #999;
+}
+
+#courses-suggested .term.tag {
+  font-weight: bold;
+}
+#courses-suggested ul {
+  list-style: circle
+}
+#courses-suggested ul ul {
+  list-style: disc;
+}
+#courses-suggested ul ul .term.tag {
+  display: none; // hide redundant term tag in suggested list
+}
