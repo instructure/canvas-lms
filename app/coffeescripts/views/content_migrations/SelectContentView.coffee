@@ -26,7 +26,7 @@ define [
     # @api private
 
     submit: (event) =>
-      attr = _.pick @model.attributes, "id", "workflow_state", "user_id", "copy"
+      attr = _.pick @model.attributes, "id", "workflow_state", "user_id"
       @model.clear(silent: true)
       @model.set attr
 
