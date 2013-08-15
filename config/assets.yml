@@ -17,6 +17,8 @@ javascripts:
 stylesheets:
   content_migrations: 
     - public/stylesheets/compiled/content_migrations.css
+  vendor:
+    - public/stylesheets/compiled/g_vendor.css
   common:
     - public/stylesheets/compiled/g_base.css
     - public/stylesheets/static/mediaelementplayer.css
