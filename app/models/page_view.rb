@@ -47,8 +47,8 @@ class PageView < ActiveRecord::Base
       p.http_method = request.method.to_s
       p.controller = request.path_parameters['controller']
       p.action = request.path_parameters['action']
-      p.session_id = request.session_options[:id]
-      p.user_agent = request.headers['User-Agent']
+      p.session_id = request.session_options[:id].to_s.force_encoding(Encoding::UTF_8).presence
+      p.user_agent = request.user_agent.try(:force_encoding, Encoding::UTF_8)
       p.interaction_seconds = 5
       p.created_at = Time.now
       p.updated_at = Time.now
