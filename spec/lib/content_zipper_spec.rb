@@ -20,6 +20,26 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe ContentZipper do
   describe "zip_assignment" do
+    it "sanitizes user names" do
+      s1, s2 = 2.times.map { course_with_student ; @student }
+      s1.update_attribute :sortable_name, 'some_999_, _1234_guy'
+      s2.update_attribute :sortable_name, 'other 567 , guy'
+      [s1, s2].each { |s| submission_model(:user => s) }
+      attachment = Attachment.new(:display_name => 'my_download.zip')
+      attachment.user = @teacher
+      attachment.workflow_state = 'to_be_zipped'
+      attachment.context = @assignment
+      attachment.save!
+      ContentZipper.process_attachment(attachment, @teacher)
+      expected_file_patterns = [
+        /other-567-_guy/,
+        /some-999-_-1234-guy/,
+      ]
+      Zip::ZipFile.foreach(attachment.reload.full_filename).each { |f|
+        f.name.should =~ expected_file_patterns.shift
+      }
+    end
+
     it "should zip up online_url submissions" do
       course_with_student(:active_all => true)
       @user.update_attributes!(:sortable_name => 'some_999_, _1234_guy')

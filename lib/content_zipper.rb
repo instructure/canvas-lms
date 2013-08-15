@@ -89,7 +89,7 @@ class ContentZipper
 
           # it's necessary to replace _\d+_ because we use that pattern to infer the user/attachment ids when teachers
           # upload graded submissions
-          users_name = submission.user.last_name_first.gsub(/_(\d+)_/, '-\1-')
+          users_name = submission.user.last_name_first.gsub(/[_ ](\d+)[_ ]/, '-\1-')
 
           filename = users_name + (submission.late? ? " LATE " : " ") + submission.user_id.to_s
           filename = filename.gsub(/ /, "_").gsub(/[^-\w]/, "").downcase
