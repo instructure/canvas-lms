@@ -209,6 +209,7 @@ module Api
     links = build_links(base_url, {
       :query_parameters => controller.request.query_parameters,
       :per_page => collection.per_page,
+      :current => collection.current_page || first_page,
       :next => collection.next_page,
       :prev => collection.previous_page,
       :first => first_page,
@@ -225,7 +226,7 @@ module Api
     qp = opts[:query_parameters] || {}
     qp = qp.with_indifferent_access.except(*EXCLUDE_IN_PAGINATION_LINKS)
     base_url += "#{qp.to_query}&" if qp.present?
-    [:next, :prev, :first, :last].each do |k|
+    [:current, :next, :prev, :first, :last].each do |k|
       if opts[k].present?
         links << "<#{base_url}page=#{opts[k]}&per_page=#{opts[:per_page]}>; rel=\"#{k}\""
       end

@@ -26,7 +26,7 @@ define [
 
   class PaginatedCollection extends Backbone.Collection
 
-    # Matches the name of each link: "next," "prev," "first," or "last."
+    # Matches the name of each link: "current", "next," "prev," "first," or "last."
     nameRegex: /rel="([a-z]+)/
 
     # Matches the full link, e.g. "/api/v1/accounts/1/users?page=1&per_page=15"
@@ -34,10 +34,14 @@ define [
 
     pageRegex: /\Wpage=(\d+)/
 
-    perPageRegex: /\per_page=(\d+)/
+    perPageRegex: /\Wper_page=(\d+)/
+
+    initialize: ->
+      super
+      @urls = {}
 
     ##
-    # options.page: 'next', 'prev', 'first', 'last', 'top', 'bottom'
+    # options.page: 'current', 'next', 'prev', 'first', 'last', 'top', 'bottom'
     fetch: (options = {}) ->
       exclusionFlag = "fetching#{capitalize options.page}Page"
       @[exclusionFlag] = true
@@ -75,7 +79,7 @@ define [
       @_urlCache ?= []
       urlIsNotCached = options.url not in @_urlCache
       @_urlCache.push options.url if not urlIsNotCached
-      firstRequest = !@urls?
+      firstRequest = !@atLeastOnePageFetched
       setBottom = firstRequest or (options.page in ['next', 'bottom'] and urlIsNotCached)
       setTop = firstRequest or (options.page in ['prev', 'top'] and urlIsNotCached)
       oldUrls = @urls

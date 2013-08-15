@@ -1118,8 +1118,9 @@ describe CoursesController, :type => :integration do
         json = api_call(:get, api_url, api_route, :search_term => "SSS", :limit => 1)
         json.length.should == 1
         link_header = response.headers['Link'].split(',')
-        link_header[0].should match /page=2&per_page=1/ # next page
-        link_header[1].should match /page=1&per_page=1/ # first page
+        link_header[0].should match /page=1&per_page=1/ # current page
+        link_header[1].should match /page=2&per_page=1/ # next page
+        link_header[2].should match /page=1&per_page=1/ # first page
       end
 
       it "should respect includes" do
@@ -1416,9 +1417,10 @@ describe CoursesController, :type => :integration do
         json.map{|x| x['id']}.uniq.length.should == 5
 
         link_header = response.headers['Link'].split(',')
-        link_header[0].should match /page=2&per_page=5/ # next page
-        link_header[1].should match /page=1&per_page=5/ # first page
-        link_header[2].should match /page=2&per_page=5/ # last page
+        link_header[0].should match /page=1&per_page=5/ # current page
+        link_header[1].should match /page=2&per_page=5/ # next page
+        link_header[2].should match /page=1&per_page=5/ # first page
+        link_header[3].should match /page=2&per_page=5/ # last page
       end
 
       it "should allow jumping to a user's page based on id" do

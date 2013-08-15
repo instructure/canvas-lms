@@ -832,16 +832,18 @@ describe EnrollmentsApiController, :type => :integration do
           h
         end
         link_header = response.headers['Link'].split(',')
-        link_header[0].should match /page=2&per_page=1/ # next page
-        link_header[1].should match /page=1&per_page=1/ # first page
-        link_header[2].should match /page=2&per_page=1/ # last page
+        link_header[0].should match /page=1&per_page=1/ # current page
+        link_header[1].should match /page=2&per_page=1/ # next page
+        link_header[2].should match /page=1&per_page=1/ # first page
+        link_header[3].should match /page=2&per_page=1/ # last page
         json.should eql [enrollments[0]]
 
         json = api_call(:get, "#{@path}?page=2&per_page=1", @params.merge(:page => 2.to_param, :per_page => 1.to_param))
         link_header = response.headers['Link'].split(',')
-        link_header[0].should match /page=1&per_page=1/ # prev page
-        link_header[1].should match /page=1&per_page=1/ # first page
-        link_header[2].should match /page=2&per_page=1/ # last page
+        link_header[0].should match /page=2&per_page=1/ # current page
+        link_header[1].should match /page=1&per_page=1/ # prev page
+        link_header[2].should match /page=1&per_page=1/ # first page
+        link_header[3].should match /page=2&per_page=1/ # last page
         json.should eql [enrollments[1]]
       end
     end
