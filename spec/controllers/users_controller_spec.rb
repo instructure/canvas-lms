@@ -276,7 +276,6 @@ describe UsersController do
       end
 
       it "should validate acceptance of the terms" do
-        Setting.set('terms_required', 'true')
         post 'create', :pseudonym => { :unique_id => 'jacob@instructure.com' }, :user => { :name => 'Jacob Fugal' }
         response.status.should =~ /400 Bad Request/
         json = JSON.parse(response.body)
@@ -284,6 +283,7 @@ describe UsersController do
       end
 
       it "should not validate acceptance of the terms if not required" do
+        Setting.set('terms_required', 'false')
         post 'create', :pseudonym => { :unique_id => 'jacob@instructure.com' }, :user => { :name => 'Jacob Fugal' }
         response.should be_success
       end

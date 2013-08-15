@@ -5,6 +5,7 @@ describe "communication channel selenium tests" do
 
   context "confirm" do
     it "should register the user" do
+      Setting.set('terms_required', 'false')
       u1 = user_with_communication_channel(:user_state => 'creation_pending')
       get "/register/#{u1.communication_channel.confirmation_code}"
       set_value f('#pseudonym_password'), "asdfasdf"
@@ -15,7 +16,6 @@ describe "communication channel selenium tests" do
     end
 
     it "should require the terms if configured to do so" do
-      Setting.set('terms_required', 'true')
       u1 = user_with_communication_channel(:user_state => 'creation_pending')
       get "/register/#{u1.communication_channel.confirmation_code}"
       f('input[name="user[terms_of_use]"]').should be_present
