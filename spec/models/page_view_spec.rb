@@ -339,9 +339,8 @@ describe PageView do
 
   describe '.generate' do
     let(:params) { {'action' => 'path', 'controller' => 'some'} }
-    let(:headers) { {'User-Agent' => 'Mozilla'} }
-    let(:session) { {:id => 42} }
-    let(:request) { stub(:url => (@url || 'host.com/some/path'), :path_parameters => params, :headers => headers, :session_options => session, :method => :get) }
+    let(:session) { {:id => '42'} }
+    let(:request) { stub(:url => (@url || 'host.com/some/path'), :path_parameters => params, :user_agent => 'Mozilla', :session_options => session, :method => :get) }
     let(:user) { User.new }
     let(:attributes) { {:real_user => user, :user => user } }
 
@@ -356,7 +355,7 @@ describe PageView do
     its(:action) { should == params['action'] }
     its(:session_id) { should == session[:id] }
     its(:real_user) { should == user }
-    its(:user_agent) { should == headers['User-Agent'] }
+    its(:user_agent) { should == request.user_agent }
     its(:interaction_seconds) { should == 5 }
     its(:created_at) { should_not be_nil }
     its(:updated_at) { should_not be_nil }
