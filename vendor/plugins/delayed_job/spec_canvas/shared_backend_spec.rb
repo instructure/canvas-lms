@@ -444,6 +444,15 @@ shared_examples_for 'a backend' do
       proc { Delayed::Periodic.cron('my SimpleJob', '*/15 * * * * *') {} }.should raise_error(ArgumentError)
     end
 
+    it "should handle jobs that are no longer scheduled" do
+      Delayed::Periodic.perform_audit!
+      Delayed::Periodic.scheduled = {}
+      job = Delayed::Job.get_and_lock_next_available('test')
+      run_job(job)
+      # shouldn't error, and the job should now be deleted
+      Delayed::Job.jobs_count(:current).should == 0
+    end
+
     it "should allow overriding schedules using periodic_jobs.yml" do
       Setting.set_config('periodic_jobs', { 'my ChangedJob' => '*/10 * * * * *' })
       Delayed::Periodic.scheduled = {}
