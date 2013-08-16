@@ -35,6 +35,7 @@ class CourseFormController < ApplicationController
     teacher2_sis_user_id = sis_user_id(teacher2_username, account_id) unless teacher2_username.nil?
     teacher2_role = sanitize_role(params[:enroll_me_as])
     cross_list = params[:cross_list]
+    course_name_too_long = false
 
     params.each do |key, value|
       if key.to_s.starts_with? "selected_course"
@@ -56,6 +57,8 @@ class CourseFormController < ApplicationController
           course_array.push sandbox["csv"]
           enrollment_array.push sandbox["enrollment_csv_1"]
           enrollment_array.push sandbox["enrollment_csv_2"] unless teacher2_sis_user_id.nil?
+
+          course_name_too_long = true if sandbox["short_long_name"].length > CANVAS_COURSE_NAME_MAX
         elsif course.starts_with? "ncc"
           logger.info "[SFU Course Form] Creating ncc course for #{teacher_username} requested by #{req_user}"
           ncc_course = ncc_info(course, teacher_sis_user_id, teacher2_sis_user_id, teacher2_role)
@@ -64,6 +67,7 @@ class CourseFormController < ApplicationController
           enrollment_array.push ncc_course["enrollment_csv_1"]
           enrollment_array.push ncc_course["enrollment_csv_2"] unless teacher2_sis_user_id.nil?
 
+          course_name_too_long = true if ncc_course["short_long_name"].length > CANVAS_COURSE_NAME_MAX
         else
           logger.info "[SFU Course Form] Creating single course container : #{course} requested by #{req_user}"
           course_info = course_info(course, account_id, teacher_sis_user_id, teacher2_sis_user_id, teacher2_role)
@@ -79,6 +83,8 @@ class CourseFormController < ApplicationController
 
           enrollment_array.push course_info["enrollment_csv_1"]
           enrollment_array.push course_info["enrollment_csv_2"] unless teacher2_username.nil?
+
+          course_name_too_long = true if course_info["long_name"].length > CANVAS_COURSE_NAME_MAX
         end
       end
 
@@ -124,9 +130,21 @@ class CourseFormController < ApplicationController
       enrollment_array.push "\"#{course_id}\",\"#{teacher_sis_user_id}\",\"teacher\",\"\",\"active\"\n"
       enrollment_array.push "\"#{course_id}\",\"#{teacher2_sis_user_id}\",\"#{teacher2_role}\",\"\",\"active\"\n" unless teacher2_sis_user_id.nil?
 
+      course_name_too_long = true if long_name.length > CANVAS_COURSE_NAME_MAX
+
     end
 
-    unless teacher_sis_user_id.nil?
+    if teacher_sis_user_id.nil?
+      render :json => {
+          :success => false,
+          :message => 'The main teacher was not found.'
+      }
+    elsif course_name_too_long
+      render :json => {
+          :success => false,
+          :message => 'The course name is too long.'
+      }
+    else
       # Send POST to import
       course_csv = course_array.join("\n")
       section_csv = section_array.join("\n")
@@ -146,11 +164,6 @@ class CourseFormController < ApplicationController
       render :json => {
         :success => true,
         :message => 'Course request submitted successfully.'
-      }
-    else
-      render :json => {
-        :success => false,
-        :message => 'The main teacher was not found.'
       }
     end
 
