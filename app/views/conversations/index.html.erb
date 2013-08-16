@@ -88,6 +88,7 @@
       </div>
     </div>
     <ul id="message_status"></ul>
+    <% if Account.site_admin.grants_right?(@current_user, nil, :become_user) %>
     <div>
       <a id="help-btn"
          class="al-trigger"
@@ -119,6 +120,17 @@
         </li>
       </ul>
     </div>
+  <% else %>
+    <a href="#"
+       id="conversations-intro-btn"
+       tabindex="-1"
+       data-track-category="Help"
+       data-track-action="Click"
+       data-track-label="Question Mark"
+       role="button">
+      <i class="icon-question"></i>
+    </a>
+    <% end %>
     <div id="create_message_form"></div>
     <ul class="messages">
     </ul>

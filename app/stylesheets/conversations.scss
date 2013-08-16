@@ -967,6 +967,22 @@ form {
   }
 }
 
+// for the non-dropdown help menu. remove this when new conversations is released
+#conversations-intro-btn {
+  color: #333;
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  z-index: 3;
+
+  .icon-question {
+    &:hover, &:focus {
+      color: #0088cc;
+      text-decoration: none;
+    }
+  }
+}
+
 .spin_holder {
   position: absolute;
   left: 50%;

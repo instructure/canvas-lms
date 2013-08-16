@@ -358,22 +358,38 @@ describe "conversations" do
   end
 
   context "help menu" do
-    it "should switch to new conversations and redirect" do
+    # temporary. remove when we release new conversations
+    it "should just be an intro button if you aren't a site admin" do
       student_in_course(:course => @course, :active_all => true)
       new_conversation
+      f('#help-btn').should be_nil
+      f('#conversations-intro-btn').should be_displayed
+      f('#conversations-intro-btn').click
+      wait_for_ajaximations
+      ff('#conversations_intro').last.should be_displayed
+    end
+
+    it "should switch to new conversations and redirect" do
+      site_admin_logged_in
+      @user.watched_conversations_intro
+      @user.save
+      new_conversation
       f('#help-btn').click
-      expect_new_page_load { f('#try-new-conversations-menu-item').click }
+      expect_new_page_load { fj('#try-new-conversations-menu-item').click }
       f('#inbox').should be_nil # #inbox is in the old conversations ui and not the new ui
       f('.help-btn').click
-      expect_new_page_load {  f('#switch-to-old-conversations-menu-item').click }
+      expect_new_page_load {  fj('#switch-to-old-conversations-menu-item').click }
       f('#inbox').should be_displayed
     end
 
     it "should show the intro" do
+      site_admin_logged_in
+      @user.watched_conversations_intro
+      @user.save
       new_conversation
       f('#help-btn').click
-      f('#conversations-intro-menu-item').click
-      wait_for_ajaximations
+      fj('#conversations-intro-menu-item').click
+      wait_for_animations
       ff('#conversations_intro').last.should be_displayed
     end
   end
