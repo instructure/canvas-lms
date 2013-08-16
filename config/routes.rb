@@ -342,7 +342,6 @@ FakeRails3Routes.draw do
     resources :gradebook_uploads
     resources :rubrics
     resources :rubric_associations do
-      match 'invite' => 'rubric_assessments#invite', :as => :invite_assessor
       match 'remind/:assessment_request_id' => 'rubric_assessments#remind', :as => :remind_assessee
       resources :rubric_assessments, :path => 'assessments'
     end
@@ -643,7 +642,6 @@ FakeRails3Routes.draw do
     match 'external_tools/:id' => 'users#external_tool', :as => :external_tool
     resources :rubrics
     resources :rubric_associations do
-      match 'invite' => 'rubric_assessments#invite', :as => :invite_assessor
       resources :rubric_assessments, :path => :assessments
     end
 

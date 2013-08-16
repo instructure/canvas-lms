@@ -47,7 +47,7 @@ describe RubricAssociation do
                                                             "skip_updating_points_possible"=>false, "update_if_existing"=>true,
                                                             "use_for_grading"=>"1", "association"=>@assignment}) #, "id"=>3})
 
-        @rubric_assoc = RubricAssociation.generate_with_invitees(@teacher, @rubric, @test_course, rubric_association)
+        @rubric_assoc = RubricAssociation.generate(@teacher, @rubric, @test_course, rubric_association)
 
         # students complete it
         @assignment.submit_homework(@student_1, :submission_type => 'online_text_entry', :body => 'Finished first')
@@ -96,7 +96,7 @@ describe RubricAssociation do
                                                                 "skip_updating_points_possible"=>false, "update_if_existing"=>true,
                                                                 "use_for_grading"=>"1", "association"=>@assignment}) #, "id"=>3})
 
-            @rubric_assoc = RubricAssociation.generate_with_invitees(@teacher, @rubric, @test_course, rubric_association)
+            @rubric_assoc = RubricAssociation.generate(@teacher, @rubric, @test_course, rubric_association)
           end
 
           it "should have 2 assessment_requests" do
@@ -116,7 +116,7 @@ describe RubricAssociation do
       rubric_params = HashWithIndifferentAccess.new({"title"=>"Some Rubric", "criteria"=>{"0"=>{"learning_outcome_id"=>"", "ratings"=>{"0"=>{"points"=>"5", "id"=>"blank", "description"=>"Full Marks"}, "1"=>{"points"=>"0", "id"=>"blank_2", "description"=>"No Marks"}}, "points"=>"5", "long_description"=>"", "id"=>"", "description"=>"Description of criterion"}}, "points_possible"=>"5", "free_form_criterion_comments"=>"0"})
       rubric_association_params = HashWithIndifferentAccess.new({:association=>@account, :hide_score_total=>"0", :use_for_grading=>"0", :purpose=>"bookmark"})
       #8864: the below raised a MethodNotFound error by trying to call @account.submissions
-      lambda { @rubric.update_with_association(@user, rubric_params, @account, rubric_association_params, nil) }.should_not raise_error
+      lambda { @rubric.update_with_association(@user, rubric_params, @account, rubric_association_params) }.should_not raise_error
     end
   end
 end

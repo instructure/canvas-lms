@@ -34,15 +34,6 @@ describe RubricAssociationsController do
       assigns[:association].title.should eql("some association")
       response.should be_success
     end
-    it "should invite users if specified" do
-      course_with_teacher_logged_in(:active_all => true)
-      rubric_association_model(:user => @user, :context => @course, :purpose => 'grading')
-      post 'create', :course_id => @course.id, :rubric_association => {:rubric_id => @rubric.id, :title => "some association", :invitations => "bob@example.com", :association_type => @rubric_association.association.class.name, :association_id => @rubric_association.association.id, :purpose => 'grading'}
-      assigns[:association].should_not be_nil
-      assigns[:association].title.should eql("some association")
-      assigns[:association].assessment_requests.should_not be_empty
-      response.should be_success
-    end
   end
   
   describe "PUT 'update'" do

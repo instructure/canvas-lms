@@ -60,19 +60,7 @@ class RubricAssessmentsController < ApplicationController
   def create
     update
   end
-  
-  def invite
-    @association = @context.rubric_associations.find(params[:rubric_association_id])
-    @rubric = @association.rubric
-    assessor_email = params[:rubric_assessment][:assessor_email]
-    # If an email address is specified, this is an invitation for someone to assess
-    if authorized_action(@association, @current_user, :manage)
-      @assessment_requests = @association.invite_assessors(@current_user, assessor_email, @association.association.find_asset_for_assessment(@association, @current_user.id)[0])
-      @assessment_request = @assessment_requests.first
-      render :json => @assessment_request.to_json(:methods => :assessor_name)
-    end
-  end
-  
+
   def remind
     @association = @context.rubric_associations.find(params[:rubric_association_id])
     @rubric = @association.rubric

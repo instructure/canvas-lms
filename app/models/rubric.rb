@@ -149,26 +149,12 @@ class Rubric < ActiveRecord::Base
     self.rubric_associations.create(:association => association, :context => context, :use_for_grading => !!opts[:use_for_grading], :purpose => purpose)
   end
   
-  def clone_for_association(current_user, association, rubric_params, association_params, invitees="")
-    rubric = Rubric.new
-    self.attributes.delete_if{|k, v| false}.each do |key, value|
-      rubric.send("#{key}=", value) if rubric.respond_to?(key)
-    end
-    rubric.migration_id = "cloned_from_#{self.id}"
-    rubric.rubric_id = self.id
-    rubric.free_form_criterion_comments = rubric_params[:free_form_criterion_comments] == '1' if rubric_params[:free_form_criterion_comments]
-    rubric.user = current_user
-    rubric_params[:hide_score_total] ||= association_params[:hide_score_total]
-    rubric.update_criteria(rubric_params)
-    RubricAssociation.generate_with_invitees(current_user, rubric, context, association_params, invitees) if association_params[:association] || association_params[:url]
-  end
-  
-  def update_with_association(current_user, rubric_params, context, association_params, invitees="")
+  def update_with_association(current_user, rubric_params, context, association_params)
     self.free_form_criterion_comments = rubric_params[:free_form_criterion_comments] == '1' if rubric_params[:free_form_criterion_comments]
     self.user ||= current_user
     rubric_params[:hide_score_total] ||= association_params[:hide_score_total]
     self.update_criteria(rubric_params)
-    RubricAssociation.generate_with_invitees(current_user, self, context, association_params, invitees) if association_params[:association] || association_params[:url]
+    RubricAssociation.generate(current_user, self, context, association_params) if association_params[:association] || association_params[:url]
   end
   
   def unique_item_id(id=nil)

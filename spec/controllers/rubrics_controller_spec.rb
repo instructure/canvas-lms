@@ -64,17 +64,6 @@ describe RubricsController do
       assigns[:rubric].rubric_associations.length.should eql(1)
       response.should be_success
     end
-    it "should invite users if specified" do
-      course_with_teacher_logged_in(:active_all => true)
-      association = @course.assignments.create!(assignment_valid_attributes)
-      post 'create', :course_id => @course.id, :rubric => {}, :rubric_association => {:association_type => association.class.to_s, :association_id => association.id, :invitations => "bob@example.com", :purpose => 'grading'}
-      assigns[:rubric].should_not be_nil
-      assigns[:rubric].should_not be_new_record
-      assigns[:rubric].rubric_associations.length.should eql(1)
-      assigns[:rubric].rubric_associations.first.assessment_requests.should_not be_empty
-      assigns[:rubric].rubric_associations.first.assessment_requests.first.assessor.email.should eql("bob@example.com")
-      response.should be_success
-    end
   end
   
   describe "PUT 'update'" do
