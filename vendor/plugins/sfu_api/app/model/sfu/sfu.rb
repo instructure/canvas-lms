@@ -37,18 +37,18 @@ module SFU
         details = info(course_code, term_code)
         # Used to match against sections starting with e.g. 'd1' for 'd100'
         main_section = section_code[0..1].downcase 
-        sections = ""
+        sections = []
 
         unless details == "[]"
           details.each do |info|
             code = info["course"]["name"] + info["course"]["number"]
             section = info["course"]["section"].downcase
             if code.downcase == course_code.downcase && section.start_with?(main_section) && section.downcase != section_code.downcase
-              sections += info["course"]["section"] + ", "
+              sections << info["course"]["section"]
             end
           end
         end
-        sections[0..-3]
+        sections
       end
 
       def title(course_code, term_code)
@@ -73,15 +73,6 @@ module SFU
       def info(sfuid)
         REST.json(REST.account_url, "&username=#{sfuid}")
       end
-
-      def student_only?(sfuid)
-        result = roles sfuid
-        if result.to_a.join("").eql? "undergrad"
-          return true
-        end
-        false
-      end
-
     end
   end
 

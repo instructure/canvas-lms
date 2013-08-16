@@ -1,0 +1,3 @@
+stylesheets:
+  course_request_form:
+    - public/stylesheets/course_request_form.scss

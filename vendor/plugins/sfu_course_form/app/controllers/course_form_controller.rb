@@ -2,14 +2,21 @@ require Pathname(File.dirname(__FILE__)) + "../../../sfu_api/app/model/sfu/sfu"
 
 class CourseFormController < ApplicationController
 
+  before_filter :require_user
+
   def new
     @user = User.find(@current_user.id)
     @sfuid = @user.pseudonym.unique_id
     @sfuid.slice! "@sfu.ca"
     @course_list = Array.new
-    @terms = current_term.concat future_terms
     @current_term = current_term
-    if SFU::User.student_only? @sfuid
+    @terms = [@current_term] + future_terms
+    # only show current term plus next 2 terms (3 in total)
+    @term_options = @terms.take(3).map { |term| [term.name, term.sis_source_id] }
+    roles = SFU::User.roles @sfuid
+    @is_student = %w(undergrad grad).any? { |role| roles.include? role }
+    # deny access to undergrad-only users
+    if roles == %w(undergrad)
       flash[:error] = "You don't have permission to access that page"
       redirect_to dashboard_url
     end
@@ -23,6 +30,7 @@ class CourseFormController < ApplicationController
     teacher2_username = params[:enroll_me]
     teacher_sis_user_id = sis_user_id(teacher_username, account_id)
     teacher2_sis_user_id = sis_user_id(teacher2_username, account_id) unless teacher2_username.nil?
+    teacher2_role = sanitize_role(params[:enroll_me_as])
     cross_list = params[:cross_list]
 
     params.each do |key, value|
@@ -40,14 +48,14 @@ class CourseFormController < ApplicationController
       selected_courses.compact.uniq.each do |course|
         if course.starts_with? "sandbox"
           logger.info "[SFU Course Form] Creating sandbox for #{teacher_username} requested by #{req_user}"
-          sandbox = sandbox_info(course, teacher_username, teacher_sis_user_id, teacher2_sis_user_id)
+          sandbox = sandbox_info(course, teacher_username, teacher_sis_user_id, teacher2_sis_user_id, teacher2_role)
 
           course_array.push sandbox["csv"]
           enrollment_array.push sandbox["enrollment_csv_1"]
           enrollment_array.push sandbox["enrollment_csv_2"] unless teacher2_sis_user_id.nil?
         elsif course.starts_with? "ncc"
           logger.info "[SFU Course Form] Creating ncc course for #{teacher_username} requested by #{req_user}"
-          ncc_course = ncc_info(course, teacher_sis_user_id, teacher2_sis_user_id)
+          ncc_course = ncc_info(course, teacher_sis_user_id, teacher2_sis_user_id, teacher2_role)
 
           course_array.push ncc_course["csv"]
           enrollment_array.push ncc_course["enrollment_csv_1"]
@@ -55,7 +63,7 @@ class CourseFormController < ApplicationController
 
         else
           logger.info "[SFU Course Form] Creating single course container : #{course} requested by #{req_user}"
-          course_info = course_info(course, account_id, teacher_sis_user_id, teacher2_sis_user_id)
+          course_info = course_info(course, account_id, teacher_sis_user_id, teacher2_sis_user_id, teacher2_role)
 
           # create course csv
           course_array.push course_info["course_csv"]
@@ -81,7 +89,7 @@ class CourseFormController < ApplicationController
       sections = []
 
       selected_courses.each do |course|
-        course_info = course_info(course, account_id, teacher_sis_user_id, teacher2_sis_user_id)
+        course_info = course_info(course, account_id, teacher_sis_user_id, teacher2_sis_user_id, teacher2_role)
 
         course_id.concat "#{course_info["course_id"]}:"
         short_name.concat "#{course_info["short_name"]} / "
@@ -103,7 +111,7 @@ class CourseFormController < ApplicationController
 
       # create enrollment csv to default section
       enrollment_array.push "\"#{course_id}\",\"#{teacher_sis_user_id}\",\"teacher\",\"\",\"active\"\n"
-      enrollment_array.push "\"#{course_id}\",\"#{teacher2_sis_user_id}\",\"teacher\",\"\",\"active\"\n" unless teacher2_sis_user_id.nil?
+      enrollment_array.push "\"#{course_id}\",\"#{teacher2_sis_user_id}\",\"#{teacher2_role}\",\"\",\"active\"\n" unless teacher2_sis_user_id.nil?
 
     end
 
@@ -124,15 +132,20 @@ class CourseFormController < ApplicationController
 
       # give some time for the delayed_jobs to process the import
       sleep 5
-      flash[:notice] = "Course request submitted successfully"
+      render :json => {
+        :success => true,
+        :message => 'Course request submitted successfully.'
+      }
     else
-      flash[:error] = "Course request failed. Please try agin."
-      redirect_to "/sfu/course/new"
+      render :json => {
+        :success => false,
+        :message => 'The main teacher was not found.'
+      }
     end
 
   end
 
-  def course_info(course_line, account_id, teacher1, teacher2 = nil)
+  def course_info(course_line, account_id, teacher1, teacher2 = nil, teacher2_role = 'teacher')
     # Example; course_line = 1131:::ensc:::351:::d100:::Real Time and Embedded Systems
     course = {}
     sections = []
@@ -153,7 +166,7 @@ class CourseFormController < ApplicationController
 
     course["course_csv"] = "\"#{course["course_id"]}\",\"#{course["short_name"]}\",\"#{course["long_name"]}\",\"#{account_id}\",\"#{course["term"]}\",\"active\""
     course["enrollment_csv_1"] = "\"#{course["course_id"]}\",\"#{teacher1}\",\"teacher\",\"#{course["default_section_id"]}\",\"active\""
-    course["enrollment_csv_2"] = "\"#{course["course_id"]}\",\"#{teacher2}\",\"teacher\",\"#{course["default_section_id"]}\",\"active\"" unless teacher2.nil?
+    course["enrollment_csv_2"] = "\"#{course["course_id"]}\",\"#{teacher2}\",\"#{teacher2_role}\",\"#{course["default_section_id"]}\",\"active\"" unless teacher2.nil?
 
     sections.push "#{course["section_id"]}:_:#{course["name"].upcase}#{course["number"]} #{course["section_name"].upcase}"
 
@@ -171,7 +184,7 @@ class CourseFormController < ApplicationController
   end
 
   # e.g. course_line = sandbox-kipling-71113273
-  def sandbox_info(course_line, username, teacher1, teacher2 = nil)
+  def sandbox_info(course_line, username, teacher1, teacher2 = nil, teacher2_role = 'teacher')
     account_sis_id = "sfu:::sandbox:::instructors"
     course_arr = course_line.split("-")
     sandbox = {}
@@ -181,22 +194,23 @@ class CourseFormController < ApplicationController
 
     sandbox["csv"] = "\"#{sandbox["course_id"]}\",\"#{sandbox["short_long_name"]}\",\"#{sandbox["short_long_name"]}\",\"#{account_sis_id}\",\"\",\"active\""
     sandbox["enrollment_csv_1"] = "\"#{sandbox["course_id"]}\",\"#{teacher1}\",\"teacher\",\"#{sandbox["default_section_id"]}\",\"active\""
-    sandbox["enrollment_csv_1"] = "\"#{sandbox["course_id"]}\",\"#{teacher2}\",\"teacher\",\"#{sandbox["default_section_id"]}\",\"active\"" unless teacher2.nil?
+    sandbox["enrollment_csv_2"] = "\"#{sandbox["course_id"]}\",\"#{teacher2}\",\"#{teacher2_role}\",\"#{sandbox["default_section_id"]}\",\"active\"" unless teacher2.nil?
     sandbox
   end
 
-  # e.g. course_ling = ncc-kipling-71113273-My special course
-  def ncc_info(course_line, teacher1, teacher2 = nil)
+  # e.g. course_line = ncc-kipling-71113273-1134-My special course
+  def ncc_info(course_line, teacher1, teacher2 = nil, teacher2_role = 'teacher')
     account_sis_id = "sfu:::ncc"
     course_arr = course_line.split("-")
     ncc = {}
     ncc["course_id"] = "#{course_arr.first(3).join("-")}"
+    ncc["term"] = course_arr[3] # Can be empty!
     ncc["short_long_name"] = course_arr.last
     ncc["default_section_id"] = ""
 
-    ncc["csv"] = "\"#{ncc["course_id"]}\",\"#{ncc["short_long_name"]}\",\"#{ncc["short_long_name"]}\",\"#{account_sis_id}\",\"\",\"active\""
+    ncc["csv"] = "\"#{ncc["course_id"]}\",\"#{ncc["short_long_name"]}\",\"#{ncc["short_long_name"]}\",\"#{account_sis_id}\",\"#{ncc["term"]}\",\"active\""
     ncc["enrollment_csv_1"] = "\"#{ncc["course_id"]}\",\"#{teacher1}\",\"teacher\",\"#{ncc["default_section_id"]}\",\"active\""
-    ncc["enrollment_csv_1"] = "\"#{ncc["course_id"]}\",\"#{teacher2}\",\"teacher\",\"#{ncc["default_section_id"]}\",\"active\"" unless teacher2.nil?
+    ncc["enrollment_csv_2"] = "\"#{ncc["course_id"]}\",\"#{teacher2}\",\"#{teacher2_role}\",\"#{ncc["default_section_id"]}\",\"active\"" unless teacher2.nil?
     ncc
   end
 
@@ -205,8 +219,13 @@ class CourseFormController < ApplicationController
     user.sis_user_id unless user.nil?
   end
 
+  def sanitize_role(role)
+    # limit role to teacher (default), TA, and designer
+    %w(teacher ta designer).include?(role) ? role : 'teacher'
+  end
+
   def current_term
-    EnrollmentTerm.find(:all, :conditions => ["workflow_state = 'active' AND (:date BETWEEN start_at AND end_at)", {:date => Date.today}])
+    EnrollmentTerm.find(:all, :conditions => ["workflow_state = 'active' AND (:date BETWEEN start_at AND end_at)", {:date => Date.today}]).first
   end
 
   def future_terms

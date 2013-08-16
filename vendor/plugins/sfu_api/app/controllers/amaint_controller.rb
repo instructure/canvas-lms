@@ -21,7 +21,7 @@ class AmaintController < ApplicationController
       user_hash = {}
 	    user_hash["sfu_id"] = sfu_id
       user_hash["roles"] = SFU::User.roles sfu_id
-	    user_array << user_hash
+	    user_array = user_hash
     elsif params[:property].to_s.eql? "roles"
       user_array = SFU::User.roles sfu_id
     elsif params[:filter].nil? && params[:property].to_s.start_with?("term")
@@ -98,7 +98,7 @@ class AmaintController < ApplicationController
                              course_hash["number"] + ":::" +
                              course_hash["section"].downcase + ":::" +
                              course_hash["title"]
-        course_hash["key"].concat ":::" + course_hash["sectionTutorials"].downcase.delete(" ") unless course_hash["sectionTutorials"].empty?
+        course_hash["key"].concat ":::" + course_hash["sectionTutorials"].join(',').downcase unless course_hash["sectionTutorials"].empty?
 
         # hide course if already exists in Canvas or is a Tutorial/Lab
         course_array.push course_hash unless course_exists? course_hash["sis_source_id"] unless exclude_sectionCode.include? c["course"].first["sectionCode"].to_s
