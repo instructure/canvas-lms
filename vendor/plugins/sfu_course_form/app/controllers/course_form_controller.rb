@@ -2,6 +2,9 @@ require Pathname(File.dirname(__FILE__)) + "../../../sfu_api/app/model/sfu/sfu"
 
 class CourseFormController < ApplicationController
 
+  # Canvas course names have a limit of 255 characters max.
+  CANVAS_COURSE_NAME_MAX = 255
+
   before_filter :require_user
 
   def new
@@ -82,26 +85,34 @@ class CourseFormController < ApplicationController
     else
 
       logger.info "[SFU Course Form] Creating cross-list container : #{selected_courses.inspect} requested by #{req_user}"
-      course_id = ""
-      short_name = ""
-      long_name = ""
+      course_ids = []
+      short_names = []
+      long_names = []
       term = ""
       sections = []
 
       selected_courses.each do |course|
         course_info = course_info(course, account_id, teacher_sis_user_id, teacher2_sis_user_id, teacher2_role)
 
-        course_id.concat "#{course_info["course_id"]}:"
-        short_name.concat "#{course_info["short_name"]} / "
-        long_name.concat  "#{course_info["long_name"]} / "
+        course_ids.push course_info["course_id"]
+        short_names.push course_info["short_name"]
+        long_names.push course_info["long_name"]
         term = course_info["term"]
 
         sections.push course_info["sections"]
       end
 
+      course_id = "#{course_ids.join(':')}:::course"
+      short_name = short_names.join(' / ')
+      long_name = long_names.join(' / ')
+
+      # Use a shorter version (omit subsequent titles) of the long name if it's too long.
+      # Original long name: IAT100 D100 Example Course / IAT100 D200 Example Course / IAT100 D300 Example Course
+      # Shorter version:    IAT100 D100 Example Course / IAT100 D200 / IAT100 D300
+      long_name = (long_names[0, 1] + short_names[1..-1]).join(' / ') if long_name.length > CANVAS_COURSE_NAME_MAX
+
       # create course csv
-      course_id.concat "::course"
-      course_array.push "\"#{course_id}\",\"#{short_name[0..-4]}\",\"#{long_name[0..-4]}\",\"#{account_id}\",\"#{term}\",\"active\""
+      course_array.push "\"#{course_id}\",\"#{short_name}\",\"#{long_name}\",\"#{account_id}\",\"#{term}\",\"active\""
 
       # create section csv
       sections.compact.uniq.each do  |section|
