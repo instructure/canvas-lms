@@ -28,8 +28,9 @@ class QuizStatistics::ItemAnalysis::Summary
   end
 
   def add_response(question, answer, respondent_id)
-    @items[question] ||= QuizStatistics::ItemAnalysis::Item.from(self, question) || return
-    @items[question].add_response(answer, respondent_id)
+    id = question[:id]
+    @items[id] ||= QuizStatistics::ItemAnalysis::Item.from(self, question) || return
+    @items[id].add_response(answer, respondent_id)
   end
 
   def add_respondent(respondent_id, score)

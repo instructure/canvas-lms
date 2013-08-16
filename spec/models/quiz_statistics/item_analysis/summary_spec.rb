@@ -7,6 +7,14 @@ describe QuizStatistics::ItemAnalysis::Summary do
     QuizStatistics::ItemAnalysis::Summary.new(@quiz)
   }
 
+  describe "#aggregate_data" do
+    it "should group items by question" do
+      simple_quiz_with_shuffled_answers %w{T T A}, %w{T T A}, %w{T T B}, %w{T F B}, %w{T F B}
+      summary = QuizStatistics::ItemAnalysis::Summary.new(@quiz)
+      summary.size.should == 3
+    end
+  end
+
   describe "#add_response" do
     it "should not add unsupported response types" do
       summary.add_response({:question_type => "foo", :answers => []}, 0, 0)
