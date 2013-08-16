@@ -39,7 +39,7 @@ module SFU
         main_section = section_code[0..1].downcase 
         sections = []
 
-        unless details == "[]"
+        if details != "[]" && section_code.end_with?("00")
           details.each do |info|
             code = info["course"]["name"] + info["course"]["number"]
             section = info["course"]["section"].downcase
