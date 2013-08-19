@@ -2,10 +2,9 @@
   "name": "canvas-lms",
   "version": "0.0.0",
   "devDependencies": {
-    "requirejs": "*"
-  },
-  "dependencies": {
+    "requirejs": "1.0.8",
     "loom": "~2.0.0",
-    "fleck": "~0.5.1"
+    "fleck": "~0.5.1",
+    "testem": "~0.3.30"
   }
 }
