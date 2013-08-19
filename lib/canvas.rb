@@ -164,10 +164,8 @@ module Canvas
     ErrorReport.log_exception(:service_timeout, e)
     if Canvas.redis_enabled?
       error_ttl = (Setting.get_cached("service_#{service_name}_error_ttl", nil) || Setting.get_cached("service_generic_error_ttl", 1.minute.to_s)).to_i
-      Canvas.redis.pipelined do
-        Canvas.redis.incrby(redis_key, 1)
-        Canvas.redis.expire(redis_key, error_ttl)
-      end
+      Canvas.redis.incrby(redis_key, 1)
+      Canvas.redis.expire(redis_key, error_ttl)
     end
     return nil
   end
