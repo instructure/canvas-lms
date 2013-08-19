@@ -27,8 +27,18 @@ class RouteView < HashView
 
   def api_path
     path = route.segments.inject("") { |str,s| str << s.to_s }
-    path.chop! if path.length > 1
+    path.chop! if path.length > 1 # remove trailing slash
     path
+  end
+
+  def path_variables
+    api_path.scan(%r{:(\w+)}).map{ |v| v.first }
+  end
+
+  def swagger_path
+    api_path.
+      gsub(%r{^/api}, '').
+      gsub(%r{:(\w+)}, '{\1}')
   end
 
   def verb

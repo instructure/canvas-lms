@@ -23,7 +23,10 @@ class MethodView < HashView
   end
 
   def nickname
-    summary.downcase.gsub(/\s+/, '_')
+    summary.downcase.
+      gsub(/ an? /, ' ').
+      gsub(/[^a-z]+/, '_').
+      gsub(/^_+|_+$/, '')
   end
 
   def desc
@@ -36,7 +39,7 @@ class MethodView < HashView
 
   def arguments
     raw_arguments.map do |tag|
-      ArgumentView.new(tag.text)
+      ArgumentView.new(tag.text, route.verb, route.path_variables)
     end
   end
 
@@ -62,6 +65,10 @@ class MethodView < HashView
     end
   end
 
+  def path
+    route.swagger_path
+  end
+
   def operation
     {
       "httpMethod" => route.verb,
@@ -75,7 +82,7 @@ class MethodView < HashView
 
   def to_swagger
     {
-      "path" => route.api_path,
+      "path" => path,
       "description" => desc,
       "operations" => [operation]
     }

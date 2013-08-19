@@ -39,28 +39,6 @@ namespace :doc do
          "See #{DOC_DIR}/index.html"
   end
 
-  namespace(:api) do
-    # Produces api.json file as output (in the current dir). The api.json file is
-    # an API description in JSON format that follows the 'swagger' API description
-    # standard.
-    YARD::Rake::YardocTask.new(:swagger) do |t|
-      t.before = proc { FileUtils.rm_rf(API_DOC_DIR) }
-      t.files = %w[
-        app/controllers/*.rb
-        vendor/plugins/*/app/controllers/*.rb
-        vendor/plugins/*/lib/*.rb
-      ]
-
-      t.options = %W[
-        -e lib/api_routes.rb
-        -p doc
-        -t api
-        -o #{API_DOC_DIR}
-      ]
-
-      t.options << '-f' << 'text'
-    end
-  end
 end
 
 rescue LoadError

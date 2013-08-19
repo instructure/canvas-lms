@@ -16,6 +16,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+$:.unshift(File.join(File.dirname(__FILE__), 'swagger'))
+require 'controller_view'
+
 include Helpers::ModuleHelper
 include Helpers::FilterHelper
 
@@ -141,6 +144,7 @@ end
 
 def init
   options[:objects] = run_verifier(options[:objects])
+  generate_swagger_json
   options[:resources] = options[:objects].
     group_by { |o| o.tags('API').first.text }.
     sort_by  { |o| o.first }
@@ -163,6 +167,36 @@ def init
 
   options[:resources].each do |resource, controllers|
     serialize_resource(resource, controllers)
+  end
+end
+
+def generate_swagger_json
+  apis = []
+  controllers = run_verifier(options[:objects])
+  controllers.each do |controller|
+    ControllerView.new(controller).methods.each do |method|
+      apis << method.to_swagger
+    end
+  end
+
+  domain = ENV["SWAGGER_DOMAIN"] || "http://canvas.instructure.com"
+
+  resource_listing = {
+    "apiVersion" => "1.0",
+    "swaggerVersion" => "1.2",
+    "basePath" => "#{domain}/api",
+    "resourcePath" => "/v1",
+    "apis" => apis,
+    # "models": models,
+  }
+
+  output_dir = File.join(%w(public doc api))
+  FileUtils.mkdir_p output_dir
+
+  filename = File.join(output_dir, "api.json")
+  puts "Writing API data to #{filename}"
+  File.open(filename, "w") do |file|
+    file.puts JSON.pretty_generate(resource_listing)
   end
 end
 
