@@ -139,9 +139,7 @@ class Job < ActiveRecord::Base
   end
 
   def self.get_with_ids(ids)
-    redis.pipelined {
-      ids.each { |id| redis.hgetall(key_for_job_id(id)) }
-    }.map { |attrs| self.instantiate_from_attrs(attrs) }
+    ids.map { |id| self.instantiate_from_attrs(redis.hgetall(key_for_job_id(id))) }
   end
 
   def self.key_for_job_id(job_id)
