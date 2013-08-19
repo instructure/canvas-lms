@@ -19,4 +19,23 @@ describe "Navigating to wiki pages" do
       driver.current_url.should == edit_url
     end
   end
+
+  describe "Permissions" do
+    before do
+      course_with_teacher
+    end
+
+    it "displays public content to unregistered users" do
+      Canvas::Plugin.register(:kaltura, nil, :settings => {'partner_id' => 1, 'subpartner_id' => 2, 'kaltura_sis' => '1'})
+
+      @course.is_public = true
+      @course.save!
+
+      title = "foo"
+      wikiPage = @course.wiki.wiki_pages.create!(:title => title, :body => "bar")
+
+      get "/courses/#{@course.id}/wiki/#{title}"
+      f('#wiki_body').should_not be_nil
+    end
+  end
 end
