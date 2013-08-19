@@ -303,7 +303,9 @@ def should_edit_an_outcome_group
   outcome_group_model
   get outcome_url
   wait_for_ajaximations
+
   fj('.outcomes-sidebar .outcome-level:first li.outcome-group').click
+  wait_for_ajaximations
 
   keep_trying_until do
     fj('.edit_button').click

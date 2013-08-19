@@ -117,11 +117,15 @@ class Rubric < ActiveRecord::Base
     if data_changed? || workflow_state_changed?
       outcome_ids = []
       unless deleted?
-        outcome_ids = (data || []).map{|c| c[:learning_outcome_id] }.compact.map(&:to_i).uniq
+        outcome_ids = data_outcome_ids
       end
       LearningOutcome.update_alignments(self, context, outcome_ids)
     end
     true
+  end
+
+  def data_outcome_ids
+    (data || []).map{|c| c[:learning_outcome_id] }.compact.map(&:to_i).uniq
   end
   
   def criteria_object
