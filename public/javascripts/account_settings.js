@@ -17,6 +17,7 @@ define([
 
   $(document).ready(function() {
     $("#account_settings").submit(function() {
+      var $this = $(this);
       $(".ip_filter .value").each(function() {
         $(this).removeAttr('name');
       }).filter(":not(.blank)").each(function() {
@@ -25,6 +26,19 @@ define([
           $(this).attr('name', 'account[ip_filters][' + name + ']');
         }
       });
+      var validations = {
+        object_name: 'account',
+        required: ['name'],
+        property_validations: {
+          'name': function(value){
+            if (value && value.length > 255) { return I18n.t("account_name_too_long", "Account Name is too long")}
+          }
+        }
+      };
+      var result = $this.validateForm(validations);
+      if(!result) {
+        return false;
+      }
     });
     $(".datetime_field").datetime_field();
     $("#add_notification_form textarea").editorBox().width('100%');
