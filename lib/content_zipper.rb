@@ -92,10 +92,10 @@ class ContentZipper
           users_name = students[submission.user_id].sortable_name
           # necessary because we use /_\d+_/ to infer the user/attachment
           # ids when teachers upload graded submissions
-          users_name.gsub! /[_ ](\d+)[_ ]/, '-\1-'
+          users_name.gsub! /_(\d+)_/, '-\1-'
 
-          filename = users_name + (submission.late? ? " LATE-" : "-") + submission.user_id.to_s
-          filename = filename.gsub(/ /, "_").gsub(/[^-\w]/, "").downcase
+          filename = users_name + (submission.late? ? " LATE_" : "_") + submission.user_id.to_s
+          filename = filename.gsub(/ /, "-").gsub(/[^-\w]/, "-").downcase
           content = nil
           if submission.submission_type == "online_upload"
             submission.attachments.each do |attachment|

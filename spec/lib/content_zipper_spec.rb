@@ -24,7 +24,9 @@ describe ContentZipper do
       s1, s2 = 2.times.map { course_with_student ; @student }
       s1.update_attribute :sortable_name, 'some_999_, _1234_guy'
       s2.update_attribute :sortable_name, 'other 567, guy 8'
-      [s1, s2].each { |s| submission_model(:user => s) }
+      [s1, s2].each { |s|
+        submission_model user: s, assignment: @assignment, body: "blah"
+      }
       attachment = Attachment.new(:display_name => 'my_download.zip')
       attachment.user = @teacher
       attachment.workflow_state = 'to_be_zipped'
@@ -32,12 +34,13 @@ describe ContentZipper do
       attachment.save!
       ContentZipper.process_attachment(attachment, @teacher)
       expected_file_patterns = [
-        /other-567-_guy-8-/,
-        /some-999-_-1234-guy/,
+        /other-567--guy-8/,
+        /some-999----1234-guy/,
       ]
       Zip::ZipFile.foreach(attachment.reload.full_filename).each { |f|
         f.name.should =~ expected_file_patterns.shift
       }
+      expected_file_patterns.should be_empty
     end
 
     it "should zip up online_url submissions" do
@@ -54,7 +57,7 @@ describe ContentZipper do
       attachment.workflow_state.should == 'zipped'
       Zip::ZipFile.foreach(attachment.full_filename) do |f|
         if f.file?
-          f.name.should =~ /some-999-_-1234-guy/
+          f.name.should =~ /some-999----1234-guy/
           f.get_input_stream.read.should match(%r{This submission was a url, we&#39;re taking you to the url link now.})
           f.get_input_stream.read.should be_include("http://www.instructure.com/")
         end
@@ -116,7 +119,7 @@ describe ContentZipper do
 
       ContentZipper.process_attachment(attachment, @teacher)
       sub_count = 0
-      expected_file_names = [/group_0/, /group_1/]
+      expected_file_names = [/group-0/, /group-1/]
       Zip::ZipFile.foreach(attachment.full_filename) do |f|
         f.name.should =~ expected_file_names.shift
         sub_count += 1
