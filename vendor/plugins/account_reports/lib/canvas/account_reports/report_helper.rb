@@ -78,6 +78,12 @@ module Canvas::AccountReports::ReportHelper
     end
   end
 
+  def section
+    if section_id = (@account_report.has_parameter? "section_id")
+      @section ||= api_find(root_account.course_sections, section_id)
+    end
+  end
+
   def add_term_scope(scope,table = 'courses')
     if term
       scope.where(table => { :enrollment_term_id => term })
