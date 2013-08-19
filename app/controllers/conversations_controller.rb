@@ -201,10 +201,9 @@ class ConversationsController < ApplicationController
   #   The message to be sent
   #
   # @argument group_conversation [Boolean]
-  #   Ignored if there is just one recipient, defaults to false. If true, this
-  #   will be a group conversation (i.e. all recipients will see all messages
-  #   and replies). If false, individual private conversations will be started
-  #   with each recipient.
+  #   Defaults to false. If true, this will be a group conversation (i.e. all
+  #   recipients may see all messages and replies). If false, individual private
+  #   conversations will be started with each recipient.
   #
   # @argument attachment_ids[] [String]
   #   An array of attachments ids. These must be files that have been previously
@@ -268,7 +267,7 @@ class ConversationsController < ApplicationController
       visibility_map = infer_visibility(*conversations) 
       render :json => conversations.map{ |c| conversation_json(c, @current_user, session, :include_participant_avatars => false, :include_participant_contexts => false, :visible => visibility_map[c.conversation_id]) }, :status => :created
     else
-      @conversation = @current_user.initiate_conversation(@recipients, nil, :subject => params[:subject], :context_type => context_type, :context_id => context_id)
+      @conversation = @current_user.initiate_conversation(@recipients, !value_to_boolean(params[:group_conversation]), :subject => params[:subject], :context_type => context_type, :context_id => context_id)
       @conversation.add_message(message, :tags => @tags, :update_for_sender => false)
       render :json => [conversation_json(@conversation.reload, @current_user, session, :include_indirect_participants => true, :messages => [message])], :status => :created
     end

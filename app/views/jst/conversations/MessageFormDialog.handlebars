@@ -10,6 +10,7 @@
     <input type="hidden" name="mode" value="async">
     <input type="hidden" name="scope" value="{{scope}}">
     <input type="hidden" name="filter" value="{{filter}}">
+    <input type="hidden" name="group_conversation" value="true">
 
     <ul class="conversations" style='display:none;'>
       <li>
@@ -115,20 +116,6 @@
           {{/if}}
         </div>
       </div>
-
-      {{#unless conversation}}
-        <div class='message-header-row group_conversation_info' style="display: none" >
-          <div class='message-header-label'></div>
-          <div class='message-header-input'>
-            <label class="checkbox" for="compose-message-group_conversation">
-              {{checkbox "group_conversation"
-                id="compose-message-group_conversation"
-                class="group_conversation"}}
-              {{#t "labels.group_conversation"}}This is a group conversation. Participants will see everyone's replies{{/t}}
-            </label>
-          </div>
-        </div>
-      {{/unless}}
 
       <div class='message-header-row user_note_info' style="display: none">
         <div class='message-header-label'></div>
