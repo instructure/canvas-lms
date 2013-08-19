@@ -240,7 +240,7 @@ class ConversationParticipant < ActiveRecord::Base
           |m| m.submission.submission_comments.map(&:author_id) if m.submission
         }.compact.flatten
       user_ids -= participants.map(&:id)
-      participants += MessageableUser.available.where(:id => user_ids).all
+      participants += Shackles.activate(:slave) { MessageableUser.available.where(:id => user_ids).all }
     end
     return participants unless options[:include_participant_contexts]
 

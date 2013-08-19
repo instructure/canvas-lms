@@ -228,6 +228,28 @@ class MessageableUser
       messageable_groups_by_shard.values.flatten
     end
 
+    def self.slave(method)
+      module_eval <<-RUBY, __FILE__, __LINE__ + 1
+        def #{method}_with_slave(*args)
+          Shackles.activate(:slave) { #{method}_without_slave(*args) }
+        end
+        alias_method_chain #{method.inspect}, :slave
+      RUBY
+    end
+
+    slave :load_messageable_users
+    slave :messageable_users_in_context
+    slave :messageable_users_in_course
+    slave :messageable_users_in_section
+    slave :messageable_users_in_group
+    slave :count_messageable_users_in_context
+    slave :count_messageable_users_in_course
+    slave :count_messageable_users_in_section
+    slave :count_messageable_users_in_group
+    slave :search_messageable_users
+    slave :messageable_sections
+    slave :messageable_groups
+
     # ==========================  end of public API  ==========================
     # |                                                                       |
     # |  the rest of these methods are to simplify the implementation of the  |
