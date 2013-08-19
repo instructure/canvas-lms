@@ -453,9 +453,14 @@ class AssessmentQuestion < ActiveRecord::Base
     end
     if migration.to_import('assessment_questions') != false || (to_import && !to_import.empty?)
 
-      questions_to_update = migration.context.assessment_questions.where(:migration_id => questions.collect{|q| q['migration_id']})
-      questions_to_update.each do |question_to_update|
-        questions.find{|q| q['migration_id'].eql?(question_to_update.migration_id)}['assessment_question_id'] = question_to_update.id
+      existing_questions = migration.context.assessment_questions.
+          except(:select).
+          select("assessment_questions.id, assessment_questions.migration_id").
+          where("assessment_questions.migration_id IS NOT NULL").
+          index_by(&:migration_id)
+      questions.each do |q|
+        existing_question = existing_questions[q['migration_id']]
+        q['assessment_question_id'] = existing_question.id if existing_question
       end
 
       logger.debug "adding #{total} assessment questions"
