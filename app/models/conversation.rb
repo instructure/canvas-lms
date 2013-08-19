@@ -37,6 +37,11 @@ class Conversation < ActiveRecord::Base
 
   attr_accessible
 
+  def reload(options = nil)
+    @current_context_strings = {}
+    super
+  end
+
   def private?
     private_hash.present?
   end
@@ -276,8 +281,9 @@ class Conversation < ActiveRecord::Base
       message.shard = self.shard
 
       # all specified (or implicit) tags, regardless of visibility to individual participants
-      new_tags = options[:tags] ? options[:tags] & current_context_strings(1) : []
-      new_tags = current_context_strings if new_tags.blank? && tags.empty? # i.e. we're creating the first message and there are no tags yet
+      users = preload_users_and_context_codes
+      new_tags = options[:tags] ? options[:tags] & current_context_strings(1, users) : []
+      new_tags = current_context_strings(nil, users) if new_tags.blank? && tags.empty? # i.e. we're creating the first message and there are no tags yet
       self.tags |= new_tags if new_tags.present?
       Shard.birth.activate do
         self.root_account_ids |= [message.root_account_id] if message.root_account_id
@@ -294,7 +300,11 @@ class Conversation < ActiveRecord::Base
       ConversationMessage.send :add_preloaded_record_to_collection, [message], :conversation, self
       message.save!
 
-      add_message_to_participants(message, options.merge(:tags => new_tags, :new_message => true))
+      add_message_to_participants(message, options.merge(
+          :tags => new_tags,
+          :new_message => true,
+          :preloaded_users => users
+      ))
 
       if options[:update_participants]
         update_participants(message, options)
@@ -327,6 +337,12 @@ class Conversation < ActiveRecord::Base
     message
   end
 
+  def preload_users_and_context_codes
+    users = conversation_participants.map { |cp| User.send(:instantiate, 'id' => cp.user_id ) }
+    User.preload_conversation_context_codes(users)
+    users = users.index_by(&:id)
+  end
+
   # Add the message to the conversation for all the participants.
   #
   # ==== Arguments
@@ -356,10 +372,14 @@ class Conversation < ActiveRecord::Base
       cps.update_all("message_count = message_count + 1") unless options[:generated]
 
       if self.shard == Shard.current
+        users = options[:preloaded_users] || preload_users_and_context_codes
+        current_context_strings(nil, users)
+
         all_new_tags = options[:tags] || []
         message_participant_data = []
         ConversationMessage.preload_latest(cps) if private? && !all_new_tags.present?
         cps.each do |cp|
+          cp.user = users[cp.user_id]
           next unless cp.user
           new_tags, message_tags = infer_new_tags_for(cp, all_new_tags)
           if new_tags.present?
@@ -688,20 +708,24 @@ class Conversation < ActiveRecord::Base
   # note that these may not all be relevant for a specific participant, so
   # they should be and-ed with User#conversation_context_codes
   # returns best matches first
-  def current_context_strings(threshold = nil)
-    participants = conversation_participants.to_a
-    return [] if private? && participants.size == 1
+  def current_context_strings(threshold = nil, preloaded_users_hash = nil)
+    @current_context_strings ||= {}
+    @current_context_strings[threshold] ||= begin
+      participants = conversation_participants.to_a
+      return [] if private? && participants.size == 1
 
-    threshold ||= participants.size / 2
+      threshold ||= participants.size / 2
 
-    participants.inject([]){ |ary, cp|
-      cp.user ? ary.concat(cp.user.conversation_context_codes) : ary
-    }.sort.inject({}){ |hash, str|
-      hash[str] = (hash[str] || 0) + 1
-      hash
-    }.select{ |key, value|
-      value > threshold
-    }.sort_by(&:last).map(&:first).reverse
+      participants.inject([]){ |ary, cp|
+        cp.user = preloaded_users_hash[cp.user_id] if preloaded_users_hash
+        cp.user ? ary.concat(cp.user.conversation_context_codes) : ary
+      }.sort.inject({}){ |hash, str|
+        hash[str] = (hash[str] || 0) + 1
+        hash
+      }.select{ |key, value|
+        value > threshold
+      }.sort_by(&:last).map(&:first).reverse
+    end
   end
 
   def associated_shards

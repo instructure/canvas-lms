@@ -1916,6 +1916,7 @@ class User < ActiveRecord::Base
   #
   # Returns an array of context code strings.
   def conversation_context_codes(include_concluded_codes = true)
+    return @conversation_context_codes[include_concluded_codes] if @conversation_context_codes
     Rails.cache.fetch([self, include_concluded_codes, 'conversation_context_codes4'].cache_key, :expires_in => 1.day) do
       Shard.birth.activate do
         associations = %w{courses concluded_courses current_groups}
@@ -1929,6 +1930,58 @@ class User < ActiveRecord::Base
     end
   end
   memoize :conversation_context_codes
+
+  def self.preload_conversation_context_codes(users)
+    users = users.reject { |u| u.instance_variable_get(:@conversation_context_codes) }
+    return if users.length < Setting.get_cached("min_users_for_conversation_context_codes_preload", 5).to_i
+    preload_shard_associations(users)
+    shards = Set.new
+    users.each do |user|
+      shards.merge(user.associated_shards)
+    end
+    courses = []
+    concluded_courses = []
+    groups = []
+    Shard.with_each_shard(shards.to_a) do
+      courses.concat(
+          Enrollment.joins(:course).
+              where(enrollment_conditions(:active)).
+              where(user_id: users).
+              select([:user_id, :course_id]).
+              uniq.
+              all)
+
+      concluded_courses.concat(
+          Enrollment.
+              where(enrollment_conditions(:completed)).
+              where(user_id: users).
+              select([:user_id, :course_id]).
+              uniq.
+              all)
+
+      groups.concat(
+          GroupMembership.joins(:group).
+              where(User.reflections[:current_group_memberships].options[:conditions]).
+              where(user_id: users).
+              select([:user_id, :group_id]).
+              uniq.
+              all)
+    end
+    Shard.birth.activate do
+      courses = courses.group_by(&:user_id)
+      concluded_courses = concluded_courses.group_by(&:user_id)
+      groups = groups.group_by(&:user_id)
+      users.each do |user|
+        active_contexts = (courses[user.id] || []).map { |e| "course_#{e.course_id}" } +
+            (groups[user.id] || []).map { |gm| "group_#{gm.group_id}" }
+        concluded_courses = (concluded_courses[user.id] || []).map { |e| "course_#{e.course_id}" }
+        user.instance_variable_set(:@conversation_context_codes, {
+          true => (active_contexts + concluded_courses).uniq,
+          false => active_contexts
+        })
+      end
+    end
+  end
 
   def section_context_codes(context_codes)
     course_ids = context_codes.grep(/\Acourse_\d+\z/).map{ |s| s.sub(/\Acourse_/, '').to_i }
@@ -2405,6 +2458,9 @@ class User < ActiveRecord::Base
     # Return only valid matching types. Otherwise, nil.
     type = type.to_s.downcase.sub(/(view)?enrollment/, '')
     %w{student teacher ta observer}.include?(type) ? type : nil
+  end
+
+  def self.preload_shard_associations(users)
   end
 
   def associated_shards

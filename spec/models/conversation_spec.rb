@@ -756,6 +756,7 @@ describe Conversation do
         broken_one.tags = []
         broken_one.save!
 
+        conversation.reload
         conversation.add_message(u1, 'another', :tags => [@course2.asset_string, "course_0"])
         u1.conversations.first.tags.should == [@course1.asset_string]
         u2.conversations.first.tags.sort.should == [@course1.asset_string]
@@ -936,6 +937,7 @@ describe Conversation do
         third_course.offer!
         third_course.enroll_teacher(@teacher).accept!
 
+        conversation.reload
         conversation.add_message(@student, 'second message')
 
         conversation.conversation_participants.each do |participant|
@@ -1035,6 +1037,7 @@ describe Conversation do
         new_group.users << student1
         new_group.users << student2
 
+        conversation.reload
         conversation.add_message(student2, 'second message')
 
         conversation.conversation_participants.each do |participant|
