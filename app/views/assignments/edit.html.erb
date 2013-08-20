@@ -22,8 +22,10 @@
   js_bundle :assignment_edit
 %>
 
-<div id="edit_assignment_header" class="header-bar">
-</div>
+<% if @context.root_account.enable_draft? %>
+  <div id="edit_assignment_header" class="header-bar">
+  </div>
+<% end %>
 
 <div id="edit_assignment_wrapper">
   <form id="edit_assignment_form" class="form-horizontal bootstrap-form">
