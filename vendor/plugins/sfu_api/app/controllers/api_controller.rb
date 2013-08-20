@@ -41,6 +41,8 @@ class ApiController < ApplicationController
         user_hash["uuid"] = user.uuid
       elsif params[:property].eql? "mysfu"
         user_hash = mysfu_enrollments_for user
+      elsif params[:property].eql? "sandbox"
+        user_hash["sandbox"] = sandbox_for user
       end
     end
 
@@ -194,6 +196,16 @@ class ApiController < ApplicationController
           output[enrollment_type].push course
         end
       end
+    end
+    output
+  end
+
+  def sandbox_for (user)
+    output = []
+    course_list = user.course_ids
+    course_list.each do |c|
+      course = Course.find(c)
+      output << course.name if course.sis_source_id.to_s.start_with?("sandbox")
     end
     output
   end
