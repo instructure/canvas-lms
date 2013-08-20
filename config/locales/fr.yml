@@ -315,10 +315,18 @@ fr:
         unsuspend: "Rétablir le compte suspendu"
     admin_tools: 
       admin_tools: 
+        auth_logging: Journalisation
         tab_labels: 
           restore_course: "Restaurer les cours"
         view_messages: "Afficher les notifications"
       admin_tools_cumb: "Outils d’administration"
+      auth_logging_content_pane: 
+        auth_logging: "Connexions/déconnexions des utilisateurs"
+      auth_logging_search_results: 
+        activity: Activité
+        date: Date
+        no_item_found: "Recherche infructueuse"
+        time: Heure
       comm_message_item: 
         created_at: "Création le :"
         from_name: De
@@ -326,13 +334,8 @@ fr:
         sent_at: "Envoi le :"
         to: À
       comm_messages_content_pane: 
-        search_info: "Pour afficher toutes les notifications envoyées à un utilisateur de Canvas, saisissez l’identifiant d’utilisateur Canvas et la période de recherche."
+        search_info2: "Pour afficher toutes les notifications envoyées à un utilisateur de Canvas, sélectionnez l’utilisateur et la plage de dates concernés."
         view_notifications: "Afficher les notifications"
-      comm_messages_search_form: 
-        canvas_user_id: "Identifiant d’utilisateur Canvas"
-        find: Rechercher
-        message_date_from: Du
-        message_date_to: Au
       comm_messages_search_overview: 
         messages_viewed: "Notifications envoyées à *%{user}* du *%{start_date}* au *%{end_date}*."
       comm_messages_search_results: 
@@ -363,6 +366,14 @@ fr:
           add_enrollments: "Ajouter des inscriptions"
           subtext: "Que souhaitez-vous faire ensuite ?"
       page_title: "Outils d’administration pour %{account}"
+      user_date_range_search_form: 
+        find: Rechercher
+        generate_activity_userid: "Identifiant de l’utilisateur : *%{user_id}*"
+        generate_activity_username: "Générer une activité pour *%{user}*"
+        message_date_from: Du
+        message_date_to: Au
+        search: Rechercher
+        search_people: "Rechercher des personnes"
     avatars: 
       all_link: 
         one: "Tous les %{count}"
@@ -448,6 +459,14 @@ fr:
           parameters: 
             note: "Il se peut que les cours contenant des travaux silencieux ne reflètent pas précisément les résultats de ce rapport."
     date_picker_parameter: 
+      account_reports: 
+        default: 
+          end: 
+            parameters: 
+              header: "Fin :"
+          start: 
+            parameters: 
+              header: "Début :"
       custom_reports: 
         end: 
           parameters: 
@@ -484,6 +503,12 @@ fr:
       page_title: Comptes
       title: "Comptes I Gérer"
     integer_required: "Un entier doit être fourni."
+    last_user_access_csv_description: 
+      account_reports: 
+        default: 
+          last_user_access: 
+            header: Exemple
+            text: "Ce rapport indique la dernière connexion des utilisateurs actifs."
     mississippi_sis_csv_description: 
       account_reports: 
         mississisppi: 
@@ -622,6 +647,7 @@ fr:
         prevent_course_renaming_by_teachers: "Ne laissez pas les enseignants renommer leurs cours"
         restrict_student_future_view: "Empêcher les étudiants de voir les cours avant la date de début"
         self_enrollment: "Autoriser l’auto-inscription"
+        self_registration: Auto-inscription
         show_scheduler: "Activer l’outil de planification"
         sis_source_id: "ID SIS"
         start_at: "Débute à"
@@ -869,11 +895,11 @@ fr:
             text: "Ce rapport affiche tous les étudiants inscrits à un cours d’un trimestre donné et ayant envoyé des travaux. Il contient une ligne par envoi."
     students_with_no_submissions_csv_description: 
       account_reports: 
-        vilas: 
-          description: 
-            header: Exemple
+        default: 
           students_with_no_submissions: 
-            text: "Ce rapport affiche tous les étudiants inscrits à un cours d’un trimestre donné et n’ayant rendu aucun travail pendant la période indiquée. Il contient une ligne par inscription."
+            description: 
+              header: Exemple
+            text: "Ce rapport répertorie tous les étudiants inscrits à un cours d’un trimestre donné et n’ayant rendu aucun travail pendant la période indiquée. Il contient une ligne par inscription répondant aux critères."
     submission_data_csv_description: 
       account_reports: 
         submission_data: 
@@ -900,11 +926,11 @@ fr:
     unrecognized_time_zone: "'%{timezone}' n’est pas un fuseau horaire reconnu."
     unused_courses_csv_description: 
       account_reports: 
-        uw: 
+        unused_courses: 
           description: 
             header: Exemple
-          student_submissions: 
-            text: "Ce rapport affiche tous les cours associés à aucun des éléments suivants : travaux, annonces, discussions, modules, pages et questionnaires."
+          main: 
+            text: "Ce rapport répertorie tous les cours ne contenant aucun des éléments suivants : travaux, annonces, discussions, fichiers, modules, pages ou questionnaires."
     update_failed_notice: "Échec de la mise à jour des paramètres du compte"
     user_add_failed_message: "Échec de l’ajout du cours, veuillez réessayer"
     user_deleted_message: "%{username} a été supprimé"
@@ -920,6 +946,17 @@ fr:
         webster: 
           login: 
             day_drop: "Éléments de cours minimum consultés:"
+    users_list: 
+      login_name_or_sis_id: "ID de connexion / SIS"
+      name: Nom
+      no_people_found: "Recherche infructueuse"
+      you_can_search_by: "Vous pouvez rechercher par :"
+    zero_activity_csv_description: 
+      account_reports: 
+        default: 
+          zero_activity: 
+            header: Exemple
+            text: "Ce rapport montre tous les étudiants inscrits à un cours d’un trimestre donné. Le fichier CSV résultant contient une ligne par inscription d’utilisateurs qui n’ont pas consulté le cours depuis la date indiquée."
   activerecord: 
     errors: 
       full_messages: 
@@ -1025,6 +1062,7 @@ fr:
     file_copy_fail: "Impossible de copier le dossier « %{base_path} »"
     file_copy_fail_message: "Impossible de renommer le répertoire vers le chemin « %{path} »"
     file_import_fail: "Impossible d’importer le fichier « %{file_path} »"
+  angel_display: "Apprentissage ANGEL"
   angel_file_description: "Format d’exportation .zip Angel"
   announcement: 
     no_title: "Sans titre"
@@ -1256,6 +1294,16 @@ fr:
         cancel: Annuler
       links: 
         add_assignment_group: "Ajouter un groupe de tâches"
+    assignment_group_list: 
+      no_assignment_groups: "Aucun groupe de tâches"
+    assignment_group_list_item: 
+      add_assignment_to: "Ajouter une tâche pour %{name}"
+      delete: Supprimer
+      edit: Modifier
+      group_weight: "%{groupWeight}% du total"
+      manage: Gérer
+      title_delete: "Supprimer le groupe de travaux ?"
+      title_edit: "Modifier le groupe de tâches"
     assignment_group_selector: 
       assignment_group: "Groupe de tâches"
       assignment_group_options: 
@@ -1263,10 +1311,20 @@ fr:
     assignment_groups_count: 
       one: 1 groupe
       other: "%{count} groupes"
+    assignment_list_item: 
+      due_date: Échéance
+      module: Module
+      multiple_modules: "Plusieurs modules"
+      points_possible: "%{pointsPossible} points"
     assignment_locked: 
       assignment_locked: "Cette tâche est verrouillée à partir du *%{lock_at}*"
       assignment_unlocked_from: "Cette tâche est verrouillée jusqu’au *%{unlock_at}*"
       assignment_unlocked_from_to: "Cette tâche est déverrouillée seulement du *%{unlock_at}* au *%{lock_at}*"
+    assignment_settings: 
+      cancel: Annuler
+      save: Enregistrer
+      validating: Enregistrement...
+      weight_groups: "Pondérer la note finale en fonction des groupes de tâches"
     assignment_sidebar: 
       links: 
         submit: "Envoyer une tâche"
@@ -1312,10 +1370,53 @@ fr:
       add_group: "Ajouter un groupe"
       delete_group: "Supprimer le groupe"
       submit_assignment: "Envoyer une tâche"
+    cannot_delete_group: "Vous devez avoir au moins un groupe de tâches"
     confirm: 
       delete_assignment: "Voulez-vous vraiment supprimer cette tâche?"
       delete_group: "Voulez-vous vraiment supprimer ce groupe ?"
+    confirm_delete_group: "Voulez-vous vraiment supprimer ce groupe de tâches ?"
+    confirms: 
+      delete_assignment: "Voulez-vous vraiment supprimer ce travail ?"
+    create_assignment: 
+      assignment: Travail
+      assignment_due_at: "Échéance :"
+      assignment_name: "Nom :"
+      assignment_points: "Points :"
+      assignment_type: "Type :"
+      cancel: Annuler
+      discussion_type: Discussion
+      external_tool_type: "Outil externe"
+      more: "Plus d’options"
+      not_graded_type: "Non noté"
+      quiz_type: Questionnaire
+      save: Enregistrer
+      saving: Enregistrement...
+    create_group: 
+      add_first_assignment: "Ajouter un travail"
+      cancel: Annuler
+      drop_highest: "Scores les plus élevés :"
+      drop_lowest: "Scores les moins élevés :"
+      example_group_name: "par exemple, Groupe de rédaction 1"
+      group_name: "Nom du groupe :"
+      never_drop: "Ne jamais supprimer :"
+      percent_of_total: "% de la note totale"
+      save: Enregistrer
+      saving: Enregistrement...
     create_new_crumb: "Créer nouveau"
+    delete_group: 
+      cancel: Annuler
+      delete: "Supprimer le groupe"
+      deleting: Suppression...
+      labels: 
+        delete_assignments_in_group: "Supprimer les travaux"
+        move_assignments_to: "Déplacer les travaux vers"
+      options: 
+        select_group: "Sélectionner un groupe"
+      tooltips: 
+        target_group: "Sélectionner un groupe vers lequel déplacer ce travail"
+      warnings: 
+        delete_assignment_group: "Vous êtes sur le point de supprimer *%{name}*, qui contient *%{assignment_count}* travaux."
+      would_you_like: "Souhaitez-vous :"
     drop_highest_scores: "Ôter les %{number} notes les plus hautes"
     drop_lowest_scores: "Ôter les %{number} notes les plus basses"
     due_date_override: 
@@ -1328,6 +1429,12 @@ fr:
       edit_assignment: "Modifier la tâche"
       new_discussion: "Nouvelle discussion"
       new_quiz: "Nouveau questionnaire"
+    edit_header_view: 
+      buttons: 
+        not_published: "Non publiés"
+        published: "Date de publication"
+      titles: 
+        delete: Supprimer
     edit_view: 
       assignment_name: "Nom de la tâche"
       buttons: 
@@ -1415,6 +1522,15 @@ fr:
       links: 
         wizard: "Comment faire pour... ?"
       page_title: Tâches
+    index_view: 
+      add_assignment: Travail
+      add_group: Groupe
+      assignments: Travaux
+      assignments_settings: "Paramètres des travaux"
+      assignments_settings_screenreader: "Paramètres des travaux"
+      search_for_assignment: "Rechercher un travail"
+      title_add_assignment: "Ajouter un travail"
+      title_add_group: "Ajouter un groupe de travaux"
     invalid_file_retrieval: "Un problème s’est produit pendant la récupération du fichier envoyé depuis cet outil."
     invalid_tool_return: "L'outil utilisé a renvoyé une ressource non valide pour cette tâche."
     loading_tools_failed: "Échec du chargement des outils"
@@ -1429,6 +1545,8 @@ fr:
       submitting: "Envoi en cours…"
     multiple_due_dates: "Plusieurs dates d’échéance"
     needs_grading_count: "%{needs_grading_count} envois pour cette tâche restent à noter"
+    never_drop: 
+      remove_rule: "Supprimer la règle"
     never_drop_scores: "Ne jamais ôter %{assignment_name}"
     no_assignments: "[Pas de tâches]"
     no_tools_found: "Aucun outil trouvé"
@@ -1642,63 +1760,10 @@ fr:
     syllabus_right_side: 
       links: 
         edit_syllabus_description: "Modifier la description du programme"
-    teacher_index: 
-      add_assignment: "Ajouter la tâche"
-      add_group: "Ajouter un groupe"
-      assignment_group_list: 
-        no_assignment_groups: "Aucun groupe de devoirs."
-      assignment_group_list_item: 
-        add_assignment_to: "Ajouter un devoir à %{name}"
-        delete: Supprimer
-        edit: Modifier
-        group_weight: "%{groupWeight} % du total"
-        manage: Gérer
-        title_delete: "Supprimer un groupe de devoirs"
-        title_edit: "Modifier le groupe de devoir"
-      assignment_list_item: 
-        due_date: Échéance
-        points_possible: "%{pointsPossible} points"
-      assignment_settings: 
-        cancel: Annuler
-        save: Enregistrer
-        validating: "Enregistrement en cours..."
-        weight_groups: "Pondérer la note finale en fonction des groupes de devoirs"
-      assignments_settings: "Paramètres des devoirs"
-      assignments_settings_screenreader: "Paramètres des devoirs"
-      create_assignment: 
-        assignment: Devoir
-        assignment_due_at: "Échéance :"
-        assignment_name: "Nom :"
-        assignment_points: "Points :"
-        assignment_type: "Type :"
-        cancel: Annuler
-        discussion_type: Discussion
-        external_tool_type: "Outil externe"
-        more: "Plus d’options"
-        not_graded_type: "Non noté"
-        quiz_type: Questionnaire
-        save: Enregistrer
-        saving: "Enregistrement en cours..."
-      create_group: 
-        add_first_assignment: "Ajouter un devoir"
-        cancel: Annuler
-        drop_highest: "Scores les plus élevés :"
-        drop_lowest: "Scores les moins élevés :"
-        example_group_name: "par exemple, Groupe d’argumentation 1"
-        group_name: "Nom du groupe :"
-        never_drop: "Ne jamais supprimer :"
-        percent_of_total: "% de la note totale"
-        save: Enregistrer
-        saving: "Enregistrement en cours..."
-      never_drop: 
-        remove_rule: "Supprimer la règle"
-      search: Rechercher
-      search_for_assignment: "Rechercher un devoir"
-      title_add_assignment: "Ajouter un devoir"
-      title_add_group: "Ajouter un groupe de devoirs"
     titles: 
       add_assignment_group: "Ajouter un groupe de tâches"
       uploading: "Envoi en cours"
+    toggle_message: "activez/désactivez l’affichage des travaux"
     turnitin_settings_dialog: 
       assignments: 
         turnitin_settings: 
@@ -1779,8 +1844,12 @@ fr:
     titles: 
       attendance_help: "Aide sur la participation"
       new_attendance_column: "Colonne Nouvelle participation"
+  auth_logging: 
+    login: CONNEXION
+    logout: DÉCONNEXION
+  bb_display: "Blackboard Learn"
   bb_file_description: "Fichier d’exportation .zip Blackboard 6/7/8/9"
-  bb_name: "Outil d’exportation Blackboard"
+  bb_name: "Convertisseur Blackboard"
   big_blue_button_conference: 
     recording_setting: Enregistrement
     recording_setting_description: "Enregistrer cette conférence"
@@ -2322,6 +2391,7 @@ fr:
         login_expiration_minimum: "Le délai d’expiration de la session doit être au moins de 20 minutes."
         need_integer: "Veuillez spécifier un entier pour le cache de la liste de lecture."
   canvas_cartridge_description: "Permet de convertir une exportation Canvas au format intermédiaire json à importer"
+  canvas_cartridge_display: "Canvas Common Cartridge"
   canvas_cartridge_file_description: "Package d’exportation de cours Canvas"
   canvas_cartridge_name: "Outil d’importation Canvas Cartridge"
   cc: 
@@ -2445,6 +2515,7 @@ fr:
     from_beginning: "le début"
     to_now: maintenant
   common_cartridge_description: "Permet la conversion de packages Common Cartridge au format intermédiaire json pour l’importation"
+  common_cartridge_display: "Common Cartridge"
   common_cartridge_file_description: "Package Common Cartridge 1.0/1.1/1.2"
   common_cartridge_name: "Outil d’importation Common Cartridge"
   communication_channel: 
@@ -2673,7 +2744,6 @@ fr:
       header: "Importer du contenu"
       import_from_label: "Type de contenu"
       import_migration: Importer
-      subtext: "Cela vous permettra d’importer dans Canvas du contenu que vous avez peut-être déjà, par exemple des fichiers, des activités et des questionnaires, à partir d’autres systèmes de gestion de cours."
     moodle_zip: 
       options: Options
     must_upload_file: "Le chargement du fichier est requis."
@@ -2683,6 +2753,8 @@ fr:
     progressing_content_migration_collection: 
       no_items: "Aucune tâche n’a été mise en file d’attente."
       progress_label: "Tâches actuelles"
+    progressing_issues: 
+      loading: Chargement
     qti_zip: 
       options: Options
     select_content: 
@@ -2691,6 +2763,7 @@ fr:
       choose_migration_file: 
         migration_text: Source
       course_find_select: 
+        include_completed_courses: "Inclure les cours terminés"
         or: ou
         search_label: "Chercher un cours"
         select_default: "Sélectionner un cours"
@@ -2708,13 +2781,16 @@ fr:
         default_select_folder: "Sélectionner le dossier"
         upload_to: "Télécharger vers"
       overwrite_assessment_content: 
+        assessment_help_alt: "« Remplacer l’icône d’aide aux évaluations »"
+        assessment_help_text: "Certains systèmes réutilisent leurs ID pour chaque nouvelle exportation. Par conséquent, si vous exportez deux banques de questions distinctes, elles auront le même ID. Afin d’éviter de perdre des données d’évaluation, nous traitons ces objets comme des éléments différents malgré les ID. En choisissant cette option, vous désactivez cette fonction de sécurité et vous laissez les données d’évaluation remplacer les données existantes ayant les mêmes ID."
+        assessment_help_title: "« Remplacer l’aide aux évaluations »"
         overwrite_assessment_content: "Remplacer le contenu de l’évaluation par les ID correspondants"
       question_bank: 
         create_new_question: "-- Créer une nouvelle banque de questions --"
         question_bank_label: "Banque de questions"
         select_question_bank: "Sélectionner une banque de questions"
       select_content_checkbox: 
-        select_migration_label: "Sélectionner le contenu pour la migration ?"
+        select_migration_label: "Sélectionner le contenu pour la migration"
   content_tag: 
     no_title: "Sans titre"
   content_tags: 
@@ -3151,13 +3227,9 @@ fr:
   context_modules_api: 
     invalid_position: "Position non valide"
   conversation_dialog: 
-    enrollments_everyone: Tous
     errors: 
       field_is_required: "Ce champ est obligatoire."
-    people_count: 
-      one: "1 personne"
-      other: "%{count} personnes"
-    select_all: "Sélectionner tout"
+    select_course: "Sélectionner un cours"
   conversation_message: 
     subject: "Message confidentiel %{timestamp}"
     users_added: 
@@ -3173,6 +3245,7 @@ fr:
       titles: 
         attachment: "Fichier à joindre"
         remove_attachment: "Supprimer les pièces jointes"
+    all_courses: "Tous les cours"
     attachment_error: "Échec du chargement de la pièce jointe. Veuillez réessayer."
     buttons: 
       add_people: "Ajouter des personnes"
@@ -3186,6 +3259,7 @@ fr:
       buttons: 
         close: fermer
     confirm: 
+      delete_conversation: "Voulez-vous vraiment supprimer le contenu de cette conversation ? Cette action est irréversible."
       delete_message: "Voulez-vous vraiment supprimer le contenu de ce message ? Cette action est irréversible."
       delete_messages: "Voulez-vous vraiment supprimer le contenu de ces messages ? Cette action est irréversible."
     conversation_context: "D’une conversation avec"
@@ -3214,6 +3288,10 @@ fr:
     conversations_pane: 
       confirm: 
         delete_conversation: "Voulez-vous vraiment supprimer le contenu de cette conversation ? Cette action est irréversible."
+    course_options: 
+      course_options: 
+        concluded: Closes
+        more_courses: "Cours supplémentaires"
     enrollments_everyone: Tous
     errors: 
       field_is_required: "Ce champ est obligatoire."
@@ -3254,15 +3332,24 @@ fr:
         submission_score: "Note de l’envoi"
         view_submission: "Ouvrir l’envoi dans une nouvelle fenêtre."
     index_new: 
+      archived: Archivées
       delete_conversation: "Supprimer la conversation"
       enter_name_group_or_course: "Saisissez un nom, un groupe ou un cours"
       filter_messages_by_course: "Filtrer les messages par cours"
       filter_messages_by_type: "Filtrer les messages par type"
+      forward: Transférer
+      inbox: "Boîte de réception"
+      mark_as_unread: "Marquer comme non lues"
       new_message: "Nouveau message"
       reply: Répondre
       reply_all: "Répondre à tous"
       search_names_groups_courses: "Rechercher des noms, groupes et cours"
+      sent: Envoyées
       settings: Paramètres
+      starred: "Avec un astérisque"
+      titles: 
+        conversations: Conversations
+      unread: "Non lues"
     message: 
       open_message: "Ouvrir le message"
       star: "Marquer d’un astérisque"
@@ -3296,8 +3383,10 @@ fr:
         add_people: "Ajouter des personnes"
       labels: 
         add_to_faculty_journal: "Ajouter comme entrée du journal des enseignants"
+        attachments: "Pièces jointes"
         course: Cours
         group_conversation: "Ceci est une conversation de groupe. Les participants verront les réponses de tout le monde"
+        select_course: "Sélectionner un cours"
         subject: Objet
         to: À
       links: 
@@ -3427,6 +3516,7 @@ fr:
       teachers_students: "Enseignants et étudiants"
   course_copy_argument_error: "Une copie de cours requiert un cours source."
   course_copy_description: "Plug-in de migration pour copier les cours Canvas"
+  course_copy_display: "Copie du cours"
   course_copy_file_description: "Copier un cours Canvas"
   course_copy_name: "Copier un cours Canvas"
   course_copy_no_course_error: "Cours source introuvable"
@@ -3494,6 +3584,7 @@ fr:
     course_dates_enforced: "Les utilisateurs peuvent participer à ce cours uniquement entre ces dates."
     course_dates_unenforced: "Ces dates ne modifieront pas la disponibilité du cours."
     edit_sections_placeholder: "Saisissez un nom de section"
+    edit_sections_title: "Nom de la section"
     errors: 
       invalid_sis_status: "Statut de publication SIS non valide"
       invitation: "Échec de l’invitation. Veuillez réessayer."
@@ -3523,6 +3614,7 @@ fr:
     private_course: Privé
     public_course: Public
     re_send_invitation: "Renvoyer l’invitation"
+    remove_user_from_course_section: "Retirer l’utilisateur de %{course_section}"
     titles: 
       click_to_edit: "Cliquez pour modifier"
       link_to_students: "Lien vers les étudiants"
@@ -3604,16 +3696,15 @@ fr:
     copy: 
       buttons: 
         create_course: "Créer un cours"
-      choose_content: "Choisir les éléments à copier ?"
+      choose_content: "Choisir les éléments à copier"
+      conclude_at: "Date de fin"
+      course_code: "Code du cours"
       details: "Entrez les informations suivantes pour commencer la création d’une copie du cours."
+      enrollment_term_id: Trimestre
       headings: 
         copy_course: "Copier %{course}"
-      labels: 
-        conclude_at: "Date de fin"
-        course_code: "Code du cours"
-        enrollment_term_id: Trimestre
-        name: Nom
-        start_at: "Date de début"
+      name: Nom
+      start_at: "Date de début"
       titles: 
         copy_course: "Copier le cours"
     course_wizard_box: 
@@ -3813,7 +3904,6 @@ fr:
         add_people: "Ajouter des personnes"
         cannot_add_users: "Il n’est pas possible d’ajouter des utilisateurs, car ce cours est terminé"
         role_to_search: "Limiter la recherche au rôle"
-        search: Rechercher
         search_people: "Rechercher des personnes"
       invitations_view: 
         accepted_invitation: "%{name} a déjà reçu et accepté l’invitation à participer au cours, mais vous pouvez quand même renvoyer l’invitation si nécessaire."
@@ -3841,12 +3931,15 @@ fr:
         pending_acceptance_explanation: "Cet utilisateur n’a pas encore accepté l’invitation au cours."
         pending_acceptance_of_invitation: "en attente"
       roster_users: 
+        canvas_user_id: "Identifiant Canvas"
         login_name_or_sis_id: "ID de connexion / SIS"
         name: Nom
         no_people_found: "Recherche infructueuse"
         role: Rôle
         section: Section
         you_can_search_by: "Vous pouvez rechercher sur les critères suivants :"
+      section: 
+        remove_user_from_course_section: "Supprimer l’utilisateur de %{name}"
     section: 
       enrollment: 
         links: 
@@ -3956,7 +4049,7 @@ fr:
       transifex_message: "Rejoindre la [Canvas Translation Community](%{transifex_url})"
       turnitin: "ces commentaires seront affichés à l’attention des étudiants lors de l’envoi d’une tâche validée par Turnitin."
       view_grading_scheme: "afficher le système de notation"
-      wiki_editing_roles: "par défaut, peut modifier les pages Wiki du cours"
+      wiki_editing_roles: "par défaut, peut créer, renommer et modifier les pages Wiki du cours"
       wiki_editing_roles_change_existing: "Change les pages actuellement modifiables par \"%{current_setting}\" par \"%{new_setting}\"."
     settings_sidebar: 
       buttons: 
@@ -4189,6 +4282,7 @@ fr:
       assign_blanks: "Attribuer un zéro aux tâches non envoyées"
     out_of_points_possible: "sur %{assignment.points_possible}"
     this_is_permanent: "La courbe de notation ne peut pas être annulée. Les historiques restent disponibles, mais l’action relative à la courbe est irréversible."
+  d2l_display: Desire2Learn
   d2l_file_description: "Format .zip d’exportation D2L"
   d2l_name: "Convertisseur D2L"
   dashboard: 
@@ -4553,6 +4647,8 @@ fr:
       my_settings: "Mes paramètres"
   discussions: 
     are_your_sure_delete: "Voulez-vous vraiment supprimer cette entrée ?"
+    cant_subscribe_not_in_group: "Vous devez être membre de ce groupe pour vous abonner"
+    cant_subscribe_not_in_group_set: "Vous devez être membre d’un groupe associé pour vous abonner"
     closed_for_comments: "Fermées aux commentaires"
     confirm_delete_discussion_topic: "Voulez-vous vraiment supprimer ce sujet de discussion ?"
     delete: Supprimer
@@ -4570,6 +4666,7 @@ fr:
       manage_discussion_entry: "Gérer l’entrée de discussion"
       open_in_speedgrader: "Ouvrir dans SpeedGrader"
       unknown_author: "Auteur inconnu"
+      write_a_reply: Répondre
     entry_stats: 
       show_more: "Afficher plus"
     hide_due_dates: "Masquer les dates d’échéance"
@@ -5041,6 +5138,9 @@ fr:
     app_review_view: 
       posted_by_on: "Publié par *%{user_name}* le *%{created}*"
     app_saved_message: "%{app} enregistré !"
+    borderless_launch: 
+      load_tool_button: "Charger manuellement %{tool}"
+      redirecting_to_lti: "Vous allez être redirigé vers l’application LTI, veuillez patienter..."
     buttons: 
       cancel: Annuler
       delete: Supprimer
@@ -5111,9 +5211,6 @@ fr:
     resource_selection_configured: "Sélection de ressources configurée"
     save_failed: "Impossible d’enregistrer la révision : %{message}"
     saving: Enregistrement...
-    sessionless_launch: 
-      load_tool_button: "Charger manuellement %{tool}"
-      redirecting_to_lti: "Vous allez être redirigé vers l’application LTI, veuillez patienter..."
     shared_secret: "Secret partagé"
     submit: Envoyer
     tool_show: 
@@ -5684,6 +5781,9 @@ fr:
         name: Nom
         out_of: Sur
         score: Note
+      icons: 
+        rubric_results: "Voir les résultats du barème"
+        turnitin_results: "Voir les résultats de Turnitin"
       labels: 
         final_grade_hidden: "Le calcul des totaux a été désactivé"
         high: Élevée
@@ -5858,6 +5958,11 @@ fr:
         grading: Notation
         no_submission: "Cet étudiant n’a pas d’envoi pour cette tâche"
         submission: "Cet étudiant a envoyé la tâche."
+      icons: 
+        delete_comment: "Supprimer le commentaire"
+        file_attachment: "Pièce jointe"
+        media_comment: "Commentaire multimédia"
+        speech_recognition: "Reconnaissance vocale"
       keycode_descriptions: 
         change_grade: "Modifier la note"
         leave_comment: "Laisser un commentaire"
@@ -5937,6 +6042,13 @@ fr:
     submission: 
       titles: 
         submission_review: "Cet envoi doit être révisé"
+    submission_score: 
+      icons: 
+        discussion_submission: "Envoi de la discussion"
+        file_upload_submission: "Envoi d’un téléchargement de fichier"
+        online_url_submission: "Envoi en ligne (URL)"
+        quiz_submission: "Envoi de questionnaire"
+        text_entry_submission: "Envoi d’une entrée de texte"
     submissions_zip_upload: 
       comments_made: 
         one: "1 commentaire ajouté"
@@ -5997,21 +6109,23 @@ fr:
       pages: Pages
       people: Personnes
   group_categories: 
-    default_category_title: "Groupes d’étude"
-    errors: 
-      cant_restrict_self_signup: "Activation impossible lorsqu’un groupe de section mixte existe dans la catégorie."
-      category_name_reserved: "%{category_name} est un nom réservé."
-      category_name_too_long: "Spécifiez un nom de catégorie plus court pour répartir les étudiants dans des groupes."
-      category_name_unavailable: "%{category_name} est déjà utilisé."
     notices: 
       create_category_success: "La catégorie a été créée."
       delete_category_success: "La catégorie a été supprimée."
       update_category_success: "La catégorie a été mise à jour."
   group_category: 
+    cant_restrict_self_signup: "Impossible de restreindre l’auto-inscription lorsqu’un groupe de section mixte figure dans la catégorie."
+    greater_than_1: "Doit être supérieur à 1"
     group_categories: 
       communities: Communautés
       imported: "Groupes importés"
       student_organized: "Groupes d’étudiants"
+    invalid_self_signup: "L’auto-inscription doit être l’une de ces valeurs : %{values}"
+    name_required: "Le nom doit être spécifié."
+    name_reserved: "%{name} est un nom réservé."
+    name_too_long: "Saisissez un nom de catégorie plus court"
+    name_unavailable: "%{name} est déjà utilisé."
+    self_signup_for_courses: "L’auto-inscription ne peut être activée que pour les groupes ou les communautés de cours"
   group_membership: 
     errors: 
       group_full: "Le groupe est plein."
@@ -6019,6 +6133,7 @@ fr:
   group_settings: 
     invitation_sent: "Invitation envoyée"
   groups: 
+    add_group: "Ajouter un groupe"
     add_group_category: 
       allow_self_signup: "Autoriser l’inscription libre"
       buttons: 
@@ -6130,6 +6245,7 @@ fr:
         description: Description
         join_level: "Autorisations de participation"
         name: "Nom du groupe"
+    edit_group: "Modifier le groupe"
     edit_group_category: 
       allow_self_signup: "Autoriser l’inscription libre"
       group_limit_blank: "(laisser vide s’il n’y a pas de limite)"
@@ -6174,7 +6290,6 @@ fr:
       add_unassigned_menu: 
         add_unassigned_student: "Ajouter un étudient non attribué"
         add_unassigned_user: "Ajouter un utilisateur non attribué"
-        search: Rechercher
         search_people: "Rechercher des personnes"
       add_unassigned_user: 
         assign_to_group: "Attribuer au groupe"
@@ -6186,15 +6301,23 @@ fr:
         assign_user_to_group: "Attribuer l’utilisateur à ce groupe"
       group: 
         add_user_to_group: "Attribuer l’utilisateur au groupe"
-        delete_group: "Supprimer le groupe"
-        edit_group: "Modifier le groupe"
+        group_delete: Supprimer
+        group_edit: Modifier
+        group_settings: Paramètres
         show_group_details: "Afficher les détails du groupe"
+      group_categories: 
+        group_set_create: "Ajouter un ensemble de groupes"
       group_category: 
+        randomly_assigning_students: "Attribution aléatoire des étudiants"
         unassigned_students: "Étudiants non attribués"
         unassigned_users: "Utilisateurs non attribués"
       group_category_detail: 
         add_group: "Ajouter un groupe"
+        category_settings: Paramètres
+        delete_category_option: Supprimer
+        edit_category_option: Modifier
         group_limit_blurb: "Les groupes sont limités à *%{count}* membres"
+        randomly_assign_students_option: "Attribuer les étudiants aléatoirement"
         restricted_self_signup_blurb: "Tous les étudiants d’un groupe doivent être dans la même section."
         search: rechercher
         self_organized_warning: "Ces groupes sont organisés automatiquement par étudiants. Contrairement aux autres types de groupes, les étudiants peuvent appartenir à plusieurs de ces groupes à la fois, par conséquent ils ne constituent pas la meilleure solution pour les devoirs notés."
@@ -6202,6 +6325,12 @@ fr:
         self_signup_help_tooltip: "Que sont les groupes d’inscription libre ?"
         student_group_instructions: "(faites glisser les étudiants à attribuer)"
         user_group_instructions: "(faites glisser les utilisateurs à attribuer)"
+      group_edit: 
+        group_name: "Nom du groupe"
+      group_edit_dialog_wrapper: 
+        cancel: Annuler
+        save: Enregistrer
+        saving: Enregistrement...
       group_user: 
         assign_to_group: "Attribuer au groupe"
       group_users: 
@@ -6212,6 +6341,10 @@ fr:
         no_groups: "Aucun groupe."
         search: Rechercher
         search_groups: "Rechercher des groupes"
+      randomly_assign_members: 
+        add_more_users: Annuler
+        close: OK
+        randomly_assign_students_dialog: "Tous les étudiants non attribués seront répartis aussi équitablement que possible dans les groupes d’étudiants existants."
     member: 
       one: "1 membre"
       other: "%{count} membres"
@@ -6223,6 +6356,7 @@ fr:
       group_join_request_info: "Ce groupe a reçu votre demande d’adhésion. Vous serez bientôt informé de l’acceptation ou du rejet de votre demande."
     messages: 
       creating_group: "Création d’un groupe..."
+    name_too_long: "Nom trop long"
     notices: 
       already_deleted: "Ce groupe a été supprimé"
       create_success: "Le groupe a été créé."
@@ -6232,6 +6366,7 @@ fr:
       students_assigned: "Étudiants attribués aux groupes."
       update_success: "Le groupe a été mis à jour."
       welcome: "Bienvenue dans le groupe %{group_name}."
+    randomly_assigning_members: "Attribution aléatoire des étudiants"
     show: 
       coming_up: "À venir"
       group_atom_feed: "Flux Atom du groupe"
@@ -6329,6 +6464,7 @@ fr:
     draft: Brouillon
     errors: 
       cannot_view_document_inline: "Ce document n’est pas consultable en ligne ; peut-être n’avez-vous pas l’autorisation de le lire ou a-t-il été supprimé."
+      document_preview_processing: "Traitement en cours de l’aperçu du document. Veuillez réessayer ultérieurement."
       field_is_required: "Ce champ est obligatoire."
       invalid_datetime: "Date/heure non valide"
       invalid_entry_for_field: "Entrée non valide : %{field}"
@@ -6601,6 +6737,7 @@ fr:
     errors: 
       file_too_large: "*Ce fichier est trop volumineux.* La taille maximum autorisée est de %{size} Mo."
       load_failed: "Échec du chargement de l’application des commentaires multimédias. Veuillez réessayer."
+      media_comment_installation_broken: "L’envoi des commentaires n’a pas été configuré correctement. Veuillez contacter votre administrateur."
       must_be_logged_in: "Vous devez vous connecter pour enregistrer un fichier multimédia."
       persistent_problem: "Si ce problème persiste, essayez d’enregistrer votre fichier multimédia localement, puis téléchargez le fichier enregistré."
       save_failed: "Échec de l’enregistrement. Pour réessayer, fermez cet écran."
@@ -8522,9 +8659,41 @@ fr:
   migration_issues: 
     errors: 
       valid_workflow_state: "Un état de workflow valide doit être envoyé."
+  module_item_types: 
+    assignment: Travail
+    disuccsion: Discussion
+    external_tool: "Outil externe"
+    external_url: "URL externe"
+    file: Fichier
+    page: Page
+    quiz: Questionnaire
+    sub_header: Sous-titre
   modules: 
+    add_module_item_dialog: 
+      item_type: "Type :"
+    add_module_item_dialog_wrapper: 
+      Save: Enregistrer
+      cancel: Annuler
+      creating: Création...
+    dialog_title: "Ajouter un élément à %{moduleName}"
     module_collection_view: 
+      button: 
+        preview: Aperçu
       course_modules: "Modules du cours"
+      header: 
+        module: Module
+    module_item_view: 
+      button: 
+        delete: Supprimer
+        edit: Modifier
+      module_item: 
+        available: Disponible
+        due: Échéance
+        points_abbreviated: points
+    module_view: 
+      module: 
+        prerequisites: "Conditions préalables"
+        published: "Date de publication"
   mute_dialog: 
     curving_assignments: "Courbe des tâches"
     grade_change_notifications: "Notifications de changement de notes"
@@ -8712,9 +8881,6 @@ fr:
       other: Autres
       parent: "E-mails parents"
       scheduling: Planification
-  notifications_search: 
-    cant_be_blank: "Vous devez indiquer l’ID d’utilisateur Canvas"
-    cant_come_before_from: "La date du champ « Jusqu'à la date » doit être ultérieure à la date du champ « À partir de la date »"
   number: 
     currency: 
       format: 
@@ -8896,6 +9062,9 @@ fr:
     delete_title: "Supprimer la page Wiki"
     errors: 
       require_title: "Vous devez saisir un titre"
+    notices: 
+      delete_failed: "Impossible de supprimer la page « %{title} »."
+      page_deleted: "La page « %{title} » a été supprimée."
   paginated_collection: 
     no_items: "Aucun élément"
   paginated_list: 
@@ -9681,13 +9850,18 @@ fr:
   publish_btn_module: 
     buttons: 
       publish: Publier
+      publish_desc: "Non publié. Cliquez pour publier."
       published: "Date de publication"
+      published_desc: "Publié. Cliquez pour annuler la publication."
       publishing: "Publication en cours..."
       unpublish: "Annuler la publication"
       unpublishing: "Annulation de la publication..."
+  publishable: 
+    cant_unpublish: "Impossible d’annuler la publication"
   purchases: 
     new: 
       payment_info: "Informations sur le paiement"
+  qti_display: QTI
   qti_file_description: "Fichier .zip QTI"
   qti_name: "Convertisseur QTI"
   question_bank: 
@@ -9848,6 +10022,9 @@ fr:
     always: Toujours
     answer_comments: "Commentaires de réponse"
     answer_text: "Texte de la réponse"
+    assignment_points_possible: 
+      one: "%{count} point"
+      other: "%{count} points"
     buttons: 
       add_selected_questions: "Ajouter les questions sélectionnées"
       adding_questions: "Ajout de questions..."
@@ -10109,6 +10286,8 @@ fr:
     graded_quiz: "Questionnaire noté"
     graded_survey: "Enquête notée"
     headers: 
+      assignment_quizzes: "Questionnaires pour un travail"
+      practice_quizzes: "Questionnaires d’entraînement"
       submitted_students_quiz_title: 
         one: "Étudiants ayant répondu au questionnaire (%{count})"
         other: "Étudiants ayant répondu au questionnaire (%{count})"
@@ -10117,6 +10296,7 @@ fr:
         one: "Étudiants ayant répondu à l’enquête (%{count})"
         other: "Étudiants ayant répondu à l’enquête (%{count})"
         zero: "Étudiants ayant répondu à l’enquête"
+      surveys: Enquêtes
       unsubmitted_students_quiz_title: 
         one: "Étudiants n’ayant pas répondu au questionnaire (%{count})"
         other: "Étudiants n’ayant pas répondu au questionnaire (%{count})"
@@ -10186,10 +10366,18 @@ fr:
         create_new_quiz: "Créer un nouveau questionnaire"
         manage_question_banks: "Gérer les banques de questions"
         publish_multiple_quizzes: "Publier plusieurs questionnaires"
+      multiple_due_dates: "Plusieurs dates"
       no_quizzes: "Aucun questionnaire disponible"
       page_titles: Questionnaires
       titles: 
         this_quiz_is_locked: "Ce questionnaire est verrouillé. Cliquez pour obtenir plus d’informations."
+    index_view: 
+      links: 
+        create_new_quiz: "Nouveau questionnaire"
+        manage_question_banks: "Gérer les banques de questions"
+        publish_multiple_quizzes: "Publier plusieurs questionnaires"
+        settings: Paramètres
+      search_for_quiz: "Rechercher un questionnaire"
     invalid_ip: 
       quiz_protected: "Ce questionnaire est protégé et ne peut être utilisé que dans certaines régions. L’ordinateur que vous utilisez ne semble pas être situé dans une zone géographique valide permettant d’utiliser ce questionnaire."
       survey_protected: "Cette enquête est protégée et ne peut être utilisée que dans certaines régions. L’ordinateur que vous utilisez ne semble pas être situé dans une zone géographique valide permettant d’utiliser cette enquête."
@@ -10362,6 +10550,10 @@ fr:
       warnings: 
         has_student_submissions: "Des étudiants ont déjà complété ou commencé ce questionnaire, par conséquent soyez prudent lorsque vous le modifiez. Si vous modifiez de manière importante des questions du questionnaire, pensez éventuellement à réévaluer les étudiants qui ont complété l’ancienne version du questionnaire."
     no_filters_found: "Aucun filtre trouvé"
+    no_quizzes_view: 
+      headers: 
+        course_quizzes: "Questionnaires de cours"
+      no_quizzes: "Aucun questionnaire disponible"
     notices: 
       cant_view_submission_while_muted: "Impossible d’afficher l’historique du questionnaire lorsque celui-ci est en mode silencieux."
       has_submissions_already: "Gardez à l’esprit que certains étudiants ont déjà complété ou commencé ce questionnaire."
@@ -10377,6 +10569,9 @@ fr:
         other: "La publication de %{count} questionnaires a bien été annulée !"
     practice_quiz: "Questionnaire d’entraînement"
     question_colon: "Question :"
+    question_count: 
+      one: "%{count} question"
+      other: "%{count} questions"
     question_group: 
       buttons: 
         update: "Mettre à jour"
@@ -10440,6 +10635,18 @@ fr:
         one: 1 minute
         other: "%{count} minutes"
       unlimited: "Sans limite"
+    quiz_item_group_view: 
+      no_quizzes: "Pas de questionnaires à afficher."
+      no_surveys: "Pas de sondages à afficher."
+    quiz_item_view: 
+      links: 
+        delete: Supprimer
+        edit: Modifier
+      quiz_available: Disponible
+      quiz_due: Échéance
+      settings: Paramètres
+      title_delete: "Supprimer un questionnaire"
+      title_edit: "Modifier un questionnaire"
     quiz_right_side: 
       attempts_left: 
         one: "1 tentative supplémentaire accordée"
@@ -10768,6 +10975,7 @@ fr:
     last_logged_in: "dernière connexion : %{last_login}"
   recipient_input: 
     context_search_placeholder: "Saisissez un nom, un cours ou un groupe"
+    context_search_title: "Nom, cours ou groupe"
     groups_count: 
       one: "1 groupe"
       other: "%{count} groupes"
@@ -10788,7 +10996,7 @@ fr:
       remember_me: "Se souvenir de moi"
       sign_in: "Se connecter"
     parent_dialog: 
-      agree_to_terms_and_pp: "Vous acceptez les *conditions d'utilisation* et la **déclaration de confidentialité**."
+      agree_to_terms_and_pp: "Vous acceptez les *conditions d’utilisation* et la **déclaration de confidentialité**."
       buttons: 
         start_participating: "Commencer à participer"
       labels: 
@@ -10797,7 +11005,7 @@ fr:
         password: "Mot de passe de l’enfant"
         username: "Nom d’utilisateur de l’enfant"
     student_dialog: 
-      agree_to_terms_and_pp: "Vous acceptez les *conditions d'utilisation* et la **déclaration de confidentialité**."
+      agree_to_terms_and_pp: "Vous acceptez les *conditions d’utilisation* et la **déclaration de confidentialité**."
       buttons: 
         start_learning: "Commencer à apprendre"
       labels: 
@@ -10807,7 +11015,7 @@ fr:
         password_confirmation: "Confirmer le mot de passe"
         username: "Nom d’utilisateur"
     teacher_dialog: 
-      agree_to_terms_and_pp: "Vous acceptez les *conditions d'utilisation* et la **déclaration de confidentialité**."
+      agree_to_terms_and_pp: "Vous acceptez les *conditions d’utilisation* et la **déclaration de confidentialité**."
       buttons: 
         start_teaching: "Commencer à enseigner"
       labels: 
@@ -10828,7 +11036,7 @@ fr:
       manage_account_memberships: "Ajouter/supprimer d’autres administrateurs du compte"
       manage_account_settings: "Gérer les paramètres du compte"
       manage_admin_users: "Ajouter/supprimer d’autres enseignants, des concepteurs de cours ou des aides-enseignants pour ce cours"
-      manage_alerts: "Gérer les alertes générales"
+      manage_announcements: "Gérer les annonces globales"
       manage_assignments: "Gérer (ajouter/modifier/supprimer) les tâches et les questionnaires"
       manage_calendar: "Ajouter, modifier et supprimer des événements dans le calendrier du cours"
       manage_canvasnet_courses: "Gérer les cours du réseau Canvas"
@@ -11553,6 +11761,8 @@ fr:
       description: 
         custom_comments_area: "Cette zone est utilisée par l’évaluateur pour ajouter des commentaires associés aux critères."
       full_marks: "Notes maximum"
+      icons: 
+        additional_comments: "Commentaires complémentaires"
       instructor_comments: "Commentaires du professeur "
       labels: 
         save_criterion_for_reuse: "Enregistrer ce commentaire pour le réutiliser"
@@ -11657,6 +11867,9 @@ fr:
       assignment: Tâche
       grading_alt: notation
       submission_comment: "Commentaire sur l’envoi"
+    terms_required: 
+      terms_have_changed: "Les *conditions d’utilisation* ont changé. Veuillez les consulter avant de continuer à utiliser Canvas."
+      updated_terms_of_use: "Nouvelles conditions d’utilisation"
     unauthorized: 
       headings: 
         needs_cookies: "Cookies requis"
@@ -11787,6 +12000,8 @@ fr:
         uploading: "Téléchargement en cours, veuillez patienter..."
   sis_batch: 
     errors: 
+      too_many_errors: "%{count} erreurs supplémentaires"
+      too_many_warnings: "%{count} avertissements supplémentaires"
       unrecorgnized_type: "Type d’importation inconnu"
     instructure_csv: "Fichier CSV Instructure ou fichier zip de CSV"
     upload_filename: "sis_upload_%{id}.zip"
@@ -12142,6 +12357,7 @@ fr:
     learning_outcomes: "Résultats d’apprentissage"
     messages: Messages
     outcome_artifacts: "Artefacts de résultats"
+    people: Personnes
     view_in_separate_window: "Afficher dans une fenêtre séparée"
   tooltips: 
     vdd: 
@@ -12175,8 +12391,11 @@ fr:
       terms: "Vous devez accepter les conditions."
       too_long: "Ne doit pas dépasser %{max} caractères"
     registration: 
-      agree_to_terms: "Vous acceptez les *conditions d’utilisation*."
+      agree_to_terms_and_privacy_policy: "Vous acceptez les *conditions d’utilisation* et la **déclaration de confidentialité**."
       agree_to_terms_with_code_of_conduct: "Vous acceptez les *conditions d’utilisation* et le **code de déontologie**."
+  user_date_range_search: 
+    cant_be_blank: "Vous devez fournir l’identifiant Canvas"
+    cant_come_before_from: "La date de fin ne peut pas être antérieure à la date de début."
   user_follow: 
     errors: 
       follow_own_collection: "Vous ne pouvez pas suivre votre propre collection."
@@ -12478,6 +12697,8 @@ fr:
       update_instructions: "Vous pouvez mettre à jour les informations de cet utilisateur, mais il pourra les rétablir s’il le souhaite."
     new: 
       create_a_canvas_account: "Créer un compte Canvas"
+      privacy_policy: "Politique de confidentialité"
+      terms_of_use: "Conditions d’utilisation"
     no_deleting_sis_user: "Impossible de supprimer un utilisateur généré par le système"
     no_self_registration: "L’enregistrement libre n’a pas été activé pour ce compte"
     oauth_fail: "Échec de la demande OAuth Impossible de trouver une demande valide"
@@ -12578,6 +12799,7 @@ fr:
         : Activer
   webct_credentials: 
     credential_not_found: "Les informations d’identification sont introuvables."
+  webct_display: "Blackboard Vista/CE (WebCT)"
   webct_file_description: "Cours 6+ Blackboard Vista/CE, WebCT"
   webct_name: "Blackboard Vista/CE (WebCT)"
   widget: 
@@ -12645,6 +12867,7 @@ fr:
       notify_users_text: "Informer les utilisateurs que ce contenu a changé"
       options_label: Options
       publish: Publier
+      title_label: "Titre de la page"
       toolbar_menu: 
         settings: Paramètres
       unpublish: "Annuler la publication"
@@ -12657,14 +12880,17 @@ fr:
         last_edit: "Dernière modification"
         page_title: "Titre de la page"
         published: "Date de publication"
+        settings: Paramètres
         sort_ascending: "Trier par ordre croissant"
         sort_descending: "Trier par ordre décroissant"
       no_pages: "Aucune page créée à ce jour."
     wiki_page_index_item: 
       labels: 
         front_page: "Première page"
-      published: "Date de publication"
-      unpublished: "Non publié"
+      menu: 
+        delete: Supprimer
+        edit: Modifier
+        set_front_page: "Définir comme première page"
   wiki_page: 
     atom_author: "Page Wiki"
     atom_entry_title: "Page Wiki %{course_or_group_name} : %{page_title}"
@@ -12749,6 +12975,7 @@ fr:
     notices: 
       add_comment_failed: "Échec de l’ajout du commentaire, veuillez réessayer"
       adding_comment: "Ajout du commentaire..."
+      cannot_edit: "Vous n’avez pas le droit de modifier la page « %{title} »."
       page_deleted: "La page \"%{title}\" a été supprimée."
       page_updated: "La page a été mise à jour."
     page_link: 
@@ -12786,6 +13013,12 @@ fr:
       wiki_description_for_group: "On peut l’imaginer comme un espace infini permettant d’y placer du contenu. Vous pouvez l’utiliser pour décrire votre groupe, donner des explications utiles sur des sujets difficiles, ou laisser les membres travailler ensemble sur des projets rédigés."
       wiki_description_header: "Quelle est la fonction d’un Wiki ?"
   wiki_pages_api: 
+    cannot_update_editing_roles: "Vous n’avez pas le droit de mettre à jour les rôles de modification de cette page Wiki"
+    cannot_update_front_page: "Vous ne pouvez pas modifier la première page Wiki."
+    cannot_update_hide_from_students: "Vous ne pouvez pas actualiser l’indicateur empêchant les étudiants de voir cette page Wiki"
+    cannot_update_published: "Vous ne pouvez pas changer l’état « publié » de cette page Wiki"
+    cannot_update_title: "Vous ne pouvez pas actualiser le titre de cette page Wiki"
+    invalid_editing_roles: "Les rôles de modification fournis ne sont pas valides."
     no_wiki_front_page: "Aucune première page n’a été définie."
   wimba_conference: 
     external_urls: 
@@ -12793,6 +13026,7 @@ fr:
       archive_link: "Afficher les archives"
   zip_argument_error: "Un chargement .zip nécessite un dossier de destination."
   zip_file_description: "Plug-in de migration pour décompresser les fichiers .zip simples dans un cours"
+  zip_file_display: "Importation de fichiers"
   zip_file_file_description: "Décompresser le fichier .zip dans le dossier"
   zip_file_imports: 
     errors: 
