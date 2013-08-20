@@ -26,6 +26,7 @@ class Conversation < ActiveRecord::Base
   has_many :conversation_message_participants, :through => :conversation_messages
   has_one :stream_item, :as => :asset
   belongs_to :context, :polymorphic => true
+  validates_length_of :subject, :maximum => maximum_string_length, :allow_nil => true
 
   # see also MessageableUser
   def participants(reload = false)

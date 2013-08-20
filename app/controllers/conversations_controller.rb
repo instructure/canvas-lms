@@ -194,7 +194,7 @@ class ConversationsController < ApplicationController
   #
   # @argument subject [Optional, String]
   #   The subject of the conversation. This is ignored when reusing a
-  #   conversation.
+  #   conversation. Maximum length is 255 characters.
   #
   # @argument body [String]
   #   The message to be sent
@@ -275,6 +275,8 @@ class ConversationsController < ApplicationController
       @conversation.add_message(message, :tags => @tags, :update_for_sender => false)
       render :json => [conversation_json(@conversation.reload, @current_user, session, :include_indirect_participants => true, :messages => [message])], :status => :created
     end
+  rescue ActiveRecord::RecordInvalid => err
+    render :json => err.record.errors.to_json, :status => :bad_request
   end
 
   # @API

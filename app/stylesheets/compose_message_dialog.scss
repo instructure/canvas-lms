@@ -251,6 +251,9 @@ $subtleBorderColor: #e5e5e5;
         -moz-box-sizing: border-box;
         height: auto;
       }
+      input[type="text"] {
+        margin: 0;
+      }
     }
   }
 

@@ -767,6 +767,16 @@ describe ConversationsController, :type => :integration do
           c["subject"].should eql 'dinner'
         }
       end
+
+      it "should constrain subject length" do
+        json = api_call(:post, "/api/v1/conversations",
+                { :controller => 'conversations', :action => 'create', :format => 'json' },
+                { :recipients => [@bob.id], :body => "test", :subject => "a" * 256 },
+                headers={},
+                {expected_status: 400})
+        json["errors"].should_not be_nil
+        json["errors"]["subject"].should_not be_nil
+      end
     end
   end
 
