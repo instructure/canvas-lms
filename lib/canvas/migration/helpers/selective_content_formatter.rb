@@ -157,7 +157,7 @@ module Canvas::Migration::Helpers
               end
             else
               if source.respond_to?(type)
-                scope = source.send(type).select(:id)
+                scope = source.send(type).select(:id).except(:includes)
                 # We only need the id and name, so don't fetch everything from DB
                 if type == 'learning_outcomes'
                   scope = scope.select(:short_description)
