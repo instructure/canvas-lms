@@ -77,7 +77,7 @@ describe "QuizRegrading" do
 
   it 'succesfully regrades the submissions and updates the scores' do
     set_regrade_option!('full_credit')
-    QuizRegrader.regrade!(@quiz)
+    QuizRegrader.regrade!(quiz: @quiz)
     @submission.reload.score.should == 3
 
     set_regrade_option!('current_correct_only')
@@ -97,7 +97,7 @@ describe "QuizRegrading" do
     @multiple_answers_question.save!
     @quiz.reload
 
-    QuizRegrader.regrade!(@quiz)
+    QuizRegrader.regrade!(quiz: @quiz)
     @submission.reload.score.should == 3
   end
 

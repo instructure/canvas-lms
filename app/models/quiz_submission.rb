@@ -510,7 +510,16 @@ class QuizSubmission < ActiveRecord::Base
     if previous_version && quiz_version != quiz.version_number
       quiz = previous_version.model.reload
     end
-    QuizRegrader.regrade!(quiz, [self])
+    # let's just write the options here in case we decide to do individual
+    # submissions asynchronously later.
+    options = {
+      quiz: quiz,
+      # Leave version_number out for now as we may be passing the version
+      # and we're not starting it as a delayed job
+      # version_number: quiz.version_number,
+      submissions: [self]
+    }
+    QuizRegrader.regrade!(options)
   end
 
   # Updates a simply_versioned version instance in-place.  We want

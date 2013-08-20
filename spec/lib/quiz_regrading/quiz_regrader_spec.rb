@@ -1,4 +1,4 @@
-require 'spec_helper'
+require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require_relative '../../../lib/quiz_regrading'
 
 describe QuizRegrader do
@@ -34,7 +34,7 @@ describe QuizRegrader do
     QuizSubmission.stubs(:where).with(quiz_id: quiz.id).returns submissions
   end
 
-  let(:quiz_regrader) { QuizRegrader.new(quiz) }
+  let(:quiz_regrader) { QuizRegrader.new(quiz: quiz) }
 
   describe '#initialize' do
     it 'saves the quiz passed' do
@@ -43,7 +43,26 @@ describe QuizRegrader do
 
     it 'takes an optional submissions argument' do
       submissions = []
-      QuizRegrader.new(quiz,submissions).submissions.should == submissions
+      QuizRegrader.new(quiz: quiz, submissions:submissions).
+        submissions.should == submissions
+    end
+  end
+
+  describe "#quiz" do
+    it "finds the passed version of the quiz if present" do
+      quiz_stub = stub
+      options = {
+        quiz: quiz,
+        version_number: 2
+      }
+
+      Version.stubs(:where).with(
+        versionable_type: 'Quiz',
+        number: 2,
+        versionable_id: quiz.id
+      ).once.returns([ stub(:model => quiz_stub) ])
+
+      QuizRegrader.new(options).quiz.should == quiz_stub
     end
   end
 
