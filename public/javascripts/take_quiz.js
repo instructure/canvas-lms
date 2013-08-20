@@ -50,7 +50,6 @@ define([
         $last_saved = $('#last_saved_indicator');
 
     return {
-      referenceDate: null,
       countDown: null,
       isDeadline: true,
       fiveMinuteDeadline: false,
@@ -63,9 +62,11 @@ define([
       started_at: started_at,
       end_at: end_at,
       time_limit: parseInt($(".time_limit").text(), 10) || null,
+      timeLeft: parseInt($(".time_left").text()) * 1000,
       oneAtATime: $("#submit_quiz_form").hasClass("one_question_at_a_time"),
       cantGoBack: $("#submit_quiz_form").hasClass("cant_go_back"),
       finalSubmitButtonClicked: false,
+      clockInterval: 500,
       updateSubmission: function(repeat, beforeLeave) {
         if(quizSubmission.submitting && !repeat) { return; }
         var now = new Date();
@@ -120,7 +121,7 @@ define([
                       serverEndAtTime     = endAtFromServer.getTime(),
                       submissionEndAtTime = submissionEndAt.getTime();
 
-                  quizSubmission.referenceDate = null;
+                  quizSubmission.timeLeft = data.time_left * 1000;
 
                   // if the new end_at from the server is different than our current end_at, then notify
                   // the user that their time limit's changed and let updateTime do the rest.
@@ -179,7 +180,7 @@ define([
                 }
               },
               {
-                timeout: 5000
+                timeout: 15000
               }
             );
           })(data);
@@ -187,37 +188,33 @@ define([
       },
 
       updateTime: function() {
+        var timeLeft = quizSubmission.timeLeft = quizSubmission.timeLeft - quizSubmission.clockInterval;
         var now = new Date();
         var end_at = quizSubmission.time_limit ? endAtText : null;
         timeMod = (timeMod + 1) % 120;
         if(timeMod == 0 && !end_at && !quizSubmission.twelveHourDeadline) {
-          quizSubmission.referenceDate = null;
           var end = endAtParsed;
           if(!quizSubmission.time_limit && (end - now) < 43200000) {
             end_at = endAtText;
           }
         }
-        if(!quizSubmission.referenceDate) {
-          $.extend(quizSubmission, timing.setReferenceDate(startedAtText, end_at, now));
-        }
+
         if(quizSubmission.countDown) {
-          var diff = quizSubmission.countDown.getTime() - now.getTime() - quizSubmission.clientServerDiff;
-          if(diff <= 0) {
-            diff = 0;
+          if(timeLeft <= 0) {
+            timeLeft = 0;
           }
-          var d = new Date(diff);
+          var d = new Date(timeLeft);
           $countdown_seconds.text(d.getUTCSeconds());
-          if(diff <= 0 && !quizSubmission.submitting) {
+          if(timeLeft <= 0 && !quizSubmission.submitting) {
             quizSubmission.submitting = true;
             quizSubmission.submitQuiz();
           }
         }
-        var diff = quizSubmission.referenceDate.getTime() - now.getTime() - quizSubmission.clientServerDiff;
         if(quizSubmission.isDeadline) {
-          if(diff < 1000) {
-            diff = 0;
+          if(timeLeft < 1000) {
+            timeLeft = 0;
           }
-          if(diff < 1000 && !quizSubmission.dialogged) {
+          if(timeLeft < 1000 && !quizSubmission.dialogged) {
             quizSubmission.dialogged = true;
             quizSubmission.countDown = new Date(now.getTime() + 10000);
             $("#times_up_dialog").show().dialog({
@@ -236,24 +233,24 @@ define([
                 }
               }
             });
-          } else if(diff >    30000 && diff <    60000 && !quizSubmission.oneMinuteDeadline) {
+          } else if(timeLeft >    30000 && timeLeft <    60000 && !quizSubmission.oneMinuteDeadline) {
             quizSubmission.oneMinuteDeadline = true;
             $.flashMessage(I18n.t('notices.one_minute_left', "One Minute Left"));
-          } else if(diff >   250000 && diff <   300000 && !quizSubmission.fiveMinuteDeadline) {
+          } else if(timeLeft >   250000 && timeLeft <   300000 && !quizSubmission.fiveMinuteDeadline) {
             quizSubmission.fiveMinuteDeadline = true;
             $.flashMessage(I18n.t('notices.five_minutes_left', "Five Minutes Left"));
-          } else if(diff >  1800000 && diff <  1770000 && !quizSubmission.thirtyMinuteDeadline) {
+          } else if(timeLeft >  1800000 && timeLeft <  1770000 && !quizSubmission.thirtyMinuteDeadline) {
             quizSubmission.thirtyMinuteDeadline = true;
             $.flashMessage(I18n.t('notices.thirty_minutes_left', "Thirty Minutes Left"));
-          } else if(diff > 43200000 && diff < 43170000 && !quizSubmission.twelveHourDeadline) {
+          } else if(timeLeft > 43200000 && timeLeft < 43170000 && !quizSubmission.twelveHourDeadline) {
             quizSubmission.twelveHourDeadline = true;
             $.flashMessage(I18n.t('notices.twelve_hours_left', "Twelve Hours Left"));
           }
         }
-        quizSubmission.updateTimeString(diff);
+        quizSubmission.updateTimeString(timeLeft);
       },
-      updateTimeString: function(diff) {
-        var date = new Date(Math.abs(diff));
+      updateTimeString: function(timeLeft) {
+        var date = new Date(Math.abs(timeLeft));
         var yr = date.getUTCFullYear() - 1970;
         var mon = date.getUTCMonth();
         var day = date.getUTCDate() - 1;
@@ -333,7 +330,7 @@ define([
       };
       $(document).delegate('a', 'click', function(event) {
         if($(this).closest('.ui-dialog,.mceToolbar,.ui-selectmenu').length > 0) { return; }
-        
+
         if($(this).hasClass('no-warning')) {
           quizSubmission.alreadyAcceptedNavigatingAway = true
           return;
@@ -387,7 +384,7 @@ define([
         mouseleave: function(event) {
           if(!quizSubmission.oneAtATime) {
             var relatedQuestion = $(this).data('relatedQuestion')
-            relatedQuestion && relatedQuestion.removeClass('related');            
+            relatedQuestion && relatedQuestion.removeClass('related');
           }
         }
       });
@@ -509,7 +506,7 @@ define([
 
       var unanswered;
       var warningMessage;
-      
+
       if(quizSubmission.cantGoBack) {
         if(!$(".question").hasClass("answered")) {
           warningMessage = I18n.t('confirms.cant_go_back_blank',
@@ -526,7 +523,7 @@ define([
             warningMessage = I18n.t('confirms.unseen_questions',
               {'one': "There is still 1 question you haven't seen yet.  Submit anyway?",
                'other': "There are still %{count} questions you haven't seen yet.  Submit anyway?"},
-               {'count': unseen})            
+               {'count': unseen})
           }
         }
         else {
@@ -535,7 +532,7 @@ define([
             warningMessage = I18n.t('confirms.unanswered_questions',
               {'one': "You have 1 unanswered question (see the right sidebar for details).  Submit anyway?",
                'other': "You have %{count} unanswered questions (see the right sidebar for details).  Submit anyway?"},
-               {'count': unanswered});            
+               {'count': unanswered});
           }
         }
       }
@@ -547,7 +544,7 @@ define([
           event.stopPropagation();
           return false;
         }
-      }        
+      }
 
       quizSubmission.submitting = true;
     });
@@ -564,7 +561,7 @@ define([
       });
     }, 2000);
 
-    setInterval(quizSubmission.updateTime, 400);
+    setInterval(quizSubmission.updateTime, quizSubmission.clockInterval);
 
     setTimeout(function() { quizSubmission.updateSubmission(true) }, 15000);
 

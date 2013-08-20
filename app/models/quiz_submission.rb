@@ -405,6 +405,11 @@ class QuizSubmission < ActiveRecord::Base
     @skip_after_save_score_updates = false
   end
 
+  def time_left
+    return unless end_at
+    (end_at - Time.zone.now).round
+  end
+
   def less_than_allotted_time?
     self.started_at && self.end_at && self.quiz && self.quiz.time_limit && (self.end_at - self.started_at) < self.quiz.time_limit.minutes
   end

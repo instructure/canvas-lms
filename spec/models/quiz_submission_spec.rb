@@ -50,6 +50,22 @@ describe QuizSubmission do
     q.end_at.should eql original_end_at
   end
 
+  describe "#time_left" do
+    it "should return nil if there's no end_at" do
+      q = @quiz.quiz_submissions.create!
+      q.update_attribute(:end_at, nil)
+
+      q.time_left.should be_nil
+    end
+
+    it "should return the correct time left in seconds" do
+      q = @quiz.quiz_submissions.create!
+      q.update_attribute(:end_at, Time.now + 1.hour)
+
+      q.time_left.should eql(60 * 60)
+    end
+  end
+
   describe "#update_scores" do
     before(:each) do
       student_in_course
