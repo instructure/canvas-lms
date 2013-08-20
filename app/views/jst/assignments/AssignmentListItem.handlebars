@@ -1,6 +1,6 @@
 <div
   id="assignment_{{id}}"
-  class="ig-row {{#ifAll ENV.PERMISSIONS.manage published}}ig-published{{/ifAll}}"
+  class="ig-row {{#ifAll canManage published}}ig-published{{/ifAll}}"
   data-item-id="{{labelId}}"
 >
   <a href="{{htmlUrl}}" class="ig-title ellipses">
@@ -13,7 +13,7 @@
     {{name}}
   </a>
   <div class="ig-details row-fluid">
-    {{#if ENV.PERMISSIONS.manage}}
+    {{#if canManage}}
       <div class="span4 ellipses modules">
         {{#if has_modules}}
           {{#ifEqual module_count 1}}
@@ -36,10 +36,15 @@
     {{/if}}
 
     <div class="span4 ellipses">
-      <!-- TODO: VDD -->
-      {{#if dueAt}}
+      {{#if multipleDueDates}}
+        <strong>{{#t "quiz_due"}}Due{{/t}}</strong>
+        <span data-view="vdd-due-tooltip"></span>
+
+      {{else}}
+        {{#if dueAt}}
         <strong>{{#t "due_date"}}Due{{/t}}</strong>
         {{datetimeFormatted dueAt}}
+        {{/if}}
       {{/if}}
     </div>
 
@@ -48,7 +53,7 @@
     </div>
   </div>
 
-  {{#if ENV.PERMISSIONS.manage}}
+  {{#if canManage}}
     <div class="ig-admin">
       <span class="publish-icon" data-view="publish-icon"></span>
 
@@ -75,6 +80,17 @@
         <li role="presentation">
           <a
             href="#"
+            class="edit_assignment icon-edit"
+            id="assignment_{{id}}_settings_edit_item"
+            tabindex="-1"
+            role="menuitem"
+            title='{{#t "edit_assignment_title"}}Edit Assignment{{/t}}'
+            data-focus-returns-to="assign_{{id}}_manage_link"
+          >{{#t "edit"}}Edit{{/t}}</a>
+        </li>
+        <li role="presentation">
+          <a
+            href="#"
             class="delete_assignment icon-trash"
             id="assignment_{{id}}_settings_delete_item"
             tabindex="-1"
@@ -84,5 +100,7 @@
         </li>
       </ul>
     </div>
+
+    <form data-view="editAssignment" class="form-dialog"></form>
   {{/if}}
 </div>

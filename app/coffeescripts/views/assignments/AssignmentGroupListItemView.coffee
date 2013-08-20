@@ -68,7 +68,7 @@ define [
 
     initializeCollection: ->
       @model.get('assignments').each (assign) ->
-        assign.doNotParse()
+        assign.doNotParse() if assign.multipleDueDates()
 
       @collection = @model.get('assignments')
       @collection.on 'add', @expand
@@ -78,7 +78,7 @@ define [
       @createAssignmentView = false
       @deleteGroupView = false
 
-      if ENV.PERMISSIONS.manage
+      if @canManage()
         @editGroupView = new CreateGroupView
           assignmentGroup: @model
         @createAssignmentView = new CreateAssignmentView
@@ -95,7 +95,7 @@ define [
 
     toJSON: ->
       count = @countRules()
-      showRules = count != 0 and ENV.PERMISSIONS.manage
+      showRules = count != 0 and @canManage()
 
       data = @model.toJSON()
       showWeight = @model.collection.course?.get('apply_assignment_group_weights') and data.group_weight?
@@ -122,7 +122,7 @@ define [
       @cache.get(@cacheKey())
 
     expand: =>
-      @toggle if !@isExpanded()
+      @toggle(true) if !@isExpanded()
 
     toggle: (setTo=false) ->
       @$el.find('.element_toggler').click()
@@ -140,3 +140,6 @@ define [
       key = @cacheKey()
       expanded = !@cache.get(key)
       @cache.set(key, expanded)
+
+    canManage: ->
+      ENV.PERMISSIONS.manage

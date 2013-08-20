@@ -56,9 +56,10 @@ class AssignmentGroupsController < ApplicationController
   # Returns the list of assignment groups for the current context. The returned
   # groups are sorted by their position field.
   #
-  # @argument include[] [String, "assignments"|"discussion_topic"]
-  #   Associations to include with the group. "discussion_topic" is only valid
-  #   if "assignments" is also included.
+  # @argument include[] [String, "assignments"|"discussion_topic"|"all_dates"]
+  #  Associations to include with the group. both "discussion_topic" and
+  #  "all_dates" is only valid are only valid if "assignments" is also included.
+  #
   # @argument override_assignment_dates [Optional, Boolean]
   #   Apply assignment overrides for each assignment, defaults to true.
   #
@@ -71,6 +72,7 @@ class AssignmentGroupsController < ApplicationController
       if params[:include].include? 'assignments'
         assignment_includes = [:rubric, :quiz, :external_tool_tag]
         assignment_includes.concat(params[:include] & [:discussion_topic])
+        assignment_includes.concat(params[:include] & [:all_dates])
         @groups = @groups.includes(:active_assignments => assignment_includes)
 
         assignment_descriptions = @groups

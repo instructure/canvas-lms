@@ -529,7 +529,7 @@ describe "assignments" do
         end
 
         get_value("#ag_#{ag.id}_assignment_name").should == ""
-        get_value("#ag_#{ag.id}_assignment_points").should == ""
+        get_value("#ag_#{ag.id}_assignment_points").should == "0"
 
         replace_content(fj("#ag_#{ag.id}_assignment_name"), "Another")
         replace_content(fj("#ag_#{ag.id}_assignment_points"), "3")
@@ -657,6 +657,13 @@ describe "assignments" do
             f("#assignment_#{@assignment.id} .publish-icon").click
             wait_for_ajaximations
             @assignment.reload.should be_published
+
+            # need to make sure buttons
+            keep_trying_until do
+              driver.execute_script(
+                "return !$('#assignment_#{@assignment.id} .publish-icon').hasClass('disabled')"
+              )
+            end
 
             f("#assignment_#{@assignment.id} .publish-icon").click
             wait_for_ajaximations

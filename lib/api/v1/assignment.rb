@@ -50,7 +50,11 @@ module Api::V1::Assignment
   }
 
   def assignment_json(assignment, user, session, opts = {})
-    opts.reverse_merge! include_discussion_topic: true, override_dates: true
+    opts.reverse_merge!(
+      include_discussion_topic: true,
+      include_all_dates: false,
+      override_dates: true
+    )
 
     if opts[:override_dates] && !assignment.new_record?
       assignment = assignment.overridden_for(user)
@@ -147,6 +151,10 @@ module Api::V1::Assignment
         user,
         session,
         !:include_assignment)
+    end
+
+    if opts[:include_all_dates] && assignment.assignment_overrides
+      hash['all_dates'] = assignment.dates_hash_visible_to(user)
     end
 
     #show published/unpublished if account.settings[:enable_draft]

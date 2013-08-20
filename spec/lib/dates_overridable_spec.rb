@@ -115,12 +115,56 @@ shared_examples_for "an object whose dates are overridable" do
     end
   end
 
+  describe "#dates_hash_visible_to" do
+
+    before :each do
+      overridable.active_assignment_overrides.stubs(:visible_to => true)
+
+      override.set = course.default_section
+      override.override_due_at(7.days.from_now)
+      override.save!
+
+      @section2 = course.course_sections.create!(:name => "Summer session")
+    end
+
+    it "only returns active overrides" do
+      overridable.dates_hash_visible_to(@teacher).size.should == 2
+    end
+
+    it "includes the original date as a hash" do
+      dates_hash = overridable.dates_hash_visible_to(@teacher)
+      dates_hash.size.should == 2
+
+      override = dates_hash[0]
+      original = dates_hash[1]
+
+      dates_hash.sort_by! {|d| d[:title].to_s }
+      dates_hash[0][:title].should be_nil
+      dates_hash[1][:title].should == "value for name"
+    end
+
+    it "not include original dates if all sections are overriden" do
+      override2 = assignment_override_model(overridable_type => overridable)
+      override2.set = @section2
+      override2.override_due_at(8.days.from_now)
+      override2.save!
+
+      dates_hash = overridable.dates_hash_visible_to(user)
+      dates_hash.size.should == 2
+
+      dates_hash.sort_by! {|d| d[:title] }
+      dates_hash[0][:title].should == "Summer session"
+      dates_hash[1][:title].should == "value for name"
+    end
+
+  end
+
   describe "without_overrides" do
     it "returns an object with no overrides applied" do
       overridable.without_overrides.overridden.should be_false
     end
   end
-    
+
   describe "#overrides_visible_to(user)" do
     before :each do
       override.set = course.default_section

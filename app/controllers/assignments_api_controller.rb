@@ -51,6 +51,16 @@
 #       // information from the API.
 #       "unlock_at": "2012-07-01T23:59:00-06:00",
 #
+#       // (Optional) all dates associated with the assignment, if applicable
+#       "all_dates": [
+#         {
+#           "title":     "Summer Session",
+#           "due_at":    "2013-08-28T23:59:00-06:00",
+#           "unlock_at": "2013-08-01T00:00:00-06:00",
+#           "lock_at":   "2013-08-31T23:59:00-06:00"
+#         }
+#       ],
+#
 #       // the ID of the course the assignment belongs to
 #       "course_id": 123,
 #

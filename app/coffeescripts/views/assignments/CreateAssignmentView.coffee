@@ -1,21 +1,21 @@
 define [
   'underscore'
-  'compiled/views/DialogFormView'
   'compiled/models/Assignment'
+  'compiled/views/DialogFormView'
   'jst/assignments/CreateAssignment'
   'jst/EmptyDialogFormWrapper'
+  'jquery'
   'jquery.instructure_date_and_time'
-], (_, DialogFormView, Assignment, template, wrapper) ->
+], (_, Assignment, DialogFormView, template, wrapper, $) ->
 
   class CreateAssignmentView extends DialogFormView
     defaults:
       width: 500
-      height: 330
+      height: 350
 
-    events: _.extend({}, @::events,
+    events: _.extend {}, @::events,
       'click .dialog_closer': 'close'
       'click .more_options': 'moreOptions'
-    )
 
     template: template
     wrapperTemplate: wrapper
@@ -24,37 +24,62 @@ define [
 
     initialize: ->
       super
-      @generateNewModel()
+      @model ?= @generateNewAssignment()
+      @on "close", -> @$el[0].reset()
 
-    onSaveSuccess: ->
+    onSaveSuccess: =>
       super
-      @assignmentGroup.get('assignments').add(@model)
+      if @assignmentGroup
+        @assignmentGroup.get('assignments').add(@model)
+        @model = @generateNewAssignment()
 
     moreOptions: ->
+      valid = ['submission_types', 'name', 'due_at', 'points_possible', 'assignment_group_id']
+
       data = @getFormData()
-      data.assignment_group_id = @assignmentGroup.get('id')
-      params = ''
-      separator = '?'
-      _.each ['submission_types', 'name', 'due_at', 'points_possible', 'assignment_group_id'], (field) ->
-        if data[field] && data[field] != ''
-          params += "#{separator}#{field}=#{data[field]}"
-          separator = '&' if separator == '?'
+      data.assignment_group_id = @assignmentGroup.get('id') if @assignmentGroup
 
-      window.location = "#{ENV.URLS.new_assignment_url}#{params}"
+      dataParams = {}
+      _.each data, (value, key) ->
+        if value and _.contains(valid, key) and value != ""
+          dataParams[key] = value
 
-    generateNewModel: ->
-      @model = new Assignment
-      @model.assignmentGroupId(@assignmentGroup.id) if @assignmentGroup
+      url = if @assignmentGroup then @newAssignmentUrl() else @model.htmlEditUrl()
+
+      @redirectTo("#{url}?#{$.param(dataParams)}")
+
+    redirectTo: (url) ->
+      window.location.href = url
+
+    generateNewAssignment: ->
+      assign = new Assignment
+      assign.assignmentGroupId(@assignmentGroup.id) if @assignmentGroup
+      assign
 
     toJSON: ->
-      json = @model.toJSON()
-      _.extend(json, {
-        label_id: @assignmentGroup.get('id')
-      })
+      json = @model.toView()
+
+      uniqLabel = if @assignmentGroup
+        "ag_#{@assignmentGroup.get('id')}"
+      else
+        "assign_#{@model.get('id')}"
+
+      _.extend json,
+        canChooseType: @assignmentGroup?
+        uniqLabel: uniqLabel
 
     openAgain: ->
-      @generateNewModel()
-      @render()
       super
-      if !@$el.find(".datetime_field").hasClass("datetime_field_enabled")
-        @$el.find(".datetime_field").datetime_field()
+
+      timeField = @$el.find(".datetime_field")
+      if @model.multipleDueDates()
+        timeField.tooltip
+          position: {my: 'center bottom', at: 'center top-10', collision: 'fit fit'},
+          tooltipClass: 'center bottom vertical',
+          content: -> $($(@).data('tooltipSelector')).html()
+      else
+        timeField.datetime_field() unless timeField.hasClass("hasDatepicker")
+
+    newAssignmentUrl: ->
+      ENV.URLS.new_assignment_url
+
