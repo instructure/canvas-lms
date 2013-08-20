@@ -1004,6 +1004,12 @@ if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
       set_standard_conforming_strings_without_version_check unless postgresql_version >= 90100
     end
     alias_method_chain :set_standard_conforming_strings, :version_check
+
+    # we always use the default sequence name, so override it to not actually query the db
+    # (also, it doesn't matter if you're using PG 8.2+)
+    def default_sequence_name(table, pk)
+      "#{table}_#{pk}_seq"
+    end
   end
 
 end
