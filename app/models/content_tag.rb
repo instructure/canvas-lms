@@ -235,7 +235,7 @@ class ContentTag < ActiveRecord::Base
           alignment_conditions[:context_id] = self.context_id
           alignment_conditions[:context_type] = self.context_type
         end
-        alignment = ContentTag.learning_outcome_alignments.where(alignment_conditions).first
+        alignment = ContentTag.learning_outcome_alignments.active.where(alignment_conditions).first
         # then don't let them delete the link
         raise LastLinkToOutcomeNotDestroyed.new(alignment) if alignment
       end

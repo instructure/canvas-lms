@@ -83,6 +83,17 @@ describe "outcomes" do
         LearningOutcome.find_by_short_description(title).should be_present
       end
     end
+
+    context "#show" do
+      it "should show rubrics as aligned items" do
+        outcome_with_rubric
+
+        get "/courses/#{@course.id}/outcomes/#{@outcome.id}"
+        wait_for_ajaximations
+
+        f('#alignments').text.should match(/#{@rubric.title}/)
+      end
+    end
   end
 
   describe "as a teacher" do

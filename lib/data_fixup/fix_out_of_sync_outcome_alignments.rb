@@ -19,7 +19,7 @@ module DataFixup::FixOutOfSyncOutcomeAlignments
         ON content_tags.content_id = r.id
         AND content_tags.content_type = 'Rubric'
     ").where("
-      content_tags.tag_type = 'learning_outcome' 
+      content_tags.tag_type = 'learning_outcome'
       AND content_tags.workflow_state = 'active'
       AND r.workflow_state = 'active'
       AND NOT r.data LIKE '%:learning_outcome_id: ' || content_tags.learning_outcome_id || '%'

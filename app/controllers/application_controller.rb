@@ -1050,6 +1050,8 @@ class ApplicationController < ActionController::Base
       redirect_to named_context_url(context, :context_quiz_url, tag.content_id, url_params)
     elsif tag.content_type == 'DiscussionTopic'
       redirect_to named_context_url(context, :context_discussion_topic_url, tag.content_id, url_params)
+    elsif tag.content_type == 'Rubric'
+      redirect_to named_context_url(context, :context_rubric_url, tag.content_id, url_params)
     elsif tag.content_type == 'ExternalUrl'
       @tag = tag
       @module = tag.context_module
