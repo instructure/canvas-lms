@@ -1,10 +1,11 @@
 class QuizRegrader
 
-  attr_reader :quiz
+  attr_reader :quiz, :quiz_version_number
 
-  def initialize(quiz, submissions=nil)
-    @quiz = quiz
-    @submissions = submissions
+  def initialize(options)
+    @quiz_version_number = options.fetch(:version_number, nil)
+    @quiz                = find_quiz_version(options.fetch(:quiz))
+    @submissions         = options.fetch(:submissions, nil)
   end
 
   def regrade!
@@ -20,8 +21,8 @@ class QuizRegrader
     end
   end
 
-  def self.regrade!(quiz, submissions=nil)
-    QuizRegrader.new(quiz, submissions).regrade!
+  def self.regrade!(options)
+    QuizRegrader.new(options).regrade!
   end
 
   def submissions
@@ -32,6 +33,14 @@ class QuizRegrader
   end
 
   private
+
+  def find_quiz_version(quiz)
+    return quiz unless quiz_version_number.present?
+    Version.where(
+      versionable_type: "Quiz",
+      versionable_id: quiz.id,
+      number: quiz_version_number).first.model
+  end
 
   # quiz question regrades keyed by question id
   def question_regrades

@@ -1236,7 +1236,11 @@ class Quiz < ActiveRecord::Base
 
   def regrade_if_published
     unless unpublished_changes?
-      QuizRegrader.send_later_if_production(:regrade!, self)
+      options = {
+        quiz: self,
+        version_number: self.version_number
+      }
+      QuizRegrader.send_later(:regrade!, options)
     end
     true
   end
