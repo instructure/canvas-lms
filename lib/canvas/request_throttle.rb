@@ -18,21 +18,39 @@ require 'set'
 
 module Canvas
 class RequestThrottle
+  # this @@last_sample data isn't thread-safe, and if canvas ever becomes
+  # multi-threaded, we'll have to just get rid of it since we can't measure
+  # per-thread heap used
+  @@last_sample = 0
+
   def initialize(app)
     @app = app
   end
 
   def call(env)
+    starting_mem = Canvas.sample_memory()
+    starting_cpu = Process.times()
+
     request = ActionController::Request.new(env)
     # workaround a rails bug where some ActionController::Request methods blow
     # up when using certain servers until request_uri is called once to set env['REQUEST_URI']
     request.request_uri
 
-    if !allowed?(request)
+    result = if !allowed?(request)
       rate_limit_exceeded
     else
       @app.call(env)
     end
+
+    ending_cpu = Process.times()
+    ending_mem = Canvas.sample_memory()
+
+    user_cpu = ending_cpu.utime - starting_cpu.utime
+    system_cpu = ending_cpu.stime - starting_cpu.stime
+    account = env["canvas.domain_root_account"]
+    report_on_stats(account, starting_mem, ending_mem, user_cpu, system_cpu)
+
+    result
   end
 
   def allowed?(request)
@@ -88,6 +106,29 @@ class RequestThrottle
       { 'Content-Type' => 'text/plain; charset=utf-8' },
       ["403 #{Rack::Utils::HTTP_STATUS_CODES[403]} (Rate Limit Exceeded)\n"]
     ]
+  end
+
+  def report_on_stats(account, starting_mem, ending_mem, user_cpu, system_cpu)
+    if account
+      Canvas::Statsd.timing("requests_user_cpu.account_#{account.id}", user_cpu)
+      Canvas::Statsd.timing("requests_system_cpu.account_#{account.id}", system_cpu)
+      Canvas::Statsd.timing("requests_user_cpu.shard_#{account.shard.id}", user_cpu)
+      Canvas::Statsd.timing("requests_system_cpu.shard_#{account.shard.id}", system_cpu)
+
+      if account.shard.respond_to?(:database_server)
+        Canvas::Statsd.timing("requests_system_cpu.cluster_#{account.shard.database_server.id}", system_cpu)
+        Canvas::Statsd.timing("requests_user_cpu.cluster_#{account.shard.database_server.id}", user_cpu)
+      end
+    end
+
+    mem_stat = if starting_mem == 0 || ending_mem == 0
+                 "? ? ? ?"
+               else
+                 "#{starting_mem} #{ending_mem} #{ending_mem - starting_mem} #{@@last_sample}"
+               end
+
+    Rails.logger.info "[STAT] #{mem_stat} #{user_cpu} #{system_cpu}"
+    @@last_sample = ending_mem
   end
 end
 end
