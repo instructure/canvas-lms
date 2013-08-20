@@ -300,14 +300,15 @@ describe ContentMigrationsController, :type => :integration do
         @migration.workflow_state = 'exported'
         @migration.migration_settings[:import_immediately] = false
         @migration.save!
-        @post_params = {:copy => {:all_assignments => true}}
+        @post_params = {:copy => {:all_assignments => true, :context_modules => {'id_9000' => true}}}
       end
 
       it "should set the selective data" do
         json = api_call(:put, @migration_url, @params, @post_params)
         @migration.reload
-        @migration.migration_settings[:migration_ids_to_import].should == {'copy' => {'all_assignments' => 'true'}}
-        @migration.copy_options.should == {'all_assignments' => 'true'}
+        copy_options = {'all_assignments' => 'true', 'context_modules' => {'9000' => 'true'}}
+        @migration.migration_settings[:migration_ids_to_import].should == {'copy' => copy_options}
+        @migration.copy_options.should == copy_options
       end
 
       it "should queue a course copy after selecting content" do

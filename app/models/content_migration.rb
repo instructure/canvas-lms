@@ -597,4 +597,21 @@ class ContentMigration < ActiveRecord::Base
       self.save
     end
   end
+
+  # strips out the "id_" prepending the migration ids in the form
+  def self.process_copy_params(hash)
+    return {} if hash.blank? || !hash.is_a?(Hash)
+    hash.values.each do |sub_hash|
+      next unless sub_hash.is_a?(Hash) # e.g. second level in :copy => {:context_modules => {:id_100 => true, etc}}
+
+      clean_hash = {}
+      sub_hash.keys.each do |k|
+        if k.is_a?(String) && k.start_with?("id_")
+          clean_hash[k.sub("id_", "")] = sub_hash.delete(k)
+        end
+      end
+      sub_hash.merge!(clean_hash)
+    end
+    hash
+  end
 end

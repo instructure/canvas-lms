@@ -63,10 +63,10 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
 
     it "should group assignments into assignment groups" do
       @formatter.get_content_list('assignments').should == [
-              {:type => "assignment_groups", :property => "copy[assignment_groups][a1]", :title => "a1", :migration_id => "a1",
-                 "sub_items" => [{:type => "assignments", :property => "copy[assignments][a2]", :title => "a2", :migration_id => "a2"}]
+              {:type => "assignment_groups", :property => "copy[assignment_groups][id_a1]", :title => "a1", :migration_id => "a1",
+                 "sub_items" => [{:type => "assignments", :property => "copy[assignments][id_a2]", :title => "a2", :migration_id => "a2"}]
               },
-              {:type => "assignments", :property => "copy[assignments][a1]", :title => "a1", :migration_id => "a1"}
+              {:type => "assignments", :property => "copy[assignments][id_a1]", :title => "a1", :migration_id => "a1"}
       ]
     end
 
@@ -80,42 +80,42 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
                                                 'a5' => {'path_name' => 'a5.html', 'file_name' => 'a5.html', 'migration_id' => 'a5'},
                                       }}.to_json)
       @formatter.get_content_list('attachments').should == [{:type => "folders",
-                                                             :property => "copy[folders][0cc175b9c0f1b6a831c399e269772661]",
+                                                             :property => "copy[folders][id_0cc175b9c0f1b6a831c399e269772661]",
                                                              :title => "a",
                                                              :migration_id => "0cc175b9c0f1b6a831c399e269772661",
                                                              :sub_items =>
                                                                      [{:type => "attachments",
-                                                                       :property => "copy[attachments][a1]",
+                                                                       :property => "copy[attachments][id_a1]",
                                                                        :title => "a1.html",
                                                                        :migration_id => "a1",
                                                                        :path => "a"},
                                                                       {:type => "attachments",
-                                                                       :property => "copy[attachments][a2]",
+                                                                       :property => "copy[attachments][id_a2]",
                                                                        :title => "a2.html",
                                                                        :migration_id => "a2",
                                                                        :path => "a"}]},
                                                             {:type => "folders",
-                                                             :property => "copy[folders][a7e86136543b019d72468ceebf71fb8e]",
+                                                             :property => "copy[folders][id_a7e86136543b019d72468ceebf71fb8e]",
                                                              :title => "a/b",
                                                              :migration_id => "a7e86136543b019d72468ceebf71fb8e",
                                                              :sub_items =>
                                                                      [{:type => "attachments",
-                                                                       :property => "copy[attachments][a3]",
+                                                                       :property => "copy[attachments][id_a3]",
                                                                        :title => "a3.html",
                                                                        :migration_id => "a3",
                                                                        :path => "a/b"}]},
                                                             {:type => "folders",
-                                                             :property => "copy[folders][cff49f359f080f71548fcee824af6ad3]",
+                                                             :property => "copy[folders][id_cff49f359f080f71548fcee824af6ad3]",
                                                              :title => "a/b/c",
                                                              :migration_id => "cff49f359f080f71548fcee824af6ad3",
                                                              :sub_items =>
                                                                      [{:type => "attachments",
-                                                                       :property => "copy[attachments][a4]",
+                                                                       :property => "copy[attachments][id_a4]",
                                                                        :title => "a4.html",
                                                                        :migration_id => "a4",
                                                                        :path => "a/b/c"}]},
                                                             {:type => "attachments",
-                                                             :property => "copy[attachments][a5]",
+                                                             :property => "copy[attachments][id_a5]",
                                                              :title => "a5.html",
                                                              :migration_id => "a5",
                                                              :path => "a5.html"}]

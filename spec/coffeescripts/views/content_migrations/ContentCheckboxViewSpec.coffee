@@ -31,25 +31,25 @@ define [
     @serverResponse = -> [200, { "Content-Type": "application/json" }, JSON.stringify([
                                               {
                                                   "type": "assignment_groups",
-                                                  "property": "copy[assignment_groups][i6314c45816f1cc6d9519d88e4b7f64ab]",
+                                                  "property": "copy[assignment_groups][id_i6314c45816f1cc6d9519d88e4b7f64ab]",
                                                   "title": "Assignments",
                                                   "migration_id": "i6314c45816f1cc6d9519d88e4b7f64ab",
                                                   "sub_items": [
                                                       {
                                                           "type": "assignments",
-                                                          "property": "copy[assignments][i1a139fc4cbf94f961973c63bd90fc1c7]",
+                                                          "property": "copy[assignments][id_i1a139fc4cbf94f961973c63bd90fc1c7]",
                                                           "title": "Assignment 1",
                                                           "migration_id": "i1a139fc4cbf94f961973c63bd90fc1c7"
                                                       },
                                                       {
                                                           "type": "assignments",
-                                                          "property": "copy[assignments][i7af74171d7c7207f1578328d8bbf9dae]",
+                                                          "property": "copy[assignments][id_i7af74171d7c7207f1578328d8bbf9dae]",
                                                           "title": "Unnamed Quiz",
                                                           "migration_id": "i7af74171d7c7207f1578328d8bbf9dae"
                                                       },
                                                       {
                                                           "type": "assignments",
-                                                          "property": "copy[assignments][i4af043da2399a5ec221f666b38714fa8]",
+                                                          "property": "copy[assignments][id_i4af043da2399a5ec221f666b38714fa8]",
                                                           "title": "Unnamed Quiz",
                                                           "migration_id": "i4af043da2399a5ec221f666b38714fa8",
                                                           "linked_resource": {
@@ -120,7 +120,6 @@ define [
     equal $subCheckboxes.length, 3
 
     $subCheckboxes[2].click()
-
     ok !$($subCheckboxes[1]).is(':checked'), "Unchecked linked resource"
 
     $subCheckboxes[2].click()

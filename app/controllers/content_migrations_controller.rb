@@ -364,9 +364,10 @@ class ContentMigrationsController < ApplicationController
         params[:do_not_run] = true
       end
     elsif params[:copy]
+      copy_options = ContentMigration.process_copy_params(params[:copy])
       @content_migration.migration_settings[:migration_ids_to_import] ||= {}
-      @content_migration.migration_settings[:migration_ids_to_import][:copy] = params[:copy]
-      @content_migration.copy_options = params[:copy]
+      @content_migration.migration_settings[:migration_ids_to_import][:copy] = copy_options
+      @content_migration.copy_options = copy_options
     else
       @content_migration.migration_settings[:import_immediately] = true
       @content_migration.copy_options = {:everything => true}

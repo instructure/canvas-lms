@@ -161,7 +161,7 @@ define [
       linkedItem = @model.get('linked_resource')
       checked = @$el.find("#checkbox-#{@cid}").is(':checked')
 
-      linkedProperty = "copy[#{linkedItem.type}][#{linkedItem.migration_id}]"
+      linkedProperty = "copy[#{linkedItem.type}][id_#{linkedItem.migration_id}]"
 
       $collection_box = $("[name=\"copy[all_#{linkedItem.type}]\"]")
       if !checked && $collection_box.is(':checked')

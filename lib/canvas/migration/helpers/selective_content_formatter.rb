@@ -114,7 +114,7 @@ module Canvas::Migration::Helpers
           content_list << item_hash('attachments', atts[0])
         else
           mig_id = Digest::MD5.hexdigest(folder_name)
-          folder = {type: 'folders', property: "copy[folders][#{mig_id}]", title: folder_name, migration_id: mig_id, sub_items: []}
+          folder = {type: 'folders', property: "copy[folders][id_#{mig_id}]", title: folder_name, migration_id: mig_id, sub_items: []}
           content_list << folder
           atts.each {|att| folder[:sub_items] << item_hash('attachments', att)}
         end
@@ -124,7 +124,7 @@ module Canvas::Migration::Helpers
     def item_hash(type, item)
       hash = {
               type: type,
-              property: "copy[#{type}][#{item['migration_id']}]",
+              property: "copy[#{type}][id_#{item['migration_id']}]",
               title: item['title'],
               migration_id: item['migration_id']
       }
@@ -245,7 +245,7 @@ module Canvas::Migration::Helpers
       title ||= item.short_description if item.respond_to?(:short_description)
       title ||= ''
 
-      hash = {type: type, property: "copy[#{type}][#{mig_id}]", title: title, migration_id: mig_id}
+      hash = {type: type, property: "copy[#{type}][id_#{mig_id}]", title: title, migration_id: mig_id}
       hash = course_linked_resource(item, hash)
 
       hash
