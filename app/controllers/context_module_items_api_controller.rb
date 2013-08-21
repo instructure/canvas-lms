@@ -24,6 +24,9 @@
 #       // the unique identifier for the module item
 #       id: 768,
 #
+#       // the id of the Module this item appears in
+#       module_id: 123,
+#
 #       // the position of this item in the module (1-based)
 #       position: 1,
 #
@@ -79,6 +82,59 @@
 #         lock_at: "2012-12-31T06:00:00-06:00"
 #       }
 #
+#     }
+#
+#
+# @object Module Item Sequence
+#     {
+#       // an array containing one hash for each appearence of the asset in the module sequence
+#       // (up to 10 total)
+#       items:
+#         [
+#           {
+#             // the ModuleItem for the previous asset in the sequence, if present
+#             // this is the previous asset in the module, or the last asset in the previous module,
+#             // or null if this is the first module item in the course sequence
+#             prev: null,
+#
+#             // the ModuleItem for the requested asset
+#             current:
+#               {
+#                 id: 768,
+#                 module_id: 123,
+#                 title: "A lonely page",
+#                 type: "Page",
+#                 ...
+#               },
+#
+#             // the ModuleItem for the next asset in the sequence, if present
+#             // this is the next asset in the module, or the first asset in the next module,
+#             // or null if this is the last module item in the course sequence
+#             next:
+#               {
+#                 id: 769,
+#                 module_id: 127,
+#                 title: "Project 1",
+#                 type: "Assignment",
+#                 ...
+#               }
+#           }
+#         ],
+#
+#       // an array containing each Module referenced above
+#       modules:
+#         [
+#           {
+#             id: 123,
+#             name: "Module A",
+#             ...
+#           },
+#           {
+#             id: 127,
+#             name: "Module B",
+#             ...
+#           }
+#         ]
 #     }
 class ContextModuleItemsApiController < ApplicationController
   before_filter :require_context
@@ -357,6 +413,93 @@ class ContextModuleItemsApiController < ApplicationController
       @tag.destroy
       @module.touch
       render :json => module_item_json(@tag, @current_user, session, @module, nil)
+    end
+  end
+
+  MAX_SEQUENCES = 10
+
+  # @API Get module item sequence
+  #
+  # Given an asset in a course, find the Module Item it belongs to, and also the previous and next Module Items
+  # in the course sequence.
+  #
+  # @argument asset_type [String, "ModuleItem"|"File"|"Page"|"Discussion"|"Assignment"|"Quiz"|"ExternalTool"]
+  #   The type of asset to find module sequence information for. Use the ModuleItem if it is known
+  #   (e.g., the user navigated from a module item), since this will avoid ambiguity if the asset
+  #   appears more than once in the module sequence.
+  #
+  # @argument asset_id [Integer]
+  #   The id of the asset (or the url in the case of a Page)
+  #
+  # @example_request
+  #
+  #     curl https://<canvas>/api/v1/courses/<course_id>/module_item_sequence?asset_type=Assignment&asset_id=123 \
+  #       -H 'Authorization: Bearer <token>'
+  #
+  # @returns Module Item Sequence
+  def item_sequence
+    if authorized_action(@context, @current_user, :read)
+      asset_type = Api.api_type_to_canvas_name(params[:asset_type])
+      return render :json => { :message => 'invalid asset_type'}, :status => :bad_request unless asset_type
+      asset_id = params[:asset_id]
+      return render :json => { :message => 'missing asset_id' }, :status => :bad_request unless asset_id
+
+      # assemble a sequence of content tags in the course
+      tags = @context.module_items_visible_to(@current_user).
+          select('content_tags.*, context_modules.position AS module_position').
+          reject { |item| item.content_type == 'ContextModuleSubHeader' }.
+          sort_by { |item| [item.module_position.to_i, item.position] }
+
+      # find content tags to include
+      tag_indices = []
+      if asset_type == 'ContentTag'
+        tag_ix = tags.each_index.detect { |ix| tags[ix].id == asset_id.to_i }
+        tag_indices << tag_ix if tag_ix
+      else
+        # map wiki page url to id
+        if asset_type == 'WikiPage'
+          page = @context.wiki.wiki_pages.find_by_url(asset_id)
+          asset_id = page.id if page
+        else
+          asset_id = asset_id.to_i
+        end
+
+        # find the associated assignment id, if applicable
+        if (asset_type == 'DiscussionTopic' || asset_type == 'Quiz')
+          asset = @context.send(asset_type.tableize).find_by_id(asset_id.to_i)
+          associated_assignment_id = asset.assignment_id if asset
+        end
+
+        # find up to MAX_SEQUENCES tags containing the object (or its associated assignment)
+        tags.each_index do |ix|
+          if (tags[ix].content_type == asset_type && tags[ix].content_id == asset_id) ||
+             (associated_assignment_id && tags[ix].content_type == 'Assignment' && tags[ix].content_id == associated_assignment_id)
+            tag_indices << ix
+            break if tag_indices.length == MAX_SEQUENCES
+          end
+        end
+      end
+
+      # render the result
+      module_ids = Set.new
+      result = { :items => [] }
+      tag_indices.each do |ix|
+        hash = { :current => module_item_json(tags[ix], @current_user, session), :prev => nil, :next => nil }
+        module_ids << tags[ix].context_module_id
+        if ix > 0
+          hash[:prev] = module_item_json(tags[ix - 1], @current_user, session)
+          module_ids << tags[ix - 1].context_module_id
+        end
+        if ix < tags.size - 1
+          hash[:next] = module_item_json(tags[ix + 1], @current_user, session)
+          module_ids << tags[ix + 1].context_module_id
+        end
+        result[:items] << hash
+      end
+      modules = @context.context_modules.find_all_by_id(module_ids.to_a)
+      result[:modules] = modules.map { |mod| module_json(mod, @current_user, session) }
+
+      render :json => result
     end
   end
 

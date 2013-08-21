@@ -468,7 +468,22 @@ module Api
                     "Quiz" => "Quiz",
                     "ContextModuleSubHeader" => "SubHeader",
                     "ExternalUrl" => "ExternalUrl",
-                    "ContextExternalTool" => "ExternalTool" }.freeze
+                    "ContextExternalTool" => "ExternalTool",
+                    "ContextModule" => "Module",
+                    "ContentTag" => "ModuleItem" }.freeze
+
+  # matches the other direction, case insensitively
+  def self.api_type_to_canvas_name(api_type)
+    unless @inverse_map
+      m = {}
+      API_DATA_TYPE.each do |k, v|
+        m[v.downcase] = k
+      end
+      @inverse_map = m
+    end
+    return nil unless api_type
+    @inverse_map[api_type.downcase]
+  end
 
   # maps canvas URLs to API URL helpers
   # target array is return type, helper, name of each capture, and optionally a Hash of extra arguments

@@ -1263,6 +1263,7 @@ FakeRails3Routes.draw do
       get "courses/:course_id/modules/:module_id/items", :action => :index, :path_name => 'course_context_module_items'
       get "courses/:course_id/modules/:module_id/items/:id", :action => :show, :path_name => 'course_context_module_item'
       get "courses/:course_id/module_item_redirect/:id", :action => :redirect, :path_name => 'course_context_module_item_redirect'
+      get "courses/:course_id/module_item_sequence", :action => :item_sequence
       post "courses/:course_id/modules/:module_id/items", :action => :create, :path_name => 'course_context_module_items_create'
       put "courses/:course_id/modules/:module_id/items/:id", :action => :update, :path_name => 'course_context_module_item_update'
       delete "courses/:course_id/modules/:module_id/items/:id", :action => :destroy

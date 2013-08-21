@@ -603,6 +603,147 @@ describe "Module Items API", :type => :integration do
       @assignment_tag.reload
       @assignment_tag.workflow_state.should == 'deleted'
     end
+
+    describe "GET 'module_item_sequence'" do
+      it "should 400 if the asset_type is missing" do
+        api_call(:get, "/api/v1/courses/#{@course.id}/module_item_sequence?asset_id=999",
+                 { :controller => "context_module_items_api", :action => "item_sequence", :format => "json",
+                   :course_id => @course.to_param, :asset_id => '999' }, {}, {}, { :expected_status => 400 })
+      end
+
+      it "should 400 if the asset_id is missing" do
+        api_call(:get, "/api/v1/courses/#{@course.id}/module_item_sequence?asset_type=quiz",
+                 { :controller => "context_module_items_api", :action => "item_sequence", :format => "json",
+                   :course_id => @course.to_param, :asset_type => 'quiz' }, {}, {}, { :expected_status => 400 })
+      end
+
+      it "should return a skeleton json structure if referencing an item that isn't in a module" do
+        other_quiz = @course.quizzes.create!
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/module_item_sequence?asset_type=quiz&asset_id=#{other_quiz.id}",
+                        :controller => "context_module_items_api", :action => "item_sequence", :format => "json",
+                        :course_id => @course.to_param, :asset_type => 'quiz', :asset_id => other_quiz.to_param)
+        json.should == { 'items' => [], 'modules' => [] }
+      end
+
+      it "should work with the first item" do
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/module_item_sequence?asset_type=Assignment&asset_id=#{@assignment.id}",
+                        :controller => "context_module_items_api", :action => "item_sequence", :format => "json",
+                        :course_id => @course.to_param, :asset_type => 'Assignment', :asset_id => @assignment.to_param)
+        json['items'].size.should eql 1
+        json['items'][0]['prev'].should be_nil
+        json['items'][0]['current']['id'].should == @assignment_tag.id
+        json['items'][0]['next']['id'].should == @quiz_tag.id
+        json['modules'].size.should eql 1
+        json['modules'][0]['id'].should == @module1.id
+      end
+
+      it "should skip subheader items" do
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/module_item_sequence?asset_type=ModuleItem&asset_id=#{@external_url_tag.id}",
+                        :controller => "context_module_items_api", :action => "item_sequence", :format => "json",
+                        :course_id => @course.to_param, :asset_type => 'ModuleItem', :asset_id => @external_url_tag.to_param)
+        json['items'].size.should eql 1
+        json['items'][0]['prev']['id'].should == @topic_tag.id
+        json['items'][0]['current']['id'].should == @external_url_tag.id
+        json['items'][0]['next']['id'].should == @wiki_page_tag.id
+        json['modules'].map {|mod| mod['id']}.sort.should == [@module1.id, @module2.id].sort
+      end
+
+      it "should find find a wiki page by url" do
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/module_item_sequence?asset_type=Page&asset_id=#{@wiki_page.url}",
+                        :controller => "context_module_items_api", :action => "item_sequence", :format => "json",
+                        :course_id => @course.to_param, :asset_type => 'Page', :asset_id => @wiki_page.to_param)
+        json['items'].size.should eql 1
+        json['items'][0]['prev']['id'].should == @external_url_tag.id
+        json['items'][0]['current']['id'].should == @wiki_page_tag.id
+        json['items'][0]['next']['id'].should == @attachment_tag.id
+        json['modules'].map {|mod| mod['id']}.sort.should == [@module1.id, @module2.id].sort
+      end
+
+      it "should skip a deleted module" do
+        new_tag = @module3.add_item(:id => @attachment.id, :type => 'attachment')
+        @module2.destroy
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/module_item_sequence?asset_type=ModuleItem&asset_id=#{@external_url_tag.id}",
+                        :controller => "context_module_items_api", :action => "item_sequence", :format => "json",
+                        :course_id => @course.to_param, :asset_type => 'ModuleItem', :asset_id => @external_url_tag.to_param)
+        json['items'].size.should eql 1
+        json['items'][0]['next']['id'].should eql new_tag.id
+        json['modules'].map {|mod| mod['id']}.sort.should == [@module1.id, @module3.id].sort
+      end
+
+      it "should skip a deleted item" do
+        @quiz_tag.destroy
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/module_item_sequence?asset_type=Assignment&asset_id=#{@assignment.id}",
+                        :controller => "context_module_items_api", :action => "item_sequence", :format => "json",
+                        :course_id => @course.to_param, :asset_type => 'Assignment', :asset_id => @assignment.to_param)
+        json['items'].size.should eql 1
+        json['items'][0]['current']['id'].should == @assignment_tag.id
+        json['items'][0]['next']['id'].should == @topic_tag.id
+      end
+
+      it "should find an item containing the assignment associated with a quiz" do
+        other_quiz = @course.quizzes.create!
+        other_quiz.publish!
+        wacky_tag = @module3.add_item(:type => 'assignment', :id => other_quiz.assignment.id)
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/module_item_sequence?asset_type=quiz&asset_id=#{other_quiz.id}",
+                        :controller => "context_module_items_api", :action => "item_sequence", :format => "json",
+                        :course_id => @course.to_param, :asset_type => 'quiz', :asset_id => other_quiz.to_param)
+        json['items'].size.should eql 1
+        json['items'][0]['current']['id'].should eql wacky_tag.id
+      end
+
+      it "should find an item containing the assignment associated with a graded discussion topic" do
+        discussion_assignment = @course.assignments.create!
+        other_topic = @course.discussion_topics.create! :assignment => discussion_assignment
+        wacky_tag = @module3.add_item(:type => 'assignment', :id => other_topic.assignment.id)
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/module_item_sequence?asset_type=discussioN&asset_id=#{other_topic.id}",
+                        :controller => "context_module_items_api", :action => "item_sequence", :format => "json",
+                        :course_id => @course.to_param, :asset_type => 'discussioN', :asset_id => other_topic.to_param)
+        json['items'].size.should eql 1
+        json['items'][0]['current']['id'].should eql wacky_tag.id
+      end
+
+      context "with duplicate items" do
+        before do
+          @other_quiz_tag = @module3.add_item(:id => @quiz.id, :type => 'quiz')
+        end
+
+        it "should return multiple items" do
+          json = api_call(:get, "/api/v1/courses/#{@course.id}/module_item_sequence?asset_type=Quiz&asset_id=#{@quiz.id}",
+                          :controller => "context_module_items_api", :action => "item_sequence", :format => "json",
+                          :course_id => @course.to_param, :asset_type => 'Quiz', :asset_id => @quiz.to_param)
+          json['items'].size.should eql 2
+          json['items'][0]['prev']['id'].should == @assignment_tag.id
+          json['items'][0]['current']['id'].should == @quiz_tag.id
+          json['items'][0]['next']['id'].should == @topic_tag.id
+          json['items'][1]['prev']['id'].should == @attachment_tag.id
+          json['items'][1]['current']['id'].should == @other_quiz_tag.id
+          json['items'][1]['next'].should be_nil
+        end
+
+        it "should limit the number of sequences returned to 10" do
+          modules = (0..9).map do |x|
+            mod = @course.context_modules.create! :name => "I will do it #{x} times"
+            mod.add_item :type => 'assignment', :id => @assignment.id
+            mod
+          end
+          json = api_call(:get, "/api/v1/courses/#{@course.id}/module_item_sequence?asset_type=Assignment&asset_id=#{@assignment.id}",
+                          :controller => "context_module_items_api", :action => "item_sequence", :format => "json",
+                          :course_id => @course.to_param, :asset_type => 'Assignment', :asset_id => @assignment.to_param)
+          json['items'].size.should eql 10
+          json['items'][9]['current']['module_id'].should == modules[8].id
+        end
+
+        it "should return a single item, given the content tag" do
+          json = api_call(:get, "/api/v1/courses/#{@course.id}/module_item_sequence?asset_type=ModuleItem&asset_id=#{@quiz_tag.id}",
+                          :controller => "context_module_items_api", :action => "item_sequence", :format => "json",
+                          :course_id => @course.to_param, :asset_type => 'ModuleItem', :asset_id => @quiz_tag.to_param)
+          json['items'].size.should eql 1
+          json['items'][0]['prev']['id'].should == @assignment_tag.id
+          json['items'][0]['current']['id'].should == @quiz_tag.id
+          json['items'][0]['next']['id'].should == @topic_tag.id
+        end
+      end
+    end
   end
 
   context "as a student" do
@@ -732,6 +873,64 @@ describe "Module Items API", :type => :integration do
                {}, {},
                {:expected_status => 401}
       )
+    end
+
+    describe "GET 'module_item_sequence'" do
+      context "unpublished item" do
+        before do
+          @quiz_tag.unpublish
+        end
+
+        it "should not find an unpublished item" do
+          json = api_call(:get, "/api/v1/courses/#{@course.id}/module_item_sequence?asset_type=Quiz&asset_id=#{@quiz.id}",
+                          :controller => "context_module_items_api", :action => "item_sequence", :format => "json",
+                          :course_id => @course.to_param, :asset_type => 'Quiz', :asset_id => @quiz.to_param)
+          json['items'].should be_empty
+        end
+
+        it "should skip an unpublished item in the sequence" do
+          json = api_call(:get, "/api/v1/courses/#{@course.id}/module_item_sequence?asset_type=Assignment&asset_id=#{@assignment.id}",
+                          :controller => "context_module_items_api", :action => "item_sequence", :format => "json",
+                          :course_id => @course.to_param, :asset_type => 'Assignment', :asset_id => @assignment.to_param)
+          json['items'][0]['next']['id'].should eql @topic_tag.id
+
+          json = api_call(:get, "/api/v1/courses/#{@course.id}/module_item_sequence?asset_type=Discussion&asset_id=#{@topic.id}",
+                          :controller => "context_module_items_api", :action => "item_sequence", :format => "json",
+                          :course_id => @course.to_param, :asset_type => 'Discussion', :asset_id => @topic.to_param)
+          json['items'][0]['prev']['id'].should eql @assignment_tag.id
+        end
+      end
+
+      context "unpublished module" do
+        before do
+          @new_assignment_1 = @course.assignments.create!
+          @new_assignment_1_tag = @module3.add_item :type => 'assignment', :id => @new_assignment_1.id
+          @module4 = @course.context_modules.create!
+          @new_assignment_2 = @course.assignments.create!
+          @new_assignment_2_tag = @module4.add_item :type => 'assignment', :id => @new_assignment_2.id
+        end
+
+        it "should not find an item in an unpublished module" do
+          json = api_call(:get, "/api/v1/courses/#{@course.id}/module_item_sequence?asset_type=Assignment&asset_id=#{@new_assignment_1.id}",
+                          :controller => "context_module_items_api", :action => "item_sequence", :format => "json",
+                          :course_id => @course.to_param, :asset_type => 'Assignment', :asset_id => @new_assignment_1.to_param)
+          json['items'].should be_empty
+        end
+
+        it "should skip an unpublished module in the sequence" do
+          json = api_call(:get, "/api/v1/courses/#{@course.id}/module_item_sequence?asset_type=File&asset_id=#{@attachment.id}",
+                          :controller => "context_module_items_api", :action => "item_sequence", :format => "json",
+                          :course_id => @course.to_param, :asset_type => 'File', :asset_id => @attachment.to_param)
+          json['items'][0]['next']['id'].should == @new_assignment_2_tag.id
+          json['modules'].map { |item| item['id'] }.sort.should == [@module2.id, @module4.id].sort
+
+          json = api_call(:get, "/api/v1/courses/#{@course.id}/module_item_sequence?asset_type=Assignment&asset_id=#{@new_assignment_2.id}",
+                          :controller => "context_module_items_api", :action => "item_sequence", :format => "json",
+                          :course_id => @course.to_param, :asset_type => 'Assignment', :asset_id => @new_assignment_2.to_param)
+          json['items'][0]['prev']['id'].should == @attachment_tag.id
+          json['modules'].map { |item| item['id'] }.sort.should == [@module2.id, @module4.id].sort
+        end
+      end
     end
   end
 

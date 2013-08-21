@@ -248,6 +248,14 @@ class Course < ActiveRecord::Base
     end
   end
 
+  def module_items_visible_to(user)
+    if self.grants_right?(user, :manage_content)
+      self.context_module_tags.not_deleted.joins(:context_module).where("context_modules.workflow_state <> 'deleted'")
+    else
+      self.context_module_tags.active.joins(:context_module).where(:context_modules => {:workflow_state => 'active'})
+    end
+  end
+
   def verify_unique_sis_source_id
     return true unless self.sis_source_id
     infer_root_account unless self.root_account_id
