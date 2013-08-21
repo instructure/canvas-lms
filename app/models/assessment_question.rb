@@ -547,7 +547,8 @@ class AssessmentQuestion < ActiveRecord::Base
     else
       query = "INSERT INTO assessment_questions (name, question_data, workflow_state, created_at, updated_at, assessment_question_bank_id, migration_id)"
       query += " VALUES (#{question_name},#{question_data},'active', '#{Time.now.to_s(:db)}', '#{Time.now.to_s(:db)}', #{bank.id}, '#{hash[:migration_id]}')"
-      id = AssessmentQuestion.connection.insert(query)
+      id = AssessmentQuestion.connection.insert(query, "#{name} Create",
+                                                primary_key, nil, sequence_name)
       hash['assessment_question_id'] = id
     end
     if context.respond_to?(:content_migration) && context.content_migration

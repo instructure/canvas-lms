@@ -161,7 +161,8 @@ class QuizQuestion < ActiveRecord::Base
     else
       query = "INSERT INTO quiz_questions (quiz_id, quiz_group_id, assessment_question_id, question_data, created_at, updated_at, migration_id, position)"
       query += " VALUES (#{q_id}, #{g_id}, #{aq_id},#{question_data},'#{Time.now.to_s(:db)}', '#{Time.now.to_s(:db)}', '#{hash[:migration_id]}', #{position})"
-      id = self.connection.insert(query)
+      self.connection.insert(query, "#{name} Create",
+                             primary_key, nil, sequence_name)
     end
     hash
   end
