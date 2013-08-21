@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2012 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -963,10 +963,15 @@ class ApplicationController < ActionController::Base
         redirect_to(login_url(:needs_cookies => '1'))
         return false
       else
-        raise(ActionController::InvalidAuthenticityToken) unless (form_authenticity_token == form_authenticity_param) || (form_authenticity_token == request.headers['X-CSRF-Token'])
+        raise(ActionController::InvalidAuthenticityToken) unless BreachMitigation::MaskingSecrets.valid_authenticity_token?(session, form_authenticity_param) ||
+          BreachMitigation::MaskingSecrets.valid_authenticity_token?(session, request.headers['X-CSRF-Token'])
       end
     end
     Rails.logger.warn("developer_key id: #{@developer_key.id}") if @developer_key
+  end
+
+  def form_authenticity_token
+    BreachMitigation::MaskingSecrets.masked_authenticity_token(session)
   end
 
   API_REQUEST_REGEX = %r{\A/api/v\d}

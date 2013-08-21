@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -116,7 +116,12 @@ module AuthenticationMethods
         if @pseudonym_session.try(:used_basic_auth?) && params[:api_key].present?
           Shard.birth.activate { @developer_key = DeveloperKey.find_by_api_key(params[:api_key]) }
         end
-        @developer_key || request.get? || !allow_forgery_protection || form_authenticity_token == form_authenticity_param || form_authenticity_token == request.headers['X-CSRF-Token'] || raise(AccessTokenError)
+        @developer_key ||
+          request.get? ||
+          !allow_forgery_protection ||
+          BreachMitigation::MaskingSecrets.valid_authenticity_token?(session, form_authenticity_param) ||
+          BreachMitigation::MaskingSecrets.valid_authenticity_token?(session, request.headers['X-CSRF-Token']) ||
+          raise(AccessTokenError)
       end
     end
 
