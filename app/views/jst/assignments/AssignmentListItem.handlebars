@@ -1,4 +1,8 @@
-<div id="assignment_{{id}}" class="ig-row {{#if published}}ig-published{{/if}}" data-item-id="{{labelId}}">
+<div
+  id="assignment_{{id}}"
+  class="ig-row {{#ifAll ENV.PERMISSIONS.manage published}}ig-published{{/ifAll}}"
+  data-item-id="{{labelId}}"
+>
   <a href="{{htmlUrl}}" class="ig-title ellipses">
     <i class='icon-{{iconType}}'></i>
     {{name}}
@@ -10,9 +14,12 @@
           {{#ifEqual module_count 1}}
             {{module_name}} {{#t "module"}}Module{{/t}}
           {{else}}
-            <a href='#' title='{{joined_names}}' class="tooltip_link" data-tooltip-selector="#module_tooltip_{{labelId}}">
-              {{#t "multiple_modules"}}Multiple Modules{{/t}}
-            </a>
+            <a
+              href='#'
+              title='{{joined_names}}'
+              class="tooltip_link"
+              data-tooltip-selector="#module_tooltip_{{labelId}}"
+            >{{#t "multiple_modules"}}Multiple Modules{{/t}}</a>
           {{/ifEqual}}
           <div id="module_tooltip_{{labelId}}" style="display:none;">
             {{#each modules}}
