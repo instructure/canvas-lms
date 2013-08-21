@@ -85,7 +85,13 @@ class MediaObject < ActiveRecord::Base
       if wait_for_completion
         bulk_upload_id = res[:id]
         Rails.logger.debug "waiting for bulk upload id: #{bulk_upload_id}"
+        started_at = Time.now
+        timeout = Setting.get('media_bulk_upload_timeout', 30.minutes.to_s).to_i
         while !res[:ready]
+          if Time.now > started_at + timeout
+            MediaObject.send_later_enqueue_args(:refresh_media_files, {:run_at => 1.minute.from_now, :priority => Delayed::LOW_PRIORITY}, res[:id], attachments.map(&:id), root_account_id)
+            break
+          end
           sleep(1.minute.to_i)
           res = client.bulkUploadGet(bulk_upload_id)
         end
