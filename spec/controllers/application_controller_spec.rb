@@ -198,11 +198,10 @@ describe ApplicationController do
   describe 'initialize_wiki_page' do
     context 'course' do
       before(:each) do
-        @domain_root_account = mock()
-        @stub_enable_draft = @domain_root_account.stubs(:enable_draft?)
-
         course_with_teacher_logged_in
         @page = @course.wiki.wiki_pages.build(:title => 'Front Page', :url => 'front-page')
+
+        @stub_draft_state_enabled = @course.stubs(:draft_state_enabled?)
 
         @controller.instance_variable_set(:@domain_root_account, @domain_root_account)
         @controller.instance_variable_set(:@current_user, @teacher)
@@ -219,7 +218,7 @@ describe ApplicationController do
 
       context 'draft not enabled' do
         before(:each) do
-          @stub_enable_draft.returns(false)
+          @stub_draft_state_enabled.returns(false)
         end
 
         it 'should initialize a new page' do
@@ -259,7 +258,7 @@ describe ApplicationController do
 
       context 'draft enabled' do
         before(:each) do
-          @stub_enable_draft.returns(true)
+          @stub_draft_state_enabled.returns(true)
         end
 
         it 'should initialize a new page' do
@@ -300,13 +299,11 @@ describe ApplicationController do
 
     context 'group' do
       before(:each) do
-        @domain_root_account = mock()
-        @stub_enable_draft = @domain_root_account.stubs(:enable_draft?)
-
         group_with_user_logged_in
         @page = @group.wiki.wiki_pages.build(:title => 'Front Page', :url => 'front-page')
 
-        @controller.instance_variable_set(:@domain_root_account, @domain_root_account)
+        @stub_draft_state_enabled = @group.stubs(:draft_state_enabled?)
+
         @controller.instance_variable_set(:@current_user, @user)
         @controller.instance_variable_set(:@context, @group)
         @controller.instance_variable_set(:@wiki, @group.wiki)
@@ -321,7 +318,7 @@ describe ApplicationController do
 
       context 'draft not enabled' do
         before(:each) do
-          @stub_enable_draft.returns(false)
+          @stub_draft_state_enabled.returns(false)
         end
 
         it 'should initialize a new page' do
@@ -361,7 +358,7 @@ describe ApplicationController do
 
       context 'draft enabled' do
         before(:each) do
-          @stub_enable_draft.returns(true)
+          @stub_draft_state_enabled.returns(true)
         end
 
         it 'should initialize a new page' do

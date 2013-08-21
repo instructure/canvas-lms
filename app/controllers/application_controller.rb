@@ -986,7 +986,7 @@ class ApplicationController < ActionController::Base
     @wiki.check_has_front_page
 
     page_name = params[:wiki_page_id] || params[:id] || (params[:wiki_page] && params[:wiki_page][:title])
-    page_name ||= (@wiki.get_front_page_url || Wiki::DEFAULT_FRONT_PAGE_URL) unless @domain_root_account.enable_draft?
+    page_name ||= (@wiki.get_front_page_url || Wiki::DEFAULT_FRONT_PAGE_URL) unless @context.draft_state_enabled?
     if(params[:format] && !['json', 'html'].include?(params[:format]))
       page_name += ".#{params[:format]}"
       params[:format] = 'html'
@@ -1009,12 +1009,12 @@ class ApplicationController < ActionController::Base
   def initialize_wiki_page
     return unless @page.new_record? || @page.deleted?
 
-    unless @domain_root_account.enable_draft?
+    unless @context.draft_state_enabled?
       @page.set_as_front_page! if !@wiki.has_front_page? and @page.url == Wiki::DEFAULT_FRONT_PAGE_URL
     end
 
     is_privileged_user = is_authorized_action?(@page.wiki, @current_user, :manage)
-    if is_privileged_user && @domain_root_account.enable_draft? && !@context.is_a?(Group)
+    if is_privileged_user && @context.draft_state_enabled? && !@context.is_a?(Group)
       @page.workflow_state = 'unpublished'
     else
       @page.workflow_state = 'active'

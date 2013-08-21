@@ -25,8 +25,7 @@ class WikiPagesController < ApplicationController
   before_filter :set_js_wiki_data, :only => [:pages_index, :show_page, :edit_page]
   add_crumb(proc { t '#crumbs.wiki_pages', "Pages"}) do |c|
     context = c.instance_variable_get('@context')
-    domain_root_account = c.instance_variable_get('@domain_root_account')
-    if domain_root_account.enable_draft?
+    if context.draft_state_enabled?
       c.send :polymorphic_path, [context, :pages]
     else
       c.send :named_context_url, c.instance_variable_get("@context"), :context_wiki_pages_url
@@ -68,7 +67,7 @@ class WikiPagesController < ApplicationController
   def index
     return unless tab_enabled?(@context.class::TAB_PAGES)
 
-    if @domain_root_account.enable_draft?
+    if @context.draft_state_enabled?
       front_page
     else
       redirect_to named_context_url(@context, :context_wiki_page_url, @context.wiki.get_front_page_url || Wiki::DEFAULT_FRONT_PAGE_URL)

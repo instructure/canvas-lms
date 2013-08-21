@@ -568,6 +568,8 @@ class Group < ActiveRecord::Base
   #
   # Returns a boolean.
   def draft_state_enabled?
+    # shouldn't matter, but most specs create anonymous (contextless) groups :(
+    return false if context.nil?
     context.draft_state_enabled?
   end
 end

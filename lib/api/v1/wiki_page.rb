@@ -29,7 +29,7 @@ module Api::V1::WikiPage
     hash['last_edited_by'] = user_display_json(wiki_page.user, wiki_page.context) if wiki_page.user
     hash['published'] = wiki_page.active?
     hash['front_page'] = wiki_page.is_front_page?
-    if @domain_root_account && @domain_root_account.enable_draft?
+    if wiki_page.context.draft_state_enabled?
       hash['html_url'] = polymorphic_url([wiki_page.context, :named_page], :wiki_page_id => wiki_page)
     else
       hash['html_url'] = polymorphic_url([wiki_page.context, :named_wiki_page], :id => wiki_page)
