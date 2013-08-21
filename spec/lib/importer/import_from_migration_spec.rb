@@ -170,7 +170,7 @@ describe Course do
     
     #groups
     course.groups.length.should eql(2)
-    
+
     # files
     course.attachments.length.should eql(4)
     course.attachments.each do |file|
@@ -185,7 +185,27 @@ describe Course do
     file.filename.should eql("dropbox.zip")
     file.folder.full_name.should eql("course files/Course Content/Orientation/WebCT specific and old stuff")
   end
+
+  it "should not duplicate assessment questions in question banks" do
+    course
+
+    json = File.open(File.join(IMPORT_JSON_DIR, 'assessments.json')).read
+    data = JSON.parse(json).with_indifferent_access
+
+    params = {:copy => {"everything" => true}}
+    migration = ContentMigration.create!(:context => @course)
+    migration.migration_settings[:migration_ids_to_import] = params
+    migration.save!
+
+    @course.import_from_migration(data, params, migration)
+
+    aqb1 = @course.assessment_question_banks.find_by_migration_id("i7ed12d5eade40d9ee8ecb5300b8e02b2")
+    aqb1.assessment_questions.count.should == 3
+    aqb1 = @course.assessment_question_banks.find_by_migration_id("ife86eb19e30869506ee219b17a6a1d4e")
+    aqb1.assessment_questions.count.should == 2
+  end
 end
+
 def from_file_path(path, course)
   list = path.split("/").select{|f| !f.empty? }
   filename = list.pop
