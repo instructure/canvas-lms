@@ -17,6 +17,13 @@
 #
 
 require 'ostruct'
+
+class OpenStruct
+  def as_json(options={})
+    table
+  end
+end
+
 class OpenObject < OpenStruct
   attr_accessor :object_type
   def self.build(type, data={})
@@ -34,42 +41,9 @@ class OpenObject < OpenStruct
     return nil unless self.type && self.id
     "#{self.type.underscore}_#{self.id}"
   end
-  
-  def as_json
-    res = {}
-    self.table.each do |key, value|
-      res[key] = value
-      if value.is_a? Array
-        new_list = []
-        res[key].each do |obj|
-          if obj.is_a? OpenObject
-            new_list << obj.as_json
-          elsif obj.is_a? OpenStruct
-            new_list << obj.table
-          else
-            new_list << obj
-          end
-        end
-        res[key] = new_list
-      elsif value.is_a? Time
-        res[key] = value.utc.iso8601.to_s
-      elsif value.is_a? OpenObject
-        res[key] = value.as_json
-      elsif value.is_a? OpenStruct
-        res[key] = value.table
-      end
-    end
-    res
-  end
 
-  def to_json(context=nil)
-    if self.object_type
-      res = {}
-      res[self.object_type.to_sym] = self.as_json
-      res.to_json
-    else
-      self.as_json.to_json
-    end
+  def as_json(options={})
+    object_type ? {object_type => super} : super
   end
 
   def self.process(pre={})
