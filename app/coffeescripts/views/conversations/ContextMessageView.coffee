@@ -10,7 +10,8 @@ define [
     template: template
 
     events:
-      'click a': 'toggle'
+      'click a.context-more': 'toggle'
+      'click a.delete-btn': 'remove'
 
     initialize: ->
       @model.set(isCondensable: @model.get('body').length > 180)

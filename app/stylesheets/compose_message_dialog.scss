@@ -257,7 +257,7 @@ $subtleBorderColor: #e5e5e5;
     list-style: none;
     margin: 0;
 
-    li {
+    > li {
       border-top: 1px solid $subtleBorderColor;
       padding: 14px;
       clear: right;
@@ -267,8 +267,13 @@ $subtleBorderColor: #e5e5e5;
       color: #777;
     }
 
+    .context-date {
+      margin-right: 4px;
+    }
+
     .context-body {
       margin-top: 7px;
+      clear: both;
     }
   }
 

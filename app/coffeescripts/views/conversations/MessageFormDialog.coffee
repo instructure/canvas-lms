@@ -199,7 +199,15 @@ define [
       @$messageSubject.val(@model?.get('subject'))
 
       if messages = @model?.messageCollection
-        contextView = new ContextMessagesView(el: @$contextMessages, collection: messages)
+        # include only messages which
+        #   1) are older than @message
+        #   2) have as participants a superset of the participants of @message
+        date = new Date(@message.get('created_at'))
+        participants = @message.get('participating_user_ids')
+        includedMessages = new Collection messages.filter (m) ->
+          new Date(m.get('created_at')) <= date &&
+            !_.find(participants, (p) -> !_.contains(m.get('participating_user_ids'), p))
+        contextView = new ContextMessagesView(el: @$contextMessages, collection: includedMessages)
         contextView.render()
 
       @$fullDialog.on 'click', '.message-body', @handleBodyClick
@@ -229,7 +237,7 @@ define [
         disableWhileLoading: true
         required: ['body']
         property_validations:
-          token_capture: => I18n.t('errors.field_is_required', "This field is required") if @tokenInput and !@tokenInput.tokenValues().length
+          token_capture: => I18n.t('errors.field_is_required', "This field is required") if @recipientView and !@recipientView.tokens.length
         handle_files: (attachments, data) ->
           data.attachment_ids = (a.attachment.id for a in attachments)
           data
