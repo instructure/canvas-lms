@@ -122,8 +122,8 @@ module Canvas::Oauth
       end
     end
 
-    describe '#to_json' do
-      let(:json) { token.to_json }
+    describe '#as_json' do
+      let(:json) { token.as_json }
 
       it 'includes the access token' do
         json['access_token'].should be_a String
