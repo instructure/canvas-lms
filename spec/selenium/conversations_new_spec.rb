@@ -29,6 +29,22 @@ describe "conversations new" do
     f(selector)
   end
 
+  def get_message_course
+    fj('.message_course.bootstrap-select')
+  end
+
+  def get_message_recipients_input
+    fj('.compose_form #compose-message-recipients')
+  end
+
+  def get_message_subject_input
+    fj('#compose-message-subject')
+  end
+
+  def get_message_body_input
+    fj('.conversation_body')
+  end
+
   def get_bootstrap_select_value(element)
     f('.selected .text', element).attribute('data-value')
   end
@@ -54,6 +70,41 @@ describe "conversations new" do
     wait_for_ajaximations
   end
 
+  def select_message_course(new_course)
+    new_course = new_course.name if new_course.respond_to? :name
+    fj('.dropdown-toggle', get_message_course).click
+    fj("a:contains('#{new_course}')", get_message_course).click
+  end
+
+  def add_message_recipient(to)
+    to = to.name if to.respond_to?(:name)
+    get_message_recipients_input.send_keys(to)
+    keep_trying_until { fj(".ac-result:contains('#{to}')") }.click
+  end
+
+  def set_message_subject(subject)
+    get_message_subject_input.send_keys(subject)
+  end
+
+  def set_message_body(body)
+    get_message_body_input.send_keys(body)
+  end
+
+  def click_send
+    f('.send-message').click
+    wait_for_ajaximations
+  end
+
+  def compose(options={})
+    fj('#compose-btn').click
+    wait_for_animations
+    select_message_course(options[:course]) if options[:course]
+    (options[:to] || []).each {|recipient| add_message_recipient recipient}
+    set_message_subject(options[:subject]) if options[:subject]
+    set_message_body(options[:body]) if options[:body]
+    click_send if options[:send].nil? || options[:send]
+  end
+
   before do
     conversation_setup
     @teacher.preferences[:use_new_conversations] = true
@@ -62,6 +113,25 @@ describe "conversations new" do
     @s1 = user(name: "first student")
     @s2 = user(name: "second student")
     [@s1, @s2].each { |s| @course.enroll_student(s).update_attribute(:workflow_state, 'active') }
+  end
+
+  describe "message sending" do
+    it "should start a group conversation when there is only one recipient" do
+      get_conversations
+      compose course: @course, to: [@s1], subject: 'single recipient', body: 'hallo!'
+      c = @s1.conversations.last.conversation
+      c.subject.should eql('single recipient')
+      c.private?.should be_false
+    end
+
+    it "should start a group conversation when there is more than one recipient" do
+      get_conversations
+      compose course: @course, to: [@s1, @s2], subject: 'multiple recipients', body: 'hallo!'
+      c = @s1.conversations.last.conversation
+      c.subject.should eql('multiple recipients')
+      c.private?.should be_false
+      c.conversation_participants.collect(&:user_id).sort.should eql([@teacher, @s1, @s2].collect(&:id).sort)
+    end
   end
 
   describe "view filter" do
