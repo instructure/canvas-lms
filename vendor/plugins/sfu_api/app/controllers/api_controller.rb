@@ -166,7 +166,7 @@ class ApiController < ApplicationController
     term_array
   end
 
-  def mysfu_enrollments_for (user)
+  def mysfu_enrollments_for(user)
     output = {
       "enrolled" => [],
       "teaching" => []
@@ -200,12 +200,16 @@ class ApiController < ApplicationController
     output
   end
 
-  def sandbox_for (user)
+  def sandbox_for(user)
     output = []
+    sandbox = {}
     course_list = user.course_ids
     course_list.each do |c|
       course = Course.find(c)
-      output << course.name if course.sis_source_id.to_s.start_with?("sandbox")
+      sandbox["id"] = course.id
+      sandbox["name"] = course.name
+      sandbox["sis_source_id"] = course.sis_source_id
+      output << sandbox if course.sis_source_id.to_s.start_with?("sandbox")
     end
     output
   end
