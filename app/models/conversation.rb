@@ -223,12 +223,14 @@ class Conversation < ActiveRecord::Base
 
         # give them all messages
         # NOTE: individual messages in group conversations don't have tags
-        connection.execute(sanitize_sql([<<-SQL, self.id, user_ids]))
-          INSERT INTO conversation_message_participants(conversation_message_id, conversation_participant_id, user_id)
-          SELECT conversation_messages.id, conversation_participants.id, conversation_participants.user_id
-          FROM conversation_messages, conversation_participants
+        connection.execute(sanitize_sql([<<-SQL, self.id, current_user.id, user_ids]))
+          INSERT INTO conversation_message_participants(conversation_message_id, conversation_participant_id, user_id, workflow_state)
+          SELECT conversation_messages.id, conversation_participants.id, conversation_participants.user_id, 'active'
+          FROM conversation_messages, conversation_participants, conversation_message_participants
           WHERE conversation_messages.conversation_id = ?
             AND conversation_messages.conversation_id = conversation_participants.conversation_id
+            AND conversation_message_participants.conversation_message_id = conversation_messages.id
+            AND conversation_message_participants.user_id = ?
             AND conversation_participants.user_id IN (?)
         SQL
 

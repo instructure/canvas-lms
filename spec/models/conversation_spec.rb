@@ -123,6 +123,25 @@ describe Conversation do
       convo.participants.size.should == 3 # includes the sender (though we don't show him in the ui)
     end
 
+    it "should only add participants to messages the existing user has participants on" do
+      sender = user
+      recipient = user
+      root_convo = Conversation.initiate([sender, recipient], false)
+      msgs = []
+      msgs << root_convo.add_message(sender, "first message body")  <<
+              root_convo.add_message(sender, "second message body") <<
+              root_convo.add_message(sender, "third message body")  <<
+              root_convo.add_message(sender, "fourth message body")
+      sender.conversations.first.remove_messages(msgs[0])
+      sender.conversations.first.delete_messages(msgs[1])
+
+      new_guy = user
+      root_convo.add_participants(sender, [new_guy])
+      # -1 for hard delete msg, +1 for generated message. soft deleted should still be added.
+      new_guy.conversations.first.messages.size.should eql(msgs.size - 1 + 1)
+    end
+
+
     it "should not re-add existing participants to group conversations" do
       sender = user
       recipient = user
