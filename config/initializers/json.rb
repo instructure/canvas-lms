@@ -3,18 +3,30 @@
 # which is really slow if you have 50,000 nil values.
 # Just return teh constant values.
 class NilClass
+  def as_json(*args)
+    self
+  end
+
   def to_json(*args)
     'null'
   end
 end
 
 class FalseClass
+  def as_json(*args)
+    self
+  end
+
   def to_json(*args)
     'false'
   end
 end
 
 class TrueClass
+  def as_json(*args)
+    self
+  end
+
   def to_json(*args)
     'true'
   end
