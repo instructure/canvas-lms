@@ -1254,63 +1254,75 @@ describe DiscussionTopicsController, :type => :integration do
       @topic.save
     end
 
-    it "should allow admins to see posts without posting" do
-      @topic.reply_from(:user => @student, :text => 'hai')
-      @user = @teacher
-      json = api_call(
-        :get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries.json",
-        { :controller => 'discussion_topics_api', :action => 'entries', :format => 'json',
-          :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
-      json.length.should == 1
+    describe "teacher" do
+      before(:each) do
+        @user = @teacher
+        @url  = "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries"
+      end
+
+      it "should see topic entries without posting" do
+        @topic.reply_from(user: @student, text: 'hai')
+        json = api_call(:get, @url, controller: 'discussion_topics_api',
+          action: 'entries', format: 'json', course_id: @course.to_param,
+          topic_id: @topic.to_param)
+
+        json.length.should == 1
+      end
     end
 
-    it "shouldn't allow student who hasn't posted to see" do
-      @topic.reply_from(:user => @teacher, :text => 'hai')
-      @user = @student
-      raw_api_call(
-        :get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries.json",
-        { :controller => 'discussion_topics_api', :action => 'entries', :format => 'json',
-          :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
-      response.status.should == '403 Forbidden'
-      response.body.should == 'require_initial_post'
+    describe "student" do
+      before(:each) do
+        @topic.reply_from(user: @teacher, text: 'Lorem ipsum dolor')
+        @user = @student
+        @url  = "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+      end
 
-      raw_api_call(
-        :get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
-        { :controller => 'discussion_topics_api', :action => 'show', :format => 'json',
-          :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
-      response.status.should == '403 Forbidden'
-      response.body.should == 'require_initial_post'
+      it "should see topic information before posting" do
+        json = api_call(:get, @url, controller: 'discussion_topics_api',
+          action: 'show', format: 'json', course_id: @course.to_param,
+          topic_id: @topic.to_param)
+        response.code.should == '200'
+      end
+
+      it "should not see entries before posting" do
+        raw_api_call(:get, "#{@url}/entries", controller: 'discussion_topics_api',
+          action: 'entries', format: 'json', course_id: @course.to_param,
+          topic_id: @topic.to_param)
+        response.body.should == 'require_initial_post'
+        response.code.should == '403'
+      end
+
+      it "should see entries after posting" do
+        @topic.reply_from(:user => @student, :text => 'hai')
+        json = api_call(:get, "#{@url}/entries", controller: 'discussion_topics_api',
+          action: 'entries', format: 'json', course_id: @course.to_param,
+          topic_id: @topic.to_param)
+        response.code.should == '200'
+      end
     end
 
-    it "shouldn't allow student's observer who hasn't posted to see" do
-      @topic.reply_from(:user => @teacher, :text => 'hai')
-      @user = @observer
-      raw_api_call(
-        :get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries.json",
-        { :controller => 'discussion_topics_api', :action => 'entries', :format => 'json',
-          :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
-      response.status.should == '403 Forbidden'
-      response.body.should == 'require_initial_post'
-    end
+    describe "observer" do
+      before(:each) do
+        @topic.reply_from(user: @teacher, text: 'Lorem ipsum')
+        @user = @observer
+        @url  = "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries"
+      end
 
-    it "should allow student who has posted to see" do
-      @topic.reply_from(:user => @student, :text => 'hai')
-      @user = @student
-      json = api_call(
-        :get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries.json",
-        { :controller => 'discussion_topics_api', :action => 'entries', :format => 'json',
-          :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
-      json.length.should == 1
-    end
+      it "should not see entries before posting" do
+        raw_api_call(:get, @url, controller: 'discussion_topics_api',
+          action: 'entries', format: 'json', course_id: @course.to_param,
+          topic_id: @topic.to_param)
+        response.body.should == 'require_initial_post'
+        response.code.should == '403'
+      end
 
-    it "should allow student's observer who has posted to see" do
-      @topic.reply_from(:user => @student, :text => 'hai')
-      @user = @observer
-      json = api_call(
-        :get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries.json",
-        { :controller => 'discussion_topics_api', :action => 'entries', :format => 'json',
-          :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
-      json.length.should == 1
+      it "should see entries after posting" do
+        @topic.reply_from(user: @student, text: 'Lorem ipsum dolor')
+        json = api_call(:get, @url, controller: 'discussion_topics_api',
+          action: 'entries', format: 'json', course_id: @course.to_param,
+          topic_id: @topic.to_param)
+        response.code.should == '200'
+      end
     end
   end
 
@@ -2031,7 +2043,6 @@ describe DiscussionTopicsController, :type => :integration do
       json = raw_api_call(:put, "/api/v1/collection_items/#{@item.id}/discussion_topics/self/entries/#{entry.id}/read.json",
                 { :controller => 'discussion_topics_api', :action => 'mark_entry_read', :format => 'json',
                   :collection_item_id => @item.id.to_s, :topic_id => "self", :entry_id => entry.id.to_s })
-      puts json
       entry.reload.read?(@user).should be_true
     end
   end

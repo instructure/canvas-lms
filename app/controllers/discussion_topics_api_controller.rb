@@ -25,7 +25,9 @@ class DiscussionTopicsApiController < ApplicationController
 
   before_filter :require_context
   before_filter :require_topic
-  before_filter :require_initial_post, :except => [:add_entry, :mark_topic_read, :mark_topic_unread, :unsubscribe_topic]
+  before_filter :require_initial_post, except: [:add_entry, :mark_topic_read,
+                                                :mark_topic_unread, :show,
+                                                :unsubscribe_topic]
 
   # @API Get a single topic
   #
@@ -36,7 +38,8 @@ class DiscussionTopicsApiController < ApplicationController
   #     curl https://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id> \ 
   #         -H 'Authorization: Bearer <token>'
   def show
-    render :json => discussion_topics_api_json([@topic], @context, @current_user, session).first
+    render(json: discussion_topics_api_json([@topic], @context,
+                                            @current_user, session).first)
   end
 
   # @API Get the full topic
