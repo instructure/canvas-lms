@@ -2,6 +2,9 @@ require Pathname(File.dirname(__FILE__)) + "../../../sfu_api/app/model/sfu/sfu"
 
 class CourseFormController < ApplicationController
 
+  # Canvas course names have a limit of 255 characters max.
+  CANVAS_COURSE_NAME_MAX = 255
+
   before_filter :require_user
 
   def new
@@ -32,6 +35,7 @@ class CourseFormController < ApplicationController
     teacher2_sis_user_id = sis_user_id(teacher2_username, account_id) unless teacher2_username.nil?
     teacher2_role = sanitize_role(params[:enroll_me_as])
     cross_list = params[:cross_list]
+    course_name_too_long = false
 
     params.each do |key, value|
       if key.to_s.starts_with? "selected_course"
@@ -53,6 +57,8 @@ class CourseFormController < ApplicationController
           course_array.push sandbox["csv"]
           enrollment_array.push sandbox["enrollment_csv_1"]
           enrollment_array.push sandbox["enrollment_csv_2"] unless teacher2_sis_user_id.nil?
+
+          course_name_too_long = true if sandbox["short_long_name"].length > CANVAS_COURSE_NAME_MAX
         elsif course.starts_with? "ncc"
           logger.info "[SFU Course Form] Creating ncc course for #{teacher_username} requested by #{req_user}"
           ncc_course = ncc_info(course, teacher_sis_user_id, teacher2_sis_user_id, teacher2_role)
@@ -61,6 +67,7 @@ class CourseFormController < ApplicationController
           enrollment_array.push ncc_course["enrollment_csv_1"]
           enrollment_array.push ncc_course["enrollment_csv_2"] unless teacher2_sis_user_id.nil?
 
+          course_name_too_long = true if ncc_course["short_long_name"].length > CANVAS_COURSE_NAME_MAX
         else
           logger.info "[SFU Course Form] Creating single course container : #{course} requested by #{req_user}"
           course_info = course_info(course, account_id, teacher_sis_user_id, teacher2_sis_user_id, teacher2_role)
@@ -76,32 +83,42 @@ class CourseFormController < ApplicationController
 
           enrollment_array.push course_info["enrollment_csv_1"]
           enrollment_array.push course_info["enrollment_csv_2"] unless teacher2_username.nil?
+
+          course_name_too_long = true if course_info["long_name"].length > CANVAS_COURSE_NAME_MAX
         end
       end
 
     else
 
       logger.info "[SFU Course Form] Creating cross-list container : #{selected_courses.inspect} requested by #{req_user}"
-      course_id = ""
-      short_name = ""
-      long_name = ""
+      course_ids = []
+      short_names = []
+      long_names = []
       term = ""
       sections = []
 
       selected_courses.each do |course|
         course_info = course_info(course, account_id, teacher_sis_user_id, teacher2_sis_user_id, teacher2_role)
 
-        course_id.concat "#{course_info["course_id"]}:"
-        short_name.concat "#{course_info["short_name"]} / "
-        long_name.concat  "#{course_info["long_name"]} / "
+        course_ids.push course_info["course_id"]
+        short_names.push course_info["short_name"]
+        long_names.push course_info["long_name"]
         term = course_info["term"]
 
         sections.push course_info["sections"]
       end
 
+      course_id = "#{course_ids.join(':')}:::course"
+      short_name = short_names.join(' / ')
+      long_name = long_names.join(' / ')
+
+      # Use a shorter version (omit subsequent titles) of the long name if it's too long.
+      # Original long name: IAT100 D100 Example Course / IAT100 D200 Example Course / IAT100 D300 Example Course
+      # Shorter version:    IAT100 D100 Example Course / IAT100 D200 / IAT100 D300
+      long_name = (long_names[0, 1] + short_names[1..-1]).join(' / ') if long_name.length > CANVAS_COURSE_NAME_MAX
+
       # create course csv
-      course_id.concat "::course"
-      course_array.push "\"#{course_id}\",\"#{short_name[0..-4]}\",\"#{long_name[0..-4]}\",\"#{account_id}\",\"#{term}\",\"active\""
+      course_array.push "\"#{course_id}\",\"#{short_name}\",\"#{long_name}\",\"#{account_id}\",\"#{term}\",\"active\""
 
       # create section csv
       sections.compact.uniq.each do  |section|
@@ -113,9 +130,21 @@ class CourseFormController < ApplicationController
       enrollment_array.push "\"#{course_id}\",\"#{teacher_sis_user_id}\",\"teacher\",\"\",\"active\"\n"
       enrollment_array.push "\"#{course_id}\",\"#{teacher2_sis_user_id}\",\"#{teacher2_role}\",\"\",\"active\"\n" unless teacher2_sis_user_id.nil?
 
+      course_name_too_long = true if long_name.length > CANVAS_COURSE_NAME_MAX
+
     end
 
-    unless teacher_sis_user_id.nil?
+    if teacher_sis_user_id.nil?
+      render :json => {
+          :success => false,
+          :message => 'The main teacher was not found.'
+      }
+    elsif course_name_too_long
+      render :json => {
+          :success => false,
+          :message => 'The course name is too long.'
+      }
+    else
       # Send POST to import
       course_csv = course_array.join("\n")
       section_csv = section_array.join("\n")
@@ -135,11 +164,6 @@ class CourseFormController < ApplicationController
       render :json => {
         :success => true,
         :message => 'Course request submitted successfully.'
-      }
-    else
-      render :json => {
-        :success => false,
-        :message => 'The main teacher was not found.'
       }
     end
 
