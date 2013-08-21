@@ -42,7 +42,7 @@ class ApiController < ApplicationController
       elsif params[:property].eql? "mysfu"
         user_hash = mysfu_enrollments_for user
       elsif params[:property].eql? "sandbox"
-        user_hash["sandbox"] = sandbox_for user
+        user_hash = sandbox_for(user)
       end
     end
 
