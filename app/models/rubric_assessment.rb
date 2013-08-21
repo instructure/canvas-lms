@@ -171,6 +171,10 @@ class RubricAssessment < ActiveRecord::Base
   def methods_for_serialization(*methods)
     @serialization_methods = methods
   end
+
+  def serialization_methods
+    @serialization_methods || []
+  end
   
   def assessor_name
     self.assessor.name rescue t('unknown_user', "Unknown User")

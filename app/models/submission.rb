@@ -1004,22 +1004,21 @@ class Submission < ActiveRecord::Base
     end
   end
 
-  # This little chunk makes it so that to_json will force it to always include the method :attachments
-  # it is especially needed in the extended gradebook so that when we grab all of the versions through simply_versioned
-  # that each of those versions include :attachments
-  alias_method :ar_to_json, :to_json
-  def to_json(options = {}, &block)
-    if simply_versioned_version_model
-      options[:methods] ||= []
-      options[:methods] = Array(options[:methods])
-      options[:methods] << :versioned_attachments
-      options[:methods].uniq!
-    end
-    self.ar_to_json(options, &block)
-    # default_options = { :methods => [ :attachments ]}
-    # options[:methods] = [options[:methods]] if options[:methods] && !options[:methods].is_a?(Array)
-    # default_options[:methods] += options[:methods] if options[:methods]
-    # self.ar_to_json(options.merge(default_options), &block)
+  # include the versioned_attachments in as_json if this was loaded from a
+  # specific version
+  def serialization_methods
+    !@without_versioned_attachments && simply_versioned_version_model ?
+      [:versioned_attachments] :
+      []
+  end
+
+  # mechanism to turn off the above behavior for the duration of a
+  # block
+  def without_versioned_attachments
+    original, @without_versioned_attachments = @without_versioned_attachments, true
+    yield
+  ensure
+    @exclude_versioned_attachments = original
   end
 
   def self.json_serialization_full_parameters(additional_parameters={})
