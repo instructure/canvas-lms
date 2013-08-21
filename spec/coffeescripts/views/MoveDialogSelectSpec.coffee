@@ -18,7 +18,6 @@ define [
   module 'MoveDialogSelect',
     setup: ->
       @set_coll_spy = sinon.spy MoveDialogSelect.prototype, 'setCollection'
-      @render_spy = sinon.spy MoveDialogSelect.prototype, 'render'
 
       @assignments = new Assignments((id: i, name: "Assignment #{i}") for i in [1..3])
       @view = new MoveDialogSelect
@@ -28,7 +27,6 @@ define [
 
     teardown: ->
       @set_coll_spy.restore()
-      @render_spy.restore()
 
   test '#initialize, if a collection is not passed the model\'s collection will be used for @collection', ->
     deepEqual @view.model.collection, @assignments
@@ -63,10 +61,11 @@ define [
     ok @set_coll_spy.returned(undefined)
 
   test '#setCollection changes the value of @collection', ->
+    spy = sinon.spy @view, 'renderOptions'
     other_assignments = new Assignments((id: i, name: "Assignment #{i}") for i in [5..9])
     @view.setCollection(other_assignments)
     deepEqual @view.collection, other_assignments
-    ok @render_spy.called
+    ok spy.called
 
   test '#toJSON returns an object that can be used for rendering the select', ->
     expected = @view.model.toView()

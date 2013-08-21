@@ -731,6 +731,17 @@ describe "assignments" do
           f("#assignment_#{@assignment.id} .publish-icon").text.should match "Published"
         end
 
+        it "shows submission scores for students on index page" do
+          @assignment.update_attributes(points_possible: 15)
+          @assignment.publish
+          course_with_student_logged_in(active_all: true, course: @course)
+          @assignment.grade_student(@student,grade: 14)
+          get "/courses/#{@course.id}/assignments"
+          wait_for_ajaximations
+          f("#assignment_#{@assignment.id} .js-score .non-screenreader").
+            text.should match "14/15 pts"
+        end
+
         it "should allow publishing from the show page" do
           get "/courses/#{@course.id}/assignments/#{@assignment.id}"
           wait_for_ajaximations

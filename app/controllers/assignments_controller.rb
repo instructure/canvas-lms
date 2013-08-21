@@ -46,6 +46,7 @@ class AssignmentsController < ApplicationController
           :sort_url => reorder_course_assignment_groups_url,
           :assignment_sort_base_url => course_assignment_groups_url,
           :context_modules_url => api_v1_course_context_modules_path(@context),
+          :course_student_submissions_url => api_v1_course_student_submissions_url(@context)
         },
         :PERMISSIONS => permissions,
       })

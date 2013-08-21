@@ -15,6 +15,7 @@ define [
 
   module 'UnassignedUsersView',
     setup: ->
+      $('#fixtures').html('<div id="content"></div>')
       clock = sinon.useFakeTimers()
       groups = new GroupCollection [
         new Group name: "a group"
@@ -34,6 +35,7 @@ define [
       view.$el.appendTo($(document.body))
 
     teardown: ->
+      $('#fixtures').empty()
       clock.restore()
       view.remove()
       $('.assign-to-group-menu').remove()

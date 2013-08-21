@@ -5,6 +5,9 @@ define [
   'jquery'
   'helpers/jquery.simulate'
 ], (Backbone, Assignment, AssignmentListItemView, $) ->
+  screenreaderText = null
+  nonScreenreaderText = null
+  oldENV = window.ENV ||= {}
 
   fixtures = $('#fixtures')
 
@@ -84,12 +87,26 @@ define [
 
   module 'AssignmentListItemViewSpec',
     setup: ->
+      ENV = window.ENV ||= {}
+      ENV.PERMISSIONS = {manage: true}
+      window.ENV = ENV
+
       @model = assignment1()
+      @view = createView(@model, canManage: true)
+      screenreaderText = =>
+        $.trim @view.$('.js-score .screenreader-only').text()
+      nonScreenreaderText = =>
+        $.trim @view.$('.js-score .non-screenreader').text()
+
+    teardown: ->
+      window.ENV = oldENV
 
   test "initializes child views if can manage", ->
     view = createView(@model, canManage: true)
     ok view.publishIconView
-    ok view.vddDueTooltipView
+    ok view.dateDueColumnView
+    ok view.dateAvailableColumnView
+    ok view.moveAssignmentView
     ok view.editAssignmentView
 
   test "initializes no child views if can't manage", ->
@@ -106,7 +123,7 @@ define [
 
     ok view.$('.ig-row').hasClass('ig-published')
     @model.set('published', false)
-    @model.save
+    @model.save()
     ok !view.$('.ig-row').hasClass('ig-published')
 
     AssignmentListItemView.prototype.canManage.restore()
@@ -122,3 +139,32 @@ define [
     view.delete()
     ok view.model.destroy.called
     view.model.destroy.restore()
+
+    ENV.context_asset_string = old_asset_string
+  test "updating grades from model change", ->
+    @model.set 'grade', 1.5555
+
+    equal screenreaderText(), 'Score: 1.56 out of 2 points', 'sets screenreader text'
+    equal nonScreenreaderText(), '1.56/2 pts', 'sets non-screenreader text'
+
+    @model.set 'grade', null
+    @model.set 'noSubmission', true
+
+    equal screenreaderText(), 'No submission for this assignment. 2 points possible.',
+      'sets screenreader text for null points'
+    equal nonScreenreaderText(), '-/2 pts',
+      'sets non-screenreader text for null points'
+
+    @model.set 'noSubmission', false
+    @model.set 'grade', 0
+
+    equal screenreaderText(), 'Score: 0 out of 2 points',
+      'sets screenreader text for 0 points'
+    equal nonScreenreaderText(), '0/2 pts',
+      'sets non-screenreader text for 0 points'
+
+    @model.set 'notYetGraded', true
+    equal screenreaderText(), 'Assignment not yet graded. 2 points possible.',
+      'sets correct screenreader text for not yet graded'
+    equal nonScreenreaderText(), 'Not Yet Graded/2 pts',
+      'sets correct non-screenreader text for not yet graded'

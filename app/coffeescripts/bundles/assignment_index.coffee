@@ -42,6 +42,7 @@ require [
     params:
       include: includes
       override_assignment_dates: !ENV.PERMISSIONS.manage
+    courseSubmissionsURL: ENV.URLS.course_student_submissions_url
 
   assignmentGroupsView = new AssignmentGroupListView
     collection: assignmentGroups
@@ -67,16 +68,18 @@ require [
       course: course
       assignmentGroups: assignmentGroups
 
-  @app = new IndexView
+  app = new IndexView
     assignmentGroupsView: assignmentGroupsView
     assignmentSettingsView: assignmentSettingsView
     createGroupView: createGroupView
     showByView: showByView
     collection: assignmentGroups
 
-  @app.render()
+  app.render()
 
   # kick it all off
   assignmentGroups.fetch(reset: true).then ->
     if ENV.PERMISSIONS.manage
       assignmentGroups.loadModuleNames()
+    else
+      assignmentGroups.getGrades()
