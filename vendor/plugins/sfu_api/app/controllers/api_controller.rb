@@ -41,6 +41,8 @@ class ApiController < ApplicationController
         user_hash["uuid"] = user.uuid
       elsif params[:property].eql? "mysfu"
         user_hash = mysfu_enrollments_for user
+      elsif params[:property].eql? "sandbox"
+        user_hash = sandbox_for(user)
       end
     end
 
@@ -164,7 +166,7 @@ class ApiController < ApplicationController
     term_array
   end
 
-  def mysfu_enrollments_for (user)
+  def mysfu_enrollments_for(user)
     output = {
       "enrolled" => [],
       "teaching" => []
@@ -194,6 +196,20 @@ class ApiController < ApplicationController
           output[enrollment_type].push course
         end
       end
+    end
+    output
+  end
+
+  def sandbox_for(user)
+    output = []
+    sandbox = {}
+    course_list = user.course_ids
+    course_list.each do |c|
+      course = Course.find(c)
+      sandbox["id"] = course.id
+      sandbox["name"] = course.name
+      sandbox["sis_source_id"] = course.sis_source_id
+      output << sandbox if course.sis_source_id.to_s.start_with?("sandbox")
     end
     output
   end
