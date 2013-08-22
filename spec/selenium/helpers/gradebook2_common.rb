@@ -80,11 +80,11 @@ end
 def switch_to_section(section=nil)
   section = section.id if section.is_a?(CourseSection)
   section ||= ""
-  button = f('#section_to_show')
-  button.click
+  f('#section_to_show').click
   sleep 1 #TODO find a better way to wait for css3 anmation to end
   f('#section-to-show-menu').should be_displayed
   f("label[for='section_option_#{section}']").click
+  wait_for_ajaximations
 end
 
 # `students` should be a hash of student_id, expected total pairs, like:
