@@ -1014,41 +1014,11 @@ class ApplicationController < ActionController::Base
     return if @page || !page_name
 
     if params[:action] != 'create'
-      @page = @wiki.wiki_pages.deleted_last.find_by_url(page_name.to_s) ||
-              @wiki.wiki_pages.deleted_last.find_by_url(page_name.to_s.to_url) ||
-              @wiki.wiki_pages.find_by_id(page_name.to_i)
+      @page = @wiki.wiki_pages.not_deleted.find_by_url(page_name.to_s) ||
+              @wiki.wiki_pages.not_deleted.find_by_url(page_name.to_s.to_url) ||
+              @wiki.wiki_pages.not_deleted.find_by_id(page_name.to_i)
     end
-    @page ||= @wiki.wiki_pages.new(
-      :title => page_name.titleize,
-      :url => page_name.to_url
-    )
-    if @page.new_record?
-      @page.wiki = @wiki
-      initialize_wiki_page
-    end
-  end
-
-  # Initializes the state of @page, but only if it is a new page
-  def initialize_wiki_page
-    return unless @page.new_record? || @page.deleted?
-
-    unless @context.draft_state_enabled?
-      @page.set_as_front_page! if !@wiki.has_front_page? and @page.url == Wiki::DEFAULT_FRONT_PAGE_URL
-    end
-
-    is_privileged_user = is_authorized_action?(@page.wiki, @current_user, :manage)
-    if is_privileged_user && @context.draft_state_enabled? && !@context.is_a?(Group)
-      @page.workflow_state = 'unpublished'
-    else
-      @page.workflow_state = 'active'
-    end
-
-    @page.editing_roles = (@context.default_wiki_editing_roles rescue nil) || @page.default_roles
-
-    if @page.is_front_page?
-      @page.body = t "#application.wiki_front_page_default_content_course", "Welcome to your new course wiki!" if @context.is_a?(Course)
-      @page.body = t "#application.wiki_front_page_default_content_group", "Welcome to your new group wiki!" if @context.is_a?(Group)
-    end
+    @page ||= @wiki.build_wiki_page(@current_user, :url => page_name)
   end
 
   def context_wiki_page_url

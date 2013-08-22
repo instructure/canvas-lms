@@ -258,6 +258,24 @@ describe WikiPage do
     end
   end
 
+  context 'initialize_wiki_page' do
+    it 'should set the course front page body' do
+      course_with_teacher_logged_in
+      front_page = @course.wiki.wiki_pages.new(:title => 'Front Page', :url => 'front-page')
+      front_page.body.should be_nil
+      front_page.initialize_wiki_page(@teacher)
+      front_page.body.should_not be_empty
+    end
+
+    it 'should set the group front page body' do
+      group_with_user_logged_in
+      front_page = @group.wiki.wiki_pages.new(:title => 'Front Page', :url => 'front-page')
+      front_page.body.should be_nil
+      front_page.initialize_wiki_page(@user)
+      front_page.body.should_not be_empty
+    end
+  end
+
   context 'set policy' do
     before :each do
       course :active_all => true

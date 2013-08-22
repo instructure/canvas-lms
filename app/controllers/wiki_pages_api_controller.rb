@@ -40,7 +40,7 @@
 #       "hide_from_students": false,
 #
 #       // roles allowed to edit the page; comma-separated list comprising a combination of
-#       // 'teachers', 'students', and/or 'public'
+#       // 'teachers', 'students', 'members', and/or 'public'
 #       // if not supplied, course defaults are used
 #       "editing_roles": "teachers,students",
 #
@@ -57,7 +57,7 @@
 #       // (present when requesting a single page; omitted when listing pages)
 #       "body": "<p>Page Content</p>",
 #
-#       // whether the page is published
+#       // whether the page is published (true) or draft state (false).
 #       "published": true,
 #
 #       // whether this page is the front page for the wiki
@@ -111,9 +111,68 @@
 class WikiPagesApiController < ApplicationController
   before_filter :require_context
   before_filter :get_wiki_page, :except => [:create, :index]
+  before_filter :require_wiki_page, :except => [:create, :update, :update_front_page, :index]
   before_filter :was_front_page, :except => [:index]
 
   include Api::V1::WikiPage
+
+  # @API Show front page
+  #
+  # Retrieve the content of the front page
+  #
+  # @example_request
+  #     curl -H 'Authorization: Bearer <token>' \ 
+  #          https://<canvas>/api/v1/courses/123/front_page
+  #
+  # @returns Page
+  def show_front_page
+    show
+  end
+
+  # @API Update/create front page
+  #
+  # Update the title or contents of the front page
+  #
+  # @argument wiki_page[title] [Optional, String]
+  #   The title for the new page. NOTE: changing a page's title will change its
+  #   url. The updated url will be returned in the result.
+  #
+  # @argument wiki_page[body] [String]
+  #   The content for the new page.
+  #
+  # @argument wiki_page[hide_from_students] [Optional, Boolean]
+  #   Whether the page should be hidden from students.
+  #
+  #   *Note:* when draft state is enabled, attempts to set +hide_from_students+
+  #   will be ignored and the value returned will always be the inverse of the
+  #   +published+ value.
+  #
+  # @argument wiki_page[editing_roles] [Optional, String, "teachers"|"students"|"members"|"public"]
+  #   Which user roles are allowed to edit this page. Any combination
+  #   of these roles is allowed (separated by commas).
+  #
+  #   "teachers":: Allows editing by teachers in the course.
+  #   "students":: Allows editing by students in the course.
+  #   "members":: For group wikis, allows editing by members of the group.
+  #   "public":: Allows editing by any user.
+  #
+  # @argument wiki_page[notify_of_update] [Optional, Boolean]
+  #   Whether participants should be notified when this page changes.
+  #
+  # @argument wiki_page[published] [Optional, Boolean]
+  #   Whether the page is published (true) or draft state (false).
+  #
+  #   *Note:* when draft state is disabled, attempts to set +published+
+  #   will be ignored and the value returned will always be true.
+  #
+  # @example_request
+  #     curl -X PUT -H 'Authorization: Bearer <token>' \
+  #     https://<canvas>/api/v1/courses/123/front_page?wiki_page[body]=Updated+body+text
+  #
+  # @returns Page
+  def update_front_page
+    update
+  end
 
   # @API List pages
   #
@@ -161,30 +220,6 @@ class WikiPagesApiController < ApplicationController
     end
   end
 
-  # @API Show page
-  #
-  # Retrieve the content of a wiki page
-  #
-  # @argument url [String]
-  #   The unique identifier for a page.
-  #
-  # @example_request
-  #     curl -H 'Authorization: Bearer <token>' \ 
-  #          https://<canvas>/api/v1/courses/123/pages/my-page-url
-  #
-  # @example_request
-  #     curl -H 'Authorization: Bearer <token>' \
-  #          https://<canvas>/api/v1/groups/456/front_page
-  #
-  # @returns Page
-  def show
-    if authorized_action(@page, @current_user, :read)
-      @page.increment_view_count(@current_user, @context)
-      log_asset_access(@page, "wiki", @wiki)
-      render :json => wiki_page_json(@page, @current_user, session)
-    end
-  end
-
   # @API Create page
   #
   # Create a new wiki page
@@ -229,8 +264,11 @@ class WikiPagesApiController < ApplicationController
   #
   # @returns Page
   def create
-    @page = @context.wiki.wiki_pages.build
+    initial_params = params.slice(:url)
+    initial_params.merge! (params[:wiki_page] || {}).slice(:url, :title)
+
     @wiki = @context.wiki
+    @page = @wiki.build_wiki_page(@current_user, initial_params)
     if authorized_action(@page, @current_user, :create)
       update_params = get_update_params(Set[:title, :body])
       if !update_params.is_a?(Symbol) && @page.update_attributes(update_params) && process_front_page
@@ -241,13 +279,27 @@ class WikiPagesApiController < ApplicationController
       end
     end
   end
+
+  # @API Show page
+  #
+  # Retrieve the content of a wiki page
+  #
+  # @example_request
+  #     curl -H 'Authorization: Bearer <token>' \ 
+  #          https://<canvas>/api/v1/courses/123/pages/my-page-url
+  #
+  # @returns Page
+  def show
+    if authorized_action(@page, @current_user, :read)
+      @page.increment_view_count(@current_user, @context)
+      log_asset_access(@page, "wiki", @wiki)
+      render :json => wiki_page_json(@page, @current_user, session)
+    end
+  end
   
-  # @API Update page
+  # @API Update/create page
   #
   # Update the title or contents of a wiki page
-  #
-  # @argument url [String]
-  #   The unique identifier for a page.
   #
   # @argument wiki_page[title] [String]
   #   The title for the new page. NOTE: changing a page's title will change its
@@ -288,13 +340,16 @@ class WikiPagesApiController < ApplicationController
   #     curl -X PUT -H 'Authorization: Bearer <token>' \ 
   #     https://<canvas>/api/v1/courses/123/pages/the-page-url?wiki_page[body]=Updated+body+text
   #
-  # @example_request
-  #     curl -X PUT -H 'Authorization: Bearer <token>' \
-  #     https://<canvas>/api/v1/courses/123/front_page?wiki_page[body]=Updated+body+text
-  #
   # @returns Page
   def update
-    if authorized_action(@page, @current_user, [:update, :update_content])
+    perform_update = false
+    if @page.new_record?
+      perform_update = true if authorized_action(@page, @current_user, [:create])
+    elsif authorized_action(@page, @current_user, [:update, :update_content])
+      perform_update = true
+    end
+
+    if perform_update
       update_params = get_update_params
       if !update_params.is_a?(Symbol) && @page.update_attributes(update_params) && process_front_page
         log_asset_access(@page, "wiki", @wiki, 'participate')
@@ -310,16 +365,9 @@ class WikiPagesApiController < ApplicationController
   #
   # Delete a wiki page
   #
-  # @argument url [String]
-  #   the unique identifier for a page.
-  #
   # @example_request
   #     curl -X DELETE -H 'Authorization: Bearer <token>' \ 
   #     https://<canvas>/api/v1/courses/123/pages/the-page-url
-  #
-  # @example_request
-  #     curl -X DELETE -H 'Authorization: Bearer <token>' \
-  #     https://<canvas>/api/v1/courses/123/front_page
   #
   # @returns Page
   def destroy
@@ -340,9 +388,6 @@ class WikiPagesApiController < ApplicationController
   #
   # List the revisions of a page. Callers must have update rights on the page in order to see page history.
   #
-  # @argument url [String]
-  #   The unique identifier for a page
-  #
   # @example_request
   #     curl -H 'Authorization: Bearer <token>' \
   #     https://<canvas>/api/v1/courses/123/pages/the-page-url/revisions
@@ -361,9 +406,6 @@ class WikiPagesApiController < ApplicationController
   #
   # Retrieve the metadata and optionally content of a revision of the page.
   # Note that retrieving historic versions of pages requires edit rights.
-  #
-  # @argument url [String]
-  #   The unique identifier for a page
   #
   # @argument summary [Optional, Boolean]
   #   If set, exclude page content from results
@@ -399,9 +441,6 @@ class WikiPagesApiController < ApplicationController
   #
   # Revert a page to a prior revision.
   #
-  # @argument url [String]
-  #   The unique identifier for the page
-  #
   # @argument revision_id [Integer]
   #   The revision to revert to (use the
   #   {api:WikiPagesApiController#revisions List Revisions API} to see
@@ -429,21 +468,45 @@ class WikiPagesApiController < ApplicationController
   end
 
   protected
+
+  def is_front_page_action?
+    !!action_name.match(/_front_page$/)
+  end
   
   def get_wiki_page
     @wiki = @context.wiki
     @wiki.check_has_front_page
 
-    url = params[:url]
-    if url.blank?
-      if @wiki.has_front_page?
-        url = @wiki.get_front_page_url
+    # attempt to find an existing page
+    is_front_page_action = is_front_page_action?
+    url = is_front_page_action ? Wiki::DEFAULT_FRONT_PAGE_URL : params[:url]
+    @page = if is_front_page_action
+      @wiki.front_page
+    else
+      @wiki.wiki_pages.not_deleted.find_by_url(url)
+    end
+
+    # create a new page if the page was not found
+    unless @page
+      @page = @wiki.build_wiki_page(@current_user, :url => url)
+      if is_front_page_action
+        @page.workflow_state = 'active'
+        @set_front_page = true
+        @set_as_front_page = true
       else
-        render :status => 404, :json => { :message => t(:no_wiki_front_page, "No front page has been set") }
-        return false
+        @page.workflow_state = 'unpublished'
       end
     end
-    @page = @wiki.wiki_pages.not_deleted.find_by_url!(url)
+  end
+
+  def require_wiki_page
+    if !@page || @page.new_record?
+      if is_front_page_action?
+        render :status => :not_found, :json => { :message => 'No front page has been set' }
+      else
+        render :status => :not_found, :json => { :message => 'page not found' }
+      end
+    end
   end
 
   def was_front_page
@@ -452,8 +515,6 @@ class WikiPagesApiController < ApplicationController
   end
   
   def get_update_params(allowed_fields=Set[])
-    initialize_wiki_page
-
     # normalize parameters
     page_params = params[:wiki_page] || {}
     if @context.draft_state_enabled?

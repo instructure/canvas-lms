@@ -1227,12 +1227,15 @@ FakeRails3Routes.draw do
     end
 
     scope(:controller => :wiki_pages_api) do
+      get "courses/:course_id/front_page", :action => :show_front_page
+      get "groups/:group_id/front_page", :action => :show_front_page
+      put "courses/:course_id/front_page", :action => :update_front_page
+      put "groups/:group_id/front_page", :action => :update_front_page
+
       get "courses/:course_id/pages", :action => :index, :path_name => 'course_wiki_pages'
       get "groups/:group_id/pages", :action => :index, :path_name => 'group_wiki_pages'
       get "courses/:course_id/pages/:url", :action => :show, :path_name => 'course_wiki_page'
       get "groups/:group_id/pages/:url", :action => :show, :path_name => 'group_wiki_page'
-      get "courses/:course_id/front_page", :action => :show
-      get "groups/:group_id/front_page", :action => :show
       get "courses/:course_id/pages/:url/revisions", :action => :revisions, :path_name => 'course_wiki_page_revisions'
       get "groups/:group_id/pages/:url/revisions", :action => :revisions, :path_name => 'group_wiki_page_revisions'
       get "courses/:course_id/pages/:url/revisions/latest", :action => :show_revision
@@ -1245,12 +1248,8 @@ FakeRails3Routes.draw do
       post "groups/:group_id/pages", :action => :create
       put "courses/:course_id/pages/:url", :action => :update
       put "groups/:group_id/pages/:url", :action => :update
-      put "courses/:course_id/front_page", :action => :update
-      put "groups/:group_id/front_page", :action => :update
       delete "courses/:course_id/pages/:url", :action => :destroy
       delete "groups/:group_id/pages/:url", :action => :destroy
-      delete "courses/:course_id/front_page", :action => :destroy
-      delete "groups/:group_id/front_page", :action => :destroy
     end
 
     scope(:controller => :context_modules_api) do
