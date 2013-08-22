@@ -108,7 +108,7 @@ class CourseFormController < ApplicationController
         sections.push course_info["sections"]
       end
 
-      course_id = "#{course_ids.join(':')}:::course"
+      course_id = course_ids.join(':')
       short_name = short_names.join(' / ')
       long_name = long_names.join(' / ')
 
