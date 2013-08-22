@@ -10,6 +10,7 @@
   show_correct_answers = @quiz && @quiz.display_correct_answers?(@current_user, @submission) || (!assessment_results && !user_answer)
   show_correct_answers = false if @quiz.try(:survey?)
   answer_id = hash_get(answer, :id)
+  question_id = hash_get(question, :id)
   selected_answer = user_answer && answer && hash_get(user_answer, :answer_id) == answer_id
   selected_answer = true if user_answer && question_type.answer_type == "matching_answer"
   selected_answer = (hash_get(user_answer, "answer_#{answer[:id]}")  == "1") if user_answer && hash_get(question, :question_type) == "multiple_answers_question"
@@ -40,7 +41,7 @@
     <% if !user_answer || question_type.display_answers != "xsingle" %>
     <div class="select_answer answer_type" <%= hidden(true) unless answer_type == "select_answer" %>>
       <% if %w{radio checkbox}.include?(question_type.entry_type) %>
-        <input id="answer-<%= answer_id %>" type="<%= question_type.entry_type %>" <%= 'checked' if selected_answer %> class="question_input" />&nbsp;
+        <input id="answer-<%= answer_id %>" name="question-<%= question_id %>" type="<%= question_type.entry_type %>" <%= 'checked' if selected_answer %> class="question_input" />&nbsp;
       <% end %>
       <label for="answer-<%= answer_id %>">
         <div class="answer_text" <%= hidden(true) if hash_get(answer, :html).present? %>><%= hash_get(answer, :text) %></div>
