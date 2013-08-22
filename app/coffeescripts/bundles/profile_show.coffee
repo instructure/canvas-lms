@@ -17,14 +17,15 @@
 #
 
 require [
+  'i18n!user_profile',
   'Backbone'
   'jquery'
   'str/htmlEscape'
   'compiled/util/AvatarWidget'
   'compiled/tinymce'
-  'compiled/jquery/validate'
+  'jquery.instructure_forms'
   'tinymce.editor_box'
-], ({View}, $, htmlEscape, AvatarWidget) ->
+], (I18n, {View}, $, htmlEscape, AvatarWidget) ->
 
   class ProfileShow extends View
 
@@ -96,7 +97,13 @@ require [
       $el.parents('tr').remove()
 
     validateForm: (event) ->
-      unless $('#edit_profile_form').validate()
+      validations =
+        required: ['user[short_name]']
+        property_validations:
+          'user_profile[title]': (value) ->
+            if value && value.length > 255
+              return I18n.t("profile_title_too_long", "Title is too long")
+      if !$(event.target).validateForm(validations)
         event.preventDefault()
 
   new ProfileShow ENV.PROFILE
