@@ -167,7 +167,7 @@ module Canvas::Migration::Helpers
                 content_list << course_item_hash(type, item)
               end
             when 'discussion_topics'
-              source.discussion_topics.active.only_discussion_topics.select("id, title, user_id, assignment_id").except(:user).each do |item|
+              source.discussion_topics.active.only_discussion_topics.select("id, title, user_id, assignment_id").except(:includes).each do |item|
                 content_list << course_item_hash(type, item)
               end
             else

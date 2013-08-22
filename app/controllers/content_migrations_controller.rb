@@ -107,7 +107,7 @@ class ContentMigrationsController < ApplicationController
 
       js_env :UPLOAD_LIMIT => @context.storage_quota
       js_env :SELECT_OPTIONS => options
-      js_env :QUESTION_BANKS => @context.assessment_question_banks.except(:include).select([:title, :id]).active
+      js_env :QUESTION_BANKS => @context.assessment_question_banks.except(:includes).select([:title, :id]).active
       js_env :COURSE_ID => @context.id
       js_env :CONTENT_MIGRATIONS => content_migration_json_hash
       js_env(:OLD_START_DATE => datetime_string(@context.start_at, :verbose, nil, true))
