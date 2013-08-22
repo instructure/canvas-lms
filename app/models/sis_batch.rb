@@ -219,7 +219,7 @@ class SisBatch < ActiveRecord::Base
     end
   end
 
-  def api_json
+  def as_json(options={})
     data = {
       "created_at" => self.created_at,
       "ended_at" => self.ended_at,
@@ -231,7 +231,7 @@ class SisBatch < ActiveRecord::Base
     }
     data["processing_errors"] = self.processing_errors if self.processing_errors.present?
     data["processing_warnings"] = self.processing_warnings if self.processing_warnings.present?
-    return data.to_json
+    data
   end
 
   private

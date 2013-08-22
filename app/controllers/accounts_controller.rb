@@ -549,7 +549,7 @@ class AccountsController < ApplicationController
       @terms = @account.enrollment_terms.active
       respond_to do |format|
         format.html
-        format.json { render :json => @current_batch.try(:api_json) }
+        format.json { render :json => @current_batch }
       end
     end
   end
