@@ -28,11 +28,12 @@ describe EmberBundle do
   describe '#initialize' do
     it 'creates an array of files to require' do
       @bundle.paths.should == [
+        "Ember",
         "compiled/ember/inbox/config/app",
+        "compiled/ember/inbox/config/routes",
         "compiled/ember/inbox/models/conversation",
         "compiled/ember/inbox/routes/application_route",
         "compiled/ember/inbox/routes/conversation_route",
-        "compiled/ember/inbox/config/routes",
         "compiled/ember/inbox/templates/application",
         "compiled/ember/inbox/templates/conversation",
         "compiled/ember/inbox/templates/index"
@@ -40,31 +41,36 @@ describe EmberBundle do
     end
 
     it 'creates an array of objects to assign to the app namespace' do
-      @bundle.objects.should == %w(App Conversation ApplicationRoute ConversationRoute)
+      @bundle.objects.should == %w(Ember App routes Conversation ApplicationRoute ConversationRoute)
     end
 
     it 'matches the order of the require paths and objects' do
-      @bundle.objects[0].should == "App"
-      @bundle.paths[0].should == "compiled/ember/inbox/config/app"
-      @bundle.objects[1].should == "Conversation"
-      @bundle.paths[1].should == "compiled/ember/inbox/models/conversation"
-      @bundle.objects[2].should == "ApplicationRoute"
-      @bundle.paths[2].should == "compiled/ember/inbox/routes/application_route"
-      @bundle.objects[3].should == "ConversationRoute"
-      @bundle.paths[3].should == "compiled/ember/inbox/routes/conversation_route"
+      @bundle.objects[0].should == "Ember"
+      @bundle.paths[0].should == "Ember"
+      @bundle.objects[1].should == "App"
+      @bundle.paths[1].should == "compiled/ember/inbox/config/app"
+      @bundle.objects[2].should == "routes"
+      @bundle.paths[2].should == "compiled/ember/inbox/config/routes"
+      @bundle.objects[3].should == "Conversation"
+      @bundle.paths[3].should == "compiled/ember/inbox/models/conversation"
+      @bundle.objects[4].should == "ApplicationRoute"
+      @bundle.paths[4].should == "compiled/ember/inbox/routes/application_route"
+      @bundle.objects[5].should == "ConversationRoute"
+      @bundle.paths[5].should == "compiled/ember/inbox/routes/conversation_route"
     end
   end
 
   describe "#build_output" do
     it "looks like this" do
       @bundle.build_output.should == <<-END
-require(["compiled/ember/inbox/config/app", "compiled/ember/inbox/models/conversation", "compiled/ember/inbox/routes/application_route", "compiled/ember/inbox/routes/conversation_route", "compiled/ember/inbox/config/routes", "compiled/ember/inbox/templates/application", "compiled/ember/inbox/templates/conversation", "compiled/ember/inbox/templates/index"], function(App, Conversation, ApplicationRoute, ConversationRoute) {
-  window.App = App;
-  App.Conversation = Conversation;
-  App.ApplicationRoute = ApplicationRoute;
-  App.ConversationRoute = ConversationRoute
-});
-      END
+# this is auto-generated
+define ["Ember", "compiled/ember/inbox/config/app", "compiled/ember/inbox/config/routes", "compiled/ember/inbox/models/conversation", "compiled/ember/inbox/routes/application_route", "compiled/ember/inbox/routes/conversation_route", "compiled/ember/inbox/templates/application", "compiled/ember/inbox/templates/conversation", "compiled/ember/inbox/templates/index"], (Ember, App, routes, Conversation, ApplicationRoute, ConversationRoute) ->
+
+  App.reopen
+    Conversation: Conversation
+    ApplicationRoute: ApplicationRoute
+    ConversationRoute: ConversationRoute
+END
     end
   end
 

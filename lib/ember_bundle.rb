@@ -12,20 +12,39 @@ class EmberBundle
     templates = opts[:templates] || Dir.glob("#{@root}/**/*.hbs")
     @paths = files.map { |file| parse_require_path(file) }
     @objects = files.map { |file| parse_object_name(file) }
-    @assigns = @objects.map { |object| "App.#{object} = #{object}" }.join(";\n  ")
+    @assigns = @objects.map { |object| "#{object}: #{object}" }.join("\n    ")
+    if File.exists?("#{@root}/config/routes.coffee")
+      @routes = "
+  App.initializer
+    name: 'routes'
+    initialize: (container, application) ->
+      application.Router.map(routes)
+"
+    else
+      @routes = ''
+    end
     include_config_files
     templates.each { |file| @paths << parse_require_path(file) }
   end
 
   def include_config_files
+    if @routes
+      @paths.unshift(parse_require_path("#{@root}/config/routes.coffee"))
+      @objects.unshift("routes")
+    end
     @paths.unshift(parse_require_path("#{@root}/config/app.coffee"))
     @objects.unshift("App")
-    @paths.push(parse_require_path("#{@root}/config/routes.coffee"))
+    @paths.unshift('Ember')
+    @objects.unshift('Ember')
   end
 
   def build
-    path = "public/javascripts/compiled/bundles/#{@app_name}.js"
-    File.open(path, 'w') { |f| f.write build_output }
+    main_path = "app/coffeescripts/ember/#{@app_name}/main.coffee"
+    bundle_path = "public/javascripts/compiled/bundles/#{@app_name}.js"
+    File.open(main_path, 'w') { |f| f.write build_output }
+    File.open(bundle_path, 'w') do |f|
+      f.write "require(['compiled/ember/#{@app_name}/main'], function(App) { window.App = App.create(); });"
+    end
   end
 
   def assignable_paths(files)
@@ -47,12 +66,11 @@ class EmberBundle
   end
 
   def build_output
-    <<-END
-require(#{@paths.inspect}, function(#{@objects.join(', ')}) {
-  window.App = App;
-  #{@assigns}
-});
-    END
+    "# this is auto-generated\ndefine #{@paths.inspect}, (#{@objects.join(', ')}) ->
+#{@routes}
+  App.reopen
+    #{@assigns}
+"
   end
 
   def self.build_from_file(path)
