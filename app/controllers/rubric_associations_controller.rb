@@ -41,8 +41,8 @@ class RubricAssociationsController < ApplicationController
       params[:rubric_association][:id] = @association.id if @association
       @association = RubricAssociation.generate(@current_user, @rubric, @context, params[:rubric_association])
       json_res = {
-        :rubric => ActiveSupport::JSON.decode(@rubric.to_json(:methods => :criteria, :include_root => false, :permissions => {:user => @current_user, :session => session})),
-        :rubric_association => ActiveSupport::JSON.decode(@association.to_json(:include_root => false, :include => [:rubric_assessments, :assessment_requests], :methods => :assessor_name, :permissions => {:user => @current_user, :session => session}))
+        :rubric => @rubric.as_json(:methods => :criteria, :include_root => false, :permissions => {:user => @current_user, :session => session}),
+        :rubric_association => @association.as_json(:include_root => false, :include => [:rubric_assessments, :assessment_requests], :methods => :assessor_name, :permissions => {:user => @current_user, :session => session})
       }
       render :json => json_res.to_json
     end

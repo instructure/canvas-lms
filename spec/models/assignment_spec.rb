@@ -842,7 +842,7 @@ describe Assignment do
     end
   end
 
-  context "to_json" do
+  context "as_json" do
     it "should include permissions if specified" do
       assignment_model
       @course.offer!
@@ -852,7 +852,7 @@ describe Assignment do
       @assignment.to_json(:permissions => {:user => nil}).should match(/\"permissions\"\s*:\s*\{\}/)
       @assignment.grants_right?(@teacher, nil, :create).should eql(true)
       @assignment.to_json(:permissions => {:user => @teacher, :session => nil}).should match(/\"permissions\"\s*:\s*\{\"/)
-      hash = ActiveSupport::JSON.decode(@assignment.to_json(:permissions => {:user => @teacher, :session => nil}))
+      hash = @assignment.as_json(:permissions => {:user => @teacher, :session => nil})
       hash["assignment"].should_not be_nil
       hash["assignment"]["permissions"].should_not be_nil
       hash["assignment"]["permissions"].should_not be_empty
@@ -862,7 +862,7 @@ describe Assignment do
     it "should serialize with roots included in nested elements" do
       course_model
       @course.assignments.create!(:title => "some assignment")
-      hash = ActiveSupport::JSON.decode(@course.to_json(:include => :assignments))
+      hash = @course.as_json(:include => :assignments)
       hash["course"].should_not be_nil
       hash["course"]["assignments"].should_not be_empty
       hash["course"]["assignments"][0].should_not be_nil
@@ -874,7 +874,7 @@ describe Assignment do
       @course.offer!
       @enr1 = @course.enroll_teacher(@teacher = user)
       @enr1.accept
-      hash = ActiveSupport::JSON.decode(@course.to_json(:permissions => {:user => @teacher, :session => nil} ))
+      hash = @course.as_json(:permissions => {:user => @teacher, :session => nil} )
       hash["course"].should_not be_nil
       hash["course"]["permissions"].should_not be_nil
       hash["course"]["permissions"].should_not be_empty
@@ -886,7 +886,7 @@ describe Assignment do
       @course.offer!
       @enr1 = @course.enroll_teacher(@teacher = user)
       @enr1.accept
-      hash = ActiveSupport::JSON.decode(@course.to_json(:include_root => false, :permissions => {:user => @teacher, :session => nil} ))
+      hash = @course.as_json(:include_root => false, :permissions => {:user => @teacher, :session => nil} )
       hash["course"].should be_nil
       hash["name"].should eql(@course.name)
       hash["permissions"].should_not be_nil
@@ -896,7 +896,7 @@ describe Assignment do
 
     it "should include group_category" do
       assignment_model(:group_category => "Something")
-      hash = ActiveSupport::JSON.decode(@assignment.to_json)
+      hash = @assignment.as_json
       hash["assignment"]["group_category"].should == "Something"
     end
   end
@@ -1606,7 +1606,7 @@ describe Assignment do
     it "should serialize permissions" do
       course_with_teacher(:active_all => true)
       @assignment = @course.assignments.create!(:title => "some assignment")
-      data = ActiveSupport::JSON.decode(@assignment.to_json(:permissions => {:user => @user, :session => nil})) rescue nil
+      data = @assignment.as_json(:permissions => {:user => @user, :session => nil}) rescue nil
       data.should_not be_nil
       data['assignment'].should_not be_nil
       data['assignment']['permissions'].should_not be_nil
