@@ -139,7 +139,7 @@ class WikiPagesApiController < ApplicationController
       # omit body from selection, since it's not included in index results
       scope = @context.wiki.wiki_pages.select(WikiPage.column_names - ['body']).includes(:user)
       scope = @context.grants_right?(@current_user, session, :view_unpublished_items) ? scope.not_deleted : scope.active
-      scope = scope.visible_to_students unless @context.grants_right?(@current_user, session, :view_hidden_items)
+      scope = scope.not_hidden unless @context.grants_right?(@current_user, session, :view_hidden_items)
 
       scope = WikiPage.search_by_attribute(scope, :title, params[:search_term])
 
@@ -198,11 +198,27 @@ class WikiPagesApiController < ApplicationController
   # @argument wiki_page[hide_from_students] [Boolean]
   #   Whether the page should be hidden from students.
   #
+  #   *Note:* when draft state is enabled, attempts to set +hide_from_students+
+  #   will be ignored and the value returned will always be the inverse of the
+  #   +published+ value.
+  #
+  # @argument wiki_page[editing_roles] [Optional, String, "teachers"|"students"|"members"|"public"]
+  #   Which user roles are allowed to edit this page. Any combination
+  #   of these roles is allowed (separated by commas).
+  #
+  #   "teachers":: Allows editing by teachers in the course.
+  #   "students":: Allows editing by students in the course.
+  #   "members":: For group wikis, allows editing by members of the group.
+  #   "public":: Allows editing by any user.
+  #
   # @argument wiki_page[notify_of_update] [Boolean]
   #   Whether participants should be notified when this page changes.
   #
   # @argument wiki_page[published] [Optional, Boolean]
   #   Whether the page is published (true) or draft state (false).
+  #
+  #   *Note:* when draft state is disabled, attempts to set +published+
+  #   will be ignored and the value returned will always be true.
   #
   # @argument wiki_page[front_page] [Optional, Boolean]
   #   Set an unhidden page as the front page (if true)
@@ -243,11 +259,27 @@ class WikiPagesApiController < ApplicationController
   # @argument wiki_page[hide_from_students] [Boolean]
   #   Whether the page should be hidden from students.
   #
+  #   *Note:* when draft state is enabled, attempts to set +hide_from_students+
+  #   will be ignored and the value returned will always be the inverse of the
+  #   +published+ value.
+  #
+  # @argument wiki_page[editing_roles] [Optional, String, "teachers"|"students"|"members"|"public"]
+  #   Which user roles are allowed to edit this page. Any combination
+  #   of these roles is allowed (separated by commas).
+  #
+  #   "teachers":: Allows editing by teachers in the course.
+  #   "students":: Allows editing by students in the course.
+  #   "members":: For group wikis, allows editing by members of the group.
+  #   "public":: Allows editing by any user.
+  #
   # @argument wiki_page[notify_of_update] [Boolean]
   #   Whether participants should be notified when this page changes.
   #
   # @argument wiki_page[published] [Optional, Boolean]
   #   Whether the page is published (true) or draft state (false).
+  #
+  #   *Note:* when draft state is disabled, attempts to set +published+
+  #   will be ignored and the value returned will always be true.
   #
   # @argument wiki_page[front_page] [Optional, Boolean]
   #   Set an unhidden page as the front page (if true)
@@ -424,6 +456,11 @@ class WikiPagesApiController < ApplicationController
 
     # normalize parameters
     page_params = params[:wiki_page] || {}
+    if @context.draft_state_enabled?
+      page_params.slice!(*%w(title body notify_of_update published front_page editing_roles))
+    else
+      page_params.slice!(*%w(title body hide_from_students notify_of_update front_page editing_roles))
+    end
 
     if page_params.has_key?(:published)
       workflow_state = value_to_boolean(page_params.delete(:published)) ? 'active' : 'unpublished'

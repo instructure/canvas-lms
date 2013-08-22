@@ -61,10 +61,8 @@ define [
         PUBLISH: !!@WIKI_RIGHTS.manage && json.contextName == "courses"
         DELETE: !!@PAGE_RIGHTS.delete
         EDIT_TITLE: !!@PAGE_RIGHTS.update || json.new_record
-        EDIT_HIDE: !!@WIKI_RIGHTS.manage && json.contextName == "courses"
         EDIT_ROLES: !!@WIKI_RIGHTS.manage
       json.SHOW =
-        OPTIONS: json.CAN.EDIT_HIDE || json.CAN.EDIT_ROLES
         COURSE_ROLES: json.contextName == "courses"
       json
 

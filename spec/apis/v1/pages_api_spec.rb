@@ -415,7 +415,6 @@ describe "Pages API", :type => :integration do
 
       it "should revert page content only" do
         @vpage.hide_from_students = true
-        @vpage.workflow_state = 'unpublished'
         @vpage.title = 'booga!'
         @vpage.body = 'booga booga!'
         @vpage.editing_roles = 'teachers,students,public'
@@ -425,7 +424,6 @@ describe "Pages API", :type => :integration do
                  :url=>@vpage.url, :revision_id=>'3')
         @vpage.reload
         @vpage.hide_from_students.should be_true
-        @vpage.should be_unpublished
         @vpage.editing_roles.should == 'teachers,students,public'
         @vpage.title.should == 'version test page'  # <- reverted
         @vpage.body.should == 'revised by ta'       # <- reverted
@@ -499,7 +497,12 @@ describe "Pages API", :type => :integration do
         json['published'].should be_true
       end
       
-      it "should create a new page in unpublished state" do
+      it "should create a new page in unpublished state (draft state)" do
+        @course.account.settings[:allow_draft] = true
+        @course.account.save!
+        @course.enable_draft = true
+        @course.save!
+
         json = api_call(:post, "/api/v1/courses/#{@course.id}/pages",
                         { :controller => 'wiki_pages_api', :action => 'create', :format => 'json', :course_id => @course.to_param },
                         { :wiki_page => { :published => false, :title => 'New Wiki Page!', :body => 'hello new page' }})
@@ -627,30 +630,105 @@ describe "Pages API", :type => :integration do
         @hidden_page.is_front_page?.should_not be_true
       end
 
-      context "with unpublished page" do
-        before do
-          @hidden_page.workflow_state = 'unpublished'
-          @hidden_page.save!
+      context 'hide_from_students' do
+        before :each do
+          @test_page = @course.wiki.wiki_pages.build(:title => 'Test Page')
+          @test_page.workflow_state = 'active'
+          @test_page.save!
         end
 
-        it "should publish a page with published=true" do
-          json = api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{@hidden_page.url}?wiki_page[published]=true",
-                   :controller => 'wiki_pages_api', :action => 'update', :format => 'json', :course_id => @course.to_param,
-                   :url => @hidden_page.url, :wiki_page => {'published' => 'true'})
+        context 'without draft state' do
+          before :each do
+            set_course_draft_state false
+          end
+
+          it 'should accept hide_from_students' do
+            json = api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{@test_page.url}",
+                     { :controller => 'wiki_pages_api', :action => 'update', :format => 'json', :course_id => @course.to_param, :url => @test_page.url },
+                     { :wiki_page => {'hide_from_students' => 'true'} })
+            json['published'].should be_true
+            json['hide_from_students'].should be_true
+
+            @test_page.reload
+            @test_page.should be_active
+            @test_page.hide_from_students.should be_true
+          end
+
+          it 'should ignore published' do
+            json = api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{@test_page.url}",
+                     { :controller => 'wiki_pages_api', :action => 'update', :format => 'json', :course_id => @course.to_param, :url => @test_page.url },
+                     { :wiki_page => {'published' => 'false'} })
+            json['published'].should be_true
+            json['hide_from_students'].should be_false
+
+            @test_page.reload
+            @test_page.should be_active
+            @test_page.hide_from_students.should be_false
+          end
+        end
+
+        context 'with draft state' do
+          before :each do
+            set_course_draft_state true
+          end
+
+          it 'should accept published' do
+            json = api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{@test_page.url}",
+                     { :controller => 'wiki_pages_api', :action => 'update', :format => 'json', :course_id => @course.to_param, :url => @test_page.url },
+                     { :wiki_page => {'published' => 'false'} })
+            json['published'].should be_false
+            json['hide_from_students'].should be_true
+
+            @test_page.reload
+            @test_page.should be_unpublished
+            @test_page.hide_from_students.should be_false
+          end
+
+          it 'should ignore hide_from_students' do
+            set_course_draft_state true
+
+            json = api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{@test_page.url}",
+                     { :controller => 'wiki_pages_api', :action => 'update', :format => 'json', :course_id => @course.to_param, :url => @test_page.url },
+                     { :wiki_page => {'hide_from_students' => 'true'} })
+            json['published'].should be_true
+            json['hide_from_students'].should be_false
+
+            @test_page.reload
+            @test_page.should be_active
+            @test_page.hide_from_students.should be_false
+          end
+        end
+      end
+
+      context 'with unpublished page' do
+        before do
+          set_course_draft_state
+          @unpublished_page = @course.wiki.wiki_pages.build(:title => 'Unpublished Page', :body => 'Body of unpublished page')
+          @unpublished_page.workflow_state = 'unpublished'
+          @unpublished_page.save!
+
+          @unpublished_page.reload
+          @unpublished_page.should be_unpublished
+        end
+
+        it 'should publish a page with published=true' do
+          json = api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{@unpublished_page.url}",
+                   { :controller => 'wiki_pages_api', :action => 'update', :format => 'json', :course_id => @course.to_param, :url => @unpublished_page.url },
+                   { :wiki_page => {'published' => 'true'} })
           json['published'].should be_true
-          @hidden_page.reload.should be_active
+          @unpublished_page.reload.should be_active
         end
         
-        it "should not publish a page otherwise" do
-          json = api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{@hidden_page.url}",
-                   :controller => 'wiki_pages_api', :action => 'update', :format => 'json', :course_id => @course.to_param,
-                   :url => @hidden_page.url)
+        it 'should not publish a page otherwise' do
+          json = api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{@unpublished_page.url}",
+                   { :controller => 'wiki_pages_api', :action => 'update', :format => 'json', :course_id => @course.to_param, :url => @unpublished_page.url })
           json['published'].should be_false
-          @hidden_page.reload.should be_unpublished
+          @unpublished_page.reload.should be_unpublished
         end
       end
 
       it "should unpublish a page" do
+        set_course_draft_state
         json = api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{@hidden_page.url}?wiki_page[published]=false",
                  :controller => 'wiki_pages_api', :action => 'update', :format => 'json', :course_id => @course.to_param,
                  :url => @hidden_page.url, :wiki_page => {'published' => 'false'})
@@ -868,6 +946,38 @@ describe "Pages API", :type => :integration do
       end
       
       it "should not allow editing attributes" do
+        set_course_draft_state false
+        api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{@editable_page.url}",
+                 { :controller => 'wiki_pages_api', :action => 'update', :format => 'json', :course_id => @course.to_param,
+                   :url => @editable_page.url },
+                 { :wiki_page => { :hide_from_students => true }},
+                 {}, {:expected_status => 401})
+        api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{@editable_page.url}",
+                 { :controller => 'wiki_pages_api', :action => 'update', :format => 'json', :course_id => @course.to_param,
+                   :url => @editable_page.url },
+                 { :wiki_page => { :title => 'Broken Links' }},
+                 {}, {:expected_status => 401})
+        api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{@editable_page.url}",
+                 { :controller => 'wiki_pages_api', :action => 'update', :format => 'json', :course_id => @course.to_param,
+                   :url => @editable_page.url },
+                 { :wiki_page => { :editing_roles => 'teachers' }},
+                 {}, {:expected_status => 401})
+        api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{@editable_page.url}",
+                 { :controller => 'wiki_pages_api', :action => 'update', :format => 'json', :course_id => @course.to_param,
+                   :url => @editable_page.url },
+                 { :wiki_page => { :editing_roles => 'teachers,students,public' }},
+                 {}, {:expected_status => 401})
+
+        @editable_page.reload
+        @editable_page.should be_active
+        @editable_page.hide_from_students.should be_false
+        @editable_page.title.should == 'Editable Page'
+        @editable_page.user_id.should_not == @student.id
+        @editable_page.editing_roles.should == 'students'
+      end
+
+      it 'should not allow editing attributes (with draft state)' do
+        set_course_draft_state
         api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{@editable_page.url}",
                  { :controller => 'wiki_pages_api', :action => 'update', :format => 'json', :course_id => @course.to_param,
                    :url => @editable_page.url },
@@ -891,6 +1001,7 @@ describe "Pages API", :type => :integration do
 
         @editable_page.reload
         @editable_page.should be_active
+        @editable_page.hide_from_students.should be_false
         @editable_page.title.should == 'Editable Page'
         @editable_page.user_id.should_not == @student.id
         @editable_page.editing_roles.should == 'students'

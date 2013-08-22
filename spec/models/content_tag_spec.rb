@@ -164,11 +164,9 @@ describe ContentTag do
   it "should not attempt to update asset name attribute if it's over the db limit" do
     course
     @page = @course.wiki.wiki_pages.create!(:title => "some page")
-    @page.workflow_state = 'unpublished'
     @page.save!
     @module = @course.context_modules.create!(:name => "module")
     @tag = @module.add_item({:type => 'WikiPage', :title => 'oh noes!' * 35, :id => @page.id})
-    @tag.workflow_state.should == 'unpublished'
 
     @tag.update_asset_name!
 
@@ -177,6 +175,8 @@ describe ContentTag do
   end
 
   it "should publish/unpublish the tag if the linked wiki page is published/unpublished" do
+    Course.any_instance.stubs(:draft_state_enabled?).returns(true)
+
     course
     @page = @course.wiki.wiki_pages.create!(:title => "some page")
     @page.workflow_state = 'unpublished'
@@ -199,6 +199,8 @@ describe ContentTag do
   end
 
   it "should publish/unpublish the linked wiki page (and its tags) if the tag is published/unpublished" do
+    Course.any_instance.stubs(:draft_state_enabled?).returns(true)
+
     course
     @page = @course.wiki.wiki_pages.create!(:title => "some page")
     @page.workflow_state = 'unpublished'

@@ -279,6 +279,10 @@ describe ContentMigration do
     end
 
     context "unpublished items" do
+      before :each do
+        Course.any_instance.stubs(:draft_state_enabled?).returns(true)
+      end
+
       it "should copy unpublished modules" do
         cm = @copy_from.context_modules.create!(:name => "some module")
         cm.publish

@@ -209,10 +209,8 @@ define [
       PUBLISH: true
       DELETE: true
       EDIT_TITLE: true
-      EDIT_HIDE: true
       EDIT_ROLES: true
     SHOW:
-      OPTIONS: true
       COURSE_ROLES: true
 
   testRights 'CAN/SHOW (manage group)',
@@ -225,10 +223,8 @@ define [
       PUBLISH: false
       DELETE: false
       EDIT_TITLE: true # new record
-      EDIT_HIDE: false
       EDIT_ROLES: true
     SHOW:
-      OPTIONS: true
       COURSE_ROLES: false
 
   testRights 'CAN/SHOW (update_content)',
@@ -244,10 +240,8 @@ define [
       PUBLISH: false
       DELETE: false
       EDIT_TITLE: false
-      EDIT_HIDE: false
       EDIT_ROLES: false
-    SHOW:
-      OPTIONS: false
+    #SHOW:
       #COURSE_ROLES: false # intentionally omitted as EDIT_ROLES === false
 
   testRights 'CAN/SHOW (null)',
@@ -257,8 +251,6 @@ define [
       PUBLISH: false
       DELETE: false
       EDIT_TITLE: false
-      EDIT_HIDE: false
       EDIT_ROLES: false
-    SHOW:
-      OPTIONS: false
+    #SHOW:
       #COURSE_ROLES: false # intentionally omitted as EDIT_ROLES === false

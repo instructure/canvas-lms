@@ -236,6 +236,12 @@ Spec::Runner.configure do |config|
         e.save!
         @teacher = u
       end
+      if opts[:draft_state]
+        account.settings[:allow_draft] = true
+        account.save!
+        @course.enable_draft = true
+        @course.save!
+      end
     end
     @course
   end
@@ -413,6 +419,18 @@ Spec::Runner.configure do |config|
   def course_with_observer_logged_in(opts={})
     course_with_observer(opts)
     user_session(@user)
+  end
+
+  def set_course_draft_state(enabled=true, opts={})
+    course = opts[:course] || @course
+    account = opts[:account] || course.account
+
+    account.settings[:allow_draft] = true
+    account.save! unless opts[:no_save]
+    course.enable_draft = enabled
+    course.save! unless opts[:no_save]
+
+    enabled
   end
 
   def add_section(section_name)

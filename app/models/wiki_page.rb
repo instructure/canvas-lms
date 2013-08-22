@@ -70,6 +70,26 @@ class WikiPage < ActiveRecord::Base
     end
   end
 
+  # sync hide_from_students with published state
+  def sync_hidden_and_unpublished
+    return if (context rescue nil).nil?
+
+    if context.draft_state_enabled?
+      if self.hide_from_students # hide_from_students overrides published
+        self.hide_from_students = false
+        self.workflow_state = 'unpublished'
+      end
+    else
+      if self.workflow_state.to_s == 'unpublished' # unpublished overrides hide_from_students
+        self.workflow_state = 'active'
+        self.hide_from_students = true
+      end
+    end
+  end
+  before_save :sync_hidden_and_unpublished
+  alias_method :after_find, :sync_hidden_and_unpublished
+  private :sync_hidden_and_unpublished
+
   def self.title_order_by_clause
     best_unicode_collation_key('wiki_pages.title')
   end  
@@ -185,11 +205,13 @@ class WikiPage < ActiveRecord::Base
 
   scope :not_deleted, where("wiki_pages.workflow_state<>'deleted'")
 
+  # needed for ensure_unique_url
   def not_deleted
     !deleted?
   end
 
-  scope :visible_to_students, where(:hide_from_students => false)
+  scope :not_hidden, where('wiki_pages.hide_from_students<>?', true)
+
   scope :order_by_id, order(:id)
 
   def locked_for?(user, opts={})
@@ -308,7 +330,7 @@ class WikiPage < ActiveRecord::Base
   def participants
     res = []
     if context && context.available?
-      if self.hide_from_students
+      if self.hide_from_students || !self.active?
         res += context.participating_admins
       else
         res += context.participants

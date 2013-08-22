@@ -34,32 +34,22 @@
 
   <textarea rows="20" cols="40" name="wiki_page[body]" class="body" aria-hidden="true"{{#unless PAGE_RIGHTS.update}} autofocus{{/unless}}>{{body}}</textarea>
 
-  {{#if SHOW.OPTIONS}}
+  {{#if CAN.EDIT_ROLES}}
     <div class="control-group options">
       <label class="control-label"><strong>{{#t "options_label"}}Options{{/t}}</strong></label>
-      {{#if CAN.EDIT_HIDE}}
-        <div class="controls">
-          <label for="hide_from_students" class="checkbox">
-            {{checkbox "hide_from_students" prefix="wiki_page"}}
-            {{#t "hide_from_students"}}Hide this page from students{{/t}}
-          </label>
-        </div>
-      {{/if}}
-      {{#if CAN.EDIT_ROLES}}
-        <div class="controls">
-          <select name="wiki_page[editing_roles]">
-            {{#if SHOW.COURSE_ROLES}}
-              <option value="teachers"{{#if IS.TEACHER_ROLE}} selected{{/if}}>{{#t "course_editing_roles.only_teachers"}}Only teachers{{/t}}</option>
-              <option value="teachers,students"{{#if IS.STUDENT_ROLE}} selected{{/if}}>{{#t "course_editing_roles.teachers_and_students"}}Teachers and students{{/t}}</option>
-              <option value="teachers,students,public"{{#if IS.ANYONE_ROLE}} selected{{/if}}>{{#t "course_editing_roles.anyone"}}Anyone{{/t}}</option>
-            {{else}}
-              <option value="members"{{#if IS.MEMBER_ROLE}} selected{{/if}}>{{#t "editing_roles.only_members"}}Only members{{/t}}</option>
-              <option value="members,public"{{#if IS.ANYONE_ROLE}} selected{{/if}}>{{#t "editing_roles.anyone"}}Anyone{{/t}}</option>
-            {{/if}}
-          </select>
-          {{#t "editing_roles.can_edit_page"}}can edit this page{{/t}}
-        </div>
-      {{/if}}
+      <div class="controls">
+        <select name="wiki_page[editing_roles]">
+          {{#if SHOW.COURSE_ROLES}}
+            <option value="teachers"{{#if IS.TEACHER_ROLE}} selected{{/if}}>{{#t "course_editing_roles.only_teachers"}}Only teachers{{/t}}</option>
+            <option value="teachers,students"{{#if IS.STUDENT_ROLE}} selected{{/if}}>{{#t "course_editing_roles.teachers_and_students"}}Teachers and students{{/t}}</option>
+            <option value="teachers,students,public"{{#if IS.ANYONE_ROLE}} selected{{/if}}>{{#t "course_editing_roles.anyone"}}Anyone{{/t}}</option>
+          {{else}}
+            <option value="members"{{#if IS.MEMBER_ROLE}} selected{{/if}}>{{#t "editing_roles.only_members"}}Only members{{/t}}</option>
+            <option value="members,public"{{#if IS.ANYONE_ROLE}} selected{{/if}}>{{#t "editing_roles.anyone"}}Anyone{{/t}}</option>
+          {{/if}}
+        </select>
+        {{#t "editing_roles.can_edit_page"}}can edit this page{{/t}}
+      </div>
     </div>
   {{/if}}
 </div>

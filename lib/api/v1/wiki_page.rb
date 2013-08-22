@@ -27,7 +27,12 @@ module Api::V1::WikiPage
     hash = api_json(wiki_page, current_user, session, :only => WIKI_PAGE_JSON_ATTRS)
     hash['editing_roles'] ||= 'teachers'
     hash['last_edited_by'] = user_display_json(wiki_page.user, wiki_page.context) if wiki_page.user
-    hash['published'] = wiki_page.active?
+    if wiki_page.context.draft_state_enabled?
+      hash['published'] = wiki_page.active?
+      hash['hide_from_students'] = !hash['published']
+    else
+      hash['published'] = true
+    end
     hash['front_page'] = wiki_page.is_front_page?
     if wiki_page.context.draft_state_enabled?
       hash['html_url'] = polymorphic_url([wiki_page.context, :named_page], :wiki_page_id => wiki_page)
