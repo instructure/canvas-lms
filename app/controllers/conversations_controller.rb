@@ -30,7 +30,7 @@ class ConversationsController < ApplicationController
   before_filter :reject_student_view_student
   before_filter :get_conversation, :only => [:show, :update, :destroy, :add_recipients, :remove_messages]
   before_filter :infer_scope, :only => [:index, :show, :create, :update, :add_recipients, :add_message, :remove_messages]
-  before_filter :normalize_recipients, :only => [:create, :add_recipients]
+  before_filter :normalize_recipients, :only => [:create, :add_recipients, :add_message]
   before_filter :infer_tags, :only => [:create, :add_message, :add_recipients]
 
   # whether it's a bulk private message, or a big group conversation,
@@ -605,6 +605,16 @@ class ConversationsController < ApplicationController
   # @argument media_comment_type [String, "audio"|"video"]
   #   Type of the associated media file.
   #
+  # @argument recipients[] [Optional, String]
+  # An array of user ids. Defaults to all of the current conversation
+  # recipients. To explicitly send a message to no other recipients,
+  # this array should consist of the logged-in user id.
+  #
+  # @argument included_messages[] [Optional, String]
+  # An array of message ids from this conversation to send to recipients
+  # of the new message. Recipients who already had a copy of included
+  # messages will not be affected.
+  #
   # @example_response
   #   {
   #     "id": 2,
@@ -640,7 +650,25 @@ class ConversationsController < ApplicationController
     get_conversation(true)
     if params[:body].present?
       message = build_message
-      @conversation.add_message message, :tags => @tags, :update_for_sender => false
+      conversation_participants = []
+      # find included_messages
+      message_ids = params[:included_messages]
+      message_ids = message_ids.split(/,/) if message_ids.is_a?(String)
+      messages = ConversationMessage.where(:id => message_ids) if message_ids
+
+      # these checks could be folded into the initial ConversationMessage lookup for better efficiency
+      if messages
+        # sanity check: can the user see the included messages?
+        return render_error('included_messages', 'not a participant') unless messages.all? { |m| m.conversation_message_participants.where(:user_id => @current_user.id).exists? }
+        # sanity check: are the messages part of this conversation?
+        return render_error('included_messages', 'not for this conversation') unless messages.all? { |m| m.conversation_id == @conversation.conversation.id }
+      end
+
+      @conversation.add_participants @recipients, no_messages: true if @recipients
+      @conversation.reload
+      messages.each { |msg| @conversation.conversation.add_message_to_participants msg, new_message: false, only_users: @recipients } if messages
+      @conversation.add_message message, :tags => @tags, :update_for_sender => false, only_users: @recipients ? @recipients + [@current_user] : nil
+
       render :json => conversation_json(@conversation.reload, @current_user, session, :messages => [message])
     else
       render :json => {}, :status => :bad_request

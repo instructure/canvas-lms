@@ -200,16 +200,24 @@ class Conversation < ActiveRecord::Base
         user_ids -= conversation_participants.map(&:user_id)
         next if user_ids.empty?
 
-        last_message_at = conversation_messages.human.first.try(:created_at)
-        raise "can't add participants if there are no messages" unless last_message_at
-        num_messages = conversation_messages.human.size
+        if options[:no_messages]
+          bulk_insert_options = {
+            :workflow_state => 'unread',
+            :message_count => 0,
+            :private_hash => self.private_hash
+          }
+        else
+          last_message_at = conversation_messages.human.first.try(:created_at)
+          raise "can't add participants if there are no messages" unless last_message_at
+          num_messages = conversation_messages.human.size
 
-        bulk_insert_options = {
+          bulk_insert_options = {
             :workflow_state => 'unread',
             :last_message_at => last_message_at,
             :message_count => num_messages,
             :private_hash => self.private_hash
           }
+        end
 
         Shard.partition_by_shard(user_ids) do |shard_user_ids|
           User.where(:id => shard_user_ids).update_all(["unread_conversations_count = unread_conversations_count + 1, updated_at = ?", Time.now.utc]) unless shard_user_ids.empty?
@@ -220,22 +228,23 @@ class Conversation < ActiveRecord::Base
         # the conversation's shard gets a participant for all users
         bulk_insert_participants(user_ids, bulk_insert_options)
 
-
-        # give them all messages
-        # NOTE: individual messages in group conversations don't have tags
-        connection.execute(sanitize_sql([<<-SQL, self.id, current_user.id, user_ids]))
-          INSERT INTO conversation_message_participants(conversation_message_id, conversation_participant_id, user_id, workflow_state)
-          SELECT conversation_messages.id, conversation_participants.id, conversation_participants.user_id, 'active'
-          FROM conversation_messages, conversation_participants, conversation_message_participants
-          WHERE conversation_messages.conversation_id = ?
-            AND conversation_messages.conversation_id = conversation_participants.conversation_id
+        unless options[:no_messages]
+          # give them all messages
+          # NOTE: individual messages in group conversations don't have tags
+          connection.execute(sanitize_sql([<<-SQL, self.id, current_user.id, user_ids]))
+            INSERT INTO conversation_message_participants(conversation_message_id, conversation_participant_id, user_id, workflow_state)
+            SELECT conversation_messages.id, conversation_participants.id, conversation_participants.user_id, 'active'
+            FROM conversation_messages, conversation_participants, conversation_message_participants
+            WHERE conversation_messages.conversation_id = ?
+              AND conversation_messages.conversation_id = conversation_participants.conversation_id
             AND conversation_message_participants.conversation_message_id = conversation_messages.id
             AND conversation_message_participants.user_id = ?
-            AND conversation_participants.user_id IN (?)
-        SQL
+              AND conversation_participants.user_id IN (?)
+          SQL
 
-        # announce their arrival
-        add_event_message(current_user, {:event_type => :users_added, :user_ids => user_ids}, options)
+          # announce their arrival
+          add_event_message(current_user, {:event_type => :users_added, :user_ids => user_ids}, options)
+        end
       end
     end
   end
@@ -305,7 +314,8 @@ class Conversation < ActiveRecord::Base
       add_message_to_participants(message, options.merge(
           :tags => new_tags,
           :new_message => true,
-          :preloaded_users => users
+          :preloaded_users => users,
+          :only_users => options[:only_users]
       ))
 
       if options[:update_participants]
@@ -370,6 +380,10 @@ class Conversation < ActiveRecord::Base
       unless options[:new_message]
         cps = cps.where("user_id NOT IN (?)", skip_users.map(&:user_id)) if skip_users.present?
       end
+
+      cps = cps.where(:user_id => options[:only_users].map(&:id)) if options[:only_users]
+
+      next unless cps.exists?
 
       cps.update_all("message_count = message_count + 1") unless options[:generated]
 
