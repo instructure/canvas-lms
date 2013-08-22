@@ -9,12 +9,12 @@ input[type="checkbox"] {
   font-size: 1.3em;
 }
 
-div.actions {
-  margin: 1em 0;
-}
 div.actions.choices button {
   min-height: 40px; // taller buttons for major choices
-  margin: 0 0.25em;
+  margin-left: 0.25em;
+  margin-right: 0.25em;
+  padding-top: 9px;
+  padding-bottom: 9px;
 }
 
 .username-display {
