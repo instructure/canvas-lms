@@ -1214,14 +1214,14 @@ class Assignment < ActiveRecord::Base
     # Creates a list of hashes, each one with a :user, :filename, and :submission entry.
     @ignored_files = []
     file_map = zip_extractor.unzip_files.map { |f| infer_comment_context_from_filename(f) }.compact
-    comment_map = partition_for_user(file_map)
-    comments = []
-    comment_map.each do |group|
-      comment = t :comment_from_files, { :one => "See attached file", :other => "See attached files" }, :count => group.size
-      submission = group.first[:submission]
-      user = group.first[:user]
-      attachments = group.map { |g| FileInContext.attach(self, g[:filename], g[:display_name]) }
-      comments << submission.add_comment({:comment => comment, :author => commenter, :attachments => attachments, :hidden => self.muted?})
+    files_for_user = file_map.group_by { |f| f[:user] }
+    comments = files_for_user.map do |user, files|
+      comment = t :comment_from_files, { :one => "See attached file", :other => "See attached files" }, :count => files.size
+      submission = files.first[:submission]
+      attachments = files.map { |g|
+        FileInContext.attach(self, g[:filename], g[:display_name])
+      }
+      submission.add_comment(:comment => comment, :author => commenter, :attachments => attachments, :hidden => muted?)
     end
     [comments.compact, @ignored_files]
   end
@@ -1746,21 +1746,6 @@ class Assignment < ActiveRecord::Base
       t :submission_action_turn_in_assignment, "Turn in %{title}", :title => title
     end
   end
-
-
-    # Takes an array of hashes and groups them by their :user entry.  All
-    # hashes must have a user entry.
-    def partition_for_user(list)
-      return [] if list.empty?
-      index = list.first[:user]
-      found, remainder = list.partition { |e| e[:user] == index }
-      if remainder.empty?
-        [found]
-      else
-        [found] + partition_for_user(remainder)
-      end
-    end
-    protected :partition_for_user
 
   # Infers the user, submission, and attachment from a filename
   def infer_comment_context_from_filename(fullpath)
