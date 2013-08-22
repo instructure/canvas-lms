@@ -463,9 +463,11 @@ describe "quizzes" do
       q.update_attribute(:time_limit, 20)
       q.update_quiz_submission_end_at_times
 
+      assert_flash_notice_message /You have been given extra time on this attempt/
+
+
       keep_trying_until do
-        assert_flash_notice_message /You have been given extra time on this attempt/
-        f('.time_running').text.should match /^[19]{2}\sMinutes/
+        f('.time_running').text.should match /19 Minutes/
       end
 
       #This step is to prevent selenium from freezing when the dialog appears when leaving the page
@@ -487,7 +489,7 @@ describe "quizzes" do
 
     def file_upload_submission_data
       @quiz.reload.quiz_submissions.first.
-        submission_data["question_#{@question.id}".to_sym]
+          submission_data["question_#{@question.id}".to_sym]
     end
 
     def file_upload_attachment
@@ -513,7 +515,7 @@ describe "quizzes" do
       }, :assessment_question => a)
       q.generate_quiz_data
       q.save!
-      filename,@fullpath,data = get_file "testfile1.txt"
+      filename, @fullpath, data = get_file "testfile1.txt"
       get "/courses/#{@course.id}/quizzes/#{q.id}/take?user_id=#{@user.id}"
       expect_new_page_load do
         driver.find_element(:link_text, 'Take the Quiz').click
@@ -523,7 +525,7 @@ describe "quizzes" do
       # the browser
       driver.execute_script "$('.file-upload').removeClass('hidden')"
       upload_attachment_answer
-      file_upload_submission_data.should == [ file_upload_attachment.id.to_s ]
+      file_upload_submission_data.should == [file_upload_attachment.id.to_s]
       # delete the attachment id
       fj('.delete-attachment').click
       keep_trying_until do
@@ -576,7 +578,7 @@ describe "quizzes" do
 
       # force a save to create a submission
       answer_one.click
-      wait_for_ajax_requests
+      wait_for_ajaximations
 
       # add time as a the moderator. this code replicates what happens in
       # QuizSubmissions#extensions when a moderator extends a student's
@@ -585,10 +587,10 @@ describe "quizzes" do
       submission.end_at = Time.now + 20.minutes
       submission.save!
 
+      assert_flash_notice_message /You have been given extra time on this attempt/
+
       keep_trying_until do
-        assert_flash_notice_message /You have been given extra time on this attempt/
-        f('.time_running').text.should match /^[19]{2}\sMinutes/
-        true
+        f('.time_running').text.should match /19 Minutes/
       end
 
       #This step is to prevent selenium from freezing when the dialog appears when leaving the page
