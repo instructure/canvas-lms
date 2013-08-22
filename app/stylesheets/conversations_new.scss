@@ -2,9 +2,22 @@
 @import "bootstrap/button-groups";
 @import "autocomplete";
 
-#wrapper-container, #wrapper, #main, #not_right_side,
-#content-wrapper, #content, .conversations {
+#not_right_side, #content-wrapper, #content, .conversations {
   height: 100%;
+}
+
+#main {
+  position: absolute;
+  top: 70px;
+  bottom: 40px;
+  width: 100%;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+#footer {
+  position: absolute;
+  bottom: 0;
 }
 
 #content.container-fluid {
@@ -13,6 +26,7 @@
 
 .conversations {
   min-width: 960px;
+  position: relative;
 }
 
 .conversations .panel {
@@ -107,7 +121,9 @@
 }
 
 .messaging-wrapper {
-  height: 100%;
+  position: absolute;
+  top: 50px;
+  bottom: 0;
 }
 
 .message-list {
@@ -244,6 +260,8 @@
 .message-detail.span8 {
   margin-left: 0;
   width: 68.08511%;
+  height: 100%;
+  overflow: auto;
 
   &:focus {
     outline: none;
