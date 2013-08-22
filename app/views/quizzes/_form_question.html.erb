@@ -165,9 +165,9 @@
     </div>
     <div class="matching_answer_incorrect_matches_holder" style="margin-top: 15px;">
       <b id="distractor_label"><%= before_label(:distractors, "Additional Match Possibilities (distractors)") %></b>
-      <div style="font-size: 0.8em;"><%= t(:distractor_instructions, "type each distractor on its own line") %></div>
+      <div id="distractor_instructions" style="font-size: 0.8em;"><%= t(:distractor_instructions, "type each distractor on its own line") %></div>
       <div style="text-align: center;">
-      <textarea style="width: 90%; height: 50px;" aria-labelledby="distractor_label" name="matching_answer_incorrect_matches"></textarea>
+      <textarea style="width: 90%; height: 50px;" aria-labelledby="distractor_label" aria-describedby="distractor_instructions" name="matching_answer_incorrect_matches"></textarea>
       </div>
     </div>
     <div class="missing_word_after_answer" style="margin-top: 15px;">
