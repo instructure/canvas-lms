@@ -481,13 +481,15 @@ class AssessmentQuestion < ActiveRecord::Base
           question_data[:qq_data][question['migration_id']] = question
           next
         end
+        next if question[:question_bank_migration_id] && !migration.import_object?("quizzes", question[:question_bank_migration_id])
         if !question_bank
           hash_id = "#{question[:question_bank_id]}_#{question[:question_bank_name]}"
           if !banks[hash_id]
-            unless bank = migration.context.assessment_question_banks.find_by_title_and_migration_id(question[:question_bank_name], question[:question_bank_id])
+            bank_mig_id = question[:question_bank_id] || question[:question_bank_migration_id]
+            unless bank = migration.context.assessment_question_banks.find_by_title_and_migration_id(question[:question_bank_name], bank_mig_id)
               bank = migration.context.assessment_question_banks.new
               bank.title = question[:question_bank_name]
-              bank.migration_id = question[:question_bank_id]
+              bank.migration_id = bank_mig_id
               bank.save!
             end
             if bank.workflow_state == 'deleted'
