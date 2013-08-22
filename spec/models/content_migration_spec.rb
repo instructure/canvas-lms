@@ -1244,6 +1244,24 @@ describe ContentMigration do
       @copy_to.quizzes.find_by_migration_id(mig_id(quiz2)).should be_nil
     end
 
+    it "should preserve links to re-uploaded attachments" do
+      att = Attachment.create!(:filename => 'first.png', :uploaded_data => StringIO.new('ohai'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
+      att.destroy
+      new_att = Attachment.create!(:filename => 'first.png', :uploaded_data => StringIO.new('ohai'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
+      @copy_from.attachments.find(att.id).should == new_att
+
+      page = @copy_from.wiki.wiki_pages.create!(:title => "some page", :body => "<a href='/courses/#{@copy_from.id}/files/#{att.id}/download?wrap=1'>link</a>")
+
+      @cm.copy_options = { :wiki_pages => {mig_id(page) => "1"}}
+      @cm.save!
+
+      run_course_copy
+
+      att2 = @copy_to.attachments.find_by_filename('first.png')
+      page2 = @copy_to.wiki.wiki_pages.find_by_migration_id(mig_id(page))
+      page2.body.should include("<a href=\"/courses/#{@copy_to.id}/files/#{att2.id}/download?wrap=1\">link</a>")
+    end
+
     it "should perform day substitutions" do
       pending unless Qti.qti_enabled?
       @copy_from.assert_assignment_group
