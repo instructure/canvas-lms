@@ -121,7 +121,25 @@ is for items that are not draggable.
       </div>
     </li>
 
+  </ul>
+</div>
 
+<div class="item-group">
+  <h2 class="ig-header">
+    <a class="ig-header-title element_toggler" href="#"
+       aria-controls="group_2"
+       aria-expanded="true">
+      <i class="icon-mini-arrow-down"></i> Item Group Header
+    </a>
+  </h2>
+  <ul class="ig-list" id="group_2">
+    <li>
+      <div class="ig-row ig-row-empty">
+        <div class="ig-empty-msg">
+          No assignments in this Group
+        </div>
+      </div>
+    </li>
   </ul>
 </div>
 ```
@@ -218,8 +236,20 @@ is for items that are not draggable.
   &.ig-published .ig-title {
     color: #34832b;
   }
-}
 
+  &.ig-row-empty {
+    height: 30px;
+    background: #f3f6f7;
+    border: 1px solid #dcdee0;
+    box-shadow: none;
+  }
+
+  .ig-empty-msg {
+    color: #676b6e;
+    text-align: center;
+    padding: 5px;
+  }
+}
 
 .ig-title {
   position: absolute;
@@ -276,15 +306,4 @@ is for items that are not draggable.
 .ig-text {
   color: #3d454c;
   font-size: 15px;
-}
-
-.ig-no-content {
-  height: 20px;
-  margin-top: 5px;
-  border: 1px dashed #c1c7cf;
-  border-radius: 3px;
-  background: #fff;
-  padding: 10px 17px;
-  color: #878d92;
-  line-height: 20px;
 }

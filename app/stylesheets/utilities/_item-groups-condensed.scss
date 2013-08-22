@@ -149,6 +149,25 @@ color with a dashed line between groups.
     </ul>
   </div>
 
+  <div class="item-group-condensed">
+    <h2 class="ig-header">
+      <a class="ig-header-title element_toggler" href="#"
+         aria-controls="cond_group_3"
+         aria-expanded="true">
+        <i class="icon-mini-arrow-down"></i> Item Group Header
+      </a>
+    </h2>
+    <ul class="ig-list" id="cond_group_3">
+      <li>
+        <div class="ig-row ig-row-empty">
+          <div class="ig-empty-msg">
+            No assignments in this Group
+          </div>
+        </div>
+      </li>
+    </ul>
+  </div>
+
 </div>
 ```
 
@@ -157,6 +176,7 @@ color with a dashed line between groups.
 body.with_item_groups #main {
   background-color: #e8ecef;
 }
+
 .item-group-container {
   background-color: $wellBackground;
   padding-bottom: 70px;
@@ -165,6 +185,7 @@ body.with_item_groups #main {
     border-bottom: 1px dashed #c2c8d0;
     padding: 15px;
   }
+
   .item-group-condensed:last-child,
   .item-group-condensed.last {
     border-bottom: 0;
@@ -173,11 +194,11 @@ body.with_item_groups #main {
   .ig-list {
     margin-top: 0;
   }
+
   .ig-list li {
     margin: 0;
   }
 }
-
 
 .item-group-condensed {
   padding: 9px;
@@ -196,17 +217,28 @@ body.with_item_groups #main {
     border-radius: 0;
     background: #fff;
   }
+
   .ig-list li:first-child {
     margin-top: 5px;
   }
+
   .ig-list li:first-child .ig-row {
     border-top: 1px solid #c1c7cf;
     border-top-left-radius: 3px;
     border-top-right-radius: 3px;
+
+    &.ig-row-empty {
+      border-top: 1px solid #dcdee0;
+    }
   }
+
   .ig-list li:last-child .ig-row {
     border-bottom: 1px solid #c1c7cf;
     border-bottom-left-radius: 3px;
     border-bottom-right-radius: 3px;
+
+    &.ig-row-empty {
+      border-bottom: 1px solid #dcdee0;
+    }
   }
 }

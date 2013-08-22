@@ -8,10 +8,16 @@
 
 <ul id="{{listId}}" class="ig-list collectionViewItems"></ul>
 
-<div class="ig-no-content">
-  {{#if isSurvey}}
-    {{#t "no_surveys"}}There are no surveys to show.{{/t}}
-  {{else}}
-    {{#t "no_quizzes"}}There are no quizzes to show.{{/t}}
-  {{/if}}
-</div>
+<ul class="ig-list no_content">
+  <li>
+    <div class="ig-row ig-row-empty">
+      <div class="ig-empty-msg">
+        {{#if isSurvey}}
+          {{#t "no_surveys"}}No surveys found{{/t}}
+        {{else}}
+          {{#t "no_quizzes"}}No quizzes found{{/t}}
+        {{/if}}
+      </div>
+    </div>
+  </li>
+</ul>
