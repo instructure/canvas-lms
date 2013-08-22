@@ -1,6 +1,6 @@
 class AddGistIndexesForApiSearch < ActiveRecord::Migration
   self.transactional = false
-  tag :predeploy
+  tag :postdeploy
 
   def self.up
     if is_postgres?
