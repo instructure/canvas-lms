@@ -46,8 +46,8 @@ define [
 
     getFormData: ->
       data = super
-      delete data.rules.drop_lowest if _.contains(["", "0"], data.rules.drop_lowest )
-      delete data.rules.drop_highest if _.contains(["", "0"], data.rules.drop_highest )
+      delete data.rules.drop_lowest if _.contains(["", "0"], data.rules.drop_lowest)
+      delete data.rules.drop_highest if _.contains(["", "0"], data.rules.drop_highest)
       delete data.rules.never_drop if data.rules.never_drop?.length == 0
       data
 

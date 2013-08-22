@@ -19,7 +19,7 @@ define [
       "due_at":"2013-08-28T23:59:00-06:00"
       "title":"Winter Session"
 
-    buildAssignment(
+    buildAssignment
       "id":1
       "name":"History Quiz"
       "description":"test"
@@ -27,24 +27,21 @@ define [
       "points_possible":2
       "position":1
       "all_dates":[date1, date2]
-    )
 
   assignment2 = ->
-    buildAssignment(
+    buildAssignment
       "id":3
       "name":"Math Quiz"
       "due_at":"2013-08-23T23:59:00-06:00"
       "points_possible":10
       "position":2
-    )
 
   assignment3 = ->
-    buildAssignment(
+    buildAssignment
       "id":2
       "name":"Science Quiz"
       "points_possible":5
       "position":3
-    )
 
   buildAssignment = (options) ->
     options ?= {}
@@ -64,9 +61,31 @@ define [
       "published":true
     $.extend base, options
 
-  createAssignmentGroup = ->
+  group1 = ->
+    buildGroup()
+
+  group2 = ->
+    buildGroup
+      "id":2
+      "name":"Other Assignments"
+      "position":2
+      "rules": {"drop_lowest":1, "drop_highest":2, "never_drop":[3,4]} # intentionally include an invalid assignment id
+
+  buildGroup = (options) ->
+    options ?= {}
+
     assignments = [assignment1(), assignment2(), assignment3()]
-    group = "id":1, "name":"Assignments", "position":1, "rules":{}, "group_weight":1, "assignments": assignments
+    base =
+      "id":1,
+      "name":"Assignments",
+      "position":1,
+      "rules":{},
+      "group_weight":1,
+      "assignments": assignments
+    $.extend base, options
+
+  createAssignmentGroup = (group) ->
+    group ?= buildGroup()
     groups = new AssignmentGroupCollection([group])
     groups.models[0]
 
@@ -74,22 +93,27 @@ define [
     options = $.extend {canManage: true}, options
 
     sinon.stub( AssignmentGroupListItemView.prototype, "canManage", -> options.canManage )
+    sinon.stub( AssignmentGroupListItemView.prototype, "currentUserId", -> 1)
     sinon.stub( AssignmentListItemView.prototype, "canManage", -> options.canManage )
     sinon.stub( AssignmentListItemView.prototype, "modules", -> )
 
-    view = new AssignmentGroupListItemView(model: model)
+    view = new AssignmentGroupListItemView
+      model: model
+      course: new Backbone.Model(id: 1)
     view.$el.appendTo $('#fixtures')
     view.render()
-
-    AssignmentGroupListItemView.prototype.canManage.restore()
-    AssignmentListItemView.prototype.canManage.restore()
-    AssignmentListItemView.prototype.modules.restore()
 
     view
 
   module 'AssignmentGroupListItemView',
     setup: ->
       @model = createAssignmentGroup()
+
+    teardown: ->
+      AssignmentGroupListItemView.prototype.canManage.restore()
+      AssignmentListItemView.prototype.canManage.restore()
+      AssignmentListItemView.prototype.modules.restore()
+      AssignmentGroupListItemView.prototype.currentUserId.restore()
 
   test "initializes collection", ->
     view = createView(@model)
@@ -151,6 +175,11 @@ define [
     view.toggle(true)
     ok view.isExpanded()
 
+  test "displayableRules", ->
+    model = createAssignmentGroup(group2())
+    view = createView(model)
+    equal view.displayableRules().length, 3
+
   test "cacheKey builds unique key", ->
     view = createView(@model)
-    equal view.cacheKey(), "ag_1_expanded"
+    deepEqual view.cacheKey(), ["course", 1, "user", 1, "ag", 1, "expanded"]

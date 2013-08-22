@@ -5,8 +5,9 @@ define [
   'compiled/views/PublishIconView'
   'compiled/views/VddTooltipView'
   'compiled/views/assignments/CreateAssignmentView'
+  'compiled/fn/preventDefault'
   'jst/assignments/AssignmentListItem'
-], (I18n, Backbone, _, PublishIconView, VddTooltipView, CreateAssignmentView, template) ->
+], (I18n, Backbone, _, PublishIconView, VddTooltipView, CreateAssignmentView, preventDefault, template) ->
 
   class AssignmentListItemView extends Backbone.View
     tagName: "li"
@@ -21,6 +22,7 @@ define [
 
     events:
       'click .delete_assignment': 'onDelete'
+      'click .tooltip_link': preventDefault ->
 
     messages:
       confirm: I18n.t('confirms.delete_assignment', 'Are you sure you want to delete this assignment?')

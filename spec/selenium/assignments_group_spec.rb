@@ -436,6 +436,21 @@ describe "assignment groups" do
       ags.collect(&:position).should == [1,3,2,4,5]
     end
 
+    it "should correctly display rules tooltip" do
+      @assignment_group.rules_hash = {
+        'drop_lowest' => '1',
+        'drop_highest' => '1'
+      }
+      @assignment_group.save!
+
+      refresh_page
+      wait_for_ajaximations
+
+      anchor = fj("#assignment_group_#{@assignment_group.id} .ag-header-controls .tooltip_link")
+      anchor.text.should == "2 Rules"
+      anchor.should have_attribute('title', "Drop the lowest score and Drop the highest score")
+    end
+
     context "modules" do
       before do
         @module = @course.context_modules.create!(:name => "module 1")

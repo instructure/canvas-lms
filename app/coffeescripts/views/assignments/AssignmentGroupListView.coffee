@@ -26,6 +26,8 @@ define [
 ], (_, Backbone, Cache, SortableCollectionView, AssignmentGroupListItemView, template, NoAssignmentsListItem) ->
 
   class AssignmentGroupListView extends SortableCollectionView
+    @optionProperty 'course'
+
     template: template
     itemView: AssignmentGroupListItemView
 
@@ -34,6 +36,7 @@ define [
     initialize: ->
       super
       $.extend true, this, Cache
+      @itemViewOptions = course: @course
 
     render: ->
       super(ENV.PERMISSIONS.manage)
