@@ -193,7 +193,7 @@ class SubmissionsController < ApplicationController
             end
           }
           json_handled = true
-          format.json { render :json => @attachment.to_json(:permissions => {:user => @current_user}) }
+          format.json { render :json => @attachment.as_json(:permissions => {:user => @current_user}) }
         else
           @submission.limit_comments(@current_user, session)
           format.html
@@ -202,7 +202,7 @@ class SubmissionsController < ApplicationController
           format.json { 
             @submission.limit_comments(@current_user, session)
             excludes = @assignment.grants_right?(@current_user, session, :grade) ? [:grade, :score] : []
-            render :json => @submission.to_json(
+            render :json => @submission.as_json(
               Submission.json_serialization_full_parameters(
                 :exclude => excludes,
                 :except  => %w(quiz_submission submission_history)
@@ -393,7 +393,7 @@ class SubmissionsController < ApplicationController
             flash[:error] = t('errors.assignment_submit_fail', "Assignment failed to submit")
             redirect_to course_assignment_url(@context, @assignment)
           }
-          format.json { render :json => e.record.errors.to_json, :status => :bad_request }
+          format.json { render :json => e.record.errors, :status => :bad_request }
         end
         return
       end
@@ -409,7 +409,7 @@ class SubmissionsController < ApplicationController
             if api_request?
               render :json => submission_json(@submission, @assignment, @current_user, session, @context, %{submission_comments attachments}), :status => :created, :location => api_v1_course_assignment_submission_url(@context, @assignment, @current_user)
             else
-              render :json => @submission.to_json(:include => :submission_comments), :status => :created, :location => course_gradebook_url(@submission.assignment.context)
+              render :json => @submission.as_json(:include => :submission_comments), :status => :created, :location => course_gradebook_url(@submission.assignment.context)
             end
           }
         else
@@ -417,7 +417,7 @@ class SubmissionsController < ApplicationController
             flash[:error] = t('errors.assignment_submit_fail', "Assignment failed to submit")
             render :action => "show", :id => @submission.assignment.context.id
           }
-          format.json { render :json => @submission.errors.to_json, :status => :bad_request }
+          format.json { render :json => @submission.errors, :status => :bad_request }
         end
       end
     end
@@ -464,7 +464,7 @@ class SubmissionsController < ApplicationController
 
     if params[:submission][:student_entered_score] && @submission.grants_right?(@current_user, session, :comment)
       update_student_entered_score(params[:submission][:student_entered_score])
-      render :json => @submission.to_json
+      render :json => @submission
       return
     end
 
@@ -512,17 +512,17 @@ class SubmissionsController < ApplicationController
             :comments => admin_in_context ? :submission_comments : :visible_submission_comments
           }).merge(:permissions => { :user => @current_user, :session => session, :include_permissions => false })
           format.json { 
-            render :json => @submissions.to_json(json_args), :status => :created, :location => course_gradebook_url(@submission.assignment.context)
+            render :json => @submissions.map{ |s| s.as_json(json_args) }, :status => :created, :location => course_gradebook_url(@submission.assignment.context)
           }
           format.text { 
-            render :json => @submissions.to_json(json_args), :status => :created, :location => course_gradebook_url(@submission.assignment.context)
+            render :json => @submissions.map{ |s| s.as_json(json_args) }, :status => :created, :location => course_gradebook_url(@submission.assignment.context)
           }
         else
           @error_message = t('errors_update_failed', "Update Failed")
           flash[:error] = @error_message
           format.html { render :action => "show", :id => @assignment.context.id }
-          format.json { render :json => {:errors => {:base => @error_message}}.to_json, :status => :bad_request }
-          format.text { render :json => {:errors => {:base => @error_message}}.to_json, :status => :bad_request }
+          format.json { render :json => {:errors => {:base => @error_message}}, :status => :bad_request }
+          format.text { render :json => {:errors => {:base => @error_message}}, :status => :bad_request }
         end
       end
     end
@@ -545,7 +545,7 @@ class SubmissionsController < ApplicationController
       @attachment.user = @current_user
       @attachment.save!
       ContentZipper.send_later_enqueue_args(:process_attachment, { :priority => Delayed::LOW_PRIORITY, :max_attempts => 1 }, @attachment)
-      render :json => @attachment.to_json
+      render :json => @attachment
     else
       respond_to do |format|
         if @attachment.zipped?
@@ -557,12 +557,12 @@ class SubmissionsController < ApplicationController
             format.html { send_file(@attachment.full_filename, :type => @attachment.content_type_with_encoding, :disposition => 'inline') }
             format.zip { send_file(@attachment.full_filename, :type => @attachment.content_type_with_encoding, :disposition => 'inline') }
           end
-          format.json { render :json => @attachment.to_json(:methods => :readable_size) }
+          format.json { render :json => @attachment.as_json(:methods => :readable_size) }
         else
           flash[:notice] = t('still_zipping', "File zipping still in process...")
           format.html { redirect_to named_context_url(@context, :context_assignment_url, @assignment.id) }
           format.zip { redirect_to named_context_url(@context, :context_assignment_url, @assignment.id) }
-          format.json { render :json => @attachment.to_json }
+          format.json { render :json => @attachment }
         end
       end
     end

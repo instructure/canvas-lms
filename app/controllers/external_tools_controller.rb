@@ -144,7 +144,7 @@ class ExternalToolsController < ApplicationController
       # prerequisite checks
       unless Canvas.redis_enabled?
         @context.errors.add(:redis, 'Redis is not enabled, but is required for sessionless LTI launch')
-        render :json => @context.errors.to_json, :status => :service_unavailable
+        render :json => @context.errors, :status => :service_unavailable
         return
       end
 
@@ -156,14 +156,14 @@ class ExternalToolsController < ApplicationController
       if params[:launch_type] == 'assessment'
         unless params[:assignment_id]
           @context.errors.add(:assignment_id, 'An assignment id must be provided for assessment LTI launch')
-          render :json => @context.errors.to_json, :status => :bad_request
+          render :json => @context.errors, :status => :bad_request
           return
         end
 
         assignment = @context.assignments.find_by_id(params[:assignment_id])
         unless assignment
           @context.errors.add(:assignment_id, 'The assignment was not found in this course')
-          render :json => @context.errors.to_json, :status => :bad_request
+          render :json => @context.errors, :status => :bad_request
           return
         end
 
@@ -175,7 +175,7 @@ class ExternalToolsController < ApplicationController
       unless tool_id || launch_url
         @context.errors.add(:id, 'An id or a url must be provided')
         @context.errors.add(:url, 'An id or a url must be provided')
-        render :json => @context.errors.to_json, :status => :bad_request
+        render :json => @context.errors, :status => :bad_request
         return
       end
 
@@ -510,10 +510,10 @@ class ExternalToolsController < ApplicationController
           if api_request?
             format.json { render :json => external_tool_json(@tool, @context, @current_user, session) }
           else
-            format.json { render :json => @tool.to_json(:methods => [:readable_state, :custom_fields_string, :vendor_help_link], :include_root => false) }
+            format.json { render :json => @tool.as_json(:methods => [:readable_state, :custom_fields_string, :vendor_help_link], :include_root => false) }
           end
         else
-          format.json { render :json => @tool.errors.to_json, :status => :bad_request }
+          format.json { render :json => @tool.errors, :status => :bad_request }
         end
       end
     end
@@ -538,10 +538,10 @@ class ExternalToolsController < ApplicationController
           if api_request?
             format.json { render :json => external_tool_json(@tool, @context, @current_user, session) }
           else
-            format.json { render :json => @tool.to_json(:methods => [:readable_state, :custom_fields_string], :include_root => false) }
+            format.json { render :json => @tool.as_json(:methods => [:readable_state, :custom_fields_string], :include_root => false) }
           end
         else
-          format.json { render :json => @tool.errors.to_json, :status => :bad_request }
+          format.json { render :json => @tool.errors, :status => :bad_request }
         end
       end
     end
@@ -563,10 +563,10 @@ class ExternalToolsController < ApplicationController
           if api_request?
             format.json { render :json => external_tool_json(@tool, @context, @current_user, session) }
           else
-            format.json { render :json => @tool.to_json(:methods => [:readable_state, :custom_fields_string], :include_root => false) }
+            format.json { render :json => @tool.as_json(:methods => [:readable_state, :custom_fields_string], :include_root => false) }
           end
         else
-          format.json { render :json => @tool.errors.to_json, :status => :bad_request }
+          format.json { render :json => @tool.errors, :status => :bad_request }
         end
       end
     end

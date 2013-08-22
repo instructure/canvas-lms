@@ -9,11 +9,11 @@ class AccountNotificationsController < ApplicationController
       if @notification.save
         flash[:notice] = t(:announcement_created_notice, "Announcement successfully created")
         format.html { redirect_to account_settings_path(@account, :anchor => 'tab-announcements') }
-        format.json { render :json => @notification.to_json }
+        format.json { render :json => @notification }
       else
         flash[:error] = t(:announcement_creation_failed_notice, "Announcement creation failed")
         format.html { redirect_to account_settings_path(@account, :anchor => 'tab-announcements') }
-        format.json { render :json => @notification.errors.to_json, :status => :bad_request }
+        format.json { render :json => @notification.errors, :status => :bad_request }
       end
     end
   end
@@ -24,7 +24,7 @@ class AccountNotificationsController < ApplicationController
     respond_to do |format|
       flash[:message] = t(:announcement_deleted_notice, "Announcement successfully deleted")
       format.html { redirect_to account_settings_path(@account, :anchor => 'tab-announcements') }
-      format.json { render :json => @notification.to_json }
+      format.json { render :json => @notification }
     end
   end
   

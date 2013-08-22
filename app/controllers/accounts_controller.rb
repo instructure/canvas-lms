@@ -351,11 +351,11 @@ class AccountsController < ApplicationController
 
         if @account.update_attributes(params[:account])
           format.html { redirect_to account_settings_url(@account) }
-          format.json { render :json => @account.to_json }
+          format.json { render :json => @account }
         else
           flash[:error] = t(:update_failed_notice, "Account settings update failed")
           format.html { redirect_to account_settings_url(@account) }
-          format.json { render :json => @account.errors.to_json, :status => :bad_request }
+          format.json { render :json => @account.errors, :status => :bad_request }
         end
       end
     end
@@ -438,7 +438,7 @@ class AccountsController < ApplicationController
       end
       respond_to do |format|
         format.html { redirect_to account_users_url(@account) }
-        format.json { render :json => (@user || {}).to_json }
+        format.json { render :json => @user || {} }
       end
     end
   end
@@ -452,9 +452,9 @@ class AccountsController < ApplicationController
           params[:turnitin_shared_secret],
           host
         )
-        render :json => { :success => turnitin.testSettings }.to_json
+        render :json => { :success => turnitin.testSettings }
       rescue
-        render :json => { :success => false }.to_json
+        render :json => { :success => false }
       end
     end
   end
@@ -495,7 +495,7 @@ class AccountsController < ApplicationController
     if authorized_action(@account, @current_user, :view_statistics)
       @items = @account.report_snapshots.progressive.last.try(:report_value_over_time, params[:attribute])
       respond_to do |format|
-        format.json { render :json => @items.to_json }
+        format.json { render :json => @items }
         format.csv { 
           res = CSV.generate do |csv|
             csv << ['Timestamp', 'Value']
@@ -638,7 +638,7 @@ class AccountsController < ApplicationController
       @account_user.destroy
       respond_to do |format|
         format.html { redirect_to account_settings_url(@context, :anchor => "tab-users") }
-        format.json { render :json => @account_user.to_json }
+        format.json { render :json => @account_user }
       end
     end
   end

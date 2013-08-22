@@ -237,7 +237,7 @@ class WikiPagesApiController < ApplicationController
         log_asset_access(@page, "wiki", @wiki, 'participate')
         render :json => wiki_page_json(@page, @current_user, session)
       else
-        render :json => @page.errors.to_json, :status => update_params.is_a?(Symbol) ? update_params : :bad_request
+        render :json => @page.errors, :status => update_params.is_a?(Symbol) ? update_params : :bad_request
       end
     end
   end
@@ -301,7 +301,7 @@ class WikiPagesApiController < ApplicationController
         @page.context_module_action(@current_user, @context, :contributed)
         render :json => wiki_page_json(@page, @current_user, session)
       else
-        render :json => @page.errors.to_json, :status => update_params.is_a?(Symbol) ? update_params : :bad_request
+        render :json => @page.errors, :status => update_params.is_a?(Symbol) ? update_params : :bad_request
       end
     end
   end
@@ -331,7 +331,7 @@ class WikiPagesApiController < ApplicationController
         render :json => wiki_page_json(@page, @current_user, session)
       else
         @page.errors.add(:front_page, t(:cannot_delete_front_page, 'The front page cannot be deleted'))
-        render :json => @page.errors.to_json, :status => :bad_request
+        render :json => @page.errors, :status => :bad_request
       end
     end
   end
@@ -423,7 +423,7 @@ class WikiPagesApiController < ApplicationController
       if @page.save
         render :json => wiki_page_revision_json(@page.versions.current, @current_user, session, true)
       else
-        render :json => @page.errors.to_json, :status => :bad_request
+        render :json => @page.errors, :status => :bad_request
       end
     end
   end

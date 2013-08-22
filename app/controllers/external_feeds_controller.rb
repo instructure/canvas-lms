@@ -98,7 +98,7 @@ class ExternalFeedsController < ApplicationController
       if @feed.save
         render :json => external_feed_api_json(@feed, @context, @current_user, session)
       else
-        render :json => @feed.errors.to_json, :status => :bad_request
+        render :json => @feed.errors, :status => :bad_request
       end
     end
   end
@@ -118,7 +118,7 @@ class ExternalFeedsController < ApplicationController
       if @feed.destroy
         render :json => external_feed_api_json(@feed, @context, @current_user, session)
       else
-        render :json => @feed.errors.to_json, :status => :bad_request
+        render :json => @feed.errors, :status => :bad_request
       end
     end
   end

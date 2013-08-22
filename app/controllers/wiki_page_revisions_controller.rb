@@ -30,7 +30,7 @@ class WikiPageRevisionsController < ApplicationController
           add_crumb(t("#crumbs.revisions", "Revisions"))
           log_asset_access(@page, "wiki", @wiki)
         }
-        format.json { render :json => @page.version_history.to_json(:methods => :version_number) }
+        format.json { render :json => @page.version_history.map{ |v| v.as_json(methods: :version_number) }}
       end
     end
   end
@@ -66,7 +66,7 @@ class WikiPageRevisionsController < ApplicationController
           log_asset_access(@page, "wiki", @wiki)
         }
         @model = @revision.model rescue nil
-        format.json { render :json => @model.to_json(:methods => :version_number) }
+        format.json { render :json => @model.as_json(:methods => :version_number) }
       end
     end
   end

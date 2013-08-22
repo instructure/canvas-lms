@@ -604,8 +604,7 @@ class DiscussionTopicsApiController < ApplicationController
     if result == true || result.try(:errors).blank?
       render :nothing => true, :status => :no_content
     else
-      error_json = result.try(:errors).try(:to_json) || {}
-      render :json => error_json, :status => :bad_request
+      render :json => result.try(:errors) || {}, :status => :bad_request
     end
   end 
 end

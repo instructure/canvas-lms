@@ -298,7 +298,7 @@ class ContextModuleItemsApiController < ApplicationController
         @module.touch
         render :json => module_item_json(@tag, @current_user, session, @module, nil)
       elsif @tag
-        render :json => @tag.errors.to_json, :status => :bad_request
+        render :json => @tag.errors, :status => :bad_request
       else
         render :status => 400, :json => { :message => t(:invalid_content, "Could not find content") }
       end
@@ -393,7 +393,7 @@ class ContextModuleItemsApiController < ApplicationController
         @tag.update_asset_name! if params[:module_item][:title]
         render :json => module_item_json(@tag, @current_user, session, @tag.context_module, nil)
       else
-        render :json => @tag.errors.to_json, :status => :bad_request
+        render :json => @tag.errors, :status => :bad_request
       end
     end
   end

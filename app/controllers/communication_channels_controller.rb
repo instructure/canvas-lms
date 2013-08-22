@@ -184,7 +184,7 @@ class CommunicationChannelsController < ApplicationController
         flash[:notice] = t 'notices.registration_confirmed', "Registration confirmed!"
         return respond_to do |format|
           format.html { redirect_back_or_default(user_profile_url(@current_user)) }
-          format.json { render :json => cc.to_json(:except => [:confirmation_code] ) }
+          format.json { render :json => cc.as_json(:except => [:confirmation_code] ) }
         end
       end
 
@@ -323,7 +323,7 @@ class CommunicationChannelsController < ApplicationController
     if failed
       respond_to do |format|
         format.html { render :action => "confirm_failed", :status => :bad_request }
-        format.json { render :json => {}.to_json, :status => :bad_request }
+        format.json { render :json => {}, :status => :bad_request }
       end
     else
       flash[:notice] = t 'notices.registration_confirmed', "Registration confirmed!"
@@ -374,7 +374,7 @@ class CommunicationChannelsController < ApplicationController
         render :json => @cc.as_json
       end
     else
-      render :json => @cc.errors.to_json, :status => :bad_request
+      render :json => @cc.errors, :status => :bad_request
     end
   end
 

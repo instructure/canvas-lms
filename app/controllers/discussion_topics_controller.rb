@@ -497,7 +497,7 @@ class DiscussionTopicsController < ApplicationController
           flash[:notice] = t :topic_deleted_notice, "%{topic_title} deleted successfully", :topic_title => @topic.title
           redirect_to named_context_url(@context, :context_discussion_topics_url)
         }
-        format.json  { render :json => @topic.to_json(:include => {:user => {:only => :name} } ), :status => :ok }
+        format.json  { render :json => @topic.as_json(:include => {:user => {:only => :name} } ), :status => :ok }
       end
     end
   end
@@ -583,7 +583,7 @@ class DiscussionTopicsController < ApplicationController
 
       render :json => discussion_topic_api_json(@topic, @context, @current_user, session)
     else
-      render :json => @topic.errors.to_json, :status => :bad_request
+      render :json => @topic.errors, :status => :bad_request
     end
   end
 

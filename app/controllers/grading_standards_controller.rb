@@ -22,7 +22,7 @@ class GradingStandardsController < ApplicationController
   before_filter { |c| c.active_tab = "grading_standards" }
   
   def default_data
-    render :json => GradingStandard.default_grading_standard.to_json
+    render :json => GradingStandard.default_grading_standard
   end
   
   def index
@@ -31,7 +31,7 @@ class GradingStandardsController < ApplicationController
       respond_to do |format|
         format.html { }
         format.json {
-          render :json => @standards.to_json(:methods => [:display_name, :context_code])
+          render :json => @standards.map{ |s| s.as_json(methods: [:display_name, :context_code]) }
         }
       end
     end
@@ -43,9 +43,9 @@ class GradingStandardsController < ApplicationController
       @standard.user = @current_user
       respond_to do |format|
         if @standard.save
-          format.json{ render :json => @standard.to_json } 
+          format.json{ render :json => @standard }
         else
-          format.json{ render :json => @standard.errors.to_json, :status => :bad_request }
+          format.json{ render :json => @standard.errors, :status => :bad_request }
         end
       end
     end
@@ -57,9 +57,9 @@ class GradingStandardsController < ApplicationController
       @standard.user = @current_user
       respond_to do |format|
         if @standard.update_attributes(params[:grading_standard])
-          format.json{ render :json => @standard.to_json }
+          format.json{ render :json => @standard }
         else
-          format.json{ render :json => @standard.errors.to_json, :status => :bad_request }
+          format.json{ render :json => @standard.errors, :status => :bad_request }
         end
       end
     end
@@ -70,9 +70,9 @@ class GradingStandardsController < ApplicationController
     if authorized_action(@context, @current_user, :manage_grades)
       respond_to do |format|
         if @standard.destroy
-          format.json{ render :json => @standard.to_json }
+          format.json{ render :json => @standard }
         else
-          format.json{ render :json => @standard.errors.to_json, :status => :bad_request }
+          format.json{ render :json => @standard.errors, :status => :bad_request }
         end
       end
     end

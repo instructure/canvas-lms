@@ -276,7 +276,7 @@ class ConversationsController < ApplicationController
       render :json => [conversation_json(@conversation.reload, @current_user, session, :include_indirect_participants => true, :messages => [message])], :status => :created
     end
   rescue ActiveRecord::RecordInvalid => err
-    render :json => err.record.errors.to_json, :status => :bad_request
+    render :json => err.record.errors, :status => :bad_request
   end
 
   # @API
@@ -757,7 +757,9 @@ class ConversationsController < ApplicationController
   # @example_response
   #   {'unread_count': '7'}
   def unread_count
-    render(:json => {'unread_count' => @current_user.unread_conversations_count.to_json})
+    # the reasons for this being a string instead of an integer are historical,
+    # but for backwards API compatibility we need to leave it a string.
+    render :json => {'unread_count' => @current_user.unread_conversations_count.to_s}
   end
   
   def public_feed

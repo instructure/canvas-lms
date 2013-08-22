@@ -296,7 +296,7 @@ class CalendarEventsApiController < ApplicationController
       if @event.save
         render :json => event_json(@event, @current_user, session), :status => :created
       else
-        render :json => @event.errors.to_json, :status => :bad_request
+        render :json => @event.errors, :status => :bad_request
       end
     end
   end
@@ -407,10 +407,9 @@ class CalendarEventsApiController < ApplicationController
         params[:calendar_event][:description] = process_incoming_html_content(params[:calendar_event][:description])
       end
       if @event.update_attributes(params[:calendar_event])
-        json_response = event_json(@event, @current_user, session)
-        render :json => json_response
+        render :json => event_json(@event, @current_user, session)
       else
-        render :json => @event.errors.to_json, :status => :bad_request
+        render :json => @event.errors, :status => :bad_request
       end
     end
   end
@@ -436,7 +435,7 @@ class CalendarEventsApiController < ApplicationController
       if @event.destroy
         render :json => event_json(@event, @current_user, session)
       else
-        render :json => @event.errors.to_json, :status => :bad_request
+        render :json => @event.errors, :status => :bad_request
       end
     end
   end

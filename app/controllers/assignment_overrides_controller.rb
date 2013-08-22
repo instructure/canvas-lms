@@ -194,7 +194,7 @@ class AssignmentOverridesController < ApplicationController
     return bad_request(:errors => errors) if errors
 
     if update_assignment_override(@override, data)
-      render :json => assignment_override_json(@override).to_json, :status => 201
+      render :json => assignment_override_json(@override), :status => 201
     else
       bad_request(@override.errors)
     end
@@ -251,7 +251,7 @@ class AssignmentOverridesController < ApplicationController
     return bad_request(:errors => errors) if errors
 
     if update_assignment_override(@override, data)
-      render :json => assignment_override_json(@override).to_json
+      render :json => assignment_override_json(@override)
     else
       bad_request(@override.errors)
     end
@@ -309,7 +309,7 @@ class AssignmentOverridesController < ApplicationController
   end
 
   def bad_request(errors)
-    render :json => errors.to_json, :status => :bad_request
+    render :json => errors, :status => :bad_request
   end
 
   # @!appendix Group assignments

@@ -252,8 +252,8 @@ class EnrollmentsApiController < ApplicationController
     user = api_find(User, params[:enrollment].delete(:user_id))
     @enrollment = @context.enroll_user(user, type, params[:enrollment].merge(:allow_multiple_enrollments => true))
     @enrollment.valid? ?
-      render(:json => enrollment_json(@enrollment, @current_user, session).to_json) :
-      render(:json => @enrollment.errors.to_json)
+      render(:json => enrollment_json(@enrollment, @current_user, session)) :
+      render(:json => @enrollment.errors)
   end
 
   # @API Conclude an enrollment
@@ -294,7 +294,7 @@ class EnrollmentsApiController < ApplicationController
     if @enrollment.send(task)
       render :json => enrollment_json(@enrollment, @current_user, session)
     else
-      render :json => @enrollment.errors.to_json, :status => :bad_request
+      render :json => @enrollment.errors, :status => :bad_request
     end
   end
 

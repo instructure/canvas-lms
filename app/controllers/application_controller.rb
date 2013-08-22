@@ -622,8 +622,8 @@ class ApplicationController < ActionController::Base
       respond_to do |format|
         flash[:error] = error unless request.format.to_s == "text/plain"
         format.html {redirect_to redirect }
-        format.json {render :json => {:errors => {:base => error}}.to_json }
-        format.text {render :json => {:errors => {:base => error}}.to_json }
+        format.json {render :json => {:errors => {:base => error}} }
+        format.text {render :json => {:errors => {:base => error}} }
       end
       return true
     end

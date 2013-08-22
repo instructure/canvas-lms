@@ -171,7 +171,7 @@ class GroupCategoriesController < ApplicationController
           render :json => group_category_json(@group_category, @current_user, session)
         else
           flash[:notice] = t('notices.create_category_success', 'Category was successfully created.')
-          render :json => [@group_category.as_json, @group_category.groups.map { |g| g.as_json(:include => :users) }].to_json
+          render :json => [@group_category.as_json, @group_category.groups.map { |g| g.as_json(:include => :users) }]
         end
       end
     end
@@ -223,7 +223,7 @@ class GroupCategoriesController < ApplicationController
         return render(:json => {'status' => 'unauthorized'}, :status => :unauthorized) if @group_category.protected?
         if populate_group_category_from_params
           flash[:notice] = t('notices.update_category_success', 'Category was successfully updated.')
-          render :json => @group_category.to_json
+          render :json => @group_category
         end
       end
     end

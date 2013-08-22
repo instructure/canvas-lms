@@ -71,7 +71,7 @@ class OutcomesController < ApplicationController
     @outcome = @context.linked_learning_outcomes.find(params[:outcome_id])
     if authorized_action(@context, @current_user, :read)
       @outcome.tie_to(@context)
-      render :json => @outcome.to_json(
+      render :json => @outcome.as_json(
         :methods => :artifacts_count_for_tied_context,
         :user_content => %w(description))
     end
@@ -89,7 +89,7 @@ class OutcomesController < ApplicationController
         end
       end
       @results = @outcome.learning_outcome_results.for_context_codes(codes).custom_ordering(params[:sort]).paginate(:page => params[:page], :per_page => 10)
-      render :json => @results.to_json
+      render :json => @results
     end
   end
   
@@ -121,7 +121,7 @@ class OutcomesController < ApplicationController
       if params[:unused]
         @outcomes -= @current_outcomes
       end
-      render :json => @outcomes.to_json(:methods => :cached_context_short_name)
+      render :json => @outcomes.map{ |o| o.as_json(methods: :cached_context_short_name) }
     end
   end
   
@@ -142,7 +142,7 @@ class OutcomesController < ApplicationController
       else
         @group.add_outcome(@outcome)
       end
-      render :json => @outcome.to_json(:methods => :cached_context_short_name, :permissions => {:user => @current_user, :session => session})
+      render :json => @outcome.as_json(:methods => :cached_context_short_name, :permissions => {:user => @current_user, :session => session})
     end
   end
   
@@ -152,7 +152,7 @@ class OutcomesController < ApplicationController
       @asset = @context.find_asset(params[:asset_string])
       mastery_type = @asset.is_a?(Assignment) ? "points" : "none"
       @alignment = @outcome.align(@asset, @context, :mastery_type => mastery_type) if @asset
-      render :json => @alignment.to_json(:include => :learning_outcome)
+      render :json => @alignment.as_json(:include => :learning_outcome)
     end
   end
   
@@ -169,7 +169,7 @@ class OutcomesController < ApplicationController
       @outcome = @context.available_outcome(params[:outcome_id].to_i)
       @alignment = @outcome.alignments.find(params[:id])
       @outcome.remove_alignment(@alignment.content, @context)
-      render :json => @alignment.to_json(:include => :learning_outcome)
+      render :json => @alignment.as_json(:include => :learning_outcome)
     end
   end
   
@@ -207,7 +207,7 @@ class OutcomesController < ApplicationController
     if authorized_action(@context, @current_user, :manage_outcomes)
       @outcome = @context.linked_learning_outcomes.find(params[:outcome_id])
       @alignments = @outcome.reorder_alignments(@context, params[:order].split(","))
-      render :json => @alignments.to_json(:include => :learning_outcome)
+      render :json => @alignments.map{ |a| a.as_json(include: :learning_outcome) }
     end
   end
   
@@ -223,11 +223,11 @@ class OutcomesController < ApplicationController
           @outcome_group.add_outcome(@outcome)
           flash[:notice] = t :successful_outcome_creation, "Outcome successfully created!"
           format.html { redirect_to named_context_url(@context, :context_outcomes_url) }
-          format.json { render :json => @outcome.to_json }
+          format.json { render :json => @outcome }
         else
           flash[:error] = t :failed_outcome_creation, "Outcome creation failed"
           format.html { redirect_to named_context_url(@context, :context_outcomes_url) }
-          format.json { render :json => @outcome.errors.to_json, :status => :bad_request }
+          format.json { render :json => @outcome.errors, :status => :bad_request }
         end
       end
     end
@@ -241,11 +241,11 @@ class OutcomesController < ApplicationController
         if @outcome.update_attributes(params[:learning_outcome])
           flash[:notice] = t :successful_outcome_update, "Outcome successfully updated!"
           format.html { redirect_to named_context_url(@context, :context_outcomes_url) }
-          format.json { render :json => @outcome.to_json }
+          format.json { render :json => @outcome }
         else
           flash[:error] = t :failed_outcome_update, "Outcome update failed"
           format.html { redirect_to named_context_url(@context, :context_outcomes_url) }
-          format.json { render :json => @outcome.errors.to_json, :statue => :bad_request }
+          format.json { render :json => @outcome.errors, :statue => :bad_request }
         end
       end
     end
@@ -261,11 +261,11 @@ class OutcomesController < ApplicationController
         if params[:id].present? && @outcome = @context.created_learning_outcomes.find_by_id(params[:id])
           @outcome.destroy
           flash[:notice] = t :successful_outcome_delete, "Outcome successfully deleted"
-          format.json { render :json => @outcome.to_json }
+          format.json { render :json => @outcome }
         elsif params[:id].present? && @link = @context.learning_outcome_links.find_by_id(params[:id])
           @link.destroy
           flash[:notice] = t :successful_outcome_removal, "Outcome successfully removed"
-          format.json { render :json => @link.learning_outcome.to_json }
+          format.json { render :json => @link.learning_outcome }
         else
           flash[:notice] = t :missing_outcome, "Couldn't find that learning outcome"
           format.json { render :json => {:errors => {:base => t(:missing_outcome, "Couldn't find that learning outcome")}}, :status => :bad_request }

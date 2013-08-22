@@ -195,7 +195,7 @@ class CoursesController < ApplicationController
           course = course_enrollments.first.course
           hash << course_json(course, @current_user, session, includes, course_enrollments)
         end
-        render :json => hash.to_json
+        render :json => hash
       }
     end
   end
@@ -338,7 +338,7 @@ class CoursesController < ApplicationController
         else
           flash[:error] = t('errors.create_failed', "Course creation failed")
           format.html { redirect_to :root_url }
-          format.json { render :json => @course.errors.to_json, :status => :bad_request }
+          format.json { render :json => @course.errors, :status => :bad_request }
         end
       end
     end
@@ -616,7 +616,7 @@ class CoursesController < ApplicationController
   def destroy
     @context = api_request? ? api_find(Course, params[:id]) : Course.find(params[:id])
     if api_request? && !['delete', 'conclude'].include?(params[:event])
-      return render(:json => { :message => 'Only "delete" and "conclude" events are allowed.' }.to_json, :status => :bad_request)
+      return render(:json => { :message => 'Only "delete" and "conclude" events are allowed.' }, :status => :bad_request)
     end
     if params[:event] != 'conclude' && (@context.created? || @context.claimed? || params[:event] == 'delete')
       return unless authorized_action(@context, @current_user, permission_for_event(params[:event]))
@@ -638,7 +638,7 @@ class CoursesController < ApplicationController
     respond_to do |format|
       format.html { redirect_to dashboard_url }
       format.json {
-        render :json => { params[:event] => true }.to_json
+        render :json => { params[:event] => true }
       }
     end
   end
@@ -677,7 +677,7 @@ class CoursesController < ApplicationController
         format.html do
           js_env(:RECENT_STUDENTS_URL => api_v1_course_recent_students_url(@context))
         end
-        format.json { render :json => @categories.to_json }
+        format.json { render :json => @categories }
       end
     end
   end
@@ -764,7 +764,7 @@ class CoursesController < ApplicationController
       @context.save
       respond_to do |format|
         format.html { redirect_to named_context_url(@context, :context_details_url) }
-        format.json { render :json => {:update_nav => true}.to_json }
+        format.json { render :json => {:update_nav => true} }
       end
     end
   end
@@ -785,7 +785,7 @@ class CoursesController < ApplicationController
 
       respond_to do |format|
         format.html { redirect_to course_settings_url }
-        format.json { render :json => {:re_sent => true}.to_json }
+        format.json { render :json => {:re_sent => true} }
       end
     end
   end
@@ -987,7 +987,7 @@ class CoursesController < ApplicationController
         end
         locks
       end
-      render :json => locks_hash.to_json
+      render :json => locks_hash
     end
   end
 
@@ -1085,7 +1085,7 @@ class CoursesController < ApplicationController
     @context = Course.active.find(params[:id])
     if request.xhr?
       if authorized_action(@context, @current_user, [:read, :read_as_admin])
-        render :json => @context.to_json
+        render :json => @context
       end
       return
     end
@@ -1206,9 +1206,9 @@ class CoursesController < ApplicationController
     if @enrollment.can_be_concluded_by(@current_user, @context, session)
       respond_to do |format|
         if @enrollment.conclude
-          format.json { render :json => @enrollment.to_json }
+          format.json { render :json => @enrollment }
         else
-          format.json { render :json => @enrollment.to_json, :status => :bad_request }
+          format.json { render :json => @enrollment, :status => :bad_request }
         end
       end
     else
@@ -1225,9 +1225,9 @@ class CoursesController < ApplicationController
       respond_to do |format|
         @enrollment.workflow_state = 'active'
         if @enrollment.save
-          format.json { render :json => @enrollment.to_json }
+          format.json { render :json => @enrollment }
         else
-          format.json { render :json => @enrollment.to_json, :status => :bad_request }
+          format.json { render :json => @enrollment, :status => :bad_request }
         end
       end
     else
@@ -1241,10 +1241,10 @@ class CoursesController < ApplicationController
     if authorized_action(@context, @current_user, :manage_admin_users)
       if params[:limit] == "1"
         Enrollment.limit_privileges_to_course_section!(@context, @user, true)
-        render :json => {:limited => true}.to_json
+        render :json => {:limited => true}
       else
         Enrollment.limit_privileges_to_course_section!(@context, @user, false)
-        render :json => {:limited => false}.to_json
+        render :json => {:limited => false}
       end
     else
       authorized_action(@context, @current_user, :permission_fail)
@@ -1257,9 +1257,9 @@ class CoursesController < ApplicationController
     if @enrollment.can_be_deleted_by(@current_user, @context, session)
       respond_to do |format|
         if (!@enrollment.defined_by_sis? || @context.grants_right?(@current_user, session, :manage_account_settings)) && @enrollment.destroy
-          format.json { render :json => @enrollment.to_json }
+          format.json { render :json => @enrollment }
         else
-          format.json { render :json => @enrollment.to_json, :status => :bad_request }
+          format.json { render :json => @enrollment, :status => :bad_request }
         end
       end
     else
@@ -1340,7 +1340,7 @@ class CoursesController < ApplicationController
       student = nil
       student = @context.students.find(params[:student_id]) if params[:student_id] != 'none'
       enrollment.update_attribute(:associated_user_id, student && student.id)
-      render :json => enrollment.to_json(:methods => :associated_user_name)
+      render :json => enrollment.as_json(:methods => :associated_user_name)
     end
   end
 
@@ -1358,12 +1358,12 @@ class CoursesController < ApplicationController
           "id<>? AND user_id=? AND course_section_id=? AND type=? AND (associated_user_id IS NULL OR associated_user_id=?)",
           @enrollment, @enrollment.user_id, params[:course_section_id], @enrollment.type, @enrollment.associated_user_id).first
         if @possible_dup.present?
-          format.json { render :json => @enrollment.to_json, :status => :forbidden }
+          format.json { render :json => @enrollment, :status => :forbidden }
         else
           @enrollment.course_section = @context.course_sections.find(params[:course_section_id])
           @enrollment.save!
 
-          format.json { render :json => @enrollment.to_json }
+          format.json { render :json => @enrollment }
         end
       end
     else
@@ -1529,12 +1529,12 @@ class CoursesController < ApplicationController
             if api_request?
               render :json => course_json(@course, @current_user, session, [:hide_final_grades], nil)
             else
-             render :json => @course.to_json(:methods => [:readable_license, :quota, :account_name, :term_name, :grading_standard_title, :storage_quota_mb]), :status => :ok
+             render :json => @course.as_json(:methods => [:readable_license, :quota, :account_name, :term_name, :grading_standard_title, :storage_quota_mb]), :status => :ok
             end
           end
         else
           format.html { render :action => "edit" }
-          format.json { render :json => @course.errors.to_json, :status => :bad_request }
+          format.json { render :json => @course.errors, :status => :bad_request }
         end
       end
     end

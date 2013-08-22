@@ -85,11 +85,11 @@ class ConferencesController < ApplicationController
           end
           @conference.save
           format.html { redirect_to named_context_url(@context, :context_conference_url, @conference.id) }
-          format.json { render :json => WebConference.find(@conference).to_json(:permissions => {:user => @current_user, :session => session},
+          format.json { render :json => WebConference.find(@conference).as_json(:permissions => {:user => @current_user, :session => session},
                                                                                 :url => named_context_url(@context, :context_conference_url, @conference)) }
         else
           format.html { render :action => 'index' }
-          format.json { render :json => @conference.errors.to_json, :status => :bad_request }
+          format.json { render :json => @conference.errors, :status => :bad_request }
         end
       end
     end
@@ -109,11 +109,11 @@ class ConferencesController < ApplicationController
           end
           @conference.save
           format.html { redirect_to named_context_url(@context, :context_conference_url, @conference.id) }
-          format.json { render :json => @conference.to_json(:permissions => {:user => @current_user, :session => session},
+          format.json { render :json => @conference.as_json(:permissions => {:user => @current_user, :session => session},
                                                             :url => named_context_url(@context, :context_conference_url, @conference)) }
         else
           format.html { render :action => "edit" }
-          format.json { render :json => @conference.errors.to_json, :status => :bad_request }
+          format.json { render :json => @conference.errors, :status => :bad_request }
         end
       end
     end
@@ -150,10 +150,10 @@ class ConferencesController < ApplicationController
   def close
     if authorized_action(@conference, @current_user, :close)
       if @conference.close
-        render :json => @conference.to_json(:permissions => {:user => @current_user, :session => session},
+        render :json => @conference.as_json(:permissions => {:user => @current_user, :session => session},
                                             :url => named_context_url(@context, :context_conference_url, @conference))
       else
-        render :json => @conference.errors.to_json
+        render :json => @conference.errors
       end
     end
   end
@@ -174,7 +174,7 @@ class ConferencesController < ApplicationController
       @conference.destroy
       respond_to do |format|
         format.html { redirect_to named_context_url(@context, :context_conferences_url) }
-        format.json { render :json => @conference.to_json }
+        format.json { render :json => @conference }
       end
     end
   end

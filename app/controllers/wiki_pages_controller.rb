@@ -66,7 +66,7 @@ class WikiPagesController < ApplicationController
       log_asset_access(@page, "wiki", @wiki)
       respond_to do |format|
         format.html {render :action => "show" }
-        format.json {render :json => @page.to_json }
+        format.json {render :json => @page }
       end
     else
       render_unauthorized_action(@page)
@@ -126,7 +126,7 @@ class WikiPagesController < ApplicationController
     else
       respond_to do |format|
         format.html { render :action => "show" }
-        format.json { render :json => @page.errors.to_json, :status => :bad_request }
+        format.json { render :json => @page.errors, :status => :bad_request }
       end
     end
   end

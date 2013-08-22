@@ -33,7 +33,7 @@ class SearchController < ApplicationController
     end
     res += Rubric.publicly_reusable.matching(params[:q])
     res = res.select{|r| r.title.downcase.match(params[:q].downcase) }
-    render :json => res.to_json
+    render :json => res
   end
 
   # @API Find recipients

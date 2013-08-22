@@ -270,7 +270,7 @@ class ContextModulesApiController < ApplicationController
       if @module.save && set_position
         render :json => module_json(@module, @current_user, session, nil)
       else
-        render :json => @module.errors.to_json, :status => :bad_request
+        render :json => @module.errors, :status => :bad_request
       end
     end
   end
@@ -336,7 +336,7 @@ class ContextModulesApiController < ApplicationController
       if @module.update_attributes(module_parameters) && set_position
         render :json => module_json(@module, @current_user, session, nil)
       else
-        render :json => @module.errors.to_json, :status => :bad_request
+        render :json => @module.errors, :status => :bad_request
       end
     end
   end

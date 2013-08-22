@@ -514,7 +514,7 @@ class UsersController < ApplicationController
         :start_at => datetime_string(c.start_at, :verbose, nil, true),
         :end_at => datetime_string(c.conclude_at, :verbose, nil, true)
       }
-    }.to_json
+    }
   end
 
   include Api::V1::TodoItem
@@ -691,7 +691,7 @@ class UsersController < ApplicationController
         item.update_attribute(:hidden, true) # observer handles cache invalidation
       end
     end
-    render :json => { :hidden => true }.to_json
+    render :json => { :hidden => true }
   end
 
   # @API Upload a file
@@ -716,7 +716,7 @@ class UsersController < ApplicationController
 
   def close_notification
     @current_user.close_announcement(AccountNotification.find(params[:id]))
-    render :json => @current_user.to_json
+    render :json => @current_user
   end
 
   def delete_user_service
@@ -742,7 +742,7 @@ class UsersController < ApplicationController
           raise "Unknown Service"
       end
       @service = UserService.register_from_params(@current_user, params[:user_service])
-      render :json => @service.to_json
+      render :json => @service
     rescue => e
       render :json => {:errors => true}, :status => :bad_request
     end
@@ -755,7 +755,7 @@ class UsersController < ApplicationController
       if params[:service_types]
         @services = @services.of_type(params[:service_types].split(",")) rescue []
       end
-      @services.to_json(:only => [:service_user_id, :service_user_url, :service_user_name, :service, :type, :id])
+      @services.map{ |s| s.as_json(only: [:service_user_id, :service_user_url, :service_user_name, :service, :type, :id]) }
     end
     render :json => json
   end
@@ -764,7 +764,7 @@ class UsersController < ApplicationController
     @service = @current_user.user_services.find_by_type_and_service('BookmarkService', params[:service_type]) rescue nil
     res = nil
     res = @service.find_bookmarks(params[:q]) if @service
-    render :json => res.to_json
+    render :json => res
   end
 
   def show
@@ -1234,14 +1234,14 @@ class UsersController < ApplicationController
     @user = User.find(params[:user_id])
     if authorized_action(@user, @current_user, :read)
       res = @user.assignments_needing_grading
-      render :json => res.to_json
+      render :json => res
     end
   end
 
   def assignments_needing_submitting
     @user = User.find(params[:user_id])
     if authorized_action(@user, @current_user, :read)
-      render :json => @user.assignments_needing_submitting.to_json
+      render :json => @user.assignments_needing_submitting
     end
   end
 
@@ -1250,7 +1250,7 @@ class UsersController < ApplicationController
       if authorized_action(@user, @current_user, :remove_avatar)
         @user.avatar_image = {}
         @user.save
-        render :json => @user.to_json
+        render :json => @user
       end
     else
       if !session["reported_#{@user.id}".to_sym]
@@ -1261,7 +1261,7 @@ class UsersController < ApplicationController
         @user.report_avatar_image!(@context)
       end
       session["reports_#{@user.id}".to_sym] = true
-      render :json => {:reported => true}.to_json
+      render :json => {:reported => true}
     end
   end
 
@@ -1327,7 +1327,7 @@ class UsersController < ApplicationController
     if authorized_action(@user, @current_user, :remove_avatar)
       @user.avatar_state = params[:avatar][:state]
       @user.save
-      render :json => @user.to_json(:include_root => false)
+      render :json => @user.as_json(:include_root => false)
     end
   end
 

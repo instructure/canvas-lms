@@ -78,9 +78,9 @@ class GradebooksController < ApplicationController
         @rubric_context = Context.find_by_asset_string(params[:context_code])
       end
       @rubric_associations = @context.sorted_rubrics(@current_user, @rubric_context)
-      render :json => @rubric_associations.to_json(:methods => [:context_name], :include => :rubric)
+      render :json => @rubric_associations.map{ |r| r.as_json(methods: [:context_name], include: :rubric) }
     else
-      render :json => @rubric_contexts.to_json
+      render :json => @rubric_contexts
     end
   end
 
@@ -94,9 +94,9 @@ class GradebooksController < ApplicationController
 
       respond_to do |format|
         if @new_submissions.empty?
-          format.json { render :json => [].to_json }
+          format.json { render :json => [] }
         else
-          format.json { render :json => @new_submissions.to_json(:include => [:quiz_submission, :submission_comments, :attachments]) }
+          format.json { render :json => @new_submissions.map{ |s| s.as_json(include: [:quiz_submission, :submission_comments, :attachments]) }}
         end
       end
     end
@@ -200,7 +200,7 @@ class GradebooksController < ApplicationController
           Shackles.activate(:slave) do
             @submissions = @context.submissions
             @new_submissions = @submissions
-            render :json => @new_submissions.to_json(:include => [:quiz_submission, :submission_comments, :attachments])
+            render :json => @new_submissions.map{ |s| s.as_json(include: [:quiz_submission, :submission_comments, :attachments]) }
           end
         }
       end
@@ -224,7 +224,7 @@ class GradebooksController < ApplicationController
                          id=assignments.group_category_id) AS group_category"]) + groups_as_assignments
       elsif params[:students]
         # you need to specify specifically which student fields you want returned to the gradebook via json here
-        render :json => @context.students_visible_to(@current_user).order_by_sortable_name.to_json(:only => ["id", "name", "sortable_name", "short_name"])
+        render :json => @context.students_visible_to(@current_user).order_by_sortable_name.map{ |s| s.as_json(only: ["id", "name", "sortable_name", "short_name"]) }
       else
         params[:user_ids] ||= params[:user_id]
         user_ids = params[:user_ids].split(",").map(&:to_i) if params[:user_ids]
@@ -232,7 +232,7 @@ class GradebooksController < ApplicationController
         @submissions = @context.submissions
         @submissions = @submissions.where(:user_id => user_ids) if user_ids
         @submissions = @submissions.where(:assignment_id => assignment_ids) if assignment_ids
-        render :json => @submissions.to_json(:include => [:attachments, :quiz_submission, :submission_comments])
+        render :json => @submissions.map{ |s| s.as_json(include: [:attachments, :quiz_submission, :submission_comments]) }
       end
     end
   end
@@ -307,17 +307,17 @@ class GradebooksController < ApplicationController
           flash[:notice] = t('notices.updated', 'Assignment submission was successfully updated.')
           format.html { redirect_to course_gradebook_url(@assignment.context) }
           format.json {
-            render :json => @submissions.to_json(Submission.json_serialization_full_parameters), :status => :created, :location => course_gradebook_url(@assignment.context)
+            render :json => @submissions.map{ |s| s.as_json(Submission.json_serialization_full_parameters) }, :status => :created, :location => course_gradebook_url(@assignment.context)
           }
           format.text {
-            render :json => @submissions.to_json(Submission.json_serialization_full_parameters), :status => :created, :location => course_gradebook_url(@assignment.context),
+            render :json => @submissions.map{ |s| s.as_json(Submission.json_serialization_full_parameters) }, :status => :created, :location => course_gradebook_url(@assignment.context),
                    :as_text => true
           }
         else
           flash[:error] = t('errors.submission_failed', "Submission was unsuccessful: %{error}", :error => @error_message || t('errors.submission_failed_default', 'Submission Failed'))
           format.html { render :action => "show", :course_id => @assignment.context.id }
-          format.json { render :json => {:errors => {:base => @error_message}}.to_json, :status => :bad_request }
-          format.text { render :json => {:errors => {:base => @error_message}}.to_json, :status => :bad_request }
+          format.json { render :json => {:errors => {:base => @error_message}}, :status => :bad_request }
+          format.text { render :json => {:errors => {:base => @error_message}}, :status => :bad_request }
         end
       end
     end

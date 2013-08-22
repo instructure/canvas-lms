@@ -103,14 +103,14 @@ class QuizSubmissionsController < ApplicationController
             @submission.backup_submission_data(params)
             render :json => {:backup => true,
                              :end_at => @submission && @submission.end_at,
-                             :time_left => @submission && @submission.time_left}.to_json
+                             :time_left => @submission && @submission.time_left}
             return
           end
         end
       end
       render :json => {:backup => false,
                        :end_at => @submission && @submission.end_at,
-                       :time_left => @submission && @submission.time_left}.to_json
+                       :time_left => @submission && @submission.time_left}
     end
   end
 
@@ -137,7 +137,7 @@ class QuizSubmissionsController < ApplicationController
       @submission.save!
       respond_to do |format|
         format.html { redirect_to named_context_url(@context, :context_quiz_history_url, @quiz, :user_id => @submission.user_id) }
-        format.json { render :json => @submission.to_json(:include_root => false, :exclude => :submission_data, :methods => ['extendable?', :finished_in_words, :attempts_left]) }
+        format.json { render :json => @submission.as_json(:include_root => false, :exclude => :submission_data, :methods => ['extendable?', :finished_in_words, :attempts_left]) }
       end
     end
   end
@@ -190,7 +190,7 @@ class QuizSubmissionsController < ApplicationController
       @attachment.user = @current_user
       @attachment.save!
       ContentZipper.send_later_enqueue_args(:process_attachment, { :priority => Delayed::LOW_PRIORITY, :max_attempts => 1 }, @attachment)
-      render :json => @attachment.to_json
+      render :json => @attachment
     else
       respond_to do |format|
         if @attachment.zipped?
@@ -202,12 +202,12 @@ class QuizSubmissionsController < ApplicationController
             format.html { send_file(@attachment.full_filename, :type => @attachment.content_type_with_encoding, :disposition => 'inline') }
             format.zip { send_file(@attachment.full_filename, :type => @attachment.content_type_with_encoding, :disposition => 'inline') }
           end
-          format.json { render :json => @attachment.to_json(:methods => :readable_size) }
+          format.json { render :json => @attachment.as_json(:methods => :readable_size) }
         else
           flash[:notice] = t('still_zipping', "File zipping still in process...")
           format.html { redirect_to named_context_url(@context, :context_quiz_url, @quiz.id) }
           format.zip { redirect_to named_context_url(@context, :context_quiz_url, @quiz.id) }
-          format.json { render :json => @attachment.to_json }
+          format.json { render :json => @attachment }
         end
       end
     end

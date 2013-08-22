@@ -36,7 +36,7 @@ class ContentExportsController < ApplicationController
     if params[:id].present? && export = @context.content_exports.find_by_id(params[:id])
       render_export(export)
     else
-      render :json => {:errors => {:base => t('errors.not_found', "Export does not exist")}}.to_json, :status => :bad_request
+      render :json => {:errors => {:base => t('errors.not_found', "Export does not exist")}}, :status => :bad_request
     end
   end
 
@@ -60,7 +60,7 @@ class ContentExportsController < ApplicationController
         export.export_course
         render_export(export)
       else
-        render :json => {:error_message => t('errors.couldnt_create', "Couldn't create course export.")}.to_json
+        render :json => {:error_message => t('errors.couldnt_create', "Couldn't create course export.")}
       end
     else
       # an export is already running, just return it
@@ -74,9 +74,9 @@ class ContentExportsController < ApplicationController
 
     if params[:id].present? && export = @context.content_exports.find_by_id(params[:id])
       export.destroy
-      render :json => {:success=>'true'}.to_json
+      render :json => {:success=>'true'}
     else
-      render :json => {:errors => {:base => t('errors.not_found', "Export does not exist")}}.to_json, :status => :bad_request
+      render :json => {:errors => {:base => t('errors.not_found', "Export does not exist")}}, :status => :bad_request
     end
   end
 

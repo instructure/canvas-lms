@@ -594,9 +594,9 @@ class GroupsController < ApplicationController
       @membership = @group.add_user(User.find(params[:user_id]))
       if @membership.valid?
         @group.touch
-        render :json => @membership.to_json
+        render :json => @membership
       else
-        render :json => @membership.errors.to_json, :status => :bad_request
+        render :json => @membership.errors, :status => :bad_request
       end
     end
   end
@@ -606,7 +606,7 @@ class GroupsController < ApplicationController
     if authorized_action(@group, @current_user, :manage)
       @membership = @group.group_memberships.find_by_user_id(params[:user_id])
       @membership.destroy
-      render :json => @membership.to_json
+      render :json => @membership
     end
   end
 

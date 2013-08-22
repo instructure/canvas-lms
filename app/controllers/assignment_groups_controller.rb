@@ -155,7 +155,7 @@ class AssignmentGroupsController < ApplicationController
     if authorized_action(@assignment_group, @current_user, :read)
       respond_to do |format|
         format.html { redirect_to(named_context_url(@context, :context_assignments_url, @assignment_group.context_id)) }
-        format.json { render :json => @assignment_group.to_json(:permissions => {:user => @current_user, :session => session}) }
+        format.json { render :json => @assignment_group.as_json(:permissions => {:user => @current_user, :session => session}) }
       end
     end
   end
@@ -168,9 +168,9 @@ class AssignmentGroupsController < ApplicationController
           @assignment_group.insert_at(1)
           flash[:notice] = t 'notices.created', 'Assignment Group was successfully created.'
           format.html { redirect_to named_context_url(@context, :context_assignments_url) }
-          format.json { render :json => @assignment_group.to_json(:permissions => {:user => @current_user, :session => session}), :status => :created}
+          format.json { render :json => @assignment_group.as_json(:permissions => {:user => @current_user, :session => session}), :status => :created}
         else
-          format.json { render :json => @assignment_group.errors.to_json, :status => :bad_request }
+          format.json { render :json => @assignment_group.errors, :status => :bad_request }
         end
       end
     end
@@ -183,9 +183,9 @@ class AssignmentGroupsController < ApplicationController
         if @assignment_group.update_attributes(params[:assignment_group])
           flash[:notice] = t 'notices.updated', 'Assignment Group was successfully updated.'
           format.html { redirect_to named_context_url(@context, :context_assignments_url) }
-          format.json { render :json => @assignment_group.to_json(:permissions => {:user => @current_user, :session => session}), :status => :ok }
+          format.json { render :json => @assignment_group.as_json(:permissions => {:user => @current_user, :session => session}), :status => :ok }
         else
-          format.json { render :json => @assignment_group.errors.to_json, :status => :bad_request }
+          format.json { render :json => @assignment_group.errors, :status => :bad_request }
         end
       end
     end
@@ -198,7 +198,7 @@ class AssignmentGroupsController < ApplicationController
         @assignment_group.errors.add('workflow_state', t('errors.cannot_delete_group', "You can not delete a group with a locked assignment.", :att_name => 'workflow_state'))
         respond_to do |format|
           format.html { redirect_to named_context_url(@context, :context_assignments_url) }
-          format.json { render :json => @assignment_group.errors.to_json, :status => :bad_request }
+          format.json { render :json => @assignment_group.errors, :status => :bad_request }
         end
         return
       end
@@ -210,7 +210,10 @@ class AssignmentGroupsController < ApplicationController
 
       respond_to do |format|
         format.html { redirect_to(named_context_url(@context, :context_assignments_url)) }
-        format.json { render :json => {:assignment_group => @assignment_group, :new_assignment_group => @new_group}.to_json(:include_root => false, :include => :active_assignments) }
+        format.json { render :json => {
+          assignment_group: @assignment_group.as_json(include_root: false, include: active_assignments),
+          new_assignment_group: @new_group.as_json(include_root: false, include: active_assignments)
+        }}
       end
     end
   end

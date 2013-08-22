@@ -85,7 +85,7 @@ class AssignmentsController < ApplicationController
           format.html { render :action => :student_index }
         end
         # TODO: eager load the rubric associations
-        format.json { render :json => @assignments.to_json(:include => [ :rubric_association, :rubric ]) }
+        format.json { render :json => @assignments.map{ |a| a.as_json(include: [:rubric_association, :rubric]) } }
       end
     end
   end
@@ -145,7 +145,7 @@ class AssignmentsController < ApplicationController
         else
           format.html { render :action => 'show' }
         end
-        format.json { render :json => @assignment.to_json(:permissions => {:user => @current_user, :session => session}) }
+        format.json { render :json => @assignment.as_json(:permissions => {:user => @current_user, :session => session}) }
       end
     end
   end
@@ -168,7 +168,7 @@ class AssignmentsController < ApplicationController
         {:base => t('errors.google_docs_masquerade_rejected', "Unable to connect to Google Docs as a masqueraded user.")}
       }
       respond_to do |format|
-        format.json { render :json => error_object.to_json, :status => :bad_request }
+        format.json { render :json => error_object, :status => :bad_request }
       end
     end
   end
@@ -201,7 +201,7 @@ class AssignmentsController < ApplicationController
       @request = @assignment.assign_peer_review(@student, @reviewee)
       respond_to do |format|
         format.html { redirect_to named_context_url(@context, :context_assignment_peer_reviews_url, @assignment.id) }
-        format.json { render :json => @request.to_json(:methods => :asset_user_name) }
+        format.json { render :json => @request.as_json(:methods => :asset_user_name) }
       end
     end
   end
@@ -213,10 +213,10 @@ class AssignmentsController < ApplicationController
       respond_to do |format|
         if @request.asset.assignment == @assignment && @request.send_reminder!
           format.html { redirect_to named_context_url(@context, :context_assignment_peer_reviews_url) }
-          format.json { render :json => @request.to_json }
+          format.json { render :json => @request }
         else
           format.html { redirect_to named_context_url(@context, :context_assignment_peer_reviews_url) }
-          format.json { render :json => {:errors => {:base => t('errors.reminder_failed', "Reminder failed")}}.to_json, :status => :bad_request }
+          format.json { render :json => {:errors => {:base => t('errors.reminder_failed', "Reminder failed")}}, :status => :bad_request }
         end
       end
     end
@@ -229,10 +229,10 @@ class AssignmentsController < ApplicationController
       respond_to do |format|
         if @request.asset.assignment == @assignment && @request.destroy
           format.html { redirect_to named_context_url(@context, :context_assignment_peer_reviews_url) }
-          format.json { render :json => @request.to_json }
+          format.json { render :json => @request }
         else
           format.html { redirect_to named_context_url(@context, :context_assignment_peer_reviews_url) }
-          format.json { render :json => {:errors => {:base => t('errors.delete_reminder_failed', "Delete failed")}}.to_json, :status => :bad_request }
+          format.json { render :json => {:errors => {:base => t('errors.delete_reminder_failed', "Delete failed")}}, :status => :bad_request }
         end
       end
     end
@@ -287,9 +287,9 @@ class AssignmentsController < ApplicationController
 
     respond_to do |format|
       if @assignment && @assignment.send(method)
-        format.json { render :json => @assignment.to_json }
+        format.json { render :json => @assignment }
       else
-        format.json { render :json => @assignment.to_json, :status => :bad_request }
+        format.json { render :json => @assignment, :status => :bad_request }
       end
     end
   end
@@ -309,10 +309,10 @@ class AssignmentsController < ApplicationController
         if @assignment.save
           flash[:notice] = t 'notices.created', "Assignment was successfully created."
           format.html { redirect_to named_context_url(@context, :context_assignment_url, @assignment.id) }
-          format.json { render :json => @assignment.to_json(:permissions => {:user => @current_user, :session => session}), :status => :created}
+          format.json { render :json => @assignment.as_json(:permissions => {:user => @current_user, :session => session}), :status => :created}
         else
           format.html { render :action => "new" }
-          format.json { render :json => @assignment.errors.to_json, :status => :bad_request }
+          format.json { render :json => @assignment.errors, :status => :bad_request }
         end
       end
     end
@@ -385,7 +385,7 @@ class AssignmentsController < ApplicationController
       if params[:assignment][:default_grade]
         params[:assignment][:overwrite_existing_grades] = (params[:assignment][:overwrite_existing_grades] == "1")
         @assignment.set_default_grade(params[:assignment])
-        render :json => @assignment.submissions.to_json(:include => :quiz_submission)
+        render :json => @assignment.submissions.map{ |s| s.as_json(:include => :quiz_submission) }
         return
       end
       params[:assignment].delete :default_grade
@@ -413,10 +413,10 @@ class AssignmentsController < ApplicationController
           @assignment.reload
           flash[:notice] = t 'notices.updated', "Assignment was successfully updated."
           format.html { redirect_to named_context_url(@context, :context_assignment_url, @assignment) }
-          format.json { render :json => @assignment.to_json(:permissions => {:user => @current_user, :session => session}, :include => [:quiz, :discussion_topic]), :status => :ok }
+          format.json { render :json => @assignment.as_json(:permissions => {:user => @current_user, :session => session}, :include => [:quiz, :discussion_topic]), :status => :ok }
         else
           format.html { render :action => "edit" }
-          format.json { render :json => @assignment.errors.to_json, :status => :bad_request }
+          format.json { render :json => @assignment.errors, :status => :bad_request }
         end
       end
     end

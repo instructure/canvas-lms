@@ -60,7 +60,7 @@ class SubmissionsApiController < ApplicationController
 
       result = @submissions.map { |s| submission_json(s, @assignment, @current_user, session, @context, includes) }
 
-      render :json => result.to_json
+      render :json => result
     end
   end
 
@@ -203,7 +203,7 @@ class SubmissionsApiController < ApplicationController
 
     if authorized_action(@submission, @current_user, :read)
       includes = Array(params[:include])
-      render :json => submission_json(@submission, @assignment, @current_user, session, @context, includes).to_json
+      render :json => submission_json(@submission, @assignment, @current_user, session, @context, includes)
     end
   end
 
@@ -376,7 +376,7 @@ class SubmissionsApiController < ApplicationController
 
       json = submission_json(@submission, @assignment, @current_user, session, @context, %w(submission_comments))
       json[:all_submissions] = @submissions.map { |submission| submission_json(submission, @assignment, @current_user, session, @context) }
-      render :json => json.to_json
+      render :json => json
     end
   end
 

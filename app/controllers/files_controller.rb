@@ -67,7 +67,7 @@ class FilesController < ApplicationController
         :quota_used => h.number_to_human_size(@quota_used),
         :quota_full => (@quota_used >= @quota)
       }
-      render :json => result.to_json
+      render :json => result
     end
   end
 
@@ -104,7 +104,7 @@ class FilesController < ApplicationController
               @current_attachments = @current_folder.visible_file_attachments.by_position_then_display_name
             end
             @current_attachments = @current_attachments.includes(:thumbnail, :media_object)
-            render :json => @current_attachments.to_json(:methods => [:readable_size, :currently_locked, :thumbnail_url], :permissions => {:user => @current_user, :session => session})
+            render :json => @current_attachments.map{ |a| a.as_json(methods: [:readable_size, :currently_locked, :thumbnail_url], permissions: {user: @current_user, session: session}) }
           else
             file_structure = {
               :contexts => [@context.as_json(permissions: {user: @current_user})],
@@ -233,7 +233,7 @@ class FilesController < ApplicationController
       else
         format.html { render :action => 'full_index' }
       end
-      format.json { render :json => @file_structures.to_json }
+      format.json { render :json => @file_structures }
     end
   end
 
@@ -318,7 +318,7 @@ class FilesController < ApplicationController
       if params[:preview] && @attachment.mime_class == 'image'
         redirect_to '/images/blank.png'
       elsif request.format == :json
-        render :json => {:deleted => true}.to_json
+        render :json => {:deleted => true}
       else
         redirect_to named_context_url(@context, :context_files_url)
       end
@@ -350,7 +350,7 @@ class FilesController < ApplicationController
         @attachment.context_module_action(@current_user, :read) if @current_user
         log_asset_access(@attachment, 'files', 'files')
         @attachment.record_inline_view
-        render :json => {:ok => true}.to_json
+        render :json => {:ok => true}
       else
         render_attachment(@attachment)
       end
@@ -397,7 +397,7 @@ class FilesController < ApplicationController
           log_asset_access(attachment, "files", "files")
         end
       end
-      format.json { render :json => attachment.to_json(options) }
+      format.json { render :json => attachment.as_json(options) }
     end
   end
   protected :render_attachment
@@ -443,12 +443,12 @@ class FilesController < ApplicationController
       # Protect ourselves against reading huge files into memory -- if the
       # attachment is too big, don't return it.
       if @attachment.size > Setting.get_cached('attachment_json_response_max_size', 1.megabyte.to_s).to_i
-        render :json => { :error => t('errors.too_large', "The file is too large to edit") }.to_json
+        render :json => { :error => t('errors.too_large', "The file is too large to edit") }
         return
       end
 
       stream = @attachment.open
-      render :json => { :body => stream.read }.to_json
+      render :json => { :body => stream.read }
      end
   end
 
@@ -602,7 +602,7 @@ class FilesController < ApplicationController
                 'check_quota_after' => @check_quota ? '1' : '0'
               },
               :ssl => request.ssl?)
-      render :json => res.to_json
+      render :json => res
     end
   end
 
@@ -738,8 +738,8 @@ class FilesController < ApplicationController
           end
         else
           format.html { render :action => "new" }
-          format.json { render :json => @attachment.errors.to_json }
-          format.text { render :json => @attachment.errors.to_json }
+          format.json { render :json => @attachment.errors }
+          format.text { render :json => @attachment.errors }
         end
       end
     end
@@ -771,10 +771,10 @@ class FilesController < ApplicationController
           @attachment.move_to_bottom if @folder_id_changed
           flash[:notice] = t 'notices.updated', "File was successfully updated."
           format.html { redirect_to named_context_url(@context, :context_files_url) }
-          format.json { render :json => @attachment.to_json(:methods => [:readable_size, :mime_class, :currently_locked], :permissions => {:user => @current_user, :session => session}), :status => :ok }
+          format.json { render :json => @attachment.as_json(:methods => [:readable_size, :mime_class, :currently_locked], :permissions => {:user => @current_user, :session => session}), :status => :ok }
         else
           format.html { render :action => "edit" }
-          format.json { render :json => @attachment.errors.to_json, :status => :bad_request }
+          format.json { render :json => @attachment.errors, :status => :bad_request }
         end
       end
     end
@@ -828,7 +828,7 @@ class FilesController < ApplicationController
       if @attachment.save
         render :json => attachment_json(@attachment, @current_user)
       else
-        render :json => @attachment.errors.to_json, :status => :bad_request
+        render :json => @attachment.errors, :status => :bad_request
       end
     end
   end
@@ -840,7 +840,7 @@ class FilesController < ApplicationController
       @folders.first && @folders.first.update_order((params[:folder_order] || "").split(","))
       @folder.file_attachments.by_position_then_display_name.first && @folder.file_attachments.first.update_order((params[:order] || "").split(","))
       @folder.reload
-      render :json => @folder.subcontent.to_json(:methods => :readable_size, :permissions => {:user => @current_user, :session => session})
+      render :json => @folder.subcontent.map{ |f| f.as_json(methods: :readable_size, permissions: {user: @current_user, session: session}) }
     end
   end
 
@@ -862,7 +862,7 @@ class FilesController < ApplicationController
         if api_request?
           format.json { render :json => attachment_json(@attachment, @current_user) }
         else
-          format.json { render :json => @attachment.to_json }
+          format.json { render :json => @attachment }
         end
       end
     end
@@ -896,16 +896,20 @@ class FilesController < ApplicationController
   private
 
   def render_attachment_json(attachment, deleted_attachments, folder = attachment.folder)
-    json = { :attachment => attachment,
-      :deleted_attachment_ids => deleted_attachments.map(&:id) }
+    json = {
+      :attachment => attachment.as_json(
+        allow: :uuid,
+        methods: [:uuid,:readable_size,:mime_class,:currently_locked,:scribdable?,:thumbnail_url],
+        permissions: {user: @current_user, session: session},
+        include_root: false
+      ),
+      :deleted_attachment_ids => deleted_attachments.map(&:id)
+    }
     if folder.name == 'profile pictures'
       json[:avatar] = avatar_json(@current_user, attachment, { :type => 'attachment' })
     end
 
-    render :json => json.to_json(:allow => :uuid,
-      :methods => [:uuid,:readable_size,:mime_class,:currently_locked,:scribdable?,:thumbnail_url],
-      :permissions => {:user => @current_user, :session => session}, :include_root => false),
-      :as_text => true
+    render :json => json, :as_text => true
   end
 
 end

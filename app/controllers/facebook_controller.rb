@@ -49,7 +49,7 @@ class FacebookController < ApplicationController
   def hide_message
     @message = @user.messages.to_facebook.find(params[:id])
     @message.destroy
-    render :json => @message.to_json
+    render :json => @message
   end
   
   def index
