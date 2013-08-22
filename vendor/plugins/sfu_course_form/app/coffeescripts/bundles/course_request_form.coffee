@@ -11,7 +11,9 @@ require [
   'sfu_course_form/compiled/collections/CourseList'
   'sfu_course_form/compiled/views/courses/CourseListView'
   'sfu_course_form/compiled/views/courses/SelectableCourseListView'
-], ($, _, Backbone, User, Term, Course, AmaintTermList, TermList, TermListView, CourseList, CourseListView, SelectableCourseListView) ->
+  'sfu_course_form/compiled/collections/SandboxList'
+  'sfu_course_form/compiled/views/sandboxes/SandboxListView'
+], ($, _, Backbone, User, Term, Course, AmaintTermList, TermList, TermListView, CourseList, CourseListView, SelectableCourseListView, SandboxList, SandboxListView) ->
 
   user = {}
   currentUser = {}
@@ -33,9 +35,15 @@ require [
   nonCalendarCourseTextbox = {}
   nonCalendarTermSelect = {}
 
+  sandboxList = {}
+  sandboxListView = {}
+
   timeId = do ->
     now = new Date()
     [now.getMonth() + 1, now.getDate(), now.getYear() - 100, now.getTime().toString().substr(10)].join('')
+
+  getUsernameToDisplay = ->
+    if user == currentUser then 'yourself' else user.get('sfu_id')
 
   getCourses = ->
     # first, fetch terms in which the user teaches
@@ -53,6 +61,16 @@ require [
       error: ->
         $('#courses-suggested').html '<p>No suggested courses found</p>'
     suggestedTerms
+
+  getSandboxes = ->
+    sandboxList = new SandboxList(user.get('sfu_id'))
+    sandboxListView = new SandboxListView
+      collection: sandboxList
+      el: $('#sandboxes')
+    sandboxListView.username = getUsernameToDisplay()
+    sandboxList.fetch
+      error: ->
+        sandboxListView.renderEmpty()
 
   initPayload = ->
     payload = username: user.get('sfu_id')
@@ -132,9 +150,10 @@ require [
     $(document).one 'userloaded', -> showFacultyStep()
 
   showFacultyStep = ->
-    $('.username-display').text(if user == currentUser then 'yourself' else user.get('sfu_id'))
+    $('.username-display').text(getUsernameToDisplay())
     $('#sandbox-name-display').text("Sandbox - #{user.get('sfu_id')} - #{timeId}")
     getCourses()
+    getSandboxes()
     showStep '2-faculty'
 
   showDelegateStep = ->
