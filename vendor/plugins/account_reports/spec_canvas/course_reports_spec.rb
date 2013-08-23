@@ -41,30 +41,29 @@ describe "Course Account Reports" do
 
     start_at = 1.day.ago
     end_at = 3.months.from_now
-    @course1 = Course.new(:name => 'English 101', :course_code => 'ENG101',
-                          :start_at => start_at, :conclude_at => end_at,
-                          :account => @sub_account, :enrollment_term => @term1)
+    @course1 = Course.create(:name => 'English 101', :course_code => 'ENG101',
+                             :start_at => start_at, :conclude_at => end_at,
+                             :account => @sub_account, :enrollment_term => @term1)
     @course1.sis_source_id = "SIS_COURSE_ID_1"
     @course1.restrict_enrollments_to_course_dates = true
     @course1.save!
 
-    @course2 = Course.new(:name => 'Math 101', :course_code => 'MAT101',
-                          :conclude_at => end_at, :account => @account)
+    @course2 = Course.create(:name => 'Math 101', :course_code => 'MAT101',
+                             :conclude_at => end_at, :account => @account)
     @course2.sis_source_id = "SIS_COURSE_ID_2"
     @course2.save!
     @course2.destroy
 
-    @course3 = Course.new(:name => 'Science 101', :course_code => 'SCI101',
-                          :account => @account)
+    @course3 = Course.create(:name => 'Science 101', :course_code => 'SCI101',
+                             :account => @account)
     @course3.workflow_state = 'claimed'
     @course3.sis_source_id = "SIS_COURSE_ID_3"
     @course3.save!
 
-    @course4 = Course.new(:name => 'self help', :course_code => 'self')
-    @course4.workflow_state = 'available'
-    @course4.save!
+    @course4 = Course.create(:name => 'self help', :course_code => 'self')
+    @course4.offer
 
-    @course5 = Course.new(:name => 'talking 101', :course_code => 'Tal101')
+    @course5 = Course.create(:name => 'talking 101', :course_code => 'Tal101')
     @course5.workflow_state = 'completed'
     @course5.save!
   end
@@ -79,30 +78,29 @@ describe "Course Account Reports" do
       parameters["enrollment_term_id"] = @default_term.id
       parsed = ReportSpecHelper.run_report(@account, @report, parameters)
 
+      parsed.should == [[@course3.id.to_s, "SIS_COURSE_ID_3", "SCI101",
+                         "Science 101", nil, nil]]
       parsed.length.should == 1
 
-      parsed[0].should == [@course3.id.to_s, "SIS_COURSE_ID_3", "SCI101",
-                           "Science 101", nil, nil]
     end
 
     it "should run unpublished courses report on sub account" do
       parsed = ReportSpecHelper.run_report(@sub_account, @report)
-      parsed.length.should == 1
 
-      parsed[0].should == [@course1.id.to_s, "SIS_COURSE_ID_1", "ENG101",
-                           "English 101", @course1.start_at.iso8601,
-                           @course1.conclude_at.iso8601]
+      parsed.should == [[@course1.id.to_s, "SIS_COURSE_ID_1", "ENG101",
+                         "English 101", @course1.start_at.iso8601,
+                         @course1.conclude_at.iso8601]]
+      parsed.length.should == 1
     end
 
     it "should run unpublished courses report" do
       parsed = ReportSpecHelper.run_report(@account, @report)
+      parsed.should == [[@course1.id.to_s, "SIS_COURSE_ID_1", "ENG101",
+                         "English 101", @course1.start_at.iso8601,
+                         @course1.conclude_at.iso8601],
+                        [@course3.id.to_s, "SIS_COURSE_ID_3", "SCI101",
+                         "Science 101", nil, nil]]
       parsed.length.should == 2
-
-      parsed[0].should == [@course1.id.to_s, "SIS_COURSE_ID_1", "ENG101",
-                           "English 101", @course1.start_at.iso8601,
-                           @course1.conclude_at.iso8601]
-      parsed[1].should == [@course3.id.to_s, "SIS_COURSE_ID_3", "SCI101",
-                           "Science 101", nil, nil]
     end
   end
 
