@@ -757,6 +757,8 @@ shared_examples_for "all selenium tests" do
   def get(link, waitforajaximations = true)
     link = polymorphic_path(link) if link.is_a? Array
     driver.get(app_host + link)
+    #handles any modals prompted by navigating from the current page
+    driver.switch_to.alert.accept rescue nil
     wait_for_ajaximations if waitforajaximations
   end
 
@@ -825,7 +827,7 @@ shared_examples_for "all selenium tests" do
     temp_file = open(element.attribute('src'))
     temp_file.size.should > 0
   end
-  
+
   def check_element_attrs(element, attrs)
     element.should be_displayed
     attrs.each do |k, v|
@@ -876,9 +878,9 @@ shared_examples_for "all selenium tests" do
     box[0].should be_displayed
   end
 
-  ##
-  # load the simulate plugin to simulate a drag events (among other things)
-  # will only load it once even if its called multiple times
+##
+# load the simulate plugin to simulate a drag events (among other things)
+# will only load it once even if its called multiple times
   def load_simulate_js
     @load_simulate_js ||= begin
       js = File.read('spec/selenium/helpers/jquery.simulate.js')
@@ -886,20 +888,20 @@ shared_examples_for "all selenium tests" do
     end
   end
 
-  # when selenium fails you, reach for .simulate
-  # takes a CSS selector for jQuery to find the element you want to drag
-  # and then the change in x and y you want to drag
+# when selenium fails you, reach for .simulate
+# takes a CSS selector for jQuery to find the element you want to drag
+# and then the change in x and y you want to drag
   def drag_with_js(selector, x, y)
     load_simulate_js
     driver.execute_script "$('#{selector}').simulate('drag', { dx: #{x}, dy: #{y} })"
   end
 
-  ##
-  # drags an element matching css selector `source_selector` onto an element
-  # matching css selector `target_selector`
-  #
-  # sometimes seleniums drag and drop just doesn't seem to work right this
-  # seems to be more reliable
+##
+# drags an element matching css selector `source_selector` onto an element
+# matching css selector `target_selector`
+#
+# sometimes seleniums drag and drop just doesn't seem to work right this
+# seems to be more reliable
   def js_drag_and_drop(source_selector, target_selector)
     source = f source_selector
     source_location = source.location
@@ -913,8 +915,8 @@ shared_examples_for "all selenium tests" do
     drag_with_js source_selector, dx, dy
   end
 
-  ##
-  # returns true if a form validation error message is visible, false otherwise
+##
+# returns true if a form validation error message is visible, false otherwise
   def error_displayed?
     # after it fades out, it's still visible, just off the screen
     driver.execute_script("return $('.error_text:visible').filter(function(){ return $(this).offset().left >= 0 }).length > 0")
@@ -976,6 +978,7 @@ shared_examples_for "all selenium tests" do
       }
     JS
   end
+
 end
 
 TEST_FILE_UUIDS = {

@@ -460,20 +460,15 @@ describe "quizzes" do
       wait_for_ajax_requests
 
       # increase the time limit on the quiz
-      q.update_attribute(:time_limit, 20)
-      q.update_quiz_submission_end_at_times
-
-      assert_flash_notice_message /You have been given extra time on this attempt/
-
+      quiz_original_end_time = QuizSubmission.last.end_at
 
       keep_trying_until do
+        q.update_attribute(:time_limit, 20)
+        q.update_quiz_submission_end_at_times
+        quiz_original_end_time < QuizSubmission.last.end_at
+        assert_flash_notice_message /You have been given extra time on this attempt/
         f('.time_running').text.should match /19 Minutes/
       end
-
-      #This step is to prevent selenium from freezing when the dialog appears when leaving the page
-      driver.find_element(:link, I18n.t('links_to.quizzes', 'Quizzes')).click
-      confirm_dialog = driver.switch_to.alert
-      confirm_dialog.accept
     end
 
     def upload_attachment_answer
@@ -583,20 +578,18 @@ describe "quizzes" do
       # add time as a the moderator. this code replicates what happens in
       # QuizSubmissions#extensions when a moderator extends a student's
       # quiz time.
-      submission = QuizSubmission.last
-      submission.end_at = Time.now + 20.minutes
-      submission.save!
 
-      assert_flash_notice_message /You have been given extra time on this attempt/
+
+      quiz_original_end_time = QuizSubmission.last.end_at
 
       keep_trying_until do
+        submission = QuizSubmission.last
+        submission.end_at = Time.now + 20.minutes
+        submission.save!
+        quiz_original_end_time < QuizSubmission.last.end_at
+        assert_flash_notice_message /You have been given extra time on this attempt/
         f('.time_running').text.should match /19 Minutes/
       end
-
-      #This step is to prevent selenium from freezing when the dialog appears when leaving the page
-      driver.find_element(:link, I18n.t('links_to.quizzes', 'Quizzes')).click
-      confirm_dialog = driver.switch_to.alert
-      confirm_dialog.accept
     end
 
 
