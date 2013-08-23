@@ -154,7 +154,8 @@
             <li role="presentation">
               <a href="#" class="quiz_details_link" tabindex="-1" role="menuitem">
                 <% if @any_submissions_pending_review %>
-                  <i class="icon-warning"></i>
+                  <i class="icon-warning" aria-label="<%= t("labels.warning_icon", "Warning") %>"></i>
+
                 <% end %>
                 <i class="icon-group"></i>
                 <span id="quiz_details_text">
@@ -190,7 +191,7 @@
   <header class="quiz-header">
     <% if submission_has_regrade?(@submission) %>
     <div class="ui-state-warning ui-corner-all pad-box-micro text-center regraded-warning">
-      <i class=icon-warning></i>
+      <i class="icon-warning" aria-label="<%= t("labels.warning_icon", "Warning") %>"></i>
       <strong>
       <% if score_affected_by_regrade?(@submission) %>
         <%= t 'quiz_regraded_your_score_affected', 'This quiz has been re-graded, your score was affected.' %>
@@ -328,7 +329,8 @@
                   <li>
                     <a href="#" class="quiz_details_link">
                       <% if @any_submissions_pending_review %>
-                        <i class="icon-warning"></i>
+                        <i class="icon-warning" aria-label="<%= t("labels.warning_icon", "Warning") %>"></i>
+
                       <% end %>
                       <i class="icon-group"></i>
                       <span id="quiz_details_text">
@@ -364,7 +366,8 @@
 
     <% if @submission && params[:preview] %>
       <h3>
-        <i class="icon-warning"></i> <%= t('warnings.draft_version', "This is a preview of the draft version of the quiz") %>
+        <i class="icon-warning" aria-label="<%= t("labels.warning_icon", "Warning") %>"></i>
+        <%= t('warnings.draft_version', "This is a preview of the draft version of the quiz") %>
       </h3>
     <% end %>
 
