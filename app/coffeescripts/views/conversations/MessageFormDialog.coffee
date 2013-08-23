@@ -42,6 +42,7 @@ define [
 
     els:
       '.message_course':                '$messageCourse'
+      'input[name=context_code]':       '$contextCode'
       '.message_subject':               '$messageSubject'
       '.context_messages':              '$contextMessages'
       '.media_comment':                 '$mediaComment'
@@ -148,6 +149,7 @@ define [
 
     onCourse: (course) =>
       @recipientView.setCourse(course)
+      @$contextCode.val(if course then 'course_'+course else '')
 
     defaultCourse: null
     setDefaultCourse: (course) ->
