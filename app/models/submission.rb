@@ -808,6 +808,7 @@ class Submission < ActiveRecord::Base
     end
     if self.group
       # this is a bit icky, as it assumes the same opts hash will be passed in to each add_comment call for the group
+      # s|a bit icky|milk-curdling/vomit-inducing/baby-punching|
       opts[:group_comment_id] ||= AutoHandle.generate_securish_uuid
     end
     self.save! if self.new_record?

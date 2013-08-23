@@ -1216,12 +1216,20 @@ class Assignment < ActiveRecord::Base
     file_map = zip_extractor.unzip_files.map { |f| infer_comment_context_from_filename(f) }.compact
     files_for_user = file_map.group_by { |f| f[:user] }
     comments = files_for_user.map do |user, files|
-      comment = t :comment_from_files, { :one => "See attached file", :other => "See attached files" }, :count => files.size
-      submission = files.first[:submission]
       attachments = files.map { |g|
         FileInContext.attach(self, g[:filename], g[:display_name])
       }
-      submission.add_comment(:comment => comment, :author => commenter, :attachments => attachments, :hidden => muted?)
+      comment = {
+        comment: t(:comment_from_files, {one: "See attached file", other: "See attached files"}, count: files.size),
+        author: commenter,
+        hidden: muted?,
+        attachments: attachments,
+      }
+      group, students = group_students(user)
+      students.map { |student|
+        submission = find_or_create_submission(student)
+        submission.add_comment(comment)
+      }
     end
     [comments.compact, @ignored_files]
   end

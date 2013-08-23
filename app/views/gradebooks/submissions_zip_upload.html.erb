@@ -64,7 +64,7 @@
 <% if @comments.empty? %>
   <li><%= t(:no_comments_added, "No Comments Added") %></li>
 <% end %>
-<% @comments.each do |comment| %>
+<% @comments.flatten.each do |comment| %>
   <li>
     <a href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, comment.submission.user_id) %>"><%= comment.submission.user.name %></a>
     <ul class="file_list">

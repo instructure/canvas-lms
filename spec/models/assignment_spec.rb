@@ -2370,8 +2370,28 @@ describe Assignment do
         zip.open.path,
         @teacher)
 
-      comments.map { |c| c.submission.user }.should == [s1]
+      comments.map { |g| g.map { |c| c.submission.user } }.should == [[s1]]
       ignored.should be_empty
+    end
+
+    it "should work for groups" do
+      s1, s2 = @students
+
+      gc = @course.group_categories.create! name: "Homework Groups"
+      @assignment.update_attributes group_category_id: gc.id,
+                                    grade_group_students_individually: false
+      g1, g2 = 2.times.map { |i| gc.groups.create! name: "Group #{i}" }
+      g1.add_user(s1)
+      g1.add_user(s2)
+
+      submit_homework(s1)
+      zip = zip_submissions
+
+      comments, _ = @assignment.generate_comments_from_files(
+        zip.open.path,
+        @teacher)
+
+      comments.map { |g| g.map { |c| c.submission.user } }.should == [[s1, s2]]
     end
   end
 end
