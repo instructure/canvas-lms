@@ -304,12 +304,13 @@ def should_edit_an_outcome_group
   get outcome_url
   wait_for_ajaximations
   fj('.outcomes-sidebar .outcome-level:first li.outcome-group').click
-  f('.edit_button').click
 
-  ## when
-  # edit title
+  keep_trying_until do
+    fj('.edit_button').click
+    fj('.outcomes-content input[name=title]').should be_displayed
+  end
+
   replace_content f('.outcomes-content input[name=title]'), edited_title
-  # submit
   f('.submit_button').click
   wait_for_ajaximations
 
