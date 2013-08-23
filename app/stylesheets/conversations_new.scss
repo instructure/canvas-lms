@@ -25,7 +25,7 @@
 }
 
 .conversations {
-  min-width: 960px;
+  min-width: 1160px;
   position: relative;
 }
 
@@ -151,8 +151,11 @@
     background: -o-linear-gradient(top, #fff, #fafafa);
     background: -webkit-linear-gradient(top, #fff, #fafafa);
     background: linear-gradient(top, #fff, #fafafa);
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
     border-bottom: 1px solid #bfbfbf;
     cursor: pointer;
+    height: 100px;
     padding: 8px 12px 8px 32px;
     position: relative;
 
@@ -173,7 +176,10 @@
 
   .summary {
     color: #7f7f7f;
-    margin: 0 12px 0 0;
+    height: 40px;
+    margin: 0 24px 0 0;
+    overflow: hidden;
+    text-overflow: ellipses;
   }
 
   p {
@@ -194,7 +200,7 @@
 .message-count {
   font-size: 11px;
   position: absolute;
-  right: 8px;
+  right: 13px;
   top: 43%;
 }
 
@@ -302,11 +308,10 @@
   .message-content li {
     border-bottom: 1px solid #bfbfbf;
     margin: 0 12px;
-    padding: 32px 0 12px 0;
+    padding: 24px 0;
 
-    &.active {
-      background: #e5f3ff;
-      padding: 32px 6px 12px 6px;
+    p:last-child {
+      margin-bottom: 0;
     }
   }
 
@@ -316,7 +321,8 @@
 
   .user-info {
     .avatar {
-      border-radius: 25px;
+      border: 2px solid #eee;
+      border-radius: 30px;
       height: 50px;
       margin-right: 8px;
       width: 50px;
@@ -331,9 +337,13 @@
       color: #7f7f7f;
       display: block;
     }
+
+    .message-author-and-participants {
+      padding-top: 6px;
+    }
   }
 
-  .span2 {
+  .message-metadata {
     position: relative;
   }
 

@@ -22,12 +22,12 @@ define [
 
     events:
       'blur .actions a'                    : 'onActionBlur'
-      'click'                              : 'onSelect'
       'click .al-trigger'                  : 'onMenuOpen'
       'click .delete-btn'                  : 'onDelete'
       'click .forward-btn'                 : 'onForward'
       'click .message-participants-toggle' : 'onToggle'
       'click .reply-btn'                   : 'onReply'
+      'click .reply-all-btn'               : 'onReplyAll'
       'focus .actions a'                   : 'onActionFocus'
 
     messages:
@@ -36,7 +36,6 @@ define [
     initialize: ->
       super
       @summarized = @model.get('summarizedParticipantNames')
-      @listenTo(@model, 'change:selected', @onModelSelect)
 
     # Internal: Serialize the model for the view.
     #
@@ -65,19 +64,6 @@ define [
         else
           I18n.t('hide', 'Hide')
 
-    # Internal: Handle selecting this message.
-    #
-    # e - Event object.
-    #
-    # Returns nothing.
-    onSelect: (e) ->
-      return if _.include(['A', 'I'], e.target.nodeName)
-      e.preventDefault()
-      @model.set('selected', !@model.get('selected'))
-
-    onModelSelect: () ->
-      @$el.toggleClass('active', @model.get('selected'))
-
     # Internal: Handle toggle events between the full and summarized lists.
     #
     # e - Event object.
@@ -95,6 +81,15 @@ define [
     onReply: (e) ->
       e.preventDefault()
       @trigger('reply')
+
+    # Internal: Reply all to this message.
+    #
+    # e - Event Object.
+    #
+    # Returns nothing.
+    onReplyAll: (e) ->
+      e.preventDefault()
+      @trigger('reply-all')
 
     # Internal: Delete this message.
     #

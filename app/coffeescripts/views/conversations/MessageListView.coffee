@@ -34,6 +34,5 @@ define [
 
     afterRender: ->
       super
-      @$('.current-context').text(@course.name || '')
-      @$('.current-context-code').text(@course.code || '')
+      @$('.current-context').text(@course.name)
       @$('.list-header')[if @course.name then 'show' else 'hide']()

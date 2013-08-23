@@ -86,10 +86,8 @@ define [
       ]
 
     show: (model, options) ->
-      if @model = model
-        messages = @model.messageCollection
-        @message = messages.find((m) -> m.get('selected')) or messages.at(0)
-      @to = options?.to
+      @message       = @model.messageCollection.at(0) if @model = model
+      @to            = options?.to
       @returnFocusTo = options.trigger if options.trigger
 
       @render()

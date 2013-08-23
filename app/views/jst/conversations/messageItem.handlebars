@@ -1,45 +1,53 @@
 <div class="row-fluid message-info">
-	<div class="span10 user-info">
+	<div class="span8 user-info">
 		<img src="{{author.avatar_url}}" alt="" class="avatar pull-left" />
-		<a href="#" class="username">{{author.name}}{{#if participants.length}},{{/if}}</a>
+    <div class="message-author-and-participants">
+      <a href="#" class="username">{{author.name}}{{#if participants.length}},{{/if}}</a>
 
-		<span class="message-participants-wrapper">
-			<span class="message-participants"
-				    aria-live="polite"></span>
+      <span class="message-participants-wrapper">
+        <span class="message-participants"
+              aria-live="polite"></span>
 
-			<div class="hidden">
-				<span class="summarized-message-participants">
-					{{list summarizedParticipantNames}}...
-				</span>
-				<span class="full-message-participants">
-					{{list participantNames}}
-				</span>
-			</div>
+        <div class="hidden">
+          <span class="summarized-message-participants">
+            {{list summarizedParticipantNames}}...
+          </span>
+          <span class="full-message-participants">
+            {{list participantNames}}
+          </span>
+        </div>
 
-			{{#if summarizedParticipantNames}}
-				<a href="#" class="message-participants-toggle"></a>
-			{{/if}}
-		</span>
+        {{#if summarizedParticipantNames}}
+          <a href="#" class="message-participants-toggle"></a>
+        {{/if}}
+      </span>
 
-		<span class="context">{{context_name}}</span>
-	</div>
+      <span class="context">{{context_name}}</span>
 
-	<div class="span2 message-metadata">
+    </div>
+  </div>
+
+	<div class="span4 message-metadata">
 		<div class="date pull-right">
 			{{friendlyDatetime created_at}}
 		</div>
 
     <ul class="actions pull-right unstyled">
       <li>
-        <a href="#" class="icon-reply-2 reply-btn">
+        <a href="#"
+           class="icon-reply-2 reply-btn"
+           title="{{#t "reply"}}Reply{{/t}}">
           <span class="screenreader-only">{{#t "reply"}}Reply{{/t}}</span>
         </a>
       </li>
       <li>
-        <a href="#" class="icon-trash delete-btn">
-          <span class="screenreader-only">{{#t "delete_message"}}Delete message{{/t}}</span>
+        <a href="#"
+           class="icon-reply-all-2 reply-all-btn"
+           title="{{#t "reply_all"}}Reply all{{/t}}">
+          <span class="screenreader-only">{{#t "reply_all"}}Reply all{{/t}}</span>
         </a>
       </li>
+
       <li>
         <a href="#"
            data-kyle-menu-options='{"appendMenuTo": "body"}'
@@ -51,6 +59,9 @@
         <ul class="al-options">
           <li>
             <a href="#" class="forward-btn">{{#t "forward"}}Forward{{/t}}</a>
+          </li>
+          <li>
+            <a href="#" class="delete-btn">{{#t "delete"}}Delete{{/t}}</a>
           </li>
         </ul>
       </li>

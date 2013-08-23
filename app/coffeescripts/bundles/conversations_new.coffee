@@ -50,19 +50,30 @@ require [
       @detail.render()
 
     onReply: (message) =>
+      @_delegateReply(message, 'reply')
+
+    onReplyAll: (message) =>
+      @_delegateReply(message, 'replyAll')
+
+    _delegateReply: (message, type) ->
+      btn = if type == 'reply' then 'reply-btn' else 'reply-all-btn'
       model = if message
-        model = @detail.model.clone()
-        model.set 'messages', _.filter model.get('messages'), (m) ->
-          m.id == message.id or (_.include(m.participating_user_ids, message.author_id) and m.created_at < message.created_at)
-        trigger = $(".message-item-view[data-id=#{message.id}] .reply-btn")
+        model   = @detail.model.clone()
+        trigger = $(".message-item-view[data-id=#{message.id}] .#{btn}")
+        model.set('messages', @_getMessageContext(message, model))
         model
       else
-        trigger = $('#reply-btn')
+        trigger = $("##{btn}")
         @detail.model
-      @compose.show(model, to: 'reply', trigger: trigger)
+      @compose.show(model, to: type, trigger: trigger)
 
-    onReplyAll: =>
-      @compose.show(@detail.model, to: 'replyAll', trigger: $('#reply-all-btn'))
+    _getMessageContext: (subject, conversation) ->
+      _.filter conversation.get('messages'), (m) =>
+        m.id == subject.id or @_isContext(subject, m)
+
+    _isContext: (subject, context) ->
+      _.include(context.participating_user_ids, subject.author_id) and
+        context.created_at < subject.created_at
 
     onDelete: =>
       return unless confirm(@messages.confirmDelete)
@@ -143,6 +154,7 @@ require [
       @compose.on('addMessage', @list.updateMessage)
       @compose.on('submitting', @onSubmit)
       @detail.on('reply',       @onReply)
+      @detail.on('reply-all',   @onReplyAll)
       @detail.on('forward',     @onForward)
 
     onSubmit: (dfd) =>
