@@ -118,6 +118,7 @@ module CC
       end
       doc.discussion_type topic.discussion_type
       doc.pinned 'true' if topic.pinned
+      doc.require_initial_post 'true' if topic.require_initial_post
       if topic.assignment && !topic.assignment.deleted?
         assignment_migration_id = CCHelper.create_key(topic.assignment)
         doc.assignment(:identifier=>assignment_migration_id) do |a|
