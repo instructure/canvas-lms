@@ -32,9 +32,10 @@ define [
 
     moreOptions: ->
       data = @getFormData()
+      data.assignment_group_id = @assignmentGroup.get('id')
       params = ''
       separator = '?'
-      _.each ['submission_types', 'name', 'due_at', 'points_possible'], (field) ->
+      _.each ['submission_types', 'name', 'due_at', 'points_possible', 'assignment_group_id'], (field) ->
         if data[field] && data[field] != ''
           params += "#{separator}#{field}=#{data[field]}"
           separator = '&' if separator == '?'

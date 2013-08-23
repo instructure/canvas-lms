@@ -540,20 +540,21 @@ describe "assignments" do
       end
 
       it "should remember entered settings when 'more options' is pressed" do
-        ag = @course.assignment_groups.first
+        ag2 = @course.assignment_groups.create!(:name => "blah")
 
         get "/courses/#{@course.id}/assignments"
         wait_for_ajaximations
 
-        f("#assignment_group_#{ag.id} .add_assignment").click
+        f("#assignment_group_#{ag2.id} .add_assignment").click
         wait_for_ajaximations
 
-        replace_content(f("#ag_#{ag.id}_assignment_name"), "Do this")
-        replace_content(f("#ag_#{ag.id}_assignment_points"), "13")
+        replace_content(f("#ag_#{ag2.id}_assignment_name"), "Do this")
+        replace_content(f("#ag_#{ag2.id}_assignment_points"), "13")
         expect_new_page_load { fj('.more_options:visible').click }
 
         get_value("#assignment_name").should == "Do this"
         get_value("#assignment_points_possible").should == "13"
+        get_value("#assignment_group_id").should == ag2.id.to_s
       end
 
       it "should delete assignments" do
