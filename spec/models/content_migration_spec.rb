@@ -910,7 +910,8 @@ describe ContentMigration do
 
     it "should copy discussion topic attributes" do
       topic = @copy_from.discussion_topics.create!(:title => "topic", :message => "<p>bloop</p>",
-                                                   :pinned => true, :discussion_type => "threaded")
+                                                   :pinned => true, :discussion_type => "threaded",
+                                                   :require_initial_post => true)
       topic.posted_at = 2.days.ago
       topic.position = 2
       topic.save!
@@ -920,7 +921,7 @@ describe ContentMigration do
       @copy_to.discussion_topics.count.should == 1
       new_topic = @copy_to.discussion_topics.first
 
-      attrs = ["title", "message", "discussion_type", "type", "pinned", "position"]
+      attrs = ["title", "message", "discussion_type", "type", "pinned", "position", "require_initial_post"]
       topic.attributes.slice(*attrs).should == new_topic.attributes.slice(*attrs)
 
       new_topic.last_reply_at.to_i.should == new_topic.posted_at.to_i
