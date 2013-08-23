@@ -190,6 +190,7 @@ require [
       when 'action-go-dashboard' then window.location = '/'
       when 'action-go-course_list' then window.location = '/courses'
       when 'action-go-start_over', 'action-go-start_over-sidebar' then window.location.reload()
+      when 'action-open-help' then window.open 'http://www.sfu.ca/tlc/technology.html', '_blank'
 
   # create relevant labels for the calendar course submit button
   updateCalendarSubmitButton = ->
