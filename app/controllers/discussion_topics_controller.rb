@@ -652,7 +652,12 @@ class DiscussionTopicsController < ApplicationController
                 quota_exceeded(named_context_url(@context, :context_discussion_topics_url))
 
       if (params.has_key?(:remove_attachment) || attachment) && @topic.attachment
-        @topic.attachment.destroy!
+        @topic.transaction do
+          att = @topic.attachment
+          @topic.attachment = nil
+          @topic.save! if !@topic.new_record?
+          att.destroy!
+        end
       end
 
       if attachment
