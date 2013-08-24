@@ -371,5 +371,15 @@ describe DiscussionTopicsController do
       @topic.delayed_post_at.should be_nil
     end
 
+    it "should delete attachments" do
+      attachment = @topic.attachment = attachment_model(context: @course)
+      @topic.save!
+      put('update', course_id: @course.id, topic_id: @topic.id,
+          format: 'json', remove_attachment: '1')
+      response.should be_success
+
+      @topic.reload.attachment.should be_nil
+      lambda { attachment.reload }.should raise_exception(ActiveRecord::RecordNotFound)
+    end
   end
 end
