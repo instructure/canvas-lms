@@ -4101,7 +4101,10 @@ en:
         add_section: "Add Section"
         move_course: "Move Course"
         update_course: "Update Course Details"
-      course_open_enrollment: "This course has enabled open enrollment. Students can self-enroll in the course once you share with them this URL: *%{url}*. Alternatively, they can sign up at *%{url2}* and use the following join code: *%{code}*"
+      # BEGIN SFU MOD CANVAS-233 Hide self-enroll register link if self registration is off
+      course_open_enrollment: "This course has enabled open enrollment. Students can self-enroll in the course once you share with them this URL: *%{url}*."
+      course_self_registration: "Alternatively, they can sign up at *%{url2}* and use the following join code: *%{code}*"
+      # END SFU MOD
       course_overrides_term: "This will override any term availability settings."
       date_restricted: "Users can only participate in the course between these dates"
       deatils: 
