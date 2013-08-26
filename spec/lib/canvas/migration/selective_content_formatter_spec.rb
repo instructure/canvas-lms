@@ -226,8 +226,7 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
       res[0][:title].should == 'course files'
       res[0][:sub_items][0][:title].should == 'a5.html'
       res[1][:title].should == 'course files/a'
-      res[1][:sub_items][0][:title].should == 'a1.html'
-      res[1][:sub_items][1][:title].should == 'a2.html'
+      res[1][:sub_items].map{|item| item[:title]}.sort.should == ['a1.html', 'a2.html']
       res[2][:title].should == 'course files/a/b'
       res[2][:sub_items][0][:title].should == 'a3.html'
       res[3][:title].should == 'course files/a/b/c'
