@@ -232,15 +232,15 @@ class Account < ActiveRecord::Base
   end
 
   def terms_of_use_url
-    Setting.get('terms_of_use_url', 'http://www.instructure.com/policies/terms-of-use')
+    Setting.get_cached('terms_of_use_url', 'http://www.instructure.com/policies/terms-of-use')
   end
 
   def privacy_policy_url
-    Setting.get('privacy_policy_url', 'http://www.instructure.com/policies/privacy-policy-instructure')
+    Setting.get_cached('privacy_policy_url', 'http://www.instructure.com/policies/privacy-policy-instructure')
   end
 
   def terms_required?
-    Setting.get('terms_required', 'true') == 'true'
+    Setting.get_cached('terms_required', 'true') == 'true'
   end
 
   def require_acceptance_of_terms?(user)
