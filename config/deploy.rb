@@ -9,12 +9,11 @@ set :repository,    "git://github.com/sfu/canvas-lms.git"
 set :scm,           :git
 set :user,          "canvasuser"
 set :branch,        "sfu-deploy"
-set :deploy_via,    :remote_cache
 set :deploy_to,     "/var/rails/canvas"
 set :use_sudo,      false
-set :deploy_env,    "production"
 set :bundle_dir,    "/mnt/data/gems"
-set :bundle_without, []
+set :bundle_flags,  ""
+set :bundle_without,[:sqlite, :test]
 set :stats_server,	"stats.tier2.sfu.ca"
 default_run_options[:pty] = true
 
@@ -26,6 +25,14 @@ end
 if (ENV.has_key?('gateway') && ENV['gateway'].downcase == "true")
   set :gateway, "welcome.its.sfu.ca"
   set :stats_server, "stats.its.sfu.ca"
+end
+
+if (ENV.has_key?('repository'))
+   set :repository, ENV['repository']
+end
+
+if (ENV.has_key?('branch'))
+   set :branch, ENV['branch']
 end
 
 disable_log_formatters;
@@ -45,7 +52,6 @@ namespace :deploy do
   namespace :web do
     task :disable, :roles => :app do
       on_rollback { rm "#{shared_path}/system/maintenance.html" }
-
       run "cp /usr/local/canvas/maintenance.html #{shared_path}/system/maintenance.html && chmod 0644 #{shared_path}/system/maintenance.html"
     end
     task :enable, :roles => :app do
