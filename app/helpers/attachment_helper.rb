@@ -43,6 +43,15 @@ module AttachmentHelper
     if self.respond_to?(url_helper)
       attrs[:attachment_view_inline_ping_url] = self.send(url_helper, attachment.context, attachment.id)
     end
+    if attachment.pending_upload? || attachment.processing?
+      attrs[:attachment_preview_processing] = true
+    end
+    if attachment.scribd_doc_missing?
+      url_helper = "#{context_name}_file_scribd_render_url"
+      if self.respond_to?(url_helper)
+        attrs[:attachment_scribd_render_url] = self.send(url_helper, attachment.context, attachment.id)
+      end
+    end
     attrs.inject("") { |s,(attr,val)| s << "data-#{attr}=#{val} " }
   end
 

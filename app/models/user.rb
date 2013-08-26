@@ -31,6 +31,8 @@ class User < ActiveRecord::Base
 
   before_save :infer_defaults
   serialize :preferences
+  include TimeZoneHelper
+  time_zone_attribute :time_zone
   include Workflow
 
   # Internal: SQL fragments used to return enrollments in their respective workflow
@@ -181,8 +183,8 @@ class User < ActiveRecord::Base
     all_conversations.visible.order("last_message_at DESC, conversation_id DESC")
   end
 
-  def page_views
-    PageView.for_user(self)
+  def page_views(options={})
+    PageView.for_user(self, options)
   end
 
   scope :of_account, lambda { |account| where("EXISTS (#{account.user_account_associations.select("1").where("user_account_associations.user_id=users.id").to_sql})") }
@@ -279,6 +281,7 @@ class User < ActiveRecord::Base
 
   before_save :assign_uuid
   before_save :update_avatar_image
+  before_save :record_acceptance_of_terms
   after_save :update_account_associations_if_necessary
   after_save :self_enroll_if_necessary
 
@@ -1077,6 +1080,14 @@ class User < ActiveRecord::Base
         end
       end
     end
+  end
+
+  def record_acceptance_of_terms
+    accept_terms if @require_acceptance_of_terms && @terms_of_use
+  end
+
+  def accept_terms
+    preferences[:accepted_terms] = Time.now.utc
   end
 
   def self.max_messages_per_day
@@ -1897,6 +1908,7 @@ class User < ActiveRecord::Base
   #
   # Returns an array of context code strings.
   def conversation_context_codes(include_concluded_codes = true)
+    return @conversation_context_codes[include_concluded_codes] if @conversation_context_codes
     Rails.cache.fetch([self, include_concluded_codes, 'conversation_context_codes4'].cache_key, :expires_in => 1.day) do
       Shard.birth.activate do
         associations = %w{courses concluded_courses current_groups}
@@ -1910,6 +1922,58 @@ class User < ActiveRecord::Base
     end
   end
   memoize :conversation_context_codes
+
+  def self.preload_conversation_context_codes(users)
+    users = users.reject { |u| u.instance_variable_get(:@conversation_context_codes) }
+    return if users.length < Setting.get_cached("min_users_for_conversation_context_codes_preload", 5).to_i
+    preload_shard_associations(users)
+    shards = Set.new
+    users.each do |user|
+      shards.merge(user.associated_shards)
+    end
+    courses = []
+    concluded_courses = []
+    groups = []
+    Shard.with_each_shard(shards.to_a) do
+      courses.concat(
+          Enrollment.joins(:course).
+              where(enrollment_conditions(:active)).
+              where(user_id: users).
+              select([:user_id, :course_id]).
+              uniq.
+              all)
+
+      concluded_courses.concat(
+          Enrollment.
+              where(enrollment_conditions(:completed)).
+              where(user_id: users).
+              select([:user_id, :course_id]).
+              uniq.
+              all)
+
+      groups.concat(
+          GroupMembership.joins(:group).
+              where(User.reflections[:current_group_memberships].options[:conditions]).
+              where(user_id: users).
+              select([:user_id, :group_id]).
+              uniq.
+              all)
+    end
+    Shard.birth.activate do
+      courses = courses.group_by(&:user_id)
+      concluded_courses = concluded_courses.group_by(&:user_id)
+      groups = groups.group_by(&:user_id)
+      users.each do |user|
+        active_contexts = (courses[user.id] || []).map { |e| "course_#{e.course_id}" } +
+            (groups[user.id] || []).map { |gm| "group_#{gm.group_id}" }
+        concluded_courses = (concluded_courses[user.id] || []).map { |e| "course_#{e.course_id}" }
+        user.instance_variable_set(:@conversation_context_codes, {
+          true => (active_contexts + concluded_courses).uniq,
+          false => active_contexts
+        })
+      end
+    end
+  end
 
   def section_context_codes(context_codes)
     course_ids = context_codes.grep(/\Acourse_\d+\z/).map{ |s| s.sub(/\Acourse_/, '').to_i }
@@ -2001,10 +2065,10 @@ class User < ActiveRecord::Base
     accounts.size == 0 || accounts.any?{ |a| a.settings[:enable_eportfolios] != false }
   end
 
-  def initiate_conversation(users, private = nil)
+  def initiate_conversation(users, private = nil, options = {})
     users = ([self] + users).uniq_by(&:id)
     private = users.size <= 2 if private.nil?
-    Conversation.initiate(users, private).conversation_participants.find_by_user_id(self)
+    Conversation.initiate(users, private, options).conversation_participants.find_by_user_id(self)
   end
 
   def messageable_user_calculator
@@ -2386,6 +2450,9 @@ class User < ActiveRecord::Base
     # Return only valid matching types. Otherwise, nil.
     type = type.to_s.downcase.sub(/(view)?enrollment/, '')
     %w{student teacher ta observer}.include?(type) ? type : nil
+  end
+
+  def self.preload_shard_associations(users)
   end
 
   def associated_shards

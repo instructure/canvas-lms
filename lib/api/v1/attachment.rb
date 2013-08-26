@@ -35,7 +35,7 @@ module Api::V1::Attachment
     # of queries
     submission_attachment = options[:submission_attachment]
 
-    # this seems like a stupid amount of branching but it's too avoid expensive
+    # this seems like a stupid amount of branching but it avoids expensive
     # permission checks
     hidden_for_user = if submission_attachment
                         false
@@ -172,5 +172,10 @@ module Api::V1::Attachment
     new_atts[:locked] = value_to_boolean(params[:locked]) if params.has_key?(:locked)
     new_atts[:hidden] = value_to_boolean(params[:hidden]) if params.has_key?(:hidden)
     new_atts
+  end
+
+  def context_files_url
+    # change if context_api_index route is expanded to other contexts besides courses
+    api_v1_course_files_url(@context)
   end
 end

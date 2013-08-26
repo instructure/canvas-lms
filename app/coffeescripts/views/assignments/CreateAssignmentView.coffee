@@ -2,7 +2,7 @@ define [
   'underscore'
   'compiled/views/DialogFormView'
   'compiled/models/Assignment'
-  'jst/assignments/teacher_index/CreateAssignment'
+  'jst/assignments/CreateAssignment'
   'jst/EmptyDialogFormWrapper'
   'jquery.instructure_date_and_time'
 ], (_, DialogFormView, Assignment, template, wrapper) ->
@@ -31,9 +31,6 @@ define [
       super
       @collection.add(@model)
 
-      @generateNewModel()
-      @render()
-
     moreOptions: ->
       data = @getFormData()
       params = ''
@@ -43,7 +40,7 @@ define [
           params += "#{separator}#{field}=#{data[field]}"
           separator = '&' if separator == '?'
 
-      window.location = "#{ENV.NEW_ASSIGNMENT_URL}#{params}"
+      window.location = "#{ENV.URLS.new_assignment_url}#{params}"
 
     generateNewModel: ->
       @model = new Assignment
@@ -56,7 +53,8 @@ define [
       })
 
     openAgain: ->
+      @generateNewModel()
+      @render()
       super
       if !@$el.find(".datetime_field").hasClass("datetime_field_enabled")
         @$el.find(".datetime_field").datetime_field()
-

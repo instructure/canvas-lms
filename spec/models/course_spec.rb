@@ -3217,128 +3217,131 @@ describe Course do
   context "named scopes" do
     context "enrollments" do
       before do
+        account_model
         # has enrollments
-        @course1a = course_with_student(:course_name => 'A').course
-        @course1b = course_with_student(:course_name => 'B').course
+        @course1a = course_with_student(:account => @account, :course_name => 'A').course
+        @course1b = course_with_student(:account => @account, :course_name => 'B').course
 
         # has no enrollments
-        @course2a = Course.create!(:name => 'A')
-        @course2b = Course.create!(:name => 'B')
+        @course2a = Course.create!(:account => @account, :name => 'A')
+        @course2b = Course.create!(:account => @account, :name => 'B')
       end
 
       describe "#with_enrollments" do
         it "should include courses with enrollments" do
-          Course.with_enrollments.sort_by(&:id).should == [@course1a, @course1b]
+          @account.courses.with_enrollments.sort_by(&:id).should == [@course1a, @course1b]
         end
 
         it "should play nice with other scopes" do
-          Course.with_enrollments.where(:name => 'A').should == [@course1a]
+          @account.courses.with_enrollments.where(:name => 'A').should == [@course1a]
         end
 
         it "should be disjoint with #without_enrollments" do
-          Course.with_enrollments.without_enrollments.should be_empty
+          @account.courses.with_enrollments.without_enrollments.should be_empty
         end
       end
 
       describe "#without_enrollments" do
         it "should include courses without enrollments" do
-          Course.without_enrollments.sort_by(&:id).should == [@course2a, @course2b]
+          @account.courses.without_enrollments.sort_by(&:id).should == [@course2a, @course2b]
         end
 
         it "should play nice with other scopes" do
-          Course.without_enrollments.where(:name => 'A').should == [@course2a]
+          @account.courses.without_enrollments.where(:name => 'A').should == [@course2a]
         end
       end
     end
 
     context "completion" do
       before do
+        account_model
         # non-concluded
-        @c1 = Course.create!
-        @c2 = Course.create! :conclude_at => 1.week.from_now
+        @c1 = Course.create!(:account => @account)
+        @c2 = Course.create!(:account => @account, :conclude_at => 1.week.from_now)
 
         # concluded in various ways
-        @c3 = Course.create! :conclude_at => 1.week.ago
-        @c4 = Course.create!
+        @c3 = Course.create!(:account => @account, :conclude_at => 1.week.ago)
+        @c4 = Course.create!(:account => @account)
         term = @c4.account.enrollment_terms.create! :end_at => 2.weeks.ago
         @c4.enrollment_term = term
         @c4.save!
-        @c5 = Course.create!
+        @c5 = Course.create!(:account => @account)
         @c5.complete!
       end
 
       describe "#completed" do
         it "should include completed courses" do
-          Course.completed.sort_by(&:id).should == [@c3, @c4, @c5]
+          @account.courses.completed.sort_by(&:id).should == [@c3, @c4, @c5]
         end
 
         it "should play nice with other scopes" do
-          Course.completed.where(:conclude_at => nil).should == [@c4]
+          @account.courses.completed.where(:conclude_at => nil).should == [@c4]
         end
 
         it "should be disjoint with #not_completed" do
-          Course.completed.not_completed.should be_empty
+          @account.courses.completed.not_completed.should be_empty
         end
       end
 
       describe "#not_completed" do
         it "should include non-completed courses" do
-          Course.not_completed.sort_by(&:id).should == [@c1, @c2]
+          @account.courses.not_completed.sort_by(&:id).should == [@c1, @c2]
         end
 
         it "should play nice with other scopes" do
-          Course.not_completed.where(:conclude_at => nil).should == [@c1]
+          @account.courses.not_completed.where(:conclude_at => nil).should == [@c1]
         end
       end
     end
 
     describe "#by_teachers" do
       before do
-        @course1a = course_with_teacher(:name => "teacher A's first course").course
+        account_model
+        @course1a = course_with_teacher(:account => @account, :name => "teacher A's first course").course
         @teacherA = @teacher
-        @course1b = course_with_teacher(:name => "teacher A's second course", :user => @teacherA).course
-        @course2 = course_with_teacher(:name => "teacher B's course").course
+        @course1b = course_with_teacher(:account => @account, :name => "teacher A's second course", :user => @teacherA).course
+        @course2 = course_with_teacher(:account => @account, :name => "teacher B's course").course
         @teacherB = @teacher
-        @course3 = course_with_teacher(:name => "teacher C's course").course
+        @course3 = course_with_teacher(:account => @account, :name => "teacher C's course").course
         @teacherC = @teacher
       end
 
       it "should filter courses by teacher" do
-        Course.by_teachers([@teacherA.id]).sort_by(&:id).should == [@course1a, @course1b]
+        @account.courses.by_teachers([@teacherA.id]).sort_by(&:id).should == [@course1a, @course1b]
       end
 
       it "should support multiple teachers" do
-        Course.by_teachers([@teacherB.id, @teacherC.id]).sort_by(&:id).should == [@course2, @course3]
+        @account.courses.by_teachers([@teacherB.id, @teacherC.id]).sort_by(&:id).should == [@course2, @course3]
       end
 
       it "should work with an empty array" do
-        Course.by_teachers([]).should be_empty
+        @account.courses.by_teachers([]).should be_empty
       end
 
       it "should not follow student enrollments" do
         @course3.enroll_student(user_model)
-        Course.by_teachers([@user.id]).should be_empty
+        @account.courses.by_teachers([@user.id]).should be_empty
       end
 
       it "should not follow deleted enrollments" do
         @teacherC.enrollments.each { |e| e.destroy }
-        Course.by_teachers([@teacherB.id, @teacherC.id]).sort_by(&:id).should == [@course2]
+        @account.courses.by_teachers([@teacherB.id, @teacherC.id]).sort_by(&:id).should == [@course2]
       end
 
       it "should return no results when the user is not enrolled in the course" do
         user_model
-        Course.by_teachers([@user.id]).should be_empty
+        @account.courses.by_teachers([@user.id]).should be_empty
       end
 
       it "should play nice with other scopes" do
         @course1a.complete!
-        Course.by_teachers([@teacherA.id]).completed.should == [@course1a]
+        @account.courses.by_teachers([@teacherA.id]).completed.should == [@course1a]
       end
     end
 
     describe "#by_associated_accounts" do
       before do
-        @root_account = Account.default
+        @root_account = account_model
         @sub = account_model(:name => 'sub', :parent_account => @root_account, :root_account => @root_account)
         @subA = account_model(:name => 'subA', :parent_account => @sub1, :root_account => @root_account)
         @courseA1 = course_model(:account => @subA, :name => 'A1')

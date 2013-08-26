@@ -25,9 +25,19 @@ class QuizQuestion::FillInMultipleBlanksQuestion < QuizQuestion::Base
     @variables ||= @question_data[:answers].map{|a| a[:blank_id] }.uniq
   end
 
+  def matching_answer?(answer, variable, downcased_response)
+    answer[:blank_id] == variable && (answer[:text] || "").strip.downcase == downcased_response
+  end
+
   def find_chosen_answer(variable, response)
-    response = (response || "").strip.downcase
-    @question_data[:answers].detect{|answer| answer[:blank_id] == variable && (answer[:text] || "").strip.downcase == response } || { :text => response, :id => nil, :weight => 0 }
+    response ||= ""
+    downcased_response = response.strip.downcase
+    matching_answer = @question_data[:answers].detect{|answer| matching_answer?(answer, variable, downcased_response) }
+    if matching_answer
+      matching_answer.merge(text: response)
+    else
+      { text: response, id: nil, weight: 0 }
+    end
   end
 
   def answer_text(answer)

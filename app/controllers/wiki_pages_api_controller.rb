@@ -81,6 +81,7 @@
 class WikiPagesApiController < ApplicationController
   before_filter :require_context
   before_filter :get_wiki_page, :except => [:create, :index]
+  before_filter :was_front_page, :except => [:index]
 
   include Api::V1::WikiPage
 
@@ -105,7 +106,7 @@ class WikiPagesApiController < ApplicationController
       scope = @context.grants_right?(@current_user, session, :view_unpublished_items) ? scope.not_deleted : scope.active
       scope = scope.visible_to_students unless @context.grants_right?(@current_user, session, :view_hidden_items)
 
-      scope = scope.title_like(params[:search_term]) if params[:search_term]
+      scope = WikiPage.search_by_attribute(scope, :title, params[:search_term])
 
       order_clause = case params[:sort]
         when 'title'
@@ -166,14 +167,14 @@ class WikiPagesApiController < ApplicationController
   # @returns Page
   def create
     @page = @context.wiki.wiki_pages.build
-    if authorized_action(@page, @current_user, :update)
-      get_front_page_params
-      attrs_to_update = process_update_params 
-      if @page.update_attributes(attrs_to_update) && process_front_page
+    @wiki = @context.wiki
+    if authorized_action(@page, @current_user, :create)
+      update_params = get_update_params(Set[:title, :body, :editing_roles])
+      if !update_params.is_a?(Symbol) && @page.update_attributes(update_params) && process_front_page
         log_asset_access(@page, "wiki", @wiki, 'participate')
         render :json => wiki_page_json(@page, @current_user, session)
       else
-        render :json => @page.errors.to_json, :status => :bad_request
+        render :json => @page.errors.to_json, :status => update_params.is_a?(Symbol) ? update_params : :bad_request
       end
     end
   end
@@ -201,16 +202,14 @@ class WikiPagesApiController < ApplicationController
   #
   # @returns Page
   def update
-    if authorized_action(@page, @current_user, :update_content)
-      get_front_page_params
-      attrs_to_update = process_update_params
-
-      if @page.update_attributes(attrs_to_update) && process_front_page
+    if authorized_action(@page, @current_user, [:update, :update_content])
+      update_params = get_update_params
+      if !update_params.is_a?(Symbol) && @page.update_attributes(update_params) && process_front_page
         log_asset_access(@page, "wiki", @wiki, 'participate')
         @page.context_module_action(@current_user, @context, :contributed)
         render :json => wiki_page_json(@page, @current_user, session)
       else
-        render :json => @page.errors.to_json, :status => :bad_request
+        render :json => @page.errors.to_json, :status => update_params.is_a?(Symbol) ? update_params : :bad_request
       end
     end
   end
@@ -232,11 +231,15 @@ class WikiPagesApiController < ApplicationController
   # @returns Page
   def destroy
     if authorized_action(@page, @current_user, :delete)
-      get_front_page_params
-      @page.workflow_state = 'deleted'
-      @page.save!
-      process_front_page
-      render :json => wiki_page_json(@page, @current_user, session)
+      if !@was_front_page || is_authorized_action?(@wiki, @current_user, :update)
+        @page.workflow_state = 'deleted'
+        @page.save!
+        process_front_page
+        render :json => wiki_page_json(@page, @current_user, session)
+      else
+        @page.errors.add(:front_page, t(:cannot_update_front_page, 'You are not allowed to change the wiki front page'))
+        render :json => @page.errors.to_json, :status => :unauthorized
+      end
     end
   end
   
@@ -244,6 +247,8 @@ class WikiPagesApiController < ApplicationController
   
   def get_wiki_page
     @wiki = @context.wiki
+    @wiki.check_has_front_page
+
     url = params[:url]
     if url.blank?
       if @wiki.has_front_page?
@@ -256,34 +261,110 @@ class WikiPagesApiController < ApplicationController
     @page = @wiki.wiki_pages.not_deleted.find_by_url!(url)
   end
 
-  def get_front_page_params
-    @was_front_page = @page.is_front_page?
-    if params[:wiki_page] && params[:wiki_page].has_key?(:front_page)
-      @set_front_page = true
-      @set_as_front_page = value_to_boolean(params[:wiki_page].delete(:front_page))
-    end
+  def was_front_page
+    @was_front_page = false
+    @was_front_page = @page.is_front_page? if @page
   end
   
-  def process_update_params
+  def get_update_params(allowed_fields=Set[])
+    initialize_wiki_page
+
+    # normalize parameters
     page_params = params[:wiki_page] || {}
 
-    if @page.grants_right?(@current_user, session, :update)
-      if page_params.has_key? :published
-        new_state = value_to_boolean(page_params.delete(:published)) ? 'active' : 'unpublished'
-        @page.workflow_state = new_state
-      end
-      
-      roles = page_params[:editing_roles]
-      if roles.present?
-        page_params[:editing_roles] = roles.split(',').map(&:strip).reject{|role| !%w(teachers students members public).include?(role)}.join(',')
-      end
-    else
-      # editing_roles only allow changing content, not title or attributes
-      page_params.slice!(:body)
+    if page_params.has_key?(:published)
+      workflow_state = value_to_boolean(page_params.delete(:published)) ? 'active' : 'unpublished'
     end
 
-    page_params[:user_id] = @current_user.id if @current_user
+    if page_params.has_key?(:editing_roles)
+      editing_roles = page_params[:editing_roles].split(',').map(&:strip)
+      invalid_roles = editing_roles.reject{|role| %w(teachers students members public).include?(role)}
+      unless invalid_roles.empty?
+        @page.errors.add(:editing_roles, t(:invalid_editing_roles, 'The provided editing roles are invalid'))
+        return :bad_request
+      end
 
+      page_params[:editing_roles] = editing_roles.join(',')
+    end
+
+    if page_params.has_key?(:front_page)
+      @set_front_page = true
+      @set_as_front_page = value_to_boolean(page_params.delete(:front_page))
+    end
+    change_front_page = @set_front_page && @was_front_page != @set_as_front_page
+
+    # check user permissions
+    rejected_fields = Set[]
+    if @wiki.grants_right?(@current_user, session, :manage)
+      allowed_fields.clear
+    else
+      rejected_fields << :published if workflow_state && workflow_state != @page.workflow_state
+
+      unless @page.grants_right?(@current_user, session, :update)
+        allowed_fields << :body
+
+        rejected_fields << :title if page_params.include?(:title) && page_params[:title] != @page.title
+        rejected_fields << :hide_from_students if page_params.include?(:hide_from_students) && value_to_boolean(page_params[:hide_from_students]) != @page.hide_from_students
+
+        rejected_fields << :front_page if change_front_page && !@wiki.grants_right?(@current_user, session, :update)
+
+        if editing_roles
+          existing_editing_roles = (@page.editing_roles || '').split(',')
+          editing_roles_changed = existing_editing_roles.reject{|role| editing_roles.include?(role)}.length > 0
+          editing_roles_changed |= editing_roles.reject{|role| existing_editing_roles.include?(role)}.length > 0
+          rejected_fields << :editing_roles if editing_roles_changed
+        end
+      end
+    end
+
+    # check rejected fields
+    rejected_fields = rejected_fields - allowed_fields
+    unless rejected_fields.empty?
+      @page.errors.add(:published, t(:cannot_update_published, 'You are not allowed to update the published state of this wiki page')) if rejected_fields.include?(:published)
+      @page.errors.add(:title, t(:cannot_update_title, 'You are not allowed to update the title of this wiki page')) if rejected_fields.include?(:title)
+      @page.errors.add(:hide_from_students, t(:cannot_update_hide_from_students, 'You are not allowed to update the hidden from students flag of this wiki page')) if rejected_fields.include?(:hide_from_students)
+      @page.errors.add(:editing_roles, t(:cannot_update_editing_roles, 'You are not allowed to update the editing roles of this wiki page')) if rejected_fields.include?(:editing_roles)
+      @page.errors.add(:front_page, t(:cannot_update_front_page, 'You are not allowed to change the wiki front page')) if rejected_fields.include?(:front_page)
+
+      return :unauthorized
+    end
+
+    # check for a valid front page
+    valid_front_page = true
+
+    if change_front_page || page_params.include?(:hide_from_students)
+      new_front_page = change_front_page ? @set_as_front_page : @page.is_front_page?
+      new_hide_from_students = page_params.include?(:hide_from_students) ? value_to_boolean(page_params[:hide_from_students]) : @page.hide_from_students
+      if new_front_page && new_hide_from_students
+        valid_front_page = false
+        error_message = t(:cannot_hide_front_page, 'The front page cannot be hidden from students')
+        @page.errors.add(:front_page, error_message) if change_front_page
+        @page.errors.add(:hide_from_students, error_message) if page_params.include?(:hide_from_students)
+      end
+    end
+
+    if change_front_page || workflow_state
+      new_front_page = change_front_page ? @set_as_front_page : @page.is_front_page?
+      new_workflow_state = workflow_state ? workflow_state : @page.workflow_state
+      valid_front_page = false if new_front_page && new_workflow_state != 'active'
+      if new_front_page && new_workflow_state != 'active'
+        valid_front_page = false
+        error_message = t(:cannot_have_unpublished_front_page, 'The front page cannot be unpublished')
+        @page.errors.add(:front_page, error_message) if change_front_page
+        @page.errors.add(:published, error_message) if workflow_state
+      end
+    end
+
+    return :bad_request unless valid_front_page
+
+    # limit to just the allowed fields
+    unless allowed_fields.empty?
+      page_params.slice!(*allowed_fields.to_a)
+    end
+
+    @page.workflow_state = workflow_state if workflow_state
+
+    page_params[:user_id] = @current_user.id if @current_user
     page_params
   end
 
@@ -292,11 +373,11 @@ class WikiPagesApiController < ApplicationController
       if @set_as_front_page && !@page.is_front_page?
         return @page.set_as_front_page!
       elsif !@set_as_front_page
-        return @wiki.unset_front_page!
+        return @page.wiki.unset_front_page!
       end
     elsif @was_front_page
       if @page.deleted?
-        return @wiki.unset_front_page!
+        return @page.wiki.unset_front_page!
       elsif !@page.is_front_page?
         # if url changes, keep as front page
         return @page.set_as_front_page!

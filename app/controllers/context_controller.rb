@@ -126,9 +126,6 @@ class ContextController < ApplicationController
               mo.save!
               mo.send_later(:retrieve_details)
             end
-            if Kaltura::ClientV3.config['kaltura_sis'].present? && Kaltura::ClientV3.config['kaltura_sis'] == "1"
-              mo.send_later(:update_partner_data)
-            end
           end
         elsif notification[:notification_type] == 'entry_delete'
           entry_id = notification[:entry_id]

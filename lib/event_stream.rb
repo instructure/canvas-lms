@@ -84,9 +84,9 @@ class EventStream
       end
     end
 
-    singleton_class.send(:define_method, "for_#{name}") do |entry|
+    singleton_class.send(:define_method, "for_#{name}") do |entry, options={}|
       key = index.key_proc ? index.key_proc.call(entry) : entry
-      index.for_key(key)
+      index.for_key(key, options)
     end
 
     index

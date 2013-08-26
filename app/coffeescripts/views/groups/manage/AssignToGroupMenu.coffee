@@ -19,7 +19,7 @@ define [
 
     tagName: 'div'
 
-    className: 'assign-to-group-menu popover content-top horizontal'
+    className: 'assign-to-group-menu ui-tooltip popover content-top horizontal'
 
     template: template
 
@@ -28,6 +28,7 @@ define [
       setTimeout => # IE needs this to happen async frd
         @render()
         @$el.insertAfter($target)
+        @$el.show()
         @setElement @$el
         @$el.zIndex(1)
         @$el.position

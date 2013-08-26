@@ -776,9 +776,11 @@ describe PseudonymSessionsController do
       end
 
       it "should verify a code" do
-        post 'otp_login', :otp_login => { :verification_code => ROTP::TOTP.new(@user.otp_secret_key).now }
+        code = ROTP::TOTP.new(@user.otp_secret_key).now
+        post 'otp_login', :otp_login => { :verification_code => code }
         response.should redirect_to dashboard_url(:login_success => 1)
         cookies['canvas_otp_remember_me'].should be_nil
+        Canvas.redis.get("otp_used:#{code}").should == '1' if Canvas.redis_enabled?
       end
 
       it "should set a cookie" do
@@ -807,6 +809,16 @@ describe PseudonymSessionsController do
         post 'otp_login', :otp_login => { :verification_code => '123456' }
         response.should render_template('otp_login')
         assigns[:cc].should == cc
+      end
+
+      it "should not allow the same code to be used multiple times" do
+        pending "needs redis" unless Canvas.redis_enabled?
+
+        Canvas.redis.set("otp_used:123456", '1')
+        ROTP::TOTP.any_instance.expects(:verify_with_drift).never
+        post 'otp_login', :otp_login => { :verification_code => '123456' }
+        response.should render_template('otp_login')
+
       end
     end
 

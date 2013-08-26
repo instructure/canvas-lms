@@ -47,7 +47,10 @@
                   data-track-category="Combo_Box"
                   data-track-action="Select_Folder"
                   data-track-label="Starred"><%= link_to t('inbox_views.starred_messages', "Starred"), '#' %></li>
-              <li data-scope="sent"><%= link_to t('inbox_views.sent_messages', "Sent"), '#' %></li>
+              <li data-scope="sent"
+                  data-track-category="Combo_Box"
+                  data-track-action="Select_Folder"
+                  data-track-label="Sent"><%= link_to t('inbox_views.sent_messages', "Sent"), '#' %></li>
             </ul>
             <ul>
               <li data-scope="archived"
@@ -86,7 +89,7 @@
     </div>
     <ul id="message_status"></ul>
     <a id="help_crumb"
-       data-track-category="Individual Message"
+       data-track-category="Help"
        data-track-action="Click"
        data-track-label="Question Mark"
        href="#"><i class="icon-question standalone-icon"></i></a>

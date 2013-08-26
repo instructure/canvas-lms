@@ -1,13 +1,20 @@
 module UserSearch
 
   def self.for_user_in_context(search_term, context, searcher, options = {})
+    search_term = search_term.to_s
     base_scope = scope_for(context, searcher, options.slice(:enrollment_type, :enrollment_role, :exclude_groups))
     if search_term.to_s =~ Api::ID_REGEX
       db_id = Shard.relative_id_for(search_term)
       user = base_scope.where(id: db_id).first
-      return [user] if user
+      if user
+        return [user]
+      elsif !SearchTermHelper.valid_search_term?(search_term)
+        return []
+      end
       # no user found by id, so lets go ahead with the regular search, maybe this person just has a ton of numbers in their name
     end
+
+    SearchTermHelper.validate_search_term(search_term)
 
     base_scope.where(conditions_statement(search_term))
   end

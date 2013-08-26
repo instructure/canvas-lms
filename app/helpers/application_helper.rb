@@ -605,7 +605,7 @@ module ApplicationHelper
       opts[:options_so_far] << %{<option value="#{folder.id}" #{'selected' if opts[:selected_folder_id] == folder.id}>#{"&nbsp;" * opts[:indent_width] * opts[:depth]}#{"- " if opts[:depth] > 0}#{html_escape folder.name}</option>}
       if opts[:max_depth].nil? || opts[:depth] < opts[:max_depth]
         child_folders = if opts[:all_folders]
-                          opts[:all_folders].select {|f| f.parent_folder_id == folder.id }
+                          opts[:all_folders].to_a.select {|f| f.parent_folder_id == folder.id }
                         else
                           folder.active_sub_folders.by_position
                         end
@@ -653,6 +653,7 @@ module ApplicationHelper
       {
         :longName => "#{course.name} - #{course.short_name}",
         :shortName => course.name,
+        :courseCode => course.course_code,
         :href => course_path(course, :invitation => course.read_attribute(:invitation)),
         :term => term || nil,
         :subtitle => subtitle,
@@ -858,8 +859,12 @@ module ApplicationHelper
   def agree_to_terms
     # may be overridden by a plugin
     @agree_to_terms ||
-    t("#user.registration.agree_to_terms",
-      "You agree to the *terms of use*.",
-      :wrapper => link_to('\1', "http://www.instructure.com/terms-of-use", :target => "_new"))
+    t("#user.registration.agree_to_terms_and_privacy_policy",
+      "You agree to the *terms of use* and acknowledge the **privacy policy**.",
+      wrapper: {
+        '*' => link_to('\1', @domain_root_account.terms_of_use_url, target: '_blank'),
+        '**' => link_to('\1', @domain_root_account.privacy_policy_url, target: '_blank')
+      }
+    )
   end
 end

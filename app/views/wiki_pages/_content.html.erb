@@ -1,6 +1,6 @@
 <% course_home ||= false %>
 <% if course_home %>
-  <h2><%= @context.name %></h2>
+  <div class="h2"><%= @context.name %></div>
 <% end %>
 <a href="<%= context_url(@context, :context_wiki_page_wiki_page_revision_path, @page.new_record? ? @page : @page.id, 'latest') %>" id="latest_page_version" style="display: none;">&nbsp;</a>
 <div id="wiki_show_view_main">

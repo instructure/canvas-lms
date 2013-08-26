@@ -265,7 +265,7 @@ describe CalendarEventsApiController, :type => :integration do
           student_ids << @user.id
         }
 
-        cat = @course.group_categories.create
+        cat = @course.group_categories.create(name: "foo")
         ag2 = AppointmentGroup.create!(:title => "something", :participants_per_appointment => 4, :sub_context_codes => [cat.asset_string], :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]], :contexts => [@course])
         event2 = ag2.appointments.first
         group_ids = []
@@ -315,7 +315,7 @@ describe CalendarEventsApiController, :type => :integration do
         event1 = group1.appointments.first
         3.times { event1.reserve_for(student_in_course(:course => @course, :active_all => true).user, @teacher) }
 
-        cat = @course.group_categories.create
+        cat = @course.group_categories.create(name: "foo")
         group2 = AppointmentGroup.create!(:title => "something", :participants_per_appointment => 4, :sub_context_codes => [cat.asset_string], :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]], :contexts => [@course])
         group2.publish!
         event2 = group2.appointments.first
@@ -411,7 +411,7 @@ describe CalendarEventsApiController, :type => :integration do
         my_personal_appointment = event1.reserve_for(@me, @me)
         event1.reserve_for(otherguy, otherguy)
 
-        cat = @course.group_categories.create
+        cat = @course.group_categories.create(name: "foo")
         mygroup = cat.groups.create(:context => @course)
         mygroup.users << @me
         othergroup = cat.groups.create(:context => @course)
@@ -478,7 +478,7 @@ describe CalendarEventsApiController, :type => :integration do
           @event1 = @ag1.appointments.first
           @event2 = @ag1.appointments.last
 
-          cat = @course.group_categories.create
+          cat = @course.group_categories.create(name: "foo")
           @group = cat.groups.create(:context => @course)
           @group.users << @me
           @group.users << @other_guy

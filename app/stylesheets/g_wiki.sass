@@ -1,6 +1,7 @@
 @import environment.sass
 
 $subdued-text-color: #696969
+$darkened-text-color: #4d4d4d
 $published-text-color: #34832b
 $unpublished-text-color: $subdued-text-color
 
@@ -14,12 +15,14 @@ $index-background: #e8ecef
 $item-background: #ffffff
 $item-hover-background: #eef7ff
 
-$shadow: 0 1px 0 rgba(0,0,0,0.1)
+$shadow: 0 1px 0 rgba(0,0,0,0.15)
 
 .pages
+
   #breadcrumbs
     :border-bottom 1px solid $border-color
   .toolbar-buttons
+    :height 30px
     :padding 1em
     :border-bottom 1px solid $border-color
     :box-shadow $shadow
@@ -28,9 +31,21 @@ $shadow: 0 1px 0 rgba(0,0,0,0.1)
     .right-buttons
       :float right
 
+  .toolbar-buttons.sticky
+    position: fixed
+    z-index: 1000
+    top: 0px
+    right: 0px
+    left: 0px
+    margin-left: $left_side_width + 1px
+    background: white
+    height: 33px
+    max-width: $max_main_width - 26px
+    border-color: $menu-border-color
+
 .pages.index
-  .toolbar-buttons
-    :position relative
+  .index-content-container
+    :margin-top 1px
   .index-content
     :background $index-background
     :padding 0 1em 1em
@@ -71,12 +86,16 @@ $shadow: 0 1px 0 rgba(0,0,0,0.1)
         :font-weight bold
       .front-page
         :margin auto 0.5em
+      .al-trigger
+        :color #b4b7ba
+      .al-trigger:hover
+        :color #4d4d4d
 
-      .linkrow
+      tr
         :background $item-background
         :text-decoration inherit
         :color inherit
-        &:hover
+        &.clickable:hover
           :background $item-hover-background
           :text-decoration inherit
           :color inherit
@@ -85,12 +104,12 @@ $shadow: 0 1px 0 rgba(0,0,0,0.1)
         td:last-child
           :border-right 1px solid $border-color
 
-      .linkrow:first-child
+      tr:first-child
         td:first-child
           :border-top-left-radius $border-radius
         td:last-child
           :border-top-right-radius $border-radius
-      .linkrow:last-child
+      tr:last-child
         td
           :border-bottom 1px solid $border-color
         td:first-child
@@ -103,29 +122,35 @@ $shadow: 0 1px 0 rgba(0,0,0,0.1)
         :color $subdued-text-color
         :border-top 1px solid $border-color
 
-        .published
-          :color $published-text-color
-        .unpublished
-          :color $unpublished-text-color
-        .published, .unpublished
+        .wiki-page-link
           :font-size 13px
           :font-weight bold
+          :color $darkened-text-color
+        .wiki-page-link.published
+          :color $published-text-color
+        .wiki-page-link.unpublished
+          :color $unpublished-text-color
 
         .icon-publish
           :color $published-icon-color
         .icon-unpublished
           :color $unpublished-icon-color
 
+    .table .no-pages .no-pages-cell
+      :border 1px dashed $border-color
+
 .pages.show
   .toolbar-buttons
-    .publish, .unpublish
+    .publish-button
       :margin 0 1em
 
   .show-content
-    :padding 1em
+    :padding 15px 25px
     .page-title
-      :font-weight bold
-      :margin-top 0
+      :font-size 2.5em
+      :font-weight 200
+      :margin 15px 0
+      :color #666
 
 .pages.edit
   .form-actions
@@ -136,6 +161,9 @@ $shadow: 0 1px 0 rgba(0,0,0,0.1)
       :color $published-text-color
     .unpublished
       :color $unpublished-text-color
+    .published, .unpublished
+      :display inline-block
+      :margin 5px 8px 5px 5px
 
   .edit-form
     :margin 0
@@ -146,6 +174,9 @@ $shadow: 0 1px 0 rgba(0,0,0,0.1)
       .edit-header
         :position relative
         :margin-bottom 1em
+
+      .edit-header h2
+        :margin 0
 
       .switch_views
         :right 5px

@@ -148,6 +148,7 @@ class DiscussionTopicsController < ApplicationController
   include Api::V1::DiscussionTopics
   include Api::V1::Assignment
   include Api::V1::AssignmentOverride
+  include KalturaHelper
 
   # @API List discussion topics
   #
@@ -156,6 +157,7 @@ class DiscussionTopicsController < ApplicationController
   # @argument order_by Determines the order of the discussion topic list. May be one of "position", or "recent_activity". Defaults to "position".
   # @argument scope [Optional, "locked"|"unlocked"] Only return discussion topics in the given state. Defaults to including locked and unlocked topics. Filtering is done after pagination, so pages may be smaller than requested if topics are filtered
   # @argument only_announcements [Optional] Boolean, return announcements instead of discussion topics. Defaults to false
+  # @argument search_term (optional) The partial title of the discussion topics to match and return.
   #
   # @example_request
   #     curl https://<canvas>/api/v1/courses/<course_id>/discussion_topics \ 
@@ -174,6 +176,8 @@ class DiscussionTopicsController < ApplicationController
 
     scope = params[:order_by] == 'recent_activity' ? scope.by_last_reply_at : scope.by_position
 
+    scope = DiscussionTopic.search_by_attribute(scope, :title, params[:search_term])
+
     @topics = Api.paginate(scope, self, topic_pagination_url)
     @topics.reject! { |t| t.locked? || t.locked_for?(@current_user) } if params[:scope] == 'unlocked'
     @topics.select! { |t| t.locked? || t.locked_for?(@current_user) } if params[:scope] == 'locked'
@@ -188,16 +192,18 @@ class DiscussionTopicsController < ApplicationController
         locked_topics, open_topics = @topics.partition do |topic|
           topic.locked? || topic.locked_for?(@current_user)
         end
+        hash = {USER_SETTINGS_URL: api_v1_user_settings_url(@current_user),
+                openTopics: open_topics,
+                lockedTopics: locked_topics,
+                newTopicURL: named_context_url(@context, :new_context_discussion_topic_url),
+                permissions: {
+                    create: @context.discussion_topics.new.grants_right?(@current_user, session, :create),
+                    moderate: user_can_moderate,
+                    change_settings: user_can_edit_course_settings?
+                }}
+        append_sis_data(hash)
 
-        js_env(USER_SETTINGS_URL: api_v1_user_settings_url(@current_user),
-               openTopics: open_topics,
-               lockedTopics: locked_topics,
-               newTopicURL: named_context_url(@context, :new_context_discussion_topic_url),
-               permissions: {
-                 create: @context.discussion_topics.new.grants_right?(@current_user, session, :create),
-                 moderate: user_can_moderate,
-                 change_settings: user_can_edit_course_settings?
-               })
+        js_env(hash)
 
         if user_can_edit_course_settings?
           js_env(SETTINGS_URL: named_context_url(@context, :api_v1_context_settings_url))
@@ -252,13 +258,15 @@ class DiscussionTopicsController < ApplicationController
 
       categories = @context.respond_to?(:group_categories) ? @context.group_categories : []
       sections = @context.respond_to?(:course_sections) ? @context.course_sections.active : []
-      js_env :DISCUSSION_TOPIC => hash,
-             :SECTION_LIST => sections.map { |section| { :id => section.id, :name => section.name } },
-             :GROUP_CATEGORIES => categories.
-                                  reject { |category| category.student_organized? }.
-                                  map { |category| { :id => category.id, :name => category.name } },
-             :CONTEXT_ID => @context.id,
-             :CONTEXT_ACTION_SOURCE => :discussion_topic
+      js_hash = {:DISCUSSION_TOPIC => hash,
+                 :SECTION_LIST => sections.map { |section| { :id => section.id, :name => section.name } },
+                 :GROUP_CATEGORIES => categories.
+                     reject { |category| category.student_organized? }.
+                     map { |category| { :id => category.id, :name => category.name } },
+                 :CONTEXT_ID => @context.id,
+                 :CONTEXT_ACTION_SOURCE => :discussion_topic}
+      append_sis_data(js_hash)
+      js_env(js_hash)
       render :action => "edit"
     end
   end
@@ -345,7 +353,11 @@ class DiscussionTopicsController < ApplicationController
                                                                       :assignment_id => @topic.assignment.id,
                                                                       :anchor => {:student_id => ":student_id"}.to_json)
             end
-            js_env :DISCUSSION => env_hash
+
+            js_hash = {:DISCUSSION => env_hash}
+            js_hash[:CONTEXT_ACTION_SOURCE] = :discussion_topic
+            append_sis_data(js_hash)
+            js_env(js_hash)
 
           end
         end
@@ -605,7 +617,12 @@ class DiscussionTopicsController < ApplicationController
                 quota_exceeded(named_context_url(@context, :context_discussion_topics_url))
 
       if (params.has_key?(:remove_attachment) || attachment) && @topic.attachment
-        @topic.attachment.destroy!
+        @topic.transaction do
+          att = @topic.attachment
+          @topic.attachment = nil
+          @topic.save! if !@topic.new_record?
+          att.destroy!
+        end
       end
 
       if attachment

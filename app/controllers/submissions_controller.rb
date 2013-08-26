@@ -96,6 +96,7 @@
 #
 class SubmissionsController < ApplicationController
   include GoogleDocs
+  include KalturaHelper
   before_filter :get_course_from_section, :only => :create
   before_filter :require_context
 
@@ -130,6 +131,11 @@ class SubmissionsController < ApplicationController
       end
       return
     end
+
+    hash = {:CONTEXT_ACTION_SOURCE => :submissions}
+    append_sis_data(hash)
+    js_env(hash)
+
     @submission = @assignment.find_submission(@user)
     @submission ||= @context.submissions.build(:user => @user, :assignment_id => @assignment.id)
     @submission.grants_rights?(@current_user, session)

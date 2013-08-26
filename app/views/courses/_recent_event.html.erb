@@ -18,7 +18,7 @@
           submission || 'no_submission',
           recent_event || 'blank_event',
           (recent_event.due_at if is_assignment),
-          Date.today,
+          Time.zone.today,
           Time.zone.name,
           recent_event.cached_context_grants_right?(@current_user, nil, :manage_grades),
           recent_event.cached_context_grants_right?(@current_user, nil, :participate_as_student)

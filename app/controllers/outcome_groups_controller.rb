@@ -74,7 +74,9 @@ class OutcomeGroupsController < ApplicationController
   def destroy
     if authorized_action(@context, @current_user, :manage_outcomes)
       @outcome_group = @context.learning_outcome_groups.active.find(params[:id])
+      @outcome_group.skip_tag_touch = true
       @outcome_group.destroy
+      @context.touch
       render :json => @outcome_group.to_json
     end
   end

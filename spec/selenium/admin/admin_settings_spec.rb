@@ -61,27 +61,27 @@ describe "settings tabs" do
       end
     end
 
-    context "announcements tab" do
-      it "should require confirmation" do
-        add_announcement do
-          submit_form("#add_notification_form")
-          ff('.error_box').last.text.should =~ /You must confirm/
-          wait_for_ajax_requests
-          AccountNotification.count.should == 0
-          f("#confirm_global_announcement").click
-        end
-      end
-
-      it "should create survey announcements" do
-        notification = add_announcement do
-          f("#account_notification_required_account_service").click
-          get_value("#account_notification_months_in_display_cycle").should == AccountNotification.default_months_in_display_cycle.to_s
-          set_value(f("#account_notification_months_in_display_cycle"), "12")
-        end
-        notification.required_account_service.should == "account_survey_notifications"
-        notification.months_in_display_cycle.should == 12
-      end
-    end
+    #context "announcements tab" do
+    #  it "should require confirmation" do
+    #    add_announcement do
+    #      submit_form("#add_notification_form")
+    #      ff('.error_box').last.text.should =~ /You must confirm/
+    #      wait_for_ajax_requests
+    #      AccountNotification.count.should == 0
+    #      f("#confirm_global_announcement").click
+    #    end
+    #  end
+    #
+    #  it "should create survey announcements" do
+    #    notification = add_announcement do
+    #      f("#account_notification_required_account_service").click
+    #      get_value("#account_notification_months_in_display_cycle").should == AccountNotification.default_months_in_display_cycle.to_s
+    #      set_value(f("#account_notification_months_in_display_cycle"), "12")
+    #    end
+    #    notification.required_account_service.should == "account_survey_notifications"
+    #    notification.months_in_display_cycle.should == 12
+    #  end
+    #end
   end
 
   describe "admin" do

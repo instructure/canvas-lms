@@ -270,7 +270,10 @@ Spec::Runner.configure do |config|
 
   def user(opts={})
     @user = User.create!(opts.slice(:name, :short_name))
-    @user.register! if opts[:active_user] || opts[:active_all]
+    if opts[:active_user] || opts[:active_all]
+      @user.accept_terms
+      @user.register!
+    end
     @user.update_attribute :workflow_state, opts[:user_state] if opts[:user_state]
     @user
   end
@@ -447,6 +450,11 @@ Spec::Runner.configure do |config|
   def group_with_user_logged_in(opts={})
     group_with_user(opts)
     user_session(@user)
+  end
+
+  def group_category(opts = {})
+    context = opts[:context] || @course
+    @group_category = context.group_categories.create!(name: opts[:name] || 'foo')
   end
 
   def custom_role(base, name, opts={})

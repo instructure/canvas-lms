@@ -293,7 +293,10 @@ define([
     $("#access_token_form").find("button").attr('disabled', false).filter(".submit_button").text(I18n.t('buttons.generate_token', "Generate Token"));
     $("#add_access_token_dialog").find(":input").val("").end()
     .dialog({
-      width: 500
+      width: 500,
+      open: function() {
+        $(this).closest('.ui-dialog').focus()
+      }
     }).fixDialogButtons();
   });
   $(document).fragmentChange(function(event, hash) {

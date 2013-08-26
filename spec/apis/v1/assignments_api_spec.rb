@@ -116,6 +116,24 @@ describe AssignmentsApiController, :type => :integration do
                           assignment4)
     end
 
+    it "should search for assignments by title" do
+      course_with_teacher(:active_all => true)
+      2.times {|i| @course.assignments.create!(:title => "First_#{i}") }
+      ids = @course.assignments.map(&:id)
+      2.times {|i| @course.assignments.create!(:title => "second_#{i}") }
+
+      json = api_call(:get,
+                      "/api/v1/courses/#{@course.id}/assignments.json?search_term=fir",
+                      {
+                          :controller => 'assignments_api',
+                          :action => 'index',
+                          :format => 'json',
+                          :course_id => @course.id.to_s,
+                          :search_term => 'fir'
+                      })
+      json.map{|h| h['id']}.sort.should == ids.sort
+    end
+
     it "should return the assignments list with API-formatted Rubric data" do
       # the API changes the structure of the data quite a bit, to hide
       # implementation details and ease API use.
@@ -371,7 +389,7 @@ describe AssignmentsApiController, :type => :integration do
       @group = @course.assignment_groups.create!({:name => "some group"})
       @course.assignment_groups.create!({:name => "last group",
         :position => 2})
-      @group_category = @course.group_categories.create!
+      @group_category = @course.group_categories.create!(name: "foo")
       @course.any_instantiation.expects(:turnitin_enabled?).
         at_least_once.returns true
       @json = api_create_assignment_in_course(@course,
@@ -651,7 +669,7 @@ describe AssignmentsApiController, :type => :integration do
                                                   :due_at => nil)
         @assignment.update_attribute(:muted, false)
         @assignment.assignment_group = @start_group
-        @assignment.group_category = @assignment.context.group_categories.create!
+        @assignment.group_category = @assignment.context.group_categories.create!(name: "foo")
         @assignment.save!
 
         @new_grading_standard = grading_standard_for(@course)
@@ -1386,8 +1404,9 @@ describe AssignmentsApiController, :type => :integration do
 
     context "when turnitin_enabled is true on the context" do
       before {
-        @course.any_instantiation.expects(:turnitin_enabled?).
-          at_least_once.returns true
+        @domain_root_account.update_attributes! turnitin_account_id: 1234,
+                                                turnitin_shared_secret: 'foo',
+                                                turnitin_host: 'example.com'
       }
 
       it "contains a turnitin_enabled key" do
@@ -1396,11 +1415,6 @@ describe AssignmentsApiController, :type => :integration do
     end
 
     context "when turnitin_enabled is false on the context" do
-      before {
-        @course.any_instantiation.expects(:turnitin_enabled?).
-          at_least_once.returns false
-      }
-
       it "does not contain a turnitin_enabled key" do
         result.has_key?('turnitin_enabled').should == false
       end

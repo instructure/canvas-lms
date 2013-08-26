@@ -75,7 +75,7 @@ describe WikiPageRevisionsController do
 
     it "should redirect to the right group wiki page" do
       course_with_teacher_logged_in(:active_all => true)
-      gcs = @course.group_categories.create!
+      gcs = group_category
       @group = gcs.groups.create(:context => @course)
       @page = @group.wiki.wiki_pages.create!(:title => "a page")
       @page.title = "a better page title"

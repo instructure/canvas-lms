@@ -192,13 +192,13 @@ describe "Files API", :type => :integration do
     end
 
     it "should not list locked file if not authed" do
-      course_with_student(:course => @course)
+      course_with_student_logged_in(:course => @course)
       json = api_call(:get, @files_path, @files_path_options, {})
       json.any?{|f|f[:id] == @a2.id}.should == false
     end
 
     it "should not list hidden files if not authed" do
-      course_with_student(:course => @course)
+      course_with_student_logged_in(:course => @course)
       json = api_call(:get, @files_path, @files_path_options, {})
 
       json.any?{|f|f[:id] == @a3.id}.should == false
@@ -207,7 +207,7 @@ describe "Files API", :type => :integration do
     it "should not list locked folder if not authed" do
       @f1.locked = true
       @f1.save!
-      course_with_student(:course => @course)
+      course_with_student_logged_in(:course => @course)
       raw_api_call(:get, @files_path, @files_path_options, {}, {}, :expected_status => 401)
     end
 
@@ -254,8 +254,115 @@ describe "Files API", :type => :integration do
         res.should == %w(thing.gif thing.txt)
       end
     end
+
+    it "should search for files by title" do
+      atts = []
+      2.times {|i| atts << Attachment.create!(:filename => "first#{i}.txt", :display_name => "first#{i}.txt", :uploaded_data => StringIO.new('file'), :folder => @f1, :context => @course) }
+      2.times {|i| Attachment.create!(:filename => "second#{i}.txt", :display_name => "second#{i}.txt", :uploaded_data => StringIO.new('file'), :folder => @f1, :context => @course) }
+
+      json = api_call(:get, @files_path + "?search_term=fir", @files_path_options.merge(:search_term => 'fir'), {})
+      json.map{|h| h['id']}.sort.should == atts.map(&:id).sort
+    end
   end
-  
+
+  describe "#index for courses" do
+    append_before do
+      @root = Folder.root_folders(@course).first
+      @f1 = @root.sub_folders.create!(:name => "folder1", :context => @course)
+      @a1 = Attachment.create!(:filename => 'ztest.txt', :display_name => "ztest.txt", :position => 1, :uploaded_data => StringIO.new('file'), :folder => @f1, :context => @course)
+      @a3 = Attachment.create(:filename => 'atest3.txt', :display_name => "atest3.txt", :position => 2, :uploaded_data => StringIO.new('file'), :folder => @f1, :context => @course)
+      @a3.hidden = true
+      @a3.save!
+      @a2 = Attachment.create!(:filename => 'mtest2.txt', :display_name => "mtest2.txt", :position => 3, :uploaded_data => StringIO.new('file'), :folder => @f1, :context => @course, :locked => true)
+
+      @files_path = "/api/v1/courses/#{@course.id}/files"
+      @files_path_options = { :controller => "files", :action => "api_index", :format => "json", :course_id => @course.id.to_param }
+    end
+
+    it "should list files in alphabetical order" do
+      json = api_call(:get, @files_path, @files_path_options, {})
+      res = json.map{|f|f['display_name']}
+      res.should == %w{atest3.txt mtest2.txt ztest.txt}
+    end
+
+    it "should list files in saved order if flag set" do
+      json = api_call(:get, @files_path + "?sort_by=position", @files_path_options.merge(:sort_by => 'position'), {})
+      res = json.map{|f|f['display_name']}
+      res.should == %w{ztest.txt atest3.txt mtest2.txt}
+    end
+
+    it "should not list locked file if not authed" do
+      course_with_student_logged_in(:course => @course)
+      json = api_call(:get, @files_path, @files_path_options, {})
+      json.any?{|f|f[:id] == @a2.id}.should == false
+    end
+
+    it "should not list hidden files if not authed" do
+      course_with_student_logged_in(:course => @course)
+      json = api_call(:get, @files_path, @files_path_options, {})
+
+      json.any?{|f|f[:id] == @a3.id}.should == false
+    end
+
+    it "should not list locked folder if not authed" do
+      @f1.locked = true
+      @f1.save!
+      course_with_student_logged_in(:course => @course)
+      json = api_call(:get, @files_path, @files_path_options, {})
+
+      json.should == []
+    end
+
+    it "should paginate" do
+      4.times {|i| Attachment.create!(:filename => "test#{i}.txt", :display_name => "test#{i}.txt", :uploaded_data => StringIO.new('file'), :folder => @root, :context => @course) }
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/files?per_page=3", @files_path_options.merge(:per_page => '3'), {})
+      json.length.should == 3
+      links = response.headers['Link'].split(",")
+      links.all?{ |l| l =~ /api\/v1\/courses\/#{@course.id}\/files/ }.should be_true
+      links.find{ |l| l.match(/rel="next"/)}.should =~ /page=2/
+      links.find{ |l| l.match(/rel="first"/)}.should =~ /page=1/
+      links.find{ |l| l.match(/rel="last"/)}.should =~ /page=3/
+
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/files?per_page=3&page=3", @files_path_options.merge(:per_page => '3', :page => '3'), {})
+      json.length.should == 1
+      links = response.headers['Link'].split(",")
+      links.all?{ |l| l =~ /api\/v1\/courses\/#{@course.id}\/files/ }.should be_true
+      links.find{ |l| l.match(/rel="prev"/)}.should =~ /page=2/
+      links.find{ |l| l.match(/rel="first"/)}.should =~ /page=1/
+      links.find{ |l| l.match(/rel="last"/)}.should =~ /page=3/
+    end
+
+    context "content_types" do
+      before do
+        txt = attachment_model :display_name => 'thing.txt', :content_type => 'text/plain', :context => @course, :folder => @f1
+        png = attachment_model :display_name => 'thing.png', :content_type => 'image/png', :context => @course, :folder => @f1
+        gif = attachment_model :display_name => 'thing.gif', :content_type => 'image/gif', :context => @course, :folder => @f1
+      end
+
+      it "should match one content-type" do
+        json = api_call(:get, @files_path + "?content_types=image", @files_path_options.merge(:content_types => 'image'), {})
+        res = json.map{|f|f['display_name']}
+        res.should == %w(thing.gif thing.png)
+      end
+
+      it "should match multiple content-types" do
+        json = api_call(:get, @files_path + "?content_types[]=text&content_types[]=image/gif",
+                        @files_path_options.merge(:content_types => ['text', 'image/gif']))
+        res = json.map{|f|f['display_name']}
+        res.should == %w(thing.gif thing.txt)
+      end
+    end
+
+    it "should search for files by title" do
+      atts = []
+      2.times {|i| atts << Attachment.create!(:filename => "first#{i}.txt", :display_name => "first#{i}.txt", :uploaded_data => StringIO.new('file'), :folder => @root, :context => @course) }
+      2.times {|i| Attachment.create!(:filename => "second#{i}.txt", :display_name => "second#{i}.txt", :uploaded_data => StringIO.new('file'), :folder => @root, :context => @course) }
+
+      json = api_call(:get, @files_path + "?search_term=fir", @files_path_options.merge(:search_term => 'fir'), {})
+      json.map{|h| h['id']}.sort.should == atts.map(&:id).sort
+    end
+  end
+
   describe "#show" do
     append_before do
       @root = Folder.root_folders(@course).first

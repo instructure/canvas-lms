@@ -73,6 +73,20 @@ describe "Groups API", :type => :integration do
     links.all?{ |l| l =~ /api\/v1\/users\/self\/groups/ }.should be_true
   end
 
+  it "should allow listing all a user's group in a given context_type" do
+    @account = Account.default
+    course_with_student(:user => @member)
+    @group = @course.groups.create!(:name => "My Group")
+    @group.add_user(@member, 'accepted', true)
+
+    @user = @member
+    json = api_call(:get, "/api/v1/users/self/groups?context_type=Course", @category_path_options.merge(:action => "index", :context_type => 'Course'))
+    json.should == [group_json(@group, @user)]
+
+    json = api_call(:get, "/api/v1/users/self/groups?context_type=Account", @category_path_options.merge(:action => "index", :context_type => 'Account'))
+    json.should == [group_json(@community, @user)]
+  end
+
   it "should allow listing all of a course's groups" do
     course_with_teacher(:active_all => true)
     @group = @course.groups.create!(:name => 'New group')
@@ -93,6 +107,7 @@ describe "Groups API", :type => :integration do
                                                   :account_id => @account.to_param))
     json.count.should == 1
     json.first['id'].should == @community.id
+    json.first['sis_source_id'].should == nil
   end
 
   it "should not allow non-admins to view an account's groups" do
@@ -119,6 +134,12 @@ describe "Groups API", :type => :integration do
   it "should allow a member to retrieve the group" do
     @user = @member
     json = api_call(:get, @community_path, @category_path_options.merge(:group_id => @community.to_param, :action => "show"))
+    json.should == group_json(@community, @user)
+  end
+
+  it "should allow searching by SIS ID" do
+    @community.update_attribute(:sis_source_id, 'abc')
+    json = api_call(:get, "/api/v1/groups/sis_group_id:abc", @category_path_options.merge(:group_id => 'sis_group_id:abc', :action => "show"))
     json.should == group_json(@community, @user)
   end
 
@@ -568,7 +589,7 @@ describe "Groups API", :type => :integration do
 
     it "should find people when inviting to a group in a non-default account" do
       @account = Account.create!
-      @category = @account.group_categories.create!
+      @category = @account.group_categories.create!(name: "foo")
       @group = group_model(:name => "Blah", :group_category => @category, :context => @account)
 
       @moderator = user_model
@@ -590,7 +611,7 @@ describe "Groups API", :type => :integration do
 
     it "should allow being added to a non-community account group" do
       @account = Account.default
-      @category = @account.group_categories.create!
+      @category = @account.group_categories.create!(name: "foo")
       @group = group_model(:group_category => @category, :context => @account)
 
       @to_add = user_with_pseudonym(:account => @account, :active_all => true)
@@ -637,9 +658,9 @@ describe "Groups API", :type => :integration do
     end
 
     it "returns an error when search_term is fewer than 3 characters" do
-      json = api_call(:get, api_url, api_route, {:search_term => '12'}, {}, :expected_status => 400)
-      json["status"].should == "argument_error"
-      json["message"].should == "search_term of 3 or more characters is required"
+      json = api_call(:get, api_url, api_route, {:search_term => 'ab'}, {}, :expected_status => 400)
+      error = json["errors"].first
+      verify_json_error(error, "search_term", "invalid", "3 or more characters is required")
     end
 
     it "returns a list of users" do

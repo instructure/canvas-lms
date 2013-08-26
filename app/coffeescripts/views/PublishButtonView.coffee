@@ -16,8 +16,14 @@ define [
 
     events: {'click', 'hover'}
 
-    initialize: ->
-      @disable() unless @model.get('publishable')
+    els:
+      'i':             '$icon'
+      '.publish-text': '$text'
+      '.desc':         '$desc'
+
+    setElement: ->
+      super
+      @disable() unless @model.get 'publishable'
 
     # events
 
@@ -36,7 +42,7 @@ define [
       @keepState = true
       if @isPublish()
         @publish()
-      else if @isUnpublish()
+      else if @isUnpublish() or @isPublished()
         @unpublish()
 
     # calling publish/unpublish on the model expects a deferred object
@@ -77,10 +83,19 @@ define [
 
     reset: ->
       @$el.removeClass "#{@publishClass} #{@publishedClass} #{@unpublishClass}"
+      @$icon.removeClass 'icon-publish icon-unpublish icon-unpublished'
 
     # render
 
     render: ->
+      @$el.attr 'role', 'button'
+      @$el.html '<i></i><span class="publish-text"></span><span class="desc"></span>'
+      @cacheEls()
+
+      # don't read text of button with screenreader
+      @$text.attr 'role', 'presentation'
+      @$text.attr 'tabindex', '-1'
+
       if @model.get('published')
         @renderPublished()
       else
@@ -88,35 +103,67 @@ define [
       @
 
     renderPublish: ->
-      @reset()
-      @$el.addClass @publishClass
-      text = I18n.t('buttons.publish', 'Publish')
-      @$el.attr 'title', text
-      @$el.html "<i class='icon-unpublished'></i><span class='publish-text'>&nbsp;#{text}</span>"
+      @renderState
+        text:        I18n.t 'buttons.publish', 'Publish'
+        description: I18n.t 'buttons.publish_desc', 'Unpublished. Click to publish'
+        buttonClass: @publishClass
+        iconClass:   'icon-unpublished'
 
     renderPublished: ->
-      @reset()
-      text = I18n.t('buttons.published', 'Published')
-      @$el.addClass @publishedClass
-      @$el.attr 'title', text
-      @$el.html "<i class='icon-publish'></i><span class='publish-text'>&nbsp;#{text}</span>"
+      @renderState
+        text:        I18n.t 'buttons.published', 'Published'
+        description: I18n.t 'buttons.published_desc', 'Published. Click to unpublish'
+        buttonClass: @publishedClass
+        iconClass:   'icon-publish'
 
     renderUnpublish: ->
-      @reset()
-      text = I18n.t('buttons.unpublish', 'Unpublish')
-      @$el.addClass @unpublishClass
-      @$el.attr 'title', text
-      @$el.html "<i class='icon-unpublish'></i><span class='publish-text'>&nbsp;#{text}</span>"
+      text = I18n.t 'buttons.unpublish', 'Unpublish'
+      @renderState
+        text:        text
+        buttonClass: @unpublishClass
+        iconClass:   'icon-unpublish'
 
     renderPublishing: ->
       @disable()
-      text = I18n.t('buttons.publishing', 'Publishing...')
-      @$el.attr 'title', text
-      @$el.html "<i class='icon-publish'></i><span class='publish-text'>&nbsp;#{text}</span>"
+      text = I18n.t 'buttons.publishing', 'Publishing...'
+      @renderState
+        text:        text
+        buttonClass: @publishClass
+        iconClass:   'icon-publish'
 
     renderUnpublishing: ->
       @disable()
-      text = I18n.t('buttons.unpublishing', 'Unpublishing...')
-      @$el.attr 'title', text
-      @$el.html "<i class='icon-unpublished'></i><span class='publish-text'>&nbsp;#{text}</span>"
+      text = I18n.t 'buttons.unpublishing', 'Unpublishing...'
+      @renderState
+        text:        text
+        buttonClass: @unpublishClass
+        iconClass:   'icon-unpublished'
 
+    renderState: (options) ->
+      @reset()
+      @$el.addClass options.buttonClass
+      @$el.attr 'aria-pressed', options.buttonClass is @publishedClass
+
+      @$icon.addClass options.iconClass
+      @$text.html "&nbsp;#{options.text}"
+
+      descId = "button-desc-#{@model.id}"
+      @$desc.attr 'id', descId
+      @$desc.addClass 'screenreader-only'
+      @$el.attr 'aria-describedby', descId
+
+      # publishable
+      if @model.get 'publishable'
+        @$el.attr 'title', options.text
+
+        # description for screen readers
+        if options.description
+          @$desc.html options.description
+        else
+          @$el.removeAttr 'aria-describedby'
+
+      # disabled
+      else
+        @$el.attr 'aria-disabled', true
+        @$el.attr 'title', @model.disabledMessage()
+        @$desc.html  @model.disabledMessage()

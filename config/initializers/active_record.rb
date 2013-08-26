@@ -495,6 +495,56 @@ class ActiveRecord::Base
     result.map(&column.to_sym)
   end
 
+  def self.find_in_batches_with_usefulness(options = {}, &block)
+    # already in a transaction (or transactions don't matter); cursor is fine
+    if connection.adapter_name == 'PostgreSQL' && (Shackles.environment == :slave || connection.open_transactions > 0)
+      shard = scope(:find, :shard)
+      if shard
+        shard.activate(shard_category) { find_in_batches_with_cursor(options, &block) }
+      else
+        find_in_batches_with_cursor(options, &block)
+      end
+    elsif scope(:find, :order) || scope(:find, :group)
+      options[:transactional] = false
+      shard = scope(:find, :shard)
+      if shard
+        shard.activate(:shard_category) { find_in_batches_with_temp_table(options, &block) }
+      else
+        find_in_batches_with_temp_table(options, &block)
+      end
+    else
+      find_in_batches_without_usefulness(options) do |batch|
+        with_exclusive_scope { yield batch }
+      end
+    end
+  end
+  class << self
+    alias_method_chain :find_in_batches, :usefulness
+  end
+
+  def self.find_in_batches_with_cursor(options = {}, &block)
+    batch_size = options[:batch_size] || 1000
+    transaction do
+      begin
+        cursor = "#{table_name}_in_batches_cursor"
+        connection.execute("DECLARE #{cursor} CURSOR FOR #{scoped.to_sql}")
+        includes = scope(:find, :include)
+        with_exclusive_scope do
+          batch = connection.uncached { find_by_sql("FETCH FORWARD #{batch_size} FROM #{cursor}") }
+          while !batch.empty?
+            preload_associations(batch, includes) if includes
+            yield batch
+            break if batch.size < batch_size
+            batch = connection.uncached { find_by_sql("FETCH FORWARD #{batch_size} FROM #{cursor}") }
+          end
+        end
+        # not ensure; if the transaction rolls back to due another exception, it will
+        # automatically close
+        connection.execute("CLOSE #{cursor}")
+      end
+    end
+  end
+
   def self.generate_temp_table(options = {})
     Canvas::TempTable.new(connection, construct_finder_sql({}), options)
   end
@@ -503,34 +553,16 @@ class ActiveRecord::Base
     temptable = generate_temp_table(options)
     with_exclusive_scope do
       temptable.execute do |table|
-        table.find_in_batches(options, &block)
+        table.find_in_batches(self, options, &block)
       end
     end
   end
 
   def self.find_each_with_temp_table(options = {}, &block)
-    find_in_batches_with_temp_table(options) do |batch|
+    find_in_batches_with_temp_table(options.merge(ar_objects: false)) do |batch|
       batch.each(&block)
     end
     self
-  end
-
-  def self.useful_find_in_batches(options = {})
-    offset = 0
-    batch_size = options[:batch_size] || 1000
-    while true
-      batch = find(:all, :limit => batch_size, :offset => offset)
-      break if batch.empty?
-      with_exclusive_scope { yield batch }
-      break if batch.size < batch_size
-      offset += batch_size
-    end
-  end
-
-  def self.useful_find_each(options = {})
-    useful_find_in_batches(options) do |batch|
-      batch.each { |row| yield row }
-    end
   end
 
   # set up class-specific getters/setters for a polymorphic association, e.g.
@@ -721,22 +753,26 @@ class ActiveRecord::Base
     end
     alias_method_chain :delete_all, :joins
   end
+
+  def self.bulk_insert(records)
+    return if records.empty?
+    transaction do
+      connection.bulk_insert(table_name, records)
+    end
+  end
 end
 
 ActiveRecord::ConnectionAdapters::AbstractAdapter.class_eval do
   def bulk_insert(table_name, records)
-    return if records.empty?
-    transaction do
-      keys = records.first.keys
-      quoted_keys = keys.map{ |k| quote_column_name(k) }.join(', ')
-      records.each do |record|
-        execute <<-SQL
-          INSERT INTO #{quote_table_name(table_name)}
-            (#{quoted_keys})
-          VALUES
-            (#{keys.map{ |k| quote(record[k]) }.join(', ')})
-        SQL
-      end
+    keys = records.first.keys
+    quoted_keys = keys.map{ |k| quote_column_name(k) }.join(', ')
+    records.each do |record|
+      execute <<-SQL
+        INSERT INTO #{quote_table_name(table_name)}
+          (#{quoted_keys})
+        VALUES
+          (#{keys.map{ |k| quote(record[k]) }.join(', ')})
+      SQL
     end
   end
 end
@@ -821,13 +857,10 @@ module MySQLAdapterExtensions
   end
 
   def bulk_insert(table_name, records)
-    return if records.empty?
-    transaction do
-      keys = records.first.keys
-      quoted_keys = keys.map{ |k| quote_column_name(k) }.join(', ')
-      execute "INSERT INTO #{quote_table_name(table_name)} (#{quoted_keys}) VALUES" <<
-                  records.map{ |record| "(#{keys.map{ |k| quote(record[k]) }.join(', ')})" }.join(',')
-    end
+    keys = records.first.keys
+    quoted_keys = keys.map{ |k| quote_column_name(k) }.join(', ')
+    execute "INSERT INTO #{quote_table_name(table_name)} (#{quoted_keys}) VALUES" <<
+                records.map{ |record| "(#{keys.map{ |k| quote(record[k]) }.join(', ')})" }.join(',')
   end
 
   def add_column_with_foreign_key_check(table, name, type, options = {})
@@ -860,16 +893,13 @@ end
 if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
   ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.class_eval do
     def bulk_insert(table_name, records)
-      return if records.empty?
-      transaction do
-        keys = records.first.keys
-        quoted_keys = keys.map{ |k| quote_column_name(k) }.join(', ')
-        execute "COPY #{quote_table_name(table_name)} (#{quoted_keys}) FROM STDIN"
-        raw_connection.put_copy_data records.inject(''){ |result, record|
-          result << keys.map{ |k| quote_text(record[k]) }.join("\t") << "\n"
-        }
-        raw_connection.put_copy_end
-      end
+      keys = records.first.keys
+      quoted_keys = keys.map{ |k| quote_column_name(k) }.join(', ')
+      execute "COPY #{quote_table_name(table_name)} (#{quoted_keys}) FROM STDIN"
+      raw_connection.put_copy_data records.inject(''){ |result, record|
+        result << keys.map{ |k| quote_text(record[k]) }.join("\t") << "\n"
+      }
+      raw_connection.put_copy_end
     end
 
     def quote_text(value)
@@ -943,6 +973,12 @@ if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
       set_standard_conforming_strings_without_version_check unless postgresql_version >= 90100
     end
     alias_method_chain :set_standard_conforming_strings, :version_check
+
+    # we always use the default sequence name, so override it to not actually query the db
+    # (also, it doesn't matter if you're using PG 8.2+)
+    def default_sequence_name(table, pk)
+      "#{table}_#{pk}_seq"
+    end
   end
 
 end

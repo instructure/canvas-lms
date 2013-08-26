@@ -461,13 +461,14 @@ describe "gradebook2" do
     end
 
     it "should not include non-graded group assignment in group total" do
+      gc = group_category
       graded_assignment = @course.assignments.create!({
                                                           :title => 'group assignment 1',
                                                           :due_at => (Time.now + 1.week),
                                                           :points_possible => 10,
                                                           :submission_types => 'online_text_entry',
                                                           :assignment_group => @group,
-                                                          :group_category => GroupCategory.create!(:name => 'groups', :context => @course),
+                                                          :group_category => gc,
                                                           :grade_group_students_individually => true
                                                       })
       group_assignment = @course.assignments.create!({
@@ -476,7 +477,7 @@ describe "gradebook2" do
                                                          :points_possible => 0,
                                                          :submission_types => 'not_graded',
                                                          :assignment_group => @group,
-                                                         :group_category => GroupCategory.create!(:name => 'groups', :context => @course),
+                                                         :group_category => gc,
                                                          :grade_group_students_individually => true
                                                      })
       project_group = group_assignment.group_category.groups.create!(:name => 'g1', :context => @course)

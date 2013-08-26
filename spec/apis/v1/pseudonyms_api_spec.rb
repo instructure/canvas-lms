@@ -169,6 +169,11 @@ describe PseudonymsController, :type => :integration do
         })
         response.code.should eql '400'
       end
+
+      it "should return 400 when nothing is passed" do
+        raw_api_call(:post, @path, @path_options)
+        response.code.should eql '400'
+      end
     end
 
     context "an unauthorized user" do

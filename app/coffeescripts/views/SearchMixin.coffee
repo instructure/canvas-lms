@@ -38,7 +38,7 @@ define [
     onFail: (xhr) ->
       return if xhr.statusText is 'abort'
       parsed = $.parseJSON xhr.responseText
-      message = if parsed.message is "search_term of 3 or more characters is required"
+      message = if parsed?.errors?[0].message is "3 or more characters is required"
         I18n.t('greater_than_three', 'Please enter a search term with three or more characters')
       else
         I18n.t('unknown_error', 'Something went wrong with your search, please try again.')

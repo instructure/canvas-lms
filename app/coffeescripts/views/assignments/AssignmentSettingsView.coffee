@@ -2,7 +2,7 @@ define [
   'underscore'
   'compiled/views/DialogFormView'
   'jst/EmptyDialogFormWrapper'
-  'jst/assignments/teacher_index/AssignmentSettings'
+  'jst/assignments/AssignmentSettings'
 ], (_, DialogFormView, wrapper, assignmentSettingsTemplate) ->
 
   class AssignmentSettingsView extends DialogFormView

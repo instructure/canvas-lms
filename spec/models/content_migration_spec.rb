@@ -878,7 +878,8 @@ describe ContentMigration do
 
     it "should copy discussion topic attributes" do
       topic = @copy_from.discussion_topics.create!(:title => "topic", :message => "<p>bloop</p>",
-                                                   :pinned => true, :discussion_type => "threaded")
+                                                   :pinned => true, :discussion_type => "threaded",
+                                                   :require_initial_post => true)
       topic.posted_at = 2.days.ago
       topic.position = 2
       topic.save!
@@ -888,7 +889,7 @@ describe ContentMigration do
       @copy_to.discussion_topics.count.should == 1
       new_topic = @copy_to.discussion_topics.first
 
-      attrs = ["title", "message", "discussion_type", "type", "pinned", "position"]
+      attrs = ["title", "message", "discussion_type", "type", "pinned", "position", "require_initial_post"]
       topic.attributes.slice(*attrs).should == new_topic.attributes.slice(*attrs)
 
       new_topic.last_reply_at.to_i.should == new_topic.posted_at.to_i
@@ -1109,6 +1110,20 @@ describe ContentMigration do
 
       @copy_to.syllabus_body.should == @copy_from.syllabus_body.gsub("/courses/#{@copy_from.id}/file_contents/course%20files",'')
     end
+    
+    it "should re-use kaltura media objects" do
+      media_id = '0_deadbeef'
+      @copy_from.media_objects.create!(:media_id => media_id)
+      att = Attachment.create!(:filename => 'video.mp4', :uploaded_data => StringIO.new('pixels and frames and stuff'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
+      att.media_entry_id = media_id
+      att.content_type = "video/mp4"
+      att.save!
+
+      run_course_copy
+
+      @copy_to.attachments.find_by_migration_id(mig_id(att)).media_entry_id.should == media_id
+      Delayed::Job.find_by_tag('MediaObject.add_media_files').should be_nil
+    end
 
     it "should include implied files for course exports" do
       att = Attachment.create!(:filename => 'first.png', :uploaded_data => StringIO.new('ohai'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
@@ -1196,6 +1211,24 @@ describe ContentMigration do
       @copy_to.context_external_tools.find_by_migration_id(mig_id(tool2)).should be_nil
       @copy_to.discussion_topics.find_by_migration_id(mig_id(topic2)).should be_nil
       @copy_to.quizzes.find_by_migration_id(mig_id(quiz2)).should be_nil
+    end
+
+    it "should preserve links to re-uploaded attachments" do
+      att = Attachment.create!(:filename => 'first.png', :uploaded_data => StringIO.new('ohai'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
+      att.destroy
+      new_att = Attachment.create!(:filename => 'first.png', :uploaded_data => StringIO.new('ohai'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
+      @copy_from.attachments.find(att.id).should == new_att
+
+      page = @copy_from.wiki.wiki_pages.create!(:title => "some page", :body => "<a href='/courses/#{@copy_from.id}/files/#{att.id}/download?wrap=1'>link</a>")
+
+      @cm.copy_options = { :wiki_pages => {mig_id(page) => "1"}}
+      @cm.save!
+
+      run_course_copy
+
+      att2 = @copy_to.attachments.find_by_filename('first.png')
+      page2 = @copy_to.wiki.wiki_pages.find_by_migration_id(mig_id(page))
+      page2.body.should include("<a href=\"/courses/#{@copy_to.id}/files/#{att2.id}/download?wrap=1\">link</a>")
     end
 
     it "should perform day substitutions" do

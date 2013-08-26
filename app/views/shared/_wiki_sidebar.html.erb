@@ -42,7 +42,7 @@
         <div>
             <ul class="wiki_pages page_list">
               <% (@wiki_sidebar_data[:wiki_pages]).each do |wiki_page|  %>
-                <% if !wiki_page.hide_from_students || can_do(@context, @current_user, :manage_content) %>
+                <% if !wiki_page.hide_from_students || can_do(@wiki, @current_user, :manage) %>
                   <li title="<%= t('insert.wiki_pages', %{Click to insert a link to this page}) %>"><%= link_to wiki_page.title.titleize, context_url(@context, :context_wiki_page_url, wiki_page.url) rescue "" %></li>
                 <% end %>
               <% end %>

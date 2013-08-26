@@ -175,7 +175,29 @@ describe AssignmentGroupsController, :type => :integration do
              :course_id => @course.id.to_s,
              :include => ['assignments'])
   end
+
+  it "should not return unpublished assignments to students" do
+    course_with_student(:active_all => true)
+    @course.root_account.tap{ |a| a.settings[:enable_draft] = true }.save!
+    @course.require_assignment_group
+    assignment = @course.assignments.create! do |a|
+      a.title = "test"
+      a.assignment_group = @course.assignment_groups.first
+      a.points_possible = 10
+      a.workflow_state = "unpublished"
+    end
+    assignment.should be_unpublished
+
+    json = api_call(:get, "/api/v1/courses/#{@course.id}/assignment_groups.json?include[]=assignments",
+                    :controller => 'assignment_groups',
+                    :action => 'index',
+                    :format => 'json',
+                    :course_id => @course.id.to_s,
+                    :include => ['assignments'])
+    json.first['assignments'].should be_empty
+  end
 end
+
 
 describe AssignmentGroupsApiController, :type => :integration do
   include Api

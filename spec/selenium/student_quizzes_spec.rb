@@ -16,6 +16,7 @@ describe "quizzes" do
         @quiz.save!
       end
 
+      # This feature doesn't exist for draft state yet
       describe "on main page" do
         def validate_description_text(does_contain_text, text)
           description = f('.description')

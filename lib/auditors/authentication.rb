@@ -107,31 +107,31 @@ class Auditors::Authentication
     end
   end
 
-  def self.for_account(account)
+  def self.for_account(account, options={})
     account.shard.activate do
-      Auditors::Authentication::Stream.for_account(account)
+      Auditors::Authentication::Stream.for_account(account, options)
     end
   end
 
-  def self.for_pseudonym(pseudonym)
+  def self.for_pseudonym(pseudonym, options={})
     pseudonym.shard.activate do
-      Auditors::Authentication::Stream.for_pseudonym(pseudonym)
+      Auditors::Authentication::Stream.for_pseudonym(pseudonym, options)
     end
   end
 
-  def self.for_pseudonyms(pseudonyms)
+  def self.for_pseudonyms(pseudonyms, options={})
     # each for_pseudonym does a shard.activate, so this partition_by_shard is
     # not necessary for correctness. but it improves performance (prevents
     # shard-thrashing)
     collections = Shard.partition_by_shard(pseudonyms) do |shard_pseudonyms|
       shard_pseudonyms.map do |pseudonym|
-        [pseudonym.global_id, Auditors::Authentication.for_pseudonym(pseudonym)]
+        [pseudonym.global_id, Auditors::Authentication.for_pseudonym(pseudonym, options)]
       end
     end
     BookmarkedCollection.merge(*collections)
   end
 
-  def self.for_user(user)
+  def self.for_user(user, options={})
     collections = []
     dbs_seen = Set.new
     Shard.with_each_shard(user.associated_shards) do
@@ -145,7 +145,7 @@ class Auditors::Authentication
       # for merge
       collections << [
         db.fingerprint,
-        Auditors::Authentication::Stream.for_user(user)
+        Auditors::Authentication::Stream.for_user(user, options)
       ]
     end
     BookmarkedCollection.merge(*collections)

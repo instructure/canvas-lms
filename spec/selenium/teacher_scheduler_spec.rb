@@ -162,7 +162,7 @@ describe "scheduler" do
     end
 
     it "should send messages to appropriate participants" do
-      gc = @course.group_categories.create!
+      gc = group_category
       ug1 = @course.groups.create!(:group_category => gc)
       ug1.users << student1 = student_in_course(:course => @course, :active_all => true).user
       ug1.users << student2 = student_in_course(:course => @course, :active_all => true).user

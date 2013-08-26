@@ -37,12 +37,18 @@ module Api::V1::Account
   end
 
   def account_json(account, user, session, includes)
-    attributes = %w(id name parent_account_id root_account_id default_time_zone)
+    attributes = %w(id name parent_account_id root_account_id)
     methods = %w(default_storage_quota_mb default_user_storage_quota_mb default_group_storage_quota_mb)
     api_json(account, user, session, :only => attributes, :methods => methods).tap do |hash|
+      hash['default_time_zone'] = account.default_time_zone.tzinfo.name
       hash['sis_account_id'] = account.sis_source_id if !account.root_account? && account.root_account.grants_rights?(user, :read_sis, :manage_sis).values.any?
       if includes.include?('registration_settings')
         hash['registration_settings'] = {:login_handle_name => account.login_handle_name}
+        if account.root_account?
+          hash['terms_required'] = account.terms_required?
+          hash['terms_of_use_url'] = account.terms_of_use_url
+          hash['privacy_policy_url'] = account.privacy_policy_url
+        end
       end
       @@extensions.each do |extension|
         hash = extension.extend_account_json(hash, account, user, session, includes)

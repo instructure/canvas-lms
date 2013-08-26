@@ -31,7 +31,6 @@ module Api::V1::Submission
     if includes.include?("submission_history")
       hash['submission_history'] = []
       submission.submission_history.each_with_index do |ver, idx|
-        ver.cached_due_date = submission.cached_due_date
         hash['submission_history'] << submission_attempt_json(ver, assignment, user, session, idx, context)
       end
     end

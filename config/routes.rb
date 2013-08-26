@@ -76,6 +76,7 @@ FakeRails3Routes.draw do
       match 'download.:type' => 'files#show', :as => :typed_download, :download => '1'
       match 'preview' => 'files#show', :as => :preview, :preview => '1'
       match 'inline_view' => 'files#show', :as => :inline_view, :inline => '1'
+      match 'scribd_render' => 'files#scribd_render', :as => :scribd_render
       match 'contents' => 'files#attachment_content', :as => :attachment_content
       match ':file_path' => 'files#show_relative', :as => :relative_path, :file_path => /.+/
       collection do
@@ -584,7 +585,6 @@ FakeRails3Routes.draw do
     match 'courses.:format' => 'accounts#courses', :as => :courses_formatted
     match 'courses/:id' => 'accounts#courses_redirect', :as => :courses_redirect
     match 'user_notes' => 'user_notes#user_notes', :as => :user_notes
-    match 'run_report' => 'accounts#run_report', :as => :run_report
     resources :alerts
     resources :question_banks do
       match 'bookmark' => 'question_banks#bookmark', :as => :bookmark
@@ -738,7 +738,12 @@ FakeRails3Routes.draw do
   match 'files/:id/public_url.:format' => 'files#public_url', :as => :public_url
   match 'files/preflight' => 'files#preflight', :as => :file_preflight
   match 'files/pending' => 'files#create_pending', :as => :file_create_pending
-  match 'assignments' => 'assignments#index', :as => :assignments, :via => :get
+  resources :assignments, :only => [:index] do
+    resources :files, :only => [] do
+      match 'inline_view' => 'files#show', :as => :inline_view, :via => :post, :inline => '1'
+      match 'scribd_render' => 'files#scribd_render', :as => :scribd_render, :via => :post
+    end
+  end
 
   resources :appointment_groups, :only => [:index, :show]
 
@@ -822,14 +827,17 @@ FakeRails3Routes.draw do
       put 'courses/:course_id/settings', :action => :update_settings
       get 'courses/:course_id/recent_students', :action => :recent_students, :path_name => 'course_recent_students'
       get 'courses/:course_id/users', :action => :users, :path_name => 'course_users'
+      # this api endpoint has been removed, it was redundant with just courses#users
+      # we keep it around for backward compatibility though
+      get 'courses/:course_id/search_users', :action => :users
       get 'courses/:course_id/users/:id', :action => :user, :path_name => 'course_user'
-      get 'courses/:course_id/search_users', :action => :search_users, :path_name => 'course_search_users'
       get 'courses/:course_id/activity_stream', :action => :activity_stream, :path_name => 'course_activity_stream'
       get 'courses/:course_id/activity_stream/summary', :action => :activity_stream_summary, :path_name => 'course_activity_stream_summary'
       get 'courses/:course_id/todo', :action => :todo_items
       post 'courses/:course_id/preview_html', :action => :preview_html
       post 'courses/:course_id/course_copy', :controller => :content_imports, :action => :copy_course_content
       get 'courses/:course_id/course_copy/:id', :controller => :content_imports, :action => :copy_course_status, :path_name => :course_copy_status
+      get  'courses/:course_id/files', :controller => :files, :action => :api_index, :path_name => 'course_files'
       post 'courses/:course_id/files', :action => :create_file, :path_name => 'course_create_file'
       post 'courses/:course_id/folders', :controller => :folders, :action => :create
       get  'courses/:course_id/folders/:id', :controller => :folders, :action => :show, :path_name => 'course_folder'
@@ -1052,7 +1060,7 @@ FakeRails3Routes.draw do
       get 'accounts/:account_id/reports/:report', :action => :index
       get 'accounts/:account_id/reports', :action => :available_reports
       get 'accounts/:account_id/reports/:report/:id', :action => :show
-      post 'accounts/:account_id/reports/:report', :action => :create
+      post 'accounts/:account_id/reports/:report', :action => :create, :path_name => 'account_create_report'
       delete 'accounts/:account_id/reports/:report/:id', :action => :destroy
     end
 

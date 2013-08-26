@@ -117,7 +117,7 @@ describe "dashboard" do
       @other_student = @user
       @user = @me
 
-      @group = @course.group_categories.create.groups.create(:context => @course)
+      @group = group_category.groups.create(context: @course)
       @group.users << @other_student << @user
       # appointment group publish notification and signup notification
       appointment_participant_model(:course => @course, :participant => @group, :updating_user => @other_student)
@@ -319,6 +319,21 @@ describe "dashboard" do
       course_menu = f('#menu_enrollments')
       course_menu.should be_displayed
       course_menu.should_not include_text(c1.name)
+    end
+
+    it "should show recent feedback and it should work" do
+      assign = @course.assignments.create!(:title => 'hi', :due_at => 1.day.ago, :points_possible => 5)
+      assign.grade_student(@student, :grade => '4')
+
+      get "/"
+      wait_for_ajaximations
+
+      f('.recent_feedback a').attribute('href').should match /courses\/#{@course.id}\/assignments\/#{assign.id}\/submissions\/#{@student.id}/
+      f('.recent_feedback a').click
+      wait_for_ajaximations
+
+      # submission page should load
+      f('h2').text.should == "Submission Details"
     end
   end
 

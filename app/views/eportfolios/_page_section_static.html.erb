@@ -32,7 +32,7 @@
           <% elsif submission.submission_type = 'online_upload' %>
             <ul>
             <% submission.attachments.each do |a| %>
-              <% attachment = @static_attachments.find{|att| att.id == a.id } %>
+              <% attachment = @static_attachments.find{|att| att.attachment.id == a.id } %>
               <% if attachment %>
                 <li><a href="<%= attachment.filename %>">
                   <%= t('links.download_attachment', "Click here to Download *%{attachment}*",

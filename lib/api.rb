@@ -89,6 +89,10 @@ module Api
       { :lookups => { 'sis_section_id' => 'sis_source_id', 'id' => 'id' },
         :is_not_scoped_to_account => ['id'].to_set,
         :scope => 'root_account_id' },
+    'groups' =>
+        { :lookups => { 'sis_group_id' => 'sis_source_id', 'id' => 'id' },
+          :is_not_scoped_to_account => ['id'].to_set,
+          :scope => 'root_account_id' },
   }.freeze
 
   # (digits in 2**63-1) - 1, so that any ID representable in MAX_ID_LENGTH

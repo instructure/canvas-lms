@@ -26,6 +26,7 @@ class Quiz < ActiveRecord::Base
   extend ActionView::Helpers::SanitizeHelper::ClassMethods
   include ContextModuleItem
   include DatesOverridable
+  include SearchTermHelper
 
   attr_accessible :title, :description, :points_possible, :assignment_id, :shuffle_answers,
     :show_correct_answers, :time_limit, :allowed_attempts, :scoring_policy, :quiz_type,
@@ -585,6 +586,7 @@ class Quiz < ActiveRecord::Base
     submission.finished_at = nil
     submission.submission_data = {}
     submission.workflow_state = 'preview' if preview
+    submission.was_preview = preview
     if preview || submission.untaken?
       submission.save
     else
@@ -667,7 +669,7 @@ class Quiz < ActiveRecord::Base
         if !sub || !sub.manually_unlocked
           locked = {:asset_string => self.asset_string, :lock_at => quiz_for_user.lock_at}
         end
-      elsif (self.for_assignment? && l = self.assignment.locked_for?(user, opts))
+      elsif !opts[:skip_assignment] && (self.for_assignment? && l = self.assignment.locked_for?(user, opts))
         sub = user && quiz_submissions.find_by_user_id(user.id)
         if !sub || !sub.manually_unlocked
           locked = l
@@ -1018,17 +1020,21 @@ class Quiz < ActiveRecord::Base
     if question_data
       hash[:questions] ||= []
 
+      if question_data[:qq_data] || question_data[:aq_data]
+        existing_questions = item.quiz_questions.where("migration_id IS NOT NULL").select([:id, :migration_id]).index_by(&:migration_id)
+      end
+
       if question_data[:qq_data]
-        questions_to_update = item.quiz_questions.where(:migration_id => question_data[:qq_data].keys)
-        questions_to_update.each do |question_to_update|
-          question_data[:qq_data].values.find{|q| q['migration_id'].eql?(question_to_update.migration_id)}['quiz_question_id'] = question_to_update.id
+        question_data[:qq_data].values.each do |q|
+          existing_question = existing_questions[q['migration_id']]
+          q['quiz_question_id'] = existing_question.id if existing_question
         end
       end
 
       if question_data[:aq_data]
-        questions_to_update = item.quiz_questions.where(:migration_id => question_data[:aq_data].keys)
-        questions_to_update.each do |question_to_update|
-          question_data[:aq_data].values.find{|q| q['migration_id'].eql?(question_to_update.migration_id)}['quiz_question_id'] = question_to_update.id
+        question_data[:aq_data].values.each do |q|
+          existing_question = existing_questions[q['migration_id']]
+          q['quiz_question_id'] = existing_question.id if existing_question
         end
       end
 

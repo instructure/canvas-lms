@@ -17,7 +17,7 @@ define [
       options.inputFilterView ?= new InputFilterView {@collection, setParamOnInvalid: true}
       super
 
-    className: 'add-unassigned-menu popover right content-top horizontal'
+    className: 'add-unassigned-menu ui-tooltip popover right content-top horizontal'
 
     template: template
 
@@ -50,14 +50,14 @@ define [
       setTimeout => # IE needs this to be async frd
         @render()
         @$el.insertAfter($target)
+        @$el.show()
         @setElement @$el
         @$el.zIndex(1)
+        @$el.width 'auto'
         @$el.position
           my: 'right-8 top-47'
           at: 'left center'
           of: $target
-        @$el.width @$el.width()
-        setTimeout
         @inputFilterView.el.focus() if focus
       , 20
 

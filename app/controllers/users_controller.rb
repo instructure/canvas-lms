@@ -76,6 +76,11 @@
 #       // return a timestamp representing the last time the user logged in to
 #       // canvas.
 #       "last_login": "2012-05-30T17:45:25Z",
+#
+#       // Optional: This field is only returned in ceratin API calls, and will
+#       // return the IANA time zone name of
+#       // the user's preferred timezone
+#       "time_zone": "America/Denver",
 #     }
 class UsersController < ApplicationController
 
@@ -200,6 +205,7 @@ class UsersController < ApplicationController
     if authorized_action(@context, @current_user, :read_roster)
       @root_account = @context.root_account
       @query = (params[:user] && params[:user][:name]) || params[:term]
+      js_env :ACCOUNT => account_json(@domain_root_account, nil, session, ['registration_settings'])
       Shackles.activate(:slave) do
         if @context && @context.is_a?(Account) && @query
           @users = @context.users_name_like(@query)
@@ -213,14 +219,7 @@ class UsersController < ApplicationController
         end
 
         if api_request?
-          search_term = params[:search_term]
-          if search_term && search_term.size < 3
-            return render \
-              :json => {
-                    "status" => "argument_error",
-                    "message" => "search_term of 3 or more characters is required" },
-              :status => :bad_request
-          end
+          search_term = params[:search_term].presence
 
           if search_term
             users = UserSearch.for_user_in_context(search_term, @context, @current_user)
@@ -768,13 +767,15 @@ class UsersController < ApplicationController
   # @argument user[name] [Optional] The full name of the user. This name will be used by teacher for grading.
   # @argument user[short_name] [Optional] User's name as it will be displayed in discussions, messages, and comments.
   # @argument user[sortable_name] [Optional] User's name as used to sort alphabetically in lists.
-  # @argument user[time_zone] [Optional] The time zone for the user. Allowed time zones are listed in {http://rubydoc.info/docs/rails/2.3.8/ActiveSupport/TimeZone The Ruby on Rails documentation}.
-  # @argument user[locale] [Optional] The user's preferred language as a two-letter ISO 639-1 code. Current supported languages are English ("en") and Spanish ("es").
+  # @argument user[time_zone] [Optional] The time zone for the user. Allowed time zones are {http://www.iana.org/time-zones IANA time zones} or friendlier {http://api.rubyonrails.org/classes/ActiveSupport/TimeZone.html Ruby on Rails time zones}.
+  # @argument user[locale] [Optional] The user's preferred language as a two-letter ISO 639-1 code.
   # @argument user[birthdate] [Optional] The user's birth date.
   # @argument pseudonym[unique_id] User's login ID.
   # @argument pseudonym[password] [Optional] User's password.
   # @argument pseudonym[sis_user_id] [Optional] [Integer] SIS ID for the user's account. To set this parameter, the caller must be able to manage SIS permissions.
   # @argument pseudonym[send_confirmation] [Optional, 0|1] [Integer] Send user notification of account creation if set to 1.
+  # @argument communication_channel[type] [Optional] The communication channel type, e.g. 'email' or 'sms'.
+  # @argument communication_channel[address] [Optional] The communication channel address, e.g. the user's email address.
   #
   # @returns User
   def create
@@ -792,7 +793,14 @@ class UsersController < ApplicationController
 
     notify = params[:pseudonym].delete(:send_confirmation) == '1'
     notify = :self_registration unless manage_user_logins
-    email = params[:pseudonym].delete(:path) || params[:pseudonym][:unique_id]
+
+    if params[:communication_channel]
+      cc_type = params[:communication_channel][:type] || CommunicationChannel::TYPE_EMAIL
+      cc_addr = params[:communication_channel][:address]
+    else
+      cc_type = CommunicationChannel::TYPE_EMAIL
+      cc_addr = params[:pseudonym].delete(:path) || params[:pseudonym][:unique_id]
+    end
 
     sis_user_id = params[:pseudonym].delete(:sis_user_id)
     sis_user_id = nil unless @context.grants_right?(@current_user, session, :manage_sis)
@@ -816,7 +824,7 @@ class UsersController < ApplicationController
       end
     end
     if !manage_user_logins # i.e. a new user signing up
-      @user.require_acceptance_of_terms = true
+      @user.require_acceptance_of_terms = @domain_root_account.terms_required?
       @user.require_presence_of_name = true
       @user.require_self_enrollment_code = self_enrollment
       @user.validation_root_account = @domain_root_account
@@ -851,8 +859,9 @@ class UsersController < ApplicationController
 
     @pseudonym.account = @context
     @pseudonym.workflow_state = 'active'
-    @cc = @user.communication_channels.email.by_path(email).first
-    @cc ||= @user.communication_channels.build(:path => email)
+    @cc =
+      @user.communication_channels.where(:path_type => cc_type).by_path(cc_addr).first ||
+      @user.communication_channels.build(:path_type => cc_type, :path => cc_addr)
     @cc.user = @user
     @cc.workflow_state = 'unconfirmed' unless @cc.workflow_state == 'confirmed'
 
@@ -943,8 +952,8 @@ class UsersController < ApplicationController
   # @argument user[name] [Optional] The full name of the user. This name will be used by teacher for grading.
   # @argument user[short_name] [Optional] User's name as it will be displayed in discussions, messages, and comments.
   # @argument user[sortable_name] [Optional] User's name as used to sort alphabetically in lists.
-  # @argument user[time_zone] [Optional] The time zone for the user. Allowed time zones are listed in {http://rubydoc.info/docs/rails/2.3.8/ActiveSupport/TimeZone The Ruby on Rails documentation}.
-  # @argument user[locale] [Optional] The user's preferred language as a two-letter ISO 639-1 code. Current supported languages are English ("en") and Spanish ("es").
+  # @argument user[time_zone] [Optional] The time zone for the user. Allowed time zones are {http://www.iana.org/time-zones IANA time zones} or friendlier {http://api.rubyonrails.org/classes/ActiveSupport/TimeZone.html Ruby on Rails time zones}.
+  # @argument user[locale] [Optional] The user's preferred language as a two-letter ISO 639-1 code.
   # @argument user[avatar][token] [Optional] A unique representation of the avatar record to assign as the user's current avatar. This token can be obtained from the user avatars endpoint. This supersedes the user[avatar][url] argument, and if both are included the url will be ignored. Note: this is an internal representation and is subject to change without notice. It should be consumed with this api endpoint and used in the user update endpoint, and should not be constructed by the client.
   # @argument user[avatar][url] [Optional] To set the user's avatar to point to an external url, do not include a token and instead pass the url here. Warning: For maximum compatibility, please use 128 px square images.
   #
@@ -972,6 +981,7 @@ class UsersController < ApplicationController
 
     managed_attributes = []
     managed_attributes.concat [:name, :short_name, :sortable_name] if @user.grants_right?(@current_user, nil, :rename)
+    managed_attributes << :terms_of_use if @user == (@real_current_user || @current_user)
     if @user.grants_right?(@current_user, nil, :manage_user_details)
       managed_attributes.concat([:time_zone, :locale])
     end
@@ -1007,12 +1017,17 @@ class UsersController < ApplicationController
         @user.avatar_state = 'submitted'
       end
 
+      if session[:require_terms]
+        @user.require_acceptance_of_terms = true
+      end
+
       respond_to do |format|
         if @user.update_attributes(user_params)
           if admin_avatar_update
             @user.avatar_state = (old_avatar_state == :locked ? old_avatar_state : 'approved')
             @user.save
           end
+          session.delete(:require_terms)
           flash[:notice] = t('user_updated', 'User was successfully updated.')
           format.html { redirect_to user_url(@user) }
           format.json {

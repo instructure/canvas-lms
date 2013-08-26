@@ -36,7 +36,7 @@ describe 'appointment_reserved_by_user.facebook' do
   it "should render for groups" do
     user = user_model
     @course = course_model
-    cat = @course.group_categories.create
+    cat = group_category
     @group = cat.groups.create(:context => @course)
     @group.users << user
     appointment_participant_model(:participant => @group, :course => @course)

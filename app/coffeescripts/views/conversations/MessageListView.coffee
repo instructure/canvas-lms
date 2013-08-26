@@ -19,4 +19,13 @@ define [
 
     onClick: (e) ->
       return unless e.target is @el
-      @collection.find((m) -> m.get('selected')).set('selected', false)
+      @collection.each((m) -> m.set('selected', false))
+
+    course: {}
+    updateCourse: (course) ->
+      @course = course
+    render: ->
+      super()
+      @$('.current-context').text(@course.name || '')
+      @$('.current-context-code').text(@course.code || '')
+      @$('.list-header')[if @course.name then 'show' else 'hide']()

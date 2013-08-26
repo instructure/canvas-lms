@@ -51,9 +51,8 @@ module Canvas::AccountReports::ReportHelper
   end
 
   def term
-    if @account_report.has_parameter? "enrollment_term"
-      @term ||= api_find(root_account.enrollment_terms,
-                         @account_report.parameters["enrollment_term"])
+    if (term_id = (@account_report.has_parameter? "enrollment_term_id") || (@account_report.has_parameter? "enrollment_term"))
+      @term ||= api_find(root_account.enrollment_terms,term_id)
     end
   end
 
@@ -70,9 +69,8 @@ module Canvas::AccountReports::ReportHelper
   end
 
   def course
-    if @account_report.has_parameter? "course"
-      @course ||= api_find(root_account.courses,
-                           @account_report.parameters["course"])
+    if (course_id = (@account_report.has_parameter? "course_id") || (@account_report.has_parameter? "course"))
+      @course ||= api_find(root_account.courses, course_id)
     end
   end
 
@@ -91,6 +89,14 @@ module Canvas::AccountReports::ReportHelper
                            WHERE caa.account_id = ?
                            AND caa.course_id=#{table}.id
                            AND caa.course_section_id IS NULL)", account)
+    else
+      scope
+    end
+  end
+
+  def add_course_enrollments_scope(scope,table = 'enrollments')
+    if course
+      scope.where(table => { :course_id => course })
     else
       scope
     end

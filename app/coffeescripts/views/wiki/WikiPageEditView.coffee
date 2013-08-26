@@ -1,5 +1,6 @@
 define [
   'jquery'
+  'underscore'
   'Backbone'
   'wikiSidebar'
   'jst/wiki/WikiPageEdit'
@@ -8,7 +9,7 @@ define [
   'i18n!pages'
   'compiled/tinymce'
   'tinymce.editor_box'
-], ($, Backbone, wikiSidebar, template, ValidatedFormView, WikiPageDeleteDialog, I18n) ->
+], ($, _, Backbone, wikiSidebar, template, ValidatedFormView, WikiPageDeleteDialog, I18n) ->
 
   class WikiPageEditView extends ValidatedFormView
     @mixin
@@ -22,13 +23,21 @@ define [
       events:
         'click a.switch_views': 'switchViews'
         'click .delete_page': 'deleteWikiPage'
-        'click .form-actions .cancel': 'navigateToPageView'
+        'click .form-actions .cancel': 'cancel'
 
-    @optionProperty 'wiki_pages_url'
+    @optionProperty 'wiki_pages_path'
+    @optionProperty 'WIKI_RIGHTS'
+    @optionProperty 'PAGE_RIGHTS'
 
     initialize: ->
       super
-      @on 'success', (args) => window.location = @model.get('html_url')
+      @on 'success', (args) => window.location.href = @model.get('html_url')
+
+    toJSON: ->
+      json = super
+      json.WIKI_RIGHTS = @WIKI_RIGHTS
+      json.PAGE_RIGHTS = @PAGE_RIGHTS
+      json
 
     # After the page loads, ensure the that wiki sidebar gets initialized
     # correctly.
@@ -38,6 +47,10 @@ define [
       @$wikiPageBody.editorBox()
       @initWikiSidebar()
 
+      unless @firstRender
+        @firstRender = true
+        $ -> $('[autofocus]:not(:focus)').eq(0).focus()
+
     # Initialize the wiki sidebar
     # @api private
     initWikiSidebar: ->
@@ -46,6 +59,8 @@ define [
           wikiSidebar.init()
           $.scrollSidebar()
           wikiSidebar.attachToEditor(@$wikiPageBody).show()
+      $ ->
+        wikiSidebar.show()
 
     switchViews: (event) ->
       event?.preventDefault()
@@ -56,7 +71,7 @@ define [
     validateFormData: (data) -> 
       errors = {}
 
-      unless data.wiki_page.title 
+      if data.wiki_page?.title == ''
         errors["wiki_page[title]"] = [
           {
             type: 'required'
@@ -66,15 +81,14 @@ define [
 
       errors
 
-    navigateToPageView: (event) ->
+    cancel: (event) ->
       event?.preventDefault()
-      html_url = @model.get('html_url')
-      window.location = html_url if html_url
+      @trigger('cancel')
 
     deleteWikiPage: (event) ->
       event?.preventDefault()
 
       deleteDialog = new WikiPageDeleteDialog
         model: @model
-        wiki_pages_url: @wiki_pages_url
+        wiki_pages_path: @wiki_pages_path
       deleteDialog.open()

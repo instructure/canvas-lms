@@ -21,6 +21,7 @@ class PseudonymSessionsController < ApplicationController
   before_filter :forbid_on_files_domain, :except => [ :clear_file_session ]
   before_filter :require_password_session, :only => [ :otp_login, :disable_otp_login ]
   before_filter :require_user, :only => [ :otp_login ]
+  skip_before_filter :require_reacceptance_of_terms
 
   def new
     if @current_user && !params[:re_login] && !params[:confirm] && !params[:expected_user_id] && !session[:used_remember_me_token]
@@ -470,12 +471,22 @@ class PseudonymSessionsController < ApplicationController
 
     return render :action => 'otp_login' unless params[:otp_login].try(:[], :verification_code)
 
+    verification_code = params[:otp_login][:verification_code]
+    if Canvas.redis_enabled?
+      key = "otp_used:#{verification_code}"
+      if Canvas.redis.get(key)
+        force_fail = true
+      else
+        Canvas.redis.setex(key, 10.minutes, '1')
+      end
+    end
+
     drift = 30
     # give them 5 minutes to enter an OTP sent via SMS
     drift = 300 if session[:pending_otp_communication_channel_id] ||
         (!session[:pending_otp_secret_key] && @current_user.otp_communication_channel_id)
 
-    if ROTP::TOTP.new(secret_key).verify_with_drift(params[:otp_login][:verification_code], drift)
+    if !force_fail && ROTP::TOTP.new(secret_key).verify_with_drift(verification_code, drift)
       if session[:pending_otp_secret_key]
         @current_user.otp_secret_key = session.delete(:pending_otp_secret_key)
         @current_user.otp_communication_channel_id = session.delete(:pending_otp_communication_channel_id)
@@ -537,6 +548,8 @@ class PseudonymSessionsController < ApplicationController
         return otp_login(true)
       end
     end
+
+    session[:require_terms] = true if @domain_root_account.require_acceptance_of_terms?(@current_user)
 
     respond_to do |format|
       if session[:oauth2]

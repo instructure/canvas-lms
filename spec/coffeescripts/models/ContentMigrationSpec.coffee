@@ -47,7 +47,7 @@ define [
 
   test 'adds daySubsitution JSON to day_subsitutions namespace if daySubCollection exists', -> 
     collection = new DaySubstitutionCollection({bar:'baz'})
-    @model.set('daySubCollection', collection)
+    @model.daySubCollection = collection
 
     collectionJSON = collection.toJSON()
     json = @model.toJSON()
@@ -58,7 +58,7 @@ define [
     dsOptions = {bar: 'baz'}
     collection = new DaySubstitutionCollection
 
-    @model.set('daySubCollection', collection)
+    @model.daySubCollection = collection
     @model.set('date_shift_options', {bar: 'baz'})
 
     json = @model.toJSON()

@@ -51,6 +51,18 @@ describe QuizzesApiController, :type => :integration do
       quiz_ids.should == quizzes.map(&:id)
     end
 
+    it "should search for quizzes by title" do
+      2.times{ |i| @course.quizzes.create! :title => "first_#{i}" }
+      ids = @course.quizzes.map(&:id)
+      2.times{ |i| @course.quizzes.create! :title => "second_#{i}" }
+
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/quizzes?search_term=fir",
+                      :controller=>"quizzes_api", :action=>"index", :format=>"json", :course_id=>"#{@course.id}",
+                      :search_term => 'fir')
+
+      json.map{|h| h['id'] }.sort.should == ids.sort
+    end
+
     it "should return unauthorized if the quiz tab is disabled" do
       @course.tab_configuration = [ { :id => Course::TAB_QUIZZES, :hidden => true } ]
       student_in_course(:active_all => true, :course => @course)
@@ -90,6 +102,25 @@ describe QuizzesApiController, :type => :integration do
 
       it "includes published" do
         @json['published'].should == false
+      end
+
+      it "includes question count" do
+        @json['question_count'].should == 0
+      end
+    end
+
+    context "unpublished quiz" do
+      before do
+        @quiz = @course.quizzes.create! :title => 'title'
+        @quiz.quiz_questions.create!(:question_data => { :name => "test 1" })
+        @quiz.save!
+
+        @json = api_call(:get, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}",
+                        :controller=>"quizzes_api", :action=>"show", :format=>"json", :course_id=>"#{@course.id}", :id => "#{@quiz.id}")
+      end
+
+      it "includes unpublished questions in question count" do
+        @json['question_count'].should == 1
       end
     end
 

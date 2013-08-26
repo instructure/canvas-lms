@@ -9,11 +9,11 @@ define [
     resourceName: 'pages'
 
     @mixin DefaultUrlMixin
-    url: -> "#{@_defaultUrl()}/#{@get('url')}"
+    url: -> "#{@_defaultUrl()}" + if @get('url') then "/#{@get('url')}" else ''
 
     initialize: (attributes, options) ->
       super
-      @contextAssetString = @options?.contextAssetString
+      @contextAssetString = options?.contextAssetString
       [@contextName, @contextId] = splitAssetString(@contextAssetString) if @contextAssetString
       @set('id', @get('url')) if @get('url') && !@get('id')
 
@@ -33,7 +33,7 @@ define [
 
     # Returns a json representation suitable for presenting
     present: ->
-      _.extend _.omit(@toJSON(), 'id'), contextName: @contextName, contextId: @contextId
+      _.extend _.omit(@toJSON(), 'id'), contextName: @contextName, contextId: @contextId, new_record: !@get('url')
 
     # Uses the api to perform a publish on the page
     publish: ->
@@ -47,4 +47,18 @@ define [
       attributes =
         wiki_page:
           published: false
+      @save attributes, wait: true
+
+    # Uses the api to set the page as the front page
+    setAsFrontPage: ->
+      attributes =
+        wiki_page:
+          front_page: true
+      @save attributes, wait: true
+
+    # Uses the api to remove the page as the front page
+    removeAsFrontPage: ->
+      attributes =
+        wiki_page:
+          front_page: false
       @save attributes, wait: true

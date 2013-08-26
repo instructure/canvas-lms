@@ -215,7 +215,7 @@ class AccountsController < ApplicationController
   # Update an existing account.
   #
   # @argument account[name] [optional] Updates the account name
-  # @argument account[default_time_zone] [Optional] The default time zone of the account. Allowed time zones are listed in {http://rubydoc.info/docs/rails/ActiveSupport/TimeZone The Ruby on Rails documentation}.
+  # @argument account[default_time_zone] [Optional] The default time zone of the account. Allowed time zones are {http://www.iana.org/time-zones IANA time zones} or friendlier {http://api.rubyonrails.org/classes/ActiveSupport/TimeZone.html Ruby on Rails time zones}.
   # @argument account[default_storage_quota_mb] [Optional] The default course storage quota to be used, if not otherwise specified.
   # @argument account[default_user_storage_quota_mb] [Optional] The default user storage quota to be used, if not otherwise specified.
   # @argument account[default_group_storage_quota_mb] [Optional] The default group storage quota to be used, if not otherwise specified.
@@ -232,7 +232,7 @@ class AccountsController < ApplicationController
   #   {
   #     "id": "1",
   #     "name": "New account name",
-  #     "default_time_zone": "Mountain Time (US & Canada)",
+  #     "default_time_zone": "America/Denver",
   #     "parent_account_id": null,
   #     "root_account_id": null,
   #     "default_storage_quota_mb": 500,
@@ -363,12 +363,15 @@ class AccountsController < ApplicationController
     end
 
     js_env :ACCOUNT_ID => @account.id
-    js_env :PERMISSIONS => {:restore_course => @account.grants_right?(@current_user, session, :undelete_courses),
-                            # Permission caching issue makes explicitly checking the account setting
-                            # an easier option.
-                            :view_messages => (@account.settings[:admins_can_view_notifications] &&
-                                @account.grants_right?(@current_user, session, :view_notifications)) ||
-                                Account.site_admin.grants_right?(@current_user, :read_messages)}
+    js_env :PERMISSIONS => {
+       restore_course: @account.grants_right?(@current_user, session, :undelete_courses),
+       # Permission caching issue makes explicitly checking the account setting
+       # an easier option.
+       view_messages: (@account.settings[:admins_can_view_notifications] &&
+                       @account.grants_right?(@current_user, session, :view_notifications)) ||
+                      Account.site_admin.grants_right?(@current_user, :read_messages),
+       auth_logging: @account.grants_rights?(@current_user, :view_statistics, :manage_user_logins).values.any?,
+      }
   end
 
   def confirm_delete_user
@@ -522,16 +525,20 @@ class AccountsController < ApplicationController
   
   def courses
     if authorized_action(@context, @current_user, :read)
-      load_course_right_side
-      @courses = []
-      @query = (params[:course] && params[:course][:name]) || params[:term]
-      if @context && @context.is_a?(Account) && @query
-        @courses = @context.courses_name_like(@query, :term => @term, :hide_enrollmentless_courses => @hide_enrollmentless_courses)
+      Shackles.activate(:slave) do
+        load_course_right_side
+        @courses = []
+        @query = (params[:course] && params[:course][:name]) || params[:term]
+        if @context && @context.is_a?(Account) && @query
+          @courses = @context.courses_name_like(@query, :term => @term, :hide_enrollmentless_courses => @hide_enrollmentless_courses)
+        end
       end
       respond_to do |format|
         format.html {
-          build_course_stats
-          redirect_to @courses.first if @courses.length == 1
+          return redirect_to @courses.first if @courses.length == 1
+          Shackles.activate(:slave) do
+            build_course_stats
+          end
         }
         format.json  { 
           cancel_cache_buster
@@ -597,19 +604,6 @@ class AccountsController < ApplicationController
       respond_to do |format|
         format.html { redirect_to account_settings_url(@context, :anchor => "tab-users") }
         format.json { render :json => @account_user.to_json }
-      end
-    end
-  end
-
-  def run_report
-    if authorized_action(@context, @current_user, :read_reports)
-      student_report = AccountReport.new(:user=>@current_user, :account=>@account, :report_type=>params[:report_type], :parameters=>params[:parameters])
-      student_report.workflow_state = :running
-      student_report.progress = 0
-      student_report.save
-      student_report.run_report
-      respond_to do |format|
-        format.json {render :json => {:student_report_id=>student_report.id, :success=>true}.to_json}
       end
     end
   end

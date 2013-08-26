@@ -43,6 +43,7 @@ module Api::V1::Group
       hash['users'] = group.users.map{ |u| user_json(u, user, session) }
     end
     hash['html_url'] = group_url(group) if include.include? 'html_url'
+    hash['sis_group_id'] = group.sis_source_id if group.context_type == 'Account' && group.root_account.grants_rights?(user, session, :read_sis, :manage_sis).values.any?
     hash
   end
 

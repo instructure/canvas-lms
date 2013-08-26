@@ -30,9 +30,7 @@ module Api::V1
       student = opts[:student] || submission.user
       current_grader = submission.grader || default_grader
 
-      model = version.model
-      model.cached_due_date = submission.cached_due_date
-      json = submission_attempt_json(model, assignment, api_context.user, api_context.session, nil, course).with_indifferent_access
+      json = submission_attempt_json(version.model, assignment, api_context.user, api_context.session, nil, course).with_indifferent_access
       grader = (json[:grader_id] && json[:grader_id] > 0 && user_cache[json[:grader_id]]) || default_grader
 
       json = json.merge(

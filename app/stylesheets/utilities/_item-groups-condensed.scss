@@ -13,10 +13,15 @@ color with a dashed line between groups.
 <div class="item-group-container">
 
   <div class="item-group-condensed">
-    <div class="ig-header">
-      <i class="icon-mini-arrow-right"></i> Item Group Header
-    </div>
-    <ul class="ig-list">
+    <h2 class="ig-header">
+      <a class="element_toggler" href="#"
+         aria-controls="cond_group_1"
+         aria-expanded="true">
+        <i class="icon-mini-arrow-down"></i> Item Group Header
+      </a>
+    </h2>
+
+    <ul class="ig-list" id="cond_group_1">
       <li>
         <div class="ig-row">
           <a href="#" class="ig-title ellipses">
@@ -28,12 +33,11 @@ color with a dashed line between groups.
             <div class="span4 ellipses">10 pts</div>
           </div>
           <div class="ig-admin">
-            <a class="ig-publish-btn">
-              <i class="icon-unpublished"></i>
-              <i class="icon-publish"></i>
-            </a>
+            <span class="publish-icon publish-icon-published" data-tooltip title="Unpublish">
+              <i class="icon-publish"></i><span class="publish-text">&nbsp;Published</span>
+            </span>
 
-            <a class="al-trigger">
+            <a class="al-trigger al-trigger-gray">
               <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
             </a>
             <ul class="al-options">
@@ -55,12 +59,11 @@ color with a dashed line between groups.
             <div class="span4 ellipses">10 pts</div>
           </div>
           <div class="ig-admin">
-            <a class="ig-publish-btn">
-              <i class="icon-unpublished"></i>
-              <i class="icon-publish"></i>
-            </a>
+            <span class="publish-icon publish-icon-published" data-tooltip title="Unpublish">
+              <i class="icon-publish"></i><span class="publish-text">&nbsp;Published</span>
+            </span>
 
-            <a class="al-trigger">
+            <a class="al-trigger al-trigger-gray">
               <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
             </a>
             <ul class="al-options">
@@ -82,12 +85,11 @@ color with a dashed line between groups.
             <div class="span4 ellipses">10 pts</div>
           </div>
           <div class="ig-admin">
-            <a class="ig-publish-btn">
-              <i class="icon-unpublished"></i>
-              <i class="icon-publish"></i>
-            </a>
+            <span class="publish-icon publish-icon-published" data-tooltip title="Unpublish">
+              <i class="icon-publish"></i><span class="publish-text">&nbsp;Published</span>
+            </span>
 
-            <a class="al-trigger">
+            <a class="al-trigger al-trigger-gray">
               <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
             </a>
             <ul class="al-options">
@@ -101,10 +103,14 @@ color with a dashed line between groups.
   </div>
 
   <div class="item-group-condensed">
-    <div class="ig-header">
-      <i class="icon-mini-arrow-right"></i> Item Group Header
-    </div>
-    <ul class="ig-list">
+    <h2 class="ig-header">
+      <a class="element_toggler" href="#"
+         aria-controls="cond_group_2"
+         aria-expanded="true">
+        <i class="icon-mini-arrow-down"></i> Item Group Header
+      </a>
+    </h2>
+    <ul class="ig-list" id="cond_group_2">
     <li>
       <div class="ig-row">
         <a href="#" class="ig-title ellipses">
@@ -116,17 +122,23 @@ color with a dashed line between groups.
           <div class="span4 ellipses">10 pts</div>
         </div>
         <div class="ig-admin">
-          <a class="ig-publish-btn">
-            <i class="icon-unpublished"></i>
-            <i class="icon-publish"></i>
+          <span class="publish-icon publish-icon-published" data-tooltip title="Unpublish">
+            <i class="icon-publish"></i><span class="publish-text">&nbsp;Published</span>
+          </span>
+
+          <a class="al-trigger al-trigger-gray" role="button" aria-haspopup="true" aria-owns="content-1" tabindex="-1">
+            <i class="icon-settings"></i>
+            <i class="icon-mini-arrow-down"></i>
+            <span class="screenreader-only">Settings</span>
           </a>
 
-          <a class="al-trigger">
-            <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
-          </a>
-          <ul class="al-options">
-            <li><a href="#">Edit</a></li>
-            <li><a href="#">Delete</a></li>
+          <ul id="content-1" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="content-2">
+            <li role="presentation">
+              <a href="#" class="icon-edit" id="content-2" tabindex="-1" role="menuitem" title="Edit">Edit</a>
+            </li>
+            <li role="presentation">
+              <a href="#" class="icon-trash" id="content-3" tabindex="-1" role="menuitem" title="Delete this module">Delete</a>
+            </li>
           </ul>
         </div>
       </div>
@@ -139,15 +151,27 @@ color with a dashed line between groups.
 
 */
 
+body.with_item_groups #main {
+  background-color: #e8ecef;
+}
 .item-group-container {
   background-color: $wellBackground;
+  padding-bottom: 70px;
 
   .item-group-condensed {
     border-bottom: 1px dashed #c2c8d0;
     padding: 15px;
   }
-  .item-group-condensed:last-child {
-    border-bottom: 1px solid #b6babf;
+  .item-group-condensed:last-child,
+  .item-group-condensed.last {
+    border-bottom: 0;
+  }
+
+  .ig-list {
+    margin-top: 0;
+  }
+  .ig-list li {
+    margin: 0;
   }
 }
 
@@ -157,14 +181,16 @@ color with a dashed line between groups.
 
   .ig-header {
     padding-left: 15px;
+
+    a {
+      text-decoration: none;
+      color: #3d454c;
+    }
   }
   .ig-title {
     left: 15px;
   }
 
-  .ig-list li {
-    margin: 0;
-  }
   .ig-row {
     border-top-width: 0;
     border-bottom: 1px solid #e1e3e4;

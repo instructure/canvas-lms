@@ -84,60 +84,61 @@ class SearchController < ApplicationController
   #   permissions that the context grants the current user, e.g.
   #   { send_messages: true }
   def recipients
+    Shackles.activate(:slave) do
+      # admins may not be able to see the course listed at the top level (since
+      # they aren't enrolled in it), but if they search within it, we want
+      # things to work, so we set everything up here
+      load_all_contexts :context => get_admin_search_context(params[:context]),
+                        :permissions => params[:permissions]
 
-    # admins may not be able to see the course listed at the top level (since
-    # they aren't enrolled in it), but if they search within it, we want
-    # things to work, so we set everything up here
-    load_all_contexts :context => get_admin_search_context(params[:context]),
-                      :permissions => params[:permissions]
-
-    types = (params[:types] || [] + [params[:type]]).compact
-    types |= [:course, :section, :group] if types.delete('context')
-    types = if types.present?
-      {:user => types.delete('user').present?, :context => types.present? && types.map(&:to_sym)}
-    else
-      {:user => true, :context => [:course, :section, :group]}
-    end
-
-    @blank_fallback = !api_request?
-
-    params[:per_page] = nil if params[:per_page].to_i <= 0
-    exclude = params[:exclude] || []
-
-    recipients = []
-    if params[:user_id]
-      recipient = @current_user.load_messageable_user(params[:user_id], :conversation_id => params[:from_conversation_id], :admin_context => @admin_context)
-      recipients << recipient if recipient
-    elsif params[:context] || params[:search]
-      collections = []
-
-      if types[:context]
-        collections << ['contexts', search_messageable_contexts(
-          :search => params[:search],
-          :context => params[:context],
-          :synthetic_contexts => params[:synthetic_contexts],
-          :include_inactive => params[:include_inactive],
-          :exclude_ids => MessageableUser.context_recipients(exclude),
-          :search_all_contexts => params[:search_all_contexts],
-          :types => types[:context]
-        )]
+      types = (params[:types] || [] + [params[:type]]).compact
+      types |= [:course, :section, :group] if types.delete('context')
+      types = if types.present?
+        {:user => types.delete('user').present?, :context => types.present? && types.map(&:to_sym)}
+      else
+        {:user => true, :context => [:course, :section, :group]}
       end
 
-      if types[:user] && !@skip_users
-        collections << ['participants', @current_user.search_messageable_users(
-          :search => params[:search],
-          :context => params[:context],
-          :admin_context => @admin_context,
-          :exclude_ids => MessageableUser.individual_recipients(exclude),
-          :strict_checks => !params[:skip_visibility_checks]
-        )]
+      @blank_fallback = !api_request?
+
+      params[:per_page] = nil if params[:per_page].to_i <= 0
+      exclude = params[:exclude] || []
+
+      recipients = []
+      if params[:user_id]
+        recipient = @current_user.load_messageable_user(params[:user_id], :conversation_id => params[:from_conversation_id], :admin_context => @admin_context)
+        recipients << recipient if recipient
+      elsif params[:context] || params[:search]
+        collections = []
+
+        if types[:context]
+          collections << ['contexts', search_messageable_contexts(
+            :search => params[:search],
+            :context => params[:context],
+            :synthetic_contexts => params[:synthetic_contexts],
+            :include_inactive => params[:include_inactive],
+            :exclude_ids => MessageableUser.context_recipients(exclude),
+            :search_all_contexts => params[:search_all_contexts],
+            :types => types[:context]
+          )]
+        end
+
+        if types[:user] && !@skip_users
+          collections << ['participants', @current_user.search_messageable_users(
+            :search => params[:search],
+            :context => params[:context],
+            :admin_context => @admin_context,
+            :exclude_ids => MessageableUser.individual_recipients(exclude),
+            :strict_checks => !params[:skip_visibility_checks]
+          )]
+        end
+
+        recipients = BookmarkedCollection.concat(*collections)
+        recipients = Api.paginate(recipients, self, api_v1_search_recipients_url)
       end
 
-      recipients = BookmarkedCollection.concat(*collections)
-      recipients = Api.paginate(recipients, self, api_v1_search_recipients_url)
+      render :json => conversation_recipients_json(recipients, @current_user, session)
     end
-
-    render :json => conversation_recipients_json(recipients, @current_user, session)
   end
 
   private

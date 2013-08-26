@@ -38,11 +38,19 @@ define([
 
   var domainRootAccountId;
   $.mediaComment.partnerData = function(params) {
-    return JSON.stringify({
-      context_code: $.mediaComment.contextCode(),
-      root_account_id: domainRootAccountId || (domainRootAccountId = Number($("#domain_root_account_id").text())),
-      context_source: ENV.CONTEXT_ACTION_SOURCE
-    });
+
+      var hash = {
+          context_code: $.mediaComment.contextCode(),
+          root_account_id: domainRootAccountId || (domainRootAccountId = Number($("#domain_root_account_id").text())),
+          context_source: ENV.CONTEXT_ACTION_SOURCE
+      }
+      if(ENV.SIS_SOURCE_ID){
+          hash['sis_source_id'] = ENV.SIS_SOURCE_ID
+      }
+      if(ENV.SIS_USER_ID){
+          hash['sis_user_id'] = ENV.SIS_USER_ID
+      }
+    return JSON.stringify(hash);
   }
 
   $.mediaComment.contextCode = function() {
@@ -84,7 +92,11 @@ define([
 
   $.mediaComment.audio_delegate = {
     readyHandler: function() {
-      $("#audio_upload")[0].setMediaType('audio');
+      try {
+        $("#audio_upload")[0].setMediaType('audio');
+      } catch (e) {
+        $.mediaComment.upload_delegate.setupErrorHandler();
+      }
     },
     selectHandler: function() {
       $.mediaComment.upload_delegate.selectHandler('audio');
@@ -108,8 +120,20 @@ define([
 
 
   $.mediaComment.video_delegate = {
+    readyWatcher: null,
+    expectReady: function() {
+      // In IE, if cross-domain permissions aren't set up correctly, Flash silently stops interacting with JS.
+      if ($.mediaComment.video_delegate.readyWatcher) {return;}
+      $.mediaComment.video_delegate.readyWatcher = setTimeout($.mediaComment.upload_delegate.setupErrorHandler, 2000);
+    },
     readyHandler: function() {
-      $("#video_upload")[0].setMediaType('video');
+      try {
+        $("#video_upload")[0].setMediaType('video');
+      } catch (e) {
+        $.mediaComment.upload_delegate.setupErrorHandler();
+      }
+      clearTimeout($.mediaComment.video_delegate.readyWatcher);
+      $.mediaComment.video_delegate.readyWatcher = true;
     },
     selectHandler: function() {
       $.mediaComment.upload_delegate.selectHandler('video');
@@ -150,7 +174,12 @@ define([
     },
     selectHandler: function(type) {
       $.mediaComment.upload_delegate.currentType = type;
-      var files = $("#" + type + "_upload")[0].getFiles();
+      try {
+        var files = $("#" + type + "_upload")[0].getFiles();
+      } catch (e) {
+        $.mediaComment.upload_delegate.setupErrorHandler();
+        return;
+      }
       if(files.length > 1) {
         $("#" + type + "_upload")[0].removeFiles(0, files.length - 2);
       }
@@ -211,6 +240,12 @@ define([
       var error = $("#" + type + "_upload")[0].getError();
       $("#media_upload_errors").text(I18n.t('errors.upload_failed', "Upload failed with error:") + " " + error);
       $("#media_upload_progress").hide();
+    },
+    setupErrorHandler: function() {
+      $("#media_upload_feedback_text").html(I18n.t('errors.media_comment_installation_broken', "Media comment uploading has not been set up properly. Please contact your administrator."));
+      $("#media_upload_feedback").css('visibility', 'visible');
+      $('#audio_upload_holder').css('visibility', 'hidden');
+      $('#video_upload_holder').css('visibility', 'hidden');
     }
   };
 
@@ -347,7 +382,6 @@ define([
       var height = "50";
       swfobject.embedSWF("//" + INST.kalturaSettings.domain + "/kupload/ui_conf_id/" + INST.kalturaSettings.upload_ui_conf, "video_upload", width, height, "9.0.0", false, flashVars, params);
 
-
       var $audio_record_holder, $audio_record, $audio_record_meter;
       var audio_record_counter, current_audio_level, audio_has_volume;
       var $video_record_holder, $video_record, $video_record_meter;
@@ -447,7 +481,7 @@ define([
         var checkForKS = function() {
           if($div.data('ks')) {
             $div.html(html);
-            $div.find("#media_record_tabs").tabs();
+            $div.find("#media_record_tabs").tabs({activate: $.mediaComment.video_delegate.expectReady});
             mediaCommentReady();
           } else if($div.data('ks-error')) {
             $div.html($div.data('ks-error'));

@@ -78,7 +78,8 @@ class ProfileController < ApplicationController
   #     'sis_login_id': 'sis1-login',
   #     // The avatar_url can change over time, so we recommend not caching it for more than a few hours
   #     'avatar_url': '..url..',
-  #     'calendar': { 'ics' => '..url..' }
+  #     'calendar': { 'ics' => '..url..' },
+  #     'time_zone': 'America/Denver'
   #   }
   def settings
     if api_request?

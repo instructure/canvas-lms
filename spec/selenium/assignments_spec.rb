@@ -482,6 +482,9 @@ describe "assignments" do
         wait_for_ajaximations
 
         expect_new_page_load { f('.new_assignment').click }
+        wait_for_ajaximations
+
+        f('#edit_assignment_form').should be_present
       end
 
       it "should allow quick-adding an assignment to a group" do
@@ -489,7 +492,6 @@ describe "assignments" do
 
         get "/courses/#{@course.id}/assignments"
         wait_for_ajaximations
-
 
         f("#assignment_group_#{ag.id} .add_assignment").click
         wait_for_ajaximations
@@ -506,12 +508,39 @@ describe "assignments" do
         f("#assignment_group_#{ag.id} .ig-title").text.should match "Do this"
       end
 
-      it "should rembmer entered settings when 'more options' is pressed" do
+      it "should allow quick-adding two assignments to a group (dealing with form re-render)" do
         ag = @course.assignment_groups.first
 
         get "/courses/#{@course.id}/assignments"
         wait_for_ajaximations
 
+        f("#assignment_group_#{ag.id} .add_assignment").click
+        wait_for_ajaximations
+
+        replace_content(f("#ag_#{ag.id}_assignment_name"), "Do this")
+        replace_content(f("#ag_#{ag.id}_assignment_points"), "13")
+        fj('.create_assignment:visible').click
+        wait_for_ajaximations
+
+        f("#assignment_group_#{ag.id} .add_assignment").click
+        wait_for_ajaximations
+
+        get_value("#ag_#{ag.id}_assignment_name").should be_blank
+        get_value("#ag_#{ag.id}_assignment_points").should be_blank
+
+        replace_content(f("#ag_#{ag.id}_assignment_name"), "Another")
+        replace_content(f("#ag_#{ag.id}_assignment_points"), "3")
+        fj('.create_assignment:visible').click
+        wait_for_ajaximations
+
+        ag.reload.assignments.count.should == 2
+      end
+
+      it "should remembmer entered settings when 'more options' is pressed" do
+        ag = @course.assignment_groups.first
+
+        get "/courses/#{@course.id}/assignments"
+        wait_for_ajaximations
 
         f("#assignment_group_#{ag.id} .add_assignment").click
         wait_for_ajaximations
@@ -522,6 +551,84 @@ describe "assignments" do
 
         get_value("#assignment_name").should == "Do this"
         get_value("#assignment_points_possible").should == "13"
+      end
+
+      context 'publishing' do
+        before do
+          ag = @course.assignment_groups.first
+          @assignment = ag.assignments.create! :context => @course, :title => 'to publish'
+          @assignment.unpublish
+        end
+
+        it "should allow publishing from the index page" do
+          get "/courses/#{@course.id}/assignments"
+          wait_for_ajaximations
+
+          f("#assignment_#{@assignment.id} .publish-icon").click
+          wait_for_ajaximations
+
+          @assignment.reload.should be_published
+          f("#assignment_#{@assignment.id} .publish-icon").text.should match "Published"
+        end
+
+        it "should allow publishing from the show page" do
+          get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+          wait_for_ajaximations
+
+          f("#assignment_publish_button").click
+          wait_for_ajaximations
+
+          @assignment.reload.should be_published
+          f("#assignment_publish_button").text.should match "Published"
+        end
+
+        it "should show publishing status on the edit page" do
+          get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
+          wait_for_ajaximations
+
+          f("#edit_assignment_header").text.should match "Not Published"
+        end
+
+        context 'with overrides' do
+          before do
+            @course.course_sections.create! :name => "HI"
+            @assignment.assignment_overrides.create! { |override|
+              override.set = @course.course_sections.first
+              override.due_at = 1.day.ago
+              override.due_at_overridden = true
+            }
+          end
+
+          it "should not overwrite overrides if published twice from the index page" do
+            get "/courses/#{@course.id}/assignments"
+            wait_for_ajaximations
+
+            f("#assignment_#{@assignment.id} .publish-icon").click
+            wait_for_ajaximations
+            @assignment.reload.should be_published
+
+            f("#assignment_#{@assignment.id} .publish-icon").click
+            wait_for_ajaximations
+            @assignment.reload.should_not be_published
+
+            @assignment.reload.active_assignment_overrides.count.should == 1
+          end
+
+          it "should not overwrite overrides if published twice from the show page" do
+            get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+            wait_for_ajaximations
+
+            f("#assignment_publish_button").click
+            wait_for_ajaximations
+            @assignment.reload.should be_published
+
+            f("#assignment_publish_button").click
+            wait_for_ajaximations
+            @assignment.reload.should_not be_published
+
+            @assignment.reload.active_assignment_overrides.count.should == 1
+          end
+        end
       end
     end
   end

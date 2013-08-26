@@ -30,8 +30,8 @@ migrations.each do |migration|
     add_error("cannot use send_later in a predeploy - the jobs servers won't have the new code yet")
   end
 
-  if data =~ /find_each|find_in_batches|find_ids_in_/ && data !~ /with_exclusive_scope/
-    add_warning("find_in_batches or similar without with_exclusive_scope might be dangerous")
+  if data =~ /find_ids_in_/ && data !~ /with_exclusive_scope/
+    add_warning("find_ids_in without with_exclusive_scope might be dangerous")
   end
 
   if data =~ /concurrent\W/

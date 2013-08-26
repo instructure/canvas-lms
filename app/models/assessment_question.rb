@@ -452,9 +452,14 @@ class AssessmentQuestion < ActiveRecord::Base
     end
     if migration.to_import('assessment_questions') != false || (to_import && !to_import.empty?)
 
-      questions_to_update = migration.context.assessment_questions.where(:migration_id => questions.collect{|q| q['migration_id']})
-      questions_to_update.each do |question_to_update|
-        questions.find{|q| q['migration_id'].eql?(question_to_update.migration_id)}['assessment_question_id'] = question_to_update.id
+      existing_questions = migration.context.assessment_questions.
+          except(:select).
+          select("assessment_questions.id, assessment_questions.migration_id").
+          where("assessment_questions.migration_id IS NOT NULL").
+          index_by(&:migration_id)
+      questions.each do |q|
+        existing_question = existing_questions[q['migration_id']]
+        q['assessment_question_id'] = existing_question.id if existing_question
       end
 
       logger.debug "adding #{total} assessment questions"
@@ -546,7 +551,8 @@ class AssessmentQuestion < ActiveRecord::Base
     else
       query = "INSERT INTO assessment_questions (name, question_data, workflow_state, created_at, updated_at, assessment_question_bank_id, migration_id)"
       query += " VALUES (#{question_name},#{question_data},'active', '#{Time.now.to_s(:db)}', '#{Time.now.to_s(:db)}', #{bank.id}, '#{hash[:migration_id]}')"
-      id = AssessmentQuestion.connection.insert(query)
+      id = AssessmentQuestion.connection.insert(query, "#{name} Create",
+                                                primary_key, nil, sequence_name)
       hash['assessment_question_id'] = id
     end
     if context.respond_to?(:content_migration) && context.content_migration

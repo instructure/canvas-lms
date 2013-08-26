@@ -26,6 +26,7 @@ class Assignment < ActiveRecord::Base
   include Mutable
   include ContextModuleItem
   include DatesOverridable
+  include SearchTermHelper
 
   attr_accessible :title, :name, :description, :due_at, :points_possible,
     :min_score, :max_score, :mastery_score, :grading_type, :submission_types,
@@ -605,7 +606,7 @@ class Assignment < ActiveRecord::Base
     when %r{%$}
       # interpret as a percentage
       percentage = grade.to_f / 100.0
-      (points_possible * percentage * 100.0).round / 100.0
+      (points_possible.to_f * percentage * 100.0).round / 100.0
     when %r{[\d\.]+}
       # interpret as a numerical score
       (grade.to_f * 100.0).round / 100.0
@@ -722,6 +723,12 @@ class Assignment < ActiveRecord::Base
         locked = {:asset_string => assignment_for_user.asset_string, :lock_at => assignment_for_user.lock_at}
       elsif self.could_be_locked && item = locked_by_module_item?(user, opts[:deep_check_if_needed])
         locked = {:asset_string => self.asset_string, :context_module => item.context_module.attributes}
+      elsif self.submission_types == 'discussion_topic' && self.discussion_topic &&
+          topic_locked = self.discussion_topic.locked_for?(user, opts.merge(:skip_assignment => true))
+        locked = topic_locked
+      elsif self.submission_types == 'online_quiz' && self.quiz &&
+          quiz_locked = self.quiz.locked_for?(user, opts.merge(:skip_assignment => true))
+        locked = quiz_locked
       end
       locked
     end
@@ -802,12 +809,10 @@ class Assignment < ActiveRecord::Base
     grade = self.score_to_grade(score)
     submissions_to_save = []
     self.context.students.find_each do |student|
-      User.send(:with_exclusive_scope) do
-        submission = self.find_or_create_submission(student)
-        if !submission.score || options[:overwrite_existing_grades]
-          if submission.score != score
-            submissions_to_save << submission
-          end
+      submission = self.find_or_create_submission(student)
+      if !submission.score || options[:overwrite_existing_grades]
+        if submission.score != score
+          submissions_to_save << submission
         end
       end
     end
@@ -1100,16 +1105,42 @@ class Assignment < ActiveRecord::Base
       },
       :include_root => false
     )
-    avatar_methods = avatars ? [:avatar_path] : []
+
+    avatar_methods = (avatars && !grade_as_group?) ? [:avatar_path] : []
     visible_students = context.students_visible_to(user).order_by_sortable_name.uniq
-    res[:context][:students] = visible_students.
-      map{|u| u.as_json(:include_root => false, :methods => avatar_methods, :only => [:name, :id])}
+
+    res[:context][:rep_for_student] = {}
+
+    students = if grade_as_group?
+                 group_category.groups.includes(:group_memberships => :user).map { |g|
+                   [g.name, g.users]
+                 }.map { |group_name, group_students|
+                   representative, *others = (group_students & visible_students)
+                   next unless representative
+
+                   representative.readonly!
+                   representative.name = group_name
+
+                   others.each { |s|
+                     res[:context][:rep_for_student][s.id] = representative.id
+                   }
+                   representative
+                 }.compact
+               else
+                 visible_students
+               end
+
+    res[:context][:students] = students.map { |u|
+      u.as_json(:include_root => false,
+                :methods => avatar_methods,
+                :only => [:name, :id])
+    }
     res[:context][:active_course_sections] = context.sections_visible_to(user).
       map{|s| s.as_json(:include_root => false, :only => [:id, :name]) }
     res[:context][:enrollments] = context.enrollments_visible_to(user).
-      map{|s| s.as_json(:include_root => false, :only => [:user_id, :course_section_id]) }
+        map{|s| s.as_json(:include_root => false, :only => [:user_id, :course_section_id]) }
     res[:context][:quiz] = self.quiz.as_json(:include_root => false, :only => [:anonymous_submissions])
-    res[:submissions] = submissions.where(:user_id => visible_students).map{|sub|
+    res[:submissions] = submissions.where(:user_id => students).map{|sub|
       json = sub.as_json(:include_root => false,
         :include => {
           :submission_comments => {
@@ -1125,7 +1156,6 @@ class Assignment < ActiveRecord::Base
       )
       if json['submission_history']
         json['submission_history'].map! do |version|
-          version.cached_due_date = sub.cached_due_date
           version.as_json(
             :include => {
               :submission_comments => { :only => comment_fields }
@@ -1137,7 +1167,7 @@ class Assignment < ActiveRecord::Base
               version_json['submission']['versioned_attachments'].map! do |a|
                 a.as_json(
                   :only => attachment_fields,
-                  :methods => [:view_inline_ping_url]
+                  :methods => [:view_inline_ping_url, :scribd_render_url]
                 )
               end
             end
@@ -1146,9 +1176,14 @@ class Assignment < ActiveRecord::Base
       end
       json
     }
+    res[:GROUP_GRADING_MODE] = grade_as_group?
     res
   ensure
     Attachment.skip_thumbnails = nil
+  end
+
+  def grade_as_group?
+    has_group_category? && !grade_group_students_individually?
   end
 
   def visible_rubric_assessments_for(user)

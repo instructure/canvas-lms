@@ -23,6 +23,7 @@ class Version < ActiveRecord::Base #:nodoc:
       # INSTRUCTURE:  added if... so that if a column is removed in a migration after this was versioned it doesen't die with NoMethodError: undefined method `some_column_name=' for ...
       obj.__send__( "#{var_name}=", var_value ) if obj.respond_to?("#{var_name}=")
     end
+    obj.simply_versioned_options[:on_load].try(:call, obj, self)
     # INSTRUCTURE: Added to allow model instances pulled out
     # of versions to still know their version number
     obj.simply_versioned_version_model = true

@@ -1,0 +1,25 @@
+{{#if collection.length}}
+
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <td>{{#t "date"}}Date{{/t}}</td>
+        <td>{{#t "time"}}Time{{/t}}</td>
+        <td>{{#t "activity"}}Activity{{/t}}</td>
+      </tr>
+    </thead>
+    <tbody class="collectionViewItems"></tbody>
+  </table>
+  <div class="paginatedLoadingIndicator"></div>
+
+{{else}}
+
+  <div class="alert alert-info">
+    <p class="lead">{{#t "no_item_found"}}No items found{{/t}}</p>
+  </div>
+  <div class="paginatedLoadingIndicator"></div>
+
+{{/if}}
+
+
+

@@ -68,12 +68,12 @@ class EventStream::Index
     database.update(insert_cql, key, ordered_id, record.id, ttl_seconds)
   end
 
-  def for_key(key)
+  def for_key(key, options={})
     shard = Shard.current
     bookmarker = EventStream::Index::Bookmarker.new(self)
     BookmarkedCollection.build(bookmarker) do |pager|
       if event_stream.available?
-        shard.activate { history(key, pager) }
+        shard.activate { history(key, pager, options) }
       end
     end
   end
@@ -102,32 +102,50 @@ class EventStream::Index
     "INSERT INTO #{table} (#{key_column}, ordered_id, #{id_column}) VALUES (?, ?, ?) USING TTL ?"
   end
 
-  def history(key, pager)
+  def history(key, pager, options)
     # get the bucket to start at from the bookmark
     if pager.current_bookmark
       bucket, ordered_id = pager.current_bookmark
+    elsif options[:newest]
+      # page 1 with explicit start time
+      bucket = bucket_for_time(options[:newest])
+      ordered_id = "#{options[:newest].to_i + 1}/"
     else
-      # page 1
+      # page 1 implicit start at first event in "current" bucket
       bucket = bucket_for_time(Time.now)
       ordered_id = nil
     end
 
-    # pull results from each bucket until the page is full or we hit the
-    # scrollback_limit
+    # where to stop ("oldest" if given, defaulting to scrollback_limit, but
+    # can't go past scrollback_limit)
     scrollback_limit = self.scrollback_limit.ago
-    until pager.next_bookmark || Time.at(bucket) < scrollback_limit
+    oldest = options[:oldest] || scrollback_limit
+    oldest = scrollback_limit if oldest < scrollback_limit
+    oldest_bucket = bucket_for_time(oldest)
+    lower_bound = "#{oldest.to_i}/"
+
+    if ordered_id && (pager.include_bookmark ? ordered_id < lower_bound : ordered_id <= lower_bound)
+      # no possible results
+      pager.replace []
+      return pager
+    end
+
+    # pull results from each bucket until the page is full or we go past the
+    # end bucket
+    until pager.next_bookmark || bucket < oldest_bucket
       # build up the query based on the context, bucket, and ordered_id. fetch
       # one extra so we can tell if there are more pages
       limit = pager.per_page + 1 - pager.size
       args = []
       args << "#{key}/#{bucket}"
+      args << lower_bound
       if ordered_id
         ordered_id_clause = (pager.include_bookmark ? "AND ordered_id <= ?" : "AND ordered_id < ?")
         args << ordered_id
       else
         ordered_id_clause = nil
       end
-      qs = "SELECT ordered_id, #{id_column} FROM #{table} where #{key_column} = ? #{ordered_id_clause} ORDER BY ordered_id DESC LIMIT #{limit}"
+      qs = "SELECT ordered_id, #{id_column} FROM #{table} WHERE #{key_column} = ? AND ordered_id >= ? #{ordered_id_clause} ORDER BY ordered_id DESC LIMIT #{limit}"
 
       # execute the query collecting the results. set the bookmark iff there
       # was a result after the full page

@@ -161,13 +161,13 @@ describe GroupCategory do
 
   context 'destroy' do
     it "should not remove the database row" do
-      category = GroupCategory.create
+      category = GroupCategory.create(name: "foo")
       category.destroy
       lambda{ GroupCategory.find(category.id) }.should_not raise_error
     end
 
     it "should set deleted_at" do
-      category = GroupCategory.create
+      category = GroupCategory.create(name: "foo")
       category.destroy
       category.reload
       category.deleted_at.should_not be_nil
@@ -175,7 +175,7 @@ describe GroupCategory do
 
     it "should destroy dependent groups" do
       course = course_model
-      category = course.group_categories.create
+      category = group_category
       group1 = category.groups.create(:context => course)
       group2 = category.groups.create(:context => course)
       course.reload
@@ -191,6 +191,7 @@ describe GroupCategory do
   context 'configure_self_signup(enabled, restricted)' do
     before :each do
       @category = GroupCategory.new
+      @category.name = "foo"
     end
 
     it "should make self_signup? true and unrestricted_self_signup? true given (true, false)" do
@@ -216,6 +217,7 @@ describe GroupCategory do
     end
 
     it "should persist to the DB" do
+      @category.context = course()
       @category.configure_self_signup(true, true)
       @category.save!
       @category.reload
@@ -233,7 +235,7 @@ describe GroupCategory do
   context "has_heterogenous_group?" do
     it "should be false for accounts" do
       account = Account.default
-      category = account.group_categories.create
+      category = group_category(context: account)
       group = category.groups.create(:context => account)
       category.should_not have_heterogenous_group
     end
@@ -244,7 +246,7 @@ describe GroupCategory do
       section2 = @course.course_sections.create
       user1 = section1.enroll_user(user_model, 'StudentEnrollment').user
       user2 = section2.enroll_user(user_model, 'StudentEnrollment').user
-      category = @course.group_categories.create
+      category = group_category
       group = category.groups.create(:context => @course)
       group.add_user(user1)
       group.add_user(user2)
@@ -256,7 +258,7 @@ describe GroupCategory do
       section1 = @course.course_sections.create
       user1 = section1.enroll_user(user_model, 'StudentEnrollment').user
       user2 = section1.enroll_user(user_model, 'StudentEnrollment').user
-      category = @course.group_categories.create
+      category = group_category
       group = category.groups.create(:context => @course)
       group.add_user(user1)
       group.add_user(user2)
@@ -268,7 +270,7 @@ describe GroupCategory do
     before :each do
       course_with_teacher(:active_all => true)
       student_in_course(:active_all => true)
-      @category = @course.group_categories.create
+      @category = group_category
     end
 
     it "should return nil if no groups in category" do

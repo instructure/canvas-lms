@@ -381,7 +381,7 @@ describe AccountsController do
           @account.default_storage_quota_mb.should == 123
           @account.default_user_storage_quota_mb.should == 45
           @account.default_group_storage_quota_mb.should == 9001
-          @account.default_time_zone.should == 'Alaska'
+          @account.default_time_zone.name.should == 'Alaska'
         end
 
         it "should disallow setting default quota (bytes)" do
@@ -391,7 +391,7 @@ describe AccountsController do
           }
           @account.reload
           @account.default_storage_quota.should == 123.megabytes
-          @account.default_time_zone.should == 'Alaska'
+          @account.default_time_zone.name.should == 'Alaska'
         end
 
         it "should disallow setting storage quota" do
@@ -401,7 +401,7 @@ describe AccountsController do
           }
           @account.reload
           @account.storage_quota.should == 555.megabytes
-          @account.default_time_zone.should == 'Alaska'
+          @account.default_time_zone.name.should == 'Alaska'
         end
       end
     end

@@ -19,6 +19,16 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe AssessmentQuestion do
+
+  def attachment_in_course(course)
+    Attachment.create!(
+      :filename => 'test.jpg',
+      :display_name => "test.jpg",
+      :uploaded_data => StringIO.new('psych!'),
+      :folder => Folder.unfiled_folder(course),
+      :context => course
+    )
+  end
   
   it "should create a new instance given valid attributes" do
     assessment_question_model
@@ -40,7 +50,7 @@ describe AssessmentQuestion do
     course
     @bank = @course.assessment_question_banks.create!(:title => 'Test Bank')
 
-    @attachment = attachment_with_context(@course)
+    @attachment = attachment_in_course(@course)
     data = {'name' => "Hi", 'question_text' => "Translate this: <img src='/courses/#{@course.id}/files/#{@attachment.id}/download'>", 'answers' => [{'id' => 1}, {'id' => 2}]}
     @question = @bank.assessment_questions.create!(:question_data => data)
 
@@ -54,7 +64,7 @@ describe AssessmentQuestion do
     course
     @bank = @course.assessment_question_banks.create!(:title => 'Test Bank')
 
-    @attachment = Attachment.create!(:filename => 'test.jpg', :display_name => "test.jpg", :uploaded_data => StringIO.new('psych!'), :folder => Folder.unfiled_folder(@course), :context => @course)
+    @attachment = attachment_in_course(@course)
     data = {'name' => "Hi", 'question_text' => "Translate this: <img src='/courses/#{@course.id}/file_contents/course%20files/unfiled/test.jpg'>", 'answers' => [{'id' => 1}, {'id' => 2}]}
     @question = @bank.assessment_questions.create!(:question_data => data)
 
@@ -68,8 +78,7 @@ describe AssessmentQuestion do
     course
     @bank = @course.assessment_question_banks.create!(:title => 'Test Bank')
 
-    @attachment = attachment_with_context(@course)
-    @attachment = Attachment.create!(:filename => 'test.jpg', :display_name => "test.jpg", :uploaded_data => StringIO.new('psych!'), :folder => Folder.unfiled_folder(@course), :context => @course)
+    @attachment = attachment_in_course(@course)
     data = {'name' => "Hi",
             'question_text' => "Translate this: <img src='/courses/#{@course.id}/files/#{@attachment.id}/download?wrap=1'> and this: <img src='/courses/#{@course.id}/file_contents/course%20files/unfiled/test.jpg?wrap=1'>",
             'answers' => [{'id' => 1}, {'id' => 2}]}
@@ -85,17 +94,15 @@ describe AssessmentQuestion do
     course
     @bank = @course.assessment_question_banks.create!(:title => 'Test Bank')
 
-    @attachment = attachment_with_context(@course)
-    @attachment2 = @attachment = Attachment.create!(:filename => 'test.jpg', :display_name => "test.jpg", :uploaded_data => StringIO.new('psych!'), :folder => Folder.unfiled_folder(@course), :context => @course)
+    @attachment = attachment_in_course(@course)
+
     data = {'name' => "Hi", 'question_text' => "Translate this: <img src='/courses/#{@course.id}/files/#{@attachment.id}/download'> and this: <img src='/courses/#{@course.id}/file_contents/course%20files/unfiled/test.jpg'>", 'answers' => [{'id' => 1}, {'id' => 2}]}
     @question = @bank.assessment_questions.create!(:question_data => data)
 
     @attachment.reload.cloned_item.attachments.length.should == 2
     @clone = @attachment.cloned_item.attachments.last
-    @attachment2.reload.cloned_item.attachments.length.should == 2
-    @clone2 = @attachment2.cloned_item.attachments.last
 
-    @question.reload.question_data['question_text'].should == "Translate this: <img src='/assessment_questions/#{@question.id}/files/#{@clone.id}/download?verifier=#{@clone.uuid}'> and this: <img src='/assessment_questions/#{@question.id}/files/#{@clone2.id}/download?verifier=#{@clone2.uuid}'>"
+    @question.reload.question_data['question_text'].should == "Translate this: <img src='/assessment_questions/#{@question.id}/files/#{@clone.id}/download?verifier=#{@clone.uuid}'> and this: <img src='/assessment_questions/#{@question.id}/files/#{@clone.id}/download?verifier=#{@clone.uuid}'>"
   end
 
   it "should translate links to be readable w/ verifier" do

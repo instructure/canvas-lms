@@ -35,7 +35,10 @@ define [
       @entries.participants = @participants
 
       @set 'set_assignment', @get('assignment')?
-      assign = new Assignment(@get('assignment') or {})
+      assign_attributes = @get('assignment') or {}
+      assign_attributes.assignment_overrides or= []
+      assign_attributes.turnitin_settings or= {}
+      assign = new Assignment(assign_attributes)
       assign.alreadyScoped = true
       @set 'assignment', assign
 

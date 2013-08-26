@@ -220,7 +220,7 @@ define([
       },
       success: function(data) {
         $(this).loadingImage('remove');
-        var report = $(this).find('input[name="report_type"]').val();
+        var report = $(this).attr('id').replace('_form', '');
         $("#" + report).find('.run_report_link').hide()
           .end().find('.configure_report_link').hide()
           .end().find('.running_report_message').show();

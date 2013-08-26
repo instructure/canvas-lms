@@ -25,6 +25,7 @@ class Attachment < ActiveRecord::Base
   attr_accessible :context, :folder, :filename, :display_name, :user, :locked, :position, :lock_at, :unlock_at, :uploaded_data, :hidden
   include HasContentTags
   include ContextModuleItem
+  include SearchTermHelper
 
   attr_accessor :podcast_associated_asset, :submission_attachment
 
@@ -491,11 +492,13 @@ class Attachment < ActiveRecord::Base
 
     if !self.scribd_mime_type_id && !['text/html', 'application/xhtml+xml', 'application/xml', 'text/xml'].include?(self.content_type)
       @@mime_ids ||= {}
-      @@mime_ids[self.content_type] ||= self.content_type && ScribdMimeType.find_by_name(self.content_type).try(:id)
-      self.scribd_mime_type_id = @@mime_ids[self.content_type]
+      self.scribd_mime_type_id = @@mime_ids.fetch(self.content_type) do
+        @@mime_ids[self.content_type] = self.content_type && ScribdMimeType.find_by_name(self.content_type).try(:id)
+      end
       if !self.scribd_mime_type_id
-        @@mime_ids[self.after_extension] ||= self.after_extension && ScribdMimeType.find_by_extension(self.after_extension).try(:id)
-        self.scribd_mime_type_id = @@mime_ids[self.after_extension]
+        self.scribd_mime_type_id = @@mime_ids.fetch(self.after_extension) do
+          @@mime_ids[self.after_extension] = self.after_extension && ScribdMimeType.find_by_extension(self.after_extension).try(:id)
+        end
       end
     end
 
@@ -1199,6 +1202,7 @@ class Attachment < ActiveRecord::Base
         locked = {:asset_string => self.asset_string, :lock_at => self.lock_at}
       elsif self.could_be_locked && item = locked_by_module_item?(user, opts[:deep_check_if_needed])
         locked = {:asset_string => self.asset_string, :context_module => item.context_module.attributes}
+        locked[:unlock_at] = locked[:context_module]["unlock_at"] if locked[:context_module]["unlock_at"]
       end
       locked
     end
@@ -1274,6 +1278,7 @@ class Attachment < ActiveRecord::Base
     state :unattached_temporary
   end
 
+  scope :visible, where(['attachments.file_state in (?, ?)', 'available', 'public'])
   scope :not_deleted, where("attachments.file_state<>'deleted'")
 
   scope :not_hidden, where("attachments.file_state<>'hidden'")
@@ -1297,12 +1302,12 @@ class Attachment < ActiveRecord::Base
   alias_method :destroy!, :destroy
   # file_state is like workflow_state, which was already taken
   # possible values are: available, deleted
-  def destroy(delete_media_object = true)
+  def destroy
     return if self.new_record?
     self.file_state = 'deleted' #destroy
     self.deleted_at = Time.now
     ContentTag.delete_for(self)
-    MediaObject.where(:attachment_id => self).update_all(:workflow_state => 'deleted', :updated_at => Time.now.utc) if self.id && delete_media_object
+    MediaObject.update_all({:attachment_id => nil, :updated_at => Time.now.utc}, {:attachment_id => self.id})
     send_later_if_production(:delete_scribd_doc) if scribd_doc
     save!
     # if the attachment being deleted belongs to a user and the uuid (hash of file) matches the avatar_image_url
@@ -1686,5 +1691,29 @@ class Attachment < ActiveRecord::Base
 
   def record_inline_view
     update_attribute(:last_inline_view, Time.now)
+    check_rerender_scribd_doc unless self.scribd_doc
+  end
+
+  def scribd_doc_missing?
+    scribdable? && scribd_doc.nil? && !pending_upload? && !processing?
+  end
+
+  def scribd_render_url
+    if scribd_doc_missing?
+      "/#{context_url_prefix}/files/#{self.id}/scribd_render"
+    else
+      nil
+    end
+  end
+
+  def check_rerender_scribd_doc
+    if scribd_doc_missing?
+      self.scribd_attempts = 0
+      self.workflow_state = 'pending_upload'
+      self.save!
+      send_later :submit_to_scribd!
+      return true
+    end
+    false
   end
 end

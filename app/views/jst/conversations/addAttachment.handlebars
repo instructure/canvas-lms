@@ -1,18 +1,14 @@
-<li class="attachment clearfix"
+<li class="attachment clearfix" tabindex="0"
     title="{{#t "titles.attachment"}}File to attach{{/t}}">
-  <div class="row-fluid">
-    <div class="span8">
-      <i class="icon-paperclip"></i>
-
-      <input type="file"
-             class="file_input"
-             name="attachments[]">
-    </div>
-
-    <div class="span1 offset3">
       <a href="#"
          class="remove_link icon-end black pull-right"
          title="{{#t "titles.remove_attachment"}}Remove attachment{{/t}}"></a>
-    </div>
+      <div class="attachment-icon" aria-hidden="true">
+        <i class="icon-paperclip"></i>
+      </div>
+      <div class="attachment-name"></div>
+      <input type="file"
+             class="file_input"
+             name="attachments[]">
   </div>
 </li>

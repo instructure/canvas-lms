@@ -167,6 +167,7 @@ class PseudonymsController < ApplicationController
     if api_request?
       return unless context_is_root_account?
       @account = @context
+      params[:login] ||= {}
       params[:login][:password_confirmation] = params[:login][:password]
       params[:pseudonym] = params[:login]
     else

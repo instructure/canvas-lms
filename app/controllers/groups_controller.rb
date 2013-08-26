@@ -146,25 +146,34 @@ class GroupsController < ApplicationController
   #
   # Returns a list of active groups for the current user.
   #
+  # @argument context_type [Optional] only include groups that are in this type of
+  #  context. Can be 'Account' or 'Course'
+  #
   # @example_request
-  #     curl https://<canvas>/api/v1/users/self/groups \ 
+  #     curl https://<canvas>/api/v1/users/self/groups?context_type=Account \ 
   #          -H 'Authorization: Bearer <token>'
   #
   # @returns [Group]
   def index
     return context_index if @context
+    groups_scope = @current_user.current_groups
     respond_to do |format|
       format.html do
-        @groups = @current_user.current_groups.by_name.
-          with_each_shard{ |scope| scope.includes(:group_category) }
+        @groups = groups_scope.with_each_shard{ |scope|
+          scope = scope.by_name
+          scope = scope.where(:context_type => params[:context_type]) if params[:context_type]
+          scope.includes(:group_category)
+        }
       end
 
       format.json do
         @groups = BookmarkedCollection.with_each_shard(
-          Group::Bookmarker,
-          @current_user.current_groups) { |scope| scope.includes(:group_category) }
+          Group::Bookmarker, groups_scope) { |scope|
+          scope = scope.scoped
+          scope = scope.where(:context_type => params[:context_type]) if params[:context_type]
+          scope.includes(:group_category) }
         @groups = Api.paginate(@groups, self, api_v1_current_user_groups_url)
-        render :json => @groups.map { |g| group_json(g, @current_user, session) }
+        render :json => (@groups.map { |g| group_json(g, @current_user, session) })
       end
     end
   end
@@ -579,14 +588,7 @@ class GroupsController < ApplicationController
   def users
     return unless authorized_action(@context, @current_user, :read)
 
-    search_term = params[:search_term]
-    if search_term && search_term.size < 3
-      return render \
-          :json => {
-          "status" => "argument_error",
-          "message" => "search_term of 3 or more characters is required" },
-          :status => :bad_request
-    end
+    search_term = params[:search_term].presence
 
     if search_term
       users = UserSearch.for_user_in_context(search_term, @context, @current_user)
@@ -705,7 +707,7 @@ class GroupsController < ApplicationController
 
   def find_group
     if api_request?
-      @group = Group.active.find(params[:group_id])
+      @group = api_find(Group.active, params[:group_id])
     else
       @group = @context if @context.is_a?(Group)
       @group ||= (@context ? @context.groups : Group).find(params[:id])

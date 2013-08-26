@@ -141,7 +141,8 @@ class Submission < ActiveRecord::Base
 
   simply_versioned :explicit => true,
     :when => lambda{ |model| model.new_version_needed? },
-    :on_create => lambda{ |model,version| SubmissionVersion.index_version(version) }
+    :on_create => lambda{ |model,version| SubmissionVersion.index_version(version) },
+    :on_load => lambda{ |model,version| model.cached_due_date = version.versionable.cached_due_date }
 
   def new_version_needed?
     turnitin_data_changed? || (changes.keys - [
@@ -569,6 +570,7 @@ class Submission < ActiveRecord::Base
       ids = (attachment_ids || "").split(",")
       ids << attachment_id if attachment_id
       self.versioned_attachments = Attachment.where(:id => ids)
+      @versioned_attachments
     end
   end
 

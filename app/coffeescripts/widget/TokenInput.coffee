@@ -62,6 +62,7 @@ define [
 
       # key capture input
       @$input = $('<input name="token_capture" />')
+        .attr('title', @options.title)
         .appendTo(@$scroller)
         .css('width', '20px')
         .css('font-size', @$fakeInput.css('font-size'))
@@ -127,6 +128,7 @@ define [
           .attr('name', @nodeName + '[]')
           .val(val)
         )
+        @options.onNewToken($token) if @options.onNewToken
         # has to happen before append, so that its unlimited width doesn't make
         # @$tokens grow (which would then keep us from limiting it)
         @$tokens.resizeTokens($token)

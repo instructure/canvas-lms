@@ -1,5 +1,6 @@
 require [
   'jquery'
+  'underscore'
   'compiled/fn/preventDefault'
   'compiled/views/PublishButtonView'
   'compiled/views/PublishIconView'
@@ -8,7 +9,7 @@ require [
   'jqueryui/button'
   'jqueryui/tooltip'
   'jquery.instructure_date_and_time'
-], ($, preventDefault, PublishButtonView, PublishIconView) ->
+], ($, _, preventDefault, PublishButtonView, PublishIconView) ->
 
   do ->
     dialog = $('#dialog-buttons-dialog').dialog({
@@ -81,6 +82,9 @@ require [
       setTimeout deferred.resolve, 1000
       deferred
 
+    disabledMessage: ->
+      "Can't unpublish"
+
   # PublishButtonView doesn't require an element to initialize. It is
   # passed in here for the style-guide demonstration purposes
 
@@ -97,9 +101,16 @@ require [
   btnView = new PublishButtonView(model: model, el: "#published-disabled").render()
 
   # publish icon
-  model   = new Publishable(published: false,  publishable: true)
-  btnView = new PublishIconView(model: model, el: "#publish-icon").render()
+  _.each $('.publish-icon'), ($el) ->
+    model   = new Publishable(published: false,  publishable: true)
+    btnView = new PublishIconView(model: model, el: $el).render()
 
+
+  # Item groups
+  $('.ig-header .element_toggler').click (e) ->
+    $(e.currentTarget).find('i')
+      .toggleClass('icon-mini-arrow-down')
+      .toggleClass('icon-mini-arrow-right')
 
 
   # Progressbar
@@ -119,5 +130,3 @@ require [
   $("#repeat").buttonset()
 
   $(".styleguide-datetime_field-example").datetime_field()
-
-

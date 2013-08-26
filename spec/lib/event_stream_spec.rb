@@ -335,14 +335,20 @@ describe EventStream do
 
       describe "generated for_thing method" do
         it "should forward argument to index's for_key" do
-          @index.expects(:for_key).once.with(@entry)
+          @index.expects(:for_key).once.with(@entry, {})
           @stream.for_thing(@entry)
         end
 
         it "should translate argument through key_proc if present" do
           @index.key_proc lambda{ |entry| entry.key }
-          @index.expects(:for_key).once.with(@key)
+          @index.expects(:for_key).once.with(@key, {})
           @stream.for_thing(@entry)
+        end
+
+        it "should permit and forward options" do
+          options = {oldest: 1.day.ago}
+          @index.expects(:for_key).once.with(@entry, options)
+          @stream.for_thing(@entry, options)
         end
       end
     end

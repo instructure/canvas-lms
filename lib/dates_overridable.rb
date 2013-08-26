@@ -1,5 +1,6 @@
 module DatesOverridable
-  attr_accessor :applied_overrides, :overridden_for_user, :overridden
+  attr_accessor :applied_overrides, :overridden_for_user, :overridden,
+    :has_no_overrides
   attr_writer :without_overrides
 
   def self.included(base)

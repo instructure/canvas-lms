@@ -30,9 +30,15 @@ class Wiki < ActiveRecord::Base
   attr_accessible :title
 
   has_many :wiki_pages, :dependent => :destroy
+  before_create :default_front_page
   after_save :update_contexts
 
   DEFAULT_FRONT_PAGE_URL = 'front-page'
+
+  def default_front_page
+    has_no_front_page = front_page_url.nil? if has_no_front_page.nil?
+  end
+  private :default_front_page
 
   def update_contexts
     self.context.try(:touch)
@@ -56,6 +62,12 @@ class Wiki < ActiveRecord::Base
         p.save
       end
     end
+  end
+
+  def check_has_front_page
+    return unless self.has_no_front_page.nil?
+    self.has_no_front_page = !self.wiki_pages.where(:url => self.front_page_url || DEFAULT_FRONT_PAGE_URL).exists?
+    self.save
   end
   
   def front_page
@@ -108,17 +120,17 @@ class Wiki < ActiveRecord::Base
   end
 
   set_policy do
-    given {|user| self.context.is_public }
+    given {|user| self.context.is_public}
     can :read
 
-    given {|user, session| self.cached_context_grants_right?(user, session, :read) }#students.include?(user) }
+    given {|user, session| self.cached_context_grants_right?(user, session, :read)}
     can :read
 
     given {|user, session| self.cached_context_grants_right?(user, session, :participate_as_student) && self.context.allow_student_wiki_edits}
-    can :contribute and can :read and can :update and can :delete and can :create and can :create_page and can :update_page
+    can :read and can :create_page and can :update_page and can :update_page_content
 
-    given {|user, session| self.cached_context_grants_right?(user, session, :manage_wiki) }#admins.include?(user) }
-    can :manage and can :read and can :update and can :create and can :delete and can :create_page and can :update_page
+    given {|user, session| self.cached_context_grants_right?(user, session, :manage_wiki)}
+    can :manage and can :read and can :update and can :create_page and can :delete_page and can :delete_unpublished_page and can :update_page and can :update_page_content
   end
 
   def self.wiki_for_context(context)

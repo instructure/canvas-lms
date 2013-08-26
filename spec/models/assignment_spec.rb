@@ -390,6 +390,10 @@ describe Assignment do
     it "should return nil when no grade was entered and assignment uses a grading standard (letter grade)" do
       Assignment.interpret_grade("", 20, GradingStandard.default_grading_standard).should be_nil
     end
+
+    it "should allow grading an assignment with nil points_possible as percent" do
+      Assignment.interpret_grade("100%", nil).should == 0
+    end
   end
 
   it "should create a new version for each submission" do
@@ -578,7 +582,7 @@ describe Assignment do
 
   it "should destroy group overrides when the group category changes" do
     @assignment = assignment_model
-    @assignment.group_category = @assignment.context.group_categories.create!
+    @assignment.group_category = group_category(context: @assignment.context)
     @assignment.save!
 
     overrides = 5.times.map do
@@ -590,7 +594,7 @@ describe Assignment do
       override
     end
 
-    @assignment.group_category = @assignment.context.group_categories.create!
+    @assignment.group_category = group_category(context: @assignment.context, name: "bar")
     @assignment.save!
 
     overrides.each do |override|
@@ -1637,6 +1641,38 @@ describe Assignment do
       a1.reload
       a1.locked_for?(@user).should be_true
     end
+
+    it "should be locked when associated discussion topic is part of a locked module" do
+      course :active_all => true
+      student_in_course
+      a1 = assignment_model(:course => @course, :submission_types => "discussion_topic")
+      a1.reload
+      a1.locked_for?(@user).should be_false
+
+      m = @course.context_modules.create!
+      m.add_item(:id => a1.discussion_topic.id, :type => 'discussion_topic')
+
+      m.unlock_at = Time.now.in_time_zone + 1.day
+      m.save
+      a1.reload
+      a1.locked_for?(@user).should be_true
+    end
+
+    it "should be locked when associated quiz is part of a locked module" do
+      course :active_all => true
+      student_in_course
+      a1 = assignment_model(:course => @course, :submission_types => "online_quiz")
+      a1.reload
+      a1.locked_for?(@user).should be_false
+
+      m = @course.context_modules.create!
+      m.add_item(:id => a1.quiz.id, :type => 'quiz')
+
+      m.unlock_at = Time.now.in_time_zone + 1.day
+      m.save
+      a1.reload
+      a1.locked_for?(@user).should be_true
+    end
   end
 
   context "group_students" do
@@ -2072,6 +2108,31 @@ describe Assignment do
       json = assignment.speed_grader_json @teacher
       attachment_json = json['submissions'][0]['submission_history'][0]['submission']['versioned_attachments'][0]['attachment']
       attachment_json['view_inline_ping_url'].should match %r{/users/#{@student.id}/files/#{attachment.id}/inline_view\z}
+    end
+
+    it "should not be in group mode for non-group assignments" do
+      setup_assignment_with_homework
+      json = @assignment.speed_grader_json(@teacher)
+      json["GROUP_GRADING_MODE"].should_not be_true
+    end
+
+    it 'returns "groups" instead of students for group assignments' do
+      course_with_teacher active_all: true
+      gc = @course.group_categories.create! name: "Assignment Groups"
+      groups = 2.times.map { |i| gc.groups.create! name: "Group #{i}" }
+      students = 4.times.map { student_in_course(active_all: true); @student }
+      students.each_with_index { |s, i| groups[i % groups.length].add_user(s) }
+      assignment = @course.assignments.create!(
+        group_category_id: gc.id,
+        grade_group_students_individually: false,
+        submission_types: %w(text_entry)
+      )
+      json = assignment.speed_grader_json(@teacher)
+      groups.each do |group|
+        j = json["context"]["students"].find { |g| g["name"] == group.name }
+        group.users.map(&:id).should include j["id"]
+      end
+      json["GROUP_GRADING_MODE"].should be_true
     end
   end
 

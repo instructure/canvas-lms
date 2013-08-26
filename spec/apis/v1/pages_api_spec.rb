@@ -103,6 +103,14 @@ describe "Pages API", :type => :integration do
         urls.should == new_pages.sort_by(&:id).collect(&:url)
       end
 
+      it "should return an error if the search term is fewer than 3 characters" do
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/pages?search_term=aa",
+                        {:controller=>'wiki_pages_api', :action=>'index', :format=>'json', :course_id=>@course.to_param, :search_term => "aa"},
+                        {}, {}, {:expected_status => 400})
+        error = json["errors"].first
+        verify_json_error(error, "search_term", "invalid", "3 or more characters is required")
+      end
+
       describe "sorting" do
         it "should sort by title (case-insensitive)" do
           @wiki.wiki_pages.create! :title => 'gIntermediate Page'
@@ -224,7 +232,7 @@ describe "Pages API", :type => :integration do
       it "should set as front page" do
         json = api_call(:post, "/api/v1/courses/#{@course.id}/pages",
                         { :controller => 'wiki_pages_api', :action => 'create', :format => 'json', :course_id => @course.to_param },
-                        { :wiki_page => { :title => 'New Wiki Page!', :body => 'hello new page', :front_page => true}})
+                        { :wiki_page => { :title => 'New Wiki Page!', :body => 'hello new page', :published => true, :front_page => true}})
 
         page = @course.wiki.wiki_pages.find_by_url!(json['url'])
         page.is_front_page?.should be_true
@@ -403,13 +411,12 @@ describe "Pages API", :type => :integration do
         @hidden_page.body.should == "<p>lolcats</p>alert('what')"
       end
       
-      it "should clean editing_roles" do
+      it "should not allow invalid editing_roles" do
         api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{@hidden_page.url}",
                  { :controller => 'wiki_pages_api', :action => 'update', :format => 'json', :course_id => @course.to_param,
                    :url => @hidden_page.url },
-                 { :wiki_page => { :editing_roles => 'teachers, chimpanzees, students' }})
-        @hidden_page.reload
-        @hidden_page.editing_roles.should == 'teachers,students'
+                 { :wiki_page => { :editing_roles => 'teachers, chimpanzees, students' }},
+                 {}, {:expected_status => 400})
       end
       
       it "should 404 if the page doesn't exist" do
@@ -592,11 +599,11 @@ describe "Pages API", :type => :integration do
         @editable_page.save!
       end
       
-      it "should allow editing the body, but not attributes" do
+      it "should allow editing the body" do
         api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{@editable_page.url}",
                  { :controller => 'wiki_pages_api', :action => 'update', :format => 'json', :course_id => @course.to_param,
                    :url => @editable_page.url },
-                 { :wiki_page => { :published => false, :title => 'Broken Links', :body => '?!?!' }})
+                 { :wiki_page => { :body => '?!?!' }})
         @editable_page.reload
         @editable_page.should be_active
         @editable_page.title.should == 'Editable Page'
@@ -604,6 +611,24 @@ describe "Pages API", :type => :integration do
         @editable_page.user_id.should == @student.id
       end
       
+      it "should not allow editing attributes" do
+        api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{@editable_page.url}",
+                 { :controller => 'wiki_pages_api', :action => 'update', :format => 'json', :course_id => @course.to_param,
+                   :url => @editable_page.url },
+                 { :wiki_page => { :published => false }},
+                 {}, {:expected_status => 401})
+        api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{@editable_page.url}",
+                 { :controller => 'wiki_pages_api', :action => 'update', :format => 'json', :course_id => @course.to_param,
+                   :url => @editable_page.url },
+                 { :wiki_page => { :title => 'Broken Links' }},
+                 {}, {:expected_status => 401})
+
+        @editable_page.reload
+        @editable_page.should be_active
+        @editable_page.title.should == 'Editable Page'
+        @editable_page.user_id.should_not == @student.id
+      end
+
       it "should fulfill module completion requirements" do
         mod = @course.context_modules.create!(:name => "some module")
         tag = mod.add_item(:id => @editable_page.id, :type => 'wiki_page')

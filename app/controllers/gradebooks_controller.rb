@@ -19,6 +19,7 @@
 class GradebooksController < ApplicationController
   include ActionView::Helpers::NumberHelper
   include GradebooksHelper
+  include KalturaHelper
   include Api::V1::AssignmentGroup
   include Api::V1::Submission
 
@@ -352,7 +353,9 @@ class GradebooksController < ApplicationController
         @headers = false
         @outer_frame = true
         log_asset_access("speed_grader:#{@context.asset_string}", "grades", "other")
-        js_env(:CONTEXT_ACTION_SOURCE => :speed_grader)
+        hash = {:CONTEXT_ACTION_SOURCE => :speed_grader}
+        append_sis_data(hash)
+        js_env(hash)
         render :action => "speed_grader"
       end
 

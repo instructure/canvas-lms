@@ -638,6 +638,7 @@ describe CoursesController, :type => :integration do
       end
 
       it "should deal gracefully with an invalid course id" do
+        @course2.enrollments.scoped.delete_all
         @course2.destroy!
         json = api_call(:put, @path + "?event=offer&course_ids[]=#{@course1.id}&course_ids[]=#{@course2.id}",
                         @params.merge(:event => 'offer', :course_ids => [@course1.id.to_s, @course2.id.to_s]))
@@ -694,6 +695,7 @@ describe CoursesController, :type => :integration do
       end
       
       it "should report a failure if no updates succeeded" do
+        @course2.enrollments.scoped.delete_all
         @course2.destroy!
         json = api_call(:put, @path + "?event=offer&course_ids[]=#{@course2.id}",
                         @params.merge(:event => 'offer', :course_ids => [@course2.id.to_s]))
@@ -743,6 +745,7 @@ describe CoursesController, :type => :integration do
     courses[0]['term'].should include(
       'id' => @course1.enrollment_term_id,
       'name' => @course1.enrollment_term.name,
+      'sis_term_id' => nil,
     )
 
     # course2
@@ -752,6 +755,7 @@ describe CoursesController, :type => :integration do
     courses[0]['term'].should include(
       'id' => @course2.enrollment_term_id,
       'name' => @course2.enrollment_term.name,
+      'sis_term_id' => nil,
     )
   end
 
@@ -1056,27 +1060,21 @@ describe CoursesController, :type => :integration do
       @student2_enroll = @course1.enroll_user(@student2, 'StudentEnrollment', :section => @section2)
     end
 
-    describe "/search_users" do
-      let(:api_url) { "/api/v1/courses/#{@course1.id}/search_users.json" }
+    describe "search users" do
+      let(:api_url) { "/api/v1/courses/#{@course1.id}/users.json" }
       let(:api_route) do
         {
           :controller => 'courses',
-          :action => 'search_users',
+          :action => 'users',
           :course_id => @course1.id.to_s,
           :format => 'json'
         }
       end
 
-      it "returns an error when search_term not present" do
-        json = api_call(:get, api_url, api_route, {}, {}, :expected_status => 400)
-        json["status"].should == "argument_error"
-        json["message"].should == "search_term of 3 or more characters is required"
-      end
-
       it "returns an error when search_term is fewer than 3 characters" do
-        json = api_call(:get, api_url, api_route, {:search_term => '12'}, {}, :expected_status => 400)
-        json["status"].should == "argument_error"
-        json["message"].should == "search_term of 3 or more characters is required"
+        json = api_call(:get, api_url, api_route, {:search_term => 'ab'}, {}, :expected_status => 400)
+        error = json["errors"].first
+        verify_json_error(error, "search_term", "invalid", "3 or more characters is required")
       end
 
       it "returns a list of users" do
@@ -1088,6 +1086,13 @@ describe CoursesController, :type => :integration do
             @course1.users.select{ |u| u.name == 'TAPerson' },
             :only => USER_API_FIELDS)
 
+        sorted_users.should == expected_users
+
+        # this endpoint doesn't exist, but we maintain the route for backwards compat
+        json = api_call(:get, "/api/v1/courses/#{@course1.id}/search_users",
+                        { controller: 'courses', action: 'users', course_id: @course1.to_param, format: 'json' },
+                        :search_term => "TAP")
+        sorted_users = json.sort_by{ |x| x["id"] }
         sorted_users.should == expected_users
       end
 

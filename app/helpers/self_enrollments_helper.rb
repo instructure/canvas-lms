@@ -23,12 +23,4 @@ module SelfEnrollmentsHelper
       markdown(@registration_summary, :never) rescue nil
     end
   end
-
-  def privacy_link
-    if @privacy_link
-      @privacy_link
-    else
-      "http://www.instructure.com/privacy-policy"
-    end
-  end
 end

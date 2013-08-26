@@ -17,6 +17,8 @@ javascripts:
 stylesheets:
   content_migrations: 
     - public/stylesheets/compiled/content_migrations.css
+  vendor:
+    - public/stylesheets/compiled/g_vendor.css
   common:
     - public/stylesheets/compiled/g_base.css
     - public/stylesheets/static/mediaelementplayer.css
@@ -38,6 +40,8 @@ stylesheets:
     - public/stylesheets/compiled/print.css
   context_modules: 
     - public/stylesheets/compiled/context_modules.css
+  context_modules2: 
+    - public/stylesheets/compiled/context_modules2.css
   dashboard:
     - public/stylesheets/compiled/dashboard_messages.css
     - public/stylesheets/compiled/dashboard_activity.css
@@ -103,8 +107,8 @@ stylesheets:
     - public/stylesheets/compiled/assignments.css
     - public/stylesheets/compiled/grading_standards.css
     - public/stylesheets/static/embed_content.css
-  teacher_assignments:
-    - public/stylesheets/compiled/teacher_assignments.css
+  new_assignments:
+    - public/stylesheets/compiled/new_assignments.css
   grading_standards:
     - public/stylesheets/compiled/grading_standards.css
   login:
@@ -146,6 +150,7 @@ stylesheets:
     - public/stylesheets/compiled/conversations.css
     - public/stylesheets/compiled/slideshow.css
   conversations_new:
+    - public/javascripts/vendor/bootstrap-select/bootstrap-select.css
     - public/stylesheets/compiled/conversations_new.css
     - public/stylesheets/compiled/compose_message_dialog.css
   alerts:

@@ -1,22 +1,34 @@
 <div data-view="groupCategoryDetail"></div>
 
-{{#if ENV.IS_LARGE_ROSTER}}
-  <div data-view="groups"></div>
-{{else}}
-  <div class="row-fluid">
-    <div class="well span4">
-      <h3 class="h5">
-        <strong>
-          {{#ifEqual ENV.group_user_type "student"}}
-            {{#t "unassigned_students"}}Unassigned Students{{/t}}
-          {{else}}
-            {{#t "unassigned_users"}}Unassigned Users{{/t}}
-          {{/ifEqual}}
-        </strong>
-      </h3>
-      <div data-view="unassignedUsers"></div>
+{{#if randomlyAssignStudentsInProgress}}
+  <div class="progress-container">
+    <h5 class="progress-title">{{#t "randomly_assigning_students"}}Randomly Assigning Students{{/t}}</h5>
+    <div class="progressbar ui-progressbar ui-widget ui-widget-content ui-corner-all" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{progress.completion}}">
+        <div class="ui-progressbar-value ui-widget-header ui-corner-left" style="width: {{progress.completion}}%;"></div>
     </div>
-    <div class="span8" data-view="groups"></div>
   </div>
+{{else}}
+
+  {{#if ENV.IS_LARGE_ROSTER}}
+    <div data-view="groups"></div>
+  {{else}}
+
+    <div class="row-fluid">
+      <div class="well span4">
+        <h3 class="h5">
+          <strong>
+            {{#ifEqual ENV.group_user_type "student"}}
+              {{#t "unassigned_students"}}Unassigned Students{{/t}}
+            {{else}}
+              {{#t "unassigned_users"}}Unassigned Users{{/t}}
+            {{/ifEqual}}
+          </strong>
+        </h3>
+        <div data-view="unassignedUsers"></div>
+      </div>
+      <div class="span8" data-view="groups"></div>
+    </div>
+  {{/if}}
 {{/if}}
+
 

@@ -162,7 +162,7 @@ class GroupMembershipsController < ApplicationController
   protected
 
   def find_group
-    @group = Group.active.find(params[:group_id])
+    @group = api_find(Group.active, params[:group_id])
   end
 
   def find_membership

@@ -20,8 +20,6 @@ define [
   'jqueryui/tooltip'
 ], (_, $) ->
 
-  CARET_SIZE = 5
-
   # you can provide a 'using' option to jqueryUI position (which gets called by jqueryui Tooltip to
   # position it on the screen), it will be passed the position cordinates and a feedback object which,
   # among other things, tells you where it positioned it relative to the target. we use it to add some
@@ -43,24 +41,31 @@ define [
         feedback.important
       ].join(' '))
 
-  positions =
-    right:
-      my: "left center"
-      at: "right+#{CARET_SIZE} center"
-      collision: 'flipfit flipfit'
-    left:
-      my: "right center"
-      at: "left-#{CARET_SIZE} center"
-      collision: 'flipfit flipfit'
-    top:
-      my: "center bottom"
-      at: "center top-#{CARET_SIZE}"
-      collision: 'flipfit flipfit'
-
-    bottom:
-      my: "center top"
-      at: "center bottom+#{CARET_SIZE}"
-      collision: 'flipfit flipfit'
+  setPosition = (opts) ->
+    caret = ->
+      if opts.tooltipClass?.match('popover')
+        30
+      else
+        5
+    positions =
+      right:
+        my: "left center"
+        at: "right+#{caret()} center"
+        collision: 'flipfit flipfit'
+      left:
+        my: "right center"
+        at: "left-#{caret()} center"
+        collision: 'flipfit flipfit'
+      top:
+        my: "center bottom"
+        at: "center top-#{caret()}"
+        collision: 'flipfit flipfit'
+      bottom:
+        my: "center top"
+        at: "center bottom+#{caret()}"
+        collision: 'flipfit flipfit'
+    if opts.position of positions
+      opts.position = positions[opts.position]
 
   $('body').on 'mouseenter', '[data-tooltip]', (event) ->
     $this = $(this)
@@ -68,12 +73,11 @@ define [
 
     # allow specifying position by simply doing <a data-tooltip="left">
     # and allow shorthand top|bottom|left|right positions like <a data-tooltip='{"position":"left"}'>
-    if opts of positions
+    if opts in ['right', 'left', 'top', 'bottom']
       opts = position: opts
     opts ||= {}
     opts.position ||= 'top'
-    if opts.position of positions
-      opts.position = positions[opts.position]
+    setPosition opts
     if opts.collision
       opts.position.collision = opts.collision
 

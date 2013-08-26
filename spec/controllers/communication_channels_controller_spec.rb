@@ -114,6 +114,8 @@ describe CommunicationChannelsController do
     describe "open registration" do
       it "should show a pre-registered user the confirmation form" do
         user_with_pseudonym(:password => :autogenerate)
+        @user.accept_terms
+        @user.save
         @user.should be_pre_registered
 
         get 'confirm', :nonce => @cc.confirmation_code
@@ -126,6 +128,8 @@ describe CommunicationChannelsController do
 
       it "should finalize registration for a pre-registered user" do
         user_with_pseudonym(:password => :autogenerate)
+        @user.accept_terms
+        @user.save
         @user.should be_pre_registered
 
         post 'confirm', :nonce => @cc.confirmation_code, :register => 1, :pseudonym => {:password => 'asdfasdf', :password_confirmation => 'asdfasdf'}
@@ -152,6 +156,8 @@ describe CommunicationChannelsController do
         @account = Account.create!
         @course = Course.create!(:account => @account) { |c| c.workflow_state = 'available' }
         user_with_pseudonym(:account => @account, :password => :autogenerate)
+        @user.accept_terms
+        @user.save
         @enrollment = @course.enroll_user(@user)
         @pseudonym.account.should == @account
         @user.should be_pre_registered
@@ -190,6 +196,7 @@ describe CommunicationChannelsController do
       it "should show the confirm form for a creation_pending user" do
         course(:active_all => 1)
         user
+        @user.accept_terms
         @user.update_attribute(:workflow_state, 'creation_pending')
         @cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
         @enrollment = @course.enroll_student(@user)
@@ -205,6 +212,7 @@ describe CommunicationChannelsController do
       it "should register creation_pending user" do
         course(:active_all => 1)
         user
+        @user.accept_terms
         @user.update_attribute(:workflow_state, 'creation_pending')
         @cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
         @enrollment = @course.enroll_student(@user)
@@ -230,6 +238,7 @@ describe CommunicationChannelsController do
 
       it "should show the confirm form for a creation_pending user that's logged in (masquerading)" do
         user
+        @user.accept_terms
         @user.update_attribute(:workflow_state, 'creation_pending')
         @cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
         # not a full user session; just @current_user is set
@@ -243,6 +252,7 @@ describe CommunicationChannelsController do
 
       it "should register creation_pending user that's logged in (masquerading)" do
         user
+        @user.accept_terms
         @user.update_attribute(:workflow_state, 'creation_pending')
         @cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
         # not a full user session; just @current_user is set
@@ -267,6 +277,7 @@ describe CommunicationChannelsController do
         @account = Account.create!
         course(:active_all => 1, :account => @account)
         user
+        @user.accept_terms
         @user.update_attribute(:workflow_state, 'creation_pending')
         @cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
         @enrollment = @course.enroll_student(@user)
@@ -285,6 +296,7 @@ describe CommunicationChannelsController do
         @account = Account.create!
         course(:active_all => 1, :account => @account)
         user
+        @user.accept_terms
         @user.update_attribute(:workflow_state, 'creation_pending')
         @cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
         @enrollment = @course.enroll_student(@user)
@@ -311,6 +323,7 @@ describe CommunicationChannelsController do
       it "should prepare to register a creation_pending user in the correct account (admin)" do
         @account = Account.create!
         user
+        @user.accept_terms
         @user.update_attribute(:workflow_state, 'creation_pending')
         @account.add_user(@user)
         @cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
@@ -327,6 +340,7 @@ describe CommunicationChannelsController do
       it "should register creation_pending user in the correct account (admin)" do
         @account = Account.create!
         user
+        @user.accept_terms
         @user.update_attribute(:workflow_state, 'creation_pending')
         @account.add_user(@user)
         @cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
@@ -350,6 +364,7 @@ describe CommunicationChannelsController do
       it "should show the confirm form for old creation_pending users that have a pseudonym" do
         course(:active_all => 1)
         user
+        @user.accept_terms
         @user.update_attribute(:workflow_state, 'creation_pending')
         @cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
         @enrollment = @course.enroll_student(@user)
@@ -364,6 +379,7 @@ describe CommunicationChannelsController do
       it "should work for old creation_pending users that have a pseudonym" do
         course(:active_all => 1)
         user
+        @user.accept_terms
         @user.update_attribute(:workflow_state, 'creation_pending')
         @cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
         @enrollment = @course.enroll_student(@user)
@@ -391,6 +407,7 @@ describe CommunicationChannelsController do
         user_with_pseudonym(:active_all => 1, :username => 'jt@instructure.com')
         course(:active_all => 1)
         user
+        @user.accept_terms
         @user.update_attribute(:workflow_state, 'creation_pending')
         @cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
         @enrollment = @course.enroll_student(@user)
@@ -407,6 +424,7 @@ describe CommunicationChannelsController do
         user_with_pseudonym(:active_all => 1, :username => 'jt@instructure.com')
         course(:active_all => 1)
         user
+        @user.accept_terms
         @user.update_attribute(:workflow_state, 'creation_pending')
         @cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
         @enrollment = @course.enroll_student(@user)
@@ -562,6 +580,7 @@ describe CommunicationChannelsController do
 
       it "should accept an invitation when creating a new user" do
         course_with_student(:active_course => 1)
+        @user.accept_terms
         @user.update_attribute(:workflow_state, 'creation_pending')
         @cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
 

@@ -4,8 +4,9 @@ define [
   'Backbone'
   'jst/groups/manage/group'
   'compiled/views/groups/manage/GroupUsersView'
+  'compiled/views/groups/manage/GroupEditView'
   'compiled/jquery.rails_flash_notifications'
-], (I18n, _, {View}, template, GroupUsersView) ->
+], (I18n, _, {View}, template, GroupUsersView, GroupEditView) ->
 
   class GroupView extends View
 
@@ -23,6 +24,7 @@ define [
 
     events:
       'click .toggle-group': 'toggleDetails'
+      'click .edit-group': 'editGroup'
       'click .delete-group': 'deleteGroup'
       'click .add-user': 'showAddUser'
       'focus .add-user': 'showAddUser'
@@ -37,6 +39,11 @@ define [
       @model.on 'change', @render
       @model.on 'destroy', @remove, this
       @users.on 'add remove reset', @updateSummary
+
+    editGroup: (e) =>
+      e.preventDefault()
+      @editView ?= new GroupEditView({@model})
+      @editView.toggle();
 
     deleteGroup: (e) =>
       e.preventDefault()

@@ -26,7 +26,6 @@ module Api::V1::WikiPage
   def wiki_page_json(wiki_page, current_user, session, include_body = true)
     hash = api_json(wiki_page, current_user, session, :only => WIKI_PAGE_JSON_ATTRS)
     hash['editing_roles'] ||= 'teachers'
-    hash['body'] = api_user_content(wiki_page.body) if include_body
     hash['last_edited_by'] = user_display_json(wiki_page.user, wiki_page.context) if wiki_page.user
     hash['published'] = wiki_page.active?
     hash['front_page'] = wiki_page.is_front_page?
@@ -36,6 +35,7 @@ module Api::V1::WikiPage
       hash['html_url'] = polymorphic_url([wiki_page.context, :named_wiki_page], :id => wiki_page)
     end
     locked_json(hash, wiki_page, current_user, 'page')
+    hash['body'] = api_user_content(wiki_page.body) if include_body && !hash['locked_for_user'] && !hash['lock_info']
     hash
   end
 

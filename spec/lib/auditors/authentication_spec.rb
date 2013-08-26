@@ -88,6 +88,67 @@ describe AuthenticationAuditApiController do
     end
   end
 
+  describe "options forwarding" do
+    before do
+      @event2 = @pseudonym.shard.activate do
+        record = Auditors::Authentication::Record.new(
+          'id' => UUIDSingleton.instance.generate,
+          'created_at' => 1.day.ago,
+          'pseudonym' => @pseudonym,
+          'event_type' => 'login')
+        Auditors::Authentication::Stream.insert(record)
+      end
+    end
+
+    it "should recognize :oldest for pseudonyms" do
+      page = Auditors::Authentication.
+        for_pseudonym(@pseudonym, oldest: 12.hours.ago).
+        paginate(:per_page => 1)
+      page.should include(@event)
+      page.should_not include(@event2)
+    end
+
+    it "should recognize :newest for pseudonyms" do
+      page = Auditors::Authentication.
+        for_pseudonym(@pseudonym, newest: 12.hours.ago).
+        paginate(:per_page => 1)
+      page.should include(@event2)
+      page.should_not include(@event)
+    end
+
+    it "should recognize :oldest for accounts" do
+      page = Auditors::Authentication.
+        for_account(@account, oldest: 12.hours.ago).
+        paginate(:per_page => 1)
+      page.should include(@event)
+      page.should_not include(@event2)
+    end
+
+    it "should recognize :newest for accounts" do
+      page = Auditors::Authentication.
+        for_account(@account, newest: 12.hours.ago).
+        paginate(:per_page => 1)
+      page.should include(@event2)
+      page.should_not include(@event)
+    end
+
+    it "should recognize :oldest for users" do
+      page = Auditors::Authentication.
+        for_user(@user, oldest: 12.hours.ago).
+        paginate(:per_page => 1)
+      page.should include(@event)
+      page.should_not include(@event2)
+    end
+
+    it "should recognize :newest for users" do
+      page = Auditors::Authentication.
+        for_user(@user, newest: 12.hours.ago).
+        paginate(:per_page => 1)
+      page.should include(@event2)
+      page.should_not include(@event)
+    end
+  end
+
   describe "sharding" do
     specs_require_sharding
 

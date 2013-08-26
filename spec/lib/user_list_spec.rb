@@ -138,12 +138,17 @@ describe UserList do
     ul.duplicate_addresses.length.should == 1
   end
   
-  it "should process login ids and email addresses" do
+  it "should process login ids, SIS ids, and email addresses" do
     user = User.create!(:name => 'A 112351243')
     user.pseudonyms.create!(:unique_id => "A112351243", :account => @account)
     user = User.create!(:name => 'user 1')
     user.pseudonyms.create!(:unique_id => "user1", :account => @account)
-    ul = UserList.new regular + "," + %{user1,test@example.com,A112351243,"thomas walsh" <test2@example.com>, "walsh, thomas" <test3@example.com>}, :root_account => @account
+    user = User.create!(:name => 'sneaky hobbitses')
+    p = user.pseudonyms.create!(:unique_id => "whatever", :account => @account)
+    p.sis_user_id = '9001'
+    p.save!
+
+    ul = UserList.new regular + "," + %{user1,test@example.com,A112351243,"thomas walsh" <test2@example.com>, 9001, "walsh, thomas" <test3@example.com>}, :root_account => @account
     ul.addresses.map{|x| [x[:name], x[:address], x[:type]]}.should eql([
         ["Shaw, Ryan", "ryankshaw@gmail.com", :email],
         ["Last, First", "lastfirst@gmail.com", :email],
@@ -151,6 +156,7 @@ describe UserList do
         [nil, "test@example.com", :email],
         ["A 112351243", "A112351243", :pseudonym],
         ["thomas walsh", "test2@example.com", :email],
+        ["sneaky hobbitses", "whatever", :pseudonym],
         ["walsh, thomas", "test3@example.com", :email]])
     ul.errors.should == []
     ul.duplicate_addresses.should == []

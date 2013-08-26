@@ -33,3 +33,21 @@ define [
     ok disableWhileLoadingStub.calledWith(dfd), "Calls disableWhileLoading on el once"
     disableWhileLoadingStub.restore()
     dfdStub.restore()
+
+
+  module 'WikiPageIndexView:JSON'
+
+  test 'WIKI_RIGHTS', ->
+    collection = new WikiPageCollection
+    view = new WikiPageIndexView
+      collection: collection
+      WIKI_RIGHTS:
+        good: true
+    strictEqual view.toJSON().WIKI_RIGHTS.good, true, 'WIKI_RIGHTS represented in toJSON'
+
+  test 'contextName', ->
+    collection = new WikiPageCollection
+    view = new WikiPageIndexView
+      collection: collection
+      contextAssetString: 'group_73'
+    strictEqual view.toJSON().contextName, 'groups', 'contextName represented in toJSON'

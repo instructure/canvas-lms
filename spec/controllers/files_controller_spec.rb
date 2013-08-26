@@ -304,6 +304,19 @@ describe FilesController do
       @file.reload.last_inline_view.should > 1.minute.ago
     end
 
+    it "should record the inline view when a teacher previews a student's submission" do
+      course_with_student :active_all => true
+      @assignment = @course.assignments.create!(:title => 'upload_assignment', :submission_types => 'online_upload')
+      attachment_model :context => @student
+      @assignment.submit_homework @student, :attachments => [@attachment]
+
+      teacher_in_course :active_all => true
+      user_session @teacher
+      get 'show', :user_id => @student.id, :id => @attachment.id, :inline => 1
+      response.should be_success
+      @attachment.reload.last_inline_view.should > 1.minute.ago
+    end
+
     it "should mark files as viewed for module progressions if the file data is requested and it includes the scribd_doc data" do
       file_in_a_module
       @file.scribd_doc = Scribd::Document.new
@@ -600,7 +613,7 @@ describe FilesController do
     it "should associate assignment submission for a group assignment with the group" do
       course_with_teacher(:active_all => true)
       student_in_course(:active_all => true)
-      category = @course.group_categories.create
+      category = group_category
       assignment = @course.assignments.create(:group_category => category, :submission_types => 'online_upload')
       group = category.groups.create(:context => @course)
       group.add_user(@student)

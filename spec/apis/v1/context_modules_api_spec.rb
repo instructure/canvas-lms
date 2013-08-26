@@ -22,7 +22,7 @@ describe "Modules API", :type => :integration do
     course.offer!
 
     @module1 = @course.context_modules.create!(:name => "module1")
-    @assignment = @course.assignments.create!(:name => "pls submit", :submission_types => ["online_text_entry"])
+    @assignment = @course.assignments.create!(:name => "pls submit", :submission_types => ["online_text_entry"], :points_possible => 42)
     @assignment_tag = @module1.add_item(:id => @assignment.id, :type => 'assignment')
     @quiz = @course.quizzes.create!(:title => "score 10")
     @quiz_tag = @module1.add_item(:id => @quiz.id, :type => 'quiz')
@@ -109,6 +109,14 @@ describe "Modules API", :type => :integration do
         json.map { |mod| mod['items'].size }.should == [5, 2, 0]
       end
 
+      it "should include item content details if requested" do
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/modules?include[]=items&include[]=content_details",
+                        :controller => "context_modules_api", :action => "index", :format => "json",
+                        :course_id => "#{@course.id}", :include => %w(items content_details))
+        json.find{|h| h['id'] == @module1.id}['items'].find{|h| h['id'] == @assignment_tag.id
+          }['content_details'].should == {'points_possible' => @assignment.points_possible}
+      end
+
       it "should skip items for modules that have too many" do
         Setting.set('api_max_per_page', '3')
         json = api_call(:get, "/api/v1/courses/#{@course.id}/modules?include[]=items",
@@ -135,6 +143,47 @@ describe "Modules API", :type => :integration do
 
         ids.should == @course.context_modules.not_deleted.sort_by(&:position).collect(&:id)
       end
+
+      it "should search for modules by name" do
+        mods = []
+        2.times { |i| mods << @course.context_modules.create!(:name => "spurious module #{i}") }
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/modules?search_term=spur",
+                        :controller => "context_modules_api", :action => "index", :format => "json",
+                        :course_id => "#{@course.id}", :search_term => "spur")
+        json.size.should == 2
+        json.map{ |mod| mod['id'] }.sort.should == mods.map(&:id).sort
+      end
+
+      it "should search for modules and items by name" do
+        matching_mods = []
+        nonmatching_mods = []
+        # modules to include because their name matches
+        # which means that all their (non-matching) items should be returned
+        2.times do |i|
+          mod = @course.context_modules.create!(:name => "spurious module #{i}")
+          mod.add_item(:type => 'context_module_sub_header', :title => 'non-matching item')
+          matching_mods << mod
+        end
+        # modules to include because they have a matching item
+        # which means that their non-matching items should *not* be included
+        2.times do |i|
+          mod = @course.context_modules.create!(:name => "non-matching module #{i}")
+          mod.add_item(:type => 'context_module_sub_header', :title => 'spurious item')
+          mod.add_item(:type => 'context_module_sub_header', :title => 'non-matching item to ignore')
+          nonmatching_mods << mod
+        end
+
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/modules?include[]=items&search_term=spur",
+                        :controller => "context_modules_api", :action => "index", :format => "json",
+                        :course_id => "#{@course.id}", :include => %w{items}, :search_term => "spur")
+        json.size.should == 4
+        json.map{ |mod| mod['id'] }.sort.should == (matching_mods + nonmatching_mods).map(&:id).sort
+
+        json.each do |mod|
+          mod['items'].count.should == 1
+          mod['items'].first['title'].should_not include('ignore')
+        end
+      end
     end
 
     describe "show" do
@@ -153,6 +202,14 @@ describe "Modules API", :type => :integration do
           "items_count" => 2,
           "items_url" => "http://www.example.com/api/v1/courses/#{@course.id}/modules/#{@module2.id}/items"
         }
+      end
+
+      it "should include item content details if requested" do
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}?include[]=items&include[]=content_details",
+                        :controller => "context_modules_api", :action => "show", :format => "json",
+                        :course_id => "#{@course.id}", :include => %w(items content_details), :id => "#{@module1.id}")
+        json['items'].find{|h| h['id'] == @assignment_tag.id}['content_details'].should ==
+          {'points_possible' => @assignment.points_possible}
       end
 
       it "should show a single unpublished module" do

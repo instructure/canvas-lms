@@ -211,7 +211,7 @@ describe DueDateCacher do
         @student2 = user
         @course.enroll_student(@student2, :enrollment_state => 'active')
 
-        @assignment.group_category = @course.group_categories.create
+        @assignment.group_category = group_category
         @assignment.save!
 
         group_with_user(

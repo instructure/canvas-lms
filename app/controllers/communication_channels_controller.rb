@@ -258,9 +258,6 @@ class CommunicationChannelsController < ApplicationController
 
         # User chose to continue with this cc/pseudonym/user combination on confirmation page
         if @pseudonym && params[:register]
-          if Canvas.redis_enabled? && @merge_opportunities.length == 1
-            Canvas.redis.rpush('single_user_registered_new_account_stats', {:user_id => @user.id, :registered_at => Time.now.utc }.to_json)
-          end
           @user.require_acceptance_of_terms = require_terms?
           @user.attributes = params[:user]
           @pseudonym.attributes = params[:pseudonym]
@@ -270,7 +267,9 @@ class CommunicationChannelsController < ApplicationController
           @pseudonym.require_password = true
           @pseudonym.password_confirmation = @pseudonym.password = params[:pseudonym][:password] if params[:pseudonym]
 
-          unless @pseudonym.valid? && @user.valid?
+          valid = @pseudonym.valid?
+          valid = @user.valid? && valid # don't want to short-circuit, since we are interested in the errors
+          unless valid
             return render :json => {
                             :errors => {
                               :user => @user.errors.as_json[:errors],
@@ -378,8 +377,7 @@ class CommunicationChannelsController < ApplicationController
   end
 
   def require_terms?
-    # a plugin could potentially set this
-    @require_terms
+    @domain_root_account.require_acceptance_of_terms?(@user)
   end
   helper_method :require_terms?
 end

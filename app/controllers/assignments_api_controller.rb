@@ -291,6 +291,7 @@ class AssignmentsApiController < ApplicationController
   # @API List assignments
   # Returns the list of assignments for the current context.
   # @argument include[] ["submission"] Associations to include with the assignment.
+  # @argument search_term (optional) The partial title of the assignments to match and return.
   # @argument override_assignment_dates [Optional, Boolean]
   #   Apply assignment overrides for each assignment, defaults to true.
   # @returns [Assignment]
@@ -300,15 +301,14 @@ class AssignmentsApiController < ApplicationController
           includes(:assignment_group, :rubric_association, :rubric).
           reorder("assignment_groups.position, assignments.position")
 
-      #fake assignment used for checking if the @current_user can read unpublished assignments
+      @assignments = Assignment.search_by_attribute(@assignments, :title, params[:search_term])
+
+      # fake assignment used for checking if the @current_user can read unpublished assignments
       fake = @context.assignments.new
       fake.workflow_state = 'unpublished'
 
-      override_param = params[:override_assignment_dates] || true
-      override_dates = value_to_boolean(override_param)
-
       if @domain_root_account.enable_draft? && !fake.grants_right?(@current_user, session, :read)
-        #user is a student and assignment is not published
+        # user should not see unpublished assignments
         @assignments = @assignments.published
       end
 
@@ -321,6 +321,16 @@ class AssignmentsApiController < ApplicationController
         ]
       else
         submissions = {}
+      end
+
+      override_param = params[:override_assignment_dates] || true
+      override_dates = value_to_boolean(override_param)
+      if override_dates
+        assignments_with_overrides = @assignments.joins(:assignment_overrides)
+          .select("assignments.id")
+        @assignments = @assignments.all
+        assignments_without_overrides = @assignments - assignments_with_overrides
+        assignments_without_overrides.each { |a| a.has_no_overrides = true }
       end
 
       hashes = @assignments.map do |assignment|
@@ -345,7 +355,7 @@ class AssignmentsApiController < ApplicationController
           :include => [:assignment_group, :rubric_association, :rubric])
 
       if @domain_root_account.enable_draft? && !@assignment.grants_right?(@current_user, session, :read)
-        #assignment is not published and user is a student
+        # user should not see unpublished assignments
         render_unauthorized_action @assignment
         return
       end
@@ -482,12 +492,13 @@ class AssignmentsApiController < ApplicationController
   #
   # @argument assignment[published] [Boolean] [Optional]
   #   Whether this assignment is published.
-  #   (Only useful if 'enable draft' account setting is on)
+  #   (Only uaeful if 'enable draft' account setting is on)
   #   Unpublished assignments are not visible to students.
   #
   # @returns Assignment
   def create
     @assignment = @context.assignments.build
+    @assignment.workflow_state = 'unpublished' if @context.root_account.enable_draft?
 
     if authorized_action(@assignment, @current_user, :create)
       save_and_render_response

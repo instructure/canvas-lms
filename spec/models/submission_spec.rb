@@ -910,6 +910,23 @@ describe Submission do
     end
   end
 
+  describe "versioned_attachments" do
+    it "should include user attachments" do
+      student_in_course(active_all: true)
+      att = attachment_model(filename: "submission.doc", :context => @student)
+      sub = @assignment.submit_homework(@student, attachments: [att])
+      sub.versioned_attachments.should == [att]
+    end
+
+    it "should not include attachments with a context of Submission" do
+      student_in_course(active_all: true)
+      att = attachment_model(filename: "submission.doc", :context => @student)
+      sub = @assignment.submit_homework(@student, attachments: [att])
+      sub.attachments.update_all(:context_type => "Submission", :context_id => sub.id)
+      sub.reload.versioned_attachments.should be_empty
+    end
+  end
+
   describe "#bulk_load_versioned_attachments" do
     it "loads attachments for many submissions at once" do
       attachments = []

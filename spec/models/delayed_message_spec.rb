@@ -200,7 +200,7 @@ describe DelayedMessage do
       @dm.send_at.should == @central.now.change(:hour => 18)
     end
 
-    it "should set to 6pm in the Mountian time zone for non-weekly messages when the user hasn't set a time zone" do
+    it "should set to 6pm in the Mountain time zone for non-weekly messages when the user hasn't set a time zone" do
       @user.time_zone = nil
       @user.save
 

@@ -24,6 +24,7 @@ class DiscussionTopic < ActiveRecord::Base
   include CopyAuthorizedLinks
   include TextHelper
   include ContextModuleItem
+  include SearchTermHelper
 
   attr_accessible :title, :message, :user, :delayed_post_at, :lock_at, :assignment,
     :plaintext_message, :podcast_enabled, :podcast_has_student_posts,
@@ -275,7 +276,7 @@ class DiscussionTopic < ActiveRecord::Base
 
         if new_state == "read"
           new_entry_ids = entry_ids - existing_entry_participants.map(&:discussion_entry_id)
-          connection.bulk_insert('discussion_entry_participants', new_entry_ids.map { |entry_id|
+          DiscussionEntryParticipant.bulk_insert(new_entry_ids.map { |entry_id|
             {
               :discussion_entry_id => entry_id,
               :user_id => current_user.id,
@@ -753,12 +754,26 @@ class DiscussionTopic < ActiveRecord::Base
     self.user ? self.user.name : nil
   end
 
-  def visible_for?(user=nil, opts={})
+  # Public: Determine if the given user can view this discussion topic.
+  #
+  # user - The user attempting to view the topic (default: nil).
+  # options - Options passed to the locked_for? call (default: {}).
+  #
+  # Returns a boolean.
+  def visible_for?(user = nil, options = {})
+    # user is the topic's author
     return true if user == self.user
-    if unlock_at = locked_for?(user, opts).try_rescue(:[], :unlock_at)
+
+    # user is an admin in the context (teacher/ta/designer)
+    return true if context.grants_right?(user, :manage, nil)
+
+    # unlock date exists and has passed
+    if unlock_at = locked_for?(user, options).try_rescue(:[], :unlock_at)
       unlock_at < Time.now
+    # topic is not published
     elsif !published?
       false
+    # everything else
     else
       true
     end
@@ -775,7 +790,7 @@ class DiscussionTopic < ActiveRecord::Base
         locked = {:asset_string => self.asset_string, :unlock_at => self.delayed_post_at}
       elsif (self.lock_at && self.lock_at < Time.now)
         locked = {:asset_string => self.asset_string, :lock_at => self.lock_at}
-      elsif (self.assignment && l = self.assignment.locked_for?(user, opts))
+      elsif !opts[:skip_assignment] && (self.assignment && l = self.assignment.locked_for?(user, opts))
         locked = l
       elsif self.could_be_locked && item = locked_by_module_item?(user, opts[:deep_check_if_needed])
         locked = {:asset_string => self.asset_string, :context_module => item.context_module.attributes}
@@ -889,6 +904,7 @@ class DiscussionTopic < ActiveRecord::Base
     item.title = hash[:title]
     item.discussion_type = hash[:discussion_type]
     item.pinned = !!hash[:pinned] if hash[:pinned]
+    item.require_initial_post = !!hash[:require_initial_post] if hash[:require_initial_post]
     hash[:missing_links] = []
     item.message = ImportedHtmlConverter.convert(hash[:description] || hash[:text], context, {:missing_links => (hash[:missing_links])})
     item.message = t('#discussion_topic.empty_message', "No message") if item.message.blank?

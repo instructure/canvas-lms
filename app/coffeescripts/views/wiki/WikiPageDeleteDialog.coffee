@@ -1,9 +1,11 @@
 define [
+  'jquery'
   'underscore'
-  'compiled/views/DialogFormView'
   'i18n!pages'
+  'str/htmlEscape'
+  'compiled/views/DialogFormView'
   'jst/wiki/WikiPageDeleteDialog'
-], (_, DialogFormView, I18n, wrapperTemplate) ->
+], ($, _, I18n, htmlEscape, DialogFormView, wrapperTemplate) ->
 
   dialogDefaults =
     title: I18n.t 'delete_title', 'Delete Wiki Page'
@@ -14,20 +16,36 @@ define [
     wrapperTemplate: wrapperTemplate
     template: -> I18n.t 'delete_confirmation', 'Are you sure you wish to delete this wiki page?'
 
-    @optionProperty 'wiki_pages_url'
+    @optionProperty 'wiki_pages_path'
 
     initialize: (options) ->
+      modelView = @model?.view
       super _.extend {}, dialogDefaults, options
+      @model?.view = modelView
 
     submit: (event) ->
       event?.preventDefault()
 
-      page_title = @model.get('title')
-      wiki_pages_url = @wiki_pages_url
+      destroyDfd = @model.destroy(wait: true)
 
       dfd = $.Deferred()
-      destroyDfd = @model.destroy()
-      destroyDfd.then -> window.location = wiki_pages_url + "?deleted_page_title=#{encodeURIComponent(page_title)}"
-      destroyDfd.fail -> dfd.reject()
+      page_title = @model.get('title')
+      wiki_pages_path = @wiki_pages_path
+
+      destroyDfd.then =>
+        if wiki_pages_path
+          expires = new Date
+          expires.setMinutes(expires.getMinutes() + 1)
+          path = '/' # should be wiki_pages_path, but IE will only allow *sub*directries to read the cookie, not the directory itself...
+          $.cookie 'deleted_page_title', page_title, expires: expires, path: path
+          window.location.href = wiki_pages_path
+        else
+          $.flashMessage I18n.t 'notices.page_deleted', 'The page "%{title}" has been deleted.', title: page_title
+          dfd.resolve()
+          @close()
+
+      destroyDfd.fail =>
+        $.flashError htmlEscape(I18n.t('notices.delete_failed', 'The page "%{title}" could not be deleted.', title: page_title))
+        dfd.reject()
 
       @$el.disableWhileLoading dfd

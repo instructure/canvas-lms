@@ -1,5 +1,14 @@
 @import "environment";
 
+#adminToolsTabPanes {
+  .search-controls {
+    background-color: $lightBackground;
+  }
+  .roster tr.selected td {
+    background-color: $hover-color;
+  }
+}
+
 #commMessagesSearchResults {
   .collectionViewItems {
     margin-left: 0;

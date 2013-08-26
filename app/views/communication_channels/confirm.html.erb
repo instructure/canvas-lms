@@ -120,7 +120,7 @@ Which is you?", :count => @merge_opportunities.length %>
       <div class="control-group">
         <%= blabel :user, :time_zone, :en => "Time Zone", :class => 'control-label' %>
         <div class="controls">
-          <%= time_zone_select :user, :time_zone, ActiveSupport::TimeZone.us_zones, {:default => ((@pseudonym.account.default_time_zone) || "Mountain Time (US & Canada)"), :value => @user.time_zone} %>
+          <%= time_zone_select :user, :time_zone, ActiveSupport::TimeZone.us_zones, {:default => @pseudonym.account.default_time_zone.name, :value => @user.time_zone} %>
         </div>
       </div>
       <% if @pseudonym.account == Account.default %>
@@ -133,16 +133,18 @@ Which is you?", :count => @merge_opportunities.length %>
         </div>
       </div>
       <% end %>
-      <% if require_terms? %>
       <div class="control-group">
         <div class="controls">
-          <label for="user_terms_of_use">
-            <%= check_box :user, :terms_of_use, :checked => true %>
-            <%= agree_to_terms %>
-          </label>
+          <% if require_terms? %>
+            <label for="user_terms_of_use">
+              <%= check_box :user, :terms_of_use %>
+              <%= agree_to_terms %>
+            </label>
+          <% else %>
+            <a href="<%= @domain_root_account.privacy_policy_url %>" target="_blank"><%= t "#site.view_privacy_policy", "View Privacy Policy" %></a>
+          <% end %>
         </div>
       </div>
-      <% end %>
       <div class="control-group">
         <div class="controls">
           <% unless @merge_opportunities.empty? %>

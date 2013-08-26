@@ -41,7 +41,7 @@ describe "Accounts API", :type => :integration do
           'name' => 'root',
           'root_account_id' => nil,
           'parent_account_id' => nil,
-          'default_time_zone' => 'UTC',
+          'default_time_zone' => 'Etc/UTC',
           'default_storage_quota_mb' => 123,
           'default_user_storage_quota_mb' => 45,
           'default_group_storage_quota_mb' => 42,
@@ -52,7 +52,7 @@ describe "Accounts API", :type => :integration do
           'root_account_id' => @a1.id,
           'parent_account_id' => @a1.id,
           'sis_account_id' => 'sis1',
-          'default_time_zone' => 'Alaska',
+          'default_time_zone' => 'America/Juneau',
           'default_storage_quota_mb' => 321,
           'default_user_storage_quota_mb' => 54,
           'default_group_storage_quota_mb' => 41,
@@ -125,7 +125,7 @@ describe "Accounts API", :type => :integration do
           'name' => 'root',
           'root_account_id' => nil,
           'parent_account_id' => nil,
-          'default_time_zone' => 'UTC',
+          'default_time_zone' => 'Etc/UTC',
           'default_storage_quota_mb' => 123,
           'default_user_storage_quota_mb' => 45,
           'default_group_storage_quota_mb' => 42,
@@ -168,8 +168,8 @@ describe "Accounts API", :type => :integration do
       @a1.name.should == "blah"
     end
 
-    it "should update the default_time_zone for an account" do
-      new_zone = 'Alaska'
+    it "should update the default_time_zone for an account with an IANA timezone name" do
+      new_zone = 'America/Juneau'
       json = api_call(:put, "/api/v1/accounts/#{@a1.id}",
                       { :controller => 'accounts', :action => 'update', :id => @a1.to_param, :format => 'json' },
                       { :account => {:default_time_zone => new_zone} })
@@ -180,7 +180,21 @@ describe "Accounts API", :type => :integration do
       })
 
       @a1.reload
-      @a1.default_time_zone.should == new_zone
+      @a1.default_time_zone.tzinfo.name.should == new_zone
+    end
+
+    it "should update the default_time_zone for an account with a Rails timezone name" do
+      json = api_call(:put, "/api/v1/accounts/#{@a1.id}",
+                      { :controller => 'accounts', :action => 'update', :id => @a1.to_param, :format => 'json' },
+                      { :account => {:default_time_zone => 'Alaska'} })
+
+      json.should include({
+                              'id' => @a1.id,
+                              'default_time_zone' => 'America/Juneau',
+                          })
+
+      @a1.reload
+      @a1.default_time_zone.name.should == 'Alaska'
     end
 
     it "should check for a valid time zone" do

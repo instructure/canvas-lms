@@ -18,6 +18,7 @@
 
 class ContextModule < ActiveRecord::Base
   include Workflow
+  include SearchTermHelper
   attr_accessible :context, :name, :unlock_at, :require_sequential_progress, :completion_requirements, :prerequisites
   belongs_to :context, :polymorphic => true
   belongs_to :cloned_item
@@ -250,10 +251,18 @@ class ContextModule < ActiveRecord::Base
   end
 
   def content_tags_visible_to(user)
-    if self.grants_right?(user, :update)
-      self.content_tags.not_deleted
+    if self.content_tags.loaded?
+      if self.grants_right?(user, :update)
+        self.content_tags.select{|tag| tag.workflow_state != 'deleted'}
+      else
+        self.content_tags.select{|tag| tag.workflow_state == 'active'}
+      end
     else
-      self.content_tags.active
+      if self.grants_right?(user, :update)
+        self.content_tags.not_deleted
+      else
+        self.content_tags.active
+      end
     end
   end
 

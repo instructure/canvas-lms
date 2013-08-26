@@ -68,7 +68,7 @@ class SubmissionsApiController < ApplicationController
   #
   # Get all existing submissions for a given set of students and assignments.
   #
-  # @argument student_ids[] List of student ids to return submissions for. At least one is required.
+  # @argument student_ids[] List of student ids to return submissions for. If this argument is omitted, return submissions for the calling user. Students may only list their own submissions. Observers may only list those of associated students.
   # @argument assignment_ids[] List of assignments to return submissions for. If none are given, submissions for all assignments are returned.
   # @argument grouped If this argument is present, the response will be grouped by student, rather than a flat array of submissions.
   # @argument include[] ["submission_history"|"submission_comments"|"rubric_assessment"|"assignment"|"total_scores"] Associations to include with the group. `total_scores` requires the `grouped` argument.
@@ -92,10 +92,12 @@ class SubmissionsApiController < ApplicationController
   #       }
   #     ]
   def for_students
-    if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
-      raise ActiveRecord::RecordNotFound if params[:student_ids].blank?
-
-      student_ids = map_user_ids(params[:student_ids]).map(&:to_i) & visible_user_ids(:include_priors => true)
+    student_ids = map_user_ids(params[:student_ids] || []).map(&:to_i)
+    student_ids << @current_user.id if student_ids.empty?
+    if student_ids == [@current_user.id] ||
+        is_authorized_action?(@context, @current_user, [:manage_grades, :view_all_grades]) ||
+        (student_ids - @context.observer_enrollments.where(:user_id => @current_user.id, :workflow_state => 'active').pluck(:associated_user_id)).empty?
+      student_ids &= visible_user_ids(:include_priors => true)
       return render(:json => []) if student_ids.blank?
 
       max_students = Setting.get_cached('api_max_per_page', '50').to_i
@@ -170,6 +172,8 @@ class SubmissionsApiController < ApplicationController
       end
 
       render :json => result
+    else
+      render_unauthorized_action(@course)
     end
   end
 

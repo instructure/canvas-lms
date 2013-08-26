@@ -68,7 +68,17 @@
 #         // whether the calling user has met this requirement
 #         // (Optional; present only if the caller is a student)
 #         completed: true
+#       },
+#
+#       // (Present only if requested through include[]=content_details)
+#       // If applicable, returns additional details specific to the associated object
+#       content_details: {
+#         points_possible: 20,
+#         due_at: "2012-12-31T06:00:00-06:00",
+#         unlock_at: "2012-12-31T06:00:00-06:00",
+#         lock_at: "2012-12-31T06:00:00-06:00"
 #       }
+#
 #     }
 class ContextModuleItemsApiController < ApplicationController
   before_filter :require_context
@@ -78,6 +88,10 @@ class ContextModuleItemsApiController < ApplicationController
   #
   # List the items in a module
   #
+  # @argument include[] ["content_details"] If included, will return additional details specific to the content associated with each item.
+  #    Refer to the {api:Modules:Module%20Item Module Item specification} for more details.
+  # @argument search_term (optional) The partial title of the items to match and return.
+  #
   # @example_request
   #     curl -H 'Authorization: Bearer <token>' \
   #          https://<canvas>/api/v1/courses/222/modules/123/items
@@ -86,17 +100,22 @@ class ContextModuleItemsApiController < ApplicationController
   def index
     if authorized_action(@context, @current_user, :read)
       mod = @context.modules_visible_to(@current_user).find(params[:module_id])
+      ContextModule.send(:preload_associations, mod, {:content_tags => :content})
       route = polymorphic_url([:api_v1, @context, mod, :items])
       scope = mod.content_tags_visible_to(@current_user)
+      scope = ContentTag.search_by_attribute(scope, :title, params[:search_term])
       items = Api.paginate(scope, self, route)
       prog = @context.grants_right?(@current_user, session, :participate_as_student) ? mod.evaluate_for(@current_user) : nil
-      render :json => items.map { |item| module_item_json(item, @current_user, session, mod, prog) }
+      render :json => items.map { |item| module_item_json(item, @current_user, session, mod, prog, Array(params[:include])) }
     end
   end
 
   # @API Show module item
   #
   # Get information about a single module item
+  #
+  # @argument include[] ["content_details"] If included, will return additional details specific to the content associated with this item.
+  #    Refer to the {api:Modules:Module%20Item Module Item specification} for more details.
   #
   # @example_request
   #     curl -H 'Authorization: Bearer <token>' \
@@ -108,7 +127,7 @@ class ContextModuleItemsApiController < ApplicationController
       mod = @context.modules_visible_to(@current_user).find(params[:module_id])
       item = mod.content_tags_visible_to(@current_user).find(params[:id])
       prog = @context.grants_right?(@current_user, session, :participate_as_student) ? mod.evaluate_for(@current_user) : nil
-      render :json => module_item_json(item, @current_user, session, mod, prog)
+      render :json => module_item_json(item, @current_user, session, mod, prog, Array(params[:include]))
     end
   end
 
@@ -137,7 +156,7 @@ class ContextModuleItemsApiController < ApplicationController
   # @argument module_item[type] [Required] The type of content linked to the item
   #  one of "File", "Page", "Discussion", "Assignment", "Quiz", "SubHeader", "ExternalUrl", "ExternalTool"
   # @argument module_item[content_id] [Required, except for 'ExternalUrl', 'Page', and 'SubHeader' types] The id of the content to link to the module item
-  # @argument module_item[position] [Optional] The position of this module in the course (1-based)
+  # @argument module_item[position] [Optional] The position of this item in the module (1-based)
   # @argument module_item[indent] [Optional] 0-based indent level; module items may be indented to show a hierarchy
   # @argument module_item[page_url] [Required for 'Page' type] Suffix for the linked wiki page (e.g. 'front-page')
   # @argument module_item[external_url] [Required for 'ExternalUrl' and 'ExternalTool' types] External url that the item points to
@@ -203,7 +222,7 @@ class ContextModuleItemsApiController < ApplicationController
   # Update and return an existing module item
   #
   # @argument module_item[title] [Optional] The name of the module item
-  # @argument module_item[position] [Optional] The position of this module in the course (1-based)
+  # @argument module_item[position] [Optional] The position of this item in the module (1-based)
   # @argument module_item[indent] [Optional] 0-based indent level; module items may be indented to show a hierarchy
   # @argument module_item[external_url] [Optional, only applies to 'ExternalUrl' type] External url that the item points to
   # @argument module_item[new_tab] [Optional, only applies to 'ExternalTool' type] Whether the external tool opens in a new tab
@@ -214,6 +233,7 @@ class ContextModuleItemsApiController < ApplicationController
   #   Inapplicable types will be ignored
   # @argument module_item[completion_requirement][min_score] [Required for completion_requirement type 'min_score'] minimum score required to complete
   # @argument module_item[published] [Optional] Whether the module item is published and visible to students
+  # @argument module_item[module_id] [Optional] Move this item to another module by specifying the target module id here. The target module must be in the same course.
   #
   # @example_request
   #
@@ -235,6 +255,19 @@ class ContextModuleItemsApiController < ApplicationController
       @tag.url = params[:module_item][:external_url] if %w(ExternalUrl ContextExternalTool).include?(@tag.content_type) && params[:module_item][:external_url]
       @tag.indent = params[:module_item][:indent] if params[:module_item][:indent]
       @tag.new_tab = value_to_boolean(params[:module_item][:new_tab]) if params[:module_item][:new_tab]
+      if target_module_id = params[:module_item][:module_id]
+        return render :json => {:message => "invalid module_id"}, :status => :bad_request unless @context.context_modules.where(:id => target_module_id).exists?
+        old_module = @context.context_modules.find(@tag.context_module_id)
+        @tag.context_module_id = target_module_id
+        if req_index = old_module.completion_requirements.find_index { |req| req[:id] == @tag.id }
+          old_module.completion_requirements_will_change!
+          req = old_module.completion_requirements.delete_at(req_index)
+          old_module.save!
+          params[:module_item][:completion_requirement] = req
+        else
+          ContentTag.touch_context_modules([old_module.id, target_module_id])
+        end
+      end
 
       if params[:module_item].has_key?(:published)
         if value_to_boolean(params[:module_item][:published])

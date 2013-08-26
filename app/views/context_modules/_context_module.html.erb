@@ -41,8 +41,12 @@
       <% end %>
 
       <li class="context-module-toolbar-item adjust-top">
-        <a href="<%= context_url(@context, :context_url) %>/modules/<%= context_module ? context_module.id : "{{ id }}" %>/collapse" class="expand_module_link icon icon-expand" title="<%= t('links.show_contents', %{Show module contents}) %>"></a>
-        <a href="<%= context_url(@context, :context_url) %>/modules/<%= context_module ? context_module.id : "{{ id }}" %>/collapse" class="collapse_module_link icon icon-collapse" title="<%= t('links.hide_contents', %{Hide module contents}) %>"></a>
+        <a href="<%= context_url(@context, :context_url) %>/modules/<%= context_module ? context_module.id : "{{ id }}" %>/collapse" class="expand_module_link icon icon-expand" title="<%= t('links.show_contents', %{Show module contents}) %>">
+          <span class="screenreader-only"><%= t('links.show_contents', %{Show module contents}) %></span>
+        </a>
+        <a href="<%= context_url(@context, :context_url) %>/modules/<%= context_module ? context_module.id : "{{ id }}" %>/collapse" class="collapse_module_link icon icon-collapse" title="<%= t('links.hide_contents', %{Hide module contents}) %>">
+          <span class="screenreader-only"><%= t('links.hide_contents', %{Hide module contents}) %></span>
+        </a>
       </li>
 
       <li class="context-module-toolbar-item"><span class="id" style="display: none;"><%= context_module ? context_module.id : nbsp %></span></li>

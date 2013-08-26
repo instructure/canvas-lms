@@ -73,9 +73,9 @@ define [
     #   @get 'foo.bar' // returns catz
     #
     # @api backbone override
-    deepGet: (property) -> 
+    deepGet: (property) ->
       split = property.split "."
-      value = @get split.shift() 
+      value = @get split.shift()
 
       # Move through objects until found
       while next = split.shift()
