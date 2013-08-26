@@ -399,6 +399,10 @@ module ApplicationHelper
     end
   end
 
+  def include_common_stylesheets
+    include_stylesheets :vendor, :common, media: "all"
+  end
+
   def section_tabs
     @section_tabs ||= begin
       if @context
