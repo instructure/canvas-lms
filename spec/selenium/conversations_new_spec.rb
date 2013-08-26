@@ -134,6 +134,50 @@ describe "conversations new" do
     end
   end
 
+  describe "replying" do
+    before do
+      cp = conversation(@s1, @teacher, @s2, workflow_state: 'unread')
+      @convo = cp.conversation
+      @convo.update_attribute(:subject, 'homework')
+      @convo.add_message(@s1, "What's this week's homework?")
+      @convo.add_message(@s2, "I need the homework too.")
+    end
+
+    it "should maintain context and subject" do
+      get_conversations
+      conversation_elements[0].click
+      wait_for_ajaximations
+      fj('#reply-btn').click
+      fj('#compose-message-course').should have_attribute(:disabled, 'true')
+      fj('#compose-message-course').should have_value(@course.id.to_s)
+      fj('#compose-message-subject').should have_attribute(:disabled, 'true')
+      fj('#compose-message-subject').should have_value(@convo.subject)
+    end
+
+    it "should address replies to the most recent author by default" do
+      get_conversations
+      conversation_elements[0].click
+      wait_for_ajaximations
+      fj('#reply-btn').click
+      ffj('input[name="recipients[]"]').length.should == 1
+      fj('input[name="recipients[]"]').should have_value(@s2.id.to_s)
+    end
+
+    it "should add new messages to the conversation" do
+      get_conversations
+      initial_message_count = @convo.conversation_messages.length
+      conversation_elements[0].click
+      wait_for_ajaximations
+      fj('#reply-btn').click
+      set_message_body('Read chapters fix and six.')
+      click_send
+      wait_for_ajaximations
+      ffj('.message-item-view').length.should == initial_message_count + 1
+      @convo.reload
+      @convo.conversation_messages.length.should == initial_message_count + 1
+    end
+  end
+
   describe "view filter" do
     before do
       conversation(@teacher, @s1, @s2, workflow_state: 'unread')
