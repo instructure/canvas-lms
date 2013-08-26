@@ -1091,7 +1091,7 @@ class User < ActiveRecord::Base
   end
 
   def self.max_messages_per_day
-    Setting.get('max_messages_per_day_per_user', 500).to_i
+    Setting.get_cached('max_messages_per_day_per_user', 500).to_i
   end
 
   def max_messages_per_day
