@@ -13,6 +13,7 @@ require [
     model: wikiPage
     wiki_pages_path: ENV.WIKI_PAGES_PATH
     wiki_page_edit_path: ENV.WIKI_PAGE_EDIT_PATH
+    wiki_page_history_path: ENV.WIKI_PAGE_HISTORY_PATH
     WIKI_RIGHTS: ENV.WIKI_RIGHTS
     PAGE_RIGHTS: ENV.PAGE_RIGHTS
   $('#content').append(wikiPageView.$el)

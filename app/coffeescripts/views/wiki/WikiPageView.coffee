@@ -22,6 +22,7 @@ define [
 
     @optionProperty 'wiki_pages_path'
     @optionProperty 'wiki_page_edit_path'
+    @optionProperty 'wiki_page_history_path'
     @optionProperty 'WIKI_RIGHTS'
     @optionProperty 'PAGE_RIGHTS'
 
@@ -57,9 +58,12 @@ define [
       json = super
       json.wiki_pages_path = @wiki_pages_path
       json.wiki_page_edit_path = @wiki_page_edit_path
+      json.wiki_page_history_path = @wiki_page_history_path
       json.CAN =
         VIEW_PAGES: !!@WIKI_RIGHTS.read
         PUBLISH: !!@WIKI_RIGHTS.manage && json.contextName == 'courses'
         UPDATE_CONTENT: !!@PAGE_RIGHTS.update || !!@PAGE_RIGHTS.update_content
         DELETE: !!@PAGE_RIGHTS.delete
+        READ_REVISIONS: !!@PAGE_RIGHTS.read_revisions
+        ACCESS_GEAR_MENU: !!@PAGE_RIGHTS.delete || !!@PAGE_RIGHTS.read_revisions
       json

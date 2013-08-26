@@ -97,6 +97,7 @@ define [
         PAGE_RIGHTS:
           update: ENV.WIKI_RIGHTS.update_page
           update_content: ENV.WIKI_RIGHTS.update_page_content
+          read_revisions: ENV.WIKI_RIGHTS.read_revisions
       @$el.parent().append(@editView.$el)
 
       @editView.render()
