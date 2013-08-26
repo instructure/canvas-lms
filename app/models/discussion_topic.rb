@@ -294,8 +294,10 @@ class DiscussionTopic < ActiveRecord::Base
   def unread_count(current_user = nil)
     current_user ||= self.current_user
     return 0 unless current_user # default for logged out users
-    topic_participant = discussion_topic_participants.lock.find_by_user_id(current_user)
-    topic_participant.try(:unread_entry_count) || self.default_unread_count
+    Shackles.activate(:master) do
+      topic_participant = discussion_topic_participants.lock.find_by_user_id(current_user)
+      topic_participant.try(:unread_entry_count) || self.default_unread_count
+    end
   end
 
   # Cases where you CAN'T subscribe:
@@ -374,18 +376,20 @@ class DiscussionTopic < ActiveRecord::Base
     return nil unless current_user
 
     topic_participant = nil
-    DiscussionTopic.uncached do
-      DiscussionTopic.unique_constraint_retry do
-        topic_participant = self.discussion_topic_participants.where(:user_id => current_user).lock.first
-        topic_participant ||= self.discussion_topic_participants.build(:user => current_user,
-                                                                       :unread_entry_count => self.unread_count(current_user),
-                                                                       :workflow_state => "unread",
-                                                                       :subscribed => current_user == user && !subscription_hold(current_user, nil, nil))
-        topic_participant.workflow_state = opts[:new_state] if opts[:new_state]
-        topic_participant.unread_entry_count += opts[:offset] if opts[:offset] && opts[:offset] != 0
-        topic_participant.unread_entry_count = opts[:new_count] if opts[:new_count]
-        topic_participant.subscribed = opts[:subscribed] if opts.has_key?(:subscribed)
-        topic_participant.save
+    Shackles.activate(:master) do
+      DiscussionTopic.uncached do
+        DiscussionTopic.unique_constraint_retry do
+          topic_participant = self.discussion_topic_participants.where(:user_id => current_user).lock.first
+          topic_participant ||= self.discussion_topic_participants.build(:user => current_user,
+                                                                         :unread_entry_count => self.unread_count(current_user),
+                                                                         :workflow_state => "unread",
+                                                                         :subscribed => current_user == user && !subscription_hold(current_user, nil, nil))
+          topic_participant.workflow_state = opts[:new_state] if opts[:new_state]
+          topic_participant.unread_entry_count += opts[:offset] if opts[:offset] && opts[:offset] != 0
+          topic_participant.unread_entry_count = opts[:new_count] if opts[:new_count]
+          topic_participant.subscribed = opts[:subscribed] if opts.has_key?(:subscribed)
+          topic_participant.save
+        end
       end
     end
     topic_participant
