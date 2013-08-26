@@ -102,6 +102,10 @@ class WikiPagesController < ApplicationController
     initialize_wiki_page
 
     if @page.update_attributes(params[:wiki_page].merge(:user_id => @current_user.id))
+      unless @page.context.draft_state_enabled?
+        @page.set_as_front_page! if !@page.wiki.has_front_page? and @page.url == Wiki::DEFAULT_FRONT_PAGE_URL
+      end
+
       log_asset_access(@page, "wiki", @wiki, 'participate')
       generate_new_page_view
       @page.context_module_action(@current_user, @context, :contributed)

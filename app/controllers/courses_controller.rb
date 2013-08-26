@@ -1108,6 +1108,12 @@ class CoursesController < ApplicationController
 
       @course_home_view = (params[:view] == "feed" && 'feed') || @context.default_view || 'feed'
 
+      # make sure the wiki front page exists
+      if @course_home_view == 'wiki'
+        @context.wiki.check_has_front_page
+        @course_home_view = 'feed' if @context.wiki.front_page.nil?
+      end
+
       @contexts = [@context]
       case @course_home_view
       when "wiki"
