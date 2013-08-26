@@ -253,7 +253,7 @@ describe GradebooksController do
           controller.js_env.clear
           user_session(u)
           get 'grade_summary', :course_id => @course.id, :id => @student.id
-          assigns[:presenter].assignments.find{|a| a.class == Assignment}.due_at.should == due_at
+          assigns[:presenter].assignments.find{|a| a.class == Assignment}.due_at.to_i.should == due_at.to_i
         end
       end
 

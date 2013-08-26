@@ -43,7 +43,7 @@ shared_examples_for "an object whose dates are overridable" do
 
       it "returns a clone of the object with the relevant override(s) applied" do
         overridden = overridable.overridden_for(@student)
-        overridden.due_at.should == override.due_at
+        overridden.due_at.to_i.should == override.due_at.to_i
       end
 
       it "returns the same object when the user is nil (e.g. a guest)" do
@@ -54,7 +54,7 @@ shared_examples_for "an object whose dates are overridable" do
     context "with no overrides" do
       it "returns the original object" do
         @overridden = overridable.overridden_for(@student)
-        @overridden.due_at.should == overridable.due_at
+        @overridden.due_at.to_i.should == overridable.due_at.to_i
       end
     end
   end
@@ -352,26 +352,26 @@ shared_examples_for "an object whose dates are overridable" do
 
     it "uses the overridden unlock date as the applicable unlock date" do
       as_student, _ = overridable.unlock_ats_for(@student)
-      as_student.should == { :unlock_at => override.unlock_at }
+      as_student[:unlock_at].to_i.should == override.unlock_at.to_i
     end
 
     it "includes the base unlock date in the list of unlock dates" do
       _, as_instructor = overridable.unlock_ats_for(@teacher)
-      as_instructor.should include({ :base => true, :unlock_at => overridable.unlock_at })
+      base_override = as_instructor.detect{|o| o[:base]}
+      base_override[:unlock_at].to_i.should == overridable.unlock_at.to_i
     end
 
     it "doesn't use an overridden unlock date as the base unlock date" do
       _, as_instructor = overridable.overridden_for(@student).unlock_ats_for(@teacher)
-      as_instructor.should include({ :base => true, :unlock_at => overridable.unlock_at})
+      base_override = as_instructor.detect{|o| o[:base]}
+      base_override[:unlock_at].to_i.should == overridable.unlock_at.to_i
     end
 
     it "includes visible unlock date overrides in the list of unlock dates" do
       _, as_instructor = overridable.unlock_ats_for(@teacher)
-      as_instructor.should include({
-        :title => @course.default_section.name,
-        :unlock_at => override.unlock_at,
-        :override => override
-      })
+      section_override = as_instructor.detect{|o| o[:title] == @course.default_section.name }
+      section_override[:unlock_at].to_i.should == override.unlock_at.to_i
+      section_override[:override].should == override
     end
 
     it "excludes visible overrides that don't override unlock_at from the list of unlock dates" do
