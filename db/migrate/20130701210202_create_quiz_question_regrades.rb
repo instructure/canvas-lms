@@ -6,9 +6,6 @@ class CreateQuizQuestionRegrades < ActiveRecord::Migration
       t.integer :quiz_question_id, limit: 8, null: false
       t.string :regrade_option, null: false
 
-      t.foreign_key :quiz_regrades
-      t.foreign_key :quiz_questions
-
       t.timestamps
     end
 
