@@ -56,6 +56,7 @@ describe "Pages API", :type => :integration do
     @front_page = @wiki.front_page
     @front_page.workflow_state = 'active'
     @front_page.save!
+    @front_page.set_as_front_page!
     @hidden_page = @wiki.wiki_pages.create!(:title => "Hidden Page", :hide_from_students => true, :body => "Body of hidden page")
   end
 
@@ -270,12 +271,39 @@ describe "Pages API", :type => :integration do
         json.should == expected
       end
 
-      it "give a meaningful error if there is no front page" do
-        @wiki.unset_front_page!
+      it "should implicitly find the 'front-page' if no front page is set" do
+        @wiki.reload
+        @wiki.front_page_url = nil
+        @wiki.has_no_front_page = nil
+        @wiki.save!
+
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/front_page",
+                        :controller=>"wiki_pages_api", :action=>"show", :format=>"json", :course_id=>"#{@course.id}")
+
+        expected = { "hide_from_students" => false,
+                     "editing_roles" => "teachers",
+                     "url" => @front_page.url,
+                     "html_url" => "http://www.example.com/courses/#{@course.id}/wiki/#{@front_page.url}",
+                     "created_at" => @front_page.created_at.as_json,
+                     "updated_at" => @front_page.updated_at.as_json,
+                     "title" => @front_page.title,
+                     "body" => @front_page.body,
+                     "published" => true,
+                     "front_page" => true,
+                     "locked_for_user" => false,
+        }
+        json.should == expected
+      end
+
+      it "should give a meaningful error if there is no front page" do
+        @front_page.workflow_state = 'deleted'
+        @front_page.save!
+        wiki = @front_page.wiki
+        wiki.unset_front_page!
 
         json = api_call(:get, "/api/v1/courses/#{@course.id}/front_page",
                         {:controller=>"wiki_pages_api", :action=>"show", :format=>"json", :course_id=>"#{@course.id}"},
-                      {}, {}, {:expected_status => 404})
+                        {}, {}, {:expected_status => 404})
 
         json['message'].should == "No front page has been set"
       end
@@ -549,6 +577,9 @@ describe "Pages API", :type => :integration do
 
       it "should un-set as front page" do
         wiki = @course.wiki
+        wiki.reload
+        wiki.has_front_page?.should be_true
+
         front_page = wiki.front_page
 
         json = api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{front_page.url}",
@@ -561,7 +592,8 @@ describe "Pages API", :type => :integration do
         front_page.is_front_page?.should be_false
 
         wiki.reload
-        wiki.front_page.should be_nil
+        wiki.has_front_page?.should be_false
+        wiki.front_page.should be_new_record
 
         json['front_page'].should == false
       end

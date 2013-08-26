@@ -209,7 +209,8 @@ class WikiPage < ActiveRecord::Base
   end
 
   def is_front_page?
-    !self.deleted? && self.wiki.has_front_page? && self.url == self.wiki.get_front_page_url
+    return false if self.deleted?
+    self.url == self.wiki.get_front_page_url # wiki.get_front_page_url checks has_front_page? and context.draft_state_enabled?
   end
 
   def set_as_front_page!
