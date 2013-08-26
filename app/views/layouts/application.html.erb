@@ -26,8 +26,7 @@
 
 -%>
 <% content_for :head do %>
-  <%= include_stylesheets :vendor, :media => "all" %>
-  <%= include_stylesheets :common, :media => "all" %>
+  <%= include_common_stylesheets %>
   <% if @eportfolio_view === true %>
     <%= stylesheet_link_tag "compiled/instructure_eportfolio.css" %>
   <% end %>
