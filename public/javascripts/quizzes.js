@@ -3046,19 +3046,22 @@ define([
             if (!matchHash[variable]) {
               var $variable = $question.find(".variables tr.variable").eq(idx);
               if ($variable.length === 0) {
+                var label_id = "label_for_var_" + idx;
+
                 $variable = $("<tr class='variable'>"
-                              + "<td aria-labelledby='equation_var_name' class='name'></td>"
-                              + "<td aria-labelledby='equation_var_minimum'><input aria-labelledby='equation_var_minimum' type='text' name='min' class='min variable_setting' style='width: 30px;' value='1'/></td>"
-                              + "<td aria-labelledby='equation_var_maximum'><input aria-labelledby='equation_var_maximum' type='text' name='max' class='max variable_setting' style='width: 30px;' value='10'/></td>"
-                              + "<td aria-labelledby='equation_var_precision'><select aria-labelledby='equation_var_precision' name='round' class='round variable_setting'><option>0</option><option>1</option><option>2</option><option>3</option></td>"
+                              + "<th id='" + label_id + "' class='name'></th>"
+                              + "<td><input aria-labelledby='" + label_id + " equation_var_minimum' type='text' name='min' class='min variable_setting' style='width: 30px;' value='1'/></td>"
+                              + "<td><input aria-labelledby='" + label_id + " equation_var_maximum' type='text' name='max' class='max variable_setting' style='width: 30px;' value='10'/></td>"
+                              + "<td><select aria-labelledby='" + label_id + " equation_var_precision' name='round' class='round variable_setting'><option>0</option><option>1</option><option>2</option><option>3</option></td>"
                               + "<td aria-labelledby='equation_var_example' class='value'></td></tr>");
+
                 $question.find(".variables tbody").append($variable);
                 $variable.find(".variable_setting:first").triggerHandler('change');
               }
               $variable.removeClass('to_be_removed');
               $variable.addClass(variable);
               $variable.attr('data-name', variable);
-              $variable.find("td.name").text(variable);
+              $variable.find("th.name").text(variable);
               matchHash[variable] = true;
             }
           }

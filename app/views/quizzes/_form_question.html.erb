@@ -100,7 +100,7 @@
     </select>
     </div>
     <div class="multi_answer_sets">
-      <%= t(:show_possible_answers, "Show Possible Answers for %{question}", :question => raw("<select class='blank_id_select' aria-label='#{I18n.t('question_blank', 'Question blank')}'></select>")) %>
+      <%= t(:show_possible_answers, "Show Possible Answers for %{question}", :question => raw("<select class='blank_id_select' aria-label='#{ t(:show_possible_answers_no_question, "Show Possible Answers for")}'></select>")) %>
     </div>
     <div class="equation_answers">
       <div class="clear"></div>
@@ -114,10 +114,10 @@
         <table class="variables">
           <thead>
             <tr>
-              <th><%= t('headers.variable_name', "Variable") %></th>
-              <th><%= t('headers.variable_minimum', "Min") %></th>
-              <th><%= t('headers.variable_maximum', "Max") %></th>
-              <th><%= t('headers.variable_precision', "Decimal Places") %></th>
+              <th id='equation_var_name'><%= t('headers.variable_name', "Variable") %></th>
+              <th id='equation_var_minimum'><%= t('headers.variable_minimum', "Min") %></th>
+              <th id='equation_var_maximum'><%= t('headers.variable_maximum', "Max") %></th>
+              <th id='equation_var_precision'><%= t('headers.variable_precision', "Decimal Places") %></th>
               <th>
                 <%= t('headers.variable_example_value', "Example Value") %>
                 <div><button type="button" class="recompute_variables"><%= t('buttons.recompute', "Recompute") %></button></div>
