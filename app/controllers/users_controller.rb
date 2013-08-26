@@ -623,9 +623,9 @@ class UsersController < ApplicationController
       events = @upcoming_events.map do |e|
         event_json(e, @current_user, session)
       end
-    end
 
-    render :json => events
+      render :json => events
+    end
   end
 
   def ignore_item

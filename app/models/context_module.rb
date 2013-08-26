@@ -523,7 +523,9 @@ class ContextModule < ActiveRecord::Base
     progression ||= self.find_or_create_progression_with_multiple_lookups(user)
     if self.unpublished?
       progression.workflow_state = 'locked'
-      progression.save if progression.workflow_state_changed?
+      Shackles.activate(:master) do
+        progression.save if progression.workflow_state_changed?
+      end
       return progression
     end
     requirements_met_changed = false
@@ -538,7 +540,9 @@ class ContextModule < ActiveRecord::Base
     if recursive_check || progression.new_record? || progression.updated_at < self.updated_at || User.module_progression_jobs_queued?(user.id)
       if self.completion_requirements.blank? && active_prerequisites.empty?
         progression.workflow_state = 'completed'
-        progression.save
+        Shackles.activate(:master) do
+          progression.save
+        end
       end
       progression.workflow_state = 'locked'
       if !self.to_be_unlocked
@@ -612,7 +616,9 @@ class ContextModule < ActiveRecord::Base
       end
     end
     progression.current_position = position
-    progression.save if progression.workflow_state_changed? || requirements_met_changed
+    Shackles.activate(:master) do
+      progression.save if progression.workflow_state_changed? || requirements_met_changed
+    end
     progression
   end
 
