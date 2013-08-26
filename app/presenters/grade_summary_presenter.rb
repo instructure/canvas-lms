@@ -172,7 +172,7 @@ class GradeSummaryPresenter
   protected
 
   def allow_loading_all_submissions?
-    threshold = Setting.get('grade_distributions_submission_count_threshold', '0').to_i
+    threshold = Setting.get_cached('grade_distributions_submission_count_threshold', '0').to_i
     @context.allows_gradebook_uploads? && (threshold == 0 || @context.submissions.count < threshold)
   end
 end
