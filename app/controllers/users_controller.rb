@@ -327,10 +327,12 @@ class UsersController < ApplicationController
   end
 
   def dashboard_sidebar
-    prepare_current_user_dashboard_items
+    Shackles.activate(:slave) do
+      prepare_current_user_dashboard_items
 
-    if @show_recent_feedback = (@current_user.student_enrollments.active.size > 0)
-      @recent_feedback = (@current_user && @current_user.recent_feedback) || []
+      if @show_recent_feedback = (@current_user.student_enrollments.active.present?)
+        @recent_feedback = (@current_user && @current_user.recent_feedback) || []
+      end
     end
 
     render :layout => false
@@ -615,10 +617,12 @@ class UsersController < ApplicationController
   def upcoming_events
     return render_unauthorized_action unless @current_user
 
-    prepare_current_user_dashboard_items
+    Shackles.activate(:slave) do
+      prepare_current_user_dashboard_items
 
-    events = @upcoming_events.map do |e|
-      event_json(e, @current_user, session)
+      events = @upcoming_events.map do |e|
+        event_json(e, @current_user, session)
+      end
     end
 
     render :json => events
