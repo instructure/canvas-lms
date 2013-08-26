@@ -1079,7 +1079,14 @@ class CoursesController < ApplicationController
       return
     end
 
-    @context_enrollment = @context.enrollments.find_by_user_id(@current_user.id) if @context && @current_user
+    if @context && @current_user
+      @context_enrollment = @context.enrollments.where(user_id: @current_user).except(:includes).first
+      if @context_enrollment
+        @context_enrollment.course = @context
+        @context_enrollment.user = @current_user
+      end
+    end
+
     return if check_for_xlist
     @unauthorized_message = t('unauthorized.invalid_link', "The enrollment link you used appears to no longer be valid.  Please contact the course instructor and make sure you're still correctly enrolled.") if params[:invitation]
     claim_course if session[:claim_course_uuid] || params[:verification]
