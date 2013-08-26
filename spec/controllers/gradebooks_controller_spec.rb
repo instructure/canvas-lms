@@ -530,4 +530,19 @@ describe GradebooksController do
 
     end
   end
+
+  describe "POST 'speed_grader_settings'" do
+    it "lets you set your :enable_speedgrader_grade_by_question preference" do
+      course_with_teacher_logged_in(:active_all => true)
+      @teacher.preferences[:enable_speedgrader_grade_by_question].should_not be_true
+
+      post 'speed_grader_settings', course_id: @course.id,
+        enable_speedgrader_grade_by_question: "1"
+      @teacher.reload.preferences[:enable_speedgrader_grade_by_question].should be_true
+
+      post 'speed_grader_settings', course_id: @course.id,
+        enable_speedgrader_grade_by_question: "0"
+      @teacher.reload.preferences[:enable_speedgrader_grade_by_question].should_not be_true
+    end
+  end
 end

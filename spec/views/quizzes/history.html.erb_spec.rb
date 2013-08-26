@@ -20,7 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
 describe "/quizzes/history" do
-  it "should render" do
+  before do
     course_with_student
     view_context
     assigns[:quiz] = @course.quizzes.create!
@@ -29,8 +29,22 @@ describe "/quizzes/history" do
     assigns[:current_submission] = assigns[:submission]
     assigns[:submission]
     assigns[:version_instances] = assigns[:submission].submitted_versions
-    render "quizzes/history"
-    response.should_not be_nil
+  end
+
+  context 'beta quiz navigation' do
+    it 'displays when configured' do
+      @student.preferences[:enable_speedgrader_grade_by_question] = true
+      @student.save!
+      render "quizzes/history"
+      response.body.should match /quiz-nav/
+    end
+
+    it "doesn't display when not enabled" do
+      @student.preferences[:enable_speedgrader_grade_by_question] = nil
+      @student.save!
+      render "quizzes/history"
+      response.body.should_not match /quiz-nav/
+    end
   end
 end
 

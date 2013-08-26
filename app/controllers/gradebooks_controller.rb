@@ -24,6 +24,7 @@ class GradebooksController < ApplicationController
   include Api::V1::Submission
 
   before_filter :require_context
+  before_filter :require_user, only: %w(speed_grader speed_grader_settings)
   batch_jobs_in_actions :only => :update_submission, :batch => { :priority => Delayed::LOW_PRIORITY }
 
   add_crumb(proc { t '#crumbs.grades', "Grades" }) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_grades_url }
@@ -361,9 +362,12 @@ class GradebooksController < ApplicationController
         @headers = false
         @outer_frame = true
         log_asset_access("speed_grader:#{@context.asset_string}", "grades", "other")
-        hash = {:CONTEXT_ACTION_SOURCE => :speed_grader}
-        append_sis_data(hash)
-        js_env(hash)
+        env = {
+          :CONTEXT_ACTION_SOURCE => :speed_grader,
+          :settings_url => speed_grader_settings_course_gradebook_path,
+        }
+        append_sis_data(env)
+        js_env(env)
         render :action => "speed_grader"
       end
 
@@ -371,6 +375,13 @@ class GradebooksController < ApplicationController
         render :json => @assignment.speed_grader_json(@current_user, service_enabled?(:avatars))
       end
     end
+  end
+
+  def speed_grader_settings
+    grade_by_question = value_to_boolean(params[:enable_speedgrader_grade_by_question])
+    @current_user.preferences[:enable_speedgrader_grade_by_question] = grade_by_question
+    @current_user.save!
+    render nothing: true
   end
 
   def blank_submission

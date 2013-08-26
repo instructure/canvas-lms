@@ -10,6 +10,7 @@
   <% quizNavClass = 'quiz-nav-fullpage' %>
 <% end %>
 
+<% if @current_user.preferences[:enable_speedgrader_grade_by_question] %>
 <div class='<%= quizNavClass %> pagination'>
   <ul class='nav'>
     <li class='nav-arrow' id='nav-prev'>
@@ -34,6 +35,8 @@
     </li>
   </ul>
 </div>
+<div class=quizzes-speedgrader-padding></div>
+<% end %>
 
 <% unless params[:headless] %>
   <% content_for :right_side do %>

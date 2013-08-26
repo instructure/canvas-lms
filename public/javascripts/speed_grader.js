@@ -349,8 +349,8 @@ define([
     addEvents: function(){
       this.elements.nav.click($.proxy(this.toAssignment, this));
       this.elements.mute.link.click($.proxy(this.onMuteClick, this));
-      this.elements.settings.form.submit($.proxy(this.submitForm, this));
-      this.elements.settings.link.click($.proxy(this.showSettingsModal, this));
+      this.elements.settings.form.submit(this.submitSettingsForm.bind(this));
+      this.elements.settings.link.click(this.showSettingsModal.bind(this));
     },
     addSpinner: function(){
       this.elements.mute.link.append(this.elements.spinner.el);
@@ -392,15 +392,21 @@ define([
       EG[e.target.getAttribute('class')]();
     },
 
-    submitForm: function(e){
+    submitSettingsForm: function(e){
+      e.preventDefault();
       userSettings.set('eg_sort_by', $('#eg_sort_by').val());
       userSettings.set('eg_hide_student_names', $("#hide_student_names").prop('checked'));
       $(e.target).find(".submit_button").attr('disabled', true).text(I18n.t('buttons.saving_settings', "Saving Settings..."));
-      window.location.reload();
-      return false;
+      var gradeByQuestion = $("#enable_speedgrader_grade_by_question").prop('checked');
+      $.post(ENV.settings_url, {
+        enable_speedgrader_grade_by_question: gradeByQuestion
+      }).then(function() {
+        window.location.reload();
+      });
     },
 
     showSettingsModal: function(e){
+      e.preventDefault();
       this.elements.settings.form.dialog('open');
     },
 
