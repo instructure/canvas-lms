@@ -78,7 +78,7 @@ class ContextModule < ActiveRecord::Base
     self.workflow_state = 'deleted'
     self.deleted_at = Time.now
     ContentTag.where(:context_module_id => self).update_all(:workflow_state => 'deleted', :updated_at => Time.now.utc)
-    self.send_later_if_production(:update_downstreams, self.position)
+    self.send_later_if_production_enqueue_args(:update_downstreams, { max_attempts: 1, n_strand: "context_module_update_downstreams", priority: Delayed::LOW_PRIORITY }, self.position)
     save!
     true
   end
