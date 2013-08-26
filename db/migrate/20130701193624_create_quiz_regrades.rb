@@ -6,11 +6,6 @@ class CreateQuizRegrades < ActiveRecord::Migration
       t.integer :user_id, limit: 8, null: false
       t.integer :quiz_id, limit: 8, null: false
       t.integer :quiz_version, null: false
-
-      t.foreign_key :users
-      t.foreign_key :quizzes
-      t.foreign_key :versions
-
       t.timestamps
     end
 

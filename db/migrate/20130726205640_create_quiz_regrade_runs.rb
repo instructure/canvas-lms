@@ -6,8 +6,6 @@ class CreateQuizRegradeRuns < ActiveRecord::Migration
       t.timestamp :started_at
       t.timestamp :finished_at
       t.timestamps
-
-      t.foreign_key :quiz_regrades
     end
   end
 
