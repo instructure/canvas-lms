@@ -80,25 +80,27 @@ define([
       updateModuleItemPositions: function(event, ui) {
         var $module = ui.item.parents(".context_module");
         var url = $module.find(".reorder_items_url").attr('href');
-        $module.find(".content").loadingImage();
         var items = [];
         $module.find(".context_module_items .context_module_item").each(function() {
           items.push($(this).getTemplateData({textValues: ['id']}).id);
         });
-        $.ajaxJSON(url, 'POST', {order: items.join(",")}, function(data) {
-          $module.find(".content").loadingImage('remove');
-          if(data && data.context_module && data.context_module.content_tags) {
-            for(var idx in data.context_module.content_tags) {
-              var tag = data.context_module.content_tags[idx].content_tag;
-              $module.find("#context_module_item_" + tag.id).fillTemplateData({
-                data: {position: tag.position}
-              });
+        $module.find(".context_module_items.ui-sortable").sortable('disable');
+        $module.disableWhileLoading(
+          $.ajaxJSON(url, 'POST', {order: items.join(",")}, function(data) {
+            if(data && data.context_module && data.context_module.content_tags) {
+              for(var idx in data.context_module.content_tags) {
+                var tag = data.context_module.content_tags[idx].content_tag;
+                $module.find("#context_module_item_" + tag.id).fillTemplateData({
+                  data: {position: tag.position}
+                });
+              }
             }
-          }
-        }, function(data) {
-          $module.find(".content").loadingImage('remove');
-          $module.find(".content").errorBox(I18n.t('errors.reorder', 'Reorder failed, please try again.'));
-        });
+            $module.find(".context_module_items.ui-sortable").sortable('enable');
+          }, function(data) {
+            $module.find(".content").loadingImage('remove');
+            $module.find(".content").errorBox(I18n.t('errors.reorder', 'Reorder failed, please try again.'));
+          })
+        );
       },
 
       refreshProgressions: function(show_links) {
@@ -804,17 +806,17 @@ define([
         options.submit = function(item_data) {
           var $module = $("#context_module_" + module.id);
           var $item = modules.addItemToModule($module, item_data);
-          $module.find(".context_module_items.ui-sortable").sortable('refresh');
+          $module.find(".context_module_items.ui-sortable").sortable('refresh').sortable('disable');
           var url = $module.find(".add_module_item_link").attr('rel');
-          $item.loadingImage({image_size: 'small'});
-          $.ajaxJSON(url, 'POST', item_data, function(data) {
-            $item.loadingImage('remove');
-            $item.remove();
-            data.content_tag.type = item_data['item[type]'];
-            modules.addItemToModule($module, data.content_tag);
-            $module.find(".context_module_items.ui-sortable").sortable('refresh');
-            modules.updateAssignmentData();
-          });
+          $module.disableWhileLoading(
+            $.ajaxJSON(url, 'POST', item_data, function(data) {
+              $item.remove();
+              data.content_tag.type = item_data['item[type]'];
+              modules.addItemToModule($module, data.content_tag);
+              $module.find(".context_module_items.ui-sortable").sortable('enable').sortable('refresh');
+              modules.updateAssignmentData();
+            })
+          );
         };
         INST.selectContentDialog(options);
       }
