@@ -13,7 +13,7 @@ class ReturnViewNull < HashView
   end
 
   def to_swagger
-    nil
+    "void"
   end
 end
 

@@ -61,7 +61,7 @@ class ArgumentView < HashView
     else
       case @http_verb.downcase
       when 'get', 'delete' then 'query'
-      when 'put', 'post' then   'body'
+      when 'put', 'post' then   'form'
       else
         raise "Unknown HTTP verb: #{@verb}"
       end
