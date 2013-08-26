@@ -258,9 +258,8 @@ define [
               message.author =
                 name: ENV.current_user.display_name
                 avatar_url: ENV.current_user.avatar_image_url
-              message.participating_user_ids = _.reject message.participating_user_ids, (id) ->
-                id == ENV.current_user_id
-              @trigger('addMessage', message, response)
+              message = new Message(response, parse: true)
+              @trigger('addMessage', message.toJSON().conversation.messages[0], response)
             @to = null
 
     recipientIdsChanged: (recipientIds) =>

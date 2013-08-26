@@ -13,9 +13,9 @@ define [
     tagName: 'div'
 
     addMessage: (message) =>
-      message.participants = _.map message.participating_user_ids, (id) =>
-        _.findWhere(@model.get('participants'), id: id).name
+      message.context_name = @model.messageCollection.last().get('context_name')
       @model.get('messages').unshift(message)
+      @model.trigger('change:messages')
       @render()
 
     render: ->
