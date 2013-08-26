@@ -1127,6 +1127,17 @@ describe Assignment do
       @quiz.state.should eql(:created)
     end
 
+    it "updates the draft state of its associated quiz" do
+      assignment_model(:course => @course, :submission_types => "online_quiz")
+      Account.default.enable_draft!
+      @a.reload
+      @a.publish
+      @a.save!
+      @a.quiz.reload.should be_published
+      @a.unpublish
+      @a.quiz.reload.should_not be_published
+    end
+
     it "should create a discussion_topic if none exists and specified" do
       course_model()
       assignment_model(:course => @course, :submission_types => "discussion_topic", :updating_user => @teacher)

@@ -4,8 +4,9 @@ require [
   'jquery'
   'compiled/models/Assignment',
   'compiled/views/PublishButtonView',
+  'compiled/views/assignments/SpeedgraderLinkView'
   'jquery.instructure_forms'
-], (INST, I18n, $, Assignment, PublishButtonView) ->
+], (INST, I18n, $, Assignment, PublishButtonView, SpeedgraderLinkView) ->
 
   $ ->
     $el = $('#assignment_publish_button')
@@ -16,6 +17,8 @@ require [
         published: $el.hasClass('published')
       model.doNotParse()
 
+      new SpeedgraderLinkView(model: model, el: '#assignment-speedgrader-link')
+        .render()
       new PublishButtonView(model: model, el: $el).render()
 
   # -- This is all for the _grade_assignment sidebar partial

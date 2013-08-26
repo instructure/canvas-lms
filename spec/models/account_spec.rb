@@ -1014,4 +1014,24 @@ describe Account do
       end
     end
   end
+
+  describe "enable_draft!" do
+
+    it "updates the enable_draft setting and saves the account" do
+      account = Account.create!
+      account.enable_draft!
+      account.root_account.should be_draft_state_enabled
+      account.should be_draft_state_enabled
+    end
+  end
+
+  describe "disable_draft!" do
+    it "updates the enable_draft setting and saves the account" do
+      account = Account.create!
+      account.disable_draft!
+      account.root_account.should_not be_draft_state_enabled
+      account.should_not be_draft_state_enabled
+    end
+  end
+
 end

@@ -162,8 +162,7 @@ describe "quizzes" do
     end
 
     it "should republish on save" do
-      Account.default.settings[:enable_draft] = true
-      Account.default.save!
+      Account.default.enable_draft!
       get "/courses/#{@course.id}/quizzes"
       expect_new_page_load { f(".new-quiz-link").click }
       quiz = Quiz.last
@@ -171,6 +170,9 @@ describe "quizzes" do
         click_save_settings_button
         wait_for_ajax_requests
       end
+
+      # Hides SpeedGrader link when unpublished
+      f('.icon-speed-grader').should be_nil
 
       f('#quiz-publish-link').should_not include_text("Published")
       f('#quiz-publish-link').should include_text("Publish")
@@ -190,6 +192,9 @@ describe "quizzes" do
         quiz.reload
         quiz.versions.length.should == 3
       }
+
+      # Shows speedgrader when published
+      f('.icon-speed-grader').should_not be_nil
     end
 
     it "should create a new question group" do

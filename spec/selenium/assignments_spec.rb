@@ -473,7 +473,7 @@ describe "assignments" do
 
     context "draft state" do
       before do
-        @course.root_account.tap{ |a| a.settings[:enable_draft] = true }.save!
+        @course.root_account.enable_draft!
         @course.require_assignment_group
       end
 
@@ -598,11 +598,20 @@ describe "assignments" do
           get "/courses/#{@course.id}/assignments/#{@assignment.id}"
           wait_for_ajaximations
 
+          def speedgrader_hidden?
+            driver.execute_script(
+              "return $('#assignment-speedgrader-link').hasClass('hidden')"
+            )
+          end
+
+          speedgrader_hidden?.should == true
+
           f("#assignment_publish_button").click
           wait_for_ajaximations
 
           @assignment.reload.should be_published
           f("#assignment_publish_button").text.should match "Published"
+          speedgrader_hidden?.should == false
         end
 
         it "should show publishing status on the edit page" do

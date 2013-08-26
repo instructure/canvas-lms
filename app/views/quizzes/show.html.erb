@@ -35,7 +35,7 @@
           </a>
         <% end %>
 
-        <% if (can_do(@quiz, @current_user, :grade) || can_do(@quiz, @current_user, :review_grades)) && @quiz.available? && @quiz.assignment && @context.allows_speed_grader? %>
+        <% if (can_do(@quiz, @current_user, :grade) || can_do(@quiz, @current_user, :review_grades)) && @quiz.available? && @quiz.assignment && @context.allows_speed_grader? && (@quiz.published? || !@context.root_account.enable_draft?) %>
           <li>
             <a target="_blank" href="<%= context_url(@context, :speed_grader_context_gradebook_url, :assignment_id => @quiz.assignment.id) %>">
               <i class="icon-speed-grader"></i> <%= t(:speed_grader, "SpeedGrader™") %>

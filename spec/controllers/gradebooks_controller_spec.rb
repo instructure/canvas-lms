@@ -497,5 +497,37 @@ describe GradebooksController do
       response.should be_redirect
       response.flash[:notice].should == 'SpeedGrader is disabled for this course'
     end
+
+    context "draft state" do
+
+      before do
+        course_with_teacher_logged_in(active_all: true)
+        @assign = @course.assignments.create!(title: 'Totally')
+        @assign.unpublish
+      end
+
+      it "redirects if draft state is enabled and the assignment is unpublished" do
+
+        # Unpublished assignment and draft state enabled
+        @course.account.enable_draft!
+
+        get 'speed_grader', course_id: @course, assignment_id: @assign.id
+        response.should be_redirect
+        response.flash[:notice].should == I18n.t(
+          :speedgrader_enabled_only_for_published_content,
+                           'Speedgrader is enabled only for published content.')
+
+        # Published assignment and draft state enabled
+        @assign.publish
+        get 'speed_grader', course_id: @course, assignment_id: @assign.id
+        response.should_not be_redirect
+      end
+
+      it "does not redirect if draft state isn't enabled" do
+        get 'speed_grader', course_id: @course, assignment_id: @assign.id
+        response.should_not be_redirect
+      end
+
+    end
   end
 end

@@ -1333,4 +1333,14 @@ class Account < ActiveRecord::Base
     migration.workflow_state = :imported
     migration.save
   end
+
+  def enable_draft!
+    root_account.settings[:enable_draft] = true
+    root_account.save!
+  end
+
+  def disable_draft!
+    root_account.settings[:enable_draft] = false
+    root_account.save!
+  end
 end

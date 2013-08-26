@@ -1128,4 +1128,18 @@ describe Quiz do
       @quiz.current_quiz_question_regrades.should == [rq]
     end
   end
+
+  context "draft_state" do
+
+    it "updates the assignment's workflow state" do
+      @quiz = @course.quizzes.create!(title: 'Test Quiz')
+      @quiz.context.root_account.enable_draft!
+      @quiz.publish!
+      @quiz.unpublish!
+      @quiz.assignment.should_not be_published
+      @quiz.publish!
+      @quiz.assignment.should be_published
+    end
+
+  end
 end
