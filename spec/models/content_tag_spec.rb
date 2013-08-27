@@ -259,6 +259,17 @@ describe ContentTag do
     test_url_validation(ContentTag.create!(:content => quiz, :context => @course))
   end
 
+  it "should touch the module after committing the save" do
+    course
+    mod = @course.context_modules.create!
+    yesterday = 1.day.ago
+    ContextModule.where(:id => mod).update_all(:updated_at => yesterday)
+    tag = mod.add_item :type => 'context_module_sub_header', :title => 'blah'
+    mod.reload.updated_at.to_i.should == yesterday.to_i
+    run_transaction_commit_callbacks
+    mod.reload.updated_at.should > 5.seconds.ago
+  end
+
   it "should allow skipping touches on save" do
     course
     @assignment = @course.assignments.create!(:title => "some assignment")
@@ -268,6 +279,7 @@ describe ContentTag do
       :title => 'some assignment (renamed)',
       :id => @assignment.id
     })
+    run_transaction_commit_callbacks
     @tag.update_asset_name!
     @tag.reload
 
@@ -276,7 +288,9 @@ describe ContentTag do
 
     @tag.skip_touch = true
     @tag.save
+    run_transaction_commit_callbacks
 
     @module.reload.updated_at.to_i.should == yesterday.to_i
   end
+
 end

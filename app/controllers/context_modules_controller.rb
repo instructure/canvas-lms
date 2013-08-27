@@ -325,8 +325,7 @@ class ContextModulesController < ApplicationController
   def add_item
     @module = @context.context_modules.not_deleted.find(params[:context_module_id])
     if authorized_action(@module, @current_user, :update)
-      @tag = @module.add_item(params[:item]) #@item)
-      @module.touch
+      @tag = @module.add_item(params[:item])
       render :json => @tag.to_json
     end
   end
@@ -336,7 +335,6 @@ class ContextModulesController < ApplicationController
     if authorized_action(@tag.context_module, @current_user, :update)
       @module = @tag.context_module
       @tag.destroy
-      @module.touch
       render :json => @tag.to_json
     end
   end

@@ -42,7 +42,7 @@ class ContentTag < ActiveRecord::Base
   validates_length_of :comments, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   before_save :default_values
   after_save :update_could_be_locked
-  after_save :touch_context_module
+  after_save :touch_context_module_after_transaction
   after_save :touch_context_if_learning_outcome
   include CustomValidations
   validates_as_url :url
@@ -71,8 +71,16 @@ class ContentTag < ActiveRecord::Base
 
   attr_accessor :skip_touch
   def touch_context_module
-    ContentTag.touch_context_modules([self.context_module_id]) unless skip_touch.present?
+    return true if skip_touch.present?
+    ContentTag.touch_context_modules([self.context_module_id])
   end
+
+  def touch_context_module_after_transaction
+    connection.after_transaction_commit {
+      touch_context_module
+    }
+  end
+  private :touch_context_module_after_transaction
   
   def self.touch_context_modules(ids=[])
     ContextModule.where(:id => ids).update_all(:updated_at => Time.now.utc) unless ids.empty?
