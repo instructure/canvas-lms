@@ -8,9 +8,16 @@ module DataFixup::FilterPageViewUrlParams
   end
 
   def self.run_for_db
-    PageView.select("request_id, url, created_at").find_each do |pv|
-      pv.url = LoggingFilter.filter_uri(pv.url)
-      PageView.where(request_id: pv.request_id).update_all(url: pv.url) if pv.url_changed?
+    scope = PageView.select("request_id, url, created_at").order('request_id').limit(batch_size)
+    records = scope.all
+    while records.any?
+      last_request_id = nil
+      records.each do |pv|
+        pv.url = LoggingFilter.filter_uri(pv.url)
+        PageView.where(request_id: pv.request_id).update_all(url: pv.url) if pv.url_changed?
+      end
+      last_request_id = records.last.request_id
+      records = scope.where("request_id > ?", last_request_id).all
     end
   end
 

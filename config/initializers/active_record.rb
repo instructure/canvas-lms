@@ -497,7 +497,7 @@ class ActiveRecord::Base
 
   def self.find_in_batches_with_usefulness(options = {}, &block)
     # already in a transaction (or transactions don't matter); cursor is fine
-    if connection.adapter_name == 'PostgreSQL' && (Shackles.environment == :slave || connection.open_transactions > 0)
+    if connection.adapter_name == 'PostgreSQL' && (Shackles.environment == :slave || connection.open_transactions > (Rails.env.test? ? 1 : 0))
       shard = scope(:find, :shard)
       if shard
         shard.activate(shard_category) { find_in_batches_with_cursor(options, &block) }
