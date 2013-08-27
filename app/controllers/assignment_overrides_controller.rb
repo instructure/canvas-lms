@@ -29,40 +29,40 @@
 #       // release.
 #
 #       // the ID of the assignment override
-#       id: 4,
+#       "id": 4,
 #
 #       // the ID of the assignment the override applies to
-#       assignment_id: 123,
+#       "assignment_id": 123,
 #
 #       // the IDs of the override's target students (present if the override
 #       // targets an adhoc set of students)
-#       student_ids: [1, 2, 3],
+#       "student_ids": [1, 2, 3],
 #
 #       // the ID of the override's target group (present if the override
 #       // targets a group and the assignment is a group assignment)
-#       group_id: 2,
+#       "group_id": 2,
 #
 #       // the ID of the overrides's target section (present if the override
 #       // targets a section)
-#       course_section_id: 1
+#       "course_section_id": 1,
 #
 #       // the title of the override
-#       title: "an assignment override",
+#       "title": "an assignment override",
 #
 #       // the overridden due at (present if due_at is overridden)
-#       due_at: "2012-07-01T23:59:00-06:00",
+#       "due_at": "2012-07-01T23:59:00-06:00",
 #
 #       // the overridden all day flag (present if due_at is overridden)
-#       all_day: true,
+#       "all_day": true,
 #
 #       // the overridden all day date (present if due_at is overridden)
-#       all_day_date: "2012-07-01",
+#       "all_day_date": "2012-07-01",
 #
 #       // the overridden unlock at (present if unlock_at is overridden)
-#       unlock_at: "2012-07-01T23:59:00-06:00",
+#       "unlock_at": "2012-07-01T23:59:00-06:00",
 #
 #       // the overridden lock at, if any (present if lock_at is overridden)
-#       lock_at: "2012-07-01T23:59:00-06:00"
+#       "lock_at": "2012-07-01T23:59:00-06:00"
 #     }
 #
 class AssignmentOverridesController < ApplicationController

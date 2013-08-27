@@ -24,89 +24,89 @@
 # @object Page
 #     {
 #       // the unique locator for the page
-#       url: "my-page-title",
+#       "url": "my-page-title",
 #
 #       // the title of the page
-#       title: "My Page Title",
+#       "title": "My Page Title",
 #
 #       // the creation date for the page
-#       created_at: "2012-08-06T16:46:33-06:00",
+#       "created_at": "2012-08-06T16:46:33-06:00",
 #
 #       // the date the page was last updated
-#       updated_at: "2012-08-08T14:25:20-06:00",
+#       "updated_at": "2012-08-08T14:25:20-06:00",
 #
 #       // whether this page is hidden from students
 #       // (note: students will never see this true; pages hidden from them will be omitted from results)
-#       hide_from_students: false,
+#       "hide_from_students": false,
 #
 #       // roles allowed to edit the page; comma-separated list comprising a combination of
 #       // 'teachers', 'students', and/or 'public'
 #       // if not supplied, course defaults are used
-#       editing_roles: "teachers,students",
+#       "editing_roles": "teachers,students",
 #
 #       // the User who last edited the page
 #       // (this may not be present if the page was imported from another system)
-#       last_edited_by: { 
-#         id: 133,
-#         display_name: "Rey del Pueblo",
-#         avatar_image_url: "https://canvas.example.com/images/thumbnails/bm90aGluZyBoZXJl",
-#         html_url: "https://canvas.example.com/courses/789/users/133"
+#       "last_edited_by": { 
+#         "id": 133,
+#         "display_name": "Rey del Pueblo",
+#         "avatar_image_url": "https://canvas.example.com/images/thumbnails/bm90aGluZyBoZXJl",
+#         "html_url": "https://canvas.example.com/courses/789/users/133"
 #       },
 #
 #       // the page content, in HTML
 #       // (present when requesting a single page; omitted when listing pages)
-#       body: "<p>Page Content</p>",
+#       "body": "<p>Page Content</p>",
 #
 #       // whether the page is published
-#       published: true,
+#       "published": true,
 #
 #       // whether this page is the front page for the wiki
-#       front_page: false,
+#       "front_page": false,
 #
 #       // Whether or not this is locked for the user.
-#       locked_for_user: false,
+#       "locked_for_user": false,
 #
 #       // (Optional) Information for the user about the lock. Present when locked_for_user is true.
-#       lock_info: {
+#       "lock_info": {
 #         // Asset string for the object causing the lock
-#         asset_string: "wiki_page_1",
+#         "asset_string": "wiki_page_1",
 #
 #         // (Optional) Context module causing the lock.
-#         context_module: { ... }
+#         "context_module": {}
 #       },
 #
 #       // (Optional) An explanation of why this is locked for the user. Present when locked_for_user is true.
-#       lock_explanation: "This page is locked until September 1 at 12:00am"
+#       "lock_explanation": "This page is locked until September 1 at 12:00am"
 #     }
 #
 # @object PageRevision
 #     {
 #       // an identifier for this revision of the page
-#       revision_id: 7,
+#       "revision_id": 7,
 #
 #       // the time when this revision was saved
-#       updated_at: '2012-08-07T11:23:58-06:00',
+#       "updated_at": "2012-08-07T11:23:58-06:00",
 #
 #       // the User who saved this revision, if applicable
 #       // (this may not be present if the page was imported from another system)
-#       edited_by: {
-#         id: 1123,
-#         display_name: "Leonardo Fibonacci",
-#         avatar_image_url: "https://canvas.example.com/images/thumbnails/bWVhbmluZ2xlc3M=",
-#         html_url: "https://canvas.example.com/courses/789/users/1123"
-#       }
+#       "edited_by": {
+#         "id": 1123,
+#         "display_name": "Leonardo Fibonacci",
+#         "avatar_image_url": "https://canvas.example.com/images/thumbnails/bWVhbmluZ2xlc3M=",
+#         "html_url": "https://canvas.example.com/courses/789/users/1123"
+#       },
 #
 #       // the following fields are not included in the index action
 #       // and may be omitted from the show action via summary=1
 #
 #       // the historic url of the page
-#       url: "old-page-title",
+#       "url": "old-page-title",
 #
 #       // the historic page title
-#       title: "Old Page Title",
+#       "title": "Old Page Title",
 #
 #       // the historic page contents
-#       body: "<p>Old Page Content</p>"
+#       "body": "<p>Old Page Content</p>"
 #     }
 class WikiPagesApiController < ApplicationController
   before_filter :require_context

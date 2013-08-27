@@ -44,12 +44,12 @@
 #       // an abbreviated OutcomeGroup object representing the parent group of
 #       // this outcome group, if any. omitted in the abbreviated form.
 #       "parent_outcome_group": {
-#         "id": ...,
-#         "url": ...,
-#         "title": ...,
-#         "subgroups_url": ...,
-#         "outcomes_url": ...,
-#         "can_edit": ...
+#         "id": 1337,
+#         "url": "http://...",
+#         "title": "title",
+#         "subgroups_url": "http://...",
+#         "outcomes_url": "http://...",
+#         "can_edit": true
 #       },
 #
 #       // the context owning the outcome group. may be null for global outcome
@@ -83,7 +83,6 @@
 #     }
 #
 # @object OutcomeLink
-#
 #     {
 #       // the URL for fetching/updating the outcome link. should be treated as
 #       // opaque
@@ -99,24 +98,24 @@
 #       // the outcome link.
 #       "outcome_group": {
 #         "id": 1,
-#         "url": ...,
-#         "title": ...,
-#         "vendor_guid": ...,
-#         "subgroups_url": ...,
-#         "outcomes_url": ...,
-#         "can_edit": ...
+#         "url": "http://...",
+#         "title": "title",
+#         "vendor_guid": "af827ef88a",
+#         "subgroups_url": "http://...",
+#         "outcomes_url": "http://...",
+#         "can_edit": true
 #       },
 #
 #       // an abbreviated Outcome object representing the outcome linked into
 #       // the containing outcome group.
 #       "outcome": {
 #         "id": 1,
-#         "url": ...,
-#         "vendor_guid": ...,
-#         "context_id": ...,
-#         "context_type": ...,
-#         "title": ...,
-#         "can_edit": ...
+#         "url": "http://...",
+#         "vendor_guid": "af827ef88a",
+#         "context_id": 3392,
+#         "context_type": "Course",
+#         "title": "title",
+#         "can_edit": true
 #       }
 #     }
 #

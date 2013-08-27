@@ -40,10 +40,10 @@
 #
 #     {
 #       // The ID of the collection item.
-#       id: 7,
+#       "id": 7,
 #
 #       // The ID of the collection that this item belongs to.
-#       collection_id: 2,
+#       "collection_id": 2,
 #
 #       // The type of the item.
 #       // Currently defined types are: "url", "image", "audio", and "video".
@@ -55,78 +55,78 @@
 #       //
 #       // "image", "audio" and "video" are URLs either directly to a file of that mime type, or
 #       // to a web page that was determined to contain that type as its main content.
-#       item_type: "url",
+#       "item_type": "url",
 #
 #       // The link to the item. For item type of "url", this is the entire
 #       // contents of the collection item. For other item types, this may be a
 #       // web preview or other representation of the item data.
-#       link_url: "https://example.com/some/path",
+#       "link_url": "https://example.com/some/path",
 #
 #       // The number of posts of this item, including the original. This count
 #       // is shared between the original item and all clones.
-#       post_count: 2,
+#       "post_count": 2,
 #
 #       // The number of users who have voted up this item. This count is
 #       // shared between the original item and all clones.
-#       upvote_count: 3,
+#       "upvote_count": 3,
 #
 #       // Boolean indicating whether this user has upvoted this item (or any of its clones)
-#       upvoted_by_user: false,
+#       "upvoted_by_user": false,
 #
 #       // If this item was cloned from another item, this will be the ID of
 #       // the first, original item that all clones are derived from.
 #       // In other words, if item 7 was cloned from item 5, and
 #       // 5 was cloned from item 3, and 3 is the original, then the
 #       // root_item_id of items 7, 5 and 3 will all be 3.
-#       root_item_id: 3,
+#       "root_item_id": 3,
 #
 #       // An image representation of the collection item. This will be in a
 #       // common web format such as png or jpeg. The resolution and geometry may depend on
 #       // the item, but Canvas will attempt to make it 640 pixels wide
 #       // when possible.
-#       image_url: "https://<canvas>/files/item_image.png",
+#       "image_url": "https://<canvas>/files/item_image.png",
 #
 #       // If true, the image for this item is still being processed and
 #       // image_url will be null. Check back later.
 #       // If image_url is null but image_pending is false, the item has no image.
-#       image_pending: false,
+#       "image_pending": false,
 #
 #       // The title of the item.
-#       title: "My Image",
+#       "title": "My Image",
 #
 #       // The description of the item. This is plain text.
-#       description: "some block of plain text",
+#       "description": "some block of plain text",
 #
 #       // Any user-provided comments on the item. A user can add their own
 #       // comments when cloning an existing item. This is plain text.
-#       user_comment: "some block of plain text",
+#       "user_comment": "some block of plain text",
 #
 #       // A snippet of HTML that can be used as an in-line preview of the
 #       // item. For example, a link to a youtube page may have an iframe inline
 #       // embed of the video.
 #       // If no preview is available, this field will be null.
-#       html_preview: "<iframe>...</iframe>",
+#       "html_preview": "<iframe>...</iframe>",
 #
 #       // The API URL for this item. Used to clone the collection item.
-#       url: "https://<canvas>/api/v1/collections/items/7"
+#       "url": "https://<canvas>/api/v1/collections/items/7",
 #
 #       // The timestamp of when the item was posted by the user
-#       created_at: "2012-05-30T17:45:25Z",
+#       "created_at": "2012-05-30T17:45:25Z",
 #
 #       // Information on the user that created the collection item.
-#       user : {
+#       "user" : {
 #         // The ID of the user.
-#         id: 37,
+#         "id": 37,
 #
 #         // The display name of the user.
-#         display_name: "John Doe",
+#         "display_name": "John Doe",
 #
 #         // The URL of the user's avatar image, or a fallback image if the user has not given one.
-#         avatar_image_url: "http://...",
+#         "avatar_image_url": "http://...",
 #
 #         // The URL to the HTML page in Canvas of this user's public profile.
-#         html_url: "http://<canvas>/users/37"
-#       },
+#         "html_url": "http://<canvas>/users/37"
+#       }
 #     }
 class CollectionItemsController < ApplicationController
   before_filter :require_collection, :only => [:index, :create]

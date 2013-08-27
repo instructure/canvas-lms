@@ -25,36 +25,36 @@
 # @object CommMessage
 #     {
 #       // The ID of the CommMessage.
-#       id: 42,
+#       "id": 42,
 #
 #       // The date and time this message was created
-#       created_at: "2013-03-19T21:00:00Z"
+#       "created_at": "2013-03-19T21:00:00Z",
 #
 #       // The date and time this message was sent
-#       sent_at: "2013-03-20T22:42:00Z"
+#       "sent_at": "2013-03-20T22:42:00Z",
 #
 #       // The workflow state of the message.
 #       // One of "created", "staged", "sending", "sent", "bounced",
 #       // "dashboard", "cancelled", or "closed"
-#       workflow_state: "sent"
+#       "workflow_state": "sent",
 #
 #       // The address that was put in the "from" field of the message
-#       from: "notifications@example.com"
+#       "from": "notifications@example.com",
 #
 #       // The address the message was sent to:
-#       to: "someone@example.com"
+#       "to": "someone@example.com",
 #
 #       // The reply_to header of the message
-#       reply_to: "notifications+specialdata@example.com"
+#       "reply_to": "notifications+specialdata@example.com",
 #
 #       // The message subject
-#       subject: "example subject line"
+#       "subject": "example subject line",
 #
 #       // The plain text body of the message
-#       body: "This is the body of the message"
+#       "body": "This is the body of the message",
 #
 #       // The HTML body of the message.
-#       html_body: "<html><body>This is the body of the message</body></html>"
+#       "html_body": "<html><body>This is the body of the message</body></html>"
 #     }
 class CommMessagesApiController < ApplicationController
   include Api::V1::CommMessage

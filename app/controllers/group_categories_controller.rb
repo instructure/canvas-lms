@@ -25,15 +25,15 @@
 # @object Group Category
 #     {
 #       // The ID of the group category.
-#       id: 17,
+#       "id": 17,
 #
 #       // The display name of the group category.
-#       name: "Math Groups",
+#       "name": "Math Groups",
 #
 #       // Certain types of group categories have special role designations. Currently,
 #       // these include: "communities", "student_organized", and "imported".
 #       // Regular course/account group categories have a role of null.
-#       role: "communities",
+#       "role": "communities",
 #
 #       // If the group category allows users to join a group themselves, thought they may
 #       // only be a member of one group per group category at a time.
@@ -41,18 +41,18 @@
 #       // "enabled" allows students to assign themselves to a group
 #       // "restricted" restricts them to only joining a group in their section
 #       // null disallows students from joining groups
-#       self_signup: null,
+#       "self_signup": null,
 #
 #       // The course or account that the category group belongs to. The pattern here is
 #       // that whatever the context_type is, there will be an _id field named
 #       // after that type. So if instead context_type was "Course", the
 #       // course_id field would be replaced by an course_id field.
-#       context_type: "Account",
-#       account_id: 3,
+#       "context_type": "Account",
+#       "account_id": 3,
 #
 #       // If self-signup is enabled, group_limit can be set to cap the number of users
 #       // in each group. If null, there is no limit.
-#       group_limit: null
+#       "group_limit": null,
 #
 #       // If the group category has not yet finished a randomly student assignment request,
 #       // a progress object will be attached, which will contain information related to the
@@ -71,7 +71,6 @@
 #            "workflow_state": "running",
 #            "url": "http://localhost:3000/api/v1/progress/217"
 #        }
-#
 #     }
 #
 class GroupCategoriesController < ApplicationController

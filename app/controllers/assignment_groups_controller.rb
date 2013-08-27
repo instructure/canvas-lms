@@ -23,26 +23,26 @@
 # @object Assignment Group
 #     {
 #       // the id of the Assignment Group
-#       id: 1,
+#       "id": 1,
 #
 #       // the name of the Assignment Group
-#       name: "group2",
+#       "name": "group2",
 #
 #       // the position of the Assignment Group
-#       position: 7,
+#       "position": 7,
 #
 #       // the weight of the Assignment Group
-#       group_weight: 20,
+#       "group_weight": 20,
 #
 #       // the assignments in this Assignment Group
 #       // (see the Assignment API for a detailed list of fields)
-#       assingments: { ... },
+#       "assignments": [],
 #
 #       // the grading rules that this Assignment Group has
-#       rules: {
-#         "drop_lowest" => 1,
-#         "drop_highest" => 1,
-#         "never_drop" => [33,17,24]
+#       "rules": {
+#         "drop_lowest": 1,
+#         "drop_highest": 1,
+#         "never_drop": [33,17,24]
 #       }
 #     }
 #

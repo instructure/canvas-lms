@@ -22,13 +22,13 @@
 # @object Collaborator
 #   {
 #     // The unique user or group identifier for the collaborator.
-#     id: 12345,
+#     "id": 12345,
 #
 #     // The type of collaborator (e.g. "user" or "group").
-#     type: "user",
+#     "type": "user",
 #
 #     // The name of the collaborator.
-#     name: "Don Draper"
+#     "name": "Don Draper"
 #   }
 
 class CollaborationsController < ApplicationController

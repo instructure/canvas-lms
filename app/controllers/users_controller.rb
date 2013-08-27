@@ -80,7 +80,7 @@
 #       // Optional: This field is only returned in ceratin API calls, and will
 #       // return the IANA time zone name of
 #       // the user's preferred timezone
-#       "time_zone": "America/Denver",
+#       "time_zone": "America/Denver"
 #     }
 class UsersController < ApplicationController
 

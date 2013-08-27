@@ -21,102 +21,102 @@
 # @object Quiz
 #     {
 #       // the ID of the quiz
-#       id: 5,
+#       "id": 5,
 #
 #       // the title of the quiz
-#       title: "Hamlet Act 3 Quiz",
+#       "title": "Hamlet Act 3 Quiz",
 #
 #       // the HTTP/HTTPS URL to the quiz
-#       html_url: "http://canvas.example.edu/courses/1/quizzes/2",
+#       "html_url": "http://canvas.example.edu/courses/1/quizzes/2",
 #
 #       // a url suitable for loading the quiz in a mobile webview.  it will
 #       // persiste the headless session and, for quizzes in public courses, will
 #       // force the user to login
-#       mobile_url: "http://canvas.example.edu/courses/1/quizzes/2?persist_healdess=1&force_user=1",
+#       "mobile_url": "http://canvas.example.edu/courses/1/quizzes/2?persist_healdess=1&force_user=1",
 #
 #       // the description of the quiz
-#       description: "This is a quiz on Act 3 of Hamlet",
+#       "description": "This is a quiz on Act 3 of Hamlet",
 #
 #       // type of quiz
 #       // possible values: "practice_quiz", "assignment", "graded_survey", "survey"
-#       quiz_type: "assignment",
+#       "quiz_type": "assignment",
 #
 #       // the ID of the quiz's assignment group:
-#       assignment_group_id: 3,
+#       "assignment_group_id": 3,
 #
 #       // quiz time limit in minutes
-#       time_limit: 5,
+#       "time_limit": 5,
 #
 #       // shuffle answers for students?
-#       shuffle_answers: false,
+#       "shuffle_answers": false,
 #
 #       // let students see their quiz responses?
 #       // possible values: null, "always", "until_after_last_attempt"
-#       hide_results: "always",
+#       "hide_results": "always",
 #
 #       // show which answers were correct when results are shown?
 #       // only valid if hide_results=null
-#       show_correct_answers: true,
+#       "show_correct_answers": true,
 #
 #       // which quiz score to keep (only if allowed_attempts != 1)
 #       // possible values: "keep_highest", "keep_latest"
-#       scoring_policy: "keep_highest",
+#       "scoring_policy": "keep_highest",
 #
 #       // how many times a student can take the quiz
 #       // -1 = unlimited attempts
-#       allowed_attempts: 3,
+#       "allowed_attempts": 3,
 #
 #       // show one question at a time?
-#       one_question_at_a_time: false,
+#       "one_question_at_a_time": false,
 #
 #       // the number of questions in the quiz
-#       question_count: 12,
+#       "question_count": 12,
 # 
 #       // The total point value given to the quiz
-#       points_possible: 20,
+#       "points_possible": 20,
 #
 #       // lock questions after answering?
 #       // only valid if one_question_at_a_time=true
-#       cant_go_back: false,
+#       "cant_go_back": false,
 #
 #       // access code to restrict quiz access
-#       access_code: "2beornot2be",
+#       "access_code": "2beornot2be",
 #
 #       // IP address or range that quiz access is limited to
-#       ip_filter: "123.123.123.123",
+#       "ip_filter": "123.123.123.123",
 #
 #       // when the quiz is due
-#       due_at: "2013-01-23T23:59:00-07:00",
+#       "due_at": "2013-01-23T23:59:00-07:00",
 #
 #       // when to lock the quiz
-#       lock_at: null,
+#       "lock_at": null,
 #
 #       // when to unlock the quiz
-#       unlock_at: "2013-01-21T23:59:00-07:00",
+#       "unlock_at": "2013-01-21T23:59:00-07:00",
 #
 #       // whether the quiz has a published or unpublished draft state.
-#       published: true,
+#       "published": true,
 #
 #       // Whether or not this is locked for the user.
-#       locked_for_user: false,
+#       "locked_for_user": false,
 #
 #       // (Optional) Information for the user about the lock. Present when locked_for_user is true.
-#       lock_info: {
+#       "lock_info": {
 #         // Asset string for the object causing the lock
-#         asset_string: "quiz_5",
+#         "asset_string": "quiz_5",
 #
 #         // (Optional) Time at which this was/will be unlocked.
-#         unlock_at: "2013-01-01T00:00:00-06:00",
+#         "unlock_at": "2013-01-01T00:00:00-06:00",
 #
 #         // (Optional) Time at which this was/will be locked.
-#         lock_at: "2013-02-01T00:00:00-06:00",
+#         "lock_at": "2013-02-01T00:00:00-06:00",
 #
 #         // (Optional) Context module causing the lock.
-#         context_module: { ... }
+#         "context_module": {}
 #       },
 #
 #       // (Optional) An explanation of why this is locked for the user. Present when locked_for_user is true.
-#       lock_explanation: "This quiz is locked until September 1 at 12:00am"
+#       "lock_explanation": "This quiz is locked until September 1 at 12:00am"
 #     }
 #
 class QuizzesApiController < ApplicationController

@@ -22,66 +22,65 @@
 # @object Module Item
 #     {
 #       // the unique identifier for the module item
-#       id: 768,
+#       "id": 768,
 #
 #       // the id of the Module this item appears in
-#       module_id: 123,
+#       "module_id": 123,
 #
 #       // the position of this item in the module (1-based)
-#       position: 1,
+#       "position": 1,
 #
 #       // the title of this item
-#       title: "Square Roots: Irrational numbers or boxy vegetables?",
+#       "title": "Square Roots: Irrational numbers or boxy vegetables?",
 #
 #       // 0-based indent level; module items may be indented to show a hierarchy
-#       indent: 0,
+#       "indent": 0,
 #
 #       // the type of object referred to
 #       // one of "File", "Page", "Discussion", "Assignment", "Quiz", "SubHeader",
 #       // "ExternalUrl", "ExternalTool"
-#       type: "Assignment",
+#       "type": "Assignment",
 #
 #       // the id of the object referred to
 #       // applies to "File", "Discussion", "Assignment", "Quiz", "ExternalTool" types
-#       content_id: 1337,
+#       "content_id": 1337,
 #
 #       // link to the item in Canvas
-#       html_url: "https://canvas.example.edu/courses/222/modules/items/768",
+#       "html_url": "https://canvas.example.edu/courses/222/modules/items/768",
 #
 #       // (Optional) link to the Canvas API object, if applicable
-#       url: "https://canvas.example.edu/api/v1/courses/222/assignments/987",
+#       "url": "https://canvas.example.edu/api/v1/courses/222/assignments/987",
 #
 #       // (only for 'Page' type) unique locator for the linked wiki page
-#       page_url: "my-page-title"
+#       "page_url": "my-page-title",
 #
 #       // (only for 'ExternalUrl' and 'ExternalTool' types) external url that the item points to
-#       external_url: "https://www.example.com/externalurl",
+#       "external_url": "https://www.example.com/externalurl",
 #
 #       // (only for 'ExternalTool' type) whether the external tool opens in a new tab
-#       new_tab: false,
+#       "new_tab": false,
 #
 #       // Completion requirement for this module item
-#       completion_requirement: {
+#       "completion_requirement": {
 #         // one of "must_view", "must_submit", "must_contribute", "min_score"
-#         type: "min_score",
+#         "type": "min_score",
 #
 #         // minimum score required to complete (only present when type == 'min_score')
-#         min_score: 10,
+#         "min_score": 10,
 #
 #         // whether the calling user has met this requirement
 #         // (Optional; present only if the caller is a student)
-#         completed: true
+#         "completed": true
 #       },
 #
 #       // (Present only if requested through include[]=content_details)
 #       // If applicable, returns additional details specific to the associated object
-#       content_details: {
-#         points_possible: 20,
-#         due_at: "2012-12-31T06:00:00-06:00",
-#         unlock_at: "2012-12-31T06:00:00-06:00",
-#         lock_at: "2012-12-31T06:00:00-06:00"
+#       "content_details": {
+#         "points_possible": 20,
+#         "due_at": "2012-12-31T06:00:00-06:00",
+#         "unlock_at": "2012-12-31T06:00:00-06:00",
+#         "lock_at": "2012-12-31T06:00:00-06:00"
 #       }
-#
 #     }
 #
 #
@@ -89,52 +88,48 @@
 #     {
 #       // an array containing one hash for each appearence of the asset in the module sequence
 #       // (up to 10 total)
-#       items:
-#         [
-#           {
-#             // the ModuleItem for the previous asset in the sequence, if present
-#             // this is the previous asset in the module, or the last asset in the previous module,
-#             // or null if this is the first module item in the course sequence
-#             prev: null,
+#       "items": [
+#         {
+#           // the ModuleItem for the previous asset in the sequence, if present
+#           // this is the previous asset in the module, or the last asset in the previous module,
+#           // or null if this is the first module item in the course sequence
+#           "prev": null,
 #
-#             // the ModuleItem for the requested asset
-#             current:
-#               {
-#                 id: 768,
-#                 module_id: 123,
-#                 title: "A lonely page",
-#                 type: "Page",
-#                 ...
-#               },
+#           // the ModuleItem for the requested asset
+#           "current": {
+#             "id": 768,
+#             "module_id": 123,
+#             "title": "A lonely page",
+#             "type": "Page"
+#             // ...
+#           },
 #
-#             // the ModuleItem for the next asset in the sequence, if present
-#             // this is the next asset in the module, or the first asset in the next module,
-#             // or null if this is the last module item in the course sequence
-#             next:
-#               {
-#                 id: 769,
-#                 module_id: 127,
-#                 title: "Project 1",
-#                 type: "Assignment",
-#                 ...
-#               }
+#           // the ModuleItem for the next asset in the sequence, if present
+#           // this is the next asset in the module, or the first asset in the next module,
+#           // or null if this is the last module item in the course sequence
+#           "next": {
+#             "id": 769,
+#             "module_id": 127,
+#             "title": "Project 1",
+#             "type": "Assignment"
+#             // ...
 #           }
-#         ],
+#         }
+#       ],
 #
 #       // an array containing each Module referenced above
-#       modules:
-#         [
-#           {
-#             id: 123,
-#             name: "Module A",
-#             ...
-#           },
-#           {
-#             id: 127,
-#             name: "Module B",
-#             ...
-#           }
-#         ]
+#       "modules": [
+#         {
+#           "id": 123,
+#           "name": "Module A"
+#           // ...
+#         },
+#         {
+#           "id": 127,
+#           "name": "Module B"
+#           // ...
+#         }
+#       ]
 #     }
 class ContextModuleItemsApiController < ApplicationController
   before_filter :require_context

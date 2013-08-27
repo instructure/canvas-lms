@@ -28,44 +28,45 @@
 # @object Module
 #     {
 #       // the unique identifier for the module
-#       id: 123,
+#       "id": 123,
+#
 #       // the state of the module: active, deleted
-#       workflow_state: active,
+#       "workflow_state": "active",
 #
 #       // the position of this module in the course (1-based)
-#       position: 2,
+#       "position": 2,
 #
 #       // the name of this module
-#       name: "Imaginary Numbers and You",
+#       "name": "Imaginary Numbers and You",
 #
 #       // (Optional) the date this module will unlock
-#       unlock_at: "2012-12-31T06:00:00-06:00",
+#       "unlock_at": "2012-12-31T06:00:00-06:00",
 #
 #       // Whether module items must be unlocked in order
-#       require_sequential_progress: true,
+#       "require_sequential_progress": true,
 #
 #       // IDs of Modules that must be completed before this one is unlocked
-#       prerequisite_module_ids: [121, 122],
+#       "prerequisite_module_ids": [121, 122],
 #
 #       // The number of items in the module
-#       items_count: 10,
+#       "items_count": 10,
 #
 #       // The API URL to retrive this module's items
-#       items_url: 'https://canvas.example.com/api/v1/modules/123/items',
+#       "items_url": "https://canvas.example.com/api/v1/modules/123/items",
 #
-#       items: [ ... ]
 #       // The contents of this module, as an array of Module Items.
 #       // (Present only if requested via include[]=items
 #       //  AND the module is not deemed too large by Canvas.)
+#       "items": [],
 #
 #       // The state of this Module for the calling user
 #       // one of 'locked', 'unlocked', 'started', 'completed'
 #       // (Optional; present only if the caller is a student)
-#       state: 'started',
+#       "state": "started",
 #
 #       // the date the calling user completed the module
 #       // (Optional; present only if the caller is a student)
-#       completed_at: nil
+#       "completed_at": null
 #     }
 class ContextModulesApiController < ApplicationController
   before_filter :require_context  

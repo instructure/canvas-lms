@@ -24,10 +24,10 @@
 #       assignment_id: 23,
 #
 #       // The submission's assignment (see the assignments API) (optional)
-#       assignment: Assignment
+#       assignment: Assignment,
 #
 #       // The submission's course (see the course API) (optional)
-#       course: Course
+#       course: Course,
 #
 #       // This is the submission attempt number.
 #       attempt: 1,
@@ -51,7 +51,7 @@
 #       preview_url: "http://example.com/courses/255/assignments/543/submissions/134?preview=1",
 #
 #       // The raw score
-#       score: 13.5
+#       score: 13.5,
 #
 #       // Associated comments for a submission (optional)
 #       submission_comments: [
@@ -82,13 +82,13 @@
 #       url: null,
 #
 #       // The id of the user who created the submission
-#       user_id: 134
+#       user_id: 134,
 #
 #       // The id of the user who graded the submission
-#       grader_id: 86
+#       grader_id: 86,
 #
 #       // The submissions user (see user API) (optional)
-#       user: User
+#       user: User,
 #
 #       // Whether the submission was made after the applicable due date
 #       late: false

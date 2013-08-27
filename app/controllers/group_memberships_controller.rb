@@ -23,21 +23,21 @@
 # @object Group Membership
 #     {
 #       // The id of the membership object
-#       id: 92
+#       "id": 92,
 #
 #       // The id of the group object to which the membership belongs
-#       group_id: 17
+#       "group_id": 17,
 #
 #       // The id of the user object to which the membership belongs
-#       user_id: 3
+#       "user_id": 3,
 #
 #       // The current state of the membership. Current possible values are
 #       // "accepted", "invited", and "requested"
-#       workflow_state: "accepted"
+#       "workflow_state": "accepted",
 #
 #       // Whether or not the user is a moderator of the group (the must also
 #       // be an active member of the group to moderate)
-#       moderator: true
+#       "moderator": true
 #     }
 #
 class GroupMembershipsController < ApplicationController

@@ -20,7 +20,7 @@
 #
 # API for accessing account reports.
 #
-# @object report
+# @object Report
 #     {
 #       // The unique identifier for the report.
 #       "id": 1,
@@ -32,13 +32,13 @@
 #       "file_url": "https://example.com/some/path",
 #
 #       // The status of the report
-#       "complete",
+#       "status": "complete",
 #
 #       // The report parameters
-#       {"enrollment_term":"2","sis_terms_csv":"1","sis_accounts_csv":"1"},
+#       "parameters": {"enrollment_term":"2","sis_terms_csv":"1","sis_accounts_csv":"1"},
 #
 #       // The progress of the report
-#       "100",
+#       "progress": "100"
 #     }
 #
 class AccountReportsController < ApplicationController
