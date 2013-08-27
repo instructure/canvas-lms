@@ -908,6 +908,27 @@ describe ContentMigration do
       bank2.assessment_questions.size.should == 2
     end
 
+    it "should not copy plain text question comments as html" do
+      bank1 = @copy_from.assessment_question_banks.create!(:title => 'bank')
+      q = bank1.assessment_questions.create!(:question_data => {
+          "question_type" => "multiple_choice_question", 'name' => 'test question',
+          'answers' => [{'id' => 1, "text" => "Correct", "weight" => 100, "comments" => "another comment"},
+                        {'id' => 2, "text" => "inorrect", "weight" => 0}],
+          "correct_comments" => "Correct answer comment", "incorrect_comments" => "Incorrect answer comment",
+          "neutral_comments" => "General Comment", "more_comments" => "even more comments"
+      })
+
+      run_course_copy
+
+      q2 = @copy_to.assessment_questions.first
+      ["correct_comments_html", "incorrect_comments_html", "neutral_comments_html", "more_comments_html"].each do |k|
+        q2.question_data.keys.should_not include(k)
+      end
+      q2.question_data["answers"].each do |a|
+        a.keys.should_not include("comments_html")
+      end
+    end
+
     it "should copy discussion topic attributes" do
       topic = @copy_from.discussion_topics.create!(:title => "topic", :message => "<p>bloop</p>",
                                                    :pinned => true, :discussion_type => "threaded",
