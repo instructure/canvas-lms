@@ -1003,11 +1003,14 @@ class ApplicationController < ActionController::Base
               @wiki.wiki_pages.deleted_last.find_by_url(page_name.to_s.to_url) ||
               @wiki.wiki_pages.find_by_id(page_name.to_i)
     end
-    @page ||= @wiki.wiki_pages.build(
+    @page ||= @wiki.wiki_pages.new(
       :title => page_name.titleize,
       :url => page_name.to_url
     )
-    initialize_wiki_page if @page.new_record?
+    if @page.new_record?
+      @page.wiki = @wiki
+      initialize_wiki_page
+    end
   end
 
   # Initializes the state of @page, but only if it is a new page
