@@ -277,19 +277,15 @@ s2,test_1,section2,active},
 
     describe "with cursor based find_each" do
       it "should remove only from the specific term if it is given" do
-        test_remove_specific_term
+        Course.transaction {
+          test_remove_specific_term
+        }
       end
     end
 
-    describe "with non-transactional find_each" do
-      self.use_transactional_fixtures = false
-
+    describe "without cursor based find_each" do
       it "should remove only from the specific term if it is given" do
         test_remove_specific_term
-      end
-
-      after do
-        truncate_all_tables
       end
     end
 
