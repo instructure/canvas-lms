@@ -98,17 +98,22 @@ describe ContextModule do
         course_with_student_logged_in(:active_all => true)
         @quiz = @course.quizzes.create!(:title => "new quiz", :shuffle_answers => true)
     
-        @mod1 = @course.context_modules.create!(:name => "some module")
-        @mod1.require_sequential_progress = true
-        @mod1.save!
-        @tag1 = @mod1.add_item(:type => 'quiz', :id => @quiz.id)
-        @mod1.completion_requirements = {@tag1.id => {:type => 'min_score', :min_score => 1}}
-        @mod1.save!
-    
-        @mod2 = @course.context_modules.create!(:name => "dependant module")
-        @mod2.prerequisites = "module_#{@mod1.id}"
-        @mod2.save!
-        
+        # separate timestamps so touch_context will actually invalidate caches
+        Timecop.freeze(4.seconds.ago) do
+          @mod1 = @course.context_modules.create!(:name => "some module")
+          @mod1.require_sequential_progress = true
+          @mod1.save!
+          @tag1 = @mod1.add_item(:type => 'quiz', :id => @quiz.id)
+          @mod1.completion_requirements = {@tag1.id => {:type => 'min_score', :min_score => 1}}
+          @mod1.save!
+        end
+
+        Timecop.freeze(2.second.ago) do
+          @mod2 = @course.context_modules.create!(:name => "dependant module")
+          @mod2.prerequisites = "module_#{@mod1.id}"
+          @mod2.save!
+        end
+
         yield '<div id="test_content">yay!</div>'
         
         get @test_url

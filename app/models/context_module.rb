@@ -173,53 +173,35 @@ class ContextModule < ActiveRecord::Base
   def current?
     (self.start_at || self.end_at) && (!self.start_at || Time.now >= self.start_at) && (!self.end_at || Time.now <= self.end_at) rescue true
   end
-  
-  def self.context_prerequisites(context)
-    prereq = {}
-    to_visit = []
-    visited = []
-    context.context_modules.active.each do |m|
-      prereq[m.id] = []
-      (m.prerequisites || []).each do |p|
-        prereq[m.id] << p
-        to_visit << [m.id, p[:id]] if p[:type] == 'context_module'
+
+  def self.module_names(context)
+    Rails.cache.fetch(['module_names', context].cache_key) do
+      names = {}
+      context.context_modules.not_deleted.select([:id, :name]).each do |mod|
+        names[mod.id] = mod.name
       end
+      names
     end
-    while !to_visit.empty?
-      val = to_visit.shift
-      if(!visited.include?(val))
-        visited << val
-        (prereq[val[1]] || []).each do |p|
-          prereq[val[0]] << p
-          to_visit << [val[0], p[:context_module_id]] if p[:type] == 'context_module'
-        end
-      end
-    end
-    prereq.each{|idx, val| prereq[idx] = val.uniq.compact }
-    prereq
   end
-  
+
   def prerequisites=(val)
     if val.is_a?(Array)
       val = val.map {|item|
         if item[:type] == 'context_module'
           "module_#{item[:id]}"
-        else
-          "#{item[:type]}_#{item[:id]}"
         end
-      }.join(',') rescue nil
+      }.compact.join(',') rescue nil
     end
     if val.is_a?(String)
       res = []
-      modules = self.context.context_modules.not_deleted
-      module_prereqs = ContextModule.context_prerequisites(self.context)
-      invalid_prereqs = module_prereqs.to_a.map{|id, ps| id if (ps.any?{|p| p[:type] == 'context_module' && p[:id].to_i == self.id}) }.compact
+      module_names = ContextModule.module_names(self.context)
       pres = val.split(",")
+      pre_regex = /module_(\d+)/
       pres.each do |pre|
-        type, id = pre.reverse.split("_", 2).map{|s| s.reverse}.reverse
-        m = modules.to_a.find{|m| m.id == id.to_i}
-        if type == 'module' && !invalid_prereqs.include?(id.to_i) && m
-          res << {:id => id.to_i, :type => 'context_module', :name => (modules.to_a.find{|m| m.id == id.to_i}.name rescue "module")}
+        next unless match = pre_regex.match(pre)
+        id = match[1].to_i
+        if module_names.has_key?(id)
+          res << {:id => id, :type => 'context_module', :name => module_names[id]}
         end
       end
       val = res
