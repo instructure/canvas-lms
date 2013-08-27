@@ -582,10 +582,19 @@ class AssessmentQuestion < ActiveRecord::Base
       hash[:missing_links][field] = []
       hash[field] = ImportedHtmlConverter.convert(hash[field], context, {:missing_links => hash[:missing_links][field], :remove_outer_nodes_if_one_child => true}) if hash[field].present?
     end
+    [:correct_comments, :incorrect_comments, :neutral_comments, :more_comments].each do |field|
+      html_field = "#{field}_html".to_sym
+      if hash[field].present? && hash[field] == hash[html_field]
+        hash.delete(html_field)
+      end
+    end
     hash[:answers].each_with_index do |answer, i|
       [:html, :comments_html, :left_html].each do |field|
         hash[:missing_links]["answer #{i} #{field}"] = []
         answer[field] = ImportedHtmlConverter.convert(answer[field], context, {:missing_links => hash[:missing_links]["answer #{i} #{field}"], :remove_outer_nodes_if_one_child => true}) if answer[field].present?
+      end
+      if answer[:comments].present? && answer[:comments] == answer[:comments_html]
+        answer.delete(:comments_html)
       end
     end if hash[:answers]
     hash[:prepped_for_import] = true
