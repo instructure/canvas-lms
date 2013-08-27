@@ -157,6 +157,8 @@ module Canvas::AccountReports::ReportHelper
       csv << headers
       yield csv
     end
-    send_report(file)
+    Shackles.activate(:master) do
+      send_report(file)
+    end
   end
 end
