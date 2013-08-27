@@ -19,6 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe DataFixup::FixOutOfSyncOutcomeAlignments do
+  self.use_transactional_fixtures = false
 
   before do
     course_with_teacher_logged_in(:active_all => true)
@@ -80,5 +81,9 @@ describe DataFixup::FixOutOfSyncOutcomeAlignments do
     align.reload.should_not be_deleted
     DataFixup::FixOutOfSyncOutcomeAlignments.run
     align.reload.should be_deleted
+  end
+
+  after(:all) do
+    truncate_all_tables
   end
 end
