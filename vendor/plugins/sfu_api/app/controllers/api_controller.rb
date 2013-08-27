@@ -41,6 +41,8 @@ class ApiController < ApplicationController
         user_hash["uuid"] = user.uuid
       elsif params[:property].eql? "mysfu"
         user_hash = mysfu_enrollments_for user
+      elsif params[:property].eql? "sandbox"
+        user_hash = sandbox_for(user)
       end
     end
 
@@ -164,7 +166,7 @@ class ApiController < ApplicationController
     term_array
   end
 
-  def mysfu_enrollments_for (user)
+  def mysfu_enrollments_for(user)
     output = {
       "enrolled" => [],
       "teaching" => []
@@ -196,6 +198,18 @@ class ApiController < ApplicationController
       end
     end
     output
+  end
+
+  def sandbox_for(user)
+    # Find user's courses with sis_source_id that starts with 'sandbox'
+    courses = Course.find(:all, :conditions => ['id IN (?) AND sis_source_id LIKE ?', user.course_ids, 'sandbox%'])
+    courses.map do |course|
+      {
+        :id => course.id,
+        :name => course.name,
+        :sis_source_id => course.sis_source_id
+      }
+    end
   end
 
 end

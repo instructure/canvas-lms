@@ -1,8 +1,129 @@
-<% 
-  content_for :page_title, "Start a New Course"
+<%
+  add_crumb 'Start a New Course'
+  content_for :page_title, 'Start a New Course'
+  jammit_css :course_request_form, :plugin => :sfu_course_form
+  js_bundle :course_request_form, :plugin => :sfu_course_form
 %>
 
-<div class="new_course_container">
-<%= render :partial => 'form' %>
-</div>
+<% content_for :right_side do %>
+  <div class="actions">
+    <button type="button" id="action-go-start_over-sidebar" class="action btn button-sidebar-wide"><i class="icon-reset" aria-hidden="hidden"></i> Start over</button>
+    <button type="button" id="action-open-help" class="action btn button-sidebar-wide"><i class="icon-question" aria-hidden="hidden"></i> Need help with this form?</button>
+  </div>
+<% end %>
 
+<section id="step-1" class="step">
+  <h1>What would you like to do?</h1>
+  <div class="actions choices">
+    <% if @is_student %><button type="button" id="action-identify-student" class="action btn btn-primary">Enroll in a Course</button><% end %>
+    <button type="button" id="action-identify-faculty" class="action btn">Create a Course for <strong>Myself</strong></button>
+    <button type="button" id="action-identify-faculty-delegate-pending" class="action btn">Create a Course for <strong>Someone Else</strong></button>
+  </div>
+</section>
+<section id="step-1-delegate" class="step form-horizontal">
+  <h1>For whom are you creating the course?</h1>
+  <div class="control-group">
+    <label for="txt-user_id" class="control-label">Instructor Computing ID</label>
+    <div class="controls"><input type="text" id="txt-user_id" name="user_id" autocapitalize="off" autocorrect="off" data-default="<%= @sfuid %>" /></div>
+  </div>
+  <div class="control-group">
+    <label for="chk-enroll_me" class="control-label">Enroll Me</label>
+    <div class="controls">
+      <label for="chk-enroll_me">
+        <input type="checkbox" id="chk-enroll_me" name="enroll_me" />
+        Also, enroll me as a <%= select_tag 'sel-enroll_me_as', options_for_select([['Teacher', 'teacher'], ['TA', 'ta'], ['Designer', 'designer']]), :class => 'input-small' %> in the course
+      </label>
+    </div>
+  </div>
+  <div class="form-actions">
+    <button type="button" id="action-back-faculty-delegate" class="action btn">Back</button>
+    <button type="button" id="action-identify-faculty-delegate" class="action btn">Continue</button>
+  </div>
+</section>
+<section id="step-2-loading" class="step">
+  <h1>Loading&hellip;</h1>
+  <p>Please wait while we load the necessary information.</p>
+</section>
+<section id="step-2-student" class="step">
+  <h1>Enroll in a Course</h1>
+  <p>To enroll in a course, please contact the instructor directly. This form is meant for instructors and course designers only.</p>
+  <div class="actions">
+    <button type="button" id="action-go-dashboard" class="action btn"><i class="icon-home" aria-hidden="hidden"></i> Back to Canvas Dashboard</button>
+  </div>
+</section>
+<section id="step-2-faculty" class="step">
+  <h1>What type of course would you like to create for <span class="username-display">yourself</span>?</h1>
+  <div class="actions choices">
+    <button type="button" id="action-course-calendar" class="action btn">Credit Course</button>
+    <button type="button" id="action-course-non_calendar" class="action btn">Non-Credit Course</button>
+    <button type="button" id="action-course-sandbox" class="action btn">Sandbox Course</button>
+  </div>
+</section>
+<section id="step-3-calendar" class="step">
+  <h1>Select credit courses</h1>
+  <p>Check the box next to the course to select it. You may select multiple courses to create at once.</p>
+  <h2>Suggested Courses</h2>
+  <div id="courses-suggested" class="courses"></div>
+  <h2>Search for Courses</h2>
+  <p>If you need to create other credit courses, use the search box below to find them. Search results will show up as you type.</p>
+  <div>
+    <%= select_tag 'sel-search-term', options_for_select(@term_options, @current_term.sis_source_id), :class => 'input-medium' %>
+    <input type="text" id="search" placeholder="e.g. MATH150 D100" size="50" />
+  </div>
+  <ul id="courses-searched" class="courses"></ul>
+  <hr />
+  <h2>Selected Courses</h2>
+  <p>You are creating courses for <span class="username-display">yourself</span>. Here is a list of what will be created:</p>
+  <ul id="courses-selected" class="courses"></ul>
+  <div class="checkbox">
+    <label for="chk-crosslist">
+      <input type="checkbox" id="chk-crosslist" name="crosslist" />
+      <div>I want to cross-list these courses into one single course container</div>
+      <div id="crosslist-title">No cross-list</div>
+    </label>
+  </div>
+  <div class="form-actions">
+    <button type="button" id="action-back-calendar" class="action btn">Back</button>
+    <button type="button" id="action-submit-calendar" class="action btn btn-primary">Create Courses</button>
+  </div>
+</section>
+<section id="step-3-non_calendar" class="step form-horizontal">
+  <h1>Create a non-credit course</h1>
+  <p>A non-credit course is a course that does not meet the requirements for a certificate or a degree. Student enrollment in a non-credit course is usually not managed automatically.</p>
+  <div class="control-group">
+    <label for="sel-term" class="control-label">Term</label>
+    <div class="controls">
+      <%= select_tag 'sel-term', options_for_select([['No Term', '']] + @term_options), :class => 'input-medium' %>
+    </div>
+  </div>
+  <div class="control-group">
+    <label for="txt-course_name" class="control-label">Course Name</label>
+    <div class="controls"><input type="text" id="txt-course_name" name="course_name" maxlength="255" /></div>
+  </div>
+  <div class="form-actions">
+    <button type="button" id="action-back-non_calendar" class="action btn">Back</button>
+    <button type="button" id="action-submit-non_calendar" class="action btn btn-primary">Create Non-Credit Course</button>
+  </div>
+</section>
+<section id="step-3-sandbox" class="step">
+  <h1>Create a sandbox course</h1>
+  <p>A sandbox course is a self-contained course that allows you to experiment with features in Canvas, without affecting real student information.</p>
+  <div id="sandboxes"></div>
+  <p>The new sandbox course will be called: <strong id="sandbox-name-display">Sandbox</strong></p>
+  <div class="form-actions">
+    <button type="button" id="action-back-sandbox" class="action btn">Back</button>
+    <button type="button" id="action-submit-sandbox" class="action btn btn-primary">Create Sandbox</button>
+  </div>
+</section>
+<section id="step-4" class="step">
+  <h1>Sending&hellip;</h1>
+  <p>Please wait while your request is being sent.</p>
+</section>
+<section id="step-5" class="step">
+  <h1>Course Request Submitted Successfully</h1>
+  <p>Course creation can take up to 5 minutes to complete.</p>
+  <div class="actions">
+    <button type="button" id="action-go-course_list" class="action btn"><i class="icon-more" aria-hidden="hidden"></i> Course List</button>
+    <button type="button" id="action-go-start_over" class="action btn"><i class="icon-reset" aria-hidden="hidden"></i> Request Another Course</button>
+  </div>
+</section>
