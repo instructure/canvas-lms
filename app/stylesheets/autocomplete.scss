@@ -28,12 +28,15 @@ A generic, accessible autocomplete widget.
     <span class="screenreader-only">Search</span>
   </button>
 
-  <ul class="ac-result-list"
-      id="ac-result-list-1"
-      aria-hidden="true"></ul>
+  <div class="ac-result-container" id="ac-result-list-1" aria-hidden="true">
+    <ul class="ac-result-list"></ul>
+  </div>
 </div>
 ```
 */
+
+$border-color: #999;
+$highlight-color: #0875be;
 
 ul[class*=ac-] {
   list-style: none;
@@ -173,40 +176,98 @@ ul[class*=ac-] {
 	}
 }
 
-.ac-result-list {
-  background: #eee;
-  border: 1px solid #ccc;
-  border-top: none;
-	border-radius: 0 0 3px 3px;
+.ac-result-wrapper {
+  display: none;
+
+  &:before, &:after {
+    content: "";
+    height: 0;
+    position: absolute;
+    right: 15px;
+    width: 0;
+    z-index: 3;
+  }
+
+  &:before {
+    border-bottom: 10px solid $border-color;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    top: 26px;
+  }
+
+  &:after {
+    border-bottom: 10px solid #fff;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    top: 27px;
+  }
+}
+
+.ac-result-container {
+  background: #fff;
+  border: 1px solid $border-color;
+  border-radius: 10px;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
 	box-shadow: 0 2px 5px rgba(0, 0, 0, .2);
+  font-size: 12px;
   max-height: 250px;
   min-height: 50px;
   left: 0;
+  overflow: auto;
   position: absolute;
-  top: 31px;
+  top: 36px;
   width: 100%;
+  z-index: 2;
 }
 
 .ac-result {
-  border-bottom: 1px solid #ccc;
-  border-top: 1px solid #fff;
 	cursor: pointer;
-  padding: 4px 8px;
+  line-height: 16px;
+  padding: 5px 8px 2px 8px;
 
   &:first-child {
-    border-top: none;
+    border-radius: 10px 10px 0 0 !important;
   }
 
   &:last-child {
-    border-bottom: none;
+    border-radius: 0 0 10px 10px;
   }
 
   &.selected, &:hover {
-    background: steelblue;
+    background: $highlight-color;
     color: #fff;
 		text-shadow: -1px -1px 0 rgba(0, 0, 0, .2);
   }
 }
 
+.ac-result-list {
+  .context, .everyone {
+    border-bottom: 1px solid $border-color;
+    color: $highlight-color;
+
+    &.selected, &:hover {
+      color: #fff;
+    }
+  }
+
+  .back {
+    color: #333;
+  }
+
+  li:last-child {
+    border-bottom: none;
+  }
+
+  .no-result {
+    display: block;
+  }
+
+  .result-name {
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 80%;
+  }
+}

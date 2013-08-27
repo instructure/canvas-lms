@@ -153,7 +153,7 @@ require [
 
     _currentFilter: ->
       filter = @searchTokens || []
-      filter = filter.concat("course_#{@filters.course}") if @filters.course
+      filter = filter.concat(@filters.course) if @filters.course
       filter
 
     onSearch: (tokens) =>

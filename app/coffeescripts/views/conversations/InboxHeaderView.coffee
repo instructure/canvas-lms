@@ -96,7 +96,9 @@ define [
     filterObj: (obj) -> _.object(_.filter(_.pairs(obj), (x) -> !!x[1]))
 
     onFilterChange: (e) =>
-      @searchView.autocompleteView.course = @$courseFilter.val() if @searchView
+      @searchView?.autocompleteView.setContext
+        name: @$courseFilter.find(':selected').text().trim()
+        id: @$courseFilter.val()
       @trigger('filter', @filterObj({type: @$typeFilter.val(), course: @$courseFilter.val()}))
 
     displayState: (state) ->

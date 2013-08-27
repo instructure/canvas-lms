@@ -62,7 +62,7 @@ define [
       @triggerEvent()
 
     triggerEvent: () ->
-      @trigger('course', @_value)
+      @trigger('course', name: @$el.find(':selected').text().trim(), id: @_value)
 
     focus: ->
       @$el.next().find('.dropdown-toggle').focus()
