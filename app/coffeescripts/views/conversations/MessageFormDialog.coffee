@@ -148,8 +148,8 @@ define [
       @recipientView = new AutocompleteView(el: @$recipients).render()
 
     onCourse: (course) =>
-      @recipientView.setCourse(course)
-      @$contextCode.val(if course then 'course_'+course else '')
+      @recipientView.setContext(course, true)
+      @$contextCode.val(if course?.id then course.id else '')
 
     defaultCourse: null
     setDefaultCourse: (course) ->
@@ -168,7 +168,7 @@ define [
       @courseView.on('course', @onCourse)
       if @model
         # TODO: I imagine we'll be changing this
-        @courseView.setValue(_.keys(@model.get('audience_contexts').courses)[0])
+        @courseView.setValue("course_" + _.keys(@model.get('audience_contexts').courses)[0])
       else
         @courseView.setValue(@defaultCourse)
       @courseView.focus()

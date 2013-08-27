@@ -12,7 +12,7 @@ define [
     initialize: ->
       super
       @render()
-      @autocompleteView = new AutocompleteView(el: @$autocomplete, single: true).render()
+      @autocompleteView = new AutocompleteView(el: @$autocomplete, single: true, excludeAll: true).render()
       @autocompleteView.on('changeToken', @onSearch)
 
     onSearch: (tokens) =>

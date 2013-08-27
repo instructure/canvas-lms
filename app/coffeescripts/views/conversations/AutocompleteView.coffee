@@ -2,9 +2,12 @@ define [
   'i18n!conversations'
   'Backbone'
   'underscore'
+  'compiled/collections/PaginatedCollection'
+  'compiled/models/ConversationSearchResult'
+  'compiled/views/PaginatedCollectionView'
   'jst/conversations/autocompleteToken'
   'jst/conversations/autocompleteResult'
-], (I18n, {View}, _, tokenTemplate, resultTemplate) ->
+], (I18n, Backbone, _, PaginatedCollection, ConversationSearchResult, PaginatedCollectionView, tokenTemplate, resultTemplate) ->
 
   # Public: Helper method for capitalizing a string
   #
@@ -13,10 +16,13 @@ define [
   # Returns a capitalized string.
   capitalize = (string) -> string.charAt(0).toUpperCase() + string.slice(1)
 
-  class AutocompleteView extends View
+  class AutocompleteView extends Backbone.View
 
     # Public: Limit selection to one result.
     @optionProperty('single')
+
+    # Public: If true, don't display "All in ..." results.
+    @optionProperty('excludeAll')
 
     # Internal: Current result set from the server.
     collection: null
@@ -24,22 +30,38 @@ define [
     # Internal: Current XMLHttpRequest (if any).
     currentRequest: null
 
+    # Internal: Current context to filter searches by.
+    currentContext: null
+
+    # Internal: Parent of the current context.
+    parentContexts: []
+
     # Internal: Currently selected model.
     selectedModel: null
-
-    course: null
 
     # Internal: Currently selected results.
     tokens: []
 
+    # Internal: A cache of per-course permissions.
+    permissions: {}
+
     # Internal: Construct the search URL for the given term.
     url: (term) ->
-      url = "/api/v1/search/recipients/?search=#{term}&per_page=5"
-      url += "&context=course_#{@course}" if @course
-      url
+      baseURL = '/api/v1/search/recipients?'
+      params = { search: term, per_page: 20, 'permissions[]': 'send_messages_all' }
+      params.context = @currentContext.id if @currentContext
+      params.synthetic_contexts = true unless term
+
+      baseURL + _.reduce(params, (queryString, v, k) ->
+        queryString.push("#{k}=#{v}")
+        queryString
+      , []).join('&')
 
     messages:
       noResults: I18n.t('no_results_found', 'No results found')
+      back: I18n.t('back', 'Back')
+      everyone: (context) ->
+        I18n.t('all_in_context', 'All in %{context}', context: context)
 
     # Internal: Map of key names to codes.
     keys:
@@ -51,13 +73,16 @@ define [
 
     # Internal: Cached DOM element references.
     els:
-      '.ac-input-box'   : '$inputBox'
-      '.ac-input'       : '$input'
-      '.ac-token-list'  : '$tokenList'
-      '.ac-result-list' : '$resultList'
-      '.ac-placeholder' : '$placeholder'
-      '.ac-clear'       : '$clearBtn'
-      '.ac-search-btn'  : '$searchBtn'
+      '.ac-input-box'       : '$inputBox'
+      '.ac-input'           : '$input'
+      '.ac-token-list'      : '$tokenList'
+      '.ac-result-wrapper'  : '$resultWrapper'
+      '.ac-result-container': '$resultContainer'
+      '.ac-result-contents' : '$resultContents'
+      '.ac-result-list'     : '$resultList'
+      '.ac-placeholder'     : '$placeholder'
+      '.ac-clear'           : '$clearBtn'
+      '.ac-search-btn'      : '$searchBtn'
 
     # Internal: Event map.
     events:
@@ -77,22 +102,56 @@ define [
     # Returns an AutocompleteView instance.
     initialize: ->
       super
+      @render() # to initialize els
       @$span = @_initializeWidthSpan()
       @_fetchResults = _.debounce(@__fetchResults, 250)
+      @resultCollection = new PaginatedCollection([], model: ConversationSearchResult)
+      @resultView = new PaginatedCollectionView
+        el: @$resultContents
+        scrollContainer: @$resultContainer
+        buffer: 50
+        collection: @resultCollection
+        template: null
+        itemView: Backbone.View.extend
+          template: resultTemplate
+        itemViewOptions:
+          tagName: 'li'
+          attributes: ->
+            classes = ['ac-result']
+            classes.push('context') if @model.get('isContext')
+            classes.push('back') if @model.get('back')
+            classes.push('everyone') if @model.get('everyone')
+            attributes =
+              class: classes.join(' ')
+              'data-id': @model.id
+              'data-people-count': @model.get('user_count')
+              id: "result-#{$.guid++}" # for aria-activedescendant
+            attributes['aria-haspopup'] = @model.get('isContext')
+            attributes
 
     # Public: Toggle visibility of result list.
     #
     # isVisible - A boolean to determine if the list should be shown.
-    # deferred - (optional) A deferred that, if given, will disable the list
-    #            until it is resolved.
     #
     # Returns the result list jQuery object.
-    toggleResultList: (isVisible, deferred) ->
-      @$resultList.attr('aria-hidden', !isVisible)
+    toggleResultList: (isVisible) ->
+      @$resultWrapper.attr('aria-hidden', !isVisible)
+      @$resultWrapper.toggle(isVisible)
       @$input.attr('aria-expanded', isVisible)
       @$resultList.empty() if !isVisible
-      @$resultList.toggle(isVisible)
-      @$resultList.disableWhileLoading(deferred) if isVisible and deferred
+
+    # Internal: Empty the current and parent contexts.
+    #
+    # Returns nothing.
+    _resetContext: ->
+      if @hasExternalContext
+        @currentContext = if _.isEmpty(@parentContexts)
+          @currentContext
+        else
+          _.head(@parentContexts)
+      else
+        @currentContext = null
+      @parentContexts = []
 
     # Internal: Create a <span /> to track search term width.
     #
@@ -110,8 +169,7 @@ define [
     #
     # Returns a model object.
     _getModel: (id) ->
-      #id = parseInt(id) if (id).match and !id.match(/_/)
-      _.find(@collection, (model) -> model.id == id)
+      result = @resultCollection.find((model) -> model.id == id)
 
     # Internal: Remove the "selected" class from result list items.
     #
@@ -120,6 +178,7 @@ define [
     # Returns nothing.
     _clearSelectedStyles: (e) ->
       @$resultList.find('.selected').removeClass('selected')
+      @selectedModel = null
 
     # Internal: Translate clicks anywhere into clicks on the input.
     #
@@ -147,6 +206,7 @@ define [
     _onInputBlur: (e) ->
       @$inputBox.removeClass('focused')
       @$placeholder.css(opacity: 1) unless @tokens.length or @$input.val()
+      @_resetContext()
       @toggleResultList(false)
 
     # Internal: Set proper styles on widget when input is focused.
@@ -171,19 +231,87 @@ define [
 
     # Internal: Display search results returned from the server.
     #
+    # searchResults - An array of results from the server.
+    #
     # Returns nothing.
-    _onSearchResultLoad: (searchResults) =>
-      @collection     = searchResults
+    _onSearchResultLoad: =>
+      _.extend(@permissions, @_getPermissions())
+      @_addEveryoneResult(@resultCollection) unless @excludeAll or !@_canSendToAll()
+      shouldDrawResults = @resultCollection.length
+      @_addBackResult(@resultCollection)
       @currentRequest = null
-      resultElements  = _.map searchResults, (r) ->
-        resultTemplate(_.extend({}, r, guid: $.guid++))
-      if searchResults.length
-        @$resultList.html(resultElements.join(''))
-        $el = @$resultList.find('li:first').addClass('selected')
-        @selectedModel = @_getModel($el.data('id'))
-        @$input.attr('aria-activedescendant', $el.attr('id'))
+      if shouldDrawResults
+        @_drawResults()
       else
-        @$resultList.html( $('<li />', class: 'ac-result text-center').text(@messages.noResults) )
+        @resultCollection.push(new ConversationSearchResult({id: 'no_results', name: '', noResults: true}))
+
+    # Internal: Determine if the current user can send to all users in the course.
+    #
+    # Returns a boolean.
+    _canSendToAll: ->
+      return false unless @currentContext
+      @permissions[@_currentCourseOrGroup().id]
+
+    # Internal: Return permissions hashes from the current results.
+    #
+    # Returns a hash.
+    _getPermissions: ->
+      permissions = @resultCollection.filter((r) -> r.attributes.hasOwnProperty('permissions'))
+      _.reduce permissions, (map, result) ->
+        key = result.id.replace(/_(students|teachers)$/, '')
+        map[key] = !!result.get('permissions').send_messages_all
+        map
+      , {}
+
+    # Internal: Return the current course context.
+    #
+    # Returns a context object.
+    _currentCourseOrGroup: ->
+      return @currentContext if @currentContext.id.match(/^(course|group)_\d+$/)
+      for context in @parentContexts
+        return context if context.id.match(/^(course|group)_\d+$/)
+
+    # Internal: Add, if appropriate, an "All in %{context}" result to the
+    #           search results.
+    #
+    # results - A search results array to mutate.
+    #
+    # Returns a new search results array.
+    _addEveryoneResult: (results) ->
+      return unless @currentContext
+      name       = @messages.everyone(@currentContext.name)
+      searchTerm = new RegExp(@$input.val().trim(), 'gi')
+      return results if (searchTerm and !name.match(searchTerm)) or (!results.length and !@currentContext)
+
+      return if @currentContext.id.match(/course_\d+_(group|section)/)
+
+      tag =
+        id:       "#{@currentContext.id}_all"
+        name:     name
+        everyone: true
+        people: @currentContext.peopleCount
+      results.unshift(new ConversationSearchResult(tag))
+
+    # Internal: Add, if appropriate, an "All in %{context}" result to the
+    #           search results.
+    #
+    # results - A search results array to mutate.
+    #
+    # Returns a new search results array.
+    _addBackResult: (results) ->
+      return results unless @parentContexts.length
+      tag = { id: 'back', name: @messages.back, back: true, isContext: true }
+      results.unshift(new ConversationSearchResult(tag))
+
+    # Internal: Draw out search results to the DOM.
+    #
+    # elements - An array of HTML snippets to append to the result list.
+    #
+    # Returns nothing.
+    _drawResults: ->
+      $el = @$resultList.find('li:first').addClass('selected')
+      @selectedModel = @_getModel($el.data('id'))
+      @$input.attr('aria-activedescendant', $el.attr('id'))
 
     # Internal: Fetch and display autocomplete results from the server.
     #
@@ -193,8 +321,10 @@ define [
     __fetchResults: (fetchIfEmpty = false) ->
       return unless @$input.val() or fetchIfEmpty
       @currentRequest?.abort()
-      @currentRequest = $.getJSON(@url(@$input.val()), @_onSearchResultLoad)
-      @toggleResultList(true, @currentRequest)
+      @currentRequest = @resultCollection.fetch
+        url: @url(@$input.val())
+        success: @_onSearchResultLoad
+      @toggleResultList(true)
 
     # Internal: Delete the last token.
     #
@@ -204,21 +334,6 @@ define [
     _onBackspaceKey: (e) ->
       @_removeToken(_.last(@tokens)) if !@$input.val()
 
-    # Internal: Handle down-arrow events.
-    #
-    # e - Event object.
-    #
-    # Returns nothing.
-    _onDownKey: (e) ->
-      e.preventDefault() && e.stopPropagation()
-      @$resultList.find('li.selected:first').removeClass('selected')
-      @selectedModel = if @selectedModel
-        @collection[@collection.indexOf(@selectedModel) + 1] or @collection[0]
-      else
-        @collection[0]
-      $el = @$resultList.find("[data-id=#{@selectedModel.id}]")
-      @$input.attr('aria-activedescendant', $el.addClass('selected').attr('id'))
-
     # Internal: Close the result list without choosing an option.
     #
     # e - Event object.
@@ -227,6 +342,7 @@ define [
     _onEscapeKey: (e) ->
       e.preventDefault() && e.stopPropagation()
       @toggleResultList(false)
+      @_resetContext()
       setTimeout((=> @$input.focus()), 0)
 
     # Internal: Add the current @selectedModel to the list of tokens.
@@ -236,7 +352,55 @@ define [
     # Returns nothing.
     _onEnterKey: (e) ->
       e.preventDefault() && e.stopPropagation()
-      @_addToken(@selectedModel) if @selectedModel
+      if @selectedModel.get('back')
+        @currentContext = @parentContexts.pop()
+        @__fetchResults(true)
+      else if @selectedModel.get('isContext')
+        @parentContexts.push(@currentContext)
+        @$input.val('')
+        @currentContext =
+          id: @selectedModel.id
+          name: @selectedModel.get('name')
+          peopleCount: @selectedModel.get('user_count')
+        @__fetchResults(true)
+      else
+        @_addToken(@selectedModel.attributes)
+
+    # Internal: Handle down-arrow events.
+    #
+    # e - Event object.
+    #
+    # Returns nothing.
+    _onDownKey: (e) ->
+      @_onArrowKey(e, 1)
+
+    # Internal: Handle up-arrow events.
+    #
+    # e - Event object.
+    #
+    # Returns nothing.
+    _onUpKey: (e) ->
+      @_onArrowKey(e, -1)
+
+    # Internal: Move the current selection based on arrow key
+    #
+    # e - Event object
+    # inc - The increment to the current selection index. -1 = up, +1 = down
+    #
+    # Returns nothing.
+    _onArrowKey: (e, inc) ->
+      e.preventDefault() && e.stopPropagation()
+      @$resultList.find('li.selected:first').removeClass('selected')
+
+      currentIndex = if @selectedModel then @resultCollection.indexOf(@selectedModel) else -1
+      newIndex = currentIndex + inc
+      newIndex = 0 if newIndex < 0
+      newIndex = @resultCollection.length - 1 if newIndex >= @resultCollection.length
+
+      @selectedModel = @resultCollection.at(newIndex)
+      $el = @$resultList.find("[data-id=#{@selectedModel.id}]")
+      $el.scrollIntoView()
+      @$input.attr('aria-activedescendant', $el.addClass('selected').attr('id'))
 
     # Internal: Add the clicked model to the list of tokens.
     #
@@ -244,8 +408,23 @@ define [
     #
     # Returns nothing.
     _onResultClick: (e) ->
+      return unless e.button == 0
+      return if $(e.currentTarget).children('.no-result').length
       e.preventDefault() && e.stopPropagation()
-      @_addToken(@_getModel($(e.currentTarget).data('id')))
+      $target = $(e.currentTarget)
+      if $target.hasClass('back')
+        @currentContext = @parentContexts.pop()
+        @__fetchResults(true)
+      else if $target.hasClass('context')
+        @parentContexts.push(@currentContext)
+        @$input.val('')
+        @currentContext =
+          id: $target.data('id')
+          name: $target.text().trim()
+          peopleCount: $target.data('people-count')
+        @__fetchResults(true)
+      else
+        @_addToken(@_getModel($(e.currentTarget).data('id')).attributes)
 
     # Internal: Clear the current token.
     #
@@ -285,6 +464,7 @@ define [
     #
     # Returns nothing.
     _addToken: (model) =>
+      model.name = @_formatTokenName(model)
       @tokens.push(model.id)
       @$tokenList.append(tokenTemplate(model))
       @toggleResultList(false)
@@ -296,6 +476,18 @@ define [
         @$searchBtn.prop('disabled', true)
         @trigger('disabled')
       @trigger('changeToken', @tokenParams())
+
+    # Internal: Prepares a given model's name for display.
+    #
+    # model - A ConversationSearchResult model's attributes.
+    #
+    # Returns a formatted name.
+    _formatTokenName: (model) ->
+      return model.name unless model.everyone
+      if parent = _.head(@parentContexts)
+        "#{parent.name}: #{@currentContext.name}"
+      else
+        @currentContext.name
 
     # Internal: Remove the given model from the token list.
     #
@@ -319,29 +511,28 @@ define [
     tokenParams: ->
       _.map(@tokens, (t) -> if (t).match then t else "user_#{t}")
 
-    # Internal: Handle up-arrow events.
+    # Public: Set the current course context.
     #
-    # e - Event object.
+    # context - A context string, e.g. "course_123"
+    # disable - Disable the input if no context is given (default: false).
     #
     # Returns nothing.
-    _onUpKey: (e) ->
-      e.preventDefault() && e.stopPropagation()
-      @$resultList.find('li.selected:first').removeClass('selected')
-      @selectedModel = if @selectedModel
-        @collection[@collection.indexOf(@selectedModel) - 1] or @collection[@collection.length - 1]
-      else
-        @collection[@collection.length - 1]
-      $el = @$resultList.find("[data-id=#{@selectedModel.id}]")
-      @$input.attr('aria-activedescendant', $el.addClass('selected').attr('id'))
-
-    setCourse: (course) ->
-      return if course == @course
-      @course = course
-      @$input.prop('disabled', !course)
-      @$searchBtn.prop('disabled', !course)
-      @$inputBox.toggleClass('disabled', !course)
+    setContext: (context, disable = false) ->
+      return if context?.id == @currentContext?.id
+      context = null unless context.id
+      @currentContext     = context
+      @hasExternalContext = !!context
+      @tokens             = []
       @$tokenList.find('li.ac-token').remove()
-      @tokens = []
+      if disable and !_.include(ENV.current_user_roles, 'admin')
+        @$input.prop('disabled', !@currentContext)
+        @$searchBtn.prop('disabled', !@currentContext)
+        @$inputBox.toggleClass('disabled', !@currentContext)
 
+    # Public: Put the given tokens in the token list.
+    #
+    # tokens - Array of Result model object (course or user)
+    #
+    # Returns nothing.
     setTokens: (tokens) ->
       _.each(tokens, @_addToken)
