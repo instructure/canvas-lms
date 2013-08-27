@@ -493,19 +493,13 @@ class ContextModule < ActiveRecord::Base
   end
   
   def self.find_or_create_progression(module_id, user_id)
-    s = nil
-    attempts = 0
-    begin
-      s = ContextModuleProgression.find_or_initialize_by_context_module_id_and_user_id(module_id, user_id)
-      s.save! if s.new_record?
-      raise "bad" if s.new_record?
-    rescue => e
-      attempts += 1
-      retry if attempts < 3
+    Shackles.activate(:master) do
+      unique_constraint_retry do
+        ContextModuleProgression.find_or_create_by_context_module_id_and_user_id(module_id, user_id)
+      end
     end
-    s
   end
-  
+
   def content_tags_hash
     return @tags_hash if @tags_hash
     @tags_hash = {}
