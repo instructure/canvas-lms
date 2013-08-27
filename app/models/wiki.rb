@@ -75,7 +75,12 @@ class Wiki < ActiveRecord::Base
     # TODO i18n
     t :front_page_name, "Front Page"
     url = self.get_front_page_url
-    self.wiki_pages.find_by_url(url) || self.wiki_pages.build(:title => "Front Page", :url => url)
+    page = self.wiki_pages.find_by_url(url)
+    unless page
+      page = self.wiki_pages.new(:title => "Front Page", :url => url)
+      page.wiki = self
+    end
+    page
   end
 
   def has_front_page?

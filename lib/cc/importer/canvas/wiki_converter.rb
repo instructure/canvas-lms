@@ -41,6 +41,7 @@ module CC::Importer::Canvas
       wiki[:hide_from_students] = meta['hide_from_students'] == 'true'
       wiki[:notify_of_update] = meta['notify_of_update'] == 'true'
       wiki[:workflow_state] = meta['workflow_state']
+      wiki[:front_page] = meta['front_page'] == 'true'
       wiki[:text] = body
       wiki[:url_name] = wiki_name
       wiki

@@ -1957,6 +1957,17 @@ class Course < ActiveRecord::Base
       import_settings_from_migration(data, migration); migration.update_import_progress(96)
     end
 
+    # be very explicit about draft state courses, but be liberal toward legacy courses
+    if self.root_account.enable_draft?
+      if migration.for_course_copy? && (source = migration.source_course || Course.find_by_id(migration.migration_settings[:source_course_id]))
+        self.wiki.has_no_front_page = !!source.wiki.has_no_front_page
+        self.wiki.front_page_url = source.wiki.front_page_url
+        self.wiki.save!
+      end
+    end
+    front_page = self.wiki.front_page
+    self.wiki.unset_front_page! if front_page.nil? || (self.root_account.enable_draft? && front_page.new_record?)
+
     syllabus_should_be_added = everything_selected || migration.copy_options[:syllabus_body] || migration.copy_options[:all_syllabus_body]
     if syllabus_should_be_added
       syllabus_body = data[:course][:syllabus_body] if data[:course]

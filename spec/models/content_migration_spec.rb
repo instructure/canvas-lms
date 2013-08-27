@@ -342,6 +342,55 @@ describe ContentMigration do
       @copy_to.wiki.wiki_pages.find_by_url!("online-unit-pages").body.should == %{<a href="/courses/#{@copy_to.id}/wiki/#{main_page.url}">whoa</a>}
     end
 
+    context "wiki front page" do
+      it "should copy wiki front page setting" do
+        page = @copy_from.wiki.wiki_pages.create!(:title => "stuff and stuff")
+        @copy_from.wiki.set_front_page_url!(page.url)
+
+        run_course_copy
+
+        new_page = @copy_to.wiki.wiki_pages.find_by_migration_id(mig_id(page))
+        @copy_to.wiki.front_page.should == new_page
+      end
+
+      it "should copy wiki has_no_front_page setting if draft state is enabled" do
+        @copy_from.root_account.settings[:enable_draft] = true
+        @copy_from.root_account.save!
+
+        @copy_from.wiki.front_page.save!
+        @copy_from.wiki.unset_front_page!
+
+        run_course_copy
+
+        @copy_to.wiki.has_no_front_page?.should == true
+      end
+
+      it "should set retain default behavior if front page is missing and draft state is not enabled" do
+        @copy_from.default_view = 'wiki'
+        @copy_from.save!
+        @copy_from.wiki.set_front_page_url!('haha not here')
+
+        run_course_copy
+
+        @copy_to.wiki.has_front_page?.should == true
+        @copy_to.wiki.get_front_page_url.should == 'front-page'
+      end
+
+      it "should set default view to feed if wiki front page is missing and draft state is enabled" do
+        @copy_from.root_account.settings[:enable_draft] = true
+        @copy_from.root_account.save!
+
+        @copy_from.default_view = 'wiki'
+        @copy_from.save!
+        @copy_from.wiki.set_front_page_url!('haha not here')
+
+        run_course_copy
+
+        @copy_to.default_view.should == 'feed'
+        @copy_to.wiki.has_front_page?.should == false
+      end
+    end
+
     it "should selectively copy items" do
       dt1 = @copy_from.discussion_topics.create!(:message => "hi", :title => "discussion title")
       dt2 = @copy_from.discussion_topics.create!(:message => "hey", :title => "discussion title 2")
