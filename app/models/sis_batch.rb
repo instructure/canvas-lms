@@ -200,8 +200,19 @@ class SisBatch < ActiveRecord::Base
 
     if data[:supplied_batches].include?(:enrollment)
       # delete enrollments for courses that weren't in this batch, in the selected term
-      scope = Enrollment.active.joins(:course).select("enrollments.*").where("courses.root_account_id=? AND enrollments.sis_batch_id IS NOT NULL AND enrollments.sis_batch_id<>?", self.account, self)
-      scope = scope.where(:courses =>  { :enrollment_term_id => self.batch_mode_term })
+
+      if Rails.version < '3.0'
+        scope = Enrollment.active.scoped(joins: :course, select: "enrollments.*")
+      else
+        scope = Enrollment.active.joins(:course).select("enrollments.*")
+      end
+
+      params = {root_account: self.account, batch: self, term: self.batch_mode_term}
+      scope = scope.where("courses.root_account_id=:root_account
+                           AND enrollments.sis_batch_id IS NOT NULL
+                           AND enrollments.sis_batch_id<>:batch
+                           AND courses.enrollment_term_id=:term", params)
+
       scope.find_each do |enrollment|
         enrollment.destroy
       end
