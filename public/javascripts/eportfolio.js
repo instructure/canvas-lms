@@ -44,6 +44,16 @@ define([
   'jqueryui/sortable' /* /\.sortable/ */
 ], function(I18n, $) {
 
+  var ePortfolioValidations = {
+    object_name: 'eportfolio',
+    property_validations: {
+      'name': function(value){
+        if (!value || value.trim() == '') { return I18n.t("errors.name_required", "Name is required")}
+        if (value && value.length > 255) { return I18n.t("errors.name_too_long", "Name is too long")}
+      }
+    }
+  };
+
   function ePortfolioFormData() {
     var data = $("#edit_page_form").getFormData({
       object_name: "eportfolio_entry", 
@@ -81,11 +91,30 @@ define([
         title: I18n.t('eportfolio_settings', "ePortfolio Settings")
       }).fixDialogButtons();
     });
+    // Add ePortfolio related
+    $(".add_eportfolio_link").click(function(event) {
+      event.preventDefault();
+      $("#whats_an_eportfolio").slideToggle();
+      $("#add_eportfolio_form").slideToggle(function() {
+        $(this).find(":text:first").focus().select();
+      });
+    });
+    $("#add_eportfolio_form .cancel_button").click(function() {
+      $("#add_eportfolio_form").slideToggle();
+      $("#whats_an_eportfolio").slideToggle();
+    });
+    $('#add_eportfolio_form').submit(function(){
+      var $this = $(this);
+      var result = $this.validateForm(ePortfolioValidations);
+      if(!result) {
+        return false;
+      }
+    });
+    // Edit ePortfolio related
     $("#edit_eportfolio_form .cancel_button").click(function(event) {
       $("#edit_eportfolio_form").dialog('close');
     });
-    $("#edit_eportfolio_form").formSubmit({
-      object_name: 'eportfolio', 
+    $("#edit_eportfolio_form").formSubmit($.extend(ePortfolioValidations, {
       beforeSubmit: function(data) {
         $(this).loadingImage();
       },
@@ -93,7 +122,7 @@ define([
         $(this).loadingImage('remove');
         $(this).dialog('close');
       }
-    });
+    }));
     $(".edit_content_link").click(function(event) {
       event.preventDefault();
       $(".edit_content_link_holder").hide();

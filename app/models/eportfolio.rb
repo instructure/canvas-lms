@@ -25,6 +25,7 @@ class Eportfolio < ActiveRecord::Base
   has_many :attachments, :as => :context
   belongs_to :user
   validates_presence_of :user_id
+  validates_length_of :name, :maximum => maximum_string_length, :allow_blank => true
 
   workflow do
     state :active
