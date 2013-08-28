@@ -283,7 +283,7 @@ describe RubricsController do
       )
       outcome_group.add_outcome(outcome)
       outcome_group.save!
-      
+
       update_params = {
                             "course_id" => @course.id,
                                    "id" => @rubric.id,
@@ -347,7 +347,7 @@ describe RubricsController do
       outcome_with_rubric
       assignment = @course.assignments.create!(assignment_valid_attributes)
       association = @rubric.associate_with(assignment, @course, :purpose => 'grading')
-      
+
       update_params = {
                             "course_id" => @course.id,
                                    "id" => @rubric.id,
@@ -387,6 +387,65 @@ describe RubricsController do
            "use_for_grading" => "1"
         },
                 "rubric_association_id" => association.id,
+                            "rubric_id" => @rubric.id,
+        "skip_updating_points_possible" => "false",
+                                "title" => "Some Rubric"
+      }
+
+      assignment.reload.learning_outcome_alignments.count.should == 1
+      @rubric.reload.learning_outcome_alignments.count.should == 1
+
+      put 'update', update_params
+
+      assignment.reload.learning_outcome_alignments.count.should == 0
+      @rubric.reload.learning_outcome_alignments.count.should == 0
+    end
+
+    it "should remove an outcome association for all associations" do
+      course_with_teacher_logged_in(:active_all => true)
+      outcome_with_rubric
+      assignment = @course.assignments.create!(assignment_valid_attributes)
+      association = @rubric.associate_with(assignment, @course, :purpose => 'grading')
+
+      update_params = {
+                            "course_id" => @course.id,
+                                   "id" => @rubric.id,
+                      "points_possible" => "5",
+                               "rubric" => {
+                              "criteria" => {
+            "0" => {
+                      "description" => "Description of criterion",
+                               "id" => "",
+              "learning_outcome_id" => "",
+                 "long_description" => "",
+                           "points" => "5",
+                          "ratings" => {
+                "0" => {
+                  "description" => "Full Marks",
+                           "id" => "blank",
+                       "points" => "5"
+                },
+                "1" => {
+                  "description" => "No Marks",
+                           "id" => "blank_2",
+                       "points" => "0"
+                }
+              }
+            }
+          },
+          "free_form_criterion_comments" => "0",
+                       "points_possible" => "5",
+                                 "title" => "Some Rubric"
+        },
+                   "rubric_association" => {
+            "association_id" => @course.id,
+          "association_type" => "Course",
+          "hide_score_total" => "0",
+                        "id" => "",
+                   "purpose" => "bookmark",
+           "use_for_grading" => "0"
+        },
+                "rubric_association_id" => "",
                             "rubric_id" => @rubric.id,
         "skip_updating_points_possible" => "false",
                                 "title" => "Some Rubric"
