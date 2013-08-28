@@ -121,6 +121,20 @@ describe SisBatch do
     job.run_at.to_i.should <= 150.minutes.from_now.to_i
   end
 
+  it "should fail itself if the jobs dies" do
+    batch = nil
+    track_jobs do
+      batch = create_csv_data(['abc'])
+      batch.process
+      batch.update_attribute(:workflow_state, 'importing')
+      batch
+    end
+
+    job = created_jobs.find { |j| j.tag == 'SisBatch.process_all_for_account' }
+    job.reschedule
+    batch.reload.should be_failed
+  end
+
   describe "batch mode" do
     it "should not remove anything if no term is given" do
       @subacct = @account.sub_accounts.create(:name => 'sub1')

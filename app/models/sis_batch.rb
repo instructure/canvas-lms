@@ -86,12 +86,24 @@ class SisBatch < ActiveRecord::Base
 
   def process
     process_delay = Setting.get('sis_batch_process_start_delay', '0').to_f
-    job_args = { :singleton => "sis_batch:account:#{Shard.birth.activate { self.account_id }}", :priority => Delayed::LOW_PRIORITY }
+    job_args = { :singleton => "sis_batch:account:#{Shard.birth.activate { self.account_id }}",
+                 :priority => Delayed::LOW_PRIORITY,
+                 :max_attempts => 1 }
     if process_delay > 0
       job_args[:run_at] = process_delay.seconds.from_now
     end
 
-    SisBatch.send_later_enqueue_args(:process_all_for_account, job_args, self.account)
+    work = SisBatch::Work.new(SisBatch, :process_all_for_account, [self.account])
+    Delayed::Job.enqueue(work, job_args)
+  end
+
+  class Work < Delayed::PerformableMethod
+    def on_permanent_failure(error)
+      account = args.first
+      account.sis_batches.importing.each do |batch|
+        batch.finish(false)
+      end
+    end
   end
 
   # this method name is to stay backwards compatible with existing jobs when we deploy
@@ -121,6 +133,7 @@ class SisBatch < ActiveRecord::Base
   end
 
   scope :needs_processing, where(:workflow_state => 'created').order(:created_at)
+  scope :importing, where(:workflow_state => 'importing')
 
   def self.process_all_for_account(account)
     loop do
