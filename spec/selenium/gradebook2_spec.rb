@@ -23,8 +23,21 @@ describe "gradebook2" do
   DEFAULT_PASSWORD = "qwerty"
 
   context "as a teacher" do
-    before (:each) do
+    before(:each) do
       data_setup
+    end
+
+    it "hides unpublished/shows published assignments" do
+      @course.root_account.enable_draft!
+      @first_assignment.unpublish
+      get "/courses/#{@course.id}/gradebook2"
+      wait_for_ajaximations
+      f('#gradebook_grid .slick-header').should_not include_text(@first_assignment.title)
+
+      @first_assignment.publish
+      get "/courses/#{@course.id}/gradebook2"
+      wait_for_ajaximations
+      f('#gradebook_grid .slick-header').should include_text(@first_assignment.title)
     end
 
     it "should not show 'not-graded' assignments" do
