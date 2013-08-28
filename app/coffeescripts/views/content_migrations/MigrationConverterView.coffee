@@ -5,7 +5,7 @@ define [
   'compiled/views/ValidatedFormView'
   'vendor/jquery.ba-tinypubsub'
   'jquery.disableWhileLoading'
-], ($, _, template, ValidatedFormView) -> 
+], ($, _, template, ValidatedFormView) ->
 
   # This is an abstract class that is inherited 
   # from by other MigrationConverter views
@@ -14,11 +14,11 @@ define [
 
     template: template
 
-    initialize: -> 
+    initialize: ->
       super
       $.subscribe 'resetForm', @resetForm
     
-    els: 
+    els:
       '#converter'                : '$converter'
       '#chooseMigrationConverter' : '$chooseMigrationConverter'
       '.form-container'           : '$formActions'
@@ -28,7 +28,7 @@ define [
       'click .cancelBtn'                 : 'resetForm'
     )
 
-    toJSON: (json) -> 
+    toJSON: (json) ->
       json = super
       json.selectOptions = @selectOptions || ENV.SELECT_OPTIONS
       json
@@ -38,16 +38,15 @@ define [
     # converter div if there were any previous 
     # items set. 
 
-    renderConverter: (converter) -> 
+    renderConverter: (converter) ->
       if converter
         # Set timeout ensures that all of the html is loaded at once. We need
         # this for accessibility to work correct.
-        setTimeout => 
+        _.defer =>
           @$converter.html converter.render().$el
           @trigger 'converterRendered'
-        , 0
       else
-        @resetForm() 
+        @resetForm()
         @trigger 'converterReset'
 
     # This is the actual action for making the view swaps when selecting
@@ -57,7 +56,7 @@ define [
     #
     # @api private
 
-    selectConverter: (event) -> 
+    selectConverter: (event) ->
       @$formActions.show()
       @model.resetModel()
       @$chooseMigrationConverter.attr "aria-activedescendant", @$chooseMigrationConverter.val() # This is purely for accessibility
@@ -73,9 +72,9 @@ define [
     # @expects event
     # @api ValidatedFormView override
 
-    submit: (event) -> 
+    submit: (event) ->
       dfd = super
-      dfd?.done => 
+      dfd?.done =>
         $.publish 'migrationCreated', @model.attributes
         @model.resetModel()
         @resetForm()
@@ -86,7 +85,7 @@ define [
     #
     # @api private
 
-    resetForm: => 
+    resetForm: =>
       @$formActions.hide()
       @$converter.empty()
       @$chooseMigrationConverter.val('none')
