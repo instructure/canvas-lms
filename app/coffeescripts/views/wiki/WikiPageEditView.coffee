@@ -76,6 +76,12 @@ define [
       @$wikiPageBody.editorBox()
       @initWikiSidebar()
 
+      @checkUnsavedOnLeave = true
+      view = this
+      $(window).on 'beforeunload', ->
+        if view && view.checkUnsavedOnLeave && view.hasUnsavedChanges()
+          return view.unsavedWarning()
+
       unless @firstRender
         @firstRender = true
         $ -> $('[autofocus]:not(:focus)').eq(0).focus()
@@ -110,9 +116,27 @@ define [
 
       errors
 
+    hasUnsavedChanges: ->
+      formData = @getFormData()
+      oldBody = @model.get('body') || ''
+      newBody = formData.wiki_page?.body || ''
+      oldTitle = @model.get('title') || ''
+      newTitle = formData.wiki_page?.title || ''
+      return (oldBody != newBody) || (oldTitle != newTitle)
+
+    unsavedWarning: ->
+      I18n.t("warnings.unsaved_changes",
+        "You have unsaved changes. Do you want to continue without saving these changes?")
+
+    submit: (event) ->
+      @checkUnsavedOnLeave = false
+      super
+
     cancel: (event) ->
       event?.preventDefault()
-      @trigger('cancel')
+      if !@hasUnsavedChanges() || confirm(@unsavedWarning())
+        @checkUnsavedOnLeave = false
+        @trigger('cancel')
 
     deleteWikiPage: (event) ->
       event?.preventDefault()
