@@ -40,10 +40,11 @@ module BasicLTI
 
     path = uri.path
     path = '/' if path.empty?
+    query_params = {}
     if !uri.query.blank?
       CGI.parse(uri.query).each do |query_key, query_values|
         unless params[query_key]
-          params[query_key] = query_values.first
+          query_params[query_key] = query_values.first
         end
       end
     end
@@ -52,7 +53,8 @@ module BasicLTI
                 :timestamp        => @timestamp,
                 :nonce            => @nonce
               }
-    request = consumer.create_signed_request(:post, path, nil, options, params.stringify_keys)
+    request_params = params.merge(query_params).stringify_keys
+    request = consumer.create_signed_request(:post, path, nil, options, request_params)
 
     # the request is made by a html form in the user's browser, so we
     # want to revert the escapage and return the hash of post parameters ready
@@ -60,7 +62,7 @@ module BasicLTI
     hash = {}
     request.body.split(/&/).each do |param|
       key, val = param.split(/=/).map{|v| CGI.unescape(v) }
-      hash[key] = val
+      hash[key] = val unless (query_params[key] && !params[key])
     end
     hash
   end
