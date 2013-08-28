@@ -17,6 +17,7 @@
 #
 
 require 'set'
+require 'canvas/draft_state_validations'
 
 class Assignment < ActiveRecord::Base
   include Workflow
@@ -27,6 +28,7 @@ class Assignment < ActiveRecord::Base
   include ContextModuleItem
   include DatesOverridable
   include SearchTermHelper
+  include Canvas::DraftStateValidations
 
   attr_accessible :title, :name, :description, :due_at, :points_possible,
     :min_score, :max_score, :mastery_score, :grading_type, :submission_types,
@@ -57,6 +59,7 @@ class Assignment < ActiveRecord::Base
 
   has_one :external_tool_tag, :class_name => 'ContentTag', :as => :context, :dependent => :destroy
   validates_associated :external_tool_tag, :if => :external_tool?
+  validate :validate_draft_state_change, :if => :workflow_state_changed?
 
   accepts_nested_attributes_for :external_tool_tag, :update_only => true, :reject_if => proc { |attrs|
     # only accept the url and new_tab params, the other accessible
@@ -1843,4 +1846,21 @@ class Assignment < ActiveRecord::Base
       raise "Assignment#available? is deprecated. Use #published?"
     end
   end
+
+  def has_student_submissions?
+    self.submissions.any? { |s| context.includes_student?(s.user) }
+  end
+
+  # override so validations are called
+  def publish
+    self.workflow_state = 'published'
+    self.save
+  end
+
+  # override so validations are called
+  def unpublish
+    self.workflow_state = 'unpublished'
+    self.save
+  end
+
 end

@@ -170,6 +170,7 @@ module Api::V1::Assignment
     #show published/unpublished if account.settings[:enable_draft]
     if @domain_root_account.enable_draft?
       hash['published'] = ! assignment.unpublished?
+      hash['unpublishable'] = !assignment.has_student_submissions?
     end
 
     if submission = opts[:submission]

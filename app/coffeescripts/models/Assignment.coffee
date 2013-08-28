@@ -7,7 +7,8 @@ define [
   'compiled/models/DateGroup'
   'compiled/collections/AssignmentOverrideCollection'
   'compiled/collections/DateGroupCollection'
-], ($, _, {Model}, DefaultUrlMixin, TurnitinSettings, DateGroup, AssignmentOverrideCollection, DateGroupCollection) ->
+  'i18n!assignments'
+], ($, _, {Model}, DefaultUrlMixin, TurnitinSettings, DateGroup, AssignmentOverrideCollection, DateGroupCollection, I18n) ->
 
   class Assignment extends Model
     @mixin DefaultUrlMixin
@@ -18,6 +19,7 @@ define [
     defaults:
       "publishable": true
       "hidden": false
+      "unpublishable": true
 
     initialize: ->
       if (overrides = @get('assignment_overrides'))?
@@ -322,3 +324,6 @@ define [
 
     publish: -> @save("published", true)
     unpublish: -> @save("published", false)
+
+    disabledMessage: ->
+      I18n.t('cant_unpublish_when_students_submit', "Can't unpublish if there are student submissions")

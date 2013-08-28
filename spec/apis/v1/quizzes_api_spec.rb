@@ -294,13 +294,17 @@ describe QuizzesApiController, :type => :integration do
       it "allows un/publishing an unpublished quiz" do
         api_update_quiz({},{})
         @quiz.reload.should_not be_published # in 'created' state by default
-        api_update_quiz({}, {published: false})
+        json = api_update_quiz({}, {published: false})
+        json['unpublishable'].should == true
         @quiz.reload.should be_unpublished
-        api_update_quiz({}, {published: true})
+        json = api_update_quiz({}, {published: true})
+        json['unpublishable'].should == true
         @quiz.reload.should be_published
         api_update_quiz({},{published: nil}) # nil shouldn't change published
         @quiz.reload.should be_published
         @quiz.any_instantiation.stubs(:has_student_submissions?).returns true
+        json = api_update_quiz({},{}) # nil shouldn't change published
+        json['unpublishable'].should == false
         json = api_update_quiz({}, {published: false}, {expected_status: 400})
         json['errors']['published'].should_not be_nil
         ActiveRecord::Base.reset_any_instantiation!

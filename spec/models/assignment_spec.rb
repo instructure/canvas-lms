@@ -71,6 +71,14 @@ describe Assignment do
     @submission.versions.length.should eql(1)
   end
 
+  it "does not allow itself to be unpublished if it has student submissions" do
+    setup_assignment_with_students
+    @assignment.context.root_account.enable_draft!
+    @assignment.unpublish
+    @assignment.should_not be_valid
+    @assignment.errors['workflow_state'].should == "Can't unpublish if there are student submissions"
+  end
+
   describe '#grade_student' do
     before { setup_assignment_without_submission }
 

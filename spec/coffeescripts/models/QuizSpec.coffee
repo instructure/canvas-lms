@@ -55,16 +55,16 @@ define [
     equal @quiz.get('title_label'), 'Quiz'
 
 
-  test '#initialize defaults publishable to true', ->
-    ok @quiz.get('publishable')
+  test '#initialize defaults unpublishable to true', ->
+    ok @quiz.get('unpublishable')
 
-  test '#initialize sets publishable to false', ->
-    @quiz = new Quiz(publishable: false)
-    ok !@quiz.get('publishable')
+  test '#initialize sets unpublishable to false', ->
+    @quiz = new Quiz(unpublishable: false)
+    ok !@quiz.get('unpublishable')
 
   test '#initialize sets publishable from can_unpublish and published', ->
     @quiz = new Quiz(can_unpublish: false, published: true)
-    ok !@quiz.get('publishable')
+    ok !@quiz.get('unpublishable')
 
 
   test "#initialize sets question count", ->

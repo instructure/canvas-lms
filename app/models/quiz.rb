@@ -18,6 +18,7 @@
 
 require 'quiz_question_link_migrator'
 require 'quiz_regrading'
+require 'canvas/draft_state_validations'
 
 class Quiz < ActiveRecord::Base
   include Workflow
@@ -28,6 +29,7 @@ class Quiz < ActiveRecord::Base
   include ContextModuleItem
   include DatesOverridable
   include SearchTermHelper
+  include Canvas::DraftStateValidations
 
   attr_accessible :title, :description, :points_possible, :assignment_id, :shuffle_answers,
     :show_correct_answers, :time_limit, :allowed_attempts, :scoring_policy, :quiz_type,
@@ -1143,7 +1145,8 @@ class Quiz < ActiveRecord::Base
   end
 
   def can_unpublish?
-    !has_student_submissions?
+    !has_student_submissions? &&
+      (!assignment || !assignment.has_student_submissions?)
   end
 
   # marks a quiz as having unpublished changes
@@ -1172,15 +1175,6 @@ class Quiz < ActiveRecord::Base
   alias_method :published?, :active?
 
   def unpublished?; !published?; end
-
-  def validate_draft_state_change
-    old_draft_state, new_draft_state = self.changes['workflow_state']
-    return if old_draft_state == new_draft_state
-    if new_draft_state == 'unpublished' && has_student_submissions?
-      self.errors.add :workflow_state, I18n.t('#quizzes.cant_unpublish_when_students_submit',
-                                              "Can't unpublish if there are student submissions")
-    end
-  end
 
   def regrade_if_published
     unless unpublished_changes?

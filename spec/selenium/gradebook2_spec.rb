@@ -29,10 +29,11 @@ describe "gradebook2" do
 
     it "hides unpublished/shows published assignments" do
       @course.root_account.enable_draft!
-      @first_assignment.unpublish
+      assignment = @course.assignments.create! title: 'unpublished'
+      assignment.unpublish
       get "/courses/#{@course.id}/gradebook2"
       wait_for_ajaximations
-      f('#gradebook_grid .slick-header').should_not include_text(@first_assignment.title)
+      f('#gradebook_grid .slick-header').should_not include_text(assignment.title)
 
       @first_assignment.publish
       get "/courses/#{@course.id}/gradebook2"

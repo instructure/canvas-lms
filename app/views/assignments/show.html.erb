@@ -28,7 +28,7 @@
           <button
             id="assignment_publish_button"
             data-id='<%= @assignment.id %>'
-            class='btn <%= "published" if @assignment.published? %>'>
+            class='btn <%= "published" if @assignment.published? %> <%= "disabled" if @assignment.has_student_submissions? %>'>
           </button>
         <% end %>
         <a href="<%= edit_polymorphic_path([@context, @assignment]) %>" class='btn edit_assignment_link'>

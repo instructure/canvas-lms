@@ -79,7 +79,8 @@ module Api::V1::Quiz
       :html_url => polymorphic_url([context, quiz]),
       :mobile_url => polymorphic_url([context, quiz], :persist_headless => 1, :force_user => 1),
       :question_count => quiz.available_question_count,
-      :published => quiz.published?
+      :published => quiz.published?,
+      :unpublishable => quiz.can_unpublish?
     )
     locked_json(hash, quiz, user, 'quiz', :context => context)
     hash
