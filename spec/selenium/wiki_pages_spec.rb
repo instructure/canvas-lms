@@ -5,7 +5,10 @@ describe "Navigating to wiki pages" do
 
   describe "Navigation" do
     before do
-      course_with_teacher_logged_in
+      account_model
+      @account.settings[:enable_draft] = true
+      @account.save!
+      course_with_teacher_logged_in :account => @account
     end
 
     it "navigates to the wiki pages edit page from the show page" do

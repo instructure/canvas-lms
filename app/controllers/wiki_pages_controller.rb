@@ -38,6 +38,10 @@ class WikiPagesController < ApplicationController
   end
 
   def show
+    if @context.draft_state_enabled?
+      redirect_to polymorphic_url([@context, :named_page], :wiki_page_id => @page)
+      return
+    end
     hash = { :CONTEXT_ACTION_SOURCE => :wiki }
     append_sis_data(hash)
     js_env(hash)
@@ -149,12 +153,22 @@ class WikiPagesController < ApplicationController
   end
 
   def pages_index
+    if !@context.draft_state_enabled?
+      redirect_to polymorphic_url([@context, :wiki_pages])
+      return
+    end
+
     if authorized_action(@context.wiki, @current_user, :read)
       @padless = true
     end
   end
 
   def show_page
+    if !@context.draft_state_enabled?
+      redirect_to polymorphic_url([@context, :named_wiki_page], :id => @page)
+      return
+    end
+
     if @page.deleted?
       flash[:notice] = t('notices.page_deleted', 'The page "%{title}" has been deleted.', :title => @page.title)
       return front_page # delegate to front_page logic
@@ -171,6 +185,11 @@ class WikiPagesController < ApplicationController
   end
 
   def edit_page
+    if !@context.draft_state_enabled?
+      redirect_to polymorphic_url([@context, :named_wiki_page], :id => @page) + '#edit'
+      return
+    end
+
     if @page.deleted?
       flash[:notice] = t('notices.page_deleted', 'The page "%{title}" has been deleted.', :title => @page.title)
       return front_page # delegate to front_page logic
