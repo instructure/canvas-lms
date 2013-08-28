@@ -140,7 +140,7 @@ class AccountReportsController < ApplicationController
 #     curl -H 'Authorization: Bearer <token>' \ 
 #          https://<canvas>/api/v1/accounts/<account_id>/reports/<report_type>
 #
-# @returns [report]
+# @returns [Report]
 #
   def index
     if authorized_action(@context, @current_user, :read_reports)
@@ -160,7 +160,7 @@ class AccountReportsController < ApplicationController
 #     curl -H 'Authorization: Bearer <token>' \ 
 #          https://<canvas>/api/v1/accounts/<account_id>/reports/<report_type>/<report_id>
 #
-# @returns report
+# @returns Report
 #
   def show
     if authorized_action(@context, @current_user, :read_reports)
@@ -178,7 +178,7 @@ class AccountReportsController < ApplicationController
 #          -X DELETE \ 
 #          https://<canvas>/api/v1/accounts/<account_id>/reports/<report_type>/<id>
 #
-# @returns report
+# @returns Report
 #
   def destroy
     if authorized_action(@context, @current_user, :read_reports)

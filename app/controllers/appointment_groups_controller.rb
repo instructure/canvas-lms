@@ -23,7 +23,7 @@
 # (e.g. "Office Hours" or "Meet with professor about Final Project"). Both time
 # slots and reservations of time slots are stored as Calendar Events.
 #
-# @object Appointment Group
+# @object AppointmentGroup
 #     {
 #       // The ID of the appointment group
 #       "id": 543,

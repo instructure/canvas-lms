@@ -22,7 +22,7 @@
 # in order to automatically create announcements for each new item in
 # the feed.
 #
-# @object External Feed
+# @object ExternalFeed
 #     {
 #       // The ID of the feed
 #       "id": 5,
@@ -63,7 +63,7 @@ class ExternalFeedsController < ApplicationController
   #     curl https://<canvas>/api/v1/courses/<course_id>/external_feeds \ 
   #          -H 'Authorization: Bearer <token>'
   #
-  # @returns [External Feed]
+  # @returns [ExternalFeed]
   def index
     if authorized_action(@context.announcements.new, @current_user, :create)
       api_route = polymorphic_url([:api, :v1, @context, :external_feeds])
@@ -91,7 +91,7 @@ class ExternalFeedsController < ApplicationController
   #         -F verbosity='full' \ 
   #         -H 'Authorization: Bearer <token>'
   #
-  # @returns External Feed
+  # @returns ExternalFeed
   def create
     if authorized_action(@context.announcements.new, @current_user, :create)
       @feed = create_api_external_feed(@context, params, @current_user)
@@ -111,7 +111,7 @@ class ExternalFeedsController < ApplicationController
   #     curl -X DELETE https://<canvas>/api/v1/courses/<course_id>/external_feeds/<feed_id> \ 
   #          -H 'Authorization: Bearer <token>'
   #
-  # @returns External Feed
+  # @returns ExternalFeed
   def destroy
     if authorized_action(@context.announcements.new, @current_user, :create)
       @feed = @context.external_feeds.find(params[:external_feed_id])

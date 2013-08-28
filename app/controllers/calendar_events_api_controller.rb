@@ -20,7 +20,7 @@
 #
 # API for creating, accessing and updating calendar events.
 #
-# @object Calendar Event
+# @object CalendarEvent
 #     {
 #       // The ID of the calendar event
 #       "id": 234,
@@ -137,7 +137,7 @@
 #       "group": null
 #     }
 #
-# @object Assignment Event
+# @object AssignmentEvent
 #     {
 #       // A synthetic ID for the assignment
 #       "id": "assignment_987",

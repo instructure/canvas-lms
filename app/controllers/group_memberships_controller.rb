@@ -20,7 +20,7 @@
 #
 # Group memberships are the objects that tie users and groups together. 
 #
-# @object Group Membership
+# @object GroupMembership
 #     {
 #       // The id of the membership object
 #       "id": 92,
@@ -62,7 +62,7 @@ class GroupMembershipsController < ApplicationController
   #          -F 'filter_states[]=invited&filter_states[]=requested' \ 
   #          -H 'Authorization: Bearer <token>'
   #
-  # @returns [Group Membership]
+  # @returns [GroupMembership]
   def index
     if authorized_action(@group, @current_user, :read_roster)
       memberships_route = polymorphic_url([:api_v1, @group, :memberships])
@@ -92,7 +92,7 @@ class GroupMembershipsController < ApplicationController
   #          -F 'user_id=self'
   #          -H 'Authorization: Bearer <token>'
   #
-  # @returns Group Membership
+  # @returns GroupMembership
   def create
     @user = api_find(User, params[:user_id])
     if authorized_action(GroupMembership.new(:group => @group, :user => @user), @current_user, :create)
@@ -123,7 +123,7 @@ class GroupMembershipsController < ApplicationController
   #          -F 'moderator=true'
   #          -H 'Authorization: Bearer <token>'
   #
-  # @returns Group Membership
+  # @returns GroupMembership
   def update
     find_membership
     if authorized_action(@membership, @current_user, :update)

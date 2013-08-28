@@ -19,7 +19,7 @@
 # @API Modules
 # @subtopic Module Items
 #
-# @object Module Item
+# @object ModuleItem
 #     {
 #       // the unique identifier for the module item
 #       "id": 768,
@@ -84,7 +84,7 @@
 #     }
 #
 #
-# @object Module Item Sequence
+# @object ModuleItemSequence
 #     {
 #       // an array containing one hash for each appearence of the asset in the module sequence
 #       // (up to 10 total)
@@ -151,7 +151,7 @@ class ContextModuleItemsApiController < ApplicationController
   #     curl -H 'Authorization: Bearer <token>' \
   #          https://<canvas>/api/v1/courses/222/modules/123/items
   #
-  # @returns [Module Item]
+  # @returns [ModuleItem]
   def index
     if authorized_action(@context, @current_user, :read)
       mod = @context.modules_visible_to(@current_user).find(params[:module_id])
@@ -178,7 +178,7 @@ class ContextModuleItemsApiController < ApplicationController
   #     curl -H 'Authorization: Bearer <token>' \
   #          https://<canvas>/api/v1/courses/222/modules/123/items/768
   #
-  # @returns Module Item
+  # @returns ModuleItem
   def show
     if authorized_action(@context, @current_user, :read)
       mod = @context.modules_visible_to(@current_user).find(params[:module_id])
@@ -260,7 +260,7 @@ class ContextModuleItemsApiController < ApplicationController
   #       -d 'module_item[indent]=1' \
   #       -d 'module_item[new_tab]=true'
   #
-  # @returns Module Item
+  # @returns ModuleItem
   def create
     @module = @context.context_modules.not_deleted.find(params[:module_id])
     if authorized_action(@module, @current_user, :update)
@@ -345,7 +345,7 @@ class ContextModuleItemsApiController < ApplicationController
   #       -d 'module_item[indent]=1' \
   #       -d 'module_item[new_tab]=true'
   #
-  # @returns Module Item
+  # @returns ModuleItem
   def update
     @tag = @context.context_module_tags.not_deleted.find(params[:id])
     if authorized_action(@tag.context_module, @current_user, :update)
@@ -400,7 +400,7 @@ class ContextModuleItemsApiController < ApplicationController
   #       -X Delete \
   #       -H 'Authorization: Bearer <token>'
   #
-  # @returns Module Item
+  # @returns ModuleItem
   def destroy
     @tag = @context.context_module_tags.not_deleted.find(params[:id])
     if authorized_action(@tag.context_module, @current_user, :update)
@@ -415,7 +415,7 @@ class ContextModuleItemsApiController < ApplicationController
 
   # @API Get module item sequence
   #
-  # Given an asset in a course, find the Module Item it belongs to, and also the previous and next Module Items
+  # Given an asset in a course, find the ModuleItem it belongs to, and also the previous and next Module Items
   # in the course sequence.
   #
   # @argument asset_type [String, "ModuleItem"|"File"|"Page"|"Discussion"|"Assignment"|"Quiz"|"ExternalTool"]
@@ -431,7 +431,7 @@ class ContextModuleItemsApiController < ApplicationController
   #     curl https://<canvas>/api/v1/courses/<course_id>/module_item_sequence?asset_type=Assignment&asset_id=123 \
   #       -H 'Authorization: Bearer <token>'
   #
-  # @returns Module Item Sequence
+  # @returns ModuleItemSequence
   def item_sequence
     if authorized_action(@context, @current_user, :read)
       asset_type = Api.api_type_to_canvas_name(params[:asset_type])

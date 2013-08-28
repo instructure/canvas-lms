@@ -36,7 +36,7 @@
 #
 #     /api/v1/collection_items/<id>/discussion_topics/self/view
 #
-# @object Collection Item
+# @object CollectionItem
 #
 #     {
 #       // The ID of the collection item.
@@ -144,7 +144,7 @@ class CollectionItemsController < ApplicationController
   #     curl https://<canvas>/api/v1/collections/<collection_id>/items \ 
   #          -H 'Authorization: Bearer <token>'
   #
-  # @returns [Collection Item]
+  # @returns [CollectionItem]
   def index
     pagination_route = api_v1_collection_items_list_url(@collection)
     if authorized_action(@collection, @current_user, :read)
@@ -163,7 +163,7 @@ class CollectionItemsController < ApplicationController
   #     curl https://<canvas>/api/v1/collections/items/<item_id> \ 
   #     -H 'Authorization: Bearer <token>'
   #
-  # @returns Collection Item
+  # @returns CollectionItem
   def show
     if !api_request?
       render :template => "collections/collection_backbone_app"
@@ -258,7 +258,7 @@ class CollectionItemsController < ApplicationController
   #          -F user_comment='edited comment' \ 
   #          -H 'Authorization: Bearer <token>'
   #
-  # @returns Collection Item
+  # @returns CollectionItem
   def update
     find_item_and_collection
     if authorized_action(@item, @current_user, :update)
@@ -282,7 +282,7 @@ class CollectionItemsController < ApplicationController
   #          -X DELETE \ 
   #          -H 'Authorization: Bearer <token>'
   #
-  # @returns Collection Item
+  # @returns CollectionItem
   def destroy
     find_item_and_collection
     if authorized_action(@item, @current_user, :delete)

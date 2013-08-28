@@ -20,7 +20,7 @@
 #
 # API for accessing Assignment Group and Assignment information.
 #
-# @object Assignment Group
+# @object AssignmentGroup
 #     {
 #       // the id of the Assignment Group
 #       "id": 1,
@@ -62,7 +62,7 @@ class AssignmentGroupsController < ApplicationController
   # @argument override_assignment_dates [Optional, Boolean]
   #   Apply assignment overrides for each assignment, defaults to true.
   #
-  # @returns [Assignment Group]
+  # @returns [AssignmentGroup]
   def index
     if authorized_action(@context.assignment_groups.new, @current_user, :read)
       @groups = @context.assignment_groups.active

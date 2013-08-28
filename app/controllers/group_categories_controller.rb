@@ -22,7 +22,7 @@
 # different built-in group categories used, or custom ones can be created. The
 # built in group categories are:  "communities", "student_organized", and "imported".
 #
-# @object Group Category
+# @object GroupCategory
 #     {
 #       // The ID of the group category.
 #       "id": 17,
@@ -410,7 +410,7 @@ class GroupCategoriesController < ApplicationController
   #      }
   #    ]
   #
-  # @returns Group Membership or Progress
+  # @returns GroupMembership | Progress
   def assign_unassigned_members
     return unless authorized_action(@context, @current_user, :manage_groups)
 

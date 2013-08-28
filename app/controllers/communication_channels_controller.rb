@@ -24,7 +24,7 @@
 # In this API, the `:user_id` parameter can always be replaced with `self` if
 # the requesting user is asking for his/her own information.
 #
-# @object Communication Channel
+# @object CommunicationChannel
 #     {
 #       // The ID of the communication channel.
 #       "id": 16,
@@ -63,7 +63,7 @@ class CommunicationChannelsController < ApplicationController
   #     curl https://<canvas>/api/v1/users/12345/communication_channels \ 
   #          -H 'Authorization: Bearer <token>'
   #
-  # @returns [Communication Channel]
+  # @returns [CommunicationChannel]
   def index
     @user = api_find(User, params[:user_id])
     return unless authorized_action(@user, @current_user, :read)
@@ -98,7 +98,7 @@ class CommunicationChannelsController < ApplicationController
   #          -d 'communication_channel[address]=new@example.com' \ 
   #          -d 'communication_channel[type]=email' \ 
   #
-  # @returns Communication Channel
+  # @returns CommunicationChannel
   def create
     @user = api_request? ? api_find(User, params[:user_id]) : @current_user
 
@@ -356,7 +356,7 @@ class CommunicationChannelsController < ApplicationController
   #          -H 'Authorization: Bearer <token>
   #          -X DELETE
   #
-  # @returns Communication Channel
+  # @returns CommunicationChannel
   def destroy
     @user = api_request? ? api_find(User, params[:user_id]) : @current_user
     @cc   = @user.communication_channels.find(params[:id]) if params[:id]
