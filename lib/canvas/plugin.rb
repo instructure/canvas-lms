@@ -56,8 +56,6 @@ module Canvas
     end
     
     def settings
-      # TODO: once we have distributed memcache we can
-      # cache this properly across all web servers
       saved_settings
     end
 
