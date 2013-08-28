@@ -1957,7 +1957,7 @@ class Course < ActiveRecord::Base
       import_settings_from_migration(data, migration); migration.update_import_progress(96)
     end
 
-    syllabus_should_be_added = everything_selected || migration.copy_options[:syllabus_body]
+    syllabus_should_be_added = everything_selected || migration.copy_options[:syllabus_body] || migration.copy_options[:all_syllabus_body]
     if syllabus_should_be_added
       syllabus_body = data[:course][:syllabus_body] if data[:course]
       import_syllabus_from_migration(syllabus_body) if syllabus_body
