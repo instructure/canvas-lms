@@ -54,7 +54,7 @@ define([
       options.c1 = true;
       var $entryBox = $(this);
       var $table = $("<table class='formulas' aria-live='polite'>" +
-                        "<thead><tr><th id='headings.formula'>" + htmlEscape(I18n.t('headings.formula', "Formula")) + "</th><th id='headings.result'>" + htmlEscape(I18n.t('headings.result', "Result")) + "</th><th aria-hidden='true'>&nbsp;</th></tr></thead>" +
+                        "<thead><tr><td id='headings.formula'>" + htmlEscape(I18n.t('headings.formula', "Formula")) + "</td><td id='headings.result'>" + htmlEscape(I18n.t('headings.result', "Result")) + "</td><td aria-hidden='true'>&nbsp;</td></tr></thead>" +
                         "<tfoot>" +
                           "<tr><td colspan='3' class='last_row_details' style='display: none;'>" + htmlEscape(I18n.t('last_formula_row', "the last formula row will be used to compute the final answer")) + "</td></tr>" +
                           "<tr><td></td><td class='decimal_places'>" +
@@ -64,12 +64,14 @@ define([
                         "</tfoot>" +
                         "<tbody></tbody>"+
                       "</table>");
+
+      $entryBox.attr('aria-labelledby', 'headings.formula');
       $(this).data('table', $table);
       $entryBox.before($table);
       $table.find("tfoot tr:last td:first").append($entryBox);
       var $displayBox = $entryBox.clone(true).removeAttr('id');
       $table.find("tfoot tr:last td:first").append($displayBox);
-      var $enter = $("<button type='button' class='save_formula_button'>" + htmlEscape(I18n.t('buttons.save', "Save")) + "</button>");
+      var $enter = $("<button type='button' class='btn save_formula_button'>" + htmlEscape(I18n.t('buttons.save', "Save")) + "</button>");
       $table.find("tfoot tr:last td:first").append($enter);
       $entryBox.hide();
       var $input = $("<input type='text' readonly='true'/>");
