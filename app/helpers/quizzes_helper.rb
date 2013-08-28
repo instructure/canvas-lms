@@ -462,7 +462,7 @@ module QuizzesHelper
   end
 
   def score_affected_by_regrade?(submission)
-    submission && submission.score_before_regrade != submission.score
+    submission && submission.score_before_regrade != submission.kept_score
   end
 
 end
