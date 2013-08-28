@@ -37,13 +37,20 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
                                              'file_map' => {'oi' => {'title' => 'a1', 'migration_id' => 'a1'}},
                                              'assignments' => [{'title' => 'a1', 'migration_id' => 'a1'},{'title' => 'a2', 'migration_id' => 'a2', 'assignment_group_migration_id' => 'a1'}],
                                              'assignment_groups' => [{'title' => 'a1', 'migration_id' => 'a1'}],
-                                             'calendar_events' => []
+                                             'calendar_events' => [],
+                                             "course" => {
+                                                     "migration_id" => "i953adbb6769c915260623f0928fcd527",
+                                                     "title" => "1 graded quiz/discussion",
+                                                     "syllabus_body"=>"oh, hi there."
+                                             }
                                      }.to_json)
       @formatter = Canvas::Migration::Helpers::SelectiveContentFormatter.new(@migration, "https://example.com")
     end
 
     it "should list top-level items" do
-      @formatter.get_content_list.should == [{:type=>"context_modules", :property=>"copy[all_context_modules]", :title=>"Modules", :count=>1, :sub_items_url=>"https://example.com?type=context_modules"},
+      @formatter.get_content_list.should == [{:type=>"course_settings", :property=>"copy[all_course_settings]", :title=>"Course Settings"},
+                                             {:type=>"syllabus_body", :property=>"copy[all_syllabus_body]", :title=>"Syllabus Body"},
+                                             {:type=>"context_modules", :property=>"copy[all_context_modules]", :title=>"Modules", :count=>1, :sub_items_url=>"https://example.com?type=context_modules"},
                                              {:type=>"assignments", :property=>"copy[all_assignments]", :title=>"Assignments", :count=>2, :sub_items_url=>"https://example.com?type=assignments"},
                                              {:type=>"quizzes", :property=>"copy[all_quizzes]", :title=>"Quizzes", :count=>1, :sub_items_url=>"https://example.com?type=quizzes"},
                                              {:type=>"wiki_pages", :property=>"copy[all_wiki_pages]", :title=>"Wiki Pages", :count=>1, :sub_items_url=>"https://example.com?type=wiki_pages"},

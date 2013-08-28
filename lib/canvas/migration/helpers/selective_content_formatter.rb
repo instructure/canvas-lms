@@ -68,6 +68,13 @@ module Canvas::Migration::Helpers
           end
         end
       else
+        if course_data['course']
+          content_list << {type: 'course_settings', property: "copy[all_course_settings]", title: SELECTIVE_CONTENT_TYPES[0].last.call}
+          if course_data['course']['syllabus_body']
+            content_list << {type: 'syllabus_body', property: "copy[all_syllabus_body]", title: SELECTIVE_CONTENT_TYPES[1].last.call}
+
+          end
+        end
         SELECTIVE_CONTENT_TYPES.each do |type, title|
           if course_data[type] && course_data[type].count > 0
             hash = {type: type, property: "copy[all_#{type}]", title: title.call, count: course_data[type].count}

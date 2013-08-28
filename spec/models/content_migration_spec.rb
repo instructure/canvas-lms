@@ -83,6 +83,12 @@ describe ContentMigration do
       @copy_from.syllabus_body = "<a href='/courses/#{@copy_from.id}/discussion_topics/#{topic.id}'>link</a>"
       @copy_from.save!
 
+      @cm.copy_options = {
+        everything: false,
+        all_syllabus_body: true,
+        all_discussion_topics: true
+      }
+      @cm.save!
       run_course_copy
 
       new_topic = @copy_to.discussion_topics.find_by_migration_id(CC::CCHelper.create_key(topic))
@@ -107,7 +113,7 @@ describe ContentMigration do
       @copy_from.syllabus_body = "<p>wassup</p>"
 
       @cm.copy_options = {
-        :course => {'syllabus_body' => false}
+        :course => {'all_syllabus_body' => false}
       }
       @cm.save!
 
