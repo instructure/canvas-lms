@@ -1723,6 +1723,27 @@ describe Assignment do
       result.first.should == @group1
       result.last.map{ |u| u.id }.sort.should == [@student1, @student2].map{ |u| u.id }.sort
     end
+
+    it "returns distinct users" do
+      s1, s2 = n_students_in_course(2)
+
+      section = @course.course_sections.create! name: "some section"
+      e = @course.enroll_user s1, 'StudentEnrollment',
+                              section: section,
+                              allow_multiple_enrollments: true
+      e.update_attribute :workflow_state, 'active'
+
+      gc = @course.group_categories.create! name: "Homework Groups"
+      group = gc.groups.create! name: "Group 1"
+      group.add_user(s1)
+      group.add_user(s2)
+
+      a = @course.assignments.create! name: "Group Assignment",
+                                      group_category_id: gc.id
+      g, students = a.group_students(s1)
+      g.should == group
+      students.sort_by(&:id).should == [s1, s2]
+    end
   end
 
   it "should maintain the deprecated group_category attribute" do
@@ -2402,7 +2423,9 @@ describe Assignment do
         zip.open.path,
         @teacher)
 
-      comments.map { |g| g.map { |c| c.submission.user } }.should == [[s1, s2]]
+      comments.map { |g|
+        g.map { |c| c.submission.user }.sort_by(&:id)
+      }.should == [[s1, s2]]
     end
   end
 end
@@ -2475,6 +2498,7 @@ def zip_submissions
   zip.context = @assignment
   zip.save!
   ContentZipper.process_attachment(zip, @teacher)
+  raise "zip failed" if zip.workflow_state != "zipped"
   zip
 end
 

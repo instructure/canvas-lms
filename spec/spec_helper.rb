@@ -1110,6 +1110,11 @@ Spec::Runner.configure do |config|
     @quiz.save!
     @quiz
   end
+
+  def n_students_in_course(n, opts={})
+    opts.reverse_merge active_all: true
+    n.times.map { student_in_course(opts); @student }
+  end
 end
 
 Dir[Rails.root+'vendor/plugins/*/spec_canvas/spec_helper.rb'].each do |f|

@@ -96,9 +96,17 @@ class ContentZipper
 
           filename = users_name + (submission.late? ? " LATE_" : "_") + submission.user_id.to_s
           filename = filename.gsub(/ /, "-").gsub(/[^-\w]/, "-").downcase
+
           content = nil
           if submission.submission_type == "online_upload"
-            submission.attachments.each do |attachment|
+            # NOTE: not using #versioned_attachments or #attachments because
+            # they do not include submissions for group assignments for anyone
+            # but the original submitter of the group submission
+            attachment_ids = submission.attachment_ids.try(:split, ",")
+            attachments = attachment_ids ?
+                            Attachment.where(id: attachment_ids) :
+                            []
+            attachments.each do |attachment|
               @logger.debug("  found attachment: #{attachment.display_name}")
               fn = filename + "_" + attachment.id.to_s + "_" + attachment.display_name
               mark_successful! if add_attachment_to_zip(attachment, zipfile, fn)

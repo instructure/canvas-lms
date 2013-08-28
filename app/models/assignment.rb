@@ -863,9 +863,12 @@ class Assignment < ActiveRecord::Base
     group = nil
     students = [student]
     if has_group_category? && group = group_category.group_for(student)
-      students = group.users.joins("INNER JOIN enrollments ON enrollments.user_id=users.id").
-        where(:enrollments => { :course_id => self.context}).
-        where(Course.reflections[:student_enrollments].options[:conditions]).all
+      students = group.users
+        .joins("INNER JOIN enrollments ON enrollments.user_id=users.id")
+        .where(:enrollments => { :course_id => self.context})
+        .where(Course.reflections[:student_enrollments].options[:conditions])
+        .uniq
+        .all
     end
     [group, students]
   end
