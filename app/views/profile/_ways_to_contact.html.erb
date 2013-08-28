@@ -145,8 +145,9 @@
     <td style="white-space: nowrap"><%= label :communication_channel, :address, before_label(:email_address, "Email Address") %></td>
     <td><%= text_field :communication_channel, :address %></td>
   </tr>
-  <% # CANVAS-161 Hide checkbox for adding login using another email address %>
+  <%# SFU MOD CANVAS-161 Hide checkbox for adding login using another email address %>
   <% if false && @domain_root_account == Account.default %>
+  <%# END SFU MOD %>
   <tr>
     <td colspan="2">
       <input type="checkbox" id="build_pseudonym_for_email" name="build_pseudonym" value="1"/>
