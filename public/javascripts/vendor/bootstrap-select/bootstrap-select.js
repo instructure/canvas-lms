@@ -211,12 +211,12 @@
         },
 
         createA: function(text, classes, inline, index, $option) {
-          // INSTRUCTURE: added role and id and aria-label and the $option parameter
+          // INSTRUCTURE: added role and aria-label and the $option parameter
           var ariaLabel = ''
           if ($option.attr('aria-label') !== undefined) {
             ariaLabel = ' aria-label="' + $option.attr('aria-label') + '"'
           }
-         return '<a tabindex="-1" class="'+classes+'" style="'+inline+'" id="' + this.id+'-'+index + '" role="menuitemcheckbox"' + ariaLabel + '>' +
+         return '<a tabindex="-1" class="'+classes+'" style="'+inline+'" role="menuitemcheckbox"' + ariaLabel + '>' +
                  text +
                  '<i class="icon-ok check-mark"></i>' +
                  '</a>';
@@ -275,6 +275,11 @@
             }
 
             _this.$newElement.find('.filter-option').html(title + subtext);
+
+            // INSTRUCTURE
+            if (_this.$newElement.hasClass('open')) {
+              $('li:not(.divider):visible > a', _this.$newElement).first().focus();
+            }
         },
 
         setStyle: function(style, status) {
@@ -455,6 +460,8 @@
             });
 
             this.$menu.on('click', 'li a', function(e) {
+                // INSTRUCTURE
+                if ($(this).closest('li').hasClass('dropdown-submenu')) {return;}
                 var clickedIndex = _this.$newElement.find('a[role=menuitemcheckbox]').index(this),
                     $this = $(this).parent(),
                     prevValue = _this.$element.val();
@@ -548,25 +555,6 @@
             $target = $(e.target);
 
             // INSTRUCTURE
-            // left
-            if (e.keyCode == 37) {
-              $list = $target.parent().parent();
-              $list.css({display: ''});
-              if ($list.is('[role=group]')) {
-                $list.prev().focus();
-              }
-            }
-            // right 
-            if (e.keyCode == 39) {
-              $list = $target.next();
-              $list.css({display: 'block'});
-              if ($list.is('[role=group]')) {
-                $list.find('> li:not(.divider):visible > a').eq(0).focus();
-                e.preventDefault();
-              }
-            }
-
-            // INSTRUCTURE
             if ($target.is('a')) {
               $list = $(e.target).closest('ul');
             } else {
@@ -576,60 +564,38 @@
 
             if (!$items.length) return;
 
-            if (/(38|40)/.test(e.keyCode)) {
-
-                index = $items.index($items.filter(':focus'));
-
-                first = $items.parent(':not(.disabled)').first().index();
-                last = $items.parent(':not(.disabled)').last().index();
-                next = $items.eq(index).parent().nextAll(':not(.disabled)').eq(0).index();
-                prev = $items.eq(index).parent().prevAll(':not(.disabled)').eq(0).index();
-                nextPrev = $items.eq(next).parent().prevAll(':not(.disabled)').eq(0).index();
-
-                if (e.keyCode == 38) {
-                    if (index != nextPrev && index > prev) index = prev;
-                    if (index < first) index = first;
-                }
-
-                if (e.keyCode == 40) {
-                    if (index != nextPrev && index < next) index = next;
-                    if (index > last) index = last;
-                }
-
-                $items.eq(index).focus()
-            } else {
-                var keyCodeMap = {
-                    48:"0", 49:"1", 50:"2", 51:"3", 52:"4", 53:"5", 54:"6", 55:"7", 56:"8", 57:"9", 59:";",
-                    65:"a", 66:"b", 67:"c", 68:"d", 69:"e", 70:"f", 71:"g", 72:"h", 73:"i", 74:"j", 75:"k", 76:"l",
-                    77:"m", 78:"n", 79:"o", 80:"p", 81:"q", 82:"r", 83:"s", 84:"t", 85:"u", 86:"v", 87:"w", 88:"x", 89:"y", 90:"z",
-                    96:"0", 97:"1", 98:"2", 99:"3", 100:"4", 101:"5", 102:"6", 103:"7", 104:"8", 105:"9"
-                }
-
-                var keyIndex = [];
-
-                $items.each(function() {
-                    if ($(this).parent().is(':not(.disabled)')) {
-                        if ($.trim($(this).text().toLowerCase()).substring(0,1) == keyCodeMap[e.keyCode]) {
-                            keyIndex.push($(this).parent().index());
-                        }
-                    }
-                });
-
-                var count = $(document).data('keycount');
-                count++;
-                $(document).data('keycount',count);
-
-                var prevKey = $.trim($(':focus').text().toLowerCase()).substring(0,1);
-
-                if (prevKey != keyCodeMap[e.keyCode]) {
-                    count = 1;
-                    $(document).data('keycount',count);
-                } else if (count >= keyIndex.length) {
-                    $(document).data('keycount',0);
-                }
-
-                $items.eq(keyIndex[count - 1]).focus();
+            // INSTRUCTURE: bootstrap-dropdown handles arrow key movement
+            var keyCodeMap = {
+                48:"0", 49:"1", 50:"2", 51:"3", 52:"4", 53:"5", 54:"6", 55:"7", 56:"8", 57:"9", 59:";",
+                65:"a", 66:"b", 67:"c", 68:"d", 69:"e", 70:"f", 71:"g", 72:"h", 73:"i", 74:"j", 75:"k", 76:"l",
+                77:"m", 78:"n", 79:"o", 80:"p", 81:"q", 82:"r", 83:"s", 84:"t", 85:"u", 86:"v", 87:"w", 88:"x", 89:"y", 90:"z",
+                96:"0", 97:"1", 98:"2", 99:"3", 100:"4", 101:"5", 102:"6", 103:"7", 104:"8", 105:"9"
             }
+
+            var keyIndex = [];
+
+            $items.each(function() {
+                if ($(this).parent().is(':not(.disabled)')) {
+                    if ($.trim($(this).text().toLowerCase()).substring(0,1) == keyCodeMap[e.keyCode]) {
+                        keyIndex.push($(this).parent().index());
+                    }
+                }
+            });
+
+            var count = $(document).data('keycount');
+            count++;
+            $(document).data('keycount',count);
+
+            var prevKey = $.trim($(':focus').text().toLowerCase()).substring(0,1);
+
+            if (prevKey != keyCodeMap[e.keyCode]) {
+                count = 1;
+                $(document).data('keycount',count);
+            } else if (count >= keyIndex.length) {
+                $(document).data('keycount',0);
+            }
+
+            $items.eq(keyIndex[count - 1]).focus();
 
             if (/(13)/.test(e.keyCode)) {
                 $(':focus').click();
