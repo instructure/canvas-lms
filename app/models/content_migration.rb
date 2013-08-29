@@ -29,30 +29,9 @@ class ContentMigration < ActiveRecord::Base
   has_many :migration_issues
   has_one :job_progress, :class_name => 'Progress', :as => :context
   serialize :migration_settings
-  before_save :infer_defaults
   cattr_accessor :export_file_path
   DATE_FORMAT = "%m/%d/%Y"
-  DEFAULT_TO_EXPORT = {
-          'all_files' => false,
-          'announcements' => false,
-          'assessments' => false,
-          'assignment_groups' => true,
-          'assignments' => false,
-          'calendar_events' => false,
-          'calendar_start' => 1.year.ago.strftime(DATE_FORMAT),
-          'calendar_end' => 1.year.from_now.strftime(DATE_FORMAT),
-          'course_outline' => true,
-          'discussions' => false,
-          'discussion_responses' => false,
-          'goals' => false,
-          'groups' => false,
-          'learning_modules' => false,
-          'question_bank' => false,
-          'rubrics' => false,
-          'tasks' => false,
-          'web_links' => false,
-          'wikis' => false
-  }
+
   attr_accessible :context, :migration_settings, :user, :source_course, :copy_options, :migration_type
   attr_accessor :outcome_to_id_map
 
@@ -97,11 +76,7 @@ class ContentMigration < ActiveRecord::Base
 
   def update_migration_settings(new_settings)
     new_settings.each do |key, val|
-      if key == 'only'
-        process_to_scrape val
-      else
-        migration_settings[key] = val
-      end
+      migration_settings[key] = val
     end
   end
   
@@ -132,22 +107,6 @@ class ContentMigration < ActiveRecord::Base
   def migration_ids_to_import=(val)
     migration_settings[:migration_ids_to_import] = val
     set_date_shift_options val[:copy]
-  end
-
-  def infer_defaults
-    migration_settings[:to_scrape] ||= DEFAULT_TO_EXPORT
-  end
-
-  def process_to_scrape(hash)
-    migrate_only = migration_settings[:to_scrape] || DEFAULT_TO_EXPORT
-    hash.each do |key, arg|
-      migrate_only[key] = arg == '1' ? true : false if arg
-      if key == 'calendar_events' && migrate_only[key]
-        migrate_only['calendar_start'] = 1.year.ago.strftime(DATE_FORMAT)
-        migrate_only['calendar_end'] = 1.year.from_now.strftime(DATE_FORMAT)
-      end
-    end
-    migration_settings[:to_scrape] = migrate_only
   end
 
   def zip_path=(val)
