@@ -157,7 +157,7 @@ class Submission < ActiveRecord::Base
   end
 
   set_policy do
-    given {|user| user && user.id == self.user_id }
+    given {|user| self.assignment.published? && user && user.id == self.user_id }
     can :read and can :comment and can :make_group_comment and can :submit
 
     given { |user| user && user.id == self.user_id && !self.assignment.muted? }
@@ -174,10 +174,10 @@ class Submission < ActiveRecord::Base
       self.assignment.context.observer_enrollments.find_by_user_id_and_associated_user_id_and_workflow_state(user.id, self.user.id, 'active').try(:grants_right?, user, :read_grades) }
     can :read_grade
 
-    given {|user, session| self.assignment.cached_context_grants_right?(user, session, :manage_grades) }#admins.include?(user) }
+    given {|user, session| self.assignment.published? && self.assignment.cached_context_grants_right?(user, session, :manage_grades) }#admins.include?(user) }
     can :read and can :comment and can :make_group_comment and can :read_grade and can :grade
 
-    given {|user| user && self.assessment_requests.map{|a| a.assessor_id}.include?(user.id) }
+    given {|user| self.assignment.published? && user && self.assessment_requests.map{|a| a.assessor_id}.include?(user.id) }
     can :read and can :comment
 
     given { |user, session|

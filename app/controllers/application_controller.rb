@@ -269,6 +269,7 @@ class ApplicationController < ActionController::Base
     action_session = opts.shift if !opts[0].is_a?(Symbol) && !opts[0].is_a?(Array)
     actions = Array(opts.shift)
     can_do = false
+
     begin
       if object == @context && user == @current_user
         @context_all_permissions ||= @context.grants_rights?(user, session, nil)

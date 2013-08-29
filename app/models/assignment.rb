@@ -955,9 +955,18 @@ class Assignment < ActiveRecord::Base
     s
   end
 
+  def self.find_or_initialize_submission(assignment_id, user_id)
+    Submission.find_or_initialize_by_assignment_id_and_user_id(assignment_id, user_id)
+  end
+
   def find_or_create_submission(user)
     user_id = user.is_a?(User) ? user.id : user
     Assignment.find_or_create_submission(self.id, user_id)
+  end
+
+  def find_or_initialize_submission(user)
+    user_id = user.is_a?(User) ? user.id : user
+    Assignment.find_or_initialize_submission(self.id, user_id)
   end
 
   def find_asset_for_assessment(association, user_id)

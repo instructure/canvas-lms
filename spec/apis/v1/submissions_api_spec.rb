@@ -1965,4 +1965,69 @@ describe 'Submissions API', :type => :integration do
     end
   end
 
+  context "draft assignments" do
+    before do
+      course_with_teacher(:active_all => true)
+      student_in_course(:active_all => true)
+      @a2 = @course.assignments.create!({:title => 'assignment2'})
+      @a2.workflow_state = "unpublished"
+      @a2.save!
+    end
+
+    it "should not allow comments (teachers)" do
+      @user = @teacher
+      draft_assignment_update({ :comment => { :text_comment => 'Tacos are tasty' }})
+    end
+
+    it "should not allow comments (students)" do
+      @user = @student
+      draft_assignment_update({ :comment => { :text_comment => 'Tacos are tasty' }})
+    end
+
+    it "should not allow group comments (students)" do
+      student2 = user(:active_all => true)
+      @course.enroll_student(student2).accept!
+      group_category = @course.group_categories.create(:name => "Category")
+      @group = @course.groups.create(:name => "Group", :group_category => group_category, :context => @course)
+      @group.users = [@student, student2]
+      @a2 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'points', :points_possible => 12, :group_category => group_category)
+      draft_assignment_update({ :comment => { :text_comment => "HEY GIRL HEY!", :group_comment => "1" } })
+    end
+
+    it "should not allow grading with points" do
+      @a2.grading_type = "points"
+      @a2.points_possible = 15
+      @a2.save!
+      @user = @teacher
+      grade = "13.2"
+      draft_assignment_update({ :submission => { :posted_grade => grade }})
+    end
+
+    it "should not mark as complete for zero credit assignments" do
+      @a2.grading_type = "pass_fail"
+      @a2.points_possible = 0
+      @a2.save!
+      @user = @teacher
+      grade = "pass"
+      draft_assignment_update({ :submission => { :posted_grade => grade }})
+    end
+
+    # Give this a hash of items to update with the API call
+    def draft_assignment_update(opts)
+      json = raw_api_call(
+              :put,
+              "/api/v1/courses/#{@course.id}/assignments/#{@a2.id}/submissions/#{@student.id}",
+              {
+                :controller => 'submissions_api',
+                :action => 'update',
+                :format => 'json',
+                :course_id => @course.id.to_s,
+                :assignment_id => @a2.id.to_s,
+                :user_id => @student.id.to_s
+              },
+              opts)
+      response.status.should == "401 Unauthorized"
+    end
+  end
+
 end
