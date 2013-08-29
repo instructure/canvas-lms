@@ -915,6 +915,7 @@ describe ContentMigration do
     end
 
     it "should not copy plain text question comments as html" do
+      pending unless Qti.qti_enabled?
       bank1 = @copy_from.assessment_question_banks.create!(:title => 'bank')
       q = bank1.assessment_questions.create!(:question_data => {
           "question_type" => "multiple_choice_question", 'name' => 'test question',
