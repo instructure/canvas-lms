@@ -862,6 +862,27 @@ describe Attachment do
       new_b = b.clone_for(courseb, nil, :overwrite => true)
       new_b.root_attachment_id.should be_nil
     end
+
+    it "should maintain namespace across clones" do
+      a = attachment_model(uploaded_data: stub_png_data, content_type: 'image/png')
+      a.root_attachment_id.should be_nil
+      coursea = @course
+      @context = courseb = course
+
+      # emulate the situation where a namespace doesn't match what
+      # infer_namespace now returns
+      a.update_attribute(:namespace, "test_ns")
+
+      b = a.clone_for(courseb, nil, overwrite: true)
+      b.save
+      b.root_attachment.should == a
+      b.namespace.should == "test_ns"
+
+      new_a = b.clone_for(coursea, nil, overwrite: true)
+      new_a.save
+      new_a.should == a
+      new_a.namespace.should == "test_ns"
+    end
   end
 
   context "adheres_to_policy" do

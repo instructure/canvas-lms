@@ -221,9 +221,7 @@ class Attachment < ActiveRecord::Base
     existing ||= self.cloned_item_id ? context.attachments.find_by_cloned_item_id(self.cloned_item_id) : nil
     dup ||= Attachment.new
     dup = existing if existing && options[:overwrite]
-    self.attributes.delete_if{|k,v| [:id, :root_attachment_id, :uuid, :folder_id, :user_id, :filename].include?(k.to_sym) }.each do |key, val|
-      dup.send("#{key}=", val)
-    end
+    dup.send(:attributes=, self.attributes.except(*%w[id root_attachment_id uuid folder_id user_id filename namespace]), false)
     dup.write_attribute(:filename, self.filename)
     # avoid cycles (a -> b -> a) and self-references (a -> a) in root_attachment_id pointers
     if dup.new_record? || ![self.id, self.root_attachment_id].include?(dup.id)
@@ -550,7 +548,8 @@ class Attachment < ActiveRecord::Base
     #
     # I've added the root_account_id accessor above, but I didn't verify there
     # isn't any code still accessing the namespace for the account id directly.
-    ns = Attachment.domain_namespace
+    ns = root_attachment.try(:namespace) if root_attachment_id
+    ns ||= Attachment.domain_namespace
     ns ||= self.context.root_account.file_namespace rescue nil
     ns ||= self.context.account.file_namespace rescue nil
     if Rails.env.development? && Attachment.local_storage?
