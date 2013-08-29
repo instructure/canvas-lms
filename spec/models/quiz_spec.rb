@@ -1129,6 +1129,29 @@ describe Quiz do
     end
   end
 
+  context "#regrade_if_published" do
+
+    it "queues a job to regrade if there are current question regrades" do
+      course_with_teacher_logged_in(course: @course, active_all: true)
+      quiz = @course.quizzes.create!
+      q = quiz.quiz_questions.create!
+      regrade = QuizRegrade.find_or_create_by_quiz_id_and_quiz_version(quiz.id,quiz.version_number) { |qr| qr.user_id = @teacher.id }
+      regrade.quiz_question_regrades.create!(
+        quiz_question_id: q.id,
+        regrade_option: 'current_correct_only')
+      QuizRegrader.expects(:send_later).once.
+        with(:regrade!, quiz: quiz, version_number: quiz.version_number)
+      quiz.save!
+    end
+
+    it "does not queue a job to regrade when no current question regrades" do
+      course_with_teacher_logged_in(course: @course, active_all: true)
+      QuizRegrader.expects(:send_later).never
+      quiz = @course.quizzes.create!
+      quiz.save!
+    end
+  end
+
   context "draft_state" do
 
     it "updates the assignment's workflow state" do

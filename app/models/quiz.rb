@@ -1243,7 +1243,9 @@ class Quiz < ActiveRecord::Base
         quiz: self,
         version_number: self.version_number
       }
-      QuizRegrader.send_later(:regrade!, options)
+      if current_quiz_question_regrades.present?
+        QuizRegrader.send_later(:regrade!, options)
+      end
     end
     true
   end
