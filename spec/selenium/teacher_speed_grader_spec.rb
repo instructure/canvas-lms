@@ -25,7 +25,7 @@ describe "speed grader" do
       @enrollment.course_section = @section; @enrollment.save
 
       @assignment.submission_types = "online_upload"
-      @assignment.save
+      @assignment.save!
 
       @submission1 = @assignment.submit_homework(@student1, :submission_type => "online_text_entry", :body => "hi")
       @submission2 = @assignment.submit_homework(@student2, :submission_type => "online_text_entry", :body => "there")
@@ -33,7 +33,6 @@ describe "speed grader" do
 
     it "should list the correct number of students" do
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-      wait_for_ajax_requests
 
       f("#x_of_x_students").should include_text("1 of 1")
       ff("#students_selectmenu-menu li").count.should == 1

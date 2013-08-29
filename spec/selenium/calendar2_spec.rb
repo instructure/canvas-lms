@@ -243,7 +243,7 @@ describe "calendar2" do
       it "more options link on assignments should go to assignment edit page" do
         name = 'super big assignment'
         create_middle_day_assignment(name)
-        f('.fc-event.assignment').click
+        fj('.fc-event.assignment').click
         driver.execute_script("$('.edit_event_link').hover().click()")
         expect_new_page_load { driver.execute_script("$('.more_options_link').hover().click()") }
         f('#assignment_name').attribute(:value).should include(name)

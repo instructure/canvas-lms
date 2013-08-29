@@ -161,8 +161,10 @@ describe "context_modules" do
       f(".module_#{modules[0].id} .progress").should include_text("no information")
       f(".module_#{modules[1].id} .progress").should include_text("no information")
       student_list = f(".student_list")
-      student_list.should include_text(new_student.name)
-      student_list.should include_text("none in progress")
+      keep_trying_until do
+        student_list.should include_text(new_student.name)
+        student_list.should include_text("none in progress")
+      end
     end
 
     it "should refresh student progression page and display as expected" do
@@ -202,10 +204,11 @@ describe "context_modules" do
       wait_for_ajaximations
       # fj for last 3 lines to avoid selenium caching
       fj(".student_list").should be_displayed
-
-      fj(".module_#{modules[0].id} .progress").should include_text("completed")
-      fj(".module_#{modules[1].id} .progress").should include_text("in progress")
-      student_list.should include_text(new_student.name)
+      keep_trying_until do
+        fj(".module_#{modules[0].id} .progress").should include_text("completed")
+        fj(".module_#{modules[1].id} .progress").should include_text("in progress")
+        student_list.should include_text(new_student.name)
+      end
     end
     #student_list.should include_text("module 2") ****Should update to module 2 but doesn't until renavigating to the page****
 
@@ -240,8 +243,10 @@ describe "context_modules" do
       wait_for_ajaximations
 
       #validates the second student has been selected and that the modules information is displayed as expected
-      f(".module_#{modules[0].id} .progress").should include_text("completed")
-      f(".module_#{modules[1].id} .progress").should include_text("in progress")
+      keep_trying_until do
+        f(".module_#{modules[0].id} .progress").should include_text("completed")
+        f(".module_#{modules[1].id} .progress").should include_text("in progress")
+      end
     end
 
     it "should rearrange child objects in same module" do
@@ -265,8 +270,10 @@ describe "context_modules" do
       wait_for_ajaximations
 
       #validates the assignments switched, the number convention doesn't make sense, should be assignment == 2 and assignment2 == 1 but this is working
-      @assignment.position.should == 2
-      @assignment2.position.should == 3
+      keep_trying_until do
+        @assignment.position.should == 2
+        @assignment2.position.should == 3
+      end
     end
 
     it "should rearrange child object to new module" do
@@ -289,9 +296,11 @@ describe "context_modules" do
       wait_for_ajaximations
 
       #validates the module 1 assignments are in the expected places and that module 2 context_module_items isn't present
-      @assignment.position.should == 2
-      @assignment2.position.should == 3
-      fj('#context_modules .context_module:last-child .context_module_items .context_module_item').should be_nil
+      keep_trying_until do
+        @assignment.position.should == 2
+        @assignment2.position.should == 3
+        fj('#context_modules .context_module:last-child .context_module_items .context_module_item').should be_nil
+      end
     end
 
     it "should only display out-of on an assignment min score restriction when the assignment has a total" do

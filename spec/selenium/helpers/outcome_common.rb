@@ -335,15 +335,14 @@ def should_delete_an_outcome_group
   ## when
   # delete the outcome
   f('.delete_button').click
-  driver.switch_to.alert.accept
-  wait_for_ajaximations
+  keep_trying_until { try_to_close_modal }
 
   ## expect
   # should not be showing on page
   ffj('.outcomes-sidebar .outcome-level:first li').should be_empty
-  f('.outcomes-content .title').text.should == "Setting up Outcomes"
+  fj('.outcomes-content .title').text.should == "Setting up Outcomes"
   # db
   LearningOutcomeGroup.find_by_id(@outcome_group.id).workflow_state.should == 'deleted'
   refresh_page # to make sure it was correctly deleted
-  ff('.learning_outcome').each { |outcome_element| outcome_element.should_not be_displayed }
+  ffj('.learning_outcome').each { |outcome_element| outcome_element.should_not be_displayed }
 end

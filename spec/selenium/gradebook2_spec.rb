@@ -174,9 +174,9 @@ describe "gradebook2" do
       edit_grade(f('#gradebook_grid [row="1"] .l0'), 1)
 
       button = f('#section_to_show')
-      button.should include_text "All Sections"
+      button.should include_text("All Sections")
       switch_to_section(@other_section)
-      button.should include_text @other_section.name
+      keep_trying_until { button.should include_text(@other_section.name) }
       validate_cell_text(f('#gradebook_grid [row="0"] .l0'), '1')
 
       # verify that it remembers the section to show across page loads
@@ -546,13 +546,12 @@ describe "gradebook2" do
 
         # make sure it appears in each submission dialog
         icons.each do |icon|
-          keep_trying_until do
-            cell = icon.find_element(:xpath, '..')
-            driver.action.move_to(cell).perform
-            cell.find_element(:css, "a").click
-            wait_for_ajaximations
-            fj('.turnitin_similarity_score:visible').should be_present
-          end
+          cell = icon.find_element(:xpath, '..')
+          driver.action.move_to(cell).perform
+          wait_for_ajaximations
+          cell.find_element(:css, "a").should be_displayed
+          cell.find_element(:css, "a").click
+          wait_for_ajaximations
           fj('.ui-icon-closethick:visible').click
         end
       end

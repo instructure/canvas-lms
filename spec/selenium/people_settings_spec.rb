@@ -32,7 +32,6 @@ describe "course people" do
     def select_from_auto_complete(text, input_id)
       fj(".token_input input:visible").send_keys(text)
       wait_for_ajaximations
-      wait_for_ajaximations
       keep_trying_until { driver.execute_script("return $('##{input_id}').data('token_input').selector.list.query.search") == text }
       elements = driver.execute_script("return $('.autocomplete_menu:visible .list').last().find('ul').last().find('li').toArray();").map { |e|
         [e, (e.find_element(:tag_name, :b).text rescue e.text)]
@@ -45,7 +44,6 @@ describe "course people" do
 
     def go_to_people_page
       get "/courses/#{@course.id}/users"
-      wait_for_ajaximations
     end
 
     def kyle_menu(user, role = nil)
@@ -250,7 +248,7 @@ describe "course people" do
         student_in_course :course => @course
         e = course_with_observer(:course => @course, :role_name => "custom observer")
 
-        go_to_people_page
+        expect_new_page_load { go_to_people_page }
 
         use_link_dialog(@observer) do
           select_from_auto_complete(@student.name, 'student_input')

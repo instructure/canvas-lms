@@ -38,6 +38,7 @@ THIS_ENV = 1 if ENV['TEST_ENV_NUMBER'].blank?
 WEBSERVER = 'thin' #set WEBSERVER ENV to webrick to change webserver
 
 
+
 $server_port = nil
 $app_host_and_port = nil
 
@@ -758,8 +759,17 @@ shared_examples_for "all selenium tests" do
     link = polymorphic_path(link) if link.is_a? Array
     driver.get(app_host + link)
     #handles any modals prompted by navigating from the current page
-    driver.switch_to.alert.accept rescue nil
+    try_to_close_modal
     wait_for_ajaximations if waitforajaximations
+  end
+
+  def try_to_close_modal
+    begin
+      driver.switch_to.alert.accept
+      true
+    rescue Exception => e
+      return false
+    end
   end
 
   def refresh_page
