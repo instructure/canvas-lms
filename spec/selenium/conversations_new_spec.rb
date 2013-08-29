@@ -200,6 +200,19 @@ describe "conversations new" do
       select_view('unread')
       conversation_elements.size.should eql 1 
     end
+
+    it "should hide the spinner after deleting the last conversation" do
+      get_conversations
+      select_view('archived')
+      conversation_elements.size.should eql 1
+      conversation_elements[0].click
+      wait_for_ajaximations
+      fj('#delete-btn').click
+      driver.switch_to.alert.accept
+      wait_for_ajaximations
+      conversation_elements.size.should eql 0
+      ffj('.message-list .paginatedLoadingIndicator:visible').length.should eql 0
+    end
   end
 
   describe "starred" do
