@@ -57,23 +57,11 @@ require [
 
     _delegateReply: (message, type) ->
       btn = if type == 'reply' then 'reply-btn' else 'reply-all-btn'
-      model = if message
-        model   = @detail.model.clone()
+      if message
         trigger = $(".message-item-view[data-id=#{message.id}] .#{btn}")
-        model.set('messages', @_getMessageContext(message, model))
-        model
       else
         trigger = $("##{btn}")
-        @detail.model
-      @compose.show(model, to: type, trigger: trigger)
-
-    _getMessageContext: (subject, conversation) ->
-      _.filter conversation.get('messages'), (m) =>
-        m.id == subject.id or @_isContext(subject, m)
-
-    _isContext: (subject, context) ->
-      _.include(context.participating_user_ids, subject.author_id) and
-        context.created_at < subject.created_at
+      @compose.show(@detail.model, to: type, trigger: trigger, message: message)
 
     onDelete: =>
       return unless confirm(@messages.confirmDelete)
