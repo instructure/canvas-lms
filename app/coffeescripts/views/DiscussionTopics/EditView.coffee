@@ -202,6 +202,8 @@ htmlEscape, DiscussionTopic, Announcement, Assignment, $, preventDefault, Missin
     )
 
     validateBeforeSave: (data, errors) =>
+      if data.delay_posting == "0"
+        data.delayed_post_at = null
       if @isTopic() && data.set_assignment is '1'
         if @assignmentGroupSelector?
           errors = @assignmentGroupSelector.validateBeforeSave(data, errors)
