@@ -113,6 +113,7 @@
           </select>
           <span class="text_after_answers"><%= user_content(hash_get(question, :text_after_answers)) %></span>
         <% elsif question && hash_get(question, :question_type) == "fill_in_multiple_blanks_question" && @stored_params %>
+
           <% answer_list = []
              if assessment_results
                variables = hash_get(question, :answers, []).map{|a| hash_get(a, :blank_id) }.compact.uniq

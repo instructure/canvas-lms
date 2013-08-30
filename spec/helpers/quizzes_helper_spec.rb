@@ -128,17 +128,34 @@ describe QuizzesHelper do
   end
 
   context 'fill_in_multiple_blanks_question' do
-    it 'should sanitize user input' do
-      def user_content(stuff); stuff; end
+    before(:each) do
+      @question_text = %q|<input name="question_1" 'value={{question_1}}' />|
+      @answer_list = [] 
+      @answers = []
 
-      question_text = %q|<input name="question_1" 'value={{question_1}}' />|
+      def user_content(stuff); stuff; end # mock #user_content
+    end
+    it 'should sanitize user input' do
+      malicious_answer_list =  [%q|'><script>alert('ha!')</script><img|]
+
       html = fill_in_multiple_blanks_question(
-        :question => {:question_text => question_text},
-        :answer_list => [%q|'><script>alert('ha!')</script><img|],
-        :answers => []
+        :question => {:question_text => @question_text},
+        :answer_list => malicious_answer_list,
+        :answers => @answers
       )
 
-      html.should == %q|<input name="question_1" 'value=&#39;&gt;&lt;script&gt;alert(&#39;ha!&#39;)&lt;/script&gt;&lt;img' readonly="readonly" />|
+      html.should == %q|<input name="question_1" 'value=&#39;&gt;&lt;script&gt;alert(&#39;ha!&#39;)&lt;/script&gt;&lt;img' readonly="readonly" aria-label='Fill in the blank, read surrounding text' />|
+    end
+    
+    it 'should add an appropriate label' do
+      html = fill_in_multiple_blanks_question(
+        :question => {:question_text => @question_text},
+        :answer_list => @answer_list,
+        :answers => @answers
+      ) 
+
+      html.should =~ /aria\-label/
+      html.should =~ /Fill in the blank/
     end
   end
 
