@@ -212,4 +212,22 @@ class ApiController < ApplicationController
     end
   end
 
+  def course_enrollment
+    enrollment_id = params[:enrollment_id]
+    new_section_id = params[:new_section_id]
+    results = { :result => "Invalid POST parameters" }
+    unless enrollment_id.nil? || new_section_id.nil?
+      out = Enrollment.where(:id => enrollment_id).update_all("course_section_id = #{new_section_id}")
+      if out == 1
+        results = { :result => "Success" }
+      else
+        raise "Error updating enrollment_id of '#{enrollment_id}'"
+      end
+    end
+
+    respond_to do |format|
+      format.json { render :json => results }
+    end
+  end
+
 end

@@ -22,6 +22,7 @@ module SFU #:nodoc:
           @set.add_route("/sfu/api/v1/course-data/:term/:query", {:controller => "course_data", :action => "search", :query => nil, :format => 'json'})
           @set.add_route("/sfu/api/v1/amaint/user/:sfu_id/:property/:filter", {:controller => "amaint", :action => "user_info", :property => nil, :filter => nil, :format => 'json'})
           @set.add_route("/sfu/api/v1/amaint/course/:sis_id/:property", {:controller => "amaint", :action => "course_info", :property => nil, :format => 'json'})
+          @set.add_route("/sfu/api/v1/enrollment", {:controller => "api", :action => "course_enrollment", :method => :post})
         end
 
       end
