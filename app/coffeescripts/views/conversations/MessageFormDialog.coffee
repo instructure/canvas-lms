@@ -86,7 +86,8 @@ define [
       ]
 
     show: (model, options) ->
-      @message       = @model.messageCollection.at(0) if @model = model
+      if @model = model
+        @message = options?.message || @model.messageCollection.at(0)
       @to            = options?.to
       @returnFocusTo = options.trigger if options.trigger
 
