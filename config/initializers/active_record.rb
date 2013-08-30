@@ -18,7 +18,7 @@ class ActiveRecord::Base
 
   def feed_code
     id = self.uuid rescue self.id
-    "#{self.class.base_ar_class.name.underscore}_#{id.to_s}"
+    "#{self.class.reflection_type_name}_#{id.to_s}"
   end
 
   def opaque_identifier(column)
@@ -99,11 +99,11 @@ class ActiveRecord::Base
 
   def asset_string
     @asset_string ||= {}
-    @asset_string[Shard.current] ||= "#{self.class.base_ar_class.name.underscore}_#{id}"
+    @asset_string[Shard.current] ||= "#{self.class.reflection_type_name}_#{id}"
   end
 
   def global_asset_string
-    @global_asset_string ||= "#{self.class.base_ar_class.name.underscore}_#{global_id}"
+    @global_asset_string ||= "#{self.class.reflection_type_name}_#{global_id}"
   end
 
   # little helper to keep checks concise and avoid a db lookup
@@ -292,6 +292,10 @@ class ActiveRecord::Base
 
   def self.base_ar_class
     class_of_active_record_descendant(self)
+  end
+
+  def self.reflection_type_name
+    base_ar_class.name.underscore
   end
 
   def wildcard(*args)

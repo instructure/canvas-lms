@@ -413,10 +413,6 @@ class Group < ActiveRecord::Base
     true
   end
 
-  def file_structure_for(user)
-    User.file_structure_for(self, user)
-  end
-
   def is_a_context?
     true
   end

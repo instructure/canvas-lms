@@ -87,6 +87,7 @@ class Collaboration < ActiveRecord::Base
   scope :after, lambda { |date| where("collaborations.updated_at>?", date) }
 
   scope :for_context_codes, lambda { |context_codes| where(:context_code => context_codes) }
+  scope :for_context, lambda { |context| where(context_type: context.class.reflection_type_name, context_id: context) }
 
   # These methods should be implemented in child classes.
 

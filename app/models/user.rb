@@ -1506,35 +1506,8 @@ class User < ActiveRecord::Base
     record_merge_result(text)
   end
 
-  def file_structure_for(user)
-    User.file_structure_for(self, user)
-  end
-
   def secondary_identifier
     self.email || self.id
-  end
-
-  def self.file_structure_for(context, user)
-    results = {
-      :contexts => [context],
-      :collaborations => [],
-      :folders => [],
-      :folders_with_subcontent => [],
-      :files => []
-    }
-    context_codes = results[:contexts].map{|c| c.asset_string }
-
-    if !context.is_a?(User) && user
-      results[:collaborations] = user.collaborations.active.includes(:user, :users).select{|c| c.context_id && c.context_type && context_codes.include?("#{c.context_type.underscore}_#{c.context_id}") }
-      results[:collaborations] = results[:collaborations].sort_by{|c| c.created_at}.reverse
-    end
-
-    results[:contexts].each do |context|
-      results[:folders] += context.active_folders_with_sub_folders
-    end
-
-    results[:folders] = results[:folders].sort_by{|f| [f.parent_folder_id || 0, f.position || 0, f.name || "", f.created_at]}
-    results
   end
 
   def self_enroll_if_necessary

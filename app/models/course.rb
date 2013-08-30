@@ -1710,11 +1710,6 @@ class Course < ActiveRecord::Base
     end
   end
 
-  def file_structure_for(user)
-    User.file_structure_for(self, user)
-  end
-
-
   def merge_in(course, options = {}, import = nil)
     return [] if course == self
     res = merge_into_course(course, options, import)

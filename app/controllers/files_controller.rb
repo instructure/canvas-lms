@@ -106,7 +106,25 @@ class FilesController < ApplicationController
             @current_attachments = @current_attachments.includes(:thumbnail, :media_object)
             render :json => @current_attachments.to_json(:methods => [:readable_size, :currently_locked, :thumbnail_url], :permissions => {:user => @current_user, :session => session})
           else
-            render :json => @context.file_structure_for(@current_user).to_json(:permissions => {:user => @current_user}, :methods => [:readable_size, :mime_class, :currently_locked, :collaborator_ids])
+            file_structure = {
+              :contexts => [@context.as_json(permissions: {user: @current_user})],
+              :collaborations => [],
+              :folders => @context.active_folders_with_sub_folders.
+                order("COALESCE(parent_folder_id, 0), COALESCE(position, 0), COALESCE(name, ''), created_at").map{ |f|
+                f.as_json(permissions: {user: @current_user}, methods: [:mime_class, :currently_locked])
+              },
+              :folders_with_subcontent => [],
+              :files => []
+            }
+
+            if @current_user
+              file_structure[:collaborations] = @current_user.collaborations.for_context(@context).active.
+                includes(:user, :users).order("created_at DESC").map{ |c|
+                c.as_json(permissions: {user: @current_user}, methods: [:collaborator_ids])
+              }
+            end
+
+            render :json => file_structure
           end
         end
       end
