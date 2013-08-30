@@ -78,41 +78,54 @@ define [
         @courseID = options?.courseID || ENV?.course_id
         @assetID = options?.assetID
         @assetType = options?.assetType
+        @location = options?.location || document.location
         @previous = {}
         @next = {}
 
         @url = "/api/v1/courses/#{@courseID}/module_item_sequence"
+
+      getQueryParams: (qs) ->
+        qs = qs.split("+").join(" ")
+        params = {}
+        re = /[?&]?([^=]+)=([^&]*)/g
+
+        while (tokens = re.exec(qs))
+            params[decodeURIComponent(tokens[1])] = decodeURIComponent(tokens[2])
+        
+        params
 
       # Retrieve data based on the url, asset_type and asset_id. @success is called after a 
       # fetch is finished. This will then setup data to be used elsewhere.
       # @api public
 
       fetch: ->
-        $.ajaxJSON @url, 'GET', {asset_type: @assetType, asset_id: @assetID}, @success, null, {}
+        params = @getQueryParams(@location.search)
+        if params.module_item_id
+          $.ajaxJSON @url, 'GET', {asset_type: 'ModuleItem', asset_id: params.module_item_id}, @success, null, {}
+        else
+          $.ajaxJSON @url, 'GET', {asset_type: @assetType, asset_id: @assetID}, @success, null, {}
 
       # Determines if the data retrieved should be used to generate a buttom bar or hide it. We 
-      # can only have 1 item in the data set for this to work else we hide the sequence bar. If 
-      # we can show the bar we need to determine if the next/previous buttons should be disabled
-      # or if we should build the data for them to display their stuff.
-      # @api private
+      # can only have 1 item in the data set for this to work else we hide the sequence bar. 
+      # # @api private
 
       success: (data) => 
         @modules = data.modules
 
         # Currently only supports 1 item in the items array
-        unless data.items.length == 1
+        unless data?.items?.length == 1
           @hide = true 
           return
 
         @item = data.items[0]
-        # Buttons are disabled if @item.next/prev are null or falsy
-        @buildNextData() unless (@next.disabled = !@item.next) 
-        @buildPreviousData() unless (@previous.disabled = !@item.prev)
+        # Show the buttons if they aren't null
+        @buildNextData() if (@next.show = @item.next) 
+        @buildPreviousData() if (@previous.show = @item.prev)
 
       # Each button needs to build a data that the handlebars template can use. For example, data for
       # each button could look like this: 
       #  @previous = previous: {
-      #     disabled: false
+      #     show: true
       #     url: http://foobar.baz
       #     tooltip: <strong>Next Module:</strong> <br> Going to the fair
       #   }
@@ -133,7 +146,7 @@ define [
       # Each button needs to build a data that the handlebars template can use. For example, data for
       # each button could look like this: 
       #  @next = next: {
-      #     disabled: false
+      #     show: true
       #     url: http://foobar.baz
       #     tooltip: <strong>Next Module:</strong> <br> Going to the fair
       #   }

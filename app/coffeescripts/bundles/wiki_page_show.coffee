@@ -2,6 +2,7 @@ require [
   'jquery'
   'compiled/models/WikiPage'
   'compiled/views/wiki/WikiPageView'
+  'compiled/jquery/ModuleSequenceFooter'
 ], ($, WikiPage, WikiPageView) ->
 
   $('body').addClass('pages show')
@@ -17,3 +18,11 @@ require [
   $('#content').append(wikiPageView.$el)
 
   wikiPageView.render()
+
+  # Add module sequence footer
+  $('#module_sequence_footer').moduleSequenceFooter(
+    courseID: ENV.COURSE_ID
+    assetType: 'Page'
+    assetID: ENV.WIKI_PAGE.url
+    location: location
+  )

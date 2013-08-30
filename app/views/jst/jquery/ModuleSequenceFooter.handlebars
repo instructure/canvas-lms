@@ -1,11 +1,7 @@
-{{#if previous.disabled}}
-  <a href="javascript: void(0)" class="pull-left disabled"><i class="icon-mini-arrow-left"></i>{{#t 'previous'}}Previous{{/t}}</a>
-{{else}}
+{{#if previous.show}}
   <a href="{{previous.url}}" class="pull-left" data-tooltip title="{{previous.tooltip}}"><i class="icon-mini-arrow-left"></i>&nbsp;{{#t 'previous'}}Previous{{/t}}</a>
 {{/if}}
 
-{{#if next.disabled}}
-  <a href="javascript: void(0)" class="pull-right disabled">{{#t 'next'}}Next{{/t}}<i class="icon-mini-arrow-right"></i></a>
-{{else}}
-  <a href="{{next.url}}" class="pull-right" data-tooltip title="{{next.tooltip}}">{{#t 'next'}}Next{{/t}}&nbsp;<i class="icon-mini-arrow-right"></i></a>
+{{#if next.show}}
+  <a href="{{next.url}}" class="pull-right bordered" data-tooltip title="{{next.tooltip}}">{{#t 'next'}}Next{{/t}}&nbsp;<i class="icon-mini-arrow-right"></i></a>
 {{/if}}

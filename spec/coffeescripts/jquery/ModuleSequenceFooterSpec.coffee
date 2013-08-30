@@ -58,7 +58,7 @@ define [
          ]
      }
 
-  test 'button is disabled when next or prev data is null', ->
+  test 'there is no button when next or prev data is null', ->
     @server.respondWith "GET", 
                         "/api/v1/courses/42/module_item_sequence?asset_type=Assignment&asset_id=123",
                         [
@@ -67,7 +67,7 @@ define [
     @$testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123})
     @server.respond()
 
-    ok @$testEl.find('a').hasClass 'disabled', 'button is disabled'
+    ok @$testEl.find('a').length == 0, 'no buttons rendered'
 
   moduleTooltipData = 
      {
@@ -176,3 +176,12 @@ define [
     ok this.$testEl.find('a').first().attr('title').match('Project 1'), "displays previous item tooltip"
     ok this.$testEl.find('a').last().attr('title').match('Project 33'), "displays next item tooltip"
 
+  test 'if url has a module_item_id use that as the assetID and ModuleItem as the type instead', ->
+    @server.respondWith "GET", 
+                        "/api/v1/courses/42/module_item_sequence?asset_type=ModuleItem&asset_id=999",
+                        [
+                          200, { "Content-Type": "application/json" }, JSON.stringify({})
+                        ]
+    @$testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123, location: {search:"?module_item_id=999" }})
+    @server.respond()
+    equal @server.requests[0].status, '200', 'Request was successful'
