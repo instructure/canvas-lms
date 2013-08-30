@@ -1,8 +1,12 @@
-<div class="toolbar-buttons clearfix" data-sticky>
-  <div class="right-buttons">
-    {{#if CAN.CREATE}}
-      <a class="btn btn-primary icon-plus new_page" role="button" tabindex="0" aria-label="{{#t 'buttons.new_page_label'}}Add a page{{/t}}">{{#t 'buttons.new_page'}}Page{{/t}}</a>
-    {{/if}}
+<div class="header-bar-outer-container">
+  <div class="header-bar-container" data-sticky>
+    <div class="header-bar">
+      <div class="header-bar-right">
+        {{#if CAN.CREATE}}
+          <a class="btn btn-primary icon-plus new_page" role="button" tabindex="0" aria-label="{{#t 'buttons.new_page_label'}}Add a page{{/t}}">{{#t 'buttons.new_page'}}Page{{/t}}</a>
+        {{/if}}
+      </div>
+    </div>
   </div>
 </div>
 

@@ -1,23 +1,28 @@
-<div class="toolbar-buttons clearfix">
-  <div class="left-buttons">
-  </div>
-  <div class="right-buttons">
-    {{#if CAN.PUBLISH}}
-      {{#if published}}
-        <span class="published" aria-label="{{#t 'unpublish'}}Unpublish{{/t}}"><i class="icon-publish"></i> {{#t 'buttons.unpublish'}}Published{{/t}}</span>
-      {{else}}
-        <span class="unpublished" aira-label="{{#t 'publish'}}Publish{{/t}}"><i class="icon-unpublished muted"></i> {{#t 'buttons.publish'}}Unpublished{{/t}}</span>
-      {{/if}}
-    {{/if}}
-    {{#if CAN.DELETE}}
-      <a class="btn al-trigger" tabindex="0" role="button">
-        <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
-        <span class="screenreader-only">{{#t 'toolbar_menu.settings'}}Settings{{/t}}</span>
-      </a>
-      <ul class="al-options">
-        <li><a href="#" class="icon-trash delete_page">{{#t "delete_wiki"}}Delete{{/t}}</a></li>
-      </ul>
-    {{/if}}
+<div class="header-bar-outer-container">
+  <div class="header-bar-container" data-sticky>
+    <div class="header-bar">
+      <div class="header-bar-left">
+      </div>
+      <div class="header-bar-right">
+        {{#if CAN.PUBLISH}}
+          {{#if published}}
+            <span class="published" aria-label="{{#t 'unpublish'}}Unpublish{{/t}}"><i class="icon-publish"></i> {{#t 'buttons.unpublish'}}Published{{/t}}</span>
+          {{else}}
+            <span class="unpublished" aira-label="{{#t 'publish'}}Publish{{/t}}"><i class="icon-unpublished muted"></i> {{#t 'buttons.publish'}}Unpublished{{/t}}</span>
+          {{/if}}
+        {{/if}}
+        {{#if CAN.DELETE}}
+          <a class="btn al-trigger" tabindex="0" role="button">
+            <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
+            <span class="screenreader-only">{{#t 'toolbar_menu.settings'}}Settings{{/t}}</span>
+          </a>
+          <ul class="al-options">
+            <li><a href="#" class="icon-trash delete_page">{{#t "delete_wiki"}}Delete{{/t}}</a></li>
+          </ul>
+        {{/if}}
+      </div>
+    </div>
+    <div class="page-changed-alert" role="alert" aria-atomic="true" aria-live="assertive"></div>
   </div>
 </div>
 
@@ -32,7 +37,7 @@
     <a href="#" class="switch_views">{{#t "#editor.switch_views"}}Switch Views{{/t}}</a>
   </div>
 
-  <textarea rows="20" cols="40" name="wiki_page[body]" class="body" aria-hidden="true"{{#unless PAGE_RIGHTS.update}} autofocus{{/unless}}>{{body}}</textarea>
+  <textarea rows="16" cols="40" name="wiki_page[body]" class="body" aria-hidden="true"{{#unless PAGE_RIGHTS.update}} autofocus{{/unless}}>{{body}}</textarea>
 
   {{#if CAN.EDIT_ROLES}}
     <div class="control-group options">

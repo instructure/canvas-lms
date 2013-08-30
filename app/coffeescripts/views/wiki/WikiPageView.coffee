@@ -5,8 +5,10 @@ define [
   'jst/wiki/WikiPage'
   'compiled/views/StickyHeaderMixin'
   'compiled/views/wiki/WikiPageDeleteDialog'
+  'compiled/views/wiki/WikiPageReloadView'
   'compiled/views/PublishButtonView'
-], (_, Backbone, splitAssetString, template, StickyHeaderMixin, WikiPageDeleteDialog, PublishButtonView) ->
+  'i18n!pages'
+], (_, Backbone, splitAssetString, template, StickyHeaderMixin, WikiPageDeleteDialog, WikiPageReloadView, PublishButtonView, I18n) ->
 
   class WikiPageView extends Backbone.View
 
@@ -16,6 +18,8 @@ define [
 
     els:
       '.publish-button': '$publishButton'
+      '.header-bar-outer-container': '$headerBarOuterContainer'
+      '.page-changed-alert': '$pageChangedAlert'
 
     events:
       'click .delete_page': 'deleteWikiPage'
@@ -45,6 +49,18 @@ define [
         @model.view = @
       @publishButtonView.$el.appendTo(@$publishButton)
       @publishButtonView.render()
+
+    afterRender: ->
+      super
+      @reloadView = new WikiPageReloadView
+        el: @$pageChangedAlert
+        model: @model
+        reloadMessage: I18n.t 'reload_viewing_page', 'This page has changed since you started viewing it. *Reload*', wrapper: '<a class="reload" href="#">$1</a>'
+      @reloadView.on 'changed', =>
+        @$headerBarOuterContainer.addClass('page-changed')
+      @reloadView.on 'reload', =>
+        @render()
+      @reloadView.pollForChanges()
 
     deleteWikiPage: (ev) ->
       ev?.preventDefault()

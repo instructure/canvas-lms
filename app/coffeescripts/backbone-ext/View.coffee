@@ -92,8 +92,7 @@ define [
       @setOptionProperties()
       @storeChildrenViews()
       @$el.data 'view', this
-      @model.view = this if @model
-      @collection.view = this if @collection
+      @_setViewProperties()
       # magic from mixin
       fn.call this for fn in @__initialize__ if @__initialize__
       @attach()
@@ -311,6 +310,21 @@ define [
     hide: -> @$el.hide()
     show: -> @$el.show()
     toggle: -> @$el.toggle()
+
+    # Set view property for attached model/collection objects. If
+    # @setViewProperties is set to false, view properties will
+    # not be set.
+    #
+    # Example:
+    #   class SampleView extends Backbone.View
+    #     setViewProperties: false
+    #
+    # @api private
+    _setViewProperties: ->
+      return if @setViewProperties == false
+      @model.view = this if @model
+      @collection.view = this if @collection
+      return
 
   Backbone.View
 

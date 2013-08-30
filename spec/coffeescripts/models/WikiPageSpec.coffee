@@ -17,7 +17,28 @@ define [
 
     _.extend defaults, options
 
-  module 'WikiPageSpec:Sync'
+
+  module 'WikiPage'
+  test 'latestRevision is only available when a url is provided', ->
+    wikiPage = new WikiPage
+    equal wikiPage.latestRevision(), null, 'not provided without url'
+    wikiPage = new WikiPage url: 'url'
+    notEqual wikiPage.latestRevision(), null, 'provided with url'
+
+  test 'revision passed to latestRevision', ->
+    wikiPage = new WikiPage {url: 'url'}, revision: 42
+    equal wikiPage.latestRevision().get('revision_id'), 42, 'revision passed to latestRevision'
+
+  test 'latestRevision should be marked as latest', ->
+    wikiPage = new WikiPage {url: 'url'}
+    equal wikiPage.latestRevision().latest, true, 'marked as latest'
+
+  test 'latestRevision should default to summary', ->
+    wikiPage = new WikiPage {url: 'url'}
+    equal wikiPage.latestRevision().summary, true, 'defaulted to summary'
+
+
+  module 'WikiPage:Sync'
   test 'sets the id during construction', ->
     wikiPage = new WikiPage wikiPageObj()
     equal wikiPage.get('url'), 'front-page-2'

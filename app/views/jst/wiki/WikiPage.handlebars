@@ -1,30 +1,35 @@
-<div class="toolbar-buttons clearfix" data-sticky>
-  <div class="left-buttons">
-    {{#if CAN.VIEW_PAGES}}
-      <a class="btn{{#if front_page}} btn-primary{{/if}} view_all_pages" href="{{wiki_pages_path}}">{{#t 'buttons.view_all_pages'}}View All Pages{{/t}}</a>
-    {{/if}}
-  </div>
-  <div class="right-buttons">
-    {{#if CAN.PUBLISH}}
-      <span class="publish-button"></span>
-    {{/if}}
-    {{#if CAN.UPDATE_CONTENT}}
-      <a href="{{wiki_page_edit_path}}" class="btn edit-wiki"><i class="icon-edit"></i> {{#t 'buttons.edit'}}Edit{{/t}}</a>
-    {{/if}}
-    {{#if CAN.ACCESS_GEAR_MENU}}
-      <a class="btn al-trigger" tabindex="0" role="button">
-        <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
-        <span class="screenreader-only">{{#t 'toolbar_menu.settings'}}Settings{{/t}}</span>
-      </a>
-      <ul class="al-options">
-      {{#if CAN.DELETE}}
-        <li><a href="#" class="icon-trash delete_page">{{#t "delete_wiki"}}Delete{{/t}}</a></li>
-      {{/if}}
-      {{#if CAN.READ_REVISIONS}}
-        <li><a href="{{wiki_page_history_path}}" class="icon-clock view_page_history">{{#t "view_page_history_wiki"}}View Page History{{/t}}</a></li>
-      {{/if}}
-      </ul>
-    {{/if}}
+<div class="header-bar-outer-container">
+  <div class="header-bar-container" data-sticky>
+    <div class="header-bar">
+      <div class="header-bar-left">
+        {{#if CAN.VIEW_PAGES}}
+          <a class="btn{{#if front_page}} btn-primary{{/if}} view_all_pages" href="{{wiki_pages_path}}">{{#t 'buttons.view_all_pages'}}View All Pages{{/t}}</a>
+        {{/if}}
+      </div>
+      <div class="header-bar-right">
+        {{#if CAN.PUBLISH}}
+          <span class="publish-button"></span>
+        {{/if}}
+        {{#if CAN.UPDATE_CONTENT}}
+          <a href="{{wiki_page_edit_path}}" class="btn edit-wiki"><i class="icon-edit"></i> {{#t 'buttons.edit'}}Edit{{/t}}</a>
+        {{/if}}
+        {{#if CAN.ACCESS_GEAR_MENU}}
+          <a class="btn al-trigger" tabindex="0" role="button">
+            <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
+            <span class="screenreader-only">{{#t 'toolbar_menu.settings'}}Settings{{/t}}</span>
+          </a>
+          <ul class="al-options">
+          {{#if CAN.DELETE}}
+            <li><a href="#" class="icon-trash delete_page">{{#t "delete_wiki"}}Delete{{/t}}</a></li>
+          {{/if}}
+          {{#if CAN.READ_REVISIONS}}
+            <li><a href="{{wiki_page_history_path}}" class="icon-clock view_page_history">{{#t "view_page_history_wiki"}}View Page History{{/t}}</a></li>
+          {{/if}}
+          </ul>
+        {{/if}}
+      </div>
+    </div>
+    <div class="page-changed-alert" role="alert" aria-atomic="true" aria-live="polite"></div>
   </div>
 </div>
 

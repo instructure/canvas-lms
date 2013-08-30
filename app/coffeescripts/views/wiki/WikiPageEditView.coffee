@@ -6,15 +6,18 @@ define [
   'jst/wiki/WikiPageEdit'
   'compiled/views/ValidatedFormView'
   'compiled/views/wiki/WikiPageDeleteDialog'
+  'compiled/views/wiki/WikiPageReloadView'
   'i18n!pages'
   'compiled/tinymce'
   'tinymce.editor_box'
-], ($, _, Backbone, wikiSidebar, template, ValidatedFormView, WikiPageDeleteDialog, I18n) ->
+], ($, _, Backbone, wikiSidebar, template, ValidatedFormView, WikiPageDeleteDialog, WikiPageReloadView, I18n) ->
 
   class WikiPageEditView extends ValidatedFormView
     @mixin
       els:
         '[name="wiki_page[body]"]': '$wikiPageBody'
+        '.header-bar-outer-container': '$headerBarOuterContainer'
+        '.page-changed-alert': '$pageChangedAlert'
 
       events:
         'click a.switch_views': 'switchViews'
@@ -84,6 +87,19 @@ define [
         @firstRender = true
         $ -> $('[autofocus]:not(:focus)').eq(0).focus()
 
+      @reloadPending = false
+      @reloadView = new WikiPageReloadView
+        el: @$pageChangedAlert
+        model: @model
+        reloadMessage: I18n.t 'reload_editing_page', 'This page has changed since you started editing it. *Reloading* will lose all of your changes.', wrapper: '<a class="reload" href="#">$1</a>'
+        warning: true
+      @reloadView.on 'changed', =>
+        @$headerBarOuterContainer.addClass('page-changed')
+        @reloadPending = true
+      @reloadView.on 'reload', =>
+        @render()
+      @reloadView.pollForChanges()
+
     # Initialize the wiki sidebar
     # @api private
     initWikiSidebar: ->
@@ -128,6 +144,12 @@ define [
 
     submit: (event) ->
       @checkUnsavedOnLeave = false
+      if @reloadPending
+        unless confirm(I18n.t 'warnings.overwrite_changes', 'You are about to overwrite other changes that have been made since you started editing.\n\nOverwrite these changes?')
+          event?.preventDefault()
+          return
+
+      @reloadView?.stopPolling()
       super
 
     cancel: (event) ->

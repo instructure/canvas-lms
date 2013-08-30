@@ -1,9 +1,12 @@
 define [
   'underscore'
   'Backbone'
+  'compiled/models/WikiPageRevision'
   'compiled/backbone-ext/DefaultUrlMixin'
   'compiled/str/splitAssetString'
-], (_, Backbone, DefaultUrlMixin, splitAssetString) ->
+], (_, Backbone, WikiPageRevision, DefaultUrlMixin, splitAssetString) ->
+
+  pageOptions = ['contextAssetString', 'revision']
 
   class WikiPage extends Backbone.Model
     resourceName: 'pages'
@@ -13,9 +16,17 @@ define [
 
     initialize: (attributes, options) ->
       super
-      @contextAssetString = options?.contextAssetString
+      _.extend(this, _.pick(options || {}, pageOptions))
+
       [@contextName, @contextId] = splitAssetString(@contextAssetString) if @contextAssetString
-      @set('id', @get('url')) if @get('url') && !@get('id')
+      @set(id: attributes.url) if attributes?.url
+
+    latestRevision: (options) ->
+      if !@_latestRevision && @get('url')
+        unless @_latestRevision
+          revisionOptions = _.extend({}, {@contextAssetString, pageUrl: @get('url'), latest: true, summary: true}, options)
+          @_latestRevision = new WikiPageRevision({revision_id: @revision}, revisionOptions)
+      @_latestRevision
 
     # Flatten the nested data structure required by the api (see @publish and @unpublish)
     parse: (response, options) ->

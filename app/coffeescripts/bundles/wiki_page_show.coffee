@@ -7,7 +7,7 @@ require [
 
   $('body').addClass('pages show')
 
-  wikiPage = new WikiPage ENV.WIKI_PAGE, contextAssetString: ENV.context_asset_string
+  wikiPage = new WikiPage ENV.WIKI_PAGE, revision: ENV.WIKI_PAGE_REVISION, contextAssetString: ENV.context_asset_string
 
   wikiPageView = new WikiPageView
     model: wikiPage

@@ -1,4 +1,5 @@
 @import environment.sass
+@import wiki_animations.scss
 
 $subdued-text-color: #696969
 $darkened-text-color: #4d4d4d
@@ -21,27 +22,43 @@ $shadow: 0 1px 0 rgba(0,0,0,0.15)
 
   #breadcrumbs
     :border-bottom 1px solid $border-color
-  .toolbar-buttons
-    :height 30px
-    :padding 1em
-    :border-bottom 1px solid $border-color
-    :box-shadow $shadow
-    .left-buttons
-      :float left
-    .right-buttons
-      :float right
 
-  .toolbar-buttons.sticky
-    position: fixed
-    z-index: 1000
-    top: 0px
-    right: 0px
-    left: 0px
-    margin-left: $left_side_width + 1px
-    background: white
-    height: 33px
-    max-width: $max_main_width - 26px
-    border-color: $menu-border-color
+  .header-bar-outer-container
+    :height 64px
+    .header-bar-container
+      :box-shadow $shadow
+      :height 64px
+      &.sticky
+        :position fixed
+        :z-index 1000
+        :top 0
+        :right 0
+        :left 0
+        :margin-left $left_side_width + 1px
+        :max-width $max_main_width
+        :border-color $menu-border-color
+
+      .page-changed-alert
+        :overflow hidden
+        :height 0
+      .page-changed-alert .alert
+        :border-radius 0
+
+  .header-bar-outer-container.page-changed
+    :height 103px
+    :animation page-changed-header-bar 1.15s
+    :-webkit-animation page-changed-header-bar 1.15s
+    .header-bar-container
+      :height 103px
+      :animation page-changed-header-bar 1.15s
+      :-webkit-animation page-changed-header-bar 1.15s
+
+      .page-changed-alert
+        :margin -1px 0 0 0
+        :border-bottom 1px solid $border-color
+        :height 39px
+        :animation page-changed-alert 1.15s
+        :-webkit-animation page-changed-alert 1.15s
 
 .pages.index
   .index-content-container
@@ -153,9 +170,9 @@ $shadow: 0 1px 0 rgba(0,0,0,0.15)
       :border 1px dashed $border-color
 
 .pages.show
-  .toolbar-buttons
+  .header-bar
     .publish-button
-      :margin 0 1em
+      :margin 0 12px
 
   .show-content
     :padding 15px 25px 110px 25px
@@ -169,7 +186,7 @@ $shadow: 0 1px 0 rgba(0,0,0,0.15)
   .form-actions
     :padding-left 1em
     
-  .toolbar-buttons
+  .header-bar
     .published
       :color $published-text-color
     .unpublished
@@ -208,6 +225,10 @@ $shadow: 0 1px 0 rgba(0,0,0,0.15)
     .form-actions
       :margin-top 0
       :margin-bottom 0
+
+@media print
+  #breadcrumbs, .header-bar-outer-container
+    :display none
 
 #wiki_show_view_main
   :overflow auto
