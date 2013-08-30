@@ -63,8 +63,9 @@ define [
     #
     # Returns nothing.
     createLists: ->
+      currentUser = ENV.current_user_id && String(ENV.current_user_id)
       @userList   = new ListView
-        currentUser: ENV.current_user_id
+        currentUser: currentUser
         el: @$userList
         fetchOptions: @fetchOptions
         type: 'user'
@@ -73,7 +74,7 @@ define [
         fetchOptions: @fetchOptions
         type: 'group'
       @memberList = new MemberListView
-        currentUser: ENV.current_user_id
+        currentUser: currentUser
         el: @$memberList
 
     # Internal: Trigger initial fetch actions on each collection.

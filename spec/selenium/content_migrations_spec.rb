@@ -340,7 +340,7 @@ describe "content migrations" do
       submit
 
       cm = @course.content_migrations.last
-      cm.migration_settings["source_course_id"].should == @copy_from.id
+      cm.migration_settings["source_course_id"].should == @copy_from.id.to_s
 
       source_link = f('.migrationProgressItem .sourceLink a')
       source_link.text.should == @copy_from.name

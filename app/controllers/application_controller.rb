@@ -1406,11 +1406,15 @@ class ApplicationController < ActionController::Base
     (@body_classes ||= []) << 'embedded' if @embedded_view
   end
 
+  def stringify_json_ids?
+    request.headers['Accept'] =~ %r{application/json\+canvas-string-ids}
+  end
+
   def render(options = nil, extra_options = {}, &block)
     set_layout_options
     if options && options.key?(:json)
       json = options.delete(:json)
-      json = ActiveSupport::JSON.encode(json) unless json.is_a?(String)
+      json = ActiveSupport::JSON.encode(json, stringify_json_ids: stringify_json_ids?) unless json.is_a?(String)
       # prepend our CSRF protection to the JSON response, unless this is an API
       # call that didn't use session auth, or a non-GET request.
       if prepend_json_csrf?

@@ -3,7 +3,7 @@
   jammit_css :speed_grader
   js_env({
     :RUBRIC_ASSESSMENT => {
-      :assessor_id => @current_user ? @current_user.id : "null",
+      :assessor_id => @current_user.id.to_s,
       :assessment_type => can_do(@assignment, @current_user, :grade) ? "grading" : "peer_review"
     }
   })

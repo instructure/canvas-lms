@@ -71,7 +71,7 @@ define [
 
       enrollment = @model.findEnrollmentByRole(@model.currentRole)
       currentIds = _.map @model.sectionEditableEnrollments(), (en) -> en.course_section_id
-      sectionIds = _.map $('#user_sections').find('input'), (i) -> parseInt($(i).val().split('_')[1])
+      sectionIds = _.map $('#user_sections').find('input'), (i) -> $(i).val().split('_')[1]
       newSections = _.reject sectionIds, (i) => _.include currentIds, i
       newEnrollments = []
       deferreds = []

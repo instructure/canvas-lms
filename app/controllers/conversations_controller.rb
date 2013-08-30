@@ -153,8 +153,11 @@ class ConversationsController < ApplicationController
         load_all_contexts :permissions => [:manage_user_notes]
         notes_enabled = @current_user.associated_accounts.any?{|a| a.enable_user_notes }
         can_add_notes_for_account = notes_enabled && @current_user.associated_accounts.any?{|a| a.grants_right?(@current_user, nil, :manage_students) }
+
+        current_user_json = conversation_user_json(@current_user, @current_user, session, :include_participant_avatars => true)
+        current_user_json[:id] = current_user_json[:id].to_s
         hash = {:CONVERSATIONS => {
-            :USER => conversation_users_json([@current_user], @current_user, session, :include_participant_contexts => false).first,
+            :USER => current_user_json,
             :CONTEXTS => @contexts,
             :NOTES_ENABLED => notes_enabled,
             :CAN_ADD_NOTES_FOR_ACCOUNT => can_add_notes_for_account,

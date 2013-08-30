@@ -312,7 +312,7 @@ class ContextController < ApplicationController
       load_all_contexts(:context => @context)
       js_env({
         :ALL_ROLES => all_roles,
-        :SECTIONS => sections.map { |s| { :id => s.id, :name => s.name } },
+        :SECTIONS => sections.map { |s| { :id => s.id.to_s, :name => s.name } },
         :USER_LISTS_URL => polymorphic_path([@context, :user_lists], :format => :json),
         :ENROLL_USERS_URL => course_enroll_users_url(@context),
         :SEARCH_URL => search_recipients_url,

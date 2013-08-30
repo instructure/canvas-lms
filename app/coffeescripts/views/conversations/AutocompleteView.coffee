@@ -181,6 +181,7 @@ define [
     #
     # Returns a model object.
     _getModel: (id) ->
+      id = id && String(id)
       result = @resultCollection.find((model) -> model.id == id)
 
     # Internal: Remove the "selected" class from result list items.

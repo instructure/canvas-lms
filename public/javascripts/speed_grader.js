@@ -162,6 +162,10 @@ define([
       this.submission = $.grep(jsonData.submissions, function(submission, i){
         return submission.user_id === student.id;
       })[0];
+      $.each(visibleRubricAssessments, function(i, rubricAssessment) {
+        rubricAssessment.user_id = rubricAssessment.user_id && String(rubricAssessment.user_id);
+        rubricAssessment.assessor_id = rubricAssessment.assessor_id && String(rubricAssessment.assessor_id);
+      });
       this.rubric_assessments = $.grep(visibleRubricAssessments, function(rubricAssessment, i){
         return rubricAssessment.user_id === student.id;
       });
@@ -172,6 +176,7 @@ define([
     // the sectionToShow will be remembered for a given user in a given browser across all assignments in this course
     if (!jsonData.GROUP_GRADING_MODE) {
       sectionToShow = userSettings.contextGet('grading_show_only_section');
+      sectionToShow = sectionToShow && String(sectionToShow);
     }
     if (sectionToShow) {
       var tempArray  = $.grep(jsonData.studentsWithSubmissions, function(student, i){
@@ -189,28 +194,39 @@ define([
     //by defaut the list is sorted alphbetically by student last name so we dont have to do any more work here, 
     // if the cookie to sort it by submitted_at is set we need to sort by submitted_at.
     var hideStudentNames = utils.shouldHideStudentNames();
+    var compareBy = function(f) {
+      return function(a, b) {
+        a = f(a);
+        b = f(b);
+        if ((!a && !b) || a === b) { return 0; }
+        if (!a || a > b) { return +1; }
+        else { return -1; }
+      };
+    };
     if(hideStudentNames) {
-      jsonData.studentsWithSubmissions.sort(function(a,b){
-        return ((a && a.submission && a.submission.id) || Number.MAX_VALUE) - 
-               ((b && b.submission && b.submission.id) || Number.MAX_VALUE);
-      });          
+      jsonData.studentsWithSubmissions.sort(compareBy(function(student) {
+        return student &&
+          student.submission &&
+          student.submission.id;
+      }));
     } else if (userSettings.get("eg_sort_by") == "submitted_at") {
-      jsonData.studentsWithSubmissions.sort(function(a,b){
-        return ((a && a.submission && a.submission.submitted_at && $.parseFromISO(a.submission.submitted_at).timestamp) || Number.MAX_VALUE) - 
-               ((b && b.submission && b.submission.submitted_at && $.parseFromISO(b.submission.submitted_at).timestamp) || Number.MAX_VALUE);
-      });
+      jsonData.studentsWithSubmissions.sort(compare_by(function(student){
+        return student &&
+          student.submission &&
+          student.submission.submitted_at &&
+          $.parseFromISO(student.submission.submitted_at).timestamp;
+      }));
     } else if (userSettings.get("eg_sort_by") == "submission_status") {
-      jsonData.studentsWithSubmissions.sort(function(a,b) {
-        var states = {
-          "not_graded": 1,
-          "resubmitted": 2,
-          "not_submitted": 3,
-          "graded": 4
-        };
-        var stateA = submissionStateName(a.submission);
-        var stateB = submissionStateName(b.submission);
-        return states[stateA] - states[stateB];
-      });
+      var states = {
+        "not_graded": 1,
+        "resubmitted": 2,
+        "not_submitted": 3,
+        "graded": 4
+      };
+      jsonData.studentsWithSubmissions.sort(compareBy(function(student){
+        return student &&
+          states[submissionStateName(student.submission)];
+      }));
     }
   }
 
@@ -962,7 +978,7 @@ define([
                       hash.student_id;
 
       // choose the first ungraded student if the requested one doesn't exist
-      if (typeof(studentId) != "number" || !jsonData.studentMap[studentId]) {
+      if (!jsonData.studentMap[studentId]) {
         studentId = jsonData.studentsWithSubmissions[0].id;
         for (var i = 0, max = jsonData.studentsWithSubmissions.length; i < max; i++){
           if (typeof jsonData.studentsWithSubmissions[i].submission !== 'undefined' && jsonData.studentsWithSubmissions[i].submission.workflow_state !== 'graded'){
@@ -1002,7 +1018,7 @@ define([
     },
 
     handleStudentChanged: function(){
-      var id = parseInt( $selectmenu.val(), 10 );
+      var id = $selectmenu.val();
       this.currentStudent = jsonData.studentMap[id];
       document.location.hash = "#" + encodeURIComponent(JSON.stringify({
         "student_id": this.currentStudent.id
