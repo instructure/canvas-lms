@@ -225,20 +225,14 @@
   }
 
   .read-state {
-    background: #46aaf9;
-    background: -moz-linear-gradient(top, #73d6fc, #2489f7);
-    background: -ms-linear-gradient(top, #73d6fc, #2489f7);
-    background: -o-linear-gradient(top, #73d6fc, #2489f7);
-    background: -webkit-linear-gradient(top, #73d6fc, #2489f7);
-    background: linear-gradient(top, #73d6fc, #2489f7);
-    border: 1px solid #2e89cc;
-    border-radius: 4px;
+    background: #4aaefb;
+    border-radius: 5px;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     display: inline-block;
-    height: 8px;
-    margin: 4px 5px;
-    width: 8px;
+    height: 10px;
+    margin: 3px;
+    width: 10px;
 
     &.read {
       background: #fff;
@@ -248,19 +242,24 @@
   }
 
   .star-btn {
-    background: url(/images/messages/star.png);
+    color: #999;
     display: inline-block;
-    height: 19px;
-    left: -9999px;
-    width: 19px;
+    font-family: 'Hiragino Kaku Gothic Pro', 'Lucida Sans Unicode', 'Arial Unicode MS';
+    font-size: 16px;
+    left: -9999em;
 
-    &:focus {
+    &:hover {
+      text-decoration: none;
+    }
+
+    &:focus, &.active {
       left: 0;
     }
 
-    &.active {
-      background: url(/images/messages/star-lit.png);
-      left: 0;
+    &.active:before {
+      color: #fed676;
+      content: "\2605";
+      position: absolute;
     }
   }
 }
