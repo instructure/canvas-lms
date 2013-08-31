@@ -179,7 +179,7 @@
     height: 40px;
     margin: 0 24px 0 0;
     overflow: hidden;
-    text-overflow: ellipses;
+    text-overflow: ellipsis;
   }
 
   p {
@@ -187,6 +187,13 @@
     line-height: 16px;
     margin-bottom: 8px;
   }
+}
+
+.subject {
+  display: block;
+  max-width: 80%;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .message-full-participants {
