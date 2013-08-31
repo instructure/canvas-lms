@@ -164,7 +164,11 @@
       </div>
     </div>
     <footer role="contentinfo" id="footer">
-      <a href="http://www.instructure.com"><%= image_tag 'footer-logo.png', :alt => t('instructure_description', "Instructure, makers of the open source learning management system Canvas") %></a>
+      <a href="http://www.instructure.com" class="footer-logo">
+        <span class="screenreader-only">
+          <%= t(:instructure_description, 'Instructure, makers of the open source learning management system Canvas') %>
+        </span>
+      </a>
       <span id="footer-links">
         <% if Setting.get_cached("show_opensource_linkback", "false") == "true" %>
           <a href="http://instructure.com"><%= t('open_source_learning_management_system', 'Open Source LMS') %></a>

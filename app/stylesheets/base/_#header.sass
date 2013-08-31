@@ -17,31 +17,26 @@
     z-index: 1
 // the #header.no-user #header-logo part here is so that it overrides the byuh logo
 #header-logo, #header.no-user #header-logo
-  background: url("/images/canvas/header_canvas_logo.png") no-repeat
+  +bg-image('canvas/header_canvas_logo', 'png', no-repeat, left, top, transparent, 110px, 26px)
   width: 135px
   height: 26px
   left: 16px
   bottom: 21px
   position: absolute
   text-indent: -9999px
-  @media (min--moz-device-pixel-ratio: 1.5),(-o-min-device-pixel-ratio: 3/2),(-webkit-min-device-pixel-ratio: 1.5),(min-device-pixel-ratio: 1.5),(min-resolution: 1.5dppx)
-    background-image: url("/images/canvas/header_canvas_logo@2x.png")
-    background-size: 110px 26px
+
 // TODO: remove this style once people have time to update their logo-related custom
 // css. See related code in app/coffeescripts/bundles/common.coffee too.
 #header-logo.original, #header.no-user #header-logo.original
   bottom: 12px
 #header-logo-secondary
   display: none
-  background: url("/images/canvas/header_canvas_logo.png") no-repeat
+  +bg-image('canvas/header_canvas_logo', 'png', no-repeat, left, top, transparent, 110px, 26px)
   width: 135px
   height: 26px
   right: 26px
   bottom: 6px
   position: absolute
-  @media (min--moz-device-pixel-ratio: 1.5),(-o-min-device-pixel-ratio: 3/2),(-webkit-min-device-pixel-ratio: 1.5),(min-device-pixel-ratio: 1.5),(min-resolution: 1.5dppx)
-    background-image: url("/images/canvas/header_canvas_logo@2x.png")
-    background-size: 110px 26px
 
 #header-inner
   padding-top: 26px
@@ -51,7 +46,7 @@
 #header
   position: relative
   z-index: 11 /* IE7 needs this o so the menu-item-drops get stuck above #main */
-  background: #6a7177 url("/images/canvas/header_bg.png") repeat-x left bottom
+  +bg-image('canvas/header_bg', 'png', repeat-x, left, bottom, transparent, 28px, 70px)
   &.no-user
     background-position: 0 -25px
     min-height: 45px
@@ -75,7 +70,7 @@
   margin-right: $right_side_margin
   margin-bottom: 4px /*make room for the drop shadow*/
   padding: 0 11px
-  background: transparent url('/images/canvas/top_bar_bg.png') repeat-x
+  +bg-image('canvas/top_bar_bg', 'png', repeat-x, left, top, transparent, 22px, 23px)
   box-shadow: rgba(0, 0, 0, 0.3) 1px 1px 1px
   border-bottom-left-radius: 6px
   border-bottom-right-radius: 5px

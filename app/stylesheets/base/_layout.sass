@@ -1,7 +1,9 @@
+@import mixins/blue
+
 body, html
   height: 100%
 body
-  background-image: url("/images/blue/bg.jpg")
+  +bg-image('blue/bg', 'jpg', repeat, left, top, transparent, 150px, 150px)
   min-width: $min_main_width
 
   &.no-headers, &.embedded
@@ -178,9 +180,12 @@ body
   color: #5c5c5c
   font-size: 11px
   margin: 0 15px 34px
-  img
-    vertical-align: middle
-    padding: 0 20px 2px 0
+  .footer-logo
+    +bg-image('footer-logo', 'png', no-repeat, left, top, transparent, 140px, 10px)
+    display: inline-block
+    height: 10px
+    margin: 0 20px 0 0
+    width: 140px
 
 #footer-links
   a
