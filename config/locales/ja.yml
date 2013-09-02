@@ -254,7 +254,7 @@ ja:
     mississippi: 
       reports: "レポート: %{files}"
     outcomes: 
-      order: "順位:%{order}"
+      order: "順位: %{order}"
     sis_exporter: 
       deleted: "削除されたオブジェクトを含む: true;"
       reports: "レポート: %{files}"
@@ -605,14 +605,14 @@ ja:
           description: 
             header: 例
           student_activity: 
-            text: このレポートでは、すべての課題、そして指定された課題グループと指定された日付範囲の課題に関する情報が示されます。このレポートでは、主な授業内評価に乱れができるかぎり生じないようにした安全な演習のスケジュールに関するデータが示されます。
+            text: このレポートでは、すべての課題と、指定された課題グループおよび指定された日付範囲の課題に関する情報が示されます。このレポートでは、主なクラス内評価の混乱を最小限に抑えつつ安全な演習のスケジュールを立てるために役立つデータが示されます。
     safety_drill_csv_parameters: 
       account_reports: 
         newark: 
           assignment_groups: 
             label: "含める課題グループ:"
           date_range: 
-            label: "[Start At] (開始日) および [End At] (終了日) 両方が空の場合、デフォルトは現在から 2 週間になります"
+            label: "[開始日]  と [終了日] の両方が空の場合、デフォルトは現在から 2 週間になります"
           papers: 
             check_box: ペーパー
           projects: 
@@ -1392,7 +1392,7 @@ ja:
       other: "%{count} 個のグループ"
     assignment_list_item: 
       delete: 削除
-      delete_asssignment_title: この課題の削除
+      delete_asssignment_title: この課題を削除
       due_date: 期限
       module: モジュール
       multiple_modules: 複数のモジュール
@@ -1510,7 +1510,7 @@ ja:
       until: 次の日時まで
     due_date_view: 
       overrides: 
-        remove_these_dates: これらの日付の削除
+        remove_these_dates: これらの日付を削除
     edit: 
       edit_assignment: 課題の編集
       new_discussion: 新しいディスカッション
@@ -1854,7 +1854,7 @@ ja:
     toggle_message: 課題の表示/非表示の切り替え
     toggle_show_by: 
       date: 日付
-      show_by: "表示:"
+      show_by: "次の順序で表示:"
       type: タイプ
     turnitin_settings_dialog: 
       assignments: 
@@ -2828,7 +2828,7 @@ ja:
       error_report: "エラー レポート"
     copy_course: 
       options: オプション
-    file_required: コンテンツをインポートするファイルを選択する必要があります
+    file_required: コンテンツのインポート元のファイルを選択する必要があります
     file_too_large: "移行するファイルのサイズは %{file_size} 以下である必要があります"
     hide_issues: 問題の非表示
     index: 
@@ -2895,17 +2895,17 @@ ja:
         default_select_folder: フォルダの選択
         upload_to: アップロード先
       overwrite_assessment_content: 
-        assessment_help_label: "アセスメントの上書きヘルプ アイコン"
+        assessment_help_label: "アセスメント ヘルプ アイコンの上書き"
         assessment_help_text: "一部のシステムでは、新規エクスポート時に ID が再利用されます。そのため、2 つの別々の問題バンクをエクスポートした場合に、どちらも同じ ID を持つことになります。アセスメント データの喪失を防ぐために、当システムではこれらのオブジェクトを ID に関わらず別のものとして扱います。このオプションを選択すると、このセーフティ機能が無効になり、アセスメント データと同じ ID を持つ既存データが上書きされます。"
         assessment_help_title: "\"アセスメントの上書きヘルプ\""
-        assessment_help_title_icon: "アセスメントの上書きヘルプ アイコン"
+        assessment_help_title_icon: "アセスメント ヘルプ アイコンの上書き"
         overwrite_assessment_content: "アセスメント コンテンツを、一致する ID で上書きします"
       question_bank: 
         aria_new_label: 新しい問題バンクの作成
         create_new_question: "-- 新しい問題バンクの作成 --"
         question_bank_label: 問題バンク
         question_bank_placeholder: "\"問題バンクの名前\""
-        question_bank_placeholder_aria: "\"新しい問題バンクの名前の入力\""
+        question_bank_placeholder_aria: "\"新しい問題バンクの名前を入力\""
         question_bank_title: 新しい問題バンクの名前
         select_question_bank: 問題バンクの選択
       select_content_checkbox: 
@@ -3428,7 +3428,7 @@ ja:
     hide: 非表示
     index: 
       add_recipients_instructions: 会話に追加された人は、以前のすべてのメッセージを見ることができます。
-      conversations_intro: 会話の導入
+      conversations_intro: 会話の概要
       help: ヘルプ
       inbox_actions: 
         delete: 削除
@@ -4588,8 +4588,8 @@ ja:
       provost: 学長
       ready: 準備完了!
       school_admin: 学校管理
-      sign_up_to_canvas: "サインアップして Canvas を試してください"
-      specify_lms: "現在の LMS を指定するか、[none] (なし) を選択します"
+      sign_up_to_canvas: "サインアップして Canvas を試す"
+      specify_lms: "現在の LMS を指定するか、[なし] を選択します"
       specify_size: 組織の規模を指定します
       student: 受講生
       subscribe: "Instructure から、情報、ニュース、ヒント、情報を受け取ることを希望します。"
@@ -5697,7 +5697,7 @@ ja:
     grade: "成績: %{grade}"
     graded_by_me: "%{graded_time} 私が採点"
     graded_then_resubmitted: "採点後、(%{when}) に再提出"
-    gradee_index_of_total: "%{y} の %{gradee} %{x}"
+    gradee_index_of_total: "%{gradee} %{x}/%{y}"
     group: グループ
     hide_all_things: "すべての %{things} を非表示"
     hide_column: 列を非表示
@@ -8534,19 +8534,19 @@ ja:
         html: 
           body: "クイズ %{quiz} の再評価が終わりました"
           link_message: クイズはここで表示できます
-          subject: "クイズ再評価済み: %{quiz}, %{context}"
+          subject: "再評価済みのクイズ: %{quiz}, %{context}"
         link_message: クイズはここで表示できます
-        subject: "クイズ再評価済み: %{quiz}, %{context}"
+        subject: "再評価済みのクイズ: %{quiz}, %{context}"
       facebook: 
-        body: "クイズ再評価済み: %{title}"
+        body: "再評価済みのクイズ: %{title}"
       sms: 
-        body_sms: "%{context} の %{title} のクイズ再評価済み。"
+        body_sms: "%{context} の %{title} のクイズが再評価されました。"
         more_info: "詳細は %{url} をご覧ください"
       summary: 
         body: "クイズ %{title} の再評価が終わりました。"
-        subject: "クイズ再評価済み: %{quiz}, %{context}"
+        subject: "再評価済みのクイズ: %{quiz}, %{context}"
       twitter: 
-        body: "Canvas アラート - クイズ再評価済み: %{quiz}"
+        body: "Canvas アラート - 再評価済みのクイズ: %{quiz}"
     quiz_unpublished_module: このクイズは未公開モジュールの一部で、まだ使用できません。
     report_generated: 
       email: 
@@ -10166,10 +10166,10 @@ ja:
       invalid_quiz_type: クイズの種類は無効です
     question_name_counter: "問題 %{question_number}"
     regrade: 
-      give_everyone_full_credit: 全員にこの問題について最高の評価を与えます。
-      no_scores_reduced: "修正された回答と元々正しい回答両方に対して点数を与える (*スコアは減らされません*)"
+      give_everyone_full_credit: この問題で全員を満点にします。
+      no_scores_reduced: "修正された回答と元々正しい回答両方に対して点数を与える (*減点なし*)"
       regrade_options: "再評価オプション *(すでにこの問題に回答した受講生用):*"
-      some_scores_reduced: "正しい回答に対してのみポイントを与える (*一部の受講生のスコアは減らされる場合があります*)"
+      some_scores_reduced: "正しい回答に対してのみポイントを与える (*一部の受講生は減点される場合があります*)"
       update_question_without_regrading: 再評価せずに問題を更新する
     types: 
       quiz: クイズ
@@ -11019,7 +11019,7 @@ ja:
       manage: 管理
       only_registered_users: 登録手続きをし、名前が登録されているユーザのみが、採点対象のクイズに回答することができます。
       quiz_regraded_your_score_affected: このクイズが再評価されたため、スコアが変更されました。
-      quiz_regraded_your_score_not_affected: このクイズが再評価されましたが、スコアが変更されていません。
+      quiz_regraded_your_score_not_affected: このクイズが再評価されましたが、スコアは変更されていません。
       speed_grader: SpeedGrader™
       students_submitted_so_far: 
         one: "%{count} 人の受講生が既に提出しました"
@@ -13178,8 +13178,8 @@ ja:
       wiki_description_for_group: コンテンツを保持するための、自由な場であるとお考えください。この場を利用して、グループの説明を書いたり、難解なトピックの手助けとなる説明を提供したり、あるいは執筆プロジェクトにメンバーを参加させることだってできます。
       wiki_description_header: "Wiki とは?"
   wiki_pages_api: 
-    cannot_have_unpublished_front_page: "トップ ページは公開できません"
-    cannot_hide_front_page: "トップ ページは受講生に対して非表示にはできませｎ"
+    cannot_have_unpublished_front_page: "このトップ ページは非公開にできません"
+    cannot_hide_front_page: "このトップ ページを受講生に対して非表示にすることはできません"
     cannot_update_editing_roles: "この Wiki ページの編集の役割の更新は許可されていません"
     cannot_update_front_page: "Wiki のトップ ページの変更は許可されていません"
     cannot_update_hide_from_students: "この Wiki ページの受講生に非表示フラグの更新は許可されていません"
