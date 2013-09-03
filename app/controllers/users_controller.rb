@@ -24,63 +24,78 @@
 # `users/:user_id/page_views` can be accessed as `users/self/page_views` to
 # access the current user's page views.
 #
-# @object User
+# @model User
 #     {
-#       // The ID of the user.
-#       "id": 1,
-#
-#       // The name of the user.
-#       "name": "Sheldon Cooper",
-#
-#       // The name of the user that is should be used for sorting groups of users,
-#       // such as in the gradebook.
-#       "sortable_name": "Cooper, Sheldon",
-#
-#       // A short name the user has selected, for use in conversations or other less
-#       // formal places through the site.
-#       "short_name": "Shelly",
-#
-#       // The SIS ID associated with the user.  This field is only included if the
-#       // user came from a SIS import
-#       "sis_user_id": "",
-#
-#       // DEPRECATED: The SIS login ID associated with the user. Please use the
-#       // sis_user_id or login_id. This field will be removed in a future version of
-#       // the API.
-#       "sis_login_id": "",
-#
-#       // The unique login id for the user.  This is what the user uses to log in to
-#       // canvas.
-#       "login_id": "sheldon@caltech.example.com",
-#
-#       // If avatars are enabled, this field will be included and contain a url to
-#       // retrieve the user's avatar.
-#       "avatar_url": "",
-#
-#       // Optional: This field can be requested with certain API calls, and will
-#       // return a list of the users active enrollments. See the List enrollments
-#       // API for more details about the format of these records.
-#       "enrollments": [
-#         // ...
-#       ],
-#
-#       // Optional: This field can be requested with certain API calls, and will
-#       // return the users primary email address.
-#       "email": "sheldon@caltech.example.com",
-#
-#       // Optional: This field can be requested with certain API calls, and will
-#       // return the users locale.
-#       "locale": "tlh",
-#
-#       // Optional: This field is only returned in certain API calls, and will
-#       // return a timestamp representing the last time the user logged in to
-#       // canvas.
-#       "last_login": "2012-05-30T17:45:25Z",
-#
-#       // Optional: This field is only returned in ceratin API calls, and will
-#       // return the IANA time zone name of
-#       // the user's preferred timezone
-#       "time_zone": "America/Denver"
+#       "id": "User",
+#       "description": "A Canvas user, e.g. a student, teacher, administrator, observer, etc.",
+#       "required": ["id"],
+#       "properties": {
+#         "id": {
+#           "description": "The ID of the user.",
+#           "example": 2,
+#           "type": "integer",
+#           "format": "int64"
+#         },
+#         "name": {
+#           "description": "The name of the user.",
+#           "example": "Sheldon Cooper",
+#           "type": "string"
+#         },
+#         "sortable_name": {
+#           "description": "The name of the user that is should be used for sorting groups of users, such as in the gradebook.",
+#           "example": "Cooper, Sheldon",
+#           "type": "string"
+#         },
+#         "short_name": {
+#           "description": "A short name the user has selected, for use in conversations or other less formal places through the site.",
+#           "type": "string"
+#         },
+#         "sis_user_id": {
+#           "description": "The SIS ID associated with the user.  This field is only included if the user came from a SIS import.",
+#           "example": "SHEL93921",
+#           "type": "string"
+#         },
+#         "sis_login_id": {
+#           "description": "DEPRECATED: The SIS login ID associated with the user. Please use the sis_user_id or login_id. This field will be removed in a future version of the API.",
+#           "type": "string"
+#         },
+#         "login_id": {
+#           "description": "The unique login id for the user.  This is what the user uses to log in to Canvas.",
+#           "example": "sheldon@caltech.example.com",
+#           "type": "string"
+#         },
+#         "avatar_url": {
+#           "description": "If avatars are enabled, this field will be included and contain a url to retrieve the user's avatar.",
+#           "example": "https://en.gravatar.com/avatar/d8cb8c8cd40ddf0cd05241443a591868?s=80&r=g",
+#           "type": "string"
+#         },
+#         "enrollments": {
+#           "description": "Optional: This field can be requested with certain API calls, and will return a list of the users active enrollments. See the List enrollments API for more details about the format of these records.",
+#           "type": "array",
+#           "items": { "$ref": "Enrollment" }
+#         },
+#         "email": {
+#           "description": "Optional: This field can be requested with certain API calls, and will return the users primary email address.",
+#           "example": "sheldon@caltech.example.com",
+#           "type": "string"
+#         },
+#         "locale": {
+#           "description": "Optional: This field can be requested with certain API calls, and will return the users locale.",
+#           "example": "tlh",
+#           "type": "string"
+#         },
+#         "last_login": {
+#           "description": "Optional: This field is only returned in certain API calls, and will return a timestamp representing the last time the user logged in to canvas.",
+#           "example": "2012-05-30T17:45:25Z",
+#           "type": "string",
+#           "format": "date-time"
+#         },
+#         "time_zone": {
+#           "description": "Optional: This field is only returned in ceratin API calls, and will return the IANA time zone name of the user's preferred timezone.",
+#           "example": "America/Denver",
+#           "type": "string"
+#         }
+#       }
 #     }
 class UsersController < ApplicationController
 

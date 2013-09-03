@@ -269,7 +269,7 @@ def build_json_objects_map
   resource_obj_list = {}
   options[:resources].each do |r,cs|
     cs.each do |controller|
-      controller.tags(:object).each do |obj|
+      (controller.tags(:object) + controller.tags(:model)).each do |obj|
         name, json = obj.text.split(%r{\n+}, 2).map(&:strip)
         obj_map[name] = topicize r
         resource_obj_list[r] ||= []
