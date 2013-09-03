@@ -18,27 +18,39 @@
 
     // hijack Start New Course button (CANVAS-192)
     // first, cache the original event handler and disable it
-    var eventlist = jQuery._data( document, "events" ).click,
-        targetSelector = '.element_toggler[aria-controls]',
-        origHandler, e;
-    // cache the handler
-    for (var i = 0; i < eventlist.length; i++) {
-        e = eventlist[i];
-        if (e.selector === targetSelector) {
-            origHandler = e.handler;
+    function hijackStartNewCourseButton() {
+        if (!jQuery._data(document, "events")) {
+            // bit of a hack for IE which seems to randomly not have the events
+            // loaded by the time this script loads
+            window.setTimeout(hijackStartNewCourseButton, 100);
+        } else {
+            var eventlist = jQuery._data( document, "events" ).click,
+                targetSelector = '.element_toggler[aria-controls]',
+                origHandler, e;
+            // cache the handler
+            for (var i = 0; i < eventlist.length; i++) {
+                e = eventlist[i];
+                if (e.selector === targetSelector) {
+                    origHandler = e.handler;
+                }
+            }
+            if (origHandler) {
+                // remove the handler, and add our own
+                $(document).off('click change', targetSelector).on('click change', targetSelector, function(event) {
+                    if (this.id === 'start_new_course') {
+                        event.stopImmediatePropagation();
+                        window.location = '/sfu/course/new';
+                    } else {
+                        origHandler.call(this, event);
+                    }
+                });
+            }
         }
     }
-    if (origHandler) {
-        // remove the handler, and add our own
-        $(document).off('click change', targetSelector).on('click change', targetSelector, function(event) {
-            if (this.id === 'start_new_course') {
-                event.stopImmediatePropagation();
-                window.location = '/sfu/course/new';
-            } else {
-                origHandler.call(this, event);
-            }
-        });
-    }
+    $(document).ready(function() {
+        hijackStartNewCourseButton();
+    });
+
     // END CANVAS-192
 
     // FIX (temporary) for no-flash browsers to upload files using the Files tool
