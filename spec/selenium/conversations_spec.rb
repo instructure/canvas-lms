@@ -358,17 +358,6 @@ describe "conversations" do
   end
 
   context "help menu" do
-    # temporary. remove when we release new conversations
-    it "should just be an intro button if you aren't a site admin" do
-      student_in_course(:course => @course, :active_all => true)
-      new_conversation
-      f('#help-btn').should be_nil
-      f('#conversations-intro-btn').should be_displayed
-      f('#conversations-intro-btn').click
-      wait_for_ajaximations
-      ff('#conversations_intro').last.should be_displayed
-    end
-
     it "should switch to new conversations and redirect" do
       site_admin_logged_in
       @user.watched_conversations_intro
