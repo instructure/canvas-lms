@@ -361,7 +361,7 @@ class ContextModule < ActiveRecord::Base
     return nil unless self.prerequisites_satisfied?(user)
     progression = self.find_or_create_progression(user)
     progression.requirements_met ||= []
-    requirement = self.completion_requirements.to_a.find{|p| p[:id] == tag.id}
+    requirement = self.completion_requirements.to_a.find{|p| p[:id] == tag.local_id}
     return if !requirement || progression.requirements_met.include?(requirement)
     met = false
     met = true if requirement[:type] == 'must_view' && (action == :read || action == :contributed)
