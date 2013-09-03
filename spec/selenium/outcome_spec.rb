@@ -31,6 +31,14 @@ describe "outcomes" do
       it "should validate mastery points" do
         should_validate_mastery_points
       end
+
+      it "should require a title" do
+        should_validate_short_description_presence
+      end
+
+      it "should require a title less than 255 chars" do
+        should_validate_short_description_length
+      end
     end
 
     context "create/edit/delete outcome groups" do

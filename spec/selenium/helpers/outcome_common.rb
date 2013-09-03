@@ -243,6 +243,28 @@ def should_validate_mastery_points
   f('.error_box').should be_present
 end
 
+def should_validate_short_description_presence
+  get outcome_url
+  wait_for_ajaximations
+  f('.add_outcome_link').click
+  # Submit outcome with an empty title
+  f('.outcome_title').clear
+  f('.submit_button').click
+  wait_for_ajaximations
+  fj('.error_text div').text.should == "Cannot be blank"
+end
+
+def should_validate_short_description_length
+  get outcome_url
+  wait_for_ajaximations
+  f('.add_outcome_link').click
+  content = ('Wee taco banana hello 255 characters exceeded' * 10)
+  replace_content f('.outcome_title'), (content)
+  f('.submit_button').click
+  wait_for_ajaximations
+  fj('.error_text').should be_present
+end
+
 def should_create_an_outcome_group_root_level
   get outcome_url
   wait_for_ajaximations
