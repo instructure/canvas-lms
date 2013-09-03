@@ -258,10 +258,12 @@ class Folder < ActiveRecord::Base
 
     root_folders = []
 
-    Folder.unique_constraint_retry do
-      root_folder = context.folders.active.find_by_parent_folder_id_and_name(nil, name)
-      root_folder ||= context.folders.create(:name => name, :full_name => name, :workflow_state => "visible")
-      root_folders = [root_folder]
+    context.shard.activate do
+      Folder.unique_constraint_retry do
+        root_folder = context.folders.active.find_by_parent_folder_id_and_name(nil, name)
+        root_folder ||= context.folders.create!(:name => name, :full_name => name, :workflow_state => "visible")
+        root_folders = [root_folder]
+      end
     end
 
     root_folders
@@ -275,16 +277,16 @@ class Folder < ActiveRecord::Base
   # method before the folder is saved
   def self.assert_path(path, context)
     @@path_lookups ||= {}
-    key = [context.asset_string, path].join('//')
+    key = [context.global_asset_string, path].join('//')
     return @@path_lookups[key] if @@path_lookups[key]
     folders = path.split('/').select{|f| !f.empty? }
     @@root_folders ||= {}
-    current_folder = (@@root_folders[context.asset_string] ||= Folder.root_folders(context).first)
+    current_folder = (@@root_folders[context.global_asset_string] ||= Folder.root_folders(context).first)
     if folders[0] == current_folder.name
       folders.shift
     end
     folders.each do |name|
-      sub_folder = @@path_lookups[[context.asset_string, current_folder.full_name + '/' + name].join('//')]
+      sub_folder = @@path_lookups[[context.global_asset_string, current_folder.full_name + '/' + name].join('//')]
       sub_folder ||= current_folder.sub_folders.active.find_or_initialize_by_name(name)
       current_folder = sub_folder
       if current_folder.new_record?
@@ -292,7 +294,7 @@ class Folder < ActiveRecord::Base
         yield current_folder if block_given?
         current_folder.save!
       end
-      @@path_lookups[[context.asset_string, current_folder.full_name].join('//')] ||= current_folder
+      @@path_lookups[[context.global_asset_string, current_folder.full_name].join('//')] ||= current_folder
     end
     @@path_lookups[key] = current_folder
   end

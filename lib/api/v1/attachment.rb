@@ -89,7 +89,9 @@ module Api::V1::Attachment
   # error on failure.
   def api_attachment_preflight(context, request, opts = {})
     params = opts[:params] || request.params
+
     @attachment = Attachment.new
+    @attachment.shard = context.shard
     @attachment.context = context
     @attachment.filename = params[:name]
     atts = process_attachment_params(params)
