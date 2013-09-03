@@ -230,4 +230,13 @@ class ApiController < ApplicationController
     end
   end
 
+  def undelete_group_membership
+    membership = GroupMembership.find(params[:id])
+    membership.workflow_state = 'accepted'
+    if membership.save
+      render :json => membership.as_json(:include_root => false, :only => %w(id group_id user_id workflow_state moderator))
+    else
+      render :json => membership.errors, :status => :bad_request
+    end
+  end
 end
