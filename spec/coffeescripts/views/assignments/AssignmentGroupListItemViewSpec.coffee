@@ -7,6 +7,7 @@ define [
   'compiled/views/assignments/AssignmentListItemView'
   'jquery'
   'helpers/jquery.simulate'
+  'compiled/behaviors/elementToggler'
 ], (Backbone, AssignmentGroupCollection, AssignmentGroup, Assignment, AssignmentGroupListItemView, AssignmentListItemView, $) ->
 
   fixtures = $('#fixtures')
@@ -160,20 +161,32 @@ define [
     json = view.toJSON()
     equal json.groupWeight, 1
 
-  test "isExpanded returnes expanded state", ->
+  test "shouldBeExpanded returnes cache state", ->
     view = createView(@model)
-    view.expand()
-    ok view.isExpanded()
+    #make sure the cache starts at true
+    view.toggleCache() unless view.shouldBeExpanded()
 
-  test "toggle toggles expansion", ->
+    ok view.shouldBeExpanded()
+
+    view.toggleCache()
+    ok !view.shouldBeExpanded()
+
+  test "currentlyExpanded returns expanded state", ->
     view = createView(@model)
-    view.expand()
+    #make sure the cache starts at true
+    view.toggleCache() unless view.shouldBeExpanded()
+    ok view.currentlyExpanded()
 
-    view.toggle(false)
-    ok !view.isExpanded()
+  test "toggleCollapse toggles expansion", ->
+    view = createView(@model)
+    #make sure the cache starts at true
+    view.toggleCache() unless view.shouldBeExpanded()
 
-    view.toggle(true)
-    ok view.isExpanded()
+    view.toggleCollapse()
+    ok !view.currentlyExpanded()
+
+    view.toggleCollapse()
+    ok view.currentlyExpanded()
 
   test "displayableRules", ->
     model = createAssignmentGroup(group2())

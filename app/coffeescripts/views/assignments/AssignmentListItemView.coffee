@@ -33,6 +33,9 @@ define [
       super
       @initializeChildViews()
 
+      # we need the following line in order to access this view later
+      @model.assignmentView = @
+
       if @canManage()
         @model.on('change:published', @updatePublishState)
 
@@ -77,14 +80,15 @@ define [
 
     createModuleToolTip: =>
       link = @$el.find('.tooltip_link')
-      link.tooltip
-        position:
-          my: 'center bottom'
-          at: 'center top-10'
-          collision: 'fit fit'
-        tooltipClass: 'center bottom vertical'
-        content: ->
-          $(link.data('tooltipSelector')).html()
+      if link.length > 0
+        link.tooltip
+          position:
+            my: 'center bottom'
+            at: 'center top-10'
+            collision: 'fit fit'
+          tooltipClass: 'center bottom vertical'
+          content: ->
+            $(link.data('tooltipSelector')).html()
 
     toJSON: ->
       data = @model.toView()
@@ -117,3 +121,14 @@ define [
 
     canManage: ->
       ENV.PERMISSIONS.manage
+
+    search: (regex) ->
+      if @model.get('name').match(regex)
+        @show()
+        return true
+      else
+        @hide()
+        return false
+
+    endSearch: (regex) ->
+      @show()

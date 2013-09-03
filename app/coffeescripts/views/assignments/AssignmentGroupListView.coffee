@@ -18,12 +18,11 @@
 define [
   'underscore'
   'Backbone'
-  'compiled/class/cache'
   'compiled/views/SortableCollectionView'
   'compiled/views/assignments/AssignmentGroupListItemView'
   'jst/assignments/AssignmentGroupList'
   'jst/assignments/NoAssignmentsListItem'
-], (_, Backbone, Cache, SortableCollectionView, AssignmentGroupListItemView, template, NoAssignmentsListItem) ->
+], (_, Backbone, SortableCollectionView, AssignmentGroupListItemView, template, NoAssignmentsListItem) ->
 
   class AssignmentGroupListView extends SortableCollectionView
     @optionProperty 'course'
@@ -33,18 +32,16 @@ define [
 
     @optionProperty 'assignment_sort_base_url'
 
-    initialize: ->
+    attachCollection: ->
       super
-      $.extend true, this, Cache
       @itemViewOptions = course: @course
 
-    render: ->
+    render: =>
       super(ENV.PERMISSIONS.manage)
 
-    renderItem: (model) ->
+    renderItem: (model) =>
       view = super
-      unless model.groupView.isExpanded()
-        model.groupView.toggle()
+      model.groupView.collapseIfNeeded()
       view
 
     createItemView: (model) ->
@@ -69,14 +66,6 @@ define [
       _.extend({}, data,
         firstResetLanded: not @empty
       )
-
-    # This will be used when we implement searching
-    expandAll: ->
-      for m in @collection.models
-        if !m.groupView.isExpanded()
-          # force expand it
-          # but it will retain its state in cache
-          m.groupView.toggle()
 
     _initSort: ->
       super

@@ -40,7 +40,7 @@ define [
     # this should eventually happen at a higher level (eg for all views), but
     # we need to make sure that all children view are also children dom
     # elements first.
-    render: ->
+    render: =>
       @createAssignmentView.remove() if @createAssignmentView
       @editGroupView.remove() if @editGroupView
       @deleteGroupView.remove() if @deleteGroupView
@@ -91,7 +91,7 @@ define [
         assign.doNotParse() if assign.multipleDueDates()
 
       @collection = @model.get('assignments')
-      @collection.on 'add', @expand
+      @collection.on 'add',  => @expand(false)
 
     initializeChildViews: ->
       @editGroupView = false
@@ -162,25 +162,70 @@ define [
 
       results
 
-    isExpanded: ->
+    search: (regex) ->
+      atleastone = false
+      @collection.each (as) =>
+        atleastone = true if as.assignmentView.search(regex)
+      if atleastone
+        @show()
+        @expand(false)
+      else
+        @hide()
+      atleastone
+
+    endSearch: ->
+      @show()
+      @collapseIfNeeded()
+      @resetNoToggleCache()
+      @collection.each (as) =>
+        as.assignmentView.endSearch()
+
+    shouldBeExpanded: ->
       @cache.get(@cacheKey())
 
-    expand: =>
-      @toggle(true) if !@isExpanded()
+    collapseIfNeeded: ->
+      @collapse(false) unless @shouldBeExpanded()
 
-    toggle: (setTo=false) ->
+    expand: (toggleCache=true) =>
+      @_setNoToggleCache() unless toggleCache
+      @toggleCollapse() unless @currentlyExpanded()
+
+    collapse: (toggleCache=true) =>
+      @_setNoToggleCache() unless toggleCache
+      @toggleCollapse() if @currentlyExpanded()
+
+    toggleCollapse: (toggleCache=true) ->
+      @_setNoToggleCache() unless toggleCache
       @$el.find('.element_toggler').click()
-      @cache.set(@cacheKey(), setTo)
+
+    _setNoToggleCache: ->
+      @$el.find('.element_toggler').data("noToggleCache", true)
+
+    currentlyExpanded: ->
+      # the 2 states of the element toggler are true and "false"
+      if @$el.find('.element_toggler').attr("aria-expanded") == "false"
+        false
+      else
+        true
 
     cacheKey: ->
       ["course", @course.get('id'), "user", @currentUserId(), "ag", @model.get('id'), "expanded"]
 
-    toggleArrow: (ev) ->
+    toggleArrow: (ev) =>
       arrow = $(ev.currentTarget).children('i')
       arrow.toggleClass('icon-mini-arrow-down').toggleClass('icon-mini-arrow-right')
-      @toggleExpanded()
+      @toggleCache() unless $(ev.currentTarget).data("noToggleCache")
+      #reset noToggleCache because it is a one-time-use-only flag
+      @resetNoToggleCache(ev.currentTarget)
 
-    toggleExpanded: ->
+    resetNoToggleCache: (selector=null) ->
+      if selector?
+        obj = $(selector)
+      else
+        obj = @$el.find('.element_toggler')
+      obj.data("noToggleCache", false)
+
+    toggleCache: ->
       key = @cacheKey()
       expanded = !@cache.get(key)
       @cache.set(key, expanded)
