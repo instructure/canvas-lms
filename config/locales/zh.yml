@@ -252,10 +252,13 @@ zh:
       deleted: "包括删除的对象: true;"
     mississippi: 
       reports: "报告：%{files}"
+    outcomes: 
+      order: "顺序：%{order}"
     sis_exporter: 
       deleted: "包括删除的对象: true;"
       reports: "报告: %{files}"
   account_settings: 
+    account_name_too_long: 帐户名称太长
     confirms: 
       delete_announcement: 是否确定要删除此通告?
       global_announcement: 您必须确认全局通告
@@ -278,6 +281,8 @@ zh:
       account_admin: 帐户管理员
   accounts: 
     account_name_required: 帐户名不能为空
+    account_quotas_not_updated: 未更新帐户配额
+    account_quotas_updated: 已更新帐户配额
     account_user: 
       remove_admin_tooltip: 删除此管理员
     add_course_button: 添加课程
@@ -403,6 +408,13 @@ zh:
       unlock_link: 解锁
     cannot_manage_account: 不允许您管理帐户设置
     cannot_manage_quotas: 不允许您管理配额设置
+    chcp_student_activity_csv_description: 
+      account_reports: 
+        chcp: 
+          student_activity: 
+            description: 
+              header: 例如
+            text: "此报告显示学生参加其课程的情况。在生成的 csv 文件中，每项注册将具有一行，并且将显示学生 SIS ID、学生姓名、电话号码、电子邮件地址、课程名称、上次提交、上次提交以来的天数 (LDA)、当前评分百分比以及他们的学期开始日期。"
     confirm_delete_user: 
       confirm_delete: "是否确定要从帐户 %{account} 删除此用户?这将从所有课程和组删除该用户的数据（包括评分）。此过程无法撤消。"
       delete_button: "删除 %{user}"
@@ -458,6 +470,19 @@ zh:
         ross: 
           parameters: 
             note: 包含屏蔽作业的课程可能无法在此报告中准确反映分数。
+    custom_outcomes_csv_description: 
+      account_reports: 
+        edison: 
+          description: 
+            header: 例如
+            text: "此报告显示所有学生的学习成绩。在生成的 csv 文件中，每对“用户/成绩”将具有一行，并将显示包括相关联的作业在内的成绩详情。"
+    custom_outcomes_csv_parameters: 
+      account_reports: 
+        edison: 
+          course: 
+            text: 课程_ID：
+          outcome: 
+            text: 结果_ID：
     date_picker_parameter: 
       account_reports: 
         default: 
@@ -524,6 +549,23 @@ zh:
           users: 
             check_box: "用户 CSV"
     no_user_message: "找不到使用该 ID 的用户"
+    outcome_results_csv_description: 
+      account_reports: 
+        outcomes: 
+          description: 
+            header: 例如
+            text: "此报告显示所有学生的学习成绩。在生成的 csv 文件中，每对“用户/成绩”将具有一行，并将显示包括相关联的作业在内的成绩详情。"
+    outcome_results_csv_parameters: 
+      account_reports: 
+        outcomes: 
+          course: 
+            radio: 课程
+          order: 
+            label: 顺序
+          outcome: 
+            radio: 结果
+          user: 
+            radio: 用户
     provisioning_csv_description: 
       account_reports: 
         sis_export: 
@@ -556,6 +598,35 @@ zh:
     root_accounts: 
       labels: 
         name: 帐户名称
+    safety_drill_csv_description: 
+      account_reports: 
+        newark: 
+          description: 
+            header: 例如
+          student_activity: 
+            text: 此报告显示一个或多个指定作业组和指定日期范围中的所有作业以及与这些作业相关的信息。此报告提供用于计划安全练习的数据，同时对主要的课堂评估干扰最小。
+    safety_drill_csv_parameters: 
+      account_reports: 
+        newark: 
+          assignment_groups: 
+            label: 要包括的作业组：
+          date_range: 
+            label: "如果“开始时间”和“结束时间”为空，则默认为从现在起 2 周"
+          papers: 
+            check_box: 纸张
+          projects: 
+            check_box: 项目
+          reports: 
+            check_box: 报告
+          tests: 
+            check_box: 测试
+    scantron_quiz_csv_parameters: 
+      account_reports: 
+        edison: 
+          quiz_id: 
+            field: "测验 ID"
+          section_id: 
+            field: "章节 ID"
     settings: 
       about_google_docs: |-
           为了让用户更方便，而不强制他们下载诸如 Word 文档、PDF、Excel 电子表格等内容以及打开办公文档（此外还需要在其计算机上安装这些程序），在整个 Canvas 的许多区域，用户可以内联预览文档。
@@ -865,6 +936,12 @@ zh:
             header: 例如
           student_activity: 
             text: "此报告显示某个给定学期中注册了某给定课程或所有课程的学生的所有活动。在生成的 csv 文件中，每项学生活动将具有一行，并且将包含以下标题：章节 ID、章节 SIS ID、章节名称、课程 ID、课程 SIS ID、课程名称、用户 ID、用户 SIS ID、内容类型、内容、查看次数、参与次数和上次查看时间。查看次数和参与次数从开始时间到报告生成时间进行计数。"
+    student_assignment_outcome_map_csv_description: 
+      account_reports: 
+        student_assignment_map: 
+          description: 
+            header: 例如
+            text: "此报告显示所有学生的学习成绩。在生成的 csv 文件中，每对“用户/成绩”将具有一行，并将显示包括相关联的作业在内的成绩详情。此报告仅显示作业成绩，而不包括与题库相关的结果。"
     student_ip_csv_description: 
       account_reports: 
         dubspot: 
@@ -1298,13 +1375,14 @@ zh:
       links: 
         add_assignment_group: 添加作业组"
     assignment_group_list: 
-      no_assignment_groups: 无作业组。
+      no_assignment_groups: 无作业组
     assignment_group_list_item: 
       add_assignment_to: "将作业添加到 %{name}"
       delete: 删除
       edit: 编辑
       group_weight: "总数的 %{groupWeight}%"
       manage: 管理
+      no_assignments: 无作业
       title_delete: 是否删除作业组？
       title_edit: 编辑作业组
     assignment_group_selector: 
@@ -1315,10 +1393,13 @@ zh:
       one: "%{count} 个组"
       other: "%{count} 个组"
     assignment_list_item: 
+      delete: 删除
+      delete_asssignment_title: 删除此作业
       due_date: 到期日期
       module: 单元
       multiple_modules: 多个单元
       points_possible: "%{pointsPossible} 分"
+      settings: 设置
     assignment_locked: 
       assignment_locked: "此作业锁定于 *%{lock_at}*"
       assignment_unlocked_from: "此作业锁定至 *%{unlock_at}*"
@@ -1419,7 +1500,7 @@ zh:
       tooltips: 
         target_group: 选择此作业要移入的组
       warnings: 
-        delete_assignment_group: "您即将删除 *%{name}*，其中包含 *%{assignment_count}* 项作业。"
+        delete_assignment_group: "您即将删除 *%{name}*，其中包含 **%{assignment_count}** 项作业。"
       would_you_like: 您是否要：
     drop_highest_scores: "去掉最高的 %{number} 分"
     drop_lowest_scores: "去掉最低的 %{number} 分"
@@ -1429,6 +1510,9 @@ zh:
         due_date: 到期日期
         for: 对于
       until: 直到
+    due_date_view: 
+      overrides: 
+        remove_these_dates: 删除这些日期
     edit: 
       edit_assignment: 编辑作业
       new_discussion: 新建讨论
@@ -1770,6 +1854,10 @@ zh:
       add_assignment_group: 添加作业组
       uploading: 正在上传提交文件
     toggle_message: 切换作业可见性
+    toggle_show_by: 
+      date: 日期
+      show_by: 显示依据：
+      type: 类型
     turnitin_settings_dialog: 
       assignments: 
         turnitin_settings: 
@@ -2725,6 +2813,7 @@ zh:
     missing_content_links_title: 导入的内容中发现缺失的链接
     unexpected_error: 发生意外错误，请联系支持部门。
     unknown: 未知
+    upload_timeout_error: 文件上传进程超时。
   content_migrations: 
     bad_migration_type: 无效的迁移类型
     canvas_export: 
@@ -2734,10 +2823,18 @@ zh:
     content_checkbox: 
       select_all: 全选
       select_non: 空出选择
+    content_migration: 内容迁移
     content_migration_issue: 
       error_report: 错误报告
     copy_course: 
       options: 选项
+    file_required: 您必须选择一个要从中导入内容的文件
+    file_too_large: "您的迁移量不能超过 %{file_size}"
+    hide_issues: 隐藏问题
+    index: 
+      page_title: 导入内容
+    issues: 问题
+    loading: 正在加载...
     migration_converter: 
       cancel_migration: 取消
       default_option: 选择一个
@@ -2750,6 +2847,7 @@ zh:
     progressing_content_migration: 
       issues_text: 问题
       select_content: 选择内容
+      show_issues: 显示问题
     progressing_content_migration_collection: 
       no_items: 尚无任务排队
       progress_label: 当前任务
@@ -2759,6 +2857,7 @@ zh:
       options: 选项
     select_content: 
       select_content_btn: 选择内容
+    show_issues: 显示问题
     subviews: 
       choose_migration_file: 
         migration_text: 来源
@@ -2768,26 +2867,46 @@ zh:
         search_label: 搜索课程
         select_default: 选择课程
       date_shift: 
+        add_day_sub_title: 添加日替换
         beginning_change_to: 更改为
         beginning_date: 开始日期
         checkbox_label: 调整事件和到期日期
         ending_change_to: 更改为
         ending_date: 结束日期
+        new_end_date_label: 将结束日期更改为
+        new_end_date_title: 将结束日期更改为
+        new_start_date_label: 将开始日期更改为
+        new_start_date_title: 将开始日期更改为
+        old_end_date_label: 结束日期
+        old_end_date_title: 结束日期
+        old_start_date_label: 开始日期
+        old_start_date_title: 开始日期
         substitution: 替换
       day_substitution: 
         move_from: 移动自
+        move_from_select_label: 从该周的某日移动
+        move_from_select_title: 从该周的某日移动
+        move_to_select_label: 移动至该周的某日
+        move_to_select_title: 移动至该周的某日
+        remove_day_substitution_link: 删除日替换
+        remove_day_substitution_link_label: 删除日替换
         to_happen_on: 到
       folder_picker: 
         default_select_folder: 选择文件夹
         upload_to: 上传至
       overwrite_assessment_content: 
-        assessment_help_alt: “覆盖考试帮助图标”
+        assessment_help_label: 覆盖评估帮助图标
         assessment_help_text: "有些系统对每个新导出循环使用其 ID。因此，如果您导出两个不同的题库，它们将具有相同的 ID。为防止丢失考试数据，尽管这些对象的 ID 相同，但我们将其视为不同的对象。选择此选项将会禁用此安全功能，允许考试数据覆盖具有相同 ID 的现有数据。"
         assessment_help_title: “覆盖考试帮助”
+        assessment_help_title_icon: 覆盖评估帮助图标
         overwrite_assessment_content: "覆盖具有匹配 ID 的考试内容"
       question_bank: 
+        aria_new_label: 创建新题库
         create_new_question: "-- 创建新题库 --"
         question_bank_label: 题库
+        question_bank_placeholder: “题库名称”
+        question_bank_placeholder_aria: “输入新题库名称”
+        question_bank_title: 新题库名称
         select_question_bank: 选择题库
       select_content_checkbox: 
         select_migration_label: 选择迁移内容
@@ -3142,6 +3261,7 @@ zh:
           delete_module: 删除此单元
           edit_module: 编辑
           student_progress: 查看学生学习此单元的进度
+      manage: 管理
       module_will_unlock_at: "解锁日期 *%{unlock_date}*"
       progression_complete_count: "*%{count}* 完成"
       progression_started_count: "*%{count}* 进行中"
@@ -3228,6 +3348,7 @@ zh:
   conversation_dialog: 
     errors: 
       field_is_required: 此字段为必填字段
+    message_sent: 消息已发送！
     select_course: 选择课程
   conversation_message: 
     subject: "私人消息 %{timestamp}"
@@ -3246,6 +3367,8 @@ zh:
         remove_attachment: 删除附件
     all_courses: 所有课程
     attachment_error: 加载附件失败，请重试。
+    autocomplete_token: 
+      remove_recipient: 删除收件人
     buttons: 
       add_people: 填加人员
       send_message: 发送
@@ -3261,6 +3384,11 @@ zh:
       delete_conversation: 是否确定要删除您拥有的此会话的副本？此操作将不可恢复。
       delete_message: "是否确定要删除您拥有的此消息的副本? 此操作将不可恢复。"
       delete_messages: "是否确定要删除您拥有的这些消息的副本? 此操作将不可恢复。"
+    context_message: 
+      delete_message: 删除消息
+      labels: 
+        less: 更少...
+        more: 更多...
     conversation_context: 来自与后者的会话
     conversation_item: 
       has_attachments: 这个会话有一个或多个附件
@@ -3298,8 +3426,11 @@ zh:
     filter_by_group: 以此组筛选
     headings: 
       new_message: 新消息
+    hide: 隐藏
     index: 
       add_recipients_instructions: 您加入会话的人将会看到所有之前的消息。
+      conversations_intro: 会话简介
+      help: 帮助
       inbox_actions: 
         delete: 删除
         forward: 转发
@@ -3330,13 +3461,16 @@ zh:
         submission_author: 提交文件作者
         submission_score: 提交文件得分
         view_submission: 在新窗口中打开提交文件。
+      try_new_conversations: 尝试新会话
     index_new: 
       archived: 已存档
+      clear_search: 清除搜索结果
       delete_conversation: 删除会话
       enter_name_group_or_course: 输入名称、组或课程
       filter_messages_by_course: 按课程过滤消息
       filter_messages_by_type: 按类型过滤消息
       forward: 转发
+      help: 帮助
       inbox: 收件箱
       mark_as_unread: 标记为未读
       new_message: 新消息
@@ -3346,14 +3480,18 @@ zh:
       sent: 已发送
       settings: 设置
       starred: 已标记
+      switch_to_old_conversations: 切换回旧会话
       titles: 
         conversations: 会话
       unread: 未读
     message: 
+      no_subject: 无主题
       open_message: 打开消息
       star: 标记
       toggle_read: 切换已读/未读
       total_messages: 总消息数
+    message_detail: 
+      no_subject: 无主题
     message_form: 
       buttons: 
         send_message: 发送
@@ -3384,26 +3522,34 @@ zh:
         add_to_faculty_journal: 添加为教师日志条目
         attachments: 附件
         course: 课程
-        group_conversation: 这是组会话。参与者将会看到每个人的回复
         select_course: 选择课程
         subject: 主题
         to: 至
       links: 
         media_comment: 记录
       media_comment: 媒体评论
+      no_subject: 无主题
+      search_names_groups_courses: 搜索名称、组和课程
       titles: 
         media_comment: 已记录媒体评论
         record_media_comment: 记录音频或视频评论
         remove_media_comment: 删除媒体评论
+    message_item: 
+      delete_message: 删除消息
+      forward: 转发
+      message_actions: 消息操作
+      reply: 回复
     message_list: 
       messages: 消息
     message_progress_bar_text: 
       done_sending_message: "已将 *%{message_preview}* 发送至 *%{num_people}*"
       error_sending_message: "发送消息时出现错误:"
       sending_message: "正在发送 *%{message_preview}* 至 *%{num_people}*"
+    more_participants: "+%{total} 更多"
     no_message: 
       no_conversations_selected: 未选择会话
     no_recipients_choose_another_group: 该组中没有收件人。请另选一组。
+    no_results_found: 未找到结果
     not_applicable: 不适用
     not_scored: 没有分数
     notes_to_self: 独白
@@ -3418,6 +3564,7 @@ zh:
       other: "%{count} 个人"
     recipient_error: 您选择的课程或小组没有有效的接收人
     select_all: 全选
+    star: 标记
     title: 
       add_recipients: 添加接收人
       forward_messages: 转发消息
@@ -3427,6 +3574,7 @@ zh:
       view_submission: 在新窗口中打开提交文件。
     unknown_user: 未知用户
     unspecified_error: 发生意外错误，请重试。
+    unstar: 取消标记
   conversations_intro: 
     slide1: 
       paragraph1: 请查看收件箱!
@@ -4289,8 +4437,9 @@ zh:
     enable_dashboard: 试用新仪表板
     event_created: 事件已创建
     message_sent: 消息已发送
-    show_less: 显示更少
-    show_more: 显示更多
+    show_more_link: 
+      show_less: 显示更少
+      show_more: 显示更多
   date: 
     abbr_day_names: 
       - 周日
@@ -4404,6 +4553,19 @@ zh:
         school_name: 学校名称
         username: 电子邮件地址
     register: 
+      add_site: 添加站点
+      agree_to_terms: 您同意*使用条款*并承认**隐私政策**。
+      begin_trial: 开始试用
+      choose: 选择
+      cio: CIO
+      corporate: 公司
+      dean: 主任
+      director: 主管
+      higher_education: 高等教育
+      incorrect: 回答错误。请重试。
+      instructional_designer: 说明设计者
+      invalid_email: 无效的电子邮件地址
+      k12: K12
       labels: 
         current_lms: "当前 LMS"
         name: 名称
@@ -4412,7 +4574,32 @@ zh:
         phone: 电话号码
         school_name: 学校/组织
         school_position: 标题
+        type_what_you_hear: 键入您听到的内容
+        type_what_you_see: 键入您看到的内容
         username: 电子邮件
+      lms_admin: "LMS 管理者"
+      no_lms: 无
+      one: 其他
+      other: 其他
+      other_lms: 其他
+      other_title: 其他
+      personalize_demo: 个性化您的演示
+      personalizing: 正在个性化...
+      proprietary_lms: 本土/专有
+      provost: 教务长
+      ready: 准备好了！
+      school_admin: 学校管理者
+      sign_up_to_canvas: "注册试用 Canvas"
+      specify_lms: "请指定您当前的 LMS 或选择“无”"
+      specify_size: 请指定您组织的规模
+      student: 学生
+      subscribe: "我要从 Instructure 接收新闻、提示和信息"
+      support: 支持
+      teacher: 教师/导师
+      technologist: 技术员
+      try_again: 重试
+      vice_president: VP
+      you_must_agree_to_terms: 您必须同意使用条款
   developer_key: 
     api_key: "密钥: *%{api_key}*"
     created: "创建时间:"
@@ -4487,6 +4674,7 @@ zh:
       delete: 删除
       due: 到期日期
       graded_discussion: 评分的讨论
+      manage: 管理
       no_due_date: 无到期日期
       open_to_comments: 开放评论
       pin: 固定
@@ -5509,6 +5697,8 @@ zh:
     grade: "评分: %{grade}"
     graded_by_me: "我评分的时间 %{graded_time}"
     graded_then_resubmitted: "评分后重新提交的时间 (%{when})"
+    gradee_index_of_total: "%{gradee} %{x} / %{y}"
+    group: 组
     hide_all_things: "隐藏所有 %{things}"
     hide_column: 隐藏列
     hide_student_name: 隐藏学生姓名
@@ -5529,6 +5719,7 @@ zh:
     new_assessment: "[新评估]"
     no_submission_time: 无提交时间
     nth_student: "学生 %{n}"
+    portion_graded: "%{x} / %{y} 已评分"
     publish_to_sis: "发布评分到 SIS"
     reupload_submission_files: 重新上传提交文件
     reupload_submissions: 重新上传提交文件
@@ -5917,8 +6108,8 @@ zh:
       unauthorized: 您没有查看此课程参与情况的权限
       updated: 作业提交文件已成功更新。
       uploaded: 
-        one: "%{count} 份用户提交内容的文件和评论"
-        other: "%{count} 份用户提交内容的文件和评论"
+        one: "为 %{count} 项提交创建的文件和评论"
+        other: "为 %{count} 项提交创建的文件和评论"
     out_of_final: "最终的 %{weight}"
     out_of_points_possible: "超出 %{points_possible}"
     show: 
@@ -5954,6 +6145,7 @@ zh:
         assessment: 评估
         discussion: 讨论
         grading: 评分
+        no_group_submission: 该组没有提交此作业的文件
         no_submission: 该学生没有提交此作业的文件。
         submission: 此学生已经提交了作业
       icons: 
@@ -6001,12 +6193,10 @@ zh:
       no_annotation: 本文档的注释不可用
       not_newest_notice: "注:这不是最近的提交文件"
       page_title: "%{assignment_name}, SpeedGrader, %{course_name}"
-      portion_graded: "%{x} / %{y} 已评分"
       sort_by: 
         status: 根据提交状态（需要评分、未提交等）
         student_name: 根据学生姓名（按字母顺序）
         submitted_at: 提交作业的日期
-      student_index_of_total: "学生 %{index}，共 %{total_students}"
       submitted_files: "提交的文件:（单击以加载）"
       titles: 
         download_file: 下载此文件
@@ -6439,6 +6629,8 @@ zh:
     old_styleguide: 
       create_collection: 创建集合
       start_a_group: 启动组
+    styleguide: 
+      manage: 管理
   instructions: 
     authorize_google_docs: "需要授权 Canvas 访问您的 Google Docs 帐户之后才能协作处理文档:"
   instructure: 
@@ -6691,6 +6883,9 @@ zh:
       no_link: "[无链接]"
     titles: 
       link_to_student: 链接至学生
+  linked_assignment_message: "与作业“%{title}”链接"
+  linked_discussion_topic_message: "与讨论主题“%{title}”链接"
+  linked_quiz_message: "与测验“%{title}”链接"
   links: 
     dashboard: 我的面板
     errors: 
@@ -8343,6 +8538,25 @@ zh:
     quiz_locked_at: "此测验锁定于 %{at}。"
     quiz_locked_module: "此测验是单元 *%{module}* 的一部分，尚未解锁。"
     quiz_locked_until: "此测验锁定至 %{date}。"
+    quiz_regrade_finished: 
+      email: 
+        body: "已为测验 %{quiz} 完成了重新评分"
+        html: 
+          body: "已为测验 %{quiz} 完成了重新评分"
+          link_message: 您可在此处查看测验：
+          subject: "已完成测验重新评分：%{quiz}，%{context}"
+        link_message: 您可在此处查看测验：
+        subject: "已完成测验重新评分：%{quiz}，%{context}"
+      facebook: 
+        body: "已完成测验重新评分：%{title}"
+      sms: 
+        body_sms: "已为测验 %{title} 完成了重新评分：%{context}。"
+        more_info: "更多信息请访问 %{url}"
+      summary: 
+        body: "已为您的测验 %{title} 完成了重新评分。"
+        subject: "测验已重新评分：%{quiz}，%{context}"
+      twitter: 
+        body: "Canvas 警报 - 测验已重新评分：%{quiz}"
     quiz_unpublished_module: 此测验是未发布单元的一部分，尚未可用。
     report_generated: 
       email: 
@@ -8677,6 +8891,7 @@ zh:
       button: 
         delete: 删除
         edit: 编辑
+      manage: 管理
       module_item: 
         available: 可用
         due: 到期日期
@@ -8685,6 +8900,7 @@ zh:
       module: 
         prerequisites: 先修课程
         published: 已发布
+  moodle_dropdown_warning_title: 可能已错误地导入多个下拉列表问题
   mute_dialog: 
     curving_assignments: 曲线作业
     grade_change_notifications: 评分更改通知
@@ -9048,13 +9264,22 @@ zh:
         url: URL
         user_agent: 用户代理
   pages: 
+    cancel_button: 取消
+    delete_button: 删除
     delete_confirmation: 是否确定要删除此维基页面?
-    delete_title: 删除维基页面
+    delete_dialog_title: 删除维基页面
+    deleting_button: 正在删除...
+    edit_dialog_title: 编辑维基页面
     errors: 
       require_title: 您必须输入标题
+    headers: 
+      sort_ascending: 升序排序
+      sort_descending: 降序排序
     notices: 
       delete_failed: "页面“%{title}”无法删除。"
       page_deleted: "页面\"%{title}\"已删除。"
+    save_button: 保存
+    saving_button: 正在保存...
   paginated_collection: 
     no_items: 没有项目。
   paginated_list: 
@@ -9961,6 +10186,12 @@ zh:
       invalid_ip_filter: "IP 过滤无效"
       invalid_quiz_type: 测验类型无效
     question_name_counter: "问题 %{question_number}"
+    regrade: 
+      give_everyone_full_credit: 对于此问题给所有人满分。
+      no_scores_reduced: 更正后的回答以及原本正确的回答均可得分（*将不会扣除任何分数*）
+      regrade_options: "重新评分选项 *（针对已回答此问题的学生）：*"
+      some_scores_reduced: 仅正确的回答可得分（*可能会扣除某些学生的分数*）
+      update_question_without_regrading: 更新问题而不重新评分
     types: 
       quiz: 测验
       survey: 调查
@@ -10063,14 +10294,18 @@ zh:
       labels: 
         additional_comments: 其他评论
         for_answer_number: "有关答案 %{answer_number}"
+        warning_icon: 警告
       links: 
         delete_question: 删除此问题
         edit_question: 编辑此问题
         move_copy_question: 将问题移动/复制到另一个库
       not_yet_graded: 仍未评分
+      original_score: 原始分数：
       points_possible: "%{points_possible} 分"
+      regraded_score: 重新评分后的分数：
       show_ansers_for_variable: "显示 %{variable} 的答案"
       skip_question_text: 跳至问题文本。
+      submission_was_regraded: 此问题已重新评分。您的分数已更新。
       titles: 
         question_correct_comment: 如果学生回答问题正确，他们将看到此评论
         question_incorrect_comment: 如果学生回答问题错误，他们将看到此评论
@@ -10518,11 +10753,13 @@ zh:
         new_question_group: 新问题组
         show_assignment_rubric: 显示题目
         switch_views: 切换视图
+      manage: 管理
       minutes: 分钟
       new_assignment: 新作业
       new_discussion: 新建讨论
       one_question_at_a_time: 一次显示一个问题
       points_possible: "分数 %{n}"
+      quiz_title: 测验标题
       quiz_type: 测验类型
       require_lockdown_browser: "需要 Respondus LockDown Browser"
       require_lockdown_browser_for_results: 查看测验结果时需要
@@ -10737,11 +10974,6 @@ zh:
         one: "%{count} 分"
         other: "%{count} 分"
       student_mute_notification: 教师正在进行评分
-      titles: 
-        delete_quiz: 删除测验
-        delete_survey: 删除调查
-        edit_quiz: 编辑测验
-        edit_survey: 编辑调查
       unlimited_attempts: 无限尝试次数
     read_only: 
       default_page_title: 新测验
@@ -10786,6 +11018,7 @@ zh:
       labels: 
         available_until: 直到
         no_time_limit: 无时间限制
+        warning_icon: 警告
       links: 
         edit: 编辑
         hide_student_quiz_results: 隐藏学生测验结果
@@ -10804,6 +11037,8 @@ zh:
         survey_statistics: 调查统计
       manage: 管理
       only_registered_users: 只有注册的登记用户才能进行评分测验
+      quiz_regraded_your_score_affected: 此测验已重新评分，您的分数受到影响。
+      quiz_regraded_your_score_not_affected: 此测验已重新评分，您的分数未受影响。
       speed_grader: SpeedGrader™
       students_submitted_so_far: 
         one: "目前 %{count} 个学生已提交"
@@ -10852,6 +11087,16 @@ zh:
         one: "%{count} 个其他提交文件"
         other: "%{count} 个其他提交文件"
     statistics_crumb: 统计
+    submission_version: 
+      attempt_number: "尝试 %{att_no}"
+      kept: 保留
+      latest: 最新
+    submission_versions: 
+      attempt: 尝试
+      attempt_history: 尝试历史记录
+      regraded: 重新评分
+      score: 分数
+      time: 时间
     take_quiz: 
       buttons: 
         next: 下一个
@@ -11133,10 +11378,6 @@ zh:
   rubric_association: 
     no_details: 无详细信息
   rubrics: 
-    assessments: 
-      add_rubric_assessment: 添加题目评估
-      are_you_sure_prompt: 是否确定要删除此评估?所有结果都将丢失。
-      page_title: 评估
     index: 
       account_rubrics: 帐户题目
       are_you_sure_prompt: 是否确定要删除此题目?当前使用题目的任何位置将仍可访问，但其他人将无法使用该题目。
@@ -11150,33 +11391,6 @@ zh:
         other: "可能的 %{count} 分"
       user_rubrics: 用户题目
     loading: 正在加载...
-    rubric_association: 
-      assessment_completed: 评估已完成
-      assessment_name: 评估名称
-      buttons: 
-        invite: 邀请
-        save_assessment: 保存评估
-      emails_to_invite: "\"此处粘贴您要邀请其评估此工作的电子邮件地址\""
-      instructions: 说明
-      invite_new_assessor: 邀请新评估人员
-      labels: 
-        completed_assessments: 已完成评估
-        description: 答题说明
-        invitations: 要评估的人员
-        invited_assessors: 邀请的评估人员
-        submitted_and_completed_assessments: 已提交并已完成
-        submitted_and_incomplete_assessments: 已提交但未完成
-        title: 名称
-        unsubmitted_assessments: 未提交
-        url: "要评估的 URL"
-      links: 
-        show_rubric: 显示题目
-      no_description: 无说明
-      no_name: 无名称
-      none_invited: 未邀请任何人
-      special_instructions: 键入针对评估您工作的人员的任何特殊说明
-      submitting_instructions: 键入针对提交项目进行评估的人员的任何说明
-      view_assessed_page: 查看所评估的页面
     show: 
       buttons: 
         delete: 删除题目
@@ -11288,6 +11502,7 @@ zh:
         crosslist_this_section: 交叉列出此章节
         current_enrollments: 当前注册
         decrosslist_section: 取消交叉列出此章节
+  select_content: 选择内容
   select_content_dialog: 
     buttons: 
       add_item: 添加项目
@@ -11696,7 +11911,6 @@ zh:
       message_column: 消息
       recent_activity: 最近活动
       recent_activity_in_course: "%{course_or_group} 中的最近活动"
-      show_more: 显示更多
       unread_column: 未读
       unread_count_badge: 
         one: "%{count} 个 *未读项*"
@@ -11740,6 +11954,7 @@ zh:
           other: "请记住，已使用此题目评估了 1 个学生。若更改将会影响对他/她的评价。 请记住，已使用此题目评估了 %{count} 个学生。若更改将会影响对他们的评价。"
         rubric_in_use2: 您已使用此题目评估学生。任何重大更改都可能会影响其评估结果。
       out_of: "%{points}*，满分 %{total}*"
+      rubric_title: 标题
       titles: 
         find_existing_rubric: 查找现有题目
     rubric_criterion: 
@@ -12340,8 +12555,12 @@ zh:
     announcement: 通告
     announcements: 通告
     assignments: 作业
+    delete_quiz: 删除测验
+    delete_survey: 删除调查
     discussion: 讨论
     discussions: 讨论
+    edit_quiz: 编辑测验
+    edit_survey: 编辑调查
     error_reports: 错误报告
     learning_outcomes: 学习结果
     messages: 消息
@@ -12492,6 +12711,7 @@ zh:
         student: 学生
       page_title: 教师日志
   user_profile: 
+    profile_title_too_long: 标题太长
     tabs: 
       notifications: 通知
       profile: 个人资料
@@ -12822,21 +13042,13 @@ zh:
     wiki_page: 
       buttons: 
         edit: 编辑
-        publish: 发布
-        unpublish: 已发布
         view_all_pages: 查看所有页面
-      publish: 发布
+      delete_wiki: 删除
       toolbar_menu: 
         settings: 设置
-      unpublish: 取消发布
-    wiki_page_delete_dialog: 
-      cancel: 取消
-      delete_page: 删除
-      deleting: 正在删除...
     wiki_page_edit: 
       buttons: 
         cancel: 取消
-        preview: 预览
         publish: 已取消发布
         save: 保存
         unpublish: 已发布
@@ -12860,23 +13072,26 @@ zh:
     wiki_page_index: 
       add_page: 添加一个!
       buttons: 
-        new_page: 新页面
+        new_page: 页面
+        new_page_label: 添加页面
       headers: 
         creation_date: 创建日期
         last_edit: 最后编辑
         page_title: 页面标题
         published: 已发布
         settings: 设置
-        sort_ascending: 升序排序
-        sort_descending: 降序排序
       no_pages: 尚未创建页面。
+    wiki_page_index_edit_dialog: 
+      page_title: 标题
     wiki_page_index_item: 
       labels: 
         front_page: 首页
       menu: 
         delete: 删除
         edit: 编辑
+        remove_front_page: 作为首页删除
         set_front_page: 设置为首页
+        settings: 设置
   wiki_page: 
     atom_author: 维基页面
     atom_entry_title: "维基页面 %{course_or_group_name}: %{page_title}"
@@ -12919,8 +13134,6 @@ zh:
       not_most_recent_version_warning: 这不是最新的版本
       saved_by: "保存时间:*%{time_ago}* 通过 %{user}"
   wiki_pages: 
-    buttons: 
-      add_comment: 添加评论
     content: 
       buttons: 
         save_changes: 保存更改
@@ -12941,8 +13154,6 @@ zh:
         only_members: 仅成员
         prompt: "%{options} 可以编辑此页面"
       group_wiki_warning: "此页面是组维基的组成部分，*而不是*课程维基。如果您查找课程维基，[单击此处](%{link})。"
-      headings: 
-        page_comments: 页面评论
       labels: 
         hide_from_students: 对学生隐藏此页面
         last_edited: "由 %{name} 在 %{time_ago} 天前上次编辑"
@@ -12955,14 +13166,10 @@ zh:
         page_edited_while_viewing: "自从您开始查看后，此页面已被其他人更新。[单击此处重新加载该页面。](%{link})"
         page_edited_while_viewing_detailed: 自从您初次加载后，其他人已编辑此页面，如果您现在提交，将会覆盖其更改。您可能会想要重新加载该页面并重新输入您的更改以确保没有丢失其他人的工作。
       welcome_message: 欢迎使用课程维基
-    delete_comment_confirmation: 是否确定要删除此评论?
     errors: 
       cannot_delete_front_page: 您无法删除首页。
     front_page: 首页
-    loading_comments: 正在加载其他结果
     notices: 
-      add_comment_failed: 添加评论失败，请重试
-      adding_comment: 正在添加评论...
       cannot_edit: "不允许您编辑页面“%{title}”。"
       page_deleted: "页面\"%{title}\"已删除。"
       page_updated: 页面已成功更新。
@@ -12971,14 +13178,6 @@ zh:
     pages_index: 
       titles: 
         pages: 页面
-    wiki_page_comment: 
-      links: 
-        delete_comment: 删除评论
-    wiki_page_comment_form: 
-      buttons: 
-        add_comment: 添加评论
-      links: 
-        new_comment: 进行新评论
     wiki_right_side: 
       buttons: 
         create: 创建
@@ -13001,6 +13200,8 @@ zh:
       wiki_description_for_group: 将其视为容纳内容的无限制场所。您可以使用它描述您的组，提供难题的有用说明，或甚至允许成员一起编写项目。
       wiki_description_header: 维基的目的是什么?
   wiki_pages_api: 
+    cannot_have_unpublished_front_page: 不能取消发布首页
+    cannot_hide_front_page: 不能对学生隐藏首页
     cannot_update_editing_roles: 不允许您更新此维基页面的编辑角色
     cannot_update_front_page: 不允许您更改维基首页
     cannot_update_hide_from_students: 不允许您更新此维基页面的从学生隐藏标记
