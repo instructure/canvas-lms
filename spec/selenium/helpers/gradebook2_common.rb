@@ -22,11 +22,11 @@ def toggle_muting(assignment)
 end
 
 def open_assignment_options(cell_index)
-  assignment_cell = ff('#gradebook_grid .slick-header-column')[cell_index]
+  assignment_cell = ffj('#gradebook_grid .slick-header-column')[cell_index]
   driver.action.move_to(assignment_cell).perform
   trigger = assignment_cell.find_element(:css, '.gradebook-header-drop')
   trigger.click
-  f("##{trigger['aria-owns']}").should be_displayed
+  fj("##{trigger['aria-owns']}").should be_displayed
 end
 
 def find_slick_cells(row_index, element)
@@ -83,7 +83,6 @@ def switch_to_section(section=nil)
   fj('#section_to_show').click
   keep_trying_until { f('#section-to-show-menu').should be_displayed }
   fj("label[for='section_option_#{section}']").click
-  sleep 7
   wait_for_ajaximations
 end
 

@@ -71,7 +71,7 @@ describe "assignments" do
 
       #save changes
       submit_assignment_form
-      f('title').should include_text(assignment_name + ' edit')
+      driver.execute_script("return document.title").should include_text(assignment_name + ' edit')
     end
 
     it "should display assignment on calendar and link to assignment" do
@@ -316,7 +316,7 @@ describe "assignments" do
 
       #save changes
       submit_assignment_form
-      f('title').should include_text(assignment_name + ' edit')
+      driver.execute_script("return document.title").should include_text(assignment_name + ' edit')
     end
 
     it "should not allow group assignment or peer review for mooc course assignment" do

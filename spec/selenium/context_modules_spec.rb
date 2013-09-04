@@ -234,12 +234,12 @@ describe "context_modules" do
 
       get "/courses/#{@course.id}/modules"
 
-      f('.module_progressions_link').click
+      fj('.module_progressions_link').click
       wait_for_ajaximations
-      f(".student_list").should be_displayed
+      fj(".student_list").should be_displayed
 
       #selects the second student
-      ff(".student_list .student")[2].click
+      ffj(".student_list .student")[2].click
       wait_for_ajaximations
 
       #validates the second student has been selected and that the modules information is displayed as expected

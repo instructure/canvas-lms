@@ -163,13 +163,16 @@ describe "gradebook2" do
       edit_grade(f('#gradebook_grid [row="0"] .l0'), 0)
       edit_grade(f('#gradebook_grid [row="1"] .l0'), 1)
 
-      button = fj('#section_to_show')
-      button.should include_text("All Sections")
-      button.click
-      wait_for_ajaximations
-      keep_trying_until { fj('#section-to-show-menu').should be_displayed }
-      fj("label[for='section_option_#{@other_section.id}']").click
-      keep_trying_until { button.should include_text(@other_section.name) }
+      keep_trying_until do
+        button = fj('#section_to_show')
+        button.should include_text("All Sections")
+        button.click
+        wait_for_js
+        fj('#section-to-show-menu').should be_displayed
+        ffj('#section-to-show-menu a').last.click
+        wait_for_js
+        button.should include_text(@other_section.name)
+      end
       validate_cell_text(f('#gradebook_grid [row="0"] .l0'), '1')
 
       # verify that it remembers the section to show across page loads
@@ -186,489 +189,485 @@ describe "gradebook2" do
       fj("label[for='section_option_#{''}']").click
       keep_trying_until { button.should include_text "All Sections" }
 
-    # validate all grades (i.e. submissions) were loaded
-    validate_cell_text(f('#gradebook_grid [row="0"] .l0'), '0')
-    validate_cell_text(f('#gradebook_grid [row="1"] .l0'), '1')
-end
-
-
-it "should handle muting/unmuting correctly" do
-  get "/courses/#{@course.id}/gradebook2"
-
-  toggle_muting(@second_assignment)
-  fj(".slick-header-column[id*='assignment_#{@second_assignment.id}'] .muted").should be_displayed
-  @second_assignment.reload.should be_muted
-
-  # reload the page and make sure it remembered the setting
-  get "/courses/#{@course.id}/gradebook2"
-  wait_for_ajaximations
-  fj(".slick-header-column[id*='assignment_#{@second_assignment.id}'] .muted").should be_displayed
-
-  # make sure you can un-mute
-  toggle_muting(@second_assignment)
-  fj(".slick-header-column[id*='assignment_#{@second_assignment.id}'] .muted").should be_nil
-  @second_assignment.reload.should_not be_muted
-end
-
-context "concluded course" do
-  before do
-    @course.complete!
-    get "/courses/#{@course.id}/gradebook2"
-  end
-
-  it "should not allow editing grades" do
-    cell = driver.find_element(:css, '#gradebook_grid [row="0"] .l0')
-    cell.text.should == '10'
-    cell.click
-    ff('.grade', cell).should be_blank
-  end
-
-  it "should hide mutable actions from the menu" do
-    open_gradebook_settings do |menu|
-      ff("a.gradebook_upload_link", menu).should be_blank
-      ff("a.set_group_weights", menu).should be_blank
+      # validate all grades (i.e. submissions) were loaded
+      validate_cell_text(f('#gradebook_grid [row="0"] .l0'), '0')
+      validate_cell_text(f('#gradebook_grid [row="1"] .l0'), '1')
     end
-  end
-end
 
-it "should validate that gradebook settings is displayed when button is clicked" do
-  get "/courses/#{@course.id}/gradebook2"
-  wait_for_ajaximations
 
-  open_gradebook_settings
-end
+    it "should handle muting/unmuting correctly" do
+      get "/courses/#{@course.id}/gradebook2"
 
-it "should validate posting a comment to a graded assignment" do
-  comment_text = "This is a new comment!"
+      toggle_muting(@second_assignment)
+      fj(".slick-header-column[id*='assignment_#{@second_assignment.id}'] .muted").should be_displayed
+      @second_assignment.reload.should be_muted
 
-  get "/courses/#{@course.id}/gradebook2"
+      # reload the page and make sure it remembered the setting
+      get "/courses/#{@course.id}/gradebook2"
+      wait_for_ajaximations
+      fj(".slick-header-column[id*='assignment_#{@second_assignment.id}'] .muted").should be_displayed
 
-  dialog = open_comment_dialog
-  set_value(dialog.find_element(:id, "add_a_comment"), comment_text)
-  f("form.submission_details_add_comment_form.clearfix > button.btn").click
-  wait_for_ajaximations
-
-  #make sure it is still there if you reload the page
-  refresh_page
-  wait_for_ajaximations
-
-  comment = open_comment_dialog.find_element(:css, '.comment')
-  comment.should include_text(comment_text)
-end
-
-it "should let you post a group comment to a group assignment" do
-  group_assignment = @course.assignments.create!({
-                                                     :title => 'group assignment',
-                                                     :due_at => (Time.now + 1.week),
-                                                     :points_possible => ASSIGNMENT_3_POINTS,
-                                                     :submission_types => 'online_text_entry',
-                                                     :assignment_group => @group,
-                                                     :group_category => GroupCategory.create!(:name => "groups", :context => @course),
-                                                     :grade_group_students_individually => true
-                                                 })
-  project_group = group_assignment.group_category.groups.create!(:name => 'g1', :context => @course)
-  project_group.users << @student_1
-  project_group.users << @student_2
-
-  comment_text = "This is a new group comment!"
-
-  get "/courses/#{@course.id}/gradebook2"
-
-  dialog = open_comment_dialog(3)
-  set_value(dialog.find_element(:id, "add_a_comment"), comment_text)
-  dialog.find_element(:id, "group_comment").click
-  f("form.submission_details_add_comment_form.clearfix > button.btn").click
-  wait_for_ajaximations
-
-  #make sure it's on the other student's submission
-  comment = keep_trying_until do
-    open_comment_dialog(3, 1)
-    fj(".submission_details_dialog:visible .comment")
-  end
-  comment.should include_text(comment_text)
-end
-
-it "should validate assignment details" do
-  submissions_count = @second_assignment.submissions.count.to_s + ' submissions'
-
-  get "/courses/#{@course.id}/gradebook2"
-
-  open_assignment_options(1)
-  f('[data-action="showAssignmentDetails"]').click
-  wait_for_ajaximations
-  details_dialog = f('#assignment-details-dialog')
-  details_dialog.should be_displayed
-  table_rows = ff('#assignment-details-dialog-stats-table tr')
-  table_rows[3].find_element(:css, 'td').text.should == submissions_count
-end
-
-it "should not throw an error when setting the default grade when concluded enrollments exist" do
-  pending("bug 7413 - Error assigning default grade for all students when one student's enrollment has been concluded.") do
-    conclude_and_unconclude_course
-    3.times { student_in_course }
-
-    get "/courses/#{@course.id}/gradebook2"
-    wait_for_ajaximations
-
-    #TODO - when show concluded enrollments fix goes in we probably have to add that code right here
-    #for the test to work correctly
-
-    set_default_grade(2, 5)
-    grade_grid = f('#gradebook_grid')
-    @course.student_enrollments.each_with_index do |e, n|
-      next if e.completed?
-      find_slick_cells(n, grade_grid)[2].text.should == 5
+      # make sure you can un-mute
+      toggle_muting(@second_assignment)
+      fj(".slick-header-column[id*='assignment_#{@second_assignment.id}'] .muted").should be_nil
+      @second_assignment.reload.should_not be_muted
     end
-  end
-end
 
-describe "message students who" do
-  it "should send messages" do
-    message_text = "This is a message"
-
-    get "/courses/#{@course.id}/gradebook2"
-
-    open_assignment_options(2)
-    f('[data-action="messageStudentsWho"]').click
-    expect {
-      message_form = f('#message_assignment_recipients')
-      message_form.find_element(:css, '#body').send_keys(message_text)
-      submit_form(message_form)
-      wait_for_ajax_requests
-    }.to change(ConversationMessage, :count).by_at_least(2)
-  end
-
-  it "should only send messages to students who have not submitted and have not been graded" do
-    # student 1 submitted but not graded yet
-    @third_submission = @third_assignment.submit_homework(@student_1, :body => ' student 1 submission assignment 4')
-    @third_submission.save!
-
-    # student 2 graded without submission (turned in paper by hand)
-    @third_assignment.grade_student(@student_2, :grade => 42)
-
-    # student 3 has neither submitted nor been graded
-
-    message_text = "This is a message"
-    get "/courses/#{@course.id}/gradebook2"
-    open_assignment_options(2)
-    f('[data-action="messageStudentsWho"]').click
-    expect {
-      message_form = f('#message_assignment_recipients')
-      click_option('#message_assignment_recipients .message_types', "Haven't submitted yet")
-      message_form.find_element(:css, '#body').send_keys(message_text)
-      submit_form(message_form)
-      wait_for_ajax_requests
-    }.to change { ConversationMessage.count(:conversation_id) }.by(1)
-  end
-
-  it "should send messages when Scored more than X points" do
-    message_text = "This is a message"
-    get "/courses/#{@course.id}/gradebook2"
-
-    open_assignment_options(1)
-    f('[data-action="messageStudentsWho"]').click
-    expect {
-      message_form = f('#message_assignment_recipients')
-      click_option('#message_assignment_recipients .message_types', 'Scored more than')
-      message_form.find_element(:css, '.cutoff_score').send_keys('3') # both assignments have score of 5
-      message_form.find_element(:css, '#body').send_keys(message_text)
-      submit_form(message_form)
-      wait_for_ajax_requests
-    }.to change(ConversationMessage, :count).by_at_least(2)
-  end
-
-  it "should have a Have not been graded option" do
-    # student 2 has submitted assignment 3, but it hasn't been graded
-    submission = @third_assignment.submit_homework(@student_2, :body => 'student 2 submission assignment 3')
-    submission.save!
-
-    get "/courses/#{@course.id}/gradebook2"
-    # set grade for first student, 3rd assignment
-    edit_grade(f('#gradebook_grid [row="0"] .l2'), 0)
-    open_assignment_options(2)
-
-    # expect dialog to show 1 more student with the "Haven't been graded" option
-    f('[data-action="messageStudentsWho"]').click
-    visible_students = ffj('.student_list li:visible')
-    visible_students.size.should == 1
-    visible_students[0].text.strip.should == STUDENT_NAME_3
-    click_option('#message_assignment_recipients .message_types', "Haven't been graded")
-    visible_students = ffj('.student_list li:visible')
-    visible_students.size.should == 2
-    visible_students[0].text.strip.should == STUDENT_NAME_2
-    visible_students[1].text.strip.should == STUDENT_NAME_3
-  end
-end
-
-
-it "should handle multiple enrollments correctly" do
-  @course.enroll_student(@student_1, :section => @other_section, :allow_multiple_enrollments => true)
-
-  get "/courses/#{@course.id}/gradebook2"
-  wait_for_ajaximations
-
-  meta_cells = find_slick_cells(0, f('.grid-canvas'))
-  meta_cells[0].should include_text @course.default_section.display_name
-  meta_cells[0].should include_text @other_section.display_name
-
-  switch_to_section(@course.default_section)
-  meta_cells = find_slick_cells(0, f('.grid-canvas'))
-  meta_cells[0].should include_text STUDENT_NAME_1
-
-  switch_to_section(@other_section)
-  meta_cells = find_slick_cells(0, f('.grid-canvas'))
-  meta_cells[0].should include_text STUDENT_NAME_1
-end
-
-it "should display for users with only :view_all_grades permissions" do
-  user_logged_in
-  RoleOverride.create!(:enrollment_type => 'CustomAdmin',
-                       :permission => 'view_all_grades',
-                       :context => Account.default,
-                       :enabled => true)
-  AccountUser.create!(:user => @user,
-                      :account => Account.default,
-                      :membership_type => 'CustomAdmin')
-
-  get "/courses/#{@course.id}/gradebook2"
-  ff('.ui-state-error').count.should == 0
-end
-
-it "should display for users with only :manage_grades permissions" do
-  user_logged_in
-  RoleOverride.create!(:enrollment_type => 'CustomAdmin',
-                       :permission => 'manage_grades',
-                       :context => Account.default,
-                       :enabled => true)
-  AccountUser.create!(:user => @user,
-                      :account => Account.default,
-                      :membership_type => 'CustomAdmin')
-
-  get "/courses/#{@course.id}/gradebook2"
-  ff('.ui-state-error').count.should == 0
-end
-
-it "should include student view student for grading" do
-  @fake_student = @course.student_view_student
-  @fake_submission = @first_assignment.submit_homework(@fake_student, :body => 'fake student submission')
-
-  get "/courses/#{@course.id}/gradebook2"
-
-  ff('.student-name').map(&:text).join(" ").should match @fake_student.name
-end
-
-it "should not include non-graded group assignment in group total" do
-  gc = group_category
-  graded_assignment = @course.assignments.create!({
-                                                      :title => 'group assignment 1',
-                                                      :due_at => (Time.now + 1.week),
-                                                      :points_possible => 10,
-                                                      :submission_types => 'online_text_entry',
-                                                      :assignment_group => @group,
-                                                      :group_category => gc,
-                                                      :grade_group_students_individually => true
-                                                  })
-  group_assignment = @course.assignments.create!({
-                                                     :title => 'group assignment 2',
-                                                     :due_at => (Time.now + 1.week),
-                                                     :points_possible => 0,
-                                                     :submission_types => 'not_graded',
-                                                     :assignment_group => @group,
-                                                     :group_category => gc,
-                                                     :grade_group_students_individually => true
-                                                 })
-  project_group = group_assignment.group_category.groups.create!(:name => 'g1', :context => @course)
-  project_group.users << @student_1
-  #project_group.users << @student_2
-  graded_assignment.submissions.create(:user => @student)
-  graded_assignment.grade_student @student_1, :grade => 10 # 10 points possible
-  group_assignment.submissions.create(:user => @student)
-  group_assignment.grade_student @student_1, :grade => 2 # 0 points possible
-
-  get "/courses/#{@course.id}/gradebook2"
-  wait_for_ajaximations
-  f('#gradebook_grid [row="0"] .assignment-group-cell .percentage').should include_text('100%') # otherwise 108%
-  f('#gradebook_grid [row="0"] .total-cell .percentage').should include_text('100%') # otherwise 108%
-end
-
-it "should hide and show student names" do
-
-  def toggle_hiding_students
-    keep_trying_until do
-      f('#gradebook_settings').click
-      student_toggle = f('.student_names_toggle')
-      student_toggle.should be_displayed
-      student_toggle.click
-      true
-    end
-  end
-
-  get "/courses/#{@course.id}/gradebook2"
-  wait_for_ajaximations
-
-  toggle_hiding_students
-  fj('.student-name:visible').should be_nil
-  ffj('.student-placeholder:visible').length.should be > 0
-
-  toggle_hiding_students
-  ffj('.student-name:visible').length.should be > 0
-  fj('.student-placeholder:visible').should be_nil
-end
-
-context "turnitin" do
-  it "should show turnitin data" do
-    s1 = @first_assignment.submit_homework(@student_1, :submission_type => 'online_text_entry', :body => 'asdf')
-    s1.update_attribute :turnitin_data, {"submission_#{s1.id}" => {:similarity_score => 0.0, :web_overlap => 0.0, :publication_overlap => 0.0, :student_overlap => 0.0, :state => 'none'}}
-    a = attachment_model(:context => @student_2, :content_type => 'text/plain')
-    s2 = @first_assignment.submit_homework(@student_2, :submission_type => 'online_upload', :attachments => [a])
-    s2.update_attribute :turnitin_data, {"attachment_#{a.id}" => {:similarity_score => 1.0, :web_overlap => 5.0, :publication_overlap => 0.0, :student_overlap => 0.0, :state => 'acceptable'}}
-
-    get "/courses/#{@course.id}/gradebook2"
-    wait_for_ajaximations
-    icons = ffj('.gradebook-cell-turnitin')
-    icons.size.should == 2
-
-    # make sure it appears in each submission dialog
-    icons.each do |icon|
-      cell = icon.find_element(:xpath, '..')
-
-      keep_trying_until do
-        driver.action.move_to(cell).perform
-        cell.find_element(:css, "a").should be_displayed
+    context "concluded course" do
+      before do
+        @course.complete!
+        get "/courses/#{@course.id}/gradebook2"
       end
 
-      keep_trying_until do
-        cell.find_element(:css, "a").click
+      it "should not allow editing grades" do
+        cell = driver.find_element(:css, '#gradebook_grid [row="0"] .l0')
+        cell.text.should == '10'
+        cell.click
+        ff('.grade', cell).should be_blank
+      end
+
+      it "should hide mutable actions from the menu" do
+        open_gradebook_settings do |menu|
+          ff("a.gradebook_upload_link", menu).should be_blank
+          ff("a.set_group_weights", menu).should be_blank
+        end
+      end
+    end
+
+    it "should validate that gradebook settings is displayed when button is clicked" do
+      get "/courses/#{@course.id}/gradebook2"
+      wait_for_ajaximations
+
+      open_gradebook_settings
+    end
+
+    it "should validate posting a comment to a graded assignment" do
+      comment_text = "This is a new comment!"
+
+      get "/courses/#{@course.id}/gradebook2"
+
+      dialog = open_comment_dialog
+      set_value(dialog.find_element(:id, "add_a_comment"), comment_text)
+      f("form.submission_details_add_comment_form.clearfix > button.btn").click
+      wait_for_ajaximations
+
+      #make sure it is still there if you reload the page
+      refresh_page
+      wait_for_ajaximations
+
+      comment = open_comment_dialog.find_element(:css, '.comment')
+      comment.should include_text(comment_text)
+    end
+
+    it "should let you post a group comment to a group assignment" do
+      group_assignment = @course.assignments.create!({
+                                                         :title => 'group assignment',
+                                                         :due_at => (Time.now + 1.week),
+                                                         :points_possible => ASSIGNMENT_3_POINTS,
+                                                         :submission_types => 'online_text_entry',
+                                                         :assignment_group => @group,
+                                                         :group_category => GroupCategory.create!(:name => "groups", :context => @course),
+                                                         :grade_group_students_individually => true
+                                                     })
+      project_group = group_assignment.group_category.groups.create!(:name => 'g1', :context => @course)
+      project_group.users << @student_1
+      project_group.users << @student_2
+
+      comment_text = "This is a new group comment!"
+
+      get "/courses/#{@course.id}/gradebook2"
+
+      dialog = open_comment_dialog(3)
+      set_value(dialog.find_element(:id, "add_a_comment"), comment_text)
+      dialog.find_element(:id, "group_comment").click
+      f("form.submission_details_add_comment_form.clearfix > button.btn").click
+      wait_for_ajaximations
+
+      #make sure it's on the other student's submission
+      comment = keep_trying_until do
+        open_comment_dialog(3, 1)
+        fj(".submission_details_dialog:visible .comment")
+      end
+      comment.should include_text(comment_text)
+    end
+
+    it "should validate assignment details" do
+      submissions_count = @second_assignment.submissions.count.to_s + ' submissions'
+
+      get "/courses/#{@course.id}/gradebook2"
+
+      open_assignment_options(1)
+      f('[data-action="showAssignmentDetails"]').click
+      wait_for_ajaximations
+      details_dialog = f('#assignment-details-dialog')
+      details_dialog.should be_displayed
+      table_rows = ff('#assignment-details-dialog-stats-table tr')
+      table_rows[3].find_element(:css, 'td').text.should == submissions_count
+    end
+
+    it "should not throw an error when setting the default grade when concluded enrollments exist" do
+      pending("bug 7413 - Error assigning default grade for all students when one student's enrollment has been concluded.")
+      conclude_and_unconclude_course
+      3.times { student_in_course }
+
+      get "/courses/#{@course.id}/gradebook2"
+
+
+      #TODO - when show concluded enrollments fix goes in we probably have to add that code right here
+      #for the test to work correctly
+
+      set_default_grade(2, 5)
+      grade_grid = f('#gradebook_grid')
+      @course.student_enrollments.each_with_index do |e, n|
+        next if e.completed?
+        find_slick_cells(n, grade_grid)[2].text.should == 5
+      end
+    end
+
+    describe "message students who" do
+      it "should send messages" do
+        message_text = "This is a message"
+
+        get "/courses/#{@course.id}/gradebook2"
+
+        open_assignment_options(2)
+        f('[data-action="messageStudentsWho"]').click
+        expect {
+          message_form = f('#message_assignment_recipients')
+          message_form.find_element(:css, '#body').send_keys(message_text)
+          submit_form(message_form)
+          wait_for_ajax_requests
+        }.to change(ConversationMessage, :count).by_at_least(2)
+      end
+
+      it "should only send messages to students who have not submitted and have not been graded" do
+        # student 1 submitted but not graded yet
+        @third_submission = @third_assignment.submit_homework(@student_1, :body => ' student 1 submission assignment 4')
+        @third_submission.save!
+
+        # student 2 graded without submission (turned in paper by hand)
+        @third_assignment.grade_student(@student_2, :grade => 42)
+
+        # student 3 has neither submitted nor been graded
+
+        message_text = "This is a message"
+        get "/courses/#{@course.id}/gradebook2"
+        open_assignment_options(2)
+        f('[data-action="messageStudentsWho"]').click
+        expect {
+          message_form = f('#message_assignment_recipients')
+          click_option('#message_assignment_recipients .message_types', "Haven't submitted yet")
+          message_form.find_element(:css, '#body').send_keys(message_text)
+          submit_form(message_form)
+          wait_for_ajax_requests
+        }.to change { ConversationMessage.count(:conversation_id) }.by(1)
+      end
+
+      it "should send messages when Scored more than X points" do
+        message_text = "This is a message"
+        get "/courses/#{@course.id}/gradebook2"
+
+        open_assignment_options(1)
+        f('[data-action="messageStudentsWho"]').click
+        expect {
+          message_form = f('#message_assignment_recipients')
+          click_option('#message_assignment_recipients .message_types', 'Scored more than')
+          message_form.find_element(:css, '.cutoff_score').send_keys('3') # both assignments have score of 5
+          message_form.find_element(:css, '#body').send_keys(message_text)
+          submit_form(message_form)
+          wait_for_ajax_requests
+        }.to change(ConversationMessage, :count).by_at_least(2)
+      end
+
+      it "should have a Have not been graded option" do
+        # student 2 has submitted assignment 3, but it hasn't been graded
+        submission = @third_assignment.submit_homework(@student_2, :body => 'student 2 submission assignment 3')
+        submission.save!
+
+        get "/courses/#{@course.id}/gradebook2"
+        # set grade for first student, 3rd assignment
+        edit_grade(f('#gradebook_grid [row="0"] .l2'), 0)
+        open_assignment_options(2)
+
+        # expect dialog to show 1 more student with the "Haven't been graded" option
+        f('[data-action="messageStudentsWho"]').click
+        visible_students = ffj('.student_list li:visible')
+        visible_students.size.should == 1
+        visible_students[0].text.strip.should == STUDENT_NAME_3
+        click_option('#message_assignment_recipients .message_types', "Haven't been graded")
+        visible_students = ffj('.student_list li:visible')
+        visible_students.size.should == 2
+        visible_students[0].text.strip.should == STUDENT_NAME_2
+        visible_students[1].text.strip.should == STUDENT_NAME_3
+      end
+    end
+
+
+    it "should handle multiple enrollments correctly" do
+      @course.enroll_student(@student_1, :section => @other_section, :allow_multiple_enrollments => true)
+
+      get "/courses/#{@course.id}/gradebook2"
+      wait_for_ajaximations
+
+      meta_cells = find_slick_cells(0, f('.grid-canvas'))
+      meta_cells[0].should include_text @course.default_section.display_name
+      meta_cells[0].should include_text @other_section.display_name
+
+      switch_to_section(@course.default_section)
+      meta_cells = find_slick_cells(0, f('.grid-canvas'))
+      meta_cells[0].should include_text STUDENT_NAME_1
+
+      switch_to_section(@other_section)
+      meta_cells = find_slick_cells(0, f('.grid-canvas'))
+      meta_cells[0].should include_text STUDENT_NAME_1
+    end
+
+    it "should display for users with only :view_all_grades permissions" do
+      user_logged_in
+      RoleOverride.create!(:enrollment_type => 'CustomAdmin',
+                           :permission => 'view_all_grades',
+                           :context => Account.default,
+                           :enabled => true)
+      AccountUser.create!(:user => @user,
+                          :account => Account.default,
+                          :membership_type => 'CustomAdmin')
+
+      get "/courses/#{@course.id}/gradebook2"
+      ff('.ui-state-error').count.should == 0
+    end
+
+    it "should display for users with only :manage_grades permissions" do
+      user_logged_in
+      RoleOverride.create!(:enrollment_type => 'CustomAdmin',
+                           :permission => 'manage_grades',
+                           :context => Account.default,
+                           :enabled => true)
+      AccountUser.create!(:user => @user,
+                          :account => Account.default,
+                          :membership_type => 'CustomAdmin')
+
+      get "/courses/#{@course.id}/gradebook2"
+      ff('.ui-state-error').count.should == 0
+    end
+
+    it "should include student view student for grading" do
+      @fake_student = @course.student_view_student
+      @fake_submission = @first_assignment.submit_homework(@fake_student, :body => 'fake student submission')
+
+      get "/courses/#{@course.id}/gradebook2"
+
+      ff('.student-name').map(&:text).join(" ").should match @fake_student.name
+    end
+
+    it "should not include non-graded group assignment in group total" do
+      gc = group_category
+      graded_assignment = @course.assignments.create!({
+                                                          :title => 'group assignment 1',
+                                                          :due_at => (Time.now + 1.week),
+                                                          :points_possible => 10,
+                                                          :submission_types => 'online_text_entry',
+                                                          :assignment_group => @group,
+                                                          :group_category => gc,
+                                                          :grade_group_students_individually => true
+                                                      })
+      group_assignment = @course.assignments.create!({
+                                                         :title => 'group assignment 2',
+                                                         :due_at => (Time.now + 1.week),
+                                                         :points_possible => 0,
+                                                         :submission_types => 'not_graded',
+                                                         :assignment_group => @group,
+                                                         :group_category => gc,
+                                                         :grade_group_students_individually => true
+                                                     })
+      project_group = group_assignment.group_category.groups.create!(:name => 'g1', :context => @course)
+      project_group.users << @student_1
+      #project_group.users << @student_2
+      graded_assignment.submissions.create(:user => @student)
+      graded_assignment.grade_student @student_1, :grade => 10 # 10 points possible
+      group_assignment.submissions.create(:user => @student)
+      group_assignment.grade_student @student_1, :grade => 2 # 0 points possible
+
+      get "/courses/#{@course.id}/gradebook2"
+      wait_for_ajaximations
+      f('#gradebook_grid [row="0"] .assignment-group-cell .percentage').should include_text('100%') # otherwise 108%
+      f('#gradebook_grid [row="0"] .total-cell .percentage').should include_text('100%') # otherwise 108%
+    end
+
+    it "should hide and show student names" do
+
+      def toggle_hiding_students
+        keep_trying_until do
+          f('#gradebook_settings').click
+          student_toggle = f('.student_names_toggle')
+          student_toggle.should be_displayed
+          student_toggle.click
+          true
+        end
+      end
+
+      get "/courses/#{@course.id}/gradebook2"
+      wait_for_ajaximations
+
+      toggle_hiding_students
+      fj('.student-name:visible').should be_nil
+      ffj('.student-placeholder:visible').length.should be > 0
+
+      toggle_hiding_students
+      ffj('.student-name:visible').length.should be > 0
+      fj('.student-placeholder:visible').should be_nil
+    end
+
+    context "turnitin" do
+      it "should show turnitin data" do
+        s1 = @first_assignment.submit_homework(@student_1, :submission_type => 'online_text_entry', :body => 'asdf')
+        s1.update_attribute :turnitin_data, {"submission_#{s1.id}" => {:similarity_score => 0.0, :web_overlap => 0.0, :publication_overlap => 0.0, :student_overlap => 0.0, :state => 'none'}}
+        a = attachment_model(:context => @student_2, :content_type => 'text/plain')
+        s2 = @first_assignment.submit_homework(@student_2, :submission_type => 'online_upload', :attachments => [a])
+        s2.update_attribute :turnitin_data, {"attachment_#{a.id}" => {:similarity_score => 1.0, :web_overlap => 5.0, :publication_overlap => 0.0, :student_overlap => 0.0, :state => 'acceptable'}}
+
+        get "/courses/#{@course.id}/gradebook2"
         wait_for_ajaximations
+        icons = ffj('.gradebook-cell-turnitin')
+        icons.size.should == 2
+
+        # make sure it appears in each submission dialog
+        icons.each do |icon|
+          cell = icon.find_element(:xpath, '..')
+
+          driver.action.move_to(cell).perform
+          keep_trying_until do
+            cell.find_element(:css, "a").should be_displayed
+          end
+          cell.find_element(:css, "a").click
+          wait_for_ajaximations
+
+          fj('.ui-icon-closethick:visible').click
+        end
+      end
+    end
+
+    context "downloading and uploading submissions" do
+      it "updates the dropdown menu after downloading and processes submission uploads" do
+        # Given I have a student with an uploaded submission
+        a = attachment_model(:context => @student_2, :content_type => 'text/plain')
+        s2 = @first_assignment.submit_homework(@student_2, :submission_type => 'online_upload', :attachments => [a])
+
+        # When I go to the gradebook
+        get "/courses/#{@course.id}/gradebook2"
+
+        # And I click the dropdown menu on the assignment
+        f('.gradebook-header-drop').click
+
+        # And I click the download submissions button
+        f('[data-action="downloadSubmissions"]').click
+
+        # And I close the download submissions dialog
+        fj("div:contains('Download Assignment Submissions'):first .ui-dialog-titlebar-close").click
+
+        # And I click the dropdown menu on the assignment again
+        f('.gradebook-header-drop').click
+
+        # And I click the re-upload submissions link
+        f('[data-action="reuploadSubmissions"]').click
+
+        # When I attach a submissions zip file
+        fixtureFile = Rails.root.join('spec/fixtures/files/submissions.zip')
+        f('input[name=submissions_zip]').send_keys(fixtureFile)
+
+        # And I upload it
+        expect_new_page_load do
+          fj('button:contains("Upload Files")').click
+          # And I wait for the upload
+          wait_for_ajax_requests
+        end
+
+        # Then I should see a message indicating the file was processed
+        f('#content h3').should include_text 'Attached files to the following user submissions'
+      end
+    end
+
+    it "should show late submissions" do
+      get "/courses/#{@course.id}/gradebook2"
+      ff('.late').count.should == 0
+
+      @student_3_submission.write_attribute(:cached_due_date, 1.week.ago)
+      @student_3_submission.save!
+      get "/courses/#{@course.id}/gradebook2"
+      wait_for_ajaximations
+      ff('.late').count.should == 1
+    end
+
+    it "should not display a speedgrader link for large courses" do
+      Course.any_instance.stubs(:large_roster?).returns(true)
+
+      get "/courses/#{@course.id}/gradebook2"
+
+      f('.gradebook-header-drop').click
+      f('.gradebook-header-menu').text.should_not match(/SpeedGrader/)
+    end
+
+    context "multiple api-pages of students" do
+      before do
+        @page_size = 5
+        Setting.set 'api_max_per_page', @page_size
       end
 
-      fj('.ui-icon-closethick:visible').click
+      def test_n_students(n)
+        n.times { |i| student_in_course(:name => "student #{i+1}") }
+        get "/courses/#{@course.id}/gradebook2"
+        wait_for_ajaximations
+        filter_student(n)
+        ff('.student-name').size.should == 1
+        f('.student-name').text.should == "student #{n}"
+      end
+
+      it "should work for 2 pages" do
+        test_n_students @page_size + 1
+      end
+
+      it "should work for >2 pages" do
+        test_n_students @page_size * 2 + 1
+      end
+    end
+
+    describe "Total dropdown" do
+      def should_show_percentages
+        ff(".total-column").each { |total| total.text.should =~ /%/ }
+      end
+
+      def toggle_showing_points
+        f("#total_dropdown").click
+        f(".toggle_percent").click
+      end
+
+      it 'should allow toggling display by points or percent' do
+        should_show_percentages
+
+        get "/courses/#{@course.id}/gradebook2"
+        toggle_showing_points
+
+        expected_points = 15, 10, 10
+        ff(".total-column").each { |total|
+          total.text.should =~ /\A#{expected_points.shift}$/
+        }
+
+        toggle_showing_points
+        should_show_percentages
+      end
     end
   end
-end
 
-context "downloading and uploading submissions" do
-  it "updates the dropdown menu after downloading and processes submission uploads" do
-    # Given I have a student with an uploaded submission
-    a = attachment_model(:context => @student_2, :content_type => 'text/plain')
-    s2 = @first_assignment.submit_homework(@student_2, :submission_type => 'online_upload', :attachments => [a])
+  context "as an observer" do
+    before (:each) do
+      data_setup_as_observer
+    end
 
-    # When I go to the gradebook
-    get "/courses/#{@course.id}/gradebook2"
-
-    # And I click the dropdown menu on the assignment
-    f('.gradebook-header-drop').click
-
-    # And I click the download submissions button
-    f('[data-action="downloadSubmissions"]').click
-
-    # And I close the download submissions dialog
-    fj("div:contains('Download Assignment Submissions'):first .ui-dialog-titlebar-close").click
-
-    # And I click the dropdown menu on the assignment again
-    f('.gradebook-header-drop').click
-
-    # And I click the re-upload submissions link
-    f('[data-action="reuploadSubmissions"]').click
-
-    # When I attach a submissions zip file
-    fixtureFile = Rails.root.join('spec/fixtures/files/submissions.zip')
-    f('input[name=submissions_zip]').send_keys(fixtureFile)
-
-    # And I upload it
-    expect_new_page_load do
-      fj('button:contains("Upload Files")').click
-      # And I wait for the upload
+    it "should allow observer to see grade totals" do
+      get "/courses/#{@course.id}/grades/#{@student_2.id}"
+      f(".final_grade .grade").should include_text("66.7")
+      f("#only_consider_graded_assignments").click
       wait_for_ajax_requests
+      f(".final_grade .grade").should include_text("12.5")
     end
-
-    # Then I should see a message indicating the file was processed
-    f('#content h3').should include_text 'Attached files to the following user submissions'
   end
-end
-
-it "should show late submissions" do
-  get "/courses/#{@course.id}/gradebook2"
-  ff('.late').count.should == 0
-
-  @student_3_submission.write_attribute(:cached_due_date, 1.week.ago)
-  @student_3_submission.save!
-  get "/courses/#{@course.id}/gradebook2"
-  wait_for_ajaximations
-  ff('.late').count.should == 1
-end
-
-it "should not display a speedgrader link for large courses" do
-  Course.any_instance.stubs(:large_roster?).returns(true)
-
-  get "/courses/#{@course.id}/gradebook2"
-
-  f('.gradebook-header-drop').click
-  f('.gradebook-header-menu').text.should_not match(/SpeedGrader/)
-end
-
-context "multiple api-pages of students" do
-  before do
-    @page_size = 5
-    Setting.set 'api_max_per_page', @page_size
-  end
-
-  def test_n_students(n)
-    n.times { |i| student_in_course(:name => "student #{i+1}") }
-    get "/courses/#{@course.id}/gradebook2"
-    wait_for_ajaximations
-    filter_student(n)
-    ff('.student-name').size.should == 1
-    f('.student-name').text.should == "student #{n}"
-  end
-
-  it "should work for 2 pages" do
-    test_n_students @page_size + 1
-  end
-
-  it "should work for >2 pages" do
-    test_n_students @page_size * 2 + 1
-  end
-end
-
-describe "Total dropdown" do
-  def should_show_percentages
-    ff(".total-column").each { |total| total.text.should =~ /%/ }
-  end
-
-  def toggle_showing_points
-    f("#total_dropdown").click
-    f(".toggle_percent").click
-  end
-
-  it 'should allow toggling display by points or percent' do
-    should_show_percentages
-
-    get "/courses/#{@course.id}/gradebook2"
-    toggle_showing_points
-
-    expected_points = 15, 10, 10
-    ff(".total-column").each { |total|
-      total.text.should =~ /\A#{expected_points.shift}$/
-    }
-
-    toggle_showing_points
-    should_show_percentages
-  end
-end
-end
-
-context "as an observer" do
-  before (:each) do
-    data_setup_as_observer
-  end
-
-  it "should allow observer to see grade totals" do
-    get "/courses/#{@course.id}/grades/#{@student_2.id}"
-    f(".final_grade .grade").should include_text("66.7")
-    f("#only_consider_graded_assignments").click
-    wait_for_ajax_requests
-    f(".final_grade .grade").should include_text("12.5")
-  end
-end
 end

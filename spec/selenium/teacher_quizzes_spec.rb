@@ -457,14 +457,19 @@ describe "quizzes" do
 
       # force a save to create a submission
       answer_one.click
-      wait_for_ajax_requests
+      wait_for_ajaximations
 
-      # increase the time limit on the quiz
+      # add time as a the moderator. this code replicates what happens in
+      # QuizSubmissions#extensions when a moderator extends a student's
+      # quiz time.
+
+
       quiz_original_end_time = QuizSubmission.last.end_at
 
       keep_trying_until do
-        q.update_attribute(:time_limit, 20)
-        q.update_quiz_submission_end_at_times
+        submission = QuizSubmission.last
+        submission.end_at = Time.now + 20.minutes
+        submission.save!
         quiz_original_end_time < QuizSubmission.last.end_at
         assert_flash_notice_message /You have been given extra time on this attempt/
         f('.time_running').text.should match /19 Minutes/
@@ -544,6 +549,7 @@ describe "quizzes" do
     end
 
     it "should notify a student of extra time given by a moderator" do
+      pending('broken')
       @context = @course
       bank = @course.assessment_question_banks.create!(:title => 'Test Bank')
       q = quiz_model
@@ -578,14 +584,13 @@ describe "quizzes" do
 
       quiz_original_end_time = QuizSubmission.last.end_at
 
-      keep_trying_until do
-        submission = QuizSubmission.last
-        submission.end_at = Time.now + 20.minutes
-        submission.save!
-        quiz_original_end_time < QuizSubmission.last.end_at
-        assert_flash_notice_message /You have been given extra time on this attempt/
-        f('.time_running').text.should match /19 Minutes/
-      end
+
+      submission = QuizSubmission.last
+      submission.end_at = Time.now + 20.minutes
+      submission.save!
+      quiz_original_end_time < QuizSubmission.last.end_at
+      assert_flash_notice_message /You have been given extra time on this attempt/
+      f('.time_running').text.should match /19 Minutes/
     end
 
 

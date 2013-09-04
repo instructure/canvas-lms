@@ -89,9 +89,11 @@ describe "calendar2" do
       # make the user an admin so they can view the course's calendar without an enrollment
       Account.default.add_user(@user)
       CalendarEvent.create!(:title => "from unrelated one", :start_at => Time.now, :end_at => 5.hours.from_now) { |c| c.context = unrelated_course }
+      keep_trying_until { CalendarEvent.last.title.should == "from unrelated one" }
       get "/courses/#{unrelated_course.id}/settings"
-      expect_new_page_load { f("#course_calendar_link").click() }
-      wait_for_ajax_requests
+      f('#course_calendar_link')['href'].should match(/course_#{Course.last.id}/)
+      f("#course_calendar_link").click
+
       # only the explicit context should be selected
       f("#context-list li[data-context=course_#{unrelated_course.id}]").should have_class('checked')
       f("#context-list li[data-context=course_#{@course.id}]").should have_class('not-checked')

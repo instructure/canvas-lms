@@ -407,7 +407,7 @@ shared_examples_for "all selenium tests" do
   def enter_student_view(opts={})
     course = opts[:course] || @course || course(opts)
     get "/courses/#{@course.id}/settings"
-    f(".student_view_button").click
+    driver.execute_script("$('.student_view_button').click()")
     wait_for_ajaximations
   end
 
@@ -755,12 +755,11 @@ shared_examples_for "all selenium tests" do
 
   # you can pass an array to use the rails polymorphic_path helper, example:
   # get [@course, @announcement] => "http://10.0.101.75:65137/courses/1/announcements/1"
-  def get(link, waitforajaximations = true)
+  def get(link)
     link = polymorphic_path(link) if link.is_a? Array
     driver.get(app_host + link)
     #handles any modals prompted by navigating from the current page
     try_to_close_modal
-    wait_for_ajaximations if waitforajaximations
   end
 
   def try_to_close_modal
