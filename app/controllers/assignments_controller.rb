@@ -326,7 +326,7 @@ class AssignmentsController < ApplicationController
       edit
     end
   end
-  
+
   def edit
     @assignment ||= @context.assignments.active.find(params[:id])
     if authorized_action(@assignment, @current_user, @assignment.new_record? ? :create : :update)

@@ -457,6 +457,16 @@ describe "assignments" do
     end
 
 
+    it "should create an assignment with the correct date for keyboard entry (mm/dd/yy)" do
+      get "/courses/#{@course.id}/assignments"
+      f('.add_assignment_link').click
+      wait_for_ajaximations
+      replace_content(fj('#assignment_title'), "TACOS TACOS TACOS")
+      replace_content(fj('#assignment_due_at'), '06/10/12')
+      expect_new_page_load { f('.more_options_link').click }
+      f('#assignment_due_date').attribute(:value).should == "Jun 10, 2012 at 12am"
+    end
+
     context "frozen assignments" do
 
       append_before(:each) do
