@@ -352,7 +352,7 @@ class ContentMigration < ActiveRecord::Base
 
     return true if is_set?(to_import("all_#{asset_type}"))
 
-    return false unless to_import(asset_type)
+    return false unless to_import(asset_type).present?
 
     is_set?(to_import(asset_type)[mig_id])
   end
