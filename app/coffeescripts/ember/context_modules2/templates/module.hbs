@@ -1,0 +1,60 @@
+<div {{bindAttr class=":module :item-group-condensed module.hidden:hidden:visible" data-module-id="module.id"}}>
+  <table class="table sortable-module-items" style="min-height: 30px;min-width: 900px;">
+    <thead>
+      <tr>
+        <th>
+          <h3>
+            {{#if editable}}
+              <img class="drag-handler" src="img/module-handler.png" style="height: 12px;padding-bottom: 4px;" />
+            {{/if}}
+            {{#if module.items.length}}
+              <a {{action 'toggleExpandCollapse'}}>
+                {{#if module.expanded}}
+                  <i class="icon-mini-arrow-down" style="font-size: 2em;"></i>
+                {{else}}
+                  <i class="icon-mini-arrow-right" style="font-size: 2em;"></i>
+                {{/if}}
+              </a>
+            {{/if}}
+            {{module.name}}
+          </h3>
+        </th>
+        <th style="width: 140px;"></th>
+        <th class="align-right" style="width: 240px;" colspan="2">
+          <ul class="pill">
+            <li><strong>Prereq:</strong> <span style="font-weight: normal;">Week 1 Module</span></li>
+          </ul>
+        </th>
+        <th class="no-wrap align-right" style="width: 140px;">
+          {{canvas-module-publish published=module.published}}
+        </th>
+        <th class="no-wrap no-right-padding" style="width: 100px;">
+          {{#linkTo 'module_items.add' module class="btn add-item-button"}}
+            <i class="icon-plus"></i>
+          {{/linkTo}}
+          <a href="#" class="btn module-settings-button">
+            <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
+          </a>
+        </th>
+      </tr>
+    </thead>
+    <tbody {{bindAttr class=":sortable empty"}}>
+      {{#each item in module.items}}
+        {{render "module_item" item}}
+      {{/each}}
+    <tbody>
+  </table>
+  {{#if module.items.links.next}}
+    {{#unless module.items.loading}}
+    <div style="margin: 4px;text-align: center;">
+      <a {{action 'loadNextPage'}} class="btn btn-mini next-module-item-page-button">
+        More
+        <i class="icon-mini-arrow-down"></i>
+      </a>
+    </div>
+    {{/unless}}
+  {{/if}}
+  {{#if module.items.loading}}
+    {{instructure-spinner}}
+  {{/if}}
+</div>
