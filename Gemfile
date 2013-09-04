@@ -94,7 +94,9 @@ gem 'will_paginate',  '2.3.15'
 gem 'xml-simple',     '1.0.12', :require => 'xmlsimple'
 gem 'foreigner',      '0.9.2'
 gem 'crocodoc-ruby',  '0.0.1', :require => 'crocodoc'
-gem 'regru-premailer', '1.7.7', :require => 'premailer'
+# needs https://github.com/regru/premailer/commit/8d3ae698eff135011b19e1587a68c399ec97b185
+# we can go back to the gem once 1.7.8 is released
+gem 'regru-premailer', :require => 'premailer', :git => "https://github.com/regru/premailer.git", :ref => "08a73c70701f5d81bc4a5cf6c959a45ad94db88e"
 
 group :assets do
   gem 'compass-rails', '1.0.3'
