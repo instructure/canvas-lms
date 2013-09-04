@@ -69,7 +69,8 @@
 #         "min_score": 10,
 #
 #         // whether the calling user has met this requirement
-#         // (Optional; present only if the caller is a student)
+#         // (Optional; present only if the caller is a student
+#         // or if the optional parameter 'student_id' is included)
 #         "completed": true
 #       },
 #
@@ -133,6 +134,7 @@
 #     }
 class ContextModuleItemsApiController < ApplicationController
   before_filter :require_context
+  before_filter :find_student, :only => [:index, :show]
   include Api::V1::ContextModule
 
   # @API List module items
@@ -147,6 +149,9 @@ class ContextModuleItemsApiController < ApplicationController
   # @argument search_term [Optional, String]
   #   The partial title of the items to match and return.
   #
+  # @argument student_id [Optional]
+  #   Returns module completion information for the student with this id.
+  #
   # @example_request
   #     curl -H 'Authorization: Bearer <token>' \
   #          https://<canvas>/api/v1/courses/222/modules/123/items
@@ -154,14 +159,14 @@ class ContextModuleItemsApiController < ApplicationController
   # @returns [ModuleItem]
   def index
     if authorized_action(@context, @current_user, :read)
-      mod = @context.modules_visible_to(@current_user).find(params[:module_id])
+      mod = @context.modules_visible_to(@student || @current_user).find(params[:module_id])
       ContextModule.send(:preload_associations, mod, {:content_tags => :content})
       route = polymorphic_url([:api_v1, @context, mod, :items])
-      scope = mod.content_tags_visible_to(@current_user)
+      scope = mod.content_tags_visible_to(@student || @current_user)
       scope = ContentTag.search_by_attribute(scope, :title, params[:search_term])
       items = Api.paginate(scope, self, route)
-      prog = @context.grants_right?(@current_user, session, :participate_as_student) ? mod.evaluate_for(@current_user) : nil
-      render :json => items.map { |item| module_item_json(item, @current_user, session, mod, prog, Array(params[:include])) }
+      prog = @student ? mod.evaluate_for(@student) : nil
+      render :json => items.map { |item| module_item_json(item, @student || @current_user, session, mod, prog, Array(params[:include])) }
     end
   end
 
@@ -174,6 +179,9 @@ class ContextModuleItemsApiController < ApplicationController
   #   associated with this item. Refer to the {api:Modules:Module%20Item Module
   #   Item specification} for more details.
   #
+  # @argument student_id [Optional]
+  #   Returns module completion information for the student with this id.
+  #
   # @example_request
   #     curl -H 'Authorization: Bearer <token>' \
   #          https://<canvas>/api/v1/courses/222/modules/123/items/768
@@ -181,10 +189,10 @@ class ContextModuleItemsApiController < ApplicationController
   # @returns ModuleItem
   def show
     if authorized_action(@context, @current_user, :read)
-      mod = @context.modules_visible_to(@current_user).find(params[:module_id])
-      item = mod.content_tags_visible_to(@current_user).find(params[:id])
-      prog = @context.grants_right?(@current_user, session, :participate_as_student) ? mod.evaluate_for(@current_user) : nil
-      render :json => module_item_json(item, @current_user, session, mod, prog, Array(params[:include]))
+      mod = @context.modules_visible_to(@student || @current_user).find(params[:module_id])
+      item = mod.content_tags_visible_to(@student || @current_user).find(params[:id])
+      prog = @student ? mod.evaluate_for(@student) : nil
+      render :json => module_item_json(item, @student || @current_user, session, mod, prog, Array(params[:include]))
     end
   end
 
@@ -537,4 +545,17 @@ class ContextModuleItemsApiController < ApplicationController
     @module.save
   end
   protected :set_completion_requirement
+
+  def find_student
+    if params[:student_id]
+      student_enrollments = @context.student_enrollments.for_user(params[:student_id])
+      return render_unauthorized_action unless student_enrollments.any?{|e| e.grants_right?(@current_user, session, :read)}
+      @student = student_enrollments.first.user
+    elsif @context.grants_right?(@current_user, session, :participate_as_student)
+      @student = @current_user
+    else
+      return true
+    end
+  end
+  protected :find_student
 end

@@ -42,6 +42,8 @@ stylesheets:
     - public/stylesheets/compiled/context_modules.css
   context_modules2: 
     - public/stylesheets/compiled/context_modules2.css
+  context_module_progressions:
+      - public/stylesheets/compiled/context_module_progressions.css
   dashboard:
     - public/stylesheets/compiled/dashboard_messages.css
     - public/stylesheets/compiled/dashboard_activity.css

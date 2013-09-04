@@ -355,17 +355,21 @@ class ContextModulesController < ApplicationController
   def progressions
     if authorized_action(@context, @current_user, :read)
       if @context.context_modules.new.grants_right?(@current_user, session, :update)
-        if params[:user_id] && @user = @context.students.find(params[:user_id])
-          @progressions = @context.context_modules.active.map{|m| m.evaluate_for(@user, true, true) }
-        else
-          if  @context.large_roster
-            @progressions = []
+        if request.format == :json
+          if params[:user_id] && @user = @context.students.find(params[:user_id])
+            @progressions = @context.context_modules.active.map{|m| m.evaluate_for(@user, true, true) }
           else
-            context_module_ids = @context.context_modules.active.pluck(:id)
-            @progressions = ContextModuleProgression.where(:context_module_id => context_module_ids)
+            if @context.large_roster
+              @progressions = []
+            else
+              context_module_ids = @context.context_modules.active.pluck(:id)
+              @progressions = ContextModuleProgression.where(:context_module_id => context_module_ids)
+            end
           end
+          render :json => @progressions.to_json
+        elsif !@context.draft_state_enabled?
+          redirect_to named_context_url(@context, :context_context_modules_url, :anchor => "student_progressions")
         end
-        render :json => @progressions.to_json
       else
         @progressions = @context.context_modules.active.map{|m| m.evaluate_for(@current_user, true) }
         render :json => @progressions.to_json
