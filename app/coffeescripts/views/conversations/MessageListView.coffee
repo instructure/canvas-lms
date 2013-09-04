@@ -6,8 +6,6 @@ define [
 
   class MessageListView extends PaginatedCollectionView
 
-    scrollContainer: '.message-list'
-
     tagName: 'div'
 
     itemView: MessageView
