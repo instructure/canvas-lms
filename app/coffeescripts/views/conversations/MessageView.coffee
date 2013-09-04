@@ -29,7 +29,7 @@ define [
       @model.on('change:selected', (m) => @$el.toggleClass('active', m.get('selected')))
 
     select: (e) ->
-      return if e.target.className.match(/star|read/)
+      return if e and e.target.className.match(/star|read/)
       @model.collection.each((m) -> m.set('selected', false))
       @model.set('selected', true)
       @model.set('workflow_state', 'read') if @model.unread()
