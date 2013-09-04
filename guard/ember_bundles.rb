@@ -24,6 +24,7 @@ module Guard
 
     def build_bundles(paths)
       paths.each do |path|
+        return if path.match(/main\.coffee$/)
         begin
           UI.info "Building ember bundle for: #{path}"
           EmberBundle::build_from_file(path)

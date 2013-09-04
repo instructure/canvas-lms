@@ -1,4 +1,4 @@
-define ['Ember', 'i18nObj'], (Ember, I18n) ->
+define ['ember', 'i18nObj'], (Ember, I18n) ->
   Ember.Handlebars.registerHelper 't', (translationKey, defaultValue, options) ->
       wrappers = {}
       options = options?.hash ? {}
