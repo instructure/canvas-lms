@@ -141,7 +141,7 @@ require [
   router.route 'topic', 'topic', ->
     $container.scrollTop $('#discussion_topic')
     setTimeout ->
-      $('#discussion_topic').focus()
+      $('#discussion_topic .author').focus()
       $container.one "scroll", -> router.navigate('')
     , 10
   router.route 'entry-:id', 'id', entriesView.goToEntry

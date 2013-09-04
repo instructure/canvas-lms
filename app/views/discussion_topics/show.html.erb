@@ -151,7 +151,7 @@
 </div>
 
 <div id="discussion_container">
-  <article id="discussion_topic" tabindex="-1" class="admin-link-hover-area topic discussion_entry <%= @topic.class.to_s.underscore %> <%= 'has_podcast' if @topic.podcast_enabled %> <%= 'has_unread_entries' if @topic.unread_count(@current_user) > 0 %> can_be_marked_as_read <%= @topic.read_state(@current_user) %>" data-mark-read-url="<%= context_url(@topic.context, :api_v1_context_discussion_topic_mark_read_url, @topic) %>">
+  <article id="discussion_topic" class="admin-link-hover-area topic discussion_entry <%= @topic.class.to_s.underscore %> <%= 'has_podcast' if @topic.podcast_enabled %> <%= 'has_unread_entries' if @topic.unread_count(@current_user) > 0 %> can_be_marked_as_read <%= @topic.read_state(@current_user) %>" data-mark-read-url="<%= context_url(@topic.context, :api_v1_context_discussion_topic_mark_read_url, @topic) %>">
     <div class="entry_content">
       <% if @topic.for_assignment? %>
         <%= render :partial => 'assignment_details' %>
@@ -159,22 +159,24 @@
       <header class="discussion-section clearfix">
         <%= avatar((@topic.user), @context.asset_string, 50, image_class: 'img-circle') %>
         <div class="discussion-header-content right-of-avatar">
+          <div class="pull-left">
+            <h1 class="discussion-title"><%= @topic.title %></h1>
+            <div class="discussion-subtitle">
+              <a class="author" href="<%= context_url(@topic.context, :context_user_url, @topic.user_id) %>" title="<%= t :authors_name, "Author's name" %>"><%= context_user_name(@topic.context, @topic.user) %></a>
+            </div>
+            <% if @topic.root_topic.try(:context) && @topic.root_topic.try(:context) != @context %>
+              <span class="discussion-subtitle">
+                <%= t(:from_context, "From *%{context_name}*", {
+                        :context_name => @topic.root_topic.context.short_name,
+                        :wrapper => "<a href='#{context_url(@topic.root_topic.context, :context_url)}'>\1</a>" }) %>
+              </span>
+            <% end %>
+          </div>
 
           <div class="discussion-header-right pull-right">
             <div class="discussion-pubdate"><%= friendly_datetime @topic.posted_at %></div>
             <%= render :partial => 'new_and_total_badge', :locals => { :unread_count => @topic.unread_count(@current_user), :reply_count => @topic.discussion_subentry_count } %>
           </div>
-          <h1 class="discussion-title"><%= @topic.title %></h1>
-          <div class="discussion-subtitle">
-            <a class="author" href="<%= context_url(@topic.context, :context_user_url, @topic.user_id) %>" title="<%= t :authors_name, "Author's name" %>"><%= context_user_name(@topic.context, @topic.user) %></a>
-          </div>
-          <% if @topic.root_topic.try(:context) && @topic.root_topic.try(:context) != @context %>
-            <span class="discussion-subtitle">
-              <%= t(:from_context, "From *%{context_name}*", {
-                      :context_name => @topic.root_topic.context.short_name,
-                      :wrapper => "<a href='#{context_url(@topic.root_topic.context, :context_url)}'>\1</a>" }) %>
-            </span>
-          <% end %>
         </div>
       </header>
 
