@@ -166,6 +166,8 @@ require [
       @list = new MessageListView
         collection: new MessageCollection
         el: $('.message-list')
+        scrollContainer: $('.message-list-scroller')
+        buffer: 50
       @list.render()
 
     _initDetailView: ->

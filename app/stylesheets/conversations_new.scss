@@ -126,10 +126,13 @@
   bottom: 0;
 }
 
-.message-list {
+.message-list-scroller {
   border-right: 1px solid #bfbfbf;
   height: 100%;
   overflow: auto;
+}
+
+.message-list {
 
   .list-header {
     background: #f3f3f3;
