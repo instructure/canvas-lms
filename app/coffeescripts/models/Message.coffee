@@ -48,5 +48,10 @@ define [
       setStarred ?= !@starred()
       @set('starred', setStarred)
 
+    timestamp: ->
+      lastMessage  = new Date(@get('last_message_at')).getTime()
+      lastAuthored = new Date(@get('last_authored_message_at')).getTime()
+      new Date(_.max([lastMessage, lastAuthored]))
+
     toJSON: ->
-      { conversation: _.extend(super, unread: @unread()) }
+      { conversation: _.extend(super, unread: @unread(), timestamp: @timestamp()) }

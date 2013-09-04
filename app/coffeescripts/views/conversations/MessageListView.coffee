@@ -26,9 +26,13 @@ define [
 
     updateMessage: (message, thread) =>
       currentThread = @collection.get(thread.id)
-      currentThread.set('last_message', thread.last_message)
-      currentThread.set('message_count', currentThread.get('messages').length)
-      currentThread.view.render()
+      currentThread.set
+        last_message:  thread.last_message
+        last_authored_message_at: new Date().toString()
+        message_count: currentThread.get('messages').length
+      @collection.sort()
+      @render()
+      currentThread.view.select()
 
     afterRender: ->
       super
