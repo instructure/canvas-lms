@@ -19,6 +19,23 @@ $item-hover-background: #eef7ff
 $shadow: 0 1px 0 rgba(0,0,0,0.15)
 
 .pages
+  .sticky
+    position: fixed
+    z-index: 1000
+    top: 0px
+    left: 0px
+    margin-left: $left_side_width + 1px
+    background: white
+    height: 33px
+    max-width: $max_main_width
+    border-color: $menu-border-color
+
+    &.sticky-toolbar
+      right: 0px
+
+    &.sticky-toolbar-with-right-side
+      right: $right_side_width + 1px
+      min-width: $min_main_width - 2px
 
   #breadcrumbs
     :border-bottom 1px solid $border-color
@@ -28,16 +45,6 @@ $shadow: 0 1px 0 rgba(0,0,0,0.15)
     .header-bar-container
       :box-shadow $shadow
       :height 64px
-      &.sticky
-        :position fixed
-        :z-index 1000
-        :top 0
-        :right 0
-        :left 0
-        :margin-left $left_side_width + 1px
-        :max-width $max_main_width
-        :border-color $menu-border-color
-
       .page-changed-alert
         :overflow hidden
         :height 0
