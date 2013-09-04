@@ -251,6 +251,11 @@ $subtleBorderColor: #e5e5e5;
         height: auto;
       }
     }
+
+    .message_course abbr {
+      cursor: pointer;
+    }
+
   }
 
   .context_messages .collectionViewItems {
