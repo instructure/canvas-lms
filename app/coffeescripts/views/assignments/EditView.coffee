@@ -273,6 +273,7 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly) ->
       errors = @assignmentGroupSelector.validateBeforeSave(data, errors)
       unless ENV?.IS_LARGE_ROSTER
         errors = @groupCategorySelector.validateBeforeSave(data, errors)
+      errors = @_validatePercentagePoints(data, errors)
       errors = @_validateAdvancedOptions(data, errors)
       data2 =
         assignment_overrides: @dueDateOverrideView.getAllDates(data)
@@ -295,9 +296,18 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly) ->
       errors
 
     _validateAllowedExtensions: (data, errors) =>
-      if data.allowed_extensions && data.allowed_extensions.length == 0
+      if data.allowed_extensions and data.allowed_extensions.length == 0
         errors["allowed_extensions"] = [
           message: I18n.t 'at_least_one_file_type', 'Please specify at least one allowed file type'
+        ]
+      errors
+
+    # Require points possible > 0
+    # if grading type === percent
+    _validatePercentagePoints: (data, errors) =>
+      if data.grading_type == 'percent' and (data.points_possible == "0" or isNaN(parseFloat(data.points_possible)))
+        errors["points_possible"] = [
+          message: I18n.t 'points_possible', 'Points possible must be more than 0 for percentage grading'
         ]
       errors
 

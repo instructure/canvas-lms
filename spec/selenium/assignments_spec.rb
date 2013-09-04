@@ -142,6 +142,9 @@ describe "assignments" do
         f('#assignment_toggle_advanced_options').click
         wait_for_ajaximations
         click_option('#assignment_grading_type', grading_option, :value)
+        if grading_option == "percent"
+          replace_content f('#assignment_points_possible'), ('1')
+        end
         submit_assignment_form
         f('.title').should include_text(assignment_title)
         Assignment.find_by_title(assignment_title).grading_type.should == grading_option
@@ -405,6 +408,54 @@ describe "assignments" do
         group.updated_at.to_i.should_not == first_stamp
       end
     end
+
+    it "should validate points for percentage grading (> 0)" do
+      assignment_name = 'first test assignment'
+      @assignment = @course.assignments.create({
+        :name => assignment_name,
+        :assignment_group => @course.assignment_groups.create!(:name => "default")
+      })
+
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
+      f('#assignment_toggle_advanced_options').click
+      click_option('#assignment_grading_type', 'Percentage')
+      f('.btn-primary[type=submit]').click
+      wait_for_ajaximations
+      fj('.error_text div').text.should == "Points possible must be more than 0 for percentage grading"
+    end
+
+    it "should validate points for percentage grading (!= '')" do
+      assignment_name = 'first test assignment'
+      @assignment = @course.assignments.create({
+        :name => assignment_name,
+        :assignment_group => @course.assignment_groups.create!(:name => "default")
+      })
+
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
+      f('#assignment_toggle_advanced_options').click
+      click_option('#assignment_grading_type', 'Percentage')
+      replace_content f('#assignment_points_possible'), ('')
+      f('.btn-primary[type=submit]').click
+      wait_for_ajaximations
+      fj('.error_text div').text.should == "Points possible must be more than 0 for percentage grading"
+    end
+
+    it "should validate points for percentage grading (digits only)" do
+      assignment_name = 'first test assignment'
+      @assignment = @course.assignments.create({
+        :name => assignment_name,
+        :assignment_group => @course.assignment_groups.create!(:name => "default")
+      })
+
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
+      f('#assignment_toggle_advanced_options').click
+      click_option('#assignment_grading_type', 'Percentage')
+      replace_content f('#assignment_points_possible'), ('taco')
+      f('.btn-primary[type=submit]').click
+      wait_for_ajaximations
+      fj('.error_text div').text.should == "Points possible must be more than 0 for percentage grading"
+    end
+
 
     context "frozen assignments" do
 
