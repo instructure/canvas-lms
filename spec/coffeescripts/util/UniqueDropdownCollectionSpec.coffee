@@ -54,3 +54,30 @@ define [
     ok @coll.takenValues.get('4') instanceof Backbone.Model
     equal @coll.at(@coll.length - 1).get('state'), 4
 
+  test "add should take the value from the front of the available values collection", ->
+
+    #remove one so there's only two taken
+    @coll.remove(@coll.at(0))
+
+    first_avail = @coll.availableValues.at(0).get('state')
+    @coll.availableValues.on 'remove', (model) ->
+      strictEqual model.get('state'), first_avail
+
+    @coll.model = Backbone.Model
+
+    @coll.add {}
+
+
+  module "UniqueDropdownCollection, lazy setup",
+    setup: ->
+      @records = (new Backbone.Model(id: i, state: i.toString()) for i in [1..3])
+      @coll = new UniqueDropdownCollection [],
+        propertyName: 'state'
+        possibleValues: _.map [1..4], (i) -> i.toString()
+
+  test "reset of collection recalculates availableValues", ->
+    equal @coll.availableValues.length, 4, 'has the 4 default items on init'
+    @coll.reset @records
+    equal @coll.availableValues.length, 1, '`availableValues` is recalculated on reset'
+
+

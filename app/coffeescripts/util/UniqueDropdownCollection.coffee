@@ -1,5 +1,5 @@
 define [
-  'backbone'
+  'Backbone'
   'underscore'
 ], (Backbone, _) ->
 
@@ -82,14 +82,23 @@ define [
       @takenValues ||= new Backbone.Collection []
       @availableValues ||= new Backbone.Collection []
       {@possibleValues, @propertyName} = options
+      @availableValues.comparator = 'value'
       @calculateTakenValues(records)
 
+      @on "reset", @calculateTakenValues
       @on "change:#{@propertyName}", @updateAvailableValues
       @on "remove", @removeModel
 
     calculateTakenValues: (records) =>
-      takenValues = (model.get(@propertyName) for model in records)
+      if records instanceof Backbone.Collection
+        takenValues = records.map (m) => m.get(@propertyName)
+      else
+        takenValues = (model.get(@propertyName) for model in records)
 
+      # we need to reset the collections so that
+      # we can calculate the fresh taken and available values
+      @takenValues.reset null, silent: true
+      @availableValues.reset null, silent: true
       # Create Backbone Models with IDs so we can remove and add them
       # quickly (rather than filtering and removing from an index every time)
       # in @takenValues and @availableValues
@@ -98,6 +107,7 @@ define [
 
       for value in _.difference @possibleValues, takenValues
         @availableValues.add new Backbone.Model id: value, value: value
+
 
     updateAvailableValues: (model) =>
       previousValue = model.previousAttributes()[@propertyName]
@@ -112,6 +122,7 @@ define [
       @takenValues.add previouslyAvailableValue
       @availableValues.add previouslyTakenValue
 
+
     removeModel: (model) =>
       value = model.get @propertyName
       previouslyTakenValue = @takenValues.get value
@@ -119,12 +130,23 @@ define [
       @takenValues.remove previouslyTakenValue
       @availableValues.add previouslyTakenValue
 
+    # method for how to find the next model to add.
+    # defaults to the first item 
+    # in @availableValues
+    #
+    # override if you need more complex logic
+    #
+    # Returns a model from @availableValues
+    findNextAvailable: ->
+      @availableValues.at(0)
+
     # overrides Backbone.Collection.add
     add: (models, options) ->
       # if we pass a plan object, modify it with an available value before
       # passing it to the "model" constructor.
       if !_.isArray(models) && (typeof models is 'object') && !(models instanceof Backbone.Model)
-        previouslyAvailableValue = @availableValues.pop()
+        previouslyAvailableValue = @findNextAvailable()
+        @availableValues.remove previouslyAvailableValue
         @takenValues.add previouslyAvailableValue
         models[@propertyName] = previouslyAvailableValue.get 'value'
 

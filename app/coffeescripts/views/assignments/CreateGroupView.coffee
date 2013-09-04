@@ -1,12 +1,12 @@
 define [
-  'i18n!assignments'
   'underscore'
   'compiled/models/AssignmentGroup'
-  'compiled/views/assignments/NeverDropView'
+  'compiled/collections/NeverDropCollection'
+  'compiled/views/assignments/NeverDropCollectionView'
   'compiled/views/DialogFormView'
   'jst/assignments/CreateGroup'
   'jst/EmptyDialogFormWrapper'
-], (I18n, _, AssignmentGroup, NeverDropView, DialogFormView, template, wrapper) ->
+], ( _, AssignmentGroup, NeverDropCollection, NeverDropCollectionView, DialogFormView, template, wrapper) ->
 
   class CreateGroupView extends DialogFormView
 
@@ -16,13 +16,10 @@ define [
 
     events: _.extend({}, @::events,
       'click .dialog_closer': 'close'
-      'click .add_never_drop': 'addNeverDrop'
-      'click .remove_never_drop': 'removeNeverDrop'
     )
 
     els:
-      '.add_never_drop': '$addNeverDropLink'
-      '.never_drop': '$neverDropContainer'
+      '.never_drop_rules_group': '$neverDropContainer'
 
     template: template
     wrapperTemplate: wrapper
@@ -32,9 +29,10 @@ define [
     @optionProperty 'course'
 
     initialize: ->
-      @never_drops = []
       super
+      #@assignmentGroup will be defined when editing
       @model = @assignmentGroup or new AssignmentGroup(assignments: [])
+
 
     onSaveSuccess: ->
       super
@@ -66,54 +64,18 @@ define [
     getNeverDrops: ->
       @$neverDropContainer.empty()
       rules = @model.rules()
+      @never_drops = new NeverDropCollection [],
+        assignments: @model.get('assignments')
+        ag_id: @model.get('id') or 'new'
+
+      @ndCollectionView = new NeverDropCollectionView
+        collection: @never_drops
+
+      @$neverDropContainer.append @ndCollectionView.render().el
       if rules && rules.never_drop
-        for drop in rules.never_drop
-          assignment = @findAssignment(drop)
-          model = new Backbone.Model
-            id: @never_drops.length
-            chosen: assignment.name()
-            chosen_id: assignment.get('id')
-            label_id: @model.get('id') or 'new'
+        @never_drops.reset rules.never_drop,
+          parse: true
 
-          @createNeverDrop model
-
-    findAssignment: (id) ->
-      @model.get('assignments').find (a) ->
-        a.id == id
-
-    toggleAddNeverDropLinkText: ->
-      if @$neverDropContainer.find('.never_drop_rule').length == 0
-        text = I18n.t('add_first_never_drop_rule', 'Add an assignment')
-      else
-        text = I18n.t('add_another_never_drop_rule', 'Add another assignment')
-      @$addNeverDropLink.text(text)
-
-    addNeverDrop: (ev) ->
-      ev.preventDefault()
-      model = new Backbone.Model
-        id: @never_drops.length
-        assignments: @model.get('assignments').map (a) -> a.toView()
-        label_id: @model.get('id') or 'new'
-
-      @createNeverDrop model
-      @toggleAddNeverDropLinkText()
-
-    createNeverDrop: (model) ->
-      view = new NeverDropView {model: model}
-      view.render()
-      @insertNeverDrop view
-
-    insertNeverDrop: (view) ->
-      @never_drops.push view
-      @$neverDropContainer.append view.el
-      $(view.el).find('select').focus()
-
-    removeNeverDrop: (event) ->
-      event.preventDefault()
-      index = parseInt $(event.currentTarget).data('ruleId')
-      @never_drops[index].remove()
-      delete @never_drops[index]
-      @toggleAddNeverDropLinkText()
 
     toJSON: ->
       data = @model.toJSON()
@@ -130,4 +92,3 @@ define [
       super
       @checkGroupWeight()
       @getNeverDrops()
-      @toggleAddNeverDropLinkText()
