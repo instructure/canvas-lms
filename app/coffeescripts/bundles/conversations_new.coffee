@@ -175,6 +175,13 @@ require [
       @detail.on('reply',       @onReply)
       @detail.on('reply-all',   @onReplyAll)
       @detail.on('forward',     @onForward)
+      $(document).ready(@onPageLoad)
+
+    onPageLoad: (e) ->
+      # we add the top style here instead of in the css because
+      # we want to accomodate custom css that changes the height
+      # of the header.
+      $('#main').css(display: 'block', top: $('#header').height())
 
     onSubmit: (dfd) =>
       @_incrementSending(1)
