@@ -368,9 +368,25 @@ class Quiz < ActiveRecord::Base
   end
 
   def root_entries_max_position
-    question_max = self.quiz_questions.maximum(:position, :conditions => 'quiz_group_id is null')
+    question_max = self.active_quiz_questions.maximum(:position, :conditions => 'quiz_group_id is null')
     group_max = self.quiz_groups.maximum(:position)
     [question_max, group_max, 0].compact.max
+  end
+
+  def active_quiz_questions_without_group
+    if self.quiz_questions.loaded?
+      active_quiz_questions.select { |q| !q.quiz_group_id }
+    else
+      active_quiz_questions.where(quiz_group_id: nil).all
+    end
+  end
+
+  def active_quiz_questions
+    if self.quiz_questions.loaded?
+      quiz_questions.select(&:active?)
+    else
+      quiz_questions.active
+    end
   end
 
   # Returns the list of all "root" entries, either questions or question
@@ -379,8 +395,7 @@ class Quiz < ActiveRecord::Base
   def root_entries(force_check=false)
     return @root_entries if @root_entries && !force_check
     result = []
-    all_questions = self.quiz_questions
-    result.concat all_questions.select{|q| !q.quiz_group_id }
+    result.concat self.active_quiz_questions_without_group
     result.concat self.quiz_groups
     result = result.sort_by{|e| e.position || 99999}.map do |e|
       res = nil
@@ -393,7 +408,7 @@ class Quiz < ActiveRecord::Base
           data[:assessment_question_bank_id] = e.assessment_question_bank_id
           data[:questions] = []
         else
-          data[:questions] = e.quiz_questions.sort_by{|q| q.position || 99999}.map(&:data)
+          data[:questions] = e.quiz_questions.active.sort_by{|q| q.position || 99999}.map(&:data)
         end
         data[:actual_pick_count] = e.actual_pick_count
         res = data
@@ -756,7 +771,7 @@ class Quiz < ActiveRecord::Base
   end
   
   def migrate_content_links_by_hand(user)
-    self.quiz_questions.each do |question|
+    self.quiz_questions.active.each do |question|
       data = QuizQuestion.migrate_question_hash(question.question_data, :context => self.context, :user => user)
       question.write_attribute(:question_data, data)
       question.save
@@ -866,7 +881,7 @@ class Quiz < ActiveRecord::Base
       raise e if retrying
       return self.clone_for(context, original_dup, options, true)
     end
-    entities = self.quiz_groups + self.quiz_questions
+    entities = self.quiz_groups + self.active_quiz_questions
     entities.each do |entity|
       entity_dup = entity.clone_for(dup, nil, :old_context => self.context, :new_context => context)
       entity_dup.quiz_id = dup.id
@@ -951,7 +966,7 @@ class Quiz < ActiveRecord::Base
     return false if has_student_submissions?
 
     self.question_count = 0
-    self.quiz_questions.destroy_all
+    self.quiz_questions.active.map(&:destroy)
     self.quiz_groups.destroy_all
     self.quiz_data = nil
     true
@@ -1031,7 +1046,7 @@ class Quiz < ActiveRecord::Base
       hash[:questions] ||= []
 
       if question_data[:qq_data] || question_data[:aq_data]
-        existing_questions = item.quiz_questions.where("migration_id IS NOT NULL").select([:id, :migration_id]).index_by(&:migration_id)
+        existing_questions = item.quiz_questions.active.where("migration_id IS NOT NULL").select([:id, :migration_id]).index_by(&:migration_id)
       end
 
       if question_data[:qq_data]

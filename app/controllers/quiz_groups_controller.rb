@@ -62,8 +62,8 @@ class QuizGroupsController < ApplicationController
     if authorized_action(@quiz, @current_user, :update)
       @group = @quiz.quiz_groups.find(params[:quiz_group_id])
       items = []
-      group_questions = @group.quiz_questions
-      questions = @quiz.quiz_questions
+      group_questions = @group.quiz_questions.active
+      questions = @quiz.quiz_questions.active
       order = params[:order].split(",")
       order.each do |name|
         id = name.gsub(/\Aquestion_/, "").to_i

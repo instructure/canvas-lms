@@ -1625,7 +1625,7 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
       att4_2 = @copy_to.attachments.find_by_migration_id(mig_id(att4))
 
       q_to = @copy_to.quizzes.first
-      qq_to = q_to.quiz_questions.first
+      qq_to = q_to.active_quiz_questions.first
       qq_to.question_data[:question_text].should match_ignoring_whitespace(qtext % [@copy_to.id, att_2.id, @copy_to.id, "files/#{att2_2.id}/preview", @copy_to.id, "files/#{att4_2.id}/preview"])
       qq_to.question_data[:answers][0][:html].should match_ignoring_whitespace(%{File ref:<img src="/courses/#{@copy_to.id}/files/#{att3_2.id}/download">})
     end
@@ -1705,9 +1705,9 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
 
       @copy_to.quizzes.count.should == 1
       quiz = @copy_to.quizzes.first
-      quiz.quiz_questions.count.should == 1
+      quiz.active_quiz_questions.size.should == 1
 
-      qq = quiz.quiz_questions.first
+      qq = quiz.active_quiz_questions.first
       qq.question_data['question_type'].should == data[:question_type]
       qq.question_data['question_text'].should == data[:question_text]
     end

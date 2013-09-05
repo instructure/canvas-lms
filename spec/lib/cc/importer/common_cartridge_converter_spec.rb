@@ -152,13 +152,13 @@ describe "Standard Common Cartridge importing" do
   it "should import assessment data" do
     if Qti.qti_enabled?
       quiz = @course.quizzes.find_by_migration_id("I_00003_R")
-      quiz.quiz_questions.count.should == 11
+      quiz.active_quiz_questions.size.should == 11
       quiz.title.should == "Pretest"
       quiz.quiz_type.should == 'assignment'
       quiz.allowed_attempts.should == 2
       quiz.time_limit.should == 120
 
-      question = quiz.quiz_questions.first
+      question = quiz.active_quiz_questions.first
       question.question_data[:points_possible].should == 2
 
       bank = @course.assessment_question_banks.find_by_migration_id("I_00004_R_QDB_1")

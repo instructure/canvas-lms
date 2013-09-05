@@ -376,7 +376,7 @@ class QuizzesController < ApplicationController
     if authorized_action(@quiz, @current_user, :update)
       items = []
       groups = @quiz.quiz_groups
-      questions = @quiz.quiz_questions
+      questions = @quiz.quiz_questions.active
       order = params[:order].split(",")
       order.each_index do |idx|
         name = order[idx]
@@ -387,7 +387,7 @@ class QuizzesController < ApplicationController
         obj = groups.detect{|g| g.id == id.to_i} if id != 0 && name.match(/\Agroup/)
         items << obj if obj
       end
-      root_questions = @quiz.quiz_questions.where("quiz_group_id IS NULL").all
+      root_questions = @quiz.quiz_questions.active.where("quiz_group_id IS NULL").all
       items += root_questions
       items.uniq!
       question_updates = []

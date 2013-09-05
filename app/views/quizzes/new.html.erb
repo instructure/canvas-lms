@@ -325,11 +325,11 @@
     <div id="questions_tab">
       <div id="show_question_details_wrap">
         <input type="checkbox" id="show_question_details"
-               <%= "disabled='disabled'" if @quiz.quiz_questions.count > QuizzesController::QUIZ_QUESTIONS_DETAIL_LIMIT %>
+               <%= "disabled='disabled'" if @quiz.active_quiz_questions.size> QuizzesController::QUIZ_QUESTIONS_DETAIL_LIMIT %>
         />
         <label for="show_question_details"> <%= t('labels.show_question_details', "Show Question Details") %></label>
         <br/>
-        <% if @quiz.quiz_questions.count > QuizzesController::QUIZ_QUESTIONS_DETAIL_LIMIT %>
+        <% if @quiz.quiz_questions.active.size > QuizzesController::QUIZ_QUESTIONS_DETAIL_LIMIT %>
         <span id='question-detail-disabled' class='hint'>
           <%= t('hints.question_detail_disabled', 'NOTE: Question details not available when more than %{question_count}.',
                 :question_count => QuizzesController::QUIZ_QUESTIONS_DETAIL_LIMIT) %>
@@ -341,7 +341,7 @@
           <% if question[:entry_type] == "quiz_group" %>
             <%= render :partial => "quizzes/question_group", :object => question %>
           <% else %>
-            <%= render :partial => (@quiz.quiz_questions.count > QuizzesController::QUIZ_QUESTIONS_DETAIL_LIMIT ? "quizzes/question_teaser" : "quizzes/display_question"), :object => question, :locals => {:editing => true, :asset_string => "quiz_question_#{question['id']}"} %>
+            <%= render :partial => (@quiz.quiz_questions.active.size > QuizzesController::QUIZ_QUESTIONS_DETAIL_LIMIT ? "quizzes/question_teaser" : "quizzes/display_question"), :object => question, :locals => {:editing => true, :asset_string => "quiz_question_#{question['id']}"} %>
           <% end %>
         <% end %>
       </div>
