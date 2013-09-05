@@ -62,6 +62,8 @@ define [
       back: I18n.t('back', 'Back')
       everyone: (context) ->
         I18n.t('all_in_context', 'All in %{context}', context: context)
+      private:
+        I18n.t('cannot_add_to_private', 'You cannot add participants to a private conversation.')
 
     # Internal: Map of key names to codes.
     keys:
@@ -100,10 +102,11 @@ define [
     # Public: Create and configure a new instance.
     #
     # Returns an AutocompleteView instance.
-    initialize: ->
+    initialize: () ->
       super
       @render() # to initialize els
       @$span = @_initializeWidthSpan()
+      setTimeout((=> @_disable() if @options.disabled), 0)
       @_fetchResults = _.debounce(@__fetchResults, 250)
       @resultCollection = new PaginatedCollection([], model: ConversationSearchResult)
       @resultView = new PaginatedCollectionView
@@ -139,6 +142,17 @@ define [
       @$resultWrapper.toggle(isVisible)
       @$input.attr('aria-expanded', isVisible)
       @$resultList.empty() if !isVisible
+
+    # Internal: Disable the autocomplete input.
+    #
+    # Returns nothing.
+    _disable: ->
+      @$input.prop('disabled', true)
+      @$searchBtn.prop('disabled', true)
+      @$inputBox.addClass('disabled')
+      @$inputBox.attr('title', @messages.private)
+      @$inputBox.attr('data-tooltip', '{"position":"bottom"}')
+      @disabled = true
 
     # Internal: Empty the current and parent contexts.
     #
@@ -435,7 +449,7 @@ define [
       e.preventDefault()
       @_removeToken(@tokens[0], false) while @tokens.length
       @$clearBtn.hide()
-      @$input.prop('disabled', false).focus()
+      @$input.prop('disabled', false).focus() unless @disabled
       # fire a single token change event
       @trigger('enabled')
       @trigger('changeToken', @tokenParams())
@@ -464,6 +478,7 @@ define [
     #
     # Returns nothing.
     _addToken: (model) =>
+      return if @disabled
       model.name = @_formatTokenName(model)
       @tokens.push(model.id)
       @$tokenList.append(tokenTemplate(model))
@@ -496,6 +511,7 @@ define [
     #
     # Returns nothing.
     _removeToken: (id, silent = false) ->
+      return if @disabled
       @$tokenList.find("input[value=#{id}]").parent().remove()
       @tokens.splice(_.indexOf(id), 1)
       @$clearBtn.hide() unless @tokens.length
@@ -524,7 +540,7 @@ define [
       @hasExternalContext = !!context
       @tokens             = []
       @$tokenList.find('li.ac-token').remove()
-      if disable and !_.include(ENV.current_user_roles, 'admin')
+      if disable and !_.include(ENV.current_user_roles, 'admin') and !@disabled
         @$input.prop('disabled', !@currentContext)
         @$searchBtn.prop('disabled', !@currentContext)
         @$inputBox.toggleClass('disabled', !@currentContext)

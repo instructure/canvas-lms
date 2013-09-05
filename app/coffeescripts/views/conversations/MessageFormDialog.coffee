@@ -143,9 +143,6 @@ define [
           false
       $textArea.elastic()
 
-    initializeTokenInputs: ($scope) ->
-      @recipientView = new AutocompleteView(el: @$recipients).render()
-
     onCourse: (course) =>
       @recipientView.setContext(course, true)
       @$contextCode.val(if course?.id then course.id else '')
@@ -156,7 +153,10 @@ define [
 
     initializeForm: ->
       @prepareTextarea(@$el)
-      @initializeTokenInputs(@$el)
+      @recipientView = new AutocompleteView(
+        el: @$recipients
+        disabled: @model?.get('private')
+      ).render()
 
       @$messageCourse.prop('disabled', !!@model)
       @courseView = new CourseSelectionView(
