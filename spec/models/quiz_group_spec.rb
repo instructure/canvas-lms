@@ -23,12 +23,13 @@ describe QuizGroup do
   it "should generate valid data" do
     course
     quiz = @course.quizzes.create!(:title => "some quiz")
-    g = QuizGroup.create(:name => "question group", :pick_count => 2, :question_points => 5.0)
+    g = quiz.quiz_groups.create(:name => "question group", :pick_count => 2, :question_points => 5.0)
     g.quiz_questions << quiz.quiz_questions.create!(:question_data => {'name' => 'test question', 'answers' => [{'id' => 1}, {'id' => 2}]})
     g.quiz_questions << quiz.quiz_questions.create!(:question_data => {'name' => 'test question 2', 'answers' => [{'id' => 3}, {'id' => 4}]})
     g.name.should eql("question group")
     g.pick_count.should eql(2)
     g.question_points.should eql(5.0)
+    g.save!
     
     data = g.data
     data[:name].should eql("question group")
@@ -36,6 +37,7 @@ describe QuizGroup do
     data[:question_points].should eql(5.0)
     data[:questions].should_not be_empty
     data[:questions].length.should eql(2)
+    data[:questions].sort_by! { |q| q[:id] }
     data[:questions][0][:name].should eql("test question")
     data[:questions][1][:name].should eql("test question 2")
   end
@@ -46,7 +48,7 @@ describe QuizGroup do
     group = quiz.quiz_groups.create!(:name => "question group", :pick_count => 3, :question_points => 5.0)
     group.quiz_questions.create!(:quiz=>quiz, :question_data => {'name' => 'test question', 'answers' => [{'id' => 1}, {'id' => 2}]})
     group.quiz_questions.create!(:quiz=>quiz, :question_data => {'name' => 'test question 2', 'answers' => [{'id' => 3}, {'id' => 4}]})
-    group.quiz_questions.count.should == 2
+    group.quiz_questions.active.size.should == 2
     
     group.pick_count.should == 3
     group.actual_pick_count.should == 2

@@ -354,9 +354,9 @@ describe Quiz do
     q.quiz_questions.create!(:question_data => { :name => "test 3" })
     q.quiz_questions.create!(:question_data => { :name => "test 4" })
     q.save
-    q.quiz_questions.length.should eql(4)
+    q.active_quiz_questions.size.should eql(4)
     q.quiz_groups.length.should eql(1)
-    g.quiz_questions(true).length.should eql(2)
+    g.quiz_questions(true).active.size.should eql(2)
 
     entries = q.root_entries(true)
     entries.length.should eql(3)
@@ -617,9 +617,12 @@ describe Quiz do
       new_q.context.should_not eql(q.context)
       new_q.title.should eql(q.title)
       new_q.quiz_groups.length.should eql(q.quiz_groups.length)
-      new_q.quiz_questions.length.should eql(q.quiz_questions.length)
-      new_q.quiz_questions.first.question_data[:id].should be_nil
-      new_q.quiz_questions.first.data[:id].should == new_q.quiz_questions.first.id
+
+      new_q_questions = new_q.active_quiz_questions
+
+      new_q_questions.size.should eql(q.quiz_questions.active.length)
+      new_q_questions.first.question_data[:id].should be_nil
+      new_q_questions.first.data[:id].should == new_q.quiz_questions.active.first.id
     end
 
     it "should set the related assignment's group correctly" do
@@ -647,7 +650,7 @@ describe Quiz do
       q.save
       course
       new_q = q.clone_for(@course)
-      new_q.quiz_questions.first.question_data[:question_text].should match /\/courses\/#{@course.id}\/quizzes\/#{new_q.id}\/edit/
+      new_q.active_quiz_questions.first.question_data[:question_text].should match /\/courses\/#{@course.id}\/quizzes\/#{new_q.id}\/edit/
     end
 
     it "should only create one associated assignment for a graded quiz" do
