@@ -244,7 +244,7 @@
   <%= image_tag "ajax-loader.gif", :class => "preview_loading_image" %>
   <% @contexts.each do |context| %>
     <% root_url = context_url(context, :context_url) rescue '' %>
-    <a href="<%= root_url %>/files" class="<%= context.asset_string %>_attachments_url">&nbsp;</a>
+    <a href="<%= root_url %>/files.json" class="<%= context.asset_string %>_attachments_url">&nbsp;</a>
     <a href="<%= root_url %>/folders" class="<%= context.asset_string %>_folders_url">&nbsp;</a>
     <a href="<%= root_url %>/files/reorder" class="<%= context.asset_string %>_reorder_attachments_url">&nbsp;</a>
     <a href="<%= root_url %>/groups" class="<%= context.asset_string %>_groups_url">&nbsp;</a>

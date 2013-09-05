@@ -20,5 +20,10 @@ TEXT
         <%= f.text_field :secret_key %>
       </td>
     </tr>
+    <tr>
+      <td colspan="2">
+        <%= f.check_box :enable_html5_viewer %> <%= f.label :enable_html5_viewer, :en => "Enable HTML5 Document Viewer" %>
+      </td>
+    </tr>
   </table>
 <% end %>

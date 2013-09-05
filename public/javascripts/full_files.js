@@ -1892,8 +1892,7 @@ define([
         $form.find("form")
              .attr('action', $("#file_context_links ." + 
                                 itemData.context_string + 
-                                "_attachments_url").attr('href') + 
-                                ".text");
+                                "_attachments_url").attr('href'));
         $form.mouseover();
         $form.find(":text:first")
              .focus()
