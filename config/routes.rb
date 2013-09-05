@@ -1007,6 +1007,8 @@ FakeRails3Routes.draw do
       get 'users/self/activity_stream', :action => :activity_stream, :path_name => 'user_activity_stream'
       get 'users/activity_stream', :action => :activity_stream # deprecated
       get 'users/self/activity_stream/summary', :action => :activity_stream_summary, :path_name => 'user_activity_stream_summary'
+      delete 'users/self/activity_stream/:id', action: 'ignore_stream_item'
+      delete 'users/self/activity_stream', action: 'ignore_all_stream_items'
 
       put "users/:user_id/followers/self", :action => :follow
       delete "users/:user_id/followers/self", :action => :unfollow

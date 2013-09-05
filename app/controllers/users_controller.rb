@@ -652,6 +652,18 @@ class UsersController < ApplicationController
     render :json => { :ignored => true }
   end
 
+  # @API Hide a stream item
+  # Hide the given stream item.
+  #
+  # @example_request
+  #    curl https://<canvas>/api/v1/users/self/activity_stream/<stream_item_id> \
+  #       -X DELETE \
+  #       -H 'Authorization: Bearer <token>'
+  #
+  # @example_response
+  #     {
+  #       "hidden": true
+  #     }
   def ignore_stream_item
     @current_user.shard.activate do # can't just pass in the user's shard to relative_id_for, since local ids will be incorrectly scoped to the current shard, not the user's
       if item = @current_user.stream_item_instances.where(stream_item_id: Shard.relative_id_for(params[:id])).first
@@ -659,6 +671,27 @@ class UsersController < ApplicationController
       end
     end
     render :json => { :hidden => true }
+  end
+
+  # @API Hide all stream items
+  # Hide all stream items for the user
+  #
+  # @example_request
+  #    curl https://<canvas>/api/v1/users/self/activity_stream \
+  #       -X DELETE \
+  #       -H 'Authorization: Bearer <token>'
+  #
+  # @example_response
+  #     {
+  #       "hidden": true
+  #     }
+  def ignore_all_stream_items
+    @current_user.shard.activate do # can't just pass in the user's shard to relative_id_for, since local ids will be incorrectly scoped to the current shard, not the user's
+      @current_user.stream_item_instances.where(:hidden => false).each do |item|
+        item.update_attribute(:hidden, true) # observer handles cache invalidation
+      end
+    end
+    render :json => { :hidden => true }.to_json
   end
 
   # @API Upload a file
