@@ -34,7 +34,9 @@ module SIS
       end
       User.update_account_associations(importer.users_to_add_account_associations, :incremental => true, :precalculated_associations => {@root_account.id => 0})
       User.update_account_associations(importer.users_to_update_account_associations)
-      Pseudonym.where(:id => importer.pseudos_to_set_sis_batch_ids).update_all(:sis_batch_id => @batch_id) if @batch && !importer.pseudos_to_set_sis_batch_ids.empty?
+      importer.pseudos_to_set_sis_batch_ids.in_groups_of(1000, false) do |batch|
+        Pseudonym.where(:id => batch).update_all(:sis_batch_id => @batch_id)
+      end if @batch
       @logger.debug("Users took #{Time.now - start} seconds")
       return importer.success_count
     end
