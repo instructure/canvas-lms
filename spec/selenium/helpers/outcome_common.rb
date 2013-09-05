@@ -2,97 +2,96 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 
 
+#when 'teacher'; course_with_teacher_logged_in
+#when 'student'; course_with_student_logged_in
+#when 'admin';   course_with_admin_logged_in
 
-      #when 'teacher'; course_with_teacher_logged_in
-      #when 'student'; course_with_student_logged_in
-      #when 'admin';   course_with_admin_logged_in
 
-
-  def import_account_level_outcomes
-    keep_trying_until do
-      f(".btn-primary").click
-      driver.switch_to.alert.should_not be nil
-      driver.switch_to.alert.accept
-      wait_for_ajaximations
-      true
-    end
-  end
-
-  def traverse_nested_outcomes(outcome)
-    #pass an array with each group or outcome in sequence
-    outcome.each do |title|
-      ffj(".outcome-level:last .outcome-group .ellipsis")[0].should have_attribute("title", title)
-      f(".ellipsis[title='#{title}']").click
-      wait_for_ajaximations
-    end
-  end
-
-  def goto_state_outcomes
-    get outcome_url
+def import_account_level_outcomes
+  keep_trying_until do
+    f(".btn-primary").click
+    driver.switch_to.alert.should_not be nil
+    driver.switch_to.alert.accept
     wait_for_ajaximations
-    f('.find_outcome').click
-    wait_for_ajaximations
-    ff(".outcome-level .outcome-group").last.click
+    true
+  end
+end
+
+def traverse_nested_outcomes(outcome)
+  #pass an array with each group or outcome in sequence
+  outcome.each do |title|
+    ffj(".outcome-level:last .outcome-group .ellipsis")[0].should have_attribute("title", title)
+    f(".ellipsis[title='#{title}']").click
     wait_for_ajaximations
   end
+end
 
-  def state_outcome_setup
-    @cm.export_content
-    run_jobs
-    @cm.reload
-    @cm.old_warnings_format.should == []
-    @cm.migration_settings[:last_error].should be_nil
-    @cm.workflow_state.should == 'imported'
+def goto_state_outcomes
+  get outcome_url
+  wait_for_ajaximations
+  f('.find_outcome').click
+  wait_for_ajaximations
+  ff(".outcome-level .outcome-group").last.click
+  wait_for_ajaximations
+end
+
+def state_outcome_setup
+  @cm.export_content
+  run_jobs
+  @cm.reload
+  @cm.old_warnings_format.should == []
+  @cm.migration_settings[:last_error].should be_nil
+  @cm.workflow_state.should == 'imported'
+end
+
+def context_outcome(context, num_of_outcomes)
+  num_of_outcomes.times do |o|
+    @outcome_group ||= context.root_outcome_group
+    @outcome = context.created_learning_outcomes.create!(:title => "outcome #{o}")
+    @outcome.rubric_criterion = valid_outcome_data
+    @outcome.save!
+    @outcome_group.add_outcome(@outcome)
+    @outcome_group.save!
   end
+end
 
-  def context_outcome(context, num_of_outcomes)
+def create_bulk_outcomes_groups(context, num_of_groups, num_of_outcomes)
+  @root = context.root_outcome_group
+  num_of_groups.times do |g|
+    @group = context.learning_outcome_groups.create!(:title => "group #{g}")
     num_of_outcomes.times do |o|
-      @outcome_group ||= context.root_outcome_group
       @outcome = context.created_learning_outcomes.create!(:title => "outcome #{o}")
-      @outcome.rubric_criterion = valid_outcome_data
-      @outcome.save!
-      @outcome_group.add_outcome(@outcome)
-      @outcome_group.save!
+      @group.add_outcome(@outcome)
     end
+    @root.adopt_outcome_group(@group)
   end
+end
 
-  def create_bulk_outcomes_groups(context, num_of_groups, num_of_outcomes)
-    @root = context.root_outcome_group
-    num_of_groups.times do |g|
-      @group = context.learning_outcome_groups.create!(:title => "group #{g}")
-      num_of_outcomes.times do |o|
-        @outcome = context.created_learning_outcomes.create!(:title => "outcome #{o}")
-        @group.add_outcome(@outcome)
-      end
-      @root.adopt_outcome_group(@group)
-    end
-  end
-
-  def valid_outcome_data
-    {
+def valid_outcome_data
+  {
       :mastery_points => 3,
       :ratings => [
-        {:points => 3, :description => "Rockin"},
-        {:points => 0, :description => "Lame"}
-    ]
-    }
-  end
+          {:points => 3, :description => "Rockin"},
+          {:points => 0, :description => "Lame"}
+      ]
+  }
+end
 
-  def course_bulk_outcome_groups_course(num_of_groups, num_of_outcomes)
-    create_bulk_outcomes_groups(@course, num_of_groups, num_of_outcomes)
-  end
+def course_bulk_outcome_groups_course(num_of_groups, num_of_outcomes)
+  create_bulk_outcomes_groups(@course, num_of_groups, num_of_outcomes)
+end
 
-  def course_bulk_outcome_groups_account(num_of_groups, num_of_outcomes)
-    create_bulk_outcomes_groups(@account, num_of_groups, num_of_outcomes)
-  end
+def course_bulk_outcome_groups_account(num_of_groups, num_of_outcomes)
+  create_bulk_outcomes_groups(@account, num_of_groups, num_of_outcomes)
+end
 
-  def course_outcome(num_of_outcomes)
-    context_outcome(@course, num_of_outcomes)
-  end
+def course_outcome(num_of_outcomes)
+  context_outcome(@course, num_of_outcomes)
+end
 
-  def account_outcome(num_of_outcomes)
-    context_outcome(@account, num_of_outcomes)
-  end
+def account_outcome(num_of_outcomes)
+  context_outcome(@account, num_of_outcomes)
+end
 
 def should_create_a_learning_outcome_with_a_new_rating_root_level
   get outcome_url
@@ -110,7 +109,7 @@ def should_create_a_learning_outcome_with_a_new_rating_root_level
   f('input[name="ratings[1][description]"]').send_keys('almost exceeds')
   f('input[name="ratings[1][points]"]').send_keys('4')
   # submit
-  f('.submit_button').click
+  driver.execute_script("$('.submit_button').click()")
   wait_for_ajaximations
 
   ## expect
@@ -144,17 +143,17 @@ def should_create_a_learning_outcome_nested
   group_title = 'my group'
   replace_content f('.outcomes-content input[name=title]'), group_title
   # submit
-  f('.submit_button').click
+  driver.execute_script("$('.submit_button').click()")
   wait_for_ajaximations
 
   # create outcome
   f('.add_outcome_link').click
   wait_for_ajaximations
   outcome_name = 'first new outcome'
-  replace_content f('.outcomes-content input[name=title]'), outcome_name
+  replace_content(f('.outcomes-content input[name=title]'), outcome_name)
 
   # submit
-  f('.submit_button').click
+  driver.execute_script("$('.submit_button').click()")
   wait_for_ajaximations
 
   ## expect
@@ -168,52 +167,53 @@ def should_create_a_learning_outcome_nested
 end
 
 def should_edit_a_learning_outcome_and_delete_a_rating
-edited_title = 'edit outcome'
-who_to_login == 'teacher' ? @context = @course : @context = account
-outcome_model
-get outcome_url
-wait_for_ajaximations
-fj('.outcomes-sidebar .outcome-level:first li').click
-f('.edit_button').click
+  edited_title = 'edit outcome'
+  who_to_login == 'teacher' ? @context = @course : @context = account
+  outcome_model
+  get outcome_url
+
+  fj('.outcomes-sidebar .outcome-level:first li').click
+  wait_for_ajaximations
+  driver.execute_script("$('.edit_button').click()")
 
 ## when
 # edit title
-replace_content f('.outcomes-content input[name=title]'), edited_title
+  replace_content f('.outcomes-content input[name=title]'), edited_title
 # delete a rating
-f('.edit_rating').click
-f('.delete_rating_link').click
+  f('.edit_rating').click
+  f('.delete_rating_link').click
 # edit a rating
-f('.edit_rating').click
-replace_content f('input[name="ratings[0][points]"]'), '1'
-replace_content f('input[name="mastery_points"]'), '1'
+  f('.edit_rating').click
+  replace_content f('input[name="ratings[0][points]"]'), '1'
+  replace_content f('input[name="mastery_points"]'), '1'
 # submit
-f('.submit_button').click
-wait_for_ajaximations
+  driver.execute_script "$('.submit_button').click()"
+  wait_for_ajaximations
 
 ## expect
 # should be edited in directory browser
-ffj('.outcomes-sidebar .outcome-level:first li').detect { |li| li.text == edited_title }.should_not be_nil
+  ffj('.outcomes-sidebar .outcome-level:first li').detect { |li| li.text == edited_title }.should_not be_nil
 # title
-f(".outcomes-content .title").text.should == edited_title
+  f(".outcomes-content .title").text.should == edited_title
 # ratings
-ratings = ffj('table.criterion .rating')
-ratings.size.should == 1
-ratings.map { |r| r.text }.should == ["Lame\n1 Points"]
-f('table.criterion .total').text.should == "Total Points\n1 Points"
+  ratings = ffj('table.criterion .rating')
+  ratings.size.should == 1
+  ratings.map { |r| r.text }.should == ["Lame\n1 Points"]
+  f('table.criterion .total').text.should == "Total Points\n1 Points"
 # db
-LearningOutcome.find_by_short_description(edited_title).should be_present
+  LearningOutcome.find_by_short_description(edited_title).should be_present
 end
 
 def should_delete_a_learning_outcome
   who_to_login == 'teacher' ? @context = @course : @context = account
   outcome_model
   get outcome_url
-  wait_for_ajaximations
   fj('.outcomes-sidebar .outcome-level:first li').click
+  wait_for_ajaximations
 
   ## when
   # delete the outcome
-  f('.delete_button').click
+  driver.execute_script("$('.delete_button').click()")
   driver.switch_to.alert.accept
   wait_for_ajaximations
 
@@ -229,14 +229,13 @@ end
 
 def should_validate_mastery_points
   get outcome_url
-  wait_for_ajaximations
   f('.add_outcome_link').click
 
   ## when
   # not in ratings
   replace_content f('input[name="mastery_points"]'), '-1'
   # submit
-  f('.submit_button').click
+  driver.execute_script("$('.submit_button').click()")
   wait_for_ajaximations
 
   ## expect
@@ -267,7 +266,6 @@ end
 
 def should_create_an_outcome_group_root_level
   get outcome_url
-  wait_for_ajaximations
 
   ## when
   # create group
@@ -275,7 +273,7 @@ def should_create_an_outcome_group_root_level
   group_title = 'my group'
   replace_content f('.outcomes-content input[name=title]'), group_title
   # submit
-  f('.submit_button').click
+  driver.execute_script("$('.submit_button').click()")
   wait_for_ajaximations
 
   ## expect
@@ -290,7 +288,7 @@ end
 
 def should_create_a_learning_outcome_with_a_new_rating_nested
   get outcome_url
-  wait_for_ajaximations
+
 
   ## when
   # create group
@@ -298,7 +296,7 @@ def should_create_a_learning_outcome_with_a_new_rating_nested
   group_title = 'my group'
   replace_content f('.outcomes-content input[name=title]'), group_title
   # submit
-  f('.submit_button').click
+  driver.execute_script("$('.submit_button').click()")
   wait_for_ajaximations
 
   # create nested group
@@ -306,7 +304,7 @@ def should_create_a_learning_outcome_with_a_new_rating_nested
   nested_group_title = 'my nested group'
   replace_content f('.outcomes-content input[name=title]'), nested_group_title
   # submit
-  f('.submit_button').click
+  driver.execute_script("$('.submit_button').click()")
   wait_for_ajaximations
 
   ## expect
@@ -324,18 +322,18 @@ def should_edit_an_outcome_group
   who_to_login == 'teacher' ? @context = @course : @context = account
   outcome_group_model
   get outcome_url
-  wait_for_ajaximations
+
 
   fj('.outcomes-sidebar .outcome-level:first li.outcome-group').click
   wait_for_ajaximations
 
   keep_trying_until do
-    fj('.edit_button').click
+    driver.execute_script("$('.edit_button').click()")
     fj('.outcomes-content input[name=title]').should be_displayed
   end
 
   replace_content f('.outcomes-content input[name=title]'), edited_title
-  f('.submit_button').click
+  driver.execute_script("$('.submit_button').click()")
   wait_for_ajaximations
 
   ## expect
@@ -351,13 +349,14 @@ def should_delete_an_outcome_group
   who_to_login == 'teacher' ? @context = @course : @context = account
   outcome_group_model
   get outcome_url
-  wait_for_ajaximations
   fj('.outcomes-sidebar .outcome-level:first li.outcome-group').click
-
+  wait_for_ajaximations
   ## when
   # delete the outcome
-  f('.delete_button').click
-  keep_trying_until { try_to_close_modal }
+
+  driver.execute_script("$('.delete_button').click()")
+  driver.switch_to.alert.accept
+  wait_for_ajaximations
 
   ## expect
   # should not be showing on page

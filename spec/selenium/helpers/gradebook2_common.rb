@@ -43,7 +43,7 @@ def edit_grade(cell, grade)
   end
   set_value(grade_input, grade)
   grade_input.send_keys(:return)
-  wait_for_ajax_requests
+  wait_for_ajaximations
 end
 
 def validate_cell_text(cell, text)
@@ -80,10 +80,10 @@ end
 def switch_to_section(section=nil)
   section = section.id if section.is_a?(CourseSection)
   section ||= ""
-  f('#section_to_show').click
-  sleep 1 #TODO find a better way to wait for css3 anmation to end
-  f('#section-to-show-menu').should be_displayed
-  f("label[for='section_option_#{section}']").click
+  fj('#section_to_show').click
+  keep_trying_until { f('#section-to-show-menu').should be_displayed }
+  fj("label[for='section_option_#{section}']").click
+  sleep 7
   wait_for_ajaximations
 end
 
