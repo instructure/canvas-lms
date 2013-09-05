@@ -169,12 +169,21 @@ describe "conversations new" do
       conversation_elements[0].click
       wait_for_ajaximations
       fj('#reply-btn').click
-      set_message_body('Read chapters fix and six.')
+      set_message_body('Read chapters five and six.')
       click_send
       wait_for_ajaximations
       ffj('.message-item-view').length.should == initial_message_count + 1
       @convo.reload
       @convo.conversation_messages.length.should == initial_message_count + 1
+    end
+
+    it "should not allow adding recipients to private messages" do
+      @convo.update_attribute(:private_hash, '12345')
+      get_conversations
+      conversation_elements[0].click
+      wait_for_ajaximations
+      fj('#reply-btn').click
+      fj('.compose_form .ac-input-box.disabled').should_not be_nil
     end
   end
 

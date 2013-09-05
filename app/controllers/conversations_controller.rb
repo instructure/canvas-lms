@@ -664,7 +664,9 @@ class ConversationsController < ApplicationController
         return render_error('included_messages', 'not for this conversation') unless messages.all? { |m| m.conversation_id == @conversation.conversation.id }
       end
 
-      @conversation.add_participants @recipients, no_messages: true if @recipients
+      unless @conversation.private?
+        @conversation.add_participants @recipients, no_messages: true if @recipients
+      end
       @conversation.reload
       messages.each { |msg| @conversation.conversation.add_message_to_participants msg, new_message: false, only_users: @recipients } if messages
       @conversation.add_message message, :tags => @tags, :update_for_sender => false, only_users: @recipients ? @recipients + [@current_user] : nil
