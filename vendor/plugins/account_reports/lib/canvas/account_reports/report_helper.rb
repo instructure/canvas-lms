@@ -161,4 +161,13 @@ module Canvas::AccountReports::ReportHelper
       send_report(file)
     end
   end
+
+  def add_extra_text(text)
+    if @account_report.has_parameter?('extra_text')
+      @account_report.parameters["extra_text"] << " #{text}"
+    else
+      @account_report.parameters["extra_text"] = text
+    end
+  end
+
 end
