@@ -108,7 +108,7 @@ class Job < ActiveRecord::Base
   end
 
   def self.functions
-    @@functions ||= Delayed::Backend::Redis::Functions.new
+    @@functions ||= Delayed::Backend::Redis::Functions.new(redis)
   end
 
   def self.column(name, sql_type = nil, default = nil, null = true)
@@ -156,7 +156,7 @@ class Job < ActiveRecord::Base
 
     # as an optimization this lua function returns the hash of job attributes,
     # rather than just a job id, saving a round trip
-    job_attrs = functions.get_and_lock_next_available(redis, worker_name, queue, min_priority, max_priority, db_time_now)
+    job_attrs = functions.get_and_lock_next_available(worker_name, queue, min_priority, max_priority, db_time_now)
     instantiate_from_attrs(job_attrs) # will return nil if the attrs are blank
   end
 
@@ -168,7 +168,7 @@ class Job < ActiveRecord::Base
     check_queue(queue)
     check_priorities(min_priority, max_priority)
 
-    self.find(functions.find_available(redis, queue, limit, 0, min_priority, max_priority, db_time_now))
+    self.find(functions.find_available(queue, limit, 0, min_priority, max_priority, db_time_now))
   end
 
   # get a list of jobs of the given flavor in the given queue
@@ -186,7 +186,7 @@ class Job < ActiveRecord::Base
     when 'current'
       query ||= Delayed::Worker.queue
       check_queue(query)
-      self.find(functions.find_available(redis, query, limit, offset, nil, nil, db_time_now))
+      self.find(functions.find_available(query, limit, offset, nil, nil, db_time_now))
     when 'future'
       query ||= Delayed::Worker.queue
       check_queue(query)
@@ -268,7 +268,7 @@ class Job < ActiveRecord::Base
     if %w(current future).include?(opts[:flavor].to_s)
       opts[:query] ||= Delayed::Worker.queue
     end
-    functions.bulk_update(redis, action, opts[:ids], opts[:flavor], opts[:query], db_time_now)
+    functions.bulk_update(action, opts[:ids], opts[:flavor], opts[:query], db_time_now)
   end
 
   def self.create_singleton(options)
@@ -328,7 +328,7 @@ class Job < ActiveRecord::Base
   end
 
   def destroy
-    self.class.functions.destroy_job(redis, id, self.class.db_time_now)
+    self.class.functions.destroy_job(id, self.class.db_time_now)
     @destroyed = true
     freeze
   end
@@ -337,7 +337,7 @@ class Job < ActiveRecord::Base
   # was at the front
   def tickle_strand
     if strand.present?
-      self.class.functions.tickle_strand(redis, id, strand, self.class.db_time_now)
+      self.class.functions.tickle_strand(id, strand, self.class.db_time_now)
     end
   end
 
@@ -358,11 +358,11 @@ class Job < ActiveRecord::Base
 
   def update_queues
     if failed_at
-      self.class.functions.fail(redis, id)
+      self.class.functions.fail_job(id)
     elsif locked_at
-      self.class.functions.set_running(redis, id)
+      self.class.functions.set_running(id)
     elsif singleton
-      job_id = self.class.functions.create_singleton(redis, id, queue, strand, self.class.db_time_now)
+      job_id = self.class.functions.create_singleton(id, queue, strand, self.class.db_time_now)
       # if create_singleton returns a different job id, that means this job got
       # deleted because there was already that other job on the strand. so
       # replace this job with the other for returning.
@@ -371,7 +371,7 @@ class Job < ActiveRecord::Base
         self.reload
       end
     else
-      self.class.functions.enqueue(redis, id, queue, strand, self.class.db_time_now)
+      self.class.functions.enqueue(id, queue, strand, self.class.db_time_now)
     end
   end
 
@@ -417,7 +417,7 @@ class Job < ActiveRecord::Base
     if redis_attrs['id'].present?
       # nil attributes don't come back at all
       @attrs_template ||= columns.inject({}) { |h,c| h[c.name] = nil; h }
-      attrs = @attrs_template.dup.merge!(redis_attrs)
+      attrs = @attrs_template.merge(redis_attrs)
       self.time_attribute_names.each { |k| attrs[k] = Time.zone.at(attrs[k].to_f) if attrs[k] }
       instantiate(attrs)
     else
