@@ -143,4 +143,19 @@ describe QuizQuestion do
       }.to change(Attachment, :count).by(@attachment_count)
     end
   end
+
+  describe "#destroy" do
+
+    it "does not remove the record from the database, but changes workflow_state" do
+      course_with_teacher
+      course_quiz
+
+      question = @quiz.quiz_questions.create!
+      question.destroy
+      question = QuizQuestion.find(question.id)
+
+      question.should_not be_nil
+      question.should be_deleted
+    end
+  end
 end

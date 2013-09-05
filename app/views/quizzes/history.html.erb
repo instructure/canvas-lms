@@ -19,7 +19,7 @@
     <li>
       <div id='quiz-nav-inner-wrapper'>
         <ul>
-          <% @quiz.quiz_questions.each_with_index do |question, i| %>
+          <% @quiz.active_quiz_questions.each_with_index do |question, i| %>
             <% index = i + 1 %>
             <li id='quiz_nav_<%= question.id %>' class="q<%= index %> quiz-nav-li" data-id='<%= question.id %>' data-index='<%=i%>'>
               <a class='question_<%= question.id %> question-nav-link' data-id='<%= question.id %>' href="#question_<%= question.id %>">
