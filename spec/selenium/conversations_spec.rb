@@ -366,7 +366,7 @@ describe "conversations" do
       f('#help-btn').click
       expect_new_page_load { fj('#try-new-conversations-menu-item').click }
       f('#inbox').should be_nil # #inbox is in the old conversations ui and not the new ui
-      f('.help-btn').click
+      driver.execute_script("$('#help-btn').click()") #selenium.clik() not working in this case...
       expect_new_page_load {  fj('#switch-to-old-conversations-menu-item').click }
       f('#inbox').should be_displayed
     end

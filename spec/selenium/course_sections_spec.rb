@@ -9,8 +9,7 @@ describe "course sections" do
   end
 
   def table_rows
-    table_rows = ff('#enrollment_table tr')
-    table_rows
+    ff('#enrollment_table tr')
   end
 
   before (:each) do
@@ -22,6 +21,7 @@ describe "course sections" do
     add_enrollment('active', @section)
     get "/courses/#{@course.id}/sections/#{@section.id}"
 
+    wait_for_ajaximations
     table_rows.count.should == 1
     table_rows[0].should include_text('2 Active Enrollments')
   end
@@ -29,6 +29,7 @@ describe "course sections" do
   it "should validate the display when only 1 enrollment exists" do
     get "/courses/#{@course.id}/sections/#{@section.id}"
 
+    wait_for_ajaximations
     table_rows.count.should == 1
     table_rows[0].should include_text('1 Active Enrollment')
   end
@@ -38,6 +39,7 @@ describe "course sections" do
     add_enrollment('invited', @section)
     get "/courses/#{@course.id}/sections/#{@section.id}"
 
+    wait_for_ajaximations
     table_rows.count.should == 2
     table_rows[0].should include_text('2 Pending Enrollments')
   end
@@ -47,6 +49,7 @@ describe "course sections" do
     @course.complete!
     get "/courses/#{@course.id}/sections/#{@section.id}"
 
+    wait_for_ajaximations
     table_rows.count.should == 1
     table_rows[0].should include_text('2 Completed Enrollments')
   end
@@ -60,6 +63,6 @@ describe "course sections" do
     replace_content(edit_form.find_element(:id, 'course_section_name'), edit_name)
     submit_form(edit_form)
     wait_for_ajaximations
-f('#section_name').should include_text(edit_name)
+    f('#section_name').should include_text(edit_name)
   end
 end

@@ -32,12 +32,15 @@ describe "course people" do
     def select_from_auto_complete(text, input_id)
       fj(".token_input input:visible").send_keys(text)
       wait_for_ajaximations
+
       keep_trying_until { driver.execute_script("return $('##{input_id}').data('token_input').selector.list.query.search") == text }
-      elements = driver.execute_script("return $('.autocomplete_menu:visible .list').last().find('ul').last().find('li').toArray();").map { |e|
+      wait_for_js
+      elements = ffj(".autocomplete_menu:visible .list:last ul:last li").map { |e|
         [e, (e.find_element(:tag_name, :b).text rescue e.text)]
       }
-      element = elements.detect { |e| e.last == text } or raise "menu item does not exist"
-
+      wait_for_js
+      element = elements.detect { |e| e.last == text }
+      element.should_not be_nil
       element.first.click
       wait_for_ajaximations
     end

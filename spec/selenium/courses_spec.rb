@@ -8,6 +8,7 @@ describe "courses" do
     def create_new_course
       get "/"
       f('[aria-controls="new_course_form"]').click
+      wait_for_ajaximations
       f('[name="course[name]"]').send_keys "testing"
       f('.ui-dialog-buttonpane .btn-primary').click
     end
@@ -52,16 +53,16 @@ describe "courses" do
       wait_for_animations
       wizard_box = find_wizard_box
       wizard_box.find_element(:css, ".close_wizard_link").click
-      wait_for_animations
+      wait_for_ajaximations
       wizard_box.should_not be_displayed
       checklist_button = f('.wizard_popup_link')
       checklist_button.should be_displayed
       checklist_button.click
-      wait_for_animations
+      wait_for_ajaximations
       checklist_button.should_not be_displayed
       wizard_box = find_wizard_box
       wizard_box.find_element(:css, ".close_wizard_link").click
-      wait_for_animations
+      wait_for_ajaximations
       wizard_box.should_not be_displayed
       checklist_button.should be_displayed
     end
@@ -75,6 +76,7 @@ describe "courses" do
       form = f("#course_form")
       f("#course_form .edit_course_link").should be_displayed
       form.find_element(:css, ".edit_course_link").click
+      wait_for_ajaximations
       quota_input = form.find_element(:css, "input#course_storage_quota_mb")
       replace_content(quota_input, "10")
       submit_form(form)
@@ -87,6 +89,7 @@ describe "courses" do
       form = f("#course_form")
       form.find_element(:css, ".course_info.storage_quota_mb").text.should == "10"
       form.find_element(:css, ".edit_course_link").click
+      wait_for_ajaximations
       submit_form(form)
       keep_trying_until { f(".loading_image_holder").nil? rescue true }
       form = f("#course_form")
@@ -115,6 +118,7 @@ describe "courses" do
       options = select.find_elements(:css, 'option')
       options.length.should == 2
       select.click
+      wait_for_ajaximations
       find_with_jquery('#course_url option:not([selected])').click
 
       driver.current_url.should match %r{/courses/#{course2.id}/grades}
