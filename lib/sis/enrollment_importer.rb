@@ -36,15 +36,21 @@ module SIS
         end
       end
       @logger.debug("Raw enrollments took #{Time.now - start} seconds")
-      Enrollment.where(:id => i.enrollments_to_update_sis_batch_ids).update_all(:sis_batch_id => @batch_id) if @batch_id && !i.enrollments_to_update_sis_batch_ids.empty?
+      i.enrollments_to_update_sis_batch_ids.in_groups_of(1000, false) do |batch|
+        Enrollment.where(:id => batch).update_all(:sis_batch_id => @batch_id)
+      end if @batch_id
       # We batch these up at the end because we don't want to keep touching the same course over and over,
       # and to avoid hitting other callbacks for the course (especially broadcast_policy)
-      Course.where(:id => i.courses_to_touch_ids.to_a).update_all(:updated_at => Time.now.utc) unless i.courses_to_touch_ids.empty?
+      i.courses_to_touch_ids.to_a.in_groups_of(1000, false) do |batch|
+        Course.where(:id => batch).update_all(:updated_at => Time.now.utc)
+      end
       # We batch these up at the end because normally a user would get several enrollments, and there's no reason
       # to update their account associations on each one.
       i.incrementally_update_account_associations
       User.update_account_associations(i.update_account_association_user_ids.to_a, :account_chain_cache => i.account_chain_cache)
-      User.where(:id => i.users_to_touch_ids.to_a).update_all(:updated_at => Time.now.utc) unless i.users_to_touch_ids.empty?
+      i.users_to_touch_ids.to_a.in_groups_of(1000, false) do |batch|
+        User.where(:id => batch).update_all(:updated_at => Time.now.utc)
+      end
       @logger.debug("Enrollments with batch operations took #{Time.now - start} seconds")
       return i.success_count
     end
