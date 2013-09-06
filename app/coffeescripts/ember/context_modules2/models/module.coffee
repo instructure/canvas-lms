@@ -2,13 +2,44 @@ define [
   'ember'
   '../lib/parse_page_links'
   'jquery'
-], (Ember,parsePageLinks,$) ->
+  'underscore'
+], (Ember,parsePageLinks,$, _) ->
   # ModuleItem = Ember.Object.extend()
 
   Module = Ember.Object.extend()
   Module.url = '/api/v1/courses/' + window?.ENV?.COURSE_ID + '/modules?include%5B%5D=items&include%5B%5D=content_details&page=1&per_page=50'
 
   Module.reopen
+    modulePrereqs: (->
+      modules = Module.records.get('content')
+      ids = this.get('prerequisite_module_ids')
+      prereq_modules = _.filter modules, (module) ->
+        if _.contains ids, module.get('id')
+          return module
+    ).property()
+
+    prereqModuleCount: (->
+      this.get('prerequisite_module_ids').length
+    ).property()
+
+    onePrereq: (->
+      this.get('prerequisite_module_ids').length == 1
+    ).property()
+
+    moreThanOnePrereq: (->
+      this.get('prerequisite_module_ids').length > 1
+    ).property()
+
+    prereqModuleName: (->
+      this.get('modulePrereqs')[0].get('name')
+    ).property()
+
+    prereqModuleNames: (->
+      names = _.map this.get('modulePrereqs'), (module) ->
+        module.get('name')
+      names.join(", ")
+    ).property()
+
     loadNextPage: ->
       if @items.get('links').next
         @items.set 'loading', true
