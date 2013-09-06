@@ -49,6 +49,7 @@ class EportfolioCategoriesController < ApplicationController
           format.html { redirect_to eportfolio_category_url(@portfolio, @category) }
           format.json { render :json => @category.to_json }
         else
+          format.json { render :json => @category.errors.to_json }
         end
       end
     end

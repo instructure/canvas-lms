@@ -542,7 +542,6 @@ define([
   function saveObject($obj, type) {
     var isSaving = $obj.data('event_pending');
     if(isSaving || $obj.length === 0) { return; }
-    $obj.data('event_pending', true);
     var method = "PUT";
     var url = $obj.find(".rename_" + type + "_url").attr('href');
     if($obj.attr('id') == type + '_new') {
@@ -567,6 +566,7 @@ define([
     if(method == "POST") {
       $obj.attr('id', type + '_saving');
     }
+    $obj.data('event_pending', true);
     $obj.addClass('event_pending');
     $.ajaxJSON(url, method, data, function(data) {
       $obj.removeClass('event_pending');
@@ -585,7 +585,27 @@ define([
       });
       $obj.data('event_pending', false);
       countObjects(type);
-    });
+    },
+    // error callback
+    function(data, xhr, textStatus, errorThrown){
+      $obj.removeClass('event_pending');
+      $obj.data('event_pending', false);
+      var name_message = I18n.t("errors.section_name_invalid", "Section name is not valid")
+      if (xhr['name'] && xhr['name'].length > 0 && xhr['name'][0]['message'] == 'too_long') {
+        name_message = I18n.t("errors.section_name_too_long", "Section name is too long");
+      }
+      if ($obj.hasClass('unsaved')) {
+        alert(name_message);
+        $obj.remove();
+      }
+      else {
+        // put back in "edit" mode
+        $obj.find('.edit_section_link').click();
+        $obj.find('#section_name').errorBox(name_message).css('z-index', 20)
+      }
+    },
+    // options
+    {skipDefaultError: true});
     return true;
   }
   function editObject($obj, type) {
