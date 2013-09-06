@@ -1,4 +1,5 @@
 class StatsController < ApplicationController
+  include Common
   before_filter :require_user
   def index
     @current_term = current_term
