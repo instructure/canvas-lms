@@ -31,7 +31,6 @@ define [
     @optionProperty 'PAGE_RIGHTS'
 
     initialize: ->
-      @model.set('publishable', true)
       @model.on 'change', => @render()
       super
       @WIKI_RIGHTS ||= {}
@@ -64,6 +63,7 @@ define [
 
     deleteWikiPage: (ev) ->
       ev?.preventDefault()
+      return unless @model.get('deletable')
 
       deleteDialog = new WikiPageDeleteDialog
         model: @model

@@ -15,7 +15,7 @@ define [
   class WikiPageEditView extends ValidatedFormView
     @mixin
       els:
-        '[name="wiki_page[body]"]': '$wikiPageBody'
+        '[name="body"]': '$wikiPageBody'
         '.header-bar-outer-container': '$headerBarOuterContainer'
         '.page-changed-alert': '$pageChangedAlert'
 
@@ -120,8 +120,8 @@ define [
     validateFormData: (data) -> 
       errors = {}
 
-      if data.wiki_page?.title == ''
-        errors["wiki_page[title]"] = [
+      if data.title == ''
+        errors["title"] = [
           {
             type: 'required'
             message: I18n.t("errors.require_title",'You must enter a title')
@@ -133,9 +133,9 @@ define [
     hasUnsavedChanges: ->
       formData = @getFormData()
       oldBody = @model.get('body') || ''
-      newBody = formData.wiki_page?.body || ''
+      newBody = formData.body || ''
       oldTitle = @model.get('title') || ''
-      newTitle = formData.wiki_page?.title || ''
+      newTitle = formData.title || ''
       return (oldBody != newBody) || (oldTitle != newTitle)
 
     unsavedWarning: ->

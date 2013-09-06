@@ -38,6 +38,26 @@ define [
     equal wikiPage.latestRevision().summary, true, 'defaulted to summary'
 
 
+  module 'WikiPage:Publishable'
+  test 'publishable', ->
+    wikiPage = new WikiPage
+      front_page: false
+      published: true
+    strictEqual wikiPage.get('publishable'), true, 'publishable set during construction'
+
+    wikiPage.set('front_page', true)
+    strictEqual wikiPage.get('publishable'), false, 'publishable set when front_page changed'
+
+  test 'deletable', ->
+    wikiPage = new WikiPage
+      front_page: false
+      published: true
+    strictEqual wikiPage.get('deletable'), true, 'deletable set during construction'
+
+    wikiPage.set('front_page', true)
+    strictEqual wikiPage.get('deletable'), false, 'deletable set when front_page changed'
+
+
   module 'WikiPage:Sync'
   test 'sets the id during construction', ->
     wikiPage = new WikiPage wikiPageObj()
@@ -85,18 +105,18 @@ define [
       strictEqual attributes.wiki_page.published, false, 'published provided correctly'
     wikiPage.unpublish()
 
-  test 'setAsFrontPage convenience method', 3, ->
+  test 'setFrontPage convenience method', 3, ->
     wikiPage = new WikiPage wikiPageObj()
     sinon.stub wikiPage, 'save', (attributes, options) ->
       ok attributes, 'attributes present'
       ok attributes.wiki_page, 'wiki_page present'
       strictEqual attributes.wiki_page.front_page, true, 'front_page provided correctly'
-    wikiPage.setAsFrontPage()
+    wikiPage.setFrontPage()
 
-  test 'removeAsFrontPage convenience method', 3, ->
+  test 'unsetFrontPage convenience method', 3, ->
     wikiPage = new WikiPage wikiPageObj()
     sinon.stub wikiPage, 'save', (attributes, options) ->
       ok attributes, 'attributes present'
       ok attributes.wiki_page, 'wiki_page present'
       strictEqual attributes.wiki_page.front_page, false, 'front_page provided correctly'
-    wikiPage.removeAsFrontPage()
+    wikiPage.unsetFrontPage()

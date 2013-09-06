@@ -44,8 +44,8 @@ define [
       @view.$el.appendTo $('#fixtures')
       @view.render()
 
-      @titleInput = @view.$el.find('[name="wiki_page[title]"]')
-      @bodyInput = @view.$el.find('[name="wiki_page[body]"]')
+      @titleInput = @view.$el.find('[name="title"]')
+      @bodyInput = @view.$el.find('[name="body"]')
     teardown: ->
       @scrollSidebarStub.restore()
       @initStub.restore()
@@ -55,7 +55,7 @@ define [
 
   test 'check for unsaved changes on new model', ->
     @titleInput.val('blah')
-    ok @view.getFormData().wiki_page.title == 'blah', "blah"
+    ok @view.getFormData().title == 'blah', "blah"
     ok @view.hasUnsavedChanges(), 'Changed title'
     @titleInput.val('')
     ok !@view.hasUnsavedChanges(), 'Unchanged title'
@@ -112,15 +112,15 @@ define [
   test 'validation of the title is only performed if the title is present', ->
     view = new WikiPageEditView
 
-    errors = view.validateFormData wiki_page: {body: 'blah'}
-    strictEqual errors['wiki_page[title]'], undefined, 'no error when title is omitted'
+    errors = view.validateFormData body: 'blah'
+    strictEqual errors['title'], undefined, 'no error when title is omitted'
 
-    errors = view.validateFormData wiki_page: {title: 'blah', body: 'blah'}
-    strictEqual errors['wiki_page[title]'], undefined, 'no error when title is present'
+    errors = view.validateFormData title: 'blah', body: 'blah'
+    strictEqual errors['title'], undefined, 'no error when title is present'
 
-    errors = view.validateFormData wiki_page: {title: '', body: 'blah'}
-    ok errors['wiki_page[title]'], 'error when title is present, but blank'
-    ok errors['wiki_page[title]'][0].message, 'error message when title is present, but blank'
+    errors = view.validateFormData title: '', body: 'blah'
+    ok errors['title'], 'error when title is present, but blank'
+    ok errors['title'][0].message, 'error message when title is present, but blank'
 
 
   module 'WikiPageEditView:JSON'

@@ -41,4 +41,4 @@ define [
 
     openAgain: ->
       super
-      @.$('[name="wiki_page[title]"]').focus()
+      @.$('[name="title"]').focus()

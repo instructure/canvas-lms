@@ -7,6 +7,9 @@
         {{/if}}
       </div>
       <div class="header-bar-right">
+        {{#if front_page}}
+          <span class="front-page label">{{#t 'labels.front_page'}}Front Page{{/t}}</span>
+        {{/if}}
         {{#if CAN.PUBLISH}}
           <span class="publish-button"></span>
         {{/if}}
@@ -20,7 +23,7 @@
           </a>
           <ul class="al-options">
           {{#if CAN.DELETE}}
-            <li><a href="#" class="icon-trash delete_page">{{#t "delete_wiki"}}Delete{{/t}}</a></li>
+            <li><a href="#" class="icon-trash delete_page{{#unless deletable}} disabled{{/unless}}" {{#unless deletable}}aria-disabled="true"{{/unless}}>{{#t "delete_wiki"}}Delete{{/t}}</a></li>
           {{/if}}
           {{#if CAN.READ_REVISIONS}}
             <li><a href="{{wiki_page_history_path}}" class="icon-clock view_page_history">{{#t "view_page_history_wiki"}}View Page History{{/t}}</a></li>

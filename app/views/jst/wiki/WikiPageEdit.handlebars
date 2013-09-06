@@ -29,21 +29,21 @@
 <div class="edit-content">
   <div class="edit-header">
     {{#if CAN.EDIT_TITLE}}
-      <label for="wiki_page[title]" class="screenreader-only">{{#t "title_label"}}Page Title{{/t}}</label>
-      <input id="wiki_page[title]" name="wiki_page[title]" type="text" class="span4 title" value="{{title}}" maxlength="255" autofocus>
+      <label for="title" class="screenreader-only">{{#t "title_label"}}Page Title{{/t}}</label>
+      <input id="title" name="title" type="text" class="span4 title" value="{{title}}" maxlength="255" autofocus>
     {{else}}
       <h2>{{title}}</h2>
     {{/if}}
     <a href="#" class="switch_views">{{#t "#editor.switch_views"}}Switch Views{{/t}}</a>
   </div>
 
-  <textarea rows="16" cols="40" name="wiki_page[body]" class="body" aria-hidden="true"{{#unless PAGE_RIGHTS.update}} autofocus{{/unless}}>{{body}}</textarea>
+  <textarea rows="16" cols="40" name="body" class="body" aria-hidden="true"{{#unless PAGE_RIGHTS.update}} autofocus{{/unless}}>{{body}}</textarea>
 
   {{#if CAN.EDIT_ROLES}}
     <div class="control-group options">
       <label class="control-label"><strong>{{#t "options_label"}}Options{{/t}}</strong></label>
       <div class="controls">
-        <select name="wiki_page[editing_roles]">
+        <select name="editing_roles">
           {{#if SHOW.COURSE_ROLES}}
             <option value="teachers"{{#if IS.TEACHER_ROLE}} selected{{/if}}>{{#t "course_editing_roles.only_teachers"}}Only teachers{{/t}}</option>
             <option value="teachers,students"{{#if IS.STUDENT_ROLE}} selected{{/if}}>{{#t "course_editing_roles.teachers_and_students"}}Teachers and students{{/t}}</option>
@@ -62,7 +62,7 @@
 <div class="form-actions clearfix">
   <div style="height:30px">
     <label for="notify_of_update" class="checkbox clearfix pull-left" style="margin-top:5px">
-      {{checkbox "notify_of_update" prefix="wiki_page"}}
+      {{checkbox "notify_of_update"}}
       {{#t "notify_users_text"}}Notify users that this content has changed{{/t}}
     </label>
     <a class="btn cancel" tabindex="0" role="button">{{#t "buttons.cancel"}}Cancel{{/t}}</a>

@@ -18,7 +18,8 @@ require [
     default_editing_roles: ENV.DEFAULT_EDITING_ROLES
     WIKI_RIGHTS: ENV.WIKI_RIGHTS
 
-  view.collection.fetch({data: {sort:'title',per_page:30}}).then ->
+  view.collection.setParams sort:'title', per_page:30
+  view.collection.fetch().then ->
     view.fetched = true
     # Re-render after fetching is complete, but only if there are no pages in the collection
     view.render() if view.collection.models.length == 0

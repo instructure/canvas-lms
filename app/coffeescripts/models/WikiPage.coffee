@@ -4,22 +4,45 @@ define [
   'compiled/models/WikiPageRevision'
   'compiled/backbone-ext/DefaultUrlMixin'
   'compiled/str/splitAssetString'
-], (_, Backbone, WikiPageRevision, DefaultUrlMixin, splitAssetString) ->
+  'i18n!pages'
+], (_, Backbone, WikiPageRevision, DefaultUrlMixin, splitAssetString, I18n) ->
 
   pageOptions = ['contextAssetString', 'revision']
 
   class WikiPage extends Backbone.Model
-    resourceName: 'pages'
-
     @mixin DefaultUrlMixin
-    url: -> "#{@_defaultUrl()}" + if @get('url') then "/#{@get('url')}" else ''
+    resourceName: 'pages'
 
     initialize: (attributes, options) ->
       super
       _.extend(this, _.pick(options || {}, pageOptions))
-
       [@contextName, @contextId] = splitAssetString(@contextAssetString) if @contextAssetString
       @set(id: attributes.url) if attributes?.url
+
+      @on 'change:front_page', @setPublishable
+      @on 'change:published', @setPublishable
+      @setPublishable()
+
+    setPublishable: ->
+      front_page = @get('front_page')
+      published = @get('published')
+      publishable = !front_page || !published
+      deletable = !front_page
+      @set('publishable', publishable)
+      @set('deletable', deletable)
+      if publishable
+        @unset('publishableMessage')
+      else
+        @set('publishableMessage', I18n.t('cannot_unpublish_front_page', 'Cannot unpublish the front page'))
+
+    disabledMessage: ->
+      @get('publishableMessage')
+
+    urlRoot: ->
+      "/api/v1/#{@_contextPath()}/pages"
+
+    url: ->
+      if @get('url') then "#{@urlRoot()}/#{@get('url')}" else @urlRoot()
 
     latestRevision: (options) ->
       if !@_latestRevision && @get('url')
@@ -40,36 +63,37 @@ define [
     #
     # Specifically, the id is removed as the only reason for it's presense is to make Backbone happy
     toJSON: ->
-      _.omit super, 'id'
+      wiki_page:
+        _.omit super, 'id'
 
     # Returns a json representation suitable for presenting
     present: ->
-      _.extend _.omit(@toJSON(), 'id'), contextName: @contextName, contextId: @contextId, new_record: !@get('url')
+      _.extend _.omit(@attributes, 'id'), contextName: @contextName, contextId: @contextId, new_record: !@get('url')
 
     # Uses the api to perform a publish on the page
     publish: ->
-      attributes =
+      attrs =
         wiki_page:
           published: true
-      @save attributes, wait: true
+      @save attrs, attrs: attrs, wait: true
 
     # Uses the api to perform an unpublish on the page
     unpublish: ->
-      attributes =
+      attrs =
         wiki_page:
           published: false
-      @save attributes, wait: true
+      @save attrs, attrs: attrs, wait: true
 
     # Uses the api to set the page as the front page
-    setAsFrontPage: ->
-      attributes =
+    setFrontPage: ->
+      attrs =
         wiki_page:
           front_page: true
-      @save attributes, wait: true
+      @save attrs, attrs: attrs, wait: true
 
-    # Uses the api to remove the page as the front page
-    removeAsFrontPage: ->
-      attributes =
+    # Uses the api to unset the page as the front page
+    unsetFrontPage: ->
+      attrs =
         wiki_page:
           front_page: false
-      @save attributes, wait: true
+      @save attrs, attrs: attrs, wait: true
