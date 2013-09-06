@@ -187,7 +187,7 @@ class MessageableUser
         # by default
         scope = messageable_users_in_context_scope(options.delete(:context), options)
         scope = search_scope(scope, options[:search], global_exclude_ids)
-        scope ||= MessageableUser.where(['?', false])
+        scope ||= MessageableUser.where('?', false)
         bookmark(scope)
       else
         scope = self_scope(options)
@@ -292,9 +292,9 @@ class MessageableUser
           course.shard.activate do
             reverse_lookup = missing_users.index_by(&:id)
             missing_user_ids = reverse_lookup.keys
-            enrollment_scope(scope_options).where(:id => missing_user_ids, 'courses.id' => course.id).each do |user|
-              reverse_lookup[user.id].include_common_contexts_from(user)
-            end
+            enrollment_scope(scope_options.merge(:course_workflow_state => course.workflow_state)).
+              where(:id => missing_user_ids, :course_id => course.id).
+              each{ |user| reverse_lookup[user.id].include_common_contexts_from(user) }
           end
         end
       end
@@ -412,7 +412,9 @@ class MessageableUser
         # make sure the course is recognized
         return unless options[:admin_context] || course = course_index[course.id]
 
-        scope = enrollment_scope(options.merge(:include_concluded_students => false))
+        scope = enrollment_scope(options.merge(
+          :include_concluded_students => false,
+          :course_workflow_state => course.workflow_state))
         scope =
           if options[:admin_context]
             scope.where(full_visibility_clause([course]))
@@ -441,13 +443,19 @@ class MessageableUser
       return unless section
 
       section.shard.activate do
-        return unless options[:admin_context] || course = course_index[section.course_id]
+        course = course_index[section.course_id]
+        return unless options[:admin_context] || course
+        course ||= section.course
+
         return unless options[:admin_context] ||
           fully_visible_courses.include?(course) ||
           section_visible_courses.include?(course) &&
           visible_section_ids_in_courses([course]).include?(section.id)
 
-        scope = enrollment_scope(options.merge(:include_concluded_students => false)).where('enrollments.course_section_id' => section.id)
+        scope = enrollment_scope(options.merge(
+          :include_concluded_students => false,
+          :course_workflow_state => course.workflow_state)).
+          where('enrollments.course_section_id' => section.id)
         scope = scope.where(observer_restriction_clause) if student_courses.present?
         scope = scope.where('enrollments.type' => enrollment_types) if enrollment_types
         scope
@@ -510,21 +518,30 @@ class MessageableUser
     # the :strict_checks option (default: true) is per load_messageable_users
     # and controls the strict_course_state parameter of
     # User.enrollment_conditions.
+    #
+    # the :course_workflow_state is useful for passing on to
+    # User.enrollment_conditions to simplify the queries when the enrollments
+    # are known to come from course(s) with a single workflow_state
+    #
+    # may return nil, indicating the scope should be treated as empty.
     def self.enrollment_conditions(options={})
       options = {
         :include_concluded => true,
         :include_concluded_students => true,
-        :strict_checks => true
+        :strict_checks => true,
+        :course_workflow_state => nil
       }.merge(options)
       state_clauses = [
-        User.enrollment_conditions(:active, options[:strict_checks]),
-        User.enrollment_conditions(:invited, options[:strict_checks])
+        User.enrollment_conditions(:active, options[:strict_checks], options[:course_workflow_state]),
+        User.enrollment_conditions(:invited, options[:strict_checks], options[:course_workflow_state])
       ]
       if options[:include_concluded]
         clause = User.enrollment_conditions(:completed, options[:strict_checks])
         clause << " AND enrollments.type IN ('TeacherEnrollment', 'TaEnrollment')" unless options[:include_concluded_students]
         state_clauses << clause
       end
+      state_clauses.compact!
+      return nil if state_clauses.empty?
       "(#{state_clauses.join(' OR ')}) AND enrollments.type != 'StudentViewEnrollment'"
     end
 
@@ -543,8 +560,9 @@ class MessageableUser
     # specifying a column (or value) for :common_group_column (default: none)
     # will add that group to the returned users' common_groups.
     #
-    # the :include_concluded and :strict_checks options are passed through to
-    # enrollment_conditions; see its documentation.
+    # the :include_concluded, :strict_checks, and :course_workflow_state
+    # options are passed through to enrollment_conditions; see its
+    # documentation.
     #
     # additionally, if :strict_checks is false (default: true), all users will
     # be included, not just active users. (see MessageableUser.prepped)
@@ -553,12 +571,22 @@ class MessageableUser
         :common_course_column => 'enrollments.course_id',
         :common_role_column => 'enrollments.type'
       }.merge(options)
+      scope = base_scope(options)
 
-      base_scope(options).
-        joins(<<-SQL).where(self.class.enrollment_conditions(options))
-          INNER JOIN enrollments ON enrollments.user_id=users.id
-          INNER JOIN courses ON courses.id=enrollments.course_id
-        SQL
+      enrollment_conditions = self.class.enrollment_conditions(options)
+      if enrollment_conditions
+        scope = scope.joins("INNER JOIN courses ON courses.id=enrollments.course_id") unless options[:course_workflow_state]
+        scope = scope.where(enrollment_conditions)
+      else
+        scope = scope.where('?', false)
+      end
+
+      # this comes after the conditional join on courses that needs
+      # enrollments, because AREL is going to swap the order for some reason.
+      # if this came first (e.g. immediately after base_scope), then the join
+      # on courses would show up first in the SQL, which could make the
+      # database sad.
+      scope.joins("INNER JOIN enrollments ON enrollments.user_id=users.id")
     end
 
     # further restricts the enrollment scope to users whose enrollment is
@@ -614,7 +642,7 @@ class MessageableUser
     # enrollment in a course is as a student, he can't see observers that
     # aren't observing him
     def observer_restriction_clause
-      clause = ["courses.id NOT IN (?) OR enrollments.type != 'ObserverEnrollment'", student_courses.map(&:id)]
+      clause = ["enrollments.course_id NOT IN (?) OR enrollments.type != 'ObserverEnrollment'", student_courses.map(&:id)]
       if linked_observer_ids.present?
         clause.first << " OR enrollments.user_id IN (?)"
         clause << linked_observer_ids
