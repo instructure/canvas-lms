@@ -65,10 +65,11 @@
     margin-bottom: 0;
     width: 150px;
   }
+}
 
-  .course-filter abbr {
-    cursor: pointer;
-  }
+.bootstrap-select abbr {
+  cursor: pointer;
+  border-bottom: none;
 }
 
 .conversations .panel, .message-header {
@@ -417,8 +418,13 @@
   margin-bottom: 0;
 }
 
-.icon-ok:before {
+i.icon-ok:before {
   content: "\e015";
+  vertical-align: baseline;
+}
+
+.bootstrap-select .dropdown-submenu .dropdown-menu {
+  top: 20px;
 }
 
 .message-header-row .ac-input-box {
