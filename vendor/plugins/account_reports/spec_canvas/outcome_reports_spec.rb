@@ -270,8 +270,8 @@ describe "Outcom Reports" do
       outcome_group = @account.root_outcome_group
       outcome = @account.created_learning_outcomes.create!(:short_description => 'new outcome')
       quiz = @course1.quizzes.create!(:title => "new quiz", :shuffle_answers => true)
-      q1 = quiz.quiz_questions.create!(:question_data => {:name => 'question 1', :points_possible => 1, 'question_type' => 'multiple_choice_question', 'answers' => {'answer_0' => {'answer_text' => '1', 'answer_weight' => '100'}, 'answer_1' => {'answer_text' => '2'}, 'answer_2' => {'answer_text' => '3'}, 'answer_3' => {'answer_text' => '4'}}})
-      q2 = quiz.quiz_questions.create!(:question_data => {:name => 'question 2', :points_possible => 1, 'question_type' => 'multiple_choice_question', 'answers' => {'answer_0' => {'answer_text' => '1', 'answer_weight' => '100'}, 'answer_1' => {'answer_text' => '2'}, 'answer_2' => {'answer_text' => '3'}, 'answer_3' => {'answer_text' => '4'}}})
+      q1 = quiz.quiz_questions.create!(:question_data => {:name => 'question 1', :points_possible => 1, 'question_type' => 'multiple_choice_question', 'answers' => [{'answer_text' => '1', 'weight' => '100'}, {'answer_text' => '2'}, {'answer_text' => '3'}, {'answer_text' => '4'}]})
+      q2 = quiz.quiz_questions.create!(:question_data => {:name => 'question 2', :points_possible => 1, 'question_type' => 'multiple_choice_question', 'answers' => [{'answer_text' => '1', 'weight' => '100'}, {'answer_text' => '2'}, {'answer_text' => '3'}, {'answer_text' => '4'}]})
       bank = q1.assessment_question.assessment_question_bank
       bank.assessment_questions.create!(:question_data => {'name' => 'test question', 'answers' => [{'id' => 1}, {'id' => 2}]})
       outcome.align(bank, @account, :mastery_score => 0.7)
@@ -280,8 +280,8 @@ describe "Outcom Reports" do
       quiz.generate_quiz_data(:persist => true)
       sub = quiz.generate_submission(@user)
       sub.submission_data = {}
-      question_1 = q1.question_data[:id]
-      question_2 = q2.question_data[:id]
+      question_1 = q1[:id]
+      question_2 = q2[:id]
       sub.submission_data["question_#{question_1}"] = answer_1
       sub.submission_data["question_#{question_2}"] = answer_2 + 1
       sub.grade_submission

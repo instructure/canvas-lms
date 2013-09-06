@@ -72,9 +72,10 @@ def simple_quiz_with_submissions(answer_key, *submissions)
     answer, points = answer if answer.is_a?(Array)
     true_false = answer == 'T' || answer == 'F'
     type = true_false ? 'true_false_question' : 'multiple_choice_question'
-    answers = Hash[(true_false ? ['T', 'F'] : 'A'..'D').each_with_index.map { |a, j|
-      ["answer_#{j}", {:answer_text => a, :answer_weight => (a == answer ? 100 : 0), :id => (4 * i + j)}]
-    }]
+    answers = (true_false ? ['T', 'F'] : 'A'..'D').each_with_index.map do |a, j|
+      {:answer_text => a, :answer_weight => (a == answer ? 100 : 0), :id => (4 * i + j)}
+    end
+
     {:question_data => {:name => "question #{i + 1}", :points_possible => points, :question_type => type, :answers => answers}}
   }
   assignment_quiz(questions, opts)
@@ -82,7 +83,6 @@ def simple_quiz_with_submissions(answer_key, *submissions)
     sub = @quiz.generate_submission(user())
     sub.mark_completed
     sub.submission_data = Hash[data.each_with_index.map{ |answer, i|
-      answer = {"T" => "True", "F" => "False"}[answer] || answer
       matched_answer = @questions[i].question_data[:answers].detect{ |a| a[:text] == answer}
       ["question_#{@questions[i].id}", matched_answer ? matched_answer[:id].to_s : nil]
     }]
@@ -98,9 +98,9 @@ def simple_quiz_with_shuffled_answers(answer_key, *submissions)
     answer, points = answer if answer.is_a?(Array)
     true_false = answer == 'T' || answer == 'F'
     type = true_false ? 'true_false_question' : 'multiple_choice_question'
-    answers = Hash[(true_false ? ['T', 'F'] : 'A'..'D').each_with_index.map { |a, j|
-      ["answer_#{j}", {:answer_text => a, :answer_weight => (a == answer ? 100 : 0), :id => (4 * i + j)}]
-    }]
+    answers = (true_false ? ['T', 'F'] : 'A'..'D').each_with_index.map do |a, j|
+      {:answer_text => a, :answer_weight => (a == answer ? 100 : 0), :id => (4 * i + j)}
+    end
     {:question_data => {:name => "question #{i + 1}", :points_possible => points, :question_type => type, :answers => answers}}
   }
 

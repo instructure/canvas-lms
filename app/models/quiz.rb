@@ -678,6 +678,7 @@ class Quiz < ActiveRecord::Base
     data = entries
     if opts[:persist] != false
       self.quiz_data = data
+
       if !self.survey?
         self.points_possible = possible
       end

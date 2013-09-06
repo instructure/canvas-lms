@@ -655,6 +655,7 @@ class QuizSubmission < ActiveRecord::Base
     # the teacher gets the added burden of going back and manually assigning
     # scores for these questions per student.
     qq = QuizQuestion::Base.from_question_data(q)
+    
     user_answer = qq.score_question(params)
     result = {
       :correct => user_answer.correctness,

@@ -515,12 +515,12 @@ describe QuizSubmission do
         :question_type => "calculated_question",
         :answer_tolerance => 2.0,
         :formulas => [[0, "2*z"]],
-        :variables => [["variable_0", {:scale => 0, :min => 1.0, :max => 10.0, :name => 'z'}]],
-        :answers => [["answer_0", {
+        :variables => [{:scale => 0, :min => 1.0, :max => 10.0, :name => 'z'}],
+        :answers => [{
           :weight => 100,
-          :variables => [["variable_0", {:value => 2.0, :name => 'z'}]],
+          :variables => [{:value => 2.0, :name => 'z'}],
           :answer_text => "4.0"
-        }]],
+        }],
         :question_text => "2 * [z] is ?"
       }
       @quiz.generate_quiz_data(:persist => true)
@@ -544,12 +544,12 @@ describe QuizSubmission do
         :question_type => "calculated_question",
         :answer_tolerance => "10.0%",
         :formulas => [[0, "2*z"]],
-        :variables => [["variable_0", {:scale => 0, :min => 1.0, :max => 10.0, :name => 'z'}]],
-        :answers => [["answer_0", {
+        :variables => [{:scale => 0, :min => 1.0, :max => 10.0, :name => 'z'}],
+        :answers => [{
           :weight => 100,
-          :variables => [["variable_0", {:value => 2.0, :name => 'z'}]],
+          :variables => [{:value => 2.0, :name => 'z'}],
           :answer_text => "4.0"
-        }]],
+        }],
         :question_text => "2 * [z] is ?"
       }
       @quiz.generate_quiz_data(:persist => true)
@@ -590,8 +590,8 @@ describe QuizSubmission do
     it "should create learning outcome results when aligned to assessment questions" do
       course_with_student(:active_all => true)
       @quiz = @course.quizzes.create!(:title => "new quiz", :shuffle_answers => true)
-      @q1 = @quiz.quiz_questions.create!(:question_data => {:name => 'question 1', :points_possible => 1, 'question_type' => 'multiple_choice_question', 'answers' => {'answer_0' => {'answer_text' => '1', 'answer_weight' => '100'}, 'answer_1' => {'answer_text' => '2'}, 'answer_2' => {'answer_text' => '3'},'answer_3' => {'answer_text' => '4'}}})
-      @q2 = @quiz.quiz_questions.create!(:question_data => {:name => 'question 2', :points_possible => 1, 'question_type' => 'multiple_choice_question', 'answers' => {'answer_0' => {'answer_text' => '1', 'answer_weight' => '100'}, 'answer_1' => {'answer_text' => '2'}, 'answer_2' => {'answer_text' => '3'},'answer_3' => {'answer_text' => '4'}}})
+      @q1 = @quiz.quiz_questions.create!(:question_data => {:name => 'question 1', :points_possible => 1, 'question_type' => 'multiple_choice_question', 'answers' => [{'answer_text' => '1', 'answer_weight' => '100'}, {'answer_text' => '2'}, {'answer_text' => '3'}, {'answer_text' => '4'}]})
+      @q2 = @quiz.quiz_questions.create!(:question_data => {:name => 'question 2', :points_possible => 1, 'question_type' => 'multiple_choice_question', 'answers' => [{'answer_text' => '1', 'answer_weight' => '100'}, {'answer_text' => '2'}, {'answer_text' => '3'}, {'answer_text' => '4'}]})
       @outcome = @course.created_learning_outcomes.create!(:short_description => 'new outcome')
       @bank = @q1.assessment_question.assessment_question_bank
       @outcome.align(@bank, @bank.context, :mastery_score => 0.7)
@@ -621,8 +621,8 @@ describe QuizSubmission do
     it "should update learning outcome results when aligned to assessment questions" do
       course_with_student(:active_all => true)
       @quiz = @course.quizzes.create!(:title => "new quiz", :shuffle_answers => true)
-      @q1 = @quiz.quiz_questions.create!(:question_data => {:name => 'question 1', :points_possible => 1, 'question_type' => 'multiple_choice_question', 'answers' => {'answer_0' => {'answer_text' => '1', 'answer_weight' => '100'}, 'answer_1' => {'answer_text' => '2'}, 'answer_2' => {'answer_text' => '3'},'answer_3' => {'answer_text' => '4'}}})
-      @q2 = @quiz.quiz_questions.create!(:question_data => {:name => 'question 2', :points_possible => 1, 'question_type' => 'multiple_choice_question', 'answers' => {'answer_0' => {'answer_text' => '1', 'answer_weight' => '100'}, 'answer_1' => {'answer_text' => '2'}, 'answer_2' => {'answer_text' => '3'},'answer_3' => {'answer_text' => '4'}}})
+      @q1 = @quiz.quiz_questions.create!(:question_data => {:name => 'question 1', :points_possible => 1, 'question_type' => 'multiple_choice_question', 'answers' => [{'answer_text' => '1', 'answer_weight' => '100'}, {'answer_text' => '2'}, {'answer_text' => '3'}, {'answer_text' => '4'}]})
+      @q2 = @quiz.quiz_questions.create!(:question_data => {:name => 'question 2', :points_possible => 1, 'question_type' => 'multiple_choice_question', 'answers' => [{'answer_text' => '1', 'answer_weight' => '100'}, {'answer_text' => '2'}, {'answer_text' => '3'}, {'answer_text' => '4'}]})
       @outcome = @course.created_learning_outcomes.create!(:short_description => 'new outcome')
       @bank = @q1.assessment_question.assessment_question_bank
       @outcome.align(@bank, @bank.context, :mastery_score => 0.7)
@@ -650,8 +650,8 @@ describe QuizSubmission do
       @sub = @quiz.generate_submission(@user)
       @sub.attempt.should eql(2)
       @sub.submission_data = {}
-      question_1 = @q1.question_data[:id]
-      question_2 = @q2.question_data[:id]
+      question_1 = @q1.data[:id]
+      question_2 = @q2.data[:id]
       @sub.submission_data["question_#{question_1}"] = answer_1 + 1
       @sub.submission_data["question_#{question_2}"] = answer_2
       @sub.grade_submission
@@ -778,6 +778,7 @@ describe QuizSubmission do
         "question_1_answer_7397" => "6067",
         "question_1_answer_7398" => "6068",
         "question_1_answer_7399" => "6069",
+        "blah" => "foo"
       })
       user_answer.should == {
         :question_id => 1, :correct => false, :points => 0, :text => "",

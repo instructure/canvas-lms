@@ -49,7 +49,6 @@ class QuizQuestion::MultipleAnswersQuestion < QuizQuestion::Base
         @incorrect_answers += 1
       end
     end
-
     return nil if total_answers == 0
     return correct_answers
   end

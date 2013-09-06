@@ -40,7 +40,7 @@ class QuizQuestion < ActiveRecord::Base
   end
 
   scope :active, where("workflow_state='active' OR workflow_state IS NULL")
-  
+
   def infer_defaults
     if !self.position && self.quiz
       if self.quiz_group
@@ -51,13 +51,13 @@ class QuizQuestion < ActiveRecord::Base
     end
   end
   protected :infer_defaults
-  
+
   def update_quiz
     Quiz.mark_quiz_edited(self.quiz_id)
   end
-  
+
   def question_data=(data)
-    if data[:regrade_option]
+    if data[:regrade_option].present?
       update_question_regrade(data[:regrade_option], data[:regrade_user])
     end
 
@@ -69,27 +69,35 @@ class QuizQuestion < ActiveRecord::Base
     return if data == self.question_data
     data = AssessmentQuestion.parse_question(data, self.assessment_question)
     data[:name] = data[:question_name]
-    write_attribute(:question_data, data)
+    write_attribute(:question_data, data.to_hash)
   end
-  
+
   def question_data
     if data = read_attribute(:question_data)
       if data.class == Hash
         data = write_attribute(:question_data, data.with_indifferent_access)
       end
     end
-    
+
+    unless data.is_a?(QuizQuestion::QuestionData)
+      data = QuizQuestion::QuestionData.new(data || HashWithIndifferentAccess.new)
+    end
+
+    unless data[:id].present? && !self.id
+      data[:id] = self.id
+    end
+
     data
   end
-  
+
   def delete_assessment_question
     if self.assessment_question && self.assessment_question.editable_by?(self)
       self.assessment_question.destroy
     end
   end
-  
+
   def create_assessment_question
-    return if self.question_data && self.question_data[:question_type] == 'text_only_question'
+    return if self.question_data && self.question_data.is_type?(:text_only)
     self.assessment_question ||= AssessmentQuestion.new
     if self.assessment_question.editable_by?(self)
       self.assessment_question.question_data = self.question_data
@@ -100,7 +108,7 @@ class QuizQuestion < ActiveRecord::Base
     end
     true
   end
-  
+
   def self.migrate_question_hash(hash, params)
     if params[:old_context] && params[:new_context]
       migrator = lambda { |value| Course.migrate_content_links(value, params[:old_context], params[:new_context]) }
@@ -122,17 +130,33 @@ class QuizQuestion < ActiveRecord::Base
     hash
   end
 
+  def clone_for(quiz, dup=nil, options={})
+    dup ||= QuizQuestion.new
+    self.attributes.delete_if{|k,v| [:id, :quiz_id, :quiz_group_id, :question_data].include?(k.to_sym) }.each do |key, val|
+      dup.send("#{key}=", val)
+    end
+    data = self.question_data || HashWithIndifferentAccess.new
+    data.delete(:id)
+    if options[:old_context] && options[:new_context]
+      data = QuizQuestion.migrate_question_hash(data, options)
+    end
+    dup.write_attribute(:question_data, data)
+    dup.quiz_id = quiz.id
+    dup
+  end
+
   # QuizQuestion.data is used when creating and editing a quiz, but 
   # once the quiz is "saved" then the "rendered" version of the
   # quiz is stored in Quiz.quiz_data.  Hence, the teacher can
   # be futzing with questions and groups and not affect
   # the quiz, as students see it.
   def data
-    res = (self.question_data || self.assessment_question.question_data) rescue {}
+    res = (self.question_data || self.assessment_question.question_data) rescue QuizQuestion::QuestionData.new(HashWithIndifferentAccess.new)
     res[:assessment_question_id] = self.assessment_question_id
     res[:question_name] = t('defaults.question_name', "Question") if res[:question_name].blank?
     res[:id] = self.id
-    res.with_indifferent_access
+
+    res.to_hash
   end
 
   # All questions will be assigned to the given quiz_group, and will be

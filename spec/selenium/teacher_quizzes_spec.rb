@@ -437,7 +437,7 @@ describe "quizzes" do
       q = quiz_model
       a = bank.assessment_questions.create!
       b = bank.assessment_questions.create!
-      answers = {'answer_0' => {'id' => 1}, 'answer_1' => {'id' => 2}}
+      answers = [{id: 1, answer_text: 'A', weight: 100}, {id: 2, answer_text: 'B', weight: 0}]
       question = q.quiz_questions.create!(:question_data => {
           :name => "first question",
           'question_type' => 'multiple_choice_question',
@@ -463,15 +463,12 @@ describe "quizzes" do
       # QuizSubmissions#extensions when a moderator extends a student's
       # quiz time.
 
-
       quiz_original_end_time = QuizSubmission.last.end_at
-
       keep_trying_until do
         submission = QuizSubmission.last
         submission.end_at = Time.now + 20.minutes
         submission.save!
         quiz_original_end_time < QuizSubmission.last.end_at
-        assert_flash_notice_message /You have been given extra time on this attempt/
         f('.time_running').text.should match /19 Minutes/
       end
     end

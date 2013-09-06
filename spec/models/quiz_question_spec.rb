@@ -21,14 +21,14 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 describe QuizQuestion do
 
   it "should deserialize its json data" do
-    answers = {'answer_0' => {'id' => 1}, 'answer_1' => {'id' => 2}}
+    answers = [{'id' => 1}, {'id' => 2}]
     qd = {'name' => 'test question', 'question_type' => 'multiple_choice_question', 'answers' => answers}
     course
     bank = @course.assessment_question_banks.create!
     a = bank.assessment_questions.create!
     q = QuizQuestion.create(:question_data => qd, :assessment_question => a)
     q.question_data.should_not be_nil
-    q.question_data.class.should == HashWithIndifferentAccess
+    q.question_data.class.should == QuizQuestion::QuestionData
     q.assessment_question_id.should eql(a.id)
     q.question_data == qd
 
@@ -36,7 +36,7 @@ describe QuizQuestion do
     data[:assessment_question_id].should eql(a.id)
     data[:answers].should_not be_empty
     data[:answers].length.should eql(2)
-    data[:answers][0][:weight].should eql(100)
+    data[:answers][0][:weight].should == 100
     data[:answers][1][:weight].should eql(0.0)
   end
 
@@ -49,10 +49,11 @@ describe QuizQuestion do
       @data = {:question_name   => 'test question',
                :points_possible => '1',
                :question_type   => 'multiple_choice_question',
-               :answers         => {'answer_0' => {'answer_text' => '1', 'id' => 1},
-                                    'answer_1' => {'answer_text' => '2', 'id' => 2},
-                                    'answer_1' => {'answer_text' => '3', 'id' => 3},
-                                    'answer_1' => {'answer_text' => '4', 'id' => 4}}}
+               :answers         => [{'answer_text' => '1', 'id' => 1},
+                                    {'answer_text' => '2', 'id' => 2},
+                                    {'answer_text' => '3', 'id' => 3},
+                                    {'answer_text' => '4', 'id' => 4}]}
+
       @question = @quiz.quiz_questions.create(:question_data => @data)
     end
 

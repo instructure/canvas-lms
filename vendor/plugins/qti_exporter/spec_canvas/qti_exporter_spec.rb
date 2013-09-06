@@ -162,8 +162,10 @@ describe Qti::Converter do
     when Array
       a.size.should == b.size
       a.each_with_index do |e,i|
-        match_ignoring(e, b[i], ignoring)
+        match_ignoring(e.to_hash, b[i], ignoring)
       end
+    when QuizQuestion::QuestionData
+      a.to_hash.should == b
     else
       a.should == b
     end

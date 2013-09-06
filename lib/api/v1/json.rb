@@ -33,7 +33,16 @@ module Api::V1::Json
       permissions[:include_permissions] = true
       permissions[:policies] = Array(permissions_to_return)
     end
-    obj.as_json({ :include_root => false,
+
+    json = obj.as_json({ :include_root => false,
                   :permissions => permissions }.merge(opts))
+
+    if block_given?
+      dynamic_attributes = OpenStruct.new
+      yield dynamic_attributes, obj
+      json.merge!(dynamic_attributes.marshal_dump)
+    end
+
+    json
   end
 end

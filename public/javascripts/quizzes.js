@@ -563,6 +563,7 @@ define([
             code = code + "<li>" + htmlEscape(split[cdx]) + "</li>";
           }
         }
+
         if (code) {
           $text.append(I18n.beforeLabel('other_incorrect_matches', "Other Incorrect Match Options") + "<ul class='matching_answer_incorrect_matches_list'>" + code + "</ul>");
         }
@@ -1035,7 +1036,7 @@ define([
     data.answer_exact = data.exact || data.answer_exact;
     data.answer_error_margin = data.answer_error_margin || data.margin;
     data.answer_range_start = data.start || data.answer_range_start;
-    data.answer_range_end = data.end || data.answer_range_end
+    data.answer_range_end = data.end || data.answer_range_end;
 
     var answer = $.extend({}, quiz.defaultAnswerData, data);
     var $answer = $("#answer_template").clone(true).attr('id', '');
@@ -1174,76 +1175,50 @@ define([
 
   function generateFormQuizQuestion(formQuiz) {
     var data = {};
-    for(var name in formQuiz) {
-      if (name.indexOf('questions[question_0]') == 0) {
-        var n = name.replace("questions[question_0]", "question");
-        data[n] = formQuiz[name];
-      }
+    var quiz = formQuiz;
+    if(quiz.questions.length > 0) {
+      data["question"] = quiz.questions[0];
     }
+
     return data;
   }
 
   function generateFormQuiz(quiz) {
-    var data = {};
+    var data = {
+      quiz: {},
+      questions: []
+    };
+
     if (ENV.ASSIGNMENT_ID) {
-      data['quiz[assignment_id]'] = ENV.ASSIGNMENT_ID;
+      data.quiz.assignment_id = ENV.ASSIGNMENT_ID;
     }
-    data['quiz[title]'] = quiz.quiz_name;
-    for(var idx in quiz.questions) {
-      var question = quiz.questions[idx];
-      var id = "questions[question_" + idx + "]";
-      data[id + '[question_name]'] = question.question_name;
-      data[id + '[assessment_question_id]'] = question.assessment_question_id;
-      data[id + '[question_type]'] = question.question_type;
-      data[id + '[points_possible]'] = question.question_points;
-      data[id + '[correct_comments]'] = question.correct_comments;
-      data[id + '[incorrect_comments]'] = question.incorrect_comments;
-      data[id + '[neutral_comments]'] = question.neutral_comments;
-      data[id + '[question_text]'] = question.question_text;
-      data[id + '[regrade_option]'] = question.regrade_option;
-      data[id + '[position]'] = question.position;
-      data[id + '[text_after_answers]'] = question.text_after_answers;
-      data[id + '[matching_answer_incorrect_matches]'] = question.matching_answer_incorrect_matches;
-      for(var jdx in question.formulas) {
-        var jd = id + "[formulas][formula_" + jdx + "]";
-        data[jd] = question.formulas[jdx];
-      }
-      for(var jdx in question.variables) {
-        var jd = id + "[variables][variable_" + jdx + "]";
-        data[jd + '[name]'] = question.variables[jdx].name;
-        data[jd + '[min]'] = question.variables[jdx].min;
-        data[jd + '[max]'] = question.variables[jdx].max;
-        data[jd + '[scale]'] = question.variables[jdx].scale;
-      }
-      data[id + '[answer_tolerance]'] = question.answer_tolerance;
-      data[id + '[formula_decimal_places]'] = question.formula_decimal_places;
-      for(var jdx in question.answers) {
-          var answer = question.answers[jdx];
-          var jd = id + "[answers][answer_" + jdx + "]";
-          data[jd + '[answer_text]'] = answer.answer_text;
-          data[jd + '[answer_html]'] = answer.answer_html;
-          data[jd + '[answer_comments]'] = answer.answer_comment;
-          data[jd + '[answer_comments_html]'] = answer.answer_comment_html;
-          data[jd + '[answer_weight]'] = answer.answer_weight;
-          data[jd + '[answer_match_left]'] = answer.answer_match_left;
-          data[jd + '[answer_match_left_html]'] = answer.answer_match_left_html;
-          data[jd + '[answer_match_right]'] = answer.answer_match_right;
-          data[jd + '[numerical_answer_type]'] = answer.numerical_answer_type;
-          data[jd + '[answer_exact]'] = answer.answer_exact;
-          data[jd + '[answer_error_margin]'] = answer.answer_error_margin;
-          data[jd + '[answer_range_start]'] = answer.answer_range_start;
-          data[jd + '[answer_range_end]'] = answer.answer_range_end;
-          data[jd + '[blank_id]'] = answer.blank_id;
-          data[jd + '[match_id]'] = answer.match_id;
-          data[jd + '[id]'] = answer.id;
-          for(var kdx in answer.variables) {
-            var kd = jd + "[variables][variable_" + kdx + "]";
-            data[kd + '[name]'] = answer.variables[kdx].name;
-            data[kd + '[value]'] = answer.variables[kdx].value;
-          }
-      }
-    }
+
+    data.quiz.title = quiz.quiz_name;
+    quiz.questions.forEach(function(question) {
+      var q = {};
+      q.question_name = question.question_name;
+      q.assessment_question_id = question.assessment_question_id;
+      q.question_type = question.question_type;
+      q.points_possible = question.question_points;
+      q.correct_comments = question.correct_comments;
+      q.incorrect_comments = question.incorrect_comments;
+      q.neutral_comments = question.neutral_comments;
+      q.question_text = question.question_text;
+      q.regrade_option = question.regrade_option;
+      q.position = question.position;
+      q.text_after_answers = question.text_after_answers;
+      q.matching_answer_incorrect_matches = question.matching_answer_incorrect_matches;
+      q.formulas = question.formulas;
+      q.variables = question.variables;
+      q.answer_tolerance = question.answer_tolerance;
+      q.formula_decimal_places = question.formula_decimal_places;
+
+      q.answers = question.answers;
+      data.questions.push(q);
+    });
+
     return data;
+
   }
 
   function addHTMLFeedback($container, question_data, name) {
@@ -1691,7 +1666,7 @@ define([
       var $question = $(this).parents(".question");
       var questionID = $(this).closest('.question_holder').find('.display_question').attr('id');
       var question = $question.getTemplateData({
-        textValues: ['question_type', 'correct_comments', 'incorrect_comments', 'neutral_comments', 'question_name', 'question_points', 'answer_selection_type', 'blank_id'],
+        textValues: ['question_type', 'correct_comments', 'incorrect_comments', 'neutral_comments', 'question_name', 'question_points', 'answer_selection_type', 'blank_id', 'matching_answer_incorrect_matches'],
         htmlValues: ['question_text', 'correct_comments_html', 'incorrect_comments_html', 'neutral_comments_html']
       });
       question.question_text = $question.find("textarea[name='question_text']").val();
@@ -1699,6 +1674,7 @@ define([
       $question.find(".matching_answer_incorrect_matches_list li").each(function() {
         matches.push($(this).text());
       });
+
       question.matching_answer_incorrect_matches = matches.join("\n");
       question.question_points = parseFloat(question.question_points, 10);
       if (isNaN(question.question_points)) { question.question_points = 0; }
@@ -2347,7 +2323,7 @@ define([
           counter++;
           var question = question_results.shift();
           if (question) {
-            quiz.addExistingQuestion(question.quiz_question);
+            quiz.addExistingQuestion(question);
             if (counter > 5) {
               setTimeout(nextQuestion, 50);
             } else {
@@ -2612,8 +2588,9 @@ define([
       $.ajaxJSON(url, method, questionData, function(data) {
         $displayQuestion.loadingImage('remove');
         $displayQuestion.find('.question_name').focus();
-        var question = data.quiz_question || data.assessment_question;
-        var questionData = $.extend({}, question, question.question_data);
+
+        var questionData = data;
+
         // questionData.assessment_question_id might be null now because
         // question.question_data.assessment_quesiton_id might be null but
         // question.assessment_question_id is the right value. because $.extend
@@ -2629,7 +2606,7 @@ define([
         $displayQuestion.trigger('saved');
         $("#unpublished_changes_message").slideDown();
         if (question) {
-          REGRADE_OPTIONS[question.id] = question.question_data.regrade_option;
+          REGRADE_OPTIONS[question.id] = question.regrade_option;
           delete REGRADE_DATA['question_' + question.id];
         }
       }, function(data) {
