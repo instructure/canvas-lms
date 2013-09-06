@@ -40,14 +40,15 @@ define([
   var lastSuccessfulSubmissionData = null;
   var quizSubmission = (function() {
     var timeMod = 0,
-        started_at =  $(".started_at"),
-        end_at = $(".end_at"),
-        startedAtText = started_at.text(),
-        endAtText = end_at.text(),
+        startedAt =  $(".started_at"),
+        endAt = $(".end_at"),
+        startedAtText = startedAt.text(),
+        endAtText = endAt.text(),
         endAtParsed = endAtText && new Date(endAtText),
-        $countdown_seconds = $(".countdown_seconds"),
-        $time_running_time_remaining = $(".time_running,.time_remaining"),
-        $last_saved = $('#last_saved_indicator');
+        inBackground = false,
+        $countdownSeconds = $(".countdown_seconds"),
+        $timeRunningTimeRemaining = $(".time_running,.time_remaining"),
+        $lastSaved = $('#last_saved_indicator');
 
     return {
       countDown: null,
@@ -56,12 +57,14 @@ define([
       oneMinuteDeadline: false,
       submitting: false,
       dialogged: false,
+      inBackground: false,
       contentBoxCounter: 0,
       lastSubmissionUpdate: new Date(),
       currentlyBackingUp: false,
-      started_at: started_at,
-      end_at: end_at,
-      time_limit: parseInt($(".time_limit").text(), 10) || null,
+      startedAt: startedAt,
+      endAt: endAt,
+      startedAtText: startedAtText,
+      timeLimit: parseInt($(".time_limit").text(), 10) || null,
       timeLeft: parseInt($(".time_left").text()) * 1000,
       oneAtATime: $("#submit_quiz_form").hasClass("one_question_at_a_time"),
       cantGoBack: $("#submit_quiz_form").hasClass("cant_go_back"),
@@ -70,7 +73,9 @@ define([
       updateSubmission: function(repeat, beforeLeave) {
         if(quizSubmission.submitting && !repeat) { return; }
         var now = new Date();
-        if((now - quizSubmission.lastSubmissionUpdate) < 1000) { return }
+        if((now - quizSubmission.lastSubmissionUpdate) < 1000) { 
+          return;
+        }
         if(quizSubmission.currentlyBackingUp) { return; }
         quizSubmission.currentlyBackingUp = true;
         quizSubmission.lastSubmissionUpdate = new Date();
@@ -81,7 +86,7 @@ define([
           data[$(this).attr('id') + "_marked"] = value;
         });
 
-        $last_saved.text(I18n.t('saving', 'Saving...'));
+        $lastSaved.text(I18n.t('saving', 'Saving...'));
         var url = $(".backup_quiz_submission_url").attr('href');
         // If called before leaving the page (ie. onbeforeunload), we can't use any async or FF will kill the PUT request.
         if (beforeLeave){
@@ -101,7 +106,9 @@ define([
             var thisSubmissionData = _.clone(submissionData);
             // If this is a timeout-based submission and the data is the same as last time,
             // palliate the server by skipping the data submission
-            if (repeat && _.isEqual(submissionData, lastSuccessfulSubmissionData)) {
+            if (!quizSubmission.inBackground && repeat && _.isEqual(submissionData, lastSuccessfulSubmissionData)) {
+              $lastSaved.text(I18n.t('saving_not_needed', "No new data to save."));
+
               quizSubmission.currentlyBackingUp = false;
               setTimeout(function() { quizSubmission.updateSubmission(true) }, 30000);
               return;
@@ -110,27 +117,28 @@ define([
               // Success callback
               function(data) {
                 lastSuccessfulSubmissionData = thisSubmissionData;
-                $last_saved.text(I18n.t('saved_at', 'Quiz saved at %{t}', { t: $.friendlyDatetime(new Date()) }));
+                $lastSaved.text(I18n.t('saved_at', 'Quiz saved at %{t}', { t: $.friendlyDatetime(new Date()) }));
                 quizSubmission.currentlyBackingUp = false;
+                quizSubmission.inBackground = false;
                 if(repeat) {
                   setTimeout(function() {quizSubmission.updateSubmission(true) }, 30000);
                 }
                 if(data && data.end_at) {
                   var endAtFromServer     = Date.parse(data.end_at),
-                      submissionEndAt     = Date.parse(quizSubmission.end_at.text()),
+                      submissionEndAt     = Date.parse(quizSubmission.endAt.text()),
                       serverEndAtTime     = endAtFromServer.getTime(),
                       submissionEndAtTime = submissionEndAt.getTime();
 
                   quizSubmission.timeLeft = data.time_left * 1000;
 
-                  // if the new end_at from the server is different than our current end_at, then notify
+                  // if the new endAt from the server is different than our current endAt, then notify
                   // the user that their time limit's changed and let updateTime do the rest.
                   if (serverEndAtTime !== submissionEndAtTime) {
                     serverEndAtTime > submissionEndAtTime ?
                       $.flashMessage(I18n.t('notices.extra_time', 'You have been given extra time on this attempt')) :
                       $.flashMessage(I18n.t('notices.less_time', 'Your time for this quiz has been reduced.'));
 
-                    quizSubmission.end_at.text(data.end_at);
+                    quizSubmission.endAt.text(data.end_at);
                     endAtText   = data.end_at;
                     endAtParsed = new Date(data.end_at);
                   }
@@ -187,15 +195,29 @@ define([
         }
       },
 
+      updateCounter: function() {
+        $(".time_header").text(I18n.beforeLabel('time_elapsed', "Time Elapsed"));
+        var now = new Date().getTime();
+        var startedAt = Date.parse(quizSubmission.startedAtText).getTime();
+        var timeElapsed = now - startedAt;
+
+        quizSubmission.updateTimeString(timeElapsed);
+      },
+
       updateTime: function() {
         var timeLeft = quizSubmission.timeLeft = quizSubmission.timeLeft - quizSubmission.clockInterval;
+
+        if(!timeLeft) {
+          return quizSubmission.updateCounter();
+        }
+
         var now = new Date();
-        var end_at = quizSubmission.time_limit ? endAtText : null;
+        var endAt = quizSubmission.timeLimit ? endAtText : null;
         timeMod = (timeMod + 1) % 120;
-        if(timeMod == 0 && !end_at && !quizSubmission.twelveHourDeadline) {
+        if(timeMod == 0 && !endAt && !quizSubmission.twelveHourDeadline) {
           var end = endAtParsed;
-          if(!quizSubmission.time_limit && (end - now) < 43200000) {
-            end_at = endAtText;
+          if(!quizSubmission.timeLimit && (end - now) < 43200000) {
+            endAt = endAtText;
           }
         }
 
@@ -203,9 +225,10 @@ define([
           if(timeLeft <= 0) {
             timeLeft = 0;
           }
-          var d = new Date(timeLeft);
-          $countdown_seconds.text(d.getUTCSeconds());
-          if(timeLeft <= 0 && !quizSubmission.submitting) {
+          var s = new Date((quizSubmission.countDown - now.getTime())).getUTCSeconds();
+          if(now.getTime() < quizSubmission.countDown) { $countdownSeconds.text(s); }
+
+          if(s <= 0 && !quizSubmission.submitting) {
             quizSubmission.submitting = true;
             quizSubmission.submitQuiz();
           }
@@ -217,6 +240,7 @@ define([
           if(timeLeft < 1000 && !quizSubmission.dialogged) {
             quizSubmission.dialogged = true;
             quizSubmission.countDown = new Date(now.getTime() + 10000);
+
             $("#times_up_dialog").show().dialog({
               title: I18n.t('titles.times_up', "Time's Up!"),
               width: "auto",
@@ -247,10 +271,12 @@ define([
             $.flashMessage(I18n.t('notices.twelve_hours_left', "Twelve Hours Left"));
           }
         }
+
         quizSubmission.updateTimeString(timeLeft);
       },
-      updateTimeString: function(timeLeft) {
-        var date = new Date(Math.abs(timeLeft));
+
+      updateTimeString: function(timeDiff) {
+        var date = new Date(Math.abs(timeDiff));
         var yr = date.getUTCFullYear() - 1970;
         var mon = date.getUTCMonth();
         var day = date.getUTCDate() - 1;
@@ -264,7 +290,7 @@ define([
         if(hr) { times.push(I18n.t('hours_count', "Hour", {'count': hr})); }
         if(true || min) { times.push(I18n.t('minutes_count', "Minute", {'count': min})); }
         if(true || sec) { times.push(I18n.t('seconds_count', "Second", {'count': sec})); }
-        $time_running_time_remaining.text(times.join(", "));
+        $timeRunningTimeRemaining.text(times.join(", "));
       },
       updateFinalSubmitButtonState: function() {
         var allQuestionsAnswered = ($("#question_list li:not(.answered)").length == 0);
@@ -308,6 +334,14 @@ define([
       }
     };
   })();
+
+  $(window).focus(function(evt) {
+    quizSubmission.updateSubmission();
+  });
+
+  $(window).blur(function(evt) {
+    quizSubmission.inBackground = true;
+  });
 
   $(document).mousedown(function(event) {
     lastAnswerSelected = $(event.target).parents(".answer")[0];
