@@ -1148,7 +1148,7 @@ class Assignment < ActiveRecord::Base
         :methods => [:scribdable?, :scribd_doc, :submission_history, :late],
         :only => submission_fields
       )
-      if json['submission_history']
+      if json['submission_history'] && quiz.nil?
         json['submission_history'].map! do |version|
           version.as_json(
             :include => {
@@ -1166,6 +1166,18 @@ class Assignment < ActiveRecord::Base
               end
             end
           end
+        end
+      elsif quiz
+        quiz_submission_versions = sub.quiz_submission.versions.reverse
+        json['submission_history'] = quiz_submission_versions.map do |v|
+          qs = v.model
+          {submission: {
+            grade: qs.score,
+            show_grade_in_dropdown: true,
+            submitted_at: qs.finished_at,
+            late: qs.overdue?,
+            version: v.number,
+          }}
         end
       end
       json

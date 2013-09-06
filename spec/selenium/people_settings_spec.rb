@@ -251,7 +251,7 @@ describe "course people" do
         student_in_course :course => @course
         e = course_with_observer(:course => @course, :role_name => "custom observer")
 
-        expect_new_page_load { go_to_people_page }
+        go_to_people_page
 
         use_link_dialog(@observer) do
           select_from_auto_complete(@student.name, 'student_input')

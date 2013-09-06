@@ -17,6 +17,7 @@
  */
 
 define([
+  'underscore',
   'INST' /* INST */,
   'i18n!gradebook',
   'jquery' /* $ */,
@@ -47,7 +48,7 @@ define([
   'vendor/scribd.view' /* scribd */,
   'vendor/spin' /* new Spinner */,
   'vendor/ui.selectmenu' /* /\.selectmenu/ */
-], function(INST, I18n, $, userSettings, htmlEscape, rubricAssessment, turnitinInfoTemplate, turnitinScoreTemplate) {
+], function(_, INST, I18n, $, userSettings, htmlEscape, rubricAssessment, turnitinInfoTemplate, turnitinScoreTemplate) {
 
   // fire off the request to get the jsonData
   window.jsonData = {};
@@ -1176,26 +1177,31 @@ define([
 
     refreshSubmissionsToView: function(){
       var innerHTML = "";
-      if (this.currentStudent.submission.submission_history.length > 0) {
-        submissionToSelect = this.currentStudent.submission.submission_history[this.currentStudent.submission.submission_history.length - 1].submission;
+      var s = this.currentStudent.submission;
+      var submissionHistory;
 
-        $.each(this.currentStudent.submission.submission_history, function(i, s){
-          s = s.submission;
-          var submittedAt = s.submitted_at && $.parseFromISO(s.submitted_at),
-              late        = s['late'];
+      if ((submissionHistory = s.submission_history).length > 0) {
+        var submissionToSelect = _(submissionHistory).last();
 
-          innerHTML += "<option " + (late ? "class='late'" : "") + " value='" + i + "' " +
-                        (s == submissionToSelect ? "selected='selected'" : "") + ">" +
+        _(submissionHistory).each(function(o, i) {
+          var s           = o.submission;
+              submittedAt = s.submitted_at && $.parseFromISO(s.submitted_at),
+              late        = s.late,
+              value       = s.version || i;
+
+          innerHTML += "<option " + (late ? "class='late'" : "") + " value='" + value + "' " +
+                        (o == submissionToSelect ? "selected='selected'" : "") + ">" +
                         (submittedAt ? submittedAt.datetime_formatted : I18n.t('no_submission_time', 'no submission time')) +
                         (late ? " " + I18n.t('loud_late', "LATE") : "") +
-                        (s.grade && s.grade_matches_current_submission ? " (" + I18n.t('grade', "grade: %{grade}", {'grade': s.grade}) + ')' : "") +
+                        (s.grade && (s.grade_matches_current_submission || s.show_grade_in_dropdown) ? " (" + I18n.t('grade', "grade: %{grade}", {'grade': s.grade}) + ')' : "") +
                        "</option>";
+
         });
       }
       $submission_to_view.html(innerHTML);
 
       //if there are multiple submissions
-      if (this.currentStudent && this.currentStudent.submission && this.currentStudent.submission.submission_history && this.currentStudent.submission.submission_history.length > 1 ) {
+      if (submissionHistory.length > 1) {
         $multiple_submissions.show();
         $single_submission.hide();
       }

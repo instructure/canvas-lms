@@ -153,9 +153,7 @@ class SubmissionsController < ApplicationController
       respond_to do |format|
         json_handled = false
         if params[:preview]
-          # this if was put it by ryan, it makes it so if they pass a ?preview=true&version=2 in the url that it will load the second version in the
-          # submission_history of that submission
-          if params[:version]
+          if params[:version] && !@assignment.quiz
             @submission = @submission.submission_history[params[:version].to_i]
           end
 
@@ -163,7 +161,16 @@ class SubmissionsController < ApplicationController
           if @assignment.quiz && @context.is_a?(Course) && @context.user_is_student?(@current_user) && !@context.user_is_instructor?(@current_user)
             format.html { redirect_to(named_context_url(@context, :context_quiz_url, @assignment.quiz.id, :headless => 1)) }
           elsif @submission.submission_type == "online_quiz" && @submission.quiz_submission_version
-            format.html { redirect_to(named_context_url(@context, :context_quiz_history_url, @assignment.quiz.id, :user_id => @submission.user_id, :headless => 1, :version => @submission.quiz_submission_version)) }
+            format.html {
+              quiz_params = {
+                headless: 1,
+                user_id: @submission.user_id,
+                version: params[:version] || @submission.quiz_submission_version
+              }
+              redirect_to named_context_url(@context,
+                                            :context_quiz_history_url,
+                                            @assignment.quiz.id, quiz_params)
+            }
           else
             format.html { render :action => "show_preview" }
           end

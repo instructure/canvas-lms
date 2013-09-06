@@ -46,7 +46,10 @@ describe "speed grader" do
     @assignment.save!
     @quiz = Quiz.find_by_assignment_id(@assignment.id)
     @quiz.update_attribute(:anonymous_submissions, true)
-    student_submission
+    student_in_course
+    qs = @quiz.generate_submission(@student)
+    qs.start_grading
+    qs.complete
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
     keep_trying_until {
       fj('#this_student_has_a_submission').should be_displayed
@@ -112,6 +115,37 @@ describe "speed grader" do
     in_frame('speedgrader_iframe') do
       f('#content').text.should match(/User/)
       f('#content').text.should_not match(/nobody@example.com/)
+    end
+  end
+
+  it "lets you view previous quiz submissions" do
+    @assignment.update_attributes! points_possible: 10,
+                                   submission_types: 'online_quiz',
+                                   title: "Quiz"
+    @quiz = Quiz.find_by_assignment_id(@assignment.id)
+
+    student_in_course
+    2.times do |i|
+      qs = @quiz.generate_submission(@student)
+      opts = i == 0 ? {finished_at: Date.today - 7} : {}
+      qs.grade_submission(opts)
+    end
+
+    get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+
+    submission_dropdown = f("#submission_to_view")
+    submission_dropdown.should be_displayed
+
+    submissions = submission_dropdown.find_elements(:css, "option")
+    submissions.size.should == 2
+
+    submissions.each do |s|
+      s.click
+      submission_date = s.text
+      in_frame('speedgrader_iframe') do
+        wait_for_ajaximations
+        f('.quiz-submission').text.should include submission_date
+      end
     end
   end
 
