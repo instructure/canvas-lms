@@ -462,6 +462,24 @@ module ApplicationHelper
     end
   end
 
+  def embedded_chat_visible
+    @show_embedded_chat != false &&
+      !@embedded_view &&
+      !@body_class_no_headers &&
+      @context.is_a?(Course) &&
+      Canvas::Plugin.find(:embedded_chat).enabled? &&
+      external_tool_tab_visible('chat')
+  end
+
+  def external_tool_tab_visible(tool_id)
+    tool = @context.context_external_tools.active.find_by_tool_id(tool_id)
+    tool ||= ContextExternalTool.active.where(:context_type => 'Account', :context_id => @context.account_chain_ids, :tool_id => 'chat').first
+    return false unless tool
+    tc = @context.tab_configuration.find {|tc| tc['id'] == tool.asset_string}
+    return true unless tc # default to visible tabs if not hidden explicitly
+    tc['hidden'] != true
+  end
+
   def license_help_link
     @include_license_dialog = true
     link_to(image_tag('help.png'), '#', :class => 'license_help_link no-hover', :title => "Help with content licensing")

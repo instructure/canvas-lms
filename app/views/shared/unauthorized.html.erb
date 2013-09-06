@@ -7,6 +7,7 @@
 
 <% end %>
 <% @show_left_side = false %>
+<% @show_embedded_chat = false %>
 <% needs_login = (!@current_user && !@files_domain) %>
 <div id="unauthorized_holder">
 <% if (@unauthorized_user && @current_user && @current_user != @unauthorized_user) || @unauthorized_user || @unauthorized_message || @context || @needs_cookies %>
