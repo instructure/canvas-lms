@@ -557,13 +557,13 @@ pt:
       account_reports: 
         outcomes: 
           course: 
-            radio: Disciplinass
+            radio: Cursos
           order: 
             label: Ordem
           outcome: 
             radio: Resultados
           user: 
-            radio: utilizadores
+            radio: Utilizadores
     provisioning_csv_description: 
       account_reports: 
         sis_export: 
@@ -1389,13 +1389,13 @@ pt:
       one: "1 grupo"
       other: "%{count} grupos"
     assignment_list_item: 
-      delete: Excluir
+      delete: Eliminar
       delete_asssignment_title: "Eliminar esta tarefa"
       due_date: Prazo
       module: Módulo
       multiple_modules: "Vários módulos"
       points_possible: "%{pointsPossible} pts"
-      settings: Configurações
+      settings: Definições
     assignment_locked: 
       assignment_locked: "Esta tarefa está travada a partir de *%{lock_at}*"
       assignment_unlocked_from: "Esta tarefa está travada até *%{unlock_at}*"
@@ -2834,7 +2834,7 @@ pt:
     index: 
       page_title: "Importar conteúdo"
     issues: problemas
-    loading: Carregando...
+    loading: "A carregar..."
     migration_converter: 
       cancel_migration: Cancelar
       default_option: "Selecionar um"
@@ -3429,7 +3429,7 @@ pt:
     hide: Ocultar
     index: 
       add_recipients_instructions: "As pessoas que forem adicionadas à conversa poderão ver todas as mensagens anteriores."
-      conversations_intro: "Introdução de conversa"
+      conversations_intro: "Introdução de conversas"
       help: Ajuda
       inbox_actions: 
         delete: Excluir
@@ -3564,7 +3564,7 @@ pt:
       other: "%{count} pessoas"
     recipient_error: "A disciplina ou o grupo que selecionou não tem destinatários válidos"
     select_all: "Selecionar tudo"
-    star: MArcar
+    star: Marcar
     title: 
       add_recipients: "Adicionar destinatários"
       forward_messages: "Reencaminhar mensagens"
@@ -4437,7 +4437,7 @@ pt:
     message_sent: "Mensagem enviada"
     show_more_link: 
       show_less: "Mostrar menos"
-      show_more: "Mostrar menos"
+      show_more: "Mostrar mais"
   date: 
     abbr_day_names: 
       - Dom
@@ -4581,14 +4581,14 @@ pt:
       other: Outro
       other_lms: Outro
       other_title: Outro
-      personalize_demo: "Personalize a sua demonstração"
+      personalize_demo: "Personalizar a demonstração"
       personalizing: "A personalizar..."
       proprietary_lms: Doméstico/Exclusivo
       provost: Provost
       ready: Pronto!
       school_admin: "Administrador de escola"
       sign_up_to_canvas: "Registe-se para experimentar o Canvas"
-      specify_lms: "Especifique o seu LMS atual ou selecione \"nenhum\""
+      specify_lms: "Especifique o seu LMS atual ou selecione 'nenhum'"
       specify_size: "Especifique o tamanho da sua organização"
       student: Aluno
       subscribe: "Quero receber notícias, sugestões e informações da Instructure"
@@ -9263,7 +9263,7 @@ pt:
         user_agent: "Agente do utilizador"
   pages: 
     cancel_button: Cancelar
-    delete_button: Excluir
+    delete_button: Eliminar
     delete_confirmation: "Tem a certeza de que pretende eliminar esta página wiki?"
     delete_dialog_title: "Eliminar página wiki"
     deleting_button: "A eliminar..."
@@ -9277,7 +9277,7 @@ pt:
       delete_failed: "Não foi possível eliminar a página \"%{title}\"."
       page_deleted: "A página \"%{title}\" foi eliminada."
     save_button: Guardar
-    saving_button: Guardando...
+    saving_button: "A guardar..."
   paginated_collection: 
     no_items: "Nenhum item."
   paginated_list: 
@@ -10184,7 +10184,7 @@ pt:
       invalid_quiz_type: "O tipo de teste não é válido"
     question_name_counter: "Pergunta %{question_number}"
     regrade: 
-      give_everyone_full_credit: "Atribuir pontuação total a todos para esta pergunta."
+      give_everyone_full_credit: "Atribuir pontuação total a todos nesta pergunta."
       no_scores_reduced: "Atribuir pontos por respostas corrigidas e respostas anteriormente corretas (*nenhuma pontuação será reduzida*)"
       regrade_options: "Opções de reavaliação *(para alunos que já responderam a esta pergunta):*"
       some_scores_reduced: "Atribuir pontos apenas pela resposta correta (*as pontuações de alguns alunos poderão ser reduzidas*)"
@@ -11075,7 +11075,7 @@ pt:
     statistics_crumb: Estatísticas
     submission_version: 
       attempt_number: "Tentativa %{att_no}"
-      kept: GUARDADO
+      kept: MANTIDO
       latest: "MAIS RECENTE"
     submission_versions: 
       attempt: Tentativa
@@ -12538,8 +12538,8 @@ pt:
     announcement: Anúncio
     announcements: Anúncios
     assignments: Tarefas
-    delete_quiz: "Excluir teste"
-    delete_survey: "Excluir questionário"
+    delete_quiz: "Eliminar teste"
+    delete_survey: "Eliminar questionário"
     discussion: Discussão
     discussions: Discussões
     edit_quiz: "Editar teste"
@@ -13030,7 +13030,7 @@ pt:
       buttons: 
         edit: Editar
         view_all_pages: "Ver todas as páginas"
-      delete_wiki: Excluir
+      delete_wiki: Eliminar
       toolbar_menu: 
         settings: Definições
     wiki_page_edit: 
@@ -13078,7 +13078,7 @@ pt:
         edit: Editar
         remove_front_page: "Remover como página inicial"
         set_front_page: "Definir como primeira página"
-        settings: Configurações
+        settings: Definições
   wiki_page: 
     atom_author: "Página Wiki"
     atom_entry_title: "Página do wiki, %{course_or_group_name}: %{page_title}"
@@ -13188,7 +13188,7 @@ pt:
       wiki_description_header: "Para que serve um wiki?"
   wiki_pages_api: 
     cannot_have_unpublished_front_page: "Não é possível anular a publicação da página inicial"
-    cannot_hide_front_page: "Não é possível esconder a página inicial dos alunos"
+    cannot_hide_front_page: "Não é possível ocultar a página inicial dos alunos"
     cannot_update_editing_roles: "Não tem permissão para editar as funções de edição desta página wiki"
     cannot_update_front_page: "Não tem permissão para alterar a primeira página wiki"
     cannot_update_hide_from_students: "Não tem permissão para atualizar o sinalizador de ocultação de alunos desta página wiki"
