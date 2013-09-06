@@ -157,7 +157,9 @@
 
                         // INSTRUCTURE
                         if (_this.options.useSubmenus) {
-                          _liA.push('<a role="menuitem" aria-haspopup="true" tabindex="-1" href="#">'+label+'</a>'+
+                          _liA.push(
+                            '<div class="div-contain"><div class="divider"></div></div>'+
+                            '<a role="menuitem" aria-haspopup="true" tabindex="-1" href="#">'+label+'</a>'+
                             '<ul class="dropdown-menu" role="group">'
                             );
                           _subLiA.push(_this.createA(text, "opt " + optionClass, inline, index, $this ));
