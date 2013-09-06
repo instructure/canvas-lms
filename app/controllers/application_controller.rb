@@ -1138,8 +1138,16 @@ class ApplicationController < ActionController::Base
   helper_method :calendar_url_for, :files_url_for
 
   def conversations_path(params={})
-    hash = params.keys.empty? ? '' : "##{params.to_json.unpack('H*').first}"
-    "/conversations#{hash}"
+    if @current_user and @current_user.preferences[:use_new_conversations]
+      query_string = params.slice(:context_id, :user_id, :user_name).inject([]) do |res, (k, v)|
+        res << "#{k}=#{v}"
+        res
+      end.join('&')
+      "/conversations?#{query_string}"
+    else
+      hash = params.keys.empty? ? '' : "##{params.to_json.unpack('H*').first}"
+      "/conversations#{hash}"
+    end
   end
   helper_method :conversations_path
   

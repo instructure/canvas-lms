@@ -238,8 +238,20 @@ module ApplicationHelper
     (context ? context.class.base_ar_class : context.class).name.underscore
   end
 
-  def message_user_path(user)
-    conversations_path(:user_id => user.id)
+  def message_user_path(user, context = nil)
+    context = context || @context
+    context = nil unless context.is_a?(Course)
+    conversations_path(user_id: user.id, user_name: user.name,
+                       context_id: context.try(:asset_string))
+  end
+
+  # Public: Determine if the currently logged-in user is an account or site admin.
+  #
+  # Returns a boolean.
+  def current_user_is_account_admin
+    [@domain_root_account, Account.site_admin].map do |account|
+      account.membership_for_user(@current_user)
+    end.any?
   end
 
   def hidden(include_style=false)

@@ -26,9 +26,20 @@ require [
       confirmDelete: I18n.t('confirm.delete_conversation', 'Are you sure you want to delete your copy of this conversation? This action cannot be undone.')
 
     initialize: ->
-      @_initCollections()
+      dfd = @_initCollections()
       @_initViews()
       @_attachEvents()
+      dfd.then(@_replyFromRemote) if @_isRemoteLaunch()
+
+    # Public: Pull a value from the query string.
+    #
+    # name - The name of the query string param.
+    #
+    # Returns a string value or null.
+    param: (name) ->
+      regex = new RegExp("#{name}=([^&]+)")
+      value = window.location.search.match(regex)
+      if value then decodeURIComponent(value[1]) else null
 
     onSelected: (model) =>
       @header.onModelChange(null, @model)
@@ -112,6 +123,23 @@ require [
 
     onCourse: (course) =>
       @list.updateCourse(course)
+
+    # Internal: Determine if a reply was launched from another URL.
+    #
+    # Returns a boolean.
+    _isRemoteLaunch: ->
+      !!window.location.search.match(/user_id/)
+
+    # Internal: Open and populate the new message dialog from a remote launch.
+    #
+    # Returns nothing.
+    _replyFromRemote: =>
+      @compose.show null,
+        user:
+          id: @param('user_id')
+          name: @param('user_name')
+        context  : @param('context_id')
+        remoteLaunch: true
 
     _initCollections: () ->
       @courses = 
