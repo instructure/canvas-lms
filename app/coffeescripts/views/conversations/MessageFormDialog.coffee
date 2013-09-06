@@ -90,6 +90,7 @@ define [
         @message = options?.message || @model.messageCollection.at(0)
       @to            = options?.to
       @returnFocusTo = options.trigger if options.trigger
+      @launchParams = _.pick(options, 'context', 'user') if options.remoteLaunch
 
       @render()
       super
@@ -144,6 +145,7 @@ define [
       $textArea.elastic()
 
     onCourse: (course) =>
+      return if !@recipientView.currentContext and course.id == ''
       @recipientView.setContext(course, true)
       @$contextCode.val(if course?.id then course.id else '')
 
@@ -168,6 +170,8 @@ define [
       if @model
         # TODO: I imagine we'll be changing this
         @courseView.setValue("course_" + _.keys(@model.get('audience_contexts').courses)[0])
+      else if @launchParams
+        @courseView.setValue(@launchParams.context) if @launchParams.context
       else
         @courseView.setValue(@defaultCourse)
       @courseView.focus()
@@ -192,6 +196,8 @@ define [
           if tokens.length > 1
             tokens = _.filter(tokens, (t) -> t.id != ENV.current_user_id)
         @recipientView.setTokens(tokens)
+
+      @recipientView.setTokens([@launchParams.user]) if @launchParams
 
       if @tokenInput
         @tokenInput.change = @recipientIdsChanged
