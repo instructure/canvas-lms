@@ -1800,21 +1800,25 @@ class User < ActiveRecord::Base
   def cached_recent_stream_items(opts={})
     expires_in = 1.day
 
-    if opts[:contexts]
-      items = []
-      Array(opts[:contexts]).each do |context|
-        items.concat(
-                   Rails.cache.fetch(StreamItemCache.recent_stream_items_key(self, context.class.base_class.name, context.id),
-                                     :expires_in => expires_in) {
-                     recent_stream_items(:context => context)
-                   })
+    # just cache on the user's shard... makes cache invalidation much
+    # easier if we visit other shards
+    shard.activate do
+      if opts[:contexts]
+        items = []
+        Array(opts[:contexts]).each do |context|
+          items.concat(
+                     Rails.cache.fetch(StreamItemCache.recent_stream_items_key(self, context.class.base_class.name, context.id),
+                                       :expires_in => expires_in) {
+                       recent_stream_items(:context => context)
+                     })
+        end
+        items.sort { |a,b| b.id <=> a.id }
+      else
+        # no context in cache key
+        Rails.cache.fetch(StreamItemCache.recent_stream_items_key(self), :expires_in => expires_in) {
+          recent_stream_items
+        }
       end
-      items.sort { |a,b| b.id <=> a.id }
-    else
-      # no context in cache key
-      Rails.cache.fetch(StreamItemCache.recent_stream_items_key(self), :expires_in => expires_in) {
-        recent_stream_items
-      }
     end
   end
 

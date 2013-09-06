@@ -653,7 +653,11 @@ class UsersController < ApplicationController
   end
 
   def ignore_stream_item
-    StreamItemInstance.find_by_user_id_and_stream_item_id(@current_user.id, params[:id]).try(:update_attribute, :hidden, true)
+    @current_user.shard.activate do # can't just pass in the user's shard to relative_id_for, since local ids will be incorrectly scoped to the current shard, not the user's
+      if item = @current_user.stream_item_instances.where(stream_item_id: Shard.relative_id_for(params[:id])).first
+        item.update_attribute(:hidden, true) # observer handles cache invalidation
+      end
+    end
     render :json => { :hidden => true }
   end
 
