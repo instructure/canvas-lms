@@ -4,6 +4,7 @@
 $subtleBorderColor: #e5e5e5;
 
 .compose-message-dialog {
+  overflow: visible;
 
   .ui-dialog-titlebar {
     border-bottom: 1px solid $subtleBorderColor;
@@ -48,7 +49,7 @@ $subtleBorderColor: #e5e5e5;
 
 #compose-new-message {
   padding: 0;
-  overflow: hidden;
+  overflow: visible;
   margin: 0;
 
   form {
