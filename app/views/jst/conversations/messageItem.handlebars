@@ -2,7 +2,7 @@
 	<div class="span8 user-info">
 		<img src="{{author.avatar_url}}" alt="" class="avatar pull-left" />
     <div class="message-author-and-participants">
-      <a href="#" class="username">{{author.name}}{{#if participants.length}},{{/if}}</a>
+      <b class="username">{{author.name}}</b>{{#if participants.length}},{{/if}}
 
       <span class="message-participants-wrapper">
         <span class="message-participants"
@@ -36,27 +36,26 @@
       <li>
         <a href="#"
            class="icon-reply-2 reply-btn"
-           title="{{#t "reply"}}Reply{{/t}}">
+           title="{{#t "reply"}}Reply{{/t}}"
+           data-tooltip>
           <span class="screenreader-only">{{#t "reply"}}Reply{{/t}}</span>
-        </a>
-      </li>
-      <li>
-        <a href="#"
-           class="icon-reply-all-2 reply-all-btn"
-           title="{{#t "reply_all"}}Reply all{{/t}}">
-          <span class="screenreader-only">{{#t "reply_all"}}Reply all{{/t}}</span>
         </a>
       </li>
 
       <li>
         <a href="#"
            data-kyle-menu-options='{"appendMenuTo": "body"}'
-           class="al-trigger">
+           class="al-trigger"
+           title="{{#t "more_options"}}More options{{/t}}"
+           data-tooltip>
           <i class="icon-settings"></i>
           <i class="icon-mini-arrow-down"></i>
           <span class="screenreader-only">{{#t "message_actions"}}Message actions{{/t}}</span>
         </a>
         <ul class="al-options">
+          <li>
+            <a href="#" class="reply-all-btn">{{#t "reply_all"}}Reply all{{/t}}</a>
+          </li>
           <li>
             <a href="#" class="forward-btn">{{#t "forward"}}Forward{{/t}}</a>
           </li>
