@@ -202,6 +202,10 @@
   max-width: 80%;
   overflow: hidden;
   text-overflow: ellipsis;
+
+  &:focus {
+    outline: 0;
+  }
 }
 
 .message-full-participants {
@@ -340,11 +344,6 @@
       height: 50px;
       margin-right: 8px;
       width: 50px;
-    }
-
-    .username {
-      color: #2571bd;
-      font-weight: bold;
     }
 
     .context {

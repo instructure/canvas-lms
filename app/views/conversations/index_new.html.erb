@@ -19,27 +19,46 @@
     </div>
 
     <div class="actions">
-      <button class="btn" id="compose-btn">
-        <span class="screenreader-only"><%= t(:new_message, "New message") %></span>
+      <button class="btn"
+              id="compose-btn"
+              title="<%= t(:compose_new_message, "Compose a new message") %>"
+              data-tooltip>
+        <span class="screenreader-only"><%= t(:compose_new_message, "Compose a new message") %></span>
         <i class="icon-compose"></i>
       </button>
 
       <div class="btn-group">
-        <button class="btn" id="reply-btn" disabled>
+        <button class="btn"
+                id="reply-btn"
+                title="<%= t(:reply, "Reply") %>"
+                data-tooltip
+                disabled>
           <span class="screenreader-only"><%= t(:reply, "Reply") %></span>
           <i class="icon-reply-2"></i>
         </button>
-        <button class="btn" id="reply-all-btn" disabled>
+        <button class="btn"
+                id="reply-all-btn"
+                title="<%= t(:reply_all, "Reply all") %>"
+                data-tooltip
+                disabled>
           <span class="screenreader-only"><%= t(:reply_all, "Reply all") %></span>
           <i class="icon-reply-all-2"></i>
         </button>
-        <button class="btn" id="delete-btn" disabled>
+        <button class="btn"
+                id="delete-btn"
+                title="<%= t(:delete, "Delete") %>"
+                data-tooltip
+                disabled>
           <span class="screenreader-only"><%= t(:delete_conversation, "Delete conversation") %></span>
           <i class="icon-trash"></i>
         </button>
       </div>
 
-      <button class="al-trigger btn" id="admin-btn" disabled>
+      <button class="al-trigger btn"
+              id="admin-btn"
+              title="<%= t(:more_options, "More options") %>"
+              data-tooltip
+              disabled>
         <span class="screenreader-only"><%= t(:settings, "Settings") %></span>
         <i class="icon-settings"></i>
         <i class="icon-mini-arrow-down"></i>
@@ -112,7 +131,9 @@
 
         <button class="btn ac-search-btn recipient-finder"
                 id="search-btn"
-                type="button">
+                type="button"
+                title="<%= t(:search_for_recipients, "Search for recipients") %>"
+                data-tooltip>
           <i class="icon-address-book"></i>
           <span class="screenreader-only">
             <%= t(:search_names_groups_courses, "Search names, groups, and courses") %>

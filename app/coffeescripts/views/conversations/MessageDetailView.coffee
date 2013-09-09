@@ -33,4 +33,5 @@ define [
       else
         $template = noMessage()
       @$el.html($template)
+      @$el.find('.subject').focus()
       this

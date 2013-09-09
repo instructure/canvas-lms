@@ -54,4 +54,4 @@ define [
       new Date(_.max([lastMessage, lastAuthored]))
 
     toJSON: ->
-      { conversation: _.extend(super, unread: @unread(), timestamp: @timestamp()) }
+      { conversation: _.extend(super, unread: @unread(), starred: @starred(), timestamp: @timestamp()) }
