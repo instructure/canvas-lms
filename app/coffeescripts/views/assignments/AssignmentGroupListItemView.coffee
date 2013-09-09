@@ -41,7 +41,7 @@ define [
       @createAssignmentView.remove() if @createAssignmentView
       @editGroupView.remove() if @editGroupView
       @deleteGroupView.remove() if @deleteGroupView
-      super(ENV.PERMISSIONS.manage)
+      super(@canManage())
 
     afterRender: ->
       # need to hide child views and set trigger manually

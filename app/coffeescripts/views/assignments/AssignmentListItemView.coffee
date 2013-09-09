@@ -49,7 +49,7 @@ define [
         if @model.multipleDueDates()
           @vddDueTooltipView = new VddTooltipView(model: @model)
 
-    upatePublishState: =>
+    updatePublishState: =>
       @$('.ig-row').toggleClass('ig-published', @model.get('published'))
 
     # call remove on children so that they can clean up old dialogs.

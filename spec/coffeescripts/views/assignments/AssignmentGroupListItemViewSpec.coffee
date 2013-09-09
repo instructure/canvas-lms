@@ -131,11 +131,6 @@ define [
     view = createView(@model)
     ok view.cache
 
-  test "toJSON includes if has assignments", ->
-    view = createView(@model)
-    json = view.toJSON()
-    ok json.hasAssignments
-
   test "toJSON includes group weight", ->
     view = createView(@model)
     json = view.toJSON()
