@@ -1656,8 +1656,12 @@ define([
       if (!regradeOptions.length){
         questionID = /question_(\d+)/.exec(questionID.toString());
         var regradeOption = REGRADE_OPTIONS[questionID[1]];
+        var questionType = $el.find(".question_type").val();
 
-        $el.find('.button-container').before(regradeTemplate({regradeOption: regradeOption}));
+        $el.find('.button-container').before(regradeTemplate({
+          regradeOption: regradeOption,
+          multipleAnswer: questionType === "multiple_answers_question"
+        }));
         clickRegradeOptions();
       }
     }
@@ -1705,7 +1709,9 @@ define([
       } else {
         var oldAnswers = REGRADE_DATA[questionID];
         var newAnswers = correctAnswerIDs($el);
-        return !_.difference(oldAnswers, newAnswers).length;
+
+        return oldAnswers.length == newAnswers.length &&
+               !_.difference(oldAnswers, newAnswers).length;
       }
     }
 
