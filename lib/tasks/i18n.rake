@@ -446,9 +446,10 @@ namespace :i18n do
     userpass = "#{user}:#{password}"
     for lang in languages
       puts "Downloading tmp/#{lang}.yml"
-      json = `curl --user #{userpass} #{translation_url}/#{lang}/`
+      json = `curl --user #{userpass} #{translation_url}/#{lang.sub('-', '_')}/`
+      parsed = YAML.load(JSON.parse(json)['content'])
       File.open("tmp/#{lang}.yml", "w") do |file|
-        file.write JSON.parse(json)['content']
+        file.write({ lang => parsed[lang.sub('-', '_')] }.to_yaml)
       end
     end
   end
