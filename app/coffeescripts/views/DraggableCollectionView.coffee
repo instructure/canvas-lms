@@ -23,7 +23,6 @@ define [
       tolerance: 'pointer'
       opacity: 0.9
       zIndex: 100
-      handle: '.draggable-handle'
       connectWith: '.draggable.collectionViewItems'
       placeholder: 'draggable-dropzone'
       forcePlaceholderSize: true

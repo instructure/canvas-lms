@@ -13,7 +13,6 @@ define [
       tolerance: 'pointer'
       opacity: 0.9
       zIndex: 100
-      handle: '.sortable-handle'
       placeholder: 'sortable-dropzone'
       forcePlaceholderSize: true
 
