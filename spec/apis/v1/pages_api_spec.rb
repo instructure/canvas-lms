@@ -790,19 +790,20 @@ describe "Pages API", :type => :integration do
         @hidden_page.reload.should be_deleted
       end
 
-      it "should delete front_page" do
+      it "should not delete the front_page" do
         page = @course.wiki.wiki_pages.create!(:title => "hrup", :body => "blooop")
         page.set_as_front_page!
 
         api_call(:delete, "/api/v1/courses/#{@course.id}/front_page",
-                 { :controller => 'wiki_pages_api', :action => 'destroy', :format => 'json', :course_id => @course.to_param})
+                 { :controller => 'wiki_pages_api', :action => 'destroy', :format => 'json', :course_id => @course.to_param},
+                 {}, {}, {:expected_status => 400})
 
         page.reload
-        page.should be_deleted
+        page.should_not be_deleted
 
         wiki = @course.wiki
         wiki.reload
-        wiki.has_front_page?.should == false
+        wiki.has_front_page?.should == true
       end
     end
 

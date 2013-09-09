@@ -160,6 +160,7 @@ define [
 
     deleteWikiPage: (event) ->
       event?.preventDefault()
+      return unless @model.get('deletable')
 
       deleteDialog = new WikiPageDeleteDialog
         model: @model

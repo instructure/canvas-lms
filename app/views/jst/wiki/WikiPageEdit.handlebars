@@ -17,7 +17,7 @@
             <span class="screenreader-only">{{#t 'toolbar_menu.settings'}}Settings{{/t}}</span>
           </a>
           <ul class="al-options">
-            <li><a href="#" class="icon-trash delete_page">{{#t "delete_wiki"}}Delete{{/t}}</a></li>
+            <li><a href="#" class="icon-trash delete_page{{#unless deletable}} disabled{{/unless}}" {{#unless deletable}}aria-disabled="true"{{/unless}}>{{#t "delete_wiki"}}Delete{{/t}}</a></li>
           </ul>
         {{/if}}
       </div>

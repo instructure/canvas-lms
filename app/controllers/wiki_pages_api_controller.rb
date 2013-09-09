@@ -324,14 +324,14 @@ class WikiPagesApiController < ApplicationController
   # @returns Page
   def destroy
     if authorized_action(@page, @current_user, :delete)
-      if !@was_front_page || is_authorized_action?(@wiki, @current_user, :update)
+      if !@was_front_page
         @page.workflow_state = 'deleted'
         @page.save!
         process_front_page
         render :json => wiki_page_json(@page, @current_user, session)
       else
-        @page.errors.add(:front_page, t(:cannot_update_front_page, 'You are not allowed to change the wiki front page'))
-        render :json => @page.errors.to_json, :status => :unauthorized
+        @page.errors.add(:front_page, t(:cannot_delete_front_page, 'The front page cannot be deleted'))
+        render :json => @page.errors.to_json, :status => :bad_request
       end
     end
   end
