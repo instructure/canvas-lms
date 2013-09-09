@@ -239,6 +239,59 @@ namespace :i18n do
     dump_translations.call('_core', core_translations)
   end
 
+  desc 'Generate the pseudo-translation file lolz'
+  task :generate_lolz => [:generate, :environment] do
+    strings_processed = 0
+    process_lolz = Proc.new do |val|
+      if val.is_a?(Hash)
+        processed = strings_processed
+
+        hash = Hash.new
+        val.keys.each { |key| hash[key] = process_lolz.call(val[key]) }
+
+        print '.' if strings_processed > processed
+        hash
+      elsif val.is_a?(Array)
+        val.each.map { |v| process_lolz.call(v) }
+      elsif val.is_a?(String)
+        strings_processed += 1
+        I18n.let_there_be_lols(val)
+      else
+        val
+      end
+    end
+
+    t = Time.now
+    translations = YAML.safe_load(open('config/locales/generated/en.yml'))
+
+    I18n.send :extend, I18n::Lolcalize
+    lolz_translations = Hash.new
+    lolz_translations['lolz'] = process_lolz.call(translations['en'])
+    puts
+
+    require 'ya2yaml'
+    File.open('config/locales/lolz.yml', 'w') do |f|
+      f.write(lolz_translations.ya2yaml(:syck_compatible => true))
+    end
+    print "\nFinished generating LOLZ from #{strings_processed} strings in #{Time.now - t} seconds\n"
+
+    # add lolz to the locales.yml file
+    locales = YAML.safe_load(open('config/locales/locales.yml'))
+    if locales['lolz'].nil?
+      locales['lolz'] = {
+        'locales' => {
+          'lolz' => 'LOLZ (crowd-sourced)'
+        },
+        'crowdsourced' => true
+      }
+
+      File.open('config/locales/locales.yml', 'w') do |f|
+        f.write(locales.ya2yaml(:syck_compatible => true))
+      end
+      print "Added LOLZ to locales\n"
+    end
+  end
+
   desc "Exports new/changed English strings to be translated"
   task :export => :environment do
     Hash.send :include, I18n::HashExtensions
