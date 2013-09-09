@@ -41,10 +41,10 @@ namespace :js do
         if $?.exitstatus != 0
           puts 'some specs failed'
           result = 1
-        elsif $?.exitstatus != 0 && phantomjs_output.match(/^Took .* (\d+) tests/)[1].to_i < 1700
+        elsif $?.exitstatus != 0 && phantomjs_output.match(/^Took .* (\d+) tests/)[1].to_i < 900
           puts "some specs didn't get run and some specs failed"
           result = 1
-        elsif $?.exitstatus == 0 && phantomjs_output.match(/^Took .* (\d+) tests/)[1].to_i > 1700
+        elsif $?.exitstatus == 0 && phantomjs_output.match(/^Took .* (\d+) tests/)[1].to_i > 900
           puts 'all specs were run and passed'
           result = 0
         end
