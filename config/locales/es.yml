@@ -618,7 +618,7 @@ es:
           projects: 
             check_box: Proyectos
           reports: 
-            check_box: Reportes
+            check_box: Informes
           tests: 
             check_box: Pruebas
     scantron_quiz_csv_parameters: 
