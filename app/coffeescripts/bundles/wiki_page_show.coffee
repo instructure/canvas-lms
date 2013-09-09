@@ -20,10 +20,11 @@ require [
 
   wikiPageView.render()
 
-  # Add module sequence footer
-  $('#module_sequence_footer').moduleSequenceFooter(
-    courseID: ENV.COURSE_ID
-    assetType: 'Page'
-    assetID: ENV.WIKI_PAGE.url
-    location: location
-  )
+  # Add module sequence footer if the context is a course
+  if ENV.COURSE_ID
+    $('#module_sequence_footer').moduleSequenceFooter(
+      courseID: ENV.COURSE_ID
+      assetType: 'Page'
+      assetID: ENV.WIKI_PAGE.url
+      location: location
+    )
