@@ -53,7 +53,17 @@ class ApplicationController < ActionController::Base
   after_filter :update_enrollment_last_activity_at
   include Tour
 
-  add_crumb(proc { %Q{<i title="#{I18n.t('links.dashboard', "My Dashboard")}" class="icon-home standalone-icon"></i>}.html_safe }, :root_path, :class => "home")
+  add_crumb(proc {
+    title = I18n.t('links.dashboard', 'My Dashboard')
+    crumb = <<-END
+      <i class="icon-home standalone-icon"
+         title="#{title}">
+        <span class="screenreader-only">#{title}</span>
+      </i>
+    END
+
+    crumb.html_safe
+  }, :root_path, class: 'home')
 
   ##
   # Sends data from rails to JavaScript
