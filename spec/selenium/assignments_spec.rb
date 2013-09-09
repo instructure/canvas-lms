@@ -523,13 +523,6 @@ describe "assignments" do
         end
         @asmnt.reload.assignment_group.name.should == "other"
       end
-
-      it "should not allow assignment group to be deleted by teacher if "+
-             "assignment group id frozen" do
-        get "/courses/#{@course.id}/assignments"
-        fj("#group_#{@asmnt.assignment_group_id} .delete_group_link").should be_nil
-        fj("#assignment_#{@asmnt.id} .delete_assignment_link").should be_nil
-      end
     end
 
     context "draft state" do
@@ -669,6 +662,40 @@ describe "assignments" do
           get "/courses/#{@course.id}/assignments/#{@a2.id}"
           wait_for_ajaximations
           f("#sequence_footer .module-sequence-footer").should be_present
+        end
+      end
+
+      context "frozen assignments" do
+        before do
+          @att_map = {
+              "assignment_group_id" => "true"
+          }
+          PluginSetting.stubs(:settings_for_plugin).returns(@att_map)
+
+          @asmnt = @course.assignments.create!(
+              :name => "frozen",
+              :due_at => Time.now.utc + 2.days,
+              :assignment_group => @course.assignment_groups.create!(:name => "default"),
+              :freeze_on_copy => true
+          )
+          @asmnt.copied = true
+          @asmnt.save!
+
+          @course.assignment_groups.create!(:name => "other")
+        end
+
+        it "should not allow assignment group to be deleted by teacher if assignments are frozen" do
+          get "/courses/#{@course.id}/assignments"
+          fj("#ag_#{@asmnt.assignment_group_id}_manage_link").click
+          wait_for_ajaximations
+          element_exists("div#assignment_group_#{@asmnt.assignment_group_id} a.delete_group").should be_false
+        end
+
+        it "should not allow deleting a frozen assignment from index page" do
+          get "/courses/#{@course.id}/assignments"
+          fj("div#assignment_#{@asmnt.id} a.al-trigger").click
+          wait_for_ajaximations
+          element_exists("div#assignment_#{@asmnt.id} a.delete_assignment:visible").should be_false
         end
       end
 

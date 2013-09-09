@@ -121,6 +121,7 @@ define [
         showWeight: showWeight
         groupWeight: data.group_weight
         toggleMessage: @messages.toggleMessage
+        hasFrozenAssignments: @model.hasFrozenAssignments? and @model.hasFrozenAssignments()
       })
 
     displayableRules: ->

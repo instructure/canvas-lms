@@ -88,6 +88,7 @@
             data-focus-returns-to="assign_{{id}}_manage_link"
           >{{#t "edit"}}Edit{{/t}}</a>
         </li>
+        {{#unless frozen }}
         <li role="presentation">
           <a
             href="#"
@@ -98,6 +99,7 @@
             title="{{#t "delete_asssignment_title"}}Delete this assignment{{/t}}"
           >{{#t "delete"}}Delete{{/t}}</a>
         </li>
+        {{/unless}}
       </ul>
     </div>
 
