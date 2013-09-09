@@ -355,6 +355,12 @@ class DiscussionTopicsController < ApplicationController
               :INITIAL_POST_REQUIRED => @initial_post_required,
               :THREADED => @topic.threaded?
             }
+            if @sequence_asset
+              env_hash[:SEQUENCE] = {
+                :ASSET_ID => @sequence_asset.id,
+                :COURSE_ID => @sequence_asset.context.id,
+              }
+            end
             if @topic.for_assignment? &&
                @topic.assignment.grants_right?(@current_user, session, :grade) && @presenter.allows_speed_grader?
               env_hash[:SPEEDGRADER_URL_TEMPLATE] = named_context_url(@topic.assignment.context,

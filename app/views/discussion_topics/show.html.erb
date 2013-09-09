@@ -246,9 +246,14 @@
 
 </div>
 
-<%=
-  render :partial => "shared/sequence_footer", :locals => {:asset => @sequence_asset, :context => @sequence_asset.context} if @sequence_asset
-%>
+<% if @context.draft_state_enabled? && @headers != false %>
+  <div id="module_sequence_footer"></div>
+<% else %>
+  <%=
+    render :partial => "shared/sequence_footer", :locals => {:asset => @sequence_asset, :context => @sequence_asset.context} if @sequence_asset
+  %>
+<% end %>
+
 <% if !@headers %>
   </div>
 <% end %>

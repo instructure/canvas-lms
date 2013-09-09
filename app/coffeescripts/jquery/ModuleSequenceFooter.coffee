@@ -37,8 +37,6 @@ define [
         throw 'Option must be set with assetType and assetID'
         return
 
-      @addClass 'module-sequence-footer clearfix'
-
       # After fetching, @msfInstance will have the following
       # @hide: bool
       # @previous: Object
