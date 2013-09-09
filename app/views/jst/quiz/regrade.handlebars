@@ -5,12 +5,14 @@
     {{/t}}
   </h3>
 
+  {{#unless multipleAnswer}}
   <label class="checkbox">
     <input type="radio" name="regrade_option" class="regrade_option" value="current_and_previous_correct" {{checkedIf regradeOption "current_and_previous_correct"}}>
     {{#t "no_scores_reduced"}}
       Award points for both corrected and previously correct answers (<em>no scores will be reduced</em>)
     {{/t}}
   </label>
+  {{/unless}}
 
   <label class="checkbox">
     <input type="radio" name="regrade_option" class="regrade_option" value="current_correct_only" {{checkedIf regradeOption "current_correct_only"}} />
