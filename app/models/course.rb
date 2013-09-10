@@ -1522,6 +1522,7 @@ class Course < ActiveRecord::Base
     limit_privileges_to_course_section = opts[:limit_privileges_to_course_section]
     associated_user_id = opts[:associated_user_id]
     role_name = opts[:role_name]
+    self_enrolled = opts[:self_enrolled]
     section ||= self.default_section
     enrollment_state ||= self.available? ? "invited" : "creation_pending"
     if type == 'TeacherEnrollment' || type == 'TaEnrollment' || type == 'DesignerEnrollment'
@@ -1557,6 +1558,7 @@ class Course < ActiveRecord::Base
     end
     e.associated_user_id = associated_user_id
     e.role_name = role_name
+    e.self_enrolled = self_enrolled
     if e.changed?
       if opts[:no_notify]
         e.save_without_broadcasting
@@ -1579,8 +1581,7 @@ class Course < ActiveRecord::Base
   end
 
   def self_enroll_student(user, opts = {})
-    enrollment = enroll_student(user, opts.merge(:no_notify => true))
-    enrollment.self_enrolled = true
+    enrollment = enroll_student(user, opts.merge(:self_enrolled => true))
     enrollment.accept(:force)
     unless opts[:skip_pseudonym]
       new_pseudonym = user.find_or_initialize_pseudonym_for_account(root_account)
