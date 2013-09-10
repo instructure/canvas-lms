@@ -656,6 +656,24 @@ describe "assignments" do
         as.collect(&:position).should == [1,3,2,4]
       end
 
+      context "with modules" do
+        before do
+          @module = @course.context_modules.create!(:name => "module 1")
+          @assignment = @course.assignments.create!(:name => 'assignment 1')
+          @a2 = @course.assignments.create!(:name => 'assignment 2')
+          @a3 = @course.assignments.create!(:name => 'assignment 3')
+          @module.add_item :type => 'assignment', :id => @assignment.id
+          @module.add_item :type => 'assignment', :id => @a2.id
+          @module.add_item :type => 'assignment', :id => @a3.id
+        end
+
+        it "should show the new modules sequence footer" do
+          get "/courses/#{@course.id}/assignments/#{@a2.id}"
+          wait_for_ajaximations
+          f("#sequence_footer .module-sequence-footer").should be_present
+        end
+      end
+
       context 'publishing' do
         before do
           ag = @course.assignment_groups.first

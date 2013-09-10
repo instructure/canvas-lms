@@ -5,6 +5,7 @@ require [
   'compiled/models/Assignment',
   'compiled/views/PublishButtonView',
   'compiled/views/assignments/SpeedgraderLinkView'
+  'compiled/jquery/ModuleSequenceFooter'
   'jquery.instructure_forms'
 ], (INST, I18n, $, Assignment, PublishButtonView, SpeedgraderLinkView) ->
 
@@ -20,6 +21,15 @@ require [
       new SpeedgraderLinkView(model: model, el: '#assignment-speedgrader-link')
         .render()
       new PublishButtonView(model: model, el: $el).render()
+
+    if ENV.DRAFT_STATE
+      # Add module sequence footer
+      $('#sequence_footer').moduleSequenceFooter(
+        courseID: ENV.COURSE_ID
+        assetType: 'Assignment'
+        assetID: ENV.ASSIGNMENT_ID
+        location: location
+      )
 
   # -- This is all for the _grade_assignment sidebar partial
   $ ->

@@ -102,7 +102,12 @@ class AssignmentsController < ApplicationController
     if authorized_action(@assignment, @current_user, :read)
       @assignment = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @current_user)
       @assignment.ensure_assignment_group
-      js_env :ROOT_OUTCOME_GROUP => outcome_group_json(@context.root_outcome_group, @current_user, session)
+      js_env({
+        :ROOT_OUTCOME_GROUP => outcome_group_json(@context.root_outcome_group, @current_user, session),
+        :DRAFT_STATE => @context.draft_state_enabled?,
+        :COURSE_ID => @context.id,
+        :ASSIGNMENT_ID => @assignment.id
+      })
 
       @locked = @assignment.locked_for?(@current_user, :check_policies => true, :deep_check_if_needed => true)
       @locked.delete(:lock_at) if @locked.is_a?(Hash) && @locked.has_key?(:unlock_at) # removed to allow proper translation on show page
