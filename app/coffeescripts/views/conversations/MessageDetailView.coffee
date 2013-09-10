@@ -12,12 +12,6 @@ define [
 
     tagName: 'div'
 
-    addMessage: (message) =>
-      message.context_name = @model.messageCollection.last().get('context_name')
-      @model.get('messages').unshift(message)
-      @model.trigger('change:messages')
-      @render()
-
     render: ->
       super
       if @model

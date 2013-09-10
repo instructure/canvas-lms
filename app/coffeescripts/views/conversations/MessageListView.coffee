@@ -25,14 +25,15 @@ define [
       @course = course
 
     updateMessage: (message, thread) =>
-      currentThread = @collection.get(thread.id)
-      currentThread.set
+      selectedThread = @collection.where(selected: true)[0]
+      updatedThread = @collection.get(thread.id)
+      updatedThread.set
         last_message:  thread.last_message
         last_authored_message_at: new Date().toString()
-        message_count: currentThread.get('messages').length
+        message_count: updatedThread.get('messages').length
       @collection.sort()
       @render()
-      currentThread.view.select()
+      selectedThread?.view.select()
 
     afterRender: ->
       super

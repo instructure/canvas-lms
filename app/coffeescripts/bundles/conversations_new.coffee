@@ -25,6 +25,8 @@ require [
     messages:
       confirmDelete: I18n.t('confirm.delete_conversation', 'Are you sure you want to delete your copy of this conversation? This action cannot be undone.')
 
+    sendingCount: 0
+
     initialize: ->
       dfd = @_initCollections()
       @_initViews()
@@ -168,16 +170,31 @@ require [
       @compose.on('close',      @onCloseCompose)
       @compose.on('addMessage', @onAddMessage)
       @compose.on('addMessage', @list.updateMessage)
+      @compose.on('newConversations', @onNewConversations)
       @compose.on('submitting', @onSubmit)
       @detail.on('reply',       @onReply)
       @detail.on('reply-all',   @onReplyAll)
       @detail.on('forward',     @onForward)
 
     onSubmit: (dfd) =>
-      @detail.$el.disableWhileLoading(dfd)
+      @_incrementSending(1)
 
-    onAddMessage: (message) =>
-      @detail.addMessage(message)
+    onAddMessage: (message, conversation) =>
+      @_incrementSending(-1)
+      model = @list.collection.get(conversation.id)
+      if model? && model.get('messages')
+        message.context_name = model.messageCollection.last().get('context_name')
+        model.get('messages').unshift(message)
+        model.trigger('change:messages')
+        if model == @detail.model
+          @detail.render()
+
+    onNewConversations: (conversations) =>
+      @_incrementSending(-1)
+
+    _incrementSending: (increment) ->
+      @sendingCount += increment
+      @header.toggleSending(@sendingCount > 0)
 
     _currentFilter: ->
       filter = @searchTokens || []
