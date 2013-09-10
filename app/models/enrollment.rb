@@ -349,7 +349,7 @@ class Enrollment < ActiveRecord::Base
 
   def update_cached_due_dates
     if workflow_state_changed? && course
-      course.assignments.each do |assignment|
+      course.assignments.except(:order).select(:id).find_each do |assignment|
         DueDateCacher.recompute(assignment)
       end
     end
