@@ -5,7 +5,7 @@
 <p>
   <%= t('details', %{Please enter the details for the new course.}) %>
 </p>
-<% form_for :course, :url => course_copy_course_url(@context), :html => {:class => "form-horizontal"} do |f| %>
+<% form_for :course, :url => course_copy_course_url(@context), :html => {:id => "copy_course_form", :class => "form-horizontal"} do |f| %>
 
   <div class="control-group">
     <label class="control-label"><strong><%= t('name', 'Name') %></strong></label>

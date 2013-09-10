@@ -2010,8 +2010,7 @@ class Course < ActiveRecord::Base
           end
         end
 
-        self.start_at ||= shift_options[:new_start_date]
-        self.conclude_at ||= shift_options[:new_end_date]
+        self.set_course_dates_if_blank(shift_options)
       end
     rescue
       add_migration_warning("Couldn't adjust the due dates.", $!)
@@ -2414,8 +2413,7 @@ class Course < ActiveRecord::Base
         end
         event.respond_to?(:save_without_broadcasting!) ? event.save_without_broadcasting! : event.save!
       end
-      self.start_at ||= shift_options[:new_start_date]
-      self.conclude_at ||= shift_options[:new_end_date]
+      self.set_course_dates_if_blank(shift_options)
     end
 
     self.save
@@ -2479,6 +2477,18 @@ class Course < ActiveRecord::Base
     result[:day_substitutions] = options[:day_substitutions]
     result[:time_zone] = options[:time_zone]
     result[:time_zone] ||= course.account.default_time_zone unless course.account.nil?
+
+    result[:default_start_at] = DateTime.parse(options[:new_start_date]) rescue self.real_start_date
+    result[:default_conclude_at] = DateTime.parse(options[:new_end_date]) rescue self.real_end_date
+    Time.use_zone(result[:time_zone] || Time.zone) do
+      # convert times
+      [:default_start_at, :default_conclude_at].each do |k|
+        old_time = result[k]
+        new_time = Time.utc(old_time.year, old_time.month, old_time.day, (old_time.hour rescue 0), (old_time.min rescue 0)).in_time_zone
+        new_time -= new_time.utc_offset
+        result[k] = new_time
+      end
+    end
     result
   end
 
@@ -2514,6 +2524,11 @@ class Course < ActiveRecord::Base
       log_merge_result("Events for #{old_date.to_s} moved to #{new_date.to_s}")
       new_time
     end
+  end
+
+  def set_course_dates_if_blank(shift_options)
+    self.start_at ||= shift_options[:default_start_at]
+    self.conclude_at ||= shift_options[:default_conclude_at]
   end
 
   def real_start_date

@@ -85,6 +85,32 @@ describe "course copy" do
       new_course.name.should == "course name of testing"
       new_course.course_code.should == "course code of testing"
     end
+
+    it "should adjust the dates" do
+      course_with_admin_logged_in
+
+      get "/courses/#{@course.id}/copy"
+
+      f('#dateShiftCheckbox').click
+
+      f('#oldStartDate').clear
+      f('#oldStartDate').send_keys('7/1/2012')
+      f('#oldEndDate').send_keys('Jul 11, 2012')
+      f('#newStartDate').clear
+      f('#newStartDate').send_keys('8-5-2012')
+      f('#newEndDate').send_keys('Aug 15, 2012')
+
+      expect_new_page_load { f('button[type="submit"]').click }
+
+      opts = ContentMigration.last.migration_settings["date_shift_options"]
+      expected = {
+          "old_start_date" => "Jul 1, 2012", "old_end_date" => "Jul 11, 2012",
+          "new_start_date" => "Aug 5, 2012", "new_end_date" => "Aug 15, 2012"
+      }
+      expected.each do |k, v|
+        Date.parse(opts[k].to_s).should == Date.parse(v)
+      end
+    end
   end
 
   describe "course file imports" do

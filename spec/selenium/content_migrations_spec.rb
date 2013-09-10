@@ -455,10 +455,10 @@ describe "content migrations" do
       click_option('#daySubstitution ul > div:nth-child(2) .currentDay', "2", :value)
       click_option('#daySubstitution ul > div:nth-child(2) .subDay', "3", :value)
 
-      f('#oldStartDate').send_keys('Jul 1, 2012')
+      f('#oldStartDate').send_keys('7/1/2012')
       f('#oldEndDate').send_keys('Jul 11, 2012')
       f('#newStartDate').clear
-      f('#newStartDate').send_keys('Aug 5, 2012')
+      f('#newStartDate').send_keys('8-5-2012')
       f('#newEndDate').send_keys('Aug 15, 2012')
 
       submit
