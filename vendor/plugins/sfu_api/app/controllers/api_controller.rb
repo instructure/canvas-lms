@@ -39,6 +39,8 @@ class ApiController < ApplicationController
         user_hash["id"] = user.id
         user_hash["name"] = user.name
         user_hash["uuid"] = user.uuid
+      elsif params[:property].eql? "groups"
+        user_hash = group_membership_for user
       elsif params[:property].eql? "mysfu"
         user_hash = mysfu_enrollments_for user
       elsif params[:property].eql? "sandbox"
@@ -208,6 +210,20 @@ class ApiController < ApplicationController
         :id => course.id,
         :name => course.name,
         :sis_source_id => course.sis_source_id
+      }
+    end
+  end
+
+  def group_membership_for(user)
+    # Find user's groups
+    groups = Group.find(:all, :conditions => ['id IN (?)', user.group_ids])
+    groups.map do |group|
+      {
+        :id => group.id,
+        :name => group.name,
+        :sis_source_id => group.sis_source_id,
+        :context_type => group.context_type,
+        :context_id => group.context_id
       }
     end
   end
