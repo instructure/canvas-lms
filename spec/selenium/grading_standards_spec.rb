@@ -13,9 +13,11 @@ describe "grading standards" do
     standard.should have_class(/editing/)
     standard.find_elements(:css, ".delete_row_link").select(&:displayed?).each_with_index do |link, i|
       if i % 2 == 1
-        link.click
-        wait_for_animations
-        keep_trying_until { !link.should_not be_displayed }
+        keep_trying_until do
+          link.click
+          wait_for_animations
+          !link.should_not be_displayed
+        end
       end
     end
     standard.find_element(:css, "input.scheme_name").send_keys("New Standard")
