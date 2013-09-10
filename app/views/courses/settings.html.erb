@@ -20,9 +20,6 @@
   <ul>
     <li id="course_details_tab"><a href="#tab-details"><%= t('tabs.details', %{Course Details}) %></a></li>
     <li id="sections_tab"><a href="#tab-sections"><%= t('tabs.sections', %{Sections}) %></a></li>
-    <% if can_see_users %>
-      <li id="users_tab"><a href="#tab-users" id="tab-users-link"><%= t('tabs.users', %{Users}) %></a></li>
-    <% end %>
     <% if can_do @context, @current_user, :update %>
       <li id="navigation_tab"><a href="#tab-navigation"><%= t('tabs.navigation', %{Navigation}) %></a></li>
     <% end %>
@@ -384,10 +381,6 @@ Unpublished content may not be available if Draft State is disabled.
       <%= f.text_field :name %>
     <% end %>
   </div>
-  <% if can_see_users %>
-  <div id="tab-users">
-    <%= render :partial => 'user_tab' %></div>
-  <% end %>
   <% if can_do @context, @current_user, :update %>
 
   <div id="tab-navigation">

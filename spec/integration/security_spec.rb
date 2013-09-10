@@ -835,7 +835,6 @@ describe "security" do
         response.should be_success
         html = Nokogiri::HTML(response.body)
         html.css('.edit_course_link').should_not be_empty
-        html.css('#tab-users').should_not be_empty
         html.css('#tab-navigation').should_not be_empty
       end
 
@@ -872,9 +871,6 @@ describe "security" do
         get "/courses/#{@course.id}/details"
         response.should be_success
         response.body.should match /People/
-        html = Nokogiri::HTML(response.body)
-        html.css('#tab-users').should_not be_empty
-        html.css('.add_users_link').should be_empty
       end
 
       it "manage_students" do
@@ -890,8 +886,6 @@ describe "security" do
         get "/courses/#{@course.id}/details"
         response.should be_success
         response.body.should_not match /People/
-        html = Nokogiri::HTML(response.body)
-        html.css('#tab-users').should be_empty
 
         add_permission :manage_students
 
@@ -909,8 +903,6 @@ describe "security" do
         get "/courses/#{@course.id}/details"
         response.should be_success
         response.body.should match /People/
-        html = Nokogiri::HTML(response.body)
-        html.css('#tab-users').should_not be_empty
 
         @course.tab_configuration = [ { :id => Course::TAB_PEOPLE, :hidden => true } ]
         @course.save!
