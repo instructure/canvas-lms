@@ -252,7 +252,7 @@ class ContextModulesApiController < ApplicationController
       if ids = params[:module][:prerequisite_module_ids]
         @module.prerequisites = ids.map{|id| "module_#{id}"}.join(',')
       end
-      if @domain_root_account.enable_draft?
+      if @context.draft_state_enabled?
         @module.workflow_state = 'unpublished'
       else
         @module.workflow_state = 'active'

@@ -6,7 +6,7 @@
       id="assignment-speedgrader-link"
       target="_blank"
       href="<%= context_url(@context, :speed_grader_context_gradebook_url, :assignment_id => @assignment.id) %>"
-      <% if @context.root_account.enable_draft? && @assignment.unpublished? %>
+      <% if @context.draft_state_enabled? && @assignment.unpublished? %>
         class="hidden icon-speed-grader"
       <% else %>
         class="icon-speed-grader"

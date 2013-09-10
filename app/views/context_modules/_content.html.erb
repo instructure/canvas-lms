@@ -3,7 +3,7 @@
 <% js_env :CAN_MANAGE_MODULES  => can_do(@context, @current_user, :manage_grades) || can_do(@context, @current_user, :manage_content) %>
 <% js_env :COURSE_ID => @context.id %>
 <% js_env :NO_MODULE_PROGRESSIONS => @context.large_roster %>
-<% unless @domain_root_account.enable_draft? %>
+<% unless @context.draft_state_enabled? %>
 <% js_bundle :context_modules %>
 <% jammit_css :context_modules %>
 

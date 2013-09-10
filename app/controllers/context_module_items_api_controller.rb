@@ -283,7 +283,7 @@ class ContextModuleItemsApiController < ApplicationController
       item_params[:url] = params[:module_item][:external_url]
 
       if (@tag = @module.add_item(item_params)) && set_position && set_completion_requirement
-        if @domain_root_account.enable_draft?
+        if @context.draft_state_enabled?
           @tag.workflow_state = 'unpublished'
           @tag.save
         end

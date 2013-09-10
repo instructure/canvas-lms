@@ -32,7 +32,7 @@ class AssignmentsController < ApplicationController
   before_filter :normalize_title_param, :only => [:new, :edit]
 
   def index
-    return old_index if @context == @current_user || !@domain_root_account.enable_draft?
+    return old_index if @context == @current_user || !@context.draft_state_enabled?
 
     if authorized_action(@context, @current_user, :read)
       return unless tab_enabled?(@context.class::TAB_ASSIGNMENTS)
@@ -315,7 +315,7 @@ class AssignmentsController < ApplicationController
   
   def new
     @assignment ||= @context.assignments.new
-    @assignment.workflow_state = 'unpublished' if @context.root_account.enable_draft?
+    @assignment.workflow_state = 'unpublished' if @context.draft_state_enabled?
     add_crumb t :create_new_crumb, "Create new"
 
     if params[:submission_types] == 'online_quiz'

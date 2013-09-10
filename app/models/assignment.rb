@@ -375,7 +375,7 @@ class Assignment < ActiveRecord::Base
       quiz.assignment_group_id = self.assignment_group_id
       quiz.workflow_state = 'created' if quiz.deleted?
       quiz.saved_by = :assignment
-      if self.context.root_account.enable_draft?
+      if self.context.draft_state_enabled?
         quiz.workflow_state = published? ? 'available' : 'unpublished'
       end
       quiz.save if quiz.changed?

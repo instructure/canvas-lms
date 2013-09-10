@@ -158,7 +158,7 @@ class GradebooksController < ApplicationController
             newest = Time.parse("Jan 1 2010")
             @just_assignments = @just_assignments.sort_by{|a| [a.due_at || newest, @groups_order[a.assignment_group_id] || 0, a.position || 0] }
             @assignments = @just_assignments.dup + groups_as_assignments(@groups)
-            if @context.root_account.enable_draft?
+            if @context.draft_state_enabled?
               @assignments = @assignments.select(&:published?)
             end
             @gradebook_upload = @context.build_gradebook_upload
@@ -351,7 +351,7 @@ class GradebooksController < ApplicationController
     return unless authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
 
     @assignment = @context.assignments.active.find(params[:assignment_id])
-    if @context.root_account.enable_draft? && @assignment.unpublished?
+    if @context.draft_state_enabled? && @assignment.unpublished?
       flash[:notice] = t(:speedgrader_enabled_only_for_published_content,
                          'Speedgrader is enabled only for published content.')
       return redirect_to polymorphic_url([@context, @assignment])

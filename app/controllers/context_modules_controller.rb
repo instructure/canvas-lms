@@ -87,7 +87,7 @@ class ContextModulesController < ApplicationController
   def create
     if authorized_action(@context.context_modules.new, @current_user, :create)
       @module = @context.context_modules.build
-      if @domain_root_account.enable_draft?
+      if @context.draft_state_enabled?
         @module.workflow_state = 'unpublished'
       else
         @module.workflow_state = 'active'

@@ -35,6 +35,7 @@ class Course < ActiveRecord::Base
                   :syllabus_body,
                   :public_description,
                   :allow_student_forum_attachments,
+                  :enable_draft,
                   :allow_student_discussion_topics,
                   :allow_student_discussion_editing,
                   :default_wiki_editing_roles,
@@ -2434,7 +2435,7 @@ class Course < ActiveRecord::Base
       :storage_quota, :tab_configuration, :allow_wiki_comments,
       :turnitin_comments, :self_enrollment, :license, :indexed, :locale,
       :hide_final_grade, :hide_distribution_graphs,
-      :allow_student_discussion_topics, :lock_all_announcements ]
+      :allow_student_discussion_topics, :lock_all_announcements, :enable_draft ]
   end
 
   # TODO: remove me? looks like only a single spec exercises this code (incidentally, no less)
