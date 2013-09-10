@@ -55,6 +55,16 @@
   .btn {
     color: #555;
   }
+
+  .actions {
+    margin-right: 20px;
+  }
+}
+
+#sending-spinner {
+  display: inline-block;
+  height: 8px;
+  width: 10px;
 }
 
 .filters {

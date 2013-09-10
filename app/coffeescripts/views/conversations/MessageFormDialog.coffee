@@ -255,17 +255,21 @@ define [
           @close()
           # update conversation when message confirmed sent
           # TODO: construct the new message object and pass it to the MessageDetailView which will need to create a MessageItemView for it
+          # store @to for the closure in case there are multiple outstanding send requests
+          localTo = @to
+          @to = null
           $.when(@request).then (response) =>
             dfd.resolve()
             $.flashMessage(@messages.flashSuccess)
-            if @to
+            if localTo
               message = response.messages[0]
               message.author =
                 name: ENV.current_user.display_name
                 avatar_url: ENV.current_user.avatar_image_url
               message = new Message(response, parse: true)
               @trigger('addMessage', message.toJSON().conversation.messages[0], response)
-            @to = null
+            else
+              @trigger('newConversations', response)
 
     recipientIdsChanged: (recipientIds) =>
       if recipientIds.length > 1 or recipientIds[0]?.match(/^(course|group)_/)

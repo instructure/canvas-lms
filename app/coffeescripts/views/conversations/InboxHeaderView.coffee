@@ -21,6 +21,8 @@ define [
       '#mark-unread-btn' : '$markUnreadBtn'
       '#star-toggle-btn' : '$starToggleBtn'
       '#admin-menu'      : '$adminMenu'
+      '#sending-message' : '$sendingMessage'
+      '#sending-spinner' : '$sendingSpinner'
       '[role=search]'    : '$search'
 
     events:
@@ -38,12 +40,23 @@ define [
       star: I18n.t('star', 'Star')
       unstar: I18n.t('unstar', 'Unstar')
 
+    spinnerOptions:
+      color: '#fff'
+      lines: 10
+      length: 2
+      radius: 2
+      width: 2
+      left: 0
+
     render: () ->
       super()
       @$typeFilter.selectpicker()
       @courseView = new CourseSelectionView(el: @$courseFilter, courses: @options.courses)
       @searchView = new SearchView(el: @$search)
       @searchView.on('search', @onSearch)
+      spinner = new Spinner(@spinnerOptions)
+      spinner.spin(@$sendingSpinner[0])
+      @toggleSending(false)
 
     onSearch:      (tokens) => @trigger('search', tokens)
 
@@ -130,3 +143,6 @@ define [
     _toggleBtn: (btn, value) ->
       value = if typeof value is 'undefined' then !btn.prop('disabled') else value
       btn.prop('disabled', value)
+
+    toggleSending: (shouldShow) ->
+      @$sendingMessage.toggle(shouldShow)
