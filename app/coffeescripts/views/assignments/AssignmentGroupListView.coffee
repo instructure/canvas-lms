@@ -32,10 +32,6 @@ define [
 
     @optionProperty 'assignment_sort_base_url'
 
-    attachCollection: ->
-      super
-      @itemViewOptions = course: @course
-
     render: =>
       super(ENV.PERMISSIONS.manage)
 
@@ -56,6 +52,16 @@ define [
 
     createReorderURL: (id) ->
       @assignment_sort_base_url + "/" + id + "/reorder"
+
+
+    # TODO: make menu a child view of listitem so that it can be rendered
+    # by itself, and so it can manage all of the dialog stuff,
+    # when that happens, this can be removed
+    attachCollection: ->
+      super
+      @itemViewOptions = course: @course
+      @collection.on 'add', @render
+      @collection.on 'remove', @render
 
     renderOnReset: =>
       @firstResetLanded = true

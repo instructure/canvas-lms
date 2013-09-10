@@ -74,6 +74,16 @@
               >{{#t "delete"}}Delete{{/t}}</a>
             </li>
           {{/unless}}
+          {{#if canMove}}
+          <li>
+            <a
+              href="#"
+              class="move_group icon-updown"
+              title='{{#t "title_move"}}Move Assignment Group{{/t}}'
+              data-focus-returns-to="ag_{{id}}_manage_link"
+            >{{#t "move"}}Move To&hellip;{{/t}}</a>
+          </li>
+          {{/if}}
         </ul>
       {{/if}}
     </div>
@@ -88,5 +98,6 @@
     <form data-view="createAssignment" class="form-dialog"></form>
     <form data-view="editAssignmentGroup" class="form-dialog"></form>
     <form data-view="deleteAssignmentGroup" class="form-dialog"></form>
+    <form data-view="moveAssignmentGroup" class="form-dialog"></form>
   {{/if}}
 </div>

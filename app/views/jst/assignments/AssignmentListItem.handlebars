@@ -90,9 +90,21 @@
           >{{#t "delete"}}Delete{{/t}}</a>
         </li>
         {{/unless}}
+        {{#if canMove}}
+        <li role="presentation">
+          <a
+            href="#"
+            class="move_assignment icon-updown"
+            id="assignment_{{id}}_settings_move_item"
+            title='{{#t "move_assignment_title"}}Move Assignment{{/t}}'
+            data-focus-returns-to="assign_{{id}}_manage_link"
+          >{{#t "move"}}Move To&hellip;{{/t}}</a>
+        </li>
+        {{/if}}
       </ul>
     </div>
 
     <form data-view="edit-assignment" class="form-dialog"></form>
+    <form data-view="moveAssignment" class="form-dialog"></form>
   {{/if}}
 </div>

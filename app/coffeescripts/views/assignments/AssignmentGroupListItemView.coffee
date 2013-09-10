@@ -7,9 +7,10 @@ define [
   'compiled/views/assignments/CreateAssignmentView'
   'compiled/views/assignments/CreateGroupView'
   'compiled/views/assignments/DeleteGroupView'
+  'compiled/views/MoveDialogView'
   'compiled/fn/preventDefault'
   'jst/assignments/AssignmentGroupListItem'
-], (I18n, _, Cache, DraggableCollectionView, AssignmentListItemView, CreateAssignmentView, CreateGroupView, DeleteGroupView, preventDefault, template) ->
+], (I18n, _, Cache, DraggableCollectionView, AssignmentListItemView, CreateAssignmentView, CreateGroupView, DeleteGroupView, MoveDialogView, preventDefault, template) ->
 
   class AssignmentGroupListItemView extends DraggableCollectionView
     @optionProperty 'course'
@@ -22,11 +23,13 @@ define [
     @child 'createAssignmentView', '[data-view=createAssignment]'
     @child 'editGroupView', '[data-view=editAssignmentGroup]'
     @child 'deleteGroupView', '[data-view=deleteAssignmentGroup]'
+    @child 'moveGroupView', '[data-view=moveAssignmentGroup]'
 
     els: _.extend({}, @::els, {
       '.add_assignment': '$addAssignmentButton'
       '.delete_group': '$deleteGroupButton'
       '.edit_group': '$editGroupButton'
+      '.move_group': '$moveGroupButton'
     })
 
     events:
@@ -44,6 +47,7 @@ define [
       @createAssignmentView.remove() if @createAssignmentView
       @editGroupView.remove() if @editGroupView
       @deleteGroupView.remove() if @deleteGroupView
+      @moveGroupView.remove() if @moveGroupView
       super(@canManage())
 
       # reset the model's view property; it got overwritten by child views
@@ -62,6 +66,10 @@ define [
       if @deleteGroupView
         @deleteGroupView.hide()
         @deleteGroupView.setTrigger @$deleteGroupButton
+
+      if @moveGroupView
+        @moveGroupView.hide()
+        @moveGroupView.setTrigger @$moveGroupButton
 
       if @model.hasRules()
         @createRulesToolTip()
@@ -97,6 +105,7 @@ define [
       @editGroupView = false
       @createAssignmentView = false
       @deleteGroupView = false
+      @moveGroupView = false
 
       if @canManage()
         @editGroupView = new CreateGroupView
@@ -105,6 +114,9 @@ define [
           assignmentGroup: @model
         @deleteGroupView = new DeleteGroupView
           model: @model
+        @moveGroupView = new MoveDialogView
+          model: @model
+          saveURL: -> ENV.URLS.sort_url
 
     initCache: ->
       $.extend true, @, Cache
@@ -116,8 +128,10 @@ define [
     toJSON: ->
       data = @model.toJSON()
       showWeight = @course?.get('apply_assignment_group_weights') and data.group_weight?
+      canMove = @model.collection.length > 1
 
       attributes = _.extend(data, {
+        canMove: canMove
         showRules: @model.hasRules()
         rulesText: I18n.t('rules_text', "Rule", { count: @model.countRules() })
         displayableRules: @displayableRules()

@@ -6,9 +6,11 @@ define [
   'compiled/views/assignments/DateDueColumnView'
   'compiled/views/assignments/DateAvailableColumnView'
   'compiled/views/assignments/CreateAssignmentView'
+  'compiled/views/MoveDialogView'
   'compiled/fn/preventDefault'
   'jst/assignments/AssignmentListItem'
-], (I18n, Backbone, _, PublishIconView, DateDueColumnView, DateAvailableColumnView, CreateAssignmentView, preventDefault, template) ->
+], (I18n, Backbone, _, PublishIconView, DateDueColumnView, DateAvailableColumnView, CreateAssignmentView, MoveDialogView, preventDefault, template) ->
+
   class AssignmentListItemView extends Backbone.View
     tagName: "li"
     className: "assignment"
@@ -18,9 +20,11 @@ define [
     @child 'dateDueColumnView',       '[data-view=date-due]'
     @child 'dateAvailableColumnView', '[data-view=date-available]'
     @child 'editAssignmentView',      '[data-view=edit-assignment]'
+    @child 'moveAssignmentView', '[data-view=moveAssignment]'
 
     els:
       '.edit_assignment': '$editAssignmentButton'
+      '.move_assignment': '$moveAssignmentButton'
 
     events:
       'click .delete_assignment': 'onDelete'
@@ -28,6 +32,7 @@ define [
 
     messages:
       confirm: I18n.t('confirms.delete_assignment', 'Are you sure you want to delete this assignment?')
+      ag_move_label: I18n.beforeLabel 'assignment_group_move_label', 'Assignment Group'
 
     initialize: ->
       super
@@ -49,10 +54,19 @@ define [
       @editAssignmentView = false
       @vddDueColumnView   = false
       @dateAvailableColumnView = false
+      @moveAssignmentView = false
 
       if @canManage()
         @publishIconView    = new PublishIconView(model: @model)
         @editAssignmentView = new CreateAssignmentView(model: @model)
+        @moveAssignmentView = new MoveDialogView
+          model: @model
+          nested: true
+          parentCollection: @model.collection.view?.parentCollection
+          parentLabelText: @messages.ag_move_label
+          parentKey: 'assignment_group_id'
+          childKey: 'assignments'
+          saveURL: -> "#{ENV.URLS.assignment_sort_base_url}/#{@parentListView.value()}/reorder"
 
       @dateDueColumnView       = new DateDueColumnView(model: @model)
       @dateAvailableColumnView = new DateAvailableColumnView(model: @model)
@@ -66,7 +80,11 @@ define [
       @editAssignmentView.remove()      if @editAssignmentView
       @dateDueColumnView.remove()       if @dateDueColumnView
       @dateAvailableColumnView.remove() if @dateAvailableColumnView
+      @moveAssignmentView.remove() if @moveAssignmentView
+
       super
+      # reset the model's view property; it got overwritten by child views
+      @model.view = this if @model
 
       # reset the model's view property; it got overwritten by child views
       @model.view = this if @model
@@ -77,6 +95,11 @@ define [
       if @editAssignmentView
         @editAssignmentView.hide()
         @editAssignmentView.setTrigger @$editAssignmentButton
+
+      if @moveAssignmentView
+        @moveAssignmentView.hide()
+        @moveAssignmentView.setTrigger @$moveAssignmentButton
+
 
     createModuleToolTip: =>
       link = @$el.find('.tooltip_link')
@@ -93,6 +116,9 @@ define [
     toJSON: ->
       data = @model.toView()
       data.canManage = @canManage()
+      # can move items if there's more than one parent
+      # collection OR more than one in the model's collection
+      data.canMove = @model.collection.view?.parentCollection?.length > 1 or @model.collection.length > 1
 
       if modules = @modules(data.id)
         moduleName = modules[0]

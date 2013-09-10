@@ -66,6 +66,8 @@ define [
         new_position = positions[model.id]
         model.set('position', new_position)
 
+      # make sure the collection stays in order
+      @collection.sort()
       @_sendPositions(@_orderPositions(positions))
 
     # Internal: takes an object of {model_id:position} and returns and array

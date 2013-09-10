@@ -49,6 +49,7 @@ define [
     # add the view that is used when there are no items in a group
     _noItemsViewIfEmpty: =>
       items = @$list.children()
+
       if items.length == 0
         @noItems = new Backbone.View
           template: @noItemTemplate
@@ -113,38 +114,64 @@ define [
     # Returns nothing.
     _updateSort: (e, ui) =>
       e.stopImmediatePropagation(); #parent sortables won't fire
+
+      # if the ui.item is not still inside the view, we only want to
+      # resort, not save
+      shouldSave = @$(ui.item).length
       #only save the sorting if this is the group that the item is in (moving to)
       id = @_getItemId(ui.item)
-      sibling = @$list.children().find("[data-item-id=" + id + "]")
-      if sibling.length > 0
-        positions = {}
-        positions[id] = ui.item.index() + 1
-        for s in ui.item.siblings()
-          $s = $(s)
-          if $s.hasClass("no-items")
-            $s.remove()
-          else
-            model_id = @_getItemId($s)
+      model = @collection.get(id)
+      new_index = ui.item.index()
 
-            index = $s.prevAll().length
-            new_position = index + 1
-            positions[model_id] = new_position
-            model = @searchItem(model_id)
-            model.set('position', new_position)
+      models = @updateModels(model, new_index, shouldSave)
+      if shouldSave
+        model.set 'position', new_index + 1
+        @collection.sort()
+        @_sendPositions(@collection.pluck('id'))
+      else
+        # will still have the moved model in the collection for now
+        @collection.sort()
 
-        @_sendPositions(@_orderPositions(positions))
+    updateModels: (model, new_index, inView) =>
+      # start at the model's current position because we don't want to include the model in the slice,
+      # we'll update it separately
+      old_pos = model.get('position')
+      if old_pos
+        old_index = old_pos - 1
 
-    # Internal: takes an object of {model_id:position} and returns an array
-    # of model_ids in the correct order
-    _orderPositions: (positions) ->
-      sortable = []
-      for id,order of positions
-        sortable.push [id,order]
-      sortable.sort (a,b) -> a[1] - b[1]
-      output = []
-      for model in sortable
-        output.push model[0]
-      output
+      movedDown = (old_index < new_index)
+      #figure out how to slice the models
+      slice_args =
+        if !inView
+          #model is being removed so we need to update everything
+          #after it
+          model.unset('position')
+          [old_index]
+        else if not old_pos
+          #model is new so we need to update everything after it
+          [new_index]
+        else if movedDown
+          # moved down so slice from old to new
+          # we want to include the one at new index
+          # so we add 1
+          [old_index, new_index + 1]
+        else
+          # moved up so slice from new to old
+          [new_index, old_index + 1]
+
+      #carve out just the models that need updating
+      models_to_update = @collection.slice.apply @collection, slice_args
+      #update the position on just these models
+      _.each models_to_update, (m) ->
+        #if the model gets sliced in here, don't update its
+        #position as we'll update it later
+        if m.id != model.id
+          old = m.get('position')
+          #if we moved an item down we want to move
+          #the shifted items up (so we subtract 1)
+          neue = if !inView or movedDown then old - 1 else old + 1
+          m.set 'position', neue
+
 
     # Internal: sends an array of model_ids as a comma delimited string
     # to the sortURL

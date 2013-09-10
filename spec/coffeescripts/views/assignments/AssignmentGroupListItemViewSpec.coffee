@@ -92,7 +92,6 @@ define [
 
   createView = (model, options) ->
     options = $.extend {canManage: true}, options
-
     sinon.stub( AssignmentGroupListItemView.prototype, "canManage", -> options.canManage )
     sinon.stub( AssignmentGroupListItemView.prototype, "currentUserId", -> 1)
     sinon.stub( AssignmentListItemView.prototype, "canManage", -> options.canManage )

@@ -9,7 +9,6 @@ define [
 ], (I18n, _, AssignmentGroup, DialogFormView, template, wrapper) ->
 
   class DeleteGroupView extends DialogFormView
-
     defaults:
       width: 500
       height: 275
