@@ -79,4 +79,6 @@ define [
 
     expand: (e, ui) =>
       id = ui.item.children(":first").data('id')
-      ui.item.find("#assignment_group_#{id}_assignments").slideDown(100)
+      ag = @collection.findWhere id: parseInt(id)
+      if ag.groupView.shouldBeExpanded()
+        ui.item.find("#assignment_group_#{id}_assignments").slideDown(100)
