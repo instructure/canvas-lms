@@ -474,18 +474,46 @@ module ApplicationHelper
     end
   end
 
+  def embedded_chat_url
+    chat_tool = active_external_tool_by_id('chat')
+    return unless chat_tool && chat_tool.url && chat_tool.custom_fields['mini_script_url']
+    uri = URI.parse(chat_tool.url)
+    uri.path = chat_tool.custom_fields['mini_script_url']
+    uri.to_s
+  end
+
+  def embedded_chat_enabled
+    chat_tool = active_external_tool_by_id('chat')
+    chat_tool && chat_tool.url && chat_tool.custom_fields['mini_script_url'] && Canvas::Plugin.value_to_boolean(chat_tool.custom_fields['embedded_chat_enabled'])
+  end
+
   def embedded_chat_visible
     @show_embedded_chat != false &&
       !@embedded_view &&
       !@body_class_no_headers &&
       @context.is_a?(Course) &&
-      Canvas::Plugin.find(:embedded_chat).enabled? &&
+      embedded_chat_enabled &&
       external_tool_tab_visible('chat')
   end
 
-  def external_tool_tab_visible(tool_id)
+  def active_external_tool_by_id(tool_id)
+    # don't use for groups. they don't have account_chain_ids
     tool = @context.context_external_tools.active.find_by_tool_id(tool_id)
-    tool ||= ContextExternalTool.active.where(:context_type => 'Account', :context_id => @context.account_chain_ids, :tool_id => 'chat').first
+    return tool if tool
+
+    # account_chain_ids is in the order we need to search for tools
+    # unfortunately, the db will return an arbitrary one first.
+    # so, we pull all the tools (probably will only have one anyway) and look through them here
+    tools = ContextExternalTool.active.where(:context_type => 'Account', :context_id => @context.account_chain_ids, :tool_id => tool_id).all
+    @context.account_chain_ids.each do |account_id|
+      tool = tools.find {|t| t.context_id == account_id}
+      return tool if tool
+    end
+    nil
+  end
+
+  def external_tool_tab_visible(tool_id)
+    tool = active_external_tool_by_id(tool_id)
     return false unless tool
     tc = @context.tab_configuration.find {|tc| tc['id'] == tool.asset_string}
     return true unless tc # default to visible tabs if not hidden explicitly

@@ -1,1 +1,6 @@
-<script>console.log("Chattin' it up on " + window.location.pathname);</script>
+<% js_env :EMBEDDED_CHAT => {
+     launch_url: context_url(@context, :context_external_tool_resource_selection_url, active_external_tool_by_id('chat').id, launch_type: 'course_navigation')
+     } %>
+<% js_block do %>
+<script type="text/javascript" src="<%= embedded_chat_url %>"></script>
+<% end %>

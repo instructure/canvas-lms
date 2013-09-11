@@ -291,6 +291,7 @@ class ExternalToolsController < ApplicationController
 
       find_tool(params[:id], selection_type)
       @active_tab = @tool.asset_string if @tool
+      @show_embedded_chat = false if @tool.try(:tool_id) == 'chat'
       render_tool(selection_type)
       add_crumb(@context.name, named_context_url(@context, :context_url))
     end
