@@ -127,7 +127,7 @@ group :test do
     gem 'rspec',        '1.3.2'
     gem 'rspec-rails',  '1.3.4'
   end
-  gem 'selenium-webdriver', '2.34.0'
+  gem 'selenium-webdriver', '2.35.0'
   gem 'webrat',       '0.7.3'
   gem 'yard',         '0.8.0'
   gem 'yard-appendix',  '>=0.1.8'
