@@ -216,14 +216,15 @@ class ApiController < ApplicationController
 
   def group_membership_for(user)
     # Find user's groups
-    groups = Group.find(:all, :conditions => ['id IN (?)', user.group_ids])
-    groups.map do |group|
+    GroupMembership.find(:all, :conditions => ['user_id = ? AND workflow_state != ?', user.id, "deleted"]).map do |group_membership|
+      group = group_membership.group
       {
         :id => group.id,
         :name => group.name,
         :sis_source_id => group.sis_source_id,
         :context_type => group.context_type,
-        :context_id => group.context_id
+        :context_id => group.context_id,
+        :group_membership_id => group_membership.id
       }
     end
   end
