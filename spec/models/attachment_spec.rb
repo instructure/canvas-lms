@@ -777,6 +777,16 @@ describe Attachment do
     end
   end
 
+  context "destroy!" do
+    it "should not delete the s3 object, even here" do
+      s3_storage!
+      a = attachment_model
+      s3object = a.s3object
+      s3object.expects(:delete).never
+      a.destroy!
+    end
+  end
+
   context "inferred display name" do
     it "should take a normal filename and use it as a diplay name" do
       a = attachment_model(:filename => 'normal_name.ppt')
