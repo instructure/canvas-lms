@@ -39,7 +39,7 @@
       <li><a href="#"><label><%= t('show_concluded_enrollments', "Show Concluded Enrollments") %><input type="checkbox" id="show_concluded_enrollments" /></label></a></li>
     </ul>
     <div class="gradebook_filter">
-      <% placeholder = t('filter_by_student', 'Filter by student name or IDs') %>
+      <% placeholder = t('filter_by_student', 'Filter by student name or IDs') %> <%# SFU MOD - CANVAS-188 Add SIS ID column %>
       <input type="text" placeholder="<%= placeholder %>" aria-label="<%= placeholder %>">
     </div>
   </div>

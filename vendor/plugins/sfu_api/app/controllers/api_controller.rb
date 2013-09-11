@@ -39,6 +39,8 @@ class ApiController < ApplicationController
         user_hash["id"] = user.id
         user_hash["name"] = user.name
         user_hash["uuid"] = user.uuid
+      elsif params[:property].eql? "groups"
+        user_hash = group_membership_for user
       elsif params[:property].eql? "mysfu"
         user_hash = mysfu_enrollments_for user
       elsif params[:property].eql? "sandbox"
@@ -212,4 +214,46 @@ class ApiController < ApplicationController
     end
   end
 
+  def group_membership_for(user)
+    # Find user's groups
+    GroupMembership.find(:all, :conditions => ['user_id = ? AND workflow_state != ?', user.id, "deleted"]).map do |group_membership|
+      group = group_membership.group
+      {
+        :id => group.id,
+        :name => group.name,
+        :sis_source_id => group.sis_source_id,
+        :context_type => group.context_type,
+        :context_id => group.context_id,
+        :group_membership_id => group_membership.id
+      }
+    end
+  end
+
+  def course_enrollment
+    enrollment_id = params[:enrollment_id]
+    new_section_id = params[:new_section_id]
+    results = { :result => "Invalid POST parameters" }
+    unless enrollment_id.nil? || new_section_id.nil?
+      out = Enrollment.where(:id => enrollment_id).update_all("course_section_id = #{new_section_id}")
+      if out == 1
+        results = { :result => "Success" }
+      else
+        raise "Error updating enrollment_id of '#{enrollment_id}'"
+      end
+    end
+
+    respond_to do |format|
+      format.json { render :json => results }
+    end
+  end
+
+  def undelete_group_membership
+    membership = GroupMembership.find(params[:id])
+    membership.workflow_state = 'accepted'
+    if membership.save
+      render :json => membership.as_json(:include_root => false, :only => %w(id group_id user_id workflow_state moderator))
+    else
+      render :json => membership.errors, :status => :bad_request
+    end
+  end
 end

@@ -67,7 +67,7 @@
   <h2>Search for Courses</h2>
   <p>If you need to create other credit courses, use the search box below to find them. Search results will show up as you type.</p>
   <div>
-    <%= select_tag 'sel-search-term', options_for_select(@term_options, @current_term.sis_source_id), :class => 'input-medium' %>
+    <%= select_tag 'sel-search-term', options_for_select(@term_options, @current_term && @current_term.sis_source_id), :class => 'input-medium' %>
     <input type="text" id="search" placeholder="e.g. MATH150 D100" size="50" />
   </div>
   <ul id="courses-searched" class="courses"></ul>

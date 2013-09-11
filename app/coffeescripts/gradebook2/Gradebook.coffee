@@ -142,8 +142,9 @@ define [
         student.computed_current_score ||= 0
         student.computed_final_score ||= 0
         student.secondary_identifier = student.sis_login_id || student.login_id
-        # [CANVAS-188] Define data for SIS ID column (use dash if not available)
+        # SFU MOD CANVAS-188 Define data for SIS ID column (use dash if not available)
         student.sis_id = student.sis_user_id || '-'
+        # END SFU MOD
 
         if @sections_enabled
           mySections = (@sections[sectionId].name for sectionId in student.sections when @sections[sectionId])
@@ -683,7 +684,9 @@ define [
       @userFilterRemovedRows = []
 
       if term != ''
+        # SFU MOD CANVAS-188 Add SIS ID column
         propertiesToMatch = ['name', 'login_id', 'short_name', 'sortable_name', 'sis_user_id']
+        # END SFU MOD
         index = @multiGrid.data.length
         while index--
           student = @multiGrid.data[index]
@@ -746,7 +749,7 @@ define [
         resizable: false
         sortable: true
       },
-      # [CANVAS-188] Add SIS ID column
+      # SFU MOD CANVAS-188 Add SIS ID column
       {
         id: 'sis_id'
         name: I18n.t 'sis_id', 'SIS ID'
@@ -756,6 +759,7 @@ define [
         resizable: false
         sortable: true
       }]
+      # END SFU MOD
 
       @allAssignmentColumns = for id, assignment of @assignments
         outOfFormatter = assignment &&
@@ -877,8 +881,9 @@ define [
           bScore = -99999999999 if not bScore and bScore != 0
           if data.sortAsc then bScore - aScore else aScore - bScore
       @multiGrid.grids[0].onSort.subscribe (event, data) =>
-        # [CANVAS-188] Make SIS ID column sortable
+        # SFU MOD CANVAS-188 Make SIS ID column sortable
         propertyToSortBy = {display_name: 'sortable_name', secondary_identifier: 'secondary_identifier', sis_id: 'sis_id'}[data.sortCol.field]
+        # END SFU MOD
         sortRowsBy (a, b) ->
           res = if a[propertyToSortBy] < b[propertyToSortBy] then -1
           else if a[propertyToSortBy] > b[propertyToSortBy] then 1

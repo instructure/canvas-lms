@@ -25,7 +25,9 @@
     <% if can_do(@context, @current_user, :manage_content) %>
       <h4><%= t 'titles.you_can_also', "You can also:" %></h4>
       <div>
+        <%# SFU MOD Add "WebCT" to content import link %>
         <p><a class="btn copy_from_another" href="<%= context_url(@context, :context_import_choose_course_url) %>"> <%= mt 'links.copy_course', "Copy content from another **Canvas** or **WebCT course**" %></a></p>
+        <%# END SFU MOD %>
 
         <% if exports_enabled? %>
           <p><a class="btn import_content_package" href="<%= context_url(@context, :context_import_migrate_url) %>"> <%= mt 'links.import_package', "Import content from a **content package** or from **another system**" %></a></p>

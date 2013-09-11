@@ -105,16 +105,16 @@
     </tr>
   <% end %>
   <% if !@password_pseudonyms.empty? %>
-  <%# CANVAS-158 - remove password change field (section one) - mstanger %>
+  <%# SFU MOD CANVAS-158 - remove password change field (section one) - mstanger %>
   <% if false %>
   <tr class="edit_data_row select_change_password_row" style="display: none;">
     <td><%= before_label(:password, "Password") %></td>
     <td><label for="change_password_checkbox" class="checkbox"><input type="checkbox" id="change_password_checkbox" name="pseudonym[change_password]" value="1"/><%= t('labels.change_password', "Change Password") %></label></td>
   </tr>
   <% end %>
-  <%# End section one: CANVAS-158 remove password change field - mstanger %>
+  <%# END SFU MOD CANVAS-158 remove password change field (section one) - mstanger %>
   <% end %>
-  <%# CANVAS-158 - remove password change field (section two) - mstanger %>
+  <%# SFU MOD CANVAS-158 - remove password change field (section two) - mstanger %>
   <% if false %>
   <tr class="change_password_row" style="display: none;">
     <td class="nobr"><label for="profile_pseudonym_id"><%= before_label(:password_for, "Password For") %></label></td>
@@ -142,12 +142,12 @@
     <td colspan="2"><a href="#" class="more_options_link" style="display: none;"><%= t('links.more_options', "more options") %></a></td>
   </tr>
   <% end %>
-  <%# End section two: CANVAS-158 remove password change field - mstanger %>
+  <%# END SFU MOD CANVAS-158 remove password change field (section two) - mstanger %>
   <tr class="edit_data_row" style="display: none;">
     <td colspan="2">
-      <%# omit Delete My Account - mstanger - JIRA CANVAS-117 %>
+      <%# SFU MOD CANVAS-117 omit Delete My Account - mstanger %>
       <% if false %><p><a style="font-size: 0.9em" href="<%= user_delete_url(@user.id) %>" class="admin"><%= t('links.delete_account', "Delete My Account") %> </a></p><% end %>
-      <%# end of CANVAS-117 %>
+      <%# END SFU MOD CANVAS-117 %>
       <div class="form-actions">
         <button type="button" class="btn cancel_button"><%= t('#buttons.cancel', "Cancel") %></button>
         <button type="submit" class="btn btn-primary"><%= t('buttons.update_settings', "Update Settings") %></button>
