@@ -145,7 +145,8 @@ define [
       $textArea.elastic()
 
     onCourse: (course) =>
-      return if !@recipientView.currentContext and course.id == ''
+      if !@recipientView.currentContext and course.id == ''
+        return @recipientView.disable()
       @recipientView.setContext(course, true)
       @$contextCode.val(if course?.id then course.id else '')
 
