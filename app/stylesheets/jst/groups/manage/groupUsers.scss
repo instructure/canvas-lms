@@ -1,0 +1,41 @@
+.group-user {
+  border: 1px solid #ccc;
+  background: #fff;
+  margin-bottom: 3px;
+  padding: 0 15px;
+  border-radius: 3px;
+  position: relative;
+}
+
+.assign-to-group {
+  position: absolute;
+  right: 8px;
+  top: 0px;
+}
+
+.group .group-users {
+  overflow: hidden;
+  .collectionViewItems {
+    width: 103%;
+  }
+}
+
+.group .group-user {
+  float: left;
+  width: 31%;
+  margin: 0 2% 10px 0;
+  box-sizing: border-box;
+  .group-user-name {
+    margin-right: 0;
+  }
+}
+
+.group-user-name {
+  overflow: hidden;
+  white-space: nowrap;
+  margin-right: 10px;
+}
+
+.group-users .paginatedLoadingIndicator {
+  clear: both;
+}

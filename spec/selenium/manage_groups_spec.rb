@@ -8,6 +8,41 @@ describe "manage groups" do
     course_with_teacher_logged_in
   end
 
+  context "2.0" do
+    before do
+      account = Account.default
+      account.settings[:enable_manage_groups2] = true
+      account.save!
+    end
+
+    describe "group category creation" do
+      it "should auto-split students into groups" do
+        groups_student_enrollment 4
+        get "/courses/#{@course.id}/groups"
+
+        f('#add-group-set').click
+        set_value f('#new_category_name'), "zomg"
+        f('[name=split_groups]').click
+        set_value f('[name=split_group_count]'), 2
+        submit_form f('.group-category-create')
+
+        wait_for_ajaximations
+
+        # yay, added
+        f('#group_categories_tabs .collectionViewItems').text.should == 'zomg'
+
+        run_jobs
+
+        groups = nil
+        keep_trying_until {
+          groups = ff('.collectionViewItems.groups .group')
+          groups.present?
+        }
+        groups.size.should == 2
+      end
+    end
+  end
+
   it "should show one div.group_category per category" do
     groups_student_enrollment 3
     group_categories = create_categories @course

@@ -1,0 +1,46 @@
+<div class="form-dialog-content pad-box form-inline">
+  <fieldset class="pad-box{{#if ENV.allow_self_signup}} dotted-separator{{/if}}">
+    <label>
+      {{#t "group_set_name"}}Group Set Name{{/t}} &nbsp;
+      <input type="text" id="category_{{id}}_name" name="name" value="{{name}}">
+    </label>
+  </fieldset>
+  {{#if ENV.allow_self_signup}}
+  <fieldset class="pad-box">
+    <div class="control-group">
+      <label class="checkbox">
+        {{checkbox "enable_self_signup" class="self-signup-toggle"}}
+        {{#t "allow_self_signup"}}Allow self sign-up{{/t}}
+      </label>
+      <a href="#"
+        class="about-self-signup icon-question"
+        style="padding-right:10px"
+        title="<div class='popover-content'><p>{{#t "self_signup_description"}}You can create sets of groups where students can sign up on their own. Students are still limited to being in only one group in the set, but this way students can organize themselves into groups instead of needing the teacher to do the work. Note that as long as this option is enabled, students can move themselves from one group to another.{{/t}}</p></div>"
+        aria-label="{{#t "what_is_this"}}What is this?{{/t}}"
+        data-tooltip='{"tooltipClass":"popover", "position":"right"}'></a>
+    </div>
+    <div class="self-signup-controls">
+      <div class="control-group">
+        <label class="checkbox">
+          {{checkbox "restrict_self_signup"}}
+          {{#t "require_same_section"}}Require group members to be in the same section{{/t}}
+        </label>
+      </div>
+      <div class="control-group">
+        <label>
+          {{#t "limit_group_size"}}
+            Limit groups to {{{group_limit}}} members
+          {{/t}}
+        </label>
+        <span class="hint-text">
+          ({{#t "leave_group_limit_blank"}}Leave blank for no limit{{/t}})
+        </span>
+      </div>
+    </div>
+  </fieldset>
+  {{/if}}
+</div>
+<div class="form-controls">
+  <button type="button" class="btn dialog_closer">{{#t "cancel"}}Cancel{{/t}}</button>
+  <button type="submit" class="btn btn-primary" data-text-while-loading='{{#t "saving"}}Saving...{{/t}}'>{{#t "save"}}Save{{/t}}</button>
+</div>

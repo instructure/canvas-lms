@@ -3,7 +3,7 @@ define [
   'underscore'
   'compiled/views/DialogFormView'
   'jst/groups/manage/groupEdit'
-  'jst/groups/manage/groupEditDialogWrapper'
+  'jst/EmptyDialogFormWrapper'
 ], (I18n, _, DialogFormView, template, wrapper) ->
 
   class GroupEditView extends DialogFormView
@@ -35,6 +35,6 @@ define [
     openAgain: ->
       super
       # reset the form contents
-      @renderEl()
+      @render()
       # auto-focus the first input
       @$el.find('input:first').focus()

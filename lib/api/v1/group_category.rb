@@ -19,6 +19,7 @@
 module Api::V1::GroupCategory
   include Api::V1::Json
   include Api::V1::Context
+  include Api::V1::Progress
 
   API_GROUP_CATEGORY_JSON_OPTS = {
     :only => %w(id name role self_signup group_limit)

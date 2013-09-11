@@ -97,6 +97,7 @@ class GroupsController < ApplicationController
 
   include Api::V1::Attachment
   include Api::V1::Group
+  include Api::V1::GroupCategory
   include Api::V1::UserFollow
 
   SETTABLE_GROUP_ATTRIBUTES = %w(name description join_level is_public group_category avatar_attachment storage_quota_mb)
@@ -190,31 +191,44 @@ class GroupsController < ApplicationController
   def context_index
     return unless authorized_action(@context, @current_user, :read_roster)
 
-    @groups      = @context.groups.active.by_name
+    @groups      = all_groups = @context.groups.active.by_name
     @categories  = @context.group_categories.order("role <> 'student_organized'", :name)
     @user_groups = @current_user.group_memberships_for(@context) if @current_user
 
     unless api_request?
-      add_crumb (@context.is_a?(Account) ? t('#crumbs.users', "Users") : t('#crumbs.people', "People")), named_context_url(@context, :context_users_url)
-      add_crumb t('#crumbs.groups', "Groups"), named_context_url(@context, :context_groups_url)
-      @active_tab = @context.is_a?(Account) ? "users" : "people"
-
-      @user_groups = @groups & (@user_groups || [])
-
-      @available_groups = (@groups - @user_groups).select do |group|
-        group.grants_right?(@current_user, :join)
+      if @context.is_a?(Account)
+        user_crumb = t('#crumbs.users', "Users")
+        @active_tab = "users"
+        @group_user_type = "user"
+        @allow_self_signup = false
+      else
+        user_crumb = t('#crumbs.people', "People")
+        @active_tab = "people"
+        @group_user_type = "student"
+        @allow_self_signup = true
       end
+
+      add_crumb user_crumb, named_context_url(@context, :context_users_url)
+      add_crumb t('#crumbs.groups', "Groups"), named_context_url(@context, :context_groups_url)
     end
 
     unless @context.grants_right?(@current_user, session, :manage_groups)
-      @groups = @user_groups
+      @groups = @user_groups = @groups & (@user_groups || [])
     end
 
     respond_to do |format|
       format.html do
         if @context.grants_right?(@current_user, session, :manage_groups)
+          if @domain_root_account.enable_manage_groups2?
+            js_env group_categories: @categories.map{ |cat| group_category_json(cat, @current_user, session, include: ["progress_url"]) },
+                   group_user_type: @group_user_type,
+                   allow_self_signup: @allow_self_signup
+          end
           render :action => 'context_manage_groups'
         else
+          @available_groups = (all_groups - @user_groups).select do |group|
+            group.grants_right?(@current_user, :join)
+          end
           render :action => 'context_groups'
         end
       end

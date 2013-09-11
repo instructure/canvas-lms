@@ -3,6 +3,7 @@ define [
   'underscore'
   'Backbone'
   'compiled/views/groups/manage/GroupCategoryDetailView'
+  'compiled/views/groups/manage/GroupCategoryEditView'
   'compiled/views/groups/manage/GroupsView'
   'compiled/views/groups/manage/UnassignedUsersView'
   'compiled/views/groups/manage/AddUnassignedMenu'
@@ -11,7 +12,7 @@ define [
   'compiled/models/Group'
   'jst/groups/manage/groupCategory'
   'compiled/jquery.rails_flash_notifications'
-], (I18n, _, {View}, GroupCategoryDetailView, GroupsView, UnassignedUsersView, AddUnassignedMenu, AssignToGroupMenu, GroupEditView, Group, template) ->
+], (I18n, _, {View}, GroupCategoryDetailView, GroupCategoryEditView, GroupsView, UnassignedUsersView, AddUnassignedMenu, AssignToGroupMenu, GroupEditView, Group, template) ->
 
   class GroupCategoryView extends View
 
@@ -25,6 +26,7 @@ define [
     @child 'groupsView', '[data-view=groups]'
 
     events:
+      'click .edit-category': 'editCategory'
       'click .delete-category': 'deleteCategory'
       'click .add-group': 'addGroup'
 
@@ -39,12 +41,14 @@ define [
       if progress = @model.get('progress')
         @model.progressModel.set progress
         @randomlyAssignStudentsInProgress = true
+      else if @model.get('progress_url') or @model.progressStarting
+        @randomlyAssignStudentsInProgress = true
       super
 
     groupsView: (options) ->
       addUnassignedMenu = null
       if ENV.IS_LARGE_ROSTER
-        users = @model.unassignedUsers(false)
+        users = @model.unassignedUsers()
         addUnassignedMenu = new AddUnassignedMenu collection: users
       new GroupsView {
         collection: @groups
@@ -55,7 +59,7 @@ define [
       return false if ENV.IS_LARGE_ROSTER
       assignToGroupMenu = new AssignToGroupMenu collection: @groups
       new UnassignedUsersView {
-        collection: @model.unassignedUsers(false)
+        collection: @model.unassignedUsers()
         groupsCollection: @groups
         assignToGroupMenu
       }
@@ -68,7 +72,7 @@ define [
       @model.progressModel.on 'change', @render
       @model.on 'progressResolved', =>
         @model.groups().fetch()
-        @model.unassignedUsers().fetch()
+        @model.unassignedUsers().reset()
         @randomlyAssignStudentsInProgress = false
         @render()
 
@@ -93,3 +97,6 @@ define [
       json.randomlyAssignStudentsInProgress = @randomlyAssignStudentsInProgress
       json
 
+    editCategory: ->
+      @editCategoryView ?= new GroupCategoryEditView({@model})
+      @editCategoryView.open()
