@@ -1,10 +1,12 @@
 <div class='module-sequence-padding'></div>
 <div class='module-sequence-footer clearfix'>
-{{#if previous.show}}
-  <a href="{{previous.url}}" class="pull-left" data-tooltip title="{{previous.tooltip}}"><i class="icon-mini-arrow-left"></i>&nbsp;{{#t 'previous'}}Previous{{/t}}</a>
-{{/if}}
+  <div class="module-sequence-footer-content">
+    {{#if previous.show}}
+      <a href="{{previous.url}}" class="pull-left" data-tooltip title="{{previous.tooltip}}"><i class="icon-mini-arrow-left"></i>&nbsp;{{#t 'previous'}}Previous{{/t}}</a>
+    {{/if}}
 
-{{#if next.show}}
-  <a href="{{next.url}}" class="pull-right bordered" data-tooltip title="{{next.tooltip}}">{{#t 'next'}}Next{{/t}}&nbsp;<i class="icon-mini-arrow-right"></i></a>
-{{/if}}
+    {{#if next.show}}
+      <a href="{{next.url}}" class="pull-right bordered" data-tooltip title="{{next.tooltip}}">{{#t 'next'}}Next{{/t}}&nbsp;<i class="icon-mini-arrow-right"></i></a>
+    {{/if}}
+  </div>
 </div>

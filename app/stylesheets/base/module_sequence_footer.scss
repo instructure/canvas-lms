@@ -7,18 +7,16 @@ $text: #3a4651;
 $button-hover: #dee5ea;
 
 .module-sequence-padding{
-  height: $bar-height;
+  height: $bar-height+1;
 }
 
 .module-sequence-footer{
-  background: $bar-background;
   position: absolute;
   left:0px;
   right:0px;
   bottom:0px;
-  height: $bar-height;
-  border-top: 1px solid $top-bar-border;
-  box-shadow: inset 0px 1px 0px 0px $top-bar-shadow;
+  height: $bar-height+1;
+  overflow: hidden;
 
   a{
     line-height: $bar-height;
@@ -37,4 +35,26 @@ $button-hover: #dee5ea;
       border-left: 1px solid $button-border-line;
     }
   }
+}
+
+.module-sequence-footer .module-sequence-footer-content {
+  background: $bar-background;
+  height: $bar-height;
+  box-shadow: inset 0px 1px 0px 0px $top-bar-shadow;
+  border-top: 1px solid $top-bar-border;
+}
+
+@keyframes module-sequence-footer-animation {
+  from {height:0;}
+  to {height:$bar-height+1;}
+}
+
+@-webkit-keyframes module-sequence-footer-animation {
+  from {height:0;}
+  to {height:$bar-height+1;}
+}
+
+.module-sequence-padding, .module-sequence-footer{
+  animation: module-sequence-footer-animation 1.25s;
+  -webkit-animation: module-sequence-footer-animation 1.25s;
 }

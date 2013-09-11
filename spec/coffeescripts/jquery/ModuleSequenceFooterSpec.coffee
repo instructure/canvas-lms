@@ -185,3 +185,15 @@ define [
     @$testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123, location: {search:"?module_item_id=999" }})
     @server.respond()
     equal @server.requests[0].status, '200', 'Request was successful'
+
+  test 'show gets called when rendering', ->
+    @sandbox.stub(@$testEl, 'show')
+    @server.respondWith "GET",
+                        "/api/v1/courses/42/module_item_sequence?asset_type=Assignment&asset_id=123",
+                        [
+                          200, { "Content-Type": "application/json" }, JSON.stringify(itemTooltipData)
+                        ]
+    @$testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123})
+    @server.respond()
+
+    ok @$testEl.show.called, 'show called'

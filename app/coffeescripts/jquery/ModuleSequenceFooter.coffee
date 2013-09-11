@@ -51,6 +51,7 @@ define [
           previous: @msfInstance.previous
           next: @msfInstance.next
         )
+        @show()
 
       this
 
