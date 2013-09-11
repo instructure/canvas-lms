@@ -147,9 +147,7 @@ define [
     #
     # Returns nothing.
     _disable: ->
-      @$input.prop('disabled', true)
-      @$searchBtn.prop('disabled', true)
-      @$inputBox.addClass('disabled')
+      @disable()
       @$inputBox.attr('title', @messages.private)
       @$inputBox.attr('data-tooltip', '{"position":"bottom"}')
       @disabled = true
@@ -541,9 +539,12 @@ define [
       @tokens             = []
       @$tokenList.find('li.ac-token').remove()
       if disable and !_.include(ENV.current_user_roles, 'admin') and !@disabled
-        @$input.prop('disabled', !@currentContext)
-        @$searchBtn.prop('disabled', !@currentContext)
-        @$inputBox.toggleClass('disabled', !@currentContext)
+        @disable(!@currentContext)
+
+    disable: (value = true) ->
+      @$input.prop('disabled', value)
+      @$searchBtn.prop('disabled', value)
+      @$inputBox.toggleClass('disabled', value)
 
     # Public: Put the given tokens in the token list.
     #
