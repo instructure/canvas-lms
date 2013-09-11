@@ -29,6 +29,8 @@ define [
     @optionProperty 'wiki_page_history_path'
     @optionProperty 'WIKI_RIGHTS'
     @optionProperty 'PAGE_RIGHTS'
+    @optionProperty 'course_home'
+    @optionProperty 'course_title'
 
     initialize: ->
       @model.on 'change', => @render()
@@ -75,12 +77,14 @@ define [
       json.wiki_pages_path = @wiki_pages_path
       json.wiki_page_edit_path = @wiki_page_edit_path
       json.wiki_page_history_path = @wiki_page_history_path
+      json.course_home = @course_home
+      json.course_title = @course_title
       json.CAN =
         VIEW_PAGES: !!@WIKI_RIGHTS.read
         PUBLISH: !!@WIKI_RIGHTS.manage && json.contextName == 'courses'
         UPDATE_CONTENT: !!@PAGE_RIGHTS.update || !!@PAGE_RIGHTS.update_content
-        DELETE: !!@PAGE_RIGHTS.delete
+        DELETE: !!@PAGE_RIGHTS.delete && !@course_home
         READ_REVISIONS: !!@PAGE_RIGHTS.read_revisions
-        ACCESS_GEAR_MENU: !!@PAGE_RIGHTS.delete || !!@PAGE_RIGHTS.read_revisions
+      json.CAN.ACCESS_GEAR_MENU = json.CAN.DELETE || json.CAN.READ_REVISIONS
       json.CAN.VIEW_TOOLBAR = json.CAN.VIEW_PAGES || json.CAN.PUBLISH || json.CAN.UPDATE_CONTENT || json.CAN.ACCESS_GEAR_MENU
       json

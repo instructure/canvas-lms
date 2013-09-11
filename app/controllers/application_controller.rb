@@ -26,6 +26,7 @@ class ApplicationController < ActionController::Base
   include Api
   include LocaleSelection
   include Api::V1::User
+  include Api::V1::WikiPage
   around_filter :set_locale
 
   helper :all
@@ -1591,10 +1592,11 @@ class ApplicationController < ActionController::Base
     raise ActionController::RoutingError.new('Not Found')
   end
 
-  def set_js_rights
-    if respond_to?(:js_rights)
+  def set_js_rights(objtypes = nil)
+    objtypes ||= js_rights if respond_to?(:js_rights)
+    if objtypes
       hash = {}
-      js_rights.each do |instance_symbol|
+      objtypes.each do |instance_symbol|
         instance_name = instance_symbol.to_s
         obj = instance_variable_get("@#{instance_name}")
         policy = obj.check_policy(@current_user, session) unless obj.nil? || !obj.respond_to?(:check_policy)
@@ -1603,5 +1605,30 @@ class ApplicationController < ActionController::Base
 
       js_env hash
     end
+  end
+
+  def set_js_wiki_data(opts = {})
+    hash = {}
+
+    hash[:DEFAULT_EDITING_ROLES] = @context.default_wiki_editing_roles if @context.respond_to?(:default_wiki_editing_roles)
+    hash[:WIKI_PAGES_PATH] = polymorphic_path([@context, :pages])
+    if opts[:course_home]
+      hash[:COURSE_HOME] = true
+      hash[:COURSE_TITLE] = @context.name
+    end
+
+    if @page
+      hash[:WIKI_PAGE] = wiki_page_json(@page, @current_user, session)
+      hash[:WIKI_PAGE_REVISION] = (current_version = @page.versions.current) ? current_version.number : nil
+      hash[:WIKI_PAGE_SHOW_PATH] = polymorphic_path([@context, :named_page], :wiki_page_id => @page)
+      hash[:WIKI_PAGE_EDIT_PATH] = polymorphic_path([@context, :edit_named_page], :wiki_page_id => @page)
+      hash[:WIKI_PAGE_HISTORY_PATH] = polymorphic_path([@context, @page, :wiki_page_revisions])
+
+      if @context.is_a?(Course)
+        hash[:COURSE_ID] = @context.id if @context.grants_right?(@current_user, :read)
+      end
+    end
+
+    js_env hash
   end
 end

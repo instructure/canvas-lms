@@ -1119,6 +1119,11 @@ class CoursesController < ApplicationController
       when "wiki"
         @wiki = @context.wiki
         @page = @wiki.front_page
+        if @context.draft_state_enabled?
+          set_js_rights [:wiki, :page]
+          set_js_wiki_data :course_home => true
+          @padless = true
+        end
       when 'assignments'
         add_crumb(t('#crumbs.assignments', "Assignments"))
         get_sorted_assignments

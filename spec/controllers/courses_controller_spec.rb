@@ -368,6 +368,19 @@ describe CoursesController do
         assigns(:recent_feedback).count.should == 1
         assigns(:recent_feedback).first.assignment_id.should == @a1.id
       end
+
+      it "should work for wiki view with draft state enabled" do
+        @course1.account.settings[:allow_draft] = true
+        @course1.account.save!
+        @course1.default_view = "wiki"
+        @course1.enable_draft = true
+        @course1.save!
+        @course1.wiki.wiki_pages.create!(:title => 'blah').set_as_front_page!
+        get 'show', :id => @course1.id
+        @controller.js_env[:WIKI_RIGHTS].should eql({:read => true})
+        @controller.js_env[:PAGE_RIGHTS].should eql({:read => true})
+        @controller.js_env[:COURSE_TITLE].should eql @course1.name
+      end
       
       it "should work for syllabus view" do 
         @course1.default_view = "syllabus"

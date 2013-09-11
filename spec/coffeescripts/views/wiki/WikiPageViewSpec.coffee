@@ -59,6 +59,7 @@ define [
         model: model
         WIKI_RIGHTS: options.WIKI_RIGHTS
         PAGE_RIGHTS: options.PAGE_RIGHTS
+        course_home: options.course_home
       json = view.toJSON()
       for key of options.CAN
         strictEqual json.CAN[key], options.CAN[key], "#{subject} - CAN.#{key}"
@@ -118,3 +119,21 @@ define [
       DELETE: false
       READ_REVISIONS: false
       ACCESS_GEAR_MENU: false
+
+  testRights 'CAN (manage, course home page)',
+    contextAssetString: 'course_73'
+    course_home: true
+    WIKI_RIGHTS:
+      read: true
+      manage: true
+    PAGE_RIGHTS:
+      update: true
+      delete: true
+      read_revisions: true
+    CAN:
+      VIEW_PAGES: true
+      PUBLISH: true
+      UPDATE_CONTENT: true
+      DELETE: false
+      READ_REVISIONS: true
+      ACCESS_GEAR_MENU: true

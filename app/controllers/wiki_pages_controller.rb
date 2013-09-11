@@ -228,24 +228,4 @@ class WikiPagesController < ApplicationController
    res
   end
 
-  def set_js_wiki_data
-    hash = {}
-
-    hash[:DEFAULT_EDITING_ROLES] = @context.default_wiki_editing_roles if @context.respond_to?(:default_wiki_editing_roles)
-    hash[:WIKI_PAGES_PATH] = polymorphic_path([@context, :pages])
-
-    if @page
-      hash[:WIKI_PAGE] = wiki_page_json(@page, @current_user, session)
-      hash[:WIKI_PAGE_REVISION] = (current_version = @page.versions.current) ? current_version.number : nil
-      hash[:WIKI_PAGE_SHOW_PATH] = polymorphic_path([@context, :named_page], :wiki_page_id => @page)
-      hash[:WIKI_PAGE_EDIT_PATH] = polymorphic_path([@context, :edit_named_page], :wiki_page_id => @page)
-      hash[:WIKI_PAGE_HISTORY_PATH] = polymorphic_path([@context, @page, :wiki_page_revisions])
-
-      if @context.is_a?(Course)
-        hash[:COURSE_ID] = @context.id if @context.grants_right?(@current_user, :read)
-      end
-    end
-
-    js_env hash
-  end
 end

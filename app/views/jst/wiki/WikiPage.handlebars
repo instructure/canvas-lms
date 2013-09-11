@@ -3,17 +3,23 @@
   <div class="header-bar-container sticky-toolbar" data-sticky>
     <div class="header-bar">
       <div class="header-bar-left">
-        {{#if CAN.VIEW_PAGES}}
-          <a class="btn{{#if front_page}} btn-primary{{/if}} view_all_pages" href="{{wiki_pages_path}}">{{#t 'buttons.view_all_pages'}}View All Pages{{/t}}</a>
+        {{#if course_home}}
+          <h2 class="course-title">{{course_title}}</h2>
+        {{else}}
+          {{#if CAN.VIEW_PAGES}}
+            <a class="btn{{#if front_page}} btn-primary{{/if}} view_all_pages" href="{{wiki_pages_path}}">{{#t 'buttons.view_all_pages'}}View All Pages{{/t}}</a>
+          {{/if}}
         {{/if}}
       </div>
       <div class="header-bar-right">
-        {{#if front_page}}
-          <span class="front-page label">{{#t 'labels.front_page'}}Front Page{{/t}}</span>
-        {{/if}}
-        {{#if CAN.PUBLISH}}
-          <span class="publish-button"></span>
-        {{/if}}
+        {{#unless course_home}}
+          {{#if front_page}}
+            <span class="front-page label">{{#t 'labels.front_page'}}Front Page{{/t}}</span>
+          {{/if}}
+          {{#if CAN.PUBLISH}}
+            <span class="publish-button"></span>
+          {{/if}}
+        {{/unless}}
         {{#if CAN.UPDATE_CONTENT}}
           <a href="{{wiki_page_edit_path}}" class="btn edit-wiki"><i class="icon-edit"></i> {{#t 'buttons.edit'}}Edit{{/t}}</a>
         {{/if}}
@@ -42,4 +48,7 @@
   <h2 class="page-title">{{title}}</h2>
   {{{body}}}
 </div>
-<div id="module_sequence_footer" style="display:none;"></div>
+
+{{#unless course_home}}
+  <div id="module_sequence_footer" style="display:none;"></div>
+{{/unless}}

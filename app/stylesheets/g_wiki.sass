@@ -46,7 +46,9 @@ $table-shadow: 0 1px 0 #dde0e4
 
   .header-bar-outer-container
     :height 64px
+    :clear right
     .header-bar-container
+      :min-width $min_main_width - 2px
       :height 64px
       .page-changed-alert
         :overflow hidden
@@ -209,6 +211,20 @@ $table-shadow: 0 1px 0 #dde0e4
         :background #f4f6f8
 
 .pages.show
+  .course-title
+    :display none
+    :font-size 1.8em
+    :font-weight bold
+    :line-height 30px
+    :margin 0
+    :color #666
+
+  .page-title
+    :font-size 2.5em
+    :font-weight 200
+    :margin 15px 0
+    :color #666
+
   .header-bar
     .publish-button
       :margin 0 12px 0 0
@@ -217,11 +233,21 @@ $table-shadow: 0 1px 0 #dde0e4
 
   .show-content
     :padding 15px 25px
-    .page-title
-      :font-size 2.5em
-      :font-weight 200
-      :margin 15px 0
-      :color #666
+
+  .floating_links
+    :margin-right 15px
+
+  .public-license
+    :margin-left 15px
+    :margin-bottom 15px
+
+.pages.show.home
+  .course-title
+    :display block
+  .page-title
+    :display none
+  .show-content
+    :padding-top 25px
 
 .pages.edit
   .form-actions

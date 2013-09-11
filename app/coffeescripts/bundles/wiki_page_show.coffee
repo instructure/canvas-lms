@@ -10,13 +10,15 @@ require [
   wikiPage = new WikiPage ENV.WIKI_PAGE, revision: ENV.WIKI_PAGE_REVISION, contextAssetString: ENV.context_asset_string
 
   wikiPageView = new WikiPageView
+    el: '#wiki_page_show'
     model: wikiPage
     wiki_pages_path: ENV.WIKI_PAGES_PATH
     wiki_page_edit_path: ENV.WIKI_PAGE_EDIT_PATH
     wiki_page_history_path: ENV.WIKI_PAGE_HISTORY_PATH
     WIKI_RIGHTS: ENV.WIKI_RIGHTS
     PAGE_RIGHTS: ENV.PAGE_RIGHTS
-  $('#content').append(wikiPageView.$el)
+    course_home: ENV.COURSE_HOME
+    course_title: ENV.COURSE_TITLE
 
   wikiPageView.render()
 
