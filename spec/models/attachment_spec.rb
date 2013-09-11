@@ -1464,6 +1464,107 @@ describe Attachment do
       end
     end
   end
+
+  context "#process_s3_details!" do
+    before do
+      Attachment.stubs(:local_storage?).returns(false)
+      Attachment.stubs(:s3_storage?).returns(true)
+      attachment_model(filename: 'new filename', cached_scribd_thumbnail: "THUMBNAIL_URL")
+      @attachment.stubs(:s3object).returns(mock('s3object'))
+      @attachment.stubs(:after_attachment_saved)
+    end
+
+    context "deduplication" do
+      before do
+        attachment = @attachment
+        @existing_attachment = attachment_model(filename: 'existing filename', cached_scribd_thumbnail: "THUMBNAIL_URL")
+        @child_attachment = attachment_model(root_attachment: @existing_attachment, cached_scribd_thumbnail: "THUMBNAIL_URL")
+        @attachment = attachment
+
+        @existing_attachment.stubs(:s3object).returns(mock('existing_s3object'))
+        @attachment.stubs(:find_existing_attachment_for_md5).returns(@existing_attachment)
+      end
+
+      context "existing attachment has s3object" do
+        before do
+          @existing_attachment.s3object.stubs(:exists?).returns(true)
+          @attachment.s3object.stubs(:delete)
+        end
+
+        it "should delete the new (redundant) s3object" do
+          @attachment.s3object.expects(:delete).once
+          @attachment.process_s3_details!({})
+        end
+
+        it "should put the new attachment under the existing attachment" do
+          @attachment.process_s3_details!({})
+          @attachment.reload.root_attachment.should == @existing_attachment
+        end
+
+        it "should retire the new attachment's filename" do
+          @attachment.process_s3_details!({})
+          @attachment.reload.filename.should == @existing_attachment.filename
+        end
+
+        it "should retire the new attachment's cached_scribd_thumbnail" do
+          @attachment.process_s3_details!({})
+          @attachment.reload.cached_scribd_thumbnail.should be_nil
+        end
+      end
+
+      context "existing attachment is missing s3object" do
+        before do
+          @existing_attachment.s3object.stubs(:exists?).returns(false)
+        end
+
+        it "should not delete the new s3object" do
+          @attachment.s3object.expects(:delete).never
+          @attachment.process_s3_details!({})
+        end
+
+        it "should not put the new attachment under the existing attachment" do
+          @attachment.process_s3_details!({})
+          @attachment.reload.root_attachment.should be_nil
+        end
+
+        it "should not retire the new attachment's filename" do
+          @attachment.process_s3_details!({})
+          @attachment.reload.filename == 'new filename'
+        end
+
+        it "should not retire the new attachment's cached_scribd_thumbnail" do
+          @attachment.process_s3_details!({})
+          @attachment.reload.cached_scribd_thumbnail == 'scribd url'
+        end
+
+        it "should put the existing attachment under the new attachment" do
+          @attachment.process_s3_details!({})
+          @existing_attachment.reload.root_attachment.should == @attachment
+        end
+
+        it "should retire the existing attachment's filename" do
+          @attachment.process_s3_details!({})
+          @existing_attachment.reload.read_attribute(:filename).should be_nil
+          @existing_attachment.filename.should == @attachment.filename
+        end
+
+        it "should retire the existing attachment's cached_scribd_thumbnail" do
+          @attachment.process_s3_details!({})
+          @existing_attachment.reload.cached_scribd_thumbnail.should be_nil
+        end
+
+        it "should reparent the child attachment under the new attachment" do
+          @attachment.process_s3_details!({})
+          @child_attachment.reload.root_attachment.should == @attachment
+        end
+
+        it "should retire the child attachment's cached_scribd_thumbnail" do
+          @attachment.process_s3_details!({})
+          @child_attachment.reload.cached_scribd_thumbnail.should be_nil
+        end
+      end
+    end
+  end
 end
 
 def processing_model
