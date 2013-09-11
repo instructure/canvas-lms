@@ -122,6 +122,12 @@ module YARD::Templates::Helpers::HtmlHelper
     str.gsub(' ', '_').underscore
   end
 
+  def url_for_file(filename, anchor = nil)
+    link = filename.filename
+    link += (anchor ? '#' + urlencode(anchor) : '')
+    link
+  end
+
   # override yard-appendix link_appendix
   def link_appendix(ref)
     __errmsg = "unable to locate referenced appendix '#{ref}'"
