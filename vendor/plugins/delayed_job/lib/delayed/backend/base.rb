@@ -225,8 +225,12 @@ module Delayed
       # Moved into its own method so that new_relic can trace it.
       def invoke_job
         Delayed::Job.in_delayed_job = true
-        payload_object.perform
-        Delayed::Job.in_delayed_job = false
+        begin
+          payload_object.perform
+        ensure
+          Delayed::Job.in_delayed_job = false
+          ActiveRecord::Base.clear_active_connections! unless Rails.env.test?
+        end
       end
 
       def batch?
