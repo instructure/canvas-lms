@@ -1,7 +1,10 @@
 require File.expand_path(File.dirname(__FILE__) + '/../common')
 
   def add_category(course, name, opts={})
-    f(".add_category_link").click
+    keep_trying_until do
+      f(".add_category_link").click
+      wait_for_ajaximations
+    end
     form = f("#add_category_form")
     input = form.find_element(:css, "input[type=text]")
     replace_content input, name
@@ -35,7 +38,10 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
   end
 
   def edit_category(opts={})
-    fj(".edit_category_link:visible").click
+    keep_trying_until do
+      fj(".edit_category_link:visible").click
+      wait_for_ajaximations
+    end
     form = f("#edit_category_form")
     input_box = form.find_element(:css, "input[type=text]")
     if opts[:new_name]
