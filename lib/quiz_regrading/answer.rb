@@ -32,26 +32,25 @@ class QuizRegrader::Answer
   private
 
   def mark_full_credit!
-    return 0 if correct?
+    previously_correct = correct?
+    previous_points    = points
 
-    answer[:correct] = true
-    points_possible - points
+    regrade_and_merge_answer!
+
+    previously_correct ? 0 : points_possible - previous_points
   end
 
   def mark_current_and_previous_correct!
-    return 0 if correct?
-
     previously_partial = partial?
+    previously_correct = correct?
     previous_points    = points
     regrade_and_merge_answer!
 
-    # previously partial correct
-    if previously_partial
-      points_possible - previous_points
+    return 0 if previously_correct
 
-    # now correct
-    elsif correct?
-      points
+    # previously partial or correct
+    if previously_partial || correct?
+      points_possible - previous_points
     else
       0
     end
@@ -112,6 +111,11 @@ class QuizRegrader::Answer
 
     question_data.merge!(id: question_id, question_id: question_id)
     newly_scored_data = QuizSubmission.score_question(question_data, fake_submission_data)
+
+    # always give credit for these two regrade options
+    if ["full_credit", "current_and_previous_correct"].include?(regrade_option)
+      newly_scored_data[:points] = points_possible
+    end
 
     # clear the answer data and modify it in-place with the newly scored data
     answer.clear

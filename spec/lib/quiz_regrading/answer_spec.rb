@@ -33,6 +33,12 @@ describe QuizRegrader::Answer do
       when :wrong   then false
       when :partial then "partial"
     end
+
+    answer[:points] = case correct
+      when :correct then 15
+      when :wrong   then 0
+      when :partial then 5
+    end
   end
 
   def assert_answer_has_regrade_option!(regrade_option)
@@ -46,6 +52,8 @@ describe QuizRegrader::Answer do
       when :partial then "partial"
     end
 
+    points = correct == :wrong ? 0 : answer[:points]
+
     sent_params = {}
     QuizSubmission.expects(:score_question).with do |*args|
       sent_params, sent_answer_data = args
@@ -58,7 +66,7 @@ describe QuizRegrader::Answer do
       else
         sent_answer_data.should == answer.merge("question_#{question.id}" => answer[:text])
       end
-    end.returns(sent_params.merge(:points => answer[:points], :correct => correct)).at_least_once
+    end.returns(sent_params.merge(:points => points, :correct => correct)).at_least_once
   end
 
   describe "#initialize" do
@@ -95,6 +103,7 @@ describe QuizRegrader::Answer do
       it 'returns the points possible for the question if the answer '+
         'was not correct before' do
         mark_original_answer_as!(:wrong)
+        score_question_as!(:correct)
         answer[:points] = 0
         wrapper.regrade!.should == points
         assert_answer_has_regrade_option!('full_credit')
@@ -102,6 +111,7 @@ describe QuizRegrader::Answer do
 
       it 'returns 0 if answer was previously correct' do
         mark_original_answer_as!(:correct)
+        score_question_as!(:wrong)
         wrapper.regrade!.should == 0
         assert_answer_has_regrade_option!('full_credit')
       end
@@ -113,6 +123,7 @@ describe QuizRegrader::Answer do
 
       it 'returns 0 if previously correct' do
         mark_original_answer_as!(:correct)
+        score_question_as!(:wrong)
         wrapper.regrade!.should == 0
         assert_answer_has_regrade_option!('current_and_previous_correct')
       end
@@ -120,13 +131,14 @@ describe QuizRegrader::Answer do
       it 'returns points possible if previously wrong but now correct' do
         mark_original_answer_as!(:wrong)
         score_question_as!(:correct)
+
         wrapper.regrade!.should == points
         assert_answer_has_regrade_option!('current_and_previous_correct')
       end
 
       it 'returns points possible - previous score if previously partial correct' do
-        previous_score = answer[:points]
         mark_original_answer_as!(:partial)
+        previous_score = answer[:points]
         score_question_as!(:correct)
         wrapper.regrade!.should == points - previous_score
         assert_answer_has_regrade_option!('current_and_previous_correct')
@@ -147,7 +159,7 @@ describe QuizRegrader::Answer do
       it 'returns points_possible - points if previously wrong but now correct' do
         mark_original_answer_as!(:wrong)
         score_question_as!(:correct)
-        wrapper.regrade!.should == 0
+        wrapper.regrade!.should == points
         assert_answer_has_regrade_option!('current_correct_only')
       end
 
