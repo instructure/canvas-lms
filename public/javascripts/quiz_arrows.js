@@ -36,8 +36,9 @@ define(['i18n!quizzes.show', 'jquery'], function(I18n, $) {
         unansweredTpl    = $('<span />', { 'class': 'answer_arrow incorrect' }),
         creditFullTpl    = $('<span />', { 'class': 'answer_arrow correct' }),
         creditPartialTpl = $('<span />', { 'class': 'answer_arrow incorrect' }),
-        creditNoneTpl    = $('<span />', { 'class': 'answer_arrow incorrect' });
-        surveyAnswerTpl  = $('<span />', { 'class': 'answer_arrow info' });
+        creditNoneTpl    = $('<span />', { 'class': 'answer_arrow incorrect' }),
+        surveyAnswerTpl  = $('<span />', { 'class': 'answer_arrow info' }),
+        idGenerator      = 0;
 
     $.each([rightTpl, wrongTpl, correctTpl, shortTpl, surveyAnswerTpl], function() {
       this.css({ left: -128, top: 5 });
@@ -69,5 +70,59 @@ define(['i18n!quizzes.show', 'jquery'], function(I18n, $) {
 
     // adjust these down a little so they align better w/ answers.
     $('.short_answer_question .answer_arrow').css('top', 5);
+
+    // CNVS-6634:
+    //
+    // Enable a11y for <input /> elements that receive focus by speaking the
+    // answer result which is contained in the arrow marker.
+    $('#questions .answer_arrow').each(function() {
+      var $arrow  = $(this),
+
+          // This might be either an ".answer", or an ".answers_wrapper" in case
+          // of multiple-answer questions, we'll be using it to find the target(s),
+          // and to generate an ID, see below.
+          $answer = $arrow.parent(),
+
+          // The element(s) that will be tagged with @aria-describedby
+          $target = $(),
+
+          // @aria-describedby needs to reference an @id, so we must stamp each
+          // arrow with a proper id: (conflicts are resolved later)
+          arrowId = $answer.prop('id');
+
+      // User-generated incorrect answers are not tagged with an @id, so we
+      // auto-generate ones:
+      if (!arrowId) {
+        arrowId = [ 'user_answer', ++idGenerator ].join('_');
+      }
+
+      // Suffix it with _arrow to avoid conflicts
+      arrowId = [ arrowId, 'arrow' ].join('_');
+
+      // Stamp the arrow
+      $arrow.prop('id', arrowId);
+
+      // Locate the targets.
+      //
+      // The :visible filter is required because .answer nodes will contain
+      // <input /> items for each question type's answers, but only the actual
+      // question type answers will be visible, and we need those.
+      $target = $answer.find('input:visible');
+
+      // For the question types below, there won't be any visible <input />,
+      // so we'll be tagging the ".answers_wrapper" ($answer) node instead:
+      //
+      // - Fill in the blanks questions
+      // - Numerical questions
+      //
+      // (This may only occur if the student chooses a wrong answer.)
+      if (!$target.length) {
+        $target = $answer;
+      }
+
+      // We're done, define the @aria-describedby node referencing the @id we
+      // got above.
+      $target.attr('aria-describedby', arrowId);
+    });
   };
 });
