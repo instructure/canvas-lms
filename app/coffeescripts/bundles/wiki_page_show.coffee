@@ -5,7 +5,7 @@ require [
   'compiled/jquery/ModuleSequenceFooter'
 ], ($, WikiPage, WikiPageView) ->
 
-  $('body').addClass('pages show')
+  $('body').addClass('show')
 
   wikiPage = new WikiPage ENV.WIKI_PAGE, revision: ENV.WIKI_PAGE_REVISION, contextAssetString: ENV.context_asset_string
 

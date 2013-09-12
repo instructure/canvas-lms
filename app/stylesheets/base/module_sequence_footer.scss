@@ -55,6 +55,12 @@ $button-hover: #dee5ea;
 }
 
 .module-sequence-padding, .module-sequence-footer{
-  animation: module-sequence-footer-animation 1.25s;
-  -webkit-animation: module-sequence-footer-animation 1.25s;
+  animation: module-sequence-footer-animation 1s;
+  -webkit-animation: module-sequence-footer-animation 1s;
+}
+
+@media print {
+  .module-sequence-padding, .module-sequence-footer {
+    display: none;
+  }
 }

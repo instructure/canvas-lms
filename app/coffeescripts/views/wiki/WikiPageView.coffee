@@ -82,4 +82,5 @@ define [
         DELETE: !!@PAGE_RIGHTS.delete
         READ_REVISIONS: !!@PAGE_RIGHTS.read_revisions
         ACCESS_GEAR_MENU: !!@PAGE_RIGHTS.delete || !!@PAGE_RIGHTS.read_revisions
+      json.CAN.VIEW_TOOLBAR = json.CAN.VIEW_PAGES || json.CAN.PUBLISH || json.CAN.UPDATE_CONTENT || json.CAN.ACCESS_GEAR_MENU
       json

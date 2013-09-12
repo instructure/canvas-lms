@@ -104,10 +104,11 @@ define [
     # @api private
     initWikiSidebar: ->
       unless wikiSidebar.inited
+        $wikiPageBody = @$wikiPageBody
         $ ->
           wikiSidebar.init()
           $.scrollSidebar()
-          wikiSidebar.attachToEditor(@$wikiPageBody).show()
+          wikiSidebar.attachToEditor($wikiPageBody).show()
       $ ->
         wikiSidebar.show()
 
@@ -131,11 +132,14 @@ define [
       errors
 
     hasUnsavedChanges: ->
+      json = @toJSON()
+
       formData = @getFormData()
       oldBody = @model.get('body') || ''
       newBody = formData.body || ''
-      oldTitle = @model.get('title') || ''
-      newTitle = formData.title || ''
+      if json.CAN.EDIT_TITLE
+        oldTitle = @model.get('title') || ''
+        newTitle = formData.title || ''
       return (oldBody != newBody) || (oldTitle != newTitle)
 
     unsavedWarning: ->

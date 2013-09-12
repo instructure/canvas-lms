@@ -24,12 +24,17 @@ class WikiPagesController < ApplicationController
   before_filter :set_js_rights, :only => [:pages_index, :show_page, :edit_page]
   before_filter :set_js_wiki_data, :only => [:pages_index, :show_page, :edit_page]
   add_crumb(proc { t '#crumbs.wiki_pages', "Pages"}) do |c|
+    url = nil
     context = c.instance_variable_get('@context')
-    if context.draft_state_enabled?
-      c.send :polymorphic_path, [context, :pages]
-    else
-      c.send :named_context_url, c.instance_variable_get("@context"), :context_wiki_pages_url
+    current_user = c.instance_variable_get('@current_user')
+    if context.grants_right?(current_user, :read)
+      if context.draft_state_enabled?
+        url = c.send :polymorphic_path, [context, :pages]
+      else
+        url = c.send :named_context_url, c.instance_variable_get("@context"), :context_wiki_pages_url
+      end
     end
+    url
   end
   before_filter { |c| c.active_tab = "pages" }
 
@@ -234,8 +239,11 @@ class WikiPagesController < ApplicationController
       hash[:WIKI_PAGE_REVISION] = (current_version = @page.versions.current) ? current_version.number : nil
       hash[:WIKI_PAGE_SHOW_PATH] = polymorphic_path([@context, :named_page], :wiki_page_id => @page)
       hash[:WIKI_PAGE_EDIT_PATH] = polymorphic_path([@context, :edit_named_page], :wiki_page_id => @page)
-      hash[:COURSE_ID] = @context.id if @context.is_a? Course
       hash[:WIKI_PAGE_HISTORY_PATH] = polymorphic_path([@context, @page, :wiki_page_revisions])
+
+      if @context.is_a?(Course)
+        hash[:COURSE_ID] = @context.id if @context.grants_right?(@current_user, :read)
+      end
     end
 
     js_env hash

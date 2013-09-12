@@ -1,3 +1,4 @@
+{{#if CAN.VIEW_TOOLBAR}}
 <div class="header-bar-outer-container">
   <div class="header-bar-container sticky-toolbar-with-right-side" data-sticky>
     <div class="header-bar">
@@ -9,6 +10,7 @@
     </div>
   </div>
 </div>
+{{/if}}
 
 <div class="index-content-container">
   <div class="index-content">
@@ -38,5 +40,11 @@
         {{/if}}
       </tbody>
     </table>
+    {{#unless fetchedLast}}
+      <div class="loading {{#unless fetched}}loading{{else}}loading-more{{/unless}}">
+        <img src="/images/ajax-reload-animated.gif">
+        {{#unless fetched}}{{#t 'loading'}}Loading ...{{/t}}{{else}}{{#t 'loading_more'}}Loading more ...{{/t}}{{/unless}}
+      </div>
+    {{/unless}}
   </div>
 </div>

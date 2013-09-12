@@ -12,44 +12,49 @@ $unpublished-icon-color: #b4b7ba
 $border-color: #c1c7cf
 $border-radius: 3px
 
+$pages-border: 1px solid #c1c7cf
+$pages-dashed-border: 1px dashed #c1c7cf
+$pages-inner-border: 1px solid #e1e3e4
+
 $index-background: #e8ecef
 $item-background: #ffffff
 $item-hover-background: #eef7ff
 
 $shadow: 0 1px 0 rgba(0,0,0,0.15)
+$table-shadow: 0 1px 0 #dde0e4
+
+.pages .sticky
+  position: fixed
+  z-index: 1000
+  top: 0px
+  left: 0px
+  right: 0px
+  margin-left: 1px
+  background: white
+  height: 33px
+  max-width: $max_main_width
+  border-color: $menu-border-color
+
+.pages.with-left-side .sticky
+  margin-left: $left_side_width + 1px
+.pages.with-right-side .sticky
+  margin-right: $right_side_width + 1px
 
 .pages
-  .sticky
-    position: fixed
-    z-index: 1000
-    top: 0px
-    left: 0px
-    margin-left: $left_side_width + 1px
-    background: white
-    height: 33px
-    max-width: $max_main_width
-    border-color: $menu-border-color
-
-    &.sticky-toolbar
-      right: 0px
-
-    &.sticky-toolbar-with-right-side
-      right: $right_side_width + 1px
-      min-width: $min_main_width - 2px
-
   #breadcrumbs
-    :border-bottom 1px solid $border-color
+    :border-bottom $pages-border
 
   .header-bar-outer-container
     :height 64px
     .header-bar-container
-      :box-shadow $shadow
       :height 64px
       .page-changed-alert
         :overflow hidden
         :height 0
       .page-changed-alert .alert
         :border-radius 0
+      .header-bar
+        :box-shadow $shadow
 
   .header-bar-outer-container.page-changed
     :height 103px
@@ -62,12 +67,16 @@ $shadow: 0 1px 0 rgba(0,0,0,0.15)
 
       .page-changed-alert
         :margin -1px 0 0 0
-        :border-bottom 1px solid $border-color
+        :border-bottom $pages-border
+        :box-shadow $shadow
         :height 39px
         :animation page-changed-alert 1.15s
         :-webkit-animation page-changed-alert 1.15s
 
 .pages.index
+  #main
+    :background $index-background
+
   .index-content-container
     :margin-top 1px
 
@@ -84,10 +93,10 @@ $shadow: 0 1px 0 rgba(0,0,0,0.15)
       :width 270px
 
   .index-content
-    :background $index-background
     :padding 0 1em 1em
 
     .table
+      :margin-bottom 0
       :border-collapse separate
       :border-spacing 0
       td, th
@@ -102,6 +111,7 @@ $shadow: 0 1px 0 rgba(0,0,0,0.15)
           :cursor pointer
           :user-select none
           :color inherit
+          :white-space nowrap
           i
             :color #ccc
         a.sort-field:hover
@@ -113,6 +123,7 @@ $shadow: 0 1px 0 rgba(0,0,0,0.15)
             :color black
 
     .table thead
+      :background $index-background
       tr
         :height 40px
       th
@@ -137,18 +148,21 @@ $shadow: 0 1px 0 rgba(0,0,0,0.15)
           :text-decoration inherit
           :color inherit
         td:first-child
-          :border-left 1px solid $border-color
+          :border-left $pages-border
         td:last-child
-          :border-right 1px solid $border-color
+          :border-right $pages-border
 
       tr:first-child
+        td
+          :border-top $pages-border
         td:first-child
           :border-top-left-radius $border-radius
         td:last-child
           :border-top-right-radius $border-radius
       tr:last-child
         td
-          :border-bottom 1px solid $border-color
+          :border-bottom $pages-border
+          :box-shadow $table-shadow
         td:first-child
           :border-bottom-left-radius $border-radius
         td:last-child
@@ -157,7 +171,7 @@ $shadow: 0 1px 0 rgba(0,0,0,0.15)
       td
         :font-size 11px
         :color $subdued-text-color
-        :border-top 1px solid $border-color
+        :border-top $pages-inner-border
 
         .wiki-page-link
           :font-size 13px
@@ -174,12 +188,32 @@ $shadow: 0 1px 0 rgba(0,0,0,0.15)
           :color $unpublished-icon-color
 
     .table .no-pages .no-pages-cell
-      :border 1px dashed $border-color
+      :border $pages-dashed-border
+
+    .loading
+      :text-align center
+      :color #8f9295
+
+      img
+        :margin-top -3px
+        :opacity 0.75
+      &.loading
+        :border 1px solid transparent
+      &.loading-more
+        :border $pages-dashed-border
+        :border-top-width 0
+        :border-bottom-left-radius $border-radius
+        :border-bottom-right-radius $border-radius
+        :margin-top 1px
+        :padding 4px 12px
+        :background #f4f6f8
 
 .pages.show
   .header-bar
     .publish-button
-      :margin 0 12px
+      :margin 0 12px 0 0
+    .front-page.label
+      :margin 6px 12px 6px 0
 
   .show-content
     :padding 15px 25px

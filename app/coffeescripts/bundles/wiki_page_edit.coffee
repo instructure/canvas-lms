@@ -4,7 +4,7 @@ require [
   'compiled/views/wiki/WikiPageEditView'
 ], ($, WikiPage, WikiPageEditView) ->
 
-  $('body').addClass('pages edit')
+  $('body').addClass('edit')
 
   wikiPage = new WikiPage ENV.WIKI_PAGE, revision: ENV.WIKI_PAGE_REVISION, contextAssetString: ENV.context_asset_string
 

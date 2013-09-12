@@ -43,6 +43,14 @@ define [
       [@contextName, @contextId] = splitAssetString(@contextAssetString) if @contextAssetString
       @itemViewOptions.contextName = @contextName
 
+      @collection.on 'fetch', =>
+        unless @fetched
+          @fetched = true
+          @render()
+      @collection.on 'fetched:last', =>
+        @fetchedLast = true
+        @render()
+
       @collection.on 'sortChanged', @sortChanged
       @currentSortField = @collection.currentSortField
 
@@ -87,7 +95,7 @@ define [
 
       @$el.hide()
       $('body').removeClass('index')
-      $('body').addClass('edit')
+      $('body').addClass('edit with-right-side')
 
       @editModel = new WikiPage {editing_roles: @default_editing_roles}, contextAssetString: @contextAssetString
       @editView = new WikiPageEditView
@@ -107,7 +115,7 @@ define [
         @editView.$el.remove()
         wikiSidebar.hide()
 
-        $('body').removeClass('edit')
+        $('body').removeClass('edit with-right-side')
         $('body').addClass('index')
         @$el.show()
 
@@ -117,5 +125,7 @@ define [
         CREATE: !!@WIKI_RIGHTS.create_page
         MANAGE: !!@WIKI_RIGHTS.manage
         PUBLISH: !!@WIKI_RIGHTS.manage && @contextName == 'courses'
-      json.fetched = @fetched
+      json.CAN.VIEW_TOOLBAR = json.CAN.CREATE
+      json.fetched = !!@fetched
+      json.fetchedLast = !!@fetchedLast
       json
