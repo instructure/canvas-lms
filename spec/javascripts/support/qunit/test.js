@@ -18,7 +18,7 @@ var page = new WebPage();
 var timer;
 var errors = 0;
 var completed = false;
-var timeout = 5;
+var timeout = 30;
 page.onConsoleMessage = function (msg) {
   var result = msg.match(/^Took .*, (\d+) failed\.$/);
   if (result) {
