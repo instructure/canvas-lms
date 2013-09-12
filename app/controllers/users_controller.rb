@@ -207,7 +207,7 @@ class UsersController < ApplicationController
     end
   end
 
-  # @API List users
+  # @API List users in account
   # Retrieve the list of users associated with this account.
   #
   # @argument search_term [Optional, String]

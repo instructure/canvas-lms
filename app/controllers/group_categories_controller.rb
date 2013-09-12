@@ -278,7 +278,7 @@ class GroupCategoriesController < ApplicationController
   end
 
   include Api::V1::User
-  # @API List users
+  # @API List users in group category
   #
   # Returns a list of users in the group category.
   #

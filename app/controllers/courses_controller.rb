@@ -407,7 +407,7 @@ class CoursesController < ApplicationController
     end
   end
 
-  # @API List users
+  # @API List users in course
   # Returns the list of users in this course. And optionally the user's enrollments in the course.
   #
   # @argument search_term [Optional, String]
