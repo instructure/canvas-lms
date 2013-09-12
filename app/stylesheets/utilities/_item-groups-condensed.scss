@@ -172,6 +172,132 @@ color with a dashed line between groups.
     </ul>
   </div>
 
+  <div class="item-group-condensed">
+    <div class="ig-header">
+      <h2 class="ig-header-title element_toggler" href="#"
+         aria-controls="cond_group_4"
+         aria-expanded="true">
+        <i class="icon-mini-arrow-down"></i> Item Group Header
+      </h2>
+    </div>
+    <div class='item-group-expandable' id="cond_group_4">
+      <ul class="ig-list">
+        <li>
+          <div class="ig-row">
+            <a class="ig-title ellipses element_toggler" href="#"
+               aria-controls="cond_sub_group_1"
+               aria-expanded="true">
+              <i class="icon-mini-arrow-down"></i> Some Conference
+            </a>
+            <div class="ig-details row-fluid">
+              <div class="span4 ellipses"></div>
+              <div class="span4 ellipses">2 Recordings</div>
+            </div>
+          </div>
+          <div class="ig-sublist" id="cond_sub_group_1">
+            <ul>
+              <li>
+                <div class="ig-row row-fluid">
+                  <a href="#" class="ig-title ellipses">Recording 1</a>
+                  <div class="ig-details row-fluid">
+                    <div class="span4 ellipses"></div>
+                    <div class="span4 ellipses">09/09/2013</div>
+                    <div class="span4 ellipses">57:34</div>
+                  </div>
+                  <div class="ig-button">
+                    <a class="btn btn-small" href="#">View</a>
+                  </div>
+                </div>
+              </li>
+              <li>
+                <div class="ig-row row-fluid">
+                  <a href="#" class="ig-title ellipses">Recording 2</a>
+                  <div class="ig-details row-fluid">
+                    <div class="span4 ellipses"></div>
+                    <div class="span4 ellipses">09/09/2013</div>
+                    <div class="span4 ellipses">57:34</div>
+                   </div>
+                  <div class="ig-button">
+                   <a class="btn btn-small" href="#">View</a>
+                  </div>
+                </div>
+              </li>
+            </ul>
+          </div>
+      </ul>
+    </div>
+  </div>
+
+  <div class="item-group-condensed">
+    <div class="ig-header">
+      <h2 class="ig-header-title element_toggler" href="#"
+         aria-controls="cond_group_5"
+         aria-expanded="true">
+        <i class="icon-mini-arrow-down"></i> Item Group Header
+      </h2>
+    </div>
+    <div class='item-group-expandable' id="cond_group_5">
+      <ul class="ig-list">
+        <li>
+          <div class="ig-row">
+            <a class="ig-title ellipses element_toggler" href="#"
+               aria-controls="cond_sub_group_2"
+               aria-expanded="true">
+              <i class="icon-mini-arrow-down"></i> Some Conference
+            </a>
+            <div class="ig-details row-fluid">
+              <div class="span4 ellipses"></div>
+              <div class="span4 ellipses">2 Recordings</div>
+            </div>
+          </div>
+          <div class="ig-sublist" id="cond_sub_group_2">
+            <ul>
+              <li>
+                <div class="ig-row row-fluid">
+                  <a href="#" class="ig-title ellipses">Recording 1</a>
+                  <div class="ig-details row-fluid">
+                    <div class="span4 ellipses"></div>
+                    <div class="span4 ellipses">09/09/2013</div>
+                    <div class="span4 ellipses">57:34</div>
+                  </div>
+                  <div class="ig-button">
+                    <a class="btn btn-small" href="#">View</a>
+                  </div>
+                </div>
+              </li>
+              <li>
+                <div class="ig-row row-fluid">
+                  <a href="#" class="ig-title ellipses">Recording 2</a>
+                  <div class="ig-details row-fluid">
+                    <div class="span4 ellipses"></div>
+                    <div class="span4 ellipses">09/09/2013</div>
+                    <div class="span4 ellipses">57:34</div>
+                   </div>
+                  <div class="ig-button">
+                   <a class="btn btn-small" href="#">View</a>
+                  </div>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </li>
+        <li>
+          <div class="ig-row">
+            <a class="ig-title ellipses" href="#">Some Conference</a>
+            <div class="ig-details row-fluid">
+              <div class="span4 ellipses"></div>
+              <div class="span4 ellipses">09/09/2013</div>
+              <div class="span4 ellipses">57:34</div>
+            </div>
+            <div class="ig-button">
+              <a class="btn btn-small" href="#">View</a>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+
 </div>
 ```
 
@@ -245,4 +371,78 @@ body.with_item_groups #main {
       border-bottom: 1px solid #dcdee0;
     }
   }
+
+  .item-group-expandable {
+    border-radius: 3px;
+    border: 1px solid #c1c7cf;
+    box-shadow: 0 1px 0 #dde0e4;
+    background-color: white;
+
+    .ig-list {
+      li{
+        margin: 0px;
+      }
+      li .ig-row {
+        background: none;
+        border: none;
+        border-radius: inherit;
+      }
+
+      li:last-child .ig-row {
+        box-shadow: none;
+      }
+
+      li:last-child .ig-sublist {
+        border-bottom-left-radius: 3px;
+        border-bottom-right-radius: 3px;
+        border-bottom: none;
+      }
+    }
+
+    li:not(:last-child) .ig-sublist{
+      box-shadow: inset 0 1px 0 #f0f0f0, inset 0 -1px 0 #f0f0f0;
+    }
+
+    .ig-button {
+      position: absolute;
+      white-space: nowrap;
+      right: 10px;
+      top: 7px;
+    }
+
+    .ig-sublist {
+      background-color: #f5f7f8;
+      padding-left: 35px;
+      box-shadow: inset 0 1px 0 #f0f0f0;
+      border-top: 1px solid #e1e3e4;
+      border-bottom: 1px solid #e1e3e4;
+
+      ul {
+        list-style:none;
+        padding: 0px;
+        margin: 0px;
+
+        li:first-child {
+          margin-top: 0px;
+        }
+
+        li:last-child .ig-row {
+          border-bottom: none;
+        }
+
+        li .ig-row{
+          box-shadow: none;
+          margin: 0px;
+          padding: 0px;
+          border-bottom: 1px dotted #e1e2e3;
+          .ig-title {
+            left: 0;
+            margin-left: 0;
+            color: #434343
+          }
+        }
+      }
+    }
+  }
+
 }
