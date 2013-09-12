@@ -46,6 +46,9 @@ define [
       @deleteGroupView.remove() if @deleteGroupView
       super(@canManage())
 
+      # reset the model's view property; it got overwritten by child views
+      @model.view = this if @model
+
     afterRender: ->
       # need to hide child views and set trigger manually
       if @createAssignmentView

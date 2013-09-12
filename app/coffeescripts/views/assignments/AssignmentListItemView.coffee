@@ -61,6 +61,9 @@ define [
       @vddDueTooltipView.remove() if @vddDueTooltipView
       super
 
+      # reset the model's view property; it got overwritten by child views
+      @model.view = this if @model
+
     afterRender: ->
       @createModuleToolTip()
 

@@ -5,6 +5,7 @@ define [
   'compiled/views/DialogFormView'
   'jst/assignments/DeleteGroup'
   'jst/EmptyDialogFormWrapper'
+  'jquery.disableWhileLoading'
 ], (I18n, _, AssignmentGroup, DialogFormView, template, wrapper) ->
 
   class DeleteGroupView extends DialogFormView
@@ -63,24 +64,21 @@ define [
     destroy: ->
       data = @getFormData()
       if data.action == "move" && data.move_assignments_to
-        @destroyModel(data.move_assignments_to)
-        @close()
+        @destroyModel(data.move_assignments_to).then =>
+          @close()
 
       if data.action == "delete"
-        @destroyModel()
-        @close()
+        @destroyModel().then =>
+          @close()
 
     destroyModel: (moveTo=null) ->
       @collection = @model.collection
       data = if moveTo then "move_assignments_to=#{moveTo}" else ''
-      if moveTo
-        #delay the fetch until the destroy request is done
-        @model.on('sync', @refreshCollection)
-      @model.destroy({data: data})
-      @collection.view.render()
-
-    refreshCollection: (model,xhr,options) =>
-      @collection.fetch()
+      destroyDfd = @model.destroy(data: data, wait: true)
+      destroyDfd.then =>
+        @collection.fetch(reset: true) if moveTo
+      @$el.disableWhileLoading destroyDfd
+      destroyDfd
 
     selectMove: ->
       if !@$el.find(".group_select :selected").hasClass("blank")

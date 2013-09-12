@@ -361,6 +361,9 @@ describe "assignment groups" do
       fj('.delete_group:visible').click
       wait_for_ajaximations
 
+      # two id selectors to make sure it moved
+      fj("#assignment_group_#{@assignment_group.id} #assignment_#{@assignment.id}").should_not be_nil
+
       @assignment.reload
       @assignment.assignment_group.should == @assignment_group
     end
