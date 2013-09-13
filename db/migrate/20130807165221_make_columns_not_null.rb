@@ -220,10 +220,6 @@ class MakeColumnsNotNull < ActiveRecord::Migration
     change_column_null_with_less_locking :web_conferences, :user_id
     change_column_null_with_less_locking :wiki_pages, :workflow_state
     change_column_null_with_less_locking :wiki_pages, :wiki_id
-    change_column_null_with_less_locking :wiki_page_comments, :workflow_state
-    change_column_null_with_less_locking :wiki_page_comments, :wiki_page_id
-    change_column_null_with_less_locking :wiki_page_comments, :context_id
-    change_column_null_with_less_locking :wiki_page_comments, :context_type
     change_column_null_with_less_locking :zip_file_imports, :context_id
     change_column_null_with_less_locking :zip_file_imports, :context_type
     change_column_null_with_less_locking :zip_file_imports, :workflow_state
@@ -448,10 +444,6 @@ class MakeColumnsNotNull < ActiveRecord::Migration
     change_column_null :web_conferences, :user_id, true
     change_column_null :wiki_pages, :workflow_state, true
     change_column_null :wiki_pages, :wiki_id, true
-    change_column_null :wiki_page_comments, :workflow_state, true
-    change_column_null :wiki_page_comments, :wiki_page_id, true
-    change_column_null :wiki_page_comments, :context_id, true
-    change_column_null :wiki_page_comments, :context_type, true
     change_column_null :zip_file_imports, :context_id, true
     change_column_null :zip_file_imports, :context_type, true
     change_column_null :zip_file_imports, :workflow_state, true
