@@ -21,6 +21,8 @@ module Canvas::AccountReports::ReportHelper
   def parse_utc_string(datetime)
     if datetime.is_a? String
       Time.use_zone('UTC') {Time.zone.parse(datetime)}
+    else
+      datetime
     end
   end
 
@@ -28,13 +30,20 @@ module Canvas::AccountReports::ReportHelper
 # iso8601 for the root_account's timezone
 # A string datetime needs to be in UTC
   def default_timezone_format(datetime, account=root_account)
-    if datetime.is_a? String
-      datetime = parse_utc_string(datetime)
-    end
+    datetime = parse_utc_string(datetime)
     if datetime
       datetime.in_time_zone(account.default_time_zone).iso8601
     else
       nil
+    end
+  end
+
+  # This function will take a datetime or a datetime string and convert into
+  # iso8601 for the root_account's timezone
+  # it will then format the datetime using the given format string
+  def timezone_strftime(datetime, format)
+    if datetime = parse_utc_string(datetime)
+      datetime.strftime(format)
     end
   end
 
