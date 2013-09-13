@@ -8,3 +8,12 @@
     <i class="icon-plus"></i>
   </a>
 {{/if}}
+{{#if canRemoveFromGroup}}
+  <a href="#" data-user-id="{{id}}"
+     class="remove-from-group"
+     title="{{#t "remove_from_group"}}Remove from Group{{/t}}"
+     aria-label="{{#t "remove_from_group"}}Remove from Group{{/t}}"
+  >
+    <i class="icon-x"></i>
+  </a>
+{{/if}}

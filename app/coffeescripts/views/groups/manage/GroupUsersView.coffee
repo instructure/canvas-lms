@@ -12,6 +12,9 @@ define [
     defaults: _.extend {},
       PaginatedCollectionView::defaults,
       itemView: GroupUserView
+      itemViewOptions:
+        canAssignToGroup: false
+        canRemoveFromGroup: true
 
     initialize: ->
       super
