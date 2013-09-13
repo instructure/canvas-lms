@@ -123,7 +123,9 @@ define [
         @reply.on 'edit', => @$addRootReply?.hide()
         @reply.on 'hide', => @$addRootReply?.show()
         @reply.on 'save', (entry) =>
-          @setSubscribed(true) unless @topic.subscription_hold
+          ENV.DISCUSSION.CAN_SUBSCRIBE = true
+          @topic.set('subscription_hold', false)
+          @setSubscribed(true)
           @trigger 'addReply', entry
       @model.set 'notification', ''
       @reply.edit()

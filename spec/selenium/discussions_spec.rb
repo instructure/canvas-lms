@@ -858,6 +858,24 @@ describe "discussions" do
       @topic.subscribed?(@student).should be_false
     end
 
+    it "should display the subscribe button after an initial post" do
+      @topic.unsubscribe(@student)
+      @topic.require_initial_post = true
+      @topic.save!
+
+      get "/courses/#{@course.id}/discussion_topics/#{@topic.id}/"
+      wait_for_animations
+      f('.topic-unsubscribe-button').should_not be_displayed
+      f('.topic-subscribe-button').should_not be_displayed
+
+      f('.discussion-reply-action').click
+      wait_for_animations
+      type_in_tiny 'textarea', 'initial post text'
+      submit_form('.discussion-reply-form')
+      wait_for_ajaximations
+      f('.topic-unsubscribe-button').should be_displayed
+    end
+
     it "should allow subscribing after an initial post" do
       @topic.unsubscribe(@student)
       @topic.require_initial_post = true
