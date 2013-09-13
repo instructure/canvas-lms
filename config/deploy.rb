@@ -23,7 +23,8 @@ def push_app_servers(num_app_nodes, app_node_prefix)
 end
 
 if (ENV.has_key?('gateway') && ENV['gateway'].downcase == "true")
-  set :gateway, "welcome.its.sfu.ca"
+  gateway_user =  ENV['gateway_user'] || ENV['USER']
+  set :gateway, "#{gateway_user}welcome.its.sfu.ca"
   set :stats_server, "stats.its.sfu.ca"
 end
 
@@ -39,7 +40,6 @@ disable_log_formatters;
 
 ssh_options[:forward_agent] = true
 ssh_options[:keys] = [File.join(ENV["HOME"], ".ssh", "id_rsa_canvas")]
-ssh_options[:username] = ENV['gateway_user'] || ENV['USER']
 
 namespace :deploy do
 	task :start do ; end
