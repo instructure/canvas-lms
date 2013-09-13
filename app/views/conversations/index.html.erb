@@ -88,36 +88,48 @@
       </div>
     </div>
     <ul id="message_status"></ul>
-    <div>
-      <a id="help-btn"
-         class="al-trigger"
+    <% if Account.site_admin.grants_right?(@current_user, nil, :become_user) %>
+      <div>
+        <a id="help-btn"
+           class="al-trigger"
+           data-track-category="Help"
+           data-track-action="Click"
+           data-track-label="Question Mark"
+           href="#"
+           role="button"
+           aria-haspopup="true"
+           aria-owns="help-menu-items">
+          <i class="icon-question"></i>
+          <i class="icon-mini-arrow-down"></i>
+          <span class="screenreader-only"><%= t 'help', "Help" %></span>
+        </a>
+
+        <ul id="help-menu-items"
+            class="al-options"
+            role="menu"
+            tabindex="0"
+            aria-hidden="true"
+            aria-expanded="false"
+            aria-activedescendant="new-conversations-opt-in-menu-item">
+          <li role="presentation">
+            <a id="try-new-conversations-menu-item" href="/conversations/toggle_new_conversations?use_new_conversations=1" data-method="post" rel="nofollow" tabindex="-1" role="menuitem" title="<%= t 'try_new_conversations', "Try New Conversations" %>"><%= t 'try_new_conversations', "Try New Conversations" %></a>
+          </li>
+          <li role="presentation">
+            <a href="#" id="conversations-intro-menu-item" tabindex="-1" role="menuitem" title="<%= t 'conversations_intro', "Conversations Intro" %>"><%= t 'conversations_intro', "Conversations Intro" %></a>
+          </li>
+        </ul>
+      </div>
+    <% else %>
+      <a href="#"
+         id="conversations-intro-btn"
+         tabindex="-1"
          data-track-category="Help"
          data-track-action="Click"
          data-track-label="Question Mark"
-         href="#"
-         role="button"
-         aria-haspopup="true"
-         aria-owns="help-menu-items">
+         role="button">
         <i class="icon-question"></i>
-        <i class="icon-mini-arrow-down"></i>
-        <span class="screenreader-only"><%= t 'help', "Help" %></span>
       </a>
-
-      <ul id="help-menu-items"
-          class="al-options"
-          role="menu"
-          tabindex="0"
-          aria-hidden="true"
-          aria-expanded="false"
-          aria-activedescendant="new-conversations-opt-in-menu-item">
-        <li role="presentation">
-          <a id="try-new-conversations-menu-item" href="/conversations/toggle_new_conversations?use_new_conversations=1" data-method="post" rel="nofollow" tabindex="-1" role="menuitem" title="<%= t 'try_new_conversations', "Try New Conversations" %>"><%= t 'try_new_conversations', "Try New Conversations" %></a>
-        </li>
-        <li role="presentation">
-          <a href="#" id="conversations-intro-menu-item" tabindex="-1" role="menuitem" title="<%= t 'conversations_intro', "Conversations Intro" %>"><%= t 'conversations_intro', "Conversations Intro" %></a>
-        </li>
-      </ul>
-    </div>
+    <% end %>
     <div id="create_message_form"></div>
     <ul class="messages">
     </ul>
