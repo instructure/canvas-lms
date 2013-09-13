@@ -377,7 +377,7 @@ define([
     addExistingQuestion: function(question) {
       var $group = $("#group_top_" + question.quiz_group_id);
       var $bottom = null;
-      if ($group.length > 0) { 
+      if ($group.length > 0) {
         $bottom = $group.next();
         while($bottom.length> 0 && !$bottom.hasClass('group_bottom')) {
           $bottom = $bottom.next();
@@ -396,16 +396,19 @@ define([
     },
 
     updateDisplayQuestion: function($question, question, escaped) {
+
       fillArgs = {
         data: question,
         except: ['answers'],
         htmlValues: []
       };
+
       if (escaped) {
         fillArgs['htmlValues'].push('question_text');
       } else {
         fillArgs['except'].push('question_text');
       }
+
       $question.fillTemplateData(fillArgs);
       $question.find(".original_question_text").fillFormData(question);
       $question.find(".question_correct_comment").toggleClass('empty', !question.correct_comments && !question.correct_comments_html);
@@ -487,7 +490,7 @@ define([
             }
             $td.html(answer);
             $tr.append($td);
-            $question.find(".equation_combinations tbody").append($tr);          
+            $question.find(".equation_combinations tbody").append($tr);
           });
         }
       } else {
@@ -569,6 +572,7 @@ define([
         question_type: question_type,
         answer_selection_type: answer_type
       });
+
       $question.show();
       var isNew = $question.attr('id') == "question_new";
       if (isNew) {
@@ -582,13 +586,27 @@ define([
       $question.find(".unsupported_question_type_message").remove();
       quiz.updateDisplayComments();
       if (question.id) {
+        var answers = question.answers;
+
         $question.fillTemplateData({
           data: {id: question.id},
           id: 'question_' + question.id,
           hrefValues: ['id']
         });
+
         $question.find(".original_question_text").fillFormData(question)
         quiz.updateDisplayComments();
+
+        // We have to do the operations below to solve the problem of answer ids being overwritten by fillTemplateData
+        if (answers) {
+          $question.find('.answers .answer .hidden.id').each(function(index, answerEl){
+            $(answerEl).text(answers[index].id);
+          });
+
+          $question.find('.answers .answer .id:not(.hidden)').each(function(index, answerEl){
+            $(answerEl).text(answers[index].id);
+          });
+        }
       };
     },
 
@@ -742,7 +760,7 @@ define([
         $(this).css('display', '').toggleClass('empty', !val);
       });
       var tally = 0;
-      $("#questions .question_holder:not(.group) .question:not(#question_new)").each(function() {     
+      $("#questions .question_holder:not(.group) .question:not(#question_new)").each(function() {
         var val = parseFloat($(this).find(".question_points,.question_points.hidden").text());
         if (isNaN(val)) { val = 0; }
         tally += val;
@@ -828,7 +846,7 @@ define([
       }
       $question.find(".answers").append(makeDisplayAnswer(answer));
     }
-    $question.toggleClass('group', !!(data && data.quiz_group_id)); 
+    $question.toggleClass('group', !!(data && data.quiz_group_id));
     $question.show();
     return $question;
   }
@@ -861,11 +879,14 @@ define([
     delete answer['answer_type'];
     answer.answer_weight = parseFloat(answer.answer_weight);
     if (isNaN(answer.answer_weight)) { answer.answer_weight = 0; }
+
     $answer.fillFormData({answer_text: answer.answer_text});
     $answer.fillTemplateData({data: answer, htmlValues: ['answer_html', 'answer_match_left_html', 'answer_comment_html']});
+
     if (!answer.answer_comment || answer.answer_comment == "" || answer.answer_comment == I18n.t('answer_comments', "Answer comments")) {
       $answer.find(".answer_comment_holder").hide();
     }
+
     if (answer.answer_weight == 100) {
       $answer.addClass('correct_answer');
     } else if (answer.answer_weight > 0) {
@@ -873,6 +894,7 @@ define([
     } else if (answer.answer_weight < 0) {
       $answer.addClass('negative_answer');
     }
+
     $answer.show();
     return $answer;
   }
@@ -2082,7 +2104,7 @@ define([
         $findQuestionDialog.find("button").attr('disabled', false).filter(".submit_button").text(I18n.t('buttons.add_selected_questions', "Add Selected Questions"));
         $findQuestionDialog.find(".selected_side_tab").removeClass('selected_side_tab');
         var counter = 0;
-        function nextQuestion() { 
+        function nextQuestion() {
           counter++;
           var question = question_results.shift();
           if (question) {
@@ -2254,6 +2276,7 @@ define([
       $question.find(".blank_id_select option").each(function() {
         $displayQuestion.find(".blank_id_select").append($(this).clone());
       });
+
       var $answers = $question.find(".answer").each(function(i) {
         var $answer = $(this);
         $answer.show();
@@ -2651,7 +2674,7 @@ define([
     }).delegate(".group_edit.cancel_button", 'click', function(event) {
       if ($(this).closest('.group_top').length == 0) { return; }
       var $top = $(this).parents(".group_top");
-      $top.removeClass('editing'); 
+      $top.removeClass('editing');
       if ($top.attr('id') == 'group_top_new') {
         var $next = $top.next();
         while($next.length > 0 && !$next.hasClass('group_bottom')) {
@@ -2806,8 +2829,8 @@ define([
                     idx = i;
                   }
                 });
-                if (idx === null) { 
-                  idx = variableIdx; 
+                if (idx === null) {
+                  idx = variableIdx;
                 }
                 $this.addClass('answer_idx_' + idx);
               } else {
