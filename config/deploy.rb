@@ -39,6 +39,7 @@ disable_log_formatters;
 
 ssh_options[:forward_agent] = true
 ssh_options[:keys] = [File.join(ENV["HOME"], ".ssh", "id_rsa_canvas")]
+ssh_options[:username] = ENV['gateway_user'] || ENV['USER']
 
 namespace :deploy do
 	task :start do ; end
