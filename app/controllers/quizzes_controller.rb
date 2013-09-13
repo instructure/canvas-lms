@@ -168,7 +168,8 @@ class QuizzesController < ApplicationController
              :SECTION_LIST => sections.map { |section| { :id => section.id, :name => section.name } },
              :QUIZZES_URL => polymorphic_url([@context, :quizzes]),
              :CONTEXT_ACTION_SOURCE => :quizzes,
-             :REGRADE_OPTIONS => regrade_options }
+             :REGRADE_OPTIONS => regrade_options,
+             :ENABLE_QUIZ_REGRADE => @domain_root_account.enable_quiz_regrade? }
       append_sis_data(hash)
       js_env(hash)
       render :action => "new"

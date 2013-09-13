@@ -172,6 +172,7 @@ class Account < ActiveRecord::Base
   add_setting :self_registration, :boolean => true, :root_only => true, :default => false
   add_setting :large_course_rosters, :boolean => true, :root_only => true, :default => false
   add_setting :edit_institution_email, :boolean => true, :root_only => true, :default => true
+  add_setting :enable_quiz_regrade, :boolean => true, :root_only => true, :default => false
 
   def settings=(hash)
     if hash.is_a?(Hash)
@@ -1332,5 +1333,18 @@ class Account < ActiveRecord::Base
     migration.progress=100
     migration.workflow_state = :imported
     migration.save
+  end
+
+  def enable_quiz_regrade!
+    change_root_account_setting!(:enable_quiz_regrade, true)
+  end
+
+  def disable_quiz_regrade!
+    change_root_account_setting!(:enable_quiz_regrade, false)
+  end
+
+  def change_root_account_setting!(setting_name, new_value)
+    root_account.settings[setting_name] = new_value
+    root_account.save!
   end
 end

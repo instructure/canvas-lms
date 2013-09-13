@@ -1643,7 +1643,7 @@ define([
     });
 
     function showRegradeOptions($el,questionID) {
-      if ($("#student_submissions_warning").length == 0) {
+      if ($("#student_submissions_warning").length == 0 || !ENV.ENABLE_QUIZ_REGRADE) {
         return;
       }
 
