@@ -54,7 +54,7 @@ $button-hover: #dee5ea;
   to {height:$bar-height+1;}
 }
 
-.module-sequence-padding, .module-sequence-footer{
+.module-sequence-padding:not(.no-animation), .module-sequence-footer:not(.no-animation){
   animation: module-sequence-footer-animation 1s;
   -webkit-animation: module-sequence-footer-animation 1s;
 }

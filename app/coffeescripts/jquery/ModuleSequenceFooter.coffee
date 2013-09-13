@@ -37,6 +37,9 @@ define [
         throw 'Option must be set with assetType and assetID'
         return
 
+      @msfAnimation = (enabled) =>
+        @find('.module-sequence-padding, .module-sequence-footer').toggleClass('no-animation', !enabled)
+
       # After fetching, @msfInstance will have the following
       # @hide: bool
       # @previous: Object
@@ -51,6 +54,7 @@ define [
           previous: @msfInstance.previous
           next: @msfInstance.next
         )
+        @msfAnimation(options.animation) if options?.animation != undefined
         @show()
 
       this

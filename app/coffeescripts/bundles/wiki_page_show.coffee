@@ -17,16 +17,8 @@ require [
     wiki_page_history_path: ENV.WIKI_PAGE_HISTORY_PATH
     WIKI_RIGHTS: ENV.WIKI_RIGHTS
     PAGE_RIGHTS: ENV.PAGE_RIGHTS
+    course_id: ENV.COURSE_ID
     course_home: ENV.COURSE_HOME
     course_title: ENV.COURSE_TITLE
 
   wikiPageView.render()
-
-  # Add module sequence footer if the context is a course
-  if ENV.COURSE_ID
-    $('#module_sequence_footer').moduleSequenceFooter(
-      courseID: ENV.COURSE_ID
-      assetType: 'Page'
-      assetID: ENV.WIKI_PAGE.url
-      location: location
-    )

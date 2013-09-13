@@ -29,6 +29,7 @@ define [
     @optionProperty 'wiki_page_history_path'
     @optionProperty 'WIKI_RIGHTS'
     @optionProperty 'PAGE_RIGHTS'
+    @optionProperty 'course_id'
     @optionProperty 'course_home'
     @optionProperty 'course_title'
 
@@ -39,8 +40,9 @@ define [
       @PAGE_RIGHTS ||= {}
 
     render: ->
-      # detach the publish button to preserve data/events
+      # detach elements to preserve data/events
       @publishButtonView?.$el.detach()
+      @$sequenceFooter?.detach()
 
       super
 
@@ -50,6 +52,19 @@ define [
         @model.view = @
       @publishButtonView.$el.appendTo(@$publishButton)
       @publishButtonView.render()
+
+      # attach/re-attach the sequence footer (if this is a course, but not the home page)
+      unless @$sequenceFooter || @course_home || !@course_id
+        @$sequenceFooter ||= $('<div></div>').hide()
+        @$sequenceFooter.moduleSequenceFooter(
+          courseID: @course_id
+          assetType: 'Page'
+          assetID: @model.get('url')
+          location: location
+        )
+      else
+        @$sequenceFooter?.msfAnimation(false)
+      @$sequenceFooter.appendTo(@$el) if @$sequenceFooter
 
     afterRender: ->
       super

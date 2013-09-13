@@ -23,6 +23,42 @@ define [
     msf = new $.fn.moduleSequenceFooter.MSFClass({courseID: 42, assetType: 'Assignment', assetID: 42})
     equal msf.url, "/api/v1/courses/42/module_item_sequence", "generates a url based on the courseID"
 
+  test 'attaches msfAnimation function', ->
+    @$testEl.moduleSequenceFooter({assetType: 'Assignment', assetID: 42})
+    notStrictEqual @$testEl.msfAnimation, undefined, 'msfAnimation function defined'
+
+  test 'accepts animation option', ->
+    $.fn.moduleSequenceFooter.MSFClass.prototype.fetch.restore()
+    sinon.stub $.fn.moduleSequenceFooter.MSFClass.prototype, 'fetch', ->
+      this.success
+        items: [
+          prev: null
+          current:
+            id: 42
+            module_id: 73
+            title: 'A lonely page'
+            type: 'Page'
+          next:
+            id: 43
+            module_id: 73
+            title: 'Another lonely page'
+            type: 'Page'
+        ]
+        modules: [
+          id: 73
+          name: 'A lonely module'
+        ]
+      d = $.Deferred()
+      d.resolve()
+      d
+    @$testEl.moduleSequenceFooter({assetType: 'Assignment', assetID: 42, animation: false})
+    equal @$testEl.find('.module-sequence-footer.no-animation').length, 1, 'no-animation applied to module-sequence-footer'
+    equal @$testEl.find('.module-sequence-padding.no-animation').length, 1, 'no-animation applied to module-sequence-padding'
+
+    @$testEl.msfAnimation(true)
+    equal @$testEl.find('.module-sequence-footer:not(.no-animation)').length, 1, 'no-animation removed from module-sequence-footer'
+    equal @$testEl.find('.module-sequence-padding:not(.no-animation)').length, 1, 'no-animation removed from module-sequence-padding'
+
   module 'ModuleSequenceFooter: rendering',
     setup: -> 
       @server = sinon.fakeServer.create()
