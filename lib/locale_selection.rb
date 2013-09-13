@@ -54,15 +54,19 @@ module LocaleSelection
 
     best_locales = supported_locales.inject([]) { |ary, locale|
       if best_range = ranges.detect { |r, q| r + '-' == (locale.downcase + '-')[0..r.size] || r == '*' }
-        ary << [locale, best_range.last] unless best_range.last == 0
+        ary << [locale, best_range.last, ranges.index(best_range)] unless best_range.last == 0
       end
       ary
-    }.sort_by{ |l, q| [-q, l.count('-'), l]}
+    }.sort_by{ |l, q, pos| [-q, pos, l.count('-'), l]}
     # wrt the sorting here, rfc2616 doesn't specify which tag is preferable
     # if there is a quality tie (due to prefix matching or otherwise).
-    # technically they are equally acceptable, though we'll just always go
-    # with the shorter one (and then alphabetical). this seems reasonable for
-    # scenarios like the following:
+    # technically they are equally acceptable.  we've decided to break ties
+    # with:
+    # * position listed in header (tie here comes from '*')
+    # * length of locale (shorter first)
+    # * alphabetical
+    #
+    # this seems reasonable for scenarios like the following:
     #   given that i accept 'en'
     #     and canvas is localized in 'en-US', 'en-GB-oy' and 'en-CA-eh'
     #   then i should get 'en-US'
