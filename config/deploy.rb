@@ -24,7 +24,7 @@ end
 
 if (ENV.has_key?('gateway') && ENV['gateway'].downcase == "true")
   gateway_user =  ENV['gateway_user'] || ENV['USER']
-  set :gateway, "#{gateway_user}welcome.its.sfu.ca"
+  set :gateway, "#{gateway_user}@welcome.its.sfu.ca"
   set :stats_server, "stats.its.sfu.ca"
 end
 
