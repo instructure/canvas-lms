@@ -418,11 +418,11 @@ define [
     deepEqual actual.toArray(), expected.toArray(), 'jump to today - expected dates with events highlighted'
 
     expected = $('#mini_day_2012_01_23')
-    actual = $('.mini_calendar_day.related')
+    actual = $('.mini_calendar_day.selected')
     equal expected.length, 1, 'jump to today - today found'
     deepEqual actual.toArray(), expected.toArray(), 'jump to today - today highlighted'
 
     expected = $('.events_2012_01_23')
-    actual = $('tr.date.related')
+    actual = $('tr.date.selected')
     equal expected.length, 1, 'jump to today - today\'s events found'
     deepEqual actual.toArray(), expected.toArray(), 'jump to today - today\'s events highlighted'
