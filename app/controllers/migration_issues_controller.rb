@@ -89,7 +89,8 @@ class MigrationIssuesController < ApplicationController
   # @API Update a migration issue
   # Update the workflow_state of a migration issue
   #
-  # @argument workflow_state Set the workflow_state of the issue, only 'active' and 'resolved' accepted
+  # @argument workflow_state [String, "active"|"resolved"]
+  #   Set the workflow_state of the issue.
   #
   # @example_request
   #

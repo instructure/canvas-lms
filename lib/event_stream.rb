@@ -89,6 +89,10 @@ class EventStream
       index.for_key(key, options)
     end
 
+    singleton_class.send(:define_method, "#{name}_index") do
+      index
+    end
+
     index
   end
 
@@ -104,15 +108,15 @@ class EventStream
     "#{database_name}.#{table}"
   end
 
-  def ttl_seconds(record)
-    ((record.created_at + time_to_live) - Time.now).to_i
+  def ttl_seconds(timestamp)
+    timestamp.to_i - time_to_live.ago.to_i
   end
-
-  private
 
   def fetch_cql
     "SELECT * FROM #{table} WHERE #{id_column} IN (?)"
   end
+
+  private
 
   def callbacks_for(operation)
     @callbacks ||= {}
@@ -120,7 +124,7 @@ class EventStream
   end
 
   def execute(operation, record)
-    ttl_seconds = self.ttl_seconds(record)
+    ttl_seconds = self.ttl_seconds(record.created_at)
     return if ttl_seconds < 0
 
     database.batch do

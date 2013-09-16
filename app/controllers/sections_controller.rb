@@ -53,8 +53,10 @@ class SectionsController < ApplicationController
   # @API List course sections
   # Returns the list of sections for this course.
   #
-  # @argument include[] [optional, "students"] Associations to include with the group. Note: this is only available if you have permission to view users or grades in the course
-  # @argument include[] [optional, "avatar_url"] Include the avatar URLs for students returned.
+  # @argument include[] [Optional, String, "students"|"avatar_url"]
+  #   - "students": Associations to include with the group. Note: this is only
+  #     available if you have permission to view users or grades in the course
+  #   - "avatar_url": Include the avatar URLs for students returned.
   #
   # @returns [Section]
   def index
@@ -73,10 +75,17 @@ class SectionsController < ApplicationController
   # @API Create course section
   # Creates a new section for this course.
   #
-  # @argument course_section[name] [String] The name of the section
-  # @argument course_section[sis_section_id] [String, optional] The sis ID of the section
-  # @argument course_section[start_at] [Datetime, optional] Section start date in ISO8601 format, e.g. 2011-01-01T01:00Z
-  # @argument course_section[end_at] [Datetime, optional] Section end date in ISO8601 format. e.g. 2011-01-01T01:00Z
+  # @argument course_section[name] [String]
+  #   The name of the section
+  #
+  # @argument course_section[sis_section_id] [Optional, String]
+  #   The sis ID of the section
+  #
+  # @argument course_section[start_at] [Optional, DateTime]
+  #   Section start date in ISO8601 format, e.g. 2011-01-01T01:00Z
+  #
+  # @argument course_section[end_at] [Optional, DateTime]
+  #   Section end date in ISO8601 format. e.g. 2011-01-01T01:00Z
   #
   # @returns Section
   def create

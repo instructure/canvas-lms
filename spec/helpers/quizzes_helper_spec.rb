@@ -142,4 +142,41 @@ describe QuizzesHelper do
     end
   end
 
+  describe "#quiz_edit_text" do
+
+    it "returns correct string for survey" do
+      quiz = stub(:survey? => true)
+      quiz_edit_text(quiz).should == "Edit Survey"
+    end
+
+    it "returns correct string for quiz" do
+      quiz = stub(:survey? => false)
+      quiz_edit_text(quiz).should == "Edit Quiz"
+    end
+  end
+
+  describe "#quiz_delete_text" do
+
+    it "returns correct string for survey" do
+      quiz = stub(:survey? => true)
+      quiz_delete_text(quiz).should == "Delete Survey"
+    end
+
+    it "returns correct string for quiz" do
+      quiz = stub(:survey? => false)
+      quiz_delete_text(quiz).should == "Delete Quiz"
+    end
+  end
+
+  describe "#score_affected_by_regrade" do
+    it "returns true if kept score differs from score before regrade" do
+      submission = stub(:score_before_regrade => 5, :kept_score => 10, :score => 5)
+      score_affected_by_regrade?(submission).should be_true
+    end
+
+    it "returns false if kept score equals score before regrade" do
+      submission = stub(:score_before_regrade => 5, :kept_score => 5, :score => 0)
+      score_affected_by_regrade?(submission).should be_false
+    end
+  end
 end

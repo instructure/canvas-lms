@@ -112,9 +112,27 @@ module CC
       rel_path
     end
 
+    MAX_MEDIA_OBJECT_SIZE = 4.gigabytes
     def add_media_objects(html_content_exporter)
       return if for_course_copy
       return unless Kaltura::ClientV3.config
+
+      # check to make sure we don't export more than 4 gigabytes of media objects
+      total_size = 0
+      html_content_exporter.used_media_objects.each do |obj|
+        next if @added_attachment_ids.include?(obj.attachment_id)
+
+        info = html_content_exporter.media_object_infos[obj.id]
+        next unless info && info[:asset] && info[:asset][:size]
+
+        total_size += info[:asset][:size].to_i.kilobytes
+      end
+      if total_size > MAX_MEDIA_OBJECT_SIZE
+        add_error(I18n.t('course_exports.errors.media_files_too_large',
+                         "Media files were not exported because the total file size was too large."))
+        return
+      end
+
       client = Kaltura::ClientV3.new
       client.startSession(Kaltura::SessionType::ADMIN)
 
@@ -124,7 +142,12 @@ module CC
           migration_id = CCHelper.create_key(obj)
           info = html_content_exporter.media_object_infos[obj.id]
           next unless info && info[:asset]
-          url = client.flavorAssetGetDownloadUrl(info[:asset][:id])
+
+          unless Kaltura::ClientV3::ASSET_STATUSES[info[:asset][:status]] == :READY &&
+              url = client.flavorAssetGetDownloadUrl(info[:asset][:id])
+            add_error(I18n.t('course_exports.errors.media_file', "A media file failed to export"))
+            next
+          end
 
           path = base_path = File.join(CCHelper::WEB_RESOURCES_FOLDER, CCHelper::MEDIA_OBJECTS_FOLDER, info[:filename])
 
@@ -133,14 +156,12 @@ module CC
             FileUtils.copy_stream(remote_stream, stream)
           end
 
-          if url
-            @resources.resource(
-                    "type" => CCHelper::WEBCONTENT,
-                    :identifier => migration_id,
-                    :href => path
-            ) do |res|
-              res.file(:href => path)
-            end
+          @resources.resource(
+                  "type" => CCHelper::WEBCONTENT,
+                  :identifier => migration_id,
+                  :href => path
+          ) do |res|
+            res.file(:href => path)
           end
         rescue
           add_error(I18n.t('course_exports.errors.media_file', "A media file failed to export"), $!)

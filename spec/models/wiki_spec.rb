@@ -34,18 +34,17 @@ describe Wiki do
     it "should unset front page" do
       @wiki.unset_front_page!
 
-      @wiki.front_page_url.should == nil
-      @wiki.front_page.should == nil
       @wiki.has_front_page?.should == false
+      @wiki.front_page_url.should == nil
     end
   end
 
   context "set_front_page_url!" do
     it "should set front_page_url" do
       @wiki.unset_front_page!
-
       new_url = "ponies4ever"
       @wiki.set_front_page_url!(new_url).should == true
+
       @wiki.has_front_page?.should == true
       @wiki.front_page_url.should == new_url
     end

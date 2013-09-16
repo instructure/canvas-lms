@@ -18,6 +18,7 @@
 
 class ConversationMessageParticipant < ActiveRecord::Base
   include SimpleTags
+  include Workflow
 
   belongs_to :conversation_message
   belongs_to :user
@@ -27,8 +28,17 @@ class ConversationMessageParticipant < ActiveRecord::Base
 
   attr_accessible
 
+  scope :active, where("(conversation_message_participants.workflow_state <> 'deleted' OR conversation_message_participants.workflow_state IS NULL)")
+  scope :deleted, where("conversation_message_participants.workflow_state = 'deleted'")
+
   scope :for_conversation_and_message, lambda { |conversation_id, message_id|
     joins("INNER JOIN conversation_participants ON conversation_participants.id = conversation_participant_id").
         where(:conversation_id => conversation_id, :conversation_message_id => message_id)
   }
+
+  workflow do
+    state :active
+    state :deleted
+  end
+
 end

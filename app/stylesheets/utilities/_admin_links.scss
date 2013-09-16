@@ -13,7 +13,7 @@ Cogs, *AKA admin links*, are generally floated to the right, make sure it's the 
 
 ```html
 <div>
-  <a class="al-trigger btn" role="button" aria-haspopup="true" aria-owns="toolbar-1" tabindex="-1">
+  <a class="al-trigger btn" role="button" aria-haspopup="true" aria-owns="toolbar-1" href="#">
     <i class="icon-settings"></i>
     <i class="icon-mini-arrow-down"></i>
     <span class="screenreader-only">Settings</span>
@@ -36,7 +36,7 @@ Cogs, *AKA admin links*, are generally floated to the right, make sure it's the 
 
 ```html
 <div>
-  <a class="al-trigger al-trigger-gray" role="button" aria-haspopup="true" aria-owns="content-1" tabindex="-1">
+  <a class="al-trigger al-trigger-gray" role="button" aria-haspopup="true" aria-owns="content-1" href="#">
     <i class="icon-settings"></i>
     <i class="icon-mini-arrow-down"></i>
     <span class="screenreader-only">Settings</span>

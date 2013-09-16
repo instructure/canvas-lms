@@ -50,7 +50,6 @@ describe "course rubrics" do
       @association = @rubric.associate_with(@assignment, @course, :use_for_grading => true, :purpose => 'grading')
       @rubric.data[0][:ignore_for_scoring] = '1'
       @rubric.points_possible = 5
-      @rubric.alignments_changed = true
       @rubric.save!
 
       get "/courses/#{@course.id}/rubrics/#{@rubric.id}"
@@ -83,17 +82,9 @@ describe "course rubrics" do
       outcome_model(:context => @course)
 
       get "/courses/#{@course.id}/rubrics/#{@rubric.id}"
-      f('.edit_rubric_link').click
       wait_for_ajaximations
-      f('.rubric.editing tr.criterion .delete_criterion_link').click
-      wait_for_ajaximations
-      f('.rubric.editing .find_outcome_link').click
-      wait_for_ajaximations
-      f('.outcome-link').click
-      wait_for_ajaximations
-      f('.ui-dialog .btn-primary').click
-      accept_alert
-      wait_for_ajaximations
+      import_outcome
+
       f('tr.learning_outcome_criterion .criterion_description .description').text.should == @outcome.title
       ff('tr.learning_outcome_criterion td.rating .description').map(&:text).should == @outcome.data[:rubric_criterion][:ratings].map { |c| c[:description] }
       ff('tr.learning_outcome_criterion td.rating .points').map(&:text).should == @outcome.data[:rubric_criterion][:ratings].map { |c| c[:points].to_s }
@@ -102,6 +93,22 @@ describe "course rubrics" do
       rubric = Rubric.order(:id).last
       rubric.data.first[:ratings].map { |r| r[:description] }.should == @outcome.data[:rubric_criterion][:ratings].map { |c| c[:description] }
       rubric.data.first[:ratings].map { |r| r[:points] }.should == @outcome.data[:rubric_criterion][:ratings].map { |c| c[:points] }
+    end
+
+    it "should not allow editing a criterion row linked to an outcome" do
+      rubric_association_model(:user => @user, :context => @course, :purpose => "grading")
+      outcome_model(:context => @course)
+      rubric = Rubric.last
+
+      get "/courses/#{@course.id}/rubrics/#{@rubric.id}"
+      wait_for_ajaximations
+      import_outcome
+
+      f('.edit_rubric_link').click
+      wait_for_ajaximations
+
+      links = ffj("#rubric_#{rubric.id}.editing .ratings:first .edit_rating_link")
+      links.any?(&:displayed?).should be_false
     end
 
     it "should not show 'use for grading' as an option" do

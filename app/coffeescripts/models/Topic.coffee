@@ -36,7 +36,7 @@ define [
         return 'abort' if xhr.status isnt 200
         @set(@parse(data, 200, xhr))
         options.success?(this, data)
-        # TODO: handle options.error, perhaps with Backbone.wrapError
+        # TODO: handle options.error
         'stop'
       ,
         handleErrors: true

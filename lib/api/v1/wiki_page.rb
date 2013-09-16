@@ -29,7 +29,7 @@ module Api::V1::WikiPage
     hash['last_edited_by'] = user_display_json(wiki_page.user, wiki_page.context) if wiki_page.user
     hash['published'] = wiki_page.active?
     hash['front_page'] = wiki_page.is_front_page?
-    if @domain_root_account && @domain_root_account.enable_draft?
+    if wiki_page.context.draft_state_enabled?
       hash['html_url'] = polymorphic_url([wiki_page.context, :named_page], :wiki_page_id => wiki_page)
     else
       hash['html_url'] = polymorphic_url([wiki_page.context, :named_wiki_page], :id => wiki_page)
@@ -41,5 +41,26 @@ module Api::V1::WikiPage
 
   def wiki_pages_json(wiki_pages, current_user, session)
     wiki_pages.map { |page| wiki_page_json(page, current_user, session, false) }
+  end
+
+  def wiki_page_revision_json(version, current_user, current_session, include_content = true)
+    page = version.model
+    hash = {
+      'revision_id' => version.number,
+      'updated_at' => page.updated_at
+    }
+    if include_content
+      hash.merge!({
+        'url' => page.url,
+        'title' => page.title,
+        'body' => api_user_content(page.body)
+      })
+    end
+    hash['edited_by'] = user_display_json(page.user, page.context) if page.user
+    hash
+  end
+
+  def wiki_page_revisions_json(versions, current_user, current_session)
+    versions.map { |ver| wiki_page_revision_json(ver, current_user, current_session, false) }
   end
 end

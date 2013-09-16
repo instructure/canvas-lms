@@ -563,4 +563,13 @@ class Group < ActiveRecord::Base
   def associated_shards
     [Shard.default]
   end
+
+  # Public: Determine if the current context has draft_state enabled.
+  #
+  # Returns a boolean.
+  def draft_state_enabled?
+    # shouldn't matter, but most specs create anonymous (contextless) groups :(
+    return false if context.nil?
+    context.draft_state_enabled?
+  end
 end

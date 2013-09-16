@@ -8,4 +8,4 @@ define [
 
     initialize: () ->
       super()
-      @setParam('state', ['available', 'completed'])
+      @setParam('state', ['unpublished', 'available', 'completed'])

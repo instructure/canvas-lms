@@ -105,7 +105,7 @@ module Canvas::AccountReports
                              FROM attachments at
                              WHERE at.context_id = courses.id
                                AND at.context_type = 'Course'
-                               AND at.workflow_state <> 'deleted')
+                               AND at.file_state <> 'deleted')
              AND NOT EXISTS (SELECT NULL
                              FROM discussion_topics d
                              WHERE d.context_id = courses.id

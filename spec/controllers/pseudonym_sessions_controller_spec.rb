@@ -1105,7 +1105,7 @@ describe PseudonymSessionsController do
     it 'removes oauth session info after code generation' do
       Canvas::Oauth::Token.stubs(:generate_code_for => 'code')
       oauth_accept
-      controller.session.should == {}
+      controller.session[:oauth2].should be_nil
     end
 
     it 'forwards the oauth state if it was provided' do

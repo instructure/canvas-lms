@@ -215,6 +215,20 @@ describe "Outcom Reports" do
                            "https://#{HostUrl.context_host(@course1)}/courses/#{@course1.id}/assignments/#{@assignment.id}"]
 
     end
+
+    it "should not incluce invalid learning outcome results" do
+      ct = @assignment.learning_outcome_alignments.last
+      lor = ct.learning_outcome_results.for_association(@assignment).build
+      lor.user = @user1
+      lor.artifact = @submission
+      lor.context = ct.context
+      lor.possible = @assignment.points_possible
+      lor.score = @submission.score
+      lor.save!
+
+      parsed = ReportSpecHelper.run_report(@account, @type, {}, 1)
+      parsed.length.should == 2
+    end
   end
 
   describe "outcome results report" do

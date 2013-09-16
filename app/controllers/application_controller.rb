@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2012 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -88,6 +88,7 @@ class ApplicationController < ActionController::Base
         :AUTHENTICITY_TOKEN => form_authenticity_token,
         :files_domain => HostUrl.file_host(@domain_root_account || Account.default, request.host_with_port),
       }
+      @js_env[:lolcalize] = true if ENV['LOLCALIZE']
     end
 
     hash.each do |k,v|
@@ -962,10 +963,15 @@ class ApplicationController < ActionController::Base
         redirect_to(login_url(:needs_cookies => '1'))
         return false
       else
-        raise(ActionController::InvalidAuthenticityToken) unless (form_authenticity_token == form_authenticity_param) || (form_authenticity_token == request.headers['X-CSRF-Token'])
+        raise(ActionController::InvalidAuthenticityToken) unless BreachMitigation::MaskingSecrets.valid_authenticity_token?(session, form_authenticity_param) ||
+          BreachMitigation::MaskingSecrets.valid_authenticity_token?(session, request.headers['X-CSRF-Token'])
       end
     end
     Rails.logger.warn("developer_key id: #{@developer_key.id}") if @developer_key
+  end
+
+  def form_authenticity_token
+    BreachMitigation::MaskingSecrets.masked_authenticity_token(session)
   end
 
   API_REQUEST_REGEX = %r{\A/api/v\d}
@@ -985,7 +991,7 @@ class ApplicationController < ActionController::Base
     @wiki.check_has_front_page
 
     page_name = params[:wiki_page_id] || params[:id] || (params[:wiki_page] && params[:wiki_page][:title])
-    page_name ||= (@wiki.get_front_page_url || Wiki::DEFAULT_FRONT_PAGE_URL) unless @domain_root_account.enable_draft?
+    page_name ||= (@wiki.get_front_page_url || Wiki::DEFAULT_FRONT_PAGE_URL) unless @context.draft_state_enabled?
     if(params[:format] && !['json', 'html'].include?(params[:format]))
       page_name += ".#{params[:format]}"
       params[:format] = 'html'
@@ -997,23 +1003,26 @@ class ApplicationController < ActionController::Base
               @wiki.wiki_pages.deleted_last.find_by_url(page_name.to_s.to_url) ||
               @wiki.wiki_pages.find_by_id(page_name.to_i)
     end
-    @page ||= @wiki.wiki_pages.build(
+    @page ||= @wiki.wiki_pages.new(
       :title => page_name.titleize,
       :url => page_name.to_url
     )
-    initialize_wiki_page if @page.new_record?
+    if @page.new_record?
+      @page.wiki = @wiki
+      initialize_wiki_page
+    end
   end
 
   # Initializes the state of @page, but only if it is a new page
   def initialize_wiki_page
     return unless @page.new_record? || @page.deleted?
 
-    unless @domain_root_account.enable_draft?
+    unless @context.draft_state_enabled?
       @page.set_as_front_page! if !@wiki.has_front_page? and @page.url == Wiki::DEFAULT_FRONT_PAGE_URL
     end
 
     is_privileged_user = is_authorized_action?(@page.wiki, @current_user, :manage)
-    if is_privileged_user && @domain_root_account.enable_draft? && !@context.is_a?(Group)
+    if is_privileged_user && @context.draft_state_enabled? && !@context.is_a?(Group)
       @page.workflow_state = 'unpublished'
     else
       @page.workflow_state = 'active'
@@ -1126,8 +1135,16 @@ class ApplicationController < ActionController::Base
   helper_method :calendar_url_for, :files_url_for
 
   def conversations_path(params={})
-    hash = params.keys.empty? ? '' : "##{params.to_json.unpack('H*').first}"
-    "/conversations#{hash}"
+    if @current_user and @current_user.preferences[:use_new_conversations]
+      query_string = params.slice(:context_id, :user_id, :user_name).inject([]) do |res, (k, v)|
+        res << "#{k}=#{v}"
+        res
+      end.join('&')
+      "/conversations?#{query_string}"
+    else
+      hash = params.keys.empty? ? '' : "##{params.to_json.unpack('H*').first}"
+      "/conversations#{hash}"
+    end
   end
   helper_method :conversations_path
   

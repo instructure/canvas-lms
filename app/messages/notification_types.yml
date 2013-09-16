@@ -119,6 +119,8 @@
       delay_for: <%= 60*60 %>
     - name: Submission Grade Changed
       delay_for: <%= 5*60 %>
+    - name: Quiz Regrade Finished
+      delay_for: 0
 
 - category: Grading Policies
   notifications:

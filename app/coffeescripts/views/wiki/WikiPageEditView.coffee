@@ -13,10 +13,6 @@ define [
 
   class WikiPageEditView extends ValidatedFormView
     @mixin
-      template: template
-      className: "form-horizontal edit-form validated-form-view"
-      dontRenableAfterSaveSuccess: true
-
       els:
         '[name="wiki_page[body]"]': '$wikiPageBody'
 
@@ -25,18 +21,51 @@ define [
         'click .delete_page': 'deleteWikiPage'
         'click .form-actions .cancel': 'cancel'
 
+    template: template
+    className: "form-horizontal edit-form validated-form-view"
+    dontRenableAfterSaveSuccess: true
+
     @optionProperty 'wiki_pages_path'
     @optionProperty 'WIKI_RIGHTS'
     @optionProperty 'PAGE_RIGHTS'
 
     initialize: ->
       super
+      @WIKI_RIGHTS ||= {}
+      @PAGE_RIGHTS ||= {}
       @on 'success', (args) => window.location.href = @model.get('html_url')
 
     toJSON: ->
       json = super
-      json.WIKI_RIGHTS = @WIKI_RIGHTS
-      json.PAGE_RIGHTS = @PAGE_RIGHTS
+
+      json.IS = IS =
+        TEACHER_ROLE: false
+        STUDENT_ROLE: false
+        MEMBER_ROLE: false
+        ANYONE_ROLE: false
+
+      # rather than requiring the editing_roles to match a
+      # string exactly, we check for individual editing roles
+      editing_roles = json.editing_roles || ''
+      editing_roles = _.map(editing_roles.split(','), (s) -> s.trim())
+      if _.contains(editing_roles, 'public')
+        IS.ANYONE_ROLE = true
+      else if _.contains(editing_roles, 'members')
+        IS.MEMBER_ROLE = true
+      else if _.contains(editing_roles, 'students')
+        IS.STUDENT_ROLE = true
+      else
+        IS.TEACHER_ROLE = true
+
+      json.CAN =
+        PUBLISH: !!@WIKI_RIGHTS.manage && json.contextName == "courses"
+        DELETE: !!@PAGE_RIGHTS.delete
+        EDIT_TITLE: !!@PAGE_RIGHTS.update || json.new_record
+        EDIT_HIDE: !!@WIKI_RIGHTS.manage && json.contextName == "courses"
+        EDIT_ROLES: !!@WIKI_RIGHTS.manage
+      json.SHOW =
+        OPTIONS: json.CAN.EDIT_HIDE || json.CAN.EDIT_ROLES
+        COURSE_ROLES: json.contextName == "courses"
       json
 
     # After the page loads, ensure the that wiki sidebar gets initialized

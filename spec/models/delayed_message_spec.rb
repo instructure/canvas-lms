@@ -151,12 +151,6 @@ describe DelayedMessage do
   end
 
   describe "set_send_at" do
-    def force_now(time)
-      [@mountain, @central, @eastern].each do |time_zone|
-        time_zone.stubs(:now).returns{ time.in_time_zone(time_zone) }
-      end
-    end
-
     before :each do
       # shouldn't be used, but to make sure it's not equal to any of the other
       # time zones in play
@@ -194,27 +188,30 @@ describe DelayedMessage do
     end
 
     it "should set to 6pm in the user's time zone for non-weekly messages" do
-      force_now @central.now.change(:hour => 12)
-      @dm.frequency = 'daily'
-      @dm.send(:set_send_at)
-      @dm.send_at.should == @central.now.change(:hour => 18)
+      Timecop.freeze(@central.now.change(:hour => 12)) do
+        @dm.frequency = 'daily'
+        @dm.send(:set_send_at)
+        @dm.send_at.should == @central.now.change(:hour => 18)
+      end
     end
 
     it "should set to 6pm in the Mountain time zone for non-weekly messages when the user hasn't set a time zone" do
       @user.time_zone = nil
       @user.save
 
-      force_now @mountain.now.change(:hour => 12)
-      @dm.frequency = 'daily'
-      @dm.send(:set_send_at)
-      @dm.send_at.should == @mountain.now.change(:hour => 18)
+      Timecop.freeze(@mountain.now.change(:hour => 12)) do
+        @dm.frequency = 'daily'
+        @dm.send(:set_send_at)
+        @dm.send_at.should == @mountain.now.change(:hour => 18)
+      end
     end
 
     it "should set to 6pm the next day for non-weekly messages created after 6pm" do
-      force_now @central.now.change(:hour => 20)
-      @dm.frequency = 'daily'
-      @dm.send(:set_send_at)
-      @dm.send_at.should == @central.now.tomorrow.change(:hour => 18)
+      Timecop.freeze(@central.now.change(:hour => 20)) do
+        @dm.frequency = 'daily'
+        @dm.send(:set_send_at)
+        @dm.send_at.should == @central.now.tomorrow.change(:hour => 18)
+      end
     end
 
     it "should set to next saturday (Eastern-time) for weekly messages" do
@@ -222,91 +219,100 @@ describe DelayedMessage do
       saturday = monday + 5.days
       sunday = saturday + 1.day
 
-      force_now monday
-      @dm.frequency = 'weekly'
-      @dm.send(:set_send_at)
-      @dm.send_at.in_time_zone(@eastern).midnight.should == saturday
+      Timecop.freeze(monday) do
+        @dm.frequency = 'weekly'
+        @dm.send(:set_send_at)
+        @dm.send_at.in_time_zone(@eastern).midnight.should == saturday
+      end
 
-      force_now sunday
-      @dm.send_at = nil
-      @dm.send(:set_send_at)
-      @dm.send_at.in_time_zone(@eastern).midnight.should == saturday + 1.week
+      Timecop.freeze(sunday) do
+        @dm.send_at = nil
+        @dm.send(:set_send_at)
+        @dm.send_at.in_time_zone(@eastern).midnight.should == saturday + 1.week
+      end
     end
 
     it "should set to next saturday (Eastern-time) for weekly messages scheduled later saturday" do
       monday = @eastern.now.monday
       saturday = monday + 5.days
 
-      force_now monday
-      @dm.frequency = 'weekly'
-      @dm.send(:set_send_at)
+      Timecop.freeze(monday) do
+        @dm.frequency = 'weekly'
+        @dm.send(:set_send_at)
+      end
 
-      force_now @dm.send_at + 30.minutes
-      @dm.send_at = nil
-      @dm.send(:set_send_at)
-      @dm.send_at.in_time_zone(@eastern).midnight.should == saturday + 1.week
+      Timecop.freeze(@dm.send_at + 30.minutes) do
+        @dm.send_at = nil
+        @dm.send(:set_send_at)
+        @dm.send_at.in_time_zone(@eastern).midnight.should == saturday + 1.week
+      end
     end
 
     it "should use the same time of day across weeks for weekly messages for the same user" do
       # anchor to January 1st to avoid DST; we're consigned to slightly weird
       # behavior around DST, but don't want it failing tests
       monday = @eastern.now.change(:month => 1, :day => 1).monday
+      first = nil
 
-      force_now monday
-      @dm.frequency = 'weekly'
-      @dm.send(:set_send_at)
-      first = @dm.send_at
+      Timecop.freeze(monday) do
+        @dm.frequency = 'weekly'
+        @dm.send(:set_send_at)
+        first = @dm.send_at
+      end
 
-      force_now monday + 1.week
-      @dm.send_at = nil
-      @dm.send(:set_send_at)
-      @dm.send_at.in_time_zone(@eastern).should == first + 1.week
+      Timecop.freeze(monday + 1.week) do
+        @dm.send_at = nil
+        @dm.send(:set_send_at)
+        @dm.send_at.in_time_zone(@eastern).should == first + 1.week
+      end
     end
 
     it "should spread weekly messages for users in different accounts over the windows" do
       monday = @eastern.now.monday
       saturday = monday + 5.days
-      force_now monday
 
-      @dm.frequency = 'weekly'
+      Timecop.freeze(monday) do
+        @dm.frequency = 'weekly'
 
-      expected_windows = []
-      actual_windows = []
+        expected_windows = []
+        actual_windows = []
 
-      DelayedMessage::WEEKLY_ACCOUNT_BUCKETS.times.map do |i|
-        @dm.communication_channel.user.pseudonym.account_id = i
-        @dm.send_at = nil
-        @dm.send(:set_send_at)
-        actual_windows << (@dm.send_at - saturday).to_i / (60 * DelayedMessage::MINUTES_PER_WEEKLY_ACCOUNT_BUCKET)
-        expected_windows << i
+        DelayedMessage::WEEKLY_ACCOUNT_BUCKETS.times.map do |i|
+          @dm.communication_channel.user.pseudonym.account_id = i
+          @dm.send_at = nil
+          @dm.send(:set_send_at)
+          actual_windows << (@dm.send_at - saturday).to_i / (60 * DelayedMessage::MINUTES_PER_WEEKLY_ACCOUNT_BUCKET)
+          expected_windows << i
+        end
+
+        actual_windows.sort.should == expected_windows
       end
-
-      actual_windows.sort.should == expected_windows
     end
 
     it "should spread weekly messages for different users in the same account over the same window" do
       monday = @eastern.now.monday
       saturday = monday + 5.days
-      force_now monday
 
-      @dm.frequency = 'weekly'
+      Timecop.freeze(monday) do
+        @dm.frequency = 'weekly'
 
-      expected_diffs = []
-      actual_diffs = []
-      windows = []
+        expected_diffs = []
+        actual_diffs = []
+        windows = []
 
-      DelayedMessage::MINUTES_PER_WEEKLY_ACCOUNT_BUCKET.times.map do |i|
-        @dm.communication_channel.user.id = i
-        @dm.send_at = nil
-        @dm.send(:set_send_at)
-        window = (@dm.send_at - saturday).to_i / (60 * DelayedMessage::MINUTES_PER_WEEKLY_ACCOUNT_BUCKET)
-        windows << window
-        actual_diffs << @dm.send_at - saturday - (DelayedMessage::MINUTES_PER_WEEKLY_ACCOUNT_BUCKET * window).minutes
-        expected_diffs << i.minutes
+        DelayedMessage::MINUTES_PER_WEEKLY_ACCOUNT_BUCKET.times.map do |i|
+          @dm.communication_channel.user.id = i
+          @dm.send_at = nil
+          @dm.send(:set_send_at)
+          window = (@dm.send_at - saturday).to_i / (60 * DelayedMessage::MINUTES_PER_WEEKLY_ACCOUNT_BUCKET)
+          windows << window
+          actual_diffs << @dm.send_at - saturday - (DelayedMessage::MINUTES_PER_WEEKLY_ACCOUNT_BUCKET * window).minutes
+          expected_diffs << i.minutes
+        end
+
+        actual_diffs.sort.should == expected_diffs
+        windows.uniq.size.should == 1
       end
-
-      actual_diffs.sort.should == expected_diffs
-      windows.uniq.size.should == 1
     end
   end
 end

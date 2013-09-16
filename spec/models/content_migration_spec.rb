@@ -83,6 +83,12 @@ describe ContentMigration do
       @copy_from.syllabus_body = "<a href='/courses/#{@copy_from.id}/discussion_topics/#{topic.id}'>link</a>"
       @copy_from.save!
 
+      @cm.copy_options = {
+        everything: false,
+        all_syllabus_body: true,
+        all_discussion_topics: true
+      }
+      @cm.save!
       run_course_copy
 
       new_topic = @copy_to.discussion_topics.find_by_migration_id(CC::CCHelper.create_key(topic))
@@ -107,7 +113,7 @@ describe ContentMigration do
       @copy_from.syllabus_body = "<p>wassup</p>"
 
       @cm.copy_options = {
-        :course => {'syllabus_body' => false}
+        :course => {'all_syllabus_body' => false}
       }
       @cm.save!
 
@@ -334,6 +340,55 @@ describe ContentMigration do
       run_course_copy
       @copy_to.wiki.front_page.body.should == %{<a href="/courses/#{@copy_to.id}/wiki/online-unit-pages">wut</a>}
       @copy_to.wiki.wiki_pages.find_by_url!("online-unit-pages").body.should == %{<a href="/courses/#{@copy_to.id}/wiki/#{main_page.url}">whoa</a>}
+    end
+
+    context "wiki front page" do
+      it "should copy wiki front page setting" do
+        page = @copy_from.wiki.wiki_pages.create!(:title => "stuff and stuff")
+        @copy_from.wiki.set_front_page_url!(page.url)
+
+        run_course_copy
+
+        new_page = @copy_to.wiki.wiki_pages.find_by_migration_id(mig_id(page))
+        @copy_to.wiki.front_page.should == new_page
+      end
+
+      it "should copy wiki has_no_front_page setting if draft state is enabled" do
+        @copy_from.root_account.settings[:enable_draft] = true
+        @copy_from.root_account.save!
+
+        @copy_from.wiki.front_page.save!
+        @copy_from.wiki.unset_front_page!
+
+        run_course_copy
+
+        @copy_to.wiki.has_no_front_page?.should == true
+      end
+
+      it "should set retain default behavior if front page is missing and draft state is not enabled" do
+        @copy_from.default_view = 'wiki'
+        @copy_from.save!
+        @copy_from.wiki.set_front_page_url!('haha not here')
+
+        run_course_copy
+
+        @copy_to.wiki.has_front_page?.should == true
+        @copy_to.wiki.get_front_page_url.should == 'front-page'
+      end
+
+      it "should set default view to feed if wiki front page is missing and draft state is enabled" do
+        @copy_from.root_account.settings[:enable_draft] = true
+        @copy_from.root_account.save!
+
+        @copy_from.default_view = 'wiki'
+        @copy_from.save!
+        @copy_from.wiki.set_front_page_url!('haha not here')
+
+        run_course_copy
+
+        @copy_to.default_view.should == 'feed'
+        @copy_to.wiki.has_front_page?.should == false
+      end
     end
 
     it "should selectively copy items" do
@@ -691,7 +746,6 @@ describe ContentMigration do
           :learning_outcome_id => lo2.id
         }
       ]
-      rub.alignments_changed = true
       rub.save!
       rub.associate_with(@copy_from, @copy_from)
 
@@ -724,7 +778,6 @@ describe ContentMigration do
               :learning_outcome_id => lo.id
           }
       ]
-      rub.alignments_changed = true
       rub.save!
 
       from_assign = @copy_from.assignments.create!(:title => "some assignment")
@@ -765,6 +818,40 @@ describe ContentMigration do
       run_course_copy
 
       @copy_to.quizzes.find_by_migration_id(mig_id(@quiz)).should_not be_nil
+    end
+
+    it "should create a new assignment if copying a new quiz (even if the assignment migration_id matches)" do
+      pending unless Qti.qti_enabled?
+      quiz = @copy_from.quizzes.create!(:title => "new quiz")
+      quiz2 = @copy_to.quizzes.create!(:title => "already existing quiz")
+
+      [quiz, quiz2].each do |q|
+        q.did_edit
+        q.offer!
+      end
+
+      a = quiz2.assignment
+      a.migration_id = mig_id(quiz.assignment)
+      a.save!
+
+      run_course_copy
+
+      @copy_to.quizzes.map(&:title).sort.should == ["already existing quiz", "new quiz"]
+      @copy_to.assignments.map(&:title).sort.should == ["already existing quiz", "new quiz"]
+
+      # Re-copying should find and update the old "new" quiz and assignment
+      @cm = ContentMigration.new(:context => @copy_to, :user => @user, :source_course => @copy_from, :copy_options => {:everything => "1"})
+      @cm.user = @user
+      @cm.migration_settings[:import_immediately] = true
+      @cm.save!
+
+      quiz.title = "mwhaha changed"
+      quiz.save!
+
+      run_course_copy
+
+      @copy_to.quizzes.map(&:title).sort.should == ["already existing quiz", "mwhaha changed"]
+      @copy_to.assignments.map(&:title).sort.should == ["already existing quiz", "mwhaha changed"]
     end
 
     it "should have correct question count on copied surveys and practive quizzes" do
@@ -874,6 +961,27 @@ describe ContentMigration do
       # we don't copy over deleted questions at all, not even marked as deleted
       bank2.assessment_questions.active.size.should == 2
       bank2.assessment_questions.size.should == 2
+    end
+
+    it "should not copy plain text question comments as html" do
+      bank1 = @copy_from.assessment_question_banks.create!(:title => 'bank')
+      q = bank1.assessment_questions.create!(:question_data => {
+          "question_type" => "multiple_choice_question", 'name' => 'test question',
+          'answers' => [{'id' => 1, "text" => "Correct", "weight" => 100, "comments" => "another comment"},
+                        {'id' => 2, "text" => "inorrect", "weight" => 0}],
+          "correct_comments" => "Correct answer comment", "incorrect_comments" => "Incorrect answer comment",
+          "neutral_comments" => "General Comment", "more_comments" => "even more comments"
+      })
+
+      run_course_copy
+
+      q2 = @copy_to.assessment_questions.first
+      ["correct_comments_html", "incorrect_comments_html", "neutral_comments_html", "more_comments_html"].each do |k|
+        q2.question_data.keys.should_not include(k)
+      end
+      q2.question_data["answers"].each do |a|
+        a.keys.should_not include("comments_html")
+      end
     end
 
     it "should copy discussion topic attributes" do

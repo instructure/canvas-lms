@@ -34,7 +34,7 @@
     <div class="control-group" id="privileges">
       <div class="controls">
         <label class="checkbox">
-          <input type="checkbox" id="limit_privileges_to_course_section" name="limit_privileges_to_course_section" value="1" {{#if limit_privileges_to_course_section}}checked{{/if}}>
+          {{checkbox "limit_privileges_to_course_section"}}
           {{#t "can_only_grade_students_in_section"}}Can grade students in their section only{{/t}}
         </label>
       </div>

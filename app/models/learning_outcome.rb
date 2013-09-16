@@ -91,12 +91,16 @@ class LearningOutcome < ActiveRecord::Base
   end
 
   def self.update_alignments(asset, context, new_outcome_ids)
-    old_alignments = asset.learning_outcome_alignments
-    old_outcome_ids = old_alignments.map(&:learning_outcome_id).compact.uniq
+    old_outcome_ids = asset.learning_outcome_alignments.
+      where("learning_outcome_id IS NOT NULL").
+      pluck(:learning_outcome_id).
+      uniq
 
     defunct_outcome_ids = old_outcome_ids - new_outcome_ids
     unless defunct_outcome_ids.empty?
-      asset.learning_outcome_alignments.where(:learning_outcome_id => defunct_outcome_ids).update_all(:workflow_state => 'deleted')
+      asset.learning_outcome_alignments.
+        where(:learning_outcome_id => defunct_outcome_ids).
+        update_all(:workflow_state => 'deleted')
     end
 
     missing_outcome_ids = new_outcome_ids - old_outcome_ids

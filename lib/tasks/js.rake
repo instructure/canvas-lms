@@ -90,6 +90,12 @@ namespace :js do
     end
 
     threads << Thread.new do
+      puts "--> Pre-compiling ember handlebars templates"
+      ember_handlebars_time = Benchmark.realtime { Rake::Task['jst:ember'].invoke }
+      puts "--> Pre-compiling ember handlebars templates finished in #{ember_handlebars_time}"
+    end
+
+    threads << Thread.new do
       coffee_time = Benchmark.realtime do
         require 'coffee-script'
 
@@ -112,6 +118,11 @@ namespace :js do
         end
       end
       puts "--> Compiling CoffeeScript finished in #{coffee_time}"
+
+      # can't be in own thread, needs coffeescript first
+      puts "--> Creating ember app bundles"
+      bundle_time = Benchmark.realtime { Rake::Task['js:bundle_ember_apps'].invoke }
+      puts "--> Creating ember app bundles finished in #{bundle_time}"
     end
 
     threads.each(&:join)
@@ -133,6 +144,14 @@ namespace :js do
       raise "Error running js:build: \n#{output}\nABORTING" if $?.exitstatus != 0
     end
     puts "--> Optimized canvas-lms in #{optimize_time}"
+  end
+
+  desc "creates ember app bundles"
+  task :bundle_ember_apps do
+    require 'lib/ember_bundle'
+    Dir.entries('app/coffeescripts/ember').reject {|d| d.match(/^\./) || d == 'shared'}.each do |app|
+      EmberBundle.new(app).build
+    end
   end
 
 end

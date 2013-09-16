@@ -45,7 +45,7 @@ module CC
       
 
       # Create the syllabus resource
-      if export_symbol?(:syllabus_body)
+      if export_symbol?(:syllabus_body) || export_symbol?(:all_syllabus_body)
         syl_rel_path = create_syllabus
         @resources.resource(
           :identifier => migration_id + "_syllabus",

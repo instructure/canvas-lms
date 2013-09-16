@@ -160,6 +160,7 @@ define([
     },
     editRating: function($rating) {
       if(!$rating.parents(".rubric").hasClass('editing')) { return; }
+      if($rating.parents(".criterion").hasClass('learning_outcome_criterion')) { return; }
       rubricEditing.hideEditRating(true);
       rubricEditing.hideCriterionAdd($rating.parents(".rubric"));
       var height = Math.max(40, $rating.find(".rating").height());
@@ -184,6 +185,7 @@ define([
     },
     editCriterion: function($criterion) {
       if(!$criterion.parents(".rubric").hasClass('editing')) { return; }
+      if($criterion.hasClass('learning_outcome_criterion')) { return; }
       rubricEditing.hideEditCriterion(true);
       var $td = $criterion.find(".criterion_description");
       var height = Math.max(40, $td.find(".description").height());
@@ -735,10 +737,12 @@ define([
       rubricEditing.editCriterion($criterion);
       return false;
     }).delegate('.criterion_description_value', 'click', function(event) {
-      rubricEditing.editCriterion($(this).parents(".criterion"));
+      var $criterion = $(this).parents(".criterion")
+      rubricEditing.editCriterion($criterion);
       return false;
     }).delegate('.edit_criterion_link', 'click', function(event) {
-      rubricEditing.editCriterion($(this).parents(".criterion"));
+      var $criterion = $(this).parents(".criterion")
+      rubricEditing.editCriterion($criterion);
       return false;
     }).delegate('.delete_criterion_link', 'click', function(event) {
       var $criterion = $(this).parents(".criterion");

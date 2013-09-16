@@ -92,7 +92,7 @@
         </a>
         <% end %>
 
-        <a class="al-trigger btn" role="button" aria-haspopup="true" aria-owns="toolbar-1" tabindex="-1">
+        <a class="al-trigger btn" role="button" aria-haspopup="true" aria-owns="toolbar-1" href="#">
           <i class="icon-settings"></i>
           <i class="icon-mini-arrow-down"></i>
           <span class="screenreader-only"><%= t(:manage, "Manage") %></span>
@@ -154,7 +154,8 @@
             <li role="presentation">
               <a href="#" class="quiz_details_link" tabindex="-1" role="menuitem">
                 <% if @any_submissions_pending_review %>
-                  <i class="icon-warning"></i>
+                  <i class="icon-warning" aria-label="<%= t("labels.warning_icon", "Warning") %>"></i>
+
                 <% end %>
                 <i class="icon-group"></i>
                 <span id="quiz_details_text">
@@ -188,9 +189,21 @@
 <% end %>
 
   <header class="quiz-header">
+    <% if submission_has_regrade?(@submission) %>
+    <div class="ui-state-warning ui-corner-all pad-box-micro text-center regraded-warning">
+      <i class="icon-warning" aria-label="<%= t("labels.warning_icon", "Warning") %>"></i>
+      <strong>
+      <% if score_affected_by_regrade?(@submission) %>
+        <%= t 'quiz_regraded_your_score_affected', 'This quiz has been re-graded, your score was affected.' %>
+      <% else %>
+        <%= t 'quiz_regraded_your_score_not_affected', 'This quiz has been re-graded, your score was not affected.' %>
+      <% end %>
+      </strong>
+    </div>
+    <% end %>
 
   <% if @domain_root_account.enable_draft? %>
-    <% if needs_unpublished_warning? %>
+    <% if needs_unpublished_warning?(@quiz) %>
     <div class="alert unpublished_warning">
       <% if !@quiz.available? %>
         <%= unpublished_quiz_warning %>
@@ -206,7 +219,7 @@
 
   <% else %>
 
-    <% if needs_unpublished_warning? %>
+    <% if needs_unpublished_warning?(@quiz) %>
       <div class="alert">
         <div class='row-fluid'>
           <div class='span8 unpublished_warning'>
@@ -253,7 +266,7 @@
 
           <% if can_do(@quiz, @current_user, :update) || can_do(@quiz, @current_user, :grade) || can_do(@quiz, @current_user, :review_grades) %>
             <div class="admin-links" style="margin-left: 5px">
-              <a class="al-trigger btn">
+              <a class="al-trigger btn" href="#">
                 <span class="screenreader-only"><%= t(:manage, "Manage") %></span>
                 <i class="icon-settings"></i>
                 <i class="icon-mini-arrow-down"></i>
@@ -316,7 +329,8 @@
                   <li>
                     <a href="#" class="quiz_details_link">
                       <% if @any_submissions_pending_review %>
-                        <i class="icon-warning"></i>
+                        <i class="icon-warning" aria-label="<%= t("labels.warning_icon", "Warning") %>"></i>
+
                       <% end %>
                       <i class="icon-group"></i>
                       <span id="quiz_details_text">
@@ -352,7 +366,8 @@
 
     <% if @submission && params[:preview] %>
       <h3>
-        <i class="icon-warning"></i> <%= t('warnings.draft_version', "This is a preview of the draft version of the quiz") %>
+        <i class="icon-warning" aria-label="<%= t("labels.warning_icon", "Warning") %>"></i>
+        <%= t('warnings.draft_version', "This is a preview of the draft version of the quiz") %>
       </h3>
     <% end %>
 
@@ -391,6 +406,9 @@
         <% end %>
       <% end %>
     <% end %>
+
+    <div id="quiz-submission-version-table"></div>
+
   </header>
 
   <% if @submission && @submission.completed? %>

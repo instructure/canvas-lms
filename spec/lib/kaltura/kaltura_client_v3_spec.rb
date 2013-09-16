@@ -124,6 +124,22 @@ describe "Kaltura::ClientV3" do
               {:fileExt => 'mp4', :bitrate => '200', :isOriginal => '1'},
           ]
     end
+
+    it "should prefer assets without conversion warnings" do
+      @kaltura.sort_source_list(
+          [
+              {:fileExt => 'mp4', :bitrate => '200', :isOriginal => '1'},
+              {:fileExt => 'flv', :bitrate => '100', :isOriginal => '0', :hasWarnings => true},
+              {:fileExt => 'mp3', :bitrate => '100', :isOriginal => '0'},
+              {:fileExt => 'mp4', :bitrate => '100', :isOriginal => '0'},
+          ]).should ==
+          [
+              {:fileExt => 'mp4', :bitrate => '100', :isOriginal => '0'},
+              {:fileExt => 'mp3', :bitrate => '100', :isOriginal => '0'},
+              {:fileExt => 'mp4', :bitrate => '200', :isOriginal => '1'},
+              {:fileExt => 'flv', :bitrate => '100', :isOriginal => '0'},
+          ]
+    end
   end
 
   describe "caching" do

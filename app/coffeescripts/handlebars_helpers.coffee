@@ -245,9 +245,14 @@ define [
     #                      checked="true"
     #                      name="likes[tacos]"
     #                      class="foo bar" >
-    checkbox : (propertyName, {hash}) ->
+    checkbox: (propertyName, {hash}) ->
       splitPropertyName = propertyName.split(/\./)
       snakeCase = splitPropertyName.join('_')
+
+      if hash.prefix
+        splitPropertyName.unshift hash.prefix
+        delete hash.prefix
+
       bracketNotation = splitPropertyName[0] + _.chain(splitPropertyName)
                                                 .rest()
                                                 .map((prop) -> "[#{prop}]")
@@ -260,11 +265,19 @@ define [
         name: bracketNotation
       , hash
 
-      unless inputProps.checked
-        value = _.reduce splitPropertyName, ((memo, key) -> memo[key]), this
+      unless inputProps.checked?
+        value = _.reduce(splitPropertyName, ((memo, key) -> memo[key] if memo?), this)
         inputProps.checked = true if value
 
-      attributes = _.map inputProps, (val, key) -> "#{htmlEscape key}=\"#{htmlEscape val}\""
+      for prop in ['checked', 'disabled']
+        if inputProps[prop]
+          inputProps[prop] = prop
+        else
+          delete inputProps[prop]
+
+      attributes = for key, val of inputProps when val?
+        "#{htmlEscape key}=\"#{htmlEscape val}\""
+
       new Handlebars.SafeString """
         <input name="#{htmlEscape inputProps.name}" type="hidden" value="0" />
         <input #{attributes.join ' '} />
@@ -327,6 +340,33 @@ define [
       return textHelper.truncateText( string, {max: max})
 
     enrollmentName: enrollmentName
+
+    # Public: Print an array as a comma-separated list.
+    #
+    # separator - The string to separate values with (default: ', ')
+    # propName - If array elements are objects, this is the object property
+    #            that should be printed (default: null).
+    # limit - Only display the first n results of the list, following by "end." (default: null)
+    # end - If the list is truncated, display this string at the end of the list (default: '...').
+    #
+    # Examples
+    #   values = [1,2,3]
+    #   complexValues = [{ id: 1 }, { id: 2 }, { id: 3 }]
+    #   {{list values}} #=> 1, 2, 3
+    #   {{list values separator=";"}} #=> 1;2;3
+    #   {{list complexValues propName="id"}} #=> 1, 2, 3
+    #   {{list values limit=2}} #=> 1, 2...
+    #   {{list values limit=2 end="!"}} #=> 1, 2!
+    #
+    # Returns a string.
+    list: (value, options) ->
+      _.defaults(options.hash, separator: ', ', propName: null, limit: null, end: '...')
+      {propName, limit, end, separator} = options.hash
+      result = _.map value, (item) ->
+        if propName then item[propName] else item
+      result = result.slice(0, limit) if limit
+      string = result.join(separator)
+      if limit and value.length > limit then "#{string}#{end}" else string
 
     titleize: (str) ->
       return '' unless str

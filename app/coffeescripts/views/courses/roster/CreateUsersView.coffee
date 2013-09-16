@@ -79,6 +79,8 @@ define [
 
     startOverFrd: ->
       @model.startOver()
+      if @model.get('limit_privileges_to_course_section') == "0"
+        @$el.find('#limit_privileges_to_course_section').prop('checked', false)
       @$textarea?.val ''
 
     afterRender: ->

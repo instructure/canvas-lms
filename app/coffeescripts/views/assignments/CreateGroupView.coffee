@@ -29,13 +29,12 @@ define [
 
     @optionProperty 'assignmentGroups'
     @optionProperty 'assignmentGroup'
-    @optionProperty 'assignments'
     @optionProperty 'course'
 
     initialize: ->
       @never_drops = []
       super
-      @model = @assignmentGroup or new AssignmentGroup
+      @model = @assignmentGroup or new AssignmentGroup(assignments: [])
 
     onSaveSuccess: ->
       super
@@ -43,7 +42,7 @@ define [
         @model.collection.view.render()
       else
         @assignmentGroups.add(@model)
-        @model = new AssignmentGroup
+        @model = new AssignmentGroup(assignments: [])
 
       @render()
 
@@ -72,14 +71,14 @@ define [
           assignment = @findAssignment(drop)
           model = new Backbone.Model
             id: @never_drops.length
-            chosen: assignment[0].name()
-            chosen_id: assignment[0].id
+            chosen: assignment.name()
+            chosen_id: assignment.get('id')
             label_id: @model.get('id') or 'new'
 
           @createNeverDrop model
 
     findAssignment: (id) ->
-      @assignments.filter (a) ->
+      @model.get('assignments').find (a) ->
         a.id == id
 
     toggleAddNeverDropLinkText: ->
@@ -93,7 +92,7 @@ define [
       ev.preventDefault()
       model = new Backbone.Model
         id: @never_drops.length
-        assignments: @assignments
+        assignments: @model.get('assignments').map (a) -> a.toView()
         label_id: @model.get('id') or 'new'
 
       @createNeverDrop model
@@ -124,7 +123,7 @@ define [
         label_id: @model.get('id') or 'new'
         drop_lowest: @model.rules()?.drop_lowest or 0
         drop_highest: @model.rules()?.drop_highest or 0
-        editable_never_drop: @assignments?.length > 0
+        editable_never_drop: @model.get('assignments').length > 0
       })
 
     openAgain: ->

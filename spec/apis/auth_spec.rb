@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -70,64 +70,99 @@ describe "API Authentication", :type => :integration do
       response.should be_client_error
     end
 
-    it "should continue to allow developer key + basic auth access" do
+    describe "should continue to allow developer key + basic auth access" do
       # this will continue to be supported until we notify api users and explicitly phase it out
-      user_with_pseudonym(:active_user => true, :username => 'test1@example.com', :password => 'test123')
-      course_with_teacher(:user => @user)
+      before do
+        user_with_pseudonym(:active_user => true, :username => 'test1@example.com', :password => 'test123')
+        course_with_teacher(:user => @user)
+        post '/login', 'pseudonym_session[unique_id]' => 'test1@example.com', 'pseudonym_session[password]' => 'test123'
+      end
 
-      get "/api/v1/courses.json"
-      response.response_code.should == 401
-      get "/api/v1/courses.json?api_key=#{@key.api_key}"
-      response.response_code.should == 401
-      get "/api/v1/courses.json?api_key=#{@key.api_key}", {}, { :authorization => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'failboat') }
-      response.response_code.should == 401
-      get "/api/v1/courses.json", {}, { :authorization => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'test123') }
-      response.should be_success
-      get "/api/v1/courses.json?api_key=#{@key.api_key}", {}, { :authorization => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'test123') }
-      response.should be_success
-      reset!
+      it "should allow basic auth" do
+        get "/api/v1/courses.json"
+        response.should be_success
+        get "/api/v1/courses.json?api_key=#{@key.api_key}", {},
+            { :authorization => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'failboat') }
+        response.response_code.should == 401
+        get "/api/v1/courses.json", {},
+            { :authorization => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'test123') }
+        response.should be_success
+      end
 
-      # don't need developer key when we have an actual application session
-      post '/login', 'pseudonym_session[unique_id]' => 'test1@example.com', 'pseudonym_session[password]' => 'test123'
-      response.should redirect_to("http://www.example.com/?login_success=1")
-      get "/api/v1/courses.json", {}
-      response.should be_success
-      # because this is a normal application session, the response is prepended
-      # with our anti-csrf measure
-      json = response.body
-      json.should match(%r{^while\(1\);})
-      JSON.parse(json.sub(%r{^while\(1\);}, '')).size.should == 1
-      reset!
+      it "should allow basic auth with api key" do
 
-      post "/api/v1/courses/#{@course.id}/assignments.json", { :assignment => { :name => 'test assignment', :points_possible => '5.3', :grading_type => 'points' } }
-      response.response_code.should == 401
-      post "/api/v1/courses/#{@course.id}/assignments.json", { :assignment => { :name => 'test assignment', :points_possible => '5.3', :grading_type => 'points' } }, { :authorization => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'test123') }
-      response.response_code.should == 401
-      post "/api/v1/courses/#{@course.id}/assignments.json?api_key=#{@key.api_key}", { :assignment => { :name => 'test assignment', :points_possible => '5.3', :grading_type => 'points' } }, { :authorization => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'test123') }
-      response.should be_success
-      @course.assignments.count.should == 1
-      @course.assignments.first.title.should == 'test assignment'
-      @course.assignments.first.points_possible.should == 5.3
-      # still need an authenticity token for posts when they have an actual application session
-      reset!
-      post '/login', 'pseudonym_session[unique_id]' => 'test1@example.com', 'pseudonym_session[password]' => 'test123'
-      post "/api/v1/courses/#{@course.id}/assignments.json", { :assignment => { :name => 'test assignment', :points_possible => '5.3', :grading_type => 'points' }, :authenticity_token => 'asdf' }
-      response.response_code.should == 401
-      $now = true
-      post "/api/v1/courses/#{@course.id}/assignments.json", { :assignment => { :name => 'test assignment', :points_possible => '5.3', :grading_type => 'points' }, :authenticity_token => session[:_csrf_token] }
-      response.should be_success
-      @course.assignments.count.should == 2
+        get "/api/v1/courses.json?api_key=#{@key.api_key}", {},
+            { :authorization => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'test123') }
+        response.should be_success
+      end
 
-      # don't allow replacing the authenticity token with api_key unless basic auth is given
-      reset!
-      post '/login', 'pseudonym_session[unique_id]' => 'test1@example.com', 'pseudonym_session[password]' => 'test123'
-      post "/api/v1/courses/#{@course.id}/assignments.json?api_key=#{@key.api_key}", { :assignment => { :name => 'test assignment', :points_possible => '5.3', :grading_type => 'points' } }
-      response.response_code.should == 401
-      # the basic auth has to be correct, too
-      post "/api/v1/courses/#{@course.id}/assignments.json?api_key=#{@key.api_key}", { :assignment => { :name => 'test assignment', :points_possible => '5.3', :grading_type => 'points' } }, { :authorization => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'badpass') }
-      response.response_code.should == 401
-      post "/api/v1/courses/#{@course.id}/assignments.json?api_key=#{@key.api_key}", { :assignment => { :name => 'test assignment', :points_possible => '5.3', :grading_type => 'points' } }, { :authorization => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'test123') }
-      response.should be_success
+      it "should not need developer key when we have an actual application session" do
+        response.should redirect_to("http://www.example.com/?login_success=1")
+        get "/api/v1/courses.json", {}
+        response.should be_success
+      end
+
+      it "should have anti-crsf meausre in normal session" do
+        get "/api/v1/courses.json", {}
+        # because this is a normal application session, the response is prepended
+        # with our anti-csrf measure
+        json = response.body
+        json.should match(%r{^while\(1\);})
+        JSON.parse(json.sub(%r{^while\(1\);}, '')).size.should == 1
+      end
+
+      it "should fail without api key" do
+        post "/api/v1/courses/#{@course.id}/assignments.json",
+             { :assignment => { :name => 'test assignment', :points_possible => '5.3', :grading_type => 'points' } }
+        response.response_code.should == 401
+        post "/api/v1/courses/#{@course.id}/assignments.json",
+             { :assignment => { :name => 'test assignment', :points_possible => '5.3', :grading_type => 'points' } },
+             { :authorization => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'test123') }
+        response.response_code.should == 401
+      end
+
+      it "should allow post with api key and basic auth" do
+        post "/api/v1/courses/#{@course.id}/assignments.json?api_key=#{@key.api_key}",
+             { :assignment => { :name => 'test assignment', :points_possible => '5.3', :grading_type => 'points' } },
+             { :authorization => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'test123') }
+        response.should be_success
+        @course.assignments.count.should == 1
+        @course.assignments.first.title.should == 'test assignment'
+        @course.assignments.first.points_possible.should == 5.3
+      end
+
+      it "should not allow post without authenticity token in application session" do
+        post "/api/v1/courses/#{@course.id}/assignments.json",
+             { :assignment => { :name => 'test assignment', :points_possible => '5.3', :grading_type => 'points' },
+               :authenticity_token => 'asdf' }
+          response.response_code.should == 401
+      end
+
+      it "should allow post with authenticity token in application session" do
+        get "/"
+        post "/api/v1/courses/#{@course.id}/assignments.json",
+             { :assignment => { :name => 'test assignment', :points_possible => '5.3', :grading_type => 'points' },
+               :authenticity_token => session[:_csrf_token] }
+        response.should be_success
+        @course.assignments.count.should == 1
+      end
+
+      it "should not allow replacing the authenticity token with api_key without basic auth" do
+        post "/api/v1/courses/#{@course.id}/assignments.json?api_key=#{@key.api_key}",
+             { :assignment => { :name => 'test assignment', :points_possible => '5.3', :grading_type => 'points' } }
+        response.response_code.should == 401
+      end
+
+      it "should allow replacing the authenticity token with api_key when basic auth is correct" do
+        post "/api/v1/courses/#{@course.id}/assignments.json?api_key=#{@key.api_key}",
+             { :assignment => { :name => 'test assignment', :points_possible => '5.3', :grading_type => 'points' } },
+             { :authorization => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'badpass') }
+        response.response_code.should == 401
+        post "/api/v1/courses/#{@course.id}/assignments.json?api_key=#{@key.api_key}",
+             { :assignment => { :name => 'test assignment', :points_possible => '5.3', :grading_type => 'points' } },
+             { :authorization => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'test123') }
+        response.should be_success
+      end
     end
 
     describe "oauth2 native app flow" do

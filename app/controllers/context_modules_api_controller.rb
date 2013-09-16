@@ -75,17 +75,21 @@ class ContextModulesApiController < ApplicationController
   #
   # List the modules in a course
   #
-  # @argument include[] ["items"] Return module items inline if possible.
-  #    This parameter suggests that Canvas return module items directly
-  #    in the Module object JSON, to avoid having to make separate API
-  #    requests for each module when enumerating modules and items. Canvas
-  #    is free to omit 'items' for any particular module if it deems them
-  #    too numerous to return inline. Callers must be prepared to use the
-  #    {api:ContextModuleItemsApiController#index List Module Items API}
-  #    if items are not returned.
-  # @argument include[] ["content_details"] (Requires include['items']) Returns additional details with module items specific to their associated content items.
-  #    Refer to the {api:Modules:Module%20Item Module Item specification} for more details.
-  # @argument search_term (optional) The partial name of the modules (and module items, if include['items'] is specified) to match and return.
+  # @argument include[] [String, "items"|"content_details"]
+  #    - "items": Return module items inline if possible.
+  #      This parameter suggests that Canvas return module items directly
+  #      in the Module object JSON, to avoid having to make separate API
+  #      requests for each module when enumerating modules and items. Canvas
+  #      is free to omit 'items' for any particular module if it deems them
+  #      too numerous to return inline. Callers must be prepared to use the
+  #      {api:ContextModuleItemsApiController#index List Module Items API}
+  #      if items are not returned.
+  #    - "content_details": Requires include['items']. Returns additional
+  #      details with module items specific to their associated content items.
+  #
+  # @argument search_term [Optional, String]
+  #   The partial name of the modules (and module items, if include['items'] is
+  #   specified) to match and return.
   #
   # @example_request
   #     curl -H 'Authorization: Bearer <token>' \
@@ -121,10 +125,17 @@ class ContextModulesApiController < ApplicationController
   #
   # Get information about a single module
   #
-  # @argument include[] ["items"] Return module items inline if possible.
-  #     Please refer to the caveats outlined in the {api:ContextModulesApiController#index List modules endpoint}.
-  # @argument include[] ["content_details"] If module items are included, also returns additional details specific to their associated content items.
-  #    Refer to the {api:Modules:Module%20Item Module Item specification} for more details.
+  # @argument include[] [String, "items"|"content_details"]
+  #    - "items": Return module items inline if possible.
+  #      This parameter suggests that Canvas return module items directly
+  #      in the Module object JSON, to avoid having to make separate API
+  #      requests for each module when enumerating modules and items. Canvas
+  #      is free to omit 'items' for any particular module if it deems them
+  #      too numerous to return inline. Callers must be prepared to use the
+  #      {api:ContextModuleItemsApiController#index List Module Items API}
+  #      if items are not returned.
+  #    - "content_details": Requires include['items']. Returns additional
+  #      details with module items specific to their associated content items.
   #
   # @example_request
   #     curl -H 'Authorization: Bearer <token>' \
@@ -145,8 +156,11 @@ class ContextModulesApiController < ApplicationController
   #
   # Update multiple modules in an account.
   #
-  # @argument module_ids[] List of ids of modules to update.
-  # @argument event The action to take on each module. Must be 'delete'.
+  # @argument module_ids[] [String]
+  #   List of ids of modules to update.
+  #
+  # @argument event [String]
+  #   The action to take on each module. Must be 'delete'.
   #
   # @response_field completed A list of IDs for modules that were updated.
   #
@@ -197,12 +211,22 @@ class ContextModulesApiController < ApplicationController
   #
   # Create and return a new module
   #
-  # @argument module[name] [Required] The name of the module
-  # @argument module[unlock_at] [Optional] The date the module will unlock
-  # @argument module[position] [Optional] The position of this module in the course (1-based)
-  # @argument module[require_sequential_progress] [Optional] Whether module items must be unlocked in order
-  # @argument module[prerequisite_module_ids][] [Optional] IDs of Modules that must be completed before this one is unlocked
-  #   Prerequisite modules must precede this module (i.e. have a lower position value), otherwise they will be ignored
+  # @argument module[name] [String]
+  #   The name of the module
+  #
+  # @argument module[unlock_at] [Optional, DateTime]
+  #   The date the module will unlock
+  #
+  # @argument module[position] [Optional, Integer]
+  #   The position of this module in the course (1-based)
+  #
+  # @argument module[require_sequential_progress] [Optional, Boolean]
+  #   Whether module items must be unlocked in order
+  #
+  # @argument module[prerequisite_module_ids][] [Optional, String]
+  #   IDs of Modules that must be completed before this one is unlocked.
+  #   Prerequisite modules must precede this module (i.e. have a lower position
+  #   value), otherwise they will be ignored
   #
   # @example_request
   #
@@ -245,13 +269,25 @@ class ContextModulesApiController < ApplicationController
   #
   # Update and return an existing module
   #
-  # @argument module[name] [Optional] The name of the module
-  # @argument module[unlock_at] [Optional] The date the module will unlock
-  # @argument module[position] [Optional] The position of the module in the course (1-based)
-  # @argument module[require_sequential_progress] [Optional] Whether module items must be unlocked in order
-  # @argument module[prerequisite_module_ids][] [Optional] IDs of Modules that must be completed before this one is unlocked
-  #   Prerequisite modules must precede this module (i.e. have a lower position value), otherwise they will be ignored
-  # @argument module[published] [Optional] Whether the module is published and visible to students
+  # @argument module[name] [Optional, String]
+  #   The name of the module
+  #
+  # @argument module[unlock_at] [Optional, DateTime]
+  #   The date the module will unlock
+  #
+  # @argument module[position] [Optional, Integer]
+  #   The position of the module in the course (1-based)
+  #
+  # @argument module[require_sequential_progress] [Optional, Boolean]
+  #   Whether module items must be unlocked in order
+  #
+  # @argument module[prerequisite_module_ids][] [Optional, String]
+  #   IDs of Modules that must be completed before this one is unlocked
+  #   Prerequisite modules must precede this module (i.e. have a lower position
+  #   value), otherwise they will be ignored
+  #
+  # @argument module[published] [Optional, Boolean]
+  #   Whether the module is published and visible to students
   #
   # @example_request
   #

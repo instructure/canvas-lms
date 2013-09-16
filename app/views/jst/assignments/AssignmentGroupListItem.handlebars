@@ -1,7 +1,7 @@
 <div id="assignment_group_{{id}}">
   <h2 class="ig-header" style="position:relative;">
     <span
-      class="element_toggler"
+      class="ig-header-title element_toggler"
       aria-controls="assignment_group_{{id}}_assignments"
       aria-expanded="true"
       aria-label="{{name}} {{toggleMessage}}"
@@ -34,7 +34,7 @@
           <i class="icon-plus"></i>
         </a>
 
-        <a id="ag_{{id}}_manage_link" class="al-trigger btn">
+        <a id="ag_{{id}}_manage_link" class="al-trigger btn" href="#">
           <span class="screenreader-only">{{#t "manage"}}Manage{{/t}}</span>
           <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
         </a>
@@ -62,12 +62,24 @@
   </h2>
 
   <div id="assignment_group_{{id}}_assignments" >
-    <ul class="collectionViewItems ig-list"></ul>
+    {{#if hasAssignments}}
+      <ul class="collectionViewItems ig-list"></ul>
+    {{else}}
+      <ul class="ig-list">
+        <li>
+          <div class="ig-row">
+            <span class="ig-title ellipses">
+              {{#t "no_assignments"}}No assignments{{/t}}
+            </span>
+          </div>
+        </li>
+      </ul>
+    {{/if}}
   </div>
 
   {{#if ENV.PERMISSIONS.manage}}
     <form data-view="createAssignment" class="form-dialog"></form>
     <form data-view="editAssignmentGroup" class="form-dialog"></form>
-    <form data-view="deleteAssignmentGroup" class="form-dialog" serialize-radio-value></form>
+    <form data-view="deleteAssignmentGroup" class="form-dialog"></form>
   {{/if}}
 </div>

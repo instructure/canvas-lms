@@ -1,10 +1,10 @@
 <div class="controls">
   <label class="checkbox">
-    <input id="assignment_has_group_category"
-    name="{{#if nested}}assignment[has_group_category]{{else}}has_group_category{{/if}}"
-      type="checkbox"
-      {{checkedIf groupCategoryId}}
-      {{disabledIfIncludes frozenAttributes "group_category_id"}}/>
+    {{checkbox "has_group_category"
+      id="assignment_has_group_category"
+      prefix=prefix
+      checked=groupCategoryId
+      disabled=groupCategoryIdFrozen}}
     {{#t "is_group_assignment"}}This is a Group Assignment{{/t}}
   </label>
 </div>
@@ -13,10 +13,11 @@
 
   <div class="controls">
     <label class="checkbox" >
-      <input name="{{#if nested}}assignment[grade_group_students_individually]{{else}}grade_group_students_individually{{/if}}"
-        type="checkbox"
-        {{checkedIf gradeGroupStudentsIndividually}}
-        {{disabledIfIncludes frozenAttributes "group_category_id"}}/>
+      {{checkbox "grade_group_students_individually"
+        id=null
+        prefix=prefix
+        checked=gradeGroupStudentsIndividually
+        disabled=groupCategoryIdFrozen}}
       {{#t "grade_group_students_individually"}}
         Assign Grades to Each Student Individually
       {{/t}}

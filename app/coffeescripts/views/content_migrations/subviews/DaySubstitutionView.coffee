@@ -14,13 +14,21 @@ define [
 
     events: 
       'click a'             : 'removeView'
-      'change .currentDay'  : 'updateModelData'
+      'change .currentDay'  : 'changeCurrentDay'
       'change .subDay'      : 'updateModelData'
 
     # When a new view is created, make sure the model is updated
     # with it's initial attributes/values
 
     afterRender: -> @updateModelData()
+
+    # Ensure that after you update the current day you change focus
+    # to the next select box. In this case the next select box is
+    # @$subDay
+
+    changeCurrentDay: -> 
+      @updateModelData()
+      #@$subDay.focus()
 
     # Clear the model and add new value and key
     # for the day representation.

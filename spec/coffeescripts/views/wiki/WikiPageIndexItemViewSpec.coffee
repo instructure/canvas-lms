@@ -49,18 +49,44 @@ define [
 
   module 'WikiPageIndexItemView:JSON'
 
-  test 'WIKI_RIGHTS', ->
-    model = new WikiPage
-    view = new WikiPageIndexItemView
-      model: model
-      WIKI_RIGHTS:
-        good: true
-    strictEqual view.toJSON().WIKI_RIGHTS.good, true, 'WIKI_RIGHTS represented in toJSON'
+  testRights = (subject, options) ->
+    test "#{subject}", ->
+      model = new WikiPage
+      view = new WikiPageIndexItemView
+        model: model
+        contextName: options.contextName
+        WIKI_RIGHTS: options.WIKI_RIGHTS
+      json = view.toJSON()
+      for key of options.CAN
+        strictEqual json.CAN[key], options.CAN[key], "CAN.#{key}"
 
-  test 'contextName', ->
-    model = new WikiPage
-    view = new WikiPageIndexItemView
-      model: model
-      contextName: 'groups'
-    strictEqual view.toJSON().contextName, 'groups', 'contextName represented in toJSON'
+  testRights 'CAN (manage course)',
+    contextName: 'courses'
+    WIKI_RIGHTS:
+      read: true
+      manage: true
+    CAN:
+      MANAGE: true
+      PUBLISH: true
 
+  testRights 'CAN (manage group)',
+    contextName: 'groups'
+    WIKI_RIGHTS:
+      read: true
+      manage: true
+    CAN:
+      MANAGE: true
+      PUBLISH: false
+
+  testRights 'CAN (read)',
+    contextName: 'courses'
+    WIKI_RIGHTS:
+      read: true
+    CAN:
+      MANAGE: false
+      PUBLISH: false
+
+  testRights 'CAN (null)',
+    CAN:
+      MANAGE: false
+      PUBLISH: false

@@ -920,7 +920,7 @@ XML
     
     Quiz.import_from_migration(quiz_hash, @copy_to, {})
     q = @copy_to.quizzes.find_by_migration_id("ie3d8f8adfad423eb225229c539cdc450")
-    a = @copy_to.assignments.find_by_migration_id("i0c012cbae54b972138520466e557f5e4")
+    a = q.assignment
     a.assignment_group.id.should == ag.id
     q.assignment_group_id.should == ag.id
   end

@@ -139,7 +139,7 @@ describe "enrollment_date_restrictions" do
     @course.conclude_at = 4.days.from_now
     @course.restrict_enrollments_to_course_dates = true
     @course.save!
-    @enrollment.state_based_on_date.should == :inactive
+    @enrollment.reload.state_based_on_date.should == :inactive
 
     get '/calendar'
     html = Nokogiri::HTML(response.body)

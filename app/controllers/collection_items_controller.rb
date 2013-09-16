@@ -185,27 +185,31 @@ class CollectionItemsController < ApplicationController
   # Create a new item in this collection. You can also clone an existing item
   # from another collection.
   #
-  # @argument link_url The URL of the item to add. This can be any HTTP or
-  #   HTTPS address. The item_type will be determined by the link_url that is passed in.
+  # @argument link_url [String]
+  #   The URL of the item to add. This can be any HTTP or HTTPS address. The
+  #   item_type will be determined by the link_url that is passed in.
   #
   #   To clone an existing item, pass in the url to that item as returned in
   #   the JSON response in the "url" field.
   #
-  # @argument title The title of the item.
-  #   If no title  is provided, Canvas will try to automatically
-  #   add a relevant title based on the linked content.
+  # @argument title [String]
+  #   The title of the item. If no title  is provided, Canvas will try to
+  #   automatically add a relevant title based on the linked content.
   #
-  # @argument description The plain-text description of the item.
-  #   If no description is provided, Canvas will try to automatically
-  #   add a relevant description based on the linked content.
+  # @argument description [String]
+  #   The plain-text description of the item. If no description is provided,
+  #   Canvas will try to automatically add a relevant description based on the
+  #   linked content.
   #
-  # @argument image_url The URL of the image to use for this item. If no image
-  #   url is provided, Canvas will try to automatically determine an image
-  #   representation for the link. This parameter is ignored if the new item is
-  #   a clone of an existing item.
+  # @argument image_url [String]
+  #   The URL of the image to use for this item. If no image url is provided,
+  #   Canvas will try to automatically determine an image representation for the
+  #   link. This parameter is ignored if the new item is a clone of an existing
+  #   item.
   #
-  # @argument user_comment The user's comments on the item. This can be set
-  #   when cloning an existing item, as well.
+  # @argument user_comment [String]
+  #   The user's comments on the item. This can be set when cloning an existing
+  #   item, as well.
   #
   # @example_request
   #     curl https://<canvas>/api/v1/collections/<collection_id>/items \ 
@@ -219,7 +223,7 @@ class CollectionItemsController < ApplicationController
   #          -F user_comment="clone of some other item" \ 
   #          -H 'Authorization: Bearer <token>'
   #
-  # @returns Collection Item
+  # @returns CollectionItem
   def create
     @item = @collection.collection_items.new(:user => @current_user)
     if authorized_action(@item, @current_user, :create)
@@ -246,7 +250,7 @@ class CollectionItemsController < ApplicationController
   #
   # Change a collection item's mutable attributes.
   #
-  # @argument user_comment
+  # @argument user_comment [String]
   #
   # @example_request
   #     curl https://<canvas>/api/v1/collections/items/<item_id> \ 

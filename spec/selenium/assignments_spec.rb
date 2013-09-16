@@ -522,21 +522,24 @@ describe "assignments" do
         fj('.create_assignment:visible').click
         wait_for_ajaximations
 
-        f("#assignment_group_#{ag.id} .add_assignment").click
-        wait_for_ajaximations
+        keep_trying_until do
+          fj("#assignment_group_#{ag.id} .add_assignment").click
+          wait_for_ajaximations
+          fj("#ag_#{ag.id}_assignment_name").displayed?
+        end
 
-        get_value("#ag_#{ag.id}_assignment_name").should be_blank
-        get_value("#ag_#{ag.id}_assignment_points").should be_blank
+        get_value("#ag_#{ag.id}_assignment_name").should == ""
+        get_value("#ag_#{ag.id}_assignment_points").should == ""
 
-        replace_content(f("#ag_#{ag.id}_assignment_name"), "Another")
-        replace_content(f("#ag_#{ag.id}_assignment_points"), "3")
+        replace_content(fj("#ag_#{ag.id}_assignment_name"), "Another")
+        replace_content(fj("#ag_#{ag.id}_assignment_points"), "3")
         fj('.create_assignment:visible').click
         wait_for_ajaximations
 
         ag.reload.assignments.count.should == 2
       end
 
-      it "should remembmer entered settings when 'more options' is pressed" do
+      it "should remember entered settings when 'more options' is pressed" do
         ag = @course.assignment_groups.first
 
         get "/courses/#{@course.id}/assignments"
@@ -551,6 +554,25 @@ describe "assignments" do
 
         get_value("#assignment_name").should == "Do this"
         get_value("#assignment_points_possible").should == "13"
+      end
+
+      it "should delete assignments" do
+        ag = @course.assignment_groups.first
+        as = @course.assignments.create({:assignment_group => ag})
+
+        get "/courses/#{@course.id}/assignments"
+        wait_for_ajaximations
+
+        f("#assignment_#{as.id} .al-trigger").click
+        wait_for_animations
+        f("#assignment_#{as.id} .delete_assignment").click
+
+        accept_alert
+        wait_for_ajaximations
+        element_exists("#assignment_#{as.id}").should be_false
+
+        as.reload
+        as.workflow_state.should == 'deleted'
       end
 
       context 'publishing' do

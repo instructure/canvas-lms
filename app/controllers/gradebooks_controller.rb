@@ -333,8 +333,8 @@ class GradebooksController < ApplicationController
     end
     @comments, @failures = @assignment.generate_comments_from_files(params[:submissions_zip].path, @current_user)
     flash[:notice] = t('notices.uploaded',
-                       { :one => "Files and comments created for 1 user submission",
-                         :other => "Files and comments created for %{count} user submissions" },
+                       { :one => "Files and comments created for 1 submission",
+                         :other => "Files and comments created for %{count} submissions" },
                        :count => @comments.length)
   end
 

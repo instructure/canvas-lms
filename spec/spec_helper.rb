@@ -18,7 +18,7 @@
 if ENV['COVERAGE'] == "1"
   puts "Code Coverage enabled"
   require 'simplecov'
-  SimpleCov.start('rails') do
+  SimpleCov.start do
     SimpleCov.formatter = SimpleCov::Formatter::HTMLFormatter
     add_filter '/spec/'
     add_filter '/config/'
@@ -613,52 +613,52 @@ Spec::Runner.configure do |config|
     @outcome_group.add_outcome(@outcome)
     @outcome_group.save!
 
-    @rubric = Rubric.generate(:context => @course,
-                              :data => {
-                                  :title => 'My Rubric',
-                                  :hide_score_total => false,
-                                  :criteria => {
-                                      "0" => {
-                                          :points => 3,
-                                          :mastery_points => 0,
-                                          :description => "Outcome row",
-                                          :long_description => @outcome.description,
-                                          :ratings => {
-                                              "0" => {
-                                                  :points => 3,
-                                                  :description => "Rockin'",
-                                              },
-                                              "1" => {
-                                                  :points => 0,
-                                                  :description => "Lame",
-                                              }
-                                          },
-                                          :learning_outcome_id => @outcome.id
-                                      },
-                                      "1" => {
-                                          :points => 5,
-                                          :description => "no outcome row",
-                                          :long_description => 'non outcome criterion',
-                                          :ratings => {
-                                              "0" => {
-                                                  :points => 5,
-                                                  :description => "Amazing",
-                                              },
-                                              "1" => {
-                                                  :points => 3,
-                                                  :description => "not too bad",
-                                              },
-                                              "2" => {
-                                                  :points => 0,
-                                                  :description => "no bueno",
-                                              }
-                                          }
-                                      }
-                                  }
-                              })
-    @rubric.instance_variable_set('@alignments_changed', true)
-    @rubric.save!
-    @rubric.update_alignments
+    rubric_params = {
+      :title => 'My Rubric',
+      :hide_score_total => false,
+      :criteria => {
+        "0" => {
+          :points => 3,
+          :mastery_points => 0,
+          :description => "Outcome row",
+          :long_description => @outcome.description,
+          :ratings => {
+            "0" => {
+              :points => 3,
+              :description => "Rockin'",
+            },
+            "1" => {
+              :points => 0,
+              :description => "Lame",
+            }
+          },
+          :learning_outcome_id => @outcome.id
+        },
+        "1" => {
+          :points => 5,
+          :description => "no outcome row",
+          :long_description => 'non outcome criterion',
+          :ratings => {
+            "0" => {
+              :points => 5,
+              :description => "Amazing",
+            },
+            "1" => {
+              :points => 3,
+              :description => "not too bad",
+            },
+            "2" => {
+              :points => 0,
+              :description => "no bueno",
+            }
+          }
+        }
+      }
+    }
+
+    @rubric = @course.rubrics.build
+    @rubric.update_criteria(rubric_params)
+    @rubric.reload
   end
 
   def grading_standard_for(context, opts={})
@@ -687,7 +687,7 @@ Spec::Runner.configure do |config|
 
   def conversation(*users)
     options = users.last.is_a?(Hash) ? users.pop : {}
-    @conversation = (options.delete(:sender) || @me || users.shift).initiate_conversation(users)
+    @conversation = (options.delete(:sender) || @me || users.shift).initiate_conversation(users, options.delete(:private))
     @message = @conversation.add_message('test')
     @conversation.update_attributes(options)
     @conversation.reload

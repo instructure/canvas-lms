@@ -80,7 +80,7 @@ class ImportedHtmlConverter
           elsif val =~ %r{\$IMS_CC_FILEBASE\$/(.*)}
             rel_path = $1
             if attr == 'href' && node['class'] && node['class'] =~ /instructure_inline_media_comment/
-              unless new_url = replace_media_comment_data(node, rel_path, context)
+              unless new_url = replace_media_comment_data(node, rel_path, context, opts)
                 unless new_url = replace_relative_file_url(rel_path, context)
                   missing_relative_url = rel_path
                 end
@@ -197,7 +197,7 @@ class ImportedHtmlConverter
     File.join(URI::escape("#{course_path}/file_contents/#{Folder.root_folders(context).first.name}"), rel_path)
   end
 
-  def self.replace_media_comment_data(node, rel_path, context)
+  def self.replace_media_comment_data(node, rel_path, context, opts={})
     if context.respond_to?(:attachment_path_id_lookup) &&
       context.attachment_path_id_lookup &&
         context.attachment_path_id_lookup[rel_path]
@@ -208,12 +208,16 @@ class ImportedHtmlConverter
         return "/media_objects/#{media_id}"
       end
     end
+
     if node['id'] && node['id'] =~ /\Amedia_comment_(.+)\z/
-      return "/media_objects/#{$1}"
+      link = "/media_objects/#{$1}"
+      opts[:missing_links] << link if opts[:missing_links]
+      return link
     else
       node.delete('class')
       node.delete('id')
       node.delete('style')
+      opts[:missing_links] << rel_path if opts[:missing_links]
       return nil
     end
   end

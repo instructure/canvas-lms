@@ -10,9 +10,8 @@ define [
     copyCourseView = new CopyCourseView
                          courseFindSelect: new Backbone.View
                          dateShift: new DateShiftView
+                            collection: new Backbone.Collection
                             model: new ContentMigration
-
-
 
     $('#fixtures').html copyCourseView.render().el
     sinonSpy = sinon.spy(copyCourseView.dateShift, 'updateNewDates')

@@ -36,11 +36,10 @@
               {{#if checkName}}
                 <div class="user-preference">
                   <label class="checkbox" for="{{checkID}}">
-                    <input type="checkbox"
-                           id="{{checkID}}"
-                           class="user-pref-check"
-                           name="{{checkName}}"
-                           {{#if checkedState}}checked="checked"{{/if}} />
+                    {{checkbox checkName
+                      id=checkID
+                      class="user-pref-check"
+                      checked=checkedState}}
                     {{checkLabel}}
                   </label>
                 </div>

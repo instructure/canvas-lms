@@ -18,14 +18,18 @@
 
 module Canvas::AccountReports::ReportHelper
 
+  def parse_utc_string(datetime)
+    if datetime.is_a? String
+      Time.use_zone('UTC') {Time.zone.parse(datetime)}
+    end
+  end
+
 # This function will take a datetime or a datetime string and convert into
 # iso8601 for the root_account's timezone
 # A string datetime needs to be in UTC
   def default_timezone_format(datetime, account=root_account)
     if datetime.is_a? String
-      datetime = Time.use_zone('UTC') do
-        Time.zone.parse(datetime)
-      end
+      datetime = parse_utc_string(datetime)
     end
     if datetime
       datetime.in_time_zone(account.default_time_zone).iso8601
@@ -70,7 +74,13 @@ module Canvas::AccountReports::ReportHelper
 
   def course
     if (course_id = (@account_report.has_parameter? "course_id") || (@account_report.has_parameter? "course"))
-      @course ||= api_find(root_account.courses, course_id)
+      @course ||= api_find(root_account.all_courses, course_id)
+    end
+  end
+
+  def section
+    if section_id = (@account_report.has_parameter? "section_id")
+      @section ||= api_find(root_account.course_sections, section_id)
     end
   end
 
@@ -139,5 +149,16 @@ module Canvas::AccountReports::ReportHelper
         "%{type} report successfully generated with the following settings. Account: %{account}; %{options}",
         :type => type, :account => account.name, :options => options),
       file)
+  end
+
+  def write_report(headers)
+    file = Canvas::AccountReports.generate_file(@account_report)
+    CSV.open(file, "w") do |csv|
+      csv << headers
+      yield csv
+    end
+    Shackles.activate(:master) do
+      send_report(file)
+    end
   end
 end

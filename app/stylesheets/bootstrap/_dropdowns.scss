@@ -172,6 +172,7 @@
      -moz-border-radius: 0 6px 6px 6px;
           border-radius: 0 6px 6px 6px;
 }
+.dropdown-submenu a:focus + .dropdown-menu, /* INSTRUCTURE */
 .dropdown-submenu:hover > .dropdown-menu {
   display: block;
 }

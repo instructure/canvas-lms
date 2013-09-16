@@ -182,7 +182,6 @@ describe "assignment rubrics" do
       @submission = @assignment.submit_homework(@student, {:url => "http://www.instructure.com/"})
       @rubric.data[0][:ignore_for_scoring] = '1'
       @rubric.points_possible = 5
-      @rubric.alignments_changed = true
       @rubric.save!
       @assignment.points_possible = 5
       @assignment.save!

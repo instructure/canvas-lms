@@ -31,7 +31,6 @@ class WikiPage < ActiveRecord::Base
   belongs_to :wiki, :touch => true
   belongs_to :cloned_item
   belongs_to :user
-  has_many :wiki_page_comments, :order => "created_at DESC"
   acts_as_url :title, :scope => [:wiki_id, :not_deleted], :sync_url => true
 
   validate :validate_front_page_visibility
@@ -40,6 +39,7 @@ class WikiPage < ActiveRecord::Base
   before_validation :ensure_unique_title
 
   TITLE_LENGTH = WikiPage.columns_hash['title'].limit rescue 255
+  SIMPLY_VERSIONED_EXCLUDE_FIELDS = [:workflow_state, :hide_from_students, :editing_roles, :notify_of_update]
 
   def validate_front_page_visibility
     if self.hide_from_students && self.is_front_page?
@@ -129,7 +129,11 @@ class WikiPage < ActiveRecord::Base
   end
 
   has_a_broadcast_policy
-  simply_versioned
+  simply_versioned :exclude => SIMPLY_VERSIONED_EXCLUDE_FIELDS, :when => Proc.new { |wp|
+    # :user_id and :updated_at do not merit creating a version, but should be saved
+    exclude_fields = [:user_id, :updated_at].concat(SIMPLY_VERSIONED_EXCLUDE_FIELDS).map(&:to_s)
+    (wp.changes.keys.map(&:to_s) - exclude_fields).present?
+  }
   after_save :remove_changed_flag
 
   workflow do
@@ -205,7 +209,8 @@ class WikiPage < ActiveRecord::Base
   end
 
   def is_front_page?
-    !self.deleted? && self.wiki.has_front_page? && self.url == self.wiki.get_front_page_url
+    return false if self.deleted?
+    self.url == self.wiki.get_front_page_url # wiki.get_front_page_url checks has_front_page? and context.draft_state_enabled?
   end
 
   def set_as_front_page!
@@ -234,16 +239,16 @@ class WikiPage < ActiveRecord::Base
     can :read
 
     given {|user, session| user && self.can_edit_page?(user)}
-    can :update_content
+    can :update_content and can :read_revisions
 
     given {|user, session| user && self.can_edit_page?(user) && self.wiki.grants_right?(user, session, :create_page)}
     can :create
 
     given {|user, session| user && self.can_edit_page?(user) && self.wiki.grants_right?(user, session, :update_page)}
-    can :update
+    can :update and can :read_revisions
 
     given {|user, session| user && self.can_edit_page?(user) && self.active? && self.wiki.grants_right?(user, session, :update_page_content)}
-    can :update_content
+    can :update_content and can :read_revisions
 
     given {|user, session| user && self.can_edit_page?(user) && self.active? && self.wiki.grants_right?(user, session, :delete_page)}
     can :delete
@@ -420,6 +425,7 @@ class WikiPage < ActiveRecord::Base
         item.workflow_state = 'unpublished'
       end
     end
+    item.set_as_front_page! if !!hash[:front_page]
     context.imported_migration_items << item if context.imported_migration_items && item.new_record?
     item.migration_id = hash[:migration_id]
     (hash[:contents] || []).each do |sub_item|
@@ -541,10 +547,6 @@ class WikiPage < ActiveRecord::Base
       end
       return item
     end
-  end
-
-  def self.comments_enabled?
-    !Rails.env.production?
   end
 
   def increment_view_count(user, context = nil)

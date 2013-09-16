@@ -29,7 +29,8 @@ class PseudonymsController < ApplicationController
   # @API List user logins
   # Given a user ID, return that user's logins for the given account.
   #
-  # @argument user[id] The ID of the user to search on.
+  # @argument user[id] [String]
+  #   The ID of the user to search on.
   #
   # @response_field account_id The ID of the login's account.
   # @response_field id The unique, numeric ID for the login.
@@ -156,10 +157,18 @@ class PseudonymsController < ApplicationController
   # @API Create a user login
   # Create a new login for an existing user in the given account.
   #
-  # @argument user[id] The ID of the user to create the login for.
-  # @argument login[unique_id] The unique ID for the new login.
-  # @argument login[password] The new login's password.
-  # @argument login[sis_user_id] SIS ID for the login. To set this parameter, the caller must be able to manage SIS permissions on the account.
+  # @argument user[id] [String]
+  #   The ID of the user to create the login for.
+  #
+  # @argument login[unique_id] [String]
+  #   The unique ID for the new login.
+  #
+  # @argument login[password] [String]
+  #   The new login's password.
+  #
+  # @argument login[sis_user_id] [String]
+  #   SIS ID for the login. To set this parameter, the caller must be able to
+  #   manage SIS permissions on the account.
   def create
     return unless get_user
     return unless @user == @current_user || authorized_action(@user, @current_user, :manage_logins)
@@ -224,9 +233,16 @@ class PseudonymsController < ApplicationController
   # @API Edit a user login
   # Update an existing login for a user in the given account.
   #
-  # @argument login[unique_id] The new unique ID for the login.
-  # @argument login[password] The new password for the login. Can only be set by an admin user if admins are allowed to change passwords for the account.
-  # @argument login[sis_user_id] SIS ID for the login. To set this parameter, the caller must be able to manage SIS permissions on the account.
+  # @argument login[unique_id] [String]
+  #   The new unique ID for the login.
+  #
+  # @argument login[password] [String]
+  #   The new password for the login. Can only be set by an admin user if admins
+  #   are allowed to change passwords for the account.
+  #
+  # @argument login[sis_user_id] [String]
+  #   SIS ID for the login. To set this parameter, the caller must be able to
+  #   manage SIS permissions on the account.
   def update
     if api_request?
       @pseudonym          = Pseudonym.active.find(params[:id])

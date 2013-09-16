@@ -1,20 +1,20 @@
 <td role="gridcell">
-  <a href="{{html_url}}" class="wiki-page-link{{#if WIKI_RIGHTS.manage}}{{#ifEqual contextName "courses"}} {{#unless published}}un{{/unless}}published{{/ifEqual}}{{/if}}">{{title}}</a>
+  <a href="{{html_url}}" class="wiki-page-link{{#if CAN.PUBLISH}} {{#unless published}}un{{/unless}}published{{/if}}">{{title}}</a>
   {{#if front_page}} <span class="front-page label">{{#t 'labels.front_page'}}Front Page{{/t}}</span>{{/if}}
 </td>
 <td role="gridcell">{{tDateToString created_at "medium"}}</td>
 <td role="gridcell">{{tDateToString updated_at "medium"}}{{#if last_edited_by.display_name}} by {{last_edited_by.display_name}}{{/if}}</td>
-{{#if WIKI_RIGHTS.manage}}
-  {{#ifEqual contextName "courses"}}
+{{#if CAN.MANAGE}}
+  {{#if CAN.PUBLISH}}
     <td role="gridcell" class="publish-cell"></td>
-  {{/ifEqual}}
+  {{/if}}
   <td role="gridcell">
-    <a class="al-trigger" tabindex="-1" role="button">
+    <a class="al-trigger" href="#" role="button">
       <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
       <span class="screenreader-only">{{#t 'menu.settings'}}Settings{{/t}}</span>
     </a>
     <ul class="al-options">
-      <li><a href="{{html_url}}/edit" class="icon-edit" title="{{#t 'menu.edit'}}Edit{{/t}}">{{#t 'menu.edit'}}Edit{{/t}}</a></li>
+      <li><a href="#" class="icon-edit edit-menu-item" title="{{#t 'menu.edit'}}Edit{{/t}}">{{#t 'menu.edit'}}Edit{{/t}}</a></li>
       <li><a href="#" class="icon-trash delete-menu-item" title="{{#t 'menu.delete'}}Delete{{/t}}">{{#t 'menu.delete'}}Delete{{/t}}</a></li>
       {{#if front_page}}
         <li><a href="#" class="icon-home remove-front-page-menu-item" title="{{#t 'menu.remove_front_page'}}Remove as Front Page{{/t}}">{{#t 'menu.remove_front_page'}}Remove as Front Page{{/t}}</a></li>

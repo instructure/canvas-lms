@@ -15,8 +15,9 @@ define [
       super()
       if !@options.defaultOption then @options.defaultOption = I18n.t('all_courses', 'All Courses')
       @$el.addClass('show-tick')
-      @$el.selectpicker().next().on('mouseover', @loadAll)
-      @$el.selectpicker().next().find('.dropdown-toggle').on('focus', @loadAll)
+      @$el.selectpicker(useSubmenus: true).next()
+        .on('mouseover', @loadAll)
+        .find('.dropdown-toggle').on('focus', @loadAll)
       @options.courses.favorites.on('reset', @render)
       @options.courses.all.on('reset', @render)
       @render()
@@ -35,6 +36,7 @@ define [
         favorites: @options.courses.favorites.toJSON(),
         more: more,
         concluded: concluded
+      @truncate_course_name_data(data)
       @$el.html(template(data))
       @$el.selectpicker('refresh')
       if !@renderValue() then @loadAll()
@@ -60,7 +62,28 @@ define [
       @triggerEvent()
 
     triggerEvent: () ->
-      @trigger('course', @_value)
+      @trigger('course', name: @$el.find(':selected').text().trim(), id: @_value)
 
     focus: ->
       @$el.next().find('.dropdown-toggle').focus()
+
+    truncate_course_name_data: (course_data) ->
+      _.each(['favorites', 'more', 'concluded'], (key) =>
+        @truncate_course_names(course_data[key])
+        )
+
+    truncate_course_names: (courses) ->
+      _.each(courses, @truncate_course)
+
+    truncate_course: (course) =>
+      name = course['name']
+      truncated = @middle_truncate(name)
+      unless name == truncated
+        course['truncated_name'] = truncated
+
+    middle_truncate: (name) ->
+      # This implementation ignores non-BMP character encoding issues in favor of simplicity
+      if name.length > 25
+        name.slice(0, 10) + "&hellip;" + name.slice(-10)
+      else
+        name

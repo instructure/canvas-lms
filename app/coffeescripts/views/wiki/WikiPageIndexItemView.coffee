@@ -1,40 +1,44 @@
 define [
   'Backbone'
+  'compiled/views/wiki/WikiPageIndexEditDialog'
   'compiled/views/wiki/WikiPageDeleteDialog'
   'compiled/views/PublishIconView'
   'jst/wiki/WikiPageIndexItem'
   'compiled/jquery/redirectClickTo'
-], (Backbone, WikiPageDeleteDialog, PublishIconView, template) ->
+], (Backbone, WikiPageIndexEditDialog, WikiPageDeleteDialog, PublishIconView, template) ->
 
   class WikiPageIndexItemView extends Backbone.View
-    @mixin
-      template: template
-      tagName: 'tr'
-      className: 'clickable'
-      attributes:
-        role: 'row'
-      els:
-        '.wiki-page-link': '$wikiPageLink'
-        '.publish-cell': '$publishCell'
-      events:
-        'click a.al-trigger': 'settingsMenu'
-        'click .al-options .icon-edit': 'editPage'
-        'click a.delete-menu-item': 'deletePage'
-        'click a.set-front-page-menu-item': 'setAsFrontPage'
-        'click a.remove-front-page-menu-item': 'removeAsFrontPage'
+    template: template
+    tagName: 'tr'
+    className: 'clickable'
+    attributes:
+      role: 'row'
+    els:
+      '.wiki-page-link': '$wikiPageLink'
+      '.publish-cell': '$publishCell'
+    events:
+      'click a.al-trigger': 'settingsMenu'
+      'click .edit-menu-item': 'editPage'
+      'click .delete-menu-item': 'deletePage'
+      'click .set-front-page-menu-item': 'setAsFrontPage'
+      'click .remove-front-page-menu-item': 'removeAsFrontPage'
 
+    @optionProperty 'indexView'
+    @optionProperty 'collection'
     @optionProperty 'WIKI_RIGHTS'
     @optionProperty 'contextName'
 
     initialize: ->
       super
+      @WIKI_RIGHTS ||= {}
       @model.set('publishable', true)
       @model.on 'change', => @render()
 
     toJSON: ->
       json = super
-      json.WIKI_RIGHTS = @WIKI_RIGHTS
-      json.contextName = @contextName
+      json.CAN =
+        MANAGE: !!@WIKI_RIGHTS.manage
+        PUBLISH: !!@WIKI_RIGHTS.manage && @contextName == 'courses'
       json
 
     render: ->
@@ -57,7 +61,18 @@ define [
       ev?.preventDefault()
 
     editPage: (ev) ->
-      ev?.stopPropagation()
+      ev?.preventDefault()
+      editDialog = new WikiPageIndexEditDialog
+        model: @model
+      editDialog.open()
+
+      indexView = @indexView
+      collection = @collection
+      editDialog.on 'success', ->
+        indexView.currentSortField = null
+        indexView.renderSortHeaders()
+
+        collection.fetch page: 'current'
 
     deletePage: (ev) ->
       ev?.preventDefault()

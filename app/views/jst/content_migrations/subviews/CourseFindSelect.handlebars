@@ -15,7 +15,7 @@
   <input id="courseSearchField" type="text" placeholder="Course name" name="courseSearchField" class='span3'/>
   <br>
   <label class="checkbox">
-    <input type="checkbox" name="include_completed_courses" {{#if include_concluded}}checked{{/if}}>
+    {{checkbox "include_completed_courses" checked=include_concluded}}
     {{#t 'include_completed_courses'}}Include completed courses{{/t}}
   </label>
 </div>

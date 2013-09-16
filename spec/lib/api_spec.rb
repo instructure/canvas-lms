@@ -603,6 +603,7 @@ describe Api do
     it "should not build links for empty pages" do
       Api.build_links("www.example.com/", {
         :per_page => 10,
+        :current => "",
         :next => "",
         :prev => "",
         :first => "",
@@ -610,15 +611,17 @@ describe Api do
       }).should be_empty
     end
 
-    it "should build next, prev, first, and last links if provided" do
+    it "should build current, next, prev, first, and last links if provided" do
       links = Api.build_links("www.example.com/", {
         :per_page => 10,
+        :current => 8,
         :next => 4,
         :prev => 2,
         :first => 1,
         :last => 10,
       })
       links.all?{ |l| l =~ /www.example.com\/\?/ }.should be_true
+      links.find{ |l| l.match(/rel="current"/)}.should =~ /page=8&per_page=10>/
       links.find{ |l| l.match(/rel="next"/)}.should =~ /page=4&per_page=10>/
       links.find{ |l| l.match(/rel="prev"/)}.should =~ /page=2&per_page=10>/
       links.find{ |l| l.match(/rel="first"/)}.should =~ /page=1&per_page=10>/

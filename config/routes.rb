@@ -27,6 +27,7 @@ FakeRails3Routes.draw do
   match 'conversations/mark_all_as_read' => 'conversations#mark_all_as_read', :as => :conversations_mark_all_as_read, :via => :post
   match 'conversations/watched_intro' => 'conversations#watched_intro', :as => :conversations_watched_intro, :via => :post
   match 'conversations/batches' => 'conversations#batches', :as => :conversation_batches
+  match 'conversations/toggle_new_conversations' => 'conversations#toggle_new_conversations', :as => :toggle_new_conversations, :via => :post
   resources :conversations, :only => [:index, :show, :update, :create, :destroy] do
     match 'add_recipients' => 'conversations#add_recipients', :as => :add_recipients, :via => :post
     match 'add_message' => 'conversations#add_message', :as => :add_message, :via => :post
@@ -147,7 +148,6 @@ FakeRails3Routes.draw do
     # resources :wiki_pages, :path => :pages do
     #   match 'revisions/latest' => 'wiki_page_revisions#latest_version_number', :as => :latest_version_number
     #   resources :wiki_page_revisions, :as => "revisions"
-    #   resources :wiki_page_comments, :as => "comments"
     # end
     #
     ####
@@ -160,7 +160,6 @@ FakeRails3Routes.draw do
     resources :wiki_pages, :path => :wiki do
       match 'revisions/latest' => 'wiki_page_revisions#latest_version_number', :as => :latest_version_number
       resources :wiki_page_revisions, :path => :revisions
-      resources :wiki_page_comments, :path => :comments
     end
 
     ####
@@ -312,6 +311,7 @@ FakeRails3Routes.draw do
     match 'quizzes/unpublish' => 'quizzes#unpublish', :as => :quizzes_unpublish
     resources :quizzes do
       match 'managed_quiz_data' => 'quizzes#managed_quiz_data', :as => :managed_quiz_data
+      match 'submission_versions' => 'quizzes#submission_versions', :as => :submission_versions
       match 'reorder' => 'quizzes#reorder', :as => :reorder
       match 'history' => 'quizzes#history', :as => :history
       match 'statistics' => 'quizzes#statistics', :as => :statistics
@@ -342,7 +342,6 @@ FakeRails3Routes.draw do
     resources :gradebook_uploads
     resources :rubrics
     resources :rubric_associations do
-      match 'invite' => 'rubric_assessments#invite', :as => :invite_assessor
       match 'remind/:assessment_request_id' => 'rubric_assessments#remind', :as => :remind_assessee
       resources :rubric_assessments, :path => 'assessments'
     end
@@ -643,7 +642,6 @@ FakeRails3Routes.draw do
     match 'external_tools/:id' => 'users#external_tool', :as => :external_tool
     resources :rubrics
     resources :rubric_associations do
-      match 'invite' => 'rubric_assessments#invite', :as => :invite_assessor
       resources :rubric_assessments, :path => :assessments
     end
 
@@ -1232,6 +1230,14 @@ FakeRails3Routes.draw do
       get "groups/:group_id/pages/:url", :action => :show, :path_name => 'group_wiki_page'
       get "courses/:course_id/front_page", :action => :show
       get "groups/:group_id/front_page", :action => :show
+      get "courses/:course_id/pages/:url/revisions", :action => :revisions, :path_name => 'course_wiki_page_revisions'
+      get "groups/:group_id/pages/:url/revisions", :action => :revisions, :path_name => 'group_wiki_page_revisions'
+      get "courses/:course_id/pages/:url/revisions/latest", :action => :show_revision
+      get "groups/:group_id/pages/:url/revisions/latest", :action => :show_revision
+      get "courses/:course_id/pages/:url/revisions/:revision_id", :action => :show_revision
+      get "groups/:group_id/pages/:url/revisions/:revision_id", :action => :show_revision
+      post "courses/:course_id/pages/:url/revisions/:revision_id", :action => :revert
+      post "groups/:group_id/pages/:url/revisions/:revision_id", :action => :revert
       post "courses/:course_id/pages", :action => :create
       post "groups/:group_id/pages", :action => :create
       put "courses/:course_id/pages/:url", :action => :update
@@ -1257,6 +1263,7 @@ FakeRails3Routes.draw do
       get "courses/:course_id/modules/:module_id/items", :action => :index, :path_name => 'course_context_module_items'
       get "courses/:course_id/modules/:module_id/items/:id", :action => :show, :path_name => 'course_context_module_item'
       get "courses/:course_id/module_item_redirect/:id", :action => :redirect, :path_name => 'course_context_module_item_redirect'
+      get "courses/:course_id/module_item_sequence", :action => :item_sequence
       post "courses/:course_id/modules/:module_id/items", :action => :create, :path_name => 'course_context_module_items_create'
       put "courses/:course_id/modules/:module_id/items/:id", :action => :update, :path_name => 'course_context_module_item_update'
       delete "courses/:course_id/modules/:module_id/items/:id", :action => :destroy

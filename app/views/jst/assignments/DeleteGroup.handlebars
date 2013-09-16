@@ -1,6 +1,6 @@
 <div class="form-dialog-content">
   <div class="form-horizontal">
-    <p>{{#t 'warnings.delete_assignment_group'}}You are about to delete <strong>{{name}}</strong>, which has <strong>{{assignment_count}}</strong> assignments in it.{{/t}}
+    <p>{{#t 'warnings.delete_assignment_group'}}You are about to delete <strong>{{name}}</strong>, which has <strong class="assignment_count">{{assignment_count}}</strong> assignments in it.{{/t}}
     </p>
       <p>{{#t 'would_you_like'}}Would you like to:{{/t}}</p>
     <p>
@@ -11,7 +11,7 @@
       <select name="move_assignments_to" class="group_select" title="{{#t 'tooltips.target_group'}}Select a group to move this assignment to{{/t}}" aria-labelledby="ag_move_{{label_id}}">
         <option value="" class="blank">[ {{#t 'options.select_group'}}Select a Group{{/t}} ]</option>
         {{#each groups}}
-          <option value="{{id}}">{{name}}</option>
+          <option class="move_to_ag_{{id}}" value="{{id}}">{{name}}</option>
         {{/each}}
       </select>
     </p>

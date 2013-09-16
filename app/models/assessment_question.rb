@@ -227,6 +227,7 @@ class AssessmentQuestion < ActiveRecord::Base
     question = HashWithIndifferentAccess.new
     qdata = qdata.with_indifferent_access
     previous_data = assessment_question.question_data rescue {}
+    question[:regrade_option] = qdata[:regrade_option] if qdata[:regrade_option].present?
     question[:points_possible] = (qdata[:points_possible] || previous_data[:points_possible] || 0.0).to_f
     question[:correct_comments] = check_length(qdata[:correct_comments] || previous_data[:correct_comments] || "", 'correct comments', 5.kilobyte)
     question[:incorrect_comments] = check_length(qdata[:incorrect_comments] || previous_data[:incorrect_comments] || "", 'incorrect comments', 5.kilobyte)
@@ -480,13 +481,15 @@ class AssessmentQuestion < ActiveRecord::Base
           question_data[:qq_data][question['migration_id']] = question
           next
         end
+        next if question[:question_bank_migration_id] && !migration.import_object?("quizzes", question[:question_bank_migration_id])
         if !question_bank
           hash_id = "#{question[:question_bank_id]}_#{question[:question_bank_name]}"
           if !banks[hash_id]
-            unless bank = migration.context.assessment_question_banks.find_by_title_and_migration_id(question[:question_bank_name], question[:question_bank_id])
+            bank_mig_id = question[:question_bank_id] || question[:question_bank_migration_id]
+            unless bank = migration.context.assessment_question_banks.find_by_title_and_migration_id(question[:question_bank_name], bank_mig_id)
               bank = migration.context.assessment_question_banks.new
               bank.title = question[:question_bank_name]
-              bank.migration_id = question[:question_bank_id]
+              bank.migration_id = bank_mig_id
               bank.save!
             end
             if bank.workflow_state == 'deleted'
@@ -561,6 +564,13 @@ class AssessmentQuestion < ActiveRecord::Base
          :id => hash['assessment_question_id'], :field => field, :missing_links => missing_links,
          :url => "/#{context.class.to_s.underscore.pluralize}/#{context.id}/question_banks/#{bank.id}#question_#{hash['assessment_question_id']}_question_text")
       end
+      if hash[:import_warnings]
+        hash[:import_warnings].each do |warning|
+          context.content_migration.add_warning(warning, {
+              :fix_issue_html_url => "/#{context.class.to_s.underscore.pluralize}/#{context.id}/question_banks/#{bank.id}#question_#{hash['assessment_question_id']}_question_text"
+          })
+        end
+      end
     end
     hash.delete(:missing_links)
     hash
@@ -572,10 +582,19 @@ class AssessmentQuestion < ActiveRecord::Base
       hash[:missing_links][field] = []
       hash[field] = ImportedHtmlConverter.convert(hash[field], context, {:missing_links => hash[:missing_links][field], :remove_outer_nodes_if_one_child => true}) if hash[field].present?
     end
+    [:correct_comments, :incorrect_comments, :neutral_comments, :more_comments].each do |field|
+      html_field = "#{field}_html".to_sym
+      if hash[field].present? && hash[field] == hash[html_field]
+        hash.delete(html_field)
+      end
+    end
     hash[:answers].each_with_index do |answer, i|
       [:html, :comments_html, :left_html].each do |field|
         hash[:missing_links]["answer #{i} #{field}"] = []
         answer[field] = ImportedHtmlConverter.convert(answer[field], context, {:missing_links => hash[:missing_links]["answer #{i} #{field}"], :remove_outer_nodes_if_one_child => true}) if answer[field].present?
+      end
+      if answer[:comments].present? && answer[:comments] == answer[:comments_html]
+        answer.delete(:comments_html)
       end
     end if hash[:answers]
     hash[:prepped_for_import] = true

@@ -7,10 +7,6 @@ define ['compiled/models/Publishable'], (Publishable) ->
     setup: ->
     teardown: ->
 
-  test 'initialize stores the url for use in url generation', ->
-    cModule = buildModule true
-    equal cModule.url(), '/api/1/2/3'
-
   test 'publish updates the state of the model', ->
     cModule = buildModule false
     cModule.save = ()->

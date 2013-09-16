@@ -61,7 +61,7 @@ define [
 
     render: =>
       super
-      @renderItems() if @collection.length
+      @renderItems() unless @empty
       this
 
     ##
@@ -78,21 +78,21 @@ define [
       @collection.on 'reset', @renderOnReset
       @collection.on 'add', @renderOnAdd
       @collection.on 'remove', @removeItem
-      @collection.on 'remove', @rerenderUnlessCollection
+      @empty = not @collection.length
 
     ##
-    # Ensures item views are removed properly, when we upgrade backbone we can
-    # use options.previousModels instead of the DOM.
+    # Ensures item views are removed properly
     #
     # @param {Array} models - array of Backbone.Models
     # @api private
 
     removePreviousItems: (models) =>
-      @$list?.children().each (index, el) =>
-        @$(el).data('view')?.remove()
+      for model in models
+        model.view.remove()
 
-    renderOnReset: =>
-      @removePreviousItems()
+    renderOnReset: (models, options) =>
+      @empty = not @collection.length
+      @removePreviousItems options.previousModels
       @render()
 
     ##
@@ -110,27 +110,22 @@ define [
     # @api private
 
     removeItem: (model) =>
-      model.view.remove()
+      @empty = not @collection.length
+      if @empty
+        @render()
+      else
+        model.view.remove()
 
     ##
-    # Ensures main template is rerendered when the first item is added
+    # Ensures main template is rerendered when the first items are added
     #
     # @param {Backbone.Model} model
     # @api private
 
     renderOnAdd: (model) =>
-      if @collection.length is 1
-        @render()
-      else
-        @renderItem model
-
-    ##
-    # Ensures the template rerenders when there is no collection
-    #
-    # @api private
-
-    rerenderUnlessCollection: =>
-      @render() unless @collection.length
+      @render() if @empty
+      @empty = false
+      @renderItem(model)
 
     ##
     # Renders an item with the `itemView`

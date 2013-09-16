@@ -94,7 +94,9 @@ gem 'will_paginate',  '2.3.15'
 gem 'xml-simple',     '1.0.12', :require => 'xmlsimple'
 gem 'foreigner',      '0.9.2'
 gem 'crocodoc-ruby',  '0.0.1', :require => 'crocodoc'
-gem 'regru-premailer', '1.7.7', :require => 'premailer'
+# needs https://github.com/regru/premailer/commit/8d3ae698eff135011b19e1587a68c399ec97b185
+# we can go back to the gem once 1.7.8 is released
+gem 'regru-premailer', :require => 'premailer', :git => "https://github.com/regru/premailer.git", :ref => "08a73c70701f5d81bc4a5cf6c959a45ad94db88e"
 
 group :assets do
   gem 'compass-rails', '1.0.3'
@@ -117,7 +119,7 @@ group :test do
   gem 'simplecov', '0.7.1' if ENV['COVERAGE'] != nil && ENV['COVERAGE'] == "1" # for coverage reporting
   gem 'bluecloth',    '2.0.10' # for generating api docs
   gem 'mocha',        :git => 'git://github.com/ccutrer/mocha.git', :require => false
-  gem 'parallelized_specs', '0.4.59'
+  gem 'parallelized_specs', '0.4.64'
   gem 'thin', '1.5.1'
   if CANVAS_RAILS3
     gem 'rspec-rails',  '2.13.0'
@@ -129,7 +131,7 @@ group :test do
   gem 'webrat',       '0.7.3'
   gem 'yard',         '0.8.0'
   gem 'yard-appendix',  '>=0.1.8'
-  gem 'timecop',      '0.5.9.1'
+  gem 'timecop',      '0.6.3'
   gem 'test-unit',  '1.2.3'
 end
 

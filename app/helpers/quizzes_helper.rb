@@ -18,7 +18,13 @@
 
 module QuizzesHelper
   def needs_unpublished_warning?(quiz=@quiz)
+    return false if quiz.available? && !can_publish(quiz)
+
     !quiz.available? || quiz.unpublished_changes?
+  end
+
+  def can_publish(quiz)
+    can_do(quiz, @current_user, :update) || can_do(quiz, @current_user, :manage)
   end
 
   def unpublished_quiz_warning
@@ -429,6 +435,34 @@ module QuizzesHelper
     quiz.scoring_policy == "keep_highest" ?
       t('#quizzes.links.will_keep_highest_score', "Will keep the highest of all your scores") :
       t('#quizzes.links.will_keep_latest_score', "Will keep the latest of all your scores")
+  end
+
+  def quiz_edit_text(quiz=@quiz)
+    if quiz.survey?
+      I18n.t('titles.edit_survey', 'Edit Survey')
+    else
+      I18n.t('titles.edit_quiz', 'Edit Quiz')
+    end
+  end
+
+  def quiz_delete_text(quiz=@quiz)
+    if quiz.survey?
+      I18n.t('titles.delete_survey', 'Delete Survey')
+    else
+      I18n.t('titles.delete_quiz', 'Delete Quiz')
+    end
+  end
+
+  def has_regraded_version?(versions)
+    versions.detect {|v| v.score_before_regrade.present? }
+  end
+
+  def submission_has_regrade?(submission)
+    submission && submission.score_before_regrade.present?
+  end
+
+  def score_affected_by_regrade?(submission)
+    submission && submission.score_before_regrade != submission.kept_score
   end
 
 end

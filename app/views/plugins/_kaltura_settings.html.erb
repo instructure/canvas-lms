@@ -106,5 +106,10 @@ TEXT
       </td>
       <td><%= f.check_box :kaltura_sis %></td>
     </tr>
+    <tr>
+      <td><%= f.label :do_analytics, :en => "Send analytics events" %></td>
+      <td><%= f.check_box :do_analytics, {}, 'yes', 'no' %></td>
+    </tr>
+    <tr><td colspan="2">(#{domain}/api_v3/index.php?service=stats&action=collect&...)</td></tr>
   </table>
 <% end %>

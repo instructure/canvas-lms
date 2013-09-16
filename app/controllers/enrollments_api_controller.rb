@@ -45,14 +45,20 @@ class EnrollmentsApiController < ApplicationController
   # note: Currently, only an admin user can return other users' enrollments. A
   # user can, however, return his/her own enrollments.
   #
-  # @argument type[] A list of enrollment types to return. Accepted values are 'StudentEnrollment', 'TeacherEnrollment',
-  #   'TaEnrollment', 'DesignerEnrollment', and 'ObserverEnrollment.' If omitted, all enrollment types are returned.
-  #   This argument is ignored if `role` is given.
-  # @argument role[] A list of enrollment roles to return. Accepted values include course-level roles created by the
-  #   {api:RoleOverridesController#add_role Add Role API} as well as the base enrollment types accepted by the `type`
-  #   argument above.
-  # @argument state[] Filter by enrollment state. Accepted values are 'active', 'invited', and 'creation_pending',
-  #   'deleted', 'rejected', 'completed', and 'inactive'. If omitted, 'active' and 'invited' enrollments are returned.
+  # @argument type[] [String]
+  #   A list of enrollment types to return. Accepted values are
+  #   'StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment',
+  #   'DesignerEnrollment', and 'ObserverEnrollment.' If omitted, all enrollment
+  #   types are returned. This argument is ignored if `role` is given.
+  #
+  # @argument role[] [String]
+  #   A list of enrollment roles to return. Accepted values include course-level
+  #   roles created by the {api:RoleOverridesController#add_role Add Role API}
+  #   as well as the base enrollment types accepted by the `type` argument above.
+  #
+  # @argument state[] [String, "active"|"invited"|"creation_pending"|"deleted"|"rejected"|"completed"|"inactive"]
+  #   Filter by enrollment state. If omitted, 'active' and 'invited' enrollments
+  #   are returned.
   #
   # @response_field id The unique id of the enrollment.
   # @response_field course_id The unique id of the course.
@@ -163,13 +169,33 @@ class EnrollmentsApiController < ApplicationController
   # @API Enroll a user
   # Create a new user enrollment for a course or section.
   #
-  # @argument enrollment[user_id] [String] The ID of the user to be enrolled in the course.
-  # @argument enrollment[type] [String] [StudentEnrollment|TeacherEnrollment|TaEnrollment|ObserverEnrollment|DesignerEnrollment] Enroll the user as a student, teacher, TA, observer, or designer. If no value is given, the type will be inferred by enrollment[role] if supplied, otherwise 'StudentEnrollment' will be used.
-  # @argument enrollment[role] [String] [Optional] Assigns a custom course-level role to the user.
-  # @argument enrollment[enrollment_state] [String] [Optional, active|invited] [String] If set to 'active,' student will be immediately enrolled in the course. Otherwise they will be required to accept a course invitation. Default is 'invited.'
-  # @argument enrollment[course_section_id] [Integer] [Optional] The ID of the course section to enroll the student in. If the section-specific URL is used, this argument is redundant and will be ignored
-  # @argument enrollment[limit_privileges_to_course_section] [Boolean] [Optional] If a teacher or TA enrollment, teacher/TA will be restricted to the section given by course_section_id.
-  # @argument enrollment[notify] [Boolean] [Optional] If false (0 or "false"), a notification will not be sent to the enrolled user. Notifications are sent by default.
+  # @argument enrollment[user_id] [String]
+  #   The ID of the user to be enrolled in the course.
+  #
+  # @argument enrollment[type] [String, "StudentEnrollment"|"TeacherEnrollment"|"TaEnrollment"|"ObserverEnrollment"|"DesignerEnrollment"]
+  #   Enroll the user as a student, teacher, TA, observer, or designer. If no
+  #   value is given, the type will be inferred by enrollment[role] if supplied,
+  #   otherwise 'StudentEnrollment' will be used.
+  #
+  # @argument enrollment[role] [Optional, String]
+  #   Assigns a custom course-level role to the user.
+  #
+  # @argument enrollment[enrollment_state] [Optional, String, "active"|"invited"]
+  #   If set to 'active,' student will be immediately enrolled in the course.
+  #   Otherwise they will be required to accept a course invitation. Default is
+  #   'invited.'
+  # @argument enrollment[course_section_id] [Optional, Integer]
+  #   The ID of the course section to enroll the student in. If the
+  #   section-specific URL is used, this argument is redundant and will be
+  #   ignored.
+  #
+  # @argument enrollment[limit_privileges_to_course_section] [Optional, Boolean]
+  #   If a teacher or TA enrollment, teacher/TA will be restricted to the
+  #   section given by course_section_id.
+  #
+  # @argument enrollment[notify] [Optional, Boolean]
+  #   If false, a notification will not be sent to the enrolled user.
+  #   Notifications are sent by default.
   def create
     # error handling
     errors = []
@@ -233,7 +259,8 @@ class EnrollmentsApiController < ApplicationController
   # @API Conclude an enrollment
   # Delete or conclude an enrollment.
   #
-  # @argument task [conclude|delete] [String] The action to take on the enrollment.
+  # @argument task [String, "conclude"|"delete"]
+  #   The action to take on the enrollment.
   #
   # @example_request
   #   curl https://<canvas>/api/v1/courses/:course_id/enrollments/:enrollment_id \ 

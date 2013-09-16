@@ -59,8 +59,8 @@ class ExternalContentController < ApplicationController
     endpoint = params[:endpoint]
     url = params[:url]
     uri = URI.parse(endpoint + (endpoint.match(/\?/) ? '&url=' : '?url=') + CGI.escape(url) + '&format=json')
-    res = Net::HTTP.get(uri) rescue "{}"
-    data = JSON.parse(res) rescue {}
+    res = Canvas::HTTP.get(uri.to_s) rescue '{}'
+    data = JSON.parse(res.body) rescue {}
     if data['type']
       if data['type'] == 'photo' && data['url'].try(:match, /^http/)
         @retrieved_data = {

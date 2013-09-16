@@ -78,7 +78,7 @@ class DiscussionEntriesController < ApplicationController
   # The entry must have been created by the current user, or the current user
   # must have admin rights to the discussion. If the edit is not allowed, a 401 will be returned.
   #
-  # @argument message The updated body of the entry.
+  # @argument message [String] The updated body of the entry.
   #
   # @example_request
   #   curl -X PUT 'http://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/entries/<entry_id>' \ 

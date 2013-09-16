@@ -404,7 +404,7 @@ describe "external tools" do
     it "should launch assignment external tools when viewing assignment" do
       @tool = @course.context_external_tools.create!(:name => "new tool", :consumer_key => "key", :shared_secret => "secret", :domain => 'example.com', :custom_fields => {'a' => '1', 'b' => '2'})
       assignment_model(:course => @course, :points_possible => 40, :submission_types => 'external_tool', :grading_type => 'points')
-      tag = @assignment.build_external_tool_tag(:url => "http://example.com/one")
+      tag = @assignment.build_external_tool_tag(:url => "http://example.com")
       tag.content_type = 'ContextExternalTool'
       tag.save!
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"

@@ -35,8 +35,8 @@
 
 <div id="discussion-toolbar" class="toolbarView">
   <div class="headerBar" data-sticky>
-    <div class="row-fluid form-inline">
-      <div class="span8">
+    <div class="row-fluid form-inline" style="overflow: visible;">
+      <div class="span7">
         <label
           class="hidden-inline-text"
           for="discussion-search"
@@ -61,7 +61,7 @@
 
       </div>
 
-      <div class="span4 right-align">
+      <div class="span5 right-align">
         <a href='#' class='btn topic-subscribe-button' data-tooltip="bottom"
            title="<%= t('topic_subscribe_tooltip', 'You are unsubscribed and will not be notified of new comments') %>"
            aria-label="<%= t('topic_subscribe_tooltip', 'You are unsubscribed and will not be notified of new comments') %>">
@@ -86,7 +86,7 @@
 
         <% if @current_user.present? %>
           <div class="admin-links">
-            <a class="al-trigger btn" data-kyle-menu-options='{"appendMenuTo": "body"}'>
+            <a class="al-trigger btn" href="#">
               <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
               <div class="screenreader-only"><%= t :manage_discussion, 'Manage Discussion' %></div>
             </a>
@@ -159,22 +159,24 @@
       <header class="discussion-section clearfix">
         <%= avatar((@topic.user), @context.asset_string, 50, image_class: 'img-circle') %>
         <div class="discussion-header-content right-of-avatar">
+          <div class="pull-left">
+            <h1 class="discussion-title"><%= @topic.title %></h1>
+            <div class="discussion-subtitle">
+              <a class="author" href="<%= context_url(@topic.context, :context_user_url, @topic.user_id) %>" title="<%= t :authors_name, "Author's name" %>"><%= context_user_name(@topic.context, @topic.user) %></a>
+            </div>
+            <% if @topic.root_topic.try(:context) && @topic.root_topic.try(:context) != @context %>
+              <span class="discussion-subtitle">
+                <%= t(:from_context, "From *%{context_name}*", {
+                        :context_name => @topic.root_topic.context.short_name,
+                        :wrapper => "<a href='#{context_url(@topic.root_topic.context, :context_url)}'>\1</a>" }) %>
+              </span>
+            <% end %>
+          </div>
 
           <div class="discussion-header-right pull-right">
             <div class="discussion-pubdate"><%= friendly_datetime @topic.posted_at %></div>
             <%= render :partial => 'new_and_total_badge', :locals => { :unread_count => @topic.unread_count(@current_user), :reply_count => @topic.discussion_subentry_count } %>
           </div>
-          <h1 class="discussion-title"><%= @topic.title %></h1>
-          <div class="discussion-subtitle">
-            <a class="author" href="<%= context_url(@topic.context, :context_user_url, @topic.user_id) %>" title="<%= t :authors_name, "Author's name" %>"><%= context_user_name(@topic.context, @topic.user) %></a>
-          </div>
-          <% if @topic.root_topic.try(:context) && @topic.root_topic.try(:context) != @context %>
-            <span class="discussion-subtitle">
-              <%= t(:from_context, "From *%{context_name}*", {
-                      :context_name => @topic.root_topic.context.short_name,
-                      :wrapper => "<a href='#{context_url(@topic.root_topic.context, :context_url)}'>\1</a>" }) %>
-            </span>
-          <% end %>
         </div>
       </header>
 

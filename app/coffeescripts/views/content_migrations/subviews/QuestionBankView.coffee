@@ -20,6 +20,9 @@ define [
     setQuestionBankValues: (event) -> 
       if(event.target.value == 'new_question_bank') 
         @$createQuestionInput.show()
+
+        # Ensure focus is on the new input field
+        @$createQuestionInput.focus()
         @model.set 'settings', {question_bank_id: null}
       else
         @$createQuestionInput.hide()

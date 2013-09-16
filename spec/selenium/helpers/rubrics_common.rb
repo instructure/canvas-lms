@@ -38,7 +38,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
     ff('#rubrics .rubric').each { |rubric| rubric.should_not be_displayed }
   end
 
-def should_edit_a_rubric
+  def should_edit_a_rubric
     edit_title = 'edited rubric'
     create_rubric_with_criterion_points "5"
     rubric = Rubric.last
@@ -79,4 +79,18 @@ def should_edit_a_rubric
 
     ffj(".rubric .criterion:visible .rating .points").count.should == 3
     ffj(".rubric .criterion:visible .rating .points")[1].text.should == '0'
+  end
+
+  def import_outcome
+    f('.edit_rubric_link').click
+    wait_for_ajaximations
+    f('.rubric.editing tr.criterion .delete_criterion_link').click
+    wait_for_ajaximations
+    f('.rubric.editing .find_outcome_link').click
+    wait_for_ajaximations
+    f('.outcome-link').click
+    wait_for_ajaximations
+    f('.ui-dialog .btn-primary').click
+    accept_alert
+    wait_for_ajaximations
   end

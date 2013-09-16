@@ -65,7 +65,7 @@
     <textarea id="add_a_comment" name="comment[text_comment]"></textarea>
     {{#if assignment.group_category_id}}
     <span id="group-comment-container">
-      <input type="checkbox" id="group_comment" name="comment[group_comment]" />
+      {{checkbox "comment.group_comment" id="group_comment"}}
       <label for="group_comment">{{#t "labels.group_comment"}}Send Comment to the Whole Group{{/t}}</label>
     </span>
     {{/if}}

@@ -60,14 +60,17 @@ if Rails.version < "3.0"
   config.middleware.insert_after(ActionController::Base.session_store, 'SessionsTimeout')
   config.middleware.insert_before('ActionController::ParamsParser', 'LoadAccount')
   config.middleware.insert_before('ActionController::ParamsParser', 'StatsTiming')
+  config.middleware.insert_before('ActionController::ParamsParser', 'Canvas::RequestThrottle')
   config.middleware.insert_before('ActionController::ParamsParser', 'PreventNonMultipartParse')
   config.middleware.insert_before('ActionController::ParamsParser', "RequestContextGenerator")
 else
   config.middleware.insert_before('ActionDispatch::ParamsParser', 'LoadAccount')
   config.middleware.insert_before('ActionDispatch::ParamsParser', 'StatsTiming')
+  config.middleware.insert_before('ActionDispatch::ParamsParser', 'Canvas::RequestThrottle')
   config.middleware.insert_before('ActionDispatch::ParamsParser', 'PreventNonMultipartParse')
   config.middleware.insert_before('ActionDispatch::ParamsParser', "RequestContextGenerator")
 end
+
 config.to_prepare do
   require_dependency 'canvas/plugins/default_plugins'
   ActiveSupport::JSON::Encoding.escape_html_entities_in_json = true
@@ -147,5 +150,15 @@ if defined?(PhusionPassenger)
       # We're in smart spawning mode, and need to make unique connections for this fork.
       Canvas.reconnect_redis
     end
+  end
+end
+
+if defined?(PhusionPassenger)
+ PhusionPassenger.on_event(:after_installing_signal_handlers) do
+  Canvas::Reloader.trap_signal
+ end
+else
+  config.to_prepare do
+    Canvas::Reloader.trap_signal
   end
 end

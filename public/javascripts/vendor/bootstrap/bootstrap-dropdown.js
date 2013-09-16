@@ -17,6 +17,7 @@
  * limitations under the License.
  * ============================================================ */
 
+// INSTRUCTURE modified
 
 !function ($) {
 
@@ -30,7 +31,8 @@
     , Dropdown = function (element) {
         var $el = $(element).on('click.dropdown.data-api', this.toggle)
         $('html').on('click.dropdown.data-api', function () {
-          $el.parent().removeClass('open')
+          // INSTRUCTURE added aria-expanded
+          $el.parent().removeClass('open').attr('aria-expanded', 'false')
         })
       }
 
@@ -56,7 +58,8 @@
           // if mobile we we use a backdrop because click events don't delegate
           $('<div class="dropdown-backdrop"/>').insertBefore($(this)).on('click', clearMenus)
         }
-        $parent.toggleClass('open')
+        // INSTRUCTURE added aria-expanded
+        $parent.toggleClass('open').attr('aria-expanded', 'true')
       }
 
       $this.focus()
@@ -69,10 +72,14 @@
         , $items
         , $active
         , $parent
+        , $list
         , isActive
         , index
 
-      if (!/(38|40|27)/.test(e.keyCode)) return
+      // INSTRUCTURE
+      if (e.keyCode == 9) return clearMenus()
+
+      if (!/(37|38|39|40|27)/.test(e.keyCode)) return
 
       $this = $(this)
 
@@ -87,10 +94,37 @@
 
       if (!isActive || (isActive && e.keyCode == 27)) {
         if (e.which == 27) $parent.find(toggle).focus()
+        // INSTRUCTURE
+        setTimeout(function() {$('li:not(.divider):visible > a', $parent).first().focus()}, 0)
         return $this.click()
       }
 
-      $items = $('[role=menu] li:not(.divider):visible a', $parent)
+      // INSTRUCTURE--modified the rest of the method
+      // left
+      if (e.keyCode == 37) {
+        $list = $(e.target).parent().parent()
+        if ($list.is('[role=group]')) {
+          $list.prev().focus()
+        }
+        return
+      }
+
+      // right
+      if (e.keyCode == 39) {
+        $list = $(e.target).next()
+        if ($list.is('[role=group]')) {
+          $list.find('> li:not(.divider):visible > a').eq(0).focus()
+          e.preventDefault()
+        }
+        return
+      }
+
+      if ($(e.target).is('a')) {
+        $list = $(e.target).closest('ul')
+      } else {
+        $list = $('[role=menu]', $parent)
+      }
+      $items = $('> li:not(.divider):visible > a', $list)
 
       if (!$items.length) return
 
@@ -105,12 +139,40 @@
         .focus()
     }
 
+    // INSTRUCTURE
+    , focusSubmenu: function(e) {
+      $(this).addClass('open').attr('aria-expanded', 'true')
+    }
+
+    , blurSubmenu: function(e) {
+      var self = this;
+      setTimeout(function() {
+        if ($.contains(self, document.activeElement)) {return;}
+        $(self).removeClass('open').attr('aria-expanded', 'false')
+      }, 0)
+    }
+
+    , clickSubmenu: function(e) {
+      if (!$(e.target).closest('li').hasClass('dropdown-submenu')) {return;}
+      e.stopPropagation();
+      e.preventDefault();
+    }
   }
 
   function clearMenus() {
+    // INSTRUCTURE--maintain focus
+    var $list = $(document.activeElement).closest('.dropdown-menu')
+    if ($list) {
+      $list.parent().prev().focus();
+    }
     $('.dropdown-backdrop').remove()
     $(toggle).each(function () {
-      getParent($(this)).removeClass('open')
+      // INSTRUCTURE added aria-expanded
+      getParent($(this)).removeClass('open').attr('aria-expanded', 'false')
+    })
+    // INSTRUCTURE
+    $('.dropdown-submenu').each(function() {
+      $(this).removeClass('open').attr('aria-expanded', 'false')
     })
   }
 
@@ -165,5 +227,9 @@
     .on('click.dropdown.data-api', '.dropdown form', function (e) { e.stopPropagation() })
     .on('click.dropdown.data-api'  , toggle, Dropdown.prototype.toggle)
     .on('keydown.dropdown.data-api', toggle + ', [role=menu]' , Dropdown.prototype.keydown)
+    // INSTRUCTURE
+    .on('focus.dropdown.data-api', '.dropdown-submenu', Dropdown.prototype.focusSubmenu)
+    .on('blur.dropdown.data-api', '.dropdown-submenu', Dropdown.prototype.blurSubmenu)
+    .on('click.dropdown.data-api', '.dropdown-submenu', Dropdown.prototype.clickSubmenu)
 
 }(window.jQuery);

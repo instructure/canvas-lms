@@ -85,6 +85,17 @@ describe "quizzes" do
           get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
           f('#quiz-publish-link').should_not be_present
         end
+
+        it "should not see unpublished warning" do
+          # set to unpublished state
+          @quiz.last_edited_at = Time.now
+          @quiz.published_at   = 1.hour.ago
+          @quiz.save!
+
+          get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
+
+          f(".unpublished_warning").should_not be_present
+        end
       end
     end
 

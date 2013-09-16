@@ -195,9 +195,9 @@ class UsersController < ApplicationController
   # @API List users
   # Retrieve the list of users associated with this account.
   #
-  # @argument search_term (optional)
-  #   The partial name or full ID of the users to match and return in the results list.
-  #   Must be at least 3 characters.
+  # @argument search_term [Optional, String]
+  #   The partial name or full ID of the users to match and return in the
+  #   results list. Must be at least 3 characters.
   #
   # @returns [User]
   def index
@@ -222,7 +222,7 @@ class UsersController < ApplicationController
           search_term = params[:search_term].presence
 
           if search_term
-            users = UserSearch.for_user_in_context(search_term, @context, @current_user)
+            users = UserSearch.for_user_in_context(search_term, @context, @current_user, session)
           else
             users = UserSearch.scope_for(@context, @current_user)
           end
@@ -327,10 +327,12 @@ class UsersController < ApplicationController
   end
 
   def dashboard_sidebar
-    prepare_current_user_dashboard_items
+    Shackles.activate(:slave) do
+      prepare_current_user_dashboard_items
 
-    if @show_recent_feedback = (@current_user.student_enrollments.active.size > 0)
-      @recent_feedback = (@current_user && @current_user.recent_feedback) || []
+      if @show_recent_feedback = (@current_user.student_enrollments.active.present?)
+        @recent_feedback = (@current_user && @current_user.recent_feedback) || []
+      end
     end
 
     render :layout => false
@@ -615,13 +617,15 @@ class UsersController < ApplicationController
   def upcoming_events
     return render_unauthorized_action unless @current_user
 
-    prepare_current_user_dashboard_items
+    Shackles.activate(:slave) do
+      prepare_current_user_dashboard_items
 
-    events = @upcoming_events.map do |e|
-      event_json(e, @current_user, session)
+      events = @upcoming_events.map do |e|
+        event_json(e, @current_user, session)
+      end
+
+      render :json => events
     end
-
-    render :json => events
   end
 
   def ignore_item
@@ -651,7 +655,7 @@ class UsersController < ApplicationController
   # to specify the current user.
   def create_file
     @user = api_find(User, params[:user_id])
-    @attachment = Attachment.new(:context => @user)
+    @attachment = @user.attachments.build
     if authorized_action(@attachment, @current_user, :create)
       @context = @user
       api_attachment_preflight(@current_user, request, :check_quota => true)
@@ -764,18 +768,44 @@ class UsersController < ApplicationController
   # @API Create a user
   # Create and return a new user and pseudonym for an account.
   #
-  # @argument user[name] [Optional] The full name of the user. This name will be used by teacher for grading.
-  # @argument user[short_name] [Optional] User's name as it will be displayed in discussions, messages, and comments.
-  # @argument user[sortable_name] [Optional] User's name as used to sort alphabetically in lists.
-  # @argument user[time_zone] [Optional] The time zone for the user. Allowed time zones are {http://www.iana.org/time-zones IANA time zones} or friendlier {http://api.rubyonrails.org/classes/ActiveSupport/TimeZone.html Ruby on Rails time zones}.
-  # @argument user[locale] [Optional] The user's preferred language as a two-letter ISO 639-1 code.
-  # @argument user[birthdate] [Optional] The user's birth date.
-  # @argument pseudonym[unique_id] User's login ID.
-  # @argument pseudonym[password] [Optional] User's password.
-  # @argument pseudonym[sis_user_id] [Optional] [Integer] SIS ID for the user's account. To set this parameter, the caller must be able to manage SIS permissions.
-  # @argument pseudonym[send_confirmation] [Optional, 0|1] [Integer] Send user notification of account creation if set to 1.
-  # @argument communication_channel[type] [Optional] The communication channel type, e.g. 'email' or 'sms'.
-  # @argument communication_channel[address] [Optional] The communication channel address, e.g. the user's email address.
+  # @argument user[name] [Optional, String]
+  #   The full name of the user. This name will be used by teacher for grading.
+  #
+  # @argument user[short_name] [Optional, String]
+  #   User's name as it will be displayed in discussions, messages, and comments.
+  #
+  # @argument user[sortable_name] [Optional, String]
+  #   User's name as used to sort alphabetically in lists.
+  #
+  # @argument user[time_zone] [Optional, String]
+  #   The time zone for the user. Allowed time zones are
+  #   {http://www.iana.org/time-zones IANA time zones} or friendlier
+  #   {http://api.rubyonrails.org/classes/ActiveSupport/TimeZone.html Ruby on Rails time zones}.
+  #
+  # @argument user[locale] [Optional, String]
+  #   The user's preferred language as a two-letter ISO 639-1 code.
+  #
+  # @argument user[birthdate] [Optional, Date]
+  #   The user's birth date.
+  #
+  # @argument pseudonym[unique_id] [String]
+  #   User's login ID.
+  #
+  # @argument pseudonym[password] [Optional, String]
+  #   User's password.
+  #
+  # @argument pseudonym[sis_user_id] [Optional, String]
+  #   SIS ID for the user's account. To set this parameter, the caller must be
+  #   able to manage SIS permissions.
+  #
+  # @argument pseudonym[send_confirmation] [Optional, Boolean]
+  #   Send user notification of account creation if true.
+  #
+  # @argument communication_channel[type] [Optional, String]
+  #   The communication channel type, e.g. 'email' or 'sms'.
+  #
+  # @argument communication_channel[address] [Optional, String]
+  #   The communication channel address, e.g. the user's email address.
   #
   # @returns User
   def create
@@ -791,7 +821,7 @@ class UsersController < ApplicationController
     require_password = self_enrollment && allow_non_email_pseudonyms
     allow_password = require_password || manage_user_logins
 
-    notify = params[:pseudonym].delete(:send_confirmation) == '1'
+    notify = value_to_boolean(params[:pseudonym].delete(:send_confirmation))
     notify = :self_registration unless manage_user_logins
 
     if params[:communication_channel]
@@ -912,7 +942,9 @@ class UsersController < ApplicationController
   # @API Update user settings.
   # Update an existing user's settings.
   #
-  # @argument manual_mark_as_read If true, require user to manually mark discussion posts as read (don't auto-mark as read).
+  # @argument manual_mark_as_read [Boolean]
+  #   If true, require user to manually mark discussion posts as read (don't
+  #   auto-mark as read).
   #
   # @example_request
   #
@@ -949,13 +981,36 @@ class UsersController < ApplicationController
   # @API Edit a user
   # Modify an existing user. To modify a user's login, see the documentation for logins.
   #
-  # @argument user[name] [Optional] The full name of the user. This name will be used by teacher for grading.
-  # @argument user[short_name] [Optional] User's name as it will be displayed in discussions, messages, and comments.
-  # @argument user[sortable_name] [Optional] User's name as used to sort alphabetically in lists.
-  # @argument user[time_zone] [Optional] The time zone for the user. Allowed time zones are {http://www.iana.org/time-zones IANA time zones} or friendlier {http://api.rubyonrails.org/classes/ActiveSupport/TimeZone.html Ruby on Rails time zones}.
-  # @argument user[locale] [Optional] The user's preferred language as a two-letter ISO 639-1 code.
-  # @argument user[avatar][token] [Optional] A unique representation of the avatar record to assign as the user's current avatar. This token can be obtained from the user avatars endpoint. This supersedes the user[avatar][url] argument, and if both are included the url will be ignored. Note: this is an internal representation and is subject to change without notice. It should be consumed with this api endpoint and used in the user update endpoint, and should not be constructed by the client.
-  # @argument user[avatar][url] [Optional] To set the user's avatar to point to an external url, do not include a token and instead pass the url here. Warning: For maximum compatibility, please use 128 px square images.
+  # @argument user[name] [Optional, String]
+  #   The full name of the user. This name will be used by teacher for grading.
+  #
+  # @argument user[short_name] [Optional, String]
+  #   User's name as it will be displayed in discussions, messages, and comments.
+  #
+  # @argument user[sortable_name] [Optional, String]
+  #   User's name as used to sort alphabetically in lists.
+  #
+  # @argument user[time_zone] [Optional, String]
+  #   The time zone for the user. Allowed time zones are
+  #   {http://www.iana.org/time-zones IANA time zones} or friendlier
+  #   {http://api.rubyonrails.org/classes/ActiveSupport/TimeZone.html Ruby on Rails time zones}.
+  #
+  # @argument user[locale] [Optional, String]
+  #   The user's preferred language as a two-letter ISO 639-1 code.
+  #
+  # @argument user[avatar][token] [Optional, String]
+  #   A unique representation of the avatar record to assign as the user's
+  #   current avatar. This token can be obtained from the user avatars endpoint.
+  #   This supersedes the user[avatar][url] argument, and if both are included
+  #   the url will be ignored. Note: this is an internal representation and is
+  #   subject to change without notice. It should be consumed with this api
+  #   endpoint and used in the user update endpoint, and should not be
+  #   constructed by the client.
+  #
+  # @argument user[avatar][url] [Optional, String]
+  #   To set the user's avatar to point to an external url, do not include a
+  #   token and instead pass the url here. Warning: For maximum compatibility,
+  #   please use 128 px square images.
   #
   # @example_request
   #
@@ -1374,8 +1429,8 @@ class UsersController < ApplicationController
   # @API Un-follow a user
   # @beta
   #
-  # Stop following this user. If the current user is not already
-  # following the target user, nothing happens.
+  # Stop following this user. If the current user is not already following the
+  # target user, nothing happens.
   #
   # @example_request
   #     curl https://<canvas>/api/v1/users/<user_id>/followers/self \ 

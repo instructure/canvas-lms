@@ -96,6 +96,7 @@ class Account < ActiveRecord::Base
   time_zone_attribute :default_time_zone, default: "America/Denver"
 
   validates_locale :default_locale, :allow_nil => true
+  validates_length_of :name, :maximum => maximum_string_length, :allow_blank => true
   validate :account_chain_loop, :if => :parent_account_id_changed?
   validate :validate_auth_discovery_url
 
@@ -150,6 +151,7 @@ class Account < ActiveRecord::Base
   add_setting :open_registration, :boolean => true, :root_only => true
   add_setting :enable_scheduler, :boolean => true, :root_only => true, :default => false
   add_setting :enable_draft, :boolean => true, :root_only => true, :default => false
+  add_setting :allow_draft, :boolean => true, :root_only => true, :default => false
   add_setting :calendar2_only, :boolean => true, :root_only => true, :default => false
   add_setting :show_scheduler, :boolean => true, :root_only => true, :default => false
   add_setting :enable_profiles, :boolean => true, :root_only => true, :default => false
@@ -170,6 +172,7 @@ class Account < ActiveRecord::Base
   add_setting :self_registration, :boolean => true, :root_only => true, :default => false
   add_setting :large_course_rosters, :boolean => true, :root_only => true, :default => false
   add_setting :edit_institution_email, :boolean => true, :root_only => true, :default => true
+  add_setting :enable_quiz_regrade, :boolean => true, :root_only => true, :default => false
 
   def settings=(hash)
     if hash.is_a?(Hash)
@@ -230,15 +233,15 @@ class Account < ActiveRecord::Base
   end
 
   def terms_of_use_url
-    Setting.get('terms_of_use_url', 'http://www.instructure.com/policies/terms-of-use')
+    Setting.get_cached('terms_of_use_url', 'http://www.instructure.com/policies/terms-of-use')
   end
 
   def privacy_policy_url
-    Setting.get('privacy_policy_url', 'http://www.instructure.com/policies/privacy-policy-instructure')
+    Setting.get_cached('privacy_policy_url', 'http://www.instructure.com/policies/privacy-policy-instructure')
   end
 
   def terms_required?
-    Setting.get('terms_required', 'true') == 'true'
+    Setting.get_cached('terms_required', 'true') == 'true'
   end
 
   def require_acceptance_of_terms?(user)
@@ -1316,6 +1319,13 @@ class Account < ActiveRecord::Base
     false
   end
 
+  # Public: Determine if draft state is enabled for this account.
+  #
+  # Returns a boolean (default: false).
+  def draft_state_enabled?
+    root_account.settings[:enable_draft]
+  end
+
   def import_from_migration(data, params, migration)
 
     LearningOutcome.process_migration(data, migration)
@@ -1323,5 +1333,18 @@ class Account < ActiveRecord::Base
     migration.progress=100
     migration.workflow_state = :imported
     migration.save
+  end
+
+  def enable_quiz_regrade!
+    change_root_account_setting!(:enable_quiz_regrade, true)
+  end
+
+  def disable_quiz_regrade!
+    change_root_account_setting!(:enable_quiz_regrade, false)
+  end
+
+  def change_root_account_setting!(setting_name, new_value)
+    root_account.settings[setting_name] = new_value
+    root_account.save!
   end
 end

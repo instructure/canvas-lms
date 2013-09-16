@@ -101,12 +101,16 @@ class QuizSubmissionsController < ApplicationController
             return redirect_to next_page
           else
             @submission.backup_submission_data(params)
-            render :json => {:backup => true, :end_at => @submission && @submission.end_at}.to_json
+            render :json => {:backup => true,
+                             :end_at => @submission && @submission.end_at,
+                             :time_left => @submission && @submission.time_left}.to_json
             return
           end
         end
       end
-      render :json => {:backup => false, :end_at => @submission && @submission.end_at}.to_json
+      render :json => {:backup => false,
+                       :end_at => @submission && @submission.end_at,
+                       :time_left => @submission && @submission.time_left}.to_json
     end
   end
 

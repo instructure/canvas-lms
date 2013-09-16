@@ -238,8 +238,20 @@ module ApplicationHelper
     (context ? context.class.base_ar_class : context.class).name.underscore
   end
 
-  def message_user_path(user)
-    conversations_path(:user_id => user.id)
+  def message_user_path(user, context = nil)
+    context = context || @context
+    context = nil unless context.is_a?(Course)
+    conversations_path(user_id: user.id, user_name: user.name,
+                       context_id: context.try(:asset_string))
+  end
+
+  # Public: Determine if the currently logged-in user is an account or site admin.
+  #
+  # Returns a boolean.
+  def current_user_is_account_admin
+    [@domain_root_account, Account.site_admin].map do |account|
+      account.membership_for_user(@current_user)
+    end.any?
   end
 
   def hidden(include_style=false)
@@ -399,6 +411,10 @@ module ApplicationHelper
     end
   end
 
+  def include_common_stylesheets
+    include_stylesheets :vendor, :common, media: "all"
+  end
+
   def section_tabs
     @section_tabs ||= begin
       if @context
@@ -512,7 +528,7 @@ module ApplicationHelper
     global_inst_object = { :environment =>  Rails.env }
     {
       :allowMediaComments       => Kaltura::ClientV3.config && @context.try_rescue(:allow_media_comments?),
-      :kalturaSettings          => Kaltura::ClientV3.config.try(:slice, 'domain', 'resource_domain', 'rtmp_domain', 'partner_id', 'subpartner_id', 'player_ui_conf', 'player_cache_st', 'kcw_ui_conf', 'upload_ui_conf', 'max_file_size_bytes'),
+      :kalturaSettings          => Kaltura::ClientV3.config.try(:slice, 'domain', 'resource_domain', 'rtmp_domain', 'partner_id', 'subpartner_id', 'player_ui_conf', 'player_cache_st', 'kcw_ui_conf', 'upload_ui_conf', 'max_file_size_bytes', 'do_analytics'),
       :equellaEnabled           => !!equella_enabled?,
       :googleAnalyticsAccount   => Setting.get_cached('google_analytics_key', nil),
       :http_status              => @status,

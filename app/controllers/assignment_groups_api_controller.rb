@@ -27,7 +27,10 @@ class AssignmentGroupsApiController < ApplicationController
   #
   # Returns the assignment group with the given id.
   #
-  # @argument include[] ["assignments","discussion_topic"] Associations to include with the group. "discussion_topic" is only valid if "assignments" is also included
+  # @argument include[] ["assignments"|"discussion_topic"]
+  #   Associations to include with the group. "discussion_topic" is only valid
+  #   if "assignments" is also included.
+  #
   # @argument override_assignment_dates [Optional, Boolean]
   #   Apply assignment overrides for each assignment, defaults to true.
   #
@@ -83,9 +86,11 @@ class AssignmentGroupsApiController < ApplicationController
   #
   # Deletes the assignment group with the given id.
   #
-  # @argument move_assignment_to The ID of an active Assignment Group to which the assignments
-  #   that are currently assigned to the destroyed Assignment Group will be assigned
-  #   NOTE: If this argument is not provided, any assignments in this Assignment Group will be deleted
+  # @argument move_assignment_to [String]
+  #   The ID of an active Assignment Group to which the assignments that are
+  #   currently assigned to the destroyed Assignment Group will be assigned.
+  #   NOTE: If this argument is not provided, any assignments in this Assignment
+  #   Group will be deleted.
   #
   # @returns Assignment Group
   def destroy

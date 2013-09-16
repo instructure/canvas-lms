@@ -734,7 +734,7 @@ describe DiscussionTopic do
     end
 
     def build_submitted_assignment
-      student_in_course(:active_all => true)
+      student_in_course(name: 'student in course', active_all: true)
       @assignment = @course.assignments.create!(:title => "some discussion assignment")
       @assignment.submission_types = 'discussion_topic'
       @assignment.save!
@@ -747,7 +747,7 @@ describe DiscussionTopic do
     end
 
     it "should not re-flag graded discussion as needs grading if student make another comment" do
-      student_in_course(:name => 'student in course')
+      student_in_course(name: 'student in course', active_all: true)
       assignment = @course.assignments.create(:title => "discussion assignment", :points_possible => 20)
       topic = @course.discussion_topics.create!(:title => 'discussion topic 1', :message => "this is a new discussion topic", :assignment => assignment)
       topic.discussion_entries.create!(:message => "student message for grading", :user => @student)
@@ -1053,6 +1053,16 @@ describe DiscussionTopic do
       @topic.save!
       @topic.subscription_hold(@teacher, nil, nil).should eql(:not_in_group_set)
       @topic.subscribed?(@teacher).should be_false
+    end
+
+    it "should set the topic participant subscribed field to false when there is a hold" do
+      teacher_in_course(:active_all => true)
+      group_discussion_assignment
+      group_discussion = @topic.child_topics.first
+      group_discussion.user = @teacher
+      group_discussion.save!
+      group_discussion.change_read_state('read', @teacher) # quick way to make a participant
+      group_discussion.discussion_topic_participants.where(:user_id => @teacher.id).first.subscribed.should == false
     end
   end
 

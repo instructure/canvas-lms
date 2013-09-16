@@ -19,16 +19,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe Canvas do
-  describe "sampling methods" do
-    it "should sample the cpu on linux" do
-      if File.directory?("/proc")
-        sample = Canvas.sample_cpu_time
-        sample[0].should be > 0.0
-        sample[1].should be > 0.0
-      end
-    end
-  end
-
   describe ".timeout_protection" do
     it "should wrap the block in a timeout" do
       Setting.set("service_generic_timeout", "2")

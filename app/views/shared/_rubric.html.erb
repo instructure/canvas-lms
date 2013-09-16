@@ -59,7 +59,7 @@
         <% end %>
       </div>
       <div class="displaying">
-        <span class="title"><%= rubric.title rescue "Title" %></span>
+        <span class="title"><%= rubric.try(:title) || t(:rubric_title, "Title") %></span>
       </div>
     </th>
   </tr>

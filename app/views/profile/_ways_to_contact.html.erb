@@ -216,20 +216,20 @@
   <input type="hidden" name="pseudonym_id" value=""/>
   <input type="hidden" name="channel_id" value=""/>
   <input type="hidden" name="user_id" value=""/>
-  <div style="text-align: center;"><%= t(:sent_confirmation_sms, <<-TEXT, :sms_number => raw('<span class="path" style="font-weight: bold;">&nbsp;</span>'))
+  <div id='sms_confirmation_instructions' style="text-align: center;"><%= t(:sent_confirmation_sms, <<-TEXT, :sms_number => raw('<span class="path" style="font-weight: bold;">&nbsp;</span>'))
     We sent a four-character confirmation code to %{sms_number}.
     Enter the code below to activate this sms number.
     TEXT
   %></div>
   <div style="text-align: center;">
-    <input type="text" style="width: 100px; font-size: 1.5em;" name="code"/><br/>
+    <input type="text" style="width: 100px; font-size: 1.5em;" name="code" aria-labelledby='sms_confirmation_instructions'/><br/>
     <span style="display: none;" class="channel_id">&nbsp;</span>
     <a href="<%= registration_confirmation_path("{{ code }}") %>" style="display: none;" class="register_channel_link">&nbsp;</a>
   </div>
   <div style="margin: 0 0 5px; text-align: center; font-size: 0.8em;">
     <a href="#" class="re_send_confirmation_link"><%= t('links.resend_confirmation', "Re-Send Confirmation") %></a>
   </div>
-  <div class="status_message" style="visibility: hidden; text-align: center; color: #444; font-weight: bold"><%= t(:confirming_contact, "Confirming...") %></div>
+  <div class="status_message" role="status" aria-live="polite" style="visibility: hidden; text-align: center; color: #444; font-weight: bold"><%= t(:confirming_contact, "Confirming...") %></div>
   <div class="button-container">
     <button type="submit" class="btn"><%= t('buttons.confirm', "Confirm") %></button>
   </div>

@@ -1091,7 +1091,7 @@ class User < ActiveRecord::Base
   end
 
   def self.max_messages_per_day
-    Setting.get('max_messages_per_day_per_user', 500).to_i
+    Setting.get_cached('max_messages_per_day_per_user', 500).to_i
   end
 
   def max_messages_per_day
@@ -1306,6 +1306,10 @@ class User < ActiveRecord::Base
 
   def manual_mark_as_read?
     !!preferences[:manual_mark_as_read]
+  end
+
+  def use_new_conversations?
+    preferences[:use_new_conversations] == true
   end
 
   def ignore_item!(asset, purpose, permanent = false)
@@ -1550,6 +1554,10 @@ class User < ActiveRecord::Base
 
           unless options[:include_completed_courses]
             enrollments = Enrollment.where(:id => courses.map(&:primary_enrollment_id)).all
+            courses_hash = courses.index_by(&:id)
+            # prepopulate the reverse association
+            enrollments.each { |e| e.course = courses_hash[e.course_id] }
+            Canvas::Builders::EnrollmentDateBuilder.preload(enrollments)
             date_restricted_ids = enrollments.select{ |e| e.completed? || e.inactive? }.map(&:id)
             courses.reject! { |course| date_restricted_ids.include?(course.primary_enrollment_id.to_i) }
           end

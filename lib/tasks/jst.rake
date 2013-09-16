@@ -14,5 +14,12 @@ namespace :jst do
     end
     Handlebars.compile *all_paths
   end
-end
 
+  desc 'precompile ember templates'
+  task :ember do
+    files = Dir.glob("app/coffeescripts/**/*.hbs")
+    files.each do |file|
+      EmberHbs::compile_file(file)
+    end
+  end
+end

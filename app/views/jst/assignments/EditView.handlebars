@@ -120,10 +120,9 @@
     <fieldset>
       <div class="control-group controls">
         <label class="checkbox">
-          <input id="assignment_freeze_on_copy"
-            name="freeze_on_copy"
-            {{checkedIf freezeOnCopy}}
-            type="checkbox"/>
+          {{checkbox "freezeOnCopy"
+            id="assignment_freeze_on_copy"
+            name="freeze_on_copy"}}
           {{#t "freeze_properties"}}Lock assignment properties when copied{{/t}}
         </label>
       </div>
@@ -138,10 +137,9 @@
 
   <div style="float: left; min-width: 300px;">
     <label class="checkbox" style="text-align:left;">
-      <input id="assignment_notify_of_update"
-        name="notify_of_update"
-        {{checkedIf notifyOfUpdate}}
-        type="checkbox"/>
+      {{checkbox "notifyOfUpdate"
+        id="assignment_notify_of_update"
+        name="notify_of_update"}}
       {{#t "notify_content_change"}}Notify users that this content has changed{{/t}}
     </label>
   </div>

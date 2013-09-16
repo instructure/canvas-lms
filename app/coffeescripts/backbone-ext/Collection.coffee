@@ -176,8 +176,8 @@ define [
     #     author:
     #       foreignKey: 'person_id'
     #
-    parse: (response, xhr) ->
-      return super unless response.meta?
+    parse: (response, options) ->
+      return super unless response?.meta?
 
       primaryCollection = response[response.meta.primaryCollection]
       _.each (@sideLoad || {}), (meta, relation) ->
@@ -200,4 +200,4 @@ define [
             item[relation] = related
             delete item[foreignKey]
 
-      super primaryCollection, xhr
+      super primaryCollection, options

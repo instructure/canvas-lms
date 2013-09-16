@@ -1,17 +1,17 @@
 <div class="toolbar-buttons clearfix" data-sticky>
   <div class="left-buttons">
-    <a class="btn{{#if front_page}} btn-primary{{/if}} view_all_pages" href="{{wiki_pages_path}}">{{#t 'buttons.view_all_pages'}}View All Pages{{/t}}</a>
+    {{#if CAN.VIEW_PAGES}}
+      <a class="btn{{#if front_page}} btn-primary{{/if}} view_all_pages" href="{{wiki_pages_path}}">{{#t 'buttons.view_all_pages'}}View All Pages{{/t}}</a>
+    {{/if}}
   </div>
   <div class="right-buttons">
-    {{#ifEqual contextName "courses"}}
-      {{#if WIKI_RIGHTS.manage}}
-        <span class="publish-button"></span>
-      {{/if}}
-    {{/ifEqual}}
-    {{#ifAny PAGE_RIGHTS.update PAGE_RIGHTS.update_content}}
+    {{#if CAN.PUBLISH}}
+      <span class="publish-button"></span>
+    {{/if}}
+    {{#if CAN.UPDATE_CONTENT}}
       <a href="{{wiki_page_edit_path}}" class="btn edit-wiki"><i class="icon-edit"></i> {{#t 'buttons.edit'}}Edit{{/t}}</a>
-    {{/ifAny}}
-    {{#if PAGE_RIGHTS.delete}}
+    {{/if}}
+    {{#if CAN.DELETE}}
       <a class="btn al-trigger" tabindex="0" role="button">
         <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
         <span class="screenreader-only">{{#t 'toolbar_menu.settings'}}Settings{{/t}}</span>

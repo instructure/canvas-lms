@@ -19,13 +19,11 @@
 class RubricAssociationsController < ApplicationController
   before_filter :require_context
   def create
-    @invitees = params[:rubric_association].delete(:invitations) rescue nil
     update
   end
   
   def update
     params[:rubric_association] ||= {}
-    params[:rubric_association].delete(:invitations)
     @association = @context.rubric_associations.find(params[:id]) rescue nil
     @association_object = RubricAssociation.get_association_object(params[:rubric_association])
     @association_object = nil unless @association_object && @association_object.try(:context) == @context
@@ -41,7 +39,7 @@ class RubricAssociationsController < ApplicationController
       params[:rubric_association][:association] = @association.association if @association
       params[:rubric_association][:association] ||= @association_object
       params[:rubric_association][:id] = @association.id if @association
-      @association = RubricAssociation.generate_with_invitees(@current_user, @rubric, @context, params[:rubric_association], @invitees)
+      @association = RubricAssociation.generate(@current_user, @rubric, @context, params[:rubric_association])
       json_res = {
         :rubric => ActiveSupport::JSON.decode(@rubric.to_json(:methods => :criteria, :include_root => false, :permissions => {:user => @current_user, :session => session})),
         :rubric_association => ActiveSupport::JSON.decode(@association.to_json(:include_root => false, :include => [:rubric_assessments, :assessment_requests], :methods => :assessor_name, :permissions => {:user => @current_user, :session => session}))

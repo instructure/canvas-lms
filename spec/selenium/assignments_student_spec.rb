@@ -154,7 +154,7 @@ describe "assignments" do
     end
 
     it "should validate an assignment created with the type of external tool" do
-      t1 = factory_with_protected_attributes(@course.context_external_tools, :url => "http://www.example.com/tool1", :shared_secret => 'test123', :consumer_key => 'test123', :name => 'tool 1')
+      t1 = factory_with_protected_attributes(@course.context_external_tools, :url => "http://www.example.com/", :shared_secret => 'test123', :consumer_key => 'test123', :name => 'tool 1')
       external_tool_assignment = assignment_model(:course => @course, :title => "test2", :submission_types => 'external_tool')
       external_tool_assignment.create_external_tool_tag(:url => t1.url)
       external_tool_assignment.external_tool_tag.update_attribute(:content_type, 'ContextExternalTool')
@@ -271,6 +271,7 @@ describe "assignments" do
 
       it "should list the assignments" do
         ag = @course.assignment_groups.first
+        f("#show_by_type").click
         ag_el = f("#assignment_group_#{ag.id}")
         ag_el.should be_present
         ag_el.text.should match @assignment.name
@@ -281,7 +282,73 @@ describe "assignments" do
         f('.new_assignment').should be_nil
         f('#addGroup').should be_nil
         f('.add_assignment').should be_nil
+        f("#show_by_type").click
         f("ag_#{ag.id}_manage_link").should be_nil
+      end
+
+      it "should default to grouping by date" do
+        is_checked('#show_by_date').should be_true
+
+        # assuming two undated and two future assignments created above
+        f('#assignment_group_upcoming').should_not be_nil
+        f('#assignment_group_undated').should_not be_nil
+      end
+
+      it "should allowing grouping by assignment group (and remember)" do
+        ag = @course.assignment_groups.first
+        f("#show_by_type").click
+        is_checked('#show_by_type').should be_true
+        f("#assignment_group_#{ag.id}").should_not be_nil
+
+        get "/courses/#{@course.id}/assignments"
+        wait_for_ajaximations
+        is_checked('#show_by_type').should be_true
+      end
+
+      it "should not show empty date groups" do
+        # assuming two undated and two future assignments created above
+        f('#assignment_group_overdue').should be_nil
+        f('#assignment_group_past').should be_nil
+      end
+
+      it "should not show empty assignment groups" do
+        empty_ag = @course.assignment_groups.create!(:name => "Empty")
+
+        get "/courses/#{@course.id}/assignments"
+        wait_for_ajaximations
+
+        f("#show_by_type").click
+        f("#assignment_group_#{empty_ag.id}").should be_nil
+      end
+
+      it "should show empty assignment groups if they have a weight" do
+        @course.group_weighting_scheme = "percent"
+        @course.save!
+
+        ag = @course.assignment_groups.first
+        ag.group_weight = 90
+        ag.save!
+
+        empty_ag = @course.assignment_groups.create!(:name => "Empty", :group_weight => 10)
+
+        get "/courses/#{@course.id}/assignments"
+        wait_for_ajaximations
+
+        f("#show_by_type").click
+        f("#assignment_group_#{empty_ag.id}").should_not be_nil
+      end
+
+      it "should correctly categorize assignments be date" do
+        # assuming two undated and two future assignments created above
+        undated, upcoming = @course.assignments.partition{ |a| a.due_date.nil? }
+
+        undated.each do |a|
+          f("#assignment_group_undated #assignment_#{a.id}").should_not be_nil
+        end
+
+        upcoming.each do |a|
+          f("#assignment_group_upcoming #assignment_#{a.id}").should_not be_nil
+        end
       end
     end
   end

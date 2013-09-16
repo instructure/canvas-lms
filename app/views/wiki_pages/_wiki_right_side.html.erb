@@ -69,7 +69,7 @@
   <% if can_do(@page, @current_user, :update_content)%>
     <%= link_to ('<i class="icon-edit"></i>').html_safe + " " + t('links.edit_page', "Edit this Page"), "#edit", :class => "edit_link btn button-sidebar-wide" %>
   <% end %>
-  <% if can_do(@page, @current_user, :delete) && !@page.is_front_page? && !@page.deleted? %>
+  <% if can_do(@page, @current_user, :delete) && !@page.new_record? && !@page.is_front_page? && !@page.deleted? %>
     <%= link_to ('<i class="icon-trash"></i>').html_safe + " " + t('links.delete_page', "Delete this Page"), context_url(@context, :context_wiki_page_url, @page.url), :method => :delete, :confirm => t('delete_page_confirmation', 'Are you sure you want to delete this page? This cannot be undone!'), :class => "btn button-sidebar-wide" %>
   <% end %>
   <a href="<%= context_url(@context, :context_wiki_page_url, @page) %>" class="wiki_page_url" style="display: none;">&nbsp;</a>

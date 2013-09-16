@@ -177,10 +177,9 @@ describe 'DataFixup::RemoveMultipleRootFolders' do
       a.save!
 
       root_folder_name = get_root_folder_name(context)
+      Folder.where(:id => [extra_folder1, extra_folder2]).update_all(:parent_folder_id => nil)
       context.folders.find_by_name(root_folder_name).delete
       context.folders.find_by_name(root_folder_name).should be_nil
-
-      Folder.where(:id => [extra_folder1, extra_folder2]).update_all(:parent_folder_id => nil)
 
       Folder.where("context_type=? AND context_id=? AND workflow_state<>'deleted' AND parent_folder_id IS NULL",
                                    context.class.to_s, context).count.should == 2

@@ -208,6 +208,7 @@ describe AssignmentsApiController, :type => :integration do
                              :free_form_criterion_comments => true)
 
       @assignment.create_rubric_association(:rubric => @rubric,
+                                            :context => @course,
                                             :purpose => 'grading',
                                             :use_for_grading => true)
       json = api_get_assignments_index_from_course(@course)
