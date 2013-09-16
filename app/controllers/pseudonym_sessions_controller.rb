@@ -139,6 +139,12 @@ class PseudonymSessionsController < ApplicationController
       return unsuccessful_login(t('errors.blank_password', "No password was given"))
     end
 
+    # strip leading and trailing whitespace off the entered unique id. some
+    # mobile clients (e.g. android) will add a space after the login when using
+    # autocomplete. this would prevent us from recognizing someone's username,
+    # making them unable to login.
+    params[:pseudonym_session][:unique_id].try(:strip!)
+
     # Try to use authlogic's built-in login approach first
     @pseudonym_session = @domain_root_account.pseudonym_sessions.new(params[:pseudonym_session])
     @pseudonym_session.remote_ip = request.remote_ip
