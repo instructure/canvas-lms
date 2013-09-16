@@ -30,6 +30,8 @@ define [
   #   }
   ((($, window, document, template) ->
 
+    msfInstanceCounter = 0
+
     $.fn.moduleSequenceFooter = (options={}) ->
 
       # You must pass in a assetType and assetId or we throw an error.
@@ -51,6 +53,7 @@ define [
           return 
 
         @html template(
+          instanceNumber: @msfInstance.instanceNumber
           previous: @msfInstance.previous
           next: @msfInstance.next
         )
@@ -61,7 +64,7 @@ define [
 
     $.fn.moduleSequenceFooter.MSFClass = class ModuleSequenceFooter
 
-      # Icon class map used to determin which icon class should be placed
+      # Icon class map used to determine which icon class should be placed
       # on a tooltip
       # @api private
 
@@ -78,6 +81,7 @@ define [
       # called somewhere else to set up the data.
        
       constructor: (options) ->
+        @instanceNumber = msfInstanceCounter++
         @courseID = options?.courseID || ENV?.course_id
         @assetID = options?.assetID
         @assetType = options?.assetType
@@ -130,7 +134,8 @@ define [
       #  @previous = previous: {
       #     show: true
       #     url: http://foobar.baz
-      #     tooltip: <strong>Next Module:</strong> <br> Going to the fair
+      #     tooltip: <strong>Previous Module:</strong> <br> Going to the fair
+      #     tooltipText: Previous Module: Going to the fair
       #   }
       #
       # If the previous item is in another module, then the module ids won't be the same and we need
@@ -142,9 +147,11 @@ define [
 
         if @item.current.module_id == @item.prev.module_id
           @previous.tooltip = "<i class='#{@iconClasses[@item.prev.type]}'></i> #{@item.prev.title}"
+          @previous.tooltipText = I18n.t('prev_module_item_desc', 'Previous: *item*', wrapper: @item.prev.title)
         else # module id is different
           module = _.find @modules, (m) => m.id == @item.prev.module_id
-          @previous.tooltip = "<strong style='float:left'>#{I18n.t('prev_module', 'Previous Module')}#{I18n.t('prev_colon', ':')}</strong> <br> #{module.name}"
+          @previous.tooltip = "<strong style='float:left'>#{I18n.t('prev_module', 'Previous Module:')}</strong> <br> #{module.name}"
+          @previous.tooltipText = I18n.t('prev_module_desc', 'Previous Module: *module*', wrapper: module.name)
 
       # Each button needs to build a data that the handlebars template can use. For example, data for
       # each button could look like this: 
@@ -152,6 +159,7 @@ define [
       #     show: true
       #     url: http://foobar.baz
       #     tooltip: <strong>Next Module:</strong> <br> Going to the fair
+      #     tooltipText: Next Module: Going to the fair
       #   }
       #
       # If the next item is in another module, then the module ids won't be the same and we need
@@ -163,9 +171,10 @@ define [
 
         if @item.current.module_id == @item.next.module_id
           @next.tooltip = "<i class='#{@iconClasses[@item.next.type]}'></i> #{@item.next.title}"
+          @next.tooltipText = I18n.t('next_module_item_desc', 'Next: *item*', wrapper: @item.next.title)
         else # module id is different
           module = _.find @modules, (m) => m.id == @item.next.module_id
-          @next.tooltip = "<strong style='float:left'>#{I18n.t('next_module', 'Next Module')}#{I18n.t('next_colon', ':')}</strong> <br> #{module.name}"
-
+          @next.tooltip = "<strong style='float:left'>#{I18n.t('next_module', 'Next Module:')}</strong> <br> #{module.name}"
+          @next.tooltipText = I18n.t('next_module_desc', 'Next Module: *module*', wrapper: module.name)
 
   ))( jQuery, window, document, template)

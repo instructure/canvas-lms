@@ -35,6 +35,10 @@ $button-hover: #dee5ea;
       border-left: 1px solid $button-border-line;
     }
   }
+
+  .hidden-aria-title {
+    display: none;
+  }
 }
 
 .module-sequence-footer .module-sequence-footer-content {
