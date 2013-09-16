@@ -5,7 +5,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
   def build_assignment_with_type(type, opts={})
     driver.execute_script %{$('.header_content .add_assignment_link:first').addClass('focus');}
     f(".header_content .add_assignment_link").click
-    wait_for_animations
+    wait_for_ajaximations
 
     edit_assignment({:type => type}.merge(opts))
   end

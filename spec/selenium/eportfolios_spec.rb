@@ -45,7 +45,7 @@ describe "eportfolios" do
       eportfolio_model({:user => @user, :name => "student content"})
     end
 
-    it "Should start the download of ePortfolio contents" do
+    it "should start the download of ePortfolio contents" do
       get "/eportfolios/#{@eportfolio.id}"
       f(".download_eportfolio_link").click
       keep_trying_until { f("#export_progress").should be_displayed }
@@ -211,8 +211,8 @@ describe "eportfolios" do
           add_html
           f(".edit_content_link").click
           hover_and_click("#page_section_1 .delete_page_section_link")
-          driver.switch_to.alert.accept
-          wait_for_ajaximations
+          try_to_close_modal
+          sleep 1
           submit_form(".form_content")
           wait_for_ajaximations
           @eportfolio.eportfolio_entries.first.content[0].should == "No Content Added Yet"

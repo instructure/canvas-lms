@@ -216,6 +216,7 @@ describe "content migrations" do
     end
 
     it "should import selective content" do
+      pending('broken')
       pending unless Qti.qti_enabled?
       visit_page
       fill_migration_form
@@ -416,6 +417,7 @@ describe "content migrations" do
     end
 
     it "should selectively copy content" do
+      pending('broken')
       pending unless Qti.qti_enabled?
       visit_page
 

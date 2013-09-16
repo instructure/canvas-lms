@@ -37,7 +37,7 @@ describe "group weights" do
 
   def set_group_weight(assignment_group, weight_number)
     f('#gradebook_settings').click
-    wait_for_animations
+    wait_for_ajaximations
     f('[aria-controls="assignment_group_weights_dialog"]').click
 
     dialog = f('#assignment_group_weights_dialog')

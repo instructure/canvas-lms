@@ -632,7 +632,7 @@ describe "discussions" do
           fj('.due-date-overrides:first [name="due_at"]').send_keys(due_at1.strftime('%b %-d, %y'))
 
           f('#add_due_date').click
-          wait_for_animations
+          wait_for_ajaximations
 
           click_option('.due-date-row:last select', sec2.name)
           ff('.due-date-overrides [name="due_at"]')[1].send_keys(due_at2.strftime('%b %-d, %y'))
@@ -864,12 +864,12 @@ describe "discussions" do
       @topic.save!
 
       get "/courses/#{@course.id}/discussion_topics/#{@topic.id}/"
-      wait_for_animations
+      wait_for_ajaximations
       f('.topic-unsubscribe-button').should_not be_displayed
       f('.topic-subscribe-button').should_not be_displayed
 
       f('.discussion-reply-action').click
-      wait_for_animations
+      wait_for_ajaximations
       type_in_tiny 'textarea', 'initial post text'
       submit_form('.discussion-reply-form')
       wait_for_ajaximations
@@ -1094,7 +1094,7 @@ describe "discussions" do
         wait_for_ajax_requests
 
         f('.discussion-entries .discussion-reply-action').click
-        wait_for_animations
+        wait_for_ajaximations
         type_in_tiny 'textarea', side_comment_text
         submit_form('.discussion-entries .discussion-reply-form')
         wait_for_ajaximations
@@ -1227,14 +1227,14 @@ describe "discussions" do
       @topic.create_materialized_view
 
       get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
-      wait_for_animations
+      wait_for_ajaximations
       f('.topic-unsubscribe-button').displayed?.should be_true
       f('.topic-subscribe-button').displayed?.should be_false
 
       @topic.unsubscribe(@teacher)
       @topic.update_materialized_view
       get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
-      wait_for_animations
+      wait_for_ajaximations
       f('.topic-unsubscribe-button').displayed?.should be_false
       f('.topic-subscribe-button').displayed?.should be_true
     end
@@ -1244,7 +1244,7 @@ describe "discussions" do
       @topic.create_materialized_view
 
       get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
-      wait_for_animations
+      wait_for_ajaximations
       f('.topic-unsubscribe-button').click
       wait_for_ajaximations
       @topic.reload
@@ -1256,7 +1256,7 @@ describe "discussions" do
       @topic.create_materialized_view
 
       get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
-      wait_for_animations
+      wait_for_ajaximations
       f('.topic-subscribe-button').click
       wait_for_ajaximations
       @topic.reload

@@ -56,7 +56,7 @@ describe "course settings" do
       extra_options.should be_displayed
       more_options_link.text.should == less_options_text
       more_options_link.click
-      wait_for_animations
+      wait_for_ajaximations
       extra_options.should_not be_displayed
       more_options_link.text.should == more_options_text
     end
@@ -101,7 +101,7 @@ describe "course settings" do
       replace_content(code_input, course_code)
       click_option('#course_locale', locale_text)
       f('.course_form_more_options_link').click
-      wait_for_animations
+      wait_for_ajaximations
       f('.course_form_more_options').should be_displayed
       submit_form(course_form)
       wait_for_ajaximations

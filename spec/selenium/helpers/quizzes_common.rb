@@ -205,7 +205,7 @@ shared_examples_for "quizzes selenium tests" do
   def edit_first_question
     hover_first_question
     f('.edit_question_link').click
-    wait_for_animations
+    wait_for_ajaximations
   end
 
   def save_question

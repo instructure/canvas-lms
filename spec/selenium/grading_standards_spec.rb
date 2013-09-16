@@ -11,15 +11,11 @@ describe "grading standards" do
     standard = f("#grading_standard_new")
     standard.should_not be_nil
     standard.should have_class(/editing/)
-    standard.find_elements(:css, ".delete_row_link").select(&:displayed?).each_with_index do |link, i|
+    driver.execute_script("return $('#grading_standard_new .delete_row_link').toArray();").select(&:displayed?).each_with_index do |link, i|
       if i % 2 == 1
-        keep_trying_until do
-          if link.displayed?
-            link.click
-            wait_for_js
-          end
-          !link.displayed?
-        end
+        driver.execute_script("$('#grading_standard_new .delete_row_link:eq(#{i})').click()")
+        wait_for_js
+        keep_trying_until { !link.should_not be_displayed }
       end
     end
     standard.find_element(:css, "input.scheme_name").send_keys("New Standard")

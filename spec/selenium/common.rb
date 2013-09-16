@@ -35,8 +35,8 @@ MAX_SERVER_START_TIME = 60
 #NEED BETTER variable handling
 THIS_ENV = ENV['TEST_ENV_NUMBER'].to_i
 THIS_ENV = 1 if ENV['TEST_ENV_NUMBER'].blank?
+PORT_NUM = (4440 + THIS_ENV)
 WEBSERVER = 'thin' #set WEBSERVER ENV to webrick to change webserver
-
 
 
 $server_port = nil
@@ -88,18 +88,16 @@ module SeleniumTestsHelperMethods
       end
 
       driver = nil
-
-
+      puts 'setting up selenium server'
+      start_selenium_server_node
+      #curbs race conditions on selenium grid nodes
+      stagger_threads
       (1..60).each do |times|
         begin
-          #curbs race conditions on selenium grid nodes
-          stagger_threads
-
-          port_num = (4440 + THIS_ENV)
-          puts "Thread #{THIS_ENV} connecting to hub over port #{port_num}, try ##{times}"
+          puts "Thread #{THIS_ENV} connecting to hub over port #{PORT_NUM}, try ##{times}"
           driver = Selenium::WebDriver.for(
               :remote,
-              :url => "http://127.0.0.1:#{port_num}/wd/hub",
+              :url => "http://127.0.0.1:#{PORT_NUM}/wd/hub",
               :desired_capabilities => caps
           )
           break
@@ -116,6 +114,21 @@ module SeleniumTestsHelperMethods
 
   def set_native_events(setting)
     driver.instance_variable_get(:@bridge).instance_variable_get(:@capabilities).instance_variable_set(:@native_events, setting)
+  end
+
+  def start_selenium_server_node
+    puts 'stopping selenium server node'
+    `selenium_procs=$(ps -ef | grep #{PORT_NUM} | awk '{print $2}') && kill -9 $selenium_procs`
+    `sudo rm -rf /tmp/.X#{THIS_ENV}-lock`
+    `xvfb_procs=$(ps -ef | grep 'Xvfb :#{THIS_ENV}' | awk '{print $2}') && kill -9 $xvfb_procs`
+    puts 'restarting xvfb screen and selenium server node'
+    sleep 7
+    `Xvfb :#{THIS_ENV} -ac -noreset -screen 0 1280x1024x24 &`
+    sleep 2
+    #add configs for selenium version
+    `export DISPLAY=:#{THIS_ENV} && java -Djava.io.tmpdir=/tmp/node#{THIS_ENV} -jar /usr/lib/selenium/selenium-server-standalone-#{SELENIUM_CONFIG[:version]}.jar -port #{PORT_NUM} -timeout 60000  > /var/log/selenium/selenium-output#{THIS_ENV}.log 2> /var/log/selenium/selenium-error#{THIS_ENV}.log & echo $! > /selenium/selenium#{THIS_ENV}.pid &`
+    sleep 5
+    puts 'selenium server node has been restarted'
   end
 
 
@@ -160,9 +173,8 @@ module SeleniumTestsHelperMethods
     I18n.t(*a, &b)
   end
 
-  def stagger_threads(step_time = 9)
+  def stagger_threads(step_time = 2)
     wait_time = THIS_ENV * step_time
-    #thread 5 currently gets the most specs and lags behind the others this will decrease total build time by releasing it early
     sleep(wait_time)
   end
 
@@ -315,7 +327,7 @@ shared_examples_for "all selenium tests" do
   include ActionController::UrlWriter
 
   def selenium_driver;
-    $selenium_driver;
+    $selenium_driver
   end
 
   alias_method :driver, :selenium_driver
@@ -412,6 +424,7 @@ shared_examples_for "all selenium tests" do
   end
 
   def expect_new_page_load
+    make_full_screen
     driver.execute_script("INST.still_on_old_page = true;")
     yield
     keep_trying_until { driver.execute_script("return INST.still_on_old_page;") == nil }
@@ -495,6 +508,7 @@ shared_examples_for "all selenium tests" do
     if result == -2
       raise "Timed out waiting for ajax requests to finish. (This might mean there was a js error in an ajax callback.)"
     end
+    wait_for_js
     result
   end
 
@@ -530,6 +544,7 @@ shared_examples_for "all selenium tests" do
         }
       }
     JS
+    wait_for_js
   end
 
   def wait_for_ajaximations(wait_start = 0)
@@ -755,16 +770,18 @@ shared_examples_for "all selenium tests" do
 
   # you can pass an array to use the rails polymorphic_path helper, example:
   # get [@course, @announcement] => "http://10.0.101.75:65137/courses/1/announcements/1"
-  def get(link)
+  def get(link, waitforajaximations=true)
     link = polymorphic_path(link) if link.is_a? Array
     driver.get(app_host + link)
     #handles any modals prompted by navigating from the current page
     try_to_close_modal
+    wait_for_ajaximations if waitforajaximations
   end
 
   def try_to_close_modal
     begin
       driver.switch_to.alert.accept
+      driver.switch_to.alert.should be nil
       true
     rescue Exception => e
       return false
@@ -941,7 +958,17 @@ shared_examples_for "all selenium tests" do
   end
 
   append_before (:each) do
-    driver.manage.timeouts.implicit_wait = 3
+    #the driver sometimes gets in a hung state and this if almost always the first line of code to catch it
+    begin
+      driver.manage.timeouts.implicit_wait = 3
+    rescue
+      #cleans up and provisions a new driver
+      puts "ERROR: thread: #{THIS_ENV} selenium server hung, attempting to recover the node"
+      $selenium_driver = nil
+      $selenium_driver ||= setup_selenium
+      default_url_options[:host] = $app_host_and_port
+      driver.manage.timeouts.implicit_wait = 3
+    end
     driver.manage.timeouts.script_timeout = 60
     EncryptedCookieStore.any_instance.stubs(:secret).returns(SecureRandom.hex(64))
     enable_forgery_protection

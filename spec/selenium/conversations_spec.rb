@@ -378,7 +378,7 @@ describe "conversations" do
       new_conversation
       f('#help-btn').click
       fj('#conversations-intro-menu-item').click
-      wait_for_animations
+      wait_for_ajaximations
       ff('#conversations_intro').last.should be_displayed
     end
   end

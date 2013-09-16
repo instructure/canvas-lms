@@ -72,15 +72,15 @@ describe "jquery ui" do
       get "/courses/#{@course.id}/assignments"
       
       f(".add_assignment_link").click
-      wait_for_animations
+      wait_for_ajaximations
       f(".ui-datepicker-trigger").click
-      wait_for_animations
+      wait_for_ajaximations
       f(".ui-datepicker-time-hour").send_keys("12")
       f(".ui-datepicker-time-minute").send_keys("00")
       f(".ui-datepicker-ok").click
       
       f(".ui-datepicker-trigger").click
-      wait_for_animations
+      wait_for_ajaximations
       
       driver.execute_script("$('#ui-datepicker-time-hour').select();")
       f("#ui-datepicker-time-hour").send_keys('5')

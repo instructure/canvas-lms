@@ -32,11 +32,15 @@ describe "calendar2" do
 
   def change_calendar(direction = :next)
     css_selector = case direction
-      when :next then '.navigate_next'
-      when :prev then '.navigate_prev'
-      when :today then '.navigate_today'
-      else raise "unrecognized direction #{direction}"
-    end
+                     when :next then
+                       '.navigate_next'
+                     when :prev then
+                       '.navigate_prev'
+                     when :today then
+                       '.navigate_today'
+                     else
+                       raise "unrecognized direction #{direction}"
+                   end
 
     f('.calendar_header ' + css_selector).click
     wait_for_ajax_requests
@@ -95,9 +99,11 @@ describe "calendar2" do
       f("#course_calendar_link").click
 
       # only the explicit context should be selected
-      f("#context-list li[data-context=course_#{unrelated_course.id}]").should have_class('checked')
-      f("#context-list li[data-context=course_#{@course.id}]").should have_class('not-checked')
-      f("#context-list li[data-context=user_#{@user.id}]").should have_class('not-checked')
+      keep_trying_until do
+        f("#context-list li[data-context=course_#{unrelated_course.id}]").should have_class('checked')
+        f("#context-list li[data-context=course_#{@course.id}]").should have_class('not-checked')
+        f("#context-list li[data-context=user_#{@user.id}]").should have_class('not-checked')
+      end
     end
 
     describe "sidebar" do

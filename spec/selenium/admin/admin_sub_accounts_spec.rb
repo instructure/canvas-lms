@@ -96,10 +96,10 @@ describe "admin sub accounts" do
     get "/accounts/#{DEFAULT_ACCOUNT_ID}/sub_accounts"
     check_sub_accounts
     click_account_action_link(DEFAULT_ACCOUNT_ID, '.collapse_sub_accounts_link')
-    wait_for_animations
+    wait_for_ajaximations
     check_sub_accounts(false)
     click_account_action_link(DEFAULT_ACCOUNT_ID, '.expand_sub_accounts_link')
-    wait_for_animations
+    wait_for_ajaximations
     check_sub_accounts
   end
 

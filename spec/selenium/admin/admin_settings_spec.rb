@@ -182,7 +182,7 @@ describe "settings tabs" do
         add_announcement
         f(".delete_notification_link").click
         driver.switch_to.alert.accept
-        wait_for_animations
+        wait_for_ajaximations
         AccountNotification.count.should == 0
       end
     end

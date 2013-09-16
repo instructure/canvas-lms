@@ -37,7 +37,7 @@ describe "quizzes" do
       get "/courses/#{@course.id}/quizzes"
       f('.quiz_list .description').should include_text "Multiple Dates"
       driver.mouse.move_to f('.quiz_list .description a')
-      wait_for_animations
+      wait_for_ajaximations
       tooltip = fj('.vdd_tooltip_content:visible')
       tooltip.should include_text 'New Section'
       tooltip.should include_text 'Everyone else'
@@ -518,7 +518,7 @@ describe "quizzes" do
       expect_new_page_load do
         driver.find_element(:link_text, 'Take the Quiz').click
       end
-      wait_for_animations
+      wait_for_ajaximations
       # so we can .send_keys to the input, can't if it's invisible to
       # the browser
       driver.execute_script "$('.file-upload').removeClass('hidden')"
@@ -539,7 +539,7 @@ describe "quizzes" do
         driver.get driver.current_url
         driver.switch_to.alert.accept
       end
-      wait_for_animations
+      wait_for_ajaximations
       attachment = file_upload_attachment
       fj('.file-upload-box').text.should include attachment.display_name
       f('#submit_quiz_button').click
@@ -747,7 +747,7 @@ describe "quizzes" do
         get "/courses/#{@course.id}/quizzes"
         f('.ig-details .description').should include_text "Multiple Dates"
         driver.mouse.move_to f('.ig-details .description a')
-        wait_for_animations
+        wait_for_ajaximations
         tooltip = fj('.vdd_tooltip_content:visible')
         tooltip.should include_text 'New Section'
         tooltip.should include_text 'Everyone else'

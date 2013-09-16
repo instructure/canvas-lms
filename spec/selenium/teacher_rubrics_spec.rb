@@ -169,13 +169,13 @@ describe "course rubrics" do
 
     get "/courses/#{@course.id}/grades"
     f('.toggle_rubric_assessments_link').click
-    wait_for_animations
+    wait_for_ajaximations
     f('.rubric .criterion .custom_rating_comments').text.should == comment
     f('.rubric .criterion .custom_rating_comments a').should have_attribute('href', 'http://www.example.com/')
 
     get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}"
     f('.assess_submission_link').click
-    wait_for_animations
+    wait_for_ajaximations
     f('.rubric .criterion .custom_rating_comments').text.should == comment
     f('.rubric .criterion .custom_rating_comments a').should have_attribute('href', 'http://www.example.com/')
   end

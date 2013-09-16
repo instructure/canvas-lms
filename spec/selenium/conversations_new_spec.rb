@@ -97,7 +97,7 @@ describe "conversations new" do
 
   def compose(options={})
     fj('#compose-btn').click
-    wait_for_animations
+    wait_for_ajaximations
     select_message_course(options[:course]) if options[:course]
     (options[:to] || []).each {|recipient| add_message_recipient recipient}
     set_message_subject(options[:subject]) if options[:subject]
@@ -276,14 +276,14 @@ describe "conversations new" do
     it "should filter by course" do
       get_conversations
       select_course(@course.id)
-      conversation_elements.size.should eql 2 
+      conversation_elements.size.should eql 2
     end
 
     it "should filter by course plus view" do
       get_conversations
       select_course(@course.id)
       select_view('unread')
-      conversation_elements.size.should eql 1 
+      conversation_elements.size.should eql 1
     end
 
     it "should hide the spinner after deleting the last conversation" do

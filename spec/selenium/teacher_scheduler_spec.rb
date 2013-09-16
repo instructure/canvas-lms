@@ -198,7 +198,7 @@ describe "scheduler" do
           form.find_elements(:css, '.participant_list li').should_not be_empty
           set_value(form.find_element(:css, '#body'), 'hello')
           submit_dialog(fj('.ui-dialog:visible'), '.ui-button')
-
+          wait_for_ajaximations
           # using fj to avoid selenium caching
           keep_trying_until { fj('#message_participants_form').should be_nil }
         end
