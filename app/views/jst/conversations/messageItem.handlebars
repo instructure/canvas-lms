@@ -69,3 +69,25 @@
 </div>
 
 <p>{{body}}</p>
+
+{{#if has_attachments}}
+<ul class="message-attachments">
+  {{#if media_comment}}
+    <li><a class="instructure_inline_media_comment" data-media_comment_id="{{media_comment.media_id}}" href="{{media_comment.url}}">
+      <i class="icon-media"></i> {{media_comment.display_name}}
+    </a></li>
+  {{/if}}
+  {{#each attachments}}
+    <li><a href="{{url}}">
+      {{#if thumbnail_url}}
+        {{! The thumbnail image is still huge, unfortunately. }}
+        <!--img class="message-attachment-thumbnail" src="{{thumbnail_url}}" /-->
+        <i class="icon-paperclip"></i>
+      {{else}}
+        <i class="icon-paperclip"></i>
+      {{/if}}
+      {{display_name}}
+    </a></li>
+  {{/each}}
+</ul>
+{{/if}}
