@@ -17,12 +17,19 @@ define [
         canAssignToGroup: true
         canRemoveFromGroup: false
 
+    dropOptions:
+      activeClass: 'droppable'
+      hoverClass: 'droppable-hover'
+      tolerance: 'pointer'
+
     attach: ->
       @collection.on 'reset', @render
 
     afterRender: ->
       super
       @collection.load('first')
+      @$el.parent().droppable(_.extend({}, @dropOptions))
+                   .on('drop', @_onDrop)
 
     toJSON: ->
       loading: !@collection.loadedAll
@@ -51,3 +58,9 @@ define [
     canAssignToGroup: ->
       @options.canAssignToGroup and @groupsCollection.length
 
+    ##
+    # handle drop events on '.unassigned-students'
+    # ui.draggable: the user being dragged
+    _onDrop: (e, ui) =>
+      user = ui.draggable.data('model')
+      user.save({'groupId': null})

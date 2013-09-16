@@ -26,6 +26,9 @@ define [
     attach: ->
       @model.on 'change', @render, this
 
+    afterRender: ->
+      @$el.data('model', @model)
+
     toJSON: ->
       _.extend {}, this, super
 

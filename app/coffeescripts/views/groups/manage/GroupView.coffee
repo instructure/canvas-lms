@@ -4,15 +4,19 @@ define [
   'Backbone'
   'jst/groups/manage/group'
   'compiled/views/groups/manage/GroupUsersView'
+  'compiled/views/groups/manage/GroupDetailView'
   'compiled/views/groups/manage/GroupEditView'
   'compiled/jquery.rails_flash_notifications'
-], (I18n, _, {View}, template, GroupUsersView, GroupEditView) ->
+], (I18n, _, {View}, template, GroupUsersView, GroupDetailView, GroupEditView) ->
 
   class GroupView extends View
 
     tagName: 'li'
 
     className: 'group'
+
+    attributes: ->
+      "data-id": @model.id
 
     template: template
 
@@ -21,6 +25,7 @@ define [
     @optionProperty 'addUnassignedMenu'
 
     @child 'groupUsersView', '[data-view=groupUsers]'
+    @child 'groupDetailView', '[data-view=groupDetail]'
 
     events:
       'click .toggle-group': 'toggleDetails'
@@ -38,9 +43,7 @@ define [
     attach: ->
       @expanded = false
       @users = @model.users()
-      @model.on 'change', @render
       @model.on 'destroy', @remove, this
-      @users.on 'add remove reset', @updateSummary
 
     editGroup: (e) =>
       e.preventDefault()
@@ -55,20 +58,6 @@ define [
       @model.destroy
         success: -> $.flashMessage I18n.t('flash.removed', 'Group successfully removed.')
         failure: -> $.flashError I18n.t('flash.removeError', 'Unable to remove the group. Please try again later.')
-
-    toJSON: ->
-      json = super
-      json.summary = @summary()
-      json
-
-    summary: ->
-      if ENV.group_user_type is 'student'
-        I18n.t "student_count", "student", count: @model.usersCount()
-      else
-        I18n.t "user_count", "user", count: @model.usersCount()
-
-    updateSummary: =>
-      @$summary.text @summary()
 
     afterRender: ->
       @$el.toggleClass 'group-expanded', @expanded

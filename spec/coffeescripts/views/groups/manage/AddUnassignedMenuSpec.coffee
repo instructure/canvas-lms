@@ -49,7 +49,7 @@ define [
 
     $waldoLink = $links.last()
     $waldoLink.click()
-    sendResponse 'POST', waldo.createMembershipUrl(777), {}
+    sendResponse 'POST',"/api/v1/groups/777/memberships", {}
     equal waldo.get('groupId'), 777
 
     ok not users.contains(waldo)

@@ -933,6 +933,13 @@ shared_examples_for "all selenium tests" do
     drag_with_js source_selector, dx, dy
   end
 
+  ##
+  # drags the source element to the target element and waits for ajaximations
+  def drag_and_drop_element(source, target)
+    driver.action.drag_and_drop(source, target).perform
+    wait_for_ajaximations
+  end
+
 ##
 # returns true if a form validation error message is visible, false otherwise
   def error_displayed?

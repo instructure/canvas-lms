@@ -23,11 +23,15 @@ define [
       @load = ->
 
     updateGroupId: (model, groupId) =>
-      @remove model
+      ##
+      # handle incrementing before removing/adding
+      #   in order to have correct counts for entities
+      #   listening to collection related events
       @increment -1
+      @remove model
       if other = @groupUsersFor(groupId)
-        other.add model if other?.loaded
         other.increment 1
+        other.add model if other?.loaded
 
     increment: (amount) ->
       if @group

@@ -65,8 +65,16 @@
   color: #555;
   margin: 0;
 }
+
 a.group-heading:hover {
   color: inherit;
   text-decoration: none;
 }
 
+.unassigned-students {
+  &.droppable-hover {
+    > * {
+      opacity: 0.5;
+    }
+  }
+}

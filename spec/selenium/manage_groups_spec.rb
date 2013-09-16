@@ -89,6 +89,54 @@ describe "manage groups" do
       # should re-appear in unassigned
       ff("div[data-view='unassignedUsers'] .assign-to-group").length.should == 2
     end
+
+    it "should allow a teacher to drag and drop a student among groups" do
+      students = groups_student_enrollment 5
+      group_categories = create_categories(@course, 1)
+      groups = add_groups_in_category(group_categories[0])
+      get "/courses/#{@course.id}/groups"
+      wait_for_ajaximations
+
+      # expand groups
+      expand_group(groups[0].id)
+      expand_group(groups[1].id)
+
+      unassigned_group_selector = ".unassigned-students"
+      group1_selector = ".group[data-id=\"#{groups[0].id}\"]"
+      group2_selector = ".group[data-id=\"#{groups[1].id}\"]"
+      group_user_selector = ".group-user"
+      first_group_user_selector = ".group-user:first"
+
+      first_unassigned_user = "#{unassigned_group_selector} #{first_group_user_selector}"
+      first_group1_user = "#{group1_selector} #{first_group_user_selector}"
+
+      unassigned_users_selector = "#{unassigned_group_selector} #{group_user_selector}"
+      group1_users_selector = "#{group1_selector} #{group_user_selector}"
+      group2_users_selector = "#{group2_selector} #{group_user_selector}"
+
+      # assert all 5 students are in unassigned
+      ff(unassigned_users_selector).size.should == 5
+      ff(group1_users_selector).size.should == 0
+      ff(group2_users_selector).size.should == 0
+
+      drag_and_drop_element( fj(first_unassigned_user), fj(group1_selector) )
+      drag_and_drop_element( fj(first_unassigned_user), fj(group1_selector) )
+      # assert there are 3 students in unassigned
+      # assert there is 2 student in group 0
+      # assert there is still 0 students in group 1
+      ff(unassigned_users_selector).size.should == 3
+      ff(group1_users_selector).size.should == 2
+      ff(group2_users_selector).size.should == 0
+
+      drag_and_drop_element( fj(first_group1_user), fj(unassigned_group_selector) )
+      drag_and_drop_element( fj(first_group1_user), fj(group2_selector) )
+      # assert there are 4 students in unassigned
+      # assert there are 0 students in group 0
+      # assert there is 1 student in group 1
+      ff(unassigned_users_selector).size.should == 4
+      ff(group1_users_selector).size.should == 0
+      ff(group2_users_selector).size.should == 1
+    end
   end
 
   # TODO: Remove this whole section after new UI becomes default

@@ -2,21 +2,33 @@
   border: 1px solid #ccc;
   background: #fff;
   margin-bottom: 3px;
-  padding: 0 15px;
+  padding: 0 15px 0 0;
   line-height: 30px;
   border-radius: 3px;
   position: relative;
+  cursor: pointer;
+
+  &.ui-draggable-dragging {
+    cursor: move;
+  }
 }
 
 .remove-from-group,
 .assign-to-group {
   position: absolute;
+  top: 0px;
   right: 3px;
   top: 1px;
   i:before {
     color: #aaa;
     font-size: 0.8em;
   }
+}
+
+.assign-to-group {
+  position: absolute;
+  top: 0px;
+  right: 1px;
 }
 
 .group .group-users {
