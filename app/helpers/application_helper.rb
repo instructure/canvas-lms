@@ -802,30 +802,35 @@ module ApplicationHelper
     @global_includes
   end
 
-  def include_account_js
+  def include_account_js(options = {})
     return if params[:global_includes] == '0'
-    includes = get_global_includes.inject([]) do |js_includes, global_include|
-      js_includes << "'#{global_include[:js]}'" if global_include[:js].present?
-      js_includes
+    includes = get_global_includes.map do |global_include|
+      global_include[:js] if global_include[:js].present?
     end
+    includes.compact!
     if includes.length > 0
-      str = <<-ENDSCRIPT
-        (function() {
-          var inject = function(src) {
-            var s = document.createElement('script');
-            s.src = src;
-            s.type = 'text/javascript';
-            document.body.appendChild(s);
-          };
-          var srcs = [#{includes.join(', ')}];
-          require(['jquery'], function() {
-            for (var i = 0, l = srcs.length; i < l; i++) {
-              inject(srcs[i]);
-            }
-          });
-        })();
-      ENDSCRIPT
-      content_tag(:script, str, {}, false)
+      if options[:raw]
+        includes.unshift("/optimized/vendor/jquery-1.7.2.js")
+        javascript_include_tag(includes)
+      else
+        str = <<-ENDSCRIPT
+          (function() {
+            var inject = function(src) {
+              var s = document.createElement('script');
+              s.src = src;
+              s.type = 'text/javascript';
+              document.body.appendChild(s);
+            };
+            var srcs = #{includes.to_json};
+            require(['jquery'], function() {
+              for (var i = 0, l = srcs.length; i < l; i++) {
+                inject(srcs[i]);
+              }
+            });
+          })();
+        ENDSCRIPT
+        javascript_tag(str)
+      end
     end
   end
 
