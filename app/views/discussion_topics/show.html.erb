@@ -51,8 +51,12 @@
         ><label for="onlyUnread"><%= t('unread', 'Unread') %></label>
 
         &nbsp; &nbsp;
-        <button id="collapseAll" class="btn disableWhileFiltering" title="<%= t('collapse_replies', 'Collapse replies') %>"><%= image_tag 'discussions/collapse_icon.png' %></button>
-        <button id="expandAll" class="btn disableWhileFiltering" title="<%= t('expand_replies', 'Expand replies') %>"><%= image_tag 'discussions/expand_icon.png' %></button>
+        <button id="collapseAll" class="btn disableWhileFiltering" title="<%= t('collapse_replies', 'Collapse replies') %>" aria-label="<%= t('collapse_replies', 'Collapse replies') %>">
+          <%= image_tag 'discussions/collapse_icon.png', :alt => t('collapse_replies', 'Collapse replies') %>
+        </button>
+        <button id="expandAll" class="btn disableWhileFiltering" title="<%= t('expand_replies', 'Expand replies') %>" aria-label="<%= t('expand_replies', 'Expand replies') %>">
+          <%= image_tag 'discussions/expand_icon.png', :alt => t('expand_replies', 'Expand replies') %>
+        </button>
 
       </div>
 
