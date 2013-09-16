@@ -93,11 +93,26 @@
           <input type="hidden" name="mode" value="async">
           <input type="hidden" name="scope" value="{{scope}}">
           <input type="hidden" name="filter" value="{{filter}}">
-          <button type="submit"
-                  data-track-category="Compose Message"
-                  data-track-action="Edit"
-                  data-track-label="Send"
-                  class="btn btn-primary">{{#t "buttons.send_message"}}Send{{/t}}</button>
+          {{#if conversation.beta}}
+            <button type="button"
+                    data-track-category="Compose Message"
+                    data-track-action="Edit"
+                    data-track-label="ReplyAll"
+                    name="reply-type"
+                    value="all"
+                    class="btn">{{#t "buttons.reply_all"}}Reply all{{/t}}</button>
+            <button type="submit"
+                    data-track-category="Compose Message"
+                    data-track-action="Edit"
+                    data-track-label="Send"
+                    class="btn btn-primary">{{#t "buttons.reply"}}Reply{{/t}}</button>
+          {{else}}
+            <button type="submit"
+                    data-track-category="Compose Message"
+                    data-track-action="Edit"
+                    data-track-label="Send"
+                    class="btn btn-primary">{{#t "buttons.send_message"}}Send{{/t}}</button>
+          {{/if}}
         </div>
       </td>
     </tr>
