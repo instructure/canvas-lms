@@ -131,6 +131,9 @@ define [
 
       errors
 
+    unescape: (str) ->
+      str.replace(/\&nbsp;/g, String.fromCharCode(160))
+
     hasUnsavedChanges: ->
       json = @toJSON()
 
@@ -140,7 +143,7 @@ define [
       if json.CAN.EDIT_TITLE
         oldTitle = @model.get('title') || ''
         newTitle = formData.title || ''
-      return (oldBody != newBody) || (oldTitle != newTitle)
+      return (@unescape(oldBody) != @unescape(newBody)) || (oldTitle != newTitle)
 
     unsavedWarning: ->
       I18n.t("warnings.unsaved_changes",
