@@ -24,6 +24,7 @@ define [
             message.summarizedParticipantNames = message.participantNames.slice(0, 2)
             message.hiddenParticipantCount = message.participants.length - 2
           message.context_name = data.context_name
+          message.has_attachments = message.media_comment || message.attachments.length
       data
 
     handleMessages: ->

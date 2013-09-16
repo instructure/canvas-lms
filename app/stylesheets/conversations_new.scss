@@ -333,13 +333,25 @@
     }
   }
 
-  .message-content li {
+  .message-content > li {
     border-bottom: 1px solid #bfbfbf;
     margin: 0 12px;
     padding: 24px 0;
 
     p:last-child {
       margin-bottom: 0;
+    }
+
+    .message-attachments {
+      border-top: 1px solid #bfbfbf;
+      list-style: none;
+      margin: 0 1em;
+      padding: 0.5em;
+    }
+
+    .message-attachment-thumbnail {
+      max-height: 16px;
+      max-width: 16px;
     }
   }
 
