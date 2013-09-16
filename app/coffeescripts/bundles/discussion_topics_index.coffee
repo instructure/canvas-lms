@@ -124,7 +124,8 @@ require [
     # Returns nothing.
     _sortCollection: (pipeline) ->
       group = @_groupModels(pipeline)
-      @discussions[key].collection.add(group[key]) for key of group
+      # add silently and just render whole sorted collection once all the pages have been fetched
+      @discussions[key].collection.add(group[key], silent: true) for key of group
 
     # Internal: Group models in the given collection into an object with
     # 'open', 'locked', and 'pinned' keys.
