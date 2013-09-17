@@ -132,6 +132,38 @@ describe "conversations new" do
       c.private?.should be_false
       c.conversation_participants.collect(&:user_id).sort.should eql([@teacher, @s1, @s2].collect(&:id).sort)
     end
+
+    it "should allow admins to send a message without picking a context" do
+      user = account_admin_user
+      user.preferences[:use_new_conversations] = true
+      user.save!
+      user_logged_in({:user => user})
+      get_conversations
+      compose to: [@s1], subject: 'context-free', body: 'hallo!'
+      c = @s1.conversations.last.conversation
+      c.subject.should eql('context-free')
+    end
+
+    it "should not allow non-admins to send a message without picking a context" do
+      get_conversations
+      fj('#compose-btn').click
+      wait_for_animations
+      fj('#compose-new-message .ac-input').should have_attribute(:disabled, 'true')
+    end
+
+    it "should allow admins to message users from their profiles" do
+      user = account_admin_user
+      user.preferences[:use_new_conversations] = true
+      user.save!
+      user_logged_in({:user => user})
+      get "/accounts/#{Account.default.id}/users"
+      wait_for_ajaximations
+      f('li.user a').click
+      wait_for_ajaximations
+      f('.icon-email').click
+      wait_for_ajaximations
+      f('.ac-token').should_not be_nil
+    end
   end
 
   describe "replying" do
