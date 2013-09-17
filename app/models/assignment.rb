@@ -1148,38 +1148,38 @@ class Assignment < ActiveRecord::Base
         :methods => [:scribdable?, :scribd_doc, :submission_history, :late],
         :only => submission_fields
       )
-      if json['submission_history'] && quiz.nil?
-        json['submission_history'].map! do |version|
-          version.as_json(
-            :include => {
-              :submission_comments => { :only => comment_fields }
-            },
-            :only => submission_fields,
-            :methods => [:versioned_attachments, :late]
-          ).tap do |version_json|
-            if version_json['submission'] && version_json['submission']['versioned_attachments']
-              version_json['submission']['versioned_attachments'].map! do |a|
-                a.as_json(
-                  :only => attachment_fields,
-                  :methods => [:view_inline_ping_url, :scribd_render_url]
-                )
-              end
-            end
-          end
-        end
-      elsif quiz
-        quiz_submission_versions = sub.quiz_submission.versions.reverse
-        json['submission_history'] = quiz_submission_versions.map do |v|
-          qs = v.model
-          {submission: {
-            grade: qs.score,
-            show_grade_in_dropdown: true,
-            submitted_at: qs.finished_at,
-            late: qs.overdue?,
-            version: v.number,
-          }}
-        end
-      end
+      json['submission_history'] = if json['submission_history'] && quiz.nil?
+                                     json['submission_history'].map do |version|
+                                       version.as_json(
+                                         :include => {
+                                           :submission_comments => { :only => comment_fields }
+                                         },
+                                         :only => submission_fields,
+                                         :methods => [:versioned_attachments, :late]
+                                       ).tap do |version_json|
+                                         if version_json['submission'] && version_json['submission']['versioned_attachments']
+                                           version_json['submission']['versioned_attachments'].map! do |a|
+                                             a.as_json(
+                                               :only => attachment_fields,
+                                               :methods => [:view_inline_ping_url, :scribd_render_url]
+                                             )
+                                           end
+                                         end
+                                       end
+                                     end
+                                   elsif quiz && sub.quiz_submission
+                                     quiz_submission_versions = sub.quiz_submission.versions.reverse
+                                     quiz_submission_versions.map do |v|
+                                       qs = v.model
+                                       {submission: {
+                                         grade: qs.score,
+                                         show_grade_in_dropdown: true,
+                                         submitted_at: qs.finished_at,
+                                         late: qs.overdue?,
+                                         version: v.number,
+                                       }}
+                                     end
+                                   end
       json
     }
     res[:GROUP_GRADING_MODE] = grade_as_group?

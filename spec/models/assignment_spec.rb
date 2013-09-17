@@ -2162,6 +2162,22 @@ describe Assignment do
       end
       json["GROUP_GRADING_MODE"].should be_true
     end
+
+    it "works for quizzes without quiz_submissions" do
+      course_with_teacher(:active_all => true)
+      student_in_course
+      quiz = @course.quizzes.create! :title => "Final",
+                                     :quiz_type => "assignment"
+      quiz.did_edit
+      quiz.offer
+
+      assignment = quiz.assignment
+      assignment.grade_student(@student, grade: 1)
+      json = assignment.speed_grader_json(@teacher)
+      json[:submissions].all? { |s|
+        s.has_key? 'submission_history'
+      }.should be_true
+    end
   end
 
   describe "update_student_submissions" do
