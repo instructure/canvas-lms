@@ -43,7 +43,7 @@ class CourseFormController < ApplicationController
       end
     end
 
-    course_array = ["course_id,short_name,long_name,account_id,term_id,status"]
+    course_array = ["course_id,short_name,long_name,account_id,term_id,status,start_date,end_date"]
     section_array = ["section_id,course_id,name,status,start_date,end_date"]
     enrollment_array = ["course_id,user_id,role,section_id,status"]
 
@@ -115,7 +115,8 @@ class CourseFormController < ApplicationController
       long_name = (long_names[0, 1] + short_names[1..-1]).join(' / ') if long_name.length > CANVAS_COURSE_NAME_MAX
 
       # create course csv
-      course_array.push "#{course_id},#{short_name},#{long_name},#{account_id},#{term},active"
+      selected_term = term(term)
+      course_array.push "#{course_id},#{short_name},#{long_name},#{account_id},#{term},active,#{selected_term.start_at},#{selected_term.end_at}"
 
       # create section csv
       section_array.push section_csv(term, sections, course_id, cross_list)
@@ -175,12 +176,14 @@ class CourseFormController < ApplicationController
     course["title"] = course_arr[4].to_s
     course["child_sections"] = course_arr[5]
 
+    selected_term = term(course["term"])
+
     course["course_id"] = "#{course["term"]}-#{course["name"]}-#{course["number"]}-#{course["section_name"]}"
     course["main_section_id"] = "#{course["term"]}-#{course["name"]}-#{course["number"]}-#{course["section_name"]}:::#{time_stamp}"
     course["short_name"] = "#{course["name"].upcase}#{course["number"]} #{course["section_name"].upcase}"
     course["long_name"] =  "#{course["short_name"]} #{course["title"]}"
     course["default_section_id"] = default_section_id(course["term"], course["main_section_id"], course["section_name"], course["child_sections"])
-    course["course_csv"] = "#{course["course_id"]},#{course["short_name"]},#{course["long_name"]},#{account_id},#{course["term"]},active"
+    course["course_csv"] = "#{course["course_id"]},#{course["short_name"]},#{course["long_name"]},#{account_id},#{course["term"]},active,#{selected_term.start_at},#{selected_term.end_at}"
     course["enrollment_csv_1"] = "#{course["course_id"]},#{teacher1},teacher,#{course["default_section_id"]},active"
     course["enrollment_csv_2"] = "#{course["course_id"]},#{teacher2},#{teacher2_role},#{course["default_section_id"]},active" unless teacher2.nil?
 
@@ -283,6 +286,10 @@ class CourseFormController < ApplicationController
     else
       ""
     end
+  end
+
+  def term(term_code)
+    EnrollmentTerm.find(:all, :conditions => ["workflow_state = 'active' AND sis_source_id = :term", {:term => term_code}]).first
   end
 
 end
