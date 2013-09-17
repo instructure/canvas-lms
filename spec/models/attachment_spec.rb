@@ -768,6 +768,13 @@ describe Attachment do
       @course.attachments.should be_include(a)
       @course.attachments.active.should_not be_include(a)
     end
+
+    it "should still destroy without error if file data is lost" do
+      a = attachment_model(:uploaded_data => default_uploaded_data)
+      a.stubs(:downloadable?).returns(false)
+      a.destroy
+      a.should be_deleted
+    end
   end
 
   context "inferred display name" do

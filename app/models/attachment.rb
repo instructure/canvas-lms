@@ -301,7 +301,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def assert_attachment
-    if !self.to_be_zipped? && !self.zipping? && !self.errored? && (!filename || !content_type || !downloadable?)
+    if !self.to_be_zipped? && !self.zipping? && !self.errored? && !self.deleted? && (!filename || !content_type || !downloadable?)
       self.errors.add_to_base(t('errors.not_found', "File data could not be found"))
       return false
     end
