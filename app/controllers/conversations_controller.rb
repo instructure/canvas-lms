@@ -241,7 +241,7 @@ class ConversationsController < ApplicationController
     return render_error('body', 'blank') if params[:body].blank?
     context_type = nil
     context_id = nil
-    if params[:context_code]
+    if params[:context_code].present?
       context = Context.find_by_asset_string(params[:context_code])
       return render_error('context_code', 'invalid') if context.nil?
       context_type = context.class.name
