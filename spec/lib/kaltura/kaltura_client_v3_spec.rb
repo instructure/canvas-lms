@@ -108,7 +108,7 @@ describe "Kaltura::ClientV3" do
                       {:fileExt => 'flv', :bitrate => '100'},
               ]
     end
-    
+
     it "should prefer converted assets to the original" do
       @kaltura.sort_source_list(
           [
@@ -172,7 +172,7 @@ describe "Kaltura::ClientV3" do
       create_config_with_mock(2)
       m = mock()
       m.expects(:write).with(['media_sources2', 'hi', 2].cache_key, [@source], {:expires_in => 2})
-      m.expects(:read).returns(nil)
+      m.expects(:read)
       Rails.stubs(:cache).returns(m)
       @kaltura.media_sources('hi')
     end
@@ -181,7 +181,7 @@ describe "Kaltura::ClientV3" do
       create_config_with_mock(nil)
       m = mock()
       m.expects(:write).with(['media_sources2', 'hi', nil].cache_key, [@source])
-      m.expects(:read).returns(nil)
+      m.expects(:read)
       Rails.stubs(:cache).returns(m)
       @kaltura.media_sources('hi')
     end
@@ -191,8 +191,8 @@ describe "Kaltura::ClientV3" do
     create_config
     @source = {:content_type => "video/mp4", :containerFormat => "isom", :url => nil, :fileExt => "mp4", :status => '2', :id => "1"}
     @kaltura.expects(:flavorAssetGetByEntryId).returns([@source, @source.merge({:fileExt => "wav", :id => '2'})])
-    @kaltura.stubs(:flavorAssetGetPlaylistUrl).returns(nil)
-    @kaltura.stubs(:flavorAssetGetDownloadUrl).returns(nil)
+    @kaltura.stubs(:flavorAssetGetPlaylistUrl)
+    @kaltura.stubs(:flavorAssetGetDownloadUrl)
 
     res = @kaltura.media_sources('hi')
     res.should == []
@@ -202,10 +202,248 @@ describe "Kaltura::ClientV3" do
     create_config
     @source = {:content_type => "video/mp4", :containerFormat => "isom", :url => nil, :fileExt => "wav", :status => '2', :id => "1"}
     @kaltura.expects(:flavorAssetGetByEntryId).returns([@source])
-    @kaltura.stubs(:flavorAssetGetPlaylistUrl).returns(nil)
+    @kaltura.stubs(:flavorAssetGetPlaylistUrl)
 
     res = @kaltura.media_sources('hi')
     res.should == []
   end
 
+  describe "startSession" do
+    it "should call sendRequest with proper parameters for a user" do
+      user_id = 12345
+      session_type = Kaltura::SessionType::USER
+
+      @kaltura.expects(:sendRequest).with(
+        :session, :start, {
+          :secret => Kaltura::ClientV3.config['user_secret_key'],
+          :partnerId => '100',
+          :userId => user_id,
+          :type => session_type
+        }
+      ).returns(Nokogiri::XML("<ks>some_kaltura_session</ks>"))
+
+      @kaltura.startSession(session_type, user_id)
+    end
+
+    it "should call sendRequest with proper parameters for a admin" do
+      session_type = Kaltura::SessionType::ADMIN
+
+      @kaltura.expects(:sendRequest).with(
+        :session, :start, {
+          :secret => Kaltura::ClientV3.config['secret_key'],
+          :partnerId => '100',
+          :userId => nil,
+          :type => session_type
+        }
+      ).returns(Nokogiri::XML("<ks>some_kaltura_session</ks>"))
+
+      @kaltura.startSession(session_type)
+    end
+
+    it "should set ks properly" do
+      ks = "ks_from_kaltura"
+      @kaltura.stubs(:sendRequest).returns(Nokogiri::XML("<ks>#{ks}</ks>"))
+
+      @kaltura.startSession
+
+      @kaltura.ks.should == ks
+    end
+  end
+
+  describe "mediaGet" do
+    it "should call sendRequest with proper parameters" do
+      entry_id = 12345
+
+      @kaltura.expects(:sendRequest).with(
+        :media, :get, {:ks => nil, :entryId => entry_id}
+      ).returns(stub(:children => []))
+
+      @kaltura.mediaGet(entry_id)
+    end
+
+    it "should properly create an items hash" do
+      media_name = "Movie on 1-31-13 at 7.27 PM.mov"
+      @kaltura.stubs(:sendRequest).returns(Nokogiri::XML("<name>#{media_name}</name>"))
+
+      media_info = @kaltura.mediaGet(0)
+
+      media_info[:name].should == "Movie on 1-31-13 at 7.27 PM.mov"
+    end
+
+  end
+
+  describe "mediaUpdate" do
+    it "should call sendRequest with proper parameters" do
+      @kaltura.expects(:sendRequest).with(
+        :media, :update, {
+          :ks => nil,
+          :entryId => 12345,
+          'mediaEntry:key' => 'value'
+      }).returns(stub(:children => []))
+
+      @kaltura.mediaUpdate(12345, {"key" => "value"})
+    end
+
+    it "should return a properly formatted item" do
+      media_name = "Movie on 2-31-13 at 7.27 PM.mov"
+      @kaltura.stubs(:sendRequest).returns(Nokogiri::XML("<name>#{media_name}</name>"))
+
+      media_info = @kaltura.mediaUpdate(0,{})
+
+      media_info[:name].should == media_name
+    end
+  end
+
+  describe "mediaDelete" do
+    it "should call sendRequest with proper parameters" do
+      @kaltura.expects(:sendRequest).with(
+        :media, :delete, {:ks => nil, :entryId => 12345}
+      )
+
+      @kaltura.mediaDelete(12345)
+    end
+  end
+
+  describe "mediaTypeToSymbol" do
+    it "should return the proper symbol" do
+      vid = @kaltura.mediaTypeToSymbol(1)
+      img = @kaltura.mediaTypeToSymbol(2)
+      aud = @kaltura.mediaTypeToSymbol(5)
+
+      [vid,img,aud].should == [:video,:image,:audio]
+    end
+
+    it "should defailt to video" do
+      @kaltura.mediaTypeToSymbol(rand(10)+6).should == :video
+    end
+  end
+
+  describe "bulkUploadGet" do
+    it "should call sendRequest with proper parameters" do
+      @kaltura.stubs(:parseBulkUpload)
+
+      @kaltura.expects(:sendRequest).with(
+        :bulkUpload, :get, {:ks => nil, :id => 12345}
+      )
+
+      @kaltura.bulkUploadGet(12345)
+    end
+
+    # Implicit test of parseBulkUpload
+    it "should return properly formatted bulkUpload information" do
+      bulk_upload_id = 123
+      log_file_url = "http://example.com/bulk_upload_123.csv"
+      status = 5
+      name = "theName"
+      entryId = "theEntryId"
+      originalId = "theOriginalId"
+
+      @kaltura.stubs(:sendRequest).returns(Nokogiri::XML(
+        "<result>
+        <logFileUrl>#{log_file_url}</logFileUrl>
+        <id>#{bulk_upload_id}</id>
+        <status>#{status}</status>
+        </result>"
+      ))
+      Canvas::HTTP.stubs(:get).with(log_file_url).returns(stub(
+        :body => "#{name},,,,,,,,,#{entryId},,#{originalId}"
+      ))
+
+      bulk_upload_result = @kaltura.bulkUploadGet(bulk_upload_id)
+
+      bulk_upload_result[:id].should == bulk_upload_id.to_s
+      bulk_upload_result[:status].should == status.to_s
+      bulk_upload_result[:entries].should == [{
+        :name => name,
+        :entryId => entryId,
+        :originalId => originalId
+      }]
+    end
+  end
+
+  describe "bulkUploadCsv" do
+    it "should call kaltura's bulkupload add with the CSV" do
+      csv = "some,csv,data,about,a,bulk,upload"
+      @kaltura.stubs(:parseBulkUpload)
+
+      @kaltura.expects(:postRequest).with do |controller, action, params|
+        controller.should == :bulkUpload
+        action.should == :add
+        params[:csvFileData].read.should == csv
+      end
+
+      @kaltura.bulkUploadCsv(csv)
+    end
+
+    # parseBulkUpload behavior verified above
+    it "should call parseBulkUpload" do
+      @kaltura.stubs(:postRequest).returns(:test)
+      @kaltura.expects(:parseBulkUpload).with(:test)
+      @kaltura.bulkUploadCsv("test")
+    end
+  end
+
+  describe "bulkUploadAdd" do
+   it "should format rows properly" do
+      files = [{
+        :name => "the_name",
+        :description => "the_desc",
+        :tags => "the_tags",
+        :media_type => "the_media_type",
+        :partner_data => "the_partner_data",
+        :url => "the_url"
+      }]
+
+      @kaltura.expects(:bulkUploadCsv).with(
+        %Q[the_name,the_desc,the_tags,the_url,the_media_type,"","","","","","",the_partner_data\n]
+      )
+
+      @kaltura.bulkUploadAdd(files)
+    end
+  end
+
+  describe "assetSwfUrl" do
+    it "should return a properly formatted url" do
+      config_result = {
+       "domain" => "domain",
+       "partner_id" => "partner_id",
+       "player_ui_conf" => "player_ui_conf"
+      }
+      Kaltura::ClientV3.stubs(:config).returns(config_result)
+
+      @kaltura.assetSwfUrl(1).should == "http://domain/kwidget/wid/_partner_id/uiconf_id/player_ui_conf/entry_id/1"
+    end
+  end
+
+  describe "postRequest" do
+    it "should make the API call" do
+      response = stub('Net::HTTPOK')
+      Net::HTTP.stubs(:request).returns(response)
+
+      @kaltura.send(:postRequest,:media,:get,{}).class.should == Nokogiri::XML::Element
+    end
+
+    it "should raise a timeout error if res is nil" do
+      Net::HTTP.stubs(:start)
+      lambda {
+        @kaltura.send(:postRequest,:media,:get,{})
+      }.should raise_error(Timeout::Error)
+    end
+  end
+
+  describe "sendRequest" do
+    it "should make the API call" do
+      response = stub('Net::HTTPOK')
+      Net::HTTP.stubs(:request).returns(response)
+
+      @kaltura.send(:sendRequest,:media,:get,{}).class.should == Nokogiri::XML::Element
+    end
+
+    it "should raise a timeout error if res is nil" do
+      Net::HTTP.stubs(:get_response)
+      lambda {
+        @kaltura.send(:sendRequest,:media,:get,{})
+      }.should raise_error(Timeout::Error)
+    end
+  end
 end
