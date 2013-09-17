@@ -165,10 +165,14 @@ describe "gradebook2" do
 
       keep_trying_until do
         button = fj('#section_to_show')
-        button.should include_text("All Sections")
         button.click
         wait_for_js
         fj('#section-to-show-menu').should be_displayed
+        ffj('#section-to-show-menu a').first.click
+        wait_for_js
+        button.should include_text("All Sections")
+        button.click
+        wait_for_js
         ffj('#section-to-show-menu a').last.click
         wait_for_js
         button.should include_text(@other_section.name)
@@ -534,8 +538,8 @@ describe "gradebook2" do
         icons.each do |icon|
           cell = icon.find_element(:xpath, '..')
 
-          driver.action.move_to(cell).perform
           keep_trying_until do
+            driver.action.move_to(cell).perform
             cell.find_element(:css, "a").should be_displayed
           end
           cell.find_element(:css, "a").click

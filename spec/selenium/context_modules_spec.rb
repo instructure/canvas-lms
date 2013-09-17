@@ -238,12 +238,13 @@ describe "context_modules" do
       wait_for_ajaximations
       fj(".student_list").should be_displayed
 
-      #selects the second student
-      ffj(".student_list .student")[2].click
-      wait_for_ajaximations
 
       #validates the second student has been selected and that the modules information is displayed as expected
       keep_trying_until do
+        #selects the second student
+        ffj(".student_list .student")[2].click
+        wait_for_ajaximations
+
         f(".module_#{modules[0].id} .progress").should include_text("completed")
         f(".module_#{modules[1].id} .progress").should include_text("in progress")
       end
