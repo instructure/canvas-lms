@@ -641,19 +641,17 @@ describe "assignments" do
         ag = @course.assignment_groups.first
         as = []
         4.times do |i|
-          as << @course.assignments.create!(:name => "group_#{i}")
+          as << @course.assignments.create!(:name => "assignment_#{i}", :assignment_group =>ag)
         end
         as.collect(&:position).should == [1,2,3,4]
 
         get "/courses/#{@course.id}/assignments"
         wait_for_ajaximations
-        sleep(5)
-        drag_with_js("#assignment_group_#{ag.id}_assignments .ig-title:eq(1) .draggable-handle", 0, 50)
-        sleep(5)
+        drag_with_js("#assignment_#{as[0].id}", 0, 50)
         wait_for_ajaximations
 
         as.each {|a| a.reload}
-        as.collect(&:position).should == [1,3,2,4]
+        as.collect(&:position).should == [2,1,3,4]
       end
 
       context "with modules" do
