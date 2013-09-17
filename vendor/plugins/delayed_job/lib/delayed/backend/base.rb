@@ -229,7 +229,7 @@ module Delayed
           payload_object.perform
         ensure
           Delayed::Job.in_delayed_job = false
-          ActiveRecord::Base.clear_active_connections! unless Rails.env.test?
+          ::ActiveRecord::Base.clear_active_connections! unless Rails.env.test?
         end
       end
 
