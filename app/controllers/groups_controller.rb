@@ -88,7 +88,13 @@
 #       "group_category_id": 4,
 #
 #       // the storage quota for the group, in megabytes
-#       "storage_quota_mb": 50
+#       "storage_quota_mb": 50,
+#
+#       // optional: the permissions the user has for the group.
+#       // returned only for a single group and include[]=permissions
+#       "permissions": {
+#          "create_discussion_topic": true
+#        }
 #     }
 #
 class GroupsController < ApplicationController
@@ -252,6 +258,10 @@ class GroupsController < ApplicationController
   #     curl https://<canvas>/api/v1/groups/<group_id> \ 
   #          -H 'Authorization: Bearer <token>'
   #
+  # @argument include[] [String, "permissions"]
+  #   - "permissions": Include permissions the current user has
+  #     for the group.
+  #
   # @returns Group
   def show
     find_group
@@ -303,7 +313,7 @@ class GroupsController < ApplicationController
       end
       format.json do
         if authorized_action(@group, @current_user, :read)
-          render :json => group_json(@group, @current_user, session)
+          render :json => group_json(@group, @current_user, session, :include => Array(params[:include]))
         end
       end
     end

@@ -29,20 +29,26 @@ module Api::V1::Group
     :only => %w(id group_id user_id workflow_state moderator)
   }
 
+  API_PERMISSIONS_TO_INCLUDE = %w(create_discussion_topic)
+
   def group_json(group, user, session, options = {})
-    hash = api_json(group, user, session, API_GROUP_JSON_OPTS)
+    includes = options[:include] || []
+
+    permissions_to_include = API_PERMISSIONS_TO_INCLUDE if includes.include?('permissions')
+
+    hash = api_json(group, user, session, API_GROUP_JSON_OPTS, permissions_to_include)
     hash.merge!(context_data(group))
     followed = ::UserFollow.followed_by_user([group], user)
     hash['followed_by_user'] = !!followed.include?(group)
     image = group.avatar_attachment
     hash['avatar_url'] = image && thumbnail_image_url(image, image.uuid)
     hash['role'] = group.group_category.role if group.group_category
-    include = options[:include] || []
-    if include.include?('users')
+    
+    if includes.include?('users')
       # TODO: this should be switched to user_display_json
       hash['users'] = group.users.map{ |u| user_json(u, user, session) }
     end
-    hash['html_url'] = group_url(group) if include.include? 'html_url'
+    hash['html_url'] = group_url(group) if includes.include? 'html_url'
     hash['sis_group_id'] = group.sis_source_id if group.context_type == 'Account' && group.root_account.grants_rights?(user, session, :read_sis, :manage_sis).values.any?
     hash
   end

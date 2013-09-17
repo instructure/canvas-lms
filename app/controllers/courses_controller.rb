@@ -94,7 +94,13 @@ require 'set'
 #       },
 #
 #       // weight final grade based on assignment group percentages
-#       "apply_assignment_group_weights": true
+#       "apply_assignment_group_weights": true,
+#
+#       // optional: the permissions the user has for the course.
+#       // returned only for a single course and include[]=permissions
+#       "permissions": {
+#          "create_discussion_topic": true
+#        }
 #   }
 class CoursesController < ApplicationController
   include SearchHelper
@@ -180,6 +186,9 @@ class CoursesController < ApplicationController
         end
 
         includes = Set.new(Array(params[:include]))
+
+        # We only want to return the permissions for single courses and not lists of courses.
+        includes.delete 'permissions'
 
         hash = []
         enrollments.group_by(&:course_id).each do |course_id, course_enrollments|
@@ -1043,7 +1052,10 @@ class CoursesController < ApplicationController
   #
   # Accepts the same include[] parameters as the list action plus:
   #
-  # @argument include[] ["all_courses"] Also search recently deleted courses
+  # @argument include[] [String, "all_courses"|"permissions"]
+  #   - "all_courses": Also search recently deleted courses.
+  #   - "permissions": Include permissions the current user has
+  #     for the course.
   #
   # @returns Course
   def show

@@ -137,6 +137,23 @@ describe "Groups API", :type => :integration do
     json.should == group_json(@community, @user)
   end
 
+  it 'should include permissions' do
+    # Make sure it only returns permissions when asked
+    json = api_call(:get, @community_path, @category_path_options.merge(:group_id => @community.to_param, :action => "show", :format => 'json'))
+    json.has_key?("permissions").should be_false
+
+    # When its asked to return permissions make sure they are there
+    json = api_call(:get, "#{@community_path}.json?include[]=permissions", @category_path_options.merge(:group_id => @community.to_param, :action => "show", :format => 'json', :include => [ "permissions" ]))
+    json.has_key?("permissions").should be_true
+  end
+
+  it 'should include permission create_discussion_topic' do
+    json = api_call(:get, "#{@community_path}.json?include[]=permissions", @category_path_options.merge(:group_id => @community.to_param, :action => "show", :format => 'json', :include => [ "permissions" ]))
+
+    json.has_key?("permissions").should be_true
+    json["permissions"].has_key?("create_discussion_topic").should be_true
+  end
+
   it "should allow searching by SIS ID" do
     @community.update_attribute(:sis_source_id, 'abc')
     json = api_call(:get, "/api/v1/groups/sis_group_id:abc", @category_path_options.merge(:group_id => 'sis_group_id:abc', :action => "show"))
@@ -253,26 +270,26 @@ describe "Groups API", :type => :integration do
     @user = @member
     json = api_call(:delete, @community_path, @category_path_options.merge(:group_id => @community.to_param, :action => "destroy"), {}, {}, :expected_status => 401)
   end
-  
+
   describe "quota" do
     before do
       @account = Account.default
       Setting.set('group_default_quota', 11.megabytes)
     end
-    
+
     context "with manage_storage_quotas permission" do
       before do
         account_admin_user :account => @account
         user_session(@admin)
       end
-      
+
       it "should set the quota on create" do
         json = api_call(:post, '/api/v1/groups?name=TehGroup&storage_quota_mb=22',
                  { :controller => "groups", :action => 'create', :format => "json", :name => 'TehGroup', :storage_quota_mb => '22' })
         group = @account.groups.find(json['id'])
         group.storage_quota_mb.should == 22
       end
-      
+
       it "should set the quota on update" do
         group = @account.groups.create! :name => 'TehGroup'
         api_call(:put, "/api/v1/groups/#{group.id}?storage_quota_mb=22",
@@ -280,13 +297,13 @@ describe "Groups API", :type => :integration do
         group.reload.storage_quota_mb.should == 22
       end
     end
-    
+
     context "without manage_storage_quotas permission" do
       before do
         account_admin_user_with_role_changes(:role_changes => {:manage_storage_quotas => false})
         user_session(@admin)
       end
-      
+
       it "should ignore the quota on create" do
         json = api_call(:post, '/api/v1/groups?storage_quota_mb=22',
                         { :controller => 'groups', :action => 'create', :format => 'json', :storage_quota_mb => '22' })
@@ -363,13 +380,13 @@ describe "Groups API", :type => :integration do
       user_model
       @community.add_user(@user, 'invited')
       @user = @moderator
-      json = api_call(:get, @memberships_path, @memberships_path_options.merge(:group_id => @community.to_param, :action => "index"), { 
+      json = api_call(:get, @memberships_path, @memberships_path_options.merge(:group_id => @community.to_param, :action => "index"), {
         :filter_states => ["invited"]
       })
       json.count.should == 1
       json.first.should == membership_json(@community.group_memberships.where(:workflow_state => 'invited').first)
     end
-    
+
     it "should allow someone to request to join a group" do
       @user = user_model
       @community.join_level = "parent_context_request"
@@ -693,7 +710,7 @@ describe "Groups API", :type => :integration do
     def has_query_exemption?
       false
     end
-      
+
     def context
       @community
     end

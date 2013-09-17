@@ -574,4 +574,10 @@ class Group < ActiveRecord::Base
     return false if context.nil?
     context.draft_state_enabled?
   end
+
+  def serialize_permissions(permissions_hash, user, session)
+    permissions_hash.merge(
+      create_discussion_topic: DiscussionTopic.context_allows_user_to_create?(self, user, session)
+    )
+  end
 end

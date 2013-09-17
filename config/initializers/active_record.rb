@@ -270,6 +270,9 @@ class ActiveRecord::Base
       end
       unless options[:permissions][:include_permissions] == false
         permissions_hash = self.grants_rights?(options[:permissions][:user], options[:permissions][:session], *options[:permissions][:policies])
+        if self.respond_to?(:serialize_permissions)
+          permissions_hash = self.serialize_permissions(permissions_hash, options[:permissions][:user], options[:permissions][:session])
+        end
         obj_hash["permissions"] = permissions_hash
       end
     end

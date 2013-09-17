@@ -3163,4 +3163,10 @@ class Course < ActiveRecord::Base
   def draft_state_enabled?
     (root_account.allow_draft? && enable_draft?) || root_account.enable_draft?
   end
+
+  def serialize_permissions(permissions_hash, user, session)
+    permissions_hash.merge(
+      create_discussion_topic: DiscussionTopic.context_allows_user_to_create?(self, user, session)
+    )
+  end
 end

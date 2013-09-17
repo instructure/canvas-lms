@@ -653,6 +653,10 @@ class DiscussionTopic < ActiveRecord::Base
     can :read and can :update and can :delete and can :reply
   end
 
+  def self.context_allows_user_to_create?(context, user, session)
+    DiscussionTopic.new(context: context).grants_right?(user, session, :create)
+  end
+
   def context_allows_user_to_create?(user)
     return true unless context.respond_to?(:allow_student_discussion_topics)
     return true unless context.user_is_student?(user)

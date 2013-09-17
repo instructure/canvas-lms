@@ -51,6 +51,13 @@ describe "API", :type => :integration do
       course_with_teacher
       @course.as_json(:include_root => false, :permissions => { :user => @user, :include_permissions => false }, :only => %w(name sis_source_id)).keys.sort.should == %w(name sis_source_id)
     end
+
+    it "should serialize permissions if obj responds" do
+      course_with_teacher
+      @course.expects(:serialize_permissions).once.with(anything, @teacher, nil)
+      json = @course.as_json(:include_root => false, :permissions => { :user => @user, :session => nil, :include_permissions => true, :policies => [ "update" ] }, :only => %w(name))
+      json.keys.sort.should == %w(name permissions)
+    end
   end
 
   describe "json post format" do

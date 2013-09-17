@@ -4,7 +4,7 @@ module Api::V1
     BASE_ATTRIBUTES = %w(id name course_code account_id start_at default_view)
     
     INCLUDE_CHECKERS = { :grading => 'needs_grading_count', :syllabus => 'syllabus_body', 
-                         :url => 'html_url', :description => 'public_description' }
+                         :url => 'html_url', :description => 'public_description', :permissions => "permissions" }
     
     OPTIONAL_FIELDS = %w(needs_grading_count public_description enrollments)
 
@@ -16,7 +16,7 @@ module Api::V1
       @includes = includes.map{ |include_key| include_key.to_sym }
       @enrollments = enrollments
       if block_given? 
-        @hash = yield(self, self.allowed_attributes, self.methods_to_send) 
+        @hash = yield(self, self.allowed_attributes, self.methods_to_send, self.permissions_to_include)
       else
         @hash = {}
       end
@@ -66,6 +66,9 @@ module Api::V1
       end
     end
 
+    def permissions_to_include
+      [ :create_discussion_topic ] if include_permissions
+    end
 
     def extract_enrollments( enrollments )
       if enrollments
@@ -92,6 +95,5 @@ module Api::V1
     def include_total_scores 
       @includes.include?(:total_scores) && !@course.hide_final_grades?
     end
-
   end
 end
