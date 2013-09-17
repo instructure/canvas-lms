@@ -23,7 +23,7 @@ class ControllerListView < HashView
 
   def swagger_reference
     {
-      "path" => "#{domain}/doc/api/" + swagger_file,
+      "path" => '/' + swagger_file,
       "description" => @name,
     }
   end
