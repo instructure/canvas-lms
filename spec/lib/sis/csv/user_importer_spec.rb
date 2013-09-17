@@ -955,4 +955,19 @@ describe SIS::CSV::UserImporter do
     user_1.pseudonym.should_not == @pseudonym
   end
 
+  it "should error nicely when resurrecting an SIS user that conflicts with an active user" do
+    process_csv_data_cleanly(
+        "user_id,login_id,first_name,last_name,email,status",
+        "user_1,user1,User,Uno,user1@example.com,deleted"
+    )
+    @non_sis_user = user_with_pseudonym(:active_all => 1)
+    @pseudonym = @non_sis_user.pseudonyms.create!(:unique_id => 'user1', :account => @account)
+    importer = process_csv_data(
+        "user_id,login_id,first_name,last_name,email,status",
+        "user_1,user1,User,Uno,user1@example.com,active"
+    )
+    importer.errors.should == []
+    importer.warnings.length.should == 1
+    importer.warnings.last.last.should == "user #{@non_sis_user.id} has already claimed user_1's requested login information, skipping"
+  end
 end

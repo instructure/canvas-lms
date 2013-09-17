@@ -214,6 +214,7 @@ describe Course do
       @enrollment.start_at = 4.days.ago
       @enrollment.end_at = 2.days.ago
       @enrollment.save!
+      @enrollment.reload
       @enrollment.state_based_on_date.should == :completed
     end
 
@@ -252,7 +253,7 @@ describe Course do
       @enrollment.start_at = 4.days.ago
       @enrollment.end_at = 2.days.ago
       @enrollment.save!
-      @enrollment.state_based_on_date.should == :completed
+      @enrollment.reload.state_based_on_date.should == :completed
       @course.prior_enrollments.should == []
       @course.grants_right?(@designer, nil, :read_as_admin).should be_true
       @course.grants_right?(@designer, nil, :read_roster).should be_true
@@ -311,7 +312,7 @@ describe Course do
       course_with_teacher(:active_user => 1)
       @course.enrollment_term.update_attributes(:start_at => 2.days.from_now, :end_at => 4.days.from_now)
       @enrollment.update_attribute(:workflow_state, 'active')
-      @enrollment.state_based_on_date.should == :inactive
+      @enrollment.reload.state_based_on_date.should == :inactive
       @course.grants_right?(:read, @teacher).should be_false
     end
 
@@ -332,70 +333,91 @@ describe Course do
     end
   end
 
-  it "should clear content when resetting" do
-    course_with_student
-    @course.discussion_topics.create!
-    @course.quizzes.create!
-    @course.assignments.create!
-    @course.wiki.front_page.save!
-    @course.self_enrollment = true
-    @course.sis_source_id = 'sis_id'
-    @course.stuck_sis_fields = [].to_set
-    @course.save!
-    @course.course_sections.should_not be_empty
-    @course.students.should == [@student]
-    @course.stuck_sis_fields.should == [].to_set
-    self_enrollment_code = @course.self_enrollment_code
-    self_enrollment_code.should_not be_nil
+  describe "#reset_content" do
+    it "should clear content" do
+      course_with_student
+      @course.discussion_topics.create!
+      @course.quizzes.create!
+      @course.assignments.create!
+      @course.wiki.front_page.save!
+      @course.self_enrollment = true
+      @course.sis_source_id = 'sis_id'
+      @course.stuck_sis_fields = [].to_set
+      @course.save!
+      @course.course_sections.should_not be_empty
+      @course.students.should == [@student]
+      @course.stuck_sis_fields.should == [].to_set
+      self_enrollment_code = @course.self_enrollment_code
+      self_enrollment_code.should_not be_nil
 
-    @new_course = @course.reset_content
+      @new_course = @course.reset_content
 
-    @course.reload
-    @course.stuck_sis_fields.should == [:workflow_state].to_set
-    @course.course_sections.should be_empty
-    @course.students.should be_empty
-    @course.sis_source_id.should be_nil
-    @course.self_enrollment_code.should be_nil
+      @course.reload
+      @course.stuck_sis_fields.should == [:workflow_state].to_set
+      @course.course_sections.should be_empty
+      @course.students.should be_empty
+      @course.sis_source_id.should be_nil
+      @course.self_enrollment_code.should be_nil
 
-    @new_course.reload
-    @new_course.course_sections.should_not be_empty
-    @new_course.students.should == [@student]
-    @new_course.discussion_topics.should be_empty
-    @new_course.quizzes.should be_empty
-    @new_course.assignments.should be_empty
-    @new_course.sis_source_id.should == 'sis_id'
-    @new_course.syllabus_body.should be_blank
-    @new_course.stuck_sis_fields.should == [].to_set
-    @new_course.self_enrollment_code.should == self_enrollment_code
+      @new_course.reload
+      @new_course.course_sections.should_not be_empty
+      @new_course.students.should == [@student]
+      @new_course.discussion_topics.should be_empty
+      @new_course.quizzes.should be_empty
+      @new_course.assignments.should be_empty
+      @new_course.sis_source_id.should == 'sis_id'
+      @new_course.syllabus_body.should be_blank
+      @new_course.stuck_sis_fields.should == [].to_set
+      @new_course.self_enrollment_code.should == self_enrollment_code
 
-    @course.uuid.should_not == @new_course.uuid
-    @course.wiki_id.should_not == @new_course.wiki_id
-    @course.replacement_course_id.should == @new_course.id
-  end
+      @course.uuid.should_not == @new_course.uuid
+      @course.wiki_id.should_not == @new_course.wiki_id
+      @course.replacement_course_id.should == @new_course.id
+    end
 
-  it "should preserve sticky fields when resetting content" do
-    course_with_student
-    @course.sis_source_id = 'sis_id'
-    @course.course_code = "cid"
-    @course.save!
-    @course.stuck_sis_fields = [].to_set
-    @course.name = "course_name"
-    @course.stuck_sis_fields.should == [:name].to_set
-    @course.save!
-    @course.stuck_sis_fields.should == [:name].to_set
+    it "should retain original course profile" do
+      data = {:something => 'special here'}
+      description = 'simple story'
+      course_with_student
+      @course.profile.should_not be_nil
+      @course.profile.tap do |p|
+        p.description = description
+        p.data = data
+        p.save!
+      end
+      @course.reload
 
-    @new_course = @course.reset_content
+      @new_course = @course.reset_content
 
-    @course.reload
-    @course.stuck_sis_fields.should == [:workflow_state, :name].to_set
-    @course.sis_source_id.should be_nil
+      @new_course.profile.data.should == data
+      @new_course.profile.description.should == description
+    end
 
-    @new_course.reload
-    @new_course.sis_source_id.should == 'sis_id'
-    @new_course.stuck_sis_fields.should == [:name].to_set
+    it "should preserve sticky fields" do
+      course_with_student
+      @course.sis_source_id = 'sis_id'
+      @course.course_code = "cid"
+      @course.save!
+      @course.stuck_sis_fields = [].to_set
+      @course.name = "course_name"
+      @course.stuck_sis_fields.should == [:name].to_set
+      @course.save!
+      @course.stuck_sis_fields.should == [:name].to_set
 
-    @course.uuid.should_not == @new_course.uuid
-    @course.replacement_course_id.should == @new_course.id
+      @new_course = @course.reset_content
+
+      @course.reload
+      @course.stuck_sis_fields.should == [:workflow_state, :name].to_set
+      @course.sis_source_id.should be_nil
+
+      @new_course.reload
+      @new_course.sis_source_id.should == 'sis_id'
+      @new_course.stuck_sis_fields.should == [:name].to_set
+
+      @course.uuid.should_not == @new_course.uuid
+      @course.replacement_course_id.should == @new_course.id
+    end
+
   end
 
   it "group_categories should not include deleted categories" do
@@ -2554,7 +2576,7 @@ describe Course, "conclusions" do
     @user.reload
     @user.cached_current_enrollments(:reload)
 
-    enrollment.state.should == :active
+    enrollment.reload.state.should == :active
     enrollment.state_based_on_date.should == :completed
     enrollment.should_not be_participating_student
 
@@ -2696,6 +2718,16 @@ describe Course, "section_visibility" do
     it "should return users from all sections" do
       @course.users_visible_to(@teacher).sort_by(&:id).should eql [@teacher, @ta, @student1, @student2, @observer]
       @course.users_visible_to(@ta).sort_by(&:id).should      eql [@teacher, @ta, @student1, @observer]
+    end
+
+    it "should return student view students to account admins" do
+      @course.student_view_student
+      @admin = account_admin_user
+      @course.enrollments_visible_to(@admin).map(&:user).should be_include(@course.student_view_student)
+    end
+
+    it "should return student view students to student view students" do
+      @course.enrollments_visible_to(@course.student_view_student).map(&:user).should be_include(@course.student_view_student)
     end
   end
 
@@ -3207,128 +3239,131 @@ describe Course do
   context "named scopes" do
     context "enrollments" do
       before do
+        account_model
         # has enrollments
-        @course1a = course_with_student(:course_name => 'A').course
-        @course1b = course_with_student(:course_name => 'B').course
+        @course1a = course_with_student(:account => @account, :course_name => 'A').course
+        @course1b = course_with_student(:account => @account, :course_name => 'B').course
 
         # has no enrollments
-        @course2a = Course.create!(:name => 'A')
-        @course2b = Course.create!(:name => 'B')
+        @course2a = Course.create!(:account => @account, :name => 'A')
+        @course2b = Course.create!(:account => @account, :name => 'B')
       end
 
       describe "#with_enrollments" do
         it "should include courses with enrollments" do
-          Course.with_enrollments.sort_by(&:id).should == [@course1a, @course1b]
+          @account.courses.with_enrollments.sort_by(&:id).should == [@course1a, @course1b]
         end
 
         it "should play nice with other scopes" do
-          Course.with_enrollments.where(:name => 'A').should == [@course1a]
+          @account.courses.with_enrollments.where(:name => 'A').should == [@course1a]
         end
 
         it "should be disjoint with #without_enrollments" do
-          Course.with_enrollments.without_enrollments.should be_empty
+          @account.courses.with_enrollments.without_enrollments.should be_empty
         end
       end
 
       describe "#without_enrollments" do
         it "should include courses without enrollments" do
-          Course.without_enrollments.sort_by(&:id).should == [@course2a, @course2b]
+          @account.courses.without_enrollments.sort_by(&:id).should == [@course2a, @course2b]
         end
 
         it "should play nice with other scopes" do
-          Course.without_enrollments.where(:name => 'A').should == [@course2a]
+          @account.courses.without_enrollments.where(:name => 'A').should == [@course2a]
         end
       end
     end
 
     context "completion" do
       before do
+        account_model
         # non-concluded
-        @c1 = Course.create!
-        @c2 = Course.create! :conclude_at => 1.week.from_now
+        @c1 = Course.create!(:account => @account)
+        @c2 = Course.create!(:account => @account, :conclude_at => 1.week.from_now)
 
         # concluded in various ways
-        @c3 = Course.create! :conclude_at => 1.week.ago
-        @c4 = Course.create!
+        @c3 = Course.create!(:account => @account, :conclude_at => 1.week.ago)
+        @c4 = Course.create!(:account => @account)
         term = @c4.account.enrollment_terms.create! :end_at => 2.weeks.ago
         @c4.enrollment_term = term
         @c4.save!
-        @c5 = Course.create!
+        @c5 = Course.create!(:account => @account)
         @c5.complete!
       end
 
       describe "#completed" do
         it "should include completed courses" do
-          Course.completed.sort_by(&:id).should == [@c3, @c4, @c5]
+          @account.courses.completed.sort_by(&:id).should == [@c3, @c4, @c5]
         end
 
         it "should play nice with other scopes" do
-          Course.completed.where(:conclude_at => nil).should == [@c4]
+          @account.courses.completed.where(:conclude_at => nil).should == [@c4]
         end
 
         it "should be disjoint with #not_completed" do
-          Course.completed.not_completed.should be_empty
+          @account.courses.completed.not_completed.should be_empty
         end
       end
 
       describe "#not_completed" do
         it "should include non-completed courses" do
-          Course.not_completed.sort_by(&:id).should == [@c1, @c2]
+          @account.courses.not_completed.sort_by(&:id).should == [@c1, @c2]
         end
 
         it "should play nice with other scopes" do
-          Course.not_completed.where(:conclude_at => nil).should == [@c1]
+          @account.courses.not_completed.where(:conclude_at => nil).should == [@c1]
         end
       end
     end
 
     describe "#by_teachers" do
       before do
-        @course1a = course_with_teacher(:name => "teacher A's first course").course
+        account_model
+        @course1a = course_with_teacher(:account => @account, :name => "teacher A's first course").course
         @teacherA = @teacher
-        @course1b = course_with_teacher(:name => "teacher A's second course", :user => @teacherA).course
-        @course2 = course_with_teacher(:name => "teacher B's course").course
+        @course1b = course_with_teacher(:account => @account, :name => "teacher A's second course", :user => @teacherA).course
+        @course2 = course_with_teacher(:account => @account, :name => "teacher B's course").course
         @teacherB = @teacher
-        @course3 = course_with_teacher(:name => "teacher C's course").course
+        @course3 = course_with_teacher(:account => @account, :name => "teacher C's course").course
         @teacherC = @teacher
       end
 
       it "should filter courses by teacher" do
-        Course.by_teachers([@teacherA.id]).sort_by(&:id).should == [@course1a, @course1b]
+        @account.courses.by_teachers([@teacherA.id]).sort_by(&:id).should == [@course1a, @course1b]
       end
 
       it "should support multiple teachers" do
-        Course.by_teachers([@teacherB.id, @teacherC.id]).sort_by(&:id).should == [@course2, @course3]
+        @account.courses.by_teachers([@teacherB.id, @teacherC.id]).sort_by(&:id).should == [@course2, @course3]
       end
 
       it "should work with an empty array" do
-        Course.by_teachers([]).should be_empty
+        @account.courses.by_teachers([]).should be_empty
       end
 
       it "should not follow student enrollments" do
         @course3.enroll_student(user_model)
-        Course.by_teachers([@user.id]).should be_empty
+        @account.courses.by_teachers([@user.id]).should be_empty
       end
 
       it "should not follow deleted enrollments" do
         @teacherC.enrollments.each { |e| e.destroy }
-        Course.by_teachers([@teacherB.id, @teacherC.id]).sort_by(&:id).should == [@course2]
+        @account.courses.by_teachers([@teacherB.id, @teacherC.id]).sort_by(&:id).should == [@course2]
       end
 
       it "should return no results when the user is not enrolled in the course" do
         user_model
-        Course.by_teachers([@user.id]).should be_empty
+        @account.courses.by_teachers([@user.id]).should be_empty
       end
 
       it "should play nice with other scopes" do
         @course1a.complete!
-        Course.by_teachers([@teacherA.id]).completed.should == [@course1a]
+        @account.courses.by_teachers([@teacherA.id]).completed.should == [@course1a]
       end
     end
 
     describe "#by_associated_accounts" do
       before do
-        @root_account = Account.default
+        @root_account = account_model
         @sub = account_model(:name => 'sub', :parent_account => @root_account, :root_account => @root_account)
         @subA = account_model(:name => 'subA', :parent_account => @sub1, :root_account => @root_account)
         @courseA1 = course_model(:account => @subA, :name => 'A1')
@@ -3533,6 +3568,47 @@ describe Course do
 
     it "should be true if no visibilities are given" do
       @course.visibility_limited_to_course_sections?(nil, []).should be_true
+    end
+  end
+
+  describe "#draft_state_enabled?" do
+    before(:each) do
+      @account = Account.create!
+      @account.settings[:allow_draft] = true
+      @account.save!
+      course(active_all: true)
+      @course.root_account = @account
+      @course.save!
+    end
+
+    context "a course with enable_draft enabled" do
+      it "should check its own enable_draft setting" do
+        @course.enable_draft = true
+        @course.save!
+
+        @course.should be_draft_state_enabled
+      end
+    end
+
+    context "a course with an enable_draft account" do
+      it "should check its root_account's enable_draft setting" do
+        @course.root_account.settings[:enable_draft] = true
+        @course.root_account.save!
+
+        @course.should be_draft_state_enabled
+      end
+    end
+
+    context "a course with an account that doesn't allow draft state" do
+      it "shouldn't be able to enable draft state" do
+        @account.settings[:allow_draft] = false
+        @account.save!
+
+        @course.enable_draft = true
+        @course.save!
+
+        @course.should_not be_draft_state_enabled
+      end
     end
   end
 end

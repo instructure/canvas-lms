@@ -387,7 +387,8 @@ define([
               $span = $("<span class='instructure_file_link_holder link_holder'/>");
           $link.removeClass('instructure_file_link').before($span).appendTo($span);
           if($link.attr('target') != '_blank') {
-            $span.append("<a href='" + $link.attr('href') + "' target='_blank' title='" + htmlEscape(I18n.t('titles.view_in_new_window', "View in a new window")) + "' style='padding-left: 5px;'><img src='/images/popout.png'/></a>");
+            $span.append("<a href='" + $link.attr('href') + "' target='_blank' title='" + htmlEscape(I18n.t('titles.view_in_new_window', "View in a new window")) +
+                "' style='padding-left: 5px;'><img src='/images/popout.png' alt='" + htmlEscape(I18n.t('titles.view_in_new_window', "View in a new window")) + "'/></a>");
           }
         });
       if ($.filePreviewsEnabled()) {
@@ -395,7 +396,8 @@ define([
           var $link = $(this);
           if ( $.trim($link.text()) ) {
             var $span = $("<span class='instructure_scribd_file_holder link_holder'/>"),
-                $scribd_link = $("<a class='scribd_file_preview_link' href='" + $link.attr('href') + "' title='" + htmlEscape(I18n.t('titles.preview_document', "Preview the document")) + "' style='padding-left: 5px;'><img src='/images/preview.png'/></a>");
+                $scribd_link = $("<a class='scribd_file_preview_link' href='" + $link.attr('href') + "' title='" + htmlEscape(I18n.t('titles.preview_document', "Preview the document")) +
+                    "' style='padding-left: 5px;'><img src='/images/preview.png' alt='" + htmlEscape(I18n.t('titles.preview_document', "Preview the document")) + "'/></a>");
             $link.removeClass('instructure_scribd_file').before($span).appendTo($span);
             $span.append($scribd_link);
             if($link.hasClass('auto_open')) {
@@ -449,14 +451,16 @@ define([
           var attachment = data && data.attachment,
               scribdDocAttributes = attachment && attachment.scribd_doc && attachment.scribd_doc.attributes;
           $link.loadingImage('remove');
-          if (attachment && (scribdDocAttributes || $.isPreviewable(attachment.content_type, 'google'))) {
+          if (attachment && (attachment['scribdable?'] || $.isPreviewable(attachment.content_type, 'google'))) {
             var $div = $("<span><br /></span>")
               .insertAfter($link.parents(".link_holder:last"))
               .loadDocPreview({
                 scribd_doc_id: scribdDocAttributes && scribdDocAttributes.doc_id,
                 scribd_access_key: scribdDocAttributes && scribdDocAttributes.access_key,
                 mimeType: attachment.content_type,
-                public_url: attachment.authenticated_s3_url
+                public_url: attachment.authenticated_s3_url,
+                attachment_scribd_render_url: attachment.scribd_render_url,
+                attachment_preview_processing: attachment.workflow_state == 'pending_upload' || attachment.workflow_state == 'processing'
               })
               .append(
                 $('<a href="#" style="font-size: 0.8em;" class="hide_file_preview_link">' + htmlEscape(I18n.t('links.minimize_file_preview', 'Minimize File Preview')) + '</a>')
@@ -980,7 +984,7 @@ define([
     // happend a lot so rather than duplicating it everywhere I stuck it here
     $("#right-side").delegate(".more_link", "click", function(event) {
       var $this = $(this);
-      var $children = $this.parents("ul").children().show();
+      var $children = $this.parents("ul").children(':hidden').show();
       $this.closest('li').remove();
 
       // if they are using the keyboard to navigate (they hit enter on the link instead of actually

@@ -23,6 +23,7 @@ define [
       onInputDelay: 200
       modelAttribute: 'filter'
       minLength: 3
+      allowSmallerNumbers: true
 
     onInput: =>
       if @el.value isnt @lastValue

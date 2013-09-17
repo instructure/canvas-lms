@@ -159,7 +159,7 @@ describe AssignmentOverride do
     end
 
     it "should accept group sets" do
-      @category = @course.group_categories.create!
+      @category = group_category
       @override.assignment.group_category = @category
       @override.set = @category.groups.create!
       @override.should be_valid
@@ -186,8 +186,8 @@ describe AssignmentOverride do
     end
 
     it "should reject groups in different category than assignment" do
-      @assignment.group_category = @course.group_categories.create!
-      @category = @course.group_categories.create!
+      @assignment.group_category = group_category
+      @category = group_category(name: "bar")
       @override.set = @category.groups.create
       @override.should_not be_valid
     end
@@ -196,8 +196,8 @@ describe AssignmentOverride do
     # for an assignment's previous group category when the assignment's group
     # category changes
     it "should not reject groups in different category than assignment when deleted" do
-      @assignment.group_category = @course.group_categories.create!
-      @category = @course.group_categories.create!
+      @assignment.group_category = group_category
+      @category = group_category(name: "bar")
       @override.set = @category.groups.create
       @override.workflow_state = 'deleted'
       @override.should be_valid
@@ -257,7 +257,7 @@ describe AssignmentOverride do
     end
 
     it "should default title to the name of the group" do
-      @assignment.group_category = @course.group_categories.create!
+      @assignment.group_category = group_category
       @group = @assignment.group_category.groups.create!
       @group.name = 'Group Test Value'
       @override.set = @group
@@ -456,7 +456,7 @@ describe AssignmentOverride do
 
     context "group overrides" do
       before :each do
-        @assignment.group_category = @course.group_categories.create!
+        @assignment.group_category = group_category
         @assignment.save!
 
         @group = @assignment.group_category.groups.create!(:context => @course)

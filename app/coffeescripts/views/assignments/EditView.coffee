@@ -35,11 +35,12 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly) ->
     SUBMISSION_TYPE = '[name="submission_type"]'
     ONLINE_SUBMISSION_TYPES = '#assignment_online_submission_types'
     NAME = '[name="name"]'
-    ALLOW_FILE_UPLOADS = '[name="online_submission_types[online_upload]"]'
-    RESTRICT_FILE_UPLOADS = '#restrict_file_extensions_container'
+    ALLOW_FILE_UPLOADS = '#assignment_online_upload'
+    RESTRICT_FILE_UPLOADS = '#assignment_restrict_file_extensions'
+    RESTRICT_FILE_UPLOADS_OPTIONS = '#restrict_file_extensions_container'
     ALLOWED_EXTENSIONS = '#allowed_extensions_container'
     ADVANCED_ASSIGNMENT_OPTIONS = '#advanced_assignment_options'
-    TURNITIN_ENABLED = '[name="turnitin_enabled"]'
+    TURNITIN_ENABLED = '#assignment_turnitin_enabled'
     ADVANCED_TURNITIN_SETTINGS = '#advanced_turnitin_settings_link'
     ASSIGNMENT_TOGGLE_ADVANCED_OPTIONS = '#assignment_toggle_advanced_options'
     GRADING_TYPE_SELECTOR = '#grading_type_selector'
@@ -61,6 +62,7 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly) ->
       els["#{NAME}"] = '$name'
       els["#{ALLOW_FILE_UPLOADS}"] = '$allowFileUploads'
       els["#{RESTRICT_FILE_UPLOADS}"] = '$restrictFileUploads'
+      els["#{RESTRICT_FILE_UPLOADS_OPTIONS}"] = '$restrictFileUploadsOptions'
       els["#{ALLOWED_EXTENSIONS}"] = '$allowedExtensions'
       els["#{ADVANCED_ASSIGNMENT_OPTIONS}"] = '$advancedAssignmentOptions'
       els["#{TURNITIN_ENABLED}"] = '$turnitinEnabled'
@@ -142,14 +144,14 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly) ->
           @$externalToolsNewTab.prop('checked', data['item[new_tab]'] == '1')
 
     toggleRestrictFileUploads: =>
-      @$restrictFileUploads.toggleAccessibly @$allowFileUploads.prop('checked')
+      @$restrictFileUploadsOptions.toggleAccessibly @$allowFileUploads.prop('checked')
 
     toggleAdvancedTurnitinSettings: (ev) =>
       ev.preventDefault()
       @$advancedTurnitinSettings.toggleAccessibly @$turnitinEnabled.prop('checked')
 
     handleRestrictFileUploadsChange: =>
-      @$allowedExtensions.toggleAccessibly @$restrictFileUploads.find('input').prop('checked')
+      @$allowedExtensions.toggleAccessibly @$restrictFileUploads.prop('checked')
 
     handleGradingTypeChange: (gradingType) =>
       @$gradedAssignmentFields.toggleAccessibly gradingType != 'not_graded'
@@ -169,9 +171,11 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly) ->
       this
 
     toJSON: =>
-      _.extend @assignment.toView(),
+      data = @assignment.toView()
+      _.extend data,
         kalturaEnabled: ENV?.KALTURA_ENABLED || false
         isLargeRoster: ENV?.IS_LARGE_ROSTER || false
+        submissionTypesFrozen: _.include(data.frozenAttributes, 'submission_types')
 
     _attachEditorToDescription: =>
       @$description.editorBox()
@@ -229,7 +233,7 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly) ->
         assignmentData.submission_types = ['not_graded']
       else if assignmentData.submission_type == 'online'
         types = _.select _.keys(assignmentData.online_submission_types), (k) ->
-          assignmentData.online_submission_types[k]
+          assignmentData.online_submission_types[k] is '1'
         assignmentData.submission_types = types
       else
         assignmentData.submission_types = [assignmentData.submission_type]
@@ -240,7 +244,7 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly) ->
     _filterAllowedExtensions: (data) =>
       restrictFileExtensions = data.restrict_file_extensions
       delete data.restrict_file_extensions
-      if restrictFileExtensions
+      if restrictFileExtensions is '1'
         data.allowed_extensions = _.select data.allowed_extensions.split(","), (ext) ->
           $.trim(ext.toString()).length > 0
       else

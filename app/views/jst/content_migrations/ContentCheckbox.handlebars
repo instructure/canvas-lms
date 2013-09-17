@@ -5,10 +5,11 @@
   <label class="checkbox">
     <i class="{{iconClass}}"></i>
     <input type="checkbox" name="{{property}}" id="checkbox-{{cid}}" {{#if checked}}checked{{/if}}/> <span data-bind="title">{{title}}</span> {{#if count}}<span data-bind="count">({{count}})</span>{{/if}}
+     {{#if linkedMessage}}<span data-bind="linkedMessage">({{linkedMessage}})</span>{{/if}}
   </label>
 {{/if}}
 {{#if showHide}}<div style="margin-left:20px" class="showHide {{#if checked}}hide{{/if}}"><a href="#" id="selectAll-{{cid}}">{{#t 'select_all'}}Select All{{/t}}</a> | <a href="#" id="selectNone-{{cid}}">{{#t 'select_non'}}Select None{{/t}}</a></div>{{/if}}
 
 {{#if hasSubCheckboxes }}
-  <ul data-content="sublevelCheckboxes"><ul>
+  <ul data-content="sublevelCheckboxes"></ul>
 {{/if}}

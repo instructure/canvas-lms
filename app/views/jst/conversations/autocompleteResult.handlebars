@@ -1,0 +1,29 @@
+{{#if noResults}}
+  <span class="no-result text-center">
+    {{#t "no_results"}}No results{{/t}}
+  </span>
+{{else}}
+  {{#if isContext}}
+    <b class="result-name">{{name}}</b>
+  {{else}}
+    {{#if everyone}}
+      <b class="result-name">{{name}}</b>
+    {{else}}
+      <span class="result-name">{{name}}</span>
+    {{/if}}
+  {{/if}}
+{{/if}}
+
+<div class="pull-right">
+  {{#if isContext}}
+    {{#if back}}
+      <i class="icon-mini-arrow-left"></i>
+    {{else}}
+      <i class="icon-mini-arrow-right"></i>
+    {{/if}}
+  {{/if}}
+
+  {{#if people}}
+    {{#t "group_people"}}People: {{people}}{{/t}}
+  {{/if}}
+</div>

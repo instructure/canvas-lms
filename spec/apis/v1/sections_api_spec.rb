@@ -59,6 +59,33 @@ describe SectionsController, :type => :integration do
                       { :controller => 'sections', :action => 'index', :course_id => @course2.to_param, :format => 'json' }, { :include => ['students'] })
       json.size.should == 1
     end
+
+    it "should return sections but not students if user has :read but not :read_roster, :view_all_grades, or :manage_grades" do
+      RoleOverride.create!(:context => Account.default, :permission => 'read_roster', :enrollment_type => 'TaEnrollment', :enabled => false)
+      RoleOverride.create!(:context => Account.default, :permission => 'view_all_grades', :enrollment_type => 'TaEnrollment', :enabled => false)
+      RoleOverride.create!(:context => Account.default, :permission => 'manage_grades', :enrollment_type => 'TaEnrollment', :enabled => false)
+      enrollment = course_with_ta(:active_all => true)
+      enrollment.update_attribute(:limit_privileges_to_course_section, true)
+
+      @course.grants_right?(@ta, :read).should be_true
+      @course.grants_right?(@ta, :read_roster).should be_false
+      @course.grants_right?(@ta, :view_all_grades).should be_false
+      @course.grants_right?(@ta, :manage_grades).should be_false
+
+      route_params = {
+        :controller => 'sections',
+        :action => 'index',
+        :course_id => @course.to_param,
+        :format => 'json'
+      }
+      json = api_call(:get,
+                      "/api/v1/courses/#{@course.id}/sections.json",
+                      route_params,
+                      { :include => ['students'] })
+
+      json.first["name"].should == @course.default_section.name
+      json.first.keys.include?("students").should be_false
+    end
   end
 
   describe "#show" do

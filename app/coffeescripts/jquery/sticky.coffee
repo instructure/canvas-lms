@@ -17,6 +17,11 @@ define ['underscore', 'jquery'], (_, $) ->
       @instances.push instance
       @checkInstances()
 
+    @removeInstance: (instance) ->
+      @initialize() unless @initialized
+      @instances = _.reject @instances, (i) -> i == instance
+      @checkInstances()
+
     @checkInstances: =>
       containerTop = @$container.scrollTop()
       for instance in @instances
@@ -39,10 +44,13 @@ define ['underscore', 'jquery'], (_, $) ->
       @$el.removeClass 'sticky'
       @stuck = false
 
+    remove: ->
+      @unstick()
+      @constructor.removeInstance this
+
   $.fn.sticky = ->
     @each -> new Sticky $ this
 
   $ -> $('[data-sticky]').sticky()
 
   Sticky
-

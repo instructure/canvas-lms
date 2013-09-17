@@ -279,7 +279,8 @@ class NotificationMessageCreator
   
   def cancel_pending_duplicate_messages
     # doesn't include dashboard messages. should it?
-    @notification.messages.for(@asset).
+    Message.where(:notification_id => @notification).
+      for(@asset).
       by_name(@notification.name).
       for_user(@to_users + @to_channels).
       cancellable.

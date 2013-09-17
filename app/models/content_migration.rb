@@ -28,7 +28,6 @@ class ContentMigration < ActiveRecord::Base
   has_one :content_export
   has_many :migration_issues
   has_one :job_progress, :class_name => 'Progress', :as => :context
-  has_a_broadcast_policy
   serialize :migration_settings
   before_save :infer_defaults
   cattr_accessor :export_file_path
@@ -68,26 +67,6 @@ class ContentMigration < ActiveRecord::Base
     state :importing
     state :imported
     state :failed
-  end
-
-  set_broadcast_policy do |p|
-    p.dispatch :migration_export_ready
-    p.to { [user] }
-    p.whenever {|record|
-      record.changed_state(:exported) && !record.migration_settings[:skip_import_notification]
-    }
-
-    p.dispatch :migration_import_finished
-    p.to { [user] }
-    p.whenever {|record|
-      record.changed_state(:imported) && !record.migration_settings[:skip_import_notification]
-    }
-
-    p.dispatch :migration_import_failed
-    p.to { [user] }
-    p.whenever {|record|
-      record.changed_state(:failed) && !record.migration_settings[:skip_import_notification]
-    }
   end
   
   def self.migration_plugins(exclude_hidden=false)
@@ -144,6 +123,10 @@ class ContentMigration < ActiveRecord::Base
 
   def strand
     migration_settings[:strand]
+  end
+
+  def n_strand
+    ["migrations:import_content", self.root_account.try(:global_id) || "global"]
   end
   
   def migration_ids_to_import=(val)
@@ -314,6 +297,7 @@ class ContentMigration < ActiveRecord::Base
   def file_upload_success_callback(att)
     if att.file_state == "available"
       self.attachment = att
+      self.migration_issues.delete_all if self.migration_issues.any?
       self.workflow_state = :pre_processed
       self.save
       self.queue_migration
@@ -344,17 +328,25 @@ class ContentMigration < ActiveRecord::Base
     check_quiz_id_prepender
     plugin = Canvas::Plugin.find(migration_type)
     if plugin
+      queue_opts = {:priority => Delayed::LOW_PRIORITY, :max_attempts => 1}
+      if self.strand
+        queue_opts[:strand] = self.strand
+      else
+        queue_opts[:n_strand] = self.n_strand
+      end
+
       if self.workflow_state == 'exported' && !plugin.settings[:skip_conversion_step]
         # it's ready to be imported
         self.workflow_state = :importing
         self.save
-        import_content
+        self.send_later_enqueue_args(:import_content, queue_opts)
       else
         # find worker and queue for conversion
         begin
           if Canvas::Migration::Worker.const_defined?(plugin.settings['worker'])
             self.workflow_state = :exporting
-            job = Canvas::Migration::Worker.const_get(plugin.settings['worker']).enqueue(self)
+            worker_class = Canvas::Migration::Worker.const_get(plugin.settings['worker'])
+            job = Delayed::Job.enqueue(worker_class.new(self.id), queue_opts)
             self.save
             job
           else
@@ -401,7 +393,7 @@ class ContentMigration < ActiveRecord::Base
 
     return true if is_set?(to_import("all_#{asset_type}"))
 
-    return false unless to_import(asset_type)
+    return false unless to_import(asset_type).present?
 
     is_set?(to_import(asset_type)[mig_id])
   end
@@ -450,7 +442,7 @@ class ContentMigration < ActiveRecord::Base
       clear_migration_data
     end
   end
-  handle_asynchronously :import_content, :priority => Delayed::LOW_PRIORITY, :max_attempts => 1
+  alias_method :import_content_without_send_later, :import_content
 
   def prepare_data(data)
     data = data.with_indifferent_access if data.is_a? Hash
@@ -482,12 +474,6 @@ class ContentMigration < ActiveRecord::Base
     self.migration_settings[:date_shift_options]
   end
 
-  def copy_course
-    worker = Canvas::Migration::Worker::CourseCopyWorker.new
-    worker.perform(self)
-  end
-  handle_asynchronously :copy_course, :priority => Delayed::LOW_PRIORITY, :max_attempts => 1
-  
   scope :for_context, lambda { |context| where(:context_id => context, :context_type => context.class.to_s) }
 
   scope :successful, where(:workflow_state => 'imported')
@@ -602,4 +588,30 @@ class ContentMigration < ActiveRecord::Base
     Canvas::Migration::Helpers::SelectiveContentFormatter.new(self, base_url).get_content_list(type)
   end
 
+  UPLOAD_TIMEOUT = 1.hour
+  def check_for_pre_processing_timeout
+    if self.pre_processing? && (self.updated_at.utc + UPLOAD_TIMEOUT) < Time.now.utc
+      add_error(t(:upload_timeout_error, "The file upload process timed out."))
+      self.workflow_state = :failed
+      job_progress.fail if job_progress && !skip_job_progress
+      self.save
+    end
+  end
+
+  # strips out the "id_" prepending the migration ids in the form
+  def self.process_copy_params(hash)
+    return {} if hash.blank? || !hash.is_a?(Hash)
+    hash.values.each do |sub_hash|
+      next unless sub_hash.is_a?(Hash) # e.g. second level in :copy => {:context_modules => {:id_100 => true, etc}}
+
+      clean_hash = {}
+      sub_hash.keys.each do |k|
+        if k.is_a?(String) && k.start_with?("id_")
+          clean_hash[k.sub("id_", "")] = sub_hash.delete(k)
+        end
+      end
+      sub_hash.merge!(clean_hash)
+    end
+    hash
+  end
 end

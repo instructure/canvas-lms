@@ -39,6 +39,15 @@ else
   config.logger = RAILS_DEFAULT_LOGGER = CanvasLogger.new(log_path, log_level, opts)
 end
 
+# RailsLTS configuration (doesn't apply to rails 3)
+if Rails.version < "3.0"
+  config.rails_lts_options = {
+    disable_xml_parsing: true,
+    # this is also taken care of below, since it defaults to false in rails3 as well
+    escape_html_entities_in_json: true,
+  }
+end
+
 # Activate observers that should always be running
 config.active_record.observers = [:cacher, :stream_item_cache]
 
@@ -51,14 +60,17 @@ if Rails.version < "3.0"
   config.middleware.insert_after(ActionController::Base.session_store, 'SessionsTimeout')
   config.middleware.insert_before('ActionController::ParamsParser', 'LoadAccount')
   config.middleware.insert_before('ActionController::ParamsParser', 'StatsTiming')
+  config.middleware.insert_before('ActionController::ParamsParser', 'Canvas::RequestThrottle')
   config.middleware.insert_before('ActionController::ParamsParser', 'PreventNonMultipartParse')
   config.middleware.insert_before('ActionController::ParamsParser', "RequestContextGenerator")
 else
   config.middleware.insert_before('ActionDispatch::ParamsParser', 'LoadAccount')
   config.middleware.insert_before('ActionDispatch::ParamsParser', 'StatsTiming')
+  config.middleware.insert_before('ActionDispatch::ParamsParser', 'Canvas::RequestThrottle')
   config.middleware.insert_before('ActionDispatch::ParamsParser', 'PreventNonMultipartParse')
   config.middleware.insert_before('ActionDispatch::ParamsParser', "RequestContextGenerator")
 end
+
 config.to_prepare do
   require_dependency 'canvas/plugins/default_plugins'
   ActiveSupport::JSON::Encoding.escape_html_entities_in_json = true
@@ -138,5 +150,15 @@ if defined?(PhusionPassenger)
       # We're in smart spawning mode, and need to make unique connections for this fork.
       Canvas.reconnect_redis
     end
+  end
+end
+
+if defined?(PhusionPassenger)
+ PhusionPassenger.on_event(:after_installing_signal_handlers) do
+  Canvas::Reloader.trap_signal
+ end
+else
+  config.to_prepare do
+    Canvas::Reloader.trap_signal
   end
 end

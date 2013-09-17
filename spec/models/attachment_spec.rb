@@ -365,6 +365,14 @@ describe Attachment do
   end
 
   context "scribd cleanup" do
+    before do
+      ScribdAPI.stubs(:enabled?).returns(true)
+    end
+
+    after do
+      ScribdAPI.unstub(:enabled?)
+    end
+
     def fake_scribd_doc(doc_id = String.random(8))
       scribd_doc = Scribd::Document.new
       scribd_doc.doc_id = doc_id
@@ -461,6 +469,67 @@ describe Attachment do
         @child.read_attribute(:scribd_doc).should be_nil
       end
     end
+
+    describe "check_rerender_scribd_doc" do
+      before do
+        scribd_mime_type_model(:extension => 'docx')
+      end
+
+      it "should resubmit a deleted scribd doc" do
+        @attachment = attachment_with_scribd_doc(fake_scribd_doc, :filename => 'file.docx', :scribd_attempts => 3)
+        @attachment.scribd_doc.expects(:destroy).once.returns(true)
+        @attachment.delete_scribd_doc
+        expect {
+          @attachment.check_rerender_scribd_doc
+        }.to change(Delayed::Job, :count).by(1)
+        Delayed::Job.find_by_tag('Attachment#submit_to_scribd!').should_not be_nil
+        @attachment.should be_pending_upload
+        @attachment.scribd_attempts.should == 0
+      end
+
+      it "should not queue up duplicate render requests for the same document" do
+        @attachment = attachment_model(:filename => 'file.docx', :workflow_state => 'deleted')
+        expect { @attachment.check_rerender_scribd_doc }.to change(Delayed::Job, :count).by(1)
+        expect { @attachment.check_rerender_scribd_doc }.to change(Delayed::Job, :count).by(0)
+      end
+
+      it "should do nothing if a scribd_doc already exists" do
+        @attachment = attachment_with_scribd_doc(fake_scribd_doc, :filename => 'file.docx')
+        expect {
+          @attachment.check_rerender_scribd_doc
+        }.to change(Delayed::Job, :count).by(0)
+      end
+
+      it "should be invoked on record_inline_view" do
+        @attachment = attachment_model(:filename => 'file.docx', :workflow_state => 'deleted')
+        expect {
+          @attachment.record_inline_view
+        }.to change(Delayed::Job, :count).by(1)
+      end
+
+      it "should do nothing on non-scribdable types" do
+        @attachment = attachment_model(:filename => 'file.lolcats')
+        expect {
+          @attachment.check_rerender_scribd_doc
+        }.to change(Delayed::Job, :count).by(0)
+      end
+    end
+
+    describe "scribd_render_url" do
+      before do
+        scribd_mime_type_model(:extension => 'docx')
+      end
+
+      it "should return a url to request scribd rerendering" do
+        @attachment = attachment_model(:filename => 'file.docx', :workflow_state => 'deleted')
+        @attachment.scribd_render_url.should == "/#{@attachment.context_url_prefix}/files/#{@attachment.id}/scribd_render"
+      end
+
+      it "should return nil if the scribd doc isn't missing" do
+        @attachment = attachment_with_scribd_doc
+        @attachment.scribd_render_url.should be_nil
+      end
+    end
   end
 
   context "conversion_status" do
@@ -468,6 +537,7 @@ describe Attachment do
       ScribdAPI.stubs(:get_status).returns(:status_from_scribd)
       ScribdAPI.stubs(:set_user).returns(true)
       ScribdAPI.stubs(:upload).returns(Scribd::Document.new)
+      ScribdAPI.stubs(:enabled?).returns(true)
     end
 
     it "should have a default conversion_status of :not_submitted for attachments that haven't been submitted" do
@@ -526,6 +596,30 @@ describe Attachment do
       Attachment.uploadable.size.should eql(2)
       Attachment.uploadable.should be_include(Attachment.find(attachments[1].id))
       Attachment.uploadable.should be_include(Attachment.find(attachments[2].id))
+    end
+
+    context "by_content_types" do
+      before do
+        course_model
+        @gif = attachment_model :context => @course, :content_type => 'image/gif'
+        @jpg = attachment_model :context => @course, :content_type => 'image/jpeg'
+        @weird = attachment_model :context => @course, :content_type => "%/what's this"
+      end
+
+      it "should match type" do
+        @course.attachments.by_content_types(['image']).pluck(:id).sort.should == [@gif.id, @jpg.id].sort
+      end
+
+      it "should match type/subtype" do
+        @course.attachments.by_content_types(['image/gif']).pluck(:id).should == [@gif.id]
+        @course.attachments.by_content_types(['image/gif', 'image/jpeg']).pluck(:id).sort.should == [@gif.id, @jpg.id].sort
+      end
+
+      it "should escape sql and wildcards" do
+        @course.attachments.by_content_types(['%']).pluck(:id).should == [@weird.id]
+        @course.attachments.by_content_types(["%/what's this"]).pluck(:id).should == [@weird.id]
+        @course.attachments.by_content_types(["%/%"]).pluck(:id).should == []
+      end
     end
   end
 
@@ -625,6 +719,21 @@ describe Attachment do
       @attachment.workflow_state = nil
       @attachment.file_state = 'available'
       @attachment.save!
+    end
+    
+    it "should disassociate but not delete the associated media object" do
+      @attachment.media_entry_id = '0_feedbeef'
+      @attachment.save!
+      
+      media_object = @course.media_objects.build :media_id => '0_feedbeef'
+      media_object.attachment_id = @attachment.id
+      media_object.save!
+      
+      @attachment.destroy
+      
+      media_object.reload
+      media_object.should_not be_deleted
+      media_object.attachment_id.should be_nil
     end
   end
 
@@ -1284,6 +1393,17 @@ describe Attachment do
       Message.find_by_user_id_and_notification_name(@student.id, 'New File Added').should be_nil
       Message.find_by_user_id_and_notification_name(@teacher.id, 'New File Added').should_not be_nil
     end
+
+    it "should not fail if the attachment context does not have participants" do
+      cm = ContentMigration.create!
+      attachment_model(:context => cm, :uploaded_data => stub_file_data('file.txt', nil, 'text/html'), :content_type => 'text/html')
+
+      Attachment.where(:id => @attachment).update_all(:need_notify => true)
+
+      new_time = Time.now + 10.minutes
+      Time.stubs(:now).returns(new_time)
+      Attachment.do_notifications
+    end
   end
 
   context "quota" do
@@ -1326,12 +1446,3 @@ def processing_model
   @attachment.submit_to_scribd!
 end
 
-# Makes sure we have a value in scribd_mime_types and that the attachment model points to that.
-def scribdable_attachment_model
-  scribd_mime_type_model(:extension => 'pdf')
-  attachment_model(:content_type => 'application/pdf')
-end
-
-def crocodocable_attachment_model
-  attachment_model(:content_type => 'application/pdf')
-end

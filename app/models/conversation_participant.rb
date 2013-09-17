@@ -171,6 +171,8 @@ class ConversationParticipant < ActiveRecord::Base
   cacheable_method :conversation
 
   delegate :private?, :to => :conversation
+  delegate :context_name, :to => :conversation
+  delegate :context_components, :to => :conversation
 
   before_update :update_unread_count_for_update
   before_destroy :update_unread_count_for_destroy
@@ -182,9 +184,11 @@ class ConversationParticipant < ActiveRecord::Base
   def as_json(options = {})
     latest = last_message
     latest_authored = last_authored_message
+    subject = self.conversation.subject
     options[:include_context_info] ||= private?
     {
       :id => conversation_id,
+      :subject => subject,
       :workflow_state => workflow_state,
       :last_message => latest ? truncate_text(latest.body, :max_length => 100) : nil,
       :last_message_at => last_message_at,
@@ -198,7 +202,7 @@ class ConversationParticipant < ActiveRecord::Base
     }.with_indifferent_access
   end
 
-  def messages
+  def all_messages
     self.conversation.shard.activate do
       if self.conversation.shard == self.shard
         # use a slightly more forgiving backcompat query (since the migration may not have
@@ -216,6 +220,10 @@ class ConversationParticipant < ActiveRecord::Base
           order("created_at DESC, id DESC")
       end
     end
+  end
+
+  def messages
+    all_messages.where("(workflow_state <> ? OR workflow_state IS NULL)", 'deleted')
   end
 
   def participants(options = {})
@@ -261,18 +269,60 @@ class ConversationParticipant < ActiveRecord::Base
     conversation.add_message(user, body_or_obj, options.merge(:generated => false))
   end
 
+  # Public: soft deletes the message participants for this conversation
+  # participant for the specified messages. May pass :all to soft delete all
+  # message participants.
+  #
+  # to_delete - the list of messages to the delete
+  #
+  # Returns nothing.
   def remove_messages(*to_delete)
+    remove_or_delete_messages(:remove, *to_delete)
+  end
+
+  # Public: hard deletes the message participants for this conversation
+  # participant for the specified messages. May pass :all to hard delete all
+  # message participants.
+  #
+  # to_delete - the list of messages to the delete
+  #
+  # Returns nothing.
+  def delete_messages(*to_delete)
+    remove_or_delete_messages(:delete, *to_delete)
+  end
+
+  # Internal: soft or hard delete message participants, based on the indicated
+  # operation. Used by remove_messages and delete_messages methods.
+  #
+  # operation - The operation to perform.
+  #             :remove - Only set the workflow state on the message
+  #             participants.
+  #             :delete to delete the message participants from the database.
+  # to_delete - The list of conversation_messages to operate on. This function
+  #             only affects the conversation_message_participants for this
+  #             participant.
+  #
+  # Returns nothing.
+  def remove_or_delete_messages(operation, *to_delete)
     self.conversation.shard.activate do
       scope = ConversationMessageParticipant.joins(:conversation_message).
           where(:conversation_messages => { :conversation_id => self.conversation_id },
                           :user_id => self.user_id)
       if to_delete == [:all]
-        scope.delete_all
+        if operation == :delete
+          scope.delete_all
+        else
+          scope.update_all(:workflow_state => 'deleted')
+        end
       else
-        scope.where(:conversation_message_id => to_delete).delete_all
+        if operation == :delete
+          scope.where(:conversation_message_id => to_delete).delete_all
+        else
+          scope.where(:conversation_message_id => to_delete).update_all(:workflow_state => 'deleted')
+        end
         # if the only messages left are generated ones, e.g. "added
         # bob to the conversation", delete those too
-        return remove_messages(:all) unless messages.where(:generated => false).exists?
+        return remove_or_delete_messages(operation, :all) unless messages.where(:generated => false).exists?
       end
     end
     unless @destroyed
@@ -444,7 +494,7 @@ class ConversationParticipant < ActiveRecord::Base
   def self.conversation_ids
     raise "conversation_ids needs to be scoped to a user" unless scope(:find, :conditions) =~ /user_id = \d+/
     order = 'last_message_at DESC' unless scoped?(:find, :order)
-    self.order(order).except(:includes).select(:conversation_id).map(&:conversation_id)
+    self.order(order).pluck(:conversation_id)
   end
 
   def self.users_by_conversation_shard(user_ids)
@@ -511,7 +561,7 @@ class ConversationParticipant < ActiveRecord::Base
 
   def destroy_conversation_message_participants
     @destroyed = true
-    remove_messages(:all) if self.conversation_id
+    delete_messages(:all) if self.conversation_id
   end
 
   def update_unread_count(direction=:up, user_id=self.user_id)

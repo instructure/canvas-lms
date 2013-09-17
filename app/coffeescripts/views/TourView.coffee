@@ -1,6 +1,7 @@
 define [
   'vendor/usher/usher'
   'Backbone'
+  'jquery.ajaxJSON'
 ], (Usher, Backbone, template) ->
 
   ##
@@ -15,15 +16,37 @@ define [
 
   class TourView extends Backbone.View
 
+    events:
+      'click .usher-close': 'dismissSession'
+      'click .dismiss-tour': 'dismissForever'
+
+    @optionProperty 'name'
+
     initialize: ->
       @render()
       @$el.appendTo $(document.body)
       @tour = new Usher @$el
-      @attach()
+      super
 
     start: =>
       @tour.start()
 
     attach: ->
       setTimeout @start, 2000
+
+    dismissSession: ->
+      $.ajaxJSON "/tours/dismiss/session/#{@name}", 'DELETE'
+
+    dismissForever: ->
+      $.ajaxJSON "/tours/dismiss/#{@name}", 'DELETE'
+      @tour.close()
+
+    ##
+    # Use this when you have no hook to something being rendered
+    onElementRendered: (selector, cb, _attempts) ->
+      el = $(selector)
+      _attempts = ++_attempts or 1
+      return cb(el) if el.length
+      return if _attempts is 60
+      setTimeout (=> @onElementRendered(selector, cb, _attempts)), 250
 

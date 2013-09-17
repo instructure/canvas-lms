@@ -123,7 +123,7 @@
     <a href="<%= context_url(@context, :context_assignment_url, "{{ id }}") %>" style="display: none;" class="default_grade_url">&nbsp;</a>
   <% end %>
   <% form_tag ".", {:id => "re_upload_submissions_form", :multipart => true, :style => "display: none;"} do %>
-    <a href="<%= context_url(@context, :context_gradebook_submissions_upload_url, "{{ assignment_id }}") %>" class="re_upload_submissions_url" style="display: none;">&nbsp;</a>
+    <a href="<%= context_url(@context, :submissions_upload_context_gradebook_url, "{{ assignment_id }}") %>" class="re_upload_submissions_url" style="display: none;">&nbsp;</a>
     <p style="font-size: 0.8em;"><%= t(:upload_info, <<-DETAILS)
       If you made changes to the student submission files you downloaded
       before, just zip them back up and upload the zip with the form below.

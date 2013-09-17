@@ -30,3 +30,9 @@ ko:
   locales:
     ko: 한국말 (crowd-sourced)
   crowdsourced: true
+en-GB:
+  locales:
+    en-GB: English (United Kingdom)
+en-AU:
+  locales:
+    en-AU: English (Australia)

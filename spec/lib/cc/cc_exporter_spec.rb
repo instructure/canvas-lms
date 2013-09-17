@@ -108,7 +108,8 @@ describe "Common Cartridge exporting" do
 
       # only select one of each type
       @ce.selected_content = {
-              :discussion_topics => {mig_id(@dt1) => "1", mig_id(@dt3) => "1"},
+              :discussion_topics => {mig_id(@dt1) => "1"},
+              :announcements => {mig_id(@dt3) => "1"},
               :context_external_tools => {mig_id(@et) => "1"},
               :quizzes => {mig_id(@q1) => "1"},
               :learning_outcomes => {mig_id(@lo) => "1"},

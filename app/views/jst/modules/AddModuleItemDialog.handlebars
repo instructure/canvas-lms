@@ -1,0 +1,12 @@
+<div class="control-group">
+  <label class="control-label">{{#t "item_type"}}Type:{{/t}}</label>
+  <div class="controls">
+    <select name="module_item[type]">
+      {{#each moduleItemTypes}}
+      <option value="{{type}}">{{ label }}</option>
+      {{/each}}
+    </select>
+  </div>
+</div>
+
+<div id="moduleItemOptionsContainer"></div>

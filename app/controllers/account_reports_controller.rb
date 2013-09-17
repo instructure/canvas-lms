@@ -154,7 +154,7 @@ class AccountReportsController < ApplicationController
 
 # @API Status of a Report
 # Returns the status of a report.
-# @argument [report_id] The report id.
+# @argument report_id [Integer] The report id.
 #
 # @example_request
 #     curl -H 'Authorization: Bearer <token>' \ 

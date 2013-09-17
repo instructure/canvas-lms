@@ -470,5 +470,188 @@ describe "assignments" do
         fj("#assignment_#{@asmnt.id} .delete_assignment_link").should be_nil
       end
     end
+
+    context "draft state" do
+      before do
+        @course.root_account.tap{ |a| a.settings[:enable_draft] = true }.save!
+        @course.require_assignment_group
+      end
+
+      it "should go to the new assignment page from 'Add Assignment'" do
+        get "/courses/#{@course.id}/assignments"
+        wait_for_ajaximations
+
+        expect_new_page_load { f('.new_assignment').click }
+        wait_for_ajaximations
+
+        f('#edit_assignment_form').should be_present
+      end
+
+      it "should allow quick-adding an assignment to a group" do
+        ag = @course.assignment_groups.first
+
+        get "/courses/#{@course.id}/assignments"
+        wait_for_ajaximations
+
+        f("#assignment_group_#{ag.id} .add_assignment").click
+        wait_for_ajaximations
+
+        replace_content(f("#ag_#{ag.id}_assignment_name"), "Do this")
+        replace_content(f("#ag_#{ag.id}_assignment_points"), "13")
+        fj('.create_assignment:visible').click
+        wait_for_ajaximations
+
+        a = ag.reload.assignments.first
+        a.name.should == "Do this"
+        a.points_possible.should == 13
+
+        f("#assignment_group_#{ag.id} .ig-title").text.should match "Do this"
+      end
+
+      it "should allow quick-adding two assignments to a group (dealing with form re-render)" do
+        ag = @course.assignment_groups.first
+
+        get "/courses/#{@course.id}/assignments"
+        wait_for_ajaximations
+
+        f("#assignment_group_#{ag.id} .add_assignment").click
+        wait_for_ajaximations
+
+        replace_content(f("#ag_#{ag.id}_assignment_name"), "Do this")
+        replace_content(f("#ag_#{ag.id}_assignment_points"), "13")
+        fj('.create_assignment:visible').click
+        wait_for_ajaximations
+
+        keep_trying_until do
+          fj("#assignment_group_#{ag.id} .add_assignment").click
+          wait_for_ajaximations
+          fj("#ag_#{ag.id}_assignment_name").displayed?
+        end
+
+        get_value("#ag_#{ag.id}_assignment_name").should == ""
+        get_value("#ag_#{ag.id}_assignment_points").should == ""
+
+        replace_content(fj("#ag_#{ag.id}_assignment_name"), "Another")
+        replace_content(fj("#ag_#{ag.id}_assignment_points"), "3")
+        fj('.create_assignment:visible').click
+        wait_for_ajaximations
+
+        ag.reload.assignments.count.should == 2
+      end
+
+      it "should remember entered settings when 'more options' is pressed" do
+        ag = @course.assignment_groups.first
+
+        get "/courses/#{@course.id}/assignments"
+        wait_for_ajaximations
+
+        f("#assignment_group_#{ag.id} .add_assignment").click
+        wait_for_ajaximations
+
+        replace_content(f("#ag_#{ag.id}_assignment_name"), "Do this")
+        replace_content(f("#ag_#{ag.id}_assignment_points"), "13")
+        expect_new_page_load { fj('.more_options:visible').click }
+
+        get_value("#assignment_name").should == "Do this"
+        get_value("#assignment_points_possible").should == "13"
+      end
+
+      it "should delete assignments" do
+        ag = @course.assignment_groups.first
+        as = @course.assignments.create({:assignment_group => ag})
+
+        get "/courses/#{@course.id}/assignments"
+        wait_for_ajaximations
+
+        f("#assignment_#{as.id} .al-trigger").click
+        wait_for_animations
+        f("#assignment_#{as.id} .delete_assignment").click
+
+        accept_alert
+        wait_for_ajaximations
+        element_exists("#assignment_#{as.id}").should be_false
+
+        as.reload
+        as.workflow_state.should == 'deleted'
+      end
+
+      context 'publishing' do
+        before do
+          ag = @course.assignment_groups.first
+          @assignment = ag.assignments.create! :context => @course, :title => 'to publish'
+          @assignment.unpublish
+        end
+
+        it "should allow publishing from the index page" do
+          get "/courses/#{@course.id}/assignments"
+          wait_for_ajaximations
+
+          f("#assignment_#{@assignment.id} .publish-icon").click
+          wait_for_ajaximations
+
+          @assignment.reload.should be_published
+          f("#assignment_#{@assignment.id} .publish-icon").text.should match "Published"
+        end
+
+        it "should allow publishing from the show page" do
+          get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+          wait_for_ajaximations
+
+          f("#assignment_publish_button").click
+          wait_for_ajaximations
+
+          @assignment.reload.should be_published
+          f("#assignment_publish_button").text.should match "Published"
+        end
+
+        it "should show publishing status on the edit page" do
+          get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
+          wait_for_ajaximations
+
+          f("#edit_assignment_header").text.should match "Not Published"
+        end
+
+        context 'with overrides' do
+          before do
+            @course.course_sections.create! :name => "HI"
+            @assignment.assignment_overrides.create! { |override|
+              override.set = @course.course_sections.first
+              override.due_at = 1.day.ago
+              override.due_at_overridden = true
+            }
+          end
+
+          it "should not overwrite overrides if published twice from the index page" do
+            get "/courses/#{@course.id}/assignments"
+            wait_for_ajaximations
+
+            f("#assignment_#{@assignment.id} .publish-icon").click
+            wait_for_ajaximations
+            @assignment.reload.should be_published
+
+            f("#assignment_#{@assignment.id} .publish-icon").click
+            wait_for_ajaximations
+            @assignment.reload.should_not be_published
+
+            @assignment.reload.active_assignment_overrides.count.should == 1
+          end
+
+          it "should not overwrite overrides if published twice from the show page" do
+            get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+            wait_for_ajaximations
+
+            f("#assignment_publish_button").click
+            wait_for_ajaximations
+            @assignment.reload.should be_published
+
+            f("#assignment_publish_button").click
+            wait_for_ajaximations
+            @assignment.reload.should_not be_published
+
+            @assignment.reload.active_assignment_overrides.count.should == 1
+          end
+        end
+      end
+    end
   end
 end

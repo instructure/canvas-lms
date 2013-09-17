@@ -316,6 +316,11 @@ define([
         url = $.replaceTags(url, 'id', id);
         return url;
       },
+      scribdRenderUrl: function(context_string, id) {
+          var url = $("#file_context_links ." + context_string + "_scribd_render_url").attr('href');
+          url = $.replaceTags(url, 'id', id);
+          return url;
+      },
       selectFolder: function($original_node) {
         if(!files.selectFolder.forceRefresh && ($original_node.hasClass('active-node') || $original_node.hasClass('active-leaf'))) { return; }
         files.selectFolder.forceRefresh = false;
@@ -1579,7 +1584,9 @@ define([
                       crocodoc_session_url: data.crocodocSession,
                       scribd_doc_id: data.scribd_doc && data.scribd_doc.attributes && data.scribd_doc.attributes.doc_id,
                       scribd_access_key: data.scribd_doc && data.scribd_doc.attributes && data.scribd_doc.attributes.access_key,
-                      attachment_view_inline_ping_url: files.viewInlinePingUrl(data.context_string, data.id)
+                      attachment_view_inline_ping_url: files.viewInlinePingUrl(data.context_string, data.id),
+                      attachment_scribd_render_url: files.scribdRenderUrl(data.context_string, data.id),
+                      attachment_preview_processing: data.workflow_state == 'pending_upload' || data.workflow_state == 'processing'
                     });
                   };
                   if (data.permissions && data.permissions.download && $.isPreviewable(data.content_type)) {

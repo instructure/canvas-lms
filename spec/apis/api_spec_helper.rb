@@ -92,7 +92,9 @@ def raw_api_call(method, path, params, body_params = {}, headers = {}, opts = {}
     if !params.key?(:api_key) && !params.key?(:access_token) && !headers.key?('Authorization') && @user
       token = access_token_for_user(@user)
       headers['Authorization'] = "Bearer #{token}"
-      @user.pseudonyms.create!(:unique_id => "#{@user.id}@example.com", :account => opts[:domain_root_account]) unless @user.pseudonym(true)
+      account = opts[:domain_root_account] || Account.default
+      Pseudonym.any_instance.stubs(:works_for_account?).returns(true)
+      account.pseudonyms.create!(:unique_id => "#{@user.id}@example.com", :user => @user) unless @user.all_active_pseudonyms(:reload) && @user.find_pseudonym_for_account(account, true)
     end
 
     LoadAccount.stubs(:default_domain_root_account).returns(opts[:domain_root_account]) if opts.has_key?(:domain_root_account)
@@ -156,4 +158,10 @@ def should_process_incoming_user_content(context)
 
   saved_content = yield incoming_content
   saved_content.should == "<p>content blahblahblah <a href=\"/#{context.class.to_s.underscore.pluralize}/#{context.id}/files/#{@attachment.id}/download?a=1&amp;b=3\">haha</a></p>"
+end
+
+def verify_json_error(error, field, code, message = nil)
+  error["field"].should == field
+  error["code"].should == code
+  error["message"].should == message if message
 end

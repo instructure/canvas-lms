@@ -18,11 +18,14 @@ describe Moodle::Converter do
   before(:each) do
     @course = Course.create(:name => "test course")
     @cm = ContentMigration.create(:context => @course)
+    @course.content_migration = @cm
   end
 
   it "should successfully import the course" do
     @course.import_from_migration(@course_data, nil, @cm)
-    @cm.old_warnings_format.all?{|w| w[0].start_with?("Missing links found in imported content")}.should == true
+    allowed_warnings = ["Multiple Dropdowns question may have been imported incorrectly",
+                        "Missing links found in imported content"]
+    @cm.old_warnings_format.all?{|w| allowed_warnings.find{|aw| w[0].start_with?(aw)}}.should == true
   end
 
   context "discussion topics" do
@@ -275,6 +278,13 @@ describe Moodle::Converter do
       question.question_data[:question_name].should == "Rate Scale 1..5 Question"
       question.question_data[:question_text].should == "Rate Scale 1..5 Question Text\nquestion1 [response1]\nquestion2 [response2]\nquestion3 [response3]"
       question.question_data[:question_type].should == 'multiple_dropdowns_question'
+
+      # add warnings because these question types seem to be ambiguously structured in moodle
+      warnings = @cm.migration_issues.select{|w|
+        w.description == "Multiple Dropdowns question may have been imported incorrectly" &&
+          w.fix_issue_html_url.include?("question_#{question.assessment_question_id}")
+      }
+      warnings.count.should == 1
     end
 
     it "should convert Moodle Questionnaire Text Box Question to Canvas essay_question" do

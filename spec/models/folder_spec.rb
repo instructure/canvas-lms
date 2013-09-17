@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 
 describe Folder do
   before(:each) do
@@ -120,5 +120,21 @@ describe Folder do
 
     @course.reload
     @course.folders.count.should == 1
+  end
+
+  describe ".assert_path" do
+    specs_require_sharding
+
+    it "should not get confused by the same context on multiple shards" do
+      user1 = User.create!
+      f1 = Folder.assert_path('myfolder', user1)
+      @shard1.activate do
+        user2 = User.new
+        user2.id = user1.local_id
+        user2.save!
+        f2 = Folder.assert_path('myfolder', user2)
+        f2.should_not == f1
+      end
+    end
   end
 end

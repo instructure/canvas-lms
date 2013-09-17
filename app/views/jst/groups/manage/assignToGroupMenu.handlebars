@@ -1,10 +1,15 @@
 <div class="popover-title">
   {{#t "add_to_group"}}Add to Group{{/t}}
 </div>
-<div class="popover-content">
+<ul class="unstyled popover-content assign-to-groups">
   {{#each groups}}
-    <div>
-      <a href="#" class="set-group" data-group-id="{{id}}">{{name}}</a>
-    </div>
+    <li>
+      <a href="#"
+        class="set-group"
+        data-group-id="{{id}}"
+        title="{{#t "assign_user_to_group"}}Assign user to this group{{/t}}"
+        aria-label="{{#t "assign_user_to_group"}}Assign user to this group{{/t}}"
+        >{{name}}</a>
+    </li>
   {{/each}}
-</div>
+</ul>

@@ -32,11 +32,8 @@ class EnsureSubmissionsForDiscussions < ActiveRecord::Migration
     touched_course_ids = [].to_set
     touched_user_ids = [].to_set
 
-    # also, we already validated enrollment in the main query, don't need
-    # to validate again when saving new submission (especially not with
-    # what would amount to 4 more queries per record). also, don't touch
-    # the users per submission, we'll do them in bulk later
-    Submission.skip_callbacks(:validate_enrollment, :touch_user) do
+    # don't touch the user on each submission, we'll do them in bulk later
+    Submission.skip_callbacks(:touch_user) do
       entries.each do |entry|
         # streamlined entry.discussiont_topic.ensure_submission(entry.user)
         assignment = Assignment.find_by_sql(<<-SQL).first

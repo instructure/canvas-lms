@@ -15,24 +15,23 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-
 if ENV['COVERAGE'] == "1"
   puts "Code Coverage enabled"
   require 'simplecov'
   SimpleCov.start do
-    SimpleCov.use_merging true
     SimpleCov.formatter = SimpleCov::Formatter::HTMLFormatter
     add_filter '/spec/'
     add_filter '/config/'
+    add_filter 'spec_canvas'
 
-    add_group 'Mailers', 'app/mailers'
     add_group 'Controllers', 'app/controllers'
     add_group 'Models', 'app/models'
+    add_group 'App', '/app/'
     add_group 'Helpers', 'app/helpers'
-    add_group 'Libraries', 'lib'
+    add_group 'Libraries', '/lib/'
     add_group 'Plugins', 'vendor/plugins'
     add_group "Long files" do |src_file|
-      src_file.lines.count > 100
+      src_file.lines.count > 500
     end
     SimpleCov.at_exit do
       SimpleCov.result.format!
@@ -271,7 +270,10 @@ Spec::Runner.configure do |config|
 
   def user(opts={})
     @user = User.create!(opts.slice(:name, :short_name))
-    @user.register! if opts[:active_user] || opts[:active_all]
+    if opts[:active_user] || opts[:active_all]
+      @user.accept_terms
+      @user.register!
+    end
     @user.update_attribute :workflow_state, opts[:user_state] if opts[:user_state]
     @user
   end
@@ -308,7 +310,8 @@ Spec::Runner.configure do |config|
     @spec_pseudonym_count += 1 if username =~ /nobody(\+\d+)?@example.com/
     password = opts[:password] || "asdfasdf"
     password = nil if password == :autogenerate
-    @pseudonym = user.pseudonyms.create!(:account => opts[:account] || Account.default, :unique_id => username, :password => password, :password_confirmation => password)
+    account = opts[:account] || Account.default
+    @pseudonym = account.pseudonyms.create!(:user => user, :unique_id => username, :password => password, :password_confirmation => password)
     @pseudonym.communication_channel = communication_channel(user, opts)
     @pseudonym
   end
@@ -316,10 +319,10 @@ Spec::Runner.configure do |config|
   def managed_pseudonym(user, opts={})
     other_account = opts[:account] || account_with_saml
     if other_account.password_authentication?
-      config = AccountAuthorizationConfig.new
+      config = other_account.account_authorization_configs.build
       config.auth_type = "saml"
       config.log_in_url = opts[:saml_log_in_url] if opts[:saml_log_in_url]
-      other_account.account_authorization_configs << config
+      config.save!
     end
     opts[:account] = other_account
     pseudonym(user, opts)
@@ -447,6 +450,11 @@ Spec::Runner.configure do |config|
   def group_with_user_logged_in(opts={})
     group_with_user(opts)
     user_session(@user)
+  end
+
+  def group_category(opts = {})
+    context = opts[:context] || @course
+    @group_category = context.group_categories.create!(name: opts[:name] || 'foo')
   end
 
   def custom_role(base, name, opts={})
@@ -605,52 +613,52 @@ Spec::Runner.configure do |config|
     @outcome_group.add_outcome(@outcome)
     @outcome_group.save!
 
-    @rubric = Rubric.generate(:context => @course,
-                              :data => {
-                                  :title => 'My Rubric',
-                                  :hide_score_total => false,
-                                  :criteria => {
-                                      "0" => {
-                                          :points => 3,
-                                          :mastery_points => 0,
-                                          :description => "Outcome row",
-                                          :long_description => @outcome.description,
-                                          :ratings => {
-                                              "0" => {
-                                                  :points => 3,
-                                                  :description => "Rockin'",
-                                              },
-                                              "1" => {
-                                                  :points => 0,
-                                                  :description => "Lame",
-                                              }
-                                          },
-                                          :learning_outcome_id => @outcome.id
-                                      },
-                                      "1" => {
-                                          :points => 5,
-                                          :description => "no outcome row",
-                                          :long_description => 'non outcome criterion',
-                                          :ratings => {
-                                              "0" => {
-                                                  :points => 5,
-                                                  :description => "Amazing",
-                                              },
-                                              "1" => {
-                                                  :points => 3,
-                                                  :description => "not too bad",
-                                              },
-                                              "2" => {
-                                                  :points => 0,
-                                                  :description => "no bueno",
-                                              }
-                                          }
-                                      }
-                                  }
-                              })
-    @rubric.instance_variable_set('@alignments_changed', true)
-    @rubric.save!
-    @rubric.update_alignments
+    rubric_params = {
+      :title => 'My Rubric',
+      :hide_score_total => false,
+      :criteria => {
+        "0" => {
+          :points => 3,
+          :mastery_points => 0,
+          :description => "Outcome row",
+          :long_description => @outcome.description,
+          :ratings => {
+            "0" => {
+              :points => 3,
+              :description => "Rockin'",
+            },
+            "1" => {
+              :points => 0,
+              :description => "Lame",
+            }
+          },
+          :learning_outcome_id => @outcome.id
+        },
+        "1" => {
+          :points => 5,
+          :description => "no outcome row",
+          :long_description => 'non outcome criterion',
+          :ratings => {
+            "0" => {
+              :points => 5,
+              :description => "Amazing",
+            },
+            "1" => {
+              :points => 3,
+              :description => "not too bad",
+            },
+            "2" => {
+              :points => 0,
+              :description => "no bueno",
+            }
+          }
+        }
+      }
+    }
+
+    @rubric = @course.rubrics.build
+    @rubric.update_criteria(rubric_params)
+    @rubric.reload
   end
 
   def grading_standard_for(context, opts={})
@@ -679,7 +687,7 @@ Spec::Runner.configure do |config|
 
   def conversation(*users)
     options = users.last.is_a?(Hash) ? users.pop : {}
-    @conversation = (options.delete(:sender) || @me || users.shift).initiate_conversation(users)
+    @conversation = (options.delete(:sender) || @me || users.shift).initiate_conversation(users, options.delete(:private))
     @message = @conversation.add_message('test')
     @conversation.update_attributes(options)
     @conversation.reload

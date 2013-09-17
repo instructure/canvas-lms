@@ -35,7 +35,7 @@ $(document).ready(function() {
     <ul class="wizard_options_list">
       <% if can_do @context, @current_user, :manage_content %>
         <li class="option download_step <%= 'completed' unless @context.attachments.active.first.nil? %>">
-          <a href="<%= context_url(@context, :context_imports_url) %>" class="header icon-download"><%= t('links.import', %{Import Content}) %></a>
+          <a href="<%= context_url(@context, :context_content_migrations_url) %>" class="header icon-download"><%= t('links.import', %{Import Content}) %></a>
           <div class="details" style="display: none;">
             <%= t 'details.import', %{If you've been using another course management system, you probably have stuff in there that you're going to want moved over to Canvas.  We can walk you through the process of easily migrating your content into Canvas.} %>
           </div>

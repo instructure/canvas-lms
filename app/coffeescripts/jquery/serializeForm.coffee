@@ -1,45 +1,58 @@
-define [
-  'jquery'
-  'underscore'
-], ($, _) ->
+define ['jquery'], ($) ->
+
   rselectTextarea = /^(?:select|textarea)/i
-  rcheckboxOrRadio = /checkbox|radio/i
   rCRLF = /\r?\n/g
-  rinput = /^(?:color|date|datetime|datetime-local|email|hidden|month|number|password|range|search|tel|text|time|url|week|checkbox|radio|file)$/i
+  rinput = /^(?:color|date|datetime|datetime-local|email|hidden|month|number|password|range|search|tel|text|time|url|week|file)$/i
+  # radio / checkbox are not included, since they are handled by the @checked check
 
-  isInput = (el) ->
-    el.name && !el.disabled && rselectTextarea.test(el.nodeName) or rinput.test(el.type)
+  elements = ->
+    if @elements
+      $.makeArray @elements
+    else
+      elements = $(this).find(':input')
+      if elements.length
+        elements
+      else
+        this
 
-  getValue = (el) ->
-    resultFor = (val) ->
-      name: el.name
-      el: el
-      value: if _.isString(val) then val.replace( rCRLF, "\r\n" ) else val
+  isSerializable = ->
+    @name and not @disabled and (
+      @checked or
+      rselectTextarea.test(@nodeName) or
+      rinput.test(@type)
+    )
 
-    $input = $(el)
-    val = if rcheckboxOrRadio.test(el.type)
-      el.checked
-    else if el.type == 'file'
-      el if $input.val()
+  resultFor = (name, value) ->
+    value = value.replace(rCRLF, "\r\n") if typeof value is 'string'
+    {name, value}
+
+  getValue = ->
+    $input = $(this)
+    value = if @type == 'file'
+      this if $input.val()
     else if $input.hasClass 'datetime_field_enabled'
       # datepicker doesn't clear the data date attribute when a date is deleted
-      if $input.val() == ""
+      if $input.val() is ""
         null
       else
-        $input.data('date') || null
+        $input.data('date') or null
     else if $input.data('rich_text')
       $input.editorBox('get_code', false)
     else
       $input.val()
 
-    if _.isArray val
-      _.map val, resultFor
+    if $.isArray(value)
+      resultFor(@name, val) for val in value
     else
-      resultFor val
+      resultFor(@name, value)
 
-
+  ##
+  # identical to $.fn.serializeArray, except:
+  # 1. it works on non-forms (see elements)
+  # 2. it handles file, date picker and tinymce inputs (see getValue)
   $.fn.serializeForm = ->
-    _.chain(this[0].elements || this.find(':input'))
-      .filter(isInput)
+    @map(elements)
+      .filter(isSerializable)
       .map(getValue)
-      .value()
+      .get()
+

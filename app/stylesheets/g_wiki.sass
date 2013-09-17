@@ -1,17 +1,213 @@
 @import environment.sass
 
-#wiki_page_buttons
-  :padding 1em
-  :border-bottom 1px solid #b6babf
+$subdued-text-color: #696969
+$darkened-text-color: #4d4d4d
+$published-text-color: #34832b
+$unpublished-text-color: $subdued-text-color
 
-#wiki_page_index_content
-  :background #e4e9ed
-  :padding 0 1em 1em
+$published-icon-color: #34832b
+$unpublished-icon-color: #b4b7ba
 
-#wiki_page_index
-  tbody
-    :border 1px solid #dddddd
-    :background #ffffff
+$border-color: #c1c7cf
+$border-radius: 3px
+
+$index-background: #e8ecef
+$item-background: #ffffff
+$item-hover-background: #eef7ff
+
+$shadow: 0 1px 0 rgba(0,0,0,0.15)
+
+.pages
+
+  #breadcrumbs
+    :border-bottom 1px solid $border-color
+  .toolbar-buttons
+    :height 30px
+    :padding 1em
+    :border-bottom 1px solid $border-color
+    :box-shadow $shadow
+    .left-buttons
+      :float left
+    .right-buttons
+      :float right
+
+  .toolbar-buttons.sticky
+    position: fixed
+    z-index: 1000
+    top: 0px
+    right: 0px
+    left: 0px
+    margin-left: $left_side_width + 1px
+    background: white
+    height: 33px
+    max-width: $max_main_width - 26px
+    border-color: $menu-border-color
+
+.pages.index
+  .index-content-container
+    :margin-top 1px
+
+  .page-edit-dialog .edit-content
+    :margin 8px 5px
+    .edit-label
+      :padding-top 5px
+      :width 75px
+      :float left
+      :text-align right
+    .edit-controls
+      :margin-left 85px
+    .edit-control-text
+      :width 270px
+
+  .index-content
+    :background $index-background
+    :padding 0 1em 1em
+
+    .table
+      :border-collapse separate
+      :border-spacing 0
+      td, th
+        &:first-child
+          :padding-left 12px
+        &:last-child
+          :padding-right 12px
+          
+      .header-row
+        :text-transform uppercase
+        a.sort-field
+          :cursor pointer
+          :user-select none
+          :color inherit
+          i
+            :color #ccc
+        a.sort-field:hover
+          :text-decoration none
+          i
+            :color #0088cc
+        a.sort-field-active
+          i
+            :color black
+
+    .table thead
+      tr
+        :height 40px
+      th
+        :vertical-align middle
+
+    .table tbody
+      .page_title
+        :font-weight bold
+      .front-page
+        :margin auto 0.5em
+      .al-trigger
+        :color #b4b7ba
+      .al-trigger:hover
+        :color #4d4d4d
+
+      tr
+        :background $item-background
+        :text-decoration inherit
+        :color inherit
+        &.clickable:hover
+          :background $item-hover-background
+          :text-decoration inherit
+          :color inherit
+        td:first-child
+          :border-left 1px solid $border-color
+        td:last-child
+          :border-right 1px solid $border-color
+
+      tr:first-child
+        td:first-child
+          :border-top-left-radius $border-radius
+        td:last-child
+          :border-top-right-radius $border-radius
+      tr:last-child
+        td
+          :border-bottom 1px solid $border-color
+        td:first-child
+          :border-bottom-left-radius $border-radius
+        td:last-child
+          :border-bottom-right-radius $border-radius
+
+      td
+        :font-size 11px
+        :color $subdued-text-color
+        :border-top 1px solid $border-color
+
+        .wiki-page-link
+          :font-size 13px
+          :font-weight bold
+          :color $darkened-text-color
+        .wiki-page-link.published
+          :color $published-text-color
+        .wiki-page-link.unpublished
+          :color $unpublished-text-color
+
+        .icon-publish
+          :color $published-icon-color
+        .icon-unpublished
+          :color $unpublished-icon-color
+
+    .table .no-pages .no-pages-cell
+      :border 1px dashed $border-color
+
+.pages.show
+  .toolbar-buttons
+    .publish-button
+      :margin 0 1em
+
+  .show-content
+    :padding 15px 25px
+    .page-title
+      :font-size 2.5em
+      :font-weight 200
+      :margin 15px 0
+      :color #666
+
+.pages.edit
+  .form-actions
+    :padding-left 1em
+    
+  .toolbar-buttons
+    .published
+      :color $published-text-color
+    .unpublished
+      :color $unpublished-text-color
+    .published, .unpublished
+      :display inline-block
+      :margin 5px 8px 5px 5px
+
+  .edit-form
+    :margin 0
+
+    .edit-content
+      :padding 1em
+
+      .edit-header
+        :position relative
+        :margin-bottom 1em
+
+      .edit-header h2
+        :margin 0
+
+      .switch_views
+        :right 5px
+        :bottom 0px
+        :position absolute
+
+      .body
+        :width 98.5%
+
+      .mceLayout
+        :margin 0
+
+      .options
+        :margin-top 1em
+
+    .form-actions
+      :margin-top 0
+      :margin-bottom 0
 
 #wiki_show_view_main
   :overflow auto
@@ -29,54 +225,8 @@
 
 #page_history
   :float right
-#wiki_page_comments
-  margin-top: 50px
-  textarea
-    width: 97%
-    +border-radius(4px)
-    border: 1px solid #aaa
-    height: 50px
-  .wiki_page_comment
-    margin-bottom: 20px
-    .commenting
-      display: none
-    &.commenting
-      .commenting
-        display: block
-      .formatted_body .not_commenting
-        display: none
-    .header
-      border-bottom: 1px solid #ccc
-      margin-bottom: 2px
-      color: #888
-      font-size: 0.8em
-      .user_name
-        float: left
-      .links
-        float: right
-        .delete_comment_link
-          display: none
-    &.deletable_comment
-      .header 
-        .links .delete_comment_link
-          display: inline
-          opacity: 0.5
-        &:hover
-          .links .delete_comment_link
-            opacity: 1.0
-    .formatted_body
-      margin: 0 10px
-      .add_comment_link
-        width: 97%
-        +border-radius(4px)
-        border: 1px solid #aaa
-        cursor: text
-        display: block
-        padding: 2px 4px
-        text-decoration: none
-        color: #888
-        
-// this is to fix a bug that was reported that if you shrink your browser window width to something small 
+
+// this is to fix a bug that was reported that if you shrink your browser window width to something small
 // that it would just cut off the right side of the tiny WYSIWYG editor box and make it dissapear beind the right side.
 #wiki_page_body_parent.mceEditor
   display: block

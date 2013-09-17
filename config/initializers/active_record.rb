@@ -333,6 +333,28 @@ class ActiveRecord::Base
     end
   end
 
+  def self.init_icu
+    return if defined?(@icu)
+    begin
+      Bundler.require 'icu'
+      if !ICU::Lib.respond_to?(:ucol_getRules)
+        suffix = ICU::Lib.figure_suffix(ICU::Lib.version.to_s)
+        ICU::Lib.attach_function(:ucol_getRules, "ucol_getRules#{suffix}", [:pointer, :pointer], :pointer)
+        ICU::Collation::Collator.class_eval do
+          def rules
+            length = FFI::MemoryPointer.new(:int)
+            ptr = ICU::Lib.ucol_getRules(@c, length)
+            ptr.read_array_of_uint16(length.read_int).pack("U*")
+          end
+        end
+      end
+      @icu = true
+      @collation_local_map = {}
+    rescue LoadError
+      @icu = false
+    end
+  end
+
   def self.best_unicode_collation_key(col)
     if ActiveRecord::Base.configurations[Rails.env]['adapter'] == 'postgresql'
       # For PostgreSQL, we can't trust a simple LOWER(column), with any collation, since
@@ -342,7 +364,19 @@ class ActiveRecord::Base
       # but at least it's consistent, and orders commas before letters so you don't end up with
       # Johnson, Bob sorting before Johns, Jimmy
       @collkey ||= connection.select_value("SELECT COUNT(*) FROM pg_proc WHERE proname='collkey'").to_i
-      @collkey == 0 ? "CAST(LOWER(replace(#{col}, '\\', '\\\\')) AS bytea)" : "collkey(#{col}, 'root', true, 2, true)"
+      if @collkey == 0
+        "CAST(LOWER(replace(#{col}, '\\', '\\\\')) AS bytea)"
+      else
+        locale = 'root'
+        init_icu
+        if @icu
+          # only use the actual locale if it differs from root; using a different locale means we
+          # can't use our index, which usually doesn't matter, but sometimes is very important
+          locale = @collation_local_map[I18n.locale] ||= ICU::Collation::Collator.new(I18n.locale.to_s).rules.empty? ? 'root' : I18n.locale
+        end
+
+        "collkey(#{col}, '#{locale}', true, 2, true)"
+      end
     else
       # Not yet optimized for other dbs (MySQL's default collation is case insensitive;
       # SQLite can have custom collations inserted, but probably not worth the effort
@@ -461,41 +495,104 @@ class ActiveRecord::Base
     result.map(&column.to_sym)
   end
 
-  def self.generate_temp_table(options = {})
-    Canvas::TempTable.new(connection, construct_finder_sql({}), options)
+  def self.find_in_batches_with_usefulness(options = {}, &block)
+    # already in a transaction (or transactions don't matter); cursor is fine
+    if connection.adapter_name == 'PostgreSQL' && (Shackles.environment == :slave || connection.open_transactions > (Rails.env.test? ? 1 : 0))
+      shard = scope(:find, :shard)
+      if shard
+        shard.activate(shard_category) { find_in_batches_with_cursor(options, &block) }
+      else
+        find_in_batches_with_cursor(options, &block)
+      end
+    elsif scope(:find, :order) || scope(:find, :group)
+      shard = scope(:find, :shard)
+      if shard
+        shard.activate(:shard_category) { find_in_batches_with_temp_table(options, &block) }
+      else
+        find_in_batches_with_temp_table(options, &block)
+      end
+    else
+      find_in_batches_without_usefulness(options) do |batch|
+        with_exclusive_scope { yield batch }
+      end
+    end
+  end
+  class << self
+    alias_method_chain :find_in_batches, :usefulness
   end
 
-  def self.find_in_batches_with_temp_table(options = {}, &block)
-    temptable = generate_temp_table(options)
-    with_exclusive_scope do
-      temptable.execute do |table|
-        table.find_in_batches(options, &block)
+  def self.find_in_batches_with_cursor(options = {}, &block)
+    batch_size = options[:batch_size] || 1000
+    transaction do
+      begin
+        cursor = "#{table_name}_in_batches_cursor"
+        connection.execute("DECLARE #{cursor} CURSOR FOR #{scoped.to_sql}")
+        includes = scope(:find, :include)
+        with_exclusive_scope do
+          batch = connection.uncached { find_by_sql("FETCH FORWARD #{batch_size} FROM #{cursor}") }
+          while !batch.empty?
+            preload_associations(batch, includes) if includes
+            yield batch
+            break if batch.size < batch_size
+            batch = connection.uncached { find_by_sql("FETCH FORWARD #{batch_size} FROM #{cursor}") }
+          end
+        end
+        # not ensure; if the transaction rolls back due to another exception, it will
+        # automatically close
+        connection.execute("CLOSE #{cursor}")
       end
     end
   end
 
-  def self.find_each_with_temp_table(options = {}, &block)
-    find_in_batches_with_temp_table(options) do |batch|
-      batch.each(&block)
-    end
-    self
-  end
-
-  def self.useful_find_in_batches(options = {})
-    offset = 0
+  def self.find_in_batches_with_temp_table(options = {})
     batch_size = options[:batch_size] || 1000
-    while true
-      batch = find(:all, :limit => batch_size, :offset => offset)
-      break if batch.empty?
-      with_exclusive_scope { yield batch }
-      break if batch.size < batch_size
-      offset += batch_size
-    end
-  end
+    table = "#{table_name}_find_in_batches_temporary_table"
+    connection.execute "CREATE TEMPORARY TABLE #{table} AS #{scoped.to_sql}"
+    begin
+      index = "temp_primary_key"
+      case connection.adapter_name
+      when 'PostgreSQL'
+        begin
+          old_proc = connection.raw_connection.set_notice_processor {}
+          connection.execute "ALTER TABLE #{table}
+                               ADD temp_primary_key SERIAL PRIMARY KEY"
+        ensure
+          connection.raw_connection.set_notice_processor(&old_proc) if old_proc
+        end
+      when 'MySQL', 'Mysql2'
+        connection.execute "ALTER TABLE #{table}
+                               ADD temp_primary_key MEDIUMINT NOT NULL PRIMARY KEY AUTO_INCREMENT"
+      when 'SQLite'
+        # Sqlite always has an implicit primary key
+        index = 'rowid'
+      else
+        raise "Temp tables not supported!"
+      end
 
-  def self.useful_find_each(options = {})
-    useful_find_in_batches(options) do |batch|
-      batch.each { |row| yield row }
+      includes = scope(:find, :include)
+      sql = "SELECT *
+             FROM #{table}
+             ORDER BY #{index} ASC
+             LIMIT #{batch_size}"
+      with_exclusive_scope do
+        batch = find_by_sql(sql)
+        while !batch.empty?
+          preload_associations(batch, includes) if includes
+          yield batch
+          break if batch.size < batch_size
+          last_value = batch.last[index]
+
+          sql = "SELECT *
+               FROM #{table}
+               WHERE #{index} > #{last_value}
+               ORDER BY #{index} ASC
+               LIMIT #{batch_size}"
+          batch = find_by_sql(sql)
+        end
+      end
+    ensure
+      temporary = "TEMPORARY " if connection.adapter_name == 'Mysql2'
+      connection.execute "DROP #{temporary}TABLE #{table}"
     end
   end
 
@@ -687,22 +784,26 @@ class ActiveRecord::Base
     end
     alias_method_chain :delete_all, :joins
   end
+
+  def self.bulk_insert(records)
+    return if records.empty?
+    transaction do
+      connection.bulk_insert(table_name, records)
+    end
+  end
 end
 
 ActiveRecord::ConnectionAdapters::AbstractAdapter.class_eval do
   def bulk_insert(table_name, records)
-    return if records.empty?
-    transaction do
-      keys = records.first.keys
-      quoted_keys = keys.map{ |k| quote_column_name(k) }.join(', ')
-      records.each do |record|
-        execute <<-SQL
-          INSERT INTO #{quote_table_name(table_name)}
-            (#{quoted_keys})
-          VALUES
-            (#{keys.map{ |k| quote(record[k]) }.join(', ')})
-        SQL
-      end
+    keys = records.first.keys
+    quoted_keys = keys.map{ |k| quote_column_name(k) }.join(', ')
+    records.each do |record|
+      execute <<-SQL
+        INSERT INTO #{quote_table_name(table_name)}
+          (#{quoted_keys})
+        VALUES
+          (#{keys.map{ |k| quote(record[k]) }.join(', ')})
+      SQL
     end
   end
 end
@@ -787,13 +888,10 @@ module MySQLAdapterExtensions
   end
 
   def bulk_insert(table_name, records)
-    return if records.empty?
-    transaction do
-      keys = records.first.keys
-      quoted_keys = keys.map{ |k| quote_column_name(k) }.join(', ')
-      execute "INSERT INTO #{quote_table_name(table_name)} (#{quoted_keys}) VALUES" <<
-                  records.map{ |record| "(#{keys.map{ |k| quote(record[k]) }.join(', ')})" }.join(',')
-    end
+    keys = records.first.keys
+    quoted_keys = keys.map{ |k| quote_column_name(k) }.join(', ')
+    execute "INSERT INTO #{quote_table_name(table_name)} (#{quoted_keys}) VALUES" <<
+                records.map{ |record| "(#{keys.map{ |k| quote(record[k]) }.join(', ')})" }.join(',')
   end
 
   def add_column_with_foreign_key_check(table, name, type, options = {})
@@ -826,16 +924,13 @@ end
 if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
   ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.class_eval do
     def bulk_insert(table_name, records)
-      return if records.empty?
-      transaction do
-        keys = records.first.keys
-        quoted_keys = keys.map{ |k| quote_column_name(k) }.join(', ')
-        execute "COPY #{quote_table_name(table_name)} (#{quoted_keys}) FROM STDIN"
-        raw_connection.put_copy_data records.inject(''){ |result, record|
-          result << keys.map{ |k| quote_text(record[k]) }.join("\t") << "\n"
-        }
-        raw_connection.put_copy_end
-      end
+      keys = records.first.keys
+      quoted_keys = keys.map{ |k| quote_column_name(k) }.join(', ')
+      execute "COPY #{quote_table_name(table_name)} (#{quoted_keys}) FROM STDIN"
+      raw_connection.put_copy_data records.inject(''){ |result, record|
+        result << keys.map{ |k| quote_text(record[k]) }.join("\t") << "\n"
+      }
+      raw_connection.put_copy_end
     end
 
     def quote_text(value)
@@ -855,6 +950,8 @@ if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
       raise ArgumentError, "Cannot specify custom options with :delay_validation" if options[:options] && options[:delay_validation]
 
       options.delete(:delay_validation) unless supports_delayed_constraint_validation?
+      # pointless if we're in a transaction
+      options.delete(:delay_validation) if open_transactions > 0
       column  = options[:column] || "#{to_table.to_s.singularize}_id"
       foreign_key_name = foreign_key_name(from_table, column, options)
 
@@ -907,6 +1004,12 @@ if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
       set_standard_conforming_strings_without_version_check unless postgresql_version >= 90100
     end
     alias_method_chain :set_standard_conforming_strings, :version_check
+
+    # we always use the default sequence name, so override it to not actually query the db
+    # (also, it doesn't matter if you're using PG 8.2+)
+    def default_sequence_name(table, pk)
+      "#{table}_#{pk}_seq"
+    end
   end
 
 end

@@ -1,15 +1,22 @@
 <header class="entry-header discussion-section admin-link-hover-area clearfix {{#if collapsable}}collapsable{{/if}}" {{#if collapsable}}data-event="toggleCollapsed"{{/if}}>
-  {{>avatar author}}
+  {{>avatar_circle author}}
   <div class="discussion-header-content right-of-avatar">
+    <div class="pull-left span4">
+      <h2 class="discussion-title">
+        <a {{#if author.html_url}}href="{{author.html_url}}" data-bypass{{/if}} class="author {{#unless author.id}}unknown{{/unless}}" title="{{#t "authors_name"}}Author's name{{/t}}" {{#if author}}{{#if author.url}} href="{{author.url}}" {{/if}}{{/if}} class="author">{{#if author}}{{author.display_name}}{{else}}{{#t "unknown_author"}}Unknown Author{{/t}}{{/if}}</a>
+      </h2>
+      <div class="discussion-pubdate hide-if-collapsed">{{friendlyDatetime updated_at pubdate=true}}</div>
+      <div class="show-if-collapsed discussion-subtitle summary ellipsis">{{summary}}</div> 
+    </div>
     <div class="admin-links hide-if-collapsed">
-      <a class="al-trigger dim-till-hover" data-kyle-menu-options='{"appendMenuTo": "body"}'><i
+      <a class="al-trigger dim-till-hover" href="#"><i
           class="icon-settings standalone-icon"></i><i class="icon-mini-arrow-down standalone-icon"></i><span
           class="screenreader-only">{{#t "manage_discussion_entry"}}Manage Discussion Entry{{/t}}</span></a>
       <ul class="al-options">
         {{#if parent_id}}
           <li><a data-pushstate href="#entry-{{parent_id}}"><i class="icon-replied"></i> {{#t "go_to_parent"}}Go To Parent{{/t}}</a></li>
         {{else}}
-          <li><a href="#content"><i class="icon-discussion"></i> {{#t "go_to_topic"}}Go To Topic{{/t}}</a></li>
+          <li><a href="#topic" data-pushstate><i class="icon-discussion"></i> {{#t "go_to_topic"}}Go To Topic{{/t}}</a></li>
         {{/if}}
         {{#if canModerate}}
           <li><a data-event="edit" href="#"><i class="icon-edit"></i> {{#t "edit"}}Edit{{/t}}</a></li>
@@ -21,13 +28,8 @@
       </ul>
     </div>
     <div class="discussion-header-right">
-      <div class="discussion-pubdate hide-if-collapsed">{{friendlyDatetime updated_at pubdate=true}}</div>
       <div class="headerBadges show-if-collapsed"></div>
     </div>
-    <div class="discussion-title">
-      <a {{#if author.html_url}}href="{{author.html_url}}" data-bypass{{/if}} class="author {{#unless author.id}}unknown{{/unless}}" title="{{#t "authors_name"}}Author's name{{/t}}" {{#if author}}{{#if author.url}} href="{{author.url}}" {{/if}}{{/if}} class="author">{{#if author}}{{author.display_name}}{{else}}{{#t "unknown_author"}}Unknown Author{{/t}}{{/if}}</a>
-    </div>
-    <div class="show-if-collapsed discussion-subtitle summary ellipsis">{{summary}}</div> 
   </div>
 </header>
 <div class="discussion-section message_wrapper hide-if-collapsed">
@@ -47,6 +49,11 @@
 {{#if inlineReplyLink}}
 <div class="entry-controls hide-if-collapsed hide-if-replying">
   <div class="notification" data-bind="notification"></div>
-  <a class='discussion-reply-action entry-control dim-till-hover' data-event="addReply" href='#'><i class='icon-replied standalone-icon'></i></a>
+  <a class="discussion-reply-action entry-control dim-till-hover"
+     data-event="addReply"
+     href="#">
+    <i class="icon-replied standalone-icon"></i>
+    {{#t "write_a_reply"}}Reply{{/t}}
+  </a>
 </div>
 {{/if}}

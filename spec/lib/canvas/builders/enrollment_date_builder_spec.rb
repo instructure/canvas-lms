@@ -134,4 +134,40 @@ describe Canvas::Builders::EnrollmentDateBuilder do
     end
 
   end
+
+  describe ".preload" do
+    it "should work" do
+      course_with_teacher(:active_all => true)
+      @enrollment.reload
+      @enrollment.loaded_course?.should be_false
+      Canvas::Builders::EnrollmentDateBuilder.preload([@enrollment])
+      @enrollment.loaded_course?.should be_true
+      @enrollment.loaded_course_section?.should be_true
+      @enrollment.course.loaded_enrollment_term?.should be_true
+
+      # should already be cached on the object
+      Rails.cache.expects(:fetch).never
+      @enrollment.enrollment_dates
+    end
+
+    it "should not have to load stuff if already in cache" do
+      enable_cache do
+        course_with_teacher(:active_all => true)
+        # prime the cache
+        Canvas::Builders::EnrollmentDateBuilder.preload([@enrollment])
+
+        # now reload
+        @enrollment = Enrollment.find(@enrollment)
+        Canvas::Builders::EnrollmentDateBuilder.preload([@enrollment])
+        @enrollment.loaded_course?.should be_true
+        # it shouldn't have had to load these associations
+        @enrollment.loaded_course_section?.should be_false
+        @enrollment.course.loaded_enrollment_term?.should be_false
+        # should already be cached on the object
+
+        Rails.cache.expects(:fetch).never
+        @enrollment.enrollment_dates
+      end
+    end
+  end
 end

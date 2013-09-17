@@ -390,6 +390,10 @@ describe Assignment do
     it "should return nil when no grade was entered and assignment uses a grading standard (letter grade)" do
       Assignment.interpret_grade("", 20, GradingStandard.default_grading_standard).should be_nil
     end
+
+    it "should allow grading an assignment with nil points_possible as percent" do
+      Assignment.interpret_grade("100%", nil).should == 0
+    end
   end
 
   it "should create a new version for each submission" do
@@ -578,7 +582,7 @@ describe Assignment do
 
   it "should destroy group overrides when the group category changes" do
     @assignment = assignment_model
-    @assignment.group_category = @assignment.context.group_categories.create!
+    @assignment.group_category = group_category(context: @assignment.context)
     @assignment.save!
 
     overrides = 5.times.map do
@@ -590,7 +594,7 @@ describe Assignment do
       override
     end
 
-    @assignment.group_category = @assignment.context.group_categories.create!
+    @assignment.group_category = group_category(context: @assignment.context, name: "bar")
     @assignment.save!
 
     overrides.each do |override|
@@ -1330,6 +1334,13 @@ describe Assignment do
         assignment_model(:context => @course)
         @a.messages_sent.should be_include('Assignment Created')
       end
+
+      it "should not create a message in an unpublished course" do
+        Notification.create(:name => 'Assignment Created')
+        course_with_teacher(:active_user => true)
+        assignment_model(:context => @course)
+        @a.messages_sent.should_not be_include('Assignment Created')
+      end
     end
 
     context "varied due date notifications" do
@@ -1630,6 +1641,38 @@ describe Assignment do
       a1.reload
       a1.locked_for?(@user).should be_true
     end
+
+    it "should be locked when associated discussion topic is part of a locked module" do
+      course :active_all => true
+      student_in_course
+      a1 = assignment_model(:course => @course, :submission_types => "discussion_topic")
+      a1.reload
+      a1.locked_for?(@user).should be_false
+
+      m = @course.context_modules.create!
+      m.add_item(:id => a1.discussion_topic.id, :type => 'discussion_topic')
+
+      m.unlock_at = Time.now.in_time_zone + 1.day
+      m.save
+      a1.reload
+      a1.locked_for?(@user).should be_true
+    end
+
+    it "should be locked when associated quiz is part of a locked module" do
+      course :active_all => true
+      student_in_course
+      a1 = assignment_model(:course => @course, :submission_types => "online_quiz")
+      a1.reload
+      a1.locked_for?(@user).should be_false
+
+      m = @course.context_modules.create!
+      m.add_item(:id => a1.quiz.id, :type => 'quiz')
+
+      m.unlock_at = Time.now.in_time_zone + 1.day
+      m.save
+      a1.reload
+      a1.locked_for?(@user).should be_true
+    end
   end
 
   context "group_students" do
@@ -1781,24 +1824,20 @@ describe Assignment do
     end
 
     it "should mark comments as hidden for submission zip uploads" do
-      create_and_submit
-      @assignment.muted = true
-      @assignment.save!
+      course_with_teacher
+      student_in_course
 
-      temp = Tempfile.new('sub.txt')
+      @assignment = @course.assignments.create! name: "Mute Comment Test",
+                                                submission_types: %w(online_upload)
+      @assignment.update_attribute :muted, true
+      submit_homework(@student)
 
-      group = {:user => @user, :submission => @submission, :display_name => 'sub.txt', :filename => temp.path}
+      zip = zip_submissions
 
-      fake = mock()
-      fake.stubs(:map).returns([])
-      fake.stubs(:unzip_files).returns(fake)
-      ZipExtractor.stubs(:new).returns(fake)
-      @assignment.stubs(:partition_for_user).returns([[group]])
+      @assignment.generate_comments_from_files(zip.open.path, @user)
 
-      @assignment.generate_comments_from_files(temp.path, @user)
-
-      @submission.reload
-      @submission.submission_comments.last.hidden.should == true
+      submission = @assignment.submission_for_student(@student)
+      submission.submission_comments.last.hidden.should == true
     end
   end
 
@@ -2066,6 +2105,31 @@ describe Assignment do
       attachment_json = json['submissions'][0]['submission_history'][0]['submission']['versioned_attachments'][0]['attachment']
       attachment_json['view_inline_ping_url'].should match %r{/users/#{@student.id}/files/#{attachment.id}/inline_view\z}
     end
+
+    it "should not be in group mode for non-group assignments" do
+      setup_assignment_with_homework
+      json = @assignment.speed_grader_json(@teacher)
+      json["GROUP_GRADING_MODE"].should_not be_true
+    end
+
+    it 'returns "groups" instead of students for group assignments' do
+      course_with_teacher active_all: true
+      gc = @course.group_categories.create! name: "Assignment Groups"
+      groups = 2.times.map { |i| gc.groups.create! name: "Group #{i}" }
+      students = 4.times.map { student_in_course(active_all: true); @student }
+      students.each_with_index { |s, i| groups[i % groups.length].add_user(s) }
+      assignment = @course.assignments.create!(
+        group_category_id: gc.id,
+        grade_group_students_individually: false,
+        submission_types: %w(text_entry)
+      )
+      json = assignment.speed_grader_json(@teacher)
+      groups.each do |group|
+        j = json["context"]["students"].find { |g| g["name"] == group.name }
+        group.users.map(&:id).should include j["id"]
+      end
+      json["GROUP_GRADING_MODE"].should be_true
+    end
   end
 
   describe "update_student_submissions" do
@@ -2260,6 +2324,76 @@ describe Assignment do
       a.external_tool_tag.should == tag
     end
   end
+
+  describe "allowed_extensions=" do
+    it "should accept a string as input" do
+      a = Assignment.new
+      a.allowed_extensions = "doc,xls,txt"
+      a.allowed_extensions.should == ["doc", "xls", "txt"]
+    end
+
+    it "should accept an array as input" do
+      a = Assignment.new
+      a.allowed_extensions = ["doc", "xls", "txt"]
+      a.allowed_extensions.should == ["doc", "xls", "txt"]
+    end
+
+    it "should sanitize the string" do
+      a = Assignment.new
+      a.allowed_extensions = ".DOC, .XLS, .TXT"
+      a.allowed_extensions.should == ["doc", "xls", "txt"]
+    end
+
+    it "should sanitize the array" do
+      a = Assignment.new
+      a.allowed_extensions = [".DOC", " .XLS", " .TXT"]
+      a.allowed_extensions.should == ["doc", "xls", "txt"]
+    end
+  end
+
+  describe '#generate_comments_from_files' do
+    before do
+      course_with_teacher
+      @students = 3.times.map { student_in_course; @student }
+
+      @assignment = @course.assignments.create! :name => "zip upload test",
+                                                :submission_types => %w(online_upload)
+    end
+
+    it "should work for individuals" do
+      s1 = @students.first
+      submit_homework(s1)
+
+      zip = zip_submissions
+
+      comments, ignored = @assignment.generate_comments_from_files(
+        zip.open.path,
+        @teacher)
+
+      comments.map { |g| g.map { |c| c.submission.user } }.should == [[s1]]
+      ignored.should be_empty
+    end
+
+    it "should work for groups" do
+      s1, s2 = @students
+
+      gc = @course.group_categories.create! name: "Homework Groups"
+      @assignment.update_attributes group_category_id: gc.id,
+                                    grade_group_students_individually: false
+      g1, g2 = 2.times.map { |i| gc.groups.create! name: "Group #{i}" }
+      g1.add_user(s1)
+      g1.add_user(s2)
+
+      submit_homework(s1)
+      zip = zip_submissions
+
+      comments, _ = @assignment.generate_comments_from_files(
+        zip.open.path,
+        @teacher)
+
+      comments.map { |g| g.map { |c| c.submission.user } }.should == [[s1, s2]]
+    end
+  end
 end
 
 def setup_assignment_with_group
@@ -2313,3 +2447,23 @@ def setup_assignment
   @c = course_model(:workflow_state => "available")
   @c.enroll_student(@u)
 end
+
+def submit_homework(student)
+  a = Attachment.create! context: student,
+                         filename: "homework.pdf",
+                         uploaded_data: StringIO.new("blah blah blah")
+  @assignment.submit_homework(student, attachments: [a],
+                                       submission_type: "online_upload")
+  a
+end
+
+def zip_submissions
+  zip = Attachment.new filename: 'submissions.zip'
+  zip.user = @teacher
+  zip.workflow_state = 'to_be_zipped'
+  zip.context = @assignment
+  zip.save!
+  ContentZipper.process_attachment(zip, @teacher)
+  zip
+end
+

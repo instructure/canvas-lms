@@ -25,7 +25,9 @@ class DiscussionTopicsApiController < ApplicationController
 
   before_filter :require_context
   before_filter :require_topic
-  before_filter :require_initial_post, :except => [:add_entry, :mark_topic_read, :mark_topic_unread, :unsubscribe_topic]
+  before_filter :require_initial_post, except: [:add_entry, :mark_topic_read,
+                                                :mark_topic_unread, :show,
+                                                :unsubscribe_topic]
 
   # @API Get a single topic
   #
@@ -36,7 +38,8 @@ class DiscussionTopicsApiController < ApplicationController
   #     curl https://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id> \ 
   #         -H 'Authorization: Bearer <token>'
   def show
-    render :json => discussion_topics_api_json([@topic], @context, @current_user, session).first
+    render(json: discussion_topics_api_json([@topic], @context,
+                                            @current_user, session).first)
   end
 
   # @API Get the full topic
@@ -123,7 +126,7 @@ class DiscussionTopicsApiController < ApplicationController
   # Create a new entry in a discussion topic. Returns a json representation of
   # the created entry (see documentation for 'entries' method) on success.
   #
-  # @argument message The body of the entry.
+  # @argument message [String] The body of the entry.
   #
   # @argument attachment [Optional] a multipart/form-data form-field-style
   #   attachment. Attachments larger than 1 kilobyte are subject to quota
@@ -235,7 +238,7 @@ class DiscussionTopicsApiController < ApplicationController
   # If it is required, and the user has not posted, will respond with a 403
   # Forbidden status and the body 'require_initial_post'.
   #
-  # @argument message The body of the entry.
+  # @argument message [String] The body of the entry.
   #
   # @argument attachment [Optional] a multipart/form-data form-field-style
   #   attachment. Attachments larger than 1 kilobyte are subject to quota
@@ -312,7 +315,9 @@ class DiscussionTopicsApiController < ApplicationController
   # If it is required, and the user has not posted, will respond with a 403
   # Forbidden status and the body 'require_initial_post'.
   #
-  # @argument ids[] A list of entry ids to retrieve. Entries will be returned in id order, smallest id first.
+  # @argument ids[] [String]
+  #   A list of entry ids to retrieve. Entries will be returned in id order,
+  #   smallest id first.
   #
   # @response_field id The unique identifier for the reply.
   #
@@ -388,7 +393,9 @@ class DiscussionTopicsApiController < ApplicationController
   #
   # No request fields are necessary.
   #
-  # @argument forced_read_state [Optional] A boolean value to set all of the entries' forced_read_state. No change is made if this argument is not specified.
+  # @argument forced_read_state [Optional, Boolean]
+  #   A boolean value to set all of the entries' forced_read_state. No change
+  #   is made if this argument is not specified.
   # 
   # On success, the response will be 204 No Content with an empty body.
   #
@@ -407,7 +414,9 @@ class DiscussionTopicsApiController < ApplicationController
   #
   # No request fields are necessary.
   #
-  # @argument forced_read_state [Optional] A boolean value to set all of the entries' forced_read_state. No change is made if this argument is not specified.
+  # @argument forced_read_state [Optional, Boolean]
+  #   A boolean value to set all of the entries' forced_read_state. No change is
+  #   made if this argument is not specified.
   # 
   # On success, the response will be 204 No Content with an empty body.
   #
@@ -425,7 +434,9 @@ class DiscussionTopicsApiController < ApplicationController
   #
   # No request fields are necessary.
   #
-  # @argument forced_read_state [Optional] A boolean value to set the entry's forced_read_state. No change is made if this argument is not specified.
+  # @argument forced_read_state [Optional, Boolean]
+  #   A boolean value to set the entry's forced_read_state. No change is made if
+  #   this argument is not specified.
   #
   # On success, the response will be 204 No Content with an empty body.
   #
@@ -444,7 +455,9 @@ class DiscussionTopicsApiController < ApplicationController
   #
   # No request fields are necessary.
   #
-  # @argument forced_read_state [Optional] A boolean value to set the entry's forced_read_state. No change is made if this argument is not specified.
+  # @argument forced_read_state [Optional, Boolean]
+  #   A boolean value to set the entry's forced_read_state. No change is made if
+  #   this argument is not specified.
   #
   # On success, the response will be 204 No Content with an empty body.
   #

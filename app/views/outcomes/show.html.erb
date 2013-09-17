@@ -27,7 +27,24 @@
 <div id="outcome_results">
   <ul id="outcome_results_list">
   <% @results.each do |result| %>
-    <%= render :partial => "outcome_result", :object => result %>
+    <%#
+      There are a few old LearningOutcomeResults that have a nil artifact, and
+      many that have a Submission as an artifact.  We want to get rid of these
+      because they come from bad data, and step 1 toward that goal is to stop
+      creating them and hide them in the UI.
+
+      The LORs with a nil artifact are very old and I believe came from a very
+      early incarnation of outcomes.  The LORs with a Submission as an artifact
+      came from a combination of two code problems.  The first was old code
+      that allowed an assignment that was aligned with an outcome but did not
+      have a rubric to create LORs directly based on it's submission.  The
+      second was a bug that prevented the assignment <-> outcome link from
+      being destroyed when a rubric with an outcome was removed from an
+      assignment.
+    %>
+    <% if result.artifact_type.present? && result.artifact_type != 'Submission' %>
+      <%= render :partial => "outcome_result", :object => result %>
+    <% end %>
   <% end %>
   </ul>
   <%= will_paginate(@results) %>

@@ -47,6 +47,7 @@ module Kaltura
       if @cache_play_list_seconds = config['cache_play_list_seconds']
         @cache_play_list_seconds = @cache_play_list_seconds.to_i
       end
+      @kaltura_sis = config['kaltura_sis']
     end
 
     def self.config
@@ -105,6 +106,8 @@ module Kaltura
               next
             end
 
+            hash[:hasWarnings] = true if asset[:description] && asset[:description].include?("warnings")
+
             sources << hash
           else
             # if it was deleted or if it did not convert because it did not need to
@@ -133,9 +136,11 @@ module Kaltura
     # preferring converted assets over the original (since they're likely to stream better)
     # and sorting by descending bitrate for identical file types.
     def sort_source_list(sources)
-      sources.sort_by do |a|
-        [a[:isOriginal] == '0' ? 0 : 1, PREFERENCE.index(a[:fileExt]) || PREFERENCE.size + 1, 0 - a[:bitrate].to_i]
+      sources = sources.sort_by do |a|
+        [a[:hasWarnings] ? 1 : 0, a[:isOriginal] == '0' ? 0 : 1, PREFERENCE.index(a[:fileExt]) || PREFERENCE.size + 1, 0 - a[:bitrate].to_i]
       end
+      sources.each{|a| a.delete(:hasWarnings)}
+      sources
     end
 
     def thumbnail_url(entryId, opts = {})
@@ -267,7 +272,7 @@ module Kaltura
         filename = (file[:name] || "Media File").gsub(/,/, "")
         description = (file[:description] || "no description").gsub(/,/, "")
         url = file[:url]
-        rows << [filename, description, file[:tags] || "", url, file[:media_type] || "video", '', '', '' ,'' ,'' ,'' ,file[:id] || ''] if file[:url]
+        rows << [filename, description, file[:tags] || "", url, file[:media_type] || "video", '', '', '' ,'' ,'' ,'' ,file[:partner_data] || ''] if file[:url]
       end
       res = CSV.generate do |csv|
         rows.each do |row|
@@ -303,7 +308,7 @@ module Kaltura
       result = sendRequest(:flavorAsset, :getDownloadUrl,
                            :ks => @ks,
                            :id => assetId)
-      return result.content
+      return result.content if result
     end
 
     # This is not a true Kaltura API call, but generates the url for a "playlist"

@@ -34,7 +34,9 @@ module SIS
       end
       User.update_account_associations(importer.users_to_add_account_associations, :incremental => true, :precalculated_associations => {@root_account.id => 0})
       User.update_account_associations(importer.users_to_update_account_associations)
-      Pseudonym.where(:id => importer.pseudos_to_set_sis_batch_ids).update_all(:sis_batch_id => @batch_id) if @batch && !importer.pseudos_to_set_sis_batch_ids.empty?
+      importer.pseudos_to_set_sis_batch_ids.in_groups_of(1000, false) do |batch|
+        Pseudonym.where(:id => batch).update_all(:sis_batch_id => @batch_id)
+      end if @batch
       @logger.debug("Users took #{Time.now - start} seconds")
       return importer.success_count
     end
@@ -91,13 +93,15 @@ module SIS
             pseudo ||= pseudo_by_login
             pseudo ||= @root_account.pseudonyms.active.by_unique_id(email).first if email.present?
 
+            status_is_active = !(status =~ /\Adeleted/i)
+
             if pseudo
-              if pseudo.sis_user_id.present? && pseudo.sis_user_id != user_id
+              if pseudo.sis_user_id && pseudo.sis_user_id != user_id
                 @messages << "user #{pseudo.sis_user_id} has already claimed #{user_id}'s requested login information, skipping"
                 next
               end
-              if !pseudo_by_login.nil? && pseudo.unique_id != login_id
-                @messages << "user #{pseudo_by_login.sis_user_id} has already claimed #{user_id}'s requested login information, skipping"
+              if pseudo_by_login && (pseudo.unique_id != login_id || pseudo != pseudo_by_login && status_is_active)
+                @messages << "user #{pseudo_by_login.sis_user_id || pseudo_by_login.user_id} has already claimed #{user_id}'s requested login information, skipping"
                 next
               end
 
@@ -119,8 +123,6 @@ module SIS
 
             should_add_account_associations = false
             should_update_account_associations = false
-
-            status_is_active = !(status =~ /\Adeleted/i)
 
             if !status_is_active && !user.new_record?
               # if this user is deleted, we're just going to make sure the user isn't enrolled in anything in this root account and

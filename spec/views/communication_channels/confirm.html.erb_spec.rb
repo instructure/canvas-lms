@@ -26,7 +26,7 @@ describe "communication_channels/confirm.html.erb" do
     assigns[:communication_channel] = @cc = @communication_channel = @user.communication_channels.create!(:path => 'johndoe@example.com')
     assigns[:nonce] = @cc.confirmation_code
     assigns[:body_classes] = []
-    assigns[:root_account] = Account.default
+    assigns[:domain_root_account] = assigns[:root_account] = Account.default
     @controller.template.stubs(:require_terms?).returns(nil) # since controller-defined helper methods don't get plumbed down here
   end
 

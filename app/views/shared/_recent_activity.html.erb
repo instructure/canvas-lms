@@ -40,11 +40,11 @@
           </div>
         </div>
         <div class=header-right-side>
-          <a href="#" class="toggle-details" aria-controls="<%= category_class %>-details" role="button"><%= t :show_more, 'Show More' %> ▼</a>
+          <a href="#" class="toggle-details" aria-controls="details_container"></a>
         </div>
       </div>
 
-      <div class=details_container aria-expanded=false>
+      <div class='details_container'>
         <table id="<%= category_class %>-details" class="stream-details">
           <caption class="accessibly-hidden"><%= category_details_label(category) %></caption>
           <thead class="accessibly-hidden">

@@ -27,7 +27,7 @@ class RubricAssociation < ActiveRecord::Base
   belongs_to :association, :polymorphic => true
 
   belongs_to :context, :polymorphic => true
-  has_many :rubric_assessments, :dependent => :destroy
+  has_many :rubric_assessments
   has_many :assessment_requests, :dependent => :destroy
   
   has_a_broadcast_policy
@@ -41,8 +41,9 @@ class RubricAssociation < ActiveRecord::Base
   after_create :link_to_assessments
   before_save :update_old_rubric
   after_destroy :update_rubric
+  after_destroy :update_alignments
   after_save :assert_uniqueness
-  after_save :update_outcome_relations
+  after_save :update_alignments
   serialize :summary_data
 
   ValidAssociationModels = {
@@ -96,9 +97,12 @@ class RubricAssociation < ActiveRecord::Base
     end
   end
 
-  def update_outcome_relations
+  def update_alignments
     return unless assignment
-    outcome_ids = rubric.learning_outcome_alignments.map(&:learning_outcome_id)
+    outcome_ids = []
+    unless self.destroyed?
+      outcome_ids = rubric.learning_outcome_alignments.map(&:learning_outcome_id)
+    end
     LearningOutcome.update_alignments(assignment, context, outcome_ids)
     true
   end
@@ -142,35 +146,12 @@ class RubricAssociation < ActiveRecord::Base
     end
   end
   protected :update_assignment_points
-  
-  def invite_assessor(assessee, assessor, asset, invite=false)
-    # Invitations should be unique per asset, user and assessor
-    assessment_request = self.assessment_requests.find_by_user_id_and_assessor_id(assessee.id, assessor.id)
-    assessment_request ||= self.assessment_requests.build(:user => assessee, :assessor => assessor)
-    assessment_request.workflow_state = "assigned" if assessment_request.new_record?
-    assessment_request.asset = asset
-    invite ? assessment_request.send_reminder! : assessment_request.save!
-    assessment_request
-  end
-  
+
   def remind_user(assessee)
     assessment_request = self.assessment_requests.find_by_user_id(assessee.id)
     assessment_request ||= self.assessment_requests.build(:user => assessee)
     assessment_request.send_reminder! if assessment_request.assigned?
     assessment_request
-  end
-    
-  def invite_assessors(assessee, invitations, asset)
-    assessors = TmailParser.new(invitations).parse
-    assessors.map do |assessor|
-      cc = CommunicationChannel.find_or_create_by_path(assessor[:email])
-      user = cc.user || User.create() { |u| u.workflow_state = :creation_pending }
-      user.assert_name(assessor[:name] || assessor[:email])
-      cc.user ||= user
-      cc.save!
-      user.reload
-      invite_assessor(assessee, user, asset, true)
-    end
   end
   
   def update_rubric
@@ -207,7 +188,7 @@ class RubricAssociation < ActiveRecord::Base
     self.context.students - self.rubric_assessments.map{|a| a.user} - self.assessment_requests.map{|a| a.user}
   end
   
-  def self.generate_with_invitees(current_user, rubric, context, params, invitees=nil)
+  def self.generate(current_user, rubric, context, params)
     raise "context required" unless context
     association_object = params.delete :association
     if (association_id = params.delete(:id)) && association_id.present?
@@ -223,10 +204,6 @@ class RubricAssociation < ActiveRecord::Base
     association.skip_updating_points_possible = params.delete :skip_updating_points_possible
     association.update_attributes(params)
     association.association = association_object
-    # Invite any recipients from the get-go
-    if invitees && association
-      assessments = association.invite_assessors(current_user, invitees, association_object.find_asset_for_assessment(association, current_user.id)[0])
-    end
     association
   end
   

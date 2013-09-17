@@ -4,11 +4,21 @@
 <% else %>
   <% grade = nil; score = nil
     @submission_score_lookup ||= {
-      'online_url' => 'link.png',
-      'online_text_entry' => 'text_entry.png',
-      'discussion_topic' => 'text_entry.png',
-      'online_upload' => 'file.png',
-      'online_quiz' => 'quiz.png'
+      'online_url' => {
+        :path => 'link.png',
+        :alt => t('icons.online_url_submission', 'Online Url Submission') },
+      'online_text_entry' => {
+        :path => 'text_entry.png',
+        :alt => t('icons.text_entry_submission', 'Text Entry Submission') },
+      'online_upload' => {
+        :path => 'file.png',
+        :alt => t('icons.file_upload_submission', 'File Upload Submission') },
+      'discussion_topic' => {
+        :path => 'text_entry.png',
+        :alt => t('icons.discussion_submission', 'Discussion Submission') },
+      'online_quiz' => {
+        :path => 'quiz.png',
+        :alt => t('icons.quiz_submission', 'Quiz Submission') }
     }
     if submission
       grade = student_score ? submission.published_grade : submission.grade
@@ -28,7 +38,8 @@
       <%= grade.to_f.round(2) %>
     <% end %>
   <% elsif submission && submission.submission_type %>
-    <%= @submission_score_lookup[submission.submission_type] ? image_tag(@submission_score_lookup[submission.submission_type], :class => "submission_icon") : ' - ' %>
+    <% sub_score = @submission_score_lookup[submission.submission_type] %>
+    <%= sub_score ? image_tag(sub_score[:path], :class => "submission_icon", :alt => sub_score[:alt]) : ' - ' %>
   <% else %>
     -
   <% end %>

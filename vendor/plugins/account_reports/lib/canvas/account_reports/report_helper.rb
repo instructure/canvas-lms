@@ -18,14 +18,18 @@
 
 module Canvas::AccountReports::ReportHelper
 
+  def parse_utc_string(datetime)
+    if datetime.is_a? String
+      Time.use_zone('UTC') {Time.zone.parse(datetime)}
+    end
+  end
+
 # This function will take a datetime or a datetime string and convert into
 # iso8601 for the root_account's timezone
 # A string datetime needs to be in UTC
   def default_timezone_format(datetime, account=root_account)
     if datetime.is_a? String
-      datetime = Time.use_zone('UTC') do
-        Time.zone.parse(datetime)
-      end
+      datetime = parse_utc_string(datetime)
     end
     if datetime
       datetime.in_time_zone(account.default_time_zone).iso8601
@@ -51,9 +55,8 @@ module Canvas::AccountReports::ReportHelper
   end
 
   def term
-    if @account_report.has_parameter? "enrollment_term"
-      @term ||= api_find(root_account.enrollment_terms,
-                         @account_report.parameters["enrollment_term"])
+    if (term_id = (@account_report.has_parameter? "enrollment_term_id") || (@account_report.has_parameter? "enrollment_term"))
+      @term ||= api_find(root_account.enrollment_terms,term_id)
     end
   end
 
@@ -70,9 +73,14 @@ module Canvas::AccountReports::ReportHelper
   end
 
   def course
-    if @account_report.has_parameter? "course"
-      @course ||= api_find(root_account.courses,
-                           @account_report.parameters["course"])
+    if (course_id = (@account_report.has_parameter? "course_id") || (@account_report.has_parameter? "course"))
+      @course ||= api_find(root_account.all_courses, course_id)
+    end
+  end
+
+  def section
+    if section_id = (@account_report.has_parameter? "section_id")
+      @section ||= api_find(root_account.course_sections, section_id)
     end
   end
 
@@ -91,6 +99,14 @@ module Canvas::AccountReports::ReportHelper
                            WHERE caa.account_id = ?
                            AND caa.course_id=#{table}.id
                            AND caa.course_section_id IS NULL)", account)
+    else
+      scope
+    end
+  end
+
+  def add_course_enrollments_scope(scope,table = 'enrollments')
+    if course
+      scope.where(table => { :course_id => course })
     else
       scope
     end
@@ -133,5 +149,16 @@ module Canvas::AccountReports::ReportHelper
         "%{type} report successfully generated with the following settings. Account: %{account}; %{options}",
         :type => type, :account => account.name, :options => options),
       file)
+  end
+
+  def write_report(headers)
+    file = Canvas::AccountReports.generate_file(@account_report)
+    CSV.open(file, "w") do |csv|
+      csv << headers
+      yield csv
+    end
+    Shackles.activate(:master) do
+      send_report(file)
+    end
   end
 end

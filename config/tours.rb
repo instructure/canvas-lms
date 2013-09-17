@@ -22,11 +22,13 @@
 
 Tour.config do
 
-  #tour(:first_time_login, 'users#user_dashboard') {
-    #params[:registration_success] &&
-    #@current_user &&
-    #@current_user.initial_enrollment_type == 'teacher'
-  #}
+  #tour(:discussion_topic_auto_unread, 1, ['discussion_topics#show', 'discussion_topics#index']) do
+    #if params["action"] == "show"
+      #DiscussionTopic.find(params["id"]).discussion_entries.length > 0
+    #elsif params["tour-topic-id"]
+      #true
+    #end
+  #end
 
 end
 

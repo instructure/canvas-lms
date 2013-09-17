@@ -160,7 +160,7 @@ module ApplicationHelper
     end
   end
 
-  def avatar_image(user_or_id, width=50)
+  def avatar_image(user_or_id, width=50, opts = {})
     user_id = user_or_id.is_a?(User) ? user_or_id.id : user_or_id
     user = user_or_id.is_a?(User) && user_or_id
     if session["reported_#{user_id}"]
@@ -179,14 +179,17 @@ module ApplicationHelper
         alt = user ? user.short_name : ''
         [url, alt]
       end
-      image_tag(image_url, :style => "width: #{width}px; min-height: #{(width/1.6).to_i}px; max-height: #{(width*1.6).to_i}px", :alt => alt_tag)
+      image_tag(image_url,
+        :style => "width: #{width}px; min-height: #{(width/1.6).to_i}px; max-height: #{(width*1.6).to_i}px",
+        :alt => alt_tag,
+        :class => Array(opts[:image_class]).join(' '))
     end
   end
 
-  def avatar(user_or_id, context_code, width=50)
+  def avatar(user_or_id, context_code, width=50, opts = {})
     user_id = user_or_id.is_a?(User) ? user_or_id.id : user_or_id
     if service_enabled?(:avatars)
-      link_to(avatar_image(user_or_id, width), "#{context_prefix(context_code)}/users/#{user_id}", :style => 'z-index: 2; position: relative;', :class => 'avatar')
+      link_to(avatar_image(user_or_id, width, opts), "#{context_prefix(context_code)}/users/#{user_id}", :style => 'z-index: 2; position: relative;', :class => 'avatar img-circle')
     end
   end
 
@@ -235,8 +238,20 @@ module ApplicationHelper
     (context ? context.class.base_ar_class : context.class).name.underscore
   end
 
-  def message_user_path(user)
-    conversations_path(:user_id => user.id)
+  def message_user_path(user, context = nil)
+    context = context || @context
+    context = nil unless context.is_a?(Course)
+    conversations_path(user_id: user.id, user_name: user.name,
+                       context_id: context.try(:asset_string))
+  end
+
+  # Public: Determine if the currently logged-in user is an account or site admin.
+  #
+  # Returns a boolean.
+  def current_user_is_account_admin
+    [@domain_root_account, Account.site_admin].map do |account|
+      account.membership_for_user(@current_user)
+    end.any?
   end
 
   def hidden(include_style=false)
@@ -396,6 +411,10 @@ module ApplicationHelper
     end
   end
 
+  def include_common_stylesheets
+    include_stylesheets :vendor, :common, media: "all"
+  end
+
   def section_tabs
     @section_tabs ||= begin
       if @context
@@ -509,7 +528,7 @@ module ApplicationHelper
     global_inst_object = { :environment =>  Rails.env }
     {
       :allowMediaComments       => Kaltura::ClientV3.config && @context.try_rescue(:allow_media_comments?),
-      :kalturaSettings          => Kaltura::ClientV3.config.try(:slice, 'domain', 'resource_domain', 'rtmp_domain', 'partner_id', 'subpartner_id', 'player_ui_conf', 'player_cache_st', 'kcw_ui_conf', 'upload_ui_conf', 'max_file_size_bytes'),
+      :kalturaSettings          => Kaltura::ClientV3.config.try(:slice, 'domain', 'resource_domain', 'rtmp_domain', 'partner_id', 'subpartner_id', 'player_ui_conf', 'player_cache_st', 'kcw_ui_conf', 'upload_ui_conf', 'max_file_size_bytes', 'do_analytics'),
       :equellaEnabled           => !!equella_enabled?,
       :googleAnalyticsAccount   => Setting.get_cached('google_analytics_key', nil),
       :http_status              => @status,
@@ -533,6 +552,7 @@ module ApplicationHelper
     contexts << @context if @context && @context.respond_to?(:context_external_tools)
     contexts += @context.account_chain if @context.respond_to?(:account_chain)
     contexts << @domain_root_account if @domain_root_account
+    return [] if contexts.empty?
     Rails.cache.fetch((['editor_buttons_for'] + contexts.uniq).cache_key) do
       tools = ContextExternalTool.active.having_setting('editor_button').where(contexts.map{|context| "(context_type='#{context.class.base_class.to_s}' AND context_id=#{context.id})"}.join(" OR "))
       tools.sort_by(&:id).map do |tool|
@@ -601,7 +621,7 @@ module ApplicationHelper
       opts[:options_so_far] << %{<option value="#{folder.id}" #{'selected' if opts[:selected_folder_id] == folder.id}>#{"&nbsp;" * opts[:indent_width] * opts[:depth]}#{"- " if opts[:depth] > 0}#{html_escape folder.name}</option>}
       if opts[:max_depth].nil? || opts[:depth] < opts[:max_depth]
         child_folders = if opts[:all_folders]
-                          opts[:all_folders].select {|f| f.parent_folder_id == folder.id }
+                          opts[:all_folders].to_a.select {|f| f.parent_folder_id == folder.id }
                         else
                           folder.active_sub_folders.by_position
                         end
@@ -649,6 +669,7 @@ module ApplicationHelper
       {
         :longName => "#{course.name} - #{course.short_name}",
         :shortName => course.name,
+        :courseCode => course.course_code,
         :href => course_path(course, :invitation => course.read_attribute(:invitation)),
         :term => term || nil,
         :subtitle => subtitle,
@@ -854,8 +875,12 @@ module ApplicationHelper
   def agree_to_terms
     # may be overridden by a plugin
     @agree_to_terms ||
-    t("#user.registration.agree_to_terms",
-      "You agree to the *terms of use*.",
-      :wrapper => link_to('\1', "http://www.instructure.com/terms-of-use", :target => "_new"))
+    t("#user.registration.agree_to_terms_and_privacy_policy",
+      "You agree to the *terms of use* and acknowledge the **privacy policy**.",
+      wrapper: {
+        '*' => link_to('\1', @domain_root_account.terms_of_use_url, target: '_blank'),
+        '**' => link_to('\1', @domain_root_account.privacy_policy_url, target: '_blank')
+      }
+    )
   end
 end

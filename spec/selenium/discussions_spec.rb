@@ -58,6 +58,25 @@ describe "discussions" do
       get url
       check_permissions(what_to_create.count)
     end
+
+    it "should bucket topics based on section-specific locks" do
+      sec = @course.course_sections.create!(:name => "Section 2")
+      topic = @course.discussion_topics.build(:title => "topic closed to section 2", :user => @user)
+      topic.assignment = @course.assignments.build
+      topic.save!
+      topic.assignment.assignment_overrides.create! { |override|
+        override.set = sec 
+        override.lock_at = 1.day.ago
+        override.lock_at_overridden = true
+      }
+
+      student = user_with_pseudonym({:unique_id => 'sectionuser@example.com', :password => 'asdfasdf'})
+      @course.enroll_user(student, 'StudentEnrollment', :section => sec).accept!
+      login_as(student.primary_pseudonym.unique_id, 'asdfasdf')
+      get url
+      wait_for_ajaximations
+      f('#locked-discussions .collectionViewItems .discussion').should_not be_nil 
+    end
   end
 
   context "as a teacher" do
@@ -167,7 +186,7 @@ describe "discussions" do
         expect_new_page_load { f(".discussion_locked_toggler").click }
         f('.discussion-fyi').text.should == 'This topic is closed for comments'
         ff('.discussion-reply-action').should be_empty
-        DiscussionTopic.last.workflow_state.should == 'locked'
+        DiscussionTopic.last.locked?.should be_true
       end
 
       it "should validate reopening the discussion for comments" do
@@ -176,6 +195,7 @@ describe "discussions" do
         expect_new_page_load { f(".discussion_locked_toggler").click }
         ff('.discussion-reply-action').should_not be_empty
         DiscussionTopic.last.workflow_state.should == 'active'
+        DiscussionTopic.last.locked?.should be_false
       end
 
       it "should escape correctly when posting an attachment" do
@@ -356,6 +376,52 @@ describe "discussions" do
 
           f('.locked.discussion-list .al-trigger').click
           ffj('.icon-pin:visible').length.should == 1
+        end
+
+        it "should show subscription icons" do
+          topic = @course.discussion_topics.create!(title: 'Test Discussion', user: @user)
+          topic.subscribed?(@user).should be_true
+          get(url)
+          wait_for_ajaximations
+          f('.discussion .icon-discussion-check').should be_displayed
+          f('.discussion .icon-discussion').should be_nil
+
+          topic.unsubscribe(@user)
+          get(url)
+          wait_for_ajaximations
+          f('.discussion .icon-discussion-check').should be_nil
+          f('.discussion .icon-discussion').should be_displayed
+        end
+
+        it "should allow subscribing to a topic" do
+          topic = @course.discussion_topics.create!(title: 'Test Discussion', user: @user)
+          topic.unsubscribe(@user)
+          get(url)
+          wait_for_ajaximations
+          f('.icon-discussion').should be_displayed
+          f('.subscription-toggler').click
+          wait_for_ajaximations
+          driver.execute_script(%{$('.subscription-toggler').trigger('mouseleave')})
+          f('.icon-discussion').should be_nil
+          f('.icon-discussion-check').should be_displayed
+          topic.reload
+          topic.subscribed?(@user).should be_true
+        end
+
+        it "should allow unsubscribing from a topic" do
+          topic = @course.discussion_topics.create!(title: 'Test Discussion', user: @user)
+          topic.subscribe(@user)
+          get(url)
+          wait_for_ajaximations
+          driver.execute_script(%{$('.subscription-toggler').trigger('mouseleave')})
+          f('.icon-discussion-check').should be_displayed
+          f('.subscription-toggler').click
+          wait_for_ajaximations
+          driver.execute_script(%{$('.subscription-toggler').trigger('mouseleave')})
+          f('.icon-discussion-check').should be_nil
+          f('.icon-discussion').should be_displayed
+          topic.reload
+          topic.subscribed?(@user).should be_false
         end
       end
 
@@ -607,7 +673,7 @@ describe "discussions" do
         it "should set as active when removing existing delayed_post_at and lock_at dates" do
           @topic.delayed_post_at = 10.days.ago
           @topic.lock_at         = 5.days.ago
-          @topic.workflow_state  = 'locked'
+          @topic.locked          = true
           @topic.save!
 
           get "/courses/#{@course.id}/discussion_topics/#{@topic.id}/edit"
@@ -623,12 +689,13 @@ describe "discussions" do
           @topic.delayed_post_at.should be_nil
           @topic.lock_at.should be_nil
           @topic.active?.should be_true
+          @topic.locked?.should be_false
         end
 
-        it "should clear the delayed_post_at and lock_at when manually triggering unlock" do
+        it "should clear lock_at when manually triggering unlock" do
           @topic.delayed_post_at = 10.days.ago
           @topic.lock_at         = 5.days.ago
-          @topic.workflow_state  = 'locked'
+          @topic.locked          = true
           @topic.save!
 
           get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
@@ -638,12 +705,12 @@ describe "discussions" do
           expect_new_page_load { f(".discussion_locked_toggler").click }
 
           @topic.reload
-          @topic.delayed_post_at.should be_nil
           @topic.lock_at.should be_nil
           @topic.active?.should be_true
+          @topic.locked?.should be_false
         end
 
-        it "should set workflow to locked when delayed_post_at and lock_at are in past" do
+        it "should be locked when delayed_post_at and lock_at are in past" do
           @topic.delayed_post_at = nil
           @topic.lock_at         = nil
           @topic.workflow_state  = 'active'
@@ -693,7 +760,8 @@ describe "discussions" do
         it "should set workflow to active when delayed_post_at in past and lock_at in future" do
           @topic.delayed_post_at = 5.days.from_now
           @topic.lock_at         = 10.days.from_now
-          @topic.workflow_state  = 'locked'
+          @topic.workflow_state  = 'active'
+          @topic.locked          = nil
           @topic.save!
 
           get "/courses/#{@course.id}/discussion_topics/#{@topic.id}/edit"
@@ -711,6 +779,7 @@ describe "discussions" do
           @topic.reload
           @topic.delayed_post_at.strftime(date_format).should == delayed_post_at.strftime(date_format)
           @topic.active?.should be_true
+          @topic.locked?.should be_false
         end
       end
     end
@@ -771,6 +840,64 @@ describe "discussions" do
       @topic = @course.discussion_topics.create!(:user => @teacher, :message => 'new topic from teacher', :discussion_type => 'side_comment')
       @entry = @topic.discussion_entries.create!(:user => @teacher, :message => 'new entry from teacher')
       user_session(@student)
+    end
+
+    it "should not allow subscribing to a topic that requires an initial post" do
+      @topic.unsubscribe(@student)
+      @topic.require_initial_post = true
+      @topic.save!
+      get "/courses/#{@course.id}/discussion_topics"
+      wait_for_ajaximations
+      f('.icon-discussion').should be_displayed
+      f('.subscription-toggler').click
+      wait_for_ajaximations
+      driver.execute_script(%{$('.subscription-toggler').trigger('mouseleave')})
+      f('.icon-discussion-check').should be_nil
+      f('.icon-discussion').should be_displayed
+      @topic.reload
+      @topic.subscribed?(@student).should be_false
+    end
+
+    it "should allow subscribing after an initial post" do
+      @topic.unsubscribe(@student)
+      @topic.require_initial_post = true
+      @topic.save!
+      @topic.reply_from(:user => @student, :text => 'initial post')
+      @topic.unsubscribe(@student)
+      get "/courses/#{@course.id}/discussion_topics"
+      wait_for_ajaximations
+      driver.execute_script(%{$('.subscription-toggler').trigger('mouseleave')})
+      f('.icon-discussion').should be_displayed
+      f('.subscription-toggler').click
+      wait_for_ajaximations
+      driver.execute_script(%{$('.subscription-toggler').trigger('mouseleave')})
+      f('.icon-discussion-check').should be_displayed
+      @topic.reload.subscribed?(@student).should be_true
+    end
+
+    it "should display subscription action icons on hover" do
+      @topic.subscribe(@student)
+      get "/courses/#{@course.id}/discussion_topics"
+      wait_for_ajaximations
+      driver.execute_script(%{$('.subscription-toggler').trigger('mouseleave')})
+      f('.icon-discussion-check').should be_displayed
+      driver.execute_script(%{$('.subscription-toggler').trigger('mouseenter')})
+      f('.icon-discussion-check').should be_nil
+      f('.icon-discussion-x').should be_displayed
+      f('.subscription-toggler').click
+      wait_for_ajaximations
+      f('.icon-discussion-x').should be_nil
+      f('.icon-discussion').should be_displayed
+      driver.execute_script(%{$('.subscription-toggler').trigger('mouseleave')})
+      f('.icon-discussion').should be_displayed
+      @topic.reload
+      @topic.require_initial_post = true
+      @topic.save!
+      get "/courses/#{@course.id}/discussion_topics"
+      wait_for_ajaximations
+      driver.execute_script(%{$('.subscription-toggler').trigger('mouseenter')})
+      f('.icon-discussion').should be_nil
+      f('.icon-discussion-x').should be_displayed
     end
 
     it "should not allow students to create discussions according to setting" do

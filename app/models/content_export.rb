@@ -114,12 +114,12 @@ class ContentExport < ActiveRecord::Base
   #   checked should be exported or not. 
   #
   #   Returns: bool
-  def export_object?(obj)
+  def export_object?(obj, asset_type=nil)
     return false unless obj
     return true if selected_content.empty?
     return true if is_set?(selected_content[:everything])
 
-    asset_type = obj.class.table_name
+    asset_type ||= obj.class.table_name
     return true if is_set?(selected_content["all_#{asset_type}"])
 
     return false unless selected_content[asset_type]

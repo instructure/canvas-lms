@@ -1,0 +1,10 @@
+<% define_content :link do %>
+  <%= HostUrl.protocol %>://<%= polymorphic_path([asset.quiz.context,asset.quiz]) %>
+<% end %>
+
+<% define_content :subject do %>
+  <%= t :subject, "Quiz Regraded: %{quiz}, %{context}", :quiz => asset.quiz.title, :context => asset.quiz.context.name %>
+<% end %>
+
+<%= t :body, "A regrade has finished for your quiz %{title}.", :title => asset.quiz.title, :wrapper => "<b><a href=\"#{content :link}\">\\1</a></b>" %>
+

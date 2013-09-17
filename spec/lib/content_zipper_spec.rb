@@ -20,6 +20,29 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe ContentZipper do
   describe "zip_assignment" do
+    it "sanitizes user names" do
+      s1, s2 = 2.times.map { course_with_student ; @student }
+      s1.update_attribute :sortable_name, 'some_999_, _1234_guy'
+      s2.update_attribute :sortable_name, 'other 567, guy 8'
+      [s1, s2].each { |s|
+        submission_model user: s, assignment: @assignment, body: "blah"
+      }
+      attachment = Attachment.new(:display_name => 'my_download.zip')
+      attachment.user = @teacher
+      attachment.workflow_state = 'to_be_zipped'
+      attachment.context = @assignment
+      attachment.save!
+      ContentZipper.process_attachment(attachment, @teacher)
+      expected_file_patterns = [
+        /other-567--guy-8/,
+        /some-999----1234-guy/,
+      ]
+      Zip::ZipFile.foreach(attachment.reload.full_filename).each { |f|
+        f.name.should =~ expected_file_patterns.shift
+      }
+      expected_file_patterns.should be_empty
+    end
+
     it "should zip up online_url submissions" do
       course_with_student(:active_all => true)
       @user.update_attributes!(:sortable_name => 'some_999_, _1234_guy')
@@ -34,7 +57,7 @@ describe ContentZipper do
       attachment.workflow_state.should == 'zipped'
       Zip::ZipFile.foreach(attachment.full_filename) do |f|
         if f.file?
-          f.name.should =~ /some-999-_-1234-guy/
+          f.name.should =~ /some-999----1234-guy/
           f.get_input_stream.read.should match(%r{This submission was a url, we&#39;re taking you to the url link now.})
           f.get_input_stream.read.should be_include("http://www.instructure.com/")
         end
@@ -74,6 +97,34 @@ describe ContentZipper do
       attachment.reload
       # no submissions
       attachment.workflow_state.should == 'errored'
+    end
+
+    it "only includes one submission per group" do
+      teacher_in_course active_all: true
+      gc = @course.group_categories.create! name: "Homework Groups"
+      groups = 2.times.map { |i| gc.groups.create! name: "Group #{i}" }
+      students = 4.times.map { student_in_course(active_all: true); @student }
+      students.each_with_index { |s, i| groups[i % groups.size].add_user(s) }
+      a = @course.assignments.create! group_category_id: gc.id,
+                                      grade_group_students_individually: false,
+                                      submission_types: %w(text_entry)
+      a.submit_homework(students.first, body: "group 1 submission")
+      a.submit_homework(students.second, body: "group 2 submission")
+
+      attachment = Attachment.new(:display_name => 'my_download.zip')
+      attachment.user = @teacher
+      attachment.workflow_state = 'to_be_zipped'
+      attachment.context = a
+      attachment.save!
+
+      ContentZipper.process_attachment(attachment, @teacher)
+      sub_count = 0
+      expected_file_names = [/group-0/, /group-1/]
+      Zip::ZipFile.foreach(attachment.full_filename) do |f|
+        f.name.should =~ expected_file_names.shift
+        sub_count += 1
+      end
+      sub_count.should == 2
     end
   end
 

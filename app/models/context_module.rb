@@ -18,6 +18,7 @@
 
 class ContextModule < ActiveRecord::Base
   include Workflow
+  include SearchTermHelper
   attr_accessible :context, :name, :unlock_at, :require_sequential_progress, :completion_requirements, :prerequisites
   belongs_to :context, :polymorphic => true
   belongs_to :cloned_item
@@ -250,10 +251,18 @@ class ContextModule < ActiveRecord::Base
   end
 
   def content_tags_visible_to(user)
-    if self.grants_right?(user, :update)
-      self.content_tags.not_deleted
+    if self.content_tags.loaded?
+      if self.grants_right?(user, :update)
+        self.content_tags.select{|tag| tag.workflow_state != 'deleted'}
+      else
+        self.content_tags.select{|tag| tag.workflow_state == 'active'}
+      end
     else
-      self.content_tags.active
+      if self.grants_right?(user, :update)
+        self.content_tags.not_deleted
+      else
+        self.content_tags.active
+      end
     end
   end
 
@@ -352,7 +361,7 @@ class ContextModule < ActiveRecord::Base
     return nil unless self.prerequisites_satisfied?(user)
     progression = self.find_or_create_progression(user)
     progression.requirements_met ||= []
-    requirement = self.completion_requirements.to_a.find{|p| p[:id] == tag.id}
+    requirement = self.completion_requirements.to_a.find{|p| p[:id] == tag.local_id}
     return if !requirement || progression.requirements_met.include?(requirement)
     met = false
     met = true if requirement[:type] == 'must_view' && (action == :read || action == :contributed)
@@ -484,19 +493,13 @@ class ContextModule < ActiveRecord::Base
   end
   
   def self.find_or_create_progression(module_id, user_id)
-    s = nil
-    attempts = 0
-    begin
-      s = ContextModuleProgression.find_or_initialize_by_context_module_id_and_user_id(module_id, user_id)
-      s.save! if s.new_record?
-      raise "bad" if s.new_record?
-    rescue => e
-      attempts += 1
-      retry if attempts < 3
+    Shackles.activate(:master) do
+      unique_constraint_retry do
+        ContextModuleProgression.find_or_create_by_context_module_id_and_user_id(module_id, user_id)
+      end
     end
-    s
   end
-  
+
   def content_tags_hash
     return @tags_hash if @tags_hash
     @tags_hash = {}
@@ -514,7 +517,9 @@ class ContextModule < ActiveRecord::Base
     progression ||= self.find_or_create_progression_with_multiple_lookups(user)
     if self.unpublished?
       progression.workflow_state = 'locked'
-      progression.save if progression.workflow_state_changed?
+      Shackles.activate(:master) do
+        progression.save if progression.workflow_state_changed?
+      end
       return progression
     end
     requirements_met_changed = false
@@ -529,7 +534,9 @@ class ContextModule < ActiveRecord::Base
     if recursive_check || progression.new_record? || progression.updated_at < self.updated_at || User.module_progression_jobs_queued?(user.id)
       if self.completion_requirements.blank? && active_prerequisites.empty?
         progression.workflow_state = 'completed'
-        progression.save
+        Shackles.activate(:master) do
+          progression.save
+        end
       end
       progression.workflow_state = 'locked'
       if !self.to_be_unlocked
@@ -603,7 +610,9 @@ class ContextModule < ActiveRecord::Base
       end
     end
     progression.current_position = position
-    progression.save if progression.workflow_state_changed? || requirements_met_changed
+    Shackles.activate(:master) do
+      progression.save if progression.workflow_state_changed? || requirements_met_changed
+    end
     progression
   end
 

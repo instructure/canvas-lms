@@ -80,38 +80,6 @@ describe ActiveRecord::Base do
       @e6 = c2.enroll_student(u3, :enrollment_state => 'active')
     end
 
-    it "should find each enrollment from course join" do
-      e = Course.active.joins(:enrollments)
-      all_enrollments = []
-      e.useful_find_each(:batch_size => 2) do |e|
-        all_enrollments << e.id
-      end
-      all_enrollments.length.should == 6
-    end
-
-    it "should find in batches all enrollments from course join" do
-      e = Course.active.select("enrollments.id as eid").joins(:enrollments)
-      all_enrollments = []
-      e.useful_find_in_batches(:batch_size => 2) do |batch|
-        batch.each do |e|
-          all_enrollments << e.eid
-        end
-      end
-      all_enrollments.length.should == 6
-    end
-
-    it "should find each enrollment from course using temp table" do
-      e = Course.active.select("enrollments.id AS e_id").
-                        joins(:enrollments).order("e_id asc")
-      es = []
-      e.find_each_with_temp_table(:batch_size => 2) do |record|
-        es << record["e_id"]
-      end
-      es.length.should == 6
-      es.should == [@e1.id.to_s,@e2.id.to_s,@e3.id.to_s,@e4.id.to_s,@e5.id.to_s,@e6.id.to_s]
-
-    end
-
     it "should find all enrollments from course join in batches" do
       e = Course.active.select("enrollments.id AS e_id").
                         joins(:enrollments).order("e_id asc")
@@ -120,11 +88,21 @@ describe ActiveRecord::Base do
       e.find_in_batches_with_temp_table(:batch_size => batch_size) do |batch|
         batch.size.should == batch_size
         batch.each do |r|
-          es << r["e_id"]
+          es << r["e_id"].to_i
         end
       end
       es.length.should == 6
-      es.should == [@e1.id.to_s,@e2.id.to_s,@e3.id.to_s,@e4.id.to_s,@e5.id.to_s,@e6.id.to_s]
+      es.should == [@e1.id,@e2.id,@e3.id,@e4.id,@e5.id,@e6.id]
+    end
+
+    it "should honor includes when using a cursor" do
+      pending "needs PostgreSQL" unless Account.connection.adapter_name == 'PostgreSQL'
+      Account.default.courses.create!
+      Account.transaction do
+        Account.where(:id => Account.default).includes(:courses).find_each do |a|
+          a.courses.loaded?.should be_true
+        end
+      end
     end
   end
 
@@ -274,12 +252,13 @@ describe ActiveRecord::Base do
       User.create
       User.cache do
         User.first
-        query_cache = User.connection.instance_variable_get(:@query_cache)
-        keys = query_cache.keys
-        keys.should be_present
+        User.connection.expects(:select).never
+        User.first
+        User.connection.unstub(:select)
 
         User.create!
-        (query_cache.keys & keys).should eql []
+        User.connection.expects(:select).once.returns([])
+        User.first
       end
     end
 
@@ -287,14 +266,15 @@ describe ActiveRecord::Base do
       u = User.create
       User.cache do
         User.first
-        query_cache = User.connection.instance_variable_get(:@query_cache)
-        keys = query_cache.keys
-        keys.should be_present
+        User.connection.expects(:select).never
+        User.first
+        User.connection.unstub(:select)
 
         u2 = User.new
         u2.id = u.id
         lambda{ u2.save! }.should raise_error(ActiveRecord::Base::UniqueConstraintViolation)
-        (query_cache.keys & keys).should eql []
+        User.connection.expects(:select).once.returns([])
+        User.first
       end
     end
   end
@@ -365,16 +345,16 @@ describe ActiveRecord::Base do
 
   context "bulk_insert" do
     it "should work" do
-      Course.connection.bulk_insert "courses", [
+      Course.bulk_insert [
         {:name => "foo"},
         {:name => "bar"}
       ]
-      Course.all.map(&:name).sort.should eql ["bar", "foo"]
+      Course.order(:name).pluck(:name).should eql ["bar", "foo"]
     end
 
     it "should not raise an error if there are no records" do
-      lambda { Course.connection.bulk_insert "courses", [] }.should_not raise_error
-      Course.all.size.should eql 0
+      lambda { Course.bulk_insert [] }.should_not raise_error
+      Course.count.should eql 0
     end
   end
 

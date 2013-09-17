@@ -9,7 +9,7 @@ define [
                .html(editApptCalendarEventTemplate(@event))
                .appendTo('body')
 
-      $maxParticipantsOption = @form.find('[name=max_participants_option]')
+      $maxParticipantsOption = @form.find('[type=checkbox][name=max_participants_option]')
       @$maxParticipants      = @form.find('[name=max_participants]')
 
       $maxParticipantsOption.change =>
@@ -36,7 +36,7 @@ define [
     save: =>
       formData = @dialog.getFormData()
 
-      limit_participants = formData.max_participants_option == "on"
+      limit_participants = formData.max_participants_option == "1"
       max_participants = formData.max_participants
 
       if limit_participants and max_participants <= 0

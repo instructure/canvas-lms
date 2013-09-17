@@ -92,9 +92,12 @@ class RoleOverridesController < ApplicationController
   # @API List roles
   # List the roles available to an account.
   #
-  # @argument account_id The id of the account to retrieve roles for.
-  # @argument state[] Filter by role state. Accepted values are 'active' and 'inactive'. If this argument
-  #   is omitted, only 'active' roles are returned.
+  # @argument account_id [String]
+  #   The id of the account to retrieve roles for.
+  #
+  # @argument state[] [String, "active"|"inactive"]
+  #   Filter by role state. If this argument is omitted, only 'active' roles are
+  #   returned.
   #
   # @returns [Role]
   def api_index
@@ -150,8 +153,11 @@ class RoleOverridesController < ApplicationController
   # @API Get a single role
   # Retrieve information about a single role
   #
-  # @argument account_id The id of the account containing the role
-  # @argument role The name and unique identifier for the role
+  # @argument account_id [String]
+  #   The id of the account containing the role
+  #
+  # @argument role [String]
+  #   The name and unique identifier for the role
   #
   # @returns Role
   def show
@@ -168,17 +174,18 @@ class RoleOverridesController < ApplicationController
   # @API Create a new role
   # Create a new course-level or account-level role.
   #
-  # @argument role
+  # @argument role [String]
   #   Label and unique identifier for the role.
   #
-  # @argument base_role_type [Optional] Accepted values are 'AccountMembership', 'StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment', 'ObserverEnrollment', and 'DesignerEnrollment'
+  # @argument base_role_type [Optional, String, "AccountMembership"|"StudentEnrollment"|"TeacherEnrollment"|"TaEnrollment"|"ObserverEnrollment"|"DesignerEnrollment"]
   #   Specifies the role type that will be used as a base
   #   for the permissions granted to this role.
   #
   #   Defaults to 'AccountMembership' if absent
   #
-  # @argument permissions[<X>][explicit] [Optional]
-  # @argument permissions[<X>][enabled] [Optional]
+  # @argument permissions[<X>][explicit] [Optional, Boolean]
+  #
+  # @argument permissions[<X>][enabled] [Optional, Boolean]
   #   If explicit is 1 and enabled is 1, permission <X> will be explicitly
   #   granted to this role. If explicit is 1 and enabled has any other value
   #   (typically 0), permission <X> will be explicitly denied to this role. If
@@ -252,7 +259,7 @@ class RoleOverridesController < ApplicationController
   #
   #   Additional permissions may exist based on installed plugins.
   #
-  # @argument permissions[<X>][locked] [Optional]
+  # @argument permissions[<X>][locked] [Optional, Boolean]
   #   If the value is 1, permission <X> will be locked downstream (new roles in
   #   subaccounts cannot override the setting). For any other value, permission
   #   <X> is left unlocked. Ignored if permission <X> is already locked
@@ -320,7 +327,7 @@ class RoleOverridesController < ApplicationController
   # continue to function with the same permissions they had previously.
   # Built-in roles cannot be deactivated.
   #
-  # @argument role
+  # @argument role [String]
   #   Label and unique identifier for the role.
   #
   # @returns Role
@@ -338,7 +345,7 @@ class RoleOverridesController < ApplicationController
   # @API Activate a role
   # Re-activates an inactive role (allowing it to be assigned to new users)
   #
-  # @argument role
+  # @argument role [String]
   #   Label and unique identifier for the role.
   #
   # @returns Role
@@ -365,9 +372,10 @@ class RoleOverridesController < ApplicationController
   # * AccountAdmin
   # * Any previously created custom role
   #
-  # @argument permissions[<X>][explicit] [Optional]
-  # @argument permissions[<X>][enabled] [Optional]
-  #   These arguments are described in the documentation for the {api:RoleOverridesController#add_role add_role method}.
+  # @argument permissions[<X>][explicit] [Optional, Boolean]
+  # @argument permissions[<X>][enabled] [Optional, Boolean]
+  #   These arguments are described in the documentation for the
+  #   {api:RoleOverridesController#add_role add_role method}.
   #
   # @example_request
   #   curl https://<canvas>/api/v1/accounts/:account_id/roles/TaEnrollment \ 

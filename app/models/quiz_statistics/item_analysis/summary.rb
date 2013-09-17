@@ -7,7 +7,7 @@ class QuizStatistics::ItemAnalysis::Summary
   def initialize(quiz, options = {})
     @quiz = quiz
     @items = {}
-    @attempts = quiz.quiz_submissions.map { |qs| qs.submitted_versions.first }.compact
+    @attempts = quiz.quiz_submissions.where("was_preview IS NULL OR NOT was_preview").map { |qs| qs.submitted_versions.first }.compact
     @options = options
     @options[:buckets] ||= [
       [:bottom, 0.27],
@@ -28,8 +28,9 @@ class QuizStatistics::ItemAnalysis::Summary
   end
 
   def add_response(question, answer, respondent_id)
-    @items[question] ||= QuizStatistics::ItemAnalysis::Item.from(self, question) || return
-    @items[question].add_response(answer, respondent_id)
+    id = question[:id]
+    @items[id] ||= QuizStatistics::ItemAnalysis::Item.from(self, question) || return
+    @items[id].add_response(answer, respondent_id)
   end
 
   def add_respondent(respondent_id, score)

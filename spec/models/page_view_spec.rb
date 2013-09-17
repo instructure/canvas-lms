@@ -75,45 +75,6 @@ describe PageView do
         pv.save!
         pv = PageView.find(pv.request_id)
         pv.interaction_seconds.should == 25
-        @shard2.settings[:page_view_method] = :cache
-        @shard2.save
-        @shard2.activate do
-          user
-          pv = page_view_model
-          pv.shard.should == @shard2
-          pv.save!
-        end
-        @shard2.activate do
-          PageView.find(pv.request_id).should be_present
-        end
-        # can't find in cassandra
-        expect { PageView.find(pv.request_id) }.to raise_error(ActiveRecord::RecordNotFound)
-      end
-
-      it "should respect the per-shard setting" do
-        pending("needs redis") unless Canvas.redis_enabled?
-
-        begin
-          Shard.default.settings[:page_view_method] = :db
-          Shard.default.save!
-
-          @shard1.activate do
-            course_model
-            pv = page_view_model
-            pv.user = @user
-            pv.context = @course
-            pv.store
-
-            PageView.process_cache_queue
-            pv = PageView.find(pv.request_id)
-            pv.should be_present
-            pv.user.should == @user
-            pv.context.should == @course
-          end
-        ensure
-          Shard.default.settings.delete(:page_view_method)
-          Shard.default.save!
-        end
       end
 
       it "should handle default shard ids through redis" do
@@ -122,10 +83,10 @@ describe PageView do
         @pv_user = user_model
         id = @shard1.activate do
           @user2 = User.create! { |u| u.id = @user.local_id }
-          course_model
-          pv = page_view_model
-          pv.user = @pv_user
-          pv.context = @course
+          account = Account.create!
+          course_model(:account => account)
+          pv = PageView.new(user: @pv_user, context: @course)
+          pv.request_id = UUIDSingleton.instance.generate
           pv.store
 
           PageView.process_cache_queue
@@ -378,13 +339,12 @@ describe PageView do
 
   describe '.generate' do
     let(:params) { {'action' => 'path', 'controller' => 'some'} }
-    let(:headers) { {'User-Agent' => 'Mozilla'} }
-    let(:session) { {:id => 42} }
-    let(:request) { stub(:url => 'host.com/some/path', :path_parameters => params, :headers => headers, :session_options => session, :method => :get) }
+    let(:session) { {:id => '42'} }
+    let(:request) { stub(:url => (@url || 'host.com/some/path'), :path_parameters => params, :user_agent => 'Mozilla', :session_options => session, :method => :get) }
     let(:user) { User.new }
     let(:attributes) { {:real_user => user, :user => user } }
 
-    before { RequestContextGenerator.stubs( :request_id => 9 ) }
+    before { RequestContextGenerator.stubs( :request_id => 'xyz' ) }
     after { RequestContextGenerator.unstub :request_id }
 
     subject { PageView.generate(request, attributes) }
@@ -395,11 +355,24 @@ describe PageView do
     its(:action) { should == params['action'] }
     its(:session_id) { should == session[:id] }
     its(:real_user) { should == user }
-    its(:user_agent) { should == headers['User-Agent'] }
+    its(:user_agent) { should == request.user_agent }
     its(:interaction_seconds) { should == 5 }
     its(:created_at) { should_not be_nil }
     its(:updated_at) { should_not be_nil }
     its(:http_method) { should == 'get' }
+
+    it "should filter sensitive url params" do
+      @url = 'http://canvas.example.com/api/v1/courses/1?access_token=SUPERSECRET'
+      pv = PageView.generate(request, attributes)
+      pv.url.should ==  'http://canvas.example.com/api/v1/courses/1?access_token=[FILTERED]'
+    end
+
+    it "should filter sensitive url params on the way out" do
+      pv = PageView.generate(request, attributes)
+      pv.update_attribute(:url, 'http://canvas.example.com/api/v1/courses/1?access_token=SUPERSECRET')
+      pv.reload
+      pv.url.should ==  'http://canvas.example.com/api/v1/courses/1?access_token=[FILTERED]'
+    end
   end
 
   describe ".for_request_id" do
@@ -470,10 +443,6 @@ describe PageView do
           end
         end
       end
-
-      it "should not be flagged for cassandra" do
-        PageView.from_attributes(@attributes).should_not be_cassandra
-      end
     end
 
     context "cassandra-backed" do
@@ -490,10 +459,6 @@ describe PageView do
             page_view2.user_id.should == Shard.default.relative_id_for(user_id)
           end
         end
-      end
-
-      it "should be flagged for cassandra" do
-        PageView.from_attributes(@attributes).should be_cassandra
       end
     end
   end

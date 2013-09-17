@@ -48,6 +48,10 @@ class QuizQuestion < ActiveRecord::Base
   end
   
   def question_data=(data)
+    if data[:regrade_option] && self.quiz.context.root_account.enable_quiz_regrade?
+      update_question_regrade(data[:regrade_option], data[:regrade_user])
+    end
+
     if data.is_a?(String)
       data = ActiveSupport::JSON.decode(data) rescue nil
     elsif data.class == Hash
@@ -157,7 +161,8 @@ class QuizQuestion < ActiveRecord::Base
     else
       query = "INSERT INTO quiz_questions (quiz_id, quiz_group_id, assessment_question_id, question_data, created_at, updated_at, migration_id, position)"
       query += " VALUES (#{q_id}, #{g_id}, #{aq_id},#{question_data},'#{Time.now.to_s(:db)}', '#{Time.now.to_s(:db)}', '#{hash[:migration_id]}', #{position})"
-      id = self.connection.insert(query)
+      self.connection.insert(query, "#{name} Create",
+                             primary_key, nil, sequence_name)
     end
     hash
   end
@@ -173,5 +178,17 @@ class QuizQuestion < ActiveRecord::Base
         question.save
       end
     end
+  end
+
+  private
+
+  def update_question_regrade(regrade_option, regrade_user)
+    regrade = QuizRegrade.find_or_create_by_quiz_id_and_quiz_version(quiz.id, quiz.version_number) do |qr|
+      qr.user_id = regrade_user.id
+    end
+
+    question_regrade = QuizQuestionRegrade.find_or_initialize_by_quiz_question_id_and_quiz_regrade_id(id, regrade.id)
+    question_regrade.regrade_option = regrade_option
+    question_regrade.save!
   end
 end

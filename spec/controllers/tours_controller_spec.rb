@@ -9,7 +9,7 @@ describe ToursController do
   end
 
   it "should add dismissed tours to user preferences" do
-    @user.preferences.should be_empty
+    @user.preferences[:dismissed_tours].should be_nil
     delete 'dismiss', :name => 'FakeTour'
     @user.reload
     @user.preferences[:dismissed_tours].should == {:fake_tour => 1}

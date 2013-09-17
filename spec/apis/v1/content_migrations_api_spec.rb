@@ -58,6 +58,12 @@ describe ContentMigrationsController, :type => :integration do
       course_with_student_logged_in(:course => @course, :active_all => true)
       api_call(:get, @migration_url, @params, {}, {}, :expected_status => 401)
     end
+
+    it "should create the course root folder" do
+      @course.folders.should be_empty
+      api_call(:get, @migration_url, @params)
+      @course.reload.folders.should_not be_empty
+    end
   end
 
   describe 'show' do
@@ -82,7 +88,7 @@ describe ContentMigrationsController, :type => :integration do
       json["migration_issues_count"].should == 0
       json["attachment"]["url"].should =~ %r{/files/#{@migration.attachment.id}/download}
       json['progress_url'].should == "http://www.example.com/api/v1/progress/#{progress.id}"
-      json['migration_type_title'].should == 'Common Cartridge Importer'
+      json['migration_type_title'].should == 'Common Cartridge'
     end
 
     it "should return waiting_for_select when it's supposed to" do
@@ -100,6 +106,43 @@ describe ContentMigrationsController, :type => :integration do
     it "should 401" do
       course_with_student_logged_in(:course => @course, :active_all => true)
       api_call(:get, @migration_url, @params, {}, {}, :expected_status => 401)
+    end
+
+    it "should not return attachment for course copies" do
+      @migration.migration_type = nil
+      @migration.source_course_id = @course.id
+      @attachment = Attachment.create!(:context => @migration, :filename => "test.zip", :uploaded_data => StringIO.new("test file"))
+      @attachment.file_state = "deleted"
+      @attachment.workflow_state = "unattached"
+      @attachment.save
+      @migration.attachment = @attachment
+      @migration.save!
+
+      json = api_call(:get, @migration_url, @params)
+      json["attachment"].should be_nil
+    end
+
+    it "should return source course info for course copy" do
+      @migration.migration_type = nil
+      @migration.source_course_id = @course.id
+      @migration.save!
+
+      json = api_call(:get, @migration_url, @params)
+      json['settings']['source_course_id'].should == @course.id
+      json['settings']['source_course_name'].should == @course.name
+    end
+
+    it "should mark as failed if stuck in pre_processing" do
+      @migration.workflow_state = 'pre_processing'
+      @migration.save!
+      ContentMigration.where(:id => @migration.id).update_all(:updated_at => Time.now.utc - 2.hours)
+
+      json = api_call(:get, @migration_url, @params)
+      json['workflow_state'].should == 'failed'
+      json['migration_issues_count'].should == 1
+      @migration.reload
+      @migration.should be_failed
+      @migration.migration_issues.first.description.should == "The file upload process timed out."
     end
   end
 
@@ -257,14 +300,15 @@ describe ContentMigrationsController, :type => :integration do
         @migration.workflow_state = 'exported'
         @migration.migration_settings[:import_immediately] = false
         @migration.save!
-        @post_params = {:copy => {:all_assignments => true}}
+        @post_params = {:copy => {:all_assignments => true, :context_modules => {'id_9000' => true}}}
       end
 
       it "should set the selective data" do
         json = api_call(:put, @migration_url, @params, @post_params)
         @migration.reload
-        @migration.migration_settings[:migration_ids_to_import].should == {'copy' => {'all_assignments' => 'true'}}
-        @migration.copy_options.should == {'all_assignments' => 'true'}
+        copy_options = {'all_assignments' => 'true', 'context_modules' => {'9000' => 'true'}}
+        @migration.migration_settings[:migration_ids_to_import].should == {'copy' => copy_options}
+        @migration.copy_options.should == copy_options
       end
 
       it "should queue a course copy after selecting content" do

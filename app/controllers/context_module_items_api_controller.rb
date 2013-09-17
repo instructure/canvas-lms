@@ -24,6 +24,9 @@
 #       // the unique identifier for the module item
 #       id: 768,
 #
+#       // the id of the Module this item appears in
+#       module_id: 123,
+#
 #       // the position of this item in the module (1-based)
 #       position: 1,
 #
@@ -68,7 +71,70 @@
 #         // whether the calling user has met this requirement
 #         // (Optional; present only if the caller is a student)
 #         completed: true
+#       },
+#
+#       // (Present only if requested through include[]=content_details)
+#       // If applicable, returns additional details specific to the associated object
+#       content_details: {
+#         points_possible: 20,
+#         due_at: "2012-12-31T06:00:00-06:00",
+#         unlock_at: "2012-12-31T06:00:00-06:00",
+#         lock_at: "2012-12-31T06:00:00-06:00"
 #       }
+#
+#     }
+#
+#
+# @object Module Item Sequence
+#     {
+#       // an array containing one hash for each appearence of the asset in the module sequence
+#       // (up to 10 total)
+#       items:
+#         [
+#           {
+#             // the ModuleItem for the previous asset in the sequence, if present
+#             // this is the previous asset in the module, or the last asset in the previous module,
+#             // or null if this is the first module item in the course sequence
+#             prev: null,
+#
+#             // the ModuleItem for the requested asset
+#             current:
+#               {
+#                 id: 768,
+#                 module_id: 123,
+#                 title: "A lonely page",
+#                 type: "Page",
+#                 ...
+#               },
+#
+#             // the ModuleItem for the next asset in the sequence, if present
+#             // this is the next asset in the module, or the first asset in the next module,
+#             // or null if this is the last module item in the course sequence
+#             next:
+#               {
+#                 id: 769,
+#                 module_id: 127,
+#                 title: "Project 1",
+#                 type: "Assignment",
+#                 ...
+#               }
+#           }
+#         ],
+#
+#       // an array containing each Module referenced above
+#       modules:
+#         [
+#           {
+#             id: 123,
+#             name: "Module A",
+#             ...
+#           },
+#           {
+#             id: 127,
+#             name: "Module B",
+#             ...
+#           }
+#         ]
 #     }
 class ContextModuleItemsApiController < ApplicationController
   before_filter :require_context
@@ -78,6 +144,14 @@ class ContextModuleItemsApiController < ApplicationController
   #
   # List the items in a module
   #
+  # @argument include[] [String, "content_details"]
+  #   If included, will return additional details specific to the content
+  #   associated with each item. Refer to the {api:Modules:Module%20Item Module
+  #   Item specification} for more details.
+  #
+  # @argument search_term [Optional, String]
+  #   The partial title of the items to match and return.
+  #
   # @example_request
   #     curl -H 'Authorization: Bearer <token>' \
   #          https://<canvas>/api/v1/courses/222/modules/123/items
@@ -86,17 +160,24 @@ class ContextModuleItemsApiController < ApplicationController
   def index
     if authorized_action(@context, @current_user, :read)
       mod = @context.modules_visible_to(@current_user).find(params[:module_id])
+      ContextModule.send(:preload_associations, mod, {:content_tags => :content})
       route = polymorphic_url([:api_v1, @context, mod, :items])
       scope = mod.content_tags_visible_to(@current_user)
+      scope = ContentTag.search_by_attribute(scope, :title, params[:search_term])
       items = Api.paginate(scope, self, route)
       prog = @context.grants_right?(@current_user, session, :participate_as_student) ? mod.evaluate_for(@current_user) : nil
-      render :json => items.map { |item| module_item_json(item, @current_user, session, mod, prog) }
+      render :json => items.map { |item| module_item_json(item, @current_user, session, mod, prog, Array(params[:include])) }
     end
   end
 
   # @API Show module item
   #
   # Get information about a single module item
+  #
+  # @argument include[] [String, "content_details"]
+  #   If included, will return additional details specific to the content
+  #   associated with this item. Refer to the {api:Modules:Module%20Item Module
+  #   Item specification} for more details.
   #
   # @example_request
   #     curl -H 'Authorization: Bearer <token>' \
@@ -108,7 +189,7 @@ class ContextModuleItemsApiController < ApplicationController
       mod = @context.modules_visible_to(@current_user).find(params[:module_id])
       item = mod.content_tags_visible_to(@current_user).find(params[:id])
       prog = @context.grants_right?(@current_user, session, :participate_as_student) ? mod.evaluate_for(@current_user) : nil
-      render :json => module_item_json(item, @current_user, session, mod, prog)
+      render :json => module_item_json(item, @current_user, session, mod, prog, Array(params[:include]))
     end
   end
 
@@ -133,21 +214,44 @@ class ContextModuleItemsApiController < ApplicationController
   #
   # Create and return a new module item
   #
-  # @argument module_item[title] [Optional] The name of the module item and associated content
-  # @argument module_item[type] [Required] The type of content linked to the item
-  #  one of "File", "Page", "Discussion", "Assignment", "Quiz", "SubHeader", "ExternalUrl", "ExternalTool"
-  # @argument module_item[content_id] [Required, except for 'ExternalUrl', 'Page', and 'SubHeader' types] The id of the content to link to the module item
-  # @argument module_item[position] [Optional] The position of this module in the course (1-based)
-  # @argument module_item[indent] [Optional] 0-based indent level; module items may be indented to show a hierarchy
-  # @argument module_item[page_url] [Required for 'Page' type] Suffix for the linked wiki page (e.g. 'front-page')
-  # @argument module_item[external_url] [Required for 'ExternalUrl' and 'ExternalTool' types] External url that the item points to
-  # @argument module_item[new_tab] [Optional, only applies to 'ExternalTool' type] Whether the external tool opens in a new tab
-  # @argument module_item[completion_requirement][type] [Optional] Completion requirement for this module item
+  # @argument module_item[title] [Optional, String]
+  #   The name of the module item and associated content
+  #
+  # @argument module_item[type] [String, "File"|"Page"|"Discussion"|"Assignment"|"Quiz"|"SubHeader"|"ExternalUrl"|"ExternalTool"]
+  #   The type of content linked to the item
+  #
+  # @argument module_item[content_id] [String]
+  #   The id of the content to link to the module item. Required, except for
+  #   'ExternalUrl', 'Page', and 'SubHeader' types.
+  #
+  # @argument module_item[position] [Optional, Integer]
+  #   The position of this item in the module (1-based).
+  #
+  # @argument module_item[indent] [Optional, Integer]
+  #   0-based indent level; module items may be indented to show a hierarchy
+  #
+  # @argument module_item[page_url] [String]
+  #   Suffix for the linked wiki page (e.g. 'front-page'). Required for 'Page'
+  #   type.
+  #
+  # @argument module_item[external_url] [String]
+  #   External url that the item points to. [Required for 'ExternalUrl' and
+  #   'ExternalTool' types.
+  #
+  # @argument module_item[new_tab] [Optional, Boolean]
+  #   Whether the external tool opens in a new tab. Only applies to
+  #   'ExternalTool' type.
+  #
+  # @argument module_item[completion_requirement][type] [Optional, String, "must_view"|"must_contribute"|"must_submit"]
+  #   Completion requirement for this module item.
   #   "must_view": Applies to all item types
   #   "must_contribute": Only applies to "Assignment", "Discussion", and "Page" types
   #   "must_submit", "min_score": Only apply to "Assignment" and "Quiz" types
   #   Inapplicable types will be ignored
-  # @argument module_item[completion_requirement][min_score] [Required for completion_requirement type 'min_score'] minimum score required to complete
+  #
+  # @argument module_item[completion_requirement][min_score] [Integer]
+  #   Minimum score required to complete. Required for completion_requirement
+  #   type 'min_score'.
   #
   # @example_request
   #
@@ -202,18 +306,39 @@ class ContextModuleItemsApiController < ApplicationController
   #
   # Update and return an existing module item
   #
-  # @argument module_item[title] [Optional] The name of the module item
-  # @argument module_item[position] [Optional] The position of this module in the course (1-based)
-  # @argument module_item[indent] [Optional] 0-based indent level; module items may be indented to show a hierarchy
-  # @argument module_item[external_url] [Optional, only applies to 'ExternalUrl' type] External url that the item points to
-  # @argument module_item[new_tab] [Optional, only applies to 'ExternalTool' type] Whether the external tool opens in a new tab
-  # @argument module_item[completion_requirement][type] [Optional] Completion requirement for this module item
+  # @argument module_item[title] [Optional, String]
+  #   The name of the module item
+  #
+  # @argument module_item[position] [Optional, Integer]
+  #   The position of this item in the module (1-based)
+  #
+  # @argument module_item[indent] [Optional, Integer]
+  #   0-based indent level; module items may be indented to show a hierarchy
+  #
+  # @argument module_item[external_url] [Optional, String]
+  #   External url that the item points to. Only applies to 'ExternalUrl' type.
+  #
+  # @argument module_item[new_tab] [Optional, Boolean]
+  #   Whether the external tool opens in a new tab. Only applies to
+  #   'ExternalTool' type.
+  #
+  # @argument module_item[completion_requirement][type] [Optional, "must_view"|"must_contribute"|"must_submit"]
+  #   Completion requirement for this module item.
   #   "must_view": Applies to all item types
   #   "must_contribute": Only applies to "Assignment", "Discussion", and "Page" types
   #   "must_submit", "min_score": Only apply to "Assignment" and "Quiz" types
   #   Inapplicable types will be ignored
-  # @argument module_item[completion_requirement][min_score] [Required for completion_requirement type 'min_score'] minimum score required to complete
-  # @argument module_item[published] [Optional] Whether the module item is published and visible to students
+  #
+  # @argument module_item[completion_requirement][min_score] [Integer]
+  #   Minimum score required to complete, Required for completion_requirement
+  #   type 'min_score'.
+  #
+  # @argument module_item[published] [Optional, Boolean]
+  #   Whether the module item is published and visible to students.
+  #
+  # @argument module_item[module_id] [Optional, String]
+  #   Move this item to another module by specifying the target module id here.
+  #   The target module must be in the same course.
   #
   # @example_request
   #
@@ -235,6 +360,20 @@ class ContextModuleItemsApiController < ApplicationController
       @tag.url = params[:module_item][:external_url] if %w(ExternalUrl ContextExternalTool).include?(@tag.content_type) && params[:module_item][:external_url]
       @tag.indent = params[:module_item][:indent] if params[:module_item][:indent]
       @tag.new_tab = value_to_boolean(params[:module_item][:new_tab]) if params[:module_item][:new_tab]
+      if target_module_id = params[:module_item][:module_id]
+        target_module = @context.context_modules.find_by_id(target_module_id)
+        return render :json => {:message => "invalid module_id"}, :status => :bad_request unless target_module
+        old_module = @context.context_modules.find(@tag.context_module_id)
+        @tag.context_module = target_module
+        if req_index = old_module.completion_requirements.find_index { |req| req[:id] == @tag.id }
+          old_module.completion_requirements_will_change!
+          req = old_module.completion_requirements.delete_at(req_index)
+          old_module.save!
+          params[:module_item][:completion_requirement] = req
+        else
+          ContentTag.touch_context_modules([old_module.id, target_module_id])
+        end
+      end
 
       if params[:module_item].has_key?(:published)
         if value_to_boolean(params[:module_item][:published])
@@ -274,6 +413,93 @@ class ContextModuleItemsApiController < ApplicationController
       @tag.destroy
       @module.touch
       render :json => module_item_json(@tag, @current_user, session, @module, nil)
+    end
+  end
+
+  MAX_SEQUENCES = 10
+
+  # @API Get module item sequence
+  #
+  # Given an asset in a course, find the Module Item it belongs to, and also the previous and next Module Items
+  # in the course sequence.
+  #
+  # @argument asset_type [String, "ModuleItem"|"File"|"Page"|"Discussion"|"Assignment"|"Quiz"|"ExternalTool"]
+  #   The type of asset to find module sequence information for. Use the ModuleItem if it is known
+  #   (e.g., the user navigated from a module item), since this will avoid ambiguity if the asset
+  #   appears more than once in the module sequence.
+  #
+  # @argument asset_id [Integer]
+  #   The id of the asset (or the url in the case of a Page)
+  #
+  # @example_request
+  #
+  #     curl https://<canvas>/api/v1/courses/<course_id>/module_item_sequence?asset_type=Assignment&asset_id=123 \
+  #       -H 'Authorization: Bearer <token>'
+  #
+  # @returns Module Item Sequence
+  def item_sequence
+    if authorized_action(@context, @current_user, :read)
+      asset_type = Api.api_type_to_canvas_name(params[:asset_type])
+      return render :json => { :message => 'invalid asset_type'}, :status => :bad_request unless asset_type
+      asset_id = params[:asset_id]
+      return render :json => { :message => 'missing asset_id' }, :status => :bad_request unless asset_id
+
+      # assemble a sequence of content tags in the course
+      tags = @context.module_items_visible_to(@current_user).
+          select('content_tags.*, context_modules.position AS module_position').
+          reject { |item| item.content_type == 'ContextModuleSubHeader' }.
+          sort_by { |item| [item.module_position.to_i, item.position] }
+
+      # find content tags to include
+      tag_indices = []
+      if asset_type == 'ContentTag'
+        tag_ix = tags.each_index.detect { |ix| tags[ix].id == asset_id.to_i }
+        tag_indices << tag_ix if tag_ix
+      else
+        # map wiki page url to id
+        if asset_type == 'WikiPage'
+          page = @context.wiki.wiki_pages.find_by_url(asset_id)
+          asset_id = page.id if page
+        else
+          asset_id = asset_id.to_i
+        end
+
+        # find the associated assignment id, if applicable
+        if (asset_type == 'DiscussionTopic' || asset_type == 'Quiz')
+          asset = @context.send(asset_type.tableize).find_by_id(asset_id.to_i)
+          associated_assignment_id = asset.assignment_id if asset
+        end
+
+        # find up to MAX_SEQUENCES tags containing the object (or its associated assignment)
+        tags.each_index do |ix|
+          if (tags[ix].content_type == asset_type && tags[ix].content_id == asset_id) ||
+             (associated_assignment_id && tags[ix].content_type == 'Assignment' && tags[ix].content_id == associated_assignment_id)
+            tag_indices << ix
+            break if tag_indices.length == MAX_SEQUENCES
+          end
+        end
+      end
+
+      # render the result
+      module_ids = Set.new
+      result = { :items => [] }
+      tag_indices.each do |ix|
+        hash = { :current => module_item_json(tags[ix], @current_user, session), :prev => nil, :next => nil }
+        module_ids << tags[ix].context_module_id
+        if ix > 0
+          hash[:prev] = module_item_json(tags[ix - 1], @current_user, session)
+          module_ids << tags[ix - 1].context_module_id
+        end
+        if ix < tags.size - 1
+          hash[:next] = module_item_json(tags[ix + 1], @current_user, session)
+          module_ids << tags[ix + 1].context_module_id
+        end
+        result[:items] << hash
+      end
+      modules = @context.context_modules.find_all_by_id(module_ids.to_a)
+      result[:modules] = modules.map { |mod| module_json(mod, @current_user, session) }
+
+      render :json => result
     end
   end
 

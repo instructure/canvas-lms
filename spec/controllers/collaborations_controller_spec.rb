@@ -57,7 +57,7 @@ describe CollaborationsController do
 
     it "should work with groups" do
       course_with_student_logged_in(:active_all => true)
-      gc = @course.group_categories.create!
+      gc = group_category
       group = gc.groups.create!(:context => @course)
       group.add_user(@student, 'accepted')
 

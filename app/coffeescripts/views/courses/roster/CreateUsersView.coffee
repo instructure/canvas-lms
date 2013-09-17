@@ -4,7 +4,7 @@ define [
   'i18n!create_users_view'
   'compiled/views/DialogFormView'
   'jst/courses/roster/createUsers'
-  'jst/courses/roster/createUsersWrapper'
+  'jst/EmptyDialogFormWrapper'
   'vendor/jquery.placeholder'
 ], (CreateUserList, _, I18n, DialogFormView, template, wrapper) ->
 
@@ -79,6 +79,8 @@ define [
 
     startOverFrd: ->
       @model.startOver()
+      if @model.get('limit_privileges_to_course_section') == "0"
+        @$el.find('#limit_privileges_to_course_section').prop('checked', false)
       @$textarea?.val ''
 
     afterRender: ->

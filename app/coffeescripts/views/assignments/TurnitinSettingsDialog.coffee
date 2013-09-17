@@ -11,7 +11,7 @@ define [
     tagName: 'div'
 
     EXCLUDE_SMALL_MATCHES_OPTIONS = '.js-exclude-small-matches-options'
-    EXCLUDE_SMALL_MATCHES = '[name="exclude_small_matches"]'
+    EXCLUDE_SMALL_MATCHES = '#exclude_small_matches'
     EXCLUDE_SMALL_MATCHES_TYPE = '[name="exclude_small_matches_type"]'
 
     events: do ->

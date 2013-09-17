@@ -208,10 +208,18 @@ tr.question td .number_answer.correct_answer {
   <% end %>
   </table>
   <div id="submitted_users" style="display: none;">
+    <%
+      # A submitted user can either be:
+      # 1. User Model
+      # 2. TemporaryUser Struct
+      #   (defined in models/quiz_statistics/student_analysis.rb at the top around line 4)
+      #   Temporary Users are ones that are not logged in and ergo don't have a user id.
+      #   The id below is a temporary_user_code
+    %>
     <% @submitted_users.each_with_index do |user, idx| %>
       <div class="user user_<%= user.id %>">
         <% if @quiz.survey? && @quiz.anonymous_submissions %>
-          <%= t(:student_n, "Student %{n}", :n => idx + 1) %>
+          <%= t(:student_n, "Student %{student_counter}", :student_counter => idx + 1) %>
         <% else %>
           <%= user.short_name %>
         <% end %>

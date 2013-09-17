@@ -1,24 +1,7 @@
-<div id="calendar-header" {{#if showScheduler}}class="with-scheduler"{{/if}}>
-  <a href="#" id="refresh_calendar_link" title="{{#t "refresh"}}Refresh{{/t}}" data-tooltip>{{#t "refresh"}}Refresh{{/t}}</a>
-  <a href="#" id="create_new_event_link" class="icon-add" title="{{#t "create_event"}}Create New Event{{/t}}" data-tooltip></a>
-
-  {{#unless calendar2Only}}
-  <a id="change-calendar-version" href="/switch_calendar/1" data-method="post" rel="nofollow" class="btn">{{#t "use_old_calendar"}}Old Calendar{{/t}}</a>
-  {{/unless}}
-  <a href="http://guides.instructure.com/s/2204/m/4152/l/59600-how-is-the-new-calendar-different-from-the-old-calendar" class="whats-new">What's new?</a>
-
-  <span id="calendar_views">
-    <input type="radio" id="week"      name="calendar_view" /><label for="week">{{#t "links.calendar_week"}}Week{{/t}}</label>
-    <input type="radio" id="month"     name="calendar_view" checked="checked" /><label for="month">{{#t "links.calendar_month"}}Month{{/t}}</label>
-    {{#if showScheduler}}
-    <input type="radio" id="scheduler" name="calendar_view" /><label for="scheduler">{{#t "links.calendar_scheduler"}}Scheduler{{/t}} <span stye="display: none" class="counter-badge"></span></label>
-    {{/if}}
-  </span>
-</div>
-
 <div class="scheduler-wrapper" style="display: none">
   <div class="appointment-list">
     <div class="list-wrapper"></div>
   </div>
 </div>
+<div class="scheduler_navigator"></div>
 <div class="calendar"></div>

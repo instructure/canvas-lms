@@ -290,8 +290,12 @@ class AssignmentsApiController < ApplicationController
 
   # @API List assignments
   # Returns the list of assignments for the current context.
-  # @argument include[] ["submission"] Associations to include with the
-  # assignment.
+  # @argument include[] [String, "submission"]
+  #   Associations to include with the assignment.
+  # @argument search_term [Optional, String]
+  #   The partial title of the assignments to match and return.
+  # @argument override_assignment_dates [Optional, Boolean]
+  #   Apply assignment overrides for each assignment, defaults to true.
   # @returns [Assignment]
   def index
     if authorized_action(@context, @current_user, :read)
@@ -299,12 +303,14 @@ class AssignmentsApiController < ApplicationController
           includes(:assignment_group, :rubric_association, :rubric).
           reorder("assignment_groups.position, assignments.position")
 
-      #fake assignment used for checking if the @current_user can read unpublished assignments
+      @assignments = Assignment.search_by_attribute(@assignments, :title, params[:search_term])
+
+      # fake assignment used for checking if the @current_user can read unpublished assignments
       fake = @context.assignments.new
       fake.workflow_state = 'unpublished'
 
       if @domain_root_account.enable_draft? && !fake.grants_right?(@current_user, session, :read)
-        #user is a student and assignment is not published
+        # user should not see unpublished assignments
         @assignments = @assignments.published
       end
 
@@ -318,9 +324,21 @@ class AssignmentsApiController < ApplicationController
       else
         submissions = {}
       end
+
+      override_param = params[:override_assignment_dates] || true
+      override_dates = value_to_boolean(override_param)
+      if override_dates
+        assignments_with_overrides = @assignments.joins(:assignment_overrides)
+          .select("assignments.id")
+        @assignments = @assignments.all
+        assignments_without_overrides = @assignments - assignments_with_overrides
+        assignments_without_overrides.each { |a| a.has_no_overrides = true }
+      end
+
       hashes = @assignments.map do |assignment|
         submission = submissions[assignment.id]
-        assignment_json(assignment, @current_user, session,true,submission)
+        assignment_json(assignment, @current_user, session,
+                        submission: submission, override_dates: override_dates)
       end
 
       render :json => hashes.to_json
@@ -329,27 +347,33 @@ class AssignmentsApiController < ApplicationController
 
   # @API Get a single assignment
   # Returns the assignment with the given id.
+  # @argument include[] [String, "submission"]
+  #   Associations to include with the assignment.
+  # @argument override_assignment_dates [Optional, Boolean]
+  #   Apply assignment overrides to the assignment, defaults to true.
   # @returns Assignment
-  # @argument include[] ["submission"] Associations to include with the
-  # assignment.
   def show
     if authorized_action(@context, @current_user, :read)
       @assignment = @context.active_assignments.find(params[:id],
           :include => [:assignment_group, :rubric_association, :rubric])
 
       if @domain_root_account.enable_draft? && !@assignment.grants_right?(@current_user, session, :read)
-        #assignment is not published and user is a student
+        # user should not see unpublished assignments
         render_unauthorized_action @assignment
         return
       end
 
       if Array(params[:include]).include?('submission')
         submission = @assignment.submissions.for_user(@current_user).first
-      else
-         submission =  nil
       end
+
+      override_param = params[:override_assignment_dates] || true
+      override_dates = value_to_boolean(override_param)
+
       @assignment.context_module_action(@current_user, :read) unless @assignment.locked_for?(@current_user, :check_policies => true)
-      render :json => assignment_json(@assignment, @current_user, session,true,submission)
+      render :json => assignment_json(@assignment, @current_user, session,
+                                      submission: submission,
+                                      override_dates: override_dates)
     end
   end
 
@@ -357,13 +381,13 @@ class AssignmentsApiController < ApplicationController
   # Create a new assignment for this course. The assignment is created in the
   # active state.
   #
-  # @argument assignment[name] The assignment name.
+  # @argument assignment[name] [String] The assignment name.
   #
   # @argument assignment[position] [Integer]
   #   The position of this assignment in the group when displaying
   #   assignment lists.
   #
-  # @argument assignment[submission_types] [Array]
+  # @argument assignment[submission_types][] [String, "online_quiz"|"none"|"on_paper"|"online_quiz"|"discussion_topic"|"external_tool"|"online_upload"|"online_text_entry"|"online_url"|"media_recording"]
   #   List of supported submission types for the assignment.
   #   Unless the assignment is allowing online submissions, the array should
   #   only have one element.
@@ -384,13 +408,13 @@ class AssignmentsApiController < ApplicationController
   #     "online_url"
   #     "media_recording" (Only valid when the Kaltura plugin is enabled)
   #
-  # @argument assignment[allowed_extensions] [Array]
+  # @argument assignment[allowed_extensions][] [String]
   #   Allowed extensions if submission_types includes "online_upload"
   #
   #   Example:
   #     allowed_extensions: ["docx","ppt"]
   #
-  # @argument assignment[turnitin_enabled] [Optional,Boolean]
+  # @argument assignment[turnitin_enabled] [Optional, Boolean]
   #   Only applies when the Turnitin plugin is enabled for a course and
   #   the submission_types array includes "online_upload".
   #   Toggles Turnitin submissions for the assignment.
@@ -400,25 +424,25 @@ class AssignmentsApiController < ApplicationController
   #   Settings to send along to turnitin. See Assignment object definition for
   #   format.
   #
-  # @argument assignment[peer_reviews] [Optional,Boolean]
+  # @argument assignment[peer_reviews] [Optional, Boolean]
   #   If submission_types does not include external_tool,discussion_topic,
   #   online_quiz, or on_paper, determines whether or not peer reviews
   #   will be turned on for the assignment.
   #
-  # @argument assignment[automatic_peer_reviews] [Optional,Boolean]
+  # @argument assignment[automatic_peer_reviews] [Optional, Boolean]
   #   Whether peer reviews will be assigned automatically by Canvas or if
   #   teachers must manually assign peer reviews. Does not apply if peer reviews
   #   are not enabled.
   #
-  # @argument assignment[notify_of_update] [Optional,Boolean]
+  # @argument assignment[notify_of_update] [Optional, Boolean]
   #   If true, Canvas will send a notification to students in the class
   #   notifying them that the content has changed.
   #
-  # @argument assignment[group_category_id] [Optional,Integer]
+  # @argument assignment[group_category_id] [Optional, Integer]
   #   If present, the assignment will become a group assignment assigned
   #   to the group.
   #
-  # @argument assignment[grade_group_students_individually] [Optional,Integer]
+  # @argument assignment[grade_group_students_individually] [Optional, Integer]
   #   If this is a group assignment, teachers have the options to grade
   #   students individually. If false, Canvas will apply the assignment's
   #   score to each member of the group. If true, the teacher can manually
@@ -434,12 +458,13 @@ class AssignmentsApiController < ApplicationController
   #       new_tab: false
   #     }
   #
-  # @argument assignment[points_possible] [Float] The maximum points possible on
-  #   the assignment.
+  # @argument assignment[points_possible] [Float]
+  #   The maximum points possible on the assignment.
   #
   # @argument assignment[grading_type] [Optional, "pass_fail"|"percent"|"letter_grade"|"points"]
   #  The strategy used for grading the assignment.
   #  The assignment is ungraded if this field is omitted.
+  #
   # @argument assignment[due_at] [Timestamp]
   #   The day/time the assignment is due.
   #   Accepts times in ISO 8601 format, e.g. 2011-10-21T18:48Z.
@@ -465,18 +490,19 @@ class AssignmentsApiController < ApplicationController
   #   and hides grades from students.
   #   Defaults to false.
   #
-  # @argument assignment[assignment_overrides] [Optional, [AssignmentOverride]]
+  # @argument assignment[assignment_overrides][] [Optional, AssignmentOverride]
   #   List of overrides for the assignment.
   #   NOTE: The assignment overrides feature is in beta.
   #
-  # @argument assignment[published] [Boolean] [Optional]
+  # @argument assignment[published] [Optional, Boolean]
   #   Whether this assignment is published.
-  #   (Only useful if 'enable draft' account setting is on)
+  #   (Only uaeful if 'enable draft' account setting is on)
   #   Unpublished assignments are not visible to students.
   #
   # @returns Assignment
   def create
     @assignment = @context.assignments.build
+    @assignment.workflow_state = 'unpublished' if @context.root_account.enable_draft?
 
     if authorized_action(@assignment, @current_user, :create)
       save_and_render_response

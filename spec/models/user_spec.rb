@@ -500,7 +500,8 @@ describe User do
         @shard1.activate do
           alice = User.create!(:name => 'alice')
           bob = User.create!(:name => 'bob')
-          courseX = Course.new
+          account = Account.create!
+          courseX = account.courses.build
           courseX.workflow_state = 'available'
           courseX.save!
           bobs_enrollment = StudentEnrollment.create!(:course => courseX, :user => bob, :workflow_state => 'completed')
@@ -508,7 +509,8 @@ describe User do
         end
 
         @shard2.activate do
-          courseY = Course.new
+          account = Account.create!
+          courseY = account.courses.build
           courseY.workflow_state = 'available'
           courseY.save!
           alices_enrollment = StudentEnrollment.new(:course => courseY, :user => alice, :workflow_state => 'active')
@@ -523,7 +525,8 @@ describe User do
         alice = nil
         @shard1.activate do
           alice = User.create!(:name => 'alice')
-          courseX = Course.new
+          account = Account.create!
+          courseX = account.courses.build
           courseX.workflow_state = 'available'
           courseX.save!
           StudentEnrollment.create!(:course => courseX, :user => alice, :workflow_state => 'completed')
@@ -1563,15 +1566,6 @@ describe User do
     end
 
     describe "upcoming_events" do
-      it "should include manageable appointment groups" do
-        course(:active_all => true)
-        @user = @course.instructors.first
-        ag = AppointmentGroup.create!(:title => 'test appointment', :contexts => [@course], :new_appointments => [[Time.now, Time.now + 1.hour]])
-        events = @user.upcoming_events
-        events.size.should eql 1
-        events.first.title.should eql 'test appointment'
-      end
-
       it "handles assignments where the applied due_at is nil" do
         course_with_teacher_logged_in(:active_all => true)
         assignment = @course.assignments.create!(:title => "Should not throw",
@@ -1749,6 +1743,23 @@ describe User do
       User.create!(:name => "John Johnson")
       User.create!(:name => "John John")
       User.select([:id, :sortable_name]).order_by_sortable_name(:direction => :descending).all.map(&:sortable_name).should == ["Johnson, John", "John, John"]
+    end
+
+    it "should sort by the current locale with pg_collkey if possible" do
+      pending "requires postgres" unless User.connection.adapter_name == 'PostgreSQL'
+      pending "requires pg_collkey on the server" if User.connection.select_value("SELECT COUNT(*) FROM pg_proc WHERE proname='collkey'").to_i == 0
+      begin
+        Bundler.require 'icu'
+      rescue LoadError
+        pending "requires icu locally"
+      end
+      I18n.locale = :es
+      User.sortable_name_order_by_clause.should match /es/
+      User.sortable_name_order_by_clause.should_not match /root/
+      # english has no specific sorting rules, so use root
+      I18n.locale = :en
+      User.sortable_name_order_by_clause.should_not match /es/
+      User.sortable_name_order_by_clause.should match /root/
     end
   end
 

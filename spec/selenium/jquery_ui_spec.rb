@@ -5,6 +5,24 @@ require File.expand_path(File.dirname(__FILE__) + "/common")
 describe "jquery ui" do
   it_should_behave_like "in-process server selenium tests"
 
+  def active
+    driver.switch_to.active_element
+  end
+  def shift_tab
+    driver.action.key_down(:shift)
+      .send_keys(:tab)
+      .key_up(:shift)
+      .perform
+  end
+  def create_simple_modal
+    driver.execute_script(<<-JS)
+      return $('<div><select /><input /></div>')
+        .dialog()
+        .find('select')
+        .focus()
+    JS
+  end
+
   before (:each) do
     course_with_teacher_logged_in
     get "/"
@@ -25,6 +43,28 @@ describe "jquery ui" do
         .dialog('option', 'modal');
     JS
     f(".ui-widget-overlay").should be_displayed
+  end
+
+  it "should capture tabbing" do
+    create_simple_modal
+    active.tag_name.should == 'select'
+    active.send_keys(:tab)
+    active.tag_name.should == 'input'
+    active.send_keys(:tab)
+    active.tag_name.should == 'a'
+    active.send_keys(:tab)
+    active.tag_name.should == 'select'
+  end
+
+  it "should capture shift-tabbing" do
+    create_simple_modal
+    active.tag_name.should == 'select'
+    shift_tab
+    active.tag_name.should == 'a'
+    shift_tab
+    active.tag_name.should == 'input'
+    shift_tab
+    active.tag_name.should == 'select'
   end
   
   context "calendar widget" do

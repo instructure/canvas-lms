@@ -38,7 +38,7 @@ describe AppointmentGroupsController, :type => :integration do
 
   it 'should return manageable appointment groups' do
     ag1 = AppointmentGroup.create!(:title => "something", :contexts => [@course1])
-    cat = @course1.group_categories.create
+    cat = @course1.group_categories.create(name: "foo")
     ag2 = AppointmentGroup.create!(:title => "another", :contexts => [@course1], :sub_context_codes => [cat.asset_string])
     ag3 = AppointmentGroup.create!(:title => "inaccessible", :contexts => [Course.create!])
     ag4 = AppointmentGroup.create!(:title => "past", :contexts => [@course1, @course2], :new_appointments => [["#{Time.now.year - 1}-01-01 12:00:00", "#{Time.now.year - 1}-01-01 13:00:00"]])
@@ -88,7 +88,7 @@ describe AppointmentGroupsController, :type => :integration do
 
     ag6 = AppointmentGroup.create!(:title => "yay", :new_appointments => [["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"]], :contexts => [@course])
     ag6.publish!
-    cat = @course.group_categories.create
+    cat = @course.group_categories.create(name: "foo")
     mygroup = cat.groups.create(:context => @course)
     mygroup.users << @me
     @me.reload
@@ -389,7 +389,7 @@ describe AppointmentGroupsController, :type => :integration do
       student2 = student_in_course(:course => @course, :active_all => true).user
     },
     'groups' => proc {
-      cat = @course.group_categories.create
+      cat = @course.group_categories.create(name: "foo")
       @ag = AppointmentGroup.create!(:title => "yay", :sub_context_codes => [cat.asset_string], :new_appointments => [["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"], ["#{Time.now.year + 1}-01-01 13:00:00", "#{Time.now.year + 1}-01-01 14:00:00"]], :contexts => [@course])
       @ag.publish!
       group1 = cat.groups.create(:context => @course)

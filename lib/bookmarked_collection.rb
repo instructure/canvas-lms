@@ -149,6 +149,16 @@ module BookmarkedCollection
   #   bookmarked_collection = BookmarkedCollection.wrap(UserBookmarker, User.active)
   #   Api.paginate(bookmarked_collection, ...)
   #
+  # Note that if your bookmarker has relatively simple behavior (i.e.
+  # just order by one or more columns), you can just instantiate a
+  # BookmarkedCollection::SimpleBookmarker. The example above could be
+  # simplified like so:
+  #
+  #   UserBookmarker = BookmarkedCollection::SimpleBookmarker.new(User, :sortable_name)
+  #
+  #   bookmarked_collection = BookmarkedCollection.wrap(UserBookmarker, User.active)
+  #   Api.paginate(bookmarked_collection, ...)
+  #
   def self.wrap(bookmarker, base_scope, &block)
     BookmarkedCollection::WrapProxy.new(bookmarker, base_scope, &block)
   end

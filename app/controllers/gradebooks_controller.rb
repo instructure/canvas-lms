@@ -19,6 +19,7 @@
 class GradebooksController < ApplicationController
   include ActionView::Helpers::NumberHelper
   include GradebooksHelper
+  include KalturaHelper
   include Api::V1::AssignmentGroup
   include Api::V1::Submission
 
@@ -332,8 +333,8 @@ class GradebooksController < ApplicationController
     end
     @comments, @failures = @assignment.generate_comments_from_files(params[:submissions_zip].path, @current_user)
     flash[:notice] = t('notices.uploaded',
-                       { :one => "Files and comments created for 1 user submission",
-                         :other => "Files and comments created for %{count} user submissions" },
+                       { :one => "Files and comments created for 1 submission",
+                         :other => "Files and comments created for %{count} submissions" },
                        :count => @comments.length)
   end
 
@@ -352,6 +353,9 @@ class GradebooksController < ApplicationController
         @headers = false
         @outer_frame = true
         log_asset_access("speed_grader:#{@context.asset_string}", "grades", "other")
+        hash = {:CONTEXT_ACTION_SOURCE => :speed_grader}
+        append_sis_data(hash)
+        js_env(hash)
         render :action => "speed_grader"
       end
 

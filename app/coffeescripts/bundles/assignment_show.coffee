@@ -2,8 +2,21 @@ require [
   'INST'
   'i18n!assignment'
   'jquery'
+  'compiled/models/Assignment',
+  'compiled/views/PublishButtonView',
   'jquery.instructure_forms'
-], (INST, I18n, $) ->
+], (INST, I18n, $, Assignment, PublishButtonView) ->
+
+  $ ->
+    $el = $('#assignment_publish_button')
+    if $el.length > 0
+      model = new Assignment
+        id: $el.attr('data-id')
+        publishable: true
+        published: $el.hasClass('published')
+      model.doNotParse()
+
+      new PublishButtonView(model: model, el: $el).render()
 
   # -- This is all for the _grade_assignment sidebar partial
   $ ->

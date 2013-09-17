@@ -30,9 +30,17 @@ class Wiki < ActiveRecord::Base
   attr_accessible :title
 
   has_many :wiki_pages, :dependent => :destroy
+  before_save :set_has_no_front_page_default
   after_save :update_contexts
 
   DEFAULT_FRONT_PAGE_URL = 'front-page'
+
+  def set_has_no_front_page_default
+    if self.has_no_front_page.nil? && self.id && context
+      self.has_no_front_page = true if context.draft_state_enabled?
+    end
+  end
+  private :set_has_no_front_page_default
 
   def update_contexts
     self.context.try(:touch)
@@ -57,13 +65,32 @@ class Wiki < ActiveRecord::Base
       end
     end
   end
+
+  def check_has_front_page
+    return unless self.has_no_front_page.nil?
+
+    url = DEFAULT_FRONT_PAGE_URL
+    self.has_no_front_page = !self.wiki_pages.not_deleted.where(:url => url).exists?
+    self.front_page_url = url unless self.has_no_front_page
+    self.save
+  end
   
   def front_page
-    return nil unless has_front_page?
+    url = self.get_front_page_url
+    return nil if url.nil?
+
     # TODO i18n
     t :front_page_name, "Front Page"
-    url = self.get_front_page_url
-    self.wiki_pages.find_by_url(url) || self.wiki_pages.build(:title => "Front Page", :url => url)
+    # attempt to find the page and store it's url (if it is found)
+    page = self.wiki_pages.not_deleted.find_by_url(url)
+    self.set_front_page_url!(url) if self.has_no_front_page && page
+
+    # return an implicitly created page if a page could not be found
+    unless page
+      page = self.wiki_pages.new(:title => url.titleize, :url => url)
+      page.wiki = self
+    end
+    page
   end
 
   def has_front_page?
@@ -71,7 +98,7 @@ class Wiki < ActiveRecord::Base
   end
 
   def get_front_page_url
-    return nil unless self.has_front_page?
+    return nil unless self.has_front_page? || !context.draft_state_enabled?
     self.front_page_url || DEFAULT_FRONT_PAGE_URL
   end
 
@@ -108,17 +135,17 @@ class Wiki < ActiveRecord::Base
   end
 
   set_policy do
-    given {|user| self.context.is_public }
+    given {|user| self.context.is_public}
     can :read
 
-    given {|user, session| self.cached_context_grants_right?(user, session, :read) }#students.include?(user) }
+    given {|user, session| self.cached_context_grants_right?(user, session, :read)}
     can :read
 
     given {|user, session| self.cached_context_grants_right?(user, session, :participate_as_student) && self.context.allow_student_wiki_edits}
-    can :contribute and can :read and can :update and can :delete and can :create and can :create_page and can :update_page
+    can :read and can :create_page and can :update_page and can :update_page_content
 
-    given {|user, session| self.cached_context_grants_right?(user, session, :manage_wiki) }#admins.include?(user) }
-    can :manage and can :read and can :update and can :create and can :delete and can :create_page and can :update_page
+    given {|user, session| self.cached_context_grants_right?(user, session, :manage_wiki)}
+    can :manage and can :read and can :update and can :create_page and can :delete_page and can :delete_unpublished_page and can :update_page and can :update_page_content
   end
 
   def self.wiki_for_context(context)

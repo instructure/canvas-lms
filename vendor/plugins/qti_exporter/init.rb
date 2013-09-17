@@ -3,6 +3,7 @@ Rails.configuration.to_prepare do
 
   Canvas::Plugin.register :qti_converter, :export_system, {
           :name => proc { I18n.t(:qti_name, 'QTI Converter') },
+          :display_name => proc { I18n.t(:qti_display, 'QTI') },
           :author => 'Instructure',
           :description => 'This enables converting QTI .zip files to Canvas quiz json.',
           :version => '1.0.0',

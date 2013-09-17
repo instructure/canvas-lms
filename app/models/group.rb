@@ -68,6 +68,8 @@ class Group < ActiveRecord::Base
   include StickySisFields
   are_sis_sticky :name
 
+  validates_length_of :name, :maximum => maximum_string_length, :allow_nil => true, :allow_blank => true
+
   alias_method :participating_users_association, :participating_users
 
   def participating_users(user_ids = nil)
@@ -193,7 +195,10 @@ class Group < ActiveRecord::Base
     group_memberships.update_all(:workflow_state => 'deleted')
   end
 
+  Bookmarker = BookmarkedCollection::SimpleBookmarker.new(Group, :name, :id)
+
   scope :active, where("groups.workflow_state<>'deleted'")
+  scope :by_name, lambda { order(Bookmarker.order_by) }
 
   def full_name
     res = before_label(self.name) + " "
@@ -559,21 +564,12 @@ class Group < ActiveRecord::Base
     [Shard.default]
   end
 
-  class Bookmarker
-    def self.bookmark_for(group)
-      group.id
-    end
-
-    def self.validate(bookmark)
-      bookmark.is_a?(Fixnum)
-    end
-
-    def self.restrict_scope(scope, pager)
-      if bookmark = pager.current_bookmark
-        comparison = (pager.include_bookmark ? 'groups.id >= ?' : 'groups.id > ?')
-        scope = scope.where(comparison, bookmark)
-      end
-      scope.order("groups.id ASC")
-    end
+  # Public: Determine if the current context has draft_state enabled.
+  #
+  # Returns a boolean.
+  def draft_state_enabled?
+    # shouldn't matter, but most specs create anonymous (contextless) groups :(
+    return false if context.nil?
+    context.draft_state_enabled?
   end
 end

@@ -1,7 +1,10 @@
- <div class="span8">
+ <div class="span12">
 {{#if fix_issue_url }}
   <a href="{{fix_issue_url}}" target="_blank">{{description}}</a>
 {{else}}
   {{description}}
+{{/if}}
+{{#if error_report_html_url }}
+  (<a href="{{error_report_html_url}}" target="_blank">{{#t "error_report"}}Error Report{{/t}}</a>)
 {{/if}}
 </div>

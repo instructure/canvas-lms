@@ -62,7 +62,8 @@ define [
     showErrors: (errors) ->
       for fieldName, field of errors
         $input = @findField fieldName
-        html = (message for {message} in field).join('</p><p>')
+        # check for a translations option first, fall back to just displaying otherwise
+        html = (@translations?[message] or message for {message} in field).join('</p><p>')
         $input.errorBox "<div>#{html}</div>"
         field.$input = $input
         field.$errorBox = $input.data 'associated_error_box'

@@ -18,8 +18,8 @@
 
 class Account < ActiveRecord::Base
   include Context
-  attr_accessible :name, :turnitin_account_id,
-    :turnitin_shared_secret, :turnitin_comments, :turnitin_pledge,
+  attr_accessible :name, :turnitin_account_id, :turnitin_shared_secret,
+    :turnitin_host, :turnitin_comments, :turnitin_pledge,
     :default_time_zone, :parent_account, :settings, :default_storage_quota,
     :default_storage_quota_mb, :storage_quota, :ip_filters, :default_locale,
     :default_user_storage_quota_mb, :default_group_storage_quota_mb
@@ -92,8 +92,11 @@ class Account < ActiveRecord::Base
   after_create :default_enrollment_term
   
   serialize :settings, Hash
+  include TimeZoneHelper
+  time_zone_attribute :default_time_zone, default: "America/Denver"
 
   validates_locale :default_locale, :allow_nil => true
+  validates_length_of :name, :maximum => maximum_string_length, :allow_blank => true
   validate :account_chain_loop, :if => :parent_account_id_changed?
   validate :validate_auth_discovery_url
 
@@ -148,6 +151,7 @@ class Account < ActiveRecord::Base
   add_setting :open_registration, :boolean => true, :root_only => true
   add_setting :enable_scheduler, :boolean => true, :root_only => true, :default => false
   add_setting :enable_draft, :boolean => true, :root_only => true, :default => false
+  add_setting :allow_draft, :boolean => true, :root_only => true, :default => false
   add_setting :calendar2_only, :boolean => true, :root_only => true, :default => false
   add_setting :show_scheduler, :boolean => true, :root_only => true, :default => false
   add_setting :enable_profiles, :boolean => true, :root_only => true, :default => false
@@ -157,6 +161,8 @@ class Account < ActiveRecord::Base
   add_setting :admins_can_view_notifications, :boolean => true, :root_only => true, :default => false
   add_setting :outgoing_email_default_name
   add_setting :external_notification_warning, :boolean => true, :default => false
+  # Terms of Use and Privacy Policy settings for the root account
+  add_setting :terms_changed_at, :root_only => true
   # When a user is invited to a course, do we let them see a preview of the
   # course even without registering?  This is part of the free-for-teacher
   # account perks, since anyone can invite anyone to join any course, and it'd
@@ -166,6 +172,7 @@ class Account < ActiveRecord::Base
   add_setting :self_registration, :boolean => true, :root_only => true, :default => false
   add_setting :large_course_rosters, :boolean => true, :root_only => true, :default => false
   add_setting :edit_institution_email, :boolean => true, :root_only => true, :default => true
+  add_setting :enable_quiz_regrade, :boolean => true, :root_only => true, :default => false
 
   def settings=(hash)
     if hash.is_a?(Hash)
@@ -223,6 +230,28 @@ class Account < ActiveRecord::Base
 
   def self_registration?
     !!settings[:self_registration] && canvas_authentication?
+  end
+
+  def terms_of_use_url
+    Setting.get_cached('terms_of_use_url', 'http://www.instructure.com/policies/terms-of-use')
+  end
+
+  def privacy_policy_url
+    Setting.get_cached('privacy_policy_url', 'http://www.instructure.com/policies/privacy-policy-instructure')
+  end
+
+  def terms_required?
+    Setting.get_cached('terms_required', 'true') == 'true'
+  end
+
+  def require_acceptance_of_terms?(user)
+    return false if !terms_required?
+    return true if user.nil? || user.new_record?
+    terms_changed_at = settings[:terms_changed_at]
+    last_accepted = user.preferences[:accepted_terms]
+    return false if terms_changed_at.nil? && user.registered? # make sure existing users are grandfathered in
+    return false if last_accepted && (terms_changed_at.nil? || last_accepted > terms_changed_at)
+    true
   end
 
   def ip_filters=(params)
@@ -627,10 +656,6 @@ class Account < ActiveRecord::Base
     @self_and_all_sub_accounts ||= Account.where("root_account_id=? OR parent_account_id=?", self, self).pluck(:id).uniq + [self.id]
   end
   
-  def default_time_zone
-    read_attribute(:default_time_zone) || "Mountain Time (US & Canada)"
-  end
-  
   workflow do
     state :active
     state :deleted
@@ -778,7 +803,7 @@ class Account < ActiveRecord::Base
   end
 
   def saml_authentication?
-    !!(self.account_authorization_config && self.account_authorization_config.saml_authentication?)
+    !!(self.account_authorization_config && self.account_authorization_config.saml_authentication?) && AccountAuthorizationConfig.saml_enabled
   end
 
   def multi_auth?
@@ -897,9 +922,7 @@ class Account < ActiveRecord::Base
       # match the "batch" size in Course.update_account_associations
       scopes.each do |scope|
         scope.select([:id, :account_id]).find_in_batches(:batch_size => 500) do |courses|
-          Course.send(:with_exclusive_scope) do
-            all_user_ids.merge Course.update_account_associations(courses, :skip_user_account_associations => true, :account_chain_cache => account_chain_cache)
-          end
+          all_user_ids.merge Course.update_account_associations(courses, :skip_user_account_associations => true, :account_chain_cache => account_chain_cache)
         end
       end
 
@@ -955,9 +978,9 @@ class Account < ActiveRecord::Base
   
   def turnitin_settings
     if self.turnitin_account_id.present? && self.turnitin_shared_secret.present?
-      [self.turnitin_account_id, self.turnitin_shared_secret]
+      [self.turnitin_account_id, self.turnitin_shared_secret, self.turnitin_host]
     else
-      self.parent_account.turnitin_settings rescue nil
+      self.parent_account.try(:turnitin_settings)
     end
   end
   
@@ -974,7 +997,7 @@ class Account < ActiveRecord::Base
     if self.turnitin_comments && !self.turnitin_comments.empty?
       self.turnitin_comments
     else
-      self.parent_account.closest_turnitin_comments rescue nil
+      self.parent_account.try(:closest_turnitin_comments)
     end
   end
   
@@ -1296,6 +1319,13 @@ class Account < ActiveRecord::Base
     false
   end
 
+  # Public: Determine if draft state is enabled for this account.
+  #
+  # Returns a boolean (default: false).
+  def draft_state_enabled?
+    root_account.settings[:enable_draft]
+  end
+
   def import_from_migration(data, params, migration)
 
     LearningOutcome.process_migration(data, migration)
@@ -1303,5 +1333,18 @@ class Account < ActiveRecord::Base
     migration.progress=100
     migration.workflow_state = :imported
     migration.save
+  end
+
+  def enable_quiz_regrade!
+    change_root_account_setting!(:enable_quiz_regrade, true)
+  end
+
+  def disable_quiz_regrade!
+    change_root_account_setting!(:enable_quiz_regrade, false)
+  end
+
+  def change_root_account_setting!(setting_name, new_value)
+    root_account.settings[setting_name] = new_value
+    root_account.save!
   end
 end

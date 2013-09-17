@@ -867,6 +867,15 @@ shared_examples_for "all selenium tests" do
     end
   end
 
+  def assert_error_box(selector)
+    box = driver.execute_script <<-JS, selector
+      var $result = $(arguments[0]).data('associated_error_box');
+      return $result ? $result.toArray() : []
+    JS
+    box.length.should == 1
+    box[0].should be_displayed
+  end
+
   ##
   # load the simulate plugin to simulate a drag events (among other things)
   # will only load it once even if its called multiple times

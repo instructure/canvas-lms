@@ -25,6 +25,7 @@ class ContentTag < ActiveRecord::Base
     end 
   end
   include Workflow
+  include SearchTermHelper
   belongs_to :content, :polymorphic => true
   belongs_to :context, :polymorphic => true
   belongs_to :associated_asset, :polymorphic => true
@@ -165,17 +166,25 @@ class ContentTag < ActiveRecord::Base
   def content_or_self
     content || self
   end
-  
+
+  def asset_safe_title(column)
+    name = self.title.to_s
+    if (limit = self.content.class.try(:columns_hash)[column].try(:limit)) && name.length > limit
+      name = name[0, limit][/.{0,#{limit}}/mu]
+    end
+    name
+  end
+
   def update_asset_name!
     return unless self.sync_title_to_asset_title?
     correct_context = self.content && self.content.respond_to?(:context) && self.content.context == self.context
     if correct_context
       if self.content.respond_to?("name=") && self.content.respond_to?("name") && self.content.name != self.title
-        self.content.update_attribute(:name, self.title)
+        self.content.update_attribute(:name, asset_safe_title('name'))
       elsif self.content.respond_to?("title=") && self.content.title != self.title
-        self.content.update_attribute(:title, self.title)
+        self.content.update_attribute(:title, asset_safe_title('title'))
       elsif self.content.respond_to?("display_name=") && self.content.display_name != self.title
-        self.content.update_attribute(:display_name, self.title)
+        self.content.update_attribute(:display_name, asset_safe_title('display_name'))
       end
     end
   end
@@ -256,7 +265,7 @@ class ContentTag < ActiveRecord::Base
   
   def self.update_for(asset)
     tags = ContentTag.where(:content_id => asset, :content_type => asset.class.to_s).not_deleted.select([:id, :tag_type, :content_type, :context_module_id]).all
-    module_ids = tags.select{|t| t.context_module_id }.map(&:context_module_id)
+    module_ids = tags.map(&:context_module_id).compact
 
     # update title
     tag_ids = tags.select{|t| t.sync_title_to_asset_title? }.map(&:id)
@@ -264,7 +273,7 @@ class ContentTag < ActiveRecord::Base
     {:display_name => :title, :name => :title, :title => :title}.each do |attr, val|
       attr_hash[val] = asset.send(attr) if asset.respond_to?(attr)
     end
-    ContentTag.where(:id => tag_ids).update_all(attr_hash)
+    ContentTag.where(:id => tag_ids).update_all(attr_hash) unless tag_ids.empty?
 
     # update workflow_state
     tag_ids = tags.select{|t| t.sync_workflow_state_to_asset? }.map(&:id)
@@ -276,7 +285,7 @@ class ContentTag < ActiveRecord::Base
         attr_hash[:workflow_state] = asset.workflow_state
       end
     end
-    ContentTag.where(:id => tag_ids).update_all(attr_hash) if attr_hash[:workflow_state]
+    ContentTag.where(:id => tag_ids).update_all(attr_hash) if attr_hash[:workflow_state] && !tag_ids.empty?
 
     ContentTag.touch_context_modules(module_ids)
   end

@@ -80,9 +80,17 @@ class CommunicationChannelsController < ApplicationController
   #
   # Creates a new communication channel for the specified user.
   #
-  # @argument communication_channel[address] An email address or SMS number.
-  # @argument communication_channel[type] [email|sms] The type of communication channel.
-  # @argument skip_confirmation [Optional] Only valid for site admins making requests; If '1', the channel is automatically validated and no confirmation email or SMS is sent. Otherwise, the user must respond to a confirmation message to confirm the channel.
+  # @argument communication_channel[address] [String]
+  #   An email address or SMS number.
+  #
+  # @argument communication_channel[type] [String, "email"|"sms"]
+  #   The type of communication channel.
+  #
+  # @argument skip_confirmation [Optional, Boolean]
+  #   Only valid for site admins making requests; If true, the channel is
+  #   automatically validated and no confirmation email or SMS is sent.
+  #   Otherwise, the user must respond to a confirmation message to confirm the
+  #   channel.
   #
   # @example_request
   #     curl https://<canvas>/api/v1/users/1/communication_channels \ 
@@ -98,7 +106,7 @@ class CommunicationChannelsController < ApplicationController
 
     params.delete(:build_pseudonym) if api_request?
 
-    skip_confirmation = params[:skip_confirmation].present? &&
+    skip_confirmation = value_to_boolean(params[:skip_confirmation]) &&
       Account.site_admin.grants_right?(@current_user, :manage_students)
 
     # If a new pseudonym is requested, build (but don't save) a pseudonym to ensure
@@ -258,9 +266,6 @@ class CommunicationChannelsController < ApplicationController
 
         # User chose to continue with this cc/pseudonym/user combination on confirmation page
         if @pseudonym && params[:register]
-          if Canvas.redis_enabled? && @merge_opportunities.length == 1
-            Canvas.redis.rpush('single_user_registered_new_account_stats', {:user_id => @user.id, :registered_at => Time.now.utc }.to_json)
-          end
           @user.require_acceptance_of_terms = require_terms?
           @user.attributes = params[:user]
           @pseudonym.attributes = params[:pseudonym]
@@ -270,7 +275,9 @@ class CommunicationChannelsController < ApplicationController
           @pseudonym.require_password = true
           @pseudonym.password_confirmation = @pseudonym.password = params[:pseudonym][:password] if params[:pseudonym]
 
-          unless @pseudonym.valid? && @user.valid?
+          valid = @pseudonym.valid?
+          valid = @user.valid? && valid # don't want to short-circuit, since we are interested in the errors
+          unless valid
             return render :json => {
                             :errors => {
                               :user => @user.errors.as_json[:errors],
@@ -378,8 +385,7 @@ class CommunicationChannelsController < ApplicationController
   end
 
   def require_terms?
-    # a plugin could potentially set this
-    @require_terms
+    @domain_root_account.require_acceptance_of_terms?(@user)
   end
   helper_method :require_terms?
 end

@@ -1,5 +1,4 @@
 define([], function() {
-  window.FileAPI = {
-    staticPath: "/javascripts/vendor/FileAPI/"
-  };
+  window.FileAPI = window.FileAPI || {};
+  window.FileAPI.staticPath = "/javascripts/vendor/FileAPI/";
 })

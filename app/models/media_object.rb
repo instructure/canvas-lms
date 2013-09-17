@@ -66,11 +66,17 @@ class MediaObject < ActiveRecord::Base
     files = []
     root_account_id = attachments.map{|a| a.root_account_id }.compact.first
     attachments.select{|a| !a.media_object }.each do |attachment|
+      pseudonym = attachment.user.sis_pseudonym_for(attachment.context) if attachment.user
+      sis_source_id, sis_user_id = "", ""
+      if Kaltura::ClientV3.config['kaltura_sis'].present? && Kaltura::ClientV3.config['kaltura_sis'] == "1"
+        sis_source_id = %Q[,"sis_source_id":"#{attachment.context.sis_source_id}"] if attachment.context.respond_to?('sis_source_id') && attachment.context.sis_source_id
+        sis_user_id = %Q[,"sis_user_id":"#{pseudonym ? pseudonym.sis_user_id : ''}"] if pseudonym
+      end
       files << {
                   :name       => attachment.display_name,
                   :url        => attachment.cacheable_s3_download_url,
                   :media_type => (attachment.content_type || "").match(/\Avideo/) ? 'video' : 'audio',
-                  :id         => attachment.id
+                  :partner_data  => %Q[{"attachment_id":"#{attachment.id}","context_source":"file_upload" #{sis_source_id} #{sis_user_id}}]
                }
     end
     res = client.bulkUploadAdd(files)
@@ -79,7 +85,13 @@ class MediaObject < ActiveRecord::Base
       if wait_for_completion
         bulk_upload_id = res[:id]
         Rails.logger.debug "waiting for bulk upload id: #{bulk_upload_id}"
+        started_at = Time.now
+        timeout = Setting.get('media_bulk_upload_timeout', 30.minutes.to_s).to_i
         while !res[:ready]
+          if Time.now > started_at + timeout
+            MediaObject.send_later_enqueue_args(:refresh_media_files, {:run_at => 1.minute.from_now, :priority => Delayed::LOW_PRIORITY}, res[:id], attachments.map(&:id), root_account_id)
+            break
+          end
           sleep(1.minute.to_i)
           res = client.bulkUploadGet(bulk_upload_id)
         end
@@ -126,7 +138,14 @@ class MediaObject < ActiveRecord::Base
   def self.build_media_objects(data, root_account_id)
     root_account = Account.find_by_id(root_account_id)
     data[:entries].each do |entry|
-      attachment = Attachment.find_by_id(entry[:originalId]) if entry[:originalId].present?
+      attachment_id = nil
+      if entry[:originalId].present? && (Integer(entry[:originalId]).is_a?(Integer) rescue false)
+        attachment_id = entry[:originalId]
+      elsif entry[:originalId].present? && entry[:originalId].length >= 2
+        partner_data = JSON.parse(entry[:originalId]).with_indifferent_access
+        attachment_id = partner_data[:attachment_id] if partner_data[:attachment_id].present?
+      end
+      attachment = Attachment.find_by_id(attachment_id) if attachment_id
       mo = MediaObject.find_or_initialize_by_media_id(entry[:entryId])
       mo.root_account ||= root_account || Account.default
       mo.title ||= entry[:name]
@@ -137,7 +156,7 @@ class MediaObject < ActiveRecord::Base
         attachment.update_attribute(:media_entry_id, entry[:entryId])
         # check for attachments that were created temporarily, just to import a media object
         if attachment.full_path.starts_with?(File.join(Folder::ROOT_FOLDER_NAME, CC::CCHelper::MEDIA_OBJECTS_FOLDER) + '/')
-          attachment.destroy(false)
+          attachment.destroy
         end
       end
       mo.context ||= mo.root_account

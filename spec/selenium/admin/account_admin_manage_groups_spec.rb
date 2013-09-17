@@ -224,51 +224,17 @@ describe "account admin manage groups" do
       @admin_account.group_categories.last.name.should == category_name
     end
 
-    it "should create a category and should be able to check the Allow self sign-up box" do
+    it "should not be able to check the Allow self sign-up box" do
       get "/accounts/#{@admin_account.id}/groups"
       @admin_account.group_categories.last.name.should == "Existing Category"
       make_full_screen
       driver.find_element(:css, "#category_#{@courses_group_category.id} .edit_category_link .icon-edit").click
       wait_for_ajaximations
       form = driver.find_element(:id, "edit_category_form")
-      form.find_element(:id, "category_enable_self_signup").click
-      wait_for_ajaximations
-      is_checked('#category_enable_self_signup').should be_true
-      f('#group_structure_self_signup_subcontainer').should be_displayed
+      ff("#category_enable_self_signup", form).should be_empty
       submit_form(form)
       wait_for_ajaximations
-      driver.find_element(:css, "#category_#{@courses_group_category.id} .self_signup_text").should include_text "Self sign-up is enabled"
-    end
-
-    it "should create a category and should be able to check the Allow self sign-up box and the Require group members to be in the same section" do
-      get "/accounts/#{@admin_account.id}/groups"
-      @admin_account.group_categories.last.name.should == "Existing Category"
-      make_full_screen
-      driver.find_element(:css, "#category_#{@courses_group_category.id} .edit_category_link .icon-edit").click
-      wait_for_ajaximations
-      form = driver.find_element(:id, "edit_category_form")
-      form.find_element(:id, "category_enable_self_signup").click
-      wait_for_ajaximations
-      is_checked('#category_enable_self_signup').should be_true
-      form.find_element(:id, "category_restrict_self_signup").click
-      wait_for_ajaximations
-      is_checked('#category_restrict_self_signup').should be_true
-      submit_form(form)
-      wait_for_ajaximations
-      driver.find_element(:css, ".self_signup_text").should include_text "Self sign-up is enabled"
-      driver.find_element(:css, ".restricted_self_signup_text").should include_text "All students in a group are required to be in the same section"
-    end
-
-    it "should click on  the self signup help link " do
-      get "/accounts/#{@admin_account.id}/groups"
-      @admin_account.group_categories.last.name.should include "Existing Category"
-      make_full_screen
-      driver.find_element(:css, "#category_#{@courses_group_category.id} .edit_category_link .icon-edit").click
-      wait_for_ajaximations
-      form = driver.find_element(:id, "edit_category_form")
-      form.find_element(:css, ".self_signup_help_link").click
-      wait_for_ajaximations
-      driver.find_element(:id, "self_signup_help_dialog").should be_displayed
+      driver.find_element(:css, "#category_#{@courses_group_category.id} .self_signup_text").should_not include_text "Self sign-up is enabled"
     end
   end
 end

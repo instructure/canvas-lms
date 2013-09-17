@@ -1,26 +1,9 @@
 <% content_for :page_title do %><%= t :page_title, "Import Files" %><% end %>
 
-<% unless params[:return_to] %>
-  <%= render :partial => 'content_imports/wizard_secondary_nav', :locals => {:view => 'files' } %>
-<% end %>
-
 <div class="content-imports-wrapper">
   <h2><%= t :page_title, "Import Files" %></h2>
   <p><%= t :description, "You can upload a zipped collection of files into your course and we'll extract them all out for you.  This is an easy way to move files from another system into Canvas." %>
   </p>
-  <% unless params[:return_to] %>
-  <div class="content-imports-instructions">
-    <a href="#" class="icon-question element_toggler" aria-controls="zip_from_webct"><%= t 'links.zip_from_webct', "How do I get a .zip file from WebCT?" %></a>
-    <div class="alert" id="zip_from_webct" style="display:none;">
-      <ol>
-        <li><%= t 'instructions.webct.1', "Log in to WebCT and go to the File Manager" %></li>
-        <li><%= t 'instructions.webct.2', "Select all the files you want to export" %></li>
-        <li><%= t 'instructions.webct.3', "Click the zip option to archive the files" %></li>
-        <li><%= t 'instructions.webct.4', "Save the file to your local computer" %></li>
-      </ol>
-    </div>
-  </div>
-  <% end %>
   <%= render :partial => 'shared/zip_file_import_form' %>
 </div>
 <% js_block do %>
@@ -31,7 +14,7 @@ require([
 
   $(function(){
     $("#zip_file_import_form .cancel_button")
-      .attr("href", "<%= qti_or_content_link %>")
+      .attr("href", "<%= return_or_context_url %>")
       .text(<%= params[:return_to] ? t('#buttons.cancel', "Cancel").to_json.html_safe : t('buttons.skip', "Skip this Step").to_json.html_safe %>);
   });
 });

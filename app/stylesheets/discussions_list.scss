@@ -131,7 +131,13 @@
   }
 
   .element_toggler {
+    color: #3d454c;
     cursor: pointer;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: none;
+    }
   }
 
   .loader {
@@ -198,8 +204,20 @@
     color: #bbb;
     width: 40px;
 
-    .icon-discussion-check, .icon-published {
-      color: #5bb75b;
+    .subscription-toggler:focus {
+      outline: none;
+    }
+
+    a[class*=icon-] {
+       text-decoration: none;
+    }
+
+    .icon-discussion-check {
+      color: #35842c;
+    }
+
+    .icon-discussion-x {
+      color: $btnDangerBackground;
     }
   }
 

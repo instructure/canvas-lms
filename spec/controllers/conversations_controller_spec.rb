@@ -107,6 +107,34 @@ describe ConversationsController do
       assigns[:conversations_json][0][:id].should == @c2.conversation_id
     end
 
+    it "should use the boolean operation in filter_mode when combining multiple filters" do
+      course_with_student_logged_in(:active_all => true)
+      @course1 = @course
+      @c1 = conversation(:course => @course1)
+      @course2 = course(:active_all => true)
+      enrollment = @course2.enroll_student(@user)
+      enrollment.workflow_state = 'active'
+      enrollment.save!
+      @c2 = conversation(:course => @course2)
+      @c3 = conversation(:course => @course2)
+
+      get 'index', :filter => [@course1.asset_string, @course2.asset_string], :filter_mode => 'or', :format => 'json'
+      response.should be_success
+      assigns[:conversations_json].map{|c| c[:id]}.sort.should eql [@c1, @c2, @c3].map(&:conversation_id).sort
+
+      get 'index', :filter => [@course2.asset_string, @user.asset_string], :filter_mode => 'or', :format => 'json'
+      response.should be_success
+      assigns[:conversations_json].map{|c| c[:id]}.sort.should eql [@c1, @c2, @c3].map(&:conversation_id).sort
+
+      get 'index', :filter => [@course2.asset_string, @user.asset_string], :filter_mode => 'and', :format => 'json'
+      response.should be_success
+      assigns[:conversations_json].map{|c| c[:id]}.sort.should eql [@c2, @c3].map(&:conversation_id).sort
+
+      get 'index', :filter => [@course1.asset_string, @course2.asset_string], :filter_mode => 'and', :format => 'json'
+      response.should be_success
+      assigns[:conversations_json].should eql []
+    end
+
     it "should return conversations matching a user filter" do
       course_with_student_logged_in(:active_all => true)
       @c1 = conversation
@@ -283,10 +311,13 @@ describe ConversationsController do
       @course1 = @course
       @course2 = course(:active_all => true)
       @course2.enroll_teacher(@user).accept
+      @course3 = course(:active_all => true)
       @group1 = @course1.groups.create!
       @group2 = @course1.groups.create!
+      @group3 = @course3.groups.create!
       @group1.users << @user
       @group2.users << @user
+      @group3.users << @user
 
       new_user1 = User.create
       enrollment1 = @course1.enroll_student(new_user1)
@@ -307,13 +338,46 @@ describe ConversationsController do
       enrollment3.workflow_state = 'active'
       enrollment3.save
 
-      post 'create', :recipients => [@course2.asset_string + "_students", @group1.asset_string], :body => "yo", :group_conversation => true
+      post 'create', :recipients => [@course2.asset_string + "_students", @group1.asset_string], :body => "yo", :group_conversation => true, :context_code => @group3.asset_string
       response.should be_success
 
       c = Conversation.first
-      c.tags.sort.should eql [@course1.asset_string, @course2.asset_string, @group1.asset_string].sort
+      c.tags.sort.should eql [@course1.asset_string, @course2.asset_string, @group1.asset_string, @course3.asset_string, @group3.asset_string].sort
       # course1 inferred from group1, course2 inferred from synthetic context,
       # group1 explicit, group2 not present (even though it's shared by everyone)
+      # group3 from context_code, course3 inferred from group3
+    end
+
+    it "should populate subject" do
+      course_with_student_logged_in(:active_all => true)
+
+      new_user = User.create
+      enrollment = @course.enroll_student(new_user)
+      enrollment.workflow_state = 'active'
+      enrollment.save
+      post 'create', :recipients => [new_user.id.to_s], :body => "yo", :subject => "greetings"
+      response.should be_success
+      assigns[:conversation].conversation.subject.should_not be_nil
+    end
+
+    it "should populate subject on batch conversations" do
+      course_with_student_logged_in(:active_all => true)
+
+      new_user1 = User.create
+      enrollment1 = @course.enroll_student(new_user1)
+      enrollment1.workflow_state = 'active'
+      enrollment1.save
+      new_user2 = User.create
+      enrollment2 = @course.enroll_student(new_user2)
+      enrollment2.workflow_state = 'active'
+      enrollment2.save
+      post 'create', :recipients => [new_user1.id.to_s, new_user2.id.to_s], :body => "later", :subject => "farewell"
+      response.should be_success
+      json = json_parse(response.body)
+      json.size.should eql 2
+      json.each { |c|
+        c["subject"].should_not be_nil
+      }
     end
   end
 
@@ -495,6 +559,42 @@ describe ConversationsController do
       feed = Atom::Feed.load_feed(response.body) rescue nil
       feed.should_not be_nil
       feed.entries.first.content.should match(/somefile\.doc/)
+    end
+  end
+
+  describe "POST 'toggle_new_conversations'" do
+    before :each do
+      course_with_student_logged_in(:active_all => true)
+    end
+
+    it "should enable new conversations for a user" do
+      @user.preferences[:use_new_conversations] = false
+      @user.save!
+      @user.use_new_conversations?.should be_false
+      post 'toggle_new_conversations', :use_new_conversations => true
+      @user.reload
+      @user.use_new_conversations?.should be_true
+    end
+
+    it "should disable new conversations for a user" do
+      @user.preferences[:use_new_conversations] = true
+      @user.save!
+      post 'toggle_new_conversations'
+      @user.reload
+      @user.use_new_conversations?.should be_false
+    end
+
+    it "should be idempotent" do
+      @user.use_new_conversations?.should be_false
+      post 'toggle_new_conversations'
+      @user.reload
+      @user.use_new_conversations?.should be_false
+      post 'toggle_new_conversations', :use_new_conversations => 1
+      @user.reload
+      @user.use_new_conversations?.should be_true
+      post 'toggle_new_conversations', :use_new_conversations => 1
+      @user.reload
+      @user.use_new_conversations?.should be_true
     end
   end
 

@@ -1,30 +1,40 @@
 define [
+  'require'
   'Backbone'
   'underscore'
-], (Backbone, _) ->
+  'compiled/collections/PaginatedCollection'
+  'compiled/collections/FilesCollection'
+], (require, Backbone, _, PaginatedCollection, FilesCollection) ->
+
+  # this breaks the circular dependency between Folder <-> FoldersCollection
+  FoldersCollection = null
+  require ['compiled/collections/FoldersCollection'], (fc) -> FoldersCollection = fc
 
   class Folder extends Backbone.Model
 
     defaults:
       'name' : ''
 
-    initialize: ->
+    initialize: (options) ->
+      @contentTypes ||= options?.contentTypes
       @setUpFilesAndFoldersIfNeeded()
       super
 
     parse: (response) ->
+      json = super
+      @contentTypes ||= response.contentTypes
       @setUpFilesAndFoldersIfNeeded()
 
       @folders.url = response.folders_url
       @files.url   = response.files_url
-      super
+
+      json
 
     setUpFilesAndFoldersIfNeeded: ->
       unless @folders
-        @folders = new Backbone.Collection
-        @folders.model = Folder
+        @folders = new FoldersCollection [], parentFolder: this
       unless @files
-        @files = new Backbone.Collection
+        @files = new FilesCollection [], parentFolder: this
 
     expand: (force=false) ->
       @isExpanded = true
@@ -53,13 +63,6 @@ define [
       else
         @expand()
 
-    contents: ->
-      _(@files.models.concat(@folders.models)).sortBy (model) ->
-        (model.get('name') || model.get('display_name') || '').toLowerCase()
-        
-    previewUrlForFile: (file) ->
+    previewUrl: ->
       if @get('context_type') in ['Course', 'Group']
-        "/#{ @get('context_type').toLowerCase() + 's' }/#{ @get('context_id') }/files/#{ file.get('id') }/preview"
-      else
-        # we need the full path with verifier for user files
-        file.get('url')
+        "/#{ @get('context_type').toLowerCase() + 's' }/#{ @get('context_id') }/files/{{id}}/preview"

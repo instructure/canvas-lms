@@ -34,4 +34,10 @@
 
 
 // Completely hide, but make available to screenreader so it can read it.
-.screenreader-only { @extend .ui-helper-hidden-accessible }
+.screenreader-only { 
+  position: absolute !important;
+  clip: rect(1px 1px 1px 1px);
+  clip: rect(1px,1px,1px,1px);
+  width: 1px;
+  overflow: hidden;
+}

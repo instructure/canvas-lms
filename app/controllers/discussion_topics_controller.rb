@@ -45,6 +45,9 @@
 #        // has made an initial reply. Defaults to false.
 #        "require_initial_post":false,
 #
+#        // Whether or not posts in this topic are visible to the user.
+#       "user_can_see_posts":true,
+#
 #        // The count of entries in the topic.
 #        "discussion_subentry_count":0,
 #
@@ -57,11 +60,22 @@
 #        // Whether or not the current user is subscribed to this topic.
 #        "subscribed":true,
 #
+#        // (Optional) Why the user cannot subscribe to this topic. Only one reason
+#        // will be returned even if multiple apply. Can be one of:
+#        // 'initial_post_required': The user must post a reply first
+#        // 'not_in_group_set': The user is not in the group set for this graded group discussion
+#        // 'not_in_group': The user is not in this topic's group
+#        // 'topic_is_announcement': This topic is an announcement
+#        "subscription_hold":"not_in_group_set",
+#
 #        // The unique identifier of the assignment if the topic is for grading, otherwise null.
 #        "assignment_id":null,
 #
 #        // The datetime to publish the topic (if not right away).
 #        "delayed_post_at":null,
+#
+#        // Whether this discussion topic is published (true) or draft state (false)
+#        "published":true,
 #
 #        // The datetime to lock the topic (if ever).
 #        "lock_at":null,
@@ -134,14 +148,25 @@ class DiscussionTopicsController < ApplicationController
   include Api::V1::DiscussionTopics
   include Api::V1::Assignment
   include Api::V1::AssignmentOverride
+  include KalturaHelper
 
   # @API List discussion topics
   #
   # Returns the paginated list of discussion topics for this course or group.
   #
-  # @argument order_by Determines the order of the discussion topic list. May be one of "position", or "recent_activity". Defaults to "position".
-  # @argument scope [Optional, "locked"|"unlocked"] Only return discussion topics in the given state. Defaults to including locked and unlocked topics. Filtering is done after pagination, so pages may be smaller than requested if topics are filtered
-  # @argument only_announcements [Optional] Boolean, return announcements instead of discussion topics. Defaults to false
+  # @argument order_by [String, "position"|"recent_activity"]
+  #   Determines the order of the discussion topic list. Defaults to "position".
+  #
+  # @argument scope [Optional, String, "locked"|"unlocked"]
+  #   Only return discussion topics in the given state. Defaults to including
+  #   locked and unlocked topics. Filtering is done after pagination, so pages
+  #   may be smaller than requested if topics are filtered
+  #
+  # @argument only_announcements [Optional, Boolean]
+  #   Return announcements instead of discussion topics. Defaults to false
+  #
+  # @argument search_term [Optional, String]
+  #   The partial title of the discussion topics to match and return.
   #
   # @example_request
   #     curl https://<canvas>/api/v1/courses/<course_id>/discussion_topics \ 
@@ -160,6 +185,8 @@ class DiscussionTopicsController < ApplicationController
 
     scope = params[:order_by] == 'recent_activity' ? scope.by_last_reply_at : scope.by_position
 
+    scope = DiscussionTopic.search_by_attribute(scope, :title, params[:search_term])
+
     @topics = Api.paginate(scope, self, topic_pagination_url)
     @topics.reject! { |t| t.locked? || t.locked_for?(@current_user) } if params[:scope] == 'unlocked'
     @topics.select! { |t| t.locked? || t.locked_for?(@current_user) } if params[:scope] == 'locked'
@@ -174,16 +201,18 @@ class DiscussionTopicsController < ApplicationController
         locked_topics, open_topics = @topics.partition do |topic|
           topic.locked? || topic.locked_for?(@current_user)
         end
+        hash = {USER_SETTINGS_URL: api_v1_user_settings_url(@current_user),
+                openTopics: open_topics,
+                lockedTopics: locked_topics,
+                newTopicURL: named_context_url(@context, :new_context_discussion_topic_url),
+                permissions: {
+                    create: @context.discussion_topics.new.grants_right?(@current_user, session, :create),
+                    moderate: user_can_moderate,
+                    change_settings: user_can_edit_course_settings?
+                }}
+        append_sis_data(hash)
 
-        js_env(USER_SETTINGS_URL: api_v1_user_settings_url(@current_user),
-               openTopics: open_topics,
-               lockedTopics: locked_topics,
-               newTopicURL: named_context_url(@context, :new_context_discussion_topic_url),
-               permissions: {
-                 create: @context.discussion_topics.new.grants_right?(@current_user, session, :create),
-                 moderate: @context.grants_right?(@current_user, session, :moderate_forum),
-                 change_settings: user_can_edit_course_settings?
-               })
+        js_env(hash)
 
         if user_can_edit_course_settings?
           js_env(SETTINGS_URL: named_context_url(@context, :api_v1_context_settings_url))
@@ -218,7 +247,7 @@ class DiscussionTopicsController < ApplicationController
         :PERMISSIONS => {
           :CAN_CREATE_ASSIGNMENT => @context.respond_to?(:assignments) && @context.assignments.new.grants_right?(@current_user, session, :create),
           :CAN_ATTACH => @topic.grants_right?(@current_user, session, :attach),
-          :CAN_MODERATE => @context.grants_right?(@current_user, session, :moderate_forum)
+          :CAN_MODERATE => user_can_moderate
         }
       }
 
@@ -238,12 +267,15 @@ class DiscussionTopicsController < ApplicationController
 
       categories = @context.respond_to?(:group_categories) ? @context.group_categories : []
       sections = @context.respond_to?(:course_sections) ? @context.course_sections.active : []
-      js_env :DISCUSSION_TOPIC => hash,
-             :SECTION_LIST => sections.map { |section| { :id => section.id, :name => section.name } },
-             :GROUP_CATEGORIES => categories.
-                                  reject { |category| category.student_organized? }.
-                                  map { |category| { :id => category.id, :name => category.name } },
-             :CONTEXT_ID => @context.id
+      js_hash = {:DISCUSSION_TOPIC => hash,
+                 :SECTION_LIST => sections.map { |section| { :id => section.id, :name => section.name } },
+                 :GROUP_CATEGORIES => categories.
+                     reject { |category| category.student_organized? }.
+                     map { |category| { :id => category.id, :name => category.name } },
+                 :CONTEXT_ID => @context.id,
+                 :CONTEXT_ACTION_SOURCE => :discussion_topic}
+      append_sis_data(js_hash)
+      js_env(js_hash)
       render :action => "edit"
     end
   end
@@ -305,7 +337,7 @@ class DiscussionTopicsController < ApplicationController
                 :CAN_REPLY      => @locked ? false : !(@topic.for_group_assignment? || @topic.locked?),     # Can reply
                 :CAN_ATTACH     => @locked ? false : @topic.grants_right?(@current_user, session, :attach), # Can attach files on replies
                 :CAN_MANAGE_OWN => @context.user_can_manage_own_discussion_posts?(@current_user),           # Can moderate their own topics
-                :MODERATE       => @context.grants_right?(@current_user, session, :moderate_forum)          # Can moderate any topic
+                :MODERATE       => user_can_moderate                                                        # Can moderate any topic
               },
               :ROOT_URL => named_context_url(@context, :api_v1_context_discussion_topic_view_url, @topic),
               :ENTRY_ROOT_URL => named_context_url(@context, :api_v1_context_discussion_topic_entry_list_url, @topic),
@@ -318,9 +350,7 @@ class DiscussionTopicsController < ApplicationController
               :MARK_ALL_READ_URL => named_context_url(@context, :api_v1_context_discussion_topic_mark_all_read_url, @topic),
               :MARK_ALL_UNREAD_URL => named_context_url(@context, :api_v1_context_discussion_topic_mark_all_unread_url, @topic),
               :MANUAL_MARK_AS_READ => @current_user.try(:manual_mark_as_read?),
-              :CAN_SUBSCRIBE => !@initial_post_required && !@topic.is_a?(Announcement),                    # can subscribe when no initial post required for user and don't show for announcements
-              :SUBSCRIBE_URL => named_context_url(@context, :api_v1_context_discussion_topic_subscribe_url, @topic),
-              :UNSUBSCRIBE_URL => named_context_url(@context, :api_v1_context_discussion_topic_unsubscribe_url, @topic),
+              :CAN_SUBSCRIBE => !@topic.subscription_hold(@current_user, @context_enrollment, session),
               :CURRENT_USER => user_display_json(@current_user),
               :INITIAL_POST_REQUIRED => @initial_post_required,
               :THREADED => @topic.threaded?
@@ -332,7 +362,11 @@ class DiscussionTopicsController < ApplicationController
                                                                       :assignment_id => @topic.assignment.id,
                                                                       :anchor => {:student_id => ":student_id"}.to_json)
             end
-            js_env :DISCUSSION => env_hash
+
+            js_hash = {:DISCUSSION => env_hash}
+            js_hash[:CONTEXT_ACTION_SOURCE] = :discussion_topic
+            append_sis_data(js_hash)
+            js_env(js_hash)
 
           end
         end
@@ -344,23 +378,51 @@ class DiscussionTopicsController < ApplicationController
   #
   # Create an new discussion topic for the course or group.
   #
-  # @argument title
-  # @argument message
-  # @argument discussion_type
+  # @argument title [String]
+  # @argument message [String]
+  # @argument discussion_type [String]
   #
-  # @argument delayed_post_at If a timestamp is given, the topic will not be published until that time.
-  # @argument lock_at If a timestamp is given, the topic will be scheduled to lock at the provided timestamp. If the timestamp is in the past, the topic will be locked.
+  # @argument published [Optional, Boolean]
+  #   Whether this topic is published (true) or draft state (false). Only
+  #   teachers and TAs have the ability to create draft state topics.
   #
-  # @argument podcast_enabled If true, the topic will have an associated podcast feed.
-  # @argument podcast_has_student_posts If true, the podcast will include posts from students as well. Implies podcast_enabled.
+  # @argument delayed_post_at [Optional, DateTime]
+  #   If a timestamp is given, the topic will not be published until that time.
   #
-  # @argument require_initial_post If true then a user may not respond to other replies until that user has made an initial reply. Defaults to false.
+  # @argument lock_at [Optional, DateTime]
+  #   If a timestamp is given, the topic will be scheduled to lock at the
+  #   provided timestamp. If the timestamp is in the past, the topic will be
+  #   locked.
   #
-  # @argument assignment To create an assignment discussion, pass the assignment parameters as a sub-object. See the {api:AssignmentsApiController#create Create an Assignment API} for the available parameters. The name parameter will be ignored, as it's taken from the discussion title. If you want to make a discussion that was an assignment NOT an assignment, pass set_assignment = false as part of the assignment object
+  # @argument podcast_enabled [Boolean]
+  #   If true, the topic will have an associated podcast feed.
   #
-  # @argument is_announcement If true, this topic is an announcement. It will appear in the announcements section rather than the discussions section. This requires announcment-posting permissions.
+  # @argument podcast_has_student_posts [Boolean]
+  #   If true, the podcast will include posts from students as well. Implies
+  #   podcast_enabled.
   #
-  # @argument position_after By default, discussions are sorted chronologically by creation date, you can pass the id of another topic to have this one show up after the other when they are listed.
+  # @argument require_initial_post [Boolean]
+  #   If true then a user may not respond to other replies until that user has
+  #   made an initial reply. Defaults to false.
+  #
+  # @argument assignment [Assignment]
+  #   To create an assignment discussion, pass the assignment parameters as a
+  #   sub-object. See the {api:AssignmentsApiController#create Create an Assignment API}
+  #   for the available parameters. The name parameter will be ignored, as it's
+  #   taken from the discussion title. If you want to make a discussion that was
+  #   an assignment NOT an assignment, pass set_assignment = false as part of
+  #   the assignment object
+  #
+  # @argument is_announcement [Boolean]
+  #   If true, this topic is an announcement. It will appear in the
+  #   announcement's section rather than the discussions section. This requires
+  #   announcment-posting permissions.
+  #
+  # @argument position_after [String]
+  #   By default, discussions are sorted chronologically by creation date, you
+  #   can pass the id of another topic to have this one show up after the other
+  #   when they are listed.
+  #
   # @example_request
   #     curl https://<canvas>/api/v1/courses/<course_id>/discussion_topics \ 
   #         -F title='my topic' \ 
@@ -450,9 +512,15 @@ class DiscussionTopicsController < ApplicationController
     end
   end
 
+  def user_can_moderate
+    @user_can_moderate = @context.grants_right?(@current_user, session, :moderate_forum) if @user_can_moderate.nil?
+    @user_can_moderate
+  end
+
   API_ALLOWED_TOPIC_FIELDS = %w(title message discussion_type delayed_post_at lock_at podcast_enabled
                                 podcast_has_student_posts require_initial_post is_announcement pinned)
   def process_discussion_topic(is_new = false)
+    @errors = {}
     discussion_topic_hash = params.slice(*API_ALLOWED_TOPIC_FIELDS)
     model_type = value_to_boolean(discussion_topic_hash.delete(:is_announcement)) && @context.announcements.new.grants_right?(@current_user, session, :create) ? :announcements : :discussion_topics
     if is_new
@@ -461,103 +529,163 @@ class DiscussionTopicsController < ApplicationController
       @topic = @context.send(model_type).active.find(params[:id] || params[:topic_id])
     end
 
-    if authorized_action(@topic, @current_user, (is_new ? :create : :update))
+    return unless authorized_action(@topic, @current_user, (is_new ? :create : :update))
 
-      discussion_topic_hash[:podcast_enabled] = true if value_to_boolean(discussion_topic_hash[:podcast_has_student_posts])
+    process_podcast_parameters(discussion_topic_hash)
 
-      unless @context.grants_right?(@current_user, session, :moderate_forum)
-        discussion_topic_hash.delete :podcast_enabled
-        discussion_topic_hash.delete :podcast_has_student_posts
-      end
+    @topic.send(is_new ? :user= : :editor=, @current_user)
+    @topic.current_user = @current_user
+    @topic.content_being_saved_by(@current_user)
 
-      @topic.send(is_new ? :user= : :editor=, @current_user)
-      @topic.current_user = @current_user
-      @topic.content_being_saved_by(@current_user)
+    if discussion_topic_hash.has_key?(:message)
+      discussion_topic_hash[:message] = process_incoming_html_content(discussion_topic_hash[:message])
+    end
 
-      if discussion_topic_hash.has_key?(:message)
-        discussion_topic_hash[:message] = process_incoming_html_content(discussion_topic_hash[:message])
-      end
+    unless process_future_date_parameters(discussion_topic_hash)
+      process_lock_parameters(discussion_topic_hash)
+      process_published_parameters(discussion_topic_hash)
+    end
 
-      # Set the delayed_post_at and lock_at if provided. This will be used to determine if the values have changed
-      # in order to know if we should rely on this data to update the workflow state
-      @topic.delayed_post_at = discussion_topic_hash[:delayed_post_at] if params.has_key? :delayed_post_at
-      @topic.lock_at = discussion_topic_hash[:lock_at] if params.has_key? :lock_at
+    if @errors.present?
+      render :json => {errors: @errors}, :status => :bad_request
+    elsif @topic.update_attributes(discussion_topic_hash)
+      log_asset_access(@topic, 'topics', 'topics', 'participate')
+      generate_new_page_view
 
-      if @topic.delayed_post_at_changed? || @topic.lock_at_changed?
-        @topic.workflow_state = @topic.desired_workflow_state
-      
-      # Handle locking/unlocking (overrides workflow state if provided). It appears that the locked param as a hash
-      # is from old code and is not being used. Verification requested.
-      elsif params.has_key?(:locked) && !params[:locked].is_a?(Hash)
-        should_lock = value_to_boolean(params[:locked])
-        if should_lock != @topic.locked?
-          if should_lock
-            @topic.lock
-          else
-            discussion_topic_hash[:delayed_post_at] = nil
-            discussion_topic_hash[:lock_at] = nil
-            @topic.unlock
-          end
-        end
-      end
+      apply_positioning_parameters
+      apply_attachment_parameters
+      apply_assignment_parameters
 
-      if @topic.update_attributes(discussion_topic_hash)
-        log_asset_access(@topic, 'topics', 'topics', 'participate')
-        generate_new_page_view
+      render :json => discussion_topic_api_json(@topic, @context, @current_user, session)
+    else
+      render :json => @topic.errors.to_json, :status => :bad_request
+    end
+  end
 
-        # handle sort positioning
-        if params[:position_after] && @context.grants_right?(@current_user, session, :moderate_forum)
-          other_topic = @context.discussion_topics.active.find(params[:position_after])
-          @topic.insert_at(other_topic.position)
-        end
+  def process_podcast_parameters(discussion_topic_hash)
+    discussion_topic_hash[:podcast_enabled] = true if value_to_boolean(discussion_topic_hash[:podcast_has_student_posts])
 
-        if params[:position_at] && @context.grants_right?(@current_user, session, :moderate_forum)
-          @topic.insert_at(params[:position_at].to_i)
-        end
+    unless user_can_moderate
+      discussion_topic_hash.delete :podcast_enabled
+      discussion_topic_hash.delete :podcast_has_student_posts
+    end
+  end
 
-        # handle creating/removing attachment
-        if @topic.grants_right?(@current_user, session, :attach)
-          attachment = params[:attachment] &&
-                       params[:attachment].size > 0 &&
-                       params[:attachment]
+  # Internal: detetermines if the delayed_post_at or lock_at dates were changed
+  # and applies changes to the topic if the were.
+  #
+  # Returns true if dates were changed and the topic was updated, false otherwise.
+  def process_future_date_parameters(discussion_topic_hash)
+    # Set the delayed_post_at and lock_at if provided. This will be used to determine if the values have changed
+    # in order to know if we should rely on this data to update the workflow state
+    @topic.delayed_post_at = discussion_topic_hash[:delayed_post_at] if params.has_key? :delayed_post_at
+    @topic.lock_at = discussion_topic_hash[:lock_at] if params.has_key? :lock_at
 
-          return if attachment && attachment.size > 1.kilobytes &&
-                    quota_exceeded(named_context_url(@context, :context_discussion_topics_url))
-
-          if (params.has_key?(:remove_attachment) || attachment) && @topic.attachment
-            @topic.attachment.destroy!
-          end
-
-          if attachment
-            @attachment = @context.attachments.create!(:uploaded_data => attachment)
-            @topic.attachment = @attachment
-            @topic.save
-          end
-        end
-
-        # handle creating/deleting assignment
-        if params[:assignment] && !@topic.root_topic_id?
-          if params[:assignment].has_key?(:set_assignment) && !value_to_boolean(params[:assignment][:set_assignment])
-            if @topic.assignment && @topic.assignment.grants_right?(@current_user, session, :update)
-              assignment = @topic.assignment
-              @topic.assignment = nil
-              @topic.save!
-              assignment.destroy
-            end
-
-          elsif (@assignment = @topic.assignment || @topic.restore_old_assignment || (@topic.assignment = @context.assignments.build)) &&
-                 @assignment.grants_right?(@current_user, session, :update)
-            update_api_assignment(@assignment, params[:assignment].merge(@topic.attributes.slice('title')))
-            @assignment.submission_types = 'discussion_topic'
-            @assignment.saved_by = :discussion_topic
-            @topic.assignment = @assignment
-            @topic.save!
-          end
-        end
-
-        render :json => discussion_topic_api_json(@topic, @context, @current_user, session)
+    if @topic.delayed_post_at_changed? || @topic.lock_at_changed?
+      @topic.workflow_state = @topic.should_not_post_yet ? 'post_delayed' : 'active'
+      if @topic.should_lock_yet
+        @topic.lock(without_save: true)
       else
-        render :json => @topic.errors.to_json, :status => :bad_request
+        @topic.unlock(without_save: true)
+      end
+      true
+    else
+      false
+    end
+  end
+
+  def process_lock_parameters(discussion_topic_hash)
+    # Handle locking/unlocking (overrides workflow state if provided). It appears that the locked param as a hash
+    # is from old code and is not being used. Verification requested.
+    if params.has_key?(:locked) && !params[:locked].is_a?(Hash)
+      should_lock = value_to_boolean(params[:locked])
+      if should_lock != @topic.locked?
+        if should_lock
+          @topic.lock(without_save: true)
+        else
+          discussion_topic_hash[:lock_at] = nil
+          @topic.unlock(without_save: true)
+        end
+      end
+    end
+  end
+
+  def process_published_parameters(discussion_topic_hash)
+    if params.has_key?(:published)
+      should_publish = value_to_boolean(params[:published])
+      if should_publish != @topic.published?
+        if should_publish
+          @topic.workflow_state = 'active'
+        elsif @topic.is_announcement
+          @errors[:published] = t(:error_draft_state_announcement, "This topic cannot be set to draft state because it is an announcement.")
+        elsif @topic.discussion_subentry_count > 0
+          @errors[:published] = t(:error_draft_state_with_posts, "This topic cannot be set to draft state because it contains posts.")
+        elsif user_can_moderate
+          discussion_topic_hash[:delayed_post_at] = nil
+          @topic.workflow_state = 'post_delayed'
+        else
+          @errors[:published] = t(:error_draft_state_unauthorized, "You do not have permission to set this topic to draft state.")
+        end
+      end
+    end
+  end
+
+  def apply_positioning_parameters
+    if params[:position_after] && user_can_moderate
+      other_topic = @context.discussion_topics.active.find(params[:position_after])
+      @topic.insert_at(other_topic.position)
+    end
+
+    if params[:position_at] && user_can_moderate
+      @topic.insert_at(params[:position_at].to_i)
+    end
+  end
+
+  def apply_attachment_parameters
+    # handle creating/removing attachment
+    if @topic.grants_right?(@current_user, session, :attach)
+      attachment = params[:attachment] &&
+                   params[:attachment].size > 0 &&
+                   params[:attachment]
+
+      return if attachment && attachment.size > 1.kilobytes &&
+                quota_exceeded(named_context_url(@context, :context_discussion_topics_url))
+
+      if (params.has_key?(:remove_attachment) || attachment) && @topic.attachment
+        @topic.transaction do
+          att = @topic.attachment
+          @topic.attachment = nil
+          @topic.save! if !@topic.new_record?
+          att.destroy!
+        end
+      end
+
+      if attachment
+        @attachment = @context.attachments.create!(:uploaded_data => attachment)
+        @topic.attachment = @attachment
+        @topic.save
+      end
+    end
+  end
+
+  def apply_assignment_parameters
+    # handle creating/deleting assignment
+    if params[:assignment] && !@topic.root_topic_id?
+      if params[:assignment].has_key?(:set_assignment) && !value_to_boolean(params[:assignment][:set_assignment])
+        if @topic.assignment && @topic.assignment.grants_right?(@current_user, session, :update)
+          assignment = @topic.assignment
+          @topic.assignment = nil
+          @topic.save!
+          assignment.destroy
+        end
+
+      elsif (@assignment = @topic.assignment || @topic.restore_old_assignment || (@topic.assignment = @context.assignments.build)) &&
+             @assignment.grants_right?(@current_user, session, :update)
+        update_api_assignment(@assignment, params[:assignment].merge(@topic.attributes.slice('title')))
+        @assignment.submission_types = 'discussion_topic'
+        @assignment.saved_by = :discussion_topic
+        @topic.assignment = @assignment
+        @topic.save!
       end
     end
   end

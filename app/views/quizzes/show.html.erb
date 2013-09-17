@@ -69,8 +69,157 @@
 <% jammit_css :quizzes, :learning_outcomes %>
 
 <div id="quiz_show">
+<% if @domain_root_account.enable_draft? %>
+  <% if can_do(@quiz, @current_user, :update) || can_do(@quiz, @current_user, :manage) %>
+  <div class="header-bar">
+    <div class="header-bar-right">
+      <div class="header-group-left">
+        <button id="quiz-publish-link" 
+          class='btn quiz-publish-button <%= "disabled " unless @quiz.can_unpublish? %>'
+          <%= 'data-tooltip' unless @quiz.can_unpublish? %>>
+        </button>
+
+        <% link_to context_url(@context, :context_quiz_take_url, @quiz, :preview => 1), :method => :post, :class => 'btn', :id => 'preview_quiz_button' do %>
+          <%= t('links.preview', "Preview") %>
+        <% end %>
+      </div>
+
+      <% if can_do(@quiz, @current_user, :update) || can_do(@quiz, @current_user, :grade) || can_do(@quiz, @current_user, :review_grades) %>
+      <div class="header-group-right">
+        <% if can_do(@quiz, @current_user, :update) %>
+        <a href="<%= edit_polymorphic_path([@context, @quiz]) %>" class='btn edit_assignment_link quiz-edit-button'>
+          <i class='icon-edit'></i> <%= t('links.edit', 'Edit') %>
+        </a>
+        <% end %>
+
+        <a class="al-trigger btn" role="button" aria-haspopup="true" aria-owns="toolbar-1" href="#">
+          <i class="icon-settings"></i>
+          <i class="icon-mini-arrow-down"></i>
+          <span class="screenreader-only"><%= t(:manage, "Manage") %></span>
+        </a>
+        <ul id="toolbar-1" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false">
+          <% if can_do(@quiz, @current_user, :update) && @assignment %>
+            <li role="presentation">
+              <a href="#" rel="<%= context_url(@context, :context_assignment_rubric_url, @assignment.id) %>" class="show_rubric_link" tabindex="-1" role="menuitem">
+                <i class="icon-rubric"></i>
+                <%= t('links.show_assignment_rubric', "Show Rubric") %>
+              </a>
+            </li>
+            <a href="<%= context_url(@context, :context_rubrics_url) %>" class="icon-rubric" id="add_rubric_url" style="display:none">&nbsp;</a>
+          <% end %>
+
+          <% if can_do(@quiz, @current_user, :update) && !needs_unpublished_warning? %>
+            <li role="presentation">
+              <a href="<%= polymorphic_path([@context, @quiz, :take], :preview => 1) %>" class="preview_link" data-method="post" tabindex="-1" role="menuitem">
+                <i class="icon-quiz"></i>
+                <%= t('links.preview', "Preview") %>
+              </a>
+            </li>
+          <% end %>
+
+          <% if can_do(@quiz, @current_user, :update) %>
+            <% if @quiz.locked? %>
+              <% form_for @quiz, :url => context_url(@context, :context_quiz_url, @quiz.id), :html => { :id => 'quiz_unlock_form' } do |f| %>
+                <%= hidden_field_tag 'quiz[locked]', false %>
+                <div id="unlock_for_how_long_dialog" title="<%= t('titles.unlock_for_how_long', "How long would you like to unlock the quiz for?") %>" style="display:none;">
+                  <label style="float: left;" for="no_time_limit">
+                    <%= f.radio_button('do_lock_at', false, :checked => true) %>
+                    <%= f.label('do_lock_at_false', :no_time_limit, :en => 'No time limit') %>
+                  </label>
+                  <label id="how_long_to_unlock_wrapper" style="float: left; margin-left: 30px;" for="until">
+                    <%= f.radio_button('do_lock_at', true, :checked => false) %>
+                    <%= f.label('do_lock_at', :available_until, :en => 'Until', :value => true) %>
+                    <%= f.text_field :lock_at, :class => "datetime_field", :style => "width: 150px;", :value => datetime_string(@quiz.lock_at) %>
+                  </label>
+                </div>
+              <% end %>
+              <li role="presentation">
+                <a href="#" id="let_students_take_this_quiz_button" tabindex="-1" role="menuitem">
+                  <i class="icon-unlock"></i> <%= @quiz.survey? ? t('buttons.unlock_survey', "Let Students Take this Survey Now") : t('buttons.unlock_quiz', "Let Students Take this Quiz Now") %>
+                </a>
+              </li>
+            <% else %>
+              <% form_for @quiz, :url => context_url(@context, :context_quiz_url, @quiz.id), :html => { :id => 'quiz_lock_form' } do |f| %>
+                <%= hidden_field_tag 'quiz[locked]', true %>
+              <% end %>
+              <li role="presentation">
+                <a href="#" id="lock_this_quiz_now_link" tabindex="-1" role="menuitem">
+                  <i class="icon-lock"></i> <%= @quiz.survey? ? t('buttons.lock_survey', "Lock this Survey Now") : t('buttons.lock_quiz', "Lock this Quiz Now") %>
+                </a>
+              </li>
+            <% end %>
+          <% end %>
+
+          <% if (can_do(@quiz, @current_user, :grade) || can_do(@quiz, @current_user, :review_grades)) && @quiz.available? %>
+            <li role="presentation">
+              <a href="#" class="quiz_details_link" tabindex="-1" role="menuitem">
+                <% if @any_submissions_pending_review %>
+                  <i class="icon-warning" aria-label="<%= t("labels.warning_icon", "Warning") %>"></i>
+
+                <% end %>
+                <i class="icon-group"></i>
+                <span id="quiz_details_text">
+                  <%= @quiz.survey? ? t('links.show_student_survey_results', "Show Student Survey Results") : t('links.show_student_quiz_results', "Show Student Quiz Results") %>
+                </span>
+                <div style="font-size: 0.8em; padding-left: 20px;">(<%= t(:students_submitted_so_far, {:one => "1 student submitted so far", :other => "%{count} students submitted so far"}, :count => @submitted_student_count) %>)</div>
+              </a>
+            </li>
+          <% end %>
+
+          <% if can_do(@quiz, @current_user, :grade) && can_do(@context, @current_user, :send_messages) && @quiz.available? && !@quiz.anonymous_submissions? && @quiz.graded? %>
+            <li role="presentation">
+              <a href="#" class="message_students_link" tabindex="-1" role="menuitem">
+                <i class="icon-email"></i> <%= t('links.message_students_who', "Message Students Who...") %>
+              </a>
+            </li>
+          <% end %>
+
+          <li role="presentation">
+            <a href="<%= context_url(@context, :context_quiz_url, @quiz) %>" class="delete_quiz_link" tabindex="-1" role="menuitem">
+              <i class="icon-trash"></i> <%= t('titles.delete', "Delete") %>
+            </a>
+          </li>
+        </ul>
+
+      </div>
+      <% end %>
+    </div>
+  </div>
+  <% end %>
+<% end %>
+
   <header class="quiz-header">
-    <% if needs_unpublished_warning? %>
+    <% if submission_has_regrade?(@submission) %>
+    <div class="ui-state-warning ui-corner-all pad-box-micro text-center regraded-warning">
+      <i class="icon-warning" aria-label="<%= t("labels.warning_icon", "Warning") %>"></i>
+      <strong>
+      <% if score_affected_by_regrade?(@submission) %>
+        <%= t 'quiz_regraded_your_score_affected', 'This quiz has been re-graded, your score was affected.' %>
+      <% else %>
+        <%= t 'quiz_regraded_your_score_not_affected', 'This quiz has been re-graded, your score was not affected.' %>
+      <% end %>
+      </strong>
+    </div>
+    <% end %>
+
+  <% if @domain_root_account.enable_draft? %>
+    <% if needs_unpublished_warning?(@quiz) %>
+    <div class="alert unpublished_warning">
+      <% if !@quiz.available? %>
+        <%= unpublished_quiz_warning %>
+      <% else %>
+        <%= unpublished_changes_warning %>
+      <% end %>
+    </div>
+    <% end %>
+
+    <h2 id="quiz_title">
+      <%= @quiz.quiz_title || @quiz.readable_type %>
+    </h2>
+
+  <% else %>
+
+    <% if needs_unpublished_warning?(@quiz) %>
       <div class="alert">
         <div class='row-fluid'>
           <div class='span8 unpublished_warning'>
@@ -82,10 +231,12 @@
           </div>
           <div class='span4 actions'>
             <% if can_do(@quiz, @current_user, :update) || can_do(@quiz, @current_user, :manage) %>
+
+
               <% link_to context_url(@context, :context_quiz_take_url, @quiz, :preview => 1), :method => :post, :class => 'btn', :id => 'preview_quiz_button' do %><%= t('links.preview', "Preview") %><% end %>
               <% form_tag context_url(@context, :context_quiz_url, @quiz.id), {:method => :put, :style => 'display:inline', :id => 'publish_quiz_form'} do %>
                 <input type="hidden" name="activate" value="true"/>
-                <button type="submit" class="btn btn-primary publish_quiz_button">
+                <button type="submit" class="btn btn-primary quiz-publish-button">
                   <% if !@quiz.available? %>
                     <%= t('buttons.publish', "Publish") %>
                   <% else %>
@@ -100,13 +251,13 @@
     <% end %>
 
     <div class='row-fluid'>
-      <div class='span9'>
+      <div class='span8'>
         <h2 id="quiz_title">
           <%= @quiz.quiz_title || @quiz.readable_type %>
         </h2>
       </div>
-      <div class='span3' style="text-align: right;line-height: 36px">
-          <div class="admin-link-hover-area">
+      <div class='span4' style="text-align: right;line-height: 36px">
+        <div class="admin-link-hover-area">
           <% if can_do(@quiz, @current_user, :update) %>
             <a href="<%= edit_polymorphic_path([@context, @quiz]) %>" class='btn edit_assignment_link quiz-edit-button'>
               <i class='icon-edit'></i> <%= t('links.edit', 'Edit') %>
@@ -115,8 +266,8 @@
 
           <% if can_do(@quiz, @current_user, :update) || can_do(@quiz, @current_user, :grade) || can_do(@quiz, @current_user, :review_grades) %>
             <div class="admin-links" style="margin-left: 5px">
-              <a class="al-trigger btn">
-                <span class="screenreader-only">Manage</span>
+              <a class="al-trigger btn" href="#">
+                <span class="screenreader-only"><%= t(:manage, "Manage") %></span>
                 <i class="icon-settings"></i>
                 <i class="icon-mini-arrow-down"></i>
               </a>
@@ -178,7 +329,8 @@
                   <li>
                     <a href="#" class="quiz_details_link">
                       <% if @any_submissions_pending_review %>
-                        <i class="icon-warning"></i>
+                        <i class="icon-warning" aria-label="<%= t("labels.warning_icon", "Warning") %>"></i>
+
                       <% end %>
                       <i class="icon-group"></i>
                       <span id="quiz_details_text">
@@ -205,15 +357,17 @@
 
               </ul>
             </div>
-          </div>
-        <% end %>
+          <% end %>
+        </div>
       </div>
     </div>
 
+  <% end %>
 
     <% if @submission && params[:preview] %>
       <h3>
-        <i class="icon-warning"></i> <%= t('warnings.draft_version', "This is a preview of the draft version of the quiz") %>
+        <i class="icon-warning" aria-label="<%= t("labels.warning_icon", "Warning") %>"></i>
+        <%= t('warnings.draft_version', "This is a preview of the draft version of the quiz") %>
       </h3>
     <% end %>
 
@@ -252,6 +406,9 @@
         <% end %>
       <% end %>
     <% end %>
+
+    <div id="quiz-submission-version-table"></div>
+
   </header>
 
   <% if @submission && @submission.completed? %>

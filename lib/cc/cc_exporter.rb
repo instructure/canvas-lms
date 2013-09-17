@@ -98,8 +98,8 @@ module CC
       @content_export ? @content_export.id : nil
     end
 
-    def export_object?(obj)
-      @content_export ? @content_export.export_object?(obj) : true
+    def export_object?(obj, asset_type=nil)
+      @content_export ? @content_export.export_object?(obj, asset_type) : true
     end
 
     def export_symbol?(obj)

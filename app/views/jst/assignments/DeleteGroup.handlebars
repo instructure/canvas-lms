@@ -1,0 +1,32 @@
+<div class="form-dialog-content">
+  <div class="form-horizontal">
+    <p>{{#t 'warnings.delete_assignment_group'}}You are about to delete <strong>{{name}}</strong>, which has <strong class="assignment_count">{{assignment_count}}</strong> assignments in it.{{/t}}
+    </p>
+      <p>{{#t 'would_you_like'}}Would you like to:{{/t}}</p>
+    <p>
+      <label class="radio"><input type="radio" class="assignment_group_delete" name="action" value="delete" checked="checked"/> {{#t 'labels.delete_assignments_in_group'}}Delete its assignments{{/t}}</label>
+    </p>
+    <p>
+      <label id="ag_move_{{label_id}}" class="radio"><input type="radio" class="assignment_group_move" name="action" value="move"/> {{#t 'labels.move_assignments_to'}}Move its assignments to {{/t}}</label>
+      <select name="move_assignments_to" class="group_select" title="{{#t 'tooltips.target_group'}}Select a group to move this assignment to{{/t}}" aria-labelledby="ag_move_{{label_id}}">
+        <option value="" class="blank">[ {{#t 'options.select_group'}}Select a Group{{/t}} ]</option>
+        {{#each groups}}
+          <option class="move_to_ag_{{id}}" value="{{id}}">{{name}}</option>
+        {{/each}}
+      </select>
+    </p>
+
+
+  </div>
+</div>
+<div class="form-controls">
+  <button
+    class="cancel_button btn dialog_closer"
+    type="button"
+  >{{#t "cancel"}}Cancel{{/t}}</button>
+  <button
+    class="delete_group btn btn-primary"
+    data-text-while-loading='{{#t "deleting"}}Deleting...{{/t}}'
+    type="button"
+  >{{#t "delete"}}Delete Group{{/t}}</button>
+</div>

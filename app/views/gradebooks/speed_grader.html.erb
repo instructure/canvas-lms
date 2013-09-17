@@ -27,7 +27,7 @@
       <div id="combo_box_container"></div>
       <a href="#" class="next"><%= t('links.next', "Next") %></a>
       <div id='x_of_x_students'>
-        (<%= t(:student_index_of_total, "student %{index} of %{total_students}", :index => raw('<span>???</span>'), :total_students => @assignment.context.students_visible_to(@current_user).count(:id, :distinct => true)) %>)<br />
+        <span id='x_of_x_students_frd'></span><br>
         <a href="<%= gradebook_url_for(@current_user, @context, @assignment) %>" id="speed_grader_gradebook_link">
           <%= t('links.gradebook', "Gradebook") %>
         </a>
@@ -41,7 +41,7 @@
         | <%= help_link %>
       <% end %>
       <div>
-        <span id="x_of_x_graded"><%= t(:portion_graded, "%{x} / %{y} Graded", :x => raw('<span>0</span>'), :y => raw("<span>#{@assignment.context.students.length}</span>")) %></span>
+        <span id="x_of_x_graded"></span>
         <span id='average_score_wrapper' style='display:none; padding-left: 10px;'><%= before_label(:average, "Avg") %> <span id='average_score'>0.0</span></span>
       </div>
     </div>
@@ -62,7 +62,13 @@
       </div>
       <div id='submissions_container'>
         <div id="this_student_does_not_have_a_submission">
-          <h3><%= t('headers.no_submission', "This student does not have a submission for this assignment") %></h3>
+          <h3>
+            <% if @assignment.grade_as_group? %>
+              <%= t('headers.no_group_submission', "This group does not have a submission for this assignment") %>
+            <% else %>
+              <%= t('headers.no_submission', "This student does not have a submission for this assignment") %>
+            <% end %>
+          </h3>
         </div>
         <div id="this_student_has_a_submission">
           <h3>
@@ -173,7 +179,9 @@
         <div id="discussion">
           <div id="comments">
             <div class="comment" id="comment_blank" style="display: none;">
-              <a href="javascript:void 0;" class="delete_comment_link"><span class="ui-icon ui-icon-close"></span></a>
+              <a href="javascript:void 0;" class="delete_comment_link icon-x">
+                <span class="screenreader-only"><%= t('icons.delete_comment', 'Delete comment') %></span>
+              </a>
               <img src="#" class="avatar" alt="" style="display: none;"/>
               <span class="comment"></span>
               <a href="#" class="play_comment_link media-comment" style="display:none;"><%= t('links.click_to_view', "click here to view") %></a>
@@ -191,8 +199,8 @@
 
           <% unless @context.completed? || @context_enrollment.try(:completed?) %>
             <form id="add_a_comment">
-              <label><%= t('labels.add_comment', "Add a Comment") %></label>
-              <textarea></textarea>
+              <label for="speedgrader_comment_textarea"><%= t('labels.add_comment', "Add a Comment") %></label>
+              <textarea id="speedgrader_comment_textarea"></textarea>
               <div>
                 <div id="media_media_recording" style="display: none;">
                   <div class="media_recording"></div>
@@ -218,7 +226,7 @@
                       <span class="tooltip_wrap">
                         <span class="tooltip_text"><%= t('tooltips.file_attachment', "File Attachment") %></span>
                       </span>
-                      <span class="icon"><%= image_tag "file_multiple.png" %></span>
+                      <span class="icon"><%= image_tag "file_multiple.png", :alt => t('icons.file_attachment', 'File Attachment') %></span>
                     </a>
                   </li>
                   <% if feature_enabled?(:kaltura) %>
@@ -227,7 +235,7 @@
                         <span class="tooltip_wrap">
                           <span class="tooltip_text"><%= t('tooltips.media_comment', "Media Comment") %></span>
                         </span>
-                        <span class="icon"><%= image_tag "webcam.png" %></span>
+                        <span class="icon"><%= image_tag "webcam.png", :alt => t('icons.media_comment', 'Media Comment') %></span>
                       </a>
                     </li>
                     <li style="display:none">
@@ -235,7 +243,7 @@
                         <span class="tooltip_wrap">
                           <span class="tooltip_text"><%= t('tooltips.speech_recognition', "Speech Recognition") %></span>
                         </span>
-                        <span class="icon"><%= image_tag "microphone_pencil.png" %></span>
+                        <span class="icon"><%= image_tag "microphone_pencil.png", :alt => t('icons.speech_recognition', 'Speech Recognition') %></span>
                       </a>
                     </li>
                   <% end %>

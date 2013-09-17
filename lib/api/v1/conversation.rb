@@ -21,6 +21,18 @@ module Api::V1::Conversation
   include Api::V1::Submission
   include Api::V1::Attachment
 
+  def conversations_json(conversations, current_user, session, options = {})
+    include_context_name = options.delete(:include_context_name)
+    if include_context_name
+      context_names_by_type_and_id = Context.names_by_context_types_and_ids(conversations.map(&:conversation).map(&:context_components))
+    end
+    conversations.map do |c|
+      result = conversation_json(c, current_user, session, options)
+      result[:context_name] = context_names_by_type_and_id[c.context_components] if include_context_name
+      result
+    end
+  end
+
   def conversation_json(conversation, current_user, session, options = {})
     options = {
       :include_participant_contexts => true
@@ -41,11 +53,13 @@ module Api::V1::Conversation
     result[:avatar_url] = avatar_url_for(conversation, explicit_participants)
     result[:participants] = conversation_users_json(participants, current_user, session, options)
     result[:visible] = options.key?(:visible) ? options[:visible] : @set_visibility && infer_visibility(conversation)
+    result[:context_name] = conversation.context_name if options[:include_context_name]
     result
   end
 
   def conversation_message_json(message, current_user, session)
     result = message.as_json
+    result['participating_user_ids'] = message.conversation_message_participants.pluck(:user_id)
     result['media_comment'] = media_comment_json(result['media_comment']) if result['media_comment']
     result['attachments'] = result['attachments'].map{ |attachment| attachment_json(attachment, current_user) }
     result['forwarded_messages'] = result['forwarded_messages'].map{ |m| conversation_message_json(m, current_user, session) }

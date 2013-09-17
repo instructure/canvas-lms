@@ -389,4 +389,27 @@ describe UserContent, :type => :integration do
       doc.at_css('a')['href'].should == url
     end
   end
+
+  describe ".api_bulk_load_user_content_attachments" do
+    it "returns a hash of assignment_id => assignment" do
+      course_with_teacher(:active_all => true)
+      a1, a2, a3 = attachment_model, attachment_model, attachment_model
+      html1, html2 = <<-HTML1, <<-HTML2
+        <a href="/courses/#{@course.id}/files/#{a1.id}/download">uh...</a>
+        <img src="/courses/#{@course.id}/files/#{a2.id}/download">
+      HTML1
+        <a href="/courses/#{@course.id}/files/#{a3.id}/download">Hi</a>
+      HTML2
+
+      class ApiClass
+        include Api
+      end
+
+      ApiClass.new.api_bulk_load_user_content_attachments(
+        [html1, html2],
+        @course,
+        @teacher
+      ).should == {a1.id => a1, a2.id => a2, a3.id => a3}
+    end
+  end
 end

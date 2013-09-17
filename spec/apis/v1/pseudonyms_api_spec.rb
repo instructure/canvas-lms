@@ -64,9 +64,10 @@ describe PseudonymsController, :type => :integration do
         })
         json.count.should eql 1
         headers = response.headers['Link'].split(',')
-        headers[0].should match /page=2&per_page=1/ # next page
-        headers[1].should match /page=1&per_page=1/ # first page
-        headers[2].should match /page=2&per_page=1/ # last page
+        headers[0].should match /page=1&per_page=1/ # current page
+        headers[1].should match /page=2&per_page=1/ # next page
+        headers[2].should match /page=1&per_page=1/ # first page
+        headers[3].should match /page=2&per_page=1/ # last page
       end
 
       it "should return all pseudonyms for a user" do
@@ -167,6 +168,11 @@ describe PseudonymsController, :type => :integration do
             :unique_id => 'duplicate@example.com'
           }
         })
+        response.code.should eql '400'
+      end
+
+      it "should return 400 when nothing is passed" do
+        raw_api_call(:post, @path, @path_options)
         response.code.should eql '400'
       end
     end

@@ -381,7 +381,7 @@ describe AccountsController do
           @account.default_storage_quota_mb.should == 123
           @account.default_user_storage_quota_mb.should == 45
           @account.default_group_storage_quota_mb.should == 9001
-          @account.default_time_zone.should == 'Alaska'
+          @account.default_time_zone.name.should == 'Alaska'
         end
 
         it "should disallow setting default quota (bytes)" do
@@ -391,7 +391,7 @@ describe AccountsController do
           }
           @account.reload
           @account.default_storage_quota.should == 123.megabytes
-          @account.default_time_zone.should == 'Alaska'
+          @account.default_time_zone.name.should == 'Alaska'
         end
 
         it "should disallow setting storage quota" do
@@ -401,10 +401,53 @@ describe AccountsController do
           }
           @account.reload
           @account.storage_quota.should == 555.megabytes
-          @account.default_time_zone.should == 'Alaska'
+          @account.default_time_zone.name.should == 'Alaska'
         end
       end
     end
-  end
 
+    context "turnitin" do
+      before do
+        account_with_admin_logged_in
+      end
+
+      it "should allow setting turnitin values" do
+        post 'update', :id => @account.id, :account => {
+          :turnitin_account_id => '123456',
+          :turnitin_shared_secret => 'sekret',
+          :turnitin_host => 'secret.turnitin.com',
+          :turnitin_pledge => 'i will do it',
+          :turnitin_comments => 'good work',
+        }
+
+        @account.reload
+        @account.turnitin_account_id.should == '123456'
+        @account.turnitin_shared_secret.should == 'sekret'
+        @account.turnitin_host.should == 'secret.turnitin.com'
+        @account.turnitin_pledge.should == 'i will do it'
+        @account.turnitin_comments.should == 'good work'
+      end
+
+      it "should pull out the host from a valid url" do
+        post 'update', :id => @account.id, :account => {
+          :turnitin_host => 'https://secret.turnitin.com/'
+        }
+        @account.reload.turnitin_host.should == 'secret.turnitin.com'
+      end
+
+      it "should nil out the host if blank is passed" do
+        post 'update', :id => @account.id, :account => {
+          :turnitin_host => ''
+        }
+        @account.reload.turnitin_host.should be_nil
+      end
+
+      it "should error on an invalid host" do
+        post 'update', :id => @account.id, :account => {
+          :turnitin_host => 'blah'
+        }
+        response.should_not be_success
+      end
+    end
+  end
 end

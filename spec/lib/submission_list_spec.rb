@@ -76,8 +76,8 @@ describe SubmissionList do
       available_keys = [:graders, :date]
       SubmissionList.days(@course).each do |day|
         day.should be_is_a(OpenStruct)
-        day.hash_data.keys.size.should eql(available_keys.size)
-        available_keys.each {|k| day.hash_data.should be_include(k)}
+        day.send(:table).keys.size.should eql(available_keys.size)
+        available_keys.each {|k| day.send(:table).should be_include(k)}
         day.graders.should be_is_a(Array)
         day.date.should be_is_a(Date)
       end
@@ -88,8 +88,8 @@ describe SubmissionList do
       SubmissionList.days(@course).each do |day|
         day.graders.each do |grader|
           grader.should be_is_a(OpenStruct)
-          grader.hash_data.keys.size.should eql(available_keys.size)
-          available_keys.each {|k| grader.hash_data.keys.should be_include(k)}
+          grader.send(:table).keys.size.should eql(available_keys.size)
+          available_keys.each {|k| grader.send(:table).keys.should be_include(k)}
           grader.grader_id.should be_is_a(Numeric)
           grader.assignments.should be_is_a(Array)
           grader.name.should be_is_a(String)
@@ -115,8 +115,8 @@ describe SubmissionList do
         day.graders.each do |grader|
           grader.assignments.each do |assignment|
             assignment.should be_is_a(OpenStruct)
-            assignment.hash_data.keys.size.should eql(available_keys.size)
-            available_keys.each {|k| assignment.hash_data.keys.should be_include(k)}
+            assignment.send(:table).keys.size.should eql(available_keys.size)
+            available_keys.each {|k| assignment.send(:table).keys.should be_include(k)}
             assignment.submission_count.should eql(assignment.submissions.size)
             assignment.name.should be_is_a(String)
             assignment.name.should eql(assignment.submissions[0].assignment_name)
@@ -145,8 +145,8 @@ describe SubmissionList do
           grader.assignments.each do |assignment|
             assignment.submissions.each do |submission|
               submission.should be_is_a(OpenStruct)
-              submission.hash_data.keys.size.should eql(available_keys.size)
-              available_keys.each {|k| submission.hash_data.keys.should be_include(k)}
+              submission.send(:table).keys.size.should eql(available_keys.size)
+              available_keys.each {|k| submission.send(:table).keys.should be_include(k)}
             end
           end
         end

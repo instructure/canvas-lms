@@ -120,6 +120,7 @@ class ContextController < ApplicationController
               context = Context.find_by_asset_string(data['context_code'])
               context = nil unless context.respond_to?(:is_a_context?) && context.is_a_context?
               user = User.find_by_id(data['puser_id'].split("_").first) if data['puser_id'].present?
+
               mo.context ||= context
               mo.user ||= user
               mo.save!

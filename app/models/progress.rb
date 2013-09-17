@@ -32,7 +32,7 @@ class Progress < ActiveRecord::Base
       event :fail, :transitions_to => :failed
     end
     state :running do
-      event(:complete, :transitions_to => :completed) { update_completion! 100 }
+      event(:complete, :transitions_to => :completed) { self.completion = 100 }
       event :fail, :transitions_to => :failed
     end
     state :completed
@@ -49,5 +49,36 @@ class Progress < ActiveRecord::Base
 
   def pending?
     queued? || running?
+  end
+
+  # Tie this Progress model to a delayed job. Rather than `obj.send_later(:long_method)`, use:
+  # `progress.process_job(obj, :long_method)`. This will transition from queued
+  # => running when the job starts, from running => completed when the job
+  # finishes, and from running => failed if the job fails.
+  #
+  # This progress object will get passed as the first argument to the method,
+  # so that you can update the completion percentage on it as the job runs.
+  def process_job(target, method, enqueue_args = {}, *method_args)
+    enqueue_args = enqueue_args.reverse_merge(max_attempts: 1, priority: Delayed::LOW_PRIORITY)
+    method_args = method_args.unshift(self)
+    work = Progress::Work.new(self, target, method, method_args)
+    Delayed::Job.enqueue(work, enqueue_args)
+  end
+
+  # (private)
+  class Work < Delayed::PerformableMethod
+    def initialize(progress, *args)
+      @progress = progress
+      super(*args)
+    end
+
+    def perform
+      @progress.start
+      super.tap { @progress.complete }
+    end
+
+    def on_permanent_failure(error)
+      @progress.fail
+    end
   end
 end

@@ -205,6 +205,14 @@ This text has a http://www.google.com link in it...
         tc1.messages.last.author.should eql @teacher1
       end
 
+      it "should set the root_account_ids" do
+        @submission1.add_comment(:author => @student1, :comment => "hello")
+        @teacher.conversations.where(:root_account_ids => nil).any?.should be_false
+        @submission1.add_comment(:author => @teacher1, :comment => "sup")
+        @teacher.conversations.where(:root_account_ids => nil).any?.should be_false
+        @student.conversations.where(:root_account_ids => nil).any?.should be_false
+      end
+
       it "should not be visible to the student until an instructor comments" do
         @submission1.add_comment(:author => @student1, :comment => "hello")
         @student1.conversations.size.should eql 0

@@ -37,13 +37,20 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
                                              'file_map' => {'oi' => {'title' => 'a1', 'migration_id' => 'a1'}},
                                              'assignments' => [{'title' => 'a1', 'migration_id' => 'a1'},{'title' => 'a2', 'migration_id' => 'a2', 'assignment_group_migration_id' => 'a1'}],
                                              'assignment_groups' => [{'title' => 'a1', 'migration_id' => 'a1'}],
-                                             'calendar_events' => []
+                                             'calendar_events' => [],
+                                             "course" => {
+                                                     "migration_id" => "i953adbb6769c915260623f0928fcd527",
+                                                     "title" => "1 graded quiz/discussion",
+                                                     "syllabus_body"=>"oh, hi there."
+                                             }
                                      }.to_json)
       @formatter = Canvas::Migration::Helpers::SelectiveContentFormatter.new(@migration, "https://example.com")
     end
 
     it "should list top-level items" do
-      @formatter.get_content_list.should == [{:type=>"context_modules", :property=>"copy[all_context_modules]", :title=>"Modules", :count=>1, :sub_items_url=>"https://example.com?type=context_modules"},
+      @formatter.get_content_list.should == [{:type=>"course_settings", :property=>"copy[all_course_settings]", :title=>"Course Settings"},
+                                             {:type=>"syllabus_body", :property=>"copy[all_syllabus_body]", :title=>"Syllabus Body"},
+                                             {:type=>"context_modules", :property=>"copy[all_context_modules]", :title=>"Modules", :count=>1, :sub_items_url=>"https://example.com?type=context_modules"},
                                              {:type=>"assignments", :property=>"copy[all_assignments]", :title=>"Assignments", :count=>2, :sub_items_url=>"https://example.com?type=assignments"},
                                              {:type=>"quizzes", :property=>"copy[all_quizzes]", :title=>"Quizzes", :count=>1, :sub_items_url=>"https://example.com?type=quizzes"},
                                              {:type=>"wiki_pages", :property=>"copy[all_wiki_pages]", :title=>"Wiki Pages", :count=>1, :sub_items_url=>"https://example.com?type=wiki_pages"},
@@ -63,10 +70,10 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
 
     it "should group assignments into assignment groups" do
       @formatter.get_content_list('assignments').should == [
-              {:type => "assignment_groups", :property => "copy[assignment_groups][a1]", :title => "a1", :migration_id => "a1",
-                 "sub_items" => [{:type => "assignments", :property => "copy[assignments][a2]", :title => "a2", :migration_id => "a2"}]
+              {:type => "assignment_groups", :property => "copy[assignment_groups][id_a1]", :title => "a1", :migration_id => "a1",
+                 "sub_items" => [{:type => "assignments", :property => "copy[assignments][id_a2]", :title => "a2", :migration_id => "a2"}]
               },
-              {:type => "assignments", :property => "copy[assignments][a1]", :title => "a1", :migration_id => "a1"}
+              {:type => "assignments", :property => "copy[assignments][id_a1]", :title => "a1", :migration_id => "a1"}
       ]
     end
 
@@ -80,46 +87,58 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
                                                 'a5' => {'path_name' => 'a5.html', 'file_name' => 'a5.html', 'migration_id' => 'a5'},
                                       }}.to_json)
       @formatter.get_content_list('attachments').should == [{:type => "folders",
-                                                             :property => "copy[folders][0cc175b9c0f1b6a831c399e269772661]",
+                                                             :property => "copy[folders][id_0cc175b9c0f1b6a831c399e269772661]",
                                                              :title => "a",
                                                              :migration_id => "0cc175b9c0f1b6a831c399e269772661",
                                                              :sub_items =>
                                                                      [{:type => "attachments",
-                                                                       :property => "copy[attachments][a1]",
+                                                                       :property => "copy[attachments][id_a1]",
                                                                        :title => "a1.html",
                                                                        :migration_id => "a1",
                                                                        :path => "a"},
                                                                       {:type => "attachments",
-                                                                       :property => "copy[attachments][a2]",
+                                                                       :property => "copy[attachments][id_a2]",
                                                                        :title => "a2.html",
                                                                        :migration_id => "a2",
                                                                        :path => "a"}]},
                                                             {:type => "folders",
-                                                             :property => "copy[folders][a7e86136543b019d72468ceebf71fb8e]",
+                                                             :property => "copy[folders][id_a7e86136543b019d72468ceebf71fb8e]",
                                                              :title => "a/b",
                                                              :migration_id => "a7e86136543b019d72468ceebf71fb8e",
                                                              :sub_items =>
                                                                      [{:type => "attachments",
-                                                                       :property => "copy[attachments][a3]",
+                                                                       :property => "copy[attachments][id_a3]",
                                                                        :title => "a3.html",
                                                                        :migration_id => "a3",
                                                                        :path => "a/b"}]},
                                                             {:type => "folders",
-                                                             :property => "copy[folders][cff49f359f080f71548fcee824af6ad3]",
+                                                             :property => "copy[folders][id_cff49f359f080f71548fcee824af6ad3]",
                                                              :title => "a/b/c",
                                                              :migration_id => "cff49f359f080f71548fcee824af6ad3",
                                                              :sub_items =>
                                                                      [{:type => "attachments",
-                                                                       :property => "copy[attachments][a4]",
+                                                                       :property => "copy[attachments][id_a4]",
                                                                        :title => "a4.html",
                                                                        :migration_id => "a4",
                                                                        :path => "a/b/c"}]},
                                                             {:type => "attachments",
-                                                             :property => "copy[attachments][a5]",
+                                                             :property => "copy[attachments][id_a5]",
                                                              :title => "a5.html",
                                                              :migration_id => "a5",
                                                              :path => "a5.html"}]
 
+    end
+
+    it "should show announcements separate from discussion topics" do
+      @migration.stubs(:read).returns({
+                                          'discussion_topics' => [
+                                              {'title' => 'a1', 'migration_id' => 'a1'},
+                                              {'title' => 'a2', 'migration_id' => 'a1', 'type' => 'announcement'},
+                                          ]}.to_json)
+      @formatter.get_content_list('discussion_topics').count.should == 1
+      @formatter.get_content_list('discussion_topics').first[:title].should == 'a1'
+      @formatter.get_content_list('announcements').count.should == 1
+      @formatter.get_content_list('announcements').first[:title].should == 'a2'
     end
 
   end
@@ -127,10 +146,13 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
   context "course copy" do
     before do
       course_model
-      @dt1 = @course.discussion_topics.create!(:message => "hi", :title => "discussion title")
+      @topic = @course.discussion_topics.create!(:message => "hi", :title => "discussion title")
       @cm = @course.context_modules.create!(:name => "some module")
       attachment_model(:context => @course, :filename => 'a5.html')
       @wiki = @course.wiki.wiki_pages.create!(:title => "wiki", :body => "ohai")
+      @category = @course.group_categories.create(:name => "other category")
+      @group = Group.create!(:name=>"group1", :group_category => @category, :context => @course)
+      @announcement = announcement_model
       @migration = mock()
       @migration.stubs(:migration_type).returns('course_copy_importer')
       @migration.stubs(:source_course).returns(@course)
@@ -138,19 +160,53 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
     end
 
     it "should list top-level items" do
+      #groups should not show up even though there are some
       @formatter.get_content_list.should == [{:type=>"course_settings", :property=>"copy[all_course_settings]", :title=>"Course Settings"},
                                              {:type=>"syllabus_body", :property=>"copy[all_syllabus_body]", :title=>"Syllabus Body"},
                                              {:type=>"context_modules", :property=>"copy[all_context_modules]", :title=>"Modules", :count=>1},
                                              {:type=>"discussion_topics", :property=>"copy[all_discussion_topics]", :title=>"Discussion Topics", :count=>1},
                                              {:type=>"wiki_pages", :property=>"copy[all_wiki_pages]", :title=>"Wiki Pages", :count=>1},
+                                             {:type=>"announcements", :property=>"copy[all_announcements]", :title=>"Announcements", :count=>1},
                                              {:type=>"attachments", :property=>"copy[all_attachments]", :title=>"Files", :count=>1}]
     end
 
-    it "should individual types" do
+    it "should list individual types" do
       @formatter.get_content_list('wiki_pages').length.should == 1
       @formatter.get_content_list('context_modules').length.should == 1
       @formatter.get_content_list('attachments').length.should == 1
       @formatter.get_content_list('discussion_topics').length.should == 1
+      @formatter.get_content_list('announcements').length.should == 1
+    end
+
+    context "deleted objects" do
+      append_before do
+        @cm.destroy
+        @attachment.destroy
+        @wiki.destroy
+        @announcement.destroy
+        @topic.destroy
+        assignment_model.destroy
+        quiz_model.destroy
+        calendar_event_model.destroy
+        rubric_model.destroy
+      end
+
+      it "should ignore in top-level list" do
+        @formatter.get_content_list.should == [{:type=>"course_settings", :property=>"copy[all_course_settings]", :title=>"Course Settings"},
+                                             {:type=>"syllabus_body", :property=>"copy[all_syllabus_body]", :title=>"Syllabus Body"}]
+      end
+
+      it "should ignore in specific item request" do
+        @formatter.get_content_list('wiki_pages').length.should == 0
+        @formatter.get_content_list('context_modules').length.should == 0
+        @formatter.get_content_list('attachments').length.should == 0
+        @formatter.get_content_list('discussion_topics').length.should == 0
+        @formatter.get_content_list('announcements').length.should == 0
+        @formatter.get_content_list('assignments').length.should == 0
+        @formatter.get_content_list('quizzes').length.should == 0
+        @formatter.get_content_list('calendar_events').length.should == 0
+        @formatter.get_content_list('rubrics').length.should == 0
+      end
     end
 
     it "should group files by folders" do

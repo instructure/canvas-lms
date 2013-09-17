@@ -1,9 +1,10 @@
 define [
   'jquery'
   'compiled/views/ValidatedFormView'
+  'compiled/fn/preventDefault'
   'jst/DialogFormWrapper'
   'jqueryui/dialog'
-], ($, ValidatedFormView, wrapper) ->
+], ($, ValidatedFormView, preventDefault, wrapper) ->
 
   ##
   # Creates a form dialog.
@@ -57,18 +58,21 @@ define [
     initialize: ->
       super
       @setTrigger()
+      @open = @firstOpen
+      @renderEl = @firstRenderEl
 
     ##
+    # the function to open the dialog.  will be set to either @firstOpen or
+    # @openAgain depending on the state of the view
+    #
     # @api public
-    open: ->
-      @firstOpen()
-      @openAgain()
-      @open = @openAgain
+    open: null
 
     ##
     # @api public
     close: ->
       @dialog.close()
+      @focusReturnsTo()?.focus()
 
     ##
     # @api public
@@ -83,6 +87,9 @@ define [
     remove: ->
       super
       @$trigger?.off '.dialogFormView'
+      @$dialog?.remove()
+      @open = @firstOpen
+      @renderEl = @firstRenderEl
 
     ##
     # lazy init on first open
@@ -91,6 +98,8 @@ define [
       @insert()
       @render()
       @setupDialog()
+      @openAgain()
+      @open = @openAgain
 
     ##
     # @api private
@@ -119,19 +128,24 @@ define [
     ##
     # @api private
     attachTrigger: ->
-      @$trigger.on 'click.dialogFormView', @toggle
+      @$trigger?.on 'click.dialogFormView', preventDefault(@toggle)
 
     ##
+    # the function to render the element.  it will either be firstRenderEl or
+    # renderElAgain depending on the state of the view
+    #
     # @api private
-    renderEl: =>
+    renderEl: null
+
+    firstRenderEl: =>
       @$el.html @wrapperTemplate @toJSON()
-      @renderOutlet()
+      @renderElAgain()
       # reassign: only render the outlout now
-      @renderEl = @renderOutlet
+      @renderEl = @renderElAgain
 
     ##
     # @api private
-    renderOutlet: =>
+    renderElAgain: =>
       html = @template @toJSON()
       @$el.find('.outlet').html html
 
@@ -139,11 +153,11 @@ define [
     # @api private
     getDialogTitle: ->
       @options.title or
-      @$trigger.attr('title') or
+      @$trigger?.attr('title') or
       @getAriaTitle()
 
     getAriaTitle: ->
-      ariaID = @$trigger.attr 'aria-describedby'
+      ariaID = @$trigger?.attr 'aria-describedby'
       $("##{ariaID}").text()
 
     ##
@@ -160,9 +174,25 @@ define [
       @$el.fixDialogButtons() if @options.fixDialogButtons
       @dialog = @$el.data 'dialog'
 
+    setDimensions: (width, height) ->
+      width = if width? then width else @options.width
+      height = if height? then height else @options.height
+      opts =
+        width: width
+        height: height
+      @$el.dialog(opts)
+
     ##
     # @api private
     onSaveSuccess: =>
       super
       @close()
 
+    ##
+    # @api private
+    focusReturnsTo: ->
+      return null unless @$trigger
+      if id = @$trigger.data('focusReturnsTo')
+        return $("##{id}")
+      else
+        return @$trigger

@@ -42,6 +42,7 @@ module Canvas::Migration::Helpers
       course_data = Rails.cache.fetch(['migration_selective_cache', @migration.shard, @migration].cache_key, :expires_in => 5.minutes) do
         att = @migration.overview_attachment.open
         data = JSON.parse(att.read)
+        data = separate_announcements(data)
         data['attachments'] ||= data['file_map'] ? data['file_map'].values : nil
         data['quizzes'] ||= data['assessments']
         data['context_modules'] ||= data['modules']
@@ -67,6 +68,13 @@ module Canvas::Migration::Helpers
           end
         end
       else
+        if course_data['course']
+          content_list << {type: 'course_settings', property: "copy[all_course_settings]", title: SELECTIVE_CONTENT_TYPES[0].last.call}
+          if course_data['course']['syllabus_body']
+            content_list << {type: 'syllabus_body', property: "copy[all_syllabus_body]", title: SELECTIVE_CONTENT_TYPES[1].last.call}
+
+          end
+        end
         SELECTIVE_CONTENT_TYPES.each do |type, title|
           if course_data[type] && course_data[type].count > 0
             hash = {type: type, property: "copy[all_#{type}]", title: title.call, count: course_data[type].count}
@@ -113,7 +121,7 @@ module Canvas::Migration::Helpers
           content_list << item_hash('attachments', atts[0])
         else
           mig_id = Digest::MD5.hexdigest(folder_name)
-          folder = {type: 'folders', property: "copy[folders][#{mig_id}]", title: folder_name, migration_id: mig_id, sub_items: []}
+          folder = {type: 'folders', property: "copy[folders][id_#{mig_id}]", title: folder_name, migration_id: mig_id, sub_items: []}
           content_list << folder
           atts.each {|att| folder[:sub_items] << item_hash('attachments', att)}
         end
@@ -123,7 +131,7 @@ module Canvas::Migration::Helpers
     def item_hash(type, item)
       hash = {
               type: type,
-              property: "copy[#{type}][#{item['migration_id']}]",
+              property: "copy[#{type}][id_#{item['migration_id']}]",
               title: item['title'],
               migration_id: item['migration_id']
       }
@@ -132,9 +140,24 @@ module Canvas::Migration::Helpers
         hash[:title] = item['file_name']
       end
 
+      hash = add_linked_resource(type, item, hash)
       hash
     end
 
+    def add_linked_resource(type, item, hash)
+      if type == 'assignments'
+        if mig_id = item['quiz_migration_id']
+          hash[:linked_resource] = {:type => 'quizzes', :migration_id => mig_id}
+        elsif mig_id = item['topic_migration_id']
+          hash[:linked_resource] = {:type => 'discussion_topics', :migration_id => mig_id}
+        end
+      elsif type == 'discussion_topics' && mig_id = item['assignment_migration_id']
+        hash[:linked_resource] = {:type => 'assignments', :migration_id => mig_id}
+      elsif type == 'quizzes' && mig_id = item['assignment_migration_id']
+        hash[:linked_resource] = {:type => 'assignments', :migration_id => mig_id}
+      end
+      hash
+    end
 
     # returns lists of available content from a source course
     def get_content_from_course(type=nil)
@@ -147,23 +170,32 @@ module Canvas::Migration::Helpers
             when 'attachments'
               course_attachments_data(content_list, source)
             when 'wiki_pages'
-              source.wiki.wiki_pages.select("id, title").each do |item|
+              source.wiki.wiki_pages.not_deleted.select("id, title").each do |item|
                 content_list << course_item_hash(type, item)
               end
             when 'discussion_topics'
-              source.discussion_topics.select("id, title, user_id").except(:user).each do |item|
+              source.discussion_topics.active.only_discussion_topics.select("id, title, user_id, assignment_id").except(:includes).each do |item|
                 content_list << course_item_hash(type, item)
               end
             else
               if source.respond_to?(type)
-                scope = source.send(type).select(:id)
+                scope = source.send(type).select(:id).except(:includes)
                 # We only need the id and name, so don't fetch everything from DB
+
+                scope = scope.select(:assignment_id) if type == 'quizzes'
+
                 if type == 'learning_outcomes'
                   scope = scope.select(:short_description)
-                elsif type == 'context_modules' || type == 'context_external_tools'
+                elsif type == 'context_modules' || type == 'context_external_tools' || type == 'groups'
                   scope = scope.select(:name)
                 else
                   scope = scope.select(:title)
+                end
+
+                if scope.respond_to?(:not_deleted)
+                  scope = scope.not_deleted
+                elsif scope.respond_to?(:active)
+                  scope = scope.active
                 end
 
                 scope.each do |item|
@@ -173,21 +205,30 @@ module Canvas::Migration::Helpers
           end
         else
           SELECTIVE_CONTENT_TYPES.each do |type, title|
+            next if type == 'groups'
+
+            count = 0
             if type == 'course_settings' || type == 'syllabus_body'
               content_list << {type: type, property: "copy[all_#{type}]", title: title.call}
+              next
             elsif type == 'wiki_pages'
-              count = source.wiki.wiki_pages.count
-              next if count == 0
-              hash = {type: type, property: "copy[all_#{type}]", title: title.call, count: count}
-              add_url!(hash, type)
-              content_list << hash
+              count = source.wiki.wiki_pages.not_deleted.count
+            elsif type == 'discussion_topics'
+              count = source.discussion_topics.active.only_discussion_topics.count
             elsif source.respond_to?(type) && source.send(type).respond_to?(:count)
-              count = source.send(type).count
-              next if count == 0
-              hash = {type: type, property: "copy[all_#{type}]", title: title.call, count: count}
-              add_url!(hash, type)
-              content_list << hash
+              scope = source.send(type)
+              if scope.respond_to?(:not_deleted)
+                scope = scope.not_deleted
+              elsif scope.respond_to?(:active)
+                scope = scope.active
+              end
+              count = scope.count
             end
+
+            next if count == 0
+            hash = {type: type, property: "copy[all_#{type}]", title: title.call, count: count}
+            add_url!(hash, type)
+            content_list << hash
           end
         end
       end
@@ -211,14 +252,47 @@ module Canvas::Migration::Helpers
       title ||= item.short_description if item.respond_to?(:short_description)
       title ||= ''
 
-      {type: type, property: "copy[#{type}][#{mig_id}]", title: title, migration_id: mig_id}
+      hash = {type: type, property: "copy[#{type}][id_#{mig_id}]", title: title, migration_id: mig_id}
+      hash = course_linked_resource(item, hash)
+
+      hash
+    end
+
+    def course_linked_resource(item, hash)
+      if item.is_a?(Assignment)
+        if item.quiz
+          mig_id = CC::CCHelper.create_key(item.quiz)
+          hash[:linked_resource] = {:type => 'quizzes', :migration_id => mig_id,
+              :message => I18n.t('linked_quiz_message', "linked with Quiz '%{title}'", :title => item.quiz.title)
+          }
+        elsif item.discussion_topic
+          mig_id = CC::CCHelper.create_key(item.discussion_topic)
+          hash[:linked_resource] = {:type => 'discussion_topics', :migration_id => mig_id,
+            :message => I18n.t('linked_discussion_topic_message', "linked with Discussion Topic '%{title}'",
+                               :title => item.discussion_topic.title)
+          }
+        end
+      elsif item.is_a?(DiscussionTopic) && item.assignment
+        mig_id = CC::CCHelper.create_key(item.assignment)
+        hash[:linked_resource] = {:type => 'assignments', :migration_id => mig_id,
+          :message => I18n.t('linked_assignment_message', "linked with Assignment '%{title}'",
+                              :title => item.assignment.title)
+        }
+      elsif item.is_a?(Quiz) && item.assignment
+        mig_id = CC::CCHelper.create_key(item.assignment)
+        hash[:linked_resource] = {:type => 'assignments', :migration_id => mig_id,
+          :message => I18n.t('linked_assignment_message', "linked with Assignment '%{title}'",
+                              :title => item.assignment.title)
+        }
+      end
+      hash
     end
 
     def course_assignment_data(content_list, source_course)
-      source_course.assignment_groups.includes(:assignments).select("id, name").each do |group|
+      source_course.assignment_groups.active.includes(:assignments).select("id, name").each do |group|
         item = course_item_hash('assignment_groups', group)
         content_list << item
-        group.assignments.select(:id).select(:title).each do |asmnt|
+        group.assignments.active.select(:id).select(:title).each do |asmnt|
           item[:sub_items] ||= []
           item[:sub_items] << course_item_hash('assignments', asmnt)
         end
@@ -238,6 +312,17 @@ module Canvas::Migration::Helpers
       end
     end
 
+    def separate_announcements(course_data)
+      return course_data unless course_data['discussion_topics']
 
+      announcements, topics = course_data['discussion_topics'].partition{|topic_hash| topic_hash['type'] == 'announcement'}
+
+      if announcements.any?
+        course_data['announcements'] ||= []
+        course_data['announcements'] += announcements
+        course_data['discussion_topics'] = topics
+      end
+      course_data
+    end
   end
 end

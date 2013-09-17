@@ -85,7 +85,7 @@ describe "announcements" do
     end
 
     it "should allow a group member to create an announcement" do
-      gc = @course.group_categories.create!
+      gc = group_category
       group = gc.groups.create!(:context => @course)
       group.add_user(@student, 'accepted')
 
@@ -148,7 +148,7 @@ describe "announcements" do
         f('#lock').click
         wait_for_ajax_requests
         #TODO: check the UI to make sure the topics have a locked symbol
-        what_to_create.where(:workflow_state => 'locked').count.should == 5
+        what_to_create.where(:locked => true).count.should == 5
       end
 
       it "should search by title" do
@@ -282,6 +282,18 @@ describe "announcements" do
       f('.ui-datepicker-time .ui-datepicker-ok').click
       expect_new_page_load { submit_form('.form-actions') }
       f('.discussion-fyi').should include_text('This topic will not be visible')
+    end
+
+    it "should remove delayed_post_at when unchecking delay_posting" do
+      topic = announcement_model(:title => @topic_title, :user => @user, :delayed_post_at => 10.days.ago)
+      get "/courses/#{@course.id}/announcements/#{topic.id}"
+      expect_new_page_load { f(".edit-btn").click }
+
+      f('input[type=checkbox][name="delay_posting"]').click
+      expect_new_page_load { f('.form-actions button[type=submit]').click }
+
+      topic.reload
+      topic.delayed_post_at.should be_nil
     end
 
     it "should have a teacher add a new entry to its own announcement" do

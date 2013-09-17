@@ -9,27 +9,25 @@ module Stats
   def self.job_complete(job, worker)
     return unless enabled?
     redis = Canvas.redis
-    redis.pipelined do
-      # simple list of job ids... you can get this from redis directly with
-      #   redis.keys("job:id:*")
-      # but that requires walking the entire keyspace
-      # (this is an index sorted by completion time)
-      redis.lpush("job_stats:id", job.id)
-      # set of tags ever seen
-      # sorted set, but all weights are 0 so that we get a sorted-by-name set
-      redis.zadd('job_stats:tag', 0, job.tag)
-      # second sorted set, with weights as number of jobs of that type completed
-      redis.zincrby("job_stats:tag:counts", 1, job.tag)
-      # job details, stored in a redis hash
-      data = job.attributes
-      data['finished_at'] = job.class.db_time_now
-      data['worker'] = worker.name
-      data['full_command'] = job.full_name
-      data['run_time'] = data['finished_at'] - data['locked_at']
-      redis.hmset("job_stats:id:#{job.id}", *data.to_a.flatten)
-      ttl = Setting.get_cached('delayed_jobs_stats_ttl', 1.month.to_s).to_i.from_now
-      redis.expireat("job_stats:id:#{job.id}", ttl.to_i)
-    end
+    # simple list of job ids... you can get this from redis directly with
+    #   redis.keys("job:id:*")
+    # but that requires walking the entire keyspace
+    # (this is an index sorted by completion time)
+    redis.lpush("job_stats:id", job.id)
+    # set of tags ever seen
+    # sorted set, but all weights are 0 so that we get a sorted-by-name set
+    redis.zadd('job_stats:tag', 0, job.tag)
+    # second sorted set, with weights as number of jobs of that type completed
+    redis.zincrby("job_stats:tag:counts", 1, job.tag)
+    # job details, stored in a redis hash
+    data = job.attributes
+    data['finished_at'] = job.class.db_time_now
+    data['worker'] = worker.name
+    data['full_command'] = job.full_name
+    data['run_time'] = data['finished_at'] - data['locked_at']
+    redis.hmset("job_stats:id:#{job.id}", *data.to_a.flatten)
+    ttl = Setting.get_cached('delayed_jobs_stats_ttl', 1.month.to_s).to_i.from_now
+    redis.expireat("job_stats:id:#{job.id}", ttl.to_i)
   rescue
     Rails.logger.warn "Failed saving job stats: #{$!.inspect}"
   end

@@ -121,6 +121,7 @@ class QuizGroup < ActiveRecord::Base
             QuizQuestion.import_from_migration(aq_hash, context, quiz, item)
           else
             aq_hash = AssessmentQuestion.import_from_migration(qq, context)
+            qq['assessment_question_id'] = aq_hash['assessment_question_id']
             QuizQuestion.import_from_migration(aq_hash, context, quiz, item)
           end
         end

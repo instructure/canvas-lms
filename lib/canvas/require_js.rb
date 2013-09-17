@@ -53,6 +53,7 @@ module Canvas
 
       def paths(cache_busting = false)
         @paths ||= {
+          :Ember => 'vendor/ember/ember',
           :common => 'compiled/bundles/common',
           :jqueryui => 'vendor/jqueryui',
           :use => 'vendor/use',
@@ -114,6 +115,15 @@ module Canvas
             'vendor/FileAPI/FileAPI.min': {
               deps: ['jquery', 'vendor/FileAPI/config'],
               attach: 'FileAPI'
+            },
+
+            'vendor/bootstrap/bootstrap-dropdown' : {
+              deps: ['jquery'],
+              attach: '$'
+            },
+            'vendor/bootstrap-select/bootstrap-select' : {
+              deps: ['jquery'],
+              attach: '$'
             }
           }
         JS

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 Instructure, Inc.
+# Copyright (C) 2012 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -18,6 +18,7 @@
 
 module Api::V1::AccountReport
   include Api::V1::Json
+  include Api::V1::Attachment
 
   def account_reports_json(reports, user, session)
     reports.map do |f|
@@ -31,8 +32,10 @@ module Api::V1::AccountReport
     )
     json[:status] = report.workflow_state
     json[:report] = report.report_type
-    json[:file_url] = (report.attachment.nil? ? nil : "https://#{HostUrl.context_host(report.account)}/accounts/#{report.account.id}/files/#{report.attachment.id}/download")
-
+    json[:file_url] = (report.attachment.nil? ? nil : "https://#{HostUrl.context_host(report.account.root_account)}/accounts/#{report.account_id}/files/#{report.attachment.id}/download")
+    if report.attachment
+      json[:attachment] = attachment_json(report.attachment, user, :host => HostUrl.context_host(report.account.root_account))
+    end
     json
   end
 end

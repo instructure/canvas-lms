@@ -32,5 +32,24 @@ describe "/quizzes/index" do
     render "quizzes/index"
     response.should_not be_nil
   end
+
+  it "with draft state enabled should render" do
+    a = Account.default
+    a.settings[:enable_draft] = true
+    a.save!
+
+    course_with_student
+    view_context
+    assigns[:body_classes] = []
+
+    assigns[:quizzes] = [@course.quizzes.create!]
+    assigns[:assignment_json] = assigns[:quizzes]
+    assigns[:open_json]       = assigns[:quizzes]
+    assigns[:surveys_json]    = assigns[:quizzes]
+    assigns[:submissions_hash] = {}
+
+    render "quizzes/index"
+    response.should_not be_nil
+  end
 end
 

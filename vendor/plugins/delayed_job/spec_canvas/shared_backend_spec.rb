@@ -341,6 +341,34 @@ shared_examples_for 'a backend' do
         job = Delayed::Job.enqueue(SimpleJob.new, :n_strand => 'njobs')
         job.strand.should == "njobs:2"
       end
+
+      context "with two parameters" do
+        it "should use the first param as the setting to read" do
+          job = Delayed::Job.enqueue(SimpleJob.new, n_strand: ["njobs", "123"])
+          job.strand.should == "njobs/123"
+          Setting.set("njobs_num_strands", "3")
+          Delayed::Job.expects(:rand).with(3).returns(1)
+          job = Delayed::Job.enqueue(SimpleJob.new, n_strand: ["njobs", "123"])
+          job.strand.should == "njobs/123:2"
+        end
+
+        it "should allow overridding the setting based on the second param" do
+          Setting.set("njobs/123_num_strands", "5")
+          Delayed::Job.expects(:rand).with(5).returns(3)
+          job = Delayed::Job.enqueue(SimpleJob.new, n_strand: ["njobs", "123"])
+          job.strand.should == "njobs/123:4"
+          job = Delayed::Job.enqueue(SimpleJob.new, n_strand: ["njobs", "456"])
+          job.strand.should == "njobs/456"
+
+          Setting.set("njobs_num_strands", "3")
+          Delayed::Job.expects(:rand).with(5).returns(2)
+          Delayed::Job.expects(:rand).with(3).returns(1)
+          job = Delayed::Job.enqueue(SimpleJob.new, n_strand: ["njobs", "123"])
+          job.strand.should == "njobs/123:3"
+          job = Delayed::Job.enqueue(SimpleJob.new, n_strand: ["njobs", "456"])
+          job.strand.should == "njobs/456:2"
+        end
+      end
     end
   end
 
@@ -414,6 +442,15 @@ shared_examples_for 'a backend' do
 
     it "should reject duplicate named jobs" do
       proc { Delayed::Periodic.cron('my SimpleJob', '*/15 * * * * *') {} }.should raise_error(ArgumentError)
+    end
+
+    it "should handle jobs that are no longer scheduled" do
+      Delayed::Periodic.perform_audit!
+      Delayed::Periodic.scheduled = {}
+      job = Delayed::Job.get_and_lock_next_available('test')
+      run_job(job)
+      # shouldn't error, and the job should now be deleted
+      Delayed::Job.jobs_count(:current).should == 0
     end
 
     it "should allow overriding schedules using periodic_jobs.yml" do

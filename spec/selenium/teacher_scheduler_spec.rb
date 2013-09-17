@@ -133,21 +133,21 @@ describe "scheduler" do
       }
       # assert options are checked
       open_edit_dialog
-      f('[name="per_slot_option"]').selected?.should be_true
-      f('[name="participant_visibility"]').selected?.should be_true
-      f('[name="max_appointments_per_participant_option"]').selected?.should be_true
+      f('[type=checkbox][name="per_slot_option"]').selected?.should be_true
+      f('[type=checkbox][name="participant_visibility"]').selected?.should be_true
+      f('[type=checkbox][name="max_appointments_per_participant_option"]').selected?.should be_true
 
       # uncheck the options
-      f('[name="per_slot_option"]').click
-      f('[name="participant_visibility"]').click
-      f('[name="max_appointments_per_participant_option"]').click
+      f('[type=checkbox][name="per_slot_option"]').click
+      f('[type=checkbox][name="participant_visibility"]').click
+      f('[type=checkbox][name="max_appointments_per_participant_option"]').click
       submit_dialog('.ui-dialog-buttonset', '.ui-button')
       wait_for_ajaximations
       # assert options are not checked
       open_edit_dialog
-      f('[name="per_slot_option"]').selected?.should be_false
-      f('[name="participant_visibility"]').selected?.should be_false
-      f('[name="max_appointments_per_participant_option"]').selected?.should be_false
+      f('[type=checkbox][name="per_slot_option"]').selected?.should be_false
+      f('[type=checkbox][name="participant_visibility"]').selected?.should be_false
+      f('[type=checkbox][name="max_appointments_per_participant_option"]').selected?.should be_false
     end
 
     it "should delete an appointment group after clicking appointment group link" do
@@ -162,7 +162,7 @@ describe "scheduler" do
     end
 
     it "should send messages to appropriate participants" do
-      gc = @course.group_categories.create!
+      gc = group_category
       ug1 = @course.groups.create!(:group_category => gc)
       ug1.users << student1 = student_in_course(:course => @course, :active_all => true).user
       ug1.users << student2 = student_in_course(:course => @course, :active_all => true).user
@@ -282,7 +282,7 @@ describe "scheduler" do
       fj('.fc-event:visible').click
 
       keep_trying_until { ff('#attendees li').size.should == 1 }
-      f('.single_item_done_button').click
+      f('.scheduler_done_button').click
     end
 
     it "should allow removing individual appointment groups" do
@@ -323,7 +323,7 @@ describe "scheduler" do
       wait_for_ajaximations
       fj('.fc-event:visible').click
       ff('#attendees li').size.should == 1
-      f('.single_item_done_button').click
+      f('.scheduler_done_button').click
     end
 
     it "should allow me to create a course with multiple contexts" do
@@ -375,7 +375,7 @@ describe "scheduler" do
       ag.participants_per_appointment.should == 2
 
       open_edit_event_dialog
-      f('[name=max_participants_option]').click
+      f('[type=checkbox][name=max_participants_option]').click
       fj('.ui-button:contains(Update)').click
       wait_for_ajaximations
 

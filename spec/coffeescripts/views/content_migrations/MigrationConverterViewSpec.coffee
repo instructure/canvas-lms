@@ -16,8 +16,16 @@ define [
 
     teardown: -> @migrationConverterView.remove()
 
-  test "renders a backbone view into it's main view container", -> 
+  asyncTest "renders a backbone view into it's main view container", 1, -> 
     subView = new SomeBackboneView
     @migrationConverterView.renderConverter subView
 
-    ok @migrationConverterView.$el.find('#converter #rendered').length > 0, "Rendered a sub view"
+    @migrationConverterView.on 'converterRendered', =>
+      ok @migrationConverterView.$el.find('#converter #rendered').length > 0, "Rendered a sub view"
+      start()
+
+  test "trigger reset event when no subView is passed in to render", 1, -> 
+    @migrationConverterView.on 'converterReset', -> 
+      ok true, "converterReset was called"
+
+    @migrationConverterView.renderConverter()

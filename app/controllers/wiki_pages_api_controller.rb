@@ -19,7 +19,7 @@
 # @API Pages
 #
 # Pages are rich content associated with Courses and Groups in Canvas.
-# The Pages API allows you to create, retrieve, update, and delete ages.
+# The Pages API allows you to create, retrieve, update, and delete pages.
 #
 # @object Page
 #     {
@@ -76,11 +76,42 @@
 #       },
 #
 #       // (Optional) An explanation of why this is locked for the user. Present when locked_for_user is true.
-#       lock_explanation: "This discussion is locked until September 1 at 12:00am"
+#       lock_explanation: "This page is locked until September 1 at 12:00am"
+#     }
+#
+# @object PageRevision
+#     {
+#       // an identifier for this revision of the page
+#       revision_id: 7,
+#
+#       // the time when this revision was saved
+#       updated_at: '2012-08-07T11:23:58-06:00',
+#
+#       // the User who saved this revision, if applicable
+#       // (this may not be present if the page was imported from another system)
+#       edited_by: {
+#         id: 1123,
+#         display_name: "Leonardo Fibonacci",
+#         avatar_image_url: "https://canvas.example.com/images/thumbnails/bWVhbmluZ2xlc3M=",
+#         html_url: "https://canvas.example.com/courses/789/users/1123"
+#       }
+#
+#       // the following fields are not included in the index action
+#       // and may be omitted from the show action via summary=1
+#
+#       // the historic url of the page
+#       url: "old-page-title",
+#
+#       // the historic page title
+#       title: "Old Page Title",
+#
+#       // the historic page contents
+#       body: "<p>Old Page Content</p>"
 #     }
 class WikiPagesApiController < ApplicationController
   before_filter :require_context
   before_filter :get_wiki_page, :except => [:create, :index]
+  before_filter :was_front_page, :except => [:index]
 
   include Api::V1::WikiPage
 
@@ -88,8 +119,14 @@ class WikiPagesApiController < ApplicationController
   #
   # List the wiki pages associated with a course or group
   #
-  # @argument sort [optional] Sort results by this field: one of 'title', 'created_at', or 'updated_at'
-  # @argument order [optional] The sorting order: 'asc' (default) or 'desc'
+  # @argument sort [Optional, String, "title"|"created_at"|"updated_at"]
+  #   Sort results by this field.
+  #
+  # @argument order [Optional, String, "asc"|"desc"]
+  #   The sorting order. Defaults to 'asc'.
+  #
+  # @argument search_term [Optional, String]
+  #   The partial title of the pages to match and return.
   #
   # @example_request
   #     curl -H 'Authorization: Bearer <token>' \ 
@@ -103,6 +140,8 @@ class WikiPagesApiController < ApplicationController
       scope = @context.wiki.wiki_pages.select(WikiPage.column_names - ['body']).includes(:user)
       scope = @context.grants_right?(@current_user, session, :view_unpublished_items) ? scope.not_deleted : scope.active
       scope = scope.visible_to_students unless @context.grants_right?(@current_user, session, :view_hidden_items)
+
+      scope = WikiPage.search_by_attribute(scope, :title, params[:search_term])
 
       order_clause = case params[:sort]
         when 'title'
@@ -126,7 +165,8 @@ class WikiPagesApiController < ApplicationController
   #
   # Retrieve the content of a wiki page
   #
-  # @argument url the unique identifier for a page.
+  # @argument url [String]
+  #   The unique identifier for a page.
   #
   # @example_request
   #     curl -H 'Authorization: Bearer <token>' \ 
@@ -134,7 +174,7 @@ class WikiPagesApiController < ApplicationController
   #
   # @example_request
   #     curl -H 'Authorization: Bearer <token>' \
-  #          https://<canvas>/api/v1/courses/123/front_page
+  #          https://<canvas>/api/v1/groups/456/front_page
   #
   # @returns Page
   def show
@@ -149,12 +189,23 @@ class WikiPagesApiController < ApplicationController
   #
   # Create a new wiki page
   #
-  # @argument wiki_page[title] the title for the new page.
-  # @argument wiki_page[body] the content for the new page.
-  # @argument wiki_page[hide_from_students] [boolean] whether the page should be hidden from students.
-  # @argument wiki_page[notify_of_update] [boolean] whether participants should be notified when this page changes.
-  # @argument wiki_page[published] [optional] [boolean] whether the page is published (true) or draft state (false).
-  # @argument wiki_page[front_page] [optional] [boolean] set an unhidden page as the front page (if true)
+  # @argument wiki_page[title] [String]
+  #   The title for the new page.
+  #
+  # @argument wiki_page[body] [String]
+  #   The content for the new page.
+  #
+  # @argument wiki_page[hide_from_students] [Boolean]
+  #   Whether the page should be hidden from students.
+  #
+  # @argument wiki_page[notify_of_update] [Boolean]
+  #   Whether participants should be notified when this page changes.
+  #
+  # @argument wiki_page[published] [Optional, Boolean]
+  #   Whether the page is published (true) or draft state (false).
+  #
+  # @argument wiki_page[front_page] [Optional, Boolean]
+  #   Set an unhidden page as the front page (if true)
   #
   # @example_request
   #     curl -X POST -H 'Authorization: Bearer <token>' \ 
@@ -163,14 +214,14 @@ class WikiPagesApiController < ApplicationController
   # @returns Page
   def create
     @page = @context.wiki.wiki_pages.build
-    if authorized_action(@page, @current_user, :update)
-      get_front_page_params
-      attrs_to_update = process_update_params 
-      if @page.update_attributes(attrs_to_update) && process_front_page
+    @wiki = @context.wiki
+    if authorized_action(@page, @current_user, :create)
+      update_params = get_update_params(Set[:title, :body])
+      if !update_params.is_a?(Symbol) && @page.update_attributes(update_params) && process_front_page
         log_asset_access(@page, "wiki", @wiki, 'participate')
         render :json => wiki_page_json(@page, @current_user, session)
       else
-        render :json => @page.errors.to_json, :status => :bad_request
+        render :json => @page.errors.to_json, :status => update_params.is_a?(Symbol) ? update_params : :bad_request
       end
     end
   end
@@ -179,14 +230,27 @@ class WikiPagesApiController < ApplicationController
   #
   # Update the title or contents of a wiki page
   #
-  # @argument url the unique identifier for a page.
-  # @argument wiki_page[title] [optional] the new title for the page.
-  #     NOTE: changing a page's title will change its url. The updated url will be returned in the result.
-  # @argument wiki_page[body] [optional] the new content for the page.
-  # @argument wiki_page[hide_from_students] [optional] boolean; whether the page should be hidden from students.
-  # @argument wiki_page[notify_of_update] [optional] [boolean] notify participants that the wiki page has been changed.
-  # @argument wiki_page[published] [optional] [boolean] whether the page is published (true) or draft state (false)
-  # @argument wiki_page[front_page] [optional] [boolean] set an unhidden page as the front page (if true), or un-set it (if false)
+  # @argument url [String]
+  #   The unique identifier for a page.
+  #
+  # @argument wiki_page[title] [String]
+  #   The title for the new page. NOTE: changing a page's title will change its
+  #   url. The updated url will be returned in the result.
+  #
+  # @argument wiki_page[body] [String]
+  #   The content for the new page.
+  #
+  # @argument wiki_page[hide_from_students] [Boolean]
+  #   Whether the page should be hidden from students.
+  #
+  # @argument wiki_page[notify_of_update] [Boolean]
+  #   Whether participants should be notified when this page changes.
+  #
+  # @argument wiki_page[published] [Optional, Boolean]
+  #   Whether the page is published (true) or draft state (false).
+  #
+  # @argument wiki_page[front_page] [Optional, Boolean]
+  #   Set an unhidden page as the front page (if true)
   #
   # @example_request
   #     curl -X PUT -H 'Authorization: Bearer <token>' \ 
@@ -198,16 +262,14 @@ class WikiPagesApiController < ApplicationController
   #
   # @returns Page
   def update
-    if authorized_action(@page, @current_user, :update_content)
-      get_front_page_params
-      attrs_to_update = process_update_params
-
-      if @page.update_attributes(attrs_to_update) && process_front_page
+    if authorized_action(@page, @current_user, [:update, :update_content])
+      update_params = get_update_params
+      if !update_params.is_a?(Symbol) && @page.update_attributes(update_params) && process_front_page
         log_asset_access(@page, "wiki", @wiki, 'participate')
         @page.context_module_action(@current_user, @context, :contributed)
         render :json => wiki_page_json(@page, @current_user, session)
       else
-        render :json => @page.errors.to_json, :status => :bad_request
+        render :json => @page.errors.to_json, :status => update_params.is_a?(Symbol) ? update_params : :bad_request
       end
     end
   end
@@ -216,7 +278,8 @@ class WikiPagesApiController < ApplicationController
   #
   # Delete a wiki page
   #
-  # @argument url the unique identifier for a page.
+  # @argument url [String]
+  #   the unique identifier for a page.
   #
   # @example_request
   #     curl -X DELETE -H 'Authorization: Bearer <token>' \ 
@@ -229,18 +292,116 @@ class WikiPagesApiController < ApplicationController
   # @returns Page
   def destroy
     if authorized_action(@page, @current_user, :delete)
-      get_front_page_params
-      @page.workflow_state = 'deleted'
-      @page.save!
-      process_front_page
-      render :json => wiki_page_json(@page, @current_user, session)
+      if !@was_front_page || is_authorized_action?(@wiki, @current_user, :update)
+        @page.workflow_state = 'deleted'
+        @page.save!
+        process_front_page
+        render :json => wiki_page_json(@page, @current_user, session)
+      else
+        @page.errors.add(:front_page, t(:cannot_update_front_page, 'You are not allowed to change the wiki front page'))
+        render :json => @page.errors.to_json, :status => :unauthorized
+      end
     end
   end
-  
+
+  # @API List revisions
+  #
+  # List the revisions of a page. Callers must have update rights on the page in order to see page history.
+  #
+  # @argument url [String]
+  #   The unique identifier for a page
+  #
+  # @example_request
+  #     curl -H 'Authorization: Bearer <token>' \
+  #     https://<canvas>/api/v1/courses/123/pages/the-page-url/revisions
+  #
+  # @returns [PageRevision]
+  def revisions
+    if authorized_action(@page, @current_user, :read_revisions)
+      route = polymorphic_url([:api_v1, @context, @page, :revisions])
+      scope = @page.versions
+      revisions = Api.paginate(scope, self, route)
+      render :json => wiki_page_revisions_json(revisions, @current_user, session)
+    end
+  end
+
+  # @API Show revision
+  #
+  # Retrieve the metadata and optionally content of a revision of the page.
+  # Note that retrieving historic versions of pages requires edit rights.
+  #
+  # @argument url [String]
+  #   The unique identifier for a page
+  #
+  # @argument summary [Optional, Boolean]
+  #   If set, exclude page content from results
+  #
+  # @example_request
+  #     curl -H 'Authorization: Bearer <token>' \
+  #     https://<canvas>/api/v1/courses/123/pages/the-page-url/revisions/latest
+  #
+  # @example_request
+  #     curl -H 'Authorization: Bearer <token>' \
+  #     https://<canvas>/api/v1/courses/123/pages/the-page-url/revisions/4
+  #
+  # @returns PageRevision
+  def show_revision
+    if params.has_key?(:revision_id)
+      permission = :read_revisions
+      revision = @page.versions.find_by_number!(params[:revision_id].to_i)
+    else
+      permission = :read
+      revision = @page.versions.current
+    end
+    if authorized_action(@page, @current_user, permission)
+      include_content = if params.has_key?(:summary)
+                          !value_to_boolean(params[:summary])
+                        else
+                          true
+                        end
+      render :json => wiki_page_revision_json(revision, @current_user, session, include_content)
+    end
+  end
+
+  # @API Revert to revision
+  #
+  # Revert a page to a prior revision.
+  #
+  # @argument url [String]
+  #   The unique identifier for the page
+  #
+  # @argument revision_id [Integer]
+  #   The revision to revert to (use the
+  #   {api:WikiPagesApiController#revisions List Revisions API} to see
+  #   available revisions)
+  #
+  # @example_request
+  #    curl -X POST -H 'Authorization: Bearer <token>' \
+  #    https://<canvas>/api/v1/courses/123/pages/the-page-url/revisions/6
+  #
+  # @returns PageRevision
+  def revert
+    if authorized_action(@page, @current_user, :read_revisions) && authorized_action(@page, @current_user, :update)
+      revision_id = params[:revision_id].to_i
+      @revision = @page.versions.find_by_number!(revision_id).model
+      @page.body = @revision.body
+      @page.title = @revision.title
+      @page.url = @revision.url
+      @page.user_id = @current_user.id if @current_user
+      if @page.save
+        render :json => wiki_page_revision_json(@page.versions.current, @current_user, session, true)
+      else
+        render :json => @page.errors.to_json, :status => :bad_request
+      end
+    end
+  end
+
   protected
   
   def get_wiki_page
     @wiki = @context.wiki
+    @wiki.check_has_front_page
+
     url = params[:url]
     if url.blank?
       if @wiki.has_front_page?
@@ -253,48 +414,124 @@ class WikiPagesApiController < ApplicationController
     @page = @wiki.wiki_pages.not_deleted.find_by_url!(url)
   end
 
-  def get_front_page_params
-    @was_front_page = @page.front_page?
-    if params[:wiki_page] && params[:wiki_page].has_key?(:front_page)
-      @set_front_page = true
-      @set_as_front_page = value_to_boolean(params[:wiki_page].delete(:front_page))
-    end
+  def was_front_page
+    @was_front_page = false
+    @was_front_page = @page.is_front_page? if @page
   end
   
-  def process_update_params
+  def get_update_params(allowed_fields=Set[])
+    initialize_wiki_page
+
+    # normalize parameters
     page_params = params[:wiki_page] || {}
 
-    if @page.grants_right?(@current_user, session, :update)
-      if page_params.has_key? :published
-        new_state = value_to_boolean(page_params.delete(:published)) ? 'active' : 'unpublished'
-        @page.workflow_state = new_state
-      end
-      
-      roles = page_params[:editing_roles]
-      if roles.present?
-        page_params[:editing_roles] = roles.split(',').map(&:strip).reject{|role| !%w(teachers students public).include?(role)}.join(',')
-      end
-    else
-      # editing_roles only allow changing content, not title or attributes
-      page_params.slice!(:body)
+    if page_params.has_key?(:published)
+      workflow_state = value_to_boolean(page_params.delete(:published)) ? 'active' : 'unpublished'
     end
 
-    page_params[:user_id] = @current_user.id if @current_user
+    if page_params.has_key?(:editing_roles)
+      editing_roles = page_params[:editing_roles].split(',').map(&:strip)
+      invalid_roles = editing_roles.reject{|role| %w(teachers students members public).include?(role)}
+      unless invalid_roles.empty?
+        @page.errors.add(:editing_roles, t(:invalid_editing_roles, 'The provided editing roles are invalid'))
+        return :bad_request
+      end
 
+      page_params[:editing_roles] = editing_roles.join(',')
+    end
+
+    if page_params.has_key?(:front_page)
+      @set_front_page = true
+      @set_as_front_page = value_to_boolean(page_params.delete(:front_page))
+    end
+    change_front_page = @set_front_page && @was_front_page != @set_as_front_page
+
+    # check user permissions
+    rejected_fields = Set[]
+    if @wiki.grants_right?(@current_user, session, :manage)
+      allowed_fields.clear
+    else
+      rejected_fields << :published if workflow_state && workflow_state != @page.workflow_state
+
+      if editing_roles
+        existing_editing_roles = (@page.editing_roles || '').split(',')
+        editing_roles_changed = existing_editing_roles.reject{|role| editing_roles.include?(role)}.length > 0
+        editing_roles_changed |= editing_roles.reject{|role| existing_editing_roles.include?(role)}.length > 0
+        rejected_fields << :editing_roles if editing_roles_changed
+      end
+
+      rejected_fields << :hide_from_students if page_params.include?(:hide_from_students) && value_to_boolean(page_params[:hide_from_students]) != @page.hide_from_students
+
+      unless @page.grants_right?(@current_user, session, :update)
+        allowed_fields << :body
+        rejected_fields << :title if page_params.include?(:title) && page_params[:title] != @page.title
+
+        rejected_fields << :front_page if change_front_page && !@wiki.grants_right?(@current_user, session, :update)
+      end
+    end
+
+    # check rejected fields
+    rejected_fields = rejected_fields - allowed_fields
+    unless rejected_fields.empty?
+      @page.errors.add(:published, t(:cannot_update_published, 'You are not allowed to update the published state of this wiki page')) if rejected_fields.include?(:published)
+      @page.errors.add(:title, t(:cannot_update_title, 'You are not allowed to update the title of this wiki page')) if rejected_fields.include?(:title)
+      @page.errors.add(:hide_from_students, t(:cannot_update_hide_from_students, 'You are not allowed to update the hidden from students flag of this wiki page')) if rejected_fields.include?(:hide_from_students)
+      @page.errors.add(:editing_roles, t(:cannot_update_editing_roles, 'You are not allowed to update the editing roles of this wiki page')) if rejected_fields.include?(:editing_roles)
+      @page.errors.add(:front_page, t(:cannot_update_front_page, 'You are not allowed to change the wiki front page')) if rejected_fields.include?(:front_page)
+
+      return :unauthorized
+    end
+
+    # check for a valid front page
+    valid_front_page = true
+
+    if change_front_page || page_params.include?(:hide_from_students)
+      new_front_page = change_front_page ? @set_as_front_page : @page.is_front_page?
+      new_hide_from_students = page_params.include?(:hide_from_students) ? value_to_boolean(page_params[:hide_from_students]) : @page.hide_from_students
+      if new_front_page && new_hide_from_students
+        valid_front_page = false
+        error_message = t(:cannot_hide_front_page, 'The front page cannot be hidden from students')
+        @page.errors.add(:front_page, error_message) if change_front_page
+        @page.errors.add(:hide_from_students, error_message) if page_params.include?(:hide_from_students)
+      end
+    end
+
+    if change_front_page || workflow_state
+      new_front_page = change_front_page ? @set_as_front_page : @page.is_front_page?
+      new_workflow_state = workflow_state ? workflow_state : @page.workflow_state
+      valid_front_page = false if new_front_page && new_workflow_state != 'active'
+      if new_front_page && new_workflow_state != 'active'
+        valid_front_page = false
+        error_message = t(:cannot_have_unpublished_front_page, 'The front page cannot be unpublished')
+        @page.errors.add(:front_page, error_message) if change_front_page
+        @page.errors.add(:published, error_message) if workflow_state
+      end
+    end
+
+    return :bad_request unless valid_front_page
+
+    # limit to just the allowed fields
+    unless allowed_fields.empty?
+      page_params.slice!(*allowed_fields.to_a)
+    end
+
+    @page.workflow_state = workflow_state if workflow_state
+
+    page_params[:user_id] = @current_user.id if @current_user
     page_params
   end
 
   def process_front_page
     if @set_front_page
-      if @set_as_front_page && !@page.front_page?
+      if @set_as_front_page && !@page.is_front_page?
         return @page.set_as_front_page!
       elsif !@set_as_front_page
-        return @wiki.unset_front_page!
+        return @page.wiki.unset_front_page!
       end
     elsif @was_front_page
       if @page.deleted?
-        return @wiki.unset_front_page!
-      elsif !@page.front_page?
+        return @page.wiki.unset_front_page!
+      elsif !@page.is_front_page?
         # if url changes, keep as front page
         return @page.set_as_front_page!
       end

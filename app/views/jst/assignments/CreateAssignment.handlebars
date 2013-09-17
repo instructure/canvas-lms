@@ -1,0 +1,70 @@
+<div class="form-dialog-content">
+  <div class="form-horizontal">
+
+    <div class="control-group">
+      <label class="control-label" for="ag_{{label_id}}_assignment_type">
+        {{#t "assignment_type"}}Type:{{/t}}
+      </label>
+      <div class="controls">
+        <select type="text" id="ag_{{label_id}}_assignment_type" name="submission_types">
+          <option value>{{#t "assignment"}}Assignment{{/t}}</option>
+          <option value="discussion_topic">{{#t "discussion_type"}}Discussion{{/t}}</option>
+          <option value="online_quiz">{{#t "quiz_type"}}Quiz{{/t}}</option>
+          <option value="external_tool">{{#t "external_tool_type"}}External Tool{{/t}}</option>
+          <option value="not_graded">{{#t "not_graded_type"}}Not Graded{{/t}}</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="control-group">
+      <label class="control-label" for="ag_{{label_id}}_assignment_name">
+        {{#t "assignment_name"}}Name:{{/t}}
+      </label>
+      <div class="controls">
+        <input type="text" id="ag_{{label_id}}_assignment_name" name="name" />
+      </div>
+    </div>
+
+    <div class="control-group">
+      <label class="control-label" for="ag_{{label_id}}_assignment_due_at">
+        {{#t "assignment_due_at"}}Due:{{/t}}
+      </label>
+      <div class="controls">
+        <input
+          type="text"
+          id="ag_{{label_id}}_assignment_due_at"
+          class="datetime_field input-medium"
+          name="due_at" />
+      </div>
+    </div>
+
+    <div class="control-group">
+      <label class="control-label" for="ag_{{label_id}}_assignment_points">
+        {{#t "assignment_points"}}Points:{{/t}}
+      </label>
+      <div class="controls">
+        <input
+          type="text"
+          id="ag_{{label_id}}_assignment_points"
+          class="input-small"
+          name="points_possible" />
+      </div>
+    </div>
+
+  </div>
+</div>
+<div class="form-controls">
+  <button
+    class="more_options btn pull-left"
+    type="button"
+  >{{#t "more"}}More Options{{/t}}</button>
+  <button
+    class="cancel_button btn dialog_closer"
+    type="button"
+  >{{#t "cancel"}}Cancel{{/t}}</button>
+  <button
+    class="create_assignment btn btn-primary"
+    data-text-while-loading='{{#t "saving"}}Saving...{{/t}}'
+    type="submit"
+  >{{#t "save"}}Save{{/t}}</button>
+</div>

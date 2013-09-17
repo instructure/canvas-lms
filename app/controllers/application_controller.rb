@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2012 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -39,6 +39,8 @@ class ApplicationController < ActionController::Base
   before_filter :set_user_id_header
   before_filter :set_time_zone
   before_filter :set_page_view
+  before_filter :refresh_cas_ticket
+  before_filter :require_reacceptance_of_terms
   after_filter :log_page_view
   after_filter :discard_flash_if_xhr
   after_filter :cache_buster
@@ -83,11 +85,10 @@ class ApplicationController < ActionController::Base
         :current_user_id => @current_user.try(:id),
         :current_user => user_display_json(@current_user, :profile),
         :current_user_roles => @current_user.try(:roles),
-        :context_asset_string => @context.try(:asset_string),
         :AUTHENTICITY_TOKEN => form_authenticity_token,
-        :files_domain => HostUrl.file_host(@domain_root_account || Account.default, request.host_with_port)
+        :files_domain => HostUrl.file_host(@domain_root_account || Account.default, request.host_with_port),
       }
-      @js_env[:IS_LARGE_ROSTER] = true if @context.respond_to?(:large_roster?) && @context.large_roster?
+      @js_env[:lolcalize] = true if ENV['LOLCALIZE']
     end
 
     hash.each do |k,v|
@@ -97,7 +98,8 @@ class ApplicationController < ActionController::Base
         @js_env[k] = v
       end
     end
-
+    @js_env[:IS_LARGE_ROSTER] = true if !@js_env[:IS_LARGE_ROSTER] && @context.respond_to?(:large_roster?) && @context.large_roster?
+    @js_env[:context_asset_string] = @context.try(:asset_string) if !@js_env[:context_asset_string]
     @js_env
   end
   helper_method :js_env
@@ -139,8 +141,8 @@ class ApplicationController < ActionController::Base
   def set_time_zone
     if @current_user && !@current_user.time_zone.blank?
       Time.zone = @current_user.time_zone
-      if Time.zone && Time.zone.name == "UTC" && @current_user.time_zone && @current_user.time_zone.match(/\s/)
-        Time.zone = @current_user.time_zone.split(/\s/)[1..-1].join(" ") rescue nil
+      if Time.zone && Time.zone.name == "UTC" && @current_user.time_zone && @current_user.time_zone.name.match(/\s/)
+        Time.zone = @current_user.time_zone.name.split(/\s/)[1..-1].join(" ") rescue nil
       end
     else
       Time.zone = @domain_root_account && @domain_root_account.default_time_zone
@@ -384,7 +386,7 @@ class ApplicationController < ActionController::Base
         @context_membership = @context_enrollment
         @account = @context
       elsif params[:group_id]
-        @context = Group.find(params[:group_id])
+        @context = api_request? ? api_find(Group, params[:group_id]) : Group.find(params[:group_id])
         params[:context_id] = params[:group_id]
         params[:context_type] = "Group"
         @context_enrollment = @context.group_memberships.find_by_user_id(@current_user.id) if @context && @current_user      
@@ -508,7 +510,7 @@ class ApplicationController < ActionController::Base
     @context = @courses.first
 
     if @just_viewing_one_course
-      @groups = @courses.first.assignment_groups.active.includes(:active_assignments)
+      @groups = @context.assignment_groups.active.includes(:active_assignments)
       @assignments = @groups.map(&:active_assignments).flatten
     else
       assignments_and_groups = Shard.partition_by_shard(@courses) do |courses|
@@ -709,6 +711,19 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def refresh_cas_ticket
+    if session[:cas_session] && @current_pseudonym
+      @current_pseudonym.claim_cas_ticket(session[:cas_session])
+    end
+  end
+
+  def require_reacceptance_of_terms
+    if session[:require_terms] && !api_request? && request.get?
+      render :template => "shared/terms_required", :layout => "application", :status => :unauthorized
+      false
+    end
+  end
+
   def generate_page_view
     attributes = { :user => @current_user, :developer_key => @developer_key, :real_user => @real_current_user }
     @page_view = PageView.generate(request, attributes)
@@ -807,15 +822,17 @@ class ApplicationController < ActionController::Base
       type = 'default'
       type = '404' if status == '404 Not Found'
 
-      error = ErrorReport.log_exception(type, exception, {
-        :url => request.url,
-        :user => @current_user,
-        :user_agent => request.headers['User-Agent'],
-        :request_context_id => RequestContextGenerator.request_id,
-        :account => @domain_root_account,
-        :request_method => request.method,
-        :format => request.format,
-      }.merge(ErrorReport.useful_http_env_stuff_from_request(request)))
+      unless exception.respond_to?(:skip_error_report?) && exception.skip_error_report?
+        error = ErrorReport.log_exception(type, exception, {
+          :url => request.url,
+          :user => @current_user,
+          :user_agent => request.headers['User-Agent'],
+          :request_context_id => RequestContextGenerator.request_id,
+          :account => @domain_root_account,
+          :request_method => request.method,
+          :format => request.format,
+        }.merge(ErrorReport.useful_http_env_stuff_from_request(request)))
+      end
 
       if api_request?
         rescue_action_in_api(exception, error)
@@ -832,6 +849,7 @@ class ApplicationController < ActionController::Base
   def render_rescue_action(exception, error, status, status_code)
     clear_crumbs
     @headers = nil
+    load_account unless @domain_root_account
     session[:last_error_id] = error.id rescue nil
     if request.xhr? || request.format == :text
       render :status => status_code, :json => {
@@ -863,7 +881,20 @@ class ApplicationController < ActionController::Base
   end
 
   def rescue_action_in_api(exception, error_report)
-    status_code = response_code_for_rescue(exception) || 500
+    status_code = exception.response_status if exception.respond_to?(:response_status)
+    status_code ||= response_code_for_rescue(exception) || 500
+
+    data = exception.error_json if exception.respond_to?(:error_json)
+    data ||= api_error_json(exception, status_code)
+
+    if error_report.try(:id)
+      data[:error_report_id] = error_report.id
+    end
+
+    render :json => data, :status => status_code
+  end
+
+  def api_error_json(exception, status_code)
     if status_code.is_a?(Symbol)
       status_code_string = status_code.to_s
     else
@@ -872,21 +903,16 @@ class ApplicationController < ActionController::Base
     end
 
     data = { :status => status_code_string }
-    if error_report.try(:id)
-      data[:error_report_id] = error_report.id
-    end
-
     # inject exception-specific data into the response
     case exception
-    when ActiveRecord::RecordNotFound
-      data[:message] = 'The specified resource does not exist.'
-    when AuthenticationMethods::AccessTokenError
-      add_www_authenticate_header
-      data[:message] = 'Invalid access token.'
+      when ActiveRecord::RecordNotFound
+        data[:message] = 'The specified resource does not exist.'
+      when AuthenticationMethods::AccessTokenError
+        add_www_authenticate_header
+        data[:message] = 'Invalid access token.'
     end
-
     data[:message] ||= "An error occurred."
-    render :json => data, :status => status_code
+    data
   end
 
   def rescue_action_locally(exception)
@@ -937,10 +963,15 @@ class ApplicationController < ActionController::Base
         redirect_to(login_url(:needs_cookies => '1'))
         return false
       else
-        raise(ActionController::InvalidAuthenticityToken) unless (form_authenticity_token == form_authenticity_param) || (form_authenticity_token == request.headers['X-CSRF-Token'])
+        raise(ActionController::InvalidAuthenticityToken) unless BreachMitigation::MaskingSecrets.valid_authenticity_token?(session, form_authenticity_param) ||
+          BreachMitigation::MaskingSecrets.valid_authenticity_token?(session, request.headers['X-CSRF-Token'])
       end
     end
     Rails.logger.warn("developer_key id: #{@developer_key.id}") if @developer_key
+  end
+
+  def form_authenticity_token
+    BreachMitigation::MaskingSecrets.masked_authenticity_token(session)
   end
 
   API_REQUEST_REGEX = %r{\A/api/v\d}
@@ -957,29 +988,49 @@ class ApplicationController < ActionController::Base
   # the page title.
   def get_wiki_page
     @wiki = @context.wiki
-    page_name = (params[:wiki_page_id] || params[:id] || (params[:wiki_page] && params[:wiki_page][:title]) || @wiki.get_front_page_url || Wiki::DEFAULT_FRONT_PAGE_URL)
+    @wiki.check_has_front_page
+
+    page_name = params[:wiki_page_id] || params[:id] || (params[:wiki_page] && params[:wiki_page][:title])
+    page_name ||= (@wiki.get_front_page_url || Wiki::DEFAULT_FRONT_PAGE_URL) unless @context.draft_state_enabled?
     if(params[:format] && !['json', 'html'].include?(params[:format]))
       page_name += ".#{params[:format]}"
       params[:format] = 'html'
     end
-    return @page if @page
+    return if @page || !page_name
+
     if params[:action] != 'create'
       @page = @wiki.wiki_pages.deleted_last.find_by_url(page_name.to_s) ||
               @wiki.wiki_pages.deleted_last.find_by_url(page_name.to_s.to_url) ||
               @wiki.wiki_pages.find_by_id(page_name.to_i)
     end
-    @page ||= @wiki.wiki_pages.build(
+    @page ||= @wiki.wiki_pages.new(
       :title => page_name.titleize,
       :url => page_name.to_url
     )
     if @page.new_record?
-      if @domain_root_account.enable_draft?
-        @page.workflow_state = 'unpublished'
-      else
-        @page.workflow_state = 'active'
-      end
+      @page.wiki = @wiki
+      initialize_wiki_page
     end
-    if @page.front_page? && @page.new_record?
+  end
+
+  # Initializes the state of @page, but only if it is a new page
+  def initialize_wiki_page
+    return unless @page.new_record? || @page.deleted?
+
+    unless @context.draft_state_enabled?
+      @page.set_as_front_page! if !@wiki.has_front_page? and @page.url == Wiki::DEFAULT_FRONT_PAGE_URL
+    end
+
+    is_privileged_user = is_authorized_action?(@page.wiki, @current_user, :manage)
+    if is_privileged_user && @context.draft_state_enabled? && !@context.is_a?(Group)
+      @page.workflow_state = 'unpublished'
+    else
+      @page.workflow_state = 'active'
+    end
+
+    @page.editing_roles = (@context.default_wiki_editing_roles rescue nil) || @page.default_roles
+
+    if @page.is_front_page?
       @page.body = t "#application.wiki_front_page_default_content_course", "Welcome to your new course wiki!" if @context.is_a?(Course)
       @page.body = t "#application.wiki_front_page_default_content_group", "Welcome to your new group wiki!" if @context.is_a?(Group)
     end
@@ -1084,8 +1135,16 @@ class ApplicationController < ActionController::Base
   helper_method :calendar_url_for, :files_url_for
 
   def conversations_path(params={})
-    hash = params.keys.empty? ? '' : "##{params.to_json.unpack('H*').first}"
-    "/conversations#{hash}"
+    if @current_user and @current_user.preferences[:use_new_conversations]
+      query_string = params.slice(:context_id, :user_id, :user_name).inject([]) do |res, (k, v)|
+        res << "#{k}=#{v}"
+        res
+      end.join('&')
+      "/conversations?#{query_string}"
+    else
+      hash = params.keys.empty? ? '' : "##{params.to_json.unpack('H*').first}"
+      "/conversations#{hash}"
+    end
   end
   helper_method :conversations_path
   
@@ -1509,6 +1568,24 @@ class ApplicationController < ActionController::Base
       Delayed::Batch.serial_batch(batch_opts || {}) do
         action.call
       end
+    end
+  end
+
+  def not_found
+    raise ActionController::RoutingError.new('Not Found')
+  end
+
+  def set_js_rights
+    if respond_to?(:js_rights)
+      hash = {}
+      js_rights.each do |instance_symbol|
+        instance_name = instance_symbol.to_s
+        obj = instance_variable_get("@#{instance_name}")
+        policy = obj.check_policy(@current_user, session) unless obj.nil? || !obj.respond_to?(:check_policy)
+        hash["#{instance_name.upcase}_RIGHTS".to_sym] = HashWithIndifferentAccess[policy.map { |right| [right, true] }] unless policy.nil?
+      end
+
+      js_env hash
     end
   end
 end

@@ -29,6 +29,7 @@ define [
 
     defaults: ->
       placeholder: I18n.t('context_search_placeholder', 'Enter a name, course, or group')
+      title: I18n.t('context_search_title', 'Name, course, or group')
       selector:
         messages: {noResults: I18n.t('no_results', 'No results found')}
         populator: @populator

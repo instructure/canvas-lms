@@ -13,6 +13,10 @@ define [
     @optionProperty 'selectOptions'
 
     template: template
+
+    initialize: -> 
+      super
+      $.subscribe 'resetForm', @resetForm
     
     els: 
       '#converter'                : '$converter'
@@ -36,10 +40,15 @@ define [
 
     renderConverter: (converter) -> 
       if converter
-        converter.setElement @$converter
-        converter.render()
+        # Set timeout ensures that all of the html is loaded at once. We need
+        # this for accessibility to work correct.
+        setTimeout => 
+          @$converter.html converter.render().$el
+          @trigger 'converterRendered'
+        , 0
       else
         @resetForm() 
+        @trigger 'converterReset'
 
     # This is the actual action for making the view swaps when selecting
     # a different converter view. Ensures that when you select a new view
@@ -51,6 +60,7 @@ define [
     selectConverter: (event) -> 
       @$formActions.show()
       @model.resetModel()
+      @$chooseMigrationConverter.attr "aria-activedescendant", @$chooseMigrationConverter.val() # This is purely for accessibility
       @model.set 'migration_type', @$chooseMigrationConverter.val()
       $.publish 'contentImportChange', {value: @$chooseMigrationConverter.val(), migrationConverter: this}
 
@@ -76,7 +86,7 @@ define [
     #
     # @api private
 
-    resetForm: -> 
+    resetForm: => 
       @$formActions.hide()
       @$converter.empty()
       @$chooseMigrationConverter.val('none')

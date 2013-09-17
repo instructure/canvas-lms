@@ -19,6 +19,11 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe Context do
+  it "should not have draft_state_enabled" do
+    class TmpContext; include Context; end
+    TmpContext.new.should_not be_draft_state_enabled
+  end
+
   context "find_by_asset_string" do
     it "should find a valid course" do
       course = Course.create!
@@ -89,6 +94,21 @@ describe Context do
       @course2.find_asset(@assignment.asset_string).should eql(nil)
       @course.find_asset("assignment_0").should eql(nil)
       @course.find_asset("").should eql(nil)
+    end
+  end
+
+  context "self.names_by_context_types_and_ids" do
+    it "should find context names" do
+      contexts = []
+      contexts << course1 = Course.create!(:name => "a course")
+      contexts << course2 = Course.create!(:name => "another course")
+      contexts << group1 = Group.create!(:name => "a group")
+      contexts << group2 = Group.create!(:name => "another group")
+      contexts << user = User.create!(:name => "a user")
+      names = Context.names_by_context_types_and_ids(contexts.map{|c| [c.class.name, c.id]})
+      contexts.each do |c|
+        names[[c.class.name, c.id]].should eql(c.name)
+      end
     end
   end
 end

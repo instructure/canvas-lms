@@ -92,22 +92,26 @@ class ContentMigrationsController < ApplicationController
   def index
     return unless authorized_action(@context, @current_user, :manage_content)
 
+    Folder.root_folders(@context) # ensure course root folder exists so file imports can run
+
     @migrations = Api.paginate(@context.content_migrations.order("id DESC"), self, api_v1_course_content_migration_list_url(@context))
+    @migrations.each{|mig| mig.check_for_pre_processing_timeout }
     content_migration_json_hash = content_migrations_json(@migrations, @current_user, session)
 
     if api_request?
       render :json => content_migration_json_hash
     else
-      @plugins = ContentMigration.migration_plugins(true)
+      @plugins = ContentMigration.migration_plugins(true).sort_by {|p| [p.metadata(:sort_order) || 100, p.metadata(:select_text)]}
 
       options = @plugins.map{|p| {:label => p.metadata(:select_text), :id => p.id}}
 
       js_env :UPLOAD_LIMIT => @context.storage_quota
       js_env :SELECT_OPTIONS => options
-      js_env :QUESTION_BANKS => @context.assessment_question_banks.except(:include).select([:title, :id]).active
-      js_env :COURSES => @context.account.courses.active.all
+      js_env :QUESTION_BANKS => @context.assessment_question_banks.except(:includes).select([:title, :id]).active
       js_env :COURSE_ID => @context.id
       js_env :CONTENT_MIGRATIONS => content_migration_json_hash
+      js_env(:OLD_START_DATE => datetime_string(@context.start_at, :verbose, nil, true))
+      js_env(:OLD_END_DATE => datetime_string(@context.conclude_at, :verbose, nil, true))
     end
   end
 
@@ -123,6 +127,7 @@ class ContentMigrationsController < ApplicationController
   # @returns ContentMigration
   def show
     @content_migration = @context.content_migrations.find(params[:id])
+    @content_migration.check_for_pre_processing_timeout
     render :json => content_migration_json(@content_migration, @current_user, session)
   end
 
@@ -154,27 +159,60 @@ class ContentMigrationsController < ApplicationController
   # 3. {api:ContentMigrationsController#show GET} the ContentMigration
   # 4. Use the {api:ProgressController#show Progress} specified in _progress_url_ to monitor progress
   #
-  # @argument migration_type [string] The type of the migration. Use the {api:ContentMigrationsController#available_migrators Migrator} endpoint to see all available migrators. Default allowed values: canvas_cartridge_importer, common_cartridge_importer, course_copy_importer, zip_file_importer, qti_converter, moodle_converter
+  # @argument migration_type [String]
+  #   The type of the migration. Use the
+  #   {api:ContentMigrationsController#available_migrators Migrator} endpoint to
+  #   see all available migrators. Default allowed values:
+  #   canvas_cartridge_importer, common_cartridge_importer,
+  #   course_copy_importer, zip_file_importer, qti_converter, moodle_converter
   #
-  # @argument pre_attachment[name] [string] Required if uploading a file. This is the first step in uploading a file to the content migration. See the {file:file_uploads.html File Upload Documentation} for details on the file upload workflow.
+  # @argument pre_attachment[name] [String]
+  #   Required if uploading a file. This is the first step in uploading a file
+  #   to the content migration. See the {file:file_uploads.html File Upload
+  #   Documentation} for details on the file upload workflow.
   #
-  # @argument pre_attachment[*] (optional) Other file upload properties, See {file:file_uploads.html File Upload Documentation}
+  # @argument pre_attachment[*] [Optional]
+  #   Other file upload properties, See {file:file_uploads.html File Upload
+  #   Documentation}
   #
-  # @argument settings[source_course_id] [string] (optional) The course to copy from for a course copy migration. (required if doing course copy)
+  # @argument settings[source_course_id] [Optional, String]
+  #   The course to copy from for a course copy migration. (required if doing
+  #   course copy)
   #
-  # @argument settings[folder_id] [string] (optional) The folder to unzip the .zip file into for a zip_file_import. (required if doing .zip file upload)
+  # @argument settings[folder_id] [Optional, String]
+  #   The folder to unzip the .zip file into for a zip_file_import.
+  #  (required if doing .zip file upload)
   #
-  # @argument settings[overwrite_quizzes] [boolean] (optional) Whether to overwrite quizzes with the same identifiers between content packages
+  # @argument settings[overwrite_quizzes] [Optional, Boolean]
+  #   Whether to overwrite quizzes with the same identifiers between content
+  #   packages.
   #
-  # @argument settings[question_bank_id] [integer] (optional) The existing question bank ID to import questions into if not specified in the content package
-  # @argument settings[question_bank_name] [string] (optional) The question bank to import questions into if not specified in the content package, if both bank id and name are set, id will take precedence.
+  # @argument settings[question_bank_id] [Optional, Integer]
+  #   The existing question bank ID to import questions into if not specified in
+  #   the content package.
   #
-  # @argument date_shift_options[shift_dates] [boolean] (optional) Whether to shift dates
-  # @argument date_shift_options[old_start_date] [yyyy-mm-dd] (optional) The original start date of the source content/course
-  # @argument date_shift_options[old_end_date] [yyyy-mm-dd] (optional) The original end date of the source content/course
-  # @argument date_shift_options[new_start_date] [yyyy-mm-dd] (optional) The new start date for the content/course
-  # @argument date_shift_options[new_end_date] [yyyy-mm-dd] (optional) The new end date for the source content/course
-  # @argument date_shift_options[day_substitutions][x] [integer] (optional) Move anything scheduled for day 'x' to the specified day. (0-Sunday, 1-Monday, 2-Tuesday, 3-Wednesday, 4-Thursday, 5-Friday, 6-Saturday)
+  # @argument settings[question_bank_name] [Optional, String]
+  #   The question bank to import questions into if not specified in the content
+  #   package, if both bank id and name are set, id will take precedence.
+  #
+  # @argument date_shift_options[shift_dates] [Optional, Boolean]
+  #   Whether to shift dates
+  #
+  # @argument date_shift_options[old_start_date] [Optional, Date]
+  #   The original start date of the source content/course
+  #
+  # @argument date_shift_options[old_end_date] [Optional, Date]
+  #   The original end date of the source content/course
+  #
+  # @argument date_shift_options[new_start_date] [Optional, Date]
+  #   The new start date for the content/course
+  #
+  # @argument date_shift_options[new_end_date] [Optional, Date]
+  #   The new end date for the source content/course
+  #
+  # @argument date_shift_options[day_substitutions][X] [Optional, Integer]
+  #   Move anything scheduled for day 'X' to the specified day. (0-Sunday,
+  #   1-Monday, 2-Tuesday, 3-Wednesday, 4-Thursday, 5-Friday, 6-Saturday)
   #
   # @example_request
   #
@@ -218,14 +256,17 @@ class ContentMigrationsController < ApplicationController
 
   # @API Update a content migration
   #
-  # Update a content migration. Takes same arguments as create except that you can't change the migration type.
-  # However, changing most settings after the migration process has started will not do anything.
-  # Generally updating the content migration will be used when there is a file upload problem.
-  # If the first upload has a problem you can supply new _pre_attachment_ values to start the process again.
+  # Update a content migration. Takes same arguments as create except that you
+  # can't change the migration type. However, changing most settings after the
+  # migration process has started will not do anything. Generally updating the
+  # content migration will be used when there is a file upload problem. If the
+  # first upload has a problem you can supply new _pre_attachment_ values to
+  # start the process again.
   #
   # @returns ContentMigration
   def update
     @content_migration = @context.content_migrations.find(params[:id])
+    @content_migration.check_for_pre_processing_timeout
     @plugin = Canvas::Plugin.find(@content_migration.migration_type)
 
     update_migration
@@ -294,7 +335,7 @@ class ContentMigrationsController < ApplicationController
   # If there is no count for an item that means there are no sub-items and you
   # shouldn't try to fetch them
   #
-  # @argument type [string] (optional) Return list of specified type
+  # @argument type [Optional, String] Return list of specified type
   #
   # @returns list of content items
   def content_list
@@ -323,9 +364,10 @@ class ContentMigrationsController < ApplicationController
         params[:do_not_run] = true
       end
     elsif params[:copy]
+      copy_options = ContentMigration.process_copy_params(params[:copy])
       @content_migration.migration_settings[:migration_ids_to_import] ||= {}
-      @content_migration.migration_settings[:migration_ids_to_import][:copy] = params[:copy]
-      @content_migration.copy_options = params[:copy]
+      @content_migration.migration_settings[:migration_ids_to_import][:copy] = copy_options
+      @content_migration.copy_options = copy_options
     else
       @content_migration.migration_settings[:import_immediately] = true
       @content_migration.copy_options = {:everything => true}

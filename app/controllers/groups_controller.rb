@@ -98,7 +98,6 @@ class GroupsController < ApplicationController
   include Api::V1::Attachment
   include Api::V1::Group
   include Api::V1::UserFollow
-  include Api::V1::Progress
 
   SETTABLE_GROUP_ATTRIBUTES = %w(name description join_level is_public group_category avatar_attachment storage_quota_mb)
 
@@ -147,25 +146,34 @@ class GroupsController < ApplicationController
   #
   # Returns a list of active groups for the current user.
   #
+  # @argument context_type [Optional, String, "Account"|"Course"]
+  #  Only include groups that are in this type of context.
+  #
   # @example_request
-  #     curl https://<canvas>/api/v1/users/self/groups \ 
+  #     curl https://<canvas>/api/v1/users/self/groups?context_type=Account \ 
   #          -H 'Authorization: Bearer <token>'
   #
   # @returns [Group]
   def index
     return context_index if @context
+    groups_scope = @current_user.current_groups
     respond_to do |format|
       format.html do
-        @groups = @current_user.current_groups.
-          with_each_shard{ |scope| scope.includes(:group_category) }
+        @groups = groups_scope.with_each_shard{ |scope|
+          scope = scope.by_name
+          scope = scope.where(:context_type => params[:context_type]) if params[:context_type]
+          scope.includes(:group_category)
+        }
       end
 
       format.json do
         @groups = BookmarkedCollection.with_each_shard(
-          Group::Bookmarker,
-          @current_user.current_groups) { |scope| scope.includes(:group_category) }
+          Group::Bookmarker, groups_scope) { |scope|
+          scope = scope.scoped
+          scope = scope.where(:context_type => params[:context_type]) if params[:context_type]
+          scope.includes(:group_category) }
         @groups = Api.paginate(@groups, self, api_v1_current_user_groups_url)
-        render :json => @groups.map { |g| group_json(g, @current_user, session) }
+        render :json => (@groups.map { |g| group_json(g, @current_user, session) })
       end
     end
   end
@@ -182,7 +190,7 @@ class GroupsController < ApplicationController
   def context_index
     return unless authorized_action(@context, @current_user, :read_roster)
 
-    @groups      = @context.groups.active.order(:name, :created_at)
+    @groups      = @context.groups.active.by_name
     @categories  = @context.group_categories.order("role <> 'student_organized'", :name)
     @user_groups = @current_user.group_memberships_for(@context) if @current_user
 
@@ -298,15 +306,20 @@ class GroupsController < ApplicationController
   # Creates a new group. Groups created using the "/api/v1/groups/"
   # endpoint will be community groups.
   #
-  # @argument name the name of the group
-  # @argument description a description of the group
-  # @argument is_public whether the group is public (applies only to
-  #   community groups)
-  # @argument join_level parent_context_auto_join, parent_context_request,
-  #   or invitation_only
-  # @argument storage_quota_mb The allowed file storage for the group,
-  #   in megabytes. This parameter is ignored if the caller does not have
-  #   the manage_storage_quotas permission.
+  # @argument name [String]
+  #  The name of the group
+  #
+  # @argument description [String]
+  #  A description of the group
+  #
+  # @argument is_public [Boolean]
+  #   whether the group is public (applies only to community groups)
+  #
+  # @argument join_level [String, "parent_context_auto_join"|"parent_context_request"|"invitation_only"]
+  #
+  # @argument storage_quota_mb [Integer]
+  #   The allowed file storage for the group, in megabytes. This parameter is
+  #   ignored if the caller does not have the manage_storage_quotas permission.
   #
   # @example_request
   #     curl https://<canvas>/api/v1/groups \ 
@@ -368,16 +381,25 @@ class GroupsController < ApplicationController
   # {file:file_uploads.html File Upload Documentation} for details on the file
   # upload workflow.
   #
-  # @argument name
-  # @argument description
-  # @argument is_public Currently you cannot set a group back to private once
-  #   it has been made public.
-  # @argument join_level
-  # @argument avatar_id The id of the attachment previously uploaded to the
-  #   group that you would like to use as the avatar image for this group.
-  # @argument storage_quota_mb The allowed file storage for the group,
-  #   in megabytes. This parameter is ignored if the caller does not have
-  #   the manage_storage_quotas permission.
+  # @argument name [String]
+  #  The name of the group
+  #
+  # @argument description [String]
+  #  A description of the group
+  #
+  # @argument is_public [Boolean]
+  #   Whether the group is public (applies only to community groups). Currently
+  #   you cannot set a group back to private once it has been made public.
+  #
+  # @argument join_level [String, "parent_context_auto_join"|"parent_context_request"|"invitation_only"]
+  #
+  # @argument avatar_id [Integer]
+  #   The id of the attachment previously uploaded to the group that you would
+  #   like to use as the avatar image for this group.
+  #
+  # @argument storage_quota_mb [Integer]
+  #   The allowed file storage for the group, in megabytes. This parameter is
+  #   ignored if the caller does not have the manage_storage_quotas permission.
   #
   # @example_request
   #     curl https://<canvas>/api/v1/groups/<group_id> \ 
@@ -504,7 +526,8 @@ class GroupsController < ApplicationController
   # Sends an invitation to all supplied email addresses which will allow the
   # receivers to join the group.
   #
-  # @argument invitees An array of email addresses to be sent invitations
+  # @argument invitees[] [String]
+  #   An array of email addresses to be sent invitations.
   #
   # @example_request
   #     curl https://<canvas>/api/v1/groups/<group_id>/invite \ 
@@ -568,9 +591,9 @@ class GroupsController < ApplicationController
   #
   # Returns a list of users in the group.
   #
-  # @argument search_term (optional)
-  #   The partial name or full ID of the users to match and return in the results list.
-  #   Must be at least 3 characters.
+  # @argument search_term [Optional, String]
+  #   The partial name or full ID of the users to match and return in the
+  #   results list. Must be at least 3 characters.
   #
   # @example_request
   #     curl https://<canvas>/api/v1/groups/1/users \
@@ -580,17 +603,10 @@ class GroupsController < ApplicationController
   def users
     return unless authorized_action(@context, @current_user, :read)
 
-    search_term = params[:search_term]
-    if search_term && search_term.size < 3
-      return render \
-          :json => {
-          "status" => "argument_error",
-          "message" => "search_term of 3 or more characters is required" },
-          :status => :bad_request
-    end
+    search_term = params[:search_term].presence
 
     if search_term
-      users = UserSearch.for_user_in_context(search_term, @context, @current_user)
+      users = UserSearch.for_user_in_context(search_term, @context, @current_user, session)
     else
       users = UserSearch.scope_for(@context, @current_user)
     end
@@ -636,33 +652,6 @@ class GroupsController < ApplicationController
     end
   end
 
-  def assign_unassigned_members
-    return unless authorized_action(@context, @current_user, :manage_groups)
-
-    # valid category?
-    category = @context.group_categories.find_by_id(params[:category_id])
-    return render(:json => {}, :status => :not_found) unless category
-
-    # option disabled for student organized groups or section-restricted
-    # self-signup groups. (but self-signup is ignored for non-Course groups)
-    return render(:json => {}, :status => :bad_request) if category.student_organized?
-    return render(:json => {}, :status => :bad_request) if @context.is_a?(Course) && category.restricted_self_signup?
-
-    if value_to_boolean(params[:async])
-      category.assign_unassigned_members_in_background
-      render :json => progress_json(category.current_progress, @current_user, session)
-    else
-      # do the distribution and note the changes
-      memberships = category.assign_unassigned_members
-
-      # render the changes
-      json = memberships.group_by{ |m| m.group_id }.map do |group_id, new_members|
-        { :id => group_id, :new_members => new_members.map{ |m| m.user.group_member_json(@context) } }
-      end
-      render :json => json
-    end
-  end
-
   # @API Upload a file
   #
   # Upload a file to the group.
@@ -678,6 +667,30 @@ class GroupsController < ApplicationController
     @attachment = Attachment.new(:context => @context)
     if authorized_action(@attachment, @current_user, :create)
       api_attachment_preflight(@context, request, :check_quota => true)
+    end
+  end
+
+  include Api::V1::PreviewHtml
+  # @API Preview processed html
+  #
+  # Preview html content processed for this group
+  #
+  # @argument html [String]
+  #   The html content to process
+  #
+  # @example_request
+  #     curl https://<canvas>/api/v1/groups/<group_id>/preview_html \
+  #          -F 'html=<p><badhtml></badhtml>processed html</p>' \
+  #          -H 'Authorization: Bearer <token>'
+  #
+  # @example_response
+  #   {
+  #     "html": "<p>processed html</p>"
+  #   }
+  def preview_html
+    get_context
+    if @context && authorized_action(@context, @current_user, :read)
+      render_preview_html
     end
   end
 
@@ -710,7 +723,7 @@ class GroupsController < ApplicationController
 
   def find_group
     if api_request?
-      @group = Group.active.find(params[:group_id])
+      @group = api_find(Group.active, params[:group_id])
     else
       @group = @context if @context.is_a?(Group)
       @group ||= (@context ? @context.groups : Group).find(params[:id])

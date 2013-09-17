@@ -1,0 +1,20 @@
+<div class="popover-title">
+  {{#ifEqual ENV.group_user_type "student"}}
+    {{#t "add_unassigned_student"}}Add Unassigned Student{{/t}}
+  {{else}}
+    {{#t "add_unassigned_user"}}Add Unassigned User{{/t}}
+  {{/ifEqual}}
+</div>
+<div class="popover-content">
+  <div class="form-search clearfix">
+    <input
+      type="text"
+      name="search_term"
+      class="search-query"
+      data-view="inputFilter"
+      placeholder='{{#t "search_people"}}Search people{{/t}}'
+      aria-label='{{#t "search_people"}}Search people{{/t}}'
+    >
+  </div>
+  <div data-view="users"></div>
+</div>

@@ -1,0 +1,48 @@
+<b class="author">{{list participants propName="name" limit=2}}</b>
+
+<span class="date pull-right">{{friendlyDatetime timestamp}}</span>
+
+<p class="subject">
+  {{#if subject}}
+    {{subject}}
+  {{else}}
+    ({{#t "no_subject"}}No subject{{/t}})
+  {{/if}}
+</p>
+
+<span class="message-count label">
+  {{message_count}}
+  <span class="screenreader-only">{{#t "total_messages"}}Total messages{{/t}}</span>
+</span>
+
+<div class="summary">{{last_message}}</div>
+
+<ul class="message-actions unstyled">
+  <li>
+    <a href="#"
+       class="star-btn {{#if starred}}active{{/if}}"
+       title="{{#if starred}}{{#t "unstar_conversation"}}Unstar conversation{{/t}}{{else}}{{#t "star_conversation"}}Star conversation{{/t}}{{/if}}"
+       aria-checked="{{#if starred}}true{{else}}false{{/if}}"
+       role="checkbox">
+      &#9734;
+      <span class="screenreader-only">
+        {{#t "starred"}}Starred{{/t}}
+      </span>
+    </a>
+  </li>
+  <li>
+    <a href="#"
+       class="read-state {{#unless unread}}read{{/unless}}"
+       role="checkbox"
+       aria-checked="{{#if unread}}true{{else}}false{{/if}}"
+       title="{{#if unread}}{{#t "mark_as_read"}}Mark as read{{/t}}{{else}}{{#t "mark_as_unread"}}Mark as unread{{/t}}{{/if}}">
+      <span class="screenreader-only">
+        {{#t "unread"}}Unread{{/t}}
+      </span>
+    </a>
+  </li>
+</ul>
+
+<a href="#" class="open-message" role="button">
+  {{#t "open_message"}}Open Message{{/t}}
+</a>

@@ -1,0 +1,10 @@
+<%
+  @body_classes << 'hide-content-while-scripts-not-loaded'
+  @body_classes << 'with_item_groups'
+
+  content_for :page_title, join_title((t '#titles.assignments', 'Assignments'),
+    @context.name)
+
+  js_bundle :assignment_index
+  jammit_css :new_assignments
+%>

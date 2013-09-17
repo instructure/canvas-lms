@@ -1,7 +1,7 @@
 class DueDateCacher
   def self.recompute(assignment)
     new([assignment]).send_later_if_production_enqueue_args(:recompute,
-      :singleton => "cached_due_date:calculator:#{assignment.global_id}")
+      :singleton => "cached_due_date:calculator:#{Shard.global_id_for(assignment)}")
   end
 
   def self.recompute_batch(assignments)
@@ -29,12 +29,13 @@ class DueDateCacher
     shard.activate do
       Assignment.transaction do
         # create temporary table
+        cast = Submission.connection.adapter_name == 'Mysql2' ? 'UNSIGNED INTEGER' : 'BOOL'
         Assignment.connection.execute("CREATE TEMPORARY TABLE calculated_due_ats AS (#{submissions.select([
           "submissions.id AS submission_id",
           "submissions.user_id",
           "submissions.assignment_id",
           "assignments.due_at",
-          "CAST(#{Submission.sanitize(false)} AS BOOL) AS overridden"
+          "CAST(#{Submission.sanitize(false)} AS #{cast}) AS overridden"
         ]).joins(:assignment).to_sql})")
 
         # create an ActiveRecord class around that temp table for the update_all
@@ -57,7 +58,8 @@ class DueDateCacher
           update_all("cached_due_date=calculated_due_ats.due_at")
 
         # clean up
-        Assignment.connection.execute("DROP TABLE calculated_due_ats")
+        temporary = "TEMPORARY " if Assignment.connection.adapter_name == 'Mysql2'
+        Assignment.connection.execute("DROP #{temporary}TABLE calculated_due_ats")
       end
     end
   end

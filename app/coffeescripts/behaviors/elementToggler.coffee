@@ -44,7 +44,7 @@ define [
       # update the element with the new text
       $this.html(newHtml)
 
-  toggleRegion = ($region, showRegion) ->
+  toggleRegion = ($region, showRegion, $trigger) ->
     showRegion ?= ($region.is(':ui-dialog:hidden') || ($region.attr('aria-expanded') != 'true'))
     $allElementsControllingRegion = $("[aria-controls*=#{$region.attr('id')}]")
 
@@ -52,7 +52,11 @@ define [
     # the data-hide-while-target-shown attribute
     $allElementsControllingRegion.filter(-> $(this).data('hideWhileTargetShown')).toggle !showRegion
 
-    $region.attr('aria-expanded', '' + showRegion).toggle showRegion
+    if $trigger and $trigger.attr('aria-expanded') isnt undefined
+      $trigger.attr('aria-expanded', !($trigger.attr('aria-expanded') is 'true'))
+      $region.toggle($trigger.attr('aria-expanded') is 'true')
+    else
+      $region.attr('aria-expanded', '' + showRegion).toggle showRegion
 
     # behavior if $region is a dialog
     if $region.is(':ui-dialog') || dialogOpts = $region.data('turnIntoDialog')
@@ -69,13 +73,6 @@ define [
         $region.dialog('open')
       else if $region.dialog('isOpen')
         $region.dialog('close')
-
-    if showRegion
-      # to make things accessable:
-      # move focus to the region if tabbable (or it's first tabbable child).
-      # to make anything tabbable, just give it a tabindex
-      $firstFocusableEl = $region.find('*').andSelf().filter(':focusable').first()
-      $firstFocusableEl.focus() if $firstFocusableEl.length
 
     $allElementsControllingRegion.each updateTextToState( if showRegion then 'Shown' else 'Hidden' )
 
@@ -94,4 +91,4 @@ define [
     $parent = $(document.body) unless $parent.length
 
     $region = $parent.find("##{$this.attr('aria-controls').replace(/\s/g, ', #')}")
-    toggleRegion($region, force) if $region.length
+    toggleRegion($region, force, $this) if $region.length

@@ -26,10 +26,11 @@ class WikiPage < ActiveRecord::Base
   include CopyAuthorizedLinks
   include ContextModuleItem
 
+  include SearchTermHelper
+
   belongs_to :wiki, :touch => true
   belongs_to :cloned_item
   belongs_to :user
-  has_many :wiki_page_comments, :order => "created_at DESC"
   acts_as_url :title, :scope => [:wiki_id, :not_deleted], :sync_url => true
 
   validate :validate_front_page_visibility
@@ -38,9 +39,10 @@ class WikiPage < ActiveRecord::Base
   before_validation :ensure_unique_title
 
   TITLE_LENGTH = WikiPage.columns_hash['title'].limit rescue 255
+  SIMPLY_VERSIONED_EXCLUDE_FIELDS = [:workflow_state, :hide_from_students, :editing_roles, :notify_of_update]
 
   def validate_front_page_visibility
-    if self.hide_from_students && self.front_page?
+    if self.hide_from_students && self.is_front_page?
       self.errors.add(:hide_from_students, t(:cannot_hide_page, "cannot hide front page"))
     end
   end
@@ -127,7 +129,11 @@ class WikiPage < ActiveRecord::Base
   end
 
   has_a_broadcast_policy
-  simply_versioned
+  simply_versioned :exclude => SIMPLY_VERSIONED_EXCLUDE_FIELDS, :when => Proc.new { |wp|
+    # :user_id and :updated_at do not merit creating a version, but should be saved
+    exclude_fields = [:user_id, :updated_at].concat(SIMPLY_VERSIONED_EXCLUDE_FIELDS).map(&:to_s)
+    (wp.changes.keys.map(&:to_s) - exclude_fields).present?
+  }
   after_save :remove_changed_flag
 
   workflow do
@@ -196,13 +202,15 @@ class WikiPage < ActiveRecord::Base
       locked = false
       if (m && !m.available_for?(user))
         locked = {:asset_string => self.asset_string, :context_module => m.attributes}
+        locked[:unlock_at] = locked[:context_module]["unlock_at"] if locked[:context_module]["unlock_at"]
       end
       locked
     end
   end
 
-  def front_page?
-    !self.deleted? && self.wiki.has_front_page? && self.url == self.wiki.get_front_page_url
+  def is_front_page?
+    return false if self.deleted?
+    self.url == self.wiki.get_front_page_url # wiki.get_front_page_url checks has_front_page? and context.draft_state_enabled?
   end
 
   def set_as_front_page!
@@ -224,35 +232,48 @@ class WikiPage < ActiveRecord::Base
   end
 
   set_policy do
-    given {|user, session| self.wiki.grants_right?(user, session, :read) && can_read_page?(user) }
+    given {|user, session| self.wiki.grants_right?(user, session, :read) && can_read_page?(user, session)}
     can :read
 
-    given {|user, session| self.wiki.grants_right?(user, session, :contribute) && can_read_page?(user) }
+    given {|user, session| self.can_edit_page?(user)}
     can :read
 
-    given {|user, session| self.editing_role?(user) && !self.locked_for?(user) }
-    can :read and can :update_content and can :create
+    given {|user, session| user && self.can_edit_page?(user)}
+    can :update_content and can :read_revisions
 
-    given {|user, session| self.wiki.grants_right?(user, session, :manage) }
-    can :create and can :read and can :update and can :delete and can :update_content
+    given {|user, session| user && self.can_edit_page?(user) && self.wiki.grants_right?(user, session, :create_page)}
+    can :create
 
-    given {|user, session| self.wiki.grants_right?(user, session, :manage_content) }
-    can :create and can :read and can :update and can :delete and can :update_content
+    given {|user, session| user && self.can_edit_page?(user) && self.wiki.grants_right?(user, session, :update_page)}
+    can :update and can :read_revisions
 
+    given {|user, session| user && self.can_edit_page?(user) && self.active? && self.wiki.grants_right?(user, session, :update_page_content)}
+    can :update_content and can :read_revisions
+
+    given {|user, session| user && self.can_edit_page?(user) && self.active? && self.wiki.grants_right?(user, session, :delete_page)}
+    can :delete
+
+    given {|user, session| user && self.can_edit_page?(user) && self.workflow_state == 'unpublished' && self.wiki.grants_right?(user, session, :delete_unpublished_page)}
+    can :delete
   end
 
-  def can_read_page?(user)
-    (!hide_from_students && self.active?) || (context.respond_to?(:admins) && context.admins.include?(user))
+  def can_read_page?(user, session=nil)
+    self.wiki.grants_right?(user, session, :manage) || (!hide_from_students && self.active?)
   end
 
-  def editing_role?(user)
+  def can_edit_page?(user, session=nil)
     context_roles = context.default_wiki_editing_roles rescue nil
-    edit_roles = editing_roles unless self.front_page?
-    roles = (edit_roles || context_roles || default_roles).split(",")
+    roles = (editing_roles || context_roles || default_roles).split(",")
+
+    # managers are always allowed to edit
+    return true if wiki.grants_right?(user, session, :manage)
+
     return true if roles.include?('teachers') && context.respond_to?(:teachers) && context.teachers.include?(user)
-    return true if !hide_from_students && roles.include?('students') && context.respond_to?(:students) && context.includes_student?(user)
-    return true if !hide_from_students && roles.include?('members') && context.respond_to?(:users) && context.users.include?(user)
-    return true if !hide_from_students && roles.include?('public')
+    # the remaining edit roles all require read access, so just check here
+    return false unless can_read_page?(user, session) && !self.locked_for?(user)
+    return true if roles.include?('students') && context.respond_to?(:students) && context.includes_student?(user)
+    return true if roles.include?('members') && context.respond_to?(:users) && context.users.include?(user)
+    return true if roles.include?('public')
     false
   end
 
@@ -404,6 +425,7 @@ class WikiPage < ActiveRecord::Base
         item.workflow_state = 'unpublished'
       end
     end
+    item.set_as_front_page! if !!hash[:front_page]
     context.imported_migration_items << item if context.imported_migration_items && item.new_record?
     item.migration_id = hash[:migration_id]
     (hash[:contents] || []).each do |sub_item|
@@ -525,10 +547,6 @@ class WikiPage < ActiveRecord::Base
       end
       return item
     end
-  end
-
-  def self.comments_enabled?
-    !Rails.env.production?
   end
 
   def increment_view_count(user, context = nil)

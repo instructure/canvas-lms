@@ -96,4 +96,16 @@ describe I18n do
         should == "thing count: 2"
     end
   end
+
+  context "_core_en.js" do
+    it "should be up-to-date" do
+      pending('RAILS_LOAD_ALL_LOCALES=true') unless ENV['RAILS_LOAD_ALL_LOCALES']
+      translations = {'en' => I18n.backend.direct_lookup('en').slice(*I18n::Utils::CORE_KEYS)}
+
+      # HINT: if this spec fails, run `rake i18n:generate_js`...
+      # it probably means you added a format or a new language
+      File.read('public/javascripts/translations/_core_en.js').should ==
+        I18n::Utils.dump_js(translations)
+    end
+  end
 end

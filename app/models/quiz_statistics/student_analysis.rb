@@ -1,10 +1,14 @@
 class QuizStatistics::StudentAnalysis < QuizStatistics::Report
   include TextHelper
 
+  class TemporaryUser < Struct.new(:id, :short_name)
+  end
+
   # returns a blob of stats junk like this:
   # {
   #   :multiple_attempts_exist=>false,
   #   :submission_user_ids=>#<Set: {2, ...}>,
+  #   :submission_logged_out_users=>#<Array: [<#Hash: {"id"=>"tmp_93920...", "short_name"=>"Anonymous User"}>]>,
   #   :unique_submission_count=>50,
   #   :submission_score_average=>5,
   #   :submission_score_high=>10,
@@ -42,10 +46,17 @@ class QuizStatistics::StudentAnalysis < QuizStatistics::Report
       s.attempt && s.attempt > 1
     }
     stats[:submission_user_ids] = Set.new
+    stats[:submission_logged_out_users] = []
     stats[:unique_submission_count] = 0
     correct_cnt = incorrect_cnt = total_duration = 0
-    submissions.each do |sub|
-      stats[:submission_user_ids] << sub.user_id if sub.user_id > 0
+    submissions.each_with_index do |sub,index|
+      #check for temporary user submissions
+      if sub.user_id
+        stats[:submission_user_ids] << sub.user_id if sub.user_id > 0
+      else
+        temp_user = TemporaryUser.new(sub.temporary_user_code, I18n.t(:logged_out_user, "Logged Out User %{user_counter}", :user_counter => index + 1))
+        stats[:submission_logged_out_users] << temp_user
+      end
       if !found_ids[sub.id]
         stats[:unique_submission_count] += 1
         found_ids[sub.id] = true
@@ -87,7 +98,7 @@ class QuizStatistics::StudentAnalysis < QuizStatistics::Report
     submissions.each do |s|
       s.submission_data.each do |a|
         q_id = a[:question_id]
-        a[:user_id] = s.user_id
+        a[:user_id] = s.user_id || s.temporary_user_code
         responses_for_question[q_id] ||= []
         responses_for_question[q_id] << a
       end
@@ -130,7 +141,7 @@ class QuizStatistics::StudentAnalysis < QuizStatistics::Report
 
   def to_csv
     start_progress
-
+    context = quiz.context
     columns = []
     columns << I18n.t('statistics.csv_columns.name', 'name') unless anonymous?
     columns << I18n.t('statistics.csv_columns.id', 'id') unless anonymous?
@@ -163,13 +174,19 @@ class QuizStatistics::StudentAnalysis < QuizStatistics::Report
     submissions.each_with_index do |submission, i|
       update_progress(i, submissions.size)
       row = []
-      row << submission.user.name unless anonymous?
-      row << submission.user_id unless anonymous?
-      row << submission.user.sis_pseudonym_for(quiz.context.account).try(:sis_user_id) unless anonymous?
+      if submission.user
+        row << submission.user.name unless anonymous?
+        row << submission.user_id unless anonymous?
+        row << submission.user.sis_pseudonym_for(quiz.context.account).try(:sis_user_id) unless anonymous?
+      else
+        3.times do
+          row << ''
+        end
+      end
       section_name = []
       section_id = []
       section_sis_id = []
-      submission.quiz.context.student_enrollments.active.where(:user_id => submission.user_id).each do |enrollment|
+      context.student_enrollments.active.where(:user_id => submission.user_id).each do |enrollment|
         section_name << enrollment.course_section.name
         section_id << enrollment.course_section.id
         section_sis_id << enrollment.course_section.try(:sis_source_id)
@@ -250,17 +267,28 @@ class QuizStatistics::StudentAnalysis < QuizStatistics::Report
 
   def submissions_for_statistics
     Shackles.activate(:slave) do
+      #submissions from users
       for_users = quiz.context.student_ids
       scope = quiz.quiz_submissions.where(:user_id => for_users)
-      scope = scope.includes(:versions) if includes_all_versions?
-      scope.map { |qs|
-        includes_all_versions? ?
-          qs.submitted_versions :
-          [qs.latest_submitted_version].compact
-      }.flatten.
-        select{ |s| s && s.completed? && s.submission_data.is_a?(Array) }.
-        sort { |a,b| b.updated_at <=> a.updated_at }
+      logged_out = quiz.quiz_submissions.logged_out
+
+      all_submissions = []
+      all_submissions = prep_submissions scope
+      all_submissions += prep_submissions logged_out
     end
+  end
+
+  def prep_submissions(submissions)
+    if includes_all_versions?
+      submissions = submissions.includes(:versions)
+    end
+    submissions.map { |qs|
+      includes_all_versions? ?
+        qs.submitted_versions :
+        [qs.latest_submitted_version].compact
+    }.flatten.
+      select{ |s| s && s.completed? && s.submission_data.is_a?(Array) }.
+      sort { |a,b| b.updated_at <=> a.updated_at }
   end
 
   def strip_html_answers(question)

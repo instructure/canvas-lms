@@ -10,3 +10,8 @@ define [
     @child 'courseFindSelect', '.courseFindSelect'
     @child 'dateShift', '.dateShift'
     @child 'selectContent', '.selectContent'
+
+    initialize: ->
+      super
+      @courseFindSelect.on 'course_changed', (course) =>
+        @dateShift.updateNewDates(course)

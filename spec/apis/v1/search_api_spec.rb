@@ -295,7 +295,7 @@ describe SearchController, :type => :integration do
           l['search'].should == 'cletus'
           l['type'].should == 'user'
         end
-        links.map{ |l| l[:rel] }.should == ['next', 'first']
+        links.map{ |l| l[:rel] }.should == ['current', 'next', 'first']
 
         # get the next page
         json = follow_pagination_link('next', :controller => 'search', :action => 'recipients')
@@ -306,7 +306,7 @@ describe SearchController, :type => :integration do
           l['search'].should == 'cletus'
           l['type'].should == 'user'
         end
-        links.map{ |l| l[:rel] }.should == ['first']
+        links.map{ |l| l[:rel] }.should == ['current', 'first']
       end
 
       it "should paginate contexts and return proper pagination headers" do
@@ -324,7 +324,7 @@ describe SearchController, :type => :integration do
           l['search'].should == 'ofcourse'
           l['type'].should == 'context'
         end
-        links.map{ |l| l[:rel] }.should == ['next', 'first']
+        links.map{ |l| l[:rel] }.should == ['current', 'next', 'first']
 
         # get the next page
         json = follow_pagination_link('next', :controller => 'search', :action => 'recipients')
@@ -335,7 +335,7 @@ describe SearchController, :type => :integration do
           l['search'].should == 'ofcourse'
           l['type'].should == 'context'
         end
-        links.map{ |l| l[:rel] }.should == ['first']
+        links.map{ |l| l[:rel] }.should == ['current', 'first']
       end
 
       it "should ignore invalid per_page" do
@@ -350,7 +350,7 @@ describe SearchController, :type => :integration do
           l['search'].should == 'cletus'
           l['type'].should == 'user'
         end
-        links.map{ |l| l[:rel] }.should == ['next', 'first']
+        links.map{ |l| l[:rel] }.should == ['current', 'next', 'first']
 
         # get the next page
         json = follow_pagination_link('next', :controller => 'search', :action => 'recipients')
@@ -361,7 +361,7 @@ describe SearchController, :type => :integration do
           l['search'].should == 'cletus'
           l['type'].should == 'user'
         end
-        links.map{ |l| l[:rel] }.should == ['first']
+        links.map{ |l| l[:rel] }.should == ['current', 'first']
       end
 
       it "should paginate combined context/user results" do
@@ -385,7 +385,7 @@ describe SearchController, :type => :integration do
           l[:uri].to_s.should match(%r{api/v1/search/recipients})
           l['search'].should == 'term'
         end
-        links.map{ |l| l[:rel] }.should == ['next', 'first']
+        links.map{ |l| l[:rel] }.should == ['current', 'next', 'first']
 
         # get the next page
         json = follow_pagination_link('next', :controller => 'search', :action => 'recipients')
@@ -396,7 +396,7 @@ describe SearchController, :type => :integration do
           l[:uri].to_s.should match(%r{api/v1/search/recipients})
           l['search'].should == 'term'
         end
-        links.map{ |l| l[:rel] }.should == ['next', 'first']
+        links.map{ |l| l[:rel] }.should == ['current', 'next', 'first']
 
         # get the final page
         json = follow_pagination_link('next', :controller => 'search', :action => 'recipients')
@@ -407,7 +407,7 @@ describe SearchController, :type => :integration do
           l[:uri].to_s.should match(%r{api/v1/search/recipients})
           l['search'].should == 'term'
         end
-        links.map{ |l| l[:rel] }.should == ['first']
+        links.map{ |l| l[:rel] }.should == ['current', 'first']
       end
     end
 

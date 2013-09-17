@@ -56,7 +56,7 @@ class Pseudonym < ActiveRecord::Base
     config.validations_scope = [:account_id, :workflow_state]
     config.perishable_token_valid_for = 30.minutes
     config.validates_length_of_login_field_options = {:within => 1..MAX_UNIQUE_ID_LENGTH}
-    config.validates_uniqueness_of_login_field_options = { :case_sensitive => false, :scope => [:account_id, :workflow_state], :if => lambda { |p| p.unique_id_changed? && p.active? } }
+    config.validates_uniqueness_of_login_field_options = { :case_sensitive => false, :scope => [:account_id, :workflow_state], :if => lambda { |p| (p.unique_id_changed? || p.workflow_state_changed?) && p.active? } }
   end
 
   attr_writer :require_password
@@ -85,7 +85,7 @@ class Pseudonym < ActiveRecord::Base
   
   def update_account_associations_if_account_changed
     return unless self.user && !User.skip_updating_account_associations?
-    if self.new_record?
+    if self.id_was.nil?
       return if %w{creation_pending deleted}.include?(self.user.workflow_state)
       self.user.update_account_associations(:incremental => true, :precalculated_associations => {self.account_id => 0})
     elsif self.account_id_changed?
@@ -113,7 +113,7 @@ class Pseudonym < ActiveRecord::Base
     if %w{mysql mysql2}.include?(connection_pool.spec.config[:adapter])
       where(:unique_id => unique_id)
     else
-      where("LOWER(#{quoted_table_name}.unique_id)=?", unique_id.mb_chars.downcase)
+      where("LOWER(#{quoted_table_name}.unique_id)=LOWER(?)", unique_id)
     end
   }
 
@@ -380,7 +380,7 @@ class Pseudonym < ActiveRecord::Base
     nil
   end
 
-  scope :active, where("pseudonyms.workflow_state IS NULL OR pseudonyms.workflow_state<>'deleted'")
+  scope :active, where(workflow_state: 'active')
 
   def self.serialization_excludes; [:crypted_password, :password_salt, :reset_password_token, :persistence_token, :single_access_token, :perishable_token, :sis_ssha]; end
 
@@ -432,5 +432,21 @@ class Pseudonym < ActiveRecord::Base
     else
       self.account.mfa_settings
     end
+  end
+
+  def claim_cas_ticket(ticket)
+    return unless Canvas.redis_enabled?
+    Canvas.redis.setex("cas_session:#{ticket}", 1.day, global_id)
+  end
+
+  def self.release_cas_ticket(ticket)
+    return unless Canvas.redis_enabled?
+    redis_key = "cas_session:#{ticket}"
+    if id = Canvas.redis.get(redis_key)
+      pseudonym = Pseudonym.find_by_id(id)
+      Canvas.redis.del(redis_key)
+    end
+    pseudonym.try(:reset_persistence_token!)
+    pseudonym
   end
 end

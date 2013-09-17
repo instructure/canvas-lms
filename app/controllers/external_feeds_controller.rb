@@ -76,9 +76,13 @@ class ExternalFeedsController < ApplicationController
   #
   # Create a new external feed for the course or group.
   #
-  # @argument url The url to the external rss or atom feed
-  # @argument header_match If given, only feed entries that contain this string in their title will be imported
-  # @argument verbosity ["full", "truncate", "link_only"]
+  # @argument url [String]
+  #   The url to the external rss or atom feed
+  #
+  # @argument header_match [Optional, Boolean]
+  #   If given, only feed entries that contain this string in their title will be imported
+  #
+  # @argument verbosity [String, "full"|"truncate"|"link_only"]
   #
   # @example_request
   #     curl https://<canvas>/api/v1/courses/<course_id>/external_feeds \ 

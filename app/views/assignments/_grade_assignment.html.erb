@@ -21,7 +21,7 @@
         <a href="#" class="upload_submissions_link icon-upload" style="<%= hidden unless @assignment.submissions_downloaded? %>">
           <%= t 'links.reupload_submissions', "Re-Upload Submissions" %>
         </a>
-        <% form_tag context_url(@context, :context_gradebook_submissions_upload_url, @assignment.id), {:id => "re_upload_submissions_form", :multipart => true, :style => "margin-top: 10px; display: none;"} do %>
+        <% form_tag context_url(@context, :submissions_upload_context_gradebook_url, @assignment.id), {:id => "re_upload_submissions_form", :multipart => true, :style => "margin-top: 10px; display: none;"} do %>
           <div style="font-size: 0.8em;">
             <%= mt :reupload_instructions, <<-EOT
 If you made changes to the student submission files you downloaded

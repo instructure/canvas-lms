@@ -1,0 +1,166 @@
+<% jammit_css :conversations_new %>
+<% js_bundle  :conversations_new %>
+<% @body_classes << 'full-width' %>
+
+<% content_for :page_title, t('titles.conversations', "Conversations") %>
+
+<div class="conversations">
+  <header class="panel">
+    <div class="filters">
+      <select class="course-filter" id="course-filter" aria-label="<%= t(:filter_messages_by_course, "Filter messages by course") %>"></select>
+
+      <select class="type-filter show-tick" id="type-filter" aria-label="<%= t(:filter_messages_by_type, "Filter messages by type") %>">
+        <option value="inbox"><%= t(:inbox, "Inbox") %></option>
+        <option value="unread"><%= t(:unread, "Unread") %></option>
+        <option value="starred"><%= t(:starred, "Starred") %></option>
+        <option value="sent"><%= t(:sent, "Sent") %></option>
+        <option value="archived"><%= t(:archived, "Archived") %></option>
+      </select>
+    </div>
+
+    <div class="actions">
+      <button class="btn"
+              id="compose-btn"
+              title="<%= t(:compose_new_message, "Compose a new message") %>"
+              data-tooltip>
+        <span class="screenreader-only"><%= t(:compose_new_message, "Compose a new message") %></span>
+        <i class="icon-compose"></i>
+      </button>
+
+      <div class="btn-group">
+        <button class="btn"
+                id="reply-btn"
+                title="<%= t(:reply, "Reply") %>"
+                data-tooltip
+                disabled>
+          <span class="screenreader-only"><%= t(:reply, "Reply") %></span>
+          <i class="icon-reply-2"></i>
+        </button>
+        <button class="btn"
+                id="reply-all-btn"
+                title="<%= t(:reply_all, "Reply all") %>"
+                data-tooltip
+                disabled>
+          <span class="screenreader-only"><%= t(:reply_all, "Reply all") %></span>
+          <i class="icon-reply-all-2"></i>
+        </button>
+        <button class="btn"
+                id="delete-btn"
+                title="<%= t(:delete, "Delete") %>"
+                data-tooltip
+                disabled>
+          <span class="screenreader-only"><%= t(:delete_conversation, "Delete conversation") %></span>
+          <i class="icon-trash"></i>
+        </button>
+      </div>
+
+      <button class="al-trigger btn"
+              id="admin-btn"
+              title="<%= t(:more_options, "More options") %>"
+              data-tooltip
+              disabled>
+        <span class="screenreader-only"><%= t(:settings, "Settings") %></span>
+        <i class="icon-settings"></i>
+        <i class="icon-mini-arrow-down"></i>
+      </button>
+      <ul class="al-options" id="admin-menu">
+        <li><a href="#" id="mark-unread-btn"><%= t(:mark_as_unread, "Mark as unread") %></a></li>
+        <li><a href="#" id="forward-btn"><%= t(:forward, "Forward") %></a></li>
+        <li><a href="#" id="star-toggle-btn"><%# text set by view %></a></li>
+      </ul>
+    </div>
+
+    <div id="sending-message" class="badge badge-info" aria-live="polite">
+      <span><%= t(:sending, "sending") %></span>
+      <div id="sending-spinner"></div>
+    </div>
+
+    <div class="admin-link pull-right">
+      <a id="help-btn"
+         class="al-trigger help-btn"
+         href="#"
+         role="button"
+         aria-haspopup="true"
+         aria-owns="help-menu-items">
+        <i class="icon-question"></i>
+        <i class="icon-mini-arrow-down"></i>
+        <span class="screenreader-only"><%= t(:help, "Help") %></span>
+      </a>
+
+      <ul id="help-menu-items"
+          class="al-options"
+          role="menu"
+          tabindex="0"
+          aria-hidden="true"
+          aria-expanded="false"
+          aria-activedescendant="switch-to-old-conversations-menu-item">
+        <li role="presentation">
+          <a id="switch-to-old-conversations-menu-item"
+             href="/conversations/toggle_new_conversations"
+             data-method="post"
+             rel="nofollow"
+             tabindex="-1"
+             role="menuitem"
+             title="<%= t(:switch_to_old_conversations, "Switch Back to Old Conversations") %>"><%= t(:switch_to_old_conversations, "Switch Back to Old Conversations")%></a>
+        </li>
+      </ul>
+    </div>
+
+    <div role="search" class="search pull-right form-search">
+      <div class="ac" id="search-autocomplete">
+        <div class="ac-input-box">
+          <ul class="ac-token-list"></ul>
+          <input type="search"
+                 class="ac-input"
+                 id="compose-message-recipients"
+                 aria-expanded="false"
+                 aria-activedescendant=""
+                 aria-owns="ac-result-list-2"
+                 aria-labelledby="ac-placeholder-1"
+                 aria-autocomplete="list"
+                 role="combobox" />
+
+          <span class="ac-placeholder" id="ac-placeholder-1">
+            <%= t(:enter_name_group_or_course, "Enter a name, group, or course") %>
+          </span>
+
+          <a href="#"
+             class="ac-clear"
+             title="<%= t(:clear_search, "Clear search results") %>">
+            <i class="icon-x"></i>
+            <span class="screenreader-only">
+              <%= t(:clear_search, "Clear search results") %>
+            </span>
+          </a>
+        </div>
+
+        <button class="btn ac-search-btn recipient-finder"
+                id="search-btn"
+                type="button"
+                title="<%= t(:search_for_recipients, "Search for recipients") %>"
+                data-tooltip>
+          <i class="icon-address-book"></i>
+          <span class="screenreader-only">
+            <%= t(:search_names_groups_courses, "Search names, groups, and courses") %>
+          </span>
+        </button>
+
+        <div class="ac-result-wrapper" id="ac-result-list-2" aria-hidden="true">
+          <div class="ac-result-container">
+            <div class="ac-result-contents">
+              <ul class="ac-result-list collectionViewItems" role="menu"></ul>
+              <div class="paginatedLoadingIndicator"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="row-fluid messaging-wrapper">
+    <div class="span4 message-list-scroller">
+      <div class="message-list"></div>
+    </div>
+    <div class="span8 message-detail"></div>
+  </div>
+</div>

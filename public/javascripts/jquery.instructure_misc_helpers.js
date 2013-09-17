@@ -115,6 +115,7 @@ define([
               notRightSideIsTallerThanRightSide = notRightSideHeight > rightSideHeight,
               rightSideBottomIsBelowMainBottom = ( headerHeight + $main.height() - windowScrollTop ) <= ( rightSideHeight + rightSideMarginBottom );
         }
+
         // windows chrome repaints when you set the class, even if the classes
         // aren't truly changing, which wreaks havoc on open select elements.
         // so we only toggle if we really need to
@@ -128,7 +129,6 @@ define([
       var throttledOnScroll = _.throttle(onScroll, 50);
       throttledOnScroll();
       $window.scroll(throttledOnScroll);
-      setInterval(throttledOnScroll, 1000);
       scrollSideBarIsBound = true;
     }
   };

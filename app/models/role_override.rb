@@ -573,7 +573,7 @@ class RoleOverride < ActiveRecord::Base
         ]
       },
       :manage_alerts => {
-        :label => lambda { t('permissions.manage_alerts', "Manage global alerts") },
+        :label => lambda { t('permissions.manage_announcements', "Manage global announcements") },
         :account_only => true,
         :true_for => %w(AccountAdmin),
         :available_to => %w(AccountAdmin AccountMembership),

@@ -188,6 +188,7 @@ define([
           intent: options.intent,
           folder_id: $.isFunction(options.folder_id) ? (options.folder_id.call($form)) : options.folder_id,
           file_elements: $form.find("input[type='file']:visible"),
+          files: $.isFunction(options.files) ? (options.files.call($form)) : options.files,
           url: (options.upload_only ? null : action),
           method: options.method,
           uploadDataUrl: options.uploadDataUrl,
@@ -954,7 +955,7 @@ define([
     var errorDetails = {};
     $('#aria_alerts').empty();
     $.each(errors, function(name, msg) {
-      var $obj = $form.find(":input[name='" + name + "'],:input[name*='[" + name + "]']").filter(":first");
+      var $obj = $form.find(":input[name='" + name + "'],:input[name*='[" + name + "]']").filter(":visible").first();
       if(!$obj || $obj.length === 0 || name == "general") {
         $obj = $form;
       }

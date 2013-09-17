@@ -296,6 +296,8 @@ describe TextHelper do
         -----------------
 
         Link to Foo ( http://foo.com )
+
+        Some Image
       END
     end
 
@@ -318,7 +320,9 @@ describe TextHelper do
         <br/>
         This is an h6 tag<br/>
         <br/>
-        Link to Foo ( <a href='http://foo.com'>http://foo.com</a> )</p>
+        Link to Foo ( <a href='http://foo.com'>http://foo.com</a> )<br/>
+        <br/>
+        Some Image</p>
       END
     end
 

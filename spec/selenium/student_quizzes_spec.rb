@@ -16,6 +16,7 @@ describe "quizzes" do
         @quiz.save!
       end
 
+      # This feature doesn't exist for draft state yet
       describe "on main page" do
         def validate_description_text(does_contain_text, text)
           description = f('.description')
@@ -56,7 +57,7 @@ describe "quizzes" do
         def validate_resume_button_text(text)
           f('#not_right_side .take_quiz_button').text.should == text
         end
-        
+
         before do
           @resume_text = 'Resume Quiz'
         end
@@ -78,6 +79,22 @@ describe "quizzes" do
           update_quiz_lock(Time.now - 5.minutes, nil)
           get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
           f('#not_right_side .take_quiz_button').should_not be_present
+        end
+
+        it "should not see the publish button" do
+          get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
+          f('#quiz-publish-link').should_not be_present
+        end
+
+        it "should not see unpublished warning" do
+          # set to unpublished state
+          @quiz.last_edited_at = Time.now
+          @quiz.published_at   = 1.hour.ago
+          @quiz.save!
+
+          get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
+
+          f(".unpublished_warning").should_not be_present
         end
       end
     end

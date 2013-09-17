@@ -89,7 +89,7 @@ class Pool
     read_config(options[:config_file])
 
     # fork to handle unlocking (to prevent polluting the parent with worker objects)
-    unlock_pid = fork do
+    unlock_pid = fork_with_reconnects do
       unlock_orphaned_jobs
     end
     Process.wait unlock_pid
@@ -148,13 +148,21 @@ class Pool
       worker = Delayed::Worker.new(worker_config)
     end
 
-    pid = fork do
-      Canvas.reconnect_redis
-      Delayed::Job.reconnect!
+    pid = fork_with_reconnects do
       Delayed::Periodic.load_periodic_jobs_config
       worker.start
     end
     workers[pid] = worker
+  end
+
+  # child processes need to reconnect so they don't accidentally share redis or
+  # db connections with the parent
+  def fork_with_reconnects
+    fork do
+      Canvas.reconnect_redis
+      Delayed::Job.reconnect!
+      yield
+    end
   end
 
   def spawn_periodic_auditor
@@ -178,7 +186,7 @@ class Pool
   end
 
   def schedule_periodic_audit
-    pid = fork do
+    pid = fork_with_reconnects do
       # we want to avoid db connections in the main pool process
       $0 = "delayed_periodic_audit_scheduler"
       Delayed::Periodic.load_periodic_jobs_config
@@ -196,7 +204,11 @@ class Pool
           say "ran auditor: #{worker}"
         else
           say "child exited: #{child}, restarting", :info
-          unlock_orphaned_jobs(worker, child)
+          # fork to handle unlocking (to prevent polluting the parent with worker objects)
+          unlock_pid = fork_with_reconnects do
+            unlock_orphaned_jobs(worker, child)
+          end
+          Process.wait unlock_pid
           spawn_worker(worker.config)
         end
       end
