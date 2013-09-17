@@ -68,7 +68,7 @@ class AccountReport < ActiveRecord::Base
       self.save
     end
   end
-  handle_asynchronously :run_report
+  handle_asynchronously :run_report, :priority => Delayed::LOW_PRIORITY, :max_attempts => 1
 
   def has_parameter?(key)
     self.parameters.is_a?(Hash) && self.parameters[key].presence
