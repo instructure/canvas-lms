@@ -266,7 +266,7 @@ class PseudonymSessionsController < ApplicationController
   end
 
   def saml_consume
-    if @domain_root_account.saml_authentication? && params[:SAMLResponse]
+    if @domain_root_account.account_authorization_configs.any? { |aac| aac.saml_authentication? } && params[:SAMLResponse]
       # Break up the SAMLResponse into chunks for logging (a truncated version was probably already
       # logged with the request when using syslog)
       chunks = params[:SAMLResponse].scan(/.{1,1024}/)
@@ -401,7 +401,7 @@ class PseudonymSessionsController < ApplicationController
   end
 
   def saml_logout
-    if @domain_root_account.saml_authentication? && params[:SAMLResponse]
+    if @domain_root_account.account_authorization_configs.any? { |aac| aac.saml_authentication? } && params[:SAMLResponse]
       response = saml_logout_response(params[:SAMLResponse])
       if  aac = @domain_root_account.account_authorization_configs.find_by_idp_entity_id(response.issuer)
         settings = aac.saml_settings(request.host_with_port)

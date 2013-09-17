@@ -250,6 +250,44 @@ describe PseudonymSessionsController do
       Setting.set_config("saml", nil)
     end
 
+    context "multiple authorization configs" do
+      before do
+        @account = Account.create!
+        @unique_id = 'foo@example.com'
+        @user1 = user_with_pseudonym(:active_all => true, :username => @unique_id, :account => @account)
+        aac1 = Account.default.account_authorization_configs.create!(:auth_type => 'ldap', :identifier_format => 'uid')
+        @account.account_authorization_configs << aac1
+
+        aac2 = AccountAuthorizationConfig.new
+        aac2.auth_type = "saml"
+        aac2.idp_entity_id = "https://example.com/idp1"
+        aac2.log_out_url = "https://example.com/idp1/slo"
+        @account.account_authorization_configs << aac2
+
+        @stub_hash = {:issuer => aac2.idp_entity_id, :is_valid? => true, :success_status? => true, :name_id => @unique_id, :name_qualifier => nil, :session_index => nil, :process => nil}
+      end
+
+      it "should saml_consume login with multiple authorization configs" do
+        controller.stubs(:saml_response).returns(
+            stub('response', @stub_hash)
+        )
+        controller.request.env['canvas.domain_root_account'] = @account
+        get 'saml_consume', :SAMLResponse => "foo", :RelayState => "/courses"
+        response.should redirect_to(courses_url)
+        session[:saml_unique_id].should == @unique_id
+      end
+
+      it "should saml_logout with multiple authorization configs" do
+        controller.stubs(:saml_logout_response).returns(
+            stub('response', @stub_hash)
+        )
+        controller.request.env['canvas.domain_root_account'] = @account
+        get 'saml_logout', :SAMLResponse => "foo", :RelayState => "/courses"
+
+        response.should redirect_to(:action => :destroy)
+      end
+    end
+
     context "multiple SAML configs" do
       before do
         @account = account_with_saml(:saml_log_in_url => "https://example.com/idp1/sli")
