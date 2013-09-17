@@ -207,6 +207,9 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly) ->
         data.unlock_at = defaultDates?.get('unlock_at') or null
         data.due_at = defaultDates?.get('due_at') or null
         data.assignment_overrides = @dueDateOverrideView.getOverrides()
+      else
+        unfudged = $.unfudgeDateForProfileTimezone(data.due_at)
+        data.due_at = $.dateToISO8601UTC(unfudged) if unfudged?
       return data
 
     submit: (event) =>
