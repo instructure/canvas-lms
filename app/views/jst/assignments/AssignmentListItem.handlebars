@@ -14,7 +14,7 @@
   </a>
   <div class="ig-details row-fluid">
     {{#if canManage}}
-      <div class="span4 ellipses modules">
+      <div class="span3 ellipses modules">
         {{#if has_modules}}
           {{#ifEqual module_count 1}}
             {{module_name}} {{#t "module"}}Module{{/t}}
@@ -35,20 +35,10 @@
       </div>
     {{/if}}
 
-    <div class="span4 ellipses">
-      {{#if multipleDueDates}}
-        <strong>{{#t "quiz_due"}}Due{{/t}}</strong>
-        <span data-view="vdd-due-tooltip"></span>
+    <div class="span3 ellipses" data-view="date-available"></div>
+    <div class="span3 ellipses" data-view="date-due"></div>
 
-      {{else}}
-        {{#if dueAt}}
-        <strong>{{#t "due_date"}}Due{{/t}}</strong>
-        {{datetimeFormatted dueAt}}
-        {{/if}}
-      {{/if}}
-    </div>
-
-    <div class="span4 ellipses">
+    <div class="span3 ellipses">
       {{#if pointsPossible}}{{#t "points_possible"}}{{pointsPossible}} pts{{/t}}{{/if}}
     </div>
   </div>
@@ -103,6 +93,6 @@
       </ul>
     </div>
 
-    <form data-view="editAssignment" class="form-dialog"></form>
+    <form data-view="edit-assignment" class="form-dialog"></form>
   {{/if}}
 </div>

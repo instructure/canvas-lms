@@ -1,0 +1,55 @@
+{{#if multipleDueDates}}
+  <strong>{{#t "available"}}Available{{/t}}</strong>
+
+  <a title class="vdd_tooltip_link"
+     aria-labelledby="vdd_tooltip_{{selector}}"
+     data-tooltip-selector="#vdd_tooltip_{{selector}}"
+     {{#if linkHref}}href="{{linkHref}}"{{/if}}
+     >{{#t "multiple_dates"}}Multiple Dates{{/t}}</a>
+
+  <div id="vdd_tooltip_{{selector}}" style="display:none;">
+    <dl class="vdd_tooltip_content dl-horizontal">
+      {{#each allDates}}
+        <div class="clearfix">
+          <dt>{{dueFor}}</dt>
+          <dd>
+            <dd>
+              {{#if available}}
+                {{#t "available"}}Available{{/t}}
+              {{/if}}
+
+              {{#if pending}}
+                {{#t "available_on"}}Available on{{/t}}
+                {{strftime unlockAt "%b %-d"}}
+              {{/if}}
+
+              {{#if open}}
+                {{#t "available_until"}}Available until{{/t}}
+                {{strftime lockAt "%b %-d"}}
+              {{/if}}
+
+              {{#if closed}}
+                {{#t "closed"}}Closed{{/t}}
+              {{/if}}
+            </dd>
+          </dd>
+        </div>
+      {{/each}}
+    </dl>
+  </div>
+
+{{else}}
+  {{#if defaultDates.pending}}
+    <strong>{{#t "not_available_until"}}Not available until{{/t}}</strong>
+    {{strftime defaultDates.unlockAt "%b %-d"}}
+  {{/if}}
+
+  {{#if defaultDates.open}}
+    <strong>{{#t "available_until"}}Available until{{/t}}</strong>
+    {{strftime defaultDates.lockAt "%b %-d"}}
+  {{/if}}
+
+  {{#if defaultDates.closed}}
+    <strong>{{#t "closed"}}Closed{{/t}}</strong>
+  {{/if}}
+{{/if}}

@@ -3,19 +3,21 @@ define [
   'Backbone'
   'underscore'
   'compiled/views/PublishIconView'
-  'compiled/views/VddTooltipView'
+  'compiled/views/assignments/DateDueColumnView'
+  'compiled/views/assignments/DateAvailableColumnView'
   'compiled/views/assignments/CreateAssignmentView'
   'compiled/fn/preventDefault'
   'jst/assignments/AssignmentListItem'
-], (I18n, Backbone, _, PublishIconView, VddTooltipView, CreateAssignmentView, preventDefault, template) ->
-
+], (I18n, Backbone, _, PublishIconView, DateDueColumnView, DateAvailableColumnView, CreateAssignmentView, preventDefault, template) ->
   class AssignmentListItemView extends Backbone.View
     tagName: "li"
+    className: "assignment"
     template: template
 
-    @child 'publishIconView',    '[data-view=publish-icon]'
-    @child 'vddDueTooltipView',  '[data-view=vdd-due-tooltip]'
-    @child 'editAssignmentView', '[data-view=editAssignment]'
+    @child 'publishIconView',         '[data-view=publish-icon]'
+    @child 'dateDueColumnView',       '[data-view=date-due]'
+    @child 'dateAvailableColumnView', '[data-view=date-available]'
+    @child 'editAssignmentView',      '[data-view=edit-assignment]'
 
     els:
       '.edit_assignment': '$editAssignmentButton'
@@ -40,25 +42,27 @@ define [
         @model.on(observe, @render)
 
     initializeChildViews: ->
-      @publishIconView = false
+      @publishIconView    = false
       @editAssignmentView = false
-      @vddDueTooltipView = false
+      @vddDueColumnView   = false
+      @dateAvailableColumnView = false
 
       if @canManage()
         @publishIconView    = new PublishIconView(model: @model)
         @editAssignmentView = new CreateAssignmentView(model: @model)
 
-        if @model.multipleDueDates()
-          @vddDueTooltipView = new VddTooltipView(model: @model)
+      @dateDueColumnView       = new DateDueColumnView(model: @model)
+      @dateAvailableColumnView = new DateAvailableColumnView(model: @model)
 
     updatePublishState: =>
       @$('.ig-row').toggleClass('ig-published', @model.get('published'))
 
     # call remove on children so that they can clean up old dialogs.
     render: ->
-      @publishIconView.remove() if @publishIconView
-      @editAssignmentView.remove() if @editAssignmentView
-      @vddDueTooltipView.remove() if @vddDueTooltipView
+      @publishIconView.remove()         if @publishIconView
+      @editAssignmentView.remove()      if @editAssignmentView
+      @dateDueColumnView.remove()       if @dateDueColumnView
+      @dateAvailableColumnView.remove() if @dateAvailableColumnView
       super
 
       # reset the model's view property; it got overwritten by child views

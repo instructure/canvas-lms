@@ -1,12 +1,12 @@
 define [
   'i18n!assignments'
   'Backbone'
-  'jst/VddTooltipView'
+  'jst/assignments/DateDueColumnView'
   'jquery'
   'compiled/behaviors/tooltip'
 ], (I18n, Backbone, template, $) ->
 
-  class VddTooltipView extends Backbone.View
+  class DateDueColumnView extends Backbone.View
     template: template
 
     els:
@@ -19,8 +19,12 @@ define [
         content: -> $($(@).data('tooltipSelector')).html()
 
     toJSON: ->
-      base = super
-      base.selector = @model.get("id")
-      base.linkHref = @model.htmlUrl()
-      base.allDates = @model.allDates()
-      base
+      data = @model.toView()
+      data.canManage = @canManage()
+      data.selector  = @model.get("id") + "_due"
+      data.linkHref  = @model.htmlUrl()
+      data.allDates  = @model.allDates()
+      data
+
+    canManage: ->
+      ENV.PERMISSIONS.manage
