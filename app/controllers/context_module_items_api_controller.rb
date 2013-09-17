@@ -448,10 +448,11 @@ class ContextModuleItemsApiController < ApplicationController
       return render :json => { :message => 'missing asset_id' }, :status => :bad_request unless asset_id
 
       # assemble a sequence of content tags in the course
+      # (break ties on module position by module id)
       tags = @context.module_items_visible_to(@current_user).
-          select('content_tags.*, context_modules.position AS module_position').
+          select('content_tags.*, context_modules.id as module_id, context_modules.position AS module_position').
           reject { |item| item.content_type == 'ContextModuleSubHeader' }.
-          sort_by { |item| [item.module_position.to_i, item.position] }
+          sort_by { |item| [item.module_position.to_i, item.module_id, item.position] }
 
       # find content tags to include
       tag_indices = []
