@@ -29,44 +29,50 @@ define [
 
     render: (drag=true) ->
       super
-      @_initSort() if drag
+      @initSort() if drag
       @
 
     attachCollection: ->
       super
       @collection.on 'add', @_noItemsViewIfEmpty
 
-    _initSort: ->
+    initSort: ->
       @$list.sortable(_.extend({}, @sortOptions, scope: @cid))
+        .on('sortstart', @modifyPlaceholder)
         .on('sortreceive', @_onReceive)
         .on('sortupdate', @_updateSort)
         .on('sortremove', @_noItemsViewIfEmpty)
-        .on('sortover', @_noItemsViewIfEmpty)
       @$list.disableSelection()
       @_noItemsViewIfEmpty()
+
+    modifyPlaceholder: (e, ui) =>
+      $(ui.placeholder).data("group", @groupId)
 
     # If there are no children within the group,
     # add the view that is used when there are no items in a group
     _noItemsViewIfEmpty: =>
-      items = @$list.children()
-
-      if items.length == 0
-        @noItems = new Backbone.View
-          template: @noItemTemplate
-          tagName: "li"
-          className: "no-items"
-        @noItems.render()
-        @$list.append(@noItems.el)
+      list = @$list.children()
+      if list.length == 0
+        @insertNoItemView()
       else
-        @noItems.remove() if @noItems
+        @removeNoItemView()
+
+    insertNoItemView: ->
+      @noItems = new Backbone.View
+        template: @noItemTemplate
+        tagName: "li"
+        className: "no-items"
+      @$list.append(@noItems.render().el)
+
+    removeNoItemView: ->
+      @noItems.remove() if @noItems
 
     # Find an item without knowing the group it is in
     searchItem: (itemId) ->
       chosen = null
       @parentCollection.find (group) =>
         assignments = group.get(@childKey)
-        result = assignments.find (a) =>
-          a.id == itemId
+        result = assignments.findWhere id: itemId
         chosen = result if result?
       chosen
 
@@ -89,19 +95,15 @@ define [
       @_removeFromGroup(model)
       @_addToGroup(model)
 
-      @_noItemsViewIfEmpty()
-
     _removeFromGroup: (model) ->
       old_group_id = model.get(@groupKey)
-      old_group = @parentCollection.find (g) =>
-        g.id == old_group_id
+      old_group = @parentCollection.findWhere id: old_group_id
       old_children = old_group.get(@childKey)
       old_children.remove(model, {silent: true})
 
     _addToGroup: (model) ->
       model.set(@groupKey, @groupId)
-      new_group = @parentCollection.find (g) =>
-        g.id == @groupId
+      new_group = @parentCollection.findWhere id: @groupId
       new_children = new_group.get(@childKey)
       new_children.add(model, {silent: true})
 

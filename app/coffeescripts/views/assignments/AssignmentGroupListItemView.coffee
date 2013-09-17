@@ -10,7 +10,8 @@ define [
   'compiled/views/MoveDialogView'
   'compiled/fn/preventDefault'
   'jst/assignments/AssignmentGroupListItem'
-], (I18n, _, Cache, DraggableCollectionView, AssignmentListItemView, CreateAssignmentView, CreateGroupView, DeleteGroupView, MoveDialogView, preventDefault, template) ->
+], (I18n, _, Cache, DraggableCollectionView, AssignmentListItemView, CreateAssignmentView,
+  CreateGroupView, DeleteGroupView, MoveDialogView, preventDefault, template) ->
 
   class AssignmentGroupListItemView extends DraggableCollectionView
     @optionProperty 'course'
@@ -124,6 +125,23 @@ define [
       key = @cacheKey()
       if !@cache.get(key)?
         @cache.set(key, true)
+
+    initSort: ->
+      super
+      @$list.on('sortactivate', @startSort)
+        .on('sortdeactivate', @endSort)
+
+    startSort: (e, ui) =>
+      # When there is 1 assignment in this group and you drag an assignment
+      # from another group, don't insert the noItemView
+      if @collection.length == 1 && $(ui.placeholder).data("group") == @model.id
+        @insertNoItemView()
+
+    endSort: (e, ui) =>
+      if @collection.length == 0 && @$list.children().length < 1
+        @insertNoItemView()
+      else if @$list.children().length > 1
+        @removeNoItemView()
 
     toJSON: ->
       data = @model.toJSON()
