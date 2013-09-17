@@ -64,7 +64,7 @@ define [
     toJSON: ->
       data = super
       _.extend({}, data,
-        firstResetLanded: not @empty
+        firstResetLanded: @firstResetLanded
       )
 
     _initSort: ->

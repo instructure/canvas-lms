@@ -140,6 +140,21 @@ describe "assignment groups" do
     end
   end
 
+  context "draft state with no assignments or assignment groups" do
+    before do
+      Account.default.settings[:enable_draft] = true
+      Account.default.save!
+      @domain_root_account = Account.default
+      course_with_teacher_logged_in(:active_all => true)
+    end
+
+    it "should display no assignment groups" do
+      get "/courses/#{@course.id}/assignments"
+      wait_for_ajaximations
+      fj(".ig-empty-msg").should include_text("No Assignment Groups found")
+    end
+  end
+
   context "draft state" do
     before do
       Account.default.settings[:enable_draft] = true
