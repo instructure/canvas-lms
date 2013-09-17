@@ -881,7 +881,7 @@ class User < ActiveRecord::Base
     self.update_account_associations
   end
 
-  def associate_with_shard(shard)
+  def associate_with_shard(shard, strength = :strong)
   end
 
   def self.clone_communication_channel(cc, new_user, max_position)
@@ -2491,7 +2491,7 @@ class User < ActiveRecord::Base
   def self.preload_shard_associations(users)
   end
 
-  def associated_shards
+  def associated_shards(strength = :strong)
     [Shard.default]
   end
 

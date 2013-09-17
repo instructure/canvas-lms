@@ -14,8 +14,10 @@ class UserMerge
     return unless target_user
     return if target_user == from_user
     target_user.save if target_user.changed?
-    from_user.associated_shards.each do |shard|
-      target_user.associate_with_shard(shard)
+    [:strong, :weak, :shadow].each do |strength|
+      from_user.associated_shards(strength).each do |shard|
+        target_user.associate_with_shard(shard, strength)
+      end
     end
 
     max_position = target_user.communication_channels.last.try(:position) || 0
@@ -87,7 +89,7 @@ class UserMerge
       from_user.communication_channels.update_all(["user_id=?, position=position+?", target_user, max_position]) unless from_user.communication_channels.empty?
     end
 
-    Shard.with_each_shard(from_user.associated_shards) do
+    Shard.with_each_shard(from_user.associated_shards + from_user.associated_shards(:weak) + from_user.associated_shards(:shadow)) do
       max_position = Pseudonym.where(:user_id => target_user).order(:position).last.try(:position) || 0
       Pseudonym.where(:user_id => from_user).update_all(["user_id=?, position=position+?", target_user, max_position])
 
