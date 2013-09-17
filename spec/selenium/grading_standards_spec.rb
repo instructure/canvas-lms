@@ -11,17 +11,20 @@ describe "grading standards" do
     standard = f("#grading_standard_new")
     standard.should_not be_nil
     standard.should have_class(/editing/)
-    standard.find_elements(:css, ".delete_row_link").select(&:displayed?).each_with_index do |link, i|
+    elements = standard.find_elements(:css, ".delete_row_link").select(&:displayed?)
+    remaining_elements = elements.count
+    elements.each_with_index do |link, i|
       if i % 2 == 1
           link.click
-          wait_for_js
+          remaining_elements -= 1
+          wait_for_ajax_requests
           keep_trying_until { !link.should_not be_displayed }
       end
     end
     standard.find_element(:css, "input.scheme_name").send_keys("New Standard")
     standard.find_element(:css, ".save_button").click
     keep_trying_until { !standard.attribute(:class).match(/editing/) }
-    standard.find_elements(:css, ".grading_standard_row").select(&:displayed?).length.should == 6
+    standard.find_elements(:css, ".grading_standard_row").select(&:displayed?).length.should == remaining_elements
     standard.find_element(:css, ".standard_title .title").text.should == "New Standard"
 
     id = standard.attribute(:id)
