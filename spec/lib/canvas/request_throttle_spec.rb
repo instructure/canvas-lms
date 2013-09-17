@@ -106,34 +106,50 @@ describe 'Canvas::RequestThrottle' do
 
     it "should skip without redis enabled" do
       Canvas.stubs(:redis_enabled?).returns(false)
-      Canvas::RequestThrottle::LeakyBucket.expects(:new).never
+      Redis::Scripting::Module.any_instance.expects(:run).never
       throttler.call(request_user_1).should == response
     end
 
     it "should skip if no client_identifier found" do
-      Canvas::RequestThrottle::LeakyBucket.expects(:new).never
+      Redis::Scripting::Module.any_instance.expects(:run).never
       throttler.call(request_no_session).should == response
     end
 
-    it "should throttle if bucket is full" do
+    def throttled_request
       bucket = mock('Bucket')
       Canvas::RequestThrottle::LeakyBucket.expects(:new).with("1").returns(bucket)
-      bucket.expects(:load_data)
+      bucket.expects(:reserve_capacity).yields
       bucket.expects(:full?).returns(true)
       bucket.expects(:to_json) # in the logger.info line
-      bucket.expects(:increment)
+    end
 
+    it "should throttle if bucket is full" do
+      throttled_request
       throttler.call(request_user_1).should == rate_limit_exceeded
+    end
+
+    it "should not throttle if disabled" do
+      Setting.set("request_throttle.enabled", "false")
+      throttled_request
+      throttler.call(request_user_1).should == response
     end
 
     it "should not throttle, but update, if bucket is not full" do
       bucket = mock('Bucket')
       Canvas::RequestThrottle::LeakyBucket.expects(:new).with("1").returns(bucket)
-      bucket.expects(:load_data)
+      bucket.expects(:reserve_capacity).yields
       bucket.expects(:full?).returns(false)
-      bucket.expects(:increment)
 
       throttler.call(request_user_1).should == response
+    end
+
+    if Canvas.redis_enabled?
+      it "should increment the bucket" do
+        throttler.call(request_user_1).should == response
+        bucket = Canvas::RequestThrottle::LeakyBucket.new("1")
+        count, last_touched = bucket.redis.hmget(bucket.cache_key, 'count', 'last_touched')
+        last_touched.to_f.should be > 0.0
+      end
     end
   end
 
@@ -149,24 +165,19 @@ describe 'Canvas::RequestThrottle' do
       end
 
       describe "#full?" do
-        it "should leak based on time and outflow" do
-          @bucket.leak(Time.at(@current_time)).should be_close(@expected, 0.1)
-          @bucket.leak(Time.at(75)).should == 0.0 # clamps to 0
-        end
-
-        it "should leak then compare to hwm" do
-          Setting.set('request_throttle.hwm', '100')
-          @bucket.full?(Time.at(@current_time)).should == false
-          @bucket.full?(Time.at(@bucket.last_touched)).should == true
-          Setting.set('request_throttle.hwm', @expected - 0.5)
-          @bucket.full?(Time.at(@current_time)).should == true
+        it "should compare to the hwm setting" do
+          bucket = Canvas::RequestThrottle::LeakyBucket.new("test", 5.0)
+          Setting.set('request_throttle.hwm', '6.0')
+          bucket.full?.should == false
+          Setting.set('request_throttle.hwm', '4.0')
+          bucket.full?.should == true
         end
       end
 
       describe "redis interaction" do
         it "should use defaults if no redis data" do
           Timecop.freeze('2012-01-29 12:00:00 UTC') do
-            @bucket.load_data
+            @bucket.increment(0)
             @bucket.count.should == 0
             @bucket.last_touched.should == Time.now.to_f
           end
@@ -175,7 +186,7 @@ describe 'Canvas::RequestThrottle' do
         it "should load data from redis" do
           ts = Time.parse('2012-01-29 12:00:00 UTC')
           @bucket.redis.hmset(@bucket.cache_key, 'count', '15', 'last_touched', ts.to_f)
-          @bucket.load_data
+          @bucket.increment(0, 0, ts)
           @bucket.count.should == 15
           @bucket.last_touched.should be_close(ts.to_f, 0.1)
         end
@@ -183,11 +194,46 @@ describe 'Canvas::RequestThrottle' do
         it "should update redis via the lua script" do
           @bucket.redis.hmset(@bucket.cache_key, 'count', @bucket.count, 'last_touched', @bucket.last_touched)
           @cost = 20.5
-          @bucket.increment(@cost, @current_time)
+          @bucket.increment(@cost, 0, @current_time)
           @bucket.count.should be_close(@expected + @cost, 0.1)
           @bucket.last_touched.should be_close(@current_time, 0.1)
           @bucket.redis.hget(@bucket.cache_key, 'count').to_f.should be_close(@expected + @cost, 0.1)
           @bucket.redis.hget(@bucket.cache_key, 'last_touched').to_f.should be_close(@current_time, 0.1)
+        end
+
+        it "should leak when incrementing" do
+          @bucket.redis.hmset(@bucket.cache_key, 'count', @bucket.count, 'last_touched', @bucket.last_touched)
+          @bucket.increment(0, 0, Time.at(@current_time))
+          @bucket.count.should be_close(@expected, 0.1)
+          @bucket.last_touched.should be_close(@current_time, 0.1)
+          @bucket.increment(0, 0, Time.at(75))
+          @bucket.count.should == 0.0
+          @bucket.last_touched.should be_close(75, 0.1)
+        end
+      end
+
+      describe "#reserve_capacity" do
+        it "should increment at the beginning then decrement at the end" do
+          Timecop.freeze('2012-01-29 12:00:00 UTC') do
+            @bucket.increment(0, 0, @current_time)
+            @bucket.reserve_capacity(20) do
+              @bucket.redis.hget(@bucket.cache_key, 'count').to_f.should be_close(20, 0.1)
+              5
+            end
+            @bucket.redis.hget(@bucket.cache_key, 'count').to_f.should be_close(5, 0.1)
+          end
+        end
+
+        it "clamps a negative increment to 0" do
+          Timecop.freeze('2013-01-01 3:00:00 UTC') do
+            @bucket.reserve_capacity(20) do
+              # finishing 6 seconds later, so final cost with leak is < 0
+              Timecop.freeze(Time.now + 6.seconds)
+              5
+            end
+          end
+          @bucket.count.should == 0
+          @bucket.redis.hget(@bucket.cache_key, 'count').to_f.should == 0
         end
       end
     end

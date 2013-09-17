@@ -4,15 +4,12 @@ local current_time = tonumber(ARGV[2])
 local outflow = tonumber(ARGV[3])
 local maximum = tonumber(ARGV[4])
 
--- this same leak logic is implemented in ruby in lib/canvas/request_throttle.rb
+-- Our modified leaky bucket algorithm is explained in lib/canvas/request_throttle.rb
 local leak = function(count, last_touched, current_time, outflow)
   if count > 0 then
     local timespan = current_time - last_touched
     local loss = outflow * timespan
     if loss > 0 then
-      if loss > count then
-        loss = count
-      end
       count = count - loss
     end
   end
@@ -26,6 +23,7 @@ last_touched = tonumber(last_touched or current_time)
 count, last_touched = leak(count, last_touched, current_time, outflow)
 count = count + amount
 if count > maximum then count = maximum end
+if count < 0 then count = 0 end
 
 redis.call('HMSET', cache_key, 'count', count, 'last_touched', current_time)
 -- reset expiration to 1 hour from now each time we write

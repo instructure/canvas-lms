@@ -48,26 +48,29 @@ class RequestThrottle
     # up when using certain servers until request_uri is called once to set env['REQUEST_URI']
     request.request_uri
 
-    bucket = bucket(request)
+    result = nil
+    bucket = LeakyBucket.new(client_identifier(request))
 
-    result = if !allowed?(request, bucket)
-      rate_limit_exceeded
-    else
-      @app.call(env)
+    bucket.reserve_capacity do
+      result = if !allowed?(request, bucket)
+        rate_limit_exceeded
+      else
+        @app.call(env)
+      end
+
+      ending_cpu = Process.times()
+      ending_mem = Canvas.sample_memory()
+
+      user_cpu = ending_cpu.utime - starting_cpu.utime
+      system_cpu = ending_cpu.stime - starting_cpu.stime
+      account = env["canvas.domain_root_account"]
+      report_on_stats(account, starting_mem, ending_mem, user_cpu, system_cpu)
+
+      # currently we define cost as the amount of user cpu time plus the amount
+      # of time spent in db queries
+      cost = user_cpu + (env['active_record_runtime'] || 0.0)
+      cost
     end
-
-    ending_cpu = Process.times()
-    ending_mem = Canvas.sample_memory()
-
-    user_cpu = ending_cpu.utime - starting_cpu.utime
-    system_cpu = ending_cpu.stime - starting_cpu.stime
-    account = env["canvas.domain_root_account"]
-    report_on_stats(account, starting_mem, ending_mem, user_cpu, system_cpu)
-
-    # currently we define cost as the amount of user cpu time plus the amount
-    # of time spent in db queries
-    cost = user_cpu + (env['active_record_runtime'] || 0.0)
-    bucket.increment(cost) if bucket
 
     result
   end
@@ -80,12 +83,13 @@ class RequestThrottle
       Canvas::Statsd.increment("request_throttling.blacklisted")
       return false
     else
-      if bucket
-        bucket.load_data()
-        if bucket.full?
+      if bucket.full?
+        if Setting.get_cached("request_throttle.enabled", "true") == "true"
           Rails.logger.info("blocking request due to throttling, client id: #{client_identifier(request)} bucket: #{bucket.to_json}")
           Canvas::Statsd.increment("request_throttling.throttled")
           return false
+        else
+          Rails.logger.info("would block request due to throttling, client id: #{client_identifier(request)} bucket: #{bucket.to_json}")
         end
       end
       return true
@@ -119,15 +123,6 @@ class RequestThrottle
     request.env['rack.session.options'].try(:[], :id)
   end
 
-  def bucket(request)
-    request.env['canvas.request_throttle.bucket'] ||=
-      if Canvas.redis_enabled? && client_id = client_identifier(request)
-        LeakyBucket.new(client_id)
-      else
-        nil
-      end
-  end
-
   def self.blacklist
     @blacklist ||= list_from_setting('request_throttle.blacklist')
   end
@@ -141,7 +136,7 @@ class RequestThrottle
   end
 
   def self.list_from_setting(key)
-    Set.new(Setting.get(key, '').split(',').map(&:strip))
+    Set.new(Setting.get(key, '').split(',').map(&:strip).reject(&:blank?))
   end
 
   def rate_limit_exceeded
@@ -185,7 +180,6 @@ class RequestThrottle
   # full.
   class LeakyBucket < Struct.new(:client_identifier, :count, :last_touched)
     def initialize(client_identifier, count = 0.0, last_touched = nil)
-      raise(ArgumentError, "client_identifier required") unless client_identifier.present?
       super
     end
 
@@ -202,39 +196,36 @@ class RequestThrottle
       "request_throttling:#{client_identifier}"
     end
 
-    [[:maximum, 800], [:hwm, 600], [:outflow, 10]].each do |(setting, default)|
+    SETTING_DEFAULTS = [
+      [:maximum, 800],
+      [:hwm, 600],
+      [:outflow, 10],
+      [:up_front_cost, 50],
+    ]
+
+    SETTING_DEFAULTS.each do |(setting, default)|
       define_method(setting) do
         Setting.get_cached("request_throttle.#{setting}", default).to_f
       end
     end
 
-    def load_data
-      count, last_touched = redis.hmget(cache_key, "count", "last_touched")
-      self.count = (count || 0.0).to_f
-      self.last_touched = (last_touched || Time.now).to_f
+    # up_front_cost is a placeholder cost. Essentially it adds some cost to
+    # doing multiple requests in parallel, but that cost is transient -- it
+    # disappears again when the request finishes.
+    #
+    # This method does an initial increment by the up_front_cost, loading the
+    # data out of redis at the same time. It then yields to the block,
+    # expecting the block to return the final cost. It then increments again,
+    # subtracting the initial up_front_cost from the final cost to erase it.
+    def reserve_capacity(up_front_cost = self.up_front_cost)
+      increment(0, up_front_cost)
+      cost = yield
+    ensure
+      increment(cost, -up_front_cost)
     end
 
-    def full?(current_time = Time.now)
-      new_count = leak(current_time)
-      new_count >= hwm
-    end
-
-    # This same leak logic is implemented in the lua script.
-    # Note that this leaking applies only locally to the current process, it
-    # isn't saved back to redis. That redis update happens purely in lua.
-    def leak(current_time)
-      new_count = self.count
-      if new_count > 0
-        timespan = current_time - Time.at(self.last_touched)
-        loss = outflow * timespan
-        if loss > 0
-          if loss > new_count
-            loss = new_count
-          end
-          new_count -= loss
-        end
-      end
-      new_count
+    def full?
+      count >= hwm
     end
 
     # This is where we both leak and then increment by the given cost amount,
@@ -243,10 +234,15 @@ class RequestThrottle
     # Without lua, we'd have to use a redis optimistic transaction, reading the
     # old values, and then pushing the new values. That would take at least 2
     # round trips, and possibly more when we get a transaction conflict.
-    def increment(amount, current_time = Time.now)
+    # amount and reserve_cost are passed separately for logging purposes.
+    def increment(amount, reserve_cost = 0, current_time = Time.now)
+      if client_identifier.blank? || !Canvas.redis_enabled?
+        return
+      end
+
       current_time = current_time.to_f
-      Rails.logger.debug("request throttling increment: #{([amount, current_time] + self.as_json).to_json}")
-      count, last_touched = LeakyBucket.lua.run(:increment_bucket, [cache_key], [amount, current_time, outflow, maximum], redis)
+      Rails.logger.debug("request throttling increment: #{([amount, reserve_cost, current_time] + self.as_json).to_json}")
+      count, last_touched = LeakyBucket.lua.run(:increment_bucket, [cache_key], [amount + reserve_cost, current_time, outflow, maximum], redis)
       self.count = count.to_f
       self.last_touched = last_touched.to_f
     end
