@@ -5,8 +5,8 @@ describe "web conference" do
 
   before (:each) do
     course_with_teacher_logged_in
-    PluginSetting.create!(:name => "dim_dim", :settings =>
-        {"domain" => "dimdim.instructure.com"})
+    PluginSetting.create!(:name => "wimba", :settings =>
+        {"domain" => "wimba.instructure.com"})
   end
 
   context "with no conferences" do

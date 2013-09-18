@@ -233,11 +233,11 @@ describe "dashboard" do
     end
 
     it "should display scheduled web conference in stream" do
-      PluginSetting.create!(:name => "dim_dim", :settings => {"domain" => "dimdim.instructure.com"})
+      PluginSetting.create!(:name => "wimba", :settings => {"domain" => "wimba.instructure.com"})
 
       # NOTE: recently changed the behavior here: conferences only display on
       # the course page, and they only display when they are in progress
-      @conference = @course.web_conferences.build({:title => "my Conference", :conference_type => "DimDim", :duration => 60})
+      @conference = @course.web_conferences.build({:title => "my Conference", :conference_type => "Wimba", :duration => 60})
       @conference.user = @user
       @conference.save!
       @conference.restart
