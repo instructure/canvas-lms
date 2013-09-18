@@ -539,7 +539,7 @@ describe "gradebook2" do
           cell = icon.find_element(:xpath, '..')
 
           keep_trying_until do
-            driver.action.move_to(cell).perform
+            driver.action.move_to(f('#gradebook_settings')).move_to(cell).perform
             cell.find_element(:css, "a").should be_displayed
           end
           cell.find_element(:css, "a").click
