@@ -13,7 +13,9 @@ class ReturnViewNull < HashView
   end
 
   def to_swagger
-    "void"
+    {
+      "type" => "void"
+    }
   end
 end
 
@@ -21,26 +23,31 @@ class ReturnView < ReturnViewNull
   def initialize(line)
     if line
       @line = line.gsub(/\s+/m, " ").strip
+    else
+      raise "@return type required"
     end
   end
 
   def array?
-    if @line
-      @line.include?('[') && @line.include?(']')
-    else
-      false
-    end
+    @line.include?('[') && @line.include?(']')
   end
 
   def type
-    if @line
-      @line.gsub('[', '').gsub(']', '')
-    else
-      nil
-    end
+    @line.gsub('[', '').gsub(']', '')
   end
 
   def to_swagger
-    type
+    if array? and type
+      {
+        "type" => "array",
+        "items" => {
+          "$ref" => type
+        }
+      }
+    else
+      {
+        "type" => type
+      }
+    end
   end
 end
