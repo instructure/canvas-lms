@@ -43,7 +43,7 @@ module Canvas::AccountReports::ReportHelper
   # it will then format the datetime using the given format string
   def timezone_strftime(datetime, format)
     if datetime = parse_utc_string(datetime)
-      datetime.strftime(format)
+      (datetime.in_time_zone(account.default_time_zone)).strftime(format)
     end
   end
 
