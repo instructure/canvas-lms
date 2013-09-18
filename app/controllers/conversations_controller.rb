@@ -136,7 +136,7 @@ class ConversationsController < ApplicationController
                                                :include_participant_avatars => false,
                                                :include_participant_contexts => false,
                                                :visible => true,
-                                               :include_context_name => true) 
+                                               :include_context_name => true).reject {|c| c['message_count'] == 0}
   
       if params[:include_all_conversation_ids]
         @conversations_json = {:conversations => @conversations_json, :conversation_ids => @conversations_scope.conversation_ids}
