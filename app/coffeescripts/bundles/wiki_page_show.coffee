@@ -12,6 +12,7 @@ require [
   wikiPageView = new WikiPageView
     el: '#wiki_page_show'
     model: wikiPage
+    modules_path: ENV.MODULES_PATH
     wiki_pages_path: ENV.WIKI_PAGES_PATH
     wiki_page_edit_path: ENV.WIKI_PAGE_EDIT_PATH
     wiki_page_history_path: ENV.WIKI_PAGE_HISTORY_PATH

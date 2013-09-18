@@ -1624,8 +1624,9 @@ class ApplicationController < ActionController::Base
       hash[:WIKI_PAGE_EDIT_PATH] = polymorphic_path([@context, :edit_named_page], :wiki_page_id => @page)
       hash[:WIKI_PAGE_HISTORY_PATH] = polymorphic_path([@context, @page, :wiki_page_revisions])
 
-      if @context.is_a?(Course)
-        hash[:COURSE_ID] = @context.id if @context.grants_right?(@current_user, :read)
+      if @context.is_a?(Course) && @context.grants_right?(@current_user, :read)
+        hash[:COURSE_ID] = @context.id
+        hash[:MODULES_PATH] = polymorphic_path([@context, :context_modules])
       end
     end
 

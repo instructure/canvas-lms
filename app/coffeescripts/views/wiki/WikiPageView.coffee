@@ -24,6 +24,7 @@ define [
     events:
       'click .delete_page': 'deleteWikiPage'
 
+    @optionProperty 'modules_path'
     @optionProperty 'wiki_pages_path'
     @optionProperty 'wiki_page_edit_path'
     @optionProperty 'wiki_page_history_path'
@@ -89,6 +90,7 @@ define [
 
     toJSON: ->
       json = super
+      json.modules_path = @modules_path
       json.wiki_pages_path = @wiki_pages_path
       json.wiki_page_edit_path = @wiki_page_edit_path
       json.wiki_page_history_path = @wiki_page_history_path
@@ -102,4 +104,12 @@ define [
         READ_REVISIONS: !!@PAGE_RIGHTS.read_revisions
       json.CAN.ACCESS_GEAR_MENU = json.CAN.DELETE || json.CAN.READ_REVISIONS
       json.CAN.VIEW_TOOLBAR = json.CAN.VIEW_PAGES || json.CAN.PUBLISH || json.CAN.UPDATE_CONTENT || json.CAN.ACCESS_GEAR_MENU
+
+      json.lock_info = _.clone(json.lock_info) if json.lock_info
+      if json.lock_info?.unlock_at
+        json.lock_info.unlock_at = if Date.parse(json.lock_info.unlock_at) < Date.now()
+          null
+        else
+          $.parseFromISO(json.lock_info.unlock_at).datetime_formatted
+
       json

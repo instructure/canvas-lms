@@ -46,5 +46,36 @@
 
 <div class="show-content">
   <h2 class="page-title">{{title}}</h2>
-  {{{body}}}
+  {{#if locked_for_user}}
+    <div class="locked-alert alert alert-warning">
+      {{#if lock_info.context_module.prerequisites}}
+        {{#if lock_info.unlock_at}}
+          {{#t 'page_locked_by_modules_until'}}This page will be available on {{lock_info.unlock_at}} if you have completed these modules:{{/t}}
+        {{else}}
+          {{#t 'page_locked_by_modules'}}This page will be available once you have completed these modules:{{/t}}
+        {{/if}}
+        <ul>
+          {{#each lock_info.context_module.prerequisites}}{{#ifEqual this.type "context_module"}}
+            {{#if this.name}}
+              <li>
+                {{#ifAll ../../../../modules_path this.id}}
+                  <a href="{{../../../../modules_path}}/{{this.id}}">{{this.name}}</a>
+                {{else}}
+                  {{this.name}}
+                {{/ifAll}}
+              </li>
+            {{/if}}
+          {{/ifEqual}}{{/each}}
+        </ul>
+      {{else}}
+        {{#if lock_info.unlock_at}}
+          {{#t 'page_locked_until'}}This page will be available on {{lock_info.unlock_at}}{{/t}}
+        {{else}}
+          {{#t 'page_locked'}}This page is locked{{/t}}
+        {{/if}}
+      {{/if}}
+    </div>
+  {{else}}
+    {{{body}}}
+  {{/if}}
 </div>
