@@ -28,10 +28,13 @@ class ConversationBatch < ActiveRecord::Base
     ModelCache.with_cache(:conversations => existing_conversations, :users => {:id => user_map}) do
       recipient_ids.each_slice(chunk_size) do |ids|
         ids.each do |id|
-          @conversations << conversation = user.initiate_conversation([user_map[id]], nil, :subject => subject, :context_type => context_type, :context_id => context_id)
+          is_group = self.group?
+          conversation = user.initiate_conversation([user_map[id]], !is_group,
+            subject: subject, context_type: context_type, context_id: context_id)
+          @conversations << conversation
           message = conversation.add_message(root_conversation_message.clone,
-                                             :update_for_sender => false,
-                                             :tags => tags)
+                                             update_for_sender: false,
+                                             tags: tags)
           conversation_message_ids << message.id
         end
         # update it in chunks, not on every message
@@ -40,7 +43,7 @@ class ConversationBatch < ActiveRecord::Base
     end
 
     update_attribute :workflow_state, 'sent'
-  rescue
+  rescue StandardError => e
     self.workflow_state = 'error'
     save!
   end
@@ -125,6 +128,7 @@ class ConversationBatch < ActiveRecord::Base
     batch.context_id = options[:context_id]
     batch.tags = options[:tags]
     batch.subject = options[:subject]
+    batch.group = !!options[:group]
     user_map = recipients.index_by(&:id)
     user_map[batch.user_id] = batch.user
     batch.user_map = user_map
