@@ -12,7 +12,7 @@
      {{/eachProp}}
   </select>
   {{#t "or"}}or{{/t}}
-  <input id="courseSearchField" type="text" placeholder="Course name" name="courseSearchField" class='span3'/>
+  <input id="courseSearchField" type="text" placeholder="{{#t "course_name"}}Course name{{/t}}" name="courseSearchField" class='span3'/>
   <br>
   <label class="checkbox">
     {{checkbox "include_completed_courses" checked=include_concluded}}
