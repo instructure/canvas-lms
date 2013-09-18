@@ -248,12 +248,17 @@ class ConversationsController < ApplicationController
       context_id = context.id
     end
 
-    batch_private_messages = !value_to_boolean(params[:group_conversation]) && @recipients.size > 1
+    group_conversation     = value_to_boolean(params[:group_conversation])
+    batch_private_messages = !group_conversation && @recipients.size > 1
+    batch_group_messages   = group_conversation && value_to_boolean(params[:bulk_message])
+    message                = build_message
 
-    message = build_message
-    if batch_private_messages
+    if batch_private_messages || batch_group_messages
       mode = params[:mode] == 'async' ? :async : :sync
-      batch = ConversationBatch.generate(message, @recipients, mode, :subject => params[:subject], :context_type => context_type, :context_id => context_id, :tags => @tags)
+      batch = ConversationBatch.generate(message, @recipients, mode,
+        subject: params[:subject], context_type: context_type,
+        context_id: context_id, tags: @tags, group: batch_group_messages)
+
       if mode == :async
         headers['X-Conversation-Batch-Id'] = batch.id.to_s
         return render :json => [], :status => :accepted
