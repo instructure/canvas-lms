@@ -169,4 +169,37 @@ describe "jquery ui" do
       JS
     end
   end
+
+  context 'admin-links' do
+    before do
+      driver.execute_script(<<-JS)
+        $('<div class="al-selenium">\
+            <a class="al-trigger btn" role="button" aria-haspopup="true" aria-owns="toolbar-1" href="#">\
+              <i class="icon-settings"></i>\
+              <i class="icon-mini-arrow-down"></i>\
+              <span class="screenreader-only">Settings</span>\
+            </a>\
+            <ul id="toolbar-1" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="toolbar-2">\
+              <li role="presentation">\
+                <a href="#" class="icon-edit" id="toolbar-2" tabindex="-1" role="menuitem">Edit</a>\
+              </li>\
+            </ul>\
+          </div>').appendTo($('body')).find('.al-trigger').focus();
+      JS
+    end
+
+    def options
+      fj('.al-selenium .al-options:visible')
+    end
+
+    it "should open every time when pressing return" do
+      options.should be_nil
+      active.send_keys(:return)
+      options.should_not be_nil
+      f('.al-selenium .al-trigger').click
+      options.should be_nil
+      active.send_keys(:return)
+      options.should_not be_nil
+    end
+  end
 end

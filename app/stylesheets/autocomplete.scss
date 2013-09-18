@@ -23,9 +23,8 @@ A generic, accessible autocomplete widget.
   </div>
 
   <button class="btn ac-search-btn"
-          type="button">
+          type="button" aria-label="Search">
     <i class="icon-address-book"></i>
-    <span class="screenreader-only">Search</span>
   </button>
 
   <div class="ac-result-container" id="ac-result-list-1" aria-hidden="true">

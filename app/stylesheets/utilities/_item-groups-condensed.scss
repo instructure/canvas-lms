@@ -39,9 +39,8 @@ color with a dashed line between groups.
               <i class="icon-publish"></i><span class="publish-text">&nbsp;Published</span>
             </span>
 
-            <a class="al-trigger al-trigger-gray" href="#">
+            <a class="al-trigger al-trigger-gray" aria-label="<%= t('manage', 'Manage') %>" href="#">
               <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
-              <span class="screenreader-only"><%= t('manage', 'Manage') %></span>
             </a>
             <ul class="al-options">
               <li><a href="#">Edit</a></li>
@@ -66,9 +65,8 @@ color with a dashed line between groups.
               <i class="icon-publish"></i><span class="publish-text">&nbsp;Published</span>
             </span>
 
-            <a class="al-trigger al-trigger-gray" href="#">
+            <a class="al-trigger al-trigger-gray" aria-label="<%= t('manage', 'Manage') %>" href="#">
               <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
-              <span class="screenreader-only"><%= t('manage', 'Manage') %></span>
             </a>
             <ul class="al-options">
               <li><a href="#">Edit</a></li>
@@ -93,9 +91,8 @@ color with a dashed line between groups.
               <i class="icon-publish"></i><span class="publish-text">&nbsp;Published</span>
             </span>
 
-            <a class="al-trigger al-trigger-gray" href="#">
+            <a class="al-trigger al-trigger-gray" aria-label="<%= t('manage', 'Manage') %>" href="#">
               <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
-              <span class="screenreader-only"><%= t('manage', 'Manage') %></span>
             </a>
             <ul class="al-options">
               <li><a href="#">Edit</a></li>
@@ -133,10 +130,9 @@ color with a dashed line between groups.
             <i class="icon-publish"></i><span class="publish-text">&nbsp;Published</span>
           </span>
 
-          <a class="al-trigger al-trigger-gray" role="button" aria-haspopup="true" aria-owns="content-1" href="#">
+          <a class="al-trigger al-trigger-gray" role="button" aria-haspopup="true" aria-owns="content-1" aria-label="Settings" href="#">
             <i class="icon-settings"></i>
             <i class="icon-mini-arrow-down"></i>
-            <span class="screenreader-only">Settings</span>
           </a>
 
           <ul id="content-1" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="content-2">
