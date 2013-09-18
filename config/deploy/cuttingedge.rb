@@ -8,6 +8,7 @@
 
 role :app, "canvas-edge.tier2.sfu.ca"
 role :db, "canvas-edge.tier2.sfu.ca", :primary => true
+set :canvas_url, 'https://canvas-edge.sfu.ca'
 
 set :rails_env, "production"
 set :branch, "sfu-develop"
