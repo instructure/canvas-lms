@@ -92,6 +92,13 @@ describe ConversationBatch do
       end
     end
 
+    it "should send group messages" do
+      batch = ConversationBatch.generate(@message, [@user, @user3], :async, group: true)
+      batch.deliver
+      Conversation.count.should == 2
+      Conversation.all.each { |c| c.should_not be_private }
+    end
+
     context "sharding" do
       specs_require_sharding
 
