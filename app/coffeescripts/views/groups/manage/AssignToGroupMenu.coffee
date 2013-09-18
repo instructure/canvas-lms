@@ -1,17 +1,15 @@
 define [
-  'Backbone'
+  'compiled/views/groups/manage/PopoverMenuView'
   'jst/groups/manage/assignToGroupMenu'
+  'underscore'
   'compiled/jquery/outerclick'
-], ({View}, template) ->
+], (PopoverMenuView, template, _) ->
 
-  class AssignToGroupMenu extends View
+  class AssignToGroupMenu extends PopoverMenuView
 
-    events:
-      'click': 'cancelHide'
+    events: _.extend {},
+      PopoverMenuView::events,
       'click .set-group': 'setGroup'
-      'focusin': 'cancelHide'
-      'focusout': 'hide'
-      'outerclick': 'hide'
 
     attach: ->
       @collection.on 'change add remove reset', @render
@@ -22,28 +20,6 @@ define [
     className: 'assign-to-group-menu ui-tooltip popover content-top horizontal'
 
     template: template
-
-    showBy: ($target) ->
-      @cancelHide()
-      setTimeout => # IE needs this to happen async frd
-        @render()
-        @$el.insertAfter($target)
-        @$el.show()
-        @setElement @$el
-        @$el.zIndex(1)
-        @$el.position
-          my: 'left+6 top-47'
-          at: 'right center'
-          of: $target
-      , 20
-
-    cancelHide: =>
-      clearTimeout @hideTimeout
-
-    hide: =>
-      @hideTimeout = setTimeout =>
-        @$el.detach()
-      , 20
 
     setGroup: (e) ->
       e.preventDefault()

@@ -1,8 +1,14 @@
 .assign-to-groups {
-  overflow: auto;
-  max-height: 400px;
-
   a.set-group {
     display: block;
   }
 }
+
+.popover-content {
+  overflow: auto;
+  max-height: 400px;
+  .form-search {
+   padding-right: 16px;
+  }
+}
+
