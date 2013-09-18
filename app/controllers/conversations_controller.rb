@@ -171,14 +171,6 @@ class ConversationsController < ApplicationController
     end
   end
 
-  # New Conversations UI. When finished, move back to index action.
-  def index_new
-    js_env(:CONVERSATIONS => {
-             :ATTACHMENTS_FOLDER_ID => @current_user.conversation_attachments_folder.id
-           })
-    return unless authorized_action(Account.site_admin, @current_user, :become_user)
-  end
-
   def toggle_new_conversations
     @current_user.preferences[:use_new_conversations] = value_to_boolean(params[:use_new_conversations])
     @current_user.save!

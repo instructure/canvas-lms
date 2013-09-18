@@ -21,7 +21,6 @@ FakeRails3Routes.draw do
   match 'conversations/sent' => 'conversations#index', :as => :conversations_sent, :redirect_scope => 'sent'
   match 'conversations/archived' => 'conversations#index', :as => :conversations_archived, :redirect_scope => 'archived'
   match 'conversations/find_recipients' => 'search#recipients'
-  match '/conversations/beta' => 'conversations#index_new'
 
   match 'search/recipients' => 'search#recipients', :as => :search_recipients
   match 'conversations/mark_all_as_read' => 'conversations#mark_all_as_read', :as => :conversations_mark_all_as_read, :via => :post
