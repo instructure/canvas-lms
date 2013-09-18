@@ -607,4 +607,10 @@ describe ActiveRecord::Base do
       lambda { User.connection.add_index :users, [:id], name: name }.should raise_error
     end
   end
+
+  describe "nested conditions" do
+    it "should not barf if the condition has a question mark" do
+      User.joins(:enrollments).where(enrollments: { sis_source_id: 'a?c'}).first.should be_nil
+    end
+  end
 end
