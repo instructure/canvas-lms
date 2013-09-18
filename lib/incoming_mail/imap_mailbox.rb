@@ -17,10 +17,15 @@
 #
 
 require 'net/imap'
+require File.expand_path('../configurable_timeout', __FILE__)
 
 module IncomingMail
 
   class ImapMailbox
+    include ConfigurableTimeout
+
+    UsedImapMethods = [:login, :logout, :disconnect, :select, :search, :fetch, :expunge, :store, :list, :create, :copy]
+
     attr_accessor :server, :port, :ssl, :username, :password, :folder, :filter
 
     def initialize(options = {})
@@ -34,7 +39,8 @@ module IncomingMail
     end
 
     def connect
-      @imap = Net::IMAP.new(@server, :port => @port, :ssl => @ssl)
+      @imap = with_timeout { Net::IMAP.new(@server, :port => @port, :ssl => @ssl) }
+      wrap_with_timeout(@imap, UsedImapMethods)
       @imap.login(@username, @password)
     end
 

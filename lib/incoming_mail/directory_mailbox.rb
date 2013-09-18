@@ -17,15 +17,21 @@
 #
 
 require 'fileutils'
+require File.expand_path('../configurable_timeout', __FILE__)
 
 module IncomingMail
   
   class DirectoryMailbox
 
+    include ConfigurableTimeout
+
     attr_accessor :folder
 
     def initialize(options = {})
       @folder = options.fetch(:folder, "")
+      @options = options
+      wrap_with_timeout(self,
+        [:folder_exists?, :files_in_folder, :read_file, :file?, :delete_file, :move_file, :create_folder])
     end
 
     def connect
@@ -71,7 +77,8 @@ module IncomingMail
     end
 
     def file?(folder, filename)
-      File.file?(File.join(folder, filename))
+      path = File.join(folder, filename)
+      File.file?(path) || (@options[:read_pipes] && File.pipe?(path))
     end
 
     def delete_file(folder, filename)
