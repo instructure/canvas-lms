@@ -16,10 +16,11 @@
 <header class="quiz-header">
   <h2><%= @quiz.quiz_title || @quiz.readable_type %></h2>
   <% if @submission.preview? %>
-    <h3>
-      <i class="icon-warning"></i>
-      <%= t('headers.draft_preview',
+    <% draft_preview_title = t('headers.draft_preview',
             "This is a preview of the draft version of the quiz") %>
+    <h3>
+      <i class="icon-warning"><span class="screenreader-only"><%= draft_preview_title %></span></i>
+      <%= draft_preview_title %>
     </h3>
   <% end %>
   <%= before_label(:started, "Started") %>
@@ -56,18 +57,20 @@
   <div class="button-container clearfix">
     <% if @quiz_presenter.one_question_at_a_time? %>
       <% if @quiz_presenter.previous_question_viewable? %>
+        <% previous_question_button_title = t('buttons.previous', "Previous") %>
         <button type="submit" class="btn submit_button btn-secondary previous-question" data-action="<%= @quiz_presenter.previous_question_form_action(session, @current_user) %>" disabled>
-          <i class="icon-mini-arrow-left"></i>
-          <%= t('buttons.previous', "Previous") %>
+          <i class="icon-mini-arrow-left"><span class="screenreader-only"><%= previous_question_button_title %></span></i>
+          <%= previous_question_button_title %>
         </button>
       <% end %>
 
       <% if @quiz_presenter.next_question %>
+        <% next_question_button_title = t('buttons.next', "Next") %>
         <%= hidden_field_tag :last_question_id, @quiz_presenter.current_question[:id] %>
 
         <button type="submit" class="btn submit_button btn-secondary next-question" data-action="<%= @quiz_presenter.next_question_form_action(session, @current_user) %>" disabled>
-          <%= t('buttons.next', "Next") %>
-          <i class="icon-mini-arrow-right"></i>
+          <%= next_question_button_title %>
+          <i class="icon-mini-arrow-right"><span class="screenreader-only"><%= next_question_button_title %></span></i>
         </button>
       <% end %>
     <% end %>

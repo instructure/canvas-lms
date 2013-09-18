@@ -1,5 +1,5 @@
-<% 
-   group = question_group || nil 
+<%
+   group = question_group || nil
    if group && hash_get(group, :assessment_question_bank_id)
      question_bank = @banks_hash[hash_get(group, :assessment_question_bank_id)]
    end
@@ -17,8 +17,8 @@
       <%= t(:show_questions_and_points, "Pick *%{num_questions}* questions, #%{num_points}# pts per question",
             :num_questions => hash_get(group, :pick_count, 1),
             :num_points => hash_get(group, :question_points, 1),
-            :wrapper => { 
-              '*' => '<span class="pick_count">\1</span>', 
+            :wrapper => {
+              '*' => '<span class="pick_count">\1</span>',
               '#' => '<span class="question_points">\1</span>'
             }) %>
     </span>
@@ -26,7 +26,7 @@
       <%= t(:edit_questions_and_points, "Pick *%{num_questions}* questions, #%{num_points}# pts per question",
             :num_questions => hash_get(group, :pick_count, 1),
             :num_points => hash_get(group, :question_points, 1),
-            :wrapper => { 
+            :wrapper => {
               '*' => "<input name='quiz_group[pick_count]' aria-label='#{t('labels.number_of_questions', "Number of Questions")}' type='text' style='width: 20px;' value='\1'/>",
               '#' => "<input name='quiz_group[question_points]' aria-label='#{t('labels.points_per_question', "Points per Question")}' type='text' style='width: 20px;' value='\1'/>"
             }) %>
@@ -39,12 +39,17 @@
   </div>
   <div style="float: right;" class="links">
     <span class="local_group_links">
-      <a href="#" class="collapse_link group_display no-hover" title="<%= t('titles.collapse_group', "Collapse Group") %>"><i class="icon-arrow-up standalone-icon"><span class="screenreader-only"><%= t('titles.collapse_group', "Collapse Group") %></span></i></a>
-      <a href="#" class="expand_link group_display hidden no-hover" title="<%= t('titles.expand_group', "Expand Group") %>"><i class="icon-arrow-down standalone-icon"><span class="screenreader-only"><%= t('titles.expand_group', "Expand Group") %></span></i></a>
-      <a href="#" class="add_question_link group_display no-hover" title="<%= t('titles.add_question_to_group', "Add Question to this Group") %>"><i class="icon-add standalone-icon"><span class="screenreader-only"><%= t('titles.add_question_to_group', "Add Question to this Group") %></span></i></a>
+      <% collapse_title = t('titles.collapse_group', "Collapse Group") %>
+      <% expand_title = t('titles.expand_group', "Expand Group") %>
+      <% add_question_title = t('titles.add_question_to_group', "Add Question to this Group") %>
+      <a href="#" class="collapse_link group_display no-hover" title="<%= collapse_title %>"><i class="icon-arrow-up standalone-icon"><span class="screenreader-only"><%= collapse_title %></span></i></a>
+      <a href="#" class="expand_link group_display hidden no-hover" title="<%= expand_title %>"><i class="icon-arrow-down standalone-icon"><span class="screenreader-only"><%= expand_title %></span></i></a>
+      <a href="#" class="add_question_link group_display no-hover" title="<%= add_question_title %>"><i class="icon-add standalone-icon"><span class="screenreader-only"><%= add_question_title %></span></i></a>
     </span>
-    <a href="#" class="edit_group_link group_display no-hover" title="<%= t('titles.edit_group_details', "Edit Group Details") %>"><i class="icon-edit standalone-icon"><span class="screenreader-only"><%= t('titles.edit_group_details', "Edit Group Details") %></span></i></a>
-    <a href="#" class="delete_group_link group_display no-hover" title="<%= t('titles.delete_group', "Delete Group") %>"><i class="icon-trash standalone-icon"><span class="screenreader-only"><%= t('titles.delete_group', "Delete Group") %></span></i></a>
+    <% edit_group_title = t('titles.edit_group_details', "Edit Group Details") %>
+    <% delete_group_title = t('titles.delete_group', "Delete Group") %>
+    <a href="#" class="edit_group_link group_display no-hover" title="<%= edit_group_title %>"><i class="icon-edit standalone-icon"><span class="screenreader-only"><%= edit_group_title %></span></i></a>
+    <a href="#" class="delete_group_link group_display no-hover" title="<%= delete_group_title %>"><i class="icon-trash standalone-icon"><span class="screenreader-only"><%= delete_group_title %></span></i></a>
   </div>
   <div class="clear"></div>
   <div class="button-container">
@@ -58,7 +63,7 @@
   <% end %>
 </div>
 <% if !group || question_bank %>
-  <div class="assessment_question_bank" style="<%= hidden unless question_bank %>"><%= before_label(:question_bank, "Questions will be pulled from the bank") %> 
+  <div class="assessment_question_bank" style="<%= hidden unless question_bank %>"><%= before_label(:question_bank, "Questions will be pulled from the bank") %>
     <a href="/<%= question_bank.try(:context_type).try(:underscore).try(:pluralize) || '{{ context_type_string }}' %>/<%= question_bank.try(:context_id) || '{{ context_id }}' %>/question_banks/<%= question_bank.try(:id) || '{{ bank_id }}' %>" class="bank_name bank_name_link" style="font-weight: bold; <%= hidden unless question_bank %>"><%= question_bank.try(:title) %></a>
     <span class="bank_name" style="font-weight: bold; <%= hidden if question_bank %>"><%= question_bank.try(:title) %></span>
   </div>

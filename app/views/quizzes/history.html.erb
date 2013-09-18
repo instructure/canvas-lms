@@ -65,10 +65,12 @@
           <li class="quiz_version <%= "selected" if version_instance.version_number == @submission.version_number %>">
             <a class="no-hover" href="?version=<%= version_instance.version_number %><%= "&user_id=#{@submission.user_id}" if @current_user.id != @submission.user_id %>">
               <% if version_instance.pending_review? %>
+                <% needs_review_title = t('titles.submission_needs_review', "This submission needs review") %>
                 <% if can_do(@quiz, @current_user, :grade) %>
-                  <i class="icon-warning" title="<%= t('titles.submission_needs_review', "This submission needs review") %>"></i>
+                  <i class="icon-warning" title="<%= needs_review_title %>"><span class="screenreader-only"><%= needs_review_title %></span></i>
                 <% else %>
-                  <i class="icon-hour-glass" title="<%= t('titles.score_pending_review', "This score is pending review, and may change") %>"></i>
+                  <% pending_review_title = t('titles.score_pending_review', "This score is pending review, and may change") %>
+                  <i class="icon-hour-glass" title="<%= pending_review_title %>"><span class="screenreader-only"><%= pending_review_title %></span></i>
                 <% end %>
               <% end %>
               <%= t(:score_for_attempt, "Attempt %{attempt_number}: %{score}", :attempt_number => version_instance.attempt, :score => render_score(version_instance.score)) %>

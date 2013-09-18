@@ -184,7 +184,7 @@ describe "quizzes" do
       quiz.versions.length.should == 2
       get "/courses/#{@course.id}/quizzes/#{quiz.id}/edit"
       expect_new_page_load {
-        f('#quiz-draft-state').text.strip.should == 'Published'
+        f('#quiz-draft-state').text.strip.should match accessible_variant_of 'Published'
         expect_new_page_load do
           click_save_settings_button
           wait_for_ajax_requests
@@ -598,7 +598,7 @@ describe "quizzes" do
       quiz_with_submission
       get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
 
-      driver.find_element(:link, "Quiz Statistics").click
+      click_quiz_statistics_button
 
       f('#content .question_name').should include_text("Question 1")
     end
