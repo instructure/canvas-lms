@@ -1363,8 +1363,14 @@ ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
     when 'SQLite'; return
     when 'PostgreSQL'
       foreign_key_name = foreign_key_name(from_table, column, options)
-      and_valid = " AND convalidated" if supports_delayed_constraint_validation?
-      return if select_value("SELECT conname FROM pg_constraint INNER JOIN pg_namespace ON pg_namespace.oid=connamespace WHERE conname='#{foreign_key_name}' AND nspname=current_schema()#{and_valid}")
+      query = supports_delayed_constraint_validation? ? 'convalidated' : 'conname'
+      value = select_value("SELECT #{query} FROM pg_constraint INNER JOIN pg_namespace ON pg_namespace.oid=connamespace WHERE conname='#{foreign_key_name}' AND nspname=current_schema()")
+      if supports_delayed_constraint_validation? && value == 'f'
+        execute("ALTER TABLE #{quote_table_name(from_table)} DROP CONSTRAINT #{quote_table_name(foreign_key_name)}")
+      elsif value
+        return
+      end
+
       add_foreign_key(from_table, to_table, options)
     else
       foreign_key_name = foreign_key_name(from_table, column, options)
