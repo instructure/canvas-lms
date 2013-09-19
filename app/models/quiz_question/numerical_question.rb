@@ -35,6 +35,11 @@ class QuizQuestion::NumericalQuestion < QuizQuestion::Base
     match = answers.find do |answer|
       if answer[:numerical_answer_type] == "exact_answer"
         val = BigDecimal.new(answer[:exact].to_s)
+
+        # calculate margin value using percentage
+        if answer[:margin].to_s.ends_with?("%")
+          answer[:margin] = answer[:margin].to_f / 100.0 * val
+        end
         margin = BigDecimal.new(answer[:margin].to_s)
         min = val - margin
         max = val + margin

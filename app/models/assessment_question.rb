@@ -363,7 +363,7 @@ class AssessmentQuestion < ActiveRecord::Base
           :scale => variable[:scale].to_i
         }
       end
-      question[:answer_tolerance] = qdata[:answer_tolerance].to_f
+      question[:answer_tolerance] = qdata[:answer_tolerance]
       question[:formula_decimal_places] = qdata[:formula_decimal_places].to_i
       answers.each do |key, answer|
         obj = {:weight => 100, :variables => []}

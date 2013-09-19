@@ -483,7 +483,7 @@ define([
             var $td = $("<td class='final_answer'/>");
             var answer = data.answer;
             if (question.answerDecimalPoints || question.answer_tolerance) {
-              var tolerance = parseFloat(question.answer_tolerance);
+              var tolerance = parseFloatOrPercentage(question.answer_tolerance);
               tolerance = tolerance || Math.pow(0.1, question.answerDecimalPoints);
               answer = answer + " <span style='font-size: 0.8em;'>+/-</span> " + tolerance;
               $question.find(".answer_tolerance").text(tolerance);
@@ -806,6 +806,12 @@ define([
       }
     },
 
+    validateAnswerTolerance: function($input) {
+      var val = $input.val();
+      if (val == "") { return; }
+      $input.val( parseFloatOrPercentage(val) );
+    },
+
     defaultQuestionData: {
       question_type: "multiple_choice_question",
       question_text: "",
@@ -987,7 +993,7 @@ define([
           question.answers.push(data);
         });
         question.formula_decimal_places = parseInt($question.find(".formula_decimal_places").text(), 10) || 0;
-        question.answer_tolerance = parseFloat($question.find(".answer_tolerance").text(), 10) || 0;
+        question.answer_tolerance = parseFloatOrPercentage($question.find(".answer_tolerance").text(), 10) || 0;
       }
       question.position = i;
       question.question_points = parseFloat(question.question_points);
@@ -1099,6 +1105,26 @@ define([
       return true;
     }
     return false;
+  }
+
+  function parseFloatOrPercentage(val) {
+    if (val == "") { return val; }
+    var result;
+
+    // percentage value
+    if ((val + "").indexOf('%') === val.length - 1) {
+      var number = val.replace("%", "");
+      result = (Math.round(parseFloat(number) * 10000.0) / 10000.0) + "%";
+
+    // point value
+    } else if (!isNaN(val)) {
+      result = Math.round(parseFloat(val) * 10000.0) / 10000.0;
+      if (isNaN(result)) { result = 0.0; }
+
+    } else {
+      result = 0.0;
+    }
+    return result;
   }
 
   $(document).ready(function() {
@@ -2319,7 +2345,7 @@ define([
           question.formulas.push(data);
         });
         question.formula_decimal_places = parseInt($question.find(".decimal_places .round").val(), 10) || 0;
-        question.answer_tolerance = parseFloat($question.find(".combination_answer_tolerance").val(), 10) || 0;
+        question.answer_tolerance = parseFloatOrPercentage($question.find(".combination_answer_tolerance").val());
         question.answerDecimalPoints = parseFloat($question.find(".combination_error_margin").val(), 10) || 0;
         var $ths = $question.find(".combinations thead th");
         $question.find(".combinations tbody tr").each(function() {
@@ -2417,6 +2443,14 @@ define([
       }
     }).delegate('input.float_value', 'change blur focus', function(event) {
       quiz.parseInput($(this), $(this).hasClass('long') ? 'float_long' : 'float');
+    });
+
+    $(document).delegate("input.combination_answer_tolerance", 'keydown', function(event) {
+      if (!event.metaKey && event.keyCode > 57 && event.keyCode < 91) {
+        event.preventDefault();
+      }
+    }).delegate('input.combination_answer_tolerance', 'change blur focus', function(event) {
+      quiz.validateAnswerTolerance($(this));
     });
 
     $("#questions").delegate('.question_teaser_link', 'click', function(event) {
@@ -2927,7 +2961,7 @@ define([
         $variable_values = $question.find(".variables .variable"),
         $tbody = $table.find("tbody");
       $question.find(".supercalc").superCalc('cache_finds');
-      var answer_tolerance = parseFloat($question.find(".combination_answer_tolerance").val(), 10);
+      var answer_tolerance = parseFloatOrPercentage($question.find(".combination_answer_tolerance").val());
       var next = function() {
         $button.text(I18n.t('buttons.generating_combinations_progress', "Generating... (%{done}/%{total})", {'done': succeeded, 'total': cnt}));
         var fragment = document.createDocumentFragment();
