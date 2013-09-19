@@ -1205,6 +1205,24 @@ describe QuizzesController do
       assigns[:submission].should_not be_nil
       assigns[:versions].should_not be_nil
     end
+
+    it "should render nothing if quiz is muted" do
+      course_with_teacher_logged_in(:active_all => true)
+      course_quiz
+
+      submission = @quiz.generate_submission @user
+
+      assignment = @course.assignments.create(:title => "Test Assignment")
+      assignment.workflow_state = "available"
+      assignment.submission_types = "online_quiz"
+      assignment.muted = true
+      assignment.save!
+      @quiz.assignment = assignment
+
+      get 'submission_versions', :course_id => @course.id, :quiz_id => @quiz.id
+      response.should be_success
+      response.body.should match(/^\s?$/)
+    end
   end
 end
 
