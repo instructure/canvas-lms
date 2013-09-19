@@ -243,7 +243,7 @@ class QuizzesController < ApplicationController
       if @submission
         upload_url = api_v1_quiz_submission_create_file_path(:course_id => @context.id, :quiz_id => @quiz.id)
         js_env :UPLOAD_URL => upload_url
-        js_env :SUBMISSION_VERSIONS_URL => polymorphic_url([@context, @quiz, 'submission_versions'])
+        js_env :SUBMISSION_VERSIONS_URL => polymorphic_url([@context, @quiz, 'submission_versions']) unless @quiz.muted?
       end
 
       setup_attachments
@@ -648,7 +648,7 @@ class QuizzesController < ApplicationController
       @submission = get_submission
       @versions   = get_versions
 
-      if @versions.size > 0
+      if @versions.size > 0 && !@quiz.muted?
         render :layout => false
       else
         render :nothing => true
