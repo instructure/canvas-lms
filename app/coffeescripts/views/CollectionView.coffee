@@ -88,7 +88,7 @@ define [
 
     removePreviousItems: (models) =>
       for model in models
-        model.view.remove()
+        model.view?.remove()
 
     renderOnReset: (models, options) =>
       @empty = not @collection.length

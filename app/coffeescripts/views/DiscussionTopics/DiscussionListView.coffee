@@ -146,6 +146,8 @@ define [
       @options.showMessage = true
       @_stopLoader()
       @_toggleNoContentMessage()
+      # reset to render the whole sorted colleciton now
+      @collection.reset(@collection.models)
 
     # Internal: Enable sorting of the this view's discussions.
     #
