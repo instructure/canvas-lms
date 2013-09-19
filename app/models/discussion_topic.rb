@@ -503,7 +503,7 @@ class DiscussionTopic < ActiveRecord::Base
 
   def user_can_see_posts?(user, session=nil)
     return false unless user
-    !self.require_initial_post || self.grants_right?(user, session, :update) || user_ids_who_have_posted_and_admins.member?(user.id)
+    !self.require_initial_post? || self.grants_right?(user, session, :update) || user_ids_who_have_posted_and_admins.member?(user.id)
   end
 
   def reply_from(opts)
