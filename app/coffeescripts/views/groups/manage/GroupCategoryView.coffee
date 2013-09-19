@@ -2,6 +2,7 @@ define [
   'i18n!groups'
   'underscore'
   'Backbone'
+  'compiled/views/MessageStudentsDialog',
   'compiled/views/groups/manage/GroupCategoryDetailView'
   'compiled/views/groups/manage/GroupCategoryEditView'
   'compiled/views/groups/manage/GroupsView'
@@ -12,7 +13,8 @@ define [
   'compiled/models/Group'
   'jst/groups/manage/groupCategory'
   'compiled/jquery.rails_flash_notifications'
-], (I18n, _, {View}, GroupCategoryDetailView, GroupCategoryEditView, GroupsView, UnassignedUsersView, AddUnassignedMenu, AssignToGroupMenu, GroupEditView, Group, template) ->
+  'jquery.disableWhileLoading'
+], (I18n, _, {View}, MessageStudentsDialog, GroupCategoryDetailView, GroupCategoryEditView, GroupsView, UnassignedUsersView, AddUnassignedMenu, AssignToGroupMenu, GroupEditView, Group, template) ->
 
   class GroupCategoryView extends View
 
@@ -26,6 +28,7 @@ define [
     @child 'groupsView', '[data-view=groups]'
 
     events:
+      'click .message-all-unassigned': 'messageAllUnassigned'
       'click .edit-category': 'editCategory'
       'click .delete-category': 'deleteCategory'
       'click .add-group': 'addGroup'
@@ -100,3 +103,28 @@ define [
     editCategory: ->
       @editCategoryView ?= new GroupCategoryEditView({@model})
       @editCategoryView.open()
+
+    messageAllUnassigned: (e) ->
+      e.preventDefault()
+      disabler = $.Deferred()
+      @$el.disableWhileLoading disabler
+      disabler.done =>
+        # display the dialog when all data is ready
+        students = @model.unassignedUsers().map (user)->
+          {id: user.get("id"), short_name: user.get("short_name")}
+        dialog = new MessageStudentsDialog
+          context: @model.get 'name'
+          recipientGroups: [
+            {name: I18n.t('students_who_have_not_joined_a_group', 'Students who have not joined a group'), recipients: students}
+          ]
+        dialog.open()
+      users = @model.unassignedUsers()
+      # get notified when last page is fetched and then open the dialog
+      users.on 'fetched:last', =>
+        disabler.resolve()
+      # ensure all data is loaded before displaying dialog
+      if users.urls.next?
+        users.loadAll = true
+        users.fetch page: 'next'
+      else
+        disabler.resolve()

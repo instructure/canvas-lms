@@ -7,6 +7,10 @@
     </a>
     <ul class="al-options">
       {{#unless studentOrganizedOrSelfSignupRestricted}}
+        {{#unless ENV.IS_LARGE_ROSTER}}
+          <li><a href="#"
+                 class="icon-email message-all-unassigned">{{#t "message_all_unassigned_option"}}Message All Unassigned Students{{/t}}</a></li>
+        {{/unless}}
         <li><a href="#"
                class="icon-user randomly-assign-members">{{#t "randomly_assign_students_option"}}Randomly Assign Students{{/t}}</a></li>
       {{/unless}}
