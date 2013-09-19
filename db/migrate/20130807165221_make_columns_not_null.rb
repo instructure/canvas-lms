@@ -6,6 +6,9 @@ class MakeColumnsNotNull < ActiveRecord::Migration
     change_column_null_with_less_locking :abstract_courses, :workflow_state
     change_column_null_with_less_locking :abstract_courses, :account_id
     change_column_null_with_less_locking :abstract_courses, :root_account_id
+    AbstractCourse.where(enrollment_term_id: nil).find_each do |ac|
+      AbstractCourse.where(id: ac).update_all(enrollment_term_id: ac.root_account.default_enrollment_term.id)
+    end
     change_column_null_with_less_locking :abstract_courses, :enrollment_term_id
     change_column_null_with_less_locking :account_authorization_configs, :account_id
     change_column_null_with_less_locking :account_notifications, :start_at
@@ -80,6 +83,7 @@ class MakeColumnsNotNull < ActiveRecord::Migration
     change_column_null_with_less_locking :context_modules, :context_type
     change_column_null_with_less_locking :conversation_batches, :workflow_state
     change_column_null_with_less_locking :conversation_batches, :user_id
+    ConversationBatch.where(root_conversation_message_id: nil).delete_all
     change_column_null_with_less_locking :conversation_batches, :root_conversation_message_id
     change_column_null_with_less_locking :conversation_participants, :workflow_state
     change_column_null_with_less_locking :conversation_participants, :conversation_id
@@ -118,6 +122,9 @@ class MakeColumnsNotNull < ActiveRecord::Migration
     change_column_null_with_less_locking :enrollments, :course_id
     change_column_null_with_less_locking :enrollments, :type
     change_column_null_with_less_locking :enrollments, :root_account_id
+    Enrollment.where(course_section_id: nil).find_each do |e|
+      Enrollment.where(id: e).update_all(course_section_id: e.course.default_section.id)
+    end
     change_column_null_with_less_locking :enrollments, :course_section_id
     change_column_null_with_less_locking :enrollments, :workflow_state
     change_column_null_with_less_locking :eportfolios, :user_id
@@ -144,8 +151,10 @@ class MakeColumnsNotNull < ActiveRecord::Migration
     change_column_null_with_less_locking :groups, :account_id
     change_column_null_with_less_locking :groups, :root_account_id
     change_column_null_with_less_locking :groups, :workflow_state
+    LearningOutcome.where(short_description: nil).update_all(short_description: '')
     change_column_null_with_less_locking :learning_outcomes, :short_description
     change_column_null_with_less_locking :learning_outcomes, :workflow_state
+    LearningOutcomeGroup.where(title: nil).update_all(title: '')
     change_column_null_with_less_locking :learning_outcome_groups, :title
     change_column_null_with_less_locking :learning_outcome_groups, :workflow_state
     change_column_null_with_less_locking :media_objects, :workflow_state
@@ -167,6 +176,7 @@ class MakeColumnsNotNull < ActiveRecord::Migration
     change_column_null_with_less_locking :progresses, :workflow_state
     change_column_null_with_less_locking :pseudonyms, :workflow_state
     change_column_null_with_less_locking :pseudonyms, :account_id
+    Pseudonym.where(user_id: nil).delete_all
     change_column_null_with_less_locking :pseudonyms, :user_id
     change_column_null_with_less_locking :quizzes, :context_id
     change_column_null_with_less_locking :quizzes, :context_type
@@ -210,6 +220,7 @@ class MakeColumnsNotNull < ActiveRecord::Migration
     change_column_null_with_less_locking :user_notes, :workflow_state
     change_column_null_with_less_locking :user_services, :user_id
     change_column_null_with_less_locking :user_services, :service
+    UserService.where(service_user_id: nil).delete_all
     change_column_null_with_less_locking :user_services, :service_user_id
     change_column_null_with_less_locking :user_services, :workflow_state
     change_column_null_with_less_locking :users, :workflow_state
