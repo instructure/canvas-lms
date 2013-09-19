@@ -62,6 +62,19 @@ module ActiveRecord
             return false
           end
         end
+
+        def fix_position_conflicts
+          list = acts_as_list_class.where(scope_condition).select([:id, position_column.to_sym]).sort_by{|o| [o.send(position_column) || SortLast, o.id] }
+          updates = []
+          last_position = 0
+          list.each do |obj|
+            new_position = (obj.position && obj.position > last_position) ? obj.position : last_position + 1
+            updates << "WHEN id=#{obj.id} THEN #{new_position}"
+            last_position = new_position
+          end
+          acts_as_list_class.update_all("position=CASE #{updates.join(" ")} ELSE NULL END", scope_condition) unless updates.empty?
+        end
+
       end
     end
   end

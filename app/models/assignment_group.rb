@@ -22,7 +22,7 @@ class AssignmentGroup < ActiveRecord::Base
 
   attr_accessible :name, :rules, :assignment_weighting_scheme, :group_weight, :position, :default_assignment_name
   attr_readonly :context_id, :context_type
-  acts_as_list :scope => :context
+  acts_as_list :scope => 'assignment_groups.context_type = #{connection.quote(context_type)} AND assignment_groups.context_id = #{context_id} AND assignment_groups.workflow_state <> \'deleted\''
   has_a_broadcast_policy
 
   has_many :assignments, :order => 'position, due_at, title', :dependent => :destroy
@@ -200,6 +200,7 @@ class AssignmentGroup < ActiveRecord::Base
         end
       end
     end
+    migration.context.assignment_groups.first.try(:fix_position_conflicts)
   end
 
   def self.add_groups_for_imported_assignments(data, migration)

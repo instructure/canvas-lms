@@ -76,5 +76,42 @@ describe "acts_as_list" do
       @modules.map(&:position).should == [1, 2, 3]
     end
   end
-end
 
+  describe "#fix_position_conflicts" do
+    it "should order null positions last" do
+      course
+      module_1 = @course.context_modules.create :name => 'one'
+      module_1.position = nil
+      module_1.save!
+      module_2 = @course.context_modules.create :name => 'two'
+      module_2.position = 1
+      module_2.save!
+      module_1.fix_position_conflicts
+      @course.context_modules.map{|m| [m.id, m.position]}.should eql [[module_2.id, 1], [module_1.id, 2]]
+    end
+
+    it "should break ties by object id" do
+      course
+      module_1 = @course.context_modules.create :name => 'one'
+      module_1.position = 1
+      module_1.save!
+      module_2 = @course.context_modules.create :name => 'two'
+      module_2.position = 1
+      module_2.save!
+      module_1.fix_position_conflicts
+      @course.context_modules.map{|m| [m.id, m.position]}.should eql [[module_1.id, 1], [module_2.id, 2]]
+    end
+
+    it "should leave gaps alone" do
+      course
+      module_1 = @course.context_modules.create :name => 'one'
+      module_1.position = 1
+      module_1.save!
+      module_2 = @course.context_modules.create :name => 'two'
+      module_2.position = 3
+      module_2.save!
+      module_1.fix_position_conflicts
+      @course.context_modules.map{|m| [m.id, m.position]}.should eql [[module_1.id, 1], [module_2.id, 3]]
+    end
+  end
+end

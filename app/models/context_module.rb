@@ -24,7 +24,7 @@ class ContextModule < ActiveRecord::Base
   belongs_to :cloned_item
   has_many :context_module_progressions, :dependent => :destroy
   has_many :content_tags, :dependent => :destroy, :order => 'content_tags.position, content_tags.title'
-  acts_as_list :scope => :context
+  acts_as_list :scope => 'context_modules.context_type = #{connection.quote(context_type)} AND context_modules.context_id = #{context_id} AND context_modules.workflow_state <> \'deleted\''
   
   serialize :prerequisites
   serialize :completion_requirements
@@ -673,14 +673,8 @@ class ContextModule < ActiveRecord::Base
         end
       end
     end
-    migration_ids = modules.map{|m| m['module_id'] }.compact
-    conn = self.connection
-    cases = []
-    max = migration.context.context_modules.not_deleted.map(&:position).compact.max || 0
-    modules.each_with_index{|m, idx| cases << " WHEN migration_id=#{conn.quote(m['module_id'])} THEN #{max + idx + 1} " if m['module_id'] }
-    unless cases.empty?
-      conn.execute("UPDATE context_modules SET position=CASE #{cases.join(' ')} ELSE NULL END WHERE context_id=#{migration.context.id} AND context_type=#{conn.quote(migration.context.class.to_s)} AND migration_id IN (#{migration_ids.map{|id| conn.quote(id)}.join(',')})")
-    end
+    migration.context.context_modules.first.try(:fix_position_conflicts)
+    migration.context.touch
   end
   
   def self.import_from_migration(hash, context, item=nil)
