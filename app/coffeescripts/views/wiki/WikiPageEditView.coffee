@@ -79,9 +79,11 @@ define [
 
       @checkUnsavedOnLeave = true
       view = this
-      $(window).on 'beforeunload', ->
+      window.addEventListener 'beforeunload', (ev) ->
         if view && view.checkUnsavedOnLeave && view.hasUnsavedChanges()
-          return view.unsavedWarning()
+          warning = view.unsavedWarning()
+          (ev || window.event).returnValue = warning
+          return warning
 
       unless @firstRender
         @firstRender = true
@@ -131,19 +133,13 @@ define [
 
       errors
 
-    unescape: (str) ->
-      str.replace(/\&nbsp;/g, String.fromCharCode(160))
-
     hasUnsavedChanges: ->
       json = @toJSON()
-
-      formData = @getFormData()
-      oldBody = @model.get('body') || ''
-      newBody = formData.body || ''
+      dirty = @$wikiPageBody.editorBox('is_dirty')
       if json.CAN.EDIT_TITLE
-        oldTitle = @model.get('title') || ''
-        newTitle = formData.title || ''
-      return (@unescape(oldBody) != @unescape(newBody)) || (oldTitle != newTitle)
+        dirty ||= (@model.get('title') ? '') != (@getFormData().title ? '')
+
+      dirty
 
     unsavedWarning: ->
       I18n.t("warnings.unsaved_changes",

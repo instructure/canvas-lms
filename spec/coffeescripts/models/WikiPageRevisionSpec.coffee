@@ -42,7 +42,7 @@ define [
   test 'the summary flag is passed to the server', ->
     @stub($, 'ajax').returns($.Deferred())
 
-    revision = new WikiPageRevision {}, pageUrl: 'page-url', summary: true
+    revision = new WikiPageRevision {}, contextAssetString: 'course_73', pageUrl: 'page-url', summary: true
     revision.fetch()
     strictEqual $.ajax.args[0]?[0]?.data?.summary, true, 'summary provided'
 
