@@ -173,8 +173,8 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly) ->
     toJSON: =>
       data = @assignment.toView()
       _.extend data,
-        kalturaEnabled: ENV?.KALTURA_ENABLED || false
-        isLargeRoster: ENV?.IS_LARGE_ROSTER || false
+        kalturaEnabled: ENV?.KALTURA_ENABLED or false
+        isLargeRoster: ENV?.IS_LARGE_ROSTER or false
         submissionTypesFrozen: _.include(data.frozenAttributes, 'submission_types')
 
     _attachEditorToDescription: =>
@@ -284,7 +284,9 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly) ->
       errors
 
     _validateTitle: (data, errors) =>
-      if !data.name or $.trim(data.name.toString()).length == 0
+      frozenTitle = _.contains(@model.frozenAttributes(), "title")
+
+      if !frozenTitle and (!data.name or $.trim(data.name.toString()).length == 0)
         errors["name"] = [
           message: I18n.t 'name_is_required', 'Name is required!'
         ]
@@ -318,7 +320,8 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly) ->
     _validateAdvancedOptions: (data, errors) =>
       ariaExpanded = @$advancedAssignmentOptions.attr('aria-expanded')
       expanded = ariaExpanded == 'true' or ariaExpanded == true
-      if _.keys(errors).length > 0 && !expanded
+      error_keys = _.keys(errors)
+      if error_keys.length > 0 and !_.contains(error_keys, "name") and !expanded
         errors["assignmentToggleAdvancedOptions"] = [
           message: I18n.t 'advanced_options_errors', 'There were errors on one or more advanced options'
         ]

@@ -24,6 +24,35 @@ describe "assignments" do
       wait_for_ajaximations
     end
 
+    def run_assignment_edit(assignment)
+      get "/courses/#{@course.id}/assignments/#{assignment.id}/edit"
+      f('#assignment_toggle_advanced_options').try(:click)
+
+      yield
+
+      submit_assignment_form
+    end
+
+    def stub_freezer_plugin(frozen_atts = nil)
+      frozen_atts ||= {
+        "assignment_group_id" => "true"
+      }
+      PluginSetting.stubs(:settings_for_plugin).returns(frozen_atts)
+    end
+
+    def frozen_assignment(group)
+      group ||= @course.assignment_groups.first
+      assign = @course.assignments.create!(
+          :name => "frozen",
+          :due_at => Time.now.utc + 2.days,
+          :assignment_group => group,
+          :freeze_on_copy => true
+      )
+      assign.copied = true
+      assign.save!
+      assign
+    end
+
     before(:each) do
       course_with_teacher_logged_in
     end
@@ -467,61 +496,54 @@ describe "assignments" do
       f('#assignment_due_date').attribute(:value).should == "Jun 10, 2012 at 12am"
     end
 
-    context "frozen assignments" do
-
-      append_before(:each) do
-        @att_map = {
-            "assignment_group_id" => "true"
-        }
-        PluginSetting.stubs(:settings_for_plugin).returns(@att_map)
-
-        @asmnt = @course.assignments.create!(
-            :name => "frozen",
-            :due_at => Time.now.utc + 2.days,
-            :assignment_group => @course.assignment_groups.create!(:name => "default"),
-            :freeze_on_copy => true
-        )
-        @asmnt.copied = true
-        @asmnt.save!
-
-        @course.assignment_groups.create!(:name => "other")
-      end
-
-      def run_assignment_edit
-        orig_title = @asmnt.title
-
-        get "/courses/#{@course.id}/assignments"
-
-        expect_new_page_load { f("#assignment_#{@asmnt.id} .title").click }
-        edit_assignment
-        f('#assignment_toggle_advanced_options').try(:click)
-
-        yield
-
-        # title isn't locked, should allow editing
-        f('#assignment_name').send_keys(' edit')
-
-        #save changes
-        submit_assignment_form
-        f('h2.title').should include_text(orig_title + ' edit')
+    context "frozen assignment_group_id" do
+      before do
+        stub_freezer_plugin
+        default_group = @course.assignment_groups.create!(:name => "default")
+        @frozen_assign = frozen_assignment(default_group)
       end
 
       it "should not allow assignment group to be deleted by teacher if assignment group id frozen" do
         get "/courses/#{@course.id}/assignments"
-        fj("#group_#{@asmnt.assignment_group_id} .delete_group_link").should be_nil
-        fj("#assignment_#{@asmnt.id} .delete_assignment_link").should be_nil
+        fj("#group_#{@frozen_assign.assignment_group_id} .delete_group_link").should be_nil
+        fj("#assignment_#{@frozen_assign.id} .delete_assignment_link").should be_nil
       end
 
       it "should not be locked for admin" do
+        @course.assignment_groups.create!(:name => "other")
         course_with_admin_logged_in(:course => @course, :name => "admin user")
+        orig_title = @frozen_assign.title
 
-        run_assignment_edit do
+        run_assignment_edit(@frozen_assign) do
+          # title isn't locked, should allow editing
+          f('#assignment_name').send_keys(' edit')
+
           f('#assignment_group_id').attribute('disabled').should be_nil
           f('#assignment_peer_reviews').attribute('disabled').should be_nil
           f('#assignment_description').attribute('disabled').should be_nil
           click_option('#assignment_group_id', "other")
         end
-        @asmnt.reload.assignment_group.name.should == "other"
+
+        f('h2.title').should include_text(orig_title + ' edit')
+        @frozen_assign.reload.assignment_group.name.should == "other"
+      end
+    end
+
+    context "frozen assignment" do
+      before do
+        stub_freezer_plugin Hash[Assignment::FREEZABLE_ATTRIBUTES.map{|a| [a, "true"]}]
+        default_group = @course.assignment_groups.create!(:name => "default")
+        @frozen_assign = frozen_assignment(default_group)
+      end
+
+      it "should allow editing the due date even if completely frozen" do
+        old_due_at = @frozen_assign.due_at
+        run_assignment_edit(@frozen_assign) do
+          replace_content(fj('.due-date-overrides form:first input[name=due_at]'), 'Sep 20, 2012')
+        end
+
+        f('.assignment_dates').text.should match /Sep 20, 2012/
+        @frozen_assign.reload.due_at.to_i.should_not == old_due_at.to_i
       end
     end
 
@@ -665,37 +687,25 @@ describe "assignments" do
         end
       end
 
-      context "frozen assignments" do
+      context "frozen assignment_group_id" do
         before do
-          @att_map = {
-              "assignment_group_id" => "true"
-          }
-          PluginSetting.stubs(:settings_for_plugin).returns(@att_map)
-
-          @asmnt = @course.assignments.create!(
-              :name => "frozen",
-              :due_at => Time.now.utc + 2.days,
-              :assignment_group => @course.assignment_groups.create!(:name => "default"),
-              :freeze_on_copy => true
-          )
-          @asmnt.copied = true
-          @asmnt.save!
-
-          @course.assignment_groups.create!(:name => "other")
+          stub_freezer_plugin
+          default_group = @course.assignment_groups.create!(:name => "default")
+          @frozen_assign = frozen_assignment(default_group)
         end
 
         it "should not allow assignment group to be deleted by teacher if assignments are frozen" do
           get "/courses/#{@course.id}/assignments"
-          fj("#ag_#{@asmnt.assignment_group_id}_manage_link").click
+          fj("#ag_#{@frozen_assign.assignment_group_id}_manage_link").click
           wait_for_ajaximations
-          element_exists("div#assignment_group_#{@asmnt.assignment_group_id} a.delete_group").should be_false
+          element_exists("div#assignment_group_#{@frozen_assign.assignment_group_id} a.delete_group").should be_false
         end
 
         it "should not allow deleting a frozen assignment from index page" do
           get "/courses/#{@course.id}/assignments"
-          fj("div#assignment_#{@asmnt.id} a.al-trigger").click
+          fj("div#assignment_#{@frozen_assign.id} a.al-trigger").click
           wait_for_ajaximations
-          element_exists("div#assignment_#{@asmnt.id} a.delete_assignment:visible").should be_false
+          element_exists("div#assignment_#{@frozen_assign.id} a.delete_assignment:visible").should be_false
         end
       end
 
