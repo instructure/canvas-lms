@@ -403,7 +403,7 @@ class Account < ActiveRecord::Base
         FROM users
        INNER JOIN user_account_associations uaa on uaa.user_id = users.id
        WHERE uaa.account_id = ? AND users.workflow_state != 'deleted'
-       #{Group.not_in_group_sql_fragment(groups)}
+       #{Group.not_in_group_sql_fragment(groups.map(&:id))}
        #{"ORDER BY #{opts[:order_by]}" if opts[:order_by].present?}", self.id]
   end
 

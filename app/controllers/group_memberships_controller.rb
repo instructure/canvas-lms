@@ -97,7 +97,11 @@ class GroupMembershipsController < ApplicationController
     @user = api_find(User, params[:user_id])
     if authorized_action(GroupMembership.new(:group => @group, :user => @user), @current_user, :create)
       @membership = @group.add_user(@user)
-      render :json => group_membership_json(@membership, @current_user, session)
+      if @membership.valid?
+        render :json => group_membership_json(@membership, @current_user, session)
+      else
+        render :json => @membership.errors, :status => :bad_request
+      end
     end
   end
 

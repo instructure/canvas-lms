@@ -13,6 +13,17 @@ define [
 
     template: template
 
+    els: _.extend {}, # override Filterable's els, since our filter is in another view
+      PaginatedCollectionView::els
+      '.no-results': '$noResults'
+
+    render: ->
+      super
+
+    afterRender: ->
+      @$filter = @$externalFilter
+      super
+
     initialize: ->
       super
       @detachScroll() if @collection.loadAll

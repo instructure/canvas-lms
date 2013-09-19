@@ -168,7 +168,7 @@ class GroupCategoriesController < ApplicationController
       @group_category = @context.group_categories.build
       if populate_group_category_from_params
         if api_request?
-          render :json => group_category_json(@group_category, @current_user, session)
+          render :json => group_category_json(@group_category, @current_user, session, include: ["unassigned_users_count", "groups_count"])
         else
           flash[:notice] = t('notices.create_category_success', 'Category was successfully created.')
           render :json => [@group_category.as_json, @group_category.groups.map { |g| g.as_json(:include => :users) }]
@@ -308,7 +308,7 @@ class GroupCategoriesController < ApplicationController
     search_params[:enrollment_role] = "StudentEnrollment" if @context.is_a? Course
 
     @group_category ||= @context.group_categories.find_by_id(params[:category_id])
-    exclude_groups = value_to_boolean(params[:unassigned]) ? @group_category.groups.active : []
+    exclude_groups = value_to_boolean(params[:unassigned]) ? @group_category.groups.active.pluck(:id) : []
     search_params[:exclude_groups] = exclude_groups
 
     if search_term

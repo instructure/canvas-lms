@@ -1,3 +1,5 @@
+@import 'environment';
+
 .progress-title {
   text-align: center;
   font-weight: bold;
@@ -8,3 +10,63 @@
   margin-right: auto;
   width: 60%;
 }
+
+.group-category-contents {
+  background: $wellBackground;
+  border-color: darken($wellBackground, 7%);
+  border-style: solid;
+  border-width: 1px 0px;
+  padding: 1em 1.5em;
+  min-height: 350px;
+}
+
+.group-category-contents-condensed {
+  padding: 0;
+  .groups {
+    > p {
+      margin: 1em;
+    }
+    > .paginatedLoadingIndicator {
+      margin-top: 1em;
+    }
+  }
+}
+
+.groups {
+  > .collectionViewItems {
+    margin: -1px 0 0;
+  }
+  > p {
+    margin: 1em 0;
+  }
+}
+
+.group-category-summary {
+  min-height: 32px;
+  margin: 0 1em 1em;
+  background: #fff;
+  .group-category-actions {
+    margin-left: 1em;
+  }
+  .group-category-detail {
+    overflow: hidden; // to play nice w/ action buttons
+    .alert, p {
+      margin-bottom: 0;
+    }
+    .student-organized-groups {
+      overflow: hidden; // so it doesn't overlap with the button/cog
+    }
+  }
+}
+
+.group-heading {
+  font-weight: bold;
+  font-size: 1.1em;
+  color: #555;
+  margin: 0;
+}
+a.group-heading:hover {
+  color: inherit;
+  text-decoration: none;
+}
+

@@ -21,8 +21,8 @@ define [
       filterColumns: ['name']
 
     afterRender: ->
-      @$filter.on 'input', => @setFilter @$filter.val()
-      @$filter.trigger 'input'
+      @$filter?.on 'input', => @setFilter @$filter.val()
+      @$filter?.trigger 'input'
 
     setFilter: (filter) ->
       @filter = filter.toLowerCase()
@@ -30,7 +30,7 @@ define [
         model.trigger 'filterOut', @filterOut(model)
       # show a "no results" message if there are items but they are all
       # filtered out
-      @$noResults.toggleClass 'hidden', @collection.length and not @$list.children(':visible').length
+      @$noResults.toggleClass 'hidden', not (@filter and not @collection.fetchingPage and @collection.length > 0 and @$list.children(':visible').length is 0)
 
     attachItemView: (model, view) ->
       filterView = (filtered) ->

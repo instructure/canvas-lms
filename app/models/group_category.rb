@@ -253,9 +253,12 @@ class GroupCategory < ActiveRecord::Base
     end
   end
 
+  def unassigned_users
+    context.users_not_in_groups(groups.active)
+  end
+
   def assign_unassigned_members
-    potential_members = context.users_not_in_groups(groups.active)
-    distribute_members_among_groups(potential_members, groups.active)
+    distribute_members_among_groups(unassigned_users, groups.active)
   end
 
   def assign_unassigned_members_in_background

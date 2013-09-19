@@ -7,8 +7,8 @@ define [
 
   class UnassignedUsersView extends GroupUsersView
 
-    @optionProperty 'assignToGroupMenu'
     @optionProperty 'groupsCollection'
+    @optionProperty 'category'
 
     defaults: _.extend {},
       GroupUsersView::defaults,
@@ -18,8 +18,7 @@ define [
         canRemoveFromGroup: false
 
     attach: ->
-      @groupsCollection.on 'add', @groupAdded
-      @groupsCollection.on 'remove', @groupRemoved
+      @collection.on 'reset', @render
 
     afterRender: ->
       super
@@ -30,7 +29,7 @@ define [
       count: @collection.length
 
     remove: ->
-      @assignToGroupMenu.remove()
+      @assignToGroupMenu?.remove()
       super
 
     events:
@@ -42,6 +41,7 @@ define [
       e.preventDefault()
       e.stopPropagation()
       $target = $(e.currentTarget)
+      @assignToGroupMenu ?= new AssignToGroupMenu collection: @groupsCollection
       @assignToGroupMenu.model = @collection.get($target.data('user-id'))
       @assignToGroupMenu.showBy $target
 
@@ -50,16 +50,4 @@ define [
 
     canAssignToGroup: ->
       @options.canAssignToGroup and @groupsCollection.length
-
-    groupAdded: =>
-      @$el.removeClass 'group-category-empty'
-
-    groupRemoved: (group) =>
-      users = group.users()
-      if users.loadedAll
-        users = users.models.slice()
-        user.set 'groupId', null for user in users
-      else
-        @collection.fetch()
-      @$el.addClass 'group-category-empty' if @groupsCollection.length is 0
 

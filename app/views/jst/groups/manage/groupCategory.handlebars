@@ -1,34 +1,44 @@
-<div data-view="groupCategoryDetail"></div>
-
-{{#if randomlyAssignStudentsInProgress}}
-  <div class="progress-container">
-    <h5 class="progress-title">{{#t "randomly_assigning_students"}}Randomly Assigning Students{{/t}}</h5>
-    <div class="progressbar ui-progressbar ui-widget ui-widget-content ui-corner-all" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{progress.completion}}">
-        <div class="ui-progressbar-value ui-widget-header ui-corner-left" style="width: {{progress.completion}}%;"></div>
-    </div>
-  </div>
-{{else}}
-
+<div class="group-category-summary">
   {{#if ENV.IS_LARGE_ROSTER}}
-    <div data-view="groups"></div>
+    <p>
+      <input
+        type="text"
+        class="filterable search-query"
+        placeholder="{{#t "search_groups"}}Search groups{{/t}}"
+        aria-label="{{#t "search"}}Search{{/t}}"
+      >
+    </p>
+  {{/if}}
+
+  <div data-view="groupCategoryDetail" class="group-category-detail"></div>
+</div>
+
+<div class="group-category-contents {{#if ENV.IS_LARGE_ROSTER}}group-category-contents-condensed{{/if}}">
+  {{#if randomlyAssignStudentsInProgress}}
+    <div class="progress-container">
+      <h5 class="progress-title">{{#t "randomly_assigning_students"}}Randomly Assigning Students{{/t}}</h5>
+      <div class="progressbar ui-progressbar ui-widget ui-widget-content ui-corner-all" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{progress.completion}}">
+          <div class="ui-progressbar-value ui-widget-header ui-corner-left" style="width: {{progress.completion}}%;"></div>
+      </div>
+    </div>
   {{else}}
 
-    <div class="row-fluid">
-      <div class="well span4">
-        <h3 class="h5">
-          <strong>
-            {{#ifEqual ENV.group_user_type "student"}}
-              {{#t "unassigned_students"}}Unassigned Students{{/t}}
-            {{else}}
-              {{#t "unassigned_users"}}Unassigned Users{{/t}}
-            {{/ifEqual}}
-          </strong>
-        </h3>
-        <div data-view="unassignedUsers"></div>
+    {{#if ENV.IS_LARGE_ROSTER}}
+      <div class="groups" data-view="groups"></div>
+    {{else}}
+
+      <div class="row-fluid">
+        <div class="span3">
+          <h3 class="unassigned-users-heading group-heading"></h3>
+          <div data-view="unassignedUsers"></div>
+        </div>
+        <div class="span9 groups">
+          <h2 class="group-heading groups-with-count"></h2>
+          <div data-view="groups"></div>
+        </div>
       </div>
-      <div class="span8" data-view="groups"></div>
-    </div>
+    {{/if}}
   {{/if}}
-{{/if}}
+</div>
 
 

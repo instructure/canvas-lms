@@ -18,9 +18,30 @@
 
 define [
   'compiled/collections/PaginatedCollection'
+  'compiled/collections/GroupUserCollection'
   'compiled/models/Group'
-], (PaginatedCollection, Group) ->
+], (PaginatedCollection, GroupUserCollection, Group) ->
 
   class GroupCollection extends PaginatedCollection
     model: Group
     comparator: (group) -> group.get('name').toLowerCase()
+
+    initialize: ->
+      super
+      @on 'remove', @removed
+
+    removed: (group) ->
+      # update/reset the unassigned users collection (if it's around)
+      unassignedUsers = @category?._unassignedUsers
+      return unless unassignedUsers
+      users = group.users()
+      return unless group.usersCount()
+
+      if users.loadedAll
+        models = users.models.slice()
+        user.set 'groupId', null for user in models
+      else
+        unassignedUsers.increment group.usersCount()
+
+      if not users.loadedAll or not unassignedUsers.loadedAll
+        unassignedUsers.fetch()

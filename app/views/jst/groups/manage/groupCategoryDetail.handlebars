@@ -1,54 +1,52 @@
-<div class="pull-right">
-  <a href="#" class="btn add-group">{{#t "add_group"}}Add Group{{/t}}</a>
+<div class="pull-right group-category-actions">
+  <a href="#" class="btn add-group icon-plus" title="{{#t "add_group"}}Add Group{{/t}}">{{#t "group"}}Group{{/t}}</a>
   <span>
     <a class="al-trigger btn" href="#">
       <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
       <span class="screenreader-only">{{#t "category_settings"}}Settings{{/t}}</span>
     </a>
     <ul class="al-options">
-      {{#unless studentOrganizedOrSelfSignupRestricted}}
-        {{#unless ENV.IS_LARGE_ROSTER}}
-          <li><a href="#"
-                 class="icon-email message-all-unassigned">{{#t "message_all_unassigned_option"}}Message All Unassigned Students{{/t}}</a></li>
-        {{/unless}}
-        {{#unless noGroups}}
-          <li><a href="#"
-                 class="icon-user randomly-assign-members">{{#t "randomly_assign_students_option"}}Randomly Assign Students{{/t}}</a></li>
-        {{/unless}}
+      {{#unless ENV.IS_LARGE_ROSTER}}
+         <li>
+           <a href="#" class="icon-email message-all-unassigned">
+             {{#t "message_all_unassigned_option"}}Message All Unassigned Students{{/t}}
+           </a>
+         </li>
       {{/unless}}
-      <li><a href="#"
-             class="icon-edit edit-category">{{#t "edit_category_option"}}Edit{{/t}}</a></li>
-      <li><a href="#"
-             class="icon-trash delete-category">{{#t "delete_category_option"}}Delete{{/t}}</a></li>
+      {{#if canAssignMembers}}
+        <li>
+          <a href="#" class="icon-user randomly-assign-members">
+            {{#t "randomly_assign_students_option"}}Randomly Assign Students{{/t}}
+          </a>
+        </li>
+      {{/if}}
+      <li>
+        <a href="#" class="icon-edit edit-category">
+          {{#t "edit_category_option"}}Edit{{/t}}
+        </a>
+      </li>
+      <li>
+        <a href="#" class="icon-trash delete-category">
+          {{#t "delete_category_option"}}Delete{{/t}}
+        </a>
+      </li>
     </ul>
   </span>
 </div>
 
-{{#if mooc}}
-  <input type="text" class="input-medium search-query" placeholder="{{#t "search"}}search{{/t}}">
-{{/if}}
-
-<div>{{groupCountText}}
-  {{#ifEqual ENV.group_user_type "student"}}
-    {{#t "student_group_instructions"}}(drag students to assign){{/t}}
-  {{else}}
-    {{#t "user_group_instructions"}}(drag users to assign){{/t}}
-  {{/ifEqual}}
-</div>
-
-{{#if selfSignup}}
-  <div>
+{{#if self_signup}}
+  <p>
     {{#t "self_signup_blurb"}}Self sign-up is enabled for these groups.{{/t}}
-    <a href="#" class="self_signup_help_link" title="{{#t "self_signup_help_tooltip"}}What Are Self Sign-Up Groups?{{/t}}"><i class="icon-question-sign"></i></a>
-    {{#if restrictedSelfSignup}}
+    {{#ifEqual self_signup "restricted"}}
       <span>{{#t "restricted_self_signup_blurb"}}All students in a group are required to be in the same section.{{/t}}</span>
-    {{/if}}
-    {{#if groupLimit}}
-      <p>{{#t "group_limit_blurb"}}Groups are limited to <strong>{{count}}</strong> members{{/t}}</p>
-    {{/if}}
-  </div>
+    {{/ifEqual}}
+    {{> [groups/manage/selfSignupHelp]}}
+  </p>
+  {{#if group_limit}}
+    <p>{{#t "group_limit_blurb"}}Groups are limited to <strong>{{group_limit}}</strong> members.{{/t}}</p>
+  {{/if}}
 {{/if}}
 
-{{#if studentOrganized}}
-  <div class="alert"><i class="icon-warning-sign"></i> {{#t "self_organized_warning"}}These groups are self-organized by students.  Unlike other types of groups, students can belong to more than one of these groups at a time, so these groups may not be the best solution for graded assignments.{{/t}}</div>
-{{/if}}
+{{#ifEqual role "student_organized"}}
+  <div class="alert student-organized-groups"><i class="icon-warning"></i> {{#t "self_organized_warning"}}These groups are self-organized by students.  Unlike other types of groups, students can belong to more than one of these groups at a time, so these groups may not be the best solution for graded assignments.{{/t}}</div>
+{{/ifEqual}}

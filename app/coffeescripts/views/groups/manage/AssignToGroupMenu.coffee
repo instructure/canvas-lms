@@ -13,7 +13,6 @@ define [
 
     attach: ->
       @collection.on 'change add remove reset', @render
-      @render()
 
     tagName: 'div'
 

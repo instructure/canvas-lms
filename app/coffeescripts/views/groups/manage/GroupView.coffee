@@ -12,7 +12,7 @@ define [
 
     tagName: 'li'
 
-    className: 'group well'
+    className: 'group'
 
     template: template
 

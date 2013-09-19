@@ -37,9 +37,8 @@ define [
       parentBound = parent.offset().top + parent.height()
       popoverOffset = popover.offset().top
       popoverHeader = popover.find('.popover-title').outerHeight()
-      contentPadding = content.outerHeight() - content.height()
       defaultHeight = parseInt content.css('maxHeight')
-      newHeight = parentBound - popoverOffset - popoverHeader - contentPadding
+      newHeight = parentBound - popoverOffset - popoverHeader
       content.css maxHeight: Math.min(defaultHeight, newHeight)
 
     cancelHide: =>

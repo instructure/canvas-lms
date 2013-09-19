@@ -1,7 +1,5 @@
-<div class='headerBar clearfix'>
-  <div class='headerBar-right'>
-    <a href='#' id='add-group-set' class='btn btn-primary'>{{#t 'group_set_create'}}Add Group Set{{/t}}</a>
-  </div>
+<div class='pull-right group-categories-actions'>
+  <a href='#' id='add-group-set' class='btn btn-primary icon-plus' title="{{#t 'add_group_set'}}Add Group Set{{/t}}">{{#t 'group_set'}}Group Set{{/t}}</a>
 </div>
 
 <div class='empty-groupset-instructions'>
@@ -34,7 +32,7 @@
   {{/ifEqual}}
 </div>
 
-<div id="group_categories_tabs" style="display:none;" class="ui-tabs-minimal">
+<div id="group_categories_tabs" class="ui-tabs-minimal">
   <ul class='collectionViewItems'></ul>
   <!--panels get inserted dynamically-->
 </div>
