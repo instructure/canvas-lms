@@ -242,6 +242,7 @@ class RequestThrottle
 
       current_time = current_time.to_f
       Rails.logger.debug("request throttling increment: #{([amount, reserve_cost, current_time] + self.as_json).to_json}")
+      redis = self.redis
       count, last_touched = LeakyBucket.lua.run(:increment_bucket, [cache_key], [amount + reserve_cost, current_time, outflow, maximum], redis)
       self.count = count.to_f
       self.last_touched = last_touched.to_f
