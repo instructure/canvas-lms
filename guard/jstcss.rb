@@ -36,7 +36,12 @@ module Guard
         if remove
           File.delete(css_path) if File.exist?(css_path)
         else
-          Compass.compiler.compile path, css_path
+          begin
+            Compass.compiler.compile path, css_path
+          rescue
+            UI.error $!.to_s
+            UI.error $!.backtrace[0]
+          end
         end
 
         # now make sure hbs gets recompiled (via other guard)
@@ -52,7 +57,7 @@ module Guard
     def run_all
       UI.info "Compiling all jst css in #{@options[:input]} to #{@options[:output]}"
       update_jst_css Dir["{,vendor/plugins/*/}app/stylesheets/jst/**/*.s{c,a}ss"]
-      UI.info "Successfully compiled all jst css in #{@options[:input]}"
+      UI.info "Compiled all jst css in #{@options[:input]}"
     end
 
     def run_on_deletion(paths)
