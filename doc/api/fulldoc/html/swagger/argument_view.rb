@@ -1,31 +1,59 @@
 require 'hash_view'
 
 class ArgumentView < HashView
-  attr_reader :line
+  attr_reader :line, :http_verb, :path_variables
+  attr_reader :name, :type, :desc
+
+  DEFAULT_TYPE = "[String]"
+  DEFAULT_DESC = "no description"
 
   def initialize(line, http_verb = "get", path_variables = [])
-    @line = line.gsub(/\s+/m, " ")
+    @line, @name, @type, @desc = parse_line(line)
     @http_verb = http_verb
     @path_variables = path_variables
-    @name, remaining = @line.scan(/^([^\s]+)(.*)$/).first
-    @type, @desc = parse_type_desc(remaining)
-    # debugger
-    @name.strip! if @name
-    @type = format(@type.strip.gsub('[', '').gsub(']', '')) if @type
-    @desc.strip! if @desc
+    parse_line(@line)
+  end
+
+  def parse_line(line)
+    clean_line = line.gsub(/\s+/m, " ")
+    name, remaining = clean_line.scan(/^([^\s]+)(.*)$/).first
+    name.strip! if @name
+    if remaining
+      type, desc = split_type_desc(remaining)
+      # type = format(type.strip.gsub('[', '').gsub(']', '')) if type
+      type.strip! if type
+      desc.strip! if desc
+    end
+    [clean_line, name, type, desc]
   end
 
   # Atrocious use of regex to parse out type signatures such as:
   # "[[Integer], Optional] The IDs of the override's target students."
-  def parse_type_desc(str)
-    parts = str.strip.
-      gsub(/\]\s+,/, '],'). # turn "] ," into "],"
-      gsub(/[^,] /){ |s| s[0] == ']' ? s[0] + '|||' : s }. # put "|||" between type and desc
+  def split_type_desc(str)
+    type_desc_parts_to_pair(
+      str.strip.
+      # turn "] ," into "],"
+      gsub(/\]\s+,/, '],').
+      # put "|||" between type and desc
+      sub(/[^,] /){ |s| s[0] == ']' ? s[0] + '|||' : s }.
+      # split on "|||"
       split('|||')
-    if parts.size == 1
-      [nil, parts.first]
-    else
+    )
+  end
+
+  def type_desc_parts_to_pair(parts)
+    case parts.size
+    when 0 then [DEFAULT_TYPE, DEFAULT_DESC]
+    when 1 then
+      if parts.first.include?('[') and parts.first.include?(']')
+        [parts.first, DEFAULT_DESC]
+      else
+        [DEFAULT_TYPE, parts.first]
+      end
+    when 2 then
       parts
+    else
+      raise "Too many parts while splitting type and description: #{parts.inspect}"
     end
   end
 
@@ -37,8 +65,12 @@ class ArgumentView < HashView
     format(@desc)
   end
 
+  def remove_outer_square_brackets(str)
+    str.sub(/^\[/, '').sub(/\]$/, '')
+  end
   def metadata_parts
-    (@type || '').split(/\s*[,\|]\s*/).map{ |t| t.force_encoding('UTF-8') }
+    remove_outer_square_brackets(@type).
+      split(/\s*[,\|]\s*/).map{ |t| t.force_encoding('UTF-8') }
   end
 
   def enum_and_types
@@ -80,11 +112,11 @@ class ArgumentView < HashView
   end
 
   def optional?
-    enum_and_types.last.include?('optional')
+    enum_and_types.last.map{ |t| t.downcase }.include?('optional')
   end
 
   def required?
-    !!optional?
+    not optional?
   end
 
   def array?
