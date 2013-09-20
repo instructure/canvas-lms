@@ -482,7 +482,10 @@ class AssessmentQuestion < ActiveRecord::Base
           question_data[:qq_data][question['migration_id']] = question
           next
         end
-        next if question[:question_bank_migration_id] && !migration.import_object?("quizzes", question[:question_bank_migration_id])
+        next if question[:question_bank_migration_id] &&
+            !migration.import_object?("quizzes", question[:question_bank_migration_id]) &&
+            !migration.import_object?("assessment_question_banks", question[:question_bank_migration_id])
+
         if !question_bank
           hash_id = "#{question[:question_bank_id]}_#{question[:question_bank_name]}"
           if !banks[hash_id]
