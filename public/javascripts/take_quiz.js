@@ -70,10 +70,10 @@ define([
       cantGoBack: $("#submit_quiz_form").hasClass("cant_go_back"),
       finalSubmitButtonClicked: false,
       clockInterval: 500,
-      updateSubmission: function(repeat, beforeLeave) {
+      updateSubmission: function(repeat, beforeLeave, autoInterval) {
         if(quizSubmission.submitting && !repeat) { return; }
         var now = new Date();
-        if((now - quizSubmission.lastSubmissionUpdate) < 1000) { 
+        if((now - quizSubmission.lastSubmissionUpdate) < 1000 && !autoInterval) {
           return;
         }
         if(quizSubmission.currentlyBackingUp) { return; }
@@ -107,10 +107,11 @@ define([
             // If this is a timeout-based submission and the data is the same as last time,
             // palliate the server by skipping the data submission
             if (!quizSubmission.inBackground && repeat && _.isEqual(submissionData, lastSuccessfulSubmissionData)) {
-              $lastSaved.text(I18n.t('saving_not_needed', "No new data to save."));
+              $lastSaved.text(I18n.t('saving_not_needed', "No new data to save. Last checked at %{t}", { t: $.friendlyDatetime(new Date()) }));
 
               quizSubmission.currentlyBackingUp = false;
-              setTimeout(function() { quizSubmission.updateSubmission(true) }, 30000);
+
+              setTimeout(function() { quizSubmission.updateSubmission(true, false, true) }, 30000);
               return;
             }
             $.ajaxJSON(url, 'PUT', submissionData,
@@ -121,7 +122,7 @@ define([
                 quizSubmission.currentlyBackingUp = false;
                 quizSubmission.inBackground = false;
                 if(repeat) {
-                  setTimeout(function() {quizSubmission.updateSubmission(true) }, 30000);
+                  setTimeout(function() {quizSubmission.updateSubmission(true, false, true) }, 30000);
                 }
                 if(data && data.end_at) {
                   var endAtFromServer     = Date.parse(data.end_at),
