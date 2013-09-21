@@ -68,5 +68,13 @@ describe InfoController do
       response.should be_success
       response.body.should == 'canvas ok'
     end
+
+    it "should respond_to json" do
+      request.accept = "application/json"
+      Canvas.stubs(:revision).returns("Test Proc")
+      get "health_check"
+      response.should be_success
+      JSON.parse(response.body).should == { "status" => "canvas ok", "revision" => "Test Proc" }
+    end
   end
 end
