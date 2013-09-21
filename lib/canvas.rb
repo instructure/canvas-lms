@@ -122,7 +122,7 @@ module Canvas
     if File.file?(Rails.root+"VERSION")
       @revision = File.readlines(Rails.root+"VERSION").first.try(:strip)
     end
-    @revision ||= false
+    @revision ||= I18n.t(:canvas_revision_unknown, "Unknown")
   end
 
   # protection against calling external services that could timeout or misbehave.
