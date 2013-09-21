@@ -234,6 +234,13 @@ module ApplicationHelper
     @context_url_lookup[lookup] = res
   end
 
+  def full_url(path)
+    uri = URI.parse(request.url)
+    uri.path = ''
+    uri.query = ''
+    URI.join(uri, path).to_s
+  end
+
   def url_helper_context_from_object(context)
     (context ? context.class.base_ar_class : context.class).name.underscore
   end
@@ -476,15 +483,15 @@ module ApplicationHelper
 
   def embedded_chat_url
     chat_tool = active_external_tool_by_id('chat')
-    return unless chat_tool && chat_tool.url && chat_tool.custom_fields['mini_script_url']
+    return unless chat_tool && chat_tool.url && chat_tool.custom_fields['mini_view_url']
     uri = URI.parse(chat_tool.url)
-    uri.path = chat_tool.custom_fields['mini_script_url']
+    uri.path = chat_tool.custom_fields['mini_view_url']
     uri.to_s
   end
 
   def embedded_chat_enabled
     chat_tool = active_external_tool_by_id('chat')
-    chat_tool && chat_tool.url && chat_tool.custom_fields['mini_script_url'] && Canvas::Plugin.value_to_boolean(chat_tool.custom_fields['embedded_chat_enabled'])
+    chat_tool && chat_tool.url && chat_tool.custom_fields['mini_view_url'] && Canvas::Plugin.value_to_boolean(chat_tool.custom_fields['embedded_chat_enabled'])
   end
 
   def embedded_chat_visible
