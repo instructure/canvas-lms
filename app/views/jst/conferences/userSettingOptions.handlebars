@@ -2,7 +2,14 @@
   {{#if isBoolean}}
     <label class="checkbox" for="web_conference_user_settings_{{field}}">
       <input name="web_conference[user_settings][{{field}}]" type="hidden" value="0">
-      <input id="web_conference_user_settings_{{field}}" name="web_conference[user_settings][{{field}}]" type="checkbox" value="1" {{#if checked}}checked{{/if}}>
+      <input
+        id="web_conference_user_settings_{{field}}"
+        name="web_conference[user_settings][{{field}}]"
+        type="checkbox"
+        value="1"
+        {{#if ../../conference_started}}disabled="disabled"{{/if}}
+        {{#if checked}}checked{{/if}}
+        >
       {{description}}
     </label>
   {{/if}}

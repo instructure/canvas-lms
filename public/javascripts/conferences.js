@@ -92,7 +92,8 @@ define([
       }
       $('.web_conference_user_settings').html(userSettingOptionsTemplate({
         settings: selected.settings,
-        conference: conferenceData
+        conference: conferenceData,
+        conference_started: !!conferenceData['started_at']
       }));
     };
 
