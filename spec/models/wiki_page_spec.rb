@@ -124,6 +124,20 @@ describe WikiPage do
     p1.url.should eql('asdf-2')
   end
 
+  it "should preserve course links when in a group belonging to the course" do
+    other_course = Course.create!
+    course_with_teacher
+    group(:group_context => @course)
+    page = @group.wiki.wiki_pages.create(:title => "poni3s")
+    page.user = @teacher
+    page.update_attribute(:body, %{<a href='/courses/#{@course.id}/files#oops'>click meh</a>
+                                  <a href='/courses/#{other_course.id}/files#whoops'>click meh too</a>})
+
+    page.reload
+    page.body.should include("/courses/#{@course.id}/files#oops")
+    page.body.should include("/groups/#{@group.id}/files#whoops")
+  end
+
   context "unpublished" do
     before do
       teacher_in_course(:active_all => true)
