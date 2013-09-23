@@ -224,6 +224,16 @@ describe 'Canvas::RequestThrottle' do
           end
         end
 
+        it "should still decrement when an error is thrown" do
+          Timecop.freeze('2012-01-29 12:00:00 UTC') do
+            @bucket.increment(0, 0, @current_time)
+            expect { @bucket.reserve_capacity(20) do
+              raise "oh noes"
+            end }.to raise_error(RuntimeError)
+            @bucket.redis.hget(@bucket.cache_key, 'count').to_f.should be_close(0, 0.1)
+          end
+        end
+
         it "clamps a negative increment to 0" do
           Timecop.freeze('2013-01-01 3:00:00 UTC') do
             @bucket.reserve_capacity(20) do
