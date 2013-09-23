@@ -221,7 +221,7 @@ class RequestThrottle
       increment(0, up_front_cost)
       cost = yield
     ensure
-      increment(cost, -up_front_cost)
+      increment(cost || 0, -up_front_cost)
     end
 
     def full?
