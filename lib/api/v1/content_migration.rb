@@ -21,7 +21,7 @@ module Api::V1::ContentMigration
   include Api::V1::Attachment
 
   def content_migrations_json(migrations, current_user, session)
-    migrations.map do |migration|
+    migrations.reject{|m| !!m.migration_settings['hide_from_index']}.map do |migration|
       content_migration_json(migration, current_user, session)
     end
   end

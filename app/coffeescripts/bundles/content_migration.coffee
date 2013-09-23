@@ -46,6 +46,11 @@ require [
                                  template: progressingMigrationCollectionTemplate
                                  emptyTemplate: -> "There are no migrations currently running"
                                  itemView: ProgressingContentMigrationView
+
+  progressingCollectionView.getStatusView = (migProgress) ->
+    if getView = ConverterViewControl.getView(migProgress.get('migration_type'))?.view?.getStatusView
+      getView(migProgress)
+
   progressingCollectionView.render()
 
   migrationConverterView    = new MigrationConverterView
