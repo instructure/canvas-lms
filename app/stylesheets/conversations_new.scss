@@ -186,7 +186,14 @@
       left: 0;
       outline: none;
     }
+  }
 
+  .author {
+    display: inline-block;
+    max-width: 70%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .date {
