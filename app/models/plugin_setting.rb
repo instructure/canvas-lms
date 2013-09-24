@@ -120,7 +120,9 @@ class PluginSetting < ActiveRecord::Base
   end
 
   def clear_cache
-    Rails.cache.delete(PluginSetting.settings_cache_key(self.name))
+    connection.after_transaction_commit do
+      Rails.cache.delete(PluginSetting.settings_cache_key(self.name))
+    end
   end
 
   def self.encrypt(text)
