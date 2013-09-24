@@ -56,6 +56,11 @@
     color: #555;
   }
 
+  .btn.ui-state-active {
+    background-color: #E6E6E6;
+    background-image: none;
+  }
+
   .actions {
     margin-right: 20px;
   }

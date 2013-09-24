@@ -14,6 +14,7 @@ define [
       '#compose-btn'     : '$composeBtn'
       '#reply-btn'       : '$replyBtn'
       '#reply-all-btn'   : '$replyAllBtn'
+      '#archive-btn'     : '$archiveBtn'
       '#delete-btn'      : '$deleteBtn'
       '#type-filter'     : '$typeFilter'
       '#course-filter'   : '$courseFilter'
@@ -29,6 +30,7 @@ define [
       'click #compose-btn':       'onCompose'
       'click #reply-btn':         'onReply'
       'click #reply-all-btn':     'onReplyAll'
+      'click #archive-btn':       'onArchive'
       'click #delete-btn':        'onDelete'
       'change #type-filter':      'onFilterChange'
       'change #course-filter':    'onFilterChange'
@@ -39,6 +41,10 @@ define [
     messages:
       star: I18n.t('star', 'Star')
       unstar: I18n.t('unstar', 'Unstar')
+      archive: I18n.t('archive', 'Archive')
+      unarchive: I18n.t('unarchive', 'Unarchive')
+      archive_conversation: I18n.t('archive_conversation', 'Archive conversation')
+      unarchive_conversation: I18n.t('unarchive_conversation', 'Unarchive conversation')
 
     spinnerOptions:
       color: '#fff'
@@ -66,6 +72,8 @@ define [
 
     onReplyAll:    (e) -> @trigger('reply-all')
 
+    onArchive:     (e) -> @trigger('archive')
+
     onDelete:      (e) -> @trigger('delete')
 
     onMarkUnread: (e) ->
@@ -89,6 +97,7 @@ define [
       @toggleMessageBtns(!newModel || !newModel.get('selected'))
       @onReadStateChange(newModel)
       @onStarStateChange(newModel)
+      @onArchivedStateChange(newModel)
 
     detachModelEvents: (oldModel) ->
       oldModel.off(null, null, this) if oldModel
@@ -105,6 +114,13 @@ define [
       if msg
         key = if msg.starred() then 'unstar' else 'star'
         @$starToggleBtn.text(@messages[key])
+
+    onArchivedStateChange: (msg) ->
+      return if !msg
+      archived = msg.get('workflow_state') == 'archived'
+      @$archiveBtn.attr('title', if archived then @messages['unarchive'] else @messages['archive'])
+      @$archiveBtn.find('.screenreader-only')
+        .text(if archived then @messages['unarchive_conversation'] else @messages['archive_conversation'])
 
     filterObj: (obj) -> _.object(_.filter(_.pairs(obj), (x) -> !!x[1]))
 
@@ -124,6 +140,7 @@ define [
     toggleMessageBtns: (value) ->
       @toggleReplyBtn(value)
       @toggleReplyAllBtn(value)
+      @toggleArchiveBtn(value)
       @toggleDeleteBtn(value)
       @toggleAdminBtn(value)
 
@@ -131,6 +148,8 @@ define [
 
     toggleReplyAllBtn: (value) -> @_toggleBtn(@$replyAllBtn, value)
     
+    toggleArchiveBtn:  (value) -> @_toggleBtn(@$archiveBtn, value)
+
     toggleDeleteBtn:   (value) -> @_toggleBtn(@$deleteBtn, value)
 
     toggleAdminBtn:    (value) -> @_toggleBtn(@$adminBtn, value)
