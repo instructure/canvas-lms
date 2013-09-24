@@ -298,7 +298,7 @@ define [
       return if @currentContext.id.match(/course_\d+_(group|section)/)
 
       tag =
-        id:       "#{@currentContext.id}_all"
+        id:       @currentContext.id
         name:     name
         everyone: true
         people: @currentContext.peopleCount
