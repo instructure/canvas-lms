@@ -374,32 +374,20 @@ class AccountAuthorizationConfig < ActiveRecord::Base
   def ldap_bind_result(unique_id, password_plaintext)
     return nil if password_plaintext.blank?
 
-    if self.last_timeout_failure.present?
-      failure_timeout = self.class.ldap_failure_wait_time.ago
-      if self.last_timeout_failure >= failure_timeout
-        # we've failed too recently, don't try again
-        return nil
-      end
+    default_timeout = Setting.get('ldap_timelimit', 5.seconds.to_s).to_f
+
+    Canvas.timeout_protection("ldap:#{self.global_id}",
+                              raise_on_timeout: true,
+                              fallback_timeout_length: default_timeout) do
+      ldap = self.ldap_connection
+      filter = self.ldap_filter(unique_id)
+      ldap.bind_as(:base => ldap.base, :filter => filter, :password => password_plaintext)
     end
-
-    timelimit = Setting.get('ldap_timelimit', 5.seconds.to_s).to_f
-
-    begin
-      Timeout.timeout(timelimit) do
-        ldap = self.ldap_connection
-        filter = self.ldap_filter(unique_id)
-        res = ldap.bind_as(:base => ldap.base, :filter => filter, :password => password_plaintext)
-        return res if res
-      end
-    rescue Net::LDAP::LdapError
-      ErrorReport.log_exception(:ldap, $!, :account => self.account)
-    rescue Timeout::Error
-      ErrorReport.log_exception(:ldap, $!, :account => self.account)
+  rescue => e
+    ErrorReport.log_exception(:ldap, e, :account => self.account)
+    if e.is_a?(Timeout::Error)
       self.update_attribute(:last_timeout_failure, Time.now)
-    rescue
-      ErrorReport.log_exception(:ldap, $!, :account => self.account)
     end
-
     return nil
   end
 

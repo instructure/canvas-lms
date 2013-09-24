@@ -35,6 +35,22 @@ describe Canvas do
       ran.should == true
     end
 
+    it "should raise on timeout if raise_on_timeout option is specified" do
+      Timeout.expects(:timeout).raises(Timeout::Error)
+      lambda { Canvas.timeout_protection("spec", raise_on_timeout: true) {} }.should raise_error(Timeout::Error)
+    end
+
+    it "should use the timeout argument over the generic default" do
+      Timeout.expects(:timeout).with(23)
+      Canvas.timeout_protection("foo", fallback_timeout_length: 23)
+    end
+
+    it "should use the settings timeout over the timeout argument" do
+      Setting.set("service_foo_timeout", "1")
+      Timeout.expects(:timeout).with(1)
+      Canvas.timeout_protection("foo", fallback_timeout_length: 23)
+    end
+
     if Canvas.redis_enabled?
       it "should skip calling the block after X failures" do
         Setting.set("service_spec_cutoff", "2")
@@ -54,6 +70,11 @@ describe Canvas do
         Timeout.expects(:timeout).with(15).yields
         Canvas.timeout_protection("spec") { ran = true }
         ran.should == true
+      end
+
+      it "should raise on cutoff if raise_on_timeout option is specified" do
+        Canvas.redis.set("service:timeouts:spec", 42)
+        lambda { Canvas.timeout_protection("spec", raise_on_timeout: true) {} }.should raise_error(Timeout::Error)
       end
     end
   end
