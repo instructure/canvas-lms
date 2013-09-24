@@ -7,11 +7,20 @@ define [
   class AppCenterView extends PaginatedCollectionView
 
     filterText: ''
+    targetInstalledState: 'all'
 
     template: template
     itemView: AppThumbnailView
 
     renderItem: (model) =>
       filter = new RegExp(@filterText, "i")
-      if model.get('name').match(filter) || model.get('categories').join().match(filter)
+      isInstalled = model.get('is_installed') || false
+
+      show = true
+      if @targetInstalledState == 'not_installed' && isInstalled
+        show = false
+      else if @targetInstalledState == 'installed' && !isInstalled
+        show = false
+
+      if show && (model.get('name').match(filter) || model.get('categories').join().match(filter))
         super
