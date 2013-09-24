@@ -67,17 +67,7 @@ class VariableSubstitutor
 
   # $Person.address.timezone
   def sub_Person_address_timezone
-    Time.zone || nil
-  end
-
-  # $Canvas.user.timezone
-  def sub_Canvas_user_timezone
-    Time.zone || nil
-  end
-
-  # $Canvas.user.timezone.offset
-  def sub_Canvas_user_timezone_offset
-    Time.zone ? Time.zone.formatted_offset : nil
+    Time.zone.tzinfo.name
   end
 
   # returns the same LIS Role values as the default 'roles' parameter,
