@@ -28,15 +28,23 @@ class SubmissionVersion < ActiveRecord::Base
       SubmissionVersion.create(attributes) if attributes
     end
 
-    def index_versions(versions)
-      records = versions.map{ |version| extract_version_attributes(version) }.compact
+    def index_versions(versions, options = {})
+      records = versions.map{ |version| extract_version_attributes(version, options) }.compact
       bulk_insert(records) if records.present?
     end
 
     private
-    def extract_version_attributes(version)
+    def extract_version_attributes(version, options = {})
       # TODO make context extraction more efficient in bulk case
-      model = version.model
+      model = if options[:ignore_errors]
+        begin
+          version.model
+        rescue ArgumentError
+          return nil
+        end
+      else
+        version.model
+      end
       assignment = model.assignment
       return nil unless assignment
       {
