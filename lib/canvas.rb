@@ -142,12 +142,12 @@ module Canvas
       error_count = Canvas.redis.get(redis_key)
       if error_count.to_i >= cutoff
         Rails.logger.error("Skipping service call due to error count: #{service_name} #{error_count}")
-        raise "timeout_protection cutoff triggered" if options[:raise_on_timeout]
+        raise(Timeout::Error, "timeout_protection cutoff triggered") if options[:raise_on_timeout]
         return
       end
     end
 
-    timeout = (Setting.get_cached("service_#{service_name}_timeout", nil) || Setting.get_cached("service_generic_timeout", 15.seconds.to_s)).to_f
+    timeout = (Setting.get_cached("service_#{service_name}_timeout", nil) || options[:fallback_timeout_length] || Setting.get_cached("service_generic_timeout", 15.seconds.to_s)).to_f
     Timeout.timeout(timeout) do
       yield
     end
