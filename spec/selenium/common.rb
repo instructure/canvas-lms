@@ -173,7 +173,7 @@ module SeleniumTestsHelperMethods
     I18n.t(*a, &b)
   end
 
-  def stagger_threads(step_time = 2)
+  def stagger_threads(step_time = 9)
     wait_time = THIS_ENV * step_time
     sleep(wait_time)
   end
