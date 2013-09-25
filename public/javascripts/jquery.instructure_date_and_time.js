@@ -140,10 +140,7 @@ var speakMessage = function ($this, message) {
       result.date_sortable = iso.substring(0, 10);
       result.date_string = month_string + "/" + day_string + "/" + year_string;
       result.date_formatted = $.dateString(result.date);
-      var hours = hour * 1000.0 * 3600;
-      if(hour_shift && !isNaN(hour_shift)) {
-        hours = hours + (hour_shift * 1000.0 * 3600);
-      }
+      var hours = (hour + hour_shift) * 1000.0 * 3600;
       var minutes = minute * 1000.0 * 60;
       var seconds = second * 1000.0;
       var time_timestamp = hours + minutes + seconds;
