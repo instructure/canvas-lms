@@ -576,21 +576,19 @@ define([
       }
     }
     $event = $("#event_" + id);
-    var all_day_date = $.parseFromISO(event.all_day_date);
-    if(all_day_date.date_timestamp && false) {
-      event.start_at = event.all_day_date.substring(0, 10);
-      event.all_day_date = all_day_date.date_formatted;
-    } else {
-      event.all_day_date = '';
-    }
     if(event.all_day) {
-      event.start_at = event.all_day_date.substring(0, 10);
+      var all_day_date = $.parseFromISO(event.all_day_date);
       if(all_day_date.date_timestamp) {
         event.all_day_date = all_day_date.date_formatted;
         event.start_at = all_day_date.date_sortable.substring(0, 10);
+      } else {
+        event.all_day_date = '';
+        event.start_at = '';
       }
       event.start_time_formatted = '';
       event.end_time_formatted = '';
+    } else {
+      event.all_day_date = '';
     }
     var isManagementContext = ENV.calendarManagementContexts && $.inArray(event.context_code, ENV.calendarManagementContexts) != -1;
     if(event.permissions || isManagementContext) {
