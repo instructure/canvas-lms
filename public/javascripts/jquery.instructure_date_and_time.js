@@ -137,17 +137,22 @@ var speakMessage = function ($this, message) {
       // passed in and may technically be incorrect if there
       // is shifting due to time zones.
       // result.date = $.datepicker.parseDate("yy-mm-dd", iso.substring(0, 10));
-      result.date_sortable = iso.substring(0, 10);
-      result.date_string = month_string + "/" + day_string + "/" + year_string;
-      result.date_formatted = $.dateString(result.date);
       var hours = (hour + hour_shift) * 1000.0 * 3600;
       var minutes = minute * 1000.0 * 60;
       var seconds = second * 1000.0;
       var time_timestamp = hours + minutes + seconds;
       var date_timestamp = Date.UTC(year, month - 1, day);
-
       var tz_offset = result.date.getTimezoneOffset() * 60000;
       var time = new Date(date_timestamp + time_timestamp + tz_offset);
+      result.timestamp = (time_timestamp + date_timestamp) / 1000;
+      result.minute_timestamp = result.timestamp - (result.timestamp % 60);
+
+      // format date fields
+      result.date_sortable = iso.substring(0, 10);
+      result.date_string = month_string + "/" + day_string + "/" + year_string;
+      result.date_formatted = $.dateString(result.date);
+
+      // format time fields
       var ampm = "am";
       hours = time.getHours();
       if(hours > 12) {
@@ -182,8 +187,8 @@ var speakMessage = function ($this, message) {
       result.datetime = time;
       result.date_formatted = $.dateString(result.datetime);
       result.datetime_formatted = result.date_formatted + time_for_date_formatted;
-      result.timestamp = (time_timestamp + date_timestamp) / 1000;
-      result.minute_timestamp = result.timestamp - (result.timestamp % 60);
+
+      // done
       result.valid = true;
       return result;
     } catch(e) {
