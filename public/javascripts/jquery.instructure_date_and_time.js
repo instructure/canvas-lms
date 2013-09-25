@@ -96,8 +96,6 @@ var speakMessage = function ($this, message) {
   };  
   
   $.parseFromISO = function(iso, datetime_type) {
-    var user_offset = tz.currentOffset() / 3600;
-    var today = new Date();
     datetime_type = datetime_type || 'event';
     try {
       var result = {};
@@ -133,15 +131,10 @@ var speakMessage = function ($this, message) {
       result.timestamp = timestamp / 1000;
       result.minute_timestamp = result.timestamp - (result.timestamp % 60);
 
-      if(result.date.getTimezoneOffset() != today.getTimezoneOffset()) {
-        user_offset = user_offset - ((result.date.getTimezoneOffset() - today.getTimezoneOffset()) / 60);
-      }
-      // NOTE: This value is a literal parsing of the date
-      // passed in and may technically be incorrect if there
-      // is shifting due to time zones.
-      // result.date = $.datepicker.parseDate("yy-mm-dd", iso.substring(0, 10));
-      var tz_offset = result.date.getTimezoneOffset() * 60000;
-      var time = new Date(timestamp + user_offset * 3600000 + tz_offset);
+      // fudged time for display
+      var time = $.fudgeDateForProfileTimezone(new Date(timestamp));
+      result.time = time;
+      result.datetime = time;
 
       // format date fields
       result.date_sortable = iso.substring(0, 10);
@@ -179,8 +172,6 @@ var speakMessage = function ($this, message) {
       time_formatted += ampm;
       result.time_formatted = time_formatted;
       result.time_string = hours + time_tail + ampm;
-      result.time = time;
-      result.datetime = time;
       result.date_formatted = $.dateString(result.datetime);
       result.datetime_formatted = result.date_formatted + time_for_date_formatted;
 
