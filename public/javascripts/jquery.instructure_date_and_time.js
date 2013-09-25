@@ -129,9 +129,8 @@ var speakMessage = function ($this, message) {
       if (isNaN(hour) || isNaN(minute) || isNaN(second) || isNaN(offset)) { throw 'invalid'; }
 
       // combine them into an accurate unfudged timestamp
-      var date_timestamp = Date.UTC(year, month - 1, day);
-      var time_timestamp = (((hour - offset) * 60 + minute) * 60 + second) * 1000;
-      result.timestamp = (time_timestamp + date_timestamp) / 1000;
+      var timestamp = Date.UTC(year, month - 1, day) + (((hour - offset) * 60 + minute) * 60 + second) * 1000;
+      result.timestamp = timestamp / 1000;
       result.minute_timestamp = result.timestamp - (result.timestamp % 60);
 
       if(result.date.getTimezoneOffset() != today.getTimezoneOffset()) {
@@ -142,7 +141,7 @@ var speakMessage = function ($this, message) {
       // is shifting due to time zones.
       // result.date = $.datepicker.parseDate("yy-mm-dd", iso.substring(0, 10));
       var tz_offset = result.date.getTimezoneOffset() * 60000;
-      var time = new Date(date_timestamp + time_timestamp + user_offset * 3600000 + tz_offset);
+      var time = new Date(timestamp + user_offset * 3600000 + tz_offset);
 
       // format date fields
       result.date_sortable = iso.substring(0, 10);
