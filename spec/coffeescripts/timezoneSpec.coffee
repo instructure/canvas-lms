@@ -104,12 +104,3 @@ define [
     tz.changeLocale('fr_FR').then ->
       start()
       equal tz.format(moonwalk, '%c'), "lun. 21 juil. 1969 02:56:00 UTC"
-
-  test 'currentOffset() should return the current offset in second in the right timezone', ->
-    equal tz.currentOffset(), 0
-    # yes, there's a race condition here if the spec is run right at the DST
-    # boundary. oh well
-    tz.changeZone(detroit, 'America/Detroit')
-    dst = tz.format('*', '%Z') is 'EDT'
-    expected = (if dst then -4 else -5) * 3600
-    equal tz.currentOffset(), expected
