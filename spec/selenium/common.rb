@@ -22,7 +22,6 @@ require "socket"
 require "timeout"
 require 'coffee-script'
 require File.expand_path(File.dirname(__FILE__) + '/helpers/custom_selenium_rspec_matchers')
-require File.expand_path(File.dirname(__FILE__) + '/../../spec/selenium/servers/thin_server')
 include I18nUtilities
 
 SELENIUM_CONFIG = Setting.from_config("selenium") || {}
@@ -36,7 +35,8 @@ MAX_SERVER_START_TIME = 60
 THIS_ENV = ENV['TEST_ENV_NUMBER'].to_i
 THIS_ENV = 1 if ENV['TEST_ENV_NUMBER'].blank?
 PORT_NUM = (4440 + THIS_ENV)
-WEBSERVER = 'thin' #set WEBSERVER ENV to webrick to change webserver
+ENV['WEBSERVER'].nil? ? WEBSERVER = 'thin' : WEBSERVER = ENV['WEBSERVER']
+#set WEBSERVER ENV to webrick to change webserver
 
 
 $server_port = nil
@@ -117,18 +117,18 @@ module SeleniumTestsHelperMethods
   end
 
   def start_selenium_server_node
-    puts 'stopping selenium server node'
+    puts "stopping selenium server node: #{THIS_ENV}"
     `selenium_procs=$(ps -ef | grep #{PORT_NUM} | awk '{print $2}') && kill -9 $selenium_procs`
     `sudo rm -rf /tmp/.X#{THIS_ENV}-lock`
     `xvfb_procs=$(ps -ef | grep 'Xvfb :#{THIS_ENV}' | awk '{print $2}') && kill -9 $xvfb_procs`
-    puts 'restarting xvfb screen and selenium server node'
+    puts "restarting xvfb screen and selenium server node: #{THIS_ENV}"
     sleep 7
     `Xvfb :#{THIS_ENV} -ac -noreset -screen 0 1280x1024x24 &`
     sleep 2
     #add configs for selenium version
     `export DISPLAY=:#{THIS_ENV} && java -Djava.io.tmpdir=/tmp/node#{THIS_ENV} -jar /usr/lib/selenium/selenium-server-standalone-#{SELENIUM_CONFIG[:version]}.jar -port #{PORT_NUM} -timeout 60000  > /var/log/selenium/selenium-output#{THIS_ENV}.log 2> /var/log/selenium/selenium-error#{THIS_ENV}.log & echo $! > /selenium/selenium#{THIS_ENV}.pid &`
     sleep 5
-    puts 'selenium server node has been restarted'
+    puts "selenium server node: #{THIS_ENV} has been restarted"
   end
 
 
@@ -173,7 +173,7 @@ module SeleniumTestsHelperMethods
     I18n.t(*a, &b)
   end
 
-  def stagger_threads(step_time = 9)
+  def stagger_threads(step_time = 6)
     wait_time = THIS_ENV * step_time
     sleep(wait_time)
   end
@@ -251,6 +251,7 @@ module SeleniumTestsHelperMethods
   end
 
   def self.start_in_process_thin_server
+    require File.expand_path(File.dirname(__FILE__) + '/../../spec/selenium/servers/thin_server')
     server = SpecFriendlyThinServer
     app = self.rack_app
     server.run(app, :BindAddress => BIND_ADDRESS, :Port => $server_port, :AccessLog => [])
@@ -259,6 +260,7 @@ module SeleniumTestsHelperMethods
   end
 
   def self.start_in_process_webrick_server
+    require File.expand_path(File.dirname(__FILE__) + '/../../spec/selenium/servers/webrick_server')
     server = SpecFriendlyWEBrickServer
     app = self.rack_app
     server.run(app, :BindAddress => BIND_ADDRESS, :Port => $server_port, :AccessLog => [])
