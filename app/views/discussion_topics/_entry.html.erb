@@ -51,7 +51,7 @@
         </span>
       </div>
       <% end %>
-      <div class="post_date time_ago_date"><%= entry.try_rescue(:created_at).tap{|time| time && datetime_string(time)} %></div>
+      <div class="post_date time_ago_date" data-timestamp="<%= entry.try_rescue(:created_at).try_rescue(:iso8601) %>"><%= datetime_string(entry.try_rescue(:created_at)) || nbsp %></div>
       <div class="clear"></div>
     <% end %>
   </div>
