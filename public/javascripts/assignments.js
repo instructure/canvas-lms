@@ -858,7 +858,7 @@ define([
         }
         var updatedTimestamp = 0;
         if(date) {
-          updatedTimestamp = Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), date.getMinutes()) / 1000;
+          updatedTimestamp = +date / 1000;
           due_time = date.toString('h:mmtt').toLowerCase();
           if(due_time == '12:00am') {
             due_time = '';

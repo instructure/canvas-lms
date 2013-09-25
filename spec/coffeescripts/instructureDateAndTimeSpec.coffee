@@ -1,7 +1,9 @@
 define [
   'jquery'
+  'timezone'
+  'vendor/timezone/America/Detroit'
   'jquery.instructure_date_and_time'
-], ($) ->
+], ($, tz, detroit) ->
   module 'parseFromISO'
 
   expectedTimestamp = Date.UTC(2013, 8, 1) / 1000
@@ -53,3 +55,17 @@ define [
     parsed = $.parseFromISO('2013-09-01T00:00:00.123Z')
     equal parsed.valid, true
     equal parsed.timestamp, expectedTimestamp
+
+  test 'should fudge the time object', ->
+    snapshot = tz.snapshot()
+    tz.changeZone(detroit, 'America/Detroit')
+    parsed = $.parseFromISO('2013-09-01T00:00:00Z')
+    equal parsed.time.getHours(), 20 # -4 offset between UTC and EDT
+    tz.restore(snapshot)
+
+  test 'should not fudge the timestamp', ->
+    snapshot = tz.snapshot()
+    tz.changeZone(detroit, 'America/Detroit')
+    parsed = $.parseFromISO('1970-01-01T00:00:00Z')
+    equal parsed.timestamp, 0
+    tz.restore(snapshot)
