@@ -215,7 +215,6 @@
 <% end %>
   <div style="display:none;"><!-- Everything inside of this should always stay hidden -->
     <div id="ajax_authenticity_token"><%= form_authenticity_token %></div>
-    <div id="time_zone_offset"><%= ActiveSupport::TimeWithZone.new(Time.now.utc, Time.zone).utc_offset / -60 %></div>
     <% if @context && session && temp_type = session["role_#{@context.asset_string}"] %>
       <span id="switched_role_type" class="<%= @context.asset_string %>" data-role="<%= temp_type %>"><%= Enrollment.readable_type(temp_type) %></span>
     <% end %>
