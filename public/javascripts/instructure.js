@@ -22,6 +22,7 @@ define([
   'i18n!instructure',
   'jquery' /* $ */,
   'underscore',
+  'timezone',
   'compiled/userSettings',
   'str/htmlEscape',
   'wikiSidebar',
@@ -53,7 +54,7 @@ define([
   'compiled/badge_counts',
   'vendor/scribd.view' /* scribd */,
   'vendor/jquery.placeholder'
-], function(KeyboardNavDialog, INST, I18n, $, _, userSettings, htmlEscape, wikiSidebar) {
+], function(KeyboardNavDialog, INST, I18n, $, _, tz, userSettings, htmlEscape, wikiSidebar) {
 
   $.trackEvent('Route', location.pathname.replace(/\/$/, '').replace(/\d+/g, '--') || '/');
 
@@ -758,7 +759,7 @@ define([
     // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
     // vvvvvvvvvvvvvvvvv BEGIN stuf form making pretty dates vvvvvvvvvvvvvvvvvv
     // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-    var timeZoneOffset = parseInt($("#time_zone_offset").text(), 10),
+    var timeZoneOffset = tz.currentOffset() / -60,
         timeAgoEvents  = [];
     function timeAgoRefresh() {
       timeAgoEvents = $(".time_ago_date:visible").toArray();

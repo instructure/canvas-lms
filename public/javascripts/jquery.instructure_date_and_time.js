@@ -18,13 +18,14 @@
 define([
   'i18n!instructure',
   'jquery' /* jQuery, $ */,
+  'timezone',
   'str/htmlEscape',
   'jquery.keycodes' /* keycodes */,
   'vendor/date' /* Date.parse, Date.UTC, Date.today */,
   'jqueryui/datepicker' /* /\.datepicker/ */,
   'jqueryui/sortable' /* /\.sortable/ */,
   'jqueryui/widget' /* /\.widget/ */
-], function(I18n, $, htmlEscape) {
+], function(I18n, $, tz, htmlEscape) {
   // Create a function to pass to setTimeout
 var speakMessage = function ($this, message) {
   if ($this.data('accessible-message-timeout')) {
@@ -95,7 +96,7 @@ var speakMessage = function ($this, message) {
   };  
   
   $.parseFromISO = function(iso, datetime_type) {
-    var user_offset = parseInt($("#time_zone_offset").text(), 10) / -60;
+    var user_offset = tz.currentOffset() / 3600;
     var today = new Date();
     datetime_type = datetime_type || 'event';
     try {
@@ -181,12 +182,6 @@ var speakMessage = function ($this, message) {
     }
   };
 
-  // getUserOffset is used to query the user's timezone offset setting, which is usually
-  // communicated from the server through the #time_zone_offset element
-  $.getUserOffset = function() {
-    return user_offset = parseInt($("#time_zone_offset").text(), 10) * -1; // in minutes
-  }
-
   // fudgeDateForProfileTimezone is used to apply an offset to the date which represents the
   // difference between the user's configured timezone in their profile, and the timezone
   // of the browser. We want to display times in the timezone of their profile. Use
@@ -196,7 +191,7 @@ var speakMessage = function ($this, message) {
 
     if (!date) return null;
     today = new Date();
-    user_offset = $.getUserOffset();
+    user_offset = tz.currentOffset() / 60;
     if (date.getTimezoneOffset() != today.getTimezoneOffset()) {
       user_offset = user_offset - (date.getTimezoneOffset() - today.getTimezoneOffset());
     }

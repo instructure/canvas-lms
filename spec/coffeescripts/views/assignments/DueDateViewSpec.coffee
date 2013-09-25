@@ -1,13 +1,17 @@
 define [
   'compiled/views/assignments/DueDateView'
   'compiled/models/AssignmentOverride'
+  'timezone'
+  'vendor/timezone/America/Denver'
   'jquery'
   'jquery.instructure_date_and_time'
-], (DueDateView, AssignmentOverride, $) ->
+], (DueDateView, AssignmentOverride, tz, denver, $) ->
 
   module "DueDateView",
     setup: ->
-      $('#fixtures').append("<div id='time_zone_offset'>540</div>")
+      @tzSnapshot = tz.snapshot()
+      tz.changeZone(denver, 'America/Denver')
+
       @date = new Date "March 13 1992"
       @override = new AssignmentOverride
         course_section_id: 1
@@ -21,6 +25,7 @@ define [
     teardown: ->
       @dueDateView.remove()
       $('#fixtures').empty()
+      tz.restore(@tzSnapshot)
 
   test "#getFormValues unfudges for user timezone offset", ->
     formValues = @dueDateView.getFormValues()

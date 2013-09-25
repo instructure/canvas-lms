@@ -111,5 +111,14 @@ define([
   // changing zone and locale are just aliases for applying a feature
   tz.changeZone = tz.changeLocale = tz.applyFeature;
 
+  // XXX: temporary helper method for calculating the zone's current offset
+  // from UTC, in seconds. once the code is fixed to not care about this value,
+  // this method can and should go away.
+  var offsetReduction = function(memo, fragment) { return memo * 60 + (+fragment); };
+  tz.currentOffset = function() {
+    var offsetString = _tz('*', '%::z').split(':');
+    return _.reduce(offsetString, offsetReduction, 0);
+  };
+
   return tz;
 });
