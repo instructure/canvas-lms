@@ -167,6 +167,10 @@ I18n.class_eval do
     end
     string.html_safe
   end
+
+  def self.qualified_locale
+    I18n.t("qualified_locale", "en-US")
+  end
 end
 
 if CANVAS_RAILS2

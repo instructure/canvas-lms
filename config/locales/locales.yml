@@ -1,48 +1,63 @@
 en:
   locales:
     en: English
+  qualified_locale: en-US
 es:
   locales:
     es: Español
+  qualified_locale: es-ES
 de:
   locales:
     de: Deutsch
+  qualified_locale: de-DE
 ru:
   locales:
     ru: pу́сский
+  qualified_locale: ru-RU
 fr:
   locales:
     fr: Français
+  qualified_locale: fr-FR
 pl:
   locales:
     pl: Polski
+  qualified_locale: pl-PL
 zh:
   locales:
     zh: 中文
+  qualified_locale: zh-CN
 ar:
   locales:
     ar: العربية
+  qualified_locale: ar-SA
 pt:
   locales:
     pt: Português
+  qualified_locale: pt-PT
 ja:
   locales:
     ja: 日本語
+  qualified_locale: ja-JP
 nl:
   locales:
     nl: Nederlands (crowd-sourced)
+  qualified_locale: nl-NL
   crowdsourced: true
 ko:
   locales:
     ko: 한국말 (crowd-sourced)
+  qualified_locale: ko-KR
   crowdsourced: true
 en-GB:
   locales:
     en-GB: English (United Kingdom)
+  qualified_locale: en-GB
 en-AU:
   locales:
     en-AU: English (Australia)
+  qualified_locale: en-AU
 tr:
   locales:
     tr: Türkçe (crowd-sourced)
+  qualified_locale: tr-TR
   crowdsourced: true
