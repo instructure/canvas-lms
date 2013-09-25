@@ -187,30 +187,22 @@ var speakMessage = function ($this, message) {
   // difference between the user's configured timezone in their profile, and the timezone
   // of the browser. We want to display times in the timezone of their profile. Use
   // unfudgeDateForProfileTimezone to remove the correction before sending dates back to the server.
-  $.fudgeDateForProfileTimezone = function(date, unfudge) {
-    var today, user_offset, minutes_shift, time, newDate;
-
+  $.fudgeDateForProfileTimezone = function(date) {
+    date = tz.parse(date);
     if (!date) return null;
-    today = new Date();
-    user_offset = tz.currentOffset() / 60;
-    if (date.getTimezoneOffset() != today.getTimezoneOffset()) {
-      user_offset = user_offset - (date.getTimezoneOffset() - today.getTimezoneOffset());
-    }
-    minutes_shift = user_offset + date.getTimezoneOffset();
-
-    if (minutes_shift == 0) {
-      return date;
-    }
-
-    time = date.getTime(); // in ms
-    time += minutes_shift * 60 * 1000 * (unfudge === true ? -1 : 1);
-    newDate = new Date();
-    newDate.setTime(time);
-    return newDate;
+    // format true date into profile timezone without tz-info, then parse in
+    // browser timezone. then, as desired:
+    // output.toString('yyyy-MM-dd hh:mm:ss') == tz.format(input, '%Y-%m-%d %H:%M:%S')
+    return Date.parse(tz.format(date, '%F %T'));
   }
 
   $.unfudgeDateForProfileTimezone = function(date) {
-    return $.fudgeDateForProfileTimezone(date, true);
+    date = tz.parse(date);
+    if (!date) return null;
+    // format fudged date into browser timezone without tz-info, then parse in
+    // profile timezone. then, as desired:
+    // tz.format(output, '%Y-%m-%d %H:%M:%S') == input.toString('yyyy-MM-dd hh:mm:ss')
+    return tz.parse(date.toString('yyyy-MM-dd HH:mm:ss'));
   }
 
   // The following method is simply a helper to use the logic from $.parseFromISO on
