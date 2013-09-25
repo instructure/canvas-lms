@@ -236,11 +236,16 @@ module Api
   # Add [link HTTP Headers](http://www.w3.org/Protocols/9707-link-header.html) for pagination
   # The collection needs to be a will_paginate collection (or act like one)
   # a new, paginated collection will be returned
-  def self.paginate(collection, controller, base_url, pagination_args = {})
+  def self.paginate(collection, controller, base_url, pagination_args = {}, response_args = {})
     collection = paginate_collection!(collection, controller, pagination_args)
-    links = build_links(base_url, meta_for_pagination(controller, collection))
+    hash = build_links_hash(base_url, meta_for_pagination(controller, collection))
+    links = build_links_from_hash(hash)
     controller.response.headers["Link"] = links.join(',') if links.length > 0
-    collection
+    if response_args[:enhanced_return]
+      {hash: hash, collection: collection}
+    else
+      collection
+    end
   end
 
   # Returns collection as the first return value, and the meta information hash
@@ -315,6 +320,10 @@ module Api
   EXCLUDE_IN_PAGINATION_LINKS = %w(page per_page access_token api_key)
   def self.build_links(base_url, opts={})
     links = build_links_hash(base_url, opts)
+    build_links_from_hash(links)
+  end
+
+  def self.build_links_from_hash(links)
     # iterate in order, but only using the keys present from build_links_hash
     (PAGINATION_PARAMS & links.keys).map do |k|
       v = links[k]

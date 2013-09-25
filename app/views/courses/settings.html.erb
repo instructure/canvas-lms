@@ -256,6 +256,11 @@ TEXT
           <%= f.select :course_format, format_options %>
         </td>
       </tr><tr>
+        <td class="form-label"><label><%= before_label('course_description', %{Description}) %></label></td>
+        <td colspan="3">
+          <%= f.text_area :public_description, :style => "height: 100px;" %>
+        </td>
+      </tr><tr>
         <td></td>
         <td colspan="3">
           <span class="self_enrollment_message" style="<%= hidden unless @context.self_enrollment_enabled? %>">

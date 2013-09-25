@@ -316,7 +316,6 @@ define([
           return;
         }
         $(this).loadingImage('remove');
-        $("#course_form .public_options").showIf(course.is_public);
         $("#course_form .self_enrollment_message").css('display', course.self_enrollment ? '' : 'none');
         $("#course_form").fillTemplateData({data: course});
         if (course.self_enrollment_code) {
@@ -418,9 +417,6 @@ define([
     $("#enrollment_type").change(function() {
       $(".teacherless_invite_message").showIf($(this).find(":selected").hasClass('teacherless_invite'));
     });
-    $(".is_public_checkbox").change(function() {
-      $(".public_options").showIf($(this).attr('checked'));
-    }).change();
 
     $(".self_enrollment_checkbox").change(function() {
       $(".open_enrollment_holder").showIf($(this).attr('checked'));

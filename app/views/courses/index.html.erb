@@ -18,6 +18,14 @@
   <% end %>
 <% end %>
 
+<% if @domain_root_account.feature_enabled?(:course_catalog) %>
+  <% content_for :right_side do %>
+    <div class="rs-margin-lr pad-box-mini">
+      <a href="/search/all_courses/"><%= t('browse_more_courses', 'Browse more courses') %></a>
+    </div>
+  <% end %>
+<% end %>
+
 <% jammit_css :context_list, :course_list %>
 <% js_bundle :course_list %>
 <% @favorite_course_ids = @current_user.courses_with_primary_enrollment(:favorite_courses).map(&:id) %>

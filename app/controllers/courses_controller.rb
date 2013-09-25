@@ -1435,6 +1435,8 @@ class CoursesController < ApplicationController
       unless @context.grants_right?(@current_user, session, :manage_content)
         @course_home_sub_navigation_tools.reject! { |tool| tool.course_home_sub_navigation(:visibility) == 'admins' }
       end
+    elsif @context.indexed
+      render :template => "courses/description"
     else
       # clear notices that would have been displayed as a result of processing
       # an enrollment invitation, since we're giving an error
@@ -1864,12 +1866,6 @@ class CoursesController < ApplicationController
 
       if params[:course].has_key?(:locale) && params[:course][:locale].blank?
         params[:course][:locale] = nil
-      end
-
-      if params[:course].has_key?(:is_pubic) && !value_to_boolean(params[:course][:is_public])
-        params[:course][:indexed] = nil if params[:course].has_key?(:indexed)
-      elsif !@course.is_public
-        params[:course][:indexed] = nil if params[:course].has_key?(:indexed)
       end
 
       if params[:course][:event] && @course.grants_right?(@current_user, session, :change_course_state)

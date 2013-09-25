@@ -274,6 +274,17 @@ END
       applies_to: 'RootAccount',
       state: 'allowed',
       development: true
+    },
+    'course_catalog' =>
+    {
+      display_name: -> { I18n.t('features.course_catalog', "Course Catalog") },
+      description:  -> { I18n.t('display_course_catalog', <<-END) },
+Show a searchable list of courses in this root account with the "Include this course in the public course index" flag enabled.
+END
+      applies_to: 'RootAccount',
+      state: 'allowed',
+      beta: true,
+      root_opt_in: true
     }
   )
 

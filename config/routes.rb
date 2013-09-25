@@ -617,6 +617,7 @@ CanvasRails::Application.routes.draw do
   get 'services' => 'users#services'
   get 'search/bookmarks' => 'users#bookmark_search', as: :bookmark_search
   get 'search/rubrics' => 'search#rubrics'
+  get 'search/all_courses' => 'search#all_courses'
   delete 'tours/dismiss/:name' => 'tours#dismiss', as: :dismiss_tour
   delete 'tours/dismiss/session/:name' => 'tours#dismiss_session', as: :dismiss_tour_session
   resources :users do
@@ -1235,6 +1236,7 @@ CanvasRails::Application.routes.draw do
     scope(controller: :search) do
       get 'search/rubrics', action: 'rubrics', as: 'search_rubrics'
       get 'search/recipients', action: 'recipients', as: 'search_recipients'
+      get 'search/all_courses', action: 'all_courses', as: 'search_all_courses'
     end
 
     post 'files/:id/create_success', controller: :files, action: :api_create_success, as: 'files_create_success'

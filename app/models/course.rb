@@ -719,7 +719,6 @@ class Course < ActiveRecord::Base
       self.course_code = res.compact.join(" ")
     end
     @group_weighting_scheme_changed = self.group_weighting_scheme_changed?
-    self.indexed = nil unless self.is_public
     if self.account_id && self.account_id_changed?
       infer_root_account
     end

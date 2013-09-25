@@ -157,6 +157,8 @@ stylesheets:
     - public/stylesheets/compiled/pages/locale.css
   mobile_auth:
     - public/stylesheets/compiled/pages/mobile_auth.css
+  all_courses:
+    - public/stylesheets/compiled/pages/all_courses.css
   external_tool_full_width:
     - public/stylesheets/compiled/pages/external_tools/full_width.css
   # Client Apps:
