@@ -22,7 +22,6 @@ define([
   'i18n!instructure',
   'jquery' /* $ */,
   'underscore',
-  'timezone',
   'compiled/userSettings',
   'str/htmlEscape',
   'wikiSidebar',
@@ -32,7 +31,7 @@ define([
   'jquery.doc_previews' /* filePreviewsEnabled, loadDocPreview */,
   'jquery.dropdownList' /* dropdownList */,
   'jquery.google-analytics' /* trackEvent */,
-  'jquery.instructure_date_and_time' /* parseFromISO, dateString */,
+  'jquery.instructure_date_and_time' /* parseFromISO, dateString, fudgeDateForProfileTimezone */,
   'jquery.instructure_forms' /* formSubmit, fillFormData, formErrors */,
   'jqueryui/dialog',
   'jquery.instructure_misc_helpers' /* replaceTags, youTubeID */,
@@ -54,7 +53,7 @@ define([
   'compiled/badge_counts',
   'vendor/scribd.view' /* scribd */,
   'vendor/jquery.placeholder'
-], function(KeyboardNavDialog, INST, I18n, $, _, tz, userSettings, htmlEscape, wikiSidebar) {
+], function(KeyboardNavDialog, INST, I18n, $, _, userSettings, htmlEscape, wikiSidebar) {
 
   $.trackEvent('Route', location.pathname.replace(/\/$/, '').replace(/\d+/g, '--') || '/');
 
@@ -759,8 +758,7 @@ define([
     // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
     // vvvvvvvvvvvvvvvvv BEGIN stuf form making pretty dates vvvvvvvvvvvvvvvvvv
     // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-    var timeZoneOffset = tz.currentOffset() / -60,
-        timeAgoEvents  = [];
+    var timeAgoEvents  = [];
     function timeAgoRefresh() {
       timeAgoEvents = $(".time_ago_date:visible").toArray();
       processNextTimeAgoEvent();
@@ -769,31 +767,13 @@ define([
       var eventElement = timeAgoEvents.shift();
       if (eventElement) {
         var $event = $(eventElement),
-            originalDate = $event.data('original_date') || "",
-            date = $event.data('parsed_date') || ( originalDate ?
-                      Date.parse(originalDate.replace(/ (at|by)/, "")) :
-                      Date.parse(($event.text() || "").replace(/ (at|by)/, "")) );
+            date = $event.data('parsed_date') || Date.parse($event.data('timestamp') || "");
         if (date) {
-          var now = new Date();
-          now.setDate(now.getDate() + 1);
-          if (!originalDate && date > now && date - now > 3600000) {
-            var year = date.getUTCFullYear().toString();
-            if(date > now && date.getUTCFullYear() == now.getUTCFullYear() && !$event.text().match(year)) {
-              date.setUTCFullYear(date.getUTCFullYear() - 1);
-            }
-          }
-          var timeZoneDiff = now.getTimezoneOffset() - timeZoneOffset;
-          if(isNaN(timeZoneDiff)) { timeZoneDiff = 0; }
-          var diff = now - date + (timeZoneDiff * 60 * 1000);
-          $event.data('original_date', date.toString("MMM d, yyyy h:mmtt"));
+          var diff = new Date() - date;
+          $event.data('timestamp', date.toISOString());
           $event.data('parsed_date', date);
-          // This line would compensate for a user who set their time zone to something
-          //   different than the time zone setting on the current computer.  It would adjust
-          //   the times displayed to match the time zone of the current computer.  This could
-          //   be confusing for a student since due dates and things will NOT be adjusted,
-          //   so dates and times will not match up.
-          // date = date.addMinutes(-1 * timeZoneDiff);
-          var defaultDateString = date.toString("MMM d, yyyy") + date.toString(" h:mmtt").toLowerCase();
+          var fudgedDate = $.fudgeDateForProfileTimezone(date);
+          var defaultDateString = fudgedDate.toString("MMM d, yyyy") + fudgedDate.toString(" h:mmtt").toLowerCase();
           var dateString = defaultDateString;
           if(diff < (24 * 3600 * 1000)) {
             if(diff < (3600 * 1000)) {

@@ -9,7 +9,7 @@
     <div class="link_box">
       <a href="<%= context_url(entry_context, :context_discussion_entry_url, entry ? entry.id : "{{ id }}") %>" class="delete_entry_link disabled_link"><%= image_tag "delete.png" %></a>
     </div>
-    <div class="post_date time_ago_date"><%= datetime_string(entry.try_rescue(:created_at)) || nbsp %></div>
+    <div class="post_date time_ago_date" data-timestamp="<%= entry.try_rescue(:created_at).try_rescue(:iso8601) %>"><%= datetime_string(entry.try_rescue(:created_at)) || nbsp %></div>
     <div class="clear"></div>
   </div>
   <div class="content">
