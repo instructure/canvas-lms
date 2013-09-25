@@ -112,10 +112,23 @@ var speakMessage = function ($this, message) {
       var hour_string = iso.substring(11, 13);
       var minute_string = iso.substring(14, 16);
       var second_string = iso.substring(17, 19);
-      var offset_string = iso.substring(19);
+      var offset_string = iso.substring(iso[19] == '.' ? 23 : 19);
 
-      var date_offset = parseInt(offset_string, 10) || 0;
-      result.date = new Date(year_string, month_string - 1, day_string);
+      // validate date portion
+      var year = +year_string;
+      var month = +month_string;
+      var day = +day_string;
+      if (isNaN(year) || isNaN(month) || isNaN(day)) { throw 'invalid'; }
+      result.date = new Date(year, month - 1, day);
+
+      // validate time portion (TODO: incorrect handling of offset_string)
+      var hour = +hour_string;
+      var minute = +minute_string;
+      var second = +second_string;
+      var offset = offset_string == 'Z' ? 0 : +offset_string;
+      if (isNaN(hour) || isNaN(minute) || isNaN(second) || isNaN(offset)) { throw 'invalid'; }
+
+      var date_offset = offset;
       if(result.date.getTimezoneOffset() != today.getTimezoneOffset()) {
         user_offset = user_offset - ((result.date.getTimezoneOffset() - today.getTimezoneOffset()) / 60);
       }
@@ -127,15 +140,14 @@ var speakMessage = function ($this, message) {
       result.date_sortable = iso.substring(0, 10);
       result.date_string = month_string + "/" + day_string + "/" + year_string;
       result.date_formatted = $.dateString(result.date);
-      var hours = (parseInt(hour_string, 10)) * 1000.0 * 3600;
+      var hours = hour * 1000.0 * 3600;
       if(hour_shift && !isNaN(hour_shift)) {
         hours = hours + (hour_shift * 1000.0 * 3600);
       }
-      var minutes = parseInt(minute_string, 10) * 1000.0 * 60;
-      var seconds = parseInt(second_string, 10) * 1000.0;
-      var time_timestamp = (hours + minutes + seconds) || 0;
-      var date_timestamp = Date.UTC(year_string, month_string - 1, day_string);
-      if (isNaN(date_timestamp)) { throw 'invalid date'; }
+      var minutes = minute * 1000.0 * 60;
+      var seconds = second * 1000.0;
+      var time_timestamp = hours + minutes + seconds;
+      var date_timestamp = Date.UTC(year, month - 1, day);
 
       var tz_offset = result.date.getTimezoneOffset() * 60000;
       var time = new Date(date_timestamp + time_timestamp + tz_offset);
