@@ -103,11 +103,18 @@ var speakMessage = function ($this, message) {
       if(!iso) {
         return $.parseFromISO.defaults;
       }
-      var year = iso.substring(0, 4);
-      var month = iso.substring(5, 7);
-      var day = iso.substring(8, 10);
-      var date_offset = parseInt(iso.substring(19), 10) || 0;
-      result.date = new Date(year, month - 1, day);
+
+      // divide iso string into parts
+      var year_string = iso.substring(0, 4);
+      var month_string = iso.substring(5, 7);
+      var day_string = iso.substring(8, 10);
+      var hour_string = iso.substring(11, 13);
+      var minute_string = iso.substring(14, 16);
+      var second_string = iso.substring(17, 19);
+      var offset_string = iso.substring(19);
+
+      var date_offset = parseInt(offset_string, 10) || 0;
+      result.date = new Date(year_string, month_string - 1, day_string);
       if(result.date.getTimezoneOffset() != today.getTimezoneOffset()) {
         user_offset = user_offset - ((result.date.getTimezoneOffset() - today.getTimezoneOffset()) / 60);
       }
@@ -117,11 +124,8 @@ var speakMessage = function ($this, message) {
       // is shifting due to time zones.
       // result.date = $.datepicker.parseDate("yy-mm-dd", iso.substring(0, 10));
       result.date_sortable = iso.substring(0, 10);
-      result.date_string = month + "/" + day + "/" + year;
+      result.date_string = month_string + "/" + day_string + "/" + year_string;
       result.date_formatted = $.dateString(result.date);
-      var hour_string = iso.substring(11, 13);
-      var minute_string = iso.substring(14, 16);
-      var second_string = iso.substring(17, 19);
       var hours = (parseInt(hour_string, 10)) * 1000.0 * 3600;
       if(hour_shift && !isNaN(hour_shift)) {
         hours = hours + (hour_shift * 1000.0 * 3600);
@@ -129,7 +133,7 @@ var speakMessage = function ($this, message) {
       var minutes = parseInt(minute_string, 10) * 1000.0 * 60;
       var seconds = parseInt(second_string, 10) * 1000.0;
       var time_timestamp = (hours + minutes + seconds) || 0;
-      var date_timestamp = Date.UTC(year, month - 1, day);
+      var date_timestamp = Date.UTC(year_string, month_string - 1, day_string);
       if (isNaN(date_timestamp)) { throw 'invalid date'; }
 
       var tz_offset = result.date.getTimezoneOffset() * 60000;
