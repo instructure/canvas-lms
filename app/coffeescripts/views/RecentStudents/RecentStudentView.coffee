@@ -15,7 +15,7 @@ define [
     toJSON: ->
       data = @model.toJSON()
       if data.last_login?
-        date = $.fudgeDateForProfileTimezone(new Date(data.last_login), false)
+        date = $.fudgeDateForProfileTimezone(new Date(data.last_login))
         data.last_login = I18n.t '#time.event', '%{date} at %{time}',
           date: I18n.l('#date.formats.short', date)
           time: I18n.l('#time.formats.tiny', date)
