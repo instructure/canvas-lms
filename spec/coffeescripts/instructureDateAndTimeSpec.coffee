@@ -5,7 +5,12 @@ define [
   'vendor/timezone/America/Juneau'
   'jquery.instructure_date_and_time'
 ], ($, tz, detroit, juneau) ->
-  module 'parseFromISO'
+  module 'parseFromISO',
+    setup: ->
+      @snapshot = tz.snapshot()
+
+    teardown: ->
+      tz.restore(@snapshot)
 
   expectedTimestamp = Date.UTC(2013, 8, 1) / 1000
 
@@ -58,18 +63,34 @@ define [
     equal parsed.timestamp, expectedTimestamp
 
   test 'should fudge the time object', ->
-    snapshot = tz.snapshot()
     tz.changeZone(detroit, 'America/Detroit')
     parsed = $.parseFromISO('2013-09-01T00:00:00Z')
     equal parsed.time.getHours(), 20 # -4 offset between UTC and EDT
-    tz.restore(snapshot)
+
+  test 'should fudge the datetime object', ->
+    tz.changeZone(detroit, 'America/Detroit')
+    parsed = $.parseFromISO('2013-09-01T00:00:00Z')
+    equal parsed.datetime.getHours(), 20 # -4 offset between UTC and EDT
+
+  test 'should construct date_formatted in the profile timezone', ->
+    tz.changeZone(detroit, 'America/Detroit')
+    parsed = $.parseFromISO('2013-09-02T02:00:00Z')
+    equal parsed.date_formatted, 'Sep 1, 2013' # Sep 2nd at 2am UTC == Sep 1 at 10pm EDT
+
+  test 'should construct time_formatted in the profile timezone', ->
+    tz.changeZone(detroit, 'America/Detroit')
+    parsed = $.parseFromISO('2013-09-02T02:00:00Z')
+    equal parsed.time_formatted, '10pm' # Sep 2nd at 2am UTC == Sep 1 at 10pm EDT
+
+  test 'should construct datetime_formatted in the profile timezone', ->
+    tz.changeZone(detroit, 'America/Detroit')
+    parsed = $.parseFromISO('2013-09-02T02:00:00Z')
+    equal parsed.datetime_formatted, 'Sep 1, 2013 at 10pm' # Sep 2nd at 2am UTC == Sep 1 at 10pm EDT
 
   test 'should not fudge the timestamp', ->
-    snapshot = tz.snapshot()
     tz.changeZone(detroit, 'America/Detroit')
     parsed = $.parseFromISO('1970-01-01T00:00:00Z')
     equal parsed.timestamp, 0
-    tz.restore(snapshot)
 
   module 'fudgeDateForProfileTimezone',
     setup: ->
