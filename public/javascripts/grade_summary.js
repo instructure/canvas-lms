@@ -34,7 +34,6 @@ define([
   function updateStudentGrades() {
     var ignoreUngradedSubmissions = $("#only_consider_graded_assignments").attr('checked');
     var currentOrFinal = ignoreUngradedSubmissions ? 'current' : 'final';
-
     var calculatedGrades = GradeCalculator.calculate(
       ENV.submissions,
       ENV.assignment_groups,
@@ -158,9 +157,9 @@ define([
         update = false;
         $assignment.removeClass('dont_update');
       }
+      var assignment_id = $assignment.getTemplateData({ textValues: ['assignment_id'] }).assignment_id;
       if (update) {
-        var assignment_id = $assignment.getTemplateData({ textValues: ['assignment_id'] }).assignment_id,
-            url           = $.replaceTags($('.update_submission_url').attr('href'), 'assignment_id', assignment_id);
+        var url           = $.replaceTags($('.update_submission_url').attr('href'), 'assignment_id', assignment_id);
         if (!isChanged) { val = null; }
         $.ajaxJSON(url, 'PUT', { 'submission[student_entered_score]': val }, function(data) {
           data = {student_entered_score: data.submission.student_entered_score};
@@ -186,9 +185,8 @@ define([
       if (val === 0) { val = '0.0'; }
       if (val === originalVal) { val = originalScore; }
       $assignment.find('.grade').html(val || $assignment.find('.grade').data('originalValue'));
-      if (update) {
-        updateScoreForAssignment(assignment_id, val);
-      }
+
+      updateScoreForAssignment(assignment_id, val);
       updateStudentGrades();
     });
     $("#grade_entry").blur(function() {
@@ -204,12 +202,14 @@ define([
             I18n.t('student_mute_notification', 'Instructor is working on grades') :
             I18n.t('click_to_change', 'Click to test a different score');
       $assignment.find(".score").text(val);
-      $assignment.data('muted') ? $assignment.find('.grade').html('<img alt="Muted" class="muted_icon" src="/images/sound_mute.png?1318436336">') : $assignment.find(".grade").text(val || "-");
       $assignment.find(".assignment_score").attr('title', I18n.t('click_to_change', 'Click to test a different score'))
         .find(".score_teaser").text(tooltip).end()
         .find(".grade").removeClass('changed');
       $assignment.find(".revert_score_link").remove();
       $assignment.find(".score_value").text(val);
+
+      if (isNaN(parseFloat(val))) { val = null; }
+      $assignment.data('muted') ? $assignment.find('.grade').html('<img alt="Muted" class="muted_icon" src="/images/sound_mute.png?1318436336">') : $assignment.find(".grade").text(val || "-");
 
       var assignmentId = $assignment.getTemplateValue('assignment_id');
       updateScoreForAssignment(assignmentId, val);
