@@ -44,7 +44,7 @@ define [
       @assignment.html_url
 
     parseStartDate: () ->
-      if @assignment.due_at then $.parseFromISO(@assignment.due_at, 'due_date').time else null
+      if @assignment.due_at then $.parseFromISO(@assignment.due_at).time else null
 
     displayTimeString: () ->
       unless date = @originalStart

@@ -536,7 +536,7 @@ define([
       }
       details_url = updateEvent.details_urls[key];
     } else {
-      var date_data = $.parseFromISO(event.due_at, 'due_date');
+      var date_data = $.parseFromISO(event.due_at);
       event.datetime = (date_data && date_data.datetime);
       event.start_time_string = date_data.time_string;
       event.end_time_string = date_data.time_string;

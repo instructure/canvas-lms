@@ -95,8 +95,7 @@ var speakMessage = function ($this, message) {
     return result;
   };  
   
-  $.parseFromISO = function(iso, datetime_type) {
-    datetime_type = datetime_type || 'event';
+  $.parseFromISO = function(iso) {
     try {
       var result = {};
       if(!iso) {
@@ -161,8 +160,7 @@ var speakMessage = function ($this, message) {
       if(time.getMinutes() !== 0) {
         time_formatted += time_tail;
       }
-      var by_at = datetime_type == 'due_date' ? 'by' : 'at';
-      var time_for_date_formatted = ' ' + by_at + ' ' + time_formatted + ampm;
+      var time_for_date_formatted = ' at ' + time_formatted + ampm;
       result.show_time = true;
       var sortable_hour = time.getHours();
       if(sortable_hour < 10) {
