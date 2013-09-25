@@ -275,7 +275,7 @@ define([
       $assignment.find(".date_text").show();
     }
     else if(assignment.due_at) {
-      var date_data = $.parseFromISO(assignment.due_at, 'due_date');
+      var date_data = $.parseFromISO(assignment.due_at);
       assignment.due_date = date_data.date_formatted;
       assignment.due_time = date_data.time_formatted;
       assignment.timestamp = date_data.timestamp;
