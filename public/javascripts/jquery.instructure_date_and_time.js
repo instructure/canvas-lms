@@ -138,7 +138,7 @@ var speakMessage = function ($this, message) {
       // format date fields
       result.date_sortable = iso.substring(0, 10);
       result.date_string = month_string + "/" + day_string + "/" + year_string;
-      result.date_formatted = $.dateString(result.date);
+      result.date_formatted = $.dateString(result.datetime);
 
       // format time fields
       var ampm = "am";
@@ -160,18 +160,18 @@ var speakMessage = function ($this, message) {
       if(time.getMinutes() !== 0) {
         time_formatted += time_tail;
       }
-      var time_for_date_formatted = ' at ' + time_formatted + ampm;
+      time_formatted += ampm;
       result.show_time = true;
       var sortable_hour = time.getHours();
       if(sortable_hour < 10) {
         sortable_hour = "0" + sortable_hour;
       }
       result.time_sortable = sortable_hour + time_tail;
-      time_formatted += ampm;
       result.time_formatted = time_formatted;
       result.time_string = hours + time_tail + ampm;
-      result.date_formatted = $.dateString(result.datetime);
-      result.datetime_formatted = result.date_formatted + time_for_date_formatted;
+
+      // combine date and time into datetime (TODO: i18n)
+      result.datetime_formatted = result.date_formatted + ' at ' + result.time_formatted;
 
       // done
       result.valid = true;
