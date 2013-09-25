@@ -205,11 +205,6 @@ var speakMessage = function ($this, message) {
     return tz.parse(date.toString('yyyy-MM-dd HH:mm:ss'));
   }
 
-  // The following method is simply a helper to use the logic from $.parseFromISO on
-  // an existing Date() object. This is not the right solution and should be replaced.
-  $.parseFromDateUTC = function(date, datetime_type) {
-    return $.parseFromISO($.dateToISO8601UTC(date), datetime_type)
-  };
   $.parseFromISO.ref_date = new Date();
   $.parseFromISO.offset = $.parseFromISO.ref_date.getTimezoneOffset() * 60000;
   $.parseFromISO.defaults = {
