@@ -25,6 +25,8 @@ define [
   'compiled/collections/SyllabusAppointmentGroupsCollection'
   'compiled/views/courses/SyllabusView'
   'spec/javascripts/views/SyllabusViewPrerendered'
+  'helpers/fakeENV'
+  'helpers/jquery.simulate'
 ], ($, _, SyllabusBehaviors, SyllabusCollection, SyllabusCalendarEventsCollection, SyllabusAppointmentGroupsCollection, SyllabusView, SyllabusViewPrerendered) ->
 
   setupServerResponses = ->
