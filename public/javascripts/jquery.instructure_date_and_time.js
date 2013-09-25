@@ -132,20 +132,16 @@ var speakMessage = function ($this, message) {
       if(result.date.getTimezoneOffset() != today.getTimezoneOffset()) {
         user_offset = user_offset - ((result.date.getTimezoneOffset() - today.getTimezoneOffset()) / 60);
       }
-      var hour_shift = user_offset - date_offset;
       // NOTE: This value is a literal parsing of the date
       // passed in and may technically be incorrect if there
       // is shifting due to time zones.
       // result.date = $.datepicker.parseDate("yy-mm-dd", iso.substring(0, 10));
-      var hours = (hour + hour_shift) * 1000.0 * 3600;
-      var minutes = minute * 1000.0 * 60;
-      var seconds = second * 1000.0;
-      var time_timestamp = hours + minutes + seconds;
       var date_timestamp = Date.UTC(year, month - 1, day);
-      var tz_offset = result.date.getTimezoneOffset() * 60000;
-      var time = new Date(date_timestamp + time_timestamp + tz_offset);
+      var time_timestamp = (((hour + user_offset - date_offset) * 60 + minute) * 60 + second) * 1000;
       result.timestamp = (time_timestamp + date_timestamp) / 1000;
       result.minute_timestamp = result.timestamp - (result.timestamp % 60);
+      var tz_offset = result.date.getTimezoneOffset() * 60000;
+      var time = new Date(date_timestamp + time_timestamp + tz_offset);
 
       // format date fields
       result.date_sortable = iso.substring(0, 10);
