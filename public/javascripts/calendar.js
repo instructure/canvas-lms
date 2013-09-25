@@ -578,7 +578,7 @@ define([
     $event = $("#event_" + id);
     if(event.all_day) {
       var all_day_date = $.parseFromISO(event.all_day_date);
-      if(all_day_date.date_timestamp) {
+      if(all_day_date.valid) {
         event.all_day_date = all_day_date.date_formatted;
         event.start_at = all_day_date.date_sortable.substring(0, 10);
       } else {

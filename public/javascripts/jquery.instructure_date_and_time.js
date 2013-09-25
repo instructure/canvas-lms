@@ -129,9 +129,9 @@ var speakMessage = function ($this, message) {
       var minutes = parseInt(minute_string, 10) * 1000.0 * 60;
       var seconds = parseInt(second_string, 10) * 1000.0;
       var time_timestamp = (hours + minutes + seconds) || 0;
-      var date_timestamp = (Date.UTC(year, month - 1, day)) || 0;
-      result.time_timestamp = time_timestamp / 1000;
-      result.date_timestamp = date_timestamp / 1000;
+      var date_timestamp = Date.UTC(year, month - 1, day);
+      if (isNaN(date_timestamp)) { throw 'invalid date'; }
+
       var tz_offset = result.date.getTimezoneOffset() * 60000;
       var time = new Date(date_timestamp + time_timestamp + tz_offset);
       var ampm = "am";
@@ -170,6 +170,7 @@ var speakMessage = function ($this, message) {
       result.datetime_formatted = result.date_formatted + time_for_date_formatted;
       result.timestamp = (time_timestamp + date_timestamp) / 1000;
       result.minute_timestamp = result.timestamp - (result.timestamp % 60);
+      result.valid = true;
       return result;
     } catch(e) {
       return $.parseFromISO.defaults;
@@ -220,12 +221,11 @@ var speakMessage = function ($this, message) {
   $.parseFromISO.ref_date = new Date();
   $.parseFromISO.offset = $.parseFromISO.ref_date.getTimezoneOffset() * 60000;
   $.parseFromISO.defaults = {
+      valid: false,
       date: new Date($.parseFromISO.offset),
       date_sortable: "0000-00-00",
       date_string: "",
       date_formatted: "",
-      time_timestamp: 0,
-      date_timestamp: 0,
       timestamp: 0,
       time: new Date($.parseFromISO.offset),
       time_formatted: "",
