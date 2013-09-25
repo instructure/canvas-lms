@@ -6,6 +6,7 @@ require [
   'compiled/widget/courseList'
   'compiled/helpDialog'
   'compiled/tours'
+  'timezone'
 
   # modules that do their own thing on every page that simply need to
   # be required
@@ -49,7 +50,7 @@ require [
   'vendor/jquery.pageless'
   'vendor/jquery.scrollTo'
   'compiled/badge_counts'
-], ($, Backbone, courseList, helpDialog, tours) ->
+], ($, Backbone, courseList, helpDialog, tours, tz) ->
   courseList.init()
   helpDialog.initTriggers()
   tours.init()
@@ -74,3 +75,7 @@ require [
     event.preventDefault()
     Backbone.history.navigate $(this).attr('href'), yes
 
+  ##
+  # Set up timezone
+  tz.changeZone(ENV.TIMEZONE)
+  tz.changeLocale(ENV.LOCALE.replace('-', '_'))

@@ -34,6 +34,13 @@ describe ApplicationController do
       controller.js_env[:files_domain].should == 'files.example.com'
     end
 
+    it "should auto-set timezone and locale" do
+      I18n.locale = :fr
+      Time.zone = 'Alaska'
+      @controller.js_env[:LOCALE].should == 'fr-FR'
+      @controller.js_env[:TIMEZONE].should == 'America/Juneau'
+    end
+
     it "should allow multiple items" do
       controller.js_env :A => 'a', :B => 'b'
       controller.js_env[:A].should == 'a'
