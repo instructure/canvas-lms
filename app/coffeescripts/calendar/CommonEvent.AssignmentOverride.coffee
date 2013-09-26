@@ -63,7 +63,7 @@ define [
       @title = "#{title} #{titleContext}"
 
     saveDates: (success, error) =>
-      @save { 'assignment_override[due_at]': $.dateToISO8601UTC($.unfudgeDateForProfileTimezone(@start)) }, success, error
+      @save { 'assignment_override[due_at]': $.unfudgeDateForProfileTimezone(@start).toISOString() }, success, error
 
     methodAndURLForSave: () ->
       url = $.replaceTags(@contextInfo.assignment_override_url,

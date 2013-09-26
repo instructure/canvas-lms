@@ -222,8 +222,8 @@ define [
 
         {
           context_codes: contexts
-          start_date: $.dateToISO8601UTC($.unfudgeDateForProfileTimezone(startDay))
-          end_date: $.dateToISO8601UTC($.unfudgeDateForProfileTimezone(endDay))
+          start_date: $.unfudgeDateForProfileTimezone(startDay).toISOString()
+          end_date: $.unfudgeDateForProfileTimezone(endDay).toISOString()
         }
 
       paramsForUndatedEvents = (contexts) =>

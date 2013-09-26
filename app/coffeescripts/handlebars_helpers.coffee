@@ -42,7 +42,7 @@ define [
 
       # if datetime is already a date convert it back into an ISO string to parseFromISO,
       # TODO: be smarter about this
-      datetime = $.dateToISO8601UTC(datetime) if _.isDate datetime
+      datetime = datetime.toISOString() if _.isDate datetime
 
       parsed = $.parseFromISO(datetime)
       new Handlebars.SafeString "<time title='#{parsed.datetime_formatted}' datetime='#{parsed.datetime.toISOString()}' #{'pubdate' if pubdate}>#{$.friendlyDatetime(parsed.datetime)}</time>"
