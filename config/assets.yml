@@ -115,6 +115,8 @@ stylesheets:
     - public/stylesheets/compiled/grading_standards.css
   login:
     - public/stylesheets/compiled/login.css
+  otp_login:
+    - public/stylesheets/compiled/otp_login.css
   roster:
     - public/stylesheets/compiled/roster.css
   roster_user:
