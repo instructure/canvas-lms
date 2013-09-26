@@ -243,14 +243,14 @@ class SearchController < ApplicationController
         [
           context_state_ranks[context[:state]],
           context_type_ranks[context[:type]],
-          context[:name].downcase,
+          Canvas::ICU.collation_key(context[:name]),
           context[:id]
         ]
       }
     else
       result.sort_by{ |context|
         [
-          context[:name].downcase,
+          Canvas::ICU.collation_key(context[:name]),
           context[:id]
         ]
       }

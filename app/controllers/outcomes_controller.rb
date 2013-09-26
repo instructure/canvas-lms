@@ -117,7 +117,7 @@ class OutcomesController < ApplicationController
     if authorized_action(@context, @current_user, :manage_outcomes)
       @account_contexts = @context.associated_accounts rescue []
       @current_outcomes = @context.linked_learning_outcomes
-      @outcomes = @context.available_outcomes.sort_by{ |o| o.title }
+      @outcomes = Canvas::ICU.collate_by(@context.available_outcomes, &:title)
       if params[:unused]
         @outcomes -= @current_outcomes
       end

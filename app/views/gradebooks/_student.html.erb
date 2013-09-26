@@ -2,11 +2,10 @@
 <span class="hidden_name nobr" style="display: none;"><%= t(:student, "Student") %></span>
 <%
   es = @enrollments_hash[student.id] if @context.course_sections.active.count > 1 && @enrollments_hash && @enrollments_hash[student.id]
-  sections = es.map{ |e| e.course_section }.compact.sort_by{ |s| s.display_name } if es
+  sections = Canvas::ICU.collate_by(es.map{ |e| e.course_section }.compact, &:display_name) if es
 %>
   <div class="secondary_identifier <%= 'with_section' if es %>" title="<%= student.secondary_identifier %>"><%= student.secondary_identifier %></div>
 <% if es %>
-  <% section_names = sections.map{ |s| s.display_name}.to_sentence %>
   <% sections.each do |section| %>
     <div class="course_section" data-course_section_id="<%= section.id %>" title="<%= section.display_name %>"><%= section.display_name %></div>
   <% end %>

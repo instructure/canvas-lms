@@ -198,7 +198,7 @@ class GroupsController < ApplicationController
     return unless authorized_action(@context, @current_user, :read_roster)
 
     @groups      = all_groups = @context.groups.active.by_name
-    @categories  = @context.group_categories.order("role <> 'student_organized'", :name)
+    @categories  = @context.group_categories.order("role <> 'student_organized'", GroupCategory.best_unicode_collation_key('name'))
     @user_groups = @current_user.group_memberships_for(@context) if @current_user
 
     unless api_request?

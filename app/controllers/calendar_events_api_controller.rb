@@ -480,7 +480,7 @@ class CalendarEventsApiController < ApplicationController
       end
     end
 
-    @events = @events.sort_by{ |e| [(e.start_at || Time.now), e.title] }
+    @events = @events.sort_by{ |e| [(e.start_at || Time.now), Canvas::ICU.collation_key(e.title)] }
 
     @contexts.each do |context|
       log_asset_access("calendar_feed:#{context.asset_string}", "calendar", 'other')

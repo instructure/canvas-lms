@@ -304,7 +304,7 @@ class LearningOutcome < ActiveRecord::Base
   scope :has_result_for, lambda { |user|
     joins(:learning_outcome_results).
         where("learning_outcomes.id=learning_outcome_results.learning_outcome_id AND learning_outcome_results.user_id=?", user).
-        order(:short_description)
+        order(best_unicode_collation_key('short_description'))
   }
 
   scope :global, where(:context_id => nil)

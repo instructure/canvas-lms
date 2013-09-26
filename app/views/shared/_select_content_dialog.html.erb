@@ -147,9 +147,9 @@
         <div style="margin-top: 5px;">
         <select class="module_item_select" multiple>
           <% includes = @context.grants_right?(@current_user, session, :manage_files) ? :active_file_attachments : :visible_file_attachments %>
-          <% @context.folders.active.limit(200).includes(includes).sort_by{|f| f.full_name}.each do |folder| %>
+          <% Canvas::ICU.collate_by(@context.folders.active.limit(200).includes(includes), &:full_name).each do |folder| %>
             <optgroup label="<%= folder.full_name %>">
-              <% folder.send(includes).sort_by{|file| file.display_name }.each do |file| %>
+              <% Canvas::ICU.collate_by(folder.send(includes), &:display_name).each do |file| %>
                 <option value="<%= file.id %>"><%= file.display_name %></option>
               <% end %>
             </optgroup>

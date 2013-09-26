@@ -32,7 +32,7 @@ class QuestionBanksController < ApplicationController
         @question_banks += @context.inherited_assessment_question_banks.active
       end
       @question_banks = @question_banks.select{|b| b.grants_right?(@current_user, nil, :manage) } if params[:managed] == '1'
-      @question_banks = @question_banks.uniq.sort_by{|b| b.title || "zzz" }
+      @question_banks = Canvas::ICU.collate_by(@question_banks.uniq) { |b| b.title || "zzz" }
       respond_to do |format|
         format.html
         format.json { render :json => @question_banks.map{ |b| b.as_json(methods: [:cached_context_short_name, :assessment_question_count]) }}
@@ -61,7 +61,7 @@ class QuestionBanksController < ApplicationController
 
     add_crumb(@bank.title)
     if authorized_action(@bank, @current_user, :read)
-      @alignments = @bank.learning_outcome_alignments.sort_by{|a| a.learning_outcome.short_description.downcase }
+      @alignments = Canvas::ICU.collate_by(@bank.learning_outcome_alignments) { |a| a.learning_outcome.short_description }
       @questions = @bank.assessment_questions.active.paginate(:per_page => 50, :page => 1)
     end
   end

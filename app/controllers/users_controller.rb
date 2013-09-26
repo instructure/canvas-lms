@@ -1548,6 +1548,6 @@ class UsersController < ApplicationController
       end
     end
 
-    data.values.sort_by { |e| e[:enrollment].user.sortable_name.downcase }
+    Canvas::ICU.collate_by(data.values) { |e| e[:enrollment].user.sortable_name }
   end
 end

@@ -22,7 +22,7 @@ class SubAccountsController < ApplicationController
 
   def sub_accounts_of(account, current_depth = 0)
     account_data = @accounts[account.id] = { :account => account, :course_count => 0}
-    sub_accounts = account.sub_accounts.active.order(:name).limit(101) unless current_depth == 2
+    sub_accounts = account.sub_accounts.active.order(Account.best_unicode_collation_key('name')).limit(101) unless current_depth == 2
     sub_account_ids = (sub_accounts || []).map(&:id)
     if current_depth == 2 || sub_accounts.length > 100
       account_data[:sub_account_ids] = []

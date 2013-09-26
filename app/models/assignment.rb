@@ -1225,7 +1225,7 @@ class Assignment < ActiveRecord::Base
 
   def visible_rubric_assessments_for(user)
     if self.rubric_association
-      self.rubric_association.rubric_assessments.select{|a| a.grants_rights?(user, :read)[:read]}.sort_by{|a| [a.assessment_type == 'grading' ? '0' : '1', a.assessor_name] }
+      self.rubric_association.rubric_assessments.select{|a| a.grants_rights?(user, :read)[:read]}.sort_by{|a| [a.assessment_type == 'grading' ? '0' : '1', Canvas::ICU.collation_key(a.assessor_name)] }
     end
   end
 
@@ -1768,7 +1768,7 @@ class Assignment < ActiveRecord::Base
 
   def sort_key
     # undated assignments go last
-    [due_at ? 0 : 1, due_at || 0, title]
+    [due_at ? 0 : 1, due_at || 0, Canvas::ICU.collation_key(title)]
   end
 
   def special_class; nil; end

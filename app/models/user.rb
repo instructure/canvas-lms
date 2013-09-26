@@ -1324,7 +1324,7 @@ class User < ActiveRecord::Base
     context_codes = ([self] + self.management_contexts).uniq.map(&:asset_string)
     rubrics = self.context_rubrics.active
     rubrics += Rubric.active.find_all_by_context_code(context_codes)
-    rubrics.uniq.sort_by{|r| [(r.association_count || 0) > 3 ? 'a' : 'b', (r.title.downcase rescue 'zzzzz')]}
+    rubrics.uniq.sort_by{|r| [(r.association_count || 0) > 3 ? 'a' : 'b', Canvas::ICU.collation_key(r.title || 'zzzzz')]}
   end
 
   def assignments_recently_graded(opts={})
@@ -1616,7 +1616,7 @@ class User < ActiveRecord::Base
       end
     end
 
-    res.sort_by{ |c| [c.primary_enrollment_rank, c.name.downcase] }
+    res.sort_by{ |c| [c.primary_enrollment_rank, Canvas::ICU.collation_key(c.name)] }
   end
   memoize :courses_with_primary_enrollment
 
@@ -1826,7 +1826,7 @@ class User < ActiveRecord::Base
     event_codes = context_codes + AppointmentGroup.manageable_by(self, context_codes).intersecting(opts[:start_at], opts[:end_at]).map(&:asset_string)
     events += ev.for_user_and_context_codes(self, event_codes, []).between(opts[:start_at], opts[:end_at]).updated_after(opts[:updated_at])
     events += Assignment.active.for_context_codes(context_codes).due_between(opts[:start_at], opts[:end_at]).updated_after(opts[:updated_at]).with_just_calendar_attributes
-    events.sort_by{|e| [e.start_at, e.title || ""] }.uniq
+    events.sort_by{|e| [e.start_at, Canvas::ICU.collation_key(e.title || "")] }.uniq
   end
 
   def upcoming_events(opts={})
@@ -1846,7 +1846,7 @@ class User < ActiveRecord::Base
         include_submitted_count.
         map {|a| a.overridden_for(self)},opts.merge(:time => now)).
       first(opts[:limit])
-    events.sort_by{|e| [e.start_at ? 0: 1,e.start_at || 0, e.title] }.uniq.first(opts[:limit])
+    events.sort_by{|e| [e.start_at ? 0: 1,e.start_at || 0, Canvas::ICU.collation_key(e.title)] }.uniq.first(opts[:limit])
   end
 
   def select_upcoming_assignments(assignments,opts)
@@ -1870,7 +1870,7 @@ class User < ActiveRecord::Base
     undated_events = []
     undated_events += CalendarEvent.active.for_user_and_context_codes(self, context_codes, []).undated.updated_after(opts[:updated_at])
     undated_events += Assignment.active.for_context_codes(context_codes).undated.updated_after(opts[:updated_at]).with_just_calendar_attributes
-    undated_events.sort_by{|e| e.title }
+    Canvas::ICU.collate_by(undated_events, &:title)
   end
 
   def setup_context_lookups(contexts=nil)
@@ -2191,7 +2191,7 @@ class User < ActiveRecord::Base
         contexts += Group.where(:id => info.common_groups.keys).all if info.common_groups.present?
       end
     end
-    contexts.map(&:name).sort_by{|c|c.downcase}
+    Canvas::ICU.collate(contexts.map(&:name))
   end
 
   def mark_all_conversations_as_read!
@@ -2227,7 +2227,7 @@ class User < ActiveRecord::Base
       if !e.course
         coalesced_enrollments << {
           :enrollment => e,
-          :sortable => [e.rank_sortable, e.state_sortable, e.long_name],
+          :sortable => [e.rank_sortable, e.state_sortable, Canvas::ICU.collation_key(e.long_name)],
           :types => [ e.readable_type ]
         }
       end
@@ -2248,9 +2248,8 @@ class User < ActiveRecord::Base
     active_enrollments = coalesced_enrollments.map{ |e| e[:enrollment] }
 
     cached_group_memberships = self.cached_current_group_memberships
-    coalesced_group_memberships = cached_group_memberships.
-      select{ |gm| gm.active_given_enrollments?(active_enrollments) }.
-      sort_by{ |gm| gm.group.name }
+    coalesced_group_memberships = Canvas::ICU.collate_by(cached_group_memberships.
+      select{ |gm| gm.active_given_enrollments?(active_enrollments) }) { |gm| gm.group.name }
 
     @menu_data = {
       :group_memberships => coalesced_group_memberships,

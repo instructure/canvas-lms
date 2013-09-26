@@ -39,7 +39,7 @@ class Rubric < ActiveRecord::Base
   serialize :data
   simply_versioned
   
-  scope :publicly_reusable, where(:reusable => true).order(:title)
+  scope :publicly_reusable, lambda { where(:reusable => true).order(best_unicode_collation_key('title')) }
   scope :matching, lambda { |search| where(wildcard('rubrics.title', search)).order("rubrics.association_count DESC") }
   scope :before, lambda { |date| where("rubrics.created_at<?", date) }
   scope :active, where("workflow_state<>'deleted'")

@@ -431,7 +431,7 @@ class ContextExternalTool < ActiveRecord::Base
     contexts.each do |context|
       tools += context.context_external_tools.active
     end
-    tools.sort_by(&:name)
+    Canvas::ICU.collate_by(tools, &:name)
   end
   
   # Order of precedence: Basic LTI defines precedence as first

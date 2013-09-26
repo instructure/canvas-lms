@@ -300,7 +300,7 @@ module Canvas::Migration::Helpers
     end
 
     def course_attachments_data(content_list, source_course)
-      source_course.folders.active.select('id, full_name, name').includes(:active_file_attachments).sort_by{|f| f.full_name}.each do |folder|
+      Canvas::ICU.collate_by(source_course.folders.active.select('id, full_name, name').includes(:active_file_attachments), &:full_name).each do |folder|
         next if folder.active_file_attachments.length == 0
 
         item = course_item_hash('folders', folder)

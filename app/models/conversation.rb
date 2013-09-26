@@ -698,7 +698,7 @@ class Conversation < ActiveRecord::Base
         MessageableUser.select("#{MessageableUser.build_select}, last_authored_at, conversation_id").
           joins(:all_conversations).
           where(:conversation_participants => { :conversation_id => conversations }).
-          order('last_authored_at IS NULL, last_authored_at DESC, LOWER(COALESCE(short_name, name))').group_by { |mu| mu.conversation_id.to_i }
+          order("last_authored_at IS NULL, last_authored_at DESC, #{Conversation.best_unicode_collation_key("COALESCE(short_name, name)")}").group_by { |mu| mu.conversation_id.to_i }
       end
       conversations.each do |conversation|
         participants[conversation.global_id].concat(user_map[conversation.id] || [])

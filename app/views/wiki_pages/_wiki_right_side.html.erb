@@ -22,7 +22,7 @@
     </div>
   <% end %>
   <div>
-    <% pages = @context.wiki.wiki_pages.not_deleted.select{|p| !p.new_record? }.sort_by{|p| p.title || ""} %>
+    <% pages = Canvas::ICU.collate_by(@context.wiki.wiki_pages.not_deleted.select{|p| !p.new_record? }){|p| p.title || ""} %>
     <% if pages.length > 10 %>
     <h2><%= t 'headers.common_pages', 'Common Pages' %></h2>
     <div class="rs-margin-lr rs-margin-bottom">
@@ -51,13 +51,13 @@
     <% if pages.length < 8 %>
       <ul class="item_list limit_height">
         <%= render :partial => 'wiki_pages/page_link' %>
-        <%= render :partial => 'wiki_pages/page_link', :collection => pages.sort_by{|p| p.title }, :locals => {:skip_front_page => true} %>
+        <%= render :partial => 'wiki_pages/page_link', :collection => Canvas::ICU.collate_by(pages, &:title), :locals => {:skip_front_page => true} %>
       </ul>
     <% else %>
       <ul class="item_list limit_height">
         <li><a href="#" class="more_pages_link" style="padding-left: 20px; font-size: 0.9em;"><%= t 'links.show_all', 'show all...' %></a></li>
         <%= render :partial => 'wiki_pages/page_link', :locals => {:hidden => true} %>
-        <%= render :partial => 'wiki_pages/page_link', :collection => pages.sort_by{|p| p.title }, :locals => {:skip_front_page => true, :hidden => true} %>
+        <%= render :partial => 'wiki_pages/page_link', :collection => Canvas::ICU.collate_by(pages, &:title), :locals => {:skip_front_page => true, :hidden => true} %>
       </ul>
     <% end %>
       </div>

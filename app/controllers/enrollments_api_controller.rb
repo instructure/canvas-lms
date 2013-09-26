@@ -149,7 +149,7 @@ class EnrollmentsApiController < ApplicationController
     endpoint_scope = (@context.is_a?(Course) ? (@section.present? ? "section" : "course") : "user")
     scope_arguments = {
       :conditions => enrollment_index_conditions,
-      :order => 'enrollments.type ASC, users.sortable_name ASC',
+      :order => "enrollments.type, #{User.sortable_name_order_by_clause("users")}",
       :include => [:user, :course, :course_section]
     }
 
