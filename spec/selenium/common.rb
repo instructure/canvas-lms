@@ -191,29 +191,19 @@ module SeleniumTestsHelperMethods
       return $server_port
     end
 
-    tried_ports = Set.new
-    while tried_ports.length < 60
-      port = rand(65535 - 1024) + 1024
-      next if tried_ports.include? port
-      tried_ports << port
+    # find an available socket
+    s = Socket.new(:INET, :STREAM)
+    s.setsockopt(:SOCKET, :REUSEADDR, true)
+    s.bind(Addrinfo.tcp(SERVER_IP, 0))
 
-      socket = Socket.new(Socket::AF_INET, Socket::SOCK_STREAM, 0)
-      socket.setsockopt(Socket::SOL_SOCKET, Socket::SO_REUSEADDR, true)
-      sockaddr = Socket.pack_sockaddr_in(port, '0.0.0.0')
-      begin
-        socket.bind(sockaddr)
-        socket.close
-        puts "found port #{port} after #{tried_ports.length} tries"
-        $server_port = port
-        $app_host_and_port = "#{SERVER_IP}:#{$server_port}"
+    $server_port = s.local_address.ip_port
+    $app_host_and_port = "#{s.local_address.ip_address}:#{s.local_address.ip_port}"
+    puts "found available port: #{$app_host_and_port}"
 
-        return $server_port
-      rescue Errno::EADDRINUSE => e
-        # pass
-      end
-    end
+    return $server_port
 
-    raise "couldn't find an available port after #{tried_ports.length} tries! ports tried: #{tried_ports.join ", "}"
+  ensure
+    s.close() if s
   end
 
   def self.start_webserver(webserver)
