@@ -138,7 +138,7 @@ var speakMessage = function ($this, message) {
       // format date fields
       result.date_sortable = iso.substring(0, 10);
       result.date_string = month_string + "/" + day_string + "/" + year_string;
-      result.date_formatted = $.dateString(result.datetime);
+      result.date_formatted = $.dateString(timestamp);
 
       // format time fields
       var ampm = "am";
@@ -216,17 +216,30 @@ var speakMessage = function ($this, message) {
       time_formatted: "",
       time_string: ""
   };
-  
-  var today = new Date();
-  $.thisYear = function(date) {
-    return date && (date.getFullYear() == today.getFullYear());
+
+  // this batch of methods assumes *real* dates passed in (or, really, anything
+  // tz.parse() can recognize. so timestamps are cool, too. but not fudged dates).
+  // use accordingly
+  $.sameYear = function(d1, d2) {
+    return tz.format(d1, '%Y') == tz.format(d2, '%Y');
+  };
+  $.sameDate = function(d1, d2) {
+    return tz.format(d1, '%F') == tz.format(d2, '%F');
+  };
+  $.midnight = function(date) {
+    return date != null && tz.format(date, '%R') == '00:00';
   };
   $.dateString = function(date) {
-    return (date && (date.toString($.thisYear(date) ? 'MMM d' : 'MMM d, yyyy'))) || "";
+    return (date != null && tz.format(date, $.sameYear(date, new Date()) ? '%b %-d' : '%b %-d, %Y')) || "";
   };
   $.timeString = function(date) {
-    return (date && date.toString('h:mmtt').toLowerCase()) || "";
+    return (date != null && tz.format(date, '%l:%M%P')) || "";
   };
+  $.datetimeString = function(date) {
+    return (date != null && I18n.t('#time.event', '%{date} at %{time}', { date: $.dateString(date), time: $.timeString(date) })) || "";
+  };
+  // end batch
+
   $.friendlyDatetime = function(datetime, perspective) {
     var today = Date.today();
     if (Date.equals(datetime.clone().clearTime(), today)) {

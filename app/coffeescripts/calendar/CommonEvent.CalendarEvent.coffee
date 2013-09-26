@@ -57,8 +57,8 @@ define [
 
     displayTimeString: () ->
         if @calendarEvent.all_day
-          date = this.startDate()
-          "<time datetime='#{date.toISOString()}'>#{$.dateString(date)}</time>"
+          datetime = $.unfudgeDateForProfileTimezone(@startDate())
+          "<time datetime='#{datetime.toISOString()}'>#{$.dateString(datetime)}</time>"
         else
           semanticDateRange(@calendarEvent.start_at, @calendarEvent.end_at)
 

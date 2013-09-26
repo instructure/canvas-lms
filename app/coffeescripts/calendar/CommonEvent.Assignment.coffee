@@ -36,12 +36,12 @@ define [
       if @assignment.due_at then $.parseFromISO(@assignment.due_at).time else null
 
     displayTimeString: () ->
-      unless date = @originalStart
+      unless datetime = @originalStart
         return "No Date" # TODO: i18n
 
       # TODO: i18n
-      time_string = "#{$.dateString(date)} at #{$.timeString(date)}"
-      "Due: <time datetime='#{date.toISOString()}'>#{time_string}</time>"
+      datetime = $.unfudgeDateForProfileTimezone(datetime)
+      "Due: <time datetime='#{datetime.toISOString()}'>#{$.datetimeString(datetime)}</time>"
 
     readableType: () ->
       @readableTypes[@assignmentType()]

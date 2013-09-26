@@ -20,6 +20,7 @@ define([
   'INST' /* INST */,
   'i18n!calendars',
   'jquery' /* $ */,
+  'timezone',
   'compiled/userSettings',
   'calendar_move' /* calendarMonths */,
   'jqueryui/draggable' /* /\.draggable/ */,
@@ -38,7 +39,7 @@ define([
   'jqueryui/resizable' /* /\.resizable/ */,
   'jqueryui/sortable' /* /\.sortable/ */,
   'jqueryui/tabs' /* /\.tabs/ */
-], function(INST, I18n, $, userSettings, calendarMonths) {
+], function(INST, I18n, $, tz, userSettings, calendarMonths) {
 
   window.calendar = {
     activateEventId: ENV.CALENDAR.ACTIVE_EVENT,
@@ -690,10 +691,10 @@ define([
       }
     }
     if(data.all_day == 'true') {
-      date = Date.parse(date_string);
+      date = tz.parse(date_string);
       data.time_string = $.dateString(date);
     } else if(data.start_time_string) {
-      date = Date.parse(date_string);
+      date = tz.parse(date_string);
       data.time_string = $.dateString(date);
     } else {
       data.time_string = "No Date Set";

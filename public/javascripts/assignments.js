@@ -21,6 +21,7 @@ define([
   'INST' /* INST */,
   'i18n!assignments',
   'jquery' /* $ */,
+  'timezone',
   'str/htmlEscape',
   'compiled/util/vddTooltip',
   'jqueryui/draggable' /* /\.draggable/ */,
@@ -39,7 +40,7 @@ define([
   'jqueryui/datepicker' /* /\.datepicker/ */,
   'jqueryui/droppable' /* /\.droppable/ */,
   'jqueryui/sortable' /* /\.sortable/ */
-], function(round, INST, I18n, $, htmlEscape, vddTooltip) {
+], function(round, INST, I18n, $, tz, htmlEscape, vddTooltip) {
 
   var defaultShowDateOptions = false;
   function hideAssignmentForm() {
@@ -854,18 +855,14 @@ define([
         $assignment.fillTemplateData({ data: data });
         var date = null;
         if(data['assignment[due_at]']) {
-          date = Date.parse(data['assignment[due_at]']);
+          date = tz.parse(data['assignment[due_at]']);
         }
         var updatedTimestamp = 0;
         if(date) {
           updatedTimestamp = +date / 1000;
-          due_time = date.toString('h:mmtt').toLowerCase();
-          if(due_time == '12:00am') {
-            due_time = '';
-          }
           $assignment.fillTemplateData({data: {
             due_date: $.dateString(date),
-            due_time: due_time
+            due_time: $.midnight(date) ? '' : $.timeString(date)
           }});
         }
         $assignment.find(".date_text").show();
