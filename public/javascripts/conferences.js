@@ -26,6 +26,9 @@ define([
       conferenceData['join_url'] = conferenceData['url'] + '/join';
       conferenceData['close_url'] = conferenceData['url'] + '/close';
       conferenceData['show_end'] = conferenceData['permissions']['initiate'] && conferenceData['started_at'] && conferenceData['long_running'];
+      conferenceData['recording'] = conferenceData.recordings[0];
+      conferenceData['recordingCount'] = conferenceData.recordings.length;
+      conferenceData['multipleRecordings'] = conferenceData.recordingCount > 1;
       $conference_row = $(newConferenceTemplate(conferenceData));
       $conference_row.data('conference', conferenceData);
       return $conference_row;
@@ -33,8 +36,9 @@ define([
 
     var buildConcludedRow = function(conferenceData) {
       conferenceData['has_actions'] = (conferenceData['permissions']['delete']);
-      // grab the first recording from the possible list and add as own object.
       conferenceData['recording'] = conferenceData.recordings[0];
+      conferenceData['recordingCount'] = conferenceData.recordings.length;
+      conferenceData['multipleRecordings'] = conferenceData.recordingCount > 1;
       $conference_row = $(concludedConferenceTemplate(conferenceData));
       $conference_row.data('conference', conferenceData);
       return $conference_row;
@@ -114,10 +118,10 @@ define([
 
     // populate the conference list with inital set of data
     _.each(ENV.current_conferences, function(conference) {
-      $("#new-conference-list").append(buildRow(conference));
+      $("#new-conference-list .ig-list").append(buildRow(conference));
     });
     _.each(ENV.concluded_conferences, function(conference) {
-      $("#concluded-conference-list").append(buildConcludedRow(conference));
+      $("#concluded-conference-list .ig-list").append(buildConcludedRow(conference));
     });
     updatedConferenceListCount();
 
@@ -150,13 +154,13 @@ define([
       }
     });
 
-    $('.conference-wrapper h2 a').on('click', function(e) {
+    $('.element_toggler').on('click', function(e) {
       var $icon = $(this).children('i');
 
-      if ($icon.hasClass('icon-arrow-down')) {
-        $icon.removeClass('icon-arrow-down').addClass('icon-arrow-right');
+      if ($icon.hasClass('icon-mini-arrow-down')) {
+        $icon.removeClass('icon-mini-arrow-down').addClass('icon-mini-arrow-right');
       } else {
-        $icon.removeClass('icon-arrow-right').addClass('icon-arrow-down');
+        $icon.removeClass('icon-mini-arrow-right').addClass('icon-mini-arrow-down');
       }
     });
     $('body').on('change', '#web_conference_long_running', function(){
@@ -217,7 +221,7 @@ define([
           if(edit){
             $conference.loadingImage();
           } else {
-            $('#new-conference-list').loadingImage();
+            $('#new-conference-list .ig-list').loadingImage();
           }
           return $conference;
         },
@@ -228,8 +232,8 @@ define([
           $conference.html(buildRow(data).html());
           $conference.data('conference', data);
           if (!edit){
-            $('#new-conference-list').loadingImage('remove');
-            $("#new-conference-list").prepend($conference);
+            $('#new-conference-list .ig-list').loadingImage('remove');
+            $("#new-conference-list .ig-list").prepend($conference);
             updatedConferenceListCount();
           }
         },
@@ -281,7 +285,7 @@ define([
             updatedConferenceListCount();
           });
           // add updated entry to the concluded conferences list
-          $('#concluded-conference-list').prepend(buildConcludedRow(data));
+          $('#concluded-conference-list .ig-list').prepend(buildConcludedRow(data));
           updatedConferenceListCount();
         });
       }

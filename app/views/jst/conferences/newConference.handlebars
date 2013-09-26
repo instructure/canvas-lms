@@ -1,40 +1,101 @@
-<div class="conference table-row">
-  <div class="table-cell conference-title ellipsis" title="{{title}}">
-    {{title}}
-  </div>
-  <div class="table-cell conference-description">
-    {{newlinesToBreak description}}
-  </div>
-  <div class="table-cell conference-actions align-center">
-    {{#if started_at}}
-      <span class="label label-success {{#if has_actions}}has_actions{{/if}}">{{#t "in_progress"}}In Progress{{/t}}</span>
+<li class="conference">
+  <div class="ig-row">
+    {{#if recording}}
+      <a class="ig-title ellipses element_toggler"
+          href="#"
+          aria-controls="conference-{{id}}"
+          aria-expanded="false"
+          role="button">
+        <i class="icon-mini-arrow-right"></i>
+        {{title}}
+      </a>
+    {{else}}
+      <span class="ig-title ellipses">{{title}}</span>
     {{/if}}
-
-    <div class="actions">
-      {{#if permissions.update}}
-        <a class="icon-edit edit_conference_link" href="{{ url }}" aria-label="{{#t "edit"}}Edit{{/t}}"></a>
+    <div class="ig-details row-fluid">
+      <div class="span4 ellipses">{{newlinesToBreak description}}</div>
+      <div class="span4 ellipses {{#if has_actions}}has_actions{{/if}}">
+        {{#if started_at}}
+          <span class="label label-success">{{#t "in_progress"}}In Progress{{/t}}</span>
+        {{/if}}
+      </div>
+      {{#if recording}}
+        {{#if multipleRecordings}}
+          <div class="span4 ellipses">{{#t "recordings"}}{{recordingCount}} Recordings{{/t}}</div>
+        {{else}}
+          <div class="span4 ellipses">{{#t "recording"}}1 Recording{{/t}}</div>
+        {{/if}}
       {{/if}}
-      {{#if permissions.delete}}
-        <a class="icon-trash delete_conference_link" href="{{ url }}" aria-label="{{#t "delete"}}Delete{{/t}}"></a>
+    </div>
+    <div class="ig-admin">
+      {{# if show_end}}
+        <a class='btn btn-small close_conference_link' href="{{ url }}/close">{{#t "end_it_now"}}End{{/t}}</a>
+      {{/if}}
+      {{#if started_at}}
+        {{#if permissions.join}}
+          <a href="{{ join_url }}" class="btn btn-small join-button btn-primary" target="_blank">
+            {{#t "join"}}Join{{/t}}
+          </a>
+        {{/if}}
+      {{else}}
+        {{#if permissions.initiate}}
+          <a href="{{ join_url }}" class="btn btn-small start-button" target="_blank">
+            {{#t "start"}}Start{{/t}}
+         </a>
+        {{/if}}
+      {{/if}}
+      {{#if has_actions}}
+        <a class="al-trigger al-trigger-gray" role="button" aria-haspopup="true" aria-owns="{{id}}-content-1" aria-label="{{#t "setings"}}settings{{/t}}" href="#">
+          <i class="icon-settings"></i>
+          <i class="icon-mini-arrow-down"></i>
+        </a>
+        <ul id="{{id}}-content-1" class="al-options" role="menu" aria-hidden="true" aria-expanded="false" aria-activedescendant="{{id}}-content-2">
+          {{#if permissions.update}}
+            <li role="presentation">
+              <a href="{{ url }}"
+                  class="icon-edit edit_conference_link"
+                  id="{{id}}-content-2"
+                  role="menuitem"
+                  aria-label="{{#t "edit"}}Edit{{/t}}"
+                  title="{{#t "edit"}}Edit{{/t}}">{{#t "edit"}}Edit{{/t}}</a>
+            </li>
+          {{/if}}
+          {{#if permissions.delete}}
+            <li role="presentation">
+              <a href="{{ url }}"
+                  class="icon-trash  delete_conference_link"
+                  id="{{id}}-content-3"
+                  role="menuitem"
+                  aria-label="{{#t "delete"}}Delete{{/t}}"
+                  title="{{#t "delete"}}Delete{{/t}}">{{#t "delete"}}Delete{{/t}}
+              </a>
+            </li>
+          {{/if}}
+        </ul>
       {{/if}}
     </div>
   </div>
-  <div class="table-cell conference-start align-right {{#if show_end}}show-end-button{{/if}}">
-    {{# if show_end}}
-      <a class='btn btn-small close_conference_link' href="{{ url }}/close">{{#t "end_it_now"}}End{{/t}}</a>
-    {{/if}}
-    {{#if started_at}}
-      {{# if permissions.join}}
-        <a href="{{ join_url }}" class="btn btn-small join-button btn-primary" target="_blank">
-          {{#t "join"}}Join{{/t}}
-        </a>
-      {{/if}}
-   {{else}}
-      {{#if permissions.initiate}}
-        <a href="{{ join_url }}" class="btn btn-small start-button" target="_blank">
-          {{#t "start"}}Start{{/t}}
-        </a>
-      {{/if}}
-   {{/if}}
-  </div>
-</div>
+  {{#if recording}}
+    <div class="ig-sublist" id="conference-{{id}}" style="display: none;">
+      <ul>
+        {{#each recordings}}
+          <li>
+            <div class="ig-row row-fluid">
+              <a href="{{playback_url}}" target="_blank" class="ig-title ellipses">{{title}}</a>
+              <div class="ig-details row-fluid">
+                <div class="span4 ellipses"></div>
+                <div class="span4 ellipses">{{dateString created_at}}</div>
+                <div class="span4 ellipses">{{minutesToHM duration_minutes}}</div>
+              </div>
+              <div class="ig-button">
+                <a class="btn btn-small" target="_blank" href="{{playback_url}}">
+                  {{#t "view"}}View{{/t}}
+                </a>
+              </div>
+            </div>
+          </li>
+        {{/each}}
+      </ul
+    </div>
+  {{/if}}
+</li>

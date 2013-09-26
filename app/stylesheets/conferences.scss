@@ -13,7 +13,7 @@
 
 /* Page styles */
 #main {
-  background: #dfe9f0;
+  background: #e8ecef;
 }
 
 #content {
@@ -32,8 +32,6 @@ header {
   color: #434343;
 
   a {
-    color: #434343;
-
     &.btn-primary, &.btn-primary:hover {
       color: #fff;
     }
@@ -48,79 +46,23 @@ header {
     font-size: 13px;
   }
 
-  h1,h2,h3,h4,h5,h6 {
-    font-size: 16px;
-    font-weight: bold;
-    line-height: 20px;
-    margin: 0 0 8px 16px;
-  }
-
-  > div {
-    background: #fff;
-    border-radius: 3px;
-    box-shadow: 1px 1px 2px rgba(0, 0, 0, .1);
-    min-height: 64px;
-  }
 }
 
-/* Conference styles */
-.conference-wrapper {
-  padding: 8px 16px;
+.ig-details{
+  right: 170px
 }
 
-.table-row {
-  border-bottom: 1px solid #b6babf;
-
-  &:last-child .table-cell {
-    border-bottom: none;
-  }
-
-  &:hover .label.has_actions {
-    display: none;
-  }
-
-  &:hover .conference-length.has_actions {
-    display: none;
-  }
-
-  &:hover .actions a, .actions a:focus {
-    clip: auto;
-    position: static;
-  }
-}
-
-.table-cell {
-  border-bottom: 1px solid #b6babf;
-  padding: 8px 16px 8px 0;
-  vertical-align: middle;
-
-  &:first-child {
-    padding-left: 16px;
-  }
-}
-
-.conference-title {
+.ig-title{
+  right: auto;
   max-width: 200px;
-  width: 200px;
-  font-weight: bold;
 }
 
-.conference-actions   { width: 70px; height: 22px;}
-.conference-start     {
-  width: 70px;
-  .join-button, .start-button { min-width: 25px; }
-  &.show-end-button   { width: 95px; }
-}
-.conference-day       { width: 80px; }
-.conference-length    { width: 70px; }
-.conference-recording {
-  width: 80px;
-  white-space: nowrap;
+.ig-header-title a{
+  color: #434343;
 }
 
-.conference-actions .actions a {
-  clip: rect(1px, 1px, 1px, 1px);
-  position: absolute;
+.ig-list .ig-row .ellipses{
+  color: #737373;
 }
 
 #add_conference_form {
