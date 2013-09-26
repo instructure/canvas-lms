@@ -1,4 +1,5 @@
 define [
+  'timezone'
   'compiled/util/enrollmentName'
   'handlebars'
   'i18nObj'
@@ -14,7 +15,7 @@ define [
   'jquery.instructure_misc_helpers'
   'jquery.instructure_misc_plugins'
   'translations/_core_en'
-], (enrollmentName, Handlebars, I18n, $, _, htmlEscape, semanticDateRange, dateSelect, mimeClass, convertApiUserContent, textHelper) ->
+], (tz, enrollmentName, Handlebars, I18n, $, _, htmlEscape, semanticDateRange, dateSelect, mimeClass, convertApiUserContent, textHelper) ->
 
   Handlebars.registerHelper name, fn for name, fn of {
     t : (translationKey, defaultValue, options) ->
@@ -37,37 +38,38 @@ define [
     semanticDateRange : ->
       new Handlebars.SafeString semanticDateRange arguments...
 
+    # expects: a Date object or an ISO string
     friendlyDatetime : (datetime, {hash: {pubdate}}) ->
       return unless datetime?
+      datetime = tz.parse(datetime) unless _.isDate datetime
+      fudged = $.fudgeDateForProfileTimezone(datetime)
+      new Handlebars.SafeString "<time title='#{$.datetimeString(datetime)}' datetime='#{datetime.toISOString()}' #{'pubdate' if pubdate}>#{$.friendlyDatetime(fudged)}</time>"
 
-      # if datetime is already a date convert it back into an ISO string to parseFromISO,
-      # TODO: be smarter about this
-      datetime = datetime.toISOString() if _.isDate datetime
-
-      parsed = $.parseFromISO(datetime)
-      new Handlebars.SafeString "<time title='#{parsed.datetime_formatted}' datetime='#{parsed.datetime.toISOString()}' #{'pubdate' if pubdate}>#{$.friendlyDatetime(parsed.datetime)}</time>"
-
-    # expects: a Date object
+    # expects: a Date object or an ISO string
     formattedDate : (datetime, format, {hash: {pubdate}}) ->
       return unless datetime?
-      new Handlebars.SafeString "<time title='#{datetime}' datetime='#{datetime.toISOString()}' #{'pubdate' if pubdate}>#{datetime.toString(format)}</time>"
+      datetime = tz.parse(datetime) unless _.isDate datetime
+      new Handlebars.SafeString "<time title='#{$.datetimeString(datetime)}' datetime='#{datetime.toISOString()}' #{'pubdate' if pubdate}>#{datetime.toString(format)}</time>"
 
-    # IMPORTANT: this handlebars helper "fudges", or adjusts the time for the
-    # user's timezone chosen in their preferences using
-    # $.fudgeDateForProfileTimezone. If you use this helper, you need to use
-    # $.unfudgeDateForProfileTimezone before sending to the server!
+    # IMPORTANT: these next two handlebars helpers emit profile-timezone
+    # human-formatted strings. don't send them as is to the server (you can
+    # parse them with tz.parse(), or preferably not use these values at all
+    # when sending to the server, instead using a machine-formatted value
+    # stored elsewhere).
+
+    # expects: an object as returned from parseFromISO or an ISO string
     datetimeFormatted : (isoString) ->
       return '' unless isoString
-      isoString = $.parseFromISO(isoString) unless isoString.datetime
-      isoString.datetime_formatted
+      isoString = isoString.timestamp * 1000 if typeof isoString is 'object'
+      $.datetimeString(isoString)
 
-    # Strips the time information from the datetime and accounts for the
-    # user's timezone preference.
+    # Strips the time information from the datetime and accounts for the user's
+    # timezone preference. expects: an object as returned from parseFromISO or
+    # an ISO string
     dateString : (isoString) ->
       return '' unless isoString
-      isoString = $.parseFromISO(isoString) unless isoString.datetime
-      isoString.date_string
-
+      isoString = isoString.timestamp * 1000 if typeof isoString is 'object'
+      tz.format(isoString, '%m/%d/%Y')
 
     # Convert the total amount of minutes into a Hours:Minutes format.
     minutesToHM : (minutes) ->
