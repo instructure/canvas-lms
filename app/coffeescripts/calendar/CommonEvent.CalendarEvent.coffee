@@ -44,10 +44,10 @@ define [
     endDate: () -> @originalEndDate
 
     parseStartDate: () ->
-      if @calendarEvent.start_at then $.parseFromISO(@calendarEvent.start_at).time else null
+      if @calendarEvent.start_at then $.fudgeDateForProfileTimezone(@calendarEvent.start_at) else null
 
     parseEndDate: () ->
-      if @calendarEvent.end_at then $.parseFromISO(@calendarEvent.end_at).time else null
+      if @calendarEvent.end_at then $.fudgeDateForProfileTimezone(@calendarEvent.end_at) else null
 
     fullDetailsURL: () ->
       if @isAppointmentGroupEvent()

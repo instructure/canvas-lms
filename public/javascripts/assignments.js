@@ -26,7 +26,7 @@ define([
   'compiled/util/vddTooltip',
   'jqueryui/draggable' /* /\.draggable/ */,
   'jquery.ajaxJSON' /* ajaxJSON */,
-  'jquery.instructure_date_and_time' /* parseFromISO, dateString, datepicker, time_field, datetime_field, /\$\.datetime/ */,
+  'jquery.instructure_date_and_time' /* $.timeString, $.dateString, datepicker, time_field, datetime_field, /\$\.datetime/ */,
   'jquery.instructure_forms' /* formSubmit, fillFormData, getFormData */,
   'jqueryui/dialog',
   'compiled/jquery/fixDialogButtons',
@@ -276,12 +276,12 @@ define([
       $assignment.find(".date_text").show();
     }
     else if(assignment.due_at) {
-      var date_data = $.parseFromISO(assignment.due_at);
-      assignment.due_date = date_data.date_formatted;
-      assignment.due_time = date_data.time_formatted;
-      assignment.timestamp = date_data.timestamp;
-      assignment.due_date_string = $.datepicker.formatDate("mm/dd/yy", date_data.date);
-      assignment.due_time_string = date_data.time_string;
+      var due_at = tz.parse(assignment.due_at);
+      assignment.due_date = $.dateString(due_at);
+      assignment.due_time = $.timeString(due_at);
+      assignment.timestamp = +due_at / 1000;
+      assignment.due_date_string = $.datepicker.formatDate("mm/dd/yy", due_at);
+      assignment.due_time_string = $.timeString(due_at);
       $assignment.find(".date_text").show();
     } else {
       $assignment.find(".date_text").hide();

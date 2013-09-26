@@ -95,63 +95,6 @@ var speakMessage = function ($this, message) {
     return result;
   };  
   
-  $.parseFromISO = function(iso) {
-    try {
-      var result = {};
-      if(!iso) {
-        return $.parseFromISO.defaults;
-      }
-
-      // divide iso string into parts
-      var year_string = iso.substring(0, 4);
-      var month_string = iso.substring(5, 7);
-      var day_string = iso.substring(8, 10);
-      var hour_string = iso.substring(11, 13);
-      var minute_string = iso.substring(14, 16);
-      var second_string = iso.substring(17, 19);
-      var offset_string = iso.substring(iso[19] == '.' ? 23 : 19);
-
-      // validate date portion
-      var year = +year_string;
-      var month = +month_string;
-      var day = +day_string;
-      if (isNaN(year) || isNaN(month) || isNaN(day)) { throw 'invalid'; }
-      result.date = new Date(year, month - 1, day);
-
-      // validate time portion (TODO: incorrect handling of offset_string)
-      var hour = +hour_string;
-      var minute = +minute_string;
-      var second = +second_string;
-      var offset = offset_string == 'Z' ? 0 : +offset_string;
-      if (isNaN(hour) || isNaN(minute) || isNaN(second) || isNaN(offset)) { throw 'invalid'; }
-
-      // combine them into an accurate unfudged timestamp
-      var timestamp = Date.UTC(year, month - 1, day) + (((hour - offset) * 60 + minute) * 60 + second) * 1000;
-      result.timestamp = timestamp / 1000;
-      result.minute_timestamp = result.timestamp - (result.timestamp % 60);
-
-      // fudged time for display
-      var time = $.fudgeDateForProfileTimezone(timestamp);
-      result.time = time;
-      result.datetime = time;
-
-      // format date fields
-      result.date_sortable = tz.format(timestamp, '%Y-%m-%d');
-      result.time_sortable = tz.format(timestamp, '%H:%M');
-      result.date_string = tz.format(timestamp, '%m/%d/%Y');
-      result.time_string = $.timeString(timestamp);
-      result.date_formatted = $.dateString(timestamp);
-      result.time_formatted = $.timeString(timestamp);
-      result.datetime_formatted = $.datetimeString(timestamp);
-
-      // done
-      result.valid = true;
-      return result;
-    } catch(e) {
-      return $.parseFromISO.defaults;
-    }
-  };
-
   // fudgeDateForProfileTimezone is used to apply an offset to the date which represents the
   // difference between the user's configured timezone in their profile, and the timezone
   // of the browser. We want to display times in the timezone of their profile. Use
@@ -174,20 +117,6 @@ var speakMessage = function ($this, message) {
     return tz.parse(date.toString('yyyy-MM-dd HH:mm:ss'));
   }
 
-  $.parseFromISO.ref_date = new Date();
-  $.parseFromISO.offset = $.parseFromISO.ref_date.getTimezoneOffset() * 60000;
-  $.parseFromISO.defaults = {
-      valid: false,
-      date: new Date($.parseFromISO.offset),
-      date_sortable: "0000-00-00",
-      date_string: "",
-      date_formatted: "",
-      timestamp: 0,
-      time: new Date($.parseFromISO.offset),
-      time_formatted: "",
-      time_string: ""
-  };
-
   // this batch of methods assumes *real* dates passed in (or, really, anything
   // tz.parse() can recognize. so timestamps are cool, too. but not fudged dates).
   // use accordingly
@@ -207,7 +136,9 @@ var speakMessage = function ($this, message) {
     return (date != null && tz.format(date, '%l:%M%P')) || "";
   };
   $.datetimeString = function(date) {
-    return (date != null && I18n.t('#time.event', '%{date} at %{time}', { date: $.dateString(date), time: $.timeString(date) })) || "";
+    date = tz.parse(date);
+    if (date == null) return "";
+    return I18n.t('#time.event', '%{date} at %{time}', { date: $.dateString(date), time: $.timeString(date) });
   };
   // end batch
 
@@ -238,7 +169,6 @@ var speakMessage = function ($this, message) {
     }
     return I18n.l('#date.formats.medium', date);
   };
-  $.fn.parseFromISO = $.parseFromISO;
 
   $.datetime = {};
   $.datetime.shortFormat = "MMM d, yyyy";
@@ -271,7 +201,6 @@ var speakMessage = function ($this, message) {
     return result;
   };
 
-  
   $.datepicker.oldParseDate = $.datepicker.parseDate;
   $.datepicker.parseDate = function(format, value, settings) {
     return $.datetime.parse(value) || $.datepicker.oldParseDate(format, value, settings);

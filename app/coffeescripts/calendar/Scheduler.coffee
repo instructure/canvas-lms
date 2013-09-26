@@ -187,7 +187,7 @@ define [
 
         @calendar.showSchedulerSingle();
         if @viewingGroup.start_at
-          @calendar.gotoDate($.parseFromISO(@viewingGroup.start_at).time)
+          @calendar.gotoDate($.fudgeDateForProfileTimezone(@viewingGroup.start_at))
         else
           @calendar.gotoDate(new Date())
 

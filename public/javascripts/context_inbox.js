@@ -20,7 +20,7 @@ define([
   'jquery' /* $ */,
   'str/pluralize',
   'jquery.ajaxJSON' /* ajaxJSON */,
-  'jquery.instructure_date_and_time' /* parseFromISO */,
+  'jquery.instructure_date_and_time' /* datetimeString */,
   'jquery.instructure_forms' /* formSubmit */,
   'jquery.instructure_misc_helpers' /* /\$\.underscore/ */,
   'jquery.templateData' /* fillTemplateData */,
@@ -72,7 +72,7 @@ define([
   window.messages = {
     updateInboxItem: function($message, data, add_position) {
       var message = data.inbox_item;
-      message.created_at = $.parseFromISO(message.created_at).datetime_formatted;
+      message.created_at = $.datetimeString(message.created_at);
       if(!$message || $message.length === 0) {
         $message = $("#inbox_item_blank:first").clone(true).removeAttr('id');
       }

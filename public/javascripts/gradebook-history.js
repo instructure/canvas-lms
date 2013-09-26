@@ -20,7 +20,7 @@ define([
   'i18n!gradebook',
   'jquery' /* $ */,
   'jquery.ajaxJSON' /* ajaxJSON */,
-  'jquery.instructure_date_and_time' /* parseFromISO */
+  'jquery.instructure_date_and_time' /* datetimeString */
 ], function(I18n, $) {
 
   var GradebookHistory = {
@@ -59,7 +59,7 @@ define([
           var submission = this.submission;
           $(".assignment_" + submission.assignment_id + "_user_" + submission.user_id + "_current_grade")
             .removeClass('loading')
-            .attr('title', I18n.t('graded_by_me', "%{graded_time} by me", { 'graded_time': $.parseFromISO(submission.graded_at).datetime_formatted }))
+            .attr('title', I18n.t('graded_by_me', "%{graded_time} by me", { 'graded_time': $.datetimeString(submission.graded_at) }))
             .text(submission.grade || "--");
         });
       });

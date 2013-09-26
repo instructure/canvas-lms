@@ -22,7 +22,7 @@ define([
   'jquery',
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_forms' /* ajaxJSONFiles */,
-  'jquery.instructure_date_and_time' /* parseFromISO */,
+  'jquery.instructure_date_and_time' /* datetimeString */,
   'jquery.instructure_misc_plugins' /* fragmentChange, showIf */,
   'jquery.loadingImg' /* loadingImg, loadingImage */,
   'jquery.templateData' /* fillTemplateData, getTemplateData */,
@@ -48,7 +48,7 @@ define([
         var comment = comments[idx].submission_comment;
         if($("#submission_comment_" + comment.id).length > 0) { continue; }
         var $comment = $("#comment_blank").clone(true).removeAttr('id');
-        comment.posted_at = $.parseFromISO(comment.created_at).datetime_formatted;
+        comment.posted_at = $.datetimeString(comment.created_at);
         $comment.fillTemplateData({
           data: comment,
           id: 'submission_comment_' + comment.id
