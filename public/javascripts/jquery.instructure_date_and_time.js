@@ -216,24 +216,6 @@ var speakMessage = function ($this, message) {
       time_formatted: "",
       time_string: ""
   };
-  $.dateToISO8601UTC = function(date) {
-    var padZero = function(n) { return n < 10 ? '0' + n : n; }
-    return date.getUTCFullYear() + '-' +
-      padZero(date.getUTCMonth() + 1) + '-' +
-      padZero(date.getUTCDate()) + 'T' +
-      padZero(date.getUTCHours()) + ':' +
-      padZero(date.getUTCMinutes()) + ':' +
-      padZero(date.getUTCSeconds()) + 'Z'
-  }
-  $.dateToISO8601 = function(date) {
-    var padZero = function(n) { n < 10 ? '0' + n : n }
-    return date.getFullYear() + '-' +
-      padZero(date.getMonth() + 1) + '-' +
-      padZero(date.getDate()) + 'T' +
-      padZero(date.getHours()) + ':' +
-      padZero(date.getMinutes()) + ':' +
-      padZero(date.getSeconds()) + 'Z'
-  }
   
   var today = new Date();
   $.thisYear = function(date) {

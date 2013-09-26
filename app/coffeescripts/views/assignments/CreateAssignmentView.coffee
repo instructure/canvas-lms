@@ -37,7 +37,7 @@ define [
     getFormData: =>
       data = super
       unfudged = $.unfudgeDateForProfileTimezone(data.due_at)
-      data.due_at = $.dateToISO8601UTC(unfudged) if unfudged?
+      data.due_at = unfudged.toISOString() if unfudged?
       return data
 
     moreOptions: ->

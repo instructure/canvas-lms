@@ -67,8 +67,8 @@ define [
 
     saveDates: (success, error) =>
       @save {
-        'calendar_event[start_at]': if @start then $.dateToISO8601UTC($.unfudgeDateForProfileTimezone(@start)) else ''
-        'calendar_event[end_at]': if @end then $.dateToISO8601UTC($.unfudgeDateForProfileTimezone(@end)) else ''
+        'calendar_event[start_at]': if @start then $.unfudgeDateForProfileTimezone(@start).toISOString() else ''
+        'calendar_event[end_at]': if @end then $.unfudgeDateForProfileTimezone(@end).toISOString() else ''
         'calendar_event[all_day]': @allDay
       }, success, error
 
