@@ -355,6 +355,7 @@ describe DiscussionTopicsController, :type => :integration do
           topic.save!
         end
         [@sub, @topic2, @topic3].each(&:lock!)
+        @topic2.update_attribute(:pinned, true)
         
         json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics.json?per_page=10&scope=unlocked",
                         {:controller => 'discussion_topics', :action => 'index', :format => 'json', :course_id => @course.id.to_s, 
@@ -373,6 +374,21 @@ describe DiscussionTopicsController, :type => :integration do
         links.each do |link|
           link.should match('scope=locked')
         end
+
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics.json?per_page=10&scope=pinned",
+                        {:controller => 'discussion_topics', :action => 'index', :format => 'json', :course_id => @course.id.to_s,
+                         :per_page => '10', :scope => 'pinned'})
+        json.size.should == 1
+
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics.json?per_page=10&scope=unpinned",
+                        {:controller => 'discussion_topics', :action => 'index', :format => 'json', :course_id => @course.id.to_s,
+                         :per_page => '10', :scope => 'unpinned'})
+        json.size.should == 3
+
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics.json?per_page=10&scope=locked,unpinned",
+                        {:controller => 'discussion_topics', :action => 'index', :format => 'json', :course_id => @course.id.to_s,
+                         :per_page => '10', :scope => 'locked,unpinned'})
+        json.size.should == 2
       end
       
       it "should include all parameters in pagination urls" do
