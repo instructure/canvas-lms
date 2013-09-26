@@ -168,7 +168,7 @@
                 <%= before_label :folder, "Folder" %>
               </td><td>
                 <% Folder.root_folders(@context) %>
-                <% folders = @context.active_folders.all %>
+                <% folders = @context.active_folders.select([:id, :name, :parent_folder_id]).to_a %>
                 <% root_folders = folders.select{|f| f.parent_folder_id == nil} %>
                 <select name="attachment[folder_id]" id="attachment_folder_id">
                   <%= folders_as_options(root_folders, :all_folders => folders, :max_depth => 1) %>

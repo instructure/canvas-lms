@@ -1,5 +1,5 @@
 <%
-  folders = @context.active_folders_with_sub_folders.by_position
+  folders = @context.active_folders.by_position.select([:id, :name, :parent_folder_id]).to_a
   root_folders = folders.select{|f| f.parent_folder_id == nil}
 
   content_for :page_title, join_title(t(:page_title, "Import Content"), @context.name)
