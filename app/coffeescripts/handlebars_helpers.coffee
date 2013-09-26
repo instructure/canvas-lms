@@ -57,19 +57,15 @@ define [
     # when sending to the server, instead using a machine-formatted value
     # stored elsewhere).
 
-    # expects: an object as returned from parseFromISO or an ISO string
-    datetimeFormatted : (isoString) ->
-      return '' unless isoString
-      isoString = isoString.timestamp * 1000 if typeof isoString is 'object'
-      $.datetimeString(isoString)
+    # expects: anything that $.datetimeString can handle
+    datetimeFormatted : (datetime) ->
+      $.datetimeString(datetime)
 
     # Strips the time information from the datetime and accounts for the user's
-    # timezone preference. expects: an object as returned from parseFromISO or
-    # an ISO string
-    dateString : (isoString) ->
-      return '' unless isoString
-      isoString = isoString.timestamp * 1000 if typeof isoString is 'object'
-      tz.format(isoString, '%m/%d/%Y')
+    # timezone preference. expects: anything tz() can handle
+    dateString : (datetime) ->
+      return '' unless datetime
+      tz.format(datetime, '%m/%d/%Y')
 
     # Convert the total amount of minutes into a Hours:Minutes format.
     minutesToHM : (minutes) ->

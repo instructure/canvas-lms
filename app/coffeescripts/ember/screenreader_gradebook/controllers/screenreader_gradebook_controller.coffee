@@ -7,10 +7,11 @@ define [
   'i18n!sr_gradebook'
   'ember'
   'underscore'
+  'timezone'
   'compiled/AssignmentDetailsDialog'
   'compiled/AssignmentMuter'
   'compiled/grade_calculator'
-  ], (ajax, round, userSettings, fetchAllPages, parseLinkHeader, I18n, Ember, _,  AssignmentDetailsDialog, AssignmentMuter, GradeCalculator ) ->
+  ], (ajax, round, userSettings, fetchAllPages, parseLinkHeader, I18n, Ember, _, tz, AssignmentDetailsDialog, AssignmentMuter, GradeCalculator ) ->
 
   {get, set, setProperties} = Ember
 
@@ -381,7 +382,7 @@ define [
     ).observes('submissions.@each')
 
     updateSubmission: (submission, student) ->
-      submission.submitted_at = Ember.$.parseFromISO(submission.submitted_at) if submission.submitted_at
+      submission.submitted_at = tz.parse(submission.submitted_at)
       set(student, "assignment_#{submission.assignment_id}", submission)
 
     assignments: Ember.ArrayProxy.createWithMixins(Ember.SortableMixin,
@@ -398,8 +399,9 @@ define [
       set as, 'ag_position', assignmentGroup.position
       set as, 'noPointsPossibleWarning', assignmentGroup.invalid
       if as.due_at
-        set as, 'due_at', Ember.$.parseFromISO(as.due_at)
-        set as, 'sortable_date', as.due_at.timestamp
+        due_at = tz.parse(as.due_at)
+        set as, 'due_at', due_at
+        set as, 'sortable_date', +due_at / 1000
       else
         set as, 'sortable_date', Number.MAX_VALUE
 

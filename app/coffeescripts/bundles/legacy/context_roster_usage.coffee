@@ -1,7 +1,7 @@
 require [
   "jquery",
   "i18n!context.roster_user_usage",
-  "jquery.instructure_date_and_time",
+  "jquery.instructure_date_and_time", # $.datetimeString
   "jquery.templateData",
   "vendor/jquery.pageless"
 ], ($, I18n) ->
@@ -22,7 +22,7 @@ require [
           access = data[idx].asset_user_access
           $access.addClass access.asset_class_name
           access.readable_name = access.readable_name or access.display_name or access.asset_code
-          access.last_viewed = $.parseFromISO(access.last_access).datetime_formatted
+          access.last_viewed = $.datetimeString(access.last_access)
           $access.fillTemplateData data: access
           $("#usage_report table tbody").append $access.show()
         ""

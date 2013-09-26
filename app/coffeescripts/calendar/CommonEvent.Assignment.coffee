@@ -33,7 +33,7 @@ define [
       @assignment.html_url
 
     parseStartDate: () ->
-      if @assignment.due_at then $.parseFromISO(@assignment.due_at).time else null
+      if @assignment.due_at then $.fudgeDateForProfileTimezone(@assignment.due_at) else null
 
     displayTimeString: () ->
       unless datetime = @originalStart
