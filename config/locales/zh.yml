@@ -418,7 +418,7 @@ zh:
       account_reports: 
         ccp: 
           ccp_zero_activity_csv: 
-            header: 例如
+            header: 示例
             text: "此报告显示某个给定学期中注册了任意课程的所有学生。在生成的 csv 文件中，自该日期起尚未访问课程的每项用户注册将具有一行。"
     ccp_zero_activity_csv_parameters: 
       account_reports: 
