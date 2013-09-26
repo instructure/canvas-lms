@@ -131,47 +131,18 @@ var speakMessage = function ($this, message) {
       result.minute_timestamp = result.timestamp - (result.timestamp % 60);
 
       // fudged time for display
-      var time = $.fudgeDateForProfileTimezone(new Date(timestamp));
+      var time = $.fudgeDateForProfileTimezone(timestamp);
       result.time = time;
       result.datetime = time;
 
       // format date fields
-      result.date_sortable = iso.substring(0, 10);
-      result.date_string = month_string + "/" + day_string + "/" + year_string;
+      result.date_sortable = tz.format(timestamp, '%Y-%m-%d');
+      result.time_sortable = tz.format(timestamp, '%H:%M');
+      result.date_string = tz.format(timestamp, '%m/%d/%Y');
+      result.time_string = $.timeString(timestamp);
       result.date_formatted = $.dateString(timestamp);
-
-      // format time fields
-      var ampm = "am";
-      hours = time.getHours();
-      if(hours > 12) {
-        hours -= 12;
-        ampm = "pm";
-      } else if(hours == 12) {
-        ampm = "pm";
-      } else if(hours === 0) {
-        hours = 12;
-      }
-      var time_formatted = hours;
-      var time_tail = ":";
-      if(time.getMinutes() < 10) {
-        time_tail += "0";
-      }
-      time_tail += time.getMinutes();
-      if(time.getMinutes() !== 0) {
-        time_formatted += time_tail;
-      }
-      time_formatted += ampm;
-      result.show_time = true;
-      var sortable_hour = time.getHours();
-      if(sortable_hour < 10) {
-        sortable_hour = "0" + sortable_hour;
-      }
-      result.time_sortable = sortable_hour + time_tail;
-      result.time_formatted = time_formatted;
-      result.time_string = hours + time_tail + ampm;
-
-      // combine date and time into datetime (TODO: i18n)
-      result.datetime_formatted = result.date_formatted + ' at ' + result.time_formatted;
+      result.time_formatted = $.timeString(timestamp);
+      result.datetime_formatted = $.datetimeString(timestamp);
 
       // done
       result.valid = true;

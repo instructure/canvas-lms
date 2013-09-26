@@ -69,20 +69,40 @@ define [
     parsed = $.parseFromISO('2013-09-01T00:00:00Z')
     equal parsed.datetime.getHours(), 20 # -4 offset between UTC and EDT
 
+  test 'should construct date_sortable in the profile timezone', ->
+    tz.changeZone(detroit, 'America/Detroit')
+    parsed = $.parseFromISO('2013-09-02T02:00:00Z')
+    equal parsed.date_sortable, '2013-09-01'
+
+  test 'should construct date_string in the profile timezone', ->
+    tz.changeZone(detroit, 'America/Detroit')
+    parsed = $.parseFromISO('2013-09-02T02:00:00Z')
+    equal parsed.date_string, '09/01/2013'
+
   test 'should construct date_formatted in the profile timezone', ->
     tz.changeZone(detroit, 'America/Detroit')
     parsed = $.parseFromISO('2013-09-02T02:00:00Z')
     equal parsed.date_formatted, 'Sep 1, 2013' # Sep 2nd at 2am UTC == Sep 1 at 10pm EDT
 
+  test 'should construct time_sortable in the profile timezone', ->
+    tz.changeZone(detroit, 'America/Detroit')
+    parsed = $.parseFromISO('2013-09-02T02:00:00Z')
+    equal parsed.time_sortable, '22:00'
+
+  test 'should construct time_string in the profile timezone', ->
+    tz.changeZone(detroit, 'America/Detroit')
+    parsed = $.parseFromISO('2013-09-02T02:00:00Z')
+    equal parsed.time_string, '10:00pm'
+
   test 'should construct time_formatted in the profile timezone', ->
     tz.changeZone(detroit, 'America/Detroit')
     parsed = $.parseFromISO('2013-09-02T02:00:00Z')
-    equal parsed.time_formatted, '10pm' # Sep 2nd at 2am UTC == Sep 1 at 10pm EDT
+    equal parsed.time_formatted, '10:00pm'
 
   test 'should construct datetime_formatted in the profile timezone', ->
     tz.changeZone(detroit, 'America/Detroit')
     parsed = $.parseFromISO('2013-09-02T02:00:00Z')
-    equal parsed.datetime_formatted, 'Sep 1, 2013 at 10pm' # Sep 2nd at 2am UTC == Sep 1 at 10pm EDT
+    equal parsed.datetime_formatted, 'Sep 1, 2013 at 10:00pm' # Sep 2nd at 2am UTC == Sep 1 at 10pm EDT
 
   test 'should not fudge the timestamp', ->
     tz.changeZone(detroit, 'America/Detroit')

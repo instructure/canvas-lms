@@ -127,7 +127,7 @@ describe "speed grader" do
     student_in_course
     2.times do |i|
       qs = @quiz.generate_submission(@student)
-      opts = i == 0 ? {finished_at: Date.today - 7} : {}
+      opts = i == 0 ? {finished_at: (Date.today - 7) + 30.minutes} : {}
       qs.grade_submission(opts)
     end
 

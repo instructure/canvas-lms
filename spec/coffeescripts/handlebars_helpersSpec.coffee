@@ -80,11 +80,11 @@ define [
     # commit where we can manage all the ramifications
     datetime = $.fudgeDateForProfileTimezone(new Date(0)).toISOString()
     equal helpers.friendlyDatetime('1970-01-01 00:00:00Z', hash: {pubDate: false}).string,
-      "<time title='Dec 31, 1969 at 7pm' datetime='#{datetime}' undefined>Dec 31, 1969</time>"
+      "<time title='Dec 31, 1969 at  7:00pm' datetime='#{datetime}' undefined>Dec 31, 1969</time>"
 
   test 'can take a date object', ->
     tz.changeZone(detroit, 'America/Detroit')
     # ditto
     datetime = $.fudgeDateForProfileTimezone(new Date(0)).toISOString()
     equal helpers.friendlyDatetime(new Date(0), hash: {pubDate: false}).string,
-      "<time title='Dec 31, 1969 at 7pm' datetime='#{datetime}' undefined>Dec 31, 1969</time>"
+      "<time title='Dec 31, 1969 at  7:00pm' datetime='#{datetime}' undefined>Dec 31, 1969</time>"
