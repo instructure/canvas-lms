@@ -104,6 +104,7 @@ class BigBlueButtonConference < WebConference
       :meetingID => conference_key,
       })
     result = response[:recordings] if response
+    result = [] if result.is_a?(String)
     Array(result)
   end
 
