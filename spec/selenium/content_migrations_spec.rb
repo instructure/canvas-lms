@@ -80,12 +80,15 @@ def test_selective_content(source_course=nil)
 
   # directly click checkboxes
   boxes_to_click.each do |name, value|
-    box = f(".selectContentDialog input[name=\"#{name}\"]")
-    box.should_not be_nil
     keep_trying_until do
+      escaped_name = name.gsub("[", "\\[").gsub("]", "\\]")
+      selector = ".selectContentDialog input[name=\"#{escaped_name}\"]"
+      box = f(selector)
+      selector = selector.gsub("\"", "\\\"")
+      box.should_not be_nil
       set_value(box, value)
       wait_for_ajaximations
-      value == driver.execute_script("return !!($('.selectContentDialog input[name=\"#{name}\"]').is(':checked'))")
+      is_checked(selector).should == value
     end
   end
 
@@ -216,7 +219,6 @@ describe "content migrations" do
     end
 
     it "should import selective content" do
-      pending('broken')
       pending unless Qti.qti_enabled?
       visit_page
       fill_migration_form
@@ -417,7 +419,6 @@ describe "content migrations" do
     end
 
     it "should selectively copy content" do
-      pending('broken')
       pending unless Qti.qti_enabled?
       visit_page
 
