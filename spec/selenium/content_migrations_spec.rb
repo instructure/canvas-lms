@@ -39,7 +39,7 @@ end
 def import(cm=nil)
   cm ||= @course.content_migrations.last
   cm.reload
-  cm.check_quiz_id_prepender
+  cm.set_default_settings
   cm.import_content
 end
 
@@ -227,6 +227,34 @@ describe "content migrations" do
       run_migration
 
       test_selective_content
+    end
+
+    it "should overwrite quizzes when option is checked and duplicate otherwise" do
+      pending unless Qti.qti_enabled?
+
+      # Pre-create the quiz
+      q = @course.quizzes.create!(:title => "Name to be overwritten")
+      q.migration_id = "QDB_1"
+      q.save!
+
+      # Don't overwrite
+      visit_page
+      fill_migration_form(:type => "qti_converter")
+      submit
+      run_migration
+      @course.quizzes.reload.count.should == 2
+      @course.quizzes.map(&:title).sort.should == ["Name to be overwritten", "Pretest"]
+
+      # Overwrite original
+      visit_page
+      fill_migration_form(:type => "qti_converter")
+      f('#overwriteAssessmentContent').click
+      submit
+      cm = @course.content_migrations.last
+      cm.migration_settings["overwrite_quizzes"].should == true
+      run_migration
+      @course.quizzes.reload.count.should == 2
+      @course.quizzes.map(&:title).should == ["Pretest", "Pretest"]
     end
 
     context "default question bank" do

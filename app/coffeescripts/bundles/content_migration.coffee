@@ -145,6 +145,7 @@ require [
                                    fileSizeLimit: ENV.UPLOAD_LIMIT
 
             selectContent:       new SelectContentCheckboxView(model: ConverterViewControl.getModel())
+            overwriteAssessmentContent: new OverwriteAssessmentContentView(model: ConverterViewControl.getModel())
 
             questionBank:        new QuestionBankView
                                    questionBanks: ENV.QUESTION_BANKS

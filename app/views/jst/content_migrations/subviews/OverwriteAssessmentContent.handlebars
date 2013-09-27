@@ -1,11 +1,8 @@
-<div class="checkbox">
-  <label class="pull-left" for="overwriteAssessmentContent">
-    <input type="checkbox" id="overwriteAssessmentContent" />
-    {{#t "overwrite_assessment_content"}}Overwrite assessment content with matching IDs{{/t}}
-  </label>
-
-  <a href="#" class="pull-left element_toggler" style="margin-left: 10px" aria-controls="helpDialog" aria-label="{{#t "assessment_help_label"}}Overwrite Assessment Help Icon{{/t}}" title="{{#t "assessment_help_title_icon"}}Overwrite Assessment Help Icon{{/t}}"><i class="icon-question"></i></a>
-  <div id="helpDialog" data-turn-into-dialog='{"width":600,"modal":true}' style="display:none" title={{#t "assessment_help_title"}}"Overwrite Assessment Help"{{/t}}>
-      {{#t "assessment_help_text"}}Some systems recycle their IDs for each new export. As a result, if you export two separate question banks they will have the same IDs. To prevent losing assessment data we treat these objects as different despite the IDs. Choosing this option will disable this safety feature and allow assessment data to overwrite existing data with the same IDs. {{/t}}
+<label class="checkbox" for="overwriteAssessmentContent">
+  <input type="checkbox" id="overwriteAssessmentContent"/>
+  {{#t "overwrite_assessment_content"}}Overwrite assessment content with matching IDs{{/t}}
+  <a href="#" class="element_toggler" style="margin-left: 10px" aria-controls="helpDialog" aria-label="{{#t "assessment_help_label"}}Overwrite Assessment Help Icon{{/t}}" title="{{#t "assessment_help_title_icon"}}Overwrite Assessment Help Icon{{/t}}"><i class="icon-question"></i></a>
+    <div id="helpDialog" data-turn-into-dialog='{"width":600,"modal":true}' style="display:none" title={{#t "assessment_help_title"}}"Overwrite Assessment Help"{{/t}}>
+    {{#t "assessment_help_text"}}Some systems recycle their IDs for each new export. As a result, if you export two separate question banks they will have the same IDs. To prevent losing assessment data we treat these objects as different despite the IDs. Choosing this option will disable this safety feature and allow assessment data to overwrite existing data with the same IDs. {{/t}}
   </div>
-</div>
+</label>

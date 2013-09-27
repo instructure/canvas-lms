@@ -174,12 +174,13 @@ module MigratorHelper
   end
   
   def add_assessment_id_prepend
-    if id_prepender
+    if id_prepender && !@settings[:overwrite_quizzes]
       if @course[:assessment_questions] && @course[:assessment_questions][:assessment_questions]
         prepend_id_to_questions(@course[:assessment_questions][:assessment_questions])
       end
       if @course[:assessments] && @course[:assessments][:assessments]
         prepend_id_to_assessments(@course[:assessments][:assessments])
+        prepend_id_to_linked_assessment_module_items(@course[:modules]) if @course[:modules]
       end
     end
   end
@@ -206,6 +207,18 @@ module MigratorHelper
           q[:questions].each do |gq|
             gq[:migration_id] = prepend_id(gq[:migration_id], prepend_value)
           end
+        end
+      end
+    end
+  end
+
+  def prepend_id_to_linked_assessment_module_items(modules, prepend_value=nil)
+    modules.each do |m|
+      next unless m[:items]
+      m[:items].each do |i|
+        if i[:linked_resource_type] =~ /assessment|quiz/i
+          i[:item_migration_id] = prepend_id(i[:item_migration_id], prepend_value)
+          i[:linked_resource_id] = prepend_id(i[:linked_resource_id], prepend_value)
         end
       end
     end
