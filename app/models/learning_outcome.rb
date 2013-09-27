@@ -192,18 +192,6 @@ class LearningOutcome < ActiveRecord::Base
     end
     self.learning_outcome_results.for_context_codes(codes).count
   end
-  
-  def clone_for(context, parent)
-    lo = context.created_learning_outcomes.new
-    lo.context = context
-    lo.short_description = self.short_description
-    lo.description = self.description
-    lo.data = self.data
-    lo.save
-    parent.add_outcome(lo)
-    
-    lo
-  end
 
   def self.delete_if_unused(ids)
     tags = ContentTag.active.find_all_by_content_id_and_content_type(ids, 'LearningOutcome')

@@ -34,7 +34,6 @@ class CalendarEvent < ActiveRecord::Base
 
   belongs_to :context, :polymorphic => true
   belongs_to :user
-  belongs_to :cloned_item
   belongs_to :parent_event, :class_name => 'CalendarEvent', :foreign_key => :parent_calendar_event_id
   has_many :child_events, :class_name => 'CalendarEvent', :foreign_key => :parent_calendar_event_id, :conditions => "calendar_events.workflow_state <> 'deleted'"
   validates_presence_of :context, :workflow_state
@@ -499,31 +498,6 @@ class CalendarEvent < ActiveRecord::Base
 
   def to_ics(in_own_calendar=true)
     return CalendarEvent::IcalEvent.new(self).to_ics(in_own_calendar)
-  end
-
-  attr_accessor :clone_updated
-  def clone_for(context, dup=nil, options={})
-    options[:migrate] = true if options[:migrate] == nil
-    if !self.cloned_item && !self.new_record?
-      self.cloned_item ||= ClonedItem.create(:original_item => self)
-      self.save!
-    end
-    existing = context.calendar_events.active.find_by_id(self.id)
-    existing ||= context.calendar_events.active.find_by_cloned_item_id(self.cloned_item_id || 0)
-    return existing if existing && !options[:overwrite]
-    dup ||= CalendarEvent.new
-    dup = existing if existing && options[:overwrite]
-    self.attributes.delete_if{|k,v| %w(id participants_per_appointment).include?(k) }.each do |key, val|
-      dup.send("#{key}=", val)
-    end
-    dup.context = context
-    dup.description = context.migrate_content_links(self.description, self.context) if options[:migrate]
-    dup.write_attribute :participants_per_appointment, read_attribute(:participants_per_appointment)
-    context.log_merge_result("Calendar Event \"#{self.title}\" created")
-    context.may_have_links_to_migrate(dup)
-    dup.updated_at = Time.now
-    dup.clone_updated = true
-    dup
   end
 
   def self.process_migration(data, migration)

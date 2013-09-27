@@ -29,7 +29,6 @@ class WikiPage < ActiveRecord::Base
   include SearchTermHelper
 
   belongs_to :wiki, :touch => true
-  belongs_to :cloned_item
   belongs_to :user
   acts_as_url :title, :scope => [:wiki_id, :not_deleted], :sync_url => true
 
@@ -367,30 +366,6 @@ class WikiPage < ActiveRecord::Base
     res = self.revised_at || self.updated_at
     res = Time.now if res.is_a?(String)
     res
-  end
-
-  attr_accessor :clone_updated
-  def clone_for(context, dup=nil, options={}) #migrate=true)
-    options[:migrate] = true if options[:migrate] == nil
-    if !self.cloned_item && !self.new_record?
-      self.cloned_item ||= ClonedItem.create(:original_item => self)
-      self.save!
-    end
-    existing = context.wiki.wiki_pages.active.find_by_id(self.id)
-    existing ||= context.wiki.wiki_pages.active.find_by_cloned_item_id(self.cloned_item_id || 0)
-    return existing if existing && !options[:overwrite]
-    dup ||= WikiPage.new
-    dup = existing if existing && options[:overwrite]
-    self.attributes.delete_if{|k,v| [:id, :wiki_id].include?(k.to_sym) }.each do |key, val|
-      dup.send("#{key}=", val)
-    end
-    dup.wiki = context.wiki
-    dup.body = context.migrate_content_links(self.body, options[:old_context] || self.context) if options[:migrate]
-    context.log_merge_result(t('notices.wiki_page_created', 'Wiki Page "%{title}" created', :title => dup.title))
-    context.may_have_links_to_migrate(dup)
-    dup.updated_at = Time.now
-    dup.clone_updated = true
-    dup
   end
 
   def self.process_migration_course_outline(data, migration)

@@ -1037,15 +1037,6 @@ class Submission < ActiveRecord::Base
     res
   end
 
-  def clone_for(context, dup=nil, options={})
-    return nil unless params[:overwrite]
-    submission = self.assignment.find_or_create_submission(self.user_id)
-    self.attributes.delete_if{|k,v| [:id, :assignment_id, :user_id].include?(k.to_sym) }.each do |key, val|
-      submission.send("#{key}=", val)
-    end
-    submission
-  end
-
   def course_id=(val)
   end
 

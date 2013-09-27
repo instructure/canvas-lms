@@ -29,7 +29,6 @@ class AssignmentGroup < ActiveRecord::Base
   has_many :active_assignments, :class_name => 'Assignment', :conditions => ['assignments.workflow_state != ?', 'deleted'], :order => 'assignments.position, assignments.due_at, assignments.title'
 
   belongs_to :context, :polymorphic => true
-  belongs_to :cloned_item
   validates_presence_of :context_id, :context_type, :workflow_state
   validates_length_of :rules, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :default_assignment_name, :maximum => maximum_string_length, :allow_nil => true
@@ -161,27 +160,6 @@ class AssignmentGroup < ActiveRecord::Base
       false &&
       record.changed_in_state(:available, :fields => :group_weight)
     }
-  end
-
-  attr_accessor :clone_updated
-  def clone_for(context, dup=nil, options={})
-    if !self.cloned_item && !self.new_record?
-      self.cloned_item ||= ClonedItem.create(:original_item => self)
-      self.save
-    end
-    existing = context.assignment_groups.active.find_by_id(self.id)
-    existing ||= context.assignment_groups.active.find_by_cloned_item_id(self.cloned_item_id || 0)
-    return existing if existing && !options[:overwrite]
-    dup ||= AssignmentGroup.new
-    dup = existing if existing && options[:overwrite]
-    self.attributes.delete_if{|k,v| [:id, :position].include?(k.to_sym) }.each do |key, val|
-      dup.send("#{key}=", val)
-    end
-    dup.context = context
-    context.log_merge_result("Assignment Group \"#{self.name}\" created")
-    dup.updated_at = Time.now
-    dup.clone_updated = true
-    dup
   end
 
   def students

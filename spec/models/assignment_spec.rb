@@ -1612,19 +1612,6 @@ describe Assignment do
     end
   end
 
-  context "clone_for" do
-    it "should clone for another course" do
-      course_with_teacher
-      @assignment = @course.assignments.create!(:title => "some assignment")
-      @assignment.update_attribute(:needs_grading_count, 5)
-      course
-      @new_assignment = @assignment.clone_for(@course)
-      @new_assignment.context.should_not eql(@assignment.context)
-      @new_assignment.title.should eql(@assignment.title)
-      @new_assignment.needs_grading_count.should == 0
-    end
-  end
-
   context "modules" do
     it "should be locked when part of a locked module" do
       course :active_all => true

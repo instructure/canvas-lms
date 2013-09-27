@@ -44,7 +44,6 @@ class DiscussionTopic < ActiveRecord::Base
   has_one :external_feed_entry, :as => :asset
   belongs_to :external_feed
   belongs_to :context, :polymorphic => true
-  belongs_to :cloned_item
   belongs_to :attachment
   belongs_to :assignment
   belongs_to :editor, :class_name => 'User'
@@ -566,17 +565,6 @@ class DiscussionTopic < ActiveRecord::Base
     end
   end
 
-  def self.find_or_create_for_new_context(new_context, old_context, old_id)
-    res = new_context.discussion_topics.active.find_by_cloned_item_id(old_context.discussion_topics.find_by_id(old_id).cloned_item_id || 0) rescue nil
-    res = nil if res && !res.cloned_item_id
-    if !res
-      old = old_context.discussion_topics.active.find_by_id(old_id)
-      res = old.clone_for(new_context) if old
-      res.save if res
-    end
-    res
-  end
-
   def unlink_from(type)
     @saved_by = type
     if self.discussion_entries.empty?
@@ -807,63 +795,6 @@ class DiscussionTopic < ActiveRecord::Base
       end
       locked
     end
-  end
-
-  attr_accessor :clone_updated
-  attr_accessor :assignment_clone_updated
-  def clone_for(context, dup=nil, options={})
-    options[:migrate] = true if options[:migrate] == nil
-    if !self.cloned_item && !self.new_record?
-      self.cloned_item ||= ClonedItem.create(:original_item => self)
-      self.save!
-    end
-    existing = context.discussion_topics.active.find_by_id(self.id)
-    existing ||= context.discussion_topics.active.find_by_cloned_item_id(self.cloned_item_id || 0)
-    return existing if existing && !options[:overwrite]
-    if context.merge_mapped_id(self.assignment)
-      dup ||= context.discussion_topics.find_by_assignment_id(context.merge_mapped_id(self.assignment))
-    end
-    dup ||= DiscussionTopic.new
-    dup = existing if existing && options[:overwrite]
-    self.attributes.delete_if{|k,v| [:id, :assignment_id, :attachment_id, :root_topic_id].include?(k.to_sym) }.each do |key, val|
-      dup.send("#{key}=", val)
-    end
-    dup.assignment_id = context.merge_mapped_id(self.assignment)
-    if !dup.assignment_id && self.assignment_id && self.assignment && !options[:cloning_for_assignment]
-      new_assignment = self.assignment.clone_for(context, nil, :cloning_for_topic=>true)
-      assignment_clone_updated = new_assignment.clone_updated
-      new_assignment.save_without_broadcasting!
-      context.map_merge(self.assignment, new_assignment)
-      dup.assignment_id = new_assignment.id
-    end
-    if !dup.attachment_id && self.attachment
-      attachment = self.attachment.clone_for(context)
-      attachment.folder_id = nil
-      attachment.save_without_broadcasting!
-      context.map_merge(self.attachment, attachment)
-      context.warn_merge_result("Added file \"#{attachment.folder.full_name}/#{attachment.display_name}\" which is needed for the topic \"#{self.title}\"")
-      dup.attachment_id = attachment.id
-    end
-    dup.context = context
-    dup.message = context.migrate_content_links(self.message, self.context) if options[:migrate]
-    dup.saved_by = :assignment if options[:cloning_for_assignment]
-    dup.save_without_broadcasting!
-    context.log_merge_result("Discussion \"#{dup.title}\" created")
-    if options[:include_entries]
-      self.discussion_entries.sort_by{|e| e.created_at }.each do |entry|
-        dup_entry = entry.clone_for(context, nil, :migrate => options[:migrate])
-        dup_entry.parent_id = context.merge_mapped_id("discussion_entry_#{entry.parent_id}")
-        dup_entry.discussion_topic_id = dup.id
-        dup_entry.save!
-        context.map_merge(entry, dup_entry)
-        dup_entry
-      end
-      context.log_merge_result("Included #{dup.discussion_entries.length} entries for the topic \"#{dup.title}\"")
-    end
-    context.may_have_links_to_migrate(dup)
-    dup.updated_at = Time.now
-    dup.clone_updated = true
-    dup
   end
 
   def self.process_migration(data, migration)

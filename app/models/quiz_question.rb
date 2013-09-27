@@ -121,21 +121,6 @@ class QuizQuestion < ActiveRecord::Base
 
     hash
   end
-  
-  def clone_for(quiz, dup=nil, options={})
-    dup ||= QuizQuestion.new
-    self.attributes.delete_if{|k,v| [:id, :quiz_id, :quiz_group_id, :question_data].include?(k.to_sym) }.each do |key, val|
-      dup.send("#{key}=", val)
-    end
-    data = self.question_data || HashWithIndifferentAccess.new
-    data.delete(:id)
-    if options[:old_context] && options[:new_context]
-      data = QuizQuestion.migrate_question_hash(data, options)
-    end
-    dup.write_attribute(:question_data, data)
-    dup.quiz_id = quiz.id
-    dup
-  end
 
   # QuizQuestion.data is used when creating and editing a quiz, but 
   # once the quiz is "saved" then the "rendered" version of the

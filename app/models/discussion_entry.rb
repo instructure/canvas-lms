@@ -328,26 +328,6 @@ class DiscussionEntry < ActiveRecord::Base
     end
   end
 
-  def clone_for(context, dup=nil, options={})
-    options[:migrate] = true if options[:migrate] == nil
-    dup ||= DiscussionEntry.new
-    self.attributes.delete_if{|k,v| [:id, :discussion_topic_id, :attachment_id].include?(k.to_sym) }.each do |key, val|
-      dup.send("#{key}=", val)
-    end
-    dup.parent_id = context.merge_mapped_id("discussion_entry_#{self.parent_id}")
-    dup.attachment_id = context.merge_mapped_id(self.attachment)
-    if !dup.attachment_id && self.attachment
-      attachment = self.attachment.clone_for(context)
-      attachment.folder_id = nil
-      attachment.save_without_broadcasting!
-      context.map_merge(self.attachment, attachment)
-      context.warn_merge_result(t :file_added_warning, "Added file \"%{file_path}\" which is needed for an entry in the topic \"%{discussion_topic_title}\"", :file_path => "%{attachment.folder.full_name}/#{attachment.display_name}", :discussion_topic_title => self.discussion_topic.title)
-      dup.attachment_id = attachment.id
-    end
-    dup.message = context.migrate_content_links(self.message, self.context) if options[:migrate]
-    dup
-  end
-
   def context
     self.discussion_topic.context
   end

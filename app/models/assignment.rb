@@ -52,7 +52,6 @@ class Assignment < ActiveRecord::Base
   has_one :teacher_enrollment, :class_name => 'TeacherEnrollment', :foreign_key => 'course_id', :primary_key => 'context_id', :include => :user, :conditions => ["enrollments.workflow_state = 'active' AND enrollments.type = 'TeacherEnrollment'"]
   has_many :ignores, :as => :asset
   belongs_to :context, :polymorphic => true
-  belongs_to :cloned_item
   belongs_to :grading_standard
   belongs_to :group_category
 
@@ -1500,77 +1499,6 @@ class Assignment < ActiveRecord::Base
     end
   end
   protected :readable_submission_type
-
-  CLONE_FOR_EXCLUDE_ATTRIBUTES = [:id, :assignment_group_id, :group_category, :peer_review_count, :peer_reviews_assigned, :needs_grading_count]
-
-  attr_accessor :clone_updated
-  def clone_for(context, dup=nil, options={}) #migrate=true)
-    options[:migrate] = true if options[:migrate] == nil
-    if !self.cloned_item && !self.new_record?
-      self.cloned_item ||= ClonedItem.create(:original_item => self)
-      self.save!
-    end
-    existing = context.assignments.active.find_by_id(self.id)
-    existing ||= context.assignments.active.find_by_cloned_item_id(self.cloned_item_id || 0)
-    return existing if existing && !options[:overwrite]
-    dup ||= Assignment.new
-    dup = existing if existing && options[:overwrite]
-    self.attributes.delete_if{|k,v| CLONE_FOR_EXCLUDE_ATTRIBUTES.include?(k.to_sym) }.each do |key, val|
-      dup.send("#{key}=", val)
-    end
-
-    context.log_merge_result(t('warnings.group_assignment', "The Assignment \"%{assignment}\" was a group assignment, and you'll need to re-set the group settings for this new context", :assignment => self.title)) if self.has_group_category?
-    context.log_merge_result(t('warnings.peer_assignment', "The Assignment \"%{assignment}\" was a peer review assignment, and you'll need to re-set the peer review settings for this new context", :assignment => self.title)) if self.peer_review_count && self.peer_review_count > 0
-
-    dup.context = context
-    dup.description = context.migrate_content_links(self.description, self.context) if options[:migrate]
-    dup.saved_by = :quiz if options[:cloning_for_quiz]
-    dup.saved_by = :discussion_topic if options[:cloning_for_topic]
-    dup.save_without_broadcasting!
-    if self.rubric_association
-      old_association = self.rubric_association
-      new_association = RubricAssociation.new(
-        :rubric => old_association.rubric,
-        :association => dup,
-        :use_for_grading => old_association.use_for_grading,
-        :title => old_association.title,
-        :description => old_association.description,
-        :summary_data => old_association.summary_data,
-        :purpose => old_association.purpose,
-        :url => old_association.url,
-        :context => dup.context
-      )
-      new_association.save_without_broadcasting!
-    end
-    if self.submission_types == 'online_quiz' && self.quiz && !options[:cloning_for_quiz]
-      new_quiz = Quiz.find_by_assignment_id(dup.id)
-      new_quiz = self.quiz.clone_for(context, new_quiz, :cloning_for_assignment=>true)
-      new_quiz.assignment_id = dup.id
-      new_quiz.save! #_without_broadcasting!
-    elsif self.submission_types == 'discussion_topic' && self.discussion_topic && !options[:cloning_for_topic]
-      new_topic = DiscussionTopic.find_by_assignment_id(dup.id)
-      new_topic = self.discussion_topic.clone_for(context, new_topic, :cloning_for_assignment=>true)
-      new_topic.assignment_id = dup.id
-      dup.submission_types = 'discussion_topic'
-      new_topic.save!
-    elsif self.submission_types == 'external_tool' && self.external_tool_tag
-      tag = dup.build_external_tool_tag(:url => external_tool_tag.url, :new_tab => external_tool_tag.new_tab)
-      tag.content_type = 'ContextExternalTool'
-      tag.save
-    end
-    dup.assignment_group_id = context.merge_mapped_id(self.assignment_group) rescue nil
-    if dup.assignment_group_id.nil? && self.assignment_group
-      new_group = self.assignment_group.clone_for(context)
-      new_group.save_without_broadcasting!
-      dup.assignment_group = new_group
-      context.map_merge(self.assignment_group, new_group)
-    end
-    context.log_merge_result(t('messages.assignment_created', "Assignment \"%{assignment}\" created", :assignment => self.title))
-    context.may_have_links_to_migrate(dup)
-    dup.updated_at = Time.now
-    dup.clone_updated = true
-    dup
-  end
 
   def self.process_migration(data, migration)
     assignments = data['assignments'] ? data['assignments']: []

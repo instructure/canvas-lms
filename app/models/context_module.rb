@@ -21,7 +21,6 @@ class ContextModule < ActiveRecord::Base
   include SearchTermHelper
   attr_accessible :context, :name, :unlock_at, :require_sequential_progress, :completion_requirements, :prerequisites
   belongs_to :context, :polymorphic => true
-  belongs_to :cloned_item
   has_many :context_module_progressions, :dependent => :destroy
   has_many :content_tags, :dependent => :destroy, :order => 'content_tags.position, content_tags.title'
   acts_as_list :scope => 'context_modules.context_type = #{connection.quote(context_type)} AND context_modules.context_id = #{context_id} AND context_modules.workflow_state <> \'deleted\''
@@ -601,65 +600,6 @@ class ContextModule < ActiveRecord::Base
 
   def to_be_unlocked
     self.unlock_at && self.unlock_at > Time.now
-  end
-  
-  attr_accessor :clone_updated
-  def clone_for(context, dup=nil, options={})
-    options[:migrate] = true if options[:migrate] == nil
-    if !self.cloned_item && !self.new_record?
-      self.cloned_item ||= ClonedItem.create(:original_item => self)
-      self.save! 
-    end
-    existing = context.context_modules.active.find_by_id(self.id)
-    existing ||= context.context_modules.active.find_by_cloned_item_id(self.cloned_item_id || 0)
-    return existing if existing && !options[:overwrite]
-    dup ||= ContextModule.new
-    dup = existing if existing && options[:overwrite]
-
-    dup.context = context
-    self.attributes.delete_if{|k,v| [:id, :context_id, :context_type, :downstream_modules].include?(k.to_sym) }.each do |key, val|
-      dup.send("#{key}=", val)
-    end
-
-    dup.save!
-    tag_changes = {}
-    self.content_tags.not_deleted.each do |tag|
-      new_tag = tag.clone_for(context, nil, :context_module_id => dup.id)
-      if new_tag
-        new_tag.context_module_id = dup.id
-        new_tag.save
-        context.map_merge(tag, new_tag)
-        tag_changes[tag.id] = new_tag.id
-      end
-    end
-    pres = []
-    (self.prerequisites || []).each do |req|
-      new_req = req.dup
-      if req[:type] == 'context_module'
-        id = context.merge_mapped_id("context_module_#{req[:id]}")
-        if !id
-          cm = self.context.context_modules.find_by_id(req[:id]) if req[:id].present?
-          clone_id = cm.cloned_item_id if cm
-          obj = ContextModule.find_by_cloned_item_id_and_context_id_and_context_type(clone_id, context.id, context.class.to_s) if clone_id
-          id = obj.id if obj
-        end
-        new_req[:id] = id
-        new_req = nil unless id
-      end
-      pres << new_req if new_req
-    end
-    dup.prerequisites = pres
-    reqs = []
-    (self.completion_requirements || []).each do |req|
-      new_req = req.dup
-      new_req[:id] = tag_changes[req[:id]]
-      reqs << new_req
-    end
-    dup.completion_requirements = reqs
-    context.log_merge_result("Module \"#{self.name}\" created")
-    dup.updated_at = Time.now
-    dup.clone_updated = true
-    dup
   end
 
   def self.process_migration(data, migration)

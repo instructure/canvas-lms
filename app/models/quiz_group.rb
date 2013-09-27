@@ -45,15 +45,6 @@ class QuizGroup < ActiveRecord::Base
     
     [self.pick_count.to_i, count].min
   end
-  
-  def clone_for(quiz, dup=nil, options={})
-    dup ||= QuizGroup.new
-    self.attributes.delete_if{|k,v| [:id, :quiz_id].include?(k.to_sym) }.each do |key, val|
-      dup.send("#{key}=", val)
-    end
-    dup.quiz_id = quiz.id
-    dup
-  end
 
   # QuizGroup.data is used when creating and editing a quiz, but 
   # once the quiz is "saved" then the "rendered" version of the

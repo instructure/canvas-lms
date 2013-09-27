@@ -117,34 +117,6 @@ describe "course rubrics" do
       f('.add_rubric_link').click
       fj('.rubric_grading:hidden').should_not be_nil
     end
-
-    context "importing" do
-
-      it "should create a allow immediate editing when adding an imported rubric to a new assignment" do
-        rubric_association_model(:user => @user, :context => @course, :purpose => "grading")
-
-        @old_course = @course
-        @course = nil
-        course_with_teacher(:user => @user, :active_all => true)
-
-        @course.merge_into_course(@old_course, :everything => true)
-        @assignment = @course.assignments.create!(assignment_valid_attributes.merge({:title => "New Course Assignment"}))
-
-        get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-        f(".add_rubric_link").click
-        fj(".find_rubric_link:visible").click
-        wait_for_ajaximations
-        fj(".select_rubric_link:visible").click
-        wait_for_ajaximations
-        fj(".edit_rubric_link:visible").click
-        fj(".rubric_custom_rating:visible").click
-        fj(".save_button:visible").click
-        wait_for_ajax_requests
-
-        get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-        ffj(".custom_ratings:visible").size.should == 1
-      end
-    end
   end
 
   it "should display free-form comments to the student" do

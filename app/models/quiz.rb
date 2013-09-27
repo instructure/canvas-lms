@@ -47,7 +47,6 @@ class Quiz < ActiveRecord::Base
   has_many :quiz_regrades
   belongs_to :context, :polymorphic => true
   belongs_to :assignment
-  belongs_to :cloned_item
   belongs_to :assignment_group
   validates_length_of :description, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true
@@ -824,79 +823,6 @@ class Quiz < ActiveRecord::Base
 
   def valid_hide_results_values
     %w[always until_after_last_attempt]
-  end
-  
-  attr_accessor :clone_updated
-  def clone_for(context, original_dup=nil, options={}, retrying = false)
-    dup = original_dup
-    if !self.cloned_item && !self.new_record?
-      self.cloned_item ||= ClonedItem.create(:original_item => self)
-      self.save!
-    end
-    existing = context.quizzes.active.find_by_id(self.id)
-    existing ||= context.quizzes.active.find_by_cloned_item_id(self.cloned_item_id || 0)
-    return existing if existing && !options[:overwrite]
-    if (context.merge_mapped_id(self.assignment))
-      dup ||= Quiz.find_by_assignment_id(context.merge_mapped_id(self.assignment))
-    end
-    dup ||= Quiz.new
-    dup = existing if existing && options[:overwrite]
-    self.attributes.delete_if{|k,v| [:id, :assignment_id, :assignment_group_id].include?(k.to_sym) }.each do |key, val|
-      dup.send("#{key}=", val)
-    end
-    # We need to save the quiz now so that the migrate_question_hash call will find
-    # the duplicated quiz and not try to make it itself.
-    dup.context = context
-    dup.saved_by = :clone
-    dup.save!
-    data = self.quiz_data
-    if data
-      data.each_with_index do |obj, idx|
-        if obj[:answers]
-          data[idx] = QuizQuestion.migrate_question_hash(data[idx], :old_context => self.context, :new_context => context)
-        elsif obj[:questions]
-          questions = []
-          obj[:questions].each do |question|
-            questions << QuizQuestion.migrate_question_hash(question, :old_context => self.context, :new_context => context)
-          end
-          obj[:questions] = questions
-          data[idx] = obj
-        end
-      end
-    end
-    dup.quiz_data = data
-    dup.assignment_id = context.merge_mapped_id(self.assignment) rescue nil
-    if !dup.assignment_id && self.assignment_id && self.assignment && !options[:cloning_for_assignment]
-      new_assignment = self.assignment.clone_for(context, nil, :cloning_for_quiz => true)
-      new_assignment.saved_by = :quiz
-      new_assignment.save_without_broadcasting!
-      context.map_merge(self.assignment, new_assignment)
-      dup.assignment_id = new_assignment.id
-    end
-    begin
-      dup.saved_by = :assignment if options[:cloning_for_assignment]
-      dup.save!
-    rescue => e
-      logger.warn "Couldn't save quiz copy: #{e.to_s}"
-      raise e if retrying
-      return self.clone_for(context, original_dup, options, true)
-    end
-    entities = self.quiz_groups + self.active_quiz_questions
-    entities.each do |entity|
-      entity_dup = entity.clone_for(dup, nil, :old_context => self.context, :new_context => context)
-      entity_dup.quiz_id = dup.id
-      if entity_dup.respond_to?(:quiz_group_id=)
-        entity_dup.quiz_group_id = context.merge_mapped_id(entity.quiz_group)
-      end
-      entity_dup.save!
-      context.map_merge(entity, entity_dup)
-    end
-    dup.reload
-    context.log_merge_result("Quiz \"#{self.title}\" created")
-    context.may_have_links_to_migrate(dup)
-    dup.updated_at = Time.now
-    dup.clone_updated = true
-    dup
   end
 
   def strip_html_answers(question)

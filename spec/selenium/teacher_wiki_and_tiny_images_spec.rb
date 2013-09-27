@@ -39,24 +39,6 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
       keep_trying_until { @image_list.find_elements(:css, '.img').length }.should == 2
     end
 
-
-    it "should properly clone images, including thumbnails, and display" do
-      wiki_page_tools_file_tree_setup
-      old_course = @course
-      new_course = old_course.clone_for(old_course.account)
-      new_course.merge_into_course(old_course, :everything => true)
-      new_course.enroll_teacher(@user)
-
-      get "/courses/#{new_course.id}/wiki"
-      f('#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
-      keep_trying_until do
-        images = ffj('#editor_tabs_4 .image_list .img')
-        images.length.should == 2
-        images.each { |i| i.should have_attribute('complete', 'true') } # - commented out because it is breaking with
-                                                                     #webdriver 2.22 and firefox 12
-      end
-    end
-
     it "should infini-scroll images" do
       wiki_page_tools_file_tree_setup
       90.times do |i|
