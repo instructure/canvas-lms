@@ -73,7 +73,7 @@ describe 'Delayed::Backend::Redis::Job' do
       job = "string".send_later :reverse
       job.should be_nil
       Delayed::Job.jobs_count(:current).should == before_count
-      run_transaction_commit_callbacks
+      Delayed::Job.connection.run_transaction_commit_callbacks
       Delayed::Job.jobs_count(:current) == before_count + 1
     end
   end

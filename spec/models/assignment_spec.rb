@@ -818,7 +818,6 @@ describe Assignment do
       @sub = @assignment.grade_student(@student, :grader => @teacher, :grade => 'C').first
       @sub.grade.should eql('C')
       @sub.score.should eql(15.2)
-      run_transaction_commit_callbacks
       @enrollment.reload.computed_current_score.should == 76
 
       @assignment.points_possible = 30
@@ -826,7 +825,6 @@ describe Assignment do
       @sub.reload
       @sub.score.should eql(15.2)
       @sub.grade.should eql('F')
-      run_transaction_commit_callbacks
       @enrollment.reload.computed_current_score.should == 50.7
     end
 

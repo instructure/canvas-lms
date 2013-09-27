@@ -848,7 +848,7 @@ class ActiveRecord::ConnectionAdapters::AbstractAdapter
   end
 
   def after_transaction_commit(&block)
-    if open_transactions == 0
+    if open_transactions <= (Rails.env.test? ? 1 : 0)
       block.call
     else
       @after_transaction_commit ||= []
@@ -864,7 +864,26 @@ class ActiveRecord::ConnectionAdapters::AbstractAdapter
   # override commit_db_transaction
   def commit_db_transaction_with_callbacks
     commit_db_transaction_without_callbacks
-    return unless @after_transaction_commit
+    run_transaction_commit_callbacks
+  end
+
+  # this will only be chained in in Rails.env.test?, but we still
+  # sometimes stub Rails.env.test? in specs to specifically
+  # test behavior like this, so leave the check in this code
+  def release_savepoint_with_callbacks
+    release_savepoint_without_callbacks
+    return unless Rails.env.test?
+    return if open_transactions > 1
+    run_transaction_commit_callbacks
+  end
+
+  def rollback_db_transaction_with_callbacks
+    rollback_db_transaction_without_callbacks
+    @after_transaction_commit = [] if @after_transaction_commit
+  end
+
+  def run_transaction_commit_callbacks
+    return unless @after_transaction_commit.present?
     # the callback could trigger a new transaction on this connection,
     # and leaving the callbacks in @after_transaction_commit could put us in an
     # infinite loop.
@@ -873,11 +892,6 @@ class ActiveRecord::ConnectionAdapters::AbstractAdapter
     @after_transaction_commit = []
     callbacks.each { |cb| cb.call() }
   ensure
-    @after_transaction_commit = [] if @after_transaction_commit
-  end
-
-  def rollback_db_transaction_with_callbacks
-    rollback_db_transaction_without_callbacks
     @after_transaction_commit = [] if @after_transaction_commit
   end
 end
@@ -889,6 +903,7 @@ module MySQLAdapterExtensions
     klass.alias_method_chain :configure_connection, :pg_compat
     klass.alias_method_chain :commit_db_transaction, :callbacks
     klass.alias_method_chain :rollback_db_transaction, :callbacks
+    klass.alias_method_chain :release_savepoint, :callbacks if Rails.env.test?
   end
 
   def bulk_insert(table_name, records)
@@ -1157,6 +1172,7 @@ if defined?(ActiveRecord::ConnectionAdapters::SQLiteAdapter)
   ActiveRecord::ConnectionAdapters::SQLiteAdapter.class_eval do
     alias_method_chain :commit_db_transaction, :callbacks
     alias_method_chain :rollback_db_transaction, :callbacks
+    alias_method_chain :release_savepoint, :callbacks if Rails.env.test?
   end
 end
 
@@ -1181,6 +1197,7 @@ if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
 
     alias_method_chain :commit_db_transaction, :callbacks
     alias_method_chain :rollback_db_transaction, :callbacks
+    alias_method_chain :release_savepoint, :callbacks if Rails.env.test?
   end
 end
 

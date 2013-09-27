@@ -414,6 +414,10 @@ describe ActiveRecord::Base do
   context "after_transaction_commit" do
     self.use_transactional_fixtures = false
 
+    before do
+      Rails.env.stubs(:test?).returns(false)
+    end
+
     it "should execute the callback immediately if not in a transaction" do
       a = 0
       User.connection.after_transaction_commit { a += 1 }

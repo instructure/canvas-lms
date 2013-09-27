@@ -34,7 +34,6 @@ describe ContextModule do
       response.body.should match(/My Sub Header Title/)
 
       content_tag.update_attributes(:title => "My New Title")
-      run_transaction_commit_callbacks
 
       get "/courses/#{@course.id}/modules"
       response.body.should match(/My New Title/)

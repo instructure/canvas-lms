@@ -27,7 +27,6 @@ describe AccountUser do
         @user.reload
         @account.grants_right?(@user, :read).should be_false
         @account.add_user(@user)
-        @account.shard.activate { run_transaction_commit_callbacks }
         @user.reload
         RoleOverride.clear_cached_contexts
         @account.instance_variable_set(:@account_users_cache, {})
@@ -42,7 +41,6 @@ describe AccountUser do
         @user.reload
         @account.grants_right?(@user, :read).should be_true
         au.destroy
-        @account.shard.activate { run_transaction_commit_callbacks }
         @user.reload
         RoleOverride.clear_cached_contexts
         @account.instance_variable_set(:@account_users_cache, {})

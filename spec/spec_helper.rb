@@ -1010,9 +1010,11 @@ Spec::Runner.configure do |config|
     send(method, url, query, headers.merge(http_headers))
   end
 
+  # deprecated; just run it on the connection yourself. mostly you shouldn't
+  # though, cause specs will run transaction commit callbacks when
+  # transactions get down to 1
   def run_transaction_commit_callbacks(conn = ActiveRecord::Base.connection)
-    conn.after_transaction_commit_callbacks.each { |cb| cb.call }
-    conn.after_transaction_commit_callbacks.clear
+    conn.run_transaction_commit_callbacks
   end
 
   def force_string_encoding(str, encoding = "UTF-8")
