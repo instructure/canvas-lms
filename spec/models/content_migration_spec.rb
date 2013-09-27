@@ -65,6 +65,7 @@ describe ContentMigration do
     end
 
     def run_course_copy(warnings=[])
+      @cm.set_default_settings
       worker = Canvas::Migration::Worker::CourseCopyWorker.new
       worker.perform(@cm)
       @cm.reload
@@ -825,10 +826,13 @@ describe ContentMigration do
       @copy_to.quizzes.find_by_migration_id(mig_id(@quiz)).should_not be_nil
     end
 
-    it "should create a new assignment if copying a new quiz (even if the assignment migration_id matches)" do
+    it "should create a new assignment and module item if copying a new quiz (even if the assignment migration_id matches)" do
       pending unless Qti.qti_enabled?
       quiz = @copy_from.quizzes.create!(:title => "new quiz")
       quiz2 = @copy_to.quizzes.create!(:title => "already existing quiz")
+
+      mod = @copy_from.context_modules.create!(:name => "some module")
+      tag = mod.add_item({:id => quiz.id, :type => 'quiz'})
 
       [quiz, quiz2].each do |q|
         q.did_edit
@@ -843,20 +847,77 @@ describe ContentMigration do
 
       @copy_to.quizzes.map(&:title).sort.should == ["already existing quiz", "new quiz"]
       @copy_to.assignments.map(&:title).sort.should == ["already existing quiz", "new quiz"]
+      @copy_to.context_module_tags.map(&:title).should == ["new quiz"]
+    end
 
-      # Re-copying should find and update the old "new" quiz and assignment
+    it "should not duplicate quizzes and associated items if overwrite_quizzes is true" do
+      # overwrite_quizzes should now default to true for course copy and canvas import
+
+      quiz = @copy_from.quizzes.create!(:title => "published quiz")
+      quiz2 = @copy_from.quizzes.create!(:title => "unpublished quiz")
+      quiz.did_edit
+      quiz.offer!
+      quiz2.unpublish!
+
+      mod = @copy_from.context_modules.create!(:name => "some module")
+      tag = mod.add_item({:id => quiz.id, :type => 'quiz'})
+      tag2 = mod.add_item({:id => quiz2.id, :type => 'quiz'})
+
+      run_course_copy
+
+      @copy_to.quizzes.map(&:title).sort.should == ["published quiz", "unpublished quiz"]
+      @copy_to.assignments.map(&:title).sort.should == ["published quiz"]
+      @copy_to.context_module_tags.map(&:title).sort.should == ["published quiz", "unpublished quiz"]
+
+      @copy_to.quizzes.find_by_title("published quiz").should_not be_unpublished
+      @copy_to.quizzes.find_by_title("unpublished quiz").should be_unpublished
+
+      quiz.title = "edited published quiz"
+      quiz.save!
+      quiz2.title = "edited unpublished quiz"
+      quiz2.save!
+
+      # run again
       @cm = ContentMigration.new(:context => @copy_to, :user => @user, :source_course => @copy_from, :copy_options => {:everything => "1"})
       @cm.user = @user
       @cm.migration_settings[:import_immediately] = true
       @cm.save!
 
-      quiz.title = "mwhaha changed"
-      quiz.save!
+      run_course_copy
+
+      @copy_to.quizzes.map(&:title).sort.should == ["edited published quiz", "edited unpublished quiz"]
+      @copy_to.assignments.map(&:title).sort.should == ["edited published quiz"]
+      @copy_to.context_module_tags.map(&:title).sort.should == ["edited published quiz", "edited unpublished quiz"]
+
+      @copy_to.quizzes.find_by_title("edited published quiz").should_not be_unpublished
+      @copy_to.quizzes.find_by_title("edited unpublished quiz").should be_unpublished
+    end
+
+    it "should duplicate quizzes and associated items if overwrite_quizzes is false" do
+      quiz = @copy_from.quizzes.create!(:title => "published quiz")
+      quiz2 = @copy_from.quizzes.create!(:title => "unpublished quiz")
+      quiz.did_edit
+      quiz2.did_edit
+      quiz.offer!
+
+      mod = @copy_from.context_modules.create!(:name => "some module")
+      tag = mod.add_item({:id => quiz.id, :type => 'quiz'})
+      tag2 = mod.add_item({:id => quiz2.id, :type => 'quiz'})
 
       run_course_copy
 
-      @copy_to.quizzes.map(&:title).sort.should == ["already existing quiz", "mwhaha changed"]
-      @copy_to.assignments.map(&:title).sort.should == ["already existing quiz", "mwhaha changed"]
+      # run again
+      @cm = ContentMigration.new(:context => @copy_to, :user => @user, :source_course => @copy_from, :copy_options => {:everything => "1"})
+      @cm.user = @user
+      @cm.migration_settings[:import_immediately] = true
+      @cm.migration_settings[:overwrite_quizzes] = false
+      @cm.save!
+
+      run_course_copy
+
+      @copy_to.quizzes.map(&:title).sort.should == ["published quiz", "published quiz", "unpublished quiz", "unpublished quiz"]
+      @copy_to.assignments.map(&:title).sort.should == ["published quiz", "published quiz"]
+      @copy_to.context_module_tags.map(&:title).sort.should == ["published quiz", "published quiz", "unpublished quiz", "unpublished quiz"]
     end
 
     it "should have correct question count on copied surveys and practive quizzes" do

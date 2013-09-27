@@ -10,3 +10,4 @@ define [
     @child 'questionBank', '.selectQuestionBank'
     @child 'dateShift', '.dateShift'
     @child 'selectContent', '.selectContent'
+    @child 'overwriteAssessmentContent', '.overwriteAssessmentContent'
