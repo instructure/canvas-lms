@@ -2959,10 +2959,10 @@ zh:
     upload_warning: 离开此页将取消上传进程。
     uploading: 正在上传...
     web_ct_course_list: 
-      no_files_help_label: “不上传文件”选项的更多信息
+      no_files_help_label: “不下载文件”选项的更多信息
       no_files_help_text: "从 WebCT 课程下载文件会占用很长时间，可能导致迁移进程失败。相反，您可以手动复制文件，然后选择此选项迁移剩余的内容。"
       no_files_help_title: “不下载文件”选项的更多信息
-      no_files_help_title_icon: “不上传文件”选项的更多信息
+      no_files_help_title_icon: “不下载文件”选项的更多信息
       skip_all_files: 不从课程下载文件
   content_tag: 
     no_title: 无标题
@@ -3563,7 +3563,7 @@ zh:
       mark_as_unread: 标记为未读
       no_subject: 无主题
       open_message: 打开消息
-      star_conversation: 开始会话
+      star_conversation: 标记会话
       starred: 已标记
       total_messages: 总消息数
       unread: 未读
@@ -3647,7 +3647,7 @@ zh:
     recipient_error: 您选择的课程或小组没有有效的接收人
     select_all: 全选
     star: 标记
-    star_conversation: 开始会话
+    star_conversation: 标记会话
     title: 
       add_recipients: 添加接收人
       forward_messages: 转发消息
@@ -5136,7 +5136,7 @@ zh:
       missing_file: 请选择文件
       name_required: 需要名称
       name_too_long: 名称太长
-      section_name_invalid: 节名称无效
+      section_name_invalid: 节名无效
       section_name_too_long: 节名太长
       upload_failed: 上传失败。
     first_category: 主页
