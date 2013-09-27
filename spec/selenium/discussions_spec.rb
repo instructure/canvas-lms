@@ -359,6 +359,22 @@ describe "discussions" do
           ffj('.open.discussion-list li.discussion:visible').length.should == 1
         end
 
+        it "should allow pinning of all pages of topics" do
+          100.times do |n|
+            DiscussionTopic.create!(context: @course, user: @teacher,
+              title: "Discussion Topic #{n+1}")
+          end
+          topic = DiscussionTopic.where(context_id: @course.id).order('id DESC').last
+          topic.should_not be_pinned
+          get(url)
+          wait_for_ajaximations
+          keep_trying_until { fj(".al-trigger") }
+          fj("[data-id=#{topic.id}] .al-trigger").click
+          fj('.icon-pin:visible').click
+          wait_for_ajaximations
+          topic.reload.should be_pinned
+        end
+
         it "should allow locking a pinned topic" do
           topic = @course.discussion_topics.create!(title: 'Test Discussion', user: @user, pinned: true)
           get(url)
