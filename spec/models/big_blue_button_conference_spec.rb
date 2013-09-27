@@ -125,6 +125,20 @@ describe BigBlueButtonConference do
       end
       bbb.initiate_conference
     end
+
+    it "should properly serialize a response with no recordings" do
+      bbb = BigBlueButtonConference.new
+      bbb.stubs(:conference_key).returns('12345')
+      bbb.user_settings = { record: true }
+      bbb.user = user
+      bbb.context = Account.default
+      bbb.save!
+      response = {returncode: 'SUCCESS', recordings: "\n  ",
+                  messageKey: 'noRecordings', message: 'There are not
+                  recordings for the meetings'}
+      bbb.stubs(:send_request).returns(response)
+      bbb.recordings.should == []
+    end
   end
 
   describe 'plugin setting recording disabled' do
