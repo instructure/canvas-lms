@@ -420,7 +420,7 @@ ja:
         ccp: 
           ccp_zero_activity_csv: 
             header: 例
-            text: "このレポートでは、指定した期間のすべてのコースに登録しているすべての受講生が示されます。生成される csv ファイルでは、日付以降にコースを訪問していない登録ユーザがそれぞれ 1 行で示されます。"
+            text: "このレポートでは、指定した期間中にいずれかのコースに登録している受講生がすべて表示されます。生成される csv ファイルでは、指定の日付以降にコースを訪問していない登録ユーザがそれぞれ 1 行で示されます。"
     ccp_zero_activity_csv_parameters: 
       account_reports: 
         ccp: 
@@ -622,7 +622,7 @@ ja:
           description: 
             header: 例
           student_activity: 
-            text: このレポートでは、指定された課題グループおよび指定された日付範囲のすべての課題、およびそれらの課題に関する情報が表示されます。このレポートでは、主な授業内評価に乱れができるかぎり生じないようにした安全な演習のスケジュールに関するデータが示されます。
+            text: このレポートでは、指定された課題グループおよび指定された日付範囲のすべての課題、およびそれらの課題に関する情報が表示されます。このレポートでは、主な授業内評価の混乱を最小限に抑えつつ安全な演習のスケジュール設定を行うためのデータが示されます。
     safety_drill_csv_parameters: 
       account_reports: 
         newark: 
@@ -1300,7 +1300,7 @@ ja:
     messages: 
       assignment_created: "課題 \"%{assignment}\" が作成されました"
     name_is_required: 名前は必須項目です
-    points_possible: "パーセンテージによる採点では、0 よりも大きい配点であることが必要です"
+    points_possible: "パーセント方式の採点の場合は、配点を 0 より大きくする必要があります。"
     select_external_tool_dialog_title: 外部ツールの設定
     show_advanced_options: 詳細オプションを表示
     submission_action_take_quiz: "%{title} を受ける"
@@ -1534,12 +1534,12 @@ ja:
         delete_assignment_group: "*%{assignment_count}** 件の課題がある *%{name}* を削除しようとしています。"
       would_you_like: "行う操作:"
     drop_highest_rule: 
-      one: "上位 %{count} 個のスコアを下げる"
-      other: "上位 %{count} 個のスコアを下げる"
+      one: "上位 %{count} 個のスコアを除外する"
+      other: "上位 %{count} 個のスコアを除外する"
     drop_highest_scores: "最高スコア %{number} を下げる"
     drop_lowest_rule: 
-      one: "下位 %{count} 個のスコアを下げる"
-      other: "下位 %{count} 個のスコアを下げる"
+      one: "下位 %{count} 個のスコアを除外する"
+      other: "下位 %{count} 個のスコアを除外する"
     drop_lowest_scores: "最低スコア %{number} を下げる"
     due_date_override: 
       overrides: 
@@ -1677,7 +1677,7 @@ ja:
     never_drop_collection: 
       add_another_assignment: 別の課題の追加
       add_first_assignment: 課題の追加
-    never_drop_rule: "%{assignment_name} を決して下げない"
+    never_drop_rule: "%{assignment_name} を除外しない"
     never_drop_scores: "%{assignment_name} を決して下げない"
     no_assignments: "[課題なし]"
     no_assignments_list_item: 
@@ -2959,10 +2959,10 @@ ja:
     upload_warning: このページから移動すると、アップロード処理がキャンセルされます。
     uploading: アップロードしています...
     web_ct_course_list: 
-      no_files_help_label: "'ファイルをダウンロードしない' オプションの詳細"
-      no_files_help_text: "WebCT コースからのファイルのダウンロードには長い時間がかかることがあり、移行処理が失敗する原因となることがあります。ダウンロードする代わりに、ファイルを手動でコピーし、このオプションを選択して、残りのコンテンツを移行できます。"
-      no_files_help_title: "\"'ファイルをダウンロードしない' オプションの詳細\""
-      no_files_help_title_icon: "'ファイルをダウンロードしない' オプションの詳細"
+      no_files_help_label: "'ファイルをダウンロードしない' オプションの詳細を表示"
+      no_files_help_text: "WebCT コースからファイルをダウンロードするには長い時間がかかる場合があり、そのために移行処理が失敗することがあります。ダウンロードする代わりに、ファイルを手動でコピーしてから、このオプションを選択して、残りのコンテンツを移行することもできます。"
+      no_files_help_title: "\"'ファイルをダウンロードしない' オプションの詳細を表示\""
+      no_files_help_title_icon: "'ファイルをダウンロードしない' オプションの詳細を表示"
       skip_all_files: コースからファイルをダウンロードしない
   content_tag: 
     no_title: タイトルなし
@@ -9036,8 +9036,8 @@ ja:
       module_progress_for_student: "%{student.name} のモジュールの進捗"
       no_modules_found: モジュールが見つかりませんでした
     progression_module_view: 
-      items: 完了するアイテム
-      items_below: 完了するアイテムは以下のとおりです
+      items: 完了すべきアイテム
+      items_below: 完了すべきアイテムは以下のとおりです
     progression_student_view: 
       show_progressions_for_student: "%{name} の進捗を表示"
     progressions_index: 
@@ -11930,8 +11930,8 @@ ja:
       find: 検索
       find_existing_scheme: 既存の採点スキームの検索
       full_name: "フル ネーム、小書きのテキスト"
-      grading_standard_name_table_summary: "編集可能なセルとして、採点スキームの名前を示すセルを 1 つのみ含む表です。"
-      grading_standard_summary: 採点スキームを含む表です。値の名前と範囲の列があります。各行には、最低および最大のパーセンテージの値が格納されています。
+      grading_standard_name_table_summary: "採点スキームの名前を示す編集可能なセルを 1 つだけ含む表です。"
+      grading_standard_summary: 採点スキームを含む表です。値の名前と範囲の列があります。各行には、最低および最大のパーセンテージの値が含まれています。
       insert_here: ここに挿入
       labels: 
         name: 名前
