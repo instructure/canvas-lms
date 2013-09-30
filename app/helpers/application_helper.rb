@@ -498,6 +498,7 @@ module ApplicationHelper
     @show_embedded_chat != false &&
       !@embedded_view &&
       !@body_class_no_headers &&
+      @current_user &&
       @context.is_a?(Course) &&
       embedded_chat_enabled &&
       external_tool_tab_visible('chat')
@@ -522,9 +523,7 @@ module ApplicationHelper
   def external_tool_tab_visible(tool_id)
     tool = active_external_tool_by_id(tool_id)
     return false unless tool
-    tc = @context.tab_configuration.find {|tc| tc['id'] == tool.asset_string}
-    return true unless tc # default to visible tabs if not hidden explicitly
-    tc['hidden'] != true
+    @context.tabs_available(@current_user).find {|tc| tc[:id] == tool.asset_string}.present?
   end
 
   def license_help_link
