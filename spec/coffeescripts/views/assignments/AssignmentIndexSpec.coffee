@@ -13,6 +13,8 @@ define [
 
   fixtures = $('#fixtures')
 
+  assignmentGroups = null
+
   assignmentIndex = () ->
     $('<div id="content"></div>').appendTo fixtures
 
@@ -49,9 +51,12 @@ define [
         MODULES: {}
         PERMISSIONS:
           manage: true
+      @enable_spy = sinon.spy(IndexView.prototype, 'enableSearch')
 
     teardown: ->
       window.ENV = oldENV
+      assignmentGroups = null
+      @enable_spy.restore()
 
   test 'should filter by search term', ->
 
@@ -69,3 +74,23 @@ define [
     $('#search_term').val('name')
     view.filterResults()
     equal view.$el.find('.assignment:visible').length, 2
+
+
+  test 'should have search disabled on render', ->
+    view = assignmentIndex()
+    ok view.$('#search_term').is(':disabled')
+
+
+  test 'should enable search on assignmentGroup reset', ->
+    view = assignmentIndex()
+    assignmentGroups.reset()
+    ok !view.$('#search_term').is(':disabled')
+
+  test 'enable search handler should only fire on the first reset', ->
+    view = assignmentIndex()
+    assignmentGroups.reset()
+    ok @enable_spy.calledOnce
+    #reset a second time and make sure it was still only called once
+    assignmentGroups.reset()
+    ok @enable_spy.calledOnce
+

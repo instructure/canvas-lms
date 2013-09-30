@@ -22,6 +22,10 @@ define [
       '#addGroup': '$addGroupButton'
       '#assignmentSettingsCog': '$assignmentSettingsButton'
 
+    initialize: ->
+      super
+      @collection.once 'reset', @enableSearch, @
+
     afterRender: ->
       # need to hide child views and set trigger manually
 
@@ -32,6 +36,9 @@ define [
       if @assignmentSettingsView
         @assignmentSettingsView.hide()
         @assignmentSettingsView.setTrigger @$assignmentSettingsButton
+
+    enableSearch: ->
+      @$('#search_term').prop 'disabled', false
 
     search: _.debounce ->
       @filterResults()
