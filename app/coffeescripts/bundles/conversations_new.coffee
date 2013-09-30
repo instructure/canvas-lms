@@ -107,6 +107,7 @@ require [
     onForward: (message) =>
       model = if message
         model = @detail.model.clone()
+        model.handleMessages()
         model.set 'messages', _.filter model.get('messages'), (m) ->
           m.id == message.id or (_.include(m.participating_user_ids, message.author_id) and m.created_at < message.created_at)
         trigger = $(".message-item-view[data-id=#{message.id}] .al-trigger")
