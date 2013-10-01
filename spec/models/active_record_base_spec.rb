@@ -617,4 +617,35 @@ describe ActiveRecord::Base do
       User.joins(:enrollments).where(enrollments: { sis_source_id: 'a?c'}).first.should be_nil
     end
   end
+
+  describe ".nulls" do
+    before do
+      @u1 = User.create!
+      User.where(id: @u1).update_all(name: nil)
+      @u2 = User.create!(name: 'a')
+      @u3 = User.create!
+      User.where(id: @u3).update_all(name: nil)
+      @u4 = User.create!(name: 'b')
+
+      @us = [@u1, @u2, @u3, @u4]
+      # for sanity
+      User.where(id: @us, name: nil).order(:id).all.should == [@u1, @u3]
+    end
+
+    it "should sort nulls first" do
+      User.where(id: @us).order(User.nulls(:first, :name), :id).all.should == [@u1, @u3, @u2, @u4]
+    end
+
+    it "should sort nulls last" do
+      User.where(id: @us).order(User.nulls(:last, :name), :id).all.should == [@u2, @u4, @u1, @u3]
+    end
+
+    it "should sort nulls first, desc" do
+      User.where(id: @us).order(User.nulls(:first, :name, :desc), :id).all.should == [@u1, @u3, @u4, @u2]
+    end
+
+    it "should sort nulls last, desc" do
+      User.where(id: @us).order(User.nulls(:last, :name, :desc), :id).all.should == [@u4, @u2, @u1, @u3]
+    end
+  end
 end

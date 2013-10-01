@@ -473,6 +473,20 @@ class ActiveRecord::Base
     result.map(&column.to_sym)
   end
 
+  # direction is nil, :asc, or :desc
+  def self.nulls(first_or_last, column, direction = nil)
+    if connection.adapter_name == 'PostgreSQL'
+      clause = if first_or_last == :first && direction != :desc
+                 " NULLS FIRST"
+               elsif first_or_last == :last && direction == :desc
+                 " NULLS LAST"
+               end
+      "#{column} #{direction.to_s.upcase}#{clause}".strip
+    else
+      "#{column} IS#{" NOT" unless first_or_last == :last} NULL, #{column} #{direction.to_s.upcase}".strip
+    end
+  end
+
   def self.find_in_batches_with_usefulness(options = {}, &block)
     # already in a transaction (or transactions don't matter); cursor is fine
     if connection.adapter_name == 'PostgreSQL' && (Shackles.environment == :slave || connection.open_transactions > (Rails.env.test? ? 1 : 0))
