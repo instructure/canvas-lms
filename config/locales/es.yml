@@ -673,10 +673,10 @@ es:
       allow_draft: "Permitir estado Borrador (beta)"
       allow_draft_help_message: |-
           El estado Borrador es una función en beta que permite publicar y ocultar el contenido del curso.
-          El contenido oculto no estará visibel para los alumnos y no afectará a las calificaciones.
-          También incluye un rediseño de alguas de las áreas de los cursos para hacerlas más uniformes en lo que respecta al diseño y las funciones.
+          El contenido oculto no estará visible para los alumnos y no afectará a las calificaciones.
+          También incluye un rediseño de algunas de las áreas de los cursos para hacerlas más uniformes en lo que respecta al diseño y las funciones.
           
-          Permitir el estado Borrador aquí permitirá a los profesores habilitarlo para sus cursos individuales.
+          Permitir el estado Borrador aquí facilitará que los profesores puedan habilitarlo para sus cursos individuales.
       allow_draft_help_tooltip: "¿Qué es el estado Borrador?"
       announcement_sent_to_subset: "Enviar a 1 / %{denominator} de usuarios cada mes"
       buttons: 
@@ -1303,7 +1303,7 @@ es:
     messages: 
       assignment_created: "Tarea \"%{assignment}\" creada"
     name_is_required: "Es obligatorio escribir un nombre"
-    points_possible: "El número de puntos posible debe ser mayor que 0 para la calificación porcentual"
+    points_possible: "El número de puntos posible debe ser mayor que 0 si la calificación es porcentual"
     select_external_tool_dialog_title: "Configurar herramienta externa"
     show_advanced_options: "Mostrar opciones avanzadas"
     submission_action_take_quiz: "Realizar %{title}"
@@ -1427,7 +1427,7 @@ es:
       delete_asssignment_title: "Borrar esta tarea"
       due_date: "Fecha Límite"
       edit: Editar
-      edit_assignment_title: "Editar la tarea"
+      edit_assignment_title: "Editar tarea"
       module: Módulo
       multiple_modules: "Varios módulos"
       points_possible: "%{pointsPossible} pts"
@@ -1505,7 +1505,7 @@ es:
       discussion_type: Debate
       external_tool_type: "Herramienta externa"
       more: "Más opciones"
-      multiple_due_dates: "Varias fechas de vencimiento"
+      multiple_due_dates: "Varias fechas límite"
       not_graded_type: "No calificado"
       quiz_type: Evaluación
       save: Guardar
@@ -3394,7 +3394,7 @@ es:
     progressions: 
       titles: 
         student_progress: "Progreso del alumno"
-        student_progression: "Progresión del Módulo por el Estudiante"
+        student_progression: "Progresión del módulo por alumno"
     still_needs_completing: "Todavía necesita ser completado"
     titles: 
       add: "Agregar Módulo"
@@ -3426,7 +3426,7 @@ es:
         attachment: "Archivo para adjuntar"
         remove_attachment: "Remover el archivo adjunto"
     all_courses: "Todos los cursos"
-    all_in_context: "Todo lo de %{context}"
+    all_in_context: "Todo lo incluido en %{context}"
     attachment_error: "No se pudo cargar el archivo adjunto. Por favor, inténtelo de nuevo."
     autocomplete_result: 
       group_people: "Personas: %{people}"
@@ -3561,8 +3561,8 @@ es:
       mark_as_unread: "Marcar como no leído"
       no_subject: "Sin asunto"
       open_message: "Abrir mensaje"
-      star_conversation: "Marcar la conversación como destacado"
-      starred: Señalado
+      star_conversation: "Marcar la conversación como destacada"
+      starred: Destacado
       total_messages: "Total de mensajes"
       unread: "No leído"
       unstar_conversation: "Eliminar la conversación de destacados"
@@ -3645,7 +3645,7 @@ es:
     recipient_error: "El curso o grupo que ha seleccionado no tiene destinatarios válidos"
     select_all: "Seleccionar Todo"
     star: Señalar
-    star_conversation: "Marcar conversación como destacado"
+    star_conversation: "Marcar conversación como destacada"
     title: 
       add_recipients: "Agregar destinatarios"
       forward_messages: "Reeviar Mensaje"
@@ -4524,7 +4524,7 @@ es:
       other: "Contraer %{count} anuncios"
     announcements_expand: 
       one: "Expandir %{count} anuncio"
-      other: "Expendir %{count} anuncios"
+      other: "Expandir %{count} anuncios"
     assignments_collapse: 
       one: "Contraer %{count} notificación de tarea"
       other: "Contraer %{count} notificaciones de tareas"
@@ -8734,7 +8734,7 @@ es:
             
             No olvide configurar su perfil de Canvas Network de modo que el resto del curso le conozca. Puede actualizar su perfil en %{profile_url}⏎ 
             ⏎ 
-            ¡Buen aprendizaje!⏎ 
+            ¡Siga aprendiendo!⏎ 
             ⏎ 
             Canvas Network
         html: 
@@ -9038,14 +9038,14 @@ es:
         prerequisites: "Requisitos previos"
         published: Publicado
     progression_module_collection: 
-      module_progress_for: "Módulo de Progreso para %h{student_link}"
-      module_progress_for_student: "Módulo de Progreso para %{student.name}"
+      module_progress_for: "Progreso del módulo para %h{student_link}"
+      module_progress_for_student: "Progreso del módulo para %{student.name}"
       no_modules_found: "No se han encontrado módulos"
     progression_module_view: 
       items: "Elementos pendientes de finalización"
       items_below: "Elementos pendientes de finalización a continuación"
     progression_student_view: 
-      show_progressions_for_student: "Mostrar progreso para %{name}"
+      show_progressions_for_student: "Mostrar progresión para %{name}"
     progressions_index: 
       back_to_modules: "Volver a la página de módulos"
       no_students_found: "No se han encontrado alumnos"
@@ -11235,7 +11235,7 @@ es:
     submission_versions: 
       attempt: Intento
       attempt_history: "Historial de intentos"
-      quiz_attempt_history_description: "Una tabla que muestra su historial de intentos de evaluaciones. Cada intento se encuentra en la parte izquierda. EL intento, hora y puntuación están a lo largo de la parte superior."
+      quiz_attempt_history_description: "Una tabla que muestra su historial de intentos de realizar la evaluación. Cada intento se encuentra en la parte izquierda. EL intento, hora y puntuación están a lo largo de la parte superior."
       regraded: "Cambio de calificación"
       score: Calificación
       time: Tiempo
@@ -11269,7 +11269,7 @@ es:
         other: "%{count} Horas"
       labels: 
         started: Comenzado
-        time_elapsed: "Tiempo Transcurrido"
+        time_elapsed: "Tiempo transcurrido"
         times_up: "¡Se acabó el tiempo! Enviando resultados en"
       logged_out_of_canvas: "*Ha cerrado su sesión en Canvas.* Para continuar, inicie sesión"
       login_required: "Inicio de sesión obligatorio"
@@ -11708,9 +11708,9 @@ es:
       not_available_yet: "Le enviaremos un correo electrónico antes de que comience el curso."
   sequence_footer: 
     next_colon: ":"
-    next_module: "Siguiente Módulo"
+    next_module: "Siguiente módulo"
     prev_colon: ":"
-    prev_module: "Módulo Anterior"
+    prev_module: "Módulo anterior"
   services_api: 
     must_be_logged_in: "Debe haber ingresado a su cuenta para usar Kaltura"
   set_default_grade_dialog: 
@@ -11915,7 +11915,7 @@ es:
       find_existing_scheme: "Encontrar el Esquema Existente de Calificación"
       full_name: "Nombre completo, texto más pequeño"
       grading_standard_name_table_summary: "Una tabla con una sola celda editable que incluye el nombre de su esquema de calificaciones."
-      grading_standard_summary: "Una table que incluye su esquema de calificaciones. El nombre del valor y el rango se encuentran en la parte superior. Cada línea contiene un valor porcentual mínimo y máximo."
+      grading_standard_summary: "Una tabla que incluye su esquema de calificaciones. El nombre del valor y el rango se encuentran en la parte superior. Cada línea contiene un valor porcentual mínimo y máximo."
       insert_here: "insertar aquí"
       labels: 
         name: Nombre
@@ -13194,7 +13194,7 @@ es:
         front_page: "Página de Inicio"
       toolbar_menu: 
         settings: Configuraciones
-      view_page_history_wiki: "Verel historial de páginas"
+      view_page_history_wiki: "Ver el historial de páginas"
     wiki_page_edit: 
       buttons: 
         cancel: Cancelar
