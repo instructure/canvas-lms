@@ -42,11 +42,14 @@ require 'set'
 #       // the account associated with the course
 #       "account_id": 81259,
 #
+#       // the root account associated with the course
+#       "root_account_id": 81259,
+#
 #       // the start date for the course, if applicable
 #       "start_at": "2012-06-01T00:00:00-06:00",
 #
 #       // the end date for the course, if applicable
-#       "end_at": null,
+#       "end_at": "2012-09-01T00:00:00-06:00",
 #
 #       // A list of enrollments linking the current user to the course.
 #       // for student enrollments, grading information may be included
@@ -100,7 +103,31 @@ require 'set'
 #       // returned only for a single course and include[]=permissions
 #       "permissions": {
 #          "create_discussion_topic": true
-#        }
+#       },
+#
+#       "is_public": true,
+#
+#       "public_syllabus": true,
+#
+#       "public_description": "Come one, come all to InstructureCon 2012!",
+#
+#       "storage_quota_mb": 5,
+#
+#       "hide_final_grades": false,
+#
+#       "license": "Creative Commons",
+#
+#       "allow_student_assignment_edits": false,
+#
+#       "allow_wiki_comments": false,
+#
+#       "allow_student_forum_attachments": false,
+#
+#       "open_enrollment": true,
+#
+#       "self_enrollment": false,
+#
+#       "restrict_enrollments_to_course_dates": false
 #   }
 class CoursesController < ApplicationController
   include SearchHelper
