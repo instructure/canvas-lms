@@ -394,7 +394,7 @@ class AccountAuthorizationConfigsController < ApplicationController
   def update_all
     account_configs_to_delete = @account.account_authorization_configs.to_a.dup
     account_configs = []
-    (params[:account_authorization_config] || {}).sort {|a,b| a[0] <=> b[0] }.each do |idx, data|
+    (params[:account_authorization_config] || {}).sort_by {|k,v| k }.each do |idx, data|
       id = data.delete :id
       disabled = data.delete :disabled
       next if disabled == '1'

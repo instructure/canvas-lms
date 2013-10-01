@@ -373,7 +373,7 @@ describe "Groups API", :type => :integration do
     it "should allow listing the group memberships" do
       @user = @moderator
       json = api_call(:get, @memberships_path, @memberships_path_options.merge(:group_id => @community.to_param, :action => "index"))
-      json.sort{ |a,b| a['id'] <=> b['id'] }.should == [membership_json(@community.has_member?(@member)), membership_json(@community.has_member?(@moderator))]
+      json.sort_by{|a| a['id'] }.should == [membership_json(@community.has_member?(@member)), membership_json(@community.has_member?(@moderator))]
     end
 
     it "should allow filtering to a certain membership state" do
@@ -594,7 +594,7 @@ describe "Groups API", :type => :integration do
       }.to change(User, :count).by(2)
       @memberships = @community.reload.group_memberships.where(:workflow_state => "invited").order(:id).all
       @memberships.count.should == 2
-      @json.sort{ |a,b| a['id'] <=> b['id'] }.should == @memberships.map{ |gm| membership_json(gm) }
+      @json.sort_by{ |a| a['id'] }.should == @memberships.map{ |gm| membership_json(gm) }
     end
 
     it "should not allow a member to invite people to a group" do

@@ -206,12 +206,12 @@ class CommunicationChannelsController < ApplicationController
             (account_to_pseudonyms_hash[p.account] ||= []) << p
           end
           @merge_opportunities << [user, account_to_pseudonyms_hash.map do |(account, pseudonyms)|
-            pseudonyms.detect { |p| p.sis_user_id } || pseudonyms.sort { |a, b| a.position <=> b.position }.first
+            pseudonyms.detect { |p| p.sis_user_id } || pseudonyms.sort_by(&:position).first
           end]
           @merge_opportunities.last.last.sort! { |a, b| Canvas::ICU.compare(a.account.name, b.account.name) }
         end
       end
-      @merge_opportunities.sort! { |a, b| [a.first == @current_user ? 0 : 1, Canvas::ICU.collation_key(a.first.name)] <=> [b.first == @current_user ? 0 : 1, Canvas::ICU.collation_key(b.first.name)] }
+      @merge_opportunities.sort_by! { |a| [a.first == @current_user ? SortFirst : SortLast, Canvas::ICU.collation_key(a.first.name)] }
 
       js_env :PASSWORD_POLICY => @domain_root_account.password_policy
 

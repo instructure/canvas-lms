@@ -156,7 +156,7 @@ I18n.class_eval do
   def self.apply_wrappers(string, wrappers)
     string = ERB::Util.h(string) unless string.html_safe?
     wrappers = { '*' => wrappers } unless wrappers.is_a?(Hash)
-    wrappers.sort { |a, b| -(a.first.length <=> b.first.length) }.each do |sym, replace|
+    wrappers.sort_by { |a| -a.first.length }.each do |sym, replace|
       regex = (WRAPPER_REGEXES[sym] ||= %r{#{Regexp.escape(sym)}([^#{Regexp.escape(sym)}]*)#{Regexp.escape(sym)}})
       string = string.gsub(regex, replace)
     end

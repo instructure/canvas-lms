@@ -117,7 +117,7 @@ module Context
 
   def sorted_rubrics(user, context)
     associations = RubricAssociation.bookmarked.for_context_codes(context.asset_string).include_rubric
-    Canvas::ICU.collate_by(associations.to_a.once_per(&:rubric_id).select{|r| r.rubric }) { |r| r.rubric.title || "zzzz" }
+    Canvas::ICU.collate_by(associations.to_a.once_per(&:rubric_id).select{|r| r.rubric }) { |r| r.rubric.title || SortLast }
   end
 
   def rubric_contexts(user)
@@ -140,7 +140,7 @@ module Context
         :name => context_name
       }
     end
-    contexts.sort_by{|c| codes_order[c[:context_code]] || 999 }
+    contexts.sort_by{|c| codes_order[c[:context_code]] || SortLast }
   end
 
   def active_record_types

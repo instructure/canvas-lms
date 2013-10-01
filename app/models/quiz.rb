@@ -397,7 +397,7 @@ class Quiz < ActiveRecord::Base
     result = []
     result.concat self.active_quiz_questions_without_group
     result.concat self.quiz_groups
-    result = result.sort_by{|e| e.position || 99999}.map do |e|
+    result = result.sort_by{|e| e.position || SortLast}.map do |e|
       res = nil
       if e.is_a? QuizQuestion
         res = e.data
@@ -408,7 +408,7 @@ class Quiz < ActiveRecord::Base
           data[:assessment_question_bank_id] = e.assessment_question_bank_id
           data[:questions] = []
         else
-          data[:questions] = e.quiz_questions.active.sort_by{|q| q.position || 99999}.map(&:data)
+          data[:questions] = e.quiz_questions.active.sort_by{|q| q.position || SortLast}.map(&:data)
         end
         data[:actual_pick_count] = e.actual_pick_count
         res = data
@@ -450,7 +450,7 @@ class Quiz < ActiveRecord::Base
       
       if val[:answers]
         val[:answers] = prepare_answers(val)
-        val[:matches] = val[:matches].sort_by{|m| m[:text] || "" } if val[:matches]
+        val[:matches] = val[:matches].sort_by{|m| m[:text] || SortFirst } if val[:matches]
       elsif val[:questions] # It's a QuizGroup
         if val[:assessment_question_bank_id]
           # It points to a question bank
@@ -460,7 +460,7 @@ class Quiz < ActiveRecord::Base
           val[:questions].each do |question|
             if question[:answers]
               question[:answers] = prepare_answers(question)
-              question[:matches] = question[:matches].sort_by{|m| m[:text] || ""} if question[:matches]
+              question[:matches] = question[:matches].sort_by{|m| m[:text] || SortFirst} if question[:matches]
             end
             questions << question
           end
@@ -574,7 +574,7 @@ class Quiz < ActiveRecord::Base
             questions.each do |question|
               if question[:answers]
                 question[:answers] = prepare_answers(question)
-                question[:matches] = question[:matches].sort_by{|m| m[:text] || ""} if question[:matches]
+                question[:matches] = question[:matches].sort_by{|m| m[:text] || SortFirst} if question[:matches]
               end
               question[:points_possible] = q[:question_points]
               question[:published_at] = q[:published_at]

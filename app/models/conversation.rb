@@ -708,11 +708,8 @@ class Conversation < ActiveRecord::Base
     # post-sort and -uniq in Ruby
     if shards.length > 1
       participants.each do |key, value|
-        participants[key] = value.uniq_by(&:id).sort do |user1, user2|
-          result = (user1.last_authored_at ? 0 : 1) <=> (user2.last_authored_at ? 0 : 1)
-          result = -(user1.last_authored_at <=> user2.last_authored_at) if result == 0 && user1.last_authored_at
-          result = (user1.short_name.try(:downcase) || user1.name.downcase) <=> (user2.short_name.try(:downcase) || user2.name.downcase) if result == 0
-          result
+        participants[key] = value.uniq_by(&:id).sort_by do |user|
+          [user.last_authored_at ? -user.last_authored_at.to_f : SortLast, Canvas::ICU.collation_key(user.short_name || user.name)]
         end
       end
     end

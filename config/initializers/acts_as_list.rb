@@ -3,7 +3,7 @@ module ActiveRecord
     module List
       module InstanceMethods
         def compact_list
-          list = acts_as_list_class.find(:all, :conditions => "#{scope_condition}").sort_by{|o| o.send(position_column) || 999999 }
+          list = acts_as_list_class.find(:all, :conditions => "#{scope_condition}").sort_by{|o| o.send(position_column) || SortLast }
           updates = []
           list.each_with_index do |obj, idx|
             updates << "WHEN id=#{obj.id} THEN #{idx}"
@@ -17,7 +17,7 @@ module ActiveRecord
           send(position_column) || insert_at_bottom
         end
         def update_order(ids)
-          list = acts_as_list_class.find(:all, :conditions => "#{scope_condition}").sort_by{|o| o.send(position_column) || 999999 }
+          list = acts_as_list_class.find(:all, :conditions => "#{scope_condition}").sort_by{|o| o.send(position_column) || SortLast }
           updates = []
           done_ids = {}
           cnt = 1
@@ -40,7 +40,7 @@ module ActiveRecord
 
         def insert_at_position(position, list=nil)
           list ||= acts_as_list_class.find(:all, :conditions => "#{scope_condition}")
-          list = list.sort_by{|o| o.send(position_column) || 999999 }
+          list = list.sort_by{|o| o.send(position_column) || SortLast }
           if self_index = list.index{|o| o.id == self.id}
             list.delete_at(self_index)
           end

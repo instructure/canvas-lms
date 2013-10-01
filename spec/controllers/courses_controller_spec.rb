@@ -905,7 +905,7 @@ describe CoursesController do
       get 'sis_publish_status', :course_id => @course.id
       response.should be_success
       response_body = json_parse(response.body)
-      response_body["sis_publish_statuses"]["Published"].sort!{|x,y|x["id"] <=> y["id"]}
+      response_body["sis_publish_statuses"]["Published"].sort_by!{|x|x["id"]}
       response_body.should == {
           "sis_publish_overall_status" => "error",
           "sis_publish_statuses" => {
@@ -970,7 +970,7 @@ describe CoursesController do
 
       response.should be_success
       response_body = json_parse(response.body)
-      response_body["sis_publish_statuses"]["Published"].sort!{|x,y|x["id"] <=> y["id"]}
+      response_body["sis_publish_statuses"]["Published"].sort_by!{|x|x["id"]}
       response_body.should == {
           "sis_publish_overall_status" => "published",
           "sis_publish_statuses" => {

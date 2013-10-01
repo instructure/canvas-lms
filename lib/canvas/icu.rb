@@ -1,4 +1,22 @@
 module Canvas::ICU
+  module NaiveCollator
+    def self.rules
+      ''
+    end
+
+    def self.collation_key(string)
+      string.downcase
+    end
+
+    def self.compare(a, b)
+      collation_key(a) <=> collation_key(b)
+    end
+
+    def self.collate(sortable)
+      sortable.sort{ |a, b| compare(a, b) }
+    end
+  end
+
   begin
     Bundler.require 'icu'
     if !ICU::Lib.respond_to?(:ucol_getRules)
@@ -82,7 +100,6 @@ module Canvas::ICU
         }.freeze
         ATTRIBUTE_VALUES_INVERSE = Hash[ATTRIBUTE_VALUES.map {|k,v| [v, k]}].freeze
       end
-
     end
 
     def self.collator
@@ -96,31 +113,31 @@ module Canvas::ICU
       end
     end
 
-    def self.locale_for_collation
-      collator.rules.empty? ? 'root' : I18n.locale
-    end
-
-    class << self
-      delegate :collate, :compare, :collation_key, to: :collator
-    end
-
   rescue LoadError
-
-    def self.locale_for_collation
-      'root'
+    def self.collator
+      NaiveCollator
     end
+  end
 
-    def self.collate(sortable)
-      sortable.sort { |a, b| compare(a, b) }
-    end
+  def self.locale_for_collation
+    collator.rules.empty? ? 'root' : I18n.locale
+  end
 
-    def self.compare(a, b)
-      collation_key(a) <=> collation_key(b)
+  def self.compare(a, b)
+    if (!a.is_a?(String) || !b.is_a?(String))
+      a <=> b
+    else
+      collator.compare(a, b)
     end
+  end
 
-    def self.collation_key(string)
-      string.downcase
-    end
+  def self.collation_key(string)
+    return string unless string.is_a?(String)
+    collator.collation_key(string)
+  end
+
+  class << self
+    delegate :collate, to: :collator
   end
 
   def self.collate_by(sortable)

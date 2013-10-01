@@ -20,7 +20,7 @@ require 'bigdecimal'
 
 class QuizQuestion::NumericalQuestion < QuizQuestion::Base
   def answers
-    @question_data[:answers].sort_by{|a| a[:weight] || 0}
+    @question_data[:answers].sort_by{|a| a[:weight] || SortFirst}
   end
 
   def correct_answer_parts(user_answer)

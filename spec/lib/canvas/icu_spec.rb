@@ -27,6 +27,13 @@ describe Canvas::ICU do
         result.first[:id].should == 2
         result.last[:id].should == 1
       end
+
+      it "should handle SortFirst" do
+        array = [{id: 2, str: SortFirst}, {id:1, str: 'b'}]
+        result = Canvas::ICU.collate_by(array) { |x| x[:str] }
+        result.first[:id].should == 2
+        result.last[:id].should == 1
+      end
     end
 
     describe ".collation_key" do
@@ -37,11 +44,19 @@ describe Canvas::ICU do
         b_prime = Canvas::ICU.collation_key(b)
         (a_prime <=> b_prime).should == -1
       end
+
+      it "should pass-thru SortFirst" do
+        Canvas::ICU.collation_key(SortFirst).should == SortFirst
+      end
     end
 
     describe ".compare" do
       it "should work" do
         Canvas::ICU.compare("a", "b").should == -1
+      end
+
+      it "should handle SortFirst" do
+        Canvas::ICU.compare(SortFirst, "a").should == -1
       end
     end
 
@@ -58,7 +73,19 @@ describe Canvas::ICU do
     end
   end
 
-  context "default" do
+  context "NaiveCollator" do
     it_should_behave_like "Collator"
+
+    before do
+      Canvas::ICU.stubs(:collator).returns(Canvas::ICU::NaiveCollator)
+    end
+  end
+
+  context "ICU" do
+    it_should_behave_like "Collator"
+
+    before do
+      pending if Canvas::ICU.collator == Canvas::ICU::NaiveCollator
+    end
   end
 end

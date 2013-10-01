@@ -159,8 +159,6 @@ describe SubmissionList do
     before do
       course_model
       sl = SubmissionList.new(@course)
-      @sort_block_for_filtering = sl.send(:sort_block_for_filtering)
-      @sort_block_for_displaying = sl.send(:sort_block_for_displaying)
       @full_hash_list = YAML.load_file(
         File.expand_path(
           File.join(
@@ -171,60 +169,7 @@ describe SubmissionList do
           )
         )
       )
-      # def sort_block_for_filtering
-      #   lambda{|a, b|
-      #     tier_1 = a[:id] <=> b[:id]
-      #     tier_2 = a[:updated_at] <=> b[:updated_at]
-      #     tier_1 == 0 ? tier_2 : tier_1
-      #   }
-      # end
-      # 
-      # def sort_block_for_displaying
-      #   lambda{|a, b|
-      # 
-      #     first_tier = if b[:graded_at] and a[:graded_at]
-      #       b[:graded_at] <=> a[:graded_at]
-      #     elsif b[:graded_at]
-      #       1
-      #     elsif a[:graded_at]
-      #       -1
-      #     else
-      #       0
-      #     end
-      # 
-      #     second_tier = a[:safe_grader_id] <=> b[:safe_grader_id]
-      #     third_tier = a[:assignment_id] <=> b[:assignment_id]
-      # 
-      #     case first_tier
-      #     when -1
-      #       -1
-      #     when 1
-      #       1
-      #     when 0
-      #       case second_tier
-      #       when -1
-      #         -1
-      #       when 1
-      #         1
-      #       when 0
-      #         third_tier
-      #       end
-      #     end
-      #   }
-      # end
-      
-      
     end
-    
-    it "should be able to use a desctructive sort" do
-      fhl = @full_hash_list.dup
-      fhl.sort!(&@sort_block_for_displaying)
-      fhl.should_not eql(@full_hash_list)
-    end
-    
-    it "should order by id, then updated_at" do
-    end
-    
   end
 end
 

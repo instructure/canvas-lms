@@ -242,7 +242,7 @@ class AssessmentQuestion < ActiveRecord::Base
     question[:answers] = []
     reset_local_ids
     qdata[:answers] ||= previous_data[:answers] rescue []
-    answers = qdata[:answers].to_a.sort_by{|a| (a[0] || "").gsub(/answer_/, "").to_i || ""}
+    answers = qdata[:answers].to_a.sort_by{|a| (a[0] || "").gsub(/answer_/, "").to_i}
     if question[:question_type] == "multiple_choice_question"
       found_correct = false
       answers.each do |key, answer|

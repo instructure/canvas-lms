@@ -347,7 +347,7 @@ class QuizSubmission < ActiveRecord::Base
     versions = self.versions.reload.reject {|v| v.id == exclude_version_id } rescue []
 
     # only most recent version for each attempt - some have regraded a version
-    versions.sort {|v| v.number }.reverse.each do |ver|
+    versions.sort_by(&:number).reverse.each do |ver|
       scores[ver.model.attempt] ||= ver.model.score || 0.0
     end
 

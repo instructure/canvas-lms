@@ -1324,7 +1324,7 @@ class User < ActiveRecord::Base
     context_codes = ([self] + self.management_contexts).uniq.map(&:asset_string)
     rubrics = self.context_rubrics.active
     rubrics += Rubric.active.find_all_by_context_code(context_codes)
-    rubrics.uniq.sort_by{|r| [(r.association_count || 0) > 3 ? 'a' : 'b', Canvas::ICU.collation_key(r.title || 'zzzzz')]}
+    rubrics.uniq.sort_by{|r| [(r.association_count || 0) > 3 ? SortFirst : SortLast, Canvas::ICU.collation_key(r.title || SortLast)]}
   end
 
   def assignments_recently_graded(opts={})
@@ -1785,7 +1785,7 @@ class User < ActiveRecord::Base
                        recent_stream_items(:context => context)
                      })
         end
-        items.sort { |a,b| b.id <=> a.id }
+        items.sort_by(&:id).reverse
       else
         # no context in cache key
         Rails.cache.fetch(StreamItemCache.recent_stream_items_key(self), :expires_in => expires_in) {
@@ -1826,7 +1826,7 @@ class User < ActiveRecord::Base
     event_codes = context_codes + AppointmentGroup.manageable_by(self, context_codes).intersecting(opts[:start_at], opts[:end_at]).map(&:asset_string)
     events += ev.for_user_and_context_codes(self, event_codes, []).between(opts[:start_at], opts[:end_at]).updated_after(opts[:updated_at])
     events += Assignment.active.for_context_codes(context_codes).due_between(opts[:start_at], opts[:end_at]).updated_after(opts[:updated_at]).with_just_calendar_attributes
-    events.sort_by{|e| [e.start_at, Canvas::ICU.collation_key(e.title || "")] }.uniq
+    events.sort_by{|e| [e.start_at, Canvas::ICU.collation_key(e.title || SortFirst)] }.uniq
   end
 
   def upcoming_events(opts={})
@@ -2224,27 +2224,19 @@ class User < ActiveRecord::Base
         next
       end
 
-      if !e.course
-        coalesced_enrollments << {
-          :enrollment => e,
-          :sortable => [e.rank_sortable, e.state_sortable, Canvas::ICU.collation_key(e.long_name)],
-          :types => [ e.readable_type ]
-        }
-      end
-
       existing_enrollment_info = coalesced_enrollments.find { |en|
         # coalesce together enrollments for the same course and the same state
-        !e.course.nil? && en[:enrollment].course == e.course && en[:enrollment].workflow_state == e.workflow_state
+        en[:enrollment].course == e.course && en[:enrollment].workflow_state == e.workflow_state
       }
 
       if existing_enrollment_info
         existing_enrollment_info[:types] << e.readable_type
-        existing_enrollment_info[:sortable] = [existing_enrollment_info[:sortable] || [999,999, 999], [e.rank_sortable, e.state_sortable, 0 - e.id]].min
+        existing_enrollment_info[:sortable] = [existing_enrollment_info[:sortable] || SortLast, [e.rank_sortable, e.state_sortable, 0 - e.id]].min
       else
         coalesced_enrollments << { :enrollment => e, :sortable => [e.rank_sortable, e.state_sortable, 0 - e.id], :types => [ e.readable_type ] }
       end
     end
-    coalesced_enrollments = coalesced_enrollments.sort_by{|e| e[:sortable] || [999,999, 999] }
+    coalesced_enrollments = coalesced_enrollments.sort_by{|e| e[:sortable] }
     active_enrollments = coalesced_enrollments.map{ |e| e[:enrollment] }
 
     cached_group_memberships = self.cached_current_group_memberships

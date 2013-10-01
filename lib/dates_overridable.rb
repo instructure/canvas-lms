@@ -115,7 +115,7 @@ module DatesOverridable
 
     all_dates = all_dates.sort_by do |date|
       due_at = date[:due_at]
-      [ due_at.present? ?  0 : 1, due_at.presence || 0 ]
+      [ due_at.present? ? SortFirst : SortLast, due_at.presence || SortFirst ]
     end
 
     all_dates.map do |dates|
