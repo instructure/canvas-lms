@@ -137,7 +137,7 @@ describe "courses" do
       # Test that the page loads properly the first time.
       get "/courses/#{@course.id}/users"
       wait_for_ajaximations
-      ff('.ui-state-error').length.should == 0
+      flash_message_present?(:error).should be_false
       ff('.roster .rosterUser').length.should == 50
     end
 

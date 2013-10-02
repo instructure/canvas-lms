@@ -437,7 +437,7 @@ describe "gradebook2" do
                           :membership_type => 'CustomAdmin')
 
       get "/courses/#{@course.id}/gradebook2"
-      ff('.ui-state-error').count.should == 0
+      flash_message_present?(:error).should be_false
     end
 
     it "should display for users with only :manage_grades permissions" do
@@ -451,7 +451,7 @@ describe "gradebook2" do
                           :membership_type => 'CustomAdmin')
 
       get "/courses/#{@course.id}/gradebook2"
-      ff('.ui-state-error').count.should == 0
+      flash_message_present?(:error).should be_false
     end
 
     it "should include student view student for grading" do

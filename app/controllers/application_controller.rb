@@ -1504,13 +1504,16 @@ class ApplicationController < ActionController::Base
         notices << {:type => 'warning', :content => unsupported_browser, :classes => 'unsupported_browser'} 
       end
       if error = flash.delete(:error)
-        notices << {:type => 'error', :content => error}
+        notices << {:type => 'error', :content => error, :icon => 'warning'}
       end
       if warning = flash.delete(:warning)
-        notices << {:type => 'warning', :content => warning}
+        notices << {:type => 'warning', :content => warning, :icon => 'warning'}
+      end
+      if info = flash.delete(:info)
+        notices << {:type => 'info', :content => info, :icon => 'info'}
       end
       if notice = (flash[:html_notice] ? flash.delete(:html_notice).html_safe : flash.delete(:notice))
-        notices << {:type => 'success', :content => notice}
+        notices << {:type => 'success', :content => notice, :icon => 'check'}
       end
       notices
     end

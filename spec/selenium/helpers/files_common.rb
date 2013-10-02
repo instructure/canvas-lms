@@ -61,7 +61,7 @@ def unzip_from_form_to_folder()
       job = Delayed::Job.order(:id).last
       job.tag.should == 'ZipFileImport#process_without_send_later'
       run_job(job)
-      upload_file(true) if refresh != true && f("#flash_message_holder .ui-state-error").present?
+      upload_file(true) if refresh != true && flash_message_present?(:error)
       zfi
     end
 
