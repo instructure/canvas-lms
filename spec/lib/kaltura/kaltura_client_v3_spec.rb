@@ -136,9 +136,19 @@ describe "Kaltura::ClientV3" do
           [
               {:fileExt => 'mp4', :bitrate => '100', :isOriginal => '0'},
               {:fileExt => 'mp3', :bitrate => '100', :isOriginal => '0'},
-              {:fileExt => 'mp4', :bitrate => '200', :isOriginal => '1'},
               {:fileExt => 'flv', :bitrate => '100', :isOriginal => '0'},
+              {:fileExt => 'mp4', :bitrate => '200', :isOriginal => '1'},
           ]
+    end
+
+    it "should prefer assets with conversion warnings over original" do
+      @kaltura.sort_source_list(
+          [
+              {:fileExt => 'mp4', :bitrate => '200', :isOriginal => '1'},
+              {:fileExt => 'flv', :bitrate => '100', :isOriginal => '0', :hasWarnings => true},
+              {:fileExt => 'mp3', :bitrate => '100', :isOriginal => '0', :hasWarnings => true},
+              {:fileExt => 'mp4', :bitrate => '100', :isOriginal => '0', :hasWarnings => true},
+          ]).first[:isOriginal].should_not == '1'
     end
   end
 
