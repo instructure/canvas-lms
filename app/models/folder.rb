@@ -50,7 +50,7 @@ class Folder < ActiveRecord::Base
   before_save :infer_hidden_state
   validates_presence_of :context_id, :context_type
   validates_length_of :name, :maximum => maximum_string_length
-  validate_on_update :reject_recursive_folder_structures
+  validate :reject_recursive_folder_structures, on: :update
 
   def reject_recursive_folder_structures
     return true if !self.parent_folder_id_changed?

@@ -131,6 +131,39 @@ ActiveRecord::Base.class_eval do
       end
     end
     alias_method_chain :scope, :named_scope
+
+    # allow validate to recognize the Rails 3 style on: action modifiers,
+    # translating those calls into validate_on_action calls.
+    def validate_with_rails3_compatibility(*methods, &block)
+      options = methods.extract_options! || {}
+      callback =
+        case validation_method(options[:on])
+        when :validate_on_create then :validate_on_create
+        when :validate_on_update then :validate_on_update
+        else :validate_without_rails3_compatibility
+        end
+      methods << block if block_given?
+      methods << options unless options.empty?
+      send(callback, *methods)
+    end
+    alias_method_chain :validate, :rails3_compatibility
+
+    # allow before_validation to recognize the Rails 3 style on: action
+    # modifiers, translating those calls into before_validation_on_action
+    # calls.
+    def before_validation_with_rails3_compatibility(*methods, &block)
+      options = methods.extract_options! || {}
+      callback =
+        case validation_method(options[:on])
+        when :validate_on_create then :before_validation_on_create
+        when :validate_on_update then :before_validation_on_update
+        else :before_validation_without_rails3_compatibility
+        end
+      methods << block if block_given?
+      methods << options unless options.empty?
+      send(callback, *methods)
+    end
+    alias_method_chain :before_validation, :rails3_compatibility
   end
 
   # support 0 arguments
