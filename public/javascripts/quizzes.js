@@ -1691,6 +1691,10 @@ define([
     });
 
     function showRegradeOptions($el,questionID) {
+      if (!canRegradeQuestion($el)) {
+        return;
+      }
+
       if ($("#student_submissions_warning").length == 0 || !ENV.ENABLE_QUIZ_REGRADE) {
         return;
       }
@@ -1712,6 +1716,15 @@ define([
         }));
         clickRegradeOptions();
       }
+    }
+
+    function canRegradeQuestion($el) {
+      var regradeTypes = ["multiple_choice_question",
+                          "true_false_question",
+                          "multiple_answers_question"];
+      return _.find(regradeTypes, function(className) {
+        return $el.hasClass(className);
+      })
     }
 
     $(document).delegate(".regrade-options", 'click', clickRegradeOptions);
