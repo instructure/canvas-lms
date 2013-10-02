@@ -64,6 +64,10 @@ class ToolLaunch < Struct.new(:url, :tool, :user, :context, :link_code, :return_
 
       hash['custom_canvas_assignment_id'] = assignment.id if tool.public?
     end
+    
+    def has_selection_html!(html)
+      hash['text'] = CGI::escape(html)
+    end
 
     def generate
       hash['lti_message_type'] = 'basic-lti-launch-request'

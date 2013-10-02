@@ -333,6 +333,7 @@ class ExternalToolsController < ApplicationController
       @assignment = @context.assignments.active.find(params[:assignment_id])
       @launch.for_homework_submission!(@assignment)
     end
+    @launch.has_selection_html!(params[:selection]) if params[:selection]
     @resource_url = @launch.url
     resource_uri = URI.parse @launch.url
     @tool_id = @tool.tool_id || resource_uri.host || 'unknown'
