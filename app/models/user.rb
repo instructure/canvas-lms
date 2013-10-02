@@ -154,7 +154,7 @@ class User < ActiveRecord::Base
   has_many :all_courses, :source => :course, :through => :enrollments
   has_many :current_and_concluded_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section],
            :conditions => [enrollment_conditions(:active), enrollment_conditions(:completed)].join(' OR '), :order => 'enrollments.created_at'
-  has_many :current_and_concluded_courses, :source => :course, :through => :current_and_concluded_enrollments, :uniq => true
+  has_many :current_and_concluded_courses, :source => :course, :through => :current_and_concluded_enrollments
   has_many :group_memberships, :include => :group, :dependent => :destroy
   has_many :groups, :through => :group_memberships
 
@@ -953,7 +953,9 @@ class User < ActiveRecord::Base
       self.pseudonyms.detect { |p| p.active? && p.sis_user_id && p.account_id == root_account.id }
     else
       root_account.shard.activate do
-        root_account.pseudonyms.active.find_by_user_id(self.id, :conditions => "sis_user_id IS NOT NULL")
+        root_account.pseudonyms.active.
+          where("sis_user_id IS NOT NULL AND user_id=?", self).
+          first
       end
     end
   end
@@ -1712,38 +1714,35 @@ class User < ActiveRecord::Base
 
     Shackles.activate(:slave) do
       submissions = []
-      submissions += self.submissions.after(opts[:start_at]).for_context_codes(context_codes).find(
-        :all,
-        :conditions => ["submissions.score IS NOT NULL AND assignments.workflow_state != ? AND assignments.muted = ?", 'deleted', false],
-        :include => [:assignment, :user, :submission_comments],
-        :order => 'submissions.created_at DESC',
-        :limit => opts[:limit]
-      )
+      submissions += self.submissions.after(opts[:start_at]).for_context_codes(context_codes).
+        where("submissions.score IS NOT NULL AND assignments.workflow_state<>? AND assignments.muted=?", 'deleted', false).
+        order('submissions.created_at DESC').
+        limit(opts[:limit]).all
 
       # THIS IS SLOW, it takes ~230ms for mike
-      submissions += Submission.for_context_codes(context_codes).find(
-        :all,
-        :select => "submissions.*, last_updated_at_from_db",
-        :joins => self.class.send(:sanitize_sql_array, [<<-SQL, opts[:start_at], self.id, self.id]),
-                  INNER JOIN (
-                    SELECT MAX(submission_comments.created_at) AS last_updated_at_from_db, submission_id
-                    FROM submission_comments, submission_comment_participants
-                    WHERE submission_comments.id = submission_comment_id
-                      AND (submission_comments.created_at > ?)
-                      AND (submission_comment_participants.user_id = ?)
-                      AND (submission_comments.author_id <> ?)
-                    GROUP BY submission_id
-                  ) AS relevant_submission_comments ON submissions.id = submission_id
-                  INNER JOIN assignments ON assignments.id = submissions.assignment_id AND assignments.workflow_state <> 'deleted'
-                  SQL
-        :order => 'last_updated_at_from_db DESC',
-        :limit => opts[:limit],
-        :conditions => { "assignments.muted" => false }
-      )
+      submissions += Submission.for_context_codes(context_codes).
+        select(["submissions.*, last_updated_at_from_db"]).
+        joins(self.class.send(:sanitize_sql_array, [<<-SQL, opts[:start_at], self.id, self.id])).
+          INNER JOIN (
+            SELECT MAX(submission_comments.created_at) AS last_updated_at_from_db, submission_id
+            FROM submission_comments, submission_comment_participants
+            WHERE submission_comments.id = submission_comment_id
+              AND (submission_comments.created_at > ?)
+              AND (submission_comment_participants.user_id = ?)
+              AND (submission_comments.author_id <> ?)
+            GROUP BY submission_id
+          ) AS relevant_submission_comments ON submissions.id = submission_id
+          INNER JOIN assignments ON assignments.id = submissions.assignment_id AND assignments.workflow_state <> 'deleted'
+        SQL
+        where(assignments: {muted: false}).
+        order('last_updated_at_from_db DESC').
+        limit(opts[:limit]).all
 
-      submissions = submissions.sort_by{|t| (t.last_updated_at_from_db.to_datetime.in_time_zone rescue nil)  || t.created_at}.reverse
+      submissions = submissions.sort_by{|t| (t.last_updated_at_from_db.to_datetime.in_time_zone rescue nil) || t.created_at}.reverse
       submissions = submissions.uniq
       submissions.first(opts[:limit])
+
+      Submission.send(:preload_associations, submissions, [:assignment, :user, :submission_comments])
       submissions
     end
   end

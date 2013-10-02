@@ -733,7 +733,7 @@ class Attachment < ActiveRecord::Base
         quota = context.quota if (context.respond_to?("quota") && context.quota)
         min = self.minimum_size_for_quota
         # translated to ruby this is [size, min].max || 0
-        quota_used = context.attachments.active.sum("COALESCE(CASE when size < #{min} THEN #{min} ELSE size END, 0)", :conditions => { :root_attachment_id => nil }).to_i
+        quota_used = context.attachments.active.where(root_attachment_id: nil).sum("COALESCE(CASE when size < #{min} THEN #{min} ELSE size END, 0)").to_i
       end
     end
     {:quota => quota, :quota_used => quota_used}

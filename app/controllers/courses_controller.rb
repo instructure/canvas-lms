@@ -708,8 +708,7 @@ class CoursesController < ApplicationController
 
       @all_roles = Role.custom_roles_and_counts_for_course(@context, @current_user, true)
 
-      users_scope = @context.users_visible_to(@current_user)
-      @invited_count = users_scope.count(:distinct => true, :select => 'users.id', :conditions => ["enrollments.workflow_state = 'invited' AND enrollments.type != 'StudentViewEnrollment'"])
+      @invited_count = @context.invited_count_visible_to(@current_user)
 
       js_env(:COURSE_ID => @context.id,
              :USERS_URL => "/api/v1/courses/#{ @context.id }/users",

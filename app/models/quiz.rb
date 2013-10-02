@@ -367,7 +367,7 @@ class Quiz < ActiveRecord::Base
   end
 
   def root_entries_max_position
-    question_max = self.active_quiz_questions.maximum(:position, :conditions => 'quiz_group_id is null')
+    question_max = self.active_quiz_questions.where(quiz_group_id: nil).maximum(:position)
     group_max = self.quiz_groups.maximum(:position)
     [question_max, group_max, 0].compact.max
   end

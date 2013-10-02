@@ -80,20 +80,21 @@ class CommMessagesApiController < ApplicationController
     start_time = TimeHelper.try_parse(params[:start_time])
     end_time = TimeHelper.try_parse(params[:end_time])
 
-    conditions = case
-      when Account.site_admin.grants_right?(@current_user, :read_messages)
-        {} # No further restrictions, site admins see all
-      when @domain_root_account.settings[:admins_can_view_notifications] &&
-            @domain_root_account.grants_right?(@current_user, :view_notifications)
-        { :root_account_id => @domain_root_account.id }
-      else
+    query = user.messages.order('created_at DESC')
+
+    # site admins see all, but if not a site admin...
+    if !Account.site_admin.grants_right?(@current_user, :read_messages)
+      # ensure they can see the domain root account
+      unless @domain_root_account.settings[:admins_can_view_notifications] &&
+        @domain_root_account.grants_right?(@current_user, :view_notifications)
         return render_unauthorized_action
+      end
+      # and then scope to just the messages from that root account
+      query = query.where(root_account_id: @domain_root_account)
     end
 
-    query = user.messages.scoped(:order => 'created_at DESC')
-    query = query.scoped(:conditions => conditions) unless conditions.empty?
-    query = query.scoped(:conditions => ['created_at >= ?', start_time]) if start_time
-    query = query.scoped(:conditions => ['created_at <= ?', end_time]) if end_time
+    query = query.where('created_at >= ?', start_time) if start_time
+    query = query.where('created_at <= ?', end_time) if end_time
     messages = Api.paginate(query, self, api_v1_comm_messages_url)
 
     messages_json = messages.map { |m| comm_message_json(m) }

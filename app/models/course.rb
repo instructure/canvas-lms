@@ -2393,6 +2393,16 @@ class Course < ActiveRecord::Base
     end
   end
 
+  def invited_count_visible_to(user)
+    scope = users_visible_to(user).
+      where("enrollments.workflow_state = 'invited' AND enrollments.type != 'StudentViewEnrollment'")
+    if CANVAS_RAILS2
+      scope.count(:distinct => true, :select => 'users.id')
+    else
+      scope.select('users.id').uniq.count
+    end
+  end
+
   def unpublished?
     self.created? || self.claimed?
   end
