@@ -459,6 +459,10 @@ class DiscussionTopic < ActiveRecord::Base
     workflow_state != 'post_delayed'
   end
 
+  def can_unpublish?
+    !self.assignment && self.discussion_subentry_count == 0
+  end
+
   def should_send_to_stream
     if self.delayed_post_at && self.delayed_post_at > Time.now
       false

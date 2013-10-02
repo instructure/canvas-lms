@@ -1,4 +1,4 @@
-<% 
+<%
   editable ||= can_do(@context, @current_user, :manage_grades) || can_do(@context, @current_user, :manage_content)
   workflow_state = context_module && context_module.workflow_state
   @modules ||= []

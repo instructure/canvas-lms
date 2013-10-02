@@ -109,6 +109,8 @@ class ContextModule < ActiveRecord::Base
   scope :unpublished, where(:workflow_state => 'unpublished')
   scope :not_deleted, where("context_modules.workflow_state<>'deleted'")
 
+  alias_method :published?, :active?
+
   def publish_items!
     self.content_tags.select{|t| t.unpublished?}.each do |tag|
       tag.publish

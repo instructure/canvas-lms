@@ -1231,6 +1231,8 @@ class Attachment < ActiveRecord::Base
   end
   memoize :hidden?
 
+  def published?; !hidden?; end
+
   def just_hide
     self.file_state == 'hidden'
   end

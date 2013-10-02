@@ -324,7 +324,11 @@ $(document).ready(function() {
       <%= render :partial => "wiki_pages/content", :locals => {:course_home => true } %>
     <% end %>
   <% elsif @course_home_view == 'modules' %>
-    <%= render :partial => 'context_modules/content', :locals => {:course_home => true} %>
+    <% if @domain_root_account.enable_draft? %>
+      <%= render :partial => 'context_modules/content_next', :locals => {:course_home => true} %>
+    <% else %>
+      <%= render :partial => 'context_modules/content', :locals => {:course_home => true} %>
+    <% end %>
   <% elsif @course_home_view == 'assignments' %>
     <%= render :partial => 'assignments/assignments_list_content', :locals => {:course_home => true} %>
   <% elsif @course_home_view == 'syllabus' %>
