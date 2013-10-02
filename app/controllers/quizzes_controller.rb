@@ -254,6 +254,7 @@ class QuizzesController < ApplicationController
       hash = { :QUIZZES_URL => polymorphic_url([@context, :quizzes]),
              :IS_SURVEY => @quiz.survey?,
              :QUIZ => quiz_json(@quiz,@context,@current_user,session),
+             :COURSE_ID => @context.id,
              :LOCKDOWN_BROWSER => @quiz.require_lockdown_browser?,
              :ATTACHMENTS => Hash[@attachments.map { |_,a| [a.id,attachment_hash(a)]}],
              :CONTEXT_ACTION_SOURCE => :quizzes  }

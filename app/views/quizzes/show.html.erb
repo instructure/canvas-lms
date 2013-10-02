@@ -450,7 +450,9 @@
     <%= render 'cant_go_back_warning' %>
   <% end %>
 
-  <% if @sequence_asset %>
+  <% if @context.draft_state_enabled? %>
+    <div id="module_sequence_footer"></div>
+  <% elsif @sequence_asset %>
     <%= render :partial => "shared/sequence_footer", :locals => {:asset => @sequence_asset} %>
   <% end %>
 
