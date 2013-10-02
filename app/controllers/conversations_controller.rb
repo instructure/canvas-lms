@@ -30,7 +30,7 @@ class ConversationsController < ApplicationController
   before_filter :reject_student_view_student
   before_filter :get_conversation, :only => [:show, :update, :destroy, :add_recipients, :remove_messages]
   before_filter :infer_scope, :only => [:index, :show, :create, :update, :add_recipients, :add_message, :remove_messages]
-  before_filter :normalize_recipients, :only => [:create, :add_recipients, :add_message]
+  before_filter :normalize_recipients, :only => [:create, :add_recipients]
   before_filter :infer_tags, :only => [:create, :add_message, :add_recipients]
 
   # whether it's a bulk private message, or a big group conversation,
@@ -659,8 +659,17 @@ class ConversationsController < ApplicationController
   def add_message
     get_conversation(true)
     if params[:body].present?
+
+      # if this is from old conversations or an admin message, allow people to respond to anyone who
+      # is already a participant. We might want to allow this in general. this will probably change
+      # when we make the account the context of an admin conversation.
+      if @conversation.conversation.context.blank?
+        params[:from_conversation_id] = @conversation.conversation_id
+      end
+      # not a before_filter because the above check needs to delay this until now
+      normalize_recipients
+
       message = build_message
-      conversation_participants = []
       # find included_messages
       message_ids = params[:included_messages]
       message_ids = message_ids.split(/,/) if message_ids.is_a?(String)
