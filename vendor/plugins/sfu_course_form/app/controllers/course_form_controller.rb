@@ -43,9 +43,9 @@ class CourseFormController < ApplicationController
       end
     end
 
-    course_array = ["\"course_id\",\"short_name\",\"long_name\",\"account_id\",\"term_id\",\"status\""]
-    section_array = ["\"section_id\",\"course_id\",\"name\",\"status\",\"start_date\",\"end_date\""]
-    enrollment_array = ["\"course_id\",\"user_id\",\"role\",\"section_id\",\"status\""]
+    course_array = ["course_id,short_name,long_name,account_id,term_id,status,start_date,end_date"]
+    section_array = ["section_id,course_id,name,status,start_date,end_date"]
+    enrollment_array = ["course_id,user_id,role,section_id,status"]
 
     unless cross_list
 
@@ -76,10 +76,7 @@ class CourseFormController < ApplicationController
           course_array.push course_info["course_csv"]
 
           # create section csv
-          course_info["sections"].compact.uniq.each do  |section|
-            section_info = section.split(":_:")
-            section_array.push "#{section_info[0]},#{course_info["course_id"]},#{section_info[1]},active,,,"
-          end
+          section_array.push section_csv(course_info["term"], course_info["sections"], course_info["course_id"])
 
           enrollment_array.push course_info["enrollment_csv_1"]
           enrollment_array.push course_info["enrollment_csv_2"] unless teacher2_username.nil?
@@ -118,17 +115,15 @@ class CourseFormController < ApplicationController
       long_name = (long_names[0, 1] + short_names[1..-1]).join(' / ') if long_name.length > CANVAS_COURSE_NAME_MAX
 
       # create course csv
-      course_array.push "\"#{course_id}\",\"#{short_name}\",\"#{long_name}\",\"#{account_id}\",\"#{term}\",\"active\""
+      selected_term = term(term)
+      course_array.push "#{course_id},#{short_name},#{long_name},#{account_id},#{term},active,#{selected_term.start_at},#{selected_term.end_at}"
 
       # create section csv
-      sections.compact.uniq.each do  |section|
-        section_info = section.first.split(":_:")
-        section_array.push "\"#{section_info[0]}\",\"#{course_id}\",\"#{section_info[1]}\",\"active\",\"\",\"\","
-      end
+      section_array.push section_csv(term, sections, course_id, cross_list)
 
       # create enrollment csv to default section
-      enrollment_array.push "\"#{course_id}\",\"#{teacher_sis_user_id}\",\"teacher\",\"\",\"active\"\n"
-      enrollment_array.push "\"#{course_id}\",\"#{teacher2_sis_user_id}\",\"#{teacher2_role}\",\"\",\"active\"\n" unless teacher2_sis_user_id.nil?
+      enrollment_array.push "#{course_id},#{teacher_sis_user_id},teacher,,active\n"
+      enrollment_array.push "#{course_id},#{teacher2_sis_user_id},#{teacher2_role},,active\n" unless teacher2_sis_user_id.nil?
 
       course_name_too_long = true if long_name.length > CANVAS_COURSE_NAME_MAX
 
@@ -179,24 +174,24 @@ class CourseFormController < ApplicationController
     course["number"] = course_arr[2]
     course["section_name"] = course_arr[3].to_s
     course["title"] = course_arr[4].to_s
-    course["section_tutorials"] = course_arr[5]
+    course["child_sections"] = course_arr[5]
+
+    selected_term = term(course["term"])
 
     course["course_id"] = "#{course["term"]}-#{course["name"]}-#{course["number"]}-#{course["section_name"]}"
-    course["section_id"] = "#{course["term"]}-#{course["name"]}-#{course["number"]}-#{course["section_name"]}:::#{time_stamp}"
+    course["main_section_id"] = "#{course["term"]}-#{course["name"]}-#{course["number"]}-#{course["section_name"]}:::#{time_stamp}"
     course["short_name"] = "#{course["name"].upcase}#{course["number"]} #{course["section_name"].upcase}"
     course["long_name"] =  "#{course["short_name"]} #{course["title"]}"
-    # Default Section set D100, D200, E300, G800 or if only 1 section (i.e. no section tutorials)
-    course["default_section_id"] = course["section_id"] if course["section_name"].end_with? "00" || course["section_tutorials"].nil?
+    course["default_section_id"] = default_section_id(course["term"], course["main_section_id"], course["section_name"], course["child_sections"])
+    course["course_csv"] = "#{course["course_id"]},#{course["short_name"]},#{course["long_name"]},#{account_id},#{course["term"]},active,#{selected_term.start_at},#{selected_term.end_at}"
+    course["enrollment_csv_1"] = "#{course["course_id"]},#{teacher1},teacher,#{course["default_section_id"]},active"
+    course["enrollment_csv_2"] = "#{course["course_id"]},#{teacher2},#{teacher2_role},#{course["default_section_id"]},active" unless teacher2.nil?
 
-    course["course_csv"] = "\"#{course["course_id"]}\",\"#{course["short_name"]}\",\"#{course["long_name"]}\",\"#{account_id}\",\"#{course["term"]}\",\"active\""
-    course["enrollment_csv_1"] = "\"#{course["course_id"]}\",\"#{teacher1}\",\"teacher\",\"#{course["default_section_id"]}\",\"active\""
-    course["enrollment_csv_2"] = "\"#{course["course_id"]}\",\"#{teacher2}\",\"#{teacher2_role}\",\"#{course["default_section_id"]}\",\"active\"" unless teacher2.nil?
+    sections.push "#{course["main_section_id"]}:_:#{course["name"].upcase}#{course["number"]} #{course["section_name"].upcase}"
 
-    sections.push "#{course["section_id"]}:_:#{course["name"].upcase}#{course["number"]} #{course["section_name"].upcase}"
-
-    # add section tutorials csv
-    unless course["section_tutorials"].nil?
-      course["section_tutorials"].split(",").compact.uniq.each do |tutorial_name|
+    # add child sections csv
+    unless course["child_sections"].nil?
+      course["child_sections"].split(",").compact.uniq.each do |tutorial_name|
         section_id = "#{course["term"]}-#{course["name"]}-#{course["number"]}-#{tutorial_name.downcase}:::#{time_stamp}"
         sections.push "#{section_id}:_:#{course["name"].upcase}#{course["number"]} #{tutorial_name.upcase}"
       end
@@ -207,6 +202,30 @@ class CourseFormController < ApplicationController
     course
   end
 
+  def section_csv(term, sections, course_id, cross_list=nil)
+    section_array = []
+    num_of_sections = sections.compact.uniq.count
+    unless cross_list
+      sections.compact.uniq.each do  |section|
+        section_info = section.split(":_:")
+        if term.to_i != 1137 && !section_info[1].to_s.end_with?("00") && num_of_sections > 1
+          # Create only child sections
+          section_array.push "#{section_info[0]},#{course_id},#{section_info[1]},active,,,"
+        elsif term.to_i != 1137 && num_of_sections == 1
+          # No child sections
+          section_array.push "#{section_info[0]},#{course_id},#{section_info[1]},active,,,"
+        elsif term.to_i == 1137
+          section_array.push "#{section_info[0]},#{course_id},#{section_info[1]},active,,,"
+        end
+      end
+    else
+      sections.compact.uniq.each do  |section|
+        section_array.push (section_csv(term, section, course_id))
+      end
+    end
+    section_array
+  end
+
   # e.g. course_line = sandbox-kipling-71113273
   def sandbox_info(course_line, username, teacher1, teacher2 = nil, teacher2_role = 'teacher')
     account_sis_id = "sfu:::sandbox:::instructors"
@@ -214,11 +233,10 @@ class CourseFormController < ApplicationController
     sandbox = {}
     sandbox["course_id"] = course_line
     sandbox["short_long_name"] = "Sandbox - #{username} - #{course_arr.last}"
-    sandbox["default_section_id"] = ""
 
-    sandbox["csv"] = "\"#{sandbox["course_id"]}\",\"#{sandbox["short_long_name"]}\",\"#{sandbox["short_long_name"]}\",\"#{account_sis_id}\",\"\",\"active\""
-    sandbox["enrollment_csv_1"] = "\"#{sandbox["course_id"]}\",\"#{teacher1}\",\"teacher\",\"#{sandbox["default_section_id"]}\",\"active\""
-    sandbox["enrollment_csv_2"] = "\"#{sandbox["course_id"]}\",\"#{teacher2}\",\"#{teacher2_role}\",\"#{sandbox["default_section_id"]}\",\"active\"" unless teacher2.nil?
+    sandbox["csv"] = "#{sandbox["course_id"]},#{sandbox["short_long_name"]},#{sandbox["short_long_name"]},#{account_sis_id},,active"
+    sandbox["enrollment_csv_1"] = "#{sandbox["course_id"]},#{teacher1},teacher,,active"
+    sandbox["enrollment_csv_2"] = "#{sandbox["course_id"]},#{teacher2},#{teacher2_role},,active" unless teacher2.nil?
     sandbox
   end
 
@@ -230,11 +248,10 @@ class CourseFormController < ApplicationController
     ncc["course_id"] = "#{course_arr.first(3).join("-")}"
     ncc["term"] = course_arr[3] # Can be empty!
     ncc["short_long_name"] = course_arr.last
-    ncc["default_section_id"] = ""
 
-    ncc["csv"] = "\"#{ncc["course_id"]}\",\"#{ncc["short_long_name"]}\",\"#{ncc["short_long_name"]}\",\"#{account_sis_id}\",\"#{ncc["term"]}\",\"active\""
-    ncc["enrollment_csv_1"] = "\"#{ncc["course_id"]}\",\"#{teacher1}\",\"teacher\",\"#{ncc["default_section_id"]}\",\"active\""
-    ncc["enrollment_csv_2"] = "\"#{ncc["course_id"]}\",\"#{teacher2}\",\"#{teacher2_role}\",\"#{ncc["default_section_id"]}\",\"active\"" unless teacher2.nil?
+    ncc["csv"] = "#{ncc["course_id"]},#{ncc["short_long_name"]},#{ncc["short_long_name"]},#{account_sis_id},#{ncc["term"]},active"
+    ncc["enrollment_csv_1"] = "#{ncc["course_id"]},#{teacher1},teacher,,active"
+    ncc["enrollment_csv_2"] = "#{ncc["course_id"]},#{teacher2},#{teacher2_role},,active" unless teacher2.nil?
     ncc
   end
 
@@ -259,6 +276,20 @@ class CourseFormController < ApplicationController
   def time_stamp
     t = Time.new
     "#{t.day}#{t.month}#{t.year}#{t.min}#{t.sec}"
+  end
+
+  def default_section_id(term, main_section_id, section_name, child_sections)
+    if term == 1137 && (section_name.end_with? "00" || child_sections.nil?)
+      # Set default Section to D100, D200, E300, G800
+      # e.g. 1137-arch-329-d100:::1762013813
+      main_section_id
+    else
+      ""
+    end
+  end
+
+  def term(term_code)
+    EnrollmentTerm.find(:all, :conditions => ["workflow_state = 'active' AND sis_source_id = :term", {:term => term_code}]).first
   end
 
 end
