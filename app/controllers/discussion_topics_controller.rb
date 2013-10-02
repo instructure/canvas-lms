@@ -192,7 +192,7 @@ class DiscussionTopicsController < ApplicationController
     if states.present?
       if (states.include?('pinned') && states.include?('unpinned')) ||
           (states.include?('locked') && states.include?('unlocked'))
-        render :json => t('errors.bad_scope', "scope is contradictory"), :status => :bad_request
+        render json: {errors: {scope: "scope is contradictory"}}, :status => :bad_request
         return
       end
 
