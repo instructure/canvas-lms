@@ -311,6 +311,17 @@ describe ContextModule do
       @progression.should be_completed
     end
 
+    it "should trigger completion events" do
+      course_module
+      @module.completion_events = [:publish_final_grade]
+      @module.context = @course
+      @module.save!
+      @user = User.create!(:name => "some name")
+      @course.enroll_student(@user)
+      @course.expects(:publish_final_grades).with(@user, @user.id).once
+      @progression = @module.evaluate_for(@user, true)
+    end
+
     it "should create an unlocked progression for no prerequisites" do
       course_module
       @user = User.create!(:name => "some name")
@@ -732,6 +743,17 @@ describe ContextModule do
       ContextModule.any_instance.expects(:re_evaluate_for).never
       new_module.save!
       run_jobs
+    end
+  end
+
+  describe "#completion_events" do
+    it "should serialize correctly" do
+      cm = ContextModule.new
+      cm.completion_events = []
+      cm.completion_events.should == []
+
+      cm.completion_events = ['publish_final_grade']
+      cm.completion_events.should == [:publish_final_grade]
     end
   end
 end

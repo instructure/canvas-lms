@@ -466,7 +466,9 @@ class ContextModule < ActiveRecord::Base
   
   def find_or_create_progression(user)
     return nil unless user
-    ContextModule.find_or_create_progression(self.id, user.id)
+    progression = ContextModule.find_or_create_progression(self.id, user.id)
+    progression.context_module = self
+    progression
   end
   
   def find_or_create_progression_with_multiple_lookups(user)
@@ -802,5 +804,24 @@ class ContextModule < ActiveRecord::Base
       end
     end
     item
+  end
+
+  VALID_COMPLETION_EVENTS = [:publish_final_grade].freeze
+
+  def completion_events
+    (read_attribute(:completion_events) || '').split(',').map(&:to_sym)
+  end
+
+  def completion_events=(value)
+    return write_attribute(:completion_events, nil) unless value
+    write_attribute(:completion_events, (value.map(&:to_sym) & VALID_COMPLETION_EVENTS).join(','))
+  end
+
+  def completion_event_callbacks
+    callbacks = []
+    if completion_events.include?(:publish_final_grade)
+      callbacks << lambda { |user| context.publish_final_grades(user, user.id) }
+    end
+    callbacks
   end
 end
