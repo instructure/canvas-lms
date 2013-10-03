@@ -27,6 +27,7 @@ class ActiveRecord::Base
     'attachments' => %w(enrollment_id cached_s3_url s3_url_cached_at),
     'calendar_events' => %w(calendar_event_repeat_id for_repeat_on),
     'content_tags' => %w(sequence_position context_module_association_id),
+    'context_modules' => %w(downstream_modules),
     'conversation_messages' => %w(context_message_id),
     'course_sections' => %w(sis_cross_listed_section_id sis_cross_listed_section_sis_batch_id sticky_xlist sis_name students_can_participate_before_start_at section_organization_name long_section_code account_id),
     'courses' => %w(section hidden_tabs sis_name sis_course_code hashtag allow_student_assignment_edits publish_grades_immediately),

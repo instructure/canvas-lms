@@ -27,7 +27,6 @@ class ContextModule < ActiveRecord::Base
   
   serialize :prerequisites
   serialize :completion_requirements
-  serialize :downstream_modules
   before_save :infer_position
   before_save :validate_prerequisites
   before_save :confirm_valid_requirements
