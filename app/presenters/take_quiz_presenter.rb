@@ -67,10 +67,32 @@ class TakeQuizPresenter
   def question_class(q)
     classes = ["list_question"]
     classes << "answered" if submission.question_answered?(q[:id])
-    classes << "marked" if submission.submission_data["question_#{q[:id]}_marked"].present?
+    classes << "marked" if marked?(q)
     classes << "seen" if question_seen?(q)
     classes << "current_question" if one_question_at_a_time? && current_question?(q) 
     classes.join(' ')
+  end
+
+  def marked?(q)
+    submission.submission_data["question_#{q[:id]}_marked"].present?
+  end
+
+  def answered_icon(q)
+    question_answered?(q) ? 'icon-check' : 'icon-question'
+  end
+
+  def answered_text(q)
+    if question_answered?(q)
+      I18n.t('question_answered', 'Answered')
+    else
+      I18n.t('question_unanswered', 'Haven\'t Answered Yet')
+    end
+  end
+
+  def marked_text(q)
+    if marked?(q)
+      I18n.t('titles.come_back_later', 'You marked this question to come back to later')
+    end
   end
 
   def current_question?(question)
