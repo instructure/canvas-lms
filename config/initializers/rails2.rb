@@ -1,4 +1,4 @@
-if Rails.version < '3'
+if CANVAS_RAILS2
 
 ActiveRecord::Base.class_eval do
   class << self

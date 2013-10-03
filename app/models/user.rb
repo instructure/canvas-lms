@@ -566,7 +566,7 @@ class User < ActiveRecord::Base
             # for incremental, only update the old association if it is deeper than the new one
             # for non-incremental, update it if it changed
             if incremental && association[1] > depth || !incremental && association[1] != depth
-              if Rails.version < '3.0'
+              if CANVAS_RAILS2
                 UserAccountAssociation.update_all({ :depth => depth }, :id => association[0])
               else
                 UserAccountAssociation.where(:id => association[0]).update_all(:depth => depth)
@@ -579,7 +579,7 @@ class User < ActiveRecord::Base
       end
 
       to_delete += current_associations.map { |k, v| v[0] }
-      if Rails.version < '3.0'
+      if CANVAS_RAILS2
         UserAccountAssociation.delete_all(:id => to_delete) unless incremental || to_delete.empty?
       else
         UserAccountAssociation.where(:id => to_delete).delete_all unless incremental || to_delete.empty?
@@ -2194,7 +2194,7 @@ class User < ActiveRecord::Base
   def shared_contexts(user)
     contexts = []
     if info = load_messageable_user(user)
-      if Rails.version < '3.0'
+      if CANVAS_RAILS2
         contexts += Course.find(:all, :conditions => {:id => info.common_courses.keys}) if info.common_courses.present?
         contexts += Group.find(:all, :conditions => {:id => info.common_groups.keys}) if info.common_groups.present?
       else
@@ -2554,7 +2554,7 @@ class User < ActiveRecord::Base
   end
 
   def stamp_logout_time!
-    if Rails.version < '3.0'
+    if CANVAS_RAILS2
       User.update_all({ :last_logged_out => Time.zone.now }, :id => self)
     else
       User.where(:id => self).update_all(:last_logged_out => Time.zone.now)

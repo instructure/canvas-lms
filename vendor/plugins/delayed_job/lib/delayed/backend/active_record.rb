@@ -197,7 +197,7 @@ module Delayed
             end
 
           scope = scope.group(:tag).offset(offset).limit(limit)
-          (Rails.version < "3.0" ?
+          (CANVAS_RAILS2 ?
               scope.count(:tag, :order => "COUNT(tag) DESC") :
               scope.order("COUNT(tag) DESC").count).map { |t,c| { :tag => t, :count => c } }
         end

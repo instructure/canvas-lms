@@ -30,10 +30,10 @@ class ErrorReport < ActiveRecord::Base
   # Define a custom callback for external notification of an error report.
   define_callbacks :on_send_to_external
   # Setup callback to default behavior.
-  if Rails.version >= "3.0"
-    set_callback :on_send_to_external, :send_via_email_or_post
-  else
+  if CANVAS_RAILS2
     on_send_to_external :send_via_email_or_post
+  else
+    set_callback :on_send_to_external, :send_via_email_or_post
   end
 
   attr_accessible

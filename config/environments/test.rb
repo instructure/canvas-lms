@@ -12,7 +12,7 @@ environment_configuration(defined?(config) && config) do |config|
   config.whiny_nils = false
 
   # Show full error reports and disable caching
-  if Rails.version < "3.0"
+  if CANVAS_RAILS2
     config.action_controller.consider_all_requests_local = true
   else
     config.consider_all_requests_local = true
@@ -41,7 +41,7 @@ environment_configuration(defined?(config) && config) do |config|
   require_dependency 'nil_store'
   config.cache_store = NilStore.new
 
-  if Rails.version < "3.0"
+  if CANVAS_RAILS2
     # Raise an exception on bad mass assignment. Helps us catch these bugs before
     # they hit.
     Canvas.protected_attribute_error = :raise

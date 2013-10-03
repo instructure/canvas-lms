@@ -1,7 +1,7 @@
 module DataFixup::FixOutOfSyncOutcomeAlignments
   def self.run
     # Active alignments to deleted rubrics
-    if Rails.version < '3.0'
+    if CANVAS_RAILS2
       scope = ContentTag.scoped(joins:
         "INNER JOIN rubrics r
           ON content_tags.content_id = r.id
@@ -24,7 +24,7 @@ module DataFixup::FixOutOfSyncOutcomeAlignments
     end
 
     # Active alignments to rubrics that should no longer be aligned
-    if Rails.version < '3.0'
+    if CANVAS_RAILS2
       scope = ContentTag.scoped(joins:
         "INNER JOIN rubrics r
           ON content_tags.content_id = r.id
@@ -48,7 +48,7 @@ module DataFixup::FixOutOfSyncOutcomeAlignments
     end
 
     # Active alignments to assignments without rubrics
-    if Rails.version < '3.0'
+    if CANVAS_RAILS2
       scope = ContentTag.scoped(joins:
         "INNER JOIN assignments a
           ON content_tags.content_id = a.id
@@ -78,7 +78,7 @@ module DataFixup::FixOutOfSyncOutcomeAlignments
 
     # Active alignments to assignments with rubrics
     # that don't have a matching alignment
-    if Rails.version < '3.0'
+    if CANVAS_RAILS2
       scope = ContentTag.scoped(joins:
         "INNER JOIN assignments a
           ON content_tags.content_id = a.id

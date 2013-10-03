@@ -44,12 +44,12 @@ end
 ENV["RAILS_ENV"] = 'test'
 
 require File.expand_path('../../config/environment', __FILE__) unless defined?(Rails)
-if CANVAS_RAILS3
-  require 'rspec/rails'
-else
+if CANVAS_RAILS2
   require 'spec'
   # require 'spec/autorun'
   require 'spec/rails'
+else
+  require 'rspec/rails'
 end
 require 'webrat'
 require 'mocha/api'

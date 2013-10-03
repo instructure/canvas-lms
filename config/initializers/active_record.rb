@@ -3,7 +3,7 @@ class ActiveRecord::Base
 
   extend ActiveSupport::Memoizable # used for a lot of the reporting queries
 
-  if Rails.version < "3.0"
+  if CANVAS_RAILS2
     # this functionality is built into rails 3
     class ProtectedAttributeAssigned < Exception; end
     def log_protected_attribute_removal_with_raise(*attributes)

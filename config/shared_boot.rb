@@ -15,7 +15,7 @@ if ENV['RUNNING_AS_DAEMON'] == 'true'
   config.log_path = Rails.root+'log/delayed_job.log'
 end
 
-log_config = File.exists?(Rails.root+"config/logging.yml") && YAML.load_file(Rails.root+"config/logging.yml")[CANVAS_RAILS3 ? Rails.env : RAILS_ENV]
+log_config = File.exists?(Rails.root+"config/logging.yml") && YAML.load_file(Rails.root+"config/logging.yml")[CANVAS_RAILS2 ? RAILS_ENV : Rails.env]
 log_config = { 'logger' => 'rails', 'log_level' => 'debug' }.merge(log_config || {})
 opts = {}
 require 'canvas_logger'
@@ -35,12 +35,14 @@ when "syslog"
   config.logger = RAILS_DEFAULT_LOGGER = SyslogWrapper.new(ident, facilities, opts)
   config.logger.level = log_level
 else
-  log_path = Rails.version >= "3.0" ? config.paths.log.first : config.log_path
+  log_path = CANVAS_RAILS2 ?
+    config.log_path :
+    config.paths.log.first
   config.logger = RAILS_DEFAULT_LOGGER = CanvasLogger.new(log_path, log_level, opts)
 end
 
 # RailsLTS configuration (doesn't apply to rails 3)
-if Rails.version < "3.0"
+if CANVAS_RAILS2
   config.rails_lts_options = {
     disable_xml_parsing: true,
     # this is also taken care of below, since it defaults to false in rails3 as well
@@ -55,7 +57,7 @@ config.autoload_paths += %W(#{Rails.root}/app/middleware
                             #{Rails.root}/app/observers
                             #{Rails.root}/app/presenters)
 
-if Rails.version < "3.0"
+if CANVAS_RAILS2
   # XXX: Rails3 needs SessionsTimeout
   config.middleware.insert_after(ActionController::Base.session_store, 'SessionsTimeout')
   config.middleware.insert_before('ActionController::ParamsParser', 'LoadAccount')
@@ -79,7 +81,7 @@ end
 # this patch is perfectly placed to go in as soon as the PostgreSQLAdapter
 # is required for the first time, but before it's actually used
 # XXX: Rails3
-if Rails.version < "3.0"
+if CANVAS_RAILS2
   Rails::Initializer.class_eval do
     def initialize_database_with_postgresql_patches
       initialize_database_without_postgresql_patches

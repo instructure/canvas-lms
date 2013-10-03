@@ -889,7 +889,7 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  if Rails.version < "3.0"
+  if CANVAS_RAILS2
     rescue_responses['AuthenticationMethods::AccessTokenError'] = 401
   else
     ActionDispatch::ShowExceptions.rescue_responses['AuthenticationMethods::AccessTokenError'] = 401
@@ -1546,7 +1546,7 @@ class ApplicationController < ActionController::Base
     data
   end
 
-  unless CANVAS_RAILS3
+  if CANVAS_RAILS2
     filter_parameter_logging *LoggingFilter.filtered_parameters
   end
 

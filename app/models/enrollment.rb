@@ -881,7 +881,7 @@ class Enrollment < ActiveRecord::Base
   scope :currently_online, joins(:pseudonyms).where("pseudonyms.last_request_at>?", 5.minutes.ago)
   # this returns enrollments for creation_pending users; should always be used in conjunction with the invited scope
   scope :for_email, lambda { |email|
-    if Rails.version < '3.0'
+    if CANVAS_RAILS2
       {
         :joins => { :user => :communication_channels },
         :conditions => ["users.workflow_state='creation_pending' AND communication_channels.workflow_state='unconfirmed' AND path_type='email' AND LOWER(path)=LOWER(?)", email],

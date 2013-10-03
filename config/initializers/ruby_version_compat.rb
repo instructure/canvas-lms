@@ -65,7 +65,7 @@ module TZInfo
   end
 end
 
-if Rails.version < "3.0"
+if CANVAS_RAILS2
 
   require "active_support/core_ext/string/output_safety"
   class ERB

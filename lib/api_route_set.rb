@@ -126,16 +126,16 @@ class ApiRouteSet
     end
     opts[:constraints] ||= {}
     opts[:constraints][:format] = 'json'
-    if CANVAS_RAILS3
-      opts[:format] = 'json'
-      mapper.send(method, "#{prefix}/#{path}(.json)", opts)
-    else
+    if CANVAS_RAILS2
       # Our fake rails3 router isn't clever enough to translate (.json) to
       # something that rails 2 routing understands, so we help it out here for
       # api routes.
       opts[:format] = false
       mapper.send(method, "#{prefix}/#{path}.json", opts)
       mapper.send(method, "#{prefix}/#{path}", opts)
+    else
+      opts[:format] = 'json'
+      mapper.send(method, "#{prefix}/#{path}(.json)", opts)
     end
   end
 
