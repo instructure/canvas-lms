@@ -217,7 +217,6 @@ class User < ActiveRecord::Base
   has_many :all_conversations, :class_name => 'ConversationParticipant', :include => :conversation
   has_many :conversation_batches, :include => :root_conversation_message
   has_many :favorites
-  has_many :favorite_courses, :source => :course, :through => :current_and_invited_enrollments, :conditions => "EXISTS (SELECT 1 FROM favorites WHERE context_type = 'Course' AND context_id = enrollments.course_id AND user_id = enrollments.user_id)"
   has_many :zip_file_imports, :as => :context
   has_many :messages
 
@@ -1559,7 +1558,7 @@ class User < ActiveRecord::Base
     rid = in_root_account.id
     accts = self.associated_accounts.where("accounts.id = ? OR accounts.root_account_id = ?", rid, rid)
     return [] if accts.blank?
-    children = accts.inject({}) do |hash,acct| 
+    children = accts.inject({}) do |hash,acct|
       pid = acct.parent_account_id
       if pid.present?
         hash[pid] ||= []
@@ -1580,7 +1579,19 @@ class User < ActiveRecord::Base
   def courses_with_primary_enrollment(association = :current_and_invited_courses, enrollment_uuid = nil, options = {})
     res = self.shard.activate do
       Rails.cache.fetch([self, 'courses_with_primary_enrollment', association, options].cache_key, :expires_in => 15.minutes) do
-        send(association).with_each_shard do |scope|
+
+        # Set the actual association based on if its asking for favorite courses or not.
+        actual_association = association == :favorite_courses ? :current_and_invited_courses : association
+
+        send(actual_association).with_each_shard do |scope|
+
+          # Limit favorite courses based on current shard.
+          if association == :favorite_courses
+            local_ids = self.favorite_context_ids("Course")
+            next if local_ids.length < 1
+            scope = scope.where(:id => local_ids)
+          end
+
           courses = scope.distinct_on(["courses.id"],
             :select => "courses.*, enrollments.id AS primary_enrollment_id, enrollments.type AS primary_enrollment, #{Enrollment.type_rank_sql} AS primary_enrollment_rank, enrollments.workflow_state AS primary_enrollment_state",
             :order => "courses.id, #{Enrollment.type_rank_sql}, #{Enrollment.state_rank_sql}")
@@ -2249,6 +2260,34 @@ class User < ActiveRecord::Base
       :accounts => self.accounts,
       :accounts_count => self.accounts.length,
     }
+  end
+
+  # Public: Returns a unique list of favorite context type ids relative to the active shard.
+  #
+  # Examples
+  #
+  #   favorite_context_ids("Course")
+  #   # => [1, 2, 3, 4]
+  #
+  # Returns an array of unique global ids.
+  def favorite_context_ids(context_type)
+    @favorite_context_ids ||= {}
+
+    context_ids = @favorite_context_ids[context_type]
+    unless context_ids
+      # Only get the users favorites from their shard.
+      self.shard.activate do
+        # Get favorites and map them to their global ids.
+        context_ids = self.favorites.where(context_type: context_type).pluck(:context_id).map { |id| Shard.global_id_for(id) }
+        @favorite_context_ids[context_type] = context_ids
+      end
+    end
+
+    # Return ids relative for the current shard and only the ids for the current shard.
+    context_ids.map { |id|
+      relative_id = Shard.relative_id_for(id)
+      relative_id == id ? nil : relative_id
+    }.compact
   end
 
   def menu_courses(enrollment_uuid = nil)

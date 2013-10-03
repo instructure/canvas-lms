@@ -1242,6 +1242,50 @@ describe User do
     end
   end
 
+  describe "favorites" do
+    before :each do
+      @user = User.create!
+
+      @courses = []
+      (1..3).each do |x|
+        course = course_with_student(:course_name => "Course #{x}", :user => @user, :active_all => true).course
+        @courses << course
+        @user.favorites.build(context: course)
+      end
+
+      @user.save!
+    end
+
+    it "should default favorites to enrolled courses when favorite courses do not exist" do
+      @user.favorites.by("Course").destroy_all
+      @user.menu_courses.should == @courses
+    end
+
+    it "should only include favorite courses when set" do
+      @user.favorites.by("Course").first.destroy
+      @user.menu_courses.should == [ @courses[1], @courses[2] ]
+    end
+
+    context "sharding" do
+      specs_require_sharding
+
+      before :each do
+        (4..6).each do |x|
+          course = course_with_student(:course_name => "Course #{x}", :user => @user, :active_all => true).course
+          @courses << course
+          @user.favorites.build(context: course)
+        end
+
+        @user.save!
+      end
+
+      it "should include cross shard favorite courses" do
+        @user.favorites.by("Course").where("id % 2 = 0").destroy_all
+        @user.menu_courses.size.should eql(@courses.length / 2)
+      end
+    end
+  end
+
   describe "cached_current_enrollments" do
     it "should include temporary invitations" do
       user_with_pseudonym(:active_all => 1)
