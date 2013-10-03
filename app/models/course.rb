@@ -773,8 +773,8 @@ class Course < ActiveRecord::Base
     end
   end
 
-  def recompute_student_scores
-    Enrollment.recompute_final_score(student_ids, self.id)
+  def recompute_student_scores(student_ids = nil)
+    Enrollment.recompute_final_score(student_ids || self.student_ids, self.id)
   end
   handle_asynchronously_if_production :recompute_student_scores,
     :singleton => proc { |c| "recompute_student_scores:#{ c.global_id }" }
@@ -1307,7 +1307,7 @@ class Course < ActiveRecord::Base
     return true
   end
 
-  def publish_final_grades(publishing_user)
+  def publish_final_grades(publishing_user, user_ids_to_publish = nil)
     # we want to set all the publishing statuses to 'pending' immediately,
     # and then as a delayed job, actually go publish them.
 
@@ -1315,20 +1315,23 @@ class Course < ActiveRecord::Base
     settings = Canvas::Plugin.find!('grade_export').settings
 
     last_publish_attempt_at = Time.now.utc
-    self.student_enrollments.not_fake.update_all(:grade_publishing_status => "pending",
+    scope = self.student_enrollments.not_fake
+    scope = scope.where(user_id: user_ids_to_publish) if user_ids_to_publish
+    scope.update_all(:grade_publishing_status => "pending",
                                         :grade_publishing_message => nil,
                                         :last_publish_attempt_at => last_publish_attempt_at)
 
-    send_later_if_production(:send_final_grades_to_endpoint, publishing_user)
+    send_later_if_production(:send_final_grades_to_endpoint, publishing_user, user_ids_to_publish)
     send_at(last_publish_attempt_at + settings[:success_timeout].to_i.seconds, :expire_pending_grade_publishing_statuses, last_publish_attempt_at) if should_kick_off_grade_publishing_timeout?
   end
 
-  def send_final_grades_to_endpoint(publishing_user)
+  def send_final_grades_to_endpoint(publishing_user, user_ids_to_publish = nil)
     # actual grade publishing logic is here, but you probably want
     # 'publish_final_grades'
 
-    self.recompute_student_scores_without_send_later
+    self.recompute_student_scores_without_send_later(user_ids_to_publish)
     enrollments = self.student_enrollments.not_fake.includes(:user, :course_section).order_by_sortable_name
+    enrollments = enrollments.where(user_id: user_ids_to_publish) if user_ids_to_publish
 
     errors = []
     posts_to_make = []

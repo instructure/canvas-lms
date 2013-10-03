@@ -1350,7 +1350,7 @@ describe Course, 'grade_publishing' do
 
       it 'should check whether or not grade export is enabled - success' do
         grade_publishing_user
-        @course.expects(:send_final_grades_to_endpoint).with(@user).returns(nil)
+        @course.expects(:send_final_grades_to_endpoint).with(@user, nil).returns(nil)
         @plugin.stubs(:enabled?).returns(true)
         @plugin_settings[:publish_endpoint] = "http://localhost/endpoint"
         @course.publish_final_grades(@user)
@@ -1370,7 +1370,7 @@ describe Course, 'grade_publishing' do
         @student_enrollments.map(&:workflow_state).should == ["active"] * 6 + ["inactive"] + ["active"] * 2
         @student_enrollments.map(&:last_publish_attempt_at).should == [nil] * 9
         grade_publishing_user
-        @course.expects(:send_final_grades_to_endpoint).with(@user).returns(nil)
+        @course.expects(:send_final_grades_to_endpoint).with(@user, nil).returns(nil)
         @plugin.stubs(:enabled?).returns(true)
         @plugin_settings[:publish_endpoint] = "http://localhost/endpoint"
         @course.publish_final_grades(@user)
@@ -1388,15 +1388,25 @@ describe Course, 'grade_publishing' do
 
       it 'should kick off the actual grade send' do
         grade_publishing_user
-        @course.expects(:send_later_if_production).with(:send_final_grades_to_endpoint, @user).returns(nil)
+        @course.expects(:send_later_if_production).with(:send_final_grades_to_endpoint, @user, nil).returns(nil)
         @plugin.stubs(:enabled?).returns(true)
         @plugin_settings[:publish_endpoint] = "http://localhost/endpoint"
         @course.publish_final_grades(@user)
       end
 
+      it 'should kick off the actual grade send for a specific user' do
+        grade_publishing_user
+        make_student_enrollments
+        @course.expects(:send_later_if_production).with(:send_final_grades_to_endpoint, @user, @student_enrollments.first.user_id).returns(nil)
+        @plugin.stubs(:enabled?).returns(true)
+        @plugin_settings[:publish_endpoint] = "http://localhost/endpoint"
+        @course.publish_final_grades(@user, @student_enrollments.first.user_id)
+        @student_enrollments.first.reload.grade_publishing_status.should == "pending"
+      end
+
       it 'should kick off the timeout when a success timeout is defined and waiting is configured' do
         grade_publishing_user
-        @course.expects(:send_later_if_production).with(:send_final_grades_to_endpoint, @user).returns(nil)
+        @course.expects(:send_later_if_production).with(:send_final_grades_to_endpoint, @user, nil).returns(nil)
         current_time = Time.now.utc
         Time.stubs(:now).returns(current_time)
         current_time.stubs(:utc).returns(current_time)
@@ -1412,7 +1422,7 @@ describe Course, 'grade_publishing' do
 
       it 'should not kick off the timeout when a success timeout is defined and waiting is not configured' do
         grade_publishing_user
-        @course.expects(:send_later_if_production).with(:send_final_grades_to_endpoint, @user).returns(nil)
+        @course.expects(:send_later_if_production).with(:send_final_grades_to_endpoint, @user, nil).returns(nil)
         current_time = Time.now.utc
         Time.stubs(:now).returns(current_time)
         current_time.stubs(:utc).returns(current_time)
@@ -1428,7 +1438,7 @@ describe Course, 'grade_publishing' do
 
       it 'should not kick off the timeout when a success timeout is not defined and waiting is not configured' do
         grade_publishing_user
-        @course.expects(:send_later_if_production).with(:send_final_grades_to_endpoint, @user).returns(nil)
+        @course.expects(:send_later_if_production).with(:send_final_grades_to_endpoint, @user, nil).returns(nil)
         current_time = Time.now.utc
         Time.stubs(:now).returns(current_time)
         current_time.stubs(:utc).returns(current_time)
@@ -1444,7 +1454,7 @@ describe Course, 'grade_publishing' do
 
       it 'should not kick off the timeout when a success timeout is not defined and waiting is configured' do
         grade_publishing_user
-        @course.expects(:send_later_if_production).with(:send_final_grades_to_endpoint, @user).returns(nil)
+        @course.expects(:send_later_if_production).with(:send_final_grades_to_endpoint, @user, nil).returns(nil)
         current_time = Time.now.utc
         Time.stubs(:now).returns(current_time)
         current_time.stubs(:utc).returns(current_time)
@@ -1545,6 +1555,35 @@ describe Course, 'grade_publishing' do
               }
           })
         @course.send_final_grades_to_endpoint @user
+        @checked.should be_true
+      end
+
+      it "should try to publish appropriate enrollments (limited users)" do
+        plugin_settings = Course.valid_grade_export_types["instructure_csv"]
+        Course.stubs(:valid_grade_export_types).returns(plugin_settings.merge({
+                "instructure_csv" => { :requires_grading_standard => true, :requires_publishing_pseudonym => true }}))
+        @course.grading_standard_enabled = true
+        @course.save!
+        grade_publishing_user
+        @plugin.stubs(:enabled?).returns(true)
+        @plugin_settings.merge!({
+                                    :publish_endpoint => "http://localhost/endpoint",
+                                    :format_type => "instructure_csv"
+                                })
+        @checked = false
+        Course.stubs(:valid_grade_export_types).returns({
+                                                            "instructure_csv" => {
+                                                                :callback => lambda {|course, enrollments, publishing_user, publishing_pseudonym|
+                                                                  course.should == @course
+                                                                  enrollments.should == [@student_enrollments.first]
+                                                                  publishing_pseudonym.should == @pseudonym
+                                                                  publishing_user.should == @user
+                                                                  @checked = true
+                                                                  return []
+                                                                }
+                                                            }
+                                                        })
+        @course.send_final_grades_to_endpoint @user, @student_enrollments.first.user_id
         @checked.should be_true
       end
 
