@@ -853,16 +853,21 @@ form.question_form
 
 ul#question_list
   margin: 0 0 13px
-  padding: 0 0 0 40px
+  padding: 0 0 0 20px
   list-style-type: none
   li
+    padding-left: 20px
+
+    i
+      color: #595959
+      margin-right: 4px
     &.answered a
       color: #a1bfe0
     &.answered.current_question a
       color: #396eb2
     &.marked
       :font-weight bold
-      :list-style-image url(/images/flagged_question.png)
+      background: url(/images/flagged_question.png) 3px 7px no-repeat
     &.current_question
       :color $right_side_text_color !important
       :font-weight bold

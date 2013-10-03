@@ -125,6 +125,71 @@ describe TakeQuizPresenter do
     end
   end
 
+  describe "marked?" do
+    before do
+      submission.stubs(:submission_data).returns(
+        "question_#{question1[:id]}_marked" => true,
+        "question_#{question2[:id]}_marked" => false
+      )
+    end
+
+    it "returns true if the submission is marked" do
+      presenter.marked?(question1).should be_true
+    end
+
+    it "returns false if the submission is not marked" do
+      presenter.marked?(question2).should be_false
+    end
+  end
+
+  describe "answered_icon" do
+    before do
+      submission.stubs(:question_answered?).with(question1[:id]).returns(true)
+      submission.stubs(:question_answered?).with(question2[:id]).returns(false)
+    end
+
+    it 'returns icon-check for answered questions' do
+      presenter.answered_icon(question1).should == 'icon-check'
+    end
+
+    it 'returns icon-question for unanswered questions' do
+      presenter.answered_icon(question2).should == 'icon-question'
+    end
+  end
+
+  describe "answered_text" do
+    before do
+      submission.stubs(:question_answered?).with(question1[:id]).returns(true)
+      submission.stubs(:question_answered?).with(question2[:id]).returns(false)
+    end
+
+    it 'returns icon-check for answered questions' do
+      presenter.answered_text(question1).should == 'Answered'
+    end
+
+    it 'returns icon-question for unanswered questions' do
+      presenter.answered_text(question2).should == 'Haven\'t Answered Yet'
+    end
+  end
+
+  describe "marked_text" do
+    before do
+      submission.stubs(:submission_data).returns(
+        "question_#{question1[:id]}_marked" => true,
+        "question_#{question2[:id]}_marked" => false
+      )
+    end
+
+    it "returns text if the submission is marked" do
+      text = "You marked this question to come back to later"
+      presenter.marked_text(question1).should == text
+    end
+
+    it "returns empty string if the submission is not marked" do
+      presenter.marked_text(question2).should be_nil
+    end
+  end
+
   describe "current_question?" do
     before do
       set_current_question question2

@@ -308,15 +308,15 @@ define([
         var listSelector = "#list_" + questionId;
         var questionSelector = "#" + questionId;
         var combinedId = listSelector + ", " + questionSelector;
-        var $questionIcon = $(listSelector + "> i.placeholder");
+        var $questionIcon = $(listSelector + " i.placeholder");
         if(answer) {
           $(combinedId).addClass('answered');
           $questionIcon.addClass('icon-check').removeClass('icon-question');
-          $questionIcon.siblings('div.icon-text').text(I18n.t('question_answered',"Answered"))
+          $questionIcon.find('.icon-text').text(I18n.t('question_answered', "Answered"));
         } else {
           $(combinedId).removeClass('answered');
           $questionIcon.addClass('icon-question').removeClass('icon-check');
-          $questionIcon.siblings('div.icon-text').text(I18n.t('question_unanswered', "Haven't Answered Yet"))
+          $questionIcon.find('.icon-text').text(I18n.t('question_unanswered', "Haven't Answered Yet"));
         }
       },
 
@@ -348,6 +348,11 @@ define([
     lastAnswerSelected = $(event.target).parents(".answer")[0];
   }).keydown(function() {
     lastAnswerSelected = null;
+  });
+
+  // fix screenreader focus for links to href="#target"
+  $("a[href^='#']").not("a[href='#']").click(function() {
+    $($(this).attr('href')).attr('tabindex', -1).focus()
   });
 
   $(function() {
@@ -401,15 +406,7 @@ define([
       .find(".list_question").bind({
         mouseenter: function(event) {
           var $this = $(this),
-              data = $this.data(),
-              title = I18n.t('titles.not_answered', "Haven't Answered yet");
-
-          if ($this.hasClass('marked')) {
-            title = I18n.t('titles.come_back_later', "You marked this question to come back to later");
-          } else if ($this.hasClass('answered')) {
-            title = I18n.t('titles.answered', "Answered");
-          }
-          $this.attr('title', title);
+              data = $this.data();
 
           if(!quizSubmission.oneAtATime) {
             data.relatedQuestion || (data.relatedQuestion = $("#" + $this.attr('id').substring(5)));
@@ -466,6 +463,15 @@ define([
         $question.toggleClass('marked');
         $(this).attr("aria-checked", $question.hasClass('marked'));
         $("#list_" + $question.attr('id')).toggleClass('marked');
+
+        var markedText;
+        if ($("#list_" + $question.attr('id')).hasClass('marked')) {
+          markedText = I18n.t('titles.come_back_later', 'You marked this question to come back to later');
+        } else {
+          markedText = "";
+        }
+        $("#list_" + $question.attr('id')).find(".marked-status").text(markedText);
+
         quizSubmission.updateSubmission();
       })
       .delegate(".question_input", 'change', function(event, update, changedMap) {
