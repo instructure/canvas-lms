@@ -15,6 +15,7 @@ describe "default plugins" do
     Twitter.stubs(:config_check).returns("Bad check")
     get "/plugins/twitter"
 
+    multiple_accounts_select
     f("#plugin_setting_disabled").click
     wait_for_ajaximations
     f("#settings_api_key").send_keys("asdf")
@@ -41,8 +42,8 @@ describe "default plugins" do
     settings.should be_nil
 
     get "/plugins/etherpad"
-    get "/plugins/etherpad"
 
+    multiple_accounts_select
     f("#plugin_setting_disabled").click
     wait_for_ajaximations
     f("#settings_domain").send_keys("asdf")
@@ -69,6 +70,7 @@ describe "default plugins" do
     GoogleDocs.stubs(:config_check).returns("Bad check")
     get "/plugins/google_docs"
 
+    multiple_accounts_select
     f("#plugin_setting_disabled").click
     wait_for_ajaximations
     f("#settings_api_key").send_keys("asdf")
@@ -96,6 +98,7 @@ describe "default plugins" do
     LinkedIn.stubs(:config_check).returns("Bad check")
     get "/plugins/linked_in"
 
+    multiple_accounts_select
     f("#plugin_setting_disabled").click
     wait_for_ajaximations
     f("#settings_api_key").send_keys("asdf")
@@ -123,6 +126,7 @@ describe "default plugins" do
     ScribdAPI.stubs(:config_check).returns("Bad check")
     get "/plugins/scribd"
 
+    multiple_accounts_select
     f("#plugin_setting_disabled").click
 
     f("#settings_api_key").send_keys("asdf")
@@ -152,6 +156,7 @@ describe "default plugins" do
     Tinychat.stubs(:config_check).returns("Bad check")
     get "/plugins/tinychat"
 
+    multiple_accounts_select
     f("#plugin_setting_disabled").click
     wait_for_ajaximations
     f("#settings_api_key").send_keys("asdf")
@@ -170,6 +175,13 @@ describe "default plugins" do
     settings.should_not be_nil
     settings[:api_key].should == 'asdf'
     settings[:secret_key].should == 'asdf'
+  end
+
+  def multiple_accounts_select
+    if !f("#plugin_setting_disabled").displayed?
+      f("#accounts_select option:nth-child(2)").click
+      keep_trying_until { f("#plugin_setting_disabled").displayed? }
+    end
   end
 end
 
