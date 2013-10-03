@@ -755,5 +755,14 @@ describe ContextModule do
       cm.completion_events = ['publish_final_grade']
       cm.completion_events.should == [:publish_final_grade]
     end
+
+    it "should generate methods correctly" do
+      cm = ContextModule.new
+      cm.publish_final_grade?.should be_false
+      cm.publish_final_grade = true
+      cm.publish_final_grade?.should be_true
+      cm.publish_final_grade = false
+      cm.publish_final_grade?.should be_false
+    end
   end
 end

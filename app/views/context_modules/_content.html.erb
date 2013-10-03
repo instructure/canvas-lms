@@ -124,7 +124,16 @@ TEXT
           </div>
         </div>
       </td>
-    </tr><tr>
+    </tr>
+    <% if Canvas::Plugin.find!('grade_export').enabled? %>
+      <tr>
+        <td colspan="2">
+          <%= f.check_box :publish_final_grade, :id => "publish_final_grade" %>
+          <%= f.label :publish_final_grade, :en => "publish final grade for the student when this module is completed", :for => "publish_final_grade" %>
+        </td>
+      </tr>
+    <% end %>
+    <tr>
         <td colspan="2">
           <%= f.check_box :require_sequential_progress, :id => "require_sequential_progress" %>
           <%= f.label :require_sequential_progress, :en => "students must move through requirements in this module in sequential order", :for => "require_sequential_progress" %>

@@ -19,7 +19,7 @@
 class ContextModule < ActiveRecord::Base
   include Workflow
   include SearchTermHelper
-  attr_accessible :context, :name, :unlock_at, :require_sequential_progress, :completion_requirements, :prerequisites
+  attr_accessible :context, :name, :unlock_at, :require_sequential_progress, :completion_requirements, :prerequisites, :publish_final_grade
   belongs_to :context, :polymorphic => true
   has_many :context_module_progressions, :dependent => :destroy
   has_many :content_tags, :dependent => :destroy, :order => 'content_tags.position, content_tags.title'
@@ -817,9 +817,25 @@ class ContextModule < ActiveRecord::Base
     write_attribute(:completion_events, (value.map(&:to_sym) & VALID_COMPLETION_EVENTS).join(','))
   end
 
+  VALID_COMPLETION_EVENTS.each do |event|
+    self.class_eval <<-CODE
+      def #{event}=(value)
+        if Canvas::Plugin.value_to_boolean(value)
+          self.completion_events |= [:#{event}]
+        else
+          self.completion_events -= [:#{event}]
+        end
+      end
+
+      def #{event}?
+        completion_events.include?(:#{event})
+      end
+    CODE
+  end
+
   def completion_event_callbacks
     callbacks = []
-    if completion_events.include?(:publish_final_grade)
+    if publish_final_grade?
       callbacks << lambda { |user| context.publish_final_grades(user, user.id) }
     end
     callbacks
