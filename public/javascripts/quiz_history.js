@@ -52,13 +52,11 @@ define([
     $quizBody: null,
 
     jumpToQuestion: function(question_id) {
-      var top = $("#question_" + question_id).offset().top - 180;
+      var top = $("#question_" + question_id).offset().top - 10;
       if(scoringSnapshot.$quizBody === null){
         scoringSnapshot.$quizBody = $('html,body');
       }
-      scoringSnapshot.$quizBody.stop();
-      scoringSnapshot.$quizBody.clearQueue();
-      scoringSnapshot.$quizBody.animate({scrollTop: top}, 500);
+      scoringSnapshot.$quizBody.scrollTo({top:top, left:0});
     },
 
     externallySet: false,
@@ -186,10 +184,6 @@ define([
     initialize: function(){
       $('.user_points > .question_input').each(function(index){
         quizNavBar.updateStatusFor($(this));
-        var questionId = parseInt(parentWindow.get('active_question_id'));
-        if(!isNaN(questionId)){
-          scoringSnapshot.jumpToQuestion(questionId);
-        }
       });
     },
 
@@ -378,13 +372,6 @@ define([
     });
 
     $(document).scroll(gradingForm.onScroll);
-
-    //Add padding to the bottom of the last question
-    var winHeight = $(window).innerHeight();
-    var lastHeight = $('div.question_holder:last-child').outerHeight();
-    var paddingHeight = (winHeight - lastHeight - 110);
-    $('#update_history_form .button-container').css('marginBottom', paddingHeight + 'px');
-
 
     $('.question_holder').click(function() {
       $('.quiz-nav li').removeClass('active');
