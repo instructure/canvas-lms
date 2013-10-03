@@ -1173,6 +1173,8 @@ describe "discussions" do
     end
 
     it "should automatically mark things as read" do
+      resize_screen_to_default
+
       reply_count = 2
       reply_count.times { @topic.discussion_entries.create!(:message => 'Lorem ipsum dolor sit amet', :user => @student) }
       @topic.create_materialized_view
@@ -1183,6 +1185,7 @@ describe "discussions" do
       f('.new-and-total-badge .new-items').text.should == reply_count.to_s
 
       #wait for the discussionEntryReadMarker to run, make sure it marks everything as .just_read
+      driver.execute_script("$('.entry_content').last().get(0).scrollIntoView()")
       keep_trying_until { ff('.discussion_entry.unread').should be_empty }
       ff('.discussion_entry.read').length.should == reply_count + 1 # +1 because the topic also has the .discussion_entry class
 
@@ -1201,6 +1204,8 @@ describe "discussions" do
       get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
       ff(".discussion_entry.unread").size.should == 2
       f('.new-and-total-badge .new-items').text.should == '2'
+
+      driver.execute_script("$('.entry_content').last().get(0).scrollIntoView()")
       keep_trying_until { ff('.discussion_entry.unread').size < 2 }
       wait_for_ajaximations
       ff(".discussion_entry.unread").size.should == 1
