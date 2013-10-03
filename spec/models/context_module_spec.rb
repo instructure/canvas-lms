@@ -765,4 +765,13 @@ describe ContextModule do
       cm.publish_final_grade?.should be_false
     end
   end
+
+  describe "#find_or_create_progression" do
+    it "should not create progressions for non-enrolled users" do
+      course = Course.create!
+      cm = course.context_modules.create!
+      user = User.create!
+      cm.find_or_create_progression(user).should == nil
+    end
+  end
 end

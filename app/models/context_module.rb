@@ -341,6 +341,7 @@ class ContextModule < ActiveRecord::Base
     return nil unless self.context.users.include?(user)
     return nil unless self.prerequisites_satisfied?(user)
     progression = self.find_or_create_progression(user)
+    return unless progression
     progression.requirements_met ||= []
     requirement = self.completion_requirements.to_a.find{|p| p[:id] == tag.local_id}
     return if !requirement || progression.requirements_met.include?(requirement)
@@ -466,7 +467,19 @@ class ContextModule < ActiveRecord::Base
   
   def find_or_create_progression(user)
     return nil unless user
-    progression = ContextModule.find_or_create_progression(self.id, user.id)
+    progression = nil
+    self.shard.activate do
+      Shackles.activate(:master) do
+        self.class.unique_constraint_retry do
+          progression = context_module_progressions.where(user_id: user).first
+          if !progression
+            # check if we should even be creating a progression for this user
+            return nil unless context.enrollments.except(:includes).where(user_id: user).exists?
+            progression = context_module_progressions.create!(user: user)
+          end
+        end
+      end
+    end
     progression.context_module = self
     progression
   end
@@ -475,14 +488,6 @@ class ContextModule < ActiveRecord::Base
     user.module_progression_for(self.id) || self.find_or_create_progression(user)
   end
   
-  def self.find_or_create_progression(module_id, user_id)
-    Shackles.activate(:master) do
-      unique_constraint_retry do
-        ContextModuleProgression.find_or_create_by_context_module_id_and_user_id(module_id, user_id)
-      end
-    end
-  end
-
   def content_tags_hash
     return @tags_hash if @tags_hash
     @tags_hash = {}
@@ -498,6 +503,7 @@ class ContextModule < ActiveRecord::Base
     end
     return nil unless user
     progression ||= self.find_or_create_progression_with_multiple_lookups(user)
+    return unless progression
     if self.unpublished?
       progression.workflow_state = 'locked'
       Shackles.activate(:master) do
