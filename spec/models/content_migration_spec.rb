@@ -851,6 +851,7 @@ describe ContentMigration do
     end
 
     it "should not duplicate quizzes and associated items if overwrite_quizzes is true" do
+      pending unless Qti.qti_enabled?
       # overwrite_quizzes should now default to true for course copy and canvas import
 
       quiz = @copy_from.quizzes.create!(:title => "published quiz")
@@ -894,6 +895,7 @@ describe ContentMigration do
     end
 
     it "should duplicate quizzes and associated items if overwrite_quizzes is false" do
+      pending unless Qti.qti_enabled?
       quiz = @copy_from.quizzes.create!(:title => "published quiz")
       quiz2 = @copy_from.quizzes.create!(:title => "unpublished quiz")
       quiz.did_edit
