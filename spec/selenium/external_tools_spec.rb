@@ -689,16 +689,17 @@ describe "external tools" do
        'meta' => { "next" => "https://www.example.com/api/v1/apps?offset=72"},
        'current_offset' => 0,
        'limit' => 72,
-       'objects' => [
+       'lti_apps' => [
            {
                'name' => 'First Tool',
-               'id' => 'first_tool',
-               'any_key' => true,
-               'config_url' => ""
+               'short_name' => 'first_tool',
+               'requires_secret' => false,
+               'config_xml_url' => ""
            },
            {
                'name' => 'Second Tool',
-               'id' => 'second_tool',
+               'short_name' => 'second_tool',
+               'requires_secret' => true,
            }
        ]
     })
@@ -707,15 +708,21 @@ describe "external tools" do
          'meta' => { "next" => "https://www.example.com/api/v1/apps/first_tool/reviews?offset=15"},
          'current_offset' => 0,
          'limit' => 15,
-         'objects' => [
+         'reviews' => [
              {
-                 'user_name' => 'Iron Man',
-                 'user_avatar_url' => 'http://www.example.com/rich.ico',
+                 'user' => {
+                     "name" => 'Iron Man',
+                     "avatar_url" => 'http://www.example.com/rich.ico',
+                     "url" => nil
+                 },
                  'comments' => 'This tool is so great',
              },
              {
-                 'user_name' => 'The Hulk',
-                 'user_avatar_url' => 'http://www.example.com/beefy.ico',
+                 'user' => {
+                     "name" => 'The Hulk',
+                     "avatar_url" => 'http://www.example.com/beefy.ico',
+                     "url" => nil
+                 },
                  'comments' => 'SMASH!',
              }
          ]

@@ -288,7 +288,7 @@ define [
 
     toPrecision: (number, precision) ->
       if number
-        number.toPrecision(precision)
+        parseFloat(number).toPrecision(precision)
       else
         ''
 
