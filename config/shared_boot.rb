@@ -32,14 +32,16 @@ when "syslog"
   end
   ident = ENV['RUNNING_AS_DAEMON'] == 'true' ? log_config["daemon_ident"] : log_config["app_ident"]
   opts[:include_pid] = true if log_config["include_pid"] == true
-  config.logger = RAILS_DEFAULT_LOGGER = SyslogWrapper.new(ident, facilities, opts)
+  config.logger = SyslogWrapper.new(ident, facilities, opts)
   config.logger.level = log_level
 else
   log_path = CANVAS_RAILS2 ?
     config.log_path :
     config.paths.log.first
-  config.logger = RAILS_DEFAULT_LOGGER = CanvasLogger.new(log_path, log_level, opts)
+  config.logger = CanvasLogger.new(log_path, log_level, opts)
 end
+
+RAILS_DEFAULT_LOGGER = config.logger if CANVAS_RAILS2
 
 # RailsLTS configuration (doesn't apply to rails 3)
 if CANVAS_RAILS2
