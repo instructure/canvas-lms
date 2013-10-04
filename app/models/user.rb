@@ -1151,7 +1151,7 @@ class User < ActiveRecord::Base
   end
 
   def self.max_messages_per_day
-    Setting.get_cached('max_messages_per_day_per_user', 500).to_i
+    Setting.get('max_messages_per_day_per_user', 500).to_i
   end
 
   def max_messages_per_day
@@ -1970,7 +1970,7 @@ class User < ActiveRecord::Base
 
   def self.preload_conversation_context_codes(users)
     users = users.reject { |u| u.instance_variable_get(:@conversation_context_codes) }
-    return if users.length < Setting.get_cached("min_users_for_conversation_context_codes_preload", 5).to_i
+    return if users.length < Setting.get("min_users_for_conversation_context_codes_preload", 5).to_i
     preload_shard_associations(users)
     shards = Set.new
     users.each do |user|
@@ -2074,7 +2074,7 @@ class User < ActiveRecord::Base
   end
   
   def self.default_storage_quota
-    Setting.get_cached('user_default_quota', 50.megabytes.to_s).to_i
+    Setting.get('user_default_quota', 50.megabytes.to_s).to_i
   end
 
   def update_last_user_note

@@ -936,7 +936,7 @@ class Course < ActiveRecord::Base
   def storage_quota
     return read_attribute(:storage_quota) ||
       (self.account.default_storage_quota rescue nil) ||
-      Setting.get_cached('course_default_quota', 500.megabytes.to_s).to_i
+      Setting.get('course_default_quota', 500.megabytes.to_s).to_i
   end
 
   def storage_quota=(val)
@@ -1101,7 +1101,7 @@ class Course < ActiveRecord::Base
   def old_gradebook_visible?
     !(large_roster? || (
       student_count = Rails.cache.fetch(['student_count', self].cache_key) { students.count }
-      student_count > Setting.get_cached('gb1_max', '250').to_i)
+      student_count > Setting.get('gb1_max', '250').to_i)
     )
   end
 

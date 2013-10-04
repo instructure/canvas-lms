@@ -117,7 +117,7 @@ class ContentParticipationCount < ActiveRecord::Base
   # - unmuting an assignment with submissions
   # - deleting a discussion/announcement/assignment/submission
   def ttl
-    Setting.get_cached('content_participation_count_ttl', 30.minutes).to_i
+    Setting.get('content_participation_count_ttl', 30.minutes).to_i
   end
   private :ttl
 end

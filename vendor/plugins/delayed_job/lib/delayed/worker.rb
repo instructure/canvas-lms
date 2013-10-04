@@ -86,9 +86,9 @@ class Worker
 
   def run
     # need to do this here, since we're avoiding db calls in the master process pre-fork
-    @sleep_delay ||= Setting.get_cached('delayed_jobs_sleep_delay', '5.0').to_f
-    @sleep_delay_stagger ||= Setting.get_cached('delayed_jobs_sleep_delay_stagger', '2.5').to_f
-    @make_tmpdir ||= Setting.get_cached('delayed_jobs_unique_tmpdir', 'true') == 'true'
+    @sleep_delay ||= Setting.get('delayed_jobs_sleep_delay', '5.0').to_f
+    @sleep_delay_stagger ||= Setting.get('delayed_jobs_sleep_delay_stagger', '2.5').to_f
+    @make_tmpdir ||= Setting.get('delayed_jobs_unique_tmpdir', 'true') == 'true'
 
     job = Delayed::Job.get_and_lock_next_available(
       name,

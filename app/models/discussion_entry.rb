@@ -107,7 +107,7 @@ class DiscussionEntry < ActiveRecord::Base
 
   # The maximum discussion entry threading depth that is allowed
   def self.max_depth
-    Setting.get_cached('discussion_entry_max_depth', '50').to_i
+    Setting.get('discussion_entry_max_depth', '50').to_i
   end
 
   def set_depth

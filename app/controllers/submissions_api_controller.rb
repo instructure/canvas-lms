@@ -113,7 +113,7 @@ class SubmissionsApiController < ApplicationController
       student_ids &= visible_user_ids(:include_priors => true)
       return render(:json => []) if student_ids.blank?
 
-      max_students = Setting.get_cached('api_max_per_page', '50').to_i
+      max_students = Setting.get('api_max_per_page', '50').to_i
       student_ids = student_ids.first(max_students)
 
       includes = Array(params[:include])

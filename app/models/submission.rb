@@ -302,7 +302,7 @@ class Submission < ActiveRecord::Base
 
   def submit_to_turnitin_later
     if self.turnitinable? && @submit_to_turnitin
-      delay = Setting.get_cached('turnitin_submission_delay_seconds', 60.to_s).to_i
+      delay = Setting.get('turnitin_submission_delay_seconds', 60.to_s).to_i
       send_later_enqueue_args(:submit_to_turnitin, { :run_at => delay.seconds.from_now }.merge(TURNITIN_JOB_OPTS))
     end
   end

@@ -138,7 +138,7 @@ module Canvas
   def self.timeout_protection(service_name, options={})
     redis_key = "service:timeouts:#{service_name}"
     if Canvas.redis_enabled?
-      cutoff = (Setting.get_cached("service_#{service_name}_cutoff", nil) || Setting.get_cached("service_generic_cutoff", 3.to_s)).to_i
+      cutoff = (Setting.get("service_#{service_name}_cutoff", nil) || Setting.get("service_generic_cutoff", 3.to_s)).to_i
       error_count = Canvas.redis.get(redis_key)
       if error_count.to_i >= cutoff
         Rails.logger.error("Skipping service call due to error count: #{service_name} #{error_count}")
@@ -147,7 +147,7 @@ module Canvas
       end
     end
 
-    timeout = (Setting.get_cached("service_#{service_name}_timeout", nil) || options[:fallback_timeout_length] || Setting.get_cached("service_generic_timeout", 15.seconds.to_s)).to_f
+    timeout = (Setting.get("service_#{service_name}_timeout", nil) || options[:fallback_timeout_length] || Setting.get("service_generic_timeout", 15.seconds.to_s)).to_f
 
     begin
       Timeout.timeout(timeout) do
@@ -156,7 +156,7 @@ module Canvas
     rescue Timeout::Error => e
       ErrorReport.log_exception(:service_timeout, e)
       if Canvas.redis_enabled?
-        error_ttl = (Setting.get_cached("service_#{service_name}_error_ttl", nil) || Setting.get_cached("service_generic_error_ttl", 1.minute.to_s)).to_i
+        error_ttl = (Setting.get("service_#{service_name}_error_ttl", nil) || Setting.get("service_generic_error_ttl", 1.minute.to_s)).to_i
         Canvas.redis.incrby(redis_key, 1)
         Canvas.redis.expire(redis_key, error_ttl)
       end

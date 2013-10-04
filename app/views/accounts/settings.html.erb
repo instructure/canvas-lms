@@ -332,7 +332,7 @@ Allowing Draft State here will allow teachers to enable it in their individual c
           <% end %>
         </fieldset>
 
-        <% if @account.root_account? && !@account.site_admin? && Setting.get_cached("show_feedback_link", "false") == "true"  %>
+        <% if @account.root_account? && !@account.site_admin? && Setting.get("show_feedback_link", "false") == "true"  %>
           <fieldset>
             <legend><%= t(:custom_links_to_include_in_the_help_dialog_popup, "Custom Links to include in the help dialog popup") %></legend>
             <p style="font-size: 0.9em;"><%= t(:if_you_would_like_to_link_to_your_own_campus_support_website_in_the_help_dialog_you_can_do_that_here, "If you would like to link to your own campus support website in the help dialog you can do that here") %></p>

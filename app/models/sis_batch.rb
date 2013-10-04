@@ -85,7 +85,7 @@ class SisBatch < ActiveRecord::Base
   end
 
   def process
-    process_delay = Setting.get_cached('sis_batch_process_start_delay', '0').to_f
+    process_delay = Setting.get('sis_batch_process_start_delay', '0').to_f
     job_args = { :singleton => "sis_batch:account:#{Shard.birth.activate { self.account_id }}", :priority => Delayed::LOW_PRIORITY }
     if process_delay > 0
       job_args[:run_at] = process_delay.seconds.from_now
@@ -243,7 +243,7 @@ class SisBatch < ActiveRecord::Base
   end
 
   def self.max_messages
-    Setting.get_cached('sis_batch_max_messages', '1000').to_i
+    Setting.get('sis_batch_max_messages', '1000').to_i
   end
 
   def limit_size_of_messages

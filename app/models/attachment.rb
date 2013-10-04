@@ -241,7 +241,7 @@ class Attachment < ActiveRecord::Base
     transitioned_to_this_state = self.id_was == nil || self.file_state_changed? && self.workflow_state_was =~ /^unattached/
     if in_the_right_state && transitioned_to_this_state &&
         self.content_type && self.content_type.match(/\A(video|audio)/)
-      delay = Setting.get_cached('attachment_build_media_object_delay_seconds', 10.to_s).to_i
+      delay = Setting.get('attachment_build_media_object_delay_seconds', 10.to_s).to_i
       MediaObject.send_later_enqueue_args(:add_media_files, { :run_at => delay.seconds.from_now, :priority => Delayed::LOWER_PRIORITY }, self, false)
     end
   end
@@ -720,7 +720,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def self.minimum_size_for_quota
-    Setting.get_cached('attachment_minimum_size_for_quota', '512').to_i
+    Setting.get('attachment_minimum_size_for_quota', '512').to_i
   end
 
   def self.get_quota(context)
@@ -729,7 +729,7 @@ class Attachment < ActiveRecord::Base
     context = context.quota_context if context.respond_to?(:quota_context) && context.quota_context
     if context
       Shackles.activate(:slave) do
-        quota = Setting.get_cached('context_default_quota', 50.megabytes.to_s).to_i
+        quota = Setting.get('context_default_quota', 50.megabytes.to_s).to_i
         quota = context.quota if (context.respond_to?("quota") && context.quota)
         min = self.minimum_size_for_quota
         # translated to ruby this is [size, min].max || 0
@@ -1255,7 +1255,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def self.filtering_scribd_submits?
-    Setting.get_cached("filter_scribd_submits", "false") == "true"
+    Setting.get("filter_scribd_submits", "false") == "true"
   end
 
   include Workflow
@@ -1650,7 +1650,7 @@ class Attachment < ActiveRecord::Base
 
   # the list of allowed thumbnail sizes to be generated dynamically
   def self.dynamic_thumbnail_sizes
-    DYNAMIC_THUMBNAIL_SIZES + Setting.get_cached("attachment_thumbnail_sizes", "").split(",")
+    DYNAMIC_THUMBNAIL_SIZES + Setting.get("attachment_thumbnail_sizes", "").split(",")
   end
 
   def create_dynamic_thumbnail(geometry_string)

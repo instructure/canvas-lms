@@ -210,9 +210,9 @@ module Delayed
           check_queue(queue)
           check_priorities(min_priority, max_priority)
 
-          self.batch_size ||= Setting.get_cached('jobs_get_next_batch_size', '5').to_i
+          self.batch_size ||= Setting.get('jobs_get_next_batch_size', '5').to_i
           if self.select_random.nil?
-            self.select_random = Setting.get_cached('jobs_select_random', 'false') == 'true'
+            self.select_random = Setting.get('jobs_select_random', 'false') == 'true'
           end
           loop do
             jobs = find_available(@batch_size, queue, min_priority, max_priority)

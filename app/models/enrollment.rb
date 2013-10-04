@@ -779,7 +779,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   def self.recompute_final_score_if_stale(course, user=nil)
-    Rails.cache.fetch(['recompute_final_scores', course.id, user].cache_key, :expires_in => Setting.get_cached('recompute_grades_window', 600).to_i.seconds) do
+    Rails.cache.fetch(['recompute_final_scores', course.id, user].cache_key, :expires_in => Setting.get('recompute_grades_window', 600).to_i.seconds) do
       recompute_final_score user ? user.id : course.student_enrollments.map(&:user_id), course.id
       yield if block_given?
       true
@@ -1060,7 +1060,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   def record_recent_activity_threshold
-    Setting.get_cached('enrollment_last_activity_at_threshold', 10.minutes).to_i
+    Setting.get('enrollment_last_activity_at_threshold', 10.minutes).to_i
   end
 
   def record_recent_activity_worthwhile?(as_of, threshold)

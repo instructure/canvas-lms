@@ -65,7 +65,7 @@ class AccountNotification < ActiveRecord::Base
   end
 
   def self.default_months_in_display_cycle
-    Setting.get_cached("account_notification_default_months_in_display_cycle", "9").to_i
+    Setting.get("account_notification_default_months_in_display_cycle", "9").to_i
   end
 
   # private

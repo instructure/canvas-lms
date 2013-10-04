@@ -582,7 +582,7 @@ module ApplicationHelper
       :allowMediaComments       => Kaltura::ClientV3.config && @context.try_rescue(:allow_media_comments?),
       :kalturaSettings          => Kaltura::ClientV3.config.try(:slice, 'domain', 'resource_domain', 'rtmp_domain', 'partner_id', 'subpartner_id', 'player_ui_conf', 'player_cache_st', 'kcw_ui_conf', 'upload_ui_conf', 'max_file_size_bytes', 'do_analytics'),
       :equellaEnabled           => !!equella_enabled?,
-      :googleAnalyticsAccount   => Setting.get_cached('google_analytics_key', nil),
+      :googleAnalyticsAccount   => Setting.get('google_analytics_key', nil),
       :http_status              => @status,
       :error_id                 => @error && @error.id,
       :disableGooglePreviews    => !service_enabled?(:google_docs_previews),
@@ -794,7 +794,7 @@ module ApplicationHelper
 
   def help_link
     url = ((@domain_root_account && @domain_root_account.settings[:support_url]) || (Account.default && Account.default.settings[:support_url]))
-    show_feedback_link = Setting.get_cached("show_feedback_link", "false") == "true"
+    show_feedback_link = Setting.get("show_feedback_link", "false") == "true"
     css_classes = []
     css_classes << "support_url" if url
     css_classes << "help_dialog_trigger" if show_feedback_link

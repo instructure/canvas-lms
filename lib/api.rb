@@ -188,7 +188,7 @@ module Api
   end
 
   def self.per_page_for(controller)
-    [(controller.params[:per_page] || Setting.get_cached('api_per_page', '10')).to_i, Setting.get_cached('api_max_per_page', '50').to_i].min
+    [(controller.params[:per_page] || Setting.get('api_per_page', '10')).to_i, Setting.get('api_max_per_page', '50').to_i].min
   end
 
   # Add [link HTTP Headers](http://www.w3.org/Protocols/9707-link-header.html) for pagination

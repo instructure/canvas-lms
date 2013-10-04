@@ -438,7 +438,7 @@ class Group < ActiveRecord::Base
   end
 
   def self.default_storage_quota
-    Setting.get_cached('group_default_quota', 50.megabytes.to_s).to_i
+    Setting.get('group_default_quota', 50.megabytes.to_s).to_i
   end
 
   def storage_quota_mb

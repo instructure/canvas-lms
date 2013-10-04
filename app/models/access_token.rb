@@ -43,7 +43,7 @@ class AccessToken < ActiveRecord::Base
   end
 
   def record_last_used_threshold
-    Setting.get_cached('access_token_last_used_threshold', 10.minutes).to_i
+    Setting.get('access_token_last_used_threshold', 10.minutes).to_i
   end
 
   def used!
