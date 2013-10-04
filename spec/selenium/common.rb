@@ -92,20 +92,18 @@ module SeleniumTestsHelperMethods
       start_selenium_server_node
       #curbs race conditions on selenium grid nodes
       stagger_threads
-      (1..60).each do |times|
-        begin
-          puts "Thread #{THIS_ENV} connecting to hub over port #{PORT_NUM}, try ##{times}"
-          driver = Selenium::WebDriver.for(
-              :remote,
-              :url => "http://127.0.0.1:#{PORT_NUM}/wd/hub",
-              :desired_capabilities => caps
-          )
-          break
-        rescue Exception => e
-          puts "Thread #{THIS_ENV}\n try ##{times}\nError attempting to start remote webdriver: #{e}"
-          sleep 10
-          raise e if times == 60
-        end
+      begin
+        tries ||= 20
+        puts "Thread #{THIS_ENV} connecting to hub over port #{PORT_NUM}, try ##{tries}"
+        driver = Selenium::WebDriver.for(
+            :remote,
+            :url => "http://127.0.0.1:#{PORT_NUM}/wd/hub",
+            :desired_capabilities => caps
+        )
+      rescue Exception => e
+        puts "Thread #{THIS_ENV}\n try ##{tries}\nError attempting to start remote webdriver: #{e}"
+        sleep 2
+        retry unless (tries -= 1).zero?
       end
     end
     driver.manage.timeouts.implicit_wait = 10
@@ -954,18 +952,23 @@ shared_examples_for "all selenium tests" do
   append_before (:each) do
     #the driver sometimes gets in a hung state and this if almost always the first line of code to catch it
     begin
+      tries ||= 3
       driver.manage.timeouts.implicit_wait = 3
+      driver.manage.timeouts.script_timeout = 60
+      EncryptedCookieStore.any_instance.stubs(:secret).returns(SecureRandom.hex(64))
+      enable_forgery_protection
     rescue
-      #cleans up and provisions a new driver
-      puts "ERROR: thread: #{THIS_ENV} selenium server hung, attempting to recover the node"
-      $selenium_driver = nil
-      $selenium_driver ||= setup_selenium
-      default_url_options[:host] = $app_host_and_port
-      driver.manage.timeouts.implicit_wait = 3
+      if ENV['PARALLEL_EXECS'] != nil
+        #cleans up and provisions a new driver
+        puts "ERROR: thread: #{THIS_ENV} selenium server hung, attempting to recover the node"
+        $selenium_driver = nil
+        $selenium_driver ||= setup_selenium
+        default_url_options[:host] = $app_host_and_port
+        retry unless (tries -= 1).zero?
+      else
+        raise('spec run time crashed')
+      end
     end
-    driver.manage.timeouts.script_timeout = 60
-    EncryptedCookieStore.any_instance.stubs(:secret).returns(SecureRandom.hex(64))
-    enable_forgery_protection
   end
 
   append_before (:all) do
