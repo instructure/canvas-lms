@@ -44,10 +44,10 @@ class AssignmentsController < ApplicationController
           :new_assignment_url => new_polymorphic_url([@context, :assignment]),
           :course_url => api_v1_course_url(@context),
           :sort_url => reorder_course_assignment_groups_url,
-          :assignment_sort_base_url => course_assignment_groups_url
+          :assignment_sort_base_url => course_assignment_groups_url,
+          :context_modules_url => api_v1_course_context_modules_path(@context),
         },
         :PERMISSIONS => permissions,
-        :MODULES => get_module_names
       })
 
       respond_to do |format|
@@ -460,23 +460,6 @@ class AssignmentsController < ApplicationController
 
   def index_edit_params
     params.slice(*[:title, :due_at, :points_possible, :assignment_group_id])
-  end
-
-  def get_module_names
-    return {} if @context.context_modules.count == 0
-    @context.assignments.active.each_with_object({}) do |a, hash|
-      tags = nil
-      if a.submission_types == "online_quiz"
-        tags = a.quiz.try(:context_module_tags)
-      elsif a.submission_types == "discussion_topic"
-        tags = a.discussion_topic.try(:context_module_tags)
-      else
-        tags = a.context_module_tags
-      end
-
-      modules = ContextModule.where(:id => tags.map(&:context_module_id)).pluck(:name)
-      hash[a.id] = modules
-    end
   end
 
 end

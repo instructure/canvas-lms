@@ -33,7 +33,9 @@ require [
   course.fetch()
 
   includes = ["assignments"]
-  includes.push("all_dates") if ENV.PERMISSIONS.manage
+  if ENV.PERMISSIONS.manage
+    includes.push "all_dates"
+    includes.push "module_ids"
 
   assignmentGroups = new AssignmentGroupCollection [],
     course: course
@@ -75,4 +77,6 @@ require [
   @app.render()
 
   # kick it all off
-  assignmentGroups.fetch(reset: true)
+  assignmentGroups.fetch(reset: true).then ->
+    if ENV.PERMISSIONS.manage
+      assignmentGroups.loadModuleNames()

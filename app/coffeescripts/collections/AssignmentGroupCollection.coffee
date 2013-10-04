@@ -1,7 +1,8 @@
 define [
+  'underscore'
   'Backbone'
   'compiled/models/AssignmentGroup'
-], (Backbone, AssignmentGroup) ->
+], (_, Backbone, AssignmentGroup) ->
 
   class AssignmentGroupCollection extends Backbone.Collection
 
@@ -14,5 +15,22 @@ define [
     defaults:
       params:
         include: ["assignments"]
+
+    loadModuleNames: ->
+      $.get(ENV.URLS.context_modules_url).then (modules) =>
+        moduleNames = {}
+        for m in modules
+          moduleNames[m.id] = m.name
+
+        for assignment in @assignments()
+          assignmentModuleNames = _(assignment.get 'module_ids')
+            .map (id) -> moduleNames[id]
+          assignment.set('modules', assignmentModuleNames)
+
+    assignments: ->
+      @chain()
+        .map((ag) -> ag.get('assignments').toArray())
+        .flatten()
+        .value()
 
     comparator: 'position'

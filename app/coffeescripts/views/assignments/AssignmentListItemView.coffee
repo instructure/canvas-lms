@@ -45,7 +45,7 @@ define [
         @model.on('change:published', @updatePublishState)
 
         # re-render for attributes we are showing
-        attrs = ["name", "points_possible", "due_at", "lock_at", "unlock_at"]
+        attrs = ["name", "points_possible", "due_at", "lock_at", "unlock_at", "modules"]
         observe = _.map(attrs, (attr) -> "change:#{attr}").join(" ")
         @model.on(observe, @render)
 
@@ -120,7 +120,7 @@ define [
       # collection OR more than one in the model's collection
       data.canMove = @model.collection.view?.parentCollection?.length > 1 or @model.collection.length > 1
 
-      if modules = @modules(data.id)
+      if modules = @model.get('modules')
         moduleName = modules[0]
         has_modules = modules.length > 0
         joinedNames = modules.join(",")
@@ -141,9 +141,6 @@ define [
     delete: ->
       @model.destroy()
       @$el.remove()
-
-    modules: (id) ->
-      ENV.MODULES[id]
 
     canManage: ->
       ENV.PERMISSIONS.manage

@@ -48,7 +48,6 @@ define [
     setup: ->
       oldENV = window.ENV
       window.ENV =
-        MODULES: {}
         PERMISSIONS:
           manage: true
       @enable_spy = sinon.spy(IndexView.prototype, 'enableSearch')
@@ -94,3 +93,13 @@ define [
     assignmentGroups.reset()
     ok @enable_spy.calledOnce
 
+  test 'should show modules column', ->
+    view = assignmentIndex()
+
+    [a1, a2] = assignmentGroups.assignments()
+    a1.set 'modules', ['One', 'Two']
+    a2.set 'modules', ['Three']
+
+    ok view.$("#assignment_1 .modules .tooltip_link").text().match(/Multiple Modules/)
+    ok view.$("#assignment_1 .modules").text().match(/One\s+Two/)
+    ok view.$("#assignment_2 .modules").text().match(/Three Module/)
