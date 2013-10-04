@@ -254,4 +254,11 @@ class Class
   end
 end
 
+# let Rails.env= work like it does in rails3
+Rails.module_eval do
+  def self.env=(environment)
+    @_env = ActiveSupport::StringInquirer.new(environment)
+  end
+end
+
 end

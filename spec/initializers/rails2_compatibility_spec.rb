@@ -80,4 +80,24 @@ describe 'rails2 compatibility' do
       @klass.before_validation(:method, on: :create, &block)
     end
   end
+
+  describe "Rails.env=" do
+    before :each do
+      @current_rails_env = Rails.env
+    end
+
+    after :each do
+      Rails.env = @current_rails_env
+    end
+
+    it "should set the env" do
+      Rails.env = "development"
+      Rails.env.should == "development"
+    end
+
+    it "should work cast the value to an 'inquirer'" do
+      Rails.env = "development"
+      Rails.env.development?.should == true
+    end
+  end
 end
