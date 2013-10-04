@@ -240,7 +240,8 @@ Either use `<a>` with icon desired icon class added or insert `<i>` inside `<but
 <div class="row-fluid">
   <span class="span3"><i class="icon-reply-2"></i> icon-reply-2</span>
   <span class="span3"><i class="icon-reply-all-2"></i> icon-reply-all-2</span>
-   <span class="span3"><i class="icon-drag-handle"></i> icon-drag-handle</span>
+  <span class="span3"><i class="icon-drag-handle"></i> icon-drag-handle</span>
+  <span class="span3"><i class="icon-remove-from-collection"></i> icon-remove-from-collection</span>
 </div>
 */
 
@@ -481,6 +482,7 @@ h1, h2, h3, h4, .h1, .h2, .h3, .h4, p {
 .icon-reply-2:before { content: "\e103" }
 .icon-reply-all-2:before { content: "\e104" }
 .icon-drag-handle:before { content: "\e105" }
+.icon-remove-from-collection:before { content: "\e106" }
 
 // deprecated in favor of .screenreader-only, which is meant to be usable anywhere
 span.screen-reader-text {
