@@ -379,7 +379,7 @@ describe DiscussionTopicsController do
       response.should be_success
 
       @topic.reload.attachment.should be_nil
-      lambda { attachment.reload }.should raise_exception(ActiveRecord::RecordNotFound)
+      attachment.reload.should be_deleted
     end
   end
 end

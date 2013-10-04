@@ -681,7 +681,7 @@ class DiscussionTopicsController < ApplicationController
           att = @topic.attachment
           @topic.attachment = nil
           @topic.save! if !@topic.new_record?
-          att.destroy!
+          att.destroy
         end
       end
 
