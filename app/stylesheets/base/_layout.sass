@@ -64,7 +64,7 @@ body
 
 // so we don't get the non-interactionable content
 .scripts-not-loaded
-  a, button
+  a:not([href]), a[href="#"], button:not([type])
     visibility: hidden !important
 
 #wrapper-container
@@ -135,9 +135,6 @@ body
   #content, #right-side-wrapper
     +single-transition(opacity, 0.3s)
     +opacity(1)
-.scripts-not-loaded
-  #content, #right-side-wrapper
-    +opacity(0)
 
 
 // **********************************************************************************
