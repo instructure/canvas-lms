@@ -913,6 +913,7 @@ shared_examples_for "all selenium tests" do
   def drag_with_js(selector, x, y)
     load_simulate_js
     driver.execute_script "$('#{selector}').simulate('drag', { dx: #{x}, dy: #{y} })"
+    wait_for_js
   end
 
 ##
