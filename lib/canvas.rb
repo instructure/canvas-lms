@@ -135,7 +135,7 @@ module Canvas
   #
   # all the configurable params have service-specific Settings with fallback to
   # generic Settings.
-  def self.timeout_protection(service_name)
+  def self.timeout_protection(service_name, options={})
     redis_key = "service:timeouts:#{service_name}"
     if Canvas.redis_enabled?
       cutoff = (Setting.get_cached("service_#{service_name}_cutoff", nil) || Setting.get_cached("service_generic_cutoff", 3.to_s)).to_i
@@ -158,6 +158,7 @@ module Canvas
       Canvas.redis.incrby(redis_key, 1)
       Canvas.redis.expire(redis_key, error_ttl)
     end
+    raise if options[:raise_on_timeout]
     return nil
   end
 end
