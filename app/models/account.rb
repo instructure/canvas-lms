@@ -668,7 +668,7 @@ class Account < ActiveRecord::Base
     return [] unless user
     @account_users_cache ||= {}
     if self == Account.site_admin
-      @account_users_cache[user] ||= Rails.cache.fetch('all_site_admin_account_users', :expires_in => 30.minutes) do
+      @account_users_cache[user] ||= Rails.cache.fetch('all_site_admin_account_users') do
         self.account_users.all
       end.select { |au| au.user_id == user.id }.each { |au| au.account = self }
     else
@@ -857,7 +857,7 @@ class Account < ActiveRecord::Base
   end
 
   def self.find_cached(id)
-    account = Rails.cache.fetch(account_lookup_cache_key(id), :expires_in => 1.hour) do
+    account = Rails.cache.fetch(account_lookup_cache_key(id)) do
       account = Account.find_by_id(id)
       account.precache if account
       account || :nil
