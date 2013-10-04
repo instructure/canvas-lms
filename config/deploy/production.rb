@@ -1,4 +1,4 @@
-set :app_node_prefix = "canvas-ap"
+set :app_node_prefix, "canvas-ap"
 set :canvas_url, 'https://canvas.sfu.ca'
 
 role :db, "canvas-mp.tier2.sfu.ca", :primary => true
