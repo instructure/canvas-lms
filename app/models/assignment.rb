@@ -1134,7 +1134,7 @@ class Assignment < ActiveRecord::Base
     res[:context][:enrollments] = context.enrollments_visible_to(user).
         map{|s| s.as_json(:include_root => false, :only => [:user_id, :course_section_id]) }
     res[:context][:quiz] = self.quiz.as_json(:include_root => false, :only => [:anonymous_submissions])
-    res[:submissions] = submissions.where(:user_id => students).map{|sub|
+    res[:submissions] = submissions.where(:user_id => students).map do |sub|
       json = sub.as_json(:include_root => false,
         :include => {
           :submission_comments => {
@@ -1175,13 +1175,13 @@ class Assignment < ActiveRecord::Base
                                          grade: qs.score,
                                          show_grade_in_dropdown: true,
                                          submitted_at: qs.finished_at,
-                                         late: qs.overdue?,
+                                         late: sub.late?,
                                          version: v.number,
                                        }}
                                      end
                                    end
       json
-    }
+    end
     res[:GROUP_GRADING_MODE] = grade_as_group?
     res
   ensure

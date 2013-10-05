@@ -2176,6 +2176,23 @@ describe Assignment do
         s.has_key? 'submission_history'
       }.should be_true
     end
+
+    it "returns quiz lateness correctly" do
+      course_with_teacher(:active_all => true)
+      student_in_course
+      quiz_with_graded_submission([], { :course => @course, :user => @student })
+      @quiz.time_limit = 10
+      @quiz.save!
+
+      json = @assignment.speed_grader_json(@teacher)
+      json[:submissions].first['submission_history'].first[:submission]['late'].should be_false
+
+      @quiz.due_at = 1.day.ago
+      @quiz.save!
+
+      json = @assignment.speed_grader_json(@teacher)
+      json[:submissions].first['submission_history'].first[:submission]['late'].should be_true
+    end
   end
 
   describe "update_student_submissions" do
