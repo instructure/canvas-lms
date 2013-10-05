@@ -148,17 +148,20 @@ module Canvas
     end
 
     timeout = (Setting.get_cached("service_#{service_name}_timeout", nil) || options[:fallback_timeout_length] || Setting.get_cached("service_generic_timeout", 15.seconds.to_s)).to_f
-    Timeout.timeout(timeout) do
-      yield
+
+    begin
+      Timeout.timeout(timeout) do
+        yield
+      end
+    rescue Timeout::Error => e
+      ErrorReport.log_exception(:service_timeout, e)
+      if Canvas.redis_enabled?
+        error_ttl = (Setting.get_cached("service_#{service_name}_error_ttl", nil) || Setting.get_cached("service_generic_error_ttl", 1.minute.to_s)).to_i
+        Canvas.redis.incrby(redis_key, 1)
+        Canvas.redis.expire(redis_key, error_ttl)
+      end
+      raise if options[:raise_on_timeout]
+      return nil
     end
-  rescue Timeout::Error => e
-    ErrorReport.log_exception(:service_timeout, e)
-    if Canvas.redis_enabled?
-      error_ttl = (Setting.get_cached("service_#{service_name}_error_ttl", nil) || Setting.get_cached("service_generic_error_ttl", 1.minute.to_s)).to_i
-      Canvas.redis.incrby(redis_key, 1)
-      Canvas.redis.expire(redis_key, error_ttl)
-    end
-    raise if options[:raise_on_timeout]
-    return nil
   end
 end

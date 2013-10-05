@@ -75,6 +75,7 @@ describe Canvas do
       it "should raise on cutoff if raise_on_timeout option is specified" do
         Canvas.redis.set("service:timeouts:spec", 42)
         lambda { Canvas.timeout_protection("spec", raise_on_timeout: true) {} }.should raise_error(Timeout::Error)
+        Canvas.redis.get("service:timeouts:spec").should == "42"
       end
     end
   end
