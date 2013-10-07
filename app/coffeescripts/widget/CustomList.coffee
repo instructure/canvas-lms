@@ -187,6 +187,7 @@ define [
       @element.find('> ul > li').each (index, element) =>
         element = jQuery element
         id      = element.data('id')
+        id      = id && String id
         item    = @items.findBy('id', id)
 
         return unless item
@@ -206,6 +207,7 @@ define [
       # DOM and data get out of sync for atomic clicking, hence @animating
       return if @animating or @requests.reset
       id = element.data 'id'
+      id = id && String id
       item = @pinned.findBy 'id', id
 
       if item
