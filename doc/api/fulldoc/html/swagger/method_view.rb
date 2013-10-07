@@ -37,10 +37,24 @@ class MethodView < HashView
     select_tags("argument")
   end
 
-  def arguments
+  def query_args
     raw_arguments.map do |tag|
       ArgumentView.new(tag.text, route.verb, route.path_variables)
     end
+  end
+
+  def query_arg_names
+    query_args.map{ |arg| arg.name }
+  end
+
+  def path_args
+    (route.path_variables - query_arg_names).map do |path_variable|
+      ArgumentView.new("#{path_variable} [String] ID", route.verb, route.path_variables)
+    end
+  end
+
+  def arguments
+    path_args + query_args
   end
 
   def return_tag
@@ -69,14 +83,18 @@ class MethodView < HashView
     route.swagger_path
   end
 
+  def swagger_type
+    returns.to_swagger
+  end
+
   def operation
     {
-      "httpMethod" => route.verb,
-      "nickname" => nickname,
-      "responseClass" => returns.to_swagger,
-      "parameters" => parameters,
+      "method" => route.verb,
       "summary" => summary,
-      "notes" => desc
+      "notes" => desc,
+      "type" => swagger_type,
+      "nickname" => nickname,
+      "parameters" => parameters,
     }
   end
 

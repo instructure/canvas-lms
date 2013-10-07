@@ -433,7 +433,7 @@ describe Group do
     course()
     gc = group_category(name: "Something")
     group = Group.create(:group_category => gc)
-    hash = ActiveSupport::JSON.decode(group.to_json)
+    hash = group.as_json
     hash["group"]["group_category"].should == "Something"
   end
 

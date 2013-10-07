@@ -17,7 +17,48 @@ define [
 
     _.extend defaults, options
 
-  module 'WikiPageSpec:Sync'
+
+  module 'WikiPage'
+  test 'latestRevision is only available when a url is provided', ->
+    wikiPage = new WikiPage
+    equal wikiPage.latestRevision(), null, 'not provided without url'
+    wikiPage = new WikiPage url: 'url'
+    notEqual wikiPage.latestRevision(), null, 'provided with url'
+
+  test 'revision passed to latestRevision', ->
+    wikiPage = new WikiPage {url: 'url'}, revision: 42
+    equal wikiPage.latestRevision().get('revision_id'), 42, 'revision passed to latestRevision'
+
+  test 'latestRevision should be marked as latest', ->
+    wikiPage = new WikiPage {url: 'url'}
+    equal wikiPage.latestRevision().latest, true, 'marked as latest'
+
+  test 'latestRevision should default to summary', ->
+    wikiPage = new WikiPage {url: 'url'}
+    equal wikiPage.latestRevision().summary, true, 'defaulted to summary'
+
+
+  module 'WikiPage:Publishable'
+  test 'publishable', ->
+    wikiPage = new WikiPage
+      front_page: false
+      published: true
+    strictEqual wikiPage.get('publishable'), true, 'publishable set during construction'
+
+    wikiPage.set('front_page', true)
+    strictEqual wikiPage.get('publishable'), false, 'publishable set when front_page changed'
+
+  test 'deletable', ->
+    wikiPage = new WikiPage
+      front_page: false
+      published: true
+    strictEqual wikiPage.get('deletable'), true, 'deletable set during construction'
+
+    wikiPage.set('front_page', true)
+    strictEqual wikiPage.get('deletable'), false, 'deletable set when front_page changed'
+
+
+  module 'WikiPage:Sync'
   test 'sets the id during construction', ->
     wikiPage = new WikiPage wikiPageObj()
     equal wikiPage.get('url'), 'front-page-2'
@@ -64,18 +105,18 @@ define [
       strictEqual attributes.wiki_page.published, false, 'published provided correctly'
     wikiPage.unpublish()
 
-  test 'setAsFrontPage convenience method', 3, ->
+  test 'setFrontPage convenience method', 3, ->
     wikiPage = new WikiPage wikiPageObj()
     sinon.stub wikiPage, 'save', (attributes, options) ->
       ok attributes, 'attributes present'
       ok attributes.wiki_page, 'wiki_page present'
       strictEqual attributes.wiki_page.front_page, true, 'front_page provided correctly'
-    wikiPage.setAsFrontPage()
+    wikiPage.setFrontPage()
 
-  test 'removeAsFrontPage convenience method', 3, ->
+  test 'unsetFrontPage convenience method', 3, ->
     wikiPage = new WikiPage wikiPageObj()
     sinon.stub wikiPage, 'save', (attributes, options) ->
       ok attributes, 'attributes present'
       ok attributes.wiki_page, 'wiki_page present'
       strictEqual attributes.wiki_page.front_page, false, 'front_page provided correctly'
-    wikiPage.removeAsFrontPage()
+    wikiPage.unsetFrontPage()

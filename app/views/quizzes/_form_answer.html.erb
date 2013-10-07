@@ -6,12 +6,12 @@
         <div style="width: 30px;" class="answer_box">
           <% click_to_set_correct = t('titles.click_to_set_as_correct', "Click to set this answer as correct") %>
           <a href="#" class="select_answer_link no-hover" role="button" title="<%= click_to_set_correct %>"><%= image_tag "blank_answer.png", :class => "answer_image", :alt => click_to_set_correct %></a><br/>
-          <span class="answer_weight"><input class="float_value" type="text" style="width: 25px;" name="answer_weight"/>%</span>
+          <span class="answer_weight"><input class="float_value" type="text" style="width: 25px;" arial-label="<%= t('answer_weight', "Answer Weight") %>" name="answer_weight"/>%</span>
         </div>
       </td><td>
         <div class="select_answer answer_type">
-          <label for="answer_text"><b><%= t 'answer_text', 'Answer Text' %></b></label>
-          <input type="text" style="width: 200px;" name="answer_text" placeholder="<%= t('answer_text', 'Answer Text') %>" />
+          <label for="answer_text"><b><%= t 'possible_answer', 'Possible Answer' %></b></label>
+          <input type="text" style="width: 200px;" name="answer_text" aria-label="<%= t 'possible_answer', 'Possible Answer' %>" placeholder="<%= t('answer_text', 'Answer Text') %>" />
           <input type="hidden" name="answer_html"/>
           <span class="answer_html" style="display:inline-block;"></span>
         </div>
@@ -20,7 +20,7 @@
         </div>
         <div class="short_answer answer_type">
           <label class="short_answer_header" for="answer_text"><b><%= t 'possible_answer', 'Possible Answer' %></b></label>
-          <input type="text" name="answer_text" placeholder="<%= t('answer_text', 'Answer Text') %>"/>
+          <input type="text" name="answer_text" aria-label="<%= t 'possible_answer', 'Possible Answer' %>" placeholder="<%= t('answer_text', 'Answer Text') %>"/>
         </div>
         <div class="matching_answer answer_match answer_type">
           <div class="answer_match_left">

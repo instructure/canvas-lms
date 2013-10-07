@@ -345,11 +345,11 @@ describe ActiveRecord::Base do
 
   context "bulk_insert" do
     it "should work" do
-      Course.bulk_insert [
-        {:name => "foo"},
-        {:name => "bar"}
+      User.bulk_insert [
+        {:name => "foo", :workflow_state => "registered"},
+        {:name => "bar", :workflow_state => "registered"}
       ]
-      Course.order(:name).pluck(:name).should eql ["bar", "foo"]
+      User.order(:name).pluck(:name).should eql ["bar", "foo"]
     end
 
     it "should not raise an error if there are no records" do
@@ -598,6 +598,13 @@ describe ActiveRecord::Base do
       it "should merge group" do
         User.group(:id).group(:name).scope(:find, :group).should == 'id, name'
       end
+    end
+  end
+
+  describe "add_index" do
+    it "should raise an error on too long of name" do
+      name = 'some_really_long_name_' * 10
+      lambda { User.connection.add_index :users, [:id], name: name }.should raise_error
     end
   end
 end

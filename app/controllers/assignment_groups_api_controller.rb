@@ -34,7 +34,7 @@ class AssignmentGroupsApiController < ApplicationController
   # @argument override_assignment_dates [Optional, Boolean]
   #   Apply assignment overrides for each assignment, defaults to true.
   #
-  # @returns Assignment Group
+  # @returns AssignmentGroup
   def show
     if authorized_action(@assignment_group, @current_user, :read)
       includes = Array(params[:include])
@@ -62,7 +62,7 @@ class AssignmentGroupsApiController < ApplicationController
   #   The grading rules that are applied within this assignment group
   #   See the Assignment Group object definition for format
   #
-  # @returns Assignment Group
+  # @returns AssignmentGroup
   def create
     @assignment_group = @context.assignment_groups.new
     if authorized_action(@assignment_group, @current_user, :create)
@@ -75,7 +75,7 @@ class AssignmentGroupsApiController < ApplicationController
   # Modify an existing Assignment Group.
   # Accepts the same parameters as Assignment Group creation
   #
-  # @returns Assignment Group
+  # @returns AssignmentGroup
   def update
     if authorized_action(@assignment_group, @current_user, :update)
       process_assignment_group
@@ -92,7 +92,7 @@ class AssignmentGroupsApiController < ApplicationController
   #   NOTE: If this argument is not provided, any assignments in this Assignment
   #   Group will be deleted.
   #
-  # @returns Assignment Group
+  # @returns AssignmentGroup
   def destroy
     if authorized_action(@assignment_group, @current_user, :delete)
 

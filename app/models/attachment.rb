@@ -310,8 +310,7 @@ class Attachment < ActiveRecord::Base
   after_create :flag_as_recently_created
   attr_accessor :recently_created
 
-  validates_presence_of :context_id
-  validates_presence_of :context_type
+  validates_presence_of :context_id, :context_type, :workflow_state
 
   serialize :scribd_doc, Scribd::Document
 

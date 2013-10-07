@@ -1,6 +1,7 @@
 define [
   'compiled/models/Assignment'
-], (Assignment) ->
+  'compiled/models/DateGroup'
+], (Assignment, DateGroup) ->
 
   module "Assignment"
 
@@ -302,6 +303,34 @@ define [
     assignment.notifyOfUpdate( false )
     deepEqual assignment.notifyOfUpdate(), false
 
+  module "Assignment#multipleDueDates"
+
+  test "checks for multiple due dates from assignment overrides", ->
+    assignment = new Assignment all_dates: [{title: "Winter"}, {title: "Summer"}]
+    ok assignment.multipleDueDates()
+
+  test "checks for no multiple due dates from assignment overrides", ->
+    assignment = new Assignment
+    ok !assignment.multipleDueDates()
+
+  module "Assignment#allDates"
+
+  test "gets the due dates from the assignment overrides", ->
+    dueAt = new Date("2013-08-20 11:13:00")
+    dates = [
+      new DateGroup due_at: dueAt, title: "Everyone"
+    ]
+    assignment = new Assignment all_dates: dates
+    allDates = assignment.allDates()
+    first    = allDates[0]
+
+    equal first.dueAt+"", dueAt+""
+    equal first.dueFor,   "Everyone"
+
+  test "gets empty due dates when there are no dates", ->
+    assignment = new Assignment
+    deepEqual assignment.allDates(), []
+
   module "Assignment#toView"
 
   test "returns the assignment's name", ->
@@ -408,3 +437,28 @@ define [
     assignment.allowedExtensions []
     json = assignment.toView()
     deepEqual json.allowedExtensions, []
+
+  test "includes htmlUrl", ->
+    assignment = new Assignment html_url: 'http://example.com/assignments/1'
+    json = assignment.toView()
+    deepEqual json.htmlUrl, 'http://example.com/assignments/1'
+
+  test "includes htmlEditUrl", ->
+    assignment = new Assignment html_url: 'http://example.com/assignments/1'
+    json = assignment.toView()
+    deepEqual json.htmlEditUrl, 'http://example.com/assignments/1/edit'
+
+  test "includes multipleDueDates", ->
+    assignment = new Assignment all_dates: [{title: "Summer"}, {title: "Winter"}]
+    json = assignment.toView()
+    deepEqual json.multipleDueDates, true
+
+  test "includes allDates", ->
+    assignment = new Assignment all_dates: [{title: "Summer"}, {title: "Winter"}]
+    json = assignment.toView()
+    equal json.allDates.length, 2
+
+  test "includes isQuiz", ->
+    assignment = new Assignment("submission_types":["online_quiz"])
+    json = assignment.toView()
+    ok json.isQuiz

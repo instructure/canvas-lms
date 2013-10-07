@@ -45,6 +45,13 @@ define [
       wiki_page_edit_path: '/groups/73/pages/37'
     strictEqual view.toJSON().wiki_page_edit_path, '/groups/73/pages/37', 'wiki_page_edit_path represented in toJSON'
 
+  test 'wiki_page_history_path', ->
+    model = new WikiPage
+    view = new WikiPageView
+      model: model
+      wiki_page_edit_path: '/groups/73/pages/37/revisions'
+    strictEqual view.toJSON().wiki_page_edit_path, '/groups/73/pages/37/revisions', 'wiki_page_history_path represented in toJSON'
+
   testRights = (subject, options) ->
     test "#{subject}", ->
       model = new WikiPage options.attributes, contextAssetString: options.contextAssetString
@@ -64,11 +71,14 @@ define [
     PAGE_RIGHTS:
       update: true
       delete: true
+      read_revisions: true
     CAN:
       VIEW_PAGES: true
       PUBLISH: true
       UPDATE_CONTENT: true
       DELETE: true
+      READ_REVISIONS: true
+      ACCESS_GEAR_MENU: true
 
   testRights 'CAN (update)',
     contextAssetString: 'group_73'
@@ -77,11 +87,14 @@ define [
       manage: true
     PAGE_RIGHTS:
       update_content: true
+      read_revisions: true
     CAN:
       VIEW_PAGES: true
       PUBLISH: false
       UPDATE_CONTENT: true
       DELETE: false
+      READ_REVISIONS: true
+      ACCESS_GEAR_MENU: true
 
   testRights 'CAN (read)',
     contextAssetString: 'course_73'
@@ -94,6 +107,8 @@ define [
       PUBLISH: false
       UPDATE_CONTENT: false
       DELETE: false
+      READ_REVISIONS: false
+      ACCESS_GEAR_MENU: false
 
   testRights 'CAN (null)',
     CAN:
@@ -101,3 +116,5 @@ define [
       PUBLISH: false
       UPDATE_CONTENT: false
       DELETE: false
+      READ_REVISIONS: false
+      ACCESS_GEAR_MENU: false

@@ -565,6 +565,31 @@ describe "Modules API", :type => :integration do
       @module1.reload
       @module1.workflow_state.should == 'deleted'
     end
+
+    it "should show module progress for a student" do
+      student = User.create!
+      @course.enroll_student(student).accept!
+
+      # to simplify things, eliminate the other requirements
+      @module1.completion_requirements.reject! {|r| [@quiz_tag.id, @topic_tag.id, @external_url_tag.id].include? r[:id]}
+      @module1.save!
+      @assignment.submit_homework(student, :body => "done!")
+
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/modules?include[]=items&student_id=#{student.id}",
+                      :controller => "context_modules_api", :action => "index", :format => "json",
+                      :course_id => "#{@course.id}", :student_id => "#{student.id}", :include => ["items"])
+      h = json.find{|m| m["id"] == @module1.id}
+      h['state'].should == 'completed'
+      h['completed_at'].should_not be_nil
+      h['items'].find{|i| i["id"] == @assignment_tag.id}["completion_requirement"]["completed"].should == true
+
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}?include[]=items&student_id=#{student.id}",
+                      :controller => "context_modules_api", :action => "show", :format => "json",
+                      :course_id => "#{@course.id}", :id => "#{@module1.id}", :student_id => "#{student.id}", :include => ["items"])
+      json['state'].should == 'completed'
+      json['completed_at'].should_not be_nil
+      json['items'].find{|i| i["id"] == @assignment_tag.id}["completion_requirement"]["completed"].should == true
+    end
   end
   
   context "as a student" do
@@ -666,6 +691,25 @@ describe "Modules API", :type => :integration do
                 :course_id => "#{@course.id}", :id => "#{@module1.id}"},
                {}, {},
                {:expected_status => 401}
+      )
+    end
+
+    it "should not show progress for other students" do
+      student = User.create!
+      @course.enroll_student(student).accept!
+
+      api_call(:get, "/api/v1/courses/#{@course.id}/modules?student_id=#{student.id}",
+               {:controller => "context_modules_api", :action => "index", :format => "json",
+                :course_id => "#{@course.id}", :student_id => "#{student.id}"},
+               {}, {},
+               {:expected_status => 401}
+      )
+
+      api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}?student_id=#{student.id}",
+              {:controller => "context_modules_api", :action => "show", :format => "json",
+               :course_id => "#{@course.id}", :id => "#{@module1.id}", :student_id => "#{student.id}"},
+              {}, {},
+              {:expected_status => 401}
       )
     end
   end

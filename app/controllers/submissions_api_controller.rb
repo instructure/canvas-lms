@@ -326,10 +326,11 @@ class SubmissionsApiController < ApplicationController
     @user = get_user_considering_section(params[:user_id])
 
     authorized = false
+    @submission = @assignment.find_or_initialize_submission(@user)
+
     if params[:submission] || params[:rubric_assessment]
-      authorized = authorized_action(@context, @current_user, :manage_grades)
+      authorized = authorized_action(@submission, @current_user, :grade)
     else
-      @submission = @assignment.find_or_create_submission(@user)
       authorized = authorized_action(@submission, @current_user, :comment)
     end
 
@@ -342,7 +343,7 @@ class SubmissionsApiController < ApplicationController
         @submissions = @assignment.grade_student(@user, submission)
         @submission = @submissions.first
       else
-        @submission ||= @assignment.find_or_create_submission(@user)
+        @submission = @assignment.find_or_create_submission(@user)
         @submissions ||= [@submission]
       end
 

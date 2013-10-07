@@ -13,14 +13,21 @@ namespace :js do
     require 'canvas/require_js'
     require 'erubis'
     output = Erubis::Eruby.new(File.read("#{Rails.root}/spec/javascripts/runner.html.erb")).
-      result(Canvas::RequireJs.get_binding)
+        result(Canvas::RequireJs.get_binding)
     File.open("#{Rails.root}/spec/javascripts/runner.html", 'w') { |f| f.write(output) }
   end
 
   desc 'test javascript specs with PhantomJS'
   task :test do
+    if test_js_with_timeout(300) != 0
+      puts "--> PhantomJS tests failed. retrying PhantomJS..."
+      raise "PhantomJS tests failed on second attempt." if test_js_with_timeout(400) != 0
+    end
+  end
+
+  def test_js_with_timeout(timeout)
     begin
-      Timeout::timeout(300) do
+      Timeout::timeout(timeout) do
         quick = ENV["quick"] && ENV["quick"] == "true"
         unless quick
           puts "--> do rake js:test quick=true to skip generating compiled coffeescript and handlebars."
@@ -29,19 +36,29 @@ namespace :js do
         puts "--> executing phantomjs tests"
         Rake::Task['js:generate_runner'].invoke
         phantomjs_output = `phantomjs spec/javascripts/support/qunit/test.js file:///#{Dir.pwd}/spec/javascripts/runner.html 2>&1`
-        exit_status = $?.exitstatus
         puts phantomjs_output
-        raise "PhantomJS tests failed" if exit_status != 0
+
+        if $?.exitstatus != 0
+          puts 'some specs failed'
+          result = 1
+        elsif $?.exitstatus != 0 && phantomjs_output.match(/^Took .* (\d+) tests/)[1].to_i < 900
+          puts "some specs didn't get run and some specs failed"
+          result = 1
+        elsif $?.exitstatus == 0 && phantomjs_output.match(/^Took .* (\d+) tests/)[1].to_i > 900
+          puts 'all specs were run and passed'
+          result = 0
+        end
+        return result
       end
     rescue Timeout::Error
-      raise "PhantomJS tests reached timeout!"
+      puts "PhantomJS tests reached timeout!"
     end
   end
 
   def coffee_destination(dir_or_file)
     dir_or_file.sub('app/coffeescripts', 'public/javascripts/compiled').
-                sub('spec/coffeescripts', 'spec/javascripts').
-                sub(%r{/javascripts/compiled/plugins/([^/]+)(/|$)}, '/plugins/\\1/javascripts/compiled\\2')
+        sub('spec/coffeescripts', 'spec/javascripts').
+        sub(%r{/javascripts/compiled/plugins/([^/]+)(/|$)}, '/plugins/\\1/javascripts/compiled\\2')
   end
 
   def compile_coffeescript(coffee_file)
@@ -70,9 +87,9 @@ namespace :js do
     # clear out all the files in case there are any old compiled versions of
     # files that don't map to any source file anymore
     paths_to_remove = [
-      'public/javascripts/compiled',
-      'public/javascripts/jst',
-      'public/plugins/*/javascripts/{compiled,javascripts/jst}'
+        'public/javascripts/compiled',
+        'public/javascripts/jst',
+        'public/plugins/*/javascripts/{compiled,javascripts/jst}'
     ] + Dir.glob('spec/javascripts/**/*Spec.js')
     FileUtils.rm_rf(paths_to_remove)
 
@@ -135,7 +152,7 @@ namespace :js do
     require 'erubis'
 
     output = Erubis::Eruby.new(File.read("#{Rails.root}/config/build.js.erb")).
-      result(Canvas::RequireJs.get_binding)
+        result(Canvas::RequireJs.get_binding)
     File.open("#{Rails.root}/config/build.js", 'w') { |f| f.write(output) }
 
     puts "--> Optimizing canvas-lms"
@@ -149,7 +166,7 @@ namespace :js do
   desc "creates ember app bundles"
   task :bundle_ember_apps do
     require 'lib/ember_bundle'
-    Dir.entries('app/coffeescripts/ember').reject {|d| d.match(/^\./) || d == 'shared'}.each do |app|
+    Dir.entries('app/coffeescripts/ember').reject { |d| d.match(/^\./) || d == 'shared' }.each do |app|
       EmberBundle.new(app).build
     end
   end

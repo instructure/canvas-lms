@@ -73,14 +73,14 @@ describe GroupsController do
 
   describe "GET show" do
     it "should require authorization" do
-      @group = Group.create!(:name => "some group")
+      @group = Account.default.groups.create!(:name => "some group")
       get 'show', :id => @group.id
       assigns[:group].should eql(@group)
       assert_unauthorized
     end
 
     it "should assign variables" do
-      @group = Group.create!(:name => "some group")
+      @group = Account.default.groups.create!(:name => "some group")
       @user = user_model
       user_session(@user)
       @group.add_user(@user)
@@ -141,7 +141,7 @@ describe GroupsController do
   describe "GET new" do
     it "should require authorization" do
       @course = course_model(:reusable => true)
-      @group = @course.groups.create(:name => "some group")
+      @group = @course.groups.create!(:name => "some group")
       get 'new', :course_id => @course.id
       assert_unauthorized
     end
@@ -149,7 +149,7 @@ describe GroupsController do
 
   describe "POST add_user" do
     it "should require authorization" do
-      @group = Group.create(:name => "some group")
+      @group = Account.default.groups.create!(:name => "some group")
       post 'add_user', :group_id => @group.id
       assert_unauthorized
     end
@@ -186,7 +186,7 @@ describe GroupsController do
 
   describe "DELETE remove_user" do
     it "should require authorization" do
-      @group = Group.create(:name => "some group")
+      @group = Account.default.groups.create!(:name => "some group")
       @user = user(:active_all => true)
       @group.add_user(@user)
       delete 'remove_user', :group_id => @group.id, :user_id => @user.id

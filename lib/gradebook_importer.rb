@@ -184,7 +184,7 @@ class GradebookImporter
     student.write_attribute(:submissions, l)
   end
   
-  def to_json
+  def as_json(options={})
     {
       :students => @students.map { |s| student_to_hash(s) },
       :assignments => @assignments.map { |a| assignment_to_hash(a) },
@@ -194,7 +194,7 @@ class GradebookImporter
       },
       :original_submissions => @original_submissions,
       :unchanged_assignments => @unchanged_assignments
-    }.to_json
+    }
   end
   
   protected

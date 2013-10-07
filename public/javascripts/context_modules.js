@@ -1231,9 +1231,13 @@ define([
       });
     });
     $(document).fragmentChange(function(event, hash) {
-      var module = $(hash.replace(/module/, "context_module"));
-      if (module.hasClass('collapsed_module')) {
-        module.find(".expand_module_link").triggerHandler('click');
+      if (hash == '#student_progressions') {
+        $(".module_progressions_link").trigger('click');
+      } else {
+        var module = $(hash.replace(/module/, "context_module"));
+        if (module.hasClass('collapsed_module')) {
+          module.find(".expand_module_link").triggerHandler('click');
+        }
       }
     });
 

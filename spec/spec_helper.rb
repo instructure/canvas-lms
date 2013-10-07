@@ -236,6 +236,12 @@ Spec::Runner.configure do |config|
         e.save!
         @teacher = u
       end
+      if opts[:draft_state]
+        account.settings[:allow_draft] = true
+        account.save!
+        @course.enable_draft = true
+        @course.save!
+      end
     end
     @course
   end
@@ -415,6 +421,18 @@ Spec::Runner.configure do |config|
     user_session(@user)
   end
 
+  def set_course_draft_state(enabled=true, opts={})
+    course = opts[:course] || @course
+    account = opts[:account] || course.account
+
+    account.settings[:allow_draft] = true
+    account.save! unless opts[:no_save]
+    course.enable_draft = enabled
+    course.save! unless opts[:no_save]
+
+    enabled
+  end
+
   def add_section(section_name)
     @course_section = @course.course_sections.create!(:name => section_name)
     @course.reload
@@ -437,7 +455,8 @@ Spec::Runner.configure do |config|
   VALID_GROUP_ATTRIBUTES = [:name, :context, :max_membership, :group_category, :join_level, :description, :is_public, :avatar_attachment]
 
   def group(opts={})
-    @group = (opts[:group_context].try(:groups) || Group).create! opts.slice(*VALID_GROUP_ATTRIBUTES)
+    context = opts[:group_context] || Account.default
+    @group = context.groups.create! opts.slice(*VALID_GROUP_ATTRIBUTES)
   end
 
   def group_with_user(opts={})
@@ -1109,6 +1128,11 @@ Spec::Runner.configure do |config|
     @quiz.workflow_state = "available" if active
     @quiz.save!
     @quiz
+  end
+
+  def n_students_in_course(n, opts={})
+    opts.reverse_merge active_all: true
+    n.times.map { student_in_course(opts); @student }
   end
 end
 

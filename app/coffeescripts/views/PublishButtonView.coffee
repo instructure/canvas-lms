@@ -21,6 +21,11 @@ define [
       '.publish-text': '$text'
       '.desc':         '$desc'
 
+    initialize: ->
+      super
+      @model?.on 'change:publishable', =>
+        @disable() unless @model.get 'publishable'
+
     setElement: ->
       super
       @disable() unless @model.get 'publishable'

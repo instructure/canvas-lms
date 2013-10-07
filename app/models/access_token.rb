@@ -42,8 +42,12 @@ class AccessToken < ActiveRecord::Base
     developer_key.try(:name) || "No App"
   end
 
+  def record_last_used_threshold
+    Setting.get_cached('access_token_last_used_threshold', 10.minutes).to_i
+  end
+
   def used!
-    if !last_used_at || last_used_at < 5.minutes.ago
+    if !last_used_at || last_used_at < record_last_used_threshold.ago
       self.last_used_at = Time.now
       self.save
     end

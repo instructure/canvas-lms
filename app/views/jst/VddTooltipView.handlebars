@@ -1,0 +1,20 @@
+<a title class="vdd_tooltip_link" data-tooltip-selector="#vdd_tooltip_{{selector}}"
+  {{#if linkHref}}href="{{linkHref}}"{{/if}}
+  >{{#t "multiple_dates"}}Multiple Dates{{/t}}</a>
+
+<div id="vdd_tooltip_{{selector}}" style="display:none;">
+  <dl class="vdd_tooltip_content dl-horizontal">
+    {{#each allDates}}
+      <div class="clearfix">
+        <dt>{{dueFor}}</dt>
+        <dd>{{#if dueAt}} {{strftime dueAt "%b %-d"}} {{else}} - {{/if}}</dd>
+      </div>
+    {{/each}}
+
+    {{#if moreMessage}}
+      <div class="clearfix">
+        <dd>{{moreMessage}}</dd>
+      </div>
+    {{/if}}
+  </dl>
+</div>

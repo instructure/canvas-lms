@@ -2,15 +2,18 @@ define [
   'i18n!assignments'
   'underscore'
   'compiled/class/cache'
-  'compiled/views/CollectionView'
+  'compiled/views/DraggableCollectionView'
   'compiled/views/assignments/AssignmentListItemView'
   'compiled/views/assignments/CreateAssignmentView'
   'compiled/views/assignments/CreateGroupView'
   'compiled/views/assignments/DeleteGroupView'
+  'compiled/fn/preventDefault'
   'jst/assignments/AssignmentGroupListItem'
-], (I18n, _, Cache, CollectionView, AssignmentListItemView, CreateAssignmentView, CreateGroupView, DeleteGroupView, template) ->
+], (I18n, _, Cache, DraggableCollectionView, AssignmentListItemView, CreateAssignmentView, CreateGroupView, DeleteGroupView, preventDefault, template) ->
 
-  class AssignmentGroupListItemView extends CollectionView
+  class AssignmentGroupListItemView extends DraggableCollectionView
+    @optionProperty 'course'
+
     tagName: "li"
     className: "item-group-condensed"
     itemView: AssignmentListItemView
@@ -28,9 +31,10 @@ define [
 
     events:
       'click .element_toggler': 'toggleArrow'
+      'click .tooltip_link': preventDefault ->
 
     messages:
-      toggleMessage: I18n.t('toggle_message',"toggle assignment visibility")
+      toggleMessage: I18n.t('toggle_message', "toggle assignment visibility")
 
     # call remove on children so that they can clean up old dialogs.
     # this should eventually happen at a higher level (eg for all views), but
@@ -40,7 +44,7 @@ define [
       @createAssignmentView.remove() if @createAssignmentView
       @editGroupView.remove() if @editGroupView
       @deleteGroupView.remove() if @deleteGroupView
-      super
+      super(@canManage())
 
     afterRender: ->
       # need to hide child views and set trigger manually
@@ -56,6 +60,20 @@ define [
         @deleteGroupView.hide()
         @deleteGroupView.setTrigger @$deleteGroupButton
 
+      if @model.hasRules()
+        @createRulesToolTip()
+
+    createRulesToolTip: =>
+      link = @$el.find('.tooltip_link')
+      link.tooltip
+        position:
+          my: 'center top'
+          at: 'center bottom+10'
+          collision: 'fit fit'
+        tooltipClass: 'center top vertical'
+        content: ->
+          $(link.data('tooltipSelector')).html()
+
     initialize: ->
       @initializeCollection()
       super
@@ -67,7 +85,7 @@ define [
 
     initializeCollection: ->
       @model.get('assignments').each (assign) ->
-        assign.doNotParse()
+        assign.doNotParse() if assign.multipleDueDates()
 
       @collection = @model.get('assignments')
       @collection.on 'add', @expand
@@ -77,7 +95,7 @@ define [
       @createAssignmentView = false
       @deleteGroupView = false
 
-      if ENV.PERMISSIONS.manage
+      if @canManage()
         @editGroupView = new CreateGroupView
           assignmentGroup: @model
         @createAssignmentView = new CreateAssignmentView
@@ -93,43 +111,65 @@ define [
         @cache.set(key, true)
 
     toJSON: ->
-      count = @countRules()
-      showRules = count != 0 and ENV.PERMISSIONS.manage
-
       data = @model.toJSON()
-      showWeight = @model.collection.course?.get('apply_assignment_group_weights') and data.group_weight?
+      showWeight = @course?.get('apply_assignment_group_weights') and data.group_weight?
 
       attributes = _.extend(data, {
-        hasAssignments: @model.get('assignments')?.length > 0
-        showRules: showRules
-        rulesText: I18n.t('rules_text', "Rule", { count: count })
+        showRules: @model.hasRules()
+        rulesText: I18n.t('rules_text', "Rule", { count: @model.countRules() })
+        displayableRules: @displayableRules()
         showWeight: showWeight
         groupWeight: data.group_weight
         toggleMessage: @messages.toggleMessage
       })
 
-    countRules: ->
-      rules = @model.get('rules')
-      count = 0
-      for k,v of rules
-        if k == "never_drop"
-          count += v.length
-        else
-          count++
-      count
+    displayableRules: ->
+      rules = @model.rules() or {}
+      results = []
+
+      if rules.drop_lowest? and rules.drop_lowest > 0
+        results.push(I18n.t('drop_lowest_rule', {
+          'one': 'Drop the lowest score',
+          'other': 'Drop the lowest %{count} scores'
+        }, {
+          'count': rules.drop_lowest
+        }))
+
+      if rules.drop_highest? and rules.drop_highest > 0
+        results.push(I18n.t('drop_highest_rule', {
+          'one': 'Drop the highest score',
+          'other': 'Drop the highest %{count} scores'
+        }, {
+          'count': rules.drop_highest
+        }))
+
+      if rules.never_drop? and rules.never_drop.length > 0
+        _.each rules.never_drop, (never_drop_assignment_id) =>
+          assign = @model.get('assignments').findWhere(id: never_drop_assignment_id)
+
+          # TODO: students won't see never drop rules for unpublished
+          # assignments because we don't know if the assignment is missing
+          # because it is unpublished or because it has been moved or deleted.
+          # Once those cases are handled better, we can add a default here.
+          if name = assign?.get('name')
+            results.push(I18n.t('never_drop_rule', 'Never drop %{assignment_name}', {
+              'assignment_name': name
+            }))
+
+      results
 
     isExpanded: ->
       @cache.get(@cacheKey())
 
     expand: =>
-      @toggle if !@isExpanded()
+      @toggle(true) if !@isExpanded()
 
     toggle: (setTo=false) ->
       @$el.find('.element_toggler').click()
       @cache.set(@cacheKey(), setTo)
 
     cacheKey: ->
-      "ag_#{@model.get('id')}_expanded"
+      ["course", @course.get('id'), "user", @currentUserId(), "ag", @model.get('id'), "expanded"]
 
     toggleArrow: (ev) ->
       arrow = $(ev.currentTarget).children('i')
@@ -140,3 +180,9 @@ define [
       key = @cacheKey()
       expanded = !@cache.get(key)
       @cache.set(key, expanded)
+
+    canManage: ->
+      ENV.PERMISSIONS.manage
+
+    currentUserId: ->
+      ENV.current_user_id

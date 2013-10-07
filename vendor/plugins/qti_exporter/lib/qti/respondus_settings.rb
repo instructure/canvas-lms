@@ -31,7 +31,7 @@ class RespondusSettings
       if feedback.include?('lastAttemptOnly')
          assessment[:hide_results] = 'until_after_last_attempt'
       else
-        assessment[:hide_results] = 'never'
+        assessment[:hide_results] = {'never' => '1'}
       end
     elsif feedback.include?('none')
       assessment[:hide_results] = 'always'

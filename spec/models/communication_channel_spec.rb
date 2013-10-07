@@ -231,6 +231,7 @@ describe CommunicationChannel do
     @cc.confirm!
     @user.otp_communication_channel = @cc
     @user.save!
+    @cc.reload
     @cc.destroy.should be_false
     @cc.reload.should be_active
   end

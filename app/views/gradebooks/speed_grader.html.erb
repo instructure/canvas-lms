@@ -8,6 +8,7 @@
     }
   })
   @show_left_side = false
+  @show_embedded_chat = false
   @body_classes << 'full-width'
   @can_edit_anything = !@context.completed?
 %>
@@ -273,6 +274,7 @@
     <input type="checkbox" id="hide_student_names" name="hide_student_names"/>
     <label for="hide_student_names"><%= t('labels.hide_names', "Hide student names in the SpeedGrader") %></label>
   </p>
+
   <div class="button-container">
     <button class="btn dialog_closer"><%= t('#buttons.cancel', "Cancel") %></button>
     <button type="submit" class="btn btn-primary submit_button"><%= t('buttons.save_settings', "Save Settings") %></button>

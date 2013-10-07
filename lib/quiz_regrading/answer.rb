@@ -21,62 +21,22 @@ class QuizRegrader::Answer
 
   def regrade!
     return 0 if regrade_option == 'no_regrade'
-    previous_score = points
-    score = send("mark_#{regrade_option}!")
-    answer[:regrade_option] = regrade_option
-    answer[:score_before_regrade] = previous_score unless points == previous_score
-    answer[:question_id] = question.id
+    previous_score   = points
+    previous_regrade = score_before_regrade
+
+    regrade_and_merge_answer!
+    score = (-previous_score + points)
+
+    # only update previous regrade if it is empty
+    previous_regrade ||= previous_score
+
+    answer[:regrade_option]       = regrade_option
+    answer[:score_before_regrade] = previous_regrade
+    answer[:question_id]          = question.id
     score
   end
 
   private
-
-  def mark_full_credit!
-    previously_correct = correct?
-    previous_points    = points
-
-    regrade_and_merge_answer!
-
-    previously_correct ? 0 : points_possible - previous_points
-  end
-
-  def mark_current_and_previous_correct!
-    previously_partial = partial?
-    previously_correct = correct?
-    previous_points    = points
-    regrade_and_merge_answer!
-
-    return 0 if previously_correct
-
-    # previously partial or correct
-    if previously_partial || correct?
-      points_possible - previous_points
-    else
-      0
-    end
-  end
-
-  def mark_current_correct_only!
-    previously_partial = partial?
-    previously_correct = correct?
-    previous_points    = points
-    regrade_and_merge_answer!
-
-    # now fully correct
-    if !previously_correct && correct?
-      points_possible - previous_points
-
-    # now partial correct
-    elsif previously_correct && partial?
-      -(points_possible - points)
-
-    # no longer correct
-    elsif previously_correct && !correct?
-      -previous_points
-    else
-      0
-    end
-  end
 
   def correct?
     answer[:correct] == true
@@ -90,15 +50,30 @@ class QuizRegrader::Answer
     answer[:points] || 0
   end
 
+  def score_before_regrade
+    answer[:score_before_regrade]
+  end
+
   def points_possible
     question_data[:points_possible] || 0
   end
 
   def question_data
-    question.question_data
+    unless @question_data
+      @question_data = question.question_data
+
+      # update points_possible if we are part of a quiz group
+      group = question.quiz_group
+      if group && group.pick_count
+        @question_data[:points_possible] = group.question_points
+      end
+    end
+
+    @question_data
   end
 
   def regrade_and_merge_answer!
+    previously_correct = correct?
     question_id = question.id
 
     fake_submission_data = if question_data[:question_type] == 'multiple_answers_question'
@@ -112,8 +87,12 @@ class QuizRegrader::Answer
     question_data.merge!(id: question_id, question_id: question_id)
     newly_scored_data = QuizSubmission.score_question(question_data, fake_submission_data)
 
-    # always give credit for these two regrade options
-    if ["full_credit", "current_and_previous_correct"].include?(regrade_option)
+    # always give full credit
+    if regrade_option == "full_credit"
+      newly_scored_data[:points] = points_possible
+
+    # give full credit if was previously correct or correct now
+    elsif regrade_option == "current_and_previous_correct" && previously_correct
       newly_scored_data[:points] = points_possible
     end
 

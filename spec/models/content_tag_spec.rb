@@ -164,11 +164,9 @@ describe ContentTag do
   it "should not attempt to update asset name attribute if it's over the db limit" do
     course
     @page = @course.wiki.wiki_pages.create!(:title => "some page")
-    @page.workflow_state = 'unpublished'
     @page.save!
     @module = @course.context_modules.create!(:name => "module")
     @tag = @module.add_item({:type => 'WikiPage', :title => 'oh noes!' * 35, :id => @page.id})
-    @tag.workflow_state.should == 'unpublished'
 
     @tag.update_asset_name!
 
@@ -177,6 +175,8 @@ describe ContentTag do
   end
 
   it "should publish/unpublish the tag if the linked wiki page is published/unpublished" do
+    Course.any_instance.stubs(:draft_state_enabled?).returns(true)
+
     course
     @page = @course.wiki.wiki_pages.create!(:title => "some page")
     @page.workflow_state = 'unpublished'
@@ -199,6 +199,8 @@ describe ContentTag do
   end
 
   it "should publish/unpublish the linked wiki page (and its tags) if the tag is published/unpublished" do
+    Course.any_instance.stubs(:draft_state_enabled?).returns(true)
+
     course
     @page = @course.wiki.wiki_pages.create!(:title => "some page")
     @page.workflow_state = 'unpublished'
@@ -259,6 +261,17 @@ describe ContentTag do
     test_url_validation(ContentTag.create!(:content => quiz, :context => @course))
   end
 
+  it "should touch the module after committing the save" do
+    course
+    mod = @course.context_modules.create!
+    yesterday = 1.day.ago
+    ContextModule.where(:id => mod).update_all(:updated_at => yesterday)
+    tag = mod.add_item :type => 'context_module_sub_header', :title => 'blah'
+    mod.reload.updated_at.to_i.should == yesterday.to_i
+    run_transaction_commit_callbacks
+    mod.reload.updated_at.should > 5.seconds.ago
+  end
+
   it "should allow skipping touches on save" do
     course
     @assignment = @course.assignments.create!(:title => "some assignment")
@@ -268,6 +281,7 @@ describe ContentTag do
       :title => 'some assignment (renamed)',
       :id => @assignment.id
     })
+    run_transaction_commit_callbacks
     @tag.update_asset_name!
     @tag.reload
 
@@ -276,7 +290,9 @@ describe ContentTag do
 
     @tag.skip_touch = true
     @tag.save
+    run_transaction_commit_callbacks
 
     @module.reload.updated_at.to_i.should == yesterday.to_i
   end
+
 end

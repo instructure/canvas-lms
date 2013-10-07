@@ -20,7 +20,7 @@
 #
 # API for accessing account reports.
 #
-# @object report
+# @object Report
 #     {
 #       // The unique identifier for the report.
 #       "id": 1,
@@ -32,13 +32,13 @@
 #       "file_url": "https://example.com/some/path",
 #
 #       // The status of the report
-#       "complete",
+#       "status": "complete",
 #
 #       // The report parameters
-#       {"enrollment_term":"2","sis_terms_csv":"1","sis_accounts_csv":"1"},
+#       "parameters": {"enrollment_term":"2","sis_terms_csv":"1","sis_accounts_csv":"1"},
 #
 #       // The progress of the report
-#       "100",
+#       "progress": "100"
 #     }
 #
 class AccountReportsController < ApplicationController
@@ -140,7 +140,7 @@ class AccountReportsController < ApplicationController
 #     curl -H 'Authorization: Bearer <token>' \ 
 #          https://<canvas>/api/v1/accounts/<account_id>/reports/<report_type>
 #
-# @returns [report]
+# @returns [Report]
 #
   def index
     if authorized_action(@context, @current_user, :read_reports)
@@ -160,7 +160,7 @@ class AccountReportsController < ApplicationController
 #     curl -H 'Authorization: Bearer <token>' \ 
 #          https://<canvas>/api/v1/accounts/<account_id>/reports/<report_type>/<report_id>
 #
-# @returns report
+# @returns Report
 #
   def show
     if authorized_action(@context, @current_user, :read_reports)
@@ -178,7 +178,7 @@ class AccountReportsController < ApplicationController
 #          -X DELETE \ 
 #          https://<canvas>/api/v1/accounts/<account_id>/reports/<report_type>/<id>
 #
-# @returns report
+# @returns Report
 #
   def destroy
     if authorized_action(@context, @current_user, :read_reports)

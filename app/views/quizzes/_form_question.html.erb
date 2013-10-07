@@ -100,7 +100,7 @@
     </select>
     </div>
     <div class="multi_answer_sets">
-      <%= t(:show_possible_answers, "Show Possible Answers for %{question}", :question => raw("<select class='blank_id_select' aria-label='#{I18n.t('question_blank', 'Question blank')}'></select>")) %>
+      <%= t(:show_possible_answers, "Show Possible Answers for %{question}", :question => raw("<select class='blank_id_select' aria-label='#{ t(:show_possible_answers_no_question, "Show Possible Answers for")}'></select>")) %>
     </div>
     <div class="equation_answers">
       <div class="clear"></div>
@@ -114,13 +114,13 @@
         <table class="variables">
           <thead>
             <tr>
-              <th><%= t('headers.variable_name', "Variable") %></th>
-              <th><%= t('headers.variable_minimum', "Min") %></th>
-              <th><%= t('headers.variable_maximum', "Max") %></th>
-              <th><%= t('headers.variable_precision', "Decimal Places") %></th>
+              <th id='equation_var_name'><%= t('headers.variable_name', "Variable") %></th>
+              <th id='equation_var_minimum'><%= t('headers.variable_minimum', "Min") %></th>
+              <th id='equation_var_maximum'><%= t('headers.variable_maximum', "Max") %></th>
+              <th id='equation_var_precision'><%= t('headers.variable_precision', "Decimal Places") %></th>
               <th>
                 <%= t('headers.variable_example_value', "Example Value") %>
-                <div><button type="button" class="recompute_variables"><%= t('buttons.recompute', "Recompute") %></button></div>
+                <div><button type="button" class="btn btn-small recompute_variables"><%= t('buttons.recompute', "Recompute") %></button></div>
               </th>
             </tr>
           </thead>
@@ -146,7 +146,7 @@
       <div class="equation_content variables_specified formulas_specified">
         <%= t(:offer_combinations, "Offer %{how_many} possible value combinations (max %{max_combinations})", :how_many => raw('<input type="text" class="combination_count combinations_option" style="width: 30px;"/>'), :max_combinations => max_combinations) %><br/>
         <%= t(:allow_tolerance, "allow an error margin of +/- %{tolerance}", :tolerance => raw('<input type="text" class="combination_answer_tolerance float_value" style="width: 30px;" value="0"/>')) %>
-        <button type="button" class="compute_combinations combinations_option"><%= t('buttons.generate', "Generate") %></button>
+        <button type="button" class="btn compute_combinations combinations_option"><%= t('buttons.generate', "Generate") %></button>
       </div>
       <div class="formulas_specified combinations_holder">
         <table class="combinations">
@@ -165,9 +165,9 @@
     </div>
     <div class="matching_answer_incorrect_matches_holder" style="margin-top: 15px;">
       <b id="distractor_label"><%= before_label(:distractors, "Additional Match Possibilities (distractors)") %></b>
-      <div style="font-size: 0.8em;"><%= t(:distractor_instructions, "type each distractor on its own line") %></div>
+      <div id="distractor_instructions" style="font-size: 0.8em;"><%= t(:distractor_instructions, "type each distractor on its own line") %></div>
       <div style="text-align: center;">
-      <textarea style="width: 90%; height: 50px;" aria-labelledby="distractor_label" name="matching_answer_incorrect_matches"></textarea>
+      <textarea style="width: 90%; height: 50px;" aria-labelledby="distractor_label" aria-describedby="distractor_instructions" name="matching_answer_incorrect_matches"></textarea>
       </div>
     </div>
     <div class="missing_word_after_answer" style="margin-top: 15px;">

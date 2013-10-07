@@ -53,7 +53,17 @@ class ApplicationController < ActionController::Base
   after_filter :update_enrollment_last_activity_at
   include Tour
 
-  add_crumb(proc { %Q{<i title="#{I18n.t('links.dashboard', "My Dashboard")}" class="icon-home standalone-icon"></i>}.html_safe }, :root_path, :class => "home")
+  add_crumb(proc {
+    title = I18n.t('links.dashboard', 'My Dashboard')
+    crumb = <<-END
+      <i class="icon-home standalone-icon"
+         title="#{title}">
+        <span class="screenreader-only">#{title}</span>
+      </i>
+    END
+
+    crumb.html_safe
+  }, :root_path, class: 'home')
 
   ##
   # Sends data from rails to JavaScript
@@ -269,6 +279,7 @@ class ApplicationController < ActionController::Base
     action_session = opts.shift if !opts[0].is_a?(Symbol) && !opts[0].is_a?(Array)
     actions = Array(opts.shift)
     can_do = false
+
     begin
       if object == @context && user == @current_user
         @context_all_permissions ||= @context.grants_rights?(user, session, nil)
@@ -429,7 +440,10 @@ class ApplicationController < ActionController::Base
       end
       set_badge_counts_for(@context, @current_user, @current_enrollment)
       assign_localizer if @context.present?
-      add_crumb(@context.short_name, named_context_url(@context, :context_url), :id => "crumb_#{@context.asset_string}") if @context && @context.respond_to?(:short_name)
+      if @context && @context.respond_to?(:short_name)
+        crumb_url = named_context_url(@context, :context_url) if @context.grants_right?(@current_user, :read)
+        add_crumb(@context.short_name, crumb_url)
+      end
     end
   end
   
@@ -1053,6 +1067,8 @@ class ApplicationController < ActionController::Base
       redirect_to named_context_url(context, :context_quiz_url, tag.content_id, url_params)
     elsif tag.content_type == 'DiscussionTopic'
       redirect_to named_context_url(context, :context_discussion_topic_url, tag.content_id, url_params)
+    elsif tag.content_type == 'Rubric'
+      redirect_to named_context_url(context, :context_rubric_url, tag.content_id, url_params)
     elsif tag.content_type == 'ExternalUrl'
       @tag = tag
       @module = tag.context_module

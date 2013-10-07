@@ -1,0 +1,20 @@
+<div class="row-fluid">
+  <div id="progression_modules" class="span9" aria-busy="true" aria-live="polite" aria-relevant="additions" aria-atomic="false">
+  </div>
+  <div id="progression_students" class="span3" aria-busy="true">
+    <div class="header">
+      <h3>{{#t "student_progress"}}Student Progress{{/t}}</h3>
+      <a title="{{#t "back_to_modules"}}Back to Modules Page{{/t}}" href="{{ modules_url }}">
+        <i class="icon-x standalone-icon"></i>
+        <span class="screenreader-only">{{#t "back_to_modules"}}Back to Modules Page{{/t}}</span>
+      </a>
+    </div>
+    {{#if collection.length}}
+      <ul class="collectionViewItems"></ul>
+    {{else}}
+      {{#if collection.atLeastOnePageFetched}}
+        {{#t "no_students_found"}}No students were found{{/t}}
+      {{/if}}
+    {{/if}}
+  </div>
+</div>

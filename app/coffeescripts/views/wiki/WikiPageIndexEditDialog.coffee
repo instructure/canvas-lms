@@ -14,15 +14,14 @@ define [
     height: 190
 
   class WikiPageIndexEditDialog extends DialogFormView
+    setViewProperties: false
     className: 'page-edit-dialog'
 
     wrapperTemplate: wrapperTemplate
     template: -> ''
 
     initialize: (options) ->
-      modelView = @model?.view
       super _.extend {}, dialogDefaults, options
-      @model?.view = modelView
 
     setupDialog: ->
       super
@@ -42,4 +41,4 @@ define [
 
     openAgain: ->
       super
-      @.$('[name="wiki_page[title]"]').focus()
+      @.$('[name="title"]').focus()

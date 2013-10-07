@@ -25,7 +25,8 @@ class LearningOutcome < ActiveRecord::Base
   serialize :data
   before_save :infer_defaults
   validates_length_of :description, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
-  validates_presence_of :short_description
+  validates_length_of :short_description, :maximum => maximum_string_length
+  validates_presence_of :short_description, :workflow_state
   sanitize_field :description, Instructure::SanitizeField::SANITIZE
 
   set_policy do

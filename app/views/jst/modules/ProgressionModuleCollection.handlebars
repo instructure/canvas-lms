@@ -1,0 +1,15 @@
+<h2 id="student_{{student.id}}_header" class="screenreader-only">
+  {{#t "module_progress_for_student"}}Module Progress for {{student.name}}{{/t}}
+</h2>
+<h2 class="student-header" aria-hidden="true">
+  {{#t "module_progress_for"}}Module Progress for {{{student_link}}}{{/t}}
+</h2>
+<div class="module-progressions">
+  {{#if collection.length}}
+    <ul class="collectionViewItems"></ul>
+  {{else}}
+    {{#if collection.atLeastOnePageFetched}}
+      {{#t "no_modules_found"}}No modules were found{{/t}}
+    {{/if}}
+  {{/if}}
+</div>

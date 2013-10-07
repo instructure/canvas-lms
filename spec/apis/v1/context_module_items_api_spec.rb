@@ -604,6 +604,24 @@ describe "Module Items API", :type => :integration do
       @assignment_tag.workflow_state.should == 'deleted'
     end
 
+    it "should show module item completion for a student" do
+      student = User.create!
+      @course.enroll_student(student).accept!
+
+      @assignment.submit_homework(student, :body => "done!")
+
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items?student_id=#{student.id}",
+                      :controller => "context_module_items_api", :action => "index", :format => "json",
+                      :course_id => "#{@course.id}", :student_id => "#{student.id}", :module_id => "#{@module1.id}")
+      json.find{|m| m["id"] == @assignment_tag.id}["completion_requirement"]["completed"].should == true
+
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@assignment_tag.id}?student_id=#{student.id}",
+                      :controller => "context_module_items_api", :action => "show", :format => "json",
+                      :course_id => "#{@course.id}", :module_id => "#{@module1.id}",
+                      :id => "#{@assignment_tag.id}", :student_id => "#{student.id}")
+      json["completion_requirement"]["completed"].should == true
+    end
+
     describe "GET 'module_item_sequence'" do
       it "should 400 if the asset_type is missing" do
         api_call(:get, "/api/v1/courses/#{@course.id}/module_item_sequence?asset_id=999",
@@ -873,6 +891,24 @@ describe "Module Items API", :type => :integration do
                {}, {},
                {:expected_status => 401}
       )
+    end
+
+    it "should not show module item completion for other students" do
+      student = User.create!
+      @course.enroll_student(student).accept!
+
+      api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items?student_id=#{student.id}",
+                      {:controller => "context_module_items_api", :action => "index", :format => "json",
+                      :course_id => "#{@course.id}", :student_id => "#{student.id}", :module_id => "#{@module1.id}"},
+                      {}, {},
+                      {:expected_status => 401})
+
+      api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@assignment_tag.id}?student_id=#{student.id}",
+                      {:controller => "context_module_items_api", :action => "show", :format => "json",
+                      :course_id => "#{@course.id}", :module_id => "#{@module1.id}",
+                      :id => "#{@assignment_tag.id}", :student_id => "#{student.id}"},
+                      {}, {},
+                      {:expected_status => 401})
     end
 
     describe "GET 'module_item_sequence'" do

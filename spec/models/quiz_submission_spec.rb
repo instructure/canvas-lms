@@ -544,8 +544,8 @@ describe QuizSubmission do
       @quiz.generate_quiz_data(:persist => true)
       @sub = @quiz.generate_submission(@user)
       @sub.submission_data = {}
-      question_1 = @q1.question_data[:id]
-      question_2 = @q2.question_data[:id]
+      question_1 = @q1.data[:id]
+      question_2 = @q2.data[:id]
       @sub.submission_data["question_#{question_1}"] = answer_1
       @sub.submission_data["question_#{question_2}"] = answer_2 + 1
       @sub.grade_submission
@@ -575,8 +575,8 @@ describe QuizSubmission do
       @quiz.generate_quiz_data(:persist => true)
       @sub = @quiz.generate_submission(@user)
       @sub.submission_data = {}
-      question_1 = @q1.question_data[:id]
-      question_2 = @q2.question_data[:id]
+      question_1 = @q1.data[:id]
+      question_2 = @q2.data[:id]
       @sub.submission_data["question_#{question_1}"] = answer_1
       @sub.submission_data["question_#{question_2}"] = answer_2 + 1
       @sub.grade_submission
@@ -589,7 +589,6 @@ describe QuizSubmission do
       @results.first.mastery.should eql(true)
       @results.last.associated_asset.should eql(@q2.assessment_question)
       @results.last.mastery.should eql(false)
-
       @sub = @quiz.generate_submission(@user)
       @sub.attempt.should eql(2)
       @sub.submission_data = {}
@@ -1330,7 +1329,7 @@ describe QuizSubmission do
   end
 
   describe "question" do
-    let(:submission) { QuizSubmission.new }
+    let(:submission) { @quiz.quiz_submissions.build }
     let(:question1) { {:id => 1} }
     let(:question2) { {:id => 2} }
     let(:questions) { [question1, question2] }
@@ -1363,7 +1362,7 @@ describe QuizSubmission do
   end
 
   describe "question_answered?" do
-    let(:submission) { QuizSubmission.new }
+    let(:submission) { @quiz.quiz_submissions.build }
 
     before do
       submission.stubs(:temporary_data).returns \
@@ -1461,7 +1460,7 @@ describe QuizSubmission do
   end
 
   describe "update_submission_version" do
-    let(:submission) { QuizSubmission.new }
+    let(:submission) { @quiz.quiz_submissions.create! }
 
     before do
       submission.with_versioning(true) do |s|

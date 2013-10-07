@@ -21,77 +21,77 @@
 # @object Submission
 #     {
 #       // The submission's assignment id
-#       assignment_id: 23,
+#       "assignment_id": 23,
 #
 #       // The submission's assignment (see the assignments API) (optional)
-#       assignment: Assignment
+#       "assignment": "Assignment",
 #
 #       // The submission's course (see the course API) (optional)
-#       course: Course
+#       "course": "Course",
 #
 #       // This is the submission attempt number.
-#       attempt: 1,
+#       "attempt": 1,
 #
 #       // The content of the submission, if it was submitted directly in a
 #       // text field.
-#       body: "There are three factors too...",
+#       "body": "There are three factors too...",
 #
 #       // The grade for the submission, translated into the assignment grading
 #       // scheme (so a letter grade, for example).
-#       grade: "A-",
+#       "grade": "A-",
 #
 #       // A boolean flag which is false if the student has re-submitted since
 #       // the submission was last graded.
-#       grade_matches_current_submission: true,
+#       "grade_matches_current_submission": true,
 #
 #       // URL to the submission. This will require the user to log in.
-#       html_url: "http://example.com/courses/255/assignments/543/submissions/134",
+#       "html_url": "http://example.com/courses/255/assignments/543/submissions/134",
 #
 #       // URL to the submission preview. This will require the user to log in.
-#       preview_url: "http://example.com/courses/255/assignments/543/submissions/134?preview=1",
+#       "preview_url": "http://example.com/courses/255/assignments/543/submissions/134?preview=1",
 #
 #       // The raw score
-#       score: 13.5
+#       "score": 13.5,
 #
 #       // Associated comments for a submission (optional)
-#       submission_comments: [
+#       "submission_comments": [
 #         {
-#           id: 37,
-#           author_id: 134,
-#           author_name: "Toph Beifong",
-#           comment: "Well here's the thing...",
-#           created_at: "2012-01-01T01:00:00Z",
-#           media_comment: {
-#             content-type: "audio/mp4",
-#             display_name: "something",
-#             media_id: "3232",
-#             media_type: "audio",
-#             url:  "http://example.com/media_url"
+#           "id": 37,
+#           "author_id": 134,
+#           "author_name": "Toph Beifong",
+#           "comment": "Well here's the thing...",
+#           "created_at": "2012-01-01T01:00:00Z",
+#           "media_comment": {
+#             "content-type": "audio/mp4",
+#             "display_name": "something",
+#             "media_id": "3232",
+#             "media_type": "audio",
+#             "url":  "http://example.com/media_url"
 #           }
 #         }
 #       ],
 #
 #       // The types of submission
 #       // ex: ("online_text_entry"|"online_url"|"online_upload"|"media_recording")
-#       submission_type: "online_text_entry",
+#       "submission_type": "online_text_entry",
 #
 #       // The timestamp when the assignment was submitted
-#       submitted_at: "2012-01-01T01:00:00Z",
+#       "submitted_at": "2012-01-01T01:00:00Z",
 #
 #       // The URL of the submission (for "online_url" submissions).
-#       url: null,
+#       "url": null,
 #
 #       // The id of the user who created the submission
-#       user_id: 134
+#       "user_id": 134,
 #
 #       // The id of the user who graded the submission
-#       grader_id: 86
+#       "grader_id": 86,
 #
 #       // The submissions user (see user API) (optional)
-#       user: User
+#       "user": "User",
 #
 #       // Whether the submission was made after the applicable due date
-#       late: false
+#       "late": false
 #     }
 #
 class SubmissionsController < ApplicationController
@@ -153,9 +153,7 @@ class SubmissionsController < ApplicationController
       respond_to do |format|
         json_handled = false
         if params[:preview]
-          # this if was put it by ryan, it makes it so if they pass a ?preview=true&version=2 in the url that it will load the second version in the
-          # submission_history of that submission
-          if params[:version]
+          if params[:version] && !@assignment.quiz
             @submission = @submission.submission_history[params[:version].to_i]
           end
 
@@ -163,7 +161,16 @@ class SubmissionsController < ApplicationController
           if @assignment.quiz && @context.is_a?(Course) && @context.user_is_student?(@current_user) && !@context.user_is_instructor?(@current_user)
             format.html { redirect_to(named_context_url(@context, :context_quiz_url, @assignment.quiz.id, :headless => 1)) }
           elsif @submission.submission_type == "online_quiz" && @submission.quiz_submission_version
-            format.html { redirect_to(named_context_url(@context, :context_quiz_history_url, @assignment.quiz.id, :user_id => @submission.user_id, :headless => 1, :version => @submission.quiz_submission_version)) }
+            format.html {
+              quiz_params = {
+                headless: 1,
+                user_id: @submission.user_id,
+                version: params[:version] || @submission.quiz_submission_version
+              }
+              redirect_to named_context_url(@context,
+                                            :context_quiz_history_url,
+                                            @assignment.quiz.id, quiz_params)
+            }
           else
             format.html { render :action => "show_preview" }
           end

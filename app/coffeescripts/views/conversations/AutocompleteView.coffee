@@ -532,14 +532,14 @@ define [
     #
     # Returns nothing.
     setContext: (context, disable = false) ->
-      return if context?.id == @currentContext?.id
       context = null unless context.id
+      if disable and !_.include(ENV.current_user_roles, 'admin') and !@disabled
+        @disable(!context)
+      return if context?.id == @currentContext?.id
       @currentContext     = context
       @hasExternalContext = !!context
       @tokens             = []
       @$tokenList.find('li.ac-token').remove()
-      if disable and !_.include(ENV.current_user_roles, 'admin') and !@disabled
-        @disable(!@currentContext)
 
     disable: (value = true) ->
       @$input.prop('disabled', value)

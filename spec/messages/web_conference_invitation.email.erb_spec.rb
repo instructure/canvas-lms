@@ -28,7 +28,7 @@ describe 'web_conference_invitation.email' do
 
   it "should render" do
     course_model(:reusable => true)
-    @object = @course.web_conferences.create!(:conference_type => 'DimDim')
+    @object = @course.web_conferences.create!(:conference_type => 'DimDim', :user => user)
     generate_message(:web_conference_invitation, :email, @object)
   end
 end

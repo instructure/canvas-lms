@@ -147,7 +147,7 @@ define [
       $lastBefore = undefined
       $('tr.date').each ->
         dateString = $(this).find('.day_date').attr('data-date')
-        return false if dateString > todayString
+        return false if !dateString || dateString > todayString
         $lastBefore = $(this)
 
       calendarMonths.changeMonth $mini_month, $.datepicker.formatDate 'mm/dd/yy', new Date

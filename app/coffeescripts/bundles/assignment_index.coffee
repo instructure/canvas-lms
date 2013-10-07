@@ -33,10 +33,13 @@ require [
   course.url = ENV.URLS.course_url
   course.fetch()
 
+  includes = ["assignments"]
+  includes.push("all_dates") if ENV.PERMISSIONS.manage
+
   assignmentGroups = new AssignmentGroupCollection [],
     course: course
     params:
-      include: ["assignments"]
+      include: includes
       override_assignment_dates: !ENV.PERMISSIONS.manage
 
   inputFilterView = new InputFilterView
@@ -44,6 +47,9 @@ require [
 
   assignmentGroupsView = new AssignmentGroupListView
     collection: assignmentGroups
+    sortURL: ENV.URLS.sort_url
+    assignment_sort_base_url: ENV.URLS.assignment_sort_base_url
+    course: course
 
   assignmentSettingsView = false
   createGroupView = false

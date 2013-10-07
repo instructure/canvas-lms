@@ -104,6 +104,29 @@ module DatesOverridable
     list << without_overrides.due_date_hash.merge(:base => true)
   end
 
+  def dates_hash_visible_to(user)
+    all_dates = all_dates_visible_to(user)
+
+    # remove base if all sections are set
+    overrides = all_dates.select { |d| d[:set_type] == 'CourseSection' }
+    if overrides.count > 0 && overrides.count == context.active_course_sections.count
+      all_dates.delete_if {|d| d[:base] }
+    end
+
+    all_dates = all_dates.sort_by do |date|
+      due_at = date[:due_at]
+      [ due_at.present? ?  0 : 1, due_at.presence || 0 ]
+    end
+
+    all_dates.map do |dates|
+      dates.keep_if do |k, v|
+        [:due_at, :unlock_at, :lock_at, :title, :base].include?(k)
+      end
+    end
+
+    all_dates
+  end
+
   def observed_student_due_dates(user)
     ObserverEnrollment.observed_students(context, user).map do |student, enrollments|
       self.overridden_for(student).due_date_hash

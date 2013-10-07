@@ -42,6 +42,7 @@ class ContextController < ApplicationController
   end
   
   def media_object_inline
+    @show_embedded_chat = false
     @show_left_side = false
     @show_right_side = false
     @media_object = MediaObject.by_media_id(params[:id]).first

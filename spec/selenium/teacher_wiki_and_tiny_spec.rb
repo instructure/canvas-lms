@@ -21,9 +21,11 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       accordion = f('#pages_accordion')
       accordion.find_element(:link, I18n.t('links_to.quizzes', 'Quizzes')).click
       keep_trying_until { accordion.find_element(:link, quiz.title).should be_displayed }
-      accordion.find_element(:link, quiz.title).click
-      in_frame "wiki_page_body_ifr" do
-        f('#tinymce').should include_text(quiz.title)
+      keep_trying_until do
+        accordion.find_element(:link, quiz.title).click
+        in_frame "wiki_page_body_ifr" do
+          f('#tinymce').should include_text(quiz.title)
+        end
       end
 
       submit_form('#new_wiki_page')

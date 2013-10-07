@@ -20,29 +20,29 @@
 #
 # API for accessing Assignment Group and Assignment information.
 #
-# @object Assignment Group
+# @object AssignmentGroup
 #     {
 #       // the id of the Assignment Group
-#       id: 1,
+#       "id": 1,
 #
 #       // the name of the Assignment Group
-#       name: "group2",
+#       "name": "group2",
 #
 #       // the position of the Assignment Group
-#       position: 7,
+#       "position": 7,
 #
 #       // the weight of the Assignment Group
-#       group_weight: 20,
+#       "group_weight": 20,
 #
 #       // the assignments in this Assignment Group
 #       // (see the Assignment API for a detailed list of fields)
-#       assingments: { ... },
+#       "assignments": [],
 #
 #       // the grading rules that this Assignment Group has
-#       rules: {
-#         "drop_lowest" => 1,
-#         "drop_highest" => 1,
-#         "never_drop" => [33,17,24]
+#       "rules": {
+#         "drop_lowest": 1,
+#         "drop_highest": 1,
+#         "never_drop": [33,17,24]
 #       }
 #     }
 #
@@ -56,13 +56,14 @@ class AssignmentGroupsController < ApplicationController
   # Returns the list of assignment groups for the current context. The returned
   # groups are sorted by their position field.
   #
-  # @argument include[] [String, "assignments"|"discussion_topic"]
-  #   Associations to include with the group. "discussion_topic" is only valid
-  #   if "assignments" is also included.
+  # @argument include[] [String, "assignments"|"discussion_topic"|"all_dates"]
+  #  Associations to include with the group. both "discussion_topic" and
+  #  "all_dates" is only valid are only valid if "assignments" is also included.
+  #
   # @argument override_assignment_dates [Optional, Boolean]
   #   Apply assignment overrides for each assignment, defaults to true.
   #
-  # @returns [Assignment Group]
+  # @returns [AssignmentGroup]
   def index
     if authorized_action(@context.assignment_groups.new, @current_user, :read)
       @groups = @context.assignment_groups.active
@@ -71,6 +72,7 @@ class AssignmentGroupsController < ApplicationController
       if params[:include].include? 'assignments'
         assignment_includes = [:rubric, :quiz, :external_tool_tag]
         assignment_includes.concat(params[:include] & [:discussion_topic])
+        assignment_includes.concat(params[:include] & [:all_dates])
         @groups = @groups.includes(:active_assignments => assignment_includes)
 
         assignment_descriptions = @groups

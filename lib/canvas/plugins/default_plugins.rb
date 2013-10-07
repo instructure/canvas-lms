@@ -286,3 +286,13 @@ Canvas::Plugin.register('app_center', nil, {
     },
     :validator => 'AppCenterValidator'
 })
+Canvas::Plugin.register('embedded_chat', nil, {
+    :name => lambda{ t :name, 'Embedded Chat' },
+    :description => lambda{ t :description, 'In-page chat widget for use with the Instructure Chat LTI app' },
+    :website => 'http://www.instructure.com',
+    :author => 'Instructure',
+    :author_website => 'http://www.instructure.com',
+    :version => '1.0.0',
+    :settings_partial => 'plugins/embedded_chat_settings',
+    :settings => {}
+})

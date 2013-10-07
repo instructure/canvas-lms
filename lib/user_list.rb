@@ -59,12 +59,12 @@ class UserList
   
   attr_reader :errors, :addresses, :duplicate_addresses
   
-  def to_json(*options)
+  def as_json(*options)
     {
       :users => addresses.map { |a| a.reject { |k, v| k == :shard } },
       :duplicates => duplicate_addresses,
       :errored_users => errors
-    }.to_json
+    }
   end
 
   def users
@@ -76,7 +76,8 @@ class UserList
     non_existing = @addresses.select { |a| !a[:user_id] }
     non_existing_users = non_existing.map do |a|
       user = User.new(:name => a[:name] || a[:address])
-      user.communication_channels.build(:path => a[:address], :path_type => 'email')
+      cc = user.communication_channels.build(:path => a[:address], :path_type => 'email')
+      cc.user = user
       user.workflow_state = 'creation_pending'
       user.initial_enrollment_type = User.initial_enrollment_type_from_text(@options[:initial_type])
       user.save!

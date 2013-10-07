@@ -27,6 +27,8 @@ class DiscussionTopicParticipant < ActiveRecord::Base
 
   before_save :check_unread_count
 
+  validates_presence_of :discussion_topic_id, :user_id, :workflow_state, :unread_entry_count
+
   # keeps track of the read state for the initial discussion topic text
   workflow do
     state :unread

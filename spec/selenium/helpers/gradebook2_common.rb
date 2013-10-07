@@ -22,11 +22,11 @@ def toggle_muting(assignment)
 end
 
 def open_assignment_options(cell_index)
-  assignment_cell = ff('#gradebook_grid .slick-header-column')[cell_index]
+  assignment_cell = ffj('#gradebook_grid .slick-header-column')[cell_index]
   driver.action.move_to(assignment_cell).perform
   trigger = assignment_cell.find_element(:css, '.gradebook-header-drop')
   trigger.click
-  f("##{trigger['aria-owns']}").should be_displayed
+  fj("##{trigger['aria-owns']}").should be_displayed
 end
 
 def find_slick_cells(row_index, element)
@@ -43,7 +43,7 @@ def edit_grade(cell, grade)
   end
   set_value(grade_input, grade)
   grade_input.send_keys(:return)
-  wait_for_ajax_requests
+  wait_for_ajaximations
 end
 
 def validate_cell_text(cell, text)
@@ -80,10 +80,9 @@ end
 def switch_to_section(section=nil)
   section = section.id if section.is_a?(CourseSection)
   section ||= ""
-  f('#section_to_show').click
-  sleep 1 #TODO find a better way to wait for css3 anmation to end
-  f('#section-to-show-menu').should be_displayed
-  f("label[for='section_option_#{section}']").click
+  fj('#section_to_show').click
+  keep_trying_until { f('#section-to-show-menu').should be_displayed }
+  fj("label[for='section_option_#{section}']").click
   wait_for_ajaximations
 end
 

@@ -17,7 +17,7 @@
 #
 
 def enrollment_model(opts={})
-  @enrollment = factory_with_protected_attributes(Enrollment, valid_enrollment_attributes.merge(opts))
+  @enrollment = factory_with_protected_attributes(StudentEnrollment, valid_enrollment_attributes.merge(opts))
 end
 
 def valid_enrollment_attributes

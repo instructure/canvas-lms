@@ -6,15 +6,18 @@ define [
   'jst/wiki/WikiPageEdit'
   'compiled/views/ValidatedFormView'
   'compiled/views/wiki/WikiPageDeleteDialog'
+  'compiled/views/wiki/WikiPageReloadView'
   'i18n!pages'
   'compiled/tinymce'
   'tinymce.editor_box'
-], ($, _, Backbone, wikiSidebar, template, ValidatedFormView, WikiPageDeleteDialog, I18n) ->
+], ($, _, Backbone, wikiSidebar, template, ValidatedFormView, WikiPageDeleteDialog, WikiPageReloadView, I18n) ->
 
   class WikiPageEditView extends ValidatedFormView
     @mixin
       els:
-        '[name="wiki_page[body]"]': '$wikiPageBody'
+        '[name="body"]': '$wikiPageBody'
+        '.header-bar-outer-container': '$headerBarOuterContainer'
+        '.page-changed-alert': '$pageChangedAlert'
 
       events:
         'click a.switch_views': 'switchViews'
@@ -61,10 +64,8 @@ define [
         PUBLISH: !!@WIKI_RIGHTS.manage && json.contextName == "courses"
         DELETE: !!@PAGE_RIGHTS.delete
         EDIT_TITLE: !!@PAGE_RIGHTS.update || json.new_record
-        EDIT_HIDE: !!@WIKI_RIGHTS.manage && json.contextName == "courses"
         EDIT_ROLES: !!@WIKI_RIGHTS.manage
       json.SHOW =
-        OPTIONS: json.CAN.EDIT_HIDE || json.CAN.EDIT_ROLES
         COURSE_ROLES: json.contextName == "courses"
       json
 
@@ -76,18 +77,38 @@ define [
       @$wikiPageBody.editorBox()
       @initWikiSidebar()
 
+      @checkUnsavedOnLeave = true
+      view = this
+      $(window).on 'beforeunload', ->
+        if view && view.checkUnsavedOnLeave && view.hasUnsavedChanges()
+          return view.unsavedWarning()
+
       unless @firstRender
         @firstRender = true
         $ -> $('[autofocus]:not(:focus)').eq(0).focus()
+
+      @reloadPending = false
+      @reloadView = new WikiPageReloadView
+        el: @$pageChangedAlert
+        model: @model
+        reloadMessage: I18n.t 'reload_editing_page', 'This page has changed since you started editing it. *Reloading* will lose all of your changes.', wrapper: '<a class="reload" href="#">$1</a>'
+        warning: true
+      @reloadView.on 'changed', =>
+        @$headerBarOuterContainer.addClass('page-changed')
+        @reloadPending = true
+      @reloadView.on 'reload', =>
+        @render()
+      @reloadView.pollForChanges()
 
     # Initialize the wiki sidebar
     # @api private
     initWikiSidebar: ->
       unless wikiSidebar.inited
+        $wikiPageBody = @$wikiPageBody
         $ ->
           wikiSidebar.init()
           $.scrollSidebar()
-          wikiSidebar.attachToEditor(@$wikiPageBody).show()
+          wikiSidebar.attachToEditor($wikiPageBody).show()
       $ ->
         wikiSidebar.show()
 
@@ -100,8 +121,8 @@ define [
     validateFormData: (data) -> 
       errors = {}
 
-      if data.wiki_page?.title == ''
-        errors["wiki_page[title]"] = [
+      if data.title == ''
+        errors["title"] = [
           {
             type: 'required'
             message: I18n.t("errors.require_title",'You must enter a title')
@@ -110,12 +131,40 @@ define [
 
       errors
 
+    hasUnsavedChanges: ->
+      json = @toJSON()
+
+      formData = @getFormData()
+      oldBody = @model.get('body') || ''
+      newBody = formData.body || ''
+      if json.CAN.EDIT_TITLE
+        oldTitle = @model.get('title') || ''
+        newTitle = formData.title || ''
+      return (oldBody != newBody) || (oldTitle != newTitle)
+
+    unsavedWarning: ->
+      I18n.t("warnings.unsaved_changes",
+        "You have unsaved changes. Do you want to continue without saving these changes?")
+
+    submit: (event) ->
+      @checkUnsavedOnLeave = false
+      if @reloadPending
+        unless confirm(I18n.t 'warnings.overwrite_changes', 'You are about to overwrite other changes that have been made since you started editing.\n\nOverwrite these changes?')
+          event?.preventDefault()
+          return
+
+      @reloadView?.stopPolling()
+      super
+
     cancel: (event) ->
       event?.preventDefault()
-      @trigger('cancel')
+      if !@hasUnsavedChanges() || confirm(@unsavedWarning())
+        @checkUnsavedOnLeave = false
+        @trigger('cancel')
 
     deleteWikiPage: (event) ->
       event?.preventDefault()
+      return unless @model.get('deletable')
 
       deleteDialog = new WikiPageDeleteDialog
         model: @model

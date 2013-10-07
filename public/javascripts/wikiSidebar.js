@@ -95,6 +95,8 @@ define([
         $file = $tree1.find(".file_blank").clone(true);
         $file
           .attr('class', 'file')
+          .attr('title', file.display_name)
+          .attr('data-tooltip', '')
           .addClass(file.mime_class)
           .toggleClass('scribdable', file['scribdable?']);
         if(file.media_entry_id) {

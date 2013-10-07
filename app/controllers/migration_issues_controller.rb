@@ -22,33 +22,32 @@
 # @object MigrationIssue
 #   {
 #       // the unique identifier for the issue
-#       id: 370663
+#       "id": 370663,
 #
 #       // API url to the content migration
-#       content_migration_url: "https://example.com/api/v1/courses/1/content_migrations/1"
+#       "content_migration_url": "https://example.com/api/v1/courses/1/content_migrations/1",
 #
 #       // Description of the issue for the end-user
-#       description:  "Questions in this quiz couldn't be converted"
+#       "description":  "Questions in this quiz couldn't be converted",
 #
 #       // Current state of the issue: active, resolved
-#       workflow_state: "active"
+#       "workflow_state": "active",
 #
 #       // HTML Url to the Canvas page to investigate the issue
-#       fix_issue_html_url "https://example.com/courses/1/quizzes/2"
+#       "fix_issue_html_url": "https://example.com/courses/1/quizzes/2",
 #
 #       // Severity of the issue: todo, warning, error
-#       issue_type: "warning"
+#       "issue_type": "warning",
 #
 #       // Link to a Canvas error report if present (If the requesting user has permissions)
-#       error_report_html_url: "https://example.com/error_reports/3"
+#       "error_report_html_url": "https://example.com/error_reports/3",
 #
 #       // Site administrator error message (If the requesting user has permissions)
-#       error_message: "admin only message"
+#       "error_message": "admin only message",
 #
 #       // timestamps
-#       created_at: "2012-06-01T00:00:00-06:00",
-#       updated_at: "2012-06-01T00:00:00-06:00",
-#
+#       "created_at": "2012-06-01T00:00:00-06:00",
+#       "updated_at": "2012-06-01T00:00:00-06:00"
 #   }
 class MigrationIssuesController < ApplicationController
   include Api::V1::ContentMigration

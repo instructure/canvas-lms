@@ -25,7 +25,7 @@ class ExternalFeed < ActiveRecord::Base
   before_validation :infer_defaults
 
   include CustomValidations
-  validates_presence_of :url
+  validates_presence_of :url, :context_id, :context_type
   validates_as_url :url
 
   VERBOSITIES = %w(full link_only truncate)

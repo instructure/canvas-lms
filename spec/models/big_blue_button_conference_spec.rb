@@ -44,7 +44,7 @@ describe BigBlueButtonConference do
       user_model
       email = "email@email.com"
       @user.stubs(:email).returns(email)
-      conference = BigBlueButtonConference.create!(:title => "my conference", :user => @user)
+      conference = BigBlueButtonConference.create!(:title => "my conference", :user => @user, :context => Account.default)
       conference.config.should_not be_nil
 
       # set some vars so it thinks it's been created and doesn't do an api call
@@ -69,7 +69,7 @@ describe BigBlueButtonConference do
       user_model
       email = "email@email.com"
       @user.stubs(:email).returns(email)
-      conference = BigBlueButtonConference.create!(:title => "my conference", :user => @user)
+      conference = BigBlueButtonConference.create!(:title => "my conference", :user => @user, :context => Account.default)
       conference.expects(:send_request).with(:isMeetingRunning, anything).at_least(1).returns({:running => 'false'}, {:running => 'true'}, {:running => 'false'})
       conference.expects(:send_request).with(:create, anything).twice.returns(true)
 
@@ -103,6 +103,8 @@ describe BigBlueButtonConference do
     it "should send record flag if record user_setting is set" do
       bbb = BigBlueButtonConference.new
       bbb.user_settings = { :record => true }
+      bbb.user = user
+      bbb.context = Account.default
       bbb.save!
       bbb.expects(:send_request).with do |verb, options|
         verb.should eql :create
@@ -114,12 +116,28 @@ describe BigBlueButtonConference do
     it "should not send record flag if record user setting is unset" do
       bbb = BigBlueButtonConference.new
       bbb.user_settings = { :record => false }
+      bbb.user = user
+      bbb.context = Account.default
       bbb.save!
       bbb.expects(:send_request).with do |verb, options|
         verb.should eql :create
         options[:record].should eql "false"
       end
       bbb.initiate_conference
+    end
+
+    it "should properly serialize a response with no recordings" do
+      bbb = BigBlueButtonConference.new
+      bbb.stubs(:conference_key).returns('12345')
+      bbb.user_settings = { record: true }
+      bbb.user = user
+      bbb.context = Account.default
+      bbb.save!
+      response = {returncode: 'SUCCESS', recordings: "\n  ",
+                  messageKey: 'noRecordings', message: 'There are not
+                  recordings for the meetings'}
+      bbb.stubs(:send_request).returns(response)
+      bbb.recordings.should == []
     end
   end
 
@@ -141,6 +159,8 @@ describe BigBlueButtonConference do
     it "should not send record flag even if record user_setting is set" do
       bbb = BigBlueButtonConference.new
       bbb.user_settings = { :record => true }
+      bbb.user = user
+      bbb.context = Account.default
       bbb.save!
       bbb.expects(:send_request).with do |verb, options|
         verb.should eql :create

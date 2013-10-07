@@ -3,7 +3,7 @@ require File.expand_path(File.dirname(__FILE__) + '/messages_helper')
 
 describe 'report_generation_failed.email' do
   it "should render" do
-    @object = AccountReport.create!
+    @object = Account.default.account_reports.create!(user: user)
     @object.update_attribute :workflow_state, :error
     generate_message(:report_generation_failed, :email, @object)
   end

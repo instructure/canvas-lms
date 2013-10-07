@@ -3,9 +3,9 @@ define [
   'underscore'
   'Backbone'
   'compiled/class/cache'
-  'compiled/collections/AssignmentCollection'
+  'compiled/models/AssignmentGroup'
   'jst/assignments/ToggleShowBy'
-], (I18n, _, Backbone, Cache, AssignmentCollection, template) ->
+], (I18n, _, Backbone, Cache, AssignmentGroup, template) ->
 
   class ToggleShowByView extends Backbone.View
     @optionProperty 'course'
@@ -23,46 +23,43 @@ define [
     initialize: ->
       super
       @initialized = false
-      @firstResetLanded = @assignmentGroups.length > 0
-
+      @initializeCache()
       @course.on 'change', @initializeCache
       @course.on 'change', @render
-      @assignmentGroups.on 'reset', @initializeDateGroups
+      @assignmentGroups.once 'reset', @initializeDateGroups
       @.on 'changed:showBy', @setAssignmentGroups
       @.on 'changed:showBy', @render
 
     initializeCache: =>
+      return unless @course.get('id')?
       $.extend true, @, Cache
       @cache.use('localStorage') if ENV.current_user_id? # default: {}
       @cache.set(@cacheKey(), true) if !@cache.get(@cacheKey())?
       @initialized = true
 
     initializeDateGroups: =>
-      unless @firstResetLanded
-        @firstResetLanded = true
+      assignments = _.flatten(@assignmentGroups.map (ag) -> ag.get('assignments').models)
+      dated = _.select assignments, (a) -> a.dueAt()?
+      undated = _.difference assignments, dated
+      past = _.chain(dated)
+        .select((a) -> (new Date()) > Date.parse(a.dueAt()))
+        .sortBy((a) -> (new Date()) - Date.parse(a.dueAt()))
+        .value()
+      upcoming = _.chain(dated)
+        .difference(past)
+        .sortBy((a) -> Date.parse(a.dueAt()))
+        .value()
+      overdue = []
 
-        assignments = _.flatten(@assignmentGroups.map (ag) -> ag.get('assignments').models)
-        dated = _.select assignments, (a) -> a.dueAt()?
-        undated = _.difference assignments, dated
-        past = _.chain(dated)
-          .select((a) -> (new Date()) > Date.parse(a.dueAt()))
-          .sortBy((a) -> (new Date()) - Date.parse(a.dueAt()))
-          .value()
-        upcoming = _.chain(dated)
-          .difference(past)
-          .sortBy((a) -> Date.parse(a.dueAt()))
-          .value()
-        overdue = []
+      @groupedByAG = @assignmentGroups.models
+      @groupedByDate = [
+        new AssignmentGroup({ id: 'overdue', name: 'Overdue Assignments', assignments: overdue }),
+        new AssignmentGroup({ id: 'upcoming', name: 'Upcoming Assignments', assignments: upcoming }),
+        new AssignmentGroup({ id: 'undated', name: 'Undated Assignments', assignments: undated }),
+        new AssignmentGroup({ id: 'past', name: 'Past Assignments', assignments: past })
+      ]
 
-        @groupedByAG = @assignmentGroups.models
-        @groupedByDate = [
-          new Backbone.Model({ id: 'overdue', name: 'Overdue Assignments', assignments: new AssignmentCollection(overdue) }),
-          new Backbone.Model({ id: 'upcoming', name: 'Upcoming Assignments', assignments: new AssignmentCollection(upcoming) }),
-          new Backbone.Model({ id: 'undated', name: 'Undated Assignments', assignments: new AssignmentCollection(undated) }),
-          new Backbone.Model({ id: 'past', name: 'Past Assignments', assignments: new AssignmentCollection(past) })
-        ]
-
-        @setAssignmentGroups()
+      @setAssignmentGroups()
 
     toJSON: ->
       visible: @initialized

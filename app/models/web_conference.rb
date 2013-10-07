@@ -28,7 +28,7 @@ class WebConference < ActiveRecord::Base
   has_many :attendees, :through => :web_conference_participants, :source => :user, :conditions => ['web_conference_participants.participation_type = ?', 'attendee']
   belongs_to :user
   validates_length_of :description, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
-  validates_presence_of :conference_type, :title
+  validates_presence_of :conference_type, :title, :context_id, :context_type, :user_id
   
   before_validation :infer_conference_details
 

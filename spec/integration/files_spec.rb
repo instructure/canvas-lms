@@ -224,7 +224,8 @@ describe FilesController do
     before do
       course_with_teacher(:active_all => true, :user => user_with_pseudonym)
       login_as
-      @aq = assessment_question_model
+      bank = @course.assessment_question_banks.create!
+      @aq = assessment_question_model(:bank => bank)
       @att = @aq.attachments.create!(:uploaded_data => stub_png_data)
     end
 

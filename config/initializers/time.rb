@@ -7,6 +7,18 @@ Time.class_eval do
                    timestamp.strftime("%H").to_i, 
                    timestamp.strftime("%M").to_i)
   end
+
+  def as_json_with_utc(options={})
+    self.utc.as_json_without_utc(options)
+  end
+  alias_method_chain :as_json, :utc
+end
+
+DateTime.class_eval do
+  def as_json_with_utc(options={})
+    self.utc.as_json_without_utc(options)
+  end
+  alias_method_chain :as_json, :utc
 end
 
 # Object#blank? calls respond_to?, which has to instantiate the time object
@@ -18,5 +30,9 @@ class ActiveSupport::TimeWithZone
 
   def utc_datetime
     self.comparable_time.utc_datetime
+  end
+
+  def as_json(options={})
+    self.utc.as_json_without_utc(options)
   end
 end

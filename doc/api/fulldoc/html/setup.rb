@@ -17,7 +17,7 @@
 #
 
 $:.unshift(File.join(File.dirname(__FILE__), 'swagger'))
-require 'controller_view'
+require 'controller_list_view'
 
 include Helpers::ModuleHelper
 include Helpers::FilterHelper
@@ -122,6 +122,12 @@ module YARD::Templates::Helpers::HtmlHelper
     str.gsub(' ', '_').underscore
   end
 
+  def url_for_file(filename, anchor = nil)
+    link = filename.filename
+    link += (anchor ? '#' + urlencode(anchor) : '')
+    link
+  end
+
   # override yard-appendix link_appendix
   def link_appendix(ref)
     __errmsg = "unable to locate referenced appendix '#{ref}'"
@@ -144,10 +150,10 @@ end
 
 def init
   options[:objects] = run_verifier(options[:objects])
-  generate_swagger_json
   options[:resources] = options[:objects].
     group_by { |o| o.tags('API').first.text }.
     sort_by  { |o| o.first }
+  generate_swagger_json
 
   options[:page_title] = "Canvas LMS REST API Documentation"
 
@@ -170,34 +176,32 @@ def init
   end
 end
 
-def generate_swagger_json
-  apis = []
-  controllers = run_verifier(options[:objects])
-  controllers.each do |controller|
-    ControllerView.new(controller).methods.each do |method|
-      apis << method.to_swagger
-    end
-  end
+def generate_swagger(filename, json)
+  output_dir = File.join(%w(public doc api))
+  FileUtils.mkdir_p output_dir
 
-  domain = ENV["SWAGGER_DOMAIN"] || "http://canvas.instructure.com"
+  path = File.join(output_dir, filename)
+  File.open(path, "w") do |file|
+    file.puts JSON.pretty_generate(json)
+  end
+end
+
+def generate_swagger_json
+  api_resources = []
+  model_resources = []
+  options[:resources].each do |name, controllers|
+    view = ControllerListView.new(name, controllers)
+    api_resources << view.swagger_reference
+    generate_swagger(view.swagger_file, view.swagger_api_listing)
+  end
 
   resource_listing = {
     "apiVersion" => "1.0",
     "swaggerVersion" => "1.2",
-    "basePath" => "#{domain}/api",
-    "resourcePath" => "/v1",
-    "apis" => apis,
-    # "models": models,
+    "apis" => api_resources
   }
 
-  output_dir = File.join(%w(public doc api))
-  FileUtils.mkdir_p output_dir
-
-  filename = File.join(output_dir, "api.json")
-  puts "Writing API data to #{filename}"
-  File.open(filename, "w") do |file|
-    file.puts JSON.pretty_generate(resource_listing)
-  end
+  generate_swagger("api-docs.json", resource_listing)
 end
 
 def serialize(object)
@@ -271,7 +275,7 @@ def build_json_objects_map
   resource_obj_list = {}
   options[:resources].each do |r,cs|
     cs.each do |controller|
-      controller.tags(:object).each do |obj|
+      (controller.tags(:object) + controller.tags(:model)).each do |obj|
         name, json = obj.text.split(%r{\n+}, 2).map(&:strip)
         obj_map[name] = topicize r
         resource_obj_list[r] ||= []

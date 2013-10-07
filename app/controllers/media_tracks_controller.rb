@@ -42,7 +42,7 @@ class MediaTracksController < ApplicationController
   #         -F content='0\n00:00:00,000 --> 00:00:01,000\nInstructor…This is the first sentance\n\n\n1\n00:00:01,000 --> 00:00:04,000\nand a second...' \ 
   #         -H 'Authorization: Bearer <token>'
   #
-  # @returns Media Object
+  # @returns MediaObject
   def create
     @media_object = MediaObject.active.by_media_id(params[:media_object_id]).first
     if authorized_action(@media_object, @current_user, :add_captions)
@@ -77,7 +77,7 @@ class MediaTracksController < ApplicationController
   #     curl -X DELETE https://<canvas>/media_objects/<media_object_id>/media_tracks/<media_track_id> \
   #          -H 'Authorization: Bearer <token>'
   #
-  # @returns Media Object
+  # @returns MediaObject
   def destroy
     @media_object = MediaObject.by_media_id(params[:media_object_id]).first
     if authorized_action(@media_object, @current_user, :delete_captions)

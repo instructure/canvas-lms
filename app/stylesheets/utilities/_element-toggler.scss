@@ -1,0 +1,41 @@
+/*
+@styleguide Element Toggler
+
+This represents current best practices around using the .element-toggler class.
+
+The current thinking on accessibility is that we should use a span for the
+element-toggler dom element so that it's not read as "link" like it would if we
+used an &lt;&gt; tag.  Use aria-controls and aria-expanded on the dom element that
+has class element_toggler.  However, this does not work in all the screenreader
+configurations that we currently support, so it is also recommended that you
+include an aria-label, of the format: "[toggler-name] toggle
+[toggled-content-description] visibility".  So for example on the assignment
+index page, for an assignment group named "Math Week 1" we say "Math Week
+1 toggle assignment visibility"
+
+see app/coffeescripts/behaviors/elementToggler.coffee for implementation
+see the styleguide javascript for a bit of js to toggle the arrow button based
+on state.
+
+```html
+
+<span
+  class="element_toggler"
+  aria-controls="group_1"
+  aria-expanded="true"
+  aria-label="Toggler toggle list visibility"
+  role="button"
+>
+  <i class="icon-mini-arrow-down"></i> Toggler
+</span>
+<ul id="group_1">
+  <li>item 1</li>
+  <li>item 2</li>
+</ul>
+
+```
+*/
+
+.element_toggler {
+  cursor: pointer;
+}

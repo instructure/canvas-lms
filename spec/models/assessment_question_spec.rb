@@ -31,11 +31,11 @@ describe AssessmentQuestion do
   end
   
   it "should create a new instance given valid attributes" do
-    assessment_question_model
+    assessment_question_model(bank: AssessmentQuestionBank.create!(context: Course.create!))
   end
 
   it "should infer_defaults from question_data before validation" do
-    @question = assessment_question_model
+    @question = assessment_question_model(bank: AssessmentQuestionBank.create!(context: Course.create!))
     @question.name = "1" * 300
     @question.save(false) # save without validations
     @question.name.length.should == 300

@@ -173,8 +173,8 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly) ->
     toJSON: =>
       data = @assignment.toView()
       _.extend data,
-        kalturaEnabled: ENV?.KALTURA_ENABLED || false
-        isLargeRoster: ENV?.IS_LARGE_ROSTER || false
+        kalturaEnabled: ENV?.KALTURA_ENABLED or false
+        isLargeRoster: ENV?.IS_LARGE_ROSTER or false
         submissionTypesFrozen: _.include(data.frozenAttributes, 'submission_types')
 
     _attachEditorToDescription: =>
@@ -273,6 +273,7 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly) ->
       errors = @assignmentGroupSelector.validateBeforeSave(data, errors)
       unless ENV?.IS_LARGE_ROSTER
         errors = @groupCategorySelector.validateBeforeSave(data, errors)
+      errors = @_validatePercentagePoints(data, errors)
       errors = @_validateAdvancedOptions(data, errors)
       data2 =
         assignment_overrides: @dueDateOverrideView.getAllDates(data)
@@ -280,7 +281,9 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly) ->
       errors
 
     _validateTitle: (data, errors) =>
-      if !data.name or $.trim(data.name.toString()).length == 0
+      frozenTitle = _.contains(@model.frozenAttributes(), "title")
+
+      if !frozenTitle and (!data.name or $.trim(data.name.toString()).length == 0)
         errors["name"] = [
           message: I18n.t 'name_is_required', 'Name is required!'
         ]
@@ -295,9 +298,18 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly) ->
       errors
 
     _validateAllowedExtensions: (data, errors) =>
-      if data.allowed_extensions && data.allowed_extensions.length == 0
+      if data.allowed_extensions and data.allowed_extensions.length == 0
         errors["allowed_extensions"] = [
           message: I18n.t 'at_least_one_file_type', 'Please specify at least one allowed file type'
+        ]
+      errors
+
+    # Require points possible > 0
+    # if grading type === percent
+    _validatePercentagePoints: (data, errors) =>
+      if data.grading_type == 'percent' and (data.points_possible == "0" or isNaN(parseFloat(data.points_possible)))
+        errors["points_possible"] = [
+          message: I18n.t 'points_possible', 'Points possible must be more than 0 for percentage grading'
         ]
       errors
 
@@ -305,7 +317,8 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly) ->
     _validateAdvancedOptions: (data, errors) =>
       ariaExpanded = @$advancedAssignmentOptions.attr('aria-expanded')
       expanded = ariaExpanded == 'true' or ariaExpanded == true
-      if _.keys(errors).length > 0 && !expanded
+      error_keys = _.keys(errors)
+      if error_keys.length > 0 and !_.contains(error_keys, "name") and !expanded
         errors["assignmentToggleAdvancedOptions"] = [
           message: I18n.t 'advanced_options_errors', 'There were errors on one or more advanced options'
         ]

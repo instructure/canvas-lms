@@ -17,6 +17,7 @@ namespace :jst do
 
   desc 'precompile ember templates'
   task :ember do
+    require 'lib/handlebars/ember'
     files = Dir.glob("app/coffeescripts/**/*.hbs")
     files.each do |file|
       EmberHbs::compile_file(file)

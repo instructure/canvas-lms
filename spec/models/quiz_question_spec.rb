@@ -23,7 +23,9 @@ describe QuizQuestion do
   it "should deserialize its json data" do
     answers = {'answer_0' => {'id' => 1}, 'answer_1' => {'id' => 2}}
     qd = {'name' => 'test question', 'question_type' => 'multiple_choice_question', 'answers' => answers}
-    a = AssessmentQuestion.create!
+    course
+    bank = @course.assessment_question_banks.create!
+    a = bank.assessment_questions.create!
     q = QuizQuestion.create(:question_data => qd, :assessment_question => a)
     q.question_data.should_not be_nil
     q.question_data.class.should == HashWithIndifferentAccess
@@ -139,6 +141,21 @@ describe QuizQuestion do
         result = QuizQuestion.migrate_question_hash @quiz_question.question_data, :context => @course, :user => @user
         confirm_all_migrations(result)
       }.to change(Attachment, :count).by(@attachment_count)
+    end
+  end
+
+  describe "#destroy" do
+
+    it "does not remove the record from the database, but changes workflow_state" do
+      course_with_teacher
+      course_quiz
+
+      question = @quiz.quiz_questions.create!
+      question.destroy
+      question = QuizQuestion.find(question.id)
+
+      question.should_not be_nil
+      question.should be_deleted
     end
   end
 end

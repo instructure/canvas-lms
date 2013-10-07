@@ -106,4 +106,5 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
           $('#{from_group} .user_id_#{user_id}'),
           $('#{to_group}'))
     SCRIPT
+    sleep 1
   end

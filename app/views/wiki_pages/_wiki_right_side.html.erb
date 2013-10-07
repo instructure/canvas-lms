@@ -22,7 +22,7 @@
     </div>
   <% end %>
   <div>
-    <% pages = @context.wiki.wiki_pages.active.select{|p| !p.new_record? }.sort_by{|p| p.title || ""} %>
+    <% pages = @context.wiki.wiki_pages.not_deleted.select{|p| !p.new_record? }.sort_by{|p| p.title || ""} %>
     <% if pages.length > 10 %>
     <h2><%= t 'headers.common_pages', 'Common Pages' %></h2>
     <div class="rs-margin-lr rs-margin-bottom">

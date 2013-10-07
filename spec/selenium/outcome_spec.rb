@@ -31,6 +31,14 @@ describe "outcomes" do
       it "should validate mastery points" do
         should_validate_mastery_points
       end
+
+      it "should require a title" do
+        should_validate_short_description_presence
+      end
+
+      it "should require a title less than 255 chars" do
+        should_validate_short_description_length
+      end
     end
 
     context "create/edit/delete outcome groups" do
@@ -81,6 +89,17 @@ describe "outcomes" do
         # LearningOutcome.find_by_short_description(escaped_title).should be_present
         # or not, looks like it isn't being escaped
         LearningOutcome.find_by_short_description(title).should be_present
+      end
+    end
+
+    context "#show" do
+      it "should show rubrics as aligned items" do
+        outcome_with_rubric
+
+        get "/courses/#{@course.id}/outcomes/#{@outcome.id}"
+        wait_for_ajaximations
+
+        f('#alignments').text.should match(/#{@rubric.title}/)
       end
     end
   end

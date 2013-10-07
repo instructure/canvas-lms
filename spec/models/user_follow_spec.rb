@@ -71,7 +71,7 @@ describe "UserFollow" do
     it "should unfollow private collections on group unfollow" do
       @shard1.activate do
         account = Account.create!
-        @group = Group.create!(:group_category => GroupCategory.communities_for(account), :is_public => true, :join_level => 'parent_context_auto_join')
+        @group = Group.create!(:group_category => GroupCategory.communities_for(account), :is_public => true, :join_level => 'parent_context_auto_join', :context => account)
         @coll = @group.collections.create!(:name => 'col1', :visibility => 'private')
       end
       @membership = @group.add_user(@user1)

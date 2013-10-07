@@ -40,7 +40,7 @@ class QuizGroup < ActiveRecord::Base
       # don't do a valid question check because we don't want to instantiate all the bank's questions
       count = self.assessment_question_bank.assessment_question_count
     else
-      count = self.quiz_questions.select{|q| q.unsupported != true}.length rescue self.quiz_questions.length
+      count = self.quiz_questions.active.count
     end
     
     [self.pick_count.to_i, count].min
@@ -66,7 +66,7 @@ class QuizGroup < ActiveRecord::Base
       "name" => self.name,
       "pick_count" => self.pick_count,
       "question_points" => self.question_points,
-      "questions" => self.assessment_question_bank_id ? [] : self.quiz_questions.map{|q| q.data},
+      "questions" => self.assessment_question_bank_id ? [] : self.quiz_questions.active.map{|q| q.data},
       "assessment_question_bank_id" => self.assessment_question_bank_id
     }.with_indifferent_access
   end

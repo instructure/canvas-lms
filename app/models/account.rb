@@ -99,6 +99,7 @@ class Account < ActiveRecord::Base
   validates_length_of :name, :maximum => maximum_string_length, :allow_blank => true
   validate :account_chain_loop, :if => :parent_account_id_changed?
   validate :validate_auth_discovery_url
+  validates_presence_of :workflow_state
 
   include StickySisFields
   are_sis_sticky :name
@@ -1335,6 +1336,14 @@ class Account < ActiveRecord::Base
     migration.save
   end
 
+  def enable_draft!
+    change_root_account_setting!(:enable_draft, true)
+  end
+
+  def disable_draft!
+    change_root_account_setting!(:enable_draft, false)
+  end
+
   def enable_quiz_regrade!
     change_root_account_setting!(:enable_quiz_regrade, true)
   end
@@ -1347,4 +1356,5 @@ class Account < ActiveRecord::Base
     root_account.settings[setting_name] = new_value
     root_account.save!
   end
+
 end

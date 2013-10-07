@@ -108,27 +108,27 @@ describe GradebookImporter do
       end
 
       importer_with_rows(uploaded_csv)
-      hash = ActiveSupport::JSON.decode(@gi.to_json)
+      hash = @gi.as_json
 
-      hash['students'][0]['id'].should == @u1.id
-      hash['students'][0]['original_id'].should == @u1.id
-      hash['students'][0]['name'].should eql(@u1.name)
+      hash[:students][0][:id].should == @u1.id
+      hash[:students][0][:original_id].should == @u1.id
+      hash[:students][0][:name].should eql(@u1.name)
 
-      hash['students'][1]['id'].should == @u2.id
-      hash['students'][1]['original_id'].should == @u2.id
+      hash[:students][1][:id].should == @u2.id
+      hash[:students][1][:original_id].should == @u2.id
 
-      hash['students'][2]['id'].should == @u3.id
-      hash['students'][2]['original_id'].should == @u3.id
+      hash[:students][2][:id].should == @u3.id
+      hash[:students][2][:original_id].should == @u3.id
 
       # Looking up by login, but there are no active pseudonyms for u4
-      hash['students'][3]['id'].should < 0
-      hash['students'][3]['original_id'].should be_nil
+      hash[:students][3][:id].should < 0
+      hash[:students][3][:original_id].should be_nil
 
-      hash['students'][4]['id'].should == @u5.id
-      hash['students'][4]['original_id'].should == @u5.id
+      hash[:students][4][:id].should == @u5.id
+      hash[:students][4][:original_id].should == @u5.id
 
-      hash['students'][5]['id'].should <  0
-      hash['students'][5]['original_id'].should be_nil
+      hash[:students][5][:id].should <  0
+      hash[:students][5][:original_id].should be_nil
     end
     
     it "should allow ids that look like numbers" do
@@ -155,13 +155,13 @@ describe GradebookImporter do
       end
 
       importer_with_rows(uploaded_csv)
-      hash = ActiveSupport::JSON.decode(@gi.to_json)
+      hash = @gi.as_json
 
-      hash['students'][0]['id'].should == @u0.id
-      hash['students'][0]['original_id'].should == @u0.id
+      hash[:students][0][:id].should == @u0.id
+      hash[:students][0][:original_id].should == @u0.id
 
-      hash['students'][1]['id'].should == @u1.id
-      hash['students'][1]['original_id'].should == @u1.id
+      hash[:students][1][:id].should == @u1.id
+      hash[:students][1][:original_id].should == @u1.id
     end
   end
 
@@ -264,20 +264,20 @@ describe GradebookImporter do
     end
 
     it "should have a simplified json output" do
-      hash = ActiveSupport::JSON.decode(@gi.to_json)
-      hash.keys.sort.should eql(["assignments", "missing_objects", "original_submissions", "students", "unchanged_assignments"])
-      students = hash["students"]
+      hash = @gi.as_json
+      hash.keys.sort.should eql([:assignments, :missing_objects, :original_submissions, :students, :unchanged_assignments])
+      students = hash[:students]
       students.should be_is_a(Array)
       student = students.first
-      student.keys.sort.should eql(["id", "last_name_first", "name", "original_id", "submissions"])
-      submissions = student["submissions"]
+      student.keys.sort.should eql([:id, :last_name_first, :name, :original_id, :submissions])
+      submissions = student[:submissions]
       submissions.should be_is_a(Array)
       submission = submissions.first
       submission.keys.sort.should eql(["assignment_id", "grade", "original_grade"])
-      assignments = hash["assignments"]
+      assignments = hash[:assignments]
       assignments.should be_is_a(Array)
       assignment = assignments.first
-      assignment.keys.sort.should eql(["grading_type", "id", "original_id", "points_possible", "title"])
+      assignment.keys.sort.should eql([:grading_type, :id, :original_id, :points_possible, :title])
     end
   end
 end

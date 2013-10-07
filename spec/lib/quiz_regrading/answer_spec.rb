@@ -11,7 +11,8 @@ describe QuizRegrader::Answer do
   let(:question) do
     stub(:id => 1, :question_data => {:id => 1,
                                       :regrade_option => 'full_credit',
-                                      :points_possible => points})
+                                      :points_possible => points},
+                   :quiz_group => nil)
   end
 
   let(:question_regrade) do
@@ -52,7 +53,11 @@ describe QuizRegrader::Answer do
       when :partial then "partial"
     end
 
-    points = correct == :wrong ? 0 : answer[:points]
+    points = case correct
+      when true      then 15
+      when false     then 0
+      when "partial" then 10
+    end
 
     sent_params = {}
     QuizSubmission.expects(:score_question).with do |*args|
@@ -100,8 +105,7 @@ describe QuizRegrader::Answer do
 
     context 'full_credit regrade option' do
 
-      it 'returns the points possible for the question if the answer '+
-        'was not correct before' do
+      it 'returns the points possible for the question if the answer was not correct before' do
         mark_original_answer_as!(:wrong)
         score_question_as!(:correct)
         answer[:points] = 0
@@ -167,6 +171,13 @@ describe QuizRegrader::Answer do
         mark_original_answer_as!(:correct)
         score_question_as!(:correct)
         wrapper.regrade!.should == 0
+        assert_answer_has_regrade_option!('current_correct_only')
+      end
+
+      it 'returns difference if previously partial and partial after regrading' do
+        mark_original_answer_as!(:partial)
+        score_question_as!(:partial)
+        wrapper.regrade!.should == 5
         assert_answer_has_regrade_option!('current_correct_only')
       end
 

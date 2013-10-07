@@ -22,7 +22,9 @@ class UserService < ActiveRecord::Base
   belongs_to :user
   attr_accessor :password
   attr_accessible :user, :service, :protocol, :token, :secret, :service_user_url, :service_user_id, :service_user_name, :service_domain, :visible
-  
+
+  validates_presence_of :user_id, :service, :service_user_id, :workflow_state
+
   before_save :infer_defaults
   after_save :assert_relations
   after_save :touch_user

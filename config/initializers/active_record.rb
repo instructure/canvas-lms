@@ -238,12 +238,13 @@ class ActiveRecord::Base
     except = options.delete(:except) || []
     except = Array(except)
     except.concat(self.class.serialization_excludes) if self.class.respond_to?(:serialization_excludes)
-    except.concat(@serialization_excludes) if @serialization_excludes
+    except.concat(self.serialization_excludes) if self.respond_to?(:serialization_excludes)
     except.uniq!
+
     methods = options.delete(:methods) || []
     methods = Array(methods)
     methods.concat(self.class.serialization_methods) if self.class.respond_to?(:serialization_methods)
-    methods.concat(@serialization_methods) if @serialization_methods
+    methods.concat(self.serialization_methods) if self.respond_to?(:serialization_methods)
     methods.uniq!
 
     options[:except] = except unless except.empty?
@@ -895,7 +896,7 @@ module MySQLAdapterExtensions
   end
 
   def add_column_with_foreign_key_check(table, name, type, options = {})
-    Canvas.active_record_foreign_key_check(name, type, options)
+    Canvas.active_record_foreign_key_check(name, type, options) unless adapter_name == 'Sqlite'
     add_column_without_foreign_key_check(table, name, type, options)
   end
 
@@ -988,7 +989,9 @@ if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
       end
 
       if index_name.length > index_name_length
-        @logger.warn("Index name '#{index_name}' on table '#{table_name}' is too long; the limit is #{index_name_length} characters. Skipping.")
+        warning = "Index name '#{index_name}' on table '#{table_name}' is too long; the limit is #{index_name_length} characters. Skipping."
+        @logger.warn(warning)
+        raise warning unless Rails.env.production?
         return
       end
       if index_exists?(table_name, index_name, false)
@@ -1087,7 +1090,9 @@ end
 
 ActiveRecord::ConnectionAdapters::TableDefinition.class_eval do
   def column_with_foreign_key_check(name, type, options = {})
-    Canvas.active_record_foreign_key_check(name, type, options)
+    # SQLite isn't a first class supported db, but some specs still use it as an extra shard,
+    # and it implements column changes by recreating, so just ignore this for SQLite
+    Canvas.active_record_foreign_key_check(name, type, options) unless @base.adapter_name == 'SQLite'
     column_without_foreign_key_check(name, type, options)
   end
   alias_method_chain :column, :foreign_key_check
@@ -1380,5 +1385,11 @@ ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
     rescue ActiveRecord::StatementInvalid => e
       raise unless e.message =~ /PG(?:::)?Error: ERROR:.+does not exist|Mysql2?::Error: Error on rename/
     end
+  end
+
+  # does a query first to make the actual constraint adding fast
+  def change_column_null_with_less_locking(table, column)
+    execute("SELECT COUNT(*) FROM #{table} WHERE #{column} IS NULL") if open_transactions == 0
+    change_column_null table, column, false
   end
 end

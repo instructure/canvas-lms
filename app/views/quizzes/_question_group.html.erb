@@ -12,7 +12,7 @@
   <div style="float: left;">
     <input type="hidden" name="quiz_group[assessment_question_bank_id]" class="bank_id"/>
     <span class="group_display name" style="font-weight: bold; padding-right: 20px;"><%= hash_get(group, :name, t(:default_group_name, "Group")) %></span>
-    <input name="quiz_group[name]" type="text" value="Group Name" class="group_edit" value="<%= hash_get(group, :name, t(:default_group_name, "Group")) %>"/>
+    <input name="quiz_group[name]" aria-label=<%= t('labels.group_name', "Group Name") %> type="text" value="Group Name" class="group_edit" value="<%= hash_get(group, :name, t(:default_group_name, "Group")) %>"/>
     <span class="group_display">
       <%= t(:show_questions_and_points, "Pick *%{num_questions}* questions, #%{num_points}# pts per question",
             :num_questions => hash_get(group, :pick_count, 1),
@@ -27,8 +27,8 @@
             :num_questions => hash_get(group, :pick_count, 1),
             :num_points => hash_get(group, :question_points, 1),
             :wrapper => { 
-              '*' => '<input name="quiz_group[pick_count]" type="text" style="width: 20px;" value="\1"/>',
-              '#' => '<input name="quiz_group[question_points]" type="text" style="width: 20px;" value="\1"/>'
+              '*' => "<input name='quiz_group[pick_count]' aria-label='#{t('labels.number_of_questions', "Number of Questions")}' type='text' style='width: 20px;' value='\1'/>",
+              '#' => "<input name='quiz_group[question_points]' aria-label='#{t('labels.points_per_question', "Points per Question")}' type='text' style='width: 20px;' value='\1'/>"
             }) %>
     </span>
     <% if !group %>

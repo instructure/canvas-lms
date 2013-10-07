@@ -31,7 +31,9 @@ module Api::V1::Submission
     if includes.include?("submission_history")
       hash['submission_history'] = []
       submission.submission_history.each_with_index do |ver, idx|
-        hash['submission_history'] << submission_attempt_json(ver, assignment, user, session, idx, context)
+        ver.without_versioned_attachments do
+          hash['submission_history'] << submission_attempt_json(ver, assignment, user, session, idx, context)
+        end
       end
     end
 

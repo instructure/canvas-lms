@@ -41,9 +41,9 @@ describe "Quiz Import" do
     data = get_import_data ['vista', 'quiz'], 'simple_quiz_data'
     Quiz.import_from_migration(data, context, question_data)
     quiz = Quiz.find_by_migration_id data[:migration_id]
-    quiz.quiz_questions.count.should == 1
+    quiz.quiz_questions.active.count.should == 1
     # Check if the expected question name is in there
-    quiz.quiz_questions.first.question_data[:question_name].should == "Rocket Bee!"
+    quiz.quiz_questions.active.first.question_data[:question_name].should == "Rocket Bee!"
   end
   
   it "should import a text only question" do
@@ -53,8 +53,8 @@ describe "Quiz Import" do
     Quiz.import_from_migration(data, context, question_data)
     quiz = Quiz.find_by_migration_id data[:migration_id]
     quiz.unpublished_question_count.should == 2
-    quiz.quiz_questions.count.should == 2
-    sorted_questions = quiz.quiz_questions.sort { |a, b| a.id <=> b.id }
+    quiz.quiz_questions.active.count.should == 2
+    sorted_questions = quiz.quiz_questions.active.sort { |a, b| a.id <=> b.id }
     sorted_questions.first.question_data[:question_text].should == data[:questions].first[:question_text]
     sorted_questions.first.question_data[:question_type].should == 'text_only_question'
   end
@@ -66,7 +66,7 @@ describe "Quiz Import" do
     Quiz.import_from_migration(data, context, question_data)
      quiz = Quiz.find_by_migration_id data[:migration_id]
     quiz.quiz_groups.count.should == 1
-    quiz.quiz_groups.first.quiz_questions.count.should == 3
+    quiz.quiz_groups.first.quiz_questions.active.count.should == 3
     quiz.quiz_groups.first.pick_count.should == data[:questions].first[:pick_count]
     quiz.quiz_groups.first.question_points.should == data[:questions].first[:question_points]
   end
@@ -113,12 +113,12 @@ describe "Quiz Import" do
     Quiz.import_from_migration(data, context, question_data)
     quiz = Quiz.find_by_migration_id data[:migration_id]
 
-    quiz.quiz_questions.first.question_data[:question_name].should == "Rocket Bee!"
+    quiz.quiz_questions.active.first.question_data[:question_name].should == "Rocket Bee!"
 
     question_data[:aq_data][data['questions'].first[:migration_id]]['question_name'] = "Not Rocket Bee?"
     Quiz.import_from_migration(data, context, question_data)
 
-    quiz.quiz_questions.first.question_data[:question_name].should == "Not Rocket Bee?"
+    quiz.quiz_questions.active.first.question_data[:question_name].should == "Not Rocket Bee?"
   end
 
 end

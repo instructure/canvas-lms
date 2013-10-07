@@ -1,0 +1,95 @@
+<div class="test-modal-overlay"></div>
+
+<div class="test-modal">
+  {{yield}}
+</div>
+
+<style>
+.context_modules2 .test2 {
+  border-radius: 50%;
+  padding-left: 5px;
+  padding-right: 5px;
+  height: 19px;
+  border-color: #c5c5c5;
+}
+
+.test-modal .form-horizontal .control-label {
+  width: 110px;
+}
+
+.test-modal .form-horizontal .controls {
+  margin-left: 130px;
+}
+
+.test-modal-overlay {
+  background-color: #262b33;
+  opacity: .7;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  position: fixed;
+  z-index: 1000;
+}
+
+.test-modal-close {
+  float: right;
+  display: inline-block;
+}
+
+.test-modal {
+  border-radius: 4px;
+  overflow: hidden;
+  box-sizing: border-box;
+  height: 550px;
+  width: 600px;
+  margin: auto;
+  position: fixed;
+  top: 0; left: 0; bottom: 0; right: 0;
+  background-color: white;
+  z-index: 1001;
+}
+
+.test-modal-content {
+  padding: 12px;
+  overflow-y: scroll;
+  position: absolute;
+  top: 40px;
+  bottom: 50px;
+  left: 0;
+  right: 0;
+}
+
+.test-modal-titlebar {
+  box-sizing: border-box;
+  overflow: hidden;
+  line-height: 1.8em;
+  vertical-align: middle;
+  font-weight: bold;
+  padding: 8px 8px 8px 12px;
+  width: 100%;
+  position: absolute;
+  background-color: #dae1e6;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#e0e6eb), to(#d4dce2));
+  background-image: -webkit-linear-gradient(top, #e0e6eb, #d4dce2);
+  background-image: -moz-linear-gradient(top, #e0e6eb, #d4dce2);
+  background-image: -ms-linear-gradient(top, #e0e6eb, #d4dce2);
+  background-image: -o-linear-gradient(top, #e0e6eb, #d4dce2);
+  background-image: linear-gradient(top, #e0e6eb, #d4dce2);
+}
+
+.test-modal-footer {
+  border-top: 1px solid #e5e5e5;
+  box-shadow: inset 0 1px 0 white;
+  overflow: hidden;
+  box-sizing: border-box;
+  background-color: whitesmoke;
+  padding: 10px;
+  padding-right: 20px;
+  bottom: 0;
+  position: absolute;
+  width: 100%;
+  text-align: right;
+}
+
+</style>

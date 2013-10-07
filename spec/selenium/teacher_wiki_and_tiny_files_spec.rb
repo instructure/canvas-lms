@@ -261,8 +261,9 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       attachment.save!
 
       get "/courses/#{@course.id}/discussion_topics/new"
-      f('#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
-      f('li.folder span').click
+      fj('#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
+      wait_for_ajaximations
+      fj('li.folder span').click
       wait_for_ajaximations
       ff('li.folder li.file').count.should == 2
     end
@@ -275,8 +276,9 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       attachment.save!
 
       get "/courses/#{@course.id}/discussion_topics/new"
-      f('#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
-      f('li.folder span').click
+      fj('#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
+      wait_for_ajaximations
+      fj('li.folder span').click
       wait_for_ajaximations
       ff('li.folder li.file').count.should == 2
     end

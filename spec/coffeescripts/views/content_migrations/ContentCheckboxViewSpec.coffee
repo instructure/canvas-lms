@@ -6,7 +6,7 @@ define [
 
   class CheckboxHelper
 
-    @renderView = (options) -> 
+    @renderView = (options) ->
       options ||= {}
 
       checkboxModel = new CheckboxModel options
@@ -19,7 +19,7 @@ define [
       checkboxCollection = new CheckboxCollection [checkboxModel],
                                isTopLevel: true
 
-      @checkboxView = new CheckboxView(model: checkboxModel) 
+      @checkboxView = new CheckboxView(model: checkboxModel)
       @$fixtures.html @checkboxView.render().el
 
     @teardown = -> @checkboxView.remove()
@@ -61,20 +61,20 @@ define [
                                               }
                                           ])]
 
-  module "Toplevel Content Checkbox Behaviors", 
+  module "Toplevel Content Checkbox Behaviors",
     teardown: -> CheckboxHelper.teardown()
 
-  test 'renders a checkbox with name set from model property', -> 
+  test 'renders a checkbox with name set from model property', ->
     CheckboxHelper.renderView(property: 'copy[all_assignments]')
     nameValue = CheckboxHelper.$checkbox().prop('name')
 
     equal nameValue, 'copy[all_assignments]', 'Adds the correct name attribute from property'
 
-  test 'toplevel checkbox is checked by default', -> 
+  test 'toplevel checkbox is checked by default', ->
     CheckboxHelper.renderView()
     ok CheckboxHelper.$checkbox().is(":checked"), "Checkbox is checked"
 
-  test 'sublevel checkbox is unchecked by default', -> 
+  test 'sublevel checkbox is unchecked by default', ->
     CheckboxHelper.renderView()
     ok !CheckboxHelper.$sublevelCheckboxes().is(":checked"), "Checkbox is unchecked"
 
@@ -85,10 +85,10 @@ define [
       @server = sinon.fakeServer.create()
       @server.respondWith('GET', @url, CheckboxHelper.serverResponse())
       CheckboxHelper.renderView(sub_items_url: @url)
-      CheckboxHelper.$checkbox().click()
+      CheckboxHelper.$checkbox().simulate 'click'
       @server.respond()
-      @clock.tick 1
-    teardown: -> 
+      @clock.tick 15
+    teardown: ->
       @server.restore()
       @clock.restore()
       CheckboxHelper.teardown()
@@ -100,7 +100,7 @@ define [
     equal CheckboxHelper.checkboxView.$el.find('ul').first().find('[type=checkbox]').length, 3, "Doesn't include checkbox"
 
   test 'clicking Select All, checks all sublevel checkboxes', ->
-    CheckboxHelper.checkboxView.$el.find("a").first().click()
+    CheckboxHelper.checkboxView.$el.find("a").first().simulate 'click'
 
     $subCheckboxes = CheckboxHelper.checkboxView.$el.find('ul').first().find('[type=checkbox]')
     equal $subCheckboxes.length, 3
@@ -111,7 +111,7 @@ define [
     $subCheckboxes = CheckboxHelper.checkboxView.$el.find('ul').first().find('[type=checkbox]')
     equal $subCheckboxes.length, 3
 
-    CheckboxHelper.checkboxView.$el.find("a").last().click()
+    CheckboxHelper.checkboxView.$el.find("a").last().simulate 'click'
     $subCheckboxes.each ->
       ok !$(this).is(':checked'), "Unchecked child checkboxes"
 
@@ -119,8 +119,8 @@ define [
     $subCheckboxes = CheckboxHelper.checkboxView.$el.find('ul').first().find('[type=checkbox]')
     equal $subCheckboxes.length, 3
 
-    $subCheckboxes[2].click()
+    $($subCheckboxes[2]).simulate 'click'
     ok !$($subCheckboxes[1]).is(':checked'), "Unchecked linked resource"
 
-    $subCheckboxes[2].click()
+    $($subCheckboxes[2]).simulate 'click'
     ok $($subCheckboxes[1]).is(':checked'), "Checked linked resource"

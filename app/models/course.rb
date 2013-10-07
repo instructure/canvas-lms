@@ -35,6 +35,7 @@ class Course < ActiveRecord::Base
                   :syllabus_body,
                   :public_description,
                   :allow_student_forum_attachments,
+                  :enable_draft,
                   :allow_student_discussion_topics,
                   :allow_student_discussion_editing,
                   :default_wiki_editing_roles,
@@ -174,13 +175,14 @@ class Course < ActiveRecord::Base
   include Profile::Association
 
   before_save :assign_uuid
-  before_save :assert_defaults
+  before_validation :assert_defaults
   before_save :set_update_account_associations_if_changed
   before_save :update_enrollments_later
   after_save :update_final_scores_on_weighting_scheme_change
   after_save :update_account_associations_if_changed
   after_save :set_self_enrollment_code
   before_validation :verify_unique_sis_source_id
+  validates_presence_of :account_id, :root_account_id, :enrollment_term_id, :workflow_state
   validates_length_of :syllabus_body, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :name, :maximum => maximum_string_length, :allow_nil => true, :allow_blank => true
   validates_length_of :course_code, :maximum => maximum_string_length, :allow_nil => true, :allow_blank => true
@@ -1521,6 +1523,7 @@ class Course < ActiveRecord::Base
     limit_privileges_to_course_section = opts[:limit_privileges_to_course_section]
     associated_user_id = opts[:associated_user_id]
     role_name = opts[:role_name]
+    self_enrolled = opts[:self_enrolled]
     section ||= self.default_section
     enrollment_state ||= self.available? ? "invited" : "creation_pending"
     if type == 'TeacherEnrollment' || type == 'TaEnrollment' || type == 'DesignerEnrollment'
@@ -1556,6 +1559,7 @@ class Course < ActiveRecord::Base
     end
     e.associated_user_id = associated_user_id
     e.role_name = role_name
+    e.self_enrolled = self_enrolled
     if e.changed?
       if opts[:no_notify]
         e.save_without_broadcasting
@@ -1578,8 +1582,7 @@ class Course < ActiveRecord::Base
   end
 
   def self_enroll_student(user, opts = {})
-    enrollment = enroll_student(user, opts.merge(:no_notify => true))
-    enrollment.self_enrolled = true
+    enrollment = enroll_student(user, opts.merge(:self_enrolled => true))
     enrollment.accept(:force)
     unless opts[:skip_pseudonym]
       new_pseudonym = user.find_or_initialize_pseudonym_for_account(root_account)
@@ -2434,7 +2437,7 @@ class Course < ActiveRecord::Base
       :storage_quota, :tab_configuration, :allow_wiki_comments,
       :turnitin_comments, :self_enrollment, :license, :indexed, :locale,
       :hide_final_grade, :hide_distribution_graphs,
-      :allow_student_discussion_topics, :lock_all_announcements ]
+      :allow_student_discussion_topics, :lock_all_announcements, :enable_draft ]
   end
 
   # TODO: remove me? looks like only a single spec exercises this code (incidentally, no less)

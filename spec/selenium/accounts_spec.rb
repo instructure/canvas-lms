@@ -25,9 +25,9 @@ describe "account" do
       ldap_form.find_element(:id, 'account_authorization_config_0_auth_password').send_keys('primary password')
       ldap_form.find_element(:id, 'account_authorization_config_0_login_handle_name').send_keys('login handle')
       ldap_form.find_element(:id, 'account_authorization_config_0_change_password_url').send_keys('http://forgot.password.example.com/')
-      expect_new_page_load { submit_form(ldap_form) }
+      submit_form('#auth_form')
 
-      Account.default.account_authorization_configs.length.should == 1
+      keep_trying_until { Account.default.account_authorization_configs.length.should == 1 }
       config = Account.default.account_authorization_configs.first
       config.auth_host.should == 'primary.host.example.com'
       config.auth_port.should == 1
@@ -50,10 +50,9 @@ describe "account" do
       ldap_form.find_element(:id, 'account_authorization_config_1_auth_filter').send_keys('secondary filter')
       ldap_form.find_element(:id, 'account_authorization_config_1_auth_username').send_keys('secondary username')
       ldap_form.find_element(:id, 'account_authorization_config_1_auth_password').send_keys('secondary password')
+      submit_form('#auth_form')
 
-      expect_new_page_load { submit_form(ldap_form) }
-
-      Account.default.account_authorization_configs.length.should == 2
+      keep_trying_until { Account.default.account_authorization_configs.length.should == 2 }
       config = Account.default.account_authorization_configs.first
       config.auth_host.should == 'primary.host.example.com'
       config.auth_over_tls.should == 'simple_tls'
@@ -77,9 +76,9 @@ describe "account" do
       f('.edit_auth_link').click
       ldap_form = f('form.ldap_form')
       ldap_form.find_element(:css, '.remove_secondary_ldap_link').click
-      expect_new_page_load { submit_form(ldap_form) }
+      submit_form('#auth_form')
 
-      Account.default.account_authorization_configs.length.should == 1
+      keep_trying_until { Account.default.account_authorization_configs.length.should == 1 }
 
       # test removing the entire config
       expect_new_page_load do

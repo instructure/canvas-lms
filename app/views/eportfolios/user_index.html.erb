@@ -1,3 +1,6 @@
+<%
+   js_bundle :eportfolio
+%>
 <% content_for :page_title do %>
   <%= t(:page_title, "My ePortfolios") %>
 <% end %>
@@ -40,28 +43,6 @@ DETAILS
   <ul class="unstyled_list" style="padding-left: 20px;">
     <%= render :partial => "eportfolio", :collection => @portfolios %>
   </ul>
-<% end %>
-<% js_block do %>
-<script>
-require([
-  'jquery' /* $ */
-], function($) {
-
-$(document).ready(function() {
-  $(".add_eportfolio_link").click(function(event) {
-    event.preventDefault();
-    $("#whats_an_eportfolio").slideToggle();
-    $("#add_eportfolio_form").slideToggle(function() {
-      $(this).find(":text:first").focus().select();
-    });
-  });
-  $("#add_eportfolio_form .cancel_button").click(function() {
-    $("#add_eportfolio_form").slideToggle();
-    $("#whats_an_eportfolio").slideToggle();
-  });
-});
-});
-</script>
 <% end %>
 <% form_for Eportfolio.new, :url => eportfolios_path, :html => {:style => "display: none;", :id => "add_eportfolio_form"} do |f| %>
 <h2><%= t('headers.add_eportfolio', "Make an ePortfolio") %></h2>

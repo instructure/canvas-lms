@@ -2,10 +2,10 @@ $LOAD_PATH << Pathname.new(File.absolute_path __FILE__) + "../../.."
 require 'lib/handlebars/ember'
 
 expected_precompiled_template = <<-END
-define(['Ember', 'compiled/ember/shared/helpers/common'], function(Ember) {
+define(['ember', 'compiled/ember/shared/helpers/common'], function(Ember) {
   Ember.TEMPLATES['application'] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
-this.compilerInfo = [3,'>= 1.0.0-rc.4'];
-helpers = helpers || Ember.Handlebars.helpers; data = data || {};
+this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   
 
 

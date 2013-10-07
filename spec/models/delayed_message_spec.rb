@@ -69,7 +69,7 @@ describe DelayedMessage do
 
     it "should have a scope to order the messages by a field" do
       notification = notification_model
-      cc = CommunicationChannel.create!(:path => 'path@example.com')
+      cc = user.communication_channels.create!(:path => 'path@example.com')
       nps = (1..3).inject([]) do |list, e|
         list << cc.notification_policies.create!(:notification => notification)
       end

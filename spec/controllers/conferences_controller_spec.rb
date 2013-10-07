@@ -97,7 +97,7 @@ describe ConferencesController do
     
     it "should update a conference" do
       course_with_teacher_logged_in(:active_all => true)
-      @conference = @course.web_conferences.create(:conference_type => 'DimDim')
+      @conference = @course.web_conferences.create!(:conference_type => 'DimDim', :user => @teacher)
       post 'update', :course_id => @course.id, :id => @conference, :web_conference => {:title => "Something else"}, :format => 'json'
       response.should be_success
     end
@@ -106,14 +106,14 @@ describe ConferencesController do
   describe "POST 'join'" do
     it "should require authorization" do
       course_with_teacher(:active_all => true)
-      @conference = @course.web_conferences.create(:conference_type => 'DimDim', :duration => 60)
+      @conference = @course.web_conferences.create!(:conference_type => 'DimDim', :duration => 60, :user => @teacher)
       post 'join', :course_id => @course.id, :conference_id => @conference.id
       assert_unauthorized
     end
 
     it "should let admins join a conference" do
       course_with_teacher_logged_in(:active_all => true, :user => user_with_pseudonym(:active_all => true))
-      @conference = @course.web_conferences.create(:conference_type => 'DimDim', :duration => 60)
+      @conference = @course.web_conferences.create!(:conference_type => 'DimDim', :duration => 60, :user => @teacher)
       post 'join', :course_id => @course.id, :conference_id => @conference.id
       response.should be_redirect
       response['Location'].should =~ /dimdim\.test/
@@ -121,7 +121,7 @@ describe ConferencesController do
 
     it "should let students join an inactive long running conference" do
       course_with_student_logged_in(:active_all => true, :user => user_with_pseudonym(:active_all => true))
-      @conference = @course.web_conferences.create(:conference_type => 'DimDim') 
+      @conference = @course.web_conferences.create!(:conference_type => 'DimDim', :user => @teacher)
       @conference.update_attribute :start_at, 1.month.ago
       @conference.users << @user
       DimDimConference.any_instance.stubs(:conference_status).returns(:closed)
@@ -134,7 +134,7 @@ describe ConferencesController do
 
       before do
         course_with_student_logged_in(:active_all => true, :user => user_with_pseudonym(:active_all => true))
-        @conference = @course.web_conferences.create(:conference_type => 'DimDim', :duration => 60)
+        @conference = @course.web_conferences.create!(:conference_type => 'DimDim', :duration => 60, :user => @teacher)
         @conference.users << @user
       end
 

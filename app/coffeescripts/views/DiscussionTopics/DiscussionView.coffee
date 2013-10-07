@@ -72,19 +72,6 @@ define [
       @model.save(locked: locked, pinned: pinned)
       $(e.target).text(@messages[key])
 
-    # Public: Pin or unpin the model and update it on the server.
-    #
-    # e - Event object.
-    #
-    # Returns nothing.
-    togglePinned: (e) =>
-      e.preventDefault()
-      key = if @model.get('pinned') then 'pin' else 'unpin'
-      pinned = !@model.get('pinned')
-      locked = if pinned then false else @model.get('locked')
-      @model.save(locked: locked, pinned: pinned)
-      $(e.target).text(@messages[key])
-
     # Public: Confirm a request to delete and then complete it if needed.
     #
     # e - Event object.

@@ -130,14 +130,13 @@ class ConversationsController < ApplicationController
       conversations = Api.paginate(@conversations_scope, self, api_v1_conversations_url)
       # optimize loading the most recent messages for each conversation into a single query
       ConversationParticipant.preload_latest_messages(conversations, @current_user)
-      @conversations_json = conversations_json(conversations,
-                                               @current_user,
-                                               session,
-                                               :include_participant_avatars => false,
-                                               :include_participant_contexts => false,
-                                               :visible => true,
-                                               :include_context_name => true) 
-  
+      @conversations_json = conversations_json(conversations, @current_user,
+        session, include_participant_avatars: false,
+        include_participant_contexts: false, visible: true,
+        include_context_name: true, include_beta: params[:include_beta]).reject { |c|
+          c['message_count'] == 0
+        }
+
       if params[:include_all_conversation_ids]
         @conversations_json = {:conversations => @conversations_json, :conversation_ids => @conversations_scope.conversation_ids}
       end
@@ -242,19 +241,24 @@ class ConversationsController < ApplicationController
     return render_error('body', 'blank') if params[:body].blank?
     context_type = nil
     context_id = nil
-    if params[:context_code]
+    if params[:context_code].present?
       context = Context.find_by_asset_string(params[:context_code])
       return render_error('context_code', 'invalid') if context.nil?
       context_type = context.class.name
       context_id = context.id
     end
 
-    batch_private_messages = !value_to_boolean(params[:group_conversation]) && @recipients.size > 1
+    group_conversation     = value_to_boolean(params[:group_conversation])
+    batch_private_messages = !group_conversation && @recipients.size > 1
+    batch_group_messages   = group_conversation && value_to_boolean(params[:bulk_message])
+    message                = build_message
 
-    message = build_message
-    if batch_private_messages
+    if batch_private_messages || batch_group_messages
       mode = params[:mode] == 'async' ? :async : :sync
-      batch = ConversationBatch.generate(message, @recipients, mode, :subject => params[:subject], :context_type => context_type, :context_id => context_id, :tags => @tags)
+      batch = ConversationBatch.generate(message, @recipients, mode,
+        subject: params[:subject], context_type: context_type,
+        context_id: context_id, tags: @tags, group: batch_group_messages)
+
       if mode == :async
         headers['X-Conversation-Batch-Id'] = batch.id.to_s
         return render :json => [], :status => :accepted
@@ -433,10 +437,11 @@ class ConversationsController < ApplicationController
     render :json => conversation_json(@conversation,
                                       @current_user,
                                       session,
-                                      :include_indirect_participants => true,
-                                      :messages => messages,
-                                      :submissions => submissions,
-                                      :include_context_name => true)
+                                      include_indirect_participants: true,
+                                      messages: messages,
+                                      submissions: submissions,
+                                      include_beta: params[:include_beta],
+                                      include_context_name: true)
   end
 
   # @API Edit a conversation

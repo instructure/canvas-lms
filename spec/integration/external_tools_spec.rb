@@ -71,8 +71,6 @@ describe "External Tools" do
     it "should include time zone in LTI paramaters if included in custom fields" do
       @tool.custom_fields = {
         "custom_time_zone" => "$Person.address.timezone",
-        "custom_user_time_zone" => "$Canvas.user.timezone",
-        "custom_user_offset" => "$Canvas.user.timezone.offset"
       }
       @tool.save!
       student_in_course(:course => @course, :active_all => true)
@@ -85,9 +83,7 @@ describe "External Tools" do
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
       response.should be_success
       doc = Nokogiri::HTML.parse(response.body)
-      doc.at_css('form#tool_form input#custom_time_zone')['value'].should == "(GMT-09:00) Alaska"
-      doc.at_css('form#tool_form input#custom_user_time_zone')['value'].should == "(GMT-09:00) Alaska"
-      doc.at_css('form#tool_form input#custom_user_offset')['value'].should == "-09:00"
+      doc.at_css('form#tool_form input#custom_time_zone')['value'].should == "America/Juneau"
 
       @user.time_zone = "Hawaii"
       @user.save!
@@ -95,9 +91,7 @@ describe "External Tools" do
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
       response.should be_success
       doc = Nokogiri::HTML.parse(response.body)
-      doc.at_css('form#tool_form input#custom_time_zone')['value'].should == "(GMT-10:00) Hawaii"
-      doc.at_css('form#tool_form input#custom_user_time_zone')['value'].should == "(GMT-10:00) Hawaii"
-      doc.at_css('form#tool_form input#custom_user_offset')['value'].should == "-10:00"
+      doc.at_css('form#tool_form input#custom_time_zone')['value'].should == "Pacific/Honolulu"
     end
 
     it "should redirect if the tool can't be configured" do

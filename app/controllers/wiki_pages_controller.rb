@@ -24,12 +24,17 @@ class WikiPagesController < ApplicationController
   before_filter :set_js_rights, :only => [:pages_index, :show_page, :edit_page]
   before_filter :set_js_wiki_data, :only => [:pages_index, :show_page, :edit_page]
   add_crumb(proc { t '#crumbs.wiki_pages', "Pages"}) do |c|
+    url = nil
     context = c.instance_variable_get('@context')
-    if context.draft_state_enabled?
-      c.send :polymorphic_path, [context, :pages]
-    else
-      c.send :named_context_url, c.instance_variable_get("@context"), :context_wiki_pages_url
+    current_user = c.instance_variable_get('@current_user')
+    if context.grants_right?(current_user, :read)
+      if context.draft_state_enabled?
+        url = c.send :polymorphic_path, [context, :pages]
+      else
+        url = c.send :named_context_url, c.instance_variable_get("@context"), :context_wiki_pages_url
+      end
     end
+    url
   end
   before_filter { |c| c.active_tab = "pages" }
 
@@ -38,6 +43,10 @@ class WikiPagesController < ApplicationController
   end
 
   def show
+    if @context.draft_state_enabled?
+      redirect_to polymorphic_url([@context, :named_page], :wiki_page_id => @page)
+      return
+    end
     hash = { :CONTEXT_ACTION_SOURCE => :wiki }
     append_sis_data(hash)
     js_env(hash)
@@ -153,12 +162,22 @@ class WikiPagesController < ApplicationController
   end
 
   def pages_index
+    if !@context.draft_state_enabled?
+      redirect_to polymorphic_url([@context, :wiki_pages])
+      return
+    end
+
     if authorized_action(@context.wiki, @current_user, :read)
       @padless = true
     end
   end
 
   def show_page
+    if !@context.draft_state_enabled?
+      redirect_to polymorphic_url([@context, :named_wiki_page], :id => @page)
+      return
+    end
+
     if @page.deleted?
       flash[:notice] = t('notices.page_deleted', 'The page "%{title}" has been deleted.', :title => @page.title)
       return front_page # delegate to front_page logic
@@ -175,6 +194,11 @@ class WikiPagesController < ApplicationController
   end
 
   def edit_page
+    if !@context.draft_state_enabled?
+      redirect_to polymorphic_url([@context, :named_wiki_page], :id => @page) + '#edit'
+      return
+    end
+
     if @page.deleted?
       flash[:notice] = t('notices.page_deleted', 'The page "%{title}" has been deleted.', :title => @page.title)
       return front_page # delegate to front_page logic
@@ -212,8 +236,14 @@ class WikiPagesController < ApplicationController
 
     if @page
       hash[:WIKI_PAGE] = wiki_page_json(@page, @current_user, session)
+      hash[:WIKI_PAGE_REVISION] = (current_version = @page.versions.current) ? current_version.number : nil
       hash[:WIKI_PAGE_SHOW_PATH] = polymorphic_path([@context, :named_page], :wiki_page_id => @page)
       hash[:WIKI_PAGE_EDIT_PATH] = polymorphic_path([@context, :edit_named_page], :wiki_page_id => @page)
+      hash[:WIKI_PAGE_HISTORY_PATH] = polymorphic_path([@context, @page, :wiki_page_revisions])
+
+      if @context.is_a?(Course)
+        hash[:COURSE_ID] = @context.id if @context.grants_right?(@current_user, :read)
+      end
     end
 
     js_env hash

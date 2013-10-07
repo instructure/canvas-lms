@@ -442,14 +442,14 @@ describe ContextModulesController do
     
     it "should return all student progressions to teacher" do
       course_with_teacher_logged_in(:course => @course, :active_all => true)
-      get 'progressions', :course_id => @course.id
+      get 'progressions', :course_id => @course.id, :format => "json"
       json = JSON.parse response.body.gsub("while(1);",'')
       json.length.should == 1
     end
     
     it "should return a single student progression" do
       user_session(@student)
-      get 'progressions', :course_id => @course.id
+      get 'progressions', :course_id => @course.id, :format => "json"
       json = JSON.parse response.body.gsub("while(1);",'')
       json.length.should == 1
     end
@@ -462,14 +462,14 @@ describe ContextModulesController do
       
       it "should return a single student progression" do
         user_session(@student)
-        get 'progressions', :course_id => @course.id
+        get 'progressions', :course_id => @course.id, :format => "json"
         json = JSON.parse response.body.gsub("while(1);",'')
         json.length.should == 1
       end
       
       it "should not return any student progressions to teacher" do
         course_with_teacher_logged_in(:course => @course, :active_all => true)
-        get 'progressions', :course_id => @course.id
+        get 'progressions', :course_id => @course.id, :format => "json"
         json = JSON.parse response.body.gsub("while(1);",'')
         json.length.should == 0
       end

@@ -146,7 +146,7 @@ describe "quizzes question creation" do
     submit_form(question)
     wait_for_ajax_requests
 
-    f('#show_question_details').click
+    driver.execute_script("$('#show_question_details').click();")  
     quiz.reload
     finished_question = f("#question_#{quiz.quiz_questions[0].id}")
     finished_question.should be_displayed

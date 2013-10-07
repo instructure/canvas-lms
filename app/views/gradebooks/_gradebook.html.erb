@@ -26,6 +26,7 @@
     jammit_css :gradebooks, :datagrid
     js_bundle :datagrid, :gradebooks
     @show_left_side = false
+    @show_embedded_chat = false
     add_crumb t(:try_out_the_new_gradebook, "Try out the new gradebook"), context_url(@context, :change_gradebook_version_context_gradebook_url, :version => 2), :id => 'change_gradebook_version_link_holder'
   %>
   <div style="display: none;"><input type="checkbox" id="hide_students_option"/><label for="hide_students_option"><%= t(:hide_names, "Hide Student Names") %></label></div>

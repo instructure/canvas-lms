@@ -22,8 +22,9 @@ describe 'Account Reports API', :type => :integration do
   before do
     @admin = account_admin_user
     user_with_pseudonym(:user => @admin)
-    @report = AccountReport.create()
+    @report = AccountReport.new
     @report.account = @admin.account
+    @report.user = @admin
     @report.progress=rand(100)
     @report.start_at=DateTime.now
     @report.end_at=(Time.now + (rand(60*60*4))).to_datetime
