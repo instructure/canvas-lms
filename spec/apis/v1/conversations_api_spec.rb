@@ -1272,6 +1272,22 @@ describe ConversationsController, :type => :integration do
       new_message.conversation_message_participants.size.should == 2
     end
 
+    it "should allow users to respond to anyone who is already a participant" do
+      cp = conversation(@bob, @billy, @jane, @joe, sender: @bob)
+      real_conversation = cp.conversation
+      real_conversation.context = @course
+      real_conversation.save!
+
+      @joe.enrollments.each { |e| e.destroy }
+      @user = @billy
+      json = api_call(:post, "/api/v1/conversations/#{real_conversation.id}/add_message",
+        { :controller => 'conversations', :action => 'add_message', :id => real_conversation.id.to_s, :format => 'json' },
+        { :body => "ok", :recipients => [@bob, @billy, @jane, @joe].map(&:id).map(&:to_s) })
+      real_conversation.reload
+      new_message = real_conversation.conversation_messages.first
+      new_message.conversation_message_participants.size.should == 4
+    end
+
     it "should create a media object if it doesn't exist" do
       conversation = conversation(@bob)
 

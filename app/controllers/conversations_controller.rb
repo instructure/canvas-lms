@@ -652,13 +652,9 @@ class ConversationsController < ApplicationController
     get_conversation(true)
     if params[:body].present?
 
-      # if this is from old conversations or an admin message, allow people to respond to anyone who
-      # is already a participant. We might want to allow this in general. this will probably change
-      # when we make the account the context of an admin conversation.
-      if @conversation.conversation.context.blank?
-        params[:from_conversation_id] = @conversation.conversation_id
-      end
-      # not a before_filter because the above check needs to delay this until now
+      # allow responses to be sent to anyone who is already a conversation participant.
+      params[:from_conversation_id] = @conversation.conversation_id
+      # not a before_filter because we need to set the above parameter.
       normalize_recipients
 
       message = build_message
