@@ -79,6 +79,8 @@ define [
         @render()
       @reloadView.pollForChanges()
 
+      $.publish('userContent/change')
+
     deleteWikiPage: (ev) ->
       ev?.preventDefault()
       return unless @model.get('deletable')
