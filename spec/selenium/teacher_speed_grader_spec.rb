@@ -233,7 +233,7 @@ describe "speed grader" do
     second_criterion.find_element(:css, '.ratings .edge_rating').click
     rubric.find_element(:css, '.rubric_total').should include_text('8')
     f('#rubric_full .save_rubric_button').click
-    keep_trying_until { f('#rubric_summary_container > table').should be_displayed }
+    keep_trying_until { f('#rubric_summary_container > .rubric_container').should be_displayed }
     f('#rubric_summary_container').should include_text(@rubric.title)
     f('#rubric_summary_container .rubric_total').should include_text('8')
     wait_for_ajaximations
@@ -470,8 +470,8 @@ describe "speed grader" do
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
     wait_for_ajaximations
     f('button.toggle_full_rubric').click
-    f("table.rubric.assessing tr:nth-child(1) table.ratings td:nth-child(1)").click
-    f("table.rubric.assessing tr:nth-child(3) table.ratings td:nth-child(1)").click
+    f(".rubric.assessing table.rubric_table tr:nth-child(1) table.ratings td:nth-child(1)").click
+    f(".rubric.assessing table.rubric_table tr:nth-child(3) table.ratings td:nth-child(1)").click
     f("#rubric_holder button.save_rubric_button").click
     wait_for_ajaximations
 

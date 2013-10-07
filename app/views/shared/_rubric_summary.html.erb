@@ -1,14 +1,19 @@
 <% rubric = rubric_summary %>
 <% rubric_association ||= nil; editable ||= false; association_object = nil
    edit ||= false; rubic ||= nil; assessing ||= false; assessment ||= nil; brief ||= false %>
-<table class="rubric rubric_summary <%= 'free_form' if rubric && rubric.free_form_criterion_comments %>" id="<%= rubric ? "rubric_summary_#{rubric.id}" : "default_rubric_summary" %>" style="<%= 'hidden' unless brief %>">
+<div class="rubric_container rubric rubric_summary <%= 'free_form' if rubric && rubric.free_form_criterion_comments %>" id="<%= rubric ? "rubric_summary_#{rubric.id}" : "default_rubric_summary" %>" style="<%= 'hidden' unless brief %>">
+  <div class="screenreader-only"><h3><%= t 'rubric', "Rubric" %></h3></div>
+  <div class="rubric_title" style="<%= hidden if brief %>">
+    <span class="title"><%= rubric.try(:title) || t('defaults.title', "Title") %></span>
+    <span class="id" style="display: none;"><%= rubric.id rescue nbsp %></span>
+  </div>
+<table class="rubric_table">
+<caption>
+  <div class="screenreader-only">
+    <span class="title"><%= rubric.try(:title) || t('defaults.title', "Title") %></span>
+  </div>
+</caption>
 <thead>
-  <tr class="rubric_title" style="<%= hidden if brief %>">
-    <th colspan="2">
-      <span class="title"><%= rubric.title rescue t('defaults.title', "Title") %></span>
-      <span class="id" style="display: none;"><%= rubric.id rescue nbsp %></span>
-    </th>
-  </tr>
   <tr>
     <th><%= t 'headers.criteria', "Criteria" %></th>
     <th><%= t 'headers.assessment', "Assessment" %></th>
@@ -38,7 +43,7 @@
   </tr>
 </tbody>
 </table>
+</div>
 <div class="button-container" style="<%= hidden if brief %>">
   <button class="toggle_full_rubric edit btn"><%= t 'buttons.edit_assessment', "Edit Assessment" %></button>
 </div>
-

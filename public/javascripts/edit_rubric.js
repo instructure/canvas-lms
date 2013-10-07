@@ -53,7 +53,7 @@ define([
       return $criterion;
     },
     onFindOutcome: function(outcome) {
-      var $rubric = $('table.rubric:visible:first'),
+      var $rubric = $('.rubric table.rubric_table:visible:first'),
           $criterion;
 
       $rubric.find(".criterion.learning_outcome_" + outcome.id).find(".delete_criterion_link").click();
@@ -236,7 +236,8 @@ define([
         $(this).parents(".criterion").find(".display_criterion_points").text(val);
       });
       var vals = $rubric.getFormData();
-      $rubric.find("thead .title").text(vals.title);
+      $rubric.find(".rubric_title .title").text(vals.title);
+      $rubric.find(".rubric_table caption .title").text(vals.title);
       var vals = $rubric.getTemplateData({textValues: ['title', 'description', 'rubric_total', 'rubric_association_id']});
       var data = {};
       data['rubric[title]'] = vals.title;
@@ -295,7 +296,7 @@ define([
       $rubric.find("#edit_rubric").remove();
       var $tr = $("#edit_rubric").clone(true).show().removeAttr('id').addClass('edit_rubric');
       var $form = $tr.find("#edit_rubric_form");
-      $rubric.append($tr);
+      $rubric.find('.rubric_table').append($tr);
       $form.attr('method', 'POST').attr('action', $("#add_rubric_url").attr('href'));
       // I believe this should only be visible on the assignment page (not
       // rubric page or quiz page) but we need to audit uses of the add rubric
@@ -318,7 +319,7 @@ define([
 
       $tr = $("#edit_rubric").clone(true).show().removeAttr('id').addClass('edit_rubric');
       $form = $tr.find("#edit_rubric_form");
-      $rubric.append($tr);
+      $rubric.find('.rubric_table').append($tr);
 
       $rubric.find(":text:first").focus().select();
       $form.find(".grading_rubric_checkbox").attr('checked', data.use_for_grading == "true").triggerHandler('change');
@@ -343,9 +344,11 @@ define([
       $rubric.find(".edit_rubric").remove();
       if(remove) {
         if($rubric.attr('id') != 'rubric_new') {
-          $rubric.prev(".rubric").show();
+          $display_rubric = $rubric.prev(".rubric");
+          $display_rubric.show();
+          $display_rubric.find('.rubric_title .title').focus();
         } else {
-          $(".add_rubric_link").show();
+          $(".add_rubric_link").show().focus();
         }
         $rubric.remove();
       } else {
@@ -362,14 +365,21 @@ define([
         avoid: '.criterion'
       });
       $rubric.fillFormData(rubric);
-      var url = $.replaceTags($rubric.find(".edit_rubric_url").attr('href'), 'rubric_id', rubric.id);
       rubricEditing.isEditing = false;
-      $rubric.find(".edit_rubric_link").attr('href', url);
-      var url = $.replaceTags($rubric.find(".delete_rubric_url").attr('href'), 'association_id', rubric.rubric_association_id);
-      $rubric.find(".delete_rubric_link").attr('href', url);
-      $rubric.find(".edit_rubric_link").showIf(rubric.permissions.update_association);
-      $rubric.find(".find_rubric_link").showIf(rubric.permissions.update_association && !$("#rubrics").hasClass('raw_listing'));
-      $rubric.find(".delete_rubric_link").showIf(rubric.permissions['delete_association']);
+
+      var url = $.replaceTags($rubric.find(".edit_rubric_url").attr('href'), 'rubric_id', rubric.id);
+      $rubric.find(".edit_rubric_link").
+        attr('href', url).
+        showIf(rubric.permissions.update_association);
+
+      url = $.replaceTags($rubric.find(".delete_rubric_url").attr('href'), 'association_id', rubric.rubric_association_id);
+      $rubric.find(".delete_rubric_link").
+        attr('href', url).
+        showIf(rubric.permissions['delete_association']);
+
+      $rubric.find(".find_rubric_link").
+        showIf(rubric.permissions.update_association && !$("#rubrics").hasClass('raw_listing'));
+
       $rubric.find(".criterion:not(.blank) .ratings").empty();
       for(var idx in rubric.criteria) {
         var criterion = rubric.criteria[idx];
@@ -396,6 +406,7 @@ define([
       $rubric.find(".criterion:not(.blank)")
         .find(".ratings").showIf(!rubric.free_form_criterion_comments).end()
         .find(".custom_ratings").showIf(rubric.free_form_criterion_comments);
+      $rubric.find('.rubric_title .title').focus();
     }
   };
   rubricEditing.sizeRatings = _.debounce(rubricEditing.originalSizeRatings, 10);
@@ -502,7 +513,7 @@ define([
         message: message,
         success: function() {
           $(this).fadeOut(function() {
-            $(".add_rubric_link").show();
+            $(".add_rubric_link").show().focus();
             if(callback && $.isFunction(callback)) {
               callback();
             }
@@ -699,7 +710,8 @@ define([
       },
       beforeSubmit: function(data) {
         var $rubric = $(this).parents(".rubric");
-        $rubric.find("thead .title").text(data['rubric[title]']);
+        $rubric.find(".rubric_title .title").text(data['rubric[title]']);
+        $rubric.find(".rubric_table caption .title").text(data['rubric[title]']);
         $rubric.find(".rubric_total").text(data['points_possible']);
         $rubric.removeClass('editing');
         if($rubric.attr('id') == 'rubric_new') {

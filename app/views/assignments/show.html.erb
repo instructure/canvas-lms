@@ -138,10 +138,12 @@
     </table>
 
     <% if can_do(@assignment, @current_user, :update) %>
-      <a href="<%= context_url(@context, :context_rubrics_url) %>" class="add_rubric_link btn button-sidebar-wide"
-         style="<%= hidden if @assignment.rubric_association %>">
-        <i class="icon-add"></i> <%= t 'links.add_rubric', "Add Rubric" %>
-      </a>
+      <a
+        href="<%= context_url(@context, :context_rubrics_url) %>"
+        class="add_rubric_link btn button-sidebar-wide icon-add"
+        style="<%= hidden if @assignment.rubric_association %>"
+        role="button"
+      ><%= t 'links.add_rubric', "Add Rubric" %></a>
     <% end %>
 
     <div class="course_id" style="display: none;"><%= @context.id if @context && @context.is_a?(Course) %></div>

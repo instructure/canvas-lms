@@ -1,72 +1,118 @@
-<% rubric_association ||= nil; editable ||= false; association_object = nil; edit_view ||= false
+<%
+   rubric_association ||= nil; editable ||= false; association_object = nil; edit_view ||= false
    rubric ||= nil; assessing ||= false; assessment ||= nil; has_assessments ||= false
    for_context ||= false
    context = @context
    context = context.context if context.is_a?(Group)
    show_grading = !@assignment || @assignment.submission_types != 'online_quiz' 
+   rubric_association = assessment.rubric_association if assessment
 %>
-<% rubric_association = assessment.rubric_association if assessment %>
-<% cache(['rubric_render2', (rubric.cache_key rescue 'no_rubric'), (rubric.cache_key rescue context.asset_string), (rubric_association.cache_key rescue 'no_association'), (assessment.cache_key rescue 'no_assessment'), editable, edit_view, assessing, show_grading].join('/')) do %>
-<table class="rubric <%= "assessing" if assessing %> <%= "for_grading" if (rubric.use_for_grading rescue false) %>" id="<%= rubric ? "rubric_#{rubric.id}" : "default_rubric" %>" style="<%= hidden unless rubric %>">
+<% cache(['rubric_render2',
+         (rubric.try(:cache_key) || 'no_rubric'),
+         (rubric.try(:cache_key) || context.asset_string),
+         (rubric_association.try(:cache_key) || 'no_association'),
+         (assessment.try(:cache_key) || 'no_assessment'),
+         editable,
+         edit_view,
+         assessing,
+         show_grading].join('/')) do %>
+<div
+  class="rubric_container rubric <%= "assessing" if assessing %> <%= "for_grading" if rubric_association.try(:use_for_grading) %>"
+  id="<%= rubric ? "rubric_#{rubric.id}" : "default_rubric" %>"
+  style="<%= hidden unless rubric %>"
+>
+  <div class="screenreader-only"><h3><%= t 'rubric', "Rubric" %></h3></div>
+  <div class="rubric_title">
+    <div style="float: right; <%= hidden unless editable && edit_view %>" class="links displaying">
+      <% hash = rubric_association ? {:rubric_association_id => rubric_association.id} : {} %>
+      <a
+        href="<%= context_url(context, :context_rubric_url, rubric ? rubric.id : "{{ id }}", hash) %>"
+        class="<%= 'copy_edit' if rubric && !can_do(rubric, @current_user, :update) %> edit_rubric_link no-print no-hover"
+        style="<%= hidden unless !rubric || can_do(rubric_association, @current_user, :update) %>"
+        title="<%= t 'links.edit', "Edit Rubric" %>"
+        aria-label="<%= t 'links.edit', "Edit Rubric" %>"
+        role="button"
+      ><i class="icon-edit standalone-icon"></i></a>
+      <a
+        href="<%= search_rubrics_url(:q => "") %>"
+        class="find_rubric_link no-print no-hover"
+        style="<%= hidden unless !rubric || can_do(rubric_association, @current_user, :update) %>"
+        title="<%= t 'links.find_another_rubric', "Find Another Rubric" %>"
+        aria-label="<%= t 'links.find_another_rubric', "Find Another Rubric" %>"
+        role="button"
+      ><i class="icon-search standalone-icon"></i></a>
+      <% if for_context %>
+        <a
+          href="<%= context_url(context, :context_rubric_url, rubric ? rubric.id : "{{ id }}") %>"
+          class="delete_rubric_link no-print no-hover"
+          style="<%= hidden unless !rubric || can_do(rubric_association, @current_user, :delete) %>"
+          title="<%= t 'links.delete', "Delete Rubric" %>"
+          aria-label="<%= t 'links.delete', "Delete Rubric" %>"
+          role="button"
+        ><i class="icon-trash standalone-icon"></i></a>
+      <% else %>
+        <a
+          href="<%= context_url(context, :context_rubric_association_url, rubric_association ? rubric_association.id : "{{ rubric_association_id }}") %>"
+          class="delete_rubric_link no-print no-hover"
+          style="<%= hidden unless !rubric || can_do(rubric_association, @current_user, :delete) %>"
+          title="<%= t 'links.delete', "Delete Rubric" %>"
+          aria-label="<%= t 'links.delete', "Delete Rubric" %>"
+          role="button"
+        ><i class="icon-trash standalone-icon"></i></a>
+      <% end %>
+      <div style="display: none;">
+        <div class="use_for_grading"><%= (rubric_association && rubric_association.use_for_grading) ? "true" : nbsp %></div>
+        <div class="free_form_criterion_comments"><%= (rubric && rubric.free_form_criterion_comments) ? "true" : nbsp %></div>
+        <div class="hide_score_total"><%= (rubric && rubric.hide_score_total) ? "true" : nbsp %></div>
+        <div class="rubric_association_id"><%= rubric_association ? rubric_association.id : nbsp %></div>
+        <div class="user_id"><%= assessment ? assessment.user_id : nbsp %></div>
+        <div class="assessment_type"><%= assessment ? assessment.assessment_type : "" %></div>
+        <a href="<%= context_url(context, :context_rubric_association_rubric_assessment_url, rubric_association ? rubric_association.id : "{{ rubric_association_id }}", (assessment ? assessment.id : "{{ assessment_id }}")) %>" rel="nofollow" class="edit_assessment_link">&nbsp;</a>
+        <a href="<%= context_url(context, :context_rubric_url, "{{ rubric_id }}") %>" class="edit_rubric_url">&nbsp;</a>
+        <% if for_context %>
+          <a href="<%= context_url(context, :context_rubric_url, rubric ? rubric.id : "{{ id }}") %>" class="delete_rubric_url">&nbsp;</a>
+        <% else %>
+          <a href="<%= context_url(context, :context_rubric_association_url, "{{ association_id }}") %>" class="delete_rubric_url">&nbsp;</a>
+        <% end %>
+      </div>
+    </div>
+    <div style="float: right; font-size: 0.8em; display: none;" class="links displaying locked">
+      <span style="<%= hidden if editable %>"><%= t 'messages.locked', "Can't change a rubric once you've started using it." %></span>
+      <% if for_context %>
+        <a href="<%= context_url(context, :context_rubric_url, rubric ? rubric.id : "{{ id }}") %>" class="delete_rubric_url" style="display: none;">&nbsp;</a>
+      <% else %>
+        <a href="<%= context_url(context, :context_rubric_association_url, "{{ association_id }}") %>" class="delete_rubric_url" style="display: none;">&nbsp;</a>
+      <% end %>
+    </div>
+
+    <div class="editing" style="float: right;">
+      <a href="<%= search_rubrics_url(:q => "") %>" class="find_rubric_link icon-search" style="<%= hidden unless !rubric || can_do(rubric_association, @current_user, :update) %>" title="<%= t 'titles.find_existing_rubric', "Find Existing Rubric" %>"><%= t 'links.find_a_rubric', "Find a Rubric" %></a>
+    </div>
+    <div class="editing" style="text-align: left">
+      <%= before_label :title, "Title" %>
+      <input type="text" class="no-margin-bottom" name="title" value="<%= rubric.title rescue t('defaults.rubric_title', "Some Rubric") %>" style="width: 200px;" maxlength="255"/>
+      <a href="<%= search_rubrics_url(:q => "") %>" style="display: none;"><%= image_tag "find.png" %> <%= t 'links.find_rubric', "Find Rubric" %></a>
+      <% if rubric_association && !rubric_association.rubric_assessments.empty? %>
+        <div class="editing" style="font-size: 0.8em;"><%= t 'messages.rubric_in_use',
+                                                             { :one => "Keep in mind that 1 student has already been assessed using this rubric.  Changing it will affect their evaluation.",
+                                                               :other => "Keep in mind that %{count} students have already been assessed using this rubric.  Changing it will affect their evaluations." },
+                                                           :count => rubric_association.rubric_assessments.count %></div>
+      <% end %>
+    </div>
+    <div class="displaying">
+      <span class="title" tabindex="-1"><%= rubric.try(:title) || t(:rubric_title, "Title") %></span>
+    </div>
+    <div class="has-assessments-warning" style="<%= hidden unless edit_view && has_assessments %>">
+      <%= t 'messages.rubric_in_use2', "You've already rated students with this rubric.  Any major changes could affect their assessment results." %>
+    </div>
+  </div>
+<table class="rubric_table">
+<caption>
+  <div class="screenreader-only">
+    <span class="title"><%= rubric.try(:title) || t(:rubric_title, "Title") %></span>
+  </div>
+</caption>
 <thead>
-  <tr class="rubric_title">
-    <th colspan="4">
-      <div style="float: right; <%= hidden unless editable && edit_view %>" class="links displaying">
-        <% hash = rubric_association ? {:rubric_association_id => rubric_association.id} : {} %>
-        <a href="<%= context_url(context, :context_rubric_url, rubric ? rubric.id : "{{ id }}", hash) %>" class="<%= 'copy_edit' if rubric && !can_do(rubric, @current_user, :update) %> edit_rubric_link no-print no-hover" title="<%= t 'links.edit', "Edit Rubric" %>" style="<%= hidden unless !rubric || can_do(rubric_association, @current_user, :update) %>"><i class="icon-edit standalone-icon"></i></a>
-        <a href="<%= search_rubrics_url(:q => "") %>" class="find_rubric_link no-print no-hover" style="<%= hidden unless !rubric || can_do(rubric_association, @current_user, :update) %>" title="<%= t 'links.find_another_rubric', "Find Another Rubric" %>"><i class="icon-search standalone-icon"></i></a>
-        <% if for_context %>
-          <a href="<%= context_url(context, :context_rubric_url, rubric ? rubric.id : "{{ id }}") %>" class="delete_rubric_link no-print no-hover" title="<%= t 'links.delete', "Delete Rubric" %>" style="<%= hidden unless !rubric || can_do(rubric_association, @current_user, :delete) %>"><i class="icon-trash standalone-icon"></i></a>
-        <% else %>
-          <a href="<%= context_url(context, :context_rubric_association_url, rubric_association ? rubric_association.id : "{{ rubric_association_id }}") %>" class="delete_rubric_link no-print no-hover" title="<%= t 'links.delete', "Delete Rubric" %>" style="<%= hidden unless !rubric || can_do(rubric_association, @current_user, :delete) %>"><i class="icon-trash standalone-icon"></i></a>
-        <% end %>
-        <div style="display: none;">
-          <div class="use_for_grading"><%= (rubric_association && rubric_association.use_for_grading) ? "true" : nbsp %></div>
-          <div class="free_form_criterion_comments"><%= (rubric && rubric.free_form_criterion_comments) ? "true" : nbsp %></div>
-          <div class="hide_score_total"><%= (rubric && rubric.hide_score_total) ? "true" : nbsp %></div>
-          <div class="rubric_association_id"><%= rubric_association ? rubric_association.id : nbsp %></div>
-          <div class="user_id"><%= assessment ? assessment.user_id : nbsp %></div>
-          <div class="assessment_type"><%= assessment ? assessment.assessment_type : "" %></div>
-          <a href="<%= context_url(context, :context_rubric_association_rubric_assessment_url, rubric_association ? rubric_association.id : "{{ rubric_association_id }}", (assessment ? assessment.id : "{{ assessment_id }}")) %>" rel="nofollow" class="edit_assessment_link">&nbsp;</a>
-          <a href="<%= context_url(context, :context_rubric_url, "{{ rubric_id }}") %>" class="edit_rubric_url">&nbsp;</a>
-          <% if for_context %>
-            <a href="<%= context_url(context, :context_rubric_url, rubric ? rubric.id : "{{ id }}") %>" class="delete_rubric_url">&nbsp;</a>
-          <% else %>
-            <a href="<%= context_url(context, :context_rubric_association_url, "{{ association_id }}") %>" class="delete_rubric_url">&nbsp;</a>
-          <% end %>
-        </div>
-      </div>
-      <div style="float: right; font-size: 0.8em; display: none;" class="links displaying locked">
-        <span style="<%= hidden if editable %>"><%= t 'messages.locked', "Can't change a rubric once you've started using it." %></span>
-        <% if for_context %>
-          <a href="<%= context_url(context, :context_rubric_url, rubric ? rubric.id : "{{ id }}") %>" class="delete_rubric_url" style="display: none;">&nbsp;</a>
-        <% else %>
-          <a href="<%= context_url(context, :context_rubric_association_url, "{{ association_id }}") %>" class="delete_rubric_url" style="display: none;">&nbsp;</a>
-        <% end %>
-      </div>
-      
-      <div class="editing" style="float: right;">
-        <a href="<%= search_rubrics_url(:q => "") %>" class="find_rubric_link icon-search" style="<%= hidden unless !rubric || can_do(rubric_association, @current_user, :update) %>" title="<%= t 'titles.find_existing_rubric', "Find Existing Rubric" %>"><%= t 'links.find_a_rubric', "Find a Rubric" %></a>
-      </div>
-      <div class="editing" style="text-align: left">
-        <%= before_label :title, "Title" %> <input type="text" class="no-margin-bottom" name="title" value="<%= rubric.title rescue t('defaults.rubric_title', "Some Rubric") %>" style="width: 200px;" maxlength="255"/>
-        <a href="<%= search_rubrics_url(:q => "") %>" style="display: none;"><%= image_tag "find.png" %> <%= t 'links.find_rubric', "Find Rubric" %></a>
-        <% if rubric_association && !rubric_association.rubric_assessments.empty? %>
-          <div class="editing" style="font-size: 0.8em;"><%= t 'messages.rubric_in_use',
-                                                               { :one => "Keep in mind that 1 student has already been assessed using this rubric.  Changing it will affect their evaluation.",
-                                                                 :other => "Keep in mind that %{count} students have already been assessed using this rubric.  Changing it will affect their evaluations." },
-                                                             :count => rubric_association.rubric_assessments.count %></div>
-        <% end %>
-      </div>
-      <div class="displaying">
-        <span class="title"><%= rubric.try(:title) || t(:rubric_title, "Title") %></span>
-      </div>
-    </th>
-  </tr>
-  <tr style="<%= hidden unless edit_view && has_assessments %>">
-    <td colspan="4" style="font-size: 0.8em;"><%= t 'messages.rubric_in_use2', "You've already rated students with this rubric.  Any major changes could affect their assessment results." %>
-    </td>
-  </tr>
   <tr>
     <th><%= t 'headers.criteria', "Criteria" %></th>
     <th><%= t 'headers.ratings', "Ratings" %></th>
@@ -101,6 +147,7 @@
   </tr>
 </tbody>
 </table>
+</div>
 <table style="display: none;">
   <tr id="edit_rubric">
     <td colspan="4">

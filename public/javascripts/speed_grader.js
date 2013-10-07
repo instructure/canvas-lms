@@ -938,20 +938,22 @@ define([
     },
 
     toggleFullRubric: function(force){
-      //if there is no rubric associated with this assignment, then the edit rubric thing should never be shown.
-      //the view should make sure that the edit rubric html is not even there but we also want to
-      //make sure that pressing "r" wont make it appear either
+      // if there is no rubric associated with this assignment, then the edit
+      // rubric thing should never be shown.  the view should make sure that
+      // the edit rubric html is not even there but we also want to make sure
+      // that pressing "r" wont make it appear either
       if (!jsonData.rubric_association){ return false; }
 
       if ($rubric_full.filter(":visible").length || force === "close") {
         $("#grading").height("auto").children().show();
         $rubric_full.fadeOut();
         this.resizeFullHeight();
-      }
-      else {
+        $(".toggle_full_rubric").focus()
+      } else {
         $rubric_full.fadeIn();
         $("#grading").children().hide();
         this.refreshFullRubric();
+        $rubric_full.find('.rubric_title .title').focus()
       }
     },
 
