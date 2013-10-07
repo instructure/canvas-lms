@@ -603,6 +603,47 @@ describe "calendar2" do
         pending("dragging events doesn't seem to work")
       end
     end
+
+    context "agenda view" do
+      before(:each) do
+        account = Account.default
+        account.settings[:agenda_view] = true
+        account.save!
+      end
+
+      it "should display agenda events" do
+        get '/calendar2'
+        wait_for_ajaximations
+        f('label[for=agenda]').click
+        wait_for_ajaximations
+        fj('.agenda-wrapper:visible').should be_present
+      end
+
+      it "should set the header in the format 'Oct 11, 2013'" do
+        start_date = Time.now.beginning_of_day + 12.hours
+        event = @course.calendar_events.create!(title: "ohai",
+          start_at: start_date, end_at: start_date + 1.hour)
+        get '/calendar2'
+        wait_for_ajaximations
+        f('label[for=agenda]').click
+        wait_for_ajaximations
+        f('.navigation_title').text.should match(/[A-Z][a-z]{2}\s\d{2},\s\d{4}/)
+      end
+
+      it "should respect context filters" do
+        start_date = Time.now.beginning_of_day + 12.hours
+        event = @course.calendar_events.create!(title: "ohai",
+          start_at: start_date, end_at: start_date + 1.hour)
+        get '/calendar2'
+        wait_for_ajaximations
+        f('label[for=agenda]').click
+        wait_for_ajaximations
+        ffj('.ig-row').length.should == 1
+        fj('.context-list-toggle-box:last').click
+        wait_for_ajaximations
+        ffj('.ig-row').length.should == 0
+      end
+    end
   end
 
   context "as a student" do

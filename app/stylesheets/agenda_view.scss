@@ -1,0 +1,58 @@
+.agenda-wrapper {
+  display: none;
+
+  &.active {
+    display: block;
+  }
+}
+
+.agenda-day {
+  border-bottom: 1px dashed #bac0c6;
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+
+  &:after {
+    clear: both;
+    content: "";
+    display: table;
+  }
+
+  .item-group-condensed {
+    padding: 0 15px 0 0;
+  }
+}
+
+.agenda-date {
+  float: left;
+  font-size: 12px;
+  font-weight: bold;
+  line-height: 52px;
+  margin: 0;
+  max-width: 125px;
+  width: 10%;
+}
+
+.agenda-events {
+  float: left;
+  width: 90%;
+}
+
+.agenda-event {
+  &:first-child .color-tag {
+    border-top-left-radius: 2px;
+  }
+
+  &:last-child .color-tag {
+    border-bottom-left-radius: 2px;
+  }
+}
+
+.color-tag {
+  display: inline-block;
+  height: 100%;
+  width: 4px;
+}
+
+.agenda-actions {
+  margin-left: 10%;
+}

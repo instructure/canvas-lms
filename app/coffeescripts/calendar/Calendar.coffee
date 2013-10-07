@@ -17,6 +17,7 @@ define [
   'compiled/calendar/EditEventDetailsDialog'
   'compiled/calendar/Scheduler'
   'compiled/views/calendar/CalendarNavigator'
+  'compiled/views/calendar/AgendaView'
   'compiled/calendar/CalendarDefaults'
   'vendor/fullcalendar'
 
@@ -24,7 +25,7 @@ define [
   'jquery.instructure_misc_plugins'
   'vendor/jquery.ba-tinypubsub'
   'jqueryui/button'
-], (I18n, $, _, userSettings, hsvToRgb, calendarAppTemplate, EventDataSource, commonEventFactory, ShowEventDetailsDialog, EditEventDetailsDialog, Scheduler, CalendarNavigator, calendarDefaults) ->
+], (I18n, $, _, userSettings, hsvToRgb, calendarAppTemplate, EventDataSource, commonEventFactory, ShowEventDetailsDialog, EditEventDetailsDialog, Scheduler, CalendarNavigator, AgendaView, calendarDefaults) ->
 
   class Calendar
     constructor: (selector, @contexts, @manageContexts, @dataSource, @options) ->
@@ -47,6 +48,7 @@ define [
         "EventDataSource/ajaxEnded" : @ajaxEnded
         "Calendar/refetchEvents" : @refetchEvents
         'CommonEvent/assignmentSaved' : @updateOverrides
+        'Calendar/colorizeContexts': @colorizeContexts
 
       weekColumnFormatter = """
         '<span class="agenda-col-wrapper">
@@ -111,6 +113,8 @@ define [
         viewName = if data.view_name == 'agendaWeek' then 'week' else 'month'
         @header.selectView(viewName)
         fullCalendarParams.defaultView = data.view_name
+      else if data.view_name == 'agenda'
+        @header.selectView(data.view_name)
 
       if data.show && data.show != ''
         @visibleContextList = data.show.split(',')
@@ -133,6 +137,8 @@ define [
 
       @connectHeaderEvents()
       @connectSchedulerNavigatorEvents()
+      @agenda = new AgendaView(el: $('.agenda-wrapper'))
+      @loadView('agenda') if data.view_name is 'agenda'
 
       window.setTimeout =>
         if data.view_name == 'scheduler'
@@ -142,10 +148,13 @@ define [
 
     connectHeaderEvents: ->
       @header.on('navigatePrev',  => @calendar.fullCalendar('prev'))
-      @header.on('navigateToday', => @calendar.fullCalendar('today'))
+      @header.on 'navigateToday', =>
+        @calendar.fullCalendar('today')
+        @agenda.fetch(@visibleContextList) if @currentView == 'agenda'
       @header.on('navigateNext',  => @calendar.fullCalendar('next'))
       @header.on('week', => @loadView('week'))
       @header.on('month', => @loadView('month'))
+      @header.on('agenda', => @loadView('agenda'))
       @header.on('scheduler', => @loadView('scheduler'))
       @header.on('createNewEvent', @addEventClick)
       @header.on('refreshCalendar', @reloadClick)
@@ -458,6 +467,7 @@ define [
 
     visibleContextListChanged: (newList) =>
       @visibleContextList = newList
+      @loadAgendaView() if @currentView == 'agenda'
       @calendar.fullCalendar('refetchEvents')
 
     ajaxStarted: () =>
@@ -479,9 +489,10 @@ define [
     loadView: (view) =>
       @updateFragment view_name: view
 
-      if view != 'scheduler'
+      $('.agenda-wrapper').removeClass('active')
+      if view != 'scheduler' and view != 'agenda'
         @currentView = view
-        @calendar.removeClass('scheduler-mode')
+        @calendar.removeClass('scheduler-mode').removeClass('agenda-mode')
         @displayAppointmentEvents = null
         @scheduler.hide()
         @calendar.show()
@@ -489,13 +500,44 @@ define [
         @schedulerNavigator.hide()
         @calendar.fullCalendar('refetchEvents')
         @calendar.fullCalendar('changeView', if view == 'week' then 'agendaWeek' else 'month')
-      else
+        @calendar.fullCalendar('render')
+      else if view == 'scheduler'
         @currentView = 'scheduler'
         @calendar.addClass('scheduler-mode')
         @calendar.hide()
         @header.showSchedulerTitle()
         @schedulerNavigator.hide()
         @scheduler.show()
+      else
+        @loadAgendaView()
+        @calendar.hide()
+        @scheduler.hide()
+
+    loadAgendaView: ->
+      oldView = @currentView
+      calendarDate = @calendar.fullCalendar('getDate')
+      now = $.fudgeDateForProfileTimezone(new Date)
+      if oldView == 'month'
+        if calendarDate.getMonth() == now.getMonth()
+          start = now
+        else
+          start = new Date(calendarDate.getTime())
+          start.setDate(1)
+      else if oldView == 'week'
+        if calendarDate.getWeek() == now.getWeek()
+          start = now
+        else
+          start = new Date(calendarDate.getTime())
+          until start.getDay() == 0
+            start.setDate(start.getDate() - 1)
+      else
+        start = now
+      start.setHours(0)
+      start.setMinutes(0)
+      start.setSeconds(0)
+
+      @currentView = 'agenda'
+      @agenda.fetch(@visibleContextList, start)
 
     showSchedulerSingle: ->
       @calendar.show()
@@ -522,7 +564,7 @@ define [
       rgbArray = hsvToRgb(h,s,b)
       "rgb(#{rgbArray.join ' ,'})"
 
-    colorizeContexts: ->
+    colorizeContexts: =>
       [bgSaturation, bgBrightness]         = [30, 96]
       [textSaturation, textBrightness]     = [60, 40]
       [strokeSaturation, strokeBrightness] = [70, 70]

@@ -19,6 +19,7 @@ define [
     events:
       'click #week'      : '_triggerWeek'
       'click #month'     : '_triggerMonth'
+      'click #agenda'    : '_triggerAgenda'
       'click #scheduler' : '_triggerScheduler'
       'click .scheduler_done_button': '_triggerDone'
       'click #create_new_event_link': '_triggerCreateNewEvent'
@@ -40,6 +41,8 @@ define [
       @navigator.on('navigatePrev', => @trigger('navigatePrev'))
       @navigator.on('navigateToday', => @trigger('navigateToday'))
       @navigator.on('navigateNext', => @trigger('navigateNext'))
+      $.subscribe('Calendar/updateHeader', @setHeaderText)
+      $.subscribe('Calendar/loadStatus', @animateLoading)
       @$schedulerDoneButton
 
     showNavigator: ->
@@ -60,13 +63,13 @@ define [
       @$appointmentGroupTitle.hide()
       @$schedulerDoneButton.show()
 
-    setHeaderText: (newText) ->
+    setHeaderText: (newText) =>
       @navigator.setTitle(newText)
 
     selectView: (viewName) ->
       $("##{viewName}").click()
 
-    animateLoading: (shouldAnimate) ->
+    animateLoading: (shouldAnimate) =>
       @$refreshCalendarLink.toggleClass('loading', shouldAnimate)
 
     setSchedulerBadgeCount: (badgeCount) ->
@@ -80,6 +83,9 @@ define [
 
     _triggerMonth: (event) ->
       @trigger('month')
+
+    _triggerAgenda: (event) ->
+      @trigger('agenda')
 
     _triggerScheduler: (event) ->
       @trigger('scheduler')

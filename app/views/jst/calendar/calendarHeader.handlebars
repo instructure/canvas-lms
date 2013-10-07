@@ -8,6 +8,9 @@
     <div class="calendar_view_buttons header-table-cell header-table-middle">
       <input type="radio" id="week"      name="calendar_view" /><label for="week">{{#t "links.calendar_week"}}Week{{/t}}</label>
       <input type="radio" id="month"     name="calendar_view" checked="checked" /><label for="month">{{#t "links.calendar_month"}}Month{{/t}}</label>
+      {{#if showAgenda}}
+      <input type="radio" id="agenda"    name="calendar_view" /><label for="agenda">{{#t "links.calendar_agenda"}}Agenda{{/t}}</label>
+      {{/if}}
       {{#if showScheduler}}
       <input type="radio" id="scheduler" name="calendar_view" /><label for="scheduler">{{#t "links.calendar_scheduler"}}Scheduler{{/t}} <span stye="display: none" class="counter-badge"></span></label>
       {{/if}}

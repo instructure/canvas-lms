@@ -1,0 +1,60 @@
+<div class="item-group-container">
+  {{#each days}}
+    <div class="agenda-day">
+      <h3 class="agenda-date">{{date}}</h3>
+
+      <div class="agenda-events">
+        <div class="item-group-condensed">
+          <ul class="ig-list">
+            {{#each events}}
+              <li class="agenda-event">
+                <div class="ig-row">
+                  <span class="color-tag group_{{context_code}}"></span>
+
+                  <span class="ig-title">
+                    {{#if assignment}}
+                      <i class="icon-assignment"></i>
+                    {{else}}
+                      <i class="icon-calendar-month"></i>
+                    {{/if}}
+                    <b>{{title}}</b>
+                  </span>
+
+                  <div class="ig-details">
+                    {{#if assignment}}
+                      <b>{{#t "due"}}due{{/t}}</b>
+                      {{strftime assignment.due_at "%l:%M%P"}}
+
+                    {{else}}
+                      {{#unless all_day}}
+                        {{strftime start_at "%l:%M%P"}}
+                      {{/unless}}
+                    {{/if}}
+                  </div>
+
+                  <div class="ig-admin">
+                    <a href="#" class="al-trigger al-trigger-gray">
+                      <i class="icon-settings"></i>
+                      <i class="icon-mini-arrow-down"></i>
+                    </a>
+
+                    <ul class="al-options">
+                      <li><a href="#">{{#t "edit"}}Edit{{/t}}</a></li>
+                      <li><a href="#">{{#t "delete"}}Delete{{/t}}</a></li>
+                    </ul>
+                  </div>
+                </div>
+              </li>
+            {{/each}}
+          </ul>
+        </div>
+      </div>
+    </div>
+  {{/each}}
+
+  <div class="agenda-actions">
+    {{#if meta.hasMore}}
+      <a href="#" class="btn agenda-load-btn">Load more</a>
+    {{/if}}
+  </div>
+</div>
