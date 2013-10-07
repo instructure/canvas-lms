@@ -18,17 +18,15 @@ if CANVAS_RAILS2
   end
   gem 'authlogic', '2.1.3'
 else
-  # 3.0.20 is transitional, we will be on 3.2.x before support is complete
-  # that's also why some gems below have to be downgraded, 3.0.20 relies on old versions of some gems
   # just to be clear, Canvas is NOT READY to run under Rails 3 in production
-  gem 'rails', '3.0.20'
+  gem 'rails', '3.2.14'
   gem 'authlogic', '3.2.0'
 end
 
 gem "aws-sdk", '1.8.3.1'
 gem 'barby', '0.5.0'
 gem 'bcrypt-ruby', '3.0.1'
-gem 'builder', '2.1.2'
+gem 'builder', '3.0.0'
 if CANVAS_RAILS2
   gem 'canvas_connect', '0.2'
 end
@@ -37,7 +35,7 @@ gem 'diff-lcs', '1.1.3', :require => 'diff/lcs'
 if CANVAS_RAILS2
   gem 'encrypted_cookie_store-instructure', '1.0.4', :require => 'encrypted_cookie_store'
 end
-gem 'erubis', CANVAS_RAILS2 ? '2.7.0' : '2.6.6'
+gem 'erubis', '2.7.0'
 if CANVAS_RAILS2
   gem 'fake_arel', '1.0.0'
 end
@@ -47,7 +45,7 @@ gem 'hairtrigger', '0.2.3'
 gem 'sass', '3.2.3'
 gem 'hashery', '1.3.0', :require => 'hashery/dictionary'
 gem 'highline', '1.6.1'
-gem 'i18n', CANVAS_RAILS2 ? '0.6.0' : '0.5.0'
+gem 'i18n', '0.6.4'
 if CANVAS_RAILS2
   gem 'i18nema', '0.0.7'
 end
@@ -57,7 +55,7 @@ gem 'json', '1.8.0'
 # native xml parsing, diigo
 gem 'libxml-ruby', '2.6.0', :require => 'xml/libxml'
 gem 'macaddr', '1.0.0' # macaddr 1.2.0 tries to require 'systemu' which isn't a dependency
-gem 'mail', CANVAS_RAILS2 ? '2.5.3' : '2.2.19'
+gem 'mail', '2.5.4'
 # using this forked gem until https://github.com/37signals/marginalia/pull/15 is in the source gem
 gem 'instructure-marginalia', '1.1.3', :require => false
 gem 'mime-types', '1.17.2', :require => 'mime/types'
@@ -68,7 +66,7 @@ gem 'netaddr', '1.5.0'
 gem 'nokogiri', '1.5.6'
 # oauth gem, with rails3 fixes rolled in
 gem 'oauth-instructure', '0.4.9', :require => 'oauth'
-gem 'rack', CANVAS_RAILS2 ? '1.1.3' : '1.2.5'
+gem 'rack', CANVAS_RAILS2 ? '1.1.3' : '1.4.5'
 gem 'rake', '10.1.0'
 gem 'rdoc', '3.12'
 gem 'ratom-instructure', '0.6.9', :require => "atom" # custom gem until necessary changes are merged into mainstream
@@ -125,6 +123,7 @@ group :test do
     gem 'rspec', '1.3.2'
     gem 'rspec-rails', '1.3.4'
   else
+    gem 'rspec', '2.13.0'
     gem 'rspec-rails', '2.13.0'
   end
   gem 'selenium-webdriver', '2.35.0'
