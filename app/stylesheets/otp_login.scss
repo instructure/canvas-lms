@@ -2,8 +2,18 @@
 @import "bootstrap/responsive-767px-max";
 @import "bootstrap/responsive-navbar";
 
-body.modal #login-box .btn {
-  float: none;
+body.modal {
+  #modal-box {
+    max-width: $modal_box_width - (2 * $modal_box_padding);
+    width: auto;
+  }
+  #footer {
+    max-width: $modal_box_width + 20px;
+    width: auto;
+  }
+  #login-box .btn {
+    float: none;
+  }
 }
 @media (max-width: 767px) {
   body {
