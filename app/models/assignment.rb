@@ -118,6 +118,7 @@ class Assignment < ActiveRecord::Base
   validates_presence_of :context_id, :context_type, :workflow_state
   validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true
   validates_length_of :description, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
+  validates_length_of :allowed_extensions, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
   validate :frozen_atts_not_altered, :if => :frozen?, :on => :update
 
   acts_as_list :scope => :assignment_group_id

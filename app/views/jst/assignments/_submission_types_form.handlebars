@@ -99,6 +99,7 @@
           <input id="assignment_allowed_extensions"
             name="allowed_extensions"
             type="text"
+            maxlength="254"
             placeholder="{{#t "labels.allowed_extensions"}}Allowed File Extensions{{/t}}"
             value="{{join allowedExtensions ","}}"
             {{disabledIfIncludes frozenAttributes "submission_types"}}/>
