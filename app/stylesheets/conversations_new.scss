@@ -479,6 +479,8 @@ input.dropdown-search {
 }
 
 .message-header-row .ac-input-box {
+  max-height: 130px;
+  overflow-y: scroll;
   width: 93%;
 }
 
