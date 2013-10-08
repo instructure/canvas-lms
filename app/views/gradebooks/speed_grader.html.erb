@@ -275,6 +275,13 @@
     <label for="hide_student_names"><%= t('labels.hide_names', "Hide student names in the SpeedGrader") %></label>
   </p>
 
+  <p <% unless @assignment.quiz %>class=hidden<% end %>>
+    <%= check_box_tag :enable_speedgrader_grade_by_question, "1",
+      @current_user.preferences[:enable_speedgrader_grade_by_question] %>
+    <%= label_tag :enable_speedgrader_grade_by_question,
+      t('labels.grade_by_question_beta', 'Grade by question (beta)') %>
+  </p>
+
   <div class="button-container">
     <button class="btn dialog_closer"><%= t('#buttons.cancel', "Cancel") %></button>
     <button type="submit" class="btn btn-primary submit_button"><%= t('buttons.save_settings', "Save Settings") %></button>
