@@ -289,14 +289,5 @@ describe "quizzes questions" do
         true
       end
     end
-
-    it "should selectmenu-ify select elements" do
-      select = f('.question select')
-      keep_trying_until { fj('.question_select:visible').should be_nil }
-
-      f('.ui-selectmenu').click
-      ff('.ui-selectmenu-open li')[1].click
-      select[:selectedIndex].should == "1"
-    end
   end
 end
