@@ -221,7 +221,7 @@ describe "dashboard" do
       group = Group.create!(:name => "group1", :context => @course)
       group.add_user(@user)
       @course.update_attributes(:start_at => 2.days.from_now, :conclude_at => 4.days.from_now, :restrict_enrollments_to_course_dates => false)
-      Enrollment.update_all(:created_at =>  1.minute.ago)
+      Enrollment.update_all(:created_at => 1.minute.ago)
 
       get "/"
 
@@ -230,6 +230,18 @@ describe "dashboard" do
       driver.action.move_to(course_menu).perform
       course_menu.should include_text('Current Groups')
       course_menu.should include_text(group.name)
+    end
+
+    it "should go to /courses when the courses nav item is clicked" do
+      @course.update_attributes(:start_at => 2.days.from_now, :conclude_at => 4.days.from_now, :restrict_enrollments_to_course_dates => false)
+      Enrollment.update_all(:created_at => 1.minute.ago)
+
+      get '/'
+
+      keep_trying_until do
+        f('#courses_menu_item a').click
+        driver.current_url.should include('courses')
+      end
     end
 
     it "should display scheduled web conference in stream" do
@@ -251,24 +263,24 @@ describe "dashboard" do
 
     it "should display calendar events in the coming up list" do
       calendar_event_model({
-                               :title => "super fun party",
-                               :description => 'celebrating stuff',
-                               :start_at => 5.minutes.from_now,
-                               :end_at => 10.minutes.from_now
+                             :title => "super fun party",
+                             :description => 'celebrating stuff',
+                             :start_at => 5.minutes.from_now,
+                             :end_at => 10.minutes.from_now
                            })
       get "/"
       f('div.events_list .event a').should include_text(@event.title)
     end
 
     it "should display quiz submissions with essay questions as submitted in coming up list" do
-      quiz_with_graded_submission([:question_data => {:id => 31, 
-                                                      :name => "Quiz Essay Question 1", 
-                                                      :question_type => 'essay_question', 
-                                                      :question_text => 'qq1', 
+      quiz_with_graded_submission([:question_data => {:id => 31,
+                                                      :name => "Quiz Essay Question 1",
+                                                      :question_type => 'essay_question',
+                                                      :question_text => 'qq1',
                                                       :points_possible => 10}],
                                   {:user => @student, :course => @course}) do
         {
-          "question_31"   => "<p>abeawebawebae</p>", 
+          "question_31" => "<p>abeawebawebae</p>",
           "question_text" => "qq1"
         }
       end

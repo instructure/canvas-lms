@@ -250,5 +250,17 @@ describe "courses" do
       login_as(@student.name)
       f('#menu').should_not include_text('Courses')
     end
+
+    it "should display user groups on courses page" do
+      group = Group.create!(:name => "group1", :context => @course)
+      group.add_user(@student)
+
+      login_as(@student.name)
+      get '/courses'
+
+      content = f('#content')
+      content.should include_text('My Groups')
+      content.should include_text('group1')
+    end
   end
 end
