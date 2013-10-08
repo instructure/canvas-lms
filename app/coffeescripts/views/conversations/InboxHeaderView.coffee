@@ -118,6 +118,7 @@ define [
     onArchivedStateChange: (msg) ->
       return if !msg
       archived = msg.get('workflow_state') == 'archived'
+      @$archiveBtn.find('i').attr('class', if archived then 'icon-remove-from-collection' else 'icon-collection-save')
       @$archiveBtn.attr('title', if archived then @messages['unarchive'] else @messages['archive'])
       @$archiveBtn.find('.screenreader-only')
         .text(if archived then @messages['unarchive_conversation'] else @messages['archive_conversation'])
