@@ -100,7 +100,6 @@
     }
     // END no-flash upload FIX
 
-    // Fix top positioning on the conversations page
     // Fix for the new conversations page - toolbar renders underneath the rainbow bar
     utils.onPage(/conversations/, function() {
         // are we on the new conversations page?
