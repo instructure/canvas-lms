@@ -17,6 +17,7 @@ define [
 
     defaults:
       "publishable": true
+      "hidden": false
 
     initialize: ->
       if (overrides = @get('assignment_overrides'))?
@@ -252,6 +253,17 @@ define [
       data = super
       data = @_filterFrozenAttributes(data)
       if @alreadyScoped then data else { assignment: data }
+
+    search: (regex) ->
+      if @get('name').match(regex)
+        @set 'hidden', false
+        return true
+      else
+        @set 'hidden', true
+        return false
+
+    endSearch: ->
+      @set 'hidden', false
 
     parse: (data) ->
       data = super data

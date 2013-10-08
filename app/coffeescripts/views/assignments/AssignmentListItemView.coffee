@@ -41,6 +41,8 @@ define [
       # we need the following line in order to access this view later
       @model.assignmentView = @
 
+      @model.on('change:hidden', @toggleHidden)
+
       if @canManage()
         @model.on('change:published', @updatePublishState)
 
@@ -76,6 +78,7 @@ define [
 
     # call remove on children so that they can clean up old dialogs.
     render: ->
+      @toggleHidden(@model, @model.get('hidden'))
       @publishIconView.remove()         if @publishIconView
       @editAssignmentView.remove()      if @editAssignmentView
       @dateDueColumnView.remove()       if @dateDueColumnView
@@ -83,9 +86,6 @@ define [
       @moveAssignmentView.remove() if @moveAssignmentView
 
       super
-      # reset the model's view property; it got overwritten by child views
-      @model.view = this if @model
-
       # reset the model's view property; it got overwritten by child views
       @model.view = this if @model
 
@@ -100,6 +100,9 @@ define [
         @moveAssignmentView.hide()
         @moveAssignmentView.setTrigger @$moveAssignmentButton
 
+    toggleHidden: (model, hidden) =>
+      @$el.toggleClass('hidden', hidden)
+      @$el.toggleClass('search_show', !hidden)
 
     createModuleToolTip: =>
       link = @$el.find('.tooltip_link')
@@ -144,14 +147,3 @@ define [
 
     canManage: ->
       ENV.PERMISSIONS.manage
-
-    search: (regex) ->
-      if @model.get('name').match(regex)
-        @show()
-        return true
-      else
-        @hide()
-        return false
-
-    endSearch: (regex) ->
-      @show()
