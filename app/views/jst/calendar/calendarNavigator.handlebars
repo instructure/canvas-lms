@@ -9,4 +9,11 @@
     <span class="screenreader-only">{{#t "next"}}Next{{/t}}</span>
   </button>
 </span>
-<h2 class="navigation_title"></h2>
+<h2 class="navigation_title" {{#if showPicker}}role="button" tabindex="0"{{/if}}></h2>
+{{#if showPicker}}
+<span class="date_field_wrapper">
+  <input type="text" name="start date" style="width: 100px;" class="date_field"
+         aria-label="{{#t "enter_jump_date"}}Enter a date and press enter to jump to that date.{{/t}}" />
+  <span class="screenreader-only suggestion_reader" role="status" aria-live="polite"></span>
+</span>
+{{/if}}

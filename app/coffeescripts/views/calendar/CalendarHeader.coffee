@@ -29,6 +29,7 @@ define [
       @render()
       @navigator = new CalendarNavigator(
         el: @$navigator
+        showPicker: @options.showAgenda
       )
       @$calendarViewButtons.buttonset()
       @showNavigator()
@@ -41,7 +42,7 @@ define [
       @navigator.on('navigatePrev', => @trigger('navigatePrev'))
       @navigator.on('navigateToday', => @trigger('navigateToday'))
       @navigator.on('navigateNext', => @trigger('navigateNext'))
-      $.subscribe('Calendar/updateHeader', @setHeaderText)
+      @navigator.on('navigateDate', (selectedDate) => @trigger('navigateDate', selectedDate))
       $.subscribe('Calendar/loadStatus', @animateLoading)
       @$schedulerDoneButton
 

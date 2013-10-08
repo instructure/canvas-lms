@@ -68,8 +68,6 @@ define [
       super
       $.publish('Calendar/loadStatus', false)
       $.publish('Calendar/colorizeContexts')
-      if @startDate
-        $.publish('Calendar/updateHeader', I18n.l('#date.formats.medium', @startDate))
       @$el.addClass('active')
 
     hasMore: ->

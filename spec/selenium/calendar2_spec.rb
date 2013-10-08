@@ -46,6 +46,13 @@ describe "calendar2" do
     wait_for_ajax_requests
   end
 
+  def quick_jump_to_date(text)
+    f('.navigation_title').click
+    dateInput = keep_trying_until { f('.date_field') }
+    dateInput.send_keys(text + "\n")
+    wait_for_ajaximations
+  end
+
   def add_date(middle_number)
     fj('.ui-datepicker-trigger:visible').click
     datepicker_current(middle_number)
@@ -426,6 +433,19 @@ describe "calendar2" do
         get_header_text.should == (current_month + ' ' + Time.now.year.to_s)
       end
 
+      it "should navigate with jump-to-date control" do
+        Account.default.change_root_account_setting!(:agenda_view, true)
+        make_event(start: 1.month.from_now)
+
+        get "/calendar2"
+        wait_for_ajaximations
+        f('.fc-event').should be_nil
+        next_month_num = Time.now.month + 1 % 12
+        next_month = Date::MONTHNAMES[next_month_num]
+        quick_jump_to_date(next_month)
+        f('.fc-event').should_not be_nil
+      end
+
       it "should show section-level events, but not the parent event" do
         @course.default_section.update_attribute(:name, "default section!")
         s2 = @course.course_sections.create!(:name => "other section!")
@@ -642,6 +662,19 @@ describe "calendar2" do
         fj('.context-list-toggle-box:last').click
         wait_for_ajaximations
         ffj('.ig-row').length.should == 0
+      end
+
+      it "should be navigable via the jump-to-date control" do
+        yesterday = 1.day.ago
+        event = make_event(start: yesterday)
+        get "/calendar2"
+        wait_for_ajaximations
+        f('label[for=agenda]').click
+        wait_for_ajaximations
+        ffj('.ig-row').length.should == 0
+        quick_jump_to_date(yesterday.strftime("%b %-d %Y"))
+        wait_for_ajaximations
+        ffj('.ig-row').length.should == 1
       end
     end
   end

@@ -105,7 +105,7 @@ define [
 
       @el = $(selector).html calendarAppTemplate()
 
-      @schedulerNavigator = new CalendarNavigator(el: $('.scheduler_navigator'))
+      @schedulerNavigator = new CalendarNavigator(el: $('.scheduler_navigator'), showPicker: @options.showPicker)
       @schedulerNavigator.hide()
 
       data.view_name = 'agendaWeek' if data.view_name == 'week'
@@ -150,8 +150,9 @@ define [
       @header.on('navigatePrev',  => @calendar.fullCalendar('prev'))
       @header.on 'navigateToday', =>
         @calendar.fullCalendar('today')
-        @agenda.fetch(@visibleContextList) if @currentView == 'agenda'
+        @agendaViewFetch(new Date) if @currentView == 'agenda'
       @header.on('navigateNext',  => @calendar.fullCalendar('next'))
+      @header.on('navigateDate',  (selectedDate) => @selectDate(selectedDate))
       @header.on('week', => @loadView('week'))
       @header.on('month', => @loadView('month'))
       @header.on('agenda', => @loadView('agenda'))
@@ -164,6 +165,11 @@ define [
       @schedulerNavigator.on('navigatePrev',  => @calendar.fullCalendar('prev'))
       @schedulerNavigator.on('navigateToday', => @calendar.fullCalendar('today'))
       @schedulerNavigator.on('navigateNext',  => @calendar.fullCalendar('next'))
+      @schedulerNavigator.on('navigateDate',  (selectedDate) => @selectDate(selectedDate))
+
+    selectDate: (selectedDate) ->
+      @calendar.fullCalendar('gotoDate', selectedDate)
+      @agendaViewFetch(selectedDate) if @currentView == 'agenda'
 
     # FullCalendar callbacks
 
@@ -361,8 +367,11 @@ define [
 
     viewDisplay: (view) =>
       @updateFragment view_start: $.dateToISO8601UTC(view.start)
-      @header.setHeaderText(view.title)
-      @schedulerNavigator.setTitle(view.title)
+      @setDateTitle(view.title)
+
+    setDateTitle: (title) =>
+      @header.setHeaderText(title)
+      @schedulerNavigator.setTitle(title)
 
     # event triggered by items being dropped from outside the calendar
     drop: (date, allDay, jsEvent, ui) =>
@@ -512,6 +521,7 @@ define [
         @loadAgendaView()
         @calendar.hide()
         @scheduler.hide()
+        @header.showNavigator()
 
     loadAgendaView: ->
       oldView = @currentView
@@ -532,11 +542,15 @@ define [
             start.setDate(start.getDate() - 1)
       else
         start = now
+
+      @currentView = 'agenda'
+      @agendaViewFetch(start)
+
+    agendaViewFetch: (start) ->
       start.setHours(0)
       start.setMinutes(0)
       start.setSeconds(0)
-
-      @currentView = 'agenda'
+      @setDateTitle(I18n.l('#date.formats.medium', start))
       @agenda.fetch(@visibleContextList, start)
 
     showSchedulerSingle: ->
