@@ -21,6 +21,10 @@ class Mailer < ActionMailer::Base
   attr_reader :email
 
   def message(m)
+    headers({
+      # notifications have context, bounce replies don't.
+      'Auto-Submitted' => m.context ? 'auto-generated' : 'auto-replied'
+      })
     recipients m.to
     bcc m.bcc if m.bcc
     cc m.cc if m.cc
