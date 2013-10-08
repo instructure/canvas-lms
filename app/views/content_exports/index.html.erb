@@ -33,7 +33,7 @@
   </div>
 
   <div class="form" style="<%= hidden if @current_export_id %>">
-    <% form_tag course_content_exports_path(@context.id), :id => "exporter_form" do %>
+    <%= form_tag course_content_exports_path(@context.id), :id => "exporter_form" do %>
       <fieldset>
         <legend><%= t :export_type, "Export Type" %></legend>
         <div>

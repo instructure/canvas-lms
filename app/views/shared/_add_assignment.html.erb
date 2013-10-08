@@ -1,6 +1,6 @@
 <% cache([@context, 'add_assignment']) do %>
   <div id="add_assignment_inline" class="add_assignment_inline" style="padding: 0; display: none; position: relative;">
-    <% form_for :assignment, :url => (context_url(@context, :context_assignments_url) rescue "."), :html => {:id => "add_assignment_inline_form", :style => "padding: 10px;"} do |f| %>
+    <%= form_for :assignment, :url => (context_url(@context, :context_assignments_url) rescue "."), :html => {:id => "add_assignment_inline_form", :style => "padding: 10px;"} do |f| %>
     <table class="formtable" style="width: 100%">
       <tr>
         <td><%= f.blabel :title, :en => "Name" %></td>

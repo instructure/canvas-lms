@@ -1,7 +1,7 @@
 <% if can_do @account, @current_user, :read_roster %>
   <h2><%= t 'titles.find_user', "Find A User" %></h2>
   <div class="rs-margin-lr">
-    <% form_for :user, :url => account_users_path(@account), :html => {:id => "new_user", :class => "form-inline", :method => :get} do |f| -%>
+    <%= form_for :user, :url => account_users_path(@account), :html => {:id => "new_user", :class => "form-inline", :method => :get} do |f| -%>
       <fieldset class="input-append">
         <input type="text" id="user_name" name="user[name]" value="<%= @user_query %>" />
         <button class='btn'><%= t 'buttons.go', "Go" %></button>

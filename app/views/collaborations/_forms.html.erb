@@ -1,4 +1,4 @@
-<% form_for([@context, Collaboration.new], :html => { :target => '_blank',
+<%= form_for([@context, Collaboration.new], :html => { :target => '_blank',
                                                       :style => 'display: none; margin-top: 10px;' }) do |f| %>
 <h2 tabindex="-1"><%= t 'titles.new', "Start a New Collaboration" %></h2>
 <table class="formtable">
@@ -76,7 +76,7 @@ HEREDOC
   <button type="button" class="btn delete_button"><%= mt 'buttons.delete_from_google_docs', "Also Delete From  \nGoogle Docs" %></button>
   </div>
 </div>
-<% form_tag(context_url(@context, :context_collaboration_url, "{{ id }}"), {:id => "edit_collaboration_form", :method => :put, :style => "display: none; margin-top: 10px;", :class => 'collaboration communication_message'}) do %>
+<%= form_tag(context_url(@context, :context_collaboration_url, "{{ id }}"), {:id => "edit_collaboration_form", :method => :put, :style => "display: none; margin-top: 10px;", :class => 'collaboration communication_message'}) do %>
   <div class="header">
     <%= text_field :collaboration, :title, :style => "width: 300px;", :value => t('collaboration_name', "%{course_or_group_name} Collaboration", :course_or_group_name => @context.name) %>
   </div>

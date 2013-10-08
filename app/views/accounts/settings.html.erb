@@ -58,7 +58,7 @@
   </ul>
   <% if can_do(@context, @current_user, :manage_account_settings) %>
     <div id="tab-settings">
-      <% form_for :account, :url => account_url(@account), :html => {:method => :put, :id => "account_settings", :class => 'account_settings'} do |f| %>
+      <%= form_for :account, :url => account_url(@account), :html => {:method => :put, :id => "account_settings", :class => 'account_settings'} do |f| %>
         <fieldset id="account_settings" class="">
           <legend><%= t(:account_settings_title, "Account Settings") %></legend>
           <table class="formtable">
@@ -103,7 +103,7 @@ TEXT
                   <%= f.time_zone_select :default_time_zone, ActiveSupport::TimeZone.us_zones %>
                 </td>
               </tr>
-              <% f.fields_for :settings do |settings| %>
+              <%= f.fields_for :settings do |settings| %>
                 <% if @account.grants_right?(@current_user, :manage_site_settings) %>
                   <tr>
                     <td><%= settings.blabel :mfa_settings, :en => "Multi-Factor Authentication" %></td>
@@ -183,7 +183,7 @@ TEXT
 
         <fieldset>
           <legend><%= t(:features_title, "Features") %></legend>
-          <% f.fields_for :settings do |settings| %>
+          <%= f.fields_for :settings do |settings| %>
             <% if @account.root_account? %>
               <% if @account.grants_right?(@current_user, :manage_site_settings) %>
                 <div>
@@ -301,7 +301,7 @@ Allowing Draft State here will allow teachers to enable it in their individual c
               </div>
              <% end %>
           <% end %>
-          <% f.fields_for :services do |services| %>
+          <%= f.fields_for :services do |services| %>
             <% Account.services_exposed_to_ui_hash(:setting, @current_user, @account).sort_by { |k,h| Canvas::ICU.collation_key(h[:name]) }.each do |key, service| %>
               <div>
                 <%= services.check_box key, :checked => @account.service_enabled?(key) %>
@@ -314,7 +314,7 @@ Allowing Draft State here will allow teachers to enable it in their individual c
         <fieldset id="account_settings_global_includes_settings" style="<%= hidden unless @account.allow_global_includes? %>">
           <legend><%= t(:global_js_and_css_includes_title, "Global JavaScript and CSS Includes") %></legend>
           <p style="font-size: 0.9em;"><%= t(:global_js_and_css_includes_description, "These files will be included on all page loads for your account") %></p>
-          <% f.fields_for :settings do |settings| %>
+          <%= f.fields_for :settings do |settings| %>
             <table class="formtable">
               <tr>
                 <td><%= settings.blabel :global_javascript, :en => "Global JavaScript URL" %></td>
@@ -336,7 +336,7 @@ Allowing Draft State here will allow teachers to enable it in their individual c
           <fieldset>
             <legend><%= t(:custom_links_to_include_in_the_help_dialog_popup, "Custom Links to include in the help dialog popup") %></legend>
             <p style="font-size: 0.9em;"><%= t(:if_you_would_like_to_link_to_your_own_campus_support_website_in_the_help_dialog_you_can_do_that_here, "If you would like to link to your own campus support website in the help dialog you can do that here") %></p>
-            <% f.fields_for :custom_help_links do |custom_help_links, i| %>
+            <%= f.fields_for :custom_help_links do |custom_help_links, i| %>
               <div id="custom_help_links">
                 <% ((@account.settings[:custom_help_links] || []) << {}).each_with_index do |help_link, i| %>
                   <div class="custom_help_link <%= raw ' blank" style="display: none;' if help_link.empty? %>">
@@ -383,7 +383,7 @@ Allowing Draft State here will allow teachers to enable it in their individual c
         <% unless @account.site_admin? %>
           <fieldset id="enable_equella_settings" style="display: none;">
             <legend><%= t(:equella_settings_title, "Equella Settings") %></legend>
-            <% f.fields_for :settings do |settings| %>
+            <%= f.fields_for :settings do |settings| %>
               <table class="formtable">
                 <tr>
                   <td style="vertical-align: top;"><%= settings.label :equella_endpoint, :en => "Equella Endpoint" %></td>
@@ -444,7 +444,7 @@ Allowing Draft State here will allow teachers to enable it in their individual c
         <% if @account.root_account? and not (exposed_services = Account.services_exposed_to_ui_hash(:service, @current_user)).empty? %>
           <fieldset>
             <legend><%= t(:enabled_web_serices_title, "Enabled Web Services") %></legend>
-            <% f.fields_for :services do |services| %>
+            <%= f.fields_for :services do |services| %>
               <% exposed_services.sort_by { |k,h| Canvas::ICU.collation_key(h[:name]) }.each do |key, service| %>
                 <div>
                   <%= services.check_box key, :checked => @account.service_enabled?(key) %>
@@ -478,7 +478,7 @@ Allowing Draft State here will allow teachers to enable it in their individual c
           <fieldset>
             <legend><%= t(:create_courses_title, "Who Can Create New Courses") %></legend>
             <div style="font-size: 0.8em;"><%= t(:create_courses_description, "(Account Administrators can always create courses)") %></div>
-            <% f.fields_for :settings do |settings| %>
+            <%= f.fields_for :settings do |settings| %>
               <div>
                 <%= settings.check_box :teachers_can_create_courses, :checked => @account.teachers_can_create_courses? %>
                 <%= settings.label :teachers_can_create_courses, :en => "Teachers" %>
@@ -508,12 +508,12 @@ Allowing Draft State here will allow teachers to enable it in their individual c
 
   <% if can_do(@context, @current_user, :manage_account_settings) %>
     <div id="tab-notifications">
-      <% form_for :account, :url => account_url(@account), :html => {:method => :put, :id => "account_settings_notifications"} do |f| %>
+      <%= form_for :account, :url => account_url(@account), :html => {:method => :put, :id => "account_settings_notifications"} do |f| %>
 
         <% if @account.root_account? && !@account.site_admin? %>
           <h2><%= t(:email_notification_from_settings, 'E-mail Notification "From" Settings') %></h2>
           <p><%= t(:email_notification_from_description, "This setting allows the Admin to brand or label the 'From' text on all notifications sent from Canvas for this Account.") %></p>
-          <% f.fields_for :settings do |settings| %>
+          <%= f.fields_for :settings do |settings| %>
             <div>
               <%= settings.radio_button :outgoing_email_default_name_option, 'default',
                                         :checked => @account.settings[:outgoing_email_default_name].blank?,
@@ -627,7 +627,7 @@ Allowing Draft State here will allow teachers to enable it in their individual c
     <% if can_do(@context, @current_user, :manage_account_memberships) %>
       <% js_bundle :user_lists %>
       <a href="#" class="add_users_link btn btn-primary"><i class="icon-add"></i> <%= t('links.add_admins', %{Add Account Admins}) %></a>
-      <% form_tag account_add_account_user_url(@account), {:id => "enroll_users_form", :style => "display: none;"} do  %>
+      <%= form_tag account_add_account_user_url(@account), {:id => "enroll_users_form", :style => "display: none;"} do  %>
         <h2><%= t(:add_admin_title, "Add Account Admins") %></h2>
         <div style="margin-top: 5px;">
           <div>
@@ -696,7 +696,7 @@ Allowing Draft State here will allow teachers to enable it in their individual c
       </ul>
       <% if can_do(@account, @current_user, :manage_alerts) %>
         <a href="#" class="btn btn-primary element_toggler" role="button" data-hide-while-target-shown="true" aria-controls="add_notification_form"><i class="icon-add"></i> <%= t(:add_announcement_link, "Add a New Announcement") %></a>
-        <% form_for :account_notification, :url => account_account_notifications_url(@account), :html => {:id => "add_notification_form", :style => 'display: none;', :class => 'well', :role => "region" } do |f| %>
+        <%= form_for :account_notification, :url => account_account_notifications_url(@account), :html => {:id => "add_notification_form", :style => 'display: none;', :class => 'well', :role => "region" } do |f| %>
           <table class="formtable">
             <tr>
               <td><%= f.blabel :subject, :en => "Subject" %></td>

@@ -26,7 +26,7 @@
     <% if @associated_courses_count > 0 %>
       <h2><%= t(:filter_label, "Find a Course") %></h2>
       <div class="rs-margin-lr rs-margin-bottom">
-        <% form_for :course, :url => account_courses_path(@account), :html => {:id => "new_course", :class => "form-inline", :method => :get} do |f| -%>
+        <%= form_for :course, :url => account_courses_path(@account), :html => {:id => "new_course", :class => "form-inline", :method => :get} do |f| -%>
           <fieldset class="input-append">
             <input id="course_name"
                    type="text"

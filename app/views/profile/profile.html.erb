@@ -35,7 +35,7 @@
 <% end %>
 <h2 style="padding-top: 0.3em;"><%= t('headers.users_profile', "%{user}'s Settings", :user => @user.short_name) %></h2>
 <div class="clear"></div>
-<% form_for @user, :url => profile_path, :html => {:id => "update_profile_form", :style => "margin-bottom: 20px;", :class => 'form-inline'} do |f| %>
+<%= form_for @user, :url => profile_path, :html => {:id => "update_profile_form", :style => "margin-bottom: 20px;", :class => 'form-inline'} do |f| %>
 <table class="profile_table">
   <tr>
     <% editable_name = @user.user_can_edit_name? %>
@@ -265,7 +265,7 @@ TEXT
             <div class="clear"></div>
           </div>
           <div style="text-align: center; font-size: 1.2em; margin-top: 10px;">
-            <% form_for :user_service, :url => profile_create_user_service_url, :html => {:class => "create_user_service_form"} do |f| %>
+            <%= form_for :user_service, :url => profile_create_user_service_url, :html => {:class => "create_user_service_form"} do |f| %>
             <%= f.hidden_field :service, :value => "skype" %>
             <table class="formtable">
               <tr>
@@ -361,7 +361,7 @@ TEXT
             <div class="clear"></div>
           </div>
           <div style="font-size: 1.0em; margin-top: 10px;">
-            <% form_for :user_service, :url => profile_create_user_service_url, :html => {:class => "create_user_service_form"} do |f| %>
+            <%= form_for :user_service, :url => profile_create_user_service_url, :html => {:class => "create_user_service_form"} do |f| %>
             <%= f.hidden_field :service, :value => "delicious" %>
             <table class="formtable">
               <tr>
@@ -396,7 +396,7 @@ TEXT
             <div class="clear"></div>
           </div>
           <div style="font-size: 1.0em; margin-top: 10px;">
-            <% form_for :user_service, :url => profile_create_user_service_url, :html => {:class => "create_user_service_form"} do |f| %>
+            <%= form_for :user_service, :url => profile_create_user_service_url, :html => {:class => "create_user_service_form"} do |f| %>
             <%= f.hidden_field :service, :value => "diigo" %>
             <table class="formtable">
               <tr>
@@ -517,7 +517,7 @@ applications as needed, but if [you're developing a new or limited
 project](%{documentation_url}) you can just generate the token from here.
 TEXT
     %>
-    <% form_for :access_token, :url => profile_tokens_url, :html => {:id => "access_token_form", :style => "margin-top: 10px;"} do |f| %>
+    <%= form_for :access_token, :url => profile_tokens_url, :html => {:id => "access_token_form", :style => "margin-top: 10px;"} do |f| %>
       <table class="formtable">
         <tr>
           <td><%= f.blabel :purpose, :en => "Purpose" %></td>
@@ -549,7 +549,7 @@ TEXT
     <div class="clear"></div>
   </div>
   <a href="#" class="add_pic_link add"><%= t('links.upload_new_image', "Upload a new Image") %></a>
-  <% form_for :attachment, :url => context_url(@user, :context_files_url, :format => 'json'), :html => {:id => "add_pic_form", :style => "display: none;"} do |f| %>
+  <%= form_for :attachment, :url => context_url(@user, :context_files_url, :format => 'json'), :html => {:id => "add_pic_form", :style => "display: none;"} do |f| %>
     <input type="hidden" name="format" value="text" />
     <%= f.file_field :uploaded_data %>
     <button type="submit" class="btn btn-small"><%= t('buttons.add_picture_file', "Add File") %></button>

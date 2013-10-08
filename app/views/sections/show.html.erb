@@ -105,7 +105,7 @@ h3 .tally {
 }
 </style>
 <% end %>
-<% form_for @section, :url => context_url(@context, :context_section_url, @section), :html => {:id => "edit_section_form", :style => "display: none;"} do |f| %>
+<%= form_for @section, :url => context_url(@context, :context_section_url, @section), :html => {:id => "edit_section_form", :style => "display: none;"} do |f| %>
 <table class="formtable">
   <tr>
     <td><%= f.blabel :name, :en => "Section Name" %></td>
@@ -206,7 +206,7 @@ h3 .tally {
 <% js_bundle :section %>
 
 <div style="display: none;">
-  <% form_tag context_url(@context, :context_section_crosslist_url, @section.id), :id => "crosslist_course_form", :class => "no-margin-bottom", :title => t('titles.crosslist_this_section', 'Cross-List this Section'), :method => :post do %>
+  <%= form_tag context_url(@context, :context_section_crosslist_url, @section.id), :id => "crosslist_course_form", :class => "no-margin-bottom", :title => t('titles.crosslist_this_section', 'Cross-List this Section'), :method => :post do %>
     <h2><%= t('titles.cross_listed_sections', 'Cross-List Section') %></h2>
     <p>
       <%= t('crosslist_description', %{
@@ -249,7 +249,7 @@ h3 .tally {
     </table>
   <% end %>
 
-  <% form_tag context_url(@context, :context_section_uncrosslist_url, @section.id), :id => "uncrosslist_form", :title => t('titles.decrosslist_section', 'De-Cross-List this Section'), :method => :delete do %>
+  <%= form_tag context_url(@context, :context_section_uncrosslist_url, @section.id), :id => "uncrosslist_form", :title => t('titles.decrosslist_section', 'De-Cross-List this Section'), :method => :delete do %>
     <h2><%= t('titles.decrosslist_section', 'De-Cross-List this Section') %></h2>
     <p>
       <%= t('prompts.are_you_sure_decrosslist', 'Are you sure you want to de-cross-list this section?') %>

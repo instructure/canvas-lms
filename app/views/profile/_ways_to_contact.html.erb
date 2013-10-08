@@ -147,7 +147,7 @@
   <li><a href="#register_email_address"><%= t('links.email', "Email") %></a></li>
   <li><a href="#register_sms_number"><%= t('links.text_sms', "Text (SMS)") %></a></li>
 </ul>
-<% form_tag communication_channels_url, {:id => "register_email_address", :class => 'form-horizontal'} do %>
+<%= form_tag communication_channels_url, {:id => "register_email_address", :class => 'form-horizontal'} do %>
     <input type="hidden" name="communication_channel[type]" value="email"/>
     <div class="control-group">
       <%= label :communication_channel, :address, t('labels.email_address', 'Email Address'), :class => 'control-label' %>
@@ -171,7 +171,7 @@
       <button type="submit" class="btn btn-primary"><%= t('buttons.register_email', "Register Email") %></button>
     </div>
 <% end %>
-<% form_tag communication_channels_url, {:id => "register_sms_number", :class => 'form-horizontal'} do %>
+<%= form_tag communication_channels_url, {:id => "register_sms_number", :class => 'form-horizontal'} do %>
     <input type="hidden" name="communication_channel[type]" value="sms"/>
     <div class="control-group">
       <label for='communication_channel_sms_number' class='control-label'><%= t('labels.cell_number', 'Cell Number') %></label>
@@ -223,7 +223,7 @@
     <button type="button" class="btn cancel_button"><%= t('buttons.ok_thanks', "Ok, Thanks") %></button>
   </div>
 </div>
-<% form_tag "", {:id => "confirm_communication_channel", :style => "display: none;", :class => "dialog"} do %>
+<%= form_tag "", {:id => "confirm_communication_channel", :style => "display: none;", :class => "dialog"} do %>
   <input type="hidden" name="pseudonym_id" value=""/>
   <input type="hidden" name="channel_id" value=""/>
   <input type="hidden" name="user_id" value=""/>

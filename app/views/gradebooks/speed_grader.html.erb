@@ -17,7 +17,7 @@
   <%= t(:loading, "loading...") %>
 </h4>
 <div id="gradebook_header" style="display:none;">
-  <% form_tag({ :controller => :gradebooks, :course_id => @context.id, :action => :update_submission }) do %>
+  <%= form_tag({ :controller => :gradebooks, :course_id => @context.id, :action => :update_submission }) do %>
     <div class="left">
       <% if service_enabled?(:avatars) %>
          <div id="avatar">

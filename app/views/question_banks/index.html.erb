@@ -62,7 +62,7 @@
 <% if @context != @current_user %>
   <%= render :partial => "question_bank" %>
 
-  <% form_for :assessment_question_bank, :url => "", :html => {:id => "edit_bank_form", :style => "display: none;"} do |f| %>
+  <%= form_for :assessment_question_bank, :url => "", :html => {:id => "edit_bank_form", :style => "display: none;"} do |f| %>
     <%= f.blabel :title, :en => "Bank Name" %>
     <%= f.text_field :title, :class => "bank_name_box" %>
   <% end %>

@@ -227,7 +227,7 @@
       </li>
     </ul>
 
-    <% form_for [@context, Group.new], :html => {:id => "edit_group_form", :style => "display: none;"} do |f| %>
+    <%= form_for [@context, Group.new], :html => {:id => "edit_group_form", :style => "display: none;"} do |f| %>
       <%= f.text_field :name, :style => "width: 95%;" %>
       <div style="font-size: 0.8em; margin: 4px 10px; float: left; display: none;">
         <%= f.text_field :max_membership, :style => "width: 25px;" %> users or less

@@ -196,6 +196,25 @@ class ActiveRecord::Generators
   include FakeRails3Generators
 end
 
+ActionView::Base.class_eval do
+  [:content_tag, :content_tag_for, :field_set_tag,
+   :fields_for, :form_for, :form_tag, :javascript_tag].each do |block_helper|
+    define_method("#{block_helper}_with_nil_return") do |*args, &block|
+      if block
+        self.send("#{block_helper}_without_nil_return", *args, &block)
+        nil
+      else
+        self.send("#{block_helper}_without_nil_return", *args)
+      end
+    end
+    alias_method_chain block_helper, :nil_return
+  end
+end
+
+ActiveSupport::SafeBuffer.class_eval do
+  alias :append= :<<
+end
+
 class Class
   def self.class_attribute(*attrs)
     class_inheritable_accessor(*attrs)

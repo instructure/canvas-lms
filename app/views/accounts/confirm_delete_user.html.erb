@@ -3,7 +3,7 @@
 
 <h2><%= t(:title, "Confirm Delete %{user} from %{account}", :user => @user.name, :account => @account.name) %></h2>
 
-<% form_for :user, :url => account_user_url(@context, @user), :html => {:method => :delete} do |f| %>
+<%= form_for :user, :url => account_user_url(@context, @user), :html => {:method => :delete} do |f| %>
   <%= t(:confirm_delete,
   "Are you sure you want to delete this user from the account %{account}?
   This will remove the user's data (including grades) from all

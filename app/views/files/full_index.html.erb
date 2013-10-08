@@ -213,7 +213,7 @@
     <div class="clear"></div>
   </li>
   <li class="folder_item file add_item clearfix" id="add_file_form">
-    <% form_for :attachment, :url => "#", :html => {:class => "add_file_form add_form"} do |f| %>
+    <%= form_for :attachment, :url => "#", :html => {:class => "add_file_form add_form"} do |f| %>
       <%= f.hidden_field :folder_id %>
       <div class="header">
         <%= image_tag "blank.png", :alt => '', :class => "item_icon" %>
@@ -230,7 +230,7 @@
     <% end %>
   </li>
   <li class="folder_item folder add_item clearfix" id="add_folder_form">
-    <% form_for :folder, :url => "#", :html => {:class => "form-inline add_folder_form add_form header"} do |f| %>
+    <%= form_for :folder, :url => "#", :html => {:class => "form-inline add_folder_form add_form header"} do |f| %>
       <%= f.hidden_field :parent_folder_id %>
       <%= image_tag "blank.png", :alt => '', :class => "item_icon" %>
       <span class="name" style="display: none;">&nbsp;</span>
@@ -277,7 +277,7 @@
   <%= image_tag "blank.png", :alt => '', :id => "content_blank_icon" %>
   <%= image_tag "lock_for_file_folder.png", :id => "content_locked_icon" %>
 <div id="lock_item_dialog" style="display: none;">
-  <% form_for :attachment, :url => "", :html => {:id => "lock_attachment_form", :method => :put} do |f| %>
+  <%= form_for :attachment, :url => "", :html => {:id => "lock_attachment_form", :method => :put} do |f| %>
     <%= image_tag "lock_closed.png", :style => "float: left;", :alt => "" %>
     <h4 style="margin: 0;"><%= t 'titles.lock_file', "Lock %{file_name}", :file_name => '<span class="name">&nbsp;</span>'.html_safe %></h4>
     <%= t 'descriptions.lock_file', "When a file is locked, only teachers and TAs can access it." %>
@@ -318,7 +318,7 @@
       </tr>
     </table>
   <% end %>
-  <% form_for :folder, :url => "", :html => {:id => "lock_folder_form", :method => :put} do |f| %>
+  <%= form_for :folder, :url => "", :html => {:id => "lock_folder_form", :method => :put} do |f| %>
     <%= image_tag "lock_closed.png", :style => "float: left;", :alt => "" %>
     <h4 style="margin: 0;"><%= t 'titles.lock_folder', "Lock %{folder_name}", :folder_name => '<span class="name">&nbsp;</span>'.html_safe %></h4>
     <%= t 'descriptions.lock_folder', "When a folder is locked, only teachers and TAs can access it." %>

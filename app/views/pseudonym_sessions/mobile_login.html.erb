@@ -1,4 +1,4 @@
-<% form_for :pseudonym_session, :url => login_path, :html => {:id => "login_form", :class => "front face", :novalidate => 'novalidate'} do |f| %>
+<%= form_for :pseudonym_session, :url => login_path, :html => {:id => "login_form", :class => "front face", :novalidate => 'novalidate'} do |f| %>
   <input class="input-block-level" <%= 'type=email' if @login_handle_is_email %> name="pseudonym_session[unique_id]" value="<%= params[:pseudonym_session].try(:[], :unique_id) %>" placeholder="<%= @login_handle_name %>">
   <input class="input-block-level" type="password" name="pseudonym_session[password]" placeholder="<%= t :password, "Password" %>">
   <% if request.post? && flash[:error] %>
@@ -11,7 +11,7 @@
     <a class="btn btn-large btn-inverse flip-to-back"><%= t('dont_know_password', "I don't know my password") %></a>
   <% end %>
 <% end %>
-<% form_for :pseudonym_session, :url => forgot_password_path, :html => {:id => "forgot_password_form", :class => 'back face'} do |f| %>
+<%= form_for :pseudonym_session, :url => forgot_password_path, :html => {:id => "forgot_password_form", :class => 'back face'} do |f| %>
   <label for="pseudonym_session_unique_id_forgot"><%= t('login_handle', "Enter your %{login_handle_name} and we'll send you a link to change your password.", :login_handle_name => @login_handle_name) %></label>
   <input class="input-block-level" <%= 'type=email' if @login_handle_is_email %> name="pseudonym_session[unique_id_forgot]" value="<%= @unauthorized_user.try :email %>" placeholder="<%= @login_handle_name %>" id="pseudonym_session_unique_id_forgot" />
   <button type="submit" class="btn btn-primary btn-large" data-text-while-loading="<%= t :sending, "Sending..." %>" class="request-password-button"><%= t('buttons.request_password', 'Request Password') %></button>

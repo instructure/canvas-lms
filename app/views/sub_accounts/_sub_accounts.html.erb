@@ -26,7 +26,7 @@
       <div class="clear"></div>
     </div>
     <div class="edit_account">
-      <% form_for (account || Account.new), :url => (account ? context_url(@context, :context_sub_account_url, account.id) : context_url(@context, :context_sub_accounts_url)), :html => {:class => "edit_sub_account_form form-inline", :method => (account ? :put : :post)} do |f| %>
+      <%= form_for (account || Account.new), :url => (account ? context_url(@context, :context_sub_account_url, account.id) : context_url(@context, :context_sub_accounts_url)), :html => {:class => "edit_sub_account_form form-inline", :method => (account ? :put : :post)} do |f| %>
         <%= f.text_field :name, :class => "account_name" %>
       <% end %>
     </div>

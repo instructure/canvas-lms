@@ -31,7 +31,7 @@
   </div>
   <% if can_do(calendar_event, @current_user, :update_content) %>
   <% url = calendar_event.new_record? ? context_url(@context, :context_calendar_events_url) : context_url(@context, :context_calendar_event_url, calendar_event.id) %>
-  <% form_for calendar_event, :url => url, :html => {:method => (calendar_event.new_record? ? 'POST' : 'PUT'), :style => 'display: none;', :id => 'edit_calendar_event_form', :class => (calendar_event.new_record? ? 'new_event' : '')} do |f| %>
+  <%= form_for calendar_event, :url => url, :html => {:method => (calendar_event.new_record? ? 'POST' : 'PUT'), :style => 'display: none;', :id => 'edit_calendar_event_form', :class => (calendar_event.new_record? ? 'new_event' : '')} do |f| %>
   <table class="formtable full_calendar_event_table" style="width: 100%;">
     <% if can_do(calendar_event, @current_user, :update) %>
     <tr>

@@ -893,8 +893,14 @@ module ApplicationHelper
   def friendly_datetime(datetime, opts={})
     attributes = { :title => datetime }
     attributes[:pubdate] = true if opts[:pubdate]
-    content_tag(:time, attributes) do
-      datetime_string(datetime)
+    if CANVAS_RAILS2 # see config/initializers/rails2.rb
+      content_tag_without_nil_return(:time, attributes) do
+        datetime_string(datetime)
+      end
+    else
+      content_tag(:time, attributes) do
+        datetime_string(datetime)
+      end
     end
   end
 

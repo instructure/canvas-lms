@@ -139,7 +139,7 @@
 
           <% if can_do(@quiz, @current_user, :update) %>
             <% if @quiz.locked? %>
-              <% form_for @quiz, :url => context_url(@context, :context_quiz_url, @quiz.id), :html => { :id => 'quiz_unlock_form' } do |f| %>
+              <%= form_for @quiz, :url => context_url(@context, :context_quiz_url, @quiz.id), :html => { :id => 'quiz_unlock_form' } do |f| %>
                 <%= hidden_field_tag 'quiz[locked]', false %>
                 <div id="unlock_for_how_long_dialog" title="<%= t('titles.unlock_for_how_long', "How long would you like to unlock the quiz for?") %>" style="display:none;">
                   <label style="float: left;" for="no_time_limit">
@@ -160,7 +160,7 @@
                 </a>
               </li>
             <% else %>
-              <% form_for @quiz, :url => context_url(@context, :context_quiz_url, @quiz.id), :html => { :id => 'quiz_lock_form' } do |f| %>
+              <%= form_for @quiz, :url => context_url(@context, :context_quiz_url, @quiz.id), :html => { :id => 'quiz_lock_form' } do |f| %>
                 <%= hidden_field_tag 'quiz[locked]', true %>
               <% end %>
               <% qos_lock_quiz_title = @quiz.survey? ? t('buttons.lock_survey', "Lock this Survey Now") : t('buttons.lock_quiz', "Lock this Quiz Now") %>
@@ -257,7 +257,7 @@
 
 
               <% link_to context_url(@context, :context_quiz_take_url, @quiz, :preview => 1), :method => :post, :class => 'btn', :id => 'preview_quiz_button' do %><%= t('links.preview', "Preview") %><% end %>
-              <% form_tag context_url(@context, :context_quiz_url, @quiz.id), {:method => :put, :style => 'display:inline', :id => 'publish_quiz_form'} do %>
+              <%= form_tag context_url(@context, :context_quiz_url, @quiz.id), {:method => :put, :style => 'display:inline', :id => 'publish_quiz_form'} do %>
                 <input type="hidden" name="activate" value="true"/>
                 <button type="submit" class="btn btn-primary quiz-publish-button">
                   <% if !@quiz.available? %>
@@ -317,7 +317,7 @@
 
                 <% if can_do(@quiz, @current_user, :update) %>
                   <% if @quiz.locked? %>
-                    <% form_for @quiz, :url => context_url(@context, :context_quiz_url, @quiz.id), :html => { :id => 'quiz_unlock_form' } do |f| %>
+                    <%= form_for @quiz, :url => context_url(@context, :context_quiz_url, @quiz.id), :html => { :id => 'quiz_unlock_form' } do |f| %>
                       <%= hidden_field_tag 'quiz[locked]', false %>
                       <div id="unlock_for_how_long_dialog" title="<%= t('titles.unlock_for_how_long', "How long would you like to unlock the quiz for?") %>" style="display:none;">
                         <label style="float: left;" for="no_time_limit">
@@ -338,7 +338,7 @@
                       </a>
                     </li>
                   <% else %>
-                    <% form_for @quiz, :url => context_url(@context, :context_quiz_url, @quiz.id), :html => { :id => 'quiz_lock_form' } do |f| %>
+                    <%= form_for @quiz, :url => context_url(@context, :context_quiz_url, @quiz.id), :html => { :id => 'quiz_lock_form' } do |f| %>
                       <%= hidden_field_tag 'quiz[locked]', true %>
                     <% end %>
                     <% qos_lock_quiz_title = @quiz.survey? ? t('buttons.lock_survey', "Lock this Survey Now") : t('buttons.lock_quiz', "Lock this Quiz Now") %>

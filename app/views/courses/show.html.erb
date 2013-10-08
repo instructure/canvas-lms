@@ -195,7 +195,7 @@ $(document).ready(function() {
   <%= render :partial => 'shared/dashboard_invitation', :object => @pending_enrollment %>
 <% end %>
 <div id="edit_course_home_content" style="display: none;">
-  <% form_for :course, :url => context_url(@context, :context_url), :html => {:id => "edit_course_home_content_form", :method => :put} do |f| %>
+  <%= form_for :course, :url => context_url(@context, :context_url), :html => {:id => "edit_course_home_content_form", :method => :put} do |f| %>
     <h2><%= t('headings.set_layout', %{Set Home Page Layout}) %></h2>
 
     <p>
