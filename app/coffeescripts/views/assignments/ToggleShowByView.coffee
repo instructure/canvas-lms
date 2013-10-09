@@ -26,7 +26,7 @@ define [
       @initializeCache()
       @course.on 'change', @initializeCache
       @course.on 'change', @render
-      @assignmentGroups.once 'reset', @initializeDateGroups
+      @assignmentGroups.once 'change:submissions', @initializeDateGroups
       @.on 'changed:showBy', @setAssignmentGroups
       @.on 'changed:showBy', @render
 
@@ -41,15 +41,23 @@ define [
       assignments = _.flatten(@assignmentGroups.map (ag) -> ag.get('assignments').models)
       dated = _.select assignments, (a) -> a.dueAt()?
       undated = _.difference assignments, dated
-      past = _.chain(dated)
-        .select((a) -> (new Date()) > Date.parse(a.dueAt()))
-        .sortBy((a) -> (new Date()) - Date.parse(a.dueAt()))
-        .value()
-      upcoming = _.chain(dated)
-        .difference(past)
-        .sortBy((a) -> Date.parse(a.dueAt()))
-        .value()
+
+      past = []
       overdue = []
+      upcoming = []
+      _.each(dated, (a) ->
+        if new Date() > Date.parse(a.dueAt())
+          if a.expectsSubmission() && a.allowedToSubmit() && a.withoutGradedSubmission()
+            overdue.push a
+          else
+            past.push a
+        else
+          upcoming.push a
+      )
+
+      past = _.sortBy(past, (a) -> (new Date()) - Date.parse(a.dueAt()))
+      upcoming = _.sortBy(upcoming, (a) -> Date.parse(a.dueAt()))
+      overdue = _.sortBy(overdue, (a) -> Date.parse(a.dueAt()))
 
       @groupedByAG = @assignmentGroups.models
       @groupedByDate = [

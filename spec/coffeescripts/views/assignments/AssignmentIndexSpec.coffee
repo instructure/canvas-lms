@@ -1,14 +1,13 @@
 define [
   'Backbone'
   'compiled/models/AssignmentGroup'
-  'compiled/models/Assignment'
   'compiled/models/Course'
   'compiled/collections/AssignmentGroupCollection'
   'compiled/views/assignments/AssignmentGroupListView'
   'compiled/views/assignments/IndexView'
   'jquery'
   'helpers/jquery.simulate'
-], (Backbone, AssignmentGroup, Assignment, Course, AssignmentGroupCollection, AssignmentGroupListView, IndexView, $) ->
+], (Backbone, AssignmentGroup, Course, AssignmentGroupCollection, AssignmentGroupListView, IndexView, $) ->
 
 
   fixtures = $('#fixtures')

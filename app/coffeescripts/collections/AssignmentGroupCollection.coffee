@@ -68,3 +68,5 @@ define [
           # manually trigger a change so the UI can update appropriately.
           assignment.set 'submission', null
           assignment.trigger 'change:submission'
+
+      @trigger 'change:submissions'

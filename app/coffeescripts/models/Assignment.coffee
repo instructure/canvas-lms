@@ -102,6 +102,25 @@ define [
       else if _.include submissionTypes, 'external_tool' then 'external_tool'
       else 'online'
 
+    expectsSubmission: =>
+      submissionTypes = @_submissionTypes()
+      submissionTypes.length > 0 && !_.include(submissionTypes, "") && !_.include(submissionTypes, 'none') && !_.include(submissionTypes, 'not_graded') && !_.include(submissionTypes, 'on_paper') && !_.include(submissionTypes, 'external_tool')
+
+    allowedToSubmit: =>
+      submissionTypes = @_submissionTypes()
+      @expectsSubmission() && !@get('locked_for_user') && !_.include(submissionTypes, 'online_quiz') && !_.include(submissionTypes, 'attendance')
+
+    isGraded: =>
+      submission = @get('submission') || new Backbone.Model {}
+      !submission.get('notYetGraded')?
+
+    hasSubmission: =>
+      submission = @get('submission') || new Backbone.Model {}
+      !!submission.get('submission_type')
+
+    withoutGradedSubmission: =>
+      !@get('submission')? || (!@hasSubmission() && !@isGraded())
+
     acceptsOnlineUpload: =>
       !! _.include @_submissionTypes(), 'online_upload'
 
