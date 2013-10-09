@@ -1,4 +1,4 @@
-<div class="quiz-submission">
+<div class="quiz-submission <%= "headless" if !@headers %>">
 <% if !(@current_submission || @submission).results_visible? %>
   <h4><%= @quiz.hide_results == 'until_after_last_attempt' ?
           t(:quiz_results_protected_until_last_attempt, "Quiz results are protected for this quiz, and are not visible to students until they have submitted their last attempt.") :
@@ -156,50 +156,72 @@ $(document).ready(function() {
 <div id="questions" class="assessment_results <%= 'survey_results' if @quiz.survey? %> <%= (@quiz.display_correct_answers?(@current_user, @submission) ? 'show_correct_answers' : 'suppress_correct_answers') %>">
   <%= render :partial => "quizzes/display_question", :collection => submission_questions, :locals => {:assessment_results => true, :user_answer_hash => submission_data_hash, :editable => editable} %>
 </div>
-<div style="margin: 10px 0;">
-  <% if editable %>
-    <table>
-      <tr>
-        <td style="vertical-align: top; white-space: nowrap;">
-          <label for="fudge_points_entry"><%= before_label(:fudge_points, "Fudge Points") %></label>
-        </td><td style="vertical-align: top;">
-          <input id="fudge_points_entry" type="text" name="fudge_points" value="<%= (!@submission.fudge_points || @submission.fudge_points == 0 ? '--' : @submission.fudge_points) %>"/>
-          <div style="font-size: 0.8em;">
-            <label for="fudge_points_entry">
-              <% if @submission.quiz_points_possible == @quiz.points_possible || !@submission.quiz_points_possible %>
-                <%= t('labels.fudge_points_generic_explanation', "You can manually adjust the score by adding positive or negative points to this box:") %> 
-              <% elsif @quiz.survey? %>
-                <%= t('labels.fudge_points_changed_points_survey', <<-TEXT,
-                  Since %{user} took this survey, the points possible for the
-                  survey has changed by %{difference}. You can adjust for this
-                  change and manually add positive or negative points using
-                  this box:
-                  TEXT
-                  :user => @submission.user.name,
-                  :difference => @quiz.points_possible - @submission.quiz_points_possible) %>
-              <% else %>
-                <%= t('labels.fudge_points_changed_points_quiz', <<-TEXT,
-                  Since %{user} took this quiz, the points possible for the
-                  quiz has changed by %{difference}. You can adjust for this
-                  change and manually add positive or negative points using
-                  this box:
-                  TEXT
-                  :user => @submission.user.name,
-                  :difference => @quiz.points_possible - @submission.quiz_points_possible) %>
-              <% end %>
-            </label>
-          </div>
-        </td>
-      </tr>
-      <tr>
-      </tr>
-        <td style="white-space: nowrap; font-size: 1.2em;"><b><%= before_label(:final_score, "Final Score") %></b></td>
-        <td>
-          <%= score_out_of_points_possible(@submission.score || 0, @quiz.points_possible || 0, :id => 'after_fudge_points_total', :style => 'font-size: 1.5em; padding-left: 5px') %>
-        </td>
-    </table>
-  <% elsif @submission.fudge_points && @submission.fudge_points != 0 %>
-    <div style="font-size: 1.2em;">
+<% if !@headers && editable && @current_user.preferences[:enable_speedgrader_grade_by_question] %>
+  <div id="speed_update_scores_container">
+<% else %>
+  <div id="update_scores">
+<% end %>
+
+<% if editable %>
+  <div class="update_scores_fudge">
+    <label for="fudge_points_entry"><%= before_label(:fudge_points, "Fudge Points") %></label>
+    <input id="fudge_points_entry" type="text" name="fudge_points" value="<%= (!@submission.fudge_points || @submission.fudge_points == 0 ? '--' : @submission.fudge_points) %>"/>
+    <%
+      fudge_text = begin
+        if @submission.quiz_points_possible == @quiz.points_possible || !@submission.quiz_points_possible
+          t('labels.fudge_points_generic_explanation', "You can manually adjust the score by adding positive or negative points to this box.")
+        elsif @quiz.survey?
+          t('labels.fudge_points_changed_points_survey', <<-TEXT,
+            Since %{user} took this survey, the number of points possible
+            has changed by %{difference}. You can adjust for this
+            change and manually add positive or negative points using
+            this box.
+            TEXT
+            :user => @submission.user.name,
+            :difference => @quiz.points_possible - @submission.quiz_points_possible)
+        else
+          t('labels.fudge_points_changed_points_quiz', <<-TEXT,
+            Since %{user} took this quiz, the number of points possible
+            has changed by %{difference}. You can adjust for this
+            change and manually add positive or negative points using
+            this box.
+            TEXT
+            :user => @submission.user.name,
+            :difference => @quiz.points_possible - @submission.quiz_points_possible)
+        end
+      end
+    %>
+
+    <% if @current_user.preferences[:enable_speedgrader_grade_by_question] %>
+      <i
+        class="icon-question"
+        data-tooltip='{"tooltipClass":"popover", "position":"bottom", "tooltipClass":"center bottom vertical"}'
+        title="<%= fudge_text %>"></i>
+    <% else %>
+      <div><small><%= fudge_text %></small></div>
+    <% end %>
+  </div>
+  <div class="update_scores">
+    <div class="button-container">
+      <button type="submit" class="btn btn-primary update-scores"><%= t('buttons.update_scores', "Update Scores") %></button>
+    </div>
+  </div>
+  <div class="update_scores_final_score">
+    <b><%= before_label(:final_score, "Final Score") %></b>
+      <%= score_out_of_points_possible(@submission.score || 0, @quiz.points_possible || 0, :id => 'after_fudge_points_total', :style => 'font-size: 1.5em; padding-left: 5px') %>
+  </div>
+<% end %>
+
+<% if !editable %>
+<div class="quiz_score" style="text-align: right; font-size: 1.2em; <%= hidden if @quiz.ungraded? %>">
+  <% if @quiz.survey? %>
+    <%= before_label(:survey_score, "Survey Score") %>
+  <% else %>
+    <%= before_label(:quiz_score, "Quiz Score") %>
+  <% end %>
+  <%= score_out_of_points_possible(@submission.score, params[:preview] ? @submission.points_possible_at_submission_time : @quiz.points_possible, :class => 'score_value') %>
+  <% if @submission.fudge_points && @submission.fudge_points != 0 %>
+    <div><small>
       <% if @quiz.survey? %>
         <% if @submission.fudge_points > 0 %>
           <%= t(:survey_fudged_positive, "This survey score has been manually adjusted by +%{fudge} points.", :fudge => @submission.fudge_points) %>
@@ -213,17 +235,8 @@ $(document).ready(function() {
           <%= t(:quiz_fudged_negative, "This quiz score has been manually adjusted by %{fudge} points.", :fudge => @submission.fudge_points) %>
         <% end %>
       <% end %>
-    </div>
+    </small></div>
   <% end %>
-</div>
-<% if !editable %>
-<div class="quiz_score" style="text-align: right; font-size: 1.2em; <%= hidden if @quiz.ungraded? %>">
-  <% if @quiz.survey? %>
-    <%= before_label(:survey_score, "Survey Score") %>
-  <% else %>
-    <%= before_label(:quiz_score, "Quiz Score") %>
-  <% end %>
-  <%= score_out_of_points_possible(@submission.score, params[:preview] ? @submission.points_possible_at_submission_time : @quiz.points_possible, :class => 'score_value') %>
   <% if @submission.pending_review? %>
     <div class='question-not-graded-text'>
       *
@@ -236,6 +249,7 @@ $(document).ready(function() {
   <% end %>
 </div>
 <% end %>
+</div> <!-- #speed_update_scores || #update_scores -->
 <% end %>
 <% end %>
 </div>

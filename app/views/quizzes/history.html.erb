@@ -138,11 +138,6 @@
     <% end %>
     <input type="hidden" name="submission_version_number" value="<%= @submission.version_number %>"/>
     <%= render :partial => "quizzes/quiz_submission", :locals => {:editable => can_do(@quiz, @current_user, :grade)} %>
-    <% if can_do(@quiz, @current_user, :grade) %>
-      <div class="button-container">
-        <button type="submit" class="btn btn-primary update-scores"><%= t('buttons.update_scores', "Update Scores") %></button>
-      </div>
-    <% end %>
   <% end %>
 <% end %>
 

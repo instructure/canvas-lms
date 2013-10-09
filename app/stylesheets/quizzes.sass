@@ -14,9 +14,6 @@ $selectedBorderColor: #31b5ff
 .quizzes-speedgrader #wrapper-container
   min-width: 1000px
 
-  .update-scores
-    display: block
-    margin: 0 auto
 
 // quiz index
 li.quiz
@@ -1336,6 +1333,7 @@ ul#quiz_versions
 
 // quiz history-specific styles
 #update_history_form
+  margin: 0px
   .assessment_results
     clear: none
 
@@ -1593,3 +1591,27 @@ ul#quiz_versions
     border-top: 1px solid #C4AE90
     background-color: $warningBackground
 
+#speed_update_scores_container
+  background: #e8e8e8
+  border-top: 1px solid #ccc
+  width: 100%
+  padding: 20px 0 20px 20px
+  position: fixed
+  bottom: 0px
+  left: 0px
+  .update_scores_fudge
+    padding-right: 200px
+  .button-container
+    position: fixed
+    bottom: 30px
+    right: 10px
+
+#update_scores
+  position: relative
+  .update_scores_fudge
+    padding-right: 200px
+  .button-container
+    position: absolute
+    right: 0px
+    bottom: 0px
+    padding-bottom: 0px
