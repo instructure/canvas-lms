@@ -30,8 +30,26 @@ describe TakeQuizPresenter do
   let(:all_questions) { [question1, question2, question3] }
 
   def set_current_question(question)
+    presenter.reload! true
+
     params[:question_id] = question[:id]
     submission.stubs(:question).with(question[:id]).returns(question)
+  end
+
+  before(:all) do
+    # Invalidate cached versions of stuff in the presenter, this is needed
+    # if you stub or modify the submission's data, current question, or question
+    # set.
+    def presenter.reload!(soft = false)
+      @current_questions = nil
+
+      unless soft
+        self.submission_data = submission.temporary_data
+        self.answers = resolve_answers
+      end
+
+      self
+    end
   end
 
   before do
@@ -131,6 +149,7 @@ describe TakeQuizPresenter do
         "question_#{question1[:id]}_marked" => true,
         "question_#{question2[:id]}_marked" => false
       )
+      presenter.reload!
     end
 
     it "returns true if the submission is marked" do
@@ -144,8 +163,11 @@ describe TakeQuizPresenter do
 
   describe "answered_icon" do
     before do
-      submission.stubs(:question_answered?).with(question1[:id]).returns(true)
-      submission.stubs(:question_answered?).with(question2[:id]).returns(false)
+      submission.stubs(:submission_data).returns({
+        "question_#{question1[:id]}" => true,
+        "question_#{question2[:id]}" => nil
+      })
+      presenter.reload!
     end
 
     it 'returns icon-check for answered questions' do
@@ -159,8 +181,11 @@ describe TakeQuizPresenter do
 
   describe "answered_text" do
     before do
-      submission.stubs(:question_answered?).with(question1[:id]).returns(true)
-      submission.stubs(:question_answered?).with(question2[:id]).returns(false)
+      submission.stubs(:submission_data).returns({
+        "question_#{question1[:id]}" => true,
+        "question_#{question2[:id]}" => nil
+      })
+      presenter.reload!
     end
 
     it 'returns icon-check for answered questions' do
@@ -178,6 +203,7 @@ describe TakeQuizPresenter do
         "question_#{question1[:id]}_marked" => true,
         "question_#{question2[:id]}_marked" => false
       )
+      presenter.reload!
     end
 
     it "returns text if the submission is marked" do
@@ -239,8 +265,11 @@ describe TakeQuizPresenter do
 
   describe "question_answered?" do
     before do
-      submission.stubs(:question_answered?).with(question1[:id]).returns(true)
-      submission.stubs(:question_answered?).with(question2[:id]).returns(false)
+      submission.stubs(:submission_data).returns(
+        "question_#{question1[:id]}" => true,
+        "question_#{question2[:id]}" => nil
+      )
+      presenter.reload!
     end
 
     it 'returns true for answered questions' do
@@ -249,6 +278,40 @@ describe TakeQuizPresenter do
 
     it 'returns false for unanswered questions' do
       presenter.question_answered?(question2).should be_false
+    end
+  end
+
+  describe 'building the answer set' do
+    it 'should discard irrelevant entries' do
+      submission.stubs(:submission_data).returns({
+        'foo' => 'bar',
+        "question_#{question1[:id]}_marked" => true
+      })
+
+      p = TakeQuizPresenter.new(quiz, submission, params)
+      p.answers.empty?.should be_true
+    end
+
+    it 'marks a question as answered' do
+      submission.stubs(:submission_data).returns({
+        "question_#{question1[:id]}" => '123',
+        "question_#{question2[:id]}" => true
+      })
+
+      p = TakeQuizPresenter.new(quiz, submission, params)
+
+      p.answers.has_key?(question1[:id]).should be_true
+      p.answers.has_key?(question2[:id]).should be_true
+      p.answers.has_key?(question3[:id]).should be_false
+    end
+
+    it 'rejects zeroes for an answer' do
+      submission.stubs(:submission_data).returns({
+        "question_#{question1[:id]}" => '0'
+      })
+
+      p = TakeQuizPresenter.new(quiz, submission, params)
+      p.answers.has_key?(question1[:id]).should be_false
     end
   end
 
