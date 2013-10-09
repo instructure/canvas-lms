@@ -2365,4 +2365,20 @@ describe User do
       end
     end
   end
+
+  describe "delete_enrollments" do
+    before do
+      course
+      2.times { @course.course_sections.create! }
+      2.times { @course.assignments.create! }
+    end
+
+    it "should batch DueDateCacher jobs" do
+      DueDateCacher.expects(:recompute).never
+      DueDateCacher.expects(:recompute_course).twice # sync_enrollments and destroy_enrollments
+      test_student = @course.student_view_student
+      test_student.destroy
+      test_student.reload.enrollments.each { |e| e.should be_deleted }
+    end
+  end
 end

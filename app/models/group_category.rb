@@ -224,10 +224,8 @@ class GroupCategory < ActiveRecord::Base
     end
     if !touched_groups.empty?
       Group.where(:id => touched_groups.to_a).update_all(:updated_at => Time.now.utc)
-      if context_type != 'Account'
-        Assignment.where(context_type: context_type, context_id: context_id, group_category_id: self).pluck(:id).each do |assignment|
-          DueDateCacher.recompute(assignment)
-        end
+      if context_type == 'Course'
+        DueDateCacher.recompute_course(context_id, Assignment.where(context_type: context_type, context_id: context_id, group_category_id: self).pluck(:id))
       end
     end
     complete_progress

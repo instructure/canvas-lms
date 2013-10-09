@@ -868,7 +868,18 @@ class User < ActiveRecord::Base
       self.save
       self.pseudonyms.each{|p| p.destroy(even_if_managed_passwords) }
       self.communication_channels.each{|cc| cc.destroy }
-      self.enrollments.each{|e| e.destroy }
+      self.delete_enrollments
+    end
+  end
+
+  # avoid extraneous callbacks when enrolled in multiple sections
+  def delete_enrollments
+    courses_to_update = self.enrollments.active.select(:course_id).uniq.map(&:course_id)
+    Enrollment.skip_callback(:update_cached_due_dates) do
+      self.enrollments.each { |e| e.destroy }
+    end
+    courses_to_update.each do |course|
+      DueDateCacher.recompute_course(course)
     end
   end
 
