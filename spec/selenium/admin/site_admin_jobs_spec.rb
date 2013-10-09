@@ -120,7 +120,7 @@ describe "site admin jobs ui" do
           driver.switch_to.alert.should_not be_nil
           driver.switch_to.alert.accept
           wait_for_ajaximations
-          Delayed::Job.count.should eql num_of_jobs - 3
+          Delayed::Job.count.should == num_of_jobs - 3
         end
 
         fj("#jobs-grid .odd").should be_nil # using fj to bypass selenium cache

@@ -1249,15 +1249,15 @@ describe "discussions" do
 
       get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
       wait_for_ajaximations
-      f('.topic-unsubscribe-button').displayed?.should be_true
-      f('.topic-subscribe-button').displayed?.should be_false
+      f('.topic-unsubscribe-button').should be_displayed
+      f('.topic-subscribe-button').should_not be_displayed
 
       @topic.unsubscribe(@teacher)
       @topic.update_materialized_view
       get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
       wait_for_ajaximations
-      f('.topic-unsubscribe-button').displayed?.should be_false
-      f('.topic-subscribe-button').displayed?.should be_true
+      f('.topic-unsubscribe-button').should_not be_displayed
+      f('.topic-subscribe-button').should be_displayed
     end
 
     it "should unsubscribe from topic" do
@@ -1292,22 +1292,22 @@ describe "discussions" do
       get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
       wait_for_ajax_requests
       # shouldn't see subscribe button until after posting
-      f('.topic-subscribe-button').displayed?.should be_false
+      f('.topic-subscribe-button').should_not be_displayed
       add_reply new_student_entry_text
       # now the subscribe button should be available.
       get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
       wait_for_ajax_requests
       # already subscribed because they posted
-      f('.topic-unsubscribe-button').displayed?.should be_true
+      f('.topic-unsubscribe-button').should be_displayed
     end
 
     it "should updated subscribed button when user posts to a topic" do
       course_with_student_logged_in(:course => @course)
       get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
       wait_for_ajax_requests
-      f('.topic-subscribe-button').displayed?.should be_true
+      f('.topic-subscribe-button').should be_displayed
       add_reply "student posting"
-      f('.topic-unsubscribe-button').displayed?.should be_true
+      f('.topic-unsubscribe-button').should be_displayed
     end
   end
 

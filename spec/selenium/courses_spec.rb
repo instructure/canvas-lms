@@ -25,13 +25,13 @@ describe "courses" do
       create_new_course
 
       wizard_box = f("#wizard_box")
-      keep_trying_until { wizard_box.displayed? }
+      keep_trying_until { wizard_box.should be_displayed }
       wizard_box.find_element(:css, ".close_wizard_link").click
 
       refresh_page
       wait_for_ajaximations # we need to give the wizard a chance to pop up
       wizard_box = f("#wizard_box")
-      wizard_box.displayed?.should be_false
+      wizard_box.should_not be_displayed
 
       # un-remember the setting
       driver.execute_script "localStorage.clear()"

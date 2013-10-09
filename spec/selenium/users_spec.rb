@@ -242,7 +242,7 @@ describe "users" do
       expect_new_page_load { form.submit }
       # confirm the user is authenticated into the dashboard
       f('#identity .logout').should be_present
-      User.last.initial_enrollment_type.should eql 'student'
+      User.last.initial_enrollment_type.should == 'student'
     end
 
     it "should register a teacher" do
@@ -257,7 +257,7 @@ describe "users" do
       expect_new_page_load { form.submit }
       # confirm the user is authenticated into the dashboard
       f('#identity .logout').should be_present
-      User.last.initial_enrollment_type.should eql 'teacher'
+      User.last.initial_enrollment_type.should == 'teacher'
     end
 
     it "should register an observer" do
@@ -276,7 +276,7 @@ describe "users" do
       expect_new_page_load { form.submit }
       # confirm the user is authenticated into the dashboard
       f('#identity .logout').should be_present
-      User.last.initial_enrollment_type.should eql 'observer'
+      User.last.initial_enrollment_type.should == 'observer'
     end
   end
 

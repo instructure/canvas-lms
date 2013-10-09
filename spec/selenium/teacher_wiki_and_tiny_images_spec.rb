@@ -130,7 +130,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
       f('.edit_link').click
       add_url_image(driver, 'http://example.com/image.png', 'alt text')
       submit_form("#edit_wiki_page_#{@blank_page.id}")
-      keep_trying_until { f('#wiki_body').displayed? }
+      keep_trying_until { f('#wiki_body').should be_displayed }
       check_element_attrs(f('#wiki_body img'), :src => 'http://example.com/image.png', :alt => 'alt text')
     end
     
@@ -148,14 +148,14 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
       it "should add a course image" do
         add_canvas_image(driver, 'Course files', 'course.jpg')
         submit_form("#edit_wiki_page_#{@blank_page.id}")
-        keep_trying_until { f('#wiki_body').displayed? }
+        keep_trying_until { f('#wiki_body').should be_displayed }
         check_element_attrs(f('#wiki_body img'), :src => /\/files\/#{@course_attachment.id}/, :alt => 'course.jpg')
       end
       
       it "should add a user image" do
         add_canvas_image(driver, 'My files', 'teacher.jpg')
         submit_form("#edit_wiki_page_#{@blank_page.id}")
-        keep_trying_until { f('#wiki_body').displayed? }
+        keep_trying_until { f('#wiki_body').should be_displayed }
         check_element_attrs(f('#wiki_body img'), :src => /\/files\/#{@teacher_attachment.id}/, :alt => 'teacher.jpg')
       end
     end
@@ -167,7 +167,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
       get "/courses/#{@course.id}/quizzes"
       wait_for_ajaximations
       f(".new-quiz-link").click
-      keep_trying_until { f(".mce_instructure_image").displayed? }
+      keep_trying_until { f(".mce_instructure_image").should be_displayed }
       add_canvas_image(driver, 'Course files', 'course2.jpg')
 
       click_questions_tab

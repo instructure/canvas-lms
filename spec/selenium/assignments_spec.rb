@@ -225,10 +225,8 @@ describe "assignments" do
           should == I18n.t("#assignments.multiple_due_dates", "Multiple Due Dates")
       assignment_title = f("#assignment_title")
       assignment_points_possible = f("#assignment_points_possible")
-      assignment_title.clear
-      assignment_title.send_keys("VDD Test Assignment Updated")
-      assignment_points_possible.clear
-      assignment_points_possible.send_keys("100")
+      replace_content(assignment_title, "VDD Test Assignment Updated")
+      replace_content(assignment_points_possible, "100")
       f("#add_assignment_form").submit
       wait_for_ajaximations
       @assignment.reload.points_possible.should == 100

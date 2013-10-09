@@ -508,7 +508,7 @@ describe "external tools" do
 
       def select_submission_content(iframe_link_selector)
         f("#submit_from_external_tool_form .tools .tool").click
-        keep_trying_until { f("#homework_selection_dialog").displayed? }
+        keep_trying_until { f("#homework_selection_dialog").should be_displayed }
 
         in_frame('homework_selection_iframe') do
           keep_trying_until { ff(iframe_link_selector).length > 0 }
@@ -551,8 +551,8 @@ describe "external tools" do
         pick_submission_tool('#file_link')
 
         f("#external_tool_url").attribute('value').should match(/delete\.png/)
-        f("#external_tool_filename").attribute('value').should eql('delete.png')
-        f("#external_tool_submission_type").attribute('value').should eql('online_url_to_file')
+        f("#external_tool_filename").attribute('value').should ==('delete.png')
+        f("#external_tool_submission_type").attribute('value').should ==('online_url_to_file')
 
         expect do
           f("#submit_from_external_tool_form .btn-primary").click
@@ -573,7 +573,7 @@ describe "external tools" do
         pick_submission_tool('#full_url_link')
 
         f("#external_tool_url").attribute('value').should match(/delete\.png/)
-        f("#external_tool_submission_type").attribute('value').should eql('online_url')
+        f("#external_tool_submission_type").attribute('value').should ==('online_url')
         f("#submit_from_external_tool_form .btn-primary").click
         keep_trying_until { !f("#submit_assignment").displayed? }
         submission = @assignment.find_or_create_submission(@user)
@@ -627,7 +627,7 @@ describe "external tools" do
         homework_submission_tool
         pick_submission_tool('#bad_file_link')
 
-        f("#external_tool_submission_type").attribute('value').should eql('online_url_to_file')
+        f("#external_tool_submission_type").attribute('value').should ==('online_url_to_file')
         f('#submit_from_external_tool_form .btn-primary').click
         wait_for_ajax_requests
         Delayed::Job.last.invoke_job

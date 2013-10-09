@@ -18,7 +18,7 @@ describe "web conference" do
     it "should create a web conference" do
       conference_title = 'Testing Conference'
       keep_trying_until do
-        fj('.new-conference-btn').displayed?.should be_true
+        fj('.new-conference-btn').should be_displayed
       end
       fj('.new-conference-btn').click
       wait_for_ajaximations
@@ -26,7 +26,7 @@ describe "web conference" do
         replace_content(f('#web_conference_title'), conference_title)
         f('#add_conference_form .btn-primary').click
         wait_for_ajaximations
-        fj("#new-conference-list .ig-title").displayed?.should be_true
+        fj("#new-conference-list .ig-title").should be_displayed
       end
       fj("#new-conference-list .ig-title").text.should contain(conference_title)
     end
@@ -40,7 +40,7 @@ describe "web conference" do
         f('#add_conference_form button.cancel_button').click
         wait_for_ajaximations
       end
-      f('#add_conference_form').displayed?.should be_false
+      f('#add_conference_form').should_not be_displayed
     end
   end
 
