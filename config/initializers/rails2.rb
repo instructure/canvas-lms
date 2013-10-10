@@ -192,6 +192,10 @@ ActiveRecord::Associations::AssociationCollection.class_eval do
   end
 end
 
+class ActiveRecord::Generators
+  include FakeRails3Generators
+end
+
 class Class
   def self.class_attribute(*attrs)
     class_inheritable_accessor(*attrs)
