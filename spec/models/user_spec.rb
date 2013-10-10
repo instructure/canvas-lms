@@ -1262,8 +1262,9 @@ describe User do
     end
 
     it "should only include favorite courses when set" do
-      @user.favorites.by("Course").first.destroy
-      @user.menu_courses.should == [ @courses[1], @courses[2] ]
+      course = @courses.shift
+      @user.favorites.where(context_type: "Course", context_id: course).first.destroy
+      @user.menu_courses.should == @courses
     end
 
     context "sharding" do

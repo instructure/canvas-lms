@@ -2285,8 +2285,7 @@ class User < ActiveRecord::Base
 
     # Return ids relative for the current shard and only the ids for the current shard.
     context_ids.map { |id|
-      relative_id = Shard.relative_id_for(id)
-      relative_id == id ? nil : relative_id
+      Shard.relative_id_for(id) if Shard.current == Shard.shard_for(id)
     }.compact
   end
 
