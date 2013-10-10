@@ -50,5 +50,21 @@ describe "plugins ui" do
     end
     is_checked('#plugin_setting_disabled').should be_false
   end
+
+  it "should not overwrite settings that are not shown" do
+    get '/plugins/etherpad'
+
+    f("#plugin_setting_disabled").click
+    expect_new_page_load { submit_form("#new_plugin_setting") }
+
+    plugin_setting = PluginSetting.last
+    plugin_setting.settings["other_thingy"] = "dude"
+    plugin_setting.save!
+
+    expect_new_page_load { submit_form("#edit_plugin_setting_#{plugin_setting.id}") }
+
+    plugin_setting.reload
+    plugin_setting.settings["other_thingy"].should == "dude"
+  end
 end
 

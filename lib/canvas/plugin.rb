@@ -139,7 +139,7 @@ module Canvas
         if validator_module && validator_module.respond_to?(:validate)
           res = validator_module.validate(settings, plugin_setting)
           if res.is_a?(Hash)
-            plugin_setting.settings = (self.default_settings || {}).with_indifferent_access.merge(res || {})
+            plugin_setting.settings = (plugin_setting.settings || self.default_settings || {}).with_indifferent_access.merge(res || {})
           else
             false
           end
@@ -148,7 +148,7 @@ module Canvas
           false
         end
       else
-        plugin_setting.settings = (self.default_settings || {}).with_indifferent_access.merge(settings || {})
+        plugin_setting.settings = (plugin_setting.settings || self.default_settings || {}).with_indifferent_access.merge(settings || {})
       end
     end
 
