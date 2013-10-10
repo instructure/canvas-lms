@@ -481,6 +481,10 @@ module ApplicationHelper
     end
   end
 
+  def embedded_chat_quicklaunch_params
+    {user_id: @current_user.id, course_id: @context.id, canvas_url: "#{HostUrl.protocol}://#{HostUrl.default_host}"}
+  end
+
   def embedded_chat_url
     chat_tool = active_external_tool_by_id('chat')
     return unless chat_tool && chat_tool.url && chat_tool.custom_fields['mini_view_url']
