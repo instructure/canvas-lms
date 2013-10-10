@@ -8,13 +8,9 @@ define [
   class CourseList extends Backbone.Collection
 
     initialize: (@term) ->
-      @on 'reset', ->
+      @on 'sync', ->
         @each ( (course) -> course.term = @term ), this
       super
-
-    fetch: (options) ->
-      @trigger 'request'
-      Backbone.Collection.prototype.fetch.call(this, options)
 
     model: Course
 
