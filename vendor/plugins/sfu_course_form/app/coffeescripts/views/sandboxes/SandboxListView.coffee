@@ -8,7 +8,7 @@ define [
 
     initialize: ->
       @collection.on 'request', ( -> this.$el.html '<p>Loading existing sandbox courses&hellip;</p>' ), this
-      @collection.on 'reset', ( -> @render() ), this
+      @collection.on 'sync', ( -> @render() ), this
       super
 
     tagName: 'div'

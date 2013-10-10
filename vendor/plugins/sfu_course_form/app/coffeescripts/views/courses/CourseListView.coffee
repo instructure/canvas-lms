@@ -9,7 +9,7 @@ define [
 
     initialize: ->
       @collection.on 'request', ( -> this.$el.html '<li>Loading&hellip;</li>' ), this
-      @collection.on 'reset', ( -> @render() ), this
+      @collection.on 'sync', ( -> @render() ), this
       @collection.on 'error', ( -> this.$el.html '<li>No available courses</li>' ), this
       super
 
