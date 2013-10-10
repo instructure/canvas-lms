@@ -2,6 +2,40 @@
 
 (function($) {
 
+    var utils = {
+
+        onPage: function(regex, fn) {
+          if (location.pathname.match(regex)) fn();
+        },
+
+        hasAnyRole: function(/*roles, cb*/) {
+          var roles = [].slice.call(arguments, 0);
+          var cb = roles.pop();
+          for (var i = 0; i < arguments.length; i++) {
+            if (ENV.current_user_roles.indexOf(arguments[i]) !== -1) {
+              return cb(true);
+            }
+          }
+          return cb(false);
+        },
+
+        isUser: function(id, cb) {
+          cb(ENV.current_user_id == id);
+        },
+
+        onElementRendered: function(selector, cb, _attempts) {
+          var el = $(selector);
+          _attempts = ++_attempts || 1;
+          if (el.length) return cb(el);
+          if (_attempts == 60) return;
+          setTimeout(function() {
+            onElementRendered(selector, cb, _attempts);
+          }, 250);
+        }
+
+    }
+
+
     // header rainbow
 
     $('#header').append('<div id="header-rainbow">');
@@ -66,6 +100,13 @@
     }
     // END no-flash upload FIX
 
+    // Fix for the new conversations page - toolbar renders underneath the rainbow bar
+    utils.onPage(/conversations/, function() {
+        // are we on the new conversations page?
+        if (ENV.CONVERSATIONS && (ENV.CONVERSATIONS.ATTACHMENTS_FOLDER_ID && !ENV.hasOwnProperty('CONTEXT_ACTION_SOURCE'))) {
+            jQuery('div#main').css('top', '92px');
+        }
+    });
 })(jQuery);
 
 // google analytics
