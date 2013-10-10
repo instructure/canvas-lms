@@ -19,7 +19,7 @@ the these type of tools as domain-matching tool and only return URLs
 whose domain matches the tool's specified domain.
 
 When tools are loaded as link selectors, Canvas sends an additional 
-parameter to notify the tool of the directive, "ext_content_return_types=select_link".
+parameter to notify the tool of the directive, `ext_content_return_types=select_link`.
 When a tool receives this directive, it means Canvas is expecting the 
 tool to redirect the user to the LTI success URL with some specific 
 additional parameters. These additional parameters tell Canvas what 
@@ -49,7 +49,7 @@ values such as url.
 </table>
 
 #### examples:
-If the <code>launch_presentation_return_url</code> were
+If the `launch_presentation_return_url` were
 <code>http://www.example.com/done</code>, possible return URLs could include:
 
 - http://www.example.com/done?return_type=lti_launch_url&url=https%3A%2F%2Fothersite.com%2Flti_link
