@@ -27,6 +27,7 @@ define [
 
     toJSON: ->
       json = super
+      json.noGroups = @model.groupsCount() is 0
       json.groupCountText = I18n.t "group_count", {one: "1 group", other: "%{count} groups"}, count: @model.groupsCount()
       json.studentOrganizedOrSelfSignupRestricted = @model.get('role') is "student_organized" or @model.get('self_signup') is "restricted"
       json
