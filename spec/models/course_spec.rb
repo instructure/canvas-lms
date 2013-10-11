@@ -36,24 +36,57 @@ describe Course do
     @course.apply_group_weights?.should == true
   end
 
-  it "should know if it has been soft-concluded" do
-    @course.enrollment_term = Account.default.enrollment_terms.create!
+  describe "soft-concluded?" do
+    before do
+      @course.enrollment_term = Account.default.enrollment_terms.create!
+    end
 
-    # Both course and term end_at dates are nil
-    @course.should_not be_soft_concluded
+    context "without term end date" do
+      it "should know if it has been soft-concluded" do
+        @course.update_attribute(:conclude_at, nil)
+        @course.should_not be_soft_concluded
 
-    # Course end_at is in the past
-    @course.update_attribute(:conclude_at, Time.now - 1.week)
-    @course.should be_soft_concluded
+        @course.update_attribute(:conclude_at, 1.week.from_now)
+        @course.should_not be_soft_concluded
 
-    # Course end_at in the future, term end_at in the past
-    @course.update_attribute(:conclude_at, Time.now + 1.week)
-    @course.enrollment_term.update_attribute(:end_at, Time.now - 1.week)
-    @course.should be_soft_concluded
+        @course.update_attribute(:conclude_at, 1.week.ago)
+        @course.should be_soft_concluded
+      end
+    end
 
-    # Both course and term end_at dates are in the future
-    @course.enrollment_term.update_attribute(:end_at, Time.now + 1.week)
-    @course.should_not be_soft_concluded
+    context "with term end date in the past" do
+      before do
+        @course.enrollment_term.update_attribute(:end_at, 1.week.ago)
+      end
+
+      it "should know if it has been soft-concluded" do
+        @course.update_attribute(:conclude_at, nil)
+        @course.should be_soft_concluded
+
+        @course.update_attribute(:conclude_at, 1.week.from_now)
+        @course.should_not be_soft_concluded
+
+        @course.update_attribute(:conclude_at, 1.week.ago)
+        @course.should be_soft_concluded
+      end
+    end
+
+    context "with term end date in the future" do
+      before do
+        @course.enrollment_term.update_attribute(:end_at, 1.week.from_now)
+      end
+
+      it "should know if it has been soft-concluded" do
+        @course.update_attribute(:conclude_at, nil)
+        @course.should_not be_soft_concluded
+
+        @course.update_attribute(:conclude_at, 1.week.from_now)
+        @course.should_not be_soft_concluded
+
+        @course.update_attribute(:conclude_at, 1.week.ago)
+        @course.should be_soft_concluded
+      end
+    end
   end
 
   context "#old_gradebook_visible?" do
