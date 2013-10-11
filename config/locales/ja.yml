@@ -167,7 +167,7 @@ ja:
       test_ldap_search_label: "LDAP 検索をテストしています..."
     ldap_timeout_error: 
       last_ldap_timeout_failure: 前回のタイムアウト
-      ldap_timeout_failure_help2: "Canvas は、LDAP サーバーとの通信が一定回数以上タイムアウトした場合、それ以降の %{time} 間はその後のログインの試行でその LDAP サーバーが使用されないようにブロックします。"
+      ldap_timeout_failure_help2: "Canvas は、特定の LDAP サーバーとの通信が一定回数以上タイムアウトした場合、それ以降の %{time} 間は、ログイン試行の際にその LDAP サーバーを使用しなくなります。"
     login_required: 入力が必要です
     no_auth_mixing: 複数の認証の種類を組み合わせることはできません
     no_changing_auth_types: 認証設定の種類は変更できません。削除した後、新しい設定を作成してください。
@@ -1571,7 +1571,7 @@ ja:
       available_until: 次の日付まで利用可能
       closed: 締切済み
       multiple_dates: 複数の日付
-      not_available_until: 次の日付まで利用可能でない
+      not_available_until: 次の日付まで利用不可
     date_due_column_view: 
       due: 期限
       due_date: 期限
@@ -3757,7 +3757,7 @@ ja:
       rss_feed: 会話フィード
       view_submission: 提出物を新しいウィンドウに開きます。
     unarchive: アーカイブ解凍
-    unarchive_conversation: 会話のアーカイブ解凍
+    unarchive_conversation: 会話のアーカイブを解凍
     unknown_user: 不明なユーザ
     unspecified_error: 予期しないエラーが発生しました。もう一度やり直してください
     unstar: スター取り消し
@@ -6733,7 +6733,7 @@ ja:
         save: 保存
         saving: 保存しています...
         self_signup: "セルフ サインアップ"
-        self_signup_description: "受講生が自分でサインアップできるグループのセットを作成できます。受講生はセット内の 1 つのグループだけにしかサインアップできませんが、このオプションを使用すると、講師が受講生をグループに振り分けなくても、受講生が自分でグループを選択できます。このオプションを有効にしている場合、受講生は自分で別のグループに移動できることに注意してください。"
+        self_signup_description: "受講生が自分でサインアップできるグループのセットを作成できます。受講生はセット内の 1 つのグループにしかサインアップできませんが、このオプションを使用すると、講師が受講生をグループに振り分けなくても、受講生が自分でグループを選択できます。このオプションを有効にしている場合は、受講生が自分で別のグループに移動できることに注意してください。"
         split_into_groups: "%h{split_num} つの均等なグループに受講生を分割"
         what_is_this: これは何ですか?
       group_category_detail: 
@@ -6760,7 +6760,7 @@ ja:
         require_same_section: "グループ メンバーに、同じセクションに入ることを要求する"
         save: 保存
         saving: 保存しています...
-        self_signup_description: "受講生が自分でサインアップできるグループのセットを作成できます。受講生はセット内の 1 つのグループだけにしかサインアップできませんが、このオプションを使用すると、講師が受講生をグループに振り分けなくても、受講生が自分でグループを選択できます。このオプションを有効にしている場合、受講生は自分で別のグループに移動できることに注意してください。"
+        self_signup_description: "受講生が自分でサインアップできるグループのセットを作成できます。受講生はセット内の 1 つのグループにしかサインアップできませんが、このオプションを使用すると、講師が受講生をグループに振り分けなくても、受講生が自分でグループを選択できます。このオプションを有効にしている場合は、受講生が自分で別のグループに移動できることに注意してください。"
         what_is_this: これは何ですか?
       group_edit: 
         cancel: キャンセル
@@ -11066,7 +11066,7 @@ ja:
         delete: 削除
         find_ip_address_filter: "IP アドレス フィルタの検索"
       warnings: 
-        has_student_submissions: 受講生は既にこのクイズを受けたか、または受け始めています。編集は慎重に行ってください。大幅に変更したクイズ問題がある場合は、古いバージョンのクイズを受けた受講生の採点をやり直すことを検討してください。
+        has_student_submissions: 受講生は既にこのクイズに回答したか、回答を始めています。編集は慎重に行ってください。大幅に変更したクイズ問題がある場合は、古いバージョンのクイズに回答した受講生の採点をやり直すことを検討してください。
     no_filters_found: フィルタが見つかりません
     no_quizzes_view: 
       headers: 
@@ -12888,7 +12888,7 @@ ja:
       first_bullet: 解答を変更したら、問題を更新する前にオプションを選択する必要があります。
       got_it: わかりました
       second_bullet: 受講生のスコアに影響を及ぼす可能性があるため、必ず最も適切なオプションを選択してください。
-      third_bullet: "クイズを保存した後、Canvas はすべての提出物を再評価します。この処理には数分かかる場合があります。"
+      third_bullet: クイズを保存すると、すべての提出物が再評価されます。この処理には数分かかる場合があります。
       try_later: 既にクイズに回答した受講生のための再評価オプションを設定できます。
   turnitin: 
     error_1007: アップロードされたファイルが大きすぎます。
@@ -13368,7 +13368,7 @@ ja:
         front_page: "トップ ページ"
       page_locked: このページはロックされています
       page_locked_by_modules: "このページは、次のモジュールを完了した後に利用できます:"
-      page_locked_by_modules_until: "このページは、次のモジュールを完了したら、%{lock_info.unlock_at} に利用可能になります:"
+      page_locked_by_modules_until: "このページは、次のモジュールの完了後、%{lock_info.unlock_at} に利用可能になります:"
       page_locked_until: "このページは、%{lock_info.unlock_at} に利用可能になります"
       toolbar_menu: 
         settings: 設定
