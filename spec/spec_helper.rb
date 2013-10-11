@@ -126,6 +126,46 @@ class ActiveRecord::ConnectionAdapters::MysqlAdapter < ActiveRecord::ConnectionA
   end
 end
 
+
+# Be sure to actually test serializing things to non-existent caches,
+# but give Mocks a pass, since they won't exist in dev/prod
+Mocha::Mock.class_eval do
+  def marshal_dump
+    nil
+  end
+
+  def marshal_load(data)
+    raise "Mocks aren't really serializeable!"
+  end
+
+  def respond_to_with_marshalling?(symbol, include_private = false)
+    return true if [:marshal_dump, :marshal_load].include?(symbol)
+    respond_to_without_marshalling?(symbol, include_private)
+  end
+  alias_method_chain :respond_to?, :marshalling
+end
+
+[ActiveSupport::Cache::MemoryStore, NilStore].each do |store|
+  store.class_eval do
+    def write_with_serialization_check(name, value, options = nil)
+      Marshal.dump(value)
+      write_without_serialization_check(name, value, options)
+    end
+    alias_method_chain :write, :serialization_check
+  end
+end
+
+unless CANVAS_RAILS2
+  NilStore.class_eval do
+    def fetch_with_serialization_check(name, options = {}, &block)
+      result = fetch_without_serialization_check(name, options, &block)
+      Marshal.dump(result) if result
+      result
+    end
+    alias_method_chain :fetch, :serialization_check
+  end
+end
+
 Spec::Matchers.define :encompass do |expected|
   match do |actual|
     if expected.is_a?(Array) && actual.is_a?(Array)
