@@ -60,7 +60,7 @@ module Canvas
     end
 
     def enabled?
-      ps = PluginSetting.cached_plugin_setting(self.id)
+      ps = PluginSetting.find_by_name(self.id.to_s)
       return false unless ps
       ps.valid_settings? && ps.enabled?
     end
