@@ -44,7 +44,17 @@ module Canvas
               :base=>nil
       }.with_indifferent_access
     end
-    
+
+
+    # custom serialization, since the meta can containt procs
+    def _dump(depth)
+      self.id.to_s
+    end
+
+    def self._load(str)
+      find(str)
+    end
+
     def default_settings
       settings = @meta[:settings]
       settings = settings.call if settings.respond_to?(:call)
