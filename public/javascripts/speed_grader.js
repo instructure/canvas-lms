@@ -338,7 +338,7 @@ define([
     elements: {
       mute: {
         icon: $('#mute_link .ui-icon'),
-        label: $('#mute_link .label'),
+        label: $('#mute_link .mute_label'),
         link: $('#mute_link'),
         modal: $('#mute_dialog')
       },
@@ -445,7 +445,7 @@ define([
 
     toggleMute: function(){
       this.muted = !this.muted;
-      var label = this.muted ? I18n.t('unmute_assignment', 'Unmute Assignment') : I18n.t('mute_assignment', 'Mute Assignment');
+      var label = this.muted ? I18n.t('unmute_assignment', 'Unmute Assignment') : I18n.t('mute_assignment', 'Mute Assignment'),
           action = this.muted ? 'mute' : 'unmute',
           actions = {
         /* Mute action */
