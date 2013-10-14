@@ -460,11 +460,11 @@ describe Enrollment do
         @enrollment.accept.should be_true
       end
 
-      def enrollment_dates_override_test(enrollment_type)
+      def enrollment_dates_override_test
         @term = @course.enrollment_term
         @term.should_not be_nil
         @term.save!
-        @override = @term.enrollment_dates_overrides.create!(:enrollment_type => enrollment_type, :enrollment_term => @term)
+        @override = @term.enrollment_dates_overrides.create!(:enrollment_type => @enrollment.type, :enrollment_term => @term)
         @override.start_at = 2.days.ago
         @override.end_at = 2.days.from_now
         @override.save!
@@ -502,7 +502,7 @@ describe Enrollment do
         @term.start_at = 2.days.from_now
         @term.end_at = 4.days.from_now
         @term.save!
-        @enrollment.reload.state_based_on_date.should eql(:inactive)
+        @enrollment.reload.state_based_on_date.should eql(@enrollment.admin? ? :active : :inactive)
       end
 
       context "as a student" do
@@ -527,7 +527,7 @@ describe Enrollment do
         end
 
         it "should accept into the right state based on availability dates on enrollment_dates_override" do
-          enrollment_dates_override_test('StudentEnrollment')
+          enrollment_dates_override_test
         end
 
         it "should have the correct state for a half-open past course" do
@@ -566,7 +566,7 @@ describe Enrollment do
         end
 
         it "should accept into the right state based on availability dates on enrollment_dates_override" do
-          enrollment_dates_override_test("TeacherEnrollment")
+          enrollment_dates_override_test
         end
       end
     end
@@ -844,7 +844,7 @@ describe Enrollment do
       @term.end_at = 4.days.from_now
       @term.save!
 
-      @teacher_enrollment.reload.state_based_on_date.should == :inactive
+      @teacher_enrollment.reload.state_based_on_date.should == :active
       @student_enrollment.reload.state_based_on_date.should == :inactive
 
       # Now between course and term dates, course first
