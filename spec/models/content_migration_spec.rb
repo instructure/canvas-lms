@@ -749,6 +749,7 @@ describe ContentMigration do
           :description => "Outcome row 2",
           :id => 2,
           :ratings => [{:points => 3,:description => "lame'",:criterion_id => 2,:id => 3}],
+          :ignore_for_scoring => true,
           :learning_outcome_id => lo2.id
         }
       ]
@@ -765,6 +766,7 @@ describe ContentMigration do
       to_assign = @copy_to.assignments.first
       
       to_rub.data[1]["learning_outcome_id"].should == new_lo2.id
+      to_rub.data[1]["ignore_for_scoring"].should == true
       to_rub.data[0]["learning_outcome_id"].should == lo.id
       to_rub.learning_outcome_alignments.map(&:learning_outcome_id).sort.should == [lo.id, new_lo2.id].sort
       to_assign.learning_outcome_alignments.map(&:learning_outcome_id).sort.should == [lo.id, new_lo2.id].sort
