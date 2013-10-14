@@ -1513,7 +1513,10 @@ class User < ActiveRecord::Base
 
   def self_enroll_if_necessary
     return unless @self_enrollment_course
+    return if @self_enrolling # avoid infinite recursion when enrolling across shards (pseudonym creation + shard association stuff)
+    @self_enrolling = true
     @self_enrollment_course.self_enroll_student(self, :skip_pseudonym => @just_created, :skip_touch_user => true)
+    @self_enrolling = false
   end
 
   def time_difference_from_date(hash)
