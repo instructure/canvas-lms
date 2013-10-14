@@ -37,7 +37,13 @@
   height: 40px;
 
   .datetime_suggest, .input-append {
-    display: inline;
+    display: inline-block;
+    vertical-align: middle;
+    margin-bottom: 0;
+  }
+
+  .input-append input, .input-append button {
+    vertical-align: middle;
   }
 }
 

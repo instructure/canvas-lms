@@ -22,7 +22,7 @@ require [
     activateEvent: ENV.CALENDAR.ACTIVE_EVENT
     viewStart:     ENV.CALENDAR.VIEW_START
     showScheduler: ENV.CALENDAR.SHOW_SCHEDULER
-    showPicker:    ENV.CALENDAR.SHOW_AGENDA
+    showAgenda:    ENV.CALENDAR.SHOW_AGENDA
     header:        @header
     )
   new MiniCalendar("#minical", @calendar)

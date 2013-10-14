@@ -105,7 +105,7 @@ define [
 
       @el = $(selector).html calendarAppTemplate()
 
-      @schedulerNavigator = new CalendarNavigator(el: $('.scheduler_navigator'), showPicker: @options.showPicker)
+      @schedulerNavigator = new CalendarNavigator(el: $('.scheduler_navigator'), showAgenda: @options.showAgenda)
       @schedulerNavigator.hide()
 
       data.view_name = 'agendaWeek' if data.view_name == 'week'

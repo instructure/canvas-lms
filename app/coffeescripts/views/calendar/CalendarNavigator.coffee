@@ -74,7 +74,7 @@ define [
       @$dateField.val('')
 
     _titleActivated: ->
-      @showPicker() if @options.showPicker
+      @showPicker() if @options.showAgenda
 
     _dateFieldSelect: (selectedDateText) ->
       if @_enterKeyPressed

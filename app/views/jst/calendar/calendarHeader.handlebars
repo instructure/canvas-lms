@@ -5,12 +5,28 @@
       <h2 class="appointment_group_title">{{#t "my_appointment_groups"}}My Appointment Groups{{/t}}</h2>
       <button class="btn scheduler_done_button">{{#t "done_go_back_to_list"}}Done, Go Back To List{{/t}}</button>
     </div>
+    {{#if showAgenda}}
+    <div class="calendar_action_buttons header-table-cell header-table-right">
+      <a href="#" id="refresh_calendar_link" class="" title="{{#t "loading"}}Loading{{/t}}" data-tooltip>
+        <span class="screenreader-only">{{#t "loading"}}Loading{{/t}}</span>
+      </a>
+      <span class="calendar_view_buttons">
+        <input type="radio" id="week"      name="calendar_view" /><label for="week">{{#t "links.calendar_week"}}Week{{/t}}</label>
+        <input type="radio" id="month"     name="calendar_view" checked="checked" /><label for="month">{{#t "links.calendar_month"}}Month{{/t}}</label>
+        <input type="radio" id="agenda"    name="calendar_view" /><label for="agenda">{{#t "links.calendar_agenda"}}Agenda{{/t}}</label>
+        {{#if showScheduler}}
+        <input type="radio" id="scheduler" name="calendar_view" /><label for="scheduler">{{#t "links.calendar_scheduler"}}Scheduler{{/t}} <span stye="display: none" class="counter-badge"></span></label>
+        {{/if}}
+      </span>
+      <a href="#" id="create_new_event_link" class="btn" title="{{#t "create_event"}}Create New Event{{/t}}" data-tooltip>
+        <i class="icon-plus"></i>
+        <span class="screenreader-only">{{#t "create_event"}}Create New Event{{/t}}</span>
+      </a>
+    </div>
+    {{else}}
     <div class="calendar_view_buttons header-table-cell header-table-middle">
       <input type="radio" id="week"      name="calendar_view" /><label for="week">{{#t "links.calendar_week"}}Week{{/t}}</label>
       <input type="radio" id="month"     name="calendar_view" checked="checked" /><label for="month">{{#t "links.calendar_month"}}Month{{/t}}</label>
-      {{#if showAgenda}}
-      <input type="radio" id="agenda"    name="calendar_view" /><label for="agenda">{{#t "links.calendar_agenda"}}Agenda{{/t}}</label>
-      {{/if}}
       {{#if showScheduler}}
       <input type="radio" id="scheduler" name="calendar_view" /><label for="scheduler">{{#t "links.calendar_scheduler"}}Scheduler{{/t}} <span stye="display: none" class="counter-badge"></span></label>
       {{/if}}
@@ -27,5 +43,6 @@
         <span class="screenreader-only">{{#t "refresh"}}Refresh{{/t}}</span>
       </a>
     </div>
+    {{/if}}
   </div>
 </div>

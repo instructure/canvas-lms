@@ -29,7 +29,7 @@ define [
       @render()
       @navigator = new CalendarNavigator(
         el: @$navigator
-        showPicker: @options.showAgenda
+        showAgenda: @options.showAgenda
       )
       @$calendarViewButtons.buttonset()
       @showNavigator()
