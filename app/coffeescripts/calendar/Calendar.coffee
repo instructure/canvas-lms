@@ -10,6 +10,7 @@ define [
   'underscore'
   'compiled/userSettings'
   'compiled/util/hsvToRgb'
+  'compiled/util/colorSlicer'
   'jst/calendar/calendarApp'
   'compiled/calendar/EventDataSource'
   'compiled/calendar/commonEventFactory'
@@ -25,7 +26,7 @@ define [
   'jquery.instructure_misc_plugins'
   'vendor/jquery.ba-tinypubsub'
   'jqueryui/button'
-], (I18n, $, _, userSettings, hsvToRgb, calendarAppTemplate, EventDataSource, commonEventFactory, ShowEventDetailsDialog, EditEventDetailsDialog, Scheduler, CalendarNavigator, AgendaView, calendarDefaults) ->
+], (I18n, $, _, userSettings, hsvToRgb, colorSlicer, calendarAppTemplate, EventDataSource, commonEventFactory, ShowEventDetailsDialog, EditEventDetailsDialog, Scheduler, CalendarNavigator, AgendaView, calendarDefaults) ->
 
   class Calendar
     constructor: (selector, @contexts, @manageContexts, @dataSource, @options) ->
@@ -66,7 +67,7 @@ define [
         header: false
         editable: true
         columnFormat:
-          month: 'dddd'
+          month: if ENV.CALENDAR.SHOW_AGENDA then 'ddd' else 'dddd'
           week: weekColumnFormatter
         buttonText:
           today: I18n.t 'today', 'Today'
@@ -274,6 +275,10 @@ define [
       $element.attr('title', $.trim("#{timeString}\n#{$element.find('.fc-event-title').text()}\n\n#{I18n.t('calendar_title', 'Calendar:')} #{event.contextInfo.name}"))
       $element.find('.fc-event-inner').prepend($("<span class='screenreader-only'>#{I18n.t('calendar_title', 'Calendar:')} #{event.contextInfo.name}</span>"));
       $element.find('.fc-event-title').prepend($("<span class='screenreader-only'>#{screenReaderTitleHint}</span>"))
+
+      if ENV.CALENDAR.SHOW_AGENDA && event.eventType.match(/assignment/)
+        isQuiz = event.assignment.submission_types?.length && event.assignment.submission_types[0] == 'online_quiz'
+        element.find('.fc-event-inner').prepend($('<i />', {'class': if isQuiz then 'icon-quiz' else 'icon-assignment'}))
       true
 
     eventAfterRender: (event, element, view) =>
@@ -283,8 +288,12 @@ define [
       if event.eventType.match(/assignment/) && view.name == "agendaWeek"
         element.height('') # this fixes it so it can wrap and not be forced onto 1 line
           .find('.ui-resizable-handle').remove()
-      if event.eventType.match(/assignment/)
-        element.find('.fc-event-time').html I18n.t('labels.due', 'due')
+      if ENV.CALENDAR.SHOW_AGENDA
+        if event.eventType.match(/assignment/) && event.isDueAtMidnight()
+          element.find('.fc-event-time').empty()
+      else
+        if event.eventType.match(/assignment/)
+          element.find('.fc-event-time').html I18n.t('labels.due', 'due')
       if event.eventType == 'calendar_event' && @options?.activateEvent && event.id == "calendar_event_#{@options?.activateEvent}"
         @options.activateEvent = null
         @eventClick event,
@@ -579,17 +588,28 @@ define [
       "rgb(#{rgbArray.join ' ,'})"
 
     colorizeContexts: =>
-      [bgSaturation, bgBrightness]         = [30, 96]
-      [textSaturation, textBrightness]     = [60, 40]
-      [strokeSaturation, strokeBrightness] = [70, 70]
+      if ENV.CALENDAR.SHOW_AGENDA
+        colors = colorSlicer.getColors(@contextCodes.length)
+        html = for contextCode, index in @contextCodes
+          color = colors[index]
+          ".group_#{contextCode}{
+             color: #{color};
+             border-color: #{color};
+             background-color: #{color};
+          }"
+      else
+        [bgSaturation, bgBrightness]         = [30, 96]
+        [textSaturation, textBrightness]     = [60, 40]
+        [strokeSaturation, strokeBrightness] = [70, 70]
 
-      html = for contextCode, index in @contextCodes
-        hue = hues[index % hues.length]
-        ".group_#{contextCode}{
-           color: #{cssColor hue, textSaturation, textBrightness};
-           border-color: #{cssColor hue, strokeSaturation, strokeBrightness};
-           background-color: #{cssColor hue, bgSaturation, bgBrightness};
-        }"
+        html = for contextCode, index in @contextCodes
+          hue = hues[index % hues.length]
+          ".group_#{contextCode}{
+            color: #{cssColor hue, textSaturation, textBrightness};
+            border-color: #{cssColor hue, strokeSaturation, strokeBrightness};
+            background-color: #{cssColor hue, bgSaturation, bgBrightness};
+          }"
+
       $styleContainer.html "<style>#{html.join('')}</style>"
 
     dataFromDocumentHash: () =>

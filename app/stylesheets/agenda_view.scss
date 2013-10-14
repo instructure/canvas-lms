@@ -90,3 +90,37 @@
     }
   }
 }
+
+#calendar-app {
+  .fc-content {
+    background: none;
+    tbody {
+      background-color: white;
+    }
+  }
+
+  .fc-view-month .fc-widget-header {
+      background: none;
+      text-transform: uppercase;
+      border-left: none;
+      border-right: none;
+  }
+
+  .fc-other-month {
+    background: none;
+  }
+
+  .fc-state-highlight {
+    background-color: #fef6e8;
+    box-shadow: none;
+  }
+
+  .fc-event {
+    background-color: white;
+    font-weight: bold;
+  }
+
+  .fc-grid .fc-day-number {
+    padding: 1px 4px;
+  }
+}
