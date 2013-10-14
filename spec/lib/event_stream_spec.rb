@@ -20,7 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe EventStream do
   before do
-    @database_name = stub(:to_s => stub('database_name'))
+    @database_name = 'test_db'
     @database = stub('database')
     def @database.batch; yield; end
     def @database.update_record(*args); end
@@ -285,6 +285,22 @@ describe EventStream do
       it "should skip the fetch if no ids were given" do
         @database.expects(:execute).never
         @stream.fetch([])
+      end
+
+      it "should use the configured consistency level" do
+        @database.expects(:execute).once.with(Not(regexp_matches(/ USING CONSISTENCY /)), anything).returns(@results)
+        @stream.fetch([1])
+
+        # specific db name gets priority
+        Setting.set("event_stream.read_consistency.#{@database_name}", "ALL")
+        Setting.set("event_stream.read_consistency", "LOCAL_QUORUM")
+        @database.expects(:execute).once.with(regexp_matches(/ USING CONSISTENCY ALL /), anything).returns(@results)
+        @stream.fetch([1])
+
+        # falls back to default
+        Setting.remove("event_stream.read_consistency.#{@database_name}")
+        @database.expects(:execute).once.with(regexp_matches(/ USING CONSISTENCY LOCAL_QUORUM /), anything).returns(@results)
+        @stream.fetch([1])
       end
     end
 
