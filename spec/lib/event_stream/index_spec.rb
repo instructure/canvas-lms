@@ -29,7 +29,8 @@ describe EventStream::Index do
       :database => @database,
       :available? => true,
       :record_type => EventStream::Record,
-      :ttl_seconds => 1.year)
+      :ttl_seconds => 1.year,
+      :read_consistency_clause => nil)
   end
 
   context "setup block" do
