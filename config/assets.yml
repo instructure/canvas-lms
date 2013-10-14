@@ -15,6 +15,8 @@ css_compressor: 'sass'
 javascripts:
 
 stylesheets:
+  course_show: 
+    - public/stylesheets/compiled/course_show.css
   content_migrations: 
     - public/stylesheets/compiled/content_migrations.css
   vendor:
