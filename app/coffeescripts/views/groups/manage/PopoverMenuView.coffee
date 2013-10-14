@@ -48,6 +48,7 @@ define [
     hide: =>
       @hideTimeout = setTimeout =>
         @$el.detach()
+      , 100
 
     checkEsc: (e) ->
       @hide() if e.keyCode is 27 # escape
