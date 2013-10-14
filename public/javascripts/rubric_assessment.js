@@ -59,16 +59,17 @@ window.rubricAssessment = {
           }
         }
       })
-      .delegate('.criterion_comments', 'click', function(event) {
+      .delegate('.criterion_comments_link', 'click', function(event) {
         event.preventDefault();
-        event.preventDefault();
-        var $criterion = $(this).parents(".criterion"),
-            comments = $criterion.getTemplateData({textValues: ['custom_rating']}).custom_rating,
-            editing = $(this).closest('td').children('.editing').is(':visible'),
-            data = {
-              criterion_comments: comments,
-              criterion_description: $criterion.find(".description:first").text()
-            };
+        var $rubric_criterion_comments_link = $(this);
+        var $criterion = $(this).parents(".criterion");
+        var comments = $criterion.getTemplateData({textValues: ['custom_rating']}).custom_rating;
+        var editing = $(this).closest('td').children('.editing').is(':visible');
+        var data = {
+          criterion_comments: comments,
+          criterion_description: $criterion.find(".description:first").text()
+        };
+
         $rubric_criterion_comments_dialog.data('current_rating', $criterion);
         $rubric_criterion_comments_dialog.fillTemplateData({data: data});
         $rubric_criterion_comments_dialog.fillFormData(data);
@@ -76,8 +77,12 @@ window.rubricAssessment = {
         $rubric_criterion_comments_dialog.find(".displaying").showIf(!editing);
         $rubric_criterion_comments_dialog.dialog({
           title: I18n.t('titles.additional_comments', "Additional Comments"),
-          width: 400
+          width: 400,
+          close: function() {
+            $rubric_criterion_comments_link.focus();
+          }
         });
+        $rubric_criterion_comments_dialog.find("textarea.criterion_comments").focus();
       })
       // cant use a .delegate because up above when we delegate '.rating' 'click' it calls .change() and that doesnt bubble right so it doesen't get caught
       .find(".criterion_points").bind('keypress change blur', function(event) {
@@ -110,12 +115,13 @@ window.rubricAssessment = {
 
     $(".rubric_summary").delegate(".rating_comments_dialog_link", 'click', function(event) {
       event.preventDefault();
-      var $criterion = $(this).parents(".criterion"),
-          comments = $criterion.getTemplateData({textValues: ['rating_custom']}).rating_custom,
-          data = {
-            criterion_comments: comments,
-            criterion_description: $criterion.find(".description_title:first").text()
-          };
+      var $rubric_rating_comments_link = $(this);
+      var $criterion = $(this).parents(".criterion");
+      var comments = $criterion.getTemplateData({textValues: ['rating_custom']}).rating_custom;
+      var data = {
+        criterion_comments: comments,
+        criterion_description: $criterion.find(".description_title:first").text()
+      };
 
       $rubric_criterion_comments_dialog.data('current_rating', $criterion);
       $rubric_criterion_comments_dialog.fillTemplateData({data: data});
@@ -124,11 +130,13 @@ window.rubricAssessment = {
       $rubric_criterion_comments_dialog.find(".displaying").show();
       $rubric_criterion_comments_dialog.dialog({
         title: I18n.t('titles.additional_comments', "Additional Comments"),
-        width: 400
+        width: 400,
+        close: function() {
+          $rubric_rating_comments_link.focus();
+        }
       });
+      $rubric_criterion_comments_dialog.find(".criterion_description").focus();
     });
-
-
 
     $rubric_criterion_comments_dialog.find(".save_button").click(function(event) { 
       var comments   = $rubric_criterion_comments_dialog.find("textarea.criterion_comments").val(),

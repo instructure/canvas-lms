@@ -293,7 +293,7 @@ define([
     },
     addRubric: function() {
       var $rubric = $("#default_rubric").clone(true).attr('id', 'rubric_new').addClass('editing');
-      $rubric.find("#edit_rubric").remove();
+      $rubric.find(".edit_rubric").remove();
       var $tr = $("#edit_rubric").clone(true).show().removeAttr('id').addClass('edit_rubric');
       var $form = $tr.find("#edit_rubric_form");
       $rubric.find('.rubric_table').append($tr);
@@ -312,7 +312,7 @@ define([
       rubricEditing.isEditing = true;
 
       $rubric = $original_rubric.clone(true).addClass('editing');
-      $rubric.find("#edit_rubric").remove();
+      $rubric.find(".edit_rubric").remove();
 
       data = $rubric.getTemplateData({textValues: ['use_for_grading', 'free_form_criterion_comments', 'hide_score_total']});
       $original_rubric.hide().after($rubric.show());
