@@ -82,4 +82,14 @@ class DeveloperKey < ActiveRecord::Base
   rescue URI::InvalidURIError
     return false
   end
+
+  # for now, only one AWS account for SNS is supported
+  def self.sns
+    if !defined?(@sns)
+      settings = Setting.from_config('sns')
+      @sns = nil
+      @sns = AWS::SNS.new(settings) if settings
+    end
+    @sns
+  end
 end

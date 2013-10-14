@@ -30,12 +30,14 @@ class CommunicationChannel < ActiveRecord::Base
   belongs_to :user
   has_many :notification_policies, :dependent => :destroy
   has_many :messages
+  belongs_to :access_token
 
   before_save :consider_retiring, :assert_path_type, :set_confirmation_code
   before_save :consider_building_pseudonym
   validates_presence_of :path, :path_type, :user, :workflow_state
   validate :uniqueness_of_path
   validate :not_otp_communication_channel, :if => lambda { |cc| cc.path_type == TYPE_SMS && cc.retired? && !cc.new_record? }
+  validates_presence_of :access_token_id, if: lambda { |cc| cc.path_type == TYPE_PUSH }
 
   acts_as_list :scope => :user_id
 
@@ -50,6 +52,7 @@ class CommunicationChannel < ActiveRecord::Base
   TYPE_CHAT     = 'chat'
   TYPE_TWITTER  = 'twitter'
   TYPE_FACEBOOK = 'facebook'
+  TYPE_PUSH     = 'push'
 
   RETIRE_THRESHOLD = 5
 
@@ -162,6 +165,8 @@ class CommunicationChannel < ActiveRecord::Base
       res = self.user.user_services.for_service(TYPE_TWITTER).first.service_user_name rescue nil
       res ||= t :default_twitter_handle, 'Twitter Handle'
       res
+    elsif self.path_type == TYPE_PUSH
+      access_token.purpose ? "#{access_token.purpose} (#{access_token.developer_key.name})" : access_token.developer_key.name
     else
       self.path
     end
@@ -326,7 +331,7 @@ class CommunicationChannel < ActiveRecord::Base
   # This is setup as a default in the database, but this overcomes misspellings.
   def assert_path_type
     pt = self.path_type
-    self.path_type = TYPE_EMAIL unless pt == TYPE_EMAIL or pt == TYPE_SMS or pt == TYPE_CHAT or pt == TYPE_FACEBOOK or pt == TYPE_TWITTER
+    self.path_type = TYPE_EMAIL unless pt == TYPE_EMAIL or pt == TYPE_SMS or pt == TYPE_CHAT or pt == TYPE_FACEBOOK or pt == TYPE_TWITTER or pt == TYPE_PUSH
     true
   end
   protected :assert_path_type
@@ -356,4 +361,28 @@ class CommunicationChannel < ActiveRecord::Base
   def has_merge_candidates?
     !merge_candidates(true).empty?
   end
+
+    def self.create_push(access_token, device_token)
+      (scope(:find, :shard) || Shard.current).activate do
+        connection.transaction do
+          cc = new
+          cc.path_type = CommunicationChannel::TYPE_PUSH
+          cc.path = device_token
+          cc.access_token = access_token
+          cc.workflow_state = 'active'
+
+          # save first, so we can put the global id in it
+          cc.save!
+          response = DeveloperKey.sns.client.create_platform_endpoint(
+              platform_application_arn: access_token.developer_key.sns_arn,
+              token: device_token,
+              custom_user_data: cc.global_id.to_s
+          )
+
+          cc.internal_path = response.data[:endpoint_arn]
+          cc.save!
+          cc
+        end
+      end
+    end
 end

@@ -23,7 +23,7 @@ else
   gem 'authlogic', '3.2.0'
 end
 
-gem "aws-sdk", '1.8.3.1'
+gem "aws-sdk", '1.21.0'
 gem 'barby', '0.5.0'
 gem 'bcrypt-ruby', '3.0.1'
 gem 'builder', '3.0.0'
