@@ -113,10 +113,21 @@ class EventStream
   end
 
   def fetch_cql
-    "SELECT * FROM #{table} WHERE #{id_column} IN (?)"
+    "SELECT * FROM #{table} #{read_consistency_clause}WHERE #{id_column} IN (?)"
+  end
+
+  def read_consistency_clause
+    if read_consistency_level
+      "USING CONSISTENCY #{read_consistency_level} "
+    end
   end
 
   private
+
+  def read_consistency_level
+    Setting.get("event_stream.read_consistency.#{database_name}", nil) ||
+      Setting.get("event_stream.read_consistency", nil)
+  end
 
   def callbacks_for(operation)
     @callbacks ||= {}

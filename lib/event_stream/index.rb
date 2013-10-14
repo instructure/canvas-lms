@@ -97,7 +97,7 @@ class EventStream::Index
   end
 
   def select_cql
-    "SELECT ordered_id, #{id_column} FROM #{table} WHERE #{key_column} = ?"
+    "SELECT ordered_id, #{id_column} FROM #{table} #{event_stream.read_consistency_clause}WHERE #{key_column} = ?"
   end
 
   def insert_cql
