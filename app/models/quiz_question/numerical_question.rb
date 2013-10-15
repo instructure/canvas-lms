@@ -38,8 +38,9 @@ class QuizQuestion::NumericalQuestion < QuizQuestion::Base
 
         # calculate margin value using percentage
         if answer[:margin].to_s.ends_with?("%")
-          answer[:margin] = answer[:margin].to_f / 100.0 * val
+          answer[:margin] = (answer[:margin].to_f / 100.0 * val).abs
         end
+
         margin = BigDecimal.new(answer[:margin].to_s)
         min = val - margin
         max = val + margin
