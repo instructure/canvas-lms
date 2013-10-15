@@ -10,9 +10,9 @@ define ['i18n!dates'], (I18n) ->
 
     startAt = $.parseFromISO startISO
     endAt = $.parseFromISO endISO
-    startDay = $.dateString(startAt.date)
+    startDay = startAt.date_formatted
     if startAt.timestamp != endAt.timestamp
-      endDay = $.dateString(endAt.date)
+      endDay = endAt.date_formatted
       # TODO: i18n
       if startDay != endDay
         """
