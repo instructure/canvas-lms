@@ -502,6 +502,66 @@ describe "calendar2" do
           lambda { f('.fc-event') }.should_not raise_error
         end
       end
+
+      context "time zone" do
+        before do
+          @user.time_zone = 'America/Denver'
+          @user.save!
+        end
+
+        it "should display popup with correct day on an event" do
+          local_now = @user.time_zone.now
+          event_start = @user.time_zone.local(local_now.year, local_now.month, 15, 23, 0, 0)
+          make_event(:start => event_start)
+          get "/calendar2"
+          wait_for_ajaximations
+          f('.fc-event').click
+          f('.event-details-timestring').text.should include event_start.strftime("%b %e")
+        end
+
+        it "should display popup with correct day on an assignment" do
+          local_now = @user.time_zone.now
+          event_start = @user.time_zone.local(local_now.year, local_now.month, 15, 23, 0, 0)
+          @course.assignments.create!(
+            title: 'test assignment',
+            due_at: event_start,
+            )
+          get "/calendar2"
+          wait_for_ajaximations
+          f('.fc-event').click
+          f('.event-details-timestring').text.should include event_start.strftime("%b %e")
+        end
+
+        it "should display popup with correct day on an assignment override" do
+          @student = course_with_student_logged_in.user
+          @student.time_zone = 'America/Denver'
+          @student.save!
+
+          local_now = @user.time_zone.now
+          assignment_start = @user.time_zone.local(local_now.year, local_now.month, 15, 23, 0, 0)
+          assignment = @course.assignments.create!(title: 'test assignment', due_at: assignment_start)
+
+          override_start = @user.time_zone.local(local_now.year, local_now.month, 20, 23, 0, 0)
+          override = assignment.assignment_overrides.create! do |o|
+            o.title = 'test override'
+            o.set_type = 'ADHOC'
+            o.due_at = override_start
+            o.due_at_overridden = true
+          end
+          override.assignment_override_students.create! do |link|
+            link.user = @student
+            link.assignment_override = override
+          end
+
+          get "/calendar2"
+          wait_for_ajaximations
+          f('.fc-event').click
+          f('.event-details-timestring').text.should include override_start.strftime("%b %e")
+        end
+
+
+      end
+
     end
 
     context "week view" do
