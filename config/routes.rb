@@ -323,6 +323,7 @@ FakeRails3Routes.draw do
           put :backup
         end
         member do
+          get :record_answer
           post :record_answer
         end
       end

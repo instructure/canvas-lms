@@ -89,7 +89,8 @@ class QuizSubmissionsController < ApplicationController
       end
 
       if @quiz.ip_filter && !@quiz.valid_ip?(request.remote_ip)
-      elsif is_previewing? || (@submission && @submission.temporary_user_code == temporary_user_code(false)) || (@submission && @submission.grants_right?(@current_user, session, :update))
+      elsif is_previewing? || (@submission && @submission.temporary_user_code == temporary_user_code(false)) ||
+                              (@submission && @submission.grants_right?(@current_user, session, :update))
         if !@submission.completed? && !@submission.overdue?
           if params[:action] == 'record_answer'
             if last_question = params[:last_question_id]
@@ -108,6 +109,7 @@ class QuizSubmissionsController < ApplicationController
           end
         end
       end
+
       render :json => {:backup => false,
                        :end_at => @submission && @submission.end_at,
                        :time_left => @submission && @submission.time_left}
@@ -115,7 +117,14 @@ class QuizSubmissionsController < ApplicationController
   end
 
   def record_answer
-    backup
+    # temporary fix for CNVS-8651 while we rewrite front-end quizzes
+    if request.get?
+      @quiz = @context.quizzes.find(params[:quiz_id])
+      user_id = @current_user && @current_user.id
+      redirect_to polymorphic_url([@context, @quiz, :take], :user_id => user_id)
+    else
+      backup
+    end
   end
 
   def extensions

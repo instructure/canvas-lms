@@ -68,6 +68,12 @@ describe QuizSubmissionsController do
       backup_answer_1
       @qs.reload.submission_data[:question_1].should == 'blah_overridden'
     end
+
+    it "should redirect back to take quiz if the user loses connection" do
+      get "/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions/#{@qs.id}/record_answer",
+         :question_1 => 'blah', :last_question_id => 1, :validation_token => @qs.validation_token
+      response.should be_redirect
+    end
   end
 
   def submit_quiz
