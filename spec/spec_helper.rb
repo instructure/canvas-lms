@@ -357,7 +357,8 @@ Spec::Runner.configure do |config|
     password = opts[:password] || "asdfasdf"
     password = nil if password == :autogenerate
     account = opts[:account] || Account.default
-    @pseudonym = account.pseudonyms.create!(:user => user, :unique_id => username, :password => password, :password_confirmation => password)
+    @pseudonym = account.pseudonyms.build(:user => user, :unique_id => username, :password => password, :password_confirmation => password)
+    @pseudonym.save_without_session_maintenance
     @pseudonym.communication_channel = communication_channel(user, opts)
     @pseudonym
   end
