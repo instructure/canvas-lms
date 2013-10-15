@@ -28,7 +28,7 @@ describe EmberBundle do
   describe '#initialize' do
     it 'creates an array of files to require' do
       @bundle.paths.should == [
-        "Ember",
+        "ember",
         "compiled/ember/inbox/config/app",
         "compiled/ember/inbox/config/routes",
         "compiled/ember/inbox/models/conversation",
@@ -46,7 +46,7 @@ describe EmberBundle do
 
     it 'matches the order of the require paths and objects' do
       @bundle.objects[0].should == "Ember"
-      @bundle.paths[0].should == "Ember"
+      @bundle.paths[0].should == "ember"
       @bundle.objects[1].should == "App"
       @bundle.paths[1].should == "compiled/ember/inbox/config/app"
       @bundle.objects[2].should == "routes"
@@ -64,12 +64,13 @@ describe EmberBundle do
     it "looks like this" do
       @bundle.build_output.should == <<-END
 # this is auto-generated
-define ["Ember", "compiled/ember/inbox/config/app", "compiled/ember/inbox/config/routes", "compiled/ember/inbox/models/conversation", "compiled/ember/inbox/routes/application_route", "compiled/ember/inbox/routes/conversation_route", "compiled/ember/inbox/templates/application", "compiled/ember/inbox/templates/conversation", "compiled/ember/inbox/templates/index"], (Ember, App, routes, Conversation, ApplicationRoute, ConversationRoute) ->
+define ["ember", "compiled/ember/inbox/config/app", "compiled/ember/inbox/config/routes", "compiled/ember/inbox/models/conversation", "compiled/ember/inbox/routes/application_route", "compiled/ember/inbox/routes/conversation_route", "compiled/ember/inbox/templates/application", "compiled/ember/inbox/templates/conversation", "compiled/ember/inbox/templates/index"], (Ember, App, routes, Conversation, ApplicationRoute, ConversationRoute) ->
 
-  App.reopen
+  App.reopen({
     Conversation: Conversation
     ApplicationRoute: ApplicationRoute
     ConversationRoute: ConversationRoute
+  })
 END
     end
   end

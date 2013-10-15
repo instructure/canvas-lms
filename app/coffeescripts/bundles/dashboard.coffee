@@ -21,7 +21,7 @@ require [
     el: document.body
 
     events:
-      'click .stream_header': 'expandDetails'
+      'click .stream_header': 'toggleDetails'
       'click .stream_header .links a': 'stopPropagation'
       'click .stream-details': 'handleDetailsClick'
       'beforeremove': 'updateCategoryCounts' # ujsLinks event
@@ -29,21 +29,72 @@ require [
     initialize: ->
       super
       # setup all 'Show More' links to reflect currently being collapsed.
-      $('.toggle-details').each (idx, elm) =>
-        @setShowMoreLink $(elm), false
+      $('.stream-category').each (idx, elm) =>
+        @setShowMoreLink $(elm)
 
-    expandDetails: (event) ->
+    toggleDetails: (event) ->
       header   = $(event.currentTarget)
       # since toggling, isExpanded is the opposite of the current DOM state
       isExpanded = not (header.attr('aria-expanded') == 'true')
       header.attr('aria-expanded', isExpanded)
       details  = header.next('.details_container')
       details.toggle(isExpanded)
+      # if expanded, focus first link in detail area
+      if isExpanded
+        details.find('a:first').focus()
       # Set the link contents. Second param for being currently expanded or collapsed
-      @setShowMoreLink header.find('.toggle-details'), isExpanded
+      @setShowMoreLink header.closest('.stream-category'), isExpanded
 
-    setShowMoreLink: ($link, isExpanded) ->
-      $link.html showMoreTemplate({expanded: isExpanded}) if $link
+    setShowMoreLink: ($category) ->
+      return unless $category
+      # determine if currently expanded
+      isExpanded = $category.find('.details_container').is(':visible')
+      # go up to stream-category to build the text to display
+      categoryName = $category.data('category')
+      count = parseInt($category.find('.count:first').text())
+      assistiveText = @getCategoryText(categoryName, count, !isExpanded)
+      $link = $category.find('.toggle-details')
+      $link.html showMoreTemplate({expanded: isExpanded, assistiveText: assistiveText})
+
+    getCategoryText: (category, count, forExpand) ->
+      if category == 'Announcement'
+        if forExpand
+          I18n.t("announcements_expand", {
+            one: "Expand %{count} announcement",
+            other: "Expand %{count} announcements"}, {count: count})
+        else
+          I18n.t("announcements_collapse", {
+            one: "Collapse %{count} announcement",
+            other: "Collapse %{count} announcements"}, {count: count})
+      else if category == 'Conversation'
+        if forExpand
+          I18n.t("conversations_expand", {
+            one: "Expand %{count} conversation message",
+            other: "Expand %{count} conversation messages"}, {count: count})
+        else
+          I18n.t("conversations_collapse", {
+            one: "Collapse %{count} conversation message",
+            other: "Collapse %{count} conversation messages"}, {count: count})
+      else if category == 'Assignment'
+        if forExpand
+          I18n.t("assignments_expand", {
+            one: "Expand %{count} assignment notification",
+            other: "Expand %{count} assignment notifications"}, {count: count})
+        else
+          I18n.t("assignments_collapse", {
+            one: "Collapse %{count} assignment notification",
+            other: "Collapse %{count} assignment notifications"}, {count: count})
+      else if category == 'DiscussionTopic'
+        if forExpand
+          I18n.t("discussions_expand", {
+            one: "Expand %{count} discussion",
+            other: "Expand %{count} discussions"}, {count: count})
+        else
+          I18n.t("discussions_collapse", {
+            one: "Collapse %{count} discussion",
+            other: "Collapse %{count} discussions"}, {count: count})
+      else
+        ''
 
     handleDetailsClick: (event) ->
       row = $(event.target).closest('tr')
@@ -58,6 +109,7 @@ require [
         parent.find('.count').text items.length
       else
         parent.remove()
+      @setShowMoreLink $(event.target).closest('.stream-category')
 
   new DashboardView
 

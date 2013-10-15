@@ -17,7 +17,7 @@
 #
 
 def assessment_question_model(opts={})
-  AssessmentQuestion.create!(valid_assessment_question_attributes.merge(opts))
+  opts.delete(:bank).assessment_questions.create!(valid_assessment_question_attributes.merge(opts))
 end
 
 def valid_assessment_question_attributes

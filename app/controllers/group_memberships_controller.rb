@@ -20,24 +20,24 @@
 #
 # Group memberships are the objects that tie users and groups together. 
 #
-# @object Group Membership
+# @object GroupMembership
 #     {
 #       // The id of the membership object
-#       id: 92
+#       "id": 92,
 #
 #       // The id of the group object to which the membership belongs
-#       group_id: 17
+#       "group_id": 17,
 #
 #       // The id of the user object to which the membership belongs
-#       user_id: 3
+#       "user_id": 3,
 #
 #       // The current state of the membership. Current possible values are
 #       // "accepted", "invited", and "requested"
-#       workflow_state: "accepted"
+#       "workflow_state": "accepted",
 #
 #       // Whether or not the user is a moderator of the group (the must also
 #       // be an active member of the group to moderate)
-#       moderator: true
+#       "moderator": true
 #     }
 #
 class GroupMembershipsController < ApplicationController
@@ -62,7 +62,7 @@ class GroupMembershipsController < ApplicationController
   #          -F 'filter_states[]=invited&filter_states[]=requested' \ 
   #          -H 'Authorization: Bearer <token>'
   #
-  # @returns [Group Membership]
+  # @returns [GroupMembership]
   def index
     if authorized_action(@group, @current_user, :read_roster)
       memberships_route = polymorphic_url([:api_v1, @group, :memberships])
@@ -92,7 +92,7 @@ class GroupMembershipsController < ApplicationController
   #          -F 'user_id=self'
   #          -H 'Authorization: Bearer <token>'
   #
-  # @returns Group Membership
+  # @returns GroupMembership
   def create
     @user = api_find(User, params[:user_id])
     if authorized_action(GroupMembership.new(:group => @group, :user => @user), @current_user, :create)
@@ -123,7 +123,7 @@ class GroupMembershipsController < ApplicationController
   #          -F 'moderator=true'
   #          -H 'Authorization: Bearer <token>'
   #
-  # @returns Group Membership
+  # @returns GroupMembership
   def update
     find_membership
     if authorized_action(@membership, @current_user, :update)

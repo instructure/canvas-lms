@@ -22,6 +22,7 @@ end
 
 def valid_rubric_attributes
   {
+    :context => Account.default,
     :title => "test rubric",
     :data => [{
       :description => "Some criterion",

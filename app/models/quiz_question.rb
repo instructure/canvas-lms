@@ -19,6 +19,8 @@
 require 'quiz_question_link_migrator'
 
 class QuizQuestion < ActiveRecord::Base
+  include Workflow
+
   attr_accessible :quiz, :quiz_group, :assessment_question, :question_data, :assessment_question_version
   attr_readonly :quiz_id
   belongs_to :quiz
@@ -31,11 +33,18 @@ class QuizQuestion < ActiveRecord::Base
   validates_presence_of :quiz_id
   serialize :question_data
   after_save :update_quiz
+
+  workflow do
+    state :active
+    state :deleted
+  end
+
+  scope :active, where("workflow_state='active' OR workflow_state IS NULL")
   
   def infer_defaults
     if !self.position && self.quiz
       if self.quiz_group
-        self.position = (self.quiz_group.quiz_questions.map(&:position).compact.max || 0) + 1
+        self.position = (self.quiz_group.quiz_questions.active.map(&:position).compact.max || 0) + 1
       else
         self.position = self.quiz.root_entries_max_position + 1
       end
@@ -178,6 +187,12 @@ class QuizQuestion < ActiveRecord::Base
         question.save
       end
     end
+  end
+
+  alias_method :destroy!, :destroy
+  def destroy
+    self.workflow_state = 'deleted'
+    self.save
   end
 
   private

@@ -21,7 +21,7 @@ class QuizQuestionsController < ApplicationController
 
   def show
     if authorized_action(@quiz, @current_user, :update)
-      @question = @quiz.quiz_questions.find(params[:id])
+      @question = @quiz.quiz_questions.active.find(params[:id])
       render :json => @question.to_json(:include => :assessment_question)
     end
   end
@@ -55,7 +55,7 @@ class QuizQuestionsController < ApplicationController
 
   def update
     if authorized_action(@quiz, @current_user, :update)
-      @question = @quiz.quiz_questions.find(params[:id])
+      @question = @quiz.quiz_questions.active.find(params[:id])
       question_data = params[:question]
       question_data[:regrade_user] = @current_user
       question_data ||= {}
@@ -64,7 +64,7 @@ class QuizQuestionsController < ApplicationController
         @group = @quiz.quiz_groups.find(question_data[:quiz_group_id])
         if question_data[:quiz_group_id] != @question.quiz_group_id
           @question.quiz_group_id = question_data[:quiz_group_id]
-          @question.position = @group.quiz_questions.length
+          @question.position = @group.quiz_questions.active.length
         end
       end
 
@@ -78,7 +78,7 @@ class QuizQuestionsController < ApplicationController
 
   def destroy
     if authorized_action(@quiz, @current_user, :update)
-      @question = @quiz.quiz_questions.find(params[:id])
+      @question = @quiz.quiz_questions.active.find(params[:id])
       @question.destroy
       render :json => @question.to_json
     end

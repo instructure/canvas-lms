@@ -103,6 +103,8 @@
     stop();
     require(<%= Dir["spec/javascripts/#{matcher}"].map{ |file| file.sub(/\.js$/, '') }.inspect %>, function() {
       // run specs once they've all loaded
+       <%= puts Dir["/mnt/hudson/workspace/canvas-plugins-aux/spec/javascripts/**/*Spec.js"].count %>
+       <%= Dir["spec/javascripts/#{matcher}"].each { |file| puts("File being required: #{file.to_s}") }  %>
       start();
     });
   </script>

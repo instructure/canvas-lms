@@ -540,7 +540,7 @@ Implemented for: Canvas LMS}]
     migration.update_migration_settings(settings)
     if itemType == 'qdb'
       # skip creating the quiz, just import the questions into the bank
-      migration.migration_ids_to_import = { :copy => { :quizzes => {} } }
+      migration.migration_ids_to_import = { :copy => { :all_quizzes => false, :all_assessment_question_banks => true} }
     end
     migration.save!
 

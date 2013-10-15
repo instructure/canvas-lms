@@ -179,6 +179,7 @@ class ConversationParticipant < ActiveRecord::Base
 
   attr_accessible :subscribed, :starred, :workflow_state, :user
 
+  validates_presence_of :conversation_id, :user_id, :workflow_state
   validates_inclusion_of :label, :in => ['starred'], :allow_nil => true
 
   def as_json(options = {})
@@ -240,7 +241,7 @@ class ConversationParticipant < ActiveRecord::Base
           |m| m.submission.submission_comments.map(&:author_id) if m.submission
         }.compact.flatten
       user_ids -= participants.map(&:id)
-      participants += MessageableUser.available.where(:id => user_ids).all
+      participants += Shackles.activate(:slave) { MessageableUser.available.where(:id => user_ids).all }
     end
     return participants unless options[:include_participant_contexts]
 

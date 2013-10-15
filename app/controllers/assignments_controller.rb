@@ -32,7 +32,7 @@ class AssignmentsController < ApplicationController
   before_filter :normalize_title_param, :only => [:new, :edit]
 
   def index
-    return old_index if @context == @current_user || !@domain_root_account.enable_draft?
+    return old_index if @context == @current_user || !@context.draft_state_enabled?
 
     if authorized_action(@context, @current_user, :read)
       return unless tab_enabled?(@context.class::TAB_ASSIGNMENTS)
@@ -43,6 +43,8 @@ class AssignmentsController < ApplicationController
         :URLS => {
           :new_assignment_url => new_polymorphic_url([@context, :assignment]),
           :course_url => api_v1_course_url(@context),
+          :sort_url => reorder_course_assignment_groups_url,
+          :assignment_sort_base_url => course_assignment_groups_url
         },
         :PERMISSIONS => permissions,
         :MODULES => get_module_names
@@ -100,7 +102,12 @@ class AssignmentsController < ApplicationController
     if authorized_action(@assignment, @current_user, :read)
       @assignment = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @current_user)
       @assignment.ensure_assignment_group
-      js_env :ROOT_OUTCOME_GROUP => outcome_group_json(@context.root_outcome_group, @current_user, session)
+      js_env({
+        :ROOT_OUTCOME_GROUP => outcome_group_json(@context.root_outcome_group, @current_user, session),
+        :DRAFT_STATE => @context.draft_state_enabled?,
+        :COURSE_ID => @context.id,
+        :ASSIGNMENT_ID => @assignment.id
+      })
 
       @locked = @assignment.locked_for?(@current_user, :check_policies => true, :deep_check_if_needed => true)
       @locked.delete(:lock_at) if @locked.is_a?(Hash) && @locked.has_key?(:unlock_at) # removed to allow proper translation on show page
@@ -313,7 +320,7 @@ class AssignmentsController < ApplicationController
   
   def new
     @assignment ||= @context.assignments.new
-    @assignment.workflow_state = 'unpublished' if @context.root_account.enable_draft?
+    @assignment.workflow_state = 'unpublished' if @context.draft_state_enabled?
     add_crumb t :create_new_crumb, "Create new"
 
     if params[:submission_types] == 'online_quiz'
@@ -324,7 +331,7 @@ class AssignmentsController < ApplicationController
       edit
     end
   end
-  
+
   def edit
     @assignment ||= @context.assignments.active.find(params[:id])
     if authorized_action(@assignment, @current_user, @assignment.new_record? ? :create : :update)

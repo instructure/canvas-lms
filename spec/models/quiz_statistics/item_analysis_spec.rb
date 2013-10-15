@@ -23,7 +23,7 @@ describe QuizStatistics::ItemAnalysis do
   end
 
   it "should generate a csv" do
-    qs = @quiz.quiz_questions
+    qs = @quiz.active_quiz_questions
     csv = @quiz_statistics.csv_attachment.open.read
     stats = CSV.parse(csv)
     stats[0].should == ["Question Id" , "Question Title" , "Answered Student Count" , "Top Student Count" , "Middle Student Count" , "Bottom Student Count" , "Quiz Question Count" , "Correct Student Count" , "Wrong Student Count" , "Correct Student Ratio" , "Wrong Student Ratio" , "Correct Top Student Count" , "Correct Middle Student Count" , "Correct Bottom Student Count" , "Variance"            , "Standard Deviation"  , "Difficulty Index"   , "Alpha"              , "Point Biserial of Correct" , "Point Biserial of Distractor 2" , "Point Biserial of Distractor 3" , "Point Biserial of Distractor 4"]

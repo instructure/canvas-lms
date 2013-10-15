@@ -23,6 +23,8 @@ class AccountReport < ActiveRecord::Base
   belongs_to :user
   belongs_to :attachment
 
+  validates_presence_of :account_id, :user_id, :workflow_state
+
   serialize :parameters
 
   workflow do

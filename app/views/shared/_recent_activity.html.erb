@@ -12,7 +12,7 @@
   <% items = categorized_items[category] %> 
   <% category_class = category.underscore %> 
   <% if items.present? %>
-    <li class="stream-<%= category_class %>">
+    <li class="stream-category stream-<%= category_class %>" data-category="<%= category %>">
       <div class="stream_header">
         <div class="image-block">
           <div class=image-block-image>

@@ -216,7 +216,7 @@ module Canvas::Migration::Helpers
             elsif type == 'discussion_topics'
               count = source.discussion_topics.active.only_discussion_topics.count
             elsif source.respond_to?(type) && source.send(type).respond_to?(:count)
-              scope = source.send(type)
+              scope = source.send(type).except(:includes)
               if scope.respond_to?(:not_deleted)
                 scope = scope.not_deleted
               elsif scope.respond_to?(:active)

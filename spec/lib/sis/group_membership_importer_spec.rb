@@ -5,9 +5,9 @@ module SIS
   describe GroupMembershipImporter do
 
     def create_group(opts = {})
-      group = Group.create!(opts)
+      group = Group.new(opts)
       group.sis_source_id = "54321"
-      group.account = Account.default
+      group.context = Account.default
       group.save!
       group
     end
@@ -39,7 +39,7 @@ module SIS
         group_category.self_signup = 'restricted'
         group_category.save!
 
-        create_group(:group_category => group_category)
+        group = create_group(:group_category => group_category)
         
         importer = GroupMembershipImporter.new(Account.default, {})
         lambda do

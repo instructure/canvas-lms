@@ -20,12 +20,14 @@ class AbstractCourse < ActiveRecord::Base
 
   include Workflow
 
-  attr_accessible :name, :account, :short_name, :enrollment_term
+  attr_accessible :name, :account, :short_name, :enrollment_term, :root_account
   
   belongs_to :root_account, :class_name => 'Account'
   belongs_to :account
   belongs_to :enrollment_term
   has_many :courses
+
+  validates_presence_of :account_id, :root_account_id, :enrollment_term_id, :workflow_state
 
   workflow do
     state :active

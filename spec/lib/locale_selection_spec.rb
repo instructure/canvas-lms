@@ -82,6 +82,8 @@ describe LocaleSelection do
       ls.infer_browser_locale("pt-BR, *;q=0.9, pt;q=0", ['pt']).should be_nil
       # no pt variants supported, so we get the first alternative
       ls.infer_browser_locale("pt-BR, pt;q=0.9, *;q=0.8", ['es', 'fr']).should eql('es')
+      # equal matches sort by position before alphabetical
+      ls.infer_browser_locale("en, *", ['ar', 'en']).should eql('en')
     end
   end
 

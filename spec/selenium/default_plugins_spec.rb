@@ -16,7 +16,7 @@ describe "default plugins" do
     get "/plugins/twitter"
 
     f("#plugin_setting_disabled").click
-
+    wait_for_ajaximations
     f("#settings_api_key").send_keys("asdf")
     f("#settings_secret_key").send_keys("asdf")
     submit_form('#new_plugin_setting')
@@ -44,7 +44,7 @@ describe "default plugins" do
     get "/plugins/etherpad"
 
     f("#plugin_setting_disabled").click
-
+    wait_for_ajaximations
     f("#settings_domain").send_keys("asdf")
     submit_form('#new_plugin_setting')
 
@@ -70,7 +70,7 @@ describe "default plugins" do
     get "/plugins/google_docs"
 
     f("#plugin_setting_disabled").click
-
+    wait_for_ajaximations
     f("#settings_api_key").send_keys("asdf")
     f("#settings_secret_key").send_keys("asdf")
     submit_form('#new_plugin_setting')
@@ -97,7 +97,7 @@ describe "default plugins" do
     get "/plugins/linked_in"
 
     f("#plugin_setting_disabled").click
-
+    wait_for_ajaximations
     f("#settings_api_key").send_keys("asdf")
     f("#settings_secret_key").send_keys("asdf")
     submit_form('#new_plugin_setting')
@@ -153,7 +153,7 @@ describe "default plugins" do
     get "/plugins/tinychat"
 
     f("#plugin_setting_disabled").click
-
+    wait_for_ajaximations
     f("#settings_api_key").send_keys("asdf")
     f("#settings_secret_key").send_keys("asdf")
     submit_form('#new_plugin_setting')

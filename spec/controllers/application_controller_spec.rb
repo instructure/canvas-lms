@@ -201,7 +201,7 @@ describe ApplicationController do
         course_with_teacher_logged_in
         @page = @course.wiki.wiki_pages.build(:title => 'Front Page', :url => 'front-page')
 
-        @stub_draft_state_enabled = @course.stubs(:draft_state_enabled?)
+        @stub_draft_state_enabled = Course.any_instance.stubs(:draft_state_enabled?)
 
         @controller.instance_variable_set(:@domain_root_account, @domain_root_account)
         @controller.instance_variable_set(:@current_user, @teacher)
@@ -234,15 +234,6 @@ describe ApplicationController do
           @page.should be_deleted
 
           @page.expects(:workflow_state=).with('active')
-          @controller.send :initialize_wiki_page
-        end
-
-        it 'should not initialize an unpublished page' do
-          @page.workflow_state = 'unpublished'
-          @page.save!
-          @page.should be_unpublished
-
-          @page.expects(:workflow_state=).never
           @controller.send :initialize_wiki_page
         end
 
@@ -302,7 +293,7 @@ describe ApplicationController do
         group_with_user_logged_in
         @page = @group.wiki.wiki_pages.build(:title => 'Front Page', :url => 'front-page')
 
-        @stub_draft_state_enabled = @group.stubs(:draft_state_enabled?)
+        @stub_draft_state_enabled = Group.any_instance.stubs(:draft_state_enabled?)
 
         @controller.instance_variable_set(:@current_user, @user)
         @controller.instance_variable_set(:@context, @group)
@@ -334,15 +325,6 @@ describe ApplicationController do
           @page.should be_deleted
 
           @page.expects(:workflow_state=).with('active')
-          @controller.send :initialize_wiki_page
-        end
-
-        it 'should not initialize an unpublished page' do
-          @page.workflow_state = 'unpublished'
-          @page.save!
-          @page.should be_unpublished
-
-          @page.expects(:workflow_state=).never
           @controller.send :initialize_wiki_page
         end
 

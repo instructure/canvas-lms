@@ -163,4 +163,38 @@ describe DiscussionTopicPresenter do
     end
   end
 
+  describe "#allows_speed_grader?" do
+
+    it "returns false when course is large roster" do
+      topic.context = Course.new(name: 'Canvas')
+      topic.context.large_roster = true
+      presenter.allows_speed_grader?.should == false
+    end
+
+    context "draft state" do
+
+      before do
+        course = topic.context = Course.create!(name: 'Canvas')
+        course.root_account.enable_draft!
+        assignment.context = course
+        assignment.save!
+        topic.assignment = assignment
+      end
+
+      it "returns false when draft state enabled and assignment unpublished" do
+        assignment.unpublish
+        presenter.allows_speed_grader?.should == false
+      end
+
+      it "returns true when draft state enabled and assignment published" do
+        presenter.allows_speed_grader?.should == true
+      end
+
+      it "returns true when draft state disabled" do
+        topic.context.root_account.disable_draft!
+        presenter.allows_speed_grader?.should == true
+      end
+    end
+  end
+
 end

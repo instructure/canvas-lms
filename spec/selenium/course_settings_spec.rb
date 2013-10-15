@@ -10,6 +10,7 @@ describe "course settings" do
 
   it "should show unused tabs to teachers" do
     get "/courses/#{@course.id}/settings"
+    wait_for_ajaximations
     ff("#section-tabs .section.section-tab-hidden").count.should > 0
   end
 
@@ -19,6 +20,7 @@ describe "course settings" do
       get "/courses/#{@course.id}/settings"
 
       f('.edit_course_link').click
+      wait_for_ajaximations
       f('.grading_standard_checkbox').click unless is_checked('.grading_standard_checkbox')
       f('.edit_letter_grades_link').click
       f('.find_grading_standard_link').click

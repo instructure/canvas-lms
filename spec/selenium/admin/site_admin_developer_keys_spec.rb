@@ -35,11 +35,11 @@ describe "managing developer keys" do
 
     f("#keys tbody tr.key .edit_link").click
     f("#edit_dialog").should be_displayed
-    f("#key_name").send_keys([:backspace] * 20, [:delete] * 20, "Cooler Tool")
-    f("#email").send_keys([:backspace] * 20, [:delete] * 20, "admins@example.com")
-    f("#tool_id").send_keys([:backspace] * 20, [:delete] * 20, "cooler_tool")
-    f("#redirect_uri").send_keys([:backspace] * 20, [:delete] * 20, "https://example.com")
-    f("#icon_url").send_keys([:backspace] * 20, [:delete] * 20, "/images/add.png")
+    replace_content(f("#key_name"),"Cooler Tool")
+    replace_content(f("#email"), "admins@example.com")
+    replace_content(f("#tool_id"), "cooler_tool")
+    replace_content(f("#redirect_uri"), "https://example.com")
+    replace_content(f("#icon_url") ,"/images/add.png")
     submit_dialog("#edit_dialog", '.submit')
     wait_for_ajaximations
 

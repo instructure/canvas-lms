@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/messages_helper')
 describe 'collaboration_invitation.sms' do
   it "should render" do
     course_with_student
-    @collaboration = @course.collaborations.create!
+    @collaboration = @course.collaborations.create!(:user => @user, :title => "my collab")
     @object = @collaboration.collaborators.create!(:user => @user)
     @object.collaboration.should_not be_nil
     @object.collaboration.context.should_not be_nil

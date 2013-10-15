@@ -23,7 +23,7 @@ class StreamItemInstance < ActiveRecord::Base
   belongs_to :stream_item
   belongs_to :context, :polymorphic => true
 
-  validates_presence_of :stream_item_id
+  validates_presence_of :stream_item_id, :user_id, :context_id, :context_type
 
   attr_accessible :user, :stream_item, :context
 

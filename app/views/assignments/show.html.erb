@@ -24,7 +24,7 @@
         </h2>
       </div>
       <div class='edit-content'>
-        <% if @domain_root_account.enable_draft? %>
+        <% if @context.draft_state_enabled? %>
           <button
             id="assignment_publish_button"
             data-id='<%= @assignment.id %>'

@@ -21,25 +21,25 @@
 #
 # @object Folder
 #     {
-#       "context_type":"Course",
-#       "context_id":1401,
-#       "files_count":0,
-#       "position":3,
-#       "updated_at":"2012-07-06T14:58:50Z",
-#       "folders_url":"https://www.example.com/api/v1/folders/2937/folders",
-#       "files_url":"https://www.example.com/api/v1/folders/2937/files",
-#       "full_name":"course files/11folder",
-#       "lock_at":null,
-#       "id":2937,
-#       "folders_count":0,
-#       "name":"11folder",
-#       "parent_folder_id":2934,
-#       "created_at":"2012-07-06T14:58:50Z",
-#       "unlock_at":null
-#       "hidden":null
-#       "hidden_for_user":false,
-#       "locked":true,
-#       "locked_for_user":false
+#       "context_type": "Course",
+#       "context_id": 1401,
+#       "files_count": 0,
+#       "position": 3,
+#       "updated_at": "2012-07-06T14:58:50Z",
+#       "folders_url": "https://www.example.com/api/v1/folders/2937/folders",
+#       "files_url": "https://www.example.com/api/v1/folders/2937/files",
+#       "full_name": "course files/11folder",
+#       "lock_at": null,
+#       "id": 2937,
+#       "folders_count": 0,
+#       "name": "11folder",
+#       "parent_folder_id": 2934,
+#       "created_at": "2012-07-06T14:58:50Z",
+#       "unlock_at": null,
+#       "hidden": null,
+#       "hidden_for_user": false,
+#       "locked": true,
+#       "locked_for_user": false
 #     }
 class FoldersController < ApplicationController
   include Api::V1::Folders

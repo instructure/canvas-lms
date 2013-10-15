@@ -197,29 +197,8 @@ describe Pseudonym do
     it "should set last_timeout_failure on LDAP servers that timeout" do
       Net::LDAP.any_instance.expects(:bind_as).once.raises(Timeout::Error, "timed out")
       @pseudonym.ldap_bind_result('test').should be_false
-      ErrorReport.last.message.should match /Timeout::Error|timed out/ # 1.8/1.9 compat
+      ErrorReport.last.message.should match(/timed out/)
       @aac.reload.last_timeout_failure.should > 1.minute.ago
-    end
-
-    it "should not attempt to bind if last_timeout_failure is set recently" do
-      # calling again should not attempt to bind
-      @aac.update_attribute(:last_timeout_failure, 5.seconds.ago)
-      Net::LDAP.any_instance.expects(:bind_as).never
-      @pseudonym.ldap_bind_result('test').should be_false
-
-      # updating the config should reset :last_timeout_failure
-      @aac.reload.update_attributes(:auth_port => 637)
-      @aac.last_timeout_failure.should be_nil
-      Net::LDAP.any_instance.expects(:bind_as).returns(true)
-      @pseudonym.reload
-      @pseudonym.ldap_bind_result('test').should be_true
-    end
-
-    it "should allow another attempt once last_timeout_failure is sufficiently in the past" do
-      @aac.update_attribute(:last_timeout_failure, 5.seconds.ago)
-      Setting.set('ldap_failure_wait_time', 2.seconds)
-      Net::LDAP.any_instance.expects(:bind_as).returns(true)
-      @pseudonym.ldap_bind_result('test').should be_true
     end
   end
 

@@ -44,7 +44,7 @@ describe FacebookController do
 
     it "should not find a user without a user_id" do
       @user = user_model
-      UserService.create!(:user => @user, :service => 'facebook', :service_user_id => nil)
+      UserService.create!(:user => @user, :service => 'facebook', :service_user_id => 'garbage')
       get 'index', :signed_request => signed_request
       assigns[:user].should be_nil
     end

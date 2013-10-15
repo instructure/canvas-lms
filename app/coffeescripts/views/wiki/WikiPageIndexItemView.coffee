@@ -20,8 +20,7 @@ define [
       'click a.al-trigger': 'settingsMenu'
       'click .edit-menu-item': 'editPage'
       'click .delete-menu-item': 'deletePage'
-      'click .set-front-page-menu-item': 'setAsFrontPage'
-      'click .remove-front-page-menu-item': 'removeAsFrontPage'
+      'click .use-as-front-page-menu-item': 'useAsFrontPage'
 
     @optionProperty 'indexView'
     @optionProperty 'collection'
@@ -31,7 +30,6 @@ define [
     initialize: ->
       super
       @WIKI_RIGHTS ||= {}
-      @model.set('publishable', true)
       @model.on 'change', => @render()
 
     toJSON: ->
@@ -76,14 +74,14 @@ define [
 
     deletePage: (ev) ->
       ev?.preventDefault()
+      return unless @model.get('deletable')
+
       deleteDialog = new WikiPageDeleteDialog
         model: @model
       deleteDialog.open()
 
-    setAsFrontPage: (ev) ->
+    useAsFrontPage: (ev) ->
       ev?.preventDefault()
-      @model.setAsFrontPage()
+      return unless @model.get('published')
 
-    removeAsFrontPage: (ev) ->
-      ev?.preventDefault()
-      @model.removeAsFrontPage()
+      @model.setFrontPage()

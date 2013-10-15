@@ -45,9 +45,7 @@ describe ConversationsController do
       course_with_student_logged_in(:active_all => true)
       conversation
 
-      term = EnrollmentTerm.create! :name => "Fall"
-      term.root_account_id = @course.root_account_id
-      term.save!
+      term = @course.root_account.enrollment_terms.create! :name => "Fall"
       @course.update_attributes! :enrollment_term => term
 
       get 'index'

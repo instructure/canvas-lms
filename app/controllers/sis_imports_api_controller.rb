@@ -183,7 +183,7 @@ class SisImportsApiController < ApplicationController
         @account.save
       end
 
-      render :json => batch.api_json
+      render :json => batch
     end
   end
 
@@ -195,7 +195,7 @@ class SisImportsApiController < ApplicationController
       @batch = SisBatch.find(params[:id])
       raise "Sis Import not found" unless @batch
       raise "Batch does not match account" unless @batch.account.id == @account.id
-      render :json => @batch.api_json
+      render :json => @batch
     end
   end
 

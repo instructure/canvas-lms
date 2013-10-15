@@ -230,6 +230,7 @@ FakeRails3Routes.draw do
         get :change_gradebook_version
         get :blank_submission
         get :speed_grader
+        post :speed_grader_settings
         get :history
         post :update_submission
       end

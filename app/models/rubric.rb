@@ -25,10 +25,16 @@ class Rubric < ActiveRecord::Base
   has_many :rubric_associations, :class_name => 'RubricAssociation', :dependent => :destroy
   has_many :rubric_assessments, :through => :rubric_associations, :dependent => :destroy
   has_many :learning_outcome_alignments, :as => :content, :class_name => 'ContentTag', :conditions => ['content_tags.tag_type = ? AND content_tags.workflow_state != ?', 'learning_outcome', 'deleted'], :include => :learning_outcome
+
   before_save :default_values
   after_save :update_alignments
+  validates_presence_of :context_id, :context_type, :workflow_state
   validates_length_of :description, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :title, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
+
+  before_save :default_values
+  after_save :update_alignments
+  after_save :touch_associations
 
   serialize :data
   simply_versioned
@@ -90,7 +96,7 @@ class Rubric < ActiveRecord::Base
   
   alias_method :destroy!, :destroy
   def destroy
-    RubricAssociation.where(:rubric_id => self).update_all(:bookmarked => false, :updated_at => Time.now.utc)
+    rubric_associations.update_all(:bookmarked => false, :updated_at => Time.now.utc)
     self.workflow_state = 'deleted'
     self.save
   end
@@ -106,15 +112,15 @@ class Rubric < ActiveRecord::Base
   # a rubric_association are 'grading' and 'bookmark'.  Confusing,
   # I know.
   def destroy_for(context)
-    RubricAssociation.where(:rubric_id => self, :context_id => context, :context_type => context.class.to_s).
+    rubric_associations.where(:context_id => context, :context_type => context.class.to_s).
         update_all(:bookmarked => false, :updated_at => Time.now.utc)
-    unless RubricAssociation.where(:rubric_id => self, :bookmarked => true).exists?
+    unless rubric_associations.bookmarked.exists?
       self.destroy
     end
   end
 
   def update_alignments
-    if data_changed? || workflow_state_changed?
+    if alignments_need_update?
       outcome_ids = []
       unless deleted?
         outcome_ids = data_outcome_ids
@@ -122,6 +128,17 @@ class Rubric < ActiveRecord::Base
       LearningOutcome.update_alignments(self, context, outcome_ids)
     end
     true
+  end
+
+  def touch_associations
+    if alignments_need_update?
+      # associations might need to update their alignments also
+      rubric_associations.bookmarked.each &:touch
+    end
+  end
+
+  def alignments_need_update?
+    data_changed? || workflow_state_changed?
   end
 
   def data_outcome_ids
@@ -155,7 +172,7 @@ class Rubric < ActiveRecord::Base
     purpose = opts[:purpose] || "unknown"
     self.rubric_associations.create(:association => association, :context => context, :use_for_grading => !!opts[:use_for_grading], :purpose => purpose)
   end
-  
+
   def update_with_association(current_user, rubric_params, context, association_params)
     self.free_form_criterion_comments = rubric_params[:free_form_criterion_comments] == '1' if rubric_params[:free_form_criterion_comments]
     self.user ||= current_user

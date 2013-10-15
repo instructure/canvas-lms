@@ -30,7 +30,7 @@ define [
 
     render: ->
       super
-      @$el.find('.ig-no-content').toggle(@isEmpty())
+      @$el.find('.no_content').toggle(@isEmpty())
       @
 
     renderItem: (model) =>

@@ -1,0 +1,28 @@
+<div id="progression_student_{{student_id}}_module_{{id}}" class="progression-module content-box border border-trbl border-round container-fluid">
+  <div class="row-fluid">
+    <div class="name ig-header span8">{{name}}</div>
+    <div class="status ig-header span4 {{#unless started}}no_subtitle{{/unless}} {{#if completed}}completed{{/if}}">
+      {{status_text}}
+      {{#if started}}
+        <div class="subtitle">
+          {{#t "items_below"}}Items to complete below{{/t}}
+        </div>
+      {{/if}}
+      {{#if completed}}<i class="icon-check" aria-hidden="true"></i>{{/if}}
+    </div>
+  </div>
+  {{#if started}}
+    <div class="items">
+      <hr>
+      <ul title="{{#t "items"}}Items to complete{{/t}}" aria-label="{{#t "items"}}Items to complete{{/t}}">
+        {{#each items}}
+          {{#unless this.completion_requirement.completed}}
+            <li class="ig-text">
+              <i class="{{this.icon_class}}" aria-hidden="true"></i> {{this.title}}
+            </li>
+          {{/unless}}
+        {{/each}}
+      </ul>
+    </div>
+  {{/if}}
+</div>

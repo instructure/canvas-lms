@@ -693,10 +693,12 @@ class Conversation < ActiveRecord::Base
     # look up participants across all shards
     shards = conversations.map(&:associated_shards).flatten.uniq
     Shard.with_each_shard(shards) do
-      user_map = MessageableUser.select("#{MessageableUser.build_select}, last_authored_at, conversation_id").
-        joins(:all_conversations).
-        where(:conversation_participants => { :conversation_id => conversations }).
-        order('last_authored_at IS NULL, last_authored_at DESC, LOWER(COALESCE(short_name, name))').group_by { |mu| mu.conversation_id.to_i }
+      user_map = Shackles.activate(:slave) do
+        MessageableUser.select("#{MessageableUser.build_select}, last_authored_at, conversation_id").
+          joins(:all_conversations).
+          where(:conversation_participants => { :conversation_id => conversations }).
+          order('last_authored_at IS NULL, last_authored_at DESC, LOWER(COALESCE(short_name, name))').group_by { |mu| mu.conversation_id.to_i }
+      end
       conversations.each do |conversation|
         participants[conversation.global_id].concat(user_map[conversation.id] || [])
       end

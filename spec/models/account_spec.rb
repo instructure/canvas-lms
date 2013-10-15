@@ -984,7 +984,7 @@ describe Account do
       account = Account.create!
       c1 = account.courses.create!
       c2 = account.courses.create!
-      account.course_account_associations.delete_all
+      account.course_account_associations.scoped.delete_all
       account.associated_courses.should == []
       account.update_account_associations
       account.reload
@@ -1012,6 +1012,25 @@ describe Account do
 
         sub_account.should be_draft_state_enabled
       end
+    end
+  end
+
+  describe "enable_draft!" do
+
+    it "updates the enable_draft setting and saves the account" do
+      account = Account.create!
+      account.enable_draft!
+      account.root_account.should be_draft_state_enabled
+      account.should be_draft_state_enabled
+    end
+  end
+
+  describe "disable_draft!" do
+    it "updates the enable_draft setting and saves the account" do
+      account = Account.create!
+      account.disable_draft!
+      account.root_account.should_not be_draft_state_enabled
+      account.should_not be_draft_state_enabled
     end
   end
 
@@ -1049,4 +1068,5 @@ describe Account do
       account.root_account.should_not be_draft_state_enabled
     end
   end
+
 end

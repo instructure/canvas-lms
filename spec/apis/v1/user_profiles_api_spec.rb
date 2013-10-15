@@ -123,8 +123,8 @@ describe "User Profile API", :type => :integration do
 
   context "user_services" do
     before do
-      @student.user_services.create! :service => 'skype', :service_user_name => 'user', :visible => false
-      @student.user_services.create! :service => 'twitter', :service_user_name => 'user', :visible => true
+      @student.user_services.create! :service => 'skype', :service_user_name => 'user', :service_user_id => 'user', :visible => false
+      @student.user_services.create! :service => 'twitter', :service_user_name => 'user', :service_user_id => 'user', :visible => true
     end
 
     it "should return user_services, if requested" do

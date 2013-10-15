@@ -24,7 +24,7 @@ describe 'rubric_assessment_submission_reminder.summary' do
     user_model
     rubric_assessment_model(:user => @user)
     @submission = @course.assignments.first.submissions.create!(:user => @user)
-    @object = @rubric_association.assessment_requests.create!(:user => @user, :asset => @submission)
+    @object = @rubric_association.assessment_requests.create!(:user => @user, :asset => @submission, :assessor_asset => @submission, :assessor => @user)
     @object.rubric_association.should_not be_nil
     @object.rubric_association.context.should_not be_nil
     @object.user.should_not be_nil

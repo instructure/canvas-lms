@@ -102,6 +102,11 @@ $(document).ready(function() {
   $(".enrollment_term_form").formSubmit({
     processData: function(data) {
       var permissions = $(this).parents("tr").find(".permissions").getFormData({object_name: 'enrollment_term'});
+      $.each(permissions, function(key, val) {
+        if (key.match(/\[(start)|(end)_at\]/)) {
+          permissions[key] = $.datetime.process(val);
+        }
+      });
       return $.extend(permissions, data);
     },
     beforeSubmit: function(data) {

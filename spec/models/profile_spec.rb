@@ -48,18 +48,18 @@ describe Profile do
       end
 
       it "should have the correct class when found" do
-        Foo.new(:name => "foo").profile.save!
+        Foo.new(:name => "foo", :workflow_state => 'registered').profile.save!
         Profile.all.first.class.should == FooProfile
       end
     end
 
     describe ".path" do
       it "should be inferred from the title" do
-        profile = Foo.create!(:name => "My Foo!").profile
+        profile = Foo.create!(:name => "My Foo!", :workflow_state => 'registered').profile
         profile.path.should == "my-foo"
         profile.save!
 
-        profile2 = Foo.create!(:name => "My Foo?!!!").profile
+        profile2 = Foo.create!(:name => "My Foo?!!!", :workflow_state => 'registered').profile
         profile2.path.should == "my-foo-1"
       end
     end

@@ -22,6 +22,8 @@
 
 Tour.config do
 
+  tour(:quiz_regrade, 1, ['quizzes#edit'])
+
   #tour(:discussion_topic_auto_unread, 1, ['discussion_topics#show', 'discussion_topics#index']) do
     #if params["action"] == "show"
       #DiscussionTopic.find(params["id"]).discussion_entries.length > 0

@@ -17,6 +17,7 @@ require [
       assignmentQuizzes: I18n.t('headers.assignment_quizzes', 'Assignment Quizzes')
       practiceQuizzes:   I18n.t('headers.practice_quizzes', 'Practice Quizzes')
       surveys:           I18n.t('headers.surveys', 'Surveys')
+      toggleMessage:     I18n.t('toggle_message', 'toggle quiz visibility')
 
     initialize: ->
       @allQuizzes = ENV.QUIZZES
@@ -56,6 +57,7 @@ require [
         isSurvey: type is 'surveys'
         listId: "#{type}-quizzes"
         title: title
+        toggleMessage: @translations.toggleMessage
 
   # Start up the page
   router = new QuizzesIndexRouter

@@ -19,10 +19,10 @@
 # @object Favorite
 #     {
 #       // The ID of the object the Favorite refers to
-#       context_id: 1170,
+#       "context_id": 1170,
 #
 #       // The type of the object the Favorite refers to (currently, only "Course" is supported)
-#       context_type: "Course"
+#       "context_type": "Course"
 #     }
 class FavoritesController < ApplicationController
 

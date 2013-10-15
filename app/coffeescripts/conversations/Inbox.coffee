@@ -113,7 +113,7 @@ define [
 
       return cb() unless conversation?
 
-      url = conversation.url()
+      url = "#{conversation.url()}&include_beta=1"
       @$messageList.show().disableWhileLoading $.ajaxJSON url, 'GET', {}, (data) =>
         @conversations.updateItems [data]
         return unless @conversations.isActive(data.id)
@@ -124,8 +124,10 @@ define [
           @formPane.resetForParticipant(user)
         @resize()
         @$messages.show()
+        @currentConversation = data
         @$messageList.append @buildMessage(message) for message in data.messages
         @$messageList.show()
+        @formPane.form.setAuthor(data.messages, data.participants)
         cb()
 
     resetMessageForm: (conversation) ->

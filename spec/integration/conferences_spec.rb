@@ -50,8 +50,8 @@ describe ConferencesController, :type => :integration do
     @group = @course.groups.create!(:name => "some group")
     @group.add_user(@user)
 
-    course_conference = @course.web_conferences.create!(:conference_type => 'Wimba') { |c| c.start_at = Time.now }
-    group_conference = @group.web_conferences.create!(:conference_type => 'Wimba') { |c| c.start_at = Time.now }
+    course_conference = @course.web_conferences.create!(:conference_type => 'Wimba', :user => @user) { |c| c.start_at = Time.now }
+    group_conference = @group.web_conferences.create!(:conference_type => 'Wimba', :user => @user) { |c| c.start_at = Time.now }
     course_conference.add_initiator(@user)
     group_conference.add_initiator(@user)
 

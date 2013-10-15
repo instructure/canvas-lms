@@ -43,4 +43,24 @@ describe "report helper" do
       report.send_report
     end
   end
+
+  describe "timezone_strftime" do
+      it "Should format DateTime" do
+         date_time = DateTime.new(2003,9,13)
+         formatted = report.timezone_strftime(date_time, '%d-%b')
+         formatted.should == "13-Sep"
+      end
+
+      it "Should format Time" do
+        time_zone = Time.use_zone('UTC'){Time.zone.parse('2013-09-13T00:00:00Z')}
+        formatted = report.timezone_strftime(time_zone, '%d-%b')
+        formatted.should == "13-Sep"
+      end
+
+      it "Should format String" do
+        time_zone = Time.use_zone('UTC'){Time.zone.parse('2013-09-13T00:00:00Z')}
+        formatted = report.timezone_strftime(time_zone.to_s, '%d-%b')
+        formatted.should == "13-Sep"
+      end
+  end
 end

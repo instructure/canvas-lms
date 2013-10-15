@@ -36,13 +36,12 @@ class EmberHbs
 
     def compile_template(name, template_string)
       require "execjs"
-
-      handlebars_source = File.read(File.dirname(__FILE__) + '/vendor/handlebars-1.0.0-rc.4.js')
-      precompiler_source = File.read(File.dirname(__FILE__) + '/vendor/ember-template-compiler-1.0.0-rc5.js')
+      handlebars_source = File.read(File.dirname(__FILE__) + '/vendor/handlebars-1.0.0.js')
+      precompiler_source = File.read(File.dirname(__FILE__) + '/vendor/ember-template-compiler-1.0.0.js')
       context = ExecJS.compile "exports = {};" + handlebars_source + precompiler_source
       precompiled = context.eval "Ember.Handlebars.precompile(#{template_string.inspect}).toString()", template_string
       template_module = <<-END
-define(['Ember', 'compiled/ember/shared/helpers/common'], function(Ember) {
+define(['ember', 'compiled/ember/shared/helpers/common'], function(Ember) {
   Ember.TEMPLATES['#{name}'] = Ember.Handlebars.template(#{precompiled});
 });
       END

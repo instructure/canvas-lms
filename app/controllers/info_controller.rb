@@ -90,7 +90,7 @@ class InfoController < ApplicationController
 
     respond_to do |format|
       format.html { render :text => 'canvas ok' }
-      format.json { render :json => { :status => 'canvas ok' } }
+      format.json { render :json => { :status => 'canvas ok', :revision => Canvas.revision } }
     end
   end
 end

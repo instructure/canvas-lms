@@ -354,9 +354,9 @@ describe Quiz do
     q.quiz_questions.create!(:question_data => { :name => "test 3" })
     q.quiz_questions.create!(:question_data => { :name => "test 4" })
     q.save
-    q.quiz_questions.length.should eql(4)
+    q.active_quiz_questions.size.should eql(4)
     q.quiz_groups.length.should eql(1)
-    g.quiz_questions(true).length.should eql(2)
+    g.quiz_questions(true).active.size.should eql(2)
 
     entries = q.root_entries(true)
     entries.length.should eql(3)
@@ -617,9 +617,12 @@ describe Quiz do
       new_q.context.should_not eql(q.context)
       new_q.title.should eql(q.title)
       new_q.quiz_groups.length.should eql(q.quiz_groups.length)
-      new_q.quiz_questions.length.should eql(q.quiz_questions.length)
-      new_q.quiz_questions.first.question_data[:id].should be_nil
-      new_q.quiz_questions.first.data[:id].should == new_q.quiz_questions.first.id
+
+      new_q_questions = new_q.active_quiz_questions
+
+      new_q_questions.size.should eql(q.quiz_questions.active.length)
+      new_q_questions.first.question_data[:id].should be_nil
+      new_q_questions.first.data[:id].should == new_q.quiz_questions.active.first.id
     end
 
     it "should set the related assignment's group correctly" do
@@ -647,7 +650,7 @@ describe Quiz do
       q.save
       course
       new_q = q.clone_for(@course)
-      new_q.quiz_questions.first.question_data[:question_text].should match /\/courses\/#{@course.id}\/quizzes\/#{new_q.id}\/edit/
+      new_q.active_quiz_questions.first.question_data[:question_text].should match /\/courses\/#{@course.id}\/quizzes\/#{new_q.id}\/edit/
     end
 
     it "should only create one associated assignment for a graded quiz" do
@@ -823,12 +826,12 @@ describe Quiz do
     end
 
     it 'is false if the user is not part of this course' do
-      @user.student_enrollments.delete_all
+      @user.student_enrollments.scoped.delete_all
       @quiz.has_student_submissions?.should be_false
     end
 
     it 'is false if there are no submissions' do
-      @quiz.quiz_submissions.delete_all
+      @quiz.quiz_submissions.scoped.delete_all
       @quiz.has_student_submissions?.should be_false
     end
 
@@ -965,6 +968,7 @@ describe Quiz do
 
       it "should not validate quiz_type if not changed" do
         quiz = @course.quizzes.build :title => "test quiz", :quiz_type => 'invalid'
+        quiz.workflow_state = 'created'
         quiz.save(false).should be_true  # save without validation
         quiz.reload
         quiz.save.should be_true
@@ -983,6 +987,7 @@ describe Quiz do
 
       it "should not validate ip_filter if not changed" do
         quiz = @course.quizzes.build :title => "test quiz", :ip_filter => '123.fourfivesix'
+        quiz.workflow_state = 'created'
         quiz.save(false).should be_true  # save without validation
         quiz.reload
         quiz.save.should be_true
@@ -1023,6 +1028,7 @@ describe Quiz do
 
       it "should not validate hide_results if not changed" do
         quiz = @course.quizzes.build :title => "test quiz", :hide_results => 'invalid'
+        quiz.workflow_state = 'created'
         quiz.save(false).should be_true  # save without validation
         quiz.reload
         quiz.save.should be_true
@@ -1150,5 +1156,19 @@ describe Quiz do
       quiz = @course.quizzes.create!
       quiz.save!
     end
+  end
+
+  context "draft_state" do
+
+    it "updates the assignment's workflow state" do
+      @quiz = @course.quizzes.create!(title: 'Test Quiz')
+      @quiz.context.root_account.enable_draft!
+      @quiz.publish!
+      @quiz.unpublish!
+      @quiz.assignment.should_not be_published
+      @quiz.publish!
+      @quiz.assignment.should be_published
+    end
+
   end
 end

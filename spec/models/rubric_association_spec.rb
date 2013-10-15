@@ -112,7 +112,7 @@ describe RubricAssociation do
       it "should do nothing if it is not associated to an assignment" do
         rubric = @course.rubrics.create!
         ra = RubricAssociation.create!(
-          :rubric => @rubric,
+          :rubric => rubric,
           :association => @course,
           :context => @course,
           :purpose => 'bookmark'

@@ -22,7 +22,7 @@
   js_bundle :assignment_edit
 %>
 
-<% if @context.root_account.enable_draft? %>
+<% if @context.draft_state_enabled? %>
   <div id="edit_assignment_header" class="header-bar">
   </div>
 <% end %>

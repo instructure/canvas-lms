@@ -633,7 +633,7 @@ describe Attachment do
       self.use_transactional_fixtures = false
 
       before do
-        attachment_model(:context => Group.create!, :filename => 'test.mp4', :content_type => 'video')
+        attachment_model(:context => Account.default.groups.create!, :filename => 'test.mp4', :content_type => 'video')
       end
 
       after do
@@ -1395,7 +1395,7 @@ describe Attachment do
     end
 
     it "should not fail if the attachment context does not have participants" do
-      cm = ContentMigration.create!
+      cm = ContentMigration.create!(:context => course)
       attachment_model(:context => cm, :uploaded_data => stub_file_data('file.txt', nil, 'text/html'), :content_type => 'text/html')
 
       Attachment.where(:id => @attachment).update_all(:need_notify => true)

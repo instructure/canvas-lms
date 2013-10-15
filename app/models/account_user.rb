@@ -28,7 +28,7 @@ class AccountUser < ActiveRecord::Base
   after_destroy :update_account_associations_later
   attr_accessible :account, :user, :membership_type
 
-  validates_presence_of :account_id, :user_id
+  validates_presence_of :account_id, :user_id, :membership_type
 
   alias_method :context, :account
 

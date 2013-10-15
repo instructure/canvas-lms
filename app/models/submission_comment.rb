@@ -208,13 +208,8 @@ class SubmissionComment < ActiveRecord::Base
     !hidden? && submission.possible_participants_ids.include?(author_id)
   end
 
-  alias_method :ar_to_json, :to_json
-  def to_json(options = {}, &block)
-    if self.context.root_account.service_enabled?(:avatars)
-      options[:methods] ||= []
-      options[:methods] << :avatar_path
-    end
-    self.ar_to_json(options, &block)
+  def serialization_methods
+    context.root_account.service_enabled?(:avatars) ? [:avatar_path] : []
   end
 
   scope :visible, where(:hidden => false)

@@ -52,6 +52,8 @@
       <input class="input-block-level" type="email" name="error[email]" id="error-email">
     </div>
     <input class="input-block-level" type="hidden" name="error[url]" value="{{url}}">
+    <input class="input-block-level" type="hidden" name="error[context_asset_string]" value="{{contextAssetString}}">
+    <input class="input-block-level" type="hidden" name="error[user_roles]" value="{{userRoles}}">
     <div class="button-container">
       <button type="submit" data-text-while-loading="{{#t "Submitting_Ticket"}}Submitting Ticket...{{/t}}" class="btn submit_button"><img src="/images/email.png" alt=""/>{{#t "submit_this_support_request"}}Submit Ticket{{/t}}</button>
     </div>

@@ -771,9 +771,7 @@ describe Conversation do
         u2.conversations.first.tags.should == [@course1.asset_string]
         u3.conversations.first.tags.should == [@course2.asset_string]
         broken_one = u3.conversations.first
-        broken_one.user_id = nil
-        broken_one.tags = []
-        broken_one.save!
+        ConversationParticipant.where(id: broken_one).update_all(user_id: -1, tags: '')
 
         conversation.reload
         conversation.add_message(u1, 'another', :tags => [@course2.asset_string, "course_0"])
@@ -922,8 +920,7 @@ describe Conversation do
 
       it "should ignore conversation_participants without a user" do
         broken_one = @u3.conversations.first
-        broken_one.user_id = nil
-        broken_one.save!
+        ConversationParticipant.where(id: broken_one).update_all(user_id: -1)
 
         @conversation.migrate_context_tags!
 

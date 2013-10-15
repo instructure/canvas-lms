@@ -44,6 +44,9 @@ define [
           showEmail: showEmail
           helpLinks: links
           url: window.location
+          contextAssetString: ENV.context_asset_string
+          userRoles: ENV.current_user_roles
+
 
         @$dialog.html(helpDialogTemplate locals)
         @initTicketForm()

@@ -33,21 +33,21 @@
 # @object Group
 #     {
 #       // The ID of the group.
-#       id: 17,
+#       "id": 17,
 #
 #       // The display name of the group.
-#       name: "Math Group 1",
+#       "name": "Math Group 1",
 #
 #       // A description of the group. This is plain text.
-#       description: null,
+#       "description": null,
 #
 #       // Whether or not the group is public.  Currently only community groups
 #       // can be made public.  Also, once a group has been set to public, it
 #       // cannot be changed back to private.
-#       is_public: false,
+#       "is_public": false,
 #
 #       // Whether or not the current user is following this group.
-#       followed_by_user: false,
+#       "followed_by_user": false,
 #
 #       // How people are allowed to join the group.  For all groups except for
 #       // community groups, the user must share the group's parent course or
@@ -64,31 +64,31 @@
 #       //   must be approved by a group moderator.
 #       // * If "invitation_only", only those how have received an
 #       //   invitation my join the group, by accepting that invitation.
-#       join_level: "invitation_only",
+#       "join_level": "invitation_only",
 #
 #       // The number of members currently in the group
-#       members_count: 0,
+#       "members_count": 0,
 #
 #       // The url of the group's avatar
-#       avatar_url: "https://<canvas>/files/avatar_image.png",
+#       "avatar_url": "https://<canvas>/files/avatar_image.png",
 #
 #       // The course or account that the group belongs to. The pattern here is
 #       // that whatever the context_type is, there will be an _id field named
 #       // after that type. So if instead context_type was "account", the
 #       // course_id field would be replaced by an account_id field.
-#       context_type: "Course",
-#       course_id: 3,
+#       "context_type": "Course",
+#       "course_id": 3,
 #
 #       // Certain types of groups have special role designations. Currently,
 #       // these include: "communities", "student_organized", and "imported".
 #       // Regular course/account groups have a role of null.
-#       role: null,
+#       "role": null,
 #
 #       // The ID of the group's category.
-#       group_category_id: 4,
+#       "group_category_id": 4,
 #
 #       // the storage quota for the group, in megabytes
-#       storage_quota_mb: 50
+#       "storage_quota_mb": 50
 #     }
 #
 class GroupsController < ApplicationController

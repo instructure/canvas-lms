@@ -132,6 +132,91 @@ describe "conversations new" do
       c.private?.should be_false
       c.conversation_participants.collect(&:user_id).sort.should eql([@teacher, @s1, @s2].collect(&:id).sort)
     end
+
+    it "should allow admins to send a message without picking a context" do
+      user = account_admin_user
+      user.preferences[:use_new_conversations] = true
+      user.save!
+      user_logged_in({:user => user})
+      get_conversations
+      compose to: [@s1], subject: 'context-free', body: 'hallo!'
+      c = @s1.conversations.last.conversation
+      c.subject.should eql('context-free')
+    end
+
+    it "should not allow non-admins to send a message without picking a context" do
+      get_conversations
+      fj('#compose-btn').click
+      wait_for_animations
+      fj('#compose-new-message .ac-input').should have_attribute(:disabled, 'true')
+    end
+
+    it "should allow admins to message users from their profiles" do
+      user = account_admin_user
+      user.preferences[:use_new_conversations] = true
+      user.save!
+      user_logged_in({:user => user})
+      get "/accounts/#{Account.default.id}/users"
+      wait_for_ajaximations
+      f('li.user a').click
+      wait_for_ajaximations
+      f('.icon-email').click
+      wait_for_ajaximations
+      f('.ac-token').should_not be_nil
+    end
+  end
+
+  describe "replying" do
+    before do
+      cp = conversation(@s1, @teacher, @s2, workflow_state: 'unread')
+      @convo = cp.conversation
+      @convo.update_attribute(:subject, 'homework')
+      @convo.add_message(@s1, "What's this week's homework?")
+      @convo.add_message(@s2, "I need the homework too.")
+    end
+
+    it "should maintain context and subject" do
+      get_conversations
+      conversation_elements[0].click
+      wait_for_ajaximations
+      fj('#reply-btn').click
+      fj('#compose-message-course').should have_attribute(:disabled, 'true')
+      fj('#compose-message-course').should have_value(@course.id.to_s)
+      fj('#compose-message-subject').should have_attribute(:disabled, 'true')
+      fj('#compose-message-subject').should have_value(@convo.subject)
+    end
+
+    it "should address replies to the most recent author by default" do
+      get_conversations
+      conversation_elements[0].click
+      wait_for_ajaximations
+      fj('#reply-btn').click
+      ffj('input[name="recipients[]"]').length.should == 1
+      fj('input[name="recipients[]"]').should have_value(@s2.id.to_s)
+    end
+
+    it "should add new messages to the conversation" do
+      get_conversations
+      initial_message_count = @convo.conversation_messages.length
+      conversation_elements[0].click
+      wait_for_ajaximations
+      fj('#reply-btn').click
+      set_message_body('Read chapters five and six.')
+      click_send
+      wait_for_ajaximations
+      ffj('.message-item-view').length.should == initial_message_count + 1
+      @convo.reload
+      @convo.conversation_messages.length.should == initial_message_count + 1
+    end
+
+    it "should not allow adding recipients to private messages" do
+      @convo.update_attribute(:private_hash, '12345')
+      get_conversations
+      conversation_elements[0].click
+      wait_for_ajaximations
+      fj('#reply-btn').click
+      fj('.compose_form .ac-input-box.disabled').should_not be_nil
+    end
   end
 
   describe "replying" do

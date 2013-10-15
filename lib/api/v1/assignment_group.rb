@@ -47,6 +47,8 @@ module Api::V1::AssignmentGroup
       end
 
       include_discussion_topic = includes.include?('discussion_topic')
+      include_all_dates        = includes.include?('all_dates')
+
       user_content_attachments   = opts[:preloaded_user_content_attachments]
       user_content_attachments ||= api_bulk_load_user_content_attachments(
         assignment_scope.map(&:description),
@@ -57,6 +59,7 @@ module Api::V1::AssignmentGroup
         a.context = group.context
         assignment_json(a, user, session,
           include_discussion_topic: include_discussion_topic,
+          include_all_dates: include_all_dates,
           override_dates: opts[:override_assignment_dates],
           preloaded_user_content_attachments: user_content_attachments)
       }

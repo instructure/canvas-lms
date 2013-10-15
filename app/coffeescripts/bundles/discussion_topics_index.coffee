@@ -17,6 +17,7 @@ require [
         pinned: I18n.t('pinned_discussions',  'Pinned Discussions')
       help:
         title: I18n.t('ordered_by_recent_activity', 'Ordered by Recent Activity')
+      toggleMessage: I18n.t('toggle_message', 'toggle discussion visibility')
 
     # Public: Routes to respond to.
     routes:
@@ -57,7 +58,7 @@ require [
     # Returns nothing.
     fetchDiscussions: ->
       pipeline = new DiscussionTopicsCollection
-      pipeline.fetch(add: true, data: {order_by: 'recent_activity', per_page: 50})
+      pipeline.fetch(data: {order_by: 'recent_activity', per_page: 50})
       pipeline.on('fetch', @_onPipelineLoad)
       pipeline.on('fetched:last', @_onPipelineEnd)
 
@@ -83,6 +84,7 @@ require [
         sortable: !!options.sortable
         title: @messages.lists[type]
         titleHelp: (if _.include(['open', 'locked'], type) then @messages.help.title else null)
+        toggleMessage: @messages.toggleMessage
 
     # Internal: Attach events to the discussion topic collections.
     #
@@ -99,8 +101,8 @@ require [
     #
     # Returns nothing.
     _onPipelineLoad: (collection, models) =>
-      @_sortCollection(collection)
-      setTimeout((-> collection.fetch(add: true, page: 'next')), 0) if collection.urls.next
+      @_sortCollection(models)
+      setTimeout((-> collection.fetch(page: 'next')), 0) if collection.urls.next
 
     # Internal: Handle the last page of discussion topic results, propagating
     # the event down to all of the filtered collections.
@@ -133,7 +135,7 @@ require [
     # Returns an object.
     _groupModels: (pipeline) ->
       defaults = { pinned: [], locked: [], open: [] }
-      _.extend(defaults, pipeline.groupBy(@_modelBucket))
+      _.extend(defaults, _.groupBy(pipeline, @_modelBucket))
 
     # Determine the name of the model's proper collection.
     #
@@ -141,8 +143,12 @@ require [
     #
     # Returns a string.
     _modelBucket: (model) ->
-      return 'pinned' if model.get('pinned')
-      return 'locked' if model.get('locked') || model.get('locked_for_user')
+      if model.attributes
+        return 'pinned' if model.get('pinned')
+        return 'locked' if model.get('locked') || model.get('locked_for_user')
+      else
+        return 'pinned' if model.pinned
+        return 'locked' if model.locked || model.locked_for_user
       'open'
 
     # Internal: Move a model from one collection to another.

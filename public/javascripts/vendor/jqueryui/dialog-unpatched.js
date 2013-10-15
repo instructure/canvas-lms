@@ -715,7 +715,11 @@ $.extend( $.ui.dialog.overlay, {
 					$( document ).bind( $.ui.dialog.overlay.events, function( event ) {
 						// stop events if the z-index of the target is < the z-index of the overlay
 						// we cannot return true when we don't want to cancel the event (#3523)
-						if ( $( event.target ).zIndex() < $.ui.dialog.overlay.maxZ ) {
+						//
+						// INSTRUCTURE - make sure that the element isn't in the dialog
+						// before stopping all events
+						if ( $( event.target ).zIndex() < $.ui.dialog.overlay.maxZ &&
+								!(dialog.element.has(event.target).length ) ) {
 							return false;
 						}
 					});

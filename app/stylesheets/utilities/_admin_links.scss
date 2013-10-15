@@ -78,6 +78,14 @@ Cogs, *AKA admin links*, are generally floated to the right, make sure it's the 
     text-shadow: rgba(0,0,0,0.5) 1px 0 1px;
     white-space: nowrap;
   }
+  .ui-menu-item a.disabled,
+  .ui-menu-item a.disabled.ui-state-focus {
+    background-color: black;
+    background-color: rgba(0,0,0,0.7);
+    background-image: none;
+    cursor: default;
+    color: #c0c0c0;
+  }
   .ui-menu-carat {
     border-color: transparent;
   }

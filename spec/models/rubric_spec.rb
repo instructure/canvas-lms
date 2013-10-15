@@ -239,6 +239,7 @@ describe Rubric do
 
   context "fractional_points" do
     it "should allow fractional points" do
+      course
       @rubric = Rubric.new(:context => @course)
       @rubric.data = [
         {

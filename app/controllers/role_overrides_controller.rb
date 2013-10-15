@@ -27,7 +27,7 @@
 #     // The role type that is being used as a base for this role.
 #     // For account-level roles, this is "AccountMembership".
 #     // For course-level roles, it is an enrollment type.
-#     "base_role_type": "AccountMembership"
+#     "base_role_type": "AccountMembership",
 #
 #     // JSON representation of the account the role is in.
 #     "account": {
@@ -79,8 +79,8 @@
 #         "locked": false,
 #         "readonly": false,
 #         "explicit": false
-#       },
-#       ...
+#       }
+#       // ...
 #     }
 #   }
 #

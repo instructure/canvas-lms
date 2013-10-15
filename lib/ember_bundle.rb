@@ -9,6 +9,7 @@ class EmberBundle
     @app_name = app_name
     @root = "app/coffeescripts/ember/#{@app_name}"
     files = assignable_paths(opts[:files] || Dir.glob("#{@root}/**/*.coffee"))
+    helpers = Dir.glob("#{@root}/helpers/**/*.coffee")
     templates = opts[:templates] || Dir.glob("#{@root}/**/*.hbs")
     @paths = files.map { |file| parse_require_path(file) }
     @objects = files.map { |file| parse_object_name(file) }
@@ -24,7 +25,7 @@ class EmberBundle
       @routes = ''
     end
     include_config_files
-    templates.each { |file| @paths << parse_require_path(file) }
+    (templates+helpers).each { |file| @paths << parse_require_path(file) }
   end
 
   def include_config_files
@@ -34,7 +35,7 @@ class EmberBundle
     end
     @paths.unshift(parse_require_path("#{@root}/config/app.coffee"))
     @objects.unshift("App")
-    @paths.unshift('Ember')
+    @paths.unshift('ember')
     @objects.unshift('Ember')
   end
 
@@ -68,14 +69,17 @@ class EmberBundle
   def build_output
     "# this is auto-generated\ndefine #{@paths.inspect}, (#{@objects.join(', ')}) ->
 #{@routes}
-  App.reopen
+  App.reopen({
     #{@assigns}
+  })
 "
   end
 
   def self.build_from_file(path)
     # TODO: don't build if its not assignable
-    EmberBundle.new(EmberBundle::parse_app_from_file(path)).build
+    app_name = EmberBundle::parse_app_from_file(path)
+    return false if !app_name
+    EmberBundle.new(app_name).build
   end
 
   def self.parse_app_from_file(path)

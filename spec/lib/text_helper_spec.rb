@@ -460,7 +460,7 @@ answers:
  position: 2
       }.force_encoding('binary').strip
       # now actually insert it into an AR column
-      aq = assessment_question_model
+      aq = assessment_question_model(bank: AssessmentQuestionBank.create!(context: Course.create!))
       AssessmentQuestion.where(:id => aq).update_all(:question_data => yaml_blob)
       text = aq.reload.question_data['answers'][0]['valid_ascii']
       text.should == "text"
@@ -476,7 +476,7 @@ answers:
 
       it "should strip columns on the list" do
         TextHelper.unstub(:recursively_strip_invalid_utf8!)
-        aq = assessment_question_model
+        aq = assessment_question_model(bank: AssessmentQuestionBank.create!(context: Course.create!))
         TextHelper.expects(:recursively_strip_invalid_utf8!).with(instance_of(HashWithIndifferentAccess), true)
         aq = AssessmentQuestion.find(aq)
         aq.question_data

@@ -485,7 +485,7 @@ describe "external tools" do
 
       def assert_invalid_selection_message(msg=nil)
         msg ||= /returned an invalid/
-        keep_trying_until{ ff("#flash_message_holder li").length > 0 }
+        keep_trying_until{ ffj("#flash_message_holder li").length > 0 }
         message = f("#flash_message_holder li")
         message.should_not be_nil
         message.text.should match(msg)
@@ -519,8 +519,12 @@ describe "external tools" do
         f("#external_tool_url").attribute('value').should match(/delete\.png/)
         f("#external_tool_filename").attribute('value').should eql('delete.png')
         f("#external_tool_submission_type").attribute('value').should eql('online_url_to_file')
-        f("#submit_from_external_tool_form .btn-primary").click
-        wait_for_ajax_requests
+
+        expect do
+          f("#submit_from_external_tool_form .btn-primary").click
+          wait_for_ajaximations
+        end.to change(Delayed::Job, :count).by(1)
+
         Delayed::Job.last.invoke_job
         a = Attachment.last
         keep_trying_until { puts a.file_state; a.file_state == 'available' }

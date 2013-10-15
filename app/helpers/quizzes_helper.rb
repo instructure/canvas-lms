@@ -304,23 +304,33 @@ module QuizzesHelper
     answers  = hash_get(options, :answers).dup
     answer_list = hash_get(options, :answer_list)
     res      = user_content hash_get(question, :question_text)
-    readonly_markup = hash_get(options, :editable) ? ' />' : 'readonly="readonly" />'
-    # If given answer list, insert the values into the text inputs for displaying user's answers.
-    if answer_list && !answer_list.empty?
-      index  = 0
-      res.gsub %r{<input.*?name=['"](question_.*?)['"].*?/>} do |match|
-        a = h(answer_list[index])
-        index += 1
+    readonly_markup = hash_get(options, :editable) ? " />" : 'readonly="readonly" />'
+    label_attr = "aria-label='#{I18n.t('#quizzes.labels.multiple_blanks_question', "Fill in the blank, read surrounding text")}'"
+    index  = 0
+
+    res.gsub! %r{<input.*?name=['"](question_.*?)['"].*?/>} do |match|
+      a = h(answer_list[index])
+      index += 1
+      # If given answer list, insert the values into the text inputs for displaying user's answers.
+      if answer_list && !answer_list.empty?
+
         #  Replace the {{question_BLAH}} template text with the user's answer text.
-        match.sub(/\{\{question_.*?\}\}/, a).
+        match = match.sub(/\{\{question_.*?\}\}/, a).
           # Match on "/>" but only when at the end of the string and insert "readonly" if set to be readonly
           sub(/\/\>\Z/, readonly_markup)
       end
-    else
+
+      # add labelling to input element regardless
+      match.sub(/\/\>\Z/, "#{label_attr} />")
+    end
+
+    unless answer_list && !answer_list.empty?
       answers.delete_if { |k, v| !k.match /^question_#{hash_get(question, :id)}/ }
       answers.each { |k, v| res.sub! /\{\{#{k}\}\}/, v }
-      res.gsub /\{\{question_[^}]+\}\}/, ""
+      res.gsub! /\{\{question_[^}]+\}\}/, ""
     end
+
+    res
   end
 
   def multiple_dropdowns_question(options)

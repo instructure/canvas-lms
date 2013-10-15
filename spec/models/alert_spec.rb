@@ -110,7 +110,7 @@ describe Alert do
       end
 
       it "should not trigger any alerts when there are no students in the class" do
-        course = Course.new
+        course = Account.default.courses.create!
         course.offer!
         course.alerts.create!(:recipients => [:student], :criteria => [{:criterion_type => 'Interaction', :threshold => 7}])
         Alert.evaluate_for_course(course)

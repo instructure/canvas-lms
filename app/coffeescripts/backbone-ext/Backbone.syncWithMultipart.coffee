@@ -56,7 +56,7 @@ define [
 
     callback = ->
       # contentDocument doesn't work in IE (7)
-      iframeBody = ($iframe[0].contentDocument || $iframe[0].contentWindow.document).body
+      iframeBody = ($iframe[0].contentDocument || $iframe[0].contentWindow?.document)?.body
       response = $.parseJSON($(iframeBody).text())
       # in case the form redirects after receiving the upload (API uploads),
       # prevent trying to work with an empty response

@@ -108,7 +108,7 @@ define [
     open        = new QuizCollection([{id: 3, title: 'Foo Title'}, {id: 4, title: 'Bar Title'}])
     view = indexView(assignments, open)
 
-    equal view.$el.find('.item-group-condensed li').length, 4
+    equal view.$el.find('.collectionViewItems li').length, 4
 
   test 'should filter by search term', ->
     assignments = new QuizCollection([{id: 1, title: 'Foo Name'}, {id: 2, title: 'Bar Title'}])
@@ -117,12 +117,12 @@ define [
     view = indexView(assignments, open)
     $('#searchTerm').val('foo')
     view.filterResults()
-    equal view.$el.find('.item-group-condensed li').length, 1
+    equal view.$el.find('.collectionViewItems li').length, 1
 
     view = indexView(assignments, open)
     $('#searchTerm').val('name')
     view.filterResults()
-    equal view.$el.find('.item-group-condensed li').length, 2
+    equal view.$el.find('.collectionViewItems li').length, 2
 
   test 'should filter models with title that doesnt match term', ->
     view = indexView()

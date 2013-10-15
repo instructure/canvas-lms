@@ -267,8 +267,9 @@ describe "quizzes questions" do
                                  :name => "Question",
                                  :question_name => "Question",
                                  :incorrect_comments => "",
-                                 :assessment_question_id => nil
+                                 :assessment_question_id => b.id
                              })
+      quest2.save!
       q.generate_quiz_data
       q.save!
       get "/courses/#{@course.id}/quizzes/#{q.id}/edit"

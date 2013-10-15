@@ -40,7 +40,16 @@ class EnrollmentsFromUserList
     @enrollments = []
 
     list.addresses.slice!(0,@limit) if @limit
-    list.users.each { |user| enroll_user(user) }
+    @course.transaction do
+      Enrollment.skip_callback(:update_cached_due_dates) do
+        list.users.each { |user| enroll_user(user) }
+      end
+      if !@enrollments.empty?
+        @course.assignments.select(:id).except(:order).find_each do |assignment|
+          DueDateCacher.recompute(assignment)
+        end
+      end
+    end
     @enrollments
   end
   

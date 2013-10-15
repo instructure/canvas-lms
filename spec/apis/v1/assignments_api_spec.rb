@@ -150,9 +150,11 @@ describe AssignmentsApiController, :type => :integration do
                              :points_possible => 12,
                               :free_form_criterion_comments => true)
 
-      @assignment.create_rubric_association(:rubric => @rubric,
-                                            :purpose => 'grading',
-                                            :use_for_grading => true)
+      @assignment.build_rubric_association(:rubric => @rubric,
+                                           :purpose => 'grading',
+                                           :use_for_grading => true,
+                                           :context => @course)
+      @assignment.rubric_association.save!
       json = api_get_assignments_index_from_course(@course)
       json.first['rubric_settings'].should == {
         'points_possible' => 12,
@@ -207,10 +209,11 @@ describe AssignmentsApiController, :type => :integration do
                              :points_possible => 12,
                              :free_form_criterion_comments => true)
 
-      @assignment.create_rubric_association(:rubric => @rubric,
-                                            :context => @course,
-                                            :purpose => 'grading',
-                                            :use_for_grading => true)
+      @assignment.build_rubric_association(:rubric => @rubric,
+                                           :purpose => 'grading',
+                                           :use_for_grading => true,
+                                           :context => @course)
+      @assignment.rubric_association.save!
       json = api_get_assignments_index_from_course(@course)
 
       json.first['rubric'].first["outcome_id"].should == @outcome.id

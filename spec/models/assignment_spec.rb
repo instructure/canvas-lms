@@ -587,7 +587,7 @@ describe Assignment do
 
     overrides = 5.times.map do
       override = @assignment.assignment_overrides.build
-      override.set = @assignment.group_category.groups.create!
+      override.set = @assignment.group_category.groups.create!(context: @assignment.context)
       override.save!
 
       override.workflow_state.should == 'active'
@@ -842,7 +842,7 @@ describe Assignment do
     end
   end
 
-  context "to_json" do
+  context "as_json" do
     it "should include permissions if specified" do
       assignment_model
       @course.offer!
@@ -852,7 +852,7 @@ describe Assignment do
       @assignment.to_json(:permissions => {:user => nil}).should match(/\"permissions\"\s*:\s*\{\}/)
       @assignment.grants_right?(@teacher, nil, :create).should eql(true)
       @assignment.to_json(:permissions => {:user => @teacher, :session => nil}).should match(/\"permissions\"\s*:\s*\{\"/)
-      hash = ActiveSupport::JSON.decode(@assignment.to_json(:permissions => {:user => @teacher, :session => nil}))
+      hash = @assignment.as_json(:permissions => {:user => @teacher, :session => nil})
       hash["assignment"].should_not be_nil
       hash["assignment"]["permissions"].should_not be_nil
       hash["assignment"]["permissions"].should_not be_empty
@@ -862,7 +862,7 @@ describe Assignment do
     it "should serialize with roots included in nested elements" do
       course_model
       @course.assignments.create!(:title => "some assignment")
-      hash = ActiveSupport::JSON.decode(@course.to_json(:include => :assignments))
+      hash = @course.as_json(:include => :assignments)
       hash["course"].should_not be_nil
       hash["course"]["assignments"].should_not be_empty
       hash["course"]["assignments"][0].should_not be_nil
@@ -874,7 +874,7 @@ describe Assignment do
       @course.offer!
       @enr1 = @course.enroll_teacher(@teacher = user)
       @enr1.accept
-      hash = ActiveSupport::JSON.decode(@course.to_json(:permissions => {:user => @teacher, :session => nil} ))
+      hash = @course.as_json(:permissions => {:user => @teacher, :session => nil} )
       hash["course"].should_not be_nil
       hash["course"]["permissions"].should_not be_nil
       hash["course"]["permissions"].should_not be_empty
@@ -886,7 +886,7 @@ describe Assignment do
       @course.offer!
       @enr1 = @course.enroll_teacher(@teacher = user)
       @enr1.accept
-      hash = ActiveSupport::JSON.decode(@course.to_json(:include_root => false, :permissions => {:user => @teacher, :session => nil} ))
+      hash = @course.as_json(:include_root => false, :permissions => {:user => @teacher, :session => nil} )
       hash["course"].should be_nil
       hash["name"].should eql(@course.name)
       hash["permissions"].should_not be_nil
@@ -896,7 +896,7 @@ describe Assignment do
 
     it "should include group_category" do
       assignment_model(:group_category => "Something")
-      hash = ActiveSupport::JSON.decode(@assignment.to_json)
+      hash = @assignment.as_json
       hash["assignment"]["group_category"].should == "Something"
     end
   end
@@ -1125,6 +1125,17 @@ describe Assignment do
       @a.state.should eql(:published)
       @quiz.reload
       @quiz.state.should eql(:created)
+    end
+
+    it "updates the draft state of its associated quiz" do
+      assignment_model(:course => @course, :submission_types => "online_quiz")
+      Account.default.enable_draft!
+      @a.reload
+      @a.publish
+      @a.save!
+      @a.quiz.reload.should be_published
+      @a.unpublish
+      @a.quiz.reload.should_not be_published
     end
 
     it "should create a discussion_topic if none exists and specified" do
@@ -1595,7 +1606,7 @@ describe Assignment do
     it "should serialize permissions" do
       course_with_teacher(:active_all => true)
       @assignment = @course.assignments.create!(:title => "some assignment")
-      data = ActiveSupport::JSON.decode(@assignment.to_json(:permissions => {:user => @user, :session => nil})) rescue nil
+      data = @assignment.as_json(:permissions => {:user => @user, :session => nil}) rescue nil
       data.should_not be_nil
       data['assignment'].should_not be_nil
       data['assignment']['permissions'].should_not be_nil
@@ -1711,6 +1722,27 @@ describe Assignment do
       result = @assignment.reload.group_students(@student1)
       result.first.should == @group1
       result.last.map{ |u| u.id }.sort.should == [@student1, @student2].map{ |u| u.id }.sort
+    end
+
+    it "returns distinct users" do
+      s1, s2 = n_students_in_course(2)
+
+      section = @course.course_sections.create! name: "some section"
+      e = @course.enroll_user s1, 'StudentEnrollment',
+                              section: section,
+                              allow_multiple_enrollments: true
+      e.update_attribute :workflow_state, 'active'
+
+      gc = @course.group_categories.create! name: "Homework Groups"
+      group = gc.groups.create! name: "Group 1", context: @course
+      group.add_user(s1)
+      group.add_user(s2)
+
+      a = @course.assignments.create! name: "Group Assignment",
+                                      group_category_id: gc.id
+      g, students = a.group_students(s1)
+      g.should == group
+      students.sort_by(&:id).should == [s1, s2]
     end
   end
 
@@ -2115,7 +2147,7 @@ describe Assignment do
     it 'returns "groups" instead of students for group assignments' do
       course_with_teacher active_all: true
       gc = @course.group_categories.create! name: "Assignment Groups"
-      groups = 2.times.map { |i| gc.groups.create! name: "Group #{i}" }
+      groups = 2.times.map { |i| gc.groups.create! name: "Group #{i}", context: @course }
       students = 4.times.map { student_in_course(active_all: true); @student }
       students.each_with_index { |s, i| groups[i % groups.length].add_user(s) }
       assignment = @course.assignments.create!(
@@ -2129,6 +2161,39 @@ describe Assignment do
         group.users.map(&:id).should include j["id"]
       end
       json["GROUP_GRADING_MODE"].should be_true
+    end
+
+    it "works for quizzes without quiz_submissions" do
+      course_with_teacher(:active_all => true)
+      student_in_course
+      quiz = @course.quizzes.create! :title => "Final",
+                                     :quiz_type => "assignment"
+      quiz.did_edit
+      quiz.offer
+
+      assignment = quiz.assignment
+      assignment.grade_student(@student, grade: 1)
+      json = assignment.speed_grader_json(@teacher)
+      json[:submissions].all? { |s|
+        s.has_key? 'submission_history'
+      }.should be_true
+    end
+
+    it "returns quiz lateness correctly" do
+      course_with_teacher(:active_all => true)
+      student_in_course
+      quiz_with_graded_submission([], { :course => @course, :user => @student })
+      @quiz.time_limit = 10
+      @quiz.save!
+
+      json = @assignment.speed_grader_json(@teacher)
+      json[:submissions].first['submission_history'].first[:submission]['late'].should be_false
+
+      @quiz.due_at = 1.day.ago
+      @quiz.save!
+
+      json = @assignment.speed_grader_json(@teacher)
+      json[:submissions].first['submission_history'].first[:submission]['late'].should be_true
     end
   end
 
@@ -2380,7 +2445,7 @@ describe Assignment do
       gc = @course.group_categories.create! name: "Homework Groups"
       @assignment.update_attributes group_category_id: gc.id,
                                     grade_group_students_individually: false
-      g1, g2 = 2.times.map { |i| gc.groups.create! name: "Group #{i}" }
+      g1, g2 = 2.times.map { |i| gc.groups.create! name: "Group #{i}", context: @course }
       g1.add_user(s1)
       g1.add_user(s2)
 
@@ -2391,7 +2456,9 @@ describe Assignment do
         zip.open.path,
         @teacher)
 
-      comments.map { |g| g.map { |c| c.submission.user } }.should == [[s1, s2]]
+      comments.map { |g|
+        g.map { |c| c.submission.user }.sort_by(&:id)
+      }.should == [[s1, s2]]
     end
   end
 end
@@ -2464,6 +2531,7 @@ def zip_submissions
   zip.context = @assignment
   zip.save!
   ContentZipper.process_attachment(zip, @teacher)
+  raise "zip failed" if zip.workflow_state != "zipped"
   zip
 end
 

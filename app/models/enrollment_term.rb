@@ -27,6 +27,7 @@ class EnrollmentTerm < ActiveRecord::Base
   has_many :courses
   has_many :enrollments, :through => :courses
   has_many :course_sections
+  validates_presence_of :root_account_id, :workflow_state
   before_validation :verify_unique_sis_source_id
   before_save :update_courses_later_if_necessary
 

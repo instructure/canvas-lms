@@ -55,6 +55,11 @@
 #       "position":1,
 #       "auth_base":"127.0.0.1"
 #     }
+#
+# @object DiscoveryUrl
+#     {
+#       "discovery_url": "http://..."
+#     }
 
 class AccountAuthorizationConfigsController < ApplicationController
   before_filter :require_context, :require_root_account_management
@@ -434,7 +439,7 @@ class AccountAuthorizationConfigsController < ApplicationController
   #   curl 'https://<canvas>/api/v1/account/<account_id>/account_authorization_configs/discovery_url' \ 
   #        -H 'Authorization: Bearer <token>'
   #
-  # @returns discovery url
+  # @returns DiscoveryUrl
   def show_discovery_url
     render :json => {:discovery_url => @account.auth_discovery_url}
   end
@@ -454,7 +459,7 @@ class AccountAuthorizationConfigsController < ApplicationController
   #        -F 'discovery_url=<new_url>' \ 
   #        -H 'Authorization: Bearer <token>'
   #
-  # @returns discovery url
+  # @returns DiscoveryUrl
   def update_discovery_url
     if params[:discovery_url] && params[:discovery_url] != ''
       @account.auth_discovery_url = params[:discovery_url]

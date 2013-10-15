@@ -195,7 +195,7 @@ describe RubricsController do
     it "should not update the rubric if not updateable (should make a new one instead)" do
       course_with_teacher_logged_in(:active_all => true)
       rubric_association_model(:user => @user, :context => @course, :purpose => 'grading')
-      @rubric.rubric_associations.create!(:purpose => 'grading')
+      @rubric.rubric_associations.create!(:purpose => 'grading', :context => @course, :association => @course)
       put 'update', :course_id => @course.id, :id => @rubric.id, :rubric => {:title => "new title"}, :rubric_association_id => @rubric_association.id
       assigns[:rubric].should_not eql(@rubric)
       assigns[:rubric].should_not be_new_record
@@ -233,7 +233,7 @@ describe RubricsController do
       }
       @rubric.update_criteria(params)
       @rubric.save!
-      @rubric.rubric_associations.create!(:purpose => 'grading')
+      @rubric.rubric_associations.create!(:purpose => 'grading', :context => @course, :association => @course)
       criteria = @rubric.criteria
       put 'update', :course_id => @course.id, :id => @rubric.id, :rubric => params, :rubric_association_id => @rubric_association.id
       assigns[:rubric].should eql(@rubric)
@@ -283,7 +283,7 @@ describe RubricsController do
       )
       outcome_group.add_outcome(outcome)
       outcome_group.save!
-      
+
       update_params = {
                             "course_id" => @course.id,
                                    "id" => @rubric.id,
@@ -347,7 +347,7 @@ describe RubricsController do
       outcome_with_rubric
       assignment = @course.assignments.create!(assignment_valid_attributes)
       association = @rubric.associate_with(assignment, @course, :purpose => 'grading')
-      
+
       update_params = {
                             "course_id" => @course.id,
                                    "id" => @rubric.id,
@@ -400,6 +400,65 @@ describe RubricsController do
       assignment.reload.learning_outcome_alignments.count.should == 0
       @rubric.reload.learning_outcome_alignments.count.should == 0
     end
+
+    it "should remove an outcome association for all associations" do
+      course_with_teacher_logged_in(:active_all => true)
+      outcome_with_rubric
+      assignment = @course.assignments.create!(assignment_valid_attributes)
+      association = @rubric.associate_with(assignment, @course, :purpose => 'grading')
+
+      update_params = {
+                            "course_id" => @course.id,
+                                   "id" => @rubric.id,
+                      "points_possible" => "5",
+                               "rubric" => {
+                              "criteria" => {
+            "0" => {
+                      "description" => "Description of criterion",
+                               "id" => "",
+              "learning_outcome_id" => "",
+                 "long_description" => "",
+                           "points" => "5",
+                          "ratings" => {
+                "0" => {
+                  "description" => "Full Marks",
+                           "id" => "blank",
+                       "points" => "5"
+                },
+                "1" => {
+                  "description" => "No Marks",
+                           "id" => "blank_2",
+                       "points" => "0"
+                }
+              }
+            }
+          },
+          "free_form_criterion_comments" => "0",
+                       "points_possible" => "5",
+                                 "title" => "Some Rubric"
+        },
+                   "rubric_association" => {
+            "association_id" => @course.id,
+          "association_type" => "Course",
+          "hide_score_total" => "0",
+                        "id" => "",
+                   "purpose" => "bookmark",
+           "use_for_grading" => "0"
+        },
+                "rubric_association_id" => "",
+                            "rubric_id" => @rubric.id,
+        "skip_updating_points_possible" => "false",
+                                "title" => "Some Rubric"
+      }
+
+      assignment.reload.learning_outcome_alignments.count.should == 1
+      @rubric.reload.learning_outcome_alignments.count.should == 1
+
+      put 'update', update_params
+
+      assignment.reload.learning_outcome_alignments.count.should == 0
+      @rubric.reload.learning_outcome_alignments.count.should == 0
+    end
   end
   
   describe "DELETE 'destroy'" do
@@ -422,7 +481,7 @@ describe RubricsController do
       Account.default.add_user(@user, 'AccountAdmin')
 
       @rubric = Rubric.create!(:user => @user, :context => @course)
-      RubricAssociation.create!(:rubric => @rubric, :context => @course, :purpose => :bookmark)
+      RubricAssociation.create!(:rubric => @rubric, :context => @course, :purpose => :bookmark, :association => @course)
       @course.rubric_associations.bookmarked.include_rubric.to_a.select(&:rubric_id).once_per(&:rubric_id).sort_by{|a| a.rubric.title }.map(&:rubric).should == [@rubric]
 
       delete 'destroy', :course_id => @course.id, :id => @rubric.id
@@ -438,8 +497,8 @@ describe RubricsController do
       @user.reload
 
       @rubric = Rubric.create!(:user => @user, :context => Account.default)
-      RubricAssociation.create!(:rubric => @rubric, :context => @course, :purpose => :bookmark)
-      RubricAssociation.create!(:rubric => @rubric, :context => Account.default, :purpose => :bookmark)
+      RubricAssociation.create!(:rubric => @rubric, :context => @course, :purpose => :bookmark, :association => @course)
+      RubricAssociation.create!(:rubric => @rubric, :context => Account.default, :purpose => :bookmark, :association => @course)
       @course.rubric_associations.bookmarked.include_rubric.to_a.select(&:rubric_id).once_per(&:rubric_id).sort_by{|a| a.rubric.title }.map(&:rubric).should == [@rubric]
       
       delete 'destroy', :course_id => @course.id, :id => @rubric.id

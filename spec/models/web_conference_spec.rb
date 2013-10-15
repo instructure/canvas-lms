@@ -48,7 +48,7 @@ describe WebConference do
       user_model
       email = "email@email.com"
       @user.stubs(:email).returns(email)
-      conference = DimDimConference.create!(:title => "my conference", :user => @user, :user_settings => {:foo => :bar})
+      conference = DimDimConference.create!(:title => "my conference", :user => @user, :user_settings => {:foo => :bar}, :context => course)
       conference.user_settings.should be_empty
     end
 
@@ -56,7 +56,7 @@ describe WebConference do
       user_model
       email = "email@email.com"
       @user.stubs(:email).returns(email)
-      conference = BigBlueButtonConference.new(:title => "my conference", :user => @user)
+      conference = BigBlueButtonConference.new(:title => "my conference", :user => @user, :context => course)
       conference.settings = {:record => true, :not => :for_user}
       conference.save
       conference.reload
@@ -70,7 +70,7 @@ describe WebConference do
       user_model
       email = "email@email.com"
       @user.stubs(:email).returns(email)
-      conference = DimDimConference.create!(:title => "my conference", :user => @user, :duration => 60)
+      conference = DimDimConference.create!(:title => "my conference", :user => @user, :duration => 60, :context => course)
       conference.start_at.should be_nil
       conference.end_at.should be_nil
       conference.started_at.should be_nil
@@ -81,7 +81,7 @@ describe WebConference do
       user_model
       email = "email@email.com"
       @user.stubs(:email).returns(email)
-      conference = DimDimConference.create!(:title => "my conference", :user => @user, :duration => 60)
+      conference = DimDimConference.create!(:title => "my conference", :user => @user, :duration => 60, :context => course)
       conference.add_attendee(@user)
       conference.start_at.should_not be_nil
       conference.end_at.should eql(conference.start_at + conference.duration_in_seconds)
@@ -93,7 +93,7 @@ describe WebConference do
       user_model
       email = "email@email.com"
       @user.stubs(:email).returns(email)
-      conference = DimDimConference.create!(:title => "my conference", :user => @user, :duration => 60)
+      conference = DimDimConference.create!(:title => "my conference", :user => @user, :duration => 60, :context => course)
       conference.add_attendee(@user)
       conference.stubs(:conference_status).returns(:active)
       conference.ended_at.should be_nil
@@ -105,7 +105,7 @@ describe WebConference do
       user_model
       email = "email@email.com"
       @user.stubs(:email).returns(email)
-      conference = DimDimConference.create!(:title => "my conference", :user => @user, :duration => 60)
+      conference = DimDimConference.create!(:title => "my conference", :user => @user, :duration => 60, :context => course)
       conference.add_attendee(@user)
       conference.stubs(:conference_status).returns(:closed)
       conference.ended_at.should be_nil
@@ -117,7 +117,7 @@ describe WebConference do
       user_model
       email = "email@email.com"
       @user.stubs(:email).returns(email)
-      conference = DimDimConference.create!(:title => "my conference", :user => @user, :duration => 60)
+      conference = DimDimConference.create!(:title => "my conference", :user => @user, :duration => 60, :context => course)
       conference.add_attendee(@user)
       conference.stubs(:conference_status).returns(:closed)
       conference.start_at = 30.minutes.ago
@@ -133,7 +133,7 @@ describe WebConference do
       user_model
       email = "email@email.com"
       @user.stubs(:email).returns(email)
-      conference = DimDimConference.create!(:title => "my conference", :user => @user, :duration => 60)
+      conference = DimDimConference.create!(:title => "my conference", :user => @user, :duration => 60, :context => course)
       conference.add_attendee(@user)
       conference.stubs(:conference_status).returns(:active)
       conference.ended_at.should be_nil
@@ -150,7 +150,7 @@ describe WebConference do
       user_model
       email = "email@email.com"
       @user.stubs(:email).returns(email)
-      conference = DimDimConference.create!(:title => "my conference", :user => @user, :duration => 60)
+      conference = DimDimConference.create!(:title => "my conference", :user => @user, :duration => 60, :context => course)
       conference.add_attendee(@user)
       conference.stubs(:conference_status).returns(:active)
       conference.should_not be_finished
@@ -161,7 +161,7 @@ describe WebConference do
       user_model
       email = "email@email.com"
       @user.stubs(:email).returns(email)
-      conference = DimDimConference.create!(:title => "my conference", :user => @user, :duration => 60)
+      conference = DimDimConference.create!(:title => "my conference", :user => @user, :duration => 60, :context => course)
       conference.add_attendee(@user)
       conference.start_at = 30.minutes.ago
       conference.end_at = 20.minutes.ago
@@ -175,7 +175,7 @@ describe WebConference do
       user_model
       email = "email@email.com"
       @user.stubs(:email).returns(email)
-      conference = DimDimConference.create!(:title => "my conference", :user => @user)
+      conference = DimDimConference.create!(:title => "my conference", :user => @user, :context => course)
       conference.add_attendee(@user)
       conference.start_at = 30.minutes.ago
       conference.close

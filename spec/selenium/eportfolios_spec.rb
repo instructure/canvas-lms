@@ -131,7 +131,7 @@ describe "eportfolios" do
 
       it "should click on the How Do I..? button" do
         f(".wizard_popup_link").click
-        f("#wizard_box .wizard_options_list").should be_displayed
+        keep_trying_until { f("#wizard_box .wizard_options_list").should be_displayed }
       end
 
       it "should add rich text content" do

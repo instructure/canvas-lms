@@ -4,7 +4,7 @@
 {{else}}
   <label class="checkbox">
     <i class="{{iconClass}}"></i>
-    <input type="checkbox" name="{{property}}" id="checkbox-{{cid}}" {{#if checked}}checked{{/if}}/> <span data-bind="title">{{title}}</span> {{#if count}}<span data-bind="count">({{count}})</span>{{/if}}
+    <input type="checkbox" name="{{property}}" value="1" id="checkbox-{{cid}}" {{#if checked}}checked{{/if}}/> <span data-bind="title">{{title}}</span> {{#if count}}<span data-bind="count">({{count}})</span>{{/if}}
      {{#if linkedMessage}}<span data-bind="linkedMessage">({{linkedMessage}})</span>{{/if}}
   </label>
 {{/if}}

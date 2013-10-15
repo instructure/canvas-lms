@@ -253,7 +253,7 @@ describe GradebooksController do
           controller.js_env.clear
           user_session(u)
           get 'grade_summary', :course_id => @course.id, :id => @student.id
-          assigns[:presenter].assignments.find{|a| a.class == Assignment}.due_at.should == due_at
+          assigns[:presenter].assignments.find{|a| a.class == Assignment}.due_at.to_i.should == due_at.to_i
         end
       end
 
@@ -496,6 +496,53 @@ describe GradebooksController do
       get 'speed_grader', :course_id => @course.id, :assignment_id => assignment.id
       response.should be_redirect
       response.flash[:notice].should == 'SpeedGrader is disabled for this course'
+    end
+
+    context "draft state" do
+
+      before do
+        course_with_teacher_logged_in(active_all: true)
+        @assign = @course.assignments.create!(title: 'Totally')
+        @assign.unpublish
+      end
+
+      it "redirects if draft state is enabled and the assignment is unpublished" do
+
+        # Unpublished assignment and draft state enabled
+        @course.account.enable_draft!
+
+        get 'speed_grader', course_id: @course, assignment_id: @assign.id
+        response.should be_redirect
+        response.flash[:notice].should == I18n.t(
+          :speedgrader_enabled_only_for_published_content,
+                           'Speedgrader is enabled only for published content.')
+
+        # Published assignment and draft state enabled
+        @assign.publish
+        get 'speed_grader', course_id: @course, assignment_id: @assign.id
+        response.should_not be_redirect
+      end
+
+      it "does not redirect if draft state isn't enabled" do
+        get 'speed_grader', course_id: @course, assignment_id: @assign.id
+        response.should_not be_redirect
+      end
+
+    end
+  end
+
+  describe "POST 'speed_grader_settings'" do
+    it "lets you set your :enable_speedgrader_grade_by_question preference" do
+      course_with_teacher_logged_in(:active_all => true)
+      @teacher.preferences[:enable_speedgrader_grade_by_question].should_not be_true
+
+      post 'speed_grader_settings', course_id: @course.id,
+        enable_speedgrader_grade_by_question: "1"
+      @teacher.reload.preferences[:enable_speedgrader_grade_by_question].should be_true
+
+      post 'speed_grader_settings', course_id: @course.id,
+        enable_speedgrader_grade_by_question: "0"
+      @teacher.reload.preferences[:enable_speedgrader_grade_by_question].should_not be_true
     end
   end
 end

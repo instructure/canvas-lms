@@ -22,28 +22,28 @@
 #
 # @object File
 #     {
-#       "size":4,
-#       "content-type":"text/plain",
-#       "url":"http://www.example.com/files/569/download?download_frd=1\u0026verifier=c6HdZmxOZa0Fiin2cbvZeI8I5ry7yqD7RChQzb6P",
-#       "id":569,
-#       "display_name":"file.txt",
-#       "created_at':"2012-07-06T14:58:50Z",
-#       "updated_at':"2012-07-06T14:58:50Z",
-#       "unlock_at':null,
-#       "locked':false,
-#       "hidden':false,
-#       "lock_at':null,
-#       "locked_for_user":false,
-#       "lock_info":{
-#         "asset_string":"file_569",
-#         "unlock_at":"2013-01-01T00:00:00-06:00",
-#         "lock_at":"2013-02-01T00:00:00-06:00",
-#         "context_module":{ ... },
-#         "manually_locked":true
+#       "size": 4,
+#       "content-type": "text/plain",
+#       "url": "http://www.example.com/files/569/download?download_frd=1\u0026verifier=c6HdZmxOZa0Fiin2cbvZeI8I5ry7yqD7RChQzb6P",
+#       "id": 569,
+#       "display_name": "file.txt",
+#       "created_at": "2012-07-06T14:58:50Z",
+#       "updated_at": "2012-07-06T14:58:50Z",
+#       "unlock_at": null,
+#       "locked": false,
+#       "hidden": false,
+#       "lock_at": null,
+#       "locked_for_user": false,
+#       "lock_info": {
+#         "asset_string": "file_569",
+#         "unlock_at": "2013-01-01T00:00:00-06:00",
+#         "lock_at": "2013-02-01T00:00:00-06:00",
+#         "context_module": {},
+#         "manually_locked": true
 #       },
-#       "lock_explanation":"This assignment is locked until September 1 at 12:00am",
-#       "hidden_for_user":false,
-#       "thumbnail_url":null
+#       "lock_explanation": "This assignment is locked until September 1 at 12:00am",
+#       "hidden_for_user": false,
+#       "thumbnail_url": null
 #     }
 class FilesController < ApplicationController
   before_filter :require_user, :only => :create_pending

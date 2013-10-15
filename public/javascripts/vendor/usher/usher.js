@@ -17,11 +17,8 @@ define(['jquery', 'jqueryui/core', 'vendor/usher/scrollIntoView'], function($) {
     this.initPopups();
     this.attachEvents();
     this.$el.hide();
-    this.constructor.addInstance(this);
     return this;
   }
-
-  Usher.autoStartFromHash = true;
 
   Usher.prototype.defaults = {
     position: true,
@@ -38,19 +35,20 @@ define(['jquery', 'jqueryui/core', 'vendor/usher/scrollIntoView'], function($) {
   /**
    * Start a tour.
    *
-   * The initial popup to display will be the first unless one is found in the
-   * hash.
-   *
    * @return {Usher}
    * @api public
    */
 
-  Usher.prototype.start = function() {
-    if (this.$popup) return; // started from constructor
-    var indexFromHash = this.getIndexFromHash();
-    var index = indexFromHash > -1 ? indexFromHash : 0;
-    this.$el.show();
+  Usher.prototype.start = function(index) {
+    index = index == null ? 0 : index;
     this.show(index);
+  };
+
+  Usher.prototype.indexOfPopupId = function(id) {
+    for (var i = 0; i < this.popups.length; i++) {
+      if (this.popups[i].attr('id') == id) return i;
+    }
+    return -1;
   };
 
   /**
@@ -62,6 +60,9 @@ define(['jquery', 'jqueryui/core', 'vendor/usher/scrollIntoView'], function($) {
    */
 
   Usher.prototype.show = function(index) {
+    if (typeof index === 'string') {
+      index = this.indexOfPopupId(index);
+    }
     this.$el.show();
     this.hideCurrent();
     this.$popup = this.popups[index];
@@ -116,7 +117,6 @@ define(['jquery', 'jqueryui/core', 'vendor/usher/scrollIntoView'], function($) {
   Usher.prototype.close = function(event) {
     this.$el.hide();
     if (event) event.preventDefault();
-    window.location.hash = '';
     this.trigger('hide');
     return this;
   };
@@ -129,37 +129,8 @@ define(['jquery', 'jqueryui/core', 'vendor/usher/scrollIntoView'], function($) {
 
   Usher.prototype.beforeShow = function() {
     this.trigger(this.$popup.attr('id') + ':before');
-    this.appendHash();
   };
 
-  /**
-   * Appends a hash to a popup's `points-to` href to persist a tour across page
-   * loads.
-   *
-   * @api private
-   */
-
-  Usher.prototype.appendHash = function() {
-    var data = this.$popup.data();
-    if (!data.appendHash || !data.pointsTo) return;
-    var target = $(data.pointsTo);
-    var hash = data.appendHash.replace(/^#/, '');
-    target.attr('href', target.attr('href') + '#' + hash);
-  };
-
-  /**
-   * Removes hash from popup's `points-to` href.
-   *
-   * @api private
-   */
-
-  Usher.prototype.removeHash = function() {
-    var data = this.$popup.data();
-    if (!data.appendHash || !data.pointsTo) return;
-    var target = $(data.pointsTo);
-    var href = target.attr('href').replace(/#.+$/, '');
-    target.attr('href', href);
-  };
 
   /**
    * Animates the popup.
@@ -202,9 +173,10 @@ define(['jquery', 'jqueryui/core', 'vendor/usher/scrollIntoView'], function($) {
    */
 
   Usher.prototype.bindMethods = function() {
-    this.initPopup = $.proxy(this, 'initPopup');
-    this.close = $.proxy(this, 'close');
-    this.animate = $.proxy(this, 'animate');
+    var methods = ['initPopups', 'close', 'animate', 'showFromDataAttribute'];
+    for (var i = 0; i < methods.length; i += 1) {
+      this[methods[i]] = $.proxy(this, methods[i]);
+    }
   };
 
   /**
@@ -215,7 +187,12 @@ define(['jquery', 'jqueryui/core', 'vendor/usher/scrollIntoView'], function($) {
 
   Usher.prototype.attachEvents = function() {
     this.$el.on('click.usher', '.usher-close', this.close);
-    //$('body').on('click.usher', '[hijack]', $.proxy(this, 'hijackClick'));
+    $('body').on('click.usher', '[data-usher-show]', this.showFromDataAttribute);
+  };
+
+  Usher.prototype.showFromDataAttribute = function(event) {
+    var id = $(event.target).data('usherShow');
+    this.show(id);
   };
 
   /**
@@ -226,24 +203,6 @@ define(['jquery', 'jqueryui/core', 'vendor/usher/scrollIntoView'], function($) {
 
   Usher.prototype.removeEvents = function() {
     this.$el.off('.usher');
-    //$('body').off('.usher');
-  };
-
-  /**
-   * Finds the index for the popup id found in `location.hash` or -1 if not
-   * found.
-   *
-   * @return {Number}
-   * @api private
-   */
-
-  Usher.prototype.getIndexFromHash = function() {
-    var id = window.location.hash.replace(/^#/, '');
-    if (id === '') return -1;
-    for (var i = 0; i < this.popups.length; i++) {
-      if (this.popups[i].attr('id') == id) return i;
-    }
-    return -1;
   };
 
   /**
@@ -274,9 +233,8 @@ define(['jquery', 'jqueryui/core', 'vendor/usher/scrollIntoView'], function($) {
    */
 
   Usher.prototype.hideCurrent = function() {
-    if (!this.$popup) return;
+    if (!this.$popup) return; // don't first time showing
     this.$popup.hide();
-    this.removeHash();
     this.trigger(this.$popup.attr('id') + ':hide');
   };
 
@@ -345,12 +303,6 @@ define(['jquery', 'jqueryui/core', 'vendor/usher/scrollIntoView'], function($) {
   };
 
   /**
-   * Stores all instances
-   */
-
-  Usher.instances = [];
-
-  /**
    * Map `points-to` values to `$.fn.position` options.
    */
 
@@ -362,47 +314,6 @@ define(['jquery', 'jqueryui/core', 'vendor/usher/scrollIntoView'], function($) {
     top:       { my: 'bottom', at: 'top',    collision: 'none' },
     bottom:    { my: 'top',    at: 'bottom', collision: 'none' },
     'default': { my: 'center', at: 'center', of: window, collision: 'none' }
-  };
-
-  /**
-   * Adds an Usher to instances array.
-   *
-   * @param {Usher} instance
-   * @api private
-   */
-
-  Usher.addInstance = function(instance) {
-    this.instances.push(instance);
-    if (this.instances.length == 1) {
-      this.attachEvents();
-      if (this.autoStartFromHash) this.checkHash();
-    }
-  };
-
-  /**
-   * Attaches hashchange event for all instances.
-   *
-   * @api private
-   */
-
-  Usher.attachEvents = function() {
-    $(window).on('hashchange', $.proxy(this, 'checkHash'));
-  };
-
-  /**
-   * Checks `location.hash` for popups in all instances and shows one if found.
-   *
-   * @param {Object} event jQuery event object
-   * @api private
-   */
-
-  Usher.checkHash = function(event) {
-    for (var i = 0; i < this.instances.length; i++) {
-      var index = this.instances[i].getIndexFromHash();
-      if (index == -1) continue;
-      this.instances[i].show(index);
-      break;
-    }
   };
 
   return Usher;

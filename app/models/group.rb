@@ -23,6 +23,7 @@ class Group < ActiveRecord::Base
   include UserFollow::FollowedItem
 
   attr_accessible :name, :context, :max_membership, :group_category, :join_level, :default_view, :description, :is_public, :avatar_attachment, :storage_quota_mb
+  validates_presence_of :context_id, :context_type, :account_id, :root_account_id, :workflow_state
   validates_allowed_transitions :is_public, false => true
 
   has_many :group_memberships, :dependent => :destroy, :conditions => ['group_memberships.workflow_state != ?', 'deleted']
@@ -62,7 +63,8 @@ class Group < ActiveRecord::Base
   has_many :following_user_follows, :class_name => 'UserFollow', :as => :followed_item
   has_many :user_follows, :foreign_key => 'following_user_id'
 
-  before_save :ensure_defaults, :maintain_category_attribute
+  before_validation :ensure_defaults
+  before_save :maintain_category_attribute
   after_save :close_memberships_if_deleted
 
   include StickySisFields

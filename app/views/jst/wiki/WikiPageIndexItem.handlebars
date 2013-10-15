@@ -15,12 +15,10 @@
     </a>
     <ul class="al-options">
       <li><a href="#" class="icon-edit edit-menu-item" title="{{#t 'menu.edit'}}Edit{{/t}}">{{#t 'menu.edit'}}Edit{{/t}}</a></li>
-      <li><a href="#" class="icon-trash delete-menu-item" title="{{#t 'menu.delete'}}Delete{{/t}}">{{#t 'menu.delete'}}Delete{{/t}}</a></li>
-      {{#if front_page}}
-        <li><a href="#" class="icon-home remove-front-page-menu-item" title="{{#t 'menu.remove_front_page'}}Remove as Front Page{{/t}}">{{#t 'menu.remove_front_page'}}Remove as Front Page{{/t}}</a></li>
-      {{else}}
-        <li><a href="#" class="icon-home set-front-page-menu-item" title="{{#t 'menu.set_front_page'}}Set as Front Page{{/t}}">{{#t 'menu.set_front_page'}}Set as Front Page{{/t}}</a></li>
-      {{/if}}
+      <li><a href="#" class="icon-trash delete-menu-item{{#unless deletable}} disabled{{/unless}}" title="{{#t 'menu.delete'}}Delete{{/t}}" {{#unless deletable}}aria-disabled="true"{{/unless}}>{{#t 'menu.delete'}}Delete{{/t}}</a></li>
+      {{#unless front_page}}
+        <li><a href="#" class="icon-document use-as-front-page-menu-item{{#unless published}} disabled{{/unless}}" title="{{#t 'menu.use_front_page'}}Use as Front Page{{/t}}" {{#unless published}}aria-disabled="true"{{/unless}}>{{#t 'menu.use_front_page'}}Use as Front Page{{/t}}</a></li>
+      {{/unless}}
     </ul>
   </td>
 {{/if}}

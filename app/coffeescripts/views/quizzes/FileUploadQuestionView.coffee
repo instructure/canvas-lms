@@ -47,9 +47,8 @@ define [
       # For now, remove the input rendered in ERB-land, and the template is
       # responsible for rendering a fallback to a regular input type=file
       isIE = !!$.browser.msie
-      if isIE
-        @$fileUpload.remove()
       @$fileUploadBox.html template _.extend({}, @model.present(), {isIE})
+      @$fileUpload = @$ '.file-upload'
       this
 
     removeFileStatusMessage: =>

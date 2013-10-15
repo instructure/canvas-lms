@@ -3,9 +3,10 @@ define [
   'underscore'
   'jst/content_migrations/MigrationConverter'
   'compiled/views/ValidatedFormView'
+  'i18n!content_migrations'
   'vendor/jquery.ba-tinypubsub'
   'jquery.disableWhileLoading'
-], ($, _, template, ValidatedFormView) -> 
+], ($, _, template, ValidatedFormView, I18n) ->
 
   # This is an abstract class that is inherited 
   # from by other MigrationConverter views
@@ -14,13 +15,14 @@ define [
 
     template: template
 
-    initialize: -> 
+    initialize: ->
       super
       $.subscribe 'resetForm', @resetForm
     
-    els: 
+    els:
       '#converter'                : '$converter'
       '#chooseMigrationConverter' : '$chooseMigrationConverter'
+      '#submitMigration'          : '$submitBtn'
       '.form-container'           : '$formActions'
 
     events: _.extend({}, @::events,
@@ -28,7 +30,7 @@ define [
       'click .cancelBtn'                 : 'resetForm'
     )
 
-    toJSON: (json) -> 
+    toJSON: (json) ->
       json = super
       json.selectOptions = @selectOptions || ENV.SELECT_OPTIONS
       json
@@ -38,16 +40,15 @@ define [
     # converter div if there were any previous 
     # items set. 
 
-    renderConverter: (converter) -> 
+    renderConverter: (converter) ->
       if converter
         # Set timeout ensures that all of the html is loaded at once. We need
         # this for accessibility to work correct.
-        setTimeout => 
+        _.defer =>
           @$converter.html converter.render().$el
           @trigger 'converterRendered'
-        , 0
       else
-        @resetForm() 
+        @resetForm()
         @trigger 'converterReset'
 
     # This is the actual action for making the view swaps when selecting
@@ -57,7 +58,7 @@ define [
     #
     # @api private
 
-    selectConverter: (event) -> 
+    selectConverter: (event) ->
       @$formActions.show()
       @model.resetModel()
       @$chooseMigrationConverter.attr "aria-activedescendant", @$chooseMigrationConverter.val() # This is purely for accessibility
@@ -73,9 +74,15 @@ define [
     # @expects event
     # @api ValidatedFormView override
 
-    submit: (event) -> 
+    submit: (event) ->
+      btnText = @$submitBtn.val()
+      @$submitBtn.val(I18n.t('uploading', 'Uploading...'))
+      $(window).on 'beforeunload', ->
+        I18n.t('upload_warning', "Navigating away from this page will cancel the upload process.")
       dfd = super
-      dfd?.done => 
+      dfd?.done =>
+        $(window).off 'beforeunload'
+        @$submitBtn.val(btnText)
         $.publish 'migrationCreated', @model.attributes
         @model.resetModel()
         @resetForm()
@@ -86,7 +93,7 @@ define [
     #
     # @api private
 
-    resetForm: => 
+    resetForm: =>
       @$formActions.hide()
       @$converter.empty()
       @$chooseMigrationConverter.val('none')

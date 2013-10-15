@@ -13,15 +13,14 @@ define [
     height: 160
 
   class WikiPageDeleteDialog extends DialogFormView
+    setViewProperties: false
     wrapperTemplate: -> '<div class="outlet"></div>'
     template: -> I18n.t 'delete_confirmation', 'Are you sure you wish to delete this wiki page?'
 
     @optionProperty 'wiki_pages_path'
 
     initialize: (options) ->
-      modelView = @model?.view
       super _.extend {}, dialogDefaults, options
-      @model?.view = modelView
 
     submit: (event) ->
       event?.preventDefault()
