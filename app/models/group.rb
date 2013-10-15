@@ -70,7 +70,13 @@ class Group < ActiveRecord::Base
   include StickySisFields
   are_sis_sticky :name
 
-  validates_length_of :name, :maximum => maximum_string_length, :allow_nil => true, :allow_blank => true
+  validates_each :name do |record, attr, value|
+    if value.blank?
+      record.errors.add attr, t(:name_required, "Name is required")
+    elsif value.length > maximum_string_length
+      record.errors.add attr, t(:name_too_long, "Enter a shorter group name")
+    end
+  end
 
   alias_method :participating_users_association, :participating_users
 
