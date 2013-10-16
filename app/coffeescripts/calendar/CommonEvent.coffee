@@ -76,13 +76,16 @@ define [
       @start && (@midnightFudged || (@start.getHours() == 23 && @start.getMinutes() == 59))
 
     copyDataFromObject: (data) ->
+      @midnightFudged = false # clear out cached value because now we have new data
       if @isDueAtMidnight()
         @midnightFudged = true
         @start.setMinutes(30)
+        @start.setSeconds(0)
+        @end = new Date(@start.getTime()) unless @end
       @forceMinimumDuration()
 
     forceMinimumDuration: () ->
       minimumDuration = 30 * 60 * 1000 # 30 minutes
-      if @end && (@end.getTime() - @start.getTime()) < minimumDuration
+      if @start && @end && (@end.getTime() - @start.getTime()) < minimumDuration
         # new date so we don't mutate the original
         @end = new Date(@start.getTime() + minimumDuration)
