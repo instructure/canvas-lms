@@ -24,6 +24,7 @@ define [
       @addClass "group_#{@contextCode()}"
       @description = data.description
       @start = @parseStartDate()
+      @end = null # in case it got set by midnight fudging
       @originalStartDate = new Date(@start) if @start
 
       super
