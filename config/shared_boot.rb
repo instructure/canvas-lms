@@ -60,17 +60,17 @@ config.autoload_paths += %W(#{Rails.root}/app/middleware
 if CANVAS_RAILS2
   # XXX: Rails3 needs SessionsTimeout
   config.middleware.insert_after(ActionController::Base.session_store, 'SessionsTimeout')
+  config.middleware.insert_before('ActionController::ParamsParser', "RequestContextGenerator")
   config.middleware.insert_before('ActionController::ParamsParser', 'LoadAccount')
   config.middleware.insert_before('ActionController::ParamsParser', 'StatsTiming')
   config.middleware.insert_before('ActionController::ParamsParser', 'Canvas::RequestThrottle')
   config.middleware.insert_before('ActionController::ParamsParser', 'PreventNonMultipartParse')
-  config.middleware.insert_before('ActionController::ParamsParser', "RequestContextGenerator")
 else
+  config.middleware.insert_before('ActionDispatch::ParamsParser', "RequestContextGenerator")
   config.middleware.insert_before('ActionDispatch::ParamsParser', 'LoadAccount')
   config.middleware.insert_before('ActionDispatch::ParamsParser', 'StatsTiming')
   config.middleware.insert_before('ActionDispatch::ParamsParser', 'Canvas::RequestThrottle')
   config.middleware.insert_before('ActionDispatch::ParamsParser', 'PreventNonMultipartParse')
-  config.middleware.insert_before('ActionDispatch::ParamsParser', "RequestContextGenerator")
 end
 
 config.to_prepare do
