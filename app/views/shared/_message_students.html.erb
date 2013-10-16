@@ -1,6 +1,9 @@
 <div id="message_students_dialog" style="display: none;">
   <%= form_tag conversations_url, :id => "message_assignment_recipients" do %>
     <%= hidden_field_tag :recipients, "", :class => "recipient_ids" %>
+    <%= hidden_field_tag :group_conversation, "true" %>
+    <%= hidden_field_tag :bulk_message, "true" %>
+    <%= hidden_field_tag :context_code, "" %>
     <h2><%= t('message_students_who', 'Message students who...') %></h2>
     <div style="margin-bottom: 15px;">
       <%= t('for_title', 'for %{title}', :title => '<span class="asset_title">&nbsp;</span>'.html_safe) %>
@@ -18,6 +21,12 @@
     </ul>
     <div class="clear"></div>
     <table class="formtable" style="width: 100%;">
+      <tr>
+        <td style="font-weight: bold;" colspan="2">
+          <%= label_tag :subject, before_label(:subject, "Subject") %>
+          <%= text_field_tag :subject, "", :style => "width: 90%;" %>
+        </td>
+      </tr>
       <tr>
         <td style="font-weight: bold;" colspan="2">
           <%= label_tag :body, before_label(:body, "Message") %>

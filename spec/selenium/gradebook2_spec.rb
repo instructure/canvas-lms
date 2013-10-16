@@ -405,6 +405,21 @@ describe "gradebook2" do
         visible_students[0].text.strip.should == STUDENT_NAME_2
         visible_students[1].text.strip.should == STUDENT_NAME_3
       end
+
+      it "should create separate conversations" do
+        message_text = "This is a message"
+
+        get "/courses/#{@course.id}/gradebook2"
+
+        open_assignment_options(2)
+        f('[data-action="messageStudentsWho"]').click
+        expect {
+          message_form = f('#message_assignment_recipients')
+          message_form.find_element(:css, '#body').send_keys(message_text)
+          submit_form(message_form)
+          wait_for_ajax_requests
+        }.to change(Conversation, :count).by_at_least(2)
+      end
     end
 
 

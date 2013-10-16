@@ -63,6 +63,7 @@ define([
     $message_students_dialog.find(".out_of").showIf(settings.points_possible != null);
     $message_students_dialog.find(".send_button").text(I18n.t("send_message", "Send Message"));
     $message_students_dialog.find(".points_possible").text(settings.points_possible);
+    $message_students_dialog.find("[name=context_code]").val(settings.context_code);
     
     $message_students_dialog.find("textarea").val("");
     $message_students_dialog.find("select")[0].selectedIndex = 0;
@@ -124,6 +125,9 @@ define([
       }
       student_ids = student_ids || [];
       
+      if (currentSettings.subjectCallback) {
+        $message_students_dialog.find("[name=subject]").val(currentSettings.subjectCallback(option.text, cutoff));
+      }
       $message_students_dialog.find(".cutoff_holder").showIf(option.cutoff);
       $message_students_dialog.find(".student_list").toggleClass('show_score', option.cutoff || option.score);
       $message_students_dialog.find("button").attr('disabled', student_ids.length == 0);

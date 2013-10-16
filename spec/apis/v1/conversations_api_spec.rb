@@ -779,6 +779,24 @@ describe ConversationsController, :type => :integration do
         json["errors"].should_not be_nil
         json["errors"]["subject"].should_not be_nil
       end
+
+      it "should send bulk group messages" do
+        json = api_call(:post, "/api/v1/conversations",
+                { :controller => 'conversations', :action => 'create', :format => 'json' },
+                { :recipients => [@bob.id, @joe.id], :body => "test",
+                  :group_conversation => "true", :bulk_message => "true" })
+        puts json.inspect
+        json.size.should eql 2
+      end
+
+      it "should send bulk group messages with a single recipient" do
+        pending('this is currently throwing an error in sync mode, though it does manage to send; see CNVS-8891')
+        json = api_call(:post, "/api/v1/conversations",
+                { :controller => 'conversations', :action => 'create', :format => 'json' },
+                { :recipients => [@bob.id], :body => "test",
+                  :group_conversation => "true", :bulk_message => "true" })
+        json.size.should eql 1
+      end
     end
   end
 
