@@ -445,6 +445,7 @@ class QuizzesController < ApplicationController
       if params[:score_updated]
         js_env :SCORE_UPDATED => true
       end
+      js_env :GRADE_BY_QUESTION => @current_user.preferences[:enable_speedgrader_grade_by_question]
       if authorized_action(@submission, @current_user, :read)
         dont_show_user_name = @submission.quiz.anonymous_submissions || (!@submission.user || @submission.user == @current_user)
         add_crumb((dont_show_user_name ? t(:default_history_crumb, "History") : @submission.user.name))
