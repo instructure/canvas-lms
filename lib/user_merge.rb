@@ -213,7 +213,7 @@ class UserMerge
         begin
           klass = table.classify.constantize
           if klass.new.respond_to?("#{column}=".to_sym)
-            klass.connection.execute("UPDATE #{table} SET #{column}=#{target_user.id} WHERE #{column}=#{from_user.id}")
+            klass.where(column => from_user).update_all(column => target_user.id)
           end
         rescue => e
           logger.error "migrating #{table} column #{column} failed: #{e.to_s}"
