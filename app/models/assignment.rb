@@ -527,9 +527,18 @@ class Assignment < ActiveRecord::Base
   end
 
   def participants_with_overridden_due_at
-    assignment_overrides.active.overriding_due_at.inject([]) do |overridden_users, o|
+    Assignment.participants_with_overridden_due_at([self])
+  end
+
+  def self.participants_with_overridden_due_at(assignments)
+    overridden_users = []
+
+    AssignmentOverride.active.overriding_due_at.where(assignment_id: assignments).each do |o|
       overridden_users.concat(o.applies_to_students)
     end
+
+    overridden_users.uniq!
+    overridden_users
   end
 
   attr_accessor :saved_by
