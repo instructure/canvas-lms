@@ -1279,6 +1279,11 @@ FakeRails3Routes.draw do
       delete "courses/:course_id/quizzes/:id", action: :destroy, path_name: 'course_quiz_destroy'
     end
 
+    scope(:controller => :quiz_groups) do
+      post "courses/:course_id/quizzes/:quiz_id/groups", :action => :create, :path_name => 'course_quiz_group_create'
+      put "courses/:course_id/quizzes/:quiz_id/groups/:id", :action => :update, :path_name => 'course_quiz_group_update'
+    end
+
     scope(:controller => :quiz_reports) do
       post "courses/:course_id/quizzes/:quiz_id/reports", :action => :create, :path_name => 'course_quiz_reports_create'
       get "courses/:course_id/quizzes/:quiz_id/reports/:id", :action => :show, :path_name => 'course_quiz_report'

@@ -17,7 +17,7 @@
 #
 
 class QuizGroup < ActiveRecord::Base
-  attr_accessible :name, :pick_count, :question_points, :assessment_question_bank
+  attr_accessible :name, :pick_count, :question_points, :assessment_question_bank_id
   attr_readonly :quiz_id
   belongs_to :quiz
   belongs_to :assessment_question_bank
