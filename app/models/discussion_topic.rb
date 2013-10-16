@@ -853,6 +853,7 @@ class DiscussionTopic < ActiveRecord::Base
     item.delayed_post_at ||= Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:start_date]) if hash[:start_date]
     item.position = hash[:position] if hash[:position]
     item.workflow_state = 'active' if item.deleted?
+    item.workflow_state = 'post_delayed' if item.should_not_post_yet
     if hash[:attachment_migration_id]
       item.attachment = context.attachments.find_by_migration_id(hash[:attachment_migration_id])
     end

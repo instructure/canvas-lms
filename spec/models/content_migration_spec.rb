@@ -1094,17 +1094,18 @@ describe ContentMigration do
       @copy_to.discussion_topics.find_by_migration_id(mig_id(topic)).should_not be_nil
     end
 
-    it "should copy selected announcements" do
-      ann = @copy_from.announcements.create!(:message => "howdy", :title => "announcement title")
+    it "should properly copy selected delayed announcements" do
+      from_ann = @copy_from.announcements.create!(:message => "goodbye", :title => "goodbye announcement", delayed_post_at: 1.hour.from_now)
+      from_ann.workflow_state = "post_delayed"
+      from_ann.save!
 
-      @cm.copy_options = {
-          :announcements => {mig_id(ann) => "1"},
-      }
+      @cm.copy_options = { :announcements => {mig_id(from_ann) => "1"}}
       @cm.save!
 
       run_course_copy
 
-      @copy_to.announcements.find_by_migration_id(mig_id(ann)).should_not be_nil
+      to_ann = @copy_to.announcements.find_by_migration_id(mig_id(from_ann))
+      to_ann.workflow_state.should == "post_delayed"
     end
 
     it "should not copy announcements if not selected" do
