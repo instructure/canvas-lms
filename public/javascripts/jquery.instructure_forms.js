@@ -312,8 +312,8 @@ define([
           (options.upload_error || options.error).call($this, data);
         }
         } finally {}
-        
-      }, function() { 
+
+      }, function() {
         return (options.upload_error || options.error).apply(this, arguments);
       });
     };
@@ -1025,21 +1025,25 @@ define([
         left: offset.left + objLeftIndent
       }).fadeIn('fast');
 
-      var fade = function() {
-        $box.fadeOut('slow', function() {
-          $box.remove();
-        });
+      var cleanup = function() {
+        $box.remove();
+        $obj.removeData('associated_error_box');
+        $obj.removeData('associated_error_object');
       };
+
+      var fade = function() {
+        $box.stop(true,true).fadeOut('slow', cleanup);
+      };
+
       $obj.data({
         associated_error_box :$box,
         associated_error_object: $obj
       }).click(fade).keypress(fade);
 
       $box.click(function() {
-        $(this).fadeOut('fast', function() {
-          $(this).remove();
-        });
+        $(this).fadeOut('fast', cleanup);
       });
+
       $.fn.errorBox.errorBoxes.push($obj);
       if(!$.fn.errorBox.isBeingAdjusted) {
         $.moveErrorBoxes();
