@@ -21,8 +21,10 @@ describe 'Canvas::RequestThrottle' do
   let(:base_req) { { 'QUERY_STRING' => '', 'PATH_INFO' => '/' } }
   let(:request_user_1) { base_req.merge({ 'REMOTE_ADDR' => '1.2.3.4', 'rack.session' => { user_id: 1 } }) }
   let(:request_user_2) { base_req.merge({ 'REMOTE_ADDR' => '4.3.2.1', 'rack.session' => { user_id: 2 } }) }
-  let(:request_query_token) { base_req.merge({ 'REMOTE_ADDR' => '1.2.3.4', 'QUERY_STRING' => 'access_token=xyz' }) }
-  let(:request_header_token) { base_req.merge({ 'REMOTE_ADDR' => '4.3.2.1', 'HTTP_AUTHORIZATION' => 'Bearer abc' }) }
+  let(:token1) { AccessToken.create!(user: user) }
+  let(:token2) { AccessToken.create!(user: user) }
+  let(:request_query_token) { base_req.merge({ 'REMOTE_ADDR' => '1.2.3.4', 'QUERY_STRING' => "access_token=#{token1.full_token}" }) }
+  let(:request_header_token) { base_req.merge({ 'REMOTE_ADDR' => '4.3.2.1', 'HTTP_AUTHORIZATION' => "Bearer #{token2.full_token}" }) }
   let(:request_logged_out) { base_req.merge({ 'REMOTE_ADDR' => '1.2.3.4', 'rack.session.options' => { id: 'sess1' } }) }
   let(:request_no_session) { base_req.merge({ 'REMOTE_ADDR' => '1.2.3.4' }) }
 
@@ -39,15 +41,15 @@ describe 'Canvas::RequestThrottle' do
     end
 
     it "should use access token" do
-      throttler.client_identifier(req request_header_token).should == "abc"
+      throttler.client_identifier(req request_header_token).should == "token:#{AccessToken.hashed_token(token2.full_token)}"
     end
 
     it "should use user id" do
-      throttler.client_identifier(req request_user_2).should == "2"
+      throttler.client_identifier(req request_user_2).should == "user:2"
     end
 
     it "should use session id" do
-      throttler.client_identifier(req request_logged_out).should == 'sess1'
+      throttler.client_identifier(req request_logged_out).should == 'session:sess1'
     end
 
     it "should fall back to nil" do
@@ -68,24 +70,24 @@ describe 'Canvas::RequestThrottle' do
     end
 
     it "should blacklist based on ip" do
-      set_blacklist('1.2.3.4')
+      set_blacklist('ip:1.2.3.4')
       throttler.call(request_user_1).should == rate_limit_exceeded
       throttler.call(request_user_2).should == response
-      set_blacklist('1.2.3.4,4.3.2.1')
+      set_blacklist('ip:1.2.3.4,ip:4.3.2.1')
       throttler.call(request_user_2).should == rate_limit_exceeded
     end
 
     it "should blacklist based on user id" do
-      set_blacklist('2')
+      set_blacklist('user:2')
       throttler.call(request_user_1).should == response
       throttler.call(request_user_2).should == rate_limit_exceeded
     end
 
     it "should blacklist based on access token" do
-      set_blacklist('abc')
+      set_blacklist("token:#{AccessToken.hashed_token(token2.full_token)}")
       throttler.call(request_query_token).should == response
       throttler.call(request_header_token).should == rate_limit_exceeded
-      set_blacklist('abc,xyz')
+      set_blacklist("token:#{AccessToken.hashed_token(token1.full_token)},token:#{AccessToken.hashed_token(token2.full_token)}")
       throttler.call(request_query_token).should == rate_limit_exceeded
       throttler.call(request_header_token).should == rate_limit_exceeded
     end
@@ -93,8 +95,8 @@ describe 'Canvas::RequestThrottle' do
 
   describe ".list_from_setting" do
     it "should split the string and create a set" do
-      Setting.set('list_test', 'x,y ,  z ')
-      Canvas::RequestThrottle.list_from_setting('list_test').should == Set.new(%w[z y x])
+      Setting.set('list_test', 'a:x,b:y ,  z ')
+      Canvas::RequestThrottle.list_from_setting('list_test').should == Set.new(%w[z b:y a:x])
     end
   end
 
@@ -117,7 +119,7 @@ describe 'Canvas::RequestThrottle' do
 
     def throttled_request
       bucket = mock('Bucket')
-      Canvas::RequestThrottle::LeakyBucket.expects(:new).with("1").returns(bucket)
+      Canvas::RequestThrottle::LeakyBucket.expects(:new).with("user:1").returns(bucket)
       bucket.expects(:reserve_capacity).yields
       bucket.expects(:full?).returns(true)
       bucket.expects(:to_json) # in the logger.info line
@@ -136,7 +138,7 @@ describe 'Canvas::RequestThrottle' do
 
     it "should not throttle, but update, if bucket is not full" do
       bucket = mock('Bucket')
-      Canvas::RequestThrottle::LeakyBucket.expects(:new).with("1").returns(bucket)
+      Canvas::RequestThrottle::LeakyBucket.expects(:new).with("user:1").returns(bucket)
       bucket.expects(:reserve_capacity).yields
       bucket.expects(:full?).returns(false)
 
@@ -146,7 +148,7 @@ describe 'Canvas::RequestThrottle' do
     if Canvas.redis_enabled?
       it "should increment the bucket" do
         throttler.call(request_user_1).should == response
-        bucket = Canvas::RequestThrottle::LeakyBucket.new("1")
+        bucket = Canvas::RequestThrottle::LeakyBucket.new("user:1")
         count, last_touched = bucket.redis.hmget(bucket.cache_key, 'count', 'last_touched')
         last_touched.to_f.should be > 0.0
       end
