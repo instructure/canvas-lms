@@ -106,7 +106,7 @@ end
 def truncate_all_cassandra_tables
   Canvas::Cassandra::Database.config_names.each do |cass_config|
     db = Canvas::Cassandra::Database.from_config(cass_config)
-    db.keyspace_information.tables.each do |table|
+    db.tables.each do |table|
       db.execute("TRUNCATE #{table}")
     end
   end
