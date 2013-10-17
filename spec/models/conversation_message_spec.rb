@@ -271,5 +271,23 @@ describe ConversationMessage do
         :text => "body"
       }) }.should raise_error(IncomingMail::IncomingMessageProcessor::UnknownAddressError)
     end
+
+    it "should reply only to the message author on conversations2 conversations" do
+      course_with_teacher
+      users = 3.times.map{ course_with_student(course: @course).user }
+      conversation = Conversation.initiate(users, false, :context_type => 'Course', :context_id => @course.id)
+      cm1 = conversation.add_message(users[0], "initial message", :root_account_id => Account.default.id)
+      cm2 = conversation.add_message(users[1], "subsequent message", :root_account_id => Account.default.id)
+      cm2.recipients.size.should == 2
+      cm3 = cm2.reply_from({
+        :purpose => 'general',
+        :user => users[2],
+        :subject => "an email reply",
+        :html => "body",
+        :text => "body"
+      })
+      cm3.conversation_message_participants.size.should == 1
+      cm3.conversation_message_participants[0].user.should == users[1]
+    end
   end
 end

@@ -228,7 +228,9 @@ class ConversationMessage < ActiveRecord::Base
 
   def reply_from(opts)
     raise IncomingMail::IncomingMessageProcessor::UnknownAddressError if self.context.try(:root_account).try(:deleted?)
-    conversation.reply_from(opts.merge(:root_account_id => self.root_account_id))
+    # If this is from conversations 2, only reply to the author.
+    recipients = conversation.context ? [author] : nil
+    conversation.reply_from(opts.merge(:root_account_id => self.root_account_id, :only_users => recipients))
   end
 
   def forwarded_messages
