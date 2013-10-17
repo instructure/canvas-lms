@@ -618,6 +618,9 @@ class Quiz < ActiveRecord::Base
     else
       submission.with_versioning(true, &:save!)
     end
+
+    # Make sure the submission gets graded when it becomes overdue (if applicable)
+    submission.grade_when_overdue unless preview || !submission.end_at
     submission
   end
 
