@@ -425,6 +425,37 @@ describe UserMerge do
       cc2.workflow_state.should == 'retired'
     end
 
+    context "manual invitation" do
+      it "should not keep a temporary invitation in cache for an enrollment deleted after a user merge" do
+        email = 'foo@example.com'
+
+        enable_cache do
+          course
+          @course.offer!
+
+          # create an active enrollment (usually through an SIS import)
+          user1 = user_with_pseudonym(:username => email, :active_all => true)
+          @course.enroll_user(user1).accept!
+
+          # manually invite the same email address into the course
+          # if open_registration is set on the root account, this creates a new temporary user
+          user2 = user_with_communication_channel(:username => email, :user_state => "creation_pending")
+          @course.enroll_user(user2)
+
+          # cache the temporary invitations
+          user1.temporary_invitations.should_not be_empty
+
+          # when the user follows the confirmation link, they will be prompted to merge into the other user
+          UserMerge.from(user2).into(user1)
+
+          # should not hold onto the now-deleted invitation
+          # (otherwise it will retrieve it in CoursesController#fetch_enrollment,
+          # which causes the login loop in CoursesController#accept_enrollment)
+          user1.reload
+          user1.temporary_invitations.should be_empty
+        end
+      end
+    end
   end
 
 end

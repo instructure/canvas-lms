@@ -176,8 +176,12 @@ class UserMerge
 
         to_delete_ids << to_delete.id if to_delete && !['deleted', 'inactive', 'rejected'].include?(to_delete.workflow_state)
       end
-      Enrollment.where(:id => to_delete_ids).update_all(:workflow_state => 'deleted') unless to_delete_ids.empty?
-
+      unless to_delete_ids.empty?
+        Enrollment.where(:id => to_delete_ids).update_all(:workflow_state => 'deleted')
+        target_user.communication_channels.email.unretired.each do |cc|
+          Rails.cache.delete([cc.path, 'invited_enrollments'].cache_key)
+        end
+      end
       [
         [:quiz_id, :quiz_submissions],
         [:assignment_id, :submissions]
