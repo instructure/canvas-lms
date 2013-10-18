@@ -995,6 +995,7 @@ describe DiscussionTopicsController, :type => :integration do
         { :message => @message, :attachment => data })
       @entry = DiscussionEntry.find_by_id(json['id'])
       @entry.attachment.should_not be_nil
+      @entry.attachment.context.should eql @user
     end
 
     it "should include attachments on replies to top-level entries" do
@@ -1009,6 +1010,7 @@ describe DiscussionTopicsController, :type => :integration do
         { :message => @message, :attachment => data })
       @entry = DiscussionEntry.find_by_id(json['id'])
       @entry.attachment.should_not be_nil
+      @entry.attachment.context.should eql @user
     end
 
     it "should include attachment info in the json response" do
@@ -1022,6 +1024,7 @@ describe DiscussionTopicsController, :type => :integration do
         { :message => @message, :attachment => data })
       json['attachment'].should_not be_nil
       json['attachment'].should_not be_empty
+      json['attachment']['url'].should be_include 'verifier='
     end
 
     it "should create a submission from an entry on a graded topic" do

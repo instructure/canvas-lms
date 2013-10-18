@@ -533,7 +533,7 @@ class DiscussionTopicsApiController < ApplicationController
       generate_new_page_view
       @entry.context_module_action
       if has_attachment
-        @attachment = @context.attachments.create(:uploaded_data => params[:attachment])
+        @attachment = (@current_user || @context).attachments.create(:uploaded_data => params[:attachment])
         @entry.attachment = @attachment
         @entry.save
       end
