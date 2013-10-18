@@ -263,7 +263,7 @@ class ConversationsController < ApplicationController
       conversations = ConversationParticipant.where(:id => batch.conversations).includes(:conversation).order("visible_last_authored_at DESC, last_message_at DESC, id DESC")
       Conversation.preload_participants(conversations.map(&:conversation))
       ConversationParticipant.preload_latest_messages(conversations, @current_user)
-      visibility_map = infer_visibility(*conversations) 
+      visibility_map = infer_visibility(conversations)
       render :json => conversations.map{ |c| conversation_json(c, @current_user, session, :include_participant_avatars => false, :include_participant_contexts => false, :visible => visibility_map[c.conversation_id]) }, :status => :created
     else
       @conversation = @current_user.initiate_conversation(@recipients, !value_to_boolean(params[:group_conversation]), :subject => params[:subject], :context_type => context_type, :context_id => context_id)
@@ -863,13 +863,15 @@ class ConversationsController < ApplicationController
     @set_visibility = true
   end
 
-  def infer_visibility(*conversations)
+  def infer_visibility(conversations)
+    multiple = conversations.is_a? Enumerable
+    conversations = [conversations] unless multiple
     result = Hash.new(false)
     visible_conversations = @current_user.shard.activate do
         @conversations_scope.select(:conversation_id).where(:conversation_id => conversations.map(&:conversation_id)).all
       end
     visible_conversations.each { |c| result[c.conversation_id] = true }
-    if conversations.size == 1
+    if !multiple
       result[conversations.first.conversation_id]
     else
       result

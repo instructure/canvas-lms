@@ -790,7 +790,6 @@ describe ConversationsController, :type => :integration do
       end
 
       it "should send bulk group messages with a single recipient" do
-        pending('this is currently throwing an error in sync mode, though it does manage to send; see CNVS-8891')
         json = api_call(:post, "/api/v1/conversations",
                 { :controller => 'conversations', :action => 'create', :format => 'json' },
                 { :recipients => [@bob.id], :body => "test",
