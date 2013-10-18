@@ -68,7 +68,7 @@ define [
         editable: true
         columnFormat:
           month: if ENV.CALENDAR.SHOW_AGENDA then 'ddd' else 'dddd'
-          week: weekColumnFormatter
+          week: if ENV.CALENDAR.SHOW_AGENDA then 'ddd M/d' else weekColumnFormatter
         buttonText:
           today: I18n.t 'today', 'Today'
         defaultEventMinutes: 60
@@ -109,6 +109,7 @@ define [
       @schedulerNavigator = new CalendarNavigator(el: $('.scheduler_navigator'), showAgenda: @options.showAgenda)
       @schedulerNavigator.hide()
 
+      @currentView = data.view_name
       data.view_name = 'agendaWeek' if data.view_name == 'week'
       if data.view_name == 'month' || data.view_name == 'agendaWeek'
         viewName = if data.view_name == 'agendaWeek' then 'week' else 'month'
@@ -146,6 +147,8 @@ define [
           @header.selectView('scheduler')
           if data.appointment_group_id
             @scheduler.viewCalendarForGroupId data.appointment_group_id
+
+      window.setInterval(@drawNowLine, 1000 * 60)
 
     connectHeaderEvents: ->
       @header.on('navigatePrev',  => @calendar.fullCalendar('prev'))
@@ -241,6 +244,7 @@ define [
 
     windowResize: (view) =>
       @closeEventPopups()
+      @drawNowLine()
 
     eventRender: (event, element, view) =>
       $element = $(element)
@@ -376,6 +380,28 @@ define [
     viewDisplay: (view) =>
       @updateFragment view_start: $.dateToISO8601UTC(view.start)
       @setDateTitle(view.title)
+      @drawNowLine()
+
+    drawNowLine: =>
+      return unless @currentView == 'week' && ENV.CALENDAR.SHOW_AGENDA
+
+      if !@nowLine
+        @nowLine = $('<div />', {'class': 'calendar-nowline'})
+      $('.fc-agenda-slots').parent().append(@nowLine)
+
+      now = $.fudgeDateForProfileTimezone(new Date)
+      currentDate = @el.find("div.calendar").fullCalendar('getDate')
+      midnight = new Date(now.getTime())
+      midnight.setHours(0, 0, 0)
+      seconds = (now.getTime() - midnight.getTime())/1000
+
+      weekStart = currentDate.getTime()
+      weekEnd = weekStart + 7 * 24 * 3600 * 1000
+      @nowLine.toggle(weekStart < now.getTime() < weekEnd)
+
+      @nowLine.css('width', $('.fc-agenda-slots .fc-widget-content:first').css('width'))
+      secondHeight = $('.fc-agenda-slots').css('height').replace('px', '')/24/3600
+      @nowLine.css('top', seconds*secondHeight + 'px')
 
     setDateTitle: (title) =>
       @header.setHeaderText(title)
@@ -508,11 +534,11 @@ define [
     loadView: (view) =>
       @updateFragment view_name: view
 
+      @currentView = view
       $('.agenda-wrapper').removeClass('active')
       @header.showNavigator()
       @header.showPrevNext()
       if view != 'scheduler' and view != 'agenda'
-        @currentView = view
         @calendar.removeClass('scheduler-mode').removeClass('agenda-mode')
         @displayAppointmentEvents = null
         @scheduler.hide()
@@ -522,7 +548,6 @@ define [
         @calendar.fullCalendar('changeView', if view == 'week' then 'agendaWeek' else 'month')
         @calendar.fullCalendar('render')
       else if view == 'scheduler'
-        @currentView = 'scheduler'
         @calendar.addClass('scheduler-mode')
         @calendar.hide()
         @header.showSchedulerTitle()

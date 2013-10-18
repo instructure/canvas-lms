@@ -94,16 +94,62 @@
 #calendar-app {
   .fc-content {
     background: none;
-    tbody {
-      background-color: white;
+  }
+
+  .fc-view-agendaWeek {
+    .fc-widget-header {
+        background: none;
+        border-left: none;
+        color: #627382;
+    }
+
+    .fc-agenda-axis {
+      border-color: #DADADA;
+      padding: 3px 6px;
+    }
+
+    .fc-agenda-days {
+      thead .fc-first {
+        height: 32px;
+      }
+
+      .fc-widget-header {
+        border-right: none;
+        text-transform: uppercase;
+
+        &.fc-first {
+          border-bottom: none;
+        }
+      }
+
+      .fc-widget-content {
+        background-color: white;
+      }
+
+      .fc-widget-content.fc-state-highlight {
+        background-color: #FEF6E8;
+      }
+    }
+
+    .calendar-nowline {
+      background-color: #FACE90;
+      position: absolute;
+      right: 0;
+      height: 2px;
     }
   }
 
-  .fc-view-month .fc-widget-header {
+  .fc-view-month {
+    .fc-widget-header {
       background: none;
       text-transform: uppercase;
       border-left: none;
       border-right: none;
+    }
+
+    tbody {
+      background-color: white;
+    }
   }
 
   .fc-other-month {
@@ -123,4 +169,8 @@
   .fc-grid .fc-day-number {
     padding: 1px 4px;
   }
+}
+
+#context-list label {
+  display: inline;
 }
