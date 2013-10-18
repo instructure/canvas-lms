@@ -170,7 +170,7 @@ group :redis do
 end
 
 group :cassandra do
-  gem 'cassandra-cql', '1.1.5'
+  gem 'cassandra-cql', '1.2.1', git: 'https://github.com/kreynolds/cassandra-cql',ref: 'd100be075b04153cf4116da7512892a1e8c0a7e4'
 end
 
 group :embedly do

@@ -53,11 +53,6 @@ module Canvas::Cassandra
 
     def initialize(cluster_name, environment, servers, opts, thrift_opts)
       Bundler.require 'cassandra'
-      CassandraCQL::Database.class_eval do
-        def use_cql3?
-          false
-        end
-      end
       @db = CassandraCQL::Database.new(servers, opts, thrift_opts)
       @cluster_name = cluster_name
       @environment = environment
