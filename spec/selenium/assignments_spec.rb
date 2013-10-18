@@ -555,68 +555,8 @@ describe "assignments" do
         @course.require_assignment_group
       end
 
-      it "should go to the new assignment page from 'Add Assignment'" do
-        get "/courses/#{@course.id}/assignments"
-        wait_for_ajaximations
-
-        expect_new_page_load { f('.new_assignment').click }
-        wait_for_ajaximations
-
-        f('#edit_assignment_form').should be_present
-      end
-
-      it "should allow quick-adding an assignment to a group" do
-        ag = @course.assignment_groups.first
-
-        get "/courses/#{@course.id}/assignments"
-        wait_for_ajaximations
-
-        f("#assignment_group_#{ag.id} .add_assignment").click
-        wait_for_ajaximations
-
-        replace_content(f("#ag_#{ag.id}_assignment_name"), "Do this")
-        replace_content(f("#ag_#{ag.id}_assignment_points"), "13")
-        fj('.create_assignment:visible').click
-        wait_for_ajaximations
-
-        a = ag.reload.assignments.first
-        a.name.should == "Do this"
-        a.points_possible.should == 13
-
-        f("#assignment_group_#{ag.id} .ig-title").text.should match "Do this"
-      end
-
-      it "should allow quick-adding two assignments to a group (dealing with form re-render)" do
-        ag = @course.assignment_groups.first
-
-        get "/courses/#{@course.id}/assignments"
-        wait_for_ajaximations
-
-        f("#assignment_group_#{ag.id} .add_assignment").click
-        wait_for_ajaximations
-
-        replace_content(f("#ag_#{ag.id}_assignment_name"), "Do this")
-        replace_content(f("#ag_#{ag.id}_assignment_points"), "13")
-        fj('.create_assignment:visible').click
-        wait_for_ajaximations
-
-        keep_trying_until do
-          fj("#assignment_group_#{ag.id} .add_assignment").click
-          wait_for_ajaximations
-          fj("#ag_#{ag.id}_assignment_name").displayed?
-        end
-
-        get_value("#ag_#{ag.id}_assignment_name").should == ""
-        get_value("#ag_#{ag.id}_assignment_points").should == "0"
-
-        replace_content(fj("#ag_#{ag.id}_assignment_name"), "Another")
-        replace_content(fj("#ag_#{ag.id}_assignment_points"), "3")
-        fj('.create_assignment:visible').click
-        wait_for_ajaximations
-
-        ag.reload.assignments.count.should == 2
-      end
-
+      #Per selenium guidelines, we should not test buttons navigating to a page
+      # We could test that the page loads with the correct info from the params elsewhere
       it "should remember entered settings when 'more options' is pressed" do
         ag2 = @course.assignment_groups.create!(:name => "blah")
 
@@ -635,6 +575,8 @@ describe "assignments" do
         get_value("#assignment_group_id").should == ag2.id.to_s
       end
 
+      # This should be part of a spec that follows a critical path through
+      #  the draft state index page, but does not need to be a lone wolf
       it "should delete assignments" do
         ag = @course.assignment_groups.first
         as = @course.assignments.create({:assignment_group => ag})
@@ -696,19 +638,6 @@ describe "assignments" do
           @frozen_assign = frozen_assignment(default_group)
         end
 
-        it "should not allow assignment group to be deleted by teacher if assignments are frozen" do
-          get "/courses/#{@course.id}/assignments"
-          fj("#ag_#{@frozen_assign.assignment_group_id}_manage_link").click
-          wait_for_ajaximations
-          element_exists("div#assignment_group_#{@frozen_assign.assignment_group_id} a.delete_group").should be_false
-        end
-
-        it "should not allow deleting a frozen assignment from index page" do
-          get "/courses/#{@course.id}/assignments"
-          fj("div#assignment_#{@frozen_assign.id} a.al-trigger").click
-          wait_for_ajaximations
-          element_exists("div#assignment_#{@frozen_assign.id} a.delete_assignment:visible").should be_false
-        end
       end
 
       context 'publishing' do
@@ -716,17 +645,6 @@ describe "assignments" do
           ag = @course.assignment_groups.first
           @assignment = ag.assignments.create! :context => @course, :title => 'to publish'
           @assignment.unpublish
-        end
-
-        it "should allow publishing from the index page" do
-          get "/courses/#{@course.id}/assignments"
-          wait_for_ajaximations
-
-          f("#assignment_#{@assignment.id} .publish-icon").click
-          wait_for_ajaximations
-
-          @assignment.reload.should be_published
-          f("#assignment_#{@assignment.id} .publish-icon").attribute('aria-label').should include_text("Published")
         end
 
         it "shows submission scores for students on index page" do

@@ -162,6 +162,20 @@ define [
     #@model.save()
     ok !view.$('.ig-row').hasClass('ig-published')
 
+  test 'asks for confirmation before deleting an assignment', ->
+    view = createView(@model)
+
+    confirm_stub = sinon.stub(window, "confirm", -> true )
+    delete_spy = sinon.spy view, "delete"
+
+    view.$("#assignment_#{@model.id} .delete_assignment").click()
+
+    ok confirm_stub.called
+    ok delete_spy.called
+
+    confirm_stub.restore()
+    delete_spy.restore()
+
   test "delete destroys model", ->
     old_asset_string = ENV.context_asset_string
     ENV.context_asset_string = "course_1"
@@ -239,6 +253,26 @@ define [
 
     equal document.activeElement, trigger.get(0)
 
+  test "assignment cannot be deleted if frozen", ->
+    @model.set('frozen', true)
+    view = createView(@model)
+    ok !view.$("#assignment_#{@model.id} a.delete_assignment").length
+
+  test "allows publishing", ->
+    #setup fake server
+    @server = sinon.fakeServer.create()
+    @server.respondWith "PUT", "/api/v1/users/1/assignments/1", [
+      200,
+      { "Content-Type": "application/json" },
+      JSON.stringify("")
+    ]
+    @model.set 'published', false
+    view = createView(@model)
+
+    view.$("#assignment_#{@model.id} .publish-icon").click()
+    @server.respond()
+
+    equal @model.get('published'), true
 
   module 'AssignmentListItemViewSpec—alternate grading type: percent',
     setup: ->

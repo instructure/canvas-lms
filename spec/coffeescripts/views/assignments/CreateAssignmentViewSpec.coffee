@@ -7,6 +7,7 @@ define [
   'compiled/views/DialogFormView'
   'jquery'
   'helpers/jquery.simulate'
+  'compiled/behaviors/tooltip'
 ], (Backbone, AssignmentGroupCollection, AssignmentGroup, Assignment, CreateAssignmentView, DialogFormView, $) ->
 
   fixtures = $('#fixtures')
@@ -132,6 +133,17 @@ define [
     view.onSaveSuccess()
 
     equal @group.get("assignments").length, 3
+
+    DialogFormView.prototype.close.restore()
+
+  test "the form is cleared after adding an assignment", ->
+    sinon.stub( DialogFormView.prototype, "close", -> )
+
+    view = createView(@group)
+    view.onSaveSuccess()
+
+    equal view.$("#ag_#{@group.id}_assignment_name").val(), ""
+    equal view.$("#ag_#{@group.id}_assignment_points").val(), "0"
 
     DialogFormView.prototype.close.restore()
 

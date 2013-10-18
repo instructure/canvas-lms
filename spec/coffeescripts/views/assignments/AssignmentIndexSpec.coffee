@@ -67,12 +67,10 @@ define [
     view.filterResults()
     equal view.$el.find('.assignment').not('.hidden').length, 1
 
-    view = assignmentIndex()
     $('#search_term').val('BooBerry')
     view.filterResults()
     equal view.$el.find('.assignment').not('.hidden').length, 0
 
-    view = assignmentIndex()
     $('#search_term').val('name')
     view.filterResults()
     equal view.$el.find('.assignment').not('.hidden').length, 2

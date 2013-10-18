@@ -193,3 +193,9 @@ define [
   test "cacheKey builds unique key", ->
     view = createView(@model)
     deepEqual view.cacheKey(), ["course", 1, "user", 1, "ag", 1, "expanded"]
+
+  test "not allow group to be deleted with frozen assignments", ->
+    assignments = @model.get('assignments')
+    assignments.first().set('frozen', true)
+    view = createView(@model)
+    ok !view.$("#assignment_group_#{@model.id} a.delete_group").length
