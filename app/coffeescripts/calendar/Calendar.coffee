@@ -149,11 +149,9 @@ define [
 
     connectHeaderEvents: ->
       @header.on('navigatePrev',  => @calendar.fullCalendar('prev'))
-      @header.on 'navigateToday', =>
-        @calendar.fullCalendar('today')
-        @agendaViewFetch(new Date) if @currentView == 'agenda'
+      @header.on 'navigateToday', @today
       @header.on('navigateNext',  => @calendar.fullCalendar('next'))
-      @header.on('navigateDate',  (selectedDate) => @selectDate(selectedDate))
+      @header.on('navigateDate', @gotoDate)
       @header.on('week', => @loadView('week'))
       @header.on('month', => @loadView('month'))
       @header.on('agenda', => @loadView('agenda'))
@@ -164,13 +162,14 @@ define [
 
     connectSchedulerNavigatorEvents: ->
       @schedulerNavigator.on('navigatePrev',  => @calendar.fullCalendar('prev'))
-      @schedulerNavigator.on('navigateToday', => @calendar.fullCalendar('today'))
+      @schedulerNavigator.on('navigateToday', @today)
       @schedulerNavigator.on('navigateNext',  => @calendar.fullCalendar('next'))
-      @schedulerNavigator.on('navigateDate',  (selectedDate) => @selectDate(selectedDate))
+      @schedulerNavigator.on('navigateDate', @gotoDate)
 
-    selectDate: (selectedDate) ->
-      @calendar.fullCalendar('gotoDate', selectedDate)
-      @agendaViewFetch(selectedDate) if @currentView == 'agenda'
+    today: =>
+      @calendar.fullCalendar('today')
+      now = $.fudgeDateForProfileTimezone(new Date)
+      @agendaViewFetch(now) if @currentView == 'agenda'
 
     # FullCalendar callbacks
 
@@ -502,19 +501,22 @@ define [
 
     # Methods
 
-    gotoDate: (d) -> @calendar.fullCalendar("gotoDate", d)
+    gotoDate: (d) =>
+      @calendar.fullCalendar("gotoDate", d)
+      @agendaViewFetch(d) if @currentView == 'agenda'
 
     loadView: (view) =>
       @updateFragment view_name: view
 
       $('.agenda-wrapper').removeClass('active')
+      @header.showNavigator()
+      @header.showPrevNext()
       if view != 'scheduler' and view != 'agenda'
         @currentView = view
         @calendar.removeClass('scheduler-mode').removeClass('agenda-mode')
         @displayAppointmentEvents = null
         @scheduler.hide()
         @calendar.show()
-        @header.showNavigator()
         @schedulerNavigator.hide()
         @calendar.fullCalendar('refetchEvents')
         @calendar.fullCalendar('changeView', if view == 'week' then 'agendaWeek' else 'month')
@@ -530,7 +532,7 @@ define [
         @loadAgendaView()
         @calendar.hide()
         @scheduler.hide()
-        @header.showNavigator()
+        @header.hidePrevNext()
 
     loadAgendaView: ->
       oldView = @currentView

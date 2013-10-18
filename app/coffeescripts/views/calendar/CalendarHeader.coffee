@@ -76,6 +76,12 @@ define [
     setSchedulerBadgeCount: (badgeCount) ->
       @$badge.toggle(badgeCount > 0).text(badgeCount)
 
+    showPrevNext: ->
+      @navigator.showPrevNext()
+
+    hidePrevNext: ->
+      @navigator.hidePrevNext()
+
     _triggerDone: (event) ->
       @trigger('done')
 

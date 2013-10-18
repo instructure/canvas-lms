@@ -66,6 +66,12 @@ define [
 
     hidePicker: -> @showPicker(false)
 
+    showPrevNext: ->
+      @$buttons.show()
+
+    hidePrevNext: ->
+      @$buttons.hide()
+
     _resetPicker: ->
       @_enterKeyPressed = false
       @_enterKeyValue = ''

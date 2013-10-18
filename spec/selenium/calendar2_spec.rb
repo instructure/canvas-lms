@@ -736,6 +736,20 @@ describe "calendar2" do
         wait_for_ajaximations
         ffj('.ig-row').length.should == 1
       end
+
+      it "should be navigable via the minical" do
+        yesterday = 1.day.ago
+        event = make_event(start: yesterday)
+        get "/calendar2"
+        wait_for_ajaximations
+        f('label[for=agenda]').click
+        wait_for_ajaximations
+        ffj('.ig-row').length.should == 0
+        f('.fc-button-prev').click
+        f('.fc-day-number').click
+        wait_for_ajaximations
+        ffj('.ig-row').length.should == 1
+      end
     end
   end
 
