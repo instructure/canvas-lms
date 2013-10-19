@@ -53,6 +53,10 @@ end
 gem 'icalendar', '1.1.5'
 gem 'jammit', '0.6.6'
 gem 'json', '1.8.0'
+gem 'oj', '2.1.7'
+unless CANVAS_RAILS2
+  gem 'rails-patch-json-encode', '0.0.1'
+end
 # native xml parsing, diigo
 gem 'libxml-ruby', '2.6.0', :require => 'xml/libxml'
 gem 'macaddr', '1.0.0' # macaddr 1.2.0 tries to require 'systemu' which isn't a dependency

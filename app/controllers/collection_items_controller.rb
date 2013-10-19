@@ -361,7 +361,7 @@ class CollectionItemsController < ApplicationController
       data = Canvas::Embedly.new(params[:url])
       # if embedly returns any kind of error, we return a data response with
       # all fields set to null
-      render :json => data
+      render :json => data.as_json
     else
       render :nothing => true, :status => :unauthorized
     end

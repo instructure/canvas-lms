@@ -1395,7 +1395,15 @@ class ApplicationController < ActionController::Base
     set_layout_options
     if options && options.key?(:json)
       json = options.delete(:json)
-      json = ActiveSupport::JSON.encode(json, stringify_json_ids: stringify_json_ids?) unless json.is_a?(String)
+      unless json.is_a?(String)
+        Api.recursively_stringify_json_ids(json) if stringify_json_ids?
+        if CANVAS_RAILS2
+          json = MultiJson.dump(json)
+        else
+          json = ActiveSupport::JSON.encode(json)
+        end
+      end
+
       # prepend our CSRF protection to the JSON response, unless this is an API
       # call that didn't use session auth, or a non-GET request.
       if prepend_json_csrf?

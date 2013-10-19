@@ -1,8 +1,3 @@
-# CVE-2013-0333
-# https://groups.google.com/d/topic/rubyonrails-security/1h2DR63ViGo/discussion
-# With Rails 2.3.16 we could remove this line, but we still prefer JSONGem for performance reasons
-ActiveSupport::JSON.backend = "JSONGem"
-
 if CANVAS_RAILS2
   # bug submitted to rails: https://rails.lighthouseapp.com/projects/8994/tickets/5802-activerecordassociationsassociationcollectionload_target-doesnt-respect-protected-attributes#ticket-5802-1
   # This fix has been merged into rails trunk and will be in the rails 3.1 release.

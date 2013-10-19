@@ -545,6 +545,17 @@ module Api
     {}
   end
 
+  def self.recursively_stringify_json_ids(value)
+    case value
+    when Hash
+      stringify_json_ids(value)
+      value.each_value { |v| recursively_stringify_json_ids(v) if v.is_a?(Hash) || v.is_a?(Array) }
+    when Array
+      value.each { |v| recursively_stringify_json_ids(v) if v.is_a?(Hash) || v.is_a?(Array) }
+    end
+    value
+  end
+
   def self.stringify_json_ids(value)
     return unless value.is_a?(Hash)
     value.keys.each do |key|
