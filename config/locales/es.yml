@@ -165,7 +165,7 @@ es:
       test_ldap_search_label: "Probando la búsqueda LDAP..."
     ldap_timeout_error: 
       last_ldap_timeout_failure: "Fallo del último tiempo de espera"
-      ldap_timeout_failure_help2: "Si el tiempo de espera en las comunicaciones entre Canvas con el servidor LDAP se ha agotado en diversas ocasiones, Canvas bloqueará cualquier otro intento de inicio de sesión a través de ese servidor LDAP durante %{time}."
+      ldap_timeout_failure_help2: "Si el tiempo de espera en las comunicaciones entre Canvas y el servidor LDAP se ha agotado en diversas ocasiones, Canvas bloqueará cualquier otro intento de inicio de sesión a través de ese servidor LDAP durante %{time}."
     login_required: "debe ser suministrado"
     no_auth_mixing: "No se pueden mezclar los tipos de autenticación"
     no_changing_auth_types: "No se puede cambiar el tipo de configuración de la autorización, elimínelo y cree una configuración nueva."
@@ -395,7 +395,7 @@ es:
           description: 
             header: Ejemplo
           student_activity: 
-            text: "Este informe muestra todas las tareas y la información correspondiente a las tareas incluidas en un grupo o varios grupos de tareas específicas en un intervalo de fechas específico. Este informe ofrece datos útiles para programar tareas y gestionar la cantidad de tareas de los alumnos, mostrando solo los alumnos y las tareas en las que hay dos o más tareas en conflicto que vencen en la misma fecha para el mismo alumno."
+            text: "Este informe muestra todas las tareas y la información correspondiente a las tareas incluidas en un grupo o varios grupos de tareas específicos y en un intervalo de fechas específico. Este informe ofrece datos útiles para programar tareas y gestionar la cantidad de tareas de los alumnos, mostrando solo los alumnos y las tareas en las que hay dos o más tareas en conflicto que vencen en la misma fecha para el mismo alumno."
     assignment_scheduling_csv_parameters: 
       account_reports: 
         newark: 
@@ -1038,7 +1038,7 @@ es:
           students_with_no_submissions: 
             description: 
               header: Ejemplo
-            text: "Este infome muestra todos los alumnos inscritos en un curso en un determinado periodo que no han enviado tareas en un intervalo de tiempo determinado en el curso. Este informe incluye una fila por alumno inscrito que cumpla los requisitos. El intervalo de tiempo no puede ser mayor de dos semanas."
+            text: "Este infome muestra todos los alumnos inscritos en un curso en un determinado período que no han enviado tareas en un intervalo de tiempo determinado en el curso. Este informe incluye una fila por alumno inscrito que cumpla los criterios. El intervalo de tiempo no puede ser mayor de dos semanas."
     submission_data_csv_description: 
       account_reports: 
         submission_data: 
@@ -1050,15 +1050,15 @@ es:
           description: 
             header: Ejemplo
           grade_export: 
-            text: "En este informe aparecen todos los resultados de la calificación final de todos los alumnos en un periodo en concreto. El archivo delimitado por tabulaciones que se genera incluirá una línea por inscripción de usuario, en la que aparecerá la calificación final y varios campos de información de los cursos, que se utilizarán para cargar los datos de las calificaciones en Synergy SIS."
+            text: "En este informe aparecen los resultados de las calificaciones finales de todos los alumnos en un periodo en concreto. El archivo delimitado por tabulaciones que se genera incluirá una línea por inscripción de usuario, en la que aparecerá la calificación final y varios campos de información de los cursos, que se utilizarán para cargar los datos de las calificaciones en Synergy SIS."
     tempe_grade_export_csv_parameters: 
       account_reports: 
         tempe: 
           course: 
             text: "ID del curso"
           parameters: 
-            note1: "La ID puede dejarse en blanco para generar el informe de todos los cursos del período."
-            note2: "Los cursos con tareas desactivadas pueden no reflejar las calificaciones con exactitud en este informe."
+            note1: "La ID del curso puede dejarse en blanco para generar el informe de todos los cursos del período."
+            note2: "En este informe, los cursos con tareas desactivadas pueden no reflejar con exactitud las calificaciones."
     terms_parameters: 
       account_reports: 
         default: 
@@ -2978,7 +2978,7 @@ es:
       loading: Cargando
     qti_zip: 
       options: Opciones
-    school_required: "Deje seleccionar una escuela."
+    school_required: "Debe seleccionar una escuela."
     select_content: 
       select_content_btn: "Seleccionar contenido"
     select_course: "Seleccionar curso"
@@ -3755,7 +3755,7 @@ es:
       expand_inline: "Mostrar más comentarios"
       rss_feed: "Feed de conversaciones"
       view_submission: "Abra el envío en una ventana nueva."
-    unarchive: "No archivar"
+    unarchive: Desarchivar
     unarchive_conversation: "Desarchivar conversación"
     unknown_user: "Usuario desconocido"
     unspecified_error: "Ha ocurrido un error inesperado. Inténtelo de nuevo."
@@ -5604,7 +5604,7 @@ es:
       not_installed: "No instalada"
       search_filter: "Filtrar por nombre"
       view_app_center: "Ver el Centro de aplicaciones"
-      view_installed_tools: "Ver las configuraciones de aplicaciones"
+      view_installed_tools: "Ver las configuraciones de las aplicaciones"
     missing_stars: "Debe elegir una calificación por estrellas."
     rate_tool_view: 
       rate_tool: "¿Cómo califica esta herramienta?"
@@ -6637,7 +6637,7 @@ es:
       messages: 
         no_students: "Ningún estudiante se ha agregado a este curso"
       page_title: "Grupos del Curso"
-      page_title_accounts: "Reporte de Grupos"
+      page_title_accounts: "Grupos de cuentas"
     create_group_set: "Crear conjunto de grupos"
     delete_confirm: "¿Está seguro de que desea eliminar esta categoría de grupo?"
     edit: 
@@ -6720,16 +6720,16 @@ es:
         allow_self_signup: "Permitir la auto-inscripción"
         cancel: Cancelar
         create_groups: "Crear %h{num_groups} grupos ahora"
-        create_groups_manually: "Crearé grupos manualmente"
+        create_groups_manually: "Crearé los grupos manualmente"
         group_set_name: "Nombre del conjunto de grupos"
-        group_structure: "Estructura del Grupo"
+        group_structure: "Estructura de los grupos"
         leave_group_limit_blank: "Dejar en blanco si no se establece un límite"
         limit_group_size: "Limitar los grupos a %h{group_limit} miembros"
-        require_same_section: "Requerir que miembros de grupos pertenezcan a la misma sección"
+        require_same_section: "Hacer obligatorio que los miembros del grupo pertenezcan a la misma sección"
         save: Guardar
         saving: Guardando...
         self_signup: Auto-Inscripción
-        self_signup_description: "Puede crear conjuntos de grupos en los que los alumnos se puedan registrar solos. Los alumnos seguirán teniendo la restricción de pertenecer a un solo grupo del conjunto, pero de esta forma se podrán organizar en grupos ellos mismos en vez de tener que hacerlo el profesor. Recuerde que mientras esta función esté habilitada, los estudiantes podrán moverse de un grupo a otro."
+        self_signup_description: "Puede crear conjuntos de grupos en los que los alumnos se puedan registrar solos. Los alumnos seguirán teniendo que pertenecer a un solo grupo del conjunto, pero de esta forma se podrán organizar en grupos ellos mismos en vez de tener que hacerlo el profesor. Recuerde que mientras esta función esté habilitada, los estudiantes podrán moverse de un grupo a otro."
         split_into_groups: "Dividir a los alumnos en %h{split_num} grupos equitativos"
         what_is_this: "¿Qué es esto?"
       group_category_detail: 
@@ -6753,10 +6753,10 @@ es:
         group_set_name: "Nombre del conjunto de grupos"
         leave_group_limit_blank: "Dejar en blanco si no se establece un límite"
         limit_group_size: "Limitar grupos a %h{group_limit} miembros"
-        require_same_section: "Requerir que miembros de grupos pertenezcan a la misma sección"
+        require_same_section: "Hacer obligatorio que los miembros de grupos pertenezcan a la misma sección"
         save: Guardar
         saving: Guardando...
-        self_signup_description: "Puede crear conjuntos de grupos en los que los alumnos se puedan registrar solos. Los alumnos seguirán teniendo la restricción de pertenecer a un solo grupo del conjunto, pero de esta forma se podrán organizar en grupos ellos mismos en vez de tener que hacerlo el profesor. Recuerde que mientras esta función esté habilitada, los estudiantes podrán moverse de un grupo a otro."
+        self_signup_description: "Puede crear conjuntos de grupos en los que los alumnos se puedan registrar solos. Los alumnos seguirán teniendo que pertenecer a un solo grupo del conjunto, pero de esta forma se podrán organizar en grupos ellos mismos en vez de tener que hacerlo el profesor. Recuerde que mientras esta función esté habilitada, los estudiantes podrán moverse de un grupo a otro."
         what_is_this: "¿Qué es esto?"
       group_edit: 
         cancel: Cancelar
@@ -11049,7 +11049,7 @@ es:
         delete: Borrar
         find_ip_address_filter: "Encontrar Filtro para la Dirección IP"
       warnings: 
-        has_student_submissions: "Los alumnos ya han realizado o comenzado a realizar esta evaluación, por lo que deberá tener cuidado al editarla. Si cambia cualquier pregunta importante, es posible que deba volver a calificar a los alumnos que realizaron la versión anterior de la evaluación."
+        has_student_submissions: "Los alumnos ya han realizado esta evaluación o la han comenzado, por lo que deberá tener cuidado al editarla. Si cambia cualquier pregunta importante, es posible que deba volver a calificar a los alumnos que realizaron la versión anterior de la evaluación."
     no_filters_found: "No se encontraron filtros"
     no_quizzes_view: 
       headers: 
@@ -11848,7 +11848,7 @@ es:
       not_available_yet: "Le enviaremos un correo electrónico antes de que comience el curso."
   sequence_footer: 
     next_module: "Módulo siguiente:"
-    next_module_desc: "Siguiente módulo: *módulo*"
+    next_module_desc: "Módulo siguiente: *módulo*"
     next_module_item_desc: "Siguiente: *elemento*"
     prev_module: "Módulo anterior:"
     prev_module_desc: "Módulo anterior: *módulo*"
@@ -12863,7 +12863,7 @@ es:
       more_message: "y %{count} más..."
   tours: 
     quiz_regrade: 
-      first_bullet: "Después de cambiar una respuesta deberá elegir una opción antes de actualizar la pregunta."
+      first_bullet: "Una vez que haya cambiado la respuesta, deberá elegir una opción antes de actualizar la pregunta."
       got_it: Entendido
       second_bullet: "Asegúrese de elegir la opción más adecuada, ya que las calificaciones de los alumnos PUEDEN cambiar."
       third_bullet: "Canvas volverá a calificar todos sus envíos cuando haya guardado la evaluación. Este proceso puede tardar algunos minutos."
@@ -13339,10 +13339,10 @@ es:
       delete_wiki: Borrar
       labels: 
         front_page: "Página de Inicio"
-      page_locked: "Esta página está bloquead"
+      page_locked: "Esta página está bloqueada"
       page_locked_by_modules: "Esta página estará disponible cuando haya finalizado estos módulos:"
-      page_locked_by_modules_until: "Esta página estará disponible en %{lock_info.unlock_at} si ha finalizado estos módulos:"
-      page_locked_until: "Esta página estará disponible en %{lock_info.unlock_at}"
+      page_locked_by_modules_until: "Esta página estará disponible el %{lock_info.unlock_at} si ha finalizado estos módulos:"
+      page_locked_until: "Esta página estará disponible el %{lock_info.unlock_at}"
       toolbar_menu: 
         settings: Configuraciones
       view_page_history_wiki: "Ver el historial de páginas"
