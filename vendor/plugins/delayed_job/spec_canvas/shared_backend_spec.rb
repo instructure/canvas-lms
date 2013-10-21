@@ -99,14 +99,6 @@ shared_examples_for 'a backend' do
       @job = create_job
       Delayed::Job.find_available(5).should include(@job)
     end
-    
-    it "should find expired jobs" do
-      @job = create_job
-      Delayed::Job.get_and_lock_next_available('other_worker').should == @job
-      @job.update_attribute(:locked_at, Delayed::Job.db_time_now - 2.minutes)
-      Delayed::Job.unlock_expired_jobs(1.minute)
-      Delayed::Job.find_available(5).should include(@job)
-    end
   end
   
   context "when another worker is already performing an task, it" do
@@ -120,23 +112,8 @@ shared_examples_for 'a backend' do
       Delayed::Job.get_and_lock_next_available('worker2').should be_nil
     end
 
-    it "should allow a second worker to get exclusive access if the timeout has passed" do
-      @job.update_attribute(:locked_at, 5.hours.ago)
-      Delayed::Job.unlock_expired_jobs(4.hours)
-      Delayed::Job.get_and_lock_next_available('worker2').should == @job
-      @job.reload
-      @job.locked_by.should == 'worker2'
-      @job.locked_at.should > 1.minute.ago
-    end
-
     it "should not be found by another worker" do
       Delayed::Job.find_available(1).length.should == 0
-    end
-
-    it "should be found by another worker if the time has expired" do
-      @job.update_attribute(:locked_at, 5.hours.ago)
-      Delayed::Job.unlock_expired_jobs(4.hours)
-      Delayed::Job.find_available(5).length.should == 1
     end
   end
 

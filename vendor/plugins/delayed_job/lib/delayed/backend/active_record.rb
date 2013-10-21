@@ -97,10 +97,6 @@ module Delayed
           where(:locked_by => worker_name).update_all(:locked_by => nil, :locked_at => nil)
         end
 
-        def self.unlock_expired_jobs(max_run_time = Delayed::Worker.max_run_time)
-          where("locked_by<>'on hold' AND locked_at<?", db_time_now - max_run_time).update_all(:locked_by => nil, :locked_at => nil)
-        end
-
         def self.strand_size(strand)
           self.where(:strand => strand).count
         end
