@@ -176,6 +176,7 @@ class Account < ActiveRecord::Base
   add_setting :edit_institution_email, :boolean => true, :root_only => true, :default => true
   add_setting :enable_quiz_regrade, :boolean => true, :root_only => true, :default => false
   add_setting :agenda_view, boolean: true, root_only: true, default: false
+  add_setting :enable_fabulous_quizzes, :boolean => true, :root_only => true, :default => false
 
   def settings=(hash)
     if hash.is_a?(Hash)
@@ -1352,6 +1353,14 @@ class Account < ActiveRecord::Base
 
   def disable_quiz_regrade!
     change_root_account_setting!(:enable_quiz_regrade, false)
+  end
+
+  def enable_fabulous_quizzes!
+    change_root_account_setting!(:enable_fabulous_quizzes, true)
+  end
+
+  def disable_fabulous_quizzes!
+    change_root_account_setting!(:enable_fabulous_quizzes, false)
   end
 
   def change_root_account_setting!(setting_name, new_value)
