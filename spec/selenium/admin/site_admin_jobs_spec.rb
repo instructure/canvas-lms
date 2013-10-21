@@ -223,5 +223,45 @@ describe "site admin jobs ui" do
         first_cell.text.should == 'my test worker'
       end
     end
+
+    it "should sort by runtime by default" do
+      @all_jobs[0].lock_exclusively!('my test worker 1')
+      Delayed::Job.stubs(:db_time_now).returns(24.hours.ago)
+      @all_jobs[1].update_attribute(:run_at, 48.hours.ago)
+      @all_jobs[1].lock_exclusively!('my test worker 2')
+      Delayed::Job.unstub(:db_time_now)
+
+      load_jobs_page
+      ffj('#running-grid .slick-row').size.should == 2
+      keep_trying_until do
+        first_cell = fj('#running-grid .slick-cell.l0.r0')
+        first_cell.text.should == 'my test worker 2'
+        last_cell = fj('#running-grid .slick-cell.l6.r6 .super-slow')
+        last_cell.should_not be_nil
+        true
+      end
+    end
+
+    it "should sort dynamically" do
+      @all_jobs[0].lock_exclusively!('my test worker 1')
+      @all_jobs[1].lock_exclusively!('my test worker 2')
+
+      load_jobs_page
+      ffj('#running-grid .slick-row').size.should == 2
+      # sort ASC
+      worker_header = fj("#running-grid .slick-header div[title='worker'] .slick-column-name")
+      worker_header.click
+      keep_trying_until do
+        first_cell = fj('#running-grid .slick-cell.l0.r0')
+        first_cell.text.should == 'my test worker 1'
+      end
+
+      # sort DESC
+      worker_header.click
+      keep_trying_until do
+        first_cell = fj('#running-grid .slick-cell.l0.r0')
+        first_cell.text.should == 'my test worker 2'
+      end
+    end
   end
 end
