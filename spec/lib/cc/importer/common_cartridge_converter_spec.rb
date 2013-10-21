@@ -541,7 +541,7 @@ describe "non-ASCII attachment names" do
                 "web_resources/abc.txt"]
     @converter.resources.values.map { |v| v[:files][0][:href] }.sort.should == contents.sort
 
-    Zip::ZipFile.open File.join(@converter.base_export_dir, "all_files.zip") do |zipfile|
+    Zip::File.open File.join(@converter.base_export_dir, "all_files.zip") do |zipfile|
       zipcontents = zipfile.entries.map(&:name)
       (contents - zipcontents).should eql []
     end

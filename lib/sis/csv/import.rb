@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'zip/zip'
+require 'zip'
 
 module SIS
   module CSV
@@ -314,7 +314,7 @@ module SIS
       end
     
       def unzip_file(file, dest)
-        Zip::ZipFile.open(file) do |zip_file|
+        Zip::File.open(file) do |zip_file|
           zip_file.each do |f|
             f_path = File.join(dest, f.name)
             FileUtils.mkdir_p(File.dirname(f_path))

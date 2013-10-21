@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'zip/zip'
+require 'zip'
 
 module Canvas::AccountReports
   REPORTS = {}
@@ -70,7 +70,7 @@ module Canvas::AccountReports
       filepath = temp.path
       temp.close!
 
-      Zip::ZipFile.open(filepath, Zip::ZipFile::CREATE) do |zipfile|
+      Zip::File.open(filepath, Zip::File::CREATE) do |zipfile|
         csv.each do |report_name, contents|
           zipfile.add(report_name + ".csv", contents)
         end

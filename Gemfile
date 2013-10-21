@@ -89,7 +89,8 @@ gem 'rscribd', '1.2.0'
 gem 'net-ldap', '0.3.1', :require => 'net/ldap'
 gem 'ruby-saml-mod', '0.1.22'
 gem 'rubycas-client', '2.2.1'
-gem 'rubyzip', '0.9.5', :require => 'zip/zip'
+gem 'rubyzip', '1.0.0', :require => 'zip'
+gem 'zip-zip', '0.2' # needed until plugins use the new namespace
 gem 'safe_yaml-instructure', '0.8.0', :require => false
 gem 'sanitize', '2.0.3'
 gem 'shackles', '1.0.1'
@@ -140,7 +141,7 @@ group :test do
     gem 'rspec', '2.13.0'
     gem 'rspec-rails', '2.13.0'
   end
-  gem 'selenium-webdriver', '2.35.0'
+  gem 'selenium-webdriver', '2.37.0'
   gem 'webrat', '0.7.3'
   gem 'yard', '0.8.0'
   gem 'yard-appendix', '>=0.1.8'
