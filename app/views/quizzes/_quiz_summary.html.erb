@@ -5,27 +5,15 @@
   unpublished ||= false
   start = Time.now
 %>
-<li class="quiz clearfix <%= 'unpublished' if unpublished %>" id="summary_quiz_<%= q ? q.id : "blank" %>">
+<li class="quiz clearfix <%= 'unpublished' if unpublished %>" id="summary_quiz_<%= q ? q.id : "blank" %>" style="position: relative">
   <div class="title">
-    <div style="float: right; font-weight: normal;">
-      <% if can_do(q, @current_user, :update) %>
-        <div>
-          <a href="<%= context_url(@context, :edit_context_quiz_url, q) %>" title="<%= quiz_edit_text(q) %>" class="edit_quiz_link no-hover icon-edit standalone-icon">
-            <span class="screenreader-only"><%= quiz_edit_text(q) %></span>
-          </a>
-          <a href="<%= context_url(@context, :context_quiz_url, q) %>" title="<%= quiz_delete_text(q) %>" class="delete_quiz_link no-hover icon-trash standalone-icon">
-            <span class="screenreader-only"><%= quiz_delete_text(q) %></span>
-          </a>
-        </div>
-      <% end %>
-    </div>
     <a href="<%= context_url(@context, :context_quiz_url, q) %>" class="quiz_title"><%= q.quiz_title || q.readable_type %></a>
     <span class="quiz_id" style="display: none;"><%= (q && q.id) || nbsp %></span>
     <% if q && q.assignment_id && q.assignment.try(:points_possible) %>
       <span style="font-size: 0.8em; font-weight: normal;">(<%= t(:assignment_points_possible, "pt", :count => q.assignment.points_possible) %>)</span>
     <% end %>
-    <div class="clear"></div>
   </div>
+
   <div class="description user_content">
     <% if q.available? %>
       <div style="float: right; margin: 0 0 0 20px;">
@@ -96,4 +84,17 @@
     </div>
     <div class="clear"></div>
   </div>
+
+  <% if can_do(q, @current_user, :update) %>
+  <div class="quiz_actions" style="position: absolute; top: 5px; right: 5px; font-weight: normal;">
+    <div>
+      <a href="<%= context_url(@context, :edit_context_quiz_url, q) %>" title="<%= quiz_edit_text(q) %>" class="edit_quiz_link no-hover icon-edit standalone-icon">
+        <span class="screenreader-only"><%= quiz_edit_text(q) %></span>
+      </a>
+      <a href="<%= context_url(@context, :context_quiz_url, q) %>" title="<%= quiz_delete_text(q) %>" class="delete_quiz_link no-hover icon-trash standalone-icon">
+        <span class="screenreader-only"><%= quiz_delete_text(q) %></span>
+      </a>
+    </div>
+  </div>
+  <% end %>
 </li>
