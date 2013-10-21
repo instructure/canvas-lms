@@ -4,6 +4,36 @@
   </div>
 </div>
 
+<div class='empty-groupset-instructions'>
+  {{#ifEqual ENV.group_user_type "student"}}
+    <h2>{{#t 'headings.course_groups'}}Student Groups{{/t}}</h2>
+    <p>
+      {{#t 'course_group_explanation'}}
+        Student groups are a useful way to organize students for things like group projects or
+        papers.  Every student group gets their own calendar, discussion board and collaboration
+        tools so they can organize themselves and work together more effectively.
+      {{/t}}
+    </p>
+
+    <p>{{#t 'group_assignment_instructions'}}
+      You can randomly assign students to groups of a specific size, or manually
+      create and organize the groups.  Once your groups are created, you can set assignments
+      to be "group submission" assignments, which means each group will have one submission for
+      all users of that group.
+    {{/t}}
+    </p>
+  {{else}}
+    <h2>{{#t 'headings.account_groups'}}Account-level Student Groups{{/t}}</h2>
+    <p>{{#t 'account_group_explanation'}}
+      Account-level student groups are a good way to group students without being
+      tied to a specific course. Every student group gets their own calendar, discussion
+      board and collaboration tools so they can organize themselves and work together
+      more effectively.
+    {{/t}}
+    </p>
+  {{/ifEqual}}
+</div>
+
 <div id="group_categories_tabs" style="display:none;" class="ui-tabs-minimal">
   <ul class='collectionViewItems'></ul>
   <!--panels get inserted dynamically-->
