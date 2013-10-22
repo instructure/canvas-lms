@@ -104,6 +104,8 @@ class Account < ActiveRecord::Base
   include StickySisFields
   are_sis_sticky :name
 
+  include FeatureFlags
+
   def default_locale(recurse = false)
     read_attribute(:default_locale) ||
     (recurse && parent_account ? parent_account.default_locale(true) : nil)

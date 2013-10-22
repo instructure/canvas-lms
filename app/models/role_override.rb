@@ -715,6 +715,11 @@ class RoleOverride < ActiveRecord::Base
         :true_for => %w(AccountAdmin),
         :available_to => %w(AccountAdmin AccountMembership),
         :enabled_for_plugin => :assignment_freezer
+      },
+      :manage_feature_flags => {
+        :label => lambda { t('permissions.manage_feature_flags', "Enable or disable features at an account level") },
+        :true_for => %w(AccountAdmin),
+        :available_to => %w(AccountAdmin AccountMembership)
       }
     })
 

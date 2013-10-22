@@ -1359,6 +1359,17 @@ routes.draw do
         post "#{prefix}/apps/:app_id/reviews/self", :action => :add_review
       end
     end
+
+    scope(:controller => :feature_flags) do
+      ['course', 'account', 'user'].each do |context|
+        prefix = "#{context}s/:#{context}_id/features"
+        get "#{prefix}", :action => :index, :path_name => "#{context}_features"
+        get "#{prefix}/enabled", :action => :enabled_features, :path_name => "#{context}_enabled_features"
+        get "#{prefix}/flags/:feature", :action => :show
+        put "#{prefix}/flags/:feature", :action => :update
+        delete "#{prefix}/flags/:feature", :action => :delete
+      end
+    end
   end
 
   # this is not a "normal" api endpoint in the sense that it is not documented

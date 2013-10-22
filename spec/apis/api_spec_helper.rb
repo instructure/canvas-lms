@@ -82,6 +82,7 @@ def api_call_as_user(user, method, path, params, body_params = {}, headers = {},
   account = opts[:domain_root_account] || Account.default
   user.pseudonyms.reload
   account.pseudonyms.create!(:unique_id => "#{user.id}@example.com", :user => user) unless user.find_pseudonym_for_account(account, true)
+  Pseudonym.any_instance.stubs(:works_for_account?).returns(true)
   api_call(method, path, params, body_params, headers, opts)
 end
 
