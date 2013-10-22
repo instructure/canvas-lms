@@ -212,7 +212,7 @@ describe "eportfolios" do
           f(".edit_content_link").click
           hover_and_click("#page_section_1 .delete_page_section_link")
           try_to_close_modal
-          sleep 1
+          wait_for_ajaximations
           submit_form(".form_content")
           wait_for_ajaximations
           @eportfolio.eportfolio_entries.first.content[0].should == "No Content Added Yet"
