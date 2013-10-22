@@ -31,7 +31,7 @@ describe "quizzes question banks" do
       wait_for_ajaximations
       f(".select_all_link")
     }.click
-    submit_dialog("div#find_question_dialog", '.submit_button')
+    submit_dialog("#find_question_dialog", '.submit_button')
     wait_for_ajaximations
     click_settings_tab
     keep_trying_until { fj("#quiz_display_points_possible .points_possible").text.should == "17" }
@@ -55,7 +55,7 @@ describe "quizzes question banks" do
     end
     f(".select_all_link").click
     wait_for_ajaximations
-    submit_dialog("div#find_question_dialog", '.submit_button')
+    submit_dialog("#find_question_dialog", '.submit_button')
     wait_for_ajaximations
     click_settings_tab
     keep_trying_until { fj("#quiz_display_points_possible .points_possible").text.should == "1" }

@@ -173,7 +173,7 @@ shared_examples_for "quizzes selenium tests" do
     @quiz ||= quiz_with_new_questions(!:goto_edit)
 
     get "/courses/#{@course.id}/quizzes/#{@quiz.id}/take?user_id=#{@user.id}"
-    expect_new_page_load { driver.find_element(:link_text, 'Take the Quiz').click }
+    expect_new_page_load { f("#take_quiz_link").click }
 
     # sleep because display is updated on timer, not ajax callback
     sleep 1

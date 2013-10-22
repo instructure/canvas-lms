@@ -105,7 +105,7 @@ describe "quizzes" do
         # setup a quiz and start taking it
         quiz_with_new_questions(!:goto_edit)
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
-        expect_new_page_load { driver.find_element(:link_text, 'Take the Quiz').click }
+        expect_new_page_load { f("#take_quiz_link").click }
         sleep 1 # sleep because display is updated on timer, not ajax callback
 
         # answer a question, and check that it is saved
@@ -159,7 +159,7 @@ describe "quizzes" do
       Delayed::Job.find_by_tag(job_tag).should == nil
 
       get "/courses/#{@course.id}/quizzes/#{@quiz.id}/take?user_id=#{@user.id}"
-      expect_new_page_load { driver.find_element(:link_text, 'Take the Quiz').click }
+      expect_new_page_load { f("#take_quiz_link").click }
 
       answer_id = quiz.stored_questions[0][:answers][0][:id]
 

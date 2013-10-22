@@ -78,7 +78,7 @@ describe "account admin manage groups" do
       # We need to refresh the page because it doesn't update the sidebar,
       # This is should probably be reported as a bug
       refresh_page
-      driver.find_element(:id, "sidebar_category_#{new_category.id}").should be_displayed
+      f("#sidebar_category_#{new_category.id}").should be_displayed
     end
 
     it "should populate sidebar with new category when adding a category and group" do
@@ -88,8 +88,8 @@ describe "account admin manage groups" do
       f("#sidebar_category_#{@courses_group_category.id} #sidebar_group_#{group.id}").should be_displayed
       new_category = add_account_category(@admin_account, 'New Category')
       group2 = add_group_to_category new_category, "New Group Category 2"
-      driver.find_element(:id, "sidebar_category_#{new_category.id}").should be_displayed
-      f("#sidebar_category_#{new_category.id} #sidebar_group_#{group2.id}").should be_displayed
+      f("#sidebar_category_#{new_category.id}").should be_displayed
+      driver.find_element(:css, "#sidebar_category_#{new_category.id} #sidebar_group_#{group2.id}").should be_displayed
     end
 
     it "should preserve group to category association when editing a group" do
@@ -144,7 +144,7 @@ describe "account admin manage groups" do
       get "/accounts/#{@admin_account.id}/groups"
       group = add_group_to_category @courses_group_category, "group 1"
       group.should_not be_nil
-      driver.find_element(:id, "group_#{group.id}").click
+      f("#group_#{group.id}").click
       wait_for_ajaximations
       f("#group_#{group.id} .edit_group_link").click
       wait_for_ajaximations
@@ -159,8 +159,8 @@ describe "account admin manage groups" do
     it "should delete an individual group" do
       get "/accounts/#{@admin_account.id}/groups"
       group = add_group_to_category @courses_group_category, "group 1"
-      driver.find_element(:id, "group_#{group.id}").click
-      f("#group_#{group.id} .delete_group_link").click
+      f("#group_#{group.id}").click
+      driver.find_element(:css, "#group_#{group.id} .delete_group_link").click
       confirm_dialog = driver.switch_to.alert
       confirm_dialog.accept
       wait_for_ajaximations
@@ -215,7 +215,7 @@ describe "account admin manage groups" do
       make_full_screen
       f("#category_#{@courses_group_category.id} .edit_category_link .icon-edit").click
       wait_for_ajaximations
-      form = driver.find_element(:id, "edit_category_form")
+      form = f("#edit_category_form")
       input_box = form.find_element(:css, "input[type=text]")
       category_name = "New Category"
       replace_content input_box, category_name

@@ -269,7 +269,7 @@ describe "dashboard" do
                              :end_at => 10.minutes.from_now
                            })
       get "/"
-      f('div.events_list .event a').should include_text(@event.title)
+      f('.events_list .event a').should include_text(@event.title)
     end
 
     it "should display quiz submissions with essay questions as submitted in coming up list" do

@@ -290,7 +290,7 @@ describe "quizzes" do
       get "/courses/#{@course.id}/quizzes/#{@q.id}"
 
       expect_new_page_load do
-        driver.find_element(:link, 'Take the Quiz').click
+        f("#take_quiz_link").click
         wait_for_ajaximations
       end
 
@@ -412,6 +412,7 @@ describe "quizzes" do
         wait_for_ajaximations
 
         driver.find_element(:link, 'Quizzes').click
+        debugger
         wait_for_ajaximations
 
         driver.switch_to.alert.accept
@@ -450,7 +451,7 @@ describe "quizzes" do
       q.save!
 
       get "/courses/#{@course.id}/quizzes/#{q.id}/take?user_id=#{@user.id}"
-      driver.find_element(:link_text, 'Take the Quiz').click
+      f("#take_quiz_link").click
 
       answer_one = f("#question_#{question.id}_answer_1")
       answer_two = f("#question_#{question.id}_answer_2")
@@ -516,7 +517,7 @@ describe "quizzes" do
       filename, @fullpath, data = get_file "testfile1.txt"
       get "/courses/#{@course.id}/quizzes/#{q.id}/take?user_id=#{@user.id}"
       expect_new_page_load do
-        driver.find_element(:link_text, 'Take the Quiz').click
+        f("#take_quiz_link").click
       end
       wait_for_ajaximations
       # so we can .send_keys to the input, can't if it's invisible to
@@ -568,7 +569,7 @@ describe "quizzes" do
       q.save!
 
       get "/courses/#{@course.id}/quizzes/#{q.id}/take?user_id=#{@user.id}"
-      driver.find_element(:link_text, 'Take the Quiz').click
+      f("#take_quiz_link").click
 
       answer_one = f("#question_#{question.id}_answer_1")
       answer_two = f("#question_#{question.id}_answer_2")
