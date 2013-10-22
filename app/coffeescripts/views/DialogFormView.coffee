@@ -140,7 +140,7 @@ define [
     firstRenderEl: =>
       @$el.html @wrapperTemplate @toJSON()
       @renderElAgain()
-      # reassign: only render the outlout now
+      # reassign: only render the outlet now
       @renderEl = @renderElAgain
 
     ##

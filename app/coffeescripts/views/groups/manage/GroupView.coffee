@@ -32,6 +32,7 @@ define [
 
     els:
       '.group-summary': '$summary'
+      '.al-trigger': '$groupActions'
 
     attach: ->
       @expanded = false
@@ -42,12 +43,14 @@ define [
 
     editGroup: (e) =>
       e.preventDefault()
-      @editView ?= new GroupEditView({@model})
-      @editView.toggle();
+      @editView ?= new GroupEditView({@model, focusReturnsTo: => @$el.find('.al-trigger')})
+      @editView.toggle()
 
     deleteGroup: (e) =>
       e.preventDefault()
-      return unless confirm I18n.t('delete_confirm', 'Are you sure you want to remove this group?')
+      unless confirm I18n.t('delete_confirm', 'Are you sure you want to remove this group?')
+        @$groupActions.focus()
+        return
       @model.destroy
         success: -> $.flashMessage I18n.t('flash.removed', 'Group successfully removed.')
         failure: -> $.flashError I18n.t('flash.removeError', 'Unable to remove the group. Please try again later.')

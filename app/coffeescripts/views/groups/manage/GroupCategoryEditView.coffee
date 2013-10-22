@@ -20,24 +20,39 @@ define [
       fixDialogButtons: false
 
     els:
-      '.self-signup-help':        '$selfSignupHelp'
+      '.self-signup-help': '$selfSignupHelp'
       '.self-signup-description': '$selfSignup'
-      '.self-signup-toggle':      '$selfSignupToggle'
-      '.self-signup-controls':    '$selfSignupControls'
+      '.self-signup-toggle': '$selfSignupToggle'
+      '.self-signup-controls': '$selfSignupControls'
 
-    events:
-      _.extend {},
-      DialogFormView::events,
-      'click .dialog_closer':      'close'
+    events: _.extend {},
+      DialogFormView::events
+      'click .dialog_closer': 'close'
       'click .self-signup-toggle': 'toggleSelfSignup'
 
     afterRender: ->
       @toggleSelfSignup()
 
+    close: ->
+      super
+      # detach our custom handler from the bound element
+      $(document).off 'keyup', @checkEsc
+      # return focus using the closure from our parent view
+      @options.focusReturnsTo?().focus()
+
     openAgain: ->
       super
+      # reset the form contents
       @render()
+      # auto-focus the first input
       @$el.find('input:first').focus()
+      # attach a custom handler because the bound element is outside this view's scope
+      $(document).on 'keyup', @checkEsc
+      # override jQueryUI escKey handler to use our own
+      @$el.dialog("option", "closeOnEscape", false)
+
+    checkEsc: (e) =>
+      @close() if e.keyCode is 27 # escape
 
     toggleSelfSignup: ->
       disabled = !@$selfSignupToggle.prop('checked')
@@ -57,4 +72,3 @@ define [
                  class="input-micro"
                  value="#{h(json.group_limit ? '')}">
           """
-

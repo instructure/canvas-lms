@@ -24,6 +24,7 @@ define [
 
     els:
       '.randomly-assign-members': '$randomlyAssignMembersLink'
+      '.al-trigger': '$groupCategoryActions'
 
     initialize: (options) ->
       super
@@ -37,6 +38,8 @@ define [
     afterRender: ->
       # its trigger will not be rendered yet, set it manually
       @randomlyAssignUsersView.setTrigger @$randomlyAssignMembersLink
+      # pass in a closure to define the focus target within this scope
+      _.extend @randomlyAssignUsersView.options, focusReturnsTo: => @$el.find('.al-trigger')
 
     toJSON: ->
       json = super
@@ -45,14 +48,16 @@ define [
 
     deleteCategory: (e) =>
       e.preventDefault()
-      return unless confirm I18n.t('delete_confirm', 'Are you sure you want to remove this group set?')
+      unless confirm I18n.t('delete_confirm', 'Are you sure you want to remove this group set?')
+        @$groupCategoryActions.focus()
+        return
       @model.destroy
         success: -> $.flashMessage I18n.t('flash.removed', 'Group set successfully removed.')
         failure: -> $.flashError I18n.t('flash.removeError', 'Unable to remove the group set. Please try again later.')
 
     addGroup: (e) ->
       e.preventDefault()
-      @createView ?= new GroupEditView(editing: false)
+      @createView ?= new GroupEditView({editing: false, focusReturnsTo: => @$el.find('.add-group')})
       new_group = new Group(group_category_id: @model.id)
       new_group.on 'sync', _.once =>
         @collection.add(new_group)
@@ -60,7 +65,7 @@ define [
       @createView.toggle()
 
     editCategory: ->
-      @editCategoryView ?= new GroupCategoryEditView({@model})
+      @editCategoryView ?= new GroupCategoryEditView({@model, focusReturnsTo: => @$el.find('.al-trigger')})
       @editCategoryView.open()
 
     messageAllUnassigned: (e) ->
@@ -76,6 +81,7 @@ define [
           recipientGroups: [
             {name: I18n.t('students_who_have_not_joined_a_group', 'Students who have not joined a group'), recipients: students}
           ]
+          focusReturnsTo: => @$el.find('.al-trigger')
         dialog.open()
       users = @model.unassignedUsers()
       # get notified when last page is fetched and then open the dialog

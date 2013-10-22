@@ -18,7 +18,7 @@ define [
     className: 'group_categories_area'
 
     els: _.extend {},
-      CollectionView::els,
+      CollectionView::els
       '#group_categories_tabs': '$tabs'
       '#add-group-set': '$addGroupSetButton'
       '.empty-groupset-instructions': '$emptyInstructions'
@@ -76,7 +76,7 @@ define [
 
     addGroupSet: (e) ->
       e.preventDefault()
-      @createView ?= new GroupCategoryCreateView({@collection})
+      @createView ?= new GroupCategoryCreateView({@collection, focusReturnsTo: => @$el.find('#add-group-set')})
       cat = new GroupCategory
       cat.once 'sync', =>
         @collection.add(cat)
