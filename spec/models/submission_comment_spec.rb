@@ -664,7 +664,7 @@ This text has a http://www.google.com link in it...
       @submission.unread?(@student).should be_true
     end
 
-    it "should be unread after submission is commented on by self" do
+    it "should be read after submission is commented on by self" do
       expect {
         @comment = SubmissionComment.create!(@valid_attributes.merge({:author => @student}))
       }.to change(ContentParticipation, :count).by(0)

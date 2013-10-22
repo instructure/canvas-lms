@@ -1100,11 +1100,21 @@ class Submission < ActiveRecord::Base
   def read_state(current_user)
     return "read" unless current_user #default for logged out user
     uid = current_user.is_a?(User) ? current_user.id : current_user
-    state = content_participations.find_by_user_id(uid).try(:workflow_state)
+    cp = if content_participations.loaded?
+           content_participations.detect { |cp| cp.user_id == uid }
+         else
+           content_participations.find_by_user_id(uid)
+         end
+    state = cp.try(:workflow_state)
     return state if state.present?
     return "read" if (assignment.deleted? || assignment.muted? || !self.user_id)
     return "unread" if (self.grade || self.score)
-    return "unread" if self.submission_comments.where("author_id<>?", user_id).exists?
+    has_comments = if visible_submission_comments.loaded?
+                     visible_submission_comments.detect { |c| c.author_id != user_id }
+                   else
+                     visible_submission_comments.where("author_id<>?", user_id).first
+                   end
+    return "unread" if has_comments
     return "read"
   end
 

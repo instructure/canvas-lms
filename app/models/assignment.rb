@@ -793,21 +793,6 @@ class Assignment < ActiveRecord::Base
     end
   end
 
-  def grade_distribution(submissions = nil)
-    submissions ||= self.submissions
-    tally = 0
-    cnt = 0
-    scores = submissions.map{|s| s.score}.compact
-    scores.each do |score|
-      tally += score
-      cnt += 1
-    end
-    high = scores.max
-    low = scores.min
-    mean = tally.to_f / cnt.to_f
-    [high, low, mean]
-  end
-
   # Everyone, students, TAs, teachers
   def participants
     context.participants

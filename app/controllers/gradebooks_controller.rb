@@ -52,20 +52,40 @@ class GradebooksController < ApplicationController
             @presenter.assignments
             @presenter.groups_assignments = groups_as_assignments(@presenter.groups, :out_of_final => true, :exclude_total => @context.hide_final_grades?)
             @presenter.submissions
-            @presenter.submissions_by_assignment
+            @presenter.submission_counts
+            @presenter.assignment_stats
           end
 
           submissions_json = @presenter.submissions.map { |s|
-            submission_json(s, s.assignment, @current_user, session)
+            { assignment_id: s.assignment_id, score: s.score }
           }
-          js_env :submissions => submissions_json,
-                 :assignment_groups => assignment_groups_json,
-                 :group_weighting_scheme => @context.group_weighting_scheme
+          ags_json = light_weight_ags_json(@presenter.groups)
+          js_env submissions: submissions_json,
+                 assignment_groups: ags_json,
+                 group_weighting_scheme: @context.group_weighting_scheme
           format.html { render :action => 'grade_summary' }
         else
           format.html { render :action => 'grade_summary_list' }
         end
       end
+    end
+  end
+
+  def light_weight_ags_json(assignment_groups)
+    assignment_groups.map do |ag|
+      assignments = ag.active_assignments.map do |a|
+        {
+          :id => a.id,
+          :submission_types => a.submission_types_array,
+          :points_possible => a.points_possible,
+        }
+      end
+      {
+        :id           => ag.id,
+        :rules        => ag.rules_hash,
+        :group_weight => ag.group_weight,
+        :assignments  => assignments,
+      }
     end
   end
 
@@ -155,6 +175,7 @@ class GradebooksController < ApplicationController
             @groups_order = {}
             @groups.each_with_index{|group, idx| @groups_order[group.id] = idx }
             @just_assignments = @context.assignments.active.gradeable.order(:due_at, Assignment.best_unicode_collation_key('title')).select{|a| @groups_order[a.assignment_group_id] }
+
             newest = Time.parse("Jan 1 2010")
             @just_assignments = @just_assignments.sort_by{|a| [a.due_at || newest, @groups_order[a.assignment_group_id] || 0, a.position || 0] }
             @assignments = @just_assignments.dup + groups_as_assignments(@groups)
