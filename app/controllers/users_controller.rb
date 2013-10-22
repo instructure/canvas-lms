@@ -258,7 +258,7 @@ class UsersController < ApplicationController
           else
             @enrollment_terms = []
             if @root_account == @context
-              @enrollment_terms = @context.enrollment_terms.active
+              @enrollment_terms = @context.enrollment_terms.active.sort_by{|t| t.start_at || Time.parse("Jan 1 2000")}
             end
             format.html
           end

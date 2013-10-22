@@ -88,7 +88,7 @@
         <td><%= f.select :account_id, @account.sub_accounts_as_options, :selected => @term && @term.id %></td>
       </tr><tr>
         <td><%= f.label :enrollment_term_id, :en => "Enrollment Term" %></td>
-        <td><%= f.select :enrollment_term_id, @root_account.enrollment_terms.active.map{|t| [t.name, t.id] }, :selected => @term && @term.id %></td>
+        <td><%= f.select :enrollment_term_id, @root_account.enrollment_terms.active.sort_by{|t| t.start_at || Time.parse("Jan 1 2000")}.map{|t| [t.name, t.id] }, :selected => @term && @term.id %></td>
       </tr><tr>
         <td colspan="2">
           <div class="button-container">
