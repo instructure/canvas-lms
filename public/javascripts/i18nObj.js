@@ -27,8 +27,8 @@ I18n.isValidNode = function(obj, node) {
   // handle names like "foo.bar.baz"
   var nameParts = node.split('.');
   for (var j=0; j < nameParts.length; j++) {
-    if (!(nameParts[j] in obj)) return false;
     obj = obj[nameParts[j]];
+    if (typeof obj === 'undefined' || obj === null) return false;
   }
   return true; 
 };
