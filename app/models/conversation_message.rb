@@ -95,7 +95,17 @@ class ConversationMessage < ActiveRecord::Base
   end
 
   on_create_send_to_streams do
-    self.recipients unless submission # we still render them w/ the conversation in the stream item, we just don't cause it to jump to the top
+    self.recipients unless skip_broadcasts || submission # we still render them w/ the conversation in the stream item, we just don't cause it to jump to the top
+  end
+
+  def after_participants_created_broadcast
+    conversation_message_participants(true) # reload this association so we get latest data
+    skip_broadcasts = false
+    @re_send_message = true
+    set_broadcast_flags
+    broadcast_notifications
+    queue_create_stream_items
+    generate_user_note!
   end
 
   before_save :infer_values
@@ -165,7 +175,9 @@ class ConversationMessage < ActiveRecord::Base
 
   def recipients
     return [] unless conversation
-    self.subscribed_participants.reject{ |u| u.id == self.author_id }
+    subscribed = subscribed_participants.reject{ |u| u.id == self.author_id }
+    participants = conversation_message_participants.map(&:user)
+    subscribed & participants
   end
 
   def new_recipients
@@ -204,6 +216,7 @@ class ConversationMessage < ActiveRecord::Base
 
   attr_accessor :generate_user_note
   def generate_user_note!
+    return if skip_broadcasts
     return unless @generate_user_note
     return unless recipients.size == 1
     recipient = recipients.first

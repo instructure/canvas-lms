@@ -40,8 +40,8 @@ describe ConversationMessage do
       add_message # need initial message for add_participants to not barf
     end
 
-    def add_message
-      @conversation.add_message("message")
+    def add_message(options = {})
+      @conversation.add_message("message", options)
     end
 
     def add_last_student
@@ -80,6 +80,16 @@ describe ConversationMessage do
     it "should notify subscribed participants on new message" do
       message = add_message
       message.messages_sent["Conversation Message"].map(&:user_id).should be_include(@first_student.id)
+    end
+
+    it "should limit notifications to message recipients, still excluding the author" do
+      message = add_message(only_users: [@teacher, @students.first])
+      message_user_ids = message.messages_sent["Conversation Message"].map(&:user_id)
+      message_user_ids.should_not include(@teacher.id)
+      message_user_ids.should include(@students.first.id)
+      @students[1..-1].each do |student|
+        message_user_ids.should_not include(student.id)
+      end
     end
 
     it "should notify new participants" do

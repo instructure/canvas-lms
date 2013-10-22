@@ -310,7 +310,7 @@ class Conversation < ActiveRecord::Base
 
       # so we can take advantage of other preloaded associations
       ConversationMessage.send :add_preloaded_record_to_collection, [message], :conversation, self
-      message.save!
+      message.save_without_broadcasting!
 
       add_message_to_participants(message, options.merge(
           :tags => new_tags,
@@ -322,6 +322,8 @@ class Conversation < ActiveRecord::Base
       if options[:update_participants]
         update_participants(message, options)
       end
+      # now that the message participants are all saved, we can properly broadcast to recipients
+      message.after_participants_created_broadcast
       message
     end
   end
