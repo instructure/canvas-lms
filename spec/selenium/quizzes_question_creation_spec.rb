@@ -525,7 +525,7 @@ describe "quizzes question creation" do
       f('#multiple_attempts_option').click
       f('#limit_attempts_option').click
       replace_content(f('#quiz_allowed_attempts'), attempts)
-      f('#protect_quiz').click
+      f('#quiz_time_limit').click
       alert = driver.switch_to.alert
       alert.text.should == alert_text
       alert.dismiss
@@ -550,7 +550,7 @@ describe "quizzes question creation" do
       f('#multiple_attempts_option').click
       f('#limit_attempts_option').click
       replace_content(f('#quiz_allowed_attempts'), attempts)
-      f('#protect_quiz').click
+      f('#quiz_time_limit').click
       alert_present?.should be_false
       fj('#quiz_allowed_attempts').should have_attribute('value', attempts) # fj to avoid selenium caching
       expect_new_page_load {

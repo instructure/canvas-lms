@@ -4,6 +4,14 @@
           t(:quiz_results_protected_until_last_attempt, "Quiz results are protected for this quiz, and are not visible to students until they have submitted their last attempt.") :
           t(:quiz_results_protected, "Quiz results are protected for this quiz, and are not visible to students.") %></h4>
 <% end %>
+
+<% if correct_answers_protected? %>
+  <div class="alert">
+    <i class="icon-warning" aria-label="<%= render_correct_answer_protection(@quiz) %>"></i>
+    <span><%= render_correct_answer_protection(@quiz) %></span>
+  </div>
+<% end %>
+
 <% if !(@current_submission || @submission) || (@current_submission || @submission).settings_only? %>
   <% if @quiz.survey? %>
     <%= t(:survey_not_yet_taken, "The survey hasn't been taken yet.") %>
@@ -153,7 +161,7 @@ $(document).ready(function() {
 });
 </script>
 <% end %>
-<div id="questions" class="assessment_results <%= 'survey_results' if @quiz.survey? %> <%= (@quiz.display_correct_answers?(@current_user, @submission) ? 'show_correct_answers' : 'suppress_correct_answers') %>">
+<div id="questions" class="assessment_results <%= 'survey_results' if @quiz.survey? %> <%= (show_correct_answers? ? 'show_correct_answers' : 'suppress_correct_answers') %>">
   <%= render :partial => "quizzes/display_question", :collection => submission_questions, :locals => {:assessment_results => true, :user_answer_hash => submission_data_hash, :editable => editable} %>
 </div>
 <% if !@headers && editable && @current_user.preferences[:enable_speedgrader_grade_by_question] %>

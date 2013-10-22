@@ -966,8 +966,6 @@ ul#quiz_versions
         &.nowrap
           white-space: nowrap
       #keep_score_select,
-      #quiz_access_code,
-      #quiz_ip_filter,
       #quiz_allowed_attempts
         margin-left: 10px
       #quiz_allowed_attempts
@@ -975,7 +973,44 @@ ul#quiz_versions
         margin-bottom: 5px
       #keep_score_select
         width: 100px
-
+      #quiz_show_correct_answers_options
+        > div
+          margin-bottom: 10px
+        label.inline
+          min-width: 160px
+        .datetime_suggest
+          display: inline-block
+      .control-group
+        margin-bottom: 10px
+        overflow: visible
+      .option-group
+        padding: 10px 10px 0 10px
+        border: 1px solid #ccc
+        border-radius: 4px
+        margin-bottom: 15px
+        position: relative
+        overflow: hidden
+        &> label.checkbox
+          position: relative
+          z-index: 1
+          &:hover:before
+            content: ""
+            position: absolute
+            z-index: -1
+            top: -10px
+            right: -10px
+            bottom: -10px
+            left: -10px
+            background: #E7F4FF
+            border-radius: 4px
+      .option-caption
+        font-size: 15px
+        font-weight: bold
+        line-height: 1.4em
+        &:not(:first-of-type)
+          margin-top: 30px
+      .options
+        margin-left: 20px
 
 .options_header
   font-weight: bold

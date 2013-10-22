@@ -32,6 +32,8 @@ module Api::V1::Quiz
       shuffle_answers
       hide_results
       show_correct_answers
+      show_correct_answers_at
+      hide_correct_answers_at
       scoring_policy
       allowed_attempts
       one_question_at_a_time
@@ -55,6 +57,8 @@ module Api::V1::Quiz
       shuffle_answers
       hide_results
       show_correct_answers
+      show_correct_answers_at
+      hide_correct_answers_at
       scoring_policy
       allowed_attempts
       one_question_at_a_time
@@ -115,6 +119,14 @@ module Api::V1::Quiz
       hide_results = update_params.fetch('hide_results', quiz.hide_results)
       unless hide_results.blank?
         update_params.delete 'show_correct_answers'
+      end
+    end
+
+    # show_correct_answers_at and hide_correct_answers_at are valid only if
+    # show_correct_answers=true
+    unless update_params.fetch('show_correct_answers', quiz.show_correct_answers)
+      %w[ show_correct_answers_at hide_correct_answers_at ].each do |key|
+        update_params.delete(key) if update_params.has_key?(key)
       end
     end
 

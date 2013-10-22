@@ -1989,6 +1989,8 @@ class Course < ActiveRecord::Base
             event.due_at = shift_date(event.due_at, shift_options)
             event.lock_at = shift_date(event.lock_at, shift_options)
             event.unlock_at = shift_date(event.unlock_at, shift_options)
+            event.show_correct_answers_at = shift_date(event.show_correct_answers_at, shift_options)
+            event.hide_correct_answers_at = shift_date(event.hide_correct_answers_at, shift_options)
             event.save!
           elsif event.is_a?(ContextModule)
             event.unlock_at = shift_date(event.unlock_at, shift_options)

@@ -220,12 +220,12 @@ describe QuizzesApiController, :type => :integration do
       end
 
       context "show_correct_answers" do
-        it "should save show_correct_answers if hide_results is null" do
+        it "should be set if hide_results is disabled" do
           api_create_quiz({'show_correct_answers' => false, 'hide_results' => nil})
           new_quiz.show_correct_answers.should be_false
         end
 
-        it "should not save show_correct_answers if hide_results is not null" do
+        it "should be ignored if hide_results is enabled" do
           api_create_quiz({'show_correct_answers' => false, 'hide_results' => 'always'})
           new_quiz.show_correct_answers.should be_true
         end

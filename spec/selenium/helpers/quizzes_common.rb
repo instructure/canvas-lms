@@ -185,6 +185,24 @@ shared_examples_for "quizzes selenium tests" do
     driver.switch_to.alert.accept
   end
 
+  def take_and_answer_quiz(submit=true)
+    get "/courses/#{@course.id}/quizzes/#{@quiz.id}/take?user_id=#{@user.id}"
+    expect_new_page_load { driver.find_element(:link_text, 'Take the Quiz').click }
+
+    answer = @quiz.stored_questions[0][:answers][0][:id]
+
+    fj("input[type=radio][value=#{answer}]").click
+    wait_for_js
+
+    if submit
+      driver.execute_script("$('#submit_quiz_form .btn-primary').click()")
+
+      keep_trying_until do
+        f('.quiz-submission .quiz_score .score_value').should be_displayed
+      end
+    end
+  end
+
   def set_answer_comment(answer_num, text)
     driver.execute_script("$('.question_form:visible .form_answers .answer:eq(#{answer_num}) .comment_focus').click()")
     wait_for_ajaximations

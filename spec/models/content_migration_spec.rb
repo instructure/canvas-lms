@@ -1474,7 +1474,9 @@ describe ContentMigration do
       )
       @copy_from.quizzes.create!(:due_at => "05 Jul 2012 06:00:00 UTC +00:00",
                                  :unlock_at => old_start + 1.days,
-                                 :lock_at => old_start + 5.days
+                                 :lock_at => old_start + 5.days,
+                                 :show_correct_answers_at => old_start + 6.days,
+                                 :hide_correct_answers_at => old_start + 7.days
       )
       @copy_from.discussion_topics.create!(:title => "some topic",
                                            :message => "<p>some text</p>",
@@ -1502,6 +1504,8 @@ describe ContentMigration do
       new_quiz.due_at.to_i.should  == (new_start + 4.day).to_i
       new_quiz.unlock_at.to_i.should == (new_start + 1.day).to_i
       new_quiz.lock_at.to_i.should == (new_start + 5.day).to_i
+      new_quiz.show_correct_answers_at.to_i.should == (new_start + 6.day).to_i
+      new_quiz.hide_correct_answers_at.to_i.should == (new_start + 7.day).to_i
 
       new_disc = @copy_to.discussion_topics.first
       new_disc.delayed_post_at.to_i.should == (new_start + 3.day).to_i
@@ -1522,7 +1526,7 @@ describe ContentMigration do
               :title => 'quiz',
               :description => "<p>description eh</p>",
               :shuffle_answers => true,
-              :show_correct_answers => 'true',
+              :show_correct_answers => true,
               :time_limit => 20,
               :allowed_attempts => 4,
               :scoring_policy => 'keep_highest',

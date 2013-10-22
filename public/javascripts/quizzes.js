@@ -54,7 +54,7 @@ define([
             DueDateList,SectionList,
             MissingDateDialog,MultipleChoiceToggle,TextHelper){
 
-  var dueDateList, overrideView, quizModel, sectionList;
+  var dueDateList, overrideView, quizModel, sectionList, correctAnswerVisibility;
 
   function adjustOverridesForFormParams(overrides){
     var idx = 0;
@@ -95,7 +95,7 @@ define([
     dueDateList = new DueDateList(quizModel.get('assignment_overrides'),
                                   sectionList, quizModel);
 
-    overrideView = new DueDateOverrideView({
+    overrideView = window.overrideView = new DueDateOverrideView({
       el: '.js-assignment-overrides',
       model: dueDateList,
       views: {
@@ -832,6 +832,172 @@ define([
     }
   };
 
+  correctAnswerVisibility = {
+    $toggler: $(),
+    $options: $(),
+    $pickers: $(),
+
+    /**
+     * Build date pickers, and install handlers for show_correct_answers stuff when:
+     *  - form is being serialized
+     *  - form errors are thrown
+     *  - related date fields change
+     */
+    init: function() {
+      var that = correctAnswerVisibility;
+      var $toggler = that.$toggler = $('#quiz_show_correct_answers');
+      var $options = that.$options = $('#quiz_show_correct_answers_options');
+      var $pickers = that.$pickers = $options.find('.date_field');
+
+      $pickers.each(function() {
+        var $field = $(this);
+        var formattedDate = Handlebars.helpers.datetimeFormatted($field.val() || '');
+
+        $field.val(formattedDate);
+        $field.datetime_field();
+      });
+
+      $('#quiz_options_form')
+        .on('xhrError', that.onFormError)
+        .on('serializing', that.serialize);
+
+      $toggler.on('change', function() {
+        $options.toggle($toggler.is(':checked'));
+      }).triggerHandler('change');
+
+      that.installValidators();
+    },
+
+    /**
+     * Install handlers for validating show_correct_answers (and related fields)
+     * values, as well as error handlers for bad values that show friendly
+     * error boxes.
+     */
+    installValidators: function() {
+      var that = correctAnswerVisibility;
+
+      that.$toggler.on('invalid:bad_range', function() {
+        $('#quiz_hide_correct_answers_at').errorBox(
+          I18n.t('errors.invalid_show_correct_answers_range',
+          'Hide date cannot be before show date.'));
+
+        return true;
+      });
+
+      that.$pickers.on('change', that.validateRange);
+    },
+
+    /**
+     * Ensure that if both show_at and hide_at dates are specified, they form
+     * a valid time range.
+     *
+     * @fires invalid:bad_range
+     * @delegate #quiz_show_correct_answers
+     */
+    validateRange: function() {
+      var that = correctAnswerVisibility;
+
+      var $hide_at = that.$options.find('#quiz_hide_correct_answers_at');
+      var $show_at = that.$options.find('#quiz_show_correct_answers_at');
+
+      // Clear any existing error boxes
+      that.$pickers.each(function() {
+        var $errorBox = $(this).data('associated_error_box');
+
+        if ($errorBox) {
+          $errorBox.remove();
+        }
+      });
+
+      if ($show_at.val().length && $hide_at.val().length) {
+        if ($show_at.data().date >= $hide_at.data().date) {
+          that.$toggler.triggerHandler('invalid:bad_range');
+        }
+      }
+    },
+
+    /**
+     * Handle remote show_correct_answers errors by triggering the corresponding
+     * events so the error handlers can pick them up.
+     *
+     * Side-effects:
+     *
+     * - `show_correct_answers` key will be deleted from the XHR response to prevent
+     *   $.fn.formErrors from handling it.
+     *
+     * @param {jQuery} e XHR event.
+     * @param {Object} resp XHR response.
+     *
+     * @fires invalid:bad_range
+     * @delegate #quiz_show_correct_answers
+     */
+    onFormError: function(e, resp) {
+      var that = correctAnswerVisibility;
+      var i, errorEntry, event;
+
+      // Delegate the handling of "show_correct_answers" errors to the handlers bound
+      // to #quiz_show_correct_answers.
+      if (resp && resp.show_correct_answers) {
+        for (i = 0; i < resp.show_correct_answers.length; ++i) {
+          errorEntry = resp.show_correct_answers[i];
+          event = 'invalid:' + errorEntry.type.toLowerCase().replace(/\s/, '_');
+
+          that.$toggler.triggerHandler(event);
+        }
+
+        // Prevent $.fn.formErrors from generating an error box with the API's
+        // cryptic error message.
+        delete resp.show_correct_answers;
+      }
+    },
+
+    /**
+     * Serialize the dates set for the visibility duration, if specified and
+     * `hide_results` is enabled. If that's not enabled, nullify the values.
+     *
+     * @param  {jQuery} e     A jQuery event
+     * @param  {Object} data  The form/XHR data.
+     */
+    serialize: function(e, data) {
+      var show;
+      var resetField = function(key, value) {
+        data['quiz[' + key + ']'] = value || '';
+      };
+      var serializeField = function(key) {
+        var $field = $('#quiz_' + key);
+        var date;
+
+        if ($field.val().length) {
+          date = $field.data().date;
+          data['quiz[' + key + ']'] = $.dateToISO8601UTC(
+            $.unfudgeDateForProfileTimezone(date)
+          );
+        } else {
+          resetField(key);
+        }
+      };
+
+      show = data['quiz[hide_results][never]'] != '0';
+      show = show && data['quiz[show_correct_answers]'] == '1';
+
+      if (show) {
+        serializeField('show_correct_answers_at');
+        serializeField('hide_correct_answers_at');
+      } else {
+        resetField('show_correct_answers', '0');
+        resetField('show_correct_answers_at');
+        resetField('hide_correct_answers_at');
+      }
+    },
+
+    disable: function() {
+      var that = correctAnswerVisibility;
+
+      that.$toggler.prop('checked', false);
+      that.$options.hide();
+    }
+  };
+
   function makeQuestion(data) {
     var idx = $(".question_holder:visible").length + 1;
     var question = $.extend({}, quiz.defaultQuestionData, {question_name: I18n.t('default_quesiton_name', "Question")}, data);
@@ -1129,6 +1295,7 @@ define([
 
   $(document).ready(function() {
     quiz.init().updateDisplayComments();
+    correctAnswerVisibility.init();
 
     $('#quiz_tabs').tabs();
     $('#editor_tabs').show();
@@ -1184,14 +1351,47 @@ define([
       }
     }).triggerHandler('change', [true]);
 
-    $("#protect_quiz").change(function() {
-      var checked = $(this).attr('checked');
-      $(".protected_options").showIf(checked).find(":checkbox").each(function() {
-        if (!checked) {
-          $(this).attr('checked', false).change();
+    $('#enable_quiz_ip_filter, #enable_quiz_access_code').on('change', function() {
+      var $checkbox = $(this);
+      var $optionGroup = $checkbox.closest('.option-group');
+      var checked = $checkbox.prop('checked');
+
+      $optionGroup.find('> .options').toggle(checked);
+
+      if (!checked) {
+        $optionGroup
+          .find('[type="text"]')
+            .val('');
+      }
+    }).each(function() {
+      $(this).triggerHandler('change');
+    });
+
+    $quiz_options_form.on('serializing', function(e, data) {
+      var erratic = false;
+
+      if ($('#enable_quiz_ip_filter').is(':checked')) {
+        if (!data['quiz[ip_filter]']) {
+          erratic = true;
+          $('#quiz_ip_filter').errorBox(
+            I18n.t('errors.missing_ip_filter', 'You must enter a valid IP Address')
+          );
         }
-      });
-    }).triggerHandler('change');
+      }
+
+      if ($('#enable_quiz_access_code').is(':checked')) {
+        if (!data['quiz[access_code]']) {
+          erratic = true;
+          $('#quiz_access_code').errorBox(
+            I18n.t('errors.missing_access_code', 'You must enter an access code')
+          );
+        }
+      }
+
+      if (erratic) {
+        e.preventDefault();
+      }
+    });
 
     $("#quiz_require_lockdown_browser").change(function() {
       $("#lockdown_browser_suboptions").showIf($(this).attr('checked'));
@@ -1199,15 +1399,6 @@ define([
     });
 
     $("#lockdown_browser_suboptions").showIf($("#quiz_require_lockdown_browser").attr('checked'));
-
-    $("#ip_filter").change(function(event, noFocus) {
-      $("#ip_filter_suboptions").showIf($(this).attr('checked'));
-      if (!$(this).attr('checked')) {
-        $("#quiz_ip_filter").val("");
-      } else if (!noFocus) {
-        $("#quiz_ip_filter").focus();
-      }
-    }).triggerHandler('change', [true]);
 
     $("#ip_filters_dialog").delegate('.ip_filter', 'click', function(event) {
       event.preventDefault();
@@ -1248,21 +1439,12 @@ define([
       }
     });
 
-    $("#require_access_code").change(function(event, noFocus) {
-      $("#access_code_suboptions").showIf($(this).attr('checked'));
-      if (!$(this).attr('checked')) {
-        $("#quiz_access_code").val("");
-      } else if (!noFocus) {
-        $("#quiz_access_code").focus();
-      }
-    }).triggerHandler('change', [true]);
-
     $("#never_hide_results").change(function() {
       var $this = $(this);
       $(".show_quiz_results_options").showIf($this.attr('checked'));
       if (!$this.attr('checked')) {
         $("#hide_results_only_after_last").attr('checked', false);
-        $("#quiz_show_correct_answers").attr('checked', false);
+        correctAnswerVisibility.disable();
       }
     }).triggerHandler('change');
 
@@ -1368,6 +1550,15 @@ define([
           if (overrides.length === 0) { overrides = false; }
           data['quiz[assignment_overrides]'] = overrides;
         }
+
+        var serializingEvent = $.Event('serializing');
+
+        $(this).trigger(serializingEvent, data);
+
+        if (serializingEvent.isDefaultPrevented()) {
+          return false;
+        }
+
         return data;
       },
 
@@ -1403,6 +1594,12 @@ define([
         quiz.updateDisplayComments();
     },
     error: function(data) {
+      $("#quiz_edit_wrapper")
+        .find(".btn.save_quiz_button")
+        .attr('disabled', false)
+        .text(I18n.t('buttons.save', "Save"));
+
+      $(this).trigger('xhrError', data);
       $(this).formErrors(data);
       $quiz_edit_wrapper.find(".btn.save_quiz_button").attr('disabled', false);
       }

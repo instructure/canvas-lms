@@ -213,4 +213,50 @@ describe QuizzesHelper do
       title.should be_nil
     end
   end
+
+  describe '#render_correct_answer_protection' do
+    it 'should provide a useful message when "no"' do
+      quiz = stub({
+        show_correct_answers: false,
+        show_correct_answers_at: nil,
+        hide_correct_answers_at: nil
+      })
+
+      message = render_correct_answer_protection(quiz)
+      message.should =~ /are hidden/
+    end
+
+    it 'should provide nothing when "yes"' do
+      quiz = stub({
+        show_correct_answers: true,
+        show_correct_answers_at: nil,
+        hide_correct_answers_at: nil
+      })
+
+      message = render_correct_answer_protection(quiz)
+      message.should == nil
+    end
+
+    it 'should provide a useful message, and an availability date, when "show at" is set' do
+      quiz = stub({
+        show_correct_answers: true,
+        show_correct_answers_at: 1.day.from_now,
+        hide_correct_answers_at: nil
+      })
+
+      message = render_correct_answer_protection(quiz)
+      message.should =~ /will be available/
+    end
+
+    it 'should provide a useful message, and a date, when "hide at" is set' do
+      quiz = stub({
+        show_correct_answers: true,
+        show_correct_answers_at: nil,
+        hide_correct_answers_at: 1.day.from_now
+      })
+
+      message = render_correct_answer_protection(quiz)
+      message.should =~ /are available until/
+    end
+  end
 end

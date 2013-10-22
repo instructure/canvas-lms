@@ -30,7 +30,7 @@ describe "/quiz_submissions/show" do
     @quiz.stubs(:questions).returns([])
     @quiz.stubs(:points_possible).returns(10)
     @quiz.stubs(:stored_questions).returns([])
-    @quiz.stubs(:show_correct_answers).returns(true)
+    @quiz.stubs(:show_correct_answers?).returns(true)
     assigns[:quiz] = @quiz
     assigns[:submission] = @submission
     

@@ -1227,4 +1227,99 @@ describe Quiz do
     end
 
   end
+
+  context "show_correct_answers" do
+    it "totally hides the correct answers" do
+      quiz = @course.quizzes.create!({
+        title: 'test quiz',
+        show_correct_answers: false
+      })
+
+      quiz.publish!
+
+      submission = quiz.generate_submission(@user)
+
+      quiz.show_correct_answers?(@user, submission).should be_false
+    end
+
+    it "shows the correct answers immediately" do
+      quiz = @course.quizzes.create!({
+        title: 'test quiz',
+        show_correct_answers: true
+      })
+
+      quiz.publish!
+
+      submission = quiz.generate_submission(@user)
+
+      quiz.show_correct_answers?(@user, submission).should be_true
+    end
+
+    it "shows the correct answers after a certain date" do
+      quiz = @course.quizzes.create!({
+        title: 'test quiz',
+        show_correct_answers: true,
+        show_correct_answers_at: 10.minutes.from_now
+      })
+
+      quiz.publish!
+
+      submission = quiz.generate_submission(@user)
+
+      quiz.show_correct_answers?(@user, submission).should be_false
+
+      quiz.show_correct_answers_at = 2.minutes.ago
+      quiz.save!
+      quiz.reload
+
+      quiz.show_correct_answers?(@user, submission).should be_true
+    end
+
+    it "hides the correct answers after a certain date" do
+      quiz = @course.quizzes.create!({
+        title: 'test quiz',
+        show_correct_answers: true
+      })
+
+      quiz.publish!
+
+      submission = quiz.generate_submission(@user)
+
+      quiz.show_correct_answers?(@user, submission).should be_true
+
+      quiz.hide_correct_answers_at = 2.minutes.ago
+      quiz.save!
+      quiz.reload
+
+      quiz.show_correct_answers?(@user, submission).should be_false
+    end
+
+    it "nullifies related fields when turned off" do
+      quiz = @course.quizzes.create({
+        title: 'test quiz',
+        show_correct_answers: false,
+        show_correct_answers_at: 2.days.from_now,
+        hide_correct_answers_at: 5.days.from_now
+      })
+
+      quiz.show_correct_answers_at.should be_nil
+      quiz.hide_correct_answers_at.should be_nil
+
+      quiz.update_attributes({
+        show_correct_answers: true,
+        show_correct_answers_at: 2.days.from_now,
+        hide_correct_answers_at: 5.days.from_now
+      })
+
+      quiz.show_correct_answers_at.should_not be_nil
+      quiz.hide_correct_answers_at.should_not be_nil
+
+      quiz.update_attributes({
+        show_correct_answers: false
+      })
+
+      quiz.show_correct_answers_at.should be_nil
+      quiz.hide_correct_answers_at.should be_nil
+    end
+  end
 end

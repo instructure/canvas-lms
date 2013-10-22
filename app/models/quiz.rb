@@ -36,7 +36,7 @@ class Quiz < ActiveRecord::Base
     :lock_at, :unlock_at, :due_at, :access_code, :anonymous_submissions, :assignment_group_id,
     :hide_results, :locked, :ip_filter, :require_lockdown_browser,
     :require_lockdown_browser_for_results, :context, :notify_of_update,
-    :one_question_at_a_time, :cant_go_back
+    :one_question_at_a_time, :cant_go_back, :show_correct_answers_at, :hide_correct_answers_at
 
   attr_readonly :context_id, :context_type
   attr_accessor :notify_of_update
@@ -58,7 +58,10 @@ class Quiz < ActiveRecord::Base
   validate :validate_ip_filter, :if => :ip_filter_changed?
   validate :validate_hide_results, :if => :hide_results_changed?
   validate :validate_draft_state_change, :if => :workflow_state_changed?
-
+  validate :validate_correct_answer_visibility, :if => lambda { |quiz|
+    quiz.show_correct_answers_at_changed? ||
+    quiz.hide_correct_answers_at_changed?
+  }
   sanitize_field :description, Instructure::SanitizeField::SANITIZE
   copy_authorized_links(:description) { [self.context, nil] }
   before_save :build_assignment
@@ -90,6 +93,10 @@ class Quiz < ActiveRecord::Base
     self.cant_go_back = false if self.cant_go_back == nil || self.one_question_at_a_time == false
     self.shuffle_answers = false if self.shuffle_answers == nil
     self.show_correct_answers = true if self.show_correct_answers == nil
+    if !self.show_correct_answers
+      self.show_correct_answers_at = nil
+      self.hide_correct_answers_at = nil
+    end
     self.allowed_attempts = 1 if self.allowed_attempts == nil
     self.scoring_policy = "keep_highest" if self.scoring_policy == nil
     self.due_at ||= self.lock_at if self.lock_at.present?
@@ -267,12 +274,24 @@ class Quiz < ActiveRecord::Base
     !self.graded?
   end
 
-  # Determine if the quiz should display the correct answers.
-  # Takes into account the quiz settings, the user viewing and
-  # the submission to be viewed.
-  def display_correct_answers?(user, submission)
-    # NOTE: We don't have a submission user when the teacher is previewing the quiz and displaying the results'
-    self.show_correct_answers || (self.grants_right?(user, nil, :grade) && (submission && submission.user && submission.user != user))
+  # Determine if the quiz should display the correct answers and the score points.
+  # Takes into account the quiz settings, the user viewing and the submission to
+  # be viewed.
+  def show_correct_answers?(user, submission)
+    show_at = self.show_correct_answers_at
+    hide_at = self.hide_correct_answers_at
+
+    # NOTE: We don't have a submission user when the teacher is previewing the
+    # quiz and displaying the results'
+    return true if self.grants_right?(user, nil, :grade) &&
+      (submission && submission.user && submission.user != user)
+
+    return false if !self.show_correct_answers
+
+    # Are we past the date the correct answers should no longer be shown after?
+    return false if hide_at.present? && Time.now > hide_at
+
+    show_at.present? ? Time.now > show_at : true
   end
 
   def update_existing_submissions
@@ -833,7 +852,16 @@ class Quiz < ActiveRecord::Base
   end
 
   def valid_hide_results_values
-    %w[always until_after_last_attempt]
+    %w[always until_after_last_attempt until_after_due_date until_after_available_date]
+  end
+
+  def validate_correct_answer_visibility
+    show_at = self.show_correct_answers_at
+    hide_at = self.hide_correct_answers_at
+
+    if show_at.present? && hide_at.present? && hide_at <= show_at
+      errors.add(:show_correct_answers, 'bad_range')
+    end
   end
 
   def strip_html_answers(question)
@@ -959,15 +987,33 @@ class Quiz < ActiveRecord::Base
     item.lock_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:lock_at]) if hash[:lock_at]
     item.unlock_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:unlock_at]) if hash[:unlock_at]
     item.due_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:due_at]) if hash[:due_at]
+    item.show_correct_answers_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:show_correct_answers_at]) if hash[:show_correct_answers_at]
+    item.hide_correct_answers_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:hide_correct_answers_at]) if hash[:hide_correct_answers_at]
     item.scoring_policy = hash[:which_attempt_to_keep] if hash[:which_attempt_to_keep]
     hash[:missing_links] = []
     item.description = ImportedHtmlConverter.convert(hash[:description], context, {:missing_links => hash[:missing_links]})
-    [:migration_id, :title, :allowed_attempts, :time_limit,
-     :shuffle_answers, :show_correct_answers, :points_possible, :hide_results,
-     :access_code, :ip_filter, :scoring_policy, :require_lockdown_browser,
-     :require_lockdown_browser_for_results, :anonymous_submissions, 
-     :could_be_locked, :quiz_type, :one_question_at_a_time,
-     :cant_go_back].each do |attr|
+
+    %w[
+      migration_id
+      title
+      allowed_attempts
+      time_limit
+      shuffle_answers
+      show_correct_answers
+      points_possible
+      hide_results
+      access_code
+      ip_filter
+      scoring_policy
+      require_lockdown_browser
+      require_lockdown_browser_for_results
+      anonymous_submissions
+      could_be_locked
+      quiz_type
+      one_question_at_a_time
+      cant_go_back
+    ].each do |attr|
+      attr = attr.to_sym
       item.send("#{attr}=", hash[attr]) if hash.key?(attr)
     end
 

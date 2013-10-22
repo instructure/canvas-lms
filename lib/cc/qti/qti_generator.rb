@@ -194,6 +194,8 @@ module CC
           q_node.access_code quiz.access_code unless quiz.access_code.blank?
           q_node.ip_filter quiz.ip_filter unless quiz.ip_filter.blank?
           q_node.show_correct_answers quiz.show_correct_answers unless quiz.show_correct_answers.nil?
+          q_node.show_correct_answers_at quiz.show_correct_answers_at unless quiz.show_correct_answers_at.nil?
+          q_node.hide_correct_answers_at quiz.hide_correct_answers_at unless quiz.hide_correct_answers_at.nil?
           q_node.anonymous_submissions quiz.anonymous_submissions unless quiz.anonymous_submissions.nil?
           q_node.could_be_locked quiz.could_be_locked unless quiz.could_be_locked.nil?
           q_node.time_limit quiz.time_limit unless quiz.time_limit.nil?

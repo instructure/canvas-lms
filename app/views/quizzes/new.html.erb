@@ -201,117 +201,23 @@
             </div>
 
             <div class="control-group">
-              <label class="control-label">Options</label>
               <div class="controls">
+                <p class="option-caption"><strong>Options</strong></p>
+
                 <label class="checkbox" for="quiz_shuffle_answers">
                   <%= check_box :quiz, :shuffle_answers %>
                   <%= t(:shuffle_answers, "Shuffle Answers") %>
                 </label>
 
-                <label class="checkbox inline nowrap" for="time_limit_option" style="margin-top:-3px;">
-                  <input type="checkbox" <%= "checked" if @quiz.time_limit %> name="time_limit" id="time_limit_option"/>
-                  <%= t('label.time_limit', "Time Limit") %>
-                </label>
-
-                <label class="checkbox inline" for="quiz_time_limit" style="padding-top:0;">
-                  <%= text_field :quiz, :time_limit, :style => "width: 30px;", :"aria-label" => t(:time_limit, "How many minutes?") %>
-                  <%= t(:minutes, "Minutes") %>
-                </label>
-
-                <label class="checkbox" for="multiple_attempts_option">
-                  <input type="checkbox" <%= "checked" if @quiz.allowed_attempts && @quiz.allowed_attempts != 1 %> name="multiple_attempts" value="1" id="multiple_attempts_option" />
-                  <%= t('labels.allow_multiple_attempts', "Allow Multiple Attempts") %>
-                </label>
-                <div id="multiple_attempts_suboptions">
-                  <div>
-                    <label for="keep_score_select" class="inline"><%= t(:score_to_keep, "Quiz Score to Keep") %></label>
-                    <%= select(:quiz, :scoring_policy, [[render_score_to_keep('keep_highest'), 'keep_highest'], [render_score_to_keep('keep_latest'), 'keep_latest']], {}, :id => 'keep_score_select') %>
-                  </div>
-                  <div style="margin-top:5px">
-                    <label for="limit_attempts_option" class="checkbox inline nowrap">
-                      <input type="checkbox" <%= "checked" if @quiz.allowed_attempts && @quiz.allowed_attempts > 1 %> name="limit_attempts" id="limit_attempts_option"/>
-                      <%= t(:limited_attempts, "Allowed Attempts") %>
-                    </label>
-                    <%= text_field :quiz, :allowed_attempts, :tabindex => "0", :value => (@quiz.allowed_attempts == -1 ? 1 : @quiz.allowed_attempts), :"aria-label" => t(:allowed_attempts, "Number of allowed attempts") %>
-                  </div>
-                </div>
-
-                <label class="checkbox" for="never_hide_results">
-                  <input type="hidden" name="quiz[hide_results][never]" value="0"/>
-                  <input type="checkbox" name="quiz[hide_results][never]" value="1" id="never_hide_results" <%= 'checked' if @quiz.hide_results != 'always' %> />
-                  <%= t('labels.never_hide_results', "Let Students See Their Quiz Responses") %>
-                </label>
-                <div class="show_quiz_results_options">
-                  <div id="hide_results_only_after_last_holder">
-                    <label class="checkbox" for="hide_results_only_after_last">
-                      <input type="hidden" name="quiz[hide_results][last_attempt]" value="0"/>
-                      <input type="checkbox" name="quiz[hide_results][last_attempt]" value="1" id="hide_results_only_after_last" <%= 'checked' if @quiz.hide_results == 'until_after_last_attempt' %> />
-                      <%= t('labels.hide_results_only_after_last', "Only After Their Last Attempt") %>
-                    </label>
-                  </div>
-
-                  <div>
-                    <label class="checkbox" for="quiz_show_correct_answers">
-                      <%= check_box :quiz, :show_correct_answers %>
-                      <%= t('show_correct_answers', "Show Which Answers Were Correct") %>
-                    </label>
-                  </div>
-                </div>
-
-                <label class="checkbox" for="protect_quiz">
-                <input type="checkbox" <%= 'checked' if !@quiz.access_code.blank? || !@quiz.ip_filter.blank? ||!@quiz.require_lockdown_browser.blank? %> name="protect_quiz" id="protect_quiz"/>
-                  <%= t('labels.restrict_quiz', "Restrict this Quiz") %>
-                </label>
-                <div class="protected_options">
-                  <label class="checkbox" for="require_access_code">
-                    <input type="checkbox" <%= 'checked' if !@quiz.access_code.blank? %> name="require_access_code" id="require_access_code"/>
-                    <%= t('labels.require_access_code', "Require an access code") %>
+                <div>
+                  <label class="checkbox inline nowrap" for="time_limit_option" style="margin-top:-3px;">
+                    <input type="checkbox" <%= "checked" if @quiz.time_limit %> name="time_limit" id="time_limit_option"/>
+                    <%= t('label.time_limit', "Time Limit") %>
                   </label>
-                </div>
-                <div id="access_code_suboptions" style="display: none;">
-                  <label class="nobr" for="quiz_access_code">
-                    <%= t(:code, "Access Code") %>
-                    <input type="text" name="quiz[access_code]" id="quiz_access_code" value="<%= @quiz.access_code %>"/>
-                  </label>
-                </div>
-                <div class="protected_options">
-                  <label class="checkbox" for="ip_filter">
-                    <input type="checkbox" <%= 'checked' if !@quiz.ip_filter.blank? %> name="ip_filter" id="ip_filter">
-                    <%= t('labels.ip_filter', "Filter IP Addresses") %>
-                  </label>
-                </div>
-                <div id="ip_filter_suboptions" style="display: none;">
-                  <label class="nobr" for="quiz_ip_filter">
-                    <%= t(:filter, "IP Filter") %>
-                    <input type="text" name="quiz[ip_filter]" id="quiz_ip_filter" value="<%= @quiz.ip_filter %>" maxlength="255"/>
-                    <%= link_to(image_tag("find.png"), '#', :class => 'ip_filtering_link', :title => t('titles.find_ip_address_filter', 'Find IP Address Filter')) %>
-                  </label>
-                </div>
-                <% if feature_enabled?(:lockdown_browser) %>
-                  <div class="protected_options">
-                    <label class="checkbox" for="quiz_require_lockdown_browser">
-                      <%= check_box :quiz, :require_lockdown_browser %>
-                      <%= t(:require_lockdown_browser, "Require Respondus LockDown Browser") %>
-                    </label>
-                  </div>
-                  <div id="lockdown_browser_suboptions" style="display: none;">
-                    <label class="checkbox" for="quiz_require_lockdown_browser_for_results">
-                      <%= check_box :quiz, :require_lockdown_browser_for_results %>
-                      <%= t(:require_lockdown_browser_for_results, "Required to view quiz results") %>
-                    </label>
-                  </div>
-                <% end %>
 
-                <label class="checkbox" for="quiz_one_question_at_a_time">
-                  <%= hidden_field_tag "quiz[one_question_at_a_time]", "0", :id => nil %>
-                  <%= check_box_tag "quiz[one_question_at_a_time]", "1", @quiz.one_question_at_a_time?, :class => "element_toggler"  %>
-                  <%= t('one_question_at_a_time', 'Show one question at a time') %>
-                </label>
-                <div id="one_question_at_a_time_options" style="<%= 'display:none;' unless @quiz.one_question_at_a_time? %>">
-                  <label class="checkbox" for="quiz_cant_go_back">
-                    <%= hidden_field_tag "quiz[cant_go_back]", "0", :id => nil %>
-                    <%= check_box_tag "quiz[cant_go_back]", "1", @quiz.cant_go_back? %>
-                    <%= t('cant_go_back', "Lock questions after answering") %>
+                  <label class="checkbox inline" for="quiz_time_limit" style="padding-top:0;">
+                    <%= text_field :quiz, :time_limit, :style => "width: 30px;", :"aria-label" => t(:time_limit, "How many minutes?") %>
+                    <%= t(:minutes, "Minutes") %>
                   </label>
                 </div>
 
@@ -321,6 +227,133 @@
                     <%= t('anonymous_submissions', "Keep Submissions Anonymous") %>
                   </label>
                 </div>
+
+                <!-- Multiple Attempts -->
+                <div class="option-group">
+                  <label class="checkbox" for="multiple_attempts_option">
+                    <input type="checkbox" <%= "checked" if @quiz.allowed_attempts && @quiz.allowed_attempts != 1 %> name="multiple_attempts" value="1" id="multiple_attempts_option" />
+                    <%= t('labels.allow_multiple_attempts', "Allow Multiple Attempts") %>
+                  </label>
+                  <div class="options" id="multiple_attempts_suboptions">
+                    <div>
+                      <label for="keep_score_select" class="inline"><%= t(:score_to_keep, "Quiz Score to Keep") %></label>
+                      <%= select(:quiz, :scoring_policy, [[render_score_to_keep('keep_highest'), 'keep_highest'], [render_score_to_keep('keep_latest'), 'keep_latest']], {}, :id => 'keep_score_select') %>
+                    </div>
+                    <div style="margin-top:5px">
+                      <label for="limit_attempts_option" class="checkbox inline nowrap">
+                        <input type="checkbox" <%= "checked" if @quiz.allowed_attempts && @quiz.allowed_attempts > 1 %> name="limit_attempts" id="limit_attempts_option"/>
+                        <%= t(:limited_attempts, "Allowed Attempts") %>
+                      </label>
+                      <%= text_field :quiz, :allowed_attempts, :tabindex => "0", :value => (@quiz.allowed_attempts == -1 ? 1 : @quiz.allowed_attempts), :"aria-label" => t(:allowed_attempts, "Number of allowed attempts") %>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Response/CA Visibility -->
+                <div class="option-group">
+                  <label class="checkbox" for="never_hide_results">
+                    <input type="hidden" name="quiz[hide_results][never]" value="0"/>
+                    <input type="checkbox" name="quiz[hide_results][never]" value="1" id="never_hide_results" <%= 'checked' if @quiz.hide_results != 'always' %> />
+                    <%= t('labels.never_hide_results', "Let Students See Their Quiz Responses") %>
+                  </label>
+                  <div class="show_quiz_results_options options">
+                    <div id="hide_results_only_after_last_holder">
+                      <label class="checkbox" for="hide_results_only_after_last">
+                        <input type="hidden" name="quiz[hide_results][last_attempt]" value="0"/>
+                        <input type="checkbox" name="quiz[hide_results][last_attempt]" value="1" id="hide_results_only_after_last" <%= 'checked' if @quiz.hide_results == 'until_after_last_attempt' %> />
+                        <%= t('labels.hide_results_only_after_last', "Only After Their Last Attempt") %>
+                      </label>
+                    </div>
+
+                    <div>
+                      <label class="checkbox">
+                        <%= check_box :quiz, :show_correct_answers %>
+                        <%= t(:show_correct_answers, "Let Students See The Correct Answers") %>
+                      </label>
+                    </div>
+
+                    <div id="quiz_show_correct_answers_options" class="options">
+                      <div>
+                        <label for="quiz_show_correct_answers_at" class="inline">
+                          <%= t(:show_correct_answers_at, 'Show Correct Answers at') %>
+                        </label>
+
+                        <div class="date_field_container inline">
+                          <%= text_field :quiz, :show_correct_answers_at,
+                            :class => "input-medium date_field",
+                            :type => "text",
+                            :value => @quiz.show_correct_answers_at.as_json %>
+                        </div>
+                      </div>
+                      <div>
+                        <label for="quiz_hide_correct_answers_at" class="inline">
+                          <%= t(:hide_correct_answers_at, 'Hide Correct Answers at') %>
+                        </label>
+
+                        <div class="date_field_container inline">
+                          <%= text_field :quiz, :hide_correct_answers_at,
+                            :class => "input-medium date_field",
+                            :type => "text",
+                            :value => @quiz.hide_correct_answers_at.as_json %>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- OQAAT -->
+                <div class="option-group">
+                  <label class="checkbox" for="quiz_one_question_at_a_time">
+                    <%= hidden_field_tag "quiz[one_question_at_a_time]", "0", :id => nil %>
+                    <%= check_box_tag "quiz[one_question_at_a_time]", "1", @quiz.one_question_at_a_time?, :class => "element_toggler"  %>
+                    <%= t('one_question_at_a_time', 'Show one question at a time') %>
+                  </label>
+                  <div id="one_question_at_a_time_options" style="<%= 'display:none;' unless @quiz.one_question_at_a_time? %>" class="options">
+                    <label class="checkbox" for="quiz_cant_go_back">
+                      <%= hidden_field_tag "quiz[cant_go_back]", "0", :id => nil %>
+                      <%= check_box_tag "quiz[cant_go_back]", "1", @quiz.cant_go_back? %>
+                      <%= t('cant_go_back', "Lock questions after answering") %>
+                    </label>
+                  </div>
+                </div>
+
+                <p class="option-caption"><strong><%= t('labels.restrict_quiz', "Quiz Restrictions") %></strong></p>
+
+                <!-- Quiz Restrictions -->
+                <div class="option-group">
+                  <label class="checkbox" for="enable_quiz_access_code">
+                    <input type="checkbox" <%= 'checked' if !@quiz.access_code.blank? %> id="enable_quiz_access_code">
+                    <%= t('labels.require_access_code', "Require an access code") %>
+                  </label>
+
+                  <div class="options control-group">
+                    <input type="text" name="quiz[access_code]" id="quiz_access_code" value="<%= @quiz.access_code %>" placeholder="ex: Password85" />
+                  </div>
+                </div>
+                <div class="option-group">
+                  <label class="checkbox" for="enable_quiz_ip_filter">
+                    <input type="checkbox" <%= 'checked' if !@quiz.ip_filter.blank? %> id="enable_quiz_ip_filter">
+                    <%= t('labels.ip_filter', "Filter IP Addresses") %>
+                  </label>
+                  <div class="options control-group">
+                    <input type="text" name="quiz[ip_filter]" id="quiz_ip_filter" value="<%= @quiz.ip_filter %>" maxlength="255" placeholder="ex: 192.168.217.1" />
+                    <%= link_to(image_tag("find.png"), '#', :class => 'ip_filtering_link', :title => t('titles.find_ip_address_filter', 'Find IP Address Filter')) %>
+                  </div>
+                </div>
+                <% if feature_enabled?(:lockdown_browser) %>
+                  <div class="option-group">
+                    <label class="checkbox" for="quiz_require_lockdown_browser">
+                      <%= check_box :quiz, :require_lockdown_browser %>
+                      <%= t(:require_lockdown_browser, "Require Respondus LockDown Browser") %>
+                    </label>
+                    <div id="lockdown_browser_suboptions" class="options" style="display: none;">
+                      <label class="checkbox" for="quiz_require_lockdown_browser_for_results">
+                        <%= check_box :quiz, :require_lockdown_browser_for_results %>
+                        <%= t(:require_lockdown_browser_for_results, "Required to view quiz results") %>
+                      </label>
+                    </div>
+                  </div>
+                <% end %>
               </div>
             </div>
           </fieldset>

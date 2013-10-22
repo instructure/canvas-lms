@@ -3,6 +3,21 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/quizzes_common')
 describe "quizzes" do
   it_should_behave_like "quizzes selenium tests"
 
+  def prepare_quiz
+    @quiz = quiz_model({
+      :course => @course,
+      :time_limit => 5
+    })
+
+    @quiz.quiz_questions.create!(:question_data => {
+        :name => 'test 3',
+        :question_type => 'multiple_choice_question',
+        :answers => {'answer_0' => {'answer_text' => '0'}, 'answer_1' => {'answer_text' => '1'}}})
+    @quiz.generate_quiz_data
+    @quiz.save
+    @quiz
+  end
+
   context "as a student" do
     before (:each) do
       course_with_student_logged_in
@@ -143,29 +158,11 @@ describe "quizzes" do
       job_tag = 'QuizSubmission#grade_if_untaken'
 
       course_with_student_logged_in
-
-      quiz = quiz_model({
-        :course => @course,
-        :time_limit => 5
-      })
-
-      quiz.quiz_questions.create!(:question_data => {
-          :name => 'test 3',
-          :question_type => 'multiple_choice_question',
-          :answers => {'answer_0' => {'answer_text' => '0'}, 'answer_1' => {'answer_text' => '1'}}})
-      quiz.generate_quiz_data
-      quiz.save
+      quiz = prepare_quiz
 
       Delayed::Job.find_by_tag(job_tag).should == nil
 
-      get "/courses/#{@course.id}/quizzes/#{@quiz.id}/take?user_id=#{@user.id}"
-      expect_new_page_load { f("#take_quiz_link").click }
-
-      answer_id = quiz.stored_questions[0][:answers][0][:id]
-
-      fj("input[type=radio][value=#{answer_id}]").click
-
-      wait_for_js
+      take_and_answer_quiz(false)
 
       driver.execute_script("window.close()")
 
@@ -183,6 +180,31 @@ describe "quizzes" do
 
       quiz_sub.reload
       quiz_sub.workflow_state.should == "complete"
+    end
+  end
+
+  context "correct answer visibility" do
+    before(:each) do
+      course_with_student_logged_in
+      prepare_quiz
+    end
+
+    it "should not highlight correct answers" do
+      @quiz.update_attributes(show_correct_answers: false)
+      @quiz.save!
+
+      take_and_answer_quiz
+
+      ff('.correct_answer').length.should == 0
+    end
+
+    it "should highlight correct answers" do
+      @quiz.update_attributes(show_correct_answers: true)
+      @quiz.save!
+
+      take_and_answer_quiz
+
+      ff('.correct_answer').length.should > 0
     end
   end
 end
