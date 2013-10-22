@@ -105,6 +105,7 @@ class AssignmentGroupsController < ApplicationController
           json = @groups.map { |g|
             g.context = @context
             assignment_group_json(g, @current_user, session, params[:include],
+                                  stringify_json_ids: stringify_json_ids?,
                                   override_assignment_dates: override_dates,
                                   preloaded_user_content_attachments: user_content_attachments)
           }

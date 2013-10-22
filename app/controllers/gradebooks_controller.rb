@@ -483,7 +483,7 @@ class GradebooksController < ApplicationController
 
   def assignment_groups_json
     @context.assignment_groups.active.map { |g|
-      assignment_group_json(g, @current_user, session, ['assignments'])
+      assignment_group_json(g, @current_user, session, ['assignments'], {stringify_json_ids: stringify_json_ids?})
     }
   end
 end

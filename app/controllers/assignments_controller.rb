@@ -193,7 +193,7 @@ class AssignmentsController < ApplicationController
       end
     end
   end
-  
+
   def assign_peer_review
     @assignment = @context.assignments.active.find(params[:assignment_id])
     @student = @context.students_visible_to(@current_user).find params[:reviewer_id]
@@ -206,7 +206,7 @@ class AssignmentsController < ApplicationController
       end
     end
   end
-  
+
   def remind_peer_review
     @assignment = @context.assignments.active.find(params[:assignment_id])
     if authorized_action(@assignment, @current_user, :grade)
@@ -222,7 +222,7 @@ class AssignmentsController < ApplicationController
       end
     end
   end
-  
+
   def delete_peer_review
     @assignment = @context.assignments.active.find(params[:assignment_id])
     if authorized_action(@assignment, @current_user, :grade)
@@ -238,7 +238,7 @@ class AssignmentsController < ApplicationController
       end
     end
   end
-  
+
   def peer_reviews
     @assignment = @context.assignments.active.find(params[:assignment_id])
     if authorized_action(@assignment, @current_user, :grade)
@@ -250,7 +250,7 @@ class AssignmentsController < ApplicationController
       @submissions = @assignment.submissions.include_assessment_requests
     end
   end
-  
+
   def syllabus
     add_crumb t '#crumbs.syllabus', "Syllabus"
     active_tab = "Syllabus"
@@ -318,7 +318,7 @@ class AssignmentsController < ApplicationController
       end
     end
   end
-  
+
   def new
     @assignment ||= @context.assignments.new
     @assignment.workflow_state = 'unpublished' if @context.draft_state_enabled?
@@ -355,7 +355,7 @@ class AssignmentsController < ApplicationController
         map { |c| { :id => c.id, :name => c.name } }
 
       hash = {
-        :ASSIGNMENT_GROUPS => assignment_groups.map{|g| assignment_group_json(g, @current_user, session) },
+        :ASSIGNMENT_GROUPS => assignment_groups.map{|g| assignment_group_json(g, @current_user, session, [], {stringify_json_ids: stringify_json_ids?}) },
         :GROUP_CATEGORIES => group_categories,
         :KALTURA_ENABLED => !!feature_enabled?(:kaltura),
         :SECTION_LIST => (@context.course_sections.active.map { |section|
@@ -443,7 +443,7 @@ class AssignmentsController < ApplicationController
       end
     end
   end
-  
+
   protected
 
   def get_assignment_group(assignment_params)

@@ -303,7 +303,8 @@ describe AssignmentGroupsApiController, :type => :integration do
 
     before do
       course_with_teacher(:active_all => true)
-      @group = @course.assignment_groups.create!(:name => 'group')
+      rules_in_db = "drop_lowest:1\ndrop_highest:1\nnever_drop:1\nnever_drop:2\n"
+      @group = @course.assignment_groups.create!(:name => 'group', :rules => rules_in_db)
     end
 
     it 'should succeed' do
@@ -338,8 +339,35 @@ describe AssignmentGroupsApiController, :type => :integration do
 
       json['assignments'].should_not be_empty
     end
-  end
 
+    it 'should return never_drop rules as strings with Accept header' do
+      rules = {'never_drop' => ["1","2"], 'drop_lowest' => 1, 'drop_highest' => 1}
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/assignment_groups/#{@group.id}", {
+        :controller => 'assignment_groups_api',
+        :action => 'show',
+        :format => 'json',
+        :course_id => @course.id.to_s,
+        :assignment_group_id => @group.id.to_s},
+        {},
+        { 'Accept' => 'application/json+canvas-string-ids' })
+
+      json['rules'].should == rules
+    end
+
+    it 'should return never_drop rules as ints without Accept header' do
+      rules = {'never_drop' => [1,2], 'drop_lowest' => 1, 'drop_highest' => 1}
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/assignment_groups/#{@group.id}", {
+        :controller => 'assignment_groups_api',
+        :action => 'show',
+        :format => 'json',
+        :course_id => @course.id.to_s,
+        :assignment_group_id => @group.id.to_s}
+        )
+
+      json['rules'].should == rules
+    end
+
+  end
   context '#create' do
     before do
       course_with_teacher(:active_all => true)
@@ -380,7 +408,7 @@ describe AssignmentGroupsApiController, :type => :integration do
     end
 
     it 'should update rules properly' do
-      rules = {'never_drop' => [1,2], 'drop_lowest' => 1, 'drop_highest' => 1}
+      rules = {'never_drop' => ["1","2"], 'drop_lowest' => 1, 'drop_highest' => 1}
       rules_in_db = "drop_lowest:1\ndrop_highest:1\nnever_drop:1\nnever_drop:2\n"
       params = {'rules' => rules}
       json = api_call(:put, "/api/v1/courses/#{@course.id}/assignment_groups/#{@assignment_group.id}", {
@@ -389,7 +417,8 @@ describe AssignmentGroupsApiController, :type => :integration do
         :format => 'json',
         :course_id => @course.id.to_s,
         :assignment_group_id => @assignment_group.id.to_s},
-        params)
+        params,
+        { 'Accept' => 'application/json+canvas-string-ids' })
 
       json['rules'].should == rules
       @assignment_group.reload

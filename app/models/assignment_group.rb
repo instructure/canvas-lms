@@ -96,7 +96,7 @@ class AssignmentGroup < ActiveRecord::Base
     to_restore.each { |assignment| assignment.restore(:assignment_group) }
   end
 
-  def rules_hash
+  def rules_hash (options={})
     return @rules_hash if @rules_hash
     @rules_hash = {}.with_indifferent_access
     (rules || "").split("\n").each do |rule|
@@ -104,7 +104,7 @@ class AssignmentGroup < ActiveRecord::Base
       if split.length > 1
         if split[0] == 'never_drop'
           @rules_hash[split[0]] ||= []
-          @rules_hash[split[0]] << split[1].to_i
+          @rules_hash[split[0]] << (options[:stringify_json_ids] ? split[1].to_s : split[1].to_i)
         else
           @rules_hash[split[0]] = split[1].to_i
         end

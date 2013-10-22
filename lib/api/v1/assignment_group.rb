@@ -33,7 +33,8 @@ module Api::V1::AssignmentGroup
 
     hash = api_json(group, user, session,
                     :only => %w(id name position group_weight))
-    hash['rules'] = group.rules_hash
+
+    hash['rules'] = group.rules_hash(stringify_json_ids: opts[:stringify_json_ids])
 
     if includes.include?('assignments')
       assignment_scope = group.active_assignments
