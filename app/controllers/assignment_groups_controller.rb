@@ -216,8 +216,8 @@ class AssignmentGroupsController < ApplicationController
       respond_to do |format|
         format.html { redirect_to(named_context_url(@context, :context_assignments_url)) }
         format.json { render :json => {
-          assignment_group: @assignment_group.as_json(include_root: false, include: active_assignments),
-          new_assignment_group: @new_group.as_json(include_root: false, include: active_assignments)
+          assignment_group: @assignment_group.as_json(include_root: false, include: :active_assignments),
+          new_assignment_group: @new_group.as_json(include_root: false, include: :active_assignments)
         }}
       end
     end
