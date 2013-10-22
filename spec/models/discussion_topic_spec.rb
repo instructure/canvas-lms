@@ -1111,6 +1111,8 @@ describe DiscussionTopic do
   context "materialized view" do
     before do
       topic_with_nested_replies
+      # materialized view jobs are now delayed
+      Timecop.travel(Time.now + 20.seconds)
     end
 
     it "should return nil if the view has not been built yet, and schedule a job" do

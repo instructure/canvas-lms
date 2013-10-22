@@ -1840,6 +1840,8 @@ describe DiscussionTopicsController, :type => :integration do
 
       @all_entries.each &:reload
 
+      # materialized view jobs are now delayed
+      Timecop.travel(Time.now + 20.seconds)
       run_jobs
 
       json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/view",
@@ -1936,6 +1938,8 @@ describe DiscussionTopicsController, :type => :integration do
       @topic = @course.discussion_topics.create!(:title => "title", :message => "message", :user => @teacher, :discussion_type => 'threaded')
       @root1 = @topic.reply_from(:user => @student, :html => "root1")
 
+      # materialized view jobs are now delayed
+      Timecop.travel(Time.now + 20.seconds)
       run_jobs
 
       # make everything slightly in the past to test updating
