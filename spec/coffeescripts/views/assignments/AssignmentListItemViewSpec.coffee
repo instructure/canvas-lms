@@ -73,15 +73,11 @@ define [
   createView = (model, options) ->
     options = $.extend {canManage: true}, options
 
-    sinon.stub( AssignmentListItemView.prototype, "canManage", -> options.canManage )
-    sinon.stub( AssignmentListItemView.prototype, "modules", -> )
+    ENV.PERMISSIONS = { manage: options.canManage }
 
     view = new AssignmentListItemView(model: model)
     view.$el.appendTo $('#fixtures')
     view.render()
-
-    AssignmentListItemView.prototype.canManage.restore()
-    AssignmentListItemView.prototype.modules.restore()
 
     view
 
@@ -101,6 +97,10 @@ define [
     teardown: ->
       window.ENV = oldENV
 
+    teardown: ->
+      delete ENV.PERMISSIONS
+      $('#fixtures').empty()
+
   test "initializes child views if can manage", ->
     view = createView(@model, canManage: true)
     ok view.publishIconView
@@ -116,19 +116,12 @@ define [
     ok !view.editAssignmentView
 
   test "upatePublishState toggles ig-published", ->
-    view = createView(@model)
-
-    sinon.stub( AssignmentListItemView.prototype, "canManage", -> true )
-    sinon.stub( AssignmentListItemView.prototype, "modules", -> )
+    view = createView(@model, canManage: true)
 
     ok view.$('.ig-row').hasClass('ig-published')
     @model.set('published', false)
     @model.save()
     ok !view.$('.ig-row').hasClass('ig-published')
-
-    AssignmentListItemView.prototype.canManage.restore()
-    AssignmentListItemView.prototype.modules.restore()
-
 
   test "delete destroys model", ->
     window.ENV = {context_asset_string: "course_1"}

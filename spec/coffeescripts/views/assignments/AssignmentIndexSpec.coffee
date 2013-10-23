@@ -55,6 +55,7 @@ define [
     teardown: ->
       window.ENV = oldENV
       assignmentGroups = null
+      $('#fixtures').empty()
       @enable_spy.restore()
 
   test 'should filter by search term', ->
@@ -62,17 +63,17 @@ define [
     view = assignmentIndex()
     $('#search_term').val('foo')
     view.filterResults()
-    equal view.$el.find('.assignment:visible').length, 1
+    equal view.$el.find('.assignment').not('.hidden').length, 1
 
     view = assignmentIndex()
     $('#search_term').val('BooBerry')
     view.filterResults()
-    equal view.$el.find('.assignment:visible').length, 0
+    equal view.$el.find('.assignment').not('.hidden').length, 0
 
     view = assignmentIndex()
     $('#search_term').val('name')
     view.filterResults()
-    equal view.$el.find('.assignment:visible').length, 2
+    equal view.$el.find('.assignment').not('.hidden').length, 2
 
 
   test 'should have search disabled on render', ->

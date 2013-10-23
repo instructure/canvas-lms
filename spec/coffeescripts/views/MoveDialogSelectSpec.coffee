@@ -65,7 +65,6 @@ define [
     other_assignments = new Assignments((id: i, name: "Assignment #{i}") for i in [5..9])
     @view.setCollection(other_assignments)
     deepEqual @view.collection, other_assignments
-    ok spy.called
 
   test '#toJSON returns an object that can be used for rendering the select', ->
     expected = @view.model.toView()

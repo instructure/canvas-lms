@@ -92,10 +92,8 @@ define [
 
   createView = (model, options) ->
     options = $.extend {canManage: true}, options
-    sinon.stub( AssignmentGroupListItemView.prototype, "canManage", -> options.canManage )
+    ENV.PERMISSIONS = { manage: options.canManage }
     sinon.stub( AssignmentGroupListItemView.prototype, "currentUserId", -> 1)
-    sinon.stub( AssignmentListItemView.prototype, "canManage", -> options.canManage )
-    sinon.stub( AssignmentListItemView.prototype, "modules", -> )
 
     view = new AssignmentGroupListItemView
       model: model
@@ -110,10 +108,9 @@ define [
       @model = createAssignmentGroup()
 
     teardown: ->
-      AssignmentGroupListItemView.prototype.canManage.restore()
-      AssignmentListItemView.prototype.canManage.restore()
-      AssignmentListItemView.prototype.modules.restore()
+      delete ENV.PERMISSIONS
       AssignmentGroupListItemView.prototype.currentUserId.restore()
+      $('#fixtures').empty()
 
   test "initializes collection", ->
     view = createView(@model)

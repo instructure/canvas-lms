@@ -11,16 +11,19 @@ require [
     server.requests[1].respond 200,
       { 'Content-Type': 'application/json' }, assignmentResponse
 
-  $.fudgeDateForProfileTimezone = (d) -> d
+  originalFudge = $.fudgeDateForProfileTimezone
+
 
   module "AgendaView",
     setup: ->
       @container = $('<div />', id: 'agenda-wrapper').appendTo('body')
       @server = sinon.fakeServer.create()
+      $.fudgeDateForProfileTimezone = (d) -> d
 
     teardown: ->
       @container.remove()
       @server.restore()
+      $.fudgeDateForProfileTimezone = originalFudge
 
   test 'should render results', ->
     view = new AgendaView(el: @container)
