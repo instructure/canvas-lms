@@ -1,6 +1,6 @@
 # coding: utf-8
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -86,25 +86,6 @@ describe Attachment do
           @attachment.scribd_mime_type.should be_nil
         end
       end
-    end
-
-    it "should create a ScribdAccount if one isn't present" do
-      scribd_mime_type_model(:extension => 'pdf')
-      course_model
-      @course.scribd_account.should be_nil
-      attachment_obj_with_context(@course, :content_type => 'application/pdf')
-      @attachment.context.should eql(@course)
-      @attachment.context.scribd_account.should be_nil
-      expect {
-        @attachment.save!
-        @attachment.context.scribd_account.should_not be_nil
-        @attachment.context.scribd_account.should be_is_a(ScribdAccount)
-      }.to change(ScribdAccount, :count).by(1)
-    end
-
-    it "should set the attachment.scribd_account to the context scribd_account" do
-      scribdable_attachment_model
-      @attachment.scribd_account.should eql(@attachment.context.scribd_account)
     end
 
   end

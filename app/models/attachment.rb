@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011-2012 Instructure, Inc.
+# Copyright (C) 2011-2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -44,7 +44,6 @@ class Attachment < ActiveRecord::Base
   has_many :attachment_associations
   belongs_to :root_attachment, :class_name => 'Attachment'
   belongs_to :scribd_mime_type
-  belongs_to :scribd_account
   has_one :sis_batch
   has_one :thumbnail, :foreign_key => "parent_id", :conditions => {:thumbnail => "thumb"}
   has_many :thumbnails, :foreign_key => "parent_id"
@@ -355,13 +354,17 @@ class Attachment < ActiveRecord::Base
     self.scribd_doc = nil
     self.workflow_state = 'deleted'  # not file_state :P
     unless shared
-      ScribdAPI.instance.set_user(self.scribd_account)
+      ScribdAPI.instance.set_user(scribd_user)
       return false unless scribd_doc.destroy
     end
     save
   end
 
-  # This method retrieves a URL to the thumbnail of a document, in a given size, and for any page in that document. Note that docs.getSettings and docs.getList also retrieve thumbnail URLs in default size - this method is really for resizing those. IMPORTANT - it is possible that at some time in the future, Scribd will redesign its image system, invalidating these URLs. So if you cache them, please have an update strategy in place so that you can update them if neceessary.
+  def scribd_user
+    self.scribd_doc.try(:owner) || 'canvas'
+  end
+
+  # This method retrieves a URL to the thumbnail of a document, in a given size, and for any page in that document. Note that docs.getSettings and docs.getList also retrieve thumbnail URLs in default size - this method is really for resizing those. IMPORTANT - it is possible that at some time in the future, Scribd will redesign its image system, invalidating these URLs. So if you cache them, please have an update strategy in place so that you can update them if necessary.
   #
   # Parameters
   # integer width  (optional) Width in px of the desired image. If not included, will use the default thumb size.
@@ -379,14 +382,14 @@ class Attachment < ActiveRecord::Base
       begin
       # if we aren't requesting special demensions, fetch and save it to the db.
       if options.empty?
-        ScribdAPI.instance.set_user(self.scribd_account)
+        ScribdAPI.instance.set_user(scribd_user)
         self.cached_scribd_thumbnail = self.scribd_doc.thumbnail(options)
         # just update the cached_scribd_thumbnail column of this attachment without running callbacks
         Attachment.where(:id => self).update_all(:cached_scribd_thumbnail => self.cached_scribd_thumbnail)
         self.cached_scribd_thumbnail
       else
         Rails.cache.fetch(['scribd_thumb', self, options].cache_key) do
-          ScribdAPI.instance.set_user(self.scribd_account)
+          ScribdAPI.instance.set_user(scribd_user)
           self.scribd_doc.thumbnail(options)
         end
       end
@@ -480,7 +483,7 @@ class Attachment < ActiveRecord::Base
     self.scribd_attempts ||= 0
     self.folder_id ||= Folder.root_folders(context).first.id rescue nil
     if self.root_attachment && self.new_record?
-      [:md5, :size, :content_type, :scribd_mime_type_id, :scribd_user, :submitted_to_scribd_at, :workflow_state, :scribd_doc].each do |key|
+      [:md5, :size, :content_type, :scribd_mime_type_id, :submitted_to_scribd_at, :workflow_state, :scribd_doc].each do |key|
         self.send("#{key.to_s}=", self.root_attachment.send(key))
       end
       self.write_attribute(:filename, self.root_attachment.filename)
@@ -513,15 +516,6 @@ class Attachment < ActiveRecord::Base
     end
 
     self.media_entry_id ||= 'maybe' if self.new_record? && self.content_type && self.content_type.match(/(video|audio)/)
-
-    # Raise an error if this is scribdable without a scribdable context?
-    if scribdable_context? and scribdable? and ScribdAPI.enabled?
-      unless context.scribd_account
-        ScribdAccount.create(:scribdable => context)
-        self.context.reload
-      end
-      self.scribd_account_id ||= context.scribd_account.id
-    end
   end
   protected :default_values
 
@@ -1389,7 +1383,7 @@ class Attachment < ActiveRecord::Base
   def submit_to_scribd!
     # Newly created record that needs to be submitted to scribd
     if self.pending_upload? and self.scribdable? and self.filename and ScribdAPI.enabled?
-      ScribdAPI.instance.set_user(self.scribd_account)
+      ScribdAPI.instance.set_user(scribd_user)
       begin
         upload_path = if Attachment.local_storage?
                  self.full_filename
@@ -1439,7 +1433,7 @@ class Attachment < ActiveRecord::Base
 
   def resubmit_to_scribd!
     if self.scribd_doc && ScribdAPI.enabled?
-      ScribdAPI.instance.set_user(self.scribd_account)
+      ScribdAPI.instance.set_user(scribd_user)
       self.scribd_doc.destroy rescue nil
     end
     self.workflow_state = 'pending_upload'
@@ -1472,7 +1466,7 @@ class Attachment < ActiveRecord::Base
   def query_conversion_status!
     return unless ScribdAPI.enabled? && self.scribdable?
     if self.scribd_doc
-      ScribdAPI.set_user(self.scribd_account) rescue nil
+      ScribdAPI.set_user(scribd_user)
       res = ScribdAPI.get_status(self.scribd_doc) rescue 'ERROR'
       case res
       when 'DONE'
@@ -1490,7 +1484,7 @@ class Attachment < ActiveRecord::Base
   def download_url(format='original')
     return @download_url if @download_url
     return nil unless ScribdAPI.enabled?
-    ScribdAPI.set_user(self.scribd_account)
+    ScribdAPI.set_user(scribd_user)
     begin
       @download_url = self.scribd_doc.download_url(format)
     rescue Scribd::ResponseError => e
