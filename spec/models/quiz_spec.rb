@@ -1098,6 +1098,31 @@ describe Quiz do
     end
   end
 
+  context "#destroy" do
+    it "should logical delete published quiz" do
+      quiz = @course.quizzes.create(title: 'test quiz')
+      quiz.context.root_account.enable_draft!
+      quiz.stubs(:has_student_submissions? => true)
+      quiz.publish!
+      quiz.assignment.stubs(:has_student_submissions? => true)
+
+      quiz.destroy
+      quiz.deleted?.should be_true
+    end
+
+    it "should logical delete the published quiz's associated assignment" do
+      quiz = @course.quizzes.create(title: 'test quiz')
+      quiz.context.root_account.enable_draft!
+      quiz.stubs(:has_student_submissions?).returns true
+      quiz.publish!
+      assignment = quiz.assignment
+      assignment.stubs(:has_student_submissions?).returns true
+
+      quiz.destroy
+      assignment.deleted?.should be_true
+    end
+  end
+
   context "draft_state" do
 
     it "updates the assignment's workflow state" do

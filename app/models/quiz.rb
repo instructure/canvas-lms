@@ -310,7 +310,7 @@ class Quiz < ActiveRecord::Base
         a.assignment_group_id = self.assignment_group_id
         a.saved_by = :quiz
         a.workflow_state = 'published' if a.deleted?
-        if context.draft_state_enabled?
+        if context.draft_state_enabled? && !deleted?
           a.workflow_state = self.published? ? 'published' : 'unpublished'
         end
         a.notify_of_update = @notify_of_update
