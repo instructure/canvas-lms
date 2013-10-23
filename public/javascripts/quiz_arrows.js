@@ -58,15 +58,15 @@ define(['i18n!quizzes.show', 'jquery'], function(I18n, $) {
     creditNoneTpl.text(I18n.t('answers.incorrect', 'Incorrect'));
     surveyAnswerTpl.text(I18n.t('answers.you_answered', 'You Answered'));
 
-    rightAnswers.append(rightTpl);
-    wrongAnswers.append(wrongTpl);
-    correctAnswers.append(correctTpl);
-    shortAnswers.append(shortTpl);
-    unansweredQ.append(unansweredTpl);
-    creditPartial.append(creditPartialTpl);
-    creditFull.append(creditFullTpl);
-    creditNone.append(creditNoneTpl);
-    surveyAnswers.append(surveyAnswerTpl);
+    rightAnswers.prepend(rightTpl);
+    wrongAnswers.prepend(wrongTpl);
+    correctAnswers.prepend(correctTpl);
+    shortAnswers.prepend(shortTpl);
+    unansweredQ.prepend(unansweredTpl);
+    creditPartial.prepend(creditPartialTpl);
+    creditFull.prepend(creditFullTpl);
+    creditNone.prepend(creditNoneTpl);
+    surveyAnswers.prepend(surveyAnswerTpl);
 
     // adjust these down a little so they align better w/ answers.
     $('.short_answer_question .answer_arrow').css('top', 5);
