@@ -12,6 +12,10 @@
 }
 
 /* Page styles */
+body.conferences {
+  min-width: 960px;
+}
+
 #main {
   background: #e8ecef;
 }
@@ -48,27 +52,31 @@ header {
 
 }
 
-.ig-details{
+.ig-details {
   right: 170px
 }
 
-.ig-title{
+.ig-title {
   right: auto;
   max-width: 200px;
 }
 
-.ig-header-title a{
+.ig-header-title a {
   color: #434343;
 }
 
-.ig-list .ig-row .ellipses{
+.ig-list .ig-row .ellipses {
   color: #737373;
 }
 
 #add_conference_form {
   min-width: 700px;
 }
-#web_conference_title, #web_conference_description { min-width: 500px; }
+
+#web_conference_title, #web_conference_description {
+  min-width: 500px;
+}
+
 #web_conference_duration {
   width: 25px;
 }
