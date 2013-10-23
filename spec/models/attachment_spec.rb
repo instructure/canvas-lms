@@ -1556,6 +1556,48 @@ describe Attachment do
       end
     end
   end
+
+  describe ".delete_stale_scribd_docs" do
+    before do
+      attachment_model
+      @attachment.scribd_doc = Scribd::Document.new
+      ScribdAPI.stubs(:enabled?).returns(true)
+    end
+
+    it "should delete old views ones" do
+      Scribd::Document.any_instance.expects(:destroy).returns(true).once
+      @attachment.update_attribute(:last_inline_view, 1.year.ago)
+      Attachment.delete_stale_scribd_docs
+      @attachment.reload
+      @attachment.scribd_doc.should be_nil
+      @attachment.workflow_state.should == 'deleted'
+    end
+
+    it "should delete old ones that were never viewed" do
+      Scribd::Document.any_instance.expects(:destroy).returns(true).once
+      @attachment.update_attribute(:created_at, 1.year.ago)
+      Attachment.delete_stale_scribd_docs
+      @attachment.reload
+      @attachment.scribd_doc.should be_nil
+      @attachment.workflow_state.should == 'deleted'
+    end
+
+    it "should not delete new ones that were never viewed" do
+      Scribd::Document.any_instance.expects(:destroy).never
+      @attachment.save!
+      Attachment.delete_stale_scribd_docs
+      @attachment.reload
+      @attachment.scribd_doc.should_not be_nil
+    end
+
+    it "should not delete recently viewed ones" do
+      Scribd::Document.any_instance.expects(:destroy).never
+      @attachment.update_attribute(:last_inline_view, 1.hour.ago)
+      Attachment.delete_stale_scribd_docs
+      @attachment.reload
+      @attachment.scribd_doc.should_not be_nil
+    end
+  end
 end
 
 def processing_model

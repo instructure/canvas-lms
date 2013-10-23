@@ -352,10 +352,16 @@ class Attachment < ActiveRecord::Base
 
     scribd_doc = self.scribd_doc
     self.scribd_doc = nil
+    self.scribd_attempts = 0
     self.workflow_state = 'deleted'  # not file_state :P
     unless shared
-      Scribd::API.instance.user = scribd_user
-      return false unless scribd_doc.destroy
+    Scribd::API.instance.user = scribd_user
+      begin
+        return false unless scribd_doc.destroy
+      rescue Scribd::ResponseError => e
+        # does not exist
+        return false unless e.code == '612'
+      end
     end
     save
   end
@@ -1613,6 +1619,15 @@ class Attachment < ActiveRecord::Base
     @attachments = Attachment.scribdable?.recyclable
     @attachments.each do |attachment|
       attachment.resubmit_to_scribd!
+    end
+  end
+
+  def self.delete_stale_scribd_docs
+    cutoff = Setting.get('scribd.stale_threshold', 120).to_f.days.ago
+    Shackles.activate(:slave) do
+      Attachment.where("scribd_doc IS NOT NULL AND (last_inline_view<? OR (last_inline_view IS NULL AND created_at<?))", cutoff, cutoff).find_each do |att|
+        Shackles.activate(:master) { att.delete_scribd_doc }
+      end
     end
   end
 

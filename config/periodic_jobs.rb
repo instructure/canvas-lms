@@ -40,9 +40,17 @@ Delayed::Periodic.cron 'SummaryMessageConsolidator.process', '*/15 * * * *' do
   end
 end
 
-Delayed::Periodic.cron 'Attachment.process_scribd_conversion_statuses', '*/5 * * * *' do
-  Shard.with_each_shard do
-    Attachment.process_scribd_conversion_statuses
+if ScribdAPI.enabled?
+  Delayed::Periodic.cron 'Attachment.process_scribd_conversion_statuses', '*/5 * * * *' do
+    Shard.with_each_shard do
+      Attachment.process_scribd_conversion_statuses
+    end
+  end
+
+  Delayed::Periodic.cron 'Attachment.delete_stale_scribd_docs', '15 11 * * *' do
+    Shard.with_each_shard do
+      Attachment.delete_stale_scribd_docs
+    end
   end
 end
 
