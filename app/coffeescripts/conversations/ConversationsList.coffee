@@ -24,7 +24,7 @@ define [
 
       $('#menu-wrapper').on('click', 'a.standard_action', @triggerConversationAction)
       @$list.on('click', 'li[data-id] > a.standard_action', @triggerConversationAction)
-      @$list.on('click', 'button.al-trigger', @pane.filterMenu.bind(@pane))
+      @$list.on('mousedown keydown', 'button.al-trigger', @pane.filterMenu.bind(@pane))
 
       $(window).unload(=> clearTimeout(@markAsUnread))
 
