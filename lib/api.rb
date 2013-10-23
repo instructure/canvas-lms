@@ -561,4 +561,8 @@ module Api
   def self.stringify_json_id(id)
     id.is_a?(Integer) ? id.to_s : id
   end
+
+  def accepts_jsonapi?
+    !!(/application\/vnd\.api\+json/ =~ request.headers['Accept'].to_s)
+  end
 end
