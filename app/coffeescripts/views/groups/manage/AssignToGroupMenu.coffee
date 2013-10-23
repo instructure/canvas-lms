@@ -27,4 +27,12 @@ define [
       @hide()
 
     toJSON: ->
-      groups: @collection.toJSON()
+      hasGroups = @collection.length > 0
+      {
+        groups: @collection.toJSON()
+        noGroups: !hasGroups
+        allFull: =>
+          hasGroups && @collection.models.filter (g)->
+            !g.isFull()
+          .length == 0
+      }

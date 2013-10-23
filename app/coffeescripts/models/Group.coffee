@@ -45,3 +45,12 @@ define [
         "/api/v1/group_categories/#{@get('group_category_id')}/groups"
       else
         "/api/v1/groups/#{@id}"
+
+    isFull: ->
+      limit = @collection?.category.get 'group_limit'
+      limit and @get('members_count') >= limit
+
+    toJSON: ->
+      json = super
+      json.isFull = @isFull()
+      json
