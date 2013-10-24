@@ -1446,11 +1446,12 @@ class User < ActiveRecord::Base
       limit = 15 unless opts.key?(:limit)
 
       result = Shard.partition_by_shard(course_ids) do |shard_course_ids|
-        Assignment.for_course(shard_course_ids).active.
+        as = Assignment.for_course(shard_course_ids).active.
           expecting_submission.
           not_ignored_by(self, 'grading').
-          need_grading_info(limit).
-          reject{|a| a.needs_grading_count_for_user(self) == 0}
+          need_grading_info(limit)
+        Assignment.send :preload_associations, as, :context
+        as.reject{|a| a.needs_grading_count_for_user(self) == 0}
       end
       # outer limit, since there could be limit * n_shards results
       result = result[0..(limit - 1)] if limit
