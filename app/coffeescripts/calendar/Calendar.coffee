@@ -100,18 +100,17 @@ define [
         @updateFragment data
       if data.view_start
         date = $.fullCalendar.parseISO8601(data.view_start)
-        if date
-          fullCalendarParams.year = date.getFullYear()
-          fullCalendarParams.month = date.getMonth()
-          fullCalendarParams.date = date.getDate()
+      else
+        date = $.fudgeDateForProfileTimezone(new Date)
+      fullCalendarParams.year = date.getFullYear()
+      fullCalendarParams.month = date.getMonth()
+      fullCalendarParams.date = date.getDate()
 
       @el = $(selector).html calendarAppTemplate()
 
       @schedulerNavigator = new CalendarNavigator(el: $('.scheduler_navigator'), showAgenda: @options.showAgenda)
       @schedulerNavigator.hide()
 
-      data.view_name = 'month' if !data.view_name
-      @currentView = data.view_name
       data.view_name = 'agendaWeek' if data.view_name == 'week'
       if data.view_name == 'month' || data.view_name == 'agendaWeek'
         viewName = if data.view_name == 'agendaWeek' then 'week' else 'month'
@@ -141,8 +140,8 @@ define [
 
       @connectHeaderEvents()
       @connectSchedulerNavigatorEvents()
-      @agenda = new AgendaView(el: $('.agenda-wrapper'))
-      @loadView('agenda') if data.view_name is 'agenda'
+      @agenda = new AgendaView(el: $('.agenda-wrapper'), dataSource: @dataSource)
+      @agenda.on('agendaDateRange', @renderDateRange)
 
       window.setTimeout =>
         if data.view_name == 'scheduler'
@@ -220,7 +219,7 @@ define [
 
         events
 
-      @dataSource.getEvents $.unfudgeDateForProfileTimezone(start), $.unfudgeDateForProfileTimezone(end), @visibleContextList, (events) =>
+      @dataSource.getEvents start, end, @visibleContextList, (events) =>
         if @displayAppointmentEvents
           @dataSource.getEventsForAppointmentGroup @displayAppointmentEvents, (aEvents) =>
             # Make sure any events in the current appointment group get marked -
@@ -375,9 +374,11 @@ define [
 
     updateFragment: (opts) ->
       data = @dataFromDocumentHash()
+      changed = false
       for k, v of opts
+        changed = true if data[k] != v
         data[k] = v
-      location.replace("#" + $.param(data))
+      location.href = "#" + $.param(data) if changed
 
     viewDisplay: (view) =>
       @setDateTitle(view.title)
@@ -447,14 +448,12 @@ define [
 
     fragmentChange: (event, hash) =>
       data = @dataFromDocumentHash()
-      return unless @currentView && !$.isEmptyObject(data)
+      return if $.isEmptyObject(data)
 
       if data.view_name != @currentView
         @loadView(data.view_name)
 
-      if data.view_start
-        date = $.fullCalendar.parseISO8601(data.view_start)
-        @gotoDate(date)
+      @gotoDate(@getCurrentDate())
 
     reloadClick: (event) =>
       event?.preventDefault()
@@ -588,7 +587,6 @@ define [
         @schedulerNavigator.hide()
         @scheduler.show()
       else
-        @loadAgendaView()
         @calendar.hide()
         @scheduler.hide()
         @header.hidePrevNext()
@@ -603,6 +601,9 @@ define [
       start.setSeconds(0)
       @setDateTitle(I18n.l('#date.formats.medium', start))
       @agenda.fetch(@visibleContextList, start)
+
+    renderDateRange: (start, end) =>
+      @setDateTitle(I18n.l('#date.formats.medium', start)+' &ndash; '+I18n.l('#date.formats.medium', end))
 
     showSchedulerSingle: ->
       @calendar.show()
