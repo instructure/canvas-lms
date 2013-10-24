@@ -183,18 +183,16 @@ class ContextModule < ActiveRecord::Base
     end
   end
 
-  def prerequisites=(val)
-    if val.is_a?(Array)
-      val = val.map {|item|
-        if item[:type] == 'context_module'
-          "module_#{item[:id]}"
-        end
-      }.compact.join(',') rescue nil
-    end
-    if val.is_a?(String)
+  def prerequisites=(prereqs)
+    if prereqs.is_a?(Array)
+      # validate format, skipping invalid ones
+      prereqs = prereqs.select do |pre|
+        pre.has_key?(:id) && pre.has_key?(:name) && pre[:type] == 'context_module'
+      end
+    elsif prereqs.is_a?(String)
       res = []
       module_names = ContextModule.module_names(self.context)
-      pres = val.split(",")
+      pres = prereqs.split(",")
       pre_regex = /module_(\d+)/
       pres.each do |pre|
         next unless match = pre_regex.match(pre)
@@ -203,11 +201,11 @@ class ContextModule < ActiveRecord::Base
           res << {:id => id, :type => 'context_module', :name => module_names[id]}
         end
       end
-      val = res
+      prereqs = res
     else
-      val = nil
+      prereqs = nil
     end
-    write_attribute(:prerequisites, val)
+    write_attribute(:prerequisites, prereqs)
   end
   
   def completion_requirements=(val)

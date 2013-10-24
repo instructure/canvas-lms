@@ -285,12 +285,20 @@ describe ContextModule do
 
     it "should be satisfied if dependant on both a published and unpublished module" do
       @module3.prerequisites = "module_#{@module.id}"
-      @module3.prerequisites = [{:type=>"context_module", :id=>@module.id}, {:type=>"context_module", :id=>@module2.id}]
+      @module3.prerequisites = [{:type=>"context_module", :id=>@module.id, :name=>@module.name}, {:type=>"context_module", :id=>@module2.id, :name=>@module2.name}]
       @module3.save!
       @module3.reload
       @module3.prerequisites.count.should == 2
 
       @module3.prerequisites_satisfied?(@user, true).should == true
+    end
+
+    it "should skip incorrect prereq hashes" do
+      @module3.prerequisites = [{:type=>"context_module", :id=>@module.id},
+                                {:type=>"not_context_module", :id=>@module2.id, :name=>@module2.name}]
+      @module3.save!
+
+      @module3.prerequisites.count.should == 0
     end
 
     it "should update when publishing or unpublishing" do

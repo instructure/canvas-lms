@@ -1393,6 +1393,23 @@ describe ContentMigration do
       @copy_to.quizzes.find_by_migration_id(mig_id(quiz2)).should be_nil
     end
 
+    it "should copy module prerequisites" do
+      enable_cache do
+        mod = @copy_from.context_modules.create!(:name => "first module")
+        mod2 = @copy_from.context_modules.create(:name => "next module")
+        mod2.position = 2
+        mod2.prerequisites = "module_#{mod.id}"
+        mod2.save!
+
+        run_course_copy
+
+        to_mod = @copy_to.context_modules.find_by_migration_id(mig_id(mod))
+        to_mod2 = @copy_to.context_modules.find_by_migration_id(mig_id(mod2))
+        to_mod2.prerequisites.should_not == []
+        to_mod2.prerequisites[0][:id].should eql(to_mod.id)
+      end
+    end
+
     it "should preserve links to re-uploaded attachments" do
       att = Attachment.create!(:filename => 'first.png', :uploaded_data => StringIO.new('ohai'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
       att.destroy
