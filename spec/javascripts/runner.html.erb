@@ -59,7 +59,7 @@
         },
         {
           name: 'helpers',
-          location: '../../spec/javascripts/helpers',
+          location: '../../spec/javascripts/compiled/helpers',
           main: 'helpers',
           lib: './'
         },
@@ -103,7 +103,12 @@
     // loading, execute it.
     var specsLoading = true;
     var onSpecsLoaded = null;
-    require(<%= Dir["spec/javascripts/#{matcher}"].map{ |file| file.sub(/\.js$/, '') }.inspect %>, function() {
+    require(<%=
+      Dir[
+        "spec/javascripts/compiled/#{matcher}",
+        "spec/plugins/*/javascripts/compiled/#{matcher}"
+      ].map{ |file| file.sub(/\.js$/, '') }.inspect
+    %>, function() {
       specsLoading = false;
       if (onSpecsLoaded) onSpecsLoaded();
     });

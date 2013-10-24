@@ -64,7 +64,7 @@ namespace :js do
 
   def coffee_destination(dir_or_file)
     dir_or_file.sub('app/coffeescripts', 'public/javascripts/compiled').
-        sub('spec/coffeescripts', 'spec/javascripts').
+        sub('spec/coffeescripts', 'spec/javascripts/compiled').
         sub(%r{/javascripts/compiled/plugins/([^/]+)(/|$)}, '/plugins/\\1/javascripts/compiled\\2')
   end
 
@@ -94,10 +94,11 @@ namespace :js do
     # clear out all the files in case there are any old compiled versions of
     # files that don't map to any source file anymore
     paths_to_remove = [
-        'public/javascripts/compiled',
-        'public/javascripts/jst',
-        'public/plugins/*/javascripts/{compiled,javascripts/jst}'
-    ] + Dir.glob('spec/javascripts/**/*Spec.js')
+      'public/javascripts/{compiled,jst}',
+      'public/plugins/*/javascripts/{compiled,jst}',
+      'spec/javascripts/compiled',
+      'spec/plugins/*/javascripts/compiled'
+    ]
     FileUtils.rm_rf(paths_to_remove)
 
     threads = []
