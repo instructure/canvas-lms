@@ -1197,20 +1197,17 @@ class Quiz < ActiveRecord::Base
                 includes(:quiz_question_regrades => :quiz_question).first
   end
 
-  # this is needed because of the context #current_regrade is used in -
-  # the callbacks it's performed in can become confused by version number.The latest
-  # quiz's version may not point to the latest quiz regrade.
-  # #last_regrade_performed will always point to the last regrade, regardless of
-  # version number
-  def last_regrade_performed
-    QuizRegrade.where(quiz_id: id)
-               .includes(quiz_question_regrades: :quiz_question)
-               .limit(1)
-               .last
-  end
-
   def current_quiz_question_regrades
     current_regrade ? current_regrade.quiz_question_regrades : []
   end
 
+  def questions_regraded_since(created_at)
+    question_regrades = Set.new
+    quiz_regrades.where("created_at > ?", created_at)
+                 .includes(:quiz_question_regrades).each do |regrade|
+      ids = regrade.quiz_question_regrades.map {|qqr| qqr.quiz_question_id }
+      question_regrades.merge(ids)
+    end
+    question_regrades.count
+  end
 end

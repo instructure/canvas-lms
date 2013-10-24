@@ -190,7 +190,7 @@ class OutcomesController < ApplicationController
           if @submission.attempt <= @result.attempt
             @submission_version = @submission
           else
-            @submission_version = @submission.submitted_versions.detect{|s| s.attempt >= @result.attempt }
+            @submission_version = @submission.submitted_attempts.detect{|s| s.attempt >= @result.attempt }
           end
           question = @submission.quiz_data.detect{|q| q['assessment_question_id'] == @question.data[:id] }
           question_id = (question && question['id']) || @question.data[:id]

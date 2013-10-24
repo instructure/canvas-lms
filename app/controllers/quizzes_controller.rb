@@ -558,7 +558,7 @@ class QuizzesController < ApplicationController
           @body_classes << 'quizzes-speedgrader'
         end
         @current_submission = @submission
-        @version_instances = @submission.submitted_versions.sort_by{|v| v.version_number }
+        @version_instances = @submission.submitted_attempts.sort_by{|v| v.version_number }
         @versions = get_versions
         params[:version] ||= @version_instances[0].version_number if @submission.untaken? && !@version_instances.empty?
         @current_version = true

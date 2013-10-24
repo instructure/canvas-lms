@@ -28,7 +28,7 @@ describe "/quizzes/history" do
     assigns[:submission] = assigns[:quiz].generate_submission(@user)
     assigns[:current_submission] = assigns[:submission]
     assigns[:submission]
-    assigns[:version_instances] = assigns[:submission].submitted_versions
+    assigns[:version_instances] = assigns[:submission].submitted_attempts
   end
 
   context 'beta quiz navigation' do

@@ -278,8 +278,8 @@ class QuizStatistics::StudentAnalysis < QuizStatistics::Report
     end
     submissions.map { |qs|
       includes_all_versions? ?
-        qs.submitted_versions :
-        [qs.latest_submitted_version].compact
+        qs.submitted_attempts :
+        [qs.latest_submitted_attempt].compact
     }.flatten.
       select{ |s| s && s.completed? && s.submission_data.is_a?(Array) }.
       sort_by(&:updated_at).reverse

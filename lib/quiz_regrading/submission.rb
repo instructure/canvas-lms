@@ -11,7 +11,7 @@ class QuizRegrader::Submission
     return unless answers_to_grade.size > 0
 
     # regrade all previous versions
-    submission.attempt_versions.each do |version|
+    submission.attempts.last_versions.each do |version|
       QuizRegrader::AttemptVersion.new(
         :version           => version,
         :question_regrades => question_regrades).regrade!

@@ -478,7 +478,7 @@ describe Quiz do
     data[2][:answers].should_not be_nil
   end
 
-  context "#generate_submission" do
+  describe "#generate_submission" do
 
     it "should generate a valid submission for a given user" do
       u = User.create!(:name => "some user")
@@ -989,7 +989,8 @@ describe Quiz do
       quiz.has_file_upload_question?.should be_false
     end
   end
-  context "#unpublished?" do
+
+  describe "#unpublished?" do
     before do
       @quiz = @course.quizzes.build title: 'Test Quiz'
     end
@@ -1005,7 +1006,7 @@ describe Quiz do
     end
   end
 
-  context "#active?" do
+  describe "#active?" do
     before do
       @quiz = @course.quizzes.build title: 'Test Quiz'
     end
@@ -1024,7 +1025,7 @@ describe Quiz do
 
   end
 
-  context "#published?" do
+  describe "#published?" do
     before do
       @quiz = @course.quizzes.build title: 'Test Quiz'
     end
@@ -1039,7 +1040,7 @@ describe Quiz do
     end
   end
 
-  context "#current_regrade" do
+  describe "#current_regrade" do
 
     before { @quiz = @course.quizzes.create! title: 'Test Quiz' }
 
@@ -1050,7 +1051,7 @@ describe Quiz do
     end
   end
 
-  context "#current_regrade_question_ids" do
+  describe "#current_regrade_question_ids" do
 
     before { @quiz = @course.quizzes.create! title: 'Test Quiz' }
 
@@ -1063,19 +1064,7 @@ describe Quiz do
     end
   end
 
-  context "#last_regrade_performed" do
-    before { @quiz = @course.quizzes.create! title: 'Test Quiz' }
-
-    it "returns the last regrade for the quiz, regardless of version" do
-      course_with_teacher_logged_in(active_all: true, course: @course)
-      versioned_regrade = QuizRegrade.find_or_create_by_quiz_id_and_quiz_version(@quiz.id, @quiz.version_number) { |qr| qr.user_id = @teacher.id }
-      last_regrade = QuizRegrade.find_or_create_by_quiz_id_and_quiz_version(@quiz.id, @quiz.version_number-1) { |qr| qr.user_id = @teacher.id }
-
-      @quiz.last_regrade_performed.should == last_regrade
-    end
-  end
-
-  context "#regrade_if_published" do
+  describe "#regrade_if_published" do
 
     it "queues a job to regrade if there are current question regrades" do
       course_with_teacher_logged_in(course: @course, active_all: true)
@@ -1098,7 +1087,40 @@ describe Quiz do
     end
   end
 
-  context "#destroy" do
+  describe "#questions_regraded_since" do
+    before do
+      course_with_teacher_logged_in(active_all: true)
+      @quiz = @course.quizzes.create!
+    end
+
+    it "should count how many questions have been regraded since the given date" do
+      first_regrade_time = 1.hour.ago
+      Timecop.freeze(first_regrade_time) do
+        # regrade once
+        regrade1 = QuizRegrade.find_or_create_by_quiz_id_and_quiz_version(@quiz.id, @quiz.version_number) do |qr|
+          qr.user_id = @teacher.id
+        end
+        regrade1.quiz_question_regrades.create(:quiz_question_id => @quiz.quiz_questions.create.id, :regrade_option => 'current_correct_only')
+      end
+
+      # regrade twice
+      regrade2 = QuizRegrade.find_or_create_by_quiz_id_and_quiz_version(@quiz.id, @quiz.version_number-1) do |qr|
+        qr.user_id = @teacher.id
+      end
+      regrade2.quiz_question_regrades.create(:quiz_question_id => @quiz.quiz_questions.create.id, :regrade_option => 'current_correct_only')
+      regrade2.quiz_question_regrades.create(:quiz_question_id => @quiz.quiz_questions.create.id, :regrade_option => 'current_correct_only')
+
+      # find all
+      count = @quiz.questions_regraded_since(first_regrade_time - 10.minutes)
+      count.should == 3
+
+      # onlye find those after the first regrade
+      count = @quiz.questions_regraded_since(first_regrade_time)
+      count.should == 2
+    end
+  end
+
+  describe "#destroy" do
     it "should logical delete published quiz" do
       quiz = @course.quizzes.create(title: 'test quiz')
       quiz.context.root_account.enable_draft!

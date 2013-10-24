@@ -217,7 +217,9 @@
       <i class="icon-warning" aria-label="<%= t("labels.warning_icon", "Warning") %>"></i>
       <strong>
       <% if score_affected_by_regrade?(@submission) %>
-        <%= t 'quiz_regraded_your_score_affected', {:one => "This quiz has been regraded; your score was affected.", :other => "This quiz has been regraded; your new score reflects %{count} questions that were affected."}, :count => @quiz.last_regrade_performed.quiz_question_regrades.count %>
+        <%= t 'quiz_regraded_your_score_affected', {:one => "This quiz has been regraded; your score was affected.",
+                                                    :other => "This quiz has been regraded; your new score reflects %{count} questions that were affected."},
+                                                    :count => @submission.questions_regraded_since_last_attempt %>
       <% else %>
         <%= t 'quiz_regraded_your_score_not_affected', 'This quiz has been regraded; your score was not affected.' %>
       <% end %>
