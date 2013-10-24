@@ -210,7 +210,7 @@ define([
           student.submission.id;
       }));
     } else if (userSettings.get("eg_sort_by") == "submitted_at") {
-      jsonData.studentsWithSubmissions.sort(compare_by(function(student){
+      jsonData.studentsWithSubmissions.sort(compareBy(function(student){
         return student &&
           student.submission &&
           student.submission.submitted_at &&

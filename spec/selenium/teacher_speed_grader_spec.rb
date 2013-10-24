@@ -420,8 +420,14 @@ describe "speed grader" do
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
     wait_for_ajaximations
 
+    # sort by submission date
     f("#settings_link").click
     f('select#eg_sort_by option[value="submitted_at"]').click
+    expect_new_page_load { fj('.ui-dialog-buttonset .ui-button:visible:last').click }
+    keep_trying_until { f('#combo_box_container .ui-selectmenu .ui-selectmenu-item-header').text == "student@example.com" }
+
+    # hide student names
+    f("#settings_link").click
     f('#hide_student_names').click
     expect_new_page_load { fj('.ui-dialog-buttonset .ui-button:visible:last').click }
     keep_trying_until { f('#combo_box_container .ui-selectmenu .ui-selectmenu-item-header').text == "Student 1" }
