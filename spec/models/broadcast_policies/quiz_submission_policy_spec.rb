@@ -18,6 +18,7 @@ module BroadcastPolicies
         q.stubs(:muted?).returns(false)
         q.stubs(:context).returns(course)
         q.stubs(:assignment).returns(assignment)
+        q.stubs(:survey?).returns(false)
       end
     end
     let(:submission) do
@@ -85,6 +86,7 @@ module BroadcastPolicies
         policy.should_dispatch_submission_needs_grading?.should == true
       end
       specify { wont_send_when { quiz.stubs(:assignment).returns nil } }
+      specify { wont_send_when { quiz.stubs(:survey?).returns true} }
       specify { wont_send_when { quiz.stubs(:muted?).returns true } }
       specify { wont_send_when { course.stubs(:available?).returns false} }
       specify { wont_send_when { quiz.stubs(:deleted?).returns true } }

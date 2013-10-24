@@ -259,4 +259,37 @@ describe QuizzesHelper do
       message.should =~ /are available until/
     end
   end
+
+  context "#point_value_for_input" do
+    let(:user_answer) { @user_answer }
+    let(:question) { { points_possible: 5 } }
+    let(:quiz) { @quiz }
+
+    before do
+      @quiz = stub(quiz_type: 'graded_survey')
+      @user_answer = { correct: 'undefined', points: 5 }
+    end
+
+    it "returns user_answer[:points] if correct is true/false" do
+      [true, false].each do |bool|
+        user_answer[:correct] = bool
+        point_value_for_input(user_answer, question).should == user_answer[:points]
+      end
+    end
+
+    it "returns -- if quiz is practice quiz or assignment" do
+      ['assignment', 'practice_quiz'].each do |quiz_type|
+        @quiz.expects(:quiz_type).returns quiz_type
+        point_value_for_input(user_answer, question).should == "--"
+      end
+    end
+
+    it "returns points possible for the question if (un)graded survey" do
+      ['survey', 'graded_survey'].each do |quiz_type|
+        @quiz.expects(:quiz_type).returns quiz_type
+        point_value_for_input(user_answer, question).should ==
+          question[:points_possible]
+      end
+    end
+  end
 end

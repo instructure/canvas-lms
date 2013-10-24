@@ -487,7 +487,9 @@ class QuizSubmission < ActiveRecord::Base
     self.submission_data = @user_answers
     self.workflow_state = "complete"
     @user_answers.each do |answer|
-      self.workflow_state = "pending_review" if answer[:correct] == "undefined"
+      if answer[:correct] == "undefined" && !quiz.survey?
+        self.workflow_state = 'pending_review'
+      end
     end
     self.score_before_regrade = nil
     self.finished_at = Time.now

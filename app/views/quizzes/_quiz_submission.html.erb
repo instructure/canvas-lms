@@ -31,9 +31,9 @@
     <% if (@current_submission || @submission).try(:pending_review?) %>
       *
       <div class='question-not-graded-text'>
-        <% if can_do(@quiz, @current_user, :grade) %>
+        <% if can_do(@quiz, @current_user, :grade) && !@quiz.survey? %>
           <%= link_to t(:questions_not_graded, 'Some questions not yet graded'), context_url(@context, :context_quiz_history_url, @quiz, :version => @submission.version_number, :user_id => @submission.user_id) %>
-        <% else %>
+        <% elsif !@quiz.survey? %>
           <%= t(:questions_not_graded, 'Some questions not yet graded') %>
         <% end %>
       </div>
@@ -87,9 +87,9 @@
 <% if @submission.pending_review? %>
   <div class='question-not-graded-text'>
     *
-    <% if can_do(@quiz, @current_user, :grade) %>
+    <% if can_do(@quiz, @current_user, :grade) && !@quiz.survey? %>
       <%= link_to t(:questions_not_graded, 'Some questions not yet graded'), context_url(@context, :context_quiz_history_url, @quiz, :version => @submission.version_number, :user_id => @submission.user_id) %>
-    <% else %>
+    <% elsif !@quiz.survey?  %>
       <%= t(:questions_not_graded, 'Some questions not yet graded') %>
     <% end %>
   </div>

@@ -1655,6 +1655,20 @@ describe QuizSubmission do
 
   end
 
+  it "does not put a graded survey submission in teacher's todos" do
+    questions = [
+      { question_data: { name: 'question 1', question_type: 'essay_question' } }
+    ]
+    submission_data = { 'question_1' => 'Hello' }
+    survey_with_submission(questions) { submission_data }
+    teacher_in_course(course: @course, active_all: true)
+    @quiz.update_attributes(points_possible: 15, quiz_type: 'graded_survey')
+    @quiz_submission.reload.grade_submission
+
+    @quiz_submission.should be_completed
+    @quiz_submission.submission.should be_graded
+    @teacher.assignments_needing_grading.should_not include @quiz.assignment
+  end
 
   describe 'broadcast policy' do
     before do
@@ -1705,4 +1719,5 @@ describe QuizSubmission do
       @submission.reload.messages_sent.keys.should_not include 'Submission Needs Grading'
     end
   end
+
 end
