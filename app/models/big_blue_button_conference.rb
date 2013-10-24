@@ -48,6 +48,7 @@ class BigBlueButtonConference < WebConference
       :logoutURL => (settings[:default_return_url] || "http://www.instructure.com"),
       :record => settings[:record] ? "true" : "false",
     }) or return nil
+    @conference_active = true
     save
     conference_key
   end
@@ -82,12 +83,17 @@ class BigBlueButtonConference < WebConference
   private
 
   def retouch?
-    # by default, BBB will remove chat rooms that have been idle for more than
-    # an hour. so if an admin creates a room and then leaves, and then a user
-    # tries to join more than an hour later, we need to make sure we recreate
-    # the room before we redirect the user. there's no harm in "creating" a
-    # room that already exists, the api will just return the room info.
-    updated_at < 30.minutes.ago
+    # If we've queried the room status recently, use that result to determine if
+    # we need to recreate it.
+    if !@conference_active.nil?
+      return !@conference_active
+    end
+
+    # BBB removes chat rooms that have been idle fairly quickly.
+    # There's no harm in "creating" a room that already exists; the api will
+    # just return the room info. So we'll just go ahead and recreate it
+    # to make sure we don't accidentally redirect people to an inactive room.
+    return true
   end
 
   def join_url(user, type = :user)
