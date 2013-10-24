@@ -696,7 +696,7 @@ describe "calendar2" do
       end
 
       it "should respect context filters" do
-        start_date = Time.now.beginning_of_day + 12.hours
+        start_date = Time.now.utc.beginning_of_day + 12.hours
         event = @course.calendar_events.create!(title: "ohai",
           start_at: start_date, end_at: start_date + 1.hour)
         get '/calendar2'
@@ -734,6 +734,29 @@ describe "calendar2" do
         f('.fc-day-number').click
         wait_for_ajaximations
         ffj('.ig-row').length.should == 1
+      end
+
+      it "should persist the start date across reloads" do
+        get "/calendar2"
+        wait_for_ajaximations
+        f('label[for=agenda]').click
+        next_year = 1.year.from_now.strftime("%Y")
+        quick_jump_to_date(next_year)
+        refresh_page
+        wait_for_ajaximations
+        f('.navigation_title').should include_text(next_year)
+      end
+
+      it "should transfer the start date when switching views" do
+        get "/calendar2"
+        wait_for_ajaximations
+        f('.navigate_next').click()
+        f('label[for=agenda]').click
+        f('.navigation_title').should include_text(1.month.from_now.strftime("%b"))
+        next_year = 1.year.from_now.strftime("%Y")
+        quick_jump_to_date(next_year)
+        f('label[for=month]').click
+        f('.navigation_title').should include_text(next_year)
       end
     end
   end
