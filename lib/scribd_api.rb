@@ -16,85 +16,49 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-# This is another Singleton to talk to the rscribd singleton with a
-# little sugar to make things work a little better for us.  E.g.  All we
-# need to do is call ScribdAPI.instance.set_user('some uuid') to change
-# the user we're dealing with. 
-
-require 'rubygems'
-gem 'rscribd'
-require 'rscribd'
-
 class ScribdAPI
   class << self
-    def instance
-      @@inst ||= new
+    def initialize
+      self.authenticate if config
     end
 
-    # Create a shorthand for everything, so ScribdAPI.get_status, etc.
-    def method_missing(sym, *args, &block)
-      self.instance.send(sym, *args, &block)
+    # This uploads the file and returns the doc_id.
+    # This should not need to use any other API options, as long as the file
+    # has its extension in tact.
+    def upload(filename, filetype=nil)
+      if filetype
+        # MAKE SURE THAT THIS IS PRIVATE, that would suck bad if anything ever got sent as not private
+        Scribd::Document.upload(:file => filename, :type => filetype, :access => 'private')
+      else
+        ErrorReport.log_error(:default, {
+          :message => "tried to upload a scribd doc that does not have a filetype, that should never happen.",
+          :url => filename,
+        })
+      end
+    end
+
+    def config_check(settings)
+      authenticate(settings)
+      begin
+        Scribd::Document.find(0)
+      rescue Scribd::ResponseError => e
+        return "Configuration check failed, please check your settings" if e.code == '401'
+      end
+      nil
+    end
+
+    def config
+      Canvas::Plugin.find(:scribd).try(:settings)
+    end
+
+    def enabled?
+      !!config
+    end
+
+    protected
+    def authenticate(settings = config)
+      Scribd::API.instance.key = settings['api_key']
+      Scribd::API.instance.secret = settings['secret_key']
     end
   end
-
-  def initialize
-    self.authenticate if ScribdAPI.config
-  end
-
-  def api
-    Scribd::API.instance
-  end
-
-  # Takes the doc, which is stored in Attachment.scribd_doc
-  def get_status(doc)
-    doc.conversion_status
-  end
-
-  # This uploads the file and returns the doc_id.
-  # This should not need to use any other API options, as long as the file
-  # has its extension in tact. 
-  def upload(filename, filetype=nil)
-    if filetype
-      # MAKE SURE THAT THIS IS PRIVATE, that would suck bad if anything ever got sent as not private
-      Scribd::Document.upload(:file => filename, :type => filetype, :access => 'private')
-    else
-      ErrorReport.log_error(:default, {
-        :message => "tried to upload a scribd doc that does not have a filetype, that should never happen.",
-        :url => filename,
-      })
-    end
-  end
-
-  # This is actually setting up a 'phantom' user, or a unique user for
-  # accessing these documents. 
-  def set_user(user)
-    self.api.user = user
-  end
-
-  def self.config_check(settings)
-    scribd = ScribdAPI.new
-    scribd.api.key = settings['api_key']
-    scribd.api.secret = settings['secret_key']
-    begin
-      Scribd::Document.find(0)
-    rescue Scribd::ResponseError => e
-      return "Configuration check failed, please check your settings" if e.code == '401'
-    end
-    nil
-  end
-
-  def self.config
-    Canvas::Plugin.find(:scribd).try(:settings)
-  end
-
-  def self.enabled?
-    !!config
-  end
-
-  protected
-  def authenticate
-    self.api.key = ScribdAPI.config['api_key']
-    self.api.secret = ScribdAPI.config['secret_key']
-  end
-
 end

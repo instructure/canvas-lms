@@ -354,7 +354,7 @@ class Attachment < ActiveRecord::Base
     self.scribd_doc = nil
     self.workflow_state = 'deleted'  # not file_state :P
     unless shared
-      ScribdAPI.instance.set_user(scribd_user)
+      Scribd::API.instance.user = scribd_user
       return false unless scribd_doc.destroy
     end
     save
@@ -382,14 +382,14 @@ class Attachment < ActiveRecord::Base
       begin
       # if we aren't requesting special demensions, fetch and save it to the db.
       if options.empty?
-        ScribdAPI.instance.set_user(scribd_user)
+        Scribd::API.instance.user = scribd_user
         self.cached_scribd_thumbnail = self.scribd_doc.thumbnail(options)
         # just update the cached_scribd_thumbnail column of this attachment without running callbacks
         Attachment.where(:id => self).update_all(:cached_scribd_thumbnail => self.cached_scribd_thumbnail)
         self.cached_scribd_thumbnail
       else
         Rails.cache.fetch(['scribd_thumb', self, options].cache_key) do
-          ScribdAPI.instance.set_user(scribd_user)
+          Scribd::API.instance.user = scribd_user
           self.scribd_doc.thumbnail(options)
         end
       end
@@ -1383,7 +1383,7 @@ class Attachment < ActiveRecord::Base
   def submit_to_scribd!
     # Newly created record that needs to be submitted to scribd
     if self.pending_upload? and self.scribdable? and self.filename and ScribdAPI.enabled?
-      ScribdAPI.instance.set_user(scribd_user)
+      Scribd::API.instance.user = scribd_user
       begin
         upload_path = if Attachment.local_storage?
                  self.full_filename
@@ -1433,7 +1433,7 @@ class Attachment < ActiveRecord::Base
 
   def resubmit_to_scribd!
     if self.scribd_doc && ScribdAPI.enabled?
-      ScribdAPI.instance.set_user(scribd_user)
+      Scribd::API.instance.user = scribd_user
       self.scribd_doc.destroy rescue nil
     end
     self.workflow_state = 'pending_upload'
@@ -1466,8 +1466,8 @@ class Attachment < ActiveRecord::Base
   def query_conversion_status!
     return unless ScribdAPI.enabled? && self.scribdable?
     if self.scribd_doc
-      ScribdAPI.set_user(scribd_user)
-      res = ScribdAPI.get_status(self.scribd_doc) rescue 'ERROR'
+      Scribd::API.instance.user = scribd_user
+      res = scribd_doc.conversion_status rescue 'ERROR'
       case res
       when 'DONE'
         self.process
@@ -1484,7 +1484,7 @@ class Attachment < ActiveRecord::Base
   def download_url(format='original')
     return @download_url if @download_url
     return nil unless ScribdAPI.enabled?
-    ScribdAPI.set_user(scribd_user)
+    Scribd::API.instance.user = scribd_user
     begin
       @download_url = self.scribd_doc.download_url(format)
     rescue Scribd::ResponseError => e

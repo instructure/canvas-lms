@@ -247,7 +247,6 @@ describe Attachment do
 
   context "submit_to_scribd!" do
     before do
-      ScribdAPI.stubs(:set_user).returns(true)
       ScribdAPI.stubs(:upload).returns(UUIDSingleton.instance.generate)
     end
 
@@ -303,14 +302,14 @@ describe Attachment do
     it "should bypass non-scridbable attachments" do
       attachment_model
       @attachment.should_not be_scribdable
-      ScribdAPI.expects(:set_user).never
+      Scribd::API.instance.expects(:user=).never
       ScribdAPI.expects(:upload).never
       @attachment.submit_to_scribd!.should be_true
       @attachment.state.should eql(:processed)
     end
 
     it "should not mess with attachments outside the pending_upload state" do
-      ScribdAPI.expects(:set_user).never
+      Scribd::API.instance.expects(:user=).never
       ScribdAPI.expects(:upload).never
       attachment_model(:workflow_state => 'processing')
       @attachment.submit_to_scribd!.should be_false
@@ -515,9 +514,10 @@ describe Attachment do
 
   context "conversion_status" do
     before(:each) do
-      ScribdAPI.stubs(:get_status).returns(:status_from_scribd)
-      ScribdAPI.stubs(:set_user).returns(true)
-      ScribdAPI.stubs(:upload).returns(Scribd::Document.new)
+      @document = Scribd::Document.new
+      @document.stubs(:conversion_status).returns(:status_from_scribd)
+      Scribd::API.instance.stubs(:user=).returns(true)
+      ScribdAPI.stubs(:upload).returns(@document)
       ScribdAPI.stubs(:enabled?).returns(true)
     end
 
@@ -527,9 +527,9 @@ describe Attachment do
     end
 
     it "should ask Scribd for the status" do
-      ScribdAPI.expects(:get_status).returns(:status_from_scribd)
       scribdable_attachment_model
       @doc_obj = Scribd::Document.new
+      @doc_obj.expects(:conversion_status).returns(:status_from_scribd)
       ScribdAPI.expects(:upload).returns(@doc_obj)
       @doc_obj.stubs(:thumbnail).returns("the url to the scribd doc thumbnail")
       @attachment.submit_to_scribd!
@@ -537,9 +537,9 @@ describe Attachment do
     end
 
     it "should not ask Scribd for the status" do
-      ScribdAPI.expects(:get_status).never
       scribdable_attachment_model
       @doc_obj = Scribd::Document.new
+      @doc_obj.expects(:conversion_status).never
       ScribdAPI.expects(:upload).returns(@doc_obj)
       @doc_obj.stubs(:thumbnail).returns("the url to the scribd doc thumbnail")
       @attachment.submit_to_scribd!
@@ -550,7 +550,7 @@ describe Attachment do
 
   context "download_url" do
     before do
-      ScribdAPI.stubs(:set_user).returns(true)
+      Scribd::API.instance.stubs(:user=).returns(true)
       @doc = mock('Scribd Document', :download_url => 'some url')
       Scribd::Document.stubs(:find).returns(@doc)
     end
@@ -1559,9 +1559,10 @@ describe Attachment do
 end
 
 def processing_model
-  ScribdAPI.stubs(:get_status).returns(:status_from_scribd)
-  ScribdAPI.stubs(:set_user).returns(true)
-  ScribdAPI.stubs(:upload).returns(Scribd::Document.new)
+  document = Scribd::Document.new
+  Scribd::API.instance.stubs(:user=).returns(true)
+  document.stubs(:conversion_status).returns(:status_from_scribd)
+  ScribdAPI.stubs(:upload).returns(document)
   scribdable_attachment_model
   @attachment.submit_to_scribd!
 end

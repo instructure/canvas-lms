@@ -1,6 +1,8 @@
 require 'uri'
 require 'open-uri'
 
+ScribdAPI.initialize
+
 module Scribd
   class Document
     
