@@ -41,7 +41,7 @@ module DataFixup::FixOutOfSyncOutcomeAlignments
       content_tags.tag_type = 'learning_outcome'
       AND content_tags.workflow_state = 'active'
       AND r.workflow_state = 'active'
-      AND NOT r.data LIKE '%:learning_outcome_id: ' || content_tags.learning_outcome_id || '%'
+      AND NOT r.data LIKE '%learning_outcome_id: ' || content_tags.learning_outcome_id || '%'
     ")
     scope.find_each do |ct|
       ct.destroy
