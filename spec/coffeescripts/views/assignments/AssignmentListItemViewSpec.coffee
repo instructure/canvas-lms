@@ -84,11 +84,12 @@ define [
   module 'AssignmentListItemViewSpec',
     setup: ->
       ENV = window.ENV ||= {}
-      ENV.PERMISSIONS = {manage: true}
+      ENV.PERMISSIONS = {manage: false}
       window.ENV = ENV
 
       @model = assignment1()
-      @view = createView(@model, canManage: true)
+      @submission = new Backbone.Model
+      @view = createView(@model, canManage: false)
       screenreaderText = =>
         $.trim @view.$('.js-score .screenreader-only').text()
       nonScreenreaderText = =>
@@ -133,30 +134,32 @@ define [
     ok view.model.destroy.called
     view.model.destroy.restore()
 
-    ENV.context_asset_string = old_asset_string
+    window.ENV = oldENV
   test "updating grades from model change", ->
-    @model.set 'grade', 1.5555
+    @submission.set 'grade', 1.5555
+    @model.set 'submission', @submission
+    @model.trigger 'change:submission'
 
     equal screenreaderText(), 'Score: 1.56 out of 2 points', 'sets screenreader text'
     equal nonScreenreaderText(), '1.56/2 pts', 'sets non-screenreader text'
 
-    @model.set 'grade', null
-    @model.set 'noSubmission', true
-
+    @model.set 'submission', null
     equal screenreaderText(), 'No submission for this assignment. 2 points possible.',
       'sets screenreader text for null points'
     equal nonScreenreaderText(), '-/2 pts',
       'sets non-screenreader text for null points'
 
-    @model.set 'noSubmission', false
-    @model.set 'grade', 0
+    @submission.set 'grade', 0
+    @model.set 'submission', @submission
 
     equal screenreaderText(), 'Score: 0 out of 2 points',
       'sets screenreader text for 0 points'
     equal nonScreenreaderText(), '0/2 pts',
       'sets non-screenreader text for 0 points'
 
-    @model.set 'notYetGraded', true
+    @submission.set 'notYetGraded', true
+    @model.set 'submission', @submission
+    @model.trigger 'change:submission'
     equal screenreaderText(), 'Assignment not yet graded. 2 points possible.',
       'sets correct screenreader text for not yet graded'
     equal nonScreenreaderText(), 'Not Yet Graded/2 pts',
