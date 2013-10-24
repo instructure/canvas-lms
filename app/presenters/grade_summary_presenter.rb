@@ -104,10 +104,29 @@ class GradeSummaryPresenter
   end
 
   def submissions
-    @submissions ||= @context.submissions.
-      except(:includes).
-      includes(:visible_submission_comments, {:rubric_assessments => :rubric}, :content_participations).
-      find_all_by_user_id(student)
+    @submissions ||= begin
+      ss = @context.submissions
+      .except(:includes)
+      .includes(:visible_submission_comments,
+                {:rubric_assessments => [:rubric, :rubric_association]},
+                :content_participations)
+      .find_all_by_user_id(student)
+
+      assignments_index = assignments.index_by(&:id)
+
+      # preload submission comment stuff
+      comments = ss.map { |s|
+        s.assignment = assignments_index[s.assignment_id]
+
+        s.visible_submission_comments.map { |c|
+          c.submission = s
+          c
+        }
+      }.flatten
+      SubmissionComment.preload_attachments comments
+
+      ss
+    end
   end
 
   def submission_counts
@@ -128,10 +147,7 @@ class GradeSummaryPresenter
   def assignment_presenters
     submission_index = submissions.index_by(&:assignment_id)
     assignments.map{ |a|
-      if s = submission_index[a.id]
-        s.assignment = a # prevent extra assignment loads
-      end
-      GradeSummaryAssignmentPresenter.new(self, @current_user, a, s)
+      GradeSummaryAssignmentPresenter.new(self, @current_user, a, submission_index[a.id])
     }
   end
 

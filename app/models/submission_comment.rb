@@ -173,10 +173,16 @@ class SubmissionComment < ActiveRecord::Base
 
 
   def attachments
-    ids = (self.attachment_ids || "").split(",").map{|id| id.to_i}
+    ids = Set.new((attachment_ids || "").split(",").map { |id| id.to_i})
     attachments = associated_attachments
-    attachments += self.submission.assignment.attachments rescue []
-    attachments.select{|a| ids.include?(a.id) }
+    attachments += submission.assignment.attachments rescue []
+    attachments.select { |a| ids.include?(a.id) }
+  end
+
+  def self.preload_attachments(comments)
+    SubmissionComment.send :preload_associations, comments, [:associated_attachments, :submission]
+    submissions = comments.map(&:submission).uniq
+    Submission.send :preload_associations, submissions, :assignment => :attachments
   end
 
   def update_submission

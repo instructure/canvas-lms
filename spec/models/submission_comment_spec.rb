@@ -85,10 +85,6 @@ describe SubmissionComment do
     @comment.messages_sent.should be_include('Submission Comment For Teacher')
   end
   
-  it "should respond to attachments" do
-    SubmissionComment.new.should be_respond_to(:attachments)
-  end
-  
   it "should allow valid attachments" do
     a = Attachment.create!(:context => @assignment, :uploaded_data => default_uploaded_data)
     @comment = SubmissionComment.create!(@valid_attributes)
