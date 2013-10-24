@@ -169,6 +169,17 @@
   .fc-grid .fc-day-number {
     padding: 1px 4px;
   }
+
+  .loading-spinner {
+    display: inline-block;
+    background-image: url("/images/ajax-loader-black-on-white.gif");
+    background-position: 50% 50%;
+    height: 16px;
+    margin-left: 3px;
+    position: relative;
+    top: 8px;
+    width: 16px;
+  }
 }
 
 #context-list label {

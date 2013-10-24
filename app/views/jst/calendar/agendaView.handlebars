@@ -9,7 +9,7 @@
             {{#each events}}
               <li class="agenda-event">
                 <div class="ig-row">
-                  <span class="color-tag group_{{context_code}}"></span>
+                  <span class="color-tag group_{{contextCode}}"></span>
 
                   <span class="ig-title">
                     {{#if assignment}}
@@ -23,11 +23,11 @@
                   <div class="ig-details">
                     {{#if assignment}}
                       <b>{{#t "due"}}due{{/t}}</b>
-                      {{strftime assignment.due_at "%l:%M%P"}}
+                      {{strftime start "%l:%M%P"}}
 
                     {{else}}
                       {{#unless all_day}}
-                        {{strftime start_at "%l:%M%P"}}
+                        {{strftime start "%l:%M%P"}}
                       {{/unless}}
                     {{/if}}
                   </div>
@@ -56,5 +56,6 @@
     {{#if meta.hasMore}}
       <a href="#" class="btn agenda-load-btn">Load more</a>
     {{/if}}
+    <i class="loading-spinner" aria-label="{{#t "loading"}}Loading{{/t}}"></i>
   </div>
 </div>

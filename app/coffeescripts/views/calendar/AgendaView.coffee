@@ -13,6 +13,9 @@ define [
 
     template: template
 
+    els:
+      '.agenda-actions .loading-spinner'   : '$spinner'
+
     events:
       'click .agenda-load-btn': 'loadMore'
 
@@ -20,93 +23,51 @@ define [
 
     constructor: ->
       super
-      @eventCollection      = new CalendarEventCollection
-      @assignmentCollection = new CalendarEventCollection
+      @dataSource = @options.dataSource
 
     fetch: (contexts, start = new Date) ->
-      end = new Date
-      end.setYear(3000)
+      @$el.empty()
+      @$el.addClass('active')
+
+      @contexts = contexts
 
       start.setHours(0)
       start.setMinutes(0)
       start.setSeconds(0)
 
-      @startDate = $.fudgeDateForProfileTimezone(start)
+      @startDate = start
 
-      $.publish('Calendar/loadStatus', true)
+      @_fetch(start, @handleEvents)
 
-      p1 = @eventCollection.fetch
-        data:
-          context_codes: contexts
-          end_date: $.dateToISO8601UTC(end)
-          per_page: @PER_PAGE
-          start_date: $.dateToISO8601UTC(start)
-      p2 = @assignmentCollection.fetch
-        data:
-          context_codes: contexts
-          end_date: $.dateToISO8601UTC(end)
-          per_page: @PER_PAGE
-          start_date: $.dateToISO8601UTC(start)
-          type: 'assignment'
-      $.when(p1, p2).then(@render)
+    _fetch: (start, callback) ->
+      end = new Date(3000, 1, 1)
+      @lastRequestID = $.guid++
+      @dataSource.getEvents start, end, @contexts, callback, {singlePage: true, requestID: @lastRequestID}
+
+    handleEvents: (events) =>
+      return if events.requestID != @lastRequestID
+      @collection = []
+      @appendEvents(events)
+
+    appendEvents: (events) =>
+      @nextPageDate = events.nextPageDate
+      @collection.push.apply(@collection, events)
+      @collection = _.sortBy(@collection, 'start')
+      @render()
 
     loadMore: (e) ->
       e.preventDefault()
-      promises = _.map [@eventCollection, @assignmentCollection], (coll) ->
-        coll.fetch(page: 'next') if coll.canFetch('next')
-      $.when.apply($, _.compact(promises)).then(@render)
+      @$spinner.show()
+      @_fetch(@nextPageDate, @appendEvents)
 
     render: =>
       super
-      $.publish('Calendar/loadStatus', false)
+      @$spinner.hide()
       $.publish('Calendar/colorizeContexts')
-      @$el.addClass('active')
 
-    hasMore: ->
-      @eventCollection.canFetch('next') or
-        @assignmentCollection.canFetch('next')
-
-    # Public: Helper function translate a model date string into a date object.
-    #
-    # m - A model instance.
-    #
-    # Returns a Date object.
-    toDate: (m) -> new Date(m.get('start_at'))
-
-    # Internal: Helper function to translate a model date into a timestamp.
-    #
-    # m - A model instance.
-    #
-    # Returns a timestamp integer.
-    toTime: (m) => @toDate(m).getTime()
-
-    # Internal: Helper function to translate a model date into a fudged date.
-    #
-    # m - A model instance or hash.
-    # prop - The name of the date property (default: 'start_at').
-    #
-    # Returns a fudged date.
-    toFudgedDate: (m, prop = 'start_at') =>
-      d = if m.get then m.get(prop) else m[prop]
-      $.fudgeDateForProfileTimezone(new Date(d))
-
-    # Internal: Given two collections, determine the latest shared date.
-    #
-    # c1 - Collection object.
-    # c2 - Collection object.
-    #
-    # Returns a date object or null if there is no limit.
-    limitOf: (c1, c2) ->
-      m1 = c1.max(@toTime)
-      m2 = c2.max(@toTime)
-      if c1.canFetch('next') and c2.canFetch('next')
-        _.min([@toTime(m1), @toTime(m2)])
-      else if c1.canFetch('next')
-        @toTime(m1)
-      else if c2.canFetch('next')
-        @toTime(m2)
-      else
-        null
+      lastEvent = @collection.slice(-1)[0]
+      return if !lastEvent
+      @trigger('agendaDateRange', @startDate, lastEvent.start)
 
     # Internal: Change a flat array of objects into a sturctured array of
     # objects based on the given iterator function. Similar to _.groupBy,
@@ -132,26 +93,13 @@ define [
         result
       , [])
 
-    # Internal: Do necessary changes on each event model in the list
-    #
-    # list - the list of the events to prepare
-    #
-    # Returns nothing.
-    prepareEvents: (list) ->
-      prepare = (event) ->
-        event.set('start_at', @toFudgedDate(event))
-        if assignment = event.get('assignment')
-          assignment.due_at = @toFudgedDate(assignment, 'due_at')
-
-      _.each(list, prepare, this)
-
-    # Internal: returns the 'start_at' of the event formatted for the template
+    # Internal: returns the 'start' of the event formatted for the template
     #
     # event - the event to format
     #
     # Returns the formatted String
     formattedDayString: (event) =>
-      I18n.l('#date.formats.short_with_weekday', @toDate(event))
+      I18n.l('#date.formats.short_with_weekday', event.start)
 
     # Internal: change a box of events into an output hash for toJSON
     #
@@ -160,7 +108,7 @@ define [
     # Returns an Object with 'date' and 'events' keys.
     eventBoxToHash: (events) =>
       date: @formattedDayString(_.first(events))
-      events: _.map(events, (e) -> e.toJSON())
+      events: events
 
     # Internal: Format a hash of event data to an object ready to be sent to the template.
     #
@@ -170,7 +118,7 @@ define [
     formatResult: (boxedEvents) ->
       days: _.map(boxedEvents, @eventBoxToHash)
       meta:
-        hasMore: @hasMore()
+        hasMore: !!@nextPageDate
 
     # Public: Creates the json for the template.
     #
@@ -185,10 +133,5 @@ define [
     #     }
     #   }
     toJSON: ->
-      limit = @limitOf(@eventCollection, @assignmentCollection)
-      list = _.union(@eventCollection.models, @assignmentCollection.models)
-      list = _.filter(list, (e) => @toTime(e) < limit) if limit
-      list = _.sortBy(list, @toTime)
-      @prepareEvents(list)
-      list = @sortedBoxBy(list, @formattedDayString)
+      list = @sortedBoxBy(@collection, @formattedDayString)
       @formatResult(list)
