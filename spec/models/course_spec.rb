@@ -1829,6 +1829,34 @@ describe Course, 'grade_publishing' do
         @student_enrollments.map(&:reload).map(&:grade_publishing_status).should == ["unpublishable", "published", "unpublishable", "published", "published", "published", "unpublished", "unpublishable", "unpublishable"]
       end
 
+      it 'should update enrollment status if no resource provided' do
+        @plugin.stubs(:enabled?).returns(true)
+        @plugin_settings.merge! :publish_endpoint => "http://localhost/endpoint", :format_type => "test_format"
+        grade_publishing_user
+        @ase = @student_enrollments.find_all{|e| e.workflow_state == 'active'}
+        Course.stubs(:valid_grade_export_types).returns({
+                                                            "test_format" => {
+                                                                :callback => lambda {|course, enrollments, publishing_user, publishing_pseudonym|
+                                                                  course.should == @course
+                                                                  enrollments.sort_by(&:id).should == @ase.sort_by(&:id)
+                                                                  publishing_pseudonym.should == @pseudonym
+                                                                  publishing_user.should == @user
+                                                                  return [
+                                                                      [[@ase[1].id, @ase[3].id],
+                                                                       nil,
+                                                                       nil],
+                                                                      [[@ase[4].id, @ase[7].id],
+                                                                       nil,
+                                                                       nil]]
+                                                                }
+                                                            }
+                                                        })
+        SSLCommon.expects(:post_data).never
+        @course.send_final_grades_to_endpoint @user
+        @student_enrollments.map(&:reload).map(&:grade_publishing_status).should == ["unpublishable", "published", "unpublishable", "published", "published", "unpublishable", "unpublished", "unpublishable", "published"]
+        @student_enrollments.map(&:grade_publishing_message).should == [nil] * 9
+      end
+
     end
   
     context 'generate_grade_publishing_csv_output' do

@@ -1364,7 +1364,9 @@ class Course < ActiveRecord::Base
     posts_to_make.each do |enrollment_ids, res, mime_type, headers={}|
       begin
         posted_enrollment_ids += enrollment_ids
-        SSLCommon.post_data(settings[:publish_endpoint], res, mime_type, headers )
+        if res
+          SSLCommon.post_data(settings[:publish_endpoint], res, mime_type, headers )
+        end
         Enrollment.where(:id => enrollment_ids).update_all(:grade_publishing_status => (should_kick_off_grade_publishing_timeout? ? "publishing" : "published"), :grade_publishing_message => nil)
       rescue => e
         errors << e
