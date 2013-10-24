@@ -1,8 +1,8 @@
 require [
   'underscore'
   'compiled/views/calendar/AgendaView'
-  'spec/javascripts/helpers/ajax_mocks/api/v1/calendarEvents'
-  'spec/javascripts/helpers/ajax_mocks/api/v1/calendarAssignments'
+  'helpers/ajax_mocks/api/v1/calendarEvents'
+  'helpers/ajax_mocks/api/v1/calendarAssignments'
 ], (_, AgendaView, eventResponse, assignmentResponse) ->
 
   loadEventPage = (server) ->
