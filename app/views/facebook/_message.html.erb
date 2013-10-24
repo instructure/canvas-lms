@@ -4,7 +4,11 @@
       <%= image_tag "#{slugify(message.notification_category) || 'notification'}_icon.png", :class => "header_icon", :alt => "notification" %>
       <a href="<%= message.url %>" target="_top"><%= message.subject %></a>
       <div class="context_name">
-        <span><%= message.context.type if Context::ContextTypes.const_defined?(message.context_type) %></span>
+        <span>
+          <% if Context::ContextTypes.const_defined?(message.context_type) && message.context.respond_to?(:type) %>
+            <%= message.context.type %>
+          <% end %>
+        </span>
       </div>
     </div>
     <div class="right_links">

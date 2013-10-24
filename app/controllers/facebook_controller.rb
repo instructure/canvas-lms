@@ -61,7 +61,6 @@ class FacebookController < ApplicationController
     @messages = []
     if @user
       @messages = @user.messages.to_facebook.to_a
-      Facebook.dashboard_clear_count(@service) if @service
       @domains = @user.pseudonyms.includes(:account).to_a.once_per(&:account_id).map{|p| HostUrl.context_host(p.account) }.uniq
     end
     respond_to do |format|
