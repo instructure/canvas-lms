@@ -20,13 +20,14 @@ define [
   'compiled/views/calendar/CalendarNavigator'
   'compiled/views/calendar/AgendaView'
   'compiled/calendar/CalendarDefaults'
-  'vendor/fullcalendar'
+  'compiled/util/deparam'
 
+  'vendor/fullcalendar'
   'jquery.instructure_misc_helpers'
   'jquery.instructure_misc_plugins'
   'vendor/jquery.ba-tinypubsub'
   'jqueryui/button'
-], (I18n, $, _, userSettings, hsvToRgb, colorSlicer, calendarAppTemplate, EventDataSource, commonEventFactory, ShowEventDetailsDialog, EditEventDetailsDialog, Scheduler, CalendarNavigator, AgendaView, calendarDefaults) ->
+], (I18n, $, _, userSettings, hsvToRgb, colorSlicer, calendarAppTemplate, EventDataSource, commonEventFactory, ShowEventDetailsDialog, EditEventDetailsDialog, Scheduler, CalendarNavigator, AgendaView, calendarDefaults, deparam) ->
 
   class Calendar
     constructor: (selector, @contexts, @manageContexts, @dataSource, @options) ->
@@ -96,7 +97,7 @@ define [
       data = @dataFromDocumentHash()
       if not data.view_start and @options?.viewStart
         data.view_start = @options.viewStart
-        location.hash = $.encodeToHex(JSON.stringify(data))
+        @updateFragment data
       if data.view_start
         date = $.fullCalendar.parseISO8601(data.view_start)
         if date
@@ -109,6 +110,7 @@ define [
       @schedulerNavigator = new CalendarNavigator(el: $('.scheduler_navigator'), showAgenda: @options.showAgenda)
       @schedulerNavigator.hide()
 
+      data.view_name = 'month' if !data.view_name
       @currentView = data.view_name
       data.view_name = 'agendaWeek' if data.view_name == 'week'
       if data.view_name == 'month' || data.view_name == 'agendaWeek'
@@ -151,9 +153,9 @@ define [
       window.setInterval(@drawNowLine, 1000 * 60)
 
     connectHeaderEvents: ->
-      @header.on('navigatePrev',  => @calendar.fullCalendar('prev'))
+      @header.on('navigatePrev',  => @handleArrow('prev'))
       @header.on 'navigateToday', @today
-      @header.on('navigateNext',  => @calendar.fullCalendar('next'))
+      @header.on('navigateNext',  => @handleArrow('next'))
       @header.on('navigateDate', @gotoDate)
       @header.on('week', => @loadView('week'))
       @header.on('month', => @loadView('month'))
@@ -164,15 +166,14 @@ define [
       @header.on('done', @schedulerSingleDoneClick)
 
     connectSchedulerNavigatorEvents: ->
-      @schedulerNavigator.on('navigatePrev',  => @calendar.fullCalendar('prev'))
+      @schedulerNavigator.on('navigatePrev',  => @handleArrow('prev'))
       @schedulerNavigator.on('navigateToday', @today)
-      @schedulerNavigator.on('navigateNext',  => @calendar.fullCalendar('next'))
+      @schedulerNavigator.on('navigateNext',  => @handleArrow('next'))
       @schedulerNavigator.on('navigateDate', @gotoDate)
 
     today: =>
-      @calendar.fullCalendar('today')
       now = $.fudgeDateForProfileTimezone(new Date)
-      @agendaViewFetch(now) if @currentView == 'agenda'
+      @gotoDate(now)
 
     # FullCalendar callbacks
 
@@ -347,6 +348,7 @@ define [
       allowedContexts = userSettings.get('checked_calendar_codes') or _.pluck(@contexts, 'asset_string')
       activeContexts  = _.filter @contexts, (c) -> _.contains(allowedContexts, c.asset_string)
       event = commonEventFactory(null, activeContexts)
+      event.date = @getCurrentDate()
 
       new EditEventDetailsDialog(event).show()
 
@@ -375,12 +377,19 @@ define [
       data = @dataFromDocumentHash()
       for k, v of opts
         data[k] = v
-      location.replace("#" + $.encodeToHex(JSON.stringify(data)))
+      location.replace("#" + $.param(data))
 
     viewDisplay: (view) =>
-      @updateFragment view_start: $.dateToISO8601UTC(view.start)
       @setDateTitle(view.title)
       @drawNowLine()
+
+    isSameWeek: (date1, date2) ->
+      # Note that our date-js's getWeek is Monday-based.
+      sunday = new Date(date1.getTime())
+      sunday.setDate(sunday.getDate() - sunday.getDay())
+      weekStart = sunday.getTime()
+      weekEnd = weekStart + 7 * 24 * 3600 * 1000
+      weekStart <= date2 <= weekEnd
 
     drawNowLine: =>
       return unless @currentView == 'week' && ENV.CALENDAR.SHOW_AGENDA
@@ -390,14 +399,11 @@ define [
       $('.fc-agenda-slots').parent().append(@nowLine)
 
       now = $.fudgeDateForProfileTimezone(new Date)
-      currentDate = @el.find("div.calendar").fullCalendar('getDate')
       midnight = new Date(now.getTime())
       midnight.setHours(0, 0, 0)
       seconds = (now.getTime() - midnight.getTime())/1000
 
-      weekStart = currentDate.getTime()
-      weekEnd = weekStart + 7 * 24 * 3600 * 1000
-      @nowLine.toggle(weekStart < now.getTime() < weekEnd)
+      @nowLine.toggle(@isSameWeek(@getCurrentDate(), now))
 
       @nowLine.css('width', $('.fc-agenda-slots .fc-widget-content:first').css('width'))
       secondHeight = $('.fc-agenda-slots').css('height').replace('px', '')/24/3600
@@ -441,16 +447,14 @@ define [
 
     fragmentChange: (event, hash) =>
       data = @dataFromDocumentHash()
-      view = @calendar?.fullCalendar('getView')
-      return unless view && !$.isEmptyObject(data)
+      return unless @currentView && !$.isEmptyObject(data)
 
-      if (data.view_name == 'month' || data.view_name == 'agendaWeek') && data.view_name != view.name
-        @calendar.fullCalendar('changeView', data.view_name)
+      if data.view_name != @currentView
+        @loadView(data.view_name)
 
-      if data.view_start && data.view_start != $.dateToISO8601UTC(view.start)
+      if data.view_start
         date = $.fullCalendar.parseISO8601(data.view_start)
-        if date
-          @calendar.fullCalendar('gotoDate', date)
+        @gotoDate(date)
 
     reloadClick: (event) =>
       event?.preventDefault()
@@ -530,6 +534,36 @@ define [
     gotoDate: (d) =>
       @calendar.fullCalendar("gotoDate", d)
       @agendaViewFetch(d) if @currentView == 'agenda'
+      @setCurrentDate(d)
+
+    handleArrow: (type) ->
+      @calendar.fullCalendar(type)
+      calendarDate = @calendar.fullCalendar('getDate')
+      now = $.fudgeDateForProfileTimezone(new Date)
+      if @currentView == 'month'
+        if calendarDate.getMonth() == now.getMonth() && calendarDate.getFullYear() == now.getFullYear()
+          start = now
+        else
+          start = new Date(calendarDate.getTime())
+          start.setDate(1)
+      else
+        if @isSameWeek(calendarDate, now)
+          start = now
+        else
+          start = new Date(calendarDate.getTime())
+          start.setDate(start.getDate() - start.getDay())
+      @setCurrentDate(start)
+
+    setCurrentDate: (d) ->
+      @updateFragment view_start: $.dateToISO8601UTC(d)
+      $.publish('Calendar/currentDate', d)
+
+    getCurrentDate: () ->
+      data = @dataFromDocumentHash()
+      if data.view_start
+        $.fullCalendar.parseISO8601(data.view_start)
+      else
+        $.fudgeDateForProfileTimezone(new Date)
 
     loadView: (view) =>
       @updateFragment view_name: view
@@ -560,27 +594,8 @@ define [
         @header.hidePrevNext()
 
     loadAgendaView: ->
-      oldView = @currentView
-      calendarDate = @calendar.fullCalendar('getDate')
-      now = $.fudgeDateForProfileTimezone(new Date)
-      if oldView == 'month'
-        if calendarDate.getMonth() == now.getMonth()
-          start = now
-        else
-          start = new Date(calendarDate.getTime())
-          start.setDate(1)
-      else if oldView == 'week'
-        if calendarDate.getWeek() == now.getWeek()
-          start = now
-        else
-          start = new Date(calendarDate.getTime())
-          until start.getDay() == 0
-            start.setDate(start.getDate() - 1)
-      else
-        start = now
-
-      @currentView = 'agenda'
-      @agendaViewFetch(start)
+      date = @getCurrentDate()
+      @agendaViewFetch(date)
 
     agendaViewFetch: (start) ->
       start.setHours(0)
@@ -642,7 +657,12 @@ define [
     dataFromDocumentHash: () =>
       data = {}
       try
-        data = $.parseJSON($.decodeFromHex(location.hash.substring(1))) || {}
+        fragment = location.hash.substring(1)
+        if fragment.indexOf('=') != -1
+          data = deparam(location.hash.substring(1)) || {}
+        else
+          # legacy
+          data = $.parseJSON($.decodeFromHex(location.hash.substring(1))) || {}
       catch e
         data = {}
       data
