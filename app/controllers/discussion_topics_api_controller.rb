@@ -75,7 +75,7 @@ class DiscussionTopicsApiController < ApplicationController
   #
   # @example_request
   #
-  #   curl 'http://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/view' \ 
+  #   curl 'https://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/view' \
   #        -H "Authorization: Bearer <token>"
   #
   # @example_response
@@ -134,7 +134,7 @@ class DiscussionTopicsApiController < ApplicationController
   #
   # @example_request
   #
-  #   curl 'http://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/entries.json' \ 
+  #   curl 'https://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/entries.json' \
   #        -F 'message=<message>' \ 
   #        -F 'attachment=@<filename>' \ 
   #        -H "Authorization: Bearer <token>"
@@ -246,7 +246,7 @@ class DiscussionTopicsApiController < ApplicationController
   #
   # @example_request
   #
-  #   curl 'http://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/entries/<entry_id>/replies.json' \ 
+  #   curl 'https://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/entries/<entry_id>/replies.json' \
   #        -F 'message=<message>' \ 
   #        -F 'attachment=@<filename>' \ 
   #        -H "Authorization: Bearer <token>"
@@ -339,7 +339,7 @@ class DiscussionTopicsApiController < ApplicationController
   #
   # @example_request
   #
-  #   curl 'http://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/entry_list?ids[]=1&ids[]=2&ids[]=3' \ 
+  #   curl 'https://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/entry_list?ids[]=1&ids[]=2&ids[]=3' \
   #        -H "Authorization: Bearer <token>"
   #
   # @example_response
@@ -364,7 +364,7 @@ class DiscussionTopicsApiController < ApplicationController
   #
   # @example_request
   #
-  #   curl 'http://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/read.json' \ 
+  #   curl 'https://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/read.json' \
   #        -X PUT \ 
   #        -H "Authorization: Bearer <token>" \ 
   #        -H "Content-Length: 0"
@@ -381,7 +381,7 @@ class DiscussionTopicsApiController < ApplicationController
   #
   # @example_request
   #
-  #   curl 'http://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/read.json' \ 
+  #   curl 'https://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/read.json' \
   #        -X DELETE \ 
   #        -H "Authorization: Bearer <token>"
   def mark_topic_unread
@@ -401,7 +401,7 @@ class DiscussionTopicsApiController < ApplicationController
   #
   # @example_request
   #
-  #   curl 'http://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/read_all.json' \ 
+  #   curl 'https://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/read_all.json' \
   #        -X PUT \ 
   #        -H "Authorization: Bearer <token>" \ 
   #        -H "Content-Length: 0"
@@ -422,7 +422,7 @@ class DiscussionTopicsApiController < ApplicationController
   #
   # @example_request
   #
-  #   curl 'http://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/read_all.json' \ 
+  #   curl 'https://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/read_all.json' \
   #        -X DELETE \ 
   #        -H "Authorization: Bearer <token>"
   def mark_all_unread
@@ -442,7 +442,7 @@ class DiscussionTopicsApiController < ApplicationController
   #
   # @example_request
   #
-  #   curl 'http://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/entries/<entry_id>/read.json' \ 
+  #   curl 'https://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/entries/<entry_id>/read.json' \
   #        -X PUT \ 
   #        -H "Authorization: Bearer <token>"\ 
   #        -H "Content-Length: 0"
@@ -463,7 +463,7 @@ class DiscussionTopicsApiController < ApplicationController
   #
   # @example_request
   #
-  #   curl 'http://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/entries/<entry_id>/read.json' \ 
+  #   curl 'https://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/entries/<entry_id>/read.json' \
   #        -X DELETE \ 
   #        -H "Authorization: Bearer <token>"
   def mark_entry_unread
@@ -476,7 +476,7 @@ class DiscussionTopicsApiController < ApplicationController
   # On success, the response will be 204 No Content with an empty body
   #
   # @example_request
-  #   curl 'http://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/subscribed.json' \ 
+  #   curl 'https://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/subscribed.json' \
   #        -X PUT \ 
   #        -H "Authorization: Bearer <token>" \ 
   #        -H "Content-Length: 0"
@@ -490,7 +490,7 @@ class DiscussionTopicsApiController < ApplicationController
   # On success, the response will be 204 No Content with an empty body
   #
   # @example_request
-  #   curl 'http://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/subscribed.json' \ 
+  #   curl 'https://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/subscribed.json' \
   #        -X DELETE \ 
   #        -H "Authorization: Bearer <token>" 
   def unsubscribe_topic

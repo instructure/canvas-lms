@@ -149,7 +149,7 @@ class ProfileController < ApplicationController
   #
   # @example_request
   #
-  #   curl 'http://<canvas>/api/v1/users/1/avatars.json' \ 
+  #   curl 'https://<canvas>/api/v1/users/1/avatars.json' \
   #        -H "Authorization: Bearer <token>"
   #
   # @example_response

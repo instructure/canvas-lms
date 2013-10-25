@@ -81,7 +81,7 @@ class DiscussionEntriesController < ApplicationController
   # @argument message [String] The updated body of the entry.
   #
   # @example_request
-  #   curl -X PUT 'http://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/entries/<entry_id>' \ 
+  #   curl -X PUT 'https://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/entries/<entry_id>' \
   #        -F 'message=<message>' \ 
   #        -H "Authorization: Bearer <token>"
   def update
@@ -137,7 +137,7 @@ class DiscussionEntriesController < ApplicationController
   #
   # @example_request
   #
-  #   curl -X DELETE 'http://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/entries/<entry_id>' \ 
+  #   curl -X DELETE 'https://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/entries/<entry_id>' \
   #        -H "Authorization: Bearer <token>"
   def destroy
     @topic = @context.all_discussion_topics.active.find(params[:topic_id]) if params[:topic_id].present?

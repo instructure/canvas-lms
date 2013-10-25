@@ -180,7 +180,7 @@ class AssignmentOverridesController < ApplicationController
   #
   # @example_request
   #
-  #   curl 'http://<canvas>/api/v1/courses/1/assignments/2/overrides.json' \ 
+  #   curl 'https://<canvas>/api/v1/courses/1/assignments/2/overrides.json' \
   #        -X POST \ 
   #        -F 'assignment_override[student_ids][]=8' \ 
   #        -F 'assignment_override[title]=Fred Flinstone' \ 
@@ -240,7 +240,7 @@ class AssignmentOverridesController < ApplicationController
   #
   # @example_request
   #
-  #   curl 'http://<canvas>/api/v1/courses/1/assignments/2/overrides/3.json' \ 
+  #   curl 'https://<canvas>/api/v1/courses/1/assignments/2/overrides/3.json' \
   #        -X PUT \ 
   #        -F 'assignment_override[title]=Fred Flinstone' \ 
   #        -F 'assignment_override[due_at]=2012-10-08T21:00:00Z' \ 
@@ -266,7 +266,7 @@ class AssignmentOverridesController < ApplicationController
   #
   # @example_request
   #
-  #   curl 'http://<canvas>/api/v1/courses/1/assignments/2/overrides/3.json' \ 
+  #   curl 'https://<canvas>/api/v1/courses/1/assignments/2/overrides/3.json' \
   #        -X DELETE \ 
   #        -H "Authorization: Bearer <token>"
   def destroy

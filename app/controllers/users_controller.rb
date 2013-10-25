@@ -1000,7 +1000,7 @@ class UsersController < ApplicationController
   #
   # @example_request
   #
-  #   curl 'http://<canvas>/api/v1/users/<user_id>/settings \ 
+  #   curl 'https://<canvas>/api/v1/users/<user_id>/settings \
   #     -X PUT \ 
   #     -F 'manual_mark_as_read=true'
   #     -H 'Authorization: Bearer <token>'
@@ -1066,7 +1066,7 @@ class UsersController < ApplicationController
   #
   # @example_request
   #
-  #   curl 'http://<canvas>/api/v1/users/133.json' \ 
+  #   curl 'https://<canvas>/api/v1/users/133.json' \
   #        -X PUT \ 
   #        -F 'user[name]=Sheldon Cooper' \ 
   #        -F 'user[short_name]=Shelly' \ 

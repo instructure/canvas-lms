@@ -125,7 +125,7 @@
 #         "avatar_image_url": "http://...",
 #
 #         // The URL to the HTML page in Canvas of this user's public profile.
-#         "html_url": "http://<canvas>/users/37"
+#         "html_url": "https://<canvas>/users/37"
 #       }
 #     }
 class CollectionItemsController < ApplicationController

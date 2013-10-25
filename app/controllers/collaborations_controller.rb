@@ -125,7 +125,7 @@ class CollaborationsController < ApplicationController
   #
   # Examples
   #
-  #   curl http://<canvas>/api/v1/courses/1/collaborations/1/members
+  #   curl https://<canvas>/api/v1/courses/1/collaborations/1/members
   #
   # @returns [Collaborator]
   def members

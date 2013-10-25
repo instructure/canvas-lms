@@ -278,7 +278,7 @@ class CalendarEventsApiController < ApplicationController
   #
   # @example_request
   #
-  #   curl 'http://<canvas>/api/v1/calendar_events.json' \ 
+  #   curl 'https://<canvas>/api/v1/calendar_events.json' \
   #        -X POST \ 
   #        -F 'calendar_event[context_code]=course_123' \ 
   #        -F 'calendar_event[title]=Paintball Fight!' \ 
@@ -325,7 +325,7 @@ class CalendarEventsApiController < ApplicationController
   #
   # @example_request
   #
-  #   curl 'http://<canvas>/api/v1/calendar_events/345/reservations.json' \ 
+  #   curl 'https://<canvas>/api/v1/calendar_events/345/reservations.json' \
   #        -X POST \ 
   #        -F 'cancel_existing=true' \ 
   #        -H "Authorization: Bearer <token>"
@@ -389,7 +389,7 @@ class CalendarEventsApiController < ApplicationController
   #
   # @example_request
   #
-  #   curl 'http://<canvas>/api/v1/calendar_events/234.json' \ 
+  #   curl 'https://<canvas>/api/v1/calendar_events/234.json' \
   #        -X PUT \ 
   #        -F 'calendar_event[title]=Epic Paintball Fight!' \ 
   #        -H "Authorization: Bearer <token>"
@@ -423,7 +423,7 @@ class CalendarEventsApiController < ApplicationController
   #
   # @example_request
   #
-  #   curl 'http://<canvas>/api/v1/calendar_events/234.json' \ 
+  #   curl 'https://<canvas>/api/v1/calendar_events/234.json' \
   #        -X DELETE \ 
   #        -F 'cancel_reason=Greendale layed off the janitorial staff :(' \ 
   #        -H "Authorization: Bearer <token>"

@@ -252,7 +252,7 @@ class AppointmentGroupsController < ApplicationController
   #
   # @example_request
   #
-  #   curl 'http://<canvas>/api/v1/appointment_groups.json' \ 
+  #   curl 'https://<canvas>/api/v1/appointment_groups.json' \
   #        -X POST \ 
   #        -F 'appointment_group[context_codes][]=course_123' \ 
   #        -F 'appointment_group[sub_context_codes][]=course_section_234' \ 
@@ -360,7 +360,7 @@ class AppointmentGroupsController < ApplicationController
   #
   # @example_request
   #
-  #   curl 'http://<canvas>/api/v1/appointment_groups/543.json' \ 
+  #   curl 'https://<canvas>/api/v1/appointment_groups/543.json' \
   #        -X PUT \ 
   #        -F 'appointment_group[publish]=1' \
   #        -H "Authorization: Bearer <token>"
@@ -388,7 +388,7 @@ class AppointmentGroupsController < ApplicationController
   #
   # @example_request
   #
-  #   curl 'http://<canvas>/api/v1/appointment_groups/543.json' \ 
+  #   curl 'https://<canvas>/api/v1/appointment_groups/543.json' \
   #        -X DELETE \ 
   #        -F 'cancel_reason=El Tigre Chino got fired' \ 
   #        -H "Authorization: Bearer <token>"
