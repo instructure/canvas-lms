@@ -1,6 +1,6 @@
 class AddUniqueIndexToDiscussionTopics < ActiveRecord::Migration
   tag :postdeploy
-  self.transactional = false
+  disable_ddl_transaction!
 
   def self.up
     add_index :discussion_topics, [:context_id, :context_type, :root_topic_id], :unique => true, :concurrently => true, :name => "index_discussion_topics_unique_subtopic_per_context"

@@ -1,6 +1,6 @@
 class FixNeedNotifyIndexCondition < ActiveRecord::Migration
   tag :predeploy
-  self.transactional = false
+  disable_ddl_transaction!
 
   # this migration fixes a the bad index condition in AddNeedNotifyColumnToAttachments
 

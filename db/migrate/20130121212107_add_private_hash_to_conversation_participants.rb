@@ -1,6 +1,6 @@
 class AddPrivateHashToConversationParticipants < ActiveRecord::Migration
   tag :predeploy
-  self.transactional = false
+  disable_ddl_transaction!
 
   def self.up
     add_column :conversation_participants, :private_hash, :string

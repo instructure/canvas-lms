@@ -1,5 +1,5 @@
 class AddUserObservers < ActiveRecord::Migration
-  self.transactional = false
+  disable_ddl_transaction!
   tag :predeploy
 
   def self.up

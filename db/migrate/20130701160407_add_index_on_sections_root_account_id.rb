@@ -1,6 +1,6 @@
 class AddIndexOnSectionsRootAccountId < ActiveRecord::Migration
   tag :postdeploy
-  self.transactional = false
+  disable_ddl_transaction!
 
   def self.up
     add_index :course_sections, :root_account_id, concurrently: true

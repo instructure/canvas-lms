@@ -1,6 +1,6 @@
 class MakeSisIdsUnique < ActiveRecord::Migration
   tag :postdeploy
-  self.transactional = false
+  disable_ddl_transaction!
 
   def self.up
     add_index :accounts, [:sis_source_id, :root_account_id], conditions: "sis_source_id IS NOT NULL", unique: true, concurrently: true

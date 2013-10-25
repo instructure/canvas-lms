@@ -1,7 +1,7 @@
 class IndexJobsOnLockedBy < ActiveRecord::Migration
   tag :predeploy
 
-  self.transactional = false
+  disable_ddl_transaction!
 
   def self.connection
     Delayed::Backend::ActiveRecord::Job.connection

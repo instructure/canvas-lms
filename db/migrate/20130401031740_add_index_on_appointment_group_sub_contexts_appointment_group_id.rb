@@ -1,6 +1,6 @@
 class AddIndexOnAppointmentGroupSubContextsAppointmentGroupId < ActiveRecord::Migration
   tag :predeploy
-  self.transactional = false
+  disable_ddl_transaction!
 
   def self.up
     add_index :appointment_group_sub_contexts, :appointment_group_id, :concurrently => true

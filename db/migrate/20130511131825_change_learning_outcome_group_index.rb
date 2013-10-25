@@ -1,6 +1,6 @@
 class ChangeLearningOutcomeGroupIndex < ActiveRecord::Migration
   tag :postdeploy
-  self.transactional = false
+  disable_ddl_transaction!
 
   def self.up
     remove_index :learning_outcome_groups, [:context_id, :context_type]

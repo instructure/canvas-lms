@@ -1,6 +1,6 @@
 class AddIndicesToLearningOutcomeGroups < ActiveRecord::Migration
   tag :predeploy
-  self.transactional = false
+  disable_ddl_transaction!
 
   def self.up
     add_index :learning_outcome_groups, [:context_id, :context_type], :concurrently => true, :conditions => { :learning_outcome_group_id => nil }

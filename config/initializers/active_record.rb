@@ -1187,6 +1187,9 @@ class ActiveRecord::Migration
     def transactional=(value)
       @transactional = !!value
     end
+    def disable_ddl_transaction!
+      self.transactional = false
+    end
 
     def tag(*tags)
       raise "invalid tags #{tags.inspect}" unless tags - VALID_TAGS == []

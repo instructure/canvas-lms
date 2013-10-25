@@ -1,6 +1,6 @@
 class AddUserIdToConversationMessageParticipants < ActiveRecord::Migration
   tag :predeploy
-  self.transactional = false
+  disable_ddl_transaction!
 
   def self.up
     add_column :conversation_message_participants, :user_id, :integer, :limit => 8

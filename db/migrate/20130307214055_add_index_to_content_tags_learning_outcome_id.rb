@@ -1,6 +1,6 @@
 class AddIndexToContentTagsLearningOutcomeId < ActiveRecord::Migration
   tag :predeploy
-  self.transactional = false
+  disable_ddl_transaction!
 
   def self.up
     add_index :content_tags, :learning_outcome_id, :concurrently => true, :conditions => "learning_outcome_id IS NOT NULL"

@@ -1,6 +1,6 @@
 class ChangeExternalFeedEntryIndexes < ActiveRecord::Migration
   tag :postdeploy
-  self.transactional = false
+  disable_ddl_transaction!
 
   def self.up
     add_index :external_feed_entries, :external_feed_id, concurrently: true

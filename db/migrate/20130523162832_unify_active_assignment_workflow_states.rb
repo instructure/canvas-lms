@@ -1,6 +1,6 @@
 class UnifyActiveAssignmentWorkflowStates < ActiveRecord::Migration
   tag :postdeploy
-  self.transactional = false
+  disable_ddl_transaction!
 
   def self.up
     DataFixup::UnifyActiveAssignmentWorkflowStates.send_later_if_production(:run)
