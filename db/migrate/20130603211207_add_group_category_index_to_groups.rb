@@ -3,7 +3,7 @@ class AddGroupCategoryIndexToGroups < ActiveRecord::Migration
   disable_ddl_transaction!
 
   def self.up
-    add_index :groups, :group_category_id, :concurrently => true
+    add_index :groups, :group_category_id, :algorithm => :concurrently
   end
 
   def self.down

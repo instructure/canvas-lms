@@ -3,7 +3,7 @@ class AddIndexOnSectionsRootAccountId < ActiveRecord::Migration
   disable_ddl_transaction!
 
   def self.up
-    add_index :course_sections, :root_account_id, concurrently: true
+    add_index :course_sections, :root_account_id, algorithm: :concurrently
   end
 
   def self.down

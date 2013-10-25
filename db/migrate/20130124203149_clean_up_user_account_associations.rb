@@ -18,13 +18,13 @@ class CleanUpUserAccountAssociations < ActiveRecord::Migration
     User.update_account_associations(user_ids)
 
     # add a unique index
-    add_index :user_account_associations, [:user_id, :account_id], :unique => true, :concurrently => true
+    add_index :user_account_associations, [:user_id, :account_id], :unique => true, :algorithm => :concurrently
     # remove the non-unique index that's now covered by the unique index
     remove_index :user_account_associations, :user_id
   end
 
   def self.down
-    add_index :user_account_associations, :user_id, :concurrently => true
+    add_index :user_account_associations, :user_id, :algorithm => :concurrently
     remove_index :user_account_associations, [:user_id, :account_id]
   end
 end

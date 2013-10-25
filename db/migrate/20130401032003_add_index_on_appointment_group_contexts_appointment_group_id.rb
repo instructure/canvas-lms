@@ -3,7 +3,7 @@ class AddIndexOnAppointmentGroupContextsAppointmentGroupId < ActiveRecord::Migra
   disable_ddl_transaction!
 
   def self.up
-    add_index :appointment_group_contexts, :appointment_group_id, :concurrently => true
+    add_index :appointment_group_contexts, :appointment_group_id, :algorithm => :concurrently
   end
 
   def self.down

@@ -13,7 +13,7 @@ class AddAttachmentIndexesForSorting < ActiveRecord::Migration
     else
       add_index :attachments, [:folder_id, :file_state, :display_name], :length => { :display_name => 20 }
     end
-    add_index :attachments, [:folder_id, :file_state, :position], :concurrently => true
+    add_index :attachments, [:folder_id, :file_state, :position], :algorithm => :concurrently
 
     remove_index :attachments, "index_attachments_on_folder_id"
   end

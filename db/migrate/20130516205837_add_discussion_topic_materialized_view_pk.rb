@@ -20,10 +20,10 @@ class AddDiscussionTopicMaterializedViewPk < ActiveRecord::Migration
     when 'PostgreSQL'
       execute("ALTER TABLE discussion_topic_materialized_views DROP CONSTRAINT discussion_topic_materialized_views_pkey")
       execute("ALTER TABLE discussion_topic_materialized_views ALTER discussion_topic_id DROP NOT NULL")
-      add_index :discussion_topic_materialized_views, :discussion_topic_id, :concurrently => true, :unique => true, :name => 'index_discussion_topic_materialized_views'
+      add_index :discussion_topic_materialized_views, :discussion_topic_id, :algorithm => :concurrently, :unique => true, :name => 'index_discussion_topic_materialized_views'
     when 'MySQL', 'Mysql2'
       execute("ALTER TABLE discussion_topic_materialized_views DROP PRIMARY KEY")
-      add_index :discussion_topic_materialized_views, :discussion_topic_id, :concurrently => true, :unique => true, :name => 'index_discussion_topic_materialized_views'
+      add_index :discussion_topic_materialized_views, :discussion_topic_id, :algorithm => :concurrently, :unique => true, :name => 'index_discussion_topic_materialized_views'
     end
   end
 end

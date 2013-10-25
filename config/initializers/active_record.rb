@@ -985,9 +985,10 @@ if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
       index_name   = index_name(table_name, :column => column_names)
 
       if Hash === options # legacy support, since this param was a string
+        concurrently_option = options[:concurrently] || options[:algorithm] == :concurrently
         index_type = options[:unique] ? "UNIQUE" : ""
         index_name = options[:name].to_s if options[:name]
-        concurrently = "CONCURRENTLY " if options[:concurrently] && self.open_transactions == 0
+        concurrently = "CONCURRENTLY " if concurrently_option && self.open_transactions == 0
         conditions = options[:conditions]
         if conditions
           conditions = " WHERE #{ActiveRecord::Base.send(:sanitize_sql, conditions, table_name.to_s.dup)}"

@@ -15,12 +15,12 @@ class AddContextModuleProgressionsUniqueIndex < ActiveRecord::Migration
       scope.where("id<>?", keeper).delete_all
     end
 
-    add_index :context_module_progressions, [:user_id, :context_module_id], unique: true, name: 'index_cmp_on_user_id_and_module_id', concurrently: true
+    add_index :context_module_progressions, [:user_id, :context_module_id], unique: true, name: 'index_cmp_on_user_id_and_module_id', algorithm: :concurrently
     remove_index :context_module_progressions, name: 'u_id_module_id'
   end
 
   def self.down
     remove_index :context_module_progressions, name: 'index_cmp_on_user_id_and_module_id'
-    add_index :context_module_progressions, [:user_id, :context_module_id], name: 'u_id_module_id', concurrently: true
+    add_index :context_module_progressions, [:user_id, :context_module_id], name: 'u_id_module_id', algorithm: :concurrently
   end
 end

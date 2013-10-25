@@ -8,7 +8,7 @@ class IndexJobsOnLockedBy < ActiveRecord::Migration
   end
 
   def self.up
-    add_index :delayed_jobs, :locked_by, :concurrently => true, :conditions => "locked_by IS NOT NULL"
+    add_index :delayed_jobs, :locked_by, :algorithm => :concurrently, :conditions => "locked_by IS NOT NULL"
   end
 
   def self.down

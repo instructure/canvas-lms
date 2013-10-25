@@ -3,10 +3,10 @@ class AddIndexOnCourseWikiId < ActiveRecord::Migration
   disable_ddl_transaction!
 
   def self.up
-    add_index :courses, :wiki_id, concurrently: true, conditions: "wiki_id IS NOT NULL"
+    add_index :courses, :wiki_id, algorithm: :concurrently, conditions: "wiki_id IS NOT NULL"
     if connection.adapter_name == 'PostgreSQL'
       remove_index :groups, :wiki_id
-      add_index :groups, :wiki_id, concurrently: true, conditions: "wiki_id IS NOT NULL"
+      add_index :groups, :wiki_id, algorithm: :concurrently, conditions: "wiki_id IS NOT NULL"
     end
   end
 

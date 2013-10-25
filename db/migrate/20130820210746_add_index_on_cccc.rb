@@ -3,7 +3,7 @@ class AddIndexOnCccc < ActiveRecord::Migration
   disable_ddl_transaction!
 
   def self.up
-    add_index :communication_channels, :confirmation_code, concurrently: true
+    add_index :communication_channels, :confirmation_code, algorithm: :concurrently
   end
 
   def self.down

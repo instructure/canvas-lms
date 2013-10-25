@@ -3,7 +3,7 @@ class IndexCourseSectionsNonxlistCourse < ActiveRecord::Migration
   disable_ddl_transaction!
 
   def self.up
-    add_index :course_sections, [:nonxlist_course_id], :name => "index_course_sections_on_nonxlist_course", :concurrently => true, :conditions => "nonxlist_course_id IS NOT NULL"
+    add_index :course_sections, [:nonxlist_course_id], :name => "index_course_sections_on_nonxlist_course", :algorithm => :concurrently, :conditions => "nonxlist_course_id IS NOT NULL"
   end
 
   def self.down

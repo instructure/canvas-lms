@@ -12,12 +12,12 @@ class AddUniqueIndexOnCourseAccountAssociations < ActiveRecord::Migration
         map(&:course_id)
     Course.update_account_associations(course_ids)
 
-    add_index :course_account_associations, [:course_id, :course_section_id, :account_id], :unique => true, :concurrently => true, :name => 'index_caa_on_course_id_and_section_id_and_account_id'
+    add_index :course_account_associations, [:course_id, :course_section_id, :account_id], :unique => true, :algorithm => :concurrently, :name => 'index_caa_on_course_id_and_section_id_and_account_id'
     remove_index :course_account_associations, :course_id
   end
 
   def self.down
-    add_index :course_account_associations, :course_id, :concurrently => true
+    add_index :course_account_associations, :course_id, :algorithm => :concurrently
     remove_index :course_account_associations, 'index_caa_on_course_id_and_section_id_and_account_id'
   end
 end

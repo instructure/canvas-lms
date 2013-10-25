@@ -3,7 +3,7 @@ class AddCoursesSisSourceIdIndex < ActiveRecord::Migration
   disable_ddl_transaction!
 
   def self.up
-    add_index :courses, :sis_source_id, :concurrently => true
+    add_index :courses, :sis_source_id, :algorithm => :concurrently
   end
 
   def self.down

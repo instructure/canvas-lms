@@ -3,7 +3,7 @@ class AddIndexOnConversationMessagesAuthorId < ActiveRecord::Migration
   disable_ddl_transaction!
 
   def self.up
-    add_index :conversation_messages, :author_id, :concurrently => true
+    add_index :conversation_messages, :author_id, :algorithm => :concurrently
   end
 
   def self.down

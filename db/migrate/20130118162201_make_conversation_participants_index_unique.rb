@@ -3,7 +3,7 @@ class MakeConversationParticipantsIndexUnique < ActiveRecord::Migration
   tag :predeploy
 
   def self.up
-    add_index :conversation_participants, [:conversation_id, :user_id], :unique => true, :concurrently => true
+    add_index :conversation_participants, [:conversation_id, :user_id], :unique => true, :algorithm => :concurrently
     remove_index :conversation_participants, [:conversation_id]
   end
 

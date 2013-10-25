@@ -4,7 +4,7 @@ class AddPrivateHashToConversationParticipants < ActiveRecord::Migration
 
   def self.up
     add_column :conversation_participants, :private_hash, :string
-    add_index :conversation_participants, [:private_hash, :user_id], :conditions => "private_hash IS NOT NULL", :unique => true, :concurrently => true
+    add_index :conversation_participants, [:private_hash, :user_id], :conditions => "private_hash IS NOT NULL", :unique => true, :algorithm => :concurrently
   end
 
   def self.down

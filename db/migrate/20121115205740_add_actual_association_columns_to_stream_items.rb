@@ -11,8 +11,8 @@ class AddActualAssociationColumnsToStreamItems < ActiveRecord::Migration
     add_column :stream_item_instances, :context_type, :string
     add_column :stream_item_instances, :context_id, :integer, :limit => 8
 
-    add_index :stream_items, [:asset_type, :asset_id], :unique => true, :concurrently => true
-    add_index :stream_item_instances, [:context_type, :context_id], :concurrently => true
+    add_index :stream_items, [:asset_type, :asset_id], :unique => true, :algorithm => :concurrently
+    add_index :stream_item_instances, [:context_type, :context_id], :algorithm => :concurrently
   end
 
   def self.down

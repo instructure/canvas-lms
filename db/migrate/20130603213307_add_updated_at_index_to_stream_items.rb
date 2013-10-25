@@ -3,7 +3,7 @@ class AddUpdatedAtIndexToStreamItems < ActiveRecord::Migration
   disable_ddl_transaction!
 
   def self.up
-    add_index :stream_items, :updated_at, :concurrently => true
+    add_index :stream_items, :updated_at, :algorithm => :concurrently
   end
 
   def self.down

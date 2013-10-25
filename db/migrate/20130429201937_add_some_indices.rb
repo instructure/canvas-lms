@@ -3,8 +3,8 @@ class AddSomeIndices < ActiveRecord::Migration
   disable_ddl_transaction!
 
   def self.up
-    add_index :conversation_message_participants, :conversation_message_id, :name => "index_conversation_message_participants_on_message_id", :concurrently => true
-    add_index :pseudonyms, :sis_communication_channel_id, :concurrently => true
+    add_index :conversation_message_participants, :conversation_message_id, :name => "index_conversation_message_participants_on_message_id", :algorithm => :concurrently
+    add_index :pseudonyms, :sis_communication_channel_id, :algorithm => :concurrently
   end
 
   def self.down
