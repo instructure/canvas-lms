@@ -1,5 +1,30 @@
 @import 'agenda_view_minical';
 
+body {
+  background: #E8ECEF;
+}
+
+#right-side {
+  margin: 0;
+  margin-left: 20px;
+  width: 240px;
+  padding: 13px;
+  background-color: #d3d9df;
+
+  .element_toggler {
+    padding: 5px;
+    font-size: 15px;
+    font-weight: bold;
+    &:hover, &:focus {
+      background-color: #DBE0E6;
+      border-radius: 3px;
+    }
+    i {
+      vertical-align: middle;
+    }
+  }
+}
+
 .agenda-wrapper {
   display: none;
 
@@ -163,7 +188,6 @@
 
   .fc-event {
     background-color: white;
-    font-weight: bold;
   }
 
   .fc-grid .fc-day-number {
@@ -182,6 +206,49 @@
   }
 }
 
-#context-list label {
-  display: inline;
+.rs-section {
+  border: none;
+  padding: 0;
+  margin: 13px 0;
+}
+
+#context-list-holder, #undated-events {
+  border: 1px solid #C6CDD4;
+  border-radius: 3px;
+  background-color: #fff;
+  max-height: 300px;
+  overflow-y: auto;
+  padding: 10px;
+  ul {
+    margin-bottom: 10px;
+  }
+}
+
+#context-list {
+  padding: 0;
+  max-height: none;
+  .context_list_context {
+    padding: 3px;
+  }
+  .context-list-toggle-box {
+    border-radius: 2px;
+    margin-left: 0;
+  }
+  label {
+    display: inline;
+  }
+  .checked label {
+    font-weight: bold;
+  }
+}
+
+#undated-events {
+  display: none;
+  .event {
+    background-color: #fff;
+    line-height: 24px;
+    .undated_event_title {
+      color: inherit;
+    }
+  }
 }

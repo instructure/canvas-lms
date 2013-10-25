@@ -168,7 +168,7 @@ describe "calendar2" do
           e = make_event :start => nil, :title => "pizza party"
           get "/calendar2"
 
-          f(".undated-events-link").click
+          f("#undated-events-section .element_toggler").click
           wait_for_ajaximations
           undated_events = ff("#undated-events > ul > li")
           undated_events.size.should == 1
@@ -179,7 +179,7 @@ describe "calendar2" do
           e = make_event :start => nil, :title => "asdfjkasldfjklasdjfklasdjfklasjfkljasdklfjasklfjkalsdjsadkfljasdfkljfsdalkjsfdlksadjklsadjsadklasdf"
           get "/calendar2"
 
-          f(".undated-events-link").click
+          f("#undated-events-section .element_toggler").click
           wait_for_ajaximations
           undated_events = ff("#undated-events > ul > li")
           undated_events.size.should == 1
@@ -403,7 +403,7 @@ describe "calendar2" do
         replace_content(f('.ui-dialog #assignment_due_at'), "")
         submit_form('#edit_assignment_form')
         wait_for_ajax_requests
-        f(".undated-events-link").click
+        f("#undated-events-section .element_toggler").click
         f('.fc-event').should be_nil
         f('.undated_event_title').text.should == "undate me"
       end

@@ -89,3 +89,13 @@ define [
       if @start && @end && (@end.getTime() - @start.getTime()) < minimumDuration
         # new date so we don't mutate the original
         @end = new Date(@start.getTime() + minimumDuration)
+
+    assignmentType: () ->
+      return if !@assignment
+      if @assignment.submission_types?.length
+        type = @assignment.submission_types[0]
+        if type == 'online_quiz'
+          return 'quiz'
+        if type == 'discussion_topic'
+          return 'discussion'
+      return 'assignment'

@@ -10,7 +10,7 @@ define [
 
   class UndatedEventsList
     constructor: (selector, @dataSource, @calendar) ->
-      @div = $(selector).html undatedEventsTemplate({})
+      @div = $(selector).html undatedEventsTemplate({ unloaded: true })
       @hidden = true
       @visibleContextList = []
 
@@ -24,6 +24,12 @@ define [
       @div.on('click', '.event', @clickEvent)
           .on('click', '.undated_event_title', @clickEvent)
           .on('click', '.undated-events-link', @show)
+      @div.on('keydown', '.event', @keyDownEvent)
+      if toggler = @div.prev('.element_toggler')
+        toggler.on('click', @show)
+        @div.find('.undated-events-link').hide()
+
+      @showAgenda = !!ENV.CALENDAR.SHOW_AGENDA
 
     load: =>
       return if @hidden
@@ -40,7 +46,9 @@ define [
         for e in events
           e.details_url = e.fullDetailsURL()
           e.icon = if e.calendarEvent then 'calendar-day' else 'assignment'
-        @div.html undatedEventsTemplate({ events: events })
+          if @showAgenda
+            e.icon = if e.calendarEvent then 'calendar-month' else e.assignmentType()
+        @div.html undatedEventsTemplate({ events: events, showAgenda: @showAgenda })
 
         for e in events
           @div.find(".#{e.id}").data 'calendarEvent', e
@@ -70,6 +78,10 @@ define [
       event = @dataSource.eventWithId(eventId)
       if event
         new ShowEventDetailsDialog(event, @dataSource).show jsEvent
+
+    keyDownEvent: (jsEvent) =>
+      return if jsEvent.keyCode != 13 && jsEvent.keyCode != 32
+      @clickEvent(jsEvent)
 
     visibleContextListChanged: (list) =>
       @visibleContextList = list

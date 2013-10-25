@@ -280,8 +280,7 @@ define [
       $element.find('.fc-event-title').prepend($("<span class='screenreader-only'>#{screenReaderTitleHint}</span>"))
 
       if ENV.CALENDAR.SHOW_AGENDA && event.eventType.match(/assignment/)
-        isQuiz = event.assignment.submission_types?.length && event.assignment.submission_types[0] == 'online_quiz'
-        element.find('.fc-event-inner').prepend($('<i />', {'class': if isQuiz then 'icon-quiz' else 'icon-assignment'}))
+        element.find('.fc-event-inner').prepend($('<i />', {'class': "icon-#{event.assignmentType()}"}))
       true
 
     eventAfterRender: (event, element, view) =>
