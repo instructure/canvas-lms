@@ -7,14 +7,6 @@ define [
   'vendor/jquery.ba-tinypubsub'
 ], (I18n, _, Backbone, CalendarEventCollection, template) ->
 
-
-  # Public: Helper function translate a model date string into a date object.
-  #
-  # m - A model instance.
-  # prop - The name of the date property (default: 'start_at').
-  toDate = _.compose(((d) -> new Date(d)),
-                     ((m, prop = 'start_at') -> if m.get then m.get(prop) else m[prop]))
-
   class AgendaView extends Backbone.View
 
     PER_PAGE: 50
@@ -74,23 +66,31 @@ define [
       @eventCollection.canFetch('next') or
         @assignmentCollection.canFetch('next')
 
-    # Public: Helper function to translate a model date into a timestamp.
+    # Public: Helper function translate a model date string into a date object.
     #
     # m - A model instance.
-    # prop - The name of the date property (default: 'start_at').
+    #
+    # Returns a Date object.
+    toDate: (m) -> new Date(m.get('start_at'))
+
+    # Internal: Helper function to translate a model date into a timestamp.
+    #
+    # m - A model instance.
     #
     # Returns a timestamp integer.
-    toTime: _.compose(((d) -> d.getTime()), toDate)
+    toTime: (m) => @toDate(m).getTime()
 
-    # Public: Helper function to translate a model date into a fudged date.
+    # Internal: Helper function to translate a model date into a fudged date.
     #
-    # m - A model instance.
+    # m - A model instance or hash.
     # prop - The name of the date property (default: 'start_at').
     #
     # Returns a fudged date.
-    toFudgedDate: _.compose(((d) -> $.fudgeDateForProfileTimezone(d)), toDate)
+    toFudgedDate: (m, prop = 'start_at') =>
+      d = if m.get then m.get(prop) else m[prop]
+      $.fudgeDateForProfileTimezone(new Date(d))
 
-    # Public: Given two collections, determine the latest shared date.
+    # Internal: Given two collections, determine the latest shared date.
     #
     # c1 - Collection object.
     # c2 - Collection object.
@@ -108,37 +108,87 @@ define [
       else
         null
 
-    # Public: Translate a list of event models to a hash.
+    # Internal: Change a flat array of objects into a sturctured array of
+    # objects based on the given iterator function. Similar to _.groupBy,
+    # except the result is an Array instead of a Hash and this function
+    # assumes the list is already sorted by the given iterator.
     #
-    # list - An array of model objects.
-    # limit - A timestamp to stop returning events after (default: null).
+    # list     - The sorted list of values to box.
+    # iterator - A function that returns the value to box by. The iterator
+    #            is passed the value from the list.
     #
-    # Returns a hash.
-    eventListToHash: (list, limit = null) =>
-      _.reduce(list, (result, event) =>
-        return result if limit and limit < @toTime(event)
+    # Returns a new boxed array with elemens from the given list.
+    sortedBoxBy: (list, iterator) ->
+      _.reduce(list, (result, currentElt) ->
+        return [[currentElt]] if _.isEmpty(result)
 
+        previousBox = _.last(result)
+        previousElt = _.last(previousBox)
+        if iterator(currentElt) == iterator(previousElt)
+          previousBox.push(currentElt)
+        else
+          result.push([currentElt])
+
+        result
+      , [])
+
+    # Internal: Do necessary changes on each event model in the list
+    #
+    # list - the list of the events to prepare
+    #
+    # Returns nothing.
+    prepareEvents: (list) ->
+      prepare = (event) ->
         event.set('start_at', @toFudgedDate(event))
-        day = I18n.l('#date.formats.short_with_weekday', toDate(event))
         if assignment = event.get('assignment')
           assignment.due_at = @toFudgedDate(assignment, 'due_at')
-        result[day] or= []
-        result[day].push(event.toJSON())
-        result
-      , {})
 
-    # Public: Format a hash of event data to an object ready to be sent to the template.
-    #
-    # result - A hash of event data from AgendaView#toJSON.
-    #
-    # Returns an object.
-    formatResult: (events) =>
-      result = {days: [], meta: {}}
-      result.days.push(date: key, events: events[key]) for key of events
-      result.meta.hasMore = @hasMore()
-      result
+      _.each(list, prepare, this)
 
+    # Internal: returns the 'start_at' of the event formatted for the template
+    #
+    # event - the event to format
+    #
+    # Returns the formatted String
+    formattedDayString: (event) =>
+      I18n.l('#date.formats.short_with_weekday', @toDate(event))
+
+    # Internal: change a box of events into an output hash for toJSON
+    #
+    # events - a box of events (all the events occur on the same day)
+    #
+    # Returns an Object with 'date' and 'events' keys.
+    eventBoxToHash: (events) =>
+      date: @formattedDayString(_.first(events))
+      events: _.map(events, (e) -> e.toJSON())
+
+    # Internal: Format a hash of event data to an object ready to be sent to the template.
+    #
+    # boxedEvents - A boxed list of events
+    #
+    # Returns an object in the format specified by toJSON.
+    formatResult: (boxedEvents) ->
+      days: _.map(boxedEvents, @eventBoxToHash)
+      meta:
+        hasMore: @hasMore()
+
+    # Public: Creates the json for the template.
+    #
+    # Returns an Object:
+    #   {
+    #     days: [
+    #       [date: 'some date', events: [event1.toJSON(), event2.toJSON()],
+    #       [date: ...]
+    #     ],
+    #     meta: {
+    #       hasMore: true/false
+    #     }
+    #   }
     toJSON: ->
-      limit  = @limitOf(@eventCollection, @assignmentCollection)
-      list   = _.union(@eventCollection.models, @assignmentCollection.models)
-      _.compose(@formatResult, @eventListToHash)(list, limit)
+      limit = @limitOf(@eventCollection, @assignmentCollection)
+      list = _.union(@eventCollection.models, @assignmentCollection.models)
+      list = _.filter(list, (e) => @toTime(e) < limit) if limit
+      list = _.sortBy(list, @toTime)
+      @prepareEvents(list)
+      list = @sortedBoxBy(list, @formattedDayString)
+      @formatResult(list)

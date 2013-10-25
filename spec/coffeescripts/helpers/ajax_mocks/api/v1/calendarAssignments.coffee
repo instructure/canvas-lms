@@ -3,7 +3,7 @@ define [], () ->
   [
     {
       "all_day": true,
-      "all_day_date": "2013-10-11",
+      "all_day_date": "2013-10-12",
       "created_at": "2013-10-07T22:46:01Z",
       "title": "Book report",
       "updated_at": "2013-10-07T22:46:01Z",
@@ -14,7 +14,7 @@ define [], () ->
         "assignment_group_id": "2",
         "automatic_peer_reviews": false,
         "description": null,
-        "due_at": "2013-10-12T05:59:59Z",
+        "due_at": "2013-10-13T05:59:59Z",
         "grade_group_students_individually": null,
         "grading_standard_id": null,
         "grading_type": "points",
@@ -36,8 +36,8 @@ define [], () ->
         "locked_for_user": false
       },
       "context_code": "course_2",
-      "end_at": "2013-10-12T05:59:59Z",
-      "start_at": "2013-10-12T05:59:59Z",
+      "end_at": "2013-10-13T05:59:59Z",
+      "start_at": "2013-10-13T05:59:59Z",
       "url": "http://canvas.dev/api/v1/calendar_events/assignment_6",
       "html_url": "http://canvas.dev/courses/2/assignments/6"
     }
