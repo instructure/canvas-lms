@@ -120,7 +120,7 @@ define [
       view.remove()
 
   test 'AddAppView: render', ->
-    equal $.trim($('.ui-dialog-title').text()), "Add App",
+    equal $.trim($('.ui-dialog-title:visible').text()), "Add App",
       '"Add App" appears as dialog title'
 
     equal $('#canvas_app_name').val(), app.get('name'),

@@ -26,17 +26,24 @@ body {
 }
 
 .agenda-wrapper {
-  display: none;
+  background-color: #fff;
+  border: 1px solid #C6CDD4;
+  border-radius: 3px;
 
+  display: none;
   &.active {
     display: block;
+  }
+
+  .item-group-container {
+    background: none;
+    padding: 0;
   }
 }
 
 .agenda-day {
-  border-bottom: 1px dashed #bac0c6;
-  margin-bottom: 8px;
-  padding-bottom: 8px;
+  border-bottom: 1px dashed #D9DBDC;
+  padding: 8px;
 
   &:after {
     clear: both;
@@ -45,7 +52,15 @@ body {
   }
 
   .item-group-condensed {
-    padding: 0 15px 0 0;
+    padding: 0;
+    border: none;
+  }
+
+  &.agenda-today {
+    background-color: #FEF6E8;
+  }
+  &:last-child {
+    border-bottom: none;
   }
 }
 
@@ -53,7 +68,7 @@ body {
   float: left;
   font-size: 12px;
   font-weight: bold;
-  line-height: 52px;
+  line-height: 30px;
   margin: 0;
   max-width: 125px;
   width: 10%;
@@ -64,20 +79,26 @@ body {
   width: 90%;
 }
 
-.agenda-event {
-  &:first-child .color-tag {
-    border-top-left-radius: 2px;
+#calendar-app .agenda-event {
+  margin: 0;
+  .ig-row {
+    border: none;
+    box-shadow: none;
+    height: 30px;
+    background: none;
+    border-radius: 3px;
+    &:hover, &:focus {
+      background-color: #F2F4F6;
+    }
   }
-
-  &:last-child .color-tag {
-    border-bottom-left-radius: 2px;
+  .ig-title {
+    background: none;
+    font-weight: normal;
+    top: 4px;
   }
-}
-
-.color-tag {
-  display: inline-block;
-  height: 100%;
-  width: 4px;
+  .ig-details {
+    top: 4px;
+  }
 }
 
 .agenda-actions {
@@ -249,6 +270,21 @@ body {
     line-height: 24px;
     .undated_event_title {
       color: inherit;
+    }
+  }
+}
+
+.ig-row {
+  cursor: pointer;
+  border-bottom: none;
+  border-top: none;
+  .icon-settings {
+    color: #bbb;
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    &:hover {
+      color: #444;
     }
   }
 }

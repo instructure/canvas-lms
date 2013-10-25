@@ -788,6 +788,20 @@ describe "calendar2" do
         wait_for_ajaximations
         f('.navigation_title').should_not include_text('Invalid')
       end
+
+      it "should allow editing events" do
+        tomorrow = 1.day.from_now
+        event = make_event(start: tomorrow)
+        get "/calendar2"
+        wait_for_ajaximations
+        f('label[for=agenda]').click
+        wait_for_ajaximations
+        f('.ig-row').click()
+        f('.event-details .delete_event_link').click()
+        fj('.ui-dialog:visible .btn-primary').click()
+        wait_for_ajaximations
+        ffj('.ig-row').length.should == 0
+      end
     end
   end
 
