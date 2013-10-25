@@ -7,7 +7,8 @@ describe "calendar2" do
   before (:each) do
     Account.default.tap do |a|
       a.settings[:enable_scheduler] = true
-      a.settings[:show_scheduler] = true
+      a.settings[:show_scheduler]   = true
+      a.settings[:agenda_view]      = true
       a.save!
     end
   end
@@ -217,7 +218,9 @@ describe "calendar2" do
         account = Account.default.tap { |a| a.settings[:show_scheduler] = false; a.save! }
         get "/calendar2"
         wait_for_ajaximations
-        ff(".calendar_view_buttons .ui-button").length.should == 2
+        ff('.calendar_view_buttons .ui-button').each do |button|
+          button.text.should_not match(/scheduler/i)
+        end
       end
 
       it "should drag and drop an event" do
@@ -587,24 +590,6 @@ describe "calendar2" do
         end
       end
 
-
-      it "should change event duration by dragging" do
-        noon = Time.now.utc.at_beginning_of_day + 12.hours
-        #expecting time in UTC
-        event = @course.calendar_events.create! :title => "ohai", :start_at => noon, :end_at => noon + 1.hour
-        get "/calendar2"
-        wait_for_ajaximations
-        f('label[for=week]').click
-        wait_for_ajaximations
-        resize_handle = fj('.fc-event:visible .ui-resizable-handle')
-        driver.action.drag_and_drop_by(resize_handle, 0, 50).perform
-        wait_for_ajaximations
-        # dragging it 50px will make it one hour longer, a 2 hour event is 80px tall
-        fj('.fc-event:visible').size.height.should == 80
-        event.reload
-        event.end_at.should == noon + 2.hours
-      end
-
       it "should show short events at full height" do
         noon = Time.now.at_beginning_of_day + 12.hours
         event = @course.calendar_events.create! :title => "ohai", :start_at => noon, :end_at => noon + 5.minutes
@@ -858,13 +843,13 @@ describe "calendar2" do
         get "/courses/#{@course.id}/calendar_events/#{event.id}?calendar=1"
         wait_for_ajaximations
         fj('.calendar_header .navigation_title').text.should == 'Julio 2012'
-        fj('#calendar-app .fc-sun').text.should == 'Domingo'
-        fj('#calendar-app .fc-mon').text.should == 'Lunes'
-        fj('#calendar-app .fc-tue').text.should == 'Martes'
-        fj('#calendar-app .fc-wed').text.should == 'Miercoles'
-        fj('#calendar-app .fc-thu').text.should == 'Jueves'
-        fj('#calendar-app .fc-fri').text.should == 'Viernes'
-        fj('#calendar-app .fc-sat').text.should == 'Sabado'
+        fj('#calendar-app .fc-sun').text.should == 'DOM'
+        fj('#calendar-app .fc-mon').text.should == 'LUN'
+        fj('#calendar-app .fc-tue').text.should == 'MAR'
+        fj('#calendar-app .fc-wed').text.should == 'MIE'
+        fj('#calendar-app .fc-thu').text.should == 'JUE'
+        fj('#calendar-app .fc-fri').text.should == 'VIE'
+        fj('#calendar-app .fc-sat').text.should == 'SAB'
       end
     end
 
@@ -877,13 +862,6 @@ describe "calendar2" do
         # Get the spanish text for the current month/year
         expect_month_year = I18n.l(Date.today, :format => '%B %Y', :locale => 'es')
         fj('#minical h2').text.should == expect_month_year
-        fj('#minical .fc-sun').text.should == 'Dom'
-        fj('#minical .fc-mon').text.should == 'Lun'
-        fj('#minical .fc-tue').text.should == 'Mar'
-        fj('#minical .fc-wed').text.should == 'Mie'
-        fj('#minical .fc-thu').text.should == 'Jue'
-        fj('#minical .fc-fri').text.should == 'Vie'
-        fj('#minical .fc-sat').text.should == 'Sab'
       end
     end
   end
