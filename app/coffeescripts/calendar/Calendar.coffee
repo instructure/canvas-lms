@@ -579,10 +579,12 @@ define [
       $('.agenda-wrapper').removeClass('active')
       @header.showNavigator()
       @header.showPrevNext()
+      @header.hideAgendaRecommendation()
       if view != 'scheduler' and view != 'agenda'
         @calendar.removeClass('scheduler-mode').removeClass('agenda-mode')
         @displayAppointmentEvents = null
         @scheduler.hide()
+        @header.showAgendaRecommendation()
         @calendar.show()
         @schedulerNavigator.hide()
         @calendar.fullCalendar('refetchEvents')

@@ -1,4 +1,9 @@
 <div class="calendar_header header-table">
+  <div class="recommend_agenda screenreader-only">
+    {{#if showAgenda}}
+    <button id="use_agenda">{{#t "links.screenreader_recommend_agenda"}}Screenreader users: Use the Agenda to view events{{/t}}</button>
+    {{/if}}
+  </div>
   <div class="header-table-row">
     <div class="header-table-cell header-table-left">
       <div class="calendar_navigator"></div>
