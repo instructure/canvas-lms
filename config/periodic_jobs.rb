@@ -124,6 +124,11 @@ Delayed::Periodic.cron 'Ignore.cleanup', '45 23 * * *' do
   end
 end
 
+Delayed::Periodic.cron 'MessageScrubber.scrub_all', '0 0 * * *' do
+  scrubber = MessageScrubber.new
+  scrubber.scrub_all
+end
+
 Dir[Rails.root.join('vendor', 'plugins', '*', 'config', 'periodic_jobs.rb')].each do |plugin_periodic_jobs|
   require plugin_periodic_jobs
 end
