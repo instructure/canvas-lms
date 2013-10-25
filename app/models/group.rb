@@ -396,7 +396,7 @@ class Group < ActiveRecord::Base
   end
 
   def users_visible_to(user)
-    grants_rights?(user, :read) ? users : users.where("?", false)
+    grants_rights?(user, :read) ? users : users.none
   end
 
   # Helper needed by several permissions, use grants_right?(user, :participate)

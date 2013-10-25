@@ -483,12 +483,12 @@ class Course < ActiveRecord::Base
   }
   scope :by_teachers, lambda { |teacher_ids|
     teacher_ids.empty? ?
-      where("?", false) :
+      none :
       where("EXISTS (#{Enrollment.active.select("1").where("enrollments.course_id=courses.id AND enrollments.type='TeacherEnrollment' AND enrollments.user_id IN (?)", teacher_ids).to_sql})")
   }
   scope :by_associated_accounts, lambda{ |account_ids|
     account_ids.empty? ?
-      where("?", false) :
+      none :
       where("EXISTS (#{CourseAccountAssociation.select("1").where("course_account_associations.course_id=courses.id AND course_account_associations.account_id IN (?)", account_ids).to_sql})")
   }
 
@@ -2332,7 +2332,7 @@ class Course < ActiveRecord::Base
       when :full, :limited then scope
       when :sections then scope.where("enrollments.course_section_id IN (?) OR (enrollments.limit_privileges_to_course_section=? AND enrollments.type IN ('TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment'))", visibilities.map{|s| s[:course_section_id]}, false)
       when :restricted then scope.where(:enrollments => { :user_id  => visibilities.map{|s| s[:associated_user_id]}.compact + [user] })
-      else scope.where("?", false)
+      else scope.none
     end
   end
 
@@ -2345,7 +2345,7 @@ class Course < ActiveRecord::Base
       when :sections then scope.where(:enrollments => { :course_section_id => visibilities.map {|s| s[:course_section_id] } })
       when :restricted then scope.where(:enrollments => { :user_id => (visibilities.map { |s| s[:associated_user_id] }.compact + [user]) })
       when :limited then scope.where("enrollments.type IN ('StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment', 'StudentViewEnrollment')")
-      else scope.where("?", false)
+      else scope.none
     end
   end
 
@@ -2363,7 +2363,7 @@ class Course < ActiveRecord::Base
       sections.where(:id => section_ids)
     else
       # return an empty set, but keep it as a scope for downstream consistency
-      sections.where("?", false)
+      sections.none
     end
   end
 

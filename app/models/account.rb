@@ -362,7 +362,7 @@ class Account < ActiveRecord::Base
   end
 
   def users_visible_to(user)
-    self.grants_right?(user, nil, :read) ? self.all_users : self.all_users.where("?", false)
+    self.grants_right?(user, nil, :read) ? self.all_users : self.all_users.none
   end
 
   def users_name_like(query="")

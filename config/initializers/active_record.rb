@@ -777,6 +777,14 @@ class ActiveRecord::Base
       connection.bulk_insert(table_name, records)
     end
   end
+
+  if Rails.version < '4'
+    if CANVAS_RAILS3
+      scope :none, lambda { where("?", false) }
+    else
+      named_scope :none, lambda { where("?", false) }
+    end
+  end
 end
 
 ActiveRecord::ConnectionAdapters::AbstractAdapter.class_eval do
