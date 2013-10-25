@@ -574,6 +574,7 @@ class FilesController < ApplicationController
     end
 
     @attachment.context = @context
+    @attachment.user = @current_user
     if authorized_action(permission_object, @current_user, permission)
       if @context.respond_to?(:is_a_context?) && @check_quota
         get_quota

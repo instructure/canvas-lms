@@ -549,6 +549,7 @@ describe FilesController do
       response.should be_success
       assigns[:attachment].should_not be_nil
       assigns[:attachment].id.should_not be_nil
+      assigns[:attachment][:user_id].should_not be_nil
       json = json_parse
       json.should_not be_nil
       json['id'].should eql(assigns[:attachment].id)
@@ -567,6 +568,7 @@ describe FilesController do
       response.should be_success
       assigns[:attachment].should_not be_nil
       assigns[:attachment].id.should_not be_nil
+      assigns[:attachment][:user_id].should_not be_nil
       json = json_parse
       json.should_not be_nil
       json['id'].should eql(assigns[:attachment].id)
