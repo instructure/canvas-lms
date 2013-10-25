@@ -34,7 +34,24 @@ require [
     ok @container.find('.ig-row').length == 18
 
     # should bin results by day
-    ok @container.find('.agenda-date').length == 9
+    dates = @container.find('.agenda-date')
+    ok dates.length == 10
+
+    # the bins should be sorted properly
+    textDates = _.map(dates, (d) -> d.innerText)
+    console.log(textDates)
+    ok _.isEqual(textDates, [
+      "Mon, Oct 7"
+      "Tue, Oct 8"
+      "Wed, Oct 9"
+      "Thu, Oct 10"
+      "Fri, Oct 11"
+      "Sat, Oct 12"
+      "Mon, Oct 14"
+      "Wed, Oct 16"
+      "Fri, Oct 18"
+      "Fri, Nov 1"
+    ])
 
     # should not show "load more" if there are no more pages
     ok !@container.find('.agenda-load-btn').length
