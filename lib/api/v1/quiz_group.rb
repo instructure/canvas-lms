@@ -41,6 +41,10 @@ module Api::V1::QuizGroup
       )
   }
 
+  def quiz_groups_compound_json(quiz_groups, context, user, session)
+    { quiz_groups: quiz_groups_json(quiz_groups, context, user, session) }
+  end
+
   def quiz_groups_json(quiz_groups, context, user, session)
     quiz_groups.map do |quiz_group|
       quiz_group_json(quiz_group, context, user, session)

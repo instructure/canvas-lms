@@ -2525,7 +2525,8 @@ define([
       success: function(data) {
         var $form = $(this);
         var $group = $form.parents(".group_top");
-        var group = data;
+        var groups = data.quiz_groups;
+        var group = groups[0];
         $form.loadingImage('remove');
         $group.removeClass('editing');
         $group.fillTemplateData({

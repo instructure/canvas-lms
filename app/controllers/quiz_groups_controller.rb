@@ -81,6 +81,8 @@ class QuizGroupsController < ApplicationController
   #
   # Create a new question group for this quiz
   #
+  # <b>201 Created</b> response code is returned if the creation was successful.
+  #
   # @argument quiz_group[name] [Optional, String]
   #   The name of the question group.
   #
@@ -93,7 +95,10 @@ class QuizGroupsController < ApplicationController
   # @argument quiz_group[assessment_question_bank_id] [Optional, Integer]
   #   The id of the assessment question bank to pull questions from.
   #
-  # @returns QuizGroup
+  # @example_response
+  #  {
+  #    "quiz_groups": [QuizGroup]
+  #  }
   def create
     if authorized_action(@quiz, @current_user, :update)
       @quiz.did_edit if @quiz.created?
@@ -104,7 +109,8 @@ class QuizGroupsController < ApplicationController
 
       @group = @quiz.quiz_groups.build
       if update_api_quiz_group(@group, params[:quiz_group])
-        render :json => quiz_group_json(@group, @context, @current_user, session)
+        render :json   => quiz_groups_compound_json([@group], @context, @current_user, session),
+               :status => :created
       else
         render :json => @group.errors, :status => :bad_request
       end
@@ -114,7 +120,7 @@ class QuizGroupsController < ApplicationController
   # @API Update a question group
   # @beta
   #
-  # Update a new question group
+  # Update a question group
   #
   # @argument quiz_group[name] [Optional, String]
   #   The name of the question group.
@@ -125,7 +131,10 @@ class QuizGroupsController < ApplicationController
   # @argument quiz_group[question_points] [Optional, Integer]
   #   The number of points to assign to each question in the group.
   #
-  # @returns QuizGroup
+  # @example_response
+  #  {
+  #    "quiz_groups": [QuizGroup]
+  #  }
   def update
     if authorized_action(@quiz, @current_user, :update)
       @group = @quiz.quiz_groups.find(params[:id])
@@ -135,18 +144,25 @@ class QuizGroupsController < ApplicationController
       params[:quiz_group].delete(:position) # position is taken care of in reorder
 
       if update_api_quiz_group(@group, params[:quiz_group])
-        render :json => quiz_group_json(@group, @context, @current_user, session)
+        render :json => quiz_groups_compound_json([@group], @context, @current_user, session)
       else
         render :json => @group.errors, :status => :bad_request
       end
     end
   end
 
+  # @API Delete a question group
+  # @beta
+  #
+  # Delete a question group
+  #
+  # <b>204 No Content<b> response code is returned if the deletion was successful.
   def destroy
     if authorized_action(@quiz, @current_user, :update)
       @group = @quiz.quiz_groups.find(params[:id])
       @group.destroy
-      render :json => @group
+
+      head :no_content
     end
   end
 

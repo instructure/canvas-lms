@@ -26,7 +26,8 @@ describe QuizGroupsController, :type => :integration do
     def api_create_quiz_group(quiz_group_params, opts={})
       api_call(:post, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/groups",
               {:controller=>"quiz_groups", :action => "create", :format => "json", :course_id => "#{@course.id}", :quiz_id => "#{@quiz.id}"},
-              {:quiz_group => quiz_group_params}, {}, opts)
+              {:quiz_group => quiz_group_params},
+              {'Accept' => 'application/vnd.api+json'}, opts)
     end
 
     before do
@@ -71,7 +72,8 @@ describe QuizGroupsController, :type => :integration do
 
       api_call(:put, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/groups/#{@group.id}",
               {:controller=>"quiz_groups", :action => "update", :format => "json", :course_id => "#{@course.id}", :quiz_id => "#{@quiz.id}", :id => "#{@group.id}"},
-              {:quiz_group => quiz_group_params}, {}, opts)
+              {:quiz_group => quiz_group_params},
+              {'Accept' => 'application/vnd.api+json'}, opts)
     end
 
     before do
@@ -105,4 +107,20 @@ describe QuizGroupsController, :type => :integration do
     end
 
   end
+
+  describe "DELETE /courses/:course_id/quizzes/:quiz_id/groups/:id (destroy)" do
+    before do
+      teacher_in_course(:active_all => true)
+      @quiz  = @course.quizzes.create! :title => 'title'
+      @group = @quiz.quiz_groups.create :name => 'Test Group'
+    end
+
+    it "deletes a quiz group" do
+      api_call(:delete, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/groups/#{@group.id}",
+              {:controller=>"quiz_groups", :action => "destroy", :format => "json", :course_id => "#{@course.id}", :quiz_id => "#{@quiz.id}", :id => "#{@group.id}"}, 
+              {}, {'Accept' => 'application/vnd.api+json'})
+      Group.exists?(@group.id).should be_false
+    end
+  end
+
 end
