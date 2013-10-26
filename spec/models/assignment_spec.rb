@@ -2172,6 +2172,18 @@ describe Assignment do
       }.should be_true
     end
 
+    it "doesn't include quiz_submissions when there are too many attempts" do
+      course_with_teacher :active_all => true
+      student_in_course
+      quiz_with_graded_submission [], :course => @course, :user => @student
+      Setting.set('too_many_quiz_submission_versions', 3)
+      3.times {
+        @quiz_submission.versions.create!
+      }
+      json = @quiz.assignment.speed_grader_json(@teacher)
+      json[:submissions].all? { |s| s["submission_history"].size.should == 1 }
+    end
+
     it "returns quiz lateness correctly" do
       course_with_teacher(:active_all => true)
       student_in_course

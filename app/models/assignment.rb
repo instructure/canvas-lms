@@ -1122,7 +1122,26 @@ class Assignment < ActiveRecord::Base
     res[:context][:enrollments] = context.enrollments_visible_to(user).
         map{|s| s.as_json(:include_root => false, :only => [:user_id, :course_section_id]) }
     res[:context][:quiz] = self.quiz.as_json(:include_root => false, :only => [:anonymous_submissions])
-    res[:submissions] = submissions.where(:user_id => students).map do |sub|
+
+
+    submissions = self.submissions.where(:user_id => students)
+                  .includes(:submission_comments,
+                            :attachments,
+                            :versions,
+                            {:quiz_submission => :versions})
+
+    # quiz submission versions are too expensive to de-serialize so we have to
+    # cap the number we will do
+    qs_threshold = Setting.get("too_many_quiz_submission_versions", "150").to_i
+    too_many_qs_versions = qs_threshold <= submissions.inject(0) { |sum,s|
+      if s.quiz_submission
+        sum + s.quiz_submission.versions.size
+      else
+        sum
+      end
+    }
+
+    res[:submissions] = submissions.map do |sub|
       json = sub.as_json(:include_root => false,
         :include => {
           :submission_comments => {
@@ -1136,7 +1155,7 @@ class Assignment < ActiveRecord::Base
         :methods => [:scribdable?, :scribd_doc, :submission_history, :late],
         :only => submission_fields
       )
-      json['submission_history'] = if json['submission_history'] && quiz.nil?
+      json['submission_history'] = if json['submission_history'] && (quiz.nil? || too_many_qs_versions)
                                      json['submission_history'].map do |version|
                                        version.as_json(
                                          :include => {
