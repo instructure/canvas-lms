@@ -139,6 +139,37 @@ describe UserMerge do
       user1.enrollments.should be_empty
     end
 
+    it "should remove conflicting module progressions" do
+      course1.enroll_user(user1)
+      course1.enroll_user(user2, 'StudentEnrollment', enrollment_state:'active')
+      assignment = course1.assignments.create!(title:"some assignment")
+      assignment2 = course1.assignments.create!(title:"some second assignment")
+      context_module = course1.context_modules.create!(name:"some module")
+      context_module2 = course1.context_modules.create!(name:"some second module")
+      tag = context_module.add_item(id:assignment, type:'assignment')
+      tag2 = context_module2.add_item(id:assignment2, type:'assignment')
+
+      context_module.completion_requirements = {tag.id => {type:'must_view'}}
+      context_module2.completion_requirements = {tag2.id => {type:'min_score', min_score:5}}
+      context_module.save
+      context_module2.save
+
+      #have a conflicting module_progrssion
+      assignment2.grade_student(user1, :grade => "10")
+      assignment2.grade_student(user2, :grade => "4")
+
+      #have a duplicate module_progression
+      context_module.update_for(user1, :read, tag)
+      context_module.update_for(user2, :read, tag)
+
+      #it should work
+      expect { UserMerge.from(user1).into(user2) }.to_not raise_error
+
+      #it should have deleted or moved the module progressions for User1 and kept the completed ones for user2
+      ContextModuleProgression.where(user_id:user1, context_module_id:[context_module, context_module2]).count.should == 0
+      ContextModuleProgression.where(user_id:user2, context_module_id:[context_module, context_module2],workflow_state:'completed').count.should == 2
+    end
+
     it "should move and uniquify observee enrollments" do
       course2
       enrollment1 = course1.enroll_user(user1)
