@@ -1148,6 +1148,24 @@ describe CoursesController, :type => :integration do
           }
         ]
       end
+
+      context "sharding" do
+        specs_require_sharding
+
+        it "should load the user's enrollment for an out-of-shard user" do
+          @shard1.activate { @user = User.create!(name: 'outofshard') }
+          enrollment = @course1.enroll_student(@user)
+          @course1.root_account.pseudonyms.create!(user: @user, unique_id: 'outofshard')
+
+          json = api_call(:get, api_url, api_route, search_term: 'outofshard', include: ['enrollments'])
+
+          json.length.should == 1
+          json.first['id'].should == @user.id
+          json.first['enrollments'].should be_present
+          json.first['enrollments'].length.should == 1
+          json.first['enrollments'].first['id'].should == enrollment.id
+        end
+      end
     end
 
     describe "/users" do
