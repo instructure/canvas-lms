@@ -89,6 +89,8 @@ class UserMerge
       from_user.communication_channels.update_all(["user_id=?, position=position+?", target_user, max_position]) unless from_user.communication_channels.empty?
     end
 
+    destroy_conflicting_module_progressions(@from_user, target_user)
+
     Shard.with_each_shard(from_user.associated_shards + from_user.associated_shards(:weak) + from_user.associated_shards(:shadow)) do
       max_position = Pseudonym.where(:user_id => target_user).order(:position).last.try(:position) || 0
       Pseudonym.where(:user_id => from_user).update_all(["user_id=?, position=position+?", target_user, max_position])
@@ -190,7 +192,7 @@ class UserMerge
           scope = scope.where("#{unique_id} NOT IN (?)", already_there_ids) unless already_there_ids.empty?
           scope.update_all(:user_id => target_user)
         rescue => e
-          logger.error "migrating #{table} column user_id failed: #{e.to_s}"
+          Rails.logger.error "migrating #{table} column user_id failed: #{e.to_s}"
         end
       end
       from_user.all_conversations.find_each{ |c| c.move_to_user(target_user) } unless Shard.current != target_user.shard
@@ -216,7 +218,7 @@ class UserMerge
             klass.where(column => from_user).update_all(column => target_user.id)
           end
         rescue => e
-          logger.error "migrating #{table} column #{column} failed: #{e.to_s}"
+          Rails.logger.error "migrating #{table} column #{column} failed: #{e.to_s}"
         end
       end
 
@@ -242,6 +244,40 @@ class UserMerge
     from_user.reload
     target_user.touch
     from_user.destroy
+  end
+
+  def destroy_conflicting_module_progressions(from_user, target_user)
+    # there is a unique index on the context_module_progressions table
+    # we need to delete all the conflicting context_module_progressions
+    # without impacting the users module progress and without having to
+    # recalculate the progressions.
+
+    # delete all matching duplicates
+    ContextModuleProgression.
+      where("context_module_progressions.user_id = ?", from_user.id).
+      where("EXISTS (SELECT *
+                     FROM context_module_progressions cmp2
+                     WHERE context_module_progressions.context_module_id=cmp2.context_module_id
+                       AND cmp2.user_id = ?
+                       AND cmp2.workflow_state = context_module_progressions.workflow_state)", target_user.id).delete_all
+
+    # find all the modules that are left and then delete the most restrictive
+    # context_module_progression
+    ContextModuleProgression.
+      where("context_module_progressions.user_id = ?", from_user.id).
+      where("EXISTS (SELECT *
+                     FROM context_module_progressions cmp2
+                     WHERE context_module_progressions.context_module_id=cmp2.context_module_id
+                       AND cmp2.user_id = ?)", target_user.id).find_each do |cmp|
+
+      ContextModuleProgression.
+        where(context_module_id: cmp.context_module_id, user_id: [from_user, target_user]).
+        order("CASE WHEN workflow_state = 'Completed' THEN 0
+                    WHEN workflow_state = 'Started' THEN 1
+                    WHEN workflow_state = 'Unlocked' THEN 2
+                    WHEN workflow_state = 'Locked' THEN 3
+                END DESC").first.destroy
+    end
   end
 
 end
