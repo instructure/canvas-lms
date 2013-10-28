@@ -82,8 +82,7 @@ module Canvas::AccountReports
       end
       filetype = 'application/zip'
     elsif csv
-      require 'action_controller'
-      require 'action_controller/test_process.rb'
+      require 'action_controller_test_process'
       ext = csv !~ /\n/ && File.extname(csv)
       case ext
         when ".csv"

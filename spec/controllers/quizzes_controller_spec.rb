@@ -258,8 +258,7 @@ describe QuizzesController do
     end
 
     it "assigns js_env for attachments if submission is present" do
-      require 'action_controller'
-      require 'action_controller/test_process.rb'
+      require 'action_controller_test_process'
       course_with_student_logged_in :active_all => true
       course_quiz !!:active
       submission = @quiz.generate_submission @user
@@ -273,8 +272,7 @@ describe QuizzesController do
     end
 
     it "assigns js_env for versions if submission is present" do
-      require 'action_controller'
-      require 'action_controller/test_process.rb'
+      require 'action_controller_test_process'
       course_with_student_logged_in :active_all => true
       course_quiz !!:active
       submission = @quiz.generate_submission @user

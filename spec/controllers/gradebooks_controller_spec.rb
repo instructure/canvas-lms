@@ -418,8 +418,7 @@ describe GradebooksController do
       course_with_teacher_logged_in(:active_all => true)
       @assignment = @course.assignments.create!(:title => "some assignment")
       @student = @course.enroll_user(User.create!(:name => "some user"))
-      require 'action_controller'
-      require 'action_controller/test_process.rb'
+      require 'action_controller_test_process'
       data = ActionController::TestUploadedFile.new(File.join(File.dirname(__FILE__), "/../fixtures/scribd_docs/doc.doc"), "application/msword", true)
       post 'update_submission', :course_id => @course.id, :attachments => {"0" => {:uploaded_data => data}}, :submission => {:comment => "some comment", :assignment_id => @assignment.id, :user_id => @student.user_id}
       response.should be_redirect

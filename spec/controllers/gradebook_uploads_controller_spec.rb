@@ -32,8 +32,7 @@ describe GradebookUploadsController do
       file = Tempfile.new("csv.csv")
       file.puts("not a good csv")
       file.close
-      require 'action_controller'
-      require 'action_controller/test_process.rb'
+      require 'action_controller_test_process'
       data = ActionController::TestUploadedFile.new(file.path, 'text/csv', true)
       post 'create', :course_id => @course.id, :gradebook_upload => {:uploaded_data => data}
       response.should be_redirect
@@ -136,8 +135,7 @@ describe GradebookUploadsController do
     file = Tempfile.new("csv.csv")
     file.puts(@course.gradebook_to_csv(:include_sis_id => include_sis_id))
     file.close
-    require 'action_controller'
-    require 'action_controller/test_process.rb'
+    require 'action_controller_test_process'
     data = ActionController::TestUploadedFile.new(file.path, 'text/csv', true)
     post 'create', :course_id => @course.id, :gradebook_upload => {:uploaded_data => data}
     response.should be_success

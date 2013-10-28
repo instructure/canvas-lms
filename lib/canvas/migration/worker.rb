@@ -16,9 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'action_controller'
-# XXX: Rails3 doesn't have ActionController::TestUploadedFile, time to fix this
-require 'action_controller/test_process.rb' if CANVAS_RAILS2
+require 'action_controller_test_process'
 
 module Canvas::Migration::Worker
   def self.get_converter(settings)

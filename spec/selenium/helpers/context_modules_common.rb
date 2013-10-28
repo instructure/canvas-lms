@@ -1,8 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../common')
 
   def io
-    require 'action_controller'
-    require 'action_controller/test_process.rb'
+    require 'action_controller_test_process'
     ActionController::TestUploadedFile.new(File.expand_path(File.dirname(__FILE__) + '/../fixtures/scribd_docs/txt.txt'), 'text/plain', true)
   end
 

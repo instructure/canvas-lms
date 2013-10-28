@@ -210,8 +210,7 @@ describe QuizStatistics::StudentAnalysis do
   end
 
   it "includes attachment display names for quiz file upload questions" do
-    require 'action_controller'
-    require 'action_controller/test_process.rb'
+    require 'action_controller_test_process'
     student_in_course(:active_all => true)
     student = @student
     student.name = "Not Steve"
