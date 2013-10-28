@@ -193,11 +193,11 @@ Rails.configuration.to_prepare do
         },
         :start_at => {
           :required => true,
-          :description => 'The beginning date for submissions'
+          :description => 'The beginning date for submissions. Max time range is 2 weeks.'
         },
         :end_at => {
           :required => true,
-          :description => 'The end date for submissions'
+          :description => 'The end date for submissions. Max time range is 2 weeks.'
         }
       }
     },

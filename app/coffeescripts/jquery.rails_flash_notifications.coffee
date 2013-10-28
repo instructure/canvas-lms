@@ -20,7 +20,7 @@ define [
 
   flashBox = (type, content, timeout, cssOptions = {}) ->
     $node = $("""
-      <li class="ui-state-#{type}" role="alert">
+      <li class="ic-flash-#{type}" role="alert">
         <i></i>
         #{content}
         <a href="#" class="close_link icon-end">#{I18n.t("close", "Close")}</a>

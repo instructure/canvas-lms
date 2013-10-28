@@ -288,7 +288,7 @@ class QuizStatistics::StudentAnalysis < QuizStatistics::Report
         [qs.latest_submitted_version].compact
     }.flatten.
       select{ |s| s && s.completed? && s.submission_data.is_a?(Array) }.
-      sort { |a,b| b.updated_at <=> a.updated_at }
+      sort_by(&:updated_at).reverse
   end
 
   def strip_html_answers(question)

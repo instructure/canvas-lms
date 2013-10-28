@@ -68,8 +68,9 @@
       </td><td style="vertical-align: top; padding-top: 0.5em; text-align: right; width: 40px;">
         <div class="question_actions">
           <% edit_html_text = t('titles.edit_as_html', "Toggle editing answer text as HTML") %>
-          <a href="#" class="edit_html" title="<%= edit_html_text %>"><i class="icon-edit standalone-icon"></i></a>
-          <a href="#" class="delete_answer_link" title="<%= t('titles.delete_answer', "Delete this Answer") %>"><i class="icon-trash standalone-icon"></i></a>
+          <% delete_html_text = t('titles.delete_answer', "Delete this Answer") %>
+          <a href="#" class="edit_html" title="<%= edit_html_text %>"><i class="icon-edit standalone-icon"><span class="screenreader-only"><%= edit_html_text %></span></i></a>
+          <a href="#" class="delete_answer_link" title="<%= delete_html_text %>"><i class="icon-trash standalone-icon"><span class="screenreader-only"><%= delete_html_text %></span></i></a>
         </div>
       </td>
     </tr>

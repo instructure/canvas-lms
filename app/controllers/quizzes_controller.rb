@@ -34,7 +34,7 @@ class QuizzesController < ApplicationController
   def index
     if authorized_action(@context, @current_user, :read)
       return unless tab_enabled?(@context.class::TAB_QUIZZES)
-      @quizzes = @context.quizzes.active.include_assignment.sort_by{|q| [(q.assignment ? q.assignment.due_at : q.lock_at) || Time.parse("Jan 1 2020"), q.title || ""]}
+      @quizzes = @context.quizzes.active.include_assignment.sort_by{|q| [(q.assignment ? q.assignment.due_at : q.lock_at) || SortLast, Canvas::ICU.collation_key(q.title || SortFirst)]}
 
       # draft state - only filter by available? for students
       if @context.draft_state_enabled?
@@ -254,6 +254,7 @@ class QuizzesController < ApplicationController
       hash = { :QUIZZES_URL => polymorphic_url([@context, :quizzes]),
              :IS_SURVEY => @quiz.survey?,
              :QUIZ => quiz_json(@quiz,@context,@current_user,session),
+             :COURSE_ID => @context.id,
              :LOCKDOWN_BROWSER => @quiz.require_lockdown_browser?,
              :ATTACHMENTS => Hash[@attachments.map { |_,a| [a.id,attachment_hash(a)]}],
              :CONTEXT_ACTION_SOURCE => :quizzes  }
@@ -368,7 +369,7 @@ class QuizzesController < ApplicationController
         end
         @account = @account.parent_account
       end
-      render :json => @filters.to_json
+      render :json => @filters
     end
   end
 
@@ -515,10 +516,10 @@ class QuizzesController < ApplicationController
       end
       @quiz.did_edit if @quiz.created?
       @quiz.reload
-      render :json => @quiz.to_json(:include => {:assignment => {:include => :assignment_group}})
+      render :json => @quiz.as_json(:include => {:assignment => {:include => :assignment_group}})
     end
   rescue
-    render :json => @quiz.errors.to_json, :status => :bad_request
+    render :json => @quiz.errors, :status => :bad_request
   end
 
   def update
@@ -587,14 +588,14 @@ class QuizzesController < ApplicationController
         end
         flash[:notice] = t('notices.quiz_updated', "Quiz successfully updated")
         format.html { redirect_to named_context_url(@context, :context_quiz_url, @quiz) }
-        format.json { render :json => @quiz.to_json(:include => {:assignment => {:include => :assignment_group}}) }
+        format.json { render :json => @quiz.as_json(:include => {:assignment => {:include => :assignment_group}}) }
       end
     end
   rescue
     respond_to do |format|
       flash[:error] = t('errors.quiz_update_failed', "Quiz failed to update")
       format.html { redirect_to named_context_url(@context, :context_quiz_url, @quiz) }
-      format.json { render :json => @quiz.errors.to_json, :status => :bad_request }
+      format.json { render :json => @quiz.errors, :status => :bad_request }
     end
   end
 
@@ -603,10 +604,10 @@ class QuizzesController < ApplicationController
       respond_to do |format|
         if @quiz.destroy
           format.html { redirect_to course_quizzes_url(@context) }
-          format.json { render :json => @quiz.to_json }
+          format.json { render :json => @quiz }
         else
           format.html { redirect_to course_quiz_url(@context, @quiz) }
-          format.json { render :json => @quiz.errors.to_json }
+          format.json { render :json => @quiz.errors }
         end
       end
     end
@@ -624,7 +625,7 @@ class QuizzesController < ApplicationController
       @submissions = @quiz.quiz_submissions.updated_after(last_updated_at).for_user_ids(@students.map(&:id))
       respond_to do |format|
         format.html
-        format.json { render :json => @submissions.to_json(:include_root => false, :except => [:submission_data, :quiz_data], :methods => ['extendable?', :finished_in_words, :attempts_left]) }
+        format.json { render :json => @submissions.map{ |s| s.as_json(include_root: false, except: [:submission_data, :quiz_data], methods: ['extendable?', :finished_in_words, :attempts_left]) }}
       end
     end
   end

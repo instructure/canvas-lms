@@ -24,8 +24,7 @@
             <%= no_submitted_students_msg(@quiz) %>
           <% elsif student.present? && submission.present? %>
             <% if submission.pending_review? %>
-              <% warn_msg = t('titles.submission_needs_review', "This submission needs review") %>
-              <i class="icon-warning" title="<%= warn_msg %>"></i>
+              <i class="icon-warning"><span class="screenreader-only"><%= t('titles.submission_needs_review', "This submission needs review") %></span></i>
             <% end %>
           <a href="<%= polymorphic_path([@context, @quiz, :history], :quiz_submission_id => submission.id) %>" class="name">
             <% if @quiz.anonymous_survey? %>

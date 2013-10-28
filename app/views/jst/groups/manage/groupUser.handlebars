@@ -1,4 +1,4 @@
-<div class="group-user-name" title="{{name}}">{{name}}</div>
+<div class="group-user-name ellipsis" title="{{name}}">{{name}}</div>
 {{#if canAssignToGroup}}
   <a href="#" data-user-id="{{id}}" 
      class="assign-to-group" 
@@ -6,5 +6,14 @@
      aria-label="{{#t "assign_to_group"}}Assign to Group{{/t}}"
   >
     <i class="icon-plus"></i>
+  </a>
+{{/if}}
+{{#if canRemoveFromGroup}}
+  <a href="#" data-user-id="{{id}}"
+     class="remove-from-group"
+     title="{{#t "remove_from_group"}}Remove from Group{{/t}}"
+     aria-label="{{#t "remove_from_group"}}Remove from Group{{/t}}"
+  >
+    <i class="icon-x"></i>
   </a>
 {{/if}}

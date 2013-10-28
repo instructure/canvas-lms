@@ -76,6 +76,14 @@ require [
         trigger = $("##{btn}")
       @compose.show(@detail.model, to: type, trigger: trigger, message: message)
 
+    onArchive: =>
+      state = if @detail.model.get('workflow_state') == 'archived' then 'read' else 'archived'
+      @detail.model.save(workflow_state: state)
+      @header.onArchivedStateChange(@detail.model)
+      if @filters.type == 'inbox' || @filters.type == 'archived'
+        @list.collection.remove(@detail.model)
+        @selectConversation(null)
+
     onDelete: =>
       return unless confirm(@messages.confirmDelete)
       @detail.model.destroy()
@@ -107,6 +115,7 @@ require [
     onForward: (message) =>
       model = if message
         model = @detail.model.clone()
+        model.handleMessages()
         model.set 'messages', _.filter model.get('messages'), (m) ->
           m.id == message.id or (_.include(m.participating_user_ids, message.author_id) and m.created_at < message.created_at)
         trigger = $(".message-item-view[data-id=#{message.id}] .al-trigger")
@@ -160,6 +169,7 @@ require [
       @header.on('compose',     @onCompose)
       @header.on('reply',       @onReply)
       @header.on('reply-all',   @onReplyAll)
+      @header.on('archive',     @onArchive)
       @header.on('delete',      @onDelete)
       @header.on('filter',      @onFilter)
       @header.on('course',      @onCourse)

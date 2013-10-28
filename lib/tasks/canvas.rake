@@ -153,6 +153,20 @@ namespace :canvas do
    end
 end
 
+namespace :lint do
+  desc "lint controllers for bad render json calls."
+  task :render_json do
+    output = `script/render_json_lint`
+    exit_status = $?.exitstatus
+    puts output
+    if exit_status != 0
+      raise "lint:render_json test failed"
+    else
+      puts "lint:render_json test succeeded"
+    end
+  end
+end
+
 namespace :db do
   desc "Shows pending db migrations."
   task :pending_migrations => :environment do

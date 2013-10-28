@@ -210,7 +210,7 @@ describe "speed grader" do
     @association.save!
 
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-    wait_for_animations
+    wait_for_ajaximations
 
     #test opening and closing rubric
     keep_trying_until do
@@ -218,7 +218,7 @@ describe "speed grader" do
       f('#rubric_full').should be_displayed
     end
     f('#rubric_holder .hide_rubric_link').click
-    wait_for_animations
+    wait_for_ajaximations
     f('#rubric_full').should_not be_displayed
     f('.toggle_full_rubric').click
     rubric = f('#rubric_full')
@@ -245,7 +245,7 @@ describe "speed grader" do
 
     student_submission
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-    wait_for_animations
+    wait_for_ajaximations
 
     #check media comment
     keep_trying_until do
@@ -278,7 +278,7 @@ describe "speed grader" do
   it "should show comment post time" do
     @submission = student_submission
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-    wait_for_animations
+    wait_for_ajaximations
 
     #add comment
     f('#add_a_comment > textarea').send_keys('grader comment')
@@ -294,7 +294,7 @@ describe "speed grader" do
 
     # after refresh
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-    wait_for_animations
+    wait_for_ajaximations
     f('#comments > .comment .posted_at').should include_text(expected_posted_at)
   end
 
@@ -328,7 +328,7 @@ describe "speed grader" do
     @account.save!
     @account.service_enabled?(:avatars).should be_false
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-    wait_for_animations
+    wait_for_ajaximations
 
     ff("#avatar_image").length.should == 0
     ff("#comments > .comment .avatar").length.should == 1
@@ -377,7 +377,7 @@ describe "speed grader" do
     student_submission
     student_submission(:username => 'otherstudent@example.com', :section => @course.course_sections.create(:name => "another section"))
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-    wait_for_animations
+    wait_for_ajaximations
 
     keep_trying_until { ffj('#students_selectmenu option').size > 0 }
     ffj('#students_selectmenu option').size.should == 1 # just the one student
@@ -420,8 +420,14 @@ describe "speed grader" do
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
     wait_for_ajaximations
 
+    # sort by submission date
     f("#settings_link").click
     f('select#eg_sort_by option[value="submitted_at"]').click
+    expect_new_page_load { fj('.ui-dialog-buttonset .ui-button:visible:last').click }
+    keep_trying_until { f('#combo_box_container .ui-selectmenu .ui-selectmenu-item-header').text == "student@example.com" }
+
+    # hide student names
+    f("#settings_link").click
     f('#hide_student_names').click
     expect_new_page_load { fj('.ui-dialog-buttonset .ui-button:visible:last').click }
     keep_trying_until { f('#combo_box_container .ui-selectmenu .ui-selectmenu-item-header').text == "Student 1" }

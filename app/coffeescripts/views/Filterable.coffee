@@ -24,7 +24,8 @@ define [
       @$filter.on 'input', => @setFilter @$filter.val()
       @$filter.trigger 'input'
 
-    setFilter: (@filter) ->
+    setFilter: (filter) ->
+      @filter = filter.toLowerCase()
       for model in @collection.models
         model.trigger 'filterOut', @filterOut(model)
       # show a "no results" message if there are items but they are all
@@ -44,6 +45,6 @@ define [
       return false if not @filter
       return false if not @options.filterColumns.length
       return false if _.any @options.filterColumns, (col) =>
-        model.get(col).indexOf(@filter) >= 0
+        model.get(col).toLowerCase().indexOf(@filter) >= 0
       true
 

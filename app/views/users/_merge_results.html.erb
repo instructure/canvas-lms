@@ -16,7 +16,7 @@
             <th><%= t('emails', 'Emails') %></th>
             <td><%= t('no_emails', 'no emails') %></td>
             <td>
-                <% emails = (user.communication_channels.unretired.email + other_user.communication_channels.unretired.email).map(&:path).uniq.sort %>
+                <% emails = Canvas::ICU.collate((user.communication_channels.unretired.email + other_user.communication_channels.unretired.email).map(&:path).uniq) %>
                 <% if emails.empty? %>
                 <%= t('no_emails', 'no emails') %>
                 <% else %>
@@ -32,7 +32,7 @@
             <th><%= t('logins', 'Logins') %></th>
             <td><%= t('no_logins', 'no logins') %></td>
             <td>
-              <% pseudonyms = (user.pseudonyms.active + other_user.pseudonyms.active).sort_by(&:unique_id) %>
+              <% pseudonyms = Canvas::ICU.collate_by(user.pseudonyms.active + other_user.pseudonyms.active, &:unique_id) %>
               <% if pseudonyms.empty? %>
                 <%= t('no_logins', 'no logins') %>
               <% else %>
@@ -51,7 +51,7 @@
             <th><%= t('enrollments', 'Enrollments') %></th>
             <td><%= t('no_enrollments', 'no enrollments') %></td>
             <td>
-              <% enrollments = (user.current_enrollments + other_user.current_enrollments).sort_by{|e| [e.state_sortable, e.rank_sortable, e.course.name] } %>
+              <% enrollments = (user.current_enrollments + other_user.current_enrollments).sort_by{|e| [e.state_sortable, e.rank_sortable, Canvas::ICU.collation_key(e.course.name)] } %>
               <% if enrollments.empty? %>
                 <%= t('no_enrollments', 'no enrollments') %>
               <% else %>

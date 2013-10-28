@@ -12,11 +12,12 @@
  *	jquery.ui.widget.js
  *	jquery.ui.position.js
  */
+// INSTRUCTURE modified
 define([
-  'jquery',
-  'jqueryui/core',
-  'jqueryui/widget',
-  'jqueryui/position'
+	'jquery',
+	'jqueryui/core',
+	'jqueryui/widget',
+	'jqueryui/position'
 ], function( $ ) {
 
 var idIncrement = 0,
@@ -68,6 +69,27 @@ $.widget( "ui.popup", {
 		this._beforeClose();
 		this.element.hide();
 
+    // INSTRUCTURE moved from switch below for use in click handler
+		var onMouseDown = function( event ) {
+			var noFocus = false;
+			/* TODO: Determine in which cases focus should stay on the trigger after the popup opens
+			(should apply for any trigger that has other interaction besides opening the popup, e.g. a text field) */
+			if ( $( event.target ).is( "input" ) ) {
+				noFocus = true;
+			}
+			if (this.isOpen) {
+				suppressExpandOnFocus = true;
+				this.close();
+				return;
+			}
+			this.open( event );
+			clearTimeout( this.closeTimer );
+			this._delay( function() {
+				if ( !noFocus ) {
+					this.focusPopup();
+				}
+			}, 1 );
+		};
 		this._on(this.options.trigger, {
 			keydown: function( event ) {
 				switch ( event.keyCode ) {
@@ -81,17 +103,8 @@ $.widget( "ui.popup", {
 							this.close( event );
 						}
 						break;
+					// INSTRUCTURE changed SPACE to use DOWN/UP handler
 					case $.ui.keyCode.SPACE:
-						// prevent space-to-open to scroll the page, only happens for anchor ui.button
-						// TODO check for $.ui.button before using custom selector, once more below
-						if ( this.options.trigger.is( "a:ui-button" ) ) {
-							event.preventDefault();
-						}
-
-						else if (this.options.trigger.is( "a:not(:ui-button)" ) ) {
-							this.options.trigger.trigger( "click", event );
-						}
-						break;
 					case $.ui.keyCode.DOWN:
 					case $.ui.keyCode.UP:
 						// prevent scrolling
@@ -104,30 +117,21 @@ $.widget( "ui.popup", {
 						break;
 				}
 			},
+      // INSTRUCTURE added
+			mouseup: function( event ) {
+				this.mouseClickTimer = window.setTimeout(function() {
+					delete this.mouseClickTimer;
+				}.bind(this), 0);
+			},
 			click: function( event ) {
 				event.stopPropagation();
 				event.preventDefault();
+				// INSTRUCTURE added handler for keyboard-triggered clicks
+				if ( !this.mouseClickTimer ) {
+					onMouseDown.call( this, event );
+				}
 			},
-			mousedown: function( event ) {
-				var noFocus = false;
-				/* TODO: Determine in which cases focus should stay on the trigger after the popup opens
-				(should apply for any trigger that has other interaction besides opening the popup, e.g. a text field) */
-				if ( $( event.target ).is( "input" ) ) {
-					noFocus = true;
-				}
-				if (this.isOpen) {
-					suppressExpandOnFocus = true;
-					this.close();
-					return;
-				}
-				this.open( event );
-				clearTimeout( this.closeTimer );
-				this._delay( function() {
-					if ( !noFocus ) {
-						this.focusPopup();
-					}
-				}, 1 );
-			}
+			mousedown: onMouseDown
 		});
 
 		if ( this.options.expandOnFocus ) {

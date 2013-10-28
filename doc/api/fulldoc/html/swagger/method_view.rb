@@ -92,10 +92,9 @@ class MethodView < HashView
       "method" => route.verb,
       "summary" => summary,
       "notes" => desc,
-      "type" => swagger_type,
       "nickname" => nickname,
       "parameters" => parameters,
-    }
+    }.merge(swagger_type)
   end
 
   def to_swagger

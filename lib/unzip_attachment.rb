@@ -50,6 +50,7 @@ class UnzipAttachment
     @logger ||= opts[:logger]
     @rename_files = !!opts[:rename_files]
     @migration_id_map = opts[:migration_id_map] || {}
+    @queue_scribd = !!opts[:queue_scribd]
 
     raise ArgumentError, "Must provide a context." unless self.context && self.context.is_a_context?
     raise ArgumentError, "Must provide a filename." unless self.filename
@@ -151,6 +152,7 @@ class UnzipAttachment
   end
 
   def queue_scribd_submissions(attachments)
+    return unless @queue_scribd
     scribdable_ids = attachments.select(&:scribdable?).map(&:id)
     if scribdable_ids.any?
       Attachment.send_later_enqueue_args(:submit_to_scribd, { :strand => 'scribd', :max_attempts => 1 }, scribdable_ids)

@@ -29,7 +29,7 @@ class DiscussionEntriesController < ApplicationController
     if authorized_action(@entry, @current_user, :read)
       respond_to do |format|
         format.html { redirect_to named_context_url(@context, :context_discussion_topic_url, @entry.discussion_topic_id)}
-        format.json  { render :json => @entry.to_json(:methods => :read_state) }
+        format.json  { render :json => @entry.as_json(:methods => :read_state) }
       end
     end
   end
@@ -59,12 +59,12 @@ class DiscussionEntriesController < ApplicationController
           end
           flash[:notice] = t :created_entry_notice, 'Entry was successfully created.'
           format.html { redirect_to named_context_url(@context, :context_discussion_topic_url, @topic.id) }
-          format.json { render :json => @entry.to_json(:include => :attachment, :methods => [:user_name, :read_state], :permissions => {:user => @current_user, :session => session}), :status => :created }
-          format.text { render :json => @entry.to_json(:include => :attachment, :methods => [:user_name, :read_state], :permissions => {:user => @current_user, :session => session}), :status => :created }
+          format.json { render :json => @entry.as_json(:include => :attachment, :methods => [:user_name, :read_state], :permissions => {:user => @current_user, :session => session}), :status => :created }
+          format.text { render :json => @entry.as_json(:include => :attachment, :methods => [:user_name, :read_state], :permissions => {:user => @current_user, :session => session}), :status => :created }
         else
           format.html { render :action => "new" }
-          format.json { render :json => @entry.errors.to_json, :status => :bad_request }
-          format.text { render :json => @entry.errors.to_json, :status => :bad_request }
+          format.json { render :json => @entry.errors, :status => :bad_request }
+          format.text { render :json => @entry.errors, :status => :bad_request }
         end
       end
     end
@@ -120,8 +120,8 @@ class DiscussionEntriesController < ApplicationController
           format.text {  render :json => discussion_entry_api_json([@entry], @context, @current_user, session, [:user_name]).first }
         else
           format.html { render :action => "edit" }
-          format.json { render :json => @entry.errors.to_json, :status => :bad_request }
-          format.text { render :json => @entry.errors.to_json, :status => :bad_request }
+          format.json { render :json => @entry.errors, :status => :bad_request }
+          format.text { render :json => @entry.errors, :status => :bad_request }
         end
       end
     end

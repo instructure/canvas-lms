@@ -8,6 +8,9 @@ define [
 
   fixtures = $('#fixtures')
 
+  class AssignmentCollection extends Backbone.Collection
+    model: Assignment
+
   assignment1 = ->
     date1 =
       "due_at":"2013-08-28T23:59:00-06:00"
@@ -16,7 +19,7 @@ define [
       "due_at":"2013-08-28T23:59:00-06:00"
       "title":"Winter Session"
 
-    new Assignment(buildAssignment(
+    ac = new AssignmentCollection [buildAssignment(
       "id":1
       "name":"History Quiz"
       "description":"test"
@@ -24,24 +27,27 @@ define [
       "points_possible":2
       "position":1
       "all_dates":[date1, date2]
-    ))
+    )]
+    ac.at(0)
 
   assignment2 = ->
-    new Assignment(buildAssignment(
+    ac = new AssignmentCollection [buildAssignment(
       "id":3
       "name":"Math Quiz"
       "due_at":"2013-08-23T23:59:00-06:00"
       "points_possible":10
       "position":2
-    ))
+    )]
+    ac.at(0)
 
   assignment3 = ->
-    new Assignment(buildAssignment(
+    ac = new AssignmentCollection [buildAssignment(
       "id":2
       "name":"Science Quiz"
       "points_possible":5
       "position":3
-    ))
+    )]
+    ac.at(0)
 
   buildAssignment = (options) ->
     options ?= {}

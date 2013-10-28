@@ -43,10 +43,10 @@ class EportfoliosController < ApplicationController
           @portfolio.setup_defaults
           flash[:notice] = t('notices.created', "Porfolio successfully created")
           format.html { redirect_to eportfolio_url(@portfolio) }
-          format.json { render :json => @portfolio.to_json(:permissions => {:user => @current_user, :session => session}) }
+          format.json { render :json => @portfolio.as_json(:permissions => {:user => @current_user, :session => session}) }
         else
           format.html { render :action => "new" }
-          format.json { render :json => @portfolio.errors.to_json, :status => :bad_request }
+          format.json { render :json => @portfolio.errors, :status => :bad_request }
         end
       end
     end
@@ -92,10 +92,10 @@ class EportfoliosController < ApplicationController
           @portfolio.setup_defaults
           flash[:notice] = t('notices.updated', "Porfolio successfully updated")
           format.html { redirect_to eportfolio_url(@portfolio) }
-          format.json { render :json => @portfolio.to_json(:permissions => {:user => @current_user, :session => session}) }
+          format.json { render :json => @portfolio.as_json(:permissions => {:user => @current_user, :session => session}) }
         else
           format.html { render :action => "edit" }
-          format.json { render :json => @portfolio.errors.to_json, :status => :bad_request }
+          format.json { render :json => @portfolio.errors, :status => :bad_request }
         end
       end
     end
@@ -108,10 +108,10 @@ class EportfoliosController < ApplicationController
         if @portfolio.destroy
           flash[:notice] = t('notices.deleted', "Portfolio successfully deleted")
           format.html { redirect_to user_profile_url(@current_user) }
-          format.json { render :json => @portfolio.to_json }
+          format.json { render :json => @portfolio }
         else
           format.html { render :action => "delete" }
-          format.json { render :json => @portfolio.errors.to_json, :status => :bad_request }
+          format.json { render :json => @portfolio.errors, :status => :bad_request }
         end
       end
     end
@@ -126,7 +126,7 @@ class EportfoliosController < ApplicationController
         category.move_to_bottom if category
       end
       respond_to do |format|
-        format.json { render :json => @portfolio.eportfolio_categories.map{|c| [c.id, c.position]}.to_json, :status => :ok }
+        format.json { render :json => @portfolio.eportfolio_categories.map{|c| [c.id, c.position]}, :status => :ok }
       end
     end
   end
@@ -141,7 +141,7 @@ class EportfoliosController < ApplicationController
         entry.move_to_bottom if entry
       end
       respond_to do |format|
-        format.json { render :json => @portfolio.eportfolio_entries.map{|c| [c.id, c.position]}.to_json, :status => :ok }
+        format.json { render :json => @portfolio.eportfolio_entries.map{|c| [c.id, c.position]}, :status => :ok }
       end
     end
   end
@@ -164,7 +164,7 @@ class EportfoliosController < ApplicationController
         @attachment.file_state = '0'
         @attachment.save!
         ContentZipper.send_later_enqueue_args(:process_attachment, { :priority => Delayed::LOW_PRIORITY, :max_attempts => 1 }, @attachment)
-        render :json => @attachment.to_json
+        render :json => @attachment
       else
         respond_to do |format|
           if @attachment.zipped?
@@ -176,12 +176,12 @@ class EportfoliosController < ApplicationController
               format.html { send_file(@attachment.full_filename, :type => @attachment.content_type_with_encoding, :disposition => 'inline') }
               format.zip { send_file(@attachment.full_filename, :type => @attachment.content_type_with_encoding, :disposition => 'inline') }
             end
-            format.json { render :json => @attachment.to_json(:methods => :readable_size) }
+            format.json { render :json => @attachment.as_json(:methods => :readable_size) }
           else
             flash[:notice] = t('notices.zipping', "File zipping still in process...")
             format.html { redirect_to eportfolio_url(@portfolio.id) }
             format.zip { redirect_to eportfolio_url(@portfolio.id) }
-            format.json { render :json => @attachment.to_json }
+            format.json { render :json => @attachment }
           end
         end
       end

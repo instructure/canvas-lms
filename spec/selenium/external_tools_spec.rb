@@ -26,6 +26,22 @@ describe "external tools" do
       fj('a.app_cancel').click
       wait_for_ajaximations
 
+      #App list should have apps
+      ff('.app').size.should > 0
+      fj('a[data-toggle-installed-state="installed"]').click
+      wait_for_ajaximations
+
+      #Installed app list should have no apps
+      ff('.app').size.should == 0
+      fj('a[data-toggle-installed-state="not_installed"]').click
+      wait_for_ajaximations
+
+      #Not installed app list should have apps
+      ff('.app').size.should > 0
+      fj('a[data-toggle-installed-state="all"]').click
+      wait_for_ajaximations
+
+      #Install an app
       ff('.app').size.should > 0
       ff('.app').first.click
       wait_for_ajaximations
@@ -34,6 +50,24 @@ describe "external tools" do
       fj('a.add_app').click
       wait_for_ajaximations
 
+      #It should auto install because it only requires a name
+      f("#add_app_form").should be_nil
+      fj('.view_app_center_link').click
+      wait_for_ajaximations
+
+      fj('a[data-toggle-installed-state="installed"]').click
+      wait_for_ajaximations
+
+      #Installed app list should have apps
+      ff('.app').size.should > 0
+      ff('.app').first.click
+      wait_for_ajaximations
+
+      #Install app again
+      fj('a.add_app').click
+      wait_for_ajaximations
+
+      #Add app form should be displayed because the app is already installed
       f("#add_app_form").should be_displayed
       replace_content(f("#canvas_app_name"), "New App")
       fj('button.btn-primary[role="button"]').click

@@ -108,5 +108,25 @@ describe SelfEnrollmentsController do
       json = JSON.parse(response.body)
       json["user"]["self_enrollment_code"].should be_present
     end
+
+    context "with sharding" do
+      specs_require_sharding
+
+      it "should allow users to self enroll across shards" do
+        @shard2.activate do
+          user
+          user_session(@user)
+        end
+
+        post 'create', :self_enrollment_code => @course.self_enrollment_code
+        response.should be_success
+        enrollments = @user.enrollments.with_each_shard
+        enrollments.length.should == 1
+        enrollment = enrollments.first
+        enrollment.course.should == @course
+        enrollment.workflow_state.should == 'active'
+        enrollment.should be_self_enrolled
+      end
+    end
   end
 end

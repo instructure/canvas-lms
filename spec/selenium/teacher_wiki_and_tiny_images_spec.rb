@@ -190,7 +190,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
 
       click_questions_tab
       click_new_question_button
-      wait_for_animations
+      wait_for_ajaximations
       add_canvas_image(f("#question_content_0_parent"), 'Course files', 'course.jpg')
 
       in_frame "question_content_0_ifr" do

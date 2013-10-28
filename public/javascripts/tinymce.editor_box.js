@@ -361,6 +361,8 @@ define([
         return $.fn._execCommand.apply(this, arr);
       } else if(options == "destroy") {
         this._removeEditor(more_options);
+      } else if(options == "is_dirty") {
+        return $instructureEditorBoxList._getEditor(id).isDirty();
       }
       return this;
     }

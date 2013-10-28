@@ -64,6 +64,9 @@ h3, .h3 {
 // existing forms that count on them being inline.
 label { display: inline-block; }
 
+// because sometimes an input-mini is just too big
+.input-micro { width: 30px; }
+
 // if you are making a bootstrap style form and need to get your labels to look right (be block),
 // add the class .bootstrap-form to the <form>. this is the only need for .bootstrap-form, you
 // dont need to add the .bootstrap-form class if you already have the .form-horizontal class.
@@ -351,7 +354,6 @@ $popoverArrowDistanceFromCorner: $popoverArrowOuterWidth;
   }
 }
 
-
-
-
-
+.dotted-separator {
+  border-bottom: 1px dotted #aaa;
+}

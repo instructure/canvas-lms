@@ -225,5 +225,12 @@ describe AssignmentGroupsController do
       delete 'destroy', format: :json, course_id: @course.id, id: group.id
       response.should_not be_success
     end
+
+    it "should return JSON if requested" do
+      course_with_teacher_logged_in(:active_all => true)
+      course_group
+      delete 'destroy', :format => "json", :course_id => @course.id, :id => @group.id
+      response.should be_success
+    end
   end
 end

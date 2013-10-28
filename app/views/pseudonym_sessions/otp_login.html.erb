@@ -1,10 +1,14 @@
 <%
-  jammit_css :login
+  jammit_css :otp_login
   js_bundle :otp_login
   @headers = false
   @body_classes << "modal"
   content_for :page_title, t(:page_title, "Multi-factor Authentication")
 %>
+
+<% content_for :meta_tags do %>
+  <meta name="viewport" id="vp" content="initial-scale=1.0,user-scalable=yes,width=device-width">
+<% end %>
 
 <div id="modal-box">
   <h2><%= t 'titles.mfa', "Multi-factor Authentication" %></h2>
@@ -67,7 +71,7 @@ secret key **%{secret_key}**.
   <% else %>
     <div><p><%= t('details.otp_on_device', "Please enter the verification code shown by your token.") %></p></div>
   <% end %>
-  <% form_for :otp_login, :url => otp_login_path, :html => {:id => "login_form"} do |f| %>
+  <% form_for :otp_login, :url => otp_login_path, :html => {:id => "login_form", :class => "inline-form"} do |f| %>
     <div>
       <%= f.blabel :verification_code, :en => "Verification Code", :class => 'control-label' %>
       <%= f.text_field :verification_code, :class => "text", :autocomplete => 'off' %>

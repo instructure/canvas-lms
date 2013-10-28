@@ -14,6 +14,7 @@
 
   <% jammit_css :mobile_auth %>
   <%= include_css_bundles %>
+  <%= include_account_css %>
 </head>
 
 <body>
@@ -66,5 +67,6 @@
     g.src=("https:"==location.protocol?"//ssl":"//www")+".google-analytics.com/ga.js";
     s.parentNode.insertBefore(g,s)}(document,"script"));
   </script>
+  <%= include_account_js(raw: true) %>
 </body>
 </html>

@@ -4,12 +4,12 @@ define [
   'compiled/collections/GroupCollection'
   'compiled/collections/GroupUserCollection'
   'compiled/models/progressable'
-], (_, {Model}, GroupCollection, GroupUserCollection, progressable) ->
+  'compiled/backbone-ext/DefaultUrlMixin'
+], (_, Backbone, GroupCollection, GroupUserCollection, progressable, DefaultUrlMixin) ->
 
-  class GroupCategory extends Model
+  class GroupCategory extends Backbone.Model
 
-    urlRoot: '/api/v1/group_categories'
-
+    resourceName: "group_categories"
     @mixin progressable
 
     groups: ->
@@ -35,7 +35,33 @@ define [
     setUpProgress: (response) =>
       @set progress_url: response.url
 
-    present: =>
-      data = _.extend {}, @attributes
+    present: ->
+      data = Backbone.Model::toJSON.call(this)
       data.progress = @progressModel.toJSON()
       data
+
+    toJSON: ->
+      data = _.omit(super, 'self_signup', 'split_group_count')
+      data.create_group_count ?= @get('split_group_count') if @get('split_groups')
+      data
+
+    @mixin DefaultUrlMixin
+
+    sync: (method, model, options = {}) ->
+      options.url = @urlFor(method)
+      if method is 'create' and model.get('split_groups') is '1'
+        success = options.success ? ->
+        options.success = (args) =>
+          @progressStarting = true
+          success(args)
+          @assignUnassignedMembers()
+      else if method is 'delete'
+        if model.progressModel
+          model.progressModel.onPoll = ->
+      Backbone.sync method, model, options
+
+    urlFor: (method) ->
+      if method is 'create'
+        @_defaultUrl()
+      else
+        "/api/v1/group_categories/#{@id}"

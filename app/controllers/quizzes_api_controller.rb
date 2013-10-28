@@ -263,7 +263,7 @@ class QuizzesApiController < ApplicationController
       else
         # TODO: we don't really have a strategy in the API yet for returning
         # errors.
-        render :json => {:errors => @quiz.errors.to_json}, :status => 400
+        render :json => {:errors => @quiz.errors}, :status => 400
       end
     end
   end
@@ -286,7 +286,7 @@ class QuizzesApiController < ApplicationController
       else
         errors = @quiz.errors.as_json[:errors]
         errors['published'] = errors.delete('workflow_state') if errors.has_key?('workflow_state')
-        render :json => {:errors => errors.to_json}, :status => 400
+        render :json => {:errors => errors}, :status => 400
       end
     end
   end

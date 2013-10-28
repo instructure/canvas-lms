@@ -1,0 +1,7 @@
+.group-category-create.group-category-self-signup fieldset.admin-signup-controls,
+.group-category-create.group-category-admin-signup fieldset.self-signup-controls {
+  display: none;
+}
+.group-category-create.group-category-admin-signup label.self-signup-controls {
+  opacity: 0.5;
+}

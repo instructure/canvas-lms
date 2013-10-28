@@ -40,10 +40,11 @@ class FillInTheBlank < AssessmentItemConverter
     @question[:question_text] = body
 
     @doc.search('responseProcessing responseCondition').each do |cond|
-      cond.css('stringMatch,substring').each do |match|
+      cond.css('stringMatch,substring,equalRounded,equal').each do |match|
         answer = {}
-        answer[:text] = match.at_css('baseValue[baseType=string]').text.strip
-        unless answer[:text] == ""
+        node = match.at_css('baseValue[baseType=string],baseValue[baseType=integer],baseValue[baseType=float]')
+        answer[:text] = node.text.strip if node
+        unless answer[:text].blank?
           @question[:answers] << answer
           answer[:weight] = AssessmentItemConverter::DEFAULT_CORRECT_WEIGHT
           answer[:comments] = ""

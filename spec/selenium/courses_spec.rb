@@ -29,7 +29,7 @@ describe "courses" do
       wizard_box.find_element(:css, ".close_wizard_link").click
 
       refresh_page
-      wait_for_animations # we need to give the wizard a chance to pop up
+      wait_for_ajaximations # we need to give the wizard a chance to pop up
       wizard_box = f("#wizard_box")
       wizard_box.displayed?.should be_false
 
@@ -50,7 +50,7 @@ describe "courses" do
       course_with_teacher_logged_in
       create_new_course
 
-      wait_for_animations
+      wait_for_ajaximations
       wizard_box = find_wizard_box
       wizard_box.find_element(:css, ".close_wizard_link").click
       wait_for_ajaximations
@@ -137,7 +137,7 @@ describe "courses" do
       # Test that the page loads properly the first time.
       get "/courses/#{@course.id}/users"
       wait_for_ajaximations
-      ff('.ui-state-error').length.should == 0
+      flash_message_present?(:error).should be_false
       ff('.roster .rosterUser').length.should == 50
     end
 

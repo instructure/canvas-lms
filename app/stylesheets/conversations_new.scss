@@ -56,6 +56,11 @@
     color: #555;
   }
 
+  .btn.ui-state-active {
+    background-color: #E6E6E6;
+    background-image: none;
+  }
+
   .actions {
     margin-right: 20px;
   }
@@ -452,8 +457,25 @@ i.icon-ok:before {
   vertical-align: baseline;
 }
 
-.bootstrap-select .dropdown-submenu .dropdown-menu {
-  top: 20px;
+.bootstrap-select .dropdown-submenu > .dropdown-menu {
+  top: -20px;
+}
+
+.bootstrap-select .dropdown-submenu .dropdown-menu.inner {
+  max-height: 200px;
+  overflow: auto;
+}
+
+.bootstrap-select label {
+  margin: 0;
+  display: block;
+}
+
+input.dropdown-search {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 90%;
 }
 
 .message-header-row .ac-input-box {

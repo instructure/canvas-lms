@@ -98,11 +98,11 @@ class SectionsController < ApplicationController
           @context.touch
           flash[:notice] = t('section_created', "Section successfully created!")
           format.html { redirect_to course_settings_url(@context) }
-          format.json { render :json => (api_request? ? section_json(@section, @current_user, session, []) : @section.to_json) }
+          format.json { render :json => (api_request? ? section_json(@section, @current_user, session, []) : @section) }
         else
           flash[:error] = t('section_creation_failed', "Section creation failed")
           format.html { redirect_to course_settings_url(@context) }
-          format.json { render :json => @section.errors.to_json, :status => :bad_request }
+          format.json { render :json => @section.errors, :status => :bad_request }
         end
       end
     end
@@ -134,11 +134,11 @@ class SectionsController < ApplicationController
     res = {:allowed => !!allowed}
     if allowed
       @account = @new_course.account
-      res[:section] = @section
-      res[:course] = @new_course
-      res[:account] = @account
+      res[:section] = @section.as_json(include_root: false)
+      res[:course] = @new_course.as_json(include_root: false)
+      res[:account] = @account.as_json(include_root: false)
     end
-    render :json => res.to_json(:include_root => false)
+    render :json => res
   end
 
   # @API Cross-list a Section
@@ -157,7 +157,7 @@ class SectionsController < ApplicationController
       respond_to do |format|
         flash[:notice] = t('section_crosslisted', "Section successfully cross-listed!")
         format.html { redirect_to named_context_url(@new_course, :context_section_url, @section.id) }
-        format.json { render :json => (api_request? ? section_json(@section, @current_user, session, []) : @section.to_json) }
+        format.json { render :json => (api_request? ? section_json(@section, @current_user, session, []) : @section) }
       end
     end
   end
@@ -174,7 +174,7 @@ class SectionsController < ApplicationController
       respond_to do |format|
         flash[:notice] = t('section_decrosslisted', "Section successfully de-cross-listed!")
         format.html { redirect_to named_context_url(@new_course, :context_section_url, @section.id) }
-        format.json { render :json => (api_request? ? section_json(@section, @current_user, session, []) : @section.to_json) }
+        format.json { render :json => (api_request? ? section_json(@section, @current_user, session, []) : @section) }
       end
     end
   end
@@ -201,11 +201,11 @@ class SectionsController < ApplicationController
           @context.touch
           flash[:notice] = t('section_updated', "Section successfully updated!")
           format.html { redirect_to course_section_url(@context, @section) }
-          format.json { render :json => (api_request? ? section_json(@section, @current_user, session, []) : @section.to_json) }
+          format.json { render :json => (api_request? ? section_json(@section, @current_user, session, []) : @section) }
         else
           flash[:error] = t('section_update_error', "Section update failed")
           format.html { redirect_to course_section_url(@context, @section) }
-          format.json { render :json => @section.errors.to_json, :status => :bad_request }
+          format.json { render :json => @section.errors, :status => :bad_request }
         end
       end
     end
@@ -247,11 +247,11 @@ class SectionsController < ApplicationController
           @context.touch
           flash[:notice] = t('section_deleted', "Course section successfully deleted!")
           format.html { redirect_to course_settings_url(@context) }
-          format.json { render :json => (api_request? ? section_json(@section, @current_user, session, []) : @section.to_json) }
+          format.json { render :json => (api_request? ? section_json(@section, @current_user, session, []) : @section) }
         else
           flash[:error] = t('section_delete_not_allowed', "You can't delete a section that has enrollments")
           format.html { redirect_to course_section_url(@context, @section) }
-          format.json { render :json => (api_request? ? { :message => "You can't delete a section that has enrollments" } : @section.to_json), :status => :bad_request }
+          format.json { render :json => (api_request? ? { :message => "You can't delete a section that has enrollments" } : @section), :status => :bad_request }
         end
       end
     end

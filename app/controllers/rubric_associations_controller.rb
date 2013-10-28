@@ -44,7 +44,7 @@ class RubricAssociationsController < ApplicationController
         :rubric => @rubric.as_json(:methods => :criteria, :include_root => false, :permissions => {:user => @current_user, :session => session}),
         :rubric_association => @association.as_json(:include_root => false, :include => [:rubric_assessments, :assessment_requests], :methods => :assessor_name, :permissions => {:user => @current_user, :session => session})
       }
-      render :json => json_res.to_json
+      render :json => json_res
     end
   end
   
@@ -60,7 +60,7 @@ class RubricAssociationsController < ApplicationController
       if !RubricAssociation.for_purpose('bookmark').find_by_rubric_id(@rubric.id) && association_count == 0
         @rubric.destroy_for(@context)
       end
-      render :json => @association.to_json
+      render :json => @association
     end
   end
 end

@@ -38,9 +38,9 @@
   list-style: none
   margin: 0
   padding: 0
-  li, .ui-effects-wrapper
+  li:not(.ic-flash-info, .ic-flash-success, .ic-flash-warning, .ic-flash-error), .ui-effects-wrapper
     margin: 0 auto !important
-  li
+  li:not(.ic-flash-info, .ic-flash-success, .ic-flash-warning, .ic-flash-error)
     box-shadow: 0 1px 1px rgba(0,0,0,0.25)
     border-bottom-color: rgba(0,0,0,0.5)
     padding: 4px 40px 4px 8px

@@ -165,10 +165,14 @@ describe "gradebook2" do
 
       keep_trying_until do
         button = fj('#section_to_show')
-        button.should include_text("All Sections")
         button.click
         wait_for_js
         fj('#section-to-show-menu').should be_displayed
+        ffj('#section-to-show-menu a').first.click
+        wait_for_js
+        button.should include_text("All Sections")
+        button.click
+        wait_for_js
         ffj('#section-to-show-menu a').last.click
         wait_for_js
         button.should include_text(@other_section.name)
@@ -433,7 +437,7 @@ describe "gradebook2" do
                           :membership_type => 'CustomAdmin')
 
       get "/courses/#{@course.id}/gradebook2"
-      ff('.ui-state-error').count.should == 0
+      flash_message_present?(:error).should be_false
     end
 
     it "should display for users with only :manage_grades permissions" do
@@ -447,7 +451,7 @@ describe "gradebook2" do
                           :membership_type => 'CustomAdmin')
 
       get "/courses/#{@course.id}/gradebook2"
-      ff('.ui-state-error').count.should == 0
+      flash_message_present?(:error).should be_false
     end
 
     it "should include student view student for grading" do
@@ -534,8 +538,8 @@ describe "gradebook2" do
         icons.each do |icon|
           cell = icon.find_element(:xpath, '..')
 
-          driver.action.move_to(cell).perform
           keep_trying_until do
+            driver.action.move_to(f('#gradebook_settings')).move_to(cell).perform
             cell.find_element(:css, "a").should be_displayed
           end
           cell.find_element(:css, "a").click

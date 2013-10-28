@@ -26,9 +26,9 @@ class OutcomeGroupsController < ApplicationController
       @outcome_group = parent_outcome_group.child_outcome_groups.build(params[:learning_outcome_group].merge(:context => @context))
       respond_to do |format|
         if @outcome_group.save
-          format.json { render :json => @outcome_group.to_json }
+          format.json { render :json => @outcome_group }
         else
-          format.json { render :json => @outcome_group.errors.to_json, :status => :bad_request }
+          format.json { render :json => @outcome_group.errors, :status => :bad_request }
         end
       end
     end
@@ -45,7 +45,7 @@ class OutcomeGroupsController < ApplicationController
           outcome_hash = outcome_hash.with_indifferent_access
           outcome = group.learning_outcomes.create(params)
         end
-        render :json => group.to_json(:include => :learning_outcomes),
+        render :json => group.as_json(:include => :learning_outcomes),
                :as_text => true
       else
         render :json => {:errors => {:base => t(:invalid_file, "Invalid outcome group file")}},
@@ -63,9 +63,9 @@ class OutcomeGroupsController < ApplicationController
         @outcome_group.attributes = params[:learning_outcome_group]
         @outcome_group.learning_outcome_group = @context.learning_outcome_groups.find(parent_id) if parent_id
         if @outcome_group.save
-          format.json { render :json => @outcome_group.to_json }
+          format.json { render :json => @outcome_group }
         else
-          format.json { render :json => @outcome_group.errors.to_json, :status => :bad_request }
+          format.json { render :json => @outcome_group.errors, :status => :bad_request }
         end
       end
     end
@@ -77,7 +77,7 @@ class OutcomeGroupsController < ApplicationController
       @outcome_group.skip_tag_touch = true
       @outcome_group.destroy
       @context.touch
-      render :json => @outcome_group.to_json
+      render :json => @outcome_group
     end
   end
   
@@ -85,7 +85,7 @@ class OutcomeGroupsController < ApplicationController
     if authorized_action(@context, @current_user, :manage_outcomes)
       @outcome_group = @context.learning_outcome_groups.active.find(params[:outcome_group_id])
       @asset_strings = @outcome_group.reorder_content(params[:ordering])
-      render :json => @asset_strings.to_json
+      render :json => @asset_strings
     end
   end
 end

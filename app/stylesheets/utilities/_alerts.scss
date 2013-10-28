@@ -24,4 +24,90 @@
 </p>
 ```
 
+```html
+<p>
+  <div class="ic-flash-info">
+    Info: Sample flash notice style.
+  </div>
+</p>
+<p>
+  <div class="ic-flash-success">
+    Success: Sample flash notice style.
+  </div>
+</p>
+<p>
+  <div class="ic-flash-warning">
+    Warning: Sample flash notice style.
+  </div>
+</p>
+<p>
+  <div class="ic-flash-error">
+    Error: Sample flash notice style.
+  </div>
+</p>
+```
+
 */
+
+.ic-flash-info, .ic-flash-success, .ic-flash-warning, .ic-flash-error {
+  position: relative;
+
+  color: #ffffff;
+  font-weight: bold;
+
+  padding: 4px 40px 4px 8px;
+  margin: 0 auto;
+  width: 475px;
+  min-height: 20px;
+  z-index: 2;
+  zoom: 1;
+  vertical-align: middle;
+  text-align: center;
+
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.25);
+  border-bottom-color: rgba(0, 0, 0, 0.5);
+
+  a {
+    text-decoration: underline;
+    color: inherit;
+  }
+  a.close_link {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    width: 20px;
+    height: 20px;
+    overflow: hidden;
+    margin-top: -11px;
+    color: white;
+    text-decoration: none;
+  }
+  &.no_close a.close_link {
+    display: none;
+  }
+
+  i {
+    height: 20px;
+    margin-right: 2px;
+  }
+
+  &.ic-flash-static {
+    width: auto;
+  }
+}
+
+.ic-flash-info {
+  background-color: #3a87ad;
+}
+
+.ic-flash-success {
+  background-color: #468847;
+}
+
+.ic-flash-warning {
+  background-color: #f9a42b;
+}
+
+.ic-flash-error {
+  background-color: #b94a48;
+}

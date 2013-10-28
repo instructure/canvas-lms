@@ -24,6 +24,7 @@ define [
       @addClass "group_#{@contextCode()}"
       @description = data.description
       @start = @parseStartDate()
+      @end = null # in case it got set by midnight fudging
       @originalStartDate = new Date(@start) if @start
 
       super
@@ -42,7 +43,7 @@ define [
 
       date = $.parseFromISO @assignment.due_at, 'due_date'
       # TODO: i18n
-      time_string = "#{$.dateString(date.date)} at #{date.time_string}"
+      time_string = "#{date.date_formatted} at #{date.time_string}"
       "Due: <time datetime='#{date.time.toISOString()}'>#{time_string}</time>"
 
     saveDates: (success, error) =>

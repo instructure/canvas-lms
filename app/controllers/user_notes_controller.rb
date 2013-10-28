@@ -53,7 +53,7 @@ class UserNotesController < ApplicationController
     if authorized_action(@user_note, @current_user, :read)
       respond_to do |format|
         format.html { redirect_to user_user_notes_path }
-        format.json { render :json => @user_note.to_json(:methods=>[:creator_name]), :status => :created }
+        format.json { render :json => @user_note.as_json(:methods=>[:creator_name]), :status => :created }
         format.text { render :json => @user_note, :status => :created }
       end
     end
@@ -76,12 +76,12 @@ class UserNotesController < ApplicationController
         if @user_note.save
           flash[:notice] = t 'notices.created', "Journal Entry was successfully created."
           format.html { redirect_to user_user_notes_path }
-          format.json { render :json => @user_note.to_json(:methods=>[:creator_name, :formatted_note]), :status => :created }
+          format.json { render :json => @user_note.as_json(:methods=>[:creator_name, :formatted_note]), :status => :created }
           format.text { render :json => @user_note, :status => :created }
         else
           format.html { redirect_to(user_user_notes_path) }
-          format.json { render :json => @user_note.errors.to_json, :status => :bad_request }
-          format.text { render :json => @user_note.errors.to_json, :status => :bad_request }
+          format.json { render :json => @user_note.errors, :status => :bad_request }
+          format.text { render :json => @user_note.errors, :status => :bad_request }
         end
       end
     end
@@ -94,7 +94,7 @@ class UserNotesController < ApplicationController
 
       respond_to do |format|
         format.html { redirect_to user_user_notes_path }
-        format.json { render :json => @user_note.to_json(:methods=>[:creator_name]), :status => :ok }
+        format.json { render :json => @user_note.as_json(:methods=>[:creator_name]), :status => :ok }
       end 
     end
   end

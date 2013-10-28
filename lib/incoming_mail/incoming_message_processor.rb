@@ -108,9 +108,21 @@ module IncomingMail
       MailboxClasses.keys.map(&:to_s)
     end
 
+    def self.get_mailbox_class(account)
+      MailboxClasses.fetch(account.protocol)
+    end
+
     def self.create_mailbox(account)
-      mailbox_class = MailboxClasses.fetch(account.protocol)
-      mailbox_class.new(account.config)
+      mailbox_class = get_mailbox_class(account)
+      mailbox = mailbox_class.new(account.config)
+      mailbox.set_timeout_method(&method(:timeout_method))
+      return mailbox
+    end
+
+    def self.timeout_method
+      Canvas.timeout_protection("incoming_message_processor", raise_on_timeout: true) do
+        yield
+      end
     end
 
     def self.configure_settings(config)

@@ -54,7 +54,7 @@ describe "Quiz Import" do
     quiz = Quiz.find_by_migration_id data[:migration_id]
     quiz.unpublished_question_count.should == 2
     quiz.quiz_questions.active.count.should == 2
-    sorted_questions = quiz.quiz_questions.active.sort { |a, b| a.id <=> b.id }
+    sorted_questions = quiz.quiz_questions.active.sort_by(&:id)
     sorted_questions.first.question_data[:question_text].should == data[:questions].first[:question_text]
     sorted_questions.first.question_data[:question_type].should == 'text_only_question'
   end

@@ -4,9 +4,10 @@ define [
   'Backbone'
   'compiled/backbone-ext/DefaultUrlMixin'
   'compiled/models/TurnitinSettings'
+  'compiled/models/DateGroup'
   'compiled/collections/AssignmentOverrideCollection'
   'compiled/collections/DateGroupCollection'
-], ($, _, {Model}, DefaultUrlMixin, TurnitinSettings, AssignmentOverrideCollection, DateGroupCollection) ->
+], ($, _, {Model}, DefaultUrlMixin, TurnitinSettings, DateGroup, AssignmentOverrideCollection, DateGroupCollection) ->
 
   class Assignment extends Model
     @mixin DefaultUrlMixin
@@ -211,6 +212,12 @@ define [
     labelId: =>
       return @id
 
+    defaultDates: =>
+      group = new DateGroup
+        due_at:    @get("due_at")
+        unlock_at: @get("unlock_at")
+        lock_at:   @get("lock_at")
+
     multipleDueDates: =>
       dateGroups = @get("all_dates")
       dateGroups && dateGroups.length > 1
@@ -218,16 +225,7 @@ define [
     allDates: =>
       groups = @get("all_dates")
       models = (groups and groups.models) or []
-
-      result = _.map models, (group) ->
-        due    = group.get("due_at")
-        unlock = group.get("unlock_at")
-        lock   = group.get("lock_at")
-
-        dueAt:    if due then new Date(due) else null
-        dueFor:   group.get("title")
-        unlockAt: if unlock then new Date(unlock) else null
-        lockAt:   if lock then new Date(lock) else null
+      result = _.map models, (group) -> group.toJSON()
 
     toView: =>
       fields = [

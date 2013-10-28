@@ -76,7 +76,22 @@ describe QuizzesApiController, :type => :integration do
   end
 
   describe "GET /courses/:course_id/quizzes/:id (show)" do
-    before { teacher_in_course(:active_all => true) }
+    before { course_with_teacher_logged_in(:active_all => true, :course => @course) }
+
+    context "as a student" do
+
+      it "doesn't show access codes" do
+        course_with_student_logged_in(active_all: true)
+        quiz = @course.quizzes.create!(
+          title: "Access code Test",
+          access_code: "hello!"
+        )
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/quizzes/#{quiz.id}",
+                        :controller=>"quizzes_api", :action=>"show", :format=>"json", :course_id=>"#{@course.id}", :id => "#{quiz.id}")
+
+        json.should_not have_key('access_code')
+      end
+    end
 
     context "valid quiz" do
       before do

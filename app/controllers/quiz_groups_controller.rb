@@ -29,9 +29,9 @@ class QuizGroupsController < ApplicationController
       end
       @group = @quiz.quiz_groups.build(params[:quiz_group])
       if @group.save
-        render :json => @group.to_json
+        render :json => @group
       else
-        render :json => @group.errors.to_json, :status => :bad_request
+        render :json => @group.errors, :status => :bad_request
       end
     end
   end
@@ -43,9 +43,9 @@ class QuizGroupsController < ApplicationController
       params[:quiz_group].delete(:assessment_question_bank_id)
       params[:quiz_group].delete(:position) # position is taken care of in reorder
       if @group.update_attributes(params[:quiz_group])
-        render :json => @group.to_json
+        render :json => @group
       else
-        render :json => @group.errors.to_json, :status => :bad_request
+        render :json => @group.errors, :status => :bad_request
       end
     end
   end
@@ -54,7 +54,7 @@ class QuizGroupsController < ApplicationController
     if authorized_action(@quiz, @current_user, :update)
       @group = @quiz.quiz_groups.find(params[:id])
       @group.destroy
-      render :json => @group.to_json
+      render :json => @group
     end
   end
   

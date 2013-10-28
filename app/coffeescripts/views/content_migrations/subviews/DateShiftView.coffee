@@ -11,6 +11,7 @@ define [
     @child 'daySubstitution', '#daySubstitution'
     @optionProperty 'oldStartDate'
     @optionProperty 'oldEndDate'
+    @optionProperty 'addHiddenInput'
 
     els: 
       ".dateShiftContent"  : "$dateShiftContent"
@@ -32,7 +33,7 @@ define [
     # @api custom backbone override
 
     afterRender: ->
-      @$el.find('input[type=text]').datetime_field()
+      @$el.find('input[type=text]').datetime_field(addHiddenInput: @addHiddenInput)
 
       # Set date attributes on model when they change.
       @$oldStartDate.on 'change', (event) => @model.setDateShiftOptions property: 'old_start_date', value: event.target.value

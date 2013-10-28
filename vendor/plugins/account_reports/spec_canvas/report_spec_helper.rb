@@ -40,7 +40,7 @@ module ReportSpecHelper
   end
 
   def parse_report(csv_report, options)
-    order = Array(options[:order]) || [0,1]
+    order = Array(options[:order]) || [0, 1]
     if csv_report.is_a? Hash
       csv_report.inject({}) do |result, (key, csv)|
         all_parsed = CSV.parse(csv).to_a
@@ -58,7 +58,7 @@ module ReportSpecHelper
     end
   end
 
-  def self.run_report(account, report_type, parameters = {}, sort_column_or_columns = [0, 1], headers = false)
+  def self.run_report(account, report_type, parameters = {}, sort_column_or_columns = [0, 1], headers = false, col_sep = ',')
     sort_columns = Array(sort_column_or_columns)
     account_report = AccountReport.new(:user => account_admin_user(account: account), :account => account, :report_type => report_type)
     account_report.parameters = {}
@@ -74,7 +74,7 @@ module ReportSpecHelper
         result
       end
     else
-      all_parsed = CSV.parse(account_report.attachment.open).to_a
+      all_parsed = CSV.parse(account_report.attachment.open, {:col_sep => col_sep}).to_a
       all_parsed[row_range].sort_by { |r| r.values_at(*sort_columns).join }
     end
   end

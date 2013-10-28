@@ -430,6 +430,14 @@ define([
 
       var $suggest = $('<div class="datetime_suggest" />').insertAfter($thingToPutSuggestAfter);
 
+      if (options.addHiddenInput) {
+        var $hiddenInput = $('<input type="hidden">').insertAfter($field);
+        $hiddenInput.attr('name', $field.attr('name'));
+        $hiddenInput.val($field.val());
+        $field.removeAttr('name');
+        $field.data('hiddenInput', $hiddenInput);
+      }
+
       $field.bind("change focus blur keyup", function() {
         var $this = $(this),
             val = $this.val();
@@ -442,6 +450,9 @@ define([
         if (!$this.val()) { text = ""; }
         if (d) {
           $this.data('date', d);
+          if ($this.data('hiddenInput')) {
+            $this.data('hiddenInput').val(d);
+          }
           if(!options.timeOnly && !options.dateOnly && (d.getHours() || d.getMinutes() || options.alwaysShowTime)) {
             text = d.toString('ddd MMM d, yyyy h:mmtt');
             $this

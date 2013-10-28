@@ -648,7 +648,7 @@ describe "discussions" do
           fj('.due-date-overrides:first [name="due_at"]').send_keys(due_at1.strftime('%b %-d, %y'))
 
           f('#add_due_date').click
-          wait_for_animations
+          wait_for_ajaximations
 
           click_option('.due-date-row:last select', sec2.name)
           ff('.due-date-overrides [name="due_at"]')[1].send_keys(due_at2.strftime('%b %-d, %y'))
@@ -880,12 +880,12 @@ describe "discussions" do
       @topic.save!
 
       get "/courses/#{@course.id}/discussion_topics/#{@topic.id}/"
-      wait_for_animations
+      wait_for_ajaximations
       f('.topic-unsubscribe-button').should_not be_displayed
       f('.topic-subscribe-button').should_not be_displayed
 
       f('.discussion-reply-action').click
-      wait_for_animations
+      wait_for_ajaximations
       type_in_tiny 'textarea', 'initial post text'
       submit_form('.discussion-reply-form')
       wait_for_ajaximations
@@ -1110,7 +1110,7 @@ describe "discussions" do
         wait_for_ajax_requests
 
         f('.discussion-entries .discussion-reply-action').click
-        wait_for_animations
+        wait_for_ajaximations
         type_in_tiny 'textarea', side_comment_text
         submit_form('.discussion-entries .discussion-reply-form')
         wait_for_ajaximations
@@ -1173,6 +1173,8 @@ describe "discussions" do
     end
 
     it "should automatically mark things as read" do
+      resize_screen_to_default
+
       reply_count = 2
       reply_count.times { @topic.discussion_entries.create!(:message => 'Lorem ipsum dolor sit amet', :user => @student) }
       @topic.create_materialized_view
@@ -1183,6 +1185,7 @@ describe "discussions" do
       f('.new-and-total-badge .new-items').text.should == reply_count.to_s
 
       #wait for the discussionEntryReadMarker to run, make sure it marks everything as .just_read
+      driver.execute_script("$('.entry_content').last().get(0).scrollIntoView()")
       keep_trying_until { ff('.discussion_entry.unread').should be_empty }
       ff('.discussion_entry.read').length.should == reply_count + 1 # +1 because the topic also has the .discussion_entry class
 
@@ -1201,6 +1204,8 @@ describe "discussions" do
       get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
       ff(".discussion_entry.unread").size.should == 2
       f('.new-and-total-badge .new-items').text.should == '2'
+
+      driver.execute_script("$('.entry_content').last().get(0).scrollIntoView()")
       keep_trying_until { ff('.discussion_entry.unread').size < 2 }
       wait_for_ajaximations
       ff(".discussion_entry.unread").size.should == 1
@@ -1243,14 +1248,14 @@ describe "discussions" do
       @topic.create_materialized_view
 
       get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
-      wait_for_animations
+      wait_for_ajaximations
       f('.topic-unsubscribe-button').displayed?.should be_true
       f('.topic-subscribe-button').displayed?.should be_false
 
       @topic.unsubscribe(@teacher)
       @topic.update_materialized_view
       get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
-      wait_for_animations
+      wait_for_ajaximations
       f('.topic-unsubscribe-button').displayed?.should be_false
       f('.topic-subscribe-button').displayed?.should be_true
     end
@@ -1260,7 +1265,7 @@ describe "discussions" do
       @topic.create_materialized_view
 
       get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
-      wait_for_animations
+      wait_for_ajaximations
       f('.topic-unsubscribe-button').click
       wait_for_ajaximations
       @topic.reload
@@ -1272,7 +1277,7 @@ describe "discussions" do
       @topic.create_materialized_view
 
       get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
-      wait_for_animations
+      wait_for_ajaximations
       f('.topic-subscribe-button').click
       wait_for_ajaximations
       @topic.reload

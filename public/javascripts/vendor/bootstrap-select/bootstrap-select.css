@@ -77,7 +77,8 @@
     width: 100%;
 }
 
-.bootstrap-select.btn-group .dropdown-menu {
+/* INSTRUCTURE added > */
+.bootstrap-select.btn-group > .dropdown-menu {
     min-width: 100%;
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
@@ -85,6 +86,7 @@
 }
 
 .bootstrap-select.btn-group .dropdown-menu.inner {
+    width: 100%; /* INSTRUCTURE for IE9 scrollbar */
     position: static;
     border: 0;
     padding: 0;
@@ -135,7 +137,8 @@
     display: none;
 }
 
-.bootstrap-select.btn-group.show-tick .dropdown-menu li a span.text {
+/* INSTRUCTURE changed span.text to .text */
+.bootstrap-select.btn-group.show-tick .dropdown-menu li a .text {
     margin-right: 34px;
 }
 

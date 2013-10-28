@@ -351,7 +351,7 @@ class AssignmentsApiController < ApplicationController
                         submission: submission, override_dates: override_dates)
       end
 
-      render :json => hashes.to_json
+      render :json => hashes
     end
   end
 
@@ -542,7 +542,7 @@ class AssignmentsApiController < ApplicationController
   def save_and_render_response
     @assignment.content_being_saved_by(@current_user)
     if update_api_assignment(@assignment, params[:assignment])
-      render :json => assignment_json(@assignment, @current_user, session).to_json, :status => 201
+      render :json => assignment_json(@assignment, @current_user, session), :status => 201
     else
       # TODO: we don't really have a strategy in the API yet for returning
       # errors.

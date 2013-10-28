@@ -1324,7 +1324,7 @@ class User < ActiveRecord::Base
     context_codes = ([self] + self.management_contexts).uniq.map(&:asset_string)
     rubrics = self.context_rubrics.active
     rubrics += Rubric.active.find_all_by_context_code(context_codes)
-    rubrics.uniq.sort_by{|r| [(r.association_count || 0) > 3 ? 'a' : 'b', (r.title.downcase rescue 'zzzzz')]}
+    rubrics.uniq.sort_by{|r| [(r.association_count || 0) > 3 ? SortFirst : SortLast, Canvas::ICU.collation_key(r.title || SortLast)]}
   end
 
   def assignments_recently_graded(opts={})
@@ -1506,40 +1506,16 @@ class User < ActiveRecord::Base
     record_merge_result(text)
   end
 
-  def file_structure_for(user)
-    User.file_structure_for(self, user)
-  end
-
   def secondary_identifier
     self.email || self.id
   end
 
-  def self.file_structure_for(context, user)
-    results = {
-      :contexts => [context],
-      :collaborations => [],
-      :folders => [],
-      :folders_with_subcontent => [],
-      :files => []
-    }
-    context_codes = results[:contexts].map{|c| c.asset_string }
-
-    if !context.is_a?(User) && user
-      results[:collaborations] = user.collaborations.active.includes(:user, :users).select{|c| c.context_id && c.context_type && context_codes.include?("#{c.context_type.underscore}_#{c.context_id}") }
-      results[:collaborations] = results[:collaborations].sort_by{|c| c.created_at}.reverse
-    end
-
-    results[:contexts].each do |context|
-      results[:folders] += context.active_folders_with_sub_folders
-    end
-
-    results[:folders] = results[:folders].sort_by{|f| [f.parent_folder_id || 0, f.position || 0, f.name || "", f.created_at]}
-    results
-  end
-
   def self_enroll_if_necessary
     return unless @self_enrollment_course
+    return if @self_enrolling # avoid infinite recursion when enrolling across shards (pseudonym creation + shard association stuff)
+    @self_enrolling = true
     @self_enrollment_course.self_enroll_student(self, :skip_pseudonym => @just_created, :skip_touch_user => true)
+    @self_enrolling = false
   end
 
   def time_difference_from_date(hash)
@@ -1643,7 +1619,7 @@ class User < ActiveRecord::Base
       end
     end
 
-    res.sort_by{ |c| [c.primary_enrollment_rank, c.name.downcase] }
+    res.sort_by{ |c| [c.primary_enrollment_rank, Canvas::ICU.collation_key(c.name)] }
   end
   memoize :courses_with_primary_enrollment
 
@@ -1800,21 +1776,25 @@ class User < ActiveRecord::Base
   def cached_recent_stream_items(opts={})
     expires_in = 1.day
 
-    if opts[:contexts]
-      items = []
-      Array(opts[:contexts]).each do |context|
-        items.concat(
-                   Rails.cache.fetch(StreamItemCache.recent_stream_items_key(self, context.class.base_class.name, context.id),
-                                     :expires_in => expires_in) {
-                     recent_stream_items(:context => context)
-                   })
+    # just cache on the user's shard... makes cache invalidation much
+    # easier if we visit other shards
+    shard.activate do
+      if opts[:contexts]
+        items = []
+        Array(opts[:contexts]).each do |context|
+          items.concat(
+                     Rails.cache.fetch(StreamItemCache.recent_stream_items_key(self, context.class.base_class.name, context.id),
+                                       :expires_in => expires_in) {
+                       recent_stream_items(:context => context)
+                     })
+        end
+        items.sort_by(&:id).reverse
+      else
+        # no context in cache key
+        Rails.cache.fetch(StreamItemCache.recent_stream_items_key(self), :expires_in => expires_in) {
+          recent_stream_items
+        }
       end
-      items.sort { |a,b| b.id <=> a.id }
-    else
-      # no context in cache key
-      Rails.cache.fetch(StreamItemCache.recent_stream_items_key(self), :expires_in => expires_in) {
-        recent_stream_items
-      }
     end
   end
 
@@ -1849,7 +1829,7 @@ class User < ActiveRecord::Base
     event_codes = context_codes + AppointmentGroup.manageable_by(self, context_codes).intersecting(opts[:start_at], opts[:end_at]).map(&:asset_string)
     events += ev.for_user_and_context_codes(self, event_codes, []).between(opts[:start_at], opts[:end_at]).updated_after(opts[:updated_at])
     events += Assignment.active.for_context_codes(context_codes).due_between(opts[:start_at], opts[:end_at]).updated_after(opts[:updated_at]).with_just_calendar_attributes
-    events.sort_by{|e| [e.start_at, e.title || ""] }.uniq
+    events.sort_by{|e| [e.start_at, Canvas::ICU.collation_key(e.title || SortFirst)] }.uniq
   end
 
   def upcoming_events(opts={})
@@ -1869,7 +1849,7 @@ class User < ActiveRecord::Base
         include_submitted_count.
         map {|a| a.overridden_for(self)},opts.merge(:time => now)).
       first(opts[:limit])
-    events.sort_by{|e| [e.start_at ? 0: 1,e.start_at || 0, e.title] }.uniq.first(opts[:limit])
+    events.sort_by{|e| [e.start_at ? 0: 1,e.start_at || 0, Canvas::ICU.collation_key(e.title)] }.uniq.first(opts[:limit])
   end
 
   def select_upcoming_assignments(assignments,opts)
@@ -1893,7 +1873,7 @@ class User < ActiveRecord::Base
     undated_events = []
     undated_events += CalendarEvent.active.for_user_and_context_codes(self, context_codes, []).undated.updated_after(opts[:updated_at])
     undated_events += Assignment.active.for_context_codes(context_codes).undated.updated_after(opts[:updated_at]).with_just_calendar_attributes
-    undated_events.sort_by{|e| e.title }
+    Canvas::ICU.collate_by(undated_events, &:title)
   end
 
   def setup_context_lookups(contexts=nil)
@@ -2214,7 +2194,7 @@ class User < ActiveRecord::Base
         contexts += Group.where(:id => info.common_groups.keys).all if info.common_groups.present?
       end
     end
-    contexts.map(&:name).sort_by{|c|c.downcase}
+    Canvas::ICU.collate(contexts.map(&:name))
   end
 
   def mark_all_conversations_as_read!
@@ -2247,33 +2227,24 @@ class User < ActiveRecord::Base
         next
       end
 
-      if !e.course
-        coalesced_enrollments << {
-          :enrollment => e,
-          :sortable => [e.rank_sortable, e.state_sortable, e.long_name],
-          :types => [ e.readable_type ]
-        }
-      end
-
       existing_enrollment_info = coalesced_enrollments.find { |en|
         # coalesce together enrollments for the same course and the same state
-        !e.course.nil? && en[:enrollment].course == e.course && en[:enrollment].workflow_state == e.workflow_state
+        en[:enrollment].course == e.course && en[:enrollment].workflow_state == e.workflow_state
       }
 
       if existing_enrollment_info
         existing_enrollment_info[:types] << e.readable_type
-        existing_enrollment_info[:sortable] = [existing_enrollment_info[:sortable] || [999,999, 999], [e.rank_sortable, e.state_sortable, 0 - e.id]].min
+        existing_enrollment_info[:sortable] = [existing_enrollment_info[:sortable] || SortLast, [e.rank_sortable, e.state_sortable, 0 - e.id]].min
       else
         coalesced_enrollments << { :enrollment => e, :sortable => [e.rank_sortable, e.state_sortable, 0 - e.id], :types => [ e.readable_type ] }
       end
     end
-    coalesced_enrollments = coalesced_enrollments.sort_by{|e| e[:sortable] || [999,999, 999] }
+    coalesced_enrollments = coalesced_enrollments.sort_by{|e| e[:sortable] }
     active_enrollments = coalesced_enrollments.map{ |e| e[:enrollment] }
 
     cached_group_memberships = self.cached_current_group_memberships
-    coalesced_group_memberships = cached_group_memberships.
-      select{ |gm| gm.active_given_enrollments?(active_enrollments) }.
-      sort_by{ |gm| gm.group.name }
+    coalesced_group_memberships = Canvas::ICU.collate_by(cached_group_memberships.
+      select{ |gm| gm.active_given_enrollments?(active_enrollments) }) { |gm| gm.group.name }
 
     @menu_data = {
       :group_memberships => coalesced_group_memberships,

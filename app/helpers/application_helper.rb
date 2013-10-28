@@ -234,6 +234,13 @@ module ApplicationHelper
     @context_url_lookup[lookup] = res
   end
 
+  def full_url(path)
+    uri = URI.parse(request.url)
+    uri.path = ''
+    uri.query = ''
+    URI.join(uri, path).to_s
+  end
+
   def url_helper_context_from_object(context)
     (context ? context.class.base_ar_class : context.class).name.underscore
   end
@@ -474,22 +481,53 @@ module ApplicationHelper
     end
   end
 
+  def embedded_chat_quicklaunch_params
+    {user_id: @current_user.id, course_id: @context.id, canvas_url: "#{HostUrl.protocol}://#{HostUrl.default_host}"}
+  end
+
+  def embedded_chat_url
+    chat_tool = active_external_tool_by_id('chat')
+    return unless chat_tool && chat_tool.url && chat_tool.custom_fields['mini_view_url']
+    uri = URI.parse(chat_tool.url)
+    uri.path = chat_tool.custom_fields['mini_view_url']
+    uri.to_s
+  end
+
+  def embedded_chat_enabled
+    chat_tool = active_external_tool_by_id('chat')
+    chat_tool && chat_tool.url && chat_tool.custom_fields['mini_view_url'] && Canvas::Plugin.value_to_boolean(chat_tool.custom_fields['embedded_chat_enabled'])
+  end
+
   def embedded_chat_visible
     @show_embedded_chat != false &&
       !@embedded_view &&
       !@body_class_no_headers &&
+      @current_user &&
       @context.is_a?(Course) &&
-      Canvas::Plugin.find(:embedded_chat).enabled? &&
+      embedded_chat_enabled &&
       external_tool_tab_visible('chat')
   end
 
-  def external_tool_tab_visible(tool_id)
+  def active_external_tool_by_id(tool_id)
+    # don't use for groups. they don't have account_chain_ids
     tool = @context.context_external_tools.active.find_by_tool_id(tool_id)
-    tool ||= ContextExternalTool.active.where(:context_type => 'Account', :context_id => @context.account_chain_ids, :tool_id => 'chat').first
+    return tool if tool
+
+    # account_chain_ids is in the order we need to search for tools
+    # unfortunately, the db will return an arbitrary one first.
+    # so, we pull all the tools (probably will only have one anyway) and look through them here
+    tools = ContextExternalTool.active.where(:context_type => 'Account', :context_id => @context.account_chain_ids, :tool_id => tool_id).all
+    @context.account_chain_ids.each do |account_id|
+      tool = tools.find {|t| t.context_id == account_id}
+      return tool if tool
+    end
+    nil
+  end
+
+  def external_tool_tab_visible(tool_id)
+    tool = active_external_tool_by_id(tool_id)
     return false unless tool
-    tc = @context.tab_configuration.find {|tc| tc['id'] == tool.asset_string}
-    return true unless tc # default to visible tabs if not hidden explicitly
-    tc['hidden'] != true
+    @context.tabs_available(@current_user).find {|tc| tc[:id] == tool.asset_string}.present?
   end
 
   def license_help_link
@@ -635,15 +673,19 @@ module ApplicationHelper
     opts[:indent_width] ||= 3
     opts[:depth] ||= 0
     opts[:options_so_far] ||= []
+    if opts.has_key?(:all_folders)
+      opts[:sub_folders] = opts.delete(:all_folders).to_a.group_by{|f| f.parent_folder_id}
+    end
+
     folders.each do |folder|
       opts[:options_so_far] << %{<option value="#{folder.id}" #{'selected' if opts[:selected_folder_id] == folder.id}>#{"&nbsp;" * opts[:indent_width] * opts[:depth]}#{"- " if opts[:depth] > 0}#{html_escape folder.name}</option>}
       if opts[:max_depth].nil? || opts[:depth] < opts[:max_depth]
-        child_folders = if opts[:all_folders]
-                          opts[:all_folders].to_a.select {|f| f.parent_folder_id == folder.id }
+        child_folders = if opts[:sub_folders]
+                          opts[:sub_folders][folder.id] || []
                         else
                           folder.active_sub_folders.by_position
                         end
-        folders_as_options(child_folders, opts.merge({:depth => opts[:depth] + 1}))
+        folders_as_options(child_folders, opts.merge({:depth => opts[:depth] + 1})) if child_folders.any?
       end
     end
     opts[:depth] == 0 ? raw(opts[:options_so_far].join("\n")) : nil
@@ -802,30 +844,35 @@ module ApplicationHelper
     @global_includes
   end
 
-  def include_account_js
+  def include_account_js(options = {})
     return if params[:global_includes] == '0'
-    includes = get_global_includes.inject([]) do |js_includes, global_include|
-      js_includes << "'#{global_include[:js]}'" if global_include[:js].present?
-      js_includes
+    includes = get_global_includes.map do |global_include|
+      global_include[:js] if global_include[:js].present?
     end
+    includes.compact!
     if includes.length > 0
-      str = <<-ENDSCRIPT
-        (function() {
-          var inject = function(src) {
-            var s = document.createElement('script');
-            s.src = src;
-            s.type = 'text/javascript';
-            document.body.appendChild(s);
-          };
-          var srcs = [#{includes.join(', ')}];
-          require(['jquery'], function() {
-            for (var i = 0, l = srcs.length; i < l; i++) {
-              inject(srcs[i]);
-            }
-          });
-        })();
-      ENDSCRIPT
-      content_tag(:script, str, {}, false)
+      if options[:raw]
+        includes.unshift("/optimized/vendor/jquery-1.7.2.js")
+        javascript_include_tag(includes)
+      else
+        str = <<-ENDSCRIPT
+          (function() {
+            var inject = function(src) {
+              var s = document.createElement('script');
+              s.src = src;
+              s.type = 'text/javascript';
+              document.body.appendChild(s);
+            };
+            var srcs = #{includes.to_json};
+            require(['jquery'], function() {
+              for (var i = 0, l = srcs.length; i < l; i++) {
+                inject(srcs[i]);
+              }
+            });
+          })();
+        ENDSCRIPT
+        javascript_tag(str)
+      end
     end
   end
 

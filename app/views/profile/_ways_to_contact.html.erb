@@ -176,8 +176,10 @@
     <div class="control-group">
       <label for='communication_channel_sms_number' class='control-label'><%= t('labels.cell_number', 'Cell Number') %></label>
       <div class="controls">
-        <input type="text" id='communication_channel_sms_number' class="user_selected sms_number"/><br/>
-        <span style="font-size: 0.8em; color: #a44" class="should_be_10_digits"><%= t('validations.should_be_10_digits', "should be 10-digit number") %></span>
+        <input type="text" id='communication_channel_sms_number' class="user_selected sms_number" aria-describedby="communication_channel_sms_number_description" /><br/>
+        <span style="font-size: 0.8em; color: #a44" id='communication_channel_sms_number_description' class="should_be_10_digits">
+          <%= t('validations.should_be_10_digits', "should be 10-digit number") %>
+        </span>
       </div>
     </div>
 

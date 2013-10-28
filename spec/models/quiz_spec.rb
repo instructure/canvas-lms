@@ -1129,9 +1129,21 @@ describe Quiz do
     it "returns the correct question ids" do
       course_with_teacher_logged_in(active_all: true, course: @course)
       q = @quiz.quiz_questions.create!
-      regrade = QuizRegrade.find_or_create_by_quiz_id_and_quiz_version(@quiz.id,@quiz.version_number) { |qr| qr.user_id = @teacher.id }
+      regrade = QuizRegrade.find_or_create_by_quiz_id_and_quiz_version(@quiz.id, @quiz.version_number) { |qr| qr.user_id = @teacher.id }
       rq = regrade.quiz_question_regrades.create! quiz_question_id: q.id, regrade_option: 'current_correct_only'
       @quiz.current_quiz_question_regrades.should == [rq]
+    end
+  end
+
+  context "#last_regrade_performed" do
+    before { @quiz = @course.quizzes.create! title: 'Test Quiz' }
+
+    it "returns the last regrade for the quiz, regardless of version" do
+      course_with_teacher_logged_in(active_all: true, course: @course)
+      versioned_regrade = QuizRegrade.find_or_create_by_quiz_id_and_quiz_version(@quiz.id, @quiz.version_number) { |qr| qr.user_id = @teacher.id }
+      last_regrade = QuizRegrade.find_or_create_by_quiz_id_and_quiz_version(@quiz.id, @quiz.version_number-1) { |qr| qr.user_id = @teacher.id }
+
+      @quiz.last_regrade_performed.should == last_regrade
     end
   end
 

@@ -160,7 +160,7 @@
                           _liA.push(
                             '<div class="div-contain"><div class="divider"></div></div>'+
                             '<a role="menuitem" aria-haspopup="true" tabindex="-1" href="#">'+label+'</a>'+
-                            '<ul class="dropdown-menu" role="group">'
+                            '<div class="dropdown-menu open"><ul class="dropdown-menu inner" role="group">'
                             );
                           _subLiA.push(_this.createA(text, "opt " + optionClass, inline, index, $this ));
                         } else if ($this[0].index != 0) {
@@ -192,7 +192,7 @@
                   $.each(_subLiA, function(i, item) {
                       group += "<li rel='" + i + "'>" + item + "</li>";
                   });
-                  group += '</ul>'; 
+                  group += '</ul></div>'; 
                   _liA.push(group);
                   _subLiA = [];
                 }
@@ -224,7 +224,7 @@
                  '</a>';
         },
 
-        render: function() {
+        render: function(inUse) {
             var _this = this;
 
             //Update the LI to match the SELECT
@@ -279,7 +279,7 @@
             _this.$newElement.find('.filter-option').html(title + subtext);
 
             // INSTRUCTURE
-            if (_this.$newElement.hasClass('open')) {
+            if (inUse) {
               $('li:not(.divider):visible > a', _this.$newElement).first().focus();
             }
         },
@@ -310,7 +310,7 @@
         setSize: function() {
             var _this = this,
                 menu = this.$newElement.find('> .dropdown-menu'),
-                menuInner = menu.find('.inner'),
+                menuInner = menu.find('> .inner'), // INSTRUCTURE added >
                 menuA = menuInner.find('li > a'),
                 selectHeight = this.$newElement.outerHeight(),
                 liHeight = this.$newElement.data('liHeight'),
@@ -396,8 +396,12 @@
         },
 
         refresh: function() {
+            // INSTRUCTURE
+            // TODO: it would be nice to refocus the equivalent element if present
+            var inUse = this.$newElement.hasClass('open') && $.contains(this.$menu[0], document.activeElement);
+
             this.reloadLi();
-            this.render();
+            this.render(inUse);
             this.setWidth();
             this.setStyle();
             this.checkDisabled();
@@ -557,7 +561,9 @@
             $target = $(e.target);
 
             // INSTRUCTURE
-            if ($target.is('a')) {
+            if ($target.is('input')) {
+              return;
+            } else if ($target.is('a')) {
               $list = $(e.target).closest('ul');
             } else {
               $list = $('[role=menu]', $parent);

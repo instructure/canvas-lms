@@ -28,9 +28,36 @@ module Api::V1::Course
     settings
   end
 
+  # Public: Returns a course hash to serialize for a json api request.
+  #
+  # course - The course information to return as the hash.
+  # user - The user requesting the information for permissions.
+  # session - The current users session object.
+  # includes - Custom attributes to include in the data response.
+  # enrollments - Course enrollments to include in the response.
+  #
+  # Examples
+  #
+  #   course_json(course, user, session, includes, enrollments)
+  #   # => {
+  #     "account_id" => 3,
+  #     "course_code" => "TestCourse",
+  #     "default_view" => "feed",
+  #     "id" => 1,
+  #     "name" => "TestCourse",
+  #     "start_at" => nil,
+  #     "end_at" => nil,
+  #     "public_syllabus" => false,
+  #     "storage_quota_mb" => 500,
+  #     "hide_final_grades" => false,
+  #     "apply_assignment_group_weights" => false,
+  #     "calendar" => { "ics" => "http://localhost:3000/feeds/calendars/course_Y6uXZZPu965ziva2pqI7c0QR9v1yu2QZk9X0do2D.ics" },
+  #     "permissions" => { :create_discussion_topic => true }
+  #   }
+  #
   def course_json(course, user, session, includes, enrollments)
-    Api::V1::CourseJson.to_hash(course, user, includes, enrollments) do |builder, allowed_attributes, methods|
-      hash = api_json(course, user, session, :only => allowed_attributes, :methods => methods)
+    Api::V1::CourseJson.to_hash(course, user, includes, enrollments) do |builder, allowed_attributes, methods, permissions_to_include|
+      hash = api_json(course, user, session, { :only => allowed_attributes, :methods => methods }, permissions_to_include)
       hash['term'] = enrollment_term_json(course.enrollment_term, user, session, {}) if includes.include?('term')
       hash['apply_assignment_group_weights'] = course.apply_group_weights?
       add_helper_dependant_entries(hash, course, builder)

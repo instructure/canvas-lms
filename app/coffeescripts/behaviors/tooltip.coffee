@@ -83,6 +83,10 @@ define [
 
     opts.position.using ||= using
 
+    if $this.data('tooltip-title')
+      opts.content = -> $(this).data('tooltip-title')
+      opts.items = '[data-tooltip-title]'
+
     $this
       .removeAttr('data-tooltip')
       .tooltip(opts)

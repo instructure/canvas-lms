@@ -21,6 +21,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper')
 
 describe ConversationsController, :type => :integration do
   before do
+    @other = user(active_all: true)
+
     course_with_teacher(:active_course => true, :active_enrollment => true, :user => user_with_pseudonym(:active_user => true))
     @course.update_attribute(:name, "the course")
     @course.default_section.update_attributes(:name => "the section")
@@ -767,6 +769,16 @@ describe ConversationsController, :type => :integration do
           c["subject"].should eql 'dinner'
         }
       end
+
+      it "should constrain subject length" do
+        json = api_call(:post, "/api/v1/conversations",
+                { :controller => 'conversations', :action => 'create', :format => 'json' },
+                { :recipients => [@bob.id], :body => "test", :subject => "a" * 256 },
+                headers={},
+                {expected_status: 400})
+        json["errors"].should_not be_nil
+        json["errors"]["subject"].should_not be_nil
+      end
     end
   end
 
@@ -1243,6 +1255,21 @@ describe ConversationsController, :type => :integration do
       bob_sucks.reload
       bob_sucks.conversation_message_participants.where(:user_id => @billy.id).exists?.should be_true
       bob_sucks.conversation_message_participants.where(:user_id => @bob.id).exists?.should be_false
+    end
+
+    it "should allow users to respond to admin initiated conversations" do
+      account_admin_user active_all: true
+      cp = conversation(@other, sender: @admin, private: false)
+      real_conversation = cp.conversation
+
+      @user = @other
+      json = api_call(:post, "/api/v1/conversations/#{real_conversation.id}/add_message",
+        { :controller => 'conversations', :action => 'add_message', :id => real_conversation.id.to_s, :format => 'json' },
+        { :body => "ok", :recipients => [@admin.id.to_s] })
+      real_conversation.reload
+      new_message = real_conversation.conversation_messages.first
+      #debugger
+      new_message.conversation_message_participants.size.should == 2
     end
 
     it "should create a media object if it doesn't exist" do

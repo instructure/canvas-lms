@@ -42,6 +42,7 @@ ActiveSupport::JSON::Encoding.module_eval do
     depth = (options[:recursion_depth] ||= 1)
     raise CircularReferenceError, 'something references itself (probably)' if depth > 1000
     options[:recursion_depth] = depth + 1
+    Api.stringify_json_ids(value) if options[:stringify_json_ids]
     value.to_json(options)
   ensure
     options[:recursion_depth] = depth

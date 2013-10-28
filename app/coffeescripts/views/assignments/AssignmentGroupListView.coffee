@@ -18,12 +18,11 @@
 define [
   'underscore'
   'Backbone'
-  'compiled/class/cache'
   'compiled/views/SortableCollectionView'
   'compiled/views/assignments/AssignmentGroupListItemView'
   'jst/assignments/AssignmentGroupList'
   'jst/assignments/NoAssignmentsListItem'
-], (_, Backbone, Cache, SortableCollectionView, AssignmentGroupListItemView, template, NoAssignmentsListItem) ->
+], (_, Backbone, SortableCollectionView, AssignmentGroupListItemView, template, NoAssignmentsListItem) ->
 
   class AssignmentGroupListView extends SortableCollectionView
     @optionProperty 'course'
@@ -33,18 +32,12 @@ define [
 
     @optionProperty 'assignment_sort_base_url'
 
-    initialize: ->
-      super
-      $.extend true, this, Cache
-      @itemViewOptions = course: @course
-
-    render: ->
+    render: =>
       super(ENV.PERMISSIONS.manage)
 
-    renderItem: (model) ->
+    renderItem: (model) =>
       view = super
-      unless model.groupView.isExpanded()
-        model.groupView.toggle()
+      model.groupView.collapseIfNeeded()
       view
 
     createItemView: (model) ->
@@ -60,6 +53,16 @@ define [
     createReorderURL: (id) ->
       @assignment_sort_base_url + "/" + id + "/reorder"
 
+
+    # TODO: make menu a child view of listitem so that it can be rendered
+    # by itself, and so it can manage all of the dialog stuff,
+    # when that happens, this can be removed
+    attachCollection: ->
+      super
+      @itemViewOptions = course: @course
+      @collection.on 'add', @render
+      @collection.on 'remove', @render
+
     renderOnReset: =>
       @firstResetLanded = true
       super
@@ -67,16 +70,8 @@ define [
     toJSON: ->
       data = super
       _.extend({}, data,
-        firstResetLanded: not @empty
+        firstResetLanded: @firstResetLanded
       )
-
-    # This will be used when we implement searching
-    expandAll: ->
-      for m in @collection.models
-        if !m.groupView.isExpanded()
-          # force expand it
-          # but it will retain its state in cache
-          m.groupView.toggle()
 
     _initSort: ->
       super
@@ -90,4 +85,6 @@ define [
 
     expand: (e, ui) =>
       id = ui.item.children(":first").data('id')
-      ui.item.find("#assignment_group_#{id}_assignments").slideDown(100)
+      ag = @collection.findWhere id: parseInt(id)
+      if ag && ag.groupView.shouldBeExpanded()
+        ui.item.find("#assignment_group_#{id}_assignments").slideDown(100)

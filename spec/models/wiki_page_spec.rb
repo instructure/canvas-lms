@@ -124,6 +124,20 @@ describe WikiPage do
     p1.url.should eql('asdf-2')
   end
 
+  it "should preserve course links when in a group belonging to the course" do
+    other_course = Course.create!
+    course_with_teacher
+    group(:group_context => @course)
+    page = @group.wiki.wiki_pages.create(:title => "poni3s")
+    page.user = @teacher
+    page.update_attribute(:body, %{<a href='/courses/#{@course.id}/files#oops'>click meh</a>
+                                  <a href='/courses/#{other_course.id}/files#whoops'>click meh too</a>})
+
+    page.reload
+    page.body.should include("/courses/#{@course.id}/files#oops")
+    page.body.should include("/groups/#{@group.id}/files#whoops")
+  end
+
   context "unpublished" do
     before do
       teacher_in_course(:active_all => true)
@@ -241,6 +255,24 @@ describe WikiPage do
         @page.workflow_state.should == 'unpublished'
         @page.hide_from_students.should be_false
       end
+    end
+  end
+
+  context 'initialize_wiki_page' do
+    it 'should set the course front page body' do
+      course_with_teacher_logged_in
+      front_page = @course.wiki.wiki_pages.new(:title => 'Front Page', :url => 'front-page')
+      front_page.body.should be_nil
+      front_page.initialize_wiki_page(@teacher)
+      front_page.body.should_not be_empty
+    end
+
+    it 'should set the group front page body' do
+      group_with_user_logged_in
+      front_page = @group.wiki.wiki_pages.new(:title => 'Front Page', :url => 'front-page')
+      front_page.body.should be_nil
+      front_page.initialize_wiki_page(@user)
+      front_page.body.should_not be_empty
     end
   end
 

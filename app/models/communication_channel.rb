@@ -54,7 +54,7 @@ class CommunicationChannel < ActiveRecord::Base
   RETIRE_THRESHOLD = 5
 
   def self.sms_carriers
-    @sms_carriers ||= (Setting.from_config('sms', false) ||
+    @sms_carriers ||= Canvas::ICU.collate_by((Setting.from_config('sms', false) ||
         { 'AT&T' => 'txt.att.net',
           'Alltel' => 'message.alltel.com',
           'Boost' => 'myboostmobile.com',
@@ -66,7 +66,7 @@ class CommunicationChannel < ActiveRecord::Base
           'Sprint PCS' => 'messaging.sprintpcs.com',
           'T-Mobile' => 'tmomail.net',
           'Verizon' => 'vtext.com',
-          'Virgin Mobile' => 'vmobl.com' }).map.sort
+          'Virgin Mobile' => 'vmobl.com' }), &:first)
   end
 
   def pseudonym

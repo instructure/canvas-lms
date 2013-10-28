@@ -14,11 +14,11 @@ describe "assignment groups" do
   it "should create an assignment group" do
     get "/courses/#{@course.id}/assignments"
 
-    wait_for_animations
+    wait_for_ajaximations
     f('#right-side .add_group_link').click
     f('#assignment_group_name').send_keys('test group')
     submit_form('#add_group_form')
-    wait_for_animations
+    wait_for_ajaximations
     f('#add_group_form').should_not be_displayed
     f('#groups .assignment_group').should include_text('test group')
   end
@@ -43,7 +43,7 @@ describe "assignment groups" do
     f('.add_rule_link').click
     never_drop_css = '.form_rules div:nth-child(3) select'
     click_option(never_drop_css, 'Never Drop')
-    wait_for_animations
+    wait_for_ajaximations
     assignment_css = '.form_rules div:nth-child(3) .never_drop_assignment select'
     keep_trying_until { f(assignment_css).displayed? }
     click_option(assignment_css, assignment.title)
@@ -67,7 +67,7 @@ describe "assignment groups" do
     # the input
     f('input.weight').clear
     #need to wait for the total to update
-    wait_for_animations
+    wait_for_ajaximations
     keep_trying_until { fj('#group_weight_total').text.should == '50%' }
   end
 
@@ -137,6 +137,21 @@ describe "assignment groups" do
       assignment_groups[0].find_element(:css, '.delete_group_link').should_not be_displayed
       refresh_page ##refresh page to make sure the trashcan doesn't come back
       get_assignment_groups[0].find_element(:css, '.delete_group_link').should_not be_displayed
+    end
+  end
+
+  context "draft state with no assignments or assignment groups" do
+    before do
+      Account.default.settings[:enable_draft] = true
+      Account.default.save!
+      @domain_root_account = Account.default
+      course_with_teacher_logged_in(:active_all => true)
+    end
+
+    it "should display no assignment groups" do
+      get "/courses/#{@course.id}/assignments"
+      wait_for_ajaximations
+      fj(".ig-empty-msg").should include_text("No Assignment Groups found")
     end
   end
 
@@ -307,7 +322,7 @@ describe "assignment groups" do
 
       f("#assignment_group_#{@ag2.id} .al-trigger").click
       f("#assignment_group_#{@ag2.id} .delete_group").click
-      wait_for_animations
+      wait_for_ajaximations
 
       fj('.delete_group:visible').click
       wait_for_ajaximations
@@ -353,13 +368,16 @@ describe "assignment groups" do
 
       f("#assignment_group_#{@ag2.id} .al-trigger").click
       f("#assignment_group_#{@ag2.id} .delete_group").click
-      wait_for_animations
+      wait_for_ajaximations
 
       fj('.assignment_group_move:visible').click
       click_option('.group_select:visible', @assignment_group.id.to_s, :value)
 
       fj('.delete_group:visible').click
       wait_for_ajaximations
+
+      # two id selectors to make sure it moved
+      fj("#assignment_group_#{@assignment_group.id} #assignment_#{@assignment.id}").should_not be_nil
 
       @assignment.reload
       @assignment.assignment_group.should == @assignment_group
@@ -368,7 +386,7 @@ describe "assignment groups" do
     it "should persist collapsed assignment groups" do
       selector = "#assignment_group_#{@assignment_group.id} .element_toggler"
       f(selector).click
-      wait_for_animations
+      wait_for_ajaximations
       refresh_page
       wait_for_ajaximations
       f(selector).should have_attribute('aria-expanded', 'false')
@@ -383,7 +401,7 @@ describe "assignment groups" do
       # open the delete dialog the first time
       f("#assignment_group_#{@ag2.id} .al-trigger").click
       f("#assignment_group_#{@ag2.id} .delete_group").click
-      wait_for_animations
+      wait_for_ajaximations
 
       # check assignment count and move to options
       fj('.assignment_count:visible').text.should == "1"
@@ -411,7 +429,7 @@ describe "assignment groups" do
       keep_trying_until do
         f("#assignment_group_#{@ag2.id} .al-trigger").click
         f("#assignment_group_#{@ag2.id} .delete_group").click
-        wait_for_animations
+        wait_for_ajaximations
         fj('.assignment_count:visible').present?
       end
 

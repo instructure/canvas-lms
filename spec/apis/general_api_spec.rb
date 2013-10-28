@@ -51,6 +51,13 @@ describe "API", :type => :integration do
       course_with_teacher
       @course.as_json(:include_root => false, :permissions => { :user => @user, :include_permissions => false }, :only => %w(name sis_source_id)).keys.sort.should == %w(name sis_source_id)
     end
+
+    it "should serialize permissions if obj responds" do
+      course_with_teacher
+      @course.expects(:serialize_permissions).once.with(anything, @teacher, nil)
+      json = @course.as_json(:include_root => false, :permissions => { :user => @user, :session => nil, :include_permissions => true, :policies => [ "update" ] }, :only => %w(name))
+      json.keys.sort.should == %w(name permissions)
+    end
   end
 
   describe "json post format" do
@@ -101,6 +108,74 @@ describe "API", :type => :integration do
       @submission = @assignment.submissions.find_by_user_id(@user.id)
       @submission.attachments.map { |a| a.id }.sort.should == [a1.id, a2.id]
       @submission.submission_comments.first.comment.should == "yay"
+    end
+  end
+
+  describe "application/json+canvas-string-ids" do
+    it "should stringify 'id' fields" do
+      account_admin_user(active_all: true)
+      json = api_call(:get, "/api/v1/accounts/#{Account.default.id}",
+        { controller: 'accounts', action: 'show', id: Account.default.to_param, format: 'json' },
+        {}, { 'Accept' => 'application/json+canvas-string-ids' })
+      json['id'].should == Account.default.id.to_s
+    end
+
+    it "should not stringify 'id' fields without Accept header" do
+      account_admin_user(active_all: true)
+      json = api_call(:get, "/api/v1/accounts/#{Account.default.id}",
+        { controller: 'accounts', action: 'show', id: Account.default.to_param, format: 'json' })
+      json['id'].should == Account.default.id
+    end
+
+    it "should stringify 'something_id' fields" do
+      account = Account.default.sub_accounts.create!
+      account_admin_user(active_all: true, account: account)
+      json = api_call(:get, "/api/v1/accounts/#{account.id}",
+        { controller: 'accounts', action: 'show', id: account.to_param, format: 'json' },
+        {}, { 'Accept' => 'application/json+canvas-string-ids' })
+      json['root_account_id'].should == Account.default.id.to_s
+    end
+
+    it "should not stringify 'something_id' fields without Accept header" do
+      account = Account.default.sub_accounts.create!
+      account_admin_user(active_all: true, account: account)
+      json = api_call(:get, "/api/v1/accounts/#{account.id}",
+        { controller: 'accounts', action: 'show', id: account.to_param, format: 'json' })
+      json['root_account_id'].should == Account.default.id
+    end
+
+    it "should pass through non-integer 'something_id' fields" do
+      account_admin_user(active_all: true)
+      json = api_call(:get, "/api/v1/accounts/#{Account.default.id}",
+        { controller: 'accounts', action: 'show', id: Account.default.to_param, format: 'json' },
+        {}, { 'Accept' => 'application/json+canvas-string-ids' })
+      json['root_account_id'].should be_nil
+    end
+
+    it "should stringify nested ids" do
+      user_with_pseudonym(active_user: true)
+      course_with_teacher(user: @user, active_all: true)
+      student_in_course(course: @course, active_all: true)
+      @user = @teacher
+
+      json = api_call(:post, "/api/v1/conversations",
+        { controller: 'conversations', action: 'create', format: 'json' },
+        { recipients: [@student.id], body: "test" },
+        { 'Accept' => 'application/json+canvas-string-ids' })
+      json.first["participants"].first["id"].should == @teacher.id.to_s
+    end
+
+    it "should stringify all ids in a 'something_ids' field" do
+      user_with_pseudonym(active_user: true)
+      course_with_teacher(user: @user, active_all: true)
+      student_in_course(course: @course, active_all: true)
+      @user = @teacher
+
+      json = api_call(:post, "/api/v1/conversations",
+        { controller: 'conversations', action: 'create', format: 'json' },
+        { recipients: [@student.id], body: "test" },
+        { 'Accept' => 'application/json+canvas-string-ids' })
+      json.first["messages"].first["participating_user_ids"].sort.should == [@teacher.id, @student.id].map{ |id| id.to_s }.sort
     end
   end
 end

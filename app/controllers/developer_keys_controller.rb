@@ -42,7 +42,7 @@ class DeveloperKeysController < ApplicationController
     if @key.save
       render :json => developer_key_json(@key, @current_user, session)
     else
-      render :json => @key.errors.to_json, :status => :bad_request
+      render :json => @key.errors, :status => :bad_request
     end
   end
   
@@ -52,7 +52,7 @@ class DeveloperKeysController < ApplicationController
     if @key.save
       render :json => developer_key_json(@key, @current_user, session)
     else
-      render :json => @key.errors.to_json, :status => :bad_request
+      render :json => @key.errors, :status => :bad_request
     end
   end
   

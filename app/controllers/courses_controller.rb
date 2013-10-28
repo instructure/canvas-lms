@@ -94,7 +94,13 @@ require 'set'
 #       },
 #
 #       // weight final grade based on assignment group percentages
-#       "apply_assignment_group_weights": true
+#       "apply_assignment_group_weights": true,
+#
+#       // optional: the permissions the user has for the course.
+#       // returned only for a single course and include[]=permissions
+#       "permissions": {
+#          "create_discussion_topic": true
+#        }
 #   }
 class CoursesController < ApplicationController
   include SearchHelper
@@ -152,7 +158,7 @@ class CoursesController < ApplicationController
   def index
     respond_to do |format|
       format.html {
-        @current_enrollments = @current_user.cached_current_enrollments(:include_enrollment_uuid => session[:enrollment_uuid]).sort_by{|e| [e.active? ? 1 : 0, e.long_name] }
+        @current_enrollments = @current_user.cached_current_enrollments(:include_enrollment_uuid => session[:enrollment_uuid]).sort_by{|e| [e.active? ? 1 : 0, Canvas::ICU.collation_key(e.long_name)] }
         @past_enrollments    = @current_user.enrollments.with_each_shard{|scope| scope.past }
         @future_enrollments  = @current_user.enrollments.with_each_shard{|scope| scope.future.includes(:root_account)}.reject{|e| e.root_account.settings[:restrict_student_future_view]}
 
@@ -181,12 +187,15 @@ class CoursesController < ApplicationController
 
         includes = Set.new(Array(params[:include]))
 
+        # We only want to return the permissions for single courses and not lists of courses.
+        includes.delete 'permissions'
+
         hash = []
         enrollments.group_by(&:course_id).each do |course_id, course_enrollments|
           course = course_enrollments.first.course
           hash << course_json(course, @current_user, session, includes, course_enrollments)
         end
-        render :json => hash.to_json
+        render :json => hash
       }
     end
   end
@@ -329,7 +338,7 @@ class CoursesController < ApplicationController
         else
           flash[:error] = t('errors.create_failed', "Course creation failed")
           format.html { redirect_to :root_url }
-          format.json { render :json => @course.errors.to_json, :status => :bad_request }
+          format.json { render :json => @course.errors, :status => :bad_request }
         end
       end
     end
@@ -479,7 +488,8 @@ class CoursesController < ApplicationController
         # not_ended_enrollments for enrollment_json
         # enrollments course for has_grade_permissions?
         User.send(:preload_associations, users, { :not_ended_enrollments => :course },
-                  :conditions => ['enrollments.course_id = ?', @context.id])
+                  :conditions => ['enrollments.course_id = ?', @context.id],
+                  :shard => @context.shard)
       end
       render :json => users.map { |u|
         enrollments = u.not_ended_enrollments if includes.include?('enrollments')
@@ -529,7 +539,8 @@ class CoursesController < ApplicationController
         # not_ended_enrollments for enrollment_json
         # enrollments course for has_grade_permissions?
         User.send(:preload_associations, users, { :not_ended_enrollments => :course },
-                  :conditions => ['enrollments.course_id = ?', @context.id])
+                  :conditions => ['enrollments.course_id = ?', @context.id],
+                  :shard => @context.shard)
       end
       user = users.first or raise ActiveRecord::RecordNotFound
       enrollments = user.not_ended_enrollments if includes.include?('enrollments')
@@ -607,7 +618,7 @@ class CoursesController < ApplicationController
   def destroy
     @context = api_request? ? api_find(Course, params[:id]) : Course.find(params[:id])
     if api_request? && !['delete', 'conclude'].include?(params[:event])
-      return render(:json => { :message => 'Only "delete" and "conclude" events are allowed.' }.to_json, :status => :bad_request)
+      return render(:json => { :message => 'Only "delete" and "conclude" events are allowed.' }, :status => :bad_request)
     end
     if params[:event] != 'conclude' && (@context.created? || @context.claimed? || params[:event] == 'delete')
       return unless authorized_action(@context, @current_user, permission_for_event(params[:event]))
@@ -629,7 +640,7 @@ class CoursesController < ApplicationController
     respond_to do |format|
       format.html { redirect_to dashboard_url }
       format.json {
-        render :json => { params[:event] => true }.to_json
+        render :json => { params[:event] => true }
       }
     end
   end
@@ -668,7 +679,7 @@ class CoursesController < ApplicationController
         format.html do
           js_env(:RECENT_STUDENTS_URL => api_v1_course_recent_students_url(@context))
         end
-        format.json { render :json => @categories.to_json }
+        format.json { render :json => @categories }
       end
     end
   end
@@ -755,7 +766,7 @@ class CoursesController < ApplicationController
       @context.save
       respond_to do |format|
         format.html { redirect_to named_context_url(@context, :context_details_url) }
-        format.json { render :json => {:update_nav => true}.to_json }
+        format.json { render :json => {:update_nav => true} }
       end
     end
   end
@@ -776,7 +787,7 @@ class CoursesController < ApplicationController
 
       respond_to do |format|
         format.html { redirect_to course_settings_url }
-        format.json { render :json => {:re_sent => true}.to_json }
+        format.json { render :json => {:re_sent => true} }
       end
     end
   end
@@ -978,7 +989,7 @@ class CoursesController < ApplicationController
         end
         locks
       end
-      render :json => locks_hash.to_json
+      render :json => locks_hash
     end
   end
 
@@ -1043,7 +1054,10 @@ class CoursesController < ApplicationController
   #
   # Accepts the same include[] parameters as the list action plus:
   #
-  # @argument include[] ["all_courses"] Also search recently deleted courses
+  # @argument include[] [String, "all_courses"|"permissions"]
+  #   - "all_courses": Also search recently deleted courses.
+  #   - "permissions": Include permissions the current user has
+  #     for the course.
   #
   # @returns Course
   def show
@@ -1073,7 +1087,7 @@ class CoursesController < ApplicationController
     @context = Course.active.find(params[:id])
     if request.xhr?
       if authorized_action(@context, @current_user, [:read, :read_as_admin])
-        render :json => @context.to_json
+        render :json => @context
       end
       return
     end
@@ -1119,6 +1133,11 @@ class CoursesController < ApplicationController
       when "wiki"
         @wiki = @context.wiki
         @page = @wiki.front_page
+        if @context.draft_state_enabled?
+          set_js_rights [:wiki, :page]
+          set_js_wiki_data :course_home => true
+          @padless = true
+        end
       when 'assignments'
         add_crumb(t('#crumbs.assignments', "Assignments"))
         get_sorted_assignments
@@ -1129,7 +1148,7 @@ class CoursesController < ApplicationController
       when 'syllabus'
         add_crumb(t('#crumbs.syllabus', "Syllabus"))
         @syllabus_body = api_user_content(@context.syllabus_body, @context)
-        @groups = @context.assignment_groups.active.order(:position, :name).all
+        @groups = @context.assignment_groups.active.order(:position, AssignmentGroup.best_unicode_collation_key('name')).all
         @events = @context.calendar_events.active.to_a
         @events.concat @context.assignments.active.to_a
         @undated_events = @events.select {|e| e.start_at == nil}
@@ -1189,9 +1208,9 @@ class CoursesController < ApplicationController
     if @enrollment.can_be_concluded_by(@current_user, @context, session)
       respond_to do |format|
         if @enrollment.conclude
-          format.json { render :json => @enrollment.to_json }
+          format.json { render :json => @enrollment }
         else
-          format.json { render :json => @enrollment.to_json, :status => :bad_request }
+          format.json { render :json => @enrollment, :status => :bad_request }
         end
       end
     else
@@ -1208,9 +1227,9 @@ class CoursesController < ApplicationController
       respond_to do |format|
         @enrollment.workflow_state = 'active'
         if @enrollment.save
-          format.json { render :json => @enrollment.to_json }
+          format.json { render :json => @enrollment }
         else
-          format.json { render :json => @enrollment.to_json, :status => :bad_request }
+          format.json { render :json => @enrollment, :status => :bad_request }
         end
       end
     else
@@ -1224,10 +1243,10 @@ class CoursesController < ApplicationController
     if authorized_action(@context, @current_user, :manage_admin_users)
       if params[:limit] == "1"
         Enrollment.limit_privileges_to_course_section!(@context, @user, true)
-        render :json => {:limited => true}.to_json
+        render :json => {:limited => true}
       else
         Enrollment.limit_privileges_to_course_section!(@context, @user, false)
-        render :json => {:limited => false}.to_json
+        render :json => {:limited => false}
       end
     else
       authorized_action(@context, @current_user, :permission_fail)
@@ -1240,9 +1259,9 @@ class CoursesController < ApplicationController
     if @enrollment.can_be_deleted_by(@current_user, @context, session)
       respond_to do |format|
         if (!@enrollment.defined_by_sis? || @context.grants_right?(@current_user, session, :manage_account_settings)) && @enrollment.destroy
-          format.json { render :json => @enrollment.to_json }
+          format.json { render :json => @enrollment }
         else
-          format.json { render :json => @enrollment.to_json, :status => :bad_request }
+          format.json { render :json => @enrollment, :status => :bad_request }
         end
       end
     else
@@ -1323,7 +1342,7 @@ class CoursesController < ApplicationController
       student = nil
       student = @context.students.find(params[:student_id]) if params[:student_id] != 'none'
       enrollment.update_attribute(:associated_user_id, student && student.id)
-      render :json => enrollment.to_json(:methods => :associated_user_name)
+      render :json => enrollment.as_json(:methods => :associated_user_name)
     end
   end
 
@@ -1341,12 +1360,12 @@ class CoursesController < ApplicationController
           "id<>? AND user_id=? AND course_section_id=? AND type=? AND (associated_user_id IS NULL OR associated_user_id=?)",
           @enrollment, @enrollment.user_id, params[:course_section_id], @enrollment.type, @enrollment.associated_user_id).first
         if @possible_dup.present?
-          format.json { render :json => @enrollment.to_json, :status => :forbidden }
+          format.json { render :json => @enrollment, :status => :forbidden }
         else
           @enrollment.course_section = @context.course_sections.find(params[:course_section_id])
           @enrollment.save!
 
-          format.json { render :json => @enrollment.to_json }
+          format.json { render :json => @enrollment }
         end
       end
     else
@@ -1368,7 +1387,7 @@ class CoursesController < ApplicationController
     get_context
     if authorized_action(@context, @current_user, :read) &&
       authorized_action(@context, @current_user, :read_as_admin)
-      args = params[:course].slice(:name, :start_at, :conclude_at, :course_code)
+      args = params[:course].slice(:name, :course_code)
       account = @context.account
       if params[:course][:account_id]
         account = Account.find(params[:course][:account_id])
@@ -1387,6 +1406,8 @@ class CoursesController < ApplicationController
       args[:account] = account
       @course = @context.account.courses.new
       @course.attributes = args
+      @course.start_at = DateTime.parse(params[:course][:start_at]).utc rescue nil
+      @course.conclude_at = DateTime.parse(params[:course][:conclude_at]).utc rescue nil
       @course.workflow_state = 'claimed'
       @course.save
       @course.enroll_user(@current_user, 'TeacherEnrollment', :enrollment_state => 'active')
@@ -1510,12 +1531,12 @@ class CoursesController < ApplicationController
             if api_request?
               render :json => course_json(@course, @current_user, session, [:hide_final_grades], nil)
             else
-             render :json => @course.to_json(:methods => [:readable_license, :quota, :account_name, :term_name, :grading_standard_title, :storage_quota_mb]), :status => :ok
+             render :json => @course.as_json(:methods => [:readable_license, :quota, :account_name, :term_name, :grading_standard_title, :storage_quota_mb]), :status => :ok
             end
           end
         else
           format.html { render :action => "edit" }
-          format.json { render :json => @course.errors.to_json, :status => :bad_request }
+          format.json { render :json => @course.errors, :status => :bad_request }
         end
       end
     end

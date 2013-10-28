@@ -20,7 +20,7 @@ describe "quizzes questions" do
 
       click_questions_tab
       hover_and_click(".edit_question_link")
-      wait_for_animations
+      wait_for_ajaximations
       question = fj(".question_form:visible")
       click_option('.question_form:visible .question_type', 'Multiple Choice')
       replace_content(question.find_element(:css, 'input[name="question_name"]'), 'edited question')

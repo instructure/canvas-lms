@@ -2,7 +2,7 @@
   <div class="ig-header" style="position:relative;">
     {{#if ENV.PERMISSIONS.manage}}
       <span class="sortable-handle">
-        <a href="#" class="icon-updown"></a>
+        <a href="#" class="icon-drag-handle"></a>
       </span>
     {{/if}}
     <h2
@@ -64,14 +64,26 @@
               data-focus-returns-to="ag_{{id}}_manage_link"
             >{{#t "edit"}}Edit{{/t}}</a>
           </li>
+          {{#unless hasFrozenAssignments}}
+            <li>
+              <a
+                href="#"
+                class="delete_group icon-trash"
+                title='{{#t "title_delete"}}Delete Assignment Group?{{/t}}'
+                data-focus-returns-to="ag_{{id}}_manage_link"
+              >{{#t "delete"}}Delete{{/t}}</a>
+            </li>
+          {{/unless}}
+          {{#if canMove}}
           <li>
             <a
               href="#"
-              class="delete_group icon-trash"
-              title='{{#t "title_delete"}}Delete Assignment Group?{{/t}}'
+              class="move_group icon-updown"
+              title='{{#t "title_move"}}Move Assignment Group{{/t}}'
               data-focus-returns-to="ag_{{id}}_manage_link"
-            >{{#t "delete"}}Delete{{/t}}</a>
+            >{{#t "move"}}Move To&hellip;{{/t}}</a>
           </li>
+          {{/if}}
         </ul>
       {{/if}}
     </div>
@@ -86,5 +98,6 @@
     <form data-view="createAssignment" class="form-dialog"></form>
     <form data-view="editAssignmentGroup" class="form-dialog"></form>
     <form data-view="deleteAssignmentGroup" class="form-dialog"></form>
+    <form data-view="moveAssignmentGroup" class="form-dialog"></form>
   {{/if}}
 </div>

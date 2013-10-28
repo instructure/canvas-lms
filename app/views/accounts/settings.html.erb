@@ -302,7 +302,7 @@ Allowing Draft State here will allow teachers to enable it in their individual c
              <% end %>
           <% end %>
           <% f.fields_for :services do |services| %>
-            <% Account.services_exposed_to_ui_hash(:setting, @current_user, @account).sort_by { |k,h| h[:name] }.each do |key, service| %>
+            <% Account.services_exposed_to_ui_hash(:setting, @current_user, @account).sort_by { |k,h| Canvas::ICU.collation_key(h[:name]) }.each do |key, service| %>
               <div>
                 <%= services.check_box key, :checked => @account.service_enabled?(key) %>
                 <%= services.label key, service[:name] + " " %>
@@ -445,7 +445,7 @@ Allowing Draft State here will allow teachers to enable it in their individual c
           <fieldset>
             <legend><%= t(:enabled_web_serices_title, "Enabled Web Services") %></legend>
             <% f.fields_for :services do |services| %>
-              <% exposed_services.sort_by { |k,h| h[:name] }.each do |key, service| %>
+              <% exposed_services.sort_by { |k,h| Canvas::ICU.collation_key(h[:name]) }.each do |key, service| %>
                 <div>
                   <%= services.check_box key, :checked => @account.service_enabled?(key) %>
                   <%= services.label key, service[:name] + " " %>

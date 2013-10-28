@@ -15,7 +15,9 @@ describe "Standard Common Cartridge importing" do
     @course = course
     @migration = ContentMigration.create(:context => @course)
     @migration.migration_settings[:migration_ids_to_import] = {:copy => {}}
-    @course.import_from_migration(@course_data, nil, @migration)
+    enable_cache do
+      @course.import_from_migration(@course_data, nil, @migration)
+    end
   end
   
   after(:all) do
@@ -50,7 +52,8 @@ describe "Standard Common Cartridge importing" do
   # This also tests the WebLinks, they are just content tags and don't have their own class
   it "should import modules from organization" do
     @course.context_modules.count.should == 3
-    
+    @course.context_modules.map(&:position).should eql [1, 2, 3]
+
     mod1 = @course.context_modules.find_by_migration_id("I_00000")
     mod1.name.should == "Your Mom, Research, & You"
     tag = mod1.content_tags[0]
@@ -124,7 +127,7 @@ describe "Standard Common Cartridge importing" do
     tag.content_id.should == @course.assignments.find_by_migration_id("I_00011_R").id
     tag.indent.should == 0
   end
-  
+
   it "should import external tools" do
     @course.context_external_tools.count.should == 2
     et = @course.context_external_tools.find_by_migration_id("I_00010_R")
@@ -303,6 +306,102 @@ describe "Standard Common Cartridge importing" do
       @course.import_from_migration(@course_data, nil, @migration)
 
       @course.announcements.count.should == 1
+    end
+  end
+
+  context "position conflicts" do
+    append_before do
+      @import_json =
+          {
+              "modules" => [
+                  {
+                      "title" => "monkeys",
+                      "position" => 1,
+                      "migration_id" => 'm_monkeys'
+                  },
+                  {
+                      "title" => "ponies",
+                      "position" => 2,
+                      "migration_id" => 'm_ponies'
+                  },
+                  {
+                      "title" => "last",
+                      "position" => 3,
+                      "migration_id" => "m_last"
+                  }
+              ],
+              "assignment_groups" => [
+                  {
+                      "title" => "monkeys",
+                      "position" => 1,
+                      "migration_id" => "ag_monkeys"
+                  },
+                  {
+                      "title" => "ponies",
+                      "position" => 2,
+                      "migration_id" => "ag_ponies"
+                  },
+                  {
+                      "title" => "last",
+                      "position" => 3,
+                      "migration_id" => "ag_last"
+                  }
+              ]
+          }
+    end
+
+    it "should fix position conflicts for modules" do
+      @course = course
+
+      mod1 = @course.context_modules.create :name => "ponies"
+      mod1.position = 1
+      mod1.migration_id = 'm_ponies'
+      mod1.save!
+
+      mod2 = @course.context_modules.create :name => "monsters"
+      mod2.migration_id = 'm_monsters'
+      mod2.position = 2
+      mod2.save!
+
+      @migration = ContentMigration.create(:context => @course)
+      @migration.migration_settings[:migration_ids_to_import] = {
+          :copy => {
+              "everything" => "0",
+              "all_context_modules" => "1"
+          }
+      }
+      @course.import_from_migration(@import_json, nil, @migration)
+
+      mods = @course.context_modules.to_a
+      mods.map(&:position).should eql [1, 2, 3, 4]
+      mods.map(&:name).should eql %w(monkeys ponies monsters last)
+    end
+
+    it "should fix position conflicts for assignment groups" do
+      @course = course
+
+      ag1 = @course.assignment_groups.create :name => "ponies"
+      ag1.position = 1
+      ag1.migration_id = 'ag_ponies'
+      ag1.save!
+
+      ag2 = @course.assignment_groups.create :name => "monsters"
+      ag2.position = 2
+      ag2.migration_id = 'ag_monsters'
+      ag2.save!
+
+      @migration = ContentMigration.create(:context => @course)
+      @migration.migration_settings[:migration_ids_to_import] = {
+          :copy => {
+              "everything" => "0",
+              "all_assignment_groups" => "1"
+          }
+      }
+      @course.import_from_migration(@import_json, nil, @migration)
+
+      ags = @course.assignment_groups.to_a
+      ags.map(&:position).should eql [1, 2, 3, 4]
+      ags.map(&:name).should eql %w(monkeys ponies monsters last)
     end
   end
 

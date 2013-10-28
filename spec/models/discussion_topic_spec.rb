@@ -619,6 +619,17 @@ describe DiscussionTopic do
       @topic.user_can_see_posts?(@student).should == true
     end
 
+    it "should work the same for group discussions" do
+      group_discussion_assignment
+      @topic.require_initial_post = true
+      @topic.save!
+      ct = @topic.child_topics.first
+      ct.context.add_user(@student)
+      ct.user_can_see_posts?(@student).should be_false
+      ct.reply_from(user: @student, text: 'ohai')
+      ct.user_ids_who_have_posted_and_admins(true) # clear the memoization
+      ct.user_can_see_posts?(@student).should be_true
+    end
   end
 
   context "subscribers" do
@@ -1113,7 +1124,6 @@ describe DiscussionTopic do
   context "materialized view" do
     before do
       topic_with_nested_replies
-      run_transaction_commit_callbacks
     end
 
     it "should return nil if the view has not been built yet, and schedule a job" do
@@ -1133,7 +1143,6 @@ describe DiscussionTopic do
       run_jobs
       Delayed::Job.strand_size("materialized_discussion:#{@topic.id}").should == 0
       @topic.reply_from(:user => @user, :text => "ohai")
-      run_transaction_commit_callbacks
       Delayed::Job.strand_size("materialized_discussion:#{@topic.id}").should == 1
     end
 
@@ -1142,7 +1151,6 @@ describe DiscussionTopic do
       run_jobs
       Delayed::Job.strand_size("materialized_discussion:#{@topic.id}").should == 0
       reply.update_attributes(:message => "i got that wrong before")
-      run_transaction_commit_callbacks
       Delayed::Job.strand_size("materialized_discussion:#{@topic.id}").should == 1
     end
 

@@ -146,7 +146,7 @@ describe "grades" do
 
       #click rubric
       f("#submission_#{@first_assignment.id} .toggle_rubric_assessments_link").click
-      wait_for_animations
+      wait_for_ajaximations
       fj('.rubric_assessments:visible .rubric_title').should include_text(@rubric.title)
       fj('.rubric_assessments:visible .rubric_total').should include_text('2')
 

@@ -39,9 +39,9 @@ end
 
 def browse_menu
   @browser.click
-  wait_for_ajaximations(300)
+  wait_for_ajaximations(500)
   keep_trying_until { ffj('.autocomplete_menu:visible .list').size.should == @level }
-  wait_for_ajaximations(300)
+  wait_for_ajaximations(500)
 end
 
 def browse(*names)
@@ -50,7 +50,7 @@ def browse(*names)
   prev_elements = elements
   element = prev_elements.detect { |e| e.last == name } or raise "menu item does not exist"
   element.first.click
-  wait_for_ajaximations(300)
+  wait_for_ajaximations(500)
   keep_trying_until { ffj('.autocomplete_menu:visible .list').size.should == @level }
   @elements = nil
 
@@ -63,7 +63,7 @@ def browse(*names)
   @level -= 1
   @elements = nil
   @input.send_keys(:arrow_left) unless ffj('.autocomplete_menu:visible .list').empty?
-  wait_for_ajaximations(300)
+  sleep 1
 end
 
 def elements
@@ -128,11 +128,11 @@ def submit_message_form(opts={})
 
   if opts[:add_recipient] && browser = fj("#create_message_form .browser:visible")
     browser.click
-    wait_for_ajaximations(300)
+    wait_for_ajaximations(500)
     fj('.autocomplete_menu .selectable:visible').click
-    wait_for_ajaximations(300)
+    wait_for_ajaximations(500)
     fj('.autocomplete_menu .toggleable:visible .toggle').click
-    wait_for_ajaximations(300)
+    wait_for_ajaximations(500)
     ff('.token_input ul li').length.should > 0
     fj("#create_message_form input:visible").send_keys("\t")
   end
@@ -212,7 +212,7 @@ end
 def delete_selected_messages(confirm_conversation_deleted = true)
   orig_size = get_conversations.size
 
-  wait_for_ajaximations(300)
+  wait_for_ajaximations(500)
   delete = f('#action_delete')
   delete.should be_displayed
   delete.click

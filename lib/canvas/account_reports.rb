@@ -24,7 +24,7 @@ module Canvas::AccountReports
   # account id is ignored; use PluginSetting to enable a subset of reports
   def self.add_account_reports(account_id, module_name, reports)
     reports.each do |report_type, details|
-      details = { :title => details } if details.is_a? String
+      details = {:title => details} if details.is_a? String
       details[:module] ||= module_name
       details[:proc] ||= "Canvas::AccountReports::#{module_name}".constantize.method(report_type)
       REPORTS[report_type] = details
@@ -55,8 +55,8 @@ module Canvas::AccountReports
     "#{account_report.report_type}_#{Time.now.strftime('%d_%b_%Y')}_#{account_report.id}_.#{ext}"
   end
 
-  def self.generate_file(account_report)
-    temp = Tempfile.open(generate_file_name(account_report, "csv"))
+  def self.generate_file(account_report, ext = 'csv')
+    temp = Tempfile.open(generate_file_name(account_report, ext))
     filepath = temp.path
     temp.close!
     filepath
@@ -92,6 +92,10 @@ module Canvas::AccountReports
           filetype = 'text/csv'
         when ".zip"
           filetype = 'application/zip'
+        when ".txt"
+          filename = File.basename(csv);
+          filepath = csv
+          filetype = 'text/rtf'
         else
           filename = generate_file_name(account_report, "csv")
           f = Tempfile.open(filename)

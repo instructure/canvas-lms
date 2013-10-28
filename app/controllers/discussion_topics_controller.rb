@@ -157,10 +157,11 @@ class DiscussionTopicsController < ApplicationController
   # @argument order_by [String, "position"|"recent_activity"]
   #   Determines the order of the discussion topic list. Defaults to "position".
   #
-  # @argument scope [Optional, String, "locked"|"unlocked"]
-  #   Only return discussion topics in the given state. Defaults to including
-  #   locked and unlocked topics. Filtering is done after pagination, so pages
-  #   may be smaller than requested if topics are filtered
+  # @argument scope [Optional, String, "locked"|"unlocked"|"pinned"|"unpinned"]
+  #   Only return discussion topics in the given state(s). Defaults to including
+  #   all topics. Filtering is done after pagination, so pages
+  #   may be smaller than requested if topics are filtered.
+  #   Can pass multiple states as comma separated string.
   #
   # @argument only_announcements [Optional, Boolean]
   #   Return announcements instead of discussion topics. Defaults to false
@@ -187,9 +188,27 @@ class DiscussionTopicsController < ApplicationController
 
     scope = DiscussionTopic.search_by_attribute(scope, :title, params[:search_term])
 
+    states = params[:scope].split(',').map{|s| s.strip} if params[:scope]
+    if states.present?
+      if (states.include?('pinned') && states.include?('unpinned')) ||
+          (states.include?('locked') && states.include?('unlocked'))
+        render :json => t('errors.bad_scope', "scope is contradictory"), :status => :bad_request
+        return
+      end
+
+      if states.include?('pinned')
+        scope = scope.where(:pinned => true)
+      elsif states.include?('unpinned')
+        scope = scope.where("discussion_topics.pinned IS NOT TRUE")
+      end
+    end
+
     @topics = Api.paginate(scope, self, topic_pagination_url)
-    @topics.reject! { |t| t.locked? || t.locked_for?(@current_user) } if params[:scope] == 'unlocked'
-    @topics.select! { |t| t.locked? || t.locked_for?(@current_user) } if params[:scope] == 'locked'
+
+    if states.present?
+      @topics.reject! { |t| t.locked? || t.locked_for?(@current_user) } if states.include?('unlocked')
+      @topics.select! { |t| t.locked? || t.locked_for?(@current_user) } if states.include?('locked')
+    end
     @topics.each { |topic| topic.current_user = @current_user }
 
     respond_to do |format|
@@ -478,7 +497,7 @@ class DiscussionTopicsController < ApplicationController
           flash[:notice] = t :topic_deleted_notice, "%{topic_title} deleted successfully", :topic_title => @topic.title
           redirect_to named_context_url(@context, :context_discussion_topics_url)
         }
-        format.json  { render :json => @topic.to_json(:include => {:user => {:only => :name} } ), :status => :ok }
+        format.json  { render :json => @topic.as_json(:include => {:user => {:only => :name} } ), :status => :ok }
       end
     end
   end
@@ -564,7 +583,7 @@ class DiscussionTopicsController < ApplicationController
 
       render :json => discussion_topic_api_json(@topic, @context, @current_user, session)
     else
-      render :json => @topic.errors.to_json, :status => :bad_request
+      render :json => @topic.errors, :status => :bad_request
     end
   end
 
@@ -662,7 +681,7 @@ class DiscussionTopicsController < ApplicationController
           att = @topic.attachment
           @topic.attachment = nil
           @topic.save! if !@topic.new_record?
-          att.destroy!
+          att.destroy
         end
       end
 

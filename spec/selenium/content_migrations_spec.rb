@@ -39,7 +39,7 @@ end
 def import(cm=nil)
   cm ||= @course.content_migrations.last
   cm.reload
-  cm.check_quiz_id_prepender
+  cm.set_default_settings
   cm.import_content
 end
 
@@ -80,12 +80,15 @@ def test_selective_content(source_course=nil)
 
   # directly click checkboxes
   boxes_to_click.each do |name, value|
-    box = f(".selectContentDialog input[name=\"#{name}\"]")
-    box.should_not be_nil
     keep_trying_until do
+      escaped_name = name.gsub("[", "\\[").gsub("]", "\\]")
+      selector = ".selectContentDialog input[name=\"#{escaped_name}\"]"
+      box = f(selector)
+      selector = selector.gsub("\"", "\\\"")
+      box.should_not be_nil
       set_value(box, value)
       wait_for_ajaximations
-      value == driver.execute_script("return !!($('.selectContentDialog input[name=\"#{name}\"]').is(':checked'))")
+      is_checked(selector).should == value
     end
   end
 
@@ -226,6 +229,34 @@ describe "content migrations" do
       test_selective_content
     end
 
+    it "should overwrite quizzes when option is checked and duplicate otherwise" do
+      pending unless Qti.qti_enabled?
+
+      # Pre-create the quiz
+      q = @course.quizzes.create!(:title => "Name to be overwritten")
+      q.migration_id = "QDB_1"
+      q.save!
+
+      # Don't overwrite
+      visit_page
+      fill_migration_form(:type => "qti_converter")
+      submit
+      run_migration
+      @course.quizzes.reload.count.should == 2
+      @course.quizzes.map(&:title).sort.should == ["Name to be overwritten", "Pretest"]
+
+      # Overwrite original
+      visit_page
+      fill_migration_form(:type => "qti_converter")
+      f('#overwriteAssessmentContent').click
+      submit
+      cm = @course.content_migrations.last
+      cm.migration_settings["overwrite_quizzes"].should == true
+      run_migration
+      @course.quizzes.reload.count.should == 2
+      @course.quizzes.map(&:title).should == ["Pretest", "Pretest"]
+    end
+
     context "default question bank" do
       it "should import into selected question bank" do
         pending unless Qti.qti_enabled?
@@ -337,7 +368,7 @@ describe "content migrations" do
       submit
 
       cm = @course.content_migrations.last
-      cm.migration_settings["source_course_id"].should == @copy_from.id
+      cm.migration_settings["source_course_id"].should == @copy_from.id.to_s
 
       source_link = f('.migrationProgressItem .sourceLink a')
       source_link.text.should == @copy_from.name
@@ -453,10 +484,10 @@ describe "content migrations" do
       click_option('#daySubstitution ul > div:nth-child(2) .currentDay', "2", :value)
       click_option('#daySubstitution ul > div:nth-child(2) .subDay', "3", :value)
 
-      f('#oldStartDate').send_keys('Jul 1, 2012')
+      f('#oldStartDate').send_keys('7/1/2012')
       f('#oldEndDate').send_keys('Jul 11, 2012')
       f('#newStartDate').clear
-      f('#newStartDate').send_keys('Aug 5, 2012')
+      f('#newStartDate').send_keys('8-5-2012')
       f('#newEndDate').send_keys('Aug 15, 2012')
 
       submit

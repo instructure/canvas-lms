@@ -77,12 +77,12 @@ module AssignmentOverridesSeleniumHelper
 
   def select_last_override_section(section_name)
     click_option('.due-date-row:last select', section_name)
-    wait_for_animations
+    wait_for_ajaximations
   end
 
   def select_first_override_section(section_name)
     click_option('.due-date-row:first select', section_name)
-    wait_for_animations
+    wait_for_ajaximations
   end
 
   def add_due_date_override(assignment)

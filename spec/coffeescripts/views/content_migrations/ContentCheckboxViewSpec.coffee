@@ -2,7 +2,9 @@ define [
   'compiled/collections/content_migrations/ContentCheckboxCollection'
   'compiled/views/content_migrations/ContentCheckboxView'
   'compiled/models/content_migrations/ContentCheckbox'
-  ], (CheckboxCollection, CheckboxView, CheckboxModel) ->
+  'jquery'
+  'helpers/jquery.simulate'
+  ], (CheckboxCollection, CheckboxView, CheckboxModel, $) ->
 
   class CheckboxHelper
 

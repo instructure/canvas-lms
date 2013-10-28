@@ -45,6 +45,7 @@ class PageView < ActiveRecord::Base
     self.new(attributes).tap do |p|
       p.url = LoggingFilter.filter_uri(request.url)[0,255]
       p.http_method = request.method.to_s
+      p.remote_ip = request.remote_ip
       p.controller = request.path_parameters['controller']
       p.action = request.path_parameters['action']
       p.session_id = request.session_options[:id].to_s.force_encoding(Encoding::UTF_8).presence
@@ -79,7 +80,7 @@ class PageView < ActiveRecord::Base
   end
 
   # the list of columns we display to users, export to csv, etc
-  EXPORTED_COLUMNS = %w(request_id user_id url context_id context_type asset_id asset_type controller action contributed interaction_seconds created_at user_request render_time user_agent participated account_id real_user_id http_method)
+  EXPORTED_COLUMNS = %w(request_id user_id url context_id context_type asset_id asset_type controller action contributed interaction_seconds created_at user_request render_time user_agent participated account_id real_user_id http_method remote_ip)
 
   def self.page_views_enabled?
     !!page_view_method

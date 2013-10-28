@@ -162,7 +162,7 @@ class Notification < ActiveRecord::Base
         res << n if n.category && n.dashboard?
       end
     end
-    res.sort_by{|n| n.category == "Other" ? "zzzz" : n.category }
+    res.sort_by{|n| n.category == "Other" ? SortLast : n.category }
   end
 
   # Return a hash with information for a related user option if one exists.

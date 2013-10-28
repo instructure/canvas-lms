@@ -172,9 +172,10 @@ describe UnzipAttachment do
       Delayed::Job.strand_size('scribd')
     end
 
-    def process_file(name)
+    def process_file(name, opts={})
       filename = fixture_filename(name)
-      UnzipAttachment.new(:course => @course, :filename => filename).process
+      opts = opts.merge(:course => @course, :filename => filename)
+      UnzipAttachment.new(opts).process
     end
 
     it "should not queue any scribd jobs if there are not any scribdable attachments" do
@@ -182,8 +183,13 @@ describe UnzipAttachment do
       job_queue_size.should == 0
     end
 
-    it "should queue a scribd job if there is a scribdable attachment" do
+    it "should not queue a scribd job by default" do
       process_file('attachments-scribdable.zip')
+      job_queue_size.should == 0
+    end
+
+    it "should queue a scribd job if there is a scribdable attachment" do
+      process_file('attachments-scribdable.zip', {:queue_scribd => true})
       job_queue_size.should == 1
     end
   end

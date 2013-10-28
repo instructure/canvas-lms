@@ -29,9 +29,9 @@ class TermsController < ApplicationController
     @term = @context.enrollment_terms.active.build(params[:enrollment_term])
     if @term.save
       @term.set_overrides(@context, overrides)
-      render :json => @term.to_json(:include => :enrollment_dates_overrides)
+      render :json => @term.as_json(:include => :enrollment_dates_overrides)
     else
-      render :json => @term.errors.to_json, :status => :bad_request
+      render :json => @term.errors, :status => :bad_request
     end
   end
   
@@ -50,15 +50,15 @@ class TermsController < ApplicationController
     end
     if @term.update_attributes(params[:enrollment_term])
       @term.set_overrides(@context, overrides)
-      render :json => @term.to_json(:include => :enrollment_dates_overrides)
+      render :json => @term.as_json(:include => :enrollment_dates_overrides)
     else
-      render :json => @term.errors.to_json, :status => :bad_request
+      render :json => @term.errors, :status => :bad_request
     end
   end
   
   def destroy
     @term = @context.enrollment_terms.find(params[:id])
     @term.destroy
-    render :json => @term.to_json
+    render :json => @term
   end
 end

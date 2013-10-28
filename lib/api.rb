@@ -545,4 +545,20 @@ module Api
     {}
   end
 
+  def self.stringify_json_ids(value)
+    return unless value.is_a?(Hash)
+    value.keys.each do |key|
+      if key =~ /(^|_)id$/
+        # id, foo_id, etc.
+        value[key] = stringify_json_id(value[key])
+      elsif key =~ /(^|_)ids$/ && value[key].is_a?(Array)
+        # ids, foo_ids, etc.
+        value[key].map!{ |id| stringify_json_id(id) }
+      end
+    end
+  end
+
+  def self.stringify_json_id(id)
+    id.is_a?(Integer) ? id.to_s : id
+  end
 end

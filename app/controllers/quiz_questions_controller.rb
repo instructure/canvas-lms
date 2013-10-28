@@ -22,7 +22,7 @@ class QuizQuestionsController < ApplicationController
   def show
     if authorized_action(@quiz, @current_user, :update)
       @question = @quiz.quiz_questions.active.find(params[:id])
-      render :json => @question.to_json(:include => :assessment_question)
+      render :json => @question.as_json(:include => :assessment_question)
     end
   end
   
@@ -39,7 +39,7 @@ class QuizQuestionsController < ApplicationController
       @question = @quiz.quiz_questions.create(:quiz_group => @group, :question_data => question_data)
       @quiz.did_edit if @quiz.created?
       
-      render :json => @question.to_json(:include => :assessment_question)
+      render :json => @question.as_json(:include => :assessment_question)
     end
   end
   
@@ -48,7 +48,7 @@ class QuizQuestionsController < ApplicationController
       @assessment_questions = @bank.assessment_questions.active.find_all_by_id(params[:assessment_questions_ids].split(",")).compact
       @group = @quiz.quiz_groups.find_by_id(params[:quiz_group_id]) if params[:quiz_group_id].to_i > 0
       @questions = @quiz.add_assessment_questions(@assessment_questions, @group)
-      render :json => @questions.to_json
+      render :json => @questions
     end
   end
   protected :add_questions
@@ -72,7 +72,7 @@ class QuizQuestionsController < ApplicationController
       @question.save
       @quiz.did_edit if @quiz.created?
       
-      render :json => @question.to_json(:include => :assessment_question)
+      render :json => @question.as_json(:include => :assessment_question)
     end
   end
 
@@ -80,7 +80,7 @@ class QuizQuestionsController < ApplicationController
     if authorized_action(@quiz, @current_user, :update)
       @question = @quiz.quiz_questions.active.find(params[:id])
       @question.destroy
-      render :json => @question.to_json
+      render :json => @question
     end
   end
   

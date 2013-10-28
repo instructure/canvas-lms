@@ -19,8 +19,13 @@
   </div>
 
   <div>
-    <a href="#" class="remove-link"><i class="icon-end"></i>
-      <span class="screenreader-only">{{#t "overrides.remove_these_dates"}}Remove These Dates{{/t}}</span>
+    <a
+      href="#"
+      class="remove-link"
+      role="button"
+      title='{{#t "overrides.remove_these_dates"}}Remove These Dates{{/t}}'
+      aria-label='{{#t "overrides.remove_these_dates"}}Remove These Dates{{/t}}'
+    ><i class="icon-end"></i>
     </a>
   </div>
   {{/with}}

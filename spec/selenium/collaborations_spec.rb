@@ -22,14 +22,13 @@ describe "collaborations" do
   def delete_collaboration(collaboration, type = 'etherpad')
     f(".collaboration_#{collaboration.id} .delete_collaboration_link").click
 
-    wait_for_ajaximations
-
     if type == 'google_docs'
+      keep_trying_until { f('#delete_collaboration_dialog .delete_button').should be_displayed }
       f('#delete_collaboration_dialog .delete_button').click
     else
       #driver.switch_to.alert.accept
     end
-    wait_for_ajaximations
+    keep_trying_until { f(".collaboration_#{collaboration.id} .delete_collaboration_link").should be_nil }
   end
 
   # Public: Given an array of collaborations, verify their presence.
@@ -44,13 +43,10 @@ describe "collaborations" do
                               execute_script = false)
     Array(urls).each do |url|
       get url
-
       wait_for_ajaximations
-
       if execute_script
         driver.execute_script 'window.confirm = function(msg) { return true; }'
       end
-
       form_visible?.should == form_visible
     end
   end

@@ -70,6 +70,21 @@ define [
     toJSON: -> @options
 
     ##
+    # Reorder child views according to current collection ordering.
+    # Useful when your collection has a comparator and that field
+    # changes on a given model, e.g.
+    #
+    #   @on 'change:name', @reorder
+    #
+    # @api public
+
+    reorder: ->
+      @collection.sort()
+      @$list.children().detach()
+      children = (model.itemView.$el for model in @collection.models)
+      @$list.append children...
+
+    ##
     # Attaches all the collection events
     #
     # @api private
@@ -144,7 +159,9 @@ define [
     # like instantiate with child views, etc.
 
     createItemView: (model) ->
-      new @itemView $.extend {}, (@itemViewOptions || {}), {model}
+      view = new @itemView $.extend {}, (@itemViewOptions || {}), {model}
+      model.itemView = view
+      view
 
     ##
     # Inserts the item view with respect to the collection comparator.

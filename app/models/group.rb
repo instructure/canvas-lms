@@ -413,10 +413,6 @@ class Group < ActiveRecord::Base
     true
   end
 
-  def file_structure_for(user)
-    User.file_structure_for(self, user)
-  end
-
   def is_a_context?
     true
   end
@@ -573,5 +569,11 @@ class Group < ActiveRecord::Base
     # shouldn't matter, but most specs create anonymous (contextless) groups :(
     return false if context.nil?
     context.draft_state_enabled?
+  end
+
+  def serialize_permissions(permissions_hash, user, session)
+    permissions_hash.merge(
+      create_discussion_topic: DiscussionTopic.context_allows_user_to_create?(self, user, session)
+    )
   end
 end

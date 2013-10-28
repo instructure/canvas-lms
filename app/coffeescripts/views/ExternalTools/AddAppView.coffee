@@ -23,6 +23,7 @@ define [
       @model.set('config_type', 'by_url')
 
       @model.on 'error', @onSaveFail, this
+      @model.on 'sync', @onSaveSuccess, this
 
       @configOptions = @app.get('config_options') || []
 
@@ -49,6 +50,9 @@ define [
       @$el.submit (e) =>
         @submit()
         return false
+
+      if @configOptions.length == 0 && !@app.get('is_installed')
+        @submit()
       this
 
     toJSON: =>
@@ -67,8 +71,8 @@ define [
         @model.set 'name', formData['canvas_app_name'] if formData['canvas_app_name']
         @model.set 'consumer_key', formData['consumer_key'] if formData['consumer_key']
         @model.set 'shared_secret', formData['shared_secret'] if formData['shared_secret']
-        disablingDfd = new $.Deferred()
         @updateConfigUrl(formData)
+        disablingDfd = new $.Deferred()
         @model.save
           error: ->
             disablingDfd.reject()
@@ -107,6 +111,10 @@ define [
     onSaveFail: (model) =>
       message = I18n.t 'generic_error', 'There was an error in processing your request'
       @$el.prepend("<div class='alert alert-error'>#{message}</span>")
+
+    onSaveSuccess: (model) =>
+      @app.set('is_installed', true)
+      model.off 'sync', @onSaveSuccess
 
     keySecretConfigOptions: ->
       [

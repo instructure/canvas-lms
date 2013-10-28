@@ -108,7 +108,7 @@ describe 'Student reports' do
                            @course2.id.to_s, nil, 'Math 101']
     end
 
-    it 'should find users that have not submitted anything after a date' do
+    it 'should find users that have not submitted anything in a date range' do
       parameters = {}
       parameters['start_at'] = 45.days.ago
       parameters['end_at'] = 35.days.ago
@@ -125,19 +125,30 @@ describe 'Student reports' do
                            @course2.id.to_s, nil, 'Math 101']
     end
 
-    it 'should find users that have not submitted anything ever' do
+    it 'should find users that have not submitted anything in the past 2 weeks' do
       parsed = ReportSpecHelper.run_report(@account,@type,{},[1,8])
-      parsed.length.should == 1
 
-      parsed[0].should == [@user2.id.to_s, 'user_sis_id_02',
+      parsed[0].should == [@user1.id.to_s, 'user_sis_id_01',
+                           @user1.sortable_name, @section1.id.to_s,
+                           @section1.sis_source_id, @section1.name,
+                           @course1.id.to_s, 'SIS_COURSE_ID_1', 'English 101']
+      parsed[1].should == [@user1.id.to_s, 'user_sis_id_01',
+                           @user1.sortable_name, @section2.id.to_s,
+                           @section2.sis_source_id, @section2.name,
+                           @course2.id.to_s, nil, 'Math 101']
+      parsed[2].should == [@user2.id.to_s, 'user_sis_id_02',
+                           'Bolton, Michael', @section1.id.to_s,
+                           @section1.sis_source_id, @section1.name,
+                           @course1.id.to_s, 'SIS_COURSE_ID_1', 'English 101']
+      parsed[3].should == [@user2.id.to_s, 'user_sis_id_02',
                            'Bolton, Michael', @section2.id.to_s,
                            @section2.sis_source_id, @section2.name,
                            @course2.id.to_s, nil, 'Math 101']
+      parsed.length.should == 4
     end
 
-    it 'should find users that have not submitted in a term' do
-      @term1 = EnrollmentTerm.create(:name => 'Fall')
-      @term1.root_account = @account
+    it 'should adjust date range to 2 weeks' do
+      @term1 = @account.enrollment_terms.create(:name => 'Fall')
       @term1.save!
       @course1.enrollment_term = @term1
       @course1.save
@@ -148,7 +159,15 @@ describe 'Student reports' do
       parameters['enrollment_term'] = @term1.id
       parsed = ReportSpecHelper.run_report(@account,@type,parameters,[1,8])
 
-      parsed.length.should == 0
+      parsed[0].should == [@user1.id.to_s, 'user_sis_id_01',
+                           @user1.sortable_name, @section1.id.to_s,
+                           @section1.sis_source_id, @section1.name,
+                           @course1.id.to_s, 'SIS_COURSE_ID_1', 'English 101']
+      parsed[1].should == [@user2.id.to_s, 'user_sis_id_02',
+                           'Bolton, Michael', @section1.id.to_s,
+                           @section1.sis_source_id, @section1.name,
+                           @course1.id.to_s, 'SIS_COURSE_ID_1', 'English 101']
+      parsed.length.should == 2
     end
 
     it 'should find users that have not submitted under a sub account' do
@@ -157,24 +176,34 @@ describe 'Student reports' do
       @course2.account = @sub_account
       @course2.save
       parsed = ReportSpecHelper.run_report(@sub_account,@type,{},[1,5])
-      parsed.length.should == 1
 
-      parsed[0].should == [@user2.id.to_s, 'user_sis_id_02',
+      parsed[0].should == [@user1.id.to_s, 'user_sis_id_01',
+                           @user1.sortable_name, @section2.id.to_s,
+                           @section2.sis_source_id, @section2.name,
+                           @course2.id.to_s, nil, 'Math 101']
+      parsed[1].should == [@user2.id.to_s, 'user_sis_id_02',
                            'Bolton, Michael', @section2.id.to_s,
                            @section2.sis_source_id, @section2.name,
                            @course2.id.to_s, nil, 'Math 101']
+      parsed.length.should == 2
+
     end
 
     it 'should find users that have not submitted for one course' do
       parameters = {}
       parameters['course'] = @course2.id
       parsed = ReportSpecHelper.run_report(@account,@type,parameters,[1,5])
-      parsed.length.should == 1
 
-      parsed[0].should == [@user2.id.to_s, 'user_sis_id_02',
+      parsed[0].should == [@user1.id.to_s, 'user_sis_id_01',
+                           @user1.sortable_name, @section2.id.to_s,
+                           @section2.sis_source_id, @section2.name,
+                           @course2.id.to_s, nil, 'Math 101']
+      parsed[1].should == [@user2.id.to_s, 'user_sis_id_02',
                            'Bolton, Michael', @section2.id.to_s,
                            @section2.sis_source_id, @section2.name,
                            @course2.id.to_s, nil, 'Math 101']
+      parsed.length.should == 2
+
     end
   end
 
