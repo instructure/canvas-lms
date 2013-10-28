@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'oauth/request_proxy/action_controller_request'
+require 'oauth/client/action_pack'
 
 class LtiApiController < ApplicationController
   skip_before_filter :verify_authenticity_token
