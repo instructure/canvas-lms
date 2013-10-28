@@ -3,9 +3,7 @@
 # With Rails 2.3.16 we could remove this line, but we still prefer JSONGem for performance reasons
 ActiveSupport::JSON.backend = "JSONGem"
 
-if Rails::VERSION::MAJOR == 3 && Rails::VERSION::MINOR >= 1
-  raise "This patch has been merged into rails 3.1, remove it from our repo"
-else
+if CANVAS_RAILS2
   # bug submitted to rails: https://rails.lighthouseapp.com/projects/8994/tickets/5802-activerecordassociationsassociationcollectionload_target-doesnt-respect-protected-attributes#ticket-5802-1
   # This fix has been merged into rails trunk and will be in the rails 3.1 release.
   class ActiveRecord::Associations::AssociationCollection
