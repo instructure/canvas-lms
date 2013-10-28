@@ -19,7 +19,7 @@ namespace :js do
 
   desc 'test javascript specs with PhantomJS'
   task :test do
-    if test_js_with_timeout(300) != 0
+    if test_js_with_timeout(300) != 0 && !ENV['JS_SPEC_MATCHER']
       puts "--> PhantomJS tests failed. retrying PhantomJS..."
       raise "PhantomJS tests failed on second attempt." if test_js_with_timeout(400) != 0
     end
@@ -41,11 +41,18 @@ namespace :js do
         if $?.exitstatus != 0
           puts 'some specs failed'
           result = 1
-        elsif $?.exitstatus != 0 && phantomjs_output.match(/^Took .* (\d+) tests/)[1].to_i < 900
-          puts "some specs didn't get run and some specs failed"
+        elsif ENV['JS_SPEC_MATCHER']
+          # running a subset of tests in isolation, don't be paranoid about
+          # some unrun tests getting lost
+          result = 0
+        elsif phantomjs_output.match(/^Took .* (\d+) tests/)[1].to_i < 900
+          # ran all tests but didn't see enough? do be paranoid about some
+          # unrun tests getting lost
+          puts 'all run specs passed, but not all specs were run'
           result = 1
-        elsif $?.exitstatus == 0 && phantomjs_output.match(/^Took .* (\d+) tests/)[1].to_i > 900
-          puts 'all specs were run and passed'
+        else
+          # good exit status, and it seems enough specs ran to assuage our
+          # paranoia
           result = 0
         end
         return result

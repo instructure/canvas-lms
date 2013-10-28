@@ -4,10 +4,10 @@ define [
   'compiled/views/assignments/AssignmentListItemView'
   'jquery'
   'helpers/jquery.simulate'
+  'helpers/fakeENV'
 ], (Backbone, Assignment, AssignmentListItemView, $) ->
   screenreaderText = null
   nonScreenreaderText = null
-  oldENV = window.ENV ||= {}
 
   fixtures = $('#fixtures')
 
@@ -83,9 +83,7 @@ define [
 
   module 'AssignmentListItemViewSpec',
     setup: ->
-      ENV = window.ENV ||= {}
       ENV.PERMISSIONS = {manage: false}
-      window.ENV = ENV
 
       @model = assignment1()
       @submission = new Backbone.Model
@@ -96,10 +94,7 @@ define [
         $.trim @view.$('.js-score .non-screenreader').text()
 
     teardown: ->
-      window.ENV = oldENV
-
-    teardown: ->
-      delete ENV.PERMISSIONS
+      ENV.PERMISSIONS = {}
       $('#fixtures').empty()
 
   test "initializes child views if can manage", ->
@@ -125,7 +120,8 @@ define [
     ok !view.$('.ig-row').hasClass('ig-published')
 
   test "delete destroys model", ->
-    window.ENV = {context_asset_string: "course_1"}
+    old_asset_string = ENV.context_asset_string
+    ENV.context_asset_string = "course_1"
 
     view = createView(@model)
     sinon.spy view.model, "destroy"
@@ -134,7 +130,8 @@ define [
     ok view.model.destroy.called
     view.model.destroy.restore()
 
-    window.ENV = oldENV
+    ENV.context_asset_string = old_asset_string
+
   test "updating grades from model change", ->
     @submission.set 'grade', 1.5555
     @model.set 'submission', @submission

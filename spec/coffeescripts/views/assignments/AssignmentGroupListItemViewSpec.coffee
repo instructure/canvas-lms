@@ -8,6 +8,7 @@ define [
   'jquery'
   'helpers/jquery.simulate'
   'compiled/behaviors/elementToggler'
+  'helpers/fakeENV'
 ], (Backbone, AssignmentGroupCollection, AssignmentGroup, Assignment, AssignmentGroupListItemView, AssignmentListItemView, $) ->
 
   fixtures = $('#fixtures')
@@ -108,7 +109,7 @@ define [
       @model = createAssignmentGroup()
 
     teardown: ->
-      delete ENV.PERMISSIONS
+      ENV.PERMISSIONS = {}
       AssignmentGroupListItemView.prototype.currentUserId.restore()
       $('#fixtures').empty()
 
