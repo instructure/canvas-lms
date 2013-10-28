@@ -400,21 +400,6 @@ class ActiveRecord::Base
     }]
   end
 
-  class DynamicFinderTypeError < Exception; end
-  class << self
-    def construct_attributes_from_arguments_with_type_cast(attribute_names, arguments)
-      log_dynamic_finder_nil_arguments(attribute_names) if current_scoped_methods.nil? && arguments.flatten.compact.empty?
-      construct_attributes_from_arguments_without_type_cast(attribute_names, arguments)
-    end
-    alias_method_chain :construct_attributes_from_arguments, :type_cast
-
-    def log_dynamic_finder_nil_arguments(attribute_names)
-      error = "No non-nil arguments passed to #{self.base_class}.find_by_#{attribute_names.join('_and_')}"
-      raise DynamicFinderTypeError, error if Canvas.dynamic_finder_nil_arguments_error == :raise
-      logger.debug "WARNING: " + error
-    end
-  end
-
   def self.rank_sql(ary, col)
     ary.each_with_index.inject('CASE '){ |string, (values, i)|
       string << "WHEN #{col} IN (" << Array(values).map{ |value| connection.quote(value) }.join(', ') << ") THEN #{i} "
@@ -1147,22 +1132,6 @@ if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
     end
     alias_method_chain :type_to_sql, :text_to_varchar
   end
-end
-
-# patch adapted from https://rails.lighthouseapp.com/projects/8994/tickets/4887-has_many-through-belongs_to-association-bug
-# this isn't getting fixed in rails 2.3.x, and we need it. otherwise the following sorts of things
-# will generate sql errors:
-#  Course.new.default_wiki_wiki_pages.scoped(:limit => 10)
-#  Group.new.active_default_wiki_wiki_pages.size
-ActiveRecord::Associations::HasManyThroughAssociation.class_eval do
-  def construct_scope_with_has_many_fix
-    if target_reflection_has_associated_record?
-      construct_scope_without_has_many_fix
-    else
-      {:find => {:conditions => "1 != 1"}}
-    end
-  end
-  alias_method_chain :construct_scope, :has_many_fix
 end
 
 if defined?(ActiveRecord::ConnectionAdapters::SQLiteAdapter)
