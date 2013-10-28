@@ -184,14 +184,23 @@ describe EnrollmentsApiController, :type => :integration do
         Enrollment.find(json['id']).course_section.should eql @section
       end
 
-      it "should optionally not send notifications" do
+      it "should not notify by default" do
         StudentEnrollment.any_instance.expects(:save_without_broadcasting).at_least_once
+
+        api_call(:post, @path, @path_options, {
+            :enrollment => {
+                :user_id                            => @unenrolled_user.id,
+                :enrollment_state                   => 'active'}})
+      end
+
+      it "should optionally send notifications" do
+        StudentEnrollment.any_instance.expects(:save).at_least_once
 
         api_call(:post, @path, @path_options, {
           :enrollment => {
             :user_id                            => @unenrolled_user.id,
             :enrollment_state                   => 'active',
-            :notify                             => false }})
+            :notify                             => true }})
       end
 
       it "should not allow enrollments to be added to a hard-concluded course" do

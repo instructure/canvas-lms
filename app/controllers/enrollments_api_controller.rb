@@ -193,8 +193,8 @@ class EnrollmentsApiController < ApplicationController
   #   section given by course_section_id.
   #
   # @argument enrollment[notify] [Optional, Boolean]
-  #   If false, a notification will not be sent to the enrolled user.
-  #   Notifications are sent by default.
+  #   If true, a notification will be sent to the enrolled user.
+  #   Notifications are not sent by default.
   def create
     # error handling
     errors = []
@@ -240,7 +240,7 @@ class EnrollmentsApiController < ApplicationController
 
     # create enrollment
 
-    params[:enrollment][:no_notify] = true unless params[:enrollment][:notify].nil? && value_to_boolean(params[:enrollment][:notify])
+    params[:enrollment][:no_notify] = true unless value_to_boolean(params[:enrollment][:notify])
     unless @current_user.can_create_enrollment_for?(@context, session, type)
       render_unauthorized_action(@context) && return
     end
