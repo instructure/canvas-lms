@@ -1,63 +1,80 @@
 <span class="non-screenreader" aria-hidden=true>
+  {{#unless hideGrade}}
+    {{#unless submission}}
 
-  {{#unless submission}}
-
-    <span data-tooltip="" title='{{#t "no_submission"}}No Submission{{/t}}'>
-      {{#t "no_submission_with_points_possible"}}
+      <span data-tooltip="" class="span5 score-display ellipsis text-right" title='{{#t "no_submission"}}No Submission{{/t}}'>
+        {{#t "empty_points_possible"}}
         -/{{pointsPossible}} pts
-      {{/t}}
-    </span>
-
-  {{else}}
-    {{#with submission}}
-      {{#if notYetGraded}}
-
-        {{#t "not_yet_graded_with_points_possible"}}
-          <em>Not Yet Graded</em>/{{pointsPossible}} pts
         {{/t}}
+      </span>
 
-      {{else}}
+    {{else}}
+      {{#with submission}}
+        {{#if notYetGraded}}
 
-        <strong>
-          {{#t "score_with_points_possible"}}
-            {{grade}}/{{pointsPossible}} pts
+          <span class="score-display span5 text-right ellipsis">
+          {{#t "empty_points_possible"}}
+          -/{{pointsPossible}} pts
           {{/t}}
-        </strong>
+          </span>
+          <span class="grade-display span6 text-left ellipsis">
+          {{#t "not_yet_graded"}}
+            <em>Not Yet Graded</em>
+          {{/t}}
+          </span>
 
-      {{/if}}
+        {{else}}
+          <span class="score-display span5 text-right ellipsis">
+              {{#t "score_with_points_possible"}}
+              <b>{{score}}</b>/{{pointsPossible}} pts
+              {{/t}}
+          </span>
+          <span class="grade-display span6 text-left ellipsis">
+            <strong>
+              {{gradeDisplay}}
+            </strong>
+          </span>
 
-    {{/with}}
+        {{/if}}
 
+      {{/with}}
+
+    {{/unless}}
   {{/unless}}
-
 </span>
 
 <span class="screenreader-only">
-
-  {{#unless submission}}
-
-    {{#t "no_submission_for_assignment_screenreader"}}
-      No submission for this assignment. {{pointsPossible}} points possible.
+  {{#if hideGrade}}
+    {{#t "assignment_grading_type_is_not_graded"}}
+      This assignment will not be assigned a grade.
     {{/t}}
-
   {{else}}
-    {{#with submission}}
-      {{#if notYetGraded}}
+    {{#unless submission}}
 
-        {{#t "assignment_not_yet_graded_screenreader"}}
-          Assignment not yet graded. {{pointsPossible}} points possible.
-        {{/t}}
+      {{#t "no_submission_for_assignment_screenreader"}}
+        No submission for this assignment. {{pointsPossible}} points possible.
+      {{/t}}
 
-      {{else}}
+    {{else}}
+      {{#with submission}}
+        {{#if notYetGraded}}
 
-        {{#t "score_with_points_possible_screenreader"}}
-          Score: {{grade}} out of {{pointsPossible}} points
-        {{/t}}
+          {{#t "assignment_not_yet_graded_screenreader"}}
+            Assignment not yet graded. {{pointsPossible}} points possible.
+          {{/t}}
 
-      {{/if}}
+        {{else}}
 
-    {{/with}}
+          {{#t "score_with_points_possible_screenreader"}}
+            Score: {{score}} out of {{pointsPossible}} points.
+          {{/t}}
+          {{gradeDisplayForScreenreader}}
 
-  {{/unless}}
+        {{/if}}
+
+      {{/with}}
+
+    {{/unless}}
+  {{/if}}
 
 </span>

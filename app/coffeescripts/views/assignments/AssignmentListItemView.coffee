@@ -163,19 +163,49 @@ define [
     canManage: ->
       ENV.PERMISSIONS.manage
 
+    gradeStrings: (grade) ->
+      pass_fail_map =
+        incomplete:
+          I18n.t 'incomplete', 'Incomplete'
+        complete:
+          I18n.t 'complete', 'Complete'
+
+      grade = pass_fail_map[grade] or grade
+
+      'percent':
+        nonscreenreader: I18n.t 'grade_percent', '%{grade}%', grade: grade
+        screenreader: I18n.t 'grade_percent_screenreader', 'Grade: %{grade}%', grade: grade
+      'pass_fail':
+        nonscreenreader: "#{grade}"
+        screenreader: I18n.t 'grade_pass_fail_screenreader', 'Grade: %{grade}', grade: grade
+      'letter_grade':
+        nonscreenreader: "#{grade}"
+        screenreader: I18n.t 'grade_letter_grade_screenreader', 'Grade: %{grade}', grade: grade
+
+
     _setJSONForGrade: (json) ->
       if submission = @model.get('submission')
         submissionJSON = submission.toJSON()
-        grade = submission.get('grade')
-        if typeof grade is 'number' && !isNaN(grade)
-          submissionJSON.grade = round grade, round.DEFAULT
+        score = submission.get('score')
+        if typeof score is 'number' && !isNaN(score)
+          submissionJSON.score = round score, round.DEFAULT
         json.submission = submissionJSON
+        grade = submission.get('grade')
+        gradeString = @gradeStrings(grade)[json.gradingType]
+        json.submission.gradeDisplay = gradeString?.nonscreenreader
+        json.submission.gradeDisplayForScreenreader = gradeString?.screenreader
+
       pointsPossible = json.pointsPossible
 
       if typeof pointsPossible is 'number' && !isNaN(pointsPossible)
         json.pointsPossible = round pointsPossible, round.DEFAULT
         json.submission.pointsPossible = json.pointsPossible if json.submission?
 
+      json.submission.gradingType = json.gradingType if json.submission?
+
+
+      if json.gradingType is 'not_graded'
+        json.hideGrade = true
       json
 
     updateScore: =>
