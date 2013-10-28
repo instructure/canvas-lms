@@ -360,6 +360,7 @@ class ConversationParticipant < ActiveRecord::Base
   def starred
     read_attribute(:label) == 'starred'
   end
+  alias :starred? :starred
 
   def starred=(val)
     # if starred were an actual boolean column, this is the method that would
