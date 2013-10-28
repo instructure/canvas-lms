@@ -20,6 +20,14 @@
 # Likewise, all the methods added will be available for all controllers.
 
 class ApplicationController < ActionController::Base
+  def self.promote_view_path(path)
+    if CANVAS_RAILS2
+      self.view_paths.delete path
+    else
+      self.view_paths = self.view_paths.to_ary.reject{ |p| p.to_s == path }
+    end
+    prepend_view_path(path)
+  end
 
   attr_accessor :active_tab
 
