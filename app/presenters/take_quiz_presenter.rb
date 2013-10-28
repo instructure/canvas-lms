@@ -1,5 +1,9 @@
 class TakeQuizPresenter
-  include ActionController::UrlWriter
+  if CANVAS_RAILS2
+    include ActionController::UrlWriter
+  else
+    include Rails.application.routes.url_helpers
+  end
   include ApplicationHelper
 
   attr_accessor :quiz,
