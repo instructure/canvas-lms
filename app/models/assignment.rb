@@ -1226,7 +1226,7 @@ class Assignment < ActiveRecord::Base
         representative
       }.compact
     else
-      visible_students
+      visible_students.to_a
     end
   end
 

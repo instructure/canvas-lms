@@ -466,10 +466,10 @@ class Course < ActiveRecord::Base
   scope :not_deleted, where("workflow_state<>'deleted'")
 
   scope :with_enrollments, lambda {
-    where("EXISTS (#{Enrollment.active.select("1").where("enrollments.course_id=courses.id").to_sql})")
+    where("EXISTS (?)", Enrollment.active.where("enrollments.course_id=courses.id"))
   }
   scope :without_enrollments, lambda {
-    where("NOT EXISTS (#{Enrollment.active.select("1").where("enrollments.course_id=courses.id").to_sql})")
+    where("NOT EXISTS (?)", Enrollment.active.where("enrollments.course_id=courses.id"))
   }
   scope :completed, lambda {
     joins(:enrollment_term).
@@ -484,12 +484,12 @@ class Course < ActiveRecord::Base
   scope :by_teachers, lambda { |teacher_ids|
     teacher_ids.empty? ?
       none :
-      where("EXISTS (#{Enrollment.active.select("1").where("enrollments.course_id=courses.id AND enrollments.type='TeacherEnrollment' AND enrollments.user_id IN (?)", teacher_ids).to_sql})")
+      where("EXISTS (?)", Enrollment.active.where("enrollments.course_id=courses.id AND enrollments.type='TeacherEnrollment' AND enrollments.user_id IN (?)", teacher_ids))
   }
   scope :by_associated_accounts, lambda{ |account_ids|
     account_ids.empty? ?
       none :
-      where("EXISTS (#{CourseAccountAssociation.select("1").where("course_account_associations.course_id=courses.id AND course_account_associations.account_id IN (?)", account_ids).to_sql})")
+      where("EXISTS (?)", CourseAccountAssociation.where("course_account_associations.course_id=courses.id AND course_account_associations.account_id IN (?)", account_ids))
   }
 
   scope :deleted, where(:workflow_state => 'deleted')

@@ -164,6 +164,24 @@ ActiveRecord::Base.class_eval do
       send(callback, *methods)
     end
     alias_method_chain :before_validation, :rails3_compatibility
+
+    def quote_bound_value_with_relations(value)
+      if ActiveRecord::Associations::AssociationCollection === value
+        with_exclusive_scope do
+          value = value.scoped
+        end
+      end
+      if ActiveRecord::NamedScope::Scope === value
+        with_exclusive_scope do
+          unless value.scope(:find, :select)
+            value = value.select("#{value.quoted_table_name}.#{value.primary_key}")
+          end
+          return value.to_sql
+        end
+      end
+      quote_bound_value_without_relations(value)
+    end
+    alias_method_chain :quote_bound_value, :relations
   end
 
   # support 0 arguments
@@ -197,8 +215,15 @@ ActiveRecord::NamedScope::Scope.class_eval do
   # Instead, just take the easy way out and let with_scope do all
   # the hard work
   def unspin
-    with_exclusive_scope { self.scope(:find) }
+    scope = proxy_scope
+    scope = scope.proxy_scope while (ActiveRecord::NamedScope::Scope === scope)
+    scope.send(:with_exclusive_scope) { self.scope(:find) }
  end
+
+  def is_a?(klass)
+    # no, it's not a freaking Hash, and don't instantiate a gazillion things to find that out
+    super || klass >= Array
+  end
 end
 
 ActiveRecord::Associations::AssociationCollection.class_eval do

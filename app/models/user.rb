@@ -245,7 +245,7 @@ class User < ActiveRecord::Base
     PageView.for_user(self, options)
   end
 
-  scope :of_account, lambda { |account| where("EXISTS (#{account.user_account_associations.select("1").where("user_account_associations.user_id=users.id").to_sql})") }
+  scope :of_account, lambda { |account| where("EXISTS (?)", account.user_account_associations.where("user_account_associations.user_id=users.id")) }
   scope :recently_logged_in, lambda {
     includes(:pseudonyms).
         where("pseudonyms.current_login_at>?", 1.month.ago).
@@ -261,7 +261,7 @@ class User < ActiveRecord::Base
     end
   }
   scope :name_like, lambda { |name|
-    where("#{wildcard('users.name', 'users.short_name', name)} OR EXISTS (#{Pseudonym.select("1").where(wildcard('pseudonyms.sis_user_id', 'pseudonyms.unique_id', name)).where("pseudonyms.user_id=users.id").active.to_sql})")
+    where("#{wildcard('users.name', 'users.short_name', name)} OR EXISTS (?)", Pseudonym.where(wildcard('pseudonyms.sis_user_id', 'pseudonyms.unique_id', name)).where("pseudonyms.user_id=users.id").active)
   }
   scope :active, where("users.workflow_state<>'deleted'")
 
