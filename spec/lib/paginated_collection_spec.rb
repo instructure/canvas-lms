@@ -44,6 +44,7 @@ describe "PaginatedCollection" do
       proxy = PaginatedCollection.build do |pager|
         result = User.active.order(:id).paginate(:page => pager.current_page, :per_page => pager.per_page)
         result.map! { |u| u.id }
+        result
       end
       p1 = proxy.paginate(:page => 1, :per_page => 2)
       p1.current_page.should == 1
