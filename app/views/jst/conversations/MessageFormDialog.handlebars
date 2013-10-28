@@ -41,6 +41,7 @@
                   value="{{course}}">
             <option>{{#t "labels.select_course"}}Select a course{{/t}}</option>
           </select>
+          <span class="message_course_ro">{{#if course}}{{course}}{{else}}{{#t "no_course"}}No course{{/t}}{{/if}}</span>
           <input type="hidden" name="context_code" />
         </div>
       </div>
@@ -97,6 +98,7 @@
                  value="{{subject}}"
                  placeholder="{{#t "no_subject"}}No subject{{/t}}"
                  maxlength="255">
+          <span class="message_subject_ro">{{#if subject}}{{subject}}{{else}}{{#t "no_subject"}}No subject{{/t}}{{/if}}</span>
         </div>
       </div>
 

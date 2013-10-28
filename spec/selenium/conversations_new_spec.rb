@@ -184,7 +184,10 @@ describe "conversations new" do
       fj('#compose-message-course').should have_attribute(:disabled, 'true')
       fj('#compose-message-course').should have_value(@course.id.to_s)
       fj('#compose-message-subject').should have_attribute(:disabled, 'true')
+      fj('#compose-message-subject').should_not be_displayed
       fj('#compose-message-subject').should have_value(@convo.subject)
+      fj('.message_subject_ro').should be_displayed
+      fj('.message_subject_ro').text.should == @convo.subject
     end
 
     it "should address replies to the most recent author by default" do

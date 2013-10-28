@@ -42,8 +42,10 @@ define [
 
     els:
       '.message_course':                '$messageCourse'
+      '.message_course_ro':             '$messageCourseRO'
       'input[name=context_code]':       '$contextCode'
       '.message_subject':               '$messageSubject'
+      '.message_subject_ro':            '$messageSubjectRO'
       '.context_messages':              '$contextMessages'
       '.media_comment':                 '$mediaComment'
       'input[name=media_comment_id]':   '$mediaCommentId'
@@ -147,6 +149,7 @@ define [
     onCourse: (course) =>
       @recipientView.setContext(course, true)
       @$contextCode.val(if course?.id then course.id else '')
+      @$messageCourseRO.text(if course then course.name else I18n.t('no_course','No course'))
 
     defaultCourse: null
     setDefaultCourse: (course) ->
@@ -175,7 +178,12 @@ define [
         @courseView.setValue(@launchParams.context) if @launchParams.context
       else
         @courseView.setValue(@defaultCourse)
-      @courseView.focus()
+      if @model
+        @courseView.$picker.css('display', 'none')
+        @recipientView.$input.focus()
+      else
+        @$messageCourseRO.css('display', 'none')
+        @courseView.focus()
 
       if @tokenInput = @$el.find('.recipients').data('token_input')
         # since it doesn't infer percentage widths, just whatever the current pixels are
@@ -203,8 +211,14 @@ define [
       if @tokenInput
         @tokenInput.change = @recipientIdsChanged
 
-      @$messageSubject.prop('disabled', !!@model)
-      @$messageSubject.val(@model?.get('subject'))
+      if @model
+        @$messageSubject.css('display', 'none')
+        @$messageSubject.prop('disabled', true)
+      else
+        @$messageSubjectRO.css('display', 'none')
+      if @model?.get('subject')
+        @$messageSubject.val(@model.get('subject'))
+        @$messageSubjectRO.text(@model.get('subject'))
 
       if messages = @model?.messageCollection
         # include only messages which
