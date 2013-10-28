@@ -59,7 +59,6 @@ define [
     initializeChildViews: ->
       @publishIconView    = false
       @editAssignmentView = false
-      @vddDueColumnView   = false
       @dateAvailableColumnView = false
       @moveAssignmentView = false
 

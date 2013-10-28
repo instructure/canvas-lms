@@ -42,16 +42,6 @@ define [
       view.remove()
       $('#fixtures').empty()
 
-  test 'toggles group class if canAssignToGroup', ->
-    groups.pop() # no change yet, because not empty
-    ok view.$el.attr('class').indexOf('group-category-empty') == -1
-
-    group = groups.pop()
-    ok view.$el.attr('class').indexOf('group-category-empty') >= 0
-
-    groups.push(group)
-    ok view.$el.attr('class').indexOf('group-category-empty') == -1
-
   test 'opens the assignToGroupMenu', ->
     view.$('.assign-to-group').eq(0).simulate('click')
     clock.tick(100)

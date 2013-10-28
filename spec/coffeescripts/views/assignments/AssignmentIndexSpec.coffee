@@ -7,6 +7,7 @@ define [
   'compiled/views/assignments/IndexView'
   'jquery'
   'helpers/jquery.simulate'
+  'helpers/fakeENV'
 ], (Backbone, AssignmentGroup, Course, AssignmentGroupCollection, AssignmentGroupListView, IndexView, $) ->
 
 
@@ -41,18 +42,13 @@ define [
 
     app.render()
 
-  oldENV = null
-
   module 'assignmentIndex',
     setup: ->
-      oldENV = window.ENV
-      window.ENV =
-        PERMISSIONS:
-          manage: true
+      ENV.PERMISSIONS = {manage: true}
       @enable_spy = sinon.spy(IndexView.prototype, 'enableSearch')
 
     teardown: ->
-      window.ENV = oldENV
+      ENV.PERMISSIONS = {}
       assignmentGroups = null
       $('#fixtures').empty()
       @enable_spy.restore()

@@ -9,6 +9,7 @@ define [
   'compiled/views/assignments/IndexView'
   'compiled/views/assignments/ToggleShowByView'
   'jquery'
+  'helpers/fakeENV'
 ], (_, Backbone, AssignmentGroup, Assignment, Course, AssignmentGroupCollection, AssignmentGroupListView, IndexView, ToggleShowByView, $) ->
 
 
@@ -16,12 +17,10 @@ define [
 
   module 'ToggleShowByView',
     setup: ->
-      window.ENV =
-        PERMISSIONS:
-          manage: false
+      ENV.PERMISSIONS = { manage: false }
       @course   = new Course {id: 1}
       @server   = sinon.fakeServer.create()
-      @pastDate = new Date("2013-08-20 11:13:00")
+      @pastDate = new Date(2013, 8, 20)
       today     = new Date()
       @futureDate  = new Date()
       @futureDate.setDate(today.getDate() + 3)
@@ -29,9 +28,10 @@ define [
         {id: 1, name: 'Past Assignments', due_at: @pastDate, submission_types: ['online']},
         {id: 2, name: 'Past Assignments', due_at: @pastDate, submission_types: ['on_paper']},
         {id: 3, name: 'Upcoming Assignments', due_at: @futureDate},
-        {id: 4, name: 'Past Assignments', due_at: @pastDate, submission_types: ['online']},
-        {id: 5, name: 'Overdue Assignments', due_at: @pastDate, submission_types: ['online']},
-        {id: 6, name: 'Undated Assignments'}
+        {id: 4, name: 'Overdue Assignments', due_at: @pastDate, submission_types: ['online']},
+        {id: 5, name: 'Past Assignments', due_at: @pastDate, submission_types: ['online']},
+        {id: 6, name: 'Overdue Assignments', due_at: @pastDate, submission_types: ['online']},
+        {id: 7, name: 'Undated Assignments'}
       ]
       @group      = new AssignmentGroup assignments: @assignments
       @collection = new AssignmentGroupCollection [@group],
@@ -42,13 +42,15 @@ define [
         assignmentGroups: @collection
 
     teardown: ->
+      ENV.PERMISSIONS = {}
       @server.restore()
 
   test 'should sort assignments correctly', ->
 
     submissions = [
       {id: 1, assignment_id: 1, grade: 305},
-      {id: 2, assignment_id: 4}
+      {id: 2, assignment_id: 4},
+      {id: 3, assignment_id: 5, submission_type: 'online'}
     ]
     @server.respondWith "GET", "#{COURSE_SUBMISSIONS_URL}?per_page=50", [
       200,
@@ -64,4 +66,3 @@ define [
       assignments = group.get('assignments').models
       _.each assignments, (as) ->
         equal group.name(), as.name()
-

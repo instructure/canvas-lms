@@ -5,7 +5,7 @@ define [
 ], ($, I18n) ->
 
   scope = I18n.scoped('foo')
-  t = scope.t.bind(scope)
+  t = (args...) -> scope.t(args...)
 
   module "I18n"
 
