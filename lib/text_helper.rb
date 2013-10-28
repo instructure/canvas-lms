@@ -50,13 +50,37 @@ module TextHelper
     pm.to_plain_text
   end
 
-  def html_to_simple_html(html_str, opts={})
-    return "" if html_str.blank?
-    text = html_to_simple_text(html_str, opts)
-    text.gsub!(/^([\*\-]+\n*)$/, '') # Remove the H tag markers
-    text.gsub!(/\n{3,}/, "\n\n")     # Remove the triple breaks left by the H tag marker removals
-    html = format_message(text).first
-    "<p>#{html}</p>".html_safe
+  # Public: Strip (most) HTML from an HTML string.
+  #
+  # html - The original HTML string to format.
+  # options - Formatting options.
+  #   - base_url: The protocol and domain to prepend to relative links (e.g. "https://instructure.com").
+  #
+  # Returns an HTML string.
+  def html_to_simple_html(html, options = {})
+    return '' if html.blank?
+    base_url = options.fetch(:base_url, '')
+    output   = Sanitize.clean(html, Sanitize::Config::BASIC)
+
+    append_base_url(output, base_url).html_safe
+  end
+
+  # Internal: Append given base URL to relative links in the source.
+  #
+  # subject - A string to HTML.
+  # base - A base protocol/domain string (e.g. "https://instructure.com").
+  #
+  # Returns a string.
+  def append_base_url(subject, base)
+    output = Nokogiri::HTML.fragment(subject)
+    tags   = output.search('*[@href]')
+
+    tags.each do |tag|
+      next if tag.attributes['href'].value.match(/^https?|mailto|ftp/)
+      tag.attributes['href'].value = "#{base}#{tag.attributes['href']}"
+    end
+
+    output.to_s
   end
 
   def quote_clump(quote_lines)
