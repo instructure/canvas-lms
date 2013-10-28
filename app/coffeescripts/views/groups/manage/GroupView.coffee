@@ -33,6 +33,7 @@ define [
     els:
       '.group-summary': '$summary'
       '.al-trigger': '$groupActions'
+      '.toggle-group': '$toggleGroup'
 
     attach: ->
       @expanded = false
@@ -72,6 +73,7 @@ define [
     afterRender: ->
       @$el.toggleClass 'group-expanded', @expanded
       @$el.toggleClass 'group-collapsed', !@expanded
+      @$toggleGroup.attr 'aria-expanded', '' + @expanded
 
     toggleDetails: (e) ->
       e.preventDefault()
