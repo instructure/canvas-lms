@@ -25,12 +25,12 @@ describe "API Authentication", :type => :integration do
     @key = DeveloperKey.create!
     @client_id = @key.id
     @client_secret = @key.api_key
-    ActionController::Base.consider_all_requests_local = false
+    consider_all_requests_local(false)
     enable_forgery_protection
   end
 
   after do
-    ActionController::Base.consider_all_requests_local = true
+    consider_all_requests_local(true)
   end
 
   context "sharding" do

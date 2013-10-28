@@ -1170,6 +1170,14 @@ Spec::Runner.configure do |config|
     opts.reverse_merge active_all: true
     n.times.map { student_in_course(opts); @student }
   end
+
+  def consider_all_requests_local(value)
+    if CANVAS_RAILS2
+      ActionController::Base.consider_all_requests_local = value
+    else
+      Rails.application.config.consider_all_requests_local = value
+    end
+  end
 end
 
 Dir[Rails.root+'vendor/plugins/*/spec_canvas/spec_helper.rb'].each do |f|

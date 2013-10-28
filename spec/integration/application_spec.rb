@@ -20,11 +20,11 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe "site-wide" do
   before do
-    ActionController::Base.consider_all_requests_local = false
+    consider_all_requests_local(false)
   end
 
   after do
-    ActionController::Base.consider_all_requests_local = true
+    consider_all_requests_local(true)
   end
 
   it "should render 404 when user isn't logged in" do
