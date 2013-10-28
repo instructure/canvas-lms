@@ -226,7 +226,7 @@ describe "users" do
 
     it "should register a student with a join code" do
       course(:active_all => true)
-      @course.update_attribute :self_enrollment, true
+      @course.update_attribute(:self_enrollment, true)
 
       get '/register'
       f('#signup_student').click
@@ -254,7 +254,7 @@ describe "users" do
       f('#teacher_email').send_keys('teacher@example.com')
       f('input[name="user[terms_of_use]"]', form).click
 
-      expect_new_page_load { form.submit }
+      expect_new_page_load { f('.btn-primary.button_type_submit.ui-button').click }
       # confirm the user is authenticated into the dashboard
       f('#identity .logout').should be_present
       User.last.initial_enrollment_type.should == 'teacher'

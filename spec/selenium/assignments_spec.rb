@@ -778,12 +778,12 @@ describe "assignments" do
           end
 
           it "should not overwrite overrides if published twice from the index page" do
-            get "/courses/#{@course.id}/assignments"
+            get("/courses/#{@course.id}/assignments",false)
             wait_for_ajaximations
 
             f("#assignment_#{@assignment.id} .publish-icon").click
             wait_for_ajaximations
-            @assignment.reload.should be_published
+            keep_trying_until { @assignment.reload.published? }
 
             # need to make sure buttons
             keep_trying_until do
@@ -794,7 +794,7 @@ describe "assignments" do
 
             f("#assignment_#{@assignment.id} .publish-icon").click
             wait_for_ajaximations
-            @assignment.reload.should_not be_published
+            keep_trying_until { !@assignment.reload.published? }
 
             @assignment.reload.active_assignment_overrides.count.should == 1
           end
