@@ -183,14 +183,30 @@ class ActiveRecord::Base
     'StreamItem'               => %w[data]
   }
 
-  def unserialize_attribute_with_utf8_check(attr_name)
-    value = unserialize_attribute_without_utf8_check(attr_name)
-    if SERIALIZED_COLUMNS_WITH_POTENTIALLY_INVALID_UTF8[self.class.name].try(:include?, attr_name.to_s)
-      TextHelper.recursively_strip_invalid_utf8!(value, true)
+  class << self
+    def strip_invalid_utf8_from_attribute(attr_name, value)
+      if SERIALIZED_COLUMNS_WITH_POTENTIALLY_INVALID_UTF8[self.name].try(:include?, attr_name.to_s)
+        TextHelper.recursively_strip_invalid_utf8!(value, true)
+      end
+      value
     end
-    value
   end
-  alias_method_chain :unserialize_attribute, :utf8_check
+
+  if CANVAS_RAILS2
+    def unserialize_attribute_with_utf8_check(attr_name)
+      value = unserialize_attribute_without_utf8_check(attr_name)
+      self.class.strip_invalid_utf8_from_attribute(attr_name, value)
+    end
+    alias_method_chain :unserialize_attribute, :utf8_check
+  else
+    class << self
+      def type_cast_attribute_with_utf8_check(attr_name, attributes, cache={})
+        value = type_cast_attribute_without_utf8_check(attr_name, attributes, cache)
+        strip_invalid_utf8_from_attribute(attr_name, value)
+      end
+      alias_method_chain :type_cast_attribute, :utf8_check
+    end
+  end
 end
 
 # Make sure the flash sets the encoding to UTF-8 as well.
