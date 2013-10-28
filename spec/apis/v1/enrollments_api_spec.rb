@@ -605,7 +605,7 @@ describe EnrollmentsApiController, :type => :integration do
         @user = current_user
         json = api_call(:get, @path, @params)
         enrollments = %w{observer student ta teacher}.inject([]) do |res, type|
-          res = res + @course.send("#{type}_enrollments").includes(:user).order("users.sortable_name ASC")
+          res = res + @course.send("#{type}_enrollments").includes(:user).order(User.sortable_name_order_by_clause("users"))
         end
         json.should == enrollments.map { |e|
           h = {
