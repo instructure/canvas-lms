@@ -19,8 +19,13 @@
 module SendToStream
   module SendToStreamClassMethods
     def self.extended(klass)
-      klass.send(:class_inheritable_accessor, :send_to_stream_block)
-      klass.send(:class_inheritable_accessor, :send_to_stream_update_block)
+      if CANVAS_RAILS2
+        klass.send(:class_inheritable_accessor, :send_to_stream_block)
+        klass.send(:class_inheritable_accessor, :send_to_stream_update_block)
+      else
+        klass.send(:class_attribute, :send_to_stream_block)
+        klass.send(:class_attribute, :send_to_stream_update_block)
+      end
       klass.has_one :stream_item, :as => :asset
     end
 
