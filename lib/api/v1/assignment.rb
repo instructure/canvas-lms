@@ -167,8 +167,7 @@ module Api::V1::Assignment
       hash['module_ids'] = module_ids
     end
 
-    #show published/unpublished if account.settings[:enable_draft]
-    if @domain_root_account.enable_draft?
+    if assignment.context.draft_state_enabled?
       hash['published'] = ! assignment.unpublished?
       hash['unpublishable'] = !assignment.has_student_submissions?
     end
@@ -324,7 +323,7 @@ module Api::V1::Assignment
       update_params["description"] = process_incoming_html_content(update_params["description"])
     end
 
-    if @domain_root_account.enable_draft?
+    if assignment.context.draft_state_enabled?
       if assignment_params.has_key? "published"
         published = value_to_boolean(assignment_params['published'])
         assignment.workflow_state = published ? 'published' : 'unpublished'
