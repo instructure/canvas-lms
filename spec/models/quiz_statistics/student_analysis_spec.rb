@@ -112,24 +112,22 @@ describe QuizStatistics::StudentAnalysis do
 
       # and one in progress
       @quiz.generate_submission(@student)
-
       stats = CSV.parse(csv(:include_all_versions => true))
-      # format for row is row_name, '', data1, data2, ...
-      stats.first.length.should == 3
-      stats[0][0].should == "section"
+      stats.last.length.should == 9
+      stats.first.first == "section"
     end
 
     it 'should succeed with logged-out user submissions' do
       survey_with_logged_out_submission
       stats = CSV.parse(csv(:include_all_versions => true))
-      stats[0][1].should == ''
-      stats[1][1].should == ''
-      stats[2][1].should == ''
+      stats.last[0].should == ''
+      stats.last[1].should == ''
+      stats.last[2].should == ''
     end
 
     it 'should have sections in quiz statistics_csv' do
       #enroll user in multiple sections
-      pseudonym = pseudonym(@student)
+      pseudonym(@student)
       @student.pseudonym.sis_user_id = "user_sis_id_01"
       @student.pseudonym.save!
       section1 = @course.course_sections.first
@@ -144,19 +142,12 @@ describe QuizStatistics::StudentAnalysis do
       qs.grade_submission
 
       stats = CSV.parse(csv(:include_all_versions => true))
-      # format for row is row_name, '', data1, data2, ...
-      stats[0].should == ["name", "", "nobody@example.com"]
-      stats[1].should == ["id", "", @student.id.to_s]
-      stats[2].should == ["sis_id", "", "user_sis_id_01"]
-      expect_multi_value_row(stats[3], "section", ["section2", "Unnamed Course"])
-      expect_multi_value_row(stats[4], "section_id", [section1.id, section2.id])
-      expect_multi_value_row(stats[5], "section_sis_id", ["SISSection02", "SISSection01"])
-      stats.first.length.should == 3
-    end
-
-    def expect_multi_value_row(row, expected_name, expected_values)
-      row[0..1].should == [expected_name, ""]
-      row[2].split(', ').sort.should == expected_values.map(&:to_s).sort
+      stats.last[0].should == "nobody@example.com"
+      stats.last[1].should == @student.id.to_s
+      stats.last[2].should == "user_sis_id_01"
+      stats.last[3].should == "section2, Unnamed Course"
+      stats.last[4].should == "#{section2.id}, #{section1.id}"
+      stats.last[5].should == "SISSection02, SISSection01"
     end
 
     it 'should deal with incomplete fill-in-multiple-blanks questions' do
@@ -181,9 +172,8 @@ describe QuizStatistics::StudentAnalysis do
       }
       qs.grade_submission
       stats = CSV.parse(csv)
-      stats.size.should == 16 # 3 questions * 2 lines + ten more (name, id, sis_id, section, section_id, section_sis_id, submitted, correct, incorrect, score)
-      stats[11].size.should == 3
-      stats[11][2].should == ',baz'
+      stats.last.size.should == 16 # 3 questions * 2 lines + ten more (name, id, sis_id, section, section_id, section_sis_id, submitted, correct, incorrect, score)
+      stats.last[11].should == ',baz'
     end
 
     it 'should contain answers to numerical questions' do
@@ -204,7 +194,7 @@ describe QuizStatistics::StudentAnalysis do
       qs.grade_submission
 
       stats = CSV.parse(csv)
-      stats[9][2].should == '5'
+      stats.last[9].should == '5'
     end
 
   end
@@ -245,8 +235,7 @@ describe QuizStatistics::StudentAnalysis do
     qs.updated_at = 3.days.ago
     qs.save!
     stats = CSV.parse(csv({:include_all_versions => true},q.reload))
-    stats[7][2].should == "" # student2
-    stats[7][3].should == attach.display_name # student
+    stats.last[7].should == attach.display_name
   end
 
   it 'should strip tags from html multiple-choice/multiple-answers' do
@@ -285,8 +274,8 @@ describe QuizStatistics::StudentAnalysis do
 
     # csv statistics
     stats = CSV.parse(csv({}, q))
-    stats[7][2].should == "zero"
-    stats[9][2].should == "lolcats,lolrus"
+    stats.last[7].should == "zero"
+    stats.last[9].should == "lolcats,lolrus"
   end
 
 end

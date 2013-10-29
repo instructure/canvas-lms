@@ -141,123 +141,117 @@ class QuizStatistics::StudentAnalysis < QuizStatistics::Report
 
   def to_csv
     start_progress
-    context = quiz.context
-    columns = []
-    columns << I18n.t('statistics.csv_columns.name', 'name') unless anonymous?
-    columns << I18n.t('statistics.csv_columns.id', 'id') unless anonymous?
-    columns << I18n.t('statistics.csv_columns.sis_id', 'sis_id') unless anonymous?
-    columns << I18n.t('statistics.csv_columns.section', 'section')
-    columns << I18n.t('statistics.csv_columns.section_id', 'section_id')
-    columns << I18n.t('statistics.csv_columns.section_sis_id', 'section_sis_id')
-    columns << I18n.t('statistics.csv_columns.submitted', 'submitted')
-    columns << I18n.t('statistics.csv_columns.attempt', 'attempt') if includes_all_versions?
-    first_question_index = columns.length
-    submissions = submissions_for_statistics
-    preload_attachments(submissions)
-    found_question_ids = {}
-    quiz_datas = [quiz.quiz_data] + submissions.map(&:quiz_data)
-    quiz_datas.compact.each do |quiz_data|
-      quiz_data.each do |question|
-        next if question['entry_type'] == 'quiz_group'
-        if !found_question_ids[question[:id]]
-          columns << "#{question[:id]}: #{strip_tags(question[:question_text])}"
-          columns << question[:points_possible]
-          found_question_ids[question[:id]] = true
-        end
-      end
-    end
-    last_question_index = columns.length - 1
-    columns << I18n.t('statistics.csv_columns.n_correct', 'n correct')
-    columns << I18n.t('statistics.csv_columns.n_incorrect', 'n incorrect')
-    columns << I18n.t('statistics.csv_columns.score', 'score')
-    rows = []
-    submissions.each_with_index do |submission, i|
-      update_progress(i, submissions.size)
-      row = []
-      if submission.user
-        row << submission.user.name unless anonymous?
-        row << submission.user_id unless anonymous?
-        row << submission.user.sis_pseudonym_for(quiz.context.account).try(:sis_user_id) unless anonymous?
-      else
-        3.times do
-          row << ''
-        end
-      end
-      section_name = []
-      section_id = []
-      section_sis_id = []
-      context.student_enrollments.active.where(:user_id => submission.user_id).each do |enrollment|
-        section_name << enrollment.course_section.name
-        section_id << enrollment.course_section.id
-        section_sis_id << enrollment.course_section.try(:sis_source_id)
-      end
-      row << section_name.join(", ")
-      row << section_id.join(", ")
-      row << section_sis_id.join(", ")
-      row << submission.finished_at
-      row << submission.attempt if includes_all_versions?
-      columns[first_question_index..last_question_index].each do |id|
-        next unless id.is_a?(String)
-        id = id.to_i
-        answer = submission.submission_data.detect{|a| a[:question_id] == id }
-        question = submission.quiz_data.detect{|q| q[:id] == id}
-        unless question
-          # if this submission didn't answer this question, fill in with blanks
-          row << ''
-          row << ''
-          next
-        end
-        strip_html_answers(question)
-        answer_item = question && question[:answers].detect{|a| a[:id] == answer[:answer_id]}
-        answer_item ||= answer
-        if question[:question_type] == 'fill_in_multiple_blanks_question'
-          blank_ids = question[:answers].map{|a| a[:blank_id] }.uniq
-          row << blank_ids.map{|blank_id| answer["answer_for_#{blank_id}".to_sym].try(:gsub, /,/, '\,') }.compact.join(',')
-        elsif question[:question_type] == 'multiple_answers_question'
-          row << question[:answers].map{|a| answer["answer_#{a[:id]}".to_sym] == '1' ? a[:text].gsub(/,/, '\,') : nil }.compact.join(',')
-        elsif question[:question_type] == 'multiple_dropdowns_question'
-          blank_ids = question[:answers].map{|a| a[:blank_id] }.uniq
-          answer_ids = blank_ids.map{|blank_id| answer["answer_for_#{blank_id}".to_sym] }
-          row << answer_ids.map{|id| (question[:answers].detect{|a| a[:id] == id } || {})[:text].try(:gsub, /,/, '\,' ) }.compact.join(',')
-        elsif question[:question_type] == 'calculated_question'
-          list = question[:answers][0][:variables].map{|a| [a[:name],a[:value].to_s].map{|str| str.gsub(/\=>/, '\=>') }.join('=>') }
-          list << answer[:text]
-          row << list.map{|str| (str || '').gsub(/,/, '\,') }.join(',')
-        elsif question[:question_type] == 'matching_question'
-          answer_ids = question[:answers].map{|a| a[:id] }
-          answer_and_matches = answer_ids.map{|id| [id, answer["answer_#{id}".to_sym].to_i] }
-          row << answer_and_matches.map{|id, match_id| 
-            res = []
-            res << (question[:answers].detect{|a| a[:id] == id } || {})[:text]
-            match = question[:matches].detect{|m| m[:match_id] == match_id } || question[:answers].detect{|m| m[:match_id] == match_id} || {}
-            res << (match[:right] || match[:text])
-            res.map{|s| (s || '').gsub(/\=>/, '\=>')}.join('=>').gsub(/,/, '\,') 
-          }.join(',')
-        elsif question[:question_type] == 'numerical_question'
-          row << (answer && answer[:text])
-        elsif question[:question_type] == 'file_upload_question'
-
-          row << attachment_csv(answer)
-        else
-          row << ((answer_item && answer_item[:text]) || '')
-        end
-        row << (answer ? answer[:points] : "")
-      end
-      row << submission.submission_data.select{|a| a[:correct] }.length
-      row << submission.submission_data.reject{|a| a[:correct] }.length
-      row << submission.score
-      rows << row
-    end
-
     csv = CSV.generate do |csv|
-      columns.each_with_index do |val, idx|
-        r = []
-        r << val
-        r << ''
-        rows.each do |row|
-          r << row[idx]
+      context = quiz.context
+
+      # write columns to csv
+      columns = []
+      columns << I18n.t('statistics.csv_columns.name', 'name') unless anonymous?
+      columns << I18n.t('statistics.csv_columns.id', 'id') unless anonymous?
+      columns << I18n.t('statistics.csv_columns.sis_id', 'sis_id') unless anonymous?
+      columns << I18n.t('statistics.csv_columns.section', 'section')
+      columns << I18n.t('statistics.csv_columns.section_id', 'section_id')
+      columns << I18n.t('statistics.csv_columns.section_sis_id', 'section_sis_id')
+      columns << I18n.t('statistics.csv_columns.submitted', 'submitted')
+      columns << I18n.t('statistics.csv_columns.attempt', 'attempt') if includes_all_versions?
+      first_question_index = columns.length
+      submissions = submissions_for_statistics
+      preload_attachments(submissions)
+      found_question_ids = {}
+      quiz_datas = [quiz.quiz_data] + submissions.map(&:quiz_data)
+      quiz_datas.compact.each do |quiz_data|
+        quiz_data.each do |question|
+          next if question['entry_type'] == 'quiz_group'
+          if !found_question_ids[question[:id]]
+            columns << "#{question[:id]}: #{strip_tags(question[:question_text])}"
+            columns << question[:points_possible]
+            found_question_ids[question[:id]] = true
+          end
         end
-        csv << r
+      end
+      last_question_index = columns.length - 1
+      columns << I18n.t('statistics.csv_columns.n_correct', 'n correct')
+      columns << I18n.t('statistics.csv_columns.n_incorrect', 'n incorrect')
+      columns << I18n.t('statistics.csv_columns.score', 'score')
+      csv << columns
+
+      # write rows to csv
+      submissions.each_with_index do |submission, i|
+        update_progress(i, submissions.size)
+        row = []
+        if submission.user
+          row << submission.user.name unless anonymous?
+          row << submission.user_id unless anonymous?
+          row << submission.user.sis_pseudonym_for(quiz.context.account).try(:sis_user_id) unless anonymous?
+        else
+          3.times do
+            row << ''
+          end
+        end
+        section_name = []
+        section_id = []
+        section_sis_id = []
+        context.student_enrollments.active.where(:user_id => submission.user_id).each do |enrollment|
+          section_name << enrollment.course_section.name
+          section_id << enrollment.course_section.id
+          section_sis_id << enrollment.course_section.try(:sis_source_id)
+        end
+        row << section_name.join(", ")
+        row << section_id.join(", ")
+        row << section_sis_id.join(", ")
+        row << submission.finished_at
+        row << submission.attempt if includes_all_versions?
+        columns[first_question_index..last_question_index].each do |id|
+          next unless id.is_a?(String)
+          id = id.to_i
+          answer = submission.submission_data.detect { |a| a[:question_id] == id }
+          question = submission.quiz_data.detect { |q| q[:id] == id }
+          unless question
+            # if this submission didn't answer this question, fill in with blanks
+            row << ''
+            row << ''
+            next
+          end
+          strip_html_answers(question)
+          answer_item = question && question[:answers].detect { |a| a[:id] == answer[:answer_id] }
+          answer_item ||= answer
+          if question[:question_type] == 'fill_in_multiple_blanks_question'
+            blank_ids = question[:answers].map { |a| a[:blank_id] }.uniq
+            row << blank_ids.map { |blank_id| answer["answer_for_#{blank_id}".to_sym].try(:gsub, /,/, '\,') }.compact.join(',')
+          elsif question[:question_type] == 'multiple_answers_question'
+            row << question[:answers].map { |a| answer["answer_#{a[:id]}".to_sym] == '1' ? a[:text].gsub(/,/, '\,') : nil }.compact.join(',')
+          elsif question[:question_type] == 'multiple_dropdowns_question'
+            blank_ids = question[:answers].map { |a| a[:blank_id] }.uniq
+            answer_ids = blank_ids.map { |blank_id| answer["answer_for_#{blank_id}".to_sym] }
+            row << answer_ids.map { |id| (question[:answers].detect { |a| a[:id] == id } || {})[:text].try(:gsub, /,/, '\,') }.compact.join(',')
+          elsif question[:question_type] == 'calculated_question'
+            list = question[:answers][0][:variables].map { |a| [a[:name], a[:value].to_s].map { |str| str.gsub(/\=>/, '\=>') }.join('=>') }
+            list << answer[:text]
+            row << list.map { |str| (str || '').gsub(/,/, '\,') }.join(',')
+          elsif question[:question_type] == 'matching_question'
+            answer_ids = question[:answers].map { |a| a[:id] }
+            answer_and_matches = answer_ids.map { |id| [id, answer["answer_#{id}".to_sym].to_i] }
+            row << answer_and_matches.map { |id, match_id|
+              res = []
+              res << (question[:answers].detect { |a| a[:id] == id } || {})[:text]
+              match = question[:matches].detect { |m| m[:match_id] == match_id } || question[:answers].detect { |m| m[:match_id] == match_id } || {}
+              res << (match[:right] || match[:text])
+              res.map { |s| (s || '').gsub(/\=>/, '\=>') }.join('=>').gsub(/,/, '\,')
+            }.join(',')
+          elsif question[:question_type] == 'numerical_question'
+            row << (answer && answer[:text])
+          elsif question[:question_type] == 'file_upload_question'
+
+            row << attachment_csv(answer)
+          else
+            row << ((answer_item && answer_item[:text]) || '')
+          end
+          row << (answer ? answer[:points] : "")
+        end
+        row << submission.submission_data.select { |a| a[:correct] }.length
+        row << submission.submission_data.reject { |a| a[:correct] }.length
+        row << submission.score
+        csv << row
       end
     end
     csv
