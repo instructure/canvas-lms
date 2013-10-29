@@ -671,20 +671,19 @@ div#content
   .answer
     .answer_select .select_answer
       :display block
-    .answer_select .select_answer:focus .answer_box
-      :background-image url(/images/partial_answer.png)
     .select_answer_link
       :display inline
-    .answer_select .answer_box
+    .answer_select .answer_image
       :background-repeat no-repeat
+      :background-position 3px 5px
       :cursor pointer
 
-    &.hover
-      .answer_select .answer_box
-        :background-image url(/images/partial_answer.png)
-    &.partial_answer .answer_select .answer_box
+    &.hover .answer_select .answer_image,
+    .answer_select .select_answer_link:focus .answer_image
       :background-image url(/images/partial_answer.png)
-    &.negative_answer .answer_select .answer_box
+    &.partial_answer .answer_select .answer_image
+      :background-image url(/images/partial_answer.png)
+    &.negative_answer .answer_select .answer_image
       :background-image url(/images/negative_answer.png)
 
 // Don't display the "select answer" answer_box for "fill-in-the-blank" questions where
@@ -720,16 +719,16 @@ div#content
     .answer
       .answer_select
         visibility: hidden
-      .answer_select .select_answer:focus .answer_box
+      .answer_select .select_answer:focus .answer_image
         :background-image none
       .answer_select .answer_box
         &.hover .answer_box
           :background-image none
 
       &.hover
-        .answer_select .answer_box
+        .answer_select .answer_image
           :background-image none
-      &.correct_answer .answer_select .answer_box
+      &.correct_answer .answer_select .answer_image
         :background-image none
 
 .question
@@ -1400,8 +1399,8 @@ ul#quiz_versions
       .calculated_question_answers
         position: relative
       /* Display persistent correct answer arrow when editing only. */
-      &.selectable .form_answers .answer.correct_answer .answer_select .answer_box
-        background: url(/images/correct_answer.png) no-repeat 3px 5px
+      &.selectable .form_answers .answer.correct_answer .answer_select .answer_image
+        background-image: url(/images/correct_answer.png)
     .blank_id_select
       width: auto
       min-width: 220px

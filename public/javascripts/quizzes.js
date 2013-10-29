@@ -1663,6 +1663,8 @@ define([
       var $question = $(this).parents(".question");
       var questionID = $(this).closest('.question_holder').find('.display_question').attr('id');
       if (!$question.hasClass('selectable')) { return; }
+      var $answer = $(this).parents('.answer');
+
       if (!REGRADE_DATA[questionID]){
         REGRADE_DATA[questionID] = correctAnswerIDs($question)
       }
@@ -1672,11 +1674,11 @@ define([
           .find('img').attr('alt', clickSetCorrect);
         $(this)
           .attr('title', isSetCorrect)
-          .find('img').attr('alt', isSetCorrect)
-          .closest(".answer").addClass('correct_answer');
+          .find('img').attr('alt', isSetCorrect);
+        $answer.addClass('correct_answer');
       } else {
-        $(this).parents(".answer").toggleClass('correct_answer');
-        if ($(this).parents(".answer").hasClass('correct_answer')) {
+        $answer.toggleClass('correct_answer');
+        if ($answer.hasClass('correct_answer')) {
           $(this)
             .attr('title', clickUnsetCorrect)
             .find('img').attr('alt', clickUnsetCorrect);
@@ -1687,6 +1689,7 @@ define([
         }
       }
 
+      $answer.addClass('hover').siblings().removeClass('hover');
       showRegradeOptions($question,questionID);
     });
 
