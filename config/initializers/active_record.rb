@@ -769,6 +769,32 @@ class ActiveRecord::Base
       delete_all_without_joins(conditions)
     end
     alias_method_chain :delete_all, :joins
+
+    def delete_all_with_limit(conditions = nil)
+      scope = scope(:find)
+      if scope && scope[:limit]
+        case connection.adapter_name
+        when 'MySQL', 'Mysql2'
+          scope = scope(:find)
+          sql = "DELETE FROM #{quoted_table_name} "
+          add_conditions!(sql, conditions, scope)
+          add_order!(sql, nil, scope)
+          add_limit!(sql, {}, scope)
+          return connection.delete(sql, "#{name} Delete all")
+        else
+          # I would just use this relation in the where below, but
+          # it gets confused with the with_exclusive_scope, and
+          # doesn't apply current_scoped_methods_when_defined
+          # so just serialize it here
+          sql = except(:select).select(:id).to_sql
+          with_exclusive_scope do
+            return where("id IN (#{sql})").delete_all
+          end
+        end
+      end
+      delete_all_without_limit(conditions)
+    end
+    alias_method_chain :delete_all, :limit
   end
 
   def self.bulk_insert(records)

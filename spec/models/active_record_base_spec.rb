@@ -516,6 +516,17 @@ describe ActiveRecord::Base do
     end
   end
 
+  describe "delete_all with_limit" do
+    it "should work" do
+      u = User.create!
+      p1 = u.pseudonyms.create!(unique_id: 'a', account: Account.default)
+      p2 = u.pseudonyms.create!(unique_id: 'b', account: Account.default)
+      u.pseudonyms.scoped.reorder("unique_id DESC").limit(1).delete_all
+      p1.reload
+      lambda { p2.reload }.should raise_error(ActiveRecord::RecordNotFound)
+    end
+  end
+
   context "fake arel extensions" do
     before do
       @user = User.create!(:name => 'a')
