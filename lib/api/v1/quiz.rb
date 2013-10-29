@@ -81,6 +81,7 @@ module Api::V1::Quiz
       :question_count => quiz.available_question_count,
       :published => quiz.published?
     )
+    hash.delete(:access_code) unless quiz.grants_right?(user, session, :grade)
     locked_json(hash, quiz, user, 'quiz', :context => context)
     hash
   end
