@@ -83,7 +83,9 @@ describe "manage groups" do
       # Remove added user from the group
       fj(".groups .group .toggle-group:first").click
       wait_for_ajaximations
-      fj(".groups .group .remove-from-group:first").click
+      fj(".groups .group .group-user-actions:first").click
+      wait_for_ajaximations
+      fj(".remove-from-group:first").click
       wait_for_ajaximations
       fj(".group-summary:visible:first").text.should == "0 students"
       # should re-appear in unassigned
@@ -160,6 +162,52 @@ describe "manage groups" do
         wait_for_ajaximations
         fj(".group-summary:visible:first").text.should == "1 student"
       end
+    end
+
+    it "should allow a teacher to reassign a student with an accessible modal dialog" do
+      students = groups_student_enrollment 2
+      group_categories = create_categories(@course, 1)
+      groups = add_groups_in_category(group_categories[0],2)
+      get "/courses/#{@course.id}/groups"
+      wait_for_ajaximations
+
+      # expand groups
+      expand_group(groups[0].id)
+      expand_group(groups[1].id)
+
+      # Add an unassigned user to the first group
+      fj(".group-summary:visible:first").text.should == "0 students"
+      ff("div[data-view='unassignedUsers'] .assign-to-group").first.click
+      wait_for_animations
+      ff(".assign-to-group-menu .set-group").first.click
+      wait_for_ajaximations
+      fj(".group-summary:visible:first").text.should == "1 student"
+      fj(".group-summary:visible:last").text.should == "0 students"
+
+
+      # Move the user from one group into the other
+      fj(".groups .group .group-user .group-user-actions").click
+      wait_for_ajaximations
+      fj(".edit-group-assignment:first").click
+      wait_for_ajaximations
+      fj(".single-select:first option:first").click
+      wait_for_ajaximations
+      fj('.set-group:first').click
+      wait_for_ajaximations
+      fj(".group-summary:visible:first").text.should == "0 students"
+      fj(".group-summary:visible:last").text.should == "1 student"
+
+      # Move the user back
+      fj(".groups .group .group-user .group-user-actions").click
+      wait_for_ajaximations
+      fj(".edit-group-assignment:last").click
+      wait_for_ajaximations
+      fj(".single-select:last option:first").click
+      wait_for_ajaximations
+      fj('.set-group:last').click
+      wait_for_ajaximations
+      fj(".group-summary:visible:first").text.should == "1 student"
+      fj(".group-summary:visible:last").text.should == "0 students"
     end
   end
 

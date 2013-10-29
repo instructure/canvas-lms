@@ -1,19 +1,39 @@
 <div class="group-user-name ellipsis" title="{{name}}"><i class="icon-drag-handle"></i>{{name}}</div>
 {{#if canAssignToGroup}}
-  <a href="#" data-user-id="{{id}}" 
-     class="assign-to-group" 
+  <a href="#"
+     data-user-id="{{id}}"
+     class="assign-to-group"
      title="{{#t "assign_to_group"}}Assign to Group{{/t}}"
-     aria-label="{{#t "assign_user_to_group"}}Assign user {{name}} to a group{{/t}}"
-  >
-    <i class="icon-plus"></i>
+     aria-label="{{#t "assign_user_to_group"}}Assign user {{name}} to a group{{/t}}">
+      <i class="icon-plus"></i>
   </a>
 {{/if}}
-{{#if canRemoveFromGroup}}
-  <a href="#" data-user-id="{{id}}"
-     class="remove-from-group"
-     title="{{#t "remove_from_group"}}Remove from Group{{/t}}"
-     aria-label="{{#t "remove_user_from_group"}}Remove user {{name}} from this group{{/t}}"
-  >
-    <i class="icon-x"></i>
+{{#if canEditGroupAssignment}}
+  <a href="#"
+     data-user-id="{{id}}"
+     class="al-trigger group-user-actions"
+     data-kyle-menu-options='{"appendMenuTo": "body"}'>
+      <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
+      <span class="screenreader-only">
+        {{#t "edit_user_group_assignment"}}Remove or reassign user {{name}} from group{{/t}}
+      </span>
   </a>
+  <ul class="al-options">
+    <li>
+      <a href="#"
+         data-user-id="{{id}}"
+         aria-label="{{#t "remove_from_group"}}Remove user {{name}} from group{{/t}}"
+         class="icon-trash remove-from-group">
+          {{#t "remove"}}Remove{{/t}}
+      </a>
+    </li>
+    <li>
+      <a href="#"
+         data-user-id="{{id}}"
+         aria-label="{{#t "move_to_new_group"}}Move user {{name}} to a new group{{/t}}"
+         class="icon-updown edit-group-assignment">
+          {{#t "move"}}Move To...{{/t}}
+      </a>
+    </li>
+  </ul>
 {{/if}}

@@ -15,7 +15,7 @@ define [
       autoFetch: true # load until below the viewport, don't wait for the user to scroll
       itemViewOptions:
         canAssignToGroup: true
-        canRemoveFromGroup: false
+        canEditGroupAssignment: false
 
     dropOptions:
       accept: '.group-user'

@@ -7,21 +7,13 @@ define [
   class GroupUserView extends View
 
     @optionProperty 'canAssignToGroup'
-    @optionProperty 'canRemoveFromGroup'
+    @optionProperty 'canEditGroupAssignment'
 
     tagName: 'li'
 
     className: 'group-user'
 
     template: template
-
-    events:
-      'click .remove-from-group': 'removeUserFromGroup'
-
-    removeUserFromGroup: (e)->
-      e.preventDefault()
-      e.stopPropagation()
-      @model.moveTo null
 
     attach: ->
       @model.on 'change', @render, this
@@ -37,4 +29,3 @@ define [
 
     toJSON: ->
       _.extend {}, this, super
-
