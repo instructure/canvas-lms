@@ -90,7 +90,7 @@ define [
 
     disable: ->
       @$el.addClass @disabledClass
-      @$el.attr('data-tooltip', '')
+      #@$el.attr('data-tooltip', '')
 
     enable: ->
       @$el.removeClass @disabledClass
@@ -166,7 +166,7 @@ define [
       @$desc.addClass 'screenreader-only'
       @$el.attr 'aria-describedby', descId
 
-      # unpublishable 
+      # unpublishable
       if !@model.get('unpublishable')? or @model.get('unpublishable')
         @enable()
         @$el.attr 'title', options.text
