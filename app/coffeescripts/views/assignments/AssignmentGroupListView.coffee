@@ -79,13 +79,32 @@ define [
       @$list.on('sortstart', @collapse)
       @$list.on('sortstop', @expand)
 
+    handleExtraClick: (e) =>
+      e.stopImmediatePropagation()
+      $(e.target).off('click', @handleExtraClick)
+
     collapse: (e, ui) =>
-      id = ui.item.children(":first").data('id')
-      ui.item.find("#assignment_group_#{id}_assignments").slideUp(100)
+      item = ui.item
+      id = item.children(":first").attr('data-id')
+      item.find("#assignment_group_#{id}_assignments").slideUp(100)
       ui.item.css("height", "auto")
+      arrow = item.find('i').first()
+      arrow.removeClass('icon-mini-arrow-down').addClass('icon-mini-arrow-right')
 
     expand: (e, ui) =>
-      id = ui.item.children(":first").data('id')
-      ag = @collection.findWhere id: parseInt(id)
+      item = ui.item
+      $toggler = item.find('.element_toggler').first()
+      # FF triggers an extra click when you drop the item, so we want to handle it here
+      $toggler.on('click', @handleExtraClick)
+
+      # remove the extra click handler for browsers that don't trigger the extra click
+      setTimeout(=>
+        $toggler.off('click', @handleExtraClick)
+      , 50)
+
+      id = item.children(":first").attr('data-id')
+      ag = @collection.findWhere id: id
       if ag && ag.groupView.shouldBeExpanded()
-        ui.item.find("#assignment_group_#{id}_assignments").slideDown(100)
+        item.find("#assignment_group_#{id}_assignments").slideDown(100)
+        arrow = item.find('i').first()
+        arrow.addClass('icon-mini-arrow-down').removeClass('icon-mini-arrow-right')
