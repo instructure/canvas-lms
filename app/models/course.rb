@@ -893,8 +893,7 @@ class Course < ActiveRecord::Base
 
   def require_assignment_group
     shard.activate do
-      has_group = Rails.cache.read(['has_assignment_group', self].cache_key)
-      return if has_group && Rails.env.production?
+      return if Rails.cache.read(['has_assignment_group', self].cache_key)
       if self.assignment_groups.active.empty?
         self.assignment_groups.create(:name => t('#assignment_group.default_name', "Assignments"))
       end
