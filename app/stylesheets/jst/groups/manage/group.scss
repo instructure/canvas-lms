@@ -58,6 +58,11 @@
       opacity: 0.5;
     }
   }
+
+  .show-group-full { display: none; }
+  &.slots-full {
+    .show-group-full { display: inline-block; }
+  }
 }
 
 .group-category-contents-condensed .group {
