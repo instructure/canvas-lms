@@ -351,11 +351,11 @@ class Attachment < ActiveRecord::Base
     shared = scribd_doc_shared?
 
     scribd_doc = self.scribd_doc
+    Scribd::API.instance.user = scribd_user
     self.scribd_doc = nil
     self.scribd_attempts = 0
     self.workflow_state = 'deleted'  # not file_state :P
     unless shared
-    Scribd::API.instance.user = scribd_user
       begin
         return false unless scribd_doc.destroy
       rescue Scribd::ResponseError => e
