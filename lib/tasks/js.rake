@@ -45,7 +45,7 @@ namespace :js do
           # running a subset of tests in isolation, don't be paranoid about
           # some unrun tests getting lost
           result = 0
-        elsif phantomjs_output.match(/^Took .* (\d+) tests/)[1].to_i < 900
+        elsif phantomjs_output.match(/^Took .* (\d+) tests/)[1].to_i < 2000
           # ran all tests but didn't see enough? do be paranoid about some
           # unrun tests getting lost
           puts 'all run specs passed, but not all specs were run'
