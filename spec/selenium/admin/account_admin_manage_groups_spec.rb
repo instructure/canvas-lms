@@ -5,8 +5,8 @@ describe "account admin manage groups" do
   it_should_behave_like "in-process server selenium tests"
 
   def add_account_category (account, name)
-    driver.find_element(:css, ".add_category_link").click
-    form = driver.find_element(:css, "#add_category_form")
+    f(".add_category_link").click
+    form = f("#add_category_form")
     replace_content form.find_element(:css, "input[type=text]"), name
     submit_form(form)
     wait_for_ajaximations
@@ -59,9 +59,9 @@ describe "account admin manage groups" do
 
     it "should remove tab and sidebar entries for deleted category" do
       get "/accounts/#{@admin_account.id}/groups"
-      driver.find_element(:css, "#category_#{@courses_group_category.id}").should be_displayed
-      driver.find_element(:css, "#sidebar_category_#{@courses_group_category.id}").should be_displayed
-      driver.find_element(:css, "#category_#{@courses_group_category.id} .delete_category_link").click
+      f("#category_#{@courses_group_category.id}").should be_displayed
+      f("#sidebar_category_#{@courses_group_category.id}").should be_displayed
+      f("#category_#{@courses_group_category.id} .delete_category_link").click
       confirm_dialog = driver.switch_to.alert
       confirm_dialog.accept
       wait_for_ajaximations
@@ -84,12 +84,12 @@ describe "account admin manage groups" do
     it "should populate sidebar with new category when adding a category and group" do
       group = @admin_account.groups.create(:name => "Group 1", :group_category => @courses_group_category)
       get "/accounts/#{Account.default.id}/groups"
-      driver.find_element(:css, "#sidebar_category_#{@courses_group_category.id}").should be_displayed
+      f("#sidebar_category_#{@courses_group_category.id}").should be_displayed
       f("#sidebar_category_#{@courses_group_category.id} #sidebar_group_#{group.id}").should be_displayed
       new_category = add_account_category(@admin_account, 'New Category')
       group2 = add_group_to_category new_category, "New Group Category 2"
       driver.find_element(:id, "sidebar_category_#{new_category.id}").should be_displayed
-      driver.find_element(:css, "#sidebar_category_#{new_category.id} #sidebar_group_#{group2.id}").should be_displayed
+      f("#sidebar_category_#{new_category.id} #sidebar_group_#{group2.id}").should be_displayed
     end
 
     it "should preserve group to category association when editing a group" do
@@ -99,10 +99,10 @@ describe "account admin manage groups" do
       find_with_jquery("#category_#{@courses_group_category.id} #group_#{group.id}").should be_displayed
       # submit new category form
       hover_and_click(".edit_group_link")
-      form = driver.find_element(:css, "#edit_group_form")
+      form = f("#edit_group_form")
       replace_content form.find_element(:css, "input[type=text]"), "New Name"
       submit_form(form)
-      driver.find_element(:css, "#category_#{@courses_group_category.id} #group_#{group.id}").should be_displayed
+      f("#category_#{@courses_group_category.id} #group_#{group.id}").should be_displayed
     end
 
     it "should populate a group tag and check if it's there" do
@@ -110,14 +110,14 @@ describe "account admin manage groups" do
       category = add_account_category @admin_account, 'New Category'
       category_tabs = driver.find_elements(:css, '#category_list li')
       category_tabs[1].click
-      category_name = driver.find_element(:css, "#category_#{category.id} .category_name").text
+      category_name = f("#category_#{category.id} .category_name").text
       category_name.should include_text(category.name)
     end
 
     it "should add another group and see that the group is there" do
       get "/accounts/#{@admin_account.id}/groups"
       group = add_group_to_category @courses_group_category, 'group 1'
-      driver.find_element(:css, "#group_#{group.id} .group_name").text.should == group.name
+      f("#group_#{group.id} .group_name").text.should == group.name
     end
 
     it "should add multiple groups and validate they exist" do
@@ -131,7 +131,7 @@ describe "account admin manage groups" do
       add_groups_in_category @courses_group_category
       get "/accounts/#{@admin_account.id}/groups"
       make_full_screen
-      delete = driver.find_element(:css, ".delete_category_link")
+      delete = f(".delete_category_link")
       delete.click
       confirm_dialog = driver.switch_to.alert
       confirm_dialog.accept
@@ -146,11 +146,11 @@ describe "account admin manage groups" do
       group.should_not be_nil
       driver.find_element(:id, "group_#{group.id}").click
       wait_for_ajaximations
-      driver.find_element(:css, "#group_#{group.id} .edit_group_link").click
+      f("#group_#{group.id} .edit_group_link").click
       wait_for_ajaximations
       name = "new group 1"
-      driver.find_element(:css, "#group_name").send_keys(name)
-      driver.find_element(:css, "#group_#{group.id} .btn").click
+      f("#group_name").send_keys(name)
+      f("#group_#{group.id} .btn").click
       wait_for_ajaximations
       group = @admin_account.groups.find_by_name(name)
       group.should_not be_nil
@@ -160,7 +160,7 @@ describe "account admin manage groups" do
       get "/accounts/#{@admin_account.id}/groups"
       group = add_group_to_category @courses_group_category, "group 1"
       driver.find_element(:id, "group_#{group.id}").click
-      driver.find_element(:css, "#group_#{group.id} .delete_group_link").click
+      f("#group_#{group.id} .delete_group_link").click
       confirm_dialog = driver.switch_to.alert
       confirm_dialog.accept
       wait_for_ajaximations
@@ -173,7 +173,7 @@ describe "account admin manage groups" do
       get "/accounts/#{@admin_account.id}/groups"
       group = add_group_to_category @courses_group_category, "group 1"
       simulate_group_drag(student.id, "blank", group.id)
-      group_div = driver.find_element(:css, "#group_#{group.id}")
+      group_div = f("#group_#{group.id}")
       group_div.find_element(:css, ".user_id_#{student.id}").should be_displayed
     end
 
@@ -183,10 +183,10 @@ describe "account admin manage groups" do
       get "/accounts/#{@admin_account.id}/groups"
       wait_for_ajax_requests
       simulate_group_drag(student.id, "blank", groups[0].id)
-      group1_div = driver.find_element(:css, "#group_#{groups[0].id}")
+      group1_div = f("#group_#{groups[0].id}")
       group1_div.find_element(:css, ".user_id_#{student.id}").should be_displayed
       simulate_group_drag(student.id, groups[0].id, groups[1].id)
-      group2_div = driver.find_element(:css, "#group_#{groups[1].id}")
+      group2_div = f("#group_#{groups[1].id}")
       group2_div.find_element(:css, ".user_id_#{student.id}").should be_displayed
     end
 
@@ -196,16 +196,16 @@ describe "account admin manage groups" do
       get "/accounts/#{@admin_account.id}/groups"
       wait_for_ajax_requests
       simulate_group_drag(student.id, "blank", groups[0].id)
-      group1_div = driver.find_element(:css, "#group_#{groups[0].id}")
+      group1_div = f("#group_#{groups[0].id}")
       group1_div.find_element(:css, ".user_id_#{student.id}").should be_displayed
       simulate_group_drag(student.id, groups[0].id, groups[1].id)
-      group2_div = driver.find_element(:css, "#group_#{groups[1].id}")
+      group2_div = f("#group_#{groups[1].id}")
       group2_div.find_element(:css, ".user_id_#{student.id}").should be_displayed
-      unassigned_div = driver.find_element(:css, "#category_#{@courses_group_category.id} .group_blank")
+      unassigned_div = f("#category_#{@courses_group_category.id} .group_blank")
       simulate_group_drag(student.id, groups[1].id, "blank")
       unassigned_div.find_elements(:css, ".user_id_#{student.id}").should_not be_empty
       get "/accounts/#{@admin_account.id}/groups"
-      unassigned_div = driver.find_element(:css, "#category_#{@courses_group_category.id} .group_blank")
+      unassigned_div =f("#category_#{@courses_group_category.id} .group_blank")
       unassigned_div.find_elements(:css, ".user_id_#{student.id}").should_not be_empty
     end
 
@@ -213,7 +213,7 @@ describe "account admin manage groups" do
       get "/accounts/#{@admin_account.id}/groups"
       @admin_account.group_categories.last.name.should == "Existing Category"
       make_full_screen
-      driver.find_element(:css, "#category_#{@courses_group_category.id} .edit_category_link .icon-edit").click
+      f("#category_#{@courses_group_category.id} .edit_category_link .icon-edit").click
       wait_for_ajaximations
       form = driver.find_element(:id, "edit_category_form")
       input_box = form.find_element(:css, "input[type=text]")
@@ -228,13 +228,13 @@ describe "account admin manage groups" do
       get "/accounts/#{@admin_account.id}/groups"
       @admin_account.group_categories.last.name.should == "Existing Category"
       make_full_screen
-      driver.find_element(:css, "#category_#{@courses_group_category.id} .edit_category_link .icon-edit").click
+      f("#category_#{@courses_group_category.id} .edit_category_link .icon-edit").click
       wait_for_ajaximations
       form = driver.find_element(:id, "edit_category_form")
       ff("#category_enable_self_signup", form).should be_empty
       submit_form(form)
       wait_for_ajaximations
-      driver.find_element(:css, "#category_#{@courses_group_category.id} .self_signup_text").should_not include_text "Self sign-up is enabled"
+      f("#category_#{@courses_group_category.id} .self_signup_text").should_not include_text "Self sign-up is enabled"
     end
   end
 end

@@ -114,7 +114,7 @@ describe "gradebook2" do
       ff('.student-name').count.should == @course.students.count
 
       # select the option and we'll now show concluded
-      expect_new_page_load { open_gradebook_settings(driver.find_element(:css, 'label[for="show_concluded_enrollments"]')) }
+      expect_new_page_load { open_gradebook_settings(f('label[for="show_concluded_enrollments"]')) }
       wait_for_ajaximations
 
       driver.find_elements(:css, '.student-name').count.should == @course.all_students.count
@@ -130,7 +130,7 @@ describe "gradebook2" do
       driver.find_elements(:css, '.student-name').count.should == @course.all_students.count
 
       # the checkbox should fire an alert rather than changing to not showing concluded
-      expect_fired_alert { open_gradebook_settings(driver.find_element(:css, 'label[for="show_concluded_enrollments"]')) }
+      expect_fired_alert { open_gradebook_settings(f('label[for="show_concluded_enrollments"]')) }
       driver.find_elements(:css, '.student-name').count.should == @course.all_students.count
     end
 
@@ -225,7 +225,7 @@ describe "gradebook2" do
       end
 
       it "should not allow editing grades" do
-        cell = driver.find_element(:css, '#gradebook_grid [row="0"] .l0')
+        cell = f('#gradebook_grid [row="0"] .l0')
         cell.text.should == '10'
         cell.click
         ff('.grade', cell).should be_blank

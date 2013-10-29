@@ -127,8 +127,8 @@ describe "grading standards" do
     get "/courses/#{@course.id}/grades/#{student.id}"
     grading_scheme = driver.execute_script "return grading_scheme"
     grading_scheme[2][0].should == 'B+'
-    driver.find_element(:css, '#right-side .final_grade .grade').text.should == '89.9'
-    driver.find_element(:css, '#final_letter_grade_text').text.should == 'B+'
+    f("#right-side .final_grade .grade").text.should == '89.9'
+    f("#final_letter_grade_text").text.should == 'B+'
   end
 
   it "should allow editing the standard again without reloading the page" do

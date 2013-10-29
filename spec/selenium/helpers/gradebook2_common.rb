@@ -57,7 +57,7 @@ def open_gradebook_settings(element_to_click = nil)
     ff('#gradebook-toolbar ul.ui-kyle-menu').last.should be_displayed
     true
   end
-  yield(driver.find_element(:css, '#gradebook_settings')) if block_given?
+  yield(f('#gradebook_settings')) if block_given?
   element_to_click.click if element_to_click != nil
 end
 
