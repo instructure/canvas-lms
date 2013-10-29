@@ -167,8 +167,10 @@ define [
       )
       @courseView.on('course', @onCourse)
       if @model
-        # TODO: I imagine we'll be changing this
-        @courseView.setValue("course_" + _.keys(@model.get('audience_contexts').courses)[0])
+        if @model.get('context_code')
+          @courseView.setValue(@model.get('context_code'))
+        else
+          @courseView.setValue("course_" + _.keys(@model.get('audience_contexts').courses)[0])
       else if @launchParams
         @courseView.setValue(@launchParams.context) if @launchParams.context
       else
@@ -247,6 +249,10 @@ define [
         handle_files: (attachments, data) ->
           data.attachment_ids = (a.attachment.id for a in attachments)
           data
+        processData: (formData) =>
+          unless formData.context_code
+            formData.context_code = @options.account_context_code
+          formData
         onSubmit: (@request, submitData) =>
           # close dialog after submitting the message
           dfd = $.Deferred()

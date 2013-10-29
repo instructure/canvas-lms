@@ -145,7 +145,8 @@ class ConversationsController < ApplicationController
       return redirect_to conversations_path(:scope => params[:redirect_scope]) if params[:redirect_scope]
       if @current_user.use_new_conversations?
         js_env(:CONVERSATIONS => {
-                 :ATTACHMENTS_FOLDER_ID => @current_user.conversation_attachments_folder.id
+                 :ATTACHMENTS_FOLDER_ID => @current_user.conversation_attachments_folder.id,
+                 :ACCOUNT_CONTEXT_CODE => "account_#{@domain_root_account.id}",
                })
         return render :template => 'conversations/index_new'
       else
@@ -238,7 +239,8 @@ class ConversationsController < ApplicationController
     context_id = nil
     if params[:context_code].present?
       context = Context.find_by_asset_string(params[:context_code])
-      return render_error('context_code', 'invalid') if context.nil?
+      return render_error('context_code', 'invalid') unless valid_context?(context)
+
       context_type = context.class.name
       context_id = context.id
     end
@@ -955,4 +957,27 @@ class ConversationsController < ApplicationController
   def param_array(key)
     Array(params[key].presence || []).compact
   end
+
+  def valid_context?(context)
+    case context
+    when nil then false
+    when Account then valid_account_context?(context)
+    # might want to add some validation for Course and Group.
+    else true
+    end
+  end
+
+  def valid_account_context?(account)
+    return false unless account.root_account?
+    return true if account.grants_right?(@current_user, session, :read_roster)
+    account.shard.activate do
+      user_sub_accounts = @current_user.associated_accounts.where(root_account_id: account).to_a
+      if user_sub_accounts.any? { |a| a.grants_right?(@current_user, session, :read_roster) }
+        return true
+      end
+    end
+
+    false
+  end
+
 end

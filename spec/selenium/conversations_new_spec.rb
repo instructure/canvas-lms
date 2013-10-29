@@ -141,7 +141,8 @@ describe "conversations new" do
       get_conversations
       compose to: [@s1], subject: 'context-free', body: 'hallo!'
       c = @s1.conversations.last.conversation
-      c.subject.should ==('context-free')
+      c.subject.should == 'context-free'
+      c.context.should == Account.default
     end
 
     it "should not allow non-admins to send a message without picking a context" do

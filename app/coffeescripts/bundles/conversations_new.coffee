@@ -241,7 +241,11 @@ require [
       @header.render()
 
     _initComposeDialog: ->
-      @compose = new MessageFormDialog(courses: @courses, folderId: ENV.CONVERSATIONS.ATTACHMENTS_FOLDER_ID)
+      @compose = new MessageFormDialog
+        courses: @courses
+        folderId: ENV.CONVERSATIONS.ATTACHMENTS_FOLDER_ID
+        account_context_code: ENV.CONVERSATIONS.ACCOUNT_CONTEXT_CODE
+
 
   window.conversationsRouter = new ConversationsRouter
   Backbone.history.start()
