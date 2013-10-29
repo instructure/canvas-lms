@@ -107,7 +107,7 @@ class MessageMigration < ActiveRecord::Migration
         WHERE migration_signature REGEXP '^[0-9]+(,[0-9]+)?$'
       SQL
     else
-      Conversation.find_each(:conditions => "migration_signature ~ E'^[0-9]+(,[0-9]+)?$'", :batch_size => 10000) do |conversation|
+      Conversation.where("migration_signature ~ E'^[0-9]+(,[0-9]+)?$'").find_each(:batch_size => 10000) do |conversation|
         conversation.update_attribute :tmp_private_hash, Digest::SHA1.hexdigest(conversation.migration_signature)
       end
     end

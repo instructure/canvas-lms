@@ -18,7 +18,7 @@ migrations.each do |migration|
   @migration = migration
   data = File.read(@migration)
 
-  if data =~ /concurrently/i && data !~ /transactional = false/ && data !~ /disable_ddl_transaction/
+  if data =~ /concurrently/i && data !~ /disable_ddl_transaction/
     add_error("Adding an index concurrently in a transactional migration?!")
   end
 

@@ -1,9 +1,9 @@
 class AddStaleScribdIndexToAttachments < ActiveRecord::Migration
   tag :predeploy
-  self.transactional = false
+  disable_ddl_transaction!
 
   def self.up
-    add_index :attachments, [:last_inline_view, :created_at], conditions: "scribd_doc IS NOT NULL", concurrently: true
+    add_index :attachments, [:last_inline_view, :created_at], where: "scribd_doc IS NOT NULL", algorithm: :concurrently
   end
 
   def self.down

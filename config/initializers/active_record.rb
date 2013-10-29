@@ -1011,11 +1011,10 @@ if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
       index_name   = index_name(table_name, :column => column_names)
 
       if Hash === options # legacy support, since this param was a string
-        concurrently_option = options[:concurrently] || options[:algorithm] == :concurrently
         index_type = options[:unique] ? "UNIQUE" : ""
         index_name = options[:name].to_s if options[:name]
-        concurrently = "CONCURRENTLY " if concurrently_option && self.open_transactions == 0
-        conditions = options[:conditions] || options[:where]
+        concurrently = "CONCURRENTLY " if options[:algorithm] == :concurrently && self.open_transactions == 0
+        conditions = options[:where]
         if conditions
           conditions = " WHERE #{ActiveRecord::Base.send(:sanitize_sql, conditions, table_name.to_s.dup)}"
         end
@@ -1211,11 +1210,9 @@ class ActiveRecord::Migration
     def transactional?
       @transactional != false
     end
-    def transactional=(value)
-      @transactional = !!value
-    end
+
     def disable_ddl_transaction!
-      self.transactional = false
+      @transactional = false
     end
 
     def tag(*tags)
