@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2012 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -206,7 +206,7 @@ class Quiz < ActiveRecord::Base
   alias_method :destroy!, :destroy
   def destroy
     self.workflow_state = 'deleted'
-    # self.deleted_at = Time.now
+    self.deleted_at = Time.now.utc
     res = self.save
     if self.for_assignment?
       self.assignment.destroy unless self.assignment.deleted?

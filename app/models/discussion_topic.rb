@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -540,7 +540,7 @@ class DiscussionTopic < ActiveRecord::Base
   def destroy
     ContentTag.delete_for(self)
     self.workflow_state = 'deleted'
-    self.deleted_at = Time.now
+    self.deleted_at = Time.now.utc
     self.save
 
     if self.for_assignment? && self.root_topic_id.blank?

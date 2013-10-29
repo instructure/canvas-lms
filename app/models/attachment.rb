@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011-2013 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -1321,7 +1321,7 @@ class Attachment < ActiveRecord::Base
   def destroy
     return if self.new_record?
     self.file_state = 'deleted' #destroy
-    self.deleted_at = Time.now
+    self.deleted_at = Time.now.utc
     ContentTag.delete_for(self)
     MediaObject.update_all({:attachment_id => nil, :updated_at => Time.now.utc}, {:attachment_id => self.id})
     send_later_if_production(:delete_scribd_doc) if scribd_doc

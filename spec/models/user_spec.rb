@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -558,6 +558,12 @@ describe User do
     @user.workflow_state.should == "deleted"
     @user.reload
     @user.workflow_state.should == "deleted"
+  end
+
+  it "should record deleted_at" do
+    user = User.create
+    user.destroy
+    user.deleted_at.should_not be_nil
   end
 
   describe "can_masquerade?" do

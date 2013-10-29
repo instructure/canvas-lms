@@ -864,6 +864,7 @@ class User < ActiveRecord::Base
   def destroy(even_if_managed_passwords=false)
     ActiveRecord::Base.transaction do
       self.workflow_state = 'deleted'
+      self.deleted_at = Time.now.utc
       self.save
       self.pseudonyms.each{|p| p.destroy(even_if_managed_passwords) }
       self.communication_channels.each{|cc| cc.destroy }

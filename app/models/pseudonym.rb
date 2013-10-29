@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -222,7 +222,7 @@ class Pseudonym < ActiveRecord::Base
   def destroy(even_if_managed_password=false)
     raise "Cannot delete system-generated pseudonyms" if !even_if_managed_password && self.managed_password?
     self.workflow_state = 'deleted'
-    self.deleted_at = Time.now
+    self.deleted_at = Time.now.utc
     result = self.save
     self.user.try(:update_account_associations) if result
     result
