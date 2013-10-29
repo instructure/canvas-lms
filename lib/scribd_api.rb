@@ -55,6 +55,17 @@ class ScribdAPI
       !!config
     end
 
+    def delete_all_documents_for_user(user)
+      return false if user == 'canvas'
+      Scribd::API.instance.user = user
+      u = Scribd::User.new
+      while (docs = u.documents).count > 1
+        docs.each do |d|
+          d.destroy
+        end
+      end
+    end
+
     protected
     def authenticate(settings = config)
       Scribd::API.instance.key = settings['api_key']
