@@ -7,7 +7,7 @@ class FixNeedNotifyIndexCondition < ActiveRecord::Migration
   def self.up
     if connection.adapter_name =~ /\Apostgresql/i
       execute("DROP INDEX IF EXISTS index_attachments_on_need_notify")
-      add_index :attachments, :need_notify, :algorithm => :concurrently, :conditions => "need_notify"
+      add_index :attachments, :need_notify, :algorithm => :concurrently, :where => "need_notify"
     end
   end
 

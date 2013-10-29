@@ -3,7 +3,7 @@ class AddIndexToContentTagsLearningOutcomeId < ActiveRecord::Migration
   disable_ddl_transaction!
 
   def self.up
-    add_index :content_tags, :learning_outcome_id, :algorithm => :concurrently, :conditions => "learning_outcome_id IS NOT NULL"
+    add_index :content_tags, :learning_outcome_id, :algorithm => :concurrently, :where => "learning_outcome_id IS NOT NULL"
   end
 
   def self.down

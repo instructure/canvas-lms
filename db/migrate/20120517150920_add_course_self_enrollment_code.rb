@@ -4,7 +4,7 @@ class AddCourseSelfEnrollmentCode < ActiveRecord::Migration
 
   def self.up
     add_column :courses, :self_enrollment_code, :string
-    add_index :courses, [:self_enrollment_code], :unique => true, :algorithm => :concurrently, :conditions => "self_enrollment_code IS NOT NULL"
+    add_index :courses, [:self_enrollment_code], :unique => true, :algorithm => :concurrently, :where => "self_enrollment_code IS NOT NULL"
   end
 
   def self.down

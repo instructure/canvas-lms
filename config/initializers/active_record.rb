@@ -1015,7 +1015,7 @@ if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
         index_type = options[:unique] ? "UNIQUE" : ""
         index_name = options[:name].to_s if options[:name]
         concurrently = "CONCURRENTLY " if concurrently_option && self.open_transactions == 0
-        conditions = options[:conditions]
+        conditions = options[:conditions] || options[:where]
         if conditions
           conditions = " WHERE #{ActiveRecord::Base.send(:sanitize_sql, conditions, table_name.to_s.dup)}"
         end
