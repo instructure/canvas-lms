@@ -208,8 +208,7 @@ class QuizzesController < ApplicationController
              :QUIZZES_URL => polymorphic_url([@context, :quizzes]),
              :QUIZ_FILTERS_URL => polymorphic_url([@context, @quiz, :filters]),
              :CONTEXT_ACTION_SOURCE => :quizzes,
-             :REGRADE_OPTIONS => regrade_options,
-             :ENABLE_QUIZ_REGRADE => @domain_root_account.enable_quiz_regrade? }
+             :REGRADE_OPTIONS => regrade_options }
       append_sis_data(hash)
       js_env(hash)
       render :action => "new"

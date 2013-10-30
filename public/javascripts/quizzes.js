@@ -1698,7 +1698,7 @@ define([
         return;
       }
 
-      if ($("#student_submissions_warning").length == 0 || !ENV.ENABLE_QUIZ_REGRADE) {
+      if ($("#student_submissions_warning").length == 0) {
         return;
       }
 

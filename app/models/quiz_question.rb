@@ -57,7 +57,7 @@ class QuizQuestion < ActiveRecord::Base
   end
   
   def question_data=(data)
-    if data[:regrade_option] && self.quiz.context.root_account.enable_quiz_regrade?
+    if data[:regrade_option]
       update_question_regrade(data[:regrade_option], data[:regrade_user])
     end
 
