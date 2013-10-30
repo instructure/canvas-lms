@@ -4,10 +4,12 @@ define [
   'Backbone'
   'compiled/views/CollectionView'
   'compiled/views/groups/manage/GroupCategoryView'
+  'compiled/views/groups/manage/GroupCategoryCreateView'
+  'compiled/models/GroupCategory'
   'jst/groups/manage/groupCategories'
   'jst/groups/manage/groupCategoryTab'
   'jqueryui/tabs'
-], (I18n, _, {View}, CollectionView, GroupCategoryView, groupCategoriesTemplate, tabTemplate) ->
+], (I18n, _, {View}, CollectionView, GroupCategoryView, GroupCategoryCreateView, GroupCategory, groupCategoriesTemplate, tabTemplate) ->
 
   class GroupCategoriesView extends CollectionView
 
@@ -47,21 +49,34 @@ define [
       if @$tabs.find('.tab-panel').length == 1
         @loadPanelView($panel, model)
       # create the <li> tab view
-      super
+      view = super
+      view.listenTo model, 'change', => # e.g. change name
+        view.render()
+        @reorder()
+        @refreshTabs()
+        @$tabs.tabs active: @collection.indexOf(model)
+      view
 
     renderItem: ->
       super
       @refreshTabs()
 
-    removeItem: (model)->
+    removeItem: (model) ->
       super
       # remove the linked panel and refresh the tabs
-      model.panelView.remove()
+      model.itemView.remove()
+      model.panelView?.remove()
       @refreshTabs()
 
-    addGroupSet: (e)->
+    addGroupSet: (e) ->
       e.preventDefault()
-      alert('will add a group set')
+      @createView ?= new GroupCategoryCreateView({@collection})
+      cat = new GroupCategory
+      cat.once 'sync', =>
+        @collection.add(cat)
+        @$tabs.tabs active: @collection.indexOf(cat)
+      @createView.model = cat
+      @createView.open()
 
     activatedTab: (event, ui) ->
       $panel = ui.newPanel

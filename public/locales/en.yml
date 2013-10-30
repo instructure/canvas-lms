@@ -167,7 +167,7 @@ en:
       test_ldap_search_label: "Testing LDAP search..."
     ldap_timeout_error: 
       last_ldap_timeout_failure: "Last timeout failure"
-      ldap_timeout_failure_help: "If Canvas times out communicating with the LDAP server, it will block further login attempts from using that LDAP server for %{time}."
+      ldap_timeout_failure_help2: "If Canvas times out too many times communicating with the LDAP server, it will block further login attempts from using that LDAP server for %{time}."
     login_required: "must be supplied"
     no_auth_mixing: "Can not mix authentication types"
     no_changing_auth_types: "Can not change type of authorization config, please delete and create new config."
@@ -245,18 +245,20 @@ en:
     announcement_deleted_notice: "Announcement successfully deleted"
     permission_denied_notice: "You cannot create announcements for that account"
   account_reports: 
-<<<<<<< HEAD
-=======
     ccp: 
       course: 
         check_box: "For Course: %{course_id};"
       courses_only: "Online courses only"
       start_at: "Start At: %{start_at};"
->>>>>>> release/2013-10-05.19
     default: 
       all_terms: "All Terms"
+      course_text: "For Course: %{course};"
+      end_text: "End At: %{end_at};"
       extra_text_term: "Term: %{term_name};"
       message: "%{type} report successfully generated with the following settings. Account: %{account}; %{options}"
+      section_text: "For Section: %{section};"
+      start_text: "Start At: %{start_at};"
+      term_text: "Term: %{term_name};"
     grades: 
       deleted: "Include Deleted Objects: true;"
     mississippi: 
@@ -282,10 +284,7 @@ en:
         invalid_settings: "invalid Turnitin settings, please check your account id and shared secret from Turnitin"
         setings_confirmed: "Turnitin settings confirmed!"
     titles: 
-<<<<<<< HEAD
-=======
       allow_draft_help_title: "What is Draft State?"
->>>>>>> release/2013-10-05.19
       configure_report: "Configure Report"
       open_registration_delegated_warning_dialog: "An External Identity Provider is Enabled"
       what_are_quiz_ip_filters: "What are Quiz IP Filters?"
@@ -392,6 +391,30 @@ en:
         message_date_to: "To Date"
         search: Search
         search_people: "Search people"
+    assignment_scheduling_csv_description: 
+      account_reports: 
+        newark: 
+          description: 
+            header: Example
+          student_activity: 
+            text: "This report shows shows all of the assignments and info pertaining to those assignments that are in the specified assignment group or groups and in the specified date range. This report provides data for scheduling assignments, and managing students assignment load, showing only students and assignments where there are 2 or more conflicting assignments due on the same date for a student."
+    assignment_scheduling_csv_parameters: 
+      account_reports: 
+        newark: 
+          assignment_groups: 
+            label: "Assignment Groups To Include:"
+          major: 
+            check_box: Major
+          papers: 
+            check_box: Papers
+          projects: 
+            check_box: Projects
+          reports: 
+            check_box: Reports
+          section_id: 
+            field: "Section ID:"
+          tests: 
+            check_box: Tests
     avatars: 
       all_link: 
         one: "All %{count}"
@@ -421,8 +444,6 @@ en:
       unlock_link: unlock
     cannot_manage_account: "You are not allowed to manage account settings"
     cannot_manage_quotas: "You are not allowed to manage quota settings"
-<<<<<<< HEAD
-=======
     ccp_zero_activity_csv_description: 
       account_reports: 
         ccp: 
@@ -434,7 +455,6 @@ en:
         ccp: 
           filter_online: 
             check_box: "Online classes only"
->>>>>>> release/2013-10-05.19
     chcp_student_activity_csv_description: 
       account_reports: 
         chcp: 
@@ -631,23 +651,14 @@ en:
           description: 
             header: Example
           student_activity: 
-<<<<<<< HEAD
-            text: "This report shows shows all of the assignments and info pertaining to those assingments that are in the specified assignment group or groups and in the specified date range. This report provides data for scheduling safety drills with a minimum of disruption to major in-class assessments."
-=======
             text: "This report shows shows all of the assignments and info pertaining to those assignments that are in the specified assignment group or groups and in the specified date range. This report provides data for scheduling safety drills with a minimum of disruption to major in-class assessments."
->>>>>>> release/2013-10-05.19
     safety_drill_csv_parameters: 
       account_reports: 
         newark: 
           assignment_groups: 
             label: "Assignment Groups To Include:"
-<<<<<<< HEAD
-          date_range: 
-            label: "If both Start At and End At are empty default is 2 weeks from now"
-=======
           major: 
             check_box: Major
->>>>>>> release/2013-10-05.19
           papers: 
             check_box: Papers
           projects: 
@@ -670,8 +681,6 @@ en:
           If Scribd has been enabled for this account, it will try to use it to show the preview. But because Scribd uses flash paper to display the documents, and many users (namely those using an iPad/iPhone) do not have Flash Player installed, that preview will not work.  By leaving Google Docs Previews enabled, when a browser does not have Flash enabled, or if Scribd is not enabled, it will use preview powered by Google Docs. Using this service is subject to Google's viewer [terms of service](%{terms_url})
       about_google_docs_tooltip: "About Google Docs Previews"
       account_admins_title: "Account Admins"
-<<<<<<< HEAD
-=======
       account_quotas: 
         file_quota: "File Quota"
         gigabytes: gigabytes
@@ -679,7 +688,6 @@ en:
         site_admin_quotas: "Site Admin Quotas"
         student_quota: "Student Quota"
         update: Update
->>>>>>> release/2013-10-05.19
       account_settings_title: "Account Settings"
       add_a_custom_help_link: "Add a custom help link"
       add_admin_title: "Add Account Admins"
@@ -693,8 +701,6 @@ en:
       alert_icon_warning_option: warning
       alert_timespan: "from %{start_at} to %{end_at}"
       alerts_title: Alerts
-<<<<<<< HEAD
-=======
       allow_draft: "Allow Draft State (beta)"
       allow_draft_help_message: |-
           Draft state is a *beta* feature that allows course content to be published and unpublished.
@@ -703,7 +709,6 @@ en:
           
           Allowing Draft State here will allow teachers to enable it in their individual courses.
       allow_draft_help_tooltip: "What is draft state?"
->>>>>>> release/2013-10-05.19
       announcement_sent_to_subset: "Sent to 1 / %{denominator} users each month"
       buttons: 
         add_users: "OK Looks Good, Add These Users"
@@ -1033,12 +1038,27 @@ en:
           students_with_no_submissions: 
             description: 
               header: Example
-            text: "This is a report of all students enrolled in a course in a given term that have not submitted an assignment between the given date range in a course. This report contains one row per student enrollment that meet the criteria."
+            text: "This is a report of all students enrolled in a course in a given term that have not submitted an assignment between the given date range in a course. This report contains one row per student enrollment that meet the criteria. The date range can be no larger than two weeks."
     submission_data_csv_description: 
       account_reports: 
         submission_data: 
           description: 
             text: "This report contains dates of submissions for the attendance tool."
+    tempe_grade_export_csv_description: 
+      account_reports: 
+        tempe: 
+          description: 
+            header: Example
+          grade_export: 
+            text: "This report shows the student final grade results for all students in a given term. The resulting tab delimited file will have one row per enrollment, and will show the final grade and multiple course information fields that will be used for uploading grade data into Synergy SIS."
+    tempe_grade_export_csv_parameters: 
+      account_reports: 
+        tempe: 
+          course: 
+            text: "Course ID"
+          parameters: 
+            note1: "Course ID can be left blank to run the report for all courses in the term."
+            note2: "Courses with muted assignments may not accurately reflect scores in this report."
     terms_parameters: 
       account_reports: 
         default: 
@@ -1327,10 +1347,7 @@ en:
     messages: 
       assignment_created: "Assignment \"%{assignment}\" created"
     name_is_required: "Name is required!"
-<<<<<<< HEAD
-=======
     points_possible: "Points possible must be more than 0 for percentage grading"
->>>>>>> release/2013-10-05.19
     select_external_tool_dialog_title: "Configure External Tool"
     show_advanced_options: "Show Advanced Options"
     submission_action_take_quiz: "Take %{title}"
@@ -1386,10 +1403,6 @@ en:
     unmute_dialog: "This assignment is currently muted. That means students can't see their grades and feedback. Would you like to unmute now?"
     unmuting_assignment: "Unmuting Assignment..."
   assignments: 
-<<<<<<< HEAD
-    add_another_never_drop_rule: "Add another assignment"
-=======
->>>>>>> release/2013-10-05.19
     add_assignment_form: 
       assignment_name: "Assignment Name"
       labels: 
@@ -1425,10 +1438,6 @@ en:
         no_assignments: "[No Assignments]"
         weighted_by_points: "Weighted By Points"
       percent_of_total_grade: "% of total grade"
-<<<<<<< HEAD
-    add_first_never_drop_rule: "Add an assignment"
-=======
->>>>>>> release/2013-10-05.19
     assignment_count: 
       one: "1 Assignment"
       other: "%{count} Assignments"
@@ -1442,19 +1451,17 @@ en:
       links: 
         add_assignment_group: "Add Assignment Group\""
     assignment_group_list: 
-      no_assignment_groups: "No Assignment Groups"
+      no_assignment_groups: "No Assignment Groups found"
     assignment_group_list_item: 
       add_assignment_to: "Add Assignment to %{name}"
       delete: Delete
       edit: Edit
       group_weight: "%{groupWeight}% of Total"
       manage: Manage
-<<<<<<< HEAD
-      no_assignments: "No assignments"
-=======
->>>>>>> release/2013-10-05.19
+      move: "Move To&hellip;"
       title_delete: "Delete Assignment Group?"
       title_edit: "Edit Assignment Group"
+      title_move: "Move Assignment Group"
     assignment_group_selector: 
       assignment_group: "Assignment Group"
       assignment_group_options: 
@@ -1465,19 +1472,13 @@ en:
     assignment_list_item: 
       delete: Delete
       delete_asssignment_title: "Delete this assignment"
-      due_date: Due
-<<<<<<< HEAD
-      module: Module
-      multiple_modules: "Multiple Modules"
-      points_possible: "%{pointsPossible} pts"
-=======
       edit: Edit
       edit_assignment_title: "Edit Assignment"
       module: Module
+      move: "Move To&hellip;"
+      move_assignment_title: "Move Assignment"
       multiple_modules: "Multiple Modules"
       points_possible: "%{pointsPossible} pts"
-      quiz_due: Due
->>>>>>> release/2013-10-05.19
       settings: Settings
     assignment_locked: 
       assignment_locked: "This assignment is locked as of *%{lock_at}*"
@@ -1551,19 +1552,12 @@ en:
       discussion_type: Discussion
       external_tool_type: "External Tool"
       more: "More Options"
-<<<<<<< HEAD
-=======
       multiple_due_dates: "Multiple due dates"
->>>>>>> release/2013-10-05.19
       not_graded_type: "Not Graded"
       quiz_type: Quiz
       save: Save
       saving: Saving...
     create_group: 
-<<<<<<< HEAD
-      add_first_assignment: "Add an assignment"
-=======
->>>>>>> release/2013-10-05.19
       cancel: Cancel
       drop_highest: "Highest Scores:"
       drop_lowest: "Lowest Scores:"
@@ -1574,6 +1568,17 @@ en:
       save: Save
       saving: Saving...
     create_new_crumb: "Create new"
+    date_available_column_view: 
+      available: Available
+      available_on: "Available on"
+      available_until: "Available until"
+      closed: Closed
+      multiple_dates: "Multiple Dates"
+      not_available_until: "Not available until"
+    date_due_column_view: 
+      due: Due
+      due_date: Due
+      multiple_dates: "Multiple Dates"
     delete_group: 
       cancel: Cancel
       delete: "Delete Group"
@@ -1588,9 +1593,6 @@ en:
       warnings: 
         delete_assignment_group: "You are about to delete *%{name}*, which has **%{assignment_count}** assignments in it."
       would_you_like: "Would you like to:"
-<<<<<<< HEAD
-    drop_highest_scores: "Drop the Highest %{number} Scores"
-=======
     drop_highest_rule: 
       one: "Drop the highest score"
       other: "Drop the highest %{count} scores"
@@ -1598,7 +1600,6 @@ en:
     drop_lowest_rule: 
       one: "Drop the lowest score"
       other: "Drop the lowest %{count} scores"
->>>>>>> release/2013-10-05.19
     drop_lowest_scores: "Drop the Lowest %{number} Scores"
     due_date_override: 
       overrides: 
@@ -1636,10 +1637,7 @@ en:
       delete_reminder_failed: "Delete failed"
       google_docs_masquerade_rejected: "Unable to connect to Google Docs as a masqueraded user."
       reminder_failed: "Reminder failed"
-<<<<<<< HEAD
-=======
     everyone_else: "Everyone else"
->>>>>>> release/2013-10-05.19
     external_grader_sidebar: 
       edit_assignment_settings: "Edit Assignment Settings"
       speed_grader: "Speed Grader"
@@ -1722,6 +1720,9 @@ en:
       title_add_group: "Add Assignment Group"
     invalid_file_retrieval: "There was a problem retrieving the file sent from this tool."
     invalid_tool_return: "The launched tool returned an invalid resource for this assignment"
+    labels: 
+      assignment_group_move_label: "Assignment Group"
+      label_place_before: "Place before"
     loading_tools_failed: "Loading tools failed"
     messages: 
       adding_group: "Adding Group..."
@@ -1736,10 +1737,6 @@ en:
     needs_grading_count: "%{needs_grading_count} submissions for this assignment still need grading"
     never_drop: 
       remove_rule: "Remove Rule"
-<<<<<<< HEAD
-    never_drop_scores: "Never Drop %{assignment_name}"
-    no_assignments: "[No Assignments]"
-=======
     never_drop_collection: 
       add_another_assignment: "Add another assignment"
       add_first_assignment: "Add an assignment"
@@ -1748,7 +1745,10 @@ en:
     no_assignments: "[No Assignments]"
     no_assignments_list_item: 
       no_assignments_in_this_group: "No assignments in this group"
->>>>>>> release/2013-10-05.19
+    no_assignments_search: 
+      aria_assignments: Assignments
+      assignments: Assignments
+      no_assignments_found: "No assignments found"
     no_tools_found: "No tools found"
     notices: 
       assignment_delete: "This assignment has been deleted"
@@ -2601,6 +2601,7 @@ en:
   canvas_cartridge_display: "Canvas Common Cartridge"
   canvas_cartridge_file_description: "Canvas Course Export Package"
   canvas_cartridge_name: "Canvas Cartridge Importer"
+  canvas_revision_unknown: Unknown
   cc: 
     by: "CC Attribution"
     by_nc: "CC Attribution Non-Commercial"
@@ -2793,8 +2794,11 @@ en:
   conferences: 
     concluded_conference: 
       delete: Delete
-      no_recording: "No Recording"
+      no_recording: "No Recordings"
       preparing_video: "Preparing Video"
+      recording: "1 Recording"
+      recordings: "%{recordingCount} Recordings"
+      setings: settings
       view: View
     confirm: 
       close: |-
@@ -2836,7 +2840,11 @@ en:
       end_it_now: End
       in_progress: "In Progress"
       join: Join
+      recording: "1 Recording"
+      recordings: "%{recordingCount} Recordings"
+      setings: settings
       start: Start
+      view: View
     new_conference_title: "New Conference"
     no_settings_error: "The conference does not have an advanced settings page"
     no_urls_error: "Sorry, it looks like there aren't any %{type} pages for this conference yet."
@@ -2944,7 +2952,11 @@ en:
     unknown: Unknown
     upload_timeout_error: "The file upload process timed out."
   content_migrations: 
+    angel_exporter: 
+      options: Options
     bad_migration_type: "Invalid migration_type"
+    blackboard_export: 
+      options: Options
     canvas_export: 
       options: Options
     common_cartridge: 
@@ -2956,6 +2968,9 @@ en:
     content_migration_issue: 
       error_report: "Error Report"
     copy_course: 
+      options: Options
+    course_list_error: "Could not retrieve courses. Are you connected to the internet?"
+    d2_l_export: 
       options: Options
     file_required: "You must select a file to import content from"
     file_too_large: "Your migration cannot exceed %{file_size}"
@@ -2973,6 +2988,7 @@ en:
     moodle_zip: 
       options: Options
     must_upload_file: "File upload is required"
+    no_content_selected: "You have not selected any content to import."
     progressing_content_migration: 
       issues_text: issues
       select_content: "Select Content"
@@ -2984,13 +3000,16 @@ en:
       loading: Loading
     qti_zip: 
       options: Options
+    school_required: "You must select a school."
     select_content: 
       select_content_btn: "Select Content"
+    select_course: "Select Course"
     show_issues: "Show Issues"
     subviews: 
       choose_migration_file: 
         migration_text: Source
       course_find_select: 
+        course_name: "Course name"
         include_completed_courses: "Include completed courses"
         or: or
         search_label: "Search for a course"
@@ -3039,17 +3058,22 @@ en:
         select_question_bank: "Select question bank"
       select_content_checkbox: 
         select_migration_label: "Select migration content"
-<<<<<<< HEAD
-=======
     upload_warning: "Navigating away from this page will cancel the upload process."
     uploading: Uploading...
+    web_ct: 
+      cancel: Cancel
+      get_courses: "Get Courses"
+      password: Password
+      select_school: "Select School"
+      username: Username
     web_ct_course_list: 
+      course_list: Course(s)
       no_files_help_label: "More Information for 'Do not download files' option"
       no_files_help_text: "Downloading files from WebCT courses can take a long time, and may cause the migration process to fail. Instead, you can manually copy the files and then choose this option to migrate the rest of the content."
       no_files_help_title: "\"More Information for not 'Do not download files' option\""
       no_files_help_title_icon: "More Information for 'Do not download files' option"
+      options: Options
       skip_all_files: "Do not download files from course"
->>>>>>> release/2013-10-05.19
   content_tag: 
     no_title: "No title"
   content_tags: 
@@ -3423,10 +3447,7 @@ en:
     index: 
       titles: 
         course_modules: "Course Modules"
-<<<<<<< HEAD
-=======
     module_complete: Complete
->>>>>>> release/2013-10-05.19
     module_empty: "There are no items in the module \"%{module}\""
     module_item: 
       drag_to_reorder: "Drag to reorder or move item to another module"
@@ -3471,12 +3492,9 @@ en:
       must_view: 
         fulfilled: "viewed the page"
         unfulfilled: "must view the page"
-<<<<<<< HEAD
-=======
     module_locked: Locked
     module_started: "In Progress"
     module_unlocked: Unlocked
->>>>>>> release/2013-10-05.19
     none_in_progress: "none in progress"
     optgroup: 
       assignments: Assignments
@@ -3494,13 +3512,10 @@ en:
       links: 
         title: 
           remove_prerequisite: "Remove this prerequisite"
-<<<<<<< HEAD
-=======
     progressions: 
       titles: 
         student_progress: "Student Progress"
         student_progression: "Module Progression by Student"
->>>>>>> release/2013-10-05.19
     still_needs_completing: "Still Needs to Complete"
     titles: 
       add: "Add Module"
@@ -3532,15 +3547,9 @@ en:
         attachment: "File to attach"
         remove_attachment: "Remove attachment"
     all_courses: "All Courses"
-<<<<<<< HEAD
-    attachment_error: "Attachment failed to upload, please try again."
-    autocomplete_token: 
-      remove_recipient: "Remove recipient"
-    buttons: 
-      add_people: "Add People"
-      send_message: Send
-=======
     all_in_context: "All in %{context}"
+    archive: Archive
+    archive_conversation: "Archive conversation"
     attachment_error: "Attachment failed to upload, please try again."
     autocomplete_result: 
       group_people: "People: %{people}"
@@ -3552,7 +3561,6 @@ en:
       add_people: "Add People"
       send_message: Send
     cannot_add_to_private: "You cannot add participants to a private conversation."
->>>>>>> release/2013-10-05.19
     cannot_be_empty: "Message cannot be blank"
     compose_button_bar: 
       titles: 
@@ -3596,6 +3604,7 @@ en:
     conversations_pane: 
       confirm: 
         delete_conversation: "Are you sure you want to delete your copy of this conversation? This action cannot be undone."
+    course_name: "Course name"
     course_options: 
       course_options: 
         concluded: Concluded
@@ -3644,13 +3653,12 @@ en:
         view_submission: "Open submission in new window."
       try_new_conversations: "Try New Conversations"
     index_new: 
+      archive: Archive
+      archive_conversation: "Archive conversation"
       archived: Archived
       clear_search: "Clear search results"
-<<<<<<< HEAD
-=======
       compose_new_message: "Compose a new message"
       delete: Delete
->>>>>>> release/2013-10-05.19
       delete_conversation: "Delete conversation"
       enter_name_group_or_course: "Enter a name, group, or course"
       filter_messages_by_course: "Filter messages by course"
@@ -3659,19 +3667,12 @@ en:
       help: Help
       inbox: Inbox
       mark_as_unread: "Mark as unread"
-<<<<<<< HEAD
-      new_message: "New message"
-      reply: Reply
-      reply_all: "Reply all"
-      search_names_groups_courses: "Search names, groups, and courses"
-=======
       more_options: "More options"
       reply: Reply
       reply_all: "Reply all"
       search_for_recipients: "Search for recipients"
       search_names_groups_courses: "Search names, groups, and courses"
       sending: sending
->>>>>>> release/2013-10-05.19
       sent: Sent
       settings: Settings
       starred: Starred
@@ -3679,14 +3680,6 @@ en:
       titles: 
         conversations: Conversations
       unread: Unread
-<<<<<<< HEAD
-    message: 
-      no_subject: "No subject"
-      open_message: "Open Message"
-      star: Star
-      toggle_read: "Toggle Read/Unread"
-      total_messages: "Total messages"
-=======
     mark_as_read: "Mark as read"
     mark_as_unread: "Mark as unread"
     message: 
@@ -3699,11 +3692,12 @@ en:
       total_messages: "Total messages"
       unread: Unread
       unstar_conversation: "Unstar conversation"
->>>>>>> release/2013-10-05.19
     message_detail: 
       no_subject: "No subject"
     message_form: 
       buttons: 
+        reply: Reply
+        reply_all: "Reply all"
         send_message: Send
       headings: 
         new_message: "New Message"
@@ -3724,6 +3718,9 @@ en:
         record_media_comment: "Record an audio or video comment"
         remove_media_comment: "Remove media comment"
     message_form_dialog: 
+      body: Body
+      bulk_explanation: "This option creates individual messages to all recipients in the To: field."
+      bulk_message: "Bulk message"
       headings: 
         new_message: "New Message"
       inbox_actions: 
@@ -3745,19 +3742,12 @@ en:
         record_media_comment: "Record an audio or video comment"
         remove_media_comment: "Remove media comment"
     message_item: 
-<<<<<<< HEAD
-      delete_message: "Delete message"
-      forward: Forward
-      message_actions: "Message actions"
-      reply: Reply
-=======
       delete: Delete
       forward: Forward
       message_actions: "Message actions"
       more_options: "More options"
       reply: Reply
       reply_all: "Reply all"
->>>>>>> release/2013-10-05.19
     message_list: 
       messages: Messages
     message_progress_bar_text: 
@@ -3766,11 +3756,8 @@ en:
       sending_message: "Sending *%{message_preview}* to *%{num_people}*"
     more_participants: "+%{total} more"
     no_message: 
-<<<<<<< HEAD
-=======
       beta_description: "You are using a beta version of the Canvas inbox"
       beta_version: "Beta Version"
->>>>>>> release/2013-10-05.19
       no_conversations_selected: "No Conversations Selected"
     no_recipients_choose_another_group: "No recipients are in this group. Please choose another group."
     no_results_found: "No results found"
@@ -3787,12 +3774,10 @@ en:
       one: "1 person"
       other: "%{count} people"
     recipient_error: "The course or group you have selected has no valid recipients"
+    search_category: "Search %{category}"
     select_all: "Select All"
     star: Star
-<<<<<<< HEAD
-=======
     star_conversation: "Star conversation"
->>>>>>> release/2013-10-05.19
     title: 
       add_recipients: "Add Recipients"
       forward_messages: "Forward Messages"
@@ -3800,13 +3785,12 @@ en:
       expand_inline: "Show more comments"
       rss_feed: "Conversations Feed"
       view_submission: "Open submission in new window."
+    unarchive: Unarchive
+    unarchive_conversation: "Unarchive conversation"
     unknown_user: "Unknown user"
     unspecified_error: "An unexpected error occurred, please try again"
     unstar: Unstar
-<<<<<<< HEAD
-=======
     unstar_conversation: "Unstar conversation"
->>>>>>> release/2013-10-05.19
   conversations_intro: 
     slide1: 
       paragraph1: "Take a look at your Inbox!"
@@ -3919,10 +3903,7 @@ en:
       lti_links: "Failed to export some external tool configurations"
       media_file: "A media file failed to export"
       media_files: "Failed to export some media files"
-<<<<<<< HEAD
-=======
       media_files_too_large: "Media files were not exported because the total file size was too large."
->>>>>>> release/2013-10-05.19
       module_meta: "Failed to export module meta data"
       organization: "Failed to generate organization structure."
       question_bank: "The question bank \"%{title}\" failed to export"
@@ -4006,19 +3987,6 @@ en:
       section_enrollments: "Section Enrollments"
   course_statistics: 
     unknown: unknown
-  course_subscriptions: 
-    already_subscribed: 
-      already_subscribed_message: "Hi, *%{subscriber_name}*, you are already subscribed to *%{course_name}*"
-    logged_in_confirm_form: 
-      logged_in_confirm_message: "Hi, *%{user_name}*, thank you for your interest in *%{course_name}*. Please click subscribe below to receive updates about this course."
-    new: 
-      subscribe: Subscribe
-    show: 
-      thanks: "Thanks, you are now subscribed to *%{course_name}*."
-    subscribe_form: 
-      email: "Email Address"
-      subscribe_form_text: "Thank you for your interest in *%{course_name}*. To receive updates about this course, please provide your full name and email address below."
-      your_name: "Your Name"
   course_users: 
     greater_than_three: "Please enter a search term with three or more characters"
     unknown_error: "Something went wrong with your search, please try again."
@@ -4310,11 +4278,7 @@ en:
           remove_from_course: "Remove From Course"
           resend_invitation: "Resend Invitation"
           user_details: "User Details"
-<<<<<<< HEAD
-        manage: Manage
-=======
         manage_user: "Manage %{name}"
->>>>>>> release/2013-10-05.19
         pending_acceptance_explanation: "This user has not yet accepted the invitation to the course"
         pending_acceptance_of_invitation: pending
       roster_users: 
@@ -4337,22 +4301,11 @@ en:
         add_section: "Add Section"
         move_course: "Move Course"
         update_course: "Update Course Details"
-<<<<<<< HEAD
-      # SFU MOD CANVAS-233 Hide self-enroll register link if self registration is off
-      course_open_enrollment: "This course has enabled open enrollment. Students can self-enroll in the course once you share with them this URL: *%{url}*."
-      course_self_registration: "Alternatively, they can sign up at *%{url2}* and use the following join code: *%{code}*"
-      # END SFU MOD
-=======
       course_open_enrollment: "This course has enabled open enrollment. Students can self-enroll in the course once you share with them this URL: *%{url}*. Alternatively, they can sign up at *%{url2}* and use the following join code: *%{code}*"
->>>>>>> release/2013-10-05.19
       course_overrides_term: "This will override any term availability settings."
       date_restricted: "Users can only participate in the course between these dates"
       deatils: 
         move_course: "Select a new root account for this course. After you move the course you'll want to specify a new department for the course as well."
-<<<<<<< HEAD
-      drag_details: "Disabling most pages will cause students who visit those pages to be redirected to the course home page."
-      drag_to_hide: "Drag items here to hide them from students."
-=======
       draft_explanation: "Explanation of Draft State"
       draft_state_description: |-
           Draft state is a *beta* feature that allows course content to be published and unpublished.
@@ -4363,7 +4316,6 @@ en:
       drag_details: "Disabling most pages will cause students who visit those pages to be redirected to the course home page."
       drag_to_hide: "Drag items here to hide them from students."
       enable_draft: "Enable Draft State (beta)"
->>>>>>> release/2013-10-05.19
       enrollment_count: 
         one: "1 User"
         other: "%{count} Users"
@@ -4415,14 +4367,7 @@ en:
         public_syllabus: "Make the syllabus for this course publicly visible"
         restrict_enrollments_to_course_dates: "Users can only participate in the course between these dates"
         root_account_id: "Root Account"
-<<<<<<< HEAD
-        # SFU MOD CANVAS-233 Hide self-enroll register link if self registration is off
-        self_enrollment: "Let students self-enroll by sharing with them a secret URL"
-        self_enrollment_with_code: "Let students self-enroll by sharing with them a secret URL or code"
-        # END SFU MOD
-=======
         self_enrollment: "Let students self-enroll by sharing with them a secret URL or code"
->>>>>>> release/2013-10-05.19
         sis_source_id: "SIS ID"
         start_at: Starts
         storage_quota: "File Storage"
@@ -4458,10 +4403,6 @@ en:
         navigation: Navigation
         sections: Sections
         tools: Apps
-<<<<<<< HEAD
-        users: Users
-=======
->>>>>>> release/2013-10-05.19
       titles: 
         edit_navigation: "Edit Course Navigation"
       transifex_message: "Join the [Canvas Translation Community](%{transifex_url})"
@@ -4599,11 +4540,6 @@ en:
       rss_feed: "%{course} Feed"
     unauthorized: 
       invalid_link: "The enrollment link you used appears to no longer be valid.  Please contact the course instructor and make sure you're still correctly enrolled."
-<<<<<<< HEAD
-    user_tab: 
-      page_moved_to_people_section_notice: "This page has been moved to the *People section*"
-=======
->>>>>>> release/2013-10-05.19
   create_users_view: 
     required: "Please enter some email addresses"
   crumb: 
@@ -4707,9 +4643,6 @@ en:
   d2l_file_description: "D2L export .zip format"
   d2l_name: "D2L Converter"
   dashboard: 
-<<<<<<< HEAD
-    disable_dashboard: "Go back to the old dashboard"
-=======
     announcements_collapse: 
       one: "Collapse %{count} announcement"
       other: "Collapse %{count} announcements"
@@ -4735,7 +4668,6 @@ en:
     discussions_expand: 
       one: "Expand %{count} discussion"
       other: "Expand %{count} discussions"
->>>>>>> release/2013-10-05.19
     enable_dashboard: "Try out the new dashboard"
     event_created: "Event created"
     message_sent: "Message Sent"
@@ -5034,6 +4966,8 @@ en:
     error_draft_state_announcement: "This topic cannot be set to draft state because it is an announcement."
     error_draft_state_unauthorized: "You do not have permission to set this topic to draft state."
     error_draft_state_with_posts: "This topic cannot be set to draft state because it contains posts."
+    errors: 
+      bad_scope: "scope is contradictory"
     group_assignment_discussion_entry: 
       posts: 
         one: "1 Post"
@@ -5107,7 +5041,6 @@ en:
       reply_to_message: "Reply to Current Message"
       reply_to_topic: "Reply to Topic"
       retrieved_from_feed: "Retrieved from %{feed}"
-      search_entries: "Search entries or authors"
       search_entries_placeholder: "Search entries or author"
       show_rubric: "Show Rubric"
       speed_grader: "Speed Grader"
@@ -5202,10 +5135,7 @@ en:
     subscribe: "Subscribe to this topic"
     subscribed: Subscribed
     subscribed_hint: "You are subscribed to this topic. Click to unsubscribe."
-<<<<<<< HEAD
-=======
     toggle_message: "toggle discussion visibility"
->>>>>>> release/2013-10-05.19
     uknown_author: "Unknown Author"
     unknown: Unknown
     unknown_author: "Unknown Author"
@@ -5331,13 +5261,10 @@ en:
     errors: 
       compiling: "There was an error compiling your eportfolio.  Please try again in a little while."
       missing_file: "Please select a file"
-<<<<<<< HEAD
-=======
       name_required: "Name is required"
       name_too_long: "Name is too long"
       section_name_invalid: "Section name is not valid"
       section_name_too_long: "Section name is too long"
->>>>>>> release/2013-10-05.19
       upload_failed: "Upload Failed."
     first_category: Home
     first_entry: 
@@ -5638,7 +5565,13 @@ en:
     account_navigation_configured: "Account navigation configured"
     app_full_view: 
       add_tool: "Add Tool"
+      app_already_installed: "This app has already been installed"
+      average_rating: "Average Rating"
       back_to_app_center: "Back to App Center"
+      education_levels: "Education Level(s)"
+      extensions: Extensions
+      help_link: "Help Link"
+      privacy_level: "Privacy Level"
       rate_tool: "Rate this tool"
     app_review_view: 
       posted_by_on: "Posted by *%{user_name}* on *%{created}*"
@@ -5703,12 +5636,15 @@ en:
     homework_submission_configured: "Homework submission configured"
     index_view: 
       add_new_tool: "Add New App"
+      all: All
       app_headder: "External Apps"
       external_tools_note: "Apps are an easy way to add new features to Canvas. They can be added to individual courses, or to all courses in an account. Once configured, you can link to them through course modules and create assignments for assessment tools."
       external_tools_references: "Click *here* to see some LTI tools that work great with Canvas. You can also check out the Canvas Community topics about LTI tools **here**"
+      installed: Installed
+      not_installed: "Not Installed"
       search_filter: "Filter by name"
       view_app_center: "View App Center"
-      view_installed_tools: "View Installed Apps"
+      view_installed_tools: "View App Configurations"
     missing_stars: "You must select a star rating"
     rate_tool_view: 
       rate_tool: "How do you rate this tool?"
@@ -6487,10 +6423,6 @@ en:
       labels: 
         add_comment: "Add a Comment"
         average: Avg
-<<<<<<< HEAD
-=======
-        beta_grade_by_question: "Beta grade by question"
->>>>>>> release/2013-10-05.19
         grade: Grade
         group_comment: "Send Comment to the Whole Group"
         hide_names: "Hide student names in the SpeedGrader"
@@ -6532,10 +6464,7 @@ en:
         media_comment: "Media Comment"
         speech_recognition: "Speech Recognition"
     speed_grader_disabled: "SpeedGrader is disabled for this course"
-<<<<<<< HEAD
-=======
     speedgrader_enabled_only_for_published_content: "Speedgrader is enabled only for published content."
->>>>>>> release/2013-10-05.19
     student: 
       new_student: "New Student"
       student: Student
@@ -6754,6 +6683,8 @@ en:
       messages: 
         no_students: "No students have been added for this course"
       page_title: "Course Groups"
+      page_title_accounts: "Account Groups"
+    create_group_set: "Create Group Set"
     delete_confirm: "Are you sure you want to remove this group category?"
     edit: 
       buttons: 
@@ -6771,6 +6702,7 @@ en:
       group_structure_group_limit: "*Limit groups to* %{group_limit} members"
       restricted_self_signup: "Require group members to be in the same section"
       self_signup_help_tooltip: "What Are Self Sign-Up Groups?"
+    edit_group_set: "Edit Group Set"
     errors: 
       category_in_use: "\"%{category_name}\" is already in use"
       creating_category_failed: "Category Creation Failed, Try Again"
@@ -6830,12 +6762,29 @@ en:
         randomly_assigning_students: "Randomly Assigning Students"
         unassigned_students: "Unassigned Students"
         unassigned_users: "Unassigned Users"
+      group_category_create: 
+        allow_self_signup: "Allow self sign-up"
+        cancel: Cancel
+        create_groups: "Create %h{num_groups} groups now"
+        create_groups_manually: "I'll create groups manually"
+        group_set_name: "Group Set Name"
+        group_structure: "Group Structure"
+        leave_group_limit_blank: "Leave blank for no limit"
+        limit_group_size: "Limit groups to %h{group_limit} members"
+        require_same_section: "Require group members to be in the same section"
+        save: Save
+        saving: Saving...
+        self_signup: "Self Sign-Up"
+        self_signup_description: "You can create sets of groups where students can sign up on their own. Students are still limited to being in only one group in the set, but this way students can organize themselves into groups instead of needing the teacher to do the work. Note that as long as this option is enabled, students can move themselves from one group to another."
+        split_into_groups: "Split students into %h{split_num} equal groups"
+        what_is_this: "What is this?"
       group_category_detail: 
         add_group: "Add Group"
         category_settings: Settings
         delete_category_option: Delete
         edit_category_option: Edit
         group_limit_blurb: "Groups are limited to *%{count}* members"
+        message_all_unassigned_option: "Message All Unassigned Students"
         randomly_assign_students_option: "Randomly Assign Students"
         restricted_self_signup_blurb: "All students in a group are required to be in the same section."
         search: search
@@ -6844,14 +6793,25 @@ en:
         self_signup_help_tooltip: "What Are Self Sign-Up Groups?"
         student_group_instructions: "(drag students to assign)"
         user_group_instructions: "(drag users to assign)"
-      group_edit: 
-        group_name: "Group Name"
-      group_edit_dialog_wrapper: 
+      group_category_edit: 
+        allow_self_signup: "Allow self sign-up"
         cancel: Cancel
+        group_set_name: "Group Set Name"
+        leave_group_limit_blank: "Leave blank for no limit"
+        limit_group_size: "Limit groups to %h{group_limit} members"
+        require_same_section: "Require group members to be in the same section"
+        save: Save
+        saving: Saving...
+        self_signup_description: "You can create sets of groups where students can sign up on their own. Students are still limited to being in only one group in the set, but this way students can organize themselves into groups instead of needing the teacher to do the work. Note that as long as this option is enabled, students can move themselves from one group to another."
+        what_is_this: "What is this?"
+      group_edit: 
+        cancel: Cancel
+        group_name: "Group Name"
         save: Save
         saving: Saving...
       group_user: 
         assign_to_group: "Assign to Group"
+        remove_from_group: "Remove from Group"
       group_users: 
         no_students: "No students"
         no_users: "No users"
@@ -6993,6 +6953,7 @@ en:
       invalid_number: "This should be a number."
       not_a_date: "That's not a date!"
       posting_message_failed: "Post Failed, Try Again"
+      required: "Required field"
       search_failed: "Search failed, please try again."
     ignore_forever: "Ignore Forever"
     ignore_until_new_submission: "Ignore Until New Submission"
@@ -7085,13 +7046,10 @@ en:
     titles: 
       job_handler: "Job Handler"
       last_error: "Last Error"
-<<<<<<< HEAD
-=======
   jquery: 
     module_sequence_footer: 
       next: Next
       previous: Previous
->>>>>>> release/2013-10-05.19
   labels: 
     lock_module_until: "lock module until a given date"
   layouts: 
@@ -7164,6 +7122,7 @@ en:
           to because the assignment has no points possible.
       no_points_possible: "Assignment has no points possible."
       no_score: "No score given"
+      no_submission_created: "This outcome request failed to create a new homework submission."
     canvas: 
       migration: 
         announcements: Announcements
@@ -8085,7 +8044,9 @@ en:
             
             %{course}, your course on Canvas Network, started a couple days ago, and we noticed you haven't logged in yet. We just wanted to send you one last reminder in case you forgot.
             
-            To log in, go to %{site} and enter your username and password. If you haven't set a password yet, you can set one here: %{password_url}. If you simply can't make this particular course, feel free to browse our course catalog at %{site} to find something else that inspires you. New courses are being added all the time!
+            To log in, go to %{site} and enter your username and password. If you haven't set a password yet, you can set one here: %{password_url}
+            
+            If you simply can't make this particular course, feel free to browse our course catalog at %{site} to find something else that inspires you. New courses are being added all the time!
             
             We hope to see you soon,
             
@@ -8956,8 +8917,6 @@ en:
         subject: "New Assessment: %{title}, %{context}"
       twitter: 
         tweet: "Canvas Alert - New Assessment: %{title}, %{context}."
-<<<<<<< HEAD
-=======
     self_enrollment_registration: 
       email: 
         body: |-
@@ -8978,7 +8937,6 @@ en:
           self_enrollment_registration: "Your enrollment in %{course}"
           signature: "Canvas Network"
         self_enrollment_registration: "Your enrollment in %{course}"
->>>>>>> release/2013-10-05.19
     send_form: 
       labels: 
         message_body: Message
@@ -9271,8 +9229,6 @@ en:
       module: 
         prerequisites: Prerequisites
         published: Published
-<<<<<<< HEAD
-=======
     progression_module_collection: 
       module_progress_for: "Module Progress for %h{student_link}"
       module_progress_for_student: "Module Progress for %{student.name}"
@@ -9286,8 +9242,14 @@ en:
       back_to_modules: "Back to Modules Page"
       no_students_found: "No students were found"
       student_progress: "Student Progress"
->>>>>>> release/2013-10-05.19
   moodle_dropdown_warning_title: "Multiple Dropdowns question may have been imported incorrectly"
+  move_dialog: 
+    cancel: Cancel
+    save: Save
+    saving: Saving...
+    where_to_move: "Where would you like to move *%{name}*?"
+  move_dialog_select: 
+    move_to_end: "-- At the bottom --"
   mute_dialog: 
     curving_assignments: "Curving assignments"
     grade_change_notifications: "Grade change notifications"
@@ -9611,10 +9573,7 @@ en:
       importError: "An error occurred while importing. Please try again later."
       importSuccess: "Import successful"
       updateSuccess: "Update successful"
-<<<<<<< HEAD
-=======
     length_error: "Must be 255 characters or less"
->>>>>>> release/2013-10-05.19
     loading_more_results: "Loading more results"
     main_instructions: 
       instructions: 
@@ -9717,10 +9676,7 @@ en:
         user_agent: "User Agent"
   pages: 
     cancel_button: Cancel
-<<<<<<< HEAD
-=======
     cannot_unpublish_front_page: "Cannot unpublish the front page"
->>>>>>> release/2013-10-05.19
     delete_button: Delete
     delete_confirmation: "Are you sure you wish to delete this wiki page?"
     delete_dialog_title: "Delete Wiki Page"
@@ -9734,10 +9690,6 @@ en:
     notices: 
       delete_failed: "The page \"%{title}\" could not be deleted."
       page_deleted: "The page \"%{title}\" has been deleted."
-<<<<<<< HEAD
-    save_button: Save
-    saving_button: Saving...
-=======
     reload_editing_page: "This page has changed since you started editing it. *Reloading* will lose all of your changes."
     reload_viewing_page: "This page has changed since you started viewing it. *Reload*"
     save_button: Save
@@ -9745,7 +9697,6 @@ en:
     warnings: 
       overwrite_changes: "You are about to overwrite other changes that have been made since you started editing.\\n\\nOverwrite these changes?"
       unsaved_changes: "You have unsaved changes. Do you want to continue without saving these changes?"
->>>>>>> release/2013-10-05.19
   paginated_collection: 
     no_items: "No items."
   paginated_list: 
@@ -9818,12 +9769,6 @@ en:
       description: "You will need access to a Dim Dim instance."
       labels: 
         domain: Domain
-<<<<<<< HEAD
-=======
-    embedded_chat: 
-      description: "In-page chat widget for use with the Instructure Chat LTI app"
-      name: "Embedded Chat"
->>>>>>> release/2013-10-05.19
     embedly: 
       description: "Pull Embedly info for Collections"
       name: "Embedly Integration"
@@ -9933,7 +9878,6 @@ en:
         term_start_days_adjustment: "Term start days adjustment"
     index: 
       author: Author
-      canvas_revision_unknown: Unknown
       description: Description
       name: Name
       no_plugins: "There are no Canvas plugins installed"
@@ -9972,10 +9916,7 @@ en:
       kaltura_sis_explanation: "If checked user and course SIS data will be provided to Kaltura."
       labels: 
         cache_play_list_seconds: "Seconds to cache playlist URL"
-<<<<<<< HEAD
-=======
         do_analytics: "Send analytics events"
->>>>>>> release/2013-10-05.19
         domain: Domain
         kaltura_sis: "Write SIS data to Kaltura"
         kcw_ui_conf: "KCW UI Conf ID"
@@ -10318,10 +10259,7 @@ en:
           yourself, and won't appear in your public stream.
       unknown_service: Unknown
       web_services: "Canvas can make your life a lot easier by tying itself in with the web tools you already use. Click any of the services in \"Other Services\" to see what we mean."
-<<<<<<< HEAD
-=======
     purpose_required: "Purpose is required"
->>>>>>> release/2013-10-05.19
     resending: resending...
     secondary_nav: 
       links: 
@@ -10646,10 +10584,6 @@ en:
       show_details: "Show Question Details"
       title: 
         move_copy_questions: "Move/Copy Questions"
-<<<<<<< HEAD
-  question_blank: "Question blank"
-=======
->>>>>>> release/2013-10-05.19
   quick_start_bar: 
     announcement: 
       saving: Saving...
@@ -10763,12 +10697,14 @@ en:
       labels: 
         answer_with_margin: "with margin"
         your_answer: "Your Answer"
+      margin_of_error: "margin of error"
       plus_or_minus: +/-
       range_answer: "Between %{lower_bound} and %{upper_bound}"
       selected_answer: "You selected this answer."
       you_left_this_blank: "(You left this blank)"
     display_question: 
       default_question_answer: "[ Choose ]"
+      flag_this_question: "Flag this Question"
       headers: 
         formulas: Formulas
         possible_solutions: "Possible Solutions"
@@ -10792,7 +10728,7 @@ en:
       regraded_score: "Regraded Score:"
       show_ansers_for_variable: "Show Answers for %{variable}"
       skip_question_text: "Skip to question text."
-      submission_was_regraded: "This question has been regraded. Your score has been updated."
+      submission_was_regraded: "This question has been regraded; your score was affected."
       titles: 
         question_correct_comment: "Students will see this comment if they get the question correct"
         question_incorrect_comment: "Students will see this comment if they get the question wrong"
@@ -10866,10 +10802,7 @@ en:
     form_answer: 
       answer_in_range_accessible: "between *range start* and #range end#"
       answer_text: "Answer Text"
-<<<<<<< HEAD
-=======
       answer_weight: "Answer Weight"
->>>>>>> release/2013-10-05.19
       exact_answer_with_error_margin_accessible: "*exact answer* with error margin #error margin#"
       labels: 
         answer_comments: "Comments, if the student chooses this answer"
@@ -10960,10 +10893,7 @@ en:
         text_only: "Text (no question)"
         true_false: True/False
       show_possible_answers: "Show Possible Answers for %{question}"
-<<<<<<< HEAD
-=======
       show_possible_answers_no_question: "Show Possible Answers for"
->>>>>>> release/2013-10-05.19
       titles: 
         click_to_enter_correct_answer_comments: "Click to enter comments for a correct answer"
         click_to_enter_general_answer_comments: "Click to enter general comments"
@@ -11017,17 +10947,11 @@ en:
         back_to_survey: "Back to Survey"
       logged_out_user: "Logged Out User %{index}"
       named_quiz_results: "%{quiz_name} Results for %{user}"
-<<<<<<< HEAD
-      no_more_attempts: "%{user} has no attempts left"
-      page_title_quiz: "%{user}'s Quiz History"
-      page_title_survey: "%{user}'s Survey History"
-=======
       next_questions_arrow_title: "Next questions"
       no_more_attempts: "%{user} has no attempts left"
       page_title_quiz: "%{user}'s Quiz History"
       page_title_survey: "%{user}'s Survey History"
       prev_questions_arrow_title: "Previous questions"
->>>>>>> release/2013-10-05.19
       quiz_not_yet_taken: "Quiz hasn't been taken yet."
       quiz_not_yet_taken_or_in_progress: "Quiz hasn't been taken yet or is currently in progress"
       quiz_unlimited_attempts: "This quiz has unlimited attempts"
@@ -11090,10 +11014,7 @@ en:
       comments_on_question: "Comments for this question"
       comments_on_wrong_match: "Comments if the user gets this match wrong"
       message_text: "Message Text"
-<<<<<<< HEAD
-=======
       multiple_blanks_question: "Fill in the blank, read surrounding text"
->>>>>>> release/2013-10-05.19
       other_incorrect_matches: "Other Incorrect Match Options"
       possible_answer: "Possible Answer"
     links: 
@@ -11248,7 +11169,7 @@ en:
         delete: Delete
         find_ip_address_filter: "Find IP Address Filter"
       warnings: 
-        has_student_submissions: "Students have either already taken or started taking this quiz, so be careful about editing it. If you change any quiz questions in a significant way, you may want to consider re-grading students who took the old version of the quiz."
+        has_student_submissions: "Students have either already taken or started taking this quiz, so be careful about editing it. If you change any quiz questions in a significant way, you may want to consider regrading students who took the old version of the quiz."
     no_filters_found: "No filters found"
     no_quizzes_view: 
       headers: 
@@ -11278,12 +11199,9 @@ en:
       default_group_name: Group
       edit_questions_and_points: "Pick *%{num_questions}* questions, #%{num_points}# pts per question"
       labels: 
-<<<<<<< HEAD
-=======
         group_name: "Group Name"
         number_of_questions: "Number of Questions"
         points_per_question: "Points per Question"
->>>>>>> release/2013-10-05.19
         question_bank: "Questions will be pulled from the bank"
       links: 
         link_to_a_question_bank: "Link to a Question Bank"
@@ -11340,13 +11258,8 @@ en:
         other: "%{count} Minutes"
       unlimited: Unlimited
     quiz_item_group_view: 
-<<<<<<< HEAD
-      no_quizzes: "There are no quizzes to show."
-      no_surveys: "There are no surveys to show."
-=======
       no_quizzes: "No quizzes found"
       no_surveys: "No surveys found"
->>>>>>> release/2013-10-05.19
     quiz_item_view: 
       links: 
         delete: Delete
@@ -11493,7 +11406,7 @@ en:
         lock_survey: "Lock this Survey Now"
         publish: Publish
         publishing: Publishing...
-        republish: Re-Publish
+        republish: Republish
         unlock_quiz: "Let Students Take this Quiz Now"
         unlock_survey: "Let Students Take this Survey Now"
       confirms: 
@@ -11523,8 +11436,10 @@ en:
         survey_statistics: "Survey Statistics"
       manage: Manage
       only_registered_users: "Only registered, enrolled users can take graded quizzes"
-      quiz_regraded_your_score_affected: "This quiz has been re-graded, your score was affected."
-      quiz_regraded_your_score_not_affected: "This quiz has been re-graded, your score was not affected."
+      quiz_regraded_your_score_affected: 
+        one: "This quiz has been regraded; your score was affected."
+        other: "This quiz has been regraded; your new score reflects %{count} questions that were affected."
+      quiz_regraded_your_score_not_affected: "This quiz has been regraded; your score was not affected."
       speed_grader: SpeedGrader™
       students_submitted_so_far: 
         one: "1 student submitted so far"
@@ -11581,11 +11496,8 @@ en:
     submission_versions: 
       attempt: Attempt
       attempt_history: "Attempt History"
-<<<<<<< HEAD
-=======
       quiz_attempt_history_description: "A table that shows your quiz attempt history. Each attempt is on the left side. The attempt, time, and score are across the top."
->>>>>>> release/2013-10-05.19
-      regraded: Re-Graded
+      regraded: Regraded
       score: Score
       time: Time
     take_quiz: 
@@ -11618,10 +11530,7 @@ en:
         other: "%{count} Hours"
       labels: 
         started: Started
-<<<<<<< HEAD
-=======
         time_elapsed: "Time Elapsed"
->>>>>>> release/2013-10-05.19
         times_up: "Time's Up! Submitting results in"
       logged_out_of_canvas: "*You have been logged out of canvas.* To continue please log in"
       login_required: "Login Required"
@@ -11644,10 +11553,7 @@ en:
       quiz_instructions: "Quiz Instructions"
       saved_at: "Quiz saved at %{t}"
       saving: Saving...
-<<<<<<< HEAD
-=======
-      saving_not_needed: "No new data to save."
->>>>>>> release/2013-10-05.19
+      saving_not_needed: "No new data to save. Last checked at %{t}"
       seconds_count: 
         one: "1 Second"
         other: "%{count} Seconds"
@@ -11689,10 +11595,7 @@ en:
       help_with_formulas: "Help with Quiz Question Formulas"
       ip_address_filtering: "IP Address Filtering"
       set_as_correct: "This answer is set as correct"
-<<<<<<< HEAD
-=======
     toggle_message: "toggle quiz visibility"
->>>>>>> release/2013-10-05.19
     ? "true"
     : "True"
     ungraded_survey: "Ungraded Survey"
@@ -12064,14 +11967,13 @@ en:
         go_to_course: "Go to the Course"
         go_to_dashboard: "Go to your Dashboard"
       not_available_yet: "We'll send you an email shortly before the course begins."
-<<<<<<< HEAD
-=======
   sequence_footer: 
-    next_colon: ":"
-    next_module: "Next Module"
-    prev_colon: ":"
-    prev_module: "Previous Module"
->>>>>>> release/2013-10-05.19
+    next_module: "Next Module:"
+    next_module_desc: "Next Module: *module*"
+    next_module_item_desc: "Next: *item*"
+    prev_module: "Previous Module:"
+    prev_module_desc: "Previous Module: *module*"
+    prev_module_item_desc: "Previous: *item*"
   services_api: 
     must_be_logged_in: "You must be logged in to use Kaltura"
   set_default_grade_dialog: 
@@ -12275,11 +12177,8 @@ en:
       find: Find
       find_existing_scheme: "Find Existing Grading Scheme"
       full_name: "Full name, smaller text"
-<<<<<<< HEAD
-=======
       grading_standard_name_table_summary: "A table with only one editable cell containing the name of your grading scheme."
       grading_standard_summary: "A table that contains your grading scheme. The name of the value and the range are on the top. Each row contains a minimum and maximum percentage value."
->>>>>>> release/2013-10-05.19
       insert_here: "insert here"
       labels: 
         name: Name
@@ -12287,14 +12186,10 @@ en:
         scheme_name: "Scheme Name"
       loading_grading_standards: "Loading Grading Standards..."
       managing_grading_standards: "manage grading schemes"
-<<<<<<< HEAD
-      range_of_numbers: "%{lower_number} to %{higher_number}"
-=======
       range_lower: "Lower limit of range"
       range_of_numbers: "%{lower_number} to %{higher_number}"
       range_upper: "Upper limit of range"
       remove_row: "Remove row"
->>>>>>> release/2013-10-05.19
       remove_scheme: "Remove Grading Scheme"
       some_standard: "Some standard"
       use_this_standard: "Use This Grading Standard"
@@ -12499,12 +12394,8 @@ en:
       options: 
         select: "[ Select ]"
       points: "%{points} pts"
-<<<<<<< HEAD
-      points_out_of: "%{points} / %{total} pts"
-=======
       points_abbreviation: "*Points* pts"
       points_out_of: "*Points* / %{total} pts"
->>>>>>> release/2013-10-05.19
       titles: 
         linked_to_learning_outcome: "This criterion is linked to a Learning Outcome"
     rubric_criterion_dialog: 
@@ -13096,6 +12987,13 @@ en:
   tooltips: 
     vdd: 
       more_message: "and %{count} more..."
+  tours: 
+    quiz_regrade: 
+      first_bullet: "Once you’ve changed an answer you’ll need to choose an option before updating the question."
+      got_it: "Ok, got it"
+      second_bullet: "Make sure you choose the most appropiate option as students' scores MAY be affected."
+      third_bullet: "Canvas will regrade all your submissions after you save the quiz, this may take a few minutes."
+      try_later: "You can now set regrade options for students who have already taken the quiz."
   turnitin: 
     error_1007: "The uploaded file is too big."
     error_1009: "Invalid file type. (Valid file types are MS Word, Acrobat PDF, Postscript, Text, HTML, WordPerfect (WPD) and Rich Text Format.)"
@@ -13523,11 +13421,6 @@ en:
       welcome_to_happiness: "Welcome to Canvas!"
   validate: 
     is_required: "This field is required"
-<<<<<<< HEAD
-=======
-  vdd_tooltip_view: 
-    multiple_dates: "Multiple Dates"
->>>>>>> release/2013-10-05.19
   warnings: 
     test_install: 
       message: "This Canvas installation is only for testing, and will reset every week."
@@ -13582,18 +13475,12 @@ en:
         edit: Edit
         view_all_pages: "View All Pages"
       delete_wiki: Delete
-<<<<<<< HEAD
-      toolbar_menu: 
-        settings: Settings
-    wiki_page_edit: 
-      buttons: 
-        cancel: Cancel
-        publish: Unpublished
-        save: Save
-        unpublish: Published
-=======
       labels: 
         front_page: "Front Page"
+      page_locked: "This page is locked"
+      page_locked_by_modules: "This page will be available once you have completed these modules:"
+      page_locked_by_modules_until: "This page will be available on %{lock_info.unlock_at} if you have completed these modules:"
+      page_locked_until: "This page will be available on %{lock_info.unlock_at}"
       toolbar_menu: 
         settings: Settings
       view_page_history_wiki: "View Page History"
@@ -13601,33 +13488,17 @@ en:
       buttons: 
         cancel: Cancel
         save: Save
->>>>>>> release/2013-10-05.19
       course_editing_roles: 
         anyone: Anyone
         only_teachers: "Only teachers"
         teachers_and_students: "Teachers and students"
-<<<<<<< HEAD
-      delete_wiki: Delete
-=======
->>>>>>> release/2013-10-05.19
       editing_roles: 
         anyone: Anyone
         can_edit_page: "can edit this page"
         only_members: "Only members"
-<<<<<<< HEAD
-      hide_from_students: "Hide this page from students"
-      notify_users_text: "Notify users that this content has changed"
-      options_label: Options
-      publish: Publish
-      title_label: "Page Title"
-      toolbar_menu: 
-        settings: Settings
-      unpublish: Unpublish
-=======
       notify_users_text: "Notify users that this content has changed"
       options_label: Options
       title_label: "Page Title"
->>>>>>> release/2013-10-05.19
     wiki_page_index: 
       add_page: "Add one!"
       buttons: 
@@ -13639,11 +13510,8 @@ en:
         page_title: "Page title"
         published: Published
         settings: Settings
-<<<<<<< HEAD
-=======
       loading: "Loading ..."
       loading_more: "Loading more ..."
->>>>>>> release/2013-10-05.19
       no_pages: "No pages created yet."
     wiki_page_index_edit_dialog: 
       page_title: Title
@@ -13653,14 +13521,8 @@ en:
       menu: 
         delete: Delete
         edit: Edit
-<<<<<<< HEAD
-        remove_front_page: "Remove as Front Page"
-        set_front_page: "Set as Front Page"
-        settings: Settings
-=======
         settings: Settings
         use_front_page: "Use as Front Page"
->>>>>>> release/2013-10-05.19
   wiki_page: 
     atom_author: "Wiki Page"
     atom_entry_title: "Wiki Page, %{course_or_group_name}: %{page_title}"
@@ -13740,7 +13602,9 @@ en:
     front_page: "Front Page"
     notices: 
       cannot_edit: "You are not allowed to edit the page \"%{title}\"."
+      create_non_existent_page: "The page \"%{title}\" does not exist, but you can create it below"
       page_deleted: "The page \"%{title}\" has been deleted."
+      page_does_not_exist: "The page \"%{title}\" does not exist."
       page_updated: "Page was successfully updated."
     page_link: 
       link_hidden_from_students_warning: "Students won't see this link"
@@ -13769,10 +13633,7 @@ en:
       wiki_description_for_group: "Think of it as an open-ended place to hold content. You could use it to describe your group, to provide helpful explanations of difficult topics, or even to let members work together on writing projects."
       wiki_description_header: "What's a wiki for?"
   wiki_pages_api: 
-<<<<<<< HEAD
-=======
     cannot_delete_front_page: "The front page cannot be deleted"
->>>>>>> release/2013-10-05.19
     cannot_have_unpublished_front_page: "The front page cannot be unpublished"
     cannot_hide_front_page: "The front page cannot be hidden from students"
     cannot_update_editing_roles: "You are not allowed to update the editing roles of this wiki page"
@@ -13781,7 +13642,6 @@ en:
     cannot_update_published: "You are not allowed to update the published state of this wiki page"
     cannot_update_title: "You are not allowed to update the title of this wiki page"
     invalid_editing_roles: "The provided editing roles are invalid"
-    no_wiki_front_page: "No front page has been set"
   wimba_conference: 
     external_urls: 
       archive: Archive

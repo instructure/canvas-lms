@@ -39,11 +39,12 @@ def should_delete_a_grading_scheme
   GradingStandard.last.workflow_state.should == 'deleted'
 end
 
-
 def should_add_a_grading_scheme_item
   data_count = @grading_standard.data.count
-  grading_standard_rows[1].click
-  ff('.insert_grading_standard_link')[1].click
+  #grading_standard_rows[1].click
+  driver.execute_script("$('.insert_grading_standard_link:eq(2)').hover().click()")
+
+  #ff('.insert_grading_standard_link')[1].click
   replace_content(ff('.editing_box .standard_name')[1], 'F')
   save_and_reload_changes(@grading_standard)
   @grading_standard.data.count.should == data_count + 1

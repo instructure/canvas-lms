@@ -100,7 +100,7 @@ class AssignmentGroupsApiController < ApplicationController
         if @assignment_group.has_frozen_assignment_group_id_assignment?(@current_user)
           err_msg = t('errors.frozen_assignments_error', "You cannot delete a group with a locked assignment.")
           @assignment_group.errors.add('workflow_state', err_msg, :att_name => 'workflow_state')
-          render :json => @assignment_group.errors.to_json, :status => :bad_request
+          render :json => @assignment_group.errors, :status => :bad_request
           return
         end
 
@@ -122,7 +122,7 @@ class AssignmentGroupsApiController < ApplicationController
     if update_assignment_group @assignment_group, params
       render :json => assignment_group_json(@assignment_group, @current_user, session)
     else
-      render :json => @assignment_group.errors.to_json, :status => :bad_request
+      render :json => @assignment_group.errors, :status => :bad_request
     end
   end
 

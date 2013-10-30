@@ -48,7 +48,7 @@ describe "announcements" do
     f('#discussion_subentries span').text.should == "Replies are only visible to those who have posted at least one reply."
     ff('.discussion_entry').each { |entry| entry.should_not include_text(student_2_entry) }
     f('.discussion-reply-action').click
-    wait_for_animations
+    wait_for_ajaximations
     type_in_tiny('textarea', 'reply')
     submit_form('#discussion_topic .discussion-reply-form')
     wait_for_ajaximations
@@ -318,12 +318,12 @@ describe "announcements" do
       feed_name = 'http://www.google.com'
 
       f(".add_external_feed_link").click
-      wait_for_animations
+      wait_for_ajaximations
       f("#external_feed_url").should be_displayed
       f('#external_feed_url').send_keys(feed_name)
 
       f('#external_feed_enable_header_match').click
-      wait_for_animations
+      wait_for_ajaximations
       f('#external_feed_header_match').should be_displayed
       f('#external_feed_header_match').send_keys('blah')
 

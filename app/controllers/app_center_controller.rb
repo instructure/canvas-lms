@@ -19,7 +19,16 @@
 class AppCenterController < ApplicationController
   before_filter :require_context
 
-  def generate_app_api_collection(base_url)
+  def map_tools_to_apps!(context, apps)
+    return unless apps
+    ContextExternalTool.all_tools_for(context).each do |tool|
+      app = nil
+      app = apps.find{|a| tool.tool_id == a['id'] } if tool.tool_id
+      app['is_installed'] = true if app
+    end
+  end
+
+  def generate_app_api_collection
     PaginatedCollection.build do |pager|
       page = (params['page'] || 1).to_i
       response = yield AppCenter::AppApi.new, page
@@ -34,7 +43,11 @@ class AppCenterController < ApplicationController
     per_page = params['per_page'] || 72
     endpoint_scope = (@context.is_a?(Account) ? 'account' : 'course')
     base_url = send("api_v1_#{endpoint_scope}_app_center_apps_url")
-    collection = generate_app_api_collection(base_url) {|app_api, page| app_api.get_apps(page, per_page)}
+    collection = generate_app_api_collection do |app_api, page|
+      apps = app_api.get_apps(page, per_page)
+      map_tools_to_apps!(@context, apps['objects'])
+      apps
+    end
     render :json => Api.paginate(collection, self, base_url, :per_page => per_page.to_i)
   end
 
@@ -43,7 +56,7 @@ class AppCenterController < ApplicationController
     endpoint_scope = (@context.is_a?(Account) ? 'account' : 'course')
     base_url = send("api_v1_#{endpoint_scope}_app_center_app_reviews_url")
     force_refresh = params['force_refresh'] == '1'
-    collection = generate_app_api_collection(base_url) {|app_api, page| app_api.get_app_reviews(params[:app_id], page, per_page, force_refresh)}
+    collection = generate_app_api_collection {|app_api, page| app_api.get_app_reviews(params[:app_id], page, per_page, force_refresh)}
     render :json => Api.paginate(collection, self, base_url, :per_page => per_page.to_i)
   end
 

@@ -139,6 +139,12 @@ class PseudonymSessionsController < ApplicationController
       return unsuccessful_login(t('errors.blank_password', "No password was given"))
     end
 
+    # strip leading and trailing whitespace off the entered unique id. some
+    # mobile clients (e.g. android) will add a space after the login when using
+    # autocomplete. this would prevent us from recognizing someone's username,
+    # making them unable to login.
+    params[:pseudonym_session][:unique_id].try(:strip!)
+
     # Try to use authlogic's built-in login approach first
     @pseudonym_session = @domain_root_account.pseudonym_sessions.new(params[:pseudonym_session])
     @pseudonym_session.remote_ip = request.remote_ip
@@ -566,7 +572,7 @@ class PseudonymSessionsController < ApplicationController
         # adding the :login_success param to it.
         format.html { redirect_back_or_default(dashboard_url(:login_success => '1')) }
       end
-      format.json { render :json => pseudonym.to_json(:methods => :user_code), :status => :ok }
+      format.json { render :json => pseudonym.as_json(:methods => :user_code), :status => :ok }
     end
   end
 
@@ -586,7 +592,7 @@ class PseudonymSessionsController < ApplicationController
       format.json do
         @pseudonym_session ||= @domain_root_account.pseudonym_sessions.new
         @pseudonym_session.errors.add('base', message)
-        render :json => @pseudonym_session.errors.to_json, :status => :bad_request
+        render :json => @pseudonym_session.errors, :status => :bad_request
       end
     end
   end
@@ -659,7 +665,7 @@ class PseudonymSessionsController < ApplicationController
 
     Canvas::Oauth::Token.expire_code(params[:code])
 
-    render :json => token.to_json
+    render :json => token
   end
 
   def oauth2_logout

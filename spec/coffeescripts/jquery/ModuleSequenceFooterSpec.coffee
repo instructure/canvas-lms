@@ -23,6 +23,42 @@ define [
     msf = new $.fn.moduleSequenceFooter.MSFClass({courseID: 42, assetType: 'Assignment', assetID: 42})
     equal msf.url, "/api/v1/courses/42/module_item_sequence", "generates a url based on the courseID"
 
+  test 'attaches msfAnimation function', ->
+    @$testEl.moduleSequenceFooter({assetType: 'Assignment', assetID: 42})
+    notStrictEqual @$testEl.msfAnimation, undefined, 'msfAnimation function defined'
+
+  test 'accepts animation option', ->
+    $.fn.moduleSequenceFooter.MSFClass.prototype.fetch.restore()
+    sinon.stub $.fn.moduleSequenceFooter.MSFClass.prototype, 'fetch', ->
+      this.success
+        items: [
+          prev: null
+          current:
+            id: 42
+            module_id: 73
+            title: 'A lonely page'
+            type: 'Page'
+          next:
+            id: 43
+            module_id: 73
+            title: 'Another lonely page'
+            type: 'Page'
+        ]
+        modules: [
+          id: 73
+          name: 'A lonely module'
+        ]
+      d = $.Deferred()
+      d.resolve()
+      d
+    @$testEl.moduleSequenceFooter({assetType: 'Assignment', assetID: 42, animation: false})
+    equal @$testEl.find('.module-sequence-footer.no-animation').length, 1, 'no-animation applied to module-sequence-footer'
+    equal @$testEl.find('.module-sequence-padding.no-animation').length, 1, 'no-animation applied to module-sequence-padding'
+
+    @$testEl.msfAnimation(true)
+    equal @$testEl.find('.module-sequence-footer:not(.no-animation)').length, 1, 'no-animation removed from module-sequence-footer'
+    equal @$testEl.find('.module-sequence-padding:not(.no-animation)').length, 1, 'no-animation removed from module-sequence-padding'
+
   module 'ModuleSequenceFooter: rendering',
     setup: -> 
       @server = sinon.fakeServer.create()
@@ -123,8 +159,8 @@ define [
     @$testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123})
     @server.respond()
 
-    ok this.$testEl.find('a').first().attr('title').match('Module C'), "displays previous module tooltip"
-    ok this.$testEl.find('a').last().attr('title').match('Module B'), "displays next module tooltip"
+    ok this.$testEl.find('a').first().data('tooltip-title').match('Module C'), "displays previous module tooltip"
+    ok this.$testEl.find('a').last().data('tooltip-title').match('Module B'), "displays next module tooltip"
 
   itemTooltipData = 
      {
@@ -173,8 +209,8 @@ define [
     @$testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123})
     @server.respond()
 
-    ok this.$testEl.find('a').first().attr('title').match('Project 1'), "displays previous item tooltip"
-    ok this.$testEl.find('a').last().attr('title').match('Project 33'), "displays next item tooltip"
+    ok this.$testEl.find('a').first().data('tooltip-title').match('Project 1'), "displays previous item tooltip"
+    ok this.$testEl.find('a').last().data('tooltip-title').match('Project 33'), "displays next item tooltip"
 
   test 'if url has a module_item_id use that as the assetID and ModuleItem as the type instead', ->
     @server.respondWith "GET", 

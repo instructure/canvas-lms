@@ -37,11 +37,6 @@
   <div class="headerBar" data-sticky>
     <div class="row-fluid form-inline" style="overflow: visible;">
       <div class="span7">
-        <label
-          class="hidden-inline-text"
-          for="discussion-search"
-        >s<%= t("search_entries", "Search entries or authors") %></label>
-
         <input
           id          = "discussion-search"
           type        = "text"
@@ -56,8 +51,12 @@
         ><label for="onlyUnread"><%= t('unread', 'Unread') %></label>
 
         &nbsp; &nbsp;
-        <button id="collapseAll" class="btn disableWhileFiltering" title="<%= t('collapse_replies', 'Collapse replies') %>"><%= image_tag 'discussions/collapse_icon.png' %></button>
-        <button id="expandAll" class="btn disableWhileFiltering" title="<%= t('expand_replies', 'Expand replies') %>"><%= image_tag 'discussions/expand_icon.png' %></button>
+        <button id="collapseAll" class="btn disableWhileFiltering" title="<%= t('collapse_replies', 'Collapse replies') %>" aria-label="<%= t('collapse_replies', 'Collapse replies') %>">
+          <%= image_tag 'discussions/collapse_icon.png', :alt => t('collapse_replies', 'Collapse replies') %>
+        </button>
+        <button id="expandAll" class="btn disableWhileFiltering" title="<%= t('expand_replies', 'Expand replies') %>" aria-label="<%= t('expand_replies', 'Expand replies') %>">
+          <%= image_tag 'discussions/expand_icon.png', :alt => t('expand_replies', 'Expand replies') %>
+        </button>
 
       </div>
 
@@ -86,9 +85,8 @@
 
         <% if @current_user.present? %>
           <div class="admin-links">
-            <a class="al-trigger btn" href="#">
+            <a class="al-trigger btn" href="#" aria-label="<%= t :manage_discussion, 'Manage Discussion' %>">
               <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
-              <div class="screenreader-only"><%= t :manage_discussion, 'Manage Discussion' %></div>
             </a>
             <ul class="al-options">
               <li><a href="#" class="mark_all_as_read"><i class="icon-mark-as-read" aria-hidden="hidden"></i> <%= t :mark_all_as_read, 'Mark All as Read' %></a></li>
@@ -110,7 +108,7 @@
               <% end %>
 
               <% if @presenter.show_peer_reviews?(@current_user) %>
-                <li><a class="peer-review assignment_peer_reviews_link"
+                <li><a class="assignment_peer_reviews_link"
                    href="<%= context_url(@topic.assignment.context,
                                          :context_assignment_peer_reviews_url,
                                          @topic.assignment.id) %>">
@@ -126,7 +124,7 @@
                     <a href="<%= context_url(@topic.assignment.context, :context_rubrics_url) %>" id="add_rubric_url" style="display: none;"></a>
                   <% end %>
 
-                  <a class="rubric_dialog_trigger rubric" href="#" data-no-rubric-exists="<%= !@presenter.has_attached_rubric? %>" data-url="<%= context_url(@topic.assignment.context, :context_assignment_rubric_url, @topic.assignment.id) %>">
+                  <a class="rubric_dialog_trigger" href="#" data-no-rubric-exists="<%= !@presenter.has_attached_rubric? %>" data-url="<%= context_url(@topic.assignment.context, :context_assignment_rubric_url, @topic.assignment.id) %>">
                     <i class="icon-rubric" aria-hidden="hidden"></i>
                     <%= @presenter.has_attached_rubric? ? t(:show_rubric, "Show Rubric") : t(:add_rubric, "Add Rubric") %>
                   </a>

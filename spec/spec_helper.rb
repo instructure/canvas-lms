@@ -1010,11 +1010,6 @@ Spec::Runner.configure do |config|
     send(method, url, query, headers.merge(http_headers))
   end
 
-  def run_transaction_commit_callbacks(conn = ActiveRecord::Base.connection)
-    conn.after_transaction_commit_callbacks.each { |cb| cb.call }
-    conn.after_transaction_commit_callbacks.clear
-  end
-
   def force_string_encoding(str, encoding = "UTF-8")
     if str.respond_to?(:force_encoding)
       str.force_encoding(encoding)

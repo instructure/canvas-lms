@@ -69,7 +69,9 @@ end
 def api_call_as_user(user, method, path, params, body_params = {}, headers = {}, opts = {})
   token = access_token_for_user(user)
   headers['Authorization'] = "Bearer #{token}"
-  user.pseudonyms.create!(:unique_id => "#{user.id}@example.com", :account => opts[:domain_root_account]) unless user.pseudonym(true)
+  account = opts[:domain_root_account] || Account.default
+  user.pseudonyms.reload
+  account.pseudonyms.create!(:unique_id => "#{user.id}@example.com", :user => user) unless user.find_pseudonym_for_account(account, true)
   api_call(method, path, params, body_params, headers, opts)
 end
 

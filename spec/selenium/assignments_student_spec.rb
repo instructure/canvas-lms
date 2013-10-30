@@ -115,7 +115,7 @@ describe "assignments" do
       get "/courses/#{@course.id}/groups"
 
       f('.add_group_link').click
-      wait_for_animations
+      wait_for_ajaximations
       f('#group_name').send_keys(new_group_name)
       submit_form('#add_group_form')
       wait_for_ajaximations

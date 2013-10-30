@@ -9,7 +9,7 @@
       name="search_term"
       type="search"
       value=""
-      data-view="inputFilter"
+      disabled
       placeholder="{{#t "search_for_assignment"}}Search for Assignment{{/t}}"
       aria-label="{{#t "search_for_assignment"}}Search for Assignment{{/t}}"
     >
@@ -48,7 +48,7 @@
   </div>
 </div>
 
-<div data-view="assignmentGroups" class="item-group-container"></div>
+<div data-view="assignmentGroups" class="item-group-container" id="ag-list"></div>
 
 {{#if ENV.PERMISSIONS.manage}}
   <form data-view="createGroup" class="form-dialog"></form>

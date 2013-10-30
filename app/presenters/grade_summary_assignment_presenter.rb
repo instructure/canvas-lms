@@ -135,7 +135,7 @@ class GradeSummaryAssignmentPresenter
     @visible_rubric_assessments ||= begin
       if submission && !assignment.muted?
         assessments = submission.rubric_assessments.select { |a| a.grants_rights?(@current_user, :read)[:read] }
-        assessments.sort_by { |a| [a.assessment_type == 'grading' ? '0' : '1', a.assessor_name] }
+        assessments.sort_by { |a| [a.assessment_type == 'grading' ? SortFirst : SortLast, a.assessor_name] }
       else
         []
       end

@@ -1,6 +1,7 @@
 define [
+  'compiled/models/Assignment'
   'compiled/models/AssignmentGroup'
-], (AssignmentGroup) ->
+], (Assignment, AssignmentGroup) ->
 
   module "AssignmentGroup"
 
@@ -39,3 +40,11 @@ define [
   test "#countRules returns false if the group has no rules", ->
     ag = new AssignmentGroup
     strictEqual ag.countRules(), 0
+
+  module "AssignmentGroup#hasFrozenAssignments"
+
+  test "returns true if AssignmentGroup has frozen assignments", ->
+    assignment = new Assignment name: 'cheese'
+    assignment.set 'frozen', [ true ]
+    group = new AssignmentGroup name: 'taco', assignments: [ assignment ]
+    deepEqual group.hasFrozenAssignments(), true

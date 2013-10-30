@@ -514,7 +514,6 @@ describe UsersController do
       @assignment.grade_student(@s1, :grade => 3)
       @assignment.grade_student(@s2, :grade => 4)
       @assignment.grade_student(@test_student, :grade => 5)
-      run_transaction_commit_callbacks
 
       get 'grades'
       assigns[:presenter].course_grade_summaries[@course.id].should == { :score => 70, :students => 2 }

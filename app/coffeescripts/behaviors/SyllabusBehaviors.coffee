@@ -114,6 +114,17 @@ define [
     todayString = $.datepicker.formatDate 'yy_mm_dd', new Date
     highlightDate todayString
 
+  selectRow = ($row, e) ->
+    if $row.length > 0
+      $('tr.selected').removeClass('selected')
+      $row.addClass('selected')
+      $('html, body').scrollTo $row
+      $row.find('a').focus() if e.screenX == 0
+
+  selectDate = (date) ->
+    $('.mini_month .day.selected').removeClass('selected')
+    $('.mini_month').find("#mini_day_#{date}").addClass('selected')
+
   # Binds to mini calendar dom events
   bindToMiniCalendar = ->
     $mini_month = $('.mini_month')
@@ -132,10 +143,10 @@ define [
 
       calendarMonths.changeMonth $mini_month, "#{month}/#{day}/#{year}"
       highlightDaysWithEvents()
+      selectDate(date)
 
       $(".events_#{date}").ifExists ($events) ->
-        $('html, body').scrollTo $events
-        highlightDate date
+        selectRow($events, ev)
 
     $mini_month.on 'mouseover mouseout', '.mini_calendar_day', (ev) ->
       date = this.id.slice(9) unless ev.type == 'mouseout'
@@ -154,9 +165,8 @@ define [
       highlightDaysWithEvents()
 
       $lastBefore ||= $('tr.date:first')
-      $('html, body').scrollTo $lastBefore
-      $lastBefore.find('a').focus() if ev.screenX == 0
-      highlightDate todayString
+      selectDate(todayString)
+      selectRow($lastBefore, ev)
 
   # Binds to edit syllabus dom events
   bindToEditSyllabus = ->

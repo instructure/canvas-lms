@@ -14,3 +14,5 @@ define [
     defaults:
       params:
         include: ["assignments"]
+
+    comparator: 'position'

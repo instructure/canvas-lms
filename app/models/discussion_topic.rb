@@ -503,7 +503,7 @@ class DiscussionTopic < ActiveRecord::Base
 
   def user_can_see_posts?(user, session=nil)
     return false unless user
-    !self.require_initial_post || self.grants_right?(user, session, :update) || user_ids_who_have_posted_and_admins.member?(user.id)
+    !self.require_initial_post? || self.grants_right?(user, session, :update) || user_ids_who_have_posted_and_admins.member?(user.id)
   end
 
   def reply_from(opts)
@@ -651,6 +651,10 @@ class DiscussionTopic < ActiveRecord::Base
 
     given { |user, session| self.context.respond_to?(:collection) && user == self.context.user }
     can :read and can :update and can :delete and can :reply
+  end
+
+  def self.context_allows_user_to_create?(context, user, session)
+    DiscussionTopic.new(context: context).grants_right?(user, session, :create)
   end
 
   def context_allows_user_to_create?(user)

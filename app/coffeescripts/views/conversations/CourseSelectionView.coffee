@@ -2,10 +2,11 @@ define [
   'i18n!conversations'
   'underscore'
   'Backbone'
+  'compiled/views/conversations/SearchableSubmenuView'
   'jst/conversations/courseOptions'
   'use!vendor/bootstrap/bootstrap-dropdown'
   'use!vendor/bootstrap-select/bootstrap-select'
-], (I18n, _, {View, Collection}, template) ->
+], (I18n, _, {View, Collection}, SearchableSubmenuView, template) ->
 
   class CourseSelectionView extends View
     events:
@@ -31,7 +32,7 @@ define [
         collection = if course.get('workflow_state') == 'completed' then concluded else more
         collection.push(course.toJSON())
       )
-      data = 
+      data =
         defaultOption: @options.defaultOption,
         favorites: @options.courses.favorites.toJSON(),
         more: more,
@@ -39,13 +40,23 @@ define [
       @truncate_course_name_data(data)
       @$el.html(template(data))
       @$el.selectpicker('refresh')
+      @$picker = @$el.next()
+      @$picker.find('.paginatedLoadingIndicator').remove()
+      @createSearchViews()
       if !@renderValue() then @loadAll()
+
+    createSearchViews: ->
+      searchViews = []
+      @$picker.find('.dropdown-submenu').each ->
+        searchViews.push(new SearchableSubmenuView(el: this))
+      @searchViews = searchViews
 
     loadAll: () =>
       all = @options.courses.all
       if all._loading then return
       all.fetch()
       all._loading = true
+      @$picker.find('> .dropdown-menu').append($('<div />').attr('class', 'paginatedLoadingIndicator').css('clear', 'both'))
 
     _value: ''
     setValue: (value) ->
@@ -54,15 +65,26 @@ define [
       @triggerEvent()
 
     renderValue: () ->
+      @silenced = true
       @$el.selectpicker('val', @_value)
+      @silenced = false
       return @$el.val() == @_value
 
     onChange: () ->
+      return if @silenced
       @_value = @$el.val()
       @triggerEvent()
+      @searchViews.forEach (view) ->
+        view.clearSearch()
 
-    triggerEvent: () ->
-      @trigger('course', name: @$el.find(':selected').text().trim(), id: @_value)
+    getCurrentCourse: ->
+      course_id = @_value.replace('course_', '')
+      course = @options.courses.favorites.get(course_id)
+      course = @options.courses.all.get(course_id) if !course
+      return if course then {name: course.get('name'), id: @_value} else {}
+
+    triggerEvent: ->
+      @trigger('course', @getCurrentCourse())
 
     focus: ->
       @$el.next().find('.dropdown-toggle').focus()

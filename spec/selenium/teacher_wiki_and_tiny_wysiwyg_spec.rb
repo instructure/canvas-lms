@@ -228,7 +228,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
     get "/courses/#{@course.id}/wiki"
 
     f('#wiki_page_body_instructure_equation').click
-    wait_for_animations
+    wait_for_ajaximations
     f('.mathquill-editor').should be_displayed
     misc_tab = f('.mathquill-tab-bar > li:last-child a')
     misc_tab.click
@@ -256,7 +256,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
 
     get "/courses/#{@course.id}/wiki"
     f('#wiki_page_body_instructure_equation').click
-    wait_for_animations
+    wait_for_ajaximations
     f('.mathquill-editor').should be_displayed
     textarea = f('.mathquill-editor .textarea textarea')
     3.times do
@@ -307,10 +307,10 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
     get "/courses/#{@course.id}/wiki"
 
     f('#wiki_page_body_instructure_equation').click
-    wait_for_animations
+    wait_for_ajaximations
     f('.mathquill-editor').should be_displayed
     f('a.math-toggle-link').click
-    wait_for_animations
+    wait_for_ajaximations
     f('#mathjax-editor').should be_displayed
     misc_tab = f('#mathjax-view .mathquill-tab-bar > li:last-child a')
     misc_tab.click
@@ -338,10 +338,10 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
 
     get "/courses/#{@course.id}/wiki"
     f('#wiki_page_body_instructure_equation').click
-    wait_for_animations
+    wait_for_ajaximations
     f('.mathquill-editor').should be_displayed
     f('a.math-toggle-link').click
-    wait_for_animations
+    wait_for_ajaximations
     f('#mathjax-editor').should be_displayed
     textarea = f('#mathjax-editor')
     3.times do

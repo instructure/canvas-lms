@@ -78,6 +78,7 @@
 
       // INSTRUCTURE
       if (e.keyCode == 9) return clearMenus()
+      if ($(e.target).is('input')) return
 
       if (!/(37|38|39|40|27)/.test(e.keyCode)) return
 
@@ -102,9 +103,9 @@
       // INSTRUCTURE--modified the rest of the method
       // left
       if (e.keyCode == 37) {
-        $list = $(e.target).parent().parent()
+        $list = $(e.target).closest('ul')
         if ($list.is('[role=group]')) {
-          $list.prev().focus()
+          $list.closest('li').children('a').focus()
         }
         return
       }
@@ -112,8 +113,8 @@
       // right
       if (e.keyCode == 39) {
         $list = $(e.target).next()
-        if ($list.is('[role=group]')) {
-          $list.find('> li:not(.divider):visible > a').eq(0).focus()
+        if ($list.is('.dropdown-menu')) {
+          $list.find('li:not(.divider):visible > a').eq(0).focus()
           e.preventDefault()
         }
         return

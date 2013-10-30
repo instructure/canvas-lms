@@ -246,13 +246,11 @@ module Technoweenie # :nodoc:
         protected
           # Called in the after_destroy callback
           def destroy_file
-            # Not confident that a monkey patch will always work for a plugin.  Changing inline.
-            begin
-              s3object.delete
-            rescue
-              # full_filename will break if the transmission didn't work.
-              true
-            end
+            # INSTRUCTURE: We don't want to actually delete objects from s3 (at
+            # least not due to the Attachment being destroyed). With our root
+            # attachment deduplication scheme it just gets too messy and buggy.
+            # We'll just GC them later.
+            true
           end
 
           def rename_file

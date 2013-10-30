@@ -38,7 +38,9 @@
       </label>
       <div class="controls">
       {{#if multipleDueDates}}
-        <span class="datetime_field multiple_due_dates" title="vdd_tooltip" data-tooltip-selector="#vdd_tooltip_{{uniqLabel}}">
+        <span class="datetime_field multiple_due_dates" title
+              data-tooltip-selector="#vdd_tooltip_{{uniqLabel}}"
+              aria-labelledby="vdd_tooltip_{{uniqLabel}}">
           <input
             class="input-medium"
             type="text"

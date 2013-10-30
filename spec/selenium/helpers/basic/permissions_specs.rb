@@ -30,6 +30,7 @@ shared_examples_for "permission tests" do
     permission_button.find_element(:css, "a").click
     wait_for_ajaximations
     options = permission_button.find_elements(:css, ".dropdown-menu label")
+    debugger
     options[2].click # 2 is Disabled
 
     wait_for_ajaximations

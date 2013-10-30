@@ -18,15 +18,14 @@
 require [
   'compiled/collections/AssignmentGroupCollection'
   'compiled/models/Course'
-  'compiled/views/InputFilterView'
   'compiled/views/assignments/AssignmentGroupListView'
   'compiled/views/assignments/CreateGroupView'
   'compiled/views/assignments/IndexView'
   'compiled/views/assignments/AssignmentSettingsView'
   'compiled/views/assignments/AssignmentGroupWeightsView'
   'compiled/views/assignments/ToggleShowByView'
-], (AssignmentGroupCollection, Course, InputFilterView,
-  AssignmentGroupListView, CreateGroupView, IndexView, AssignmentSettingsView,
+], (AssignmentGroupCollection, Course, AssignmentGroupListView,
+  CreateGroupView, IndexView, AssignmentSettingsView,
   AssignmentGroupWeightsView, ToggleShowByView) ->
 
   course = new Course
@@ -41,9 +40,6 @@ require [
     params:
       include: includes
       override_assignment_dates: !ENV.PERMISSIONS.manage
-
-  inputFilterView = new InputFilterView
-    collection: assignmentGroups
 
   assignmentGroupsView = new AssignmentGroupListView
     collection: assignmentGroups
@@ -71,10 +67,10 @@ require [
 
   @app = new IndexView
     assignmentGroupsView: assignmentGroupsView
-    inputFilterView: inputFilterView
     assignmentSettingsView: assignmentSettingsView
     createGroupView: createGroupView
     showByView: showByView
+    collection: assignmentGroups
 
   @app.render()
 

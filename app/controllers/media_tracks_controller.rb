@@ -85,7 +85,7 @@ class MediaTracksController < ApplicationController
       if @track.destroy
         render :json => media_object_api_json(@media_object, @current_user, session)
       else
-        render :json => @track.errors.to_json, :status => :bad_request
+        render :json => @track.errors, :status => :bad_request
       end
     end
   end

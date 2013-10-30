@@ -1,0 +1,34 @@
+#!/usr/bin/env ruby
+
+require 'ruby_parser'
+
+def deep_inspect(expr)
+  return unless expr.is_a?(Sexp)
+  yield expr
+  expr.each{ |subexpr| deep_inspect(subexpr) { |x| yield x } }
+end
+
+def bad_to_json_in_render?(expr)
+  # "render json: value.to_json(args), ..." parses as
+  # s(:call, nil, :render, s(:hash, s(:lit, :json), s(:call, value, :to_json, args), ...))
+  # look for that structure, but skip if the value is a literal. known not to catch
+  # "render status: 200, json: value.to_json(args)"
+  # but that's ok for now
+  expr[0] == :call && expr[1] == nil && expr[2] == :render &&
+  expr[3].is_a?(Sexp) && expr[3].first == :hash &&
+  expr[3][1].is_a?(Sexp) && expr[3][1].first == :lit && expr[3][1].last == :json &&
+  expr[3][2].is_a?(Sexp) && expr[3][2].first == :call && expr[3][2][2] == :to_json &&
+  !(expr[3][2][1].is_a?(Sexp) && [:str, :lit, :true, :false, :nil].include?(expr[3][2][1].first))
+end
+
+errored = false
+controllers = Dir.glob("app/controllers/*.rb") + Dir.glob("vendor/plugins/*/app/controllers/*.rb")
+controllers.each do |file|
+  deep_inspect(RubyParser.new.parse(File.read(file))) do |expr|
+    if bad_to_json_in_render?(expr)
+      puts "ERROR (in #{file} near #{expr.line}): call to `to_json' on value for `render json'. Use `as_json' instead."
+      errored = true
+    end
+  end
+end
+exit 1 if errored

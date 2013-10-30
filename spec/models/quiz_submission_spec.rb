@@ -507,6 +507,35 @@ describe QuizSubmission do
     end
   end
 
+  describe "formula questions with percentage tolerance" do
+    before do
+      @quiz = @course.quizzes.create!(:title => "formula quiz")
+      @quiz.quiz_questions.create! :question_data => {
+        :name => "Question",
+        :question_type => "calculated_question",
+        :answer_tolerance => "10.0%",
+        :formulas => [[0, "2*z"]],
+        :variables => [["variable_0", {:scale => 0, :min => 1.0, :max => 10.0, :name => 'z'}]],
+        :answers => [["answer_0", {
+          :weight => 100,
+          :variables => [["variable_0", {:value => 2.0, :name => 'z'}]],
+          :answer_text => "4.0"
+        }]],
+        :question_text => "2 * [z] is ?"
+      }
+      @quiz.generate_quiz_data(:persist => true)
+    end
+
+    it "should respect the answer_tolerance" do
+      submission = @quiz.generate_submission(@user)
+      submission.submission_data = {
+        "question_#{@quiz.quiz_questions.first.id}" => 4.4, # off by 10%
+      }
+      submission.grade_submission
+      submission.instance_variable_get(:@user_answers).first[:correct].should be_true
+    end
+  end
+
   it "should update associated submission" do
     c = factory_with_protected_attributes(Course, :workflow_state => "active")
     a = c.assignments.create!(:title => "some assignment")

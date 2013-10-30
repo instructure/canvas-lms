@@ -238,13 +238,15 @@ module AngelPropExpected
           :answers=>
               [{:text=>"quick", :weight=>100, :comments=>"", :blank_id=>"l1"},
                {:text=>"fox", :weight=>100, :comments=>"", :blank_id=>"l2"},
-               {:text=>"dog", :weight=>100, :comments=>"", :blank_id=>"l3"}],
+               {:text=>"dog", :weight=>100, :comments=>"", :blank_id=>"l3"},
+               {:text=>"0.02", :weight=>100, :comments=>"", :blank_id=>"l4"},
+               {:text=>"5", :weight=>100, :comments=>"", :blank_id=>"l5"}],
           :correct_comments=>"",
           :incorrect_comments=>"",
           :question_name=>"Fill in the blank(s)",
           :migration_id=>"",
           :points_possible=>1,
-          :question_text=>"<div>The [l1] brown [l2] jumped over the lazy [l3] .</div>",
+          :question_text=>"<div>The [l1] brown [l2] jumped over the lazy [l3] .</div> [l4]  [l5] ",
           :question_type=>"fill_in_multiple_blanks_question"}
 
 end

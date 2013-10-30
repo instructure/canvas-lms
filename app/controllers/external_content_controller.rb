@@ -89,7 +89,7 @@ class ExternalContentController < ApplicationController
         :message => t("#application.errors.invalid_oembed_url", "There was a problem retrieving this resource. The external tool provided invalid information about the resource.")
       }
     end
-    render :json => @retrieved_data.to_json
+    render :json => @retrieved_data
   end
 
   # this is a simple LTI link selection extension example

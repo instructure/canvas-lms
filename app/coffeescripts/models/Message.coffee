@@ -1,7 +1,8 @@
 define [
   'underscore'
   'Backbone'
-], (_, {Model, Collection}) ->
+  'compiled/str/TextHelper'
+], (_, {Model, Collection}, TextHelper) ->
 
   class Message extends Model
     initialize: ->
@@ -25,6 +26,7 @@ define [
             message.hiddenParticipantCount = message.participants.length - 2
           message.context_name = data.context_name
           message.has_attachments = message.media_comment || message.attachments.length
+          message.bodyHTML = TextHelper.formatMessage(message.body)
       data
 
     handleMessages: ->

@@ -176,7 +176,7 @@ describe "dashboard" do
 
       keep_trying_until { ffj(".to-do-list li:visible").size.should == 5 + 1 } # +1 is the see more link
       f(".more_link").click
-      wait_for_animations
+      wait_for_ajaximations
       ffj(".to-do-list li:visible").size.should == 20
     end
 

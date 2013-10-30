@@ -394,7 +394,7 @@ class AccountAuthorizationConfigsController < ApplicationController
   def update_all
     account_configs_to_delete = @account.account_authorization_configs.to_a.dup
     account_configs = []
-    (params[:account_authorization_config] || {}).sort {|a,b| a[0] <=> b[0] }.each do |idx, data|
+    (params[:account_authorization_config] || {}).sort_by {|k,v| k }.each do |idx, data|
       id = data.delete :id
       disabled = data.delete :disabled
       next if disabled == '1'
@@ -413,7 +413,7 @@ class AccountAuthorizationConfigsController < ApplicationController
       if result
         account_configs << account_config
       else
-        return render :json => account_config.errors.to_json
+        return render :json => account_config.errors
       end
     end
 
@@ -496,7 +496,7 @@ class AccountAuthorizationConfigsController < ApplicationController
       }
       results << h.merge({:errors => config.errors.map {|attr,msg| {attr => msg}}})
     end
-    render :json => results.to_json
+    render :json => results
   end
 
   def test_ldap_bind
@@ -508,7 +508,7 @@ class AccountAuthorizationConfigsController < ApplicationController
       }
       results << h.merge({:errors => config.errors.map {|attr,msg| {attr => msg}}})
     end
-    render :json => results.to_json
+    render :json => results
   end
 
   def test_ldap_search
@@ -521,7 +521,7 @@ class AccountAuthorizationConfigsController < ApplicationController
       }
       results << h.merge({:errors => config.errors.map {|attr,msg| {attr => msg}}})
     end
-    render :json => results.to_json
+    render :json => results
   end
 
   def test_ldap_login
@@ -552,7 +552,7 @@ class AccountAuthorizationConfigsController < ApplicationController
       results << h.merge({:errors => config.errors.map {|attr,msg| {attr => msg}}})
     end
     render(
-      :json => results.to_json,
+      :json => results,
       :status_code => 200
     )
   end
@@ -571,12 +571,12 @@ class AccountAuthorizationConfigsController < ApplicationController
 
       respond_to do |format|
         format.html { render :partial => 'saml_testing', :layout => false }
-        format.json { render :json => {:debugging => @account_config.debugging?, :debug_data => render_to_string(:partial => 'saml_testing.html', :layout => false) }.to_json }
+        format.json { render :json => {:debugging => @account_config.debugging?, :debug_data => render_to_string(:partial => 'saml_testing.html', :layout => false) } }
       end
     else
       respond_to do |format|
         format.html { render :partial => 'saml_testing', :layout => false }
-        format.json { render :json => {:errors => {:account => t(:saml_required, "A SAML configuration is required to test SAML")}.to_json} }
+        format.json { render :json => {:errors => {:account => t(:saml_required, "A SAML configuration is required to test SAML")}} }
       end
     end
   end
@@ -586,7 +586,7 @@ class AccountAuthorizationConfigsController < ApplicationController
         @account_config.finish_debugging 
       end
       
-      render :json => {:status => "ok"}.to_json
+      render :json => {:status => "ok"}
   end
 
   protected

@@ -79,9 +79,14 @@ define [
 
     startOverFrd: ->
       @model.startOver()
-      if @model.get('limit_privileges_to_course_section') == "0"
-        @$el.find('#limit_privileges_to_course_section').prop('checked', false)
       @$textarea?.val ''
+
+    toJSON: =>
+      json = super
+      json.course_section_id = "#{json.course_section_id}"
+      json.limit_privileges_to_course_section = json.limit_privileges_to_course_section == true ||
+                                                    json.limit_privileges_to_course_section == "1"
+      json
 
     afterRender: ->
       @$('[placeholder]').placeholder()

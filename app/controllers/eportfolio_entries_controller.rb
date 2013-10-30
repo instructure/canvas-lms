@@ -30,9 +30,9 @@ class EportfolioEntriesController < ApplicationController
       respond_to do |format|
         if @page.save
           format.html { redirect_to eportfolio_entry_url(@portfolio, @page) }
-          format.json { render :json => @page.to_json(:methods => :category_slug) }
+          format.json { render :json => @page.as_json(:methods => :category_slug) }
         else
-          format.json { render :json => @page.errors.to_json }
+          format.json { render :json => @page.errors }
         end
       end
     end
@@ -78,10 +78,10 @@ class EportfolioEntriesController < ApplicationController
       respond_to do |format|
         if @entry.update_attributes!(params[:eportfolio_entry])
           format.html { redirect_to eportfolio_entry_url(@portfolio, @entry) }
-          format.json { render :json => @entry.to_json }
+          format.json { render :json => @entry }
         else
           format.html { redirect_to eportfolio_entry_url(@portfolio, @entry) }
-          format.json { render :json => @entry.errors.to_json, :status => :bad_request }
+          format.json { render :json => @entry.errors, :status => :bad_request }
         end
       end
     end
@@ -96,7 +96,7 @@ class EportfolioEntriesController < ApplicationController
       respond_to do |format|
         if @entry.destroy
           format.html { redirect_to eportfolio_category_url(@portfolio, @category) }
-          format.json { render :json => @entry.to_json }
+          format.json { render :json => @entry }
         else
         end
       end

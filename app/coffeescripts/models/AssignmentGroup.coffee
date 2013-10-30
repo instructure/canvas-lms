@@ -54,3 +54,7 @@ define [
       assignments = @get('assignments')
       return [] unless assignments?
       assignments.pluck('id')
+
+    hasFrozenAssignments: ->
+      @get('assignments').any (m) ->
+        m.get('frozen')

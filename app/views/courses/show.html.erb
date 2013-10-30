@@ -44,8 +44,10 @@
     <%= nbsp unless @current_user %>
   </div>
   <% if @course_home_view == 'wiki' %>
-    <% js_bundle :wiki %>
-    <%= render :partial => "wiki_pages/wiki_right_side", :locals => {:course_home => true} %>
+    <% unless @context.draft_state_enabled? %>
+      <% js_bundle :wiki %>
+      <%= render :partial => "wiki_pages/wiki_right_side", :locals => {:course_home => true} %>
+    <% end %>
   <% elsif @course_home_view == 'assignments' %>
     <%= render :partial => 'assignments/assignments_list_right_side', :locals => {:course_home => true} %>
   <% elsif @course_home_view == 'syllabus' %>
@@ -250,7 +252,12 @@ This layout is probably best for courses that aren't based on a specific schedul
     <% end %>
   </div>
   <% if @course_home_view == 'wiki' %>
-    <%= render :partial => "wiki_pages/content", :locals => {:course_home => true } %>
+    <% if @context.draft_state_enabled?
+         js_bundle :wiki_page_show %>
+      <div id="wiki_page_show"></div>
+    <% else %>
+      <%= render :partial => "wiki_pages/content", :locals => {:course_home => true } %>
+    <% end %>
   <% elsif @course_home_view == 'modules' %>
     <%= render :partial => 'context_modules/content', :locals => {:course_home => true} %>
   <% elsif @course_home_view == 'assignments' %>
@@ -263,7 +270,7 @@ This layout is probably best for courses that aren't based on a specific schedul
   <% end %>
 </div>
 <% if @context.public_license? %>
-  <div style="margin-top: 20px;">
+  <div class="public-license" style="margin-top: 20px;">
     <a href="<%= @context.license_url %>"><%= image_tag "cc/#{@context.license}.png", :style => "float: left; padding-right: 5px;" %></a>
     <span style="font-size: 0.8em; display: block; line-height: 1.5em;"><%= t 'license_notice', %{This course content is offered under a %{license_type} license.  Content in this course can be considered under this license unless otherwise noted.}, :license_type => content_tag('b', link_to(@context.readable_license, @context.license_url)) %></span>
     <div class="clear"></div>

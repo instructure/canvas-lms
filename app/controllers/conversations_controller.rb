@@ -30,7 +30,7 @@ class ConversationsController < ApplicationController
   before_filter :reject_student_view_student
   before_filter :get_conversation, :only => [:show, :update, :destroy, :add_recipients, :remove_messages]
   before_filter :infer_scope, :only => [:index, :show, :create, :update, :add_recipients, :add_message, :remove_messages]
-  before_filter :normalize_recipients, :only => [:create, :add_recipients, :add_message]
+  before_filter :normalize_recipients, :only => [:create, :add_recipients]
   before_filter :infer_tags, :only => [:create, :add_message, :add_recipients]
 
   # whether it's a bulk private message, or a big group conversation,
@@ -153,8 +153,11 @@ class ConversationsController < ApplicationController
         load_all_contexts :permissions => [:manage_user_notes]
         notes_enabled = @current_user.associated_accounts.any?{|a| a.enable_user_notes }
         can_add_notes_for_account = notes_enabled && @current_user.associated_accounts.any?{|a| a.grants_right?(@current_user, nil, :manage_students) }
+
+        current_user_json = conversation_user_json(@current_user, @current_user, session, :include_participant_avatars => true)
+        current_user_json[:id] = current_user_json[:id].to_s
         hash = {:CONVERSATIONS => {
-            :USER => conversation_users_json([@current_user], @current_user, session, :include_participant_contexts => false).first,
+            :USER => current_user_json,
             :CONTEXTS => @contexts,
             :NOTES_ENABLED => notes_enabled,
             :CAN_ADD_NOTES_FOR_ACCOUNT => can_add_notes_for_account,
@@ -194,7 +197,7 @@ class ConversationsController < ApplicationController
   #
   # @argument subject [Optional, String]
   #   The subject of the conversation. This is ignored when reusing a
-  #   conversation.
+  #   conversation. Maximum length is 255 characters.
   #
   # @argument body [String]
   #   The message to be sent
@@ -275,6 +278,8 @@ class ConversationsController < ApplicationController
       @conversation.add_message(message, :tags => @tags, :update_for_sender => false)
       render :json => [conversation_json(@conversation.reload, @current_user, session, :include_indirect_participants => true, :messages => [message])], :status => :created
     end
+  rescue ActiveRecord::RecordInvalid => err
+    render :json => err.record.errors, :status => :bad_request
   end
 
   # @API
@@ -654,8 +659,17 @@ class ConversationsController < ApplicationController
   def add_message
     get_conversation(true)
     if params[:body].present?
+
+      # if this is from old conversations or an admin message, allow people to respond to anyone who
+      # is already a participant. We might want to allow this in general. this will probably change
+      # when we make the account the context of an admin conversation.
+      if @conversation.conversation.context.blank?
+        params[:from_conversation_id] = @conversation.conversation_id
+      end
+      # not a before_filter because the above check needs to delay this until now
+      normalize_recipients
+
       message = build_message
-      conversation_participants = []
       # find included_messages
       message_ids = params[:included_messages]
       message_ids = message_ids.split(/,/) if message_ids.is_a?(String)
@@ -755,7 +769,9 @@ class ConversationsController < ApplicationController
   # @example_response
   #   {'unread_count': '7'}
   def unread_count
-    render(:json => {'unread_count' => @current_user.unread_conversations_count.to_json})
+    # the reasons for this being a string instead of an integer are historical,
+    # but for backwards API compatibility we need to leave it a string.
+    render :json => {'unread_count' => @current_user.unread_conversations_count.to_s}
   end
   
   def public_feed

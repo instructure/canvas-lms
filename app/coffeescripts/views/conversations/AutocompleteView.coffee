@@ -181,6 +181,7 @@ define [
     #
     # Returns a model object.
     _getModel: (id) ->
+      id = id && String(id)
       result = @resultCollection.find((model) -> model.id == id)
 
     # Internal: Remove the "selected" class from result list items.
@@ -298,7 +299,7 @@ define [
       return if @currentContext.id.match(/course_\d+_(group|section)/)
 
       tag =
-        id:       "#{@currentContext.id}_all"
+        id:       @currentContext.id
         name:     name
         everyone: true
         people: @currentContext.peopleCount

@@ -40,6 +40,13 @@ define [
     equal view.$list.children().length, 2
     equal view.$list.children('.hidden').length, 2
 
+    # case insensitive matching
+    view.$filter.val("B")
+    view.$filter.trigger 'input'
+
+    equal view.$list.children().length, 2
+    equal view.$list.children('.hidden').length, 1
+
 
 
 

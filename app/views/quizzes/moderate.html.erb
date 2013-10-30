@@ -1,4 +1,4 @@
-<% 
+<%
   add_crumb @quiz.title, context_url(@context, :context_quiz_url, @quiz)
   add_crumb t(:page_title, 'Moderate Quiz')
 %>
@@ -54,7 +54,7 @@
         </td>
         <td class="attempts_left number" style="<%= hidden if @quiz.allowed_attempts < 0 %>">
           <% if @quiz.allowed_attempts < 0 %>
-            -- 
+            --
           <% elsif submission %>
             <%= submission.attempts_left %>
           <% else %>
@@ -65,9 +65,12 @@
           <span class="score"><%= submission && submission.kept_score %></span>
         </td>
         <td class="links">
-          <span class="unlocked" title="<%= t('titles.manually_unlocked', "Manually Unlocked") %>" style="<%= hidden unless submission && submission.manually_unlocked %>"><i class="icon-unlock standalone-icon"></i></span>
+          <% manually_unlocked_title = t('titles.manually_unlocked', "Manually Unlocked") %>
+          <% cue_title = t('titles.change_user_extensions', "Change user extensions") %>
+
+          <span class="unlocked" title="<%= manually_unlocked_title %>" style="<%= hidden unless submission && submission.manually_unlocked %>"><i class="icon-unlock standalone-icon"><span class="screenreader-only"><%= manually_unlocked_title %></span></i></span>
           <span class="extra_attempts" style="display: none;"><%= submission && submission.extra_attempts %></span>
-          <a href="#" class="moderate_student_link no-hover" title="<%= t('titles.change_user_extensions', "Change user extensions") %>"><i class="icon-edit standalone-icon"></i></a>
+          <a href="#" class="moderate_student_link no-hover" title="<%= cue_title %>"><i class="icon-edit standalone-icon"><span class="screenreader-only"><%= cue_title %></span></i></a>
         </td>
       </tr>
     <% end %>

@@ -65,6 +65,7 @@ define([
   //      encompassing the request(s) triggered by the submit action and 2. the
   //      formData being posted
   $.fn.formSubmit = function(options) {
+    $(this).markRequired(options);
     this.submit(function(event) {
       var $form = $(this); //this is to handle if bind to a template element, then it gets cloned the original this would not be the same as the this inside of here.
        // disableWhileLoading might need to wrap this, so we don't want to modify the original
@@ -834,7 +835,8 @@ define([
           if (!errors[name]) {
             errors[name] = [];
           }
-          errors[name].push(I18n.t('errors.field_is_required', "This field is required"));
+          var fieldPrompt = $form.getFieldLabelString(name);
+          errors[name].push(I18n.t('errors.required', "Required field")+(fieldPrompt ? ': '+fieldPrompt : ''));
         }
       });
     }
@@ -951,6 +953,7 @@ define([
     });
     var hasErrors = false;
     var highestTop = 0;
+    var lastField = null;
     var currentTop = $(document).scrollTop();
     var errorDetails = {};
     $('#aria_alerts').empty();
@@ -968,7 +971,9 @@ define([
       if (offset.top > highestTop) {
         highestTop = offset.top;
       }
+      lastField = $obj;
     });
+    if (lastField) {lastField.focus();}
     for(var idx in elementErrors) {
       var $obj = elementErrors[idx][0];
       var msg = elementErrors[idx][1];
@@ -1020,14 +1025,15 @@ define([
         left: offset.left + objLeftIndent
       }).fadeIn('fast');
 
-      $obj.data({
-        associated_error_box :$box,
-        associated_error_object: $obj
-      }).focus(function() {
+      var fade = function() {
         $box.fadeOut('slow', function() {
           $box.remove();
         });
-      });
+      };
+      $obj.data({
+        associated_error_box :$box,
+        associated_error_object: $obj
+      }).click(fade).keypress(fade);
 
       $box.click(function() {
         $(this).fadeOut('fast', function() {
@@ -1096,4 +1102,33 @@ define([
     return this;
   };
 
+  $.fn.markRequired = function(options) {
+    if (!options.required) {return;}
+    var required = options.required;
+    if (options.object_name) {
+      required = $._addObjectName(required, options.object_name);
+    }
+    $form = $(this);
+    $.each(required, function(i, name) {
+      var field = $form.find('[name="'+name+'"]');
+      if (!field.length) {return;}
+      field.attr({'aria-required': 'true'});
+      // TODO: enable this, maybe when Safari supports it
+      // field.attr({required: true});
+      field.each(function() {
+        if (!this.id) {return;}
+        label = $('label[for="'+this.id+'"]');
+        if (!label.length) {return;}
+        label.append($('<span />').text('*').attr('title', I18n.t('errors.field_is_required', "This field is required")));
+      });
+    });
+  };
+
+  $.fn.getFieldLabelString = function(name) {
+    var field = $(this).find('[name="'+name+'"]');
+    if (!field.length || !field[0].id) {return;}
+    label = $('label[for="'+field[0].id+'"]');
+    if (!label.length) {return;}
+    return label[0].firstChild.textContent;
+  };
 });

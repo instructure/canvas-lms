@@ -3,6 +3,9 @@
     <tr>
       <td class="individual-app-left" valign="top">
         <img class="img-polaroid" src="{{model.attributes.banner_url}}" />
+        {{#if model.attributes.is_installed}}
+          <div class="gray-box-centered">{{#t "app_already_installed"}}This app has already been installed{{/t}}</div>
+        {{/if}}
         <a class="btn btn-primary btn-block add_app icon-add">
           {{#t "add_tool"}}Add Tool{{/t}}
         </a>
@@ -21,7 +24,7 @@
           <tbody>
             </tr>
             <tr class="data-row">
-              <td valign="top" class="data-label">Extensions:</td>
+              <td valign="top" class="data-label">{{#t "extensions"}}Extensions{{/t}}</td>
               <td valign="top" class="data-value">
                 <ul>
                 {{#each model.attributes.extensions}}
@@ -31,15 +34,15 @@
               </td>
             </tr>
             <tr class="data-row">
-              <td valign="top" class="data-label">Average Rating:</td>
+              <td valign="top" class="data-label">{{#t "average_rating"}}Average Rating{{/t}}</td>
               <td valign="top" class="data-value">{{toPrecision model.attributes.avg_rating 2}}</td>
             </tr>
             <tr class="data-row">
-              <td valign="top" class="data-label">Privacy Level:</td>
+              <td valign="top" class="data-label">{{#t "privacy_level"}}Privacy Level{{/t}}</td>
               <td valign="top" class="data-value">{{titleize model.attributes.privacy_level}}</td>
             </tr>
             <tr class="data-row">
-              <td valign="top" class="data-label">Education Level(s):</td>
+              <td valign="top" class="data-label">{{#t "education_levels"}}Education Level(s){{/t}}</td>
               <td valign="top" class="data-value">
                 <ul>
                 {{#each model.attributes.levels}}
@@ -48,6 +51,12 @@
                 </ul>
               </td>
             </tr>
+            {{#if model.attributes.support_link}}
+              <tr class="data-row">
+                <td valign="top" class="data-label">{{#t "help_link"}}Help Link{{/t}}</td>
+                <td valign="top" class="data-value"><a href="{{model.attributes.support_link}}" target="_blank">{{model.attributes.support_link}}</td>
+              </tr>
+            {{/if}}
           </tbody>
         </table>
       </td>

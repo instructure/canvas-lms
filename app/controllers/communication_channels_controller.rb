@@ -184,7 +184,7 @@ class CommunicationChannelsController < ApplicationController
         flash[:notice] = t 'notices.registration_confirmed', "Registration confirmed!"
         return respond_to do |format|
           format.html { redirect_back_or_default(user_profile_url(@current_user)) }
-          format.json { render :json => cc.to_json(:except => [:confirmation_code] ) }
+          format.json { render :json => cc.as_json(:except => [:confirmation_code] ) }
         end
       end
 
@@ -206,12 +206,12 @@ class CommunicationChannelsController < ApplicationController
             (account_to_pseudonyms_hash[p.account] ||= []) << p
           end
           @merge_opportunities << [user, account_to_pseudonyms_hash.map do |(account, pseudonyms)|
-            pseudonyms.detect { |p| p.sis_user_id } || pseudonyms.sort { |a, b| a.position <=> b.position }.first
+            pseudonyms.detect { |p| p.sis_user_id } || pseudonyms.sort_by(&:position).first
           end]
-          @merge_opportunities.last.last.sort! { |a, b| a.account.name <=> b.account.name }
+          @merge_opportunities.last.last.sort! { |a, b| Canvas::ICU.compare(a.account.name, b.account.name) }
         end
       end
-      @merge_opportunities.sort! { |a, b| [a.first == @current_user ? 0 : 1, a.first.name] <=> [b.first == @current_user ? 0 : 1, b.first.name] }
+      @merge_opportunities.sort_by! { |a| [a.first == @current_user ? SortFirst : SortLast, Canvas::ICU.collation_key(a.first.name)] }
 
       js_env :PASSWORD_POLICY => @domain_root_account.password_policy
 
@@ -323,7 +323,7 @@ class CommunicationChannelsController < ApplicationController
     if failed
       respond_to do |format|
         format.html { render :action => "confirm_failed", :status => :bad_request }
-        format.json { render :json => {}.to_json, :status => :bad_request }
+        format.json { render :json => {}, :status => :bad_request }
       end
     else
       flash[:notice] = t 'notices.registration_confirmed', "Registration confirmed!"
@@ -374,7 +374,7 @@ class CommunicationChannelsController < ApplicationController
         render :json => @cc.as_json
       end
     else
-      render :json => @cc.errors.to_json, :status => :bad_request
+      render :json => @cc.errors, :status => :bad_request
     end
   end
 

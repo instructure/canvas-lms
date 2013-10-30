@@ -39,7 +39,7 @@ class Rubric < ActiveRecord::Base
   serialize :data
   simply_versioned
   
-  scope :publicly_reusable, where(:reusable => true).order(:title)
+  scope :publicly_reusable, lambda { where(:reusable => true).order(best_unicode_collation_key('title')) }
   scope :matching, lambda { |search| where(wildcard('rubrics.title', search)).order("rubrics.association_count DESC") }
   scope :before, lambda { |date| where("rubrics.created_at<?", date) }
   scope :active, where("workflow_state<>'deleted'")
@@ -244,7 +244,7 @@ class Rubric < ActiveRecord::Base
         rating[:id] = unique_item_id(rating_data[:id])
         ratings[jdx.to_i] = rating
       end
-      criterion[:ratings] = ratings.select{|r| r}.sort_by{|r| [-1 * (r[:points] || 0), (r[:description] || "")]}
+      criterion[:ratings] = ratings.select{|r| r}.sort_by{|r| [-1 * (r[:points] || 0), r[:description] || SortFirst]}
       criterion[:points] = criterion[:ratings].map{|r| r[:points]}.max || 0
       points_possible += criterion[:points] unless criterion[:ignore_for_scoring]
       criteria[idx.to_i] = criterion

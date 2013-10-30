@@ -133,9 +133,11 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
 
       get "/courses/#{@course.id}/discussion_topics/new"
       f('#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
-      f('li.folder span').click
-      wait_for_ajaximations
-      ff('li.folder li.file').count.should == 1
+      keep_trying_until do
+        f('li.folder span').click
+        wait_for_ajaximations
+        ff('li.folder li.file').count.should == 1
+      end
       f('li.folder li.file .name').text.should == "foo.txt"
     end
   end

@@ -33,6 +33,12 @@ define [
         @assignmentGroup.get('assignments').add(@model)
         @model = @generateNewAssignment()
 
+    getFormData: =>
+      data = super
+      unfudged = $.unfudgeDateForProfileTimezone(data.due_at)
+      data.due_at = $.dateToISO8601UTC(unfudged) if unfudged?
+      return data
+
     moreOptions: ->
       valid = ['submission_types', 'name', 'due_at', 'points_possible', 'assignment_group_id']
 
@@ -82,4 +88,3 @@ define [
 
     newAssignmentUrl: ->
       ENV.URLS.new_assignment_url
-

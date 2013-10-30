@@ -720,6 +720,16 @@ describe "Module Items API", :type => :integration do
         json['items'][0]['current']['id'].should eql wacky_tag.id
       end
 
+      it "should deal with multiple modules having the same position" do
+        @module2.update_attribute(:position, 1)
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/module_item_sequence?asset_type=quiz&asset_id=#{@quiz.id}",
+                         :controller => "context_module_items_api", :action => "item_sequence", :format => "json",
+                         :course_id => @course.to_param, :asset_type => 'quiz', :asset_id => @quiz.to_param)
+        json['items'].size.should eql 1
+        json['items'][0]['prev']['id'].should eql @assignment_tag.id
+        json['items'][0]['next']['id'].should eql @topic_tag.id
+      end
+
       context "with duplicate items" do
         before do
           @other_quiz_tag = @module3.add_item(:id => @quiz.id, :type => 'quiz')

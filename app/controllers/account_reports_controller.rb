@@ -106,7 +106,7 @@ class AccountReportsController < ApplicationController
         report[:parameters] = parameters unless parameters.length == 0
         results << report
       end
-      render :json => results.to_json
+      render :json => results
 
     end
   end

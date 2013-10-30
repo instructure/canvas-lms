@@ -86,6 +86,16 @@ describe PseudonymSessionsController do
     assigns[:pseudonym_session].should_not be_nil
   end
 
+  it "password auth should work with extra whitespace around unique id " do
+    user_with_pseudonym(:username => 'jt@instructure.com', :active_all => 1, :password => 'qwerty')
+    post 'create', :pseudonym_session => { :unique_id => ' jt@instructure.com ', :password => 'qwerty'}
+    response.should be_redirect
+    response.should redirect_to(dashboard_url(:login_success => 1))
+    assigns[:user].should == @user
+    assigns[:pseudonym].should == @pseudonym
+    assigns[:pseudonym_session].should_not be_nil
+  end
+
   context "ldap" do
     it "should log in a user with a identifier_format" do
       user_with_pseudonym(:username => '12345', :active_all => 1)

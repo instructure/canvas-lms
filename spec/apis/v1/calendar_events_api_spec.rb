@@ -283,7 +283,7 @@ describe CalendarEventsApiController, :type => :integration do
                           :controller => 'calendar_events_api', :action => 'index', :format => 'json',
                           :context_codes => [@course.asset_string], :start_date => '2012-01-01', :end_date => '2012-01-31'})
         json.size.should eql 2
-        json.sort! {|e1, e2| e1['id'] <=> e2['id']}
+        json.sort_by! { |e| e['id'] }
 
         e1json = json.first
         e1json.keys.sort.should eql(expected_slot_fields)
@@ -328,7 +328,7 @@ describe CalendarEventsApiController, :type => :integration do
                           :controller => 'calendar_events_api', :action => 'index', :format => 'json',
                           :context_codes => [group1.asset_string, group2.asset_string], :start_date => '2012-01-01', :end_date => '2012-01-31'})
         json.size.should eql 2
-        json.sort! {|e1, e2| e1['id'] <=> e2['id']}
+        json.sort_by! { |e| e['id'] }
 
         ejson = json.first
         ejson.keys.sort.should eql((expected_slot_fields + ['reserved']).sort)
@@ -445,7 +445,7 @@ describe CalendarEventsApiController, :type => :integration do
                           :controller => 'calendar_events_api', :action => 'index', :format => 'json',
                           :context_codes => [ag1.asset_string, ag2.asset_string], :start_date => '2012-01-01', :end_date => '2012-01-31'})
         json.size.should eql 2
-        json.sort! {|e1, e2| e1['id'] <=> e2['id']}
+        json.sort_by! { |e| e['id'] }
         json.each do |e|
           e.keys.sort.should eql((expected_slot_fields + ['reserved']).sort)
           e['reserved'].should be_true
@@ -1123,7 +1123,7 @@ describe CalendarEventsApiController, :type => :integration do
                 :context_codes => ["course_#{@course.id}"], :start_date => '2012-01-07', :end_date => '2012-01-19', :per_page => '25'})
             json.size.should == 3
             # sort results locally by end_at
-            json.sort! {|a,b| a['end_at'] <=> b['end_at'] }
+            json.sort_by! { |a| a['end_at'] }
             json[0].keys.should_not include('assignment_override')
             json[1]['assignment_overrides'][0]['id'].should == override1.id
             json[2]['assignment_overrides'][0]['id'].should == override2.id
@@ -1180,7 +1180,7 @@ describe CalendarEventsApiController, :type => :integration do
                 :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',
                 :context_codes => ["course_#{@course.id}"], :start_date => '2012-01-07', :end_date => '2012-01-16', :per_page => '25'})
             json.size.should == 2     # both versions
-            json.sort! {|a,b| a['end_at'] <=> b['end_at'] }
+            json.sort_by! { |a| a['end_at'] }
             json[0].keys.should_not include('assignment_override')
             json[0]['end_at'].should == '2012-01-08T12:00:00Z'
             json[1]['assignment_overrides'][0]['id'].should == override.id
@@ -1206,7 +1206,7 @@ describe CalendarEventsApiController, :type => :integration do
                 :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',
                 :context_codes => ["course_#{@course.id}"], :start_date => '2012-01-07', :end_date => '2012-01-16', :per_page => '25'})
             json.size.should == 3     # all versions
-            json.sort! {|a,b| a['end_at'] <=> b['end_at'] }
+            json.sort_by! { |a| a['end_at'] }
             json[0].keys.should_not include('assignment_override')
             json[0]['end_at'].should == '2012-01-08T12:00:00Z'
             json[1]['assignment_overrides'][0]['id'].should == override1.id
@@ -1376,7 +1376,7 @@ describe CalendarEventsApiController, :type => :integration do
                     :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',
                     :context_codes => ["course_#{@course.id}"], :start_date => '2012-01-07', :end_date => '2012-01-16', :per_page => '25'})
                 json.size.should == 2
-                json.sort! {|a,b| a['end_at'] <=> b['end_at'] }
+                json.sort_by! { |a| a['end_at'] }
                 json[0]['end_at'].should == '2012-01-14T12:00:00Z'
                 json[1]['end_at'].should == '2012-01-15T12:00:00Z'
               end
@@ -1410,7 +1410,7 @@ describe CalendarEventsApiController, :type => :integration do
                     :context_codes => ["course_#{@course1.id}", "course_#{@course2.id}"], :start_date => '2012-01-07', :end_date => '2012-01-16', :per_page => '25'})
 
                 json.size.should == 2
-                json.sort! {|a,b| a['end_at'] <=> b['end_at'] }
+                json.sort_by! { |a| a['end_at'] }
                 json[0]['end_at'].should == '2012-01-14T12:00:00Z'
                 json[1]['end_at'].should == '2012-01-15T12:00:00Z'
               end
@@ -1447,7 +1447,7 @@ describe CalendarEventsApiController, :type => :integration do
                 :context_codes => ["course_#{@course.id}"], :start_date => '2012-01-07', :end_date => '2012-01-16', :per_page => '25'})
             json.size.should == 2
             # Should include the default and override in return
-            json.sort! {|a,b| a['end_at'] <=> b['end_at'] }
+            json.sort_by! { |a| a['end_at'] }
             json[0]['end_at'].should == '2012-01-12T12:00:00Z'
             json[0]['override_id'].should be_nil
             json[0].keys.should_not include('assignment_override')

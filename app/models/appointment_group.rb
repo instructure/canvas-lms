@@ -289,15 +289,10 @@ class AppointmentGroup < ActiveRecord::Base
       else                   participants
     end
 
-    two_tier_cmp = lambda do |a, b, attr1, attr2|
-      cmp = a.send(attr1) <=> b.send(attr1)
-      cmp == 0 ? a.send(attr2) <=> b.send(attr2) : cmp
-    end
-
     if participant_type == 'User'
-      participants.sort { |a,b| two_tier_cmp.call(a, b, :sortable_name, :id) }
+      participants.sort_by { |p| [Canvas::ICU.collation_key(p.sortable_name), p.id] }
     else
-      participants.sort { |a,b| two_tier_cmp.call(a, b, :name, :id) }
+      participants.sort_by { |p| [Canvas::ICU.collation_key(p.name), p.id] }
     end
   end
 

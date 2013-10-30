@@ -21,24 +21,24 @@ describe "web conference" do
         fj('.new-conference-btn').displayed?.should be_true
       end
       fj('.new-conference-btn').click
-      wait_for_animations
+      wait_for_ajaximations
       keep_trying_until do
         replace_content(f('#web_conference_title'), conference_title)
         f('#add_conference_form .btn-primary').click
         wait_for_ajaximations
-        fj("#new-conference-list .conference-title").displayed?.should be_true
+        fj("#new-conference-list .ig-title").displayed?.should be_true
       end
-      fj("#new-conference-list .conference-title").text.should contain(conference_title)
+      fj("#new-conference-list .ig-title").text.should contain(conference_title)
     end
 
     it "should cancel creating a web conference" do
       conference_title = 'new conference'
       f('.new-conference-btn').click
-      wait_for_animations
+      wait_for_ajaximations
       keep_trying_until do
         replace_content(f('#web_conference_title'), conference_title)
         f('#add_conference_form button.cancel_button').click
-        wait_for_animations
+        wait_for_ajaximations
       end
       f('#add_conference_form').displayed?.should be_false
     end

@@ -153,7 +153,7 @@ class GradebookHistoryApiController < ApplicationController
   # @returns [Day]
   def days
     days_hash = days_json(@context, api_context(api_v1_gradebook_history_url(@context)))
-    render :json => days_hash.to_json
+    render :json => days_hash
   end
 
   # @API Details for a given date in gradebook history for this course
@@ -172,7 +172,7 @@ class GradebookHistoryApiController < ApplicationController
     date = Date.strptime(params[:date], '%Y-%m-%d').in_time_zone
     path = api_v1_gradebook_history_for_day_url(@context, params[:date])
     day_hash = json_for_date(date, @context, api_context(path))
-    render :json => day_hash.to_json
+    render :json => day_hash
   end
 
   # @API Lists submissions
@@ -195,7 +195,7 @@ class GradebookHistoryApiController < ApplicationController
     date = Date.strptime(params[:date], '%Y-%m-%d').in_time_zone
     path = api_v1_gradebook_history_submissions_url(@context, params[:date], params[:grader_id], params[:assignment_id])
     submissions_hash = submissions_for(@context, api_context(path), date, params[:grader_id], params[:assignment_id])
-    render :json => submissions_hash.to_json
+    render :json => submissions_hash
   end
 
   # @API List uncollated submission versions

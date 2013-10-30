@@ -61,6 +61,14 @@ define([
     if (ENV.AUTHENTICITY_TOKEN) xhr.setRequestHeader('X-CSRF-Token', ENV.AUTHENTICITY_TOKEN);
   }
 
+  // indicate we want stringified IDs for JSON responses
+  $.ajaxPrefilter("json", function( options, originalOptions, jqXHR ) {
+    if (options.accepts.json)
+      options.accepts.json = options.accepts.json + ', application/json+canvas-string-ids';
+    else
+      options.accepts.json = 'application/json+canvas-string-ids';
+  });
+
   $.ajaxPrefilter(function( options, originalOptions, jqXHR ) {
     if ( !options.crossDomain ) CSRFProtection(jqXHR);
 

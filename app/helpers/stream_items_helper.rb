@@ -30,42 +30,47 @@ module StreamItemsHelper
   def categorize_stream_items(stream_items, user = @current_user)
     supported_categories = %w(Announcement Conversation Assignment DiscussionTopic)
     categorized_items = {}
+    return categorized_items unless stream_items.present? # if we have no items (possibly because we have no user), don't try to activate the user's shard
     supported_categories.each { |category| categorized_items[category] = [] }
-    
-    stream_items.each do |item|
-      category = item.data.class.name
-      category = category_for_message(item.data.notification_name) if category == "Message"
 
-      next unless supported_categories.include?(category)
+    # need to query relative to the user's shard for
+    # 1. conversations
+    # 2. the StreamItem#id that gets returned, since we'll use it later to
+    #    look up the user's StreamItemInstances for deletion
+    user.shard.activate do
+      stream_items.each do |item|
+        category = item.data.class.name
+        category = category_for_message(item.data.notification_name) if category == "Message"
 
-      if category == "Conversation"
-        participant = user.shard.activate do
-          # this needs to be queried relative to the user
-          user.conversation_participant(item.asset_id)
+        next unless supported_categories.include?(category)
+
+        if category == "Conversation"
+          participant = user.conversation_participant(item.asset_id)
+
+          next if participant.nil? || participant.last_message.nil? || participant.last_author?
+          item.data.write_attribute(:last_message, participant.last_message)
+          item.data.write_attribute(:last_author, participant.last_message.author)
+
+          # because we're cheating and just checking unread here instead of using
+          # the workflow_state on the stream_item_instance, that workflow_state
+          # may be out of sync with the underlying conversation.
+          item.data.write_attribute(:unread, participant.unread?)
+        elsif category == "Assignment"
+          # TODO: this handles an edge case for old stream items where their
+          # context code was getting set to "assignment_x" instead of "course_y".
+          # Can be removed when either:
+          # - we switch to direct send_to_stream for assignments
+          # - no more stream items have this bad data in production
+          next if item.context_type == "Assignment"
         end
-        next if participant.nil? || participant.last_message.nil? || participant.last_author?
-        item.data.write_attribute(:last_message, participant.last_message)
-        item.data.write_attribute(:last_author, participant.last_message.author)
 
-        # because we're cheating and just checking unread here instead of using
-        # the workflow_state on the stream_item_instance, that workflow_state
-        # may be out of sync with the underlying conversation.
-        item.data.write_attribute(:unread, participant.unread?)
-      elsif category == "Assignment"
-        # TODO: this handles an edge case for old stream items where their
-        # context code was getting set to "assignment_x" instead of "course_y".
-        # Can be removed when either:
-        # - we switch to direct send_to_stream for assignments
-        # - no more stream items have this bad data in production
-        next if item.context_type == "Assignment"
-      end
+        if ["DiscussionTopic","Announcement"].include? category
+          item.data.reload
+          next if item.data.try(:visible_for?, user) == false
+        end
 
-      if ["DiscussionTopic","Announcement"].include? category
-        item.data.reload
-        next if item.data.try(:visible_for?, user) == false
+        categorized_items[category] << generate_presenter(category, item)
       end
-      
-      categorized_items[category] << generate_presenter(category, item)
     end
     categorized_items
   end

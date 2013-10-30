@@ -221,9 +221,7 @@ class Attachment < ActiveRecord::Base
     existing ||= self.cloned_item_id ? context.attachments.find_by_cloned_item_id(self.cloned_item_id) : nil
     dup ||= Attachment.new
     dup = existing if existing && options[:overwrite]
-    self.attributes.delete_if{|k,v| [:id, :root_attachment_id, :uuid, :folder_id, :user_id, :filename].include?(k.to_sym) }.each do |key, val|
-      dup.send("#{key}=", val)
-    end
+    dup.send(:attributes=, self.attributes.except(*%w[id root_attachment_id uuid folder_id user_id filename namespace]), false)
     dup.write_attribute(:filename, self.filename)
     # avoid cycles (a -> b -> a) and self-references (a -> a) in root_attachment_id pointers
     if dup.new_record? || ![self.id, self.root_attachment_id].include?(dup.id)
@@ -301,7 +299,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def assert_attachment
-    if !self.to_be_zipped? && !self.zipping? && !self.errored? && (!filename || !content_type || !downloadable?)
+    if !self.to_be_zipped? && !self.zipping? && !self.errored? && !self.deleted? && (!filename || !content_type || !downloadable?)
       self.errors.add_to_base(t('errors.not_found', "File data could not be found"))
       return false
     end
@@ -550,7 +548,8 @@ class Attachment < ActiveRecord::Base
     #
     # I've added the root_account_id accessor above, but I didn't verify there
     # isn't any code still accessing the namespace for the account id directly.
-    ns = Attachment.domain_namespace
+    ns = root_attachment.try(:namespace) if root_attachment_id
+    ns ||= Attachment.domain_namespace
     ns ||= self.context.root_account.file_namespace rescue nil
     ns ||= self.context.account.file_namespace rescue nil
     if Rails.env.development? && Attachment.local_storage?
@@ -592,10 +591,28 @@ class Attachment < ActiveRecord::Base
     self.size = details[:content_length]
 
     if existing_attachment = find_existing_attachment_for_md5
-      s3object.delete rescue nil
-      self.root_attachment = existing_attachment
-      write_attribute(:filename, nil)
-      clear_cached_urls
+      if existing_attachment.s3object.exists?
+        # deduplicate. the existing attachment's s3object should be the same as
+        # that just uploaded ('cuz md5 match). delete the new copy and just
+        # have this attachment inherit from the existing attachment.
+        s3object.delete rescue nil
+        self.root_attachment = existing_attachment
+        write_attribute(:filename, nil)
+        clear_cached_urls
+      else
+        # it looks like we had a duplicate, but the existing attachment doesn't
+        # actually have an s3object (probably from an earlier bug). update it
+        # and all its inheritors to inherit instead from this attachment.
+        existing_attachment.root_attachment = self
+        existing_attachment.write_attribute(:filename, nil)
+        existing_attachment.clear_cached_urls
+        existing_attachment.save!
+        Attachment.where(root_attachment_id: existing_attachment).update_all(
+          root_attachment_id: self,
+          filename: nil,
+          cached_scribd_thumbnail: nil,
+          updated_at: Time.zone.now)
+      end
     end
 
     save!

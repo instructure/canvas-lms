@@ -95,7 +95,7 @@ else
 
   # Patch for CVE-2013-0155
   # https://groups.google.com/d/topic/rubyonrails-security/c7jT-EeN9eI/discussion
-  # The one changed line is flagged
+  # Also fixes problem with nested conditions containing ?
   class ActiveRecord::Base
     class << self
       def sanitize_sql_hash_for_conditions(attrs, default_table_name = quoted_table_name, top_level = true)
@@ -104,6 +104,7 @@ else
         # This is the one modified line
         raise(ActiveRecord::StatementInvalid, "non-top-level hash is empty") if !top_level && attrs.is_a?(Hash) && attrs.empty?
 
+        nested_conditions = []
         conditions = attrs.map do |attr, value|
           table_name = default_table_name
 
@@ -120,13 +121,15 @@ else
 
             attribute_condition("#{attr_table_name}.#{connection.quote_column_name(attr)}", value)
           elsif top_level
-            sanitize_sql_hash_for_conditions(value, connection.quote_table_name(attr.to_s), false)
+            nested_conditions << sanitize_sql_hash_for_conditions(value, connection.quote_table_name(attr.to_s), false)
+            nil
           else
             raise ActiveRecord::StatementInvalid
           end
-        end.join(' AND ')
+        end.compact.join(' AND ').presence
 
-        replace_bind_variables(conditions, expand_range_bind_variables(attrs.values))
+        conditions = replace_bind_variables(conditions, expand_range_bind_variables(attrs.values)) if conditions
+        [conditions, *nested_conditions].compact.join(' AND ')
       end
       alias_method :sanitize_sql_hash, :sanitize_sql_hash_for_conditions
     end

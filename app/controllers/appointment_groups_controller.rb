@@ -278,7 +278,7 @@ class AppointmentGroupsController < ApplicationController
         @group.publish! if publish
         render :json => appointment_group_json(@group, @current_user, session), :status => :created
       else
-        render :json => @group.errors.to_json, :status => :bad_request
+        render :json => @group.errors, :status => :bad_request
       end
     end
   end
@@ -373,7 +373,7 @@ class AppointmentGroupsController < ApplicationController
         @group.publish! if publish
         render :json => appointment_group_json(@group, @current_user, session)
       else
-        render :json => @group.errors.to_json, :status => :bad_request
+        render :json => @group.errors, :status => :bad_request
       end
     end
   end
@@ -398,7 +398,7 @@ class AppointmentGroupsController < ApplicationController
       if @group.destroy
         render :json => appointment_group_json(@group, @current_user, session)
       else
-        render :json => @group.errors.to_json, :status => :bad_request
+        render :json => @group.errors, :status => :bad_request
       end
     end
   end

@@ -9,7 +9,6 @@ define [
 ], ( _, AssignmentGroup, NeverDropCollection, NeverDropCollectionView, DialogFormView, template, wrapper) ->
 
   class CreateGroupView extends DialogFormView
-
     defaults:
       width: 600
       height: 500

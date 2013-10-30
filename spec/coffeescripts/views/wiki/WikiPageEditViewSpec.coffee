@@ -31,29 +31,45 @@ define [
     wikiPageEditView.render()
     ok @attachWikiEditorStub.calledOnce, 'Attached wikisidebar to body'
 
-  module 'WikiPageEditView:UnsavedChanges',
-    setup: ->
-      @initStub = sinon.stub(wikiSidebar, 'init')
-      @scrollSidebarStub = sinon.stub($, 'scrollSidebar')
-      @attachWikiEditorStub = sinon.stub(wikiSidebar, 'attachToEditor')
-      @attachWikiEditorStub.returns(show: sinon.stub())
 
-      @wikiPage = new WikiPage
-      @view = new WikiPageEditView
-        model: @wikiPage
-      @view.$el.appendTo $('#fixtures')
+  module 'WikiPageEditView:UnsavedChanges'
+  setupUnsavedChangesTest = (test, attributes) ->
+    setup = ->
+      @stub($, 'scrollSidebar')
+      @stub(wikiSidebar, 'init')
+      @stub(wikiSidebar, 'attachToEditor').returns(show: @stub())
+
+      @wikiPage = new WikiPage attributes
+      @view = new WikiPageEditView model: @wikiPage
+      @view.$el.appendTo('#fixtures')
       @view.render()
 
-      @titleInput = @view.$el.find('[name="title"]')
-      @bodyInput = @view.$el.find('[name="body"]')
-    teardown: ->
-      @scrollSidebarStub.restore()
-      @initStub.restore()
-      @attachWikiEditorStub.restore()
-      @view.remove()
-      $(window).off('beforeunload')
+      @titleInput = @view.$el.find('[name=title]')
+      @bodyInput = @view.$el.find('[name=body]')
+
+      # stub the 'is_dirty' command of the editorBox
+      model = @wikiPage
+      bodyInput = @bodyInput
+      editorBox = bodyInput.editorBox
+      @stub $.fn, 'editorBox', (options) ->
+        if options == 'is_dirty'
+          return bodyInput.val() != model.get('body')
+        else
+          editorBox.apply(this, arguments)
+
+      # extend the teardown function
+      teardown = @teardown
+      @teardown = ->
+        teardown.apply(this, arguments)
+
+        @view.remove()
+        $(window).off('beforeunload')
+
+    setup.call(test, attributes)
 
   test 'check for unsaved changes on new model', ->
+    setupUnsavedChangesTest(this, title: '', body: '')
+
     @titleInput.val('blah')
     ok @view.getFormData().title == 'blah', "blah"
     ok @view.hasUnsavedChanges(), 'Changed title'
@@ -65,11 +81,8 @@ define [
     ok !@view.hasUnsavedChanges(), 'Unchanged body'
 
   test 'check for unsaved changes on model with data', ->
-    @wikiPage.set('title', 'nooo')
-    @wikiPage.set('body', 'blargh')
+    setupUnsavedChangesTest(this, title: 'nooo', body: 'blargh')
 
-    @titleInput.val('nooo')
-    @bodyInput.val('blargh')
     ok !@view.hasUnsavedChanges(), 'No changes'
     @titleInput.val('')
     ok @view.hasUnsavedChanges(), 'Changed title'
@@ -79,33 +92,33 @@ define [
     ok @view.hasUnsavedChanges(), 'Changed body'
 
   test 'warn on cancel if unsaved changes', ->
+    setupUnsavedChangesTest(this, title: 'nooo', body: 'blargh')
+    @spy(@view, 'trigger')
+    @stub(window, 'confirm')
     @titleInput.val('mwhaha')
 
-    confirmStub = sinon.stub window, 'confirm'
-    confirmStub.returns false
-
-    sinonSpy = sinon.spy(@view, 'trigger')
-
+    window.confirm.returns(false)
     @view.$el.find('.cancel').click()
-    ok confirmStub.calledOnce, 'Warn on cancel'
-    ok !sinonSpy.calledWith('cancel'), "Don't trigger cancel if declined"
+    ok window.confirm.calledOnce, 'Warn on cancel'
+    ok !@view.trigger.calledWith('cancel'), "Don't trigger cancel if declined"
 
-    confirmStub.restore()
-    confirmStub = sinon.stub window, 'confirm'
-    confirmStub.returns true
+    window.confirm.reset()
+    @view.trigger.reset()
 
+    window.confirm.returns(true)
     @view.$el.find('.cancel').click()
-    ok confirmStub.calledOnce, 'Warn on cancel again'
-    ok sinonSpy.calledWith('cancel'), "Do trigger cancel if accepted"
-
-    confirmStub.restore()
+    ok window.confirm.calledOnce, 'Warn on cancel again'
+    ok @view.trigger.calledWith('cancel'), 'Do trigger cancel if accepted'
 
   test 'warn on leaving if unsaved changes', ->
+    setupUnsavedChangesTest(this, title: 'nooo', body: 'blargh')
+
     strictEqual $(window).triggerHandler('beforeunload'), undefined, "No warning if not changed"
 
     @titleInput.val('mwhaha')
 
     ok $(window).triggerHandler('beforeunload') != undefined, "Returns warning if changed"
+
 
   module 'WikiPageEditView:Validate'
 

@@ -68,6 +68,8 @@ $(document).ready(function() {
   });
 
   $("#register_sms_number,#register_email_address").formSubmit({
+    object_name: 'communication_channel',
+    required: ['address'],
     beforeSubmit: function(data) {
       var $list = $(".email_channels");
       var data = $(this).getFormData({object_name: 'communication_channel'});

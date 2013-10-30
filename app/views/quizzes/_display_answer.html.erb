@@ -111,8 +111,11 @@
     <% end %>
     <div class="numerical_range_answer answer_type" <%= hidden(true) unless number_type == 'equation' %>>
       <span class="answer_equation"><%= hash_get(answer, :answer) || hash_get(answer, :exact) %></span>
-      <span class="margin" style="<%= hidden unless hash_get(question, :answer_tolerance, 0) > 0 %>">
-        <span style="font-size: 0.8em;"><%= t(:plus_or_minus, "+/-") %></span>
+      <span class="margin" style="<%= hidden unless hash_get(question, :answer_tolerance, 0).to_f > 0 %>">
+        <%= t(:margin_of_error, "margin of error") %>
+        <span style="font-size: 0.8em;">
+          <%= t(:plus_or_minus, "+/-") %>
+        </span>
         <span class="answer_tolerance"><%= hash_get(question, :answer_tolerance) %></span>
       </span>
     </div>

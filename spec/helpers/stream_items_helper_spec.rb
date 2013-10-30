@@ -76,6 +76,26 @@ describe StreamItemsHelper do
       @student.recent_stream_items.should_not include @group_assignment_discussion
       @teacher.recent_stream_items.should_not include @group_assignment_discussion
     end
+
+    context "across shards" do
+      specs_require_sharding
+
+      it "stream item ids should always be relative to the user's shard" do
+        course_with_teacher(:active_all => 1)
+        @user2 = @shard1.activate { user_model }
+        @course.enroll_student(@user2).accept!
+        dt = @course.discussion_topics.create!(:title => 'title')
+
+        items = @user2.recent_stream_items
+        categorized = helper.categorize_stream_items(items, @user2)
+        categorized1 = @shard1.activate{ helper.categorize_stream_items(items, @user2) }
+        categorized2 = @shard2.activate{ helper.categorize_stream_items(items, @user2) }
+        si_id = @shard1.activate { items[0].id }
+        categorized["DiscussionTopic"][0].stream_item_id.should == si_id
+        categorized1["DiscussionTopic"][0].stream_item_id.should == si_id
+        categorized2["DiscussionTopic"][0].stream_item_id.should == si_id
+      end
+    end
   end
 
   context "extract_path" do

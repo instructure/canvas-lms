@@ -7,9 +7,11 @@ define [
   'compiled/views/assignments/CreateAssignmentView'
   'compiled/views/assignments/CreateGroupView'
   'compiled/views/assignments/DeleteGroupView'
+  'compiled/views/MoveDialogView'
   'compiled/fn/preventDefault'
   'jst/assignments/AssignmentGroupListItem'
-], (I18n, _, Cache, DraggableCollectionView, AssignmentListItemView, CreateAssignmentView, CreateGroupView, DeleteGroupView, preventDefault, template) ->
+], (I18n, _, Cache, DraggableCollectionView, AssignmentListItemView, CreateAssignmentView,
+  CreateGroupView, DeleteGroupView, MoveDialogView, preventDefault, template) ->
 
   class AssignmentGroupListItemView extends DraggableCollectionView
     @optionProperty 'course'
@@ -22,11 +24,13 @@ define [
     @child 'createAssignmentView', '[data-view=createAssignment]'
     @child 'editGroupView', '[data-view=editAssignmentGroup]'
     @child 'deleteGroupView', '[data-view=deleteAssignmentGroup]'
+    @child 'moveGroupView', '[data-view=moveAssignmentGroup]'
 
     els: _.extend({}, @::els, {
       '.add_assignment': '$addAssignmentButton'
       '.delete_group': '$deleteGroupButton'
       '.edit_group': '$editGroupButton'
+      '.move_group': '$moveGroupButton'
     })
 
     events:
@@ -40,11 +44,15 @@ define [
     # this should eventually happen at a higher level (eg for all views), but
     # we need to make sure that all children view are also children dom
     # elements first.
-    render: ->
+    render: =>
       @createAssignmentView.remove() if @createAssignmentView
       @editGroupView.remove() if @editGroupView
       @deleteGroupView.remove() if @deleteGroupView
+      @moveGroupView.remove() if @moveGroupView
       super(@canManage())
+
+      # reset the model's view property; it got overwritten by child views
+      @model.view = this if @model
 
     afterRender: ->
       # need to hide child views and set trigger manually
@@ -59,6 +67,10 @@ define [
       if @deleteGroupView
         @deleteGroupView.hide()
         @deleteGroupView.setTrigger @$deleteGroupButton
+
+      if @moveGroupView
+        @moveGroupView.hide()
+        @moveGroupView.setTrigger @$moveGroupButton
 
       if @model.hasRules()
         @createRulesToolTip()
@@ -88,12 +100,13 @@ define [
         assign.doNotParse() if assign.multipleDueDates()
 
       @collection = @model.get('assignments')
-      @collection.on 'add', @expand
+      @collection.on 'add',  => @expand(false)
 
     initializeChildViews: ->
       @editGroupView = false
       @createAssignmentView = false
       @deleteGroupView = false
+      @moveGroupView = false
 
       if @canManage()
         @editGroupView = new CreateGroupView
@@ -102,6 +115,9 @@ define [
           assignmentGroup: @model
         @deleteGroupView = new DeleteGroupView
           model: @model
+        @moveGroupView = new MoveDialogView
+          model: @model
+          saveURL: -> ENV.URLS.sort_url
 
     initCache: ->
       $.extend true, @, Cache
@@ -110,17 +126,37 @@ define [
       if !@cache.get(key)?
         @cache.set(key, true)
 
+    initSort: ->
+      super
+      @$list.on('sortactivate', @startSort)
+        .on('sortdeactivate', @endSort)
+
+    startSort: (e, ui) =>
+      # When there is 1 assignment in this group and you drag an assignment
+      # from another group, don't insert the noItemView
+      if @collection.length == 1 && $(ui.placeholder).data("group") == @model.id
+        @insertNoItemView()
+
+    endSort: (e, ui) =>
+      if @collection.length == 0 && @$list.children().length < 1
+        @insertNoItemView()
+      else if @$list.children().length > 1
+        @removeNoItemView()
+
     toJSON: ->
       data = @model.toJSON()
       showWeight = @course?.get('apply_assignment_group_weights') and data.group_weight?
+      canMove = @model.collection.length > 1
 
       attributes = _.extend(data, {
+        canMove: canMove
         showRules: @model.hasRules()
         rulesText: I18n.t('rules_text', "Rule", { count: @model.countRules() })
         displayableRules: @displayableRules()
         showWeight: showWeight
         groupWeight: data.group_weight
         toggleMessage: @messages.toggleMessage
+        hasFrozenAssignments: @model.hasFrozenAssignments? and @model.hasFrozenAssignments()
       })
 
     displayableRules: ->
@@ -158,25 +194,70 @@ define [
 
       results
 
-    isExpanded: ->
+    search: (regex) ->
+      atleastone = false
+      @collection.each (as) =>
+        atleastone = true if as.assignmentView.search(regex)
+      if atleastone
+        @show()
+        @expand(false)
+      else
+        @hide()
+      atleastone
+
+    endSearch: ->
+      @show()
+      @collapseIfNeeded()
+      @resetNoToggleCache()
+      @collection.each (as) =>
+        as.assignmentView.endSearch()
+
+    shouldBeExpanded: ->
       @cache.get(@cacheKey())
 
-    expand: =>
-      @toggle(true) if !@isExpanded()
+    collapseIfNeeded: ->
+      @collapse(false) unless @shouldBeExpanded()
 
-    toggle: (setTo=false) ->
+    expand: (toggleCache=true) =>
+      @_setNoToggleCache() unless toggleCache
+      @toggleCollapse() unless @currentlyExpanded()
+
+    collapse: (toggleCache=true) =>
+      @_setNoToggleCache() unless toggleCache
+      @toggleCollapse() if @currentlyExpanded()
+
+    toggleCollapse: (toggleCache=true) ->
+      @_setNoToggleCache() unless toggleCache
       @$el.find('.element_toggler').click()
-      @cache.set(@cacheKey(), setTo)
+
+    _setNoToggleCache: ->
+      @$el.find('.element_toggler').data("noToggleCache", true)
+
+    currentlyExpanded: ->
+      # the 2 states of the element toggler are true and "false"
+      if @$el.find('.element_toggler').attr("aria-expanded") == "false"
+        false
+      else
+        true
 
     cacheKey: ->
       ["course", @course.get('id'), "user", @currentUserId(), "ag", @model.get('id'), "expanded"]
 
-    toggleArrow: (ev) ->
+    toggleArrow: (ev) =>
       arrow = $(ev.currentTarget).children('i')
       arrow.toggleClass('icon-mini-arrow-down').toggleClass('icon-mini-arrow-right')
-      @toggleExpanded()
+      @toggleCache() unless $(ev.currentTarget).data("noToggleCache")
+      #reset noToggleCache because it is a one-time-use-only flag
+      @resetNoToggleCache(ev.currentTarget)
 
-    toggleExpanded: ->
+    resetNoToggleCache: (selector=null) ->
+      if selector?
+        obj = $(selector)
+      else
+        obj = @$el.find('.element_toggler')
+      obj.data("noToggleCache", false)
+
+    toggleCache: ->
       key = @cacheKey()
       expanded = !@cache.get(key)
       @cache.set(key, expanded)

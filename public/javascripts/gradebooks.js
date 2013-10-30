@@ -71,6 +71,7 @@ define([
       $courseSections  = $(".outer_student_name .course_section"),
       contextId = $("#current_context_code").text().split("_")[1],
       sectionToShow = userSettings.contextGet('grading_show_only_section');
+  sectionToShow = sectionToShow && String(sectionToShow);
 
   $courseSections.each(function(){
     possibleSections[$(this).data('course_section_id')] = $(this).attr('title'); 

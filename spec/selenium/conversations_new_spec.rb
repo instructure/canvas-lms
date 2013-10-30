@@ -97,7 +97,7 @@ describe "conversations new" do
 
   def compose(options={})
     fj('#compose-btn').click
-    wait_for_animations
+    wait_for_ajaximations
     select_message_course(options[:course]) if options[:course]
     (options[:to] || []).each {|recipient| add_message_recipient recipient}
     set_message_subject(options[:subject]) if options[:subject]
@@ -219,59 +219,6 @@ describe "conversations new" do
     end
   end
 
-  describe "replying" do
-    before do
-      cp = conversation(@s1, @teacher, @s2, workflow_state: 'unread')
-      @convo = cp.conversation
-      @convo.update_attribute(:subject, 'homework')
-      @convo.add_message(@s1, "What's this week's homework?")
-      @convo.add_message(@s2, "I need the homework too.")
-    end
-
-    it "should maintain context and subject" do
-      get_conversations
-      conversation_elements[0].click
-      wait_for_ajaximations
-      fj('#reply-btn').click
-      fj('#compose-message-course').should have_attribute(:disabled, 'true')
-      fj('#compose-message-course').should have_value(@course.id.to_s)
-      fj('#compose-message-subject').should have_attribute(:disabled, 'true')
-      fj('#compose-message-subject').should have_value(@convo.subject)
-    end
-
-    it "should address replies to the most recent author by default" do
-      get_conversations
-      conversation_elements[0].click
-      wait_for_ajaximations
-      fj('#reply-btn').click
-      ffj('input[name="recipients[]"]').length.should == 1
-      fj('input[name="recipients[]"]').should have_value(@s2.id.to_s)
-    end
-
-    it "should add new messages to the conversation" do
-      get_conversations
-      initial_message_count = @convo.conversation_messages.length
-      conversation_elements[0].click
-      wait_for_ajaximations
-      fj('#reply-btn').click
-      set_message_body('Read chapters five and six.')
-      click_send
-      wait_for_ajaximations
-      ffj('.message-item-view').length.should == initial_message_count + 1
-      @convo.reload
-      @convo.conversation_messages.length.should == initial_message_count + 1
-    end
-
-    it "should not allow adding recipients to private messages" do
-      @convo.update_attribute(:private_hash, '12345')
-      get_conversations
-      conversation_elements[0].click
-      wait_for_ajaximations
-      fj('#reply-btn').click
-      fj('.compose_form .ac-input-box.disabled').should_not be_nil
-    end
-  end
-
   describe "view filter" do
     before do
       conversation(@teacher, @s1, @s2, workflow_state: 'unread')
@@ -329,14 +276,14 @@ describe "conversations new" do
     it "should filter by course" do
       get_conversations
       select_course(@course.id)
-      conversation_elements.size.should eql 2 
+      conversation_elements.size.should eql 2
     end
 
     it "should filter by course plus view" do
       get_conversations
       select_course(@course.id)
       select_view('unread')
-      conversation_elements.size.should eql 1 
+      conversation_elements.size.should eql 1
     end
 
     it "should hide the spinner after deleting the last conversation" do

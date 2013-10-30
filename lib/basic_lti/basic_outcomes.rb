@@ -197,9 +197,18 @@ to because the assignment has no points possible.
         self.description = I18n.t('lib.basic_lti.no_points_possible', 'Assignment has no points possible.')
       else
         if submission_hash[:submission_type] != 'external_tool'
-          assignment.submit_homework(user, submission_hash.clone)
+          @submission = assignment.submit_homework(user, submission_hash.clone)
         end
-        @submission = assignment.grade_student(user, submission_hash).first
+
+        if new_score
+          @submission = assignment.grade_student(user, submission_hash).first
+        end
+
+        unless @submission
+          self.code_major = 'failure'
+          self.description = I18n.t('lib.basic_lti.no_submission_created', 'This outcome request failed to create a new homework submission.')
+        end
+        
         self.body = "<replaceResultResponse />"
       end
 

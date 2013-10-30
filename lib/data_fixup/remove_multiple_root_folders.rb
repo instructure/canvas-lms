@@ -32,9 +32,7 @@ module DataFixup::RemoveMultipleRootFolders
 
           main_root_folder = context_root_folders.select{|folder|
             folder.name == root_folder_name
-          }.sort{|f1, f2|
-            f2.attachments.count + f2.sub_folders.count <=> f1.attachments.count + f1.sub_folders.count
-          }.first
+          }.sort_by {|f| f.attachments.count + f.sub_folders.count }.last
 
           if main_root_folder.nil?
             main_root_folder = Folder.new(

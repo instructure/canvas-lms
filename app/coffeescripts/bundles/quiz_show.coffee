@@ -4,6 +4,7 @@ require [
   'quiz_rubric'
   'message_students'
   'jquery.disableWhileLoading'
+  'compiled/jquery/ModuleSequenceFooter'
 ], (inputMethods) ->
   $ ->
     inputMethods.setWidths()
@@ -22,3 +23,11 @@ require [
         versions.html(data)
         versions.css(height: "auto")
       versions.disableWhileLoading(dfd)
+
+    # Add module sequence footer
+    $('#module_sequence_footer').moduleSequenceFooter(
+      courseID: ENV.COURSE_ID
+      assetType: 'Quiz'
+      assetID: ENV.QUIZ.id
+      location: location
+    )

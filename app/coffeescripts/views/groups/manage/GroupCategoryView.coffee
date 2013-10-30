@@ -2,7 +2,9 @@ define [
   'i18n!groups'
   'underscore'
   'Backbone'
+  'compiled/views/MessageStudentsDialog',
   'compiled/views/groups/manage/GroupCategoryDetailView'
+  'compiled/views/groups/manage/GroupCategoryEditView'
   'compiled/views/groups/manage/GroupsView'
   'compiled/views/groups/manage/UnassignedUsersView'
   'compiled/views/groups/manage/AddUnassignedMenu'
@@ -11,7 +13,8 @@ define [
   'compiled/models/Group'
   'jst/groups/manage/groupCategory'
   'compiled/jquery.rails_flash_notifications'
-], (I18n, _, {View}, GroupCategoryDetailView, GroupsView, UnassignedUsersView, AddUnassignedMenu, AssignToGroupMenu, GroupEditView, Group, template) ->
+  'jquery.disableWhileLoading'
+], (I18n, _, {View}, MessageStudentsDialog, GroupCategoryDetailView, GroupCategoryEditView, GroupsView, UnassignedUsersView, AddUnassignedMenu, AssignToGroupMenu, GroupEditView, Group, template) ->
 
   class GroupCategoryView extends View
 
@@ -25,6 +28,8 @@ define [
     @child 'groupsView', '[data-view=groups]'
 
     events:
+      'click .message-all-unassigned': 'messageAllUnassigned'
+      'click .edit-category': 'editCategory'
       'click .delete-category': 'deleteCategory'
       'click .add-group': 'addGroup'
 
@@ -39,12 +44,14 @@ define [
       if progress = @model.get('progress')
         @model.progressModel.set progress
         @randomlyAssignStudentsInProgress = true
+      else if @model.get('progress_url') or @model.progressStarting
+        @randomlyAssignStudentsInProgress = true
       super
 
     groupsView: (options) ->
       addUnassignedMenu = null
       if ENV.IS_LARGE_ROSTER
-        users = @model.unassignedUsers(false)
+        users = @model.unassignedUsers()
         addUnassignedMenu = new AddUnassignedMenu collection: users
       new GroupsView {
         collection: @groups
@@ -55,7 +62,7 @@ define [
       return false if ENV.IS_LARGE_ROSTER
       assignToGroupMenu = new AssignToGroupMenu collection: @groups
       new UnassignedUsersView {
-        collection: @model.unassignedUsers(false)
+        collection: @model.unassignedUsers()
         groupsCollection: @groups
         assignToGroupMenu
       }
@@ -68,7 +75,7 @@ define [
       @model.progressModel.on 'change', @render
       @model.on 'progressResolved', =>
         @model.groups().fetch()
-        @model.unassignedUsers().fetch()
+        @model.unassignedUsers().reset()
         @randomlyAssignStudentsInProgress = false
         @render()
 
@@ -93,3 +100,31 @@ define [
       json.randomlyAssignStudentsInProgress = @randomlyAssignStudentsInProgress
       json
 
+    editCategory: ->
+      @editCategoryView ?= new GroupCategoryEditView({@model})
+      @editCategoryView.open()
+
+    messageAllUnassigned: (e) ->
+      e.preventDefault()
+      disabler = $.Deferred()
+      @$el.disableWhileLoading disabler
+      disabler.done =>
+        # display the dialog when all data is ready
+        students = @model.unassignedUsers().map (user)->
+          {id: user.get("id"), short_name: user.get("short_name")}
+        dialog = new MessageStudentsDialog
+          context: @model.get 'name'
+          recipientGroups: [
+            {name: I18n.t('students_who_have_not_joined_a_group', 'Students who have not joined a group'), recipients: students}
+          ]
+        dialog.open()
+      users = @model.unassignedUsers()
+      # get notified when last page is fetched and then open the dialog
+      users.on 'fetched:last', =>
+        disabler.resolve()
+      # ensure all data is loaded before displaying dialog
+      if users.urls.next?
+        users.loadAll = true
+        users.fetch page: 'next'
+      else
+        disabler.resolve()

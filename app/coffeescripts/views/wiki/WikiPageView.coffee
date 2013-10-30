@@ -24,11 +24,15 @@ define [
     events:
       'click .delete_page': 'deleteWikiPage'
 
+    @optionProperty 'modules_path'
     @optionProperty 'wiki_pages_path'
     @optionProperty 'wiki_page_edit_path'
     @optionProperty 'wiki_page_history_path'
     @optionProperty 'WIKI_RIGHTS'
     @optionProperty 'PAGE_RIGHTS'
+    @optionProperty 'course_id'
+    @optionProperty 'course_home'
+    @optionProperty 'course_title'
 
     initialize: ->
       @model.on 'change', => @render()
@@ -37,8 +41,9 @@ define [
       @PAGE_RIGHTS ||= {}
 
     render: ->
-      # detach the publish button to preserve data/events
+      # detach elements to preserve data/events
       @publishButtonView?.$el.detach()
+      @$sequenceFooter?.detach()
 
       super
 
@@ -48,6 +53,19 @@ define [
         @model.view = @
       @publishButtonView.$el.appendTo(@$publishButton)
       @publishButtonView.render()
+
+      # attach/re-attach the sequence footer (if this is a course, but not the home page)
+      unless @$sequenceFooter || @course_home || !@course_id
+        @$sequenceFooter ||= $('<div></div>').hide()
+        @$sequenceFooter.moduleSequenceFooter(
+          courseID: @course_id
+          assetType: 'Page'
+          assetID: @model.get('url')
+          location: location
+        )
+      else
+        @$sequenceFooter?.msfAnimation(false)
+      @$sequenceFooter.appendTo(@$el) if @$sequenceFooter
 
     afterRender: ->
       super
@@ -72,15 +90,26 @@ define [
 
     toJSON: ->
       json = super
+      json.modules_path = @modules_path
       json.wiki_pages_path = @wiki_pages_path
       json.wiki_page_edit_path = @wiki_page_edit_path
       json.wiki_page_history_path = @wiki_page_history_path
+      json.course_home = @course_home
+      json.course_title = @course_title
       json.CAN =
         VIEW_PAGES: !!@WIKI_RIGHTS.read
         PUBLISH: !!@WIKI_RIGHTS.manage && json.contextName == 'courses'
         UPDATE_CONTENT: !!@PAGE_RIGHTS.update || !!@PAGE_RIGHTS.update_content
-        DELETE: !!@PAGE_RIGHTS.delete
+        DELETE: !!@PAGE_RIGHTS.delete && !@course_home
         READ_REVISIONS: !!@PAGE_RIGHTS.read_revisions
-        ACCESS_GEAR_MENU: !!@PAGE_RIGHTS.delete || !!@PAGE_RIGHTS.read_revisions
+      json.CAN.ACCESS_GEAR_MENU = json.CAN.DELETE || json.CAN.READ_REVISIONS
       json.CAN.VIEW_TOOLBAR = json.CAN.VIEW_PAGES || json.CAN.PUBLISH || json.CAN.UPDATE_CONTENT || json.CAN.ACCESS_GEAR_MENU
+
+      json.lock_info = _.clone(json.lock_info) if json.lock_info
+      if json.lock_info?.unlock_at
+        json.lock_info.unlock_at = if Date.parse(json.lock_info.unlock_at) < Date.now()
+          null
+        else
+          $.parseFromISO(json.lock_info.unlock_at).datetime_formatted
+
       json

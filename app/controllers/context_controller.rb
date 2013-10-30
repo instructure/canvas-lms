@@ -37,7 +37,7 @@ class ContextController < ApplicationController
         @media_object.user_entered_title = truncate_text(params[:user_entered_title], :max_length => 255) if params[:user_entered_title] && !params[:user_entered_title].empty?
         @media_object.save
       end
-      render :json => @media_object.to_json
+      render :json => @media_object
     end
   end
   
@@ -206,7 +206,7 @@ class ContextController < ApplicationController
           :user_content => %w(formatted_body),
         }
         @asset[:is_student] = !!@item.context.enrollments.all_student.find_by_user_id(@item.sender_id) rescue false
-        render :json => @asset.to_json(json_params)
+        render :json => @asset.as_json(json_params)
       end
     end
   end
@@ -215,7 +215,7 @@ class ContextController < ApplicationController
     @item = @current_user.inbox_items.find_by_id(params[:id]) if params[:id].present?
     @asset = @item && @item.asset
     @item && @item.destroy
-    render :json => @item.to_json
+    render :json => @item
   end
   
   def chat
@@ -266,7 +266,7 @@ class ContextController < ApplicationController
           log_asset_access("chat:#{@context.asset_string}", "chat", "chat")
           render :action => 'chat'
         }
-        format.json { render :json => @room_details.to_json }
+        format.json { render :json => @room_details }
       end
     end
   end
@@ -286,7 +286,7 @@ class ContextController < ApplicationController
     log_asset_access("inbox:#{@current_user.asset_string}", "inbox", 'other')
     respond_to do |format|
       format.html { render :action => :inbox }
-      format.json { render :json => @messages.to_json(:methods => [:sender_name]) }
+      format.json { render :json => @messages.map{ |m| m.as_json(methods: [:sender_name]) } }
     end
   end
   
@@ -298,7 +298,7 @@ class ContextController < ApplicationController
     end
     respond_to do |format|
       format.html { redirect_to inbox_url }
-      format.json { render :json => {:marked_as_read => true}.to_json }
+      format.json { render :json => {:marked_as_read => true} }
     end
   end
 
@@ -312,7 +312,7 @@ class ContextController < ApplicationController
       load_all_contexts(:context => @context)
       js_env({
         :ALL_ROLES => all_roles,
-        :SECTIONS => sections.map { |s| { :id => s.id, :name => s.name } },
+        :SECTIONS => sections.map { |s| { :id => s.id.to_s, :name => s.name } },
         :USER_LISTS_URL => polymorphic_path([@context, :user_lists], :format => :json),
         :ENROLL_USERS_URL => course_enroll_users_url(@context),
         :SEARCH_URL => search_recipients_url,
@@ -372,7 +372,7 @@ class ContextController < ApplicationController
       @users.each_with_index{|u, i| @users_hash[u.id] = u; @users_order_hash[u.id] = i }
       @current_user_services = {}
       @current_user.user_services.each{|s| @current_user_services[s.service] = s }
-      @services = UserService.for_user(@users).sort_by{|s| @users_order_hash[s.user_id] || 9999}
+      @services = UserService.for_user(@users).sort_by{|s| @users_order_hash[s.user_id] || SortLast}
       @services = @services.select{|service|
         !UserService.configured_service?(service.service) || feature_and_service_enabled?(service.service.to_sym)
       }
@@ -386,7 +386,7 @@ class ContextController < ApplicationController
       @accesses = AssetUserAccess.for_user(@user).for_context(@context).most_recent.paginate(:page => params[:page], :per_page => 50)
       respond_to do |format|
         format.html
-        format.json { render :json => @accesses.to_json(:methods => [:readable_name, :asset_class_name]) }
+        format.json { render :json => @accesses.map{ |a| a.as_json(methods: [:readable_name, :asset_class_name]) } }
       end
     end
   end

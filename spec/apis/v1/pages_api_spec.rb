@@ -254,7 +254,7 @@ describe "Pages API", :type => :integration do
         page.set_as_front_page!
 
         json = api_call(:get, "/api/v1/courses/#{@course.id}/front_page",
-                        :controller=>"wiki_pages_api", :action=>"show", :format=>"json", :course_id=>"#{@course.id}")
+                        :controller=>"wiki_pages_api", :action=>"show_front_page", :format=>"json", :course_id=>"#{@course.id}")
 
         expected = { "hide_from_students" => false,
                      "editing_roles" => "teachers",
@@ -278,7 +278,7 @@ describe "Pages API", :type => :integration do
         @wiki.save!
 
         json = api_call(:get, "/api/v1/courses/#{@course.id}/front_page",
-                        :controller=>"wiki_pages_api", :action=>"show", :format=>"json", :course_id=>"#{@course.id}")
+                        :controller=>"wiki_pages_api", :action=>"show_front_page", :format=>"json", :course_id=>"#{@course.id}")
 
         expected = { "hide_from_students" => false,
                      "editing_roles" => "teachers",
@@ -302,7 +302,7 @@ describe "Pages API", :type => :integration do
         wiki.unset_front_page!
 
         json = api_call(:get, "/api/v1/courses/#{@course.id}/front_page",
-                        {:controller=>"wiki_pages_api", :action=>"show", :format=>"json", :course_id=>"#{@course.id}"},
+                        {:controller=>"wiki_pages_api", :action=>"show_front_page", :format=>"json", :course_id=>"#{@course.id}"},
                         {}, {}, {:expected_status => 404})
 
         json['message'].should == "No front page has been set"
@@ -552,7 +552,7 @@ describe "Pages API", :type => :integration do
         new_title = 'blah blah blah'
 
         api_call(:put, "/api/v1/courses/#{@course.id}/front_page",
-                 { :controller => 'wiki_pages_api', :action => 'update', :format => 'json', :course_id => @course.to_param},
+                 { :controller => 'wiki_pages_api', :action => 'update_front_page', :format => 'json', :course_id => @course.to_param},
                  { :wiki_page => { :title => new_title}})
 
         page.reload
@@ -753,10 +753,14 @@ describe "Pages API", :type => :integration do
                  {}, {:expected_status => 400})
       end
       
-      it "should 404 if the page doesn't exist" do
-        api_call(:put, "/api/v1/courses/#{@course.id}/pages/nonexistent-url?title=renamed",
+      it "should create a page if the page doesn't exist" do
+        api_call(:put, "/api/v1/courses/#{@course.id}/pages/nonexistent-url",
                  { :controller => 'wiki_pages_api', :action => 'update', :format => 'json', :course_id => @course.to_param,
-                   :url => 'nonexistent-url', :title => 'renamed' }, {}, {}, { :expected_status => 404 })
+                   :url => 'nonexistent-url' },
+                 { :wiki_page => { :body => 'Nonexistent page content' } })
+        page = @wiki.wiki_pages.find_by_url!('nonexistent-url')
+        page.should_not be_nil
+        page.body.should == 'Nonexistent page content'
       end
       
       describe "notify_of_update" do
@@ -794,8 +798,8 @@ describe "Pages API", :type => :integration do
         page = @course.wiki.wiki_pages.create!(:title => "hrup", :body => "blooop")
         page.set_as_front_page!
 
-        api_call(:delete, "/api/v1/courses/#{@course.id}/front_page",
-                 { :controller => 'wiki_pages_api', :action => 'destroy', :format => 'json', :course_id => @course.to_param},
+        api_call(:delete, "/api/v1/courses/#{@course.id}/pages/#{page.url}",
+                 { :controller => 'wiki_pages_api', :action => 'destroy', :format => 'json', :course_id => @course.to_param, :url => page.url},
                  {}, {}, {:expected_status => 400})
 
         page.reload

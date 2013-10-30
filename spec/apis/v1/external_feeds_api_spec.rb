@@ -116,8 +116,9 @@ describe 'ExternalFeedsController', :type => :integration do
     before do
       group_with_user(:moderator => true, :active_all => true)
       @allowed_user = @user
+      @allowed_user.pseudonyms.create!(:unique_id => 'user1', :account => Account.default)
       @context = @group
-      @denied_user = user(:active_all => true)
+      @denied_user = user_with_pseudonym(:active_all => true, :unique_id => 'user2')
       @url_base = "/api/v1/groups/#{@group.id}/external_feeds"
       @url_params.merge!({ :group_id => @group.to_param })
     end

@@ -1,2 +1,2 @@
-require ['course', 'context_modules']
+require ['course']
 
