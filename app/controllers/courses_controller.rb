@@ -1110,7 +1110,9 @@ class CoursesController < ApplicationController
       return
     end
 
+
     @context = Course.active.find(params[:id])
+    js_env :DRAFT_STATE => @context.draft_state_enabled?
     if request.xhr?
       if authorized_action(@context, @current_user, [:read, :read_as_admin])
         render :json => @context

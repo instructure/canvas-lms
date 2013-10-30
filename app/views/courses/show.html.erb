@@ -1,5 +1,7 @@
 <% content_for :page_title, @context.name %>
-<% jammit_css :course_show %>
+<% if @context.draft_state_enabled? %>
+  <% jammit_css :course_show %>
+<% end %>
 <% @active_tab ||= "home" %>
 <h1 class='screenreader-only'><%= @context.name %></h1>
 <% content_for :auto_discovery do %>
@@ -13,25 +15,32 @@
 <% content_for :right_side do %>
   <div id="course_show_secondary">
     <% if can_do(@context, @current_user, :manage_content) %>
-      <div class="course-options" role>
-        <a class="button-sidebar-wide element_toggler" aria-controls="edit_course_home_content_form" href="<%= context_url(@context, :context_details_url) %>">
-          <i class="icon-edit"></i>
-          <%= t('links.edit_homepage', %{Edit Homepage}) %>
-        </a>
 
-        <a class="button-sidebar-wide" href="<%= context_url(@context, :context_url, :view => 'feed') %>">
-          <i class="icon-stats"></i>
-          <%= t('links.view_course_stream', %{View Course Stream}) %>
-        </a>
+      <% if @context.draft_state_enabled? %>
+        <div class="course-options" role>
+          <a class="button-sidebar-wide element_toggler" aria-controls="edit_course_home_content_form" href="<%= context_url(@context, :context_details_url) %>">
+            <i class="icon-edit"></i>
+            <%= t('links.edit_homepage', %{Edit Homepage}) %>
+          </a>
 
-        <a href="#" class="button-sidebar-wide wizard_popup_link  <%= 'auto_open' if @context.created? || @context.claimed? %>">
-          <i class="icon-question"></i> <%= t('links.course_setup', %{Course Setup Checklist}) %>
-        </a>
+          <a class="button-sidebar-wide" href="<%= context_url(@context, :context_url, :view => 'feed') %>">
+            <i class="icon-stats"></i>
+            <%= t('links.view_course_stream', %{View Course Stream}) %>
+          </a>
 
-        <a class="button-sidebar-wide" href="<%= context_url(@context, :new_context_discussion_topic_url, :is_announcement => true) %>"><i class="icon-announcement"></i> <%= t('links.new_announcement', %{New Announcement}) %>
-        </a>
-      </div>
+          <a href="#" class="button-sidebar-wide wizard_popup_link  <%= 'auto_open' if @context.created? || @context.claimed? %>">
+            <i class="icon-question"></i> <%= t('links.course_setup', %{Course Setup Checklist}) %>
+          </a>
 
+          <a class="button-sidebar-wide" href="<%= context_url(@context, :new_context_discussion_topic_url, :is_announcement => true) %>"><i class="icon-announcement"></i> <%= t('links.new_announcement', %{New Announcement}) %>
+          </a>
+        </div>
+      <% else %>
+        <div class="secondary-button-group rs-margin-lr rs-margin-top rs-margin-bottom">
+          <a href="#" class="btn button-sidebar-wide wizard_popup_link  <%= 'auto_open' if @context.created? || @context.claimed? %>"><i class="icon-question"></i> <%= t('links.course_setup', %{Course Setup Checklist}) %></a>
+          <a class="btn button-sidebar-wide" href="<%= context_url(@context, :new_context_discussion_topic_url, :is_announcement => true) %>"><i class="icon-announcement"></i> <%= t('links.new_announcement', %{New Announcement}) %></a>
+        </div>
+      <% end %>
     <% end %>
 
     <% if @context.available? && @context.self_enrollment && @context.open_enrollment && (!@context_enrollment || !@context_enrollment.active?) && !session["role_course_#{@context.id}"] %>
@@ -173,7 +182,14 @@ $(document).ready(function() {
       });
     }
   });
-
+  <% unless @context.draft_state_enabled? %>
+    $("#edit_course_home_content_select").change(function() {
+      $(this).parents("form")
+      .find(".options_details").hide().end()
+      .find("." + $(this).val() + "_details").show().end()
+      .find(".select_details").show();
+    }).triggerHandler('change');
+  <% end %>
   $(".edit_course_home_content_link").click(function(event) {
     event.preventDefault();
     $("#edit_course_home_content").show();
@@ -217,26 +233,89 @@ $(document).ready(function() {
   <%= render :partial => 'shared/dashboard_invitation', :object => @pending_enrollment %>
 <% end %>
 
+<% if @context.draft_state_enabled? %>
 <div id="edit_course_home_content" style="display: none;">
-  <h2><%= t('headings.set_layout', %{Set Home Page Layout}) %></h2>
+  <h2><%= t('draft_state.headings.set_layout', %{Set Home Page Layout}) %></h2>
   <%= form_for :course, :url => context_url(@context, :context_url), :html => {:tabindex=>"0", :'data-turn-into-dialog'=>'{"height": 300, "width":500,"modal":true}', :title=>t('headings.edit_homepage_title', %{Edit Homepage}), :style => "display:none", :id => "edit_course_home_content_form", :method => :put} do |f| %>
-  <label for="edit_course_home_content_select"><%= t('labels.set_layout', %{Select what you'd like to display on the homepage.}) %></label>
+  <label for="edit_course_home_content_select"><%= t('draft_state.labels.select_content', %{Select what you'd like to display on the homepage.}) %></label>
   <br>
   <select name="course[default_view]" id="edit_course_home_content_select">
-    <option value="feed" <%= 'selected' if @context.default_view == 'feed' %>><%= t('options.recent_activity_dashboard', %{Recent Activity Dashboard}) %></option>
-    <option value="wiki" <%= 'selected' if @context.default_view == 'wiki' %>><%= t('options.custom_page', %{Pages Front Page}) %></option>
-    <option value="modules" <%= 'selected' if @context.default_view == 'modules' %>><%= t('options.modules', %{Course Modules}) %></option>
-    <option value="assignments" <%= 'selected' if @context.default_view == 'assignments' %>><%= t('options.assignments', %{Assignments List}) %></option>
-    <option value="syllabus" <%= 'selected' if @context.default_view == 'syllabus' %>><%= t('options.syllabus', %{Syllabus}) %></option>
+    <option value="feed" <%= 'selected' if @context.default_view == 'feed' %>><%= t('draft_state.options.recent_activity_dashboard', %{Recent Activity Dashboard}) %></option>
+    <option value="wiki" <%= 'selected' if @context.default_view == 'wiki' %>><%= t('draft_state.options.custom_page', %{Pages Front Page}) %></option>
+    <option value="modules" <%= 'selected' if @context.default_view == 'modules' %>><%= t('draft_state.options.modules', %{Course Modules}) %></option>
+    <option value="assignments" <%= 'selected' if @context.default_view == 'assignments' %>><%= t('draft_state.options.assignments', %{Assignments List}) %></option>
+    <option value="syllabus" <%= 'selected' if @context.default_view == 'syllabus' %>><%= t('draft_state.options.syllabus', %{Syllabus}) %></option>
   </select>
   <div class="button-container">
-    <a type="button" class="btn button-secondary dialog_closer"><%= t('#buttons.cancel', %{Cancel}) %></a>
-    <button type="submit" class="btn btn-primary"><%= t('buttons.update_layout', %{Save}) %></button>
+    <a type="button" class="btn button-secondary dialog_closer"><%= t('draft_state.buttons.cancel', %{Cancel}) %></a>
+    <button type="submit" class="btn btn-primary"><%= t('draft_state.buttons.update_layout', %{Save}) %></button>
   </div>
+<% end %>
+<% else %>
+  <div id="edit_course_home_content" style="display: none;">
+    <%= form_for :course, :url => context_url(@context, :context_url), :html => {:id => "edit_course_home_content_form", :method => :put} do |f| %>
+      <h2><%= t('headings.set_layout', %{Set Home Page Layout}) %></h2>
+
+      <p>
+      <label for="edit_course_home_content_select"><strong><%= t('labels.select_content', %{When people visit the course page, show them}) %></strong></label>
+      <select name="course[default_view]" id="edit_course_home_content_select">
+        <option value="feed" <%= 'selected' if @context.default_view == 'feed' %>><%= t('options.recent_activity_dashboard', %{the Recent Activity Dashboard}) %></option>
+        <option value="wiki" <%= 'selected' if @context.default_view == 'wiki' %>><%= t('options.custom_page', %{a Page I'll Design Myself}) %></option>
+        <option value="modules" <%= 'selected' if @context.default_view == 'modules' %>><%= t('options.modules', %{the Course Modules/Sections}) %></option>
+        <option value="assignments" <%= 'selected' if @context.default_view == 'assignments' %>><%= t('options.assignments', %{the Assignment List}) %></option>
+        <option value="syllabus" <%= 'selected' if @context.default_view == 'syllabus' %>><%= t('options.syllabus', %{the Assignments with Syllabus}) %></option>
+      </select>
+      </p>
+      <div class="select_details ui-state-highlight ui-corner-all" style="display: none; padding: 1em; font-size: 12px;">
+        <div class="feed_details options_details">
+          <%= mt 'details.recent_activity_dashboard', "The **recent activity dashboard** lets participants see the most recent conversations, announcements, discussions, and interactions for this course.  It's very similar to the dashboard page users see when they first log in, but only shows content for this specific course." %>
+        </div>
+        <div class="wiki_details options_details">
+          <%= mt 'details.custom_page', "You can **design your own course home page** and include whatever links, images or rich media you like." %>
+        </div>
+        <div class="modules_details options_details">
+          <%= mt 'details.modules', "You can organize your course into **modules or sections**, where each section contains a related set of files, assignments, pages, etc.  If you want, you can also sequence modules by defining criteria and prerequisites that need to be completed before each module is unlocked.
+
+-This layout is probably best for courses that aren't based on a specific schedule like a term or semester." %>
+</p>
+      </div>
+      <div class="assignments_details options_details">
+        <%= mt 'details.assignments', "This view shows the **list of assignments** for this course, with upcoming and recent assignments at the top." %>
+      </div>
+      <div class="syllabus_details options_details">
+        <%= mt 'details.syllabus', "The **syllabus view** lets you write up a description of course expectations or introduce the course with links, images, etc. and then also shows a calendar view of all assignments and course events." %>
+      </div>
+    </div>
+    <div class="button-container">
+      <button type="submit" class="btn"><%= t('buttons.update_layout', %{Update Layout}) %></button>
+      <button type="button" class="btn button-secondary cancel_button"><%= t('#buttons.cancel', %{Cancel}) %></button>
+    </div>
   <% end %>
+<% end %>
+<% unless @context.draft_state_enabled? %>
+  <div class="clear"></div>
+<% end %>
 </div>
 
 <div id="course_home_content">
+  <% unless @context.draft_state_enabled? %>
+    <div style="float: right; text-align: left;" class="floating_links clearfix">
+      <% if can_do(@context, @current_user, :manage_content) || @course_home_view != 'feed' %>
+        <div style="font-size: 0.9em;">
+          <% if can_do(@context, @current_user, :manage_content) %>
+            <a href="<%= context_url(@context, :context_details_url) %>" class="edit_course_home_content_link"><%= t('links.change_layout', %{Change Home Page Layout}) %></a>
+          <% end %>
+          <% if can_do(@context, @current_user, :manage_content) && @course_home_view != 'feed' %>
+            | 
+          <% end %>
+          <% if @course_home_view != 'feed' %>
+            <a href="<%= context_url(@context, :context_url, :view => 'feed') %>"><%= t('links.course_stream', %{See Course Stream}) %></a>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+
   <% if @course_home_view == 'wiki' %>
     <% if @context.draft_state_enabled?
          js_bundle :wiki_page_show %>
