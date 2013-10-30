@@ -476,7 +476,11 @@ describe "gradebook2" do
 
       get "/courses/#{@course.id}/gradebook2"
 
-      ff('.student-name').map(&:text).join(" ").should match @fake_student.name
+      ff('.student-name').last.text.should match @fake_student.name
+
+      # test student should always be last
+      f('.slick-header-column').click
+      ff('.student-name').last.text.should match @fake_student.name
     end
 
     it "should not include non-graded group assignment in group total" do
