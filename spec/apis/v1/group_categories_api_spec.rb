@@ -30,7 +30,8 @@ describe "Group Categories API", :type => :integration do
       "#{category.context_type.downcase}_id" => category.context_id,
       'group_limit' => category.group_limit,
       'groups_count' => category.groups.size,
-      'unassigned_users_count' => category.unassigned_users.count
+      'unassigned_users_count' => category.unassigned_users.count,
+      'protected' => false
     }
   end
 

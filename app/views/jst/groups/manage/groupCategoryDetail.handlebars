@@ -25,11 +25,13 @@
           {{#t "edit_category_option"}}Edit{{/t}}
         </a>
       </li>
-      <li>
-        <a href="#" class="icon-trash delete-category">
-          {{#t "delete_category_option"}}Delete{{/t}}
-        </a>
-      </li>
+      {{#unless protected}}
+        <li>
+          <a href="#" class="icon-trash delete-category">
+            {{#t "delete_category_option"}}Delete{{/t}}
+          </a>
+        </li>
+      {{/unless}}
     </ul>
   </span>
 </div>
