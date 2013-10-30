@@ -42,6 +42,7 @@ describe "Outcom Reports" do
 
     @section = @course1.course_sections.first
     assignment_model(:course => @course1, :title => 'Engrish Assignment')
+    outcome_group = @account.root_outcome_group
     @outcome = @account.created_learning_outcomes.create!(:short_description => 'Spelling')
     @rubric = Rubric.create!(:context => @course1)
     @rubric.data = [
@@ -87,6 +88,7 @@ describe "Outcom Reports" do
                               }
                             })
     @outcome.reload
+    outcome_group.add_outcome(@outcome)
 
   end
 
@@ -98,7 +100,6 @@ describe "Outcom Reports" do
     it "should run the Student Competency report" do
 
       parsed = ReportSpecHelper.run_report(@account, @type, {}, 1)
-      parsed.length.should == 2
 
       parsed[0][0].should == @user1.sortable_name
       parsed[0][1].should == @user1.id.to_s
@@ -138,6 +139,8 @@ describe "Outcom Reports" do
       parsed[1][16].should == @section.sis_source_id
       parsed[1][17].should == "https://#{HostUrl.context_host(@course1)}/courses/#{@course1.id}/assignments/#{@assignment.id}"
 
+      parsed.length.should == 2
+
     end
 
     it "should run the Student Competency report on a term" do
@@ -149,8 +152,8 @@ describe "Outcom Reports" do
       parameters = {}
       parameters["enrollment_term"] = @term1.id
       parsed = ReportSpecHelper.run_report(@account, @type, parameters)
-      parsed.length.should == 1
       parsed[0].should == ["No outcomes found"]
+      parsed.length.should == 1
 
     end
 
@@ -159,21 +162,22 @@ describe "Outcom Reports" do
 
       parameters = {}
       parsed = ReportSpecHelper.run_report(sub_account, @type, parameters)
-      parsed.length.should == 1
       parsed[0].should == ["No outcomes found"]
+      parsed.length.should == 1
 
     end
 
     it "should run the Student Competency report on a sub account with courses" do
       sub_account = Account.create(:parent_account => @account, :name => 'English')
+      outcome_group = sub_account.root_outcome_group
       @course1.account = sub_account
       @course1.save!
       @outcome.context_id = sub_account.id
       @outcome.save!
+      outcome_group.add_outcome(@outcome)
 
       param = {}
       parsed = ReportSpecHelper.run_report(sub_account, @type, param, 1)
-      parsed.length.should == 2
       parsed[0].should == [@user1.sortable_name, @user1.id.to_s, "user_sis_id_01",
                            @assignment.title, @assignment.id.to_s,
                            @submission.submitted_at.iso8601, @submission.grade.to_s,
@@ -188,6 +192,7 @@ describe "Outcom Reports" do
                            @course1.name, @course1.id.to_s, @course1.sis_source_id,
                            @section.name, @section.id.to_s, @section.sis_source_id,
                            "https://#{HostUrl.context_host(@course1)}/courses/#{@course1.id}/assignments/#{@assignment.id}"]
+      parsed.length.should == 2
 
     end
 
@@ -197,13 +202,12 @@ describe "Outcom Reports" do
       param = {}
       param["include_deleted"] = true
       parsed = ReportSpecHelper.run_report(@account, @type, param, 1)
-      parsed.length.should == 2
 
       parsed[0].should == [@user1.sortable_name, @user1.id.to_s, "user_sis_id_01",
                            @assignment.title, @assignment.id.to_s,
                            @submission.submitted_at.iso8601, @submission.grade.to_s,
                            @outcome.short_description, @outcome.id.to_s, '1', '2',
-                           @course1.name, @course1.id.to_s,@course1.sis_source_id,
+                           @course1.name, @course1.id.to_s, @course1.sis_source_id,
                            @section.name, @section.id.to_s, @section.sis_source_id,
                            "https://#{HostUrl.context_host(@course1)}/courses/#{@course1.id}/assignments/#{@assignment.id}"]
 
@@ -213,6 +217,7 @@ describe "Outcom Reports" do
                            @course1.name, @course1.id.to_s, @course1.sis_source_id,
                            @section.name, @section.id.to_s, @section.sis_source_id,
                            "https://#{HostUrl.context_host(@course1)}/courses/#{@course1.id}/assignments/#{@assignment.id}"]
+      parsed.length.should == 2
 
     end
 
@@ -239,7 +244,6 @@ describe "Outcom Reports" do
     it "should run the outcome result report" do
       parsed = ReportSpecHelper.run_report(@account, @type, {}, 1)
 
-      parsed.length.should == 1
       parsed[0][0].should == @user1.sortable_name
       parsed[0][1].should == @user1.id.to_s
       parsed[0][2].should == "user_sis_id_01"
@@ -257,9 +261,11 @@ describe "Outcom Reports" do
       parsed[0][14].should == @course1.name
       parsed[0][15].should == @course1.id.to_s
       parsed[0][16].should == @course1.sis_source_id
+      parsed.length.should == 1
     end
 
     it "should work with quizzes" do
+      outcome_group = @account.root_outcome_group
       outcome = @account.created_learning_outcomes.create!(:short_description => 'new outcome')
       quiz = @course1.quizzes.create!(:title => "new quiz", :shuffle_answers => true)
       q1 = quiz.quiz_questions.create!(:question_data => {:name => 'question 1', :points_possible => 1, 'question_type' => 'multiple_choice_question', 'answers' => {'answer_0' => {'answer_text' => '1', 'answer_weight' => '100'}, 'answer_1' => {'answer_text' => '2'}, 'answer_2' => {'answer_text' => '3'}, 'answer_3' => {'answer_text' => '4'}}})
@@ -278,9 +284,9 @@ describe "Outcom Reports" do
       sub.submission_data["question_#{question_2}"] = answer_2 + 1
       sub.grade_submission
       outcome.reload
+      outcome_group.add_outcome(outcome)
 
-      parsed = ReportSpecHelper.run_report(@account, @type, {}, [1,13])
-      parsed.length.should == 3
+      parsed = ReportSpecHelper.run_report(@account, @type, {}, [1, 13])
 
       parsed[0][0].should == @user1.sortable_name
       parsed[0][1].should == @user1.id.to_s
@@ -336,6 +342,7 @@ describe "Outcom Reports" do
       parsed[2][15].should == @course1.id.to_s
       parsed[2][16].should == @course1.sis_source_id
 
+      parsed.length.should == 3
     end
   end
 end
