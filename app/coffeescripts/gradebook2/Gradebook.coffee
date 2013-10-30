@@ -410,6 +410,10 @@ define [
 
       groupTotalCellTemplate templateOpts
 
+    htmlContentFormatter: (row, col, val, columnDef, student) =>
+      return '' unless val?
+      val
+
     calculateStudentGrade: (student) =>
       if student.loaded
         finalOrCurrent = if @include_ungraded_assignments then 'final' else 'current'
@@ -554,11 +558,11 @@ define [
       if e.target.className.match(/cell|slick/) or !@gradeGrid.getActiveCell
         return
 
-      if e.target.className is 'grade' and @gradeGrid.getCellEditor() instanceof SubmissionCell.out_of 
+      if e.target.className is 'grade' and @gradeGrid.getCellEditor() instanceof SubmissionCell.out_of
         # We can assume that a user clicked the up or down arrows on the
         # number input, we want to allow them to keep doing that.
         return
-      
+
       @gradeGrid.getEditorLock().commitCurrentEdit()
 
     onGridInit: () ->
@@ -762,6 +766,7 @@ define [
         cssClass: "meta-cell"
         resizable: false
         sortable: true
+        formatter: @htmlContentFormatter
       },
       {
         id: 'secondary_identifier'
@@ -771,6 +776,7 @@ define [
         cssClass: "meta-cell secondary_identifier_cell"
         resizable: false
         sortable: true
+        formatter: @htmlContentFormatter
       }]
 
       @allAssignmentColumns = for id, assignment of @assignments

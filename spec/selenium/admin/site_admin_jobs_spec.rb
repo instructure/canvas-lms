@@ -130,18 +130,18 @@ describe "site admin jobs ui" do
       it "should check current popular tags" do
         filter_tags(FlavorTags::CURRENT)
         keep_trying_until do
-          f("#tags-grid div[row='0'] .r0").text.should == "String#reverse"
-          f("#tags-grid div[row='0'] .r1").text.should == "2"
+          f("#tags-grid .slick-row:nth-child(1) .r0").text.should == "String#reverse"
+          f("#tags-grid .slick-row:nth-child(1) .r1").text.should == "2"
         end
       end
 
       it "should check all popular tags" do
         filter_tags(FlavorTags::ALL)
         keep_trying_until do
-          f("#tags-grid div[row='0'] .r0").text.should == "String#reverse"
-          f("#tags-grid div[row='0'] .r1").text.should == "2"
-          f("#tags-grid div[row='1'] .r0").text.should == "String#capitalize"
-          f("#tags-grid div[row='1'] .r1").text.should == "1"
+          f("#tags-grid .slick-row:nth-child(1) .r0").text.should == "String#reverse"
+          f("#tags-grid .slick-row:nth-child(1) .r1").text.should == "2"
+          f("#tags-grid .slick-row:nth-child(2) .r0").text.should == "String#capitalize"
+          f("#tags-grid .slick-row:nth-child(2) .r1").text.should == "1"
         end
       end
 
@@ -249,7 +249,7 @@ describe "site admin jobs ui" do
       load_jobs_page
       ffj('#running-grid .slick-row').size.should == 2
       # sort ASC
-      worker_header = fj("#running-grid .slick-header div[title='worker'] .slick-column-name")
+      worker_header = fj("#running-grid .slick-header div[id*='worker'] .slick-column-name")
       worker_header.click
       keep_trying_until do
         first_cell = fj('#running-grid .slick-cell.l0.r0')

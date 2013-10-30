@@ -86,12 +86,12 @@ module Canvas
             },
         
             // slick grid shim
-            'vendor/slickgrid/lib/jquery.event.drag-2.0.min': {
+            'vendor/slickgrid/lib/jquery.event.drag-2.2': {
               deps: ['jquery'],
               attach: '$'
             },
             'vendor/slickgrid/slick.core': {
-              deps: ['jquery', 'use!vendor/slickgrid/lib/jquery.event.drag-2.0.min'],
+              deps: ['jquery', 'use!vendor/slickgrid/lib/jquery.event.drag-2.2'],
               attach: 'Slick'
             },
             'vendor/slickgrid/slick.grid': {

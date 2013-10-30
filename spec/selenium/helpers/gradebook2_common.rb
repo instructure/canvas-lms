@@ -38,8 +38,11 @@ end
 
 def edit_grade(cell, grade)
   grade_input = keep_trying_until do
-    cell.click
-    cell.find_element(:css, '.grade')
+    driver.execute_script("$('#{cell}').hover().click()")
+    sleep 1
+    input = fj("#{cell} .grade")
+    input.should_not be_nil
+    input
   end
   set_value(grade_input, grade)
   grade_input.send_keys(:return)
