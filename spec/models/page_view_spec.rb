@@ -50,7 +50,6 @@ describe PageView do
     it "should not start a db transaction on save" do
       PageView.new { |p| p.send(:attributes=, { :user => @user, :url => "http://test.one/", :session_id => "phony", :context => @course, :controller => 'courses', :action => 'show', :user_request => true, :render_time => 0.01, :user_agent => 'None', :account_id => Account.default.id, :request_id => "abcdef", :interaction_seconds => 5 }, false) }.store
       PageView.connection.expects(:transaction).never
-      PageView.process_cache_queue
       PageView.find("abcdef").should be_present
     end
 
@@ -75,35 +74,6 @@ describe PageView do
         pv.save!
         pv = PageView.find(pv.request_id)
         pv.interaction_seconds.should == 25
-      end
-
-      it "should handle default shard ids through redis" do
-        pending("needs redis") unless Canvas.redis_enabled?
-
-        @pv_user = user_model
-        id = @shard1.activate do
-          @user2 = User.create! { |u| u.id = @user.local_id }
-          account = Account.create!
-          course_model(:account => account)
-          pv = PageView.new(user: @pv_user, context: @course)
-          pv.request_id = UUIDSingleton.instance.generate
-          pv.store
-
-          PageView.process_cache_queue
-          pv.request_id
-        end
-
-        pv = @shard1.activate { PageView.find(id) }
-        pv.user.should == @pv_user
-        pv.context.should == @course
-
-        @pv_user.page_views.paginate(:page => 1, :per_page => 1).first.should == pv
-        @user2.page_views.paginate(:page => 1, :per_page => 1).should be_empty
-
-        @shard1.activate do
-          @pv_user.page_views.paginate(:page => 1, :per_page => 1).first.should == pv
-          @user2.page_views.paginate(:page => 1, :per_page => 1).should be_empty
-        end
       end
 
       it "should store and load from cassandra when the birth shard is not the default shard" do
@@ -217,64 +187,11 @@ describe PageView do
   end
 
   if Canvas.redis_enabled?
-    before do
-      Setting.set('enable_page_views', 'cache')
-    end
-
-    it "should store into redis through to the db in cache mode" do
-      @page_view.store.should be_true
-      PageView.count.should == 0
-      PageView.process_cache_queue
-      PageView.count.should == 1
-      PageView.find(@page_view.id).attributes.except('created_at', 'updated_at', 'summarized').should == @page_view.attributes.except('created_at', 'updated_at', 'summarized')
-    end
-
-    it "should store into redis in transactional batches" do
-      @page_view.store.should be_true
-      PageView.new { |p| p.send(:attributes=, { :user => @user, :url => "http://test.one/", :session_id => "phony", :context => @course, :controller => 'courses', :action => 'show', :user_request => true, :render_time => 0.01, :user_agent => 'None', :account_id => Account.default.id, :request_id => "abcdef", :interaction_seconds => 5 }, false) }.store
-      PageView.new { |p| p.send(:attributes=, { :user => @user, :url => "http://test.one/", :session_id => "phony", :context => @course, :controller => 'courses', :action => 'show', :user_request => true, :render_time => 0.01, :user_agent => 'None', :account_id => Account.default.id, :request_id => "abcdefg", :interaction_seconds => 5 }, false) }.store
-      PageView.count.should == 0
-      Setting.set('page_view_queue_batch_size', '2')
-      PageView.connection.expects(:transaction).at_least(5).yields # 5 times, because 2 outermost transactions, then rails starts a "transaction" for each save (which runs as a no-op, since we're already in a transaction)
-      PageView.process_cache_queue
-      PageView.count.should == 3
-    end
-
-    it "should preserve timestamp" do
-      Time.use_zone('Alaska') do
-        pv = PageView.new{ |p| p.send(:attributes=, { :user => @user, :url => "http://test.one/", :session_id => "phony", :context => @course, :controller => 'courses', :action => 'show', :user_request => true, :render_time => 0.01, :user_agent => 'None', :account_id => Account.default.id, :request_id => "abcdef", :interaction_seconds => 5 }, false) }
-        pv.store
-        original_created_at = pv.created_at
-        PageView.process_cache_queue
-        pv.reload.created_at.to_i.should == original_created_at.to_i
-      end
-    end
-
-    describe "batch transaction" do
-      self.use_transactional_fixtures = false
-      it "should not fail the batch if one row fails" do
-        user
-        expect {
-          PageView.transaction do
-            PageView.process_cache_queue_item('request_id' => '1234', 'user_id' => @user.id)
-            PageView.process_cache_queue_item('request_id' => '1234', 'user_id' => @user.id)
-          end
-        }.to change(PageView, :count).by(1)
-      end
-
-      after do
-        PageView.delete_all
-
-        # tear down both the course and the user and their detritus
-        Enrollment.delete_all
-        UserAccountAssociation.delete_all
-        User.delete_all
-        CourseAccountAssociation.delete_all
-        Course.delete_all
-      end
-    end
-
     describe "active user counts" do
+      before do
+        Setting.set('enable_page_views', 'db')
+      end
+
       it "should generate bucket names" do
         PageView.user_count_bucket_for_time(Time.zone.parse('2012-01-20T13:41:17Z')).should be_starts_with 'active_users:2012-01-20T13:40:00Z'
         PageView.user_count_bucket_for_time(Time.zone.parse('2012-01-20T03:25:00Z')).should be_starts_with 'active_users:2012-01-20T03:25:00Z'
@@ -304,8 +221,8 @@ describe PageView do
         store_time_2 = Time.zone.parse('2012-01-13T15:47:52Z')
         @user1 = @user
         @user2 = user_model
-        pv2 = PageView.new { |p| p.send(:attributes=, { :user => @user2, :url => "http://test.one/", :session_id => "phony", :context => @course, :controller => 'courses', :action => 'show', :user_request => true, :render_time => 0.01, :user_agent => 'None', :account_id => Account.default.id, :request_id => "abcde", :interaction_seconds => 5 }, false) }
-        pv3 = PageView.new { |p| p.send(:attributes=, { :user => @user2, :url => "http://test.one/", :session_id => "phony", :context => @course, :controller => 'courses', :action => 'show', :user_request => true, :render_time => 0.01, :user_agent => 'None', :account_id => Account.default.id, :request_id => "abcde", :interaction_seconds => 5 }, false) }
+        pv2 = PageView.new { |p| p.send(:attributes=, { :user => @user2, :url => "http://test.one/", :session_id => "phony", :context => @course, :controller => 'courses', :action => 'show', :user_request => true, :render_time => 0.01, :user_agent => 'None', :account_id => Account.default.id, :request_id => "req1", :interaction_seconds => 5 }, false) }
+        pv3 = PageView.new { |p| p.send(:attributes=, { :user => @user2, :url => "http://test.one/", :session_id => "phony", :context => @course, :controller => 'courses', :action => 'show', :user_request => true, :render_time => 0.01, :user_agent => 'None', :account_id => Account.default.id, :request_id => "req2", :interaction_seconds => 5 }, false) }
         pv2.created_at = store_time
         pv3.created_at = store_time_2
         pv2.store.should be_true
