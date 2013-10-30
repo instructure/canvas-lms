@@ -56,7 +56,7 @@ class ScribdAPI
     end
 
     def delete_all_documents_for_user(user)
-      return false if user == 'canvas'
+      return false if user == 'canvas-production'
       Scribd::API.instance.user = user
       u = Scribd::User.new
       while (docs = u.documents).count > 1
