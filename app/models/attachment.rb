@@ -174,7 +174,9 @@ class Attachment < ActiveRecord::Base
 
     # directly update workflow_state so we don't trigger another save cycle
     if self.workflow_state_changed?
-      self.class.where(:id => self).update_all(:workflow_state => self.workflow_state)
+      self.shard.activate do
+        self.class.where(:id => self).update_all(:workflow_state => self.workflow_state)
+      end
     end
 
     # try an infer encoding if it would be useful to do so
