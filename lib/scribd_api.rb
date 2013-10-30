@@ -59,7 +59,7 @@ class ScribdAPI
       return false if user == 'canvas-production'
       Scribd::API.instance.user = user
       u = Scribd::User.new
-      while (docs = u.documents).count > 1
+      while (docs = u.documents).count > 0
         docs.each do |d|
           d.destroy
         end
