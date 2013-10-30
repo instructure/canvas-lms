@@ -15,67 +15,76 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
+
+require 'lib/basic_lti/variable_substitution/canvas'
+require 'lib/basic_lti/variable_substitution/person'
+
 module BasicLTI
-class VariableSubstitutor
+  class VariableSubstitutor
 
-  def initialize(tool_launch)
-    @launch = tool_launch
-  end
+    def initialize(tool_launch)
+      @launch = tool_launch
+      @substitutors = {}
+    end
 
+    def method_missing(method, *args, &block)
+      name = method.to_s
+      if name[0] == '$'
+        klass = var_to_class_name(name).constantize
 
-  # modifies the launch hash by substituting all the known variables
-  # if a variable is not supported or not allowed the value will not change
-  def substitute!
-    @launch.hash.each do |key, val|
-      if val.to_s.starts_with? '$'
-        method_name = "sub_#{var_to_method(val)}"
-        if self.respond_to?(method_name, true)
-          if new_val = self.send(method_name)
+        #Create or use the appropriate variable substitutor
+        @substitutors[klass] ||= klass.new(@launch)
+        return @substitutors[klass].send(var_to_method_name(name))
+      else
+        super
+      end
+    end
+
+    # modifies the launch hash by substituting all the known variables
+    # if a variable is not supported or not allowed the value will not change
+    def substitute!
+      @launch.hash.each do |key, val|
+        if val.to_s.starts_with? '$'
+          if valid_method?(val) && new_val = self.send(val)
             @launch.hash[key] = new_val
           end
         end
       end
     end
+
+    ### Substitution methods should be in the BasicLTI::VariableSubstitution namespace
+    ### and then further namespaced by their variable namespaces.  For example,
+    ### $Canvas.membership.concludedRoles should refer to the concluded_roles method
+    ### of the BasicLTI::VariableSubstitution::Canvas::Membership class.  All module
+    ### names will be titlized and all method names will be underscored to follow ruby
+    ### naming conventions.
+    ###
+    ### Additionally, all methods will be called in the context
+    ### of the BasicLTI::VariableSubstitutor class to give access to this context
+    ### and launch information
+    ###
+    ### If the launch cannot produce the substitution value, the function should
+    ### return nil.  VariableSubstitutor checks for nil return values to handle
+    ### invalid substitution parameters.  If you actually need to substitute an
+    ### empty value, return an empty string ("") .
+    ###
+    ### See the classes in the lib/basic_lti/variable_substitution folder for more examples.
+
+    private
+
+    # This method splits out the name of the class and prepends the namespace for
+    # variable substitution.  For example, $Canvas.enrollment.enrollment_state,
+    # would be converted to BasicLTI::VariableSubstitution::Canvas::Enrollment
+    def var_to_class_name(var)
+      var[1..-1].split('.')[0...-1].map{|ns| ns.titleize}.unshift('BasicLTI::VariableSubstitution').join('::')
+    end
+
+    def var_to_method_name(var)
+      var.split('.').last.underscore
+    end
+
+    def valid_method?(var)
+      var_to_class_name(var).constantize.method_defined?(var_to_method_name(var)) rescue false
+    end
   end
-
-  private
-
-  def var_to_method(var_name)
-    var_name.gsub('$', '').gsub('.', '_')
-  end
-
-
-  ### These should return the value of substituting the variable the method is named for
-  ### The method name should be prefixed with 'sub_' and have the same name as the variable except change all . to _
-  ### For Example, to support substituting $Person.name.full, create a method called sub_Person_name_full
-  ### If appropriate, check permissions by using the @launch object to reference the user/course
-
-  # $Person.name.full
-  def sub_Person_name_full
-    @launch.tool.include_name? ? @launch.user.name : nil
-  end
-
-  # $Person.name.family
-  def sub_Person_name_family
-    @launch.tool.include_name? ? @launch.user.last_name : nil
-  end
-
-  # $Person.name.given
-  def sub_Person_name_given
-    @launch.tool.include_name? ? @launch.user.first_name : nil
-  end
-
-  # $Person.address.timezone
-  def sub_Person_address_timezone
-    Time.zone.tzinfo.name
-  end
-
-  # returns the same LIS Role values as the default 'roles' parameter,
-  # but for concluded enrollments
-  # $Canvas.membership.concludedRoles
-  def sub_Canvas_membership_concludedRoles
-    @launch.user_data['concluded_role_types'] ? @launch.user_data['concluded_role_types'].join(',') : nil
-  end
-
-end
 end

@@ -156,8 +156,8 @@ describe BasicLTI do
       @tool = sub_account.context_external_tools.create!(:domain => 'yahoo.com', :consumer_key => '12345', :shared_secret => 'secret', :name => 'tool', :privacy_level => 'public')
 
       hash = BasicLTI.generate(:url => 'http://www.yahoo.com', :tool => @tool, :user => @user, :context => sub_account, :link_code => '123456', :return_url => 'http://www.google.com')
-      hash['custom_canvas_account_id'] = sub_account.id.to_s
-      hash['custom_canvas_account_sis_id'] = 'accountsis'
+      hash['custom_canvas_account_id'].should == sub_account.id.to_s
+      hash['custom_canvas_account_sis_id'].should == 'accountsis'
       hash['custom_canvas_user_login_id'].should == @user.pseudonyms.first.unique_id
     end
 
@@ -290,6 +290,7 @@ describe BasicLTI do
       @hash['ext_outcome_data_values_accepted'].should == 'url,text'
       @hash['custom_canvas_assignment_title'].should == @assignment.title
       @hash['custom_canvas_assignment_points_possible'].should == @assignment.points_possible.to_s
+      @hash['custom_canvas_assignment_id'].should == @assignment.id.to_s
     end
 
     it "should include assignment outcome service params for teacher" do

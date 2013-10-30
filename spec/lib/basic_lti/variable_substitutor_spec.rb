@@ -40,24 +40,19 @@ describe BasicLTI::VariableSubstitutor do
     @hash.should == {'full' => 'full name', 'last' => 'name', 'first' => 'full'}
   end
 
-  it "should leave variable if not allowed" do
-    @launch.stubs(:user).returns(@launch)
-    @launch.stubs(:tool).returns(@launch)
-    @launch.stubs("include_name?").returns(false)
-    @launch.stubs(:name).returns("full name")
-    @hash = {'full' => '$Person.name.full'}
-    @launch.stubs(:hash).returns(@hash)
-
-    @subber.substitute!
-    @hash.should == {'full' => '$Person.name.full'}
-  end
-
   it "should leave variable if not supported" do
-    @hash = {'something_crazy' => '$Person.social_security_number'}
+    @hash = {
+        'invalid_namespace' => '$Person.private_info.social_security_number',
+        'invalid_method' => '$Person.name.secret_identity',
+    }
+
     @launch.stubs(:hash).returns(@hash)
 
     @subber.substitute!
-    @hash.should == {'something_crazy' => '$Person.social_security_number'}
+    @hash.should == {
+        'invalid_namespace' => '$Person.private_info.social_security_number',
+        'invalid_method' => '$Person.name.secret_identity',
+    }
   end
 
   it "should add concluded enrollments" do
