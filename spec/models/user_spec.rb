@@ -2521,4 +2521,20 @@ describe User do
       test_student.reload.enrollments.each { |e| e.should be_deleted }
     end
   end
+
+  describe "otp remember me cookie" do
+    before do
+      @user = User.new
+      @user.otp_secret_key = ROTP::Base32.random_base32
+    end
+
+    it "should add an ip to an existing cookie" do
+      cookie1 = @user.otp_secret_key_remember_me_cookie(Time.now.utc, nil, 'ip1')
+      cookie2 = @user.otp_secret_key_remember_me_cookie(Time.now.utc, cookie1, 'ip2')
+      @user.validate_otp_secret_key_remember_me_cookie(cookie1, 'ip1').should be_true
+      @user.validate_otp_secret_key_remember_me_cookie(cookie1, 'ip2').should be_false
+      @user.validate_otp_secret_key_remember_me_cookie(cookie2, 'ip1').should be_true
+      @user.validate_otp_secret_key_remember_me_cookie(cookie2, 'ip2').should be_true
+    end
+  end
 end

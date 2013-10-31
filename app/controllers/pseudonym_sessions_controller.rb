@@ -524,8 +524,10 @@ class PseudonymSessionsController < ApplicationController
 
       if params[:otp_login][:remember_me] == '1'
         now = Time.now.utc
+        old_cookie = cookies['canvas_otp_remember_me']
+        old_cookie = nil unless @current_user.validate_otp_secret_key_remember_me_cookie(old_cookie)
         cookies['canvas_otp_remember_me'] = {
-              :value => @current_user.otp_secret_key_remember_me_cookie(now),
+              :value => @current_user.otp_secret_key_remember_me_cookie(now, old_cookie, request.remote_ip),
               :expires => now + 30.days,
               :domain => otp_remember_me_cookie_domain,
               :httponly => true,
@@ -566,8 +568,7 @@ class PseudonymSessionsController < ApplicationController
     @current_pseudonym = pseudonym
     Auditors::Authentication.record(@current_pseudonym, 'login')
 
-    otp_passed ||= cookies['canvas_otp_remember_me'] &&
-        @current_user.validate_otp_secret_key_remember_me_cookie(cookies['canvas_otp_remember_me'])
+    otp_passed ||= @current_user.validate_otp_secret_key_remember_me_cookie(cookies['canvas_otp_remember_me'], request.remote_ip)
     if !otp_passed
       mfa_settings = @current_user.mfa_settings
       if (@current_user.otp_secret_key && mfa_settings == :optional) ||

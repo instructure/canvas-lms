@@ -2323,14 +2323,24 @@ class User < ActiveRecord::Base
     orig_profile(force_reload) || build_profile
   end
 
-  def otp_secret_key_remember_me_cookie(time)
-    "#{time.to_i}.#{Canvas::Security.hmac_sha1("#{time.to_i}.#{self.otp_secret_key}")}"
+  def parse_otp_remember_me_cookie(cookie)
+    return 0, [], nil unless cookie
+    time, *ips, hmac = cookie.split('-')
+    [time, ips, hmac]
   end
 
-  def validate_otp_secret_key_remember_me_cookie(value)
-    value =~ /^(\d+)\.[0-9a-f]+/ &&
-        $1.to_i >= (Time.now.utc - 30.days).to_i &&
-        value == otp_secret_key_remember_me_cookie($1)
+  def otp_secret_key_remember_me_cookie(time, current_cookie, remote_ip = nil)
+    _, ips, _ = parse_otp_remember_me_cookie(current_cookie)
+    cookie = [time.to_i, *[*ips, remote_ip].compact.sort].join('-')
+
+    "#{cookie}-#{Canvas::Security.hmac_sha1("#{cookie}.#{self.otp_secret_key}")}"
+  end
+
+  def validate_otp_secret_key_remember_me_cookie(value, remote_ip = nil)
+    time, ips, hmac = parse_otp_remember_me_cookie(value)
+    time.to_i >= (Time.now.utc - 30.days).to_i &&
+        (remote_ip.nil? || ips.include?(remote_ip)) &&
+        value == otp_secret_key_remember_me_cookie(time, value)
   end
 
   def otp_secret_key
