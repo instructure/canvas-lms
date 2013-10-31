@@ -2135,7 +2135,7 @@ describe User do
     end
   end
 
-  describe "accounts" do
+  describe "all_accounts" do
     specs_require_sharding
 
     it "should include accounts from multiple shards" do
@@ -2146,7 +2146,7 @@ describe User do
         @account2.add_user(@user)
       end
 
-      @user.accounts.map(&:id).sort.should == [Account.site_admin, @account2].map(&:id).sort
+      @user.all_accounts.map(&:id).sort.should == [Account.site_admin, @account2].map(&:id).sort
     end
   end
 

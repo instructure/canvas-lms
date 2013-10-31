@@ -31,7 +31,7 @@ class AccountsController < ApplicationController
   # students and even teachers will get an empty list in response, only
   # account admins can view the accounts that they are in.
   def index
-    @accounts = @current_user.accounts rescue []
+    @accounts = @current_user ? @current_user.all_accounts : []
     respond_to do |format|
       format.html
       format.json do

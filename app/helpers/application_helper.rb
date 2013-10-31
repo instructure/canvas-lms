@@ -782,7 +782,7 @@ module ApplicationHelper
     @current_user.set_menu_data(session[:enrollment_uuid])
     [
       @current_user.menu_courses(session[:enrollment_uuid]),
-      @current_user.accounts,
+      @current_user.all_accounts,
       @current_user.cached_current_group_memberships,
       @current_user.enrollments.ended
     ].any?{ |e| e.respond_to?(:count) && e.count > 0 }
