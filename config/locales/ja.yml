@@ -1341,8 +1341,6 @@ ja:
     imported_assignments_group: インポートされた課題
     labels: 
       due: 期限
-    messages: 
-      assignment_created: "課題 \"%{assignment}\" が作成されました"
     name_is_required: 名前は必須項目です
     points_possible: "パーセント方式の採点の場合は、配点を 0 より大きくする必要があります。"
     select_external_tool_dialog_title: 外部ツールの設定
@@ -1358,9 +1356,6 @@ ja:
       a_website_url: "Web サイト URL"
     titles: 
       grading_scheme_info: 採点スキームの表示/編集
-    warnings: 
-      group_assignment: "課題 \"%{assignment}\" は、グループ課題でした。この新たな状況にあわせ、グループ設定の再設定が必要になります。"
-      peer_assignment: "課題 \"%{assignment}\" は、ピア レビューの課題でした。この新たな状況にあわせ、ピア レビュー設定の再設定が必要になります。"
   assignment_details_dialog: 
     average_score: "平均点:"
     count_of_submissions: "%{cnt} 件の提出物"
@@ -1475,8 +1470,18 @@ ja:
       move: 移動先&hellip;
       move_assignment_title: 課題の移動
       multiple_modules: 複数のモジュール
+      no_points_possible: 配点なし
       points_possible: "%{pointsPossible} 点"
+      points_possible_screen_reader: "配点 %{pointsPossible}"
       settings: 設定
+    assignment_list_item_score: 
+      assignment_not_yet_graded_screenreader: "課題はまだ採点されていません。配点は %{pointsPossible} です。"
+      no_submission: 提出なし
+      no_submission_for_assignment_screenreader: "この課題は提出されていません。配点は %{pointsPossible} です。"
+      no_submission_with_points_possible: "-/%{pointsPossible} 点"
+      not_yet_graded_with_points_possible: "*未採点*/%{pointsPossible} 点"
+      score_with_points_possible: "%{grade}/%{pointsPossible} 点"
+      score_with_points_possible_screenreader: "スコア: %{grade}/%{pointsPossible} 点"
     assignment_locked: 
       assignment_locked: "*%{lock_at}* 現在、この課題はロックされています"
       assignment_unlocked_from: "*%{unlock_at}* まで、この課題はロックされています"
@@ -1533,6 +1538,7 @@ ja:
       delete_group: グループの削除
       submit_assignment: 課題の提出
     cannot_delete_group: "少なくとも 1 つの課題グループが必要です"
+    cant_unpublish_when_students_submit: 受講生の提出物がある場合は、未公開にできません
     confirm: 
       delete_assignment: この課題を削除してもよろしいですか?
       delete_group: このグループを削除してもよろしいですか?
@@ -2234,6 +2240,10 @@ ja:
     last_formula_row: 最後の数式行を使用して、最終的な解答を計算します
     sample_final_answer: この値は、このタイプの問題の最終的な解答の一例です
   calendar: 
+    agenda_view: 
+      delete: 削除
+      due: 期限
+      edit: 編集
     appointment_group_deletion_details: これを削除すると、受講生がサインアップしたすべての予定も削除されます。
     appointment_group_list: 
       location: "場所:"
@@ -2255,13 +2265,16 @@ ja:
       create_event: 新しいイベントの作成
       done_go_back_to_list: 完了し、リストに戻る
       links: 
+        calendar_agenda: アジェンダ
         calendar_month: 月
         calendar_scheduler: スケジューラ
         calendar_week: 週
+      loading: 読み込み中
       my_appointment_groups: マイ予定グループ
       refresh: 更新
       use_old_calendar: 古いカレンダー
     calendar_navigator: 
+      enter_jump_date: "日付にジャンプするには、日付を入力して Enter キーを押します。"
       next: 次へ
       previous: 前へ
       today: 本日
@@ -2354,6 +2367,7 @@ ja:
       slots_available: 使用できるスロット
     event_event_title: "イベント タイトル:"
     event_on_this_day: この日にはイベントがあります
+    invalid_date: 日付が無効です
     labels: 
       due: 期限
     message_participants: 
@@ -3342,6 +3356,7 @@ ja:
         modules: 
           before_students_view: 受講生がこのモジュールを表示するためには
         new_tab: このツールを新しいタブに読み込む
+        publish_final_grade: このモジュールの完了時に受講生の最終的な成績を公開
         require_sequential_progress: 受講生はこのモジュールの要件を順番に通過する必要があります
         sort_by: 並べ替え
         title: タイトル
@@ -3801,6 +3816,7 @@ ja:
       slide7: "スライド 7"
       slide8: "スライド 8"
       slide9: "スライド 9"
+  correct_answer: これが正解。
   course: 
     access_denied: アクセスは拒否されました
     batch_update_message: 
@@ -4154,6 +4170,7 @@ ja:
       headings: 
         future_enrollments: 将来の登録
         my_courses: "マイ コース"
+        my_groups: "マイ グループ"
         past_enrollments: 過去の登録
       start_new_course: 新しいコースの開始
       titles: 
@@ -4401,41 +4418,35 @@ ja:
     show: 
       acting_as: "現在、次の役割をもって、このコースを表示しています:%{enrollment_type}。この役割のユーザが持つ権限の範囲でのみ、アクセスが許可されます。"
       buttons: 
-        update_layout: レイアウトの更新
+        update_layout: 保存
       details: 
-        assignments: "このビューには、このコースの **課題のリスト** が表示されます。これから予定されている課題、および最近の課題が一番上に表示されます。"
         confirm_unenroll: "このコースへの登録を解除してもよろしいですか?コース名簿の表示や、講師との直接の通信はできなくなります。また、コース イベントをストリームに表示したり、お知らせを受け取ったりすることもできなくなります。"
-        custom_page: "**ご自身のコースのホーム ページを設計** して、リンク、画像、リッチ メディアなど、好きなものを何でも含めることができます。"
-        modules: |-
-            ご自分のコースは **モジュールまたはセクション** に編成できます。それぞれのセクションには、関連するファイル、課題、ページなどをセットにして含めます。必要であれば、それぞれのモジュールをロック解除するにあたって満たさなければならない基準や前提条件を定義して、モジュールを連続ものに仕立てることもできます。
-            
-            このレイアウトはおそらく、期間や学期などの特定のスケジュールに基づいていないコースに最適です。
-        recent_activity_dashboard: "**最近のアクティビティ ダッシュボード** には、このコースでの最近の会話、アナウンス、ディスカッション、交流などが表示されます。ユーザが最初にログインしたときに表示されるダッシュボード ページと非常によく似ていますが、ここで表示されるのはこのコースのコンテンツのみです。"
-        syllabus: "**要綱ビュー** には、コースへの期待を詳述できます。または、リンクや画像などを使用してコースに導き、続いて、課題やコース イベントを網羅したカレンダー ビューを表示することなどもできます。"
       empty_body: コンテンツなし
       headings: 
         confirm_unenroll: 登録解除の確認
+        edit_homepage_title: "ホーム ページの編集"
         importing: このコースはインポートされています
         set_layout: "ホーム ページのレイアウトの設定"
         unpublished: このコースは未公開です
       importing: コースのコピー/移行が進行中です。一部のコンテンツが一時的に使用できない場合があります。
       labels: 
-        set_layout: このコースのページを訪れた人に表示します
+        set_layout: "ホーム ページに表示する内容を選択します。"
       license_notice: "このコースのコンテンツは %{license_type} 使用許諾の下で提供されています。このコースのコンテンツは、特に断りのない限り、この使用許諾の下にあるものと見なされます。"
       links: 
         change_layout: "ホーム ページのレイアウトの変更"
         course_setup: コース設定のためのチェックリスト
-        course_stream: "コース ストリームを参照"
         drop_course: このコースを中断
+        edit_homepage: "ホーム ページの編集"
         join_course: このコースに参加
         new_announcement: 新しいアナウンス
         restore_role: 役割と権限の復元
+        view_course_stream: "コース ストリームを表示"
       options: 
         assignments: 課題リスト
-        custom_page: 自分で設計するページ
-        modules: コースのモジュール/セクション
+        custom_page: "ページ/トップ ページ"
+        modules: "コース モジュール"
         recent_activity_dashboard: "最近のアクティビティ ダッシュボード"
-        syllabus: 課題と要綱
+        syllabus: 要綱
       period_name: "過去 2 週間"
       re_sending: 再送信しています...
       send_done: 完了です!メッセージが送信されるまで数分かかる場合があります。
@@ -4690,6 +4701,7 @@ ja:
       short: "%b %e"
       short_month: "%b"
       short_weekday: "%a"
+      short_with_weekday: "%a, %b %-d"
       weekday: "%A"
     month_names: 
       - ~
@@ -4847,7 +4859,6 @@ ja:
   discussion_entry: 
     atom_no_author: 作成者なし
     default_user_name: ユーザ名
-    file_added_warning: "トピック \"%{discussion_topic_title}\" 内のエントリに必要なファイル \"%{file_path}\" が追加されました"
   discussion_topic: 
     atom_no_author: 作成者なし
     default_title: タイトルなし
@@ -4933,8 +4944,6 @@ ja:
     error_draft_state_announcement: このトピックはアナウンスのため、ドラフト状態に設定できません。
     error_draft_state_unauthorized: このトピックをドラフト状態に設定する権限がありません。
     error_draft_state_with_posts: このトピックには投稿が含まれているため、ドラフト状態に設定できません。
-    errors: 
-      bad_scope: スコープが矛盾しています
     group_assignment_discussion_entry: 
       posts: 
         one: "%{count} 件の投稿"
@@ -5537,10 +5546,9 @@ ja:
       education_levels: 教育レベル
       extensions: 拡張
       help_link: "ヘルプ リンク"
-      privacy_level: "プライバシー レベル"
       rate_tool: このツールを評価
     app_review_view: 
-      posted_by_on: "*%{user_name}* によって *%{created}* に投稿"
+      posted_by_on: "*%{user.name}* によって *%{created_at}* に投稿"
     app_saved_message: "%{app} が正常に保存されました。"
     borderless_launch: 
       load_tool_button: "%{tool} を手動で読み込む"
@@ -5957,9 +5965,13 @@ ja:
     students_who: 
       havent_been_graded: 採点されていません
       havent_submitted_yet: まだ提出していない
+      no_grade_for: "%{assignment} の成績なし"
+      no_submission_for: "%{assignment} の提出なし"
       not_submitted_yet: まだ提出していない
       scored_less_than: "次のスコアに満たない: "
+      scored_less_than_on: "%{assignment} の成績が %{cutoff} 未満"
       scored_more_than: "次のスコアを上回る: "
+      scored_more_than_on: "%{assignment} の成績が %{cutoff} より高い"
     submission_information: 提出情報
     teacher_muted_title: 課題はミュートになっています
     titles: 
@@ -6046,8 +6058,13 @@ ja:
     students_who: 
       havent_been_graded: 採点されていません
       havent_submitted_yet: まだ提出していない
+      no_grade_for: "%{assignment} の成績なし"
+      no_submission_for: "%{assignment} の提出なし"
+      not_submitted_yet: まだ提出していない
       scored_less_than: "次のスコアに満たない: "
+      scored_less_than_on: "%{assignment} の成績が %{cutoff} 未満"
       scored_more_than: "次のスコアを上回る: "
+      scored_more_than_on: "%{assignment} の成績が %{cutoff} より高い"
     submitted_late: 遅れて提出
     title: 
       quiz: クイズへの提出物
@@ -6388,6 +6405,7 @@ ja:
         add_comment: コメントの追加
         average: 平均
         grade: 成績
+        grade_by_question_beta: "問題ごとの成績 (ベータ)"
         group_comment: グループ全体にコメントを送信
         hide_names: "SpeedGrader 内の受講生の名前を非表示にする"
         show_assessment_by: アセスメントの表示
@@ -6509,6 +6527,8 @@ ja:
   group: 
     default_collection_name: "%{group_name} のコレクション"
     memeber: メンバー
+    name_required: 名前は必須項目です
+    name_too_long: 短いグループ名を入力してください
     tabs: 
       chat: チャット
       discussions: ディスカッション
@@ -6643,7 +6663,7 @@ ja:
       page_title: "コース グループ"
       page_title_accounts: "アカウント グループ"
     create_group_set: "グループ セットの作成"
-    delete_confirm: "このグループ カテゴリを削除してもよろしいですか?"
+    delete_confirm: "このグループ セットを削除してもよろしいですか?"
     edit: 
       buttons: 
         update: グループの更新
@@ -6671,8 +6691,8 @@ ja:
       update_failed: 更新に失敗しました。もう一度、試してください
     feed_title: "%{course_or_account_name} のフィード"
     flash: 
-      removeError: "グループ カテゴリを削除できません。後でもう一度試してください。"
-      removed: "グループ カテゴリは正常に削除されました。"
+      removeError: "グループ セットを除できません。後でもう一度試してください。"
+      removed: "グループ セットは正常に削除されました。"
     group: 
       actions: 
         ask_to_join_group: このグループに参加するよう依頼する
@@ -6687,10 +6707,8 @@ ja:
       no_members: メンバーなし
       one: "グループ 1 件"
       other: "グループ %{count} 件"
-    group_count: 
-      one: "%{count} 件のグループ"
-      other: "%{count} 件のグループ"
     group_name: グループ名
+    groups_count: "グループ (%{count})"
     index: 
       heading_current_groups: 現在のグループ
       no_groups: グループなし
@@ -6707,7 +6725,10 @@ ja:
         too_short: "検索語を 3 文字以上で入力してください"
       assign_to_group_menu: 
         add_to_group: グループに追加
+        all_groups_full: いずれのグループにも空きがありません。
+        all_groups_full_suggestion: グループの定員を変更するか、またはグループを追加してください。
         assign_user_to_group: このグループにユーザを割り当て
+        no_groups_created: ユーザを追加する前に、グループを作成する必要があります。
       group: 
         add_user_to_group: グループにユーザを割り当て
         group_delete: 削除
@@ -6715,11 +6736,18 @@ ja:
         group_settings: 設定
         show_group_details: グループの詳細情報の表示
       group_categories: 
-        group_set_create: "グループ セットの追加"
+        account_group_explanation: "アカウント レベルの受講生グループは、受講生を特定のコースに関連付けずにグループ化するための良い方法です。すべての受講生グループが、独自のカレンダー、掲示板、および共同作用ツールを手に入れることができます。そのため、受講生自らがグループを管理でき、より効率的に共同作業を行うことができます。"
+        add_group_set: "グループ セットの追加"
+        course_group_explanation: "受講生グループは、グループ プロジェクトやグループ論文のような事柄のために受講生を編成する際に役立ちます。すべての受講生グループが、独自のカレンダー、掲示板、および共同作用ツールを手に入れることができます。そのため、受講生自らがグループを管理でき、より効率的に共同作業を行うことができます。"
+        group_assignment_instructions: "指定したサイズのグループに、受講生を無作為に割り当てることができます。または、手動でグループを作成し編成することもできます。グループを作成したら、\"グループ提出\" の課題となるように、課題を設定することができます。つまり、それぞれのグループが 1 つの提出物を、そのグループの全ユーザのために作成します。"
+        group_set: "グループ セット"
+        headings: 
+          account_groups: "アカウント レベルの受講生グループ"
+          course_groups: 受講生グループ
       group_category: 
         randomly_assigning_students: 受講生を無作為に割り当て
-        unassigned_students: 未割り当ての受講生
-        unassigned_users: 未割り当てのユーザ
+        search: 検索
+        search_groups: グループの検索
       group_category_create: 
         allow_self_signup: "セルフ サインアップを許可"
         cancel: キャンセル
@@ -6741,16 +6769,14 @@ ja:
         category_settings: 設定
         delete_category_option: 削除
         edit_category_option: 編集
-        group_limit_blurb: "グループの定員は *%{count}* 人です"
+        group: グループ
+        group_limit_blurb: "グループの定員は *%{group_limit}* 人です。"
         message_all_unassigned_option: すべての未割り当ての受講生にメッセージを送る
         randomly_assign_students_option: 受講生を無作為に割り当てます
         restricted_self_signup_blurb: 同じグループの受講生は全員が同じセクションに入っている必要があります。
-        search: 検索
         self_organized_warning: これらのグループは、受講生によって自己管理されています。ほかのタイプのグループと違って、受講生はこららのグループのうち複数のグループに同時に所属することができます。そのため、これらのグループは、採点対象の課題のためには最適なソリューションではない場合があります。
         self_signup_blurb: "これらのグループでは、セルフ サインアップが使用可能になっています。"
-        self_signup_help_tooltip: "セルフ サインアップ グループとは?"
-        student_group_instructions: (受講生をドラッグして割り当て)
-        user_group_instructions: (ユーザをドラッグして割り当て)
+        settings: 設定
       group_category_edit: 
         allow_self_signup: "セルフ サインアップを許可"
         cancel: キャンセル
@@ -6760,8 +6786,6 @@ ja:
         require_same_section: "グループ メンバーに、同じセクションに入ることを要求する"
         save: 保存
         saving: 保存しています...
-        self_signup_description: "受講生が自分でサインアップできるグループのセットを作成できます。受講生はセット内の 1 つのグループにしかサインアップできませんが、このオプションを使用すると、講師が受講生をグループに振り分けなくても、受講生が自分でグループを選択できます。このオプションを有効にしている場合は、受講生が自分で別のグループに移動できることに注意してください。"
-        what_is_this: これは何ですか?
       group_edit: 
         cancel: キャンセル
         group_name: グループ名
@@ -6774,14 +6798,15 @@ ja:
         no_students: 受講生なし
         no_users: ユーザなし
       groups: 
-        groups: グループ
         no_groups: グループなし。
-        search: 検索
-        search_groups: グループの検索
+        no_matching_groups: 一致するグループがありません。
       randomly_assign_members: 
         add_more_users: キャンセル
         close: OK
         randomly_assign_students_dialog: 未割り当ての全受講生を、自動的に、できるだけ均等に、既存の受講生グループに割り当てます。
+      self_signup_help: 
+        about_self_signup_groups: "セルフ サインアップ グループについて"
+        self_signup_description: "受講生が自分でサインアップできるグループのセットを作成できます。受講生はセット内の 1 つのグループにしかサインアップできませんが、このオプションを使用すると、講師が受講生をグループに振り分けなくても、受講生が自分でグループを選択できます。このオプションを有効にしている場合は、受講生が自分で別のグループに移動できることに注意してください。"
     member: 
       one: "%{count} 人のメンバー"
       other: "%{count} 人のメンバー"
@@ -6819,6 +6844,8 @@ ja:
     titles: 
       add_group_category: "グループ セットの追加"
       self_signup_help: "セルフ サインアップ グループ"
+    unassigned_students: "未割り当ての受講生 (%{count})"
+    unassigned_users: "未割り当てのユーザ (%{count})"
   help_dialog: 
     Back: 戻る
     Help: ヘルプ
@@ -6955,6 +6982,7 @@ ja:
       id: ID
       priority: 優先順位
       run_at: 実行された場所
+      runtime: 実行時間
       strand: ストランド
       tag: タグ
       worker: ワーカ
@@ -9198,6 +9226,7 @@ ja:
     submission_comments: 提出コメント
     sure_you_want_to_mute: "この課題をミュートにしてもよろしいですか?この課題がミュートになっている間、受講生は以下について表示できず、新しいお知らせも受信しません:"
   name: "Academic Benchmark インポーター"
+  new_facebook_message: "Canvas からの新しいメッセージがあります"
   not_applicable: N/A
   notification: 
     added_to_conversation_description: 会話に追加されました
@@ -9636,9 +9665,6 @@ ja:
       description: "このプラグインは、Crocodoc と統合して、HTML5 ドキュメント プレビュー機能を提供します。講師や受講生はこの機能を使用して、ドキュメントに注釈できます。"
       labels: 
         api_key: "Crocodoc API 鍵"
-    dim_dim: 
-      description: "Dimdim の Web 会議サポート"
-      name: Dimdim
     dim_dim_settings: 
       description: "Dimdim インスタンスへのアクセスが必要になります。"
       labels: 
@@ -9824,6 +9850,10 @@ ja:
       labels: 
         download_url: "LockDown ブラウザのダウンロード URL"
         plugin_enabled: 使用可能
+    med_cornell_export: 
+      labels: 
+        password: 認証用パスワード
+        username: 認証用ユーザ名
     notices: 
       settings_updated: プラグインの設定は正常に更新されました。
     qti_converter_settings: 
@@ -9848,6 +9878,7 @@ ja:
           作成後のプロフィールの "設定 -> API"
       labels: 
         api_key: "API 鍵"
+        enable_html5_viewer: "HTML5  ドキュメント ビューアの有効化"
         secret_key: "API シークレット"
     sessions: 
       description: "セッション タイムアウトを管理する"
@@ -10362,6 +10393,7 @@ ja:
   qti_display: QTI
   qti_file_description: "QTI .zip ファイル"
   qti_name: "QTI コンバータ"
+  question_answered: 解答済み
   question_bank: 
     align_outcomes: 成果の整列
     remove_outcome_from_bank: この成果をバンクから削除してもよろしいですか?
@@ -10449,6 +10481,7 @@ ja:
       show_details: 問題の詳細情報の表示
       title: 
         move_copy_questions: 問題の移動/コピー
+  question_unanswered: まだ解答していない
   quick_start_bar: 
     announcement: 
       saving: 保存しています...
@@ -10558,14 +10591,12 @@ ja:
     default_response_to_file_upload: 受講生が解答を提出した後、受講生に表示する応答
     default_title: 新しいクイズ
     display_answer: 
-      correct_answer: これが正解。
       labels: 
         answer_with_margin: 誤差
         your_answer: 解答
       margin_of_error: 誤差
       plus_or_minus: +/-
       range_answer: "%{lower_bound} と %{upper_bound} の間"
-      selected_answer: この解答が選択されました。
       you_left_this_blank: 空白のままになっています
     display_question: 
       default_question_answer: "[ 選択 ]"
@@ -10828,7 +10859,6 @@ ja:
       anonymous_username: 受講生
       buttons: 
         allow_extra_attempt: この受講生に追加の試行を許可
-        update_scores: スコアの更新
       count_attempts_left: 
         one: "%{user} はあと %{count} 回試行できます"
         other: "%{user} はあと %{count} 回試行できます"
@@ -11113,8 +11143,6 @@ ja:
     question_list_right_side: 
       headers: 
         questions: 質問
-      question_answered: 解答済み
-      question_unanswered: まだ解答していない
     question_statistic: 
       attempts: 
         one: "%{count} 回の試行"
@@ -11218,12 +11246,14 @@ ja:
       view_responses: 応答を表示
     quiz_submission: 
       attempt_duration: "今回の試行は %{duration} かかりました。"
+      buttons: 
+        update_scores: スコアの更新
       labels: 
         final_score: 最終的なスコア
         fudge_points: 調整点
-        fudge_points_changed_points_quiz: "%{user} がこのクイズに回答してから、クイズの配点が %{difference} 変更されました。この変更分の調整として、このボックスを使用して正または負の点数を手動で追加することができます:"
-        fudge_points_changed_points_survey: "%{user} がこのサーベイに回答してから、サーベイの配点が %{difference} 変更されました。この変更分の調整として、このボックスを使用して正または負の点数を手動で追加することができます:"
-        fudge_points_generic_explanation: "このボックスに正または負の点数を追加して、スコアを手動で調整することができます:"
+        fudge_points_changed_points_quiz: "%{user} さんがこのクイズを受けてから、クイズの配点が %{difference} 変更されました。この変更分の調整として、このボックスを使用して正または負の点数を手動で追加することができます。"
+        fudge_points_changed_points_survey: "%{user} さんがこのサーベイを受けてから、サーベイの配点が %{difference} 変更されました。この変更分の調整として、このボックスを使用して正または負の点数を手動で追加することができます。"
+        fudge_points_generic_explanation: このボックスに正または負の点数を追加して、スコアを手動で調整することができます。
         questions_need_review: 次の問題はレビューが必要です
         quiz_score: クイズのスコア
         score_for_attempt: この試行のスコア
@@ -11457,9 +11487,7 @@ ja:
         other: "%{count} 秒"
       show_time_link: 表示
       titles: 
-        answered: 解答済み
         come_back_later: この問題に、後で戻ってくるためのマークを付けました
-        not_answered: まだ解答していない
         times_up: 制限時間になりました!
       years_count: 
         one: "%{count} 年"
@@ -11819,6 +11847,7 @@ ja:
     titles: 
       add_item_to_module: モジュールにアイテムを追加
       find_links_using_service: "%{service} を使用してリンクを検索"
+  selected_answer: この解答が選択されました。
   self_enrollments: 
     already_enrolled: 
       already_enrolled: "既に **%{course}** に登録されています。"
@@ -12155,6 +12184,7 @@ ja:
       for_title: "対象: %{title}"
       labels: 
         body: メッセージ
+        subject: 科目
       message_students_who: 次の状態の受講生にメッセージを送る...
       out_of_points: "配点: %{points_possible}"
     mute_dialog: 
@@ -12269,12 +12299,14 @@ ja:
           other: "この注釈を使用して既に %{count} 人の受講生が評価されていることに注意してください。注釈を変更すると、これらの受講生の評価に影響があります。"
         rubric_in_use2: 既にこの注釈を用いて、受講生を評価しています大幅な変更は、それらのアセスメント結果に影響を及ぼします。
       out_of: "スコア: %{points} / *配点: %{total}*"
+      rubric: 注釈
       rubric_title: タイトル
       titles: 
         find_existing_rubric: 既存の注釈の検索
     rubric_criterion: 
       defaults: 
         description: 基準の説明
+      delete_criterion_link: 基準のリンクを削除
       description: 
         custom_comments_area: このエリアは、この基準に関するコメントを残すために査定人が使用します。
       full_marks: 満点
@@ -12291,7 +12323,8 @@ ja:
       options: 
         select: "[ 選択 ]"
       points: "%{points} 点"
-      points_abbreviation: "*Points* 点"
+      points_label: 点数
+      points_out_of2: "%{points} / %{total} 点"
       titles: 
         linked_to_learning_outcome: この基準がリンクされている学習成果があります。
     rubric_criterion_dialog: 
@@ -12322,6 +12355,7 @@ ja:
       labels: 
         total_points: 合計点
       points_out_of: "*スコア: %{points}* / 配点: **%{total}**"
+      rubric: 注釈
     rubric_summary_criterion: 
       defaults: 
         description: 基準の説明
@@ -12678,6 +12712,7 @@ ja:
         save_comment: コメントの保存
       crumbs: 
         assignments: 課題
+      hide_rubric_button: 注釈ボタンを非表示
       labels: 
         add_a_comment: コメントの追加
         grade: 成績
@@ -12868,6 +12903,7 @@ ja:
     announcement: アナウンス
     announcements: アナウンス
     assignments: 課題
+    come_back_later: この問題に、後で戻ってくるためのマークを付けました
     delete_quiz: クイズの削除
     delete_survey: サーベイの削除
     discussion: ディスカッション
@@ -13312,8 +13348,11 @@ ja:
     is_required: このフィールドは必須項目です
   warnings: 
     test_install: 
-      message: "この Canvas 環境はテスト用であり、毎週リセットされます。"
+      periodic_message: "この Canvas 環境はテスト用であり、定期的にリセットされます。"
       title: "Canvas テスト環境"
+      weekly_message: 
+        one: "この Canvas 環境はテスト用であり、%{count} 週間ごとにリセットされます。"
+        other: "この Canvas 環境はテスト用であり、%{count} 週間ごとにリセットされます。"
   web_conference: 
     default_name_for_courses: "コースの Web 会議"
     default_name_for_groups: "グループの Web 会議"
@@ -13423,9 +13462,6 @@ ja:
       blank_title: タイトルは空白にできません
       title_characters: "タイトルには、文字または数字を少なくとも 1 文字含めてください"
       title_too_long: "タイトルは %{max_characters} 文字以内にしてください"
-    missing_name: 名前の付いていないページ
-    notices: 
-      wiki_page_created: "Wiki ページ \"%{title}\" が作成されました"
     title_for_topics_category: "%{category} のトピック"
     unknown_user_name: 不明
     warnings: 
