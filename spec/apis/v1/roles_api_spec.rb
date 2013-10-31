@@ -323,8 +323,8 @@ describe "Roles API", type: :request do
       api_call_with_settings(:explicit => '1', :enabled => '0')
       override = @account.role_overrides.where(:permission => @permission, :role_id => @role.id).first
       expect(override).to_not be_nil
-      expect(override.enabled).to be_falsey
-      expect(override.locked).to be_nil
+      expect(override.enabled).to eq false
+      expect(override.locked).to eq false
 
       override.destroy
       r = @account.roles.first
@@ -334,8 +334,8 @@ describe "Roles API", type: :request do
       api_call_with_settings(:locked => '1')
       override = @account.role_overrides.where(:permission => @permission, :role_id => @role.id).first
       expect(override).to_not be_nil
-      expect(override.enabled).to be_nil
-      expect(override.locked).to be_truthy
+      expect(override.enabled).to eq true
+      expect(override.locked).to eq true
     end
 
     it "should discard restricted permissions" do

@@ -24,6 +24,8 @@ class RoleOverride < ActiveRecord::Base
   include Role::AssociationHelper
 
   attr_accessible :context, :permission, :role, :enabled, :applies_to_self, :applies_to_descendants
+  validates :enabled, inclusion: [true, false]
+  validates :locked, inclusion: [true, false]
 
   validate :must_apply_to_something
 
@@ -892,7 +894,7 @@ class RoleOverride < ActiveRecord::Base
       # keep track of the value for the parent
       generated_permission[:prior_default] = generated_permission[:enabled]
 
-      unless override.enabled.nil?
+      unless override.new_record?
         generated_permission[:explicit] = true if last_override
         if hit_role_context
           generated_permission[:enabled] ||= override.enabled? ? override.applies_to : nil

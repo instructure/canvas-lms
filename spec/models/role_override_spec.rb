@@ -170,13 +170,13 @@ describe RoleOverride do
 
       it "should only set the parts that are specified" do
         override = RoleOverride.manage_role_override(@account, @role, @permission, :override => false)
-        expect(override.enabled).to be_falsey
-        expect(override.locked).to be_nil
+        expect(override.enabled).to eq false
+        expect(override.locked).to eq false
         override.destroy
 
         override = RoleOverride.manage_role_override(@account, @role, @permission, :locked => true)
-        expect(override.enabled).to be_nil
-        expect(override.locked).to be_truthy
+        expect(override.enabled).to eq true
+        expect(override.locked).to eq true
       end
     end
   end
