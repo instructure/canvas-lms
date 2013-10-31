@@ -293,30 +293,28 @@ describe PageView do
     end
   end
 
-  describe ".for_request_id" do
+  describe ".find_for_update" do
     context "db-backed" do
       before do
         Setting.set('enable_page_views', 'db')
       end
 
-      it "should return use existing page view if any" do
+      it "should return the existing page view" do
         pv = page_view_model
-        PageView.for_request_id(pv.request_id).should == pv
+        PageView.find_for_update(pv.request_id).should == pv
       end
 
       it "should return nothing with unknown request id" do
-        PageView.for_request_id('unknown').should be_nil
+        PageView.find_for_update('unknown').should be_nil
       end
     end
 
     context "cassandra-backed" do
       it_should_behave_like "cassandra page views"
-      it "should generate a new page view with that request_id" do
+
+      it "should return the existing page view" do
         pv = page_view_model
-        new_pv = PageView.for_request_id(pv.request_id)
-        new_pv.should_not be_nil
-        new_pv.request_id.should == pv.request_id
-        new_pv.url.should_not == pv.url
+        PageView.find_for_update(pv.request_id).should == pv
       end
     end
   end

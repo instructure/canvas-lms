@@ -57,11 +57,17 @@ class PageView < ActiveRecord::Base
     end
   end
 
-  def self.for_request_id(request_id)
-    if PageView.page_view_method == :db
-      find_by_request_id(request_id)
+  def self.find_for_update(request_id)
+    if PageView.updates_enabled? && (self.db? || self.cassandra?)
+      begin
+        # not using find_by_id or where(..).first because the cassandra
+        # codepath doesn't support it
+        find(request_id)
+      rescue ActiveRecord::RecordNotFound
+        nil
+      end
     else
-      new{ |p| p.request_id = request_id }
+      new { |p| p.request_id = request_id }
     end
   end
 
@@ -99,6 +105,10 @@ class PageView < ActiveRecord::Base
     if PageView.cassandra? && new_record?
       self.shard = Shard.birth
     end
+  end
+
+  def self.db?
+    self.page_view_method == :db
   end
 
   def self.cassandra?
@@ -153,9 +163,14 @@ class PageView < ActiveRecord::Base
     page_view
   end
 
+  def self.updates_enabled?
+    Setting.get('skip_pageview_updates', 'false') != 'true'
+  end
+
   def store
     self.created_at ||= Time.zone.now
     return false unless user
+    return false if self.is_update && !PageView.updates_enabled?
 
     result = case PageView.page_view_method
     when :log

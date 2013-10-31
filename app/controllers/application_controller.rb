@@ -792,11 +792,12 @@ class ApplicationController < ActionController::Base
     return true if !page_views_enabled?
 
     if @current_user && @log_page_views != false
-      if request.xhr? && params[:page_view_id] && !(@page_view && @page_view.generated_by_hand)
-        @page_view = PageView.for_request_id(params[:page_view_id])
+      updated_fields = params.slice(:interaction_seconds, :page_view_contributed)
+      if request.xhr? && params[:page_view_id] && !updated_fields.empty? && !(@page_view && @page_view.generated_by_hand)
+        @page_view = PageView.find_for_update(params[:page_view_id])
         if @page_view
           response.headers["X-Canvas-Page-View-Id"] = @page_view.id.to_s if @page_view.id
-          @page_view.do_update(params.slice(:interaction_seconds, :page_view_contributed))
+          @page_view.do_update(updated_fields)
           @page_view_update = true
         end
       end
