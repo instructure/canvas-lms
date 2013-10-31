@@ -1359,4 +1359,5 @@ class Account < ActiveRecord::Base
     root_account.save!
   end
 
+  Bookmarker = BookmarkedCollection::SimpleBookmarker.new(Account, :name, :id)
 end

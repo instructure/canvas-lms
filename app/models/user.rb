@@ -2553,6 +2553,10 @@ class User < ActiveRecord::Base
   end
   memoize :all_accounts
 
+  def all_paginatable_accounts
+    BookmarkedCollection.with_each_shard(Account::Bookmarker, self.accounts)
+  end
+
   def all_pseudonyms
     self.pseudonyms.with_each_shard
   end

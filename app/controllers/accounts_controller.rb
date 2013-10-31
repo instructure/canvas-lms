@@ -31,11 +31,16 @@ class AccountsController < ApplicationController
   # students and even teachers will get an empty list in response, only
   # account admins can view the accounts that they are in.
   def index
-    @accounts = @current_user ? @current_user.all_accounts : []
     respond_to do |format|
-      format.html
+      format.html do
+        @accounts = @current_user ? @current_user.all_accounts : []
+      end
       format.json do
-        @accounts = Api.paginate(@accounts, self, api_v1_accounts_url)
+        if @current_user
+          @accounts = Api.paginate(@current_user.all_paginatable_accounts, self, api_v1_accounts_url)
+        else
+          @accounts = []
+        end
         render :json => @accounts.map { |a| account_json(a, @current_user, session, params[:includes] || []) }
       end
     end
