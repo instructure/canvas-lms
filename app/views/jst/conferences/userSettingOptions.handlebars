@@ -12,5 +12,15 @@
         >
       {{description}}
     </label>
-  {{/if}}
+  {{else}} {{#if isText}}
+    <label for="web_conference_user_settings_{{field}}">
+      {{description}}
+      <input
+        name="web_conference[user_settings][{{field}}]"
+        id="web_conference_user_settings_{{field}}"
+        type="text"
+        value="{{value}}"
+        {{#if ../../conference_started}}disabled="disabled"{{/if}}
+        >
+  {{/if}}{{/if}}
 {{/each}}
