@@ -21,16 +21,4 @@ class QuizSubmissionsApiController < ApplicationController
 
   before_filter :require_user, :require_context
 
-  # not doing api documentation for this until there is more quiz_submission
-  # api stuff to talk about
-  def create_file
-    quiz = @context.quizzes.active.find(params[:quiz_id])
-    quiz_submission = quiz.quiz_submissions.where(:user_id => @current_user).first
-    raise ActiveRecord::RecordNotFound unless quiz_submission
-
-    if authorized_action(quiz, @current_user, :submit)
-      api_attachment_preflight quiz_submission, request,
-        :check_quota => true, :do_submit_to_scribd => false, :file_param => 'file'
-    end
-  end
 end

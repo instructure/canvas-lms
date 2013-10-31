@@ -34,6 +34,12 @@ define [
     server.respond()
     equal dfrd.state(), "rejected"
 
+  test 'saveFrd handles attachments wrapped in array per JSON API style', ->
+    server.respondWith("POST", "/preflight", [200, {"Content-Type": "application/json"}, '{"attachments": [{"upload_url": "/upload", "upload_params": {"Policy": "TEST"}, "file_param": "file"}]}'])
 
-
-
+    # can't fake the upload with the server, since it's a hidden iframe post, not XHR
+    stub = sinon.stub Model.prototype, 'save'
+    model.save()
+    server.respond()
+    strictEqual model.get("Policy"), "TEST"
+    stub.restore()

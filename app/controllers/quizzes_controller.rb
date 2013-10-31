@@ -128,7 +128,7 @@ class QuizzesController < ApplicationController
         @just_graded = true
       end
       if @submission
-        upload_url = api_v1_quiz_submission_create_file_path(:course_id => @context.id, :quiz_id => @quiz.id)
+        upload_url = api_v1_quiz_submission_files_path(:course_id => @context.id, :quiz_id => @quiz.id)
         js_env :UPLOAD_URL => upload_url
         js_env :SUBMISSION_VERSIONS_URL => polymorphic_url([@context, @quiz, 'submission_versions']) unless @quiz.muted?
       end

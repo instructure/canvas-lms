@@ -1290,8 +1290,8 @@ FakeRails3Routes.draw do
       get "courses/:course_id/quizzes/:quiz_id/reports/:id", :action => :show, :path_name => 'course_quiz_report'
     end
 
-    scope(:controller => :quiz_submissions_api) do
-      post 'courses/:course_id/quizzes/:quiz_id/quiz_submissions/self/files', :action => :create_file, :path_name => 'quiz_submission_create_file'
+    scope(:controller => :quiz_submission_files) do
+      post 'courses/:course_id/quizzes/:quiz_id/quiz_submissions/self/files', :action => :create, :path_name => 'quiz_submission_files'
     end
 
     scope(:controller => :outcome_groups_api) do
