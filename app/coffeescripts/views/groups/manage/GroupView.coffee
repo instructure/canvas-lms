@@ -109,4 +109,4 @@ define [
       user = ui.draggable.data('model')
       newGroupId = $(e.currentTarget).data('id')
       setTimeout ->
-        user.save({'groupId': newGroupId})
+        user.moveTo newGroupId

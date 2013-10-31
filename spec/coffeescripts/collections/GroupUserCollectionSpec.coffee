@@ -1,7 +1,9 @@
 define [
   'compiled/collections/GroupUserCollection'
+  'compiled/models/GroupCategory'
+  'compiled/models/GroupUser'
   'Backbone'
-], (GroupUserCollection, {Model, Collection}) ->
+], (GroupUserCollection, GroupCategory, GroupUser, {Model, Collection}) ->
 
   source = null
   target = null
@@ -10,11 +12,11 @@ define [
   module 'GroupUserCollection',
     setup: ->
       group = new Model(id: 1)
-      category = new Model()
+      category = new GroupCategory()
       category._groups = new Collection([group])
       users = [
-        new Model(id: 1, name: "bob", sortable_name: "bob", groupId: null),
-        new Model(id: 2, name: "joe", sortable_name: "joe", groupId: null)
+        new GroupUser(id: 1, name: "bob", sortable_name: "bob", groupId: null),
+        new GroupUser(id: 2, name: "joe", sortable_name: "joe", groupId: null)
       ]
       source = new GroupUserCollection(users, groupId: null)
       source.category = category

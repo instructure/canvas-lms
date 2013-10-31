@@ -31,7 +31,8 @@ describe "Group Categories API", :type => :integration do
       'group_limit' => category.group_limit,
       'groups_count' => category.groups.size,
       'unassigned_users_count' => category.unassigned_users.count,
-      'protected' => false
+      'protected' => false,
+      'allows_multiple_memberships' => false
     }
   end
 

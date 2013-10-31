@@ -254,7 +254,7 @@ class GroupCategory < ActiveRecord::Base
   end
 
   def unassigned_users
-    context.users_not_in_groups(groups.active)
+    context.users_not_in_groups(allows_multiple_memberships? ? [] : groups.active)
   end
 
   def assign_unassigned_members

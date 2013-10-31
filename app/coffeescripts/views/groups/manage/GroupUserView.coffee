@@ -21,13 +21,19 @@ define [
     removeUserFromGroup: (e)->
       e.preventDefault()
       e.stopPropagation()
-      @model.save 'groupId', null
+      @model.moveTo null
 
     attach: ->
       @model.on 'change', @render, this
 
     afterRender: ->
       @$el.data('model', @model)
+
+    highlight: ->
+      @$el.addClass 'group-user-highlight'
+      setTimeout =>
+        @$el.removeClass 'group-user-highlight'
+      , 1000
 
     toJSON: ->
       _.extend {}, this, super

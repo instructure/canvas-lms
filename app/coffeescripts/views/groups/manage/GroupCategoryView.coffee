@@ -82,7 +82,9 @@ define [
     setUnassignedHeading: ->
       count = @model.unassignedUsersCount() ? 0
       @$unassignedUsersHeading.text(
-        if ENV.group_user_type is 'student'
+        if @model.get('allows_multiple_memberships')
+          I18n.t('everyone', "Everyone (%{count})", {count})
+        else if ENV.group_user_type is 'student'
           I18n.t('unassigned_students', "Unassigned Students (%{count})", {count})
         else
           I18n.t('unassigned_users', "Unassigned Users (%{count})", {count})

@@ -31,10 +31,18 @@ define [
       else
         @get('groups_count')
 
+    groupUsersFor: (id) ->
+      if id?
+        @_groups?.get(id)?._users
+      else
+        @_unassignedUsers
+
     unassignedUsers: ->
       @_unassignedUsers = new GroupUserCollection(null, groupId: null)
       @_unassignedUsers.category = this
-      @_unassignedUsers.url = "/api/v1/group_categories/#{@id}/users?unassigned=true&per_page=50"
+      url = "/api/v1/group_categories/#{@id}/users?per_page=50"
+      url += "&unassigned=true" unless @get('allows_multiple_memberships')
+      @_unassignedUsers.url = url
       @_unassignedUsers.on 'fetched:last', => @set('unassigned_users_count', @_unassignedUsers.length)
       @unassignedUsers = -> @_unassignedUsers
       @_unassignedUsers
@@ -44,7 +52,7 @@ define [
 
     canAssignUnassignedMembers: ->
       @groupsCount() > 0 and
-        @get('role') isnt 'student_organized' and
+        not @get('allows_multiple_memberships') and
         @get('self_signup') isnt 'restricted'
 
     assignUnassignedMembers: ->

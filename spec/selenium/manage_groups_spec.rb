@@ -137,6 +137,30 @@ describe "manage groups" do
       ff(group1_users_selector).size.should == 0
       ff(group2_users_selector).size.should == 1
     end
+
+    it "should support student-organized groups" do
+      course_with_teacher_logged_in(:active_all => true)
+      student_in_course
+      student_in_course
+
+      cat = GroupCategory.student_organized_for(@course)
+      add_groups_in_category cat, 1
+
+      get "/courses/#{@course.id}/groups"
+      wait_for_ajaximations
+
+      f('.group-category-actions .al-trigger').should be_nil # can't edit/delete etc.
+
+      # user never leaves "Everyone" list, only gets added to a group once
+      2.times do
+        f('.unassigned-users-heading').text.should == "Everyone (2)"
+        ff("div[data-view='unassignedUsers'] .assign-to-group").first.click
+        wait_for_animations
+        ff(".assign-to-group-menu .set-group").first.click
+        wait_for_ajaximations
+        fj(".group-summary:visible:first").text.should == "1 student"
+      end
+    end
   end
 
   # TODO: Remove this whole section after new UI becomes default

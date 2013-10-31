@@ -40,6 +40,7 @@ module Api::V1::GroupCategory
       end
     end
     hash['protected'] = group_category.protected?
+    hash['allows_multiple_memberships'] = group_category.allows_multiple_memberships?
     hash
   end
 end

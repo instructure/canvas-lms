@@ -37,6 +37,10 @@ define [
 
     attach: ->
       @group.on 'change:members_count', @render
+      @collection.on 'moved', @highlightUser
+
+    highlightUser: (user) ->
+      user.itemView.highlight()
 
     toJSON: ->
       count: @group.usersCount()

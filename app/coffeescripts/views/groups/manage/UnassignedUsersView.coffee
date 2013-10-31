@@ -24,6 +24,7 @@ define [
 
     attach: ->
       @collection.on 'reset', @render
+      @collection.on 'moved', @highlightUser
 
     afterRender: ->
       super
@@ -63,4 +64,5 @@ define [
     # ui.draggable: the user being dragged
     _onDrop: (e, ui) =>
       user = ui.draggable.data('model')
-      user.save({'groupId': null})
+      setTimeout ->
+        user.moveTo null

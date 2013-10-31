@@ -357,3 +357,21 @@ $popoverArrowDistanceFromCorner: $popoverArrowOuterWidth;
 .dotted-separator {
   border-bottom: 1px dotted #aaa;
 }
+
+@keyframes highlight-shadow-fade {
+  from {
+    @include box-shadow(0 0 8px rgba(82,168,236,1));
+  }
+  to {
+    @include box-shadow(none);
+  }
+}
+
+@-webkit-keyframes highlight-shadow-fade {
+  from {
+    @include box-shadow(0 0 8px rgba(82,168,236,1));
+  }
+  to {
+    @include box-shadow(none);
+  }
+}
