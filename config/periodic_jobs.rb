@@ -78,19 +78,6 @@ if IncomingMail::IncomingMessageProcessor.run_periodically?
   end
 end
 
-if PageView.redis_queue?
-  # periodically pull new page views off the cache and insert them into the db
-  Delayed::Periodic.cron 'PageView.process_cache_queue', '*/1 * * * *' do
-    Shard.with_each_shard do
-      unless Shard.current.settings[:process_page_view_queue] == false
-        PageView.send_later_enqueue_args(:process_cache_queue,
-                                         :singleton => "PageView.process_cache_queue:#{Shard.current.id}",
-                                         :max_attempts => 1)
-      end
-    end
-  end
-end
-
 Delayed::Periodic.cron 'ErrorReport.destroy_error_reports', '35 */1 * * *' do
   cutoff = Setting.get('error_reports_retain_for', 3.months.to_s).to_i
   if cutoff > 0
