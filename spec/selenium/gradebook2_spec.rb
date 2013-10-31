@@ -164,20 +164,20 @@ describe "gradebook2" do
       edit_grade(f('#gradebook_grid [row="0"] .l0'), 0)
       edit_grade(f('#gradebook_grid [row="1"] .l0'), 1)
 
-      keep_trying_until do
-        button = fj('#section_to_show')
+      button = f('#section_to_show')
+      choose_section = lambda do |name|
         button.click
         wait_for_js
-        fj('#section-to-show-menu').should be_displayed
-        ffj('#section-to-show-menu a').first.click
+        ff('#section-to-show-menu a').find { |a| a.text.include? name }.click
         wait_for_js
-        button.should include_text("All Sections")
-        button.click
-        wait_for_js
-        ffj('#section-to-show-menu a').last.click
-        wait_for_js
-        button.should include_text(@other_section.name)
       end
+
+      choose_section.call "All Sections"
+      button.should include_text("All Sections")
+
+      choose_section.call @other_section.name
+      button.should include_text(@other_section.name)
+
       validate_cell_text(f('#gradebook_grid [row="0"] .l0'), '1')
 
       # verify that it remembers the section to show across page loads
