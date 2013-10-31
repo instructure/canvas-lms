@@ -208,6 +208,7 @@ class User < ActiveRecord::Base
   has_many :web_conference_participants
   has_many :web_conferences, :through => :web_conference_participants
   has_many :account_users
+  has_many :accounts, :through => :account_users
   has_many :media_objects, :as => :context
   has_many :user_generated_media_objects, :class_name => 'MediaObject'
   has_many :user_notes
@@ -2548,10 +2549,9 @@ class User < ActiveRecord::Base
   end
 
   def all_accounts
-    self.account_users.with_each_shard { |scope| scope.includes(:account) }.map(&:account).uniq
+    self.accounts.with_each_shard
   end
   memoize :all_accounts
-  alias :accounts :all_accounts
 
   def all_pseudonyms
     self.pseudonyms.with_each_shard
