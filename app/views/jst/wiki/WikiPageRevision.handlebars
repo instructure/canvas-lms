@@ -1,0 +1,23 @@
+<div class="revision-content">
+  <div class="revision-details">
+    {{#if edited_by}}
+      {{#t 'revision_summary'}}<strong>{{updated_at}}</strong> by {{edited_by}}{{/t}}
+    {{else}}
+      <strong>{{updated_at}}</strong>
+    {{/if}}
+  </div>
+
+  {{#if IS.LATEST}}
+    <div class="revision-actions">{{#t 'latest_revision'}}Latest Revision{{/t}}</div>
+  {{else}}
+    {{#ifAll IS.SELECTED IS.LOADED}}
+      <div class="revision-actions">
+        {{#if IS.SAME_AS_LATEST}}
+          {{#t 'same_as_latest'}}Same as <strong>Latest</strong>{{/t}}
+        {{else}}
+          <a class="restore-link">{{#t 'restore_revision'}}Restore this revision{{/t}}</a>
+        {{/if}}
+      </div>
+    {{/ifAll}}
+  {{/if}}
+</div>

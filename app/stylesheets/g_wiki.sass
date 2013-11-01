@@ -23,7 +23,15 @@ $item-hover-background: #eef7ff
 $shadow: 0 1px 0 rgba(0,0,0,0.15)
 $table-shadow: 0 1px 0 #dde0e4
 
-.pages .sticky
+$revision-sidebar-width: 270px
+$revision-sidebar-background-color: #f6f8fa
+$revision-sidebar-selected-color: #ffffff
+$revision-sidebar-hover-color: #eef1f3
+$revision-sidebar-dimmed-color: #999999
+$revision-button-color: #999999
+$revision-button-hover-color: #2590cf
+
+.pages .sticky-toolbar .sticky
   position: fixed
   z-index: 1000
   top: 0px
@@ -35,15 +43,16 @@ $table-shadow: 0 1px 0 #dde0e4
   max-width: $max_main_width
   border-color: $menu-border-color
 
-.pages.with-left-side .sticky
+.pages.with-left-side .sticky-toolbar .sticky
   margin-left: $left_side_width + 1px
-.pages.with-right-side .sticky
+.pages.with-right-side .sticky-toolbar .sticky
   margin-right: $right_side_width + 1px
 
-.pages
+.pages:not(.revisions)
   #breadcrumbs
     :border-bottom $pages-border
 
+.pages
   .header-bar-outer-container
     :height 64px
     :clear right
@@ -296,9 +305,134 @@ $table-shadow: 0 1px 0 #dde0e4
       :margin-top 0
       :margin-bottom 0
 
+.pages.show.revisions
+  .revision:first-child
+    :border-top $pages-inner-border
+
+  #wiki_page_revisions
+    :position relative
+    :min-height 502px
+  .show-content
+    :float left
+    :margin-right $revision-sidebar-width + 1px
+  .show-revisions
+    :position absolute
+    :top 0
+    :bottom 0
+    :right 0
+    :width $revision-sidebar-width
+    :background-color $revision-sidebar-background-color
+    :border-left $pages-border
+    aside
+      :width $revision-sidebar-width
+      :position fixed
+    .revision-history
+      :text-transform uppercase
+      :font-size 14px
+      :font-weight bold
+      :line-height 40px
+      :padding 4px 11px
+      :margin-top -1px
+      :margin-left -1px
+      :border-left $pages-border
+      :border-top $pages-border
+      :border-bottom none
+      :color $subdued-text-color
+      :position relative
+    .revision-history .close-button
+      :position absolute
+      :top 3px
+      :bottom 3px
+      :right 3px
+      :width 42px
+      :text-align center
+      :color dimgrey
+      &:hover
+        :color $revision-button-hover-color
+      i.icon-x
+        :position absolute
+        :top 50%
+        :margin-top -8px
+        :right 13px
+    ul.revisions-list
+      :margin 0 0 0 -1px
+      :height 400px
+
+  .revision
+    :list-style-type none
+    :overflow hidden
+    :width $revision-sidebar-width + 1px
+    :margin-top -1px
+
+    :border-left none
+    :border-right none
+    :border-top 1px solid transparent
+    :border-bottom 1px solid transparent
+    &.selected
+      :border-top $pages-border
+      :border-bottom $pages-border
+
+    // height and transitions
+    :height 34px
+    :transition height 400ms
+    &.selected, &.latest
+      :height 56px
+      :transition height 400ms
+
+    .revision-content
+      :margin-left 1px
+      :padding 7px 8px
+    &:not(.selected):hover .revision-content
+      :background-color $revision-sidebar-hover-color
+      :cursor pointer
+    .revision-actions
+      :margin-top 2px
+      :font-style italic
+      :color $revision-sidebar-dimmed-color
+    .revision-actions a.restore-link
+      :font-style normal
+      :cursor pointer
+    &.selected
+      :background-color $revision-sidebar-selected-color
+
+  .revision-nav-buttons
+    :position relative
+    :padding 0
+    :height 40px
+    :margin-top 14px
+    :border-top $pages-inner-border
+    a
+      :user-select none
+      :font-weight bold
+      :font-size 12px
+      :text-transform uppercase
+      :padding 10px 10px
+      :color $revision-button-color
+    a:hover
+      :text-decoration none
+      :cursor pointer
+      :color $revision-button-hover-color
+      :border-radius 3px
+    .prev-button
+      :position absolute
+      :left 3px
+      :top 3px
+      :padding 7px 10px 7px 5px
+    .next-button
+      :position absolute
+      :right 3px
+      :top 3px
+      :padding 7px 5px 7px 10px
+
 @media print
   #breadcrumbs, .header-bar-outer-container
     :display none
+
+  .pages.show.revisions
+    .show-revisions
+      :display none
+    .show-content
+      :margin-right 0
 
 #wiki_show_view_main
   :overflow auto

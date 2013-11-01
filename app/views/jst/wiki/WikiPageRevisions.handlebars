@@ -1,0 +1,18 @@
+<aside>
+  <div class="revision-history">
+    {{#t 'revision_history'}}Revision History{{/t}}
+    <a href="#" class="close-button"><i class="icon-x"></i></a>
+  </div>
+  <ul class="collectionViewItems revisions-list">
+  </ul>
+  {{#ifAny CAN.FETCH_PREV CAN.FETCH_NEXT}}
+    <div class="revision-nav-buttons">
+      {{#if CAN.FETCH_PREV}}
+        <a class="prev-button"><i class="icon-mini-arrow-left"></i> Previous</a>
+      {{/if}}
+      {{#if CAN.FETCH_NEXT}}
+        <a class="next-button">Next <i class="icon-mini-arrow-right"></i></a>
+      {{/if}}
+    </div>
+  {{/ifAny}}
+</aside>

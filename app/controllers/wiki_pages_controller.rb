@@ -21,8 +21,8 @@ class WikiPagesController < ApplicationController
 
   before_filter :require_context
   before_filter :get_wiki_page
-  before_filter :set_js_rights, :only => [:pages_index, :show_page, :edit_page]
-  before_filter :set_js_wiki_data, :only => [:pages_index, :show_page, :edit_page]
+  before_filter :set_js_rights, :only => [:pages_index, :show_page, :edit_page, :page_revisions]
+  before_filter :set_js_wiki_data, :only => [:pages_index, :show_page, :edit_page, :page_revisions]
   add_crumb(proc { t '#crumbs.wiki_pages', "Pages"}) do |c|
     url = nil
     context = c.instance_variable_get('@context')
@@ -216,6 +216,26 @@ class WikiPagesController < ApplicationController
     else
       if authorized_action(@page, @current_user, :read)
         flash[:warning] = t('notices.cannot_edit', 'You are not allowed to edit the page "%{title}".', :title => @page.title)
+        redirect_to polymorphic_url([@context, :named_page], :wiki_page_id => @page)
+      end
+    end
+  end
+
+  def page_revisions
+    if !@context.draft_state_enabled?
+      redirect_to polymorphic_url([@context, @page, :wiki_page_revisions])
+      return
+    end
+
+    if is_authorized_action?(@page, @current_user, :read_revisions)
+      add_crumb(@page.title, polymorphic_url([@context, :named_page], :wiki_page_id => @page))
+      add_crumb(t("#crumbs.revisions", "Revisions"))
+
+      @padless = true
+      render
+    else
+      if authorized_action(@page, @current_user, :read)
+        flash[:warning] = t('notices.cannot_read_revisions', 'You are not allowed to review the historical revisions of "%{title}".', :title => @page.title)
         redirect_to polymorphic_url([@context, :named_page], :wiki_page_id => @page)
       end
     end

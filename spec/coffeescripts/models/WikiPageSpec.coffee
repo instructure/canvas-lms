@@ -29,6 +29,10 @@ define [
     wikiPage = new WikiPage {url: 'url'}, revision: 42
     equal wikiPage.latestRevision().get('revision_id'), 42, 'revision passed to latestRevision'
 
+  test 'wiki page passed to latestRevision', ->
+    wikiPage = new WikiPage {url: 'url'}
+    equal wikiPage.latestRevision().page, wikiPage, 'wiki page passed to latestRevision'
+
   test 'latestRevision should be marked as latest', ->
     wikiPage = new WikiPage {url: 'url'}
     equal wikiPage.latestRevision().latest, true, 'marked as latest'
