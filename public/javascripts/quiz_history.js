@@ -47,7 +47,12 @@ define([
     $quizBody: null,
 
     jumpPosition: function(question_id) {
-      return $("#question_" + question_id).offset().top - 110;
+      $question = $("#question_" + question_id);
+      if($question.length > 0) {
+        return $question.offset().top - 110;
+      } else {
+        return 0;
+      }
     },
 
     checkQuizBody: function() {
@@ -209,7 +214,8 @@ define([
       });
 
       if (ENV.GRADE_BY_QUESTION) {
-        var questionId = parseInt(parentWindow.get('active_question_id'));
+        var questionIndex = parseInt(parentWindow.get('active_question_index'));
+        var questionId = $('.q' + questionIndex).data('id');
         if(!isNaN(questionId)){
           scoringSnapshot.jumpDirectlyToQuestion(questionId);
         }
@@ -297,17 +303,13 @@ define([
         $questions = $('.question')
         for(var t = 0; t <= qArray.length; t++) {
           $question = $($questions[t])
+          qNum = t + 1;
           if ( (docScroll > qArray[t] && docScroll < qArray[t+1])  || ( t == (qArray.length - 1) && docScroll > qArray[t])) {
-            qNum = t + 1;
-            var questionId = $question.attr('id');
-            if(questionId !== undefined){
-              questionId = questionId.split('_')[1];
-              parentWindow.set('active_question_id', questionId);
-              quizNavBar.activateLink(qNum);
-              $question.addClass('selected_single_question');
-            }
+            parentWindow.set('active_question_index', qNum);
+            quizNavBar.activateLink(qNum);
+            $question.addClass('selected_single_question');
           } else {
-            $('.q'+ (t + 1)).removeClass('active');
+            $('.q'+ qNum).removeClass('active');
             $question.removeClass('selected_single_question');
           }
         }
@@ -376,10 +378,12 @@ define([
       $('.question_holder').click(function() {
         $('.quiz-nav li').removeClass('active');
         $('.question').removeClass('selected_single_question');
-        $question = $(this).find('.question');
-        var qId = $question.attr('id').split('_')[1];
-        parentWindow.set('active_question_id', qId);
-        $('#quiz_nav_' + qId).addClass('active');
+
+        var $questions = $('.question')
+        var $question = $(this).find('.question');
+        var questionIndex = $questions.index($question) + 1;
+        parentWindow.set('active_question_index', questionIndex);
+        $('.q' + questionIndex).addClass('active');
         $question.addClass('selected_single_question');
       });
     }
