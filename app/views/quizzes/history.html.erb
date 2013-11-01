@@ -19,10 +19,10 @@
     <li>
       <div id='quiz-nav-inner-wrapper'>
         <ul>
-          <% @quiz.active_quiz_questions.each_with_index do |question, i| %>
+          <% @submission.questions_as_object.each_with_index do |question, i| %>
             <% index = i + 1 %>
-            <li id='quiz_nav_<%= question.id %>' class="q<%= index %> quiz-nav-li" data-id='<%= question.id %>' data-index='<%=i%>'>
-              <a class='question_<%= question.id %> question-nav-link' data-id='<%= question.id %>' href="#question_<%= question.id %>">
+            <li id='quiz_nav_<%= question['id'] %>' class="q<%= index %> quiz-nav-li" data-id='<%= question['id'] %>' data-index='<%=i%>'>
+              <a class='question_<%= question['id'] %> question-nav-link' data-id='<%= question['id'] %>' href="#question_<%= question['id'] %>">
                 <%= index %>
               </a>
             </li>
@@ -36,6 +36,11 @@
   </ul>
 </div>
 <div class=quizzes-speedgrader-padding></div>
+<% if @quiz.quiz_groups.exists? %>
+<div class="grade-by-question-warning">
+  <%= t(:grade_by_question_warning, "The grade by question feature is affected by questions that are shuffled in a group.") %>
+</div>
+<% end %>
 <% end %>
 
 <% unless params[:headless] %>

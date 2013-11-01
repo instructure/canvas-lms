@@ -23,15 +23,17 @@ describe "/quizzes/history" do
   before do
     course_with_student
     view_context
-    assigns[:quiz] = @course.quizzes.create!
     assigns[:user] = @user
-    assigns[:submission] = assigns[:quiz].generate_submission(@user)
-    assigns[:current_submission] = assigns[:submission]
-    assigns[:submission]
-    assigns[:version_instances] = assigns[:submission].submitted_attempts
   end
 
   context 'beta quiz navigation' do
+    before do
+      assigns[:quiz] = @course.quizzes.create!
+      assigns[:submission] = assigns[:quiz].generate_submission(@user)
+      assigns[:current_submission] = assigns[:submission]
+      assigns[:version_instances] = assigns[:submission].submitted_attempts
+    end
+
     it 'displays when configured' do
       @student.preferences[:enable_speedgrader_grade_by_question] = true
       @student.save!
@@ -46,5 +48,33 @@ describe "/quizzes/history" do
       response.body.should_not match /quiz-nav/
     end
   end
-end
 
+  context 'question group warning' do
+    before do
+      @student.preferences[:enable_speedgrader_grade_by_question] = true
+      @student.save!
+    end
+
+    it 'displays when quiz has question groups' do
+      @quiz = @course.quizzes.create!
+      @quiz.quiz_groups.create!
+      assigns[:quiz] = @quiz
+      assigns[:submission] = assigns[:quiz].generate_submission(@user)
+      assigns[:current_submission] = assigns[:submission]
+      assigns[:version_instances] = assigns[:submission].submitted_attempts
+
+      render "quizzes/history"
+      response.body.should match /grade-by-question-warning/
+    end
+
+    it 'does not display when quiz has only questions' do
+      assigns[:quiz] = @course.quizzes.create!
+      assigns[:submission] = assigns[:quiz].generate_submission(@user)
+      assigns[:current_submission] = assigns[:submission]
+      assigns[:version_instances] = assigns[:submission].submitted_attempts
+
+      render "quizzes/history"
+      response.body.should_not match /grade-by-question-warning/
+    end
+  end
+end
