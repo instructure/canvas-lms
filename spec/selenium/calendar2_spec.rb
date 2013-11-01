@@ -514,7 +514,7 @@ describe "calendar2" do
 
         it "should display popup with correct day on an event" do
           local_now = @user.time_zone.now
-          event_start = @user.time_zone.local(local_now.year, local_now.month, 15, 23, 0, 0)
+          event_start = @user.time_zone.local(local_now.year, local_now.month, 15, 22, 0, 0)
           make_event(:start => event_start)
           get "/calendar2"
           wait_for_ajaximations
@@ -524,7 +524,7 @@ describe "calendar2" do
 
         it "should display popup with correct day on an assignment" do
           local_now = @user.time_zone.now
-          event_start = @user.time_zone.local(local_now.year, local_now.month, 15, 23, 0, 0)
+          event_start = @user.time_zone.local(local_now.year, local_now.month, 15, 22, 0, 0)
           @course.assignments.create!(
             title: 'test assignment',
             due_at: event_start,
@@ -541,10 +541,10 @@ describe "calendar2" do
           @student.save!
 
           local_now = @user.time_zone.now
-          assignment_start = @user.time_zone.local(local_now.year, local_now.month, 15, 23, 0, 0)
+          assignment_start = @user.time_zone.local(local_now.year, local_now.month, 15, 22, 0, 0)
           assignment = @course.assignments.create!(title: 'test assignment', due_at: assignment_start)
 
-          override_start = @user.time_zone.local(local_now.year, local_now.month, 20, 23, 0, 0)
+          override_start = @user.time_zone.local(local_now.year, local_now.month, 20, 22, 0, 0)
           override = assignment.assignment_overrides.create! do |o|
             o.title = 'test override'
             o.set_type = 'ADHOC'
@@ -692,7 +692,7 @@ describe "calendar2" do
         wait_for_ajaximations
         f('label[for=agenda]').click
         wait_for_ajaximations
-        f('.navigation_title').text.should match(/[A-Z][a-z]{2}\s\d{2},\s\d{4}/)
+        f('.navigation_title').text.should match(/[A-Z][a-z]{2}\s\d{1,2},\s\d{4}/)
       end
 
       it "should respect context filters" do
