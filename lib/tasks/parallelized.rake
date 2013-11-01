@@ -61,6 +61,7 @@ unless ARGV.any? { |a| a =~ /\Agems/ }
         end
       end
       test_files.map! { |f| "#{Rails.root}/#{f}" }
+      test_files.each { |f| puts f }
       Rake::Task['parallel:spec'].invoke(args[:count], '', '', test_files.join(' '))
     end
 
