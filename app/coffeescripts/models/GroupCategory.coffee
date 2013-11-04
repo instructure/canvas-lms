@@ -82,4 +82,4 @@ define [
       if method is 'create'
         @_defaultUrl()
       else
-        "/api/v1/group_categories/#{@id}"
+        "/api/v1/group_categories/#{@id}?includes[]=unassigned_users_count&includes[]=groups_count"

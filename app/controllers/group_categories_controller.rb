@@ -103,7 +103,9 @@ class GroupCategoriesController < ApplicationController
         if authorized_action(@context, @current_user, :manage_groups)
           path = send("api_v1_#{@context.class.to_s.downcase}_group_categories_url")
           paginated_categories = Api.paginate(@categories, self, path)
-          render :json => paginated_categories.map { |c| group_category_json(c, @current_user, session, :include => ['progress_url']) }
+          includes = ['progress_url']
+          includes.concat(params[:includes]) if params[:includes]
+          render :json => paginated_categories.map { |c| group_category_json(c, @current_user, session, :include => includes) }
         end
       end
     end
@@ -123,7 +125,9 @@ class GroupCategoriesController < ApplicationController
     respond_to do |format|
       format.json do
         if authorized_action(@group_category.context, @current_user, :manage_groups)
-          render :json => group_category_json(@group_category, @current_user, session, :include => ['progress_url'])
+          includes = ['progress_url']
+          includes.concat(params[:includes]) if params[:includes]
+          render :json => group_category_json(@group_category, @current_user, session, :include => includes)
         end
       end
     end
@@ -168,7 +172,9 @@ class GroupCategoriesController < ApplicationController
       @group_category = @context.group_categories.build
       if populate_group_category_from_params
         if api_request?
-          render :json => group_category_json(@group_category, @current_user, session, include: ["unassigned_users_count", "groups_count"])
+          includes = ["unassigned_users_count", "groups_count"]
+          includes.concat(params[:includes]) if params[:includes]
+          render :json => group_category_json(@group_category, @current_user, session, include: includes)
         else
           flash[:notice] = t('notices.create_category_success', 'Category was successfully created.')
           render :json => [@group_category.as_json, @group_category.groups.map { |g| g.as_json(:include => :users) }]
@@ -216,7 +222,9 @@ class GroupCategoriesController < ApplicationController
       if api_request?
         process_group_category_api_params
         if populate_group_category_from_params
-          render :json => group_category_json(@group_category, @current_user, session, :include => ['progress_url'])
+          includes = ['progress_url']
+          includes.concat(params[:includes]) if params[:includes]
+          render :json => group_category_json(@group_category, @current_user, session, :include => includes)
         end
       else
         return render(:json => {'status' => 'not found'}, :status => :not_found) unless @group_category

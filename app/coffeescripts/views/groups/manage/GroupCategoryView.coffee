@@ -68,10 +68,11 @@ define [
         @randomlyAssignStudentsInProgress = true
       @model.progressModel.on 'change', @render
       @model.on 'progressResolved', =>
-        @model.groups().fetch()
-        @model.unassignedUsers().reset()
-        @randomlyAssignStudentsInProgress = false
-        @render()
+        @model.fetch success: =>
+          @model.groups().fetch()
+          @model.unassignedUsers().fetch()
+          @randomlyAssignStudentsInProgress = false
+          @render()
 
     afterRender: ->
       @groupsView.$externalFilter = @$filter

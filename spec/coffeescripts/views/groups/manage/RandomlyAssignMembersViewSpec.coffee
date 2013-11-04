@@ -2,7 +2,6 @@ define [
   'compiled/views/groups/manage/GroupCategoryView'
   'compiled/views/groups/manage/RandomlyAssignMembersView'
   'compiled/models/GroupCategory'
-  #'manage_groups'
 ], (GroupCategoryView, RandomlyAssignMembersView, GroupCategory) ->
 
   server = null
@@ -197,6 +196,10 @@ define [
     ##
     # progressable mixin ensures that the progress model is now polling, respond to it with a 100% completion
     sendResponse("GET", /progress/, progressResponse)
+
+    ##
+    # progressResolved will trigger unassigned_users reset request
+    sendResponse("GET", "/api/v1/group_categories/20?includes[]=unassigned_users_count&includes[]=groups_count",  JSON.stringify([]))
 
     ##
     # the 100% completion response will cascade a model.fetch request + model.groups().fetch + model.unassignedUsers().fetch calls
