@@ -39,6 +39,62 @@ define [
 
       @activeAjax = 0
 
+      @subscribeToEvents()
+      @header = @options.header
+
+      @el = $(selector).html calendarAppTemplate()
+
+      @schedulerNavigator = new CalendarNavigator(el: $('.scheduler_navigator'), showAgenda: @options.showAgenda)
+      @schedulerNavigator.hide()
+
+      @agenda = new AgendaView(el: $('.agenda-wrapper'), dataSource: @dataSource)
+      @scheduler = new Scheduler(".scheduler-wrapper", this)
+
+      fullCalendarParams = @initializeFullCalendarParams()
+
+      data = @dataFromDocumentHash()
+      if not data.view_start and @options?.viewStart
+        data.view_start = @options.viewStart
+        @updateFragment data
+      if data.view_start
+        date = $.fullCalendar.parseISO8601(data.view_start)
+      else
+        date = $.fudgeDateForProfileTimezone(new Date)
+      fullCalendarParams.year = date.getFullYear()
+      fullCalendarParams.month = date.getMonth()
+      fullCalendarParams.date = date.getDate()
+
+      @calendar = @el.find("div.calendar").fullCalendar fullCalendarParams
+
+      if data.show && data.show != ''
+        @visibleContextList = data.show.split(',')
+
+      $(document).fragmentChange(@fragmentChange)
+
+      @colorizeContexts()
+
+      if @options.showScheduler
+        # Pre-load the appointment group list, for the badge
+        @dataSource.getAppointmentGroups false, (data) =>
+          required = 0
+          for group in data
+            required += 1 if group.requiring_action
+          @header.setSchedulerBadgeCount(required)
+
+      @connectHeaderEvents()
+      @connectSchedulerNavigatorEvents()
+      @connectAgendaEvents()
+
+      @header.selectView(@getCurrentView())
+
+      if data.view_name == 'scheduler' && data.appointment_group_id
+        @scheduler.viewCalendarForGroupId data.appointment_group_id
+
+      window.setInterval(@drawNowLine, 1000 * 60)
+
+
+
+    subscribeToEvents: ->
       $.subscribe
         "CommonEvent/eventDeleting" : @eventDeleting
         "CommonEvent/eventDeleted" : @eventDeleted
@@ -52,6 +108,29 @@ define [
         'CommonEvent/assignmentSaved' : @updateOverrides
         'Calendar/colorizeContexts': @colorizeContexts
 
+    connectHeaderEvents: ->
+      @header.on('navigatePrev',  => @handleArrow('prev'))
+      @header.on 'navigateToday', @today
+      @header.on('navigateNext',  => @handleArrow('next'))
+      @header.on('navigateDate', @gotoDate)
+      @header.on('week', => @loadView('week'))
+      @header.on('month', => @loadView('month'))
+      @header.on('agenda', => @loadView('agenda'))
+      @header.on('scheduler', => @loadView('scheduler'))
+      @header.on('createNewEvent', @addEventClick)
+      @header.on('refreshCalendar', @reloadClick)
+      @header.on('done', @schedulerSingleDoneClick)
+
+    connectSchedulerNavigatorEvents: ->
+      @schedulerNavigator.on('navigatePrev',  => @handleArrow('prev'))
+      @schedulerNavigator.on('navigateToday', @today)
+      @schedulerNavigator.on('navigateNext',  => @handleArrow('next'))
+      @schedulerNavigator.on('navigateDate', @gotoDate)
+
+    connectAgendaEvents: ->
+      @agenda.on('agendaDateRange', @renderDateRange)
+
+    initializeFullCalendarParams: ->
       weekColumnFormatter = """
         '<span class="agenda-col-wrapper">
           <span class="day-num">'d'</span>
@@ -62,9 +141,7 @@ define [
         </span>'
       """
 
-      @header = @options.header
-
-      fullCalendarParams = _.defaults(
+      _.defaults(
         header: false
         editable: true
         columnFormat:
@@ -93,82 +170,6 @@ define [
         windowResize: @windowResize
         drop: @drop
         , calendarDefaults)
-
-      data = @dataFromDocumentHash()
-      if not data.view_start and @options?.viewStart
-        data.view_start = @options.viewStart
-        @updateFragment data
-      if data.view_start
-        date = $.fullCalendar.parseISO8601(data.view_start)
-      else
-        date = $.fudgeDateForProfileTimezone(new Date)
-      fullCalendarParams.year = date.getFullYear()
-      fullCalendarParams.month = date.getMonth()
-      fullCalendarParams.date = date.getDate()
-
-      @el = $(selector).html calendarAppTemplate()
-
-      @schedulerNavigator = new CalendarNavigator(el: $('.scheduler_navigator'), showAgenda: @options.showAgenda)
-      @schedulerNavigator.hide()
-
-      data.view_name = 'agendaWeek' if data.view_name == 'week'
-      if data.view_name == 'month' || data.view_name == 'agendaWeek'
-        viewName = if data.view_name == 'agendaWeek' then 'week' else 'month'
-        @header.selectView(viewName)
-        fullCalendarParams.defaultView = data.view_name
-      else if data.view_name == 'agenda'
-        @header.selectView(data.view_name)
-
-      if data.show && data.show != ''
-        @visibleContextList = data.show.split(',')
-
-      @calendar = @el.find("div.calendar").fullCalendar fullCalendarParams
-
-      $(document).fragmentChange(@fragmentChange)
-
-      @colorizeContexts()
-
-      @scheduler = new Scheduler(".scheduler-wrapper", this)
-
-      if @options.showScheduler
-        # Pre-load the appointment group list, for the badge
-        @dataSource.getAppointmentGroups false, (data) =>
-          required = 0
-          for group in data
-            required += 1 if group.requiring_action
-          @header.setSchedulerBadgeCount(required)
-
-      @connectHeaderEvents()
-      @connectSchedulerNavigatorEvents()
-      @agenda = new AgendaView(el: $('.agenda-wrapper'), dataSource: @dataSource)
-      @agenda.on('agendaDateRange', @renderDateRange)
-
-      window.setTimeout =>
-        if data.view_name == 'scheduler'
-          @header.selectView('scheduler')
-          if data.appointment_group_id
-            @scheduler.viewCalendarForGroupId data.appointment_group_id
-
-      window.setInterval(@drawNowLine, 1000 * 60)
-
-    connectHeaderEvents: ->
-      @header.on('navigatePrev',  => @handleArrow('prev'))
-      @header.on 'navigateToday', @today
-      @header.on('navigateNext',  => @handleArrow('next'))
-      @header.on('navigateDate', @gotoDate)
-      @header.on('week', => @loadView('week'))
-      @header.on('month', => @loadView('month'))
-      @header.on('agenda', => @loadView('agenda'))
-      @header.on('scheduler', => @loadView('scheduler'))
-      @header.on('createNewEvent', @addEventClick)
-      @header.on('refreshCalendar', @reloadClick)
-      @header.on('done', @schedulerSingleDoneClick)
-
-    connectSchedulerNavigatorEvents: ->
-      @schedulerNavigator.on('navigatePrev',  => @handleArrow('prev'))
-      @schedulerNavigator.on('navigateToday', @today)
-      @schedulerNavigator.on('navigateNext',  => @handleArrow('next'))
-      @schedulerNavigator.on('navigateDate', @gotoDate)
 
     today: =>
       now = $.fudgeDateForProfileTimezone(new Date)
@@ -563,10 +564,24 @@ define [
       else
         $.fudgeDateForProfileTimezone(new Date)
 
-    loadView: (view) =>
+    setCurrentView: (view) ->
       @updateFragment view_name: view
-
       @currentView = view
+      userSettings.set('calendar_view', view) if @options.showAgenda
+
+    getCurrentView: ->
+      if @currentView
+        @currentView
+      else if (data = @dataFromDocumentHash()) && data.view_name
+        data.view_name
+      else if userSettings.get('calendar_view') && @options.showAgenda
+        userSettings.get('calendar_view')
+      else
+        'month'
+
+    loadView: (view) =>
+      @setCurrentView(view)
+
       $('.agenda-wrapper').removeClass('active')
       @header.showNavigator()
       @header.showPrevNext()

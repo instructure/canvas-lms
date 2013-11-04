@@ -205,6 +205,16 @@ describe "calendar2" do
         create_assignment_event(name)
       end
 
+      it "should remember the selected calendar view" do
+        get "/calendar2"
+        f("#month").should be_selected
+        f('label[for=agenda]').click
+        wait_for_ajaximations
+
+        get "/calendar2"
+        f('#agenda').should be_selected
+      end
+
       it "should create an event through clicking on a calendar day" do
         create_middle_day_event
       end
@@ -443,7 +453,7 @@ describe "calendar2" do
         get "/calendar2"
         wait_for_ajaximations
         f('.fc-event').should be_nil
-        next_month_num = Time.now.month + 1 % 12
+        next_month_num = (Time.now.month % 12) + 1
         next_month = Date::MONTHNAMES[next_month_num]
         quick_jump_to_date(next_month)
         f('.fc-event').should_not be_nil
