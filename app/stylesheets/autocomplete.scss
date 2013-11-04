@@ -49,6 +49,17 @@ ul[class*=ac-] {
 
 .ac {
   position: relative;
+  display: table;
+  width: 100%;
+}
+
+.ac-row {
+  display: table-row;
+}
+
+.ac-input-cell {
+  display: table-cell;
+  width: 93%;
 }
 
 .ac-input-box {
@@ -59,7 +70,6 @@ ul[class*=ac-] {
   -moz-box-sizing: border-box;
   box-sizing: border-box;
   cursor: text;
-  float: left;
   min-height: 30px;
   overflow: hidden;
   padding: 4px 6px;
@@ -84,17 +94,23 @@ ul[class*=ac-] {
 .ac .btn {
   border-left: none;
   border-radius: 0 3px 3px 0;
+  display: table-cell;
+  &.disabled {
+    color: #A6A6A6;
+  }
 }
 
 .ac-input-box .ac-input {
   background: transparent;
   border: none;
   box-shadow: none;
-  display: block;
+  display: inline;
   margin: 0;
+  margin-left: 8px;
   min-width: 15px;
   padding: 0;
   width: 15px;
+  vertical-align: middle;
 
   &:focus {
     box-shadow: none;
@@ -146,11 +162,14 @@ ul[class*=ac-] {
   -moz-box-sizing: border-box;
   box-sizing: border-box;
   cursor: default;
-  float: left;
-  height: 20px;
+  display: inline-block;
+  line-height: normal;
   margin: 2px 4px 2px 0;
-  padding: 0 16px 0 12px;
+  // Please don't remove overflow. It fixes a weird webkit bug.
+  overflow: hidden;
+  padding: 0 18px 0 8px;
   position: relative;
+  vertical-align: middle;
 
   &:hover {
     background: #bccef4;
