@@ -366,7 +366,7 @@ class ContextController < ApplicationController
 
   def roster_user_services
     if authorized_action(@context, @current_user, :read_roster)
-      @users = @context.users.order_by_sortable_name
+      @users = @context.users.where(show_user_services: true).order_by_sortable_name
       @users_hash = {}
       @users_order_hash = {}
       @users.each_with_index{|u, i| @users_hash[u.id] = u; @users_order_hash[u.id] = i }
