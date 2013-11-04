@@ -28,6 +28,10 @@ module Api::V1::Course
     settings
   end
 
+  def courses_json(courses, user, session, includes, enrollments)
+    courses.map{ |course| course_json(course, user, session, includes, enrollments) }
+  end
+
   # Public: Returns a course hash to serialize for a json api request.
   #
   # course - The course information to return as the hash.

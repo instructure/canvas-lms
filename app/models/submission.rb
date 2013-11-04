@@ -109,6 +109,12 @@ class Submission < ActiveRecord::Base
   after_save :check_for_media_object
   after_save :update_quiz_submission
   after_save :update_participation
+  after_save :grade_change_audit
+
+  def autograded?
+    # AutoGrader == (quiz_id * -1)
+    !!(self.grader_id && self.grader_id < 0)
+  end
 
   def self.needs_grading_trigger_sql
     # every database uses a different construct for a current UTC timestamp...
@@ -701,6 +707,10 @@ class Submission < ActiveRecord::Base
     true
   end
   private :validate_single_submission
+
+  def grade_change_audit
+    Auditors::GradeChange.record(self) if @score_changed
+  end
 
   include Workflow
 

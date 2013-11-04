@@ -789,6 +789,26 @@ describe Submission do
     end
   end
 
+  describe "autograded" do
+    let(:submission) { Submission.new }
+
+    it "returns false when its not autograded" do
+      assignment = stub(:muted? => false)
+      @submission = Submission.new
+      @submission.autograded?.should == false
+
+      @submission.grader_id = Shard.global_id_for(@user.id)
+      @submission.autograded?.should == false
+    end
+
+    it "returns true when its autograded" do
+      assignment = stub(:muted? => false)
+      @submission = Submission.new
+      @submission.grader_id = -1
+      @submission.autograded?.should == true
+    end
+  end
+
   describe "past_due" do
     before do
       u1 = @user

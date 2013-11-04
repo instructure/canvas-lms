@@ -138,7 +138,7 @@ describe Account do
       it "should list associated courses" do
         @account.fast_all_courses.map(&:sis_source_id).sort.should == [
           "C001", "C005", "C006", "C007", "C008", "C009",
-          
+
           "C001S", "C005S", "C006S", "C007S", "C008S", "C009S", ].sort
       end
 
@@ -158,19 +158,19 @@ describe Account do
         @account.fast_all_courses({:term => EnrollmentTerm.find_by_sis_source_id("T003"), :hide_enrollmentless_courses => true}).map(&:sis_source_id).sort.should == ["C005", "C007", "C005S", "C007S"].sort
       end
     end
-  
+
     context "name searching" do
       it "should list associated courses" do
         @account.courses_name_like("search").map(&:sis_source_id).sort.should == [
           "C001S", "C005S", "C006S", "C007S", "C008S", "C009S"]
       end
-      
+
       it "should list associated courses by term" do
         @account.courses_name_like("search", {:term => EnrollmentTerm.find_by_sis_source_id("T001")}).map(&:sis_source_id).sort.should == ["C001S"]
         @account.courses_name_like("search", {:term => EnrollmentTerm.find_by_sis_source_id("T002")}).map(&:sis_source_id).sort.should == []
         @account.courses_name_like("search", {:term => EnrollmentTerm.find_by_sis_source_id("T003")}).map(&:sis_source_id).sort.should == ["C005S", "C006S", "C007S", "C008S", "C009S"]
       end
-    
+
       it "should list associated nonenrollmentless courses" do
         @account.courses_name_like("search", {:hide_enrollmentless_courses => true}).map(&:sis_source_id).sort.should == ["C001S", "C005S", "C007S"] #C007 probably shouldn't be here, cause the enrollment section is deleted, but we kinda want to minimize database traffic
       end
@@ -182,7 +182,7 @@ describe Account do
       end
     end
   end
-  
+
   context "services" do
     before(:each) do
       @a = Account.new
@@ -194,41 +194,41 @@ describe Account do
       @a.service_enabled?(:diigo).should be_false
       @a.service_enabled?(:avatars).should be_false
     end
-    
+
     it "should not enable services off by default" do
       @a.service_enabled?(:facebook).should be_true
       @a.service_enabled?(:avatars).should be_false
     end
-    
+
     it "should add and remove services from the defaults" do
       @a.allowed_services = '+avatars,-facebook'
       @a.service_enabled?(:avatars).should be_true
       @a.service_enabled?(:twitter).should be_true
       @a.service_enabled?(:facebook).should be_false
     end
-    
+
     it "should allow settings services" do
       lambda {@a.enable_service(:completly_bogs)}.should raise_error
-      
+
       @a.disable_service(:twitter)
       @a.service_enabled?(:twitter).should be_false
-      
+
       @a.enable_service(:twitter)
       @a.service_enabled?(:twitter).should be_true
     end
-    
+
     it "should use + and - by default when setting service availabilty" do
       @a.enable_service(:twitter)
       @a.service_enabled?(:twitter).should be_true
       @a.allowed_services.should be_nil
-      
+
       @a.disable_service(:twitter)
       @a.allowed_services.should match('\-twitter')
-      
+
       @a.disable_service(:avatars)
       @a.service_enabled?(:avatars).should be_false
       @a.allowed_services.should_not match('avatars')
-      
+
       @a.enable_service(:avatars)
       @a.service_enabled?(:avatars).should be_true
       @a.allowed_services.should match('\+avatars')
@@ -236,16 +236,16 @@ describe Account do
 
     it "should be able to set service availibity for previously hard-coded values" do
       @a.allowed_services = 'avatars,facebook'
-      
+
       @a.enable_service(:twitter)
       @a.service_enabled?(:twitter).should be_true
       @a.allowed_services.should match(/twitter/)
       @a.allowed_services.should_not match(/[+-]/)
-      
+
       @a.disable_service(:facebook)
       @a.allowed_services.should_not match(/facebook/)
       @a.allowed_services.should_not match(/[+-]/)
-      
+
       @a.disable_service(:avatars)
       @a.disable_service(:twitter)
       @a.allowed_services.should be_nil
@@ -311,25 +311,25 @@ describe Account do
       end
     end
   end
-  
+
   context "settings=" do
     it "should filter disabled settings" do
       a = Account.new
       a.root_account_id = 1
       a.settings = {'global_javascript' => 'something'}.with_indifferent_access
       a.settings[:global_javascript].should eql(nil)
-      
+
       a.root_account_id = nil
       a.settings = {'global_javascript' => 'something'}.with_indifferent_access
       a.settings[:global_javascript].should eql(nil)
-      
+
       a.settings[:global_includes] = true
       a.settings = {'global_javascript' => 'something'}.with_indifferent_access
       a.settings[:global_javascript].should eql('something')
 
       a.settings = {'error_reporting' => 'string'}.with_indifferent_access
       a.settings[:error_reporting].should eql(nil)
-      
+
       a.settings = {'error_reporting' => {
         'action' => 'email',
         'email' => 'bob@yahoo.com',
@@ -341,7 +341,7 @@ describe Account do
       a.settings[:error_reporting][:extra].should eql(nil)
     end
   end
-  
+
   context "turnitin secret" do
     it "should decrypt the turnitin secret to the original value" do
       a = Account.new
@@ -578,18 +578,18 @@ describe Account do
     account.reload
     account.all_group_categories.count.should == 2
   end
-  
+
   it "should return correct values for login_handle_name based on authorization_config" do
     account = Account.default
     account.login_handle_name.should == "Email"
-    
+
     config = account.account_authorization_configs.create(:auth_type => 'cas')
     account.login_handle_name.should == "Login"
-    
+
     config.auth_type = 'saml'
     config.save
     account.reload.login_handle_name.should == "Login"
-    
+
     config.auth_type = 'ldap'
     config.save
     account.reload.login_handle_name.should == "Email"
@@ -646,16 +646,16 @@ describe Account do
       tabs = Account.site_admin.tabs_available(nil)
       tabs.map{|t| t[:id] }.should_not be_include(Account::TAB_DEVELOPER_KEYS)
     end
-    
+
     it "should not include 'Developer Keys' for non-site_admin accounts" do
       @account = Account.default.sub_accounts.create!(:name => "sub-account")
       tabs = @account.tabs_available(nil)
       tabs.map{|t| t[:id] }.should_not be_include(Account::TAB_DEVELOPER_KEYS)
-      
+
       tabs = @account.root_account.tabs_available(nil)
       tabs.map{|t| t[:id] }.should_not be_include(Account::TAB_DEVELOPER_KEYS)
     end
-    
+
     it "should not include external tools if not configured for course navigation" do
       @account = Account.default.sub_accounts.create!(:name => "sub-account")
       tool = @account.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob", :domain => "example.com")
@@ -665,7 +665,7 @@ describe Account do
       tabs = @account.tabs_available(nil)
       tabs.map{|t| t[:id] }.should_not be_include(tool.asset_string)
     end
-    
+
     it "should include active external tools if configured on the account" do
       @account = Account.default.sub_accounts.create!(:name => "sub-account")
       tools = []
@@ -697,7 +697,7 @@ describe Account do
       tab[:href].should == :account_external_tool_path
       tab[:args].should == [@account.id, tool1.id]
     end
-    
+
     it "should include external tools if configured on the root account" do
       @account = Account.default.sub_accounts.create!(:name => "sub-account")
       tool = @account.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob", :domain => "example.com")
@@ -953,8 +953,8 @@ describe Account do
     end
   end
 
-  describe "#can_see_admin_tools_tab?" do 
-    it "returns false if no user is present" do 
+  describe "#can_see_admin_tools_tab?" do
+    it "returns false if no user is present" do
       account = Account.create!
       account.can_see_admin_tools_tab?(nil).should be_false
     end
@@ -964,14 +964,14 @@ describe Account do
       Account.site_admin.can_see_admin_tools_tab?(admin).should be_false
     end
 
-    it "doesn't have permission, it returns false" do 
+    it "doesn't have permission, it returns false" do
       account = Account.create!
       account.stubs(:grants_right?).returns(false)
       account_admin_user(:account => account)
       account.can_see_admin_tools_tab?(@admin).should be_false
     end
 
-    it "does have permission, it returns true" do 
+    it "does have permission, it returns true" do
       account = Account.create!
       account.stubs(:grants_right?).returns(true)
       account_admin_user(:account => account)

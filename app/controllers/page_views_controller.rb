@@ -175,7 +175,7 @@ class PageViewsController < ApplicationController
 
       respond_to do |format|
         format.json do
-          render :json => @page_views.map { |pv| page_view_json(pv, @current_user, session) }
+          render :json => page_views_json(@page_views, @current_user, session)
         end
         format.csv do
           cancel_cache_buster

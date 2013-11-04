@@ -353,7 +353,7 @@ describe EventStream do
 
       describe "generated for_thing method" do
         it "should forward argument to index's for_key" do
-          @index.expects(:for_key).once.with(@entry, {})
+          @index.expects(:for_key).once.with([@entry], {})
           @stream.for_thing(@entry)
         end
 
@@ -365,7 +365,7 @@ describe EventStream do
 
         it "should permit and forward options" do
           options = {oldest: 1.day.ago}
-          @index.expects(:for_key).once.with(@entry, options)
+          @index.expects(:for_key).once.with([@entry], options)
           @stream.for_thing(@entry, options)
         end
       end

@@ -49,6 +49,10 @@ module Api::V1::Assignment
     )
   }
 
+  def assignments_json(assignments, user, session, opts = {})
+    assignments.map{ |assignment| assignment_json(assignment, user, session, opts) }
+  end
+
   def assignment_json(assignment, user, session, opts = {})
     opts.reverse_merge!(
       include_discussion_topic: true,

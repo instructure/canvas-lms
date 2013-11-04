@@ -891,6 +891,13 @@ routes.draw do
       get 'audit/authentication/users/:user_id', :action => :for_user, :path_name => 'audit_authentication_user'
     end
 
+    scope(:controller => :grade_change_audit_api) do
+      get 'audit/grade_change/assignments/:assignment_id', :action => :for_assignment, :path_name => 'audit_grade_change_assignment'
+      get 'audit/grade_change/courses/:course_id', :action => :for_course, :path_name => 'audit_grade_change_course'
+      get 'audit/grade_change/students/:student_id', :action => :for_student, :path_name => 'audit_grade_change_student'
+      get 'audit/grade_change/graders/:grader_id', :action => :for_grader, :path_name => 'audit_grade_change_grader'
+    end
+
     scope(:controller => :assignments_api) do
       get 'courses/:course_id/assignments', :action => :index, :path_name => 'course_assignments'
       get 'courses/:course_id/assignments/:id', :action => :show, :path_name => 'course_assignment'
