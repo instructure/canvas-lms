@@ -252,9 +252,18 @@ describe "users" do
       form = fj('.ui-dialog:visible form')
       f('#teacher_name').send_keys('teacher!')
       f('#teacher_email').send_keys('teacher@example.com')
+
+      # if instructure_misc_plugin is installed, number of registration fields increase
+      if (Dir.exists?('./vendor/plugins/instructure_misc_plugin'))
+        f('#teacher_school_position').send_keys('Dean')
+        f('#teacher_phone').send_keys('1231231234')
+        f('#teacher_school_name').send_keys('example org')
+        f('#teacher_organization_type').send_keys('Higher Ed')
+      end
+
       f('input[name="user[terms_of_use]"]', form).click
 
-      expect_new_page_load { f('.btn-primary.button_type_submit.ui-button').click }
+      expect_new_page_load { form.submit }
       # confirm the user is authenticated into the dashboard
       f('#identity .logout').should be_present
       User.last.initial_enrollment_type.should == 'teacher'
