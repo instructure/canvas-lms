@@ -172,7 +172,7 @@ class AccountsController < ApplicationController
       @courses = @courses.for_term(term)
     end
 
-    @courses = Api.paginate(@courses, self, api_v1_account_courses_url, :order => :id)
+    @courses = Api.paginate(@courses.order(:id), self, api_v1_account_courses_url)
 
     render :json => @courses.map { |c| course_json(c, @current_user, session, [], nil) }
   end

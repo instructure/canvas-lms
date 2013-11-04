@@ -42,7 +42,7 @@ describe "PaginatedCollection" do
     it "should use the pager returned" do
       3.times { user_model }
       proxy = PaginatedCollection.build do |pager|
-        result = User.active.paginate(:page => pager.current_page, :per_page => pager.per_page, :order => :id)
+        result = User.active.order(:id).paginate(:page => pager.current_page, :per_page => pager.per_page)
         result.map! { |u| u.id }
       end
       p1 = proxy.paginate(:page => 1, :per_page => 2)

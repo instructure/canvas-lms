@@ -583,11 +583,9 @@ class QuizzesController < ApplicationController
   def moderate
     if authorized_action(@quiz, @current_user, :grade)
       @all_students = @context.students_visible_to(@current_user).order_by_sortable_name
-      if @quiz.survey? && @quiz.anonymous_submissions
-        @students = @all_students.paginate(:per_page => 50, :page => params[:page], :order => :uuid)
-      else
-        @students = @all_students.paginate(:per_page => 50, :page => params[:page])
-      end
+      @students = @all_students
+      @students = @students.order(:uuid) if @quiz.survey? && @quiz.anonymous_submissions
+      @students = @students.paginate(:per_page => 50, :page => params[:page])
       last_updated_at = Time.parse(params[:last_updated_at]) rescue nil
       @submissions = @quiz.quiz_submissions.updated_after(last_updated_at).for_user_ids(@students.map(&:id))
       respond_to do |format|
