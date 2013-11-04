@@ -362,4 +362,18 @@ describe "conversations new" do
     end
   end
 
+  describe "search" do
+    before do
+      @conv1 = conversation(@teacher, @s1)
+      @conv2 = conversation(@teacher, @s2)
+    end
+
+    it "should allow finding messages by recipient" do
+      get_conversations
+      name = @s2.name
+      f('[role=main] header [role=search] input').send_keys(name)
+      keep_trying_until { fj(".ac-result:contains('#{name}')") }.click
+      conversation_elements.length.should == 1
+    end
+  end
 end
