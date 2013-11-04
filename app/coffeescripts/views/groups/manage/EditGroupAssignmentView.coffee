@@ -1,10 +1,11 @@
 define [
+  'underscore'
   'i18n!EditGroupAssignmentView'
   'compiled/views/DialogFormView'
   'compiled/collections/GroupCollection'
   'jst/groups/manage/editGroupAssignment'
   'jst/EmptyDialogFormWrapper'
-], (I18n, DialogFormView, GroupCollection, template, wrapper) ->
+], (_, I18n, DialogFormView, GroupCollection, template, wrapper) ->
 
   class EditGroupAssignmentView extends DialogFormView
 
@@ -28,26 +29,12 @@ define [
       'click .dialog_closer': 'close'
       'click .set-group': 'setGroup'
 
-    close: ->
-      super
-      # detach our custom handler from the bound element
-      $(document).off 'keyup', @checkEsc
-      # return focus using the element from our parent view
-      @focusTarget?.focus()
-
     openAgain: ->
       super
       # reset the form contents
       @render()
       # auto-focus the select element
       @$singleSelectList.focus()
-      # attach a custom handler because the bound element is outside this view's scope
-      $(document).on 'keyup', @checkEsc
-      # override jQueryUI escKey handler to use our own
-      @$el.dialog("option", "closeOnEscape", false)
-
-    checkEsc: (e) =>
-      @close() if e.keyCode is 27 # escape
 
     setGroup: (e) =>
       e.preventDefault()
@@ -55,6 +42,8 @@ define [
       targetGroup = @$('option:selected').val()
       if targetGroup then @model.moveTo targetGroup
       @close()
+      # focus override to the user's new group heading if they're moved
+      $("[data-id='#{targetGroup}'] .group-heading")?.focus()
 
     getFilteredGroups: ->
       new GroupCollection @collection.filter (g) => g isnt @group
@@ -63,7 +52,7 @@ define [
       groupCollection = @getFilteredGroups()
       hasGroups = groupCollection.length > 0
       {
-        allFull: hasGroups && groupCollection.models.every (g) -> g.isFull()
+        allFull: hasGroups and groupCollection.models.every (g) -> g.isFull()
         groupId: @group.get('id')
         userName: @model.get('name')
         groups: groupCollection.toJSON()

@@ -25,6 +25,9 @@ define [
     els:
       '.randomly-assign-members': '$randomlyAssignMembersLink'
       '.al-trigger': '$groupCategoryActions'
+      '.edit-category': '$editGroupCategoryLink'
+      '.message-all-unassigned': '$messageAllUnassignedLink'
+      '.add-group': '$addGroupButton'
 
     initialize: (options) ->
       super
@@ -38,8 +41,8 @@ define [
     afterRender: ->
       # its trigger will not be rendered yet, set it manually
       @randomlyAssignUsersView.setTrigger @$randomlyAssignMembersLink
-      # pass in a closure to define the focus target within this scope
-      _.extend @randomlyAssignUsersView.options, focusReturnsTo: => @$el.find('.al-trigger')
+      # reassign the trigger for the createView modal if instantiated
+      @createView?.setTrigger @$addGroupButton
 
     toJSON: ->
       json = super
@@ -57,15 +60,20 @@ define [
 
     addGroup: (e) ->
       e.preventDefault()
-      @createView ?= new GroupEditView({groupCategory: @model, editing: false, focusReturnsTo: => @$el.find('.add-group')})
-      new_group = new Group(group_category_id: @model.id)
-      new_group.on 'sync', _.once =>
-        @collection.add(new_group)
-      @createView.model = new_group
-      @createView.toggle()
+      @createView ?= new GroupEditView
+        groupCategory: @model
+        editing: false
+        trigger: @$addGroupButton
+      newGroup = new Group(group_category_id: @model.id)
+      newGroup.on 'sync', _.once =>
+        @collection.add(newGroup)
+      @createView.model = newGroup
+      @createView.open()
 
     editCategory: ->
-      @editCategoryView ?= new GroupCategoryEditView({@model, focusReturnsTo: => @$el.find('.al-trigger')})
+      @editCategoryView ?= new GroupCategoryEditView
+        model: @model
+        trigger: @$editGroupCategoryLink
       @editCategoryView.open()
 
     messageAllUnassigned: (e) ->
@@ -77,11 +85,11 @@ define [
         students = @model.unassignedUsers().map (user)->
           {id: user.get("id"), short_name: user.get("short_name")}
         dialog = new MessageStudentsDialog
+          trigger: @$messageAllUnassignedLink
           context: @model.get 'name'
           recipientGroups: [
             {name: I18n.t('students_who_have_not_joined_a_group', 'Students who have not joined a group'), recipients: students}
           ]
-          focusReturnsTo: => @$el.find('.al-trigger')
         dialog.open()
       users = @model.unassignedUsers()
       # get notified when last page is fetched and then open the dialog

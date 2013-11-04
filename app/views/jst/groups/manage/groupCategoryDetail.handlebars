@@ -2,27 +2,27 @@
   <button class="btn add-group" title="{{#t "add_group"}}Add Group{{/t}}"><i class='icon-plus'></i> {{#t "group"}}Group{{/t}}</button>
   {{#unless protected}}
     <span>
-      <a class="al-trigger btn" role="button" aria-haspopup="true" aria-label="{{#t "settings"}}Settings{{/t}}" href="#">
+      <a id="group-category-{{id}}-actions" class="al-trigger btn" role="button" aria-haspopup="true" aria-label="{{#t "settings"}}Settings{{/t}}" href="#">
         <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
         <span class="screenreader-only">{{#t "category_settings"}}Settings{{/t}}</span>
       </a>
       <ul class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="toolbar-2">
         {{#unless ENV.IS_LARGE_ROSTER}}
            <li>
-             <a href="#" class="icon-email message-all-unassigned">
+             <a href="#" class="icon-email message-all-unassigned" data-focus-returns-to="group-category-{{id}}-actions">
                {{#t "message_all_unassigned_option"}}Message All Unassigned Students{{/t}}
              </a>
            </li>
         {{/unless}}
         {{#if canAssignMembers}}
           <li>
-            <a href="#" class="icon-user randomly-assign-members">
+            <a href="#" class="icon-user randomly-assign-members" data-focus-returns-to="group-category-{{id}}-actions">
               {{#t "randomly_assign_students_option"}}Randomly Assign Students{{/t}}
             </a>
           </li>
         {{/if}}
         <li>
-          <a href="#" class="icon-edit edit-category">
+          <a href="#" class="icon-edit edit-category" data-focus-returns-to="group-category-{{id}}-actions" >
             {{#t "edit_category_option"}}Edit{{/t}}
           </a>
         </li>

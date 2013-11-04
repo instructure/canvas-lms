@@ -1,8 +1,10 @@
 define [
-  'i18n!GrouDetailpView'
+  'i18n!GroupDetailView'
   'Backbone'
+  'compiled/views/groups/manage/GroupEditView'
   'jst/groups/manage/groupDetail'
-], (I18n, {View}, template) ->
+  'compiled/jquery.rails_flash_notifications'
+], (I18n, {View}, GroupEditView, template) ->
 
   class GroupDetailView extends View
 
@@ -11,9 +13,14 @@ define [
 
     template: template
 
+    events:
+      'click .edit-group': 'editGroup'
+      'click .delete-group': 'deleteGroup'
+
     els:
-      '.group-summary': '$summary'
       '.toggle-group': '$toggleGroup'
+      '.al-trigger': '$groupActions'
+      '.edit-group': '$editGroupLink'
 
     attach: ->
       @group.on 'change', @render
@@ -24,6 +31,22 @@ define [
         I18n.t "student_count", "student", count: count
       else
         I18n.t "user_count", "user", count: count
+
+    editGroup: (e) =>
+      e.preventDefault()
+      @editView ?= new GroupEditView
+        model: @group
+      @editView.setTrigger @$editGroupLink
+      @editView.open()
+
+    deleteGroup: (e) =>
+      e.preventDefault()
+      unless confirm I18n.t('delete_confirm', 'Are you sure you want to remove this group?')
+        @$groupActions.focus()
+        return
+      @group.destroy
+        success: -> $.flashMessage I18n.t('flash.removed', 'Group successfully removed.')
+        failure: -> $.flashError I18n.t('flash.removeError', 'Unable to remove the group. Please try again later.')
 
     toJSON: ->
       json = @group.toJSON()

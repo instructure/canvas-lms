@@ -62,14 +62,13 @@ define [
       @editGroupAssignmentView ?= new EditGroupAssignmentView
         collection: @group.collection
         group: @group
-      # configure the dialog view with user specific model data and focus
+      # configure the dialog view with user specific model data
       $target = $(e.currentTarget)
       model = @collection.get($target.data('user-id'))
       @editGroupAssignmentView.model = model
-      focusTarget = @$el.find(".al-trigger[data-user-id='#{model.id}']")
-      @editGroupAssignmentView.focusTarget = focusTarget
-      # open the dialog view
-      @editGroupAssignmentView.toggle();
+      selector = "[data-focus-returns-to='group-#{@group.id}-user-#{model.id}-actions']"
+      @editGroupAssignmentView.setTrigger selector
+      @editGroupAssignmentView.open()
 
     toJSON: ->
       count: @group.usersCount()

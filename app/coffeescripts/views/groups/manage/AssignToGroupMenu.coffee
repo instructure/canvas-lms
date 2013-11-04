@@ -33,8 +33,5 @@ define [
       {
         groups: @collection.toJSON()
         noGroups: !hasGroups
-        allFull: =>
-          hasGroups && @collection.models.filter (g)->
-            !g.isFull()
-          .length == 0
+        allFull: hasGroups and @collection.models.every (g) -> g.isFull()
       }

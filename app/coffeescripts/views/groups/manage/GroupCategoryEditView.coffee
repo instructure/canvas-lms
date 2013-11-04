@@ -33,26 +33,12 @@ define [
     afterRender: ->
       @toggleSelfSignup()
 
-    close: ->
-      super
-      # detach our custom handler from the bound element
-      $(document).off 'keyup', @checkEsc
-      # return focus using the closure from our parent view
-      @options.focusReturnsTo?().focus()
-
     openAgain: ->
       super
       # reset the form contents
       @render()
       # auto-focus the first input
-      @$el.find('input:first').focus()
-      # attach a custom handler because the bound element is outside this view's scope
-      $(document).on 'keyup', @checkEsc
-      # override jQueryUI escKey handler to use our own
-      @$el.dialog("option", "closeOnEscape", false)
-
-    checkEsc: (e) =>
-      @close() if e.keyCode is 27 # escape
+      @$('input:first').focus()
 
     toggleSelfSignup: ->
       disabled = !@$selfSignupToggle.prop('checked')

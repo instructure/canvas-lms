@@ -1,13 +1,10 @@
 define [
-  'i18n!GroupView'
   'underscore'
   'Backbone'
   'jst/groups/manage/group'
   'compiled/views/groups/manage/GroupUsersView'
   'compiled/views/groups/manage/GroupDetailView'
-  'compiled/views/groups/manage/GroupEditView'
-  'compiled/jquery.rails_flash_notifications'
-], (I18n, _, {View}, template, GroupUsersView, GroupDetailView, GroupEditView) ->
+], (_, {View}, template, GroupUsersView, GroupDetailView) ->
 
   class GroupView extends View
 
@@ -29,15 +26,9 @@ define [
 
     events:
       'click .toggle-group': 'toggleDetails'
-      'click .edit-group': 'editGroup'
-      'click .delete-group': 'deleteGroup'
       'click .add-user': 'showAddUser'
       'focus .add-user': 'showAddUser'
       'blur .add-user': 'hideAddUser'
-
-    els:
-      '.group-summary': '$summary'
-      '.al-trigger': '$groupActions'
 
     dropOptions:
       accept: '.group-user'
@@ -50,20 +41,6 @@ define [
       @users = @model.users()
       @model.on 'destroy', @remove, this
       @model.on 'change:members_count', @updateFullState, this
-
-    editGroup: (e) =>
-      e.preventDefault()
-      @editView ?= new GroupEditView({@model, focusReturnsTo: => @$el.find('.al-trigger')})
-      @editView.toggle()
-
-    deleteGroup: (e) =>
-      e.preventDefault()
-      unless confirm I18n.t('delete_confirm', 'Are you sure you want to remove this group?')
-        @$groupActions.focus()
-        return
-      @model.destroy
-        success: -> $.flashMessage I18n.t('flash.removed', 'Group successfully removed.')
-        failure: -> $.flashError I18n.t('flash.removeError', 'Unable to remove the group. Please try again later.')
 
     afterRender: ->
       @$el.toggleClass 'group-expanded', @expanded
