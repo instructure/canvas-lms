@@ -22,7 +22,7 @@ describe "Outcom Reports" do
   before(:each) do
     Notification.find_or_create_by_name("Report Generated")
     Notification.find_or_create_by_name("Report Generation Failed")
-    @account = Account.default
+    @account = Account.create(name: 'New Account', default_time_zone: 'UTC')
     @default_term = @account.enrollment_terms.active.find_or_create_by_name(EnrollmentTerm::DEFAULT_TERM_NAME)
     @course1 = Course.create(:name => 'English 101', :course_code => 'ENG101', :account => @account)
     @course1.sis_source_id = "SIS_COURSE_ID_1"

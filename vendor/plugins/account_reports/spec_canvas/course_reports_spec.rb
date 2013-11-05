@@ -23,7 +23,7 @@ describe "Course Account Reports" do
 
     Notification.find_or_create_by_name("Report Generated")
     Notification.find_or_create_by_name("Report Generation Failed")
-    @account = Account.default
+    @account = Account.create(name: 'New Account', default_time_zone: 'UTC')
     @admin = account_admin_user(:account => @account)
     @default_term = @account.enrollment_terms.active.find_or_create_by_name(
       EnrollmentTerm::DEFAULT_TERM_NAME
@@ -60,10 +60,12 @@ describe "Course Account Reports" do
     @course3.sis_source_id = "SIS_COURSE_ID_3"
     @course3.save!
 
-    @course4 = Course.create(:name => 'self help', :course_code => 'self')
+    @course4 = Course.create(:name => 'self help', :course_code => 'self',
+                             :account => @account)
     @course4.offer
 
-    @course5 = Course.create(:name => 'talking 101', :course_code => 'Tal101')
+    @course5 = Course.create(:name => 'talking 101', :course_code => 'Tal101',
+                             :account => @account)
     @course5.workflow_state = 'completed'
     @course5.save!
   end
