@@ -1,4 +1,5 @@
 define [
+  'i18n!assignments'
   'underscore'
   'compiled/models/AssignmentGroup'
   'compiled/collections/NeverDropCollection'
@@ -6,7 +7,7 @@ define [
   'compiled/views/DialogFormView'
   'jst/assignments/CreateGroup'
   'jst/EmptyDialogFormWrapper'
-], ( _, AssignmentGroup, NeverDropCollection, NeverDropCollectionView, DialogFormView, template, wrapper) ->
+], (I18n, _, AssignmentGroup, NeverDropCollection, NeverDropCollectionView, DialogFormView, template, wrapper) ->
 
   class CreateGroupView extends DialogFormView
     defaults:
@@ -26,6 +27,11 @@ define [
     @optionProperty 'assignmentGroups'
     @optionProperty 'assignmentGroup'
     @optionProperty 'course'
+
+    messages:
+      non_number: I18n.t('non_number', 'You must use a number')
+      positive_number: I18n.t('positive_number', 'You must use a positive number')
+      max_number: I18n.t('higher_than_max', 'You cannot use a number greater than the number of assignments')
 
     initialize: ->
       super
@@ -49,6 +55,24 @@ define [
       delete data.rules.drop_highest if _.contains(["", "0"], data.rules.drop_highest)
       delete data.rules.never_drop if data.rules.never_drop?.length == 0
       data
+
+    validateFormData: (data) ->
+      max = null
+      if @assignmentGroup
+        as = @assignmentGroup.get('assignments')
+        max = as.size() if as?
+      errors = {}
+      _.each data.rules, (value, name) =>
+        val = parseInt(value)
+        field = "rules[#{name}]"
+        if isNaN(val)
+          errors[field] = [{type: 'number', message: @messages.non_number}]
+        if val < 0
+          errors[field] = [{type: 'positive_number', message: @messages.positive_number}]
+        if max?
+          if val > max
+            errors[field] = [{type: 'maximum', message: @messages.max_number}]
+      errors
 
     showWeight: ->
       course = @course or @model.collection?.course

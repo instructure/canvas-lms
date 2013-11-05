@@ -148,6 +148,7 @@ describe "assignment groups" do
 
       course_with_teacher_logged_in(:active_all => true)
       @assignment_group = @course.assignment_groups.create!(:name => "Test Group")
+      @course.assignments.create(:name => "test", :assignment_group => @assignment_group)
 
       get "/courses/#{@course.id}/assignments"
       wait_for_ajaximations
